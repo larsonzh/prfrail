@@ -3,8 +3,10 @@
 > 状态：提案（Proposal），产品设计基线 v0.1（2026-08-28）。本文将 whois 项目中沉淀的
 > AI 无人值守工程实践抽象为独立通用产品，并给出范围、领域模型、架构、安全边界与实施路线。
 >
-> 来源：基于对本仓库 `tools/test/`（约 125 个无人值守脚本）、`testdata/`（V1/Vx 任务定义体系）
-> 与 `docs/`（RFC 与操作流程文档）的实战资产盘点。
+> 来源：基于对 whois 仓库 `tools/test/`（约 125 个无人值守脚本）、`testdata/`（V1/Vx 任务定义体系）
+> 与 `docs/`（RFC 与操作流程文档）的实战资产盘点。本文档脱胎于 whois 仓库 RFC
+> （github.com/larsonzh/whois · docs/RFC-proofrail-unattended-ai-engineering-product.md），
+> whois 中的原始 RFC 保留不动，本文档以本仓库为权威版本。
 >
 > 本文已经按 R1–R22 完成合并审计；各节共同构成同一份设计基线，不再采用“后文覆盖前文”的
 > 补丁式解释。第 9 节记录需求决策，第 10–13 节定义规范性设计，第 14 节是唯一实施路线。
