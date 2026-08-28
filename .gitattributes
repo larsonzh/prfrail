@@ -1,0 +1,2 @@
+# Keep text files LF-normalized across platforms (whois repo convention).
+* text=auto eol=lf

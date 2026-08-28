@@ -1,0 +1,16 @@
+# Go
+/bin/
+*.exe
+*.test
+*.out
+vendor/
+
+# ProofRail runtime state
+/out/
+/tmp/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
