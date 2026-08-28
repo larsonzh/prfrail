@@ -1,4 +1,4 @@
-﻿{
+{
   "$schema": "../context-mode-schema.json",
   "hooks": {
     "PreToolUse": [
