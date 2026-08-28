@@ -12,7 +12,7 @@ ProofRail 让 AI 在无人值守下安全地改代码、跑验证、出证据：
 
 ## 状态
 
-**提案（Proposal）**：本文档对应产品设计基线 v0.1（2026-08-28），实现尚未开始。
+**提案（Proposal）**：本文档对应产品设计基线 v0.1.0（2026-08-28），实现尚未开始。
 设计规范见 [docs/RFC-proofrail-unattended-ai-engineering-product.md](docs/RFC-proofrail-unattended-ai-engineering-product.md)。
 
 ## 快速开始（规划中）
