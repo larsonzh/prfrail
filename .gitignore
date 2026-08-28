@@ -9,6 +9,9 @@ vendor/
 /out/
 /tmp/
 
+# context-mode runtime state
+.github/context-mode/sessions/
+
 # OS / editors
 .DS_Store
 Thumbs.db
