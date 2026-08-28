@@ -11,6 +11,7 @@ vendor/
 
 # context-mode runtime state
 .github/context-mode/sessions/
+.github/hooks/context-mode.json.bak
 
 # OS / editors
 .DS_Store
