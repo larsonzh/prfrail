@@ -7,7 +7,8 @@ vendor/
 
 # ProofRail runtime state
 /out/
-/tmp/
+/tmp/*
+!/tmp/.gitkeep
 
 # context-mode runtime state
 .github/context-mode/sessions/

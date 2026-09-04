@@ -28,6 +28,8 @@
 - Go 代码 `gofmt`；`go build ./...`、`go vet ./...`、`go test ./...` 必须通过。
 - 修改任务链/门禁/证据模型等核心语义前，先读 RFC 对应章节，保持契约与命名一致。
 - `.vscode/scripts/` 在 `.gitignore` 中（不入库），改动仅限本机。
+- 临时/一次性文件放仓库根 `tmp/`（已 gitignore，仅 `tmp/.gitkeep` 保留目录）；
+  **用完立即清除**，不得长期遗留。
 
 ## Git 纪律（硬规则）
 - 默认只推 `origin`（GitHub）；**gitee 仅镜像备份**——未经用户同一轮显式要求，
