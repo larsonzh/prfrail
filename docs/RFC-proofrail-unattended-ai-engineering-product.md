@@ -1346,6 +1346,36 @@ JCS 排序，数组顺序保持；字符串不得在 canonical 前自行 Unicode
 `proofrail:<object-type>:<schema-major>\n` 后接 canonical 字节，避免不同对象类型间重放；具体签名
 receipt 在后续 T002 切片冻结。
 
+##### 16.9.3.1 Canonical 测试向量
+
+以下代码块为展示格式；结束围栏前的换行不属于 canonical 字节。向量 `jcs-001` 的逻辑输入为：
+
+```json
+{
+  "z": [3, 2, 1],
+  "a": {"β": "值", "quote": "\"\\\n"}
+}
+```
+
+其唯一 canonical UTF-8 文本（无 BOM、无尾随换行）为：
+
+```json
+{"a":{"quote":"\"\\\n","β":"值"},"z":[3,2,1]}
+```
+
+对上述 canonical 字节直接计算 SHA-256，结果必须为
+`sha256:d902fc6bb80d7028836660afd1da1edbfdc6876608f8c456dd653c8f4186e0b1`。
+
+向量 `state-event-001` 的内层 event canonical UTF-8 文本为：
+
+```json
+{"actor":{"id":"proofrail","type":"system"},"entity":{"kind":"chain","runId":"run-001"},"eventId":"event-001","fromState":"NONE","inputEvidence":[],"occurredAt":"2026-09-06T12:34:56.789Z","previousEventHash":null,"reason":{"code":"run-created"},"runId":"run-001","sequence":1,"toState":"CREATED"}
+```
+
+SHA-256 输入必须严格为 ASCII `proofrail:state-event:1\n`（其中 `\n` 是单个 LF 字节 `0x0a`）后接
+上述 canonical UTF-8 字节，不得插入 BOM、空格或额外换行；`eventHash` 必须为
+`sha256:522dd307620e8aad5598045aba6a29d5bcbf60c8ff2d0945c70c4b480aa9502e`。
+
 #### 16.9.4 路径与平台边界
 
 Schema 中受管相对路径使用 `/`、不得为空/绝对、不得含 `.`/`..` 段、NUL、反斜杠或 URI；先按输入字符

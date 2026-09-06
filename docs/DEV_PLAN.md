@@ -28,8 +28,9 @@ T001 状态：`COMPLETE`。本次仅批准 S0 规格冻结并允许进入 T002�
 - [ ] T003 [Plan:P0.2] 建立 `testdata/contracts/{valid,invalid}/`、`tools/contracts/` 独立 validator/语义 fixture oracle，纳入三任务、四 kind、双/三语言、handoff、doc/waiver、各 receipt/manifest；依赖：T002；验收：AT-01 正反例及 RFC §17.2/4/9-12；禁止：让未来候选自己生成 expected 结果。
 
 T002 状态：`IN_PROGRESS`。已冻结共同版本/ID/路径/JCS/UTF-8 规则，并建立 chain、hook、target、
-workspace、state-event 五份 Draft 2020-12 结构 Schema；单记录状态转换已冻结，尚待 canonical 测试向量、
-跨事件 checker、错误码、队列、其余持久对象及 ADR-004。T003 独立 validator/语义 checker 与正反 golden 尚未执行，因此不得标记 T002、AT-01
+workspace、state-event 五份 Draft 2020-12 结构 Schema；首批 canonical 向量与单记录状态转换已冻结，
+尚待跨事件 checker、错误码、队列、其余持久对象及 ADR-004。T003 独立 validator/语义 checker、向量
+fixture 与正反 golden 尚未执行，因此不得标记 T002、AT-01
 或 RFC §17.2 完成。
 
 T001 同时评审 ADR-008 与 PC-01–PC-06 新增工作量；T002 冻结 RFC §19 的授权/预览/导出/副作用/成本/备份记录；T003 增加对应独立正反黄金样例，覆盖 §17.13。此处只冻结契约，不提前执行 S1 验收。

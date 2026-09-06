@@ -55,6 +55,10 @@ profile 只提供默认值；task 显式值覆盖链默认；step 显式值覆�
 父 snapshot、hook 摘要、adapter/harness 版本和已授权策略绑定 run。变更配置只能新建 run，或走 RFC
 明确的暂停、审批和新 manifest 流程；不能覆盖旧事实。
 
+RFC §16.9.3.1 已冻结 `jcs-001` 与 `state-event-001` 两条字节级向量，分别覆盖 JCS 排序/转义/Unicode
+及 state-event 域分隔摘要。T003 仍须把它们固化为独立 fixture，并以非核心实现复算；文档中的摘要值
+不能替代独立 validator 证据。
+
 ## 4. 快照、证据与接受事务
 
 捕获输入：相对路径、文件类型/权限、内容摘要、包/锁文件、环境描述、排除规则和未提交文件事实（Git 元数据仅显式启用）。原始文件字节用于内容哈希，不把 BOM/行尾转换偷偷混入捕获。路径分隔符、排序、Unicode、保留名、大小写、symlink/reparse/hardlink 规则由 ADR-002 冻结并以跨平台 goldens 验证。

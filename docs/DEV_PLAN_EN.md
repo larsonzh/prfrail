@@ -28,9 +28,10 @@ T001 status: `COMPLETE`. This approves only S0 specification freeze and allows T
 - [ ] T003 [Plan:P0.2] Create testdata/contracts/{valid,invalid}/ and tools/contracts/ independent validator/semantic fixture oracle: three tasks, four kinds, dual/triple language, handoff, docs/waiver and all receipts/manifests. Depends: T002. Accept: AT-01 and section 17.2/4/9-12. Exclude: candidate-generated expected results.
 
 T002 status: `IN_PROGRESS`. Common version, ID, path, JCS and UTF-8 rules are frozen, with five Draft 2020-12
-structural schemas for chain, hook, target, workspace and state-event. Single-record transitions are frozen; canonical test
-vectors, the cross-event checker, error codes, queue, remaining persistent objects and ADR-004 are still pending. T003's independent validator/semantic checker and positive/
-negative goldens have not run, so T002, AT-01 and RFC section 17.2 must not be marked complete.
+structural schemas for chain, hook, target, workspace and state-event. Initial canonical vectors and single-record transitions
+are frozen; the cross-event checker, error codes, queue, remaining persistent objects and ADR-004 are still pending. T003's
+independent validator/semantic checker, vector fixtures and positive/negative goldens have not run, so T002, AT-01 and RFC
+section 17.2 must not be marked complete.
 
 T001 also reviews ADR-008 and PC-01–PC-06 workload/budgets. T002 freezes RFC section 19 authorization/preview/export/effect/cost/backup records; T003 adds independent positive/negative goldens for gate 17.13. This freezes contracts, not S1 runtime acceptance.
 

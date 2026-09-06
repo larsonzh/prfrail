@@ -44,6 +44,8 @@ Profiles provide defaults only; explicit task values override chain defaults; ex
 
 After resolution, apply RFC 8785 JCS and hash the UTF-8 no-BOM bytes with SHA-256; represent the digest as `sha256:` plus 64 lowercase hexadecimal digits. Heartbeats, credentials and machine probes never rewrite user config. Bind parent snapshot, hook digests, adapter/harness versions and authorized policy. Changes require a new run or the RFC's pause/approval/new-manifest flow, never overwriting historical facts.
 
+RFC section 16.9.3.1 freezes two byte-level vectors, `jcs-001` and `state-event-001`, covering JCS ordering/escaping/Unicode and the state-event domain-separated digest. T003 must still preserve them as independent fixtures and recompute them with a non-core implementation; documented digest values are not independent-validator evidence.
+
 ## 4. Snapshots, Evidence and Acceptance
 
 Capture relative path, type/permissions, content hash, package/lock files, environment description, exclusions and uncommitted-file facts (Git metadata only when explicitly enabled). Hash original file bytes without hidden BOM/EOL conversion. ADR-002 must freeze path separators, ordering, Unicode, reserved names, case, symlinks/reparse points/hardlinks with cross-platform goldens.
