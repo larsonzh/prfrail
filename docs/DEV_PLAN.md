@@ -29,9 +29,9 @@ T001 状态：`COMPLETE`。本次仅批准 S0 规格冻结并允许进入 T002�
 
 T002 状态：`IN_PROGRESS`。已冻结共同版本/ID/路径/JCS/UTF-8 规则，并建立 chain、hook、target、
 workspace、state-event、error、adapter-envelope、adapter-receipt、snapshot-manifest、evidence-manifest、
-review-receipt、promotion-receipt、handoff-receipt 十三份 Draft 2020-12 结构 Schema；首批 canonical 向量、单记录状态转换、错误分类/CLI 退出码、
+review-receipt、promotion-receipt、handoff-receipt、hook-result 十四份 Draft 2020-12 结构 Schema；首批 canonical 向量、单记录状态转换、错误分类/CLI 退出码、
 文件队列 framing/claim/result/dispatch/takeover receipt、快照边界、评审前证据根及 approve/reject/waive
-评审结论和原子 promotion reader contract、manual-handoff step 判别分支与归还 receipt 已冻结，尚待跨事件/跨记录 checker、具体错误目录/主次规则、签名 receipt、
+评审结论和原子 promotion reader contract、manual-handoff step 判别分支与归还 receipt、hook 执行事实/门禁判断/策略处置分层已冻结，尚待跨事件/跨记录 checker、具体错误目录/主次规则、签名 receipt、
 其余持久对象及 ADR-004 能力实测。T003 独立 validator/语义 checker、向量
 fixture 与正反 golden 尚未执行，因此不得标记 T002、AT-01
 或 RFC §17.2 完成。

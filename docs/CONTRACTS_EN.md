@@ -37,8 +37,8 @@ Each persistent object has an independent `schemaVersion`, distinct from CLI and
 
 Separate three validators: JSON Schema for structure; semantic checker for references, ownership, cycles and static policy; runtime gates for diffs, processes, capabilities, secrets, budgets and review. Each invalid golden identifies its rejection layer; JSON Schema cannot check live files or processes.
 
-Thirteen structural Schemas for chain, hook, target, workspace, state-event, error, adapter-envelope, adapter-receipt,
-snapshot-manifest, evidence-manifest, review-receipt, promotion-receipt and handoff-receipt now exist under `schemas/`;
+Fourteen structural Schemas for chain, hook, target, workspace, state-event, error, adapter-envelope, adapter-receipt,
+snapshot-manifest, evidence-manifest, review-receipt, promotion-receipt, handoff-receipt and hook-result now exist under `schemas/`;
 T003 still needs to
 create `testdata/contracts/valid/` and `testdata/contracts/invalid/` and execute them with an independent validator. Each
 fixture records ID, contract version, expected accept/reject, rejection layer and reason. Include three tasks, all four kinds,
@@ -100,7 +100,12 @@ isolated-workspace: direct tool writes stay in a disposable run directory, with 
 
 Kinds are precheck/build/test/verify/review/cleanup, executed in order. executable plus args uses no implicit shell; cwd stays in the authorized workspace. Explicit environment allowlist, default-deny network and enforceable resource/output/time limits are required. shell/container/remote/PTY are declared capabilities: reject unsupported requirements instead of weakening policy.
 
-Results prove hook identity/digest, start/end, exit status, stdout/stderr summary, artifact references/hashes, policy and failure reason; exact wire fields freeze in schemas. Startup failure, timeout, unstoppable processes, missing artifacts and scan failure differ from exit 0. warn continues only with explicit nonblocking policy and is not PASS; retry(n) spends shared budgets; cleanup failure cannot erase the primary failure.
+`hook-result.schema.json` separates `executionOutcome` (runner fact), `assessment` (gate verdict) and
+`policyDisposition` (subsequent control flow), while binding the hook definition, execution ordinal, timing, exit code,
+stdout/stderr, artifacts, runner/termination proof and error evidence. Startup failure, timeout, resource enforcement,
+unstoppable processes, missing artifacts and scan failure have distinct failureKind values. warn remains failed and is not
+PASS; retry spends shared budgets; cleanup failure cannot erase the primary failure. The checker/runtime owns cross-record
+references, actual artifacts, sufficient scan/termination proof and retry budgets.
 
 Generated hook A uses locked templates, syntax/template/dependency/dangerous-capability checks, independent approval and hash-bound mounting. Disabled by default. The generator cannot alter its validator or approve itself. Arbitrary generated scripts B stay outside S1.
 

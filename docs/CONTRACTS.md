@@ -43,7 +43,7 @@ UTF-8 无 BOM + LF；canonical 字节还不得含格式空白或尾随换行。�
 三层检查不可合并：JSON Schema 判结构；语义 checker 判引用、所有权、循环、静态策略；运行期 gate 判文件 diff、进程、能力、秘密、预算与评审。非法黄金样例标注拒绝层，不能声称 JSON Schema 会检查实际文件或进程。
 
 `schemas/` 已创建 chain、hook、target、workspace、state-event、error、adapter-envelope、adapter-receipt、
-snapshot-manifest、evidence-manifest、review-receipt、promotion-receipt、handoff-receipt 十三份结构 Schema；`testdata/contracts/valid/` 与
+snapshot-manifest、evidence-manifest、review-receipt、promotion-receipt、handoff-receipt、hook-result 十四份结构 Schema；`testdata/contracts/valid/` 与
 `testdata/contracts/invalid/` 仍待 T003 创建并由独立 validator 执行。每例携带 fixture ID、契约版本、
 expected accept/reject、拒绝层和原因。必须含三任务链、四 kind、C+Go、C+JavaScript+Python、人工交接、
 代码文档协同；每一条件至少一正一反。文档中的路径/片段是设计输入，不是已验证可运行样例。
@@ -103,7 +103,11 @@ isolated-workspace：直接工具写入仅限可丢弃运行目录；记录完�
 
 kind 使用 precheck/build/test/verify/review/cleanup；按序执行。`executable + args[]` 不经过隐式 shell，cwd 必须落在授权运行工作区；环境继承白名单，网络默认拒绝，资源/输出/时长必须可执行限制。需要 shell/container/remote/PTY 是独立能力声明，不支持则拒绝而非弱化策略。
 
-结果至少证明 hook 身份/摘要、起止、退出状态、stdout/stderr 摘要、产物引用/哈希、策略及失败原因；确切 wire 字段在 schema 冻结。启动失败、超时、进程无法停止、产物缺失、扫描失败不同于 exit 0。`warn` 只有显式非阻断策略才能继续且不得冒充 PASS；retry(n) 消耗统一预算；cleanup 失败不能抹去原失败。
+`hook-result.schema.json` 分离 `executionOutcome`（runner 事实）、`assessment`（门禁判断）与
+`policyDisposition`（后续控制流），并绑定 hook 定义、执行序号、起止、退出码、stdout/stderr、产物、runner/
+停机及错误证据。启动失败、超时、资源终止、进程无法停止、产物缺失和扫描失败均有独立 failureKind；
+`warn` 仍为 failed 且不得冒充 PASS，retry 消耗统一预算，cleanup 失败不能抹去原失败。跨记录引用、实际
+产物、扫描/停机充分性与重试预算由 checker/runtime 判定。
 
 生成 hook A：只从锁定模板生成参数化命令→语法/模板/依赖/危险能力校验→独立批准→哈希绑定挂载。generated 默认禁用；生成器不能修改自己的验证规则或批准自己。任意生成脚本 B 不进入 S1。
 

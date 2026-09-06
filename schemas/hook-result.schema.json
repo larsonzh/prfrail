@@ -1,0 +1,325 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://proofrail.dev/schemas/v1/hook-result.schema.json",
+  "title": "ProofRail hook execution result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "result", "resultHash"],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "result": {
+      "$ref": "#/$defs/result"
+    },
+    "resultHash": {
+      "$ref": "#/$defs/sha256"
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$"
+    },
+    "mediaType": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 127,
+      "pattern": "^[a-z0-9][a-z0-9!#$&^_.+-]*/[a-z0-9][a-z0-9!#$&^_.+-]*$"
+    },
+    "hashSet": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/sha256"
+      }
+    },
+    "nonemptyHashSet": {
+      "$ref": "#/$defs/hashSet",
+      "minItems": 1
+    },
+    "systemActor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id"],
+      "properties": {
+        "type": {
+          "const": "system"
+        },
+        "id": {
+          "$ref": "#/$defs/id"
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["objectHash", "byteLength", "capture", "redaction"],
+      "properties": {
+        "objectHash": {
+          "$ref": "#/$defs/sha256"
+        },
+        "byteLength": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "capture": {
+          "enum": ["complete", "truncated"]
+        },
+        "redaction": {
+          "enum": ["not-required", "passed"]
+        }
+      }
+    },
+    "nullableOutput": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/output"
+        }
+      ]
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "objectHash", "mediaType", "byteLength", "redaction"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "objectHash": {
+          "$ref": "#/$defs/sha256"
+        },
+        "mediaType": {
+          "$ref": "#/$defs/mediaType"
+        },
+        "byteLength": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "redaction": {
+          "enum": ["not-required", "passed"]
+        }
+      }
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "resultId",
+        "recordedBy",
+        "runId",
+        "taskId",
+        "stepId",
+        "attempt",
+        "hookId",
+        "hookDefinitionHash",
+        "executionAttempt",
+        "attemptedAt",
+        "startedAt",
+        "finishedAt",
+        "executionOutcome",
+        "exitCode",
+        "assessment",
+        "failureKind",
+        "policyDisposition",
+        "stdout",
+        "stderr",
+        "artifacts",
+        "runnerEvidence",
+        "terminationEvidence",
+        "errorEvidence"
+      ],
+      "properties": {
+        "resultId": {"$ref": "#/$defs/id"},
+        "recordedBy": {"$ref": "#/$defs/systemActor"},
+        "runId": {"$ref": "#/$defs/id"},
+        "taskId": {"$ref": "#/$defs/id"},
+        "stepId": {"$ref": "#/$defs/id"},
+        "attempt": {"type": "integer", "minimum": 1},
+        "hookId": {"$ref": "#/$defs/id"},
+        "hookDefinitionHash": {"$ref": "#/$defs/sha256"},
+        "executionAttempt": {"type": "integer", "minimum": 1},
+        "attemptedAt": {"$ref": "#/$defs/timestamp"},
+        "startedAt": {
+          "oneOf": [
+            {"type": "null"},
+            {"$ref": "#/$defs/timestamp"}
+          ]
+        },
+        "finishedAt": {"$ref": "#/$defs/timestamp"},
+        "executionOutcome": {
+          "enum": ["exited", "start-failed", "timed-out", "resource-limited", "termination-uncertain"]
+        },
+        "exitCode": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "integer"}
+          ]
+        },
+        "assessment": {
+          "enum": ["passed", "failed"]
+        },
+        "failureKind": {
+          "oneOf": [
+            {"type": "null"},
+            {
+              "enum": [
+                "exit-nonzero",
+                "start-failed",
+                "timed-out",
+                "resource-limited",
+                "termination-uncertain",
+                "artifact-missing",
+                "scan-failed"
+              ]
+            }
+          ]
+        },
+        "policyDisposition": {
+          "enum": ["pass", "fail-stop", "warn", "manual", "retry"]
+        },
+        "stdout": {"$ref": "#/$defs/nullableOutput"},
+        "stderr": {"$ref": "#/$defs/nullableOutput"},
+        "artifacts": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/artifact"}
+        },
+        "runnerEvidence": {"$ref": "#/$defs/nonemptyHashSet"},
+        "terminationEvidence": {"$ref": "#/$defs/hashSet"},
+        "errorEvidence": {"$ref": "#/$defs/hashSet"}
+      },
+      "allOf": [
+        {
+          "oneOf": [
+            {
+              "properties": {
+                "executionOutcome": {"const": "exited"},
+                "exitCode": {"type": "integer"},
+                "startedAt": {"$ref": "#/$defs/timestamp"},
+                "terminationEvidence": {"maxItems": 0}
+              }
+            },
+            {
+              "properties": {
+                "executionOutcome": {"const": "start-failed"},
+                "exitCode": {"type": "null"},
+                "startedAt": {"type": "null"},
+                "terminationEvidence": {"maxItems": 0}
+              }
+            },
+            {
+              "properties": {
+                "executionOutcome": {
+                  "enum": ["timed-out", "resource-limited", "termination-uncertain"]
+                },
+                "exitCode": {"type": "null"},
+                "startedAt": {"$ref": "#/$defs/timestamp"},
+                "terminationEvidence": {"minItems": 1}
+              }
+            }
+          ]
+        },
+        {
+          "oneOf": [
+            {
+              "properties": {
+                "assessment": {"const": "passed"},
+                "executionOutcome": {"const": "exited"},
+                "exitCode": {"const": 0},
+                "failureKind": {"type": "null"},
+                "policyDisposition": {"const": "pass"},
+                "stdout": {"$ref": "#/$defs/output"},
+                "stderr": {"$ref": "#/$defs/output"},
+                "errorEvidence": {"maxItems": 0}
+              }
+            },
+            {
+              "properties": {
+                "assessment": {"const": "failed"},
+                "failureKind": {
+                  "enum": [
+                    "exit-nonzero",
+                    "start-failed",
+                    "timed-out",
+                    "resource-limited",
+                    "termination-uncertain",
+                    "artifact-missing",
+                    "scan-failed"
+                  ]
+                },
+                "policyDisposition": {
+                  "enum": ["fail-stop", "warn", "manual", "retry"]
+                },
+                "errorEvidence": {"minItems": 1}
+              }
+            }
+          ]
+        },
+        {
+          "oneOf": [
+            {
+              "properties": {
+                "failureKind": {"type": "null"}
+              }
+            },
+            {
+              "properties": {
+                "failureKind": {"const": "exit-nonzero"},
+                "executionOutcome": {"const": "exited"},
+                "exitCode": {
+                  "type": "integer",
+                  "not": {"const": 0}
+                }
+              }
+            },
+            {
+              "properties": {
+                "failureKind": {"const": "start-failed"},
+                "executionOutcome": {"const": "start-failed"}
+              }
+            },
+            {
+              "properties": {
+                "failureKind": {"const": "timed-out"},
+                "executionOutcome": {"const": "timed-out"}
+              }
+            },
+            {
+              "properties": {
+                "failureKind": {"const": "resource-limited"},
+                "executionOutcome": {"const": "resource-limited"}
+              }
+            },
+            {
+              "properties": {
+                "failureKind": {"const": "termination-uncertain"},
+                "executionOutcome": {"const": "termination-uncertain"}
+              }
+            },
+            {
+              "properties": {
+                "failureKind": {
+                  "enum": ["artifact-missing", "scan-failed"]
+                },
+                "executionOutcome": {"const": "exited"}
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1787,6 +1787,51 @@ manifest 和二者之间的最终 diff；三者对全部 outcome 均必填，因
 属于该 step 的 `hooksAfterReturn`，均由 checker 判定。哈希只证明完整性，不证明操作员身份或人工判断
 正确性。
 
+#### 16.9.17 Hook result
+
+`hook-result.schema.json` 冻结一次 hook 执行及其门禁判断，不把进程退出、门禁通过与后续控制流混为一个
+状态。根对象只含 `schemaVersion="1.0.0"`、`result` 与 `resultHash`；resultHash 不参与自身摘要，以
+ASCII 域 `proofrail:hook-result:1\n` 后接内层 result 的 JCS canonical 字节计算 SHA-256。
+
+内层 result 必含 `resultId/recordedBy/runId/taskId/stepId/attempt/hookId/hookDefinitionHash/
+executionAttempt/attemptedAt/startedAt/finishedAt/executionOutcome/exitCode/assessment/failureKind/
+policyDisposition/stdout/stderr/artifacts/runnerEvidence/terminationEvidence/errorEvidence`。
+`recordedBy.type` 固定为 `system`；`hookDefinitionHash` 绑定本次实际采用的完整 hook 定义，
+`executionAttempt` 从 1 开始且只表示同一 task attempt 内该 hook 的首次运行或策略重试，不能重置任务级
+共享预算。attemptedAt 记录启动尝试，startedAt 在进程或容器未成功启动时为 null，finishedAt 记录核心
+完成结果定型的时间。
+
+`executionOutcome` 只描述 runner 可观察事实：`exited|start-failed|timed-out|resource-limited|
+termination-uncertain`。只有 exited 可携带整数 `exitCode`，其余 outcome 必须为 null；timed-out 与
+resource-limited 即使停止后可观察到平台退出码，也不得伪装成正常 exited。termination-uncertain 表示
+无法证明进程树或容器已经停止，必须暂停并隔离工作区。`runnerEvidence` 至少一项，绑定实际 runner
+身份/镜像摘要、规范化 argv/entrypoint、cwd、环境 allowlist、网络与资源策略及平台能力证据；
+`terminationEvidence` 对 timed-out/resource-limited/termination-uncertain 必须至少一项，对 exited/
+start-failed 必须为空。
+
+`assessment` 只为 `passed|failed`，`failureKind` 与 `policyDisposition` 由它判别：
+
+- passed 要求 executionOutcome=exited、exitCode=0、failureKind=null、policyDisposition=pass、
+  errorEvidence 为空，stdout/stderr 均有已完成 secret scan/脱敏的对象引用，并且所有声明的必需产物均已
+  收集、扫描和哈希。
+- failed 要求 failureKind 为 `exit-nonzero|start-failed|timed-out|resource-limited|
+  termination-uncertain|artifact-missing|scan-failed` 之一，policyDisposition 为
+  `fail-stop|warn|manual|retry` 之一，errorEvidence 至少一项。failureKind 必须与 executionOutcome、
+  exitCode 及后处理事实一致；例如 exited/0 仍可因 artifact-missing 或 scan-failed 而失败。
+
+stdout/stderr 各为 null 或含 `objectHash/byteLength/capture/redaction` 的严格对象；capture 为
+`complete|truncated`，redaction 为 `not-required|passed`。不能安全归档或扫描未完成的流必须为 null，
+并以 scan-failed 错误证据说明，不得把原始秘密写入 result/error。每个 artifact 含稳定 `id`、
+`objectHash/mediaType/byteLength/redaction`；数组为空表示本次没有可归档产物，而不是自动证明声明产物
+已满足。`warn` 只允许失败后继续调度，assessment 仍为 failed 且不得用于 PASS；retry 只表示已批准
+再次运行该 hook，不能证明重试已发生；cleanup 的失败 result 独立追加，不能覆盖先前主失败。
+
+Schema 只检查单条 result 的判别形状。checker 负责验证时间顺序、hookDefinitionHash 与 task/step 的
+hook 引用、runnerEvidence 对实际 runner 与策略的闭包、声明产物与 artifacts 的匹配、输出大小限制、
+扫描证明、terminationEvidence 的平台充分性、onFail 与 policyDisposition 的一致性、重试序号及共享
+预算，以及同一 `runId/taskId/attempt/hookId/executionAttempt` 只有一个 resultHash。哈希只证明内容
+完整性，不证明 runner 真正执行或证据采集可信。
+
 ---
 
 ## 17. S0 实施就绪门禁
