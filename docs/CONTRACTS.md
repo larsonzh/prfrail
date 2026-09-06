@@ -6,7 +6,7 @@
 
 ## 1. 契约成熟度与兼容
 
-下表“必须”均来自 RFC；“待冻结”是生产实现阻断项。T002 第一切片已建立 `schemas/chain.schema.json`，
+下表“必须”均来自 RFC；“待冻结”是生产实现阻断项。T002 已建立首批结构 Schema，
 但本文不是完整 JSON Schema，也不能代替独立 validator。新增 wire 字段、枚举、canonical 算法和错误码
 必须先经 [ADR](ADR_REGISTER.md) 更新 RFC，再建立 Schema 与正反黄金样例，最后写 Go 代码。
 
@@ -34,13 +34,14 @@ UTF-8 无 BOM + LF；canonical 字节还不得含格式空白或尾随换行。�
 | hook | 独立严格注册表；process/container 判别联合、逐项参数、失败/超时/资源/网络/产物策略 | ID/引用、工具摘要与能力由 checker/preflight 判定；执行结果进入 receipt |
 | target | 独立严格注册表；稳定 id、class、access、唯一路径 glob；generated 单向来源 | 越界、重叠写、循环生成、未知引用由 checker 拒绝 |
 | component/language scope | component root；scope 的 language/harness/toolchain/target ID；依赖；step 取 scope 交集 | ID 唯一、引用存在、无环、harness 可用；同 root 允许不同唯一 target 所有者 |
+| state event | append-only envelope；chain/task/step 实体；严格前后状态；序号、前序 hash、证据与原因 | 跨事件序号/hash/实体状态连续性、主体授权和证据存在性由 checker 判定 |
 | documentation | required/if-affected/optional/forbidden；impactRules | 命中规则缺有效 doc diff、生成物陈旧拒绝；空白/mtime 不算更新 |
 | handoff | execution、允许写范围、inputPolicy、deadline、returnActions、hooksAfterReturn | 单写租约、停机、新鲜 manifest；归还后复检不能由 Schema 单独判定 |
 | review/waiver | approve/reject/waive；主体、原因、策略依据、有效期、绑定候选 | 同主体自批、过期、候选变化、范围不符均阻断 |
 
 三层检查不可合并：JSON Schema 判结构；语义 checker 判引用、所有权、循环、静态策略；运行期 gate 判文件 diff、进程、能力、秘密、预算与评审。非法黄金样例标注拒绝层，不能声称 JSON Schema 会检查实际文件或进程。
 
-`schemas/` 已创建 chain、hook、target、workspace 四份结构 Schema；`testdata/contracts/valid/` 与
+`schemas/` 已创建 chain、hook、target、workspace、state-event 五份结构 Schema；`testdata/contracts/valid/` 与
 `testdata/contracts/invalid/` 仍待 T003 创建并由独立 validator 执行。每例携带 fixture ID、契约版本、
 expected accept/reject、拒绝层和原因。必须含三任务链、四 kind、C+Go、C+JavaScript+Python、人工交接、
 代码文档协同；每一条件至少一正一反。文档中的路径/片段是设计输入，不是已验证可运行样例。

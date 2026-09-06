@@ -362,10 +362,10 @@ ProofRail 首版不是代码托管平台、CI 服务、通用项目管理工具�
     尚未成为 PASS。评审门禁（gate kind=`review`）输入任务证据包（变更清单、门禁结果、
     产物哈希），输出 `approve` / `reject` / `waive`；只有接受后才原子发布 `snapshot-i`
     并把任务标记为 `PASSED`。拒绝进入修复或终止，不得供下一任务使用。
-  2. 评审对象默认**代理/人工**：策略 `review.mode=auto|manual|hybrid`：
-     - `auto`：低风险任务（无源码变更、纯验证）可自动通过；
-     - `manual`：每任务要求用户批准；
-     - `hybrid`（默认）：按风险规则（变更文件数、严重级门禁失败数、是否触网）自动放行或暂停等待。
+    2. 评审模式为 `review=manual|policy`：
+      - `manual`：每任务要求独立用户批准；
+      - `policy`：仅由预先批准且哈希绑定的确定性风险策略产生结论，不能由执行 agent 自批。
+      配置向导可按 profile 建议模式，但 run manifest 必须展开为上述 wire 值，不保留 `auto|hybrid` 别名。
   3. 评审记录（review receipt）作为证据写入链档案，与任务快照捆绑；`waive` 必须记录授权主体、
     原因、策略依据和有效期，不得等价于匿名自动批准。
 - **结论**：采纳（P0）。
@@ -725,7 +725,7 @@ prfrail baseline snapshot        # 确立 baseline-0（只读产物项目）
 prfrail run <chain-file>          # 顺序执行 T1..Tn
   ┌─ Ti 开始：恢复 snapshot-(i-1)
   ├─ 执行：按序运行 steps[]（code/build/verify/noop）
-  ├─ 技术通过：生成候选快照 → 评审(auto/manual/hybrid)
+  ├─ 技术通过：生成候选快照 → 评审(manual/policy)
   ├─ 评审接受：原子发布 snapshot-i + PASS receipt
   │    FAIL：证据包 + 票据（修复循环，遵守预算/边界，fail-close）
   └─ Ti+1 …
@@ -1443,6 +1443,41 @@ hook receipt。`warn`、重试消耗、进程树终止和 artifact 捕获是否�
 Workspace Schema 只冻结拓扑和引用形状，不证明 harness/toolchain 已安装、target 实际匹配文件、依赖图
 无环或传输可用；这些分别属于 checker 和 capability preflight。多语言事务仍以整个 task 接受或回滚，
 不能按 component/language scope 部分发布。
+
+#### 16.9.8 状态事件与转换表
+
+`state-event.schema.json` 冻结 append-only 状态日志的单条记录。记录根对象只含 `schemaVersion`、`event`
+和 `eventHash`；`eventHash` 是对内层 `event` 按第 16.9.3 节 canonical 后，以域分隔符
+`proofrail:state-event:1\n` 计算的 SHA-256。它不参与自身摘要；下一条记录在内层引用该值。
+
+内层 event 必须包含：
+
+- `eventId`、`runId`、run 全局 `sequence`（从 1 开始严格递增）、`occurredAt`、`actor`、`entity`、
+  `fromState`、`toState`、`previousEventHash`、`inputEvidence` 和 `reason`；未知字段拒绝。
+- `eventId`/`runId` 使用基础 ID。`sequence=1` 时 `previousEventHash` 必须为 null，且只能表示 chain
+  `NONE→CREATED`；后续序号必须引用前一记录的 `eventHash`。`inputEvidence` 是唯一摘要数组，可为空。
+- `actor={type,id}`，type 为 `system|operator|agent|policy`；id 是稳定 ID，不存显示名或秘密。
+  `reason={code,message?}`，code 使用稳定 ID，message 仅供诊断且最长 1024 字符，不能作为状态判定依据。
+- `entity` 是严格判别联合：chain 含 `kind=chain,runId`；task 另含 `taskId,attempt`；step 再含
+  `stepId`。attempt 为从 1 开始的整数；runId 必须与事件顶层 runId 相同，由 checker 判定。
+
+Schema 只接受以下单步转换；未列出的转换全部拒绝：
+
+| 实体 | 合法转换 |
+|---|---|
+| chain | `NONE→CREATED`；`CREATED→BASELINED|FAILED|CANCELLED`；`BASELINED→RUNNING|FAILED|CANCELLED`；`RUNNING→PAUSED|COMPLETED|FAILED|CANCELLED`；`PAUSED→RUNNING|FAILED|CANCELLED` |
+| task | `NONE→PENDING`；`PENDING→PRECHECK|FAILED|CANCELLED`；`PRECHECK→STEPS_RUNNING|FAILED|CANCELLED`；`STEPS_RUNNING→WAITING_FOR_OPERATOR|REVIEW_PENDING|FAILED|CANCELLED`；`WAITING_FOR_OPERATOR→STEPS_RUNNING|FAILED|CANCELLED`；`REVIEW_PENDING→PASSED|REPAIR_PENDING|FAILED|CANCELLED`；`FAILED→REPAIR_PENDING`；`REPAIR_PENDING→STEPS_RUNNING|FAILED|CANCELLED` |
+| step | `NONE→PENDING`；`PENDING→RUNNING|NOOP_RECORDED|FAILED|CANCELLED`；`RUNNING→WAITING_FOR_OPERATOR|PASSED|FAILED|CANCELLED`；`WAITING_FOR_OPERATOR→RUNNING|FAILED|CANCELLED` |
+
+`NONE` 只是事件创建哨兵，不是投影可停留状态。`COMPLETED`、`PASSED`、`NOOP_RECORDED` 和
+`CANCELLED` 是终态；chain/task 的 `FAILED` 只有表中明确列出的 repair 转换可离开，step `FAILED` 不原地
+重跑，修复必须创建新 attempt 的 step 投影。相同状态的自转换禁止；心跳、进度和诊断是其他事件类型，
+不得伪装为状态转换。
+
+JSON Schema 可判单条记录的实体形状、首事件约束和合法状态对，但不能证明 sequence 无缺口、previous
+哈希指向紧邻记录、投影当前状态等于 fromState、同一 run 只有一个 genesis，或 actor 有权执行转换；
+这些由独立日志 checker 重放判定。状态 event 不等于 review、handoff、takeover 或 promotion receipt，
+后者必须提供各自授权与对象绑定字段。
 
 ---
 

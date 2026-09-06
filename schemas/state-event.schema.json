@@ -1,0 +1,332 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://proofrail.dev/schemas/v1/state-event.schema.json",
+  "title": "ProofRail append-only state event record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "event", "eventHash"],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "event": {
+      "$ref": "#/$defs/event"
+    },
+    "eventHash": {
+      "$ref": "#/$defs/sha256"
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$"
+    },
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id"],
+      "properties": {
+        "type": {
+          "enum": ["system", "operator", "agent", "policy"]
+        },
+        "id": {
+          "$ref": "#/$defs/id"
+        }
+      }
+    },
+    "reason": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code"],
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/id"
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        }
+      }
+    },
+    "chainEntity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "runId"],
+      "properties": {
+        "kind": {
+          "const": "chain"
+        },
+        "runId": {
+          "$ref": "#/$defs/id"
+        }
+      }
+    },
+    "taskEntity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "runId", "taskId", "attempt"],
+      "properties": {
+        "kind": {
+          "const": "task"
+        },
+        "runId": {
+          "$ref": "#/$defs/id"
+        },
+        "taskId": {
+          "$ref": "#/$defs/id"
+        },
+        "attempt": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "stepEntity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "runId", "taskId", "stepId", "attempt"],
+      "properties": {
+        "kind": {
+          "const": "step"
+        },
+        "runId": {
+          "$ref": "#/$defs/id"
+        },
+        "taskId": {
+          "$ref": "#/$defs/id"
+        },
+        "stepId": {
+          "$ref": "#/$defs/id"
+        },
+        "attempt": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "chainTransition": {
+      "oneOf": [
+        {
+          "properties": {
+            "sequence": {"const": 1},
+            "fromState": {"const": "NONE"},
+            "toState": {"const": "CREATED"}
+          }
+        },
+        {
+          "properties": {
+            "fromState": {"const": "CREATED"},
+            "toState": {"enum": ["BASELINED", "FAILED", "CANCELLED"]}
+          }
+        },
+        {
+          "properties": {
+            "fromState": {"const": "BASELINED"},
+            "toState": {"enum": ["RUNNING", "FAILED", "CANCELLED"]}
+          }
+        },
+        {
+          "properties": {
+            "fromState": {"const": "RUNNING"},
+            "toState": {"enum": ["PAUSED", "COMPLETED", "FAILED", "CANCELLED"]}
+          }
+        },
+        {
+          "properties": {
+            "fromState": {"const": "PAUSED"},
+            "toState": {"enum": ["RUNNING", "FAILED", "CANCELLED"]}
+          }
+        }
+      ]
+    },
+    "taskTransition": {
+      "oneOf": [
+        {
+          "properties": {
+            "fromState": {"const": "NONE"},
+            "toState": {"const": "PENDING"}
+          }
+        },
+        {
+          "properties": {
+            "fromState": {"const": "PENDING"},
+            "toState": {"enum": ["PRECHECK", "FAILED", "CANCELLED"]}
+          }
+        },
+        {
+          "properties": {
+            "fromState": {"const": "PRECHECK"},
+            "toState": {"enum": ["STEPS_RUNNING", "FAILED", "CANCELLED"]}
+          }
+        },
+        {
+          "properties": {
+            "fromState": {"const": "STEPS_RUNNING"},
+            "toState": {"enum": ["WAITING_FOR_OPERATOR", "REVIEW_PENDING", "FAILED", "CANCELLED"]}
+          }
+        },
+        {
+          "properties": {
+            "fromState": {"const": "WAITING_FOR_OPERATOR"},
+            "toState": {"enum": ["STEPS_RUNNING", "FAILED", "CANCELLED"]}
+          }
+        },
+        {
+          "properties": {
+            "fromState": {"const": "REVIEW_PENDING"},
+            "toState": {"enum": ["PASSED", "REPAIR_PENDING", "FAILED", "CANCELLED"]}
+          }
+        },
+        {
+          "properties": {
+            "fromState": {"const": "FAILED"},
+            "toState": {"const": "REPAIR_PENDING"}
+          }
+        },
+        {
+          "properties": {
+            "fromState": {"const": "REPAIR_PENDING"},
+            "toState": {"enum": ["STEPS_RUNNING", "FAILED", "CANCELLED"]}
+          }
+        }
+      ]
+    },
+    "stepTransition": {
+      "oneOf": [
+        {
+          "properties": {
+            "fromState": {"const": "NONE"},
+            "toState": {"const": "PENDING"}
+          }
+        },
+        {
+          "properties": {
+            "fromState": {"const": "PENDING"},
+            "toState": {"enum": ["RUNNING", "NOOP_RECORDED", "FAILED", "CANCELLED"]}
+          }
+        },
+        {
+          "properties": {
+            "fromState": {"const": "RUNNING"},
+            "toState": {"enum": ["WAITING_FOR_OPERATOR", "PASSED", "FAILED", "CANCELLED"]}
+          }
+        },
+        {
+          "properties": {
+            "fromState": {"const": "WAITING_FOR_OPERATOR"},
+            "toState": {"enum": ["RUNNING", "FAILED", "CANCELLED"]}
+          }
+        }
+      ]
+    },
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["eventId", "runId", "sequence", "occurredAt", "actor", "entity", "fromState", "toState", "previousEventHash", "inputEvidence", "reason"],
+      "properties": {
+        "eventId": {
+          "$ref": "#/$defs/id"
+        },
+        "runId": {
+          "$ref": "#/$defs/id"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "occurredAt": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "actor": {
+          "$ref": "#/$defs/actor"
+        },
+        "entity": {
+          "oneOf": [
+            {"$ref": "#/$defs/chainEntity"},
+            {"$ref": "#/$defs/taskEntity"},
+            {"$ref": "#/$defs/stepEntity"}
+          ]
+        },
+        "fromState": {
+          "type": "string"
+        },
+        "toState": {
+          "type": "string"
+        },
+        "previousEventHash": {
+          "oneOf": [
+            {"type": "null"},
+            {"$ref": "#/$defs/sha256"}
+          ]
+        },
+        "inputEvidence": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/sha256"
+          }
+        },
+        "reason": {
+          "$ref": "#/$defs/reason"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "sequence": {"const": 1}
+            },
+            "required": ["sequence"]
+          },
+          "then": {
+            "properties": {
+              "previousEventHash": {"type": "null"},
+              "entity": {"$ref": "#/$defs/chainEntity"},
+              "fromState": {"const": "NONE"},
+              "toState": {"const": "CREATED"}
+            }
+          },
+          "else": {
+            "properties": {
+              "sequence": {"minimum": 2},
+              "previousEventHash": {"$ref": "#/$defs/sha256"}
+            }
+          }
+        },
+        {
+          "oneOf": [
+            {
+              "properties": {
+                "entity": {"$ref": "#/$defs/chainEntity"}
+              },
+              "$ref": "#/$defs/chainTransition"
+            },
+            {
+              "properties": {
+                "entity": {"$ref": "#/$defs/taskEntity"}
+              },
+              "$ref": "#/$defs/taskTransition"
+            },
+            {
+              "properties": {
+                "entity": {"$ref": "#/$defs/stepEntity"}
+              },
+              "$ref": "#/$defs/stepTransition"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

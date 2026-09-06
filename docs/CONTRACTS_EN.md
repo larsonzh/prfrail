@@ -6,7 +6,7 @@ Date: 2026-09-06; S0 design-constraint draft. Authority: [RFC](RFC-proofrail-una
 
 ## 1. Maturity and Compatibility
 
-Requirements below come from the RFC; pending decisions block production implementation. The first T002 slice now provides `schemas/chain.schema.json`, but this document is not a complete JSON Schema or a substitute for an independent validator. New wire fields/enums, canonical algorithms and error codes require an [ADR](ADR_REGISTER_EN.md), RFC revision, schemas and positive/negative goldens before Go implementation.
+Requirements below come from the RFC; pending decisions block production implementation. T002 now provides the first structural Schemas, but this document is not a complete JSON Schema or a substitute for an independent validator. New wire fields/enums, canonical algorithms and error codes require an [ADR](ADR_REGISTER_EN.md), RFC revision, schemas and positive/negative goldens before Go implementation.
 
 | Contract | Established semantics | Pending S0 artifact |
 |---|---|---|
@@ -29,13 +29,14 @@ Each persistent object has an independent `schemaVersion`, distinct from CLI and
 | hook | Independent strict registry; discriminated process/container runners; argument, failure, timeout, resource, network and artifact policies | Checker/preflight verifies IDs, references, tool digests and capabilities; execution belongs in receipts |
 | target | Independent strict registry; stable id, class, access, unique path globs and one-way generated sources | Checker rejects escapes, overlapping writes, generation cycles and unresolved references |
 | component/language scope | Component root; scope language/harness/toolchain/target IDs; dependencies; intersected step scopes | Unique IDs, resolved references, no cycles, available harness; shared roots allowed with unique writable targets |
+| state event | Append-only envelope; chain/task/step entity; strict before/after states; sequence, predecessor hash, evidence and reason | Checker verifies cross-event sequence/hash/entity-state continuity, actor authorization and evidence existence |
 | documentation | required/if-affected/optional/forbidden and impactRules | Missing effective doc diff or stale generation; whitespace/mtime alone does not count |
 | handoff | execution, scope, inputPolicy, deadline, returnActions, hooksAfterReturn | Single lease, stopped writers, fresh manifest; Schema alone cannot prove return checks |
 | review/waiver | approve/reject/waive, actor, reason, policy, expiry, bound candidate | Self-approval, expiry, changed candidate or mismatched scope blocks |
 
 Separate three validators: JSON Schema for structure; semantic checker for references, ownership, cycles and static policy; runtime gates for diffs, processes, capabilities, secrets, budgets and review. Each invalid golden identifies its rejection layer; JSON Schema cannot check live files or processes.
 
-Four structural Schemas for chain, hook, target and workspace now exist under `schemas/`; T003 still needs to create `testdata/contracts/valid/` and `testdata/contracts/invalid/` and execute them with an independent validator. Each fixture records ID, contract version, expected accept/reject, rejection layer and reason. Include three tasks, all four kinds, C+Go, C+JavaScript+Python, handoff and code/docs collaboration; at least one positive and negative per condition. Documentation paths/snippets are design inputs, not verified executable fixtures.
+Five structural Schemas for chain, hook, target, workspace and state-event now exist under `schemas/`; T003 still needs to create `testdata/contracts/valid/` and `testdata/contracts/invalid/` and execute them with an independent validator. Each fixture records ID, contract version, expected accept/reject, rejection layer and reason. Include three tasks, all four kinds, C+Go, C+JavaScript+Python, handoff and code/docs collaboration; at least one positive and negative per condition. Documentation paths/snippets are design inputs, not verified executable fixtures.
 
 ## 3. Configuration Resolution
 
