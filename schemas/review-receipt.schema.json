@@ -1,0 +1,204 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://proofrail.dev/schemas/v1/review-receipt.schema.json",
+  "title": "ProofRail post-task review receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "receipt", "receiptHash"],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "receipt": {
+      "$ref": "#/$defs/receipt"
+    },
+    "receiptHash": {
+      "$ref": "#/$defs/sha256"
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$"
+    },
+    "hashSet": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/sha256"
+      }
+    },
+    "reviewerActor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id"],
+      "properties": {
+        "type": {
+          "enum": ["operator", "policy"]
+        },
+        "id": {
+          "$ref": "#/$defs/id"
+        }
+      }
+    },
+    "operatorActor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id"],
+      "properties": {
+        "type": {
+          "const": "operator"
+        },
+        "id": {
+          "$ref": "#/$defs/id"
+        }
+      }
+    },
+    "reason": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code"],
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/id"
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        }
+      }
+    },
+    "waiverAuthorization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authorizedBy", "policyBasisHash", "scope", "expiresAt"],
+      "properties": {
+        "authorizedBy": {
+          "$ref": "#/$defs/operatorActor"
+        },
+        "policyBasisHash": {
+          "$ref": "#/$defs/sha256"
+        },
+        "scope": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "expiresAt": {
+          "$ref": "#/$defs/timestamp"
+        }
+      }
+    },
+    "receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "receiptId",
+        "occurredAt",
+        "recordedBy",
+        "runId",
+        "taskId",
+        "attempt",
+        "evidenceRootHash",
+        "reviewMode",
+        "policyHash",
+        "outcome",
+        "evidence",
+        "errorEvidence",
+        "reason",
+        "waiverAuthorization"
+      ],
+      "properties": {
+        "receiptId": {"$ref": "#/$defs/id"},
+        "occurredAt": {"$ref": "#/$defs/timestamp"},
+        "recordedBy": {"$ref": "#/$defs/reviewerActor"},
+        "runId": {"$ref": "#/$defs/id"},
+        "taskId": {"$ref": "#/$defs/id"},
+        "attempt": {"type": "integer", "minimum": 1},
+        "evidenceRootHash": {"$ref": "#/$defs/sha256"},
+        "reviewMode": {"enum": ["manual", "policy"]},
+        "policyHash": {
+          "oneOf": [
+            {"type": "null"},
+            {"$ref": "#/$defs/sha256"}
+          ]
+        },
+        "outcome": {"enum": ["approve", "reject", "waive"]},
+        "evidence": {"$ref": "#/$defs/hashSet"},
+        "errorEvidence": {"$ref": "#/$defs/hashSet"},
+        "reason": {
+          "oneOf": [
+            {"type": "null"},
+            {"$ref": "#/$defs/reason"}
+          ]
+        },
+        "waiverAuthorization": {
+          "oneOf": [
+            {"type": "null"},
+            {"$ref": "#/$defs/waiverAuthorization"}
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "oneOf": [
+            {
+              "properties": {
+                "reviewMode": {"const": "manual"},
+                "policyHash": {"type": "null"}
+              }
+            },
+            {
+              "properties": {
+                "reviewMode": {"const": "policy"},
+                "policyHash": {"$ref": "#/$defs/sha256"}
+              }
+            }
+          ]
+        },
+        {
+          "oneOf": [
+            {
+              "properties": {
+                "outcome": {"const": "approve"},
+                "reason": {"type": "null"},
+                "waiverAuthorization": {"type": "null"},
+                "errorEvidence": {"maxItems": 0}
+              }
+            },
+            {
+              "properties": {
+                "outcome": {"const": "reject"},
+                "reason": {"type": "object"},
+                "waiverAuthorization": {"type": "null"},
+                "errorEvidence": {"minItems": 1}
+              }
+            },
+            {
+              "properties": {
+                "outcome": {"const": "waive"},
+                "reason": {"type": "object"},
+                "waiverAuthorization": {"type": "object"},
+                "errorEvidence": {"minItems": 1}
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

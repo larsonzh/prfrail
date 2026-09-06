@@ -79,6 +79,12 @@ handoff 对象摘要。它不内嵌日志，不从对象存在推断成功，也
 单向引用 evidence root，避免摘要环。条目排序/唯一、同 attempt 归属、对象存在、必需证据覆盖及脱敏
 真实性由独立 checker 判定。
 
+`review-receipt.schema.json` 是唯一可引用 `evidenceRootHash` 的对象，输出 `approve/reject/waive` 之一。
+`recordedBy.type` 限定 `operator|policy`，禁止 `agent|system` 自批；`reviewMode=policy` 必须绑定已批准的
+`policyHash`。`waive` 必须同时给出人工 `authorizedBy`、`policyBasisHash`、豁免 `scope` 和非空 `expiresAt`，
+不得等价于匿名自动批准。评审者与候选变更产生者是否同一身份、`evidenceRootHash`/`policyHash` 引用
+是否真实存在及 waiver 到期后不得复用，均由独立 checker 判定。
+
 managed-change-set：读全部目标→按全局顺序在内存模拟→检查 marker/前置哈希/断言/边界→持久 journal→逐文件原子替换→写后全量核验→记录 receipt；失败整组回滚，回滚本身失败则隔离并暂停。禁止覆盖外部修改，禁止运行进程存活时恢复。
 
 isolated-workspace：直接工具写入仅限可丢弃运行目录；记录完整前后 manifest/diff/进程/gates；接受边界仍为整个 task。不能把部分语言、部分文件或“代码成功但文档失败”的子集发布。

@@ -27,11 +27,12 @@ T001 status: `COMPLETE`. This approves only S0 specification freeze and allows T
 - [ ] T002 [Plan:P0.2] Revise docs/RFC-proofrail-unattended-ai-engineering-product.md first, synchronize docs/CONTRACTS*.md/ADRs, create schemas/*.schema.json; freeze ADR-002/004 fields, versions, canonical vectors, transitions, errors and queue. Depends: T001. Accept: AT-01 structure/independent review. Exclude: production code using guessed fields.
 - [ ] T003 [Plan:P0.2] Create testdata/contracts/{valid,invalid}/ and tools/contracts/ independent validator/semantic fixture oracle: three tasks, four kinds, dual/triple language, handoff, docs/waiver and all receipts/manifests. Depends: T002. Accept: AT-01 and section 17.2/4/9-12. Exclude: candidate-generated expected results.
 
-T002 status: `IN_PROGRESS`. Common version, ID, path, JCS and UTF-8 rules are frozen, with ten Draft 2020-12
+T002 status: `IN_PROGRESS`. Common version, ID, path, JCS and UTF-8 rules are frozen, with eleven Draft 2020-12
 structural schemas for chain, hook, target, workspace, state-event, error, adapter-envelope, adapter-receipt,
-snapshot-manifest and evidence-manifest. Initial canonical vectors, single-record transitions, error categories/CLI exits,
-file-queue framing/claim/result/dispatch/takeover receipt rules, snapshot boundaries and the pre-review evidence root are frozen;
-cross-event/cross-record checkers, the concrete error catalog/primary ordering, signature
+snapshot-manifest, evidence-manifest and review-receipt. Initial canonical vectors, single-record transitions, error
+categories/CLI exits, file-queue framing/claim/result/dispatch/takeover receipt rules, snapshot boundaries, the pre-review
+evidence root and the approve/reject/waive review verdict are frozen; cross-event/cross-record checkers, the concrete error
+catalog/primary ordering, promotion/handoff/signature
 receipts, remaining persistent objects and ADR-004 capability probes are still pending. T003's
 independent validator/semantic checker, vector fixtures and positive/negative goldens have not run, so T002, AT-01 and RFC
 section 17.2 must not be marked complete.

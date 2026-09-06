@@ -68,6 +68,13 @@ and it excludes review/waiver/promotion receipts; those objects point one-way to
 The independent checker validates item ordering/uniqueness, same-attempt ownership, object existence, required-evidence
 coverage and truthful redaction status.
 
+`review-receipt.schema.json` is the only object allowed to reference `evidenceRootHash`, producing exactly one of
+`approve/reject/waive`. `recordedBy.type` is restricted to `operator|policy`, excluding `agent|system` self-approval;
+`reviewMode=policy` must bind an approved `policyHash`. `waive` must carry a human `authorizedBy`, a `policyBasisHash`,
+a non-empty `scope` and a non-null `expiresAt`, never an anonymous automatic approval. The independent checker verifies
+reviewer identity differs from the change producer, that `evidenceRootHash`/`policyHash` references actually exist, and
+that an expired waiver is never reused.
+
 managed-change-set: read all targets, simulate operations in global order, validate markers/prehash/assertions/boundaries, persist journal, atomically replace each file, verify all postconditions, then record receipt. Roll back the entire group on failure; failed rollback means quarantine/pause. Do not overwrite external changes or restore while processes are alive.
 
 isolated-workspace: direct tool writes stay in a disposable run directory, with complete before/after manifests, diff, process and gate evidence. Acceptance remains whole-task: never publish selected languages/files or successful code with failed documentation.

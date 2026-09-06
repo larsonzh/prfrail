@@ -1692,6 +1692,35 @@ evidenceRootHash，promotion receipt 再共同绑定 review、evidence root、�
 最终 evidence pack/导出归档可以并列引用这些对象，但不得重写评审前 evidence manifest。缺少、重复、
 跨 attempt 或摘要不一致的 item 一律阻断评审和发布；哈希只证明完整性，不证明采集者或批准者身份。
 
+#### 16.9.14 Review receipt
+
+`review-receipt.schema.json` 冻结任务后评审的唯一机器结论；只有它可以引用 `evidenceRootHash`，
+promotion receipt 再引用本 receipt 而非重复评审判断。根对象只含 `schemaVersion="1.0.0"`、`receipt`
+与 `receiptHash`；receiptHash 不参与自身摘要，以 ASCII 域 `proofrail:review-receipt:1\n` 后接内层
+receipt 的 JCS canonical 字节计算 SHA-256。
+
+内层 receipt 必含 `receiptId/occurredAt/recordedBy/runId/taskId/attempt/evidenceRootHash/reviewMode/
+policyHash/outcome/evidence/errorEvidence/reason/waiverAuthorization`。`recordedBy.type` 只能为
+`operator|policy`，禁止 `agent|system`：执行 agent 不得记录自己的评审结论。`reviewMode=manual` 要求
+`policyHash=null`；`reviewMode=policy` 要求 `policyHash` 引用已批准、哈希绑定的确定性风险策略文档。
+
+`outcome` 只能为 `approve|reject|waive`：
+
+- `approve`：`reason`/`waiverAuthorization` 必须为 null，`errorEvidence` 必须为空；只有 approve 才允许
+  发布 `snapshot-i` 并把任务标记 `PASSED`。
+- `reject`：`reason` 必须非空，`errorEvidence` 至少一项；拒绝的候选快照不可被后续任务引用，任务转入
+  修复或终止。
+- `waive`：`reason` 与 `errorEvidence`（至少一项）必须非空，且必须提供 `waiverAuthorization`，含
+  `authorizedBy`（`type=operator` 的人工授权主体）、`policyBasisHash`（引用批准的风险政策文档）、
+  `scope`（至少一项稳定 ID，指明被豁免的具体 check/hook）和 `expiresAt`（非空时间戳，界定有效期）。
+  waiver 不能等价于匿名自动批准，也不得豁免第 12.2 节的完整性、停机、独占写或秘密保护等强制不变式。
+
+Schema 只检查单条 receipt 的判别分支形状；checker 负责核实 `evidenceRootHash` 指向真实持久化且
+attempt 匹配的 evidence manifest、`policyHash`/`policyBasisHash` 指向已批准文档、`waiverAuthorization.
+scope` 命中 evidence root 中真实存在的失败项、`expiresAt` 到期后不得被后续 attempt 复用为豁免，以及
+`recordedBy` 与产生候选变更的主体不是同一身份（跨记录职责分离）。哈希证明完整性，不证明评审者
+身份或专业判断正确。
+
 ---
 
 ## 17. S0 实施就绪门禁
