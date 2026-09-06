@@ -1398,6 +1398,14 @@ chain 定义或内容 manifest。
   agent 自批。早期示例的 `auto|hybrid` 不再是 wire 值：向导迁移为 `policy|manual`，歧义时拒绝。
 - `documentationPolicy` 为 `required|if-affected|optional|forbidden`。模型、target、hook、component 等引用
   仅使用 ID；配置合并完成后 run manifest 必须展开默认值和来源，不再依赖隐式 profile。
+- `execution="manual-handoff"` 的 `code` step 是独立判别分支，必须额外提供 `handoffPolicy`；
+  `autonomous`（缺省）分支禁止出现该字段，两者由 Schema `oneOf` 互斥，不能混填。`handoffPolicy` 含
+  `allowedTargets/inputPolicy/handoffTimeoutMs/returnActions/hooksAfterReturn`：`allowedTargets` 引用
+  target 注册表中 `access="read-write"` 的 ID（取代第 16.7 节示例中的原始 glob 写法，避免与 target
+  注册表出现两套写范围定义）；`inputPolicy` 为 `structured|secret-direct`；`handoffTimeoutMs` 为正整数，
+  不设上限（人工调试可能跨越多日）；`returnActions` 是至少一项、互不重复的
+  `complete|abort|request-agent` 子集，声明该 handoff 允许的归还方式；`hooksAfterReturn` 是至少一项唯一
+  hook ID，因为 `code` step 本身禁止 hooks，归还后的强制复检只能由此声明。
 
 第一组 Schema 不包含运行状态、attempt、receipt 或探测结果；它们属于引擎持久对象，不能由用户 chain
 伪造。T002 余下切片继续冻结 hook/target/workspace 细节和各持久记录；T003 才以独立 validator 判定
@@ -1748,6 +1756,36 @@ receipt，最后追加 PASSED event 并重建投影。崩溃时 reader 只有在
 `runId/taskId/attempt/candidateSnapshotHash` 最多一个 completed receipt；重复相同请求返回既有 receipt，
 冲突结果归为 integrity 错误。Schema 只检查单记录形状，上述顺序、唯一性和跨记录闭包由 checker/journal
 重放验证；哈希仍不证明发布主体身份。
+
+#### 16.9.16 Handoff receipt
+
+`handoff-receipt.schema.json` 冻结一次 `manual-handoff` 从 `WAITING_FOR_OPERATOR` 到显式归还的持久完成
+事实；未能定型归还（越界、秘密暴露、租约冲突或未知进程）不产生本 receipt，只产生 `error` 记录并保持
+暂停。根对象只含 `schemaVersion="1.0.0"`、`receipt` 与 `receiptHash`；receiptHash 不参与自身摘要，以
+ASCII 域 `proofrail:handoff-receipt:1\n` 后接内层 receipt 的 JCS canonical 字节计算 SHA-256。
+
+内层 receipt 必含 `receiptId/recordedBy/operator/runId/taskId/stepId/attempt/handoffPolicyHash/
+openedAt/closedAt/beforeManifestHash/afterManifestHash/diffHash/leaseEvidence/outcome/
+hookResultEvidence/evidence`。`recordedBy.type` 固定为 `system`：只有核心引擎能持久化该事实；`operator`
+是 `type=operator` 的人工主体，记录谁持有了写租约，二者不得混同。`handoffPolicyHash` 引用触发本次
+交接的 `handoffPolicy` 对象，使 checker 能核对归还是否落在 `allowedTargets/inputPolicy/returnActions`
+声明范围内。`leaseEvidence` 是至少一项的唯一摘要数组，证明写租约在整个交接期间独占且已正常释放，
+不是到期或转租。`beforeManifestHash/afterManifestHash/diffHash` 对应进入交接前、归还后重新捕获的工作区
+manifest 和二者之间的最终 diff；三者对全部 outcome 均必填，因为归还即触发越界/秘密/未知进程复检，
+不论最终选择哪种归还方式。
+
+`outcome` 只能为 `complete|abort|request-agent`，与 `handoffPolicy.returnActions` 声明的允许集合一致：
+
+- `complete`：`hookResultEvidence` 至少一项，绑定该 step 通过 `hooksAfterReturn` 声明的钩子结果；只有
+  complete 才允许把人工变更视为该 step 的候选产出并继续 build/verify 后的评审流程。
+- `abort|request-agent`：`hookResultEvidence` 必须为空；abort 丢弃本次人工变更并只保留证据，
+  request-agent 把已确认结论转交新 attempt，两者都不得让 hooksAfterReturn 结果冒充已发生。
+
+`evidence` 至少一项，绑定归还时执行的越界/秘密/未知进程扫描证据；扫描发现问题时不产生本 receipt，
+只能在整改或改选 `abort` 后重试。Schema 只检查单记录形状；`handoffPolicyHash` 引用存在性、
+`returnActions` 集合命中、租约与 manifest 的时间顺序、以及 `hookResultEvidence` 对应的 hook 是否确实
+属于该 step 的 `hooksAfterReturn`，均由 checker 判定。哈希只证明完整性，不证明操作员身份或人工判断
+正确性。
 
 ---
 

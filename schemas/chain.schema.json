@@ -137,6 +137,12 @@
       }
     },
     "codeStep": {
+      "oneOf": [
+        {"$ref": "#/$defs/autonomousCodeStep"},
+        {"$ref": "#/$defs/manualHandoffCodeStep"}
+      ]
+    },
+    "autonomousCodeStep": {
       "type": "object",
       "additionalProperties": false,
       "required": ["id", "kind"],
@@ -151,7 +157,7 @@
           "$ref": "#/$defs/id"
         },
         "execution": {
-          "enum": ["autonomous", "manual-handoff"],
+          "const": "autonomous",
           "default": "autonomous"
         },
         "components": {
@@ -161,6 +167,65 @@
           "$ref": "#/$defs/idList"
         },
         "targets": {
+          "$ref": "#/$defs/idList"
+        }
+      }
+    },
+    "manualHandoffCodeStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "execution", "handoffPolicy"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "kind": {
+          "const": "code"
+        },
+        "model": {
+          "$ref": "#/$defs/id"
+        },
+        "execution": {
+          "const": "manual-handoff"
+        },
+        "components": {
+          "$ref": "#/$defs/idList"
+        },
+        "languageScopes": {
+          "$ref": "#/$defs/idList"
+        },
+        "targets": {
+          "$ref": "#/$defs/idList"
+        },
+        "handoffPolicy": {
+          "$ref": "#/$defs/handoffPolicy"
+        }
+      }
+    },
+    "handoffPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowedTargets", "inputPolicy", "handoffTimeoutMs", "returnActions", "hooksAfterReturn"],
+      "properties": {
+        "allowedTargets": {
+          "$ref": "#/$defs/idList"
+        },
+        "inputPolicy": {
+          "enum": ["structured", "secret-direct"]
+        },
+        "handoffTimeoutMs": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "returnActions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": ["complete", "abort", "request-agent"]
+          }
+        },
+        "hooksAfterReturn": {
           "$ref": "#/$defs/idList"
         }
       }

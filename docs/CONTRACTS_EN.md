@@ -32,13 +32,14 @@ Each persistent object has an independent `schemaVersion`, distinct from CLI and
 | state event | Append-only envelope; chain/task/step entity; strict before/after states; sequence, predecessor hash, evidence and reason | Checker verifies cross-event sequence/hash/entity-state continuity, actor authorization and evidence existence |
 | error | Strict category/code prefix, subject, evidence, redacted message, retryMode and suggestedAction | Checker/result contracts verify references, default retry restrictions, primary-error selection and concrete code catalog |
 | documentation | required/if-affected/optional/forbidden and impactRules | Missing effective doc diff or stale generation; whitespace/mtime alone does not count |
-| handoff | execution, scope, inputPolicy, deadline, returnActions, hooksAfterReturn | Single lease, stopped writers, fresh manifest; Schema alone cannot prove return checks |
+| handoff | execution, `handoffPolicy` (allowedTargets referencing read-write targets, inputPolicy, handoffTimeoutMs, returnActions, hooksAfterReturn) | Single lease, stopped writers, fresh manifest; Schema alone cannot prove return checks |
 | review/waiver | approve/reject/waive, actor, reason, policy, expiry, bound candidate | Self-approval, expiry, changed candidate or mismatched scope blocks |
 
 Separate three validators: JSON Schema for structure; semantic checker for references, ownership, cycles and static policy; runtime gates for diffs, processes, capabilities, secrets, budgets and review. Each invalid golden identifies its rejection layer; JSON Schema cannot check live files or processes.
 
-Twelve structural Schemas for chain, hook, target, workspace, state-event, error, adapter-envelope, adapter-receipt,
-snapshot-manifest, evidence-manifest, review-receipt and promotion-receipt now exist under `schemas/`; T003 still needs to
+Thirteen structural Schemas for chain, hook, target, workspace, state-event, error, adapter-envelope, adapter-receipt,
+snapshot-manifest, evidence-manifest, review-receipt, promotion-receipt and handoff-receipt now exist under `schemas/`;
+T003 still needs to
 create `testdata/contracts/valid/` and `testdata/contracts/invalid/` and execute them with an independent validator. Each
 fixture records ID, contract version, expected accept/reject, rejection layer and reason. Include three tasks, all four kinds,
 C+Go, C+JavaScript+Python, handoff and code/docs collaboration; at least one positive and negative per condition.
@@ -85,6 +86,11 @@ proof into one publication transaction. A candidate becomes consumable only for 
 acceptedSnapshotHash equals the candidate hash and review is approve or a still-valid waive. Failed/uncertain outcomes keep
 acceptedSnapshotHash null and block advancement. Journal/checker logic verifies publication ordering, one completed receipt
 per attempt, crash reconciliation and the accepted-reference closure.
+
+`handoff-receipt.schema.json` freezes the completion fact of one `manual-handoff` return: it binds `handoffPolicyHash`,
+operator identity, lease evidence and the before/after manifest and diff. `complete` requires non-empty
+`hookResultEvidence`; `abort/request-agent` require it empty. A failed boundary/secret/unknown-process scan never produces
+this receipt; it produces an `error` record and keeps the handoff paused instead.
 
 managed-change-set: read all targets, simulate operations in global order, validate markers/prehash/assertions/boundaries, persist journal, atomically replace each file, verify all postconditions, then record receipt. Roll back the entire group on failure; failed rollback means quarantine/pause. Do not overwrite external changes or restore while processes are alive.
 

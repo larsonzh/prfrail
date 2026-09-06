@@ -37,13 +37,13 @@ UTF-8 无 BOM + LF；canonical 字节还不得含格式空白或尾随换行。�
 | state event | append-only envelope；chain/task/step 实体；严格前后状态；序号、前序 hash、证据与原因 | 跨事件序号/hash/实体状态连续性、主体授权和证据存在性由 checker 判定 |
 | error | 严格 category/code 前缀、subject、evidence、脱敏 message、retryMode、suggestedAction | 引用、默认重试限制、主错误选择与具体 code 目录由 checker/result 契约判定 |
 | documentation | required/if-affected/optional/forbidden；impactRules | 命中规则缺有效 doc diff、生成物陈旧拒绝；空白/mtime 不算更新 |
-| handoff | execution、允许写范围、inputPolicy、deadline、returnActions、hooksAfterReturn | 单写租约、停机、新鲜 manifest；归还后复检不能由 Schema 单独判定 |
+| handoff | execution、`handoffPolicy`（allowedTargets 引用 read-write target、inputPolicy、handoffTimeoutMs、returnActions、hooksAfterReturn） | 单写租约、停机、新鲜 manifest；归还后复检不能由 Schema 单独判定 |
 | review/waiver | approve/reject/waive；主体、原因、策略依据、有效期、绑定候选 | 同主体自批、过期、候选变化、范围不符均阻断 |
 
 三层检查不可合并：JSON Schema 判结构；语义 checker 判引用、所有权、循环、静态策略；运行期 gate 判文件 diff、进程、能力、秘密、预算与评审。非法黄金样例标注拒绝层，不能声称 JSON Schema 会检查实际文件或进程。
 
 `schemas/` 已创建 chain、hook、target、workspace、state-event、error、adapter-envelope、adapter-receipt、
-snapshot-manifest、evidence-manifest、review-receipt、promotion-receipt 十二份结构 Schema；`testdata/contracts/valid/` 与
+snapshot-manifest、evidence-manifest、review-receipt、promotion-receipt、handoff-receipt 十三份结构 Schema；`testdata/contracts/valid/` 与
 `testdata/contracts/invalid/` 仍待 T003 创建并由独立 validator 执行。每例携带 fixture ID、契约版本、
 expected accept/reject、拒绝层和原因。必须含三任务链、四 kind、C+Go、C+JavaScript+Python、人工交接、
 代码文档协同；每一条件至少一正一反。文档中的路径/片段是设计输入，不是已验证可运行样例。
@@ -90,6 +90,10 @@ handoff 对象摘要。它不内嵌日志，不从对象存在推断成功，也
 单个发布事务。只有 outcome=completed、acceptedSnapshotHash 等于候选摘要，且 review 为 approve 或仍有效
 waive 时，候选才可供下游消费；failed/uncertain 均保持 acceptedSnapshotHash=null 并阻断推进。发布顺序、
 同 attempt 唯一 completed receipt、崩溃 reconcile 和 accepted 引用闭包由 journal/checker 判定。
+
+`handoff-receipt.schema.json` 冻结一次 `manual-handoff` 归还的完成事实：绑定 `handoffPolicyHash`、操作员
+身份、租约证据与归还前后 manifest/diff；`complete` 要求非空 `hookResultEvidence`，`abort/request-agent`
+则必须为空。越界、秘密或未知进程扫描失败不产生该 receipt，只产生 `error` 记录并保持暂停。
 
 managed-change-set：读全部目标→按全局顺序在内存模拟→检查 marker/前置哈希/断言/边界→持久 journal→逐文件原子替换→写后全量核验→记录 receipt；失败整组回滚，回滚本身失败则隔离并暂停。禁止覆盖外部修改，禁止运行进程存活时恢复。
 
