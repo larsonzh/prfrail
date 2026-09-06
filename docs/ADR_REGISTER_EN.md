@@ -7,13 +7,13 @@ Date: 2026-09-06. Distinguish RFC-decided, proposed and experimental decisions. 
 | ID | Decision/proposal | Alternatives/rationale | Status/completion |
 |---|---|---|---|
 | ADR-001 | Go modular monolith, CLI/TUI, single writer, no default Git writes | No script translation/distribution complexity | Decided by RFC 4/11/16; T001 confirms dependency baseline |
-| ADR-002 | Freeze Schema 2020-12 toolchain, canonical JSON/paths/errors/config precedence | Evaluate a mature RFC 8785 implementation; sorted keys alone are not canonical; validator independent of core | Partially frozen: chain/hook/target/workspace/state-event/error/error-set/ticket-ledger/repair-transaction/snapshot-manifest/evidence-manifest/review-receipt/promotion-receipt/handoff-receipt/hook-result/run-manifest/signature-receipt schemas, JCS, UTF-8 without BOM, version/path, 37 error codes and primary ordering, failure fingerprints/three-phase budget/four-stage repair chain, snapshot and pre-review evidence-root hash domains, review policy/waiver authorization elements, the manual-handoff step discriminator and handoffPolicy, the hook execution/gate/disposition split, effective-config origins/runtime bindings, detached Ed25519 statement/receipt hash domains, initial canonical vectors, transitions and category exit codes are set; cross-record checker, independent fixtures/validator and remaining objects await T002/T003 |
+| ADR-002 | Freeze Schema 2020-12 toolchain, canonical JSON/paths/errors/config precedence | Evaluate a mature RFC 8785 implementation; sorted keys alone are not canonical; validator independent of core | T002 has frozen 29 structural Schemas, JCS/UTF-8/version/path, configuration merging, errors, transactions, receipts, the cross-record checker report and PC-01–PC-06 records. T003 independent fixtures/validator remain, so AT-01/section 17.2 do not pass |
 | ADR-003 | Event/journal acceptance protocol and Windows replacement/stop primitives | Rename covers one file only; prove durability, rollback and cross-file reader semantics | Partially frozen: promotion receipt binds parent/candidate/evidence/review/writer-stop/lease data and the completed/failed/uncertain reader contract; publication order, crash points and native Windows/Linux durable/atomic capabilities await T004 probes; directory separation cannot replace required OS enforcement |
-| ADR-004 | SessionBridge v0.1.1 silent plus file queue, core durable idempotency | No fork, visible/auto or GUI fallback; cache is not exactly-once | Partially frozen: shared envelope, one-record-per-file framing, atomic claim, generation fencing, result, dispatch/takeover receipts and cross-host signature receipt are set; cross-record/trust-chain checker, capability matrix and platform crash probes await T002/T004 |
+| ADR-004 | SessionBridge v0.1.1 silent plus file queue, core durable idempotency | No fork, visible/auto or GUI fallback; cache is not exactly-once | Contract frozen: shared envelope, one-record-per-file framing, atomic claim, generation fencing, result, dispatch/takeover receipts, cross-host signature receipt and checker order. Capability-matrix and platform crash probes await T004 |
 | ADR-005 | Bootstrap seed via normal build, independent Go tests and human audit; N builds N+1 with isolated replay | No candidate self-certification or host overwrite | RFC 16.5 decided; identify seed/hash/oracle/signer/rollback before T017 |
 | ADR-006 | Windows 11 amd64 production, Linux amd64 core CI, pure-Go release, pinned tooling/signing | RFC 16.2 mentions Win10 unlike 9.6/14; section 14 is the first-release scope, with no Win10 commitment | Owner approved policy 2026-09-06; T002 freezes dependencies, T017 signer/key/revocation details |
 | ADR-007 | Minimal context, offline first, task budgets, bilingual IDs | Avoid costly repeated whole-repository reviews; English is not a second authority | Owner approved 2026-09-06; zero new paid S0 calls, separate authorization for increases |
-| ADR-008 | RFC section 19 six minimum product flows in S1; local modules, no commercial backend | Reject engine-only delivery, implicit source/deployment writes or silent updates; explicitly review added cost | Owner approved scope 2026-09-06; T002/T003 records/goldens, T019–T024 runtime checks; no S1 coding authorization |
+| ADR-008 | RFC section 19 six minimum product flows in S1; local modules, no commercial backend | Reject engine-only delivery, implicit source/deployment writes or silent updates; explicitly review added cost | Owner approved scope 2026-09-06; T002 froze records, T003 adds goldens and T019–T024 run checks; no S1 coding authorization |
 
 ## 1. Release and Dependencies
 
@@ -25,7 +25,7 @@ The owner approved this signing policy on 2026-09-06: maintainer-held offline Ed
 
 ## 2. Ambiguities to Close
 
-T002 makes one focused RFC revision for empty chains, array merging, duration/size/budget units/defaults, ID/attempt/requestId types, error codes, path/symlink/hardlink policy, signing coverage, review/waiver authorization, ticket thresholds, runner capabilities, lease renewal/takeover and Windows 10 wording. Until frozen, write documents/isolated experiments, not production defaults.
+T002 has frozen empty-chain, array merge, duration/size/budget units/defaults, ID/attempt/requestId, error, path/link, signing, review/waiver, ticket, runner, lease and Windows 10 rules. Do not implement production defaults until T003 independent fixtures/validator and T004 platform facts complete.
 
 ## 3. Current S0 Readiness
 
@@ -34,18 +34,18 @@ Verdict: **NOT_READY**. This does not mean this documentation round failed or au
 | RFC 17 item | Evidence/gap | Closing tasks |
 |---|---|---|
 | 1 P0 document review | Owner accepted the third-party read-only audit recommendations and approved S0 specification freeze/decision sheet on 2026-09-06; independent security sign-off remains item 3 | Closed (T001) |
-| 2 Schemas/goldens/validator | No complete machine contracts yet | T002/T003 |
+| 2 Schemas/goldens/validator | 29 structural Schemas and checker rules are frozen; independent goldens/validator remain | T003 |
 | 3 STRIDE | Risks/owners/AT mapping written, independent review pending | T001/T003 |
 | 4 whois/non-C | Mapping planned; validated fixtures absent | T003 |
 | 5 Spikes | Go available; TUI/replacement/process trees/transports/paths unverified | T004 |
 | 6 Traceable backlog | Owner approved current S0/S1 scope and traceability plan | Closed (T001) |
-| 7 Platform/Go/license/support/response/signing | Platform/support/offline Ed25519/per-dependency review policies approved; exact dependencies/signer/key/channel remain open | T002/T017 |
+| 7 Platform/Go/license/support/response/signing | Platform/support/offline Ed25519/per-dependency review policies approved; exact dependencies/signer/key/channel remain open | T017 |
 | 8 User approval | S0 freeze, S1 scope, zero-new-paid-call budget and whois-shadow principle approved; no S1 coding, concrete whois access or release authorization | Closed (T001); execution authorization remains separate |
 | 9 step/TUI/bootstrap | Designed; prototype and seed/oracle identity absent | T003/T004 |
 | 10 Polyglot schemas | Ownership rules written; dual/triple-language goldens not executed | T003 |
 | 11 Handoff | Contract/threats written; machine positive/negative fixtures not executed | T003 |
 | 12 Documentation | Policy/impact/generation rules written; machine checks not executed | T003 |
-| 13 Product/lifecycle | PC-01–PC-06/AT-16–AT-21 mapped; authority/revocation races, measurement/shared locks, export/backup consistency and deletion conflicts not frozen/verified | T001/T002/T003 |
+| 13 Product/lifecycle | PC-01–PC-06 records and authorization/revocation, measurement/shared scope, export/backup consistency and deletion-conflict semantics are frozen; independent fixtures remain | T003 |
 
 Next allowed work: review this package, complete S0 specifications and independent spikes. S1 needs evidence for every gate and explicit owner approval; document existence cannot automatically authorize it.
 

@@ -10,11 +10,12 @@ Requirements below come from the RFC; pending decisions block production impleme
 
 | Contract | Established semantics | Pending S0 artifact |
 |---|---|---|
-| Configuration/task/step | Draft 2020-12, `schemaVersion=1.0.0`, strict chain/task/four step kinds and workspace/component/language-scope topology | Harness/toolchain registries, references, merge rules and remaining schemas |
-| change-set | Sequential in-memory prevalidation, first-fail-stop, markers/assertions, group transaction | Operations, line-ending semantics, before/after hashes, duplicate markers |
+| Configuration/task/step | Draft 2020-12, strict chain/task/four step kinds, workspace topology, harness/toolchain registries and deterministic ownership/merge | Independent positive/negative fixtures |
+| change-set | Five strict operations, sequential in-memory prevalidation, first-fail-stop, markers/exact assertions, raw-byte hashes and group transaction | Cross-record checker and positive/negative fixtures |
 | snapshot/evidence | SHA-256 addressing, parent/candidate/evidence binding, immutability | Canonical paths/hash encoding, manifests/receipts |
 | ticket/repair | Stable fingerprint, append-only ledger and three-phase budget; strict Prepare/Inspect/Validate/Promote chain | Cross-record checker and positive/negative fixtures |
-| adapter/context | Strict request/claim/result envelopes, recordHash, idempotency key, generation fencing, dispatch/takeover receipts and minimal context | Cross-record checker, signature trust chains and platform atomicity probes |
+| adapter/context | Strict request/claim/result envelopes, recordHash, idempotency key, generation fencing, dispatch/takeover receipts and minimal context | Independent trust-chain fixtures and platform atomicity probes |
+| product/lifecycle | Plan preview, export, authorization/revocation, effect/recovery, cost ledger and release/backup/retirement records | Independent positive/negative fixtures and S1 runtime acceptance |
 
 Each persistent object has an independent `schemaVersion`, distinct from CLI and SessionBridge versions. The first version is `1.0.0`; unknown majors are rejected, and unknown minor/patch versions are read-only rejected by default. Repository, schema, runtime and wire JSON uniformly use UTF-8 without BOM plus LF. Canonical bytes additionally contain no formatting whitespace or trailing newline. Only a fixture explicitly testing BOM input compatibility may contain a BOM, and it cannot be reused as a business object.
 
@@ -27,18 +28,23 @@ Each persistent object has an independent `schemaVersion`, distinct from CLI and
 | task | Stable id, nonempty steps, review and documentationPolicy | Duplicate IDs; skip-on-fail without failureIndependent |
 | step | id, code/build/verify/noop; code execution defaults autonomous | Empty steps, unknown kind; noop requires reason and cannot start hooks/agents |
 | hook | Independent strict registry; discriminated process/container runners; argument, failure, timeout, resource, network and artifact policies | Checker/preflight verifies IDs, references, tool digests and capabilities; execution belongs in receipts |
+| harness/toolchain | Harness composes languages, parameters, hooks and artifacts; toolchain declares source, platforms, probe and evidence policy | Checker/preflight verifies unique references, versions, source, hashes, authorization and actual availability |
 | target | Independent strict registry; stable id, class, access, unique path globs and one-way generated sources | Checker rejects escapes, overlapping writes, generation cycles and unresolved references |
 | component/language scope | Component root; scope language/harness/toolchain/target IDs; dependencies; intersected step scopes | Unique IDs, resolved references, no cycles, available harness; shared roots allowed with unique writable targets |
 | state event | Append-only envelope; chain/task/step entity; strict before/after states; sequence, predecessor hash, evidence and reason | Checker verifies cross-event sequence/hash/entity-state continuity, actor authorization and evidence existence |
 | error/error-set | 37 closed codes with retry/action pairs; non-empty error index and primaryErrorId | Checker verifies references, uniqueness and time/category/code/errorId primary ordering |
+| verification report | Sixteen fixed-order cross-record/trust-chain checks; passed/failed/incomplete | Checker rereads objects and verifies hashes, applicable checks, order and aggregate outcome; reports do not change state |
+| product records | Strict preview/export/authorization/effect/cost/lifecycle discriminated records | Checker verifies authorization time, reference closure, arithmetic, platform facts and the S1 external-write prohibition |
 | documentation | required/if-affected/optional/forbidden and impactRules | Missing effective doc diff or stale generation; whitespace/mtime alone does not count |
 | handoff | execution, `handoffPolicy` (allowedTargets referencing read-write targets, inputPolicy, handoffTimeoutMs, returnActions, hooksAfterReturn) | Single lease, stopped writers, fresh manifest; Schema alone cannot prove return checks |
 | review/waiver | approve/reject/waive, actor, reason, policy, expiry, bound candidate | Self-approval, expiry, changed candidate or mismatched scope blocks |
 
 Separate three validators: JSON Schema for structure; semantic checker for references, ownership, cycles and static policy; runtime gates for diffs, processes, capabilities, secrets, budgets and review. Each invalid golden identifies its rejection layer; JSON Schema cannot check live files or processes.
 
-Nineteen structural Schemas for chain, hook, target, workspace, state-event, error, adapter-envelope, adapter-receipt,
-snapshot-manifest, evidence-manifest, review-receipt, promotion-receipt, handoff-receipt, hook-result, run-manifest, signature-receipt, error-set, ticket-ledger and repair-transaction now exist under `schemas/`;
+Twenty-nine structural Schemas for chain, hook, target, workspace, state-event, error, adapter-envelope, adapter-receipt,
+snapshot-manifest, evidence-manifest, review-receipt, promotion-receipt, handoff-receipt, hook-result, run-manifest,
+signature-receipt, error-set, ticket-ledger, repair-transaction, harness, toolchain, change-set, verification-report,
+plan-preview, export-record, authorization-record, effect-record, cost-ledger and lifecycle-record now exist under `schemas/`;
 T003 still needs to
 create `testdata/contracts/valid/` and `testdata/contracts/invalid/` and execute them with an independent validator. Each
 fixture records ID, contract version, expected accept/reject, rejection layer and reason. Include three tasks, all four kinds,
@@ -47,7 +53,12 @@ Documentation paths/snippets are design inputs, not verified executable fixtures
 
 ## 3. Configuration Resolution
 
-Profiles provide defaults only; explicit task values override chain defaults; explicit step values override task defaults. List replacement/merge, empty values and workspace.toml versus proofrail.toml ownership await ADR-002. config explain reports values and origins. Silent array merging must not grant extra permissions.
+`proofrail.toml` exclusively owns chain/task/step, documentation, policy and registry references; `workspace.toml` owns
+locations, topology, platform and adapter/harness/toolchain selection. Duplicate or unknown keys are rejected. Precedence is
+builtin-default < profile < chain < task < step: absence inherits, scalars replace, known objects merge recursively and arrays
+replace wholesale, never concatenate. Empty arrays mean explicitly none only where Schema permits; empty strings are not
+unset and null deletion is unsupported. Every effective leaf has exactly one run-manifest pointer origin. `config explain`
+is read-only, showing values/redacted references and override chains without execution or writeback.
 
 After resolution, apply RFC 8785 JCS and hash the UTF-8 no-BOM bytes with SHA-256; represent the digest as `sha256:` plus 64 lowercase hexadecimal digits. Heartbeats, credentials and machine probes never rewrite user config. Bind parent snapshot, hook digests, adapter/harness versions and authorized policy. Changes require a new run or the RFC's pause/approval/new-manifest flow, never overwriting historical facts.
 
@@ -56,6 +67,12 @@ After resolution, apply RFC 8785 JCS and hash the UTF-8 no-BOM bytes with SHA-25
 builtin/profile/chain/task/step source; `bindings` freezes adapter/harness/toolchain/hook/policy versions, object digests
 and capability evidence. Absolute paths, credentials, environment values and mutable machine probes stay outside. The
 checker owns pointer existence, complete source coverage, loaded-object matching and one manifest per runId.
+
+`harness.schema.json` composes languages, toolchains, declarative parameters, registered hooks and artifact globs without
+copying runners or commands. `toolchain.schema.json` declares source, platforms, a separated executable/args probe and
+evidence policy. Registry presence does not prove installation; checker/preflight verifies references, versions, source,
+hashes and actual capability, and probing still requires authorization. Bundled generic/C/Go support does not close the
+core language set. Environment values, credentials and absolute host paths stay out of registries and run manifests.
 
 RFC section 16.9.3.1 freezes two byte-level vectors, `jcs-001` and `state-event-001`, covering JCS ordering/escaping/Unicode and the state-event domain-separated digest. T003 must still preserve them as independent fixtures and recompute them with a non-core implementation; documented digest values are not independent-validator evidence.
 
@@ -75,7 +92,8 @@ Reader contract: the next task may consume a snapshot only when valid review bin
 
 `evidence-manifest.schema.json` freezes the evidence root as an immutable pre-review index for one task attempt. It binds
 the task definition, resolved policy and parent/candidate snapshots, then references state-event, error, adapter, hook,
-artifact, change-set, diff, ticket and handoff object hashes. It neither embeds logs nor infers success from object presence,
+artifact, change-set, diff, ticket, repair, authorization, effect, cost and handoff object hashes. Verification/export/
+lifecycle records created after review cannot point backward into this root. It neither embeds logs nor infers success from object presence,
 and it excludes review/waiver/promotion receipts; those objects point one-way to the evidence root to avoid a hash cycle.
 The independent checker validates item ordering/uniqueness, same-attempt ownership, object existence, required-evidence
 coverage and truthful redaction status.
@@ -99,6 +117,12 @@ operator identity, lease evidence and the before/after manifest and diff. `compl
 this receipt; it produces an `error` record and keeps the handoff paused instead.
 
 managed-change-set: read all targets, simulate operations in global order, validate markers/prehash/assertions/boundaries, persist journal, atomically replace each file, verify all postconditions, then record receipt. Roll back the entire group on failure; failed rollback means quarantine/pause. Do not overwrite external changes or restore while processes are alive.
+
+`change-set.schema.json` closes operations to create/delete/replace-exact/insert-before/insert-after and binds the task
+attempt, parent snapshot, before/after manifests, per-operation raw-byte hashes, exact assertions and line-ending policy.
+Insert markers must move from zero occurrences to exactly one; optional replace markers obey the same rule. Existing files
+preserve one existing line-ending style while creates explicitly select LF/CRLF. Mixed endings, fuzzy/regex matching,
+sequence gaps, duplicate markers or any hash mismatch are rejected before writes.
 
 isolated-workspace: direct tool writes stay in a disposable run directory, with complete before/after manifests, diff, process and gate evidence. Acceptance remains whole-task: never publish selected languages/files or successful code with failed documentation.
 
@@ -176,7 +200,7 @@ Acceptance includes structural, semantic, runtime, crash, compatibility and secu
 
 ## 9. Product and Lifecycle Contracts (RFC Section 19)
 
-These are S0 semantics to freeze, not finalized wire fields. T002/T003 add versions, required fields, size limits, positive/negative fixtures and independent checks. Reject writes of unknown types.
+T002 has frozen these semantics and wire fields. T003 still adds positive/negative fixtures and independent checks. Reject writes of unknown types.
 
 | PC | Input/authority | Output/invariant | Acceptance |
 |---|---|---|---|
@@ -190,3 +214,10 @@ These are S0 semantics to freeze, not finalized wire fields. T002/T003 add versi
 Cost records include currency, price version, estimated/observed/unknown and settlement evidence. Subscription call/token-cap authorization explicitly disclaims monetary-bill guarantees. Record reserved/actual differences; duplicate receipts cannot settle twice. Do not claim hard currency guarantees beyond provider control.
 
 Export/backup readers verify reference closure, safe paths/types, versions, hashes and authority. Export completion does not change task/chain acceptance or imply product release. Reject live backups with uncertain consistency instead of reporting false recoverability. Disposition records exclude deleted secrets; deletion/retention conflicts require human decisions.
+
+The corresponding structures are `plan-preview.schema.json`, `export-record.schema.json`,
+`authorization-record.schema.json`, `effect-record.schema.json`, `cost-ledger.schema.json` and
+`lifecycle-record.schema.json`. `verification-report.schema.json` records cross-record decisions in a fixed order spanning
+event chains, reference closure, identity/attempt/snapshot, evidence/review/promotion, config/registries,
+change-set/repair/ticket, queue fencing, signature trust and lifecycle authorization. Failed or incomplete results fail
+closed; a report never changes state or authority.

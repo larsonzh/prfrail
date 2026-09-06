@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://proofrail.dev/schemas/v1/effect-record.schema.json",
+  "title": "ProofRail side-effect and recovery record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "record", "recordHash"],
+  "properties": {
+    "schemaVersion": {"const": "1.0.0"},
+    "record": {"oneOf": [{"$ref": "#/$defs/classification"}, {"$ref": "#/$defs/observation"}, {"$ref": "#/$defs/diagnosis"}]},
+    "recordHash": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "id": {"type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"},
+    "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "timestamp": {"type": "string", "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$"},
+    "hashSet": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/sha256"}},
+    "effectClass": {"enum": ["read-only", "local-discardable", "external-write"]},
+    "classification": {
+      "type": "object", "additionalProperties": false,
+      "required": ["recordId", "kind", "createdAt", "policyHash", "subjectKind", "subjectId", "subjectDefinitionHash", "effectClass", "externalSystems", "recoveryGuarantee", "evidence"],
+      "properties": {
+        "recordId": {"$ref": "#/$defs/id"}, "kind": {"const": "classification"}, "createdAt": {"$ref": "#/$defs/timestamp"},
+        "policyHash": {"$ref": "#/$defs/sha256"}, "subjectKind": {"enum": ["hook", "adapter", "manual-action"]},
+        "subjectId": {"$ref": "#/$defs/id"}, "subjectDefinitionHash": {"$ref": "#/$defs/sha256"},
+        "effectClass": {"$ref": "#/$defs/effectClass"}, "externalSystems": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+        "recoveryGuarantee": {"enum": ["none-required", "discard-workspace", "reconcile-only", "compensation-only"]},
+        "evidence": {"allOf": [{"$ref": "#/$defs/hashSet"}, {"minItems": 1}]}
+      }
+    },
+    "observation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["recordId", "kind", "occurredAt", "runId", "taskId", "attempt", "classificationHash", "authorizationHash", "effectClass", "operationKey", "outcome", "evidence", "errorEvidence"],
+      "properties": {
+        "recordId": {"$ref": "#/$defs/id"}, "kind": {"const": "observation"}, "occurredAt": {"$ref": "#/$defs/timestamp"},
+        "runId": {"$ref": "#/$defs/id"}, "taskId": {"$ref": "#/$defs/id"}, "attempt": {"type": "integer", "minimum": 1},
+        "classificationHash": {"$ref": "#/$defs/sha256"}, "authorizationHash": {"$ref": "#/$defs/sha256"},
+        "effectClass": {"$ref": "#/$defs/effectClass"}, "operationKey": {"$ref": "#/$defs/id"},
+        "outcome": {"enum": ["completed", "failed", "uncertain"]}, "evidence": {"$ref": "#/$defs/hashSet"}, "errorEvidence": {"$ref": "#/$defs/hashSet"}
+      },
+      "oneOf": [
+        {"properties": {"outcome": {"const": "completed"}, "evidence": {"minItems": 1}, "errorEvidence": {"maxItems": 0}}},
+        {"properties": {"outcome": {"enum": ["failed", "uncertain"]}, "errorEvidence": {"minItems": 1}}}
+      ]
+    },
+    "process": {
+      "type": "object", "additionalProperties": false, "required": ["processRef", "state", "evidence"],
+      "properties": {
+        "processRef": {"$ref": "#/$defs/id"}, "state": {"enum": ["running", "stopped", "unknown"]},
+        "evidence": {"allOf": [{"$ref": "#/$defs/hashSet"}, {"minItems": 1}]}
+      }
+    },
+    "diagnosis": {
+      "type": "object", "additionalProperties": false,
+      "required": ["recordId", "kind", "createdAt", "runId", "mode", "lastAcceptedSnapshotHash", "journalEvidence", "processes", "unknownEffectEvidence", "allowedActions", "mutationsPerformed", "outcome", "errorEvidence"],
+      "properties": {
+        "recordId": {"$ref": "#/$defs/id"}, "kind": {"const": "recovery-diagnosis"}, "createdAt": {"$ref": "#/$defs/timestamp"},
+        "runId": {"$ref": "#/$defs/id"}, "mode": {"const": "read-only-redacted"},
+        "lastAcceptedSnapshotHash": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/sha256"}]},
+        "journalEvidence": {"$ref": "#/$defs/hashSet"}, "processes": {"type": "array", "items": {"$ref": "#/$defs/process"}},
+        "unknownEffectEvidence": {"$ref": "#/$defs/hashSet"},
+        "allowedActions": {"type": "array", "uniqueItems": true, "items": {"enum": ["inspect", "controlled-stop", "reconcile", "abort", "resume"]}},
+        "mutationsPerformed": {"const": false}, "outcome": {"enum": ["clear", "blocked"]}, "errorEvidence": {"$ref": "#/$defs/hashSet"}
+      },
+      "oneOf": [
+        {"properties": {"outcome": {"const": "clear"}, "unknownEffectEvidence": {"maxItems": 0}, "errorEvidence": {"maxItems": 0}}},
+        {"properties": {"outcome": {"const": "blocked"}, "errorEvidence": {"minItems": 1}}}
+      ]
+    }
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://proofrail.dev/schemas/v1/authorization-record.schema.json",
+  "title": "ProofRail authorization and revocation record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "record", "recordHash"],
+  "properties": {
+    "schemaVersion": {"const": "1.0.0"},
+    "record": {"oneOf": [{"$ref": "#/$defs/grant"}, {"$ref": "#/$defs/revocation"}]},
+    "recordHash": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "id": {"type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"},
+    "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "timestamp": {"type": "string", "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$"},
+    "idSet": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+    "hashSet": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/sha256"}},
+    "actor": {
+      "type": "object", "additionalProperties": false, "required": ["type", "id"],
+      "properties": {"type": {"enum": ["operator", "policy"]}, "id": {"$ref": "#/$defs/id"}}
+    },
+    "networkScope": {
+      "type": "object", "additionalProperties": false, "required": ["protocol", "host", "port", "purpose"],
+      "properties": {
+        "protocol": {"enum": ["http", "https", "ssh", "custom"]},
+        "host": {"type": "string", "minLength": 1, "maxLength": 253, "pattern": "^[A-Za-z0-9.-]+$"},
+        "port": {"type": "integer", "minimum": 1, "maximum": 65535}, "purpose": {"$ref": "#/$defs/id"}
+      }
+    },
+    "budgetLimit": {
+      "type": "object", "additionalProperties": false,
+      "required": ["modelCalls", "tokens", "wallClockMs", "attempts", "currency", "amountMicros"],
+      "properties": {
+        "modelCalls": {"type": "integer", "minimum": 0}, "tokens": {"type": "integer", "minimum": 0},
+        "wallClockMs": {"type": "integer", "minimum": 1}, "attempts": {"type": "integer", "minimum": 1},
+        "currency": {"type": "string", "pattern": "^[A-Z]{3}$"}, "amountMicros": {"type": ["integer", "null"], "minimum": 0}
+      }
+    },
+    "scope": {
+      "type": "object", "additionalProperties": false,
+      "required": ["taskIds", "stepIds", "toolIds", "targetIds", "network", "effectClasses", "budget"],
+      "properties": {
+        "taskIds": {"$ref": "#/$defs/idSet"}, "stepIds": {"$ref": "#/$defs/idSet"},
+        "toolIds": {"$ref": "#/$defs/idSet"}, "targetIds": {"$ref": "#/$defs/idSet"},
+        "network": {"type": "array", "items": {"$ref": "#/$defs/networkScope"}},
+        "effectClasses": {"type": "array", "uniqueItems": true, "items": {"enum": ["read-only", "local-discardable", "external-write"]}},
+        "budget": {"$ref": "#/$defs/budgetLimit"}
+      }
+    },
+    "grant": {
+      "type": "object", "additionalProperties": false,
+      "required": ["recordId", "kind", "issuedAt", "issuedBy", "authorizationId", "runId", "runManifestHash", "policyHash", "scope", "expiresAt", "evidence"],
+      "properties": {
+        "recordId": {"$ref": "#/$defs/id"}, "kind": {"const": "grant"}, "issuedAt": {"$ref": "#/$defs/timestamp"},
+        "issuedBy": {"$ref": "#/$defs/actor"}, "authorizationId": {"$ref": "#/$defs/id"}, "runId": {"$ref": "#/$defs/id"},
+        "runManifestHash": {"$ref": "#/$defs/sha256"}, "policyHash": {"$ref": "#/$defs/sha256"},
+        "scope": {"$ref": "#/$defs/scope"}, "expiresAt": {"$ref": "#/$defs/timestamp"},
+        "evidence": {"allOf": [{"$ref": "#/$defs/hashSet"}, {"minItems": 1}]}
+      }
+    },
+    "revocation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["recordId", "kind", "issuedAt", "issuedBy", "authorizationId", "authorizationHash", "reasonCode", "stopDisposition", "stopEvidence", "residualRiskEvidence"],
+      "properties": {
+        "recordId": {"$ref": "#/$defs/id"}, "kind": {"const": "revocation"}, "issuedAt": {"$ref": "#/$defs/timestamp"},
+        "issuedBy": {"$ref": "#/$defs/actor"}, "authorizationId": {"$ref": "#/$defs/id"},
+        "authorizationHash": {"$ref": "#/$defs/sha256"}, "reasonCode": {"$ref": "#/$defs/id"},
+        "stopDisposition": {"enum": ["not-required", "requested", "completed", "uncertain"]},
+        "stopEvidence": {"$ref": "#/$defs/hashSet"}, "residualRiskEvidence": {"$ref": "#/$defs/hashSet"}
+      },
+      "allOf": [
+        {"if": {"properties": {"stopDisposition": {"const": "not-required"}}}, "then": {"properties": {"stopEvidence": {"maxItems": 0}}}},
+        {"if": {"properties": {"stopDisposition": {"enum": ["requested", "completed", "uncertain"]}}}, "then": {"properties": {"stopEvidence": {"minItems": 1}}}},
+        {"if": {"properties": {"stopDisposition": {"enum": ["requested", "uncertain"]}}}, "then": {"properties": {"residualRiskEvidence": {"minItems": 1}}}}
+      ]
+    }
+  }
+}

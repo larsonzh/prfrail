@@ -1468,7 +1468,7 @@ hook receipt。`warn`、重试消耗、进程树终止和 artifact 捕获是否�
   字面量 `.` 是唯一例外，明确表示 run-workspace 根。禁止空字符串、绝对路径、`..`、反斜杠和 URI。
 3. language scope 必须包含 `id`、`language`、`harness` 与非空 `targets`。三者均使用稳定 ID；language
   不做封闭枚举，以允许外置 harness 扩展，但 S1 随附支持仍仅为 generic/C/Go。`toolchain` 是可选的
-  toolchain 注册表 ID，具体版本与来源在后续 T002 toolchain/harness 切片冻结。
+  toolchain 注册表 ID，具体版本、来源与 probe 由第 16.9.23 节注册表冻结。
 4. `targets` 仅保存 `target.schema.json` 注册表 ID，不能内嵌 glob；component 可选 `dependsOn` 引用其他
   component，language scope 可选 `dependsOn` 引用同一 workspace 的其他 language scope。ID 唯一、引用
   存在、无自引用/环、target 属于 component root 且可写所有权不重叠，由语义 checker 判定。
@@ -1712,7 +1712,7 @@ parentSnapshotHash/candidateSnapshotHash/items`。父与候选 snapshot 摘要�
 
 - `id`：在该 manifest 内唯一的稳定 ID；
 - `kind`：`state-event|error|adapter-request|adapter-result|adapter-receipt|hook-result|artifact|change-set|
-  diff|ticket|repair-transaction|handoff-receipt`；
+  diff|ticket|repair-transaction|authorization-record|effect-record|cost-ledger|handoff-receipt`；
 - `objectHash`：已持久化对象或原始 artifact 字节的 SHA-256；
 - `mediaType`：IANA 风格小写 media type，不附带 charset 等参数；
 - `redaction`：`not-required|passed`。可能含 stdout/stderr、模型输出、人工输入或环境信息的对象必须先经
@@ -2021,6 +2021,187 @@ status 只能为 `in-progress|failed|uncertain|completed`：最后阶段成功�
 实际停机/租约、门禁充分性及原子替换。repair Promote 不产生 accepted snapshot，不进入 PASSED，也不替代
 第 16.9.14–16.9.15 节的独立 review 与 snapshot promotion；它只为 nextAttempt 提供起始工作区。
 
+#### 16.9.23 Harness 与 toolchain 注册表
+
+`harness.schema.json` 与 `toolchain.schema.json` 冻结 workspace language scope 所引用的工程适配和工具能力，
+两者都是用户配置输入，不是运行时探测结果。根对象分别只含 `schemaVersion="1.0.0"` 与非空
+`harnesses`/`toolchains` 数组；数组内 ID 必须唯一，未知字段拒绝。
+
+harness 条目必含 `id/version/languages/toolchains/parameters/hooks/artifactGlobs`：
+
+- languages 是非空稳定 ID 集合；首版随附 `generic|c|go` 只是发行支持范围，不形成核心封闭枚举；
+- toolchains 是非空 toolchain ID 集合；引用必须存在，且 language scope 显式 toolchain 若存在必须属于该集合；
+- parameters 是声明式参数定义，含稳定 id、`type=string|integer|boolean`、required 和可选 default；default
+  必须匹配 type。参数只参与配置解析，不得拼接成单字符串 shell；最终值及来源进入 run manifest；
+- hooks 是非空有序绑定，含 `phase=format|build|test|verify|integration`、hookId、required。hookId 只能引用
+  `hook.schema.json` 注册项；harness 不复制 runner/命令/权限，避免形成第二套 hook 协议；
+- artifactGlobs 使用第 16.9.4 节 managed glob，只描述待收集产物，不授予额外写权限。
+
+toolchain 条目必含 `id/versionRequirement/source/platforms/probe/evidencePolicy`：source 只能为
+`system-path|managed|container`；platforms 是非空 `{os,arch}` 集合，不含“任意主机路径”。probe 严格分离
+`executable` 与 args，禁止隐式 shell；`versionRequirement` 是 1–128 字节可打印 ASCII 的工具原生约束文本，
+不假装所有工具都遵循 SemVer。evidencePolicy 声明是否必须记录 executableHash、versionOutputHash 和
+sourceEvidence；至少一项必须为 true，S1 随附 toolchain 必须三项全开。
+
+Schema 判单条结构、参数 default 类型和 probe 参数形状；checker 验证 ID 唯一、harness/toolchain/hook 引用、
+platform 唯一、artifact 边界及 S1 内置项策略。capability preflight 在任何执行前，经授权运行 probe 并验证
+版本约束、来源、摘要与隔离能力；配置存在不证明工具已安装。探测输出只以脱敏摘要进入 run manifest
+capabilityEvidence，环境变量值、绝对主机路径和凭据不得进入注册表或 manifest。harness/toolchain 版本或
+对象摘要变化必须产生新 run manifest，不能修改活动 run 的既有绑定。
+
+#### 16.9.24 配置所有权与确定性合并
+
+人工配置只有两个 TOML 前端：`proofrail.toml` 拥有 chain/profile/task/step、documentation、policy 与注册表
+引用；`workspace.toml` 拥有 source/run/store 位置、component/language scope 拓扑、平台选择及
+adapter/harness/toolchain 选择。任一逻辑叶只能有一个文件所有；重复声明、未知键或把运行时 state、receipt、
+探测结果写入配置均拒绝。解析器先分别严格校验，再转换为第 16.9 节版本化 JSON 对象；TOML 不是第三套
+wire 契约。
+
+有效配置按 `builtin-default < profile < chain < task < step` 从低到高解析，规则固定如下：
+
+1. 缺失键表示继承；TOML 中不存在 JSON null 形式的“清除继承”，也不支持删除低层 map 键。
+2. scalar 整值替换；object 仅对 Schema 已知键递归合并；array 整体替换，绝不拼接、去重合并或按 ID
+  隐式 merge。显式空数组只在目标 Schema 允许空时表示“明确无项”，不等于继承。
+3. 空字符串是实际值；凡目标字段要求非空即拒绝，不能把空字符串解释为 unset。类型变化、未知 enum、
+  越界数值在生成 run manifest 前拒绝。
+4. 权限、target、工具、网络、预算、waiver 与 secret 引用同样遵循整体替换；高层不得通过数组合并意外
+  扩权。后置 checker 仍验证最终值未超过 owner authorization/policy 上限。
+5. 每个最终叶必须在 run manifest `resolution` 中恰有一项 RFC 6901 pointer 来源。builtin-default 的
+  sourceHash/sourcePointer 为 null；其余来源绑定对应输入对象摘要与 pointer。无来源、多来源或指向容器而
+  非叶值均拒绝。
+
+用户可读 TOML、严格中间对象、完全展开的 effective chain 与 resolution 表都进入 sourceConfigEvidence
+引用闭包；摘要变化创建新 run。`config explain <pointer>` 只读输出最终值（秘密仅显示引用/脱敏状态）、
+来源层、sourceHash/pointer 和覆盖链，不执行 probe/hook/agent，不回写配置。环境注入只解析 secret reference
+或本机位置，值不进入 canonical 配置；运行时心跳、预算消耗和能力证据永不反向合并到用户文件。
+
+#### 16.9.25 Managed change-set
+
+`change-set.schema.json` 冻结 `managed-change-set` 的输入事实：单个 task attempt、父 snapshot、写前/写后
+manifest 及 1–10000 个全局有序 operation。操作封闭为 `create-file|delete-file|replace-exact|insert-before|
+insert-after`；每项绑定相对 path、sequence、beforeHash/afterHash 和至少一个精确 assertion。create 要求
+beforeHash=null 并显式选择 lf/crlf；delete 要求 afterHash=null；已有文本只能 `preserve-existing`。所有
+文本载荷内部只用 LF 且不含 NUL；目标有混合行尾、不可解码或声明外编码时拒绝，不猜测转换。
+
+replace/insert 只按完整字节解码后的 exact text 匹配，不接受 regex、模糊定位或“首个即可”；调用方声明
+expectedMatches，insert 固定为 1。insert 必须带稳定 marker，写前该 marker 文本出现 0 次、写后恰好 1 次；
+replace 可选 marker，但提供时同样遵守 0→1。markerId 在 change-set 内唯一，marker 文本必须包含于该操作
+产生的 replacement/content，任何重复、碰撞或已存在均 first-fail-stop。assertion 在指定 before/after
+阶段判 exact-occurrences 或 absent；空匹配文本拒绝。
+
+checker 先读取并锁定全部目标，校验 managed target、路径/链接、父与写前 manifest、operationId/sequence
+从 1 连续唯一，再按数组顺序仅在内存模拟；同一路径可多次操作，但每项 beforeHash 必须等于前一模拟结果，
+最终 afterHash/afterManifestHash 必须逐字节一致。任一失败不得写文件。全部通过后，applier 把 changeSetHash、
+旧/新字节摘要和写入计划持久化到 journal，再逐文件临时写、校验、原子替换并全量后验；外部改动、崩溃或
+回滚不确定进入暂停/隔离，禁止部分成功。changeSetHash 覆盖除自身外的 JCS 对象；正文/manifest 摘要覆盖
+实际文件字节，不规范化 BOM、编码或行尾。
+
+#### 16.9.26 跨记录与信任链 checker
+
+`verification-report.schema.json` 是独立 checker 的可审计输出，不替代各对象 Schema。输入是明确 subject、
+trustPolicyHash 和按对象摘要去重的闭包；checker 必须从内容存储重新读取每个对象、验证 JCS 摘要和版本，
+不得信任调用方提供的已解析字段或投影。检查按固定次序执行：event-chain、reference-closure、identity-binding、
+attempt-binding、snapshot-lineage、evidence-completeness、review-authorization、promotion-reader、config-resolution、
+registry-reference、change-set-transaction、repair-stage-chain、ticket-budget、queue-fencing、signature-trust、
+lifecycle-authorization。只执行 subject 适用的子序列，report 内 checkId 唯一且保持该相对顺序。
+
+每项结果只可为 passed/failed/incomplete。passed 要求非空独立 evidence 且无 errorEvidence；结构/语义冲突为
+failed，缺对象、无法取得撤销新鲜度或平台事实为 incomplete，两者均带 error 证据并 fail closed。总 outcome
+为最严重结果：任一 failed 即 failed，否则任一 incomplete 即 incomplete，否则才 passed；空检查集、跳过适用
+检查、重复记录摘要或记录未进入闭包均拒绝。报告只陈述验证事实，不改变状态、授权、review 或 promotion。
+
+信任链检查须验证 detached signature、purpose/subject 配对、keyId 与公钥指纹、授权时刻的 policy、签发者
+范围、撤销/到期和完整前序摘要；哈希完整不等于身份可信。跨记录时间只验证明确的因果下界，不把不同时钟
+的墙钟顺序当唯一依据。T003 独立 oracle 必须对每个检查至少提供一正一反 fixture，并验证不同记录排列产生
+同一决定；T004 才提供 OS 原子性、进程和 capability 的实测事实。
+
+#### 16.9.27 PC-01 计划预览记录
+
+`plan-preview.schema.json` 冻结纯离线只读预览：绑定 chain/workspace/effective-config/policy 摘要，并列出
+逻辑 source/run/store 引用、读写 target、网络需求、step/阻断 gate、review 点、预算、空间估算、排除项和
+能力状态。持久记录不含绝对主机路径；渲染器可在本机解析 location ref，但不得写回记录。
+
+mode 恒为 `offline-read-only`；生成路径禁止启动 agent/hook/probe、访问网络/credential provider、安装插件
+或取得写租约。planned/unknown/unavailable 不得带伪造证据；observed/verified 必须引用既有独立证据，且
+记录生成本身不能产生该证据。ready 要求无 blockingEvidence；任何静态缺失或能力不确定导致 blocked 并引用
+错误证据。`--json` 与终端展示必须来自同一 previewHash，报告写文件是调用者另行授权的外层动作。
+
+#### 16.9.28 PC-02 导出记录
+
+`export-record.schema.json` 把交付导出与 task PASSED、chain COMPLETED、外部发布分离。记录绑定已接受
+snapshot、review、completed promotion 和 passed verification report，以及 task attempt、目标逻辑引用与
+解析后 destinationIdentityHash。目标前置恒为 absent；目标已存在、与 source/run/store 发生 canonical
+identity/ancestor/alias 冲突或引用闭包不完整时拒绝，绝不覆盖。
+
+completed 必须有非空导出 entries、packageManifestHash 和完成证据且无 errorEvidence；failed/uncertain
+必须保持 entries 为空、packageManifestHash=null 并带错误证据。条目路径、类型、原始字节摘要与大小需同
+source snapshot 一致，排除项按 secret/cache/machine-environment/unsupported-type 明列。实现先在同目标文件
+系统临时目录构造、逐项复核，再发布完成记录；临时失败或无法证明原子发布时不得留下可被 reader 接受的包。
+重试只可在相同 export identity 下核验已知临时对象，不可覆盖未知内容。导出记录不改变任何既有状态或 receipt。
+
+#### 16.9.29 PC-03 授权与撤销记录
+
+`authorization-record.schema.json` 是 append-only 的 grant/revocation 判别联合。grant 只能由 operator 或已
+信任 policy 签发，绑定 authorizationId、runId/runManifestHash、policyHash、task/step/tool/target/network/
+effect 范围、调用/token/时长/attempt/货币预算和 expiresAt；聊天文本、仓库内容、agent 输出不是授权来源。
+checker 验证签发者权限、签名（需要时）、issuedAt < expiresAt、范围是 manifest/policy 的收窄且 S1 不含
+external-write。空列表表示未授权该类能力，不表示不限。
+
+revocation 引用原 authorizationId/hash，立即阻断新 agent/hook 投递、新副作用与 snapshot acceptance；活动
+进程进入受控停止。stopDisposition 区分 not-required/requested/completed/uncertain：只有 completed 可证明
+已经停止，requested/uncertain 必须保留 residualRiskEvidence。撤销记录不删除或改写 grant，也不声称撤销
+已有外部副作用。每个副作用前及 acceptance 前，checker 均以当时时间和完整撤销链重新求有效授权；过期、
+撤销状态不明或能力隔离不足均 fail closed 到 PAUSED。waiver 不能扩大授权，也不能绕过完整性、秘密保护、
+单写者、写者停机或独占租约不变式。
+
+#### 16.9.30 PC-04 副作用与恢复记录
+
+`effect-record.schema.json` 用 classification/observation/recovery-diagnosis 三类不可变记录区分可信策略声明、
+实际一次动作和只读诊断。classification 绑定 hook/adapter/manual-action 定义摘要、policyHash、effectClass
+（read-only/local-discardable/external-write）、外部系统与恢复保证；模型自报或命令名/dry-run 文本不能作为
+分类证据。S1 checker 对 external-write 一律拒绝执行，read-only 网络仍须 PC-03 精确授权和可实施隔离。
+
+observation 绑定 run/task/attempt、classification、authorization、稳定 operationKey 和 completed/failed/
+uncertain 结果；每次潜在副作用在执行前持久化身份，崩溃或响应未知保留 uncertain，不得更换 key 后盲目
+重试。文件 rollback 只覆盖 local-discardable 工作区；外部动作至多 reconcile 或补偿，不得标为原子回滚。
+
+recovery-diagnosis 恒为 `read-only-redacted` 且 mutationsPerformed=false，列出最后 accepted snapshot、journal、
+受管进程、未知副作用证据和允许的人工动作。clear 要求没有未知副作用或错误；blocked 不自动选择 resume，
+也不删除锁、截断日志、停止进程或发送模型。任何写操作必须成为后续独立授权动作及新记录。
+
+#### 16.9.31 PC-05 成本账本
+
+`cost-ledger.schema.json` 是 owner/project/run 范围的 append-only allocation/reservation/settlement 账本。
+金额统一用非负整数 amountMicros 和 ISO 4217 三字母 currency，禁止二进制浮点；pricingMode 为 documented/
+subscription/unknown，并保留 pricingVersion 和证据。allocation 必须引用新 authorization 及前一 limits 摘要，
+只追加不改写；共享 owner/project 上限跨 run 计算，创建新 run 不能重置。
+
+每次模型调用发送前先持久化 reservation，绑定 requestId、稳定 idempotencyKey、授权和最坏可界定金额、调用
+数/token。settlement 一对一引用 reservation：observed/estimated 要给 amount 和 provider evidence；unknown
+允许 amount=null，但原预留继续占用且不得再次花费。失败、超时、取消和重试均须结算；同 requestId 或
+idempotencyKey 的重复回执不得重复计费。entries 的 sequence 从 1 连续，summary 是可重建投影，checker
+逐项复算金额/调用/token、币种、授权时点和 hard limit；不一致阻断新调用。
+
+subscription/unknown 定价可令货币金额为 null，但 modelCalls/tokens/wallClock/attempt 等本地可执行上限仍
+必须生效；报告明确“货币账单不保证”，不得把供应商不可控超额宣称为已阻止。离线无模型运行仍建立零调用
+预算事实，以便收益报告区分无费用与未知费用。账本不含 prompt、仓库内容、凭据或供应商秘密。
+
+#### 16.9.32 PC-06 生命周期记录
+
+`lifecycle-record.schema.json` 是 release/backup/retirement 判别联合。release 绑定精确版本、二进制摘要、
+依赖版本/摘要/许可证、SBOM、校验和清单、approved signature receipt、支持矩阵、能力、平台和已知限制。
+签名有效不等于仍受支持；离线无法取得撤销信息时 revocationFreshness=unknown 且不得显示 verified。
+
+backup 绑定 source store/schema、目标逻辑引用与 identity 摘要、写者停机证据、全部 object/event segment/
+reference root、secret 扫描、verification report 和在新隔离 store 的 restore evidence。completed 只允许
+closureStatus=complete、秘密 excluded、非空对象/根/恢复证据及 backupManifestHash；failed/uncertain 不得
+发布完成 manifest。未知 schema、活动写者状态不明或闭包不全均拒绝，保留原 store 且不做就地迁移。
+
+retirement 记录 deactivate/uninstall/delete-data/quarantine-secret，先绑定进程停机、adapter 撤销和保留/
+删除 inventory。共享 SessionBridge 与用户 toolchain 恒为 preserved；默认 retentionDisposition=retain。
+delete-authorized 必须引用独立人工删除授权；审计锁或引用冲突须有人工策略决定，否则失败。秘密事故只隔离
+对象、限制访问、撤销凭据并阻止外发，历史摘要/签名不得静默重写；处置记录只含证据摘要，不含秘密值。
+
 ---
 
 ## 17. S0 实施就绪门禁
@@ -2173,8 +2354,9 @@ status 只能为 `in-progress|failed|uncertain|completed`：最后阶段成功�
 ## 19. 产品闭环与生命周期细化（2026-09-06）
 
 本节是 R2/R4–R6/R9/R10/R12/R14/R16/R17/R19 的细化，不改变任务状态名、默认无 Git 写入、
-SessionBridge silent 边界或两代信任原则。所有具体命令名/字段仍需 S0 Schema/ADR 冻结。
-以下 S1 是建议纳入首版的最小范围，作为修订后的 exit 要求供所有者评审；未批准前保持 NOT_READY。
+SessionBridge silent 边界或两代信任原则。具体 wire 字段以第 16.9.27–16.9.32 节 Schema 为准。
+以下 S1 是建议纳入首版的最小范围；对应 wire 字段已在第 16.9.27–16.9.32 节冻结，但 T003 独立样例、
+T004 能力实测及后续门禁完成前仍保持 NOT_READY。
 
 ### 19.1 PC-01：从首次试用到可解释运行
 

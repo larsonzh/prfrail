@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://proofrail.dev/schemas/v1/toolchain.schema.json",
+  "title": "ProofRail toolchain registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "toolchains"],
+  "properties": {
+    "schemaVersion": {"const": "1.0.0"},
+    "toolchains": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/toolchain"}
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "platform": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["os", "arch"],
+      "properties": {
+        "os": {"$ref": "#/$defs/id"},
+        "arch": {"$ref": "#/$defs/id"}
+      }
+    },
+    "probe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["executable", "args", "timeoutMs"],
+      "properties": {
+        "executable": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024,
+          "pattern": "^(?:[A-Za-z0-9][A-Za-z0-9._+-]*|(?:(?!/)(?![A-Za-z]:)(?![A-Za-z][A-Za-z0-9+.-]*:)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*\\\\)(?!.*\\u0000).+/[^/]+))$"
+        },
+        "args": {
+          "type": "array",
+          "items": {"type": "string", "maxLength": 4096}
+        },
+        "timeoutMs": {"type": "integer", "minimum": 1, "maximum": 60000}
+      }
+    },
+    "evidencePolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["executableHash", "versionOutputHash", "sourceEvidence"],
+      "properties": {
+        "executableHash": {"type": "boolean"},
+        "versionOutputHash": {"type": "boolean"},
+        "sourceEvidence": {"type": "boolean"}
+      },
+      "anyOf": [
+        {"properties": {"executableHash": {"const": true}}},
+        {"properties": {"versionOutputHash": {"const": true}}},
+        {"properties": {"sourceEvidence": {"const": true}}}
+      ]
+    },
+    "toolchain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "versionRequirement", "source", "platforms", "probe", "evidencePolicy"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "versionRequirement": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[ -~]+$"
+        },
+        "source": {"enum": ["system-path", "managed", "container"]},
+        "platforms": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/platform"}
+        },
+        "probe": {"$ref": "#/$defs/probe"},
+        "evidencePolicy": {"$ref": "#/$defs/evidencePolicy"}
+      }
+    }
+  }
+}

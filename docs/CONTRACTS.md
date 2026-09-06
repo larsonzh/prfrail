@@ -12,11 +12,12 @@
 
 | 契约 | 已确定的语义 | S0 待冻结产物 |
 |---|---|---|
-| 配置/任务/步骤 | Draft 2020-12；`schemaVersion=1.0.0`；严格 chain/task/四类 step；workspace/component/language scope 拓扑 | harness/toolchain 注册表、引用与合并规则、其余 schema |
-| change-set | 顺序内存文本预验证、first-fail-stop、marker/精确断言、整组事务 | 操作枚举、换行语义、前后哈希、重复 marker 规则 |
+| 配置/任务/步骤 | Draft 2020-12；严格 chain/task/四类 step；workspace 拓扑；harness/toolchain 注册表；确定性所有权/合并 | 独立正反 fixtures |
+| change-set | 五类严格操作、顺序内存预验证、first-fail-stop、marker/精确断言、原始字节摘要与整组事务 | 跨记录 checker 与正反 fixtures |
 | snapshot/evidence | SHA-256 内容寻址、父快照/候选/证据绑定、不可变 | 路径 canonical、hash 输入编码、manifest/receipt schema |
 | ticket/repair | 稳定指纹、append-only ledger、三段预算；严格 Prepare→Inspect→Validate→Promote 阶段链 | 跨记录 checker 与正反 fixtures |
-| adapter/context | 严格 request/claim/result 信封、recordHash、幂等键、generation fencing、dispatch/takeover receipt、最小上下文 | 跨记录 checker、签名信任链和平台原子能力实测 |
+| adapter/context | 严格 request/claim/result 信封、recordHash、幂等键、generation fencing、dispatch/takeover receipt、最小上下文 | 独立信任链 fixtures 和平台原子能力实测 |
+| product/lifecycle | 计划预览、导出、授权/撤销、副作用/恢复、成本账本、发行/备份/退役记录 | 独立正反 fixtures 与 S1 运行验收 |
 
 各持久对象独立 `schemaVersion`，不与 CLI 版本或 SessionBridge schemaVersion 混为一谈；首版为
 `1.0.0`，未知主版本拒绝，未知 minor/patch 默认只读拒绝。仓库、Schema、运行时与 wire JSON 统一为
@@ -32,10 +33,13 @@ UTF-8 无 BOM + LF；canonical 字节还不得含格式空白或尾随换行。�
 | task | 稳定 id、非空 steps、review、documentationPolicy | id 重复、skip-on-fail 未声明 failureIndependent 拒绝 |
 | step | id、kind=code/build/verify/noop；code execution 默认 autonomous | 空 steps、未知 kind 拒绝；noop 必须 reason 且不能启动 hook/agent |
 | hook | 独立严格注册表；process/container 判别联合、逐项参数、失败/超时/资源/网络/产物策略 | ID/引用、工具摘要与能力由 checker/preflight 判定；执行结果进入 receipt |
+| harness/toolchain | harness 组合语言、参数、hook 和产物；toolchain 声明来源、平台、probe 与证据策略 | checker/preflight 验证唯一引用、版本、来源、摘要、授权与实际可用性 |
 | target | 独立严格注册表；稳定 id、class、access、唯一路径 glob；generated 单向来源 | 越界、重叠写、循环生成、未知引用由 checker 拒绝 |
 | component/language scope | component root；scope 的 language/harness/toolchain/target ID；依赖；step 取 scope 交集 | ID 唯一、引用存在、无环、harness 可用；同 root 允许不同唯一 target 所有者 |
 | state event | append-only envelope；chain/task/step 实体；严格前后状态；序号、前序 hash、证据与原因 | 跨事件序号/hash/实体状态连续性、主体授权和证据存在性由 checker 判定 |
 | error/error-set | 37 个封闭 code 及 retry/action 组合；非空错误索引与 primaryErrorId | checker 验证引用、唯一性及按时间/category/code/errorId 的主错误排序 |
+| verification report | 16 类固定顺序的跨记录/信任链检查；passed/failed/incomplete | checker 复读对象并验证摘要、适用检查集、顺序与总结果；报告不改变状态 |
+| product records | preview/export/authorization/effect/cost/lifecycle 严格判别记录 | checker 验证授权时点、引用闭包、算术、平台事实及禁止的 S1 external-write |
 | documentation | required/if-affected/optional/forbidden；impactRules | 命中规则缺有效 doc diff、生成物陈旧拒绝；空白/mtime 不算更新 |
 | handoff | execution、`handoffPolicy`（allowedTargets 引用 read-write target、inputPolicy、handoffTimeoutMs、returnActions、hooksAfterReturn） | 单写租约、停机、新鲜 manifest；归还后复检不能由 Schema 单独判定 |
 | review/waiver | approve/reject/waive；主体、原因、策略依据、有效期、绑定候选 | 同主体自批、过期、候选变化、范围不符均阻断 |
@@ -43,14 +47,18 @@ UTF-8 无 BOM + LF；canonical 字节还不得含格式空白或尾随换行。�
 三层检查不可合并：JSON Schema 判结构；语义 checker 判引用、所有权、循环、静态策略；运行期 gate 判文件 diff、进程、能力、秘密、预算与评审。非法黄金样例标注拒绝层，不能声称 JSON Schema 会检查实际文件或进程。
 
 `schemas/` 已创建 chain、hook、target、workspace、state-event、error、adapter-envelope、adapter-receipt、
-snapshot-manifest、evidence-manifest、review-receipt、promotion-receipt、handoff-receipt、hook-result、run-manifest、signature-receipt、error-set、ticket-ledger、repair-transaction 十九份结构 Schema；`testdata/contracts/valid/` 与
+snapshot-manifest、evidence-manifest、review-receipt、promotion-receipt、handoff-receipt、hook-result、run-manifest、signature-receipt、error-set、ticket-ledger、repair-transaction、harness、toolchain、change-set、verification-report、plan-preview、export-record、authorization-record、effect-record、cost-ledger、lifecycle-record 二十九份结构 Schema；`testdata/contracts/valid/` 与
 `testdata/contracts/invalid/` 仍待 T003 创建并由独立 validator 执行。每例携带 fixture ID、契约版本、
 expected accept/reject、拒绝层和原因。必须含三任务链、四 kind、C+Go、C+JavaScript+Python、人工交接、
 代码文档协同；每一条件至少一正一反。文档中的路径/片段是设计输入，不是已验证可运行样例。
 
 ## 3. 配置解析与冻结
 
-profile 只提供默认值；task 显式值覆盖链默认；step 显式值覆盖 task 默认。列表覆盖/合并、空值含义、workspace.toml 与 proofrail.toml 的责任划分尚待 ADR-002 冻结。`config explain` 必须能输出值与来源，不允许悄悄合并数组造成更多权限。
+`proofrail.toml` 独占 chain/task/step、文档、策略和注册表引用；`workspace.toml` 独占位置、拓扑、平台及
+adapter/harness/toolchain 选择，重复/未知键拒绝。优先级固定为 builtin-default < profile < chain < task <
+step：缺失继承，scalar 替换，已知 object 递归合并，array 整体替换且绝不拼接；空数组仅在 Schema 允许时
+表示明确无项，空字符串不等于 unset，不支持 null 删除。每个最终叶在 run manifest 中必须有唯一 pointer
+来源；`config explain` 只读展示值/脱敏引用及覆盖链，不执行或回写。
 
 解析完成再按 RFC 8785 JCS 计算 canonical run manifest 摘要，以 UTF-8 无 BOM 字节输入 SHA-256，
 文本表示为 `sha256:` 加 64 位小写十六进制。运行期心跳、credentials、机器探测不得回写用户配置。
@@ -62,6 +70,11 @@ profile 只提供默认值；task 显式值覆盖链默认；step 显式值覆�
 task/step，`bindings` 固定 adapter/harness/toolchain/hook/policy 的版本、对象摘要和能力证据。绝对路径、
 凭据、环境变量值及可变机器探测不进入 manifest；pointer 存在性、来源覆盖完整性、实际加载对象和
 runId 唯一 manifest 由 checker 判定。
+
+`harness.schema.json` 只组合语言、toolchain、声明式参数、已注册 hook 与 artifact glob，不复制 runner 或
+命令；`toolchain.schema.json` 声明来源、平台、分离的 executable/args probe 和证据策略。注册表存在不证明
+工具已安装；引用、版本、来源、摘要及实际能力由 checker/preflight 验证，探测仍需授权。S1 随附
+generic/C/Go 不形成核心语言枚举，环境值、凭据和绝对主机路径不得进入注册表或 run manifest。
 
 RFC §16.9.3.1 已冻结 `jcs-001` 与 `state-event-001` 两条字节级向量，分别覆盖 JCS 排序/转义/Unicode
 及 state-event 域分隔摘要。T003 仍须把它们固化为独立 fixture，并以非核心实现复算；文档中的摘要值
@@ -81,8 +94,9 @@ accepted 状态，只有有效 review + promotion receipt 才能授权下游消�
 接受事务的 reader contract：只有绑定父快照、task/attempt、候选及证据根的有效 review 和完成发布的 receipt 同时存在，才允许作为下一任务父快照。崩溃在候选、review、receipt、事件或投影之间时均重放 journal 判定；不得靠目录名或单个 PASSED 字段认定接受。哈希证明完整性，不证明发布者身份。
 
 `evidence-manifest.schema.json` 将 evidence root 冻结为单个 task attempt 的评审前不可变索引：绑定任务定义、
-解析策略、父/候选 snapshot，并引用状态事件、错误、adapter、hook、artifact、change-set、diff、ticket 与
-handoff 对象摘要。它不内嵌日志，不从对象存在推断成功，也不包含 review/waiver/promotion receipt；后者
+解析策略、父/候选 snapshot，并引用状态事件、错误、adapter、hook、artifact、change-set、diff、ticket、
+repair、authorization、effect、cost 与 handoff 对象摘要。评审后生成的 verification/export/lifecycle 记录
+不得反向进入该 root。它不内嵌日志，不从对象存在推断成功，也不包含 review/waiver/promotion receipt；后者
 单向引用 evidence root，避免摘要环。条目排序/唯一、同 attempt 归属、对象存在、必需证据覆盖及脱敏
 真实性由独立 checker 判定。
 
@@ -102,6 +116,11 @@ waive 时，候选才可供下游消费；failed/uncertain 均保持 acceptedSna
 则必须为空。越界、秘密或未知进程扫描失败不产生该 receipt，只产生 `error` 记录并保持暂停。
 
 managed-change-set：读全部目标→按全局顺序在内存模拟→检查 marker/前置哈希/断言/边界→持久 journal→逐文件原子替换→写后全量核验→记录 receipt；失败整组回滚，回滚本身失败则隔离并暂停。禁止覆盖外部修改，禁止运行进程存活时恢复。
+
+`change-set.schema.json` 封闭 create/delete/replace-exact/insert-before/insert-after 五类操作，并绑定 task
+attempt、父 snapshot、前后 manifest、逐操作前后字节摘要、精确 assertion 和行尾策略。insert marker 必须
+从 0 次变为恰好 1 次；replace 可选 marker 也遵守该规则。现有文件保留单一既有行尾，创建文件显式选择
+LF/CRLF；混合行尾、模糊/regex 匹配、序号断裂、重复 marker 或任一摘要不符均在写入前拒绝。
 
 isolated-workspace：直接工具写入仅限可丢弃运行目录；记录完整前后 manifest/diff/进程/gates；接受边界仍为整个 task。不能把部分语言、部分文件或“代码成功但文档失败”的子集发布。
 
@@ -179,7 +198,7 @@ snapshot、不进入 PASSED，也不替代独立 review 与 snapshot promotion�
 
 ## 9. 产品与生命周期契约（RFC §19）
 
-下列是 S0 必须冻结的语义，不是已确定 wire 字段。T002/T003 为每种记录补版本、必填字段、大小限制、正反样例与独立验证；未知类型拒绝写入。
+下列语义及 wire 字段已由 T002 冻结；T003 仍须补正反样例与独立验证，未知类型拒绝写入。
 
 | PC | 输入/权威 | 输出/不变式 | 验收 |
 |---|---|---|---|
@@ -193,3 +212,9 @@ snapshot、不进入 PASSED，也不替代独立 review 与 snapshot promotion�
 成本契约包含币种、价格版本、estimated/observed/unknown 和结算依据；订阅按调用/token cap 授权时必须标明“不保证货币账单”。预留与实际费用的差异留痕，重复回执不可重复结算；超供应商可控范围的硬币种保证不得宣称成立。
 
 导出/备份 reader 必须验证对象闭包、路径/类型安全、版本、哈希和授权；导出完成不提升原 task/chain 状态，更不代表产品发布。对于活动 run，一致性未知时拒绝备份，不返回可恢复的假成功。处置记录不含被删除秘密值；删除审批和审计保留冲突进入人工决定。
+
+对应结构分别为 `plan-preview.schema.json`、`export-record.schema.json`、`authorization-record.schema.json`、
+`effect-record.schema.json`、`cost-ledger.schema.json` 与 `lifecycle-record.schema.json`。跨记录结论写入
+`verification-report.schema.json`；固定检查顺序覆盖事件链、引用闭包、身份/attempt/snapshot、证据/review/
+promotion、配置/注册表、change-set/repair/ticket、queue fencing、签名信任和生命周期授权。failed 或
+incomplete 均 fail closed；报告自身不改变状态或授权。

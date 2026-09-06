@@ -7,13 +7,13 @@
 | ID | 决策/方案 | 替代与理由 | 状态/完成条件 |
 |---|---|---|---|
 | ADR-001 | Go 模块化单体、CLI/TUI、single writer、无默认 Git 写入 | 不选脚本翻译/分布式系统；降低跨平台与恢复复杂度 | RFC §4/11/16 已决定；T001 确认依赖基线 |
-| ADR-002 | 冻结 Schema 2020-12 工具链、canonical JSON/路径/错误/配置优先级 | 建议评估 RFC 8785 成熟实现，禁止自创排序即宣称 canonical；JSON Schema 库独立于核心判定器 | 部分冻结：chain/hook/target/workspace/state-event/error/error-set/ticket-ledger/repair-transaction/snapshot-manifest/evidence-manifest/review-receipt/promotion-receipt/handoff-receipt/hook-result/run-manifest/signature-receipt Schema、JCS、UTF-8 无 BOM、版本/路径、37 个错误 code 与主错误排序、失败指纹/三段预算/四阶段修复链、快照与评审前证据根摘要域、review policy/waiver 授权四要素、manual-handoff step 判别分支与 handoffPolicy、hook 执行/门禁/处置分层、有效配置来源与运行绑定、detached Ed25519 statement/receipt 摘要域、首批 canonical 向量、状态转换与分类退出码已定；跨记录 checker、独立 fixture/validator、其余对象待 T002/T003 |
+| ADR-002 | 冻结 Schema 2020-12 工具链、canonical JSON/路径/错误/配置优先级 | 建议评估 RFC 8785 成熟实现，禁止自创排序即宣称 canonical；JSON Schema 库独立于核心判定器 | T002 已冻结 29 份结构 Schema、JCS/UTF-8/版本/路径、配置合并、错误、事务、receipt、跨记录 checker 报告及 PC-01–PC-06 记录；T003 独立 fixture/validator 仍未完成，故 AT-01/§17.2 未通过 |
 | ADR-003 | 事件/journal 与接受提交协议、Windows 原子替换/停机原语 | rename 只解决单文件；需证明 durable、失败回滚和跨文件发布读者语义 | 部分冻结：promotion receipt 已绑定父/候选/evidence/review/停机/租约及 completed/failed/uncertain reader contract；发布顺序、崩溃点与原生 Windows/Linux durable/atomic 能力待 T004 实测；不能用目录隔离替代 required OS 限制 |
-| ADR-004 | SessionBridge v0.1.1 silent + 文件队列，核心自管持久幂等 | 不 fork 扩展、不用 visible/auto、无 GUI 兜底；内存缓存不等于 exactly-once | 部分冻结：共用信封、每文件单记录 framing、原子 claim、generation fencing、result、dispatch/takeover receipt 与跨主机 signature receipt 已定；跨记录/信任链 checker、能力矩阵与平台崩溃实测待 T002/T004 |
+| ADR-004 | SessionBridge v0.1.1 silent + 文件队列，核心自管持久幂等 | 不 fork 扩展、不用 visible/auto、无 GUI 兜底；内存缓存不等于 exactly-once | 契约已冻结：共用信封、每文件单记录 framing、原子 claim、generation fencing、result、dispatch/takeover receipt、跨主机 signature receipt 与 checker 顺序；能力矩阵与平台崩溃实测待 T004 |
 | ADR-005 | bootstrap 首个 seed 由常规构建、独立 Go tests 和人工审计建立；N 构建 N+1，隔离重放 | 不接受候选自证或覆盖运行中 host | RFC §16.5 已定；T017 前指定 seed 来源/摘要、外部 oracle、签名主体和 rollback 路径 |
 | ADR-006 | Windows 11 amd64 正式、Linux amd64 核心 CI；纯 Go 发布；固定工具链/依赖/签名 | RFC §16.2 提到 Win10，与 §9.6/14 的 Win11 范围不同；以 §14 为首版承诺，Win10 不承诺 | 2026-09-06 所有者批准策略；T002 冻结依赖清单，T017 落实签名主体/公钥/撤销流程 |
 | ADR-007 | 最小 context、离线先行、按任务预算、双语 ID 追踪 | 不用昂贵模型反复全仓审读；不把英文译本做第二权威源 | 2026-09-06 所有者批准；S0 新增付费调用为 0，超出须另授权 |
-| ADR-008 | RFC §19 六类产品最小闭环纳入 S1；仍用本地模块、不建商业后台 | 不采用只交执行引擎、隐式回写/部署或静默自更新；新增成本必须显式评审 | 2026-09-06 所有者批准范围；T002/T003 冻结记录/样例；T019–T024 运行验证；未授权 S1 编码 |
+| ADR-008 | RFC §19 六类产品最小闭环纳入 S1；仍用本地模块、不建商业后台 | 不采用只交执行引擎、隐式回写/部署或静默自更新；新增成本必须显式评审 | 2026-09-06 所有者批准范围；T002 已冻结记录，T003 补样例，T019–T024 运行验证；未授权 S1 编码 |
 
 ## 1. 发布与依赖决策提案
 
@@ -25,7 +25,7 @@
 
 ## 2. 必须关闭的歧义
 
-T002 需对以下做一次集中 RFC 修订：空链、列表覆盖/合并、duration/size/预算单位与默认、id/attempt/requestId 类型、error code、路径/symlink/hardlink、签名覆盖范围、review policy 与 waiver 授权、票据阈值、hook runner 最小能力、write lease 续期/接管、Windows 10 支持措辞。没有冻结前，可写文档/隔离实验，不能实现为生产默认值。
+T002 已集中冻结空链、列表覆盖/合并、duration/size/预算单位与默认、id/attempt/requestId 类型、error code、路径/symlink/hardlink、签名覆盖范围、review policy 与 waiver 授权、票据阈值、hook runner 最小能力、write lease 续期/接管及 Windows 10 支持措辞。T003 独立样例/validator 和 T004 平台事实完成前，仍不能实现为生产默认值。
 
 ## 3. S0 Readiness 当前结论
 
@@ -34,18 +34,18 @@ T002 需对以下做一次集中 RFC 修订：空链、列表覆盖/合并、dur
 | RFC §17 项 | 当前证据/缺口 | 关闭任务 |
 |---|---|---|
 | 1 P0 文档评审 | 所有者已于 2026-09-06 接受第三方只读审计建议并批准 S0 规格冻结/决策单；独立安全签署仍见第 3 项 | 已关闭（T001） |
-| 2 Schema/黄金/validator | 尚无完整机器规范 | T002/T003 |
+| 2 Schema/黄金/validator | 29 份结构 Schema 与 checker 规则已冻结；独立黄金样例/validator 未完成 | T003 |
 | 3 STRIDE | 已写风险/责任/AT 映射；待独立评审 | T001/T003 |
 | 4 whois + 非 C | 映射方案已写；尚无经验证夹具 | T003 |
 | 5 技术探针 | Go 可用；TUI/原子替换/进程树/双通道/路径未验证 | T004 |
 | 6 可追踪 backlog | 所有者已批准当前 S0/S1 范围和追踪计划 | 已关闭（T001） |
-| 7 平台/Go/许可/周期/响应/签名 | 平台、支持期、离线 Ed25519 与逐依赖许可审计策略已批准；精确依赖/主体/公钥/渠道未锁定 | T002/T017 |
+| 7 平台/Go/许可/周期/响应/签名 | 平台、支持期、离线 Ed25519 与逐依赖许可审计策略已批准；精确依赖/主体/公钥/渠道未锁定 | T017 |
 | 8 用户批准 | 已批准 S0 规格冻结、S1 范围、零新增付费预算和 whois 影子原则；未授权 S1 编码、具体 whois 数据访问或发布 | 已关闭（T001）；执行授权另行取得 |
 | 9 step/TUI/bootstrap | 设计已写；原型、seed/oracle 身份未建立 | T003/T004 |
 | 10 多语言 schema | 目标所有权规则已写；双/三语言 goldens 未执行 | T003 |
 | 11 handoff | 契约和威胁已写；合法/非法机器样例未执行 | T003 |
 | 12 documentation | policy/impact/生成方向已写；机器校验未执行 | T003 |
-| 13 产品与生命周期 | PC-01–PC-06/AT-16–AT-21 已映射；授权来源/撤销竞态、计量模式/共享锁、导出/备份一致性、数据删除冲突未冻结/验证 | T001/T002/T003 |
+| 13 产品与生命周期 | PC-01–PC-06 记录及授权/撤销、计量/共享范围、导出/备份一致性、删除冲突语义已冻结；独立 fixtures 未验证 | T003 |
 
 允许下一步：评审本包并执行 S0 规格化和独立技术探针。进入 S1 必须逐项提交证据与显式用户批准，不能由文档存在性自动放行。
 

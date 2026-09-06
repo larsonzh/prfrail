@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://proofrail.dev/schemas/v1/verification-report.schema.json",
+  "title": "ProofRail cross-record verification report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "report", "reportHash"],
+  "properties": {
+    "schemaVersion": {"const": "1.0.0"},
+    "report": {"$ref": "#/$defs/report"},
+    "reportHash": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$"
+    },
+    "hashSet": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/sha256"}
+    },
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "objectHash"],
+      "properties": {
+        "kind": {
+          "enum": [
+            "chain", "workspace", "run-manifest", "state-event", "error-set", "adapter-record",
+            "snapshot-manifest", "evidence-manifest", "review-receipt", "promotion-receipt",
+            "handoff-receipt", "hook-result", "ticket-ledger", "repair-transaction", "change-set",
+            "signature-receipt", "product-record"
+          ]
+        },
+        "objectHash": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "checkId": {
+      "enum": [
+        "event-chain", "reference-closure", "identity-binding", "attempt-binding", "snapshot-lineage",
+        "evidence-completeness", "review-authorization", "promotion-reader", "config-resolution",
+        "registry-reference", "change-set-transaction", "repair-stage-chain", "ticket-budget",
+        "queue-fencing", "signature-trust", "lifecycle-authorization"
+      ]
+    },
+    "passedCheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["checkId", "status", "subjectHashes", "evidence", "errorEvidence"],
+      "properties": {
+        "checkId": {"$ref": "#/$defs/checkId"},
+        "status": {"const": "passed"},
+        "subjectHashes": {"allOf": [{"$ref": "#/$defs/hashSet"}, {"minItems": 1}]},
+        "evidence": {"allOf": [{"$ref": "#/$defs/hashSet"}, {"minItems": 1}]},
+        "errorEvidence": {"allOf": [{"$ref": "#/$defs/hashSet"}, {"maxItems": 0}]}
+      }
+    },
+    "blockedCheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["checkId", "status", "subjectHashes", "evidence", "errorEvidence"],
+      "properties": {
+        "checkId": {"$ref": "#/$defs/checkId"},
+        "status": {"enum": ["failed", "incomplete"]},
+        "subjectHashes": {"allOf": [{"$ref": "#/$defs/hashSet"}, {"minItems": 1}]},
+        "evidence": {"$ref": "#/$defs/hashSet"},
+        "errorEvidence": {"allOf": [{"$ref": "#/$defs/hashSet"}, {"minItems": 1}]}
+      }
+    },
+    "check": {
+      "oneOf": [{"$ref": "#/$defs/passedCheck"}, {"$ref": "#/$defs/blockedCheck"}]
+    },
+    "report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reportId", "verifiedAt", "verifierId", "subjectKind", "subjectHash", "trustPolicyHash", "records", "checks", "outcome"],
+      "properties": {
+        "reportId": {"$ref": "#/$defs/id"},
+        "verifiedAt": {"$ref": "#/$defs/timestamp"},
+        "verifierId": {"$ref": "#/$defs/id"},
+        "subjectKind": {"enum": ["run", "task-attempt", "accepted-snapshot", "export", "backup", "release"]},
+        "subjectHash": {"$ref": "#/$defs/sha256"},
+        "trustPolicyHash": {"$ref": "#/$defs/sha256"},
+        "records": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 100000,
+          "items": {"$ref": "#/$defs/record"}
+        },
+        "checks": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": {"$ref": "#/$defs/check"}
+        },
+        "outcome": {"enum": ["passed", "failed", "incomplete"]}
+      }
+    }
+  }
+}

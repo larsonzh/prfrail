@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://proofrail.dev/schemas/v1/export-record.schema.json",
+  "title": "ProofRail delivery export record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "export", "exportHash"],
+  "properties": {
+    "schemaVersion": {"const": "1.0.0"},
+    "export": {"$ref": "#/$defs/export"},
+    "exportHash": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "id": {"type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"},
+    "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "timestamp": {"type": "string", "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$"},
+    "relativePath": {"type": "string", "minLength": 1, "maxLength": 1024, "pattern": "^(?!/)(?![A-Za-z]:)(?![A-Za-z][A-Za-z0-9+.-]*:)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*\\\\)(?!.*\\u0000).+$"},
+    "hashSet": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/sha256"}},
+    "actor": {"type": "object", "additionalProperties": false, "required": ["type", "id"], "properties": {"type": {"enum": ["operator", "system"]}, "id": {"$ref": "#/$defs/id"}}},
+    "entry": {
+      "type": "object", "additionalProperties": false, "required": ["path", "type", "contentHash", "sizeBytes"],
+      "properties": {"path": {"$ref": "#/$defs/relativePath"}, "type": {"enum": ["regular-file", "directory", "symbolic-link"]}, "contentHash": {"$ref": "#/$defs/sha256"}, "sizeBytes": {"type": "integer", "minimum": 0}}
+    },
+    "exclusion": {
+      "type": "object", "additionalProperties": false, "required": ["category", "pattern", "matchedCount"],
+      "properties": {"category": {"enum": ["secret", "cache", "machine-environment", "unsupported-type"]}, "pattern": {"$ref": "#/$defs/relativePath"}, "matchedCount": {"type": "integer", "minimum": 0}}
+    },
+    "exportProperties": {
+      "type": "object", "additionalProperties": false,
+      "required": ["exportId", "createdAt", "recordedBy", "runId", "taskId", "attempt", "sourceSnapshotHash", "reviewReceiptHash", "promotionReceiptHash", "verificationReportHash", "destinationRef", "destinationIdentityHash", "destinationPrecondition", "entries", "exclusions", "outcome", "packageManifestHash", "evidence", "errorEvidence"],
+      "properties": {
+        "exportId": {"$ref": "#/$defs/id"}, "createdAt": {"$ref": "#/$defs/timestamp"}, "recordedBy": {"$ref": "#/$defs/actor"},
+        "runId": {"$ref": "#/$defs/id"}, "taskId": {"$ref": "#/$defs/id"}, "attempt": {"type": "integer", "minimum": 1},
+        "sourceSnapshotHash": {"$ref": "#/$defs/sha256"}, "reviewReceiptHash": {"$ref": "#/$defs/sha256"}, "promotionReceiptHash": {"$ref": "#/$defs/sha256"}, "verificationReportHash": {"$ref": "#/$defs/sha256"},
+        "destinationRef": {"$ref": "#/$defs/id"}, "destinationIdentityHash": {"$ref": "#/$defs/sha256"}, "destinationPrecondition": {"const": "absent"},
+        "entries": {"type": "array", "items": {"$ref": "#/$defs/entry"}}, "exclusions": {"type": "array", "items": {"$ref": "#/$defs/exclusion"}},
+        "outcome": {"enum": ["completed", "failed", "uncertain"]}, "packageManifestHash": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/sha256"}]},
+        "evidence": {"$ref": "#/$defs/hashSet"}, "errorEvidence": {"$ref": "#/$defs/hashSet"}
+      },
+      "oneOf": [
+        {"properties": {"outcome": {"const": "completed"}, "entries": {"minItems": 1}, "packageManifestHash": {"$ref": "#/$defs/sha256"}, "evidence": {"minItems": 1}, "errorEvidence": {"maxItems": 0}}},
+        {"properties": {"outcome": {"enum": ["failed", "uncertain"]}, "entries": {"maxItems": 0}, "packageManifestHash": {"type": "null"}, "errorEvidence": {"minItems": 1}}}
+      ]
+    },
+    "export": {"$ref": "#/$defs/exportProperties"}
+  }
+}

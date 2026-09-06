@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://proofrail.dev/schemas/v1/plan-preview.schema.json",
+  "title": "ProofRail read-only plan preview",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "preview", "previewHash"],
+  "properties": {
+    "schemaVersion": {"const": "1.0.0"},
+    "preview": {"$ref": "#/$defs/preview"},
+    "previewHash": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "id": {"type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"},
+    "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "timestamp": {"type": "string", "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$"},
+    "idSet": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+    "hashSet": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/sha256"}},
+    "locations": {
+      "type": "object", "additionalProperties": false,
+      "required": ["sourceRef", "runRef", "storeRef"],
+      "properties": {"sourceRef": {"$ref": "#/$defs/id"}, "runRef": {"$ref": "#/$defs/id"}, "storeRef": {"$ref": "#/$defs/id"}}
+    },
+    "networkRequirement": {
+      "type": "object", "additionalProperties": false,
+      "required": ["protocol", "host", "port", "purpose"],
+      "properties": {
+        "protocol": {"enum": ["http", "https", "ssh", "custom"]},
+        "host": {"type": "string", "minLength": 1, "maxLength": 253, "pattern": "^[A-Za-z0-9.-]+$"},
+        "port": {"type": "integer", "minimum": 1, "maximum": 65535},
+        "purpose": {"$ref": "#/$defs/id"}
+      }
+    },
+    "step": {
+      "type": "object", "additionalProperties": false,
+      "required": ["taskId", "stepId", "kind", "blockingGateIds", "reviewRequired"],
+      "properties": {
+        "taskId": {"$ref": "#/$defs/id"}, "stepId": {"$ref": "#/$defs/id"},
+        "kind": {"enum": ["code", "build", "verify", "noop", "manual-handoff"]},
+        "blockingGateIds": {"$ref": "#/$defs/idSet"}, "reviewRequired": {"type": "boolean"}
+      }
+    },
+    "capability": {
+      "type": "object", "additionalProperties": false,
+      "required": ["capabilityId", "status", "evidence"],
+      "properties": {
+        "capabilityId": {"$ref": "#/$defs/id"},
+        "status": {"enum": ["planned", "observed", "verified", "unknown", "unavailable"]},
+        "evidence": {"$ref": "#/$defs/hashSet"}
+      },
+      "oneOf": [
+        {"properties": {"status": {"enum": ["observed", "verified"]}, "evidence": {"minItems": 1}}},
+        {"properties": {"status": {"enum": ["planned", "unknown", "unavailable"]}, "evidence": {"maxItems": 0}}}
+      ]
+    },
+    "budget": {
+      "type": "object", "additionalProperties": false,
+      "required": ["modelCallLimit", "tokenLimit", "wallClockMs", "attemptLimit", "currency", "estimatedAmountMicros", "estimateStatus", "pricingSource"],
+      "properties": {
+        "modelCallLimit": {"type": "integer", "minimum": 0}, "tokenLimit": {"type": "integer", "minimum": 0},
+        "wallClockMs": {"type": "integer", "minimum": 1}, "attemptLimit": {"type": "integer", "minimum": 1},
+        "currency": {"type": "string", "pattern": "^[A-Z]{3}$"},
+        "estimatedAmountMicros": {"type": ["integer", "null"], "minimum": 0},
+        "estimateStatus": {"enum": ["estimated", "unknown", "not-applicable"]},
+        "pricingSource": {"type": ["string", "null"], "minLength": 1, "maxLength": 256}
+      }
+    },
+    "preview": {
+      "type": "object", "additionalProperties": false,
+      "required": ["previewId", "createdAt", "mode", "chainDefinitionHash", "workspaceDefinitionHash", "effectiveConfigHash", "policyHash", "locations", "readTargetIds", "writeTargetIds", "networkRequirements", "steps", "reviewPointIds", "budget", "estimatedStoreBytes", "exclusionIds", "capabilities", "outcome", "blockingEvidence"],
+      "properties": {
+        "previewId": {"$ref": "#/$defs/id"}, "createdAt": {"$ref": "#/$defs/timestamp"},
+        "mode": {"const": "offline-read-only"}, "chainDefinitionHash": {"$ref": "#/$defs/sha256"},
+        "workspaceDefinitionHash": {"$ref": "#/$defs/sha256"}, "effectiveConfigHash": {"$ref": "#/$defs/sha256"},
+        "policyHash": {"$ref": "#/$defs/sha256"}, "locations": {"$ref": "#/$defs/locations"},
+        "readTargetIds": {"$ref": "#/$defs/idSet"}, "writeTargetIds": {"$ref": "#/$defs/idSet"},
+        "networkRequirements": {"type": "array", "items": {"$ref": "#/$defs/networkRequirement"}},
+        "steps": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/step"}},
+        "reviewPointIds": {"$ref": "#/$defs/idSet"}, "budget": {"$ref": "#/$defs/budget"},
+        "estimatedStoreBytes": {"type": ["integer", "null"], "minimum": 0}, "exclusionIds": {"$ref": "#/$defs/idSet"},
+        "capabilities": {"type": "array", "items": {"$ref": "#/$defs/capability"}},
+        "outcome": {"enum": ["ready", "blocked"]}, "blockingEvidence": {"$ref": "#/$defs/hashSet"}
+      },
+      "oneOf": [
+        {"properties": {"outcome": {"const": "ready"}, "blockingEvidence": {"maxItems": 0}}},
+        {"properties": {"outcome": {"const": "blocked"}, "blockingEvidence": {"minItems": 1}}}
+      ]
+    }
+  }
+}

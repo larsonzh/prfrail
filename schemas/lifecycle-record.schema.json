@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://proofrail.dev/schemas/v1/lifecycle-record.schema.json",
+  "title": "ProofRail lifecycle record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "record", "recordHash"],
+  "properties": {
+    "schemaVersion": {"const": "1.0.0"},
+    "record": {"oneOf": [{"$ref": "#/$defs/release"}, {"$ref": "#/$defs/backup"}, {"$ref": "#/$defs/retirement"}]},
+    "recordHash": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "id": {"type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"},
+    "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "timestamp": {"type": "string", "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$"},
+    "version": {"type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[!-~]+$"},
+    "hashSet": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/sha256"}},
+    "idSet": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+    "actor": {"type": "object", "additionalProperties": false, "required": ["type", "id"], "properties": {"type": {"enum": ["operator", "system"]}, "id": {"$ref": "#/$defs/id"}}},
+    "platform": {
+      "type": "object", "additionalProperties": false, "required": ["os", "arch"],
+      "properties": {"os": {"$ref": "#/$defs/id"}, "arch": {"$ref": "#/$defs/id"}}
+    },
+    "dependency": {
+      "type": "object", "additionalProperties": false, "required": ["name", "version", "contentHash", "licenseEvidence"],
+      "properties": {"name": {"type": "string", "minLength": 1, "maxLength": 256}, "version": {"$ref": "#/$defs/version"}, "contentHash": {"$ref": "#/$defs/sha256"}, "licenseEvidence": {"$ref": "#/$defs/sha256"}}
+    },
+    "support": {
+      "type": "object", "additionalProperties": false,
+      "required": ["componentId", "versionRange", "status", "supportExpiresAt", "capabilityIds", "platforms"],
+      "properties": {
+        "componentId": {"$ref": "#/$defs/id"}, "versionRange": {"$ref": "#/$defs/version"},
+        "status": {"enum": ["supported", "deprecated", "eol"]},
+        "supportExpiresAt": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/timestamp"}]},
+        "capabilityIds": {"$ref": "#/$defs/idSet"}, "platforms": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/platform"}}
+      }
+    },
+    "release": {
+      "type": "object", "additionalProperties": false,
+      "required": ["recordId", "kind", "createdAt", "version", "binaryHashes", "dependencies", "sbomHash", "licenseManifestHash", "checksumManifestHash", "signatureReceiptHash", "supportMatrix", "knownLimitationIds", "revocationFreshness", "revocationEvidence"],
+      "properties": {
+        "recordId": {"$ref": "#/$defs/id"}, "kind": {"const": "release"}, "createdAt": {"$ref": "#/$defs/timestamp"},
+        "version": {"$ref": "#/$defs/version"}, "binaryHashes": {"allOf": [{"$ref": "#/$defs/hashSet"}, {"minItems": 1}]},
+        "dependencies": {"type": "array", "items": {"$ref": "#/$defs/dependency"}}, "sbomHash": {"$ref": "#/$defs/sha256"},
+        "licenseManifestHash": {"$ref": "#/$defs/sha256"}, "checksumManifestHash": {"$ref": "#/$defs/sha256"},
+        "signatureReceiptHash": {"$ref": "#/$defs/sha256"}, "supportMatrix": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/support"}},
+        "knownLimitationIds": {"$ref": "#/$defs/idSet"}, "revocationFreshness": {"enum": ["verified", "unknown"]},
+        "revocationEvidence": {"$ref": "#/$defs/hashSet"}
+      },
+      "oneOf": [
+        {"properties": {"revocationFreshness": {"const": "verified"}, "revocationEvidence": {"minItems": 1}}},
+        {"properties": {"revocationFreshness": {"const": "unknown"}, "revocationEvidence": {"maxItems": 0}}}
+      ]
+    },
+    "backup": {
+      "type": "object", "additionalProperties": false,
+      "required": ["recordId", "kind", "createdAt", "recordedBy", "sourceStoreHash", "sourceSchemaVersion", "destinationRef", "destinationIdentityHash", "writerStopEvidence", "objectHashes", "eventSegmentHashes", "referenceRootHashes", "secretDisposition", "secretScanEvidence", "closureStatus", "verificationReportHash", "restoreEvidence", "outcome", "backupManifestHash", "errorEvidence"],
+      "properties": {
+        "recordId": {"$ref": "#/$defs/id"}, "kind": {"const": "backup"}, "createdAt": {"$ref": "#/$defs/timestamp"}, "recordedBy": {"$ref": "#/$defs/actor"},
+        "sourceStoreHash": {"$ref": "#/$defs/sha256"}, "sourceSchemaVersion": {"const": "1.0.0"},
+        "destinationRef": {"$ref": "#/$defs/id"}, "destinationIdentityHash": {"$ref": "#/$defs/sha256"},
+        "writerStopEvidence": {"$ref": "#/$defs/hashSet"}, "objectHashes": {"$ref": "#/$defs/hashSet"},
+        "eventSegmentHashes": {"$ref": "#/$defs/hashSet"}, "referenceRootHashes": {"$ref": "#/$defs/hashSet"},
+        "secretDisposition": {"const": "excluded"}, "secretScanEvidence": {"allOf": [{"$ref": "#/$defs/hashSet"}, {"minItems": 1}]},
+        "closureStatus": {"enum": ["complete", "incomplete", "unknown"]}, "verificationReportHash": {"$ref": "#/$defs/sha256"},
+        "restoreEvidence": {"$ref": "#/$defs/hashSet"}, "outcome": {"enum": ["completed", "failed", "uncertain"]},
+        "backupManifestHash": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/sha256"}]}, "errorEvidence": {"$ref": "#/$defs/hashSet"}
+      },
+      "oneOf": [
+        {"properties": {"outcome": {"const": "completed"}, "closureStatus": {"const": "complete"}, "objectHashes": {"minItems": 1}, "referenceRootHashes": {"minItems": 1}, "restoreEvidence": {"minItems": 1}, "backupManifestHash": {"$ref": "#/$defs/sha256"}, "errorEvidence": {"maxItems": 0}}},
+        {"properties": {"outcome": {"enum": ["failed", "uncertain"]}, "backupManifestHash": {"type": "null"}, "errorEvidence": {"minItems": 1}}}
+      ]
+    },
+    "retirement": {
+      "type": "object", "additionalProperties": false,
+      "required": ["recordId", "kind", "createdAt", "recordedBy", "action", "installationHash", "processStopEvidence", "adapterRevocationEvidence", "inventoryHash", "retentionDisposition", "deletionAuthorizationHash", "auditConflictDecisionHash", "sharedToolsDisposition", "secretIncidentEvidence", "outcome", "errorEvidence"],
+      "properties": {
+        "recordId": {"$ref": "#/$defs/id"}, "kind": {"const": "retirement"}, "createdAt": {"$ref": "#/$defs/timestamp"}, "recordedBy": {"$ref": "#/$defs/actor"},
+        "action": {"enum": ["deactivate", "uninstall", "delete-data", "quarantine-secret"]}, "installationHash": {"$ref": "#/$defs/sha256"},
+        "processStopEvidence": {"allOf": [{"$ref": "#/$defs/hashSet"}, {"minItems": 1}]}, "adapterRevocationEvidence": {"allOf": [{"$ref": "#/$defs/hashSet"}, {"minItems": 1}]},
+        "inventoryHash": {"$ref": "#/$defs/sha256"}, "retentionDisposition": {"enum": ["retain", "delete-authorized", "quarantine"]},
+        "deletionAuthorizationHash": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/sha256"}]},
+        "auditConflictDecisionHash": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/sha256"}]},
+        "sharedToolsDisposition": {"const": "preserved"}, "secretIncidentEvidence": {"$ref": "#/$defs/hashSet"},
+        "outcome": {"enum": ["completed", "failed", "uncertain"]}, "errorEvidence": {"$ref": "#/$defs/hashSet"}
+      },
+      "allOf": [
+        {"if": {"properties": {"retentionDisposition": {"const": "delete-authorized"}}}, "then": {"properties": {"deletionAuthorizationHash": {"$ref": "#/$defs/sha256"}}}, "else": {"properties": {"deletionAuthorizationHash": {"type": "null"}}}},
+        {"if": {"properties": {"action": {"const": "quarantine-secret"}}}, "then": {"properties": {"retentionDisposition": {"const": "quarantine"}, "secretIncidentEvidence": {"minItems": 1}}}},
+        {"if": {"properties": {"outcome": {"const": "completed"}}}, "then": {"properties": {"errorEvidence": {"maxItems": 0}}}, "else": {"properties": {"errorEvidence": {"minItems": 1}}}}
+      ]
+    }
+  }
+}

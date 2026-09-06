@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://proofrail.dev/schemas/v1/cost-ledger.schema.json",
+  "title": "ProofRail append-only cost ledger",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "ledger", "ledgerHash"],
+  "properties": {
+    "schemaVersion": {"const": "1.0.0"},
+    "ledger": {"$ref": "#/$defs/ledger"},
+    "ledgerHash": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "id": {"type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"},
+    "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "timestamp": {"type": "string", "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$"},
+    "limits": {
+      "type": "object", "additionalProperties": false,
+      "required": ["amountMicros", "modelCalls", "tokens", "wallClockMs", "attempts"],
+      "properties": {
+        "amountMicros": {"type": ["integer", "null"], "minimum": 0}, "modelCalls": {"type": "integer", "minimum": 0},
+        "tokens": {"type": "integer", "minimum": 0}, "wallClockMs": {"type": "integer", "minimum": 1},
+        "attempts": {"type": "integer", "minimum": 1}
+      }
+    },
+    "reservation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["entryId", "sequence", "kind", "occurredAt", "runId", "requestId", "idempotencyKey", "authorizationHash", "reservedAmountMicros", "reservedCalls", "reservedTokens", "pricingEvidence"],
+      "properties": {
+        "entryId": {"$ref": "#/$defs/id"}, "sequence": {"type": "integer", "minimum": 1}, "kind": {"const": "reservation"},
+        "occurredAt": {"$ref": "#/$defs/timestamp"}, "runId": {"$ref": "#/$defs/id"}, "requestId": {"$ref": "#/$defs/id"},
+        "idempotencyKey": {"$ref": "#/$defs/id"}, "authorizationHash": {"$ref": "#/$defs/sha256"},
+        "reservedAmountMicros": {"type": ["integer", "null"], "minimum": 0}, "reservedCalls": {"type": "integer", "minimum": 1},
+        "reservedTokens": {"type": "integer", "minimum": 0}, "pricingEvidence": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/sha256"}}
+      }
+    },
+    "settlement": {
+      "type": "object", "additionalProperties": false,
+      "required": ["entryId", "sequence", "kind", "occurredAt", "runId", "requestId", "idempotencyKey", "reservationHash", "status", "chargedAmountMicros", "observedCalls", "observedTokens", "providerEvidence"],
+      "properties": {
+        "entryId": {"$ref": "#/$defs/id"}, "sequence": {"type": "integer", "minimum": 1}, "kind": {"const": "settlement"},
+        "occurredAt": {"$ref": "#/$defs/timestamp"}, "runId": {"$ref": "#/$defs/id"}, "requestId": {"$ref": "#/$defs/id"},
+        "idempotencyKey": {"$ref": "#/$defs/id"}, "reservationHash": {"$ref": "#/$defs/sha256"},
+        "status": {"enum": ["observed", "estimated", "unknown"]}, "chargedAmountMicros": {"type": ["integer", "null"], "minimum": 0},
+        "observedCalls": {"type": ["integer", "null"], "minimum": 0}, "observedTokens": {"type": ["integer", "null"], "minimum": 0},
+        "providerEvidence": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/sha256"}}
+      },
+      "oneOf": [
+        {"properties": {"status": {"enum": ["observed", "estimated"]}, "chargedAmountMicros": {"type": "integer"}, "providerEvidence": {"minItems": 1}}},
+        {"properties": {"status": {"const": "unknown"}, "chargedAmountMicros": {"type": "null"}}}
+      ]
+    },
+    "allocation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["entryId", "sequence", "kind", "occurredAt", "authorizationHash", "previousLimitsHash", "limits"],
+      "properties": {
+        "entryId": {"$ref": "#/$defs/id"}, "sequence": {"type": "integer", "minimum": 1}, "kind": {"const": "allocation"},
+        "occurredAt": {"$ref": "#/$defs/timestamp"}, "authorizationHash": {"$ref": "#/$defs/sha256"},
+        "previousLimitsHash": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/sha256"}]}, "limits": {"$ref": "#/$defs/limits"}
+      }
+    },
+    "summary": {
+      "type": "object", "additionalProperties": false,
+      "required": ["reservedAmountMicros", "settledAmountMicros", "unknownReservedAmountMicros", "reservedCalls", "settledCalls", "reservedTokens", "settledTokens"],
+      "properties": {
+        "reservedAmountMicros": {"type": ["integer", "null"], "minimum": 0}, "settledAmountMicros": {"type": ["integer", "null"], "minimum": 0},
+        "unknownReservedAmountMicros": {"type": ["integer", "null"], "minimum": 0}, "reservedCalls": {"type": "integer", "minimum": 0},
+        "settledCalls": {"type": "integer", "minimum": 0}, "reservedTokens": {"type": "integer", "minimum": 0}, "settledTokens": {"type": "integer", "minimum": 0}
+      }
+    },
+    "ledger": {
+      "type": "object", "additionalProperties": false,
+      "required": ["ledgerId", "createdAt", "scopeKind", "scopeHash", "currency", "pricingMode", "pricingVersion", "entries", "summary"],
+      "properties": {
+        "ledgerId": {"$ref": "#/$defs/id"}, "createdAt": {"$ref": "#/$defs/timestamp"},
+        "scopeKind": {"enum": ["owner", "project", "run"]}, "scopeHash": {"$ref": "#/$defs/sha256"},
+        "currency": {"type": "string", "pattern": "^[A-Z]{3}$"}, "pricingMode": {"enum": ["documented", "subscription", "unknown"]},
+        "pricingVersion": {"type": "string", "minLength": 1, "maxLength": 128},
+        "entries": {"type": "array", "minItems": 1, "maxItems": 1000000, "items": {"oneOf": [{"$ref": "#/$defs/allocation"}, {"$ref": "#/$defs/reservation"}, {"$ref": "#/$defs/settlement"}]}},
+        "summary": {"$ref": "#/$defs/summary"}
+      }
+    }
+  }
+}

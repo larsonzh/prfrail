@@ -58,6 +58,9 @@
             "diff",
             "ticket",
             "repair-transaction",
+            "authorization-record",
+            "effect-record",
+            "cost-ledger",
             "handoff-receipt"
           ]
         },

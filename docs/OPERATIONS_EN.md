@@ -24,7 +24,7 @@ Future installation: select the Windows amd64 package, verify signature/checksum
 
 Planned flow: prfrail init <workspace>, prfrail validate, prfrail baseline snapshot, prfrail run <chain-file>, prfrail report <run-dir>. Exact flags/exits become a copyable tutorial only after T002 freeze/T016 implementation. Start with a file-queue fixture consumer without AI; VS Code is optional.
 
-proofrail.toml is the chain entry; workspace.toml describes environment, with precise division pending freeze. Profiles provide defaults, tasks/steps override, runtime state belongs to the engine. Never manually edit state/journals/receipts/accepted manifests. config explain exposes origins, tools/network permissions and budgets; model prose is not configuration.
+proofrail.toml exclusively owns chain/task/step, documentation, policy and registry references; workspace.toml owns locations, topology, platform and adapter/harness/toolchain selection. Profiles provide defaults, chain/task/step override in order, and arrays replace wholesale. Runtime state belongs to the engine. Never manually edit state/journals/receipts/accepted manifests. config explain exposes origins, tools/network permissions and budgets; model prose is not configuration.
 
 Before running, verify distinct source/run/store roots, secret exclusions, disk, tools, model/cost limits, review actors and enforceable isolation. Uncommitted source files do not require reset. External source changes are not automatically absorbed after baseline capture. Never give agents the original workspace to edit.
 

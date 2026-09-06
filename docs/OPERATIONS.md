@@ -24,7 +24,7 @@ go run ./cmd/prfrail version
 
 规划流程为 `prfrail init <workspace>`、`prfrail validate`、`prfrail baseline snapshot`、`prfrail run <chain-file>`、`prfrail report <run-dir>`。具体 flags/退出码由 T002 冻结、T016 实现后才成为可复制教程。没有 AI 时先使用文件队列 fixture consumer 完成闭环；VS Code 不是必需依赖。
 
-用户配置分工：proofrail.toml 提供链入口；workspace.toml 描述环境（与入口的精确分工待冻结）；profile 给默认；task/step 覆盖；运行状态由引擎维护。用户不得修改 runtime-state、journal、receipt 或已接受 manifest。使用 config explain 检查最终来源、工具/网络权限和预算，不从模型自然语言推断配置。
+用户配置分工：proofrail.toml 独占 chain/task/step、文档、策略和注册表引用；workspace.toml 独占位置、拓扑、平台及 adapter/harness/toolchain 选择。profile 给默认，chain/task/step 逐层覆盖，数组整体替换；运行状态由引擎维护。用户不得修改 runtime-state、journal、receipt 或已接受 manifest。使用 config explain 检查最终来源、工具/网络权限和预算，不从模型自然语言推断配置。
 
 首次运行前确认源树/运行区/store 不重叠，secret 排除、磁盘、工具链、模型/费用上限、review 主体和可实施隔离。源树含未提交文件不要求 reset；baseline 捕获后不自动吸收外部变化。不要把 original workspace 交给 agent 编辑。
 
