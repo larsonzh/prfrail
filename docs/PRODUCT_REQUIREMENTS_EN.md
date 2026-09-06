@@ -95,9 +95,11 @@ A chain owns ordered tasks; tasks own steps. Components/language scopes own targ
 
 S1 succeeds only when US1-US10 (including section 8 additions) and all S1 mandatory negative cases pass, source Git state/content remain unwritten by the engine, failures/rejections block advancement, both change modes and handoffs recover, native Windows and Linux core CI evidence exists, and external self-hosting acceptance completes. Cross-compilation, an empty passing test suite or an AI completion claim is not product acceptance.
 
-## 7. Approval and Further Research
+## 7. Approved Boundaries, Open Details and Further Research
 
-The owner must approve budget measurement modes/caps, per-call limits, maintainers, independent security reviewers, signing identity and support duration. Until then, no paid calls, dependency upgrades or S0 completion claim. Monetary authorization requires bounded worst-case reservations and prohibits automatic calls without a bound. Subscription mode requires separately approved call/token hard caps and acknowledgment that monetary bills are not guaranteed; see RFC section 19.5.
+On 2026-09-06, the product owner approved S0 specification freeze and ADR section 4: zero new paid S0 calls; Windows 11 amd64 production/Linux amd64 core CI; current and previous minor support with a 90-day previous-minor window; offline Ed25519 signing policy; per-dependency license review; and the principle of future redacted read-only whois shadow validation. Exact dependencies, signer/public key, EOL notice, security reviewer and concrete whois input remain later-task details. This does not authorize S1 coding, paid calls, data access or release, and does not claim S0 completion.
+
+Future monetary authorization requires bounded worst-case reservations and prohibits automatic calls without a bound. Subscription mode requires separately approved call/token hard caps and acknowledgment that monetary bills are not guaranteed; see RFC section 19.5. Independent security review remains a blocking gate before S1.
 
 One structured S0 interview confirms the three most common tasks, acceptable intervention points, evidence retention and machine limits. S1 shadow records validate H1-H3 and feed the stage report. Market size, willingness to pay and competitor performance do not block the safety loop but require separate evidence before promotional claims.
 

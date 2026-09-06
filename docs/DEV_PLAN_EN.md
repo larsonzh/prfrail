@@ -18,9 +18,9 @@ Paths not yet present are planned creation locations. T001-T004 are S0; T004 is 
 
 ### P0.1 Documents and Approval (REQ-001/014/017/023/026/028)
 
-- [ ] T001 [Plan:P0.1] Review docs/PRODUCT_REQUIREMENTS*.md, docs/SECURITY*.md and docs/ADR_REGISTER*.md; record owner/security reviewer, budgets, support/signing and shadow scope. Depends: this package. Accept: section 17.1/6/8 sign-off and license decisions. Exclude: approving for the user.
+- [x] T001 [Plan:P0.1] Review docs/PRODUCT_REQUIREMENTS*.md, docs/SECURITY*.md and docs/ADR_REGISTER*.md; record owner/security reviewer, budgets, support/signing and shadow scope. Depends: this package. Accept: section 17.1/6/8 sign-off and license decisions. Exclude: approving for the user. Completed 2026-09-06: owner approved S0 specification freeze and ADR section 4; independent security conclusions remain a separate T003/gate 17.3 closure.
 
-T001 status: `READY_FOR_OWNER_REVIEW`. Bilingual review materials, requirement/task mappings and recommendations are prepared; actual choices are in ADR section 4. No human has signed, so the checkbox remains open. While waiting, only side-effect-free consistency checks are allowed; “continue” is not paid-call, data-access, signing, release or S1-coding authorization.
+T001 status: `COMPLETE`. This approves only S0 specification freeze and allows T002 to begin. It does not authorize new paid calls, concrete whois data access, Git operations, release or S1 production coding. Signer/key, exact dependencies and independent security review remain later gates.
 
 ### P0.2 Machine Contract Freeze (REQ-001/004/005/007/008/010/012/013/017/018/020/021/022/024/025/028)
 
