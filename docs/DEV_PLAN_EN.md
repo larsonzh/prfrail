@@ -27,13 +27,13 @@ T001 status: `COMPLETE`. This approves only S0 specification freeze and allows T
 - [ ] T002 [Plan:P0.2] Revise docs/RFC-proofrail-unattended-ai-engineering-product.md first, synchronize docs/CONTRACTS*.md/ADRs, create schemas/*.schema.json; freeze ADR-002/004 fields, versions, canonical vectors, transitions, errors and queue. Depends: T001. Accept: AT-01 structure/independent review. Exclude: production code using guessed fields.
 - [ ] T003 [Plan:P0.2] Create testdata/contracts/{valid,invalid}/ and tools/contracts/ independent validator/semantic fixture oracle: three tasks, four kinds, dual/triple language, handoff, docs/waiver and all receipts/manifests. Depends: T002. Accept: AT-01 and section 17.2/4/9-12. Exclude: candidate-generated expected results.
 
-T002 status: `IN_PROGRESS`. Common version, ID, path, JCS and UTF-8 rules are frozen, with seventeen Draft 2020-12
+T002 status: `IN_PROGRESS`. Common version, ID, path, JCS and UTF-8 rules are frozen, with eighteen Draft 2020-12
 structural schemas for chain, hook, target, workspace, state-event, error, adapter-envelope, adapter-receipt,
-snapshot-manifest, evidence-manifest, review-receipt, promotion-receipt, handoff-receipt, hook-result, run-manifest, signature-receipt and error-set. Initial canonical vectors,
+snapshot-manifest, evidence-manifest, review-receipt, promotion-receipt, handoff-receipt, hook-result, run-manifest, signature-receipt, error-set and ticket-ledger. Initial canonical vectors,
 single-record transitions, 37 error codes/primary ordering and CLI exits, file-queue framing/claim/result/dispatch/takeover receipt rules,
 snapshot boundaries, the pre-review evidence root, the approve/reject/waive review verdict, the atomic promotion reader
-contract, the manual-handoff step discriminator with its return receipt, the hook execution/gate/disposition split, effective run configuration origins/bindings and the detached Ed25519 signature receipt are frozen; cross-event/cross-record/trust-chain checkers,
-remaining persistent objects and ADR-004 capability probes are still pending. T003's
+contract, the manual-handoff step discriminator with its return receipt, the hook execution/gate/disposition split, effective run configuration origins/bindings, the detached Ed25519 signature receipt and failure-fingerprint/ticket-ledger/three-phase repair budget are frozen; cross-event/cross-record/trust-chain checkers,
+the repair transaction and other persistent objects, and ADR-004 capability probes are still pending. T003's
 independent validator/semantic checker, vector fixtures and positive/negative goldens have not run, so T002, AT-01 and RFC
 section 17.2 must not be marked complete.
 

@@ -13,7 +13,7 @@ Requirements below come from the RFC; pending decisions block production impleme
 | Configuration/task/step | Draft 2020-12, `schemaVersion=1.0.0`, strict chain/task/four step kinds and workspace/component/language-scope topology | Harness/toolchain registries, references, merge rules and remaining schemas |
 | change-set | Sequential in-memory prevalidation, first-fail-stop, markers/assertions, group transaction | Operations, line-ending semantics, before/after hashes, duplicate markers |
 | snapshot/evidence | SHA-256 addressing, parent/candidate/evidence binding, immutability | Canonical paths/hash encoding, manifests/receipts |
-| ticket/repair | Categories, fingerprint budgets, leases, Prepare/Inspect/Validate/Promote | Fingerprint algorithm, thresholds, ledger format, full transition table |
+| ticket/repair | Stable fingerprint, append-only ledger and three-phase budget; Prepare/Inspect/Validate/Promote | Repair transaction Schema and full transition table |
 | adapter/context | Strict request/claim/result envelopes, recordHash, idempotency key, generation fencing, dispatch/takeover receipts and minimal context | Cross-record checker, signature trust chains and platform atomicity probes |
 
 Each persistent object has an independent `schemaVersion`, distinct from CLI and SessionBridge versions. The first version is `1.0.0`; unknown majors are rejected, and unknown minor/patch versions are read-only rejected by default. Repository, schema, runtime and wire JSON uniformly use UTF-8 without BOM plus LF. Canonical bytes additionally contain no formatting whitespace or trailing newline. Only a fixture explicitly testing BOM input compatibility may contain a BOM, and it cannot be reused as a business object.
@@ -37,8 +37,8 @@ Each persistent object has an independent `schemaVersion`, distinct from CLI and
 
 Separate three validators: JSON Schema for structure; semantic checker for references, ownership, cycles and static policy; runtime gates for diffs, processes, capabilities, secrets, budgets and review. Each invalid golden identifies its rejection layer; JSON Schema cannot check live files or processes.
 
-Seventeen structural Schemas for chain, hook, target, workspace, state-event, error, adapter-envelope, adapter-receipt,
-snapshot-manifest, evidence-manifest, review-receipt, promotion-receipt, handoff-receipt, hook-result, run-manifest, signature-receipt and error-set now exist under `schemas/`;
+Eighteen structural Schemas for chain, hook, target, workspace, state-event, error, adapter-envelope, adapter-receipt,
+snapshot-manifest, evidence-manifest, review-receipt, promotion-receipt, handoff-receipt, hook-result, run-manifest, signature-receipt, error-set and ticket-ledger now exist under `schemas/`;
 T003 still needs to
 create `testdata/contracts/valid/` and `testdata/contracts/invalid/` and execute them with an independent validator. Each
 fixture records ID, contract version, expected accept/reject, rejection layer and reason. Include three tasks, all four kinds,
@@ -157,6 +157,13 @@ unknown codes fail closed by version. `error-set.schema.json` binds a non-empty 
 selection uses earliest occurredAt, then fixed category order, code and errorId, so later cleanup failures cannot replace the
 original failure. CLI exits 10–20 follow the primary category; usage is 2, never SessionBridge or hook/OS exits. The checker
 owns reference consistency and ordering. Errors never contain secrets.
+
+`ticket-ledger.schema.json` records one append-only ledger per `(runId,fingerprint)`. The fingerprint covers only error
+code, stable subject and failurePoint, excluding messages, time, attempts and evidence hashes. Failures accumulate across
+attempts and an errorHash cannot be counted twice. Below reviewThreshold the state is pending-review; at or above it an
+effective override is required for a bounded override-window; hardBlockThreshold is irreversible within the run. Overrides
+cannot raise the hard block and resolution does not reset budget. Schema checks the three entry shapes; the checker owns
+sequence, threshold relationships, counts, authorization windows and ledger uniqueness.
 
 Acceptance includes structural, semantic, runtime, crash, compatibility and security checks, not just parseable JSON. See [test strategy](TEST_STRATEGY_EN.md) and [development plan](DEV_PLAN_EN.md). No complete contract validator was generated or executed in this round; RFC gate 17.2 remains unmet.
 

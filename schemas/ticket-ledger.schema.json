@@ -1,0 +1,160 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://proofrail.dev/schemas/v1/ticket-ledger.schema.json",
+  "title": "ProofRail ticket ledger",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "ticketLedger", "ticketLedgerHash"],
+  "properties": {
+    "schemaVersion": {"const": "1.0.0"},
+    "ticketLedger": {"$ref": "#/$defs/ticketLedger"},
+    "ticketLedgerHash": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$"
+    },
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id"],
+      "properties": {
+        "type": {"enum": ["system", "operator", "agent", "policy"]},
+        "id": {"$ref": "#/$defs/id"}
+      }
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id"],
+      "properties": {
+        "kind": {"enum": ["system", "chain", "task", "step", "hook", "adapter", "store"]},
+        "id": {"$ref": "#/$defs/id"}
+      }
+    },
+    "fingerprintInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "subject", "failurePoint"],
+      "properties": {
+        "code": {
+          "$ref": "https://proofrail.dev/schemas/v1/error.schema.json#/$defs/error/properties/code"
+        },
+        "subject": {"$ref": "#/$defs/subject"},
+        "failurePoint": {"$ref": "#/$defs/id"}
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policyHash", "reviewThreshold", "hardBlockThreshold"],
+      "properties": {
+        "policyHash": {"$ref": "#/$defs/sha256"},
+        "reviewThreshold": {"type": "integer", "minimum": 1},
+        "hardBlockThreshold": {"type": "integer", "minimum": 2}
+      }
+    },
+    "failureEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ticketId", "sequence", "recordedAt", "attempt", "errorHash", "fingerprint", "kind", "actor", "evidence"],
+      "properties": {
+        "ticketId": {"$ref": "#/$defs/id"},
+        "sequence": {"type": "integer", "minimum": 1},
+        "recordedAt": {"$ref": "#/$defs/timestamp"},
+        "attempt": {"type": "integer", "minimum": 1},
+        "errorHash": {"$ref": "#/$defs/sha256"},
+        "fingerprint": {"$ref": "#/$defs/sha256"},
+        "kind": {"const": "failure"},
+        "actor": {"$ref": "#/$defs/actor"},
+        "evidence": {"$ref": "#/$defs/evidence"}
+      }
+    },
+    "overrideEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ticketId", "sequence", "recordedAt", "attempt", "fingerprint", "kind", "actor", "evidence", "authorizationHash", "expiresAt", "maxAdditionalAttempts"],
+      "properties": {
+        "ticketId": {"$ref": "#/$defs/id"},
+        "sequence": {"type": "integer", "minimum": 1},
+        "recordedAt": {"$ref": "#/$defs/timestamp"},
+        "attempt": {"type": "integer", "minimum": 1},
+        "fingerprint": {"$ref": "#/$defs/sha256"},
+        "kind": {"const": "override-granted"},
+        "actor": {
+          "allOf": [
+            {"$ref": "#/$defs/actor"},
+            {"properties": {"type": {"enum": ["operator", "policy"]}}}
+          ]
+        },
+        "evidence": {"$ref": "#/$defs/evidence"},
+        "authorizationHash": {"$ref": "#/$defs/sha256"},
+        "expiresAt": {"$ref": "#/$defs/timestamp"},
+        "maxAdditionalAttempts": {"type": "integer", "minimum": 1}
+      }
+    },
+    "resolvedEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ticketId", "sequence", "recordedAt", "attempt", "fingerprint", "kind", "actor", "evidence", "resolutionEvidence"],
+      "properties": {
+        "ticketId": {"$ref": "#/$defs/id"},
+        "sequence": {"type": "integer", "minimum": 1},
+        "recordedAt": {"$ref": "#/$defs/timestamp"},
+        "attempt": {"type": "integer", "minimum": 1},
+        "fingerprint": {"$ref": "#/$defs/sha256"},
+        "kind": {"const": "resolved"},
+        "actor": {"$ref": "#/$defs/actor"},
+        "evidence": {"$ref": "#/$defs/evidence"},
+        "resolutionEvidence": {"$ref": "#/$defs/nonEmptyEvidence"}
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/sha256"}
+    },
+    "nonEmptyEvidence": {
+      "allOf": [
+        {"$ref": "#/$defs/evidence"},
+        {"minItems": 1}
+      ]
+    },
+    "entry": {
+      "oneOf": [
+        {"$ref": "#/$defs/failureEntry"},
+        {"$ref": "#/$defs/overrideEntry"},
+        {"$ref": "#/$defs/resolvedEntry"}
+      ]
+    },
+    "ticketLedger": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ledgerId", "runId", "fingerprint", "fingerprintInput", "policy", "entries", "currentBudgetState"],
+      "properties": {
+        "ledgerId": {"$ref": "#/$defs/id"},
+        "runId": {"$ref": "#/$defs/id"},
+        "fingerprint": {"$ref": "#/$defs/sha256"},
+        "fingerprintInput": {"$ref": "#/$defs/fingerprintInput"},
+        "policy": {"$ref": "#/$defs/policy"},
+        "entries": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/entry"}
+        },
+        "currentBudgetState": {"enum": ["pending-review", "override-window", "hard-block"]}
+      }
+    }
+  }
+}

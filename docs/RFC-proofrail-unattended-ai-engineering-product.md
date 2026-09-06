@@ -1956,6 +1956,41 @@ primaryErrorId 必须命中 errors，且等于以下升序元组的唯一最小�
 分支；primary 命中、引用一致性、唯一性和排序由 checker 验证。error-set 不改变单个错误的 retryMode，
 也不授权对整组错误自动重试。
 
+#### 16.9.21 Ticket ledger、失败指纹与修复预算
+
+`ticket-ledger.schema.json` 冻结同一 run 内、同一失败指纹的 append-only 票据账本。根对象只含
+`schemaVersion="1.0.0"`、`ticketLedger` 与 `ticketLedgerHash`；ticketLedgerHash 不参与自身摘要，以
+ASCII 域 `proofrail:ticket-ledger:1\n` 后接内层 ticketLedger 的 JCS canonical 字节计算 SHA-256。
+
+内层 ticketLedger 必含 `ledgerId/runId/fingerprint/fingerprintInput/policy/entries/currentBudgetState`：
+
+- `fingerprintInput={code,subject,failurePoint}` 是唯一指纹输入。code 必须来自第 16.9.9 节封闭目录；
+  subject 严格包含 `kind/id`；failurePoint 是 checker 产生的稳定 ID，表示 step、hook、gate 或协议检查点。
+  message、时间、attempt、绝对路径、原始 stdout/stderr、模型文本和证据摘要不得进入指纹，避免不稳定值
+  绕过预算。fingerprint 以 ASCII 域 `proofrail:failure-fingerprint:1\n` 后接 fingerprintInput 的 JCS
+  canonical 字节计算 SHA-256。
+- `policy={policyHash,reviewThreshold,hardBlockThreshold}` 绑定 run manifest 已解析策略；两个阈值均为正整数，
+  且 hardBlockThreshold 必须大于 reviewThreshold。账本创建后策略和阈值不可改变；恢复或修复不能扩大预算。
+- entries 至少一项，按 `sequence` 从 1 严格递增。每项包含唯一 `ticketId`、sequence、recordedAt、attempt、
+  fingerprint、`kind=failure|override-granted|resolved`、actor、evidence。failure 另含 errorHash 并必须引用同指纹错误；
+  override-granted 必须由 operator/policy 主体签发并额外包含 `authorizationHash/expiresAt/maxAdditionalAttempts`；
+  resolved 必须包含 `resolutionEvidence`，只能关闭待处理票据，不删除历史记录或重置 failure 计数。
+
+failureCount 是 entries 中 `kind=failure` 的累计数量，跨 task attempt、进程重启和恢复单调增加。同一 errorHash
+不得重复计数。`currentBudgetState` 必须按以下规则派生，不能由 writer 自由选择：
+
+1. `failureCount < reviewThreshold`：`pending-review`；允许既定 self-heal 策略发起新 attempt，但仍消耗共享预算；
+2. `reviewThreshold <= failureCount < hardBlockThreshold`：仅当存在未过期、未耗尽且晚于最近 failure 的有效
+   override-granted 时为 `override-window`，否则保持 `pending-review` 并进入人工等待；
+3. `failureCount >= hardBlockThreshold`：`hard-block`，在该 run 内不可回退、不可由 override 解锁，也不得通过
+   新建 ledger、改变 failurePoint 或新 attempt 绕过。
+
+override 只授权最多 maxAdditionalAttempts 次新的 repair attempt，不能改变 hardBlockThreshold；每次 attempt
+至多消耗一次窗口。checker 必须拒绝 sequence 缺口、重复 ticketId/errorHash、指纹复制不一致、阈值非法、
+无授权窗口、过期/超量 override、状态回退和同一 `(runId,fingerprint)` 的第二本账。Schema 只判单对象形状与
+判别联合；计数、时间、引用、授权、唯一账本及状态派生由 checker 判定。任何 repair transaction 必须引用
+ledgerId、fingerprint 和发起时的 ledger hash；不得仅凭 ticket 文本启动修复。
+
 ---
 
 ## 17. S0 实施就绪门禁
