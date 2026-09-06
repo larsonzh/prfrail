@@ -37,7 +37,12 @@ Each persistent object has an independent `schemaVersion`, distinct from CLI and
 
 Separate three validators: JSON Schema for structure; semantic checker for references, ownership, cycles and static policy; runtime gates for diffs, processes, capabilities, secrets, budgets and review. Each invalid golden identifies its rejection layer; JSON Schema cannot check live files or processes.
 
-Eight structural Schemas for chain, hook, target, workspace, state-event, error, adapter-envelope and adapter-receipt now exist under `schemas/`; T003 still needs to create `testdata/contracts/valid/` and `testdata/contracts/invalid/` and execute them with an independent validator. Each fixture records ID, contract version, expected accept/reject, rejection layer and reason. Include three tasks, all four kinds, C+Go, C+JavaScript+Python, handoff and code/docs collaboration; at least one positive and negative per condition. Documentation paths/snippets are design inputs, not verified executable fixtures.
+Twelve structural Schemas for chain, hook, target, workspace, state-event, error, adapter-envelope, adapter-receipt,
+snapshot-manifest, evidence-manifest, review-receipt and promotion-receipt now exist under `schemas/`; T003 still needs to
+create `testdata/contracts/valid/` and `testdata/contracts/invalid/` and execute them with an independent validator. Each
+fixture records ID, contract version, expected accept/reject, rejection layer and reason. Include three tasks, all four kinds,
+C+Go, C+JavaScript+Python, handoff and code/docs collaboration; at least one positive and negative per condition.
+Documentation paths/snippets are design inputs, not verified executable fixtures.
 
 ## 3. Configuration Resolution
 
@@ -68,12 +73,18 @@ and it excludes review/waiver/promotion receipts; those objects point one-way to
 The independent checker validates item ordering/uniqueness, same-attempt ownership, object existence, required-evidence
 coverage and truthful redaction status.
 
-`review-receipt.schema.json` is the only object allowed to reference `evidenceRootHash`, producing exactly one of
+`review-receipt.schema.json` is the only object that produces a review verdict; it directly references `evidenceRootHash` and produces exactly one of
 `approve/reject/waive`. `recordedBy.type` is restricted to `operator|policy`, excluding `agent|system` self-approval;
 `reviewMode=policy` must bind an approved `policyHash`. `waive` must carry a human `authorizedBy`, a `policyBasisHash`,
 a non-empty `scope` and a non-null `expiresAt`, never an anonymous automatic approval. The independent checker verifies
 reviewer identity differs from the change producer, that `evidenceRootHash`/`policyHash` references actually exist, and
 that an expired waiver is never reused.
+
+`promotion-receipt.schema.json` binds parent/candidate snapshots, evidence root, review receipt, writer-stop proof and lease
+proof into one publication transaction. A candidate becomes consumable only for outcome=completed, when
+acceptedSnapshotHash equals the candidate hash and review is approve or a still-valid waive. Failed/uncertain outcomes keep
+acceptedSnapshotHash null and block advancement. Journal/checker logic verifies publication ordering, one completed receipt
+per attempt, crash reconciliation and the accepted-reference closure.
 
 managed-change-set: read all targets, simulate operations in global order, validate markers/prehash/assertions/boundaries, persist journal, atomically replace each file, verify all postconditions, then record receipt. Roll back the entire group on failure; failed rollback means quarantine/pause. Do not overwrite external changes or restore while processes are alive.
 

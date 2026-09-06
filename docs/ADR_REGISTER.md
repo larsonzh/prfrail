@@ -7,8 +7,8 @@
 | ID | 决策/方案 | 替代与理由 | 状态/完成条件 |
 |---|---|---|---|
 | ADR-001 | Go 模块化单体、CLI/TUI、single writer、无默认 Git 写入 | 不选脚本翻译/分布式系统；降低跨平台与恢复复杂度 | RFC §4/11/16 已决定；T001 确认依赖基线 |
-| ADR-002 | 冻结 Schema 2020-12 工具链、canonical JSON/路径/错误/配置优先级 | 建议评估 RFC 8785 成熟实现，禁止自创排序即宣称 canonical；JSON Schema 库独立于核心判定器 | 部分冻结：chain/hook/target/workspace/state-event/error/snapshot-manifest/evidence-manifest/review-receipt Schema、JCS、UTF-8 无 BOM、版本/路径、快照与评审前证据根摘要域、review policy/waiver 授权四要素、首批 canonical 向量、状态转换与分类退出码基础已定；跨记录 checker、独立 fixture/validator、具体错误目录、其余对象待 T002/T003 |
-| ADR-003 | 事件/journal 与接受提交协议、Windows 原子替换/停机原语 | rename 只解决单文件；需证明 durable、失败回滚和跨文件发布读者语义 | 待实验；T004 给原生 Windows/Linux 崩溃点结果；不能用目录隔离替代 required OS 限制 |
+| ADR-002 | 冻结 Schema 2020-12 工具链、canonical JSON/路径/错误/配置优先级 | 建议评估 RFC 8785 成熟实现，禁止自创排序即宣称 canonical；JSON Schema 库独立于核心判定器 | 部分冻结：chain/hook/target/workspace/state-event/error/snapshot-manifest/evidence-manifest/review-receipt/promotion-receipt Schema、JCS、UTF-8 无 BOM、版本/路径、快照与评审前证据根摘要域、review policy/waiver 授权四要素、首批 canonical 向量、状态转换与分类退出码基础已定；跨记录 checker、独立 fixture/validator、具体错误目录、其余对象待 T002/T003 |
+| ADR-003 | 事件/journal 与接受提交协议、Windows 原子替换/停机原语 | rename 只解决单文件；需证明 durable、失败回滚和跨文件发布读者语义 | 部分冻结：promotion receipt 已绑定父/候选/evidence/review/停机/租约及 completed/failed/uncertain reader contract；发布顺序、崩溃点与原生 Windows/Linux durable/atomic 能力待 T004 实测；不能用目录隔离替代 required OS 限制 |
 | ADR-004 | SessionBridge v0.1.1 silent + 文件队列，核心自管持久幂等 | 不 fork 扩展、不用 visible/auto、无 GUI 兜底；内存缓存不等于 exactly-once | 部分冻结：共用信封、每文件单记录 framing、原子 claim、generation fencing、result 与 dispatch/takeover receipt 已定；跨记录 checker、签名 receipt、能力矩阵与平台崩溃实测待 T002/T004 |
 | ADR-005 | bootstrap 首个 seed 由常规构建、独立 Go tests 和人工审计建立；N 构建 N+1，隔离重放 | 不接受候选自证或覆盖运行中 host | RFC §16.5 已定；T017 前指定 seed 来源/摘要、外部 oracle、签名主体和 rollback 路径 |
 | ADR-006 | Windows 11 amd64 正式、Linux amd64 核心 CI；纯 Go 发布；固定工具链/依赖/签名 | RFC §16.2 提到 Win10，与 §9.6/14 的 Win11 范围不同；以 §14 为首版承诺，Win10 不承诺 | 2026-09-06 所有者批准策略；T002 冻结依赖清单，T017 落实签名主体/公钥/撤销流程 |

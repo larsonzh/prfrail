@@ -1694,8 +1694,8 @@ evidenceRootHash，promotion receipt 再共同绑定 review、evidence root、�
 
 #### 16.9.14 Review receipt
 
-`review-receipt.schema.json` 冻结任务后评审的唯一机器结论；只有它可以引用 `evidenceRootHash`，
-promotion receipt 再引用本 receipt 而非重复评审判断。根对象只含 `schemaVersion="1.0.0"`、`receipt`
+`review-receipt.schema.json` 冻结任务后评审的唯一机器结论；它必须直接引用 `evidenceRootHash`，
+promotion receipt 同时绑定该根与本 receipt，但不得重复或改写评审判断。根对象只含 `schemaVersion="1.0.0"`、`receipt`
 与 `receiptHash`；receiptHash 不参与自身摘要，以 ASCII 域 `proofrail:review-receipt:1\n` 后接内层
 receipt 的 JCS canonical 字节计算 SHA-256。
 
@@ -1706,8 +1706,8 @@ policyHash/outcome/evidence/errorEvidence/reason/waiverAuthorization`。`recorde
 
 `outcome` 只能为 `approve|reject|waive`：
 
-- `approve`：`reason`/`waiverAuthorization` 必须为 null，`errorEvidence` 必须为空；只有 approve 才允许
-  发布 `snapshot-i` 并把任务标记 `PASSED`。
+- `approve`：`reason`/`waiverAuthorization` 必须为 null，`errorEvidence` 必须为空；approve 或经 checker
+  验证仍有效的 waive 才允许进入 promotion，并在 promotion 完成后把任务标记 `PASSED`。
 - `reject`：`reason` 必须非空，`errorEvidence` 至少一项；拒绝的候选快照不可被后续任务引用，任务转入
   修复或终止。
 - `waive`：`reason` 与 `errorEvidence`（至少一项）必须非空，且必须提供 `waiverAuthorization`，含
@@ -1720,6 +1720,34 @@ attempt 匹配的 evidence manifest、`policyHash`/`policyBasisHash` 指向已�
 scope` 命中 evidence root 中真实存在的失败项、`expiresAt` 到期后不得被后续 attempt 复用为豁免，以及
 `recordedBy` 与产生候选变更的主体不是同一身份（跨记录职责分离）。哈希证明完整性，不证明评审者
 身份或专业判断正确。
+
+#### 16.9.15 Promotion receipt
+
+`promotion-receipt.schema.json` 是将候选快照发布为下游可消费快照的唯一持久完成事实。根对象只含
+`schemaVersion="1.0.0"`、`receipt` 与 `receiptHash`；receiptHash 不参与自身摘要，以 ASCII 域
+`proofrail:promotion-receipt:1\n` 后接内层 receipt 的 JCS canonical 字节计算 SHA-256。
+
+内层 receipt 必含 `receiptId/occurredAt/recordedBy/runId/taskId/attempt/parentSnapshotHash/
+candidateSnapshotHash/evidenceRootHash/reviewReceiptHash/writerStopEvidence/leaseEvidence/outcome/
+acceptedSnapshotHash/evidence/errorEvidence`。`recordedBy.type` 固定为 `system`，表示只有持锁核心发布路径
+可生成该事实；人工授权体现在已引用的 review receipt，不能通过手写 promotion receipt 替代。
+writerStopEvidence 与 leaseEvidence 均为至少一项的唯一摘要数组，分别证明相关写者已停止及发布租约有效。
+
+`outcome` 只能为 `completed|failed|uncertain`：
+
+- `completed` 要求 `acceptedSnapshotHash` 为 SHA-256、`errorEvidence` 为空；checker 必须验证它等于
+  candidateSnapshotHash，且 review outcome 为 `approve` 或仍有效的 `waive`。只有 completed receipt
+  可使候选成为下一任务父快照并允许随后追加 `REVIEW_PENDING→PASSED` 状态事件。
+- `failed|uncertain` 要求 `acceptedSnapshotHash=null` 且 `errorEvidence` 至少一项；两者均不得发布、推进
+  task 或供下游读取。uncertain 必须先依据 journal、目标路径与对象摘要 reconcile，禁止盲目重试。
+
+发布事务必须在 receipt 前重新验证父/候选/evidence/review 引用、职责分离、waiver 有效期、停机证明、
+当前租约与内容闭包；随后以临时写、flush、原子 no-replace 发布 accepted 引用，再持久化 promotion
+receipt，最后追加 PASSED event 并重建投影。崩溃时 reader 只有在 completed receipt、accepted 引用和
+所有摘要一致时才读取；部分写入隔离为 uncertain，不能猜测成功。同一
+`runId/taskId/attempt/candidateSnapshotHash` 最多一个 completed receipt；重复相同请求返回既有 receipt，
+冲突结果归为 integrity 错误。Schema 只检查单记录形状，上述顺序、唯一性和跨记录闭包由 checker/journal
+重放验证；哈希仍不证明发布主体身份。
 
 ---
 

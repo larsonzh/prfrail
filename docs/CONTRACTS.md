@@ -42,7 +42,8 @@ UTF-8 无 BOM + LF；canonical 字节还不得含格式空白或尾随换行。�
 
 三层检查不可合并：JSON Schema 判结构；语义 checker 判引用、所有权、循环、静态策略；运行期 gate 判文件 diff、进程、能力、秘密、预算与评审。非法黄金样例标注拒绝层，不能声称 JSON Schema 会检查实际文件或进程。
 
-`schemas/` 已创建 chain、hook、target、workspace、state-event、error、adapter-envelope、adapter-receipt 八份结构 Schema；`testdata/contracts/valid/` 与
+`schemas/` 已创建 chain、hook、target、workspace、state-event、error、adapter-envelope、adapter-receipt、
+snapshot-manifest、evidence-manifest、review-receipt、promotion-receipt 十二份结构 Schema；`testdata/contracts/valid/` 与
 `testdata/contracts/invalid/` 仍待 T003 创建并由独立 validator 执行。每例携带 fixture ID、契约版本、
 expected accept/reject、拒绝层和原因。必须含三任务链、四 kind、C+Go、C+JavaScript+Python、人工交接、
 代码文档协同；每一条件至少一正一反。文档中的路径/片段是设计输入，不是已验证可运行样例。
@@ -79,11 +80,16 @@ handoff 对象摘要。它不内嵌日志，不从对象存在推断成功，也
 单向引用 evidence root，避免摘要环。条目排序/唯一、同 attempt 归属、对象存在、必需证据覆盖及脱敏
 真实性由独立 checker 判定。
 
-`review-receipt.schema.json` 是唯一可引用 `evidenceRootHash` 的对象，输出 `approve/reject/waive` 之一。
+`review-receipt.schema.json` 是唯一产生评审结论的对象，直接引用 `evidenceRootHash` 并输出 `approve/reject/waive` 之一。
 `recordedBy.type` 限定 `operator|policy`，禁止 `agent|system` 自批；`reviewMode=policy` 必须绑定已批准的
 `policyHash`。`waive` 必须同时给出人工 `authorizedBy`、`policyBasisHash`、豁免 `scope` 和非空 `expiresAt`，
 不得等价于匿名自动批准。评审者与候选变更产生者是否同一身份、`evidenceRootHash`/`policyHash` 引用
 是否真实存在及 waiver 到期后不得复用，均由独立 checker 判定。
+
+`promotion-receipt.schema.json` 将父/候选 snapshot、evidence root、review receipt、停机与租约证据绑定为
+单个发布事务。只有 outcome=completed、acceptedSnapshotHash 等于候选摘要，且 review 为 approve 或仍有效
+waive 时，候选才可供下游消费；failed/uncertain 均保持 acceptedSnapshotHash=null 并阻断推进。发布顺序、
+同 attempt 唯一 completed receipt、崩溃 reconcile 和 accepted 引用闭包由 journal/checker 判定。
 
 managed-change-set：读全部目标→按全局顺序在内存模拟→检查 marker/前置哈希/断言/边界→持久 journal→逐文件原子替换→写后全量核验→记录 receipt；失败整组回滚，回滚本身失败则隔离并暂停。禁止覆盖外部修改，禁止运行进程存活时恢复。
 

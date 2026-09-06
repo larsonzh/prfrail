@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://proofrail.dev/schemas/v1/promotion-receipt.schema.json",
+  "title": "ProofRail snapshot promotion receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "receipt", "receiptHash"],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "receipt": {
+      "$ref": "#/$defs/receipt"
+    },
+    "receiptHash": {
+      "$ref": "#/$defs/sha256"
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$"
+    },
+    "hashSet": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/sha256"
+      }
+    },
+    "nonemptyHashSet": {
+      "$ref": "#/$defs/hashSet",
+      "minItems": 1
+    },
+    "systemActor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id"],
+      "properties": {
+        "type": {
+          "const": "system"
+        },
+        "id": {
+          "$ref": "#/$defs/id"
+        }
+      }
+    },
+    "receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "receiptId",
+        "occurredAt",
+        "recordedBy",
+        "runId",
+        "taskId",
+        "attempt",
+        "parentSnapshotHash",
+        "candidateSnapshotHash",
+        "evidenceRootHash",
+        "reviewReceiptHash",
+        "writerStopEvidence",
+        "leaseEvidence",
+        "outcome",
+        "acceptedSnapshotHash",
+        "evidence",
+        "errorEvidence"
+      ],
+      "properties": {
+        "receiptId": {"$ref": "#/$defs/id"},
+        "occurredAt": {"$ref": "#/$defs/timestamp"},
+        "recordedBy": {"$ref": "#/$defs/systemActor"},
+        "runId": {"$ref": "#/$defs/id"},
+        "taskId": {"$ref": "#/$defs/id"},
+        "attempt": {"type": "integer", "minimum": 1},
+        "parentSnapshotHash": {"$ref": "#/$defs/sha256"},
+        "candidateSnapshotHash": {"$ref": "#/$defs/sha256"},
+        "evidenceRootHash": {"$ref": "#/$defs/sha256"},
+        "reviewReceiptHash": {"$ref": "#/$defs/sha256"},
+        "writerStopEvidence": {"$ref": "#/$defs/nonemptyHashSet"},
+        "leaseEvidence": {"$ref": "#/$defs/nonemptyHashSet"},
+        "outcome": {"enum": ["completed", "failed", "uncertain"]},
+        "acceptedSnapshotHash": {
+          "oneOf": [
+            {"type": "null"},
+            {"$ref": "#/$defs/sha256"}
+          ]
+        },
+        "evidence": {"$ref": "#/$defs/hashSet"},
+        "errorEvidence": {"$ref": "#/$defs/hashSet"}
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "outcome": {"const": "completed"},
+            "acceptedSnapshotHash": {"$ref": "#/$defs/sha256"},
+            "errorEvidence": {"maxItems": 0}
+          }
+        },
+        {
+          "properties": {
+            "outcome": {"enum": ["failed", "uncertain"]},
+            "acceptedSnapshotHash": {"type": "null"},
+            "errorEvidence": {"minItems": 1}
+          }
+        }
+      ]
+    }
+  }
+}
