@@ -1368,6 +1368,52 @@ chain 定义或内容 manifest。
 伪造。T002 余下切片继续冻结 hook/target/workspace 细节和各持久记录；T003 才以独立 validator 判定
 完整正反黄金样例。仅通过本节 Schema 不代表 AT-01 或 S0 §17.2 已完成。
 
+#### 16.9.6 Hook 与 target 静态注册表
+
+`hook.schema.json` 与 `target.schema.json` 是独立、可哈希的注册表；chain、step、component 和 impact rule
+只保存 ID 引用。注册表根对象仅接受 `schemaVersion` 与对应的 `hooks`/`targets` 非空数组。数组内 ID 唯一、
+所有引用存在、target 写范围不重叠及生成关系无环由语义 checker 判定。
+
+Hook v1 规则：
+
+1. hook 必须包含 `id`、`kind`、`runner`、`onFail`、`timeoutMs`、`resourceLimits` 和
+  `networkPolicy`；`kind` 为 `precheck|build|test|verify|review|cleanup`。
+2. `runner` 是带判别字段 `type` 的严格联合：
+  - `process`：必须提供 `executable`，可提供逐项参数 `args`；禁止 shell 命令字符串。相对 executable
+    必须是受管路径，PATH 名称仅允许单段工具名；是否存在及摘要锁定由 preflight/checker 判定。
+  - `container`：必须提供不可变 `imageDigest`（`sha256:<hex>`）和 `entrypoint[]`，可另存显示用
+    `imageReference`；执行不得仅依赖可变 tag。
+  S1 Schema 不接受 `shell` 或 `remote`。远程 runner 必须先冻结身份、传输、重放与证据契约；未知类型拒绝。
+3. `args`/`entrypoint` 是字符串数组，按原顺序传给进程 API；不得拼接后交给 shell。`cwd` 缺省为
+  run-workspace 根，显式值必须是第 16.9.4 的受管相对路径。`envAllowlist` 是唯一环境变量名集合，
+  仅允许 `[A-Za-z_][A-Za-z0-9_]*`；未列出的宿主环境不继承。
+4. `onFail` 为严格对象：`action=fail-stop|warn|retry|manual`；仅 `retry` 必须且只能带
+  `maxAttempts`（2–10，包含首次执行），其他 action 禁止该字段。`warn` 仍生成失败证据且不能产生 PASS；
+  `manual` 进入显式人工决策，不等于忽略失败。
+5. `timeoutMs` 为 1–86,400,000 的整数。`resourceLimits` 必须给出正整数 `memoryBytes`、`outputBytes`、
+  `processCount`；可给出 `cpuTimeMs`。超限与超时均由 runner 终止进程树并产生失败结果。
+6. `networkPolicy` 为严格对象，`mode=deny|loopback|allowlist`；仅 `allowlist` 必须且只能带非空、唯一的
+  `hosts`。host 是小写 DNS 名或规范 IP 文本，不包含 scheme、路径、凭据或端口；端口另以唯一
+  `ports` 整数数组（1–65535）声明。Schema 只判文本结构，DNS/IP 规范化和实际隔离能力由 checker/preflight
+  fail-close。
+7. `artifactGlobs` 是唯一的受管 glob 数组，可为空；glob 使用 `/`，禁止绝对路径、反斜杠、URI、NUL、
+  `.`/`..` 段和否定前缀 `!`。匹配结果仍须通过真实路径与链接检查，不能越出 run-workspace。
+
+Target v1 规则：
+
+1. target 必须包含 `id`、`class`、`access` 与非空 `paths`；`class` 为
+  `source|test|config|documentation|generated`，`access` 为 `read-only|read-write`。
+2. `paths` 是唯一的受管 glob 数组，采用与 hook artifact 相同的语法；数组顺序不表达优先级，匹配集合
+  先规范化再参与所有权与摘要。`tags` 是唯一 ID 集合，可为空。
+3. `generated` target 必须包含非空 `generatedFrom` target ID 集合和 `generatorHook` hook ID；其他 class
+  禁止这两个字段。生成方向只从 `generatedFrom` 指向 generated target，checker 拒绝自引用、循环、
+  不存在引用和多个可写 target 对同一路径的所有权。
+4. `read-only` target 可进入上下文、快照和门禁，但 code/handoff/applier 不得写；`read-write` 才能授予
+  写范围。target 声明不能覆盖第 16.9.4 的真实路径、链接、保留名和碰撞检查。
+
+这两个 Schema 只描述可信配置中的静态声明，不包含探测结果、执行状态、实际网络连接、产物清单或
+hook receipt。`warn`、重试消耗、进程树终止和 artifact 捕获是否真实发生，只能由后续运行证据证明。
+
 ---
 
 ## 17. S0 实施就绪门禁

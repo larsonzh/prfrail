@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://proofrail.dev/schemas/v1/target.schema.json",
+  "title": "ProofRail target registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "targets"],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "targets": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "oneOf": [
+          {"$ref": "#/$defs/regularTarget"},
+          {"$ref": "#/$defs/generatedTarget"}
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "idList": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/id"
+      }
+    },
+    "managedGlob": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024,
+      "pattern": "^(?!!)(?!/)(?![A-Za-z]:)(?![A-Za-z][A-Za-z0-9+.-]*:)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*\\\\)(?!.*\\u0000).+$"
+    },
+    "paths": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/managedGlob"
+      }
+    },
+    "tags": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/id"
+      }
+    },
+    "regularTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "class", "access", "paths"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "class": {
+          "enum": ["source", "test", "config", "documentation"]
+        },
+        "access": {
+          "enum": ["read-only", "read-write"]
+        },
+        "paths": {
+          "$ref": "#/$defs/paths"
+        },
+        "tags": {
+          "$ref": "#/$defs/tags"
+        }
+      }
+    },
+    "generatedTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "class", "access", "paths", "generatedFrom", "generatorHook"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "class": {
+          "const": "generated"
+        },
+        "access": {
+          "enum": ["read-only", "read-write"]
+        },
+        "paths": {
+          "$ref": "#/$defs/paths"
+        },
+        "tags": {
+          "$ref": "#/$defs/tags"
+        },
+        "generatedFrom": {
+          "$ref": "#/$defs/idList"
+        },
+        "generatorHook": {
+          "$ref": "#/$defs/id"
+        }
+      }
+    }
+  }
+}

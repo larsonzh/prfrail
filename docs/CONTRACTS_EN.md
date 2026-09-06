@@ -26,8 +26,8 @@ Each persistent object has an independent `schemaVersion`, distinct from CLI and
 | run manifest | Frozen effective configuration, default origins and runtime bindings | No in-place plan edits during runs; exact fields await a later T002 slice |
 | task | Stable id, nonempty steps, review and documentationPolicy | Duplicate IDs; skip-on-fail without failureIndependent |
 | step | id, code/build/verify/noop; code execution defaults autonomous | Empty steps, unknown kind; noop requires reason and cannot start hooks/agents |
-| hook | id/kind, executable or container, args/cwd/envAllowlist/onFail/artifacts/limits/network | Exact fields follow RFC 9.12; build/verify requires a resolved hook |
-| target | Stable id, paths, class, tags, ownership | Escape, overlapping writes, generation cycles, unresolved references |
+| hook | Independent strict registry; discriminated process/container runners; argument, failure, timeout, resource, network and artifact policies | Checker/preflight verifies IDs, references, tool digests and capabilities; execution belongs in receipts |
+| target | Independent strict registry; stable id, class, access, unique path globs and one-way generated sources | Checker rejects escapes, overlapping writes, generation cycles and unresolved references |
 | component/language scope | root, harness, toolchain, targets, dependsOn | Unique IDs, no cycles, available harness; shared roots allowed with unique writable targets |
 | documentation | required/if-affected/optional/forbidden and impactRules | Missing effective doc diff or stale generation; whitespace/mtime alone does not count |
 | handoff | execution, scope, inputPolicy, deadline, returnActions, hooksAfterReturn | Single lease, stopped writers, fresh manifest; Schema alone cannot prove return checks |
@@ -35,7 +35,7 @@ Each persistent object has an independent `schemaVersion`, distinct from CLI and
 
 Separate three validators: JSON Schema for structure; semantic checker for references, ownership, cycles and static policy; runtime gates for diffs, processes, capabilities, secrets, budgets and review. Each invalid golden identifies its rejection layer; JSON Schema cannot check live files or processes.
 
-The first structural Schema now exists under `schemas/`; T003 still needs to create `testdata/contracts/valid/` and `testdata/contracts/invalid/` and execute them with an independent validator. Each fixture records ID, contract version, expected accept/reject, rejection layer and reason. Include three tasks, all four kinds, C+Go, C+JavaScript+Python, handoff and code/docs collaboration; at least one positive and negative per condition. Documentation paths/snippets are design inputs, not verified executable fixtures.
+Three structural Schemas for chain, hook and target now exist under `schemas/`; T003 still needs to create `testdata/contracts/valid/` and `testdata/contracts/invalid/` and execute them with an independent validator. Each fixture records ID, contract version, expected accept/reject, rejection layer and reason. Include three tasks, all four kinds, C+Go, C+JavaScript+Python, handoff and code/docs collaboration; at least one positive and negative per condition. Documentation paths/snippets are design inputs, not verified executable fixtures.
 
 ## 3. Configuration Resolution
 
