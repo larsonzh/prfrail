@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://proofrail.dev/schemas/v1/workspace.schema.json",
+  "title": "ProofRail portable workspace topology",
+  "$ref": "#/$defs/workspace",
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "idList": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/id"
+      }
+    },
+    "componentRoot": {
+      "oneOf": [
+        {
+          "const": "."
+        },
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024,
+          "pattern": "^(?!/)(?![A-Za-z]:)(?![A-Za-z][A-Za-z0-9+.-]*:)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*\\\\)(?!.*\\u0000).+$"
+        }
+      ]
+    },
+    "agent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["channel"],
+      "properties": {
+        "channel": {
+          "enum": ["ipc", "file-queue"]
+        }
+      }
+    },
+    "languageScope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "language", "harness", "targets"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "language": {
+          "$ref": "#/$defs/id"
+        },
+        "harness": {
+          "$ref": "#/$defs/id"
+        },
+        "toolchain": {
+          "$ref": "#/$defs/id"
+        },
+        "targets": {
+          "$ref": "#/$defs/idList"
+        },
+        "dependsOn": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        }
+      }
+    },
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "root", "languageScopes"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "root": {
+          "$ref": "#/$defs/componentRoot"
+        },
+        "languageScopes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/languageScope"
+          }
+        },
+        "dependsOn": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        }
+      }
+    },
+    "workspace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["components"],
+      "properties": {
+        "agent": {
+          "$ref": "#/$defs/agent"
+        },
+        "components": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/component"
+          }
+        }
+      }
+    }
+  }
+}

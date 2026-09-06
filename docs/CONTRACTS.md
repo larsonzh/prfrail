@@ -12,7 +12,7 @@
 
 | 契约 | 已确定的语义 | S0 待冻结产物 |
 |---|---|---|
-| 配置/任务/步骤 | Draft 2020-12；`schemaVersion=1.0.0`；严格 chain/task/四类 step；未知字段拒绝；有序非空步骤 | hook/target/workspace 完整字段、引用与合并规则、其余 schema |
+| 配置/任务/步骤 | Draft 2020-12；`schemaVersion=1.0.0`；严格 chain/task/四类 step；workspace/component/language scope 拓扑 | harness/toolchain 注册表、引用与合并规则、其余 schema |
 | change-set | 顺序内存文本预验证、first-fail-stop、marker/精确断言、整组事务 | 操作枚举、换行语义、前后哈希、重复 marker 规则 |
 | snapshot/evidence | SHA-256 内容寻址、父快照/候选/证据绑定、不可变 | 路径 canonical、hash 输入编码、manifest/receipt schema |
 | ticket/repair | 分类、指纹预算、租约、Prepare→Inspect→Validate→Promote | 指纹算法、阈值、ledger 格式、完整转换表 |
@@ -33,14 +33,14 @@ UTF-8 无 BOM + LF；canonical 字节还不得含格式空白或尾随换行。�
 | step | id、kind=code/build/verify/noop；code execution 默认 autonomous | 空 steps、未知 kind 拒绝；noop 必须 reason 且不能启动 hook/agent |
 | hook | 独立严格注册表；process/container 判别联合、逐项参数、失败/超时/资源/网络/产物策略 | ID/引用、工具摘要与能力由 checker/preflight 判定；执行结果进入 receipt |
 | target | 独立严格注册表；稳定 id、class、access、唯一路径 glob；generated 单向来源 | 越界、重叠写、循环生成、未知引用由 checker 拒绝 |
-| component/language scope | root、harness、toolchain、targets、dependsOn | ID 唯一、无环、harness 可用；同 root 允许不同唯一 target 所有者 |
+| component/language scope | component root；scope 的 language/harness/toolchain/target ID；依赖；step 取 scope 交集 | ID 唯一、引用存在、无环、harness 可用；同 root 允许不同唯一 target 所有者 |
 | documentation | required/if-affected/optional/forbidden；impactRules | 命中规则缺有效 doc diff、生成物陈旧拒绝；空白/mtime 不算更新 |
 | handoff | execution、允许写范围、inputPolicy、deadline、returnActions、hooksAfterReturn | 单写租约、停机、新鲜 manifest；归还后复检不能由 Schema 单独判定 |
 | review/waiver | approve/reject/waive；主体、原因、策略依据、有效期、绑定候选 | 同主体自批、过期、候选变化、范围不符均阻断 |
 
 三层检查不可合并：JSON Schema 判结构；语义 checker 判引用、所有权、循环、静态策略；运行期 gate 判文件 diff、进程、能力、秘密、预算与评审。非法黄金样例标注拒绝层，不能声称 JSON Schema 会检查实际文件或进程。
 
-`schemas/` 已创建 chain、hook、target 三份结构 Schema；`testdata/contracts/valid/` 与
+`schemas/` 已创建 chain、hook、target、workspace 四份结构 Schema；`testdata/contracts/valid/` 与
 `testdata/contracts/invalid/` 仍待 T003 创建并由独立 validator 执行。每例携带 fixture ID、契约版本、
 expected accept/reject、拒绝层和原因。必须含三任务链、四 kind、C+Go、C+JavaScript+Python、人工交接、
 代码文档协同；每一条件至少一正一反。文档中的路径/片段是设计输入，不是已验证可运行样例。

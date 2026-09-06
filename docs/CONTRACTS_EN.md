@@ -10,7 +10,7 @@ Requirements below come from the RFC; pending decisions block production impleme
 
 | Contract | Established semantics | Pending S0 artifact |
 |---|---|---|
-| Configuration/task/step | Draft 2020-12, `schemaVersion=1.0.0`, strict chain/task/four step kinds, reject unknown fields, ordered nonempty steps | Complete hook/target/workspace fields, references, merge rules and remaining schemas |
+| Configuration/task/step | Draft 2020-12, `schemaVersion=1.0.0`, strict chain/task/four step kinds and workspace/component/language-scope topology | Harness/toolchain registries, references, merge rules and remaining schemas |
 | change-set | Sequential in-memory prevalidation, first-fail-stop, markers/assertions, group transaction | Operations, line-ending semantics, before/after hashes, duplicate markers |
 | snapshot/evidence | SHA-256 addressing, parent/candidate/evidence binding, immutability | Canonical paths/hash encoding, manifests/receipts |
 | ticket/repair | Categories, fingerprint budgets, leases, Prepare/Inspect/Validate/Promote | Fingerprint algorithm, thresholds, ledger format, full transition table |
@@ -28,14 +28,14 @@ Each persistent object has an independent `schemaVersion`, distinct from CLI and
 | step | id, code/build/verify/noop; code execution defaults autonomous | Empty steps, unknown kind; noop requires reason and cannot start hooks/agents |
 | hook | Independent strict registry; discriminated process/container runners; argument, failure, timeout, resource, network and artifact policies | Checker/preflight verifies IDs, references, tool digests and capabilities; execution belongs in receipts |
 | target | Independent strict registry; stable id, class, access, unique path globs and one-way generated sources | Checker rejects escapes, overlapping writes, generation cycles and unresolved references |
-| component/language scope | root, harness, toolchain, targets, dependsOn | Unique IDs, no cycles, available harness; shared roots allowed with unique writable targets |
+| component/language scope | Component root; scope language/harness/toolchain/target IDs; dependencies; intersected step scopes | Unique IDs, resolved references, no cycles, available harness; shared roots allowed with unique writable targets |
 | documentation | required/if-affected/optional/forbidden and impactRules | Missing effective doc diff or stale generation; whitespace/mtime alone does not count |
 | handoff | execution, scope, inputPolicy, deadline, returnActions, hooksAfterReturn | Single lease, stopped writers, fresh manifest; Schema alone cannot prove return checks |
 | review/waiver | approve/reject/waive, actor, reason, policy, expiry, bound candidate | Self-approval, expiry, changed candidate or mismatched scope blocks |
 
 Separate three validators: JSON Schema for structure; semantic checker for references, ownership, cycles and static policy; runtime gates for diffs, processes, capabilities, secrets, budgets and review. Each invalid golden identifies its rejection layer; JSON Schema cannot check live files or processes.
 
-Three structural Schemas for chain, hook and target now exist under `schemas/`; T003 still needs to create `testdata/contracts/valid/` and `testdata/contracts/invalid/` and execute them with an independent validator. Each fixture records ID, contract version, expected accept/reject, rejection layer and reason. Include three tasks, all four kinds, C+Go, C+JavaScript+Python, handoff and code/docs collaboration; at least one positive and negative per condition. Documentation paths/snippets are design inputs, not verified executable fixtures.
+Four structural Schemas for chain, hook, target and workspace now exist under `schemas/`; T003 still needs to create `testdata/contracts/valid/` and `testdata/contracts/invalid/` and execute them with an independent validator. Each fixture records ID, contract version, expected accept/reject, rejection layer and reason. Include three tasks, all four kinds, C+Go, C+JavaScript+Python, handoff and code/docs collaboration; at least one positive and negative per condition. Documentation paths/snippets are design inputs, not verified executable fixtures.
 
 ## 3. Configuration Resolution
 

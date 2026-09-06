@@ -7,7 +7,7 @@
 | ID | 决策/方案 | 替代与理由 | 状态/完成条件 |
 |---|---|---|---|
 | ADR-001 | Go 模块化单体、CLI/TUI、single writer、无默认 Git 写入 | 不选脚本翻译/分布式系统；降低跨平台与恢复复杂度 | RFC §4/11/16 已决定；T001 确认依赖基线 |
-| ADR-002 | 冻结 Schema 2020-12 工具链、canonical JSON/路径/错误/配置优先级 | 建议评估 RFC 8785 成熟实现，禁止自创排序即宣称 canonical；JSON Schema 库独立于核心判定器 | 部分冻结：chain/hook/target Schema、JCS、UTF-8 无 BOM、版本/路径基础已定；validator、向量、错误码、其余对象待 T002/T003 |
+| ADR-002 | 冻结 Schema 2020-12 工具链、canonical JSON/路径/错误/配置优先级 | 建议评估 RFC 8785 成熟实现，禁止自创排序即宣称 canonical；JSON Schema 库独立于核心判定器 | 部分冻结：chain/hook/target/workspace Schema、JCS、UTF-8 无 BOM、版本/路径基础已定；validator、向量、错误码、其余对象待 T002/T003 |
 | ADR-003 | 事件/journal 与接受提交协议、Windows 原子替换/停机原语 | rename 只解决单文件；需证明 durable、失败回滚和跨文件发布读者语义 | 待实验；T004 给原生 Windows/Linux 崩溃点结果；不能用目录隔离替代 required OS 限制 |
 | ADR-004 | SessionBridge v0.1.1 silent + 文件队列，核心自管持久幂等 | 不 fork 扩展、不用 visible/auto、无 GUI 兜底；内存缓存不等于 exactly-once | RFC 边界已定；队列 framing/claim、错误映射、能力矩阵待 T002/T004 冻结 |
 | ADR-005 | bootstrap 首个 seed 由常规构建、独立 Go tests 和人工审计建立；N 构建 N+1，隔离重放 | 不接受候选自证或覆盖运行中 host | RFC §16.5 已定；T017 前指定 seed 来源/摘要、外部 oracle、签名主体和 rollback 路径 |

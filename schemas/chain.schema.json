@@ -24,7 +24,7 @@
       }
     },
     "workspace": {
-      "$ref": "#/$defs/workspace"
+      "$ref": "https://proofrail.dev/schemas/v1/workspace.schema.json"
     }
   },
   "$defs": {
@@ -153,6 +153,15 @@
         "execution": {
           "enum": ["autonomous", "manual-handoff"],
           "default": "autonomous"
+        },
+        "components": {
+          "$ref": "#/$defs/idList"
+        },
+        "languageScopes": {
+          "$ref": "#/$defs/idList"
+        },
+        "targets": {
+          "$ref": "#/$defs/idList"
         }
       }
     },
@@ -169,6 +178,19 @@
         },
         "hooks": {
           "$ref": "#/$defs/idList"
+        },
+        "components": {
+          "$ref": "#/$defs/idList"
+        },
+        "languageScopes": {
+          "$ref": "#/$defs/idList"
+        },
+        "targets": {
+          "$ref": "#/$defs/idList"
+        },
+        "order": {
+          "enum": ["declared", "dependency"],
+          "default": "declared"
         }
       }
     },
@@ -185,6 +207,19 @@
         },
         "hooks": {
           "$ref": "#/$defs/idList"
+        },
+        "components": {
+          "$ref": "#/$defs/idList"
+        },
+        "languageScopes": {
+          "$ref": "#/$defs/idList"
+        },
+        "targets": {
+          "$ref": "#/$defs/idList"
+        },
+        "order": {
+          "enum": ["declared", "dependency"],
+          "default": "declared"
         }
       }
     },
@@ -203,62 +238,6 @@
           "type": "string",
           "minLength": 1,
           "maxLength": 1024
-        }
-      }
-    },
-    "workspace": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["components"],
-      "properties": {
-        "agent": {
-          "$ref": "#/$defs/agent"
-        },
-        "components": {
-          "type": "array",
-          "minItems": 1,
-          "items": {
-            "$ref": "#/$defs/component"
-          }
-        }
-      }
-    },
-    "agent": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["channel"],
-      "properties": {
-        "channel": {
-          "enum": ["ipc", "file-queue"]
-        }
-      }
-    },
-    "component": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["id", "root", "harness"],
-      "properties": {
-        "id": {
-          "$ref": "#/$defs/id"
-        },
-        "root": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 1024,
-          "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*\\\\)(?!.*\\u0000).+$"
-        },
-        "harness": {
-          "$ref": "#/$defs/id"
-        },
-        "targets": {
-          "$ref": "#/$defs/idList"
-        },
-        "dependsOn": {
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "$ref": "#/$defs/id"
-          }
         }
       }
     }

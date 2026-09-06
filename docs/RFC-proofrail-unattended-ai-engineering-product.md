@@ -913,7 +913,12 @@ agent = { channel = "ipc" }
 [[workspace.components]]
 id = "core"
 root = "src/core"
+
+[[workspace.components.languageScopes]]
+id = "core-go"
+language = "go"
 harness = "go"
+targets = ["core-source", "core-test"]
 ```
 
 `code` step 未声明 `execution` 时默认为 `autonomous`；S1 仅在任务确有人工接管需求时显式使用
@@ -1189,20 +1194,20 @@ root = "."
 id = "native-core"
 language = "c"
 harness = "c"
-targets = ["src/**/*.c", "include/**/*.h"]
+targets = ["native-source", "native-headers"]
 
 [[workspace.components.languageScopes]]
 id = "control-ui"
 language = "javascript"
 harness = "node"
-targets = ["ui/**/*.js", "ui/package.json", "ui/package-lock.json"]
+targets = ["control-ui-source", "control-ui-lock"]
 dependsOn = ["native-core"]
 
 [[workspace.components.languageScopes]]
 id = "automation"
 language = "python"
 harness = "python"
-targets = ["tools/**/*.py", "pyproject.toml"]
+targets = ["automation-source", "automation-config"]
 dependsOn = ["native-core"]
 
 [[tasks.steps]]
@@ -1413,6 +1418,31 @@ Target v1 规则：
 
 这两个 Schema 只描述可信配置中的静态声明，不包含探测结果、执行状态、实际网络连接、产物清单或
 hook receipt。`warn`、重试消耗、进程树终止和 artifact 捕获是否真实发生，只能由后续运行证据证明。
+
+#### 16.9.7 Workspace、component 与 language scope
+
+`workspace.schema.json` 冻结可移植工作区拓扑；本机 source/run/store 绝对路径仍属于本机配置，不进入该
+对象。chain 的 `workspace` 字段引用此 Schema 的 workspace 定义，不得维护另一份近似结构。
+
+1. workspace 必须包含非空 `components`；可选 `agent.channel=ipc|file-queue`。channel 只选择已授权的
+  SessionBridge `silent` 传输，不表示可回退到 visible/GUI/剪贴板。
+2. component 必须包含 `id`、`root` 与非空 `languageScopes`。`root` 通常遵循第 16.9.4 的受管相对路径；
+  字面量 `.` 是唯一例外，明确表示 run-workspace 根。禁止空字符串、绝对路径、`..`、反斜杠和 URI。
+3. language scope 必须包含 `id`、`language`、`harness` 与非空 `targets`。三者均使用稳定 ID；language
+  不做封闭枚举，以允许外置 harness 扩展，但 S1 随附支持仍仅为 generic/C/Go。`toolchain` 是可选的
+  toolchain 注册表 ID，具体版本与来源在后续 T002 toolchain/harness 切片冻结。
+4. `targets` 仅保存 `target.schema.json` 注册表 ID，不能内嵌 glob；component 可选 `dependsOn` 引用其他
+  component，language scope 可选 `dependsOn` 引用同一 workspace 的其他 language scope。ID 唯一、引用
+  存在、无自引用/环、target 属于 component root 且可写所有权不重叠，由语义 checker 判定。
+5. code/build/verify step 均可选 `components`、`languageScopes`、`targets` 非空唯一 ID 数组以收窄作用域。
+  未声明时继承 task/chain 解析后的显式有效范围；run manifest 必须展开来源。显式 scope 必须同时满足
+  component、language scope 和 target 的交集，空交集拒绝，不能将多种选择器解释为并集扩大权限。
+6. build/verify 可选 `order=declared|dependency`，缺省 `declared`；`dependency` 按已验证的 component/scope
+  DAG 稳定拓扑排序，同层以配置声明顺序打破平局。code step 不接受 `order`，S1 不并行调度写步骤。
+
+Workspace Schema 只冻结拓扑和引用形状，不证明 harness/toolchain 已安装、target 实际匹配文件、依赖图
+无环或传输可用；这些分别属于 checker 和 capability preflight。多语言事务仍以整个 task 接受或回滚，
+不能按 component/language scope 部分发布。
 
 ---
 
