@@ -1560,8 +1560,10 @@ CLI 进程退出码按主错误 category 固定映射，不透传 hook、操作�
 - `request`：`requestId/runId/taskId/attempt/createdAt/adapter/contextHash`。requestId 是 ProofRail 幂等键，
   使用第 16.9.2 节 ID，不等同于 SessionBridge 的 `sess-<uuid>`；具体 adapter 的传输 ID 必须由后续
   dispatch receipt 显式映射。contextHash 指向已持久化、已脱敏的完整 context envelope。
-- `claim`：另含 `claimId/consumerId/claimedAt/leaseExpiresAt/generation/requestHash`。generation 从 1 开始，
-  每次获授权接管严格递增；`(claimId,generation)` 二元组是 fencing token，结果提交必须匹配当前值。
+- `claim`：另含 `claimId/consumerId/claimedAt/leaseExpiresAt/generation/requestHash/takeoverReceiptHash`。
+  generation 从 1 开始，每次获授权接管严格递增；`(claimId,generation)` 二元组是 fencing token，结果
+  提交必须匹配当前值。初始领取和同 claimId 续租时 takeoverReceiptHash 为 null；更换 claimId 的接管
+  必须引用对应 takeover receipt，由 checker 对照前一 claim 判定。
 - `result`：另含 `claimId/generation/completedAt/requestHash/status/outputEvidence/errorEvidence`。
   status 只能为 `completed|failed|uncertain`；completed 至少一个 outputEvidence 且 errorEvidence 为空，
   failed 至少一个 errorEvidence，uncertain 至少一个 errorEvidence 且只能在 reconcile 后转为新事实。
@@ -1598,6 +1600,35 @@ S1 文件队列固定在单个已配置 queue root 下，目录为 `requests/`�
 文件队列与 IPC 使用同一 envelope Schema 和幂等判定；IPC 可以不落上述目录，但必须产生等价持久
 dispatch/claim/result 事实。SessionBridge `cmd_<pid>.json`/`res_<pid>.json` 是外部 adapter wire，不能
 直接充当 ProofRail 队列文件或持久 receipt，也不得复用其单槽成功缓存声称 exactly-once。
+
+#### 16.9.11 Adapter dispatch/takeover receipt
+
+`adapter-receipt.schema.json` 只承载 adapter 生命周期的 `dispatch` 与 `takeover`，不混入 review、handoff、
+hook 或 promotion。根对象只含 `schemaVersion="1.0.0"`、`receipt` 和 `receiptHash`；receiptHash 不参与自身
+摘要，按 receipt.type 取 ASCII 域 `proofrail:adapter-dispatch-receipt:1\n` 或
+`proofrail:adapter-takeover-receipt:1\n`，后接内层 receipt 的 JCS canonical 字节计算 SHA-256。
+
+两类 receipt 共享 `receiptId/occurredAt/recordedBy/requestId/requestHash/evidence/errorEvidence`：
+
+- `recordedBy={type,id}`，type 仅为 `system|operator`，表示谁写下事实，不等于获得授权；evidence 与
+  errorEvidence 均为唯一摘要数组。receipt 只能引用已经持久化的证据。
+- dispatch 另含 `adapter/transport/transportRequestId/outcome`。transport 为
+  `ipc|file-queue|sessbridge`，outcome 为 `accepted|rejected|uncertain`。sessbridge 必须记录非空
+  transportRequestId，以显式映射其 `sess-<uuid>`；file-queue 必须为 null；IPC 是否有 transportRequestId
+  由其冻结的 transport 契约决定。accepted 要求 errorEvidence 为空；rejected/uncertain 至少一项错误证据。
+  accepted 只证明 transport 已受理，不证明 agent 执行、result 完整或 task PASS。
+- takeover 另含 `previousClaimId/previousGeneration/newClaimId/newGeneration/oldWriterEvidence/authorizationEvidence/reason/outcome`，
+  outcome 只能为 `granted|rejected`。granted 要求 errorEvidence 为空；rejected 至少一项错误证据。
+  两个 evidence 数组均至少一项；reason 使用稳定 code 与可选脱敏 message。newClaimId 必须不同于旧值，
+  newGeneration 必须大于旧值，且 requestHash/旧 claim/新 claim 与 receiptHash 的引用闭包一致；这些跨记录
+  条件由 checker 判定。仅租约过期、PID 消失或机器重启的单一证据不足，checker 必须要求已冻结策略中的
+  writer 身份、进程树/句柄或协调器 journal 等组合证明及独立授权。
+
+同一 requestHash、transport 与 transportRequestId 的重复 dispatch 若 canonical receipt 内容相同则返回
+既有 receipt；映射或 outcome 冲突归为 integrity 错误。outcome=granted 的 takeover receipt 必须先于新
+claim 发布；发布后不可撤销或覆盖，rejected receipt 只保留失败事实且不得授予或被新 claim 引用。receipt
+的哈希证明完整性，不证明主体身份；跨主机
+或发布场景的签名仍按后续签名 receipt 契约处理。
 
 ---
 

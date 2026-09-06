@@ -60,7 +60,7 @@
     "claim": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["type", "requestId", "claimId", "consumerId", "claimedAt", "leaseExpiresAt", "generation", "requestHash"],
+      "required": ["type", "requestId", "claimId", "consumerId", "claimedAt", "leaseExpiresAt", "generation", "requestHash", "takeoverReceiptHash"],
       "properties": {
         "type": {"const": "claim"},
         "requestId": {"$ref": "#/$defs/id"},
@@ -69,7 +69,13 @@
         "claimedAt": {"$ref": "#/$defs/timestamp"},
         "leaseExpiresAt": {"$ref": "#/$defs/timestamp"},
         "generation": {"type": "integer", "minimum": 1},
-        "requestHash": {"$ref": "#/$defs/sha256"}
+        "requestHash": {"$ref": "#/$defs/sha256"},
+        "takeoverReceiptHash": {
+          "oneOf": [
+            {"type": "null"},
+            {"$ref": "#/$defs/sha256"}
+          ]
+        }
       }
     },
     "result": {
