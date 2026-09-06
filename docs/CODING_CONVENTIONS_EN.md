@@ -8,11 +8,11 @@ Encoding/Git rules finalized 2026-09-04; pre-prototype workflow added 2026-09-06
 
 | Type | Encoding | EOL |
 |---|---|---|
-| .md/.ps1/.json | UTF-8 with BOM | LF |
-| Strict-parser JSON exceptions | UTF-8 without BOM | LF |
+| .md/.ps1 | UTF-8 with BOM | LF |
+| .json (configuration, schemas, fixtures and runtime data) | UTF-8 without BOM | LF |
 | Other code/text (.go/.py/.js/.txt/.gitignore/LICENSE etc.) | UTF-8 without BOM | LF |
 
-The explicit exception .github/hooks/context-mode.json must have no BOM and retain "$schema": "../context-mode-schema.json". Check both after context-mode upgrades. JSON directly consumed by strict Node/Go json.Decoder parsers also requires no BOM. Do not apply arbitrary encoding changes to unrelated files.
+All repository JSON follows the same UTF-8 without BOM plus LF rule. `.github/hooks/context-mode.json` must additionally retain `"$schema": "../context-mode-schema.json"`. Only a golden fixture explicitly named or described as a BOM-compatibility case may contain a BOM; never reuse it as configuration, a schema, canonical/wire data or an ordinary golden. UTF-8 without BOM fully supports Chinese and other Unicode text, while a BOM can break strict JSON parsers.
 
 Check BOM/LF before commits. Mechanical normalization must not change semantics. Local .vscode/scripts/ is ignored; shared engineering tools belong in tracked tools/.
 

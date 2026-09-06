@@ -6,24 +6,25 @@ Date: 2026-09-06; S0 design-constraint draft. Authority: [RFC](RFC-proofrail-una
 
 ## 1. Maturity and Compatibility
 
-Requirements below come from the RFC; pending decisions block production implementation. This is not a complete JSON Schema or a substitute for an independent validator. New wire fields/enums, canonical algorithms and error codes require an [ADR](ADR_REGISTER_EN.md), RFC revision, schemas and positive/negative goldens before Go implementation.
+Requirements below come from the RFC; pending decisions block production implementation. The first T002 slice now provides `schemas/chain.schema.json`, but this document is not a complete JSON Schema or a substitute for an independent validator. New wire fields/enums, canonical algorithms and error codes require an [ADR](ADR_REGISTER_EN.md), RFC revision, schemas and positive/negative goldens before Go implementation.
 
 | Contract | Established semantics | Pending S0 artifact |
 |---|---|---|
-| Configuration/task/step | TOML entry, detailed JSON, reject unknown fields, ordered nonempty steps | Types, required/default fields, references, merge rules, full schemas |
+| Configuration/task/step | Draft 2020-12, `schemaVersion=1.0.0`, strict chain/task/four step kinds, reject unknown fields, ordered nonempty steps | Complete hook/target/workspace fields, references, merge rules and remaining schemas |
 | change-set | Sequential in-memory prevalidation, first-fail-stop, markers/assertions, group transaction | Operations, line-ending semantics, before/after hashes, duplicate markers |
 | snapshot/evidence | SHA-256 addressing, parent/candidate/evidence binding, immutability | Canonical paths/hash encoding, manifests/receipts |
 | ticket/repair | Categories, fingerprint budgets, leases, Prepare/Inspect/Validate/Promote | Fingerprint algorithm, thresholds, ledger format, full transition table |
 | adapter/context | Versioned envelopes, tickets/receipts, idempotency/leases, minimal context | ProofRail wire format, queue framing, correlation, error taxonomy |
 
-Each persistent object has an independent schemaVersion, distinct from CLI and SessionBridge versions. Reject writes with unknown major versions; release notes state compatibility windows. Repository JSON may have BOM under repository rules: explicitly decide input-layer acceptance in the schema toolchain; runtime wire/canonical bytes have no BOM. Do not strip BOM indiscriminately from repository JSON.
+Each persistent object has an independent `schemaVersion`, distinct from CLI and SessionBridge versions. The first version is `1.0.0`; unknown majors are rejected, and unknown minor/patch versions are read-only rejected by default. Repository, schema, runtime and wire JSON uniformly use UTF-8 without BOM plus LF. Canonical bytes additionally contain no formatting whitespace or trailing newline. Only a fixture explicitly testing BOM input compatibility may contain a BOM, and it cannot be reused as a business object.
 
 ## 2. Schema and Checker Responsibilities
 
 | Object | Minimum semantics | Invalid/dynamic constraints |
 |---|---|---|
-| chain/run manifest | Ordered tasks, defaults, frozen effective values/origins | Empty-chain policy pending; no in-place plan edits during runs |
-| task | Stable id, parent snapshot, steps, review, budget, documentationPolicy | Duplicate IDs; skip-on-fail without failureIndependent |
+| chain definition | `chain.id/profile`, at least one ordered task, minimal workspace, optional documentation | Cross-array task/step ID uniqueness, references and dependency cycles belong to the checker |
+| run manifest | Frozen effective configuration, default origins and runtime bindings | No in-place plan edits during runs; exact fields await a later T002 slice |
+| task | Stable id, nonempty steps, review and documentationPolicy | Duplicate IDs; skip-on-fail without failureIndependent |
 | step | id, code/build/verify/noop; code execution defaults autonomous | Empty steps, unknown kind; noop requires reason and cannot start hooks/agents |
 | hook | id/kind, executable or container, args/cwd/envAllowlist/onFail/artifacts/limits/network | Exact fields follow RFC 9.12; build/verify requires a resolved hook |
 | target | Stable id, paths, class, tags, ownership | Escape, overlapping writes, generation cycles, unresolved references |
@@ -34,13 +35,13 @@ Each persistent object has an independent schemaVersion, distinct from CLI and S
 
 Separate three validators: JSON Schema for structure; semantic checker for references, ownership, cycles and static policy; runtime gates for diffs, processes, capabilities, secrets, budgets and review. Each invalid golden identifies its rejection layer; JSON Schema cannot check live files or processes.
 
-Planned S0 directories: schemas/, testdata/contracts/valid/ and testdata/contracts/invalid/ (not created). Each fixture records ID, contract version, expected accept/reject, rejection layer and reason. Include three tasks, all four kinds, C+Go, C+JavaScript+Python, handoff and code/docs collaboration; at least one positive and negative per condition. Documentation paths/snippets are design inputs, not verified executable fixtures.
+The first structural Schema now exists under `schemas/`; T003 still needs to create `testdata/contracts/valid/` and `testdata/contracts/invalid/` and execute them with an independent validator. Each fixture records ID, contract version, expected accept/reject, rejection layer and reason. Include three tasks, all four kinds, C+Go, C+JavaScript+Python, handoff and code/docs collaboration; at least one positive and negative per condition. Documentation paths/snippets are design inputs, not verified executable fixtures.
 
 ## 3. Configuration Resolution
 
 Profiles provide defaults only; explicit task values override chain defaults; explicit step values override task defaults. List replacement/merge, empty values and workspace.toml versus proofrail.toml ownership await ADR-002. config explain reports values and origins. Silent array merging must not grant extra permissions.
 
-Compute the canonical run-manifest digest only after resolution. Heartbeats, credentials and machine probes never rewrite user config. Bind parent snapshot, hook digests, adapter/harness versions and authorized policy. Changes require a new run or the RFC's pause/approval/new-manifest flow, never overwriting historical facts.
+After resolution, apply RFC 8785 JCS and hash the UTF-8 no-BOM bytes with SHA-256; represent the digest as `sha256:` plus 64 lowercase hexadecimal digits. Heartbeats, credentials and machine probes never rewrite user config. Bind parent snapshot, hook digests, adapter/harness versions and authorized policy. Changes require a new run or the RFC's pause/approval/new-manifest flow, never overwriting historical facts.
 
 ## 4. Snapshots, Evidence and Acceptance
 

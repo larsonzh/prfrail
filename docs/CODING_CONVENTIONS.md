@@ -13,21 +13,21 @@
 |----------|------|------|------|
 | Markdown（`.md`） | UTF-8 **with BOM** | **LF** | 含 `docs/*.md`、`copilot-instructions.md` |
 | PowerShell（`.ps1`） | UTF-8 **with BOM** | **LF** | PS 5.1 读写兼容、中文注释稳定 |
-| JSON（`.json`） | UTF-8 **with BOM** | **LF** | 纯数据/样例/文档引用 |
-| JSON（例外） | UTF-8 **without BOM** | **LF** | 被严格 JSON 解析器消费的文件，见 §1.1 |
+| JSON（`.json`） | UTF-8 **without BOM** | **LF** | 配置、Schema、样例及运行时 JSON 统一格式 |
 | 其它（`.go`/`.py`/`.js`/`.txt`/`.gitignore`/`LICENSE`…） | UTF-8 **without BOM** | **LF** | 代码与明文文本 |
 
-### 1.1 例外（必须无 BOM）
+### 1.1 JSON 例外与兼容性 fixture
 
-- **`.github/hooks/context-mode.json`**：context-mode CLI 用 `JSON.parse` 读取，
-  带 UTF-8 BOM 会解析失败（已验证）。必须为 **无 BOM + LF**，并保留
-  `"$schema": "../context-mode-schema.json"` 行（VS Code 校验需要关联 schema）。
-  - 升级 `context-mode` 后检查该文件：仍无 BOM + 保留 `$schema`；如被重写需恢复。
-- 其它被 Node / Go `json.Decoder` 等严格消费的 JSON 同理，不得带 BOM。
+- `.github/hooks/context-mode.json` 与 `schemas/*.schema.json` 同样遵循 JSON 默认规则：
+  **UTF-8 无 BOM + LF**。前者还必须保留 `"$schema": "../context-mode-schema.json"`。
+- 仅用于验证 BOM 输入兼容性的 golden fixture 可带 BOM；文件名或 fixture 元数据必须明确测试目的，
+  且不得复用为配置、Schema、canonical/wire 数据或普通黄金样例。
+- UTF-8 无 BOM 完整支持中文等 Unicode 文本；BOM 不是多语言兼容所必需，并可能使严格 JSON
+  解析器失败。
 
 ### 1.2 机械门禁
 
-- 提交前自查：`.md/.ps1/.json` 带 BOM+LF；`.go` 等无 BOM+LF。
+- 提交前自查：`.md/.ps1` 带 BOM+LF；`.json`、`.go` 等无 BOM+LF。
 - 需要时在 `.vscode/scripts/`（不入库）增加批量规范化脚本，但不得改变内容语义。
 - `.vscode/` 目录位于 `.gitignore`（如 `.vscode/scripts/proxy-toggle.ps1`），不入库。
 

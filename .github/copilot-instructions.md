@@ -18,11 +18,11 @@
   `taskdef`（任务定义）、`tickets`（票据）。
 
 ## 编码 + 行尾（硬规则，见 docs/CODING_CONVENTIONS.md）
-- `.md` / `.ps1` / `.json`：UTF-8 **with BOM** + **LF**。
-- 例外（必须**无 BOM** + LF）：`.github/hooks/context-mode.json`——context-mode CLI 的
-  `JSON.parse` 遇 BOM 抛错；该文件还必须保留 `"$schema": "../context-mode-schema.json"`。
-  `context-mode upgrade` 后需检查恢复（无 BOM + 保留 $schema）。
-- 其它（`.go`/`.py`/`.txt` 等）：UTF-8 **without BOM** + **LF**。
+- `.md` / `.ps1`：UTF-8 **with BOM** + **LF**。
+- 所有 `.json`：UTF-8 **without BOM** + **LF**；仅明确用于 BOM 兼容性测试的 fixture 可例外。
+- `.github/hooks/context-mode.json` 还必须保留 `"$schema": "../context-mode-schema.json"`；
+  `context-mode upgrade` 后需检查无 BOM + 保留 `$schema`。
+- 其它（`.go`/`.py`/`.js`/`.txt` 等）：UTF-8 **without BOM** + **LF**。
 
 ## 工程约定
 - Go 代码 `gofmt`；`go build ./...`、`go vet ./...`、`go test ./...` 必须通过。

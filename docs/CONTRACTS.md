@@ -6,24 +6,30 @@
 
 ## 1. 契约成熟度与兼容
 
-下表“必须”均来自 RFC；“待冻结”是生产实现阻断项。本文不是完整 JSON Schema，也不能代替独立 validator。新增 wire 字段、枚举、canonical 算法和错误码必须先经 [ADR](ADR_REGISTER.md) 更新 RFC，再建立 Schema 与正反黄金样例，最后写 Go 代码。
+下表“必须”均来自 RFC；“待冻结”是生产实现阻断项。T002 第一切片已建立 `schemas/chain.schema.json`，
+但本文不是完整 JSON Schema，也不能代替独立 validator。新增 wire 字段、枚举、canonical 算法和错误码
+必须先经 [ADR](ADR_REGISTER.md) 更新 RFC，再建立 Schema 与正反黄金样例，最后写 Go 代码。
 
 | 契约 | 已确定的语义 | S0 待冻结产物 |
 |---|---|---|
-| 配置/任务/步骤 | TOML 入口，JSON 详细定义；未知字段拒绝；有序非空步骤 | 字段类型/必填/default、引用与合并规则、完整 schema |
+| 配置/任务/步骤 | Draft 2020-12；`schemaVersion=1.0.0`；严格 chain/task/四类 step；未知字段拒绝；有序非空步骤 | hook/target/workspace 完整字段、引用与合并规则、其余 schema |
 | change-set | 顺序内存文本预验证、first-fail-stop、marker/精确断言、整组事务 | 操作枚举、换行语义、前后哈希、重复 marker 规则 |
 | snapshot/evidence | SHA-256 内容寻址、父快照/候选/证据绑定、不可变 | 路径 canonical、hash 输入编码、manifest/receipt schema |
 | ticket/repair | 分类、指纹预算、租约、Prepare→Inspect→Validate→Promote | 指纹算法、阈值、ledger 格式、完整转换表 |
 | adapter/context | 版本化信封、票据/回执、幂等/租约、最小上下文 | ProofRail wire 格式、队列 framing、关联键、错误分类 |
 
-各持久对象独立 schemaVersion，不与 CLI 版本或 SessionBridge schemaVersion 混为一谈；未知主版本拒绝写入，兼容窗口由发布说明声明。输入 JSON 依仓库规范可能带 BOM，输入层是否接受 BOM 必须在 Schema 工具链中明确；运行时 wire/canonical 字节不得含 BOM。不得对仓库 JSON 通用地强加去 BOM。
+各持久对象独立 `schemaVersion`，不与 CLI 版本或 SessionBridge schemaVersion 混为一谈；首版为
+`1.0.0`，未知主版本拒绝，未知 minor/patch 默认只读拒绝。仓库、Schema、运行时与 wire JSON 统一为
+UTF-8 无 BOM + LF；canonical 字节还不得含格式空白或尾随换行。仅明确验证 BOM 输入兼容性的 fixture
+可带 BOM，且不能复用为业务对象。
 
 ## 2. Schema 与静态检查责任
 
 | 对象 | 最小语义 | 非法/动态约束 |
 |---|---|---|
-| chain/run manifest | 有序 tasks、全局默认、冻结后的有效配置及来源 | 空链策略待冻结；运行中不得原地改计划 |
-| task | 稳定 id、父快照、steps、review、budget、documentationPolicy | id 重复、skip-on-fail 未声明 failureIndependent 拒绝 |
+| chain definition | `chain.id/profile`、至少一个有序 task、最小 workspace、可选 documentation | task/step ID 跨数组唯一、引用及依赖无环由 checker 判定 |
+| run manifest | 冻结后的有效配置、默认值来源和运行绑定 | 运行中不得原地改计划；确切字段待后续 T002 切片 |
+| task | 稳定 id、非空 steps、review、documentationPolicy | id 重复、skip-on-fail 未声明 failureIndependent 拒绝 |
 | step | id、kind=code/build/verify/noop；code execution 默认 autonomous | 空 steps、未知 kind 拒绝；noop 必须 reason 且不能启动 hook/agent |
 | hook | id/kind、executable 或 container、args/cwd/envAllowlist/onFail/artifacts/limits/network | 具体字段以 RFC §9.12 为准；build/verify 至少一个已解析 hook |
 | target | 稳定 id、路径选择器、class、tags、所有权 | 越界、重叠写、循环生成、未知引用拒绝 |
@@ -34,13 +40,19 @@
 
 三层检查不可合并：JSON Schema 判结构；语义 checker 判引用、所有权、循环、静态策略；运行期 gate 判文件 diff、进程、能力、秘密、预算与评审。非法黄金样例标注拒绝层，不能声称 JSON Schema 会检查实际文件或进程。
 
-完整 S0 黄金目录规划：`schemas/`、`testdata/contracts/valid/`、`testdata/contracts/invalid/`（尚未创建）。每例携带 fixture ID、契约版本、expected accept/reject、拒绝层和原因。必须含三任务链、四 kind、C+Go、C+JavaScript+Python、人工交接、代码文档协同；每一条件至少一正一反。文档中的路径/片段是设计输入，不是已验证可运行样例。
+`schemas/` 已创建第一份结构 Schema；`testdata/contracts/valid/` 与
+`testdata/contracts/invalid/` 仍待 T003 创建并由独立 validator 执行。每例携带 fixture ID、契约版本、
+expected accept/reject、拒绝层和原因。必须含三任务链、四 kind、C+Go、C+JavaScript+Python、人工交接、
+代码文档协同；每一条件至少一正一反。文档中的路径/片段是设计输入，不是已验证可运行样例。
 
 ## 3. 配置解析与冻结
 
 profile 只提供默认值；task 显式值覆盖链默认；step 显式值覆盖 task 默认。列表覆盖/合并、空值含义、workspace.toml 与 proofrail.toml 的责任划分尚待 ADR-002 冻结。`config explain` 必须能输出值与来源，不允许悄悄合并数组造成更多权限。
 
-解析完成再计算 canonical run manifest 摘要；运行期心跳、credentials、机器探测不得回写用户配置。父 snapshot、hook 摘要、adapter/harness 版本和已授权策略绑定 run。变更配置只能新建 run，或走 RFC 明确的暂停、审批和新 manifest 流程；不能覆盖旧事实。
+解析完成再按 RFC 8785 JCS 计算 canonical run manifest 摘要，以 UTF-8 无 BOM 字节输入 SHA-256，
+文本表示为 `sha256:` 加 64 位小写十六进制。运行期心跳、credentials、机器探测不得回写用户配置。
+父 snapshot、hook 摘要、adapter/harness 版本和已授权策略绑定 run。变更配置只能新建 run，或走 RFC
+明确的暂停、审批和新 manifest 流程；不能覆盖旧事实。
 
 ## 4. 快照、证据与接受事务
 

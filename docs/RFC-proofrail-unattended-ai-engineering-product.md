@@ -870,27 +870,28 @@ prfrail init        # 向导：语言/项目类型 → 任务链模板 → 环�
 prfrail validate    # schema + 预检（进程/锁/工具链/远程）
 prfrail run         # 单命令执行，TUI 实时进度
 prfrail report      # 链报告
-prfrail serve       # 本地 Web 控制台（P1）
+prfrail serve       # 本地 Web 控制台（S2）
 ```
 
 ### 13.2 用户可见配置（默认隐藏派生键）
 
 ```toml
 [proofrail]
-schemaVersion = 1
+schemaVersion = "1.0.0"
 profile = "standard"
 
 [chain]
+id = "example-chain"
 name = "example-chain"
 
 [documentation]
 policy = "if-affected"
 
 [[tasks]]
-id = "T1"
+id = "task-1"
 name = "实现 XX"
 model = "standard"
-review = "hybrid"
+review = "manual"
 
 [[tasks.steps]]
 id = "implement"
@@ -911,12 +912,16 @@ agent = { channel = "ipc" }
 
 [[workspace.components]]
 id = "core"
-root = "."
+root = "src/core"
 harness = "go"
 ```
 
-`code` step 未声明 `execution` 时默认为 `autonomous`；`supervised` 与 `manual-handoff` 仅在任务
-确有实时协作或人工接管需求时显式启用（见第 16.7 节），不作为普通链的默认配置。
+`code` step 未声明 `execution` 时默认为 `autonomous`；S1 仅在任务确有人工接管需求时显式使用
+`manual-handoff`（见第 16.7 节），不作为普通链的默认配置。`supervised` 留到 S2，不进入 S1 Schema。
+
+自 2026-09-06 的 T002 冻结起，持久对象统一使用 `schemaVersion = "1.0.0"` 形式的语义版本字符串；
+解析器不得接受整数别名，避免同一输入产生不同 canonical manifest。详细兼容与 canonical 规则见
+第 16.9 节。
 
 文档协同策略位于顶层 `[documentation]` 命名空间；`policy` 给出链级默认值，任务可用
 `documentationPolicy` 覆盖。`[[documentation.impactRules]]` 按 source/config target 或 tag 的变化，
@@ -1295,6 +1300,73 @@ source-of-truth，生成 hook 产出 `class="generated"` 的文档；新鲜度�
 S1 的 impact rule 是显式、确定性的 target/tag 映射。S2 可由 AST、schema diff 或 AI 提议新增映射和
 潜在漂移，但提议必须可解释并由规则/评审确认；AI 既不能以“无需更新文档”自行解除义务，也不能仅凭
 自然语言相似度把候选判为一致。
+
+### 16.9 T002 机器契约基础冻结
+
+本节冻结所有持久 JSON 对象的共同表示，以及 chain/task/step 第一组机器 Schema。后续 receipt、snapshot、
+ticket、hook、handoff 与第 19 节记录只能引用这些基础定义，不得另创版本、ID、时间或哈希编码。
+
+#### 16.9.1 Schema 身份与兼容
+
+1. JSON Schema 使用 Draft 2020-12；仓库路径为 `schemas/*.schema.json`，`$id` 固定使用
+   `https://proofrail.dev/schemas/v1/<name>.schema.json`。该 URL 是稳定标识，不承诺在线托管。
+2. 每个持久对象必须有 `schemaVersion`，格式为无前缀 SemVer `MAJOR.MINOR.PATCH`；S0 首版为 `1.0.0`。
+   写入器只写自己精确版本；读取器必须拒绝未知 major。未知 minor/patch 默认只读拒绝，只有发布说明和
+   兼容测试明确声明可读范围后才放宽。不得静默删除未知字段后重新写入。
+3. Schema 默认 `additionalProperties: false`。扩展只能通过新版本中的显式字段，不能使用任意
+   `x-*` 逃逸口；实验数据放独立、非权威文件，不能进入哈希绑定对象。
+4. 仓库、运行时新写和 wire JSON 统一使用 UTF-8 无 BOM + LF；canonical 与哈希输入同样无 BOM，
+  且不含格式空白或尾随换行。仅明确验证 BOM 输入兼容性的 fixture 可带 BOM，不得复用为业务对象。
+
+#### 16.9.2 基础值
+
+- ID 使用小写 ASCII：`^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$`，长度 1–64；显示名称另存 `name`，不能参与引用。
+- SHA-256 文本统一为 `sha256:` 加 64 位小写十六进制；禁止裸摘要、大写或算法猜测。
+- 时间戳统一为 UTC RFC 3339，固定三位毫秒和 `Z`，例如 `2026-09-06T12:34:56.789Z`；持续时间和配额
+  使用显式整数单位字段（如 `timeoutMs`、`maxBytes`），禁止自由文本 duration/size。
+- 有序业务序列（tasks、steps、hooks）保持数组顺序；集合型字符串数组在 Schema 中声明唯一，并在
+  canonical manifest 构建前按 Unicode code point 升序。路径排序只对已完成第 16.9.4 规范化的文本进行。
+- 数量、序号和配额仅允许 JSON integer，范围由各对象收紧；金额不得使用二进制浮点，采用
+  `amountMinor` 整数配合 ISO 4217 `currency`，或明确 `unknown` 计量状态。
+
+#### 16.9.3 Canonical JSON 与摘要
+
+采用 RFC 8785 JSON Canonicalization Scheme（JCS），编码为 UTF-8、无 BOM/空白/尾随换行。对象字段按
+JCS 排序，数组顺序保持；字符串不得在 canonical 前自行 Unicode 归一化。Schema 对所有进入哈希边界的
+数值限制为整数，从而避免跨实现浮点舍入差异。摘要输入为 canonical 字节本身，输出按第 16.9.2 的
+`sha256:<hex>` 表示；不得哈希缩进 JSON、TOML 原文、Go map 临时输出或平台换行。
+
+一个对象的自摘要字段不能参与自身摘要。需要摘要时使用外层引用，或由对象 Schema 明确列出
+`hashExcludes`；S1 核心对象禁止运行期动态排除列表。签名覆盖域为 ASCII 域分隔符
+`proofrail:<object-type>:<schema-major>\n` 后接 canonical 字节，避免不同对象类型间重放；具体签名
+receipt 在后续 T002 切片冻结。
+
+#### 16.9.4 路径与平台边界
+
+Schema 中受管相对路径使用 `/`、不得为空/绝对、不得含 `.`/`..` 段、NUL、反斜杠或 URI；先按输入字符
+保留，不做大小写或 Unicode 折叠。捕获时必须由平台实现解析真实路径并检查 symlink/reparse/hardlink；
+manifest 记录规范相对路径及文件类型。Windows 保留名、尾随点/空格、大小写碰撞和 Unicode 等价碰撞
+在跨平台模式下拒绝。绝对 source/run/store 路径只存在于本机 workspace 配置和运行诊断，不进入可移植
+chain 定义或内容 manifest。
+
+#### 16.9.5 Chain/task/step 第一组结构
+
+- `chain.schema.json` 根对象只接受 `schemaVersion`、`chain`、`documentation`、`tasks`、`workspace`。
+  `chain.id` 是稳定引用，`chain.name` 仅显示；`profile` 为 `minimal|standard|strict`。
+- `tasks` 必须至少一个且按执行顺序排列。每个 task 必须有唯一 `id` 和非空 `steps`；跨 task 唯一性、
+  引用、target 所有权和依赖无环由语义 checker 判定，不能伪称 JSON Schema 已完成。
+- step `kind` 仅为 `code|build|verify|noop`。`code` 的 `execution` 为
+  `autonomous|manual-handoff`，缺省 `autonomous`；`supervised` 留 S2，S1 Schema 不接受。
+  `build/verify` 必须有至少一个唯一 hook ID；`noop` 必须有非空 `reason` 且禁止 hooks/model/execution；
+  `code` 禁止 hooks，防止把验证命令隐藏在代理步骤。未知组合在 Schema 层拒绝。
+- task 的 `review` 为 `manual|policy`；`policy` 仅表示由已批准的确定性策略生成评审结论，不能由执行
+  agent 自批。早期示例的 `auto|hybrid` 不再是 wire 值：向导迁移为 `policy|manual`，歧义时拒绝。
+- `documentationPolicy` 为 `required|if-affected|optional|forbidden`。模型、target、hook、component 等引用
+  仅使用 ID；配置合并完成后 run manifest 必须展开默认值和来源，不再依赖隐式 profile。
+
+第一组 Schema 不包含运行状态、attempt、receipt 或探测结果；它们属于引擎持久对象，不能由用户 chain
+伪造。T002 余下切片继续冻结 hook/target/workspace 细节和各持久记录；T003 才以独立 validator 判定
+完整正反黄金样例。仅通过本节 Schema 不代表 AT-01 或 S0 §17.2 已完成。
 
 ---
 

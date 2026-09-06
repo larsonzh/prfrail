@@ -1,0 +1,266 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://proofrail.dev/schemas/v1/chain.schema.json",
+  "title": "ProofRail canonical chain definition",
+  "description": "Canonical machine definition produced from the user configuration. Runtime state and receipts are separate objects.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "chain", "tasks", "workspace"],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "chain": {
+      "$ref": "#/$defs/chain"
+    },
+    "documentation": {
+      "$ref": "#/$defs/documentation"
+    },
+    "tasks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/task"
+      }
+    },
+    "workspace": {
+      "$ref": "#/$defs/workspace"
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "displayName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "idList": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/id"
+      }
+    },
+    "chain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "profile"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "name": {
+          "$ref": "#/$defs/displayName"
+        },
+        "profile": {
+          "enum": ["minimal", "standard", "strict"]
+        }
+      }
+    },
+    "documentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policy"],
+      "properties": {
+        "policy": {
+          "$ref": "#/$defs/documentationPolicy"
+        },
+        "impactRules": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/impactRule"
+          }
+        }
+      }
+    },
+    "documentationPolicy": {
+      "enum": ["required", "if-affected", "optional", "forbidden"]
+    },
+    "impactRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "whenTargetTags", "requireTargets", "requiredHooks"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "whenTargetTags": {
+          "$ref": "#/$defs/idList"
+        },
+        "requireTargets": {
+          "$ref": "#/$defs/idList"
+        },
+        "requiredHooks": {
+          "$ref": "#/$defs/idList"
+        }
+      }
+    },
+    "task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "review", "steps"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "name": {
+          "$ref": "#/$defs/displayName"
+        },
+        "model": {
+          "$ref": "#/$defs/id"
+        },
+        "review": {
+          "enum": ["manual", "policy"]
+        },
+        "documentationPolicy": {
+          "$ref": "#/$defs/documentationPolicy"
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "oneOf": [
+              {"$ref": "#/$defs/codeStep"},
+              {"$ref": "#/$defs/buildStep"},
+              {"$ref": "#/$defs/verifyStep"},
+              {"$ref": "#/$defs/noopStep"}
+            ]
+          }
+        }
+      }
+    },
+    "codeStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "kind": {
+          "const": "code"
+        },
+        "model": {
+          "$ref": "#/$defs/id"
+        },
+        "execution": {
+          "enum": ["autonomous", "manual-handoff"],
+          "default": "autonomous"
+        }
+      }
+    },
+    "buildStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "hooks"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "kind": {
+          "const": "build"
+        },
+        "hooks": {
+          "$ref": "#/$defs/idList"
+        }
+      }
+    },
+    "verifyStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "hooks"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "kind": {
+          "const": "verify"
+        },
+        "hooks": {
+          "$ref": "#/$defs/idList"
+        }
+      }
+    },
+    "noopStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "reason"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "kind": {
+          "const": "noop"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024
+        }
+      }
+    },
+    "workspace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["components"],
+      "properties": {
+        "agent": {
+          "$ref": "#/$defs/agent"
+        },
+        "components": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/component"
+          }
+        }
+      }
+    },
+    "agent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["channel"],
+      "properties": {
+        "channel": {
+          "enum": ["ipc", "file-queue"]
+        }
+      }
+    },
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "root", "harness"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "root": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024,
+          "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*\\\\)(?!.*\\u0000).+$"
+        },
+        "harness": {
+          "$ref": "#/$defs/id"
+        },
+        "targets": {
+          "$ref": "#/$defs/idList"
+        },
+        "dependsOn": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        }
+      }
+    }
+  }
+}
