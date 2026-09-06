@@ -1,0 +1,24 @@
+{
+  "metadata": {"generated":"2026-09-06","source_plan":"docs/DEV_PLAN.md","target_tasks":"docs/DEV_PLAN.md","scope":"inline task mapping; not execution evidence"},
+  "summary": {"total_plan_items":10,"covered_plan_items":10,"missing_plan_items":0,"coverage_percentage":100.0,"total_tasks_generated":24,"orphan_tasks":0},
+  "phases": [
+    {"phase_id":"S0","items":[
+      {"item_id":"P0.1","tasks":["T001"]},
+      {"item_id":"P0.2","tasks":["T002","T003"]},
+      {"item_id":"P0.3","tasks":["T004"]}
+    ]},
+    {"phase_id":"S1","items":[
+      {"item_id":"P1.1","tasks":["T005","T006"]},
+      {"item_id":"P1.2","tasks":["T007","T008","T009","T010"]},
+      {"item_id":"P1.3","tasks":["T011","T012"]},
+      {"item_id":"P1.4","tasks":["T013","T014"]},
+      {"item_id":"P1.5","tasks":["T015","T016"]},
+      {"item_id":"P1.7","tasks":["T019","T020","T021","T022","T023","T024"]},
+      {"item_id":"P1.6","tasks":["T017","T018"]}
+    ]}
+  ],
+  "missing_plan_items": [],
+  "orphan_tasks": [],
+  "upstream_trace": "Join item_id to the union of spec-to-plan.yaml requirements.items and product_extensions.items; per-requirement task/AT mapping is in DEV_PLAN.md sections 3 and 4. Execution follows dependencies, not numeric task order.",
+  "validation": {"passed":true,"errors":[],"warnings":["All tasks pending; S1 requires every RFC section 17 gate and owner approval."]}
+}

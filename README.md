@@ -18,8 +18,14 @@ ProofRail 让 AI 在无人值守下安全地改代码、跑验证、出证据：
 
 ### 状态
 
-**提案（Proposal）**：本文档对应产品设计基线 v0.1.0（2026-08-28），实现尚未开始。
+**S0 原型前准备（2026-09-06）**：已有 Go/CLI 占位骨架，核心实现尚未开始。
+中英文工程文档已形成评审稿，Schema/黄金样例、技术探针和人工批准尚待完成，S1 仍为 `NOT_READY`。
 设计规范见 [docs/RFC-proofrail-unattended-ai-engineering-product.md](docs/RFC-proofrail-unattended-ai-engineering-product.md)。
+
+从 [docs/DOCUMENTATION_PLAN.md](docs/DOCUMENTATION_PLAN.md) 阅读文档导航与低成本模型流程；
+执行顺序见 [docs/DEV_PLAN.md](docs/DEV_PLAN.md)，就绪缺口见 [docs/ADR_REGISTER.md](docs/ADR_REGISTER.md)。
+
+产品完整性评审已补充无副作用预览、已接受结果导出、授权撤销、外部副作用边界、成本预留结算和备份/停用流程；见 [docs/PRODUCT_REQUIREMENTS.md](docs/PRODUCT_REQUIREMENTS.md) §8。均为待批准设计，不是现有功能；文件回滚不保证撤销外部操作。
 
 ### 快速开始（规划中）
 
@@ -28,13 +34,14 @@ prfrail init      # 向导：语言/项目类型 → 任务链模板 → 环境 
 prfrail validate  # schema + 预检（进程/锁/工具链/远程）
 prfrail run       # 单命令执行，TUI 实时进度
 prfrail report    # 链报告
-prfrail serve     # 本地 Web 控制台（P1）
+prfrail serve     # 本地 Web 控制台（S2）
 ```
 
 ### 构建（需 Go 工具链）
 
 ```text
 go build ./...
+go vet ./...
 go test ./...
 ```
 
@@ -73,8 +80,14 @@ ProofRail enables AI to safely modify code, run validations, and produce evidenc
 
 ### Status
 
-**Proposal**: This document corresponds to product design baseline v0.1.0 (2026-08-28); implementation has not started yet.
+**S0 pre-prototype preparation (2026-09-06)**: A Go/CLI stub exists; core implementation has not started.
+Bilingual engineering drafts are available, but schemas/goldens, technical spikes and human approval remain pending. S1 is `NOT_READY`.
 Design spec: [docs/RFC-proofrail-unattended-ai-engineering-product.md](docs/RFC-proofrail-unattended-ai-engineering-product.md).
+
+Start with [docs/DOCUMENTATION_PLAN_EN.md](docs/DOCUMENTATION_PLAN_EN.md) for navigation and the low-cost model workflow;
+see [docs/DEV_PLAN_EN.md](docs/DEV_PLAN_EN.md) for tasks and [docs/ADR_REGISTER_EN.md](docs/ADR_REGISTER_EN.md) for readiness gaps.
+
+Product review adds side-effect-free preview, accepted-result export, revocation, external-effect boundaries, cost reservation/settlement and backup/retirement flows. See [docs/PRODUCT_REQUIREMENTS_EN.md](docs/PRODUCT_REQUIREMENTS_EN.md) section 8. These are unapproved designs, not available features; file rollback cannot guarantee undoing external effects.
 
 ### Quick Start (planned)
 
@@ -83,13 +96,14 @@ prfrail init      # wizard: language/project type → chain template → environ
 prfrail validate  # schema + pre-checks (process/lock/toolchain/remote)
 prfrail run       # single-command run, TUI live progress
 prfrail report    # chain report
-prfrail serve     # local web console (P1)
+prfrail serve     # local web console (S2)
 ```
 
 ### Build (requires Go toolchain)
 
 ```text
 go build ./...
+go vet ./...
 go test ./...
 ```
 

@@ -1,0 +1,113 @@
+﻿# ProofRail 架构契约规范
+
+[English](CONTRACTS_EN.md)
+
+日期：2026-09-06；S0 设计约束草案。权威：[RFC](RFC-proofrail-unattended-ai-engineering-product.md) §9-13、§16-17。本文合并 Schema、快照/证据、hook、票据/修复、adapter 五个协议包，减少重复阅读。
+
+## 1. 契约成熟度与兼容
+
+下表“必须”均来自 RFC；“待冻结”是生产实现阻断项。本文不是完整 JSON Schema，也不能代替独立 validator。新增 wire 字段、枚举、canonical 算法和错误码必须先经 [ADR](ADR_REGISTER.md) 更新 RFC，再建立 Schema 与正反黄金样例，最后写 Go 代码。
+
+| 契约 | 已确定的语义 | S0 待冻结产物 |
+|---|---|---|
+| 配置/任务/步骤 | TOML 入口，JSON 详细定义；未知字段拒绝；有序非空步骤 | 字段类型/必填/default、引用与合并规则、完整 schema |
+| change-set | 顺序内存文本预验证、first-fail-stop、marker/精确断言、整组事务 | 操作枚举、换行语义、前后哈希、重复 marker 规则 |
+| snapshot/evidence | SHA-256 内容寻址、父快照/候选/证据绑定、不可变 | 路径 canonical、hash 输入编码、manifest/receipt schema |
+| ticket/repair | 分类、指纹预算、租约、Prepare→Inspect→Validate→Promote | 指纹算法、阈值、ledger 格式、完整转换表 |
+| adapter/context | 版本化信封、票据/回执、幂等/租约、最小上下文 | ProofRail wire 格式、队列 framing、关联键、错误分类 |
+
+各持久对象独立 schemaVersion，不与 CLI 版本或 SessionBridge schemaVersion 混为一谈；未知主版本拒绝写入，兼容窗口由发布说明声明。输入 JSON 依仓库规范可能带 BOM，输入层是否接受 BOM 必须在 Schema 工具链中明确；运行时 wire/canonical 字节不得含 BOM。不得对仓库 JSON 通用地强加去 BOM。
+
+## 2. Schema 与静态检查责任
+
+| 对象 | 最小语义 | 非法/动态约束 |
+|---|---|---|
+| chain/run manifest | 有序 tasks、全局默认、冻结后的有效配置及来源 | 空链策略待冻结；运行中不得原地改计划 |
+| task | 稳定 id、父快照、steps、review、budget、documentationPolicy | id 重复、skip-on-fail 未声明 failureIndependent 拒绝 |
+| step | id、kind=code/build/verify/noop；code execution 默认 autonomous | 空 steps、未知 kind 拒绝；noop 必须 reason 且不能启动 hook/agent |
+| hook | id/kind、executable 或 container、args/cwd/envAllowlist/onFail/artifacts/limits/network | 具体字段以 RFC §9.12 为准；build/verify 至少一个已解析 hook |
+| target | 稳定 id、路径选择器、class、tags、所有权 | 越界、重叠写、循环生成、未知引用拒绝 |
+| component/language scope | root、harness、toolchain、targets、dependsOn | ID 唯一、无环、harness 可用；同 root 允许不同唯一 target 所有者 |
+| documentation | required/if-affected/optional/forbidden；impactRules | 命中规则缺有效 doc diff、生成物陈旧拒绝；空白/mtime 不算更新 |
+| handoff | execution、允许写范围、inputPolicy、deadline、returnActions、hooksAfterReturn | 单写租约、停机、新鲜 manifest；归还后复检不能由 Schema 单独判定 |
+| review/waiver | approve/reject/waive；主体、原因、策略依据、有效期、绑定候选 | 同主体自批、过期、候选变化、范围不符均阻断 |
+
+三层检查不可合并：JSON Schema 判结构；语义 checker 判引用、所有权、循环、静态策略；运行期 gate 判文件 diff、进程、能力、秘密、预算与评审。非法黄金样例标注拒绝层，不能声称 JSON Schema 会检查实际文件或进程。
+
+完整 S0 黄金目录规划：`schemas/`、`testdata/contracts/valid/`、`testdata/contracts/invalid/`（尚未创建）。每例携带 fixture ID、契约版本、expected accept/reject、拒绝层和原因。必须含三任务链、四 kind、C+Go、C+JavaScript+Python、人工交接、代码文档协同；每一条件至少一正一反。文档中的路径/片段是设计输入，不是已验证可运行样例。
+
+## 3. 配置解析与冻结
+
+profile 只提供默认值；task 显式值覆盖链默认；step 显式值覆盖 task 默认。列表覆盖/合并、空值含义、workspace.toml 与 proofrail.toml 的责任划分尚待 ADR-002 冻结。`config explain` 必须能输出值与来源，不允许悄悄合并数组造成更多权限。
+
+解析完成再计算 canonical run manifest 摘要；运行期心跳、credentials、机器探测不得回写用户配置。父 snapshot、hook 摘要、adapter/harness 版本和已授权策略绑定 run。变更配置只能新建 run，或走 RFC 明确的暂停、审批和新 manifest 流程；不能覆盖旧事实。
+
+## 4. 快照、证据与接受事务
+
+捕获输入：相对路径、文件类型/权限、内容摘要、包/锁文件、环境描述、排除规则和未提交文件事实（Git 元数据仅显式启用）。原始文件字节用于内容哈希，不把 BOM/行尾转换偷偷混入捕获。路径分隔符、排序、Unicode、保留名、大小写、symlink/reparse/hardlink 规则由 ADR-002 冻结并以跨平台 goldens 验证。
+
+每次状态事件含 run/task、前后状态、单调序号、时间、主体、输入证据和原因；事件哈希链用于发现缺失/重排。对象先临时写、校验、原子落位；事件持久后才更新可重建投影。断尾日志处理不得丢弃已确认事件而猜测成功。
+
+接受事务的 reader contract：只有绑定父快照、task/attempt、候选及证据根的有效 review 和完成发布的 receipt 同时存在，才允许作为下一任务父快照。崩溃在候选、review、receipt、事件或投影之间时均重放 journal 判定；不得靠目录名或单个 PASSED 字段认定接受。哈希证明完整性，不证明发布者身份。
+
+managed-change-set：读全部目标→按全局顺序在内存模拟→检查 marker/前置哈希/断言/边界→持久 journal→逐文件原子替换→写后全量核验→记录 receipt；失败整组回滚，回滚本身失败则隔离并暂停。禁止覆盖外部修改，禁止运行进程存活时恢复。
+
+isolated-workspace：直接工具写入仅限可丢弃运行目录；记录完整前后 manifest/diff/进程/gates；接受边界仍为整个 task。不能把部分语言、部分文件或“代码成功但文档失败”的子集发布。
+
+## 5. Gate Hook 协议
+
+kind 使用 precheck/build/test/verify/review/cleanup；按序执行。`executable + args[]` 不经过隐式 shell，cwd 必须落在授权运行工作区；环境继承白名单，网络默认拒绝，资源/输出/时长必须可执行限制。需要 shell/container/remote/PTY 是独立能力声明，不支持则拒绝而非弱化策略。
+
+结果至少证明 hook 身份/摘要、起止、退出状态、stdout/stderr 摘要、产物引用/哈希、策略及失败原因；确切 wire 字段在 schema 冻结。启动失败、超时、进程无法停止、产物缺失、扫描失败不同于 exit 0。`warn` 只有显式非阻断策略才能继续且不得冒充 PASS；retry(n) 消耗统一预算；cleanup 失败不能抹去原失败。
+
+生成 hook A：只从锁定模板生成参数化命令→语法/模板/依赖/危险能力校验→独立批准→哈希绑定挂载。generated 默认禁用；生成器不能修改自己的验证规则或批准自己。任意生成脚本 B 不进入 S1。
+
+## 6. 票据、修复与交接
+
+ticket 分类沿用 task-static/code-fix/noncode；上下文包含所属 run/task/attempt、失败证据、允许动作、预算和租约。相同指纹预算按 pending_review→override_window→hard_block 限制，具体阈值/有效修复证明必须先冻结，禁止模型自行重置预算。
+
+Prepare 在隔离区建立候选与父摘要；Inspect 比较范围/diff/所有权；Validate 运行冻结门禁；Promote 再校验停机、租约、父/候选/验证摘要与授权，原子提升并写 promotion receipt。任何步骤变化都令后续陈旧验证失效。评审拒绝后修复必须新 attempt，不能改写旧 receipt。
+
+handoff：停止受管写者→flush journal→捕获 manifest→WAITING_FOR_OPERATOR→人工独占写租约。complete 收回租约并检查越界/秘密/未知进程、运行规定 gates；abort 保留失败证据、丢弃本次候选；request-agent 建新 attempt 并注入经确认结论。到期/断线不自动通过或转租；secret-direct 无安全终端则暂停。
+
+## 7. 代理与 SessionBridge 边界
+
+ProofRail 端口接受版本化 context envelope：任务契约、父快照、已确认决策、最新证据、未决票据、预算、允许工具及引用摘要；返回候选变更/证据，不返回可信的任务 PASS。每个 attempt 有固定关联身份；投递前持久记录，重复请求不能重复应用同一 change-set。传输重试复用 requestId；新业务 attempt 产生新身份并计费。
+
+SessionBridge v0.1.1 是独立外部依赖，冻结消费其公开 v1 契约：明确 `mode=silent`、`legacy=false`；使用同一 channel directory 和目标实例；`requestId` 绑定回执；写命令先清理同 ID 陈旧结果，再同目录原子写。准确 wire 以该产品 RFC、黄金样例及客户端实现共同核对，不能直接复制 RFC 中省略字段的说明片段。
+
+| 外部结果/能力 | ProofRail 行为 |
+|---|---|
+| status=ok 的 response 文本 | 按输出 schema 检查，再做 checker/gates/review；绝不直接 PASSED |
+| busy | 有限退避、同 requestId 重试，消耗等待预算；每目标响应槽串行化 |
+| timeout/poll_timeout/失联 | 记录结果不确定并暂停/核对；不得假设未执行而无限重发 |
+| lm_api_unavailable/未知状态/错误版本 | 显式失败/暂停；仅允许预授权文件队列替代，无 auto/visible/剪贴板兜底 |
+| history 被截断/宿主重启 | 从 ProofRail envelope 重建事实，不把压缩聊天记录当完整补丁或决策 |
+| silent 只有文本 | managed-change-set 候选输出；不得声称有 IDE 文件编辑/命令执行能力 |
+
+SessionBridge 成功缓存是内存、限时机制，不是持久 exactly-once；ProofRail 自己持久化投递/结果及应用幂等记录。完整补丁轮次按依赖契约使用 noCompress 并独立验证输出完整性。不要借历史压缩绕过 token/费用上限。Secret 扫描/脱敏由 ProofRail 保证，不假定 SessionBridge 已实现。
+
+文件队列与 IPC 共享 ProofRail 业务信封，CLI 是消费者形态，不是第三套业务语义。JSONL framing、文件名、独占 claim、租约接管与结果提交的字段级规则在 ADR-004 冻结；禁止多个进程无锁追加同一队列文件。无 IDE、无 AI 测试用确定性 fixture consumer，不调用收费模型。
+
+## 8. 错误与验收边界
+
+先区分 schema/static/policy/capability/transport/execution/integrity/storage/review/operator 类原因，持久错误枚举与 CLI 退出码由 ADR-002 冻结，不复用 SessionBridge 的 0/1/2/3 作为 ProofRail 全局退出码。错误包含所属对象、证据引用、可重试性和建议动作，但不得包含秘密。
+
+契约验收不是“JSON 能解析”：须验证结构、语义、运行行为、崩溃点、兼容及安全。对应测试目录、用例与阶段见 [TEST_STRATEGY.md](TEST_STRATEGY.md) 和 [DEV_PLAN.md](DEV_PLAN.md)。本轮未生成或运行完整契约 validator，S0 §17.2 仍不通过。
+
+## 9. 产品与生命周期契约（RFC §19）
+
+下列是 S0 必须冻结的语义，不是已确定 wire 字段。T002/T003 为每种记录补版本、必填字段、大小限制、正反样例与独立验证；未知类型拒绝写入。
+
+| PC | 输入/权威 | 输出/不变式 | 验收 |
+|---|---|---|---|
+| PC-01 | 用户配置+静态能力声明 | 计划摘要、权限/预算/unknown；不执行 hook/模型/网络/凭据调用；版本探测须另授权 | AT-16 |
+| PC-02 | 已接受 snapshot+review+完整引用 | 导出清单绑定父/目标/内容哈希/排除项；仅新目录，临时写后核验完成；失败不输出完成回执 | AT-17 |
+| PC-03 | 可信主体签发的范围/manifest/预算/期限 | 新副作用和接受前校验；撤销阻断并请求受控停止，已有副作用不被“抹除”；waiver 不改硬安全门禁 | AT-18 |
+| PC-04 | 可信策略定义 effect 类别+runner 可实施能力 | 只读/本地可丢弃/外部写分离；S1 外部写拒绝，未知副作用暂停对账；诊断不变更锁/日志 | AT-19 |
+| PC-05 | 所有者预算、价格/计量来源、调用身份 | 调用前持久 reserve，结算去重，unknown 保留占用；共享上限跨 run 生效；不得用重启释放未结算预留 | AT-20 |
+| PC-06 | 已核验引用闭包、支持矩阵、保留授权 | 备份包含对象+事件+引用但不含秘密；新 store 恢复；不改旧格式；卸载默认不删证据/共享工具 | AT-21 |
+
+成本契约包含币种、价格版本、estimated/observed/unknown 和结算依据；订阅按调用/token cap 授权时必须标明“不保证货币账单”。预留与实际费用的差异留痕，重复回执不可重复结算；超供应商可控范围的硬币种保证不得宣称成立。
+
+导出/备份 reader 必须验证对象闭包、路径/类型安全、版本、哈希和授权；导出完成不提升原 task/chain 状态，更不代表产品发布。对于活动 run，一致性未知时拒绝备份，不返回可恢复的假成功。处置记录不含被删除秘密值；删除审批和审计保留冲突进入人工决定。
