@@ -1,0 +1,197 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://proofrail.dev/schemas/v1/snapshot-manifest.schema.json",
+  "title": "ProofRail portable snapshot manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "manifest", "manifestHash"],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "manifest": {
+      "oneOf": [
+        {"$ref": "#/$defs/baselineManifest"},
+        {"$ref": "#/$defs/candidateManifest"}
+      ]
+    },
+    "manifestHash": {
+      "$ref": "#/$defs/sha256"
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$"
+    },
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024,
+      "pattern": "^(?!/)(?![A-Za-z]:)(?![A-Za-z][A-Za-z0-9+.-]*:)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*\\\\)(?!.*\\u0000).+$"
+    },
+    "managedGlob": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024,
+      "pattern": "^(?!!)(?!/)(?![A-Za-z]:)(?![A-Za-z][A-Za-z0-9+.-]*:)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*\\\\)(?!.*\\u0000).+$"
+    },
+    "linkTarget": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024,
+      "pattern": "^(?!/)(?![A-Za-z]:)(?![A-Za-z][A-Za-z0-9+.-]*:)(?!.*\\\\)(?!.*\\u0000).+$"
+    },
+    "task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["taskId", "attempt"],
+      "properties": {
+        "taskId": {"$ref": "#/$defs/id"},
+        "attempt": {"type": "integer", "minimum": 1}
+      }
+    },
+    "regularFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "type", "contentHash", "sizeBytes", "executable", "readOnly", "role", "hardlinkGroup"],
+      "properties": {
+        "path": {"$ref": "#/$defs/relativePath"},
+        "type": {"const": "regular-file"},
+        "contentHash": {"$ref": "#/$defs/sha256"},
+        "sizeBytes": {"type": "integer", "minimum": 0},
+        "executable": {"type": "boolean"},
+        "readOnly": {"type": "boolean"},
+        "role": {"enum": ["regular", "package-manifest", "lockfile", "generated"]},
+        "hardlinkGroup": {
+          "oneOf": [
+            {"type": "null"},
+            {"$ref": "#/$defs/id"}
+          ]
+        }
+      }
+    },
+    "directory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "type", "readOnly"],
+      "properties": {
+        "path": {"$ref": "#/$defs/relativePath"},
+        "type": {"const": "directory"},
+        "readOnly": {"type": "boolean"}
+      }
+    },
+    "symbolicLink": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "type", "target", "targetHash"],
+      "properties": {
+        "path": {"$ref": "#/$defs/relativePath"},
+        "type": {"const": "symbolic-link"},
+        "target": {"$ref": "#/$defs/linkTarget"},
+        "targetHash": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "entry": {
+      "oneOf": [
+        {"$ref": "#/$defs/regularFile"},
+        {"$ref": "#/$defs/directory"},
+        {"$ref": "#/$defs/symbolicLink"}
+      ]
+    },
+    "exclusion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pattern", "source", "reason"],
+      "properties": {
+        "pattern": {"$ref": "#/$defs/managedGlob"},
+        "source": {"enum": ["default", "user", "secret-policy"]},
+        "reason": {"$ref": "#/$defs/id"}
+      }
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["os", "arch", "caseSensitive", "environmentVariableNames", "toolchainEvidence"],
+      "properties": {
+        "os": {"$ref": "#/$defs/id"},
+        "arch": {"$ref": "#/$defs/id"},
+        "caseSensitive": {"type": "boolean"},
+        "environmentVariableNames": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "pattern": "^[^=\\u0000-\\u001f\\u007f]+$"
+          }
+        },
+        "toolchainEvidence": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/sha256"}
+        }
+      }
+    },
+    "manifestProperties": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["snapshotId", "kind", "capturedAt", "runId", "parentSnapshotHash", "task", "entries", "exclusions", "environment"],
+      "properties": {
+        "snapshotId": {"$ref": "#/$defs/id"},
+        "kind": {"enum": ["baseline", "candidate"]},
+        "capturedAt": {"$ref": "#/$defs/timestamp"},
+        "runId": {"$ref": "#/$defs/id"},
+        "parentSnapshotHash": {
+          "oneOf": [
+            {"type": "null"},
+            {"$ref": "#/$defs/sha256"}
+          ]
+        },
+        "task": {
+          "oneOf": [
+            {"type": "null"},
+            {"$ref": "#/$defs/task"}
+          ]
+        },
+        "entries": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/entry"}
+        },
+        "exclusions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/exclusion"}
+        },
+        "environment": {"$ref": "#/$defs/environment"}
+      }
+    },
+    "baselineManifest": {
+      "$ref": "#/$defs/manifestProperties",
+      "properties": {
+        "kind": {"const": "baseline"},
+        "parentSnapshotHash": {"type": "null"},
+        "task": {"type": "null"}
+      }
+    },
+    "candidateManifest": {
+      "$ref": "#/$defs/manifestProperties",
+      "properties": {
+        "kind": {"const": "candidate"},
+        "parentSnapshotHash": {"$ref": "#/$defs/sha256"},
+        "task": {"$ref": "#/$defs/task"}
+      }
+    }
+  }
+}

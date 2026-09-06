@@ -1630,6 +1630,41 @@ claim 发布；发布后不可撤销或覆盖，rejected receipt 只保留失败
 的哈希证明完整性，不证明主体身份；跨主机
 或发布场景的签名仍按后续签名 receipt 契约处理。
 
+#### 16.9.12 Snapshot manifest
+
+`snapshot-manifest.schema.json` 冻结 baseline 和候选快照的可移植内容清单，不编码“已接受”状态。根对象只含
+`schemaVersion="1.0.0"`、`manifest` 与 `manifestHash`；manifestHash 不参与自身摘要，以 ASCII 域
+`proofrail:snapshot-manifest:1\n` 后接内层 manifest 的 JCS canonical 字节计算 SHA-256。
+
+内层 manifest 必须包含：
+
+- `snapshotId/kind/capturedAt/runId/parentSnapshotHash/task/entries/exclusions/environment`。kind 只能为
+  `baseline|candidate`。baseline 的 parentSnapshotHash 与 task 必须为 null；candidate 必须引用父
+  snapshot，并以 `task={taskId,attempt}` 绑定产出任务。manifest 不能通过 kind 自行升级信任。
+- entries 是按规范相对路径的 Unicode code point 严格升序数组，不得重复，也不得包含 manifest 自身、
+  ProofRail store/run 目录或被 exclusions 命中的路径。空目录必须显式记录，不能靠内容对象推断。
+- regular-file 记录 `path/type=regular-file/contentHash/sizeBytes/executable/readOnly/role/hardlinkGroup`，role 为
+  `regular|package-manifest|lockfile|generated`，用原始文件而非路径猜测保存包/锁文件事实。
+  contentHash 对原始文件字节直接计算 SHA-256，不转换 BOM、行尾或文本编码；sizeBytes 是同一字节串长度。
+  hardlinkGroup 可为 null；非空组内条目必须有相同 contentHash，目标平台不能无损恢复时 fail-close。
+  S1 可移植权限只保留 executable/readOnly；ACL、owner、xattr、ADS 或其他必须保真的元数据存在时，
+  能力不足即 fail-close。
+- directory 记录 `path/type=directory/readOnly`。symbolic-link 记录
+  `path/type=symbolic-link/target/targetHash`；target 按链接中保存的 UTF-8 文本计算 SHA-256，不跟随目标
+  读取内容。绝对、越界、反斜杠、NUL 或不可无损解码的链接 target 拒绝；平台不能安全重建链接时拒绝
+  捕获/恢复。reparse point 与 junction 在 S1 不作为可移植链接类型：检测到即 fail-close，不得静默解引用。
+- exclusions 每项为 `pattern/source/reason`；source 只能为 `default|user|secret-policy`，reason 是稳定 ID。
+  默认至少排除 `.git/`、当前 ProofRail run/store 根和已声明 secret 路径；实际展开的排除结果由 checker
+  记录为证据，manifest 中规则顺序保持声明顺序，不能依赖文件系统枚举顺序。
+- environment 仅记录重建提示：`os/arch/caseSensitive/environmentVariableNames/toolchainEvidence`。
+  环境变量只存名称并按 Unicode code point 排序，不存值；toolchainEvidence 为唯一摘要数组。环境描述
+  不等于可重建保证，恢复后仍须 capability preflight。
+
+Schema 只检查单条记录形状；checker 负责路径规范化/排序/唯一、父目录闭包、内容对象存在与 size/hash
+一致、排除规则命中、大小写与 Unicode 等价冲突，以及 manifestHash/parentSnapshotHash 引用。snapshot
+发布采用临时对象、完整闭包验证、原子 no-replace 落位；candidate 只有被有效 review 与后续 promotion
+receipt 共同引用后，才成为下一任务可消费的父快照。Git 状态只可作为显式证据引用，不进入恢复来源。
+
 ---
 
 ## 17. S0 实施就绪门禁

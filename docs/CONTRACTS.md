@@ -62,7 +62,12 @@ RFC §16.9.3.1 已冻结 `jcs-001` 与 `state-event-001` 两条字节级向量�
 
 ## 4. 快照、证据与接受事务
 
-捕获输入：相对路径、文件类型/权限、内容摘要、包/锁文件、环境描述、排除规则和未提交文件事实（Git 元数据仅显式启用）。原始文件字节用于内容哈希，不把 BOM/行尾转换偷偷混入捕获。路径分隔符、排序、Unicode、保留名、大小写、symlink/reparse/hardlink 规则由 ADR-002 冻结并以跨平台 goldens 验证。
+`snapshot-manifest.schema.json` 冻结 baseline/candidate 判别、父快照与 task/attempt 绑定、三类路径条目、
+排除规则及无秘密环境事实。普通文件摘要直接覆盖原始字节，不转换 BOM/行尾/编码，并显式标记包清单、
+锁文件、生成物和 hardlink 组；目录保留空目录，symlink 摘要覆盖原始相对 target 文本。manifest 本身不含
+accepted 状态，只有有效 review + promotion receipt 才能授权下游消费。路径排序/唯一、Unicode/大小写
+碰撞、父目录与对象闭包、排除命中及可恢复性由独立语义 checker 和跨平台 goldens 验证；Git 元数据只作
+显式证据，不能成为恢复来源。
 
 每次状态事件含 run/task、前后状态、单调序号、时间、主体、输入证据和原因；事件哈希链用于发现缺失/重排。对象先临时写、校验、原子落位；事件持久后才更新可重建投影。断尾日志处理不得丢弃已确认事件而猜测成功。
 

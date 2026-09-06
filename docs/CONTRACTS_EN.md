@@ -49,7 +49,13 @@ RFC section 16.9.3.1 freezes two byte-level vectors, `jcs-001` and `state-event-
 
 ## 4. Snapshots, Evidence and Acceptance
 
-Capture relative path, type/permissions, content hash, package/lock files, environment description, exclusions and uncommitted-file facts (Git metadata only when explicitly enabled). Hash original file bytes without hidden BOM/EOL conversion. ADR-002 must freeze path separators, ordering, Unicode, reserved names, case, symlinks/reparse points/hardlinks with cross-platform goldens.
+`snapshot-manifest.schema.json` freezes baseline/candidate discrimination, parent and task/attempt binding, three path-entry
+types, exclusions and secret-free environment facts. Regular-file hashes cover original bytes without BOM/EOL/encoding
+conversion and explicitly mark package manifests, lockfiles, generated files and hardlink groups; directories preserve empty
+directories, while symlink hashes cover the original relative target text. A manifest cannot declare itself accepted: only a
+valid review plus promotion receipt authorizes downstream consumption. The independent semantic checker and cross-platform
+goldens validate path ordering/uniqueness, Unicode/case collisions, parent/object closure, exclusion matches and restoration
+feasibility. Git metadata is explicit evidence only, never a restoration source.
 
 Events contain run/task, before/after state, monotonic sequence, time, actor, input evidence and reason. Hash chaining detects omission/reordering. Write temporary objects, verify and atomically publish; persist events before rebuildable projections. Torn-tail handling must not discard acknowledged facts and guess success.
 
