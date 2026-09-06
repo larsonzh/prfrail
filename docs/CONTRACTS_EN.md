@@ -23,7 +23,7 @@ Each persistent object has an independent `schemaVersion`, distinct from CLI and
 | Object | Minimum semantics | Invalid/dynamic constraints |
 |---|---|---|
 | chain definition | `chain.id/profile`, at least one ordered task, minimal workspace, optional documentation | Cross-array task/step ID uniqueness, references and dependency cycles belong to the checker |
-| run manifest | Frozen effective configuration, default origins and runtime bindings | No in-place plan edits during runs; exact fields await a later T002 slice |
+| run manifest | Input/effective chain digests, per-leaf origins, policy/parent snapshot and versioned runtime bindings | Checker verifies pointers/source closure, loaded objects, capability proof and one manifest per run |
 | task | Stable id, nonempty steps, review and documentationPolicy | Duplicate IDs; skip-on-fail without failureIndependent |
 | step | id, code/build/verify/noop; code execution defaults autonomous | Empty steps, unknown kind; noop requires reason and cannot start hooks/agents |
 | hook | Independent strict registry; discriminated process/container runners; argument, failure, timeout, resource, network and artifact policies | Checker/preflight verifies IDs, references, tool digests and capabilities; execution belongs in receipts |
@@ -37,8 +37,8 @@ Each persistent object has an independent `schemaVersion`, distinct from CLI and
 
 Separate three validators: JSON Schema for structure; semantic checker for references, ownership, cycles and static policy; runtime gates for diffs, processes, capabilities, secrets, budgets and review. Each invalid golden identifies its rejection layer; JSON Schema cannot check live files or processes.
 
-Fourteen structural Schemas for chain, hook, target, workspace, state-event, error, adapter-envelope, adapter-receipt,
-snapshot-manifest, evidence-manifest, review-receipt, promotion-receipt, handoff-receipt and hook-result now exist under `schemas/`;
+Fifteen structural Schemas for chain, hook, target, workspace, state-event, error, adapter-envelope, adapter-receipt,
+snapshot-manifest, evidence-manifest, review-receipt, promotion-receipt, handoff-receipt, hook-result and run-manifest now exist under `schemas/`;
 T003 still needs to
 create `testdata/contracts/valid/` and `testdata/contracts/invalid/` and execute them with an independent validator. Each
 fixture records ID, contract version, expected accept/reject, rejection layer and reason. Include three tasks, all four kinds,
@@ -50,6 +50,12 @@ Documentation paths/snippets are design inputs, not verified executable fixtures
 Profiles provide defaults only; explicit task values override chain defaults; explicit step values override task defaults. List replacement/merge, empty values and workspace.toml versus proofrail.toml ownership await ADR-002. config explain reports values and origins. Silent array merging must not grant extra permissions.
 
 After resolution, apply RFC 8785 JCS and hash the UTF-8 no-BOM bytes with SHA-256; represent the digest as `sha256:` plus 64 lowercase hexadecimal digits. Heartbeats, credentials and machine probes never rewrite user config. Bind parent snapshot, hook digests, adapter/harness versions and authorized policy. Changes require a new run or the RFC's pause/approval/new-manifest flow, never overwriting historical facts.
+
+`run-manifest.schema.json` separates the validated input definition from the fully default-expanded chain through
+`chainDefinitionHash` and `effectiveChainHash`. `resolution` uses RFC 6901 pointers to attribute every final leaf to a
+builtin/profile/chain/task/step source; `bindings` freezes adapter/harness/toolchain/hook/policy versions, object digests
+and capability evidence. Absolute paths, credentials, environment values and mutable machine probes stay outside. The
+checker owns pointer existence, complete source coverage, loaded-object matching and one manifest per runId.
 
 RFC section 16.9.3.1 freezes two byte-level vectors, `jcs-001` and `state-event-001`, covering JCS ordering/escaping/Unicode and the state-event domain-separated digest. T003 must still preserve them as independent fixtures and recompute them with a non-core implementation; documented digest values are not independent-validator evidence.
 

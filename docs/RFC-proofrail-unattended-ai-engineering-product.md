@@ -1832,6 +1832,42 @@ hook 引用、runnerEvidence 对实际 runner 与策略的闭包、声明产物�
 预算，以及同一 `runId/taskId/attempt/hookId/executionAttempt` 只有一个 resultHash。哈希只证明内容
 完整性，不证明 runner 真正执行或证据采集可信。
 
+#### 16.9.18 Run manifest
+
+`run-manifest.schema.json` 冻结一次 run 开始前的完整有效配置、每个默认/覆盖值的来源及实际运行依赖；
+运行中的心跳、凭据、绝对 source/run/store 路径和可变机器探测值不得进入本对象。根对象只含
+`schemaVersion="1.0.0"`、`manifest` 与 `manifestHash`；manifestHash 不参与自身摘要，以 ASCII 域
+`proofrail:run-manifest:1\n` 后接内层 manifest 的 JCS canonical 字节计算 SHA-256。
+
+内层 manifest 必含 `manifestId/createdAt/runId/chainId/chainDefinitionHash/effectiveChainHash/
+sourceConfigEvidence/resolution/policyHash/parentSnapshotHash/bindings`。`chainDefinitionHash` 引用通过结构与
+静态检查的 canonical chain definition；`effectiveChainHash` 引用另一份同版本 chain 对象，其中 profile、
+chain、task、step 和内建默认均已展开，不再依赖缺省解释。两者可相等，但只有在输入本来已完整展开时
+才允许相等。`sourceConfigEvidence` 是至少一项的唯一摘要数组，绑定 TOML、版本化 JSON 及批准的 profile
+等解析输入；它们只作为不可变证据，不把本机路径写入 manifest。
+
+`resolution` 是至少一项的严格数组，每项含 `effectivePointer/sourceKind/sourceHash/sourcePointer`。
+pointer 使用 RFC 6901 JSON Pointer（空串表示文档根）；effectivePointer 必须唯一并指向 effective chain
+中的一个最终叶值。sourceKind 为 `builtin-default|profile|chain|task|step`：builtin-default 要求
+sourceHash/sourcePointer 均为 null；其余来源要求二者均非 null，sourceHash 命中 sourceConfigEvidence，
+sourcePointer 指向该来源文档中实际提供值的位置。继承值记录最终提供它的层级，不记录中间拷贝；数组
+整体替换或合并规则必须在解析前由协议固定，不能通过多条 resolution 暗示额外权限。
+
+`policyHash` 是本次 run 的完整有效政策集合摘要，后续 evidence/review/receipt 只能引用它或其内已批准
+的专用策略；`parentSnapshotHash` 绑定 run 启动时只读物化的已接受父快照。`bindings` 是至少一项的严格
+数组，每项含 `kind/id/version/objectHash/capabilityEvidence`；kind 为
+`adapter|harness|toolchain|hook|policy`，同一 kind/id 组合唯一。version 是该依赖报告并被策略接受的
+非空版本字符串，objectHash 绑定实际加载的可执行文件、镜像、模板或策略对象，capabilityEvidence 至少
+一项并引用启动前能力预检结果。绑定只含稳定身份和证据摘要，不含 token、环境变量值或宿主绝对路径。
+
+manifest 一经被首个 run state-event 引用即不可改写。配置、profile、policy、父快照或任一 binding
+发生变化必须创建新 run manifest；若已有副作用，则还必须暂停并走批准/恢复规则，不能仅替换摘要继续
+旧 run。Schema 只检查单对象形状；checker 负责验证 chainId 与两个 chain 对象、sourceConfigEvidence
+闭包、JSON Pointer 存在性和叶值覆盖完整性、默认/覆盖优先级、binding 唯一性、版本/摘要与实际加载对象
+一致、能力证据满足声明需求、policy/父快照已批准，以及 runId 只绑定一个 manifestHash。哈希证明冻结
+内容完整性，不证明配置来源可信、依赖安全或能力仍然可用；恢复前仍须重新 preflight，但不得覆写本
+manifest。
+
 ---
 
 ## 17. S0 实施就绪门禁

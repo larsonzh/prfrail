@@ -28,7 +28,7 @@ UTF-8 无 BOM + LF；canonical 字节还不得含格式空白或尾随换行。�
 | 对象 | 最小语义 | 非法/动态约束 |
 |---|---|---|
 | chain definition | `chain.id/profile`、至少一个有序 task、最小 workspace、可选 documentation | task/step ID 跨数组唯一、引用及依赖无环由 checker 判定 |
-| run manifest | 冻结后的有效配置、默认值来源和运行绑定 | 运行中不得原地改计划；确切字段待后续 T002 切片 |
+| run manifest | chain 输入/有效摘要、逐叶值来源、policy/父快照及版本化运行绑定 | checker 验证 pointer/来源闭包、实际加载对象、能力证据和 run 唯一 manifest |
 | task | 稳定 id、非空 steps、review、documentationPolicy | id 重复、skip-on-fail 未声明 failureIndependent 拒绝 |
 | step | id、kind=code/build/verify/noop；code execution 默认 autonomous | 空 steps、未知 kind 拒绝；noop 必须 reason 且不能启动 hook/agent |
 | hook | 独立严格注册表；process/container 判别联合、逐项参数、失败/超时/资源/网络/产物策略 | ID/引用、工具摘要与能力由 checker/preflight 判定；执行结果进入 receipt |
@@ -43,7 +43,7 @@ UTF-8 无 BOM + LF；canonical 字节还不得含格式空白或尾随换行。�
 三层检查不可合并：JSON Schema 判结构；语义 checker 判引用、所有权、循环、静态策略；运行期 gate 判文件 diff、进程、能力、秘密、预算与评审。非法黄金样例标注拒绝层，不能声称 JSON Schema 会检查实际文件或进程。
 
 `schemas/` 已创建 chain、hook、target、workspace、state-event、error、adapter-envelope、adapter-receipt、
-snapshot-manifest、evidence-manifest、review-receipt、promotion-receipt、handoff-receipt、hook-result 十四份结构 Schema；`testdata/contracts/valid/` 与
+snapshot-manifest、evidence-manifest、review-receipt、promotion-receipt、handoff-receipt、hook-result、run-manifest 十五份结构 Schema；`testdata/contracts/valid/` 与
 `testdata/contracts/invalid/` 仍待 T003 创建并由独立 validator 执行。每例携带 fixture ID、契约版本、
 expected accept/reject、拒绝层和原因。必须含三任务链、四 kind、C+Go、C+JavaScript+Python、人工交接、
 代码文档协同；每一条件至少一正一反。文档中的路径/片段是设计输入，不是已验证可运行样例。
@@ -56,6 +56,12 @@ profile 只提供默认值；task 显式值覆盖链默认；step 显式值覆�
 文本表示为 `sha256:` 加 64 位小写十六进制。运行期心跳、credentials、机器探测不得回写用户配置。
 父 snapshot、hook 摘要、adapter/harness 版本和已授权策略绑定 run。变更配置只能新建 run，或走 RFC
 明确的暂停、审批和新 manifest 流程；不能覆盖旧事实。
+
+`run-manifest.schema.json` 以 `chainDefinitionHash`/`effectiveChainHash` 区分通过检查的输入定义与完全
+展开默认值后的 chain；`resolution` 用 RFC 6901 pointer 记录每个最终叶值来自 builtin/profile/chain/
+task/step，`bindings` 固定 adapter/harness/toolchain/hook/policy 的版本、对象摘要和能力证据。绝对路径、
+凭据、环境变量值及可变机器探测不进入 manifest；pointer 存在性、来源覆盖完整性、实际加载对象和
+runId 唯一 manifest 由 checker 判定。
 
 RFC §16.9.3.1 已冻结 `jcs-001` 与 `state-event-001` 两条字节级向量，分别覆盖 JCS 排序/转义/Unicode
 及 state-event 域分隔摘要。T003 仍须把它们固化为独立 fixture，并以非核心实现复算；文档中的摘要值
