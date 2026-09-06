@@ -63,9 +63,45 @@
           "enum": ["schema", "static", "policy", "capability", "transport", "execution", "integrity", "storage", "review", "operator", "internal"]
         },
         "code": {
-          "type": "string",
-          "minLength": 3,
-          "maxLength": 128
+          "enum": [
+            "schema.invalid-document",
+            "schema.unsupported-version",
+            "static.unresolved-reference",
+            "static.dependency-cycle",
+            "static.path-invalid",
+            "static.target-conflict",
+            "policy.authorization-denied",
+            "policy.budget-exhausted",
+            "policy.boundary-violation",
+            "capability.unavailable",
+            "capability.unsupported-runner",
+            "capability.isolation-unavailable",
+            "transport.rejected",
+            "transport.timeout",
+            "transport.result-uncertain",
+            "execution.start-failed",
+            "execution.exit-nonzero",
+            "execution.timed-out",
+            "execution.resource-limited",
+            "execution.termination-uncertain",
+            "execution.artifact-missing",
+            "execution.scan-failed",
+            "integrity.hash-mismatch",
+            "integrity.reference-missing",
+            "integrity.sequence-invalid",
+            "integrity.signature-invalid",
+            "integrity.publication-conflict",
+            "storage.write-failed",
+            "storage.durability-uncertain",
+            "storage.capacity-exhausted",
+            "review.rejected",
+            "review.waiver-invalid",
+            "review.separation-violated",
+            "operator.cancelled",
+            "operator.action-required",
+            "internal.invariant-violated",
+            "internal.unexpected"
+          ]
         },
         "subject": {
           "$ref": "#/$defs/subject"
@@ -92,17 +128,28 @@
       "allOf": [
         {
           "oneOf": [
-            {"properties": {"category": {"const": "schema"}, "code": {"pattern": "^schema\\.[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"}}},
-            {"properties": {"category": {"const": "static"}, "code": {"pattern": "^static\\.[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"}}},
-            {"properties": {"category": {"const": "policy"}, "code": {"pattern": "^policy\\.[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"}}},
-            {"properties": {"category": {"const": "capability"}, "code": {"pattern": "^capability\\.[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"}}},
-            {"properties": {"category": {"const": "transport"}, "code": {"pattern": "^transport\\.[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"}}},
-            {"properties": {"category": {"const": "execution"}, "code": {"pattern": "^execution\\.[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"}}},
-            {"properties": {"category": {"const": "integrity"}, "code": {"pattern": "^integrity\\.[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"}}},
-            {"properties": {"category": {"const": "storage"}, "code": {"pattern": "^storage\\.[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"}}},
-            {"properties": {"category": {"const": "review"}, "code": {"pattern": "^review\\.[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"}}},
-            {"properties": {"category": {"const": "operator"}, "code": {"pattern": "^operator\\.[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"}}},
-            {"properties": {"category": {"const": "internal"}, "code": {"pattern": "^internal\\.[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"}}}
+            {"properties": {"category": {"const": "schema"}, "code": {"const": "schema.invalid-document"}, "retryMode": {"const": "never"}, "suggestedAction": {"const": "fix-input"}}},
+            {"properties": {"category": {"const": "schema"}, "code": {"const": "schema.unsupported-version"}, "retryMode": {"const": "never"}, "suggestedAction": {"const": "fix-contract"}}},
+            {"properties": {"category": {"const": "static"}, "code": {"enum": ["static.unresolved-reference", "static.dependency-cycle", "static.path-invalid", "static.target-conflict"]}, "retryMode": {"const": "never"}, "suggestedAction": {"const": "fix-contract"}}},
+            {"properties": {"category": {"const": "policy"}, "code": {"const": "policy.authorization-denied"}, "retryMode": {"const": "after-operator"}, "suggestedAction": {"const": "grant-policy"}}},
+            {"properties": {"category": {"const": "policy"}, "code": {"const": "policy.budget-exhausted"}, "retryMode": {"const": "after-operator"}, "suggestedAction": {"const": "operator-action"}}},
+            {"properties": {"category": {"const": "policy"}, "code": {"const": "policy.boundary-violation"}, "retryMode": {"const": "never"}, "suggestedAction": {"const": "fix-input"}}},
+            {"properties": {"category": {"const": "capability"}, "code": {"enum": ["capability.unavailable", "capability.isolation-unavailable"]}, "retryMode": {"const": "after-operator"}, "suggestedAction": {"const": "install-capability"}}},
+            {"properties": {"category": {"const": "capability"}, "code": {"const": "capability.unsupported-runner"}, "retryMode": {"const": "never"}, "suggestedAction": {"const": "fix-contract"}}},
+            {"properties": {"category": {"const": "transport"}, "code": {"const": "transport.rejected"}, "retryMode": {"const": "same-request"}, "suggestedAction": {"const": "retry"}}},
+            {"properties": {"category": {"const": "transport"}, "code": {"enum": ["transport.timeout", "transport.result-uncertain"]}, "retryMode": {"const": "after-reconcile"}, "suggestedAction": {"const": "reconcile"}}},
+            {"properties": {"category": {"const": "execution"}, "code": {"enum": ["execution.start-failed", "execution.exit-nonzero", "execution.timed-out", "execution.resource-limited", "execution.artifact-missing"]}, "retryMode": {"const": "new-attempt"}, "suggestedAction": {"const": "repair"}}},
+            {"properties": {"category": {"const": "execution"}, "code": {"const": "execution.termination-uncertain"}, "retryMode": {"const": "after-reconcile"}, "suggestedAction": {"const": "reconcile"}}},
+            {"properties": {"category": {"const": "execution"}, "code": {"const": "execution.scan-failed"}, "retryMode": {"const": "after-operator"}, "suggestedAction": {"const": "operator-action"}}},
+            {"properties": {"category": {"const": "integrity"}, "code": {"enum": ["integrity.hash-mismatch", "integrity.reference-missing", "integrity.sequence-invalid", "integrity.signature-invalid"]}, "retryMode": {"const": "never"}, "suggestedAction": {"const": "reconcile"}}},
+            {"properties": {"category": {"const": "integrity"}, "code": {"const": "integrity.publication-conflict"}, "retryMode": {"const": "after-reconcile"}, "suggestedAction": {"const": "reconcile"}}},
+            {"properties": {"category": {"const": "storage"}, "code": {"enum": ["storage.write-failed", "storage.durability-uncertain"]}, "retryMode": {"const": "after-reconcile"}, "suggestedAction": {"const": "reconcile"}}},
+            {"properties": {"category": {"const": "storage"}, "code": {"const": "storage.capacity-exhausted"}, "retryMode": {"const": "after-operator"}, "suggestedAction": {"const": "restore-storage"}}},
+            {"properties": {"category": {"const": "review"}, "code": {"const": "review.rejected"}, "retryMode": {"const": "new-attempt"}, "suggestedAction": {"const": "repair"}}},
+            {"properties": {"category": {"const": "review"}, "code": {"enum": ["review.waiver-invalid", "review.separation-violated"]}, "retryMode": {"const": "after-operator"}, "suggestedAction": {"const": "review"}}},
+            {"properties": {"category": {"const": "operator"}, "code": {"const": "operator.cancelled"}, "retryMode": {"const": "never"}, "suggestedAction": {"const": "operator-action"}}},
+            {"properties": {"category": {"const": "operator"}, "code": {"const": "operator.action-required"}, "retryMode": {"const": "after-operator"}, "suggestedAction": {"const": "operator-action"}}},
+            {"properties": {"category": {"const": "internal"}, "code": {"enum": ["internal.invariant-violated", "internal.unexpected"]}, "retryMode": {"const": "never"}, "suggestedAction": {"const": "report-bug"}}}
           ]
         }
       ]

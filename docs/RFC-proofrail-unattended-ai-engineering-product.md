@@ -1524,9 +1524,9 @@ JSON Schema 可判单条记录的实体形状、首事件约束和合法状态�
 
 - `errorId`、`occurredAt` 使用第 16.9.2 节基础格式。
 - `category` 只能为 `schema|static|policy|capability|transport|execution|integrity|storage|review|operator|internal`。
-- `code` 格式为 `<category>.<lower-kebab-detail>`，前缀必须与 category 相同；稳定 code 用于机器判定，
-  不得匹配 message。首版不穷举 detail；新增 code 不改变字段语义，但必须先有 RFC/测试并由读取方按
-  category fail-close，不能把未知 code 当成功。
+- `code` 使用下表首版封闭目录且前缀必须与 category 相同；稳定 code 用于机器判定，不得匹配 message。
+  新增 code 是协议变更，必须先修订 RFC/Schema/正反 fixture；旧读取方必须按版本 fail-close，不能把
+  未知 code 当成功。
 - `subject={kind,id,runId?,attempt?}` 标识失败对象；kind 只能为
   `system|chain|task|step|hook|adapter|store`。id/runId 使用基础 ID，attempt 从 1 开始；对象层级、引用存在
   与 attempt 一致性由 checker 判定。
@@ -1534,6 +1534,33 @@ JSON Schema 可判单条记录的实体形状、首事件约束和合法状态�
 - `retryMode` 只能为 `never|same-request|new-attempt|after-reconcile|after-operator`；
   `suggestedAction` 只能为 `fix-input|fix-contract|grant-policy|install-capability|retry|reconcile|repair|restore-storage|review|operator-action|report-bug`。
   retryMode 是许可上限而非自动重试命令，仍受预算、租约、幂等和授权约束。
+
+首版 code 目录及允许的 `retryMode/suggestedAction`：
+
+| category | code | retryMode | suggestedAction |
+|---|---|---|---|
+| schema | `schema.invalid-document` | never | fix-input |
+| schema | `schema.unsupported-version` | never | fix-contract |
+| static | `static.unresolved-reference`、`static.dependency-cycle`、`static.path-invalid`、`static.target-conflict` | never | fix-contract |
+| policy | `policy.authorization-denied` | after-operator | grant-policy |
+| policy | `policy.budget-exhausted` | after-operator | operator-action |
+| policy | `policy.boundary-violation` | never | fix-input |
+| capability | `capability.unavailable`、`capability.isolation-unavailable` | after-operator | install-capability |
+| capability | `capability.unsupported-runner` | never | fix-contract |
+| transport | `transport.rejected` | same-request | retry |
+| transport | `transport.timeout`、`transport.result-uncertain` | after-reconcile | reconcile |
+| execution | `execution.start-failed`、`execution.exit-nonzero`、`execution.timed-out`、`execution.resource-limited`、`execution.artifact-missing` | new-attempt | repair |
+| execution | `execution.termination-uncertain` | after-reconcile | reconcile |
+| execution | `execution.scan-failed` | after-operator | operator-action |
+| integrity | `integrity.hash-mismatch`、`integrity.reference-missing`、`integrity.sequence-invalid`、`integrity.signature-invalid` | never | reconcile |
+| integrity | `integrity.publication-conflict` | after-reconcile | reconcile |
+| storage | `storage.write-failed`、`storage.durability-uncertain` | after-reconcile | reconcile |
+| storage | `storage.capacity-exhausted` | after-operator | restore-storage |
+| review | `review.rejected` | new-attempt | repair |
+| review | `review.waiver-invalid`、`review.separation-violated` | after-operator | review |
+| operator | `operator.cancelled` | never | operator-action |
+| operator | `operator.action-required` | after-operator | operator-action |
+| internal | `internal.invariant-violated`、`internal.unexpected` | never | report-bug |
 
 `transport` 的 timeout、poll_timeout、断线或未知结果必须使用 `after-reconcile`，禁止标成 `same-request`
 后盲重发；只有已证明未受理或幂等契约允许的暂态失败才能使用 `same-request`。`integrity`、`review` 和
@@ -1558,8 +1585,8 @@ CLI 进程退出码按主错误 category 固定映射，不透传 hook、操作�
 | 19 | operator |
 | 20 | internal |
 
-命令结果若含多个错误，必须显式选一个 `primaryErrorId`，退出码只由该错误决定；其余错误仍保留在证据中。
-各命令选择主错误的顺序随 result/receipt Schema 冻结，禁止按 map 遍历或最后一个错误碰巧获胜。
+命令结果若含多个错误，必须通过第 16.9.20 节的 error-set 显式选择 `primaryErrorId`，退出码只由该错误
+决定；其余错误仍保留在证据中。禁止按 map 遍历、最后一个错误或 cleanup 结果碰巧覆盖原始失败。
 
 #### 16.9.10 Adapter 信封与文件队列
 
@@ -1904,6 +1931,30 @@ Schema 只检查单对象形状、用途/对象/主体判别和签名编码；ch
 验签、subject 内容摘要、key fingerprint、信任链、时间与撤销、用途隔离和验证证据。T017 仍须登记精确
 维护者签名主体、密钥保管人、公钥指纹、发布渠道及轮换/撤销流程；本 Schema 不生成密钥、不授权发布，
 也不表示 S1 已实现密码学验证。
+
+#### 16.9.20 Error set 与主错误
+
+`error-set.schema.json` 冻结一次命令或持久操作返回的非空错误集合及唯一主错误，避免各调用方以不同顺序
+选择 CLI 退出码。根对象只含 `schemaVersion="1.0.0"`、`errorSet` 与 `errorSetHash`；errorSetHash 不参与
+自身摘要，以 ASCII 域 `proofrail:error-set:1\n` 后接内层 errorSet 的 JCS canonical 字节计算 SHA-256。
+
+内层 errorSet 必含 `errorSetId/createdAt/operation/errors/primaryErrorId`。operation 是稳定 ID，标识产生
+这组结果的命令或持久操作，不存自由文本命令行。errors 至少一项，每项严格包含
+`errorId/errorHash/occurredAt/category/code`：errorHash 引用 `error.schema.json` 对象，其他字段复制其主错误
+排序所需的不可变索引；checker 必须验证复制值与被引用 error 完全一致，errorId 与 errorHash 均不得重复。
+
+primaryErrorId 必须命中 errors，且等于以下升序元组的唯一最小项：
+
+1. `occurredAt`（最早观察到的失败优先，因此后续 cleanup/storage 报错不能覆盖原始失败）；
+2. category 固定次序 `schema < static < policy < capability < transport < execution < integrity < storage < review < operator < internal`；
+3. `code` 按 ASCII 字节字典序；
+4. `errorId` 按 ASCII 字节字典序。
+
+聚合器必须先持久化全部 error，再计算 error-set；不得为改变退出码而修改 occurredAt。若操作本身无法可靠
+确定错误发生时间，使用核心首次观察该错误的 UTC 毫秒时间，而非远端未验证时间。CLI 按 primaryErrorId
+对应 category 映射第 16.9.9 节退出码，报告仍展示全部错误。Schema 只检查集合形状和 code/category
+分支；primary 命中、引用一致性、唯一性和排序由 checker 验证。error-set 不改变单个错误的 retryMode，
+也不授权对整组错误自动重试。
 
 ---
 
