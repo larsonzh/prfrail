@@ -1509,6 +1509,50 @@ JSON Schema 可判单条记录的实体形状、首事件约束和合法状态�
 这些由独立日志 checker 重放判定。状态 event 不等于 review、handoff、takeover 或 promotion receipt，
 后者必须提供各自授权与对象绑定字段。
 
+#### 16.9.9 错误记录与 CLI 退出码
+
+`error.schema.json` 冻结可持久化、可嵌入 receipt/result 的错误记录。根对象只含
+`schemaVersion="1.0.0"` 与 `error`；内层字段全部必填且未知字段拒绝：
+
+- `errorId`、`occurredAt` 使用第 16.9.2 节基础格式。
+- `category` 只能为 `schema|static|policy|capability|transport|execution|integrity|storage|review|operator|internal`。
+- `code` 格式为 `<category>.<lower-kebab-detail>`，前缀必须与 category 相同；稳定 code 用于机器判定，
+  不得匹配 message。首版不穷举 detail；新增 code 不改变字段语义，但必须先有 RFC/测试并由读取方按
+  category fail-close，不能把未知 code 当成功。
+- `subject={kind,id,runId?,attempt?}` 标识失败对象；kind 只能为
+  `system|chain|task|step|hook|adapter|store`。id/runId 使用基础 ID，attempt 从 1 开始；对象层级、引用存在
+  与 attempt 一致性由 checker 判定。
+- `evidence` 是唯一 SHA-256 摘要数组，可为空；`message` 为 1–1024 字符的已脱敏诊断文本，不能作为控制流。
+- `retryMode` 只能为 `never|same-request|new-attempt|after-reconcile|after-operator`；
+  `suggestedAction` 只能为 `fix-input|fix-contract|grant-policy|install-capability|retry|reconcile|repair|restore-storage|review|operator-action|report-bug`。
+  retryMode 是许可上限而非自动重试命令，仍受预算、租约、幂等和授权约束。
+
+`transport` 的 timeout、poll_timeout、断线或未知结果必须使用 `after-reconcile`，禁止标成 `same-request`
+后盲重发；只有已证明未受理或幂等契约允许的暂态失败才能使用 `same-request`。`integrity`、`review` 和
+`internal` 默认 `never`；若具体 code 允许其他模式，必须由后续 RFC 条款和正反 fixture 明确放宽。
+错误记录不得包含 secret、完整模型输出、未脱敏 stdout/stderr 或绝对主机路径；这些只可进入受控证据对象。
+
+CLI 进程退出码按主错误 category 固定映射，不透传 hook、操作系统或 SessionBridge 的原始退出码：
+
+| 退出码 | 结果/category |
+|---:|---|
+| 0 | 命令成功（不等于 task 已通过评审） |
+| 2 | CLI 用法错误；尚未创建持久错误记录 |
+| 10 | schema |
+| 11 | static |
+| 12 | policy |
+| 13 | capability |
+| 14 | transport |
+| 15 | execution |
+| 16 | integrity |
+| 17 | storage |
+| 18 | review |
+| 19 | operator |
+| 20 | internal |
+
+命令结果若含多个错误，必须显式选一个 `primaryErrorId`，退出码只由该错误决定；其余错误仍保留在证据中。
+各命令选择主错误的顺序随 result/receipt Schema 冻结，禁止按 map 遍历或最后一个错误碰巧获胜。
+
 ---
 
 ## 17. S0 实施就绪门禁

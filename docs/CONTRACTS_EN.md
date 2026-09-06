@@ -30,13 +30,14 @@ Each persistent object has an independent `schemaVersion`, distinct from CLI and
 | target | Independent strict registry; stable id, class, access, unique path globs and one-way generated sources | Checker rejects escapes, overlapping writes, generation cycles and unresolved references |
 | component/language scope | Component root; scope language/harness/toolchain/target IDs; dependencies; intersected step scopes | Unique IDs, resolved references, no cycles, available harness; shared roots allowed with unique writable targets |
 | state event | Append-only envelope; chain/task/step entity; strict before/after states; sequence, predecessor hash, evidence and reason | Checker verifies cross-event sequence/hash/entity-state continuity, actor authorization and evidence existence |
+| error | Strict category/code prefix, subject, evidence, redacted message, retryMode and suggestedAction | Checker/result contracts verify references, default retry restrictions, primary-error selection and concrete code catalog |
 | documentation | required/if-affected/optional/forbidden and impactRules | Missing effective doc diff or stale generation; whitespace/mtime alone does not count |
 | handoff | execution, scope, inputPolicy, deadline, returnActions, hooksAfterReturn | Single lease, stopped writers, fresh manifest; Schema alone cannot prove return checks |
 | review/waiver | approve/reject/waive, actor, reason, policy, expiry, bound candidate | Self-approval, expiry, changed candidate or mismatched scope blocks |
 
 Separate three validators: JSON Schema for structure; semantic checker for references, ownership, cycles and static policy; runtime gates for diffs, processes, capabilities, secrets, budgets and review. Each invalid golden identifies its rejection layer; JSON Schema cannot check live files or processes.
 
-Five structural Schemas for chain, hook, target, workspace and state-event now exist under `schemas/`; T003 still needs to create `testdata/contracts/valid/` and `testdata/contracts/invalid/` and execute them with an independent validator. Each fixture records ID, contract version, expected accept/reject, rejection layer and reason. Include three tasks, all four kinds, C+Go, C+JavaScript+Python, handoff and code/docs collaboration; at least one positive and negative per condition. Documentation paths/snippets are design inputs, not verified executable fixtures.
+Six structural Schemas for chain, hook, target, workspace, state-event and error now exist under `schemas/`; T003 still needs to create `testdata/contracts/valid/` and `testdata/contracts/invalid/` and execute them with an independent validator. Each fixture records ID, contract version, expected accept/reject, rejection layer and reason. Include three tasks, all four kinds, C+Go, C+JavaScript+Python, handoff and code/docs collaboration; at least one positive and negative per condition. Documentation paths/snippets are design inputs, not verified executable fixtures.
 
 ## 3. Configuration Resolution
 
@@ -95,7 +96,7 @@ File queue and IPC share a ProofRail business envelope; CLI is a consumer form, 
 
 ## 8. Errors and Acceptance
 
-Distinguish schema/static/policy/capability/transport/execution/integrity/storage/review/operator causes. ADR-002 freezes persistent enums and CLI exit codes; do not reuse SessionBridge 0/1/2/3 as ProofRail global exit codes. Include object identity, evidence reference, retryability and suggested action, never secrets.
+Persistent errors distinguish schema/static/policy/capability/transport/execution/integrity/storage/review/operator/internal causes. `error.schema.json` freezes category/code prefixes, subjects, evidence, retry modes and suggested actions; CLI category exits are 10–20 and usage is 2. Never pass through SessionBridge 0/1/2/3 or hook/OS exits. Uncertain transport results require reconciliation, not blind retry; multi-error primary ordering awaits result/receipt Schemas. Errors never contain secrets.
 
 Acceptance includes structural, semantic, runtime, crash, compatibility and security checks, not just parseable JSON. See [test strategy](TEST_STRATEGY_EN.md) and [development plan](DEV_PLAN_EN.md). No complete contract validator was generated or executed in this round; RFC gate 17.2 remains unmet.
 

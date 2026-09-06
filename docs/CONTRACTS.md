@@ -35,13 +35,14 @@ UTF-8 无 BOM + LF；canonical 字节还不得含格式空白或尾随换行。�
 | target | 独立严格注册表；稳定 id、class、access、唯一路径 glob；generated 单向来源 | 越界、重叠写、循环生成、未知引用由 checker 拒绝 |
 | component/language scope | component root；scope 的 language/harness/toolchain/target ID；依赖；step 取 scope 交集 | ID 唯一、引用存在、无环、harness 可用；同 root 允许不同唯一 target 所有者 |
 | state event | append-only envelope；chain/task/step 实体；严格前后状态；序号、前序 hash、证据与原因 | 跨事件序号/hash/实体状态连续性、主体授权和证据存在性由 checker 判定 |
+| error | 严格 category/code 前缀、subject、evidence、脱敏 message、retryMode、suggestedAction | 引用、默认重试限制、主错误选择与具体 code 目录由 checker/result 契约判定 |
 | documentation | required/if-affected/optional/forbidden；impactRules | 命中规则缺有效 doc diff、生成物陈旧拒绝；空白/mtime 不算更新 |
 | handoff | execution、允许写范围、inputPolicy、deadline、returnActions、hooksAfterReturn | 单写租约、停机、新鲜 manifest；归还后复检不能由 Schema 单独判定 |
 | review/waiver | approve/reject/waive；主体、原因、策略依据、有效期、绑定候选 | 同主体自批、过期、候选变化、范围不符均阻断 |
 
 三层检查不可合并：JSON Schema 判结构；语义 checker 判引用、所有权、循环、静态策略；运行期 gate 判文件 diff、进程、能力、秘密、预算与评审。非法黄金样例标注拒绝层，不能声称 JSON Schema 会检查实际文件或进程。
 
-`schemas/` 已创建 chain、hook、target、workspace、state-event 五份结构 Schema；`testdata/contracts/valid/` 与
+`schemas/` 已创建 chain、hook、target、workspace、state-event、error 六份结构 Schema；`testdata/contracts/valid/` 与
 `testdata/contracts/invalid/` 仍待 T003 创建并由独立 validator 执行。每例携带 fixture ID、契约版本、
 expected accept/reject、拒绝层和原因。必须含三任务链、四 kind、C+Go、C+JavaScript+Python、人工交接、
 代码文档协同；每一条件至少一正一反。文档中的路径/片段是设计输入，不是已验证可运行样例。
@@ -108,7 +109,10 @@ SessionBridge 成功缓存是内存、限时机制，不是持久 exactly-once�
 
 ## 8. 错误与验收边界
 
-先区分 schema/static/policy/capability/transport/execution/integrity/storage/review/operator 类原因，持久错误枚举与 CLI 退出码由 ADR-002 冻结，不复用 SessionBridge 的 0/1/2/3 作为 ProofRail 全局退出码。错误包含所属对象、证据引用、可重试性和建议动作，但不得包含秘密。
+持久错误区分 schema/static/policy/capability/transport/execution/integrity/storage/review/operator/internal 类原因，
+`error.schema.json` 冻结 category/code 前缀、对象、证据、重试模式和建议动作；CLI 按 category 使用 10–20，
+用法错误为 2。不得透传 SessionBridge 0/1/2/3 或 hook/OS 退出码。transport 不确定结果必须先 reconcile，
+不能盲重试；多错误主次顺序仍待 result/receipt Schema 冻结。错误不得包含秘密。
 
 契约验收不是“JSON 能解析”：须验证结构、语义、运行行为、崩溃点、兼容及安全。对应测试目录、用例与阶段见 [TEST_STRATEGY.md](TEST_STRATEGY.md) 和 [DEV_PLAN.md](DEV_PLAN.md)。本轮未生成或运行完整契约 validator，S0 §17.2 仍不通过。
 
