@@ -15,7 +15,7 @@
 | 配置/任务/步骤 | Draft 2020-12；`schemaVersion=1.0.0`；严格 chain/task/四类 step；workspace/component/language scope 拓扑 | harness/toolchain 注册表、引用与合并规则、其余 schema |
 | change-set | 顺序内存文本预验证、first-fail-stop、marker/精确断言、整组事务 | 操作枚举、换行语义、前后哈希、重复 marker 规则 |
 | snapshot/evidence | SHA-256 内容寻址、父快照/候选/证据绑定、不可变 | 路径 canonical、hash 输入编码、manifest/receipt schema |
-| ticket/repair | 稳定指纹、append-only ledger、三段预算；Prepare→Inspect→Validate→Promote | repair transaction Schema 与完整转换表 |
+| ticket/repair | 稳定指纹、append-only ledger、三段预算；严格 Prepare→Inspect→Validate→Promote 阶段链 | 跨记录 checker 与正反 fixtures |
 | adapter/context | 严格 request/claim/result 信封、recordHash、幂等键、generation fencing、dispatch/takeover receipt、最小上下文 | 跨记录 checker、签名信任链和平台原子能力实测 |
 
 各持久对象独立 `schemaVersion`，不与 CLI 版本或 SessionBridge schemaVersion 混为一谈；首版为
@@ -43,7 +43,7 @@ UTF-8 无 BOM + LF；canonical 字节还不得含格式空白或尾随换行。�
 三层检查不可合并：JSON Schema 判结构；语义 checker 判引用、所有权、循环、静态策略；运行期 gate 判文件 diff、进程、能力、秘密、预算与评审。非法黄金样例标注拒绝层，不能声称 JSON Schema 会检查实际文件或进程。
 
 `schemas/` 已创建 chain、hook、target、workspace、state-event、error、adapter-envelope、adapter-receipt、
-snapshot-manifest、evidence-manifest、review-receipt、promotion-receipt、handoff-receipt、hook-result、run-manifest、signature-receipt、error-set、ticket-ledger 十八份结构 Schema；`testdata/contracts/valid/` 与
+snapshot-manifest、evidence-manifest、review-receipt、promotion-receipt、handoff-receipt、hook-result、run-manifest、signature-receipt、error-set、ticket-ledger、repair-transaction 十九份结构 Schema；`testdata/contracts/valid/` 与
 `testdata/contracts/invalid/` 仍待 T003 创建并由独立 validator 执行。每例携带 fixture ID、契约版本、
 expected accept/reject、拒绝层和原因。必须含三任务链、四 kind、C+Go、C+JavaScript+Python、人工交接、
 代码文档协同；每一条件至少一正一反。文档中的路径/片段是设计输入，不是已验证可运行样例。
@@ -168,6 +168,12 @@ subject 和 failurePoint，不含 message、时间、attempt 或证据摘要；f
 不得重复。低于 reviewThreshold 为 pending-review；达到后须有效 override 才进入有限 override-window；达到
 hardBlockThreshold 后在该 run 内不可回退。override 不得提高 hard block，resolved 也不重置预算。Schema
 判三类 entry 形状；sequence、阈值关系、计数、授权窗口和唯一账本由 checker 判定。
+
+`repair-transaction.schema.json` 将 Prepare/Inspect/Validate/Promote 固化为带前序摘要的 1–4 项阶段链。
+只有前一阶段成功才能追加下一阶段；failed/uncertain 立即终止，completed 要求四阶段全部成功。Prepare
+绑定父快照、隔离候选、目标、停机和租约；Inspect 绑定 diff/范围/所有权；Validate 绑定冻结计划和 hook
+结果；Promote 再验停机、租约、账本与 Validate 摘要，只把候选装入下一 attempt 工作区。它不产生 accepted
+snapshot、不进入 PASSED，也不替代独立 review 与 snapshot promotion。
 
 契约验收不是“JSON 能解析”：须验证结构、语义、运行行为、崩溃点、兼容及安全。对应测试目录、用例与阶段见 [TEST_STRATEGY.md](TEST_STRATEGY.md) 和 [DEV_PLAN.md](DEV_PLAN.md)。本轮未生成或运行完整契约 validator，S0 §17.2 仍不通过。
 

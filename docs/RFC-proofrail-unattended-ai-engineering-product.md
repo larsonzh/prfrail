@@ -1712,7 +1712,7 @@ parentSnapshotHash/candidateSnapshotHash/items`。父与候选 snapshot 摘要�
 
 - `id`：在该 manifest 内唯一的稳定 ID；
 - `kind`：`state-event|error|adapter-request|adapter-result|adapter-receipt|hook-result|artifact|change-set|
-  diff|ticket|handoff-receipt`；
+  diff|ticket|repair-transaction|handoff-receipt`；
 - `objectHash`：已持久化对象或原始 artifact 字节的 SHA-256；
 - `mediaType`：IANA 风格小写 media type，不附带 charset 等参数；
 - `redaction`：`not-required|passed`。可能含 stdout/stderr、模型输出、人工输入或环境信息的对象必须先经
@@ -1990,6 +1990,36 @@ override 只授权最多 maxAdditionalAttempts 次新的 repair attempt，不能
 无授权窗口、过期/超量 override、状态回退和同一 `(runId,fingerprint)` 的第二本账。Schema 只判单对象形状与
 判别联合；计数、时间、引用、授权、唯一账本及状态派生由 checker 判定。任何 repair transaction 必须引用
 ledgerId、fingerprint 和发起时的 ledger hash；不得仅凭 ticket 文本启动修复。
+
+#### 16.9.22 Repair transaction
+
+`repair-transaction.schema.json` 冻结一次受限修复的不可变 Prepare→Inspect→Validate→Promote 阶段链。
+根对象只含 `schemaVersion="1.0.0"`、`transaction` 与 `transactionHash`；transactionHash 不参与自身摘要，
+以 ASCII 域 `proofrail:repair-transaction:1\n` 后接内层 transaction 的 JCS canonical 字节计算 SHA-256。
+
+内层 transaction 必含 `transactionId/createdAt/runId/taskId/sourceAttempt/nextAttempt/ledgerId/
+ticketLedgerHash/fingerprint/policyHash/stages/status`。nextAttempt 必须大于 sourceAttempt；ledger/hash/fingerprint
+必须匹配发起时的 ticket ledger，且 budget state 必须允许一次新 attempt。stages 为 1–4 项有序数组，阶段
+只能依次为 prepare、inspect、validate、promote；每项包含 `stageId/stage/startedAt/completedAt/actor/
+previousStageHash/outcome/evidence/errorEvidence/stageHash`。首阶段 previousStageHash 为 null，后续阶段必须
+引用紧邻前一项 stageHash。stageHash 以 ASCII 域 `proofrail:repair-stage:1\n` 后接不含 stageHash 的阶段
+statement JCS 字节计算 SHA-256。
+
+- **Prepare** 绑定 parentSnapshotHash、beforeManifestHash、目标 targetIds、停机与写租约证据；成功时必须
+  产生隔离的 candidateManifestHash，失败/不确定时为 null。
+- **Inspect** 绑定同一 candidateManifestHash、diffHash、scopeEvidence 和 ownershipEvidence；只有
+  `outcome=passed` 才允许 Validate，`failed|uncertain` 必须含错误证据。
+- **Validate** 绑定同一 candidateManifestHash、validationPlanHash 与非空 hookResultEvidence；只有
+  `outcome=passed` 才允许 Promote，`failed|uncertain` 必须含错误证据。candidate 或 plan 变化使结果陈旧。
+- **Promote** 在再次验证停机、写租约、ticketLedgerHash 和 validateStageHash 后，将候选原子装入
+  nextAttempt 的隔离工作区。`outcome=completed` 必须产生 resultingManifestHash；`failed|uncertain` 时该字段
+  为 null 且必须含错误证据。不确定结果必须 reconcile，不能重放 Promote。
+
+status 只能为 `in-progress|failed|uncertain|completed`：最后阶段成功但尚未到 Promote 时为 in-progress；
+任一阶段 failed/uncertain 后不得追加阶段；completed 仅允许四阶段全部成功。Schema 通过 prefixItems 与
+判别联合限制阶段形状和最大长度；checker 验证相邻摘要、时间、引用、候选不变、授权预算、目标边界、
+实际停机/租约、门禁充分性及原子替换。repair Promote 不产生 accepted snapshot，不进入 PASSED，也不替代
+第 16.9.14–16.9.15 节的独立 review 与 snapshot promotion；它只为 nextAttempt 提供起始工作区。
 
 ---
 

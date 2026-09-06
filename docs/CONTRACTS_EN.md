@@ -13,7 +13,7 @@ Requirements below come from the RFC; pending decisions block production impleme
 | Configuration/task/step | Draft 2020-12, `schemaVersion=1.0.0`, strict chain/task/four step kinds and workspace/component/language-scope topology | Harness/toolchain registries, references, merge rules and remaining schemas |
 | change-set | Sequential in-memory prevalidation, first-fail-stop, markers/assertions, group transaction | Operations, line-ending semantics, before/after hashes, duplicate markers |
 | snapshot/evidence | SHA-256 addressing, parent/candidate/evidence binding, immutability | Canonical paths/hash encoding, manifests/receipts |
-| ticket/repair | Stable fingerprint, append-only ledger and three-phase budget; Prepare/Inspect/Validate/Promote | Repair transaction Schema and full transition table |
+| ticket/repair | Stable fingerprint, append-only ledger and three-phase budget; strict Prepare/Inspect/Validate/Promote chain | Cross-record checker and positive/negative fixtures |
 | adapter/context | Strict request/claim/result envelopes, recordHash, idempotency key, generation fencing, dispatch/takeover receipts and minimal context | Cross-record checker, signature trust chains and platform atomicity probes |
 
 Each persistent object has an independent `schemaVersion`, distinct from CLI and SessionBridge versions. The first version is `1.0.0`; unknown majors are rejected, and unknown minor/patch versions are read-only rejected by default. Repository, schema, runtime and wire JSON uniformly use UTF-8 without BOM plus LF. Canonical bytes additionally contain no formatting whitespace or trailing newline. Only a fixture explicitly testing BOM input compatibility may contain a BOM, and it cannot be reused as a business object.
@@ -37,8 +37,8 @@ Each persistent object has an independent `schemaVersion`, distinct from CLI and
 
 Separate three validators: JSON Schema for structure; semantic checker for references, ownership, cycles and static policy; runtime gates for diffs, processes, capabilities, secrets, budgets and review. Each invalid golden identifies its rejection layer; JSON Schema cannot check live files or processes.
 
-Eighteen structural Schemas for chain, hook, target, workspace, state-event, error, adapter-envelope, adapter-receipt,
-snapshot-manifest, evidence-manifest, review-receipt, promotion-receipt, handoff-receipt, hook-result, run-manifest, signature-receipt, error-set and ticket-ledger now exist under `schemas/`;
+Nineteen structural Schemas for chain, hook, target, workspace, state-event, error, adapter-envelope, adapter-receipt,
+snapshot-manifest, evidence-manifest, review-receipt, promotion-receipt, handoff-receipt, hook-result, run-manifest, signature-receipt, error-set, ticket-ledger and repair-transaction now exist under `schemas/`;
 T003 still needs to
 create `testdata/contracts/valid/` and `testdata/contracts/invalid/` and execute them with an independent validator. Each
 fixture records ID, contract version, expected accept/reject, rejection layer and reason. Include three tasks, all four kinds,
@@ -164,6 +164,13 @@ attempts and an errorHash cannot be counted twice. Below reviewThreshold the sta
 effective override is required for a bounded override-window; hardBlockThreshold is irreversible within the run. Overrides
 cannot raise the hard block and resolution does not reset budget. Schema checks the three entry shapes; the checker owns
 sequence, threshold relationships, counts, authorization windows and ledger uniqueness.
+
+`repair-transaction.schema.json` fixes Prepare/Inspect/Validate/Promote as a one-to-four-entry stage chain linked by
+predecessor hashes. A stage may follow only a successful predecessor; failed or uncertain ends the chain, and completed
+requires all four stages. Prepare binds the parent snapshot, isolated candidate, targets, stopped writers and lease; Inspect
+binds diff/scope/ownership; Validate binds the frozen plan and hook results; Promote rechecks stop, lease, ledger and Validate
+hashes and installs only the next attempt workspace. It creates no accepted snapshot or PASSED result and cannot replace
+independent review and snapshot promotion.
 
 Acceptance includes structural, semantic, runtime, crash, compatibility and security checks, not just parseable JSON. See [test strategy](TEST_STRATEGY_EN.md) and [development plan](DEV_PLAN_EN.md). No complete contract validator was generated or executed in this round; RFC gate 17.2 remains unmet.
 

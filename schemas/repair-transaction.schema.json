@@ -1,0 +1,232 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://proofrail.dev/schemas/v1/repair-transaction.schema.json",
+  "title": "ProofRail repair transaction",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "transaction", "transactionHash"],
+  "properties": {
+    "schemaVersion": {"const": "1.0.0"},
+    "transaction": {"$ref": "#/$defs/transaction"},
+    "transactionHash": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$"
+    },
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id"],
+      "properties": {
+        "type": {"enum": ["system", "operator", "agent", "policy"]},
+        "id": {"$ref": "#/$defs/id"}
+      }
+    },
+    "hashSet": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/sha256"}
+    },
+    "nonemptyHashSet": {
+      "allOf": [
+        {"$ref": "#/$defs/hashSet"},
+        {"minItems": 1}
+      ]
+    },
+    "idSet": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/id"}
+    },
+    "nullableHash": {
+      "oneOf": [
+        {"type": "null"},
+        {"$ref": "#/$defs/sha256"}
+      ]
+    },
+    "prepareStage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stageId", "stage", "startedAt", "completedAt", "actor", "previousStageHash", "outcome", "evidence", "errorEvidence", "stageHash", "parentSnapshotHash", "beforeManifestHash", "targetIds", "writerStopEvidence", "leaseEvidence", "candidateManifestHash"],
+      "properties": {
+        "stageId": {"$ref": "#/$defs/id"},
+        "stage": {"const": "prepare"},
+        "startedAt": {"$ref": "#/$defs/timestamp"},
+        "completedAt": {"$ref": "#/$defs/timestamp"},
+        "actor": {"$ref": "#/$defs/actor"},
+        "previousStageHash": {"type": "null"},
+        "outcome": {"enum": ["completed", "failed", "uncertain"]},
+        "evidence": {"$ref": "#/$defs/nonemptyHashSet"},
+        "errorEvidence": {"$ref": "#/$defs/hashSet"},
+        "stageHash": {"$ref": "#/$defs/sha256"},
+        "parentSnapshotHash": {"$ref": "#/$defs/sha256"},
+        "beforeManifestHash": {"$ref": "#/$defs/sha256"},
+        "targetIds": {"$ref": "#/$defs/idSet"},
+        "writerStopEvidence": {"$ref": "#/$defs/nonemptyHashSet"},
+        "leaseEvidence": {"$ref": "#/$defs/nonemptyHashSet"},
+        "candidateManifestHash": {"$ref": "#/$defs/nullableHash"}
+      },
+      "oneOf": [
+        {"properties": {"outcome": {"const": "completed"}, "candidateManifestHash": {"$ref": "#/$defs/sha256"}, "errorEvidence": {"maxItems": 0}}},
+        {"properties": {"outcome": {"enum": ["failed", "uncertain"]}, "candidateManifestHash": {"type": "null"}, "errorEvidence": {"minItems": 1}}}
+      ]
+    },
+    "inspectStage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stageId", "stage", "startedAt", "completedAt", "actor", "previousStageHash", "outcome", "evidence", "errorEvidence", "stageHash", "candidateManifestHash", "diffHash", "scopeEvidence", "ownershipEvidence"],
+      "properties": {
+        "stageId": {"$ref": "#/$defs/id"},
+        "stage": {"const": "inspect"},
+        "startedAt": {"$ref": "#/$defs/timestamp"},
+        "completedAt": {"$ref": "#/$defs/timestamp"},
+        "actor": {"$ref": "#/$defs/actor"},
+        "previousStageHash": {"$ref": "#/$defs/sha256"},
+        "outcome": {"enum": ["passed", "failed", "uncertain"]},
+        "evidence": {"$ref": "#/$defs/nonemptyHashSet"},
+        "errorEvidence": {"$ref": "#/$defs/hashSet"},
+        "stageHash": {"$ref": "#/$defs/sha256"},
+        "candidateManifestHash": {"$ref": "#/$defs/sha256"},
+        "diffHash": {"$ref": "#/$defs/sha256"},
+        "scopeEvidence": {"$ref": "#/$defs/nonemptyHashSet"},
+        "ownershipEvidence": {"$ref": "#/$defs/nonemptyHashSet"}
+      },
+      "oneOf": [
+        {"properties": {"outcome": {"const": "passed"}, "errorEvidence": {"maxItems": 0}}},
+        {"properties": {"outcome": {"enum": ["failed", "uncertain"]}, "errorEvidence": {"minItems": 1}}}
+      ]
+    },
+    "validateStage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stageId", "stage", "startedAt", "completedAt", "actor", "previousStageHash", "outcome", "evidence", "errorEvidence", "stageHash", "candidateManifestHash", "validationPlanHash", "hookResultEvidence"],
+      "properties": {
+        "stageId": {"$ref": "#/$defs/id"},
+        "stage": {"const": "validate"},
+        "startedAt": {"$ref": "#/$defs/timestamp"},
+        "completedAt": {"$ref": "#/$defs/timestamp"},
+        "actor": {"$ref": "#/$defs/actor"},
+        "previousStageHash": {"$ref": "#/$defs/sha256"},
+        "outcome": {"enum": ["passed", "failed", "uncertain"]},
+        "evidence": {"$ref": "#/$defs/nonemptyHashSet"},
+        "errorEvidence": {"$ref": "#/$defs/hashSet"},
+        "stageHash": {"$ref": "#/$defs/sha256"},
+        "candidateManifestHash": {"$ref": "#/$defs/sha256"},
+        "validationPlanHash": {"$ref": "#/$defs/sha256"},
+        "hookResultEvidence": {"$ref": "#/$defs/nonemptyHashSet"}
+      },
+      "oneOf": [
+        {"properties": {"outcome": {"const": "passed"}, "errorEvidence": {"maxItems": 0}}},
+        {"properties": {"outcome": {"enum": ["failed", "uncertain"]}, "errorEvidence": {"minItems": 1}}}
+      ]
+    },
+    "promoteStage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stageId", "stage", "startedAt", "completedAt", "actor", "previousStageHash", "outcome", "evidence", "errorEvidence", "stageHash", "candidateManifestHash", "validateStageHash", "ticketLedgerHash", "writerStopEvidence", "leaseEvidence", "resultingManifestHash"],
+      "properties": {
+        "stageId": {"$ref": "#/$defs/id"},
+        "stage": {"const": "promote"},
+        "startedAt": {"$ref": "#/$defs/timestamp"},
+        "completedAt": {"$ref": "#/$defs/timestamp"},
+        "actor": {"$ref": "#/$defs/actor"},
+        "previousStageHash": {"$ref": "#/$defs/sha256"},
+        "outcome": {"enum": ["completed", "failed", "uncertain"]},
+        "evidence": {"$ref": "#/$defs/nonemptyHashSet"},
+        "errorEvidence": {"$ref": "#/$defs/hashSet"},
+        "stageHash": {"$ref": "#/$defs/sha256"},
+        "candidateManifestHash": {"$ref": "#/$defs/sha256"},
+        "validateStageHash": {"$ref": "#/$defs/sha256"},
+        "ticketLedgerHash": {"$ref": "#/$defs/sha256"},
+        "writerStopEvidence": {"$ref": "#/$defs/nonemptyHashSet"},
+        "leaseEvidence": {"$ref": "#/$defs/nonemptyHashSet"},
+        "resultingManifestHash": {"$ref": "#/$defs/nullableHash"}
+      },
+      "oneOf": [
+        {"properties": {"outcome": {"const": "completed"}, "resultingManifestHash": {"$ref": "#/$defs/sha256"}, "errorEvidence": {"maxItems": 0}}},
+        {"properties": {"outcome": {"enum": ["failed", "uncertain"]}, "resultingManifestHash": {"type": "null"}, "errorEvidence": {"minItems": 1}}}
+      ]
+    },
+    "prepareCompleted": {"allOf": [{"$ref": "#/$defs/prepareStage"}, {"properties": {"outcome": {"const": "completed"}}}]},
+    "inspectPassed": {"allOf": [{"$ref": "#/$defs/inspectStage"}, {"properties": {"outcome": {"const": "passed"}}}]},
+    "validatePassed": {"allOf": [{"$ref": "#/$defs/validateStage"}, {"properties": {"outcome": {"const": "passed"}}}]},
+    "promoteCompleted": {"allOf": [{"$ref": "#/$defs/promoteStage"}, {"properties": {"outcome": {"const": "completed"}}}]},
+    "prepareFailed": {"allOf": [{"$ref": "#/$defs/prepareStage"}, {"properties": {"outcome": {"const": "failed"}}}]},
+    "inspectFailed": {"allOf": [{"$ref": "#/$defs/inspectStage"}, {"properties": {"outcome": {"const": "failed"}}}]},
+    "validateFailed": {"allOf": [{"$ref": "#/$defs/validateStage"}, {"properties": {"outcome": {"const": "failed"}}}]},
+    "promoteFailed": {"allOf": [{"$ref": "#/$defs/promoteStage"}, {"properties": {"outcome": {"const": "failed"}}}]},
+    "prepareUncertain": {"allOf": [{"$ref": "#/$defs/prepareStage"}, {"properties": {"outcome": {"const": "uncertain"}}}]},
+    "inspectUncertain": {"allOf": [{"$ref": "#/$defs/inspectStage"}, {"properties": {"outcome": {"const": "uncertain"}}}]},
+    "validateUncertain": {"allOf": [{"$ref": "#/$defs/validateStage"}, {"properties": {"outcome": {"const": "uncertain"}}}]},
+    "promoteUncertain": {"allOf": [{"$ref": "#/$defs/promoteStage"}, {"properties": {"outcome": {"const": "uncertain"}}}]},
+    "inProgressStages": {
+      "oneOf": [
+        {"type": "array", "prefixItems": [{"$ref": "#/$defs/prepareCompleted"}], "items": false, "minItems": 1},
+        {"type": "array", "prefixItems": [{"$ref": "#/$defs/prepareCompleted"}, {"$ref": "#/$defs/inspectPassed"}], "items": false, "minItems": 2},
+        {"type": "array", "prefixItems": [{"$ref": "#/$defs/prepareCompleted"}, {"$ref": "#/$defs/inspectPassed"}, {"$ref": "#/$defs/validatePassed"}], "items": false, "minItems": 3}
+      ]
+    },
+    "failedStages": {
+      "oneOf": [
+        {"type": "array", "prefixItems": [{"$ref": "#/$defs/prepareFailed"}], "items": false, "minItems": 1},
+        {"type": "array", "prefixItems": [{"$ref": "#/$defs/prepareCompleted"}, {"$ref": "#/$defs/inspectFailed"}], "items": false, "minItems": 2},
+        {"type": "array", "prefixItems": [{"$ref": "#/$defs/prepareCompleted"}, {"$ref": "#/$defs/inspectPassed"}, {"$ref": "#/$defs/validateFailed"}], "items": false, "minItems": 3},
+        {"type": "array", "prefixItems": [{"$ref": "#/$defs/prepareCompleted"}, {"$ref": "#/$defs/inspectPassed"}, {"$ref": "#/$defs/validatePassed"}, {"$ref": "#/$defs/promoteFailed"}], "items": false, "minItems": 4}
+      ]
+    },
+    "uncertainStages": {
+      "oneOf": [
+        {"type": "array", "prefixItems": [{"$ref": "#/$defs/prepareUncertain"}], "items": false, "minItems": 1},
+        {"type": "array", "prefixItems": [{"$ref": "#/$defs/prepareCompleted"}, {"$ref": "#/$defs/inspectUncertain"}], "items": false, "minItems": 2},
+        {"type": "array", "prefixItems": [{"$ref": "#/$defs/prepareCompleted"}, {"$ref": "#/$defs/inspectPassed"}, {"$ref": "#/$defs/validateUncertain"}], "items": false, "minItems": 3},
+        {"type": "array", "prefixItems": [{"$ref": "#/$defs/prepareCompleted"}, {"$ref": "#/$defs/inspectPassed"}, {"$ref": "#/$defs/validatePassed"}, {"$ref": "#/$defs/promoteUncertain"}], "items": false, "minItems": 4}
+      ]
+    },
+    "completedStages": {
+      "type": "array",
+      "prefixItems": [
+        {"$ref": "#/$defs/prepareCompleted"},
+        {"$ref": "#/$defs/inspectPassed"},
+        {"$ref": "#/$defs/validatePassed"},
+        {"$ref": "#/$defs/promoteCompleted"}
+      ],
+      "items": false,
+      "minItems": 4
+    },
+    "transaction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["transactionId", "createdAt", "runId", "taskId", "sourceAttempt", "nextAttempt", "ledgerId", "ticketLedgerHash", "fingerprint", "policyHash", "stages", "status"],
+      "properties": {
+        "transactionId": {"$ref": "#/$defs/id"},
+        "createdAt": {"$ref": "#/$defs/timestamp"},
+        "runId": {"$ref": "#/$defs/id"},
+        "taskId": {"$ref": "#/$defs/id"},
+        "sourceAttempt": {"type": "integer", "minimum": 1},
+        "nextAttempt": {"type": "integer", "minimum": 2},
+        "ledgerId": {"$ref": "#/$defs/id"},
+        "ticketLedgerHash": {"$ref": "#/$defs/sha256"},
+        "fingerprint": {"$ref": "#/$defs/sha256"},
+        "policyHash": {"$ref": "#/$defs/sha256"},
+        "stages": {"type": "array", "minItems": 1, "maxItems": 4},
+        "status": {"enum": ["in-progress", "failed", "uncertain", "completed"]}
+      },
+      "oneOf": [
+        {"properties": {"status": {"const": "in-progress"}, "stages": {"$ref": "#/$defs/inProgressStages"}}},
+        {"properties": {"status": {"const": "failed"}, "stages": {"$ref": "#/$defs/failedStages"}}},
+        {"properties": {"status": {"const": "uncertain"}, "stages": {"$ref": "#/$defs/uncertainStages"}}},
+        {"properties": {"status": {"const": "completed"}, "stages": {"$ref": "#/$defs/completedStages"}}}
+      ]
+    }
+  }
+}

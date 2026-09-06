@@ -57,6 +57,7 @@
             "change-set",
             "diff",
             "ticket",
+            "repair-transaction",
             "handoff-receipt"
           ]
         },
