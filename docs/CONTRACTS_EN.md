@@ -61,6 +61,13 @@ Events contain run/task, before/after state, monotonic sequence, time, actor, in
 
 Reader contract: the next task may consume a snapshot only when valid review binds parent, task/attempt, candidate and evidence root, and a completed publication receipt exists. Crashes between candidate/review/receipt/event/projection require journal replay. Directory names or a PASSED field alone prove nothing. Hashes prove integrity, not publisher identity.
 
+`evidence-manifest.schema.json` freezes the evidence root as an immutable pre-review index for one task attempt. It binds
+the task definition, resolved policy and parent/candidate snapshots, then references state-event, error, adapter, hook,
+artifact, change-set, diff, ticket and handoff object hashes. It neither embeds logs nor infers success from object presence,
+and it excludes review/waiver/promotion receipts; those objects point one-way to the evidence root to avoid a hash cycle.
+The independent checker validates item ordering/uniqueness, same-attempt ownership, object existence, required-evidence
+coverage and truthful redaction status.
+
 managed-change-set: read all targets, simulate operations in global order, validate markers/prehash/assertions/boundaries, persist journal, atomically replace each file, verify all postconditions, then record receipt. Roll back the entire group on failure; failed rollback means quarantine/pause. Do not overwrite external changes or restore while processes are alive.
 
 isolated-workspace: direct tool writes stay in a disposable run directory, with complete before/after manifests, diff, process and gate evidence. Acceptance remains whole-task: never publish selected languages/files or successful code with failed documentation.

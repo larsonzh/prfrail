@@ -73,6 +73,12 @@ accepted 状态，只有有效 review + promotion receipt 才能授权下游消�
 
 接受事务的 reader contract：只有绑定父快照、task/attempt、候选及证据根的有效 review 和完成发布的 receipt 同时存在，才允许作为下一任务父快照。崩溃在候选、review、receipt、事件或投影之间时均重放 journal 判定；不得靠目录名或单个 PASSED 字段认定接受。哈希证明完整性，不证明发布者身份。
 
+`evidence-manifest.schema.json` 将 evidence root 冻结为单个 task attempt 的评审前不可变索引：绑定任务定义、
+解析策略、父/候选 snapshot，并引用状态事件、错误、adapter、hook、artifact、change-set、diff、ticket 与
+handoff 对象摘要。它不内嵌日志，不从对象存在推断成功，也不包含 review/waiver/promotion receipt；后者
+单向引用 evidence root，避免摘要环。条目排序/唯一、同 attempt 归属、对象存在、必需证据覆盖及脱敏
+真实性由独立 checker 判定。
+
 managed-change-set：读全部目标→按全局顺序在内存模拟→检查 marker/前置哈希/断言/边界→持久 journal→逐文件原子替换→写后全量核验→记录 receipt；失败整组回滚，回滚本身失败则隔离并暂停。禁止覆盖外部修改，禁止运行进程存活时恢复。
 
 isolated-workspace：直接工具写入仅限可丢弃运行目录；记录完整前后 manifest/diff/进程/gates；接受边界仍为整个 task。不能把部分语言、部分文件或“代码成功但文档失败”的子集发布。

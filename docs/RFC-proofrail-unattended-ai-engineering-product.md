@@ -1665,6 +1665,33 @@ Schema 只检查单条记录形状；checker 负责路径规范化/排序/唯一
 发布采用临时对象、完整闭包验证、原子 no-replace 落位；candidate 只有被有效 review 与后续 promotion
 receipt 共同引用后，才成为下一任务可消费的父快照。Git 状态只可作为显式证据引用，不进入恢复来源。
 
+#### 16.9.13 Evidence manifest 与评审前证据根
+
+`evidence-manifest.schema.json` 冻结单个 task attempt 在进入 `REVIEW_PENDING` 前的不可变证据索引。根对象
+只含 `schemaVersion="1.0.0"`、`manifest` 与 `evidenceRootHash`；evidenceRootHash 不参与自身摘要，以
+ASCII 域 `proofrail:evidence-manifest:1\n` 后接内层 manifest 的 JCS canonical 字节计算 SHA-256。
+
+内层 manifest 必须包含 `evidenceId/createdAt/runId/taskId/attempt/taskDefinitionHash/policyHash/
+parentSnapshotHash/candidateSnapshotHash/items`。父与候选 snapshot 摘要必须不同；它们、任务定义和已解析
+策略共同固定“对什么、按什么规则评审”。items 至少一项，每项只含：
+
+- `id`：在该 manifest 内唯一的稳定 ID；
+- `kind`：`state-event|error|adapter-request|adapter-result|adapter-receipt|hook-result|artifact|change-set|
+  diff|ticket|handoff-receipt`；
+- `objectHash`：已持久化对象或原始 artifact 字节的 SHA-256；
+- `mediaType`：IANA 风格小写 media type，不附带 charset 等参数；
+- `redaction`：`not-required|passed`。可能含 stdout/stderr、模型输出、人工输入或环境信息的对象必须先经
+  secret scan/脱敏并标为 passed；扫描失败的对象不得进入 manifest。
+
+items 按 `(kind,id)` 的 Unicode code point 升序排列；ID 唯一、排序、objectHash 存在与匹配、所有记录均
+属于同一 run/task/attempt、阻断 step/hook 的必需证据齐全，以及父/候选 snapshot 引用闭包，由语义
+checker 判定。Schema 不从“存在某个 hook-result”推断成功，gate/step 的结果语义属于其各自 receipt。
+
+为避免摘要环，evidence manifest 不得包含 review、waiver 或 promotion receipt；review receipt 引用
+evidenceRootHash，promotion receipt 再共同绑定 review、evidence root、父 snapshot 与 candidate snapshot。
+最终 evidence pack/导出归档可以并列引用这些对象，但不得重写评审前 evidence manifest。缺少、重复、
+跨 attempt 或摘要不一致的 item 一律阻断评审和发布；哈希只证明完整性，不证明采集者或批准者身份。
+
 ---
 
 ## 17. S0 实施就绪门禁
