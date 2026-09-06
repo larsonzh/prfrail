@@ -14,7 +14,7 @@ Requirements below come from the RFC; pending decisions block production impleme
 | change-set | Sequential in-memory prevalidation, first-fail-stop, markers/assertions, group transaction | Operations, line-ending semantics, before/after hashes, duplicate markers |
 | snapshot/evidence | SHA-256 addressing, parent/candidate/evidence binding, immutability | Canonical paths/hash encoding, manifests/receipts |
 | ticket/repair | Categories, fingerprint budgets, leases, Prepare/Inspect/Validate/Promote | Fingerprint algorithm, thresholds, ledger format, full transition table |
-| adapter/context | Versioned envelopes, tickets/receipts, idempotency/leases, minimal context | ProofRail wire format, queue framing, correlation, error taxonomy |
+| adapter/context | Strict request/claim/result envelopes, recordHash, idempotency key, generation fencing and minimal context | Dispatch/takeover receipts, platform atomicity probes and external-adapter mapping |
 
 Each persistent object has an independent `schemaVersion`, distinct from CLI and SessionBridge versions. The first version is `1.0.0`; unknown majors are rejected, and unknown minor/patch versions are read-only rejected by default. Repository, schema, runtime and wire JSON uniformly use UTF-8 without BOM plus LF. Canonical bytes additionally contain no formatting whitespace or trailing newline. Only a fixture explicitly testing BOM input compatibility may contain a BOM, and it cannot be reused as a business object.
 
@@ -37,7 +37,7 @@ Each persistent object has an independent `schemaVersion`, distinct from CLI and
 
 Separate three validators: JSON Schema for structure; semantic checker for references, ownership, cycles and static policy; runtime gates for diffs, processes, capabilities, secrets, budgets and review. Each invalid golden identifies its rejection layer; JSON Schema cannot check live files or processes.
 
-Six structural Schemas for chain, hook, target, workspace, state-event and error now exist under `schemas/`; T003 still needs to create `testdata/contracts/valid/` and `testdata/contracts/invalid/` and execute them with an independent validator. Each fixture records ID, contract version, expected accept/reject, rejection layer and reason. Include three tasks, all four kinds, C+Go, C+JavaScript+Python, handoff and code/docs collaboration; at least one positive and negative per condition. Documentation paths/snippets are design inputs, not verified executable fixtures.
+Seven structural Schemas for chain, hook, target, workspace, state-event, error and adapter-envelope now exist under `schemas/`; T003 still needs to create `testdata/contracts/valid/` and `testdata/contracts/invalid/` and execute them with an independent validator. Each fixture records ID, contract version, expected accept/reject, rejection layer and reason. Include three tasks, all four kinds, C+Go, C+JavaScript+Python, handoff and code/docs collaboration; at least one positive and negative per condition. Documentation paths/snippets are design inputs, not verified executable fixtures.
 
 ## 3. Configuration Resolution
 
@@ -92,7 +92,7 @@ SessionBridge v0.1.1 is an independent dependency with a frozen public v1 contra
 
 SessionBridge's success cache is bounded in-memory state, not durable exactly-once. ProofRail persists dispatch/results and application idempotency. Complete-patch turns use noCompress according to the dependency contract plus independent completeness checks. History compression cannot bypass token/cost limits. ProofRail owns secret scanning/redaction; do not assume SessionBridge implements it.
 
-File queue and IPC share a ProofRail business envelope; CLI is a consumer form, not a third business protocol. JSONL framing, filenames, exclusive claim, takeover and result fields await ADR-004. No unlocked multiprocess append to one queue. Use a deterministic fixture consumer for no-IDE/no-AI testing, without paid calls.
+File queue and IPC share ProofRail request/claim/result envelopes; CLI is a consumer form, not a third business protocol. Each queue file contains exactly one canonical JSONL record. An atomic request move into inflight acquires a claim; immutable generation files and `(claimId,generation)` fencing constrain renewal, takeover and result publication. Never append concurrently or overwrite formal files. Map SessionBridge transport IDs only in dispatch receipts; its single-slot files are not durable ProofRail facts. T004 still probes platform atomic/crash boundaries. Use a deterministic fixture consumer for no-IDE/no-AI testing, without paid calls.
 
 ## 8. Errors and Acceptance
 

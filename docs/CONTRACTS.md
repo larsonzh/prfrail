@@ -16,7 +16,7 @@
 | change-set | 顺序内存文本预验证、first-fail-stop、marker/精确断言、整组事务 | 操作枚举、换行语义、前后哈希、重复 marker 规则 |
 | snapshot/evidence | SHA-256 内容寻址、父快照/候选/证据绑定、不可变 | 路径 canonical、hash 输入编码、manifest/receipt schema |
 | ticket/repair | 分类、指纹预算、租约、Prepare→Inspect→Validate→Promote | 指纹算法、阈值、ledger 格式、完整转换表 |
-| adapter/context | 版本化信封、票据/回执、幂等/租约、最小上下文 | ProofRail wire 格式、队列 framing、关联键、错误分类 |
+| adapter/context | 严格 request/claim/result 信封、recordHash、幂等键、generation fencing、最小上下文 | dispatch/takeover receipt、平台原子能力实测、外部 adapter 映射 |
 
 各持久对象独立 `schemaVersion`，不与 CLI 版本或 SessionBridge schemaVersion 混为一谈；首版为
 `1.0.0`，未知主版本拒绝，未知 minor/patch 默认只读拒绝。仓库、Schema、运行时与 wire JSON 统一为
@@ -42,7 +42,7 @@ UTF-8 无 BOM + LF；canonical 字节还不得含格式空白或尾随换行。�
 
 三层检查不可合并：JSON Schema 判结构；语义 checker 判引用、所有权、循环、静态策略；运行期 gate 判文件 diff、进程、能力、秘密、预算与评审。非法黄金样例标注拒绝层，不能声称 JSON Schema 会检查实际文件或进程。
 
-`schemas/` 已创建 chain、hook、target、workspace、state-event、error 六份结构 Schema；`testdata/contracts/valid/` 与
+`schemas/` 已创建 chain、hook、target、workspace、state-event、error、adapter-envelope 七份结构 Schema；`testdata/contracts/valid/` 与
 `testdata/contracts/invalid/` 仍待 T003 创建并由独立 validator 执行。每例携带 fixture ID、契约版本、
 expected accept/reject、拒绝层和原因。必须含三任务链、四 kind、C+Go、C+JavaScript+Python、人工交接、
 代码文档协同；每一条件至少一正一反。文档中的路径/片段是设计输入，不是已验证可运行样例。
@@ -105,7 +105,11 @@ SessionBridge v0.1.1 是独立外部依赖，冻结消费其公开 v1 契约：�
 
 SessionBridge 成功缓存是内存、限时机制，不是持久 exactly-once；ProofRail 自己持久化投递/结果及应用幂等记录。完整补丁轮次按依赖契约使用 noCompress 并独立验证输出完整性。不要借历史压缩绕过 token/费用上限。Secret 扫描/脱敏由 ProofRail 保证，不假定 SessionBridge 已实现。
 
-文件队列与 IPC 共享 ProofRail 业务信封，CLI 是消费者形态，不是第三套业务语义。JSONL framing、文件名、独占 claim、租约接管与结果提交的字段级规则在 ADR-004 冻结；禁止多个进程无锁追加同一队列文件。无 IDE、无 AI 测试用确定性 fixture consumer，不调用收费模型。
+文件队列与 IPC 共享 ProofRail request/claim/result 信封，CLI 是消费者形态，不是第三套业务语义。文件队列
+每文件恰好一条 canonical JSONL 记录，通过 request 原子移入 inflight 获取 claim；不可变 generation 文件与
+`(claimId,generation)` fencing 约束续租、接管和 result。禁止多进程追加或覆盖正式文件。SessionBridge
+传输 ID 只在 dispatch receipt 映射，不复用其单槽文件作为持久事实。平台原子/崩溃边界仍须 T004 实测。
+无 IDE、无 AI 测试用确定性 fixture consumer，不调用收费模型。
 
 ## 8. 错误与验收边界
 

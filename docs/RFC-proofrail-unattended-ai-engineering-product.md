@@ -1553,6 +1553,52 @@ CLI 进程退出码按主错误 category 固定映射，不透传 hook、操作�
 命令结果若含多个错误，必须显式选一个 `primaryErrorId`，退出码只由该错误决定；其余错误仍保留在证据中。
 各命令选择主错误的顺序随 result/receipt Schema 冻结，禁止按 map 遍历或最后一个错误碰巧获胜。
 
+#### 16.9.10 Adapter 信封与文件队列
+
+`adapter-envelope.schema.json` 冻结 IPC 与文件队列共用的 ProofRail 业务信封，严格区分三种记录：
+
+- `request`：`requestId/runId/taskId/attempt/createdAt/adapter/contextHash`。requestId 是 ProofRail 幂等键，
+  使用第 16.9.2 节 ID，不等同于 SessionBridge 的 `sess-<uuid>`；具体 adapter 的传输 ID 必须由后续
+  dispatch receipt 显式映射。contextHash 指向已持久化、已脱敏的完整 context envelope。
+- `claim`：另含 `claimId/consumerId/claimedAt/leaseExpiresAt/generation/requestHash`。generation 从 1 开始，
+  每次获授权接管严格递增；`(claimId,generation)` 二元组是 fencing token，结果提交必须匹配当前值。
+- `result`：另含 `claimId/generation/completedAt/requestHash/status/outputEvidence/errorEvidence`。
+  status 只能为 `completed|failed|uncertain`；completed 至少一个 outputEvidence 且 errorEvidence 为空，
+  failed 至少一个 errorEvidence，uncertain 至少一个 errorEvidence 且只能在 reconcile 后转为新事实。
+  completed 仅表示 adapter 产生完整候选输出，不表示 step/task 通过。
+
+三种记录根对象只含 `schemaVersion="1.0.0"`、`message` 与 `recordHash`，未知字段拒绝。recordHash 不参与
+自身摘要：按 message.type 取 ASCII 域 `proofrail:adapter-request:1\n`、`proofrail:adapter-claim:1\n` 或
+`proofrail:adapter-result:1\n`，后接内层 message 的 JCS canonical 字节计算 SHA-256。requestHash 必须等于
+对应 request 记录的 recordHash；重复 result 的“相同 resultHash”指 result 记录的 recordHash。
+所有摘要均为内容寻址引用；Schema 可判单条形状，checker 负责 requestHash 指向对应 request、时间顺序、租约/generation 单调、当前
+claim 匹配、证据存在及同 requestId 结果唯一性。重投同一业务 attempt 必须复用 requestId/contextHash；
+改变上下文、授权或预算必须创建新 attempt/requestId，不能借重试替换请求内容。
+
+S1 文件队列固定在单个已配置 queue root 下，目录为 `requests/`、`inflight/`、`results/`、`archive/`：
+
+1. 每个正式文件恰好包含一条 JCS canonical JSON 记录和一个结尾 LF，不是可追加日志。待领取请求为
+  `requests/<requestId>.request.jsonl`；领取后请求为 `inflight/<requestId>.request.jsonl`，claim 为
+  `inflight/<requestId>.<generation>.<claimId>.claim.jsonl`，result 为
+  `results/<requestId>.result.jsonl`。generation 使用无前导零十进制。
+2. 写入必须在同目录创建唯一临时文件，flush 文件，并在支持时 flush 父目录，再以 no-replace 原子发布；
+  已存在的正式文件不得覆盖。Windows 不保证目录 flush 时，必须记录 capability 并在崩溃测试中证明
+  可恢复边界，不能宣称不存在丢失窗口。
+3. 初始 claim 通过将 request 从 `requests/` 原子 no-replace 移至 `inflight/` 获得；只有一个消费者能
+  成功，随后以 create-new 发布 generation=1 的 claim。移动后尚未发布 claim 的崩溃窗口必须由协调器
+  reconcile，不能由消费者自行复制请求。续租仅由当前 claimId 持有者发布同 claimId、递增 generation
+  的不可变 claim；接管必须先证明旧 writer 失效并写 takeover receipt，再以新 claimId 和更高
+  generation 发布。仅凭到期、PID 不存在或机器重启均不足以接管。
+4. result 只允许当前 fencing token 提交，且以 no-replace 发布。重复的相同 resultHash 返回既有结果；
+  不同内容冲突归为 integrity 错误并暂停。崩溃发生在外部执行后、result 发布前时标记 uncertain 并
+  reconcile，不能假设未执行后盲重发。
+5. 消费成功后 request/claim/result 作为一组移入 archive 必须由单写协调器 journal 化；移动失败不删除
+  事实。清理只按 retention/disposition 契约进行，不能把队列清空当作确认。
+
+文件队列与 IPC 使用同一 envelope Schema 和幂等判定；IPC 可以不落上述目录，但必须产生等价持久
+dispatch/claim/result 事实。SessionBridge `cmd_<pid>.json`/`res_<pid>.json` 是外部 adapter wire，不能
+直接充当 ProofRail 队列文件或持久 receipt，也不得复用其单槽成功缓存声称 exactly-once。
+
 ---
 
 ## 17. S0 实施就绪门禁
