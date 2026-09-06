@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://proofrail.dev/schemas/v1/signature-receipt.schema.json",
+  "title": "ProofRail detached signature receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "receipt", "receiptHash"],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "receipt": {
+      "$ref": "#/$defs/receipt"
+    },
+    "receiptHash": {
+      "$ref": "#/$defs/sha256"
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$"
+    },
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id"],
+      "properties": {
+        "type": {
+          "enum": ["system", "operator", "maintainer"]
+        },
+        "id": {
+          "$ref": "#/$defs/id"
+        }
+      }
+    },
+    "statement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "issuedAt",
+        "purpose",
+        "subjectKind",
+        "subjectHash",
+        "signer",
+        "keyId",
+        "algorithm",
+        "publicKeyFingerprint",
+        "trustPolicyHash"
+      ],
+      "properties": {
+        "issuedAt": {"$ref": "#/$defs/timestamp"},
+        "purpose": {
+          "enum": ["cross-host", "bootstrap", "release"]
+        },
+        "subjectKind": {
+          "enum": ["adapter-record", "bootstrap-artifact", "release-checksum-manifest"]
+        },
+        "subjectHash": {"$ref": "#/$defs/sha256"},
+        "signer": {"$ref": "#/$defs/actor"},
+        "keyId": {"$ref": "#/$defs/id"},
+        "algorithm": {"const": "ed25519"},
+        "publicKeyFingerprint": {"$ref": "#/$defs/sha256"},
+        "trustPolicyHash": {"$ref": "#/$defs/sha256"}
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "purpose": {"const": "cross-host"},
+            "subjectKind": {"const": "adapter-record"},
+            "signer": {
+              "properties": {
+                "type": {"const": "system"}
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "purpose": {"const": "bootstrap"},
+            "subjectKind": {"const": "bootstrap-artifact"},
+            "signer": {
+              "properties": {
+                "type": {"enum": ["operator", "maintainer"]}
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "purpose": {"const": "release"},
+            "subjectKind": {"const": "release-checksum-manifest"},
+            "signer": {
+              "properties": {
+                "type": {"const": "maintainer"}
+              }
+            }
+          }
+        }
+      ]
+    },
+    "receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["receiptId", "statement", "signature"],
+      "properties": {
+        "receiptId": {"$ref": "#/$defs/id"},
+        "statement": {"$ref": "#/$defs/statement"},
+        "signature": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{85}[AQgw]$"
+        }
+      }
+    }
+  }
+}

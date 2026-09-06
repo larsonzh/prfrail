@@ -1868,6 +1868,43 @@ manifest 一经被首个 run state-event 引用即不可改写。配置、profil
 内容完整性，不证明配置来源可信、依赖安全或能力仍然可用；恢复前仍须重新 preflight，但不得覆写本
 manifest。
 
+#### 16.9.19 Signature receipt
+
+`signature-receipt.schema.json` 为跨主机 adapter 记录、bootstrap 产物和发布校验和清单提供独立 detached
+Ed25519 签名对象；它不向被签对象添加字段，也不把内容摘要本身误当身份认证。根对象只含
+`schemaVersion="1.0.0"`、`receipt` 与 `receiptHash`。receiptHash 不参与自身摘要，以 ASCII 域
+`proofrail:signature-receipt:1\n` 后接完整内层 receipt 的 JCS canonical 字节计算 SHA-256。
+
+内层 receipt 必含 `receiptId/statement/signature`。statement 必含
+`issuedAt/purpose/subjectKind/subjectHash/signer/keyId/algorithm/publicKeyFingerprint/trustPolicyHash`；
+`algorithm` 固定为 `ed25519`：
+
+- `purpose` 只能为 `cross-host|bootstrap|release`；`subjectKind` 只能为
+  `adapter-record|bootstrap-artifact|release-checksum-manifest`，并按相同顺序一一对应，禁止用 release key
+  给普通运行记录制造授权，或用在线 adapter key 冒充发布者。
+- `subjectHash` 是被签对象已有的 canonical 内容摘要；statement 的签名输入为 ASCII 域
+  `proofrail:signature-statement:1\n` 后接 statement 的 JCS canonical UTF-8 字节。签名只覆盖该输入，
+  不覆盖 receiptHash，也不直接签宿主路径、文件名或传输包装。
+- `signer` 是严格的 `{type,id}`，type 为 `system|operator|maintainer`；cross-host 要求 system，bootstrap
+  要求 operator 或 maintainer，release 固定 maintainer。主体声明仍须由 trustPolicyHash 指向的批准信任
+  策略验证，不能仅凭字符串自证。
+- `keyId` 是信任策略中的稳定 ID；`publicKeyFingerprint` 使用本协议 SHA-256 wire 形式，计算对象是原始
+  32 字节 Ed25519 公钥，不是 PEM 文本或显示字符串。私钥、公钥原文和密钥保管位置均不得进入 receipt。
+- `signature` 是 64 字节 Ed25519 签名的 RFC 4648 base64url 无 padding 编码，固定 86 个字符；拒绝标准
+  base64 的 `+`、`/`、`=` 别名，避免同一签名产生多种 wire 表示。
+
+receipt 发布前必须验证 subjectHash 指向允许 kind 的真实对象、statement/signature 匹配、keyId 与指纹
+处于 trustPolicyHash 声明的用途/有效期/状态内，并记录验证证据；验证证据作为独立 evidence/error 对象
+引用 receiptHash，不反向写入 receipt，避免摘要环。密钥轮换或撤销不删除历史 receipt：checker 按
+issuedAt 与策略的生效/撤销语义判断历史有效性；无可信时间源时不得把“签名数学有效”提升为“当时授权
+有效”。同一 purpose/subjectKind/subjectHash/signer/keyId 可有多个不同 issuedAt 的 receipt，但相同
+statement/signature 必须得到相同 receiptHash，冲突内容不可覆盖。
+
+Schema 只检查单对象形状、用途/对象/主体判别和签名编码；checker/独立 crypto validator 负责 Ed25519
+验签、subject 内容摘要、key fingerprint、信任链、时间与撤销、用途隔离和验证证据。T017 仍须登记精确
+维护者签名主体、密钥保管人、公钥指纹、发布渠道及轮换/撤销流程；本 Schema 不生成密钥、不授权发布，
+也不表示 S1 已实现密码学验证。
+
 ---
 
 ## 17. S0 实施就绪门禁
