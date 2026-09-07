@@ -6,7 +6,7 @@
 
 ## 1. 现状和目标
 
-当前 T005–T009 已实现 evidence、snapshot、guard、taskdef change-set checker、applier transaction 与 Chain Engine，并有核心测试；gate runner、adapter、可用 CLI/TUI 和产品 CI 尚未完成。`init`/`run` 仍打印未实现，不能用其退出成功作为验收。internal 模块继续作为责任边界，不因目标架构存在而提前生成空接口。
+当前 T005–T010 已实现 evidence、snapshot、guard、taskdef change-set checker、applier transaction、Chain Engine 与 fail-close gate runner，并有核心测试；adapter、可用 CLI/TUI 和产品 CI 尚未完成。`init`/`run` 仍打印未实现，不能用其退出成功作为验收。internal 模块继续作为责任边界，不因目标架构存在而提前生成空接口。
 
 采用单机单用户、单写者 Go 模块化单体。持久事实以文件对象、append-only 事件和 journal 表达；S1 不引入服务集群、数据库、远程对象存储或消息中间件。内部调用优先 Go 方法与 `context.Context`，跨进程才使用版本化协议。
 

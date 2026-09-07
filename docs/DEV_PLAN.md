@@ -64,7 +64,7 @@ T006 状态：`COMPLETE`。AT-02 完整验收通过；无 Git 恢复与不可变
 - [x] T007 [Plan:P1.2] 实现 `internal/guard/{process,lease}.go`、平台文件及测试；证明进程树停机、接管和租约；依赖：T005、T004；验收：AT-03/06；禁止：杀用户进程、只凭 PID 或过期接管。验证：[中文](validation/t007-process-lease.md) / [English](validation/t007-process-lease_EN.md)。
 - [x] T008 [Plan:P1.2] 实现 `internal/taskdef/checker.go`、`internal/applier/{apply,journal,recover}.go` 与测试；内存顺序预验→事务→回滚；依赖：T005/T006/T007；验收：AT-04 每崩溃点；禁止：边验边写或跳过断言。验证：[中文](validation/t008-applier.md) / [English](validation/t008-applier_EN.md)。
 - [x] T009 [Plan:P1.2] 实现 `internal/chain/{engine,state,recover}.go` 与测试；三任务、四 kind、两变更模式、事件投影/暂停取消，先 fake agent/runner；依赖：T008、DG-01、DG-02；验收：AT-03；禁止：候选作为下一父快照。完成：2026-09-07。14 个切片及 Windows 11/NTFS、Ubuntu 24.04/ext4 原生验证通过。验证：[中文](validation/t009-chain.md) / [English](validation/t009-chain_EN.md)。
-- [ ] T010 [Plan:P1.2] 实现 `internal/gates/{runner,policy,result}.go` 与测试并接 chain；依赖：T007/T009；验收：AT-06；禁止：不具备能力时弱化网络/资源策略。
+- [x] T010 [Plan:P1.2] 实现 `internal/gates/{runner,policy,result}.go` 与测试并接 chain；依赖：T007/T009；验收：AT-06；禁止：不具备能力时弱化网络/资源策略。完成：2026-09-07。12 个切片及 Windows 11/NTFS、Ubuntu 24.04/ext4 原生验证通过；未实现的网络/资源 enforcement 保持 preflight 阻断。验证：[中文](validation/t010-gates.md) / [English](validation/t010-gates_EN.md)。
 
 ### P1.3 独立接受与有限修复（REQ-005/014/022/023/024/025/026）
 
