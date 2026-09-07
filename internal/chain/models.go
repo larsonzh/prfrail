@@ -217,3 +217,9 @@ func (definition Definition) validate() error {
 	}
 	return nil
 }
+
+// ValidateDefinition applies the same semantic checks used by the engine
+// before a run starts.
+func ValidateDefinition(definition Definition) error {
+	return definition.validate()
+}
