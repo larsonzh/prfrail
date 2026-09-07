@@ -54,7 +54,7 @@ T006 状态：`COMPLETE`。AT-02 完整验收通过；无 Git 恢复与不可变
 ### P1.2 写入与顺序闭环（REQ-002/003/004/012/018/023/024/026）
 
 - [x] T007 [Plan:P1.2] 实现 `internal/guard/{process,lease}.go`、平台文件及测试；证明进程树停机、接管和租约；依赖：T005、T004；验收：AT-03/06；禁止：杀用户进程、只凭 PID 或过期接管。验证：[中文](validation/t007-process-lease.md) / [English](validation/t007-process-lease_EN.md)。
-- [ ] T008 [Plan:P1.2] 实现 `internal/taskdef/checker.go`、`internal/applier/{apply,journal,recover}.go` 与测试；内存顺序预验→事务→回滚；依赖：T005/T006/T007；验收：AT-04 每崩溃点；禁止：边验边写或跳过断言。
+- [x] T008 [Plan:P1.2] 实现 `internal/taskdef/checker.go`、`internal/applier/{apply,journal,recover}.go` 与测试；内存顺序预验→事务→回滚；依赖：T005/T006/T007；验收：AT-04 每崩溃点；禁止：边验边写或跳过断言。验证：[中文](validation/t008-applier.md) / [English](validation/t008-applier_EN.md)。
 - [ ] T009 [Plan:P1.2] 实现 `internal/chain/{engine,state,recover}.go` 与测试；三任务、四 kind、两变更模式、事件投影/暂停取消，先 fake agent/runner；依赖：T008；验收：AT-03；禁止：候选作为下一父快照。
 - [ ] T010 [Plan:P1.2] 实现 `internal/gates/{runner,policy,result}.go` 与测试并接 chain；依赖：T007/T009；验收：AT-06；禁止：不具备能力时弱化网络/资源策略。
 
