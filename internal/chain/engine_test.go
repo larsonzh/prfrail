@@ -51,14 +51,50 @@ func (fake *fakeSteps) Execute(_ context.Context, request StepRequest) (StepResu
 }
 
 type fakeAcceptance struct {
-	hashes []string
-	calls  int
+	hashes   []string
+	producer evidence.Actor
+	calls    int
 }
 
-func (fake *fakeAcceptance) Accept(context.Context, string, string, int, SnapshotRef, Workspace) (SnapshotRef, []string, error) {
+func (fake *fakeAcceptance) Accept(context.Context, string, string, int, SnapshotRef, Workspace) (CandidateResult, error) {
 	hash := fake.hashes[fake.calls]
 	fake.calls++
-	return SnapshotRef{Hash: hash}, []string{stopHash}, nil
+	return CandidateResult{
+		Snapshot:          SnapshotRef{Hash: hash},
+		EvidenceRootHash:  stopHash,
+		Evidence:          []string{stopHash},
+		CandidateProducer: fake.producer,
+	}, nil
+}
+
+type fakeReviewer struct {
+	decisions []ReviewDecision
+	err       error
+	calls     int
+}
+
+func (fake *fakeReviewer) Review(context.Context, ReviewRequest) (ReviewDecision, error) {
+	if fake.err != nil {
+		return ReviewDecision{}, fake.err
+	}
+	decision := fake.decisions[fake.calls]
+	fake.calls++
+	return decision, nil
+}
+
+type fakePublisher struct {
+	decisions []PromotionDecision
+	err       error
+	calls     int
+}
+
+func (fake *fakePublisher) Publish(context.Context, PromotionRequest) (PromotionDecision, error) {
+	if fake.err != nil {
+		return PromotionDecision{}, fake.err
+	}
+	decision := fake.decisions[fake.calls]
+	fake.calls++
+	return decision, nil
 }
 
 type fakeStopper struct {
@@ -89,21 +125,31 @@ func threeTaskDefinition() Definition {
 	}}
 }
 
-func testOptions(store EventStore) (Options, *fakeBaseline, *fakeWorkspaces, *fakeSteps, *fakeAcceptance, *fakeStopper, *fakeReconciler) {
+func testOptions(store EventStore) (Options, *fakeBaseline, *fakeWorkspaces, *fakeSteps, *fakeAcceptance, *fakeReviewer, *fakePublisher, *fakeStopper, *fakeReconciler) {
 	baseline := &fakeBaseline{}
 	workspaces := &fakeWorkspaces{}
 	steps := &fakeSteps{}
-	acceptance := &fakeAcceptance{hashes: []string{acceptedOne, acceptedTwo, acceptedThree}}
+	acceptance := &fakeAcceptance{hashes: []string{acceptedOne, acceptedTwo, acceptedThree}, producer: evidence.Actor{Type: "agent", ID: "agent-one"}}
+	reviewer := &fakeReviewer{decisions: []ReviewDecision{
+		{ReceiptID: "review-one", OccurredAt: "2026-09-07T01:02:03.000Z", RecordedBy: evidence.Actor{Type: "operator", ID: "reviewer-one"}, ReviewMode: "manual", Outcome: "approve", Evidence: []string{stopHash}},
+		{ReceiptID: "review-two", OccurredAt: "2026-09-07T01:02:03.000Z", RecordedBy: evidence.Actor{Type: "operator", ID: "reviewer-one"}, ReviewMode: "manual", Outcome: "approve", Evidence: []string{stopHash}},
+		{ReceiptID: "review-three", OccurredAt: "2026-09-07T01:02:03.000Z", RecordedBy: evidence.Actor{Type: "operator", ID: "reviewer-one"}, ReviewMode: "manual", Outcome: "approve", Evidence: []string{stopHash}},
+	}}
+	publisher := &fakePublisher{decisions: []PromotionDecision{
+		{ReceiptID: "promotion-one", OccurredAt: "2026-09-07T01:02:03.000Z", Outcome: "completed", AcceptedSnapshotHash: acceptedOne, WriterStopEvidence: []string{stopHash}, LeaseEvidence: []string{stopHash}, Evidence: []string{stopHash}},
+		{ReceiptID: "promotion-two", OccurredAt: "2026-09-07T01:02:03.000Z", Outcome: "completed", AcceptedSnapshotHash: acceptedTwo, WriterStopEvidence: []string{stopHash}, LeaseEvidence: []string{stopHash}, Evidence: []string{stopHash}},
+		{ReceiptID: "promotion-three", OccurredAt: "2026-09-07T01:02:03.000Z", Outcome: "completed", AcceptedSnapshotHash: acceptedThree, WriterStopEvidence: []string{stopHash}, LeaseEvidence: []string{stopHash}, Evidence: []string{stopHash}},
+	}}
 	stopper := &fakeStopper{}
 	reconciler := &fakeReconciler{}
 	sequence := 0
-	options := Options{RunID: "run-one", Definition: threeTaskDefinition(), Events: store, Baselines: baseline, Workspaces: workspaces, Steps: steps, Acceptance: acceptance, Stopper: stopper, Reconciler: reconciler, Clock: fixedClock, IDs: func() string { sequence++; return fmt.Sprintf("event-%d", sequence) }}
-	return options, baseline, workspaces, steps, acceptance, stopper, reconciler
+	options := Options{RunID: "run-one", Definition: threeTaskDefinition(), Events: store, Baselines: baseline, Workspaces: workspaces, Steps: steps, Acceptance: acceptance, Reviewer: reviewer, Publisher: publisher, Stopper: stopper, Reconciler: reconciler, Clock: fixedClock, IDs: func() string { sequence++; return fmt.Sprintf("event-%d", sequence) }}
+	return options, baseline, workspaces, steps, acceptance, reviewer, publisher, stopper, reconciler
 }
 
 func TestEngineRunsThreeTasksFourKindsAndBothModes(t *testing.T) {
 	store := &memoryEvents{}
-	options, baseline, workspaces, steps, acceptance, _, _ := testOptions(store)
+	options, baseline, workspaces, steps, acceptance, reviewer, publisher, _, _ := testOptions(store)
 	engine, err := New(context.Background(), options)
 	if err != nil {
 		t.Fatal(err)
@@ -111,7 +157,7 @@ func TestEngineRunsThreeTasksFourKindsAndBothModes(t *testing.T) {
 	if err := engine.Run(context.Background()); err != nil {
 		t.Fatal(err)
 	}
-	if engine.Projection().ChainState != "COMPLETED" || baseline.calls != 1 || acceptance.calls != 3 {
+	if engine.Projection().ChainState != "COMPLETED" || baseline.calls != 1 || acceptance.calls != 3 || reviewer.calls != 3 || publisher.calls != 3 {
 		t.Fatalf("unexpected completion: %+v", engine.Projection())
 	}
 	if len(steps.requests) != 4 {
@@ -133,7 +179,7 @@ func TestEngineRunsThreeTasksFourKindsAndBothModes(t *testing.T) {
 
 func TestTaskFailureStopsLaterTasks(t *testing.T) {
 	store := &memoryEvents{}
-	options, _, workspaces, steps, _, _, _ := testOptions(store)
+	options, _, workspaces, steps, _, _, _, _, _ := testOptions(store)
 	steps.failTask = "task-two"
 	engine, err := New(context.Background(), options)
 	if err != nil {
@@ -149,7 +195,7 @@ func TestTaskFailureStopsLaterTasks(t *testing.T) {
 
 func TestPauseAndResume(t *testing.T) {
 	store := &memoryEvents{}
-	options, _, _, steps, _, _, _ := testOptions(store)
+	options, _, _, steps, _, _, _, _, _ := testOptions(store)
 	engine, err := New(context.Background(), options)
 	if err != nil {
 		t.Fatal(err)
@@ -171,7 +217,7 @@ func TestPauseAndResume(t *testing.T) {
 
 func TestCancelStopsBeforeTerminalState(t *testing.T) {
 	store := &memoryEvents{}
-	options, _, _, _, _, stopper, _ := testOptions(store)
+	options, _, _, _, _, _, _, stopper, _ := testOptions(store)
 	engine, err := New(context.Background(), options)
 	if err != nil {
 		t.Fatal(err)
@@ -187,7 +233,7 @@ func TestCancelStopsBeforeTerminalState(t *testing.T) {
 
 func TestCrashReplayPausesRunningStepWithoutRedispatch(t *testing.T) {
 	store := &memoryEvents{}
-	options, _, _, steps, _, _, reconciler := testOptions(store)
+	options, _, _, steps, _, _, _, _, reconciler := testOptions(store)
 	options.Failpoint = func(point string) error {
 		if point == "step-running" {
 			return errors.New("simulated crash")
@@ -204,7 +250,7 @@ func TestCrashReplayPausesRunningStepWithoutRedispatch(t *testing.T) {
 	if len(steps.requests) != 0 {
 		t.Fatal("runner executed past crash point")
 	}
-	recoveryOptions, _, _, recoverySteps, _, _, recoveryReconciler := testOptions(store)
+	recoveryOptions, _, _, recoverySteps, _, _, _, _, recoveryReconciler := testOptions(store)
 	sequence := len(store.events)
 	recoveryOptions.IDs = func() string { sequence++; return fmt.Sprintf("event-%d", sequence) }
 	recovered, err := New(context.Background(), recoveryOptions)
@@ -219,5 +265,173 @@ func TestCrashReplayPausesRunningStepWithoutRedispatch(t *testing.T) {
 	}
 	if err := recovered.Run(context.Background()); !errors.Is(err, ErrRecoveryUncertain) {
 		t.Fatalf("uncertain run resumed: %v", err)
+	}
+}
+
+func TestReviewRejectMovesTaskToRepairPending(t *testing.T) {
+	store := &memoryEvents{}
+	options, _, _, _, _, reviewer, publisher, _, _ := testOptions(store)
+	reviewer.decisions[0] = ReviewDecision{
+		ReceiptID:     "review-reject",
+		OccurredAt:    "2026-09-07T01:02:03.000Z",
+		RecordedBy:    evidence.Actor{Type: "operator", ID: "reviewer-two"},
+		ReviewMode:    "manual",
+		Outcome:       "reject",
+		Reason:        &ReviewReason{Code: "docs-missing"},
+		ErrorEvidence: []string{stopHash},
+		Evidence:      []string{stopHash},
+	}
+	engine, err := New(context.Background(), options)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := engine.Run(context.Background()); !errors.Is(err, ErrPaused) {
+		t.Fatalf("run result: %v", err)
+	}
+	projection := engine.Projection()
+	if projection.ChainState != "PAUSED" || projection.TaskStates[taskKey("task-one", 1)] != "REPAIR_PENDING" {
+		t.Fatalf("unexpected projection: %+v", projection)
+	}
+	if publisher.calls != 0 {
+		t.Fatal("publisher must not run when review rejected")
+	}
+}
+
+func TestRejectSelfReview(t *testing.T) {
+	store := &memoryEvents{}
+	options, _, _, _, acceptance, reviewer, publisher, _, _ := testOptions(store)
+	acceptance.producer = evidence.Actor{Type: "agent", ID: "reviewer-one"}
+	reviewer.decisions[0] = ReviewDecision{
+		ReceiptID:  "review-self",
+		OccurredAt: "2026-09-07T01:02:03.000Z",
+		RecordedBy: evidence.Actor{Type: "operator", ID: "reviewer-one"},
+		ReviewMode: "manual",
+		Outcome:    "approve",
+	}
+	engine, err := New(context.Background(), options)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := engine.Run(context.Background()); !errors.Is(err, ErrPaused) {
+		t.Fatalf("run result: %v", err)
+	}
+	if engine.Projection().TaskStates[taskKey("task-one", 1)] != "REPAIR_PENDING" || publisher.calls != 0 {
+		t.Fatalf("unexpected projection: %+v", engine.Projection())
+	}
+}
+
+func TestRejectExpiredOrWrongCandidateWaiver(t *testing.T) {
+	for _, scenario := range []struct {
+		name     string
+		decision ReviewDecision
+	}{
+		{
+			name: "expired waiver",
+			decision: ReviewDecision{
+				ReceiptID:     "review-waive-expired",
+				OccurredAt:    "2026-09-07T01:02:03.000Z",
+				RecordedBy:    evidence.Actor{Type: "operator", ID: "reviewer-one"},
+				ReviewMode:    "manual",
+				Outcome:       "waive",
+				Reason:        &ReviewReason{Code: "approved-exception"},
+				ErrorEvidence: []string{stopHash},
+				WaiverAuthorization: &WaiverAuthorization{
+					AuthorizedBy:    evidence.Actor{Type: "operator", ID: "release-manager"},
+					PolicyBasisHash: stopHash,
+					Scope:           []string{"task-one"},
+					ExpiresAt:       "2026-09-07T01:00:00.000Z",
+				},
+			},
+		},
+		{
+			name: "wrong candidate",
+			decision: ReviewDecision{
+				ReceiptID:             "review-waive-candidate",
+				OccurredAt:            "2026-09-07T01:02:03.000Z",
+				RecordedBy:            evidence.Actor{Type: "operator", ID: "reviewer-one"},
+				ReviewMode:            "manual",
+				Outcome:               "waive",
+				CandidateSnapshotHash: baselineHash,
+				Reason:                &ReviewReason{Code: "approved-exception"},
+				ErrorEvidence:         []string{stopHash},
+				WaiverAuthorization: &WaiverAuthorization{
+					AuthorizedBy:    evidence.Actor{Type: "operator", ID: "release-manager"},
+					PolicyBasisHash: stopHash,
+					Scope:           []string{"task-one"},
+					ExpiresAt:       "2026-09-08T01:02:03.000Z",
+				},
+			},
+		},
+	} {
+		t.Run(scenario.name, func(t *testing.T) {
+			store := &memoryEvents{}
+			options, _, _, _, _, reviewer, publisher, _, _ := testOptions(store)
+			reviewer.decisions[0] = scenario.decision
+			engine, err := New(context.Background(), options)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if err := engine.Run(context.Background()); !errors.Is(err, ErrPaused) {
+				t.Fatalf("run result: %v", err)
+			}
+			if engine.Projection().TaskStates[taskKey("task-one", 1)] != "REPAIR_PENDING" || publisher.calls != 0 {
+				t.Fatalf("unexpected projection: %+v", engine.Projection())
+			}
+		})
+	}
+}
+
+func TestValidIndependentApprovalPublishesOnce(t *testing.T) {
+	store := &memoryEvents{}
+	definition := Definition{ID: "chain-one", Tasks: []Task{{ID: "task-one", Steps: []Step{{ID: "code-one", Kind: "code", Mode: ManagedChangeSet}}}}}
+	options, _, _, _, _, reviewer, publisher, _, _ := testOptions(store)
+	options.Definition = definition
+	reviewer.decisions = []ReviewDecision{{ReceiptID: "review-approve", OccurredAt: "2026-09-07T01:02:03.000Z", RecordedBy: evidence.Actor{Type: "operator", ID: "reviewer-two"}, ReviewMode: "manual", Outcome: "approve", Evidence: []string{stopHash}}}
+	publisher.decisions = []PromotionDecision{{ReceiptID: "promotion-complete", OccurredAt: "2026-09-07T01:02:03.000Z", Outcome: "completed", AcceptedSnapshotHash: acceptedOne, WriterStopEvidence: []string{stopHash}, LeaseEvidence: []string{stopHash}, Evidence: []string{stopHash}}}
+	engine, err := New(context.Background(), options)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := engine.Run(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	projection := engine.Projection()
+	if projection.ChainState != "COMPLETED" || projection.TaskStates[taskKey("task-one", 1)] != "PASSED" {
+		t.Fatalf("unexpected projection: %+v", projection)
+	}
+	if publisher.calls != 1 {
+		t.Fatalf("publisher calls: %d", publisher.calls)
+	}
+}
+
+func TestRepairPendingCannotResumeWithoutNewAttempt(t *testing.T) {
+	store := &memoryEvents{}
+	options, _, _, _, _, reviewer, publisher, _, _ := testOptions(store)
+	reviewer.decisions[0] = ReviewDecision{
+		ReceiptID:     "review-reject",
+		OccurredAt:    "2026-09-07T01:02:03.000Z",
+		RecordedBy:    evidence.Actor{Type: "operator", ID: "reviewer-two"},
+		ReviewMode:    "manual",
+		Outcome:       "reject",
+		Reason:        &ReviewReason{Code: "docs-missing"},
+		ErrorEvidence: []string{stopHash},
+	}
+	engine, err := New(context.Background(), options)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := engine.Run(context.Background()); !errors.Is(err, ErrPaused) {
+		t.Fatalf("run result: %v", err)
+	}
+	before := engine.Projection()
+	if err := engine.Run(context.Background()); !errors.Is(err, ErrPaused) {
+		t.Fatalf("resume result: %v", err)
+	}
+	after := engine.Projection()
+	if after.ChainState != "PAUSED" || after.TaskStates[taskKey("task-one", 1)] != before.TaskStates[taskKey("task-one", 1)] || publisher.calls != 0 {
+		t.Fatalf("resume mutated repair-pending task: %+v", after)
+	}
+	if err := evidence.VerifyEventChain(store.events); err != nil {
+		t.Fatal(err)
 	}
 }

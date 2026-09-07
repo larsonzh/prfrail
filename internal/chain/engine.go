@@ -19,6 +19,8 @@ type Options struct {
 	Workspaces WorkspacePort
 	Steps      StepPort
 	Acceptance AcceptancePort
+	Reviewer   ReviewerPort
+	Publisher  PublisherPort
 	Stopper    Stopper
 	Reconciler Reconciler
 	Clock      Clock
@@ -34,7 +36,7 @@ type Engine struct {
 }
 
 func New(ctx context.Context, options Options) (*Engine, error) {
-	if !evidence.ValidID(options.RunID) || options.Events == nil || options.Baselines == nil || options.Workspaces == nil || options.Steps == nil || options.Acceptance == nil || options.Stopper == nil || options.Reconciler == nil {
+	if !evidence.ValidID(options.RunID) || options.Events == nil || options.Baselines == nil || options.Workspaces == nil || options.Steps == nil || options.Acceptance == nil || options.Reviewer == nil || options.Publisher == nil || options.Stopper == nil || options.Reconciler == nil {
 		return nil, ErrInvalidDefinition
 	}
 	if err := options.Definition.validate(); err != nil {
@@ -144,6 +146,14 @@ func (engine *Engine) runTask(ctx context.Context, task Task) error {
 		}
 		state = "PRECHECK"
 	}
+	if state == "REPAIR_PENDING" || state == "WAITING_FOR_OPERATOR" {
+		if engine.state.projection.ChainState == "RUNNING" {
+			if err := engine.transition(ctx, chainEntity(engine.options.RunID), "PAUSED", nil, "repair-required"); err != nil {
+				return err
+			}
+		}
+		return ErrPaused
+	}
 	parent := SnapshotRef{Hash: engine.state.projection.AcceptedParent}
 	if !evidence.ValidHash(parent.Hash) {
 		return engine.failTask(ctx, task.ID, "accepted-parent-missing", ErrInvalidState)
@@ -168,19 +178,95 @@ func (engine *Engine) runTask(ctx context.Context, task Task) error {
 	if err := engine.transition(ctx, entity, "REVIEW_PENDING", nil, "steps-completed"); err != nil {
 		return err
 	}
-	accepted, proof, err := engine.options.Acceptance.Accept(ctx, engine.options.RunID, task.ID, 1, parent, workspace)
-	if err != nil || !evidence.ValidHash(accepted.Hash) {
-		if err == nil {
-			err = ErrInvalidState
-		}
-		return engine.failTask(ctx, task.ID, "acceptance-failed", err)
+	candidate, err := engine.options.Acceptance.Accept(ctx, engine.options.RunID, task.ID, 1, parent, workspace)
+	if err != nil {
+		return engine.failTask(ctx, task.ID, "candidate-freeze-failed", err)
 	}
-	inputs := append([]string{accepted.Hash}, proof...)
+	if !evidence.ValidHash(candidate.Snapshot.Hash) || !evidence.ValidHash(candidate.EvidenceRootHash) {
+		return engine.failTask(ctx, task.ID, "candidate-invalid", ErrInvalidState)
+	}
+	review, err := engine.options.Reviewer.Review(ctx, ReviewRequest{
+		RunID:                 engine.options.RunID,
+		TaskID:                task.ID,
+		Attempt:               1,
+		ParentSnapshotHash:    parent.Hash,
+		CandidateSnapshotHash: candidate.Snapshot.Hash,
+		EvidenceRootHash:      candidate.EvidenceRootHash,
+		CandidateProducer:     candidate.CandidateProducer,
+	})
+	if err != nil {
+		return engine.failTask(ctx, task.ID, "review-failed", err)
+	}
+	reviewResult, err := buildReviewResult(ReviewRequest{
+		RunID:                 engine.options.RunID,
+		TaskID:                task.ID,
+		Attempt:               1,
+		ParentSnapshotHash:    parent.Hash,
+		CandidateSnapshotHash: candidate.Snapshot.Hash,
+		EvidenceRootHash:      candidate.EvidenceRootHash,
+		CandidateProducer:     candidate.CandidateProducer,
+	}, review, engine.options.Clock, engine.options.IDs)
+	if err != nil {
+		return engine.markTaskForRepair(ctx, task.ID, "review-invalid", append(candidate.Evidence, candidate.EvidenceRootHash))
+	}
+	if review.Outcome == "reject" {
+		inputs := append([]string{reviewResult.ReceiptHash, candidate.Snapshot.Hash, candidate.EvidenceRootHash}, review.ErrorEvidence...)
+		inputs = uniqueHashes(inputs)
+		return engine.markTaskForRepair(ctx, task.ID, "review-rejected", inputs)
+	}
+	promotion, err := engine.options.Publisher.Publish(ctx, PromotionRequest{
+		RunID:                 engine.options.RunID,
+		TaskID:                task.ID,
+		Attempt:               1,
+		ParentSnapshotHash:    parent.Hash,
+		CandidateSnapshotHash: candidate.Snapshot.Hash,
+		EvidenceRootHash:      candidate.EvidenceRootHash,
+		ReviewReceiptHash:     reviewResult.ReceiptHash,
+	})
+	if err != nil {
+		return engine.failTask(ctx, task.ID, "promotion-failed", err)
+	}
+	promotionResult, err := buildPromotionResult(PromotionRequest{
+		RunID:                 engine.options.RunID,
+		TaskID:                task.ID,
+		Attempt:               1,
+		ParentSnapshotHash:    parent.Hash,
+		CandidateSnapshotHash: candidate.Snapshot.Hash,
+		EvidenceRootHash:      candidate.EvidenceRootHash,
+		ReviewReceiptHash:     reviewResult.ReceiptHash,
+	}, promotion, engine.options.Clock, engine.options.IDs)
+	if err != nil {
+		return engine.markTaskForRepair(ctx, task.ID, "promotion-invalid", append(candidate.Evidence, candidate.EvidenceRootHash))
+	}
+	if promotion.Outcome != "completed" {
+		inputs := append([]string{reviewResult.ReceiptHash, promotionResult.ReceiptHash, candidate.Snapshot.Hash}, promotion.ErrorEvidence...)
+		inputs = uniqueHashes(inputs)
+		return engine.markTaskForRepair(ctx, task.ID, "promotion-incomplete", inputs)
+	}
+	inputs := []string{candidate.Snapshot.Hash, reviewResult.ReceiptHash, promotionResult.ReceiptHash, candidate.EvidenceRootHash}
+	inputs = append(inputs, candidate.Evidence...)
+	inputs = append(inputs, review.Evidence...)
+	inputs = append(inputs, promotion.Evidence...)
+	inputs = uniqueHashes(inputs)
 	if err := engine.transition(ctx, entity, "PASSED", inputs, "task-accepted"); err != nil {
 		return err
 	}
-	engine.state.projection.AcceptedParent = accepted.Hash
+	engine.state.projection.AcceptedParent = candidate.Snapshot.Hash
 	return nil
+}
+
+func (engine *Engine) markTaskForRepair(ctx context.Context, taskID, reason string, input []string) error {
+	entity := taskEntity(engine.options.RunID, taskID)
+	input = uniqueHashes(input)
+	if err := engine.transition(ctx, entity, "REPAIR_PENDING", input, reason); err != nil {
+		return err
+	}
+	if engine.state.projection.ChainState == "RUNNING" {
+		if err := engine.transition(ctx, chainEntity(engine.options.RunID), "PAUSED", input, reason); err != nil {
+			return err
+		}
+	}
+	return ErrPaused
 }
 
 func (engine *Engine) runStep(ctx context.Context, taskID string, step Step, parent SnapshotRef, workspace Workspace) error {
@@ -311,6 +397,22 @@ func cloneProjection(source Projection) Projection {
 	}
 	for key, value := range source.StepStates {
 		result.StepStates[key] = value
+	}
+	return result
+}
+
+func uniqueHashes(values []string) []string {
+	if len(values) < 2 {
+		return values
+	}
+	seen := make(map[string]struct{}, len(values))
+	result := make([]string, 0, len(values))
+	for _, value := range values {
+		if _, exists := seen[value]; exists {
+			continue
+		}
+		seen[value] = struct{}{}
+		result = append(result, value)
 	}
 	return result
 }

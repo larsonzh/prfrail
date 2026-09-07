@@ -63,6 +63,70 @@ type StepResult struct {
 	Evidence []string
 }
 
+type CandidateResult struct {
+	Snapshot          SnapshotRef
+	EvidenceRootHash  string
+	Evidence          []string
+	CandidateProducer evidence.Actor
+}
+
+type ReviewRequest struct {
+	RunID                 string
+	TaskID                string
+	Attempt               int
+	ParentSnapshotHash    string
+	CandidateSnapshotHash string
+	EvidenceRootHash      string
+	CandidateProducer     evidence.Actor
+}
+
+type ReviewReason struct {
+	Code    string `json:"code"`
+	Message string `json:"message,omitempty"`
+}
+
+type WaiverAuthorization struct {
+	AuthorizedBy    evidence.Actor `json:"authorizedBy"`
+	PolicyBasisHash string         `json:"policyBasisHash"`
+	Scope           []string       `json:"scope"`
+	ExpiresAt       string         `json:"expiresAt"`
+}
+
+type ReviewDecision struct {
+	ReceiptID             string
+	OccurredAt            string
+	RecordedBy            evidence.Actor
+	ReviewMode            string
+	PolicyHash            string
+	Outcome               string
+	CandidateSnapshotHash string
+	Evidence              []string
+	ErrorEvidence         []string
+	Reason                *ReviewReason
+	WaiverAuthorization   *WaiverAuthorization
+}
+
+type PromotionRequest struct {
+	RunID                 string
+	TaskID                string
+	Attempt               int
+	ParentSnapshotHash    string
+	CandidateSnapshotHash string
+	EvidenceRootHash      string
+	ReviewReceiptHash     string
+}
+
+type PromotionDecision struct {
+	ReceiptID            string
+	OccurredAt           string
+	Outcome              string
+	AcceptedSnapshotHash string
+	WriterStopEvidence   []string
+	LeaseEvidence        []string
+	Evidence             []string
+	ErrorEvidence        []string
+}
+
 type BaselinePort interface {
 	CaptureBaseline(context.Context, string) (SnapshotRef, error)
 }
@@ -76,7 +140,15 @@ type StepPort interface {
 }
 
 type AcceptancePort interface {
-	Accept(context.Context, string, string, int, SnapshotRef, Workspace) (SnapshotRef, []string, error)
+	Accept(context.Context, string, string, int, SnapshotRef, Workspace) (CandidateResult, error)
+}
+
+type ReviewerPort interface {
+	Review(context.Context, ReviewRequest) (ReviewDecision, error)
+}
+
+type PublisherPort interface {
+	Publish(context.Context, PromotionRequest) (PromotionDecision, error)
 }
 
 type Stopper interface {
