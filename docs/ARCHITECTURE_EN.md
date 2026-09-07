@@ -6,7 +6,7 @@ Date: 2026-09-07; S1 architecture baseline. This document is the normative autho
 
 ## 1. Current State and Target
 
-T005–T008 currently implement evidence, snapshots, guards, the taskdef change-set checker, and applier transactions with core tests. The Chain Engine, gate runner, adapters, usable CLI/TUI, and product CI remain incomplete. init/run still print unimplemented messages and their successful exits are not acceptance. Internal modules remain responsibility boundaries and must not be populated with speculative interfaces merely because they appear in the target architecture.
+T005–T009 currently implement evidence, snapshots, guards, the taskdef change-set checker, applier transactions, and the Chain Engine with core tests. The gate runner, adapters, usable CLI/TUI, and product CI remain incomplete. init/run still print unimplemented messages and their successful exits are not acceptance. Internal modules remain responsibility boundaries and must not be populated with speculative interfaces merely because they appear in the target architecture.
 
 Use a local single-user, single-writer Go modular monolith. Persist facts as content objects, append-only events and journals. S1 adds no service cluster, database, remote object store or message broker. Prefer Go calls with context.Context internally and versioned protocols across processes.
 
