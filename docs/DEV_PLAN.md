@@ -51,11 +51,19 @@ T005 状态：`COMPLETE`。结果只覆盖证据层的 AT-04 子集；journal、
 
 T006 状态：`COMPLETE`。AT-02 完整验收通过；无 Git 恢复与不可变快照已闭环；工作区写事务与崩溃回滚点由 T008 承接。
 
+### DG-01 独立产品文档治理门禁
+
+- [x] DG-01 明确 ProofRail 独立产品边界，新增 `BUSINESS_WORKFLOWS*.md` 与 `INSTALLATION_PLAN*.md`，同步 RFC、需求、导航、README 和操作手册；完成：2026-09-07。安装载体、目录、签名主体和升级方式保持待决，不生成虚假安装步骤。T 编号保持稳定，DG-01 是 T009 的文档前置门禁，不占用实施任务编号。
+
+### DG-02 分域权威迁移门禁
+
+- [x] DG-02 将原 RFC 定位为项目建议书与历史设计来源，在 `DOCUMENTATION_PLAN*.md` 建立分域权威矩阵，并把 T009 直接依赖的 chain/task/step 转换、事件投影、顺序调度、暂停取消和崩溃恢复迁入 `CONTRACTS*.md` §2.1；完成：2026-09-07。旧章节保留用于来源追踪，冲突必须阻断并修订，不由实现自行选择。
+
 ### P1.2 写入与顺序闭环（REQ-002/003/004/012/018/023/024/026）
 
 - [x] T007 [Plan:P1.2] 实现 `internal/guard/{process,lease}.go`、平台文件及测试；证明进程树停机、接管和租约；依赖：T005、T004；验收：AT-03/06；禁止：杀用户进程、只凭 PID 或过期接管。验证：[中文](validation/t007-process-lease.md) / [English](validation/t007-process-lease_EN.md)。
 - [x] T008 [Plan:P1.2] 实现 `internal/taskdef/checker.go`、`internal/applier/{apply,journal,recover}.go` 与测试；内存顺序预验→事务→回滚；依赖：T005/T006/T007；验收：AT-04 每崩溃点；禁止：边验边写或跳过断言。验证：[中文](validation/t008-applier.md) / [English](validation/t008-applier_EN.md)。
-- [ ] T009 [Plan:P1.2] 实现 `internal/chain/{engine,state,recover}.go` 与测试；三任务、四 kind、两变更模式、事件投影/暂停取消，先 fake agent/runner；依赖：T008；验收：AT-03；禁止：候选作为下一父快照。
+- [ ] T009 [Plan:P1.2] 实现 `internal/chain/{engine,state,recover}.go` 与测试；三任务、四 kind、两变更模式、事件投影/暂停取消，先 fake agent/runner；依赖：T008、DG-01、DG-02；验收：AT-03；禁止：候选作为下一父快照。固定为 14 个切片：模型/端口、转换表、非法转换、事件、投影、baseline 初始化、顺序调度、四 kind、managed-change-set、isolated-workspace、暂停恢复、取消停机、崩溃重放、双平台 AT-03。
 - [ ] T010 [Plan:P1.2] 实现 `internal/gates/{runner,policy,result}.go` 与测试并接 chain；依赖：T007/T009；验收：AT-06；禁止：不具备能力时弱化网络/资源策略。
 
 ### P1.3 独立接受与有限修复（REQ-005/014/022/023/024/025/026）

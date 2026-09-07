@@ -18,12 +18,13 @@ ProofRail 让 AI 在无人值守下安全地改代码、跑验证、出证据：
 
 ### 状态
 
-**S0 原型前准备（2026-09-06）**：已有 Go/CLI 占位骨架，核心实现尚未开始。
-中英文工程文档已形成评审稿，Schema/黄金样例、技术探针和人工批准尚待完成，S1 仍为 `NOT_READY`。
-设计规范见 [docs/RFC-proofrail-unattended-ai-engineering-product.md](docs/RFC-proofrail-unattended-ai-engineering-product.md)。
+**S1 实施中（2026-09-07）**：T005–T008 已完成证据、快照、进程/租约守卫、托管变更集与事务应用；
+Chain Engine、可用 CLI/TUI 和正式发行包尚未完成，不能作为可安装产品使用。
+项目建议书与历史设计来源见 [docs/RFC-proofrail-unattended-ai-engineering-product.md](docs/RFC-proofrail-unattended-ai-engineering-product.md)；分域权威见 [docs/DOCUMENTATION_PLAN.md](docs/DOCUMENTATION_PLAN.md)。
 
 从 [docs/DOCUMENTATION_PLAN.md](docs/DOCUMENTATION_PLAN.md) 阅读文档导航与低成本模型流程；
 执行顺序见 [docs/DEV_PLAN.md](docs/DEV_PLAN.md)，就绪缺口见 [docs/ADR_REGISTER.md](docs/ADR_REGISTER.md)。
+独立产品端到端叙事见 [docs/BUSINESS_WORKFLOWS.md](docs/BUSINESS_WORKFLOWS.md)；尚未冻结的安装发行方案见 [docs/INSTALLATION_PLAN.md](docs/INSTALLATION_PLAN.md)。
 
 产品完整性评审已补充无副作用预览、已接受结果导出、授权撤销、外部副作用边界、成本预留结算和备份/停用流程；见 [docs/PRODUCT_REQUIREMENTS.md](docs/PRODUCT_REQUIREMENTS.md) §8。均为待批准设计，不是现有功能；文件回滚不保证撤销外部操作。
 
@@ -80,12 +81,13 @@ ProofRail enables AI to safely modify code, run validations, and produce evidenc
 
 ### Status
 
-**S0 pre-prototype preparation (2026-09-06)**: A Go/CLI stub exists; core implementation has not started.
-Bilingual engineering drafts are available, but schemas/goldens, technical spikes and human approval remain pending. S1 is `NOT_READY`.
-Design spec: [docs/RFC-proofrail-unattended-ai-engineering-product.md](docs/RFC-proofrail-unattended-ai-engineering-product.md).
+**S1 implementation in progress (2026-09-07)**: T005–T008 implement evidence, snapshots, process/lease guards, managed change sets, and transactional apply.
+The Chain Engine, usable CLI/TUI, and formal release package remain incomplete; this is not yet an installable product.
+Project proposal and historical design source: [docs/RFC-proofrail-unattended-ai-engineering-product.md](docs/RFC-proofrail-unattended-ai-engineering-product.md). Domain authorities: [docs/DOCUMENTATION_PLAN_EN.md](docs/DOCUMENTATION_PLAN_EN.md).
 
 Start with [docs/DOCUMENTATION_PLAN_EN.md](docs/DOCUMENTATION_PLAN_EN.md) for navigation and the low-cost model workflow;
 see [docs/DEV_PLAN_EN.md](docs/DEV_PLAN_EN.md) for tasks and [docs/ADR_REGISTER_EN.md](docs/ADR_REGISTER_EN.md) for readiness gaps.
+See [docs/BUSINESS_WORKFLOWS_EN.md](docs/BUSINESS_WORKFLOWS_EN.md) for the independent end-to-end product narrative and [docs/INSTALLATION_PLAN_EN.md](docs/INSTALLATION_PLAN_EN.md) for unresolved installation and distribution decisions.
 
 Product review adds side-effect-free preview, accepted-result export, revocation, external-effect boundaries, cost reservation/settlement and backup/retirement flows. See [docs/PRODUCT_REQUIREMENTS_EN.md](docs/PRODUCT_REQUIREMENTS_EN.md) section 8. These are unapproved designs, not available features; file rollback cannot guarantee undoing external effects.
 

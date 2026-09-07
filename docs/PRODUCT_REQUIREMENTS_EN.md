@@ -2,7 +2,7 @@
 
 [简体中文](PRODUCT_REQUIREMENTS.md)
 
-Date: 2026-09-06. Status: S0 review draft, not a release commitment. Authority: [RFC](RFC-proofrail-unattended-ai-engineering-product.md) sections 1, 9, 14 and 17; engineering rules: [CODING_CONVENTIONS.md](CODING_CONVENTIONS.md). REQ IDs trace implementation; they do not replace RFC R IDs.
+Date: 2026-09-07. Status: product requirements baseline; S1 remains incomplete and this is not a release commitment. This document is the normative authority for product scope, actors, scenarios, REQs, and acceptance outcomes. [Project proposal](RFC-proofrail-unattended-ai-engineering-product.md) sections 1, 9, 14, and 17 retain project and decision provenance; [business workflows](BUSINESS_WORKFLOWS_EN.md) connect the end-to-end narrative; [engineering rules](CODING_CONVENTIONS_EN.md) constrain implementation. REQ IDs trace implementation, while R IDs retain proposal-decision traceability.
 
 ## 1. Research Scope and Evidence
 
@@ -10,7 +10,7 @@ Date: 2026-09-06. Status: S0 review draft, not a release commitment. Authority: 
 |---|---|---|
 | Current user confirmation | whois v3.4.0 released and frozen; SessionBridge v0.1.1 released on GitHub/Gitee/Marketplace and installed | Accepted project input; releases were not independently audited online here |
 | RFC sections 2 and 9 | Existing experience identifies runaway retries, baseline pollution, missing approvals and broken evidence chains | Experience, not external interviews or market statistics |
-| Current repository | Go 1.22 module; version command plus init/run placeholders; 11 placeholder internal directories | No execution, isolation, recovery or verification implementation |
+| Current repository | Go 1.22 module; T005–T008 implement evidence, snapshots, process/lease guards, change sets, and transactional apply; CLI remains a placeholder | No complete chain, usable CLI/TUI, or formal release package yet |
 | Adjacent SessionBridge RFC sections 4 and 7 | Reusable silent text request/receipt transport, without ProofRail task or approval semantics | Installation proves neither model availability nor file-editing tools |
 
 This is desk research and contract analysis, without paid model experiments, competitor trials or broad web research. Claims of market scarcity in the RFC are positioning hypotheses, not established competitive evidence.
@@ -32,7 +32,11 @@ Primary users are individual maintainers and small teams. The owner approves sco
 
 S0 completes specifications, schemas/goldens and spikes, then obtains S1 approval. S1 delivers Windows 11 amd64 CLI/TUI, Linux amd64 core CI, generic/C/Go harnesses, both change modes, manual-handoff, code/documentation coordination and two-generation self-hosting. S2 adds production Linux, composed languages, Web and supervised execution; S3 adds arbitrary generated scripts, more editors and inception. P is priority, S is delivery stage.
 
-This work performs inception activities for ProofRail itself; it does not implement the deferred R2 inception product. Do not modify frozen whois, released SessionBridge or Git state. No chat system, GUI injection, cloud service or database is introduced.
+This work develops ProofRail itself; it does not implement the deferred R2 inception product. Do not modify frozen whois or released SessionBridge. No chat system, GUI injection, cloud service, or database is introduced.
+
+### 2.1 Independent Product Boundary
+
+The roles, scenarios, and REQs in this document must be understandable and testable without whois knowledge. whois supplies historical problem evidence and a future shadow fixture only; its A/B, D/V, Step47, or start-file behavior is not an implicit ProofRail requirement. [Business workflows](BUSINESS_WORKFLOWS_EN.md) connect the normal, failure, recovery, handoff, delivery, and lifecycle paths. [Installation planning](INSTALLATION_PLAN_EN.md) owns unresolved distribution decisions so implementers cannot invent defaults.
 
 ## 3. User Scenarios and Testing
 
@@ -97,7 +101,7 @@ S1 succeeds only when US1-US10 (including section 8 additions) and all S1 mandat
 
 ## 7. Approved Boundaries, Open Details and Further Research
 
-On 2026-09-06, the product owner approved S0 specification freeze and ADR section 4: zero new paid S0 calls; Windows 11 amd64 production/Linux amd64 core CI; current and previous minor support with a 90-day previous-minor window; offline Ed25519 signing policy; per-dependency license review; and the principle of future redacted read-only whois shadow validation. Exact dependencies, signer/public key, EOL notice, security reviewer and concrete whois input remain later-task details. This does not authorize S1 coding, paid calls, data access or release, and does not claim S0 completion.
+On 2026-09-06, the product owner approved the S0 specification freeze and ADR section 4: zero new paid S0 calls; Windows 11 amd64 production/Linux amd64 core CI; current and previous minor support with a 90-day previous-minor window; offline Ed25519 signing policy; per-dependency license review; and future redacted read-only whois shadow validation. T005–T008 were subsequently completed under their per-turn authorization. Exact dependencies, signer/public key, EOL notice, security reviewer, and concrete whois input remain later-task details; existing implementation grants no automatic authority for paid calls, data access, or release.
 
 Future monetary authorization requires bounded worst-case reservations and prohibits automatic calls without a bound. Subscription mode requires separately approved call/token hard caps and acknowledgment that monetary bills are not guaranteed; see RFC section 19.5. Independent security review remains a blocking gate before S1.
 

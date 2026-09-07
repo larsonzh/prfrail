@@ -2,13 +2,13 @@
 
 [English](CONTRACTS_EN.md)
 
-日期：2026-09-06；S0 设计约束草案。权威：[RFC](RFC-proofrail-unattended-ai-engineering-product.md) §9-13、§16-17。本文合并 Schema、快照/证据、hook、票据/修复、adapter 五个协议包，减少重复阅读。
+日期：2026-09-07；S1 架构契约基线。本文是 wire、Schema、状态转换、事件、receipt 与跨记录不变式的规范性权威；[项目建议书](RFC-proofrail-unattended-ai-engineering-product.md) 保留来源、范围和设计理由。本文合并 Schema、快照/证据、hook、票据/修复、adapter 五个协议包，减少重复阅读。
 
 ## 1. 契约成熟度与兼容
 
-下表“必须”均来自 RFC；“待冻结”是生产实现阻断项。T002 已建立首批结构 Schema，
+下表语义由本文确立，并保留项目建议书来源追踪；“待冻结”是生产实现阻断项。T002 已建立首批结构 Schema，
 但本文不是完整 JSON Schema，也不能代替独立 validator。新增 wire 字段、枚举、canonical 算法和错误码
-必须先经 [ADR](ADR_REGISTER.md) 更新 RFC，再建立 Schema 与正反黄金样例，最后写 Go 代码。
+必须先经 [ADR](ADR_REGISTER.md) 更新本文，再建立 Schema 与正反黄金样例，最后写 Go 代码。
 
 | 契约 | 已确定的语义 | S0 待冻结产物 |
 |---|---|---|
@@ -52,6 +52,45 @@ snapshot-manifest、evidence-manifest、review-receipt、promotion-receipt、han
 expected accept/reject、拒绝层和原因。必须含三任务链、四 kind、C+Go、C+JavaScript+Python、人工交接、
 代码文档协同；每一条件至少一正一反。文档中的路径/片段是设计输入，不是已验证可运行样例。
 
+### 2.1 Chain 状态、事件与恢复（T009 权威）
+
+本节是 T009 对 chain/task/step 状态、顺序调度、事件投影和恢复行为的规范性来源。项目建议书
+§10.3、§16.9.8 保留为设计来源；两者与本节冲突时阻断实现并修订文档，不由实现者自行选择。
+
+Schema 只接受以下单步转换，未列出的转换、自转换和跨 attempt 原地重跑全部拒绝：
+
+- chain：`NONE→CREATED`；`CREATED→BASELINED|FAILED|CANCELLED`；
+	`BASELINED→RUNNING|FAILED|CANCELLED`；`RUNNING→PAUSED|COMPLETED|FAILED|CANCELLED`；
+	`PAUSED→RUNNING|FAILED|CANCELLED`。
+- task：`NONE→PENDING`；`PENDING→PRECHECK|FAILED|CANCELLED`；
+	`PRECHECK→STEPS_RUNNING|FAILED|CANCELLED`；
+	`STEPS_RUNNING→WAITING_FOR_OPERATOR|REVIEW_PENDING|FAILED|CANCELLED`；
+	`WAITING_FOR_OPERATOR→STEPS_RUNNING|FAILED|CANCELLED`；
+	`REVIEW_PENDING→PASSED|REPAIR_PENDING|FAILED|CANCELLED`；`FAILED→REPAIR_PENDING`；
+	`REPAIR_PENDING→STEPS_RUNNING|FAILED|CANCELLED`。
+- step：`NONE→PENDING`；`PENDING→RUNNING|NOOP_RECORDED|FAILED|CANCELLED`；
+	`RUNNING→WAITING_FOR_OPERATOR|PASSED|FAILED|CANCELLED`；
+	`WAITING_FOR_OPERATOR→RUNNING|FAILED|CANCELLED`。
+
+`NONE` 只用于创建事件，不是投影可停留状态。`COMPLETED`、`PASSED`、`NOOP_RECORDED` 和
+`CANCELLED` 是终态。只有 task 的 `FAILED→REPAIR_PENDING` 可离开失败态；step 修复必须增加 attempt。
+
+- 每次状态转换先持久化 append-only state event，再更新可丢弃、可重建的 projection；事件按 run 使用
+	从 1 开始的连续 sequence 和 previousEventHash 串联，并绑定 entity、前后状态、actor、证据与 reason。
+- 创建 run 的首事件只能是 chain `NONE→CREATED`。baseline-0 成功且其证据已持久化后才能追加
+	`CREATED→BASELINED`；不能从工作目录名称、文件存在或进程退出码推断状态。
+- task 按定义顺序调度。首个 task 从 baseline-0 物化；后续 task 只能从前一 task 经有效 review 和 completed
+	promotion receipt 产生的 accepted snapshot 物化，candidate、失败或不确定快照不得成为父快照。
+- 每个 task 内 step 按 sequence 执行；`noop` 只允许 `PENDING→NOOP_RECORDED` 且必须记录原因，不启动
+	agent、hook 或子进程。T009 使用 fake agent/runner，但其事件与状态规则不得形成替代协议。
+- `pause` 在当前原子边界生效，停止启动新 step；`resume` 仅从表中允许的暂停态继续。`cancel` 必须先停止
+	受管进程树并归档证据，再写 `CANCELLED`，且同一 run 不可恢复。
+- 恢复先证明旧写者失效并取得有效 fencing token，再按 journal 处理未完成写入、重放完整事件链并重建
+	projection。断尾、序号/hash/状态不连续、未知 before/after 或外部副作用不确定时保持 `PAUSED` 或
+	`REPAIR_PENDING`；禁止猜测成功、重复投递或发布候选。
+- 心跳、进度、诊断、review、handoff、takeover 和 promotion receipt 不是状态转换。Schema 判单条形状与
+	状态对；checker 判事件链连续性、当前投影、唯一 genesis、actor 权限、证据存在和调度前置条件。
+
 ## 3. 配置解析与冻结
 
 `proofrail.toml` 独占 chain/task/step、文档、策略和注册表引用；`workspace.toml` 独占位置、拓扑、平台及
@@ -62,7 +101,7 @@ step：缺失继承，scalar 替换，已知 object 递归合并，array 整体�
 
 解析完成再按 RFC 8785 JCS 计算 canonical run manifest 摘要，以 UTF-8 无 BOM 字节输入 SHA-256，
 文本表示为 `sha256:` 加 64 位小写十六进制。运行期心跳、credentials、机器探测不得回写用户配置。
-父 snapshot、hook 摘要、adapter/harness 版本和已授权策略绑定 run。变更配置只能新建 run，或走 RFC
+父 snapshot、hook 摘要、adapter/harness 版本和已授权策略绑定 run。变更配置只能新建 run，或走本文
 明确的暂停、审批和新 manifest 流程；不能覆盖旧事实。
 
 `run-manifest.schema.json` 以 `chainDefinitionHash`/`effectiveChainHash` 区分通过检查的输入定义与完全

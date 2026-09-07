@@ -5,8 +5,9 @@
 ## 定位与权威
 - 产品：ProofRail（证轨，`prfrail`）——为 AI 无人值守编程铺设**可证明轨道**：
   每个步骤可验证、可回滚、可审计，人工审批保留在关键节点。
-- **权威设计规范**：`docs/RFC-proofrail-unattended-ai-engineering-product.md`
-  （协议修订先改 RFC 再改代码）。
+- **项目建议书与历史设计来源**：`docs/RFC-proofrail-unattended-ai-engineering-product.md`；文件名为兼容保留，
+  不再是全域唯一权威。分域权威见 `docs/DOCUMENTATION_PLAN.md`：需求、流程、架构、契约、安全、验收和
+  实施分别由对应专项文档负责；协议修订先改 `docs/CONTRACTS.md` 及 Schema/样例，再改代码。
 - 工程规范：`docs/CODING_CONVENTIONS.md`（编码/行尾/Git 纪律）。
 - 姊妹仓库 `sessbridge`（同多根工作区）：ProofRail 只消费其 `silent` 消息层 + 文件队列；
   `visible` 人工交互不属于 ProofRail 正式协议。
@@ -26,7 +27,8 @@
 
 ## 工程约定
 - Go 代码 `gofmt`；`go build ./...`、`go vet ./...`、`go test ./...` 必须通过。
-- 修改任务链/门禁/证据模型等核心语义前，先读 RFC 对应章节，保持契约与命名一致。
+- 修改任务链/门禁/证据模型等核心语义前，先读 `docs/CONTRACTS.md` 对应章节；仅追溯设计理由或处理
+  尚未迁移内容时再读项目建议书。跨文档冲突必须先修订，不得自行选择。
 - `.vscode/scripts/` 在 `.gitignore` 中（不入库），改动仅限本机。
 - 临时/一次性文件放仓库根 `tmp/`（已 gitignore，仅 `tmp/.gitkeep` 保留目录）；
   **用完立即清除**，不得长期遗留。

@@ -2,7 +2,7 @@
 
 [English](SECURITY_EN.md)
 
-日期：2026-09-06；S0 评审稿，未完成独立安全签署。权威：[RFC](RFC-proofrail-unattended-ai-engineering-product.md) §12、§16.7-16.8。需求 REQ-004/005/007/013/019/021-026/028。
+日期：2026-09-07；安全设计基线，未完成独立安全签署。本文是权限、威胁模型与硬安全门禁的规范性权威；[项目建议书](RFC-proofrail-unattended-ai-engineering-product.md) §12、§16.7-16.8 保留风险与设计来源。需求 REQ-004/005/007/013/019/021-026/028。
 
 ## 1. 资产与信任边界
 

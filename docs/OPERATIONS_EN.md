@@ -2,7 +2,7 @@
 
 [简体中文](OPERATIONS.md)
 
-Date: 2026-09-06; S0 operational design. No production ProofRail package exists; CLI has version and init/run placeholders. Except for the next section, commands are planned RFC interfaces, not available features.
+Date: 2026-09-07; S1 operational design. No production ProofRail package exists; the CLI has version and init/run placeholders, and T005–T008 internal capabilities are not yet assembled into a user flow. Except for the next section, commands are planned RFC interfaces, not available features. See the [installation plan](INSTALLATION_PLAN_EN.md) for unresolved distribution choices and [business workflows](BUSINESS_WORKFLOWS_EN.md) for the complete user flow.
 
 ## 1. Available Today
 
@@ -16,7 +16,7 @@ go test ./...
 go run ./cmd/prfrail version
 ```
 
-There are no product tests; no test files is not coverage. Placeholder output/exit codes do not prove task completion. gopls is a development tool, not a core runtime dependency. System/Git proxies do not automatically configure Go downloads; use process HTTP_PROXY/HTTPS_PROXY when needed and restore them afterward, without arbitrary global GOPROXY changes or disabled verification.
+Core packages now have automated tests, but there is no usable-CLI product E2E yet. Placeholder output/exit codes do not prove task completion. gopls is a development tool, not a core runtime dependency. System/Git proxies do not automatically configure Go downloads; use process HTTP_PROXY/HTTPS_PROXY when needed and restore them afterward, without arbitrary global GOPROXY changes or disabled verification.
 
 ## 2. Installation and First Run Design
 

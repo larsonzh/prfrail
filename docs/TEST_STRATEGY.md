@@ -2,11 +2,11 @@
 
 [English](TEST_STRATEGY_EN.md)
 
-日期：2026-09-06；方案，非测试通过报告。依据：[需求](PRODUCT_REQUIREMENTS.md)、[契约](CONTRACTS.md)、[安全](SECURITY.md)及 RFC §14、§17。
+日期：2026-09-07；测试与验收基线，非测试通过报告。本文是 AT、测试分层、平台和故障注入验收规则的规范性权威。输入：[需求](PRODUCT_REQUIREMENTS.md)、[契约](CONTRACTS.md)、[安全](SECURITY.md)；[项目建议书](RFC-proofrail-unattended-ai-engineering-product.md) §14、§17 保留阶段验收来源。
 
 ## 1. 基线与分层
 
-应用类型：本地 CLI/TUI + 文件/进程编排。既有测试资产：无 `_test.go`、无 E2E，不能把 `go test` 的 no test files 当作覆盖率。规范入口为 `go test ./...`，新 Go 测试必须由该入口发现；构建/静态门禁另跑 `go build ./...`、`go vet ./...`。本轮安装的 Go 为 1.27.0；模块声明 1.22，兼容性仍须用声明的最低工具链另验。
+应用类型：本地 CLI/TUI + 文件/进程编排。T005–T008 已有核心包 `_test.go`，但尚无可用 CLI 的产品 E2E；不能把包测试替代产品验收。规范入口为 `go test ./...`，新 Go 测试必须由该入口发现；构建/静态门禁另跑 `go build ./...`、`go vet ./...`。本轮安装的 Go 为 1.27.0；模块声明 1.22，兼容性仍须用声明的最低工具链另验。
 
 | 层级 | 工具/数据 | 证明内容 | 执行时机 |
 |---|---|---|---|

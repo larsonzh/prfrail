@@ -22,7 +22,7 @@ Module github.com/larsonzh/prfrail, Go 1.22+. Use gofmt and Go naming convention
 
 ## 3. Documentation and Protocol
 
-The authoritative design is [RFC](RFC-proofrail-unattended-ai-engineering-product.md); revise it before protocol implementation. ProofRail consumes SessionBridge silent plus file queue only. visible is SessionBridge product functionality, not ProofRail's formal protocol.
+The [project proposal and historical design source](RFC-proofrail-unattended-ai-engineering-product.md) retains its filename for compatibility but is no longer the sole authority. Follow the domain authority matrix in [DOCUMENTATION_PLAN_EN.md](DOCUMENTATION_PLAN_EN.md). Revise [CONTRACTS_EN.md](CONTRACTS_EN.md) plus schemas/examples before protocol implementation. ProofRail consumes SessionBridge silent plus file queue only. visible is SessionBridge product functionality, not ProofRail's formal protocol.
 
 ## 4. Git Discipline
 
@@ -34,7 +34,7 @@ Use root tmp/ for one-off build/test/debug artifacts; only tmp/.gitkeep is track
 
 ## 6. Implementation and Review
 
-- Freeze behavior from RFC/contracts, then table-driven negative tests and minimal implementation. Do not implement unapproved defaults, permissions or wire fields.
+- Freeze behavior from the applicable domain authority, then table-driven negative tests and minimal implementation. Do not implement unapproved defaults, permissions or wire fields.
 - Consumers own interfaces; CLI composes, core never imports concrete adapters/console. Abstract real test/substitution boundaries only, not empty module scaffolds.
 - Propagate cancellation/deadlines with context.Context. Processes/goroutines have explicit stop/join paths. Inject clock/process/filesystem faults; never guess completion with sleep.
 - Preserve error causes/object identity; wrap and use errors.Is/As, not string matching for state control. Never swallow write/close/flush/rollback errors.
@@ -52,6 +52,6 @@ Report scope, actual commands/exits/counts, gaps and next action. Escalate two s
 
 ## 8. Bilingual Contributions
 
-Update specifications before tests/examples/usage. Chinese retains original filenames, English uses _EN with reciprocal links and identical REQ/AT/T/ADR identifiers in one review. The current Chinese RFC remains authoritative; translation cannot alter state machines or fields.
+Update the applicable domain specification before tests/examples/usage. Chinese retains original filenames, English uses _EN with reciprocal links and identical REQ/AT/T/ADR identifiers in one review. Resolve and block conflicts through the authority matrix in DOCUMENTATION_PLAN_EN.md; translations cannot alter state machines or fields.
 
 Review submissions include requirement/task IDs, minimal behavior differences, test evidence, compatibility and documentation impact. Security/protocol changes need independent review; the owner approves stages/budgets. Document creation or plan coverage does not imply S0 readiness.

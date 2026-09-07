@@ -2,7 +2,7 @@
 
 [English](OPERATIONS_EN.md)
 
-日期：2026-09-06；S0 操作设计稿。当前没有 ProofRail 正式安装包，CLI 只有 version 和 init/run 占位。除以下“当前可执行”外，所有产品命令均是 RFC 规划接口，不得用作现有功能说明。
+日期：2026-09-07；S1 操作设计稿。当前没有 ProofRail 正式安装包，CLI 只有 version 和 init/run 占位；T005–T008 的内部能力尚未装配为用户流程。除以下“当前可执行”外，所有产品命令均是 RFC 规划接口，不得用作现有功能说明。待决发行方案见 [安装部署规划](INSTALLATION_PLAN.md)，完整用户流程见 [业务流程](BUSINESS_WORKFLOWS.md)。
 
 ## 1. 当前可执行
 
@@ -16,7 +16,7 @@ go test ./...
 go run ./cmd/prfrail version
 ```
 
-目前无产品测试，no test files 只证明没有测试；init/run 的提示与退出码不代表完成任务。开发环境 gopls 与核心运行无关。系统/Git 代理不保证 Go 使用代理；安装 Go 工具需要进程 HTTP_PROXY/HTTPS_PROXY，使用后恢复原环境，不随意全局改 GOPROXY 或关闭校验。
+核心包已有自动化测试，但尚无可用 CLI 的产品 E2E；init/run 的提示与退出码不代表完成任务。开发环境 gopls 与核心运行无关。系统/Git 代理不保证 Go 使用代理；安装 Go 工具需要进程 HTTP_PROXY/HTTPS_PROXY，使用后恢复原环境，不随意全局改 GOPROXY 或关闭校验。
 
 ## 2. 安装与首次使用设计
 

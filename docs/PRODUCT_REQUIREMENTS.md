@@ -2,7 +2,7 @@
 
 [English](PRODUCT_REQUIREMENTS_EN.md)
 
-日期：2026-09-06。状态：S0 评审稿，非发布承诺。权威：[RFC](RFC-proofrail-unattended-ai-engineering-product.md) §1、§9、§14、§17；工程纪律：[CODING_CONVENTIONS.md](CODING_CONVENTIONS.md)。REQ 编号用于实施追踪，不替换 RFC 的 R 编号。
+日期：2026-09-07。状态：产品需求基线，S1 尚未完成，非发布承诺。本文是产品范围、角色、场景、REQ 与验收目标的规范性权威；[项目建议书](RFC-proofrail-unattended-ai-engineering-product.md) §1、§9、§14、§17 保留立项与决策来源，[业务流程](BUSINESS_WORKFLOWS.md) 串联端到端叙事，[工程规范](CODING_CONVENTIONS.md) 约束实施。REQ 编号用于实施追踪；R 编号保留建议书决策追踪。
 
 ## 1. 调研范围与事实基线
 
@@ -10,7 +10,7 @@
 |---|---|---|
 | 用户本轮确认 | whois v3.4.0 正式发布封板；SessionBridge v0.1.1 已在 GitHub/Gitee/Marketplace 发布并安装 | 作为项目输入采信；本轮未重新联网审计发布物 |
 | RFC §2、§9 | whois 实践提出失控重试、基线污染、人工审批缺位和证据断链问题 | 是既有经验，不是外部用户访谈或市场统计 |
-| 当前仓库 | Go 1.22 模块；CLI 仅 version 和 init/run 占位；11 个 internal 目录仅占位 | 不具备任务执行、安全隔离、恢复或验证功能 |
+| 当前仓库 | Go 1.22 模块；T005–T008 已实现证据、快照、进程/租约守卫、变更集与事务应用；CLI 仍为占位 | 尚无完整任务链、可用 CLI/TUI 或正式发行包 |
 | 相邻 SessionBridge RFC §4、§7 | 可复用 silent 文本请求/回执；不提供 ProofRail 任务与审批语义 | 安装扩展不等于模型可用，更不等于代理有文件编辑工具 |
 
 本次采用桌面需求分析和契约核对，不开展付费模型实验、竞品试用或批量联网调研。RFC 关于市场稀缺性的陈述仅作为定位假设，不能作为已证明的竞争优势。
@@ -34,7 +34,11 @@ H3：与模型解耦降低接入成本。以无 AI 文件队列和 SessionBridge
 
 S0 完成规范、Schema/黄金样例和技术探针，再由用户批准 S1。S1 是 Windows 11 amd64 正式 CLI/TUI、Linux amd64 核心 CI，含 generic/C/Go、两种变更模式、manual-handoff、代码文档协同和两代自托管。S2 正式 Linux、多语言组合、Web、supervised；S3 任意生成脚本、多编辑器、inception。P 表示重要性，S 表示阶段，两者不可混用。
 
-本轮是为 ProofRail 本身开展前期工程，不是在产品中实现 RFC R2 暂缓的 inception 功能。不改 whois 封板内容，不修改已发布 SessionBridge，不执行 Git 写入，不引入聊天系统、GUI 注入、云服务或数据库。
+本轮是为 ProofRail 本身开展产品与工程建设，不是在产品中实现 RFC R2 暂缓的 inception 功能。不改 whois 封板内容，不修改已发布 SessionBridge，不引入聊天系统、GUI 注入、云服务或数据库。
+
+### 2.1 独立产品边界
+
+本文件中的角色、场景和 REQ 必须不依赖 whois 背景即可理解和验收。whois 只提供历史问题证据与未来影子夹具；其 A/B、D/V、Step47 或 start-file 行为不构成 ProofRail 隐含需求。正常流、失败流、恢复、人工交接、交付和生命周期统一由 [业务流程](BUSINESS_WORKFLOWS.md) 串联；安装发行的未知项由 [安装部署规划](INSTALLATION_PLAN.md) 管理，不允许实现者自行选择默认值。
 
 ## 3. 用户场景与验收
 
@@ -99,7 +103,7 @@ S1 成功标准：US1-US10（含 §8 新增场景）和全部 S1 强制反例通
 
 ## 7. 已批准边界、待落实事项与后续调研
 
-2026-09-06，产品所有者批准 S0 规格冻结及 ADR §4：S0 新增付费调用为 0，Windows 11 amd64 正式/Linux amd64 核心 CI，当前与前一 minor（前一 minor 90 天），离线 Ed25519 签名策略，逐依赖许可审计，以及未来 whois 脱敏只读影子验证原则。精确依赖、签名主体/公钥、EOL 通知、安全评审者和具体 whois 输入仍待后续任务落实；本次不授权 S1 编码、付费调用、数据访问或发布，也不宣称 S0 完成。
+2026-09-06，产品所有者批准 S0 规格冻结及 ADR §4：S0 新增付费调用为 0，Windows 11 amd64 正式/Linux amd64 核心 CI，当前与前一 minor（前一 minor 90 天），离线 Ed25519 签名策略，逐依赖许可审计，以及未来 whois 脱敏只读影子验证原则。此后 T005–T008 已按各轮授权完成；精确依赖、签名主体/公钥、EOL 通知、安全评审者和具体 whois 输入仍待后续任务落实，不因已有实现而自动取得付费调用、数据访问或发布授权。
 
 后续若改为按金额授权，须以可界定最坏费用预留，无法界定则禁止自动调用；订阅模式只有在用户另行批准调用/token 硬上限并确认货币账单不可保证时才允许，详见 RFC §19.5。独立安全评审结论仍是进入 S1 前的阻断门禁。
 

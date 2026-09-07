@@ -2,11 +2,11 @@
 
 [简体中文](TEST_STRATEGY.md)
 
-Date: 2026-09-06; a plan, not a passing test report. Inputs: [requirements](PRODUCT_REQUIREMENTS_EN.md), [contracts](CONTRACTS_EN.md), [security](SECURITY_EN.md), RFC sections 14 and 17.
+Date: 2026-09-07; test and acceptance baseline, not a passing test report. This document is the normative authority for ATs, test tiers, platforms, and fault-injection acceptance rules. Inputs: [requirements](PRODUCT_REQUIREMENTS_EN.md), [contracts](CONTRACTS_EN.md), and [security](SECURITY_EN.md). [Project proposal](RFC-proofrail-unattended-ai-engineering-product.md) sections 14 and 17 retain stage-acceptance provenance.
 
 ## 1. Baseline and Tiers
 
-Application: local CLI/TUI with file/process orchestration. Existing test assets: no _test.go or E2E tests; no test files is not coverage. Canonical test entry is go test ./...; new Go tests must be discoverable there. Build/static gates are go build ./... and go vet ./.... Observed Go is 1.27.0; the module declares 1.22, which still needs separate minimum-toolchain verification.
+Application: local CLI/TUI with file/process orchestration. T005–T008 now have core-package _test.go coverage, but no usable-CLI product E2E exists; package tests do not replace product acceptance. Canonical test entry is go test ./...; new Go tests must be discoverable there. Build/static gates are go build ./... and go vet ./.... Observed Go is 1.27.0; the module declares 1.22, which still needs separate minimum-toolchain verification.
 
 | Tier | Tools/data | Evidence | When |
 |---|---|---|---|

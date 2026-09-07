@@ -2,7 +2,7 @@
 
 [简体中文](SECURITY.md)
 
-Date: 2026-09-06; S0 review draft, without independent security sign-off. Authority: [RFC](RFC-proofrail-unattended-ai-engineering-product.md) sections 12 and 16.7-16.8. Requirements: REQ-004/005/007/013/019/021-026/028.
+Date: 2026-09-07; security-design baseline without independent security sign-off. This document is the normative authority for permissions, threat modeling, and hard security gates. [Project proposal](RFC-proofrail-unattended-ai-engineering-product.md) sections 12 and 16.7-16.8 retain risk and design provenance. Requirements: REQ-004/005/007/013/019/021-026/028.
 
 ## 1. Assets and Trust
 

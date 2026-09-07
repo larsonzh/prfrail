@@ -2,11 +2,11 @@
 
 [简体中文](CONTRACTS.md)
 
-Date: 2026-09-06; S0 design-constraint draft. Authority: [RFC](RFC-proofrail-unattended-ai-engineering-product.md) sections 9-13 and 16-17. This document combines schema, snapshot/evidence, hooks, tickets/repair and adapters to reduce repeated reading.
+Date: 2026-09-07; S1 architecture-contract baseline. This document is the normative authority for wire formats, schemas, state transitions, events, receipts, and cross-record invariants. The [project proposal](RFC-proofrail-unattended-ai-engineering-product.md) retains provenance, scope, and design rationale. This document combines schema, snapshot/evidence, hooks, tickets/repair, and adapters to reduce repeated reading.
 
 ## 1. Maturity and Compatibility
 
-Requirements below come from the RFC; pending decisions block production implementation. T002 now provides the first structural Schemas, but this document is not a complete JSON Schema or a substitute for an independent validator. New wire fields/enums, canonical algorithms and error codes require an [ADR](ADR_REGISTER_EN.md), RFC revision, schemas and positive/negative goldens before Go implementation.
+This document establishes the semantics below while retaining project-proposal provenance; pending decisions block production implementation. T002 now provides the first structural schemas, but this document is not a complete JSON Schema or a substitute for an independent validator. New wire fields/enums, canonical algorithms, and error codes require an [ADR](ADR_REGISTER_EN.md), a revision here, schemas, and positive/negative goldens before Go implementation.
 
 | Contract | Established semantics | Pending S0 artifact |
 |---|---|---|
@@ -50,6 +50,35 @@ fixture records ID, contract version, expected accept/reject, rejection layer an
 C+Go, C+JavaScript+Python, handoff and code/docs collaboration; at least one positive and negative per condition.
 Documentation paths/snippets are design inputs, not verified executable fixtures.
 
+### 2.1 Chain State, Events, and Recovery (T009 Authority)
+
+This section is the normative source for T009 chain/task/step states, ordered scheduling, event projections, and recovery behavior. Project proposal sections 10.3 and 16.9.8 remain design sources. Any conflict blocks implementation and requires a documentation correction; implementers must not choose between them.
+
+Schemas accept only the following single-step transitions. Unlisted transitions, self-transitions, and in-place retries across attempts are rejected:
+
+- chain: `NONE→CREATED`; `CREATED→BASELINED|FAILED|CANCELLED`;
+	`BASELINED→RUNNING|FAILED|CANCELLED`; `RUNNING→PAUSED|COMPLETED|FAILED|CANCELLED`;
+	`PAUSED→RUNNING|FAILED|CANCELLED`.
+- task: `NONE→PENDING`; `PENDING→PRECHECK|FAILED|CANCELLED`;
+	`PRECHECK→STEPS_RUNNING|FAILED|CANCELLED`;
+	`STEPS_RUNNING→WAITING_FOR_OPERATOR|REVIEW_PENDING|FAILED|CANCELLED`;
+	`WAITING_FOR_OPERATOR→STEPS_RUNNING|FAILED|CANCELLED`;
+	`REVIEW_PENDING→PASSED|REPAIR_PENDING|FAILED|CANCELLED`; `FAILED→REPAIR_PENDING`;
+	`REPAIR_PENDING→STEPS_RUNNING|FAILED|CANCELLED`.
+- step: `NONE→PENDING`; `PENDING→RUNNING|NOOP_RECORDED|FAILED|CANCELLED`;
+	`RUNNING→WAITING_FOR_OPERATOR|PASSED|FAILED|CANCELLED`;
+	`WAITING_FOR_OPERATOR→RUNNING|FAILED|CANCELLED`.
+
+`NONE` is a creation-event sentinel, never a stable projection state. `COMPLETED`, `PASSED`, `NOOP_RECORDED`, and `CANCELLED` are terminal. Only task `FAILED→REPAIR_PENDING` can leave a failed state; repairing a step increments its attempt.
+
+- Persist each append-only state event before updating its disposable, rebuildable projection. Events use a contiguous per-run sequence starting at 1 and previousEventHash linkage, and bind entity, before/after state, actor, evidence, and reason.
+- The first run event is chain `NONE→CREATED`. Append `CREATED→BASELINED` only after baseline-0 and its evidence are durable. Directory names, file presence, and process exit codes never imply state.
+- Schedule tasks in definition order. Materialize the first task from baseline-0. Materialize each later task only from the previous task's accepted snapshot backed by a valid review and completed promotion receipt. Candidate, failed, or uncertain snapshots cannot parent later tasks.
+- Execute task steps by sequence. A `noop` only performs `PENDING→NOOP_RECORDED`, records a reason, and starts no agent, hook, or child process. T009 uses fake agents/runners without creating an alternate event or state protocol.
+- `pause` takes effect at the current atomic boundary and starts no new step. `resume` continues only from a listed paused state. `cancel` stops the managed process tree and archives evidence before recording `CANCELLED`; the same run cannot resume.
+- Recovery first proves the old writer inactive and acquires a valid fencing token, then resolves incomplete writes from journals, replays the complete event chain, and rebuilds projections. Torn tails, sequence/hash/state discontinuity, unknown before/after content, or uncertain external effects remain `PAUSED` or `REPAIR_PENDING`; never guess success, redispatch, or publish a candidate.
+- Heartbeats, progress, diagnostics, review, handoff, takeover, and promotion receipts are not state transitions. Schema validates one record's shape and state pair; the checker validates chain continuity, current projection, unique genesis, actor authority, evidence existence, and scheduling preconditions.
+
 ## 3. Configuration Resolution
 
 `proofrail.toml` exclusively owns chain/task/step, documentation, policy and registry references; `workspace.toml` owns
@@ -59,7 +88,7 @@ replace wholesale, never concatenate. Empty arrays mean explicitly none only whe
 unset and null deletion is unsupported. Every effective leaf has exactly one run-manifest pointer origin. `config explain`
 is read-only, showing values/redacted references and override chains without execution or writeback.
 
-After resolution, apply RFC 8785 JCS and hash the UTF-8 no-BOM bytes with SHA-256; represent the digest as `sha256:` plus 64 lowercase hexadecimal digits. Heartbeats, credentials and machine probes never rewrite user config. Bind parent snapshot, hook digests, adapter/harness versions and authorized policy. Changes require a new run or the RFC's pause/approval/new-manifest flow, never overwriting historical facts.
+After resolution, apply RFC 8785 JCS and hash the UTF-8 no-BOM bytes with SHA-256; represent the digest as `sha256:` plus 64 lowercase hexadecimal digits. Heartbeats, credentials and machine probes never rewrite user config. Bind parent snapshot, hook digests, adapter/harness versions and authorized policy. Changes require a new run or this document's pause/approval/new-manifest flow, never overwriting historical facts.
 
 `run-manifest.schema.json` separates the validated input definition from the fully default-expanded chain through
 `chainDefinitionHash` and `effectiveChainHash`. `resolution` uses RFC 6901 pointers to attribute every final leaf to a

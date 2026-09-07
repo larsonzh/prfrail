@@ -52,11 +52,19 @@ T005 status: `COMPLETE`. This covers only the evidence-layer subset of AT-04. Jo
 
 T006 status: `COMPLETE`. Full AT-02 acceptance passed; Git-free restore and immutable snapshot baseline are closed; workspace write transactions and crash rollback points belong to T008.
 
+### DG-01 Independent Product Documentation Gate
+
+- [x] DG-01 Establish the independent ProofRail product boundary; add `BUSINESS_WORKFLOWS*.md` and `INSTALLATION_PLAN*.md`; synchronize the RFC, requirements, index, README, and operations docs. Completed 2026-09-07. Artifact, location, signer, and upgrade choices remain open; no fictional installation instructions are introduced. Stable T IDs remain unchanged; DG-01 gates T009 without consuming an implementation task number.
+
+### DG-02 Domain Authority Migration Gate
+
+- [x] DG-02 Reclassify the former RFC as the project proposal and historical design source; establish the domain authority matrix in `DOCUMENTATION_PLAN*.md`; and migrate the chain/task/step transitions, event projection, ordered scheduling, pause/cancel, and crash recovery required by T009 into `CONTRACTS*.md` section 2.1. Completed 2026-09-07. Old sections remain for provenance; conflicts block implementation and require correction rather than implementer choice.
+
 ### P1.2 Writes and Ordered Loop (REQ-002/003/004/012/018/023/024/026)
 
 - [x] T007 [Plan:P1.2] Implement internal/guard/{process,lease}.go, platform files/tests for tree termination, takeover and leases. Depends: T005/T004. Accept: AT-03/06. Exclude: killing user processes or PID/expiry-only takeover. Validation: [中文](validation/t007-process-lease.md) / [English](validation/t007-process-lease_EN.md).
 - [x] T008 [Plan:P1.2] Implement internal/taskdef/checker.go and internal/applier/{apply,journal,recover}.go/tests: sequential memory validation, transaction and rollback. Depends: T005/T006/T007. Accept: AT-04 at every crash point. Exclude: validate-while-writing or omitted assertions. Validation: [中文](validation/t008-applier.md) / [English](validation/t008-applier_EN.md).
-- [ ] T009 [Plan:P1.2] Implement internal/chain/{engine,state,recover}.go/tests: three tasks, four kinds, both change modes, projection/pause/cancel, initially fake agent/runner. Depends: T008. Accept: AT-03. Exclude: candidates as downstream parents.
+- [ ] T009 [Plan:P1.2] Implement internal/chain/{engine,state,recover}.go/tests: three tasks, four kinds, both change modes, projection/pause/cancel, initially fake agent/runner. Depends: T008, DG-01, and DG-02. Accept: AT-03. Exclude: candidates as downstream parents. Fixed at 14 slices: models/ports, transition table, illegal transitions, events, projection, baseline initialization, ordered scheduling, four kinds, managed-change-set, isolated-workspace, pause/resume, cancel/stop, crash replay, and dual-platform AT-03.
 - [ ] T010 [Plan:P1.2] Implement internal/gates/{runner,policy,result}.go/tests and wire chain. Depends: T007/T009. Accept: AT-06. Exclude: weakening unavailable network/resource enforcement.
 
 ### P1.3 Independent Acceptance and Bounded Repair (REQ-005/014/022/023/024/025/026)

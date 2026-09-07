@@ -2,11 +2,11 @@
 
 [简体中文](ARCHITECTURE.md)
 
-Date: 2026-09-06; S0 review draft. Authority: [RFC](RFC-proofrail-unattended-ai-engineering-product.md) sections 10-13 and 16. Input: [requirements](PRODUCT_REQUIREMENTS_EN.md). This is a target architecture, not implemented capability.
+Date: 2026-09-07; S1 architecture baseline. This document is the normative authority for module boundaries, dependency direction, data flow, and deployment topology. [Project proposal](RFC-proofrail-unattended-ai-engineering-product.md) sections 10-13 and 16 retain design provenance. Inputs: [requirements](PRODUCT_REQUIREMENTS_EN.md) and [business workflows](BUSINESS_WORKFLOWS_EN.md). This document distinguishes implemented modules from target architecture; uncompleted capabilities are not available.
 
 ## 1. Current State and Target
 
-Only the [Go module](../go.mod) and [CLI stub](../cmd/prfrail/main.go) exist. init/run print unimplemented messages; their successful exits are not acceptance. No third-party dependencies, core tests or product CI exist. The 11 internal directories are responsibility boundaries, not a reason to generate empty interfaces together.
+T005–T008 currently implement evidence, snapshots, guards, the taskdef change-set checker, and applier transactions with core tests. The Chain Engine, gate runner, adapters, usable CLI/TUI, and product CI remain incomplete. init/run still print unimplemented messages and their successful exits are not acceptance. Internal modules remain responsibility boundaries and must not be populated with speculative interfaces merely because they appear in the target architecture.
 
 Use a local single-user, single-writer Go modular monolith. Persist facts as content objects, append-only events and journals. S1 adds no service cluster, database, remote object store or message broker. Prefer Go calls with context.Context internally and versioned protocols across processes.
 

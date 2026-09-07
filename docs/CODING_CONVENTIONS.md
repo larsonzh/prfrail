@@ -42,8 +42,8 @@
 
 ## 3. 文档与协议
 
-- 权威设计规范：`docs/RFC-proofrail-unattended-ai-engineering-product.md`；
-  协议修订走 RFC 流程，先改 RFC 再改代码。
+- 项目建议书与历史设计来源：`docs/RFC-proofrail-unattended-ai-engineering-product.md`；
+  分域权威见 `docs/DOCUMENTATION_PLAN.md`。协议修订先改 `docs/CONTRACTS.md` 及 Schema/样例，再改代码。
 - 与 `sessbridge`（姊妹仓库，同工作区）边界：ProofRail 正式协议只消费
   SessionBridge `silent` 消息层 + 文件队列；`visible` 人工交互属于 SessionBridge 产品能力，
   不进入 ProofRail 正式协议。
@@ -65,7 +65,7 @@
 
 ## 6. Go 实现与审查规则
 
-- 先依据 RFC/契约固定行为，再写 table-driven 反例测试与最小实现。不得实现待批准的默认值、权限或 wire 字段。
+- 先依据分域权威文档固定行为，再写 table-driven 反例测试与最小实现。不得实现待批准的默认值、权限或 wire 字段。
 - 接口由消费者定义；CLI 负责装配，核心不得反向依赖具体 adapter/console。仅为真实测试/替换边界抽象，避免一次生成全套空接口。
 - 使用 `context.Context` 传播取消/期限；子进程与 goroutine 有明确停止和回收路径。时钟、进程、文件故障注入可替换，不能用 sleep 猜测完成。
 - 错误保留原因和对象身份，使用包装及 errors.Is/As 判定，不以字符串匹配控制状态；禁止吞掉写入/关闭/flush/rollback 错误。
@@ -83,6 +83,6 @@
 
 ## 8. 双语与贡献流程
 
-文档先改规范，再测试/示例和用法。中文保持原名，英文 `_EN`，互链；REQ/AT/T/ADR 等编号相同、同次评审。当前中文 RFC 保持唯一权威，不因翻译改变状态机或字段。
+文档先改对应分域规范，再同步测试/示例和用法。中文保持原名，英文 `_EN`，互链；REQ/AT/T/ADR 等编号相同、同次评审。冲突按 `DOCUMENTATION_PLAN.md` 的权威矩阵定位并阻断，不因翻译改变状态机或字段。
 
 提交评审材料包括需求/任务 ID、最小行为差异、测试证据、协议兼容和文档影响。安全/协议变更需独立评审，所有者批准阶段与资源预算。不得把文档创建或计划覆盖率当 S0 readiness 通过。
