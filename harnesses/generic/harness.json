@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "1.0.0",
+  "harnesses": [
+    {
+      "id": "generic-standard",
+      "version": "1.0.0",
+      "languages": ["generic"],
+      "toolchains": ["shell-basic"],
+      "parameters": [
+        {
+          "id": "generated-hook-template",
+          "type": "string",
+          "required": true,
+          "default": "template-a@1.0.0"
+        },
+        {
+          "id": "allow-generated-hooks",
+          "type": "boolean",
+          "required": false,
+          "default": false
+        },
+        {
+          "id": "working-directory",
+          "type": "string",
+          "required": false,
+          "default": "."
+        }
+      ],
+      "hooks": [
+        {
+          "phase": "build",
+          "hookId": "generic-build",
+          "required": false
+        },
+        {
+          "phase": "test",
+          "hookId": "generic-test",
+          "required": false
+        },
+        {
+          "phase": "verify",
+          "hookId": "generic-verify",
+          "required": true
+        }
+      ],
+      "artifactGlobs": [
+        "artifacts/**"
+      ]
+    }
+  ]
+}

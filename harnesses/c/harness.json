@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "1.0.0",
+  "harnesses": [
+    {
+      "id": "c-standard",
+      "version": "1.0.0",
+      "languages": ["c"],
+      "toolchains": ["gcc-posix"],
+      "parameters": [
+        {
+          "id": "generated-hook-template",
+          "type": "string",
+          "required": true,
+          "default": "template-a@1.0.0"
+        },
+        {
+          "id": "allow-generated-hooks",
+          "type": "boolean",
+          "required": false,
+          "default": false
+        },
+        {
+          "id": "build-target",
+          "type": "string",
+          "required": false,
+          "default": "all"
+        }
+      ],
+      "hooks": [
+        {
+          "phase": "build",
+          "hookId": "c-build",
+          "required": true
+        },
+        {
+          "phase": "test",
+          "hookId": "c-test",
+          "required": true
+        },
+        {
+          "phase": "verify",
+          "hookId": "c-verify",
+          "required": true
+        }
+      ],
+      "artifactGlobs": [
+        "build/**/*.o",
+        "build/**/*.a",
+        "build/**/*.so",
+        "build/**/*.exe"
+      ]
+    }
+  ]
+}

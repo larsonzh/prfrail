@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "1.0.0",
+  "harnesses": [
+    {
+      "id": "go-standard",
+      "version": "1.0.0",
+      "languages": ["go"],
+      "toolchains": ["go-122"],
+      "parameters": [
+        {
+          "id": "generated-hook-template",
+          "type": "string",
+          "required": true,
+          "default": "template-a@1.0.0"
+        },
+        {
+          "id": "allow-generated-hooks",
+          "type": "boolean",
+          "required": false,
+          "default": false
+        },
+        {
+          "id": "race-enabled",
+          "type": "boolean",
+          "required": false,
+          "default": true
+        }
+      ],
+      "hooks": [
+        {
+          "phase": "format",
+          "hookId": "go-fmt",
+          "required": true
+        },
+        {
+          "phase": "build",
+          "hookId": "go-build",
+          "required": true
+        },
+        {
+          "phase": "test",
+          "hookId": "go-test",
+          "required": true
+        },
+        {
+          "phase": "verify",
+          "hookId": "go-verify",
+          "required": true
+        }
+      ],
+      "artifactGlobs": [
+        "bin/**",
+        "coverage/**"
+      ]
+    }
+  ]
+}
