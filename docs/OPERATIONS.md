@@ -2,7 +2,7 @@
 
 [English](OPERATIONS_EN.md)
 
-日期：2026-09-07；S1 操作设计稿。当前没有 ProofRail 正式安装包，CLI 只有 version 和 init/run 占位；T005–T008 的内部能力尚未装配为用户流程。除以下“当前可执行”外，所有产品命令均是 RFC 规划接口，不得用作现有功能说明。待决发行方案见 [安装部署规划](INSTALLATION_PLAN.md)，完整用户流程见 [业务流程](BUSINESS_WORKFLOWS.md)。
+日期：2026-09-08；S1 操作设计稿。当前没有 ProofRail 正式安装包；但 T016 已交付无 IDE CLI 基线：`version/init/validate/config explain/run/report`。`run` 目前只支持 noop-only 任务链，遇到 `code/build/verify` 会 fail-close 并返回非零退出码。除以下“当前可执行”外，其余产品能力仍是 RFC 规划接口。待决发行方案见 [安装部署规划](INSTALLATION_PLAN.md)，完整用户流程见 [业务流程](BUSINESS_WORKFLOWS.md)。
 
 ## 1. 当前可执行
 
@@ -14,17 +14,22 @@ go build ./...
 go vet ./...
 go test ./...
 go run ./cmd/prfrail version
+go run ./cmd/prfrail init --workspace .
+go run ./cmd/prfrail validate --chain .\proofrail.chain.json
+go run ./cmd/prfrail config explain --chain .\proofrail.chain.json
+go run ./cmd/prfrail run --chain .\proofrail.chain.json --run-id run-demo
+go run ./cmd/prfrail report --run-dir .\tmp\prfrail-runs\run-demo
 ```
 
-核心包已有自动化测试，但尚无可用 CLI 的产品 E2E；init/run 的提示与退出码不代表完成任务。开发环境 gopls 与核心运行无关。系统/Git 代理不保证 Go 使用代理；安装 Go 工具需要进程 HTTP_PROXY/HTTPS_PROXY，使用后恢复原环境，不随意全局改 GOPROXY 或关闭校验。
+核心包已有自动化测试，但完整产品 E2E/TUI 仍在后续切片。当前 CLI 输出默认无 ANSI 颜色并支持 `--json`；开发环境 gopls 与核心运行无关。系统/Git 代理不保证 Go 使用代理；安装 Go 工具需要进程 HTTP_PROXY/HTTPS_PROXY，使用后恢复原环境，不随意全局改 GOPROXY 或关闭校验。
 
 ## 2. 安装与首次使用设计
 
 未来安装顺序：选择 Windows amd64 对应发行包→验证签名和校验和→解压到独立目录→验证 version→静态预览→单独授权能力探测。Linux 在 S1 仅核心 CI/预览，不宣传正式支持。未知签名或平台不匹配不得执行。升级前备份对象、事件和状态引用的完整闭包并只读核验历史 run；不覆盖运行中的 host。
 
-规划流程为 `prfrail init <workspace>`、`prfrail validate`、`prfrail baseline snapshot`、`prfrail run <chain-file>`、`prfrail report <run-dir>`。具体 flags/退出码由 T002 冻结、T016 实现后才成为可复制教程。没有 AI 时先使用文件队列 fixture consumer 完成闭环；VS Code 不是必需依赖。
+当前可复制流程为 `prfrail init --workspace <path>`、`prfrail validate --chain <chain-file>`、`prfrail config explain --chain <chain-file>`、`prfrail run --chain <chain-file> [--run-id] [--run-dir]`、`prfrail report --run-dir <run-dir>`。`run` 当前仅支持 noop-only 链；执行型 step 的真实 gate/adapter 闭环仍在后续切片。没有 AI 时先使用文件队列 fixture consumer 完成闭环；VS Code 不是必需依赖。
 
-用户配置分工：proofrail.toml 独占 chain/task/step、文档、策略和注册表引用；workspace.toml 独占位置、拓扑、平台及 adapter/harness/toolchain 选择。profile 给默认，chain/task/step 逐层覆盖，数组整体替换；运行状态由引擎维护。用户不得修改 runtime-state、journal、receipt 或已接受 manifest。使用 config explain 检查最终来源、工具/网络权限和预算，不从模型自然语言推断配置。
+当前 CLI 基线使用单文件链配置（优先 `--chain`；否则按 `./proofrail.chain.json` → `./proofrail.json` 搜索）。`proofrail.toml/workspace.toml` 的分层配置仍属后续规划。运行状态由引擎维护，用户不得修改 runtime-state、journal、receipt 或已接受 manifest。使用 config explain 检查最终来源、工具/网络权限和预算，不从模型自然语言推断配置。
 
 首次运行前确认源树/运行区/store 不重叠，secret 排除、磁盘、工具链、模型/费用上限、review 主体和可实施隔离。源树含未提交文件不要求 reset；baseline 捕获后不自动吸收外部变化。不要把 original workspace 交给 agent 编辑。
 

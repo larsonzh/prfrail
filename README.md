@@ -18,8 +18,8 @@ ProofRail 让 AI 在无人值守下安全地改代码、跑验证、出证据：
 
 ### 状态
 
-**S1 实施中（2026-09-07）**：T005–T008 已完成证据、快照、进程/租约守卫、托管变更集与事务应用；
-Chain Engine、可用 CLI/TUI 和正式发行包尚未完成，不能作为可安装产品使用。
+**S1 实施中（2026-09-08）**：T005–T016 已完成证据、快照、进程/租约守卫、托管变更集与事务应用，以及无 IDE CLI 基线（`init/validate/config explain/run/report`）。
+当前仍不是正式发行包：`run` 只支持 noop-only 任务链；遇到 `code/build/verify` 步骤会 fail-close 并返回非零退出码。
 项目建议书与历史设计来源见 [docs/RFC-proofrail-unattended-ai-engineering-product.md](docs/RFC-proofrail-unattended-ai-engineering-product.md)；分域权威见 [docs/DOCUMENTATION_PLAN.md](docs/DOCUMENTATION_PLAN.md)。
 
 从 [docs/DOCUMENTATION_PLAN.md](docs/DOCUMENTATION_PLAN.md) 阅读文档导航与低成本模型流程；
@@ -28,15 +28,17 @@ Chain Engine、可用 CLI/TUI 和正式发行包尚未完成，不能作为可�
 
 产品完整性评审已补充无副作用预览、已接受结果导出、授权撤销、外部副作用边界、成本预留结算和备份/停用流程；见 [docs/PRODUCT_REQUIREMENTS.md](docs/PRODUCT_REQUIREMENTS.md) §8。均为待批准设计，不是现有功能；文件回滚不保证撤销外部操作。
 
-### 快速开始（规划中）
+### 快速开始（当前 CLI 基线）
 
 ```text
-prfrail init      # 向导：语言/项目类型 → 任务链模板 → 环境 → 生成 chain-file
-prfrail validate  # schema + 预检（进程/锁/工具链/远程）
-prfrail run       # 单命令执行，TUI 实时进度
-prfrail report    # 链报告
-prfrail serve     # 本地 Web 控制台（S2）
+prfrail init --workspace .
+prfrail validate --chain ./proofrail.chain.json
+prfrail config explain --chain ./proofrail.chain.json
+prfrail run --chain ./proofrail.chain.json --run-id run-demo
+prfrail report --run-dir ./tmp/prfrail-runs/run-demo
 ```
+
+说明：`run` 目前仅执行 noop-only 任务链；`serve`/完整 TUI 仍在后续切片。
 
 ### 构建（需 Go 工具链）
 
@@ -81,8 +83,8 @@ ProofRail enables AI to safely modify code, run validations, and produce evidenc
 
 ### Status
 
-**S1 implementation in progress (2026-09-07)**: T005–T008 implement evidence, snapshots, process/lease guards, managed change sets, and transactional apply.
-The Chain Engine, usable CLI/TUI, and formal release package remain incomplete; this is not yet an installable product.
+**S1 implementation in progress (2026-09-08)**: T005–T016 implement evidence, snapshots, process/lease guards, managed change sets, transactional apply, and a no-IDE CLI baseline (`init/validate/config explain/run/report`).
+This is still not a production release package: `run` currently supports noop-only chains and fail-closes with a non-zero exit for executable `code/build/verify` steps.
 Project proposal and historical design source: [docs/RFC-proofrail-unattended-ai-engineering-product.md](docs/RFC-proofrail-unattended-ai-engineering-product.md). Domain authorities: [docs/DOCUMENTATION_PLAN_EN.md](docs/DOCUMENTATION_PLAN_EN.md).
 
 Start with [docs/DOCUMENTATION_PLAN_EN.md](docs/DOCUMENTATION_PLAN_EN.md) for navigation and the low-cost model workflow;
@@ -91,15 +93,17 @@ See [docs/BUSINESS_WORKFLOWS_EN.md](docs/BUSINESS_WORKFLOWS_EN.md) for the indep
 
 Product review adds side-effect-free preview, accepted-result export, revocation, external-effect boundaries, cost reservation/settlement and backup/retirement flows. See [docs/PRODUCT_REQUIREMENTS_EN.md](docs/PRODUCT_REQUIREMENTS_EN.md) section 8. These are unapproved designs, not available features; file rollback cannot guarantee undoing external effects.
 
-### Quick Start (planned)
+### Quick Start (current CLI baseline)
 
 ```text
-prfrail init      # wizard: language/project type → chain template → environment → generate chain-file
-prfrail validate  # schema + pre-checks (process/lock/toolchain/remote)
-prfrail run       # single-command run, TUI live progress
-prfrail report    # chain report
-prfrail serve     # local web console (S2)
+prfrail init --workspace .
+prfrail validate --chain ./proofrail.chain.json
+prfrail config explain --chain ./proofrail.chain.json
+prfrail run --chain ./proofrail.chain.json --run-id run-demo
+prfrail report --run-dir ./tmp/prfrail-runs/run-demo
 ```
+
+Notes: `run` currently executes noop-only chains; `serve` and the full TUI remain in later slices.
 
 ### Build (requires Go toolchain)
 

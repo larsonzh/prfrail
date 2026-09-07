@@ -78,8 +78,8 @@ T006 状态：`COMPLETE`。AT-02 完整验收通过；无 Git 恢复与不可变
 
 ### P1.5 工程包与可用 CLI/TUI（REQ-009/010/011/013/015/016/018/020/022/027）
 
-- [ ] T015 [Plan:P1.5] 建立 `harnesses/{generic,c,go}/`、`internal/taskdef/documentation.go` 与测试，模板 A、impact rule、生成新鲜度、C+Go task；依赖：T014；验收：AT-11；禁止：whois 专名进入核心或交付任意脚本 B。
-- [ ] T016 [Plan:P1.5] 完成 `cmd/prfrail/main.go`、`internal/console/`、配置解析/解释与测试，同步 `README.md`/`docs/OPERATIONS*.md`；依赖：T015；验收：AT-12；禁止：视图直接改状态、占位命令报告成功。
+- [x] T015 [Plan:P1.5] 建立 `harnesses/{generic,c,go}/`、`internal/taskdef/documentation.go` 与测试，模板 A、impact rule、生成新鲜度、C+Go task；依赖：T014；验收：AT-11；禁止：whois 专名进入核心或交付任意脚本 B。完成：2026-09-08。覆盖文档协同影响规则、模板 A 锁定与生成物新鲜度检查、自批/手改生成物阻断，以及 C+Go 语言作用域任一失败触发同 task 整体恢复。验证：[中文](validation/t015-taskdef-documentation.md) / [English](validation/t015-taskdef-documentation_EN.md)。
+- [x] T016 [Plan:P1.5] 完成 `cmd/prfrail/main.go`、`internal/console/`、配置解析/解释与测试，同步 `README.md`/`docs/OPERATIONS*.md`；依赖：T015；验收：AT-12；禁止：视图直接改状态、占位命令报告成功。完成：2026-09-08。覆盖无 IDE `init/validate/config explain/run/report` 命令、稳定 `--json` 输出、配置搜索顺序（`--chain`→`proofrail.chain.json`→`proofrail.json`）、noop-only 本地运行闭环与执行型 step fail-close 非零退出。验证：[中文](validation/t016-cli-console.md) / [English](validation/t016-cli-console_EN.md)。
 
 ### P1.6 可信发布与影子验收（REQ-001/002/006/011/014/015/019/024/025/028）
 

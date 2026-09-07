@@ -2,7 +2,7 @@
 
 [简体中文](OPERATIONS.md)
 
-Date: 2026-09-07; S1 operational design. No production ProofRail package exists; the CLI has version and init/run placeholders, and T005–T008 internal capabilities are not yet assembled into a user flow. Except for the next section, commands are planned RFC interfaces, not available features. See the [installation plan](INSTALLATION_PLAN_EN.md) for unresolved distribution choices and [business workflows](BUSINESS_WORKFLOWS_EN.md) for the complete user flow.
+Date: 2026-09-08; S1 operational design. No production ProofRail package exists, but T016 now provides a no-IDE CLI baseline: `version/init/validate/config explain/run/report`. `run` currently supports noop-only chains and fail-closes with a non-zero exit for executable `code/build/verify` steps. Except for the next section, remaining product capabilities are still planned RFC interfaces. See the [installation plan](INSTALLATION_PLAN_EN.md) for unresolved distribution choices and [business workflows](BUSINESS_WORKFLOWS_EN.md) for the complete user flow.
 
 ## 1. Available Today
 
@@ -14,17 +14,22 @@ go build ./...
 go vet ./...
 go test ./...
 go run ./cmd/prfrail version
+go run ./cmd/prfrail init --workspace .
+go run ./cmd/prfrail validate --chain .\proofrail.chain.json
+go run ./cmd/prfrail config explain --chain .\proofrail.chain.json
+go run ./cmd/prfrail run --chain .\proofrail.chain.json --run-id run-demo
+go run ./cmd/prfrail report --run-dir .\tmp\prfrail-runs\run-demo
 ```
 
-Core packages now have automated tests, but there is no usable-CLI product E2E yet. Placeholder output/exit codes do not prove task completion. gopls is a development tool, not a core runtime dependency. System/Git proxies do not automatically configure Go downloads; use process HTTP_PROXY/HTTPS_PROXY when needed and restore them afterward, without arbitrary global GOPROXY changes or disabled verification.
+Core packages now have automated tests, but full product E2E/TUI is still in later slices. Current CLI output is ANSI-free by default and supports `--json`. gopls is a development tool, not a core runtime dependency. System/Git proxies do not automatically configure Go downloads; use process HTTP_PROXY/HTTPS_PROXY when needed and restore them afterward, without arbitrary global GOPROXY changes or disabled verification.
 
 ## 2. Installation and First Run Design
 
 Future installation: select the Windows amd64 package, verify signature/checksum, extract separately, check version, preview statically, then authorize capability probes separately. S1 Linux is core CI/preview, not production support. Do not execute unknown signatures or wrong-platform binaries. Back up the complete object/event/state-reference closure and verify historical runs read-only before upgrades; never overwrite a running host.
 
-Planned flow: prfrail init <workspace>, prfrail validate, prfrail baseline snapshot, prfrail run <chain-file>, prfrail report <run-dir>. Exact flags/exits become a copyable tutorial only after T002 freeze/T016 implementation. Start with a file-queue fixture consumer without AI; VS Code is optional.
+Current copyable flow is `prfrail init --workspace <path>`, `prfrail validate --chain <chain-file>`, `prfrail config explain --chain <chain-file>`, `prfrail run --chain <chain-file> [--run-id] [--run-dir]`, and `prfrail report --run-dir <run-dir>`. `run` is currently noop-only; full executable-step gate/adapter integration remains in later slices. Start with a file-queue fixture consumer without AI; VS Code is optional.
 
-proofrail.toml exclusively owns chain/task/step, documentation, policy and registry references; workspace.toml owns locations, topology, platform and adapter/harness/toolchain selection. Profiles provide defaults, chain/task/step override in order, and arrays replace wholesale. Runtime state belongs to the engine. Never manually edit state/journals/receipts/accepted manifests. config explain exposes origins, tools/network permissions and budgets; model prose is not configuration.
+The current CLI baseline uses a single chain config file (`--chain` first, then `./proofrail.chain.json`, then `./proofrail.json`). The `proofrail.toml/workspace.toml` layered model remains planned. Runtime state belongs to the engine. Never manually edit state/journals/receipts/accepted manifests. config explain exposes origins, tools/network permissions and budgets; model prose is not configuration.
 
 Before running, verify distinct source/run/store roots, secret exclusions, disk, tools, model/cost limits, review actors and enforceable isolation. Uncommitted source files do not require reset. External source changes are not automatically absorbed after baseline capture. Never give agents the original workspace to edit.
 

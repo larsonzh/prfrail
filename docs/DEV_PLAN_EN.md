@@ -79,8 +79,8 @@ T006 status: `COMPLETE`. Full AT-02 acceptance passed; Git-free restore and immu
 
 ### P1.5 Harnesses and Usable CLI/TUI (REQ-009/010/011/013/015/016/018/020/022/027)
 
-- [ ] T015 [Plan:P1.5] Create harnesses/{generic,c,go}/, internal/taskdef/documentation.go/tests for template A, impact rules, freshness and C+Go tasks. Depends: T014. Accept: AT-11. Exclude: whois core terminology or arbitrary script B.
-- [ ] T016 [Plan:P1.5] Complete cmd/prfrail/main.go, internal/console/, config parsing/explanation/tests; sync README.md and docs/OPERATIONS*.md. Depends: T015. Accept: AT-12. Exclude: direct view-state writes or successful placeholder commands.
+- [x] T015 [Plan:P1.5] Create harnesses/{generic,c,go}/, internal/taskdef/documentation.go/tests for template A, impact rules, freshness and C+Go tasks. Depends: T014. Accept: AT-11. Exclude: whois core terminology or arbitrary script B. Completed: 2026-09-08. Coverage includes documentation impact-rule enforcement, locked template A and generated freshness checks, blocking for self-approval and manual generated edits, and task-level recovery when any C+Go language scope fails. Validation: [中文](validation/t015-taskdef-documentation.md) / [English](validation/t015-taskdef-documentation_EN.md).
+- [x] T016 [Plan:P1.5] Complete cmd/prfrail/main.go, internal/console/, config parsing/explanation/tests; sync README.md and docs/OPERATIONS*.md. Depends: T015. Accept: AT-12. Exclude: direct view-state writes or successful placeholder commands. Completed: 2026-09-08. Coverage includes no-IDE `init/validate/config explain/run/report`, stable `--json` output, config search order (`--chain` → `proofrail.chain.json` → `proofrail.json`), a noop-only local run/report loop, and fail-closed non-zero exits for executable steps. Validation: [中文](validation/t016-cli-console.md) / [English](validation/t016-cli-console_EN.md).
 
 ### P1.6 Trusted Release and Shadow Acceptance (REQ-001/002/006/011/014/015/019/024/025/028)
 
