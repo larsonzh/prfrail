@@ -2,7 +2,7 @@
 
 [简体中文](DEV_PLAN.md)
 
-Date: 2026-09-07; S1 implementation remains incomplete. Inputs: [requirements](PRODUCT_REQUIREMENTS_EN.md), [architecture](ARCHITECTURE_EN.md), [contracts](CONTRACTS_EN.md), [security](SECURITY_EN.md), [ADRs](ADR_REGISTER_EN.md). This follows revised RFC sections 14/19; added S1 minimum scope requires renewed budget approval, without pulling S2/S3 enhancements into the first release.
+Date: 2026-09-08; S1 implementation remains incomplete. Inputs: [requirements](PRODUCT_REQUIREMENTS_EN.md), [architecture](ARCHITECTURE_EN.md), [contracts](CONTRACTS_EN.md), [security](SECURITY_EN.md), [ADRs](ADR_REGISTER_EN.md). This follows revised RFC sections 14/19; added S1 minimum scope requires renewed budget approval, without pulling S2/S3 enhancements into the first release.
 
 ## 1. Workflow and Constraints
 
@@ -89,10 +89,10 @@ T006 status: `COMPLETE`. Full AT-02 acceptance passed; Git-free restore and immu
 
 ### P1.7 Product Flow and Lifecycle (Before P1.6 Release Acceptance)
 
-Keep IDs stable; execution order is T016 → T019–T024 → T017 → T018. All require S0 approval. Paths are planned; split tasks by individual negative tests rather than generating whole features at once.
+Keep IDs stable; execution order is T016 → T019–T024 → T017 → T018. These run under S0 approval; T019/T020 are complete and the rest remain planned paths. Split tasks by individual negative tests rather than generating whole features at once.
 
-- [ ] T019 [Plan:P1.7] PC-01: implement internal/taskdef/preview.go, internal/console/preview.go, tests and no-AI example. Depends: T016. Accept: AT-16. Exclude: preview commands/network/models/automatic installation.
-- [ ] T020 [Plan:P1.7] PC-02: implement internal/snapshot/export.go, internal/evidence/delivery.go/tests. Depends: T019, T006/T011. Accept: AT-17. Exclude: candidate-as-accepted export, target overwrite, source/Git writes.
+- [x] T019 [Plan:P1.7] PC-01: implement internal/taskdef/preview.go, internal/console/preview.go, tests and no-AI example. Depends: T016. Accept: AT-16. Exclude: preview commands/network/models/automatic installation. Completed: 2026-09-08. Covers offline read-only preview record generation, visible unknowns, zero call counters, and JSON/text fact parity. Validation: [中文](validation/t019-preview.md) / [English](validation/t019-preview_EN.md).
+- [x] T020 [Plan:P1.7] PC-02: implement internal/snapshot/export.go, internal/evidence/delivery.go/tests. Depends: T019, T006/T011. Accept: AT-17. Exclude: candidate-as-accepted export, target overwrite, source/Git writes. Completed: 2026-09-08. Covers accepted-hash binding, destination absent precondition, source/run/store overlap blocking, secret-path blocking, missing-object/tamper blocking, and interrupted writes without a completed export record. Validation: [中文](validation/t020-export.md) / [English](validation/t020-export_EN.md).
 - [ ] T021 [Plan:P1.7] PC-03: implement internal/chain/authorization.go, internal/console/approvals.go/tests, wire guard stopping. Depends: T020, T007/T011. Accept: AT-18. Exclude: self-authorization, hard-gate waiver, expiry-based approval.
 - [ ] T022 [Plan:P1.7] PC-04: implement internal/gates/effects.go, internal/evidence/diagnostics.go and chain recovery-plan tests. Depends: T021, T010. Accept: AT-19. Exclude: external-write runners, blind unknown-effect retries, diagnostic lock/log deletion.
 - [ ] T023 [Plan:P1.7] PC-05: extend internal/tickets/budget.go, internal/adapters/ usage and internal/console/ cost reporting. Depends: T022, T012/T013. Accept: AT-20. Exclude: restart-released unknown holds, cross-run cap bypass, default telemetry.
@@ -156,4 +156,4 @@ Detail S2 after S1 exit: production Linux, composed dependency ordering/three-la
 
 Each iteration reports actual human time, calls/cost estimates, failures, accepted requirements and next action. Budget overruns pause for owner choice or written RFC scope change, not automatic models/services.
 
-RFC section 19 later candidates: S2 graphical onboarding/terminal localization, redacted notifications/remote approval identity design, external PR evaluation, external-write compensation, cost trends and explicit storage migration; S3 commercial backend/cloud management requires demand evidence. These are outside T019–T024 and will be planned later. Current totals: 10 plan items, 24 pending tasks, 21 planned acceptance groups, not completion percentages.
+RFC section 19 later candidates: S2 graphical onboarding/terminal localization, redacted notifications/remote approval identity design, external PR evaluation, external-write compensation, cost trends and explicit storage migration; S3 commercial backend/cloud management requires demand evidence. These are outside T019–T024 and will be planned later. Current totals: 10 plan items, 22 pending tasks, 21 planned acceptance groups, not completion percentages.

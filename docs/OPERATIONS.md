@@ -2,7 +2,7 @@
 
 [English](OPERATIONS_EN.md)
 
-日期：2026-09-08；S1 操作设计稿。当前没有 ProofRail 正式安装包；但 T016 已交付无 IDE CLI 基线：`version/init/validate/config explain/run/report`。`run` 目前只支持 noop-only 任务链，遇到 `code/build/verify` 会 fail-close 并返回非零退出码。除以下“当前可执行”外，其余产品能力仍是 RFC 规划接口。待决发行方案见 [安装部署规划](INSTALLATION_PLAN.md)，完整用户流程见 [业务流程](BUSINESS_WORKFLOWS.md)。
+日期：2026-09-08；S1 操作设计稿。当前没有 ProofRail 正式安装包；T016/T019/T020 已交付 CLI 与交付底座：`version/init/validate/config explain/preview/run/report` 和库级导出模块（`internal/snapshot/export.go`、`internal/evidence/delivery.go`）。`preview` 为离线只读静态预览，不执行命令/网络/模型/凭据读取；`run` 目前只支持 noop-only 任务链，遇到 `code/build/verify` 会 fail-close 并返回非零退出码。除以下“当前可执行”外，其余产品能力仍是 RFC 规划接口。待决发行方案见 [安装部署规划](INSTALLATION_PLAN.md)，完整用户流程见 [业务流程](BUSINESS_WORKFLOWS.md)。
 
 ## 1. 当前可执行
 
@@ -17,6 +17,7 @@ go run ./cmd/prfrail version
 go run ./cmd/prfrail init --workspace .
 go run ./cmd/prfrail validate --chain .\proofrail.chain.json
 go run ./cmd/prfrail config explain --chain .\proofrail.chain.json
+go run ./cmd/prfrail preview --chain .\proofrail.chain.json
 go run ./cmd/prfrail run --chain .\proofrail.chain.json --run-id run-demo
 go run ./cmd/prfrail report --run-dir .\tmp\prfrail-runs\run-demo
 ```
@@ -27,7 +28,7 @@ go run ./cmd/prfrail report --run-dir .\tmp\prfrail-runs\run-demo
 
 未来安装顺序：选择 Windows amd64 对应发行包→验证签名和校验和→解压到独立目录→验证 version→静态预览→单独授权能力探测。Linux 在 S1 仅核心 CI/预览，不宣传正式支持。未知签名或平台不匹配不得执行。升级前备份对象、事件和状态引用的完整闭包并只读核验历史 run；不覆盖运行中的 host。
 
-当前可复制流程为 `prfrail init --workspace <path>`、`prfrail validate --chain <chain-file>`、`prfrail config explain --chain <chain-file>`、`prfrail run --chain <chain-file> [--run-id] [--run-dir]`、`prfrail report --run-dir <run-dir>`。`run` 当前仅支持 noop-only 链；执行型 step 的真实 gate/adapter 闭环仍在后续切片。没有 AI 时先使用文件队列 fixture consumer 完成闭环；VS Code 不是必需依赖。
+当前可复制流程为 `prfrail init --workspace <path>`、`prfrail validate --chain <chain-file>`、`prfrail config explain --chain <chain-file>`、`prfrail preview --chain <chain-file> [--json]`、`prfrail run --chain <chain-file> [--run-id] [--run-dir]`、`prfrail report --run-dir <run-dir>`。`preview` 只读展示 `previewHash`、权限边界、unknown 及零调用计数；`run` 当前仅支持 noop-only 链。导出能力已在库级实现，但 CLI `export` 命令仍在后续切片；执行型 step 的真实 gate/adapter 全闭环同样属于后续切片。没有 AI 时先使用文件队列 fixture consumer 完成闭环；VS Code 不是必需依赖。
 
 当前 CLI 基线使用单文件链配置（优先 `--chain`；否则按 `./proofrail.chain.json` → `./proofrail.json` 搜索）。`proofrail.toml/workspace.toml` 的分层配置仍属后续规划。运行状态由引擎维护，用户不得修改 runtime-state、journal、receipt 或已接受 manifest。使用 config explain 检查最终来源、工具/网络权限和预算，不从模型自然语言推断配置。
 
@@ -104,4 +105,4 @@ bootstrap：维护者用常规 Go 构建与独立测试、人工审计建立首�
 
 S1 的交付包由用户自行决定后续合并/发布，ProofRail 不自动向原树写文件或执行 Git。安装包支持状态、SBOM/许可证、签名身份和撤销新鲜度分别检查；离线未知撤销不应显示“最新可信”。备份不包含凭据，需另行通过安全方式配置恢复环境。
 
-历史证据含秘密：隔离、停止外发、撤销凭据，再由人决定审计保留与删除冲突；不改旧哈希伪造完整链。删除不能保证 SSD/外部副本安全擦除。报告默认本地无遥测；提交支持材料只提供复现所需脱敏最小包。以上能力待 T019–T024 实现，当前不能作为可执行命令教程。
+历史证据含秘密：隔离、停止外发、撤销凭据，再由人决定审计保留与删除冲突；不改旧哈希伪造完整链。删除不能保证 SSD/外部副本安全擦除。报告默认本地无遥测；提交支持材料只提供复现所需脱敏最小包。T020 已完成库级导出能力，T021–T024 仍待实现；完整产品流程当前仍不能作为可执行命令教程。

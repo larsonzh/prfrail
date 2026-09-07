@@ -2,7 +2,7 @@
 
 [简体中文](OPERATIONS.md)
 
-Date: 2026-09-08; S1 operational design. No production ProofRail package exists, but T016 now provides a no-IDE CLI baseline: `version/init/validate/config explain/run/report`. `run` currently supports noop-only chains and fail-closes with a non-zero exit for executable `code/build/verify` steps. Except for the next section, remaining product capabilities are still planned RFC interfaces. See the [installation plan](INSTALLATION_PLAN_EN.md) for unresolved distribution choices and [business workflows](BUSINESS_WORKFLOWS_EN.md) for the complete user flow.
+Date: 2026-09-08; S1 operational design. No production ProofRail package exists, but T016/T019/T020 now provide the CLI baseline and delivery foundation: `version/init/validate/config explain/preview/run/report` plus internal export modules (`internal/snapshot/export.go`, `internal/evidence/delivery.go`). `preview` is an offline read-only static report and does not execute commands, network probes, model calls, or credential reads. `run` currently supports noop-only chains and fail-closes with a non-zero exit for executable `code/build/verify` steps. Except for the next section, remaining product capabilities are still planned RFC interfaces. See the [installation plan](INSTALLATION_PLAN_EN.md) for unresolved distribution choices and [business workflows](BUSINESS_WORKFLOWS_EN.md) for the complete user flow.
 
 ## 1. Available Today
 
@@ -17,6 +17,7 @@ go run ./cmd/prfrail version
 go run ./cmd/prfrail init --workspace .
 go run ./cmd/prfrail validate --chain .\proofrail.chain.json
 go run ./cmd/prfrail config explain --chain .\proofrail.chain.json
+go run ./cmd/prfrail preview --chain .\proofrail.chain.json
 go run ./cmd/prfrail run --chain .\proofrail.chain.json --run-id run-demo
 go run ./cmd/prfrail report --run-dir .\tmp\prfrail-runs\run-demo
 ```
@@ -27,7 +28,7 @@ Core packages now have automated tests, but full product E2E/TUI is still in lat
 
 Future installation: select the Windows amd64 package, verify signature/checksum, extract separately, check version, preview statically, then authorize capability probes separately. S1 Linux is core CI/preview, not production support. Do not execute unknown signatures or wrong-platform binaries. Back up the complete object/event/state-reference closure and verify historical runs read-only before upgrades; never overwrite a running host.
 
-Current copyable flow is `prfrail init --workspace <path>`, `prfrail validate --chain <chain-file>`, `prfrail config explain --chain <chain-file>`, `prfrail run --chain <chain-file> [--run-id] [--run-dir]`, and `prfrail report --run-dir <run-dir>`. `run` is currently noop-only; full executable-step gate/adapter integration remains in later slices. Start with a file-queue fixture consumer without AI; VS Code is optional.
+Current copyable flow is `prfrail init --workspace <path>`, `prfrail validate --chain <chain-file>`, `prfrail config explain --chain <chain-file>`, `prfrail preview --chain <chain-file> [--json]`, `prfrail run --chain <chain-file> [--run-id] [--run-dir]`, and `prfrail report --run-dir <run-dir>`. `preview` reports `previewHash`, permission boundaries, unknowns, and zero call counters in read-only mode; `run` is currently noop-only. Export support is implemented at library level, but a dedicated CLI `export` command remains in later slices; full executable-step gate/adapter integration is also still in later slices. Start with a file-queue fixture consumer without AI; VS Code is optional.
 
 The current CLI baseline uses a single chain config file (`--chain` first, then `./proofrail.chain.json`, then `./proofrail.json`). The `proofrail.toml/workspace.toml` layered model remains planned. Runtime state belongs to the engine. Never manually edit state/journals/receipts/accepted manifests. config explain exposes origins, tools/network permissions and budgets; model prose is not configuration.
 
@@ -104,4 +105,4 @@ Rollback stops candidate processes and preserves evidence; restore an older bina
 
 Users decide whether to merge/release S1 delivery packages externally; ProofRail does not write source or execute Git automatically. Check support status, SBOM/licenses, signing identity and revocation freshness separately. Unknown offline revocation must not display current trust. Backups exclude credentials; restore environments require separate secure configuration.
 
-For historical secrets, quarantine/block export/revoke credentials, then obtain a human retention/deletion decision; never rewrite old hashes as intact history. Deletion does not guarantee SSD/external-copy erasure. Reports stay local without default telemetry; support submissions contain only minimal redacted reproduction data. These capabilities await T019–T024 and are not executable tutorials today.
+For historical secrets, quarantine/block export/revoke credentials, then obtain a human retention/deletion decision; never rewrite old hashes as intact history. Deletion does not guarantee SSD/external-copy erasure. Reports stay local without default telemetry; support submissions contain only minimal redacted reproduction data. T020 now provides library-level export capability; T021–T024 remain pending, and the full product flow is still not an executable command tutorial today.
