@@ -1,0 +1,429 @@
+[
+  {
+    "fixtureId": "semantic-three-task-mixed-languages",
+    "schema": "chain.schema.json",
+    "expected": "accept",
+    "rejectionLayer": "semantic",
+    "reason": "Three tasks cover all step kinds across C and Go",
+    "instance": {
+      "documents": {
+        "chain.schema.json": {
+          "schemaVersion": "1.0.0",
+          "chain": {
+            "id": "mixed-chain",
+            "profile": "standard"
+          },
+          "tasks": [
+            {
+              "id": "change-task",
+              "review": "policy",
+              "steps": [
+                {
+                  "id": "edit-sources",
+                  "kind": "code",
+                  "components": ["native-core", "go-service"],
+                  "languageScopes": ["c-main", "go-main"],
+                  "targets": ["c-source", "go-source"]
+                },
+                {
+                  "id": "build-sources",
+                  "kind": "build",
+                  "hooks": ["build-all"],
+                  "components": ["native-core", "go-service"]
+                }
+              ]
+            },
+            {
+              "id": "verify-task",
+              "review": "manual",
+              "steps": [
+                {
+                  "id": "verify-sources",
+                  "kind": "verify",
+                  "hooks": ["verify-all"],
+                  "targets": ["c-source", "go-source"]
+                }
+              ]
+            },
+            {
+              "id": "record-task",
+              "review": "policy",
+              "steps": [
+                {
+                  "id": "record-noop",
+                  "kind": "noop",
+                  "reason": "Coverage record only"
+                }
+              ]
+            }
+          ],
+          "workspace": {
+            "components": [
+              {
+                "id": "native-core",
+                "root": "native",
+                "languageScopes": [
+                  {
+                    "id": "c-main",
+                    "language": "c",
+                    "harness": "c-standard",
+                    "targets": ["c-source"]
+                  }
+                ]
+              },
+              {
+                "id": "go-service",
+                "root": "service",
+                "dependsOn": ["native-core"],
+                "languageScopes": [
+                  {
+                    "id": "go-main",
+                    "language": "go",
+                    "harness": "go-standard",
+                    "targets": ["go-source"],
+                    "dependsOn": ["c-main"]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "target.schema.json": {
+          "schemaVersion": "1.0.0",
+          "targets": [
+            {
+              "id": "c-source",
+              "class": "source",
+              "access": "read-write",
+              "paths": ["native/**/*.c"]
+            },
+            {
+              "id": "go-source",
+              "class": "source",
+              "access": "read-write",
+              "paths": ["service/**/*.go"]
+            }
+          ]
+        },
+        "hook.schema.json": {
+          "schemaVersion": "1.0.0",
+          "hooks": [
+            {
+              "id": "build-all",
+              "kind": "build",
+              "runner": {
+                "type": "process",
+                "executable": "make"
+              },
+              "onFail": {
+                "action": "fail-stop"
+              },
+              "timeoutMs": 60000,
+              "resourceLimits": {
+                "memoryBytes": 268435456,
+                "outputBytes": 1048576,
+                "processCount": 16
+              },
+              "networkPolicy": {
+                "mode": "deny"
+              }
+            },
+            {
+              "id": "verify-all",
+              "kind": "verify",
+              "runner": {
+                "type": "process",
+                "executable": "make",
+                "args": ["test"]
+              },
+              "onFail": {
+                "action": "fail-stop"
+              },
+              "timeoutMs": 60000,
+              "resourceLimits": {
+                "memoryBytes": 268435456,
+                "outputBytes": 1048576,
+                "processCount": 16
+              },
+              "networkPolicy": {
+                "mode": "deny"
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "fixtureId": "semantic-manual-handoff-polyglot",
+    "schema": "chain.schema.json",
+    "expected": "accept",
+    "rejectionLayer": "semantic",
+    "reason": "Manual handoff uses writable targets and a return hook across C JavaScript and Python",
+    "instance": {
+      "documents": {
+        "chain.schema.json": {
+          "schemaVersion": "1.0.0",
+          "chain": {
+            "id": "handoff-chain",
+            "profile": "strict"
+          },
+          "tasks": [
+            {
+              "id": "handoff-task",
+              "review": "manual",
+              "steps": [
+                {
+                  "id": "manual-edit",
+                  "kind": "code",
+                  "execution": "manual-handoff",
+                  "components": ["polyglot-app"],
+                  "languageScopes": [
+                    "c-scope",
+                    "javascript-scope",
+                    "python-scope"
+                  ],
+                  "targets": ["c-files", "javascript-files", "python-files"],
+                  "handoffPolicy": {
+                    "allowedTargets": [
+                      "c-files",
+                      "javascript-files",
+                      "python-files"
+                    ],
+                    "inputPolicy": "structured",
+                    "handoffTimeoutMs": 300000,
+                    "returnActions": ["complete", "abort"],
+                    "hooksAfterReturn": ["handoff-check"]
+                  }
+                }
+              ]
+            }
+          ],
+          "workspace": {
+            "components": [
+              {
+                "id": "polyglot-app",
+                "root": ".",
+                "languageScopes": [
+                  {
+                    "id": "c-scope",
+                    "language": "c",
+                    "harness": "c-standard",
+                    "targets": ["c-files"]
+                  },
+                  {
+                    "id": "javascript-scope",
+                    "language": "javascript",
+                    "harness": "node-standard",
+                    "targets": ["javascript-files"]
+                  },
+                  {
+                    "id": "python-scope",
+                    "language": "python",
+                    "harness": "python-standard",
+                    "targets": ["python-files"]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "target.schema.json": {
+          "schemaVersion": "1.0.0",
+          "targets": [
+            {
+              "id": "c-files",
+              "class": "source",
+              "access": "read-write",
+              "paths": ["src/**/*.c"]
+            },
+            {
+              "id": "javascript-files",
+              "class": "source",
+              "access": "read-write",
+              "paths": ["web/**/*.js"]
+            },
+            {
+              "id": "python-files",
+              "class": "source",
+              "access": "read-write",
+              "paths": ["scripts/**/*.py"]
+            }
+          ]
+        },
+        "hook.schema.json": {
+          "schemaVersion": "1.0.0",
+          "hooks": [
+            {
+              "id": "handoff-check",
+              "kind": "verify",
+              "runner": {
+                "type": "process",
+                "executable": "node",
+                "args": ["tools/check-handoff.js"]
+              },
+              "onFail": {
+                "action": "manual"
+              },
+              "timeoutMs": 30000,
+              "resourceLimits": {
+                "memoryBytes": 134217728,
+                "outputBytes": 1048576,
+                "processCount": 8
+              },
+              "networkPolicy": {
+                "mode": "deny"
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "fixtureId": "semantic-documentation-waiver",
+    "schema": "chain.schema.json",
+    "expected": "accept",
+    "rejectionLayer": "semantic",
+    "reason": "Documentation impact references valid artifacts and waiver review is separated and unexpired",
+    "instance": {
+      "documents": {
+        "chain.schema.json": {
+          "schemaVersion": "1.0.0",
+          "chain": {
+            "id": "documentation-chain",
+            "profile": "strict"
+          },
+          "documentation": {
+            "policy": "if-affected",
+            "impactRules": [
+              {
+                "id": "public-api-docs",
+                "whenTargetTags": ["public-api"],
+                "requireTargets": ["documentation"],
+                "requiredHooks": ["docs-check"]
+              }
+            ]
+          },
+          "tasks": [
+            {
+              "id": "docs-task",
+              "review": "manual",
+              "steps": [
+                {
+                  "id": "update-docs",
+                  "kind": "code",
+                  "targets": ["documentation"]
+                }
+              ]
+            }
+          ],
+          "workspace": {
+            "components": [
+              {
+                "id": "docs-component",
+                "root": ".",
+                "languageScopes": [
+                  {
+                    "id": "docs-go-scope",
+                    "language": "go",
+                    "harness": "go-standard",
+                    "targets": ["api-source", "documentation"]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "target.schema.json": {
+          "schemaVersion": "1.0.0",
+          "targets": [
+            {
+              "id": "api-source",
+              "class": "source",
+              "access": "read-write",
+              "paths": ["api/**/*.go"],
+              "tags": ["public-api"]
+            },
+            {
+              "id": "documentation",
+              "class": "documentation",
+              "access": "read-write",
+              "paths": ["docs/**/*.md"]
+            }
+          ]
+        },
+        "hook.schema.json": {
+          "schemaVersion": "1.0.0",
+          "hooks": [
+            {
+              "id": "docs-check",
+              "kind": "verify",
+              "runner": {
+                "type": "process",
+                "executable": "node",
+                "args": ["tools/check-docs.js"]
+              },
+              "onFail": {
+                "action": "fail-stop"
+              },
+              "timeoutMs": 30000,
+              "resourceLimits": {
+                "memoryBytes": 134217728,
+                "outputBytes": 1048576,
+                "processCount": 8
+              },
+              "networkPolicy": {
+                "mode": "deny"
+              }
+            }
+          ]
+        },
+        "review-receipt.schema.json": [
+          {
+            "schemaVersion": "1.0.0",
+            "receipt": {
+              "receiptId": "waiver-receipt",
+              "occurredAt": "2026-09-07T12:00:00.000Z",
+              "recordedBy": {
+                "type": "operator",
+                "id": "reviewer-one"
+              },
+              "runId": "run-one",
+              "taskId": "docs-task",
+              "attempt": 1,
+              "evidenceRootHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+              "reviewMode": "manual",
+              "policyHash": null,
+              "outcome": "waive",
+              "evidence": [
+                "sha256:2222222222222222222222222222222222222222222222222222222222222222"
+              ],
+              "errorEvidence": [
+                "sha256:3333333333333333333333333333333333333333333333333333333333333333"
+              ],
+              "reason": {
+                "code": "approved-exception",
+                "message": "Time limited documentation exception"
+              },
+              "waiverAuthorization": {
+                "authorizedBy": {
+                  "type": "operator",
+                  "id": "release-manager"
+                },
+                "policyBasisHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+                "scope": ["docs-task"],
+                "expiresAt": "2026-09-08T12:00:00.000Z"
+              }
+            },
+            "receiptHash": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+          }
+        ]
+      },
+      "context": {
+        "changeProducerId": "producer-one",
+        "now": "2026-09-07T12:30:00.000Z"
+      }
+    }
+  }
+]

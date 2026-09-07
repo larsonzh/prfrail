@@ -45,8 +45,7 @@ Twenty-nine structural Schemas for chain, hook, target, workspace, state-event, 
 snapshot-manifest, evidence-manifest, review-receipt, promotion-receipt, handoff-receipt, hook-result, run-manifest,
 signature-receipt, error-set, ticket-ledger, repair-transaction, harness, toolchain, change-set, verification-report,
 plan-preview, export-record, authorization-record, effect-record, cost-ledger and lifecycle-record now exist under `schemas/`;
-T003 still needs to
-create `testdata/contracts/valid/` and `testdata/contracts/invalid/` and execute them with an independent validator. Each
+T003 created `testdata/contracts/valid/` and `testdata/contracts/invalid/` and executed them with the independent validator under `tools/contracts/`. Each
 fixture records ID, contract version, expected accept/reject, rejection layer and reason. Include three tasks, all four kinds,
 C+Go, C+JavaScript+Python, handoff and code/docs collaboration; at least one positive and negative per condition.
 Documentation paths/snippets are design inputs, not verified executable fixtures.
@@ -74,7 +73,7 @@ evidence policy. Registry presence does not prove installation; checker/prefligh
 hashes and actual capability, and probing still requires authorization. Bundled generic/C/Go support does not close the
 core language set. Environment values, credentials and absolute host paths stay out of registries and run manifests.
 
-RFC section 16.9.3.1 freezes two byte-level vectors, `jcs-001` and `state-event-001`, covering JCS ordering/escaping/Unicode and the state-event domain-separated digest. T003 must still preserve them as independent fixtures and recompute them with a non-core implementation; documented digest values are not independent-validator evidence.
+RFC section 16.9.3.1 freezes two byte-level vectors, `jcs-001` and `state-event-001`, covering JCS ordering/escaping/Unicode and the state-event domain-separated digest. T003 preserved them as independent fixtures and reproduced their canonical bytes and digests with a non-core RFC 8785 implementation.
 
 ## 4. Snapshots, Evidence and Acceptance
 
@@ -196,11 +195,11 @@ binds diff/scope/ownership; Validate binds the frozen plan and hook results; Pro
 hashes and installs only the next attempt workspace. It creates no accepted snapshot or PASSED result and cannot replace
 independent review and snapshot promotion.
 
-Acceptance includes structural, semantic, runtime, crash, compatibility and security checks, not just parseable JSON. See [test strategy](TEST_STRATEGY_EN.md) and [development plan](DEV_PLAN_EN.md). No complete contract validator was generated or executed in this round; RFC gate 17.2 remains unmet.
+Acceptance includes structural, semantic, runtime, crash, compatibility and security checks, not just parseable JSON. See [test strategy](TEST_STRATEGY_EN.md) and [development plan](DEV_PLAN_EN.md). T003 executed the independent structural/static-semantic validator; runtime, crash and platform capabilities remain T004/S1 gates.
 
 ## 9. Product and Lifecycle Contracts (RFC Section 19)
 
-T002 has frozen these semantics and wire fields. T003 still adds positive/negative fixtures and independent checks. Reject writes of unknown types.
+T002 froze these semantics and wire fields, and T003 added positive/negative fixtures and independent checks. Reject writes of unknown types.
 
 | PC | Input/authority | Output/invariant | Acceptance |
 |---|---|---|---|

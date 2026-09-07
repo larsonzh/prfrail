@@ -48,7 +48,7 @@ UTF-8 无 BOM + LF；canonical 字节还不得含格式空白或尾随换行。�
 
 `schemas/` 已创建 chain、hook、target、workspace、state-event、error、adapter-envelope、adapter-receipt、
 snapshot-manifest、evidence-manifest、review-receipt、promotion-receipt、handoff-receipt、hook-result、run-manifest、signature-receipt、error-set、ticket-ledger、repair-transaction、harness、toolchain、change-set、verification-report、plan-preview、export-record、authorization-record、effect-record、cost-ledger、lifecycle-record 二十九份结构 Schema；`testdata/contracts/valid/` 与
-`testdata/contracts/invalid/` 仍待 T003 创建并由独立 validator 执行。每例携带 fixture ID、契约版本、
+`testdata/contracts/invalid/` 已由 T003 建立并通过 `tools/contracts/` 独立 validator。每例携带 fixture ID、契约版本、
 expected accept/reject、拒绝层和原因。必须含三任务链、四 kind、C+Go、C+JavaScript+Python、人工交接、
 代码文档协同；每一条件至少一正一反。文档中的路径/片段是设计输入，不是已验证可运行样例。
 
@@ -77,8 +77,7 @@ runId 唯一 manifest 由 checker 判定。
 generic/C/Go 不形成核心语言枚举，环境值、凭据和绝对主机路径不得进入注册表或 run manifest。
 
 RFC §16.9.3.1 已冻结 `jcs-001` 与 `state-event-001` 两条字节级向量，分别覆盖 JCS 排序/转义/Unicode
-及 state-event 域分隔摘要。T003 仍须把它们固化为独立 fixture，并以非核心实现复算；文档中的摘要值
-不能替代独立 validator 证据。
+及 state-event 域分隔摘要。T003 已将其固化为独立 fixture，并由非核心 RFC 8785 实现复算 canonical 字节与摘要。
 
 ## 4. 快照、证据与接受事务
 
@@ -194,11 +193,11 @@ hardBlockThreshold 后在该 run 内不可回退。override 不得提高 hard bl
 结果；Promote 再验停机、租约、账本与 Validate 摘要，只把候选装入下一 attempt 工作区。它不产生 accepted
 snapshot、不进入 PASSED，也不替代独立 review 与 snapshot promotion。
 
-契约验收不是“JSON 能解析”：须验证结构、语义、运行行为、崩溃点、兼容及安全。对应测试目录、用例与阶段见 [TEST_STRATEGY.md](TEST_STRATEGY.md) 和 [DEV_PLAN.md](DEV_PLAN.md)。本轮未生成或运行完整契约 validator，S0 §17.2 仍不通过。
+契约验收不是“JSON 能解析”：须验证结构、语义、运行行为、崩溃点、兼容及安全。对应测试目录、用例与阶段见 [TEST_STRATEGY.md](TEST_STRATEGY.md) 和 [DEV_PLAN.md](DEV_PLAN.md)。T003 已运行独立结构/静态语义 validator；运行行为、崩溃点和平台能力仍由 T004/S1 gate 验证。
 
 ## 9. 产品与生命周期契约（RFC §19）
 
-下列语义及 wire 字段已由 T002 冻结；T003 仍须补正反样例与独立验证，未知类型拒绝写入。
+下列语义及 wire 字段已由 T002 冻结，并由 T003 补充正反样例与独立验证；未知类型拒绝写入。
 
 | PC | 输入/权威 | 输出/不变式 | 验收 |
 |---|---|---|---|

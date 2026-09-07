@@ -1,0 +1,179 @@
+[
+  {
+    "fixtureId": "chain-minimal-valid",
+    "schema": "chain.schema.json",
+    "expected": "accept",
+    "rejectionLayer": "schema",
+    "reason": "Minimal valid chain configuration",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "chain": {
+        "id": "core-chain",
+        "profile": "minimal"
+      },
+      "tasks": [
+        {
+          "id": "core-task",
+          "review": "policy",
+          "steps": [
+            {
+              "id": "record-state",
+              "kind": "noop",
+              "reason": "No work required"
+            }
+          ]
+        }
+      ],
+      "workspace": {
+        "components": [
+          {
+            "id": "core",
+            "root": ".",
+            "languageScopes": [
+              {
+                "id": "go-main",
+                "language": "go",
+                "harness": "go-standard",
+                "targets": ["source"]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "fixtureId": "hook-minimal-valid",
+    "schema": "hook.schema.json",
+    "expected": "accept",
+    "rejectionLayer": "schema",
+    "reason": "Minimal valid process hook",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "hooks": [
+        {
+          "id": "go-test",
+          "kind": "test",
+          "runner": {
+            "type": "process",
+            "executable": "go",
+            "args": ["test", "./..."]
+          },
+          "onFail": {
+            "action": "fail-stop"
+          },
+          "timeoutMs": 60000,
+          "resourceLimits": {
+            "memoryBytes": 268435456,
+            "outputBytes": 1048576,
+            "processCount": 16
+          },
+          "networkPolicy": {
+            "mode": "deny"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "fixtureId": "target-minimal-valid",
+    "schema": "target.schema.json",
+    "expected": "accept",
+    "rejectionLayer": "schema",
+    "reason": "Minimal valid regular target",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "targets": [
+        {
+          "id": "source",
+          "class": "source",
+          "access": "read-write",
+          "paths": ["internal/**/*.go"]
+        }
+      ]
+    }
+  },
+  {
+    "fixtureId": "workspace-minimal-valid",
+    "schema": "workspace.schema.json",
+    "expected": "accept",
+    "rejectionLayer": "schema",
+    "reason": "Minimal valid workspace topology",
+    "instance": {
+      "components": [
+        {
+          "id": "core",
+          "root": ".",
+          "languageScopes": [
+            {
+              "id": "go-main",
+              "language": "go",
+              "harness": "go-standard",
+              "targets": ["source"]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "fixtureId": "harness-minimal-valid",
+    "schema": "harness.schema.json",
+    "expected": "accept",
+    "rejectionLayer": "schema",
+    "reason": "Minimal valid harness registry",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "harnesses": [
+        {
+          "id": "go-standard",
+          "version": "1.0.0",
+          "languages": ["go"],
+          "toolchains": ["go-122"],
+          "parameters": [],
+          "hooks": [
+            {
+              "phase": "test",
+              "hookId": "go-test",
+              "required": true
+            }
+          ],
+          "artifactGlobs": []
+        }
+      ]
+    }
+  },
+  {
+    "fixtureId": "toolchain-minimal-valid",
+    "schema": "toolchain.schema.json",
+    "expected": "accept",
+    "rejectionLayer": "schema",
+    "reason": "Minimal valid toolchain registry",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "toolchains": [
+        {
+          "id": "go-122",
+          "versionRequirement": ">=1.22",
+          "source": "system-path",
+          "platforms": [
+            {
+              "os": "windows",
+              "arch": "amd64"
+            }
+          ],
+          "probe": {
+            "executable": "go",
+            "args": ["version"],
+            "timeoutMs": 5000
+          },
+          "evidencePolicy": {
+            "executableHash": true,
+            "versionOutputHash": false,
+            "sourceEvidence": false
+          }
+        }
+      ]
+    }
+  }
+]

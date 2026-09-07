@@ -1,0 +1,392 @@
+[
+  {
+    "fixtureId": "chain-empty-tasks",
+    "schema": "chain.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "Tasks must contain at least one item",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "chain": {
+        "id": "core-chain",
+        "profile": "minimal"
+      },
+      "tasks": [],
+      "workspace": {
+        "components": [
+          {
+            "id": "core",
+            "root": ".",
+            "languageScopes": [
+              {
+                "id": "go-main",
+                "language": "go",
+                "harness": "go-standard",
+                "targets": ["source"]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "fixtureId": "hook-empty-hooks",
+    "schema": "hook.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "Hooks must contain at least one item",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "hooks": []
+    }
+  },
+  {
+    "fixtureId": "target-empty-targets",
+    "schema": "target.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "Targets must contain at least one item",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "targets": []
+    }
+  },
+  {
+    "fixtureId": "workspace-empty-components",
+    "schema": "workspace.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "Components must contain at least one item",
+    "instance": {
+      "components": []
+    }
+  },
+  {
+    "fixtureId": "harness-empty-harnesses",
+    "schema": "harness.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "Harnesses must contain at least one item",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "harnesses": []
+    }
+  },
+  {
+    "fixtureId": "toolchain-empty-toolchains",
+    "schema": "toolchain.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "Toolchains must contain at least one item",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "toolchains": []
+    }
+  },
+  {
+    "fixtureId": "chain-code-step-hooks-forbidden",
+    "schema": "chain.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "Code steps must not define hooks",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "chain": {
+        "id": "core-chain",
+        "profile": "minimal"
+      },
+      "tasks": [
+        {
+          "id": "core-task",
+          "review": "policy",
+          "steps": [
+            {
+              "id": "change-code",
+              "kind": "code",
+              "hooks": ["go-test"]
+            }
+          ]
+        }
+      ],
+      "workspace": {
+        "components": [
+          {
+            "id": "core",
+            "root": ".",
+            "languageScopes": [
+              {
+                "id": "go-main",
+                "language": "go",
+                "harness": "go-standard",
+                "targets": ["source"]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "fixtureId": "chain-noop-hooks-forbidden",
+    "schema": "chain.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "Noop steps must not define hooks",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "chain": {
+        "id": "core-chain",
+        "profile": "minimal"
+      },
+      "tasks": [
+        {
+          "id": "core-task",
+          "review": "policy",
+          "steps": [
+            {
+              "id": "record-state",
+              "kind": "noop",
+              "reason": "No work required",
+              "hooks": ["go-test"]
+            }
+          ]
+        }
+      ],
+      "workspace": {
+        "components": [
+          {
+            "id": "core",
+            "root": ".",
+            "languageScopes": [
+              {
+                "id": "go-main",
+                "language": "go",
+                "harness": "go-standard",
+                "targets": ["source"]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "fixtureId": "chain-noop-execution-forbidden",
+    "schema": "chain.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "Noop steps must not define execution",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "chain": {
+        "id": "core-chain",
+        "profile": "minimal"
+      },
+      "tasks": [
+        {
+          "id": "core-task",
+          "review": "policy",
+          "steps": [
+            {
+              "id": "record-state",
+              "kind": "noop",
+              "reason": "No work required",
+              "execution": "autonomous"
+            }
+          ]
+        }
+      ],
+      "workspace": {
+        "components": [
+          {
+            "id": "core",
+            "root": ".",
+            "languageScopes": [
+              {
+                "id": "go-main",
+                "language": "go",
+                "harness": "go-standard",
+                "targets": ["source"]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "fixtureId": "chain-noop-model-forbidden",
+    "schema": "chain.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "Noop steps must not define a model",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "chain": {
+        "id": "core-chain",
+        "profile": "minimal"
+      },
+      "tasks": [
+        {
+          "id": "core-task",
+          "review": "policy",
+          "steps": [
+            {
+              "id": "record-state",
+              "kind": "noop",
+              "reason": "No work required",
+              "model": "default-model"
+            }
+          ]
+        }
+      ],
+      "workspace": {
+        "components": [
+          {
+            "id": "core",
+            "root": ".",
+            "languageScopes": [
+              {
+                "id": "go-main",
+                "language": "go",
+                "harness": "go-standard",
+                "targets": ["source"]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "fixtureId": "chain-build-empty-hooks",
+    "schema": "chain.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "Build step hooks must not be empty",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "chain": {
+        "id": "core-chain",
+        "profile": "minimal"
+      },
+      "tasks": [
+        {
+          "id": "core-task",
+          "review": "policy",
+          "steps": [
+            {
+              "id": "build-core",
+              "kind": "build",
+              "hooks": []
+            }
+          ]
+        }
+      ],
+      "workspace": {
+        "components": [
+          {
+            "id": "core",
+            "root": ".",
+            "languageScopes": [
+              {
+                "id": "go-main",
+                "language": "go",
+                "harness": "go-standard",
+                "targets": ["source"]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "fixtureId": "chain-verify-empty-hooks",
+    "schema": "chain.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "Verify step hooks must not be empty",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "chain": {
+        "id": "core-chain",
+        "profile": "minimal"
+      },
+      "tasks": [
+        {
+          "id": "core-task",
+          "review": "policy",
+          "steps": [
+            {
+              "id": "verify-core",
+              "kind": "verify",
+              "hooks": []
+            }
+          ]
+        }
+      ],
+      "workspace": {
+        "components": [
+          {
+            "id": "core",
+            "root": ".",
+            "languageScopes": [
+              {
+                "id": "go-main",
+                "language": "go",
+                "harness": "go-standard",
+                "targets": ["source"]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "fixtureId": "chain-unknown-property",
+    "schema": "chain.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "Chain documents must reject unknown properties",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "chain": {
+        "id": "core-chain",
+        "profile": "minimal"
+      },
+      "tasks": [
+        {
+          "id": "core-task",
+          "review": "policy",
+          "steps": [
+            {
+              "id": "record-state",
+              "kind": "noop",
+              "reason": "No work required"
+            }
+          ]
+        }
+      ],
+      "workspace": {
+        "components": [
+          {
+            "id": "core",
+            "root": ".",
+            "languageScopes": [
+              {
+                "id": "go-main",
+                "language": "go",
+                "harness": "go-standard",
+                "targets": ["source"]
+              }
+            ]
+          }
+        ]
+      },
+      "unknownProperty": true
+    }
+  }
+]

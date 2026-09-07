@@ -1,0 +1,253 @@
+[
+  {
+    "fixtureId": "authorization-record-invalid-record-hash",
+    "schema": "authorization-record.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "recordHash must be a prefixed lowercase SHA-256 value",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "record": {
+        "recordId": "revocation-one",
+        "kind": "revocation",
+        "issuedAt": "2026-09-07T12:00:00.000Z",
+        "issuedBy": { "type": "operator", "id": "owner" },
+        "authorizationId": "authorization-one",
+        "authorizationHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "reasonCode": "operator-request",
+        "stopDisposition": "not-required",
+        "stopEvidence": [],
+        "residualRiskEvidence": []
+      },
+      "recordHash": "not-a-hash"
+    }
+  },
+  {
+    "fixtureId": "cost-ledger-invalid-empty-entries",
+    "schema": "cost-ledger.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "entries must contain at least one ledger entry",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "ledger": {
+        "ledgerId": "ledger-one",
+        "createdAt": "2026-09-07T12:00:00.000Z",
+        "scopeKind": "run",
+        "scopeHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "currency": "USD",
+        "pricingMode": "documented",
+        "pricingVersion": "2026-09-07",
+        "entries": [],
+        "summary": {
+          "reservedAmountMicros": 0,
+          "settledAmountMicros": 0,
+          "unknownReservedAmountMicros": 0,
+          "reservedCalls": 0,
+          "settledCalls": 0,
+          "reservedTokens": 0,
+          "settledTokens": 0
+        }
+      },
+      "ledgerHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333"
+    }
+  },
+  {
+    "fixtureId": "plan-preview-invalid-mode",
+    "schema": "plan-preview.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "mode must be offline-read-only",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "preview": {
+        "previewId": "preview-one",
+        "createdAt": "2026-09-07T12:00:00.000Z",
+        "mode": "online",
+        "chainDefinitionHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "workspaceDefinitionHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "effectiveConfigHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+        "policyHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+        "locations": {
+          "sourceRef": "source",
+          "runRef": "run-one",
+          "storeRef": "store"
+        },
+        "readTargetIds": ["source"],
+        "writeTargetIds": [],
+        "networkRequirements": [],
+        "steps": [
+          {
+            "taskId": "task-one",
+            "stepId": "inspect",
+            "kind": "verify",
+            "blockingGateIds": [],
+            "reviewRequired": false
+          }
+        ],
+        "reviewPointIds": [],
+        "budget": {
+          "modelCallLimit": 0,
+          "tokenLimit": 0,
+          "wallClockMs": 60000,
+          "attemptLimit": 1,
+          "currency": "USD",
+          "estimatedAmountMicros": null,
+          "estimateStatus": "not-applicable",
+          "pricingSource": null
+        },
+        "estimatedStoreBytes": 1024,
+        "exclusionIds": [],
+        "capabilities": [],
+        "outcome": "ready",
+        "blockingEvidence": []
+      },
+      "previewHash": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+    }
+  },
+  {
+    "fixtureId": "lifecycle-record-invalid-empty-binaries",
+    "schema": "lifecycle-record.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "binaryHashes must contain at least one hash",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "record": {
+        "recordId": "release-one",
+        "kind": "release",
+        "createdAt": "2026-09-07T12:00:00.000Z",
+        "version": "1.0.0",
+        "binaryHashes": [],
+        "dependencies": [],
+        "sbomHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "licenseManifestHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+        "checksumManifestHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+        "signatureReceiptHash": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+        "supportMatrix": [
+          {
+            "componentId": "proofrail",
+            "versionRange": "1.x",
+            "status": "supported",
+            "supportExpiresAt": null,
+            "capabilityIds": ["contracts"],
+            "platforms": [{ "os": "windows", "arch": "amd64" }]
+          }
+        ],
+        "knownLimitationIds": [],
+        "revocationFreshness": "unknown",
+        "revocationEvidence": []
+      },
+      "recordHash": "sha256:6666666666666666666666666666666666666666666666666666666666666666"
+    }
+  },
+  {
+    "fixtureId": "export-record-invalid-destination-precondition",
+    "schema": "export-record.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "destinationPrecondition must be absent",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "export": {
+        "exportId": "export-one",
+        "createdAt": "2026-09-07T12:00:00.000Z",
+        "recordedBy": { "type": "system", "id": "proofrail" },
+        "runId": "run-one",
+        "taskId": "task-one",
+        "attempt": 1,
+        "sourceSnapshotHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "reviewReceiptHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "promotionReceiptHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+        "verificationReportHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+        "destinationRef": "delivery",
+        "destinationIdentityHash": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+        "destinationPrecondition": "present",
+        "entries": [
+          {
+            "path": "bin/prfrail.exe",
+            "type": "regular-file",
+            "contentHash": "sha256:6666666666666666666666666666666666666666666666666666666666666666",
+            "sizeBytes": 1024
+          }
+        ],
+        "exclusions": [],
+        "outcome": "completed",
+        "packageManifestHash": "sha256:7777777777777777777777777777777777777777777777777777777777777777",
+        "evidence": [
+          "sha256:8888888888888888888888888888888888888888888888888888888888888888"
+        ],
+        "errorEvidence": []
+      },
+      "exportHash": "sha256:9999999999999999999999999999999999999999999999999999999999999999"
+    }
+  },
+  {
+    "fixtureId": "error-invalid-empty-message",
+    "schema": "error.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "message must contain at least one character",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "error": {
+        "errorId": "error-one",
+        "occurredAt": "2026-09-07T12:00:00.000Z",
+        "category": "schema",
+        "code": "schema.invalid-document",
+        "subject": {
+          "kind": "task",
+          "id": "task-one",
+          "runId": "run-one",
+          "attempt": 1
+        },
+        "evidence": [],
+        "message": "",
+        "retryMode": "never",
+        "suggestedAction": "fix-input"
+      }
+    }
+  },
+  {
+    "fixtureId": "error-set-invalid-empty-errors",
+    "schema": "error-set.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "errors must contain at least one entry",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "errorSet": {
+        "errorSetId": "error-set-one",
+        "createdAt": "2026-09-07T12:00:00.000Z",
+        "operation": "validate-contract",
+        "errors": [],
+        "primaryErrorId": "error-one"
+      },
+      "errorSetHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222"
+    }
+  },
+  {
+    "fixtureId": "effect-record-invalid-empty-evidence",
+    "schema": "effect-record.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "classification evidence must contain at least one hash",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "record": {
+        "recordId": "classification-one",
+        "kind": "classification",
+        "createdAt": "2026-09-07T12:00:00.000Z",
+        "policyHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "subjectKind": "adapter",
+        "subjectId": "local-adapter",
+        "subjectDefinitionHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "effectClass": "read-only",
+        "externalSystems": [],
+        "recoveryGuarantee": "none-required",
+        "evidence": []
+      },
+      "recordHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+    }
+  }
+]

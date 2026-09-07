@@ -1,0 +1,42 @@
+[
+  {
+    "vectorId": "jcs-001",
+    "input": {
+      "z": [3, 2, 1],
+      "a": {
+        "β": "值",
+        "quote": "\"\\\n"
+      }
+    },
+    "domainSeparator": "",
+    "canonical": "{\"a\":{\"quote\":\"\\\"\\\\\\n\",\"β\":\"值\"},\"z\":[3,2,1]}",
+    "digest": "sha256:d902fc6bb80d7028836660afd1da1edbfdc6876608f8c456dd653c8f4186e0b1"
+  },
+  {
+    "vectorId": "state-event-001",
+    "input": {
+      "eventId": "event-001",
+      "runId": "run-001",
+      "sequence": 1,
+      "occurredAt": "2026-09-06T12:34:56.789Z",
+      "actor": {
+        "type": "system",
+        "id": "proofrail"
+      },
+      "entity": {
+        "kind": "chain",
+        "runId": "run-001"
+      },
+      "fromState": "NONE",
+      "toState": "CREATED",
+      "previousEventHash": null,
+      "inputEvidence": [],
+      "reason": {
+        "code": "run-created"
+      }
+    },
+    "domainSeparator": "proofrail:state-event:1\n",
+    "canonical": "{\"actor\":{\"id\":\"proofrail\",\"type\":\"system\"},\"entity\":{\"kind\":\"chain\",\"runId\":\"run-001\"},\"eventId\":\"event-001\",\"fromState\":\"NONE\",\"inputEvidence\":[],\"occurredAt\":\"2026-09-06T12:34:56.789Z\",\"previousEventHash\":null,\"reason\":{\"code\":\"run-created\"},\"runId\":\"run-001\",\"sequence\":1,\"toState\":\"CREATED\"}",
+    "digest": "sha256:522dd307620e8aad5598045aba6a29d5bcbf60c8ff2d0945c70c4b480aa9502e"
+  }
+]

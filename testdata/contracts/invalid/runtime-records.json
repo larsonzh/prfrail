@@ -1,0 +1,210 @@
+[
+  {
+    "fixtureId": "run-manifest-invalid-hash",
+    "schema": "run-manifest.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "Manifest hash must be a prefixed lowercase SHA-256 value",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "manifest": {
+        "manifestId": "run-manifest",
+        "createdAt": "2026-09-07T12:00:00.000Z",
+        "runId": "run-one",
+        "chainId": "chain-one",
+        "chainDefinitionHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "effectiveChainHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "sourceConfigEvidence": [
+          "sha256:3333333333333333333333333333333333333333333333333333333333333333"
+        ],
+        "resolution": [
+          {
+            "effectivePointer": "/tasks/0",
+            "sourceKind": "builtin-default",
+            "sourceHash": null,
+            "sourcePointer": null
+          }
+        ],
+        "policyHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+        "parentSnapshotHash": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+        "bindings": [
+          {
+            "kind": "adapter",
+            "id": "local-adapter",
+            "version": "1.0.0",
+            "objectHash": "sha256:6666666666666666666666666666666666666666666666666666666666666666",
+            "capabilityEvidence": [
+              "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+            ]
+          }
+        ]
+      },
+      "manifestHash": "not-a-hash"
+    }
+  },
+  {
+    "fixtureId": "state-event-invalid-hash",
+    "schema": "state-event.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "Event hash must be a prefixed lowercase SHA-256 value",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "event": {
+        "eventId": "event-one",
+        "runId": "run-one",
+        "sequence": 1,
+        "occurredAt": "2026-09-07T12:00:00.000Z",
+        "actor": {
+          "type": "system",
+          "id": "proofrail"
+        },
+        "entity": {
+          "kind": "chain",
+          "runId": "run-one"
+        },
+        "fromState": "NONE",
+        "toState": "CREATED",
+        "previousEventHash": null,
+        "inputEvidence": [],
+        "reason": {
+          "code": "run-created"
+        }
+      },
+      "eventHash": "not-a-hash"
+    }
+  },
+  {
+    "fixtureId": "hook-result-invalid-hash",
+    "schema": "hook-result.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "Result hash must be a prefixed lowercase SHA-256 value",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "result": {
+        "resultId": "result-one",
+        "recordedBy": {
+          "type": "system",
+          "id": "proofrail"
+        },
+        "runId": "run-one",
+        "taskId": "task-one",
+        "stepId": "step-one",
+        "attempt": 1,
+        "hookId": "go-test",
+        "hookDefinitionHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "executionAttempt": 1,
+        "attemptedAt": "2026-09-07T12:00:00.000Z",
+        "startedAt": "2026-09-07T12:00:01.000Z",
+        "finishedAt": "2026-09-07T12:00:02.000Z",
+        "executionOutcome": "exited",
+        "exitCode": 0,
+        "assessment": "passed",
+        "failureKind": null,
+        "policyDisposition": "pass",
+        "stdout": {
+          "objectHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+          "byteLength": 0,
+          "capture": "complete",
+          "redaction": "not-required"
+        },
+        "stderr": {
+          "objectHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+          "byteLength": 0,
+          "capture": "complete",
+          "redaction": "not-required"
+        },
+        "artifacts": [],
+        "runnerEvidence": [
+          "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+        ],
+        "terminationEvidence": [],
+        "errorEvidence": []
+      },
+      "resultHash": "not-a-hash"
+    }
+  },
+  {
+    "fixtureId": "adapter-request-invalid-hash",
+    "schema": "adapter-envelope.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "Record hash must be a prefixed lowercase SHA-256 value",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "message": {
+        "type": "request",
+        "requestId": "request-one",
+        "runId": "run-one",
+        "taskId": "task-one",
+        "attempt": 1,
+        "createdAt": "2026-09-07T12:00:00.000Z",
+        "adapter": "local-adapter",
+        "contextHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+      },
+      "recordHash": "not-a-hash"
+    }
+  },
+  {
+    "fixtureId": "adapter-receipt-missing-adapter",
+    "schema": "adapter-receipt.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "Dispatch receipt must include the required adapter field",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "receipt": {
+        "type": "dispatch",
+        "receiptId": "receipt-one",
+        "occurredAt": "2026-09-07T12:00:00.000Z",
+        "recordedBy": {
+          "type": "system",
+          "id": "proofrail"
+        },
+        "requestId": "request-one",
+        "requestHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "evidence": [],
+        "errorEvidence": [],
+        "transport": "file-queue",
+        "transportRequestId": null,
+        "outcome": "accepted"
+      },
+      "receiptHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222"
+    }
+  },
+  {
+    "fixtureId": "repo-state-invalid-hash",
+    "schema": "snapshot-manifest.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "Manifest hash must be a prefixed lowercase SHA-256 value",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "manifest": {
+        "snapshotId": "snapshot-one",
+        "kind": "baseline",
+        "capturedAt": "2026-09-07T12:00:00.000Z",
+        "runId": "run-one",
+        "parentSnapshotHash": null,
+        "task": null,
+        "entries": [],
+        "exclusions": [
+          {
+            "pattern": "tmp/**",
+            "source": "default",
+            "reason": "temporary-files"
+          }
+        ],
+        "environment": {
+          "os": "windows",
+          "arch": "amd64",
+          "caseSensitive": false,
+          "environmentVariableNames": [],
+          "toolchainEvidence": []
+        }
+      },
+      "manifestHash": "not-a-hash"
+    }
+  }
+]

@@ -1,0 +1,1074 @@
+[
+  {
+    "fixtureId": "semantic-duplicate-task-id",
+    "schema": "chain.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "semantic",
+    "reason": "Duplicate task identifiers are rejected",
+    "instance": {
+      "documents": {
+        "chain.schema.json": {
+          "schemaVersion": "1.0.0",
+          "chain": { "id": "duplicate-task-chain", "profile": "minimal" },
+          "tasks": [
+            {
+              "id": "same-task",
+              "review": "policy",
+              "steps": [
+                { "id": "first-step", "kind": "noop", "reason": "First" }
+              ]
+            },
+            {
+              "id": "same-task",
+              "review": "policy",
+              "steps": [
+                { "id": "second-step", "kind": "noop", "reason": "Second" }
+              ]
+            }
+          ],
+          "workspace": {
+            "components": [
+              {
+                "id": "core",
+                "root": ".",
+                "languageScopes": [
+                  {
+                    "id": "go-main",
+                    "language": "go",
+                    "harness": "go-standard",
+                    "targets": ["source"]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "target.schema.json": {
+          "schemaVersion": "1.0.0",
+          "targets": [
+            {
+              "id": "source",
+              "class": "source",
+              "access": "read-write",
+              "paths": ["src/**/*.go"]
+            }
+          ]
+        },
+        "hook.schema.json": {
+          "schemaVersion": "1.0.0",
+          "hooks": [
+            {
+              "id": "check",
+              "kind": "verify",
+              "runner": { "type": "process", "executable": "go" },
+              "onFail": { "action": "fail-stop" },
+              "timeoutMs": 1000,
+              "resourceLimits": {
+                "memoryBytes": 1,
+                "outputBytes": 1,
+                "processCount": 1
+              },
+              "networkPolicy": { "mode": "deny" }
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "fixtureId": "semantic-duplicate-step-id",
+    "schema": "chain.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "semantic",
+    "reason": "Duplicate step identifiers are rejected",
+    "instance": {
+      "documents": {
+        "chain.schema.json": {
+          "schemaVersion": "1.0.0",
+          "chain": { "id": "duplicate-step-chain", "profile": "minimal" },
+          "tasks": [
+            {
+              "id": "first-task",
+              "review": "policy",
+              "steps": [
+                { "id": "same-step", "kind": "noop", "reason": "First" }
+              ]
+            },
+            {
+              "id": "second-task",
+              "review": "policy",
+              "steps": [
+                { "id": "same-step", "kind": "noop", "reason": "Second" }
+              ]
+            }
+          ],
+          "workspace": {
+            "components": [
+              {
+                "id": "core",
+                "root": ".",
+                "languageScopes": [
+                  {
+                    "id": "go-main",
+                    "language": "go",
+                    "harness": "go-standard",
+                    "targets": ["source"]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "target.schema.json": {
+          "schemaVersion": "1.0.0",
+          "targets": [
+            {
+              "id": "source",
+              "class": "source",
+              "access": "read-write",
+              "paths": ["src/**/*.go"]
+            }
+          ]
+        },
+        "hook.schema.json": {
+          "schemaVersion": "1.0.0",
+          "hooks": [
+            {
+              "id": "check",
+              "kind": "verify",
+              "runner": { "type": "process", "executable": "go" },
+              "onFail": { "action": "fail-stop" },
+              "timeoutMs": 1000,
+              "resourceLimits": {
+                "memoryBytes": 1,
+                "outputBytes": 1,
+                "processCount": 1
+              },
+              "networkPolicy": { "mode": "deny" }
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "fixtureId": "semantic-missing-hook-reference",
+    "schema": "chain.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "semantic",
+    "reason": "A step cannot reference an undeclared hook",
+    "instance": {
+      "documents": {
+        "chain.schema.json": {
+          "schemaVersion": "1.0.0",
+          "chain": { "id": "missing-hook-chain", "profile": "minimal" },
+          "tasks": [
+            {
+              "id": "build-task",
+              "review": "policy",
+              "steps": [
+                {
+                  "id": "build-step",
+                  "kind": "build",
+                  "hooks": ["missing-hook"]
+                }
+              ]
+            }
+          ],
+          "workspace": {
+            "components": [
+              {
+                "id": "core",
+                "root": ".",
+                "languageScopes": [
+                  {
+                    "id": "go-main",
+                    "language": "go",
+                    "harness": "go-standard",
+                    "targets": ["source"]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "target.schema.json": {
+          "schemaVersion": "1.0.0",
+          "targets": [
+            {
+              "id": "source",
+              "class": "source",
+              "access": "read-write",
+              "paths": ["src/**/*.go"]
+            }
+          ]
+        },
+        "hook.schema.json": {
+          "schemaVersion": "1.0.0",
+          "hooks": [
+            {
+              "id": "declared-hook",
+              "kind": "build",
+              "runner": { "type": "process", "executable": "go" },
+              "onFail": { "action": "fail-stop" },
+              "timeoutMs": 1000,
+              "resourceLimits": {
+                "memoryBytes": 1,
+                "outputBytes": 1,
+                "processCount": 1
+              },
+              "networkPolicy": { "mode": "deny" }
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "fixtureId": "semantic-missing-target-reference",
+    "schema": "chain.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "semantic",
+    "reason": "A step cannot reference an undeclared target",
+    "instance": {
+      "documents": {
+        "chain.schema.json": {
+          "schemaVersion": "1.0.0",
+          "chain": { "id": "missing-target-chain", "profile": "minimal" },
+          "tasks": [
+            {
+              "id": "code-task",
+              "review": "policy",
+              "steps": [
+                {
+                  "id": "code-step",
+                  "kind": "code",
+                  "targets": ["missing-target"]
+                }
+              ]
+            }
+          ],
+          "workspace": {
+            "components": [
+              {
+                "id": "core",
+                "root": ".",
+                "languageScopes": [
+                  {
+                    "id": "go-main",
+                    "language": "go",
+                    "harness": "go-standard",
+                    "targets": ["source"]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "target.schema.json": {
+          "schemaVersion": "1.0.0",
+          "targets": [
+            {
+              "id": "source",
+              "class": "source",
+              "access": "read-write",
+              "paths": ["src/**/*.go"]
+            }
+          ]
+        },
+        "hook.schema.json": {
+          "schemaVersion": "1.0.0",
+          "hooks": [
+            {
+              "id": "check",
+              "kind": "verify",
+              "runner": { "type": "process", "executable": "go" },
+              "onFail": { "action": "fail-stop" },
+              "timeoutMs": 1000,
+              "resourceLimits": {
+                "memoryBytes": 1,
+                "outputBytes": 1,
+                "processCount": 1
+              },
+              "networkPolicy": { "mode": "deny" }
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "fixtureId": "semantic-component-dependency-cycle",
+    "schema": "chain.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "semantic",
+    "reason": "Component dependency cycles are rejected",
+    "instance": {
+      "documents": {
+        "chain.schema.json": {
+          "schemaVersion": "1.0.0",
+          "chain": { "id": "component-cycle-chain", "profile": "standard" },
+          "tasks": [
+            {
+              "id": "task",
+              "review": "policy",
+              "steps": [
+                { "id": "step", "kind": "noop", "reason": "Cycle fixture" }
+              ]
+            }
+          ],
+          "workspace": {
+            "components": [
+              {
+                "id": "component-a",
+                "root": "a",
+                "dependsOn": ["component-b"],
+                "languageScopes": [
+                  {
+                    "id": "scope-a",
+                    "language": "go",
+                    "harness": "go-standard",
+                    "targets": ["source-a"]
+                  }
+                ]
+              },
+              {
+                "id": "component-b",
+                "root": "b",
+                "dependsOn": ["component-a"],
+                "languageScopes": [
+                  {
+                    "id": "scope-b",
+                    "language": "go",
+                    "harness": "go-standard",
+                    "targets": ["source-b"]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "target.schema.json": {
+          "schemaVersion": "1.0.0",
+          "targets": [
+            {
+              "id": "source-a",
+              "class": "source",
+              "access": "read-write",
+              "paths": ["a/**/*.go"]
+            },
+            {
+              "id": "source-b",
+              "class": "source",
+              "access": "read-write",
+              "paths": ["b/**/*.go"]
+            }
+          ]
+        },
+        "hook.schema.json": {
+          "schemaVersion": "1.0.0",
+          "hooks": [
+            {
+              "id": "check",
+              "kind": "verify",
+              "runner": { "type": "process", "executable": "go" },
+              "onFail": { "action": "fail-stop" },
+              "timeoutMs": 1000,
+              "resourceLimits": {
+                "memoryBytes": 1,
+                "outputBytes": 1,
+                "processCount": 1
+              },
+              "networkPolicy": { "mode": "deny" }
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "fixtureId": "semantic-language-scope-dependency-cycle",
+    "schema": "chain.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "semantic",
+    "reason": "Language scope dependency cycles are rejected",
+    "instance": {
+      "documents": {
+        "chain.schema.json": {
+          "schemaVersion": "1.0.0",
+          "chain": { "id": "scope-cycle-chain", "profile": "standard" },
+          "tasks": [
+            {
+              "id": "task",
+              "review": "policy",
+              "steps": [
+                { "id": "step", "kind": "noop", "reason": "Cycle fixture" }
+              ]
+            }
+          ],
+          "workspace": {
+            "components": [
+              {
+                "id": "core",
+                "root": ".",
+                "languageScopes": [
+                  {
+                    "id": "scope-a",
+                    "language": "go",
+                    "harness": "go-standard",
+                    "targets": ["source-a"],
+                    "dependsOn": ["scope-b"]
+                  },
+                  {
+                    "id": "scope-b",
+                    "language": "c",
+                    "harness": "c-standard",
+                    "targets": ["source-b"],
+                    "dependsOn": ["scope-a"]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "target.schema.json": {
+          "schemaVersion": "1.0.0",
+          "targets": [
+            {
+              "id": "source-a",
+              "class": "source",
+              "access": "read-write",
+              "paths": ["src/**/*.go"]
+            },
+            {
+              "id": "source-b",
+              "class": "source",
+              "access": "read-write",
+              "paths": ["src/**/*.c"]
+            }
+          ]
+        },
+        "hook.schema.json": {
+          "schemaVersion": "1.0.0",
+          "hooks": [
+            {
+              "id": "check",
+              "kind": "verify",
+              "runner": { "type": "process", "executable": "go" },
+              "onFail": { "action": "fail-stop" },
+              "timeoutMs": 1000,
+              "resourceLimits": {
+                "memoryBytes": 1,
+                "outputBytes": 1,
+                "processCount": 1
+              },
+              "networkPolicy": { "mode": "deny" }
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "fixtureId": "semantic-generated-target-cycle",
+    "schema": "chain.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "semantic",
+    "reason": "Generated target cycles are rejected",
+    "instance": {
+      "documents": {
+        "chain.schema.json": {
+          "schemaVersion": "1.0.0",
+          "chain": { "id": "generated-cycle-chain", "profile": "standard" },
+          "tasks": [
+            {
+              "id": "task",
+              "review": "policy",
+              "steps": [
+                { "id": "step", "kind": "noop", "reason": "Cycle fixture" }
+              ]
+            }
+          ],
+          "workspace": {
+            "components": [
+              {
+                "id": "core",
+                "root": ".",
+                "languageScopes": [
+                  {
+                    "id": "go-main",
+                    "language": "go",
+                    "harness": "go-standard",
+                    "targets": ["generated-a"]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "target.schema.json": {
+          "schemaVersion": "1.0.0",
+          "targets": [
+            {
+              "id": "generated-a",
+              "class": "generated",
+              "access": "read-only",
+              "paths": ["gen/a.json"],
+              "generatedFrom": ["generated-b"],
+              "generatorHook": "generate"
+            },
+            {
+              "id": "generated-b",
+              "class": "generated",
+              "access": "read-only",
+              "paths": ["gen/b.json"],
+              "generatedFrom": ["generated-a"],
+              "generatorHook": "generate"
+            }
+          ]
+        },
+        "hook.schema.json": {
+          "schemaVersion": "1.0.0",
+          "hooks": [
+            {
+              "id": "generate",
+              "kind": "build",
+              "runner": { "type": "process", "executable": "go" },
+              "onFail": { "action": "fail-stop" },
+              "timeoutMs": 1000,
+              "resourceLimits": {
+                "memoryBytes": 1,
+                "outputBytes": 1,
+                "processCount": 1
+              },
+              "networkPolicy": { "mode": "deny" }
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "fixtureId": "semantic-identical-writable-glob-overlap",
+    "schema": "chain.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "semantic",
+    "reason": "Identical writable target globs cannot have multiple owners",
+    "instance": {
+      "documents": {
+        "chain.schema.json": {
+          "schemaVersion": "1.0.0",
+          "chain": { "id": "overlap-chain", "profile": "standard" },
+          "tasks": [
+            {
+              "id": "task",
+              "review": "policy",
+              "steps": [
+                { "id": "step", "kind": "noop", "reason": "Overlap fixture" }
+              ]
+            }
+          ],
+          "workspace": {
+            "components": [
+              {
+                "id": "core",
+                "root": ".",
+                "languageScopes": [
+                  {
+                    "id": "go-main",
+                    "language": "go",
+                    "harness": "go-standard",
+                    "targets": ["source-a"]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "target.schema.json": {
+          "schemaVersion": "1.0.0",
+          "targets": [
+            {
+              "id": "source-a",
+              "class": "source",
+              "access": "read-write",
+              "paths": ["src/**/*.go"]
+            },
+            {
+              "id": "source-b",
+              "class": "test",
+              "access": "read-write",
+              "paths": ["src/**/*.go"]
+            }
+          ]
+        },
+        "hook.schema.json": {
+          "schemaVersion": "1.0.0",
+          "hooks": [
+            {
+              "id": "check",
+              "kind": "verify",
+              "runner": { "type": "process", "executable": "go" },
+              "onFail": { "action": "fail-stop" },
+              "timeoutMs": 1000,
+              "resourceLimits": {
+                "memoryBytes": 1,
+                "outputBytes": 1,
+                "processCount": 1
+              },
+              "networkPolicy": { "mode": "deny" }
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "fixtureId": "semantic-handoff-read-only-target",
+    "schema": "chain.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "semantic",
+    "reason": "Manual handoff cannot allow a read only target",
+    "instance": {
+      "documents": {
+        "chain.schema.json": {
+          "schemaVersion": "1.0.0",
+          "chain": { "id": "handoff-readonly-chain", "profile": "strict" },
+          "tasks": [
+            {
+              "id": "task",
+              "review": "manual",
+              "steps": [
+                {
+                  "id": "handoff-step",
+                  "kind": "code",
+                  "execution": "manual-handoff",
+                  "targets": ["source"],
+                  "handoffPolicy": {
+                    "allowedTargets": ["source"],
+                    "inputPolicy": "structured",
+                    "handoffTimeoutMs": 1000,
+                    "returnActions": ["complete"],
+                    "hooksAfterReturn": ["check"]
+                  }
+                }
+              ]
+            }
+          ],
+          "workspace": {
+            "components": [
+              {
+                "id": "core",
+                "root": ".",
+                "languageScopes": [
+                  {
+                    "id": "go-main",
+                    "language": "go",
+                    "harness": "go-standard",
+                    "targets": ["source"]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "target.schema.json": {
+          "schemaVersion": "1.0.0",
+          "targets": [
+            {
+              "id": "source",
+              "class": "source",
+              "access": "read-only",
+              "paths": ["src/**/*.go"]
+            }
+          ]
+        },
+        "hook.schema.json": {
+          "schemaVersion": "1.0.0",
+          "hooks": [
+            {
+              "id": "check",
+              "kind": "verify",
+              "runner": { "type": "process", "executable": "go" },
+              "onFail": { "action": "fail-stop" },
+              "timeoutMs": 1000,
+              "resourceLimits": {
+                "memoryBytes": 1,
+                "outputBytes": 1,
+                "processCount": 1
+              },
+              "networkPolicy": { "mode": "deny" }
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "fixtureId": "semantic-review-self-approval",
+    "schema": "chain.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "semantic",
+    "reason": "A change producer cannot approve the same change",
+    "instance": {
+      "documents": {
+        "chain.schema.json": {
+          "schemaVersion": "1.0.0",
+          "chain": { "id": "self-review-chain", "profile": "strict" },
+          "tasks": [
+            {
+              "id": "task",
+              "review": "manual",
+              "steps": [
+                { "id": "step", "kind": "noop", "reason": "Review fixture" }
+              ]
+            }
+          ],
+          "workspace": {
+            "components": [
+              {
+                "id": "core",
+                "root": ".",
+                "languageScopes": [
+                  {
+                    "id": "go-main",
+                    "language": "go",
+                    "harness": "go-standard",
+                    "targets": ["source"]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "target.schema.json": {
+          "schemaVersion": "1.0.0",
+          "targets": [
+            {
+              "id": "source",
+              "class": "source",
+              "access": "read-write",
+              "paths": ["src/**/*.go"]
+            }
+          ]
+        },
+        "hook.schema.json": {
+          "schemaVersion": "1.0.0",
+          "hooks": [
+            {
+              "id": "check",
+              "kind": "verify",
+              "runner": { "type": "process", "executable": "go" },
+              "onFail": { "action": "fail-stop" },
+              "timeoutMs": 1000,
+              "resourceLimits": {
+                "memoryBytes": 1,
+                "outputBytes": 1,
+                "processCount": 1
+              },
+              "networkPolicy": { "mode": "deny" }
+            }
+          ]
+        },
+        "review-receipt.schema.json": [
+          {
+            "schemaVersion": "1.0.0",
+            "receipt": {
+              "receiptId": "self-approval",
+              "occurredAt": "2026-09-07T12:00:00.000Z",
+              "recordedBy": { "type": "operator", "id": "producer-one" },
+              "runId": "run-one",
+              "taskId": "task",
+              "attempt": 1,
+              "evidenceRootHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+              "reviewMode": "manual",
+              "policyHash": null,
+              "outcome": "approve",
+              "evidence": [],
+              "errorEvidence": [],
+              "reason": null,
+              "waiverAuthorization": null
+            },
+            "receiptHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222"
+          }
+        ]
+      },
+      "context": {
+        "changeProducerId": "producer-one",
+        "now": "2026-09-07T12:30:00.000Z"
+      }
+    }
+  },
+  {
+    "fixtureId": "semantic-expired-waiver",
+    "schema": "chain.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "semantic",
+    "reason": "An expired waiver is rejected",
+    "instance": {
+      "documents": {
+        "chain.schema.json": {
+          "schemaVersion": "1.0.0",
+          "chain": { "id": "expired-waiver-chain", "profile": "strict" },
+          "tasks": [
+            {
+              "id": "task",
+              "review": "manual",
+              "steps": [
+                { "id": "step", "kind": "noop", "reason": "Waiver fixture" }
+              ]
+            }
+          ],
+          "workspace": {
+            "components": [
+              {
+                "id": "core",
+                "root": ".",
+                "languageScopes": [
+                  {
+                    "id": "go-main",
+                    "language": "go",
+                    "harness": "go-standard",
+                    "targets": ["source"]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "target.schema.json": {
+          "schemaVersion": "1.0.0",
+          "targets": [
+            {
+              "id": "source",
+              "class": "source",
+              "access": "read-write",
+              "paths": ["src/**/*.go"]
+            }
+          ]
+        },
+        "hook.schema.json": {
+          "schemaVersion": "1.0.0",
+          "hooks": [
+            {
+              "id": "check",
+              "kind": "verify",
+              "runner": { "type": "process", "executable": "go" },
+              "onFail": { "action": "fail-stop" },
+              "timeoutMs": 1000,
+              "resourceLimits": {
+                "memoryBytes": 1,
+                "outputBytes": 1,
+                "processCount": 1
+              },
+              "networkPolicy": { "mode": "deny" }
+            }
+          ]
+        },
+        "review-receipt.schema.json": [
+          {
+            "schemaVersion": "1.0.0",
+            "receipt": {
+              "receiptId": "expired-waiver",
+              "occurredAt": "2026-09-07T11:00:00.000Z",
+              "recordedBy": { "type": "operator", "id": "reviewer-one" },
+              "runId": "run-one",
+              "taskId": "task",
+              "attempt": 1,
+              "evidenceRootHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+              "reviewMode": "manual",
+              "policyHash": null,
+              "outcome": "waive",
+              "evidence": [],
+              "errorEvidence": [
+                "sha256:2222222222222222222222222222222222222222222222222222222222222222"
+              ],
+              "reason": { "code": "temporary-exception" },
+              "waiverAuthorization": {
+                "authorizedBy": { "type": "operator", "id": "release-manager" },
+                "policyBasisHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+                "scope": ["task"],
+                "expiresAt": "2026-09-07T12:00:00.000Z"
+              }
+            },
+            "receiptHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+          }
+        ]
+      },
+      "context": {
+        "changeProducerId": "producer-one",
+        "now": "2026-09-07T12:30:00.000Z"
+      }
+    }
+  },
+  {
+    "fixtureId": "semantic-required-documentation-missing",
+    "schema": "chain.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "semantic",
+    "reason": "Required documentation needs an impact rule",
+    "instance": {
+      "documents": {
+        "chain.schema.json": {
+          "schemaVersion": "1.0.0",
+          "chain": {
+            "id": "missing-documentation-chain",
+            "profile": "standard"
+          },
+          "documentation": { "policy": "required" },
+          "tasks": [
+            {
+              "id": "change-task",
+              "review": "policy",
+              "steps": [
+                {
+                  "id": "change-step",
+                  "kind": "noop",
+                  "reason": "Documentation fixture"
+                }
+              ]
+            }
+          ],
+          "workspace": {
+            "components": [
+              {
+                "id": "core",
+                "root": ".",
+                "languageScopes": [
+                  {
+                    "id": "go-main",
+                    "language": "go",
+                    "harness": "go-standard",
+                    "targets": ["source"]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "target.schema.json": {
+          "schemaVersion": "1.0.0",
+          "targets": [
+            {
+              "id": "source",
+              "class": "source",
+              "access": "read-write",
+              "paths": ["src/**/*.go"]
+            }
+          ]
+        },
+        "hook.schema.json": {
+          "schemaVersion": "1.0.0",
+          "hooks": [
+            {
+              "id": "check",
+              "kind": "verify",
+              "runner": { "type": "process", "executable": "go" },
+              "onFail": { "action": "fail-stop" },
+              "timeoutMs": 1000,
+              "resourceLimits": {
+                "memoryBytes": 1,
+                "outputBytes": 1,
+                "processCount": 1
+              },
+              "networkPolicy": { "mode": "deny" }
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "fixtureId": "semantic-step-scope-empty",
+    "schema": "chain.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "semantic",
+    "reason": "A step component and language scope selection must intersect",
+    "instance": {
+      "documents": {
+        "chain.schema.json": {
+          "schemaVersion": "1.0.0",
+          "chain": { "id": "step-scope-empty-chain", "profile": "standard" },
+          "tasks": [
+            {
+              "id": "code-task",
+              "review": "policy",
+              "steps": [
+                {
+                  "id": "code-step",
+                  "kind": "code",
+                  "components": ["component-a"],
+                  "languageScopes": ["scope-b"],
+                  "targets": ["source-a"]
+                }
+              ]
+            }
+          ],
+          "workspace": {
+            "components": [
+              {
+                "id": "component-a",
+                "root": "a",
+                "languageScopes": [
+                  {
+                    "id": "scope-a",
+                    "language": "go",
+                    "harness": "go-standard",
+                    "targets": ["source-a"]
+                  }
+                ]
+              },
+              {
+                "id": "component-b",
+                "root": "b",
+                "languageScopes": [
+                  {
+                    "id": "scope-b",
+                    "language": "go",
+                    "harness": "go-standard",
+                    "targets": ["source-b"]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "target.schema.json": {
+          "schemaVersion": "1.0.0",
+          "targets": [
+            {
+              "id": "source-a",
+              "class": "source",
+              "access": "read-write",
+              "paths": ["a/**/*.go"]
+            },
+            {
+              "id": "source-b",
+              "class": "source",
+              "access": "read-write",
+              "paths": ["b/**/*.go"]
+            }
+          ]
+        },
+        "hook.schema.json": {
+          "schemaVersion": "1.0.0",
+          "hooks": [
+            {
+              "id": "check",
+              "kind": "verify",
+              "runner": { "type": "process", "executable": "go" },
+              "onFail": { "action": "fail-stop" },
+              "timeoutMs": 1000,
+              "resourceLimits": {
+                "memoryBytes": 1,
+                "outputBytes": 1,
+                "processCount": 1
+              },
+              "networkPolicy": { "mode": "deny" }
+            }
+          ]
+        }
+      }
+    }
+  }
+]

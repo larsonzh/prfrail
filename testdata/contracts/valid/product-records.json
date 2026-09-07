@@ -1,0 +1,281 @@
+[
+  {
+    "fixtureId": "authorization-record-valid",
+    "schema": "authorization-record.schema.json",
+    "expected": "accept",
+    "rejectionLayer": "schema",
+    "reason": "Valid authorization revocation record",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "record": {
+        "recordId": "revocation-one",
+        "kind": "revocation",
+        "issuedAt": "2026-09-07T12:00:00.000Z",
+        "issuedBy": { "type": "operator", "id": "owner" },
+        "authorizationId": "authorization-one",
+        "authorizationHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "reasonCode": "operator-request",
+        "stopDisposition": "not-required",
+        "stopEvidence": [],
+        "residualRiskEvidence": []
+      },
+      "recordHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222"
+    }
+  },
+  {
+    "fixtureId": "cost-ledger-valid",
+    "schema": "cost-ledger.schema.json",
+    "expected": "accept",
+    "rejectionLayer": "schema",
+    "reason": "Valid cost ledger with one allocation",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "ledger": {
+        "ledgerId": "ledger-one",
+        "createdAt": "2026-09-07T12:00:00.000Z",
+        "scopeKind": "run",
+        "scopeHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "currency": "USD",
+        "pricingMode": "documented",
+        "pricingVersion": "2026-09-07",
+        "entries": [
+          {
+            "entryId": "allocation-one",
+            "sequence": 1,
+            "kind": "allocation",
+            "occurredAt": "2026-09-07T12:00:00.000Z",
+            "authorizationHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+            "previousLimitsHash": null,
+            "limits": {
+              "amountMicros": 1000000,
+              "modelCalls": 10,
+              "tokens": 10000,
+              "wallClockMs": 60000,
+              "attempts": 2
+            }
+          }
+        ],
+        "summary": {
+          "reservedAmountMicros": 0,
+          "settledAmountMicros": 0,
+          "unknownReservedAmountMicros": 0,
+          "reservedCalls": 0,
+          "settledCalls": 0,
+          "reservedTokens": 0,
+          "settledTokens": 0
+        }
+      },
+      "ledgerHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333"
+    }
+  },
+  {
+    "fixtureId": "plan-preview-valid",
+    "schema": "plan-preview.schema.json",
+    "expected": "accept",
+    "rejectionLayer": "schema",
+    "reason": "Valid ready read only plan preview",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "preview": {
+        "previewId": "preview-one",
+        "createdAt": "2026-09-07T12:00:00.000Z",
+        "mode": "offline-read-only",
+        "chainDefinitionHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "workspaceDefinitionHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "effectiveConfigHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+        "policyHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+        "locations": {
+          "sourceRef": "source",
+          "runRef": "run-one",
+          "storeRef": "store"
+        },
+        "readTargetIds": ["source"],
+        "writeTargetIds": [],
+        "networkRequirements": [],
+        "steps": [
+          {
+            "taskId": "task-one",
+            "stepId": "inspect",
+            "kind": "verify",
+            "blockingGateIds": [],
+            "reviewRequired": false
+          }
+        ],
+        "reviewPointIds": [],
+        "budget": {
+          "modelCallLimit": 0,
+          "tokenLimit": 0,
+          "wallClockMs": 60000,
+          "attemptLimit": 1,
+          "currency": "USD",
+          "estimatedAmountMicros": null,
+          "estimateStatus": "not-applicable",
+          "pricingSource": null
+        },
+        "estimatedStoreBytes": 1024,
+        "exclusionIds": [],
+        "capabilities": [],
+        "outcome": "ready",
+        "blockingEvidence": []
+      },
+      "previewHash": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+    }
+  },
+  {
+    "fixtureId": "lifecycle-record-valid",
+    "schema": "lifecycle-record.schema.json",
+    "expected": "accept",
+    "rejectionLayer": "schema",
+    "reason": "Valid release lifecycle record",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "record": {
+        "recordId": "release-one",
+        "kind": "release",
+        "createdAt": "2026-09-07T12:00:00.000Z",
+        "version": "1.0.0",
+        "binaryHashes": [
+          "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+        ],
+        "dependencies": [],
+        "sbomHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "licenseManifestHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+        "checksumManifestHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+        "signatureReceiptHash": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+        "supportMatrix": [
+          {
+            "componentId": "proofrail",
+            "versionRange": "1.x",
+            "status": "supported",
+            "supportExpiresAt": null,
+            "capabilityIds": ["contracts"],
+            "platforms": [{ "os": "windows", "arch": "amd64" }]
+          }
+        ],
+        "knownLimitationIds": [],
+        "revocationFreshness": "unknown",
+        "revocationEvidence": []
+      },
+      "recordHash": "sha256:6666666666666666666666666666666666666666666666666666666666666666"
+    }
+  },
+  {
+    "fixtureId": "export-record-valid",
+    "schema": "export-record.schema.json",
+    "expected": "accept",
+    "rejectionLayer": "schema",
+    "reason": "Valid completed export record",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "export": {
+        "exportId": "export-one",
+        "createdAt": "2026-09-07T12:00:00.000Z",
+        "recordedBy": { "type": "system", "id": "proofrail" },
+        "runId": "run-one",
+        "taskId": "task-one",
+        "attempt": 1,
+        "sourceSnapshotHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "reviewReceiptHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "promotionReceiptHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+        "verificationReportHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+        "destinationRef": "delivery",
+        "destinationIdentityHash": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+        "destinationPrecondition": "absent",
+        "entries": [
+          {
+            "path": "bin/prfrail.exe",
+            "type": "regular-file",
+            "contentHash": "sha256:6666666666666666666666666666666666666666666666666666666666666666",
+            "sizeBytes": 1024
+          }
+        ],
+        "exclusions": [],
+        "outcome": "completed",
+        "packageManifestHash": "sha256:7777777777777777777777777777777777777777777777777777777777777777",
+        "evidence": [
+          "sha256:8888888888888888888888888888888888888888888888888888888888888888"
+        ],
+        "errorEvidence": []
+      },
+      "exportHash": "sha256:9999999999999999999999999999999999999999999999999999999999999999"
+    }
+  },
+  {
+    "fixtureId": "error-valid",
+    "schema": "error.schema.json",
+    "expected": "accept",
+    "rejectionLayer": "schema",
+    "reason": "Valid persistent schema error",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "error": {
+        "errorId": "error-one",
+        "occurredAt": "2026-09-07T12:00:00.000Z",
+        "category": "schema",
+        "code": "schema.invalid-document",
+        "subject": {
+          "kind": "task",
+          "id": "task-one",
+          "runId": "run-one",
+          "attempt": 1
+        },
+        "evidence": [],
+        "message": "Document failed schema validation",
+        "retryMode": "never",
+        "suggestedAction": "fix-input"
+      }
+    }
+  },
+  {
+    "fixtureId": "error-set-valid",
+    "schema": "error-set.schema.json",
+    "expected": "accept",
+    "rejectionLayer": "schema",
+    "reason": "Valid persistent error set",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "errorSet": {
+        "errorSetId": "error-set-one",
+        "createdAt": "2026-09-07T12:00:00.000Z",
+        "operation": "validate-contract",
+        "errors": [
+          {
+            "errorId": "error-one",
+            "errorHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+            "occurredAt": "2026-09-07T12:00:00.000Z",
+            "category": "schema",
+            "code": "schema.invalid-document"
+          }
+        ],
+        "primaryErrorId": "error-one"
+      },
+      "errorSetHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222"
+    }
+  },
+  {
+    "fixtureId": "effect-record-valid",
+    "schema": "effect-record.schema.json",
+    "expected": "accept",
+    "rejectionLayer": "schema",
+    "reason": "Valid side effect classification record",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "record": {
+        "recordId": "classification-one",
+        "kind": "classification",
+        "createdAt": "2026-09-07T12:00:00.000Z",
+        "policyHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "subjectKind": "adapter",
+        "subjectId": "local-adapter",
+        "subjectDefinitionHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "effectClass": "read-only",
+        "externalSystems": [],
+        "recoveryGuarantee": "none-required",
+        "evidence": [
+          "sha256:3333333333333333333333333333333333333333333333333333333333333333"
+        ]
+      },
+      "recordHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+    }
+  }
+]

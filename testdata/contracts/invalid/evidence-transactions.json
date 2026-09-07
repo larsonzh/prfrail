@@ -1,0 +1,350 @@
+[
+  {
+    "fixtureId": "evidence-manifest-unsupported-schema-version",
+    "schema": "evidence-manifest.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "Schema version must be 1.0.0",
+    "instance": {
+      "schemaVersion": "2.0.0",
+      "manifest": {
+        "evidenceId": "evidence-one",
+        "createdAt": "2026-09-07T00:00:00.000Z",
+        "runId": "run-one",
+        "taskId": "task-one",
+        "attempt": 1,
+        "taskDefinitionHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "policyHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "parentSnapshotHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+        "candidateSnapshotHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+        "items": [
+          {
+            "id": "artifact-one",
+            "kind": "artifact",
+            "objectHash": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+            "mediaType": "application/json",
+            "redaction": "not-required"
+          }
+        ]
+      },
+      "evidenceRootHash": "sha256:6666666666666666666666666666666666666666666666666666666666666666"
+    }
+  },
+  {
+    "fixtureId": "change-set-unsupported-schema-version",
+    "schema": "change-set.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "Schema version must be 1.0.0",
+    "instance": {
+      "schemaVersion": "2.0.0",
+      "changeSet": {
+        "changeSetId": "change-set-one",
+        "createdAt": "2026-09-07T00:00:00.000Z",
+        "runId": "run-one",
+        "taskId": "task-one",
+        "attempt": 1,
+        "parentSnapshotHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "beforeManifestHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "afterManifestHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+        "mode": "managed-change-set",
+        "operations": [
+          {
+            "operationId": "create-one",
+            "sequence": 1,
+            "kind": "create-file",
+            "path": "docs/new.txt",
+            "beforeHash": null,
+            "afterHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+            "assertions": [
+              {
+                "phase": "after",
+                "kind": "exact-occurrences",
+                "text": "hello\n",
+                "count": 1
+              }
+            ],
+            "content": "hello\n",
+            "lineEnding": "lf"
+          }
+        ]
+      },
+      "changeSetHash": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+    }
+  },
+  {
+    "fixtureId": "verification-report-unsupported-schema-version",
+    "schema": "verification-report.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "Schema version must be 1.0.0",
+    "instance": {
+      "schemaVersion": "2.0.0",
+      "report": {
+        "reportId": "report-one",
+        "verifiedAt": "2026-09-07T00:00:00.000Z",
+        "verifierId": "verifier-one",
+        "subjectKind": "task-attempt",
+        "subjectHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "trustPolicyHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "records": [
+          {
+            "kind": "evidence-manifest",
+            "objectHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333"
+          }
+        ],
+        "checks": [
+          {
+            "checkId": "evidence-completeness",
+            "status": "passed",
+            "subjectHashes": [
+              "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+            ],
+            "evidence": [
+              "sha256:3333333333333333333333333333333333333333333333333333333333333333"
+            ],
+            "errorEvidence": []
+          }
+        ],
+        "outcome": "passed"
+      },
+      "reportHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+    }
+  },
+  {
+    "fixtureId": "signature-receipt-unsupported-schema-version",
+    "schema": "signature-receipt.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "Schema version must be 1.0.0",
+    "instance": {
+      "schemaVersion": "2.0.0",
+      "receipt": {
+        "receiptId": "signature-one",
+        "statement": {
+          "issuedAt": "2026-09-07T00:00:00.000Z",
+          "purpose": "cross-host",
+          "subjectKind": "adapter-record",
+          "subjectHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+          "signer": {
+            "type": "system",
+            "id": "signer-one"
+          },
+          "keyId": "key-one",
+          "algorithm": "ed25519",
+          "publicKeyFingerprint": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+          "trustPolicyHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333"
+        },
+        "signature": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      },
+      "receiptHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+    }
+  },
+  {
+    "fixtureId": "review-receipt-unsupported-schema-version",
+    "schema": "review-receipt.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "Schema version must be 1.0.0",
+    "instance": {
+      "schemaVersion": "2.0.0",
+      "receipt": {
+        "receiptId": "review-one",
+        "occurredAt": "2026-09-07T00:00:00.000Z",
+        "recordedBy": {
+          "type": "operator",
+          "id": "operator-one"
+        },
+        "runId": "run-one",
+        "taskId": "task-one",
+        "attempt": 1,
+        "evidenceRootHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "reviewMode": "manual",
+        "policyHash": null,
+        "outcome": "approve",
+        "evidence": [],
+        "errorEvidence": [],
+        "reason": null,
+        "waiverAuthorization": null
+      },
+      "receiptHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222"
+    }
+  },
+  {
+    "fixtureId": "promotion-receipt-unsupported-schema-version",
+    "schema": "promotion-receipt.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "Schema version must be 1.0.0",
+    "instance": {
+      "schemaVersion": "2.0.0",
+      "receipt": {
+        "receiptId": "promotion-one",
+        "occurredAt": "2026-09-07T00:00:00.000Z",
+        "recordedBy": {
+          "type": "system",
+          "id": "proofrail"
+        },
+        "runId": "run-one",
+        "taskId": "task-one",
+        "attempt": 1,
+        "parentSnapshotHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "candidateSnapshotHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "evidenceRootHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+        "reviewReceiptHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+        "writerStopEvidence": [
+          "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+        ],
+        "leaseEvidence": [
+          "sha256:6666666666666666666666666666666666666666666666666666666666666666"
+        ],
+        "outcome": "completed",
+        "acceptedSnapshotHash": "sha256:7777777777777777777777777777777777777777777777777777777777777777",
+        "evidence": [],
+        "errorEvidence": []
+      },
+      "receiptHash": "sha256:8888888888888888888888888888888888888888888888888888888888888888"
+    }
+  },
+  {
+    "fixtureId": "handoff-receipt-unsupported-schema-version",
+    "schema": "handoff-receipt.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "Schema version must be 1.0.0",
+    "instance": {
+      "schemaVersion": "2.0.0",
+      "receipt": {
+        "receiptId": "handoff-one",
+        "recordedBy": {
+          "type": "system",
+          "id": "proofrail"
+        },
+        "operator": {
+          "type": "operator",
+          "id": "operator-one"
+        },
+        "runId": "run-one",
+        "taskId": "task-one",
+        "stepId": "step-one",
+        "attempt": 1,
+        "handoffPolicyHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "openedAt": "2026-09-07T00:00:00.000Z",
+        "closedAt": "2026-09-07T00:01:00.000Z",
+        "beforeManifestHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "afterManifestHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+        "diffHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+        "leaseEvidence": [
+          "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+        ],
+        "outcome": "abort",
+        "hookResultEvidence": [],
+        "evidence": [
+          "sha256:6666666666666666666666666666666666666666666666666666666666666666"
+        ]
+      },
+      "receiptHash": "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+    }
+  },
+  {
+    "fixtureId": "repair-transaction-unsupported-schema-version",
+    "schema": "repair-transaction.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "Schema version must be 1.0.0",
+    "instance": {
+      "schemaVersion": "2.0.0",
+      "transaction": {
+        "transactionId": "repair-one",
+        "createdAt": "2026-09-07T00:00:00.000Z",
+        "runId": "run-one",
+        "taskId": "task-one",
+        "sourceAttempt": 1,
+        "nextAttempt": 2,
+        "ledgerId": "ledger-one",
+        "ticketLedgerHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "fingerprint": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "policyHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+        "stages": [
+          {
+            "stageId": "prepare-one",
+            "stage": "prepare",
+            "startedAt": "2026-09-07T00:00:00.000Z",
+            "completedAt": "2026-09-07T00:01:00.000Z",
+            "actor": {
+              "type": "system",
+              "id": "proofrail"
+            },
+            "previousStageHash": null,
+            "outcome": "failed",
+            "evidence": [
+              "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+            ],
+            "errorEvidence": [
+              "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+            ],
+            "stageHash": "sha256:6666666666666666666666666666666666666666666666666666666666666666",
+            "parentSnapshotHash": "sha256:7777777777777777777777777777777777777777777777777777777777777777",
+            "beforeManifestHash": "sha256:8888888888888888888888888888888888888888888888888888888888888888",
+            "targetIds": ["target-one"],
+            "writerStopEvidence": [
+              "sha256:9999999999999999999999999999999999999999999999999999999999999999"
+            ],
+            "leaseEvidence": [
+              "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            ],
+            "candidateManifestHash": null
+          }
+        ],
+        "status": "failed"
+      },
+      "transactionHash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    }
+  },
+  {
+    "fixtureId": "ticket-ledger-unsupported-schema-version",
+    "schema": "ticket-ledger.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "Schema version must be 1.0.0",
+    "instance": {
+      "schemaVersion": "2.0.0",
+      "ticketLedger": {
+        "ledgerId": "ledger-one",
+        "runId": "run-one",
+        "fingerprint": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "fingerprintInput": {
+          "code": "execution.exit-nonzero",
+          "subject": {
+            "kind": "task",
+            "id": "task-one"
+          },
+          "failurePoint": "validation"
+        },
+        "policy": {
+          "policyHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+          "reviewThreshold": 1,
+          "hardBlockThreshold": 2
+        },
+        "entries": [
+          {
+            "ticketId": "ticket-one",
+            "sequence": 1,
+            "recordedAt": "2026-09-07T00:00:00.000Z",
+            "attempt": 1,
+            "errorHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+            "fingerprint": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+            "kind": "failure",
+            "actor": {
+              "type": "system",
+              "id": "proofrail"
+            },
+            "evidence": []
+          }
+        ],
+        "currentBudgetState": "pending-review"
+      },
+      "ticketLedgerHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+    }
+  }
+]
