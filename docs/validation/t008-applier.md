@@ -25,8 +25,9 @@
 - Checker：五种操作、同路径顺序链、严格 JSON、摘要/sequence/managed path/UTF-8/NUL/assertion/marker 反例及失败零写入通过。
 - Applier：成功提交、普通故障整组回滚、journal durable、每项 before-write/after-write、after-verify、幂等恢复、外部未知内容、损坏 journal/blob、错误 token、中途 fencing 失效及符号链接父目录反例通过。
 - Ubuntu：Go 1.27.1，在 Ubuntu 24.04/ext4 以临时 vendor 离线执行 `go build ./...`、`go vet ./...`、`go test -count=1 ./...` 和 `go test -race -count=1 ./internal/taskdef ./internal/applier`，全部通过。
+- Ubuntu（2026-09-08 远程回归）：通过本机脚本 `.vscode/scripts/run-race-on-ubuntu.ps1` 同步当前工作区至 `10.0.0.199`，在 Go 1.27.1 + gcc 13.3.0 环境执行 `go test -race -count=20 ./internal/applier ./internal/console ./internal/taskdef` 与 `go test -race -count=1 ./...`，均通过；首轮已通过，未触发代理兜底；远端临时目录已清理。
 - `git diff --check` 通过；临时归档、vendor 和远端验证目录已清理，仓库 `tmp/` 仅保留 `.gitkeep`。
 
 ## 边界
 
-T008 不调度 task/step、不生成 chain projection/receipt、不执行 gate，也不把候选结果升级为 accepted snapshot；这些分别由 T009 及后续任务负责。Windows 的 `MoveFileExW(...WRITE_THROUGH)` 提供平台可用的替换持久性，但不宣称具备 Unix 目录 fsync 的同等断电保证；任何恢复不确定均保持 fail closed。
+T008 不调度 task/step、不生成 chain projection/receipt、不执行 gate，也不把候选结果升级为 accepted snapshot；这些分别由 T009 及后续任务负责。Windows 的 `MoveFileExW(...WRITE_THROUGH)` 提供平台可用的替换持久性，但不宣称具备 Unix 目录 fsync 的同等断电保证；任何恢复不确定均保持 fail closed。2026-09-08 复核：Windows 替换遇瞬态 `ACCESS_DENIED`/`SHARING_VIOLATION`/`LOCK_VIOLATION`（如杀毒/索引短暂占用）改为有界重试（最多 10 次、递增间隔），持久占用仍 fail closed；Unix 路径不变。

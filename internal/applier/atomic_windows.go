@@ -4,12 +4,22 @@ package applier
 
 import (
 	"syscall"
+	"time"
 	"unsafe"
 )
 
 const (
 	moveFileReplaceExisting = 0x1
 	moveFileWriteThrough    = 0x8
+
+	replaceAttempts      = 10
+	replaceRetryInterval = 5 * time.Millisecond
+)
+
+const (
+	errorAccessDenied     = syscall.Errno(5)
+	errorSharingViolation = syscall.Errno(32)
+	errorLockViolation    = syscall.Errno(33)
 )
 
 var (
@@ -26,11 +36,32 @@ func replacePath(source, target string) error {
 	if err != nil {
 		return err
 	}
-	ok, _, callErr := moveFileEx.Call(uintptr(unsafe.Pointer(sourcePointer)), uintptr(unsafe.Pointer(targetPointer)), moveFileReplaceExisting|moveFileWriteThrough)
-	if ok == 0 {
-		return callErr
+	var lastErr error
+	for attempt := 0; attempt < replaceAttempts; attempt++ {
+		ok, _, callErr := moveFileEx.Call(uintptr(unsafe.Pointer(sourcePointer)), uintptr(unsafe.Pointer(targetPointer)), moveFileReplaceExisting|moveFileWriteThrough)
+		if ok != 0 {
+			return nil
+		}
+		lastErr = callErr
+		if !transientReplaceError(callErr) {
+			return callErr
+		}
+		time.Sleep(time.Duration(attempt+1) * replaceRetryInterval)
 	}
-	return nil
+	return lastErr
+}
+
+func transientReplaceError(err error) bool {
+	errno, ok := err.(syscall.Errno)
+	if !ok {
+		return false
+	}
+	switch errno {
+	case errorAccessDenied, errorSharingViolation, errorLockViolation:
+		return true
+	default:
+		return false
+	}
 }
 
 func syncDirectory(string) error { return nil }
