@@ -54,7 +54,7 @@ T006 status: `COMPLETE`. Full AT-02 acceptance passed; Git-free restore and immu
 
 ### P1.2 Writes and Ordered Loop (REQ-002/003/004/012/018/023/024/026)
 
-- [ ] T007 [Plan:P1.2] Implement internal/guard/{process,lease}.go, platform files/tests for tree termination, takeover and leases. Depends: T005/T004. Accept: AT-03/06. Exclude: killing user processes or PID/expiry-only takeover.
+- [x] T007 [Plan:P1.2] Implement internal/guard/{process,lease}.go, platform files/tests for tree termination, takeover and leases. Depends: T005/T004. Accept: AT-03/06. Exclude: killing user processes or PID/expiry-only takeover. Validation: [中文](validation/t007-process-lease.md) / [English](validation/t007-process-lease_EN.md).
 - [ ] T008 [Plan:P1.2] Implement internal/taskdef/checker.go and internal/applier/{apply,journal,recover}.go/tests: sequential memory validation, transaction and rollback. Depends: T005/T006/T007. Accept: AT-04 at every crash point. Exclude: validate-while-writing or omitted assertions.
 - [ ] T009 [Plan:P1.2] Implement internal/chain/{engine,state,recover}.go/tests: three tasks, four kinds, both change modes, projection/pause/cancel, initially fake agent/runner. Depends: T008. Accept: AT-03. Exclude: candidates as downstream parents.
 - [ ] T010 [Plan:P1.2] Implement internal/gates/{runner,policy,result}.go/tests and wire chain. Depends: T007/T009. Accept: AT-06. Exclude: weakening unavailable network/resource enforcement.
