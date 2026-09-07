@@ -73,7 +73,7 @@ T006 状态：`COMPLETE`。AT-02 完整验收通过；无 Git 恢复与不可变
 
 ### P1.4 代理和人工交接（REQ-006/007/008/016/021/023/024/025/026）
 
-- [ ] T013 [Plan:P1.4] 实现 `internal/adapters/{filequeue,sessbridge}.go` 与测试，核心端口由消费方定义；依赖：T012；验收：AT-08，先离线后授权实机；禁止：修改 SessionBridge、GUI/auto 回退、重复应用。
+- [x] T013 [Plan:P1.4] 实现 `internal/adapters/{filequeue,sessbridge}.go` 与测试，核心端口由消费方定义；依赖：T012；验收：AT-08，先离线后授权实机；禁止：修改 SessionBridge、GUI/auto 回退、重复应用。完成：2026-09-07。覆盖 request/claim/result 信封、file-queue 领取与 fencing、幂等冲突防护，以及 sessbridge silent 派发的 accepted/rejected/uncertain 映射。验证：[中文](validation/t013-adapters.md) / [English](validation/t013-adapters_EN.md)。
 - [ ] T014 [Plan:P1.4] 实现 `internal/chain/handoff.go`、`internal/console/handoff.go` 与测试；依赖：T013；验收：AT-09/10；禁止：秘密经模型、到期自动通过、自动恢复并发写。
 
 ### P1.5 工程包与可用 CLI/TUI（REQ-009/010/011/013/015/016/018/020/022/027）

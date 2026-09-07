@@ -74,7 +74,7 @@ T006 status: `COMPLETE`. Full AT-02 acceptance passed; Git-free restore and immu
 
 ### P1.4 Agents and Handoff (REQ-006/007/008/016/021/023/024/025/026)
 
-- [ ] T013 [Plan:P1.4] Implement internal/adapters/{filequeue,sessbridge}.go/tests with consumer-owned ports. Depends: T012. Accept: AT-08 offline then authorized host. Exclude: SessionBridge edits, GUI/auto fallback or repeated application.
+- [x] T013 [Plan:P1.4] Implement internal/adapters/{filequeue,sessbridge}.go/tests with consumer-owned ports. Depends: T012. Accept: AT-08 offline then authorized host. Exclude: SessionBridge edits, GUI/auto fallback or repeated application. Completed 2026-09-07. Coverage includes request/claim/result envelopes, file-queue claim and fencing checks, idempotent conflict protection, and sessbridge silent dispatch mapping for accepted/rejected/uncertain outcomes. Validation: [中文](validation/t013-adapters.md) / [English](validation/t013-adapters_EN.md).
 - [ ] T014 [Plan:P1.4] Implement internal/chain/handoff.go and internal/console/handoff.go/tests. Depends: T013. Accept: AT-09/10. Exclude: model-mediated secrets, expiry-based success or concurrent automatic writers.
 
 ### P1.5 Harnesses and Usable CLI/TUI (REQ-009/010/011/013/015/016/018/020/022/027)
