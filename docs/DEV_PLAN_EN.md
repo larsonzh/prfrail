@@ -70,7 +70,7 @@ T006 status: `COMPLETE`. Full AT-02 acceptance passed; Git-free restore and immu
 ### P1.3 Independent Acceptance and Bounded Repair (REQ-005/014/022/023/024/025/026)
 
 - [x] T011 [Plan:P1.3] Implement internal/chain/{review,publish}.go/tests, bound candidate/review/receipt, rejection and valid waiver. Depends: T010. Accept: AT-05. Exclude: agent self-approval or technical-success PASSED. Completed 2026-09-07. Coverage includes refusal/rejection, self-approval blocking, expired/wrong-candidate waiver blocking, and exactly-once publish after valid independent approval. Validation: [中文](validation/t011-chain.md) / [English](validation/t011-chain_EN.md).
-- [ ] T012 [Plan:P1.3] Implement internal/tickets/{ledger,budget,fingerprint}.go and internal/repair/transaction.go/tests. Depends: T011. Accept: AT-07. Exclude: budget resets or direct formal-definition repair.
+- [x] T012 [Plan:P1.3] Implement internal/tickets/{ledger,budget,fingerprint}.go and internal/repair/transaction.go/tests. Depends: T011. Accept: AT-07. Exclude: budget resets or direct formal-definition repair. Completed 2026-09-07. Coverage includes same-fingerprint exhaustion, attempt/wall-clock/cost exhaustion, fake repair blocking, stale candidate blocking, and interrupted Promote handling. Validation: [中文](validation/t012-tickets-repair.md) / [English](validation/t012-tickets-repair_EN.md).
 
 ### P1.4 Agents and Handoff (REQ-006/007/008/016/021/023/024/025/026)
 

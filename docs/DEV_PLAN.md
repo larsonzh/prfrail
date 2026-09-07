@@ -69,7 +69,7 @@ T006 状态：`COMPLETE`。AT-02 完整验收通过；无 Git 恢复与不可变
 ### P1.3 独立接受与有限修复（REQ-005/014/022/023/024/025/026）
 
 - [x] T011 [Plan:P1.3] 实现 `internal/chain/{review,publish}.go` 与测试，绑定候选/review/receipt，支持拒绝和有效 waiver；依赖：T010；验收：AT-05；禁止：agent 自批、技术通过即 PASSED。完成：2026-09-07。覆盖拒评、自批、过期/错候选 waiver 拒绝，以及有效独立批准后单次发布。验证：[中文](validation/t011-chain.md) / [English](validation/t011-chain_EN.md)。
-- [ ] T012 [Plan:P1.3] 实现 `internal/tickets/{ledger,budget,fingerprint}.go`、`internal/repair/transaction.go` 与测试；依赖：T011；验收：AT-07；禁止：重置预算、改写正式定义绕过候选。
+- [x] T012 [Plan:P1.3] 实现 `internal/tickets/{ledger,budget,fingerprint}.go`、`internal/repair/transaction.go` 与测试；依赖：T011；验收：AT-07；禁止：重置预算、改写正式定义绕过候选。完成：2026-09-07。覆盖相同指纹耗尽、attempt/墙钟/费用耗尽、假修复、陈旧候选与 Promote 中断。验证：[中文](validation/t012-tickets-repair.md) / [English](validation/t012-tickets-repair_EN.md)。
 
 ### P1.4 代理和人工交接（REQ-006/007/008/016/021/023/024/025/026）
 
