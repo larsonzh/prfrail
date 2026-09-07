@@ -8,8 +8,8 @@ Date: 2026-09-06. Distinguish RFC-decided, proposed and experimental decisions. 
 |---|---|---|---|
 | ADR-001 | Go modular monolith, CLI/TUI, single writer, no default Git writes | No script translation/distribution complexity | Decided by RFC 4/11/16; T001 confirms dependency baseline |
 | ADR-002 | Freeze Schema 2020-12 toolchain, canonical JSON/paths/errors/config precedence | Use `canonicalize` 4.0.0 to reproduce RFC 8785 vectors; Ajv 8.20.0 remains independent of the future Go core | T002 froze 29 structural Schemas; all 81 hand-authored T003 fixtures and both canonical vectors pass |
-| ADR-003 | Event/journal acceptance protocol and Windows replacement/stop primitives | Rename covers one file only; prove durability, rollback and cross-file reader semantics | Partially frozen: promotion receipt binds parent/candidate/evidence/review/writer-stop/lease data and the completed/failed/uncertain reader contract; publication order, crash points and native Windows/Linux durable/atomic capabilities await T004 probes; directory separation cannot replace required OS enforcement |
-| ADR-004 | SessionBridge v0.1.1 silent plus file queue, core durable idempotency | No fork, visible/auto or GUI fallback; cache is not exactly-once | Contract frozen: shared envelope, one-record-per-file framing, atomic claim, generation fencing, result, dispatch/takeover receipts, cross-host signature receipt and checker order. Capability-matrix and platform crash probes await T004 |
+| ADR-003 | Event/journal acceptance protocol and Windows replacement/stop primitives | Rename covers one file only; prove durability, rollback and cross-file reader semantics | T004 observed that an open reader blocks ordinary replacement and directory `Sync` is unavailable on NTFS, while ext4 supports open-reader replacement and directory `Sync`; rename-before-receipt remains uncertain. S1 must use platform primitives and add power-loss injection; directory separation cannot replace required OS enforcement |
+| ADR-004 | SessionBridge v0.1.1 silent plus file queue, core durable idempotency | No fork, visible/auto or GUI fallback; cache is not exactly-once | T004 observed multi-winner rename-only claims on Windows, making fixed-claim `O_EXCL`, requestId deduplication and generation fencing mandatory. Forty no-model SessionBridge tests pass; live LM API remains a host capability gate |
 | ADR-005 | Bootstrap seed via normal build, independent Go tests and human audit; N builds N+1 with isolated replay | No candidate self-certification or host overwrite | RFC 16.5 decided; identify seed/hash/oracle/signer/rollback before T017 |
 | ADR-006 | Windows 11 amd64 production, Linux amd64 core CI, pure-Go release, pinned tooling/signing | RFC 16.2 mentions Win10 unlike 9.6/14; section 14 is the first-release scope, with no Win10 commitment | Owner approved policy 2026-09-06; T002 freezes dependencies, T017 signer/key/revocation details |
 | ADR-007 | Minimal context, offline first, task budgets, bilingual IDs | Avoid costly repeated whole-repository reviews; English is not a second authority | Owner approved 2026-09-06; zero new paid S0 calls, separate authorization for increases |
@@ -25,7 +25,7 @@ The owner approved this signing policy on 2026-09-06: maintainer-held offline Ed
 
 ## 2. Ambiguities to Close
 
-T002 has frozen empty-chain, array merge, duration/size/budget units/defaults, ID/attempt/requestId, error, path/link, signing, review/waiver, ticket, runner, lease and Windows 10 rules. T003 independent fixtures/validator are complete; do not implement production defaults until T004 platform facts complete.
+T002 has frozen empty-chain, array merge, duration/size/budget units/defaults, ID/attempt/requestId, error, path/link, signing, review/waiver, ticket, runner, lease and Windows 10 rules. T003 independent fixtures/validator and T004 platform probes are complete; production defaults still require their S1 implementations, native failure tests and supply-chain gates.
 
 ## 3. Current S0 Readiness
 
@@ -37,11 +37,11 @@ Verdict: **NOT_READY**. This does not mean this documentation round failed or au
 | 2 Schemas/goldens/validator | All 29 structural Schemas have positive and negative cases; 81 fixtures and two canonical vectors pass the independent oracle | Closed (T003) |
 | 3 STRIDE | Risks/owners/AT mapping exists; T003 read-only security review found no fail-open path, while later gates still own runtime evidence | S0 static portion closed (T003) |
 | 4 whois/non-C | whois remains a mapping example; Go/JavaScript/Python non-C fixtures pass | Closed (T003) |
-| 5 Spikes | Go available; TUI/replacement/process trees/transports/paths unverified | T004 |
+| 5 Spikes | Windows 11/NTFS, Ubuntu 24.04/ext4, TUI, process trees, file queue and no-model SessionBridge contracts were exercised; limitations are in `validation/s0-spikes_EN.md` | Closed (T004) |
 | 6 Traceable backlog | Owner approved current S0/S1 scope and traceability plan | Closed (T001) |
 | 7 Platform/Go/license/support/response/signing | Platform/support/offline Ed25519/per-dependency review policies approved; exact dependencies/signer/key/channel remain open | T017 |
 | 8 User approval | S0 freeze, S1 scope, zero-new-paid-call budget and whois-shadow principle approved; no S1 coding, concrete whois access or release authorization | Closed (T001); execution authorization remains separate |
-| 9 step/TUI/bootstrap | Designed; prototype and seed/oracle identity absent | T003/T004 |
+| 9 step/TUI/bootstrap | Step/TUI contracts and a TUI prototype are verified; seed/oracle identity remains open | T017 |
 | 10 Polyglot schemas | C+Go and C+JavaScript+Python ownership/dependency fixtures pass | Closed (T003) |
 | 11 Handoff | Valid handoff and invalid read-only-target fixtures pass | Closed (T003) |
 | 12 Documentation | Valid impact/waiver, missing-required-docs and generation-cycle fixtures pass | Closed (T003) |

@@ -38,7 +38,9 @@ T001 also reviews ADR-008 and PC-01–PC-06 workload/budgets. T002 freezes RFC s
 
 ### P0.3 Technical Spikes (REQ-006/007/009/015/017/021/023/024/027)
 
-- [ ] T004 [Plan:P0.3] Probe Go/TUI, Windows atomic replacement/process-tree stop, Linux paths and IPC/file queue in root tmp; record docs/validation/s0-spikes.md and delete experiments. Depends: T002; S1 also requires all T003/T001 gates. Accept: reproducible commands, actual platforms and explicit unavailable capabilities. Exclude: unauthorized paid calls or production claims.
+- [x] T004 [Plan:P0.3] Probe Go/TUI, Windows atomic replacement/process-tree stop, Linux paths and IPC/file queue in root tmp; record docs/validation/s0-spikes_EN.md and delete experiments. Depends: T002; S1 also requires all T003/T001 gates. Accept: reproducible commands, actual platforms and explicit unavailable capabilities. Exclude: unauthorized paid calls or production claims. Completed 2026-09-07: native Windows 11/NTFS and Ubuntu 24.04/ext4 probes, an isolated Bubble Tea v1.3.4 prototype, and 40 no-model SessionBridge tests passed; see the report for limitations and fail-closed rules.
+
+T004 status: `COMPLETE`. Technical feasibility is established, but overall S0 remains `NOT_READY`; dependency supply chain, signer identity, bootstrap and production crash injection remain T017/later gates. This result does not authorize T005.
 
 ### P1.1 Evidence and Snapshots (REQ-004/023/024/025/028)
 

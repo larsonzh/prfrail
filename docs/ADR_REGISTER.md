@@ -8,8 +8,8 @@
 |---|---|---|---|
 | ADR-001 | Go 模块化单体、CLI/TUI、single writer、无默认 Git 写入 | 不选脚本翻译/分布式系统；降低跨平台与恢复复杂度 | RFC §4/11/16 已决定；T001 确认依赖基线 |
 | ADR-002 | 冻结 Schema 2020-12 工具链、canonical JSON/路径/错误/配置优先级 | 采用 `canonicalize` 4.0.0 复算 RFC 8785 向量；Ajv 8.20.0 独立于未来 Go 核心 | T002 已冻结 29 份结构 Schema；T003 的 81 个手写预期 fixture 与两条 canonical 向量全部通过 |
-| ADR-003 | 事件/journal 与接受提交协议、Windows 原子替换/停机原语 | rename 只解决单文件；需证明 durable、失败回滚和跨文件发布读者语义 | 部分冻结：promotion receipt 已绑定父/候选/evidence/review/停机/租约及 completed/failed/uncertain reader contract；发布顺序、崩溃点与原生 Windows/Linux durable/atomic 能力待 T004 实测；不能用目录隔离替代 required OS 限制 |
-| ADR-004 | SessionBridge v0.1.1 silent + 文件队列，核心自管持久幂等 | 不 fork 扩展、不用 visible/auto、无 GUI 兜底；内存缓存不等于 exactly-once | 契约已冻结：共用信封、每文件单记录 framing、原子 claim、generation fencing、result、dispatch/takeover receipt、跨主机 signature receipt 与 checker 顺序；能力矩阵与平台崩溃实测待 T004 |
+| ADR-003 | 事件/journal 与接受提交协议、Windows 原子替换/停机原语 | rename 只解决单文件；需证明 durable、失败回滚和跨文件发布读者语义 | T004 已实测：NTFS 开放 reader 阻止普通替换且目录 `Sync` 不可用，ext4 支持开放 reader 替换与目录 `Sync`；rename 后 receipt 前必须判 uncertain。S1 采用平台原语并补断电故障注入；不能用目录隔离替代 required OS 限制 |
+| ADR-004 | SessionBridge v0.1.1 silent + 文件队列，核心自管持久幂等 | 不 fork 扩展、不用 visible/auto、无 GUI 兜底；内存缓存不等于 exactly-once | T004 已实测：Windows rename-only claim 可多赢家，固定 claim `O_EXCL`、requestId 去重和 generation fencing 为强制项；SessionBridge 40 项无模型测试通过，真实 LM API 仍属宿主能力门禁 |
 | ADR-005 | bootstrap 首个 seed 由常规构建、独立 Go tests 和人工审计建立；N 构建 N+1，隔离重放 | 不接受候选自证或覆盖运行中 host | RFC §16.5 已定；T017 前指定 seed 来源/摘要、外部 oracle、签名主体和 rollback 路径 |
 | ADR-006 | Windows 11 amd64 正式、Linux amd64 核心 CI；纯 Go 发布；固定工具链/依赖/签名 | RFC §16.2 提到 Win10，与 §9.6/14 的 Win11 范围不同；以 §14 为首版承诺，Win10 不承诺 | 2026-09-06 所有者批准策略；T002 冻结依赖清单，T017 落实签名主体/公钥/撤销流程 |
 | ADR-007 | 最小 context、离线先行、按任务预算、双语 ID 追踪 | 不用昂贵模型反复全仓审读；不把英文译本做第二权威源 | 2026-09-06 所有者批准；S0 新增付费调用为 0，超出须另授权 |
@@ -25,7 +25,7 @@
 
 ## 2. 必须关闭的歧义
 
-T002 已集中冻结空链、列表覆盖/合并、duration/size/预算单位与默认、id/attempt/requestId 类型、error code、路径/symlink/hardlink、签名覆盖范围、review policy 与 waiver 授权、票据阈值、hook runner 最小能力、write lease 续期/接管及 Windows 10 支持措辞。T003 独立样例/validator 已完成；T004 平台事实完成前，仍不能实现为生产默认值。
+T002 已集中冻结空链、列表覆盖/合并、duration/size/预算单位与默认、id/attempt/requestId 类型、error code、路径/symlink/hardlink、签名覆盖范围、review policy 与 waiver 授权、票据阈值、hook runner 最小能力、write lease 续期/接管及 Windows 10 支持措辞。T003 独立样例/validator 与 T004 平台探针已完成；生产默认值仍须由对应 S1 实现、原生故障测试和供应链门禁关闭。
 
 ## 3. S0 Readiness 当前结论
 
@@ -37,11 +37,11 @@ T002 已集中冻结空链、列表覆盖/合并、duration/size/预算单位与
 | 2 Schema/黄金/validator | 29 份结构 Schema 各有正反例；81 个 fixture 与两条 canonical 向量通过独立 oracle | 已关闭（T003） |
 | 3 STRIDE | 风险/责任/AT 映射已写；T003 只读安全复核未发现 fail-open，运行期安全证据仍由后续 gate 提供 | 已关闭 S0 静态部分（T003） |
 | 4 whois + 非 C | whois 保持映射样例；Go/JavaScript/Python 非 C fixture 已通过 | 已关闭（T003） |
-| 5 技术探针 | Go 可用；TUI/原子替换/进程树/双通道/路径未验证 | T004 |
+| 5 技术探针 | Windows 11/NTFS、Ubuntu 24.04/ext4、TUI、进程树、文件队列及 SessionBridge 无模型合同已实测，限制见 `validation/s0-spikes.md` | 已关闭（T004） |
 | 6 可追踪 backlog | 所有者已批准当前 S0/S1 范围和追踪计划 | 已关闭（T001） |
 | 7 平台/Go/许可/周期/响应/签名 | 平台、支持期、离线 Ed25519 与逐依赖许可审计策略已批准；精确依赖/主体/公钥/渠道未锁定 | T017 |
 | 8 用户批准 | 已批准 S0 规格冻结、S1 范围、零新增付费预算和 whois 影子原则；未授权 S1 编码、具体 whois 数据访问或发布 | 已关闭（T001）；执行授权另行取得 |
-| 9 step/TUI/bootstrap | 设计已写；原型、seed/oracle 身份未建立 | T003/T004 |
+| 9 step/TUI/bootstrap | step/TUI 合同与 TUI 原型已验证；seed/oracle 身份仍未建立 | T017 |
 | 10 多语言 schema | C+Go 与 C+JavaScript+Python 的所有权/依赖 fixture 已通过 | 已关闭（T003） |
 | 11 handoff | 合法交接与只读 target 非法交接 fixture 已通过 | 已关闭（T003） |
 | 12 documentation | 合法 impact/waiver、必需文档缺失及循环生成 fixture 已通过 | 已关闭（T003） |
