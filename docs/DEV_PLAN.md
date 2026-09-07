@@ -46,7 +46,10 @@ T004 状态：`COMPLETE`。技术可行性已验证，但整体 S0 仍为 `NOT_R
 - [x] T005 [Plan:P1.1] 实现 `internal/evidence/{canonical,event,receipt,verify}.go` 与同名 `_test.go`，覆盖 canonical/事件链/对象引用和只读核验；依赖：S0 全通过；验收：AT-04 证据部分；禁止：自由文本 PASS 或未知版本写入。完成：2026-09-07，冻结向量、严格 JSON/JCS、事件投影链、evidence manifest 及内容存储重读核验通过；报告见 `docs/validation/t005-evidence.md`。
 
 T005 状态：`COMPLETE`。结果只覆盖证据层的 AT-04 子集；journal、写入事务、回滚及各崩溃点仍由 T008 验收，不得由本状态推导为通过。
-- [ ] T006 [Plan:P1.1] 实现 `internal/snapshot/{capture,restore,store}.go` 与测试，路径验证/排除/配额/保留及 GC dry-run；依赖：T005；验收：AT-02；禁止：读 Git 历史恢复、自动清理有引用对象。
+
+- [x] T006 [Plan:P1.1] 实现 `internal/snapshot/{capture,restore,store,types,reparse_*}.go` 与测试，路径验证/排除/配额/保留及 GC dry-run；依赖：T005；验收：AT-02；禁止：读 Git 历史恢复、自动清理有引用对象。完成：2026-09-07，未提交文件树捕获、CAS 对象存储、保留名/大小写/长路径/软硬链接检测、捕获中变动校验、配额限制、无 Git 恢复及 Windows/Ubuntu 双平台验证通过；报告见 `docs/validation/t006-snapshot.md`。
+
+T006 状态：`COMPLETE`。AT-02 完整验收通过；无 Git 恢复与不可变快照已闭环；工作区写事务与崩溃回滚点由 T008 承接。
 
 ### P1.2 写入与顺序闭环（REQ-002/003/004/012/018/023/024/026）
 

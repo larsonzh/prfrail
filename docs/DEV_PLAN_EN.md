@@ -47,7 +47,10 @@ T004 status: `COMPLETE`. Technical feasibility is established, but overall S0 re
 - [x] T005 [Plan:P1.1] Implement internal/evidence/{canonical,event,receipt,verify}.go and matching _test.go for canonical/event chains/references/read-only verification. Depends: all S0 gates. Accept: the evidence portion of AT-04. Exclude: free-text PASS or unknown-version writes. Completed 2026-09-07: frozen vectors, strict JSON/JCS, projected event chains, evidence manifests, and content-store reread verification passed; see `docs/validation/t005-evidence_EN.md`.
 
 T005 status: `COMPLETE`. This covers only the evidence-layer subset of AT-04. Journal, write transaction, rollback, and crash-point acceptance remain T008 work and cannot be inferred as passed here.
-- [ ] T006 [Plan:P1.1] Implement internal/snapshot/{capture,restore,store}.go/tests for paths/exclusions/quotas/retention/GC dry-run. Depends: T005. Accept: AT-02. Exclude: Git-history recovery or referenced-object deletion.
+
+- [x] T006 [Plan:P1.1] Implement internal/snapshot/{capture,restore,store,types,reparse_*}.go/tests for paths/exclusions/quotas/retention/GC dry-run. Depends: T005. Accept: AT-02. Exclude: Git-history recovery or referenced-object deletion. Completed 2026-09-07: uncommitted file tree capture, CAS object store, reserved/case/long-path/link checks, concurrent modification validation, quota limits, Git-free restore, and Windows/Ubuntu dual-platform validation passed; see `docs/validation/t006-snapshot_EN.md`.
+
+T006 status: `COMPLETE`. Full AT-02 acceptance passed; Git-free restore and immutable snapshot baseline are closed; workspace write transactions and crash rollback points belong to T008.
 
 ### P1.2 Writes and Ordered Loop (REQ-002/003/004/012/018/023/024/026)
 

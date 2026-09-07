@@ -242,7 +242,7 @@ func canonicalValue(value any) ([]byte, error) {
 	return Canonicalize(encoded)
 }
 
-func decodeStrictJSON(input []byte, destination any) error {
+func DecodeStrictJSON(input []byte, destination any) error {
 	if _, err := Canonicalize(input); err != nil {
 		return err
 	}
@@ -257,5 +257,12 @@ func decodeStrictJSON(input []byte, destination any) error {
 	return nil
 }
 
-func validID(value string) bool   { return idPattern.MatchString(value) }
-func validHash(value string) bool { return hashPattern.MatchString(value) }
+func decodeStrictJSON(input []byte, destination any) error {
+	return DecodeStrictJSON(input, destination)
+}
+
+func ValidID(value string) bool   { return idPattern.MatchString(value) }
+func ValidHash(value string) bool { return hashPattern.MatchString(value) }
+
+func validID(value string) bool   { return ValidID(value) }
+func validHash(value string) bool { return ValidHash(value) }
