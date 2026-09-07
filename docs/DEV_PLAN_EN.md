@@ -75,7 +75,7 @@ T006 status: `COMPLETE`. Full AT-02 acceptance passed; Git-free restore and immu
 ### P1.4 Agents and Handoff (REQ-006/007/008/016/021/023/024/025/026)
 
 - [x] T013 [Plan:P1.4] Implement internal/adapters/{filequeue,sessbridge}.go/tests with consumer-owned ports. Depends: T012. Accept: AT-08 offline then authorized host. Exclude: SessionBridge edits, GUI/auto fallback or repeated application. Completed 2026-09-07. Coverage includes request/claim/result envelopes, file-queue claim and fencing checks, idempotent conflict protection, and sessbridge silent dispatch mapping for accepted/rejected/uncertain outcomes. Validation: [中文](validation/t013-adapters.md) / [English](validation/t013-adapters_EN.md).
-- [ ] T014 [Plan:P1.4] Implement internal/chain/handoff.go and internal/console/handoff.go/tests. Depends: T013. Accept: AT-09/10. Exclude: model-mediated secrets, expiry-based success or concurrent automatic writers.
+- [x] T014 [Plan:P1.4] Implement internal/chain/handoff.go and internal/console/handoff.go/tests. Depends: T013. Accept: AT-09/10. Exclude: model-mediated secrets, expiry-based success or concurrent automatic writers. Completed: 2026-09-07. Coverage includes handoffPolicy constraints, complete/abort/request-agent receipt semantics, WAITING_FOR_OPERATOR state transitions, and structured/secret-direct input policy enforcement with secret hashing. Supplemental validation: on 2026-09-08, Ubuntu VM remote full build/vet/test and race validation (gcc for full repository, clang for critical packages) passed through a temporary proxy chain. Validation: [中文](validation/t014-handoff.md) / [English](validation/t014-handoff_EN.md).
 
 ### P1.5 Harnesses and Usable CLI/TUI (REQ-009/010/011/013/015/016/018/020/022/027)
 

@@ -13,6 +13,10 @@ type IsolatedWorkspacePort interface {
 	CaptureIsolatedWorkspace(context.Context, StepRequest) (StepResult, error)
 }
 
+type ManualHandoffPort interface {
+	OpenManualHandoff(context.Context, StepRequest) (StepResult, error)
+}
+
 type HookPort interface {
 	RunHook(context.Context, StepRequest) (StepResult, error)
 }
@@ -20,6 +24,7 @@ type HookPort interface {
 type StepRouter struct {
 	Managed  ManagedChangeSetPort
 	Isolated IsolatedWorkspacePort
+	Handoff  ManualHandoffPort
 	Hooks    HookPort
 }
 
@@ -37,6 +42,11 @@ func (router StepRouter) Execute(ctx context.Context, request StepRequest) (Step
 				return StepResult{}, fmt.Errorf("%w: isolated workspace port unavailable", ErrInvalidDefinition)
 			}
 			return router.Isolated.CaptureIsolatedWorkspace(ctx, request)
+		case ManualHandoff:
+			if router.Handoff == nil {
+				return StepResult{}, fmt.Errorf("%w: manual handoff port unavailable", ErrInvalidDefinition)
+			}
+			return router.Handoff.OpenManualHandoff(ctx, request)
 		default:
 			return StepResult{}, fmt.Errorf("%w: unknown change mode", ErrInvalidDefinition)
 		}

@@ -23,13 +23,15 @@ type ChangeMode string
 const (
 	ManagedChangeSet  ChangeMode = "managed-change-set"
 	IsolatedWorkspace ChangeMode = "isolated-workspace"
+	ManualHandoff     ChangeMode = "manual-handoff"
 )
 
 type Step struct {
-	ID     string
-	Kind   string
-	Mode   ChangeMode
-	Reason string
+	ID            string
+	Kind          string
+	Mode          ChangeMode
+	Reason        string
+	HandoffPolicy *HandoffPolicy
 }
 
 type Task struct {
@@ -185,15 +187,27 @@ func (definition Definition) validate() error {
 			seen[step.ID] = struct{}{}
 			switch step.Kind {
 			case "code":
-				if step.Mode != ManagedChangeSet && step.Mode != IsolatedWorkspace {
+				switch step.Mode {
+				case ManagedChangeSet, IsolatedWorkspace:
+					if step.HandoffPolicy != nil {
+						return fmt.Errorf("%w: non-handoff code step %q must not define handoff policy", ErrInvalidDefinition, step.ID)
+					}
+				case ManualHandoff:
+					if step.HandoffPolicy == nil {
+						return fmt.Errorf("%w: handoff code step %q requires handoff policy", ErrInvalidDefinition, step.ID)
+					}
+					if err := validateHandoffPolicy(*step.HandoffPolicy); err != nil {
+						return err
+					}
+				default:
 					return fmt.Errorf("%w: code step %q has invalid mode", ErrInvalidDefinition, step.ID)
 				}
 			case "build", "verify":
-				if step.Mode != "" {
+				if step.Mode != "" || step.HandoffPolicy != nil {
 					return fmt.Errorf("%w: non-code step %q has a change mode", ErrInvalidDefinition, step.ID)
 				}
 			case "noop":
-				if step.Mode != "" || step.Reason == "" {
+				if step.Mode != "" || step.HandoffPolicy != nil || step.Reason == "" {
 					return fmt.Errorf("%w: noop step %q requires only a reason", ErrInvalidDefinition, step.ID)
 				}
 			default:

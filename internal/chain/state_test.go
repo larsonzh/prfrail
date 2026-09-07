@@ -32,6 +32,13 @@ func TestDefinitionValidationFourKindsAndModes(t *testing.T) {
 	valid := Definition{ID: "chain-one", Tasks: []Task{{ID: "task-one", Steps: []Step{
 		{ID: "code-managed", Kind: "code", Mode: ManagedChangeSet},
 		{ID: "code-isolated", Kind: "code", Mode: IsolatedWorkspace},
+		{ID: "code-handoff", Kind: "code", Mode: ManualHandoff, HandoffPolicy: &HandoffPolicy{
+			AllowedTargets:   []string{"target-one"},
+			InputPolicy:      "structured",
+			HandoffTimeoutMs: 300000,
+			ReturnActions:    []string{"complete", "abort"},
+			HooksAfterReturn: []string{"hook-one"},
+		}},
 		{ID: "build-one", Kind: "build"}, {ID: "verify-one", Kind: "verify"},
 		{ID: "noop-one", Kind: "noop", Reason: "not-applicable"},
 	}}}}
@@ -42,6 +49,27 @@ func TestDefinitionValidationFourKindsAndModes(t *testing.T) {
 	invalid.Tasks[0].Steps[0].Mode = "direct"
 	if !errors.Is(invalid.validate(), ErrInvalidDefinition) {
 		t.Fatal("expected invalid change mode")
+	}
+	invalidHandoff := valid
+	invalidHandoff.Tasks[0].Steps[2].HandoffPolicy.ReturnActions = []string{"complete", "complete"}
+	if !errors.Is(invalidHandoff.validate(), ErrInvalidDefinition) {
+		t.Fatal("expected invalid handoff policy")
+	}
+	missingPolicy := valid
+	missingPolicy.Tasks[0].Steps[2].HandoffPolicy = nil
+	if !errors.Is(missingPolicy.validate(), ErrInvalidDefinition) {
+		t.Fatal("expected manual-handoff step without policy rejection")
+	}
+	managedWithPolicy := valid
+	managedWithPolicy.Tasks[0].Steps[0].HandoffPolicy = &HandoffPolicy{
+		AllowedTargets:   []string{"target-one"},
+		InputPolicy:      "structured",
+		HandoffTimeoutMs: 1000,
+		ReturnActions:    []string{"abort"},
+		HooksAfterReturn: []string{"hook-one"},
+	}
+	if !errors.Is(managedWithPolicy.validate(), ErrInvalidDefinition) {
+		t.Fatal("expected managed step with handoff policy rejection")
 	}
 }
 
