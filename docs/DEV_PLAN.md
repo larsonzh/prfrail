@@ -2,7 +2,7 @@
 
 [English](DEV_PLAN_EN.md)
 
-日期：2026-09-06；全部实现任务尚未完成。输入：[需求](PRODUCT_REQUIREMENTS.md)、[架构](ARCHITECTURE.md)、[契约](CONTRACTS.md)、[安全](SECURITY.md)、[ADR](ADR_REGISTER.md)。规划遵循修订后的 RFC §14/19；新增 S1 最小范围需重新确认预算，不将 S2/S3 增强移入首版。
+日期：2026-09-07；S1 实现尚未全部完成。输入：[需求](PRODUCT_REQUIREMENTS.md)、[架构](ARCHITECTURE.md)、[契约](CONTRACTS.md)、[安全](SECURITY.md)、[ADR](ADR_REGISTER.md)。规划遵循修订后的 RFC §14/19；新增 S1 最小范围需重新确认预算，不将 S2/S3 增强移入首版。
 
 ## 1. 工作方式与约束
 
@@ -43,7 +43,9 @@ T004 状态：`COMPLETE`。技术可行性已验证，但整体 S0 仍为 `NOT_R
 
 ### P1.1 证据和快照底座（REQ-004/023/024/025/028）
 
-- [ ] T005 [Plan:P1.1] 实现 `internal/evidence/{event,receipt,verify}.go` 与同名 `_test.go`，覆盖 canonical/事件链/对象引用和只读核验；依赖：S0 全通过；验收：AT-04；禁止：自由文本 PASS 或未知版本写入。
+- [x] T005 [Plan:P1.1] 实现 `internal/evidence/{canonical,event,receipt,verify}.go` 与同名 `_test.go`，覆盖 canonical/事件链/对象引用和只读核验；依赖：S0 全通过；验收：AT-04 证据部分；禁止：自由文本 PASS 或未知版本写入。完成：2026-09-07，冻结向量、严格 JSON/JCS、事件投影链、evidence manifest 及内容存储重读核验通过；报告见 `docs/validation/t005-evidence.md`。
+
+T005 状态：`COMPLETE`。结果只覆盖证据层的 AT-04 子集；journal、写入事务、回滚及各崩溃点仍由 T008 验收，不得由本状态推导为通过。
 - [ ] T006 [Plan:P1.1] 实现 `internal/snapshot/{capture,restore,store}.go` 与测试，路径验证/排除/配额/保留及 GC dry-run；依赖：T005；验收：AT-02；禁止：读 Git 历史恢复、自动清理有引用对象。
 
 ### P1.2 写入与顺序闭环（REQ-002/003/004/012/018/023/024/026）
@@ -86,7 +88,7 @@ T004 状态：`COMPLETE`。技术可行性已验证，但整体 S0 仍为 `NOT_R
 
 ## 3. 需求映射
 
-Implementation evidence 是计划证据，当前不代表实现。
+除明确标记完成的任务外，Implementation evidence 是计划证据，不代表实现。
 
 | REQ ID | Plan Items | 任务 | 验收/实现证据 |
 |---|---|---|---|

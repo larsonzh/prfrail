@@ -2,7 +2,7 @@
 
 [简体中文](DEV_PLAN.md)
 
-Date: 2026-09-06; all implementation tasks remain incomplete. Inputs: [requirements](PRODUCT_REQUIREMENTS_EN.md), [architecture](ARCHITECTURE_EN.md), [contracts](CONTRACTS_EN.md), [security](SECURITY_EN.md), [ADRs](ADR_REGISTER_EN.md). This follows revised RFC sections 14/19; added S1 minimum scope requires renewed budget approval, without pulling S2/S3 enhancements into the first release.
+Date: 2026-09-07; S1 implementation remains incomplete. Inputs: [requirements](PRODUCT_REQUIREMENTS_EN.md), [architecture](ARCHITECTURE_EN.md), [contracts](CONTRACTS_EN.md), [security](SECURITY_EN.md), [ADRs](ADR_REGISTER_EN.md). This follows revised RFC sections 14/19; added S1 minimum scope requires renewed budget approval, without pulling S2/S3 enhancements into the first release.
 
 ## 1. Workflow and Constraints
 
@@ -44,7 +44,9 @@ T004 status: `COMPLETE`. Technical feasibility is established, but overall S0 re
 
 ### P1.1 Evidence and Snapshots (REQ-004/023/024/025/028)
 
-- [ ] T005 [Plan:P1.1] Implement internal/evidence/{event,receipt,verify}.go and matching _test.go for canonical/event chains/references/read-only verification. Depends: all S0 gates. Accept: AT-04. Exclude: free-text PASS or unknown-version writes.
+- [x] T005 [Plan:P1.1] Implement internal/evidence/{canonical,event,receipt,verify}.go and matching _test.go for canonical/event chains/references/read-only verification. Depends: all S0 gates. Accept: the evidence portion of AT-04. Exclude: free-text PASS or unknown-version writes. Completed 2026-09-07: frozen vectors, strict JSON/JCS, projected event chains, evidence manifests, and content-store reread verification passed; see `docs/validation/t005-evidence_EN.md`.
+
+T005 status: `COMPLETE`. This covers only the evidence-layer subset of AT-04. Journal, write transaction, rollback, and crash-point acceptance remain T008 work and cannot be inferred as passed here.
 - [ ] T006 [Plan:P1.1] Implement internal/snapshot/{capture,restore,store}.go/tests for paths/exclusions/quotas/retention/GC dry-run. Depends: T005. Accept: AT-02. Exclude: Git-history recovery or referenced-object deletion.
 
 ### P1.2 Writes and Ordered Loop (REQ-002/003/004/012/018/023/024/026)
@@ -87,7 +89,7 @@ Keep IDs stable; execution order is T016 → T019–T024 → T017 → T018. All 
 
 ## 3. Requirement Mapping
 
-Evidence is planned, not implemented.
+Unless a task is explicitly marked complete, implementation evidence is planned and does not represent implementation.
 
 | REQ ID | Plan Items | Tasks | Acceptance/implementation evidence |
 |---|---|---|---|
