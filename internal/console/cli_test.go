@@ -209,6 +209,100 @@ func TestTextOutputHasNoANSI(t *testing.T) {
 	}
 }
 
+func TestPreviewJSONAndTextParityWithoutSideEffects(t *testing.T) {
+	root := t.TempDir()
+	cli := newTestCLI(root)
+
+	cfg := DefaultChainConfig("preview-one")
+	cfg.Tasks[0].Steps = []StepConfig{{
+		ID:    "verify-config",
+		Kind:  "verify",
+		Hooks: []string{"go-test"},
+	}}
+	content, err := EncodeChainConfig(cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	chainPath := filepath.Join(root, "proofrail.chain.json")
+	if err := os.WriteFile(chainPath, content, 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	code, stdout, stderr := runCLI(t, cli, "preview", "--chain", chainPath, "--json")
+	if code != 0 {
+		t.Fatalf("preview code=%d stdout=%s stderr=%s", code, stdout, stderr)
+	}
+	if stderr != "" {
+		t.Fatalf("preview stderr not empty: %q", stderr)
+	}
+	result := decodeResponse(t, stdout)
+	if !result.OK {
+		t.Fatalf("preview failed: %s", stdout)
+	}
+	var report PreviewReport
+	if err := json.Unmarshal(result.Data, &report); err != nil {
+		t.Fatal(err)
+	}
+	if report.PreviewRecord.Preview.Outcome != "blocked" || report.PreviewRecord.Preview.Mode != "offline-read-only" {
+		t.Fatalf("unexpected preview summary: %+v", report.PreviewRecord.Preview)
+	}
+	if len(report.Unknowns) == 0 {
+		t.Fatal("expected unknowns in preview report")
+	}
+	if report.CallCounters.CommandCalls != 0 || report.CallCounters.NetworkCalls != 0 || report.CallCounters.ModelCalls != 0 || report.CallCounters.CredentialReads != 0 || report.CallCounters.VersionProbes != 0 {
+		t.Fatalf("expected zero call counters, got %+v", report.CallCounters)
+	}
+
+	code, textStdout, textStderr := runCLI(t, cli, "preview", "--chain", chainPath)
+	if code != 0 {
+		t.Fatalf("preview text code=%d stdout=%s stderr=%s", code, textStdout, textStderr)
+	}
+	if !strings.Contains(textStdout, report.PreviewRecord.PreviewHash) || !strings.Contains(textStdout, "outcome: blocked") {
+		t.Fatalf("text output does not match json facts: %s", textStdout)
+	}
+
+	after, err := os.ReadFile(chainPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(after) != string(content) {
+		t.Fatal("preview modified the chain file")
+	}
+	if _, err := os.Stat(filepath.Join(root, "tmp", "prfrail-runs")); !os.IsNotExist(err) {
+		t.Fatalf("preview should not create run directory: %v", err)
+	}
+}
+
+func TestPreviewReadyForNoopChain(t *testing.T) {
+	root := t.TempDir()
+	cli := newTestCLI(root)
+
+	content, err := EncodeChainConfig(DefaultChainConfig("preview-ready"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	path := filepath.Join(root, "proofrail.chain.json")
+	if err := os.WriteFile(path, content, 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	code, stdout, stderr := runCLI(t, cli, "preview", "--chain", path, "--json")
+	if code != 0 {
+		t.Fatalf("preview code=%d stdout=%s stderr=%s", code, stdout, stderr)
+	}
+	result := decodeResponse(t, stdout)
+	if !result.OK {
+		t.Fatalf("preview failed: %s", stdout)
+	}
+	var report PreviewReport
+	if err := json.Unmarshal(result.Data, &report); err != nil {
+		t.Fatal(err)
+	}
+	if !report.RunnableInCLI || report.PreviewRecord.Preview.Outcome != "ready" || len(report.PreviewRecord.Preview.BlockingEvidence) != 0 {
+		t.Fatalf("unexpected ready preview report: %+v", report)
+	}
+}
+
 func TestUnknownCommandUsageExitCode(t *testing.T) {
 	root := t.TempDir()
 	cli := newTestCLI(root)

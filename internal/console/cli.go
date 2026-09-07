@@ -57,6 +57,8 @@ func (cli CLI) Execute(ctx context.Context, args []string, stdout, stderr io.Wri
 		return cli.executeInit(args[1:], stdout, stderr)
 	case "validate":
 		return cli.executeValidate(args[1:], stdout, stderr)
+	case "preview":
+		return cli.executePreview(args[1:], stdout, stderr)
 	case "run":
 		return cli.executeRun(ctx, args[1:], stdout, stderr)
 	case "report":
@@ -355,7 +357,7 @@ func resolvePathFromCWD(cwd, value string) (string, error) {
 
 func writeMainUsage(output io.Writer) {
 	fmt.Fprintln(output, "usage: prfrail <command> [options]")
-	fmt.Fprintln(output, "commands: version, init, validate, run, report, config explain")
+	fmt.Fprintln(output, "commands: version, init, validate, preview, run, report, config explain")
 }
 
 func writeFile(path string, content []byte, force bool) error {
