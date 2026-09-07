@@ -31,8 +31,11 @@ func Restore(ctx context.Context, opts RestoreOptions) error {
 		}
 	}
 
-	// Target directory check
+	// Target directory check. Materialization happens in a sibling staging
+	// directory so any later failure leaves the requested target untouched.
+	targetExists := false
 	if info, err := os.Stat(opts.TargetDir); err == nil {
+		targetExists = true
 		if !info.IsDir() {
 			return fmt.Errorf("%w: target path is not a directory", ErrInvalidPath)
 		}
@@ -43,19 +46,28 @@ func Restore(ctx context.Context, opts RestoreOptions) error {
 		if len(items) > 0 {
 			return fmt.Errorf("%w: target directory %q is not empty", ErrTargetNotEmpty, opts.TargetDir)
 		}
-	} else if os.IsNotExist(err) {
-		if err := os.MkdirAll(opts.TargetDir, 0755); err != nil {
-			return fmt.Errorf("create target dir: %w", err)
-		}
-	} else {
+	} else if !os.IsNotExist(err) {
 		return fmt.Errorf("stat target dir: %w", err)
 	}
+	parentDir := filepath.Dir(filepath.Clean(opts.TargetDir))
+	if err := os.MkdirAll(parentDir, 0755); err != nil {
+		return fmt.Errorf("create target parent: %w", err)
+	}
+	stageDir, err := os.MkdirTemp(parentDir, ".prfrail-restore-*")
+	if err != nil {
+		return fmt.Errorf("create restore staging directory: %w", err)
+	}
+	defer os.RemoveAll(stageDir)
 
 	hardlinkPrimaries := make(map[string]string) // groupID -> full path of first restored file
+	var readOnlyDirs []struct {
+		path string
+		perm os.FileMode
+	}
 
 	// Restore entries in strict manifest order
 	for _, entry := range opts.Manifest.Manifest.Entries {
-		destPath := filepath.Join(opts.TargetDir, filepath.FromSlash(entry.Path))
+		destPath := filepath.Join(stageDir, filepath.FromSlash(entry.Path))
 
 		switch entry.Type {
 		case EntryDirectory:
@@ -67,7 +79,10 @@ func Restore(ctx context.Context, opts RestoreOptions) error {
 				return fmt.Errorf("mkdir %q: %w", entry.Path, err)
 			}
 			if entry.ReadOnly {
-				_ = os.Chmod(destPath, perm)
+				readOnlyDirs = append(readOnlyDirs, struct {
+					path string
+					perm os.FileMode
+				}{destPath, perm})
 			}
 
 		case EntryRegularFile:
@@ -79,9 +94,10 @@ func Restore(ctx context.Context, opts RestoreOptions) error {
 			linked := false
 			if entry.HardlinkGroup != nil {
 				if primaryPath, exists := hardlinkPrimaries[*entry.HardlinkGroup]; exists {
-					if err := os.Link(primaryPath, destPath); err == nil {
-						linked = true
+					if err := os.Link(primaryPath, destPath); err != nil {
+						return fmt.Errorf("%w: create hardlink %q: %v", ErrUnsupportedLink, entry.Path, err)
 					}
+					linked = true
 				}
 			}
 
@@ -103,8 +119,8 @@ func Restore(ctx context.Context, opts RestoreOptions) error {
 				if err := os.WriteFile(destPath, data, perm); err != nil {
 					return fmt.Errorf("write regular file %q: %w", entry.Path, err)
 				}
-				if entry.ReadOnly {
-					_ = os.Chmod(destPath, perm)
+				if err := os.Chmod(destPath, perm); err != nil {
+					return fmt.Errorf("restore permissions for %q: %w", entry.Path, err)
 				}
 
 				if entry.HardlinkGroup != nil {
@@ -125,6 +141,22 @@ func Restore(ctx context.Context, opts RestoreOptions) error {
 		default:
 			return fmt.Errorf("%w: unknown entry type %q for %q", ErrInvalidManifest, entry.Type, entry.Path)
 		}
+	}
+	for i := len(readOnlyDirs) - 1; i >= 0; i-- {
+		if err := os.Chmod(readOnlyDirs[i].path, readOnlyDirs[i].perm); err != nil {
+			return fmt.Errorf("restore directory permissions: %w", err)
+		}
+	}
+	if targetExists {
+		if err := os.Remove(opts.TargetDir); err != nil {
+			return fmt.Errorf("remove empty target before publication: %w", err)
+		}
+	}
+	if err := os.Rename(stageDir, opts.TargetDir); err != nil {
+		if targetExists {
+			_ = os.Mkdir(opts.TargetDir, 0755)
+		}
+		return fmt.Errorf("publish restored target: %w", err)
 	}
 
 	return nil

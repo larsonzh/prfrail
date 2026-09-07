@@ -26,6 +26,7 @@ type CaptureOptions struct {
 	Store              *Store
 	Environment        *Environment
 	MaxBytesQuota      int64
+	afterRead          func(string)
 }
 
 type fileIdentity struct {
@@ -123,6 +124,9 @@ func Capture(ctx context.Context, opts CaptureOptions) (SnapshotManifest, error)
 			if err != nil {
 				return fmt.Errorf("readlink %q: %w", relPath, err)
 			}
+			if strings.Contains(target, "\\") {
+				return fmt.Errorf("%w: symlink %q target contains a backslash", ErrUnsupportedLink, relPath)
+			}
 			normTarget := filepath.ToSlash(target)
 			if err := validateLinkTargetEscape(relPath, normTarget); err != nil {
 				return err
@@ -156,6 +160,9 @@ func Capture(ctx context.Context, opts CaptureOptions) (SnapshotManifest, error)
 			data, err := os.ReadFile(fullPath)
 			if err != nil {
 				return fmt.Errorf("read file %q: %w", relPath, err)
+			}
+			if opts.afterRead != nil {
+				opts.afterRead(fullPath)
 			}
 
 			statAfter, err := os.Lstat(fullPath)

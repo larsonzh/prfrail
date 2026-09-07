@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/larsonzh/prfrail/internal/evidence"
+	"golang.org/x/text/unicode/norm"
 )
 
 const (
@@ -22,6 +23,7 @@ var (
 	ErrInvalidPath      = errors.New("invalid snapshot path")
 	ErrReservedPath     = errors.New("windows reserved path")
 	ErrCaseCollision    = errors.New("path case collision")
+	ErrUnicodeCollision = errors.New("unicode-equivalent path collision")
 	ErrDirectoryClosure = errors.New("directory closure violation")
 	ErrHardlinkMismatch = errors.New("hardlink group mismatch")
 	ErrUnsortedEntries  = errors.New("unsorted entries")
@@ -421,6 +423,7 @@ func validateEnvironment(env Environment) error {
 func ValidateEntries(entries []Entry) error {
 	dirSet := make(map[string]struct{}, len(entries))
 	caseSet := make(map[string]string, len(entries))
+	unicodeSet := make(map[string]string, len(entries))
 	hardlinkGroups := make(map[string]Entry, len(entries))
 
 	for i := 0; i < len(entries); i++ {
@@ -436,6 +439,11 @@ func ValidateEntries(entries []Entry) error {
 			return fmt.Errorf("%w: %q conflicts with %q", ErrCaseCollision, e.Path, prev)
 		}
 		caseSet[lower] = e.Path
+		unicodeKey := norm.NFC.String(e.Path)
+		if prev, exists := unicodeSet[unicodeKey]; exists && prev != e.Path {
+			return fmt.Errorf("%w: %q conflicts with %q", ErrUnicodeCollision, e.Path, prev)
+		}
+		unicodeSet[unicodeKey] = e.Path
 
 		switch e.Type {
 		case EntryDirectory:

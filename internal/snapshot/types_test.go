@@ -197,6 +197,17 @@ func TestValidatePathLongPath(t *testing.T) {
 	}
 }
 
+func TestSnapshotManifestRejectsUnicodeEquivalentPaths(t *testing.T) {
+	body := validManifestBody()
+	body.Entries = []Entry{
+		{Path: "cafe\u0301.txt", Type: EntryRegularFile, SizeBytes: 1, ContentHash: evidence.Digest("", []byte("a")), Role: RoleRegular},
+		{Path: "café.txt", Type: EntryRegularFile, SizeBytes: 1, ContentHash: evidence.Digest("", []byte("b")), Role: RoleRegular},
+	}
+	if _, err := NewSnapshotManifest(body); !errors.Is(err, ErrUnicodeCollision) {
+		t.Fatalf("expected ErrUnicodeCollision, got %v", err)
+	}
+}
+
 func TestSymlinkEscapeRejection(t *testing.T) {
 	target := "../../secret"
 	body := validManifestBody()

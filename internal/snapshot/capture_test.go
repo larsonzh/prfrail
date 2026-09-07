@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
-	"time"
 
 	"github.com/larsonzh/prfrail/internal/evidence"
 )
@@ -127,10 +126,7 @@ func TestCaptureReservedNameRejection(t *testing.T) {
 	storeDir := t.TempDir()
 	store, _ := NewStore(storeDir, 0)
 
-	// Create file with Windows reserved name
 	conFile := filepath.Join(srcDir, "con.txt")
-	// On Windows, creating "con.txt" might directly be blocked by OS or allowed via \\?\
-	// If OS blocks creation, test ValidatePath directly; if allowed, test Capture
 	err := os.WriteFile(conFile, []byte("reserved"), 0644)
 	if err == nil {
 		opts := CaptureOptions{
@@ -144,11 +140,8 @@ func TestCaptureReservedNameRejection(t *testing.T) {
 		if !errors.Is(err, ErrReservedPath) {
 			t.Fatalf("expected ErrReservedPath, got: %v", err)
 		}
-	} else {
-		// OS itself blocked reserved name, verify ValidatePath
-		if err := ValidatePath("con.txt"); !errors.Is(err, ErrReservedPath) {
-			t.Fatalf("expected ErrReservedPath, got: %v", err)
-		}
+	} else if err := ValidatePath("con.txt"); !errors.Is(err, ErrReservedPath) {
+		t.Fatalf("expected ErrReservedPath, got: %v", err)
 	}
 }
 
@@ -168,7 +161,7 @@ func TestCaptureQuotaExceeded(t *testing.T) {
 		SnapshotID:    "snap-quota",
 		RunID:         "run-quota",
 		Store:         store,
-		MaxBytesQuota: 500, // 500 < 1000
+		MaxBytesQuota: 500,
 	}
 
 	_, err := Capture(context.Background(), opts)
@@ -271,48 +264,22 @@ func TestCaptureConcurrentModification(t *testing.T) {
 	storeDir := t.TempDir()
 	store, _ := NewStore(storeDir, 0)
 
-	// Create many files to give time for concurrent modification
-	for i := 0; i < 50; i++ {
-		p := filepath.Join(srcDir, filepath.FromSlash("file"+string(rune('a'+i%26))+".dat"))
-		_ = os.WriteFile(p, []byte("steady content"), 0644)
-	}
-
 	changeFile := filepath.Join(srcDir, "changing.dat")
 	_ = os.WriteFile(changeFile, []byte("initial"), 0644)
 
-	// In a goroutine, modify changing.dat repeatedly
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	go func() {
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			default:
-				_ = os.WriteFile(changeFile, []byte("modified content at "+time.Now().String()), 0644)
-				time.Sleep(1 * time.Millisecond)
+	_, err := Capture(context.Background(), CaptureOptions{
+		SourceDir:  srcDir,
+		Kind:       "baseline",
+		SnapshotID: "snap-conc",
+		RunID:      "run-conc",
+		Store:      store,
+		afterRead: func(path string) {
+			if path == changeFile {
+				_ = os.WriteFile(path, []byte("changed after read"), 0644)
 			}
-		}
-	}()
-
-	// Attempt capture multiple times if needed until a concurrent change is detected
-	detected := false
-	for attempt := 0; attempt < 20; attempt++ {
-		_, err := Capture(context.Background(), CaptureOptions{
-			SourceDir:  srcDir,
-			Kind:       "baseline",
-			SnapshotID: "snap-conc",
-			RunID:      "run-conc",
-			Store:      store,
-		})
-		if errors.Is(err, ErrConcurrentChange) {
-			detected = true
-			break
-		}
-	}
-	cancel()
-	if !detected {
-		t.Logf("concurrent change timing did not trigger in 20 attempts (filesystem race dependent)")
+		},
+	})
+	if !errors.Is(err, ErrConcurrentChange) {
+		t.Fatalf("expected deterministic ErrConcurrentChange, got %v", err)
 	}
 }

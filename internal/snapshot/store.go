@@ -44,14 +44,11 @@ func NewStore(root string, maxBytesQuota int64) (*Store, error) {
 	}, nil
 }
 
-func (s *Store) objectPath(hash string) string {
-	// hash format: sha256:<64 hex>
-	// file name is the raw sha256 hex or prefixed
-	safeName := hash
-	if len(safeName) > 7 && safeName[:7] == "sha256:" {
-		safeName = safeName[7:]
+func (s *Store) objectPath(hash string) (string, error) {
+	if !evidence.ValidHash(hash) {
+		return "", fmt.Errorf("%w: invalid object hash %q", ErrInvalidManifest, hash)
 	}
-	return filepath.Join(s.objectsDir, safeName)
+	return filepath.Join(s.objectsDir, hash[7:]), nil
 }
 
 func (s *Store) PutObject(ctx context.Context, data []byte) (string, error) {
@@ -59,15 +56,16 @@ func (s *Store) PutObject(ctx context.Context, data []byte) (string, error) {
 	defer s.mu.Unlock()
 
 	hash := evidence.Digest("", data)
-	targetPath := s.objectPath(hash)
+	targetPath, _ := s.objectPath(hash)
 
-	// Check if already exists intact
-	if info, err := os.Stat(targetPath); err == nil && info.Size() == int64(len(data)) {
-		// Read and verify
-		existing, err := os.ReadFile(targetPath)
-		if err == nil && evidence.Digest("", existing) == hash {
+	if _, err := os.Stat(targetPath); err == nil {
+		existing, readErr := os.ReadFile(targetPath)
+		if readErr == nil && evidence.Digest("", existing) == hash {
 			return hash, nil
 		}
+		return "", fmt.Errorf("%w: immutable object %s already exists with different bytes", ErrObjectCorrupt, hash)
+	} else if !os.IsNotExist(err) {
+		return "", fmt.Errorf("stat target object: %w", err)
 	}
 
 	// Check quota
@@ -107,9 +105,13 @@ func (s *Store) PutObject(ctx context.Context, data []byte) (string, error) {
 		return "", fmt.Errorf("close tmp object: %w", err)
 	}
 
-	// Atomic rename to final path
-	if err := os.Rename(tmpFile, targetPath); err != nil {
-		return "", fmt.Errorf("rename to target object: %w", err)
+	// A hard link publishes the fully synced temporary inode without replacing an
+	// existing immutable object. Both directories are created on the same volume.
+	if err := os.Link(tmpFile, targetPath); err != nil {
+		if existing, readErr := os.ReadFile(targetPath); readErr == nil && evidence.Digest("", existing) == hash {
+			return hash, nil
+		}
+		return "", fmt.Errorf("publish target object without replacement: %w", err)
 	}
 	return hash, nil
 }
@@ -118,7 +120,10 @@ func (s *Store) GetObject(ctx context.Context, hash string) ([]byte, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	targetPath := s.objectPath(hash)
+	targetPath, err := s.objectPath(hash)
+	if err != nil {
+		return nil, err
+	}
 	data, err := os.ReadFile(targetPath)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -136,7 +141,10 @@ func (s *Store) HasObject(hash string) bool {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	targetPath := s.objectPath(hash)
+	targetPath, err := s.objectPath(hash)
+	if err != nil {
+		return false
+	}
 	info, err := os.Stat(targetPath)
 	if err != nil || info.IsDir() {
 		return false

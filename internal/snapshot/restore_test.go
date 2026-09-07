@@ -207,7 +207,8 @@ func TestRestoreMissingObjectFailsClosed(t *testing.T) {
 
 	// Delete the object from store to simulate missing CAS object
 	objHash := manifest.Manifest.Entries[0].ContentHash
-	_ = os.Remove(store.objectPath(objHash))
+	objPath, _ := store.objectPath(objHash)
+	_ = os.Remove(objPath)
 
 	err = Restore(context.Background(), RestoreOptions{
 		TargetDir: targetDir,

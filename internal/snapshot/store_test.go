@@ -78,7 +78,7 @@ func TestStoreNotFoundAndCorrupt(t *testing.T) {
 		t.Fatalf("put: %v", err)
 	}
 
-	objFile := store.objectPath(hash)
+	objFile, _ := store.objectPath(hash)
 	if err := os.WriteFile(objFile, []byte("tampered data"), 0644); err != nil {
 		t.Fatalf("tamper file: %v", err)
 	}
@@ -88,6 +88,12 @@ func TestStoreNotFoundAndCorrupt(t *testing.T) {
 	}
 	if store.HasObject(hash) {
 		t.Fatalf("HasObject for corrupt object should be false")
+	}
+	if _, err := store.PutObject(context.Background(), data); !errors.Is(err, ErrObjectCorrupt) {
+		t.Fatalf("corrupt immutable object must not be replaced: %v", err)
+	}
+	if _, err := store.GetObject(context.Background(), "../../outside"); !errors.Is(err, ErrInvalidManifest) {
+		t.Fatalf("invalid hash must be rejected before path construction: %v", err)
 	}
 }
 
@@ -127,7 +133,8 @@ func TestStoreGCDryRun(t *testing.T) {
 
 	// Backdate hash3 object file to 2 hours ago
 	oldTime := time.Now().Add(-2 * time.Hour)
-	if err := os.Chtimes(store.objectPath(hash3), oldTime, oldTime); err != nil {
+	hash3Path, _ := store.objectPath(hash3)
+	if err := os.Chtimes(hash3Path, oldTime, oldTime); err != nil {
 		t.Fatalf("chtimes: %v", err)
 	}
 
