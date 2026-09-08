@@ -7,16 +7,32 @@ import (
 )
 
 type Hook struct {
-	ID            string
-	Kind          string
-	Runner        ProcessRunner
-	CWD           string
-	EnvAllowlist  []string
-	OnFail        FailurePolicy
-	ArtifactGlobs []string
-	Timeout       time.Duration
-	Resources     ResourceLimits
-	Network       NetworkPolicy
+	ID                string
+	Kind              string
+	Runner            ProcessRunner
+	CWD               string
+	EnvAllowlist      []string
+	EffectClass       string
+	ExternalSystems   []string
+	RecoveryGuarantee string
+	PolicyHash        string
+	AuthorizationHash string
+	EffectEvidence    []string
+	OnFail            FailurePolicy
+	ArtifactGlobs     []string
+	Timeout           time.Duration
+	Resources         ResourceLimits
+	Network           NetworkPolicy
+}
+
+type EffectScope struct {
+	EffectClass       string
+	ExternalSystems   []string
+	RecoveryGuarantee string
+	PolicyHash        string
+	AuthorizationHash string
+	OperationKey      string
+	Evidence          []string
 }
 
 type ProcessRunner struct {
@@ -76,6 +92,7 @@ type Request struct {
 	ExecutionAttempt   int
 	WorkspaceRoot      string
 	HookDefinitionHash string
+	Effect             *EffectScope
 	Hook               Hook
 }
 
@@ -95,29 +112,31 @@ type Artifact struct {
 }
 
 type Result struct {
-	ResultID            string         `json:"resultId"`
-	RecordedBy          evidence.Actor `json:"recordedBy"`
-	RunID               string         `json:"runId"`
-	TaskID              string         `json:"taskId"`
-	StepID              string         `json:"stepId"`
-	Attempt             int            `json:"attempt"`
-	HookID              string         `json:"hookId"`
-	HookDefinitionHash  string         `json:"hookDefinitionHash"`
-	ExecutionAttempt    int            `json:"executionAttempt"`
-	AttemptedAt         string         `json:"attemptedAt"`
-	StartedAt           *string        `json:"startedAt"`
-	FinishedAt          string         `json:"finishedAt"`
-	ExecutionOutcome    string         `json:"executionOutcome"`
-	ExitCode            *int           `json:"exitCode"`
-	Assessment          string         `json:"assessment"`
-	FailureKind         *string        `json:"failureKind"`
-	PolicyDisposition   string         `json:"policyDisposition"`
-	Stdout              *Output        `json:"stdout"`
-	Stderr              *Output        `json:"stderr"`
-	Artifacts           []Artifact     `json:"artifacts"`
-	RunnerEvidence      []string       `json:"runnerEvidence"`
-	TerminationEvidence []string       `json:"terminationEvidence"`
-	ErrorEvidence       []string       `json:"errorEvidence"`
+	ResultID              string         `json:"resultId"`
+	RecordedBy            evidence.Actor `json:"recordedBy"`
+	RunID                 string         `json:"runId"`
+	TaskID                string         `json:"taskId"`
+	StepID                string         `json:"stepId"`
+	Attempt               int            `json:"attempt"`
+	HookID                string         `json:"hookId"`
+	HookDefinitionHash    string         `json:"hookDefinitionHash"`
+	ExecutionAttempt      int            `json:"executionAttempt"`
+	AttemptedAt           string         `json:"attemptedAt"`
+	StartedAt             *string        `json:"startedAt"`
+	FinishedAt            string         `json:"finishedAt"`
+	ExecutionOutcome      string         `json:"executionOutcome"`
+	ExitCode              *int           `json:"exitCode"`
+	Assessment            string         `json:"assessment"`
+	FailureKind           *string        `json:"failureKind"`
+	PolicyDisposition     string         `json:"policyDisposition"`
+	EffectObservationHash *string        `json:"effectObservationHash,omitempty"`
+	EffectRecoveryAction  *string        `json:"effectRecoveryAction,omitempty"`
+	Stdout                *Output        `json:"stdout"`
+	Stderr                *Output        `json:"stderr"`
+	Artifacts             []Artifact     `json:"artifacts"`
+	RunnerEvidence        []string       `json:"runnerEvidence"`
+	TerminationEvidence   []string       `json:"terminationEvidence"`
+	ErrorEvidence         []string       `json:"errorEvidence"`
 }
 
 type ResultRecord struct {

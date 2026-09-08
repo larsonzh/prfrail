@@ -12,7 +12,7 @@ import (
 func validRequest(root string) Request {
 	return Request{
 		RunID: "run-one", TaskID: "task-one", StepID: "step-one", Attempt: 1, ExecutionAttempt: 1, WorkspaceRoot: root, HookDefinitionHash: "sha256:1111111111111111111111111111111111111111111111111111111111111111",
-		Hook: Hook{ID: "go-test", Kind: "test", Runner: ProcessRunner{Type: "process", Executable: "go", Args: []string{"test", "./...; touch injected"}}, OnFail: FailurePolicy{Action: "fail-stop"}, Timeout: time.Second, Resources: ResourceLimits{MemoryBytes: 1, OutputBytes: 1024, ProcessCount: 1}, Network: NetworkPolicy{Mode: "deny"}},
+		Hook: Hook{ID: "go-test", Kind: "test", Runner: ProcessRunner{Type: "process", Executable: "go", Args: []string{"test", "./...; touch injected"}}, EffectClass: "read-only", OnFail: FailurePolicy{Action: "fail-stop"}, Timeout: time.Second, Resources: ResourceLimits{MemoryBytes: 1, OutputBytes: 1024, ProcessCount: 1}, Network: NetworkPolicy{Mode: "deny"}},
 	}
 }
 
@@ -61,5 +61,13 @@ func TestPrepareRejectsMissingAllowedEnvironment(t *testing.T) {
 	request.Hook.EnvAllowlist = []string{"TOKEN"}
 	if _, err := Prepare(request, allCapabilities(), []string{"PATH=tools"}); !errors.Is(err, ErrEnvironmentUnavailable) {
 		t.Fatalf("got %v", err)
+	}
+}
+
+func TestPrepareRejectsMissingEffectClass(t *testing.T) {
+	request := validRequest(t.TempDir())
+	request.Hook.EffectClass = ""
+	if _, err := Prepare(request, allCapabilities(), nil); !errors.Is(err, ErrInvalidHook) {
+		t.Fatalf("missing effect class should fail closed, got %v", err)
 	}
 }

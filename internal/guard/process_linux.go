@@ -119,3 +119,46 @@ func processGroupAlive(pgid int) bool {
 	err := syscall.Kill(-pgid, 0)
 	return err == nil || errors.Is(err, syscall.EPERM)
 }
+
+func platformStopIdentity(identity ProcessIdentity, grace time.Duration) ([]string, error) {
+	pgid, err := syscall.Getpgid(identity.PID)
+	if errors.Is(err, syscall.ESRCH) {
+		return []string{"already-stopped"}, nil
+	}
+	if err != nil {
+		return []string{"signal-term-process-group"}, err
+	}
+	if pgid <= 0 {
+		return []string{"signal-term-process-group"}, errors.New("invalid process group")
+	}
+	actions := []string{"signal-term-process-group"}
+	if err := syscall.Kill(-pgid, syscall.SIGTERM); err != nil && !errors.Is(err, syscall.ESRCH) {
+		return actions, err
+	}
+	deadline := time.Now().Add(grace)
+	for time.Now().Before(deadline) {
+		alive, err := platformIdentityAlive(identity)
+		if errors.Is(err, syscall.ESRCH) {
+			return actions, nil
+		}
+		if err != nil {
+			return actions, err
+		}
+		if !alive {
+			return actions, nil
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+	alive, err := platformIdentityAlive(identity)
+	if errors.Is(err, syscall.ESRCH) || !alive {
+		return actions, nil
+	}
+	if err != nil {
+		return actions, err
+	}
+	actions = append(actions, "signal-kill-process-group")
+	if err := syscall.Kill(-pgid, syscall.SIGKILL); err != nil && !errors.Is(err, syscall.ESRCH) {
+		return actions, err
+	}
+	return actions, nil
+}

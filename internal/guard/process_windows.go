@@ -7,6 +7,8 @@ import (
 	"errors"
 	"fmt"
 	"os/exec"
+	"strconv"
+	"strings"
 	"syscall"
 	"time"
 	"unsafe"
@@ -167,4 +169,22 @@ func platformIdentityAlive(identity ProcessIdentity) (bool, error) {
 		return false, err
 	}
 	return current.StartToken == identity.StartToken, nil
+}
+
+func platformStopIdentity(identity ProcessIdentity, _ time.Duration) ([]string, error) {
+	actions := []string{"taskkill-process-tree"}
+	command := exec.Command("taskkill", "/PID", strconv.Itoa(identity.PID), "/T", "/F")
+	output, err := command.CombinedOutput()
+	if err != nil {
+		text := strings.ToLower(string(output))
+		if strings.Contains(text, "not found") || strings.Contains(text, "no running instance") {
+			return []string{"already-stopped"}, nil
+		}
+		trimmed := strings.TrimSpace(string(output))
+		if trimmed == "" {
+			return actions, err
+		}
+		return actions, fmt.Errorf("taskkill failed: %w (%s)", err, trimmed)
+	}
+	return actions, nil
 }

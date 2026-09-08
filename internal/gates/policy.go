@@ -82,6 +82,96 @@ func validateRequest(request Request) error {
 			return ErrInvalidHook
 		}
 	}
+	if err := validateHookEffectPolicy(hook); err != nil {
+		return err
+	}
+	if request.Effect != nil {
+		if err := validateEffectScope(*request.Effect); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func validateHookEffectPolicy(hook Hook) error {
+	if hook.EffectClass == "" {
+		return fmt.Errorf("%w: effect class is required", ErrInvalidHook)
+	}
+	if !validEffectClasses[EffectClass(hook.EffectClass)] {
+		return fmt.Errorf("%w: unknown effect class %q", ErrInvalidHook, hook.EffectClass)
+	}
+	if hook.RecoveryGuarantee != "" {
+		if !validRecoveryGuarantees[hook.RecoveryGuarantee] {
+			return fmt.Errorf("%w: unknown recovery guarantee %q", ErrInvalidHook, hook.RecoveryGuarantee)
+		}
+		effectClass := hook.EffectClass
+		if effectClass == "" {
+			return fmt.Errorf("%w: recovery guarantee requires effect class", ErrInvalidHook)
+		}
+		if effectClass == string(EffectExternalWrite) && (hook.RecoveryGuarantee == "none-required" || hook.RecoveryGuarantee == "discard-workspace") {
+			return fmt.Errorf("%w: external-write cannot claim %q recovery", ErrInvalidHook, hook.RecoveryGuarantee)
+		}
+	}
+	if hook.PolicyHash != "" && !evidence.ValidHash(hook.PolicyHash) {
+		return fmt.Errorf("%w: invalid effect policy hash", ErrInvalidHook)
+	}
+	if hook.AuthorizationHash != "" && !evidence.ValidHash(hook.AuthorizationHash) {
+		return fmt.Errorf("%w: invalid effect authorization hash", ErrInvalidHook)
+	}
+	if err := validateEffectSystems(hook.ExternalSystems); err != nil {
+		return err
+	}
+	if len(hook.EffectEvidence) > 0 {
+		if err := validateEffectHashSet(hook.EffectEvidence, "effectEvidence"); err != nil {
+			return fmt.Errorf("%w: %v", ErrInvalidHook, err)
+		}
+	}
+	return nil
+}
+
+func validateEffectScope(scope EffectScope) error {
+	if !validEffectClasses[EffectClass(scope.EffectClass)] {
+		return fmt.Errorf("%w: unknown effect class %q", ErrInvalidHook, scope.EffectClass)
+	}
+	if err := validateEffectSystems(scope.ExternalSystems); err != nil {
+		return err
+	}
+	if scope.RecoveryGuarantee != "" {
+		if !validRecoveryGuarantees[scope.RecoveryGuarantee] {
+			return fmt.Errorf("%w: unknown recovery guarantee %q", ErrInvalidHook, scope.RecoveryGuarantee)
+		}
+		if scope.EffectClass == string(EffectExternalWrite) && (scope.RecoveryGuarantee == "none-required" || scope.RecoveryGuarantee == "discard-workspace") {
+			return fmt.Errorf("%w: external-write cannot claim %q recovery", ErrInvalidHook, scope.RecoveryGuarantee)
+		}
+	}
+	if scope.PolicyHash != "" && !evidence.ValidHash(scope.PolicyHash) {
+		return fmt.Errorf("%w: invalid effect policy hash", ErrInvalidHook)
+	}
+	if !evidence.ValidHash(scope.AuthorizationHash) {
+		return fmt.Errorf("%w: invalid effect authorization hash", ErrInvalidHook)
+	}
+	if !validEffectID(scope.OperationKey) {
+		return fmt.Errorf("%w: invalid effect operation key", ErrInvalidHook)
+	}
+	if len(scope.Evidence) > 0 {
+		if err := validateEffectHashSet(scope.Evidence, "effect evidence"); err != nil {
+			return fmt.Errorf("%w: %v", ErrInvalidHook, err)
+		}
+	}
+	return nil
+}
+
+func validateEffectSystems(systems []string) error {
+	seen := map[string]bool{}
+	for _, system := range systems {
+		if !validEffectID(system) {
+			return fmt.Errorf("%w: invalid external system id", ErrInvalidHook)
+		}
+		if seen[system] {
+			return fmt.Errorf("%w: duplicate external system %q", ErrInvalidHook, system)
+		}
+		seen[system] = true
+	}
 	return nil
 }
 

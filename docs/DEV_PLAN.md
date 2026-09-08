@@ -92,8 +92,8 @@ T006 状态：`COMPLETE`。AT-02 完整验收通过；无 Git 恢复与不可变
 
 - [x] T019 [Plan:P1.7] PC-01：实现 `internal/taskdef/preview.go`、`internal/console/preview.go` 与测试、无 AI 示例；依赖：T016；验收：AT-16；禁止：预览启动命令/网络/模型/自动安装。完成：2026-09-08。覆盖离线只读 preview record 生成、unknown 可见、零调用计数与 JSON/文本同事实输出。验证：[中文](validation/t019-preview.md) / [English](validation/t019-preview_EN.md)。
 - [x] T020 [Plan:P1.7] PC-02：实现 `internal/snapshot/export.go`、`internal/evidence/delivery.go` 与测试；依赖：T019、T006/T011；验收：AT-17；禁止：导出候选冒充接受、覆盖目标、源树/Git 写入。完成：2026-09-08。覆盖 accepted hash 绑定、目标必须 absent、源/run/store 重叠阻断、secret 路径阻断、缺对象/篡改阻断、写中断无 completed record。验证：[中文](validation/t020-export.md) / [English](validation/t020-export_EN.md)。
-- [ ] T021 [Plan:P1.7] PC-03：实现 `internal/chain/authorization.go`、`internal/console/approvals.go` 与测试，接 guard 停机；依赖：T020、T007/T011；验收：AT-18；禁止：自授权、硬门禁 waiver、过期自动批准。
-- [ ] T022 [Plan:P1.7] PC-04：实现 `internal/gates/effects.go`、`internal/evidence/diagnostics.go` 和 chain 恢复计划测试；依赖：T021、T010；验收：AT-19；禁止：外部写 runner、未知副作用盲重试、诊断删锁/日志。
+- [x] T021 [Plan:P1.7] PC-03：实现 `internal/chain/authorization.go`、`internal/console/approvals.go` 与测试，接 guard 停机；依赖：T020、T007/T011；验收：AT-18；禁止：自授权、硬门禁 waiver、过期自动批准。
+- [x] T022 [Plan:P1.7] PC-04：实现 `internal/gates/effects.go`、`internal/evidence/diagnostics.go` 和 chain 恢复计划测试；依赖：T021、T010；验收：AT-19；禁止：外部写 runner、未知副作用盲重试、诊断删锁/日志。
 - [ ] T023 [Plan:P1.7] PC-05：扩展 `internal/tickets/budget.go`、`internal/adapters/` 用量和 `internal/console/` 成本报告；依赖：T022、T012/T013；验收：AT-20；禁止：重启释放未知费用、跨 run 绕上限、默认遥测。
 - [ ] T024 [Plan:P1.7] PC-06：实现 `internal/snapshot/backup.go`、`internal/evidence/disposition.go`、生命周期控制/测试及发布清单工具；依赖：T023；验收：AT-21、SBOM/支持说明；禁止：未知格式迁移、默认删证据/共享工具、擅自签名发布。
 

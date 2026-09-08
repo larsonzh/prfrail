@@ -163,10 +163,77 @@ func TestFileResultStoreRejectsDuplicateAndTamperedResult(t *testing.T) {
 	}
 }
 
+func effectScopeForTest(effectClass string) *EffectScope {
+	return &EffectScope{
+		EffectClass:       effectClass,
+		ExternalSystems:   []string{},
+		RecoveryGuarantee: "",
+		PolicyHash:        "",
+		AuthorizationHash: effectTestHash('e'),
+		OperationKey:      "op-run-go-test",
+		Evidence:          []string{effectTestHash('c')},
+	}
+}
+
+func TestRunnerDeniesExternalWriteEffectWithoutExecuting(t *testing.T) {
+	request := validRequest(t.TempDir())
+	request.Effect = effectScopeForTest("external-write")
+	executor := &fakeExecutor{executions: []Execution{successfulExecution()}}
+	store := &memoryResults{}
+	record, err := testRunner(executor, fakeScanner{}, store).Run(context.Background(), request)
+	if !errors.Is(err, ErrGateFailed) {
+		t.Fatalf("external-write must be denied: %v", err)
+	}
+	if executor.calls != 0 {
+		t.Fatalf("denied effect must never execute: calls=%d", executor.calls)
+	}
+	if len(store.records) != 1 {
+		t.Fatalf("denial must persist one record: %+v", store.records)
+	}
+	persisted := store.records[0]
+	if persisted.Result.ExecutionOutcome != "start-failed" || persisted.Result.Assessment != "failed" {
+		t.Fatalf("denied record must be start-failed/failed: %+v", persisted.Result)
+	}
+	if persisted.Result.EffectObservationHash == nil || persisted.Result.EffectRecoveryAction == nil {
+		t.Fatalf("denied record must bind effect observation: %+v", persisted.Result)
+	}
+	if *persisted.Result.EffectRecoveryAction != "reconcile-only" {
+		t.Fatalf("external-write denial must reconcile, got %q", *persisted.Result.EffectRecoveryAction)
+	}
+	if !evidence.ValidHash(*persisted.Result.EffectObservationHash) {
+		t.Fatalf("invalid observation hash %q", *persisted.Result.EffectObservationHash)
+	}
+	if err := validateRecord(record); err != nil {
+		t.Fatalf("denied record must satisfy store validation: %v", err)
+	}
+}
+
+func TestRunnerBindsObservationToPassedReadOnlyResult(t *testing.T) {
+	request := validRequest(t.TempDir())
+	request.Effect = effectScopeForTest("read-only")
+	store := &memoryResults{}
+	record, err := testRunner(&fakeExecutor{executions: []Execution{successfulExecution()}}, fakeScanner{}, store).Run(context.Background(), request)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if record.Result.Assessment != "passed" || record.Result.EffectObservationHash == nil || record.Result.EffectRecoveryAction == nil {
+		t.Fatalf("passed read-only result must bind observation: %+v", record.Result)
+	}
+	if *record.Result.EffectRecoveryAction != "none-required" {
+		t.Fatalf("completed read-only needs no recovery, got %q", *record.Result.EffectRecoveryAction)
+	}
+	if len(record.Result.ErrorEvidence) != 0 {
+		t.Fatalf("passed result must have no error evidence: %+v", record.Result.ErrorEvidence)
+	}
+	if err := validateRecord(record); err != nil {
+		t.Fatalf("passed record must satisfy store validation: %v", err)
+	}
+}
+
 func (runner Runner) assessForTest(t *testing.T) Result {
 	t.Helper()
 	request := validRequest(t.TempDir())
-	result, err := runner.assess(context.Background(), request, "result-one", time.Date(2026, 9, 7, 12, 0, 0, 0, time.UTC), successfulExecution())
+	result, err := runner.assess(context.Background(), request, "result-one", time.Date(2026, 9, 7, 12, 0, 0, 0, time.UTC), successfulExecution(), nil)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -97,6 +97,19 @@ func validateRecord(record ResultRecord) error {
 	if record.SchemaVersion != "1.0.0" || !evidence.ValidID(record.Result.ResultID) || !evidence.ValidID(record.Result.RunID) || !evidence.ValidID(record.Result.TaskID) || !evidence.ValidID(record.Result.StepID) || !evidence.ValidID(record.Result.HookID) || !evidence.ValidHash(record.Result.HookDefinitionHash) || record.Result.Attempt < 1 || record.Result.ExecutionAttempt < 1 || len(record.Result.RunnerEvidence) == 0 {
 		return errors.New("invalid hook result")
 	}
+	if (record.Result.EffectObservationHash == nil) != (record.Result.EffectRecoveryAction == nil) {
+		return errors.New("invalid effect observation references")
+	}
+	if record.Result.EffectObservationHash != nil {
+		if !evidence.ValidHash(*record.Result.EffectObservationHash) {
+			return errors.New("invalid effect observation hash")
+		}
+		switch *record.Result.EffectRecoveryAction {
+		case "none-required", "reconcile-only", "discard-workspace", "compensation-only":
+		default:
+			return errors.New("invalid effect recovery action")
+		}
+	}
 	canonical, err := evidence.EncodeCanonical(record.Result)
 	if err != nil || evidence.Digest("proofrail:hook-result:1\n", canonical) != record.ResultHash {
 		return errors.New("invalid hook result hash")

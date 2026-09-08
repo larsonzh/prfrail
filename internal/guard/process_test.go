@@ -61,6 +61,40 @@ func TestManagedProcessTerminatesDescendantTree(t *testing.T) {
 	}
 }
 
+func TestStopProcessIdentityStopsRunningProcess(t *testing.T) {
+	if os.Getenv("PROOFRAIL_PROCESS_HELPER") != "" {
+		runProcessHelper()
+		return
+	}
+	pidFile := filepath.Join(t.TempDir(), "unused.pid")
+	managed, err := StartManaged(context.Background(), ProcessSpec{
+		Command: os.Args[0],
+		Args:    []string{"-test.run=^TestStopProcessIdentityStopsRunningProcess$", "--", "child", pidFile},
+		Env:     append(os.Environ(), "PROOFRAIL_PROCESS_HELPER=child"),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		_ = managed.cmd.Process.Kill()
+		_, _ = managed.cmd.Process.Wait()
+		managed.platform.close()
+	}()
+
+	proof, err := StopProcessIdentity(context.Background(), managed.Identity(), 100*time.Millisecond)
+	if err != nil {
+		t.Fatalf("stop identity failed: %v (%+v)", err, proof)
+	}
+	_, _ = managed.cmd.Process.Wait()
+	if proof.Outcome != "stopped" || !evidence.ValidHash(proof.Hash) {
+		t.Fatalf("invalid stop proof: %+v", proof)
+	}
+	alive, err := ProcessAlive(managed.Identity())
+	if err != nil || alive {
+		t.Fatalf("process should be stopped: alive=%v err=%v", alive, err)
+	}
+}
+
 func runProcessHelper() {
 	separator := 0
 	for index, arg := range os.Args {

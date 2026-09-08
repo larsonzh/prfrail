@@ -26,6 +26,7 @@ type CLI struct {
 	version string
 	now     func() time.Time
 	getwd   func() (string, error)
+	stopRun func(context.Context, string, string) ([]string, error)
 }
 
 type commandResponse struct {
@@ -39,7 +40,9 @@ type commandResponse struct {
 }
 
 func NewCLI(version string) CLI {
-	return CLI{version: version, now: time.Now, getwd: os.Getwd}
+	cli := CLI{version: version, now: time.Now, getwd: os.Getwd}
+	cli.stopRun = newDefaultStopRun(cli.getwd)
+	return cli
 }
 
 func (cli CLI) Execute(ctx context.Context, args []string, stdout, stderr io.Writer) int {
@@ -59,6 +62,8 @@ func (cli CLI) Execute(ctx context.Context, args []string, stdout, stderr io.Wri
 		return cli.executeValidate(args[1:], stdout, stderr)
 	case "preview":
 		return cli.executePreview(args[1:], stdout, stderr)
+	case "approvals":
+		return cli.executeApprovals(ctx, args[1:], stdout, stderr)
 	case "run":
 		return cli.executeRun(ctx, args[1:], stdout, stderr)
 	case "report":
@@ -357,7 +362,7 @@ func resolvePathFromCWD(cwd, value string) (string, error) {
 
 func writeMainUsage(output io.Writer) {
 	fmt.Fprintln(output, "usage: prfrail <command> [options]")
-	fmt.Fprintln(output, "commands: version, init, validate, preview, run, report, config explain")
+	fmt.Fprintln(output, "commands: version, init, validate, preview, approvals, run, report, config explain")
 }
 
 func writeFile(path string, content []byte, force bool) error {

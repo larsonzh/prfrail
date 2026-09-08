@@ -18,10 +18,12 @@ ProofRail 让 AI 在无人值守下安全地改代码、跑验证、出证据：
 
 ### 状态
 
-**S1 实施中（2026-09-08）**：T005–T020 已完成证据、快照、进程/租约守卫、托管变更集与事务应用，以及无 IDE CLI 基线（`init/validate/config explain/preview/run/report`）。
+**S1 实施中（2026-09-08）**：T005–T022 已完成证据、快照、进程/租约守卫、托管变更集与事务应用，以及无 IDE CLI 基线（`init/validate/config explain/preview/approvals/run/report`）。
 当前仍不是正式发行包：`run` 只支持 noop-only 任务链；遇到 `code/build/verify` 步骤会 fail-close 并返回非零退出码。
 `preview` 已支持离线只读静态预览（no-AI），不会执行命令、网络探测、模型调用或凭据读取。
 `export` 已具备库级实现（`internal/snapshot/export.go` 与 `internal/evidence/delivery.go`），CLI 入口仍在后续切片。
+`approvals` 已提供授权账本查看与撤销（`list`/`revoke`），撤销按 `stopDisposition` 接线受控停机并持久化待审批队列（重启可见）；离线、零模型调用。
+`effects`/`diagnostics` 已具备库级副作用分类与恢复诊断（`internal/gates/effects.go`、`internal/evidence/diagnostics.go`）：S1 拒绝外部写，未知副作用只对账不重投，诊断只读脱敏；CLI 入口仍在后续切片。
 项目建议书与历史设计来源见 [docs/RFC-proofrail-unattended-ai-engineering-product.md](docs/RFC-proofrail-unattended-ai-engineering-product.md)；分域权威见 [docs/DOCUMENTATION_PLAN.md](docs/DOCUMENTATION_PLAN.md)。
 
 从 [docs/DOCUMENTATION_PLAN.md](docs/DOCUMENTATION_PLAN.md) 阅读文档导航与低成本模型流程；
@@ -37,6 +39,7 @@ prfrail init --workspace .
 prfrail validate --chain ./proofrail.chain.json
 prfrail config explain --chain ./proofrail.chain.json
 prfrail preview --chain ./proofrail.chain.json
+prfrail approvals list --ledger ./authorization-ledger.jsonl
 prfrail run --chain ./proofrail.chain.json --run-id run-demo
 prfrail report --run-dir ./tmp/prfrail-runs/run-demo
 ```
@@ -86,10 +89,12 @@ ProofRail enables AI to safely modify code, run validations, and produce evidenc
 
 ### Status
 
-**S1 implementation in progress (2026-09-08)**: T005–T020 implement evidence, snapshots, process/lease guards, managed change sets, transactional apply, and a no-IDE CLI baseline (`init/validate/config explain/preview/run/report`).
+**S1 implementation in progress (2026-09-08)**: T005–T022 implement evidence, snapshots, process/lease guards, managed change sets, transactional apply, and a no-IDE CLI baseline (`init/validate/config explain/preview/approvals/run/report`).
 This is still not a production release package: `run` currently supports noop-only chains and fail-closes with a non-zero exit for executable `code/build/verify` steps.
 `preview` now supports a no-AI offline read-only static report with zero command/network/model/credential execution.
 `export` is now implemented at library level (`internal/snapshot/export.go` + `internal/evidence/delivery.go`); a dedicated CLI entrypoint remains in later slices.
+`approvals` now provides an authorization ledger view and revocation (`list`/`revoke`) with controlled-stop wiring per `stopDisposition` and a restart-visible pending inbox; offline and model-free.
+`effects`/`diagnostics` now provide library-level side-effect classification and recovery diagnosis (`internal/gates/effects.go`, `internal/evidence/diagnostics.go`): S1 denies external writes, unknown effects reconcile instead of blind retry, and diagnosis is read-only and redacted; CLI entrypoints remain in later slices.
 Project proposal and historical design source: [docs/RFC-proofrail-unattended-ai-engineering-product.md](docs/RFC-proofrail-unattended-ai-engineering-product.md). Domain authorities: [docs/DOCUMENTATION_PLAN_EN.md](docs/DOCUMENTATION_PLAN_EN.md).
 
 Start with [docs/DOCUMENTATION_PLAN_EN.md](docs/DOCUMENTATION_PLAN_EN.md) for navigation and the low-cost model workflow;
@@ -105,6 +110,7 @@ prfrail init --workspace .
 prfrail validate --chain ./proofrail.chain.json
 prfrail config explain --chain ./proofrail.chain.json
 prfrail preview --chain ./proofrail.chain.json
+prfrail approvals list --ledger ./authorization-ledger.jsonl
 prfrail run --chain ./proofrail.chain.json --run-id run-demo
 prfrail report --run-dir ./tmp/prfrail-runs/run-demo
 ```

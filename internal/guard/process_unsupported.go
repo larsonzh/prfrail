@@ -29,3 +29,7 @@ func platformIdentity(int) (ProcessIdentity, error) {
 func platformIdentityAlive(ProcessIdentity) (bool, error) {
 	return false, errors.New("unsupported platform")
 }
+
+func platformStopIdentity(ProcessIdentity, time.Duration) ([]string, error) {
+	return nil, errors.New("unsupported platform")
+}

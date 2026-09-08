@@ -154,6 +154,32 @@ func ProcessAlive(identity ProcessIdentity) (bool, error) {
 	return platformIdentityAlive(identity)
 }
 
+// StopProcessIdentity performs a best-effort controlled stop using a persisted
+// process identity. It returns termination evidence for both success and
+// uncertainty outcomes.
+func StopProcessIdentity(ctx context.Context, identity ProcessIdentity, grace time.Duration) (TerminationEvidence, error) {
+	if identity.PID <= 0 || identity.StartToken == "" {
+		return TerminationEvidence{}, ErrInvalidProcess
+	}
+	alive, err := platformIdentityAlive(identity)
+	if err != nil {
+		return TerminationEvidence{}, err
+	}
+	requested := time.Now().UTC()
+	if !alive {
+		return buildTerminationEvidence(identity, requested, []string{"already-stopped"}, nil)
+	}
+	actions, stopErr := platformStopIdentity(identity, grace)
+	if stopErr == nil {
+		stopErr = waitIdentityGone(ctx, identity)
+	}
+	proof, proofErr := buildTerminationEvidence(identity, requested, actions, stopErr)
+	if proofErr != nil {
+		return proof, proofErr
+	}
+	return proof, nil
+}
+
 func (process *ManagedProcess) Terminate(ctx context.Context, grace time.Duration) (TerminationEvidence, error) {
 	requested := time.Now().UTC()
 	actions, terminateErr := process.platform.stop(process.identity, grace)
