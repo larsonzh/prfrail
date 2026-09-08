@@ -23,7 +23,7 @@ The S1 target is a local, single-user, single-writer CLI/TUI with no persistent 
 | Configuration search order | Explicit argument, workspace, user profile | T016 freezes CLI and config-explain behavior | TBD |
 | Signature/trust root | Offline Ed25519 direction approved; identity/key unresolved | ADR, key governance, revocation, and rotation rehearsal | TBD |
 | Update mechanism | Manual verified download; package manager later | Support matrix, schema compatibility, backup/recovery gates | TBD |
-| Uninstall/data retention | Separate binary removal from run/store disposition | T024 lifecycle record and explicit deletion authorization | TBD |
+| Uninstall/data retention | Separate binary removal from run/store disposition | T024 lifecycle record and explicit deletion authorization | Library rules frozen; installation entrypoint awaits T017 |
 | VS Code integration | Optional extension/SessionBridge adapter | CLI-independent loop passes; no authority beyond core API | TBD |
 
 Until ADRs and executable acceptance evidence exist, do not choose default directories, publish one-click installers, claim automatic updates, or require administrator privileges.
@@ -38,7 +38,7 @@ Until ADRs and executable acceptance evidence exist, do not choose default direc
 6. Before upgrade, stop writers and make a complete recoverable backup to a new store. Preserve the old binary and store on failure.
 7. Uninstall retains evidence and configuration by default; data deletion is separately authorized.
 
-These are acceptance targets, not current copy-and-run instructions. T016, T017, and T024 will supply exact commands, filenames, directories, and download locations.
+These remain acceptance targets, not current copy-and-run instructions. T024 now supplies library-level complete backup, new-store verification, retention-by-default, and explicit deletion-authorization rules; T017 still owns installation commands, release filenames, and download locations.
 
 ## 5. Pre-Release Installation Gates
 
@@ -51,4 +51,4 @@ These are acceptance targets, not current copy-and-run instructions. T016, T017,
 
 ## 6. Documentation Completion
 
-T016 freezes CLI, configuration, and current source-run behavior; T017 supplies candidate artifacts, CI, signing, and support matrix; T024 freezes backup, upgrade, retirement, and data retention. Until all three complete, this remains a plan and [Operations](OPERATIONS_EN.md) continues to distinguish executable behavior from future design.
+T016 has frozen CLI, configuration, and current source-run behavior; T024 has frozen library-level backup, pre-upgrade blocking, retirement, and data-retention rules. T017 still needs to supply candidate artifacts, CI, signing, and the release support matrix. Until T017 completes, this remains a plan and [Operations](OPERATIONS_EN.md) continues to distinguish executable behavior from future design.

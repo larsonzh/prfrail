@@ -80,6 +80,33 @@ func (ledger *Ledger) ReserveAttempt(attempt int, now time.Time, wallClockExhaus
 	return nil
 }
 
+// CostBudgetExhausted derives whether cost admission should fail closed under
+// a shared monetary cap. Unknown committed usage is treated as exhausted.
+func CostBudgetExhausted(capMicros *int64, summary CostSummary) bool {
+	if capMicros == nil {
+		return false
+	}
+	committed, known := summary.CommittedAmountMicros()
+	if !known {
+		return true
+	}
+	return committed >= *capMicros
+}
+
+// CostTokenBudgetExhausted checks token caps against settled plus unknown
+// reservation holds. It intentionally fails closed once the cap is met.
+func CostTokenBudgetExhausted(capTokens int, summary CostSummary) bool {
+	if capTokens < 0 {
+		return true
+	}
+	holdTokens := summary.ReservedTokens - summary.SettledTokens
+	if holdTokens < 0 {
+		holdTokens = 0
+	}
+	committed := summary.SettledTokens + holdTokens
+	return committed >= capTokens
+}
+
 func (ledger *Ledger) failureCount() int {
 	count := 0
 	for _, entry := range ledger.body.Entries {

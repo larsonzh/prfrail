@@ -2,7 +2,7 @@
 
 [English](OPERATIONS_EN.md)
 
-日期：2026-09-08；S1 操作设计稿。当前没有 ProofRail 正式安装包；T016/T019/T020 已交付 CLI 与交付底座：`version/init/validate/config explain/preview/run/report` 和库级导出模块（`internal/snapshot/export.go`、`internal/evidence/delivery.go`）。`preview` 为离线只读静态预览，不执行命令/网络/模型/凭据读取；`run` 目前只支持 noop-only 任务链，遇到 `code/build/verify` 会 fail-close 并返回非零退出码。除以下“当前可执行”外，其余产品能力仍是 RFC 规划接口。待决发行方案见 [安装部署规划](INSTALLATION_PLAN.md)，完整用户流程见 [业务流程](BUSINESS_WORKFLOWS.md)。
+日期：2026-09-08；S1 操作设计稿。当前没有 ProofRail 正式安装包；T016/T019/T020/T023 已交付 CLI 与交付底座：`version/init/validate/config explain/preview/cost report/run/report` 和库级导出模块（`internal/snapshot/export.go`、`internal/evidence/delivery.go`）。`preview` 为离线只读静态预览，不执行命令/网络/模型/凭据读取；`run` 目前只支持 noop-only 任务链，遇到 `code/build/verify` 会 fail-close 并返回非零退出码。除以下“当前可执行”外，其余产品能力仍是 RFC 规划接口。待决发行方案见 [安装部署规划](INSTALLATION_PLAN.md)，完整用户流程见 [业务流程](BUSINESS_WORKFLOWS.md)。
 
 ## 1. 当前可执行
 
@@ -18,6 +18,7 @@ go run ./cmd/prfrail init --workspace .
 go run ./cmd/prfrail validate --chain .\proofrail.chain.json
 go run ./cmd/prfrail config explain --chain .\proofrail.chain.json
 go run ./cmd/prfrail preview --chain .\proofrail.chain.json
+go run ./cmd/prfrail cost report --ledger .\cost-ledger.json
 go run ./cmd/prfrail run --chain .\proofrail.chain.json --run-id run-demo
 go run ./cmd/prfrail report --run-dir .\tmp\prfrail-runs\run-demo
 ```
@@ -28,7 +29,7 @@ go run ./cmd/prfrail report --run-dir .\tmp\prfrail-runs\run-demo
 
 未来安装顺序：选择 Windows amd64 对应发行包→验证签名和校验和→解压到独立目录→验证 version→静态预览→单独授权能力探测。Linux 在 S1 仅核心 CI/预览，不宣传正式支持。未知签名或平台不匹配不得执行。升级前备份对象、事件和状态引用的完整闭包并只读核验历史 run；不覆盖运行中的 host。
 
-当前可复制流程为 `prfrail init --workspace <path>`、`prfrail validate --chain <chain-file>`、`prfrail config explain --chain <chain-file>`、`prfrail preview --chain <chain-file> [--json]`、`prfrail run --chain <chain-file> [--run-id] [--run-dir]`、`prfrail report --run-dir <run-dir>`。`preview` 只读展示 `previewHash`、权限边界、unknown 及零调用计数；`run` 当前仅支持 noop-only 链。导出能力已在库级实现，但 CLI `export` 命令仍在后续切片；执行型 step 的真实 gate/adapter 全闭环同样属于后续切片。没有 AI 时先使用文件队列 fixture consumer 完成闭环；VS Code 不是必需依赖。
+当前可复制流程为 `prfrail init --workspace <path>`、`prfrail validate --chain <chain-file>`、`prfrail config explain --chain <chain-file>`、`prfrail preview --chain <chain-file> [--json]`、`prfrail cost report [--ledger <path>] [--json]`、`prfrail run --chain <chain-file> [--run-id] [--run-dir]`、`prfrail report --run-dir <run-dir>`。`preview` 只读展示 `previewHash`、权限边界、unknown 及零调用计数；`cost report` 本地读取成本账本并输出预留/结算/未知占用，不做默认遥测导出；`run` 当前仅支持 noop-only 链。导出能力已在库级实现，但 CLI `export` 命令仍在后续切片；执行型 step 的真实 gate/adapter 全闭环同样属于后续切片。没有 AI 时先使用文件队列 fixture consumer 完成闭环；VS Code 不是必需依赖。
 
 当前 CLI 基线使用单文件链配置（优先 `--chain`；否则按 `./proofrail.chain.json` → `./proofrail.json` 搜索）。`proofrail.toml/workspace.toml` 的分层配置仍属后续规划。运行状态由引擎维护，用户不得修改 runtime-state、journal、receipt 或已接受 manifest。使用 config explain 检查最终来源、工具/网络权限和预算，不从模型自然语言推断配置。
 
@@ -100,9 +101,9 @@ bootstrap：维护者用常规 Go 构建与独立测试、人工审计建立首�
 | PC-02 交付 | 选已接受结果，指定与源/run/store 不重叠的新目录，核验包摘要/排除项/评审引用 | 拒绝覆盖；中断包不算交付；导出不等于外部产品发布 |
 | PC-03 审批/撤销 | 查看待审批队列与候选摘要；撤销后确认无新投递及在途停机证据 | 不能停机则维持暂停；不通过 waive 放宽硬门禁 |
 | PC-04 恢复/诊断 | 先只读获取脱敏恢复计划，确认最后接受点、journal、进程和未知副作用 | 不手删锁、不盲目重投；上传/部署不能靠文件恢复撤销 |
-| PC-05 费用 | 查看预留/已结算/未知占用及计量来源；超限申请新授权 | 超时未必免费；订阅模式只保证授权调用/token 上限，不保证货币账单 |
+| PC-05 费用 | 运行 `prfrail cost report --ledger <path>` 查看预留/已结算/未知占用及计量来源；超限申请新授权 | 超时未必免费；订阅模式只保证授权调用/token 上限，不保证货币账单 |
 | PC-06 停用/卸载 | 停受管写者、撤销授权，核验完整备份并在新 store 演练；默认保留 run/store | 未知格式保留原件；不删除共享 SessionBridge/工具链；数据删除另确认 |
 
 S1 的交付包由用户自行决定后续合并/发布，ProofRail 不自动向原树写文件或执行 Git。安装包支持状态、SBOM/许可证、签名身份和撤销新鲜度分别检查；离线未知撤销不应显示“最新可信”。备份不包含凭据，需另行通过安全方式配置恢复环境。
 
-历史证据含秘密：隔离、停止外发、撤销凭据，再由人决定审计保留与删除冲突；不改旧哈希伪造完整链。删除不能保证 SSD/外部副本安全擦除。报告默认本地无遥测；提交支持材料只提供复现所需脱敏最小包。T020 已完成库级导出能力，T021 已实现授权/撤销与审批队列（approvals），T022 已实现副作用分类/观察与恢复诊断（库级），T023–T024 仍待实现；完整产品流程当前仍不能作为可执行命令教程。
+历史证据含秘密：隔离、停止外发、撤销凭据，再由人决定审计保留与删除冲突；不改旧哈希伪造完整链。删除不能保证 SSD/外部副本安全擦除。报告默认本地无遥测；提交支持材料只提供复现所需脱敏最小包。T020 已完成库级导出能力，T021 已实现授权/撤销与审批队列（approvals），T022 已实现副作用分类/观察与恢复诊断（库级），T023 已实现成本账本与本地成本报告（cost report），T024 已实现库级完整备份、新 store 核验、生命周期处置与发布清单；T017 发行物与安装命令仍待实现，完整产品流程当前仍不能作为可执行命令教程。

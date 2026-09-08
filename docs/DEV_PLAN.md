@@ -88,14 +88,14 @@ T006 状态：`COMPLETE`。AT-02 完整验收通过；无 Git 恢复与不可变
 
 ### P1.7 产品闭环与生命周期（在 P1.6 发布验收前执行）
 
-编号保持稳定，实际依赖顺序为 T016 → T019–T024 → T017 → T018。以下在 S0 授权后执行；T019/T020 已完成，其余任务仍为拟建位置。每个任务可再按一个失败反例拆小，不一次生成完整功能。
+编号保持稳定，实际依赖顺序为 T016 → T019–T024 → T017 → T018。以下在 S0 授权后执行；T019–T024 已完成。每个任务可再按一个失败反例拆小，不一次生成完整功能。
 
 - [x] T019 [Plan:P1.7] PC-01：实现 `internal/taskdef/preview.go`、`internal/console/preview.go` 与测试、无 AI 示例；依赖：T016；验收：AT-16；禁止：预览启动命令/网络/模型/自动安装。完成：2026-09-08。覆盖离线只读 preview record 生成、unknown 可见、零调用计数与 JSON/文本同事实输出。验证：[中文](validation/t019-preview.md) / [English](validation/t019-preview_EN.md)。
 - [x] T020 [Plan:P1.7] PC-02：实现 `internal/snapshot/export.go`、`internal/evidence/delivery.go` 与测试；依赖：T019、T006/T011；验收：AT-17；禁止：导出候选冒充接受、覆盖目标、源树/Git 写入。完成：2026-09-08。覆盖 accepted hash 绑定、目标必须 absent、源/run/store 重叠阻断、secret 路径阻断、缺对象/篡改阻断、写中断无 completed record。验证：[中文](validation/t020-export.md) / [English](validation/t020-export_EN.md)。
-- [x] T021 [Plan:P1.7] PC-03：实现 `internal/chain/authorization.go`、`internal/console/approvals.go` 与测试，接 guard 停机；依赖：T020、T007/T011；验收：AT-18；禁止：自授权、硬门禁 waiver、过期自动批准。
-- [x] T022 [Plan:P1.7] PC-04：实现 `internal/gates/effects.go`、`internal/evidence/diagnostics.go` 和 chain 恢复计划测试；依赖：T021、T010；验收：AT-19；禁止：外部写 runner、未知副作用盲重试、诊断删锁/日志。
-- [ ] T023 [Plan:P1.7] PC-05：扩展 `internal/tickets/budget.go`、`internal/adapters/` 用量和 `internal/console/` 成本报告；依赖：T022、T012/T013；验收：AT-20；禁止：重启释放未知费用、跨 run 绕上限、默认遥测。
-- [ ] T024 [Plan:P1.7] PC-06：实现 `internal/snapshot/backup.go`、`internal/evidence/disposition.go`、生命周期控制/测试及发布清单工具；依赖：T023；验收：AT-21、SBOM/支持说明；禁止：未知格式迁移、默认删证据/共享工具、擅自签名发布。
+- [x] T021 [Plan:P1.7] PC-03：实现 `internal/chain/authorization.go`、`internal/console/approvals.go` 与测试，接 guard 停机；依赖：T020、T007/T011；验收：AT-18；禁止：自授权、硬门禁 waiver、过期自动批准。完成：2026-09-08。覆盖授权/撤销绑定摘要、撤销/过期/错摘要阻断下一动作与接受、在途停止失败保持暂停并可重启可见。验证：[中文](validation/t021-approvals.md) / [English](validation/t021-approvals_EN.md)。
+- [x] T022 [Plan:P1.7] PC-04：实现 `internal/gates/effects.go`、`internal/evidence/diagnostics.go` 和 chain 恢复计划测试；依赖：T021、T010；验收：AT-19；禁止：外部写 runner、未知副作用盲重试、诊断删锁/日志。完成：2026-09-08。覆盖副作用分类与准入阻断、unknown/外部写 fail-close、只读脱敏诊断与恢复动作。验证：[中文](validation/t022-effects-diagnostics.md) / [English](validation/t022-effects-diagnostics_EN.md)。
+- [x] T023 [Plan:P1.7] PC-05：实现 `internal/tickets/cost.go`、`internal/adapters/cost_usage.go`、`internal/console/cost.go` 与测试；依赖：T022、T012/T013；验收：AT-20；禁止：重启释放未知费用、跨 run 绕上限、默认遥测。完成：2026-09-08。覆盖调用前持久 reservation、settlement 去重、unknown hold 重启保留、跨 run 共享上限阻断与本地无默认遥测成本报告。验证：[中文](validation/t023-cost-ledger.md) / [English](validation/t023-cost-ledger_EN.md)。
+- [x] T024 [Plan:P1.7] PC-06：实现 `internal/snapshot/backup.go`、`internal/evidence/disposition.go`、生命周期控制/测试及发布清单工具；依赖：T023；验收：AT-21、SBOM/支持说明；禁止：未知格式迁移、默认删证据/共享工具、擅自签名发布。完成：2026-09-08。覆盖完整对象/事件/引用闭包备份、新 store 复原核验、源 store 不变、活动写者/未知版本/缺闭包阻断、默认保留证据与共享工具、显式删除授权/保留冲突决定，以及离线撤销状态 unknown。验证：[中文](validation/t024-lifecycle.md) / [English](validation/t024-lifecycle_EN.md)。
 
 ## 3. 需求映射
 
@@ -155,4 +155,4 @@ S2 backlog 在 S1 exit 后细化，不预生成空实现：Linux 正式、多语
 
 每次迭代报告实际人工时间、模型调用/费用估算、故障数、已验收需求和下一步；若超预算，暂停并由用户选择继续或经 RFC 缩范围，不自动加模型/服务。
 
-RFC §19 的后续候选：S2 图形上手/终端本地化、脱敏通知/远程审批身份设计、外部 PR 集成评估、外部写补偿、成本趋势和显式存储迁移；S3 商业后台/云管理须先验证需求。这些不在 T019–T024 的授权范围，后续再拆任务。当前共 10 个 plan items、22 个未完成任务、21 组计划验收；不是完成率。
+RFC §19 的后续候选：S2 图形上手/终端本地化、脱敏通知/远程审批身份设计、外部 PR 集成评估、外部写补偿、成本趋势和显式存储迁移；S3 商业后台/云管理须先验证需求。这些不在 T019–T024 的授权范围，后续再拆任务。当前共 10 个 plan items、2 个未完成任务、21 组计划验收；不是完成率。
