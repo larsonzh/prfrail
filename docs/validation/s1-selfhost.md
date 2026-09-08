@@ -2,7 +2,7 @@
 
 [English](s1-selfhost_EN.md)
 
-日期：2026-09-08。结论：`IMPLEMENTED_AWAITING_CI`。本机 Windows 验证通过；[GPT-5.3 Codex 主审](t017-baseline-review.md)与 [DeepSeek V4 Pro 主审](t017-deepseek-baseline-review.md)均给出 `PASS FOR BASELINE REVIEW`。T017 仍需首次 GitHub CI 的 Windows/Linux 原生矩阵通过后才能标记 `COMPLETE`。
+日期：2026-09-08，更新于 2026-09-09。结论：`IMPLEMENTED_AWAITING_CI`。修复版经双主审并已通过 verifier baseline 的 Windows/Linux push CI；T017 仍需针对不同 candidate SHA 从 `main` 手工 dispatch 的 Windows/Linux 完整矩阵通过并归档证据后才能标记 `COMPLETE`。
 
 ## 实现范围
 
@@ -28,7 +28,7 @@
 2. 正式工作流契约测试与内存变异测试共用 `decodeWorkflow` 和 `validateWorkflowContract`。结构校验覆盖全部 job 的输入映射、原生矩阵、依赖和步骤顺序；Action 校验精确覆盖仓库、SHA、全部 `with` 参数及执行条件，包括 test checkout 的 `persist-credentials: false`、Setup Go 的版本和缓存策略，以及最终 artifact 上传。
 3. YAML 解码拒绝未知/重复字段、多文档、显式默认值、别名/锚点及非许可的 null；保留原始字段存在性，不能通过 `uses` 搭配空 `run`/`shell` 隐藏混合步骤。负例只在内存修改 YAML/结构，不执行替代脚本或修改真实 workflow。
 4. 固定摘要是内容漂移门禁，不是 PowerShell 语义证明、发布者身份认证或运行时沙箱。脚本变更即使只改注释也必须重新审查完整脚本及执行上下文，再显式更新基线常量；禁止从待验 workflow 自动刷新期望摘要。修改测试自身仍需独立代码评审。
-5. 本轮整改不等于重新完成两代演练，也不代表首次 GitHub CI 或真实 runner 攻击演练已通过。修复版已通过双主审，仍待作为新的 verifier baseline 落库并通过后续 CI；T017 状态保持 `IMPLEMENTED_AWAITING_CI`。
+5. 本轮整改不等于重新完成两代演练，也不代表手工 dispatch 的 candidate 完整矩阵或真实 runner 攻击演练已通过。修复版已通过双主审、落库并通过 verifier baseline 的双平台 push CI；T017 状态保持 `IMPLEMENTED_AWAITING_CI`。
 
 ## 当前门禁结果
 
@@ -38,7 +38,7 @@
 4. `cd tools/contracts && npm test`：通过，2/2 测试、82 个独立 fixture 全部匹配。
 5. Windows 11 本机完整两代演练：通过；固定 seed 哈希、外部 oracle、SPDX/许可证/SHA256SUMS 均复核成功，临时 worktree 和 `tmp/` 产物已清理。
 6. GitHub push CI run `34253473081`：2026-09-09 首次运行，Windows/Linux `test` job 均失败，不构成 AT-14 证据。失败暴露 Go 1.22/原生 runner 差异：进程终止测试未及时回收 child、Unix probe 测试的输出目录与候选二进制同名、许可证测试使用 test binary 导致主模块路径为空，以及 Windows 对不存在目标路径的 overlap 比较未统一解析已有父目录。
-7. 上述修复在本地当前工具链通过聚焦及全量测试；[DeepSeek V4 Pro 独立复审](t017-ci-remediation-deepseek-review.md)与 [GPT-5.3 Codex 独立复审](t017-ci-remediation-codex-review.md)均给出 `PASS FOR BASELINE REVIEW`。修复尚未作为新的 verifier baseline 落库，push CI 和首次手工 dispatch 的 Windows/Linux 完整矩阵仍未执行。AT-14 与 T017 保持未完成。
+7. 上述修复在本地当前工具链通过聚焦及全量测试；[DeepSeek V4 Pro 独立复审](t017-ci-remediation-deepseek-review.md)与 [GPT-5.3 Codex 独立复审](t017-ci-remediation-codex-review.md)均给出 `PASS FOR BASELINE REVIEW`。修复已作为 verifier baseline `18c9340c60deb30049554491f8905df51d0a3180` 落库；GitHub push CI [run 34268076912](https://github.com/larsonzh/prfrail/actions/runs/34268076912) 的 [Ubuntu job](https://github.com/larsonzh/prfrail/actions/runs/34268076912/job/102202411754) 与 [Windows job](https://github.com/larsonzh/prfrail/actions/runs/34268076912/job/102202412040) 均成功。首次手工 dispatch 的 Windows/Linux 完整矩阵仍未执行，AT-14 与 T017 保持未完成。
 
 ## 首次 CI 输入
 
@@ -46,8 +46,8 @@
 
 | 输入 | 当前评审值 |
 |---|---|
-| `candidate_commit` | 待修复后的 verifier baseline 落库后创建：必须与 verifier commit 不同的完整 candidate SHA |
-| `verifier_commit` | 待重新独立评审并落库；`12fa05d1f56c5e9a03a0964fce9d9f842bb85397` 因 push CI 失败不能作为最终绿色 baseline |
+| `candidate_commit` | 待创建：必须与 verifier commit 不同的完整 candidate SHA |
+| `verifier_commit` | `18c9340c60deb30049554491f8905df51d0a3180`；双主审通过且 push CI run `34268076912` 的 Windows/Linux job 均成功 |
 | `bootstrap_commit` | `fc99f553c3066b24230a093d14bc17af0c6a398e` |
 | `bootstrap_manifest_sha256` | `ae0d5db85d6a45de19dc75d40460705e0a7a0dea20de2a11632c25bf8b4543fc` |
 | `expected_oracle_sha256` | `388f88842710abc90676ed0a85f4bd935b594fc552146577c304b0bbbd850aaf` |
@@ -57,7 +57,7 @@
 
 ## 边界与后续
 
-1. `12fa05d1f56c5e9a03a0964fce9d9f842bb85397` 已完成独立评审和首次落库，但 push CI 失败。修复会改变 verifier 相关代码，必须重新独立评审并建立新的绿色 verifier baseline；之后由该较早 verifier commit 审核不同的 candidate commit。这是一次性的信任引导，不以候选运行结果替代人工审查。
+1. `12fa05d1f56c5e9a03a0964fce9d9f842bb85397` 的 push CI 失败后，修复版经双主审并以 `18c9340c60deb30049554491f8905df51d0a3180` 建立新的绿色 verifier baseline；之后须由该较早 verifier commit 审核不同的 candidate commit。这是一次性的信任引导，不以候选运行结果替代人工审查。
 2. 当前实现不发布安装包，也不授权 `git commit`、`git push`、tag、签名或 GitHub Release。
 3. 固定 seed 只读使用；失败时丢弃 candidate，不能覆盖或回滚 seed。
 4. 新 verifier baseline 的 push CI 与后续手工 dispatch 完整矩阵均须双平台通过；补录 verifier/candidate/run 证据后才可将 T017 标记 `COMPLETE`，任一失败均保持阻断。
