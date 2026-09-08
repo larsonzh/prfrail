@@ -16,12 +16,12 @@ The S1 target is a local, single-user, single-writer CLI/TUI with no persistent 
 
 | Decision | Candidate | Freeze condition/owner | Status |
 |---|---|---|---|
-| S1 artifact | Windows amd64 archive; evaluate winget later | T017 native acceptance, SBOM, checksum, and signing | TBD |
+| S1 artifact | Windows amd64 archive; evaluate winget later | T017 native acceptance, fixed commit, SBOM, license manifest, and checksums | TBD |
 | Linux support | S1 core CI/preview; production support candidate in S2 | Native compatibility, path/permission/upgrade tests | TBD |
 | Install directory and PATH | Per-user standalone or package-manager directory | No admin requirement; side-by-side upgrade and rollback | TBD |
 | Default state/store location | User data directory or explicit workspace configuration | Verifiable non-overlap, permissions, and backup policy | TBD |
 | Configuration search order | Explicit argument, workspace, user profile | T016 freezes CLI and config-explain behavior | TBD |
-| Signature/trust root | Offline Ed25519 direction approved; identity/key unresolved | ADR, key governance, revocation, and rotation rehearsal | TBD |
+| Release trust | S1 uses fixed commit, GitHub CI, SHA256SUMS, SBOM and license manifest | Checksums prove only content integrity; signing/attestation is deferred | S1 baseline decided |
 | Update mechanism | Manual verified download; package manager later | Support matrix, schema compatibility, backup/recovery gates | TBD |
 | Uninstall/data retention | Separate binary removal from run/store disposition | T024 lifecycle record and explicit deletion authorization | Library rules frozen; installation entrypoint awaits T017 |
 | VS Code integration | Optional extension/SessionBridge adapter | CLI-independent loop passes; no authority beyond core API | TBD |
@@ -31,7 +31,7 @@ Until ADRs and executable acceptance evidence exist, do not choose default direc
 ## 4. Planned User Path
 
 1. Select an OS/architecture-matching artifact from a trusted release location.
-2. Independently verify checksum, signature, signer identity, support status, and revocation freshness.
+2. Independently verify the fixed commit, GitHub CI result, SHA256SUMS, SBOM/license manifest, and support status; state explicitly that checksums do not authenticate the publisher.
 3. Extract/install into a separate directory without overwriting a running host; run version and read-only self-checks.
 4. Initialize explicit state/store and workspace configuration, proving no overlap with source or run workspaces.
 5. Run side-effect-free static preview before separately authorizing capability probes and execution.

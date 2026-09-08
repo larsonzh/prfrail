@@ -25,7 +25,7 @@ T001 status: `COMPLETE`. This approves only S0 specification freeze and allows T
 ### P0.2 Machine Contract Freeze (REQ-001/004/005/007/008/010/012/013/017/018/020/021/022/024/025/028)
 
 - [x] T002 [Plan:P0.2] Revise docs/RFC-proofrail-unattended-ai-engineering-product.md first, synchronize docs/CONTRACTS*.md/ADRs, create schemas/*.schema.json; freeze ADR-002/004 fields, versions, canonical vectors, transitions, errors and queue. Depends: T001. Accept: structural/local consistency checks complete; T003 owns independent fixtures/validator. Exclude: production code using guessed fields.
-- [x] T003 [Plan:P0.2] Create testdata/contracts/{valid,invalid}/ and tools/contracts/ independent validator/semantic fixture oracle: three tasks, four kinds, dual/triple language, handoff, docs/waiver and all receipts/manifests. Depends: T002. Accept: AT-01 and section 17.2/4/9-12. Exclude: candidate-generated expected results. Completed 2026-09-07: Ajv 2020 independently compiled all 29 schemas, all 81 hand-authored fixtures passed, and `canonicalize` independently reproduced both JCS/digest vectors.
+- [x] T003 [Plan:P0.2] Create testdata/contracts/{valid,invalid}/ and tools/contracts/ independent validator/semantic fixture oracle: three tasks, four kinds, dual/triple language, handoff, docs/waiver and all receipts/manifests. Depends: T002. Accept: AT-01 and section 17.2/4/9-12. Exclude: candidate-generated expected results. Completed 2026-09-07: Ajv 2020 independently compiled all 29 schemas; all 82 current hand-authored fixtures pass, and `canonicalize` independently reproduced both JCS/digest vectors.
 
 T002/T003 status: `COMPLETE`. Common version, ID, path, JCS and UTF-8 rules are frozen, with twenty-nine Draft 2020-12
 structural schemas for chain, hook, target, workspace, state-event, error, adapter-envelope, adapter-receipt,
@@ -84,7 +84,7 @@ T006 status: `COMPLETE`. Full AT-02 acceptance passed; Git-free restore and immu
 
 ### P1.6 Trusted Release and Shadow Acceptance (REQ-001/002/006/011/014/015/019/024/025/028)
 
-- [ ] T017 [Plan:P1.6] Create .github/workflows/ci.yml, testdata/selfhost/ and docs/validation/s1-selfhost.md; pin tooling, isolate generations, external oracle, native/signature checks. Depends: T024 and bootstrap approval. Accept: AT-13/14. Exclude: seed overwrite or unauthorized release.
+- [ ] T017 [Plan:P1.6] Create .github/workflows/ci.yml, testdata/selfhost/ and docs/validation/s1-selfhost.md; pin tooling, isolate generations, use an external oracle, and verify native platforms, fixed commit, SHA256SUMS, SBOM and licenses. Depends: T024 and bootstrap approval. Accept: AT-13/14. Exclude: seed overwrite, checksum-as-identity claims or unauthorized release. Signing/attestation is a later enhancement and does not block S1.
 - [ ] T018 [Plan:P1.6] Create examples/{whois-shadow,go-minimal}/ and docs/validation/s1-exit.md; compare fixed read-only input/result/failure classifications and summarize all AT/risks. Depends: T017 and whois input authorization. Accept: AT-15 and every RFC S1 exit gate. Exclude: production whois cutover or partial-pass completion.
 
 ### P1.7 Product Flow and Lifecycle (Before P1.6 Release Acceptance)

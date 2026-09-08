@@ -40,7 +40,7 @@ AT 编号代表测试组，不是已存在的测试函数。每组必须拆正/�
 | AT-11 | REQ-011/013/020/022 | generic/C/Go、锁模板生成 A；自批/手改生成物/文档缺失阻断；C+Go 同 task 整体恢复 | taskdef/gates；T015 |
 | AT-12 | REQ-009/010/015/016/027 | 无 IDE init/validate/run/report/config explain；键盘/无色/窄终端/--json；非实现命令不得冒充成功 | console/cmd；T016 |
 | AT-13 | REQ-015/019/024 | seed 与 candidate 分离；外部 oracle 比较；clean-room 成功及失败不损 seed | harness/release；T017 |
-| AT-14 | REQ-006/015/019/025/028 | Windows 原生/Linux 核心 CI；最低 Go/固定发布 Go；旧格式只读/未知版本拒写；哈希/签名校验 | release；T017 |
+| AT-14 | REQ-006/015/019/025/028 | Windows 原生/Linux 核心 CI；最低 Go/固定发布 Go；旧格式只读/未知版本拒写；固定 commit、SHA256SUMS、SBOM/许可证清单核验；校验和不冒充身份认证 | release；T017 |
 | AT-15 | REQ-001/002/011/014 | whois 冻结夹具只读影子，同输入/结果/失败分类；小 Go 非 C 夹具闭环，不触碰正式仓库 | harness；T018 |
 | AT-16 | REQ-009/010/016/027 | PC-01：无 AI 夹具预览；恶意 hook、版本探测、凭据/网络调用计数全为零；unknown 显示，源/store 不变，窄屏/JSON 同事实 | taskdef/console；T019 |
 | AT-17 | REQ-002/004/025 | PC-02：已接受包离线核验；候选/秘密/缺对象/篡改/已有目标/别名重叠拒绝；写中断无完成回执，源树不变 | snapshot/evidence；T020 |

@@ -142,6 +142,46 @@
     }
   },
   {
+    "fixtureId": "lifecycle-record-invalid-unsigned-verified-trust",
+    "schema": "lifecycle-record.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "an unsigned release cannot claim verified revocation freshness",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "record": {
+        "recordId": "release-unsigned-verified",
+        "kind": "release",
+        "createdAt": "2026-09-07T12:00:00.000Z",
+        "version": "1.0.0",
+        "binaryHashes": [
+          "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+        ],
+        "dependencies": [],
+        "sbomHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "licenseManifestHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+        "checksumManifestHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+        "signatureReceiptHash": null,
+        "supportMatrix": [
+          {
+            "componentId": "proofrail",
+            "versionRange": "1.x",
+            "status": "supported",
+            "supportExpiresAt": null,
+            "capabilityIds": ["contracts"],
+            "platforms": [{ "os": "windows", "arch": "amd64" }]
+          }
+        ],
+        "knownLimitationIds": [],
+        "revocationFreshness": "verified",
+        "revocationEvidence": [
+          "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+        ]
+      },
+      "recordHash": "sha256:6666666666666666666666666666666666666666666666666666666666666666"
+    }
+  },
+  {
     "fixtureId": "export-record-invalid-destination-precondition",
     "schema": "export-record.schema.json",
     "expected": "reject",

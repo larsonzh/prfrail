@@ -61,7 +61,7 @@ type LifecycleRelease struct {
 	SBOMHash             string                `json:"sbomHash"`
 	LicenseManifestHash  string                `json:"licenseManifestHash"`
 	ChecksumManifestHash string                `json:"checksumManifestHash"`
-	SignatureReceiptHash string                `json:"signatureReceiptHash"`
+	SignatureReceiptHash *string               `json:"signatureReceiptHash"`
 	SupportMatrix        []LifecycleSupport    `json:"supportMatrix"`
 	KnownLimitationIDs   []string              `json:"knownLimitationIds"`
 	RevocationFreshness  string                `json:"revocationFreshness"`
@@ -394,8 +394,11 @@ func validateLifecycleRelease(record LifecycleRelease) error {
 	if err := validateLifecycleHashSet(record.BinaryHashes, "binaryHashes", 1); err != nil {
 		return err
 	}
-	if !validHash(record.SBOMHash) || !validHash(record.LicenseManifestHash) || !validHash(record.ChecksumManifestHash) || !validHash(record.SignatureReceiptHash) {
+	if !validHash(record.SBOMHash) || !validHash(record.LicenseManifestHash) || !validHash(record.ChecksumManifestHash) {
 		return fmt.Errorf("%w: invalid release hash field", ErrInvalidLifecycleRecord)
+	}
+	if record.SignatureReceiptHash != nil && !validHash(*record.SignatureReceiptHash) {
+		return fmt.Errorf("%w: invalid signatureReceiptHash", ErrInvalidLifecycleRecord)
 	}
 	if len(record.SupportMatrix) == 0 {
 		return fmt.Errorf("%w: supportMatrix must not be empty", ErrInvalidLifecycleRecord)
@@ -448,8 +451,8 @@ func validateLifecycleRelease(record LifecycleRelease) error {
 	}
 	switch record.RevocationFreshness {
 	case "verified":
-		if len(record.RevocationEvidence) == 0 {
-			return fmt.Errorf("%w: verified revocation requires evidence", ErrInvalidLifecycleRecord)
+		if record.SignatureReceiptHash == nil || len(record.RevocationEvidence) == 0 {
+			return fmt.Errorf("%w: verified revocation requires a signature receipt and evidence", ErrInvalidLifecycleRecord)
 		}
 	case "unknown":
 		if len(record.RevocationEvidence) != 0 {

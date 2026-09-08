@@ -40,7 +40,7 @@ AT IDs are planned test groups, not existing functions. Expand each into positiv
 | AT-11 | REQ-011/013/020/022 | generic/C/Go, locked template A; self-approval/manual generated edits/missing docs block; C+Go whole-task recovery | taskdef/gates; T015 |
 | AT-12 | REQ-009/010/015/016/027 | No-IDE init/validate/run/report/config explain; keyboard/no-color/narrow/--json; unimplemented commands cannot report completion | console/cmd; T016 |
 | AT-13 | REQ-015/019/024 | Separate seed/candidate, external oracle, clean-room success/failure preserves seed | harness/release; T017 |
-| AT-14 | REQ-006/015/019/025/028 | Native Windows/Linux core CI, minimum/fixed release Go, historical read-only/unknown-version rejection, hashes/signatures | release; T017 |
+| AT-14 | REQ-006/015/019/025/028 | Native Windows/Linux core CI, minimum/fixed release Go, historical read-only/unknown-version rejection, fixed commit plus SHA256SUMS/SBOM/license verification; checksums never claim publisher identity | release; T017 |
 | AT-15 | REQ-001/002/011/014 | Frozen read-only whois shadow input/result/failure parity; small non-C Go loop, no production-tree changes | harness; T018 |
 | AT-16 | REQ-009/010/016/027 | PC-01: no-AI preview; zero malicious-hook/version-probe/credential/network calls, visible unknowns, unchanged source/store, narrow/JSON fact parity | taskdef/console; T019 |
 | AT-17 | REQ-002/004/025 | PC-02: offline accepted-package verification; reject candidates/secrets/missing objects/tampering/existing targets/alias overlap; interrupted writes lack completion receipt, source unchanged | snapshot/evidence; T020 |

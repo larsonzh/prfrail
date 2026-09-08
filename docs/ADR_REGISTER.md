@@ -7,11 +7,11 @@
 | ID | 决策/方案 | 替代与理由 | 状态/完成条件 |
 |---|---|---|---|
 | ADR-001 | Go 模块化单体、CLI/TUI、single writer、无默认 Git 写入 | 不选脚本翻译/分布式系统；降低跨平台与恢复复杂度 | RFC §4/11/16 已决定；T001 确认依赖基线 |
-| ADR-002 | 冻结 Schema 2020-12 工具链、canonical JSON/路径/错误/配置优先级 | 采用 `canonicalize` 4.0.0 复算 RFC 8785 向量；Ajv 8.20.0 独立于未来 Go 核心 | T002 已冻结 29 份结构 Schema；T003 的 81 个手写预期 fixture 与两条 canonical 向量全部通过 |
+| ADR-002 | 冻结 Schema 2020-12 工具链、canonical JSON/路径/错误/配置优先级 | 采用 `canonicalize` 4.0.0 复算 RFC 8785 向量；Ajv 8.20.0 独立于未来 Go 核心 | T002 已冻结 29 份结构 Schema；当前 82 个手写预期 fixture 与两条 canonical 向量全部通过 |
 | ADR-003 | 事件/journal 与接受提交协议、Windows 原子替换/停机原语 | rename 只解决单文件；需证明 durable、失败回滚和跨文件发布读者语义 | T004 已实测：NTFS 开放 reader 阻止普通替换且目录 `Sync` 不可用，ext4 支持开放 reader 替换与目录 `Sync`；rename 后 receipt 前必须判 uncertain。S1 采用平台原语并补断电故障注入；不能用目录隔离替代 required OS 限制 |
 | ADR-004 | SessionBridge v0.1.1 silent + 文件队列，核心自管持久幂等 | 不 fork 扩展、不用 visible/auto、无 GUI 兜底；内存缓存不等于 exactly-once | T004 已实测：Windows rename-only claim 可多赢家，固定 claim `O_EXCL`、requestId 去重和 generation fencing 为强制项；SessionBridge 40 项无模型测试通过，真实 LM API 仍属宿主能力门禁 |
-| ADR-005 | bootstrap 首个 seed 由常规构建、独立 Go tests 和人工审计建立；N 构建 N+1，隔离重放 | 不接受候选自证或覆盖运行中 host | RFC §16.5 已定；T017 前指定 seed 来源/摘要、外部 oracle、签名主体和 rollback 路径 |
-| ADR-006 | Windows 11 amd64 正式、Linux amd64 核心 CI；纯 Go 发布；固定工具链/依赖/签名 | RFC §16.2 提到 Win10，与 §9.6/14 的 Win11 范围不同；以 §14 为首版承诺，Win10 不承诺 | 2026-09-06 所有者批准策略；T002 冻结依赖清单，T017 落实签名主体/公钥/撤销流程 |
+| ADR-005 | bootstrap 首个 seed 由固定 commit、常规构建、独立 Go tests 和人工审计建立；N 构建 N+1，隔离重放 | 不接受候选自证或覆盖运行中 host | RFC §16.5 已定；T017 记录 seed commit/摘要、外部 oracle 和 rollback 路径 |
+| ADR-006 | Windows 11 amd64 正式、Linux amd64 核心 CI；纯 Go 发布；固定工具链/依赖，S1 以 commit+CI+SHA256SUMS+SBOM/许可清单为发布证据 | RFC §16.2 提到 Win10，与 §9.6/14 的 Win11 范围不同；不建立 S1 离线密钥体系，签名/attestation 后续增强 | 2026-09-08 所有者批准简化；T017 落实基础发布证据 |
 | ADR-007 | 最小 context、离线先行、按任务预算、双语 ID 追踪 | 不用昂贵模型反复全仓审读；不把英文译本做第二权威源 | 2026-09-06 所有者批准；S0 新增付费调用为 0，超出须另授权 |
 | ADR-008 | RFC §19 六类产品最小闭环纳入 S1；仍用本地模块、不建商业后台 | 不采用只交执行引擎、隐式回写/部署或静默自更新；新增成本必须显式评审 | 2026-09-06 所有者批准范围；T002 已冻结记录，T003 已补样例，T019–T024 运行验证；未授权 S1 编码 |
 
@@ -21,7 +21,7 @@
 
 支持策略已由所有者于 2026-09-06 批准：仅维护当前稳定 minor 和前一个 minor 的安全修复，前一个 minor 保留 90 天；未知历史 run 保持只读、不自动迁移。具体 EOL 通知方式和例外须在首版发布前冻结，当前尚不是已发布 SLA。
 
-发布签名策略已由所有者于 2026-09-06 批准：以维护者离线 Ed25519 签名校验和清单，发布公钥指纹与轮换/撤销说明；密钥仅由签名主体持有。签名主体、密钥保管人、公钥指纹和 bootstrap 身份仍须在 T017 前记录；SHA256SUMS 单独不算身份签名。
+发布信任策略由所有者于 2026-09-08 简化：S1 不建立离线 Ed25519 密钥体系，以固定 commit SHA、GitHub CI、SHA256SUMS、SBOM 和许可证清单作为基础发布证据。SHA256SUMS 只证明下载内容与清单一致，不证明发布者身份；签名或 keyless attestation 移至后续增强，不阻断 T017/T018 或 S1 exit。`signature-receipt` 能力保留供可选跨主机/后续签名场景使用。
 
 ## 2. 必须关闭的歧义
 
@@ -34,12 +34,12 @@ T002 已集中冻结空链、列表覆盖/合并、duration/size/预算单位与
 | RFC §17 项 | 当前证据/缺口 | 关闭任务 |
 |---|---|---|
 | 1 P0 文档评审 | 所有者已于 2026-09-06 接受第三方只读审计建议并批准 S0 规格冻结/决策单；独立安全签署仍见第 3 项 | 已关闭（T001） |
-| 2 Schema/黄金/validator | 29 份结构 Schema 各有正反例；81 个 fixture 与两条 canonical 向量通过独立 oracle | 已关闭（T003） |
+| 2 Schema/黄金/validator | 29 份结构 Schema 各有正反例；当前 82 个 fixture 与两条 canonical 向量通过独立 oracle | 已关闭（T003） |
 | 3 STRIDE | 风险/责任/AT 映射已写；T003 只读安全复核未发现 fail-open，运行期安全证据仍由后续 gate 提供 | 已关闭 S0 静态部分（T003） |
 | 4 whois + 非 C | whois 保持映射样例；Go/JavaScript/Python 非 C fixture 已通过 | 已关闭（T003） |
 | 5 技术探针 | Windows 11/NTFS、Ubuntu 24.04/ext4、TUI、进程树、文件队列及 SessionBridge 无模型合同已实测，限制见 `validation/s0-spikes.md` | 已关闭（T004） |
 | 6 可追踪 backlog | 所有者已批准当前 S0/S1 范围和追踪计划 | 已关闭（T001） |
-| 7 平台/Go/许可/周期/响应/签名 | 平台、支持期、离线 Ed25519 与逐依赖许可审计策略已批准；精确依赖/主体/公钥/渠道未锁定 | T017 |
+| 7 平台/Go/许可/周期/响应/发布证据 | 平台、支持期、逐依赖许可及简化发布证据策略已批准；精确依赖/渠道未锁定 | T017 |
 | 8 用户批准 | 已批准 S0 规格冻结、S1 范围、零新增付费预算和 whois 影子原则；未授权 S1 编码、具体 whois 数据访问或发布 | 已关闭（T001）；执行授权另行取得 |
 | 9 step/TUI/bootstrap | step/TUI 合同与 TUI 原型已验证；seed/oracle 身份仍未建立 | T017 |
 | 10 多语言 schema | C+Go 与 C+JavaScript+Python 的所有权/依赖 fixture 已通过 | 已关闭（T003） |
@@ -60,7 +60,7 @@ T002 已集中冻结空链、列表覆盖/合并、duration/size/预算单位与
 | 产品所有者 | 当前仓库用户作为最终范围/发布批准者 | S1 编码、Git、发布仍须各自明确授权 | 2026-09-06，产品所有者确认 |
 | 安全评审 | 指定一名未生产该候选的独立评审者；同一人兼任须披露独立性不足 | 评审者尚待指定，§17.3 保持 NOT_READY | 原则于 2026-09-06 批准；人员/结论待记录 |
 | 平台/支持 | Windows 11 amd64 正式；Linux amd64 核心 CI；当前与前一 minor，前一 minor 90 天 | 首版前冻结 EOL 通知方式和例外 | 2026-09-06，产品所有者批准 |
-| 发布签名 | 维护者离线 Ed25519 签校验和清单；密钥不入仓库/模型 | T017 前记录签名主体、公钥指纹、轮换/撤销流程 | 2026-09-06，产品所有者批准策略 |
+| 发布信任 | S1 使用固定 commit SHA、GitHub CI、SHA256SUMS、SBOM 和许可证清单；不建立离线密钥体系 | SHA256SUMS 不得表述为身份认证；签名/attestation 后续增强 | 2026-09-08，产品所有者批准简化策略 |
 | whois 影子 | 原则允许未来使用脱敏只读固定夹具 | 每次执行仍需输入路径、脱敏范围和时段授权；当前不得读取资产 | 2026-09-06，产品所有者原则批准 |
 | 依赖许可 | 优先标准库；每个 TOML/Schema/canonical/TUI 候选逐项核许可证、最低 Go 与维护状态 | T002 记录名称/版本/来源/许可证/摘要/日期后方可引入 | 2026-09-06，产品所有者批准策略 |
 

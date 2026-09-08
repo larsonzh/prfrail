@@ -31,7 +31,7 @@ Runners/OS capabilities enforce restrictions, not prompts alone. Unknown process
 | SEC-05 Denial of service | Full disk, unlimited output, stuck process trees, retry storms | Quotas, runtime monitoring, process-tree stop, shared budgets; guard/gates/tickets | AT-03/06/07 |
 | SEC-06 Elevation | Prompt-based self-approval, shell injection, generated self-validator | Data is not authority, argv, separated roles, templates; taskdef/gates/repair | AT-05/06/11 |
 | SEC-07 Compound | Human/AI concurrent writes, expired handoff accepted | Single lease, stop proof, full return checks; chain/guard | AT-09 |
-| SEC-08 Supply chain | Candidate overwrites seed or self-certifies release | Two-generation isolation, external oracle, signing/approval; release/harness | AT-13/14 |
+| SEC-08 Supply chain | Candidate overwrites seed, self-certifies release, or spoofs checksum provenance | Two-generation isolation, fixed commit, GitHub CI, external oracle, SHA256SUMS/SBOM/license evidence and human approval; release/harness | AT-13/14 |
 | SEC-09 Elevation/disclosure | Preview executes malicious hooks; export aliases overwrite source or leak secrets | Zero-execution static preview, real destination checks/integrity/export scanning; taskdef/snapshot | AT-16/17 |
 | SEC-10 Spoofing/effects | Dispatch after revocation, expired approval, uploads claimed reversible | Reauthorize each effect, in-flight stop evidence, default-deny external writes; chain/guard/gates | AT-18/19 |
 | SEC-11 Denial/repudiation | Assumed timeout refunds, cross-run budget bypass, duplicate settlements | Durable reservations, unknown holds, shared locks/deduplication; tickets/adapters | AT-20 |
@@ -51,7 +51,7 @@ Retention follows the RFC; cleanup only unreferenced expired objects, never audi
 
 Independent review is required for broader write/network/tool authority, approval changes, generated hooks and canonical/signing/recovery protocols. Unfixed fail-close bypass, acceptance of failed candidates, secret leakage or unrecoverable overwrite blocks release.
 
-Proposed response targets pending ADR-006: acknowledge private reports within two business days and classify impact within five. These are not published SLAs. Establish a private channel and maintainers before release; do not put credential-bearing reports or exploit details in public issues meanwhile. Signing keys must never enter repositories, model context or ordinary logs.
+Proposed response targets pending ADR-006: acknowledge private reports within two business days and classify impact within five. These are not published SLAs. Establish a private channel and maintainers before release; do not put credential-bearing reports or exploit details in public issues meanwhile. If signing/attestation is added later, its private keys or short-lived credentials must never enter repositories, model context or ordinary logs.
 
 ## 6. Product Lifecycle Boundaries
 
@@ -59,4 +59,4 @@ RFC section 19 PC-01–PC-06 do not authorize remote approval services or deploy
 
 Revocation blocks new actions and requests stopping; it cannot retract dispatched network calls. Unknown costs are not free. Exports/diagnostics are redacted but scanning cannot find all secrets. If historical evidence contains secrets, quarantine/restrict access, revoke credentials and block export. Human-approved deletion/retention conflict decisions produce secret-free disposition records, not rewritten history presented as intact.
 
-Backup/restore must prove closure and consistency; uninstall preserves evidence and does not delete SessionBridge/Go. SSDs, snapshots and external backups may retain copies: logical deletion is not secure erasure. Offline verification separately displays signature authenticity, support status and revocation freshness.
+Backup/restore must prove closure and consistency; uninstall preserves evidence and does not delete SessionBridge/Go. SSDs, snapshots and external backups may retain copies: logical deletion is not secure erasure. S1 separately displays content integrity and support status and states that SHA256SUMS does not prove publisher identity. If signing is added later, signature authenticity and revocation freshness remain separate signals.

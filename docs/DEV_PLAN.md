@@ -25,7 +25,7 @@ T001 状态：`COMPLETE`。本次仅批准 S0 规格冻结并允许进入 T002�
 ### P0.2 机器契约冻结（REQ-001/004/005/007/008/010/012/013/017/018/020/021/022/024/025/028）
 
 - [x] T002 [Plan:P0.2] 先修订 `docs/RFC-proofrail-unattended-ai-engineering-product.md`，同步 `docs/CONTRACTS*.md`/ADR，建立 `schemas/*.schema.json`；冻结 ADR-002/004 的字段、版本、canonical 向量、状态表、错误与队列；依赖：T001；验收：结构与本地一致性检查完成，独立 fixtures/validator 由 T003 承接；禁止：以草案字段实现生产代码。
-- [x] T003 [Plan:P0.2] 建立 `testdata/contracts/{valid,invalid}/`、`tools/contracts/` 独立 validator/语义 fixture oracle，纳入三任务、四 kind、双/三语言、handoff、doc/waiver、各 receipt/manifest；依赖：T002；验收：AT-01 正反例及 RFC §17.2/4/9-12；禁止：让未来候选自己生成 expected 结果。完成：2026-09-07，Ajv 2020 独立编译 29 份 Schema，81 个手写预期 fixture 全部通过，`canonicalize` 独立复算两条 JCS/摘要向量。
+- [x] T003 [Plan:P0.2] 建立 `testdata/contracts/{valid,invalid}/`、`tools/contracts/` 独立 validator/语义 fixture oracle，纳入三任务、四 kind、双/三语言、handoff、doc/waiver、各 receipt/manifest；依赖：T002；验收：AT-01 正反例及 RFC §17.2/4/9-12；禁止：让未来候选自己生成 expected 结果。完成：2026-09-07，Ajv 2020 独立编译 29 份 Schema；当前 82 个手写预期 fixture 全部通过，`canonicalize` 独立复算两条 JCS/摘要向量。
 
 T002/T003 状态：`COMPLETE`。已冻结共同版本/ID/路径/JCS/UTF-8 规则，并建立 chain、hook、target、
 workspace、state-event、error、adapter-envelope、adapter-receipt、snapshot-manifest、evidence-manifest、
@@ -83,7 +83,7 @@ T006 状态：`COMPLETE`。AT-02 完整验收通过；无 Git 恢复与不可变
 
 ### P1.6 可信发布与影子验收（REQ-001/002/006/011/014/015/019/024/025/028）
 
-- [ ] T017 [Plan:P1.6] 建立 `.github/workflows/ci.yml`、`testdata/selfhost/`、`docs/validation/s1-selfhost.md`；固定工具链、两代隔离、外部 oracle、原生平台/签名检查；依赖：T024 和独立 bootstrap 批准；验收：AT-13/14；禁止：候选覆盖 seed、未授权发布。
+- [ ] T017 [Plan:P1.6] 建立 `.github/workflows/ci.yml`、`testdata/selfhost/`、`docs/validation/s1-selfhost.md`；固定工具链、两代隔离、外部 oracle、原生平台、固定 commit、SHA256SUMS、SBOM/许可证检查；依赖：T024 和独立 bootstrap 批准；验收：AT-13/14；禁止：候选覆盖 seed、把校验和冒充身份认证、未授权发布。签名/attestation 属后续增强，不阻断 S1。
 - [ ] T018 [Plan:P1.6] 建立 `examples/{whois-shadow,go-minimal}/` 与 `docs/validation/s1-exit.md`；只读固定输入比较结果/失败分类，汇总全部 AT 和剩余风险；依赖：T017 及 whois 输入授权；验收：AT-15、RFC §14 S1 全部 exit；禁止：切换 whois 生产流程或“部分通过”冒充 S1 完成。
 
 ### P1.7 产品闭环与生命周期（在 P1.6 发布验收前执行）

@@ -82,6 +82,6 @@ baseline、已接受快照、最终报告及失败证据默认保留；候选/�
 
 不新增服务或“大管理模块”：PC-01 由 taskdef 生成静态执行计划、console 展示，探测执行与只读预览分离；PC-02 由 snapshot/evidence 核验已接受引用并导出，chain 记录独立交付事件，console 不能直接复制 store；PC-03 由 chain 在调度/发布边界校验授权，guard 停在途写者，console 仅呈现待审批队列。
 
-PC-04 由 gates/adapters 声明能力和副作用，taskdef 校验可信策略，chain/guard 控制恢复；evidence 只读生成脱敏诊断。PC-05 由 tickets 维护持久预算账本、chain 在调用前预留、adapter 返回用量、evidence 保存计量来源；跨 run 共享上限需要共享协调锁，单 run 锁不足。PC-06 由 snapshot/evidence 实现完整引用闭包备份和新 store 恢复，发布工具产出 SBOM/签名，停用通过 chain 控制 API。
+PC-04 由 gates/adapters 声明能力和副作用，taskdef 校验可信策略，chain/guard 控制恢复；evidence 只读生成脱敏诊断。PC-05 由 tickets 维护持久预算账本、chain 在调用前预留、adapter 返回用量、evidence 保存计量来源；跨 run 共享上限需要共享协调锁，单 run 锁不足。PC-06 由 snapshot/evidence 实现完整引用闭包备份和新 store 恢复，发布工具产出 SHA256SUMS、SBOM/许可证清单及可选签名，停用通过 chain 控制 API。
 
 新增持久事实是授权记录、预览计划摘要、导出清单/回执、成本预留/结算和备份/处置清单，不增设 task 成功状态。源树继续只读；导出目标不得与源/run/store 物理重叠。凭据不进备份；运行中备份需一致性屏障，否则停机后才执行。目录隔离和策略声明不能代替真实 OS 权限执行。

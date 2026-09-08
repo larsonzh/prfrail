@@ -19,7 +19,7 @@ Date: 2026-09-08. Verdict: `T024 COMPLETE`.
 5. Lifecycle records: completed backup requires `closureStatus=complete`, excluded secrets, object/root/restore evidence, and a manifest hash; failed/uncertain records cannot carry a completion manifest.
 6. Retention by default: retirement construction defaults to `retentionDisposition=retain` and `sharedToolsDisposition=preserved`, preventing SessionBridge or user-toolchain deletion.
 7. Deletion and audit conflicts: `delete-authorized` requires separate human authorization; retention conflicts require an independent human decision hash.
-8. Release inventory and offline revocation: inventory is path-sorted, content-stable, and rejects symlinks; release requires signature receipt, SBOM/license/checksum/support data, while offline revocation is represented only as `unknown`.
+8. Release inventory and trust representation: inventory is path-sorted, content-stable, and rejects symlinks; release requires SBOM/license/checksum/support data. After the 2026-09-08 contract revision, a signature receipt is optional: unsigned records can express trust/revocation freshness only as `unknown`, while signed records retain strict hash and verification-evidence constraints.
 
 ## Gate Results
 
@@ -36,12 +36,12 @@ Date: 2026-09-08. Verdict: `T024 COMPLETE`.
 4. `internal/evidence/disposition_test.go`: `TestLifecycleBackupRoundTrip`
 5. `internal/evidence/disposition_test.go`: `TestRetirementDefaultsRetainAndPreserveSharedTools`
 6. `internal/evidence/disposition_test.go`: `TestRetirementDeletionAndConflictRequireHumanEvidence`
-7. `internal/evidence/disposition_test.go`: `TestReleaseRequiresSignatureAndRepresentsOfflineRevocationAsUnknown`
+7. `internal/evidence/disposition_test.go`: `TestReleaseAllowsUnsignedS1AndRepresentsTrustAsUnknown`
 8. `internal/evidence/disposition_test.go`: `TestBuildReleaseInventoryIsDeterministicAndRejectsLinks`
 
 ## Boundaries
 
-1. T024 supplies library-level capabilities, not an installer, signing keys, release action, or copyable backup/uninstall CLI. Those remain governed by T017 and explicit release authorization.
+1. T024 supplies library-level capabilities, not an installer, release action, or copyable backup/uninstall CLI. Those remain governed by T017 and explicit release authorization. Signing/attestation is an optional later enhancement.
 2. Unknown schema versions are write-rejected while preserving the original store; explicit cross-version migration belongs to S2.
 3. Logical deletion does not guarantee secure erasure from SSDs, snapshots, or external copies.
 4. No `git commit`, `git push`, signing, or release action was performed.

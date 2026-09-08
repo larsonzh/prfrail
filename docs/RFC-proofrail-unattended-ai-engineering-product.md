@@ -133,7 +133,7 @@ ProofRail 的需求、业务规则和用户流程必须在不阅读 whois 文档
 
 产品需求说明回答“用户是谁、要完成什么结果、哪些规则可验收”；业务流程文档串联安装准备、初始化、
 预览授权、baseline、任务执行、暂停恢复、评审接受、导出归档和停用等端到端场景；操作手册只描述
-当前已实现且验证过的命令。安装部署在发行形态、签名主体、目录布局和升级兼容策略冻结前，只维护
+当前已实现且验证过的命令。安装部署在发行形态、发布信任证据、目录布局和升级兼容策略冻结前，只维护
 显式待决项、候选方案和决策门禁，不把目标态示例写成可执行承诺。
 
 ## 2. 可抽取的核心资产盘点
@@ -566,8 +566,8 @@ ProofRail 的需求、业务规则和用户流程必须在不阅读 whois 文档
     构建候选版本 `N+1`；候选不得覆盖正在运行的 host 二进制。
   3. 候选 `N+1` 必须在新进程和隔离 run/store 中重放固定验收链，并与 `N` 的规范结果做兼容比较；
     schema、receipt、恢复和 fail-close 黄金样例由独立测试程序或 Go 测试判定，不能由候选自报 PASS。
-  4. 发布采用“两代信任”：`N` 编排并验证 `N+1`，CI/人工发布门禁独立签名；`N+1` 至少完成一次
-    clean-room 自托管重放后才可发布。首个 `N` 由常规构建与人工审计建立 bootstrap trust。
+  4. 发布采用“两代信任”：`N` 编排并验证 `N+1`，固定 commit、GitHub CI 与人工发布门禁独立于候选；
+    `N+1` 至少完成一次 clean-room 自托管重放后才可发布。首个 `N` 由常规构建与人工审计建立 bootstrap trust。
   5. 自托管失败只阻断候选发布，不得破坏 seed、当前正式二进制、baseline 或历史证据。
 - **结论**：采纳（P0/S1，渐进自托管，不采用候选单独自证）。
 
@@ -1940,9 +1940,9 @@ issuedAt 与策略的生效/撤销语义判断历史有效性；无可信时间�
 statement/signature 必须得到相同 receiptHash，冲突内容不可覆盖。
 
 Schema 只检查单对象形状、用途/对象/主体判别和签名编码；checker/独立 crypto validator 负责 Ed25519
-验签、subject 内容摘要、key fingerprint、信任链、时间与撤销、用途隔离和验证证据。T017 仍须登记精确
-维护者签名主体、密钥保管人、公钥指纹、发布渠道及轮换/撤销流程；本 Schema 不生成密钥、不授权发布，
-也不表示 S1 已实现密码学验证。
+验签、subject 内容摘要、key fingerprint、信任链、时间与撤销、用途隔离和验证证据。本 Schema 不生成
+密钥、不授权发布，也不表示 S1 已实现密码学验证。2026-09-08 简化策略将该 receipt 保留为跨主机或
+后续签名/attestation 的可选能力，不作为 T017/T018 或 S1 exit 的强制门禁。
 
 #### 16.9.20 Error set 与主错误
 
@@ -2201,8 +2201,9 @@ subscription/unknown 定价可令货币金额为 null，但 modelCalls/tokens/wa
 #### 16.9.32 PC-06 生命周期记录
 
 `lifecycle-record.schema.json` 是 release/backup/retirement 判别联合。release 绑定精确版本、二进制摘要、
-依赖版本/摘要/许可证、SBOM、校验和清单、approved signature receipt、支持矩阵、能力、平台和已知限制。
-签名有效不等于仍受支持；离线无法取得撤销信息时 revocationFreshness=unknown 且不得显示 verified。
+依赖版本/摘要/许可证、SBOM、校验和清单、支持矩阵、能力、平台和已知限制；signature receipt 可为 null。
+无签名时 revocationFreshness=unknown 且无撤销核验证据；有签名时仍须严格验证其摘要、授权和撤销证据。
+SHA256SUMS 只证明内容与清单一致，不证明发布者身份。
 
 backup 绑定 source store/schema、目标逻辑引用与 identity 摘要、写者停机证据、全部 object/event segment/
 reference root、secret 扫描、verification report 和在新隔离 store 的 restore evidence。completed 只允许
@@ -2227,10 +2228,10 @@ delete-authorized 必须引用独立人工删除授权；审计锁或引用冲�
 4. whois 仅作为映射样例；至少再用一个小型非 C 示例证明核心模型没有语言或仓库依赖。
 5. Go/TUI、原子文件操作、进程树停止、IPC/文件队列和跨平台路径规则均有短周期技术原型结论。
 6. S1 backlog 的每项工作都映射到 R1–R22、模块、验收测试与明确非目标，并给出依赖顺序。
-7. 发布平台、Go 版本、第三方依赖许可、支持周期、漏洞响应和签名方案已形成 ADR。
+7. 发布平台、Go 版本、第三方依赖许可、支持周期、漏洞响应和发布信任方案已形成 ADR。
 8. 用户明确批准 S1 范围、风险、资源预算与 whois 影子验证方案。
-9. R18 step schema 与 UI 原型覆盖 code/build/verify/noop，R19 bootstrap ADR 明确 seed 来源、
-  外部 oracle、候选隔离、签名主体和失败回滚。
+9. R18 step schema 与 UI 原型覆盖 code/build/verify/noop，R19 bootstrap ADR 明确 seed 固定 commit/摘要、
+  外部 oracle、候选隔离、批准主体和失败回滚。
 10. R20 component/language scope schema 明确 target 所有权、harness 绑定、依赖图、共享生成物和
   整任务回滚；C+Go 与 C+JavaScript+Python 黄金配置可由 S0 validator 校验。真实任务执行分别是
   S1、S2 的 exit gate，不构成进入 S1 编码的前置条件。
@@ -2428,8 +2429,8 @@ T004 能力实测及后续门禁完成前仍保持 NOT_READY。
 
 ### 19.6 PC-06：安装到退役的生命周期
 
-- S1 发行物附能力/支持矩阵、精确依赖版本、SBOM/许可证、校验和、已批准签名和已知限制。
-  签名有效不等于仍受支持；撤销信息若离线不可获得，应展示“撤销新鲜度未知”。
+- S1 发行物附能力/支持矩阵、固定 commit、GitHub CI 结果、精确依赖版本、SBOM/许可证、SHA256SUMS 和
+  已知限制。SHA256SUMS 只证明内容与清单一致，不证明发布者身份；签名/attestation 为后续增强。
 - 升级/恢复先检查支持的 schema 范围、停止相关写者、备份并核验完整引用闭包；密钥/凭据不入备份。
   S1 对未知格式拒绝迁移、保留原件，提供在新隔离 store 的恢复演练；不能仅备份 state 引用却遗漏对象。
 - S1 停用/卸载先停进程、撤销适配器授权并展示保留/删除清单，默认保留 run/store 和审计证据。

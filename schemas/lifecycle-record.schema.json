@@ -44,12 +44,12 @@
         "version": {"$ref": "#/$defs/version"}, "binaryHashes": {"allOf": [{"$ref": "#/$defs/hashSet"}, {"minItems": 1}]},
         "dependencies": {"type": "array", "items": {"$ref": "#/$defs/dependency"}}, "sbomHash": {"$ref": "#/$defs/sha256"},
         "licenseManifestHash": {"$ref": "#/$defs/sha256"}, "checksumManifestHash": {"$ref": "#/$defs/sha256"},
-        "signatureReceiptHash": {"$ref": "#/$defs/sha256"}, "supportMatrix": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/support"}},
+        "signatureReceiptHash": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/sha256"}]}, "supportMatrix": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/support"}},
         "knownLimitationIds": {"$ref": "#/$defs/idSet"}, "revocationFreshness": {"enum": ["verified", "unknown"]},
         "revocationEvidence": {"$ref": "#/$defs/hashSet"}
       },
       "oneOf": [
-        {"properties": {"revocationFreshness": {"const": "verified"}, "revocationEvidence": {"minItems": 1}}},
+        {"properties": {"signatureReceiptHash": {"$ref": "#/$defs/sha256"}, "revocationFreshness": {"const": "verified"}, "revocationEvidence": {"minItems": 1}}},
         {"properties": {"revocationFreshness": {"const": "unknown"}, "revocationEvidence": {"maxItems": 0}}}
       ]
     },

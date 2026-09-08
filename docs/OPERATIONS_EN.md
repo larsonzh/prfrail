@@ -27,7 +27,7 @@ Core packages now have automated tests, but full product E2E/TUI is still in lat
 
 ## 2. Installation and First Run Design
 
-Future installation: select the Windows amd64 package, verify signature/checksum, extract separately, check version, preview statically, then authorize capability probes separately. S1 Linux is core CI/preview, not production support. Do not execute unknown signatures or wrong-platform binaries. Back up the complete object/event/state-reference closure and verify historical runs read-only before upgrades; never overwrite a running host.
+Future installation: select the Windows amd64 package from a trusted release page; verify the fixed commit/GitHub CI plus SHA256SUMS, SBOM and license manifest; extract separately, check version, preview statically, then authorize capability probes separately. SHA256SUMS proves agreement with the manifest, not publisher identity. S1 Linux is core CI/preview, not production support. Do not execute wrong-platform binaries. Back up the complete object/event/state-reference closure and verify historical runs read-only before upgrades; never overwrite a running host.
 
 Current copyable flow is `prfrail init --workspace <path>`, `prfrail validate --chain <chain-file>`, `prfrail config explain --chain <chain-file>`, `prfrail preview --chain <chain-file> [--json]`, `prfrail cost report [--ledger <path>] [--json]`, `prfrail run --chain <chain-file> [--run-id] [--run-dir]`, and `prfrail report --run-dir <run-dir>`. `preview` reports `previewHash`, permission boundaries, unknowns, and zero call counters in read-only mode; `cost report` reads the local cost ledger and reports reserved/settled/unknown holds without default telemetry export; `run` is currently noop-only. Export support is implemented at library level, but a dedicated CLI `export` command remains in later slices; full executable-step gate/adapter integration is also still in later slices. Start with a file-queue fixture consumer without AI; VS Code is optional.
 
@@ -85,13 +85,13 @@ S0 uses a small non-C Go fixture and dual/triple-language configurations to chal
 
 ## 7. Self-Hosting, Upgrade and Release
 
-Bootstrap the first seed through normal Go build, independent tests and human audit. Record source hash, toolchain, oracle and signing/approval actors. The current stub is not a trusted seed.
+Bootstrap the first seed from a fixed commit through normal Go build, independent tests and human audit. Record commit/source hash, toolchain, oracle and approval actor. The current stub is not a trusted seed.
 
 Stable N captures isolated input/builds N+1. The candidate never overwrites host. Replay a fixed chain in a new process and separate run/store, with an external oracle comparing schema/receipt/recovery/fail-close goldens and a clean-room drill. Failure blocks the candidate without changing seed or historical evidence.
 
-Release checklist: aligned RFC/schema/version; build/vet/test, native platforms and required AT; license/vulnerability inventory; correct binaries/CGO_ENABLED=0; checksums plus approved signature; upgrade/rollback tests; bilingual notes/limitations; independent gate and same-turn commit/push/release authorization. Default remote is origin, never automatic Gitee mirror pushes.
+Release checklist: aligned RFC/schema/version; fixed commit and GitHub CI; build/vet/test, native platforms and required AT; license/vulnerability inventory and SBOM; correct binaries/CGO_ENABLED=0; SHA256SUMS; upgrade/rollback tests; bilingual notes/limitations; independent gate and same-turn commit/push/release authorization. Checksums must not be presented as publisher authentication; signing/attestation is a later enhancement. Default remote is origin, never automatic Gitee mirror pushes.
 
-Rollback stops candidate processes and preserves evidence; restore an older binary only when storage compatibility is explicit. Unknown formats stay read-only. Signing/support/response proposals are in [ADR_REGISTER_EN.md](ADR_REGISTER_EN.md).
+Rollback stops candidate processes and preserves evidence; restore an older binary only when storage compatibility is explicit. Unknown formats stay read-only. Release-trust/support/response policies are in [ADR_REGISTER_EN.md](ADR_REGISTER_EN.md).
 
 ## 8. Complete Product Flow (Planned, RFC Section 19)
 

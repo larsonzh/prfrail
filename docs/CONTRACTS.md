@@ -210,7 +210,9 @@ SessionBridge 成功缓存是内存、限时机制，不是持久 exactly-once�
 校验和清单提供身份绑定。签名覆盖带 purpose/subjectKind/subjectHash/signer/keyId/公钥指纹/信任策略的
 canonical statement，receiptHash 再覆盖 statement 与签名字节；cross-host/bootstrap/release 与其对象
 类型和主体严格配对，64 字节签名只接受无 padding base64url。Schema 不证明密钥可信、当时未撤销或验签
-成功；这些由独立 crypto validator、信任策略与验证证据判定，精确发布主体/公钥/轮换仍由 T017 落实。
+成功；这些由独立 crypto validator、信任策略与验证证据判定。该能力在 S1 为可选增强，不是 T017/S1 exit 的强制发布门禁。
+
+`lifecycle-record.schema.json` 的 release 记录始终强制 binary、SBOM、许可证和校验和清单摘要；`signatureReceiptHash` 可为 null。无签名时 `revocationFreshness` 必须为 `unknown` 且不得携带撤销核验证据；存在签名 receipt 时仍按上述严格契约验证。SHA256SUMS 只证明内容完整性，不证明发布者身份。
 
 ## 8. 错误与验收边界
 

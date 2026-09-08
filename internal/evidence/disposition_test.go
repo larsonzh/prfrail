@@ -78,19 +78,24 @@ func TestRetirementDeletionAndConflictRequireHumanEvidence(t *testing.T) {
 	}
 }
 
-func TestReleaseRequiresSignatureAndRepresentsOfflineRevocationAsUnknown(t *testing.T) {
+func TestReleaseAllowsUnsignedS1AndRepresentsTrustAsUnknown(t *testing.T) {
 	release := validRelease()
-	release.SignatureReceiptHash = ""
+	release.SignatureReceiptHash = nil
+	release.RevocationFreshness = "unknown"
+	release.RevocationEvidence = []string{}
+	if _, err := NewLifecycleRecord(release); err != nil {
+		t.Fatalf("unsigned S1 release should be representable as unknown trust: %v", err)
+	}
+
+	release = validRelease()
+	release.SignatureReceiptHash = nil
 	if _, err := NewLifecycleRecord(release); !errors.Is(err, ErrInvalidLifecycleRecord) {
-		t.Fatalf("expected unsigned release rejection, got %v", err)
+		t.Fatalf("unsigned release must not claim verified trust: %v", err)
 	}
 
 	release = validRelease()
 	release.RevocationFreshness = "unknown"
 	release.RevocationEvidence = []string{}
-	if _, err := NewLifecycleRecord(release); err != nil {
-		t.Fatalf("offline unknown revocation should be representable: %v", err)
-	}
 	release.RevocationEvidence = []string{Digest("", []byte("stale-evidence"))}
 	if _, err := NewLifecycleRecord(release); !errors.Is(err, ErrInvalidLifecycleRecord) {
 		t.Fatalf("unknown revocation must not claim verification evidence: %v", err)
@@ -144,6 +149,7 @@ func validRetirement() LifecycleRetirement {
 }
 
 func validRelease() LifecycleRelease {
+	signatureHash := Digest("", []byte("signature"))
 	return LifecycleRelease{
 		RecordID:             "release-one",
 		Kind:                 "release",
@@ -154,7 +160,7 @@ func validRelease() LifecycleRelease {
 		SBOMHash:             Digest("", []byte("sbom")),
 		LicenseManifestHash:  Digest("", []byte("licenses")),
 		ChecksumManifestHash: Digest("", []byte("checksums")),
-		SignatureReceiptHash: Digest("", []byte("signature")),
+		SignatureReceiptHash: &signatureHash,
 		SupportMatrix: []LifecycleSupport{{
 			ComponentID:      "prfrail",
 			VersionRange:     "0.1.x",

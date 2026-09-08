@@ -199,7 +199,9 @@ artifacts and release checksum manifests. The signature covers a canonical state
 signer, key ID, public-key fingerprint and trust policy; receiptHash then covers the statement plus signature bytes.
 cross-host/bootstrap/release are strictly paired with their subject and actor types, and a 64-byte signature accepts only
 unpadded base64url. Schema cannot prove key trust, non-revocation at issuance or cryptographic validity; independent crypto
-validation, trust policy and verification evidence own those checks, while T017 still assigns the release signer/key/rotation.
+validation, trust policy and verification evidence own those checks. This capability is optional in S1 and is not a mandatory T017/S1-exit release gate.
+
+The release branch of `lifecycle-record.schema.json` always requires binary, SBOM, license-manifest and checksum-manifest hashes; `signatureReceiptHash` may be null. Without a signature, `revocationFreshness` must be `unknown` with no revocation-verification evidence. When a signature receipt is present, the strict contract above still applies. SHA256SUMS proves content integrity, not publisher identity.
 
 ## 8. Errors and Acceptance
 

@@ -19,7 +19,7 @@
 5. 生命周期记录：completed backup 强制 `closureStatus=complete`、secret excluded、对象/根/恢复证据和 manifest hash；failed/uncertain 不能携带完成 manifest。
 6. 默认保留：retirement 构造默认 `retentionDisposition=retain`、`sharedToolsDisposition=preserved`，禁止删除 SessionBridge 或用户工具链。
 7. 删除与审计冲突：`delete-authorized` 必须引用人工删除授权；存在保留冲突时必须引用独立人工决定。
-8. 发布清单与离线撤销：清单按路径排序、内容摘要稳定并拒绝符号链接；release 强制签名 receipt、SBOM/许可证/校验和/支持矩阵，离线撤销状态只能为 `unknown`。
+8. 发布清单与信任表达：清单按路径排序、内容摘要稳定并拒绝符号链接；release 强制 SBOM/许可证/校验和/支持矩阵。2026-09-08 契约修订后签名 receipt 为可选；无签名时信任/撤销新鲜度只能为 `unknown`，有签名时仍执行严格摘要和验证证据约束。
 
 ## 门禁结果
 
@@ -36,12 +36,12 @@
 4. `internal/evidence/disposition_test.go`: `TestLifecycleBackupRoundTrip`
 5. `internal/evidence/disposition_test.go`: `TestRetirementDefaultsRetainAndPreserveSharedTools`
 6. `internal/evidence/disposition_test.go`: `TestRetirementDeletionAndConflictRequireHumanEvidence`
-7. `internal/evidence/disposition_test.go`: `TestReleaseRequiresSignatureAndRepresentsOfflineRevocationAsUnknown`
+7. `internal/evidence/disposition_test.go`: `TestReleaseAllowsUnsignedS1AndRepresentsTrustAsUnknown`
 8. `internal/evidence/disposition_test.go`: `TestBuildReleaseInventoryIsDeterministicAndRejectsLinks`
 
 ## 边界
 
-1. T024 提供库级能力，不提供安装包、签名密钥、发布动作或可复制的 backup/uninstall CLI；这些仍受 T017 和发行授权约束。
+1. T024 提供库级能力，不提供安装包、发布动作或可复制的 backup/uninstall CLI；这些仍受 T017 和发行授权约束。签名/attestation 为后续可选增强。
 2. unknown schema 仅拒绝写入并保留原 store；显式跨版本迁移属于 S2。
 3. 逻辑删除不保证 SSD、快照或外部副本安全擦除。
 4. 本轮未执行 `git commit`、`git push`、签名或发布。

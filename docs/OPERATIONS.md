@@ -27,7 +27,7 @@ go run ./cmd/prfrail report --run-dir .\tmp\prfrail-runs\run-demo
 
 ## 2. 安装与首次使用设计
 
-未来安装顺序：选择 Windows amd64 对应发行包→验证签名和校验和→解压到独立目录→验证 version→静态预览→单独授权能力探测。Linux 在 S1 仅核心 CI/预览，不宣传正式支持。未知签名或平台不匹配不得执行。升级前备份对象、事件和状态引用的完整闭包并只读核验历史 run；不覆盖运行中的 host。
+未来安装顺序：从受信发布页选择 Windows amd64 发行包→核对固定 commit/GitHub CI 并验证 SHA256SUMS、SBOM 和许可证清单→解压到独立目录→验证 version→静态预览→单独授权能力探测。SHA256SUMS 只证明内容与清单一致，不认证发布者身份；平台不匹配不得执行。Linux 在 S1 仅核心 CI/预览，不宣传正式支持。升级前备份对象、事件和状态引用的完整闭包并只读核验历史 run；不覆盖运行中的 host。
 
 当前可复制流程为 `prfrail init --workspace <path>`、`prfrail validate --chain <chain-file>`、`prfrail config explain --chain <chain-file>`、`prfrail preview --chain <chain-file> [--json]`、`prfrail cost report [--ledger <path>] [--json]`、`prfrail run --chain <chain-file> [--run-id] [--run-dir]`、`prfrail report --run-dir <run-dir>`。`preview` 只读展示 `previewHash`、权限边界、unknown 及零调用计数；`cost report` 本地读取成本账本并输出预留/结算/未知占用，不做默认遥测导出；`run` 当前仅支持 noop-only 链。导出能力已在库级实现，但 CLI `export` 命令仍在后续切片；执行型 step 的真实 gate/adapter 全闭环同样属于后续切片。没有 AI 时先使用文件队列 fixture consumer 完成闭环；VS Code 不是必需依赖。
 
@@ -85,13 +85,13 @@ S0 用小型 Go 非 C 夹具和 C+Go/三语言配置反证核心耦合。S1 仅�
 
 ## 7. 自托管、升级和发布
 
-bootstrap：维护者用常规 Go 构建与独立测试、人工审计建立首个 seed；记录源码摘要、工具链、oracle、签名/批准主体。不得把当前占位版本直接当可信 seed。
+bootstrap：维护者从固定 commit 用常规 Go 构建、独立测试和人工审计建立首个 seed；记录 commit/源码摘要、工具链、oracle 和批准主体。不得把当前占位版本直接当可信 seed。
 
 两代验收：稳定 N 捕获隔离输入并构建 N+1；候选不覆盖 host；新进程+独立 run/store 重放固定验收链；独立 oracle 比较 Schema、receipt、恢复和 fail-close goldens，完成 clean-room 演练。失败只阻断候选，不修改 seed 或历史证据。
 
-发布清单：RFC/Schema/版本一致；build/vet/test、原生平台和全部强制 AT；依赖许可证/漏洞清单；二进制对应平台/CGO_ENABLED=0；校验和+已批准签名；升级/回滚测试；双语说明与已知限制；外部发布门禁和用户当轮 commit/push/release 授权。默认远端 origin，Gitee 镜像不自动推送。
+发布清单：RFC/Schema/版本一致；固定 commit 与 GitHub CI；build/vet/test、原生平台和全部强制 AT；依赖许可证/漏洞清单及 SBOM；二进制对应平台/CGO_ENABLED=0；SHA256SUMS；升级/回滚测试；双语说明与已知限制；外部发布门禁和用户当轮 commit/push/release 授权。校验和不得冒充发布者身份认证；签名/attestation 是后续增强。默认远端 origin，Gitee 镜像不自动推送。
 
-回退：停止候选进程并保留证据，只在明确存储兼容时恢复旧二进制；未知格式保持只读，不能降级覆写。签名、支持周期和漏洞响应提案见 [ADR_REGISTER.md](ADR_REGISTER.md)。
+回退：停止候选进程并保留证据，只在明确存储兼容时恢复旧二进制；未知格式保持只读，不能降级覆写。发布信任、支持周期和漏洞响应策略见 [ADR_REGISTER.md](ADR_REGISTER.md)。
 
 ## 8. 完整产品操作流程（规划，RFC §19）
 
