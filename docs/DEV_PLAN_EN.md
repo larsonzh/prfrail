@@ -20,7 +20,7 @@ Paths not yet present are planned creation locations. T001-T004 are S0; T004 is 
 
 - [x] T001 [Plan:P0.1] Review docs/PRODUCT_REQUIREMENTS*.md, docs/SECURITY*.md and docs/ADR_REGISTER*.md; record owner/security reviewer, budgets, support/signing and shadow scope. Depends: this package. Accept: section 17.1/6/8 sign-off and license decisions. Exclude: approving for the user. Completed 2026-09-06: owner approved S0 specification freeze and ADR section 4; independent security conclusions remain a separate T003/gate 17.3 closure.
 
-T001 status: `COMPLETE`. This approves only S0 specification freeze and allows T002 to begin. It does not authorize new paid calls, concrete whois data access, Git operations, release or S1 production coding. Signer/key, exact dependencies and independent security review remain later gates.
+T001 status: `COMPLETE`. This approves only S0 specification freeze and allows T002 to begin. It does not authorize new paid calls, concrete whois data access, Git operations, release or S1 production coding. Exact dependencies and independent security review remain later gates; the simplified release-trust policy approved on 2026-09-08 does not require an S1 signer or public key.
 
 ### P0.2 Machine Contract Freeze (REQ-001/004/005/007/008/010/012/013/017/018/020/021/022/024/025/028)
 
@@ -40,7 +40,7 @@ T001 also reviews ADR-008 and PC-01–PC-06 workload/budgets. T002 freezes RFC s
 
 - [x] T004 [Plan:P0.3] Probe Go/TUI, Windows atomic replacement/process-tree stop, Linux paths and IPC/file queue in root tmp; record docs/validation/s0-spikes_EN.md and delete experiments. Depends: T002; S1 also requires all T003/T001 gates. Accept: reproducible commands, actual platforms and explicit unavailable capabilities. Exclude: unauthorized paid calls or production claims. Completed 2026-09-07: native Windows 11/NTFS and Ubuntu 24.04/ext4 probes, an isolated Bubble Tea v1.3.4 prototype, and 40 no-model SessionBridge tests passed; see the report for limitations and fail-closed rules.
 
-T004 status: `COMPLETE`. Technical feasibility is established, but overall S0 remains `NOT_READY`; dependency supply chain, signer identity, bootstrap and production crash injection remain T017/later gates. This result does not authorize T005.
+T004 status: `COMPLETE`. Technical feasibility is established, but overall S0 remains `NOT_READY`; dependency supply chain, bootstrap, CI release evidence and production crash injection remain T017/later gates. This result does not authorize T005.
 
 ### P1.1 Evidence and Snapshots (REQ-004/023/024/025/028)
 
@@ -84,7 +84,7 @@ T006 status: `COMPLETE`. Full AT-02 acceptance passed; Git-free restore and immu
 
 ### P1.6 Trusted Release and Shadow Acceptance (REQ-001/002/006/011/014/015/019/024/025/028)
 
-- [ ] T017 [Plan:P1.6] Create .github/workflows/ci.yml, testdata/selfhost/ and docs/validation/s1-selfhost.md; pin tooling, isolate generations, use an external oracle, and verify native platforms, fixed commit, SHA256SUMS, SBOM and licenses. Depends: T024 and bootstrap approval. Accept: AT-13/14. Exclude: seed overwrite, checksum-as-identity claims or unauthorized release. Signing/attestation is a later enhancement and does not block S1.
+- [ ] T017 [Plan:P1.6] Create .github/workflows/ci.yml, testdata/selfhost/ and docs/validation/s1-selfhost.md; pin tooling and Actions by full SHA, isolate generations, use an earlier trusted verifier commit and external oracle, and verify native platforms, a fixed candidate commit, SHA256SUMS, SBOM and licenses. Depends: T024 and bootstrap approval. Accept: AT-13/14. Exclude: candidate-built/overwritten verifier or seed, checksum-as-identity claims, or unauthorized release. Signing/attestation is a later enhancement and does not block S1. Status: `IMPLEMENTED_AWAITING_CI`; the native Windows two-generation drill and full gates passed on 2026-09-08, and independent reviews by GPT-5.3 Codex and DeepSeek V4 Pro both returned `PASS FOR BASELINE REVIEW`. Close only after the verifier baseline is landed and runs its first successful GitHub CI Windows/Linux candidate matrix. Validation: [中文](validation/s1-selfhost.md) / [English](validation/s1-selfhost_EN.md); Codex review: [中文](validation/t017-baseline-review.md) / [English](validation/t017-baseline-review_EN.md); DeepSeek review: [中文](validation/t017-deepseek-baseline-review.md) / [English](validation/t017-deepseek-baseline-review_EN.md).
 - [ ] T018 [Plan:P1.6] Create examples/{whois-shadow,go-minimal}/ and docs/validation/s1-exit.md; compare fixed read-only input/result/failure classifications and summarize all AT/risks. Depends: T017 and whois input authorization. Accept: AT-15 and every RFC S1 exit gate. Exclude: production whois cutover or partial-pass completion.
 
 ### P1.7 Product Flow and Lifecycle (Before P1.6 Release Acceptance)

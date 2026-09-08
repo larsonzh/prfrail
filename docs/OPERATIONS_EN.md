@@ -23,7 +23,7 @@ go run ./cmd/prfrail run --chain .\proofrail.chain.json --run-id run-demo
 go run ./cmd/prfrail report --run-dir .\tmp\prfrail-runs\run-demo
 ```
 
-Core packages now have automated tests, but full product E2E/TUI is still in later slices. Current CLI output is ANSI-free by default and supports `--json`. gopls is a development tool, not a core runtime dependency. System/Git proxies do not automatically configure Go downloads; use process HTTP_PROXY/HTTPS_PROXY when needed and restore them afterward, without arbitrary global GOPROXY changes or disabled verification.
+Core packages now have automated tests, but full product E2E/TUI is still in later slices. Current CLI output is ANSI-free by default and supports `--json`. gopls is a development tool, not a core runtime dependency. The released ProofRail binary does not directly access GitHub, Go/npm registries, or other public URLs; release-evidence verification reads local files only. Dependency downloads and GitHub Actions networking belong only to development/CI. System/Git proxies do not automatically configure Go downloads; use process HTTP_PROXY/HTTPS_PROXY when needed and restore them afterward, without arbitrary global GOPROXY changes or disabled verification.
 
 ## 2. Installation and First Run Design
 

@@ -1,0 +1,8 @@
+{
+  "schemaVersion": "1.0.0",
+  "seedCommit": "fc99f553c3066b24230a093d14bc17af0c6a398e",
+  "establishedBy": "normal-go-build-independent-tests-human-audit",
+  "candidatePolicy": "separate-source-build-and-run-roots",
+  "oracle": "expected.json",
+  "rollback": "preserve-seed-and-discard-candidate"
+}

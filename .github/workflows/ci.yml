@@ -1,0 +1,391 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      candidate_commit:
+        description: Full lowercase commit SHA to validate
+        required: true
+        type: string
+      verifier_commit:
+        description: Reviewed main commit containing this workflow and verifier
+        required: true
+        type: string
+      bootstrap_commit:
+        description: Fixed lowercase 40-character bootstrap commit
+        required: true
+        type: string
+      bootstrap_manifest_sha256:
+        description: SHA-256 of testdata/selfhost/bootstrap.json
+        required: true
+        type: string
+      expected_oracle_sha256:
+        description: SHA-256 of testdata/selfhost/expected.json
+        required: true
+        type: string
+      license_policy_sha256:
+        description: SHA-256 of testdata/selfhost/licenses-policy.json
+        required: true
+        type: string
+      noop_chain_sha256:
+        description: SHA-256 of testdata/selfhost/noop-chain.json
+        required: true
+        type: string
+      executable_chain_sha256:
+        description: SHA-256 of testdata/selfhost/executable-chain.json
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+env:
+  GO_VERSION: "1.22.12"
+  CGO_ENABLED: "0"
+  GOTOOLCHAIN: "local"
+
+jobs:
+  test:
+    name: Go ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Setup Go
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Build
+        run: go build ./...
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Test
+        run: go test -count=1 ./...
+
+      - name: Contract fixtures
+        if: runner.os == 'Linux'
+        working-directory: tools/contracts
+        run: |
+          npm ci --ignore-scripts
+          npm test
+
+  candidate-build:
+    name: Candidate build (${{ matrix.os }})
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      CANDIDATE_COMMIT: ${{ inputs.candidate_commit }}
+    steps:
+      - name: Validate candidate pin
+        shell: pwsh
+        run: |
+          if ($env:CANDIDATE_COMMIT -cnotmatch '^[0-9a-f]{40}$') {
+            throw 'candidate commit must be a full lowercase commit SHA'
+          }
+
+      - name: Checkout candidate
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ env.CANDIDATE_COMMIT }}
+          path: candidate-source
+          persist-credentials: false
+
+      - name: Setup Go
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: false
+
+      - name: Build candidate without executing it
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          $suffix = if ($IsWindows) { '.exe' } else { '' }
+          $releaseRoot = Join-Path $env:GITHUB_WORKSPACE 'generations/candidate/release'
+          New-Item -ItemType Directory -Force $releaseRoot | Out-Null
+          Push-Location candidate-source
+          go build -trimpath -ldflags "-X main.version=0.1.0+$env:CANDIDATE_COMMIT" -o (Join-Path $releaseRoot "prfrail$suffix") ./cmd/prfrail
+          Pop-Location
+
+      - name: Upload immutable candidate binary
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: candidate-binary-${{ runner.os }}-${{ inputs.candidate_commit }}
+          path: generations/candidate/release/prfrail*
+          if-no-files-found: error
+
+  candidate-probe:
+    name: Candidate probe (${{ matrix.os }})
+    needs: candidate-build
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      CANDIDATE_COMMIT: ${{ inputs.candidate_commit }}
+      VERIFIER_COMMIT: ${{ inputs.verifier_commit }}
+      NOOP_CHAIN_SHA256: ${{ inputs.noop_chain_sha256 }}
+      EXECUTABLE_CHAIN_SHA256: ${{ inputs.executable_chain_sha256 }}
+    steps:
+      - name: Validate repository trust pins
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          @('CANDIDATE_COMMIT', 'VERIFIER_COMMIT') | ForEach-Object {
+            $value = [Environment]::GetEnvironmentVariable($_)
+            if ($value -cnotmatch '^[0-9a-f]{40}$') {
+              throw "$_ must be a full lowercase commit SHA"
+            }
+          }
+          if ($env:VERIFIER_COMMIT -ne $env:GITHUB_SHA) {
+            throw 'verifier commit must equal the reviewed workflow commit on main'
+          }
+          if ($env:CANDIDATE_COMMIT -eq $env:VERIFIER_COMMIT) {
+            throw 'candidate and verifier commits must be different'
+          }
+          @(
+            'NOOP_CHAIN_SHA256',
+            'EXECUTABLE_CHAIN_SHA256'
+          ) | ForEach-Object {
+            $value = [Environment]::GetEnvironmentVariable($_)
+            if ($value -cnotmatch '^[0-9a-f]{64}$') {
+              throw "T017_$_ must be a lowercase SHA-256 digest"
+            }
+          }
+
+      - name: Checkout trusted verifier
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ env.VERIFIER_COMMIT }}
+          path: verifier-source
+          persist-credentials: false
+
+      - name: Setup Go
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: false
+
+      - name: Build trusted probe harness
+        shell: pwsh
+        working-directory: verifier-source
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          $suffix = if ($IsWindows) { '.exe' } else { '' }
+          $generations = Join-Path $env:GITHUB_WORKSPACE 'generations'
+          New-Item -ItemType Directory -Force $generations | Out-Null
+          go build -trimpath -o (Join-Path $generations "prfrail-release$suffix") ./cmd/prfrail-release
+
+      - name: Download immutable candidate binary
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: candidate-binary-${{ runner.os }}-${{ inputs.candidate_commit }}
+          path: generations/candidate/release
+
+      - name: Probe untrusted candidate
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          $suffix = if ($IsWindows) { '.exe' } else { '' }
+          $generations = Join-Path $env:GITHUB_WORKSPACE 'generations'
+          $candidateRoot = Join-Path $generations 'candidate'
+          $releaseRoot = Join-Path $candidateRoot 'release'
+          $candidateBinary = Join-Path $releaseRoot "prfrail$suffix"
+          $releaseTool = Join-Path $generations "prfrail-release$suffix"
+          New-Item -ItemType Directory -Force $releaseRoot | Out-Null
+          if (-not $IsWindows) { chmod +x $candidateBinary }
+
+          function Assert-Sha256([string]$Path, [string]$Expected) {
+            $actual = (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant()
+            if ($actual -ne $Expected) {
+              throw "trusted fixture hash mismatch: $Path"
+            }
+          }
+          Assert-Sha256 verifier-source/testdata/selfhost/noop-chain.json $env:NOOP_CHAIN_SHA256
+          Assert-Sha256 verifier-source/testdata/selfhost/executable-chain.json $env:EXECUTABLE_CHAIN_SHA256
+
+          & $releaseTool probe `
+            --binary $candidateBinary `
+            --noop-chain verifier-source/testdata/selfhost/noop-chain.json `
+            --executable-chain verifier-source/testdata/selfhost/executable-chain.json `
+            --work-root (Join-Path $candidateRoot 'work') `
+            --output (Join-Path $candidateRoot 'actual.json') `
+            --expected-version "0.1.0+$env:CANDIDATE_COMMIT"
+
+      - name: Upload untrusted probe oracle
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: candidate-oracle-${{ runner.os }}-${{ inputs.candidate_commit }}
+          path: generations/candidate/actual.json
+          if-no-files-found: error
+
+  selfhost:
+    name: Bootstrap and release evidence (${{ matrix.os }})
+    needs: candidate-probe
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      CANDIDATE_COMMIT: ${{ inputs.candidate_commit }}
+      VERIFIER_COMMIT: ${{ inputs.verifier_commit }}
+      BOOTSTRAP_COMMIT: ${{ inputs.bootstrap_commit }}
+      BOOTSTRAP_MANIFEST_SHA256: ${{ inputs.bootstrap_manifest_sha256 }}
+      EXPECTED_ORACLE_SHA256: ${{ inputs.expected_oracle_sha256 }}
+      LICENSE_POLICY_SHA256: ${{ inputs.license_policy_sha256 }}
+    steps:
+      - name: Validate repository trust pins
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          @('CANDIDATE_COMMIT', 'VERIFIER_COMMIT', 'BOOTSTRAP_COMMIT') | ForEach-Object {
+            $value = [Environment]::GetEnvironmentVariable($_)
+            if ($value -cnotmatch '^[0-9a-f]{40}$') {
+              throw "$_ must be a full lowercase commit SHA"
+            }
+          }
+          if ($env:VERIFIER_COMMIT -ne $env:GITHUB_SHA) {
+            throw 'verifier commit must equal the reviewed workflow commit on main'
+          }
+          if ($env:CANDIDATE_COMMIT -eq $env:VERIFIER_COMMIT) {
+            throw 'candidate and verifier commits must be different'
+          }
+          @('BOOTSTRAP_MANIFEST_SHA256', 'EXPECTED_ORACLE_SHA256', 'LICENSE_POLICY_SHA256') | ForEach-Object {
+            $value = [Environment]::GetEnvironmentVariable($_)
+            if ($value -cnotmatch '^[0-9a-f]{64}$') {
+              throw "T017_$_ must be a lowercase SHA-256 digest"
+            }
+          }
+
+      - name: Checkout trusted verifier
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ env.VERIFIER_COMMIT }}
+          path: verifier-source
+          persist-credentials: false
+
+      - name: Checkout fixed bootstrap seed
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ env.BOOTSTRAP_COMMIT }}
+          path: seed-source
+          persist-credentials: false
+
+      - name: Checkout candidate metadata
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ env.CANDIDATE_COMMIT }}
+          path: candidate-source
+          persist-credentials: false
+
+      - name: Setup Go
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: false
+
+      - name: Build trusted verifier and seed
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          $suffix = if ($IsWindows) { '.exe' } else { '' }
+          $generations = Join-Path $env:GITHUB_WORKSPACE 'generations'
+          $seedRoot = Join-Path $generations 'seed'
+          $releaseTool = Join-Path $generations "prfrail-release$suffix"
+          $seedBinary = Join-Path $seedRoot "prfrail$suffix"
+          New-Item -ItemType Directory -Force $seedRoot | Out-Null
+          Push-Location verifier-source
+          go build -trimpath -o $releaseTool ./cmd/prfrail-release
+          Pop-Location
+          Push-Location seed-source
+          go build -trimpath -ldflags "-X main.version=bootstrap-$env:BOOTSTRAP_COMMIT" -o $seedBinary ./cmd/prfrail
+          Pop-Location
+
+      - name: Download immutable candidate binary
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: candidate-binary-${{ runner.os }}-${{ inputs.candidate_commit }}
+          path: generations/candidate/release
+
+      - name: Download untrusted probe oracle
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: candidate-oracle-${{ runner.os }}-${{ inputs.candidate_commit }}
+          path: generations/candidate
+
+      - name: Verify evidence and generate release metadata
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          $suffix = if ($IsWindows) { '.exe' } else { '' }
+          $generations = Join-Path $env:GITHUB_WORKSPACE 'generations'
+          $seedRoot = Join-Path $generations 'seed'
+          $candidateRoot = Join-Path $generations 'candidate'
+          $releaseRoot = Join-Path $candidateRoot 'release'
+          $releaseTool = Join-Path $generations "prfrail-release$suffix"
+
+          function Assert-Sha256([string]$Path, [string]$Expected) {
+            $actual = (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant()
+            if ($actual -ne $Expected) {
+              throw "trusted fixture hash mismatch: $Path"
+            }
+          }
+          Assert-Sha256 verifier-source/testdata/selfhost/bootstrap.json $env:BOOTSTRAP_MANIFEST_SHA256
+          Assert-Sha256 verifier-source/testdata/selfhost/expected.json $env:EXPECTED_ORACLE_SHA256
+          Assert-Sha256 verifier-source/testdata/selfhost/licenses-policy.json $env:LICENSE_POLICY_SHA256
+          $bootstrap = Get-Content -Raw verifier-source/testdata/selfhost/bootstrap.json | ConvertFrom-Json
+          if ($bootstrap.seedCommit -ne $env:BOOTSTRAP_COMMIT) {
+            throw 'bootstrap manifest and CI seed commit differ'
+          }
+
+          $seedHash = (& $releaseTool hash-tree --root $seedRoot).Trim()
+          & $releaseTool selfhost `
+            --commit $env:CANDIDATE_COMMIT `
+            --seed $seedRoot `
+            --seed-hash $seedHash `
+            --candidate $candidateRoot `
+            --expected verifier-source/testdata/selfhost/expected.json `
+            --actual (Join-Path $candidateRoot 'actual.json')
+
+          $generatedAt = (git -C candidate-source show -s --format=%cI $env:CANDIDATE_COMMIT).Trim()
+          & $releaseTool generate `
+            --commit $env:CANDIDATE_COMMIT `
+            --root $releaseRoot `
+            --binary "prfrail$suffix" `
+            --license-policy verifier-source/testdata/selfhost/licenses-policy.json `
+            --generated-at $generatedAt
+          & $releaseTool verify --commit $env:CANDIDATE_COMMIT --root $releaseRoot
+
+      - name: Upload verified CI artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: prfrail-${{ runner.os }}-${{ inputs.candidate_commit }}
+          path: generations/candidate/release/*
+          if-no-files-found: error

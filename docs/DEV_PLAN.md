@@ -20,7 +20,7 @@ WIP=1；每个任务执行前设定本轮人工认可的费用/时长上限，�
 
 - [x] T001 [Plan:P0.1] 评审 `docs/PRODUCT_REQUIREMENTS*.md`、`docs/SECURITY*.md`、`docs/ADR_REGISTER*.md`；记录所有者/安全评审者、预算、支持/签名和影子范围；依赖：本包；验收：§17.1/6/8 签署，依赖许可决策可查；禁止：代用户批准。完成：2026-09-06，所有者批准 S0 规格冻结及 ADR §4 决策单；独立安全结论仍由 T003/§17.3 单独关闭。
 
-T001 状态：`COMPLETE`。本次仅批准 S0 规格冻结并允许进入 T002；不授权新增付费调用、具体 whois 数据访问、Git 操作、发布或 S1 生产编码。签名主体、公钥、精确依赖及独立安全评审仍按后续门禁落实。
+T001 状态：`COMPLETE`。本次仅批准 S0 规格冻结并允许进入 T002；不授权新增付费调用、具体 whois 数据访问、Git 操作、发布或 S1 生产编码。精确依赖及独立安全评审仍按后续门禁落实；2026-09-08 批准的简化发布信任策略不要求 S1 签名主体或公钥。
 
 ### P0.2 机器契约冻结（REQ-001/004/005/007/008/010/012/013/017/018/020/021/022/024/025/028）
 
@@ -39,7 +39,7 @@ T001 同时评审 ADR-008 与 PC-01–PC-06 新增工作量；T002 冻结 RFC §
 
 - [x] T004 [Plan:P0.3] 在根 `tmp/` 隔离验证 Go/TUI、Windows 原子替换/进程树停止、Linux 路径、IPC/文件队列；结论入 `docs/validation/s0-spikes.md`，删除实验文件；依赖：T002，S1 前还需 T003/T001 全部门禁；验收：可重复命令、实际平台、失败能力明确；禁止：未授权模型付费、原型冒充生产实现。完成：2026-09-07，Windows 11/NTFS 与 Ubuntu 24.04/ext4 原生探针、Bubble Tea v1.3.4 隔离原型及 SessionBridge 40 项无模型测试通过；限制与 fail-close 规则见报告。
 
-T004 状态：`COMPLETE`。技术可行性已验证，但整体 S0 仍为 `NOT_READY`；依赖供应链、签名主体、bootstrap 与 S1 生产故障注入仍按 T017/后续任务关闭，本结果不授权 T005。
+T004 状态：`COMPLETE`。技术可行性已验证，但整体 S0 仍为 `NOT_READY`；依赖供应链、bootstrap、CI 发布证据与 S1 生产故障注入仍按 T017/后续任务关闭，本结果不授权 T005。
 
 ### P1.1 证据和快照底座（REQ-004/023/024/025/028）
 
@@ -83,7 +83,7 @@ T006 状态：`COMPLETE`。AT-02 完整验收通过；无 Git 恢复与不可变
 
 ### P1.6 可信发布与影子验收（REQ-001/002/006/011/014/015/019/024/025/028）
 
-- [ ] T017 [Plan:P1.6] 建立 `.github/workflows/ci.yml`、`testdata/selfhost/`、`docs/validation/s1-selfhost.md`；固定工具链、两代隔离、外部 oracle、原生平台、固定 commit、SHA256SUMS、SBOM/许可证检查；依赖：T024 和独立 bootstrap 批准；验收：AT-13/14；禁止：候选覆盖 seed、把校验和冒充身份认证、未授权发布。签名/attestation 属后续增强，不阻断 S1。
+- [ ] T017 [Plan:P1.6] 建立 `.github/workflows/ci.yml`、`testdata/selfhost/`、`docs/validation/s1-selfhost.md`；固定工具链与 Actions 完整 SHA、两代隔离、较早可信 verifier commit、外部 oracle、原生平台、固定 candidate commit、SHA256SUMS、SBOM/许可证检查；依赖：T024 和独立 bootstrap 批准；验收：AT-13/14；禁止：候选构建/覆盖 verifier 或 seed、把校验和冒充身份认证、未授权发布。签名/attestation 属后续增强，不阻断 S1。状态：`IMPLEMENTED_AWAITING_CI`；2026-09-08 Windows 本机两代演练与全量门禁通过，GPT-5.3 Codex 与 DeepSeek V4 Pro 独立主审均给出 `PASS FOR BASELINE REVIEW`，等待 verifier baseline 落库并由其完成首次 GitHub CI Windows/Linux 候选矩阵后关闭。验证：[中文](validation/s1-selfhost.md) / [English](validation/s1-selfhost_EN.md)；Codex 主审：[中文](validation/t017-baseline-review.md) / [English](validation/t017-baseline-review_EN.md)；DeepSeek 主审：[中文](validation/t017-deepseek-baseline-review.md) / [English](validation/t017-deepseek-baseline-review_EN.md)。
 - [ ] T018 [Plan:P1.6] 建立 `examples/{whois-shadow,go-minimal}/` 与 `docs/validation/s1-exit.md`；只读固定输入比较结果/失败分类，汇总全部 AT 和剩余风险；依赖：T017 及 whois 输入授权；验收：AT-15、RFC §14 S1 全部 exit；禁止：切换 whois 生产流程或“部分通过”冒充 S1 完成。
 
 ### P1.7 产品闭环与生命周期（在 P1.6 发布验收前执行）

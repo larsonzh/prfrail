@@ -43,7 +43,7 @@ These remain acceptance targets, not current copy-and-run instructions. T024 now
 ## 5. Pre-Release Installation Gates
 
 - Native Windows 11 amd64 install, first run, upgrade, rollback, and uninstall pass. Linux claims match the current support matrix only.
-- Artifacts support offline checksum, signature, SBOM, license, and exact-version verification. Unknown or stale revocation information never displays fully verified.
+- Artifacts support offline SHA256SUMS, SBOM, license, and exact-version verification; this evidence does not authenticate the publisher. If signing/attestation is added later, unknown or stale revocation information never displays fully verified.
 - A clean user machine runs ProofRail without Go. External tools required by project tasks are listed and never automatically installed.
 - Installation neither modifies target source/Git nor removes SessionBridge/user toolchains, and secrets never enter configuration, logs, or backups.
 - State/store backup covers the complete reference closure and has been restored into a new directory.
@@ -51,4 +51,4 @@ These remain acceptance targets, not current copy-and-run instructions. T024 now
 
 ## 6. Documentation Completion
 
-T016 has frozen CLI, configuration, and current source-run behavior; T024 has frozen library-level backup, pre-upgrade blocking, retirement, and data-retention rules. T017 still needs to supply candidate artifacts, CI, signing, and the release support matrix. Until T017 completes, this remains a plan and [Operations](OPERATIONS_EN.md) continues to distinguish executable behavior from future design.
+T016 has frozen CLI, configuration, and current source-run behavior; T024 has frozen library-level backup, pre-upgrade blocking, retirement, and data-retention rules. T017 now implements candidate CI artifacts plus fixed-commit, SHA256SUMS, SBOM, and license gates, and awaits its first dual-platform GitHub CI run. Signing/attestation is a later enhancement. Until T017 completes, this remains a plan and [Operations](OPERATIONS_EN.md) continues to distinguish executable behavior from future design.

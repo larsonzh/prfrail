@@ -31,7 +31,7 @@
 | SEC-05 拒绝服务 | 磁盘满、无限输出、挂起子树、重试风暴 | 配额预检+运行检测、进程树停机、统一预算；guard/gates/tickets | AT-03/06/07 |
 | SEC-06 权限提升 | 提示注入批准自己、shell 参数注入、生成校验器自批 | 数据不提升为指令、argv、权限分离、模板约束；taskdef/gates/repair | AT-05/06/11 |
 | SEC-07 复合风险 | 人工/AI 并发写、过期交接自动通过 | 单写租约、停机证明、归还完整复检；chain/guard | AT-09 |
-| SEC-08 供应链 | 候选覆盖 seed、候选自证发布、校验和来源被冒充 | 两代隔离、固定 commit、GitHub CI、外部 oracle、SHA256SUMS/SBOM/许可清单与人工批准；release/harness | AT-13/14 |
+| SEC-08 供应链 | 候选覆盖 seed/verifier、候选自证发布、同 runner 后台进程篡改、CI Action 漂移、校验和来源被冒充 | candidate probe 与可信核验使用独立 runner、独立较早 verifier commit、固定 candidate/bootstrap commit、Action 完整 SHA、GitHub CI、外部 oracle、SHA256SUMS/SBOM/许可清单与人工批准；release/harness | AT-13/14 |
 | SEC-09 权限提升/泄露 | 预览执行恶意 hook、导出别名覆盖源树或泄漏秘密 | 静态预览零执行，新目标实际路径检查/完整性与外发扫描；taskdef/snapshot | AT-16/17 |
 | SEC-10 冒充/副作用 | 撤销后仍投递、过期授权发布、上传被误称可回滚 | 每次副作用重新授权、在途停机证据、默认禁外部写；chain/guard/gates | AT-18/19 |
 | SEC-11 拒绝服务/抵赖 | 超时退款假设、跨 run 绕过预算、重复结算 | 持久预留、未知占用、共享锁与结算去重；tickets/adapters | AT-20 |
@@ -43,7 +43,7 @@
 
 密码/token/MFA/私钥口令不经模型、不写配置/日志；secret-direct 只允许用户直达受控终端或凭据提供方，无能力则等待。只记录命令元数据、文件摘要和经脱敏结论；默认不录屏、不记录键击和完整 REPL 历史。秘密扫描无法保证识别所有秘密，需路径排除、白名单最小输入和人工审查共同防御。
 
-网络默认拒绝，例外授权须列 host/port/purpose、提供方数据策略及期限。无法强制限制的 runner 拒绝相应策略。第三方依赖锁版本、来源、许可证和摘要；禁止运行时自动安装未知插件。
+网络默认拒绝，例外授权须列 host/port/purpose、提供方数据策略及期限。无法强制限制的 runner 拒绝相应策略。发布出的 ProofRail CLI 与核心运行时不直接访问 GitHub、GitHub API、raw content、包 registry 或其他公网发布站点；发布核验只消费本地 artifact、manifest、SBOM 和许可文件。GitHub Actions 的 checkout、依赖下载和 artifact 上传属于 CI 控制面，不扩大产品运行时网络权限。第三方依赖锁版本、来源、许可证和摘要；禁止运行时自动安装未知插件。
 
 审计证据默认遵循 RFC 保留策略，清理只针对无引用且过期对象；审计锁定永不自动清除。外发前扫描失败阻断；发现泄漏应暂停、隔离受影响产物并通知操作者撤销凭据，不在诊断中再回显秘密。
 

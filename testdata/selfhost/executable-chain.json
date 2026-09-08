@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "1.0.0",
+  "chain": {
+    "id": "selfhost-reject",
+    "profile": "minimal"
+  },
+  "tasks": [
+    {
+      "id": "selfhost-task",
+      "review": "manual",
+      "steps": [
+        {
+          "id": "build-candidate",
+          "kind": "build",
+          "hooks": ["go-build"]
+        }
+      ]
+    }
+  ],
+  "workspace": {
+    "components": [
+      {
+        "id": "proofrail",
+        "root": ".",
+        "languageScopes": [
+          {
+            "id": "go-main",
+            "language": "go",
+            "harness": "go-standard",
+            "toolchain": "go-122",
+            "targets": ["source"]
+          }
+        ]
+      }
+    ]
+  }
+}

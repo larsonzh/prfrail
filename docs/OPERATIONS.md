@@ -23,7 +23,7 @@ go run ./cmd/prfrail run --chain .\proofrail.chain.json --run-id run-demo
 go run ./cmd/prfrail report --run-dir .\tmp\prfrail-runs\run-demo
 ```
 
-核心包已有自动化测试，但完整产品 E2E/TUI 仍在后续切片。当前 CLI 输出默认无 ANSI 颜色并支持 `--json`；开发环境 gopls 与核心运行无关。系统/Git 代理不保证 Go 使用代理；安装 Go 工具需要进程 HTTP_PROXY/HTTPS_PROXY，使用后恢复原环境，不随意全局改 GOPROXY 或关闭校验。
+核心包已有自动化测试，但完整产品 E2E/TUI 仍在后续切片。当前 CLI 输出默认无 ANSI 颜色并支持 `--json`；开发环境 gopls 与核心运行无关。ProofRail 发布二进制不直接访问 GitHub、Go/npm registry 或其他公网 URL，发布证据核验只读本地文件；依赖下载和 GitHub Actions 网络仅属于开发/CI。系统/Git 代理不保证 Go 使用代理；安装 Go 工具需要进程 HTTP_PROXY/HTTPS_PROXY，使用后恢复原环境，不随意全局改 GOPROXY 或关闭校验。
 
 ## 2. 安装与首次使用设计
 

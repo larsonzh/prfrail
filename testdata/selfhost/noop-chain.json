@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "1.0.0",
+  "chain": {
+    "id": "selfhost-noop",
+    "profile": "minimal"
+  },
+  "tasks": [
+    {
+      "id": "selfhost-task",
+      "review": "manual",
+      "steps": [
+        {
+          "id": "record-noop",
+          "kind": "noop",
+          "reason": "Deterministic self-host acceptance fixture"
+        }
+      ]
+    }
+  ],
+  "workspace": {
+    "components": [
+      {
+        "id": "proofrail",
+        "root": ".",
+        "languageScopes": [
+          {
+            "id": "go-main",
+            "language": "go",
+            "harness": "go-standard",
+            "toolchain": "go-122",
+            "targets": ["source"]
+          }
+        ]
+      }
+    ]
+  }
+}
