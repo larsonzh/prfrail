@@ -136,10 +136,32 @@ func resolvePathForCompare(path string) (string, error) {
 		return "", err
 	}
 	clean := filepath.Clean(abs)
-	if resolved, err := filepath.EvalSymlinks(clean); err == nil {
-		clean = resolved
+	resolved, err := resolveExistingPathPrefix(clean)
+	if err != nil {
+		return "", err
 	}
-	return clean, nil
+	return resolved, nil
+}
+
+func resolveExistingPathPrefix(path string) (string, error) {
+	current := path
+	missing := make([]string, 0)
+	for {
+		resolved, err := filepath.EvalSymlinks(current)
+		if err == nil {
+			parts := append([]string{resolved}, missing...)
+			return filepath.Join(parts...), nil
+		}
+		if !os.IsNotExist(err) {
+			return "", err
+		}
+		parent := filepath.Dir(current)
+		if parent == current {
+			return "", err
+		}
+		missing = append([]string{filepath.Base(current)}, missing...)
+		current = parent
+	}
 }
 
 func ensureDestinationAbsent(destinationPath string) error {

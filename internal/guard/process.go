@@ -171,13 +171,25 @@ func StopProcessIdentity(ctx context.Context, identity ProcessIdentity, grace ti
 	}
 	actions, stopErr := platformStopIdentity(identity, grace)
 	if stopErr == nil {
-		stopErr = waitIdentityGone(ctx, identity)
+		waitCtx, cancel := boundedTerminationContext(ctx, grace)
+		stopErr = waitIdentityGone(waitCtx, identity)
+		cancel()
 	}
 	proof, proofErr := buildTerminationEvidence(identity, requested, actions, stopErr)
 	if proofErr != nil {
 		return proof, proofErr
 	}
 	return proof, nil
+}
+
+func boundedTerminationContext(ctx context.Context, grace time.Duration) (context.Context, context.CancelFunc) {
+	if _, hasDeadline := ctx.Deadline(); hasDeadline {
+		return context.WithCancel(ctx)
+	}
+	if grace <= 0 {
+		grace = time.Second
+	}
+	return context.WithTimeout(ctx, grace)
 }
 
 func (process *ManagedProcess) Terminate(ctx context.Context, grace time.Duration) (TerminationEvidence, error) {

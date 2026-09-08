@@ -2,6 +2,7 @@ package guard
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -75,17 +76,27 @@ func TestStopProcessIdentityStopsRunningProcess(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	waitDone := make(chan error, 1)
+	go func() {
+		_, waitErr := managed.cmd.Process.Wait()
+		waitDone <- waitErr
+	}()
 	defer func() {
 		_ = managed.cmd.Process.Kill()
-		_, _ = managed.cmd.Process.Wait()
 		managed.platform.close()
 	}()
 
-	proof, err := StopProcessIdentity(context.Background(), managed.Identity(), 100*time.Millisecond)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	proof, err := StopProcessIdentity(ctx, managed.Identity(), 100*time.Millisecond)
 	if err != nil {
 		t.Fatalf("stop identity failed: %v (%+v)", err, proof)
 	}
-	_, _ = managed.cmd.Process.Wait()
+	waitErr := <-waitDone
+	var exitErr *exec.ExitError
+	if waitErr != nil && !errors.As(waitErr, &exitErr) {
+		t.Fatalf("wait stopped process: %v", waitErr)
+	}
 	if proof.Outcome != "stopped" || !evidence.ValidHash(proof.Hash) {
 		t.Fatalf("invalid stop proof: %+v", proof)
 	}

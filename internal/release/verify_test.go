@@ -4,9 +4,10 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
-	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"runtime"
 	"testing"
 	"time"
 )
@@ -119,7 +120,13 @@ func TestVerifyReleaseBundleRejectsSBOMLicenseMismatch(t *testing.T) {
 func TestGenerateBundleMetadataRequiresApprovedLicenses(t *testing.T) {
 	root := t.TempDir()
 	binaryPath := filepath.Join(root, "release.test")
-	copyFile(t, binaryPath, executablePath(t))
+	if runtime.GOOS == "windows" {
+		binaryPath += ".exe"
+	}
+	command := exec.Command("go", "build", "-o", binaryPath, "../../cmd/prfrail")
+	if output, err := command.CombinedOutput(); err != nil {
+		t.Fatalf("build release fixture: %v\n%s", err, output)
+	}
 	policyPath := filepath.Join(root, "policy.json")
 	writeFile(t, policyPath, []byte(`{"schemaVersion":"1.0.0","modules":[{"path":"github.com/larsonzh/prfrail","license":"MIT"},{"path":"golang.org/x/text","license":"BSD-3-Clause"},{"path":"gopkg.in/yaml.v3","license":"MIT"}]}`))
 	commit := "0123456789abcdef0123456789abcdef01234567"
@@ -127,7 +134,7 @@ func TestGenerateBundleMetadataRequiresApprovedLicenses(t *testing.T) {
 	err := GenerateBundleMetadata(GeneratePlan{
 		SourceCommit:      commit,
 		ArtifactRoot:      root,
-		BinaryPath:        "release.test",
+		BinaryPath:        filepath.Base(binaryPath),
 		LicensePolicyPath: policyPath,
 		GeneratedAt:       time.Date(2026, 9, 8, 12, 0, 0, 0, time.UTC),
 	})
@@ -148,7 +155,7 @@ func TestGenerateBundleMetadataRequiresApprovedLicenses(t *testing.T) {
 	if err := GenerateBundleMetadata(GeneratePlan{
 		SourceCommit:      commit,
 		ArtifactRoot:      root,
-		BinaryPath:        "release.test",
+		BinaryPath:        filepath.Base(binaryPath),
 		LicensePolicyPath: policyPath,
 		GeneratedAt:       time.Date(2026, 9, 8, 12, 0, 0, 0, time.UTC),
 	}); err == nil {
@@ -222,35 +229,6 @@ func writeFile(t *testing.T, path string, data []byte) {
 		t.Fatal(err)
 	}
 	if err := os.WriteFile(path, data, 0644); err != nil {
-		t.Fatal(err)
-	}
-}
-
-func executablePath(t *testing.T) string {
-	t.Helper()
-	path, err := os.Executable()
-	if err != nil {
-		t.Fatal(err)
-	}
-	return path
-}
-
-func copyFile(t *testing.T, destination, source string) {
-	t.Helper()
-	input, err := os.Open(source)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer input.Close()
-	output, err := os.Create(destination)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if _, err := io.Copy(output, input); err != nil {
-		output.Close()
-		t.Fatal(err)
-	}
-	if err := output.Close(); err != nil {
 		t.Fatal(err)
 	}
 }

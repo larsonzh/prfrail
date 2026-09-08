@@ -25,14 +25,14 @@ func TestProbeCandidateAcceptsCompleteCLIResponses(t *testing.T) {
 
 	noopPath := filepath.Join(root, "noop.json")
 	executablePath := filepath.Join(root, "executable.json")
-	outputPath := filepath.Join(root, "candidate", "actual.json")
+	outputPath := filepath.Join(root, "candidate-output", "actual.json")
 	writeFile(t, noopPath, []byte("{}"))
 	writeFile(t, executablePath, []byte("{}"))
 	if err := ProbeCandidate(context.Background(), CandidateProbePlan{
 		BinaryPath:          binaryPath,
 		NoopChainPath:       noopPath,
 		ExecutableChainPath: executablePath,
-		WorkRoot:            filepath.Join(root, "candidate", "work"),
+		WorkRoot:            filepath.Join(root, "candidate-output", "work"),
 		OutputPath:          outputPath,
 		ExpectedVersion:     "candidate-test",
 	}); err != nil {
