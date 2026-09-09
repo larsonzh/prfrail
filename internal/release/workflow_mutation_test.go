@@ -170,7 +170,7 @@ func TestWorkflowStructureMutationsAreRejected(t *testing.T) {
 func TestWorkflowYAMLMutationsAreRejected(t *testing.T) {
 	data, _ := workflowFixture(t)
 	source := string(data)
-	const setupAction = "        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5\n"
+	const setupAction = "        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0\n"
 	mutations := map[string]string{
 		"missing-fail-fast":          strings.ReplaceAll(source, "      fail-fast: false\n", ""),
 		"empty-run-with-action":      strings.Replace(source, setupAction, setupAction+"        run: ''\n", 1),

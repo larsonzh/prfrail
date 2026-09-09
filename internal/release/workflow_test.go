@@ -302,17 +302,17 @@ func validateWorkflowScripts(workflow workflowDocument) error {
 
 func validateWorkflowActions(workflow workflowDocument) error {
 	expectedActions := map[string]string{
-		"Checkout source":                     "actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
-		"Checkout candidate":                  "actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
-		"Checkout trusted verifier":           "actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
-		"Checkout fixed bootstrap seed":       "actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
-		"Checkout candidate metadata":         "actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
-		"Setup Go":                            "actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff",
-		"Upload immutable candidate binary":   "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
-		"Download immutable candidate binary": "actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
-		"Upload untrusted probe oracle":       "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
-		"Download untrusted probe oracle":     "actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
-		"Upload verified CI artifact":         "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+		"Checkout source":                     "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+		"Checkout candidate":                  "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+		"Checkout trusted verifier":           "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+		"Checkout fixed bootstrap seed":       "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+		"Checkout candidate metadata":         "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+		"Setup Go":                            "actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e",
+		"Upload immutable candidate binary":   "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+		"Download immutable candidate binary": "actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c",
+		"Upload untrusted probe oracle":       "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+		"Download untrusted probe oracle":     "actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c",
+		"Upload verified CI artifact":         "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
 	}
 	expectedParameters := map[string]map[string]any{
 		"test/Checkout source": {"persist-credentials": false},
@@ -329,7 +329,7 @@ func validateWorkflowActions(workflow workflowDocument) error {
 		},
 		"candidate-probe/Setup Go": {"go-version": "${{ env.GO_VERSION }}", "cache": false},
 		"candidate-probe/Download immutable candidate binary": {
-			"name": "candidate-binary-${{ runner.os }}-${{ inputs.candidate_commit }}", "path": "generations/candidate/release",
+			"name": "candidate-binary-${{ runner.os }}-${{ inputs.candidate_commit }}", "path": "generations/candidate/release", "digest-mismatch": "error",
 		},
 		"candidate-probe/Upload untrusted probe oracle": {
 			"name": "candidate-oracle-${{ runner.os }}-${{ inputs.candidate_commit }}", "path": "generations/candidate/actual.json", "if-no-files-found": "error",
@@ -345,10 +345,10 @@ func validateWorkflowActions(workflow workflowDocument) error {
 		},
 		"selfhost/Setup Go": {"go-version": "${{ env.GO_VERSION }}", "cache": false},
 		"selfhost/Download immutable candidate binary": {
-			"name": "candidate-binary-${{ runner.os }}-${{ inputs.candidate_commit }}", "path": "generations/candidate/release",
+			"name": "candidate-binary-${{ runner.os }}-${{ inputs.candidate_commit }}", "path": "generations/candidate/release", "digest-mismatch": "error",
 		},
 		"selfhost/Download untrusted probe oracle": {
-			"name": "candidate-oracle-${{ runner.os }}-${{ inputs.candidate_commit }}", "path": "generations/candidate",
+			"name": "candidate-oracle-${{ runner.os }}-${{ inputs.candidate_commit }}", "path": "generations/candidate", "digest-mismatch": "error",
 		},
 		"selfhost/Upload verified CI artifact": {
 			"name": "prfrail-${{ runner.os }}-${{ inputs.candidate_commit }}", "path": "generations/candidate/release/*", "if-no-files-found": "error",
@@ -406,9 +406,9 @@ func TestWorkflowActionMutationsAreRejected(t *testing.T) {
 		},
 		"role-swap": func(step *workflowStep) {
 			if strings.HasPrefix(step.Uses, "actions/checkout@") {
-				step.Uses = "actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff"
+				step.Uses = "actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e"
 			} else {
-				step.Uses = "actions/checkout@11d5960a326750d5838078e36cf38b85af677262"
+				step.Uses = "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1"
 			}
 		},
 		"unnamed-action":        func(step *workflowStep) { step.Name = "" },
