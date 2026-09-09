@@ -2,15 +2,15 @@
 
 [中文](s1-exit.md)
 
-Date: 2026-09-09. Verdict: `BLOCKED`. T018 has started, and both the frozen read-only whois comparison and the minimal non-C Go loop required by AT-15 pass. The formal install-package tutorial, runnable generic/C user examples, install/upgrade/rollback/uninstall exercises, and final product-owner S1 approval remain incomplete, so partial success must not be reported as S1 completion.
+Date: 2026-09-09. Verdict: `BLOCKED`. T018 passes the frozen read-only whois comparison and minimal generic/C/Go loops required by AT-15, and a candidate lifecycle drill for trusted Windows artifacts also passes. The product owner approved manual portable-ZIP extraction without PATH modification, with bilingual installation, support-matrix, and release-note drafts now present. The final ZIP is not yet bound and rerun, the EOL notification channel remains open, and the product owner has not approved final S1 exit, so partial success must not be reported as S1 completion.
 
 ## AT-15 Evidence
 
 1. This session received read-only authorization limited to non-secret, redacted fixtures under `D:\LZProjects\whois\testdata\`. No active start files, logs, `out/`, or `release/` content was read; whois was neither modified nor executed.
 2. `examples/whois-shadow/` exports nine fixed cases from `testdata/cidr_matrix_cases_draft.tsv`. Source SHA-256 is `8a6abecb0178a970677b84b3e5403ce8830f281e1a197d792ae54089b3e9efb0`; the source has 1,981 bytes, 10 lines, and zero secret-marker matches.
 3. A stdlib-only comparator aligns cases by ID and compares input, result, and failure classification. All 9/9 positive cases pass; separate input, result, and failure-classification mutations fail closed.
-4. `examples/go-minimal/` declares a standalone `go-standard` language scope. Its CLI `validate → preview → run → report` loop writes only to a temporary run directory, reaches `COMPLETED`, makes zero command/network/model/credential/version-probe calls, and leaves the config bytes unchanged.
-5. Boundary: the whois evidence is an offline projection of an authorized frozen fixture, not a live query, production execution, or cutover. The Go example exercises the current noop-only CLI and does not claim executable-hook support.
+4. `examples/{generic-minimal,c-minimal,go-minimal}/` declare `generic-standard`, `c-standard`, and `go-standard` language scopes. All three CLI `validate → preview → run → report` loops write only to temporary run directories, reach `COMPLETED`, make zero command/network/model/credential/version-probe calls, and leave config bytes unchanged.
+5. Boundary: the whois evidence is an offline projection of an authorized frozen fixture, not a live query, production execution, or cutover. The language examples exercise the current noop-only CLI and do not claim executable-hook or compiler execution.
 
 ## AT-01–AT-21 Summary
 
@@ -30,7 +30,7 @@ Date: 2026-09-09. Verdict: `BLOCKED`. T018 has started, and both the frozen read
 | AT-12 | PASS | [T016 CLI](t016-cli-console_EN.md) |
 | AT-13 | PASS | [T017 self-host](s1-selfhost_EN.md), including Node 24 run `34325758548` |
 | AT-14 | PASS | [T017 self-host](s1-selfhost_EN.md), eight Windows/Linux jobs and six artifacts |
-| AT-15 | PASS | `examples/whois-shadow/`, `examples/go-minimal/`, and focused checks in this report |
+| AT-15 | PASS | `examples/whois-shadow/`, all three `*-minimal` language examples, and focused checks in this report |
 | AT-16 | PASS | [T019 preview](t019-preview_EN.md) |
 | AT-17 | PASS | [T020 export](t020-export_EN.md) |
 | AT-18 | PASS | [T021 approvals](t021-approvals_EN.md) |
@@ -47,16 +47,16 @@ These PASS verdicts cover the existing deterministic AT evidence; they do not au
 | Core task chain and fail-closed scenarios | PASS | AT-01–AT-14 and AT-16–AT-21 reports |
 | Seed self-host and real platforms | PASS | T017 Windows/Linux trust matrix and native Windows two-generation drill |
 | Read-only whois shadow | PASS | 9/9 fixed cases and three drift counterexamples; no production cutover |
-| generic/C/Go harnesses | PARTIAL | Harness definitions and a Go user example exist; runnable generic/C user examples do not |
-| Formal install-package tutorial | BLOCKED | `INSTALLATION_PLAN_EN.md` remains explicitly a plan; no formal release package exists |
-| Install/upgrade/rollback/uninstall exercises | BLOCKED | T024 provides library-level lifecycle behavior but no exercised installer entry point |
-| Support matrix and release notes | PARTIAL | Platform/version policy is frozen but no final documents are bound to a formal release |
+| generic/C/Go harnesses | PASS | All three harness definitions and minimal user examples pass the read-only CLI loop |
+| Formal install-package tutorial | PARTIAL | The [portable ZIP installation guide](../INSTALLATION_EN.md) and model are frozen; the final ZIP is not yet bound and rerun |
+| Install/upgrade/rollback/uninstall exercises | PARTIAL | The [Windows candidate portable-package drill](s1-install-drill_EN.md) passes; the final carrier still requires rerun |
+| Support matrix and release notes | PARTIAL | The [candidate support matrix](../S1_SUPPORT_MATRIX_EN.md) and [release-note draft](../S1_RELEASE_NOTES_EN.md) exist but are not bound to a formal release |
 | Independent review | PASS | Both T017 baseline and Node 24 replacement received Codex/DeepSeek reviews |
 | Final product-owner S1 approval | BLOCKED | This session's fixture-read authorization is not release or stage approval |
 
 ## Residual Risks and Next Steps
 
-1. The release carrier, install location, and PATH policy remain open; do not invent install commands or publish an unauthorized artifact.
-2. The final artifact requires native Windows install, first-run, upgrade, rollback, and uninstall exercises. Linux remains core CI only and is not S1 production support.
-3. Runnable generic/C user examples must use isolated temporary directories and prove source-tree immutability. Executable CLI steps currently fail closed.
-4. After those artifacts and the final support matrix/release notes exist, the product owner must explicitly approve S1 exit. Until then, T018 and S1 remain incomplete.
+1. The manually extracted portable-ZIP model, user-selected independent directory, explicit-path invocation, and no-PATH policy are frozen. The formal ZIP filename, download entry point, and EOL notification channel still require release approval.
+2. Windows candidate artifacts now pass first-run, upgrade, rollback, and evidence-preserving uninstall; the final carrier must rerun the drill. Linux remains core CI only and is not S1 production support.
+3. The generic/C/Go examples prove language scopes and noop orchestration only. Executable CLI steps currently fail closed.
+4. After rerunning the tutorial against the final ZIP and binding the support matrix/release notes, the product owner must explicitly approve S1 exit. Until then, T018 and S1 remain incomplete.

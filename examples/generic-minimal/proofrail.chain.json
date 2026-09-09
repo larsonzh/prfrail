@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "1.0.0",
+  "chain": {
+    "id": "generic-minimal",
+    "profile": "minimal"
+  },
+  "tasks": [
+    {
+      "id": "verify-generic-scope",
+      "review": "manual",
+      "steps": [
+        {
+          "id": "record-generic-scope",
+          "kind": "noop",
+          "reason": "Deterministic generic harness acceptance fixture"
+        }
+      ]
+    }
+  ],
+  "workspace": {
+    "components": [
+      {
+        "id": "generic-example",
+        "root": ".",
+        "languageScopes": [
+          {
+            "id": "generic-main",
+            "language": "generic",
+            "harness": "generic-standard",
+            "toolchain": "shell-basic",
+            "targets": ["source"]
+          }
+        ]
+      }
+    ]
+  }
+}

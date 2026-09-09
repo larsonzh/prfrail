@@ -139,12 +139,22 @@ func TestRunAndReportNoopChain(t *testing.T) {
 	}
 }
 
-func TestGoMinimalExampleCompletesReadOnlyCLILoop(t *testing.T) {
+func TestLanguageExamplesCompleteReadOnlyCLILoop(t *testing.T) {
 	repositoryRoot, err := filepath.Abs(filepath.Join("..", ".."))
 	if err != nil {
 		t.Fatal(err)
 	}
-	chainPath := filepath.Join(repositoryRoot, "examples", "go-minimal", "proofrail.chain.json")
+
+	for _, example := range []string{"generic-minimal", "c-minimal", "go-minimal"} {
+		t.Run(example, func(t *testing.T) {
+			testLanguageExampleCLILoop(t, repositoryRoot, example)
+		})
+	}
+}
+
+func testLanguageExampleCLILoop(t *testing.T, repositoryRoot, example string) {
+	t.Helper()
+	chainPath := filepath.Join(repositoryRoot, "examples", example, "proofrail.chain.json")
 	before, err := os.ReadFile(chainPath)
 	if err != nil {
 		t.Fatal(err)
@@ -180,7 +190,8 @@ func TestGoMinimalExampleCompletesReadOnlyCLILoop(t *testing.T) {
 	}
 
 	runDir := filepath.Join(root, "go-minimal-run")
-	code, stdout, stderr = runCLI(t, cli, "run", "--chain", chainPath, "--run-id", "go-minimal-test", "--run-dir", runDir, "--json")
+	runID := example + "-test"
+	code, stdout, stderr = runCLI(t, cli, "run", "--chain", chainPath, "--run-id", runID, "--run-dir", runDir, "--json")
 	if code != 0 {
 		t.Fatalf("run code=%d stdout=%s stderr=%s", code, stdout, stderr)
 	}
@@ -200,7 +211,7 @@ func TestGoMinimalExampleCompletesReadOnlyCLILoop(t *testing.T) {
 	if err := json.Unmarshal(decodeResponse(t, stdout).Data, &reportSummary); err != nil {
 		t.Fatal(err)
 	}
-	if reportSummary.ChainState != "COMPLETED" || reportSummary.RunID != "go-minimal-test" {
+	if reportSummary.ChainState != "COMPLETED" || reportSummary.RunID != runID {
 		t.Fatalf("unexpected report summary: %+v", reportSummary)
 	}
 
@@ -209,7 +220,7 @@ func TestGoMinimalExampleCompletesReadOnlyCLILoop(t *testing.T) {
 		t.Fatal(err)
 	}
 	if !bytes.Equal(before, after) {
-		t.Fatal("Go minimal example was modified")
+		t.Fatalf("%s example was modified", example)
 	}
 }
 

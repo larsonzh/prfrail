@@ -14,6 +14,7 @@ Date: 2026-09-06. Distinguish RFC-decided, proposed and experimental decisions. 
 | ADR-006 | Windows 11 amd64 production, Linux amd64 core CI, pure-Go release, pinned tooling/dependencies, and S1 commit+CI+SHA256SUMS+SBOM/license evidence | RFC 16.2 mentions Win10 unlike 9.6/14; no S1 offline key system, with signing/attestation deferred | Owner simplified policy 2026-09-08; T017 supplies baseline release evidence |
 | ADR-007 | Minimal context, offline first, task budgets, bilingual IDs | Avoid costly repeated whole-repository reviews; English is not a second authority | Owner approved 2026-09-06; zero new paid S0 calls, separate authorization for increases |
 | ADR-008 | RFC section 19 six minimum product flows in S1; local modules, no commercial backend | Reject engine-only delivery, implicit source/deployment writes or silent updates; explicitly review added cost | Owner approved scope 2026-09-06; T002 froze records, T003 added goldens and T019–T024 run checks; no S1 coding authorization |
+| ADR-009 | S1 Windows amd64 uses a manually extracted portable ZIP in a user-selected independent directory, invoked by full `prfrail.exe` path without modifying PATH, the registry, or system directories | Reject installers, package managers, automatic updates, and implicit version switching; minimize installation side effects and support directory-level coexistence/rollback | Product owner explicitly approved 2026-09-09; bind and rerun the final ZIP before release |
 
 ## 1. Release and Dependencies
 
@@ -61,6 +62,7 @@ Status: `APPROVED_FOR_S0_SPEC_FREEZE`. On 2026-09-06, the product owner (current
 | Security review | Designate a reviewer who did not produce the candidate; disclose insufficient independence if one person holds both roles | Reviewer not yet designated; gate 17.3 stays NOT_READY | Principle approved 2026-09-06; actor/conclusion pending |
 | Platform/support | Windows 11 amd64 production; Linux amd64 core CI; current/previous minor with a 90-day previous-minor window | Freeze EOL notice and exceptions before first release | Owner approved 2026-09-06 |
 | Release trust | S1 uses fixed commit SHA, GitHub CI, SHA256SUMS, SBOM and license manifest; no offline key system | Never describe SHA256SUMS as identity authentication; signing/attestation is a later enhancement | Owner approved simplified policy 2026-09-08 |
+| Installation model | Manually extract the Windows amd64 portable ZIP into a user-selected independent directory; invoke by explicit path without changing PATH, registry, or system directories | The final ZIP still requires release-record binding and rerun; no publication authorization | Owner approved 2026-09-09 |
 | whois shadow | In principle, later use fixed redacted read-only fixtures | Each run still requires input path/redaction/window authorization; no current asset access | Owner approved principle 2026-09-06 |
 | Dependency licenses | Prefer standard library; review each TOML/Schema/canonical/TUI candidate for license, minimum Go and maintenance | T002 records name/version/source/license/hash/date before adoption | Owner approved policy 2026-09-06 |
 

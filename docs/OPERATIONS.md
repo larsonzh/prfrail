@@ -2,7 +2,7 @@
 
 [English](OPERATIONS_EN.md)
 
-日期：2026-09-08；S1 操作设计稿。当前没有 ProofRail 正式安装包；T016/T019/T020/T023 已交付 CLI 与交付底座：`version/init/validate/config explain/preview/cost report/run/report` 和库级导出模块（`internal/snapshot/export.go`、`internal/evidence/delivery.go`）。`preview` 为离线只读静态预览，不执行命令/网络/模型/凭据读取；`run` 目前只支持 noop-only 任务链，遇到 `code/build/verify` 会 fail-close 并返回非零退出码。除以下“当前可执行”外，其余产品能力仍是 RFC 规划接口。待决发行方案见 [安装部署规划](INSTALLATION_PLAN.md)，完整用户流程见 [业务流程](BUSINESS_WORKFLOWS.md)。
+日期：2026-09-09；S1 操作设计稿。当前没有 ProofRail 正式发行包；手工解压 Windows amd64 便携 ZIP、显式路径运行且不修改 PATH 的 S1 安装模型已获批，候选步骤见 [安装指南](INSTALLATION.md)。T016/T019/T020/T023 已交付 CLI 与交付底座：`version/init/validate/config explain/preview/cost report/run/report` 和库级导出模块（`internal/snapshot/export.go`、`internal/evidence/delivery.go`）。`preview` 为离线只读静态预览，不执行命令/网络/模型/凭据读取；`run` 目前只支持 noop-only 任务链，遇到 `code/build/verify` 会 fail-close 并返回非零退出码。其余产品能力仍是 RFC 规划接口。待决发行绑定见 [安装部署规划](INSTALLATION_PLAN.md)，完整用户流程见 [业务流程](BUSINESS_WORKFLOWS.md)。
 
 ## 1. 当前可执行
 
@@ -25,9 +25,9 @@ go run ./cmd/prfrail report --run-dir .\tmp\prfrail-runs\run-demo
 
 核心包已有自动化测试，但完整产品 E2E/TUI 仍在后续切片。当前 CLI 输出默认无 ANSI 颜色并支持 `--json`；开发环境 gopls 与核心运行无关。ProofRail 发布二进制不直接访问 GitHub、Go/npm registry 或其他公网 URL，发布证据核验只读本地文件；依赖下载和 GitHub Actions 网络仅属于开发/CI。系统/Git 代理不保证 Go 使用代理；安装 Go 工具需要进程 HTTP_PROXY/HTTPS_PROXY，使用后恢复原环境，不随意全局改 GOPROXY 或关闭校验。
 
-## 2. 安装与首次使用设计
+## 2. 安装与首次使用
 
-未来安装顺序：从受信发布页选择 Windows amd64 发行包→核对固定 commit/GitHub CI 并验证 SHA256SUMS、SBOM 和许可证清单→解压到独立目录→验证 version→静态预览→单独授权能力探测。SHA256SUMS 只证明内容与清单一致，不认证发布者身份；平台不匹配不得执行。Linux 在 S1 仅核心 CI/预览，不宣传正式支持。升级前备份对象、事件和状态引用的完整闭包并只读核验历史 run；不覆盖运行中的 host。
+S1 使用手工解压的 Windows amd64 便携 ZIP：核对固定 commit/GitHub CI 并验证 SHA256SUMS、SBOM 和许可证清单，解压到用户选择的独立版本目录，再以 `prfrail.exe` 完整路径执行 version 和静态预览。不得修改 PATH、注册表或系统目录，不得覆盖运行中的 host。可复制命令和升级/回滚/卸载步骤见 [安装指南](INSTALLATION.md)。SHA256SUMS 只证明内容与清单一致，不认证发布者身份；平台不匹配不得执行。Linux 在 S1 仅核心 CI/预览，不宣传正式支持。
 
 当前可复制流程为 `prfrail init --workspace <path>`、`prfrail validate --chain <chain-file>`、`prfrail config explain --chain <chain-file>`、`prfrail preview --chain <chain-file> [--json]`、`prfrail cost report [--ledger <path>] [--json]`、`prfrail run --chain <chain-file> [--run-id] [--run-dir]`、`prfrail report --run-dir <run-dir>`。`preview` 只读展示 `previewHash`、权限边界、unknown 及零调用计数；`cost report` 本地读取成本账本并输出预留/结算/未知占用，不做默认遥测导出；`run` 当前仅支持 noop-only 链。导出能力已在库级实现，但 CLI `export` 命令仍在后续切片；执行型 step 的真实 gate/adapter 全闭环同样属于后续切片。没有 AI 时先使用文件队列 fixture consumer 完成闭环；VS Code 不是必需依赖。
 

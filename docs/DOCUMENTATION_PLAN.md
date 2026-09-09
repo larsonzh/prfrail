@@ -32,7 +32,7 @@
 | 协议包 | [契约](CONTRACTS.md) / [Contracts](CONTRACTS_EN.md) | Schema、快照/证据、hook、票据/修复、adapter、handoff/docs | wire/行为变化；契约维护者 |
 | 安全 | [安全](SECURITY.md) / [Security](SECURITY_EN.md) | STRIDE、权限矩阵、秘密、审计、供应链 | 新权限/风险；独立安全评审 |
 | 使用与迁移 | [操作](OPERATIONS.md) / [Operations](OPERATIONS_EN.md) | 安装/上手、配置用户手册、操作员/排错、whois 映射、自托管/发布 | CLI/部署变化；实施者/发布维护者 |
-| 安装部署规划 | [安装规划](INSTALLATION_PLAN.md) / [Installation](INSTALLATION_PLAN_EN.md) | 当前可用边界、待决发行方案、升级/卸载门禁 | 发行/目录/签名/支持决策；发布维护者 |
+| 安装与发行 | [安装指南](INSTALLATION.md) / [Installation guide](INSTALLATION_EN.md)；[安装规划](INSTALLATION_PLAN.md) / [Installation plan](INSTALLATION_PLAN_EN.md)；[支持矩阵](S1_SUPPORT_MATRIX.md) / [Support](S1_SUPPORT_MATRIX_EN.md)；[发行说明](S1_RELEASE_NOTES.md) / [Release notes](S1_RELEASE_NOTES_EN.md) | 可执行便携 ZIP 流程、待决发行绑定、升级/卸载门禁、候选支持与限制 | 发行/目录/签名/支持决策；发布维护者 |
 | 测试 | [验证](TEST_STRATEGY.md) / [Testing](TEST_STRATEGY_EN.md) | 21 组 AT、分层、平台、故障注入、证据 | 每项需求/契约变更；测试维护者 |
 | 工程规则 | [规范](CODING_CONVENTIONS.md) / [Conventions](CODING_CONVENTIONS_EN.md) | 编码、Go、Git、低成本模型流程 | 工具/约定变化；维护者 |
 | 实施 | [计划](DEV_PLAN.md) / [Plan](DEV_PLAN_EN.md) | 24 个任务、依赖、范围、需求追踪 | 每次任务/阶段验收；实施负责人 |

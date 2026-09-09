@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "1.0.0",
+  "chain": {
+    "id": "c-minimal",
+    "profile": "minimal"
+  },
+  "tasks": [
+    {
+      "id": "verify-c-scope",
+      "review": "manual",
+      "steps": [
+        {
+          "id": "record-c-scope",
+          "kind": "noop",
+          "reason": "Deterministic C harness acceptance fixture"
+        }
+      ]
+    }
+  ],
+  "workspace": {
+    "components": [
+      {
+        "id": "c-example",
+        "root": ".",
+        "languageScopes": [
+          {
+            "id": "c-main",
+            "language": "c",
+            "harness": "c-standard",
+            "toolchain": "gcc-posix",
+            "targets": ["source"]
+          }
+        ]
+      }
+    ]
+  }
+}
