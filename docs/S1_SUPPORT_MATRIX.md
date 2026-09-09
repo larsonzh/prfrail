@@ -10,13 +10,16 @@
 | Linux amd64 | 核心 CI | 仅构建、测试、候选探针和自托管；不宣称 S1 生产支持 |
 | macOS / Windows on Arm / Linux arm64 | 不支持 | 未进入 S1 验收矩阵 |
 | generic/C/Go harness | 配置与 noop 编排 | language scope、只读 preview 和 noop-only 闭环已验证；executable step 仍 fail-close |
-| VS Code / SessionBridge | 可选适配器 | 不是核心安装依赖，不扩大 ProofRail 权限 |
+| VS Code / Copilot Chat / SessionBridge | 条件必需 | 核心离线 CLI 不要求；AI 会话连接要求 VS Code 1.82+、可用 Copilot Chat 和 SessionBridge 0.1.1，不扩大 ProofRail 权限；当前 executable adapter 产品闭环未交付 |
 
 ## 版本与安全维护候选政策
 
+- 产品版本采用 `vMAJOR.MINOR.PATCH`，首版候选为 `v0.1.0`；patch 发布不启动新的 EOL 倒计时。
 - 当前稳定 minor 与前一个 minor 接收安全修复；前一个 minor 的候选维护窗口为 90 天。
 - 历史未知 run 只读保留，不自动迁移。
-- 首版正式发布前仍须冻结 EOL 通知方式和例外；本页不能替代最终公告。
+- 待审批的 ADR-010 提议：新 minor 发布时在 GitHub Release notes 与本支持矩阵同时公告前一 minor 的 EOL 日期，日期为发布后第 90 个自然日。
+- 90 天是原型期初始窗口；每次 minor 发布前按稳定性、用户量和维护能力评审，仅可延长后续新公告的窗口。
+- 任何偏离须有带日期、理由和到期日的 ADR，经产品所有者明确批准后同步两处，且不得追溯缩短已公告窗口。该提议尚未获批，本页不能替代最终公告。
 
 ## 发行信任边界
 

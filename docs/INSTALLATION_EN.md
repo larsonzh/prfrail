@@ -4,9 +4,47 @@
 
 Date: 2026-09-09. The frozen S1 installation model is a Windows 11 amd64 portable ZIP, manually extracted to an independent user-selected directory and always invoked through an explicit `prfrail.exe` path. It does not modify `PATH`, the registry, or system directories. No formal GitHub Release exists yet; the commands below apply to a trusted candidate artifact with the same structure as the final carrier and do not claim that the product has been released.
 
-## 1. Download and Offline Verification
+## 1. Environment Requirements and Capability Levels
 
-Download the artifact ZIP named `prfrail-Windows-<full-commit>` from an approved GitHub Actions run and independently check the run, full candidate commit, and supported platform. Replace these three values with the downloaded file, full commit, and an independent directory writable by the current user:
+| Item | Core offline CLI | AI sessions connected to Copilot Chat |
+|---|---|---|
+| OS/architecture | Windows 11 amd64 (x86-64), the only S1 production-support candidate | Same core requirement; VS Code and extensions must run in the same user session |
+| CPU/memory | No discrete GPU requirement; S1 has no performance baseline that supports a fixed minimum CPU or memory commitment yet | Also constrained by VS Code, Copilot Chat, and the target project's toolchain |
+| Disk | A writable install directory plus sufficiently sized, non-overlapping source, run-workspace, state/store, and backup directories | Also requires SessionBridge channel space; evidence and snapshot capacity depends on project size |
+| ProofRail runtime | The portable `prfrail.exe` requires no Go, Python, Node.js, database, Docker, administrator privileges, or system service | Core binary requirements remain unchanged |
+| Host software | Windows PowerShell 5.1+ is needed only for this guide's extraction/verification commands; use a browser or optional GitHub CLI to download | VS Code 1.82+, an authenticated and usable GitHub Copilot Chat installation, and the SessionBridge 0.1.1 extension |
+| Project tools | `validate`/`preview` need no project compiler; real harnesses require their declared compilers, interpreters, build tools, and test tools to be preinstalled | Same as the core CLI; ProofRail never installs them silently |
+| Network | GitHub access for download; current `version`/`validate`/`preview` can run offline after download and verification | Copilot Chat model calls require host networking, account/subscription access, and model entitlement |
+
+SessionBridge is not an installation dependency for the core offline CLI, but it is a necessary prerequisite for ProofRail to establish an AI session connection to Copilot Chat through VS Code. To prepare AI mode, install VS Code and GitHub Copilot Chat and sign in, install the SessionBridge `0.1.1` extension from [GitHub Releases](https://github.com/larsonzh/sessbridge/releases), then reload the VS Code window. Installing the extension alone does not make the AI loop available: the Copilot Chat model must be usable, ProofRail and SessionBridge must use the same channel directory and target VS Code instance, and communication must use non-legacy `silent` mode. The executable-step/adapter product loop remains undelivered in the current S1 candidate. At this stage, SessionBridge satisfies only the host-connectivity prerequisite and does not turn the noop-only `run` command into automated AI coding.
+
+The current release candidate has no graphical window or complete TUI. `prfrail.exe` provides line-oriented CLI text in a normal terminal, ANSI-free by default, plus `--json` for automation; it runs in Windows Terminal, PowerShell, or the VS Code integrated terminal. Bubble Tea v1.3.4 was exercised only as an isolated feasibility prototype and is not linked into the current binary. S1 therefore prioritizes one terminal, short commands, and copyable paths for quick learning instead of presenting a prototype interface as delivered functionality.
+
+## 2. Download and Offline Verification
+
+Select a GitHub Actions run that passed the trust matrix in the [S1 self-host evidence](validation/s1-selfhost_EN.md). The run page `head_sha` is the verifier commit, not the candidate commit. Independently check the report's run ID, verifier commit, candidate commit, and all job conclusions.
+
+The browser path preserves the ZIP: sign in to GitHub, open `https://github.com/larsonzh/prfrail/actions/runs/<run-id>`, and click `prfrail-Windows-<full-candidate-commit>` in the **Artifacts** section at the bottom of the page. The downloaded file is normally named `prfrail-Windows-<full-candidate-commit>.zip`.
+
+With an installed and authenticated GitHub CLI, download it directly as follows. `gh run download` automatically extracts the artifact into `--dir` and does not retain the outer ZIP. After this command, skip the `Expand-Archive` block below and use `$DownloadDir` as `$InstallDir`:
+
+```powershell
+gh auth status
+$Repository = 'larsonzh/prfrail'
+$RunId = '<run-id>'
+$CandidateCommit = '<full-candidate-commit>'
+$Artifact = "prfrail-Windows-$CandidateCommit"
+$DownloadDir = Join-Path '<user-selected-independent-directory>' $CandidateCommit
+
+gh run view $RunId --repo $Repository
+gh run download $RunId --repo $Repository --name $Artifact --dir $DownloadDir
+if ($LASTEXITCODE -ne 0) {
+    throw "Artifact download failed: $Artifact"
+}
+$InstallDir = $DownloadDir
+```
+
+The following path applies after downloading the ZIP through the browser. Replace the three values with the downloaded file, full candidate commit, and an independent directory writable by the current user:
 
 ```powershell
 $Archive = (Resolve-Path '.\prfrail-Windows-<full-commit>.zip').Path
@@ -39,9 +77,34 @@ try {
 }
 ```
 
-The expected directory contains only `prfrail.exe`, `SHA256SUMS`, `sbom.spdx.json`, and `licenses.json`. Checksums prove agreement with the manifest, not publisher identity; independently verify the run and commit from a trusted release record. Never execute a binary for a different platform or commit.
+The expected directory contains only `prfrail.exe`, `SHA256SUMS`, `sbom.spdx.json`, and `licenses.json`. Checksums prove agreement with the manifest, not publisher identity. Independently verify the run/verifier/candidate from a trusted record, and require package `version --json` to bind the same candidate commit. Never execute a binary for a different platform or commit. Actions artifacts may expire and are not a durable formal download location.
 
-## 2. First Run
+## 3. Five-Step Quick Start
+
+This path first verifies the side-effect-free core CLI. It requires no SessionBridge and makes no AI call:
+
+1. Download, extract, and verify the four release files as described above.
+2. Run `init` in an isolated test workspace to create a minimal `proofrail.chain.json`.
+3. Run `validate` to confirm the configuration and current CLI runnability.
+4. Run read-only `preview` and inspect permission boundaries, unknowns, and zero call counters.
+5. Run only the noop-only chain, then inspect it with `report`; do not infer executable/AI-loop availability from this result.
+
+```powershell
+$PrfRail = Join-Path $InstallDir 'prfrail.exe'
+$Workspace = '<empty-test-workspace>'
+$RunRoot = '<separate-run-root>'
+$RunDir = Join-Path $RunRoot 'quickstart'
+
+New-Item -ItemType Directory -Path $Workspace, $RunRoot -Force | Out-Null
+
+& $PrfRail init --workspace $Workspace
+& $PrfRail validate --chain (Join-Path $Workspace 'proofrail.chain.json')
+& $PrfRail preview --chain (Join-Path $Workspace 'proofrail.chain.json')
+& $PrfRail run --chain (Join-Path $Workspace 'proofrail.chain.json') --run-id quickstart --run-dir $RunDir
+& $PrfRail report --run-dir $RunDir
+```
+
+## 4. First-Run Checks
 
 Do not add the install directory to `PATH`. Use the full path in an isolated test workspace:
 
@@ -54,7 +117,7 @@ $PrfRail = Join-Path $InstallDir 'prfrail.exe'
 
 `preview` is offline and read-only. Current `run` supports noop-only chains; executable `code/build/verify` steps fail closed. Keep run directories, state/store, and source explicitly separate.
 
-## 3. Upgrade and Rollback
+## 5. Upgrade and Rollback
 
 1. Stop every ProofRail writer, then create and verify a state/store backup.
 2. Follow section 1 to extract the new ZIP into a new commit directory. Never overwrite the old directory.
@@ -64,7 +127,7 @@ $PrfRail = Join-Path $InstallDir 'prfrail.exe'
 
 There is no automatic update, `current` link, or implicit version switch. The operator explicitly selects the binary path for every switch.
 
-## 4. Uninstall
+## 6. Uninstall
 
 After confirming no ProofRail process is running, remove only the selected version's binary directory. Because installation never changed `PATH`, the registry, or system directories, none of them needs restoration. Evidence, configuration, runs, and stores are retained by default; deleting them requires separate authorization and prior retention/audit review.
 

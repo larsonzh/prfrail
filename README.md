@@ -34,6 +34,8 @@ ProofRail 让 AI 在无人值守下安全地改代码、跑验证、出证据：
 
 ### 快速开始（当前 CLI 基线）
 
+当前界面是 Windows Terminal、PowerShell 或 VS Code 集成终端中的逐行 CLI，不是图形窗口或完整 TUI。发布候选的软硬件要求、下载核验和五步上手见 [Windows 便携 ZIP 安装指南](docs/INSTALLATION.md)。核心离线 CLI 不要求 VS Code；要连接 Copilot Chat，必须另装 VS Code 1.82+、可用 Copilot Chat 与 SessionBridge 0.1.1，但当前 executable adapter 产品闭环仍未交付。
+
 ```text
 prfrail init --workspace .
 prfrail validate --chain ./proofrail.chain.json
@@ -104,6 +106,8 @@ See [docs/BUSINESS_WORKFLOWS_EN.md](docs/BUSINESS_WORKFLOWS_EN.md) for the indep
 Product review adds side-effect-free preview, accepted-result export, revocation, external-effect boundaries, cost reservation/settlement and backup/retirement flows. See [docs/PRODUCT_REQUIREMENTS_EN.md](docs/PRODUCT_REQUIREMENTS_EN.md) section 8. These are unapproved designs, not available features; file rollback cannot guarantee undoing external effects.
 
 ### Quick Start (current CLI baseline)
+
+The current interface is a line-oriented CLI in Windows Terminal, PowerShell, or the VS Code integrated terminal, not a graphical window or complete TUI. See the [Windows portable ZIP installation guide](docs/INSTALLATION_EN.md) for candidate hardware/software requirements, download verification, and the five-step quick start. Core offline mode needs no VS Code; Copilot Chat connectivity requires VS Code 1.82+, usable Copilot Chat, and SessionBridge 0.1.1, while the executable-adapter product loop remains undelivered.
 
 ```text
 prfrail init --workspace .

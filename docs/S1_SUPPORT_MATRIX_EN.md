@@ -10,13 +10,16 @@ Date: 2026-09-09. Status: `CANDIDATE`, effective only after the formal release c
 | Linux amd64 | Core CI | Build, test, candidate probe, and self-host only; no S1 production-support claim |
 | macOS / Windows on Arm / Linux arm64 | Unsupported | Not included in the S1 acceptance matrix |
 | generic/C/Go harnesses | Configuration and noop orchestration | Language scopes, read-only preview, and noop-only loops are verified; executable steps still fail closed |
-| VS Code / SessionBridge | Optional adapter | Not a core installation dependency and grants no authority beyond ProofRail |
+| VS Code / Copilot Chat / SessionBridge | Conditionally required | Not needed for the core offline CLI; AI-session connectivity requires VS Code 1.82+, usable Copilot Chat, and SessionBridge 0.1.1 without granting authority beyond ProofRail; the executable-adapter product loop is not delivered yet |
 
 ## Candidate Version and Security-Maintenance Policy
 
+- Product versions use `vMAJOR.MINOR.PATCH`, beginning with candidate `v0.1.0`; patch releases do not start a new EOL countdown.
 - The current stable minor and previous minor receive security fixes; the candidate maintenance window for the previous minor is 90 days.
 - Unknown historical runs remain read-only and are not automatically migrated.
-- The EOL notification channel and exceptions must still be frozen before the first formal release; this page does not replace the final notice.
+- Proposed ADR-010: when a new minor is released, announce the previous minor's EOL date in both the GitHub Release notes and this support matrix, with EOL on the 90th calendar day after release.
+- Ninety days is the initial prototype-phase window; before each minor release, review stability, adoption, and maintenance capacity, and only lengthen future newly announced windows.
+- Deviations require a dated ADR with rationale and expiry, explicit product-owner approval, and synchronized publication in both channels, and must not retroactively shorten an announced window. This proposal is not approved, and this page does not replace the final notice.
 
 ## Release Trust Boundary
 

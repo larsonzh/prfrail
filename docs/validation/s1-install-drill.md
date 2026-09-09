@@ -20,6 +20,7 @@
 | 回滚 | PASS | 删除新版 current 后恢复旧目录；旧版再次返回原完整版本 |
 | 卸载 | PASS | 删除 installed 二进制目录；独立 `data/retained-evidence.txt` 仍存在且内容为 `retain-me` |
 | 安装教程复验 | PASS | 将 run `34325758548` 的四文件 artifact 压为 ZIP 后按 `INSTALLATION.md` 从干净目录解压；逐项 SHA-256、两份 JSON、`version`、Go 样例 `validate/preview` 均通过，进程及用户 PATH 前后不变 |
+| `gh` 下载路径 | PASS | `gh run download 34325758548 --repo larsonzh/prfrail --name prfrail-Windows-603e8dc03e9fb74ce9c53243d38e704fd8469c6a` 成功，并自动展开为且仅为四个预期文件；临时目录已删除 |
 
 旧包 `prfrail.exe` 的 SHA-256 为 `5b30f2b3f0de23ce662d6c75a27395cc59d5087678016faf3daebbda7ffc2db1`；新包为 `31335030152a417757990fd36e64f882d891a14112e0a2b865e1fc7a4280bfc8`。校验和只证明内容与清单一致，不认证发布者身份。
 

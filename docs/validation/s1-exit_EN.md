@@ -56,7 +56,7 @@ These PASS verdicts cover the existing deterministic AT evidence; they do not au
 
 ## Residual Risks and Next Steps
 
-1. The manually extracted portable-ZIP model, user-selected independent directory, explicit-path invocation, and no-PATH policy are frozen. The formal ZIP filename, download entry point, and EOL notification channel still require release approval.
+1. The manually extracted portable-ZIP model, user-selected independent directory, explicit-path invocation, and no-PATH policy are frozen. The formal ZIP filename and download entry point still require release binding. ADR-010 now proposes the EOL notice and exception policy, but product-owner approval remains outstanding.
 2. Windows candidate artifacts now pass first-run, upgrade, rollback, and evidence-preserving uninstall; the final carrier must rerun the drill. Linux remains core CI only and is not S1 production support.
 3. The generic/C/Go examples prove language scopes and noop orchestration only. Executable CLI steps currently fail closed.
 4. After rerunning the tutorial against the final ZIP and binding the support matrix/release notes, the product owner must explicitly approve S1 exit. Until then, T018 and S1 remain incomplete.

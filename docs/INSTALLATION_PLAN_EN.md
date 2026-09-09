@@ -10,7 +10,7 @@ Only developer source builds and tests are currently supported, requiring Go 1.2
 
 ## 2. Target Deployment Model
 
-The S1 target is a local, single-user, single-writer CLI/TUI with no persistent cloud service. The ProofRail binary, state/store, isolated run workspaces, and read-only source have explicit boundaries. SessionBridge is an optional adapter, not a core installation dependency. Compilers, interpreters, and test tools belong to harness declarations and are never silently installed by ProofRail.
+The S1 target is a local, single-user, single-writer CLI/TUI with no persistent cloud service. The ProofRail binary, state/store, isolated run workspaces, and read-only source have explicit boundaries. SessionBridge is not an installation dependency for the core offline CLI, but it is the required adapter for connecting to Copilot Chat through VS Code. Compilers, interpreters, and test tools belong to harness declarations and are never silently installed by ProofRail. The current candidate delivers only a line-oriented CLI; the complete TUI remains future implementation.
 
 ## 3. Open Decisions
 
@@ -24,7 +24,7 @@ The S1 target is a local, single-user, single-writer CLI/TUI with no persistent 
 | Release trust | S1 uses fixed commit, GitHub CI, SHA256SUMS, SBOM and license manifest | Checksums prove only content integrity; signing/attestation is deferred | S1 baseline decided |
 | Update mechanism | Manually verify and extract each version into a new directory, then explicitly switch paths; reconsider package managers later | Support matrix, schema compatibility, backup/recovery gates | S1 model decided; final ZIP awaits rerun |
 | Uninstall/data retention | Manually remove the version directory; retain run/store by default and separately authorize data deletion | T024 lifecycle record and explicit deletion authorization | S1 model and library rules frozen |
-| VS Code integration | Optional extension/SessionBridge adapter | CLI-independent loop passes; no authority beyond core API | TBD |
+| VS Code/AI integration | Optional for core offline mode; connecting to Copilot Chat requires VS Code 1.82+, usable Copilot Chat, and SessionBridge 0.1.1 | Matching channel/instance, fixed non-legacy `silent` mode, no authority beyond the core API, and executable-adapter product-loop acceptance | Host prerequisites defined; product loop pending |
 
 S1 defines no default install directory, publishes no one-click installer, does not modify PATH, claims no automatic updates, and requires no administrator privileges. The default state/store location, formal download entry point, and EOL notification channel remain open.
 

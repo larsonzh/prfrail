@@ -20,6 +20,7 @@ Date: 2026-09-09. Verdict: `PASS AS CANDIDATE DRILL`. This report proves that ar
 | Rollback | PASS | Removed the new current directory and restored the old directory; the old binary again returned its original full version |
 | Uninstall | PASS | Removed the installed binary directory; independent `data/retained-evidence.txt` remained present with content `retain-me` |
 | Installation-guide replay | PASS | Zipped the four-file artifact from run `34325758548`, then followed `INSTALLATION_EN.md` from a clean directory; per-file SHA-256, both JSON documents, `version`, and Go-example `validate/preview` passed, with process and user PATH unchanged |
+| `gh` download path | PASS | `gh run download 34325758548 --repo larsonzh/prfrail --name prfrail-Windows-603e8dc03e9fb74ce9c53243d38e704fd8469c6a` succeeded and automatically extracted exactly the four expected files; the temporary directory was removed |
 
 The old `prfrail.exe` SHA-256 is `5b30f2b3f0de23ce662d6c75a27395cc59d5087678016faf3daebbda7ffc2db1`; the new value is `31335030152a417757990fd36e64f882d891a14112e0a2b865e1fc7a4280bfc8`. Checksums prove agreement with a manifest, not publisher identity.
 

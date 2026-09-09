@@ -15,7 +15,7 @@ Date: 2026-09-09. Status: `DRAFT / NOT RELEASED`. Version, download links, forma
 
 ## Support and Known Limitations
 
-See the [S1 candidate support matrix](S1_SUPPORT_MATRIX_EN.md). The S1 installation model is a [manually extracted Windows portable ZIP](INSTALLATION_EN.md), invoked by explicit path without modifying PATH. No formal release package exists yet; candidate packages have only completed a lifecycle drill in an isolated temporary directory. S1 does not provide signing/attestation, production Linux support, automatic updates, a Web console, the full TUI, or arbitrary executable hooks.
+See the [S1 candidate support matrix](S1_SUPPORT_MATRIX_EN.md). The S1 installation model is a [manually extracted Windows portable ZIP](INSTALLATION_EN.md), invoked by explicit path without modifying PATH; the guide also lists hardware/software requirements, AI-session prerequisites, and a five-step quick start. No formal release package exists yet; candidate packages have only completed a lifecycle drill in an isolated temporary directory. The current interface is a line-oriented CLI in a normal terminal, not the complete TUI. Core offline mode needs no VS Code; Copilot Chat connectivity requires VS Code 1.82+, usable Copilot Chat, and SessionBridge 0.1.1, while the executable-adapter product loop remains undelivered. S1 does not provide signing/attestation, production Linux support, automatic updates, a Web console, the full TUI, or arbitrary executable hooks.
 
 ## Remaining Pre-Release Gates
 
