@@ -139,6 +139,80 @@ func TestRunAndReportNoopChain(t *testing.T) {
 	}
 }
 
+func TestGoMinimalExampleCompletesReadOnlyCLILoop(t *testing.T) {
+	repositoryRoot, err := filepath.Abs(filepath.Join("..", ".."))
+	if err != nil {
+		t.Fatal(err)
+	}
+	chainPath := filepath.Join(repositoryRoot, "examples", "go-minimal", "proofrail.chain.json")
+	before, err := os.ReadFile(chainPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	root := t.TempDir()
+	cli := newTestCLI(root)
+	code, stdout, stderr := runCLI(t, cli, "validate", "--chain", chainPath, "--json")
+	if code != 0 {
+		t.Fatalf("validate code=%d stdout=%s stderr=%s", code, stdout, stderr)
+	}
+	var validation ConfigValidationSummary
+	if err := json.Unmarshal(decodeResponse(t, stdout).Data, &validation); err != nil {
+		t.Fatal(err)
+	}
+	if validation.TaskCount != 1 || validation.StepCount != 1 || !validation.RunnableInCLI {
+		t.Fatalf("unexpected validation: %+v", validation)
+	}
+
+	code, stdout, stderr = runCLI(t, cli, "preview", "--chain", chainPath, "--json")
+	if code != 0 {
+		t.Fatalf("preview code=%d stdout=%s stderr=%s", code, stdout, stderr)
+	}
+	var preview PreviewReport
+	if err := json.Unmarshal(decodeResponse(t, stdout).Data, &preview); err != nil {
+		t.Fatal(err)
+	}
+	if preview.PreviewRecord.Preview.Outcome != "ready" || preview.PreviewRecord.Preview.Mode != "offline-read-only" {
+		t.Fatalf("unexpected preview: %+v", preview.PreviewRecord.Preview)
+	}
+	if preview.CallCounters.CommandCalls != 0 || preview.CallCounters.NetworkCalls != 0 || preview.CallCounters.ModelCalls != 0 || preview.CallCounters.CredentialReads != 0 || preview.CallCounters.VersionProbes != 0 {
+		t.Fatalf("expected zero call counters, got %+v", preview.CallCounters)
+	}
+
+	runDir := filepath.Join(root, "go-minimal-run")
+	code, stdout, stderr = runCLI(t, cli, "run", "--chain", chainPath, "--run-id", "go-minimal-test", "--run-dir", runDir, "--json")
+	if code != 0 {
+		t.Fatalf("run code=%d stdout=%s stderr=%s", code, stdout, stderr)
+	}
+	var runSummary RunSummary
+	if err := json.Unmarshal(decodeResponse(t, stdout).Data, &runSummary); err != nil {
+		t.Fatal(err)
+	}
+	if runSummary.ChainState != "COMPLETED" {
+		t.Fatalf("unexpected run summary: %+v", runSummary)
+	}
+
+	code, stdout, stderr = runCLI(t, cli, "report", "--run-dir", runDir, "--json")
+	if code != 0 {
+		t.Fatalf("report code=%d stdout=%s stderr=%s", code, stdout, stderr)
+	}
+	var reportSummary RunSummary
+	if err := json.Unmarshal(decodeResponse(t, stdout).Data, &reportSummary); err != nil {
+		t.Fatal(err)
+	}
+	if reportSummary.ChainState != "COMPLETED" || reportSummary.RunID != "go-minimal-test" {
+		t.Fatalf("unexpected report summary: %+v", reportSummary)
+	}
+
+	after, err := os.ReadFile(chainPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !bytes.Equal(before, after) {
+		t.Fatal("Go minimal example was modified")
+	}
+}
+
 func TestRunRejectsExecutableSteps(t *testing.T) {
 	root := t.TempDir()
 	cli := newTestCLI(root)

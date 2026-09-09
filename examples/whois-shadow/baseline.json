@@ -1,0 +1,67 @@
+{
+  "schemaVersion": "1.0.0",
+  "source": {
+    "repository": "whois",
+    "path": "testdata/cidr_matrix_cases_draft.tsv",
+    "sha256": "8a6abecb0178a970677b84b3e5403ce8830f281e1a197d792ae54089b3e9efb0",
+    "bytes": 1981,
+    "exportedAt": "2026-09-09",
+    "classification": "non-secret-redacted-test-fixture"
+  },
+  "cases": [
+    {
+      "id": "cidr-special-purpose-default-unknown",
+      "input": {"query": "203.0.113.0/24", "startRir": "arin"},
+      "result": {"authority": "unknown", "host": "unknown"},
+      "failureClassification": "preclass-special-purpose"
+    },
+    {
+      "id": "cidr-marker-lookback-unknown-apnic",
+      "input": {"query": "8.8.0.0/16", "startRir": "apnic"},
+      "result": {"authority": "unknown", "host": "unknown"},
+      "failureClassification": "pre-apnic-lookback-hit"
+    },
+    {
+      "id": "cidr-marker-lookback-unknown-ripe",
+      "input": {"query": "8.8.0.0/16", "startRir": "ripe"},
+      "result": {"authority": "unknown", "host": "unknown"},
+      "failureClassification": "pre-apnic-lookback-hit"
+    },
+    {
+      "id": "cidr-marker-consistency-next-hit",
+      "input": {"query": "45.71.8.0/22", "startRir": "lacnic"},
+      "result": {"authority": "next_hit_rir", "host": "whois.lacnic.net"},
+      "failureClassification": "consistency-validated"
+    },
+    {
+      "id": "cidr-direct-authoritative-apnic",
+      "input": {"query": "1.1.1.0/24", "startRir": "apnic"},
+      "result": {"authority": "next_hit_rir", "host": "whois.apnic.net"},
+      "failureClassification": "direct-authoritative-no-marker"
+    },
+    {
+      "id": "cidr-invalid-search-key",
+      "input": {"query": "47.96.0.0/10", "startRir": "apnic"},
+      "result": {"authority": "unknown", "host": "unknown"},
+      "failureClassification": "no-authoritative-evidence"
+    },
+    {
+      "id": "cidr-google-cross-rir",
+      "input": {"query": "8.8.8.0/24", "startRir": "apnic"},
+      "result": {"authority": "next_hit_rir", "host": "whois.arin.net"},
+      "failureClassification": "direct-authoritative-no-marker"
+    },
+    {
+      "id": "cidr-zero-space-unknown",
+      "input": {"query": "0.0.0.0/0", "startRir": "iana"},
+      "result": {"authority": "unknown", "host": "unknown"},
+      "failureClassification": "no-authoritative-evidence"
+    },
+    {
+      "id": "cidr-invalid-syntax",
+      "input": {"query": "888.0.0.0/16", "startRir": "iana"},
+      "result": {"authority": "invalid", "host": "invalid"},
+      "failureClassification": "invalid-input"
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "1.0.0",
+  "chain": {
+    "id": "go-minimal",
+    "profile": "minimal"
+  },
+  "tasks": [
+    {
+      "id": "verify-go-scope",
+      "review": "manual",
+      "steps": [
+        {
+          "id": "record-go-scope",
+          "kind": "noop",
+          "reason": "Deterministic non-C Go harness acceptance fixture"
+        }
+      ]
+    }
+  ],
+  "workspace": {
+    "components": [
+      {
+        "id": "go-example",
+        "root": ".",
+        "languageScopes": [
+          {
+            "id": "go-main",
+            "language": "go",
+            "harness": "go-standard",
+            "toolchain": "go-122",
+            "targets": ["source"]
+          }
+        ]
+      }
+    ]
+  }
+}
