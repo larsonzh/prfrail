@@ -46,7 +46,7 @@ prfrail run --chain ./proofrail.chain.json --run-id run-demo
 prfrail report --run-dir ./tmp/prfrail-runs/run-demo
 ```
 
-说明：`run` 目前仅执行 noop-only 任务链；`serve`/完整 TUI 仍在后续切片。
+说明：`run` 目前仅执行 noop-only 任务链；`serve`/完整 TUI 仍在后续切片。目标 TUI 将显示 AI 的待处理人工请求、收集结构化响应并把控制权交回任务链；该能力尚未实现，且正式流程不依赖 SessionBridge `@sbr-review`（它只可用于独立诊断）。
 
 ### 构建（需 Go 工具链）
 
@@ -119,7 +119,7 @@ prfrail run --chain ./proofrail.chain.json --run-id run-demo
 prfrail report --run-dir ./tmp/prfrail-runs/run-demo
 ```
 
-Notes: `run` currently executes noop-only chains; `serve` and the full TUI remain in later slices.
+Notes: `run` currently executes noop-only chains; `serve` and the full TUI remain in later slices. The target TUI will show pending AI requests, collect structured operator responses, and return control to the chain. This is not implemented, and the formal path does not depend on SessionBridge `@sbr-review`, which remains standalone diagnostics only.
 
 ### Build (requires Go toolchain)
 

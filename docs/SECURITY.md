@@ -36,6 +36,7 @@
 | SEC-10 冒充/副作用 | 撤销后仍投递、过期授权发布、上传被误称可回滚 | 每次副作用重新授权、在途停机证据、默认禁外部写；chain/guard/gates | AT-18/19 |
 | SEC-11 拒绝服务/抵赖 | 超时退款假设、跨 run 绕过预算、重复结算 | 持久预留、未知占用、共享锁与结算去重；tickets/adapters | AT-20 |
 | SEC-12 数据丢失/泄露 | 不完整备份、卸载删共享工具、旧证据含秘密 | 引用闭包核验、新 store 演练、默认保留与显式处置；snapshot/evidence/release | AT-21 |
+| SEC-13 冒充/提权/泄露 | 伪造或陈旧操作员响应、UI 文本冒充授权、对话中秘密被持久化 | 主体/attempt/context hash/权限绑定、结构化允许响应、secret-direct、重放去重；chain/console/evidence | AT-22 |
 
 测试编号解析见 [TEST_STRATEGY.md](TEST_STRATEGY.md)。全部强制反例必须能断言“不发布、不推进、证据仍完整”，不能只检查返回非零。
 

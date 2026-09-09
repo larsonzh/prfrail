@@ -10,7 +10,7 @@
 
 ## 2. 目标部署模型
 
-S1 目标是本地单用户、单写者、无常驻云服务的 CLI/TUI：ProofRail 二进制、状态/store、隔离 run-workspace 和只读源目录彼此边界明确。SessionBridge 不是核心离线 CLI 的安装依赖，但它是通过 VS Code 连接 Copilot Chat 的必要 adapter；目标项目编译器、解释器和测试工具由 harness 声明，ProofRail 不静默安装。当前发行候选仅交付逐行 CLI，完整 TUI 仍是后续实现。
+S1 目标是本地单用户、单写者、无常驻云服务的 CLI/TUI：ProofRail 二进制、状态/store、隔离 run-workspace 和只读源目录彼此边界明确。SessionBridge 不是核心离线 CLI 的安装依赖，但它是通过 VS Code 连接 Copilot Chat 的必要 adapter；目标项目编译器、解释器和测试工具由 harness 声明，ProofRail 不静默安装。目标 TUI 还须承载 AI/操作员待办、响应和控制权归还；SessionBridge `@sbr-review` 仅是可选诊断能力。当前发行候选仅交付逐行 CLI，上述交互闭环与完整 TUI 均未实现。
 
 ## 3. 待决决策
 
@@ -24,7 +24,7 @@ S1 目标是本地单用户、单写者、无常驻云服务的 CLI/TUI：ProofR
 | 发布信任 | S1 使用固定 commit、GitHub CI、SHA256SUMS、SBOM 和许可证清单 | 校验和只证明内容完整性；签名/attestation 后续增强 | S1 基线已定 |
 | 更新方式 | 手工下载核验，新版本解压到新目录并显式切换路径；未来包管理器另议 | 支持矩阵、schema 兼容、备份恢复门禁 | S1 模型已定；最终 ZIP 待复验 |
 | 卸载与数据保留 | 手工删除版本目录；run/store 默认保留，数据删除单独授权 | T024 生命周期记录和显式删除授权 | S1 模型与库级规则已冻结 |
-| VS Code/AI 集成 | 核心离线模式可选；连接 Copilot Chat 时要求 VS Code 1.82+、可用 Copilot Chat、SessionBridge 0.1.1 | 通道目录/实例一致，固定 `silent`、非 legacy；权限不高于核心 API；完成 executable adapter 产品闭环验收 | 宿主前提已明确；产品闭环待实现 |
+| VS Code/AI 集成 | 核心离线模式可选；连接 Copilot Chat 时要求 VS Code 1.82+、可用 Copilot Chat、SessionBridge 0.1.1 | 通道目录/实例一致，固定 `silent`、非 legacy、稳定非空 `conversationId`；内嵌 IPC 与 TUI 交互闭环通过 AT-22；权限不高于核心 API | 宿主前提已明确；T025 待实现 |
 
 S1 不指定默认安装目录，不发布一键安装脚本，不修改 PATH，不声明自动更新，也不要求管理员权限。state/store 默认位置、正式下载入口与 EOL 通知仍待冻结。
 

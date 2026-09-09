@@ -2,7 +2,7 @@
 
 [中文](INSTALLATION.md)
 
-Date: 2026-09-09. The frozen S1 installation model is a Windows 11 amd64 portable ZIP, manually extracted to an independent user-selected directory and always invoked through an explicit `prfrail.exe` path. It does not modify `PATH`, the registry, or system directories. No formal GitHub Release exists yet; the commands below apply to a trusted candidate artifact with the same structure as the final carrier and do not claim that the product has been released.
+Date: 2026-09-10. The frozen S1 installation model is a Windows 11 amd64 portable ZIP, manually extracted to an independent user-selected directory and always invoked through an explicit `prfrail.exe` path. It does not modify `PATH`, the registry, or system directories. The extracted ZIP has one top-level `prfrail/` directory containing all four release files. No formal GitHub Release exists yet; the new layout must pass a fresh trusted-candidate replay before it can be treated as matching the final carrier.
 
 ## 1. Environment Requirements and Capability Levels
 
@@ -16,9 +16,15 @@ Date: 2026-09-09. The frozen S1 installation model is a Windows 11 amd64 portabl
 | Project tools | `validate`/`preview` need no project compiler; real harnesses require their declared compilers, interpreters, build tools, and test tools to be preinstalled | Same as the core CLI; ProofRail never installs them silently |
 | Network | GitHub access for download; current `version`/`validate`/`preview` can run offline after download and verification | Copilot Chat model calls require host networking, account/subscription access, and model entitlement |
 
-SessionBridge is not an installation dependency for the core offline CLI, but it is a necessary prerequisite for ProofRail to establish an AI session connection to Copilot Chat through VS Code. To prepare AI mode, install VS Code and GitHub Copilot Chat and sign in, install the SessionBridge `0.1.1` extension from [GitHub Releases](https://github.com/larsonzh/sessbridge/releases), then reload the VS Code window. Installing the extension alone does not make the AI loop available: the Copilot Chat model must be usable, ProofRail and SessionBridge must use the same channel directory and target VS Code instance, and communication must use non-legacy `silent` mode. The executable-step/adapter product loop remains undelivered in the current S1 candidate. At this stage, SessionBridge satisfies only the host-connectivity prerequisite and does not turn the noop-only `run` command into automated AI coding.
+SessionBridge is not an installation dependency for the core offline CLI, but its extension is a necessary prerequisite for ProofRail to establish an AI session connection to Copilot Chat through VS Code. To prepare AI mode, install VS Code and GitHub Copilot Chat and sign in; download and install the SessionBridge `0.1.1` extension from [GitHub Releases](https://github.com/larsonzh/sessbridge/releases), or install it from the VS Code Marketplace; then reload the VS Code window. The target ProofRail product integration embeds a SessionBridge v1 file-IPC client, so users do not need to download or launch a Python, PowerShell, or sh client. The three implementations under [`client/`](https://github.com/larsonzh/sessbridge/tree/main/client) remain optional tools for standalone diagnostics, protocol reference, and manual SessionBridge integration testing.
 
-The current release candidate has no graphical window or complete TUI. `prfrail.exe` provides line-oriented CLI text in a normal terminal, ANSI-free by default, plus `--json` for automation; it runs in Windows Terminal, PowerShell, or the VS Code integrated terminal. Bubble Tea v1.3.4 was exercised only as an isolated feasibility prototype and is not linked into the current binary. S1 therefore prioritizes one terminal, short commands, and copyable paths for quick learning instead of presenting a prototype interface as delivered functionality.
+Do not conflate a client program with its runtime channel. The embedded ProofRail client and optional diagnostic clients all communicate through file IPC. The channel directory defaults to `%TEMP%\sessbridge` on Windows; SessionBridge reference clients can override it with `SESSBRIDGE_CHANNEL_DIR` or `--channel-dir`/`-ChannelDir`; the target VS Code instance is selected by PID. Caller and extension must use the same channel directory and target instance. ProofRail's formal contract fixes `mode=silent` and `legacy=false`. Every continuing AI job must send a non-empty, stable `conversationId`, automatically activating the SessionBridge RFC §5.1 silent multi-turn history rather than using the stateless empty value.
+
+For standalone SessionBridge integration testing, `visible` or `@sbr-review` may be used to verify panel delivery and human interaction, followed by `silent` with a `conversationId` to verify the automated receipt and multi-turn context required by ProofRail. These are optional diagnostics only: `visible`/`auto`/`@sbr-review` must not become the ProofRail product default or an automatic fallback from silent. Formal operator intervention belongs to ProofRail's own CLI/TUI. Changing that boundary requires prior revisions to ADR-004/011, product requirements, contracts, and acceptance tests.
+
+ProofRail has not yet implemented that embedded IPC client. `internal/adapters/sessbridge.go` defines only a consumer-provided Go `SilentClient` interface, and the product runtime exposes no channel-directory, target-PID, or conversation-identity setting. Installing the extension therefore does not make the AI loop available. The executable-step/adapter product loop remains undelivered in the current S1 candidate, so the noop-only `run` command is not automated AI coding.
+
+The current release candidate has no graphical window, complete TUI, or AI/operator interaction inbox. `prfrail.exe` provides line-oriented CLI text in a normal terminal, ANSI-free by default, plus `--json` for automation; it runs in Windows Terminal, PowerShell, or the VS Code integrated terminal. Bubble Tea v1.3.4 was exercised only as an isolated feasibility prototype and is not linked into the current binary. S1 therefore prioritizes one terminal, short commands, and copyable paths for quick learning instead of presenting a prototype interface as delivered functionality.
 
 ## 2. Download and Offline Verification
 
@@ -26,7 +32,7 @@ Select a GitHub Actions run that passed the trust matrix in the [S1 self-host ev
 
 The browser path preserves the ZIP: sign in to GitHub, open `https://github.com/larsonzh/prfrail/actions/runs/<run-id>`, and click `prfrail-Windows-<full-candidate-commit>` in the **Artifacts** section at the bottom of the page. The downloaded file is normally named `prfrail-Windows-<full-candidate-commit>.zip`.
 
-With an installed and authenticated GitHub CLI, download it directly as follows. `gh run download` automatically extracts the artifact into `--dir` and does not retain the outer ZIP. After this command, skip the `Expand-Archive` block below and use `$DownloadDir` as `$InstallDir`:
+With an installed and authenticated GitHub CLI, download it directly as follows. `gh run download` automatically extracts the artifact into `--dir` and does not retain the outer ZIP. The four files are placed under `$DownloadDir\prfrail`, so skip the `Expand-Archive` block below after this command:
 
 ```powershell
 gh auth status
@@ -41,7 +47,7 @@ gh run download $RunId --repo $Repository --name $Artifact --dir $DownloadDir
 if ($LASTEXITCODE -ne 0) {
     throw "Artifact download failed: $Artifact"
 }
-$InstallDir = $DownloadDir
+$InstallDir = Join-Path $DownloadDir 'prfrail'
 ```
 
 The following path applies after downloading the ZIP through the browser. Replace the three values with the downloaded file, full candidate commit, and an independent directory writable by the current user:
@@ -50,10 +56,11 @@ The following path applies after downloading the ZIP through the browser. Replac
 $Archive = (Resolve-Path '.\prfrail-Windows-<full-commit>.zip').Path
 $CandidateCommit = '<full-commit>'
 $InstallRoot = '<user-selected-independent-directory>'
-$InstallDir = Join-Path $InstallRoot $CandidateCommit
+$ExtractDir = Join-Path $InstallRoot $CandidateCommit
+$InstallDir = Join-Path $ExtractDir 'prfrail'
 
-New-Item -ItemType Directory -Path $InstallDir -Force | Out-Null
-Expand-Archive -LiteralPath $Archive -DestinationPath $InstallDir
+New-Item -ItemType Directory -Path $ExtractDir -Force | Out-Null
+Expand-Archive -LiteralPath $Archive -DestinationPath $ExtractDir
 
 Push-Location $InstallDir
 try {
@@ -77,7 +84,7 @@ try {
 }
 ```
 
-The expected directory contains only `prfrail.exe`, `SHA256SUMS`, `sbom.spdx.json`, and `licenses.json`. Checksums prove agreement with the manifest, not publisher identity. Independently verify the run/verifier/candidate from a trusted record, and require package `version --json` to bind the same candidate commit. Never execute a binary for a different platform or commit. Actions artifacts may expire and are not a durable formal download location.
+The extraction root must contain only `prfrail/`, which in turn contains only `prfrail.exe`, `SHA256SUMS`, `sbom.spdx.json`, and `licenses.json`. Checksums prove agreement with the manifest, not publisher identity. Independently verify the run/verifier/candidate from a trusted record, and require package `version --json` to bind the same candidate commit. Never execute a binary for a different platform or commit. Actions artifacts may expire and are not a durable formal download location.
 
 ## 3. Five-Step Quick Start
 

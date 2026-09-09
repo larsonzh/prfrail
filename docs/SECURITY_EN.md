@@ -36,6 +36,7 @@ Runners/OS capabilities enforce restrictions, not prompts alone. Unknown process
 | SEC-10 Spoofing/effects | Dispatch after revocation, expired approval, uploads claimed reversible | Reauthorize each effect, in-flight stop evidence, default-deny external writes; chain/guard/gates | AT-18/19 |
 | SEC-11 Denial/repudiation | Assumed timeout refunds, cross-run budget bypass, duplicate settlements | Durable reservations, unknown holds, shared locks/deduplication; tickets/adapters | AT-20 |
 | SEC-12 Loss/disclosure | Incomplete backups, uninstall deletes shared tools, secrets in old evidence | Closure checks, new-store drills, retention by default/explicit disposition; snapshot/evidence/release | AT-21 |
+| SEC-13 Spoofing/elevation/disclosure | Forged or stale operator replies, UI text treated as authority, or secrets persisted from dialogue | Actor/attempt/context-hash/authority binding, structured allowed responses, secret-direct, and replay deduplication; chain/console/evidence | AT-22 |
 
 Test IDs resolve in [TEST_STRATEGY_EN.md](TEST_STRATEGY_EN.md). Every mandatory negative case asserts no publication, no advancement and intact evidence, not merely a nonzero exit.
 

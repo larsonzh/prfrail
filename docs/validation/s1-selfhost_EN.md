@@ -2,7 +2,7 @@
 
 [中文](s1-selfhost.md)
 
-Date: 2026-09-08; updated 2026-09-09. Verdict: `COMPLETE`. The remediation passed both independent reviews and the verifier baseline's Windows/Linux push CI. The complete Windows/Linux matrix manually dispatched from `main` against a different candidate SHA also passed, and the AT-13/14 evidence is archived below.
+Date: 2026-09-08; updated 2026-09-10. Verdict: `COMPLETE`. The remediation passed both independent reviews and the verifier baseline's Windows/Linux push CI. The complete Windows/Linux matrix manually dispatched from `main` against a different candidate SHA also passed, and the AT-13/14 evidence is archived below.
 
 ## Implementation Scope
 
@@ -70,6 +70,14 @@ On 2026-09-09, every GitHub Action was upgraded to a native Node 24 release and 
 | `prfrail-Windows-603e8dc03e9fb74ce9c53243d38e704fd8469c6a` | 2,398,249 | `sha256:38cb242a023f676bccd2b1ef64a35c62c7a2dc6a951162d4a2323d6951768fdf` |
 
 These digests cover GitHub artifact archives and do not replace the verifier-checked SHA256SUMS inside them. The Node 24 replacement does not expand T017's trust claims.
+
+## T018 Final Trusted Candidate Run (Before Nested-Directory Change)
+
+On 2026-09-10, the maintainer manually dispatched [run `34358467083`](https://github.com/larsonzh/prfrail/actions/runs/34358467083) from `main`. Its verifier/head SHA was `5f1222752ec3c66ad3b6a1e9034c520ba3e12ee2`, and its distinct candidate input was `bcc235496e0bece825047e95f3165a36585a59c0`. All eight Windows/Linux Go, candidate-build, candidate-probe, and bootstrap/release jobs succeeded, producing six artifacts.
+
+The unexpired Windows verified artifact has ID `10106867086`, name `prfrail-Windows-bcc235496e0bece825047e95f3165a36585a59c0`, size `2,398,240` bytes, and GitHub archive digest `sha256:10d902164194a8b1c6d1121adba5363bb69f829ac3516f7b891c6f5f41d08e06`. Its offline verification, upgrade, rollback, PATH/process non-interference, and five-step quick-start results are recorded in the [installation drill](s1-install-drill_EN.md).
+
+This run predates the single top-level `prfrail/` directory change for verified artifacts and proves only the old flat four-file layout. Because the layout change modifies the reviewed workflow script and digest, a new verifier baseline and a complete trusted matrix against a distinct candidate are required before final-carrier evidence exists.
 
 ## First CI Inputs
 

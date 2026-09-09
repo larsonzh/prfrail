@@ -65,7 +65,7 @@ Edge cases include empty tasks/steps, unknown fields/versions, path escape, case
 | REQ-006 | R6 | S1-S3 | S1 Windows production/Linux core CI; static model selection and preauthorized fallback; pause on missing capability |
 | REQ-007 | R7 | S1 | IPC and file queue share ProofRail receipts; SessionBridge silent only, no GUI/auto fallback |
 | REQ-008 | R8 | S1 | Rebuild context envelopes after host restart; conversation history is not authoritative |
-| REQ-009 | R9 | S1 | Unified TUI for tasks, gates, tickets, logs and budgets; no separate monitor windows |
+| REQ-009 | R9 | S1 | Unified TUI for tasks, gates, tickets, logs, budgets, and pending operator/AI exchanges; the operator can submit a structured response and return control to ProofRail in the same terminal, without depending on a SessionBridge chat participant or separate monitor window |
 | REQ-010 | R10 | S1 | init/validate/config explain generate, validate and explain configuration; runtime state never rewrites it |
 | REQ-011 | R11 | S1/S2 | External generic/C/Go harnesses in S1, no language branching in core; extend languages in S2 |
 | REQ-012 | R12 | S1 | Separate executable/args, preflight capabilities, enforce timeout/output/network/environment policy |

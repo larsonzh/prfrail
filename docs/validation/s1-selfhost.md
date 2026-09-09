@@ -2,7 +2,7 @@
 
 [English](s1-selfhost_EN.md)
 
-日期：2026-09-08，更新于 2026-09-09。结论：`COMPLETE`。修复版经双主审并通过 verifier baseline 的 Windows/Linux push CI；针对不同 candidate SHA 从 `main` 手工 dispatch 的 Windows/Linux 完整矩阵也已通过，AT-13/14 证据均已归档。
+日期：2026-09-08，更新于 2026-09-10。结论：`COMPLETE`。修复版经双主审并通过 verifier baseline 的 Windows/Linux push CI；针对不同 candidate SHA 从 `main` 手工 dispatch 的 Windows/Linux 完整矩阵也已通过，AT-13/14 证据均已归档。
 
 ## 实现范围
 
@@ -70,6 +70,14 @@
 | `prfrail-Windows-603e8dc03e9fb74ce9c53243d38e704fd8469c6a` | 2,398,249 | `sha256:38cb242a023f676bccd2b1ef64a35c62c7a2dc6a951162d4a2323d6951768fdf` |
 
 这些 digest 是 GitHub artifact archive 摘要，不替代归档内 verifier 核验的 SHA256SUMS。Node 24 替换没有扩大 T017 的信任声明。
+
+## T018 最终候选可信运行（嵌套目录变更前）
+
+2026-09-10，维护者从 `main` 手工触发 [run `34358467083`](https://github.com/larsonzh/prfrail/actions/runs/34358467083)。run 的 verifier/head SHA 为 `5f1222752ec3c66ad3b6a1e9034c520ba3e12ee2`，输入 candidate 为不同的 `bcc235496e0bece825047e95f3165a36585a59c0`；Windows/Linux 的 Go、candidate-build、candidate-probe 和 bootstrap/release 共 8/8 jobs 成功，并生成 6 个 artifact。
+
+Windows verified artifact ID 为 `10106867086`，名称为 `prfrail-Windows-bcc235496e0bece825047e95f3165a36585a59c0`，大小 `2,398,240` 字节，未过期，GitHub archive digest 为 `sha256:10d902164194a8b1c6d1121adba5363bb69f829ac3516f7b891c6f5f41d08e06`。其离线核验、升级、回滚、PATH/进程无副作用和五步快速上手结果见[安装演练](s1-install-drill.md)。
+
+该运行早于 verified artifact 的 `prfrail/` 单一顶层目录变更，只证明旧的平铺四文件布局。目录变更修改了受审 workflow 脚本及摘要，必须建立新的 verifier baseline，并以不同 candidate 重跑完整可信矩阵后，才能形成最终载体证据。
 
 ## 首次 CI 输入
 

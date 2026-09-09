@@ -25,6 +25,8 @@ go run ./cmd/prfrail report --run-dir .\tmp\prfrail-runs\run-demo
 
 Core packages now have automated tests, but full product E2E/TUI is still in later slices. The current visual surface is a line-oriented CLI in Windows Terminal, PowerShell, or the VS Code integrated terminal, ANSI-free by default and with `--json`; there is no separate graphical window. Bubble Tea v1.3.4 was only an isolated prototype and is not part of the release binary. gopls is a development tool, not a core runtime dependency. The released ProofRail binary does not directly access GitHub, Go/npm registries, or other public URLs; release-evidence verification reads local files only. Dependency downloads and GitHub Actions networking belong only to development/CI. System/Git proxies do not automatically configure Go downloads; use process HTTP_PROXY/HTTPS_PROXY when needed and restore them afterward, without arbitrary global GOPROXY changes or disabled verification.
 
+The target TUI will show pending requests and allowed responses after AI returns a structured `operator-action-required`; the task remains `WAITING_FOR_OPERATOR` until the chain control API validates and persists the operator response. Timeout, disconnect, stale response, or persistence failure never resumes automatically. Recovery uses the same non-empty `conversationId` and a new `requestId`; requests requiring file edits enter the handoff lease below. This loop belongs to T025 and the current candidate has no corresponding command or inbox. SessionBridge `@sbr-review`, when available, is standalone diagnostics only.
+
 ## 2. Installation and First Run
 
 S1 uses a manually extracted Windows amd64 portable ZIP: verify the fixed commit/GitHub CI plus SHA256SUMS, SBOM, and license manifest; extract into a user-selected independent version directory; then invoke `prfrail.exe` by full path for version and static preview. Never modify PATH, the registry, or system directories, and never overwrite a running host. See the [installation guide](INSTALLATION_EN.md) for copyable commands and upgrade/rollback/uninstall steps. SHA256SUMS proves agreement with the manifest, not publisher identity. S1 Linux is core CI/preview, not production support. Do not execute wrong-platform binaries.
@@ -46,6 +48,7 @@ Before running, verify distinct source/run/store roots, secret exclusions, disk,
 | Uncertain process liveness | Read-only identity/termination/lease inspection, stay paused | Arbitrary PID killing, early restore |
 | Low disk | Pause, GC dry-run for expired unreferenced data or increase quota | Deleting baseline/accepted/failure evidence |
 | Adapter timeout | Check durable dispatch/requestId and uncertainty | New-ID infinite retries, visible/auto fallback |
+| AI requests operator input | Use the ProofRail TUI to inspect the structured request and submit an allowed response; open handoff for file edits | Authorize through free-form chat, edit state files, or depend on `@sbr-review` to advance |
 | Budget exhaustion | Human fingerprint/cost/new-authorization review | Resetting counters to bypass hard_block |
 | Corrupt store | Quarantine and verify references offline | Rehashing corrupt content as valid history |
 

@@ -12,7 +12,7 @@
 
 ```mermaid
 flowchart TD
-  UI[CLI / TUI] --> C[chain: 控制 API / 单写者]
+  UI[CLI / TUI: 交互收件箱与响应] --> C[chain: 控制 API / 单写者]
   C --> D[taskdef: 配置与 checker]
   C --> S[snapshot: 捕获 / 恢复 / 候选]
   C --> A[applier: journal 事务]
@@ -21,6 +21,7 @@ flowchart TD
   C --> W[guard: 进程与停机证据]
   C --> E[evidence: 事件 / receipt / 离线核验]
   AD[adapters: SessionBridge silent / 文件队列] -. 实现核心端口 .-> C
+  C -. 同一 conversationId / 新 requestId .-> AD
   G --> R[隔离 run-workspace]
   AD --> R
   O[源工作树: 只读捕获] --> S
@@ -28,13 +29,15 @@ flowchart TD
 
 图中 adapter 到工作区表示其能力允许的执行路径；silent 文本本身不获得文件工具。默认可把结构化变更交给 applier，只有能力验证通过的工具代理才能选择 isolated-workspace。
 
+AI 需要人工输入时，adapter 只接收结构化 `operator-action-required` 并交给 chain；chain 持久化交互请求并进入 `WAITING_FOR_OPERATOR`，console 从控制 API 展示待办和允许响应。操作员响应经 chain 校验主体、run/task/attempt、上下文摘要和权限后，写入可重放记录；需要人工写入时转入既有 handoff，而不是绕过其租约。恢复 silent 执行必须保持同一非空 `conversationId` 并使用新的 `requestId`。SessionBridge 的 `@sbr-review` 可用于独立诊断或人工测试，但不是 ProofRail 状态转换、授权或恢复的依赖。
+
 ## 2. 所有权与依赖契约
 
 | 模块 | 唯一责任/输出 | 禁止事项 | 首批验证 |
 |---|---|---|---|
 | cmd/prfrail | 参数、依赖装配、退出码 | 实现领域状态判断 | CLI 黑盒 |
-| console | 视图、命令意图、--json | 直接写 state/store/receipt | 假控制 API、窄终端 |
-| chain | 状态转换、调度、effective config、写锁 | import 具体 adapter、信任自由文本 PASS | 表驱动状态转换 |
+| console | 视图、命令意图、--json、待处理交互展示/响应 | 直接写 state/store/receipt、把 UI 文本当授权 | 假控制 API、窄终端、断线恢复 |
+| chain | 状态转换、调度、effective config、写锁、交互请求/响应校验 | import 具体 adapter、信任自由文本 PASS/提问 | 表驱动状态转换、陈旧/伪造响应 |
 | taskdef | 解析/Schema、引用/所有权、顺序 checker、文档义务 | 写目标文件或启动命令 | 合法/非法 goldens |
 | snapshot | 捕获、物化、内容对象、引用与 GC | 使用 Git 恢复、接受未经评审候选 | 路径/损坏/配额 |
 | applier | 全量预验证、journal、写后验、整组回滚 | 边验证边写、修改源目录 | 每写入边界崩溃 |
@@ -42,8 +45,8 @@ flowchart TD
 | guard | 受管进程身份、停止与存活证据 | 仅凭 PID/租约过期宣告停机 | 子进程/PID 重用 |
 | tickets | 分类、去重、lease、attempt/指纹预算 | 自行重启进程/提升候选 | 重放/耗尽 |
 | repair | Prepare/Inspect/Validate/Promote 协调 | 直接修补正式定义、扩大权限 | 陈旧候选/哈希变化 |
-| adapters | 外部协议映射和能力探测 | 回执覆盖业务状态、GUI 兜底 | 两通道同一契约 |
-| evidence | 编码/哈希、事件链、receipt、离线检查 | 让执行面覆写证据、存秘密 | 缺失/重排/篡改 |
+| adapters | 外部协议映射、能力探测、conversation/request 映射 | 回执覆盖业务状态、GUI/`@sbr-review` 兜底 | 两通道同一契约、历史连续性 |
+| evidence | 编码/哈希、事件链、receipt、交互记录、离线检查 | 让执行面覆写证据、存秘密 | 缺失/重排/篡改/重放 |
 
 端口由消费模块定义：AgentPort、GateRunner、ProcessSupervisor、Clock、ObjectStore 是责任名，Go 签名在对应任务细化后冻结，不是现有导出 API。`cmd` 装配端口实现；核心不得 import `internal/adapters` 或 `console`。拒绝为了共享几个字段创建无所有者的“大 common 包”。
 
@@ -52,9 +55,10 @@ flowchart TD
 1. validate：解析用户 TOML 与版本化 JSON，检查未知字段、引用、依赖环和能力；解析 profile/task/step 覆盖来源并冻结 run manifest。
 2. baseline：源树只读捕获；排除 .git、run/store、缓存和 secret 路径并记录原因。捕获期间外部变动造成一致性不明时重试或暂停，不混合版本。
 3. execute：从最近已接受父快照物化独立工作区；按 steps 执行。managed-change-set 经 checker/applier；isolated-workspace 记录前后 manifest 和 diff，不宣称 IDE 每次写入原子。
-4. validate/review：阻断型技术门禁全部通过，停止写者，冻结候选与证据根，进入 REVIEW_PENDING。独立评审绑定同一候选，变更后旧批准失效。
-5. accept：以可恢复 journal 发布 snapshot/receipt 引用，再产生 PASSED 状态事实；读者只消费完成发布的接受记录。多文件 rename 不等于跨文件原子事务。
-6. recover：验证单写锁和旧写者停止，重放事件/journal，重建投影。不确定则 PAUSED/REPAIR_PENDING；不重复投递未知结果请求。
+4. interact：仅结构化 `operator-action-required` 可请求人工输入；先持久化请求并进入 WAITING_FOR_OPERATOR。console 通过控制 API 提交响应；chain 验证绑定与权限，失败、超时、断线或持久化失败都保持暂停。恢复时同一 conversationId 使用新 requestId，历史只作上下文，不作权威状态。
+5. validate/review：阻断型技术门禁全部通过，停止写者，冻结候选与证据根，进入 REVIEW_PENDING。独立评审绑定同一候选，变更后旧批准失效。
+6. accept：以可恢复 journal 发布 snapshot/receipt 引用，再产生 PASSED 状态事实；读者只消费完成发布的接受记录。多文件 rename 不等于跨文件原子事务。
+7. recover：验证单写锁和旧写者停止，重放事件/journal/待处理交互，重建投影。不确定则 PAUSED/REPAIR_PENDING；不重复投递未知结果请求。
 
 状态名严格复用 RFC §10.3：chain `CREATED/BASELINED/RUNNING/PAUSED/COMPLETED/FAILED/CANCELLED`；task `PENDING/PRECHECK/STEPS_RUNNING/WAITING_FOR_OPERATOR/REVIEW_PENDING/PASSED/FAILED/REPAIR_PENDING/CANCELLED`；step `PENDING/RUNNING/WAITING_FOR_OPERATOR/PASSED/FAILED/CANCELLED/NOOP_RECORDED`。不得把状态集合误当任意转换许可。
 

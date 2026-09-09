@@ -25,6 +25,8 @@ go run ./cmd/prfrail report --run-dir .\tmp\prfrail-runs\run-demo
 
 核心包已有自动化测试，但完整产品 E2E/TUI 仍在后续切片。当前可视化方案是 Windows Terminal、PowerShell 或 VS Code 集成终端中的逐行 CLI，默认无 ANSI 颜色并支持 `--json`；没有独立图形窗口。Bubble Tea v1.3.4 只完成过隔离原型，尚未进入发行二进制。开发环境 gopls 与核心运行无关。ProofRail 发布二进制不直接访问 GitHub、Go/npm registry 或其他公网 URL，发布证据核验只读本地文件；依赖下载和 GitHub Actions 网络仅属于开发/CI。系统/Git 代理不保证 Go 使用代理；安装 Go 工具需要进程 HTTP_PROXY/HTTPS_PROXY，使用后恢复原环境，不随意全局改 GOPROXY 或关闭校验。
 
+目标 TUI 将在 AI 返回结构化 `operator-action-required` 后展示待处理请求与允许响应；任务保持 `WAITING_FOR_OPERATOR`，直至 chain 控制 API 校验并持久化操作员响应。超时、断线、陈旧响应或写入失败均不自动继续；恢复使用同一非空 `conversationId` 和新的 `requestId`。需要人工改文件时进入下文 handoff 租约。该闭环属于 T025，当前候选尚无对应命令或收件箱；SessionBridge `@sbr-review` 即使可用也只用于独立诊断。
+
 ## 2. 安装与首次使用
 
 S1 使用手工解压的 Windows amd64 便携 ZIP：核对固定 commit/GitHub CI 并验证 SHA256SUMS、SBOM 和许可证清单，解压到用户选择的独立版本目录，再以 `prfrail.exe` 完整路径执行 version 和静态预览。不得修改 PATH、注册表或系统目录，不得覆盖运行中的 host。可复制命令和升级/回滚/卸载步骤见 [安装指南](INSTALLATION.md)。SHA256SUMS 只证明内容与清单一致，不认证发布者身份；平台不匹配不得执行。Linux 在 S1 仅核心 CI/预览，不宣传正式支持。
@@ -46,6 +48,7 @@ S1 使用手工解压的 Windows amd64 便携 ZIP：核对固定 commit/GitHub C
 | 进程存活不明 | 只读检查受管身份、终态和租约，保持暂停 | 按 PID 名称随意 kill、提前恢复文件 |
 | 磁盘不足 | 暂停、GC dry-run 检查无引用过期对象或增加配额 | 删除 baseline/已接受/失败证据取空间 |
 | adapter 超时 | 核对持久投递记录/requestId/结果不确定性 | 改 ID 无限重发、切到 visible/auto |
+| AI 请求人工输入 | 通过 ProofRail TUI 查看结构化请求并提交允许响应；需要改文件则开启 handoff | 在聊天自由文本中授权、编辑状态文件、依赖 `@sbr-review` 推进任务 |
 | 预算耗尽 | 人工复核失败指纹、费用与新授权 | 重置计数规避 hard_block |
 | store 损坏 | 隔离对象并离线核验引用，保持依赖链阻断 | 用新哈希覆盖旧摘要冒充恢复 |
 

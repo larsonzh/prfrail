@@ -12,7 +12,7 @@ Date: 2026-09-09. Verdict: `BLOCKED`. T018 passes the frozen read-only whois com
 4. `examples/{generic-minimal,c-minimal,go-minimal}/` declare `generic-standard`, `c-standard`, and `go-standard` language scopes. All three CLI `validate → preview → run → report` loops write only to temporary run directories, reach `COMPLETED`, make zero command/network/model/credential/version-probe calls, and leave config bytes unchanged.
 5. Boundary: the whois evidence is an offline projection of an authorized frozen fixture, not a live query, production execution, or cutover. The language examples exercise the current noop-only CLI and do not claim executable-hook or compiler execution.
 
-## AT-01–AT-21 Summary
+## AT-01–AT-22 Summary
 
 | AT | Status | Primary evidence |
 |---|---|---|
@@ -37,6 +37,7 @@ Date: 2026-09-09. Verdict: `BLOCKED`. T018 passes the frozen read-only whois com
 | AT-19 | PASS | [T022 effects/diagnostics](t022-effects-diagnostics_EN.md) |
 | AT-20 | PASS | [T023 cost ledger](t023-cost-ledger_EN.md) |
 | AT-21 | PASS | [T024 lifecycle](t024-lifecycle_EN.md) |
+| AT-22 | BLOCKED | T025 is not implemented: `operator-interaction` Schema/goldens, embedded SessionBridge IPC, TUI interaction inbox, and recovery tests are absent |
 
 These PASS verdicts cover the existing deterministic AT evidence; they do not automatically satisfy stage documentation and release gates.
 
@@ -44,7 +45,7 @@ These PASS verdicts cover the existing deterministic AT evidence; they do not au
 
 | Gate | Status | Evidence/gap |
 |---|---|---|
-| Core task chain and fail-closed scenarios | PASS | AT-01–AT-14 and AT-16–AT-21 reports |
+| Core task chain and fail-closed scenarios | BLOCKED | Existing AT-01–AT-14 and AT-16–AT-21 pass; new T025/AT-22 is not implemented |
 | Seed self-host and real platforms | PASS | T017 Windows/Linux trust matrix and native Windows two-generation drill |
 | Read-only whois shadow | PASS | 9/9 fixed cases and three drift counterexamples; no production cutover |
 | generic/C/Go harnesses | PASS | All three harness definitions and minimal user examples pass the read-only CLI loop |
@@ -59,4 +60,4 @@ These PASS verdicts cover the existing deterministic AT evidence; they do not au
 1. The manually extracted portable-ZIP model, user-selected independent directory, explicit-path invocation, and no-PATH policy are frozen. The formal ZIP filename and download entry point still require release binding. ADR-010 now proposes the EOL notice and exception policy, but product-owner approval remains outstanding.
 2. Windows candidate artifacts now pass first-run, upgrade, rollback, and evidence-preserving uninstall; the final carrier must rerun the drill. Linux remains core CI only and is not S1 production support.
 3. The generic/C/Go examples prove language scopes and noop orchestration only. Executable CLI steps currently fail closed.
-4. After rerunning the tutorial against the final ZIP and binding the support matrix/release notes, the product owner must explicitly approve S1 exit. Until then, T018 and S1 remain incomplete.
+4. Complete T025 and pass AT-22 to prove the TUI operator-interaction loop without `@sbr-review`; then rerun the tutorial against the final ZIP, bind the support matrix/release notes, and obtain explicit product-owner S1 exit approval. Until then, T018 and S1 remain incomplete.

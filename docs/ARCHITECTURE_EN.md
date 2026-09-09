@@ -12,7 +12,7 @@ Use a local single-user, single-writer Go modular monolith. Persist facts as con
 
 ```mermaid
 flowchart TD
-  UI[CLI / TUI] --> C[chain: control API / single writer]
+  UI[CLI / TUI: interaction inbox / response] --> C[chain: control API / single writer]
   C --> D[taskdef: config / checker]
   C --> S[snapshot: capture / restore / candidate]
   C --> A[applier: journal transaction]
@@ -21,6 +21,7 @@ flowchart TD
   C --> W[guard: process / stop evidence]
   C --> E[evidence: events / receipts / offline verification]
   AD[adapters: SessionBridge silent / file queue] -. implements core ports .-> C
+  C -. same conversationId / new requestId .-> AD
   G --> R[isolated run-workspace]
   AD --> R
   O[source tree: read-only capture] --> S
@@ -28,13 +29,15 @@ flowchart TD
 
 The adapter/workspace edge depends on verified capability: silent text has no implicit file tools. Structured output can feed applier; only a verified tool agent may select isolated-workspace.
 
+When AI needs operator input, the adapter accepts only a structured `operator-action-required` and hands it to chain. Chain persists the request and enters `WAITING_FOR_OPERATOR`; console reads pending work and allowed responses through the control API. Chain validates actor, run/task/attempt, context digest, and authority before persisting a replayable response. Responses requiring manual writes enter the existing handoff lease instead of bypassing it. Silent execution resumes with the same non-empty `conversationId` and a new `requestId`. SessionBridge `@sbr-review` may remain available for standalone diagnostics or manual testing, but ProofRail state transitions, authorization, and recovery do not depend on it.
+
 ## 2. Ownership and Dependency Contracts
 
 | Module | Owned responsibility/output | Prohibition | First verification |
 |---|---|---|---|
 | cmd/prfrail | Arguments, composition, exit codes | Domain-state decisions | CLI black-box tests |
-| console | Views, command intents, --json | Direct state/store/receipt writes | Fake control API, narrow terminal |
-| chain | Transitions, scheduling, effective config, write lock | Concrete adapter imports, free-text PASS | Transition tables |
+| console | Views, command intents, --json, pending-interaction display/response | Direct state/store/receipt writes; treating UI text as authority | Fake control API, narrow terminal, disconnect recovery |
+| chain | Transitions, scheduling, effective config, write lock, interaction request/response validation | Concrete adapter imports, free-text PASS/questions | Transition tables, stale/forged responses |
 | taskdef | Parsing/schema, references/ownership, sequential checker, doc obligations | Target writes or commands | Valid/invalid goldens |
 | snapshot | Capture, materialization, objects, references, GC | Git recovery or unreviewed acceptance | Paths, corruption, quota |
 | applier | Full prevalidation, journal, postconditions, group rollback | Validate-while-writing, source writes | Crash at every write boundary |
@@ -42,8 +45,8 @@ The adapter/workspace edge depends on verified capability: silent text has no im
 | guard | Managed process identity, stop/liveness evidence | PID/lease-expiry-only stop claims | Child processes, PID reuse |
 | tickets | Classification, deduplication, lease, attempt/fingerprint budgets | Restarting processes or promotion | Replay, exhaustion |
 | repair | Prepare/Inspect/Validate/Promote coordination | Editing formal definitions directly, widening authority | Stale candidates, changed hashes |
-| adapters | External protocol mapping and capability probes | Business-state replacement, GUI fallback | Same contracts across transports |
-| evidence | Encoding/hashes, event chain, receipts, offline checks | Execution-plane overwrites, secret storage | Missing/reordered/tampered data |
+| adapters | External protocol mapping, capability probes, conversation/request mapping | Business-state replacement, GUI/`@sbr-review` fallback | Same contracts across transports, history continuity |
+| evidence | Encoding/hashes, event chain, receipts, interaction records, offline checks | Execution-plane overwrites, secret storage | Missing/reordered/tampered/replayed data |
 
 Consumers own their ports. AgentPort, GateRunner, ProcessSupervisor, Clock and ObjectStore are responsibility names, not existing exported Go APIs; signatures freeze during the relevant design task. cmd composes implementations; core must not import internal/adapters or console. Avoid an ownerless common package for a few shared fields.
 
@@ -52,9 +55,10 @@ Consumers own their ports. AgentPort, GateRunner, ProcessSupervisor, Clock and O
 1. Validate TOML/versioned JSON, unknown fields, references, cycles and capabilities. Resolve profile/task/step origins and freeze the run manifest.
 2. Capture source read-only, recording excluded .git, run/store, caches and secret paths. Retry/pause if concurrent source changes prevent a coherent capture.
 3. Materialize an isolated workspace from the latest accepted parent. managed-change-set uses checker/applier; isolated-workspace records manifests/diffs without claiming atomic IDE writes.
-4. After blocking gates pass, stop writers, freeze candidate/evidence root and enter REVIEW_PENDING. Independent review binds that candidate; later changes invalidate approval.
-5. Publish snapshot/receipt references with a recoverable journal, then persist PASSED facts. Readers consume completed acceptance only. Multiple renames are not a cross-file transaction.
-6. On recovery, validate single-writer ownership and the old writer's termination, replay events/journals and rebuild projections. Uncertainty means PAUSED/REPAIR_PENDING, not redispatch of an unknown request.
+4. Interact only through structured `operator-action-required`: persist the request before entering WAITING_FOR_OPERATOR. Console submits responses through the control API; chain validates binding and authority. Failure, timeout, disconnect, or persistence failure remains paused. Resume with the same conversationId and a new requestId; history is context, not authoritative state.
+5. After blocking gates pass, stop writers, freeze candidate/evidence root and enter REVIEW_PENDING. Independent review binds that candidate; later changes invalidate approval.
+6. Publish snapshot/receipt references with a recoverable journal, then persist PASSED facts. Readers consume completed acceptance only. Multiple renames are not a cross-file transaction.
+7. On recovery, validate single-writer ownership and the old writer's termination, replay events/journals/pending interactions and rebuild projections. Uncertainty means PAUSED/REPAIR_PENDING, not redispatch of an unknown request.
 
 Reuse RFC section 10.3 states exactly: chain CREATED/BASELINED/RUNNING/PAUSED/COMPLETED/FAILED/CANCELLED; task PENDING/PRECHECK/STEPS_RUNNING/WAITING_FOR_OPERATOR/REVIEW_PENDING/PASSED/FAILED/REPAIR_PENDING/CANCELLED; step PENDING/RUNNING/WAITING_FOR_OPERATOR/PASSED/FAILED/CANCELLED/NOOP_RECORDED. A list of states does not authorize arbitrary transitions.
 

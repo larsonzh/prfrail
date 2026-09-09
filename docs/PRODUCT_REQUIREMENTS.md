@@ -67,7 +67,7 @@ S0 完成规范、Schema/黄金样例和技术探针，再由用户批准 S1。S
 | REQ-006 | R6 | S1-S3 | S1 Windows 正式、Linux 核心 CI；静态模型选择及预授权 fallback，能力不足暂停 |
 | REQ-007 | R7 | S1 | IPC 与文件队列统一 ProofRail 回执；SessionBridge 仅 silent，无 GUI/auto 回退 |
 | REQ-008 | R8 | S1 | context envelope 可在宿主重启后重建，不依赖聊天历史作为事实源 |
-| REQ-009 | R9 | S1 | 一体化 TUI 展示任务、门禁、票据、日志、预算；无额外监控窗口要求 |
+| REQ-009 | R9 | S1 | 一体化 TUI 展示任务、门禁、票据、日志、预算及待人工处理的 AI 对话；用户可在同一终端提交结构化答复并将控制权交还 ProofRail，不依赖 SessionBridge chat participant 或额外监控窗口 |
 | REQ-010 | R10 | S1 | init/validate/config explain 生成、检查并解释配置；运行状态不回写配置 |
 | REQ-011 | R11 | S1/S2 | S1 generic/C/Go harness 外置，核心无语言判断分支；S2 扩展语言 |
 | REQ-012 | R12 | S1 | 分离 executable 与 args，执行前能力检查，超时/输出/网络/环境受策略约束 |

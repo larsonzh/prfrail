@@ -186,7 +186,11 @@ handoff：停止受管写者→flush journal→捕获 manifest→WAITING_FOR_OPE
 
 ProofRail 端口接受版本化 context envelope：任务契约、父快照、已确认决策、最新证据、未决票据、预算、允许工具及引用摘要；返回候选变更/证据，不返回可信的任务 PASS。每个 attempt 有固定关联身份；投递前持久记录，重复请求不能重复应用同一 change-set。传输重试复用 requestId；新业务 attempt 产生新身份并计费。
 
-SessionBridge v0.1.1 是独立外部依赖，冻结消费其公开 v1 契约：明确 `mode=silent`、`legacy=false`；使用同一 channel directory 和目标实例；`requestId` 绑定回执；写命令先清理同 ID 陈旧结果，再同目录原子写。准确 wire 以该产品 RFC、黄金样例及客户端实现共同核对，不能直接复制 RFC 中省略字段的说明片段。
+SessionBridge v0.1.1 扩展是独立外部依赖，冻结消费其公开 v1 契约。ProofRail 产品集成须内置该契约的文件 IPC 客户端，直接写入 `cmd_<pid>.json` 并读取 `res_<pid>.json`，不得要求用户另行安装或启动 SessionBridge 的 Python、PowerShell 或 sh 参考客户端。内置客户端明确使用 `mode=silent`、`legacy=false`；使用同一 channel directory 和目标实例；`requestId` 绑定回执；写命令先清理同 ID 陈旧结果，再同目录原子写。准确 wire 以该产品 RFC、黄金样例及客户端实现共同核对，不能直接复制 RFC 中省略字段的说明片段。
+
+每个 ProofRail 业务 attempt 必须派生非空且稳定的 `conversationId`，同一 attempt 的后续成功轮次与传输重试复用该会话身份，使 SessionBridge RFC §5.1 的 silent 历史自动生效；空 `conversationId` 仅允许显式的无状态诊断，不得用于连续 AI 作业。新 attempt 使用新会话身份；需要重置时显式发送 `resetHistory=true`。`turnId`、history 截断和回执仍须按 SessionBridge v1 校验。会话历史只提供模型上下文，不是 ProofRail 权威状态；宿主重启、截断或丢失后仍从持久 context envelope 重建。
+
+Silent 运行中需要人工干预时，通知、答复和控制权归还由 ProofRail 自有 CLI/TUI 承担，不依赖 SessionBridge `@sbr-review`、chat participant 注册或 `reply_<conversationId>.json`。AI 的结构化干预请求先令 task/step 进入 `WAITING_FOR_OPERATOR`；用户输入必须经 ProofRail 校验并持久化为适用的 operator interaction、review、authorization 或 handoff 记录，不能让聊天文字直接改变状态或授权。未收到有效记录时保持暂停；恢复 silent 时同一 attempt 复用 `conversationId`、使用新 `requestId` 并携带人工结论及记录摘要。一般澄清问答的 `operator-interaction` wire 尚未冻结；实现前必须先增加 Schema、正反样例、摘要和重放契约。
 
 | 外部结果/能力 | ProofRail 行为 |
 |---|---|
