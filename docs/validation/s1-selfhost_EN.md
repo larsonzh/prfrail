@@ -54,6 +54,23 @@ The public API for run `34277671704` reports these six unexpired GitHub Actions 
 | `prfrail-Linux-1e7af676e8e84028c7ecfef1ccde91213738c20c` | 2,249,050 | `sha256:43a99ee59076e3eae96c9ed61016159511f9ac9309169f170befead286d1d41a` |
 | `prfrail-Windows-1e7af676e8e84028c7ecfef1ccde91213738c20c` | 2,398,244 | `sha256:7adc8f21c81df88db31d18ea5b83e892d5e7d3a9416088c51b0ec12b15df6ca7` |
 
+## Node 24 Actions Replacement Baseline
+
+On 2026-09-09, every GitHub Action was upgraded to a native Node 24 release and pinned by full commit SHA. GPT-5.3 Codex and DeepSeek V4 Pro independently returned `PASS FOR NEW VERIFIER BASELINE`. Verifier `6024526893fd7acc47de44ee862572ac9ec33303` was then manually dispatched from `main` against the distinct docs-only candidate `603e8dc03e9fb74ce9c53243d38e704fd8469c6a`.
+
+[Run `34325758548`](https://github.com/larsonzh/prfrail/actions/runs/34325758548) reports `event=workflow_dispatch`, `head_sha=6024526893fd7acc47de44ee862572ac9ec33303`, and `conclusion=success`. All eight Go, candidate-build, candidate-probe, and bootstrap/release-evidence jobs passed across Ubuntu and Windows. Its six unexpired artifacts are:
+
+| Artifact | Size (bytes) | GitHub archive digest |
+|---|---:|---|
+| `candidate-binary-Linux-603e8dc03e9fb74ce9c53243d38e704fd8469c6a` | 2,247,947 | `sha256:cd7523336b44636362290d9532e2a6e4ab45775ae8bbe6e5a7207dc66131e58a` |
+| `candidate-binary-Windows-603e8dc03e9fb74ce9c53243d38e704fd8469c6a` | 2,397,139 | `sha256:12d90fd5e60403b249455c15eaf1aafd4eceef8ed6713abc4b26eb73c6db067d` |
+| `candidate-oracle-Linux-603e8dc03e9fb74ce9c53243d38e704fd8469c6a` | 261 | `sha256:dfbdf4a319ef0a7fb436eae0c151b350ba394ae167aa42fda7114f84764b19f1` |
+| `candidate-oracle-Windows-603e8dc03e9fb74ce9c53243d38e704fd8469c6a` | 261 | `sha256:2f7d7bc568fc67389f6f59a67df9eb3e6df8de8d6b2f2e2202b44f9af9a6bcb8` |
+| `prfrail-Linux-603e8dc03e9fb74ce9c53243d38e704fd8469c6a` | 2,249,054 | `sha256:24ee9025608def05341f5e3c037067d73287289898e1ad71c856eb7e9c5f97bf` |
+| `prfrail-Windows-603e8dc03e9fb74ce9c53243d38e704fd8469c6a` | 2,398,249 | `sha256:38cb242a023f676bccd2b1ef64a35c62c7a2dc6a951162d4a2323d6951768fdf` |
+
+These digests cover GitHub artifact archives and do not replace the verifier-checked SHA256SUMS inside them. The Node 24 replacement does not expand T017's trust claims.
+
 ## First CI Inputs
 
 The maintainer must calculate these required inputs from the independently reviewed commit/fixtures and enter them manually; candidate-generated values are not trusted. The workflow must be dispatched from `main`; the self-host job is rejected for every other ref:

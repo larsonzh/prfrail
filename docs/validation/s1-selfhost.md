@@ -54,6 +54,23 @@
 | `prfrail-Linux-1e7af676e8e84028c7ecfef1ccde91213738c20c` | 2,249,050 | `sha256:43a99ee59076e3eae96c9ed61016159511f9ac9309169f170befead286d1d41a` |
 | `prfrail-Windows-1e7af676e8e84028c7ecfef1ccde91213738c20c` | 2,398,244 | `sha256:7adc8f21c81df88db31d18ea5b83e892d5e7d3a9416088c51b0ec12b15df6ca7` |
 
+## Node 24 Actions 替换基线
+
+2026-09-09，GitHub Actions 全部升级为原生 Node 24 版本并固定完整 commit SHA。GPT-5.3 Codex 与 DeepSeek V4 Pro 分别给出 `PASS FOR NEW VERIFIER BASELINE`；verifier `6024526893fd7acc47de44ee862572ac9ec33303` 随后从 `main` 手工 dispatch，不同的 docs-only candidate 为 `603e8dc03e9fb74ce9c53243d38e704fd8469c6a`。
+
+[run `34325758548`](https://github.com/larsonzh/prfrail/actions/runs/34325758548) 的 `event=workflow_dispatch`、`head_sha=6024526893fd7acc47de44ee862572ac9ec33303`、`conclusion=success`；Go、candidate-build、candidate-probe、bootstrap/release evidence 在 Ubuntu/Windows 共 8/8 jobs 成功。6 个未过期 artifact 如下：
+
+| Artifact | 大小（字节） | GitHub archive digest |
+|---|---:|---|
+| `candidate-binary-Linux-603e8dc03e9fb74ce9c53243d38e704fd8469c6a` | 2,247,947 | `sha256:cd7523336b44636362290d9532e2a6e4ab45775ae8bbe6e5a7207dc66131e58a` |
+| `candidate-binary-Windows-603e8dc03e9fb74ce9c53243d38e704fd8469c6a` | 2,397,139 | `sha256:12d90fd5e60403b249455c15eaf1aafd4eceef8ed6713abc4b26eb73c6db067d` |
+| `candidate-oracle-Linux-603e8dc03e9fb74ce9c53243d38e704fd8469c6a` | 261 | `sha256:dfbdf4a319ef0a7fb436eae0c151b350ba394ae167aa42fda7114f84764b19f1` |
+| `candidate-oracle-Windows-603e8dc03e9fb74ce9c53243d38e704fd8469c6a` | 261 | `sha256:2f7d7bc568fc67389f6f59a67df9eb3e6df8de8d6b2f2e2202b44f9af9a6bcb8` |
+| `prfrail-Linux-603e8dc03e9fb74ce9c53243d38e704fd8469c6a` | 2,249,054 | `sha256:24ee9025608def05341f5e3c037067d73287289898e1ad71c856eb7e9c5f97bf` |
+| `prfrail-Windows-603e8dc03e9fb74ce9c53243d38e704fd8469c6a` | 2,398,249 | `sha256:38cb242a023f676bccd2b1ef64a35c62c7a2dc6a951162d4a2323d6951768fdf` |
+
+这些 digest 是 GitHub artifact archive 摘要，不替代归档内 verifier 核验的 SHA256SUMS。Node 24 替换没有扩大 T017 的信任声明。
+
 ## 首次 CI 输入
 
 维护者须从已独立评审的 commit/fixture 计算并手工填写以下必填输入，不得直接信任候选生成值；workflow 必须从 `main` 分支启动，其他 ref 的 self-host job 会被拒绝：
