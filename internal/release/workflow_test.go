@@ -267,7 +267,7 @@ func validateWorkflowScripts(workflow workflowDocument) error {
 			digest: "27a4f6a51f91cc35fdcab8f3b7dc1f509a28d0d9fff04c038a45131d1df70931", shell: "pwsh",
 		},
 		"selfhost/Verify evidence and generate release metadata": {
-			digest: "7989dd9584abe48bcea870609d6f6d2df75399db9ac70ceded92636feab5a664", shell: "pwsh",
+			digest: "0cd0fd8d287621122e51f86b406fc90dbe3c8b09e090c1adef5351f369472d9b", shell: "pwsh",
 		},
 	}
 	seen := make(map[string]bool, len(expectedScripts))
@@ -351,7 +351,7 @@ func validateWorkflowActions(workflow workflowDocument) error {
 			"name": "candidate-oracle-${{ runner.os }}-${{ inputs.candidate_commit }}", "path": "generations/candidate", "digest-mismatch": "error",
 		},
 		"selfhost/Upload verified CI artifact": {
-			"name": "prfrail-${{ runner.os }}-${{ inputs.candidate_commit }}", "path": "generations/candidate/release/*", "if-no-files-found": "error",
+			"name": "prfrail-${{ runner.os }}-${{ inputs.candidate_commit }}", "path": "generations/candidate/artifact/*", "if-no-files-found": "error",
 		},
 	}
 	seen := make(map[string]bool, len(expectedParameters))

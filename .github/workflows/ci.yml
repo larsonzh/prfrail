@@ -386,9 +386,13 @@ jobs:
             --generated-at $generatedAt
           & $releaseTool verify --commit $env:CANDIDATE_COMMIT --root $releaseRoot
 
+          $packageRoot = Join-Path $candidateRoot 'artifact/prfrail'
+          New-Item -ItemType Directory -Path $packageRoot -Force | Out-Null
+          Copy-Item -Path (Join-Path $releaseRoot '*') -Destination $packageRoot
+
       - name: Upload verified CI artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: prfrail-${{ runner.os }}-${{ inputs.candidate_commit }}
-          path: generations/candidate/release/*
+          path: generations/candidate/artifact/*
           if-no-files-found: error
