@@ -192,7 +192,7 @@ CLI Agent 只在为当前 task/attempt 物化的可丢弃 run-workspace 中工�
 
 代理报告 completed、退出 0 或最终文本只表示外部执行结束。ProofRail 必须先证明进程树停止，重新扫描 workspace，校验范围/秘密/副作用，冻结 candidate，再独立运行声明的 build/test/verify gates；通过后仍进入独立 review/promotion。超时、失联、无法停止、会话恢复失败、日志或费用不完整、外部副作用不明均为 uncertain 并保持暂停，禁止换会话盲重试。AgentRunner 请求、能力报告、事件和 completion receipt 的 wire、canonical/hash、去重与重放规则尚未冻结；实现前须经 ADR、Schema、正反 golden 和 checker 更新。
 
-需要人工输入时，CLI Agent adapter 只能上报结构化 `operator-action-required`；ProofRail 在原子边界停止或暂停受管代理，持久化请求并令 task/step 进入 `WAITING_FOR_OPERATOR`。通知、答复和控制权归还由 ProofRail 自有 CLI/TUI 承担。用户输入必须经 ProofRail 校验并持久化为适用的 operator interaction、review、authorization 或 handoff 记录；终端/聊天自由文本不能直接改变状态或授权。恢复同一 Agent 会话前须重新验证 attempt、workspace、session、上下文摘要、租约和授权；一般澄清问答的 `operator-interaction` wire 仍须先完成 T025 的 Schema、正反样例、摘要和重放契约。
+需要人工输入时，CLI Agent adapter 只能上报结构化 `operator-action-required`；ProofRail 在原子边界停止或暂停受管代理，持久化请求并令 task/step 进入 `WAITING_FOR_OPERATOR`。通知、答复和控制权归还由 ProofRail 自有 CLI/TUI 承担。用户输入必须经 ProofRail 校验并持久化为适用的 operator interaction、review、authorization 或 handoff 记录；终端/聊天自由文本不能直接改变状态或授权。恢复同一 Agent 会话前须重新验证 attempt、workspace、session、上下文摘要、租约和授权。T025 已冻结一般澄清问答的 `operator-interaction` Schema、正反样例、RFC 8785 摘要、追加式 JSONL 重放和 Engine open/resume 控制 API；控制 API 只在 request/response、当前绑定与等待态一致时返回恢复命令，事件部分写入时保持 chain 暂停并按证据哈希幂等收敛。真实 Agent session 续跑由 T027 接入。
 
 SessionBridge v0.1.1 的 `silent`/`visible`/`auto` 均不是正式 AgentRunner：`silent` 可用于无工具的分类、摘要、计划、结构化分析或 managed-change-set 建议；`visible` 可用于观察、诊断、通知、人工接管及下述受监督黑箱候选流程；`auto` 不进入正式流程，因为其实际路径和能力不确定。任何 SessionBridge 使用仍须内置 v1 文件 IPC 客户端、`legacy=false`、requestId 回执绑定和自身持久幂等；连续辅助会话可使用稳定 `conversationId`，但 history 只作上下文。不得把 visible 投递成功解释为 Agent 完成，也不得在 CLI Agent 失败后自动切换模式继续写入。
 

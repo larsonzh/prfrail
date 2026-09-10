@@ -73,7 +73,7 @@ flowchart TD
 3. 用户在 TUI 中答复。普通澄清、批准/拒绝、授权变更和人工写入分别形成对应的 operator interaction、review、authorization 或 handoff 记录；终端文字本身不是权威事实，秘密只进入受控安全输入。
 4. ProofRail 校验操作者、attempt、候选/上下文摘要、租约、授权与答复范围后才收回控制权。无答复、断线、超时或记录失败均保持暂停，不自动选择默认答案。
 5. 无需人工写入时，把已确认答复及记录摘要送回当前可恢复的 CLI Agent session；恢复前重新验证 attempt/workspace/session/进程和授权，不确定则建立新 attempt。SessionBridge silent 仅可承载辅助分析上下文，不承载正式执行恢复。
-6. 一般澄清问答的 `operator-interaction` 记录在实现前必须先冻结 Schema、正反黄金样例、摘要域和重放规则；不得用聊天历史、TUI 缓冲区或 `reply_<conversationId>.json` 代替持久记录。
+6. T025 已冻结一般澄清问答的 `operator-interaction` Schema、正反黄金样例、摘要域和重放规则，并实现聚焦终端收件箱与 Engine 控制 API；不得用聊天历史、TUI 缓冲区或 `reply_<conversationId>.json` 代替持久记录。真实 CLI Agent session 续跑仍由 T027 接入。
 
 ## 6. 人工交接流程
 
@@ -104,4 +104,4 @@ whois 只用于说明这些流程的经验来源及未来只读影子验收。A/
 
 ## 9. 实施追踪
 
-T009 实现第 3–4 节的有序调度、投影、暂停、取消与重放；T010 接入真实 gate runner；T011 完成评审与接受；T013/T014 完成抽象 adapter 和人工交接；T016 提供可用逐行 CLI；T019–T024 完成预览、导出、授权、副作用、成本和生命周期；T025 规划第 5 节 TUI AI/操作员交互；T026/T027 规划 AgentRunner 契约与实现；T028 规划 §6.1 黑箱候选。各阶段只能把已实测能力从“规划”改为“可用”。
+T009 实现第 3–4 节的有序调度、投影、暂停、取消与重放；T010 接入真实 gate runner；T011 完成评审与接受；T013/T014 完成抽象 adapter 和人工交接；T016 提供可用逐行 CLI；T019–T024 完成预览、导出、授权、副作用、成本和生命周期；T025 完成第 5 节的持久交互契约、聚焦终端收件箱和 chain 控制权归还；T026/T027 规划 AgentRunner 契约与实现；T028 规划 §6.1 黑箱候选。完整统一 TUI 仍是后续切片。各阶段只能把已实测能力从“规划”改为“可用”。

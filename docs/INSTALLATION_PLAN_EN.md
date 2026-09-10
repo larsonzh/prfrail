@@ -10,7 +10,7 @@ Only developer source builds and tests are currently supported, requiring Go 1.2
 
 ## 2. Target Deployment Model
 
-The S1 target is a local, single-user, single-writer CLI/TUI with explicit binary, state/store, isolated-workspace and read-only-source boundaries. Formal execution uses a pinned CLI Agent through AgentRunner; SessionBridge serves auxiliary messaging and explicitly selected visible black-box candidates only. The black-box path trades process assurance for faster reuse of an existing Agent and requires displayed risk/responsibility plus human supervision. The current candidate delivers only a line-oriented CLI; neither AI path, the interaction loop, nor the complete TUI is implemented.
+The S1 target is a local, single-user, single-writer CLI/TUI with explicit binary, state/store, isolated-workspace and read-only-source boundaries. Formal execution uses a pinned CLI Agent through AgentRunner; SessionBridge serves auxiliary messaging and explicitly selected visible black-box candidates only. The black-box path trades process assurance for faster reuse of an existing Agent and requires displayed risk/responsibility plus human supervision. The current candidate delivers the line-oriented CLI and T025 focused terminal interaction inbox; neither AI execution path nor the complete unified TUI is implemented.
 
 ## 3. Open Decisions
 

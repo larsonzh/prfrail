@@ -24,7 +24,7 @@ SessionBridge 独立联调可验证 visible 投递、`@sbr-review` 和 silent �
 
 当前 ProofRail 尚未实现 AgentRunner、正式 CLI Agent adapter 或黑箱模式所需的 visible IPC/TUI 风险确认与归还流程。`internal/adapters/sessbridge.go` 只有消费方提供的 `SilentClient` 接口；安装扩展不等于任何 AI 闭环可用，不能把 noop-only `run` 扩大解释为 AI 已能自动改码。
 
-当前发行候选没有图形窗口、完整 TUI 或 AI/操作员交互收件箱。`prfrail.exe` 使用普通终端中的逐行 CLI 文本，默认无 ANSI 颜色，并为自动化提供 `--json`；可直接在 Windows Terminal、PowerShell 或 VS Code 集成终端中运行。Bubble Tea v1.3.4 仅完成过隔离可行性原型，尚未链接进当前二进制。S1 优先用“一个终端、短命令、可复制路径”降低学习成本，而不把原型界面冒充已交付功能。
+当前发行候选没有图形窗口或完整统一 TUI。`prfrail.exe` 使用普通终端中的逐行 CLI 文本，默认无 ANSI 颜色，并为自动化提供 `--json`；T025 已提供 `interactions list/respond/tui` 聚焦交互收件箱。它可直接在 Windows Terminal、PowerShell 或 VS Code 集成终端中运行。Bubble Tea v1.3.4 仅完成过隔离可行性原型，尚未链接进当前二进制。S1 优先用“一个终端、短命令、可复制路径”降低学习成本，而不把原型界面冒充已交付功能。
 
 ## 2. 下载与离线核验
 

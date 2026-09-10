@@ -2,7 +2,7 @@
 
 [English](OPERATIONS_EN.md)
 
-日期：2026-09-09；S1 操作设计稿。当前没有 ProofRail 正式发行包；手工解压 Windows amd64 便携 ZIP、显式路径运行且不修改 PATH 的 S1 安装模型已获批，候选步骤见 [安装指南](INSTALLATION.md)。T016/T019/T020/T023 已交付 CLI 与交付底座：`version/init/validate/config explain/preview/cost report/run/report` 和库级导出模块（`internal/snapshot/export.go`、`internal/evidence/delivery.go`）。`preview` 为离线只读静态预览，不执行命令/网络/模型/凭据读取；`run` 目前只支持 noop-only 任务链，遇到 `code/build/verify` 会 fail-close 并返回非零退出码。其余产品能力仍是 RFC 规划接口。待决发行绑定见 [安装部署规划](INSTALLATION_PLAN.md)，完整用户流程见 [业务流程](BUSINESS_WORKFLOWS.md)。
+日期：2026-09-10；S1 操作设计稿。当前没有 ProofRail 正式发行包；手工解压 Windows amd64 便携 ZIP、显式路径运行且不修改 PATH 的 S1 安装模型已获批，候选步骤见 [安装指南](INSTALLATION.md)。T016/T019/T020/T023/T025 已交付 CLI 与交付底座：`version/init/validate/config explain/preview/approvals/interactions/cost report/run/report` 和库级导出模块（`internal/snapshot/export.go`、`internal/evidence/delivery.go`）。`preview` 为离线只读静态预览，不执行命令/网络/模型/凭据读取；`run` 目前只支持 noop-only 任务链，遇到 `code/build/verify` 会 fail-close 并返回非零退出码。其余产品能力仍是 RFC 规划接口。待决发行绑定见 [安装部署规划](INSTALLATION_PLAN.md)，完整用户流程见 [业务流程](BUSINESS_WORKFLOWS.md)。
 
 ## 1. 当前可执行
 
@@ -18,6 +18,8 @@ go run ./cmd/prfrail init --workspace .
 go run ./cmd/prfrail validate --chain .\proofrail.chain.json
 go run ./cmd/prfrail config explain --chain .\proofrail.chain.json
 go run ./cmd/prfrail preview --chain .\proofrail.chain.json
+go run ./cmd/prfrail interactions list --ledger .\operator-interactions.jsonl
+go run ./cmd/prfrail interactions tui --ledger .\operator-interactions.jsonl --actor-id operator-one
 go run ./cmd/prfrail cost report --ledger .\cost-ledger.json
 go run ./cmd/prfrail run --chain .\proofrail.chain.json --run-id run-demo
 go run ./cmd/prfrail report --run-dir .\tmp\prfrail-runs\run-demo
@@ -25,13 +27,13 @@ go run ./cmd/prfrail report --run-dir .\tmp\prfrail-runs\run-demo
 
 核心包已有自动化测试，但完整产品 E2E/TUI 仍在后续切片。当前可视化方案是 Windows Terminal、PowerShell 或 VS Code 集成终端中的逐行 CLI，默认无 ANSI 颜色并支持 `--json`；没有独立图形窗口。Bubble Tea v1.3.4 只完成过隔离原型，尚未进入发行二进制。开发环境 gopls 与核心运行无关。ProofRail 发布二进制不直接访问 GitHub、Go/npm registry 或其他公网 URL，发布证据核验只读本地文件；依赖下载和 GitHub Actions 网络仅属于开发/CI。系统/Git 代理不保证 Go 使用代理；安装 Go 工具需要进程 HTTP_PROXY/HTTPS_PROXY，使用后恢复原环境，不随意全局改 GOPROXY 或关闭校验。
 
-目标 TUI 将在 AI 返回结构化 `operator-action-required` 后展示待处理请求与允许响应；任务保持 `WAITING_FOR_OPERATOR`，直至 chain 控制 API 校验并持久化操作员响应。恢复 CLI Agent 前重验 attempt/workspace/session/进程和授权，不确定则新建 attempt。该闭环属于 T025，当前候选尚无对应命令或收件箱；SessionBridge `@sbr-review` 只用于独立诊断。
+T025 已提供聚焦终端交互：`interactions list [--ledger <path>] [--json]` 重建待处理收件箱，`interactions respond` 按 interaction/actor/attempt/context/允许选项写入结构化响应，`interactions tui` 在无 ANSI 的同一终端逐项展示并选择。task/step 保持 `WAITING_FOR_OPERATOR`，直至 chain 控制 API 校验 request/response、当前绑定与持久状态，并在事件写入完成后返回恢复命令。恢复真实 CLI Agent 前仍须由 T027 重验 session/进程和授权；完整统一 TUI 未交付。SessionBridge `@sbr-review` 只用于独立诊断。
 
 ## 2. 安装与首次使用
 
 S1 使用手工解压的 Windows amd64 便携 ZIP：核对固定 commit/GitHub CI 并验证 SHA256SUMS、SBOM 和许可证清单，解压到用户选择的独立版本目录，再以 `prfrail.exe` 完整路径执行 version 和静态预览。不得修改 PATH、注册表或系统目录，不得覆盖运行中的 host。可复制命令和升级/回滚/卸载步骤见 [安装指南](INSTALLATION.md)。SHA256SUMS 只证明内容与清单一致，不认证发布者身份；平台不匹配不得执行。Linux 在 S1 仅核心 CI/预览，不宣传正式支持。
 
-当前可复制流程为 `prfrail init --workspace <path>`、`prfrail validate --chain <chain-file>`、`prfrail config explain --chain <chain-file>`、`prfrail preview --chain <chain-file> [--json]`、`prfrail cost report [--ledger <path>] [--json]`、`prfrail run --chain <chain-file> [--run-id] [--run-dir]`、`prfrail report --run-dir <run-dir>`。新用户先按[安装指南的五步快速上手](INSTALLATION.md#3-五步快速上手)完成无副作用闭环。`preview` 只读展示 `previewHash`、权限边界、unknown 及零调用计数；`cost report` 本地读取成本账本并输出预留/结算/未知占用，不做默认遥测导出；`run` 当前仅支持 noop-only 链。导出能力已在库级实现，但 CLI `export` 命令仍在后续切片；执行型 step 的真实 gate/adapter 全闭环同样属于后续切片。
+当前可复制流程为 `prfrail init --workspace <path>`、`prfrail validate --chain <chain-file>`、`prfrail config explain --chain <chain-file>`、`prfrail preview --chain <chain-file> [--json]`、`prfrail interactions list|respond|tui`、`prfrail cost report [--ledger <path>] [--json]`、`prfrail run --chain <chain-file> [--run-id] [--run-dir]`、`prfrail report --run-dir <run-dir>`。新用户先按[安装指南的五步快速上手](INSTALLATION.md#3-五步快速上手)完成无副作用闭环。`preview` 只读展示 `previewHash`、权限边界、unknown 及零调用计数；`interactions` 只处理已有持久请求，不自行调用模型；`cost report` 本地读取成本账本并输出预留/结算/未知占用，不做默认遥测导出；`run` 当前仅支持 noop-only 链。导出能力已在库级实现，但 CLI `export` 命令仍在后续切片；执行型 step 的真实 gate/adapter 全闭环同样属于后续切片。
 
 核心离线模式不要求 VS Code。正式 AI 执行目标为固定 CLI Agent 的 AgentRunner；受监督黑箱候选才要求 VS Code、可用 Copilot Chat 和 SessionBridge 0.1.1 的 visible 模式。启动黑箱模式前必须确认其过程/网络/费用/外部副作用不可观测，用户监督后显式归还 workspace，再由 ProofRail 独立验收。两条路径当前均未交付，扩展已安装或消息可达不等于 AI 自动编程验收。
 

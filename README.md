@@ -18,19 +18,20 @@ ProofRail 让 AI 在无人值守下安全地改代码、跑验证、出证据：
 
 ### 状态
 
-**S1 实施中（2026-09-08）**：T005–T022 已完成证据、快照、进程/租约守卫、托管变更集与事务应用，以及无 IDE CLI 基线（`init/validate/config explain/preview/approvals/run/report`）。
+**S1 实施中（2026-09-10）**：核心切片已推进至 T025，完成证据、快照、进程/租约守卫、托管变更集与事务应用、产品生命周期，以及无 IDE CLI 基线（`init/validate/config explain/preview/approvals/interactions/cost report/run/report`）。
 当前仍不是正式发行包：`run` 只支持 noop-only 任务链；遇到 `code/build/verify` 步骤会 fail-close 并返回非零退出码。
 `preview` 已支持离线只读静态预览（no-AI），不会执行命令、网络探测、模型调用或凭据读取。
 `export` 已具备库级实现（`internal/snapshot/export.go` 与 `internal/evidence/delivery.go`），CLI 入口仍在后续切片。
 `approvals` 已提供授权账本查看与撤销（`list`/`revoke`），撤销按 `stopDisposition` 接线受控停机并持久化待审批队列（重启可见）；离线、零模型调用。
 `effects`/`diagnostics` 已具备库级副作用分类与恢复诊断（`internal/gates/effects.go`、`internal/evidence/diagnostics.go`）：S1 拒绝外部写，未知副作用只对账不重投，诊断只读脱敏；CLI 入口仍在后续切片。
+`interactions` 已提供追加式交互账本的待办重建、结构化答复和无 ANSI 聚焦终端界面；Engine 仅在 request/response、当前绑定与等待态一致且状态事件持久化后归还控制权。真实 Agent session 续跑仍待 T027，完整统一 TUI 仍属后续切片。
 项目建议书与历史设计来源见 [docs/RFC-proofrail-unattended-ai-engineering-product.md](docs/RFC-proofrail-unattended-ai-engineering-product.md)；分域权威见 [docs/DOCUMENTATION_PLAN.md](docs/DOCUMENTATION_PLAN.md)。
 
 从 [docs/DOCUMENTATION_PLAN.md](docs/DOCUMENTATION_PLAN.md) 阅读文档导航与低成本模型流程；
 执行顺序见 [docs/DEV_PLAN.md](docs/DEV_PLAN.md)，就绪缺口见 [docs/ADR_REGISTER.md](docs/ADR_REGISTER.md)。
 独立产品端到端叙事见 [docs/BUSINESS_WORKFLOWS.md](docs/BUSINESS_WORKFLOWS.md)；尚未冻结的安装发行方案见 [docs/INSTALLATION_PLAN.md](docs/INSTALLATION_PLAN.md)。
 
-产品完整性评审已补充无副作用预览、已接受结果导出、授权撤销、外部副作用边界、成本预留结算和备份/停用流程；见 [docs/PRODUCT_REQUIREMENTS.md](docs/PRODUCT_REQUIREMENTS.md) §8。均为待批准设计，不是现有功能；文件回滚不保证撤销外部操作。
+产品完整性评审已补充无副作用预览、已接受结果导出、授权撤销、外部副作用边界、成本预留结算和备份/停用流程；见 [docs/PRODUCT_REQUIREMENTS.md](docs/PRODUCT_REQUIREMENTS.md) §8。各项实现状态以 [docs/DEV_PLAN.md](docs/DEV_PLAN.md) 为准；文件回滚不保证撤销外部操作。
 
 ### 快速开始（当前 CLI 基线）
 
@@ -42,11 +43,13 @@ prfrail validate --chain ./proofrail.chain.json
 prfrail config explain --chain ./proofrail.chain.json
 prfrail preview --chain ./proofrail.chain.json
 prfrail approvals list --ledger ./authorization-ledger.jsonl
+prfrail interactions list --ledger ./operator-interactions.jsonl
+prfrail interactions tui --ledger ./operator-interactions.jsonl --actor-id operator-one
 prfrail run --chain ./proofrail.chain.json --run-id run-demo
 prfrail report --run-dir ./tmp/prfrail-runs/run-demo
 ```
 
-说明：`run` 目前仅执行 noop-only 任务链；`serve`/完整 TUI 仍在后续切片。目标 TUI 将显示 AI 的待处理人工请求，并在用户显式选择黑箱模式时先展示降级保证和责任边界。SessionBridge visible 投递不等于完成，正式流程也不依赖 `@sbr-review`。
+说明：`run` 目前仅执行 noop-only 任务链；`interactions tui` 是 T025 的聚焦终端收件箱，不是完整统一 TUI，`serve`/完整 TUI 仍在后续切片。后续黑箱模式须先展示降级保证和责任边界。SessionBridge visible 投递不等于完成，正式流程也不依赖 `@sbr-review`。
 
 ### 构建（需 Go 工具链）
 
@@ -91,19 +94,20 @@ ProofRail enables AI to safely modify code, run validations, and produce evidenc
 
 ### Status
 
-**S1 implementation in progress (2026-09-08)**: T005–T022 implement evidence, snapshots, process/lease guards, managed change sets, transactional apply, and a no-IDE CLI baseline (`init/validate/config explain/preview/approvals/run/report`).
+**S1 implementation in progress (2026-09-10)**: core slices now reach T025, covering evidence, snapshots, process/lease guards, managed change sets, transactional apply, product lifecycle, and a no-IDE CLI baseline (`init/validate/config explain/preview/approvals/interactions/cost report/run/report`).
 This is still not a production release package: `run` currently supports noop-only chains and fail-closes with a non-zero exit for executable `code/build/verify` steps.
 `preview` now supports a no-AI offline read-only static report with zero command/network/model/credential execution.
 `export` is now implemented at library level (`internal/snapshot/export.go` + `internal/evidence/delivery.go`); a dedicated CLI entrypoint remains in later slices.
 `approvals` now provides an authorization ledger view and revocation (`list`/`revoke`) with controlled-stop wiring per `stopDisposition` and a restart-visible pending inbox; offline and model-free.
 `effects`/`diagnostics` now provide library-level side-effect classification and recovery diagnosis (`internal/gates/effects.go`, `internal/evidence/diagnostics.go`): S1 denies external writes, unknown effects reconcile instead of blind retry, and diagnosis is read-only and redacted; CLI entrypoints remain in later slices.
+`interactions` now rebuilds pending items from an append-only ledger, records structured responses, and provides a focused ANSI-free terminal UI. The Engine returns control only after request/response, current binding, waiting state, and durable state events agree. Real Agent-session continuation remains T027 work, and the complete unified TUI remains a later slice.
 Project proposal and historical design source: [docs/RFC-proofrail-unattended-ai-engineering-product.md](docs/RFC-proofrail-unattended-ai-engineering-product.md). Domain authorities: [docs/DOCUMENTATION_PLAN_EN.md](docs/DOCUMENTATION_PLAN_EN.md).
 
 Start with [docs/DOCUMENTATION_PLAN_EN.md](docs/DOCUMENTATION_PLAN_EN.md) for navigation and the low-cost model workflow;
 see [docs/DEV_PLAN_EN.md](docs/DEV_PLAN_EN.md) for tasks and [docs/ADR_REGISTER_EN.md](docs/ADR_REGISTER_EN.md) for readiness gaps.
 See [docs/BUSINESS_WORKFLOWS_EN.md](docs/BUSINESS_WORKFLOWS_EN.md) for the independent end-to-end product narrative and [docs/INSTALLATION_PLAN_EN.md](docs/INSTALLATION_PLAN_EN.md) for unresolved installation and distribution decisions.
 
-Product review adds side-effect-free preview, accepted-result export, revocation, external-effect boundaries, cost reservation/settlement and backup/retirement flows. See [docs/PRODUCT_REQUIREMENTS_EN.md](docs/PRODUCT_REQUIREMENTS_EN.md) section 8. These are unapproved designs, not available features; file rollback cannot guarantee undoing external effects.
+Product review adds side-effect-free preview, accepted-result export, revocation, external-effect boundaries, cost reservation/settlement and backup/retirement flows. See [docs/PRODUCT_REQUIREMENTS_EN.md](docs/PRODUCT_REQUIREMENTS_EN.md) section 8 and [docs/DEV_PLAN_EN.md](docs/DEV_PLAN_EN.md) for each capability's implementation status. File rollback cannot guarantee undoing external effects.
 
 ### Quick Start (current CLI baseline)
 
@@ -115,11 +119,13 @@ prfrail validate --chain ./proofrail.chain.json
 prfrail config explain --chain ./proofrail.chain.json
 prfrail preview --chain ./proofrail.chain.json
 prfrail approvals list --ledger ./authorization-ledger.jsonl
+prfrail interactions list --ledger ./operator-interactions.jsonl
+prfrail interactions tui --ledger ./operator-interactions.jsonl --actor-id operator-one
 prfrail run --chain ./proofrail.chain.json --run-id run-demo
 prfrail report --run-dir ./tmp/prfrail-runs/run-demo
 ```
 
-Notes: `run` currently executes noop-only chains; `serve` and the full TUI remain in later slices. The target TUI will show pending AI requests and, before explicit black-box selection, the reduced assurance and responsibility boundary. SessionBridge visible delivery is not completion, and the formal path does not depend on `@sbr-review`.
+Notes: `run` currently executes noop-only chains. `interactions tui` is T025's focused terminal inbox, not the complete unified TUI; `serve` and the complete TUI remain later slices. The later black-box mode must show its reduced assurance and responsibility boundary before selection. SessionBridge visible delivery is not completion, and the formal path does not depend on `@sbr-review`.
 
 ### Build (requires Go toolchain)
 

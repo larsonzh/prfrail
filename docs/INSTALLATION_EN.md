@@ -24,7 +24,7 @@ Standalone SessionBridge tests may verify visible delivery, `@sbr-review`, and s
 
 ProofRail has not implemented AgentRunner, a formal CLI Agent adapter, or the visible IPC/TUI risk-acknowledgment and return flow required by black-box mode. `internal/adapters/sessbridge.go` exposes only a consumer-provided `SilentClient`; installing the extension enables no AI product loop. The noop-only `run` command is not automated AI coding.
 
-The current release candidate has no graphical window, complete TUI, or AI/operator interaction inbox. `prfrail.exe` provides line-oriented CLI text in a normal terminal, ANSI-free by default, plus `--json` for automation; it runs in Windows Terminal, PowerShell, or the VS Code integrated terminal. Bubble Tea v1.3.4 was exercised only as an isolated feasibility prototype and is not linked into the current binary. S1 therefore prioritizes one terminal, short commands, and copyable paths for quick learning instead of presenting a prototype interface as delivered functionality.
+The current release candidate has no graphical window or complete unified TUI. `prfrail.exe` provides line-oriented CLI text in a normal terminal, ANSI-free by default, plus `--json` for automation; T025 adds the focused `interactions list/respond/tui` inbox. It runs in Windows Terminal, PowerShell, or the VS Code integrated terminal. Bubble Tea v1.3.4 was exercised only as an isolated feasibility prototype and is not linked into the current binary. S1 therefore prioritizes one terminal, short commands, and copyable paths for quick learning instead of presenting a prototype interface as delivered functionality.
 
 ## 2. Download and Offline Verification
 

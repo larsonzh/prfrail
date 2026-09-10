@@ -10,7 +10,7 @@
 
 ## 2. 目标部署模型
 
-S1 目标是本地单用户、单写者、无常驻云服务的 CLI/TUI：ProofRail 二进制、状态/store、隔离 run-workspace 和只读源目录边界明确。正式执行采用固定 CLI Agent/AgentRunner；SessionBridge 只在辅助消息和显式 visible 黑箱候选中使用。黑箱路径以快速复用现有 Agent 换取较低过程保证，须展示风险/责任并由用户监督。当前发行候选仅交付逐行 CLI，两条 AI 路径、交互闭环与完整 TUI 均未实现。
+S1 目标是本地单用户、单写者、无常驻云服务的 CLI/TUI：ProofRail 二进制、状态/store、隔离 run-workspace 和只读源目录边界明确。正式执行采用固定 CLI Agent/AgentRunner；SessionBridge 只在辅助消息和显式 visible 黑箱候选中使用。黑箱路径以快速复用现有 Agent 换取较低过程保证，须展示风险/责任并由用户监督。当前发行候选已交付逐行 CLI 与 T025 聚焦终端交互收件箱；两条 AI 执行路径和完整统一 TUI 均未实现。
 
 ## 3. 待决决策
 

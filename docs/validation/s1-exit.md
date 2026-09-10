@@ -37,7 +37,7 @@
 | AT-19 | PASS | [T022 effects/diagnostics](t022-effects-diagnostics.md) |
 | AT-20 | PASS | [T023 cost ledger](t023-cost-ledger.md) |
 | AT-21 | PASS | [T024 lifecycle](t024-lifecycle.md) |
-| AT-22 | BLOCKED | T025 尚未实现：缺少 `operator-interaction` Schema/golden、TUI 交互收件箱、结构化响应及恢复测试 |
+| AT-22 | PASS | [T025 operator interaction](t025-operator-interaction.md)：Schema/golden/hash/replay、聚焦终端收件箱、结构化响应、Engine 控制权归还及故障恢复 |
 | AT-23 | BLOCKED | T026/T027 尚未实现：缺少 AgentRunner 契约、真实 CLI Agent 能力探针、adapter、停止/恢复和独立验收闭环 |
 | AT-24 | BLOCKED | T028 尚未实现：缺少 visible 黑箱候选的风险确认、隔离投递、显式归还、全量扫描及 reduced/unknown 报告 |
 
@@ -47,7 +47,7 @@
 
 | 门禁 | 状态 | 证据/缺口 |
 |---|---|---|
-| 核心任务链与 fail-close 场景 | BLOCKED | 既有 AT-01–AT-14、AT-16–AT-21 通过；T025–T028/AT-22–AT-24 尚未实现 |
+| 核心任务链与 fail-close 场景 | BLOCKED | 既有 AT-01–AT-22 通过；T026–T028/AT-23–AT-24 尚未实现 |
 | seed 自托管与真实平台 | PASS | T017 Windows/Linux 可信矩阵及 Windows 本机两代演练 |
 | whois 只读影子 | PASS | 9/9 固定用例与 3 类漂移负例；不含生产切换 |
 | generic/C/Go harness | PASS | 三套 harness 定义及三个最小用户样例均通过只读 CLI 闭环 |
@@ -62,4 +62,4 @@
 1. 手工解压便携 ZIP、用户自选独立目录、显式路径运行且不修改 PATH 的模型已冻结；正式 ZIP 文件名和下载入口仍待发行绑定。EOL 通知与例外已有 ADR-010 待审批方案，但尚未获产品所有者批准。
 2. Windows 候选 artifact 已完成首次运行、升级、回滚和保留数据卸载；正式载体确定后必须复验。Linux 只声明核心 CI，不宣称 S1 正式支持。
 3. generic/C/Go 样例只证明语言作用域和 noop 编排；当前 CLI 对 executable step 仍 fail-close。
-4. 完成 T025/AT-22 的 TUI 人工交互、T026/T027/AT-23 的 AgentRunner 完整执行，以及 T028/AT-24 的 visible 黑箱候选降级保证；再用最终 ZIP 复跑教程并绑定支持矩阵/发行说明，最后由产品所有者明确批准 S1 exit。在此之前 T018 与 S1 状态保持未完成。
+4. T025/AT-22 已完成聚焦终端人工交互闭环；继续完成 T026/T027/AT-23 的 AgentRunner 完整执行、T028/AT-24 的 visible 黑箱候选降级保证及完整统一 TUI；再用最终 ZIP 复跑教程并绑定支持矩阵/发行说明，最后由产品所有者明确批准 S1 exit。在此之前 T018 与 S1 状态保持未完成。

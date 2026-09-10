@@ -73,7 +73,7 @@ flowchart TD
 3. The operator responds in the TUI. Clarification, approval/rejection, authorization changes, and manual writes produce the applicable operator-interaction, review, authorization, or handoff records. Terminal text is not authoritative state, and secrets use only controlled secure input.
 4. ProofRail retakes control only after validating the operator, attempt, candidate/context hashes, lease, authorization, and response scope. Missing responses, disconnection, timeout, or persistence failure remain paused and never select a default answer.
 5. When no manual write occurred, ProofRail returns the confirmed response and record hashes to the current recoverable CLI Agent session. Before resume it revalidates attempt/workspace/session/process and authority; uncertainty creates a new attempt. SessionBridge silent may carry auxiliary analysis context only, not formal execution resume.
-6. Before implementation, the general-clarification `operator-interaction` record requires a frozen Schema, positive/negative goldens, hash domain, and replay rules. Chat history, a TUI buffer, or `reply_<conversationId>.json` cannot substitute for that durable record.
+6. T025 freezes the general-clarification `operator-interaction` Schema, positive/negative goldens, hash domain, and replay rules, and implements a focused terminal inbox plus Engine control API. Chat history, a TUI buffer, or `reply_<conversationId>.json` cannot substitute for that durable record. T027 still wires continuation to a real CLI Agent session.
 
 ## 6. Operator Handoff
 
@@ -104,4 +104,4 @@ whois documents the experience source and a future read-only shadow acceptance e
 
 ## 9. Implementation Trace
 
-T009 implements ordered scheduling, projections, pause, cancel, and replay from sections 3–4. T010 adds real gate runners; T011 completes review and acceptance; T013/T014 complete the abstract adapter and handoff; T016 delivers the usable line-oriented CLI; T019–T024 complete preview, export, authorization, effects, cost, and lifecycle; T025 plans section 5 TUI AI/operator interaction; T026/T027 plan AgentRunner contract and implementation; T028 plans section 6.1 black-box candidates. A planned capability becomes documented as available only after executable validation.
+T009 implements ordered scheduling, projections, pause, cancel, and replay from sections 3–4. T010 adds real gate runners; T011 completes review and acceptance; T013/T014 complete the abstract adapter and handoff; T016 delivers the usable line-oriented CLI; T019–T024 complete preview, export, authorization, effects, cost, and lifecycle; T025 completes section 5 durable interaction contracts, the focused terminal inbox, and chain return of control; T026/T027 plan AgentRunner contract and implementation; T028 plans section 6.1 black-box candidates. The complete unified TUI remains later work. A planned capability becomes documented as available only after executable validation.
