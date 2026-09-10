@@ -4,26 +4,26 @@
     "kind": "agent-runner-capability",
     "probeId": "probe-copilot-cli-windows-20260910",
     "adapterId": "github-copilot-cli",
-    "probedAt": "2026-09-10T03:00:00.000Z",
+    "probedAt": "2026-09-10T18:29:30.789Z",
     "executableHash": "sha256:d3f3bb7b8bbf68357ad29f514a179d09f76135483d8bfb643131b8600f671ee2",
     "version": "1.0.83",
     "configHash": "sha256:d6d07e0943462974bba6380170ca6c6d147e6e609b2cc5ceff165f8f16faa5ed",
     "disposition": "blocked",
     "matrix": {
-      "noninteractive": {"status": "verified", "evidence": ["sha256:832ca3b6b38b05e0062b6c3df0ecf6892eb96f545662b9111c6264fc4762be26"]},
-      "cwd": {"status": "verified", "evidence": ["sha256:832ca3b6b38b05e0062b6c3df0ecf6892eb96f545662b9111c6264fc4762be26"]},
-      "eventStreamOrCompleteLogs": {"status": "verified", "evidence": ["sha256:832ca3b6b38b05e0062b6c3df0ecf6892eb96f545662b9111c6264fc4762be26"]},
-      "sessionCreate": {"status": "verified", "evidence": ["sha256:832ca3b6b38b05e0062b6c3df0ecf6892eb96f545662b9111c6264fc4762be26"]},
-      "sessionResume": {"status": "unknown", "evidence": ["sha256:832ca3b6b38b05e0062b6c3df0ecf6892eb96f545662b9111c6264fc4762be26"]},
-      "cancellation": {"status": "unknown", "evidence": ["sha256:832ca3b6b38b05e0062b6c3df0ecf6892eb96f545662b9111c6264fc4762be26"]},
-      "processTreeStop": {"status": "verified", "evidence": ["sha256:832ca3b6b38b05e0062b6c3df0ecf6892eb96f545662b9111c6264fc4762be26"]},
-      "toolControl": {"status": "unknown", "evidence": ["sha256:832ca3b6b38b05e0062b6c3df0ecf6892eb96f545662b9111c6264fc4762be26"]},
-      "networkControl": {"status": "unknown", "evidence": ["sha256:832ca3b6b38b05e0062b6c3df0ecf6892eb96f545662b9111c6264fc4762be26"]},
-      "permissionControl": {"status": "unknown", "evidence": ["sha256:832ca3b6b38b05e0062b6c3df0ecf6892eb96f545662b9111c6264fc4762be26"]},
-      "usage": {"status": "verified", "evidence": ["sha256:832ca3b6b38b05e0062b6c3df0ecf6892eb96f545662b9111c6264fc4762be26"]},
-      "unattendedConfirmations": {"status": "unknown", "evidence": ["sha256:832ca3b6b38b05e0062b6c3df0ecf6892eb96f545662b9111c6264fc4762be26"]}
+      "noninteractive": {"status": "verified", "evidence": ["sha256:950d300d7a5dee25dda1e913f0d982acaaa33c812020231c85de9ac64d4bd3fc"]},
+      "cwd": {"status": "verified", "evidence": ["sha256:950d300d7a5dee25dda1e913f0d982acaaa33c812020231c85de9ac64d4bd3fc"]},
+      "eventStreamOrCompleteLogs": {"status": "verified", "evidence": ["sha256:950d300d7a5dee25dda1e913f0d982acaaa33c812020231c85de9ac64d4bd3fc"]},
+      "sessionCreate": {"status": "verified", "evidence": ["sha256:950d300d7a5dee25dda1e913f0d982acaaa33c812020231c85de9ac64d4bd3fc"]},
+      "sessionResume": {"status": "unknown", "evidence": ["sha256:950d300d7a5dee25dda1e913f0d982acaaa33c812020231c85de9ac64d4bd3fc"]},
+      "cancellation": {"status": "unknown", "evidence": ["sha256:950d300d7a5dee25dda1e913f0d982acaaa33c812020231c85de9ac64d4bd3fc"]},
+      "processTreeStop": {"status": "verified", "evidence": ["sha256:950d300d7a5dee25dda1e913f0d982acaaa33c812020231c85de9ac64d4bd3fc"]},
+      "toolControl": {"status": "unsupported", "evidence": ["sha256:950d300d7a5dee25dda1e913f0d982acaaa33c812020231c85de9ac64d4bd3fc"]},
+      "networkControl": {"status": "unknown", "evidence": ["sha256:950d300d7a5dee25dda1e913f0d982acaaa33c812020231c85de9ac64d4bd3fc"]},
+      "permissionControl": {"status": "unknown", "evidence": ["sha256:950d300d7a5dee25dda1e913f0d982acaaa33c812020231c85de9ac64d4bd3fc"]},
+      "usage": {"status": "verified", "evidence": ["sha256:950d300d7a5dee25dda1e913f0d982acaaa33c812020231c85de9ac64d4bd3fc"]},
+      "unattendedConfirmations": {"status": "unknown", "evidence": ["sha256:950d300d7a5dee25dda1e913f0d982acaaa33c812020231c85de9ac64d4bd3fc"]}
     },
-    "evidence": ["sha256:832ca3b6b38b05e0062b6c3df0ecf6892eb96f545662b9111c6264fc4762be26"]
+    "evidence": ["sha256:950d300d7a5dee25dda1e913f0d982acaaa33c812020231c85de9ac64d4bd3fc"]
   },
-  "recordHash": "sha256:6b3b2a00531fe2d988714315624b9a79682710d28011f3399eebcf3c1f33e7ec"
+  "recordHash": "sha256:a6ad21b8e517b1bd8e0e2a88a0a4c9dcf7a3984752be75ee56c268a8dac6608e"
 }
