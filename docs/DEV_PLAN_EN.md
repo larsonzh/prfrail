@@ -1,6 +1,6 @@
 ﻿# ProofRail Iterative Development Plan
 
-> T026 correction, 2026-09-11 03:26: the task entry's toolControl=unsupported and one-unsupported/five-unknown counts below are historical, not current. Old P8 used the wrong permission kind; shell(Get-ChildItem) now produces a structured denial. The current matrix is **six verified, six unknown, blocked**; compound/indirect commands, confirmation requirements, network, cancellation and resume still lack sufficient evidence. OS exit capture passes local 0/7 regressions. See the [current T026 conclusion](validation/t026-agent-runner-contract_EN.md). T026 stays unchecked and T027 must not start. This turn's single model authorization was used; no commit/push was performed.
+> T026 update, 2026-09-11 03:46: the task entry's toolControl=unsupported and one-unsupported/five-unknown counts below are historical, not current. Old P8 used the wrong permission kind. Correct shell(Get-ChildItem) rules now deny both the standalone command and P8-C's Get-Location; Get-ChildItem -Name compound command. This invocation consumed one premium request without retry. The matrix remains **six verified, six unknown, blocked**; indirect invocation, a genuine confirmation-required scenario, network, cancellation, resume and effective-configuration pinning still lack sufficient evidence. OS exit capture passes local 0/7 and real-run checks. See the P8-C results in the [T026 report](validation/t026-agent-runner-contract_EN.md). T026 stays unchecked and T027 must not start.
 
 [简体中文](DEV_PLAN.md)
 

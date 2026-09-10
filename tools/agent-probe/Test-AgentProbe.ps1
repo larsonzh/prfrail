@@ -65,6 +65,30 @@ $evaluation = Test-ScenarioAssertion -Name 'tool-deny' -Facts @($fact)
 if ($evaluation.assertions.verdict -ne 'inconclusive') { throw 'Mismatched denial accepted.' }
 Write-Output 'PASS structured denial and mismatched-command rejection.'
 
+$controlCall = @{ requestName = 'powershell'; startTool = 'powershell'; requestCommand = 'Get-Location'; startCommand = 'Get-Location'; completed = $true; success = $true }
+foreach ($case in @('denied', 'error', 'missing', 'executed', 'split', 'mismatch', 'timeout', 'no-control', 'mixed')) {
+    $compoundCall = @{
+        requestName = 'powershell'; startTool = 'powershell'
+        requestCommand = 'Get-Location; Get-ChildItem -Name'; startCommand = 'Get-Location; Get-ChildItem -Name'
+        completed = $true; success = $false; errorCode = 'denied'
+    }
+    $fact.timeoutHit = ($case -eq 'timeout')
+    if ($case -eq 'error') { $compoundCall.errorCode = 'execution_error' }
+    if ($case -eq 'missing') { $compoundCall.completed = $false }
+    if ($case -eq 'executed') { $compoundCall.success = $true }
+    if ($case -eq 'split') { $compoundCall.requestCommand = 'Get-ChildItem -Name'; $compoundCall.startCommand = 'Get-ChildItem -Name' }
+    if ($case -eq 'mismatch') { $compoundCall.requestCommand = 'Get-Date' }
+    $fact.toolCalls = @($controlCall, $compoundCall)
+    if ($case -eq 'no-control') { $fact.toolCalls = @($compoundCall) }
+    if ($case -eq 'mixed') { $extraCall = $compoundCall.Clone(); $extraCall.success = $true; $fact.toolCalls += $extraCall }
+    $expected = 'inconclusive'
+    if ($case -eq 'denied') { $expected = 'supported' }
+    if ($case -in @('executed', 'mixed')) { $expected = 'failed' }
+    $evaluation = Test-ScenarioAssertion -Name 'tool-deny-compound' -Facts @($fact)
+    if ($evaluation.assertions.verdict -ne $expected) { throw "Compound $case expected $expected." }
+    Write-Output "PASS compound/$case => $expected"
+}
+
 foreach ($functionName in @('Write-Utf8NoBom', 'Invoke-CliOnce', 'Get-ScenarioPlan')) {
     $definition = $probeAst.Find({
         param($node)
@@ -78,7 +102,7 @@ $flags = $plan.invocations[0].Flags
 foreach ($flag in @('--available-tools=powershell', '--allow-tool=shell(Get-Location)', '--deny-tool=shell(Get-ChildItem)')) {
     if ($flags -notcontains $flag) { throw "Missing tool-deny flag: $flag" }
 }
-foreach ($scenario in @('tool-deny', 'permission-failclosed', 'cancel')) {
+foreach ($scenario in @('tool-deny', 'tool-deny-compound', 'permission-failclosed', 'cancel')) {
     $plan = Get-ScenarioPlan -Name $scenario
     if (@($plan.invocations[0].Flags | Where-Object { $_ -match '^--(?:allow|deny)-tool=powershell' }).Count) {
         throw "Tool name used as permission kind: $scenario"

@@ -46,6 +46,18 @@
 - 原始摘要：stdout.jsonl 为 83502 字节，SHA-256 `6114d084d8f93263f9e2c537390c8338d73238b2609208a22bbc94bcd5c74fbd`；usage.json 为 2114 字节，SHA-256 `3953a146e3e38a3fb1be6dc254f43b951503a2b3f543ee0ad6153604d129f06c`；meta.json 为 1566 字节，SHA-256 `b94b0af2a80b8abb707d19b7f3726fedf4f90c7d8e34a08c48ebed6ddb5616da`；probe-report.json 为 17092 字节，SHA-256 `6e169874502f9a6f798f4aea3cadb0300459ab5c7b4458a7b3bad7feed423166`。
 - 分析器已收紧：tool-deny、permission-failclosed、network-deny 的缺失结果或普通工具错误只能 inconclusive，成功执行不应获准的工具仍 failed。新增 `tools/agent-probe/Test-AgentProbe.ps1` 的 9 项离线断言已通过，零 CLI/模型调用；下文原 8 项合成自测仅为历史记录，其中基于“未成功即拒绝”的 supported 判定不再有效。P9 已消费授权，下文调用数是原始计划，不是新增授权或计费上限保证。
 
+## P8-C 复合命令探针
+
+2026-09-11 03:46 更新：本节补充并取代上文 03:26 快照中“复合命令尚未验证”的部分；仅此精确分号组合已验证，间接调用及其余能力仍未验证。
+
+场景 `tool-deny-compound` 保留 P8 的 `--available-tools=powershell`、`--allow-tool=shell(Get-Location)` 和 `--deny-tool=shell(Get-ChildItem)`。一次 CLI 调用内先单独执行 `Get-Location` 作对照，再将 `Get-Location; Get-ChildItem -Name` 原样作为一个工具调用提交。仅对照成功、每次精确复合调用均有同 toolCallId 关联的结构化 `denied`、OS/result exit 0 且无超时，才判该场景 supported。拆分、改写、未尝试、普通错误或缺失结果均 inconclusive；任一次精确复合调用成功则 failed。九项离线正反例通过。
+
+本轮只授权一次可能计费的 CLI 调用，不重试；调用可包含多个内部模型回合。该场景不验证间接命令、真正必须确认场景、网络、取消或恢复，不能单独关闭 T026。
+
+实测结果：**P8-C supported**。session `7b9ce935-fa38-4af7-9643-a0ea3f0195e8`，模型 `mai-code-1.1-flash`；214 条 UTF-8 JSONL 均有效。对照 `Get-Location` 成功；原样复合调用 `call_zP4z2tSWSURho9Ky07OLhxU5` 返回 `success=false`、`error.code=denied`，明确指向 `shell(Get-ChildItem)`。OS/result exit 均为 0，未超时；workspace 为空、0 文件修改、报告无匹配残留进程。费用为 1 user request、3 个内部模型回合、1 premium request、11828 输入 token（含 7552 cache-read）、181 输出 token、5847 ms API 时长。未使用代理或再次调用。
+
+工件 SHA-256：stdout.jsonl（65040 字节）`66f47ee43dfffbed6a2e2f6ac3b196972e20a5b16bff9b0ceee9b6e781be2540`；meta.json（1796 字节）`bebafdf8041777cb12e43134b9d8d96196d01d3fb2fa61ebe1f7a853e8cce706`；usage.json（2115 字节）`d44f662350e18a099dab60d930aa3e51a1f6a0b38eb5704ec0893b58796ad35f`；probe-report.json（17467 字节）`a4c3ef39234e2b42ef8fb8f531b7c0806e13937fe45c29429dc21a55a489dab2`。新机器记录 `probe-copilot-cli-windows-20260911-compound` 已绑定累计证据；仍为 **6 verified、6 unknown、blocked**，不把精确场景通过推广为完整工具控制能力。
+
 ## 门禁结果
 
 1. `go build ./...`：通过。
