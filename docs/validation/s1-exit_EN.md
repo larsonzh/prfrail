@@ -1,6 +1,6 @@
 ﻿# S1 Exit Validation Report
 
-> Correction, 2026-09-11 03:26: the one-unsupported/five-unknown counts in AT-23, the chain gate and next steps below are historical. Old P8 used invalid permission arguments; its unsupported inference is withdrawn. Correct standalone denial is verified, but full boundary coverage is missing. The current matrix is **six verified, six unknown, blocked**; candidate replacement is not mandatory based on the old inference. T026/T027, AT-23, T018 and S1 remain blocked. See the [current T026 conclusion](t026-agent-runner-contract_EN.md).
+> Current status, 2026-09-11 04:12: T026 has **nine verified, three unknown, blocked**. Resume, permission denial and unattended confirmations are newly verified; indirect tools, network egress and cancellation containment still lack evidence. All six authorized invocations were used; confirmed cost is five premium requests plus unknown cancellation cost. Old counts/replacement claims in AT-23, the chain gate and next steps below are historical snapshots; see the [current T026 conclusion](t026-agent-runner-contract_EN.md). AT-23, T018 and S1 remain blocked and T027 must not start.
 
 [中文](s1-exit.md)
 

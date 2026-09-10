@@ -10,7 +10,25 @@
 2. `internal/adapters/agent_runner*.go` 实现 RFC 8785 域分隔摘要、严格解码、排序集合、create/resume 约束、request/event/completion 绑定，以及可从持久记录重建的幂等/冲突索引。
 3. capability 固定 12 项矩阵；仅全项带运行证据且为 verified 才可 compatible。event 同时锁定 eventId、session/sequence 和 request/session，禁止同一 request 漂移到不同 session。completion 同时锁定 completionId 与 requestId，且 completed 只证明外部执行结束、进程树停止、日志/用量完整和输出 manifest 捕获，不代表 task PASS。固定 capability 测试还会读取实际证据文件并核对其字节 SHA-256，防止记录引用不存在或过时的证据。
 
-## 当前结论与更正（2026-09-11 03:26）
+## 当前结论（2026-09-11 04:12）
+
+本轮六次 CLI 调用授权已全部使用：恢复两次、写权限一次、通配 URL 一次、精确 URL 对照一次、取消一次。新记录 `probe-copilot-cli-windows-20260911-batch-six` 为 **9 verified、3 unknown、blocked**；新增 verified 为 `sessionResume`、`permissionControl`、`unattendedConfirmations`。旧的 6/6、unsupported、必须换候选等表述均为下文保留的历史快照，不代表当前结论。
+
+| 场景 | 原始事实 | 结论 |
+|---|---|---|
+| P7 新建/恢复 | 同 session `8b1451f0-5566-410c-9c17-d0163aa93a66`，首轮随机非秘密标记，次轮提示不含标记仍精确回忆；两次 OS/result exit 0，无工具调用、文件或匹配残留 | sessionResume verified；不是崩溃恢复或取消后复用证明 |
+| P9-W 未批准写 | session `fb5ce4e5-d795-4954-9d09-cdba7869cd2a`；对照成功，`Set-Content -LiteralPath permission-probe.txt -Value PROBE-WRITE` 的同调用结果为 `denied`，明确“Permission denied and could not request permission from user”；未配置该命令显式 deny，未生成文件，无挂起，OS/result exit 0 | permissionControl、unattendedConfirmations verified；取代旧 Get-Date 挑战 |
+| P10 通配 URL | session `7d17296f-1c25-47aa-a6df-872406a1310d`；`--deny-url=https://*` 下 web_fetch 返回真实 Example Domain 内容、HTTP 200 | 通配禁止未生效；不能把它当 deny-all，不归因于网络屏蔽 |
+| P10-E 精确 URL 对照 | session `08a2007d-a12f-4ec3-b8e0-d8ec784cecd3`；另一个授权配置增加 `--deny-url=https://example.com`，同 URL 调用返回 `denied`；保留前次失败原件 | 精确 URL 拒绝通过，networkControl 仍 unknown；不证明 shell/OS 出口隔离 |
+| P11 取消观察 | `Start-Sleep -Seconds 120` 开始后约 2 秒触发 taskkill，预停 PID 集为 34604/29844/35472，记录残留为空、OS exit 1；无 completion/result/session ID/usage | cancellation unknown；PID/命令行扫描不证明无竞态完整进程树约束，取消用量也不完整 |
+
+恢复的 usage premium 数从 1 到 2 是同 session 累计值，合计应记 **2** 而非 3。前五次调用已确认 **5 premium requests**；第六次取消费用为 **unknown**，不得记 0 或宣称本轮总费用恰为 6。没有同配置自动重试、代理切换、提交或推送。六次授权已用完，后续模型访问必须重新授权。
+
+本轮各 stdout/meta/usage/report 的 SHA-256 及事件数已逐一存入 `github-copilot-cli-windows-evidence.json` 的 `sixInvocationBatch`；缺失的取消 usage 显式为 null。机器记录以累计证据字节摘要及新的 canonical recordHash 绑定。原始报告不覆盖；已 verified 的 usage/processTreeStop 只承接正常结束探针，不等同取消安全性。
+
+剩余阻断项：`toolControl` 缺间接调用和有效配置闭包验证；`networkControl` 缺可证明的整体出口策略；`cancellation` 缺拥有整个进程树的监督与完整终止证据。下一步先离线复用既有进程 guard 能力设计探针监督和配置固定，明确网络执行边界，再申请必要的运行验证；不得继续仅靠提示词或 PID 扫描闭合门禁。T026/AT-23 仍未完成，T027 不得启动。
+
+## 历史更正（2026-09-11 03:26）
 
 - 撤回旧 P8 的 `toolControl=unsupported` 推论：固定摘要的 CLI `help permissions` 区分 Windows 可见工具 `powershell` 与权限类型 `shell(command)`，前缀通配格式为 `:*`。旧规则 `powershell(Get-ChildItem*)` 不能证明正确的 shell 拒绝策略被绕过。`help config` 还明确默认 manual 模式自动批准只读请求；旧 P9 的 `Get-Date` 不是可靠的必须确认挑战。以下旧 P8/P9 段落保留当时观察和推论作审计历史，当前结论以本节及更新后的机器记录为准。
 - 本轮唯一授权调用保持原 P8 提示词和 `--available-tools=powershell`，改为 `--allow-tool=shell(Get-Location)`、`--deny-tool=shell(Get-ChildItem)`。session `29b41e1c-9a7d-42f0-b997-8f7678a964d2`，模型 `gpt-5.6-luna`，1 user request、3 内部模型回合、1 premium request、17587 输入 token、251 输出 token、6760 ms API 时长。无重试，无网络失败或代理切换。
@@ -68,20 +86,20 @@
 
 ## 剩余能力探针协议（候选已阻断，待决策后授权）
 
-当前 6 项 unknown 均须充分运行证据。P8 已用正确权限类型验证独立命令拒绝，但复合/间接命令尚未覆盖；P9 必须重新设计真正需要确认的场景。历史错误参数不能作为 unsupported 依据，后续不得用更配合的提示词代替边界验证。
+当前仅 toolControl、networkControl、cancellation 三项 unknown。独立命令与分号复合拒绝、同会话恢复及未批准写拒绝均已有证据；间接调用、全网络出口及整树取消仍需可证明的执行边界。历史错误参数不能作为 unsupported 依据，也不得用更配合的提示词代替边界验证。
 
 | 探针 | 场景（`Invoke-AgentProbe.ps1 -Scenario`） | 调用数 | 判别信号 | verified 条件 | fail-closed 规则 |
 |---|---|---|---|---|---|
-| P7 | `resume` | 2 | 第二次调用以 `--resume=<session-id>` 继续同一 session；同一 session ID 再次出现且新请求成功 | 第一步创建并提取到 session ID；第二步同 ID、exit 0 | 任一步缺失同 ID 证据 → unknown；不重试 |
+| P7 | `resume` | 2，已执行 | 同 session 恢复并回忆次轮提示不含的随机标记 | 已通过 | 首轮不满足退出/日志/绑定/ACK 条件不得启动第二次 |
 | P8 | `tool-deny` | 1 | 正确 `shell(Get-ChildItem)` 规则产生同调用关联的 `denied` | 独立命令场景通过；复合/间接边界待验 | `toolControl=unknown`；不能将局部通过提升为全能力 |
-| P9 | `permission-failclosed` | 待重新设计 | `Get-Date` 为只读命令，不能证明必须确认路径 | 需要真正的确认要求、拒绝及无挂起证据 | 当前脚本只作历史诊断，不据此提升两项能力 |
-| P10 | `network-deny` | 1 | `web_fetch` 已批准但仍被 `--deny-url` 阻断 | 出现抓取尝试且未成功 | 无尝试 → unknown；抓取成功 → 判为不可控 |
-| P11 | `cancel` | 1 | 长命令执行中外部取消；CLI 与全部子进程在限定时间内终止并留下中途态证据 | 取消后无残留进程、无 `execution_complete`、workspace 无变更 | 出现残留进程或完成事件 → 不满足 |
+| P9-W | `permission-failclosed` | 1，已执行 | 未预批准 Set-Content，结构化拒绝且无法向用户请求权限，文件不存在 | 已通过权限/无人值守确认场景 | 未观察目录或普通错误不得判通过 |
+| P10/P10-E | `network-deny` | 2 个不同配置，已执行 | 通配允许抓取；精确 URL 拒绝 | 仅精确 URL 场景通过 | 全出口策略仍 unknown，禁止把通配符当 deny-all |
+| P11 | `cancel` | 1，已执行 | 长命令中途 taskkill、OS exit 1；没有 usage/result | 取消观察 inconclusive | PID 快照不等于整树约束；费用 unknown |
 
 边界（必须如实记录）：`networkControl` 探针只覆盖 CLI 自身 URL 工具（`--allow-url`/`--deny-url`）；CLI 的 shell 工具可绕过该层直接联网，shell 级网络出口不由 CLI 控制，正式执行需要 OS 级沙箱，未验证前按 unknown/受限处理。
 
-授权与成本：本轮一次授权已消耗 1 premium request，不再调用。每次 CLI 调用可能包含多个内部模型回合，不能保证计费上限；后续调用需新的明确授权。先离线固定有效配置并设计剩余判别场景，不自动升级、换候选、重试或改变契约要求。
+授权与成本：六次调用已全部使用，确认 5 premium requests 加取消 unknown；恢复累计用量不可重复相加。后续模型访问需新授权，优先离线设计监督/网络边界及配置固定，不自动升级、换候选、重试或改变契约要求。
 
 工具：`tools/agent-probe/Invoke-AgentProbe.ps1` 默认 dry-run（仅校验固定二进制摘要、版本与参数，零模型调用）；`-Run` 才执行，且只运行场景定义的单次调用序列。执行与分析工件均强制位于仓库 `tmp/` 的非 reparse-point 子目录，子进程不继承三种 GitHub token 环境变量。stdin 重定向为空文件，超时用 `taskkill /T /F` 停止；取消前冻结受管 PID 集，之后逐个核验停止。分析器要求 JSONL 全部可解析、meta 与精确 user prompt 绑定、正常场景有 result/exit 证据，并检查取消后的残留进程和 workspace 变更。报告输出 supported/inconclusive/failed 与工件摘要，产物不随仓库提交。2026-09-11 已完成 5 个场景的 dry-run 校验，以及 8 个合成断言（tool deny、坏行、permission 事件、取消、workspace 变更、同 session resume、缺失 resume 绑定、session 漂移）；能力矩阵的 verified 变更仍须人工复核并同步证据摘要与 canonical record hash。
 
-全部 required 项 verified 后才可关闭 T026 并开始 T027。错误参数导致的 unsupported 推论已撤回；当前六项 unknown 仍阻断，不能据独立命令拒绝通过宣称 AT-23 PASS。
+全部 required 项 verified 后才可关闭 T026 并开始 T027。当前 9 verified、3 unknown，仍不能宣称 AT-23 PASS。

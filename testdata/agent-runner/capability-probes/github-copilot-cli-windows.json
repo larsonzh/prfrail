@@ -2,28 +2,28 @@
   "schemaVersion": "1.0.0",
   "capability": {
     "kind": "agent-runner-capability",
-    "probeId": "probe-copilot-cli-windows-20260911-compound",
+    "probeId": "probe-copilot-cli-windows-20260911-batch-six",
     "adapterId": "github-copilot-cli",
-    "probedAt": "2026-09-10T19:46:19.366Z",
+    "probedAt": "2026-09-10T20:12:37.935Z",
     "executableHash": "sha256:d3f3bb7b8bbf68357ad29f514a179d09f76135483d8bfb643131b8600f671ee2",
     "version": "1.0.83",
     "configHash": "sha256:d6d07e0943462974bba6380170ca6c6d147e6e609b2cc5ceff165f8f16faa5ed",
     "disposition": "blocked",
     "matrix": {
-      "noninteractive": {"status": "verified", "evidence": ["sha256:929b664b1e8fa47a7895ae28d75db2bf7ad4970a97cb32a010cfba68a308812a"]},
-      "cwd": {"status": "verified", "evidence": ["sha256:929b664b1e8fa47a7895ae28d75db2bf7ad4970a97cb32a010cfba68a308812a"]},
-      "eventStreamOrCompleteLogs": {"status": "verified", "evidence": ["sha256:929b664b1e8fa47a7895ae28d75db2bf7ad4970a97cb32a010cfba68a308812a"]},
-      "sessionCreate": {"status": "verified", "evidence": ["sha256:929b664b1e8fa47a7895ae28d75db2bf7ad4970a97cb32a010cfba68a308812a"]},
-      "sessionResume": {"status": "unknown", "evidence": ["sha256:929b664b1e8fa47a7895ae28d75db2bf7ad4970a97cb32a010cfba68a308812a"]},
-      "cancellation": {"status": "unknown", "evidence": ["sha256:929b664b1e8fa47a7895ae28d75db2bf7ad4970a97cb32a010cfba68a308812a"]},
-      "processTreeStop": {"status": "verified", "evidence": ["sha256:929b664b1e8fa47a7895ae28d75db2bf7ad4970a97cb32a010cfba68a308812a"]},
-      "toolControl": {"status": "unknown", "evidence": ["sha256:929b664b1e8fa47a7895ae28d75db2bf7ad4970a97cb32a010cfba68a308812a"]},
-      "networkControl": {"status": "unknown", "evidence": ["sha256:929b664b1e8fa47a7895ae28d75db2bf7ad4970a97cb32a010cfba68a308812a"]},
-      "permissionControl": {"status": "unknown", "evidence": ["sha256:929b664b1e8fa47a7895ae28d75db2bf7ad4970a97cb32a010cfba68a308812a"]},
-      "usage": {"status": "verified", "evidence": ["sha256:929b664b1e8fa47a7895ae28d75db2bf7ad4970a97cb32a010cfba68a308812a"]},
-      "unattendedConfirmations": {"status": "unknown", "evidence": ["sha256:929b664b1e8fa47a7895ae28d75db2bf7ad4970a97cb32a010cfba68a308812a"]}
+      "noninteractive": {"status": "verified", "evidence": ["sha256:c28a482022f4d8ae8a2abf97e0c782a76b9845823450681541a5ce4ababbb434"]},
+      "cwd": {"status": "verified", "evidence": ["sha256:c28a482022f4d8ae8a2abf97e0c782a76b9845823450681541a5ce4ababbb434"]},
+      "eventStreamOrCompleteLogs": {"status": "verified", "evidence": ["sha256:c28a482022f4d8ae8a2abf97e0c782a76b9845823450681541a5ce4ababbb434"]},
+      "sessionCreate": {"status": "verified", "evidence": ["sha256:c28a482022f4d8ae8a2abf97e0c782a76b9845823450681541a5ce4ababbb434"]},
+      "sessionResume": {"status": "verified", "evidence": ["sha256:c28a482022f4d8ae8a2abf97e0c782a76b9845823450681541a5ce4ababbb434"]},
+      "cancellation": {"status": "unknown", "evidence": ["sha256:c28a482022f4d8ae8a2abf97e0c782a76b9845823450681541a5ce4ababbb434"]},
+      "processTreeStop": {"status": "verified", "evidence": ["sha256:c28a482022f4d8ae8a2abf97e0c782a76b9845823450681541a5ce4ababbb434"]},
+      "toolControl": {"status": "unknown", "evidence": ["sha256:c28a482022f4d8ae8a2abf97e0c782a76b9845823450681541a5ce4ababbb434"]},
+      "networkControl": {"status": "unknown", "evidence": ["sha256:c28a482022f4d8ae8a2abf97e0c782a76b9845823450681541a5ce4ababbb434"]},
+      "permissionControl": {"status": "verified", "evidence": ["sha256:c28a482022f4d8ae8a2abf97e0c782a76b9845823450681541a5ce4ababbb434"]},
+      "usage": {"status": "verified", "evidence": ["sha256:c28a482022f4d8ae8a2abf97e0c782a76b9845823450681541a5ce4ababbb434"]},
+      "unattendedConfirmations": {"status": "verified", "evidence": ["sha256:c28a482022f4d8ae8a2abf97e0c782a76b9845823450681541a5ce4ababbb434"]}
     },
-    "evidence": ["sha256:929b664b1e8fa47a7895ae28d75db2bf7ad4970a97cb32a010cfba68a308812a"]
+    "evidence": ["sha256:c28a482022f4d8ae8a2abf97e0c782a76b9845823450681541a5ce4ababbb434"]
   },
-  "recordHash": "sha256:da6fd82bede79a91d3ff0a19423b87f57a846346d0954b76fca1e4ce7d17c363"
+  "recordHash": "sha256:4ca9be0cd54476a3ad9f821a6e669845b0acd91acc42ab79511baf4d58b77b83"
 }

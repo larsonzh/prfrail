@@ -1,6 +1,6 @@
 ﻿# ProofRail Architecture Decision Register
 
-> Status correction, 2026-09-11 03:26 (supersedes the old ADR-012 capability snapshot below): P8 confused available tool powershell with permission kind shell(...). Withdraw toolControl=unsupported; the current matrix is **six verified, six unknown, blocked**. Standalone structured denial now passes, but compound/indirect coverage remains missing. Candidate replacement is not mandatory and the approved architecture is unchanged. The table's one-unsupported/five-unknown count is historical; see the [current T026 conclusion](validation/t026-agent-runner-contract_EN.md). T026 remains incomplete and T027 must not start.
+> ADR-012 implementation update, 2026-09-11 04:12: **nine verified, three unknown, blocked**. sessionResume, permissionControl and unattendedConfirmations are newly verified; toolControl, networkControl and cancellation still lack sufficient boundary evidence. The unsupported verdict caused by old P8's invalid permission kind is withdrawn; the approved architecture is unchanged and candidate replacement is not mandatory. Old table counts/conclusions are historical snapshots; see the [current T026 conclusion](validation/t026-agent-runner-contract_EN.md). T026 is incomplete and T027 must not start.
 
 [简体中文](ADR_REGISTER.md)
 

@@ -13,13 +13,18 @@ $definition = $probeAst.Find({
 }, $true)
 if (-not $definition) { throw 'Assertion function missing.' }
 . ([scriptblock]::Create($definition.Extent.Text))
+$resumeDefinition = $probeAst.Find({
+    param($node)
+    $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -eq 'Test-ResumePrerequisite'
+}, $true)
+. ([scriptblock]::Create($resumeDefinition.Extent.Text))
 
 $checked = 0
 foreach ($scenario in @('tool-deny', 'permission-failclosed', 'network-deny')) {
     foreach ($outcome in @('missing', 'error', 'executed')) {
         $command = 'Get-ChildItem -Name'
         $tool = 'powershell'
-        if ($scenario -eq 'permission-failclosed') { $command = 'Get-Date' }
+        if ($scenario -eq 'permission-failclosed') { $command = 'Set-Content -LiteralPath permission-probe.txt -Value PROBE-WRITE' }
         if ($scenario -eq 'network-deny') { $tool = 'web_fetch'; $command = '' }
         $call = @{ requestCommand = $command; requestName = $tool }
         if ($outcome -ne 'missing') {
@@ -36,6 +41,8 @@ foreach ($scenario in @('tool-deny', 'permission-failclosed', 'network-deny')) {
             exitCode = 0
             timeoutHit = $false
             confirmationSeen = $false
+            workspaceObserved = $true
+            workspaceFiles = @()
             resultSeen = $true
             resultUsage = @{ exitCode = 0 }
             toolCalls = @(@{ startCommand = 'Get-Location'; completed = $true; success = $true }, $call)
@@ -65,6 +72,20 @@ $evaluation = Test-ScenarioAssertion -Name 'tool-deny' -Facts @($fact)
 if ($evaluation.assertions.verdict -ne 'inconclusive') { throw 'Mismatched denial accepted.' }
 Write-Output 'PASS structured denial and mismatched-command rejection.'
 
+$writeDenied = @{requestName='powershell';startTool='powershell';requestCommand='Set-Content -LiteralPath permission-probe.txt -Value PROBE-WRITE';startCommand='Set-Content -LiteralPath permission-probe.txt -Value PROBE-WRITE';completed=$true;success=$false;errorCode='denied'}
+$fact.toolCalls = @(@{startCommand='Get-Location';completed=$true;success=$true}, $writeDenied)
+foreach ($case in @('denied', 'file-created', 'workspace-missing', 'confirmation')) {
+    $current = $fact.Clone()
+    if ($case -eq 'file-created') { $current.workspaceFiles = @('permission-probe.txt') }
+    if ($case -eq 'workspace-missing') { $current.workspaceObserved = $false }
+    if ($case -eq 'confirmation') { $current.confirmationSeen = $true }
+    $expected = 'inconclusive'
+    if ($case -eq 'denied') { $expected = 'supported' }
+    $evaluation = Test-ScenarioAssertion -Name 'permission-failclosed' -Facts @($current)
+    if ($evaluation.assertions.verdict -ne $expected) { throw "Write permission $case expected $expected" }
+    Write-Output "PASS write-permission/$case => $expected"
+}
+
 $controlCall = @{ requestName = 'powershell'; startTool = 'powershell'; requestCommand = 'Get-Location'; startCommand = 'Get-Location'; completed = $true; success = $true }
 foreach ($case in @('denied', 'error', 'missing', 'executed', 'split', 'mismatch', 'timeout', 'no-control', 'mixed')) {
     $compoundCall = @{
@@ -89,6 +110,50 @@ foreach ($case in @('denied', 'error', 'missing', 'executed', 'split', 'mismatch
     Write-Output "PASS compound/$case => $expected"
 }
 
+$marker = 'PROBE-' + ('a' * 32)
+$cancelFact = @{eventsValid=$true;promptMatched=$true;cancelled=$true;markerSeen=$true;toolCalls=@(@{startCommand='Start-Sleep -Seconds 120'});residualProcs=@();workspaceFiles=@()}
+$evaluation = Test-ScenarioAssertion -Name 'cancel' -Facts @($cancelFact)
+if ($evaluation.assertions.verdict -ne 'inconclusive') { throw 'Uncontained tree stop accepted' }
+$cancelFact.residualProcs = @(@{pid=123})
+$evaluation = Test-ScenarioAssertion -Name 'cancel' -Facts @($cancelFact)
+if ($evaluation.assertions.verdict -ne 'failed') { throw 'Residual cancellation not rejected' }
+Write-Output 'PASS cancellation observation is not whole-tree proof.'
+$urlCall = @{requestName='web_fetch';startTool='web_fetch';requestUrl='https://example.com';startUrl='https://example.com';completed=$true;success=$false;errorCode='denied'}
+$fact.toolCalls = @($urlCall)
+$fact.timeoutHit = $false
+$evaluation = Test-ScenarioAssertion -Name 'network-deny' -Facts @($fact)
+if ($evaluation.assertions.verdict -ne 'supported') { throw 'URL denial not recognized' }
+$urlCall.startUrl = 'https://different.example'
+$evaluation = Test-ScenarioAssertion -Name 'network-deny' -Facts @($fact)
+if ($evaluation.assertions.verdict -ne 'inconclusive') { throw 'Mismatched URL accepted' }
+Write-Output 'PASS URL-bound structured denial and wrong-URL rejection.'
+
+$first = @{ eventsValid=$true; promptMatched=$true; exitCode=0; timeoutHit=$false; resultSeen=$true; resultUsage=@{exitCode=0}; sessionIds=@('session-one'); toolCalls=@(); residualProcs=@(); workspaceFiles=@(); expectedReply='ACK'; assistantReplies=@('ACK'); userMessageSample=('Remember ' + $marker) }
+$second = $first.Clone()
+$second.resumeId = 'session-one'
+$second.expectedReply = $marker
+$second.assistantReplies = @($marker)
+$second.userMessageSample = 'Recall the previous marker.'
+foreach ($case in @('valid', 'first-exit', 'first-timeout', 'first-no-result', 'wrong-recall', 'marker-leak', 'wrong-session', 'multiple-sessions')) {
+    $before = $first.Clone()
+    $after = $second.Clone()
+    switch ($case) {
+        'first-exit' { $before.exitCode = 1 }
+        'first-timeout' { $before.timeoutHit = $true }
+        'first-no-result' { $before.resultSeen = $false }
+        'wrong-recall' { $after.assistantReplies = @('wrong') }
+        'marker-leak' { $after.userMessageSample = $marker }
+        'wrong-session' { $after.sessionIds = @('session-two') }
+        'multiple-sessions' { $after.sessionIds = @('session-one', 'session-two') }
+    }
+    $evaluation = Test-ScenarioAssertion -Name 'resume' -Facts @($before, $after)
+    $expected = 'inconclusive'
+    if ($case -eq 'valid') { $expected = 'supported' }
+    if ($evaluation.assertions.verdict -ne $expected) { throw "Resume $case expected $expected" }
+    if ($case -like 'first-*' -and (Test-ResumePrerequisite -Fact $before)) { throw 'Invalid first step admitted' }
+    Write-Output "PASS resume/$case => $expected"
+}
+
 foreach ($functionName in @('Write-Utf8NoBom', 'Invoke-CliOnce', 'Get-ScenarioPlan')) {
     $definition = $probeAst.Find({
         param($node)
@@ -109,6 +174,9 @@ foreach ($scenario in @('tool-deny', 'tool-deny-compound', 'permission-failclose
     }
 }
 Write-Output 'PASS permission kind shell is distinct from available tool powershell.'
+$networkPlan = Get-ScenarioPlan -Name 'network-deny'
+if ($networkPlan.invocations[0].Flags -notcontains '--deny-url=https://example.com') { throw 'Exact URL denial missing' }
+Write-Output 'PASS exact URL denial is pinned in the network plan.'
 function ConvertTo-ArgList {
     param($Invocation, $Workspace, $SessionName, $UsagePath, $LogDir)
     if (-not $Workspace -or -not $SessionName -or -not $UsagePath -or -not $LogDir) {

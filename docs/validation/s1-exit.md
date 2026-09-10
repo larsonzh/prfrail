@@ -1,6 +1,6 @@
 ﻿# S1 Exit 验收报告
 
-> 2026-09-11 03:26 更正：下文 AT-23、任务链及下一步中的“1 unsupported、5 unknown”是历史快照。旧 P8 权限参数错误，其 unsupported 推论撤回；正确独立命令拒绝已验证，但完整边界尚缺证据。当前 **6 verified、6 unknown、blocked**，无需据旧推论强制更换候选。T026/T027、AT-23、T018 与 S1 继续阻断；详见 [T026 当前结论](t026-agent-runner-contract.md)。
+> 2026-09-11 04:12 当前状态：T026 **9 verified、3 unknown、blocked**；新增恢复、权限拒绝和无人值守确认验证，剩余工具间接调用、网络出口与取消整树证据不足。本轮六次授权已用完，确认费用 5 premium requests 加取消 unknown。下文 AT-23/任务链/下一步的旧数量及换候选判断为历史快照，以 [T026 当前结论](t026-agent-runner-contract.md) 为准。AT-23、T018 与 S1 仍阻断，T027 不得启动。
 
 [English](s1-exit_EN.md)
 

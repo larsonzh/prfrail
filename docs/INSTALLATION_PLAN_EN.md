@@ -1,6 +1,6 @@
 ﻿# ProofRail Installation and Deployment Plan
 
-> Candidate correction, 2026-09-11 03:26: the CLI Agent row's one-unsupported/five-unknown count and mandatory-replacement conclusion below are withdrawn. Old probes confused available tool powershell with permission kind shell(...). Correct standalone denial passes; the matrix is **six verified, six unknown, blocked**. Formal execution remains inadmissible; this does not authorize upgrades or installation-model changes. See the [current T026 conclusion](validation/t026-agent-runner-contract_EN.md).
+> Current candidate status, 2026-09-11 04:12: **nine verified, three unknown, blocked**. Session resume, write-permission denial and unattended confirmations are verified. Indirect tools, overall network egress and cancellation containment still lack evidence; exact-URL denial is not OS network isolation. Old capability counts and mandatory-replacement claims below are superseded historical snapshots, not authorization to upgrade or change the installation model. See the [current T026 conclusion](validation/t026-agent-runner-contract_EN.md).
 
 [简体中文](INSTALLATION_PLAN.md)
 

@@ -1,6 +1,6 @@
 ﻿# ProofRail 迭代开发计划
 
-> 2026-09-11 03:46 T026 更新：下文任务项中的 `toolControl=unsupported` 及“1 unsupported、5 unknown”是更正前快照，不再是当前结论。旧 P8 权限类型配置错误；正确 `shell(Get-ChildItem)` 已分别拒绝独立命令及 P8-C 的 `Get-Location; Get-ChildItem -Name` 复合命令，本次消耗 1 premium request，无重试。当前矩阵仍为 **6 verified、6 unknown、blocked**；间接调用、真正必须确认场景、网络、取消和恢复及有效配置固定仍缺充分证据。退出码采集通过本地 0/7 与真实运行验证。详见 [T026 报告](validation/t026-agent-runner-contract.md) 的 P8-C 结果。T026 不勾选，T027 不得启动。
+> 2026-09-11 04:12 T026 当前状态：**9 verified、3 unknown、blocked**。六次授权调用已用完，新增验证会话恢复、未批准写权限拒绝及无人值守确认失败关闭。通配 URL 禁止未生效，精确 URL 对照拒绝有效；取消已观察但缺完整进程树约束。费用为已确认 5 premium requests 加取消 unknown。剩余 toolControl/networkControl/cancellation 及有效配置边界见 [T026 当前结论](validation/t026-agent-runner-contract.md)。先推进离线监督与策略设计，不自动追加模型调用。下文旧任务项中的 6/6、unsupported 和更换候选判断均为历史快照；T026 不勾选，T027 不得启动。
 
 [English](DEV_PLAN_EN.md)
 
