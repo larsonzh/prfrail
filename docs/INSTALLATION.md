@@ -12,11 +12,40 @@
 | CPU/内存 | 无独立 GPU 要求；尚无可据以承诺固定最低 CPU、内存的 S1 性能基准 | 另受 VS Code、Copilot Chat 和目标项目工具链需求约束 |
 | 磁盘 | 可写安装目录，以及彼此分离且容量足够的源目录、run workspace、state/store 和备份目录 | 还需 SessionBridge 文件通道空间；证据与快照容量取决于项目规模 |
 | ProofRail 运行依赖 | 便携 `prfrail.exe` 不要求 Go、Python、Node.js、数据库、Docker 或管理员权限 | 核心二进制要求不变 |
-| 主机软件 | Windows PowerShell 5.1+ 仅用于本指南的解压/核验命令；浏览器或可选 GitHub CLI 用于下载 | VS Code 1.82+、已登录且可用的 GitHub Copilot Chat、SessionBridge 0.1.1 扩展 |
+| 主机软件 | Windows PowerShell 5.1+ 仅用于本指南的解压/核验命令；浏览器或可选 GitHub CLI 用于下载。仅启用正式 AgentRunner 时，另需 GitHub Copilot CLI 1.0.83（Windows x64 当前固定候选） | VS Code 1.82+、已登录且可用的 GitHub Copilot Chat、SessionBridge 0.1.1 扩展；不要求安装 GitHub Copilot CLI |
 | 项目工具 | `validate`/`preview` 不要求项目编译器；实际 harness 必须预装其声明的编译器、解释器、构建和测试工具 | 同左；ProofRail 不静默安装这些工具 |
 | 网络 | 下载时访问 GitHub；下载和核验完成后，当前 `version`/`validate`/`preview` 可离线运行 | Copilot Chat 模型调用需要宿主可用网络、账号/订阅和模型权限 |
 
-SessionBridge 不是核心离线 CLI 或 AgentRunner 的安装依赖。正式 AI 执行需另行安装 T026 能力矩阵支持且版本/摘要固定的 CLI Agent。仅当用户选择 `supervised-black-box` 时，才需要 VS Code、可用的 Copilot Chat 和 SessionBridge 0.1.1；该模式必须由用户监督，并在启动前确认 ProofRail 无法证明工具/命令、越界读取、网络、实际费用、全部后台进程、会话连续性及 commit/push/发布等外部副作用。ProofRail 只保证隔离和归还后的产物扫描、独立门禁、证据与评审。
+SessionBridge 不是核心离线 CLI 或 AgentRunner 的安装依赖。正式 AI 执行需另行安装 T026 能力矩阵支持且版本/摘要固定的 CLI Agent；当前 Windows x64 候选是 GitHub Copilot CLI 1.0.83。它不是运行 `version`、`validate`、`preview` 或其他核心离线命令的前置条件。仅当用户选择 `supervised-black-box` 时，才需要 VS Code、可用的 Copilot Chat 和 SessionBridge 0.1.1；该模式必须由用户监督，并在启动前确认 ProofRail 无法证明工具/命令、越界读取、网络、实际费用、全部后台进程、会话连续性及 commit/push/发布等外部副作用。ProofRail 只保证隔离和归还后的产物扫描、独立门禁、证据与评审。
+
+### 1.1 正式 AgentRunner 的 GitHub Copilot CLI 条件依赖
+
+仅计划启用正式 AgentRunner 的用户需要安装 GitHub Copilot CLI。Windows x64 当前固定并验证的候选版本为 1.0.83；后续版本不得仅因更高而自动视为兼容，仍须重新固定实际版本/可执行文件摘要并通过能力矩阵。CLI 模型调用还要求可用的 GitHub Copilot 账号/订阅、网络和模型权限，并可能产生用量或费用。1.0.83 不接受 classic PAT；必须在用户自己的终端按 CLI 官方流程登录，或使用 fine-grained PAT 等受支持凭据。不要把 token 发送给 ProofRail、AI 助手，或写入命令行、配置样例和日志。
+
+推荐使用 Windows Package Manager；该包可能同时安装或要求 PowerShell 7，但 ProofRail 便携核心本身仍不依赖 PowerShell 7：
+
+```powershell
+winget install GitHub.Copilot
+```
+
+无法使用 winget 时，可使用已安装的 Node.js/npm：
+
+```powershell
+npm install -g @github/copilot
+```
+
+安装后重启终端并核验：
+
+```powershell
+copilot --version
+Get-Command copilot
+```
+
+`copilot --version` 必须返回计划固定的版本。VS Code 可能把自己的 `copilot.ps1` bootstrap 放在 PATH 前面，因此 `Get-Command copilot` 显示该脚本不等于真实 CLI 缺失；只要版本命令能成功转发，ProofRail 后续 preflight 仍会解析并固定最终原生可执行文件摘要。不要把 `--help`、版本输出或提示词承诺当作非交互、权限、网络、会话恢复、停机和用量能力已经通过的证据；这些能力必须由 T026 运行探针验证。更新 CLI 后必须重新运行 preflight，不能沿用旧摘要。
+
+版本核验不验证认证状态。若运行日志报告 `Classic PATs are not supported`，请在自己的终端移除或替换注入给 Copilot CLI 的 classic PAT，并重新完成受支持的认证；不要把凭据值粘贴到诊断、工单或聊天中。认证修复后仍须重新取得模型调用授权并运行 T026 preflight，不能把登录成功等同于能力矩阵通过。
+
+Copilot CLI 的模型选择独立于 VS Code 聊天输入框。单次非交互运行可用 `--model <name>` 选择该 CLI 版本和账号当前支持的模型，或用 `--model auto` 交给 CLI 路由；不传参数时使用 CLI 自身的 `model` 配置或默认值。模型可用性、倍率和计费由账号、订阅和当时的 GitHub Copilot 服务规则决定，ProofRail 不应硬编码“某模型免费”或沿用 VS Code UI 的选择。
 
 不要混淆客户端程序与运行时通道：AgentRunner 直接调用固定 CLI Agent；SessionBridge 内置客户端和可选诊断客户端通过文件 IPC，通道目录默认在 Windows 为 `%TEMP%\sessbridge`，目标 VS Code 实例由 PID 选择。黑箱候选固定 `mode=visible`、`legacy=false`；visible 回执只证明界面投递，用户必须显式归还隔离 workspace。`silent` 仅用于辅助分析，`auto` 不进入正式流程。
 

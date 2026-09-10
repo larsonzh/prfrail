@@ -12,11 +12,40 @@ Date: 2026-09-10. The frozen S1 installation model is a Windows 11 amd64 portabl
 | CPU/memory | No discrete GPU requirement; S1 has no performance baseline that supports a fixed minimum CPU or memory commitment yet | Also constrained by VS Code, Copilot Chat, and the target project's toolchain |
 | Disk | A writable install directory plus sufficiently sized, non-overlapping source, run-workspace, state/store, and backup directories | Also requires SessionBridge channel space; evidence and snapshot capacity depends on project size |
 | ProofRail runtime | The portable `prfrail.exe` requires no Go, Python, Node.js, database, Docker, administrator privileges, or system service | Core binary requirements remain unchanged |
-| Host software | Windows PowerShell 5.1+ is needed only for this guide's extraction/verification commands; use a browser or optional GitHub CLI to download | VS Code 1.82+, an authenticated and usable GitHub Copilot Chat installation, and the SessionBridge 0.1.1 extension |
+| Host software | Windows PowerShell 5.1+ is needed only for this guide's extraction/verification commands; use a browser or optional GitHub CLI to download. Formal AgentRunner execution additionally requires GitHub Copilot CLI 1.0.83, the current pinned Windows x64 candidate | VS Code 1.82+, an authenticated and usable GitHub Copilot Chat installation, and the SessionBridge 0.1.1 extension; GitHub Copilot CLI is not required |
 | Project tools | `validate`/`preview` need no project compiler; real harnesses require their declared compilers, interpreters, build tools, and test tools to be preinstalled | Same as the core CLI; ProofRail never installs them silently |
 | Network | GitHub access for download; current `version`/`validate`/`preview` can run offline after download and verification | Copilot Chat model calls require host networking, account/subscription access, and model entitlement |
 
-SessionBridge is not an installation dependency for the core offline CLI or AgentRunner. Formal AI execution separately requires a version/digest-pinned CLI Agent supported by the T026 capability matrix. VS Code, usable Copilot Chat and SessionBridge 0.1.1 are required only when the user selects `supervised-black-box`. That mode requires human supervision and prior acknowledgment that ProofRail cannot prove tools/commands, out-of-scope reads, network, actual cost, every background process, session continuity, or external effects such as commit/push/publication. ProofRail warrants isolation and post-return artifact scanning, independent gates, evidence and review only.
+SessionBridge is not an installation dependency for the core offline CLI or AgentRunner. Formal AI execution separately requires a version/digest-pinned CLI Agent supported by the T026 capability matrix; the current Windows x64 candidate is GitHub Copilot CLI 1.0.83. It is not a prerequisite for `version`, `validate`, `preview`, or other core offline commands. VS Code, usable Copilot Chat and SessionBridge 0.1.1 are required only when the user selects `supervised-black-box`. That mode requires human supervision and prior acknowledgment that ProofRail cannot prove tools/commands, out-of-scope reads, network, actual cost, every background process, session continuity, or external effects such as commit/push/publication. ProofRail warrants isolation and post-return artifact scanning, independent gates, evidence and review only.
+
+### 1.1 Conditional GitHub Copilot CLI Dependency for Formal AgentRunner
+
+Only users who plan to enable formal AgentRunner execution need GitHub Copilot CLI. Version 1.0.83 is the currently pinned and verified Windows x64 candidate. A later version is not automatically compatible merely because it is newer; its actual version and executable digest must be pinned again and its capability matrix rerun. Model calls also require a usable GitHub Copilot account/subscription, network access, and model entitlement, and may incur usage or cost. Version 1.0.83 does not accept classic PATs; authenticate through the CLI's official flow in the user's own terminal or use a supported credential such as a fine-grained PAT. Never send a token to ProofRail or an AI assistant, or place it in command lines, configuration examples, or logs.
+
+Windows Package Manager is recommended. The package may install or require PowerShell 7, but the portable ProofRail core itself still does not depend on PowerShell 7:
+
+```powershell
+winget install GitHub.Copilot
+```
+
+When winget is unavailable, use an existing Node.js/npm installation:
+
+```powershell
+npm install -g @github/copilot
+```
+
+Restart the terminal after installation and verify:
+
+```powershell
+copilot --version
+Get-Command copilot
+```
+
+`copilot --version` must report the version intended for pinning. VS Code may place its own `copilot.ps1` bootstrap earlier on PATH, so `Get-Command copilot` showing that script does not mean the real CLI is absent; successful version forwarding is sufficient for ProofRail preflight to resolve and pin the final native executable digest. Never treat `--help`, version output, or prompt promises as proof that noninteractive behavior, permissions, network controls, session resume, termination, or usage reporting passed. T026 runtime probes must verify those capabilities. Rerun preflight after every CLI update instead of reusing an old digest.
+
+Version verification does not verify authentication. If a runtime log reports `Classic PATs are not supported`, remove or replace the classic PAT supplied to Copilot CLI in your own terminal and complete a supported authentication flow. Do not paste credential values into diagnostics, tickets, or chat. After fixing authentication, obtain fresh model-call authorization and rerun the T026 preflight; successful login is not equivalent to a passing capability matrix.
+
+Copilot CLI model selection is independent of the VS Code chat input. For one non-interactive run, use `--model <name>` to select a model supported by that CLI version and account, or `--model auto` to let the CLI route the request. Without the flag, the CLI uses its own `model` configuration or default. Model availability, multipliers, and billing depend on the account, subscription, and current GitHub Copilot service rules; ProofRail must not hard-code that a model is free or inherit the VS Code UI selection.
 
 Do not conflate a client program with its runtime channel. AgentRunner invokes a pinned CLI Agent directly. The embedded SessionBridge client and optional diagnostics use file IPC; the Windows default channel is `%TEMP%\sessbridge` and PID selects the VS Code instance. Black-box candidates fix `mode=visible` and `legacy=false`; a visible receipt proves UI delivery only, and the user must explicitly return the isolated workspace. `silent` is auxiliary analysis only and `auto` is excluded from the formal flow.
 

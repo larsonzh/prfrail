@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "1.0.0",
+  "capability": {
+    "kind": "agent-runner-capability",
+    "probeId": "probe-copilot-cli-windows-20260910",
+    "adapterId": "github-copilot-cli",
+    "probedAt": "2026-09-10T03:00:00.000Z",
+    "executableHash": "sha256:d3f3bb7b8bbf68357ad29f514a179d09f76135483d8bfb643131b8600f671ee2",
+    "version": "1.0.83",
+    "configHash": "sha256:d6d07e0943462974bba6380170ca6c6d147e6e609b2cc5ceff165f8f16faa5ed",
+    "disposition": "blocked",
+    "matrix": {
+      "noninteractive": {"status": "unknown", "evidence": ["sha256:203bf65ac1b4501fd570fd63619b82d944721b174dcff0860acb96026b5adead"]},
+      "cwd": {"status": "unknown", "evidence": ["sha256:203bf65ac1b4501fd570fd63619b82d944721b174dcff0860acb96026b5adead"]},
+      "eventStreamOrCompleteLogs": {"status": "unknown", "evidence": ["sha256:203bf65ac1b4501fd570fd63619b82d944721b174dcff0860acb96026b5adead"]},
+      "sessionCreate": {"status": "unknown", "evidence": ["sha256:203bf65ac1b4501fd570fd63619b82d944721b174dcff0860acb96026b5adead"]},
+      "sessionResume": {"status": "unknown", "evidence": ["sha256:203bf65ac1b4501fd570fd63619b82d944721b174dcff0860acb96026b5adead"]},
+      "cancellation": {"status": "unknown", "evidence": ["sha256:203bf65ac1b4501fd570fd63619b82d944721b174dcff0860acb96026b5adead"]},
+      "processTreeStop": {"status": "unknown", "evidence": ["sha256:203bf65ac1b4501fd570fd63619b82d944721b174dcff0860acb96026b5adead"]},
+      "toolControl": {"status": "unknown", "evidence": ["sha256:203bf65ac1b4501fd570fd63619b82d944721b174dcff0860acb96026b5adead"]},
+      "networkControl": {"status": "unknown", "evidence": ["sha256:203bf65ac1b4501fd570fd63619b82d944721b174dcff0860acb96026b5adead"]},
+      "permissionControl": {"status": "unknown", "evidence": ["sha256:203bf65ac1b4501fd570fd63619b82d944721b174dcff0860acb96026b5adead"]},
+      "usage": {"status": "unknown", "evidence": ["sha256:203bf65ac1b4501fd570fd63619b82d944721b174dcff0860acb96026b5adead"]},
+      "unattendedConfirmations": {"status": "unknown", "evidence": ["sha256:203bf65ac1b4501fd570fd63619b82d944721b174dcff0860acb96026b5adead"]}
+    },
+    "evidence": ["sha256:203bf65ac1b4501fd570fd63619b82d944721b174dcff0860acb96026b5adead"]
+  },
+  "recordHash": "sha256:1dfb83a21f070b66b61766188113c4d41f99c91dbbd5a0a17b6b91bc0d3b399b"
+}

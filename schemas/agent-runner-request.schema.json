@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://proofrail.dev/schemas/v1/agent-runner-request.schema.json",
+  "title": "ProofRail AgentRunner request record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "request", "recordHash"],
+  "properties": {
+    "schemaVersion": {"const": "1.0.0"},
+    "request": {"$ref": "#/$defs/request"},
+    "recordHash": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "id": {"type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"},
+    "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "timestamp": {"type": "string", "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$"},
+    "idSet": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "requestId", "runId", "taskId", "stepId", "attempt", "createdAt", "adapterId", "mode", "workspaceHash", "contextHash", "parentSnapshotHash", "authorizationHash", "budgetHash", "allowedTargets", "allowedEffects", "evidence"],
+      "properties": {
+        "kind": {"const": "agent-runner-request"},
+        "requestId": {"$ref": "#/$defs/id"},
+        "runId": {"$ref": "#/$defs/id"},
+        "taskId": {"$ref": "#/$defs/id"},
+        "stepId": {"$ref": "#/$defs/id"},
+        "attempt": {"type": "integer", "minimum": 1},
+        "createdAt": {"$ref": "#/$defs/timestamp"},
+        "adapterId": {"$ref": "#/$defs/id"},
+        "mode": {"enum": ["create", "resume"]},
+        "workspaceHash": {"$ref": "#/$defs/sha256"},
+        "contextHash": {"$ref": "#/$defs/sha256"},
+        "parentSnapshotHash": {"$ref": "#/$defs/sha256"},
+        "authorizationHash": {"$ref": "#/$defs/sha256"},
+        "budgetHash": {"$ref": "#/$defs/sha256"},
+        "allowedTargets": {"$ref": "#/$defs/idSet"},
+        "allowedEffects": {"$ref": "#/$defs/idSet"},
+        "priorSessionId": {"$ref": "#/$defs/id"},
+        "priorCompletionHash": {"$ref": "#/$defs/sha256"},
+        "evidence": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/sha256"}}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"mode": {"const": "resume"}}, "required": ["mode"]},
+          "then": {
+            "properties": {
+              "priorSessionId": {"$ref": "#/$defs/id"},
+              "priorCompletionHash": {"$ref": "#/$defs/sha256"}
+            },
+            "required": ["priorSessionId", "priorCompletionHash"]
+          },
+          "else": {
+            "properties": {
+              "priorSessionId": false,
+              "priorCompletionHash": false
+            }
+          }
+        }
+      ]
+    }
+  }
+}

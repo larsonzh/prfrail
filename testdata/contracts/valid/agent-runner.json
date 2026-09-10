@@ -1,0 +1,160 @@
+[
+  {
+    "fixtureId": "agent-runner-request-create-valid",
+    "schema": "agent-runner-request.schema.json",
+    "expected": "accept",
+    "rejectionLayer": "schema",
+    "reason": "Valid create request with immutable context and authority bindings",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "request": {
+        "kind": "agent-runner-request",
+        "requestId": "agent-request-one",
+        "runId": "run-one",
+        "taskId": "task-one",
+        "stepId": "step-one",
+        "attempt": 1,
+        "createdAt": "2026-09-10T02:00:00.000Z",
+        "adapterId": "fixture-agent",
+        "mode": "create",
+        "workspaceHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "contextHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "parentSnapshotHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+        "authorizationHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+        "budgetHash": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+        "allowedTargets": ["workspace-files"],
+        "allowedEffects": ["workspace-write", "local-process"],
+        "evidence": ["sha256:6666666666666666666666666666666666666666666666666666666666666666"]
+      },
+      "recordHash": "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+    }
+  },
+  {
+    "fixtureId": "agent-runner-request-resume-valid",
+    "schema": "agent-runner-request.schema.json",
+    "expected": "accept",
+    "rejectionLayer": "schema",
+    "reason": "Valid resume request binds the prior session and completion",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "request": {
+        "kind": "agent-runner-request",
+        "requestId": "agent-request-two",
+        "runId": "run-one",
+        "taskId": "task-one",
+        "stepId": "step-one",
+        "attempt": 1,
+        "createdAt": "2026-09-10T02:01:00.000Z",
+        "adapterId": "fixture-agent",
+        "mode": "resume",
+        "workspaceHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "contextHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "parentSnapshotHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+        "authorizationHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+        "budgetHash": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+        "allowedTargets": ["workspace-files"],
+        "allowedEffects": ["workspace-write", "local-process"],
+        "priorSessionId": "session-one",
+        "priorCompletionHash": "sha256:8888888888888888888888888888888888888888888888888888888888888888",
+        "evidence": ["sha256:6666666666666666666666666666666666666666666666666666666666666666"]
+      },
+      "recordHash": "sha256:9999999999999999999999999999999999999999999999999999999999999999"
+    }
+  },
+  {
+    "fixtureId": "agent-runner-capability-blocked-valid",
+    "schema": "agent-runner-capability.schema.json",
+    "expected": "accept",
+    "rejectionLayer": "schema",
+    "reason": "A complete capability matrix may fail closed",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "capability": {
+        "kind": "agent-runner-capability",
+        "probeId": "probe-one",
+        "adapterId": "fixture-agent",
+        "probedAt": "2026-09-10T02:00:00.000Z",
+        "executableHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "version": "fixture-agent 1.0.0",
+        "configHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "disposition": "blocked",
+        "matrix": {
+          "noninteractive": {"status": "verified", "evidence": ["sha256:3333333333333333333333333333333333333333333333333333333333333333"]},
+          "cwd": {"status": "verified", "evidence": ["sha256:3333333333333333333333333333333333333333333333333333333333333333"]},
+          "eventStreamOrCompleteLogs": {"status": "verified", "evidence": ["sha256:3333333333333333333333333333333333333333333333333333333333333333"]},
+          "sessionCreate": {"status": "verified", "evidence": ["sha256:3333333333333333333333333333333333333333333333333333333333333333"]},
+          "sessionResume": {"status": "verified", "evidence": ["sha256:3333333333333333333333333333333333333333333333333333333333333333"]},
+          "cancellation": {"status": "verified", "evidence": ["sha256:3333333333333333333333333333333333333333333333333333333333333333"]},
+          "processTreeStop": {"status": "verified", "evidence": ["sha256:3333333333333333333333333333333333333333333333333333333333333333"]},
+          "toolControl": {"status": "verified", "evidence": ["sha256:3333333333333333333333333333333333333333333333333333333333333333"]},
+          "networkControl": {"status": "unknown", "evidence": ["sha256:4444444444444444444444444444444444444444444444444444444444444444"]},
+          "permissionControl": {"status": "verified", "evidence": ["sha256:3333333333333333333333333333333333333333333333333333333333333333"]},
+          "usage": {"status": "verified", "evidence": ["sha256:3333333333333333333333333333333333333333333333333333333333333333"]},
+          "unattendedConfirmations": {"status": "verified", "evidence": ["sha256:3333333333333333333333333333333333333333333333333333333333333333"]}
+        },
+        "evidence": ["sha256:4444444444444444444444444444444444444444444444444444444444444444"]
+      },
+      "recordHash": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+    }
+  },
+  {
+    "fixtureId": "agent-runner-event-valid",
+    "schema": "agent-runner-event.schema.json",
+    "expected": "accept",
+    "rejectionLayer": "schema",
+    "reason": "A normalized event binds request, session, sequence, and raw payload evidence",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "event": {
+        "kind": "agent-runner-event",
+        "eventId": "event-one",
+        "requestId": "agent-request-one",
+        "requestHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "runId": "run-one",
+        "taskId": "task-one",
+        "stepId": "step-one",
+        "attempt": 1,
+        "adapterId": "fixture-agent",
+        "sessionId": "session-one",
+        "sequence": 1,
+        "occurredAt": "2026-09-10T02:00:01.000Z",
+        "eventType": "session-created",
+        "payloadHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "evidence": ["sha256:3333333333333333333333333333333333333333333333333333333333333333"]
+      },
+      "recordHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+    }
+  },
+  {
+    "fixtureId": "agent-runner-completion-valid",
+    "schema": "agent-runner-completion.schema.json",
+    "expected": "accept",
+    "rejectionLayer": "schema",
+    "reason": "External completion proves process stop and evidence capture but not task PASS",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "completion": {
+        "kind": "agent-runner-completion",
+        "completionId": "completion-one",
+        "requestId": "agent-request-one",
+        "requestHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "runId": "run-one",
+        "taskId": "task-one",
+        "stepId": "step-one",
+        "attempt": 1,
+        "adapterId": "fixture-agent",
+        "sessionId": "session-one",
+        "completedAt": "2026-09-10T02:05:00.000Z",
+        "status": "completed",
+        "exitCode": 0,
+        "processTreeStatus": "stopped",
+        "logsComplete": true,
+        "usageComplete": true,
+        "outputManifestHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "evidence": ["sha256:3333333333333333333333333333333333333333333333333333333333333333"],
+        "errorEvidence": []
+      },
+      "recordHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+    }
+  }
+]
