@@ -10,7 +10,8 @@ Date: 2026-09-09. Status: `CANDIDATE`, effective only after the formal release c
 | Linux amd64 | Core CI | Build, test, candidate probe, and self-host only; no S1 production-support claim |
 | macOS / Windows on Arm / Linux arm64 | Unsupported | Not included in the S1 acceptance matrix |
 | generic/C/Go harnesses | Configuration and noop orchestration | Language scopes, read-only preview, and noop-only loops are verified; executable steps still fail closed |
-| VS Code / Copilot Chat / SessionBridge | Conditionally required | Not needed for the core offline CLI; AI-session connectivity requires VS Code 1.82+, usable Copilot Chat, and SessionBridge 0.1.1 without granting authority beyond ProofRail; the executable-adapter product loop is not delivered yet |
+| CLI Agent / AgentRunner | Planned, not delivered | Target formal AI execution channel; requires pinned version/config, capability probe, isolated workspace, process/session evidence and independent acceptance; T026/T027/AT-23 block S1 |
+| VS Code / Copilot Chat / SessionBridge visible black-box candidate | Planned, reduced assurance, not delivered | Not needed for core offline CLI; bridges an isolated candidate only with explicit risk acknowledgment and human supervision, followed by independent acceptance; does not warrant tools/network/cost/external effects; T028/AT-24 block S1 |
 
 ## Candidate Version and Security-Maintenance Policy
 

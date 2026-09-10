@@ -6,7 +6,7 @@
 
 ## 1. 环境要求与能力层次
 
-| 项目 | 核心离线 CLI | 连接 Copilot Chat 的 AI 会话 |
+| 项目 | 核心离线 CLI / CLI Agent | SessionBridge visible 黑箱候选 |
 |---|---|---|
 | 操作系统/架构 | Windows 11 amd64（x86-64）；S1 唯一正式支持候选 | 同核心要求；VS Code 与扩展也必须在该用户会话中运行 |
 | CPU/内存 | 无独立 GPU 要求；尚无可据以承诺固定最低 CPU、内存的 S1 性能基准 | 另受 VS Code、Copilot Chat 和目标项目工具链需求约束 |
@@ -16,13 +16,13 @@
 | 项目工具 | `validate`/`preview` 不要求项目编译器；实际 harness 必须预装其声明的编译器、解释器、构建和测试工具 | 同左；ProofRail 不静默安装这些工具 |
 | 网络 | 下载时访问 GitHub；下载和核验完成后，当前 `version`/`validate`/`preview` 可离线运行 | Copilot Chat 模型调用需要宿主可用网络、账号/订阅和模型权限 |
 
-SessionBridge 不是核心离线 CLI 的安装依赖，但它的扩展是 ProofRail 通过 VS Code 与 Copilot Chat 建立 AI 会话连接的必要前置组件。AI 模式准备顺序是：安装 VS Code 和 GitHub Copilot Chat 并登录账号；从 SessionBridge [GitHub Releases](https://github.com/larsonzh/sessbridge/releases) 下载并安装 `0.1.1` 扩展，或从 VS Code Marketplace 安装扩展；然后重载 VS Code 窗口。ProofRail 的目标产品集成会内置 SessionBridge v1 文件 IPC 客户端，用户不需要另行下载或启动 Python、PowerShell、sh 客户端；[`client/`](https://github.com/larsonzh/sessbridge/tree/main/client) 中的三种实现只作为独立诊断、协议参考和 SessionBridge 手工联调工具。
+SessionBridge 不是核心离线 CLI 或 AgentRunner 的安装依赖。正式 AI 执行需另行安装 T026 能力矩阵支持且版本/摘要固定的 CLI Agent。仅当用户选择 `supervised-black-box` 时，才需要 VS Code、可用的 Copilot Chat 和 SessionBridge 0.1.1；该模式必须由用户监督，并在启动前确认 ProofRail 无法证明工具/命令、越界读取、网络、实际费用、全部后台进程、会话连续性及 commit/push/发布等外部副作用。ProofRail 只保证隔离和归还后的产物扫描、独立门禁、证据与评审。
 
-不要混淆客户端程序与运行时通道：ProofRail 内置客户端或可选诊断客户端都通过文件 IPC 通信；通道目录默认在 Windows 为 `%TEMP%\sessbridge`，SessionBridge 参考客户端可由 `SESSBRIDGE_CHANNEL_DIR` 或 `--channel-dir`/`-ChannelDir` 覆盖；目标 VS Code 实例由 PID 选择。调用方和扩展必须使用同一通道目录及目标实例。ProofRail 的正式契约固定 `mode=silent`、`legacy=false`；每个连续 AI 作业必须发送非空、稳定的 `conversationId`，从而自动启用 SessionBridge RFC §5.1 的 silent 多轮历史，不能使用无状态空值。
+不要混淆客户端程序与运行时通道：AgentRunner 直接调用固定 CLI Agent；SessionBridge 内置客户端和可选诊断客户端通过文件 IPC，通道目录默认在 Windows 为 `%TEMP%\sessbridge`，目标 VS Code 实例由 PID 选择。黑箱候选固定 `mode=visible`、`legacy=false`；visible 回执只证明界面投递，用户必须显式归还隔离 workspace。`silent` 仅用于辅助分析，`auto` 不进入正式流程。
 
-SessionBridge 独立联调时可先用 `visible` 或 `@sbr-review` 验证面板投递和人工交互，再用带 `conversationId` 的 `silent` 验证 ProofRail 所需的自动回执及多轮上下文。但这些只是可选诊断能力；`visible`/`auto`/`@sbr-review` 不得成为 ProofRail 产品默认值或 silent 失败后的自动回退。正式人工干预由 ProofRail 自有 CLI/TUI 完成，改变该边界必须先修订 ADR-004/011、产品需求、契约和验收。
+SessionBridge 独立联调可验证 visible 投递、`@sbr-review` 和 silent 多轮；它们不证明 ProofRail 产品完成。黑箱模式只能由用户显式选择，绝不作为 AgentRunner 或 silent 失败后的自动回退；风险确认不能豁免隔离、秘密扫描、独立门禁和评审。
 
-当前 ProofRail 尚未实现该内置 IPC 客户端：`internal/adapters/sessbridge.go` 只定义由消费方实现的 Go `SilentClient` 接口，产品运行时也没有通道目录、目标 PID 或会话身份的配置入口。扩展安装成功仍不等于 AI 闭环已经可用；当前 S1 候选的 executable step/adapter 产品闭环仍未交付，不能把 noop-only `run` 扩大解释为 AI 已能自动改码。
+当前 ProofRail 尚未实现 AgentRunner、正式 CLI Agent adapter 或黑箱模式所需的 visible IPC/TUI 风险确认与归还流程。`internal/adapters/sessbridge.go` 只有消费方提供的 `SilentClient` 接口；安装扩展不等于任何 AI 闭环可用，不能把 noop-only `run` 扩大解释为 AI 已能自动改码。
 
 当前发行候选没有图形窗口、完整 TUI 或 AI/操作员交互收件箱。`prfrail.exe` 使用普通终端中的逐行 CLI 文本，默认无 ANSI 颜色，并为自动化提供 `--json`；可直接在 Windows Terminal、PowerShell 或 VS Code 集成终端中运行。Bubble Tea v1.3.4 仅完成过隔离可行性原型，尚未链接进当前二进制。S1 优先用“一个终端、短命令、可复制路径”降低学习成本，而不把原型界面冒充已交付功能。
 

@@ -37,6 +37,8 @@
 | SEC-11 拒绝服务/抵赖 | 超时退款假设、跨 run 绕过预算、重复结算 | 持久预留、未知占用、共享锁与结算去重；tickets/adapters | AT-20 |
 | SEC-12 数据丢失/泄露 | 不完整备份、卸载删共享工具、旧证据含秘密 | 引用闭包核验、新 store 演练、默认保留与显式处置；snapshot/evidence/release | AT-21 |
 | SEC-13 冒充/提权/泄露 | 伪造或陈旧操作员响应、UI 文本冒充授权、对话中秘密被持久化 | 主体/attempt/context hash/权限绑定、结构化允许响应、secret-direct、重放去重；chain/console/evidence | AT-22 |
+| SEC-14 篡改/提权/抵赖 | CLI Agent 二进制/配置替换、逃逸 source/store、提升工具/网络权限、伪造或缺失事件、停机/恢复歧义、自行 commit/push/publish | 可执行文件与配置摘要、能力探针、隔离 workspace、进程树监督、事件/日志与前后 manifest、独立 gates/review；adapters/guard/evidence | AT-23 |
+| SEC-15 信息泄露/抵赖/副作用 | visible 黑箱 Agent 读取越界资源、泄密、网络/费用/后台进程不可见、外部 Git/发布副作用，或风险说明被当作免责放行 | 显式版本化风险确认、隔离 workspace、用户监督与宿主侧限制、归还后全量扫描、unknown 标记、独立 gates/review；console/chain/guard/evidence | AT-24 |
 
 测试编号解析见 [TEST_STRATEGY.md](TEST_STRATEGY.md)。全部强制反例必须能断言“不发布、不推进、证据仍完整”，不能只检查返回非零。
 
@@ -50,7 +52,7 @@
 
 ## 5. 安全评审和响应
 
-以下事项需要独立评审：扩大写入/网络/工具权限、变更审批规则、生成 hook、canonical/签名/恢复协议。未修复的 fail-close 绕过、失败候选接受、秘密外泄或不可恢复覆盖均阻断发布。
+以下事项需要独立评审：扩大写入/网络/工具权限、变更审批规则、生成 hook、canonical/签名/恢复协议。黑箱模式的风险确认不是免责通行证：ProofRail 仍须履行其承诺的隔离、扫描、门禁、证据和评审责任，用户只承担已明确列出的宿主监督与不可观测外部行为风险。未修复的 fail-close 绕过、失败候选接受、秘密外泄或不可恢复覆盖均阻断发布。
 
 拟定响应目标（待 ADR-006 批准）：收到私密漏洞报告后 2 个工作日内确认、5 个工作日内完成影响分类；这不是已公布 SLA。安全报告渠道和维护者需发布前确定；未确定前不把含凭据/利用细节的报告放公共 issue。若后续引入签名/attestation，其私钥或短期凭据不得进入仓库、模型或普通日志。
 

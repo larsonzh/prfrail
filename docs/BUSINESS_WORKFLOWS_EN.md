@@ -72,7 +72,7 @@ flowchart TD
 2. ProofRail stops at the current atomic boundary, persists the interaction request, and moves the task/step to `WAITING_FOR_OPERATOR`. The TUI shows the pending item, context, allowed actions, and elapsed wait in the same terminal. Notification and recovery do not depend on SessionBridge `@sbr-review` registration or chat-panel visibility.
 3. The operator responds in the TUI. Clarification, approval/rejection, authorization changes, and manual writes produce the applicable operator-interaction, review, authorization, or handoff records. Terminal text is not authoritative state, and secrets use only controlled secure input.
 4. ProofRail retakes control only after validating the operator, attempt, candidate/context hashes, lease, authorization, and response scope. Missing responses, disconnection, timeout, or persistence failure remain paused and never select a default answer.
-5. When no manual write occurred, ProofRail sends the confirmed response and record hashes back through silent using the same attempt and `conversationId` but a new `requestId`. Manual writes first complete the next section's writer-stop, lease, return, and revalidation flow, then resume or create a new attempt.
+5. When no manual write occurred, ProofRail returns the confirmed response and record hashes to the current recoverable CLI Agent session. Before resume it revalidates attempt/workspace/session/process and authority; uncertainty creates a new attempt. SessionBridge silent may carry auxiliary analysis context only, not formal execution resume.
 6. Before implementation, the general-clarification `operator-interaction` record requires a frozen Schema, positive/negative goldens, hash domain, and replay rules. Chat history, a TUI buffer, or `reply_<conversationId>.json` cannot substitute for that durable record.
 
 ## 6. Operator Handoff
@@ -82,6 +82,14 @@ flowchart TD
 3. The operator edits only the specified run workspace. Passwords, tokens, and MFA never pass through the model or persistent context.
 4. `complete` means return, not approval: reclaim the lease, rescan boundaries/secrets/processes, and rerun prescribed gates.
 5. Successful checks still lead to independent review. Disconnection, expiry, or uncertain exclusivity remains paused.
+
+### 6.1 Supervised Black-Box Candidate
+
+1. The user explicitly selects `supervised-black-box`. The TUI states its assurance is lower than AgentRunner and lists unobservable tools/reads/network/cost/background processes/sessions/external effects. Acknowledgment binds task/attempt/workspace and risk version.
+2. ProofRail materializes an isolated workspace and freezes targets and verification plan, then uses SessionBridge visible to deliver the request. Delivery proves UI visibility, not Agent start or completion.
+3. The user supervises the external Agent and owns host trust plus credential/network restrictions. ProofRail infers no tool trace from chat. The user explicitly ends the work window and returns the workspace; disconnection or timeout never returns it automatically.
+4. ProofRail stops known managed processes, rebuilds the full manifest/diff, and checks scope, secrets, file types/sizes and observable effects. Unknown processes or external effects remain paused.
+5. Acceptance still requires independent build/test/verify gates and review. Reports separately show artifact acceptance and `unknown/reduced` process assurance; they never claim AgentRunner equivalence. Failures never switch execution mode automatically.
 
 ## 7. Delivery, Upgrade, and Retirement
 
@@ -96,4 +104,4 @@ whois documents the experience source and a future read-only shadow acceptance e
 
 ## 9. Implementation Trace
 
-T009 implements ordered scheduling, projections, pause, cancel, and replay from sections 3–4. T010 adds real gate runners; T011 completes review and acceptance; T013/T014 complete the abstract adapter and handoff; T016 delivers the usable line-oriented CLI; T019–T024 complete preview, export, authorization, effects, cost, and lifecycle; T025 plans the embedded SessionBridge IPC and TUI AI/operator interaction loop from section 5. A planned capability becomes documented as available only after executable validation.
+T009 implements ordered scheduling, projections, pause, cancel, and replay from sections 3–4. T010 adds real gate runners; T011 completes review and acceptance; T013/T014 complete the abstract adapter and handoff; T016 delivers the usable line-oriented CLI; T019–T024 complete preview, export, authorization, effects, cost, and lifecycle; T025 plans section 5 TUI AI/operator interaction; T026/T027 plan AgentRunner contract and implementation; T028 plans section 6.1 black-box candidates. A planned capability becomes documented as available only after executable validation.

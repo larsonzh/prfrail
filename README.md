@@ -34,7 +34,7 @@ ProofRail 让 AI 在无人值守下安全地改代码、跑验证、出证据：
 
 ### 快速开始（当前 CLI 基线）
 
-当前界面是 Windows Terminal、PowerShell 或 VS Code 集成终端中的逐行 CLI，不是图形窗口或完整 TUI。发布候选的软硬件要求、下载核验和五步上手见 [Windows 便携 ZIP 安装指南](docs/INSTALLATION.md)。核心离线 CLI 不要求 VS Code；要连接 Copilot Chat，必须另装 VS Code 1.82+、可用 Copilot Chat 与 SessionBridge 0.1.1，但当前 executable adapter 产品闭环仍未交付。
+当前界面是 Windows Terminal、PowerShell 或 VS Code 集成终端中的逐行 CLI，不是图形窗口或完整 TUI。发布候选的软硬件要求、下载核验和五步上手见 [Windows 便携 ZIP 安装指南](docs/INSTALLATION.md)。核心离线 CLI 不要求 VS Code。目标正式 AI 执行使用 AgentRunner/CLI Agent；另规划基于 SessionBridge visible 的受监督黑箱候选，可更快复用现有可见 Agent，但只保证归还后的产物检查，不保证工具、网络、费用或外部副作用。两条产品闭环当前均未交付。
 
 ```text
 prfrail init --workspace .
@@ -46,7 +46,7 @@ prfrail run --chain ./proofrail.chain.json --run-id run-demo
 prfrail report --run-dir ./tmp/prfrail-runs/run-demo
 ```
 
-说明：`run` 目前仅执行 noop-only 任务链；`serve`/完整 TUI 仍在后续切片。目标 TUI 将显示 AI 的待处理人工请求、收集结构化响应并把控制权交回任务链；该能力尚未实现，且正式流程不依赖 SessionBridge `@sbr-review`（它只可用于独立诊断）。
+说明：`run` 目前仅执行 noop-only 任务链；`serve`/完整 TUI 仍在后续切片。目标 TUI 将显示 AI 的待处理人工请求，并在用户显式选择黑箱模式时先展示降级保证和责任边界。SessionBridge visible 投递不等于完成，正式流程也不依赖 `@sbr-review`。
 
 ### 构建（需 Go 工具链）
 
@@ -107,7 +107,7 @@ Product review adds side-effect-free preview, accepted-result export, revocation
 
 ### Quick Start (current CLI baseline)
 
-The current interface is a line-oriented CLI in Windows Terminal, PowerShell, or the VS Code integrated terminal, not a graphical window or complete TUI. See the [Windows portable ZIP installation guide](docs/INSTALLATION_EN.md) for candidate hardware/software requirements, download verification, and the five-step quick start. Core offline mode needs no VS Code; Copilot Chat connectivity requires VS Code 1.82+, usable Copilot Chat, and SessionBridge 0.1.1, while the executable-adapter product loop remains undelivered.
+The current interface is a line-oriented CLI in Windows Terminal, PowerShell, or the VS Code integrated terminal, not a graphical window or complete TUI. See the [Windows portable ZIP installation guide](docs/INSTALLATION_EN.md) for candidate hardware/software requirements, download verification, and the five-step quick start. Core offline mode needs no VS Code. Target formal AI execution uses AgentRunner/CLI Agent; a separate SessionBridge-visible supervised black-box candidate mode is planned for faster reuse of an existing visible Agent, but warrants post-return artifacts only, not tools, network, cost, or external effects. Neither product loop is delivered yet.
 
 ```text
 prfrail init --workspace .
@@ -119,7 +119,7 @@ prfrail run --chain ./proofrail.chain.json --run-id run-demo
 prfrail report --run-dir ./tmp/prfrail-runs/run-demo
 ```
 
-Notes: `run` currently executes noop-only chains; `serve` and the full TUI remain in later slices. The target TUI will show pending AI requests, collect structured operator responses, and return control to the chain. This is not implemented, and the formal path does not depend on SessionBridge `@sbr-review`, which remains standalone diagnostics only.
+Notes: `run` currently executes noop-only chains; `serve` and the full TUI remain in later slices. The target TUI will show pending AI requests and, before explicit black-box selection, the reduced assurance and responsibility boundary. SessionBridge visible delivery is not completion, and the formal path does not depend on `@sbr-review`.
 
 ### Build (requires Go toolchain)
 

@@ -44,9 +44,9 @@
 
 - 项目建议书与历史设计来源：`docs/RFC-proofrail-unattended-ai-engineering-product.md`；
   分域权威见 `docs/DOCUMENTATION_PLAN.md`。协议修订先改 `docs/CONTRACTS.md` 及 Schema/样例，再改代码。
-- 与 `sessbridge`（姊妹仓库，同工作区）边界：ProofRail 正式协议只消费
-  SessionBridge `silent` 消息层 + 文件队列；`visible` 人工交互属于 SessionBridge 产品能力，
-  不进入 ProofRail 正式协议。
+- 与 `sessbridge`（姊妹仓库，同工作区）边界：ProofRail 正式 AI 执行走 `AgentRunner`；
+  SessionBridge `silent` 仅作辅助分析，`visible` 可桥接显式选择的受监督黑箱候选，`auto` 不进入
+  正式流程。黑箱的风险确认、归还、扫描和验收语义属于 ProofRail，不得反向写入 SessionBridge 协议。
 
 ## 4. Git 纪律
 

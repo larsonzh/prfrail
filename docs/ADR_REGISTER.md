@@ -9,7 +9,7 @@
 | ADR-001 | Go 模块化单体、CLI/TUI、single writer、无默认 Git 写入 | 不选脚本翻译/分布式系统；降低跨平台与恢复复杂度 | RFC §4/11/16 已决定；T001 确认依赖基线 |
 | ADR-002 | 冻结 Schema 2020-12 工具链、canonical JSON/路径/错误/配置优先级 | 采用 `canonicalize` 4.0.0 复算 RFC 8785 向量；Ajv 8.20.0 独立于未来 Go 核心 | T002 已冻结 29 份结构 Schema；当前 82 个手写预期 fixture 与两条 canonical 向量全部通过 |
 | ADR-003 | 事件/journal 与接受提交协议、Windows 原子替换/停机原语 | rename 只解决单文件；需证明 durable、失败回滚和跨文件发布读者语义 | T004 已实测：NTFS 开放 reader 阻止普通替换且目录 `Sync` 不可用，ext4 支持开放 reader 替换与目录 `Sync`；rename 后 receipt 前必须判 uncertain。S1 采用平台原语并补断电故障注入；不能用目录隔离替代 required OS 限制 |
-| ADR-004 | SessionBridge v0.1.1 silent + 文件队列，核心自管持久幂等 | 不 fork 扩展、不用 visible/auto、无 GUI 兜底；内存缓存不等于 exactly-once | T004 已实测：Windows rename-only claim 可多赢家，固定 claim `O_EXCL`、requestId 去重和 generation fencing 为强制项；SessionBridge 40 项无模型测试通过，真实 LM API 仍属宿主能力门禁 |
+| ADR-004 | SessionBridge v0.1.1 silent + 文件队列，核心自管持久幂等 | 不 fork 扩展、不用 visible/auto、无 GUI 兜底；内存缓存不等于 exactly-once | T004 探针结论保留；将 SessionBridge 作为正式 AI 执行通道的部分由 ADR-012 取代 |
 | ADR-005 | bootstrap 首个 seed 由固定 commit、常规构建、独立 Go tests 和人工审计建立；N 构建 N+1，隔离重放 | 不接受候选自证或覆盖运行中 host | RFC §16.5 已定；T017 记录 seed commit/摘要、外部 oracle 和 rollback 路径 |
 | ADR-006 | Windows 11 amd64 正式、Linux amd64 核心 CI；纯 Go 发布；固定工具链/依赖，S1 以 commit+CI+SHA256SUMS+SBOM/许可清单为发布证据 | RFC §16.2 提到 Win10，与 §9.6/14 的 Win11 范围不同；不建立 S1 离线密钥体系，签名/attestation 后续增强 | 2026-09-08 所有者批准简化；T017 落实基础发布证据 |
 | ADR-007 | 最小 context、离线先行、按任务预算、双语 ID 追踪 | 不用昂贵模型反复全仓审读；不把英文译本做第二权威源 | 2026-09-06 所有者批准；S0 新增付费调用为 0，超出须另授权 |
@@ -17,6 +17,7 @@
 | ADR-009 | S1 Windows amd64 使用手工解压的便携 ZIP；用户选择独立目录，以完整 `prfrail.exe` 路径运行，不修改 PATH/注册表/系统目录 | 不采用安装器、包管理器、自动更新或隐式版本切换；最小化安装副作用并支持目录级并存/回滚 | 2026-09-09 产品所有者明确批准；最终 ZIP 仍须绑定发行记录并复验 |
 | ADR-010 | 产品版本采用 `vMAJOR.MINOR.PATCH`（首版候选 `v0.1.0`）；原型期新 minor 发布时，在 GitHub Release notes 与仓库支持矩阵同时公告前一 minor 的 EOL，初始窗口为发布后 90 个自然日 | patch 不启动新的 EOL 倒计时；每次 minor 发布前按稳定性、用户量和维护能力评审是否延长未来窗口。不得追溯缩短已公告窗口；例外须有带日期、理由和到期日的 ADR，经产品所有者明确批准后同步两处 | `PROPOSED / NOT APPROVED`；90 天适合当前早期原型，通知渠道与演进规则须在首版发布前获产品所有者明确批准 |
 | ADR-011 | ProofRail 的 AI/操作员正式交互由本地 CLI/TUI、chain 控制 API 和持久交互记录闭环；SessionBridge `@sbr-review` 只作可选诊断/人工测试 | chat participant 的注册与可见性受 VS Code/扩展生命周期影响，不能承载权威状态、授权或恢复；复用它会形成第二控制面。代价是先冻结 `operator-interaction` 契约并实现 T025 | `PROPOSED / NOT IMPLEMENTED`；经产品所有者确认范围、Schema/golden/重放规则完成且 AT-22 通过后接受 |
+| ADR-012 | 正式 AI 执行采用核心拥有的 `AgentRunner` 端口和固定版本 CLI Agent adapter；另提供显式选择的 `supervised-black-box` 候选导入，SessionBridge 仅作消息/可见界面桥 | silent 只生成文本，visible 只证明面板投递。黑箱模式只保证隔离后的产物检查与独立验收，不保证过程、网络、费用或外部副作用；拒绝复刻完整 VS Code Agent、自动降级或把 transcript/完成声明/退出 0 当权威事实 | `APPROVED DESIGN / NOT IMPLEMENTED`；2026-09-09 产品所有者批准 AgentRunner 方向，2026-09-10 批准黑箱候选功能及显式风险/责任说明。T026/T027/AT-23 关闭 AgentRunner；T028/AT-24 关闭黑箱流程；在此之前 S1 阻断 |
 
 ## 1. 发布与依赖决策提案
 

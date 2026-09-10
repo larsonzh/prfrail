@@ -22,7 +22,7 @@ Module github.com/larsonzh/prfrail, Go 1.22+. Use gofmt and Go naming convention
 
 ## 3. Documentation and Protocol
 
-The [project proposal and historical design source](RFC-proofrail-unattended-ai-engineering-product.md) retains its filename for compatibility but is no longer the sole authority. Follow the domain authority matrix in [DOCUMENTATION_PLAN_EN.md](DOCUMENTATION_PLAN_EN.md). Revise [CONTRACTS_EN.md](CONTRACTS_EN.md) plus schemas/examples before protocol implementation. ProofRail consumes SessionBridge silent plus file queue only. visible is SessionBridge product functionality, not ProofRail's formal protocol.
+The [project proposal and historical design source](RFC-proofrail-unattended-ai-engineering-product.md) retains its filename for compatibility but is no longer the sole authority. Follow the domain authority matrix in [DOCUMENTATION_PLAN_EN.md](DOCUMENTATION_PLAN_EN.md). Revise [CONTRACTS_EN.md](CONTRACTS_EN.md) plus schemas/examples before protocol implementation. Formal ProofRail AI execution uses `AgentRunner`; SessionBridge silent is auxiliary analysis, visible may bridge explicitly selected supervised black-box candidates, and auto is excluded from the formal flow. Black-box risk acknowledgment, return, scanning, and acceptance belong to ProofRail and must not be written back into the SessionBridge protocol.
 
 ## 4. Git Discipline
 

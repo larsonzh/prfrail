@@ -15,10 +15,11 @@
 
 ## 支持与已知限制
 
-支持范围以 [S1 候选支持矩阵](S1_SUPPORT_MATRIX.md) 为准。S1 安装模型是[手工解压 Windows 便携 ZIP](INSTALLATION.md)、显式路径运行且不修改 PATH；该指南同时列出软硬件环境、AI 会话前置条件和五步快速上手。当前仍无正式发行包，候选包仅在隔离临时目录完成生命周期演练。当前界面是普通终端中的逐行 CLI，不是完整 TUI。核心离线 CLI 不要求 VS Code；连接 Copilot Chat 时必须具备 VS Code 1.82+、可用 Copilot Chat 和 SessionBridge 0.1.1，但 executable adapter 产品闭环尚未交付。S1 不提供签名/attestation、Linux 正式支持、自动更新、Web 控制台、完整 TUI 或任意 executable hook。
+支持范围以 [S1 候选支持矩阵](S1_SUPPORT_MATRIX.md) 为准。S1 安装模型是[手工解压 Windows 便携 ZIP](INSTALLATION.md)、显式路径运行且不修改 PATH。当前仍无正式发行包，界面是逐行 CLI。正式 AgentRunner/CLI Agent 与受监督 visible 黑箱候选均未交付；后者即使完成也只保证归还后的产物验收，不保证工具、网络、费用或外部副作用，并须用户显式确认风险和监督。S1 也不提供签名/attestation、Linux 正式支持、自动更新、Web 控制台、完整 TUI 或任意 executable hook。
 
 ## 发布前剩余门禁
 
 1. 对最终 ZIP 复跑核验、首次运行、升级、回滚和卸载。
 2. 将版本、artifact 文件名、下载位置、EOL 通知方式和支持日期绑定到本说明及支持矩阵。
 3. 获得独立评审结论和产品所有者明确 S1 exit/发行批准。
+4. 完成 T025–T028，并分别通过 AT-22 操作员交互、AT-23 AgentRunner 和 AT-24 黑箱候选验收。

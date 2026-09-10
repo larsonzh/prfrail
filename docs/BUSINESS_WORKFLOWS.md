@@ -72,7 +72,7 @@ flowchart TD
 2. ProofRail 在当前原子边界停止推进，持久化交互请求并令 task/step 进入 `WAITING_FOR_OPERATOR`；TUI 在同一终端展示待办、上下文、允许操作和等待时长。SessionBridge `@sbr-review` 或聊天面板可见性不属于通知或恢复依赖。
 3. 用户在 TUI 中答复。普通澄清、批准/拒绝、授权变更和人工写入分别形成对应的 operator interaction、review、authorization 或 handoff 记录；终端文字本身不是权威事实，秘密只进入受控安全输入。
 4. ProofRail 校验操作者、attempt、候选/上下文摘要、租约、授权与答复范围后才收回控制权。无答复、断线、超时或记录失败均保持暂停，不自动选择默认答案。
-5. 无需人工写入时，在同一 attempt 和 `conversationId` 下使用新的 `requestId` 将已确认答复及记录摘要送回 silent 会话；需要人工写入时先完成下节 handoff 的停写、租约、归还和复检，再恢复或新建 attempt。
+5. 无需人工写入时，把已确认答复及记录摘要送回当前可恢复的 CLI Agent session；恢复前重新验证 attempt/workspace/session/进程和授权，不确定则建立新 attempt。SessionBridge silent 仅可承载辅助分析上下文，不承载正式执行恢复。
 6. 一般澄清问答的 `operator-interaction` 记录在实现前必须先冻结 Schema、正反黄金样例、摘要域和重放规则；不得用聊天历史、TUI 缓冲区或 `reply_<conversationId>.json` 代替持久记录。
 
 ## 6. 人工交接流程
@@ -82,6 +82,14 @@ flowchart TD
 3. 操作员只在指定 run-workspace 内工作；密码、token、MFA 不经模型或持久上下文传递。
 4. `complete` 仅表示归还：引擎收回租约、重扫越界/秘密/未知进程并重跑既定门禁。
 5. 通过后仍进入独立评审；断线、到期或无法证明独占写入时保持暂停。
+
+### 6.1 受监督黑箱候选
+
+1. 用户显式选择 `supervised-black-box`，TUI 展示其保证低于 AgentRunner，并列明不可观测工具/读取/网络/费用/后台进程/会话和外部副作用；确认记录绑定 task/attempt/workspace 和风险版本。
+2. ProofRail 物化隔离 workspace、冻结 target 和验证计划，再通过 SessionBridge visible 投递请求；投递回执只证明 UI 可见，不证明代理启动或完成。
+3. 用户监督外部 Agent，并负责宿主信任、凭据和网络限制；ProofRail 不从聊天记录推断工具轨迹。用户显式结束工作窗口并归还 workspace，断线或超时不自动归还。
+4. ProofRail 停止已知受管进程、重建完整 manifest/diff，并检查范围、秘密、文件类型/大小和可观测副作用；未知进程或外部副作用保持暂停。
+5. 独立 build/test/verify gates 与评审通过后才可接受。报告同时显示“产物验收结果”和“过程保证：unknown/reduced”，不得宣称等同 AgentRunner；任何失败不得自动切换模式重试。
 
 ## 7. 交付、升级与停用
 
@@ -96,4 +104,4 @@ whois 只用于说明这些流程的经验来源及未来只读影子验收。A/
 
 ## 9. 实施追踪
 
-T009 实现第 3–4 节的有序调度、投影、暂停、取消与重放；T010 接入真实 gate runner；T011 完成评审与接受；T013/T014 完成抽象 adapter 和人工交接；T016 提供可用逐行 CLI；T019–T024 完成预览、导出、授权、副作用、成本和生命周期；T025 规划第 5 节的内嵌 SessionBridge IPC 与 TUI AI/操作员交互闭环。各阶段只能把已实测能力从“规划”改为“可用”。
+T009 实现第 3–4 节的有序调度、投影、暂停、取消与重放；T010 接入真实 gate runner；T011 完成评审与接受；T013/T014 完成抽象 adapter 和人工交接；T016 提供可用逐行 CLI；T019–T024 完成预览、导出、授权、副作用、成本和生命周期；T025 规划第 5 节 TUI AI/操作员交互；T026/T027 规划 AgentRunner 契约与实现；T028 规划 §6.1 黑箱候选。各阶段只能把已实测能力从“规划”改为“可用”。

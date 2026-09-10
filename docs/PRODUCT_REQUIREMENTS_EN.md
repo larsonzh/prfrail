@@ -11,20 +11,20 @@ Date: 2026-09-07. Status: product requirements baseline; S1 remains incomplete a
 | Current user confirmation | whois v3.4.0 released and frozen; SessionBridge v0.1.1 released on GitHub/Gitee/Marketplace and installed | Accepted project input; releases were not independently audited online here |
 | RFC sections 2 and 9 | Existing experience identifies runaway retries, baseline pollution, missing approvals and broken evidence chains | Experience, not external interviews or market statistics |
 | Current repository | Go 1.22 module; T005–T008 implement evidence, snapshots, process/lease guards, change sets, and transactional apply; CLI remains a placeholder | No complete chain, usable CLI/TUI, or formal release package yet |
-| Adjacent SessionBridge RFC sections 4 and 7 | Reusable silent text request/receipt transport, without ProofRail task or approval semantics | Installation proves neither model availability nor file-editing tools |
+| SessionBridge implementation and adjacent RFC sections 4 and 7 | Silent is `vscode.lm` text request/receipt and visible is panel delivery; neither supplies a verifiable tool loop or ProofRail task/approval semantics | Useful for auxiliary analysis, observation and diagnostics, not formal AI execution completion |
 
 This is desk research and contract analysis, without paid model experiments, competitor trials or broad web research. Claims of market scarcity in the RFC are positioning hypotheses, not established competitive evidence.
 
 | Alternative category | Useful capability | Control responsibility ProofRail must establish |
 |---|---|---|
-| IDE assistants/autonomous agents | Propose or perform edits | Independent acceptance, budgets, trusted baselines and recovery evidence; no blanket claim that vendors lack them |
+| CLI coding agents/IDE autonomous agents | Propose or perform edits through their own tool loops | Pinned executable/config, isolated workspace, capability probes, process/session supervision, independent acceptance and recovery evidence |
 | CI/script orchestration | Repeatable verification | Recoverable local long-running tasks, operator handoff and candidate acceptance |
 | Git worktrees/commits | Versioning and collaboration | Current-tree snapshots and uncommitted-file protection without Git write permission |
-| SessionBridge | Host messaging and conversation context | Task ownership, write leases, structured changes, gates, review and publication |
+| SessionBridge | Tool-free analysis, human-visible notification/diagnostics and context transport | No formal execution, task ownership, authorization, completion, recovery, review or publication |
 
 H1: Small tasks with deterministic acceptance reduce supervision. Compare interventions, elapsed time and causes against a fixed manual-script task set; promise no saving percentage before measurement.
 H2: Minimal context envelopes reduce cost. Record input/output tokens, model, price source and total cost per accepted task. Label unavailable provider usage as estimates.
-H3: Model independence lowers integration cost. Exercise the same contracts through a no-AI file queue and SessionBridge silent transport.
+H3: Isolating CLI Agent private protocols behind `AgentRunner` lowers executor replacement cost. Exercise one deterministic fake and at least one pinned real CLI Agent against the same contract/recovery cases; verify SessionBridge separately as auxiliary messaging.
 
 ## 2. Users and Scope
 
@@ -50,6 +50,7 @@ All scenarios are required for S1. Ordering represents implementation dependenci
 | US4 Aggregate review | Given a CLI change matching documentation rules, missing docs or broken examples block the whole task; independent acceptance publishes both together | Prevent contract drift |
 | US5 Offline verification | Given an archived run, verify events, objects and receipts offline; tampering, omission and reordering cannot PASS | Support audit and handover |
 | US6 Self-hosting | Given an externally audited seed, build and replay an isolated candidate; external-oracle failure leaves seed and production unchanged | Avoid circular trust |
+| US11 Supervised black-box candidate | Given explicit selection of visible black-box mode and acknowledgment of reduced assurance/responsibility, AI works only in an isolated workspace; after return ProofRail rebuilds artifacts and runs independent gates/review, while unknown process/external effects are never shown as safe | Reuse an existing visible Agent quickly while stating the guarantee honestly |
 
 Edge cases include empty tasks/steps, unknown fields/versions, path escape, case collisions, shared targets, generation cycles, lease conflicts, partial writes, uncertain process liveness, disk exhaustion, unknown cost, model timeout, expired approval and unavailable secret-direct. Every case needs explicit rejection/pause evidence, never guessed success.
 
@@ -62,32 +63,32 @@ Edge cases include empty tasks/steps, unknown fields/versions, path escape, case
 | REQ-003 | R3 | S1 | Ordered, resumable chains of three or more tasks; no fixed schema task-count ceiling |
 | REQ-004 | R4 | S1 | Read-only source capture; accepted-snapshot propagation/recovery without Git; reject nonportable paths |
 | REQ-005 | R5 | S1 | Technical success enters REVIEW_PENDING; independent approval/valid waiver is required for PASSED |
-| REQ-006 | R6 | S1-S3 | S1 Windows production/Linux core CI; static model selection and preauthorized fallback; pause on missing capability |
-| REQ-007 | R7 | S1 | IPC and file queue share ProofRail receipts; SessionBridge silent only, no GUI/auto fallback |
-| REQ-008 | R8 | S1 | Rebuild context envelopes after host restart; conversation history is not authoritative |
-| REQ-009 | R9 | S1 | Unified TUI for tasks, gates, tickets, logs, budgets, and pending operator/AI exchanges; the operator can submit a structured response and return control to ProofRail in the same terminal, without depending on a SessionBridge chat participant or separate monitor window |
+| REQ-006 | R6 | S1-S3 | S1 Windows production/Linux core CI; pin CLI Agent/config and preflight noninteractive mode, cwd, events/logs, sessions, stopping, tool/network/permission controls and usage; pause on missing capability without silently switching executors |
+| REQ-007 | R7 | S1 | Formal AI execution uses `AgentRunner` and ProofRail receipts; users may also explicitly select `supervised-black-box` candidate intake. SessionBridge visible only bridges the UI and proves no completion, auto is excluded, and failures never switch execution modes automatically |
+| REQ-008 | R8 | S1 | Rebuild context envelopes after host restart; verify Agent session/process/attempt bindings and create a new attempt when uncertain; Agent transcripts and chat history are not authoritative |
+| REQ-009 | R9 | S1 | Unified TUI for tasks, gates, tickets, Agent events/logs, budgets and pending operator requests; the operator can submit a structured response and return control to a recoverable current Agent session without depending on a SessionBridge chat participant or separate monitor window |
 | REQ-010 | R10 | S1 | init/validate/config explain generate, validate and explain configuration; runtime state never rewrites it |
 | REQ-011 | R11 | S1/S2 | External generic/C/Go harnesses in S1, no language branching in core; extend languages in S2 |
 | REQ-012 | R12 | S1 | Separate executable/args, preflight capabilities, enforce timeout/output/network/environment policy |
 | REQ-013 | R13 | S1/S3 | S1 template-generated hooks only, disabled by default, hash-bound and independently checked/approved; arbitrary scripts in S3 |
 | REQ-014 | R14 | S0-S3 | Apply RFC section 14 exit gates; iteration demos are not stage completion |
 | REQ-015 | R15 | S1 | Pure Go, Go 1.22 compatibility baseline, CGO_ENABLED=0 releases and TUI; review dependencies first |
-| REQ-016 | R16 | S1/S2 | Complete CLI flow without IDE; Web/extension views gain no extra state-write authority |
+| REQ-016 | R16 | S1/S2 | Complete formal execution through a CLI Agent without an IDE; keep CLI-specific protocols adapter-private; Web/extension views gain no extra state-write authority |
 | REQ-017 | R17 | S0 | Complete P0 documents, schemas/goldens, spikes and authorization before S1 |
 | REQ-018 | R18 | S1 | Explicit ordered code/build/verify/noop; noop has a reason and receipt and starts no process |
 | REQ-019 | R19 | S1 | Seed builds candidate, external oracle, isolated clean-room replay and independent release approval |
 | REQ-020 | R20 | S0-S2 | S0 dual/triple-language configs; S1 C+Go contracts; S2 three-language execution with whole-task failure |
-| REQ-021 | R21 | S1/S2 | S1 single-writer handoff, structured non-secret input, timeout/disconnection recovery and return checks; S2 supervised |
+| REQ-021 | R21 | S1/S2 | S1 single-writer handoff, structured non-secret input, timeout/disconnection recovery and return checks; black-box candidates require explicit start/return, full rescan and independent revalidation; S2 extends supervised execution |
 | REQ-022 | R22 | S1/S2 | First-class docs, deterministic impact rules, generation direction, waivers and aggregate acceptance; S2 intelligent hints |
 
 ## 5. Nonfunctional Requirements
 
 | ID | Source | Measurable requirement |
 |---|---|---|
-| REQ-023 | RFC section 12 | All mandatory adversarial cases block; boundary violations, missing evidence and forged PASS never advance a chain |
-| REQ-024 | RFC sections 10.3-10.4 | Faults at every durability boundary lead to replay or explicit pause; accepted references are never lost |
-| REQ-025 | RFC section 12.3 | Offline tamper/omission/reordering detection; secret canaries absent from archives/model context |
-| REQ-026 | RFC sections 9.3, 12.2 | Check wall time, attempts, fingerprints, storage and call/cost budgets before execution; pause safely on exhaustion |
+| REQ-023 | RFC section 12 | All mandatory adversarial cases block; no Agent may write source/store/policy/gates/acceptance records or self-commit/push/publish; missing black-box risk acknowledgment, boundary violations, missing evidence, unknown external effects and forged PASS never advance a chain |
+| REQ-024 | RFC sections 10.3-10.4 | Faults at every durability boundary and Agent start/stop/resume lead to replay or explicit pause; never continue without proved process-tree stop/session continuity, and never lose accepted references |
+| REQ-025 | RFC section 12.3 | Offline tamper/omission/reordering detection; AgentRunner retains full execution metadata, while black-box mode retains risk-version/user-acknowledgment/return/post-scan facts and labels unobservable process details unknown; secret canaries stay out of archives/model context |
+| REQ-026 | RFC sections 9.3, 12.2 | Before AgentRunner execution check wall time, attempts, fingerprints, storage and call/token/cost budgets and settle available usage; black-box mode displays unmeasurable model cost as unknown for host-side user control, never as zero |
 | REQ-027 | RFC section 13.3 | Stable parseable --json; keyboard, no-color and narrow-terminal state/pause access |
 | REQ-028 | RFC sections 6, 16.2 | Reject writes with unknown schema major versions; read-only historical verification; backup and compatibility checks before upgrade |
 

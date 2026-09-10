@@ -20,16 +20,19 @@ flowchart TD
   C --> T[tickets / repair]
   C --> W[guard: process / stop evidence]
   C --> E[evidence: events / receipts / offline verification]
-  AD[adapters: SessionBridge silent / file queue] -. implements core ports .-> C
-  C -. same conversationId / new requestId .-> AD
+  AR[AgentRunner adapter: primary CLI Agent execution] -. implements core ports .-> C
+  C -. task / attempt / session / process .-> AR
+  AUX[SessionBridge / file queue: auxiliary messaging] -. non-authoritative analysis/observation .-> C
   G --> R[isolated run-workspace]
-  AD --> R
+  AR --> R
   O[source tree: read-only capture] --> S
 ```
 
-The adapter/workspace edge depends on verified capability: silent text has no implicit file tools. Structured output can feed applier; only a verified tool agent may select isolated-workspace.
+The CLI Agent is the formal AI execution plane through `AgentRunner`: inside an isolated run-workspace it uses its own agent loop to search, read/write and run allowed tools. ProofRail does not reproduce that loop; it constrains workspace, targets, permissions, network, budgets and processes, captures manifests/diffs, and independently runs gates/review. Agent completion and exit zero are not PASS. `managed-change-set` remains available for deterministic structured edits; only a CLI Agent whose contract and capabilities pass T026 may select isolated-workspace.
 
-When AI needs operator input, the adapter accepts only a structured `operator-action-required` and hands it to chain. Chain persists the request and enters `WAITING_FOR_OPERATOR`; console reads pending work and allowed responses through the control API. Chain validates actor, run/task/attempt, context digest, and authority before persisting a replayable response. Responses requiring manual writes enter the existing handoff lease instead of bypassing it. Silent execution resumes with the same non-empty `conversationId` and a new `requestId`. SessionBridge `@sbr-review` may remain available for standalone diagnostics or manual testing, but ProofRail state transitions, authorization, and recovery do not depend on it.
+SessionBridge `silent`, `visible`, and `auto` are not AgentRunner. Silent supports tool-free analysis or change suggestions; visible may bridge supervised black-box candidates; auto is excluded from the formal flow. In black-box mode the operator supervises the external Agent and explicitly returns the isolated workspace; ProofRail reconstructs the candidate from disk and warrants only post-return scans and independent gates/review, not the unobservable process. SessionBridge dialogue, UI delivery and history prove no tool execution, authority, completion or audit fact, and cannot automatically take over writes after AgentRunner failure.
+
+When AI needs operator input, AgentRunner or an auxiliary adapter accepts only structured `operator-action-required` and hands it to chain. Chain persists the request and enters `WAITING_FOR_OPERATOR`; console reads pending work and allowed responses through the control API. Chain validates actor, run/task/attempt, workspace/session, context digest, and authority before persisting a replayable response. Manual writes use the existing handoff lease. Before resuming a CLI Agent, ProofRail revalidates the original session and process state; inability to prove continuity creates a new attempt. SessionBridge `@sbr-review` remains standalone diagnostics/manual testing only.
 
 ## 2. Ownership and Dependency Contracts
 
@@ -45,7 +48,7 @@ When AI needs operator input, the adapter accepts only a structured `operator-ac
 | guard | Managed process identity, stop/liveness evidence | PID/lease-expiry-only stop claims | Child processes, PID reuse |
 | tickets | Classification, deduplication, lease, attempt/fingerprint budgets | Restarting processes or promotion | Replay, exhaustion |
 | repair | Prepare/Inspect/Validate/Promote coordination | Editing formal definitions directly, widening authority | Stale candidates, changed hashes |
-| adapters | External protocol mapping, capability probes, conversation/request mapping | Business-state replacement, GUI/`@sbr-review` fallback | Same contracts across transports, history continuity |
+| adapters | AgentRunner/auxiliary protocol mapping, capability probes, session/request/process mapping | Business-state replacement, authoritative private transcripts, GUI/`@sbr-review` fallback | CLI capability matrix, stop/resume, auxiliary-channel boundary |
 | evidence | Encoding/hashes, event chain, receipts, interaction records, offline checks | Execution-plane overwrites, secret storage | Missing/reordered/tampered/replayed data |
 
 Consumers own their ports. AgentPort, GateRunner, ProcessSupervisor, Clock and ObjectStore are responsibility names, not existing exported Go APIs; signatures freeze during the relevant design task. cmd composes implementations; core must not import internal/adapters or console. Avoid an ownerless common package for a few shared fields.
@@ -54,8 +57,8 @@ Consumers own their ports. AgentPort, GateRunner, ProcessSupervisor, Clock and O
 
 1. Validate TOML/versioned JSON, unknown fields, references, cycles and capabilities. Resolve profile/task/step origins and freeze the run manifest.
 2. Capture source read-only, recording excluded .git, run/store, caches and secret paths. Retry/pause if concurrent source changes prevent a coherent capture.
-3. Materialize an isolated workspace from the latest accepted parent. managed-change-set uses checker/applier; isolated-workspace records manifests/diffs without claiming atomic IDE writes.
-4. Interact only through structured `operator-action-required`: persist the request before entering WAITING_FOR_OPERATOR. Console submits responses through the control API; chain validates binding and authority. Failure, timeout, disconnect, or persistence failure remains paused. Resume with the same conversationId and a new requestId; history is context, not authoritative state.
+3. Materialize an isolated workspace from the latest accepted parent. managed-change-set uses checker/applier; a capability-verified CLI Agent operates isolated-workspace while ProofRail supervises its process and records manifests/diffs, events/logs, budgets, and stop evidence.
+4. Interact only through structured `operator-action-required`: persist the request before entering WAITING_FOR_OPERATOR. Console submits responses through the control API; chain validates attempt/workspace/session binding and authority. Re-probe session/process state before AgentRunner resume. Failure, timeout, disconnect, or persistence failure remains paused. SessionBridge history and Agent transcripts are context, not authoritative state.
 5. After blocking gates pass, stop writers, freeze candidate/evidence root and enter REVIEW_PENDING. Independent review binds that candidate; later changes invalidate approval.
 6. Publish snapshot/receipt references with a recoverable journal, then persist PASSED facts. Readers consume completed acceptance only. Multiple renames are not a cross-file transaction.
 7. On recovery, validate single-writer ownership and the old writer's termination, replay events/journals/pending interactions and rebuild projections. Uncertainty means PAUSED/REPAIR_PENDING, not redispatch of an unknown request.

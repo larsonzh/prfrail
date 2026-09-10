@@ -85,13 +85,13 @@ T006 status: `COMPLETE`. Full AT-02 acceptance passed; Git-free restore and immu
 ### P1.6 Trusted Release and Shadow Acceptance (REQ-001/002/006/011/014/015/019/024/025/028)
 
 - [x] T017 [Plan:P1.6] Create .github/workflows/ci.yml, testdata/selfhost/ and docs/validation/s1-selfhost.md; pin tooling and Actions by full SHA, isolate generations, use an earlier trusted verifier commit and external oracle, and verify native platforms, a fixed candidate commit, SHA256SUMS, SBOM and licenses. Depends: T024 and bootstrap approval. Accept: AT-13/14. Exclude: candidate-built/overwritten verifier or seed, checksum-as-identity claims, or unauthorized release. Signing/attestation is a later enhancement and does not block S1. Completed: 2026-09-09. After baseline `12fa05d` failed on both Windows and Linux in push CI run `34253473081`, the remediation received `PASS FOR BASELINE REVIEW` from both DeepSeek V4 Pro and GPT-5.3 Codex and established `18c9340c60deb30049554491f8905df51d0a3180` as the new verifier baseline. Both Ubuntu and Windows jobs succeeded in push CI [run `34268076912`](https://github.com/larsonzh/prfrail/actions/runs/34268076912). Maintainer dispatch from `main` then evaluated the distinct docs-only candidate `1e7af676e8e84028c7ecfef1ccde91213738c20c`; all eight test, candidate-build, candidate-probe, and selfhost Windows/Linux jobs succeeded in [run `34277671704`](https://github.com/larsonzh/prfrail/actions/runs/34277671704), with names, sizes, and GitHub archive digests for all six artifacts archived. Validation: [中文](validation/s1-selfhost.md) / [English](validation/s1-selfhost_EN.md); initial Codex review: [中文](validation/t017-baseline-review.md) / [English](validation/t017-baseline-review_EN.md); initial DeepSeek review: [中文](validation/t017-deepseek-baseline-review.md) / [English](validation/t017-deepseek-baseline-review_EN.md); CI-remediation DeepSeek review: [中文](validation/t017-ci-remediation-deepseek-review.md) / [English](validation/t017-ci-remediation-deepseek-review_EN.md); CI-remediation Codex review: [中文](validation/t017-ci-remediation-codex-review.md) / [English](validation/t017-ci-remediation-codex-review_EN.md).
-- [ ] T018 [Plan:P1.6] Create examples/{whois-shadow,go-minimal}/ and docs/validation/s1-exit.md; compare fixed read-only input/result/failure classifications and summarize all AT/risks. Depends: T017, T025, and whois input authorization. Accept: AT-15/22 and every RFC S1 exit gate. Exclude: production whois cutover or partial-pass completion.
+- [ ] T018 [Plan:P1.6] Create examples/{whois-shadow,go-minimal}/ and docs/validation/s1-exit.md; compare fixed read-only input/result/failure classifications and summarize all AT/risks. Depends: T017, T025, T026, T027, T028, and whois input authorization. Accept: AT-15/22/23/24 and every RFC S1 exit gate. Exclude: production whois cutover or partial-pass completion.
 
-T018 status: `IN_PROGRESS / BLOCKED`. On 2026-09-09, a redacted frozen whois fixture was exported under a one-session read-only authorization; all 9/9 parity cases and input/result/failure-classification drift counterexamples pass. All three minimal generic/C/Go CLI loops pass, as does a Windows candidate portable-package drill covering first run, upgrade, rollback, and evidence-preserving uninstall. The product owner approved manual portable-ZIP extraction without PATH modification, and bilingual installation, support-matrix, and release-note drafts now exist. AT-01–AT-22 and remaining gates are summarized in the [S1 exit report](validation/s1-exit_EN.md). T025/AT-22, final-ZIP binding/rerun, the EOL notification channel, and product-owner S1 exit approval remain absent, so T018 stays unchecked.
+T018 status: `IN_PROGRESS / BLOCKED`. On 2026-09-09, a redacted frozen whois fixture was exported under a one-session read-only authorization; all 9/9 parity cases and input/result/failure-classification drift counterexamples pass. All three minimal generic/C/Go CLI loops pass, as does a Windows candidate portable-package drill covering first run, upgrade, rollback, and evidence-preserving uninstall. The product owner approved manual portable-ZIP extraction without PATH modification, and bilingual installation, support-matrix, and release-note drafts now exist. AT-01–AT-24 and remaining gates are summarized in the [S1 exit report](validation/s1-exit_EN.md). T025/AT-22, T026/T027/AT-23, T028/AT-24, final-ZIP binding/rerun, the EOL notification channel, and product-owner S1 exit approval remain absent, so T018 stays unchecked.
 
 ### P1.7 Product Flow and Lifecycle (Before P1.6 Release Acceptance)
 
-Keep IDs stable; execution order is T016 → T019–T024 → T017 → T025 → T018. These run under S0 approval; T019–T024 are complete. Split tasks by individual negative tests rather than generating whole features at once.
+Keep IDs stable; execution order is T016 → T019–T024 → T017 → T025 → T026 → T027 → T028 → T018. These run under S0 approval; T019–T024 are complete. Split tasks by individual negative tests rather than generating whole features at once.
 
 - [x] T019 [Plan:P1.7] PC-01: implement internal/taskdef/preview.go, internal/console/preview.go, tests and no-AI example. Depends: T016. Accept: AT-16. Exclude: preview commands/network/models/automatic installation. Completed: 2026-09-08. Covers offline read-only preview record generation, visible unknowns, zero call counters, and JSON/text fact parity. Validation: [中文](validation/t019-preview.md) / [English](validation/t019-preview_EN.md).
 - [x] T020 [Plan:P1.7] PC-02: implement internal/snapshot/export.go, internal/evidence/delivery.go/tests. Depends: T019, T006/T011. Accept: AT-17. Exclude: candidate-as-accepted export, target overwrite, source/Git writes. Completed: 2026-09-08. Covers accepted-hash binding, destination absent precondition, source/run/store overlap blocking, secret-path blocking, missing-object/tamper blocking, and interrupted writes without a completed export record. Validation: [中文](validation/t020-export.md) / [English](validation/t020-export_EN.md).
@@ -100,9 +100,12 @@ Keep IDs stable; execution order is T016 → T019–T024 → T017 → T025 → T
 - [x] T023 [Plan:P1.7] PC-05: implement internal/tickets/cost.go, internal/adapters/cost_usage.go, internal/console/cost.go, and tests. Depends: T022, T012/T013. Accept: AT-20. Exclude: restart-released unknown holds, cross-run cap bypass, default telemetry. Completed: 2026-09-08. Covers durable pre-call reservations, deduplicated settlements, restart-preserved unknown holds, shared cap blocking across runs, and local cost reporting with no default telemetry export. Validation: [中文](validation/t023-cost-ledger.md) / [English](validation/t023-cost-ledger_EN.md).
 - [x] T024 [Plan:P1.7] PC-06: implement internal/snapshot/backup.go, internal/evidence/disposition.go, lifecycle controls/tests and release inventory tooling. Depends: T023. Accept: AT-21, SBOM/support documentation. Exclude: unknown-format migration, default evidence/shared-tool deletion, unauthorized signing/release. Completed: 2026-09-08. Covers complete object/event/reference-closure backup, new-store restore verification, unchanged source store, active-writer/unknown-version/incomplete-closure blocking, evidence/shared-tool retention by default, explicit deletion authorization/retention-conflict decisions, and offline revocation status `unknown`. Validation: [中文](validation/t024-lifecycle.md) / [English](validation/t024-lifecycle_EN.md).
 
-### P1.8 AI/Operator Interaction Loop (REQ-006/007/008/009/016/021/023/024/025/027)
+### P1.8 AI Execution, Black-Box Candidates, and Operator Loop (REQ-006/007/008/009/016/021/023/024/025/026/027)
 
-- [ ] T025 [Plan:P1.8] Freeze the `operator-interaction` Schema, positive/negative goldens, hash rules, and replay contract; implement embedded SessionBridge v1 file IPC, a stable non-empty `conversationId`, the TUI pending-interaction inbox/response path, and restart recovery. Depends: T014, T016, T021, T024. Accept: AT-22. Exclude: free-text questions causing state transitions, chat history as authoritative state, dependency on `@sbr-review`, bypassing authorization/handoff, or secrets entering model/evidence. `@sbr-review` may remain a standalone SessionBridge diagnostic capability. Status: `PLANNED / NOT IMPLEMENTED`.
+- [ ] T025 [Plan:P1.8] Freeze the `operator-interaction` Schema, positive/negative goldens, hash rules, and replay contract; implement the TUI pending-interaction inbox/structured response, return of control, and restart recovery. Depends: T014, T016, T021, T024. Accept: AT-22. Exclude: free text causing state transitions, chat or Agent history as authority, dependency on `@sbr-review`, authorization/handoff bypass, or secrets entering model/evidence. Status: `PLANNED / NOT IMPLEMENTED`.
+- [ ] T026 [Plan:P1.8] Freeze `AgentRunner` request/capability/event/completion Schemas, canonical/hash rules, positive/negative goldens, dedup/replay, and adapter capability matrix. Pin at least one candidate CLI Agent version/digest and probe noninteractive use, cwd, events/complete logs, session create/resume, cancel/process-tree stop, tool/network/permission controls, usage, and confirmation behavior. Depends: T025. Accept: AT-23 contract/capability portion. Exclude: production adapter, unauthorized paid calls, or help text/prompt promises as runtime evidence. Status: `PLANNED / NOT IMPLEMENTED`.
+- [ ] T027 [Plan:P1.8] Implement the core-owned `AgentRunner` port, at least one pinned CLI Agent adapter, isolated-workspace start/stop/resume, event/log/usage/manifest/diff evidence, and post-exit independent gates/review. Depends: T026, T007, T010, T012. Accept: AT-23. Exclude: source/store/policy/acceptance writes, self commit/push/publish, exit-zero PASS, or blind unknown-state retry. Status: `PLANNED / NOT IMPLEMENTED`.
+- [ ] T028 [Plan:P1.8] Implement explicit `supervised-black-box`: versioned risk/responsibility notice with bound acknowledgment, isolated workspace, SessionBridge visible delivery, human supervision and explicit return, full post-return scan, independent gates/review, and reduced/unknown report. Depends: T025, T026, T014, T022. Accept: AT-24. Exclude: automatic AgentRunner downgrade, visible receipt as completion, risk acknowledgment waiving safety gates, or unknown cost/process/effects shown safe. Status: `PLANNED / NOT IMPLEMENTED`.
 
 ## 3. Requirement Mapping
 
@@ -115,28 +118,28 @@ Unless a task is explicitly marked complete, implementation evidence is planned 
 | REQ-003 | P1.2 | T009 | AT-03; ordered scheduling |
 | REQ-004 | P0.2,P1.1,P1.2 | T002,T006,T008 | AT-02/04; snapshot/applier |
 | REQ-005 | P0.2,P1.3 | T002,T011 | AT-05; review/publish |
-| REQ-006 | P0.3,P1.4,P1.6 | T004,T013,T017 | AT-08/14; adapters/CI |
-| REQ-007 | P0.2,P0.3,P1.4,P1.8 | T002,T004,T013,T025 | AT-08/22; two transports/embedded IPC |
-| REQ-008 | P0.2,P1.4,P1.8 | T002,T013,T025 | AT-08/22; context/interaction recovery |
-| REQ-009 | P0.3,P1.5,P1.8 | T004,T016,T025 | AT-12/22; CLI/TUI interaction |
+| REQ-006 | P0.3,P1.4,P1.6,P1.8 | T004,T013,T017,T026,T027 | AT-08/14/23; adapters/capability/CI |
+| REQ-007 | P0.2,P0.3,P1.4,P1.8 | T002,T004,T013,T025,T026,T027,T028 | AT-08/22/23/24; execution/auxiliary channels |
+| REQ-008 | P0.2,P1.4,P1.8 | T002,T013,T025,T026,T027 | AT-08/22/23; context/session recovery |
+| REQ-009 | P0.3,P1.5,P1.8 | T004,T016,T025,T027,T028 | AT-12/22/23/24; CLI/TUI interaction |
 | REQ-010 | P0.2,P1.5 | T002,T016 | AT-01/12; config explanation |
 | REQ-011 | P1.5,P1.6 | T015,T018 | AT-11/15; three harnesses |
 | REQ-012 | P0.2,P1.2 | T002,T007,T010 | AT-06; gate runner |
 | REQ-013 | P0.2,P1.5 | T002,T015 | AT-11; template generation |
 | REQ-014 | P0.1,P1.3,P1.6 | T001,T012,T018 | AT-07/15; stage report |
 | REQ-015 | P0.3,P1.5,P1.6 | T004,T016,T017 | AT-12/13/14; build/TUI |
-| REQ-016 | P1.4,P1.5,P1.8 | T013,T016,T025 | AT-08/12/22; no-IDE CLI/host interaction |
+| REQ-016 | P1.4,P1.5,P1.8 | T013,T016,T025,T026,T027 | AT-08/12/22/23; no-IDE CLI Agent |
 | REQ-017 | P0.1,P0.2,P0.3 | T001,T002,T003,T004 | AT-01; readiness |
 | REQ-018 | P0.2,P1.2,P1.5 | T003,T009,T016 | AT-01/03; four kinds |
 | REQ-019 | P1.6 | T017 | AT-13/14; two generations |
 | REQ-020 | P0.2,P1.5 | T003,T015 | AT-01/11; components/dual language |
-| REQ-021 | P0.2,P0.3,P1.4,P1.8 | T003,T004,T014,T025 | AT-09/10/22; handoff/interaction routing |
+| REQ-021 | P0.2,P0.3,P1.4,P1.8 | T003,T004,T014,T025,T028 | AT-09/10/22/24; handoff/black-box return |
 | REQ-022 | P0.2,P1.3,P1.5 | T003,T011,T015 | AT-01/05/11; coordinated docs |
-| REQ-023 | P0.1,P0.3,P1.1,P1.2,P1.3,P1.4,P1.8 | T001,T004,T005,T007,T010,T011,T012,T014,T025 | AT-05/06/07/09/22; security |
-| REQ-024 | P0.2,P0.3,P1.1,P1.2,P1.3,P1.4,P1.6,P1.8 | T002,T004,T005,T006,T008,T009,T011,T014,T017,T025 | AT-02/03/04/09/13/22; recovery |
-| REQ-025 | P0.2,P1.1,P1.3,P1.4,P1.6,P1.8 | T002,T005,T011,T013,T014,T017,T025 | AT-04/06/10/14/22; interaction evidence |
-| REQ-026 | P0.1,P1.2,P1.3,P1.4 | T001,T009,T010,T012,T013 | AT-03/06/07; budgets |
-| REQ-027 | P0.3,P1.5,P1.8 | T004,T016,T025 | AT-12/22; terminal/JSON/interaction |
+| REQ-023 | P0.1,P0.3,P1.1,P1.2,P1.3,P1.4,P1.8 | T001,T004,T005,T007,T010,T011,T012,T014,T025,T026,T027,T028 | AT-05/06/07/09/22/23/24; security |
+| REQ-024 | P0.2,P0.3,P1.1,P1.2,P1.3,P1.4,P1.6,P1.8 | T002,T004,T005,T006,T008,T009,T011,T014,T017,T025,T026,T027,T028 | AT-02/03/04/09/13/22/23/24; recovery |
+| REQ-025 | P0.2,P1.1,P1.3,P1.4,P1.6,P1.8 | T002,T005,T011,T013,T014,T017,T025,T026,T027,T028 | AT-04/06/10/14/22/23/24; execution evidence |
+| REQ-026 | P0.1,P1.2,P1.3,P1.4,P1.8 | T001,T009,T010,T012,T013,T026,T027,T028 | AT-03/06/07/23/24; budgets/unknowns |
+| REQ-027 | P0.3,P1.5,P1.8 | T004,T016,T025,T028 | AT-12/22/24; terminal/risk notice |
 | REQ-028 | P0.1,P0.2,P1.1,P1.6 | T001,T002,T003,T005,T017 | AT-01/04/14; compatibility |
 
 ## 4. Testing and Definition of Done
@@ -162,4 +165,4 @@ Detail S2 after S1 exit: production Linux, composed dependency ordering/three-la
 
 Each iteration reports actual human time, calls/cost estimates, failures, accepted requirements and next action. Budget overruns pause for owner choice or written RFC scope change, not automatic models/services.
 
-RFC section 19 later candidates: S2 graphical onboarding/terminal localization, redacted notifications/remote approval identity design, external PR evaluation, external-write compensation, cost trends and explicit storage migration; S3 commercial backend/cloud management requires demand evidence. These are outside T019–T025 and will be planned later. Current totals: 11 plan items, 2 pending tasks, 22 planned acceptance groups, not completion percentages.
+RFC section 19 later candidates: S2 graphical onboarding/terminal localization, redacted notifications/remote approval identity design, external PR evaluation, external-write compensation, cost trends and explicit storage migration; S3 commercial backend/cloud management requires demand evidence. These are outside T019–T028 and will be planned later. Current totals: 11 plan items, 5 pending tasks, 24 planned acceptance groups, not completion percentages.

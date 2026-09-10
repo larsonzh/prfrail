@@ -16,7 +16,7 @@
 | change-set | 五类严格操作、顺序内存预验证、first-fail-stop、marker/精确断言、原始字节摘要与整组事务 | 跨记录 checker 与正反 fixtures |
 | snapshot/evidence | SHA-256 内容寻址、父快照/候选/证据绑定、不可变 | 路径 canonical、hash 输入编码、manifest/receipt schema |
 | ticket/repair | 稳定指纹、append-only ledger、三段预算；严格 Prepare→Inspect→Validate→Promote 阶段链 | 跨记录 checker 与正反 fixtures |
-| adapter/context | 严格 request/claim/result 信封、recordHash、幂等键、generation fencing、dispatch/takeover receipt、最小上下文 | 独立信任链 fixtures 和平台原子能力实测 |
+| adapter/context/agent-runner | 严格 request/claim/result 信封、recordHash、幂等键、generation fencing、dispatch/takeover receipt、最小上下文；CLI Agent 进程、会话、能力与结果映射 | 现有 adapter 独立信任链 fixtures；AgentRunner Schema/正反样例与真实 CLI 能力探针待冻结 |
 | product/lifecycle | 计划预览、导出、授权/撤销、副作用/恢复、成本账本、发行/备份/退役记录 | 独立正反 fixtures 与 S1 运行验收 |
 
 各持久对象独立 `schemaVersion`，不与 CLI 版本或 SessionBridge schemaVersion 混为一谈；首版为
@@ -182,26 +182,36 @@ Prepare 在隔离区建立候选与父摘要；Inspect 比较范围/diff/所有�
 
 handoff：停止受管写者→flush journal→捕获 manifest→WAITING_FOR_OPERATOR→人工独占写租约。complete 收回租约并检查越界/秘密/未知进程、运行规定 gates；abort 保留失败证据、丢弃本次候选；request-agent 建新 attempt 并注入经确认结论。到期/断线不自动通过或转租；secret-direct 无安全终端则暂停。
 
-## 7. 代理与 SessionBridge 边界
+## 7. AgentRunner 与辅助消息通道边界
 
-ProofRail 端口接受版本化 context envelope：任务契约、父快照、已确认决策、最新证据、未决票据、预算、允许工具及引用摘要；返回候选变更/证据，不返回可信的任务 PASS。每个 attempt 有固定关联身份；投递前持久记录，重复请求不能重复应用同一 change-set。传输重试复用 requestId；新业务 attempt 产生新身份并计费。
+ProofRail 端口接受版本化 context envelope：任务契约、父快照、已确认决策、最新失败证据、未决票据、预算、授权 target、允许副作用及引用摘要；返回外部执行事实和候选引用，不返回可信的 task PASS。每个 attempt 有固定关联身份；启动前持久化请求和授权摘要，重复请求不得重复启动未知状态的代理或应用同一候选。新业务 attempt 产生新身份并计费；恢复必须绑定原 attempt、会话和工作区，无法证明连续性时从持久 envelope 建立新 attempt，不猜测续接成功。
 
-SessionBridge v0.1.1 扩展是独立外部依赖，冻结消费其公开 v1 契约。ProofRail 产品集成须内置该契约的文件 IPC 客户端，直接写入 `cmd_<pid>.json` 并读取 `res_<pid>.json`，不得要求用户另行安装或启动 SessionBridge 的 Python、PowerShell 或 sh 参考客户端。内置客户端明确使用 `mode=silent`、`legacy=false`；使用同一 channel directory 和目标实例；`requestId` 绑定回执；写命令先清理同 ID 陈旧结果，再同目录原子写。准确 wire 以该产品 RFC、黄金样例及客户端实现共同核对，不能直接复制 RFC 中省略字段的说明片段。
+正式 AI 执行通道为 `AgentRunner` 端口的 CLI Agent adapter。adapter 只负责把统一请求映射到经固定版本和摘要绑定的外部 CLI，不把厂商 transcript、私有会话格式或退出码直接提升为核心状态。启动前必须探测并记录：可执行文件身份/版本、非交互调用方式、工作目录绑定、机器可读事件或完整日志、会话创建/恢复、取消与进程树停机、工具/网络/权限约束、费用用量以及无人值守确认行为。任一 required 能力不可验证即 preflight 阻断；不能用提示词承诺替代 OS/runner 限制。
 
-每个 ProofRail 业务 attempt 必须派生非空且稳定的 `conversationId`，同一 attempt 的后续成功轮次与传输重试复用该会话身份，使 SessionBridge RFC §5.1 的 silent 历史自动生效；空 `conversationId` 仅允许显式的无状态诊断，不得用于连续 AI 作业。新 attempt 使用新会话身份；需要重置时显式发送 `resetHistory=true`。`turnId`、history 截断和回执仍须按 SessionBridge v1 校验。会话历史只提供模型上下文，不是 ProofRail 权威状态；宿主重启、截断或丢失后仍从持久 context envelope 重建。
+CLI Agent 只在为当前 task/attempt 物化的可丢弃 run-workspace 中工作，不得写源目录、store、策略、门禁实现或接受记录。它可在授权范围内检索/读取文件、直接修改 isolated-workspace、运行允许的开发工具并迭代诊断；不得自行 commit、push、发布、扩大网络/target、批准候选或清除证据。ProofRail 记录启动 argv 的脱敏形式、cwd、环境白名单摘要、agent/config/version 摘要、session ID、进程身份、事件/日志、时间/调用/费用、停止证据以及前后 manifest/diff。机器事件缺失时原始 stdout/stderr 只能作为不透明日志，不能推断工具调用完整性。
 
-Silent 运行中需要人工干预时，通知、答复和控制权归还由 ProofRail 自有 CLI/TUI 承担，不依赖 SessionBridge `@sbr-review`、chat participant 注册或 `reply_<conversationId>.json`。AI 的结构化干预请求先令 task/step 进入 `WAITING_FOR_OPERATOR`；用户输入必须经 ProofRail 校验并持久化为适用的 operator interaction、review、authorization 或 handoff 记录，不能让聊天文字直接改变状态或授权。未收到有效记录时保持暂停；恢复 silent 时同一 attempt 复用 `conversationId`、使用新 `requestId` 并携带人工结论及记录摘要。一般澄清问答的 `operator-interaction` wire 尚未冻结；实现前必须先增加 Schema、正反样例、摘要和重放契约。
+代理报告 completed、退出 0 或最终文本只表示外部执行结束。ProofRail 必须先证明进程树停止，重新扫描 workspace，校验范围/秘密/副作用，冻结 candidate，再独立运行声明的 build/test/verify gates；通过后仍进入独立 review/promotion。超时、失联、无法停止、会话恢复失败、日志或费用不完整、外部副作用不明均为 uncertain 并保持暂停，禁止换会话盲重试。AgentRunner 请求、能力报告、事件和 completion receipt 的 wire、canonical/hash、去重与重放规则尚未冻结；实现前须经 ADR、Schema、正反 golden 和 checker 更新。
+
+需要人工输入时，CLI Agent adapter 只能上报结构化 `operator-action-required`；ProofRail 在原子边界停止或暂停受管代理，持久化请求并令 task/step 进入 `WAITING_FOR_OPERATOR`。通知、答复和控制权归还由 ProofRail 自有 CLI/TUI 承担。用户输入必须经 ProofRail 校验并持久化为适用的 operator interaction、review、authorization 或 handoff 记录；终端/聊天自由文本不能直接改变状态或授权。恢复同一 Agent 会话前须重新验证 attempt、workspace、session、上下文摘要、租约和授权；一般澄清问答的 `operator-interaction` wire 仍须先完成 T025 的 Schema、正反样例、摘要和重放契约。
+
+SessionBridge v0.1.1 的 `silent`/`visible`/`auto` 均不是正式 AgentRunner：`silent` 可用于无工具的分类、摘要、计划、结构化分析或 managed-change-set 建议；`visible` 可用于观察、诊断、通知、人工接管及下述受监督黑箱候选流程；`auto` 不进入正式流程，因为其实际路径和能力不确定。任何 SessionBridge 使用仍须内置 v1 文件 IPC 客户端、`legacy=false`、requestId 回执绑定和自身持久幂等；连续辅助会话可使用稳定 `conversationId`，但 history 只作上下文。不得把 visible 投递成功解释为 Agent 完成，也不得在 CLI Agent 失败后自动切换模式继续写入。
+
+`supervised-black-box` 是正式支持但保证降级的候选生产/导入模式，不是 AgentRunner 的执行替代。ProofRail 先物化可丢弃 isolated-workspace、冻结授权 target 和验证计划，再由操作员在 `visible` AI 界面中监督外部代理；该代理及其工具循环均视为不可观测、不可信的外部变更执行者。操作员显式结束并归还工作区后，ProofRail 必须证明已知受管进程停止，重新生成完整 manifest/diff，执行范围、秘密、文件类型/大小及可观测副作用检查，随后独立运行冻结的 build/test/verify gates 和 review/promotion。任何一步不完整即暂停或拒绝；不得从聊天文本、visible 回执或用户口头确认推断执行完成、工具轨迹或安全。
+
+进入该模式前，CLI/TUI 必须展示并持久化显式风险确认：ProofRail 无法证明代理使用了哪些工具/命令、读取了哪些未被 OS 隔离的资源、是否发起网络请求、实际 token/费用/重试、全部后台进程、会话连续性，以及 commit/push/发布等外部副作用。产品只对其自身完成的隔离、归还后产物扫描、独立门禁、证据和接受事务作保证；用户负责选择可信宿主、监督过程、限制凭据/网络和确认未知外部副作用。该责任说明不能豁免源/store 隔离、秘密扫描、独立门禁或评审，也不能把未知项显示为安全。未取得绑定 task/attempt/workspace/风险版本的用户确认时禁止启动；不允许自动 fallback 到此模式。
+
+CLI Agent 退出 0 或报告完成不等于任务通过，只能触发 ProofRail 的独立停机、扫描、门禁、评审和发布流程。
 
 | 外部结果/能力 | ProofRail 行为 |
 |---|---|
-| status=ok 的 response 文本 | 按输出 schema 检查，再做 checker/gates/review；绝不直接 PASSED |
-| busy | 有限退避、同 requestId 重试，消耗等待预算；每目标响应槽串行化 |
-| timeout/poll_timeout/失联 | 记录结果不确定并暂停/核对；不得假设未执行而无限重发 |
-| lm_api_unavailable/未知状态/错误版本 | 显式失败/暂停；仅允许预授权文件队列替代，无 auto/visible/剪贴板兜底 |
-| history 被截断/宿主重启 | 从 ProofRail envelope 重建事实，不把压缩聊天记录当完整补丁或决策 |
-| silent 只有文本 | managed-change-set 候选输出；不得声称有 IDE 文件编辑/命令执行能力 |
+| CLI Agent completed/exit 0 | 仅记录外部结束；停机、manifest/diff、范围、秘密和独立 gates/review 全部通过后才可推进 |
+| CLI Agent timeout/失联/恢复失败/无法停机 | 记录 uncertain 并暂停核对；不得更换 session 或重复启动来猜测结果 |
+| CLI Agent 请求额外工具、网络、target 或确认 | 结构化进入授权/操作员流程；未获有效记录不得执行 |
+| SessionBridge silent status=ok | 按声明的辅助输出 Schema 检查；可形成分析或 managed-change-set 建议，绝不直接 PASSED |
+| SessionBridge visible 已投递 | 仅是 UI 投递/人工观察事实；黑箱模式还须显式归还工作区并从磁盘重建候选，仍不证明模型、工具或任务完成 |
+| SessionBridge auto | 正式流程拒绝；不得以自动回退改变执行能力或证据语义 |
 
-SessionBridge 成功缓存是内存、限时机制，不是持久 exactly-once；ProofRail 自己持久化投递/结果及应用幂等记录。完整补丁轮次按依赖契约使用 noCompress 并独立验证输出完整性。不要借历史压缩绕过 token/费用上限。Secret 扫描/脱敏由 ProofRail 保证，不假定 SessionBridge 已实现。
+SessionBridge 成功缓存和 CLI Agent 私有会话状态都不是持久 exactly-once。ProofRail 自己持久化投递、进程、结果及应用幂等记录；上下文历史、agent transcript 和 UI 内容均不可替代 run manifest、event、receipt、workspace manifest 与 gate evidence。Secret 扫描/脱敏由 ProofRail 保证，不假定外部 Agent 或 SessionBridge 已实现。
 
 文件队列与 IPC 共享 ProofRail request/claim/result 信封，CLI 是消费者形态，不是第三套业务语义。文件队列
 每文件恰好一条 canonical JSONL 记录，通过 request 原子移入 inflight 获取 claim；不可变 generation 文件与

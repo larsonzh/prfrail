@@ -84,13 +84,13 @@ T006 状态：`COMPLETE`。AT-02 完整验收通过；无 Git 恢复与不可变
 ### P1.6 可信发布与影子验收（REQ-001/002/006/011/014/015/019/024/025/028）
 
 - [x] T017 [Plan:P1.6] 建立 `.github/workflows/ci.yml`、`testdata/selfhost/`、`docs/validation/s1-selfhost.md`；固定工具链与 Actions 完整 SHA、两代隔离、较早可信 verifier commit、外部 oracle、原生平台、固定 candidate commit、SHA256SUMS、SBOM/许可证检查；依赖：T024 和独立 bootstrap 批准；验收：AT-13/14；禁止：候选构建/覆盖 verifier 或 seed、把校验和冒充身份认证、未授权发布。签名/attestation 属后续增强，不阻断 S1。完成：2026-09-09。baseline `12fa05d` 的 push CI run `34253473081` 在 Windows/Linux 均失败后，CI 修复版经 DeepSeek V4 Pro 与 GPT-5.3 Codex 双主审 `PASS FOR BASELINE REVIEW`，并以 `18c9340c60deb30049554491f8905df51d0a3180` 建立新的 verifier baseline；push CI run [`34268076912`](https://github.com/larsonzh/prfrail/actions/runs/34268076912) 的 Ubuntu/Windows job 均成功。不同的 docs-only candidate `1e7af676e8e84028c7ecfef1ccde91213738c20c` 随后由维护者从 `main` 手工 dispatch；[run `34277671704`](https://github.com/larsonzh/prfrail/actions/runs/34277671704) 的 test、candidate-build、candidate-probe、selfhost Windows/Linux 8 个 job 全部成功，6 个 artifact 的名称、大小和 GitHub archive digest 已归档。验证：[中文](validation/s1-selfhost.md) / [English](validation/s1-selfhost_EN.md)；初始 Codex 主审：[中文](validation/t017-baseline-review.md) / [English](validation/t017-baseline-review_EN.md)；初始 DeepSeek 主审：[中文](validation/t017-deepseek-baseline-review.md) / [English](validation/t017-deepseek-baseline-review_EN.md)；CI 修复版 DeepSeek 复审：[中文](validation/t017-ci-remediation-deepseek-review.md) / [English](validation/t017-ci-remediation-deepseek-review_EN.md)；CI 修复版 Codex 复审：[中文](validation/t017-ci-remediation-codex-review.md) / [English](validation/t017-ci-remediation-codex-review_EN.md)。
-- [ ] T018 [Plan:P1.6] 建立 `examples/{whois-shadow,go-minimal}/` 与 `docs/validation/s1-exit.md`；只读固定输入比较结果/失败分类，汇总全部 AT 和剩余风险；依赖：T017、T025 及 whois 输入授权；验收：AT-15/22、RFC §14 S1 全部 exit；禁止：切换 whois 生产流程或“部分通过”冒充 S1 完成。
+- [ ] T018 [Plan:P1.6] 建立 `examples/{whois-shadow,go-minimal}/` 与 `docs/validation/s1-exit.md`；只读固定输入比较结果/失败分类，汇总全部 AT 和剩余风险；依赖：T017、T025、T026、T027、T028 及 whois 输入授权；验收：AT-15/22/23/24、RFC §14 S1 全部 exit；禁止：切换 whois 生产流程或“部分通过”冒充 S1 完成。
 
-T018 状态：`IN_PROGRESS / BLOCKED`。2026-09-09 已在单轮只读授权内导出脱敏 whois 固定夹具并通过 9/9 结果对齐及输入/结果/失败分类漂移负例；generic/C/Go 三个最小 CLI 闭环与 Windows 候选便携包的首次运行、升级、回滚、保留数据卸载演练均通过。产品所有者已批准手工解压便携 ZIP、不修改 PATH 的安装模型，双语教程、支持矩阵和发行说明草案已建立。AT-01–AT-22 与剩余门禁见 [S1 exit 报告](validation/s1-exit.md)；T025/AT-22、最终 ZIP 绑定/复验、EOL 通知方式和产品所有者 S1 exit 批准仍缺失，因此不勾选 T018。
+T018 状态：`IN_PROGRESS / BLOCKED`。2026-09-09 已在单轮只读授权内导出脱敏 whois 固定夹具并通过 9/9 结果对齐及输入/结果/失败分类漂移负例；generic/C/Go 三个最小 CLI 闭环与 Windows 候选便携包的首次运行、升级、回滚、保留数据卸载演练均通过。产品所有者已批准手工解压便携 ZIP、不修改 PATH 的安装模型，双语教程、支持矩阵和发行说明草案已建立。AT-01–AT-24 与剩余门禁见 [S1 exit 报告](validation/s1-exit.md)；T025/AT-22、T026/T027/AT-23、T028/AT-24、最终 ZIP 绑定/复验、EOL 通知方式和产品所有者 S1 exit 批准仍缺失，因此不勾选 T018。
 
 ### P1.7 产品闭环与生命周期（在 P1.6 发布验收前执行）
 
-编号保持稳定，实际依赖顺序为 T016 → T019–T024 → T017 → T025 → T018。以下在 S0 授权后执行；T019–T024 已完成。每个任务可再按一个失败反例拆小，不一次生成完整功能。
+编号保持稳定，实际依赖顺序为 T016 → T019–T024 → T017 → T025 → T026 → T027 → T028 → T018。以下在 S0 授权后执行；T019–T024 已完成。每个任务可再按一个失败反例拆小，不一次生成完整功能。
 
 - [x] T019 [Plan:P1.7] PC-01：实现 `internal/taskdef/preview.go`、`internal/console/preview.go` 与测试、无 AI 示例；依赖：T016；验收：AT-16；禁止：预览启动命令/网络/模型/自动安装。完成：2026-09-08。覆盖离线只读 preview record 生成、unknown 可见、零调用计数与 JSON/文本同事实输出。验证：[中文](validation/t019-preview.md) / [English](validation/t019-preview_EN.md)。
 - [x] T020 [Plan:P1.7] PC-02：实现 `internal/snapshot/export.go`、`internal/evidence/delivery.go` 与测试；依赖：T019、T006/T011；验收：AT-17；禁止：导出候选冒充接受、覆盖目标、源树/Git 写入。完成：2026-09-08。覆盖 accepted hash 绑定、目标必须 absent、源/run/store 重叠阻断、secret 路径阻断、缺对象/篡改阻断、写中断无 completed record。验证：[中文](validation/t020-export.md) / [English](validation/t020-export_EN.md)。
@@ -99,9 +99,12 @@ T018 状态：`IN_PROGRESS / BLOCKED`。2026-09-09 已在单轮只读授权内�
 - [x] T023 [Plan:P1.7] PC-05：实现 `internal/tickets/cost.go`、`internal/adapters/cost_usage.go`、`internal/console/cost.go` 与测试；依赖：T022、T012/T013；验收：AT-20；禁止：重启释放未知费用、跨 run 绕上限、默认遥测。完成：2026-09-08。覆盖调用前持久 reservation、settlement 去重、unknown hold 重启保留、跨 run 共享上限阻断与本地无默认遥测成本报告。验证：[中文](validation/t023-cost-ledger.md) / [English](validation/t023-cost-ledger_EN.md)。
 - [x] T024 [Plan:P1.7] PC-06：实现 `internal/snapshot/backup.go`、`internal/evidence/disposition.go`、生命周期控制/测试及发布清单工具；依赖：T023；验收：AT-21、SBOM/支持说明；禁止：未知格式迁移、默认删证据/共享工具、擅自签名发布。完成：2026-09-08。覆盖完整对象/事件/引用闭包备份、新 store 复原核验、源 store 不变、活动写者/未知版本/缺闭包阻断、默认保留证据与共享工具、显式删除授权/保留冲突决定，以及离线撤销状态 unknown。验证：[中文](validation/t024-lifecycle.md) / [English](validation/t024-lifecycle_EN.md)。
 
-### P1.8 AI/操作员交互闭环（REQ-006/007/008/009/016/021/023/024/025/027）
+### P1.8 AI 执行、黑箱候选与操作员闭环（REQ-006/007/008/009/016/021/023/024/025/026/027）
 
-- [ ] T025 [Plan:P1.8] 冻结 `operator-interaction` Schema、正反 golden、哈希与重放契约；实现内嵌 SessionBridge v1 文件 IPC、稳定非空 `conversationId`、TUI 待处理交互收件箱/响应和重启恢复；依赖：T014、T016、T021、T024；验收：AT-22；禁止：自由文本提问触发状态转换、把聊天历史当权威状态、依赖 `@sbr-review`、绕过 authorization/handoff、秘密进入模型或证据。`@sbr-review` 可保留为 SessionBridge 独立诊断能力。状态：`PLANNED / NOT IMPLEMENTED`。
+- [ ] T025 [Plan:P1.8] 冻结 `operator-interaction` Schema、正反 golden、哈希与重放契约；实现 TUI 待处理交互收件箱/结构化响应、控制权归还和重启恢复；依赖：T014、T016、T021、T024；验收：AT-22；禁止：自由文本触发状态转换、把聊天或 Agent history 当权威状态、依赖 `@sbr-review`、绕过 authorization/handoff、秘密进入模型或证据。状态：`PLANNED / NOT IMPLEMENTED`。
+- [ ] T026 [Plan:P1.8] 冻结 `AgentRunner` request/capability/event/completion Schema、canonical/hash、正反 golden、去重/重放规则和 adapter 能力矩阵；对至少一个候选 CLI Agent 固定版本/摘要并实测非交互、cwd、事件/完整日志、session create/resume、取消/进程树停止、工具/网络/权限、用量与确认行为；依赖：T025；验收：AT-23 契约/能力部分；禁止：生产 adapter、付费调用无授权、以帮助文本或提示词代替运行证据。状态：`PLANNED / NOT IMPLEMENTED`。
+- [ ] T027 [Plan:P1.8] 实现核心拥有的 `AgentRunner` port、至少一个固定 CLI Agent adapter、隔离 workspace 启停/恢复、事件/日志/用量/manifest/diff 证据和退出后独立 gates/review；依赖：T026、T007、T010、T012；验收：AT-23；禁止：写源/store/策略/接受记录、自行 commit/push/publish、Agent 退出 0 直接 PASS、未知状态盲重试。状态：`PLANNED / NOT IMPLEMENTED`。
+- [ ] T028 [Plan:P1.8] 实现 `supervised-black-box` 显式模式：版本化风险/责任提示与绑定确认、隔离 workspace、SessionBridge visible 投递、人工监督和显式归还、后置全量扫描、独立 gates/review 及 reduced/unknown 报告；依赖：T025、T026、T014、T022；验收：AT-24；禁止：自动从 AgentRunner 降级、visible 回执冒充完成、风险确认豁免安全门禁、未知费用/进程/副作用显示为安全。状态：`PLANNED / NOT IMPLEMENTED`。
 
 ## 3. 需求映射
 
@@ -114,28 +117,28 @@ T018 状态：`IN_PROGRESS / BLOCKED`。2026-09-09 已在单轮只读授权内�
 | REQ-003 | P1.2 | T009 | AT-03；有序调度 |
 | REQ-004 | P0.2,P1.1,P1.2 | T002,T006,T008 | AT-02/04；snapshot/applier |
 | REQ-005 | P0.2,P1.3 | T002,T011 | AT-05；review/publish |
-| REQ-006 | P0.3,P1.4,P1.6 | T004,T013,T017 | AT-08/14；adapter/CI |
-| REQ-007 | P0.2,P0.3,P1.4,P1.8 | T002,T004,T013,T025 | AT-08/22；双通道/内嵌 IPC |
-| REQ-008 | P0.2,P1.4,P1.8 | T002,T013,T025 | AT-08/22；context/交互恢复 |
-| REQ-009 | P0.3,P1.5,P1.8 | T004,T016,T025 | AT-12/22；CLI/TUI 交互 |
+| REQ-006 | P0.3,P1.4,P1.6,P1.8 | T004,T013,T017,T026,T027 | AT-08/14/23；adapter/能力/CI |
+| REQ-007 | P0.2,P0.3,P1.4,P1.8 | T002,T004,T013,T025,T026,T027,T028 | AT-08/22/23/24；执行与辅助通道 |
+| REQ-008 | P0.2,P1.4,P1.8 | T002,T013,T025,T026,T027 | AT-08/22/23；context/session 恢复 |
+| REQ-009 | P0.3,P1.5,P1.8 | T004,T016,T025,T027,T028 | AT-12/22/23/24；CLI/TUI 交互 |
 | REQ-010 | P0.2,P1.5 | T002,T016 | AT-01/12；配置解释 |
 | REQ-011 | P1.5,P1.6 | T015,T018 | AT-11/15；三 harness |
 | REQ-012 | P0.2,P1.2 | T002,T007,T010 | AT-06；gate runner |
 | REQ-013 | P0.2,P1.5 | T002,T015 | AT-11；模板生成 |
 | REQ-014 | P0.1,P1.3,P1.6 | T001,T012,T018 | AT-07/15；阶段报告 |
 | REQ-015 | P0.3,P1.5,P1.6 | T004,T016,T017 | AT-12/13/14；构建/TUI |
-| REQ-016 | P1.4,P1.5,P1.8 | T013,T016,T025 | AT-08/12/22；无 IDE CLI/宿主交互 |
+| REQ-016 | P1.4,P1.5,P1.8 | T013,T016,T025,T026,T027 | AT-08/12/22/23；无 IDE CLI Agent |
 | REQ-017 | P0.1,P0.2,P0.3 | T001,T002,T003,T004 | AT-01；readiness |
 | REQ-018 | P0.2,P1.2,P1.5 | T003,T009,T016 | AT-01/03；四 kind |
 | REQ-019 | P1.6 | T017 | AT-13/14；两代自托管 |
 | REQ-020 | P0.2,P1.5 | T003,T015 | AT-01/11；组件/双语言 |
-| REQ-021 | P0.2,P0.3,P1.4,P1.8 | T003,T004,T014,T025 | AT-09/10/22；handoff/交互分流 |
+| REQ-021 | P0.2,P0.3,P1.4,P1.8 | T003,T004,T014,T025,T028 | AT-09/10/22/24；handoff/黑箱归还 |
 | REQ-022 | P0.2,P1.3,P1.5 | T003,T011,T015 | AT-01/05/11；文档协同 |
-| REQ-023 | P0.1,P0.3,P1.1,P1.2,P1.3,P1.4,P1.8 | T001,T004,T005,T007,T010,T011,T012,T014,T025 | AT-05/06/07/09/22；安全 |
-| REQ-024 | P0.2,P0.3,P1.1,P1.2,P1.3,P1.4,P1.6,P1.8 | T002,T004,T005,T006,T008,T009,T011,T014,T017,T025 | AT-02/03/04/09/13/22；恢复 |
-| REQ-025 | P0.2,P1.1,P1.3,P1.4,P1.6,P1.8 | T002,T005,T011,T013,T014,T017,T025 | AT-04/06/10/14/22；交互证据 |
-| REQ-026 | P0.1,P1.2,P1.3,P1.4 | T001,T009,T010,T012,T013 | AT-03/06/07；预算 |
-| REQ-027 | P0.3,P1.5,P1.8 | T004,T016,T025 | AT-12/22；终端/JSON/交互 |
+| REQ-023 | P0.1,P0.3,P1.1,P1.2,P1.3,P1.4,P1.8 | T001,T004,T005,T007,T010,T011,T012,T014,T025,T026,T027,T028 | AT-05/06/07/09/22/23/24；安全 |
+| REQ-024 | P0.2,P0.3,P1.1,P1.2,P1.3,P1.4,P1.6,P1.8 | T002,T004,T005,T006,T008,T009,T011,T014,T017,T025,T026,T027,T028 | AT-02/03/04/09/13/22/23/24；恢复 |
+| REQ-025 | P0.2,P1.1,P1.3,P1.4,P1.6,P1.8 | T002,T005,T011,T013,T014,T017,T025,T026,T027,T028 | AT-04/06/10/14/22/23/24；执行证据 |
+| REQ-026 | P0.1,P1.2,P1.3,P1.4,P1.8 | T001,T009,T010,T012,T013,T026,T027,T028 | AT-03/06/07/23/24；预算/unknown |
+| REQ-027 | P0.3,P1.5,P1.8 | T004,T016,T025,T028 | AT-12/22/24；终端/风险提示 |
 | REQ-028 | P0.1,P0.2,P1.1,P1.6 | T001,T002,T003,T005,T017 | AT-01/04/14；兼容 |
 
 ## 4. 测试策略与完成定义
@@ -161,4 +164,4 @@ S2 backlog 在 S1 exit 后细化，不预生成空实现：Linux 正式、多语
 
 每次迭代报告实际人工时间、模型调用/费用估算、故障数、已验收需求和下一步；若超预算，暂停并由用户选择继续或经 RFC 缩范围，不自动加模型/服务。
 
-RFC §19 的后续候选：S2 图形上手/终端本地化、脱敏通知/远程审批身份设计、外部 PR 集成评估、外部写补偿、成本趋势和显式存储迁移；S3 商业后台/云管理须先验证需求。这些不在 T019–T025 的授权范围，后续再拆任务。当前共 11 个 plan items、2 个未完成任务、22 组计划验收；不是完成率。
+RFC §19 的后续候选：S2 图形上手/终端本地化、脱敏通知/远程审批身份设计、外部 PR 集成评估、外部写补偿、成本趋势和显式存储迁移；S3 商业后台/云管理须先验证需求。这些不在 T019–T028 的范围，后续再拆任务。当前共 11 个 plan items、5 个未完成任务、24 组计划验收；不是完成率。

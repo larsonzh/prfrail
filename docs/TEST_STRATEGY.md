@@ -15,7 +15,8 @@
 | 单元 | Go testing、table-driven、fake clock/agent/runner | 状态转换、预算、checker、哈希 | 每个小任务先跑相关包 |
 | 组件集成 | t.TempDir、真实文件、Go 子进程 helper | journal、路径、停机、恢复、租约 | 涉及文件/进程的任务 |
 | CLI E2E | 已构建候选 + 临时 workspace/store + 固定 oracle | 三任务链及 US1-US6 | 迭代与 S1 exit |
-| 宿主集成 | 已安装 SessionBridge v0.1.1 + 受控测试实例 | silent 能力、路由、重启、完整响应 | 离线契约通过后，收费调用需另授权 |
+| AgentRunner 契约 | 确定性 fake + 固定版本真实 CLI Agent 能力探针 | 启动/事件/工具循环/停止/恢复/用量与独立验收 | 离线契约后；真实收费调用需另授权 |
+| 可见宿主集成 | SessionBridge v0.1.1 + 受控测试实例 | 辅助 silent 与 visible 黑箱投递/归还；不推断过程完成 | 离线契约后；收费调用需另授权 |
 | 原生平台 | Windows 11 amd64；Linux amd64 核心 CI | 文件系统/信号/路径真实语义 | 每个候选版本 |
 | 自托管 | seed N、candidate N+1、外部 oracle | 两代信任与 clean-room 重放 | S1 exit/发布 |
 
@@ -49,8 +50,10 @@ AT 编号代表测试组，不是已存在的测试函数。每组必须拆正/�
 | AT-20 | REQ-006/026 | PC-05：预留前后/投递后/结算点崩溃，超时保留余额占用，重复结算去重，两 run 竞争共享额度不超配；订阅模式不报精确账单 | tickets/adapters；T023 |
 | AT-21 | REQ-019/025/028 | PC-06：闭包缺对象/活动写者/未知格式阻断；新 store 恢复验证，原件不变；卸载保留证据/共享工具，删除确认与保留冲突，离线撤销状态 unknown | snapshot/evidence/release；T024 |
 | AT-22 | REQ-006/007/008/009/016/021/023/024/025/027 | 仅结构化请求可进入 WAITING_FOR_OPERATOR；TUI 展示允许响应并拒绝错主体/attempt/context hash、陈旧/重复响应；超时/断线/持久化失败保持暂停，重启重建待办；同 conversationId/新 requestId 恢复；人工写入走 handoff，secret-direct 不入模型/证据；没有 `@sbr-review` 仍可闭环 | adapters/chain/console/evidence；T025 |
+| AT-23 | REQ-006/007/008/009/016/023/024/025/026 | fake AgentRunner 契约与真实固定 CLI 能力探针；隔离 workspace 工具迭代，记录版本/配置/session/process/events/logs/usage；超时、日志缺失、停机或恢复不明暂停；Agent 退出 0 后仍重扫并独立 gates/review | adapters/guard/chain/evidence；T026/T027 |
+| AT-24 | REQ-007/009/021/023/024/025/026/027 | visible 黑箱模式启动前显示并持久化绑定风险确认；只在隔离 workspace，投递不等于完成；显式归还后全量 manifest/diff、范围/秘密/文件/副作用扫描及独立 gates/review；未确认、断线、未知进程/费用/外部副作用阻断，报告标记 reduced/unknown 且禁止自动降级 | console/adapters/chain/guard/evidence；T028 |
 
-AT-16–AT-21 是 RFC §19 的 S1 最小验收，AT-22 是新增 AI/操作员交互闭环验收，均先用无付费调用的确定性夹具。S0 T002/T003 只冻结记录和正反样例，不能将解析通过报成运行验证；T018 汇总全部 22 组结果。US7–US10 覆盖初次试用、交付、撤销、停用恢复，收益指标用本地记录验证，不预设节省比例。
+AT-16–AT-21 是 RFC §19 的 S1 最小验收，AT-22 是 AI/操作员交互，AT-23 是 AgentRunner 完整执行保证，AT-24 是受监督黑箱候选的降级保证。均先用无付费调用的确定性夹具；真实宿主/模型调用另授权。S0 T002/T003 只冻结记录和正反样例，不能将解析通过报成运行验证；T018 汇总全部 24 组结果。US7–US11 覆盖初次试用、交付、撤销、停用恢复和黑箱候选，收益指标用本地记录验证，不预设节省比例。
 
 S2/S3 验收仍由 RFC §14 控制：三语言产品真实集成、supervised 断线、Web、更多 adapter 和生成脚本 B；不能用 S0 配置解析替代真实运行。
 

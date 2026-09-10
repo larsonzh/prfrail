@@ -37,6 +37,8 @@ Runners/OS capabilities enforce restrictions, not prompts alone. Unknown process
 | SEC-11 Denial/repudiation | Assumed timeout refunds, cross-run budget bypass, duplicate settlements | Durable reservations, unknown holds, shared locks/deduplication; tickets/adapters | AT-20 |
 | SEC-12 Loss/disclosure | Incomplete backups, uninstall deletes shared tools, secrets in old evidence | Closure checks, new-store drills, retention by default/explicit disposition; snapshot/evidence/release | AT-21 |
 | SEC-13 Spoofing/elevation/disclosure | Forged or stale operator replies, UI text treated as authority, or secrets persisted from dialogue | Actor/attempt/context-hash/authority binding, structured allowed responses, secret-direct, and replay deduplication; chain/console/evidence | AT-22 |
+| SEC-14 Tampering/elevation/repudiation | Substituted CLI Agent binary/config, source/store escape, tool/network escalation, forged/missing events, ambiguous stop/resume, or self commit/push/publish | Executable/config digests, capability probe, isolated workspace, process-tree supervision, events/logs and before/after manifests, independent gates/review; adapters/guard/evidence | AT-23 |
+| SEC-15 Disclosure/repudiation/effects | A visible black-box Agent reads out-of-scope resources, leaks secrets, hides network/cost/background work, performs external Git/publication effects, or treats risk notice as a waiver | Explicit versioned risk acknowledgment, isolated workspace, user supervision/host controls, full post-return scan, unknown labels, independent gates/review; console/chain/guard/evidence | AT-24 |
 
 Test IDs resolve in [TEST_STRATEGY_EN.md](TEST_STRATEGY_EN.md). Every mandatory negative case asserts no publication, no advancement and intact evidence, not merely a nonzero exit.
 
@@ -50,7 +52,7 @@ Retention follows the RFC; cleanup only unreferenced expired objects, never audi
 
 ## 5. Review and Response
 
-Independent review is required for broader write/network/tool authority, approval changes, generated hooks and canonical/signing/recovery protocols. Unfixed fail-close bypass, acceptance of failed candidates, secret leakage or unrecoverable overwrite blocks release.
+Independent review is required for broader write/network/tool authority, approval changes, generated hooks and canonical/signing/recovery protocols. Black-box risk acknowledgment is not a liability waiver: ProofRail still owns its promised isolation, scanning, gates, evidence and review, while the user owns only the stated host-supervision and unobservable external-behavior risks. Unfixed fail-close bypass, acceptance of failed candidates, secret leakage or unrecoverable overwrite blocks release.
 
 Proposed response targets pending ADR-006: acknowledge private reports within two business days and classify impact within five. These are not published SLAs. Establish a private channel and maintainers before release; do not put credential-bearing reports or exploit details in public issues meanwhile. If signing/attestation is added later, its private keys or short-lived credentials must never enter repositories, model context or ordinary logs.
 
