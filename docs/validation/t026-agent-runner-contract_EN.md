@@ -2,7 +2,7 @@
 
 [中文](t026-agent-runner-contract.md)
 
-Date: 2026-09-10; probe-runner audit updated 2026-09-11. Verdict: `CONTRACT COMPLETE / RUNTIME PROBE PARTIAL / AT-23 NOT PASS`.
+Date: 2026-09-10; probe-runner audit completed 2026-09-11. Verdict: `T026 COMPLETE / CANDIDATE INCOMPATIBLE / AT-23 NOT PASS`.
 
 ## Completed Scope
 
@@ -10,9 +10,19 @@ Date: 2026-09-10; probe-runner audit updated 2026-09-11. Verdict: `CONTRACT COMP
 2. `internal/adapters/agent_runner*.go` implements RFC 8785 domain-separated hashes, strict decoding, sorted sets, create/resume constraints, request/event/completion binding, and idempotency/conflict indexes reconstructable from durable records.
 3. Capability uses a fixed 12-entry matrix and is compatible only when every entry has runtime evidence and is verified. Events lock eventId, session/sequence, and request/session so one request cannot drift across sessions. Completions lock both completionId and requestId; completed proves only external execution end, process-tree stop, complete logs/usage, and captured output manifest, never task PASS. The pinned capability test also reads the referenced evidence file and verifies its byte SHA-256 so the record cannot cite missing or stale evidence.
 
-## Current Conclusion (2026-09-11 04:12)
+## Current Conclusion (2026-09-11)
 
-All six authorized CLI invocations were used: create/resume (two), unapproved write, wildcard URL denial, an exact-URL configuration control, and cancellation observation. New record `probe-copilot-cli-windows-20260911-batch-six` is **nine verified, three unknown, blocked**. Newly verified entries are sessionResume, permissionControl, and unattendedConfirmations. The 6/6, unsupported, and mandatory-replacement wording retained below describes historical snapshots, not current conclusions.
+Final record `probe-copilot-cli-windows-20260911-final` is **ten verified, two unsupported, zero unknown, blocked**. Owned Job Object termination evidence promotes `cancellation` to verified. Allow-all controls prove that the `gci` alias bypasses a `shell(Get-ChildItem)` denial and shell `Invoke-WebRequest` bypasses an exact URL denial, making `toolControl` and `networkControl` unsupported. T026 contract freeze and candidate characterization are complete, but the pinned candidate is incompatible; this is not AT-23 PASS and does not authorize T027.
+
+Seven of ten additionally authorized invocations were used, leaving three unused. Six confirm one premium request each; cancellation usage remains unknown. No automatic retry, proxy switch, commit, or push occurred. The effective configuration digest remained `e315bf9ae8a64d9a0c06c3263555fd01a8494f1167bcbb0296f2506c1b5a859b` across the continuation probes, excluding configuration drift.
+
+| Final scenario | Runtime fact | Conclusion |
+|---|---|---|
+| Tool alias allow-all control | With shell allowed and `shell(Get-ChildItem)` denied, `gci -Name` still succeeded and returned directory content | toolControl unsupported; generic denial under a narrow allowlist is not attributed |
+| Shell network allow-all control | With `https://example.com` exactly denied, shell `Invoke-WebRequest` still obtained HTTP 200 and Example Domain content | networkControl unsupported; CLI URL policy is not overall egress control |
+| Job Object cancellation | The supervisor used `CREATE_SUSPENDED`, assigned the process to a kill-on-close Job before resume, terminated the Job after the marker, and returned complete `TerminationEvidence` with every managed process stopped | cancellation verified; supersedes the taskkill/PID-snapshot observation |
+
+The table below and following six-invocation conclusion are retained as a historical snapshot before the continuation probes.
 
 | Scenario | Runtime evidence | Conclusion |
 |---|---|---|
@@ -26,7 +36,7 @@ Resume premium snapshots 1 and 2 are cumulative for the same session and count a
 
 Each stdout/meta/usage/report SHA-256 and event count is retained in `sixInvocationBatch` in github-copilot-cli-windows-evidence.json; missing cancellation usage is explicitly null. The capability record binds the cumulative evidence byte digest and new canonical recordHash. Original reports are unchanged. Previously verified usage/processTreeStop cover normal completed probes, not cancellation safety.
 
-Remaining blockers: toolControl needs indirect invocation and effective-configuration closure; networkControl needs a provable overall egress policy; cancellation needs owned whole-tree supervision and complete termination evidence. Next, design probe supervision using existing process-guard capabilities and pin effective configuration offline, then establish network boundaries and authorize necessary runtime checks. Prompts and PID scans cannot close these gates. T026/AT-23 remains incomplete and T027 must not start.
+The final machine record binds evidence-file digest `sha256:91d2c7e00c03bd2ca68dd0a623be39ea4611422ce8036097c88711093f63c2f6` with canonical recordHash `sha256:5d0ba197ef12c867eee00c40e5063473e133053f5e7b0b9ebdb8c8f481062147`. T026 is complete; the pinned candidate remains blocked by two unsupported capabilities. Before T027, either an external enforcement boundary covering both bypasses must be separately frozen and verified, or a compatible candidate must be selected and reprobed. AT-23 remains blocked.
 
 ## Historical Correction (2026-09-11 03:26)
 
@@ -84,7 +94,7 @@ Artifact SHA-256: stdout.jsonl (65,040 bytes), 66f47ee43dfffbed6a2e2f6ac3b196972
 4. `node tools/contracts/contracts.test.js`: passed, 2/2; 34 Schemas, 96 cases, and two canonical vectors passed.
 5. `git diff --check`: passed.
 
-## Remaining Capability Probe Protocol (Candidate Blocked; Authorization Deferred Pending Decision)
+## Historical Remaining Capability Probe Protocol (Now Executed)
 
 Only toolControl, networkControl and cancellation remain unknown. Standalone and semicolon denial, same-session recall and unapproved-write denial have evidence. Indirect invocation, full egress control and whole-tree cancellation require provable execution boundaries. Invalid historical patterns do not establish unsupported status, and cooperative prompts cannot replace boundary validation.
 
@@ -102,4 +112,4 @@ Authorization and cost: all six invocations were used, confirming five premium r
 
 Tooling: `tools/agent-probe/Invoke-AgentProbe.ps1` runs dry by default (validating only the pinned binary digest, version, and flags, with zero model calls); `-Run` executes exactly the scenario's single call sequence. Execution and analysis artifacts are restricted to non-reparse-point children of the repository `tmp/` directory, and the child process does not inherit the three GitHub token environment variables. Stdin is redirected from an empty file and timeouts stop the tree via `taskkill /T /F`; cancellation freezes the managed PID set before termination and verifies every member afterward. The analyzer requires fully parseable JSONL, exact meta-to-user-prompt binding, result/exit evidence for normal scenarios, and no residual process or workspace mutation after cancellation. Reports emit supported/inconclusive/failed plus artifact digests and are never committed. On 2026-09-11 all five scenario dry runs and eight synthetic assertions (tool denial, malformed input, permission events, cancellation, workspace mutation, same-session resume, missing resume binding, and session drift) passed. Changing an entry to verified still requires human review with synchronized evidence digest and canonical record hash.
 
-T026 can close and T027 can start only after every required entry is verified. Nine entries are verified and three remain unknown; AT-23 is not PASS.
+T026 completes candidate characterization with ten verified, two unsupported, and zero unknown entries. The pinned candidate is incompatible and AT-23 is not PASS; T027 must not start without a separately frozen and verified external enforcement boundary or a compatible candidate.

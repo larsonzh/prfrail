@@ -1,10 +1,10 @@
 ﻿# S1 Exit 验收报告
 
-> 2026-09-11 04:12 当前状态：T026 **9 verified、3 unknown、blocked**；新增恢复、权限拒绝和无人值守确认验证，剩余工具间接调用、网络出口与取消整树证据不足。本轮六次授权已用完，确认费用 5 premium requests 加取消 unknown。下文 AT-23/任务链/下一步的旧数量及换候选判断为历史快照，以 [T026 当前结论](t026-agent-runner-contract.md) 为准。AT-23、T018 与 S1 仍阻断，T027 不得启动。
+> 2026-09-11 当前状态：T026 已完成，矩阵为 **10 verified、2 unsupported、0 unknown、blocked**。Job Object 取消通过；工具别名和 shell 网络可绕过 CLI deny，固定候选不兼容。十次追加授权使用 7 次，确认 6 premium requests 加取消 unknown，3 次未使用。AT-23、T018 与 S1 仍阻断；T027 须等待外部强制边界或兼容候选。详见 [T026 最终结论](t026-agent-runner-contract.md)。
 
 [English](s1-exit_EN.md)
 
-日期：2026-09-09。结论：`BLOCKED`。T018 已完成 AT-15 的只读 whois 冻结夹具对比和 generic/C/Go 最小闭环，可信 Windows artifact 的候选安装生命周期演练也已通过；手工解压便携 ZIP、不修改 PATH 的安装模型已获产品所有者批准，并已有双语教程、支持矩阵与发行说明草案。但最终 ZIP 尚未绑定和复验，EOL 通知方式尚未冻结，产品所有者也未批准最终 S1 exit，因此不得把部分通过标记为 S1 完成。2026-09-11 更新：AT-23 与任务链门禁行已同步 T026 契约完成、6 项 verified、1 项 unsupported、5 项 unknown 的能力状态。
+日期：2026-09-09。结论：`BLOCKED`。T018 已完成 AT-15 的只读 whois 冻结夹具对比和 generic/C/Go 最小闭环，可信 Windows artifact 的候选安装生命周期演练也已通过；手工解压便携 ZIP、不修改 PATH 的安装模型已获产品所有者批准，并已有双语教程、支持矩阵与发行说明草案。但最终 ZIP 尚未绑定和复验，EOL 通知方式尚未冻结，产品所有者也未批准最终 S1 exit，因此不得把部分通过标记为 S1 完成。2026-09-11 更新：T026 能力表征完成，但候选不兼容，AT-23 与任务链门禁继续阻断。
 
 ## AT-15 证据
 
@@ -40,7 +40,7 @@
 | AT-20 | PASS | [T023 cost ledger](t023-cost-ledger.md) |
 | AT-21 | PASS | [T024 lifecycle](t024-lifecycle.md) |
 | AT-22 | PASS | [T025 operator interaction](t025-operator-interaction.md)：Schema/golden/hash/replay、聚焦终端收件箱、结构化响应、Engine 控制权归还及故障恢复 |
-| AT-23 | BLOCKED | [T026 报告](t026-agent-runner-contract.md)：契约完成，6 项能力 verified；一次授权 deny 探针证明 `toolControl` unsupported，另有 5 项 unknown；T027 adapter、停止/恢复与独立验收闭环未实现 |
+| AT-23 | BLOCKED | [T026 报告](t026-agent-runner-contract.md)：能力表征完成，10 verified、2 unsupported、0 unknown；固定候选的工具/网络控制不兼容，且 T027 adapter 与独立验收闭环未实现 |
 | AT-24 | BLOCKED | T028 尚未实现：缺少 visible 黑箱候选的风险确认、隔离投递、显式归还、全量扫描及 reduced/unknown 报告 |
 
 这些 PASS 表示对应 AT 的现有确定性验收，不自动满足阶段文档与发布门禁。
@@ -49,7 +49,7 @@
 
 | 门禁 | 状态 | 证据/缺口 |
 |---|---|---|
-| 核心任务链与 fail-close 场景 | BLOCKED | 既有 AT-01–AT-22 通过；T026 契约完成，但能力矩阵为 6 verified、1 unsupported、5 unknown；T027/T028 与 AT-23/AT-24 仍未实现 |
+| 核心任务链与 fail-close 场景 | BLOCKED | 既有 AT-01–AT-22 通过；T026 完成但固定候选为 10 verified、2 unsupported、0 unknown，整体不兼容；T027/T028 与 AT-23/AT-24 仍未实现 |
 | seed 自托管与真实平台 | PASS | T017 Windows/Linux 可信矩阵及 Windows 本机两代演练 |
 | whois 只读影子 | PASS | 9/9 固定用例与 3 类漂移负例；不含生产切换 |
 | generic/C/Go harness | PASS | 三套 harness 定义及三个最小用户样例均通过只读 CLI 闭环 |
@@ -64,4 +64,4 @@
 1. 手工解压便携 ZIP、用户自选独立目录、显式路径运行且不修改 PATH 的模型已冻结；正式 ZIP 文件名和下载入口仍待发行绑定。EOL 通知与例外已有 ADR-010 待审批方案，但尚未获产品所有者批准。
 2. Windows 候选 artifact 已完成首次运行、升级、回滚和保留数据卸载；正式载体确定后必须复验。Linux 只声明核心 CI，不宣称 S1 正式支持。
 3. generic/C/Go 样例只证明语言作用域和 noop 编排；当前 CLI 对 executable step 仍 fail-close。
-4. T025/AT-22 已完成聚焦终端人工交互闭环；T026 的固定候选现为 6 verified、1 unsupported、5 unknown，须先决定更换/升级候选或建立覆盖工具过滤绕过的可证明外部强制边界，再决定是否授权剩余探针。其后仍需完成 T027/AT-23 的 AgentRunner 完整执行、T028/AT-24 的 visible 黑箱候选降级保证及完整统一 TUI；再用最终 ZIP 复跑教程并绑定支持矩阵/发行说明，最后由产品所有者明确批准 S1 exit。在此之前 T018 与 S1 状态保持未完成。
+4. T025/AT-22 已完成聚焦终端人工交互闭环；T026 已以 10 verified、2 unsupported、0 unknown 完成能力表征，固定候选不兼容。须更换/升级并重新探测候选，或建立覆盖工具别名与 shell 网络绕过的可证明外部强制边界，再开始 T027/AT-23。其后仍需完成 T028/AT-24 的 visible 黑箱候选降级保证及完整统一 TUI；再用最终 ZIP 复跑教程并绑定支持矩阵/发行说明，最后由产品所有者明确批准 S1 exit。在此之前 T018 与 S1 状态保持未完成。

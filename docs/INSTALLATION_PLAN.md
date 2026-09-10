@@ -1,6 +1,6 @@
 ﻿# ProofRail 安装与部署规划
 
-> 2026-09-11 04:12 候选当前状态：**9 verified、3 unknown、blocked**；会话恢复、写权限拒绝和无人值守确认已实测。工具间接调用、整体网络出口与取消整树约束仍缺证据；精确 URL 拒绝不等于 OS 网络隔离。下表旧能力数量和必须换候选的判断是已被取代的历史状态，不授权自动升级或改变安装模型；详见 [T026 当前结论](validation/t026-agent-runner-contract.md)。
+> 2026-09-11 T026 已完成，候选最终状态：**10 verified、2 unsupported、0 unknown、blocked**。Job Object 取消 verified；工具别名和 shell 网络可绕过 CLI deny，故固定候选不兼容。不得自动升级或改变安装模型；T027/AT-23 仍须等待外部强制边界或兼容候选。详见 [T026 最终结论](validation/t026-agent-runner-contract.md)。
 
 [English](INSTALLATION_PLAN_EN.md)
 
@@ -26,7 +26,7 @@ S1 目标是本地单用户、单写者、无常驻云服务的 CLI/TUI：ProofR
 | 发布信任 | S1 使用固定 commit、GitHub CI、SHA256SUMS、SBOM 和许可证清单 | 校验和只证明内容完整性；签名/attestation 后续增强 | S1 基线已定 |
 | 更新方式 | 手工下载核验，新版本解压到新目录并显式切换路径；未来包管理器另议 | 支持矩阵、schema 兼容、备份恢复门禁 | S1 模型已定；最终 ZIP 待复验 |
 | 卸载与数据保留 | 手工删除版本目录；run/store 默认保留，数据删除单独授权 | T024 生命周期记录和显式删除授权 | S1 模型与库级规则已冻结 |
-| CLI Agent/AgentRunner | 核心离线模式可选；正式 AI 执行必需。Windows x64 当前固定候选为 GitHub Copilot CLI 1.0.83 | 固定版本/原生可执行文件摘要、账号/订阅/网络/模型权限、受支持认证（1.0.83 拒绝 classic PAT）、能力矩阵、隔离、停止/恢复、证据与独立验收通过 AT-23；更新后重跑 preflight | T026 契约完成、web OAuth 登录成功；真实探针为 6 verified、1 unsupported（工具过滤可被复合命令绕过）、5 unknown，整体 blocked；须更换/升级候选或增加可证明的外部强制边界，T027 待实现 |
+| CLI Agent/AgentRunner | 核心离线模式可选；正式 AI 执行必需。Windows x64 当前固定候选为 GitHub Copilot CLI 1.0.83 | 固定版本/原生可执行文件摘要、账号/订阅/网络/模型权限、受支持认证（1.0.83 拒绝 classic PAT）、能力矩阵、隔离、停止/恢复、证据与独立验收通过 AT-23；更新后重跑 preflight | T026 已完成、web OAuth 登录成功；真实探针为 10 verified、2 unsupported、0 unknown，工具别名和 shell 网络可绕过 CLI deny，候选不兼容。须更换/升级候选或增加可证明的外部强制边界；T027/AT-23 仍阻断 |
 | VS Code visible 黑箱候选 | 可选降级保证；要求 VS Code 1.82+、可用 Copilot Chat、SessionBridge 0.1.1 | 显式风险确认、`visible`/非 legacy、人工监督/归还、后置全扫与 AT-24；禁止自动 fallback | T028 待实现 |
 
 S1 不指定默认安装目录，不发布一键安装脚本，不修改 PATH，不声明自动更新，也不要求管理员权限。state/store 默认位置、正式下载入口与 EOL 通知仍待冻结。

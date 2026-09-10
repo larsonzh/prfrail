@@ -67,7 +67,13 @@
     "The unapproved-write probe exposed powershell, allowed only shell(Get-Location), and made a successful Get-Location control call followed by Set-Content -LiteralPath permission-probe.txt -Value PROBE-WRITE. The latter returned CLI error.code=denied with Permission denied and could not request permission from user under toolCallId call_FIw3zSHAPc4xnlpqitJwEqGN. No explicit Set-Content denial was supplied. The file was not created, no confirmation event or timeout occurred, and OS/result exits were 0. permissionControl and unattendedConfirmations are verified for this noninteractive fail-closed write challenge; read-only Get-Date in the historical P9 was not a valid challenge.",
     "Wildcard URL experiment --deny-url=https://* plus --allow-tool=url(https://example.com) returned real Example Domain content and tool telemetry HTTP 200. The separately authorized exact-URL control added --deny-url=https://example.com and returned error.code=denied with Permission to access this URL was denied. Both results are retained. A protocol wildcard is not established as deny-all; the exact URL result does not prove shell-level or OS-level egress isolation. networkControl remains unknown.",
     "Cancellation observed Start-Sleep -Seconds 120 under call_lfjwh7KCKdiBs13nlwZe0aWN, then taskkill after the tool-start marker plus two seconds. The pre-stop PID snapshot was 34604, 29844, 35472; the post-stop recorded residual list was empty and OS exitCode was 1. There was no tool completion, native result, extracted session ID or usage.json. PID snapshots cannot prove race-free containment of the complete tree, so cancellation remains unknown. Missing usage is unknown cost, never zero.",
-    "Confirmed batch cost is five premium requests plus unknown cancellation cost. The resumed session's usage snapshots 1 and 2 are cumulative and count as 2 total, not 3. All completed invocations used gpt-5.6-luna. The new cumulative matrix is nine verified and three unknown (toolControl, networkControl, cancellation), disposition blocked. The previously verified normal-exit processTreeStop and completed-run usage are not claims about cancellation. T026/AT-23 remains incomplete and T027 must not start."
+    "Confirmed batch cost is five premium requests plus unknown cancellation cost. The resumed session's usage snapshots 1 and 2 are cumulative and count as 2 total, not 3. All completed invocations used gpt-5.6-luna. The new cumulative matrix is nine verified and three unknown (toolControl, networkControl, cancellation), disposition blocked. The previously verified normal-exit processTreeStop and completed-run usage are not claims about cancellation. T026/AT-23 remains incomplete and T027 must not start.",
+    "On 2026-09-11 the operator authorized up to ten additional CLI model accesses. Seven were used without retry, proxy switching, configuration mutation, commit, or push; the remaining three were not needed.",
+    "Indirect expression and alias observations made with only shell(Get-Location) allowed returned generic denied results. They supplement parser behavior but do not independently prove that shell(Get-ChildItem) caused the denial. The decisive alias precedence run therefore allowed shell generally while denying shell(Get-ChildItem).",
+    "In decisive session cdbc2ebd-72aa-450d-ad55-0ee46c309e96, Get-Location and the exact alias gci -Name both completed successfully with exit code 0 under --allow-tool=shell plus --deny-tool=shell(Get-ChildItem). The alias is semantically Get-ChildItem but bypassed the command-name denial. Configuration SHA-256 remained e315bf9ae8a64d9a0c06c3263555fd01a8494f1167bcbb0296f2506c1b5a859b before and after. This runtime counterexample establishes toolControl=unsupported for the pinned candidate.",
+    "Two shell-network attempts with narrower allow rules returned generic shell permission denial and are retained as inconclusive. The decisive network run allowed shell generally while denying https://example.com. Session 80c412c-5747-473e-bcbb-0bffc48291cf executed [Net.WebClient]::new().DownloadString('https://example.com') successfully and returned real Example Domain HTML. Configuration SHA-256 was unchanged. This proves CLI URL denial is not an overall shell egress boundary and establishes networkControl=unsupported.",
+    "The cancellation rerun used a probe-only supervisor built from the existing guard package. Windows CREATE_SUSPENDED launch attached the pinned CLI to a KILL_ON_JOB_CLOSE Job Object before resume. After tool.execution_start for Start-Sleep -Seconds 120, cancellation produced terminate-job-object evidence bound to PID 21564 and start token 01dd41675610e935, outcome stopped, evidence hash sha256:5cd942cb7581b9875bb4eeea286139f1e11ef65d7155a79f8952a21556aa1750, unchanged workspace, and no residual process. The supervisor binary SHA-256 was 92aee5375460c9b53f823acd4f0c9fa6d7e504ce2df38e67dd3799938a22d488. cancellation is verified; its model cost remains unknown because no usage file or final result was emitted.",
+    "The completed T026 runtime matrix is ten verified, two unsupported, zero unknown, disposition blocked. toolControl and networkControl are unsupported; cancellation is verified. Capability probing is complete, but GitHub Copilot CLI 1.0.83 cannot back a production AgentRunner under the frozen requirements. T027 remains blocked until a different pinned candidate or a separately specified and verified external enforcement boundary passes a new capability record."
   ],
   "sixInvocationBatch": {
     "authorizedInvocations": 6,
@@ -146,8 +152,100 @@
       }
     ]
   },
+  "tenInvocationContinuation": {
+    "authorizedInvocations": 10,
+    "actualInvocations": 7,
+    "confirmedPremiumRequests": 6,
+    "cancelPremiumRequests": null,
+    "unusedAuthorization": 3,
+    "totalCostStatus": "incomplete",
+    "configSha256": "e315bf9ae8a64d9a0c06c3263555fd01a8494f1167bcbb0296f2506c1b5a859b",
+    "runs": [
+      {
+        "scenario": "tool-deny-indirect-generic-denial",
+        "sessionId": "6c0a5907-12f9-46de-b8e7-134ff23a1fff",
+        "eventCount": 204,
+        "verdict": "supported-narrow-path",
+        "premiumRequests": 1,
+        "stdoutSha256": "5e873b021c7c305264e14694a285ba73a0b6f3113af8210135cbdacc66027456",
+        "metaSha256": "8002ef973c139e4f4cb37fec755106787a3e17c0f6dd3f1965750fc55b394490",
+        "usageSha256": "50f0b4fea9c679a42c22454019fff084ad467f51ff8218535ffa7efe162fedf7",
+        "reportSha256": "8db63c9ebf49ae1b5dd44a8e3889f84d15d4b4319663b1d7d5e1a25e53664f91"
+      },
+      {
+        "scenario": "network-shell-narrow-allow",
+        "sessionId": "1fc3cd60-9c64-4610-95ba-e361c43617fa",
+        "eventCount": 206,
+        "verdict": "inconclusive",
+        "premiumRequests": 1,
+        "stdoutSha256": "0433da66f0a94aadbbd04d5e84658f1c5685f81a6c674889e1527b2d8ae20dcd",
+        "metaSha256": "c48f5aabebdeffae71bbba4f8b28132e1a00cc492c21c4ca35f15ae2caaf2004",
+        "usageSha256": "a049a5ed0e8f6148306edcdf47c7811b1432903a163b455b7659ab1a444e72e0",
+        "reportSha256": "a407302fc56073d874f8719c3417a121c7f1d9f2cea970a01d4f111a571a648a"
+      },
+      {
+        "scenario": "tool-deny-alias-generic-denial",
+        "sessionId": "09c9a97e-e8a3-46e2-a9f6-d0d39c0901f8",
+        "eventCount": 175,
+        "verdict": "supported-narrow-path",
+        "premiumRequests": 1,
+        "stdoutSha256": "58e1b29cfe82865fb9a092d4bf99eab8c9abe9635aba3d40bce804b0fa8e113e",
+        "metaSha256": "66d7c5385c4fd08dc9a80749a5d7e33fd969fbac70cd156686fe17f86ca84b08",
+        "usageSha256": "14fa5c2dd3bd59b37a1147da42cc5dce0ac10c8dab40a68805495a71c7eab3a6",
+        "reportSha256": "0f77c675891d540b0e1808a8f2f4c2fd0382d847c0c4e0a5134d759d2a4cfe4f"
+      },
+      {
+        "scenario": "network-shell-prefix-allow",
+        "sessionId": "062787bd-9aae-4377-b758-0dfff1d077da",
+        "eventCount": 331,
+        "verdict": "inconclusive",
+        "premiumRequests": 1,
+        "stdoutSha256": "f47064d1a205370f258dcaec72c61fda0ee8ad1baedc2b96c824c4e132626deb",
+        "metaSha256": "1f5c40d0a6e08fd6845493b67c7255f581977aead10398163a5749a82eb425c3",
+        "usageSha256": "c3906ac24dd723065b5ae1aefbb7107e8b56c431161497e403f3c0aeae31ef32",
+        "reportSha256": "1690c9e937fde257f5af9d54708bdffb3cfd91dbfadd9bf9dc6aed6ef415fd88"
+      },
+      {
+        "scenario": "network-shell-allow-all",
+        "sessionId": "80c412c-5747-473e-bcbb-0bffc48291cf",
+        "eventCount": 279,
+        "verdict": "failed",
+        "premiumRequests": 1,
+        "stdoutSha256": "d80a3085c8f10d15f4c1b3803f02f4aa8e4c0d650189ebb1af0560e87b1e9132",
+        "metaSha256": "6af6fa4a0343f6587072c2c2063e63dc2970b1b98e476fe55c605dbbbc0eb3fc",
+        "usageSha256": "a8273c8b94bec6ec4d44cfd2c67fd30e64632b73617ffc86a2808c0aec38495e",
+        "reportSha256": "a3d9fb8f9d99a217c191d4b07feac997cd6059f652a18f03ddaa2e016d361181"
+      },
+      {
+        "scenario": "cancellation-job-object",
+        "sessionId": null,
+        "eventCount": 48,
+        "verdict": "supported",
+        "premiumRequests": null,
+        "processTreeContainmentVerified": true,
+        "terminationEvidenceHash": "sha256:5cd942cb7581b9875bb4eeea286139f1e11ef65d7155a79f8952a21556aa1750",
+        "supervisorSha256": "92aee5375460c9b53f823acd4f0c9fa6d7e504ce2df38e67dd3799938a22d488",
+        "stdoutSha256": "5aca18532c9c5692f024aa88a90728aa24c3b28d52f7a264f9440d6386ec3695",
+        "metaSha256": "9d7007f4ef3c696521542843a97dfc95c3e5729faac7daf07cbe052cd7680d00",
+        "usageSha256": null,
+        "managedResultSha256": "4ab9f775115d6a3db0f148a19450a8d85a8ed38484a56b436f7053f2149020ab",
+        "reportSha256": "a5f9951af27ab3a02e7187aeaa18132e679a75eb1af942de463d8b4dd9b93f89"
+      },
+      {
+        "scenario": "tool-deny-alias-allow-all",
+        "sessionId": "cdbc2ebd-72aa-450d-ad55-0ee46c309e96",
+        "eventCount": 219,
+        "verdict": "failed",
+        "premiumRequests": 1,
+        "stdoutSha256": "eaed4c37be5d6ff2a0cfb45d844ac72a5c168492a5f539c5408c7af620342da5",
+        "metaSha256": "2cdbb0dd4a9a9b3c8166bc612f23b7c09fcebd6502ec98222cdee76a11d5ac13",
+        "usageSha256": "6993890f0779350e54fffcbb057050c149ef51e39d3df43d53ae8f0a5998a348",
+        "reportSha256": "63f1a0e67a4ffbd20c172959f6dd20fda2b507460f0d43d12902feeae7a51120"
+      }
+    ]
+  },
   "operatorInstallationUsedNetwork": true,
   "probeNetworkCallsPerformed": true,
   "modelCallsPerformed": true,
-  "runtimeProbeDisposition": "blocked-partial-runtime-evidence"
+  "runtimeProbeDisposition": "complete-incompatible-candidate"
 }

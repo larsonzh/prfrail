@@ -7,6 +7,11 @@ $parseErrors = $null
 $probePath = Join-Path $PSScriptRoot 'Invoke-AgentProbe.ps1'
 $probeAst = [System.Management.Automation.Language.Parser]::ParseFile($probePath, [ref]$tokens, [ref]$parseErrors)
 if ($parseErrors.Count) { throw 'Probe parser failed.' }
+$getPropDefinition = $probeAst.Find({
+    param($node)
+    $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -eq 'Get-Prop'
+}, $true)
+. ([scriptblock]::Create($getPropDefinition.Extent.Text))
 $definition = $probeAst.Find({
     param($node)
     $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -eq 'Test-ScenarioAssertion'
@@ -110,14 +115,51 @@ foreach ($case in @('denied', 'error', 'missing', 'executed', 'split', 'mismatch
     Write-Output "PASS compound/$case => $expected"
 }
 
+foreach ($scenario in @('tool-deny-indirect', 'tool-deny-alias', 'network-shell-deny')) {
+    if ($scenario -eq 'tool-deny-indirect') { $command = "& ('Get-' + 'ChildItem') -Name" }
+    elseif ($scenario -eq 'tool-deny-alias') { $command = 'gci -Name' }
+    else { $command = "[Net.WebClient]::new().DownloadString('https://example.com')" }
+    foreach ($case in @('denied', 'executed', 'error', 'rewritten')) {
+        $challengedCall = @{
+            requestName = 'powershell'; startTool = 'powershell'
+            requestCommand = $command; startCommand = $command
+            completed = $true; success = $false; errorCode = 'denied'
+            resultText = if ($scenario -eq 'network-shell-deny') { 'Permission to access this URL was denied' } else { 'Permission denied' }
+        }
+        if ($case -eq 'executed') { $challengedCall.success = $true }
+        if ($case -eq 'error') { $challengedCall.errorCode = 'execution_error' }
+        if ($case -eq 'rewritten') { $challengedCall.startCommand = 'Get-Date' }
+        $fact.toolCalls = @($controlCall, $challengedCall)
+        $fact.timeoutHit = $false
+        $expected = 'inconclusive'
+        if ($case -eq 'denied') { $expected = 'supported' }
+        if ($case -eq 'executed') { $expected = 'failed' }
+        $evaluation = Test-ScenarioAssertion -Name $scenario -Facts @($fact)
+        if ($evaluation.assertions.verdict -ne $expected) { throw "$scenario/$case expected $expected." }
+        Write-Output "PASS $scenario/$case => $expected"
+    }
+}
+
 $marker = 'PROBE-' + ('a' * 32)
 $cancelFact = @{eventsValid=$true;promptMatched=$true;cancelled=$true;markerSeen=$true;toolCalls=@(@{startCommand='Start-Sleep -Seconds 120'});residualProcs=@();workspaceFiles=@()}
 $evaluation = Test-ScenarioAssertion -Name 'cancel' -Facts @($cancelFact)
 if ($evaluation.assertions.verdict -ne 'inconclusive') { throw 'Uncontained tree stop accepted' }
+$cancelFact.supervisorSha256 = 'a' * 64
+$cancelFact.processTreeEvidence = @{
+    identity = @{pid=123;startToken='0123456789abcdef'}
+    outcome = 'stopped'
+    actions = @('terminate-job-object')
+    evidenceHash = 'sha256:' + ('b' * 64)
+}
+$evaluation = Test-ScenarioAssertion -Name 'cancel' -Facts @($cancelFact)
+if ($evaluation.assertions.verdict -ne 'supported') { throw 'Complete Job Object cancellation evidence not accepted' }
+$cancelFact.processTreeEvidence.actions = @('taskkill-process-tree')
+$evaluation = Test-ScenarioAssertion -Name 'cancel' -Facts @($cancelFact)
+if ($evaluation.assertions.verdict -ne 'inconclusive') { throw 'Non-Job cancellation evidence accepted' }
 $cancelFact.residualProcs = @(@{pid=123})
 $evaluation = Test-ScenarioAssertion -Name 'cancel' -Facts @($cancelFact)
 if ($evaluation.assertions.verdict -ne 'failed') { throw 'Residual cancellation not rejected' }
-Write-Output 'PASS cancellation observation is not whole-tree proof.'
+Write-Output 'PASS cancellation requires complete Job Object proof and rejects residuals.'
 $urlCall = @{requestName='web_fetch';startTool='web_fetch';requestUrl='https://example.com';startUrl='https://example.com';completed=$true;success=$false;errorCode='denied'}
 $fact.toolCalls = @($urlCall)
 $fact.timeoutHit = $false
@@ -154,7 +196,7 @@ foreach ($case in @('valid', 'first-exit', 'first-timeout', 'first-no-result', '
     Write-Output "PASS resume/$case => $expected"
 }
 
-foreach ($functionName in @('Write-Utf8NoBom', 'Invoke-CliOnce', 'Get-ScenarioPlan')) {
+foreach ($functionName in @('Write-Utf8NoBom', 'Get-FileSha256', 'Invoke-CliOnce', 'Get-ScenarioPlan')) {
     $definition = $probeAst.Find({
         param($node)
         $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -eq $functionName
@@ -167,7 +209,11 @@ $flags = $plan.invocations[0].Flags
 foreach ($flag in @('--available-tools=powershell', '--allow-tool=shell(Get-Location)', '--deny-tool=shell(Get-ChildItem)')) {
     if ($flags -notcontains $flag) { throw "Missing tool-deny flag: $flag" }
 }
-foreach ($scenario in @('tool-deny', 'tool-deny-compound', 'permission-failclosed', 'cancel')) {
+$aliasPlan = Get-ScenarioPlan -Name 'tool-deny-alias'
+foreach ($flag in @('--allow-tool=shell', '--deny-tool=shell(Get-ChildItem)')) {
+    if ($aliasPlan.invocations[0].Flags -notcontains $flag) { throw "Missing alias precedence flag: $flag" }
+}
+foreach ($scenario in @('tool-deny', 'tool-deny-compound', 'tool-deny-indirect', 'tool-deny-alias', 'permission-failclosed', 'network-shell-deny', 'cancel')) {
     $plan = Get-ScenarioPlan -Name $scenario
     if (@($plan.invocations[0].Flags | Where-Object { $_ -match '^--(?:allow|deny)-tool=powershell' }).Count) {
         throw "Tool name used as permission kind: $scenario"
@@ -176,6 +222,10 @@ foreach ($scenario in @('tool-deny', 'tool-deny-compound', 'permission-failclose
 Write-Output 'PASS permission kind shell is distinct from available tool powershell.'
 $networkPlan = Get-ScenarioPlan -Name 'network-deny'
 if ($networkPlan.invocations[0].Flags -notcontains '--deny-url=https://example.com') { throw 'Exact URL denial missing' }
+$networkShellPlan = Get-ScenarioPlan -Name 'network-shell-deny'
+foreach ($flag in @('--allow-tool=shell', '--deny-url=https://example.com')) {
+    if ($networkShellPlan.invocations[0].Flags -notcontains $flag) { throw "Shell network plan missing: $flag" }
+}
 Write-Output 'PASS exact URL denial is pinned in the network plan.'
 function ConvertTo-ArgList {
     param($Invocation, $Workspace, $SessionName, $UsagePath, $LogDir)
