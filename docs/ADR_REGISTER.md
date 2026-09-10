@@ -1,5 +1,7 @@
 ﻿# ProofRail 架构决策记录
 
+> 2026-09-11 03:26 状态更正（适用于下表 ADR-012 的旧能力快照）：P8 把可见工具名 `powershell` 误作权限类型；正确规则是 `shell(...)`。旧 `toolControl=unsupported` 推论撤回，当前为 **6 verified、6 unknown、blocked**。本轮独立命令结构化拒绝通过，但复合/间接边界尚未验证，不强制更换候选、不改变已批准架构。下表原“1 unsupported、5 unknown”是更正前历史状态；详见 [T026 当前结论](validation/t026-agent-runner-contract.md)。T026 未完成，T027 不得启动。
+
 [English](ADR_REGISTER_EN.md)
 
 日期：2026-09-06。状态分为 RFC 已决定、提议待评审、待实验；本表不代表用户已批准 S1。每项批准时记录主体、日期、RFC 变更和测试证据，禁止模型代签。

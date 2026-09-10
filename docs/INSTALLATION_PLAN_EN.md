@@ -1,5 +1,7 @@
 ﻿# ProofRail Installation and Deployment Plan
 
+> Candidate correction, 2026-09-11 03:26: the CLI Agent row's one-unsupported/five-unknown count and mandatory-replacement conclusion below are withdrawn. Old probes confused available tool powershell with permission kind shell(...). Correct standalone denial passes; the matrix is **six verified, six unknown, blocked**. Formal execution remains inadmissible; this does not authorize upgrades or installation-model changes. See the [current T026 conclusion](validation/t026-agent-runner-contract_EN.md).
+
 [简体中文](INSTALLATION_PLAN.md)
 
 Date: 2026-09-09. Status: the S1 installation model is decided, while formal release remains pending. No formal release package or supported production deployment exists yet. This document records the frozen model, open decisions, and pre-release gates; see the [portable ZIP installation guide](INSTALLATION_EN.md) for operational steps.

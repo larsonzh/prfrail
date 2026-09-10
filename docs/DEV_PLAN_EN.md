@@ -1,5 +1,7 @@
 ﻿# ProofRail Iterative Development Plan
 
+> T026 correction, 2026-09-11 03:26: the task entry's toolControl=unsupported and one-unsupported/five-unknown counts below are historical, not current. Old P8 used the wrong permission kind; shell(Get-ChildItem) now produces a structured denial. The current matrix is **six verified, six unknown, blocked**; compound/indirect commands, confirmation requirements, network, cancellation and resume still lack sufficient evidence. OS exit capture passes local 0/7 regressions. See the [current T026 conclusion](validation/t026-agent-runner-contract_EN.md). T026 stays unchecked and T027 must not start. This turn's single model authorization was used; no commit/push was performed.
+
 [简体中文](DEV_PLAN.md)
 
 Date: 2026-09-08; S1 implementation remains incomplete. Inputs: [requirements](PRODUCT_REQUIREMENTS_EN.md), [architecture](ARCHITECTURE_EN.md), [contracts](CONTRACTS_EN.md), [security](SECURITY_EN.md), [ADRs](ADR_REGISTER_EN.md). This follows revised RFC sections 14/19; added S1 minimum scope requires renewed budget approval, without pulling S2/S3 enhancements into the first release.

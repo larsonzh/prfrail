@@ -2,28 +2,28 @@
   "schemaVersion": "1.0.0",
   "capability": {
     "kind": "agent-runner-capability",
-    "probeId": "probe-copilot-cli-windows-20260910",
+    "probeId": "probe-copilot-cli-windows-20260911-corrected",
     "adapterId": "github-copilot-cli",
-    "probedAt": "2026-09-10T18:29:30.789Z",
+    "probedAt": "2026-09-10T19:26:29.604Z",
     "executableHash": "sha256:d3f3bb7b8bbf68357ad29f514a179d09f76135483d8bfb643131b8600f671ee2",
     "version": "1.0.83",
     "configHash": "sha256:d6d07e0943462974bba6380170ca6c6d147e6e609b2cc5ceff165f8f16faa5ed",
     "disposition": "blocked",
     "matrix": {
-      "noninteractive": {"status": "verified", "evidence": ["sha256:950d300d7a5dee25dda1e913f0d982acaaa33c812020231c85de9ac64d4bd3fc"]},
-      "cwd": {"status": "verified", "evidence": ["sha256:950d300d7a5dee25dda1e913f0d982acaaa33c812020231c85de9ac64d4bd3fc"]},
-      "eventStreamOrCompleteLogs": {"status": "verified", "evidence": ["sha256:950d300d7a5dee25dda1e913f0d982acaaa33c812020231c85de9ac64d4bd3fc"]},
-      "sessionCreate": {"status": "verified", "evidence": ["sha256:950d300d7a5dee25dda1e913f0d982acaaa33c812020231c85de9ac64d4bd3fc"]},
-      "sessionResume": {"status": "unknown", "evidence": ["sha256:950d300d7a5dee25dda1e913f0d982acaaa33c812020231c85de9ac64d4bd3fc"]},
-      "cancellation": {"status": "unknown", "evidence": ["sha256:950d300d7a5dee25dda1e913f0d982acaaa33c812020231c85de9ac64d4bd3fc"]},
-      "processTreeStop": {"status": "verified", "evidence": ["sha256:950d300d7a5dee25dda1e913f0d982acaaa33c812020231c85de9ac64d4bd3fc"]},
-      "toolControl": {"status": "unsupported", "evidence": ["sha256:950d300d7a5dee25dda1e913f0d982acaaa33c812020231c85de9ac64d4bd3fc"]},
-      "networkControl": {"status": "unknown", "evidence": ["sha256:950d300d7a5dee25dda1e913f0d982acaaa33c812020231c85de9ac64d4bd3fc"]},
-      "permissionControl": {"status": "unknown", "evidence": ["sha256:950d300d7a5dee25dda1e913f0d982acaaa33c812020231c85de9ac64d4bd3fc"]},
-      "usage": {"status": "verified", "evidence": ["sha256:950d300d7a5dee25dda1e913f0d982acaaa33c812020231c85de9ac64d4bd3fc"]},
-      "unattendedConfirmations": {"status": "unknown", "evidence": ["sha256:950d300d7a5dee25dda1e913f0d982acaaa33c812020231c85de9ac64d4bd3fc"]}
+      "noninteractive": {"status": "verified", "evidence": ["sha256:35cdb5d5acab9c7c8c8c9e820d0537ffe6cf2183ee34fa63ae672f725072e608"]},
+      "cwd": {"status": "verified", "evidence": ["sha256:35cdb5d5acab9c7c8c8c9e820d0537ffe6cf2183ee34fa63ae672f725072e608"]},
+      "eventStreamOrCompleteLogs": {"status": "verified", "evidence": ["sha256:35cdb5d5acab9c7c8c8c9e820d0537ffe6cf2183ee34fa63ae672f725072e608"]},
+      "sessionCreate": {"status": "verified", "evidence": ["sha256:35cdb5d5acab9c7c8c8c9e820d0537ffe6cf2183ee34fa63ae672f725072e608"]},
+      "sessionResume": {"status": "unknown", "evidence": ["sha256:35cdb5d5acab9c7c8c8c9e820d0537ffe6cf2183ee34fa63ae672f725072e608"]},
+      "cancellation": {"status": "unknown", "evidence": ["sha256:35cdb5d5acab9c7c8c8c9e820d0537ffe6cf2183ee34fa63ae672f725072e608"]},
+      "processTreeStop": {"status": "verified", "evidence": ["sha256:35cdb5d5acab9c7c8c8c9e820d0537ffe6cf2183ee34fa63ae672f725072e608"]},
+      "toolControl": {"status": "unknown", "evidence": ["sha256:35cdb5d5acab9c7c8c8c9e820d0537ffe6cf2183ee34fa63ae672f725072e608"]},
+      "networkControl": {"status": "unknown", "evidence": ["sha256:35cdb5d5acab9c7c8c8c9e820d0537ffe6cf2183ee34fa63ae672f725072e608"]},
+      "permissionControl": {"status": "unknown", "evidence": ["sha256:35cdb5d5acab9c7c8c8c9e820d0537ffe6cf2183ee34fa63ae672f725072e608"]},
+      "usage": {"status": "verified", "evidence": ["sha256:35cdb5d5acab9c7c8c8c9e820d0537ffe6cf2183ee34fa63ae672f725072e608"]},
+      "unattendedConfirmations": {"status": "unknown", "evidence": ["sha256:35cdb5d5acab9c7c8c8c9e820d0537ffe6cf2183ee34fa63ae672f725072e608"]}
     },
-    "evidence": ["sha256:950d300d7a5dee25dda1e913f0d982acaaa33c812020231c85de9ac64d4bd3fc"]
+    "evidence": ["sha256:35cdb5d5acab9c7c8c8c9e820d0537ffe6cf2183ee34fa63ae672f725072e608"]
   },
-  "recordHash": "sha256:a6ad21b8e517b1bd8e0e2a88a0a4c9dcf7a3984752be75ee56c268a8dac6608e"
+  "recordHash": "sha256:2b43c40e9ef856716a1621bd4e581a74e9d5f63fea605dd482a1ddd31b01c5da"
 }

@@ -1,5 +1,7 @@
 ﻿# S1 Exit 验收报告
 
+> 2026-09-11 03:26 更正：下文 AT-23、任务链及下一步中的“1 unsupported、5 unknown”是历史快照。旧 P8 权限参数错误，其 unsupported 推论撤回；正确独立命令拒绝已验证，但完整边界尚缺证据。当前 **6 verified、6 unknown、blocked**，无需据旧推论强制更换候选。T026/T027、AT-23、T018 与 S1 继续阻断；详见 [T026 当前结论](t026-agent-runner-contract.md)。
+
 [English](s1-exit_EN.md)
 
 日期：2026-09-09。结论：`BLOCKED`。T018 已完成 AT-15 的只读 whois 冻结夹具对比和 generic/C/Go 最小闭环，可信 Windows artifact 的候选安装生命周期演练也已通过；手工解压便携 ZIP、不修改 PATH 的安装模型已获产品所有者批准，并已有双语教程、支持矩阵与发行说明草案。但最终 ZIP 尚未绑定和复验，EOL 通知方式尚未冻结，产品所有者也未批准最终 S1 exit，因此不得把部分通过标记为 S1 完成。2026-09-11 更新：AT-23 与任务链门禁行已同步 T026 契约完成、6 项 verified、1 项 unsupported、5 项 unknown 的能力状态。

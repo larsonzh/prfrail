@@ -1,5 +1,7 @@
 ﻿# ProofRail 安装与部署规划
 
+> 2026-09-11 03:26 候选状态更正：下表 CLI Agent 的“1 unsupported、5 unknown”及必须更换候选的判断已被撤回。旧探针混淆 `powershell` 可见工具名与 `shell(...)` 权限类型；正确规则独立命令拒绝通过，当前为 **6 verified、6 unknown、blocked**。仍不满足正式运行准入，也不据此自动升级或改动安装模型；详见 [T026 当前结论](validation/t026-agent-runner-contract.md)。
+
 [English](INSTALLATION_PLAN_EN.md)
 
 日期：2026-09-09。状态：S1 安装模型已决定，正式发行仍待批准。当前没有正式发行包或受支持的生产部署；本文件记录已冻结模型、待决事项和发布前门禁，实际步骤见 [便携 ZIP 安装指南](INSTALLATION.md)。
