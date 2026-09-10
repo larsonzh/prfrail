@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://proofrail.dev/schemas/v1/operator-interaction.schema.json",
+  "title": "ProofRail operator interaction record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "interaction", "recordHash"],
+  "properties": {
+    "schemaVersion": {"const": "1.0.0"},
+    "interaction": {
+      "oneOf": [
+        {"$ref": "#/$defs/request"},
+        {"$ref": "#/$defs/response"}
+      ]
+    },
+    "recordHash": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$"
+    },
+    "hashSet": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/sha256"}
+    },
+    "adapterActor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id"],
+      "properties": {
+        "type": {"const": "adapter"},
+        "id": {"$ref": "#/$defs/id"}
+      }
+    },
+    "operatorActor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id"],
+      "properties": {
+        "type": {"const": "operator"},
+        "id": {"$ref": "#/$defs/id"}
+      }
+    },
+    "binding": {
+      "type": "object",
+      "required": ["recordId", "kind", "interactionId", "runId", "taskId", "stepId", "attempt", "workspaceHash", "conversationId", "requestId", "contextHash", "evidence"],
+      "properties": {
+        "recordId": {"$ref": "#/$defs/id"},
+        "kind": {"enum": ["request", "response"]},
+        "interactionId": {"$ref": "#/$defs/id"},
+        "runId": {"$ref": "#/$defs/id"},
+        "taskId": {"$ref": "#/$defs/id"},
+        "stepId": {"$ref": "#/$defs/id"},
+        "attempt": {"type": "integer", "minimum": 1},
+        "workspaceHash": {"$ref": "#/$defs/sha256"},
+        "conversationId": {"$ref": "#/$defs/id"},
+        "requestId": {"$ref": "#/$defs/id"},
+        "contextHash": {"$ref": "#/$defs/sha256"},
+        "evidence": {"$ref": "#/$defs/hashSet"}
+      }
+    },
+    "request": {
+      "allOf": [
+        {"$ref": "#/$defs/binding"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["recordId", "kind", "interactionId", "requestedAt", "requestedBy", "operator", "runId", "taskId", "stepId", "attempt", "workspaceHash", "conversationId", "requestId", "contextHash", "question", "reason", "allowedResponses", "risk", "requiredAction", "evidence"],
+          "properties": {
+            "recordId": {"$ref": "#/$defs/id"},
+            "kind": {"const": "request"},
+            "interactionId": {"$ref": "#/$defs/id"},
+            "requestedAt": {"$ref": "#/$defs/timestamp"},
+            "requestedBy": {"$ref": "#/$defs/adapterActor"},
+            "operator": {"$ref": "#/$defs/operatorActor"},
+            "runId": {"$ref": "#/$defs/id"},
+            "taskId": {"$ref": "#/$defs/id"},
+            "stepId": {"$ref": "#/$defs/id"},
+            "attempt": {"type": "integer", "minimum": 1},
+            "workspaceHash": {"$ref": "#/$defs/sha256"},
+            "conversationId": {"$ref": "#/$defs/id"},
+            "requestId": {"$ref": "#/$defs/id"},
+            "contextHash": {"$ref": "#/$defs/sha256"},
+            "question": {"type": "string", "minLength": 1, "maxLength": 4096},
+            "reason": {"type": "string", "minLength": 1, "maxLength": 4096},
+            "allowedResponses": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+            "risk": {"type": "string", "minLength": 1, "maxLength": 4096},
+            "requiredAction": {"type": "string", "minLength": 1, "maxLength": 4096},
+            "evidence": {"$ref": "#/$defs/hashSet"}
+          }
+        }
+      ]
+    },
+    "response": {
+      "allOf": [
+        {"$ref": "#/$defs/binding"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["recordId", "kind", "interactionId", "respondedAt", "respondedBy", "runId", "taskId", "stepId", "attempt", "workspaceHash", "conversationId", "requestId", "contextHash", "requestHash", "selection", "evidence"],
+          "properties": {
+            "recordId": {"$ref": "#/$defs/id"},
+            "kind": {"const": "response"},
+            "interactionId": {"$ref": "#/$defs/id"},
+            "respondedAt": {"$ref": "#/$defs/timestamp"},
+            "respondedBy": {"$ref": "#/$defs/operatorActor"},
+            "runId": {"$ref": "#/$defs/id"},
+            "taskId": {"$ref": "#/$defs/id"},
+            "stepId": {"$ref": "#/$defs/id"},
+            "attempt": {"type": "integer", "minimum": 1},
+            "workspaceHash": {"$ref": "#/$defs/sha256"},
+            "conversationId": {"$ref": "#/$defs/id"},
+            "requestId": {"$ref": "#/$defs/id"},
+            "contextHash": {"$ref": "#/$defs/sha256"},
+            "requestHash": {"$ref": "#/$defs/sha256"},
+            "selection": {"$ref": "#/$defs/id"},
+            "evidence": {"$ref": "#/$defs/hashSet"}
+          }
+        }
+      ]
+    }
+  }
+}

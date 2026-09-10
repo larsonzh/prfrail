@@ -13,6 +13,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/larsonzh/prfrail/internal/chain"
 	"github.com/larsonzh/prfrail/internal/evidence"
 )
 
@@ -23,10 +24,12 @@ const (
 )
 
 type CLI struct {
-	version string
-	now     func() time.Time
-	getwd   func() (string, error)
-	stopRun func(context.Context, string, string) ([]string, error)
+	version           string
+	now               func() time.Time
+	getwd             func() (string, error)
+	stdin             io.Reader
+	stopRun           func(context.Context, string, string) ([]string, error)
+	appendInteraction func(string, chain.OperatorInteractionRecord) error
 }
 
 type commandResponse struct {
@@ -40,8 +43,9 @@ type commandResponse struct {
 }
 
 func NewCLI(version string) CLI {
-	cli := CLI{version: version, now: time.Now, getwd: os.Getwd}
+	cli := CLI{version: version, now: time.Now, getwd: os.Getwd, stdin: os.Stdin}
 	cli.stopRun = newDefaultStopRun(cli.getwd)
+	cli.appendInteraction = appendOperatorInteractionRecord
 	return cli
 }
 
@@ -64,6 +68,8 @@ func (cli CLI) Execute(ctx context.Context, args []string, stdout, stderr io.Wri
 		return cli.executePreview(args[1:], stdout, stderr)
 	case "approvals":
 		return cli.executeApprovals(ctx, args[1:], stdout, stderr)
+	case "interactions":
+		return cli.executeInteractions(args[1:], stdout, stderr)
 	case "cost":
 		return cli.executeCost(args[1:], stdout, stderr)
 	case "run":
@@ -364,7 +370,7 @@ func resolvePathFromCWD(cwd, value string) (string, error) {
 
 func writeMainUsage(output io.Writer) {
 	fmt.Fprintln(output, "usage: prfrail <command> [options]")
-	fmt.Fprintln(output, "commands: version, init, validate, preview, approvals, cost, run, report, config explain")
+	fmt.Fprintln(output, "commands: version, init, validate, preview, approvals, interactions, cost, run, report, config explain")
 }
 
 func writeFile(path string, content []byte, force bool) error {

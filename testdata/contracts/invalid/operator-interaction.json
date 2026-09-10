@@ -1,0 +1,64 @@
+[
+  {
+    "fixtureId": "operator-interaction-request-invalid-empty-responses",
+    "schema": "operator-interaction.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "A structured request must expose at least one allowed response",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "interaction": {
+        "recordId": "request-record-one",
+        "kind": "request",
+        "interactionId": "interaction-one",
+        "requestedAt": "2026-09-10T01:00:00.000Z",
+        "requestedBy": {"type": "adapter", "id": "agent-one"},
+        "operator": {"type": "operator", "id": "operator-one"},
+        "runId": "run-one",
+        "taskId": "task-one",
+        "stepId": "step-one",
+        "attempt": 2,
+        "workspaceHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "conversationId": "conversation-one",
+        "requestId": "request-one",
+        "contextHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "question": "Choose the supported migration target.",
+        "reason": "The task definition permits two targets.",
+        "allowedResponses": [],
+        "risk": "The selection changes the compatibility baseline.",
+        "requiredAction": "Select one target.",
+        "evidence": ["sha256:3333333333333333333333333333333333333333333333333333333333333333"]
+      },
+      "recordHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+    }
+  },
+  {
+    "fixtureId": "operator-interaction-response-invalid-actor",
+    "schema": "operator-interaction.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "Only the bound operator role may submit a response",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "interaction": {
+        "recordId": "response-record-one",
+        "kind": "response",
+        "interactionId": "interaction-one",
+        "respondedAt": "2026-09-10T01:01:00.000Z",
+        "respondedBy": {"type": "adapter", "id": "agent-one"},
+        "runId": "run-one",
+        "taskId": "task-one",
+        "stepId": "step-one",
+        "attempt": 2,
+        "workspaceHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "conversationId": "conversation-one",
+        "requestId": "request-two",
+        "contextHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "requestHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+        "selection": "use-java-25",
+        "evidence": ["sha256:5555555555555555555555555555555555555555555555555555555555555555"]
+      },
+      "recordHash": "sha256:6666666666666666666666666666666666666666666666666666666666666666"
+    }
+  }
+]

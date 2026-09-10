@@ -23,7 +23,7 @@ function catalogPaths() {
 
 test("all schemas compile and every catalog matches its independent expectation", () => {
   const { ajv, schemaFiles } = createValidator(schemaDir);
-  assert.equal(schemaFiles.length, 29);
+  assert.equal(schemaFiles.length, 30);
   const fixtureIds = new Set();
   const acceptedSchemas = new Set();
   const rejectedSchemas = new Set();
@@ -61,7 +61,7 @@ test("all schemas compile and every catalog matches its independent expectation"
       fixtureCount += 1;
     }
   }
-  assert.equal(fixtureCount, 82);
+  assert.equal(fixtureCount, 86);
   assert.deepEqual([...acceptedSchemas].sort(), schemaFiles);
   assert.deepEqual([...rejectedSchemas].sort(), schemaFiles);
 });

@@ -1,0 +1,64 @@
+[
+  {
+    "fixtureId": "operator-interaction-request-valid",
+    "schema": "operator-interaction.schema.json",
+    "expected": "accept",
+    "rejectionLayer": "schema",
+    "reason": "Valid structured operator interaction request",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "interaction": {
+        "recordId": "request-record-one",
+        "kind": "request",
+        "interactionId": "interaction-one",
+        "requestedAt": "2026-09-10T01:00:00.000Z",
+        "requestedBy": {"type": "adapter", "id": "agent-one"},
+        "operator": {"type": "operator", "id": "operator-one"},
+        "runId": "run-one",
+        "taskId": "task-one",
+        "stepId": "step-one",
+        "attempt": 2,
+        "workspaceHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "conversationId": "conversation-one",
+        "requestId": "request-one",
+        "contextHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "question": "Choose the supported migration target.",
+        "reason": "The task definition permits two targets.",
+        "allowedResponses": ["use-java-21", "use-java-25"],
+        "risk": "The selection changes the compatibility baseline.",
+        "requiredAction": "Select one target.",
+        "evidence": ["sha256:3333333333333333333333333333333333333333333333333333333333333333"]
+      },
+      "recordHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+    }
+  },
+  {
+    "fixtureId": "operator-interaction-response-valid",
+    "schema": "operator-interaction.schema.json",
+    "expected": "accept",
+    "rejectionLayer": "schema",
+    "reason": "Valid bound operator interaction response",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "interaction": {
+        "recordId": "response-record-one",
+        "kind": "response",
+        "interactionId": "interaction-one",
+        "respondedAt": "2026-09-10T01:01:00.000Z",
+        "respondedBy": {"type": "operator", "id": "operator-one"},
+        "runId": "run-one",
+        "taskId": "task-one",
+        "stepId": "step-one",
+        "attempt": 2,
+        "workspaceHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "conversationId": "conversation-one",
+        "requestId": "request-two",
+        "contextHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "requestHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+        "selection": "use-java-25",
+        "evidence": ["sha256:5555555555555555555555555555555555555555555555555555555555555555"]
+      },
+      "recordHash": "sha256:6666666666666666666666666666666666666666666666666666666666666666"
+    }
+  }
+]
