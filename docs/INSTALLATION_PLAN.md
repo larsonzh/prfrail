@@ -24,7 +24,7 @@ S1 目标是本地单用户、单写者、无常驻云服务的 CLI/TUI：ProofR
 | 发布信任 | S1 使用固定 commit、GitHub CI、SHA256SUMS、SBOM 和许可证清单 | 校验和只证明内容完整性；签名/attestation 后续增强 | S1 基线已定 |
 | 更新方式 | 手工下载核验，新版本解压到新目录并显式切换路径；未来包管理器另议 | 支持矩阵、schema 兼容、备份恢复门禁 | S1 模型已定；最终 ZIP 待复验 |
 | 卸载与数据保留 | 手工删除版本目录；run/store 默认保留，数据删除单独授权 | T024 生命周期记录和显式删除授权 | S1 模型与库级规则已冻结 |
-| CLI Agent/AgentRunner | 核心离线模式可选；正式 AI 执行必需。Windows x64 当前固定候选为 GitHub Copilot CLI 1.0.83 | 固定版本/原生可执行文件摘要、账号/订阅/网络/模型权限、受支持认证（1.0.83 拒绝 classic PAT）、能力矩阵、隔离、停止/恢复、证据与独立验收通过 AT-23；更新后重跑 preflight | T026 契约完成；classic PAT 被拒绝且无 OAuth 回落凭据，第二次预检为 0 请求/0 费用；重试需先认证并新授权；T027 待实现 |
+| CLI Agent/AgentRunner | 核心离线模式可选；正式 AI 执行必需。Windows x64 当前固定候选为 GitHub Copilot CLI 1.0.83 | 固定版本/原生可执行文件摘要、账号/订阅/网络/模型权限、受支持认证（1.0.83 拒绝 classic PAT）、能力矩阵、隔离、停止/恢复、证据与独立验收通过 AT-23；更新后重跑 preflight | T026 契约完成、web OAuth 登录成功且真实探针 6/12 项 verified；6 项仍 unknown，整体 blocked；T027 待实现 |
 | VS Code visible 黑箱候选 | 可选降级保证；要求 VS Code 1.82+、可用 Copilot Chat、SessionBridge 0.1.1 | 显式风险确认、`visible`/非 legacy、人工监督/归还、后置全扫与 AT-24；禁止自动 fallback | T028 待实现 |
 
 S1 不指定默认安装目录，不发布一键安装脚本，不修改 PATH，不声明自动更新，也不要求管理员权限。state/store 默认位置、正式下载入口与 EOL 通知仍待冻结。

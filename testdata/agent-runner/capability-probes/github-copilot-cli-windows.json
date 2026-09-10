@@ -10,20 +10,20 @@
     "configHash": "sha256:d6d07e0943462974bba6380170ca6c6d147e6e609b2cc5ceff165f8f16faa5ed",
     "disposition": "blocked",
     "matrix": {
-      "noninteractive": {"status": "unknown", "evidence": ["sha256:203bf65ac1b4501fd570fd63619b82d944721b174dcff0860acb96026b5adead"]},
-      "cwd": {"status": "unknown", "evidence": ["sha256:203bf65ac1b4501fd570fd63619b82d944721b174dcff0860acb96026b5adead"]},
-      "eventStreamOrCompleteLogs": {"status": "unknown", "evidence": ["sha256:203bf65ac1b4501fd570fd63619b82d944721b174dcff0860acb96026b5adead"]},
-      "sessionCreate": {"status": "unknown", "evidence": ["sha256:203bf65ac1b4501fd570fd63619b82d944721b174dcff0860acb96026b5adead"]},
-      "sessionResume": {"status": "unknown", "evidence": ["sha256:203bf65ac1b4501fd570fd63619b82d944721b174dcff0860acb96026b5adead"]},
-      "cancellation": {"status": "unknown", "evidence": ["sha256:203bf65ac1b4501fd570fd63619b82d944721b174dcff0860acb96026b5adead"]},
-      "processTreeStop": {"status": "unknown", "evidence": ["sha256:203bf65ac1b4501fd570fd63619b82d944721b174dcff0860acb96026b5adead"]},
-      "toolControl": {"status": "unknown", "evidence": ["sha256:203bf65ac1b4501fd570fd63619b82d944721b174dcff0860acb96026b5adead"]},
-      "networkControl": {"status": "unknown", "evidence": ["sha256:203bf65ac1b4501fd570fd63619b82d944721b174dcff0860acb96026b5adead"]},
-      "permissionControl": {"status": "unknown", "evidence": ["sha256:203bf65ac1b4501fd570fd63619b82d944721b174dcff0860acb96026b5adead"]},
-      "usage": {"status": "unknown", "evidence": ["sha256:203bf65ac1b4501fd570fd63619b82d944721b174dcff0860acb96026b5adead"]},
-      "unattendedConfirmations": {"status": "unknown", "evidence": ["sha256:203bf65ac1b4501fd570fd63619b82d944721b174dcff0860acb96026b5adead"]}
+      "noninteractive": {"status": "verified", "evidence": ["sha256:832ca3b6b38b05e0062b6c3df0ecf6892eb96f545662b9111c6264fc4762be26"]},
+      "cwd": {"status": "verified", "evidence": ["sha256:832ca3b6b38b05e0062b6c3df0ecf6892eb96f545662b9111c6264fc4762be26"]},
+      "eventStreamOrCompleteLogs": {"status": "verified", "evidence": ["sha256:832ca3b6b38b05e0062b6c3df0ecf6892eb96f545662b9111c6264fc4762be26"]},
+      "sessionCreate": {"status": "verified", "evidence": ["sha256:832ca3b6b38b05e0062b6c3df0ecf6892eb96f545662b9111c6264fc4762be26"]},
+      "sessionResume": {"status": "unknown", "evidence": ["sha256:832ca3b6b38b05e0062b6c3df0ecf6892eb96f545662b9111c6264fc4762be26"]},
+      "cancellation": {"status": "unknown", "evidence": ["sha256:832ca3b6b38b05e0062b6c3df0ecf6892eb96f545662b9111c6264fc4762be26"]},
+      "processTreeStop": {"status": "verified", "evidence": ["sha256:832ca3b6b38b05e0062b6c3df0ecf6892eb96f545662b9111c6264fc4762be26"]},
+      "toolControl": {"status": "unknown", "evidence": ["sha256:832ca3b6b38b05e0062b6c3df0ecf6892eb96f545662b9111c6264fc4762be26"]},
+      "networkControl": {"status": "unknown", "evidence": ["sha256:832ca3b6b38b05e0062b6c3df0ecf6892eb96f545662b9111c6264fc4762be26"]},
+      "permissionControl": {"status": "unknown", "evidence": ["sha256:832ca3b6b38b05e0062b6c3df0ecf6892eb96f545662b9111c6264fc4762be26"]},
+      "usage": {"status": "verified", "evidence": ["sha256:832ca3b6b38b05e0062b6c3df0ecf6892eb96f545662b9111c6264fc4762be26"]},
+      "unattendedConfirmations": {"status": "unknown", "evidence": ["sha256:832ca3b6b38b05e0062b6c3df0ecf6892eb96f545662b9111c6264fc4762be26"]}
     },
-    "evidence": ["sha256:203bf65ac1b4501fd570fd63619b82d944721b174dcff0860acb96026b5adead"]
+    "evidence": ["sha256:832ca3b6b38b05e0062b6c3df0ecf6892eb96f545662b9111c6264fc4762be26"]
   },
-  "recordHash": "sha256:1dfb83a21f070b66b61766188113c4d41f99c91dbbd5a0a17b6b91bc0d3b399b"
+  "recordHash": "sha256:6b3b2a00531fe2d988714315624b9a79682710d28011f3399eebcf3c1f33e7ec"
 }
