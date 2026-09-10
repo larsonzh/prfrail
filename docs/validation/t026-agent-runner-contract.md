@@ -28,6 +28,15 @@
 - 模型把两条指令合并成 `powershell("Get-Location; Get-ChildItem -Name")`；尽管参数包含 `--deny-tool=powershell(Get-ChildItem*)`，复合命令仍以 0 成功执行。139/139 条 UTF-8 JSONL 可解析，最终 result exit 0；workspace 为空、usage 报告 0 文件修改且无残留进程。这是可区分的绕过证据，故 `toolControl` 从 unknown 改为 unsupported。探针报告附带的“未产生干净退出”来自 PowerShell 5.1 进程对象未刷新而导致 meta exitCode 为 null；原生 result 明确为 0，采集器随后已修正，该次要缺陷不改变工具控制失败结论。
 - 当前矩阵为 6 verified、1 unsupported、5 unknown：`sessionResume`、`cancellation`、`networkControl`、`permissionControl`、`unattendedConfirmations` 尚待探测。固定候选整体 blocked；即使余下 5 项全部 verified，也不能使 1.0.83 compatible。
 
+## P9 追加观察（2026-09-11，待配置复核）
+
+- 本轮授权已用于唯一一次 `permission-failclosed` CLI 调用，无重试。session 为 `9f219f5d-e9a6-4e2a-a1f4-9e3b779ba59e`，模型为 `gpt-5.6-luna`；usage 为 1 user request、3 个内部模型回合、1 premium request、17598 输入 token、205 输出 token、6639 ms API 时长。
+- 参数仅批准 `powershell(Get-Location)`，但独立 toolCallId 分别证明 `Get-Location` 与 `Get-Date` 执行成功。196 条 UTF-8 JSONL 全部可解析，最终 result exit 0；报告中 workspace 文件及匹配残留进程均为空。调用正常到达模型，无网络屏蔽证据，因此未启用代理或再次调用。后续若确认网络屏蔽，可使用操作员指定的 `http://10.0.0.246:8080`，但不把网络失败视为策略拒绝，也不在费用不明时自动重试。
+- 该观察证明当前有效配置没有实现探针预期的命令白名单；尚未独立固定默认授权、用户配置与 CLI 参数匹配语义，不能据此直接宣称厂商权限实现缺陷。P9 从“未执行”转为“已执行、待有效配置复核”；现有机器矩阵暂保留 6 verified、1 unsupported、5 unknown，`permissionControl` 和 `unattendedConfirmations` 不提升。T026/T027 继续阻断。
+- meta exitCode 再次为 null，说明此前 `Refresh()` 修正未经行为验证且未解决问题；原生 result 不能代替 OS 退出码。保持这两类证据分离，后续需用非模型本地进程验证采集修复。
+- 原始摘要：stdout.jsonl 为 83502 字节，SHA-256 `6114d084d8f93263f9e2c537390c8338d73238b2609208a22bbc94bcd5c74fbd`；usage.json 为 2114 字节，SHA-256 `3953a146e3e38a3fb1be6dc254f43b951503a2b3f543ee0ad6153604d129f06c`；meta.json 为 1566 字节，SHA-256 `b94b0af2a80b8abb707d19b7f3726fedf4f90c7d8e34a08c48ebed6ddb5616da`；probe-report.json 为 17092 字节，SHA-256 `6e169874502f9a6f798f4aea3cadb0300459ab5c7b4458a7b3bad7feed423166`。
+- 分析器已收紧：tool-deny、permission-failclosed、network-deny 的缺失结果或普通工具错误只能 inconclusive，成功执行不应获准的工具仍 failed。新增 `tools/agent-probe/Test-AgentProbe.ps1` 的 9 项离线断言已通过，零 CLI/模型调用；下文原 8 项合成自测仅为历史记录，其中基于“未成功即拒绝”的 supported 判定不再有效。P9 已消费授权，下文调用数是原始计划，不是新增授权或计费上限保证。
+
 ## 门禁结果
 
 1. `go build ./...`：通过。

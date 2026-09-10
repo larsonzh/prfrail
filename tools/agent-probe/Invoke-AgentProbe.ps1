@@ -783,6 +783,12 @@ function Test-ScenarioAssertion {
         }
     }
 
+    if ($Name -in @('tool-deny', 'permission-failclosed', 'network-deny') -and $assertions.verdict -eq 'supported') {
+        $assertions.verdict = 'inconclusive'
+        $assertions.policyDenialVerified = $false
+        $reasons.Add('An unsuccessful or missing tool result does not prove policy denial. Independently verify a policy decision bound to the attempted tool call before promoting this capability.')
+    }
+
     return @{ assertions = $assertions; reasons = @($reasons) }
 }
 
