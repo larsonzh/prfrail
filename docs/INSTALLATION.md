@@ -32,25 +32,61 @@ SessionBridge 独立联调时可先用 `visible` 或 `@sbr-review` 验证面板�
 
 浏览器方式会保留 ZIP：登录 GitHub，打开 `https://github.com/larsonzh/prfrail/actions/runs/<run-id>`，在页面底部 **Artifacts** 区点击 `prfrail-Windows-<full-candidate-commit>`。下载文件通常名为 `prfrail-Windows-<full-candidate-commit>.zip`。
 
-已安装并登录 GitHub CLI 时，也可直接下载。`gh run download` 会把 artifact 自动解压到 `--dir`，不会保留外层 ZIP；下载后四个文件位于 `$DownloadDir\prfrail`，因此执行此命令后跳过下方的 `Expand-Archive`：
+命令行下载会先检测已安装且已认证的 GitHub CLI：可用时，`gh run download` 会把 artifact 自动解压到 `--dir`，不会保留外层 ZIP；下载后四个文件位于 `$DownloadDir\prfrail`，因此跳过下方的 `Expand-Archive`。没有可用 `gh` 时，脚本改用 GitHub Actions REST API 下载 ZIP，再执行下方的 `Expand-Archive`。API 回退要求把具有该仓库 Actions 读取权限的 token 放入进程环境变量 `GH_TOKEN` 或 `GITHUB_TOKEN`；不要把 token 写进脚本、命令行参数或日志。SSH 密钥不能认证 GitHub REST API。
 
 ```powershell
-gh auth status
 $Repository = 'larsonzh/prfrail'
 $RunId = '<run-id>'
 $CandidateCommit = '<full-candidate-commit>'
 $Artifact = "prfrail-Windows-$CandidateCommit"
 $DownloadDir = Join-Path '<user-selected-independent-directory>' $CandidateCommit
 
-gh run view $RunId --repo $Repository
-gh run download $RunId --repo $Repository --name $Artifact --dir $DownloadDir
-if ($LASTEXITCODE -ne 0) {
-    throw "Artifact download failed: $Artifact"
+$ghCommand = Get-Command gh -ErrorAction SilentlyContinue
+$ghReady = $false
+if ($ghCommand) {
+    gh auth status *> $null
+    $ghReady = ($LASTEXITCODE -eq 0)
 }
-$InstallDir = Join-Path $DownloadDir 'prfrail'
+
+if ($ghReady) {
+    gh run view $RunId --repo $Repository
+    gh run download $RunId --repo $Repository --name $Artifact --dir $DownloadDir
+    if ($LASTEXITCODE -ne 0) {
+        throw "Artifact download failed: $Artifact"
+    }
+    $InstallDir = Join-Path $DownloadDir 'prfrail'
+    $Archive = $null
+} else {
+    $Token = $env:GH_TOKEN
+    if (-not $Token) { $Token = $env:GITHUB_TOKEN }
+    if (-not $Token) {
+        throw 'GitHub CLI is unavailable or unauthenticated; set GH_TOKEN or GITHUB_TOKEN for the REST fallback'
+    }
+
+    $Headers = @{
+        Authorization = "Bearer $Token"
+        Accept = 'application/vnd.github+json'
+        'X-GitHub-Api-Version' = '2022-11-28'
+        'User-Agent' = 'ProofRail-install-guide'
+    }
+    $ListUri = "https://api.github.com/repos/$Repository/actions/runs/$RunId/artifacts?name=$Artifact"
+    $Response = Invoke-RestMethod -Method Get -Uri $ListUri -Headers $Headers
+    $Matches = @($Response.artifacts | Where-Object { $_.name -eq $Artifact })
+    if ($Matches.Count -ne 1) {
+        throw "Expected exactly one artifact named $Artifact in run $RunId; found $($Matches.Count)"
+    }
+    if ($Matches[0].expired) {
+        throw "Artifact has expired: $Artifact"
+    }
+
+    New-Item -ItemType Directory -Path $DownloadDir -Force | Out-Null
+    $Archive = Join-Path $DownloadDir "$Artifact.zip"
+    $DownloadUri = "https://api.github.com/repos/$Repository/actions/artifacts/$($Matches[0].id)/zip"
+    Invoke-WebRequest -UseBasicParsing -Uri $DownloadUri -Headers $Headers -OutFile $Archive
+}
 ```
 
-以下是浏览器下载 ZIP 后的解压路径。将三个值替换为实际下载文件、完整 candidate commit 和当前用户可写的独立目录：
+以下是浏览器或 REST API 下载 ZIP 后的解压路径；`gh` 分支已经自动解压，应跳过本段。将三个值替换为实际下载文件、完整 candidate commit 和当前用户可写的独立目录；若刚执行 REST 分支，则保留已经设置的 `$Archive`，不再执行第一行：
 
 ```powershell
 $Archive = (Resolve-Path '.\prfrail-Windows-<full-commit>.zip').Path

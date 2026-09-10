@@ -32,25 +32,61 @@ Select a GitHub Actions run that passed the trust matrix in the [S1 self-host ev
 
 The browser path preserves the ZIP: sign in to GitHub, open `https://github.com/larsonzh/prfrail/actions/runs/<run-id>`, and click `prfrail-Windows-<full-candidate-commit>` in the **Artifacts** section at the bottom of the page. The downloaded file is normally named `prfrail-Windows-<full-candidate-commit>.zip`.
 
-With an installed and authenticated GitHub CLI, download it directly as follows. `gh run download` automatically extracts the artifact into `--dir` and does not retain the outer ZIP. The four files are placed under `$DownloadDir\prfrail`, so skip the `Expand-Archive` block below after this command:
+The command-line path first detects an installed and authenticated GitHub CLI. When available, `gh run download` automatically extracts the artifact into `--dir` and does not retain the outer ZIP; the four files are placed under `$DownloadDir\prfrail`, so skip the `Expand-Archive` block below. Without usable `gh`, the script downloads the ZIP through the GitHub Actions REST API and then continues to the `Expand-Archive` block. The API fallback requires a token with Actions read access to this repository in the process environment as `GH_TOKEN` or `GITHUB_TOKEN`. Never put that token in the script, command-line arguments, or logs. SSH keys cannot authenticate the GitHub REST API.
 
 ```powershell
-gh auth status
 $Repository = 'larsonzh/prfrail'
 $RunId = '<run-id>'
 $CandidateCommit = '<full-candidate-commit>'
 $Artifact = "prfrail-Windows-$CandidateCommit"
 $DownloadDir = Join-Path '<user-selected-independent-directory>' $CandidateCommit
 
-gh run view $RunId --repo $Repository
-gh run download $RunId --repo $Repository --name $Artifact --dir $DownloadDir
-if ($LASTEXITCODE -ne 0) {
-    throw "Artifact download failed: $Artifact"
+$ghCommand = Get-Command gh -ErrorAction SilentlyContinue
+$ghReady = $false
+if ($ghCommand) {
+    gh auth status *> $null
+    $ghReady = ($LASTEXITCODE -eq 0)
 }
-$InstallDir = Join-Path $DownloadDir 'prfrail'
+
+if ($ghReady) {
+    gh run view $RunId --repo $Repository
+    gh run download $RunId --repo $Repository --name $Artifact --dir $DownloadDir
+    if ($LASTEXITCODE -ne 0) {
+        throw "Artifact download failed: $Artifact"
+    }
+    $InstallDir = Join-Path $DownloadDir 'prfrail'
+    $Archive = $null
+} else {
+    $Token = $env:GH_TOKEN
+    if (-not $Token) { $Token = $env:GITHUB_TOKEN }
+    if (-not $Token) {
+        throw 'GitHub CLI is unavailable or unauthenticated; set GH_TOKEN or GITHUB_TOKEN for the REST fallback'
+    }
+
+    $Headers = @{
+        Authorization = "Bearer $Token"
+        Accept = 'application/vnd.github+json'
+        'X-GitHub-Api-Version' = '2022-11-28'
+        'User-Agent' = 'ProofRail-install-guide'
+    }
+    $ListUri = "https://api.github.com/repos/$Repository/actions/runs/$RunId/artifacts?name=$Artifact"
+    $Response = Invoke-RestMethod -Method Get -Uri $ListUri -Headers $Headers
+    $Matches = @($Response.artifacts | Where-Object { $_.name -eq $Artifact })
+    if ($Matches.Count -ne 1) {
+        throw "Expected exactly one artifact named $Artifact in run $RunId; found $($Matches.Count)"
+    }
+    if ($Matches[0].expired) {
+        throw "Artifact has expired: $Artifact"
+    }
+
+    New-Item -ItemType Directory -Path $DownloadDir -Force | Out-Null
+    $Archive = Join-Path $DownloadDir "$Artifact.zip"
+    $DownloadUri = "https://api.github.com/repos/$Repository/actions/artifacts/$($Matches[0].id)/zip"
+    Invoke-WebRequest -UseBasicParsing -Uri $DownloadUri -Headers $Headers -OutFile $Archive
+}
 ```
 
-The following path applies after downloading the ZIP through the browser. Replace the three values with the downloaded file, full candidate commit, and an independent directory writable by the current user:
+The following path applies after downloading the ZIP through the browser or REST API; skip it after the `gh` branch, which already extracted the artifact. Replace the three values with the downloaded file, full candidate commit, and an independent directory writable by the current user. If the REST branch just set `$Archive`, retain that value and skip the first line:
 
 ```powershell
 $Archive = (Resolve-Path '.\prfrail-Windows-<full-commit>.zip').Path
