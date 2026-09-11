@@ -110,8 +110,14 @@
 
 边界（必须如实记录）：`networkControl` 探针只覆盖 CLI 自身 URL 工具（`--allow-url`/`--deny-url`）；CLI 的 shell 工具可绕过该层直接联网，shell 级网络出口不由 CLI 控制，正式执行需要 OS 级沙箱，未验证前按 unknown/受限处理。
 
-授权与成本：六次调用已全部使用，确认 5 premium requests 加取消 unknown；恢复累计用量不可重复相加。后续模型访问需新授权，优先离线设计监督/网络边界及配置固定，不自动升级、换候选、重试或改变契约要求。
+授权与成本：六次调用已全部使用，确认 5 premium requests 加取消 unknown；恢复累计用量不可重复相加。2026-09-11 产品所有者另行授权最多 10 次 DeepSeek V4.1 Flash API request，用于新的 BYOK 候选接入与探测；已使用 4 次（provider smoke 1 次、工具场景 3 次），剩余 6 次。CLI 单次 invocation 可能包含多个 provider request，后续预算按 usage 中模型 request 数计，不按外层进程数计。不自动升级、重试或改变契约要求。
 
-工具：`tools/agent-probe/Invoke-AgentProbe.ps1` 默认 dry-run（仅校验固定二进制摘要、版本与参数，零模型调用）；`-Run` 才执行，且只运行场景定义的单次调用序列。执行与分析工件均强制位于仓库 `tmp/` 的非 reparse-point 子目录，子进程不继承三种 GitHub token 环境变量。stdin 重定向为空文件，超时用 `taskkill /T /F` 停止；取消前冻结受管 PID 集，之后逐个核验停止。分析器要求 JSONL 全部可解析、meta 与精确 user prompt 绑定、正常场景有 result/exit 证据，并检查取消后的残留进程和 workspace 变更。报告输出 supported/inconclusive/failed 与工件摘要，产物不随仓库提交。2026-09-11 已完成 5 个场景的 dry-run 校验，以及 8 个合成断言（tool deny、坏行、permission 事件、取消、workspace 变更、同 session resume、缺失 resume 绑定、session 漂移）；能力矩阵的 verified 变更仍须人工复核并同步证据摘要与 canonical record hash。
+工具：`tools/agent-probe/Invoke-AgentProbe.ps1` 默认 dry-run（仅校验固定二进制摘要、版本与参数，零模型调用）；`-Run` 才执行，且只运行场景定义的单次调用序列。执行与分析工件均强制位于仓库 `tmp/` 的非 reparse-point 子目录。stdin 重定向为空文件，超时用 `taskkill /T /F` 停止；取消前冻结受管 PID 集，之后逐个核验停止。分析器要求 JSONL 全部可解析、meta 与精确 user prompt 绑定、正常场景有 result/exit 证据，并检查取消后的残留进程和 workspace 变更。报告输出 supported/inconclusive/failed 与工件摘要，产物不随仓库提交。能力矩阵的 verified 变更仍须人工复核并同步证据摘要与 canonical record hash。
+
+后续 DeepSeek 候选：探针器新增 `-Provider deepseek-anthropic` 与单 invocation `provider-smoke`，固定 CLI 1.0.83、`https://api.deepseek.com/anthropic` 和 `deepseek-flash`；脱敏 provider 配置摘要为 `sha256:8c78a15bc4702fed35d749d2b37046800aa90afd47b99154dffd3a79f1f85d4e`。真实执行只从进程环境读取 `COPILOT_PROVIDER_API_KEY` 或 `DEEPSEEK_API_KEY`，传给 CLI 时统一使用前者；GitHub token、provider token 及原始 DeepSeek 别名变量在启动边界受控并恢复，provider 元数据不含秘密，日志解析额外脱敏 `sk-*`。离线断言、本地进程、伪密钥不落盘/环境恢复及 DeepSeek dry-run 已通过。
+
+2026-09-11 的真实 `provider-smoke` 通过：1 个 `deepseek-flash` request，4303 input/3 output tokens，精确回复 `PONG`，session/result/usage 完整，workspace 与残留进程为空，GitHub premium cost 为 0；report/stdout/usage 摘要依次为 `sha256:bc3eb5ca8e7a5ffcefeac799de70b8aaac97135923a90db7d6bcd5f95e9d88e2`、`sha256:8da3eb723436cd5450fb244562f4e24f67a0f23a56f7560e4279a8429e9e97a0`、`sha256:309c7dfae32cfe77dd21fc2cb17621ab01b4de0537e7dbdac113e5c49e32821f`。随后 `tool-deny` 场景通过：3 个 request，13208 input/458 output tokens（含 190 reasoning tokens），模型先成功调用 `Get-Location`，再精确请求 `Get-ChildItem -Name` 并获得绑定的 `denied`，没有 workaround、文件变更或残留进程；report/stdout/usage 摘要依次为 `sha256:a300c8427e494a213ab1e44e2bc33a81498f027cca03a3f6f379583d47a0c0b8`、`sha256:8348e26bfaaca7aa7eb84e789f3c3001d5b138a92cad1d8fa01e63a8d8efd783`、`sha256:0e31aca5ca5ca990c881613a707a98fe710230bf18f00154ed84070e20b73823`。两次工件均未发现 Key、Authorization header 或 Bearer token 泄露。CLI 发出 `unknown_token_count_multiplier` warning，说明第三方模型 token 估算采用 1.0 fallback；usage 原始 token 数可作观察证据，但 CLI 的 AI credit/cost 字段不能代表 DeepSeek 账单。
+
+以上证明 CLI 可经 Anthropic BYOK 访问 DeepSeek V4.1 Flash，并能完成基本工具调用循环；它不构成完整 capability 矩阵。该 BYOK 配置是独立候选，不能继承 GitHub 托管 `auto` 候选的 10/2/0 结论。
 
 T026 以 10 verified、2 unsupported、0 unknown 完成候选能力表征。固定候选不兼容且 AT-23 不是 PASS；T027 不得在缺少另行冻结并验证的外部强制边界或兼容候选时启动。

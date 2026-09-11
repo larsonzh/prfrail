@@ -13,8 +13,13 @@
   reviewed conclusions are recorded under testdata/agent-runner/capability-probes/.
 
 .PARAMETER Scenario
-    Probe scenario: tool-deny | tool-deny-compound | tool-deny-indirect | tool-deny-alias | permission-failclosed |
-    network-deny | network-shell-deny | cancel | resume.
+        Probe scenario: provider-smoke | tool-deny | tool-deny-compound | tool-deny-indirect | tool-deny-alias |
+        permission-failclosed | network-deny | network-shell-deny | cancel | resume.
+
+.PARAMETER Provider
+    Model provider profile. github preserves the pinned T026 behavior. deepseek-anthropic uses
+    DeepSeek's Anthropic-compatible endpoint and requires COPILOT_PROVIDER_API_KEY or
+    DEEPSEEK_API_KEY only when -Run is supplied. Provider secrets are never written to artifacts.
 
 .PARAMETER Run
   Execute for real (potentially billable). Without it the runner is dry-run only and makes zero model calls.
@@ -34,8 +39,11 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory = $true)]
-    [ValidateSet('tool-deny', 'tool-deny-compound', 'tool-deny-indirect', 'tool-deny-alias', 'permission-failclosed', 'network-deny', 'network-shell-deny', 'cancel', 'resume')]
+    [ValidateSet('provider-smoke', 'tool-deny', 'tool-deny-compound', 'tool-deny-indirect', 'tool-deny-alias', 'permission-failclosed', 'network-deny', 'network-shell-deny', 'cancel', 'resume')]
     [string]$Scenario,
+
+    [ValidateSet('github', 'deepseek-anthropic')]
+    [string]$Provider = 'github',
 
     [switch]$Run,
     [switch]$AnalyzeOnly,
@@ -55,8 +63,26 @@ $RepoRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $SupervisorExePath = ''
 $CliConfigPath = Join-Path $HOME '.copilot\config.json'
 
+$ProviderConfig = if ($Provider -eq 'deepseek-anthropic') {
+    [ordered]@{
+        profile  = 'deepseek-anthropic'
+        type     = 'anthropic'
+        baseUrl  = 'https://api.deepseek.com/anthropic'
+        model    = 'deepseek-flash'
+        wireApi  = ''
+    }
+} else {
+    [ordered]@{
+        profile  = 'github'
+        type     = ''
+        baseUrl  = ''
+        model    = 'auto'
+        wireApi  = ''
+    }
+}
+
 $CommonFlags = @(
-    '--model', 'auto',
+    '--model', $ProviderConfig.model,
     '--output-format', 'json',
     '--stream', 'on',
     '--max-ai-credits', '30',
@@ -68,7 +94,7 @@ $CommonFlags = @(
     '--no-color',
     '--no-remote',
     '--no-remote-export',
-    '--secret-env-vars', 'GH_TOKEN,GITHUB_TOKEN,COPILOT_GITHUB_TOKEN',
+    '--secret-env-vars', 'GH_TOKEN,GITHUB_TOKEN,COPILOT_GITHUB_TOKEN,DEEPSEEK_API_KEY,COPILOT_PROVIDER_API_KEY,COPILOT_PROVIDER_BEARER_TOKEN',
     '--deny-url=https://*',
     '--deny-url=http://*'
 )
@@ -109,7 +135,8 @@ function ConvertTo-QuotedArg {
 function ConvertTo-RedactedText {
     param([string]$Text)
     if (-not $Text) { return $Text }
-    return [regex]::Replace($Text, '(gho|ghu|ghp|ghs|github_pat)_[A-Za-z0-9_]{8,}', '[REDACTED]')
+    $redacted = [regex]::Replace($Text, '(gho|ghu|ghp|ghs|github_pat)_[A-Za-z0-9_]{8,}', '[REDACTED]')
+    return [regex]::Replace($redacted, 'sk-[A-Za-z0-9_-]{8,}', '[REDACTED]')
 }
 
 function Resolve-ProbeRoot {
@@ -207,6 +234,21 @@ function Get-FileSha256 {
     return (Get-FileHash -Algorithm SHA256 -LiteralPath $Path).Hash.ToLowerInvariant()
 }
 
+function Get-ProviderConfigSha256 {
+    $text = 'profile=' + $ProviderConfig.profile + "`n" +
+        'type=' + $ProviderConfig.type + "`n" +
+        'baseUrl=' + $ProviderConfig.baseUrl + "`n" +
+        'model=' + $ProviderConfig.model + "`n" +
+        'wireApi=' + $ProviderConfig.wireApi + "`n"
+    $bytes = [Text.Encoding]::UTF8.GetBytes($text)
+    $sha256 = [Security.Cryptography.SHA256]::Create()
+    try {
+        return ([BitConverter]::ToString($sha256.ComputeHash($bytes))).Replace('-', '').ToLowerInvariant()
+    } finally {
+        $sha256.Dispose()
+    }
+}
+
 function Get-DescendantPid {
     param([int]$RootPid)
     $found = New-Object System.Collections.Generic.List[int]
@@ -261,6 +303,18 @@ function Get-ScenarioPlan {
     param([string]$Name)
     $plan = @{ expectedCalls = 0; invocations = @() }
     switch ($Name) {
+        'provider-smoke' {
+            $plan.invocations = @(@{
+                Label      = 'inv1'
+                Prompt     = 'Reply with exactly PONG and nothing else. Do not call any tool.'
+                Flags      = @('--available-tools=powershell', '--deny-tool=shell')
+                Name       = 'proofrail-provider-smoke'
+                CancelMode = $false
+                ResumeFrom = ''
+                ExpectedReply = 'PONG'
+            })
+            $plan.expectedCalls = 1
+        }
         'tool-deny' {
             $plan.invocations = @(@{
                 Label      = 'inv1'
@@ -431,13 +485,31 @@ function Invoke-CliOnce {
 
     $argList = ConvertTo-ArgList -Invocation $Invocation -Workspace $Workspace -SessionName $SessionName -UsagePath $usagePath -LogDir (Join-Path $InvDir 'logs')
 
-    $tokenNames = @('GH_TOKEN', 'GITHUB_TOKEN', 'COPILOT_GITHUB_TOKEN')
-    $savedTokens = @{}
-    foreach ($tokenName in $tokenNames) {
-        if (Test-Path ('Env:' + $tokenName)) {
-            $savedTokens[$tokenName] = [Environment]::GetEnvironmentVariable($tokenName, 'Process')
-            [Environment]::SetEnvironmentVariable($tokenName, $null, 'Process')
-        }
+    $environmentNames = @(
+        'GH_TOKEN', 'GITHUB_TOKEN', 'COPILOT_GITHUB_TOKEN',
+        'DEEPSEEK_API_KEY',
+        'COPILOT_PROVIDER_TYPE', 'COPILOT_PROVIDER_BASE_URL', 'COPILOT_PROVIDER_API_KEY',
+        'COPILOT_PROVIDER_BEARER_TOKEN', 'COPILOT_PROVIDER_MODEL_ID', 'COPILOT_PROVIDER_WIRE_MODEL',
+        'COPILOT_PROVIDER_WIRE_API', 'COPILOT_MODEL'
+    )
+    $savedEnvironment = @{}
+    foreach ($environmentName in $environmentNames) {
+        $savedEnvironment[$environmentName] = [Environment]::GetEnvironmentVariable($environmentName, 'Process')
+    }
+    $providerApiKey = ''
+    if ($Provider -eq 'deepseek-anthropic') {
+        $providerApiKey = $savedEnvironment['COPILOT_PROVIDER_API_KEY']
+        if (-not $providerApiKey) { $providerApiKey = $savedEnvironment['DEEPSEEK_API_KEY'] }
+        if (-not $providerApiKey) { throw 'DeepSeek execution requires COPILOT_PROVIDER_API_KEY or DEEPSEEK_API_KEY in the process environment.' }
+    }
+    foreach ($environmentName in $environmentNames) {
+        [Environment]::SetEnvironmentVariable($environmentName, $null, 'Process')
+    }
+    if ($Provider -eq 'deepseek-anthropic') {
+        [Environment]::SetEnvironmentVariable('COPILOT_PROVIDER_TYPE', $ProviderConfig.type, 'Process')
+        [Environment]::SetEnvironmentVariable('COPILOT_PROVIDER_BASE_URL', $ProviderConfig.baseUrl, 'Process')
+        [Environment]::SetEnvironmentVariable('COPILOT_PROVIDER_API_KEY', $providerApiKey, 'Process')
+        [Environment]::SetEnvironmentVariable('COPILOT_MODEL', $ProviderConfig.model, 'Process')
     }
     $configSha256Before = Get-FileSha256 $CliConfigPath
     $startedAt = Get-Date
@@ -471,8 +543,8 @@ function Invoke-CliOnce {
         }
         $null = $proc.Handle
     } finally {
-        foreach ($tokenName in $savedTokens.Keys) {
-            [Environment]::SetEnvironmentVariable($tokenName, $savedTokens[$tokenName], 'Process')
+        foreach ($environmentName in $savedEnvironment.Keys) {
+            [Environment]::SetEnvironmentVariable($environmentName, $savedEnvironment[$environmentName], 'Process')
         }
     }
 
@@ -549,6 +621,8 @@ function Invoke-CliOnce {
         supervisorExitCode = $supervisorExitCode
         configSha256Before = $configSha256Before
         configSha256After = $configSha256After
+        providerConfig = $ProviderConfig
+        providerConfigSha256 = Get-ProviderConfigSha256
     }
     Write-Utf8NoBom (Join-Path $InvDir 'meta.json') ($meta | ConvertTo-Json -Depth 5)
     Write-Output ('[{0}] exit={1} timeout={2} cancelled={3} marker={4} duration={5}s' -f $Invocation.Label, $exitCode, $timeoutHit, $cancelled, $markerSeen, $meta.durationSec)
@@ -790,6 +864,19 @@ function Test-ScenarioAssertion {
     }
 
     switch ($Name) {
+        'provider-smoke' {
+            $assertions.completedCleanly = $inv1.exitCode -eq 0 -and -not $inv1.timeoutHit -and
+                $inv1.resultSeen -and $inv1.resultUsage.exitCode -eq 0
+            $assertions.noTools = @($inv1.toolCalls).Count -eq 0
+            $assertions.expectedReply = @($inv1.assistantReplies).Count -gt 0 -and
+                $inv1.assistantReplies[-1] -ceq $inv1.expectedReply
+            if ($assertions.completedCleanly -and $assertions.noTools -and $assertions.expectedReply) {
+                $assertions.verdict = 'supported'
+            } else {
+                $assertions.verdict = 'inconclusive'
+                $reasons.Add('Provider smoke requires a clean result, no tool calls, and the exact expected reply.')
+            }
+        }
         'tool-deny' {
             $allowed = Test-ExecutedSuccess $inv1.toolCalls 'Get-Location'
             $attempt = Test-AnyAttempt $inv1.toolCalls 'Get-ChildItem'
@@ -1057,6 +1144,8 @@ function Invoke-ProbeAnalysis {
         generatedAtUtc  = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ss.fffZ')
         probeRoot       = $Root
         pinnedExe       = @{ path = $ExePath; sha256 = $PinnedExeSha256; version = $ExpectedVersion }
+        provider        = $ProviderConfig
+        providerConfigSha256 = Get-ProviderConfigSha256
         invocations     = $facts
         assertions      = $evaluation.assertions
         reasons         = $evaluation.reasons
@@ -1085,8 +1174,9 @@ if ($TimeoutSec -le 0) {
     if ($Scenario -eq 'resume') { $TimeoutSec = 180 } else { $TimeoutSec = 240 }
 }
 
-Write-Output ('Scenario: {0}; expected model calls: {1} (about 1 premium request each)' -f $Scenario, $plan.expectedCalls)
+Write-Output ('Scenario: {0}; expected CLI invocations: {1} (one invocation may make multiple provider requests)' -f $Scenario, $plan.expectedCalls)
 Write-Output ('Pinned candidate: {0}' -f $ExePath)
+Write-Output ('Provider: {0}; model: {1}; config sha256: {2}' -f $ProviderConfig.profile, $ProviderConfig.model, (Get-ProviderConfigSha256))
 
 $pin = Test-ExePin
 if (-not $pin.exeExists) { throw "Pinned native executable not found: $ExePath" }

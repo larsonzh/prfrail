@@ -24,6 +24,18 @@ $resumeDefinition = $probeAst.Find({
 }, $true)
 . ([scriptblock]::Create($resumeDefinition.Extent.Text))
 
+$smokeFact = @{
+    eventsValid=$true; promptMatched=$true; exitCode=0; timeoutHit=$false
+    resultSeen=$true; resultUsage=@{exitCode=0}; toolCalls=@()
+    assistantReplies=@('PONG'); expectedReply='PONG'
+}
+$evaluation = Test-ScenarioAssertion -Name 'provider-smoke' -Facts @($smokeFact)
+if ($evaluation.assertions.verdict -ne 'supported') { throw 'Provider smoke success not recognized.' }
+$smokeFact.assistantReplies = @('not-pong')
+$evaluation = Test-ScenarioAssertion -Name 'provider-smoke' -Facts @($smokeFact)
+if ($evaluation.assertions.verdict -ne 'inconclusive') { throw 'Provider smoke mismatch accepted.' }
+Write-Output 'PASS provider smoke requires an exact reply and clean no-tool result.'
+
 $checked = 0
 foreach ($scenario in @('tool-deny', 'permission-failclosed', 'network-deny')) {
     foreach ($outcome in @('missing', 'error', 'executed')) {
@@ -196,7 +208,7 @@ foreach ($case in @('valid', 'first-exit', 'first-timeout', 'first-no-result', '
     Write-Output "PASS resume/$case => $expected"
 }
 
-foreach ($functionName in @('Write-Utf8NoBom', 'Get-FileSha256', 'Invoke-CliOnce', 'Get-ScenarioPlan')) {
+foreach ($functionName in @('Write-Utf8NoBom', 'Get-FileSha256', 'Get-ProviderConfigSha256', 'ConvertTo-RedactedText', 'Invoke-CliOnce', 'Get-ScenarioPlan')) {
     $definition = $probeAst.Find({
         param($node)
         $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -eq $functionName
@@ -204,6 +216,11 @@ foreach ($functionName in @('Write-Utf8NoBom', 'Get-FileSha256', 'Invoke-CliOnce
     if (-not $definition) { throw "Missing function: $functionName" }
     . ([scriptblock]::Create($definition.Extent.Text))
 }
+$smokePlan = Get-ScenarioPlan -Name 'provider-smoke'
+if ($smokePlan.expectedCalls -ne 1 -or $smokePlan.invocations[0].ExpectedReply -cne 'PONG') {
+    throw 'Provider smoke plan is not pinned to one exact-reply call.'
+}
+Write-Output 'PASS provider smoke plan is pinned to one call.'
 $plan = Get-ScenarioPlan -Name 'tool-deny'
 $flags = $plan.invocations[0].Flags
 foreach ($flag in @('--available-tools=powershell', '--allow-tool=shell(Get-Location)', '--deny-tool=shell(Get-ChildItem)')) {
@@ -227,6 +244,9 @@ foreach ($flag in @('--allow-tool=shell', '--deny-url=https://example.com')) {
     if ($networkShellPlan.invocations[0].Flags -notcontains $flag) { throw "Shell network plan missing: $flag" }
 }
 Write-Output 'PASS exact URL denial is pinned in the network plan.'
+$redacted = ConvertTo-RedactedText 'key=sk-test-secret-value-12345678 token=ghp_1234567890abcdef'
+if ($redacted.Contains('sk-test-secret') -or $redacted.Contains('ghp_')) { throw 'Provider or GitHub token redaction failed.' }
+Write-Output 'PASS provider and GitHub token redaction.'
 function ConvertTo-ArgList {
     param($Invocation, $Workspace, $SessionName, $UsagePath, $LogDir)
     if (-not $Workspace -or -not $SessionName -or -not $UsagePath -or -not $LogDir) {
@@ -236,6 +256,9 @@ function ConvertTo-ArgList {
 }
 $ExePath = Join-Path $env:SystemRoot 'System32\cmd.exe'
 $CommonFlags = @()
+$Provider = 'github'
+$ProviderConfig = [ordered]@{profile='github';type='';baseUrl='';model='auto';wireApi=''}
+$null = $Provider, $ProviderConfig
 if (-not (Test-Path -LiteralPath $ExePath) -or $CommonFlags.Count -ne 0) {
     throw 'Local process tests require cmd.exe and no CLI flags.'
 }
@@ -251,6 +274,30 @@ try {
             throw "OS exit capture expected $expectedExitCode, got '$($meta.exitCode)'."
         }
         Write-Output "PASS local process OS exit code $expectedExitCode"
+    }
+
+    $savedDeepSeek = [Environment]::GetEnvironmentVariable('DEEPSEEK_API_KEY', 'Process')
+    $savedProviderKey = [Environment]::GetEnvironmentVariable('COPILOT_PROVIDER_API_KEY', 'Process')
+    $fakeKey = 'sk-test-secret-value-12345678'
+    try {
+        [Environment]::SetEnvironmentVariable('DEEPSEEK_API_KEY', $fakeKey, 'Process')
+        [Environment]::SetEnvironmentVariable('COPILOT_PROVIDER_API_KEY', $null, 'Process')
+        $Provider = 'deepseek-anthropic'
+        $ProviderConfig = [ordered]@{profile='deepseek-anthropic';type='anthropic';baseUrl='https://api.deepseek.com/anthropic';model='deepseek-flash';wireApi=''}
+        $invDir = Join-Path $testRoot 'deepseek-secret'
+        $invocation = @{ Label = 'local-deepseek'; Prompt = ''; Flags = @(); ResumeId = ''; CancelMode = $false; ExpectedExitCode = 0 }
+        $null = Invoke-CliOnce -Invocation $invocation -InvDir $invDir -Workspace $testRoot -SessionName 'local-deepseek-test' -TimeoutSec 10 -CancelAfterSec 1
+        $metaText = [IO.File]::ReadAllText((Join-Path $invDir 'meta.json'), [Text.Encoding]::UTF8)
+        if ($metaText.Contains($fakeKey)) { throw 'Provider key leaked into probe metadata.' }
+        if ([Environment]::GetEnvironmentVariable('DEEPSEEK_API_KEY', 'Process') -cne $fakeKey) { throw 'DeepSeek key alias was not restored.' }
+        $restoredProviderKey = [Environment]::GetEnvironmentVariable('COPILOT_PROVIDER_API_KEY', 'Process')
+        if (-not [string]::IsNullOrEmpty($restoredProviderKey)) { throw 'Provider key environment was not restored.' }
+        Write-Output 'PASS DeepSeek provider key is not persisted and environment is restored.'
+    } finally {
+        [Environment]::SetEnvironmentVariable('DEEPSEEK_API_KEY', $savedDeepSeek, 'Process')
+        [Environment]::SetEnvironmentVariable('COPILOT_PROVIDER_API_KEY', $savedProviderKey, 'Process')
+        $Provider = 'github'
+        $ProviderConfig = [ordered]@{profile='github';type='';baseUrl='';model='auto';wireApi=''}
     }
 } finally {
     if (Test-Path -LiteralPath $testRoot) { Remove-Item -LiteralPath $testRoot -Recurse -Force }
