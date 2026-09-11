@@ -13,6 +13,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/larsonzh/prfrail/internal/adapters"
 	"github.com/larsonzh/prfrail/internal/chain"
 	"github.com/larsonzh/prfrail/internal/evidence"
 )
@@ -30,6 +31,8 @@ type CLI struct {
 	stdin             io.Reader
 	stopRun           func(context.Context, string, string) ([]string, error)
 	appendInteraction func(string, chain.OperatorInteractionRecord) error
+	secretManager     adapters.AISecretManager
+	readSecret        func() ([]byte, error)
 }
 
 type commandResponse struct {
@@ -43,7 +46,14 @@ type commandResponse struct {
 }
 
 func NewCLI(version string) CLI {
-	cli := CLI{version: version, now: time.Now, getwd: os.Getwd, stdin: os.Stdin}
+	cli := CLI{
+		version:       version,
+		now:           time.Now,
+		getwd:         os.Getwd,
+		stdin:         os.Stdin,
+		secretManager: adapters.NewPlatformAISecretManager(),
+		readSecret:    readTerminalSecret,
+	}
 	cli.stopRun = newDefaultStopRun(cli.getwd)
 	cli.appendInteraction = appendOperatorInteractionRecord
 	return cli
@@ -72,6 +82,8 @@ func (cli CLI) Execute(ctx context.Context, args []string, stdout, stderr io.Wri
 		return cli.executeInteractions(args[1:], stdout, stderr)
 	case "cost":
 		return cli.executeCost(args[1:], stdout, stderr)
+	case "secret":
+		return cli.executeSecret(ctx, args[1:], stdout, stderr)
 	case "run":
 		return cli.executeRun(ctx, args[1:], stdout, stderr)
 	case "report":
@@ -370,7 +382,7 @@ func resolvePathFromCWD(cwd, value string) (string, error) {
 
 func writeMainUsage(output io.Writer) {
 	fmt.Fprintln(output, "usage: prfrail <command> [options]")
-	fmt.Fprintln(output, "commands: version, init, validate, preview, approvals, interactions, cost, run, report, config explain")
+	fmt.Fprintln(output, "commands: version, init, validate, preview, approvals, interactions, cost, secret, run, report, config explain")
 }
 
 func writeFile(path string, content []byte, force bool) error {
