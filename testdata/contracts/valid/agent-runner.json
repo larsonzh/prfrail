@@ -74,6 +74,9 @@
         "probeId": "probe-one",
         "adapterId": "fixture-agent",
         "probedAt": "2026-09-10T02:00:00.000Z",
+        "os": "windows",
+        "arch": "amd64",
+        "platformHash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         "executableHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
         "version": "fixture-agent 1.0.0",
         "configHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
@@ -95,6 +98,34 @@
         "evidence": ["sha256:4444444444444444444444444444444444444444444444444444444444444444"]
       },
       "recordHash": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+    }
+  },
+  {
+    "fixtureId": "agent-runner-enforcement-valid",
+    "schema": "agent-runner-enforcement.schema.json",
+    "expected": "accept",
+    "rejectionLayer": "schema",
+    "reason": "External enforcement binds the candidate, platform, boundary configuration, and runtime evidence for both controls",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "enforcement": {
+        "kind": "agent-runner-enforcement",
+        "enforcementId": "enforcement-one",
+        "providerId": "windows-sandbox",
+        "probedAt": "2026-09-11T06:00:00.000Z",
+        "capabilityRecordHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "executableHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "configHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+        "platformHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+        "enforcementConfigHash": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+        "disposition": "verified",
+        "matrix": {
+          "toolControl": {"status": "verified", "evidence": ["sha256:6666666666666666666666666666666666666666666666666666666666666666"]},
+          "networkControl": {"status": "verified", "evidence": ["sha256:7777777777777777777777777777777777777777777777777777777777777777"]}
+        },
+        "evidence": ["sha256:8888888888888888888888888888888888888888888888888888888888888888"]
+      },
+      "recordHash": "sha256:9999999999999999999999999999999999999999999999999999999999999999"
     }
   },
   {

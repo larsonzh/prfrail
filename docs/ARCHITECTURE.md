@@ -30,6 +30,8 @@ flowchart TD
 
 CLI Agent 经 `AgentRunner` 成为正式 AI 执行面：它在隔离 run-workspace 内使用自身代理循环检索、读写、运行允许工具并迭代；ProofRail 不复刻该工具循环，而是约束工作区、target、权限、网络、预算与进程，捕获前后 manifest/diff，并独立运行 gates/review。Agent 完成声明和退出 0 都不是 PASS。`managed-change-set` 仍可用于确定性结构化修改；只有通过 T026 能力探针和契约冻结的 CLI Agent 才能选择 isolated-workspace。
 
+AgentRunner 的候选与执行策略按规范化 `os`、`arch` 和平台包/构建摘要选择，不能按 CLI 版本号跨平台复用 capability。共享核心只消费平台事实、能力矩阵和 fail-closed 结果，不包含 PowerShell、Job Object、POSIX signal、路径分隔符或特定沙箱命令；环境发现、进程监督、文件系统及网络强制由 adapters/guard 下的窄平台实现承担。当前生产目标仅为 `windows/amd64`；Windows 版本完成后，`linux/amd64` 必须在 Ubuntu 24.04 VM 或经证明等价的环境中独立通过。macOS、ARM 及其他 OS/架构组合只保留扩展点，暂不进入支持矩阵或承诺排期，后续可在原生环境或 GitHub Actions runner 上独立探测。编译通过、模拟运行或宿主机上的非等价虚拟环境只能提供开发反馈，不能提升平台能力状态。
+
 SessionBridge `silent`/`visible`/`auto` 均不是 AgentRunner：silent 用于无工具分析或变更建议，visible 可桥接受监督黑箱候选，auto 不进入正式流程。黑箱模式由操作员监督外部 Agent 并显式归还隔离 workspace；ProofRail 只从磁盘重建候选并保证后置扫描、独立 gates/review，不保证不可观测过程。SessionBridge 对话、UI 投递和历史都不构成工具执行、授权、完成或审计事实，也不得在 AgentRunner 失败后自动接管写入。
 
 AI 需要人工输入时，AgentRunner 或辅助 adapter 只接收结构化 `operator-action-required` 并交给 chain；chain 持久化交互请求并进入 `WAITING_FOR_OPERATOR`，console 从控制 API 展示待办和允许响应。操作员响应经 chain 校验主体、run/task/attempt、workspace/session、上下文摘要和权限后，写入可重放记录；需要人工写入时转入既有 handoff。恢复 CLI Agent 前重新验证原会话与进程已知状态；无法证明时创建新 attempt。SessionBridge 的 `@sbr-review` 只可用于独立诊断或人工测试。
@@ -48,7 +50,7 @@ AI 需要人工输入时，AgentRunner 或辅助 adapter 只接收结构化 `ope
 | guard | 受管进程身份、停止与存活证据 | 仅凭 PID/租约过期宣告停机 | 子进程/PID 重用 |
 | tickets | 分类、去重、lease、attempt/指纹预算 | 自行重启进程/提升候选 | 重放/耗尽 |
 | repair | Prepare/Inspect/Validate/Promote 协调 | 直接修补正式定义、扩大权限 | 陈旧候选/哈希变化 |
-| adapters | AgentRunner/辅助消息协议映射、能力探测、session/request/process 映射 | 回执覆盖业务状态、私有 transcript 成为权威、GUI/`@sbr-review` 兜底 | CLI 能力矩阵、停机/恢复、辅助通道降级边界 |
+| adapters | AgentRunner/辅助消息协议映射、平台发现与策略选择、能力探测、session/request/process 映射 | 跨平台复用 capability、回执覆盖业务状态、私有 transcript 成为权威、GUI/`@sbr-review` 兜底 | CLI 平台/能力矩阵、停机/恢复、辅助通道降级边界 |
 | evidence | 编码/哈希、事件链、receipt、交互记录、离线检查 | 让执行面覆写证据、存秘密 | 缺失/重排/篡改/重放 |
 
 端口由消费模块定义：AgentPort、GateRunner、ProcessSupervisor、Clock、ObjectStore 是责任名，Go 签名在对应任务细化后冻结，不是现有导出 API。`cmd` 装配端口实现；核心不得 import `internal/adapters` 或 `console`。拒绝为了共享几个字段创建无所有者的“大 common 包”。

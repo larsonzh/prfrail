@@ -40,6 +40,9 @@ type AgentRunnerCapability struct {
 	ProbeID        string                      `json:"probeId"`
 	AdapterID      string                      `json:"adapterId"`
 	ProbedAt       string                      `json:"probedAt"`
+	OS             string                      `json:"os"`
+	Arch           string                      `json:"arch"`
+	PlatformHash   string                      `json:"platformHash"`
 	ExecutableHash string                      `json:"executableHash"`
 	Version        string                      `json:"version"`
 	ConfigHash     string                      `json:"configHash"`
@@ -143,8 +146,8 @@ func validateAgentRunnerCapability(capability AgentRunnerCapability) error {
 	if _, err := time.Parse(TimestampLayout, capability.ProbedAt); err != nil {
 		return fmt.Errorf("%w: invalid timestamp", ErrInvalidAgentRunnerCapability)
 	}
-	if !evidence.ValidHash(capability.ExecutableHash) || !evidence.ValidHash(capability.ConfigHash) || capability.Version == "" || len(capability.Version) > 128 || !validSortedUniqueHashes(capability.Evidence) {
-		return fmt.Errorf("%w: invalid executable, config, version, or evidence", ErrInvalidAgentRunnerCapability)
+	if !validAgentRunnerPlatform(capability.OS, capability.Arch) || !evidence.ValidHash(capability.PlatformHash) || !evidence.ValidHash(capability.ExecutableHash) || !evidence.ValidHash(capability.ConfigHash) || capability.Version == "" || len(capability.Version) > 128 || !validSortedUniqueHashes(capability.Evidence) {
+		return fmt.Errorf("%w: invalid platform, executable, config, version, or evidence", ErrInvalidAgentRunnerCapability)
 	}
 	allVerified := true
 	for _, finding := range agentRunnerCapabilityFindings(&capability.Matrix) {
@@ -160,6 +163,12 @@ func validateAgentRunnerCapability(capability AgentRunnerCapability) error {
 		return fmt.Errorf("%w: invalid disposition", ErrInvalidAgentRunnerCapability)
 	}
 	return nil
+}
+
+func validAgentRunnerPlatform(osName, arch string) bool {
+	validOS := osName == "windows" || osName == "linux" || osName == "darwin"
+	validArch := arch == "amd64" || arch == "arm64"
+	return validOS && validArch
 }
 
 func validAgentRunnerCapabilityFinding(finding AgentRunnerCapabilityFinding) bool {

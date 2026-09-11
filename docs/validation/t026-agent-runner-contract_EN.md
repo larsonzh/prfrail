@@ -6,7 +6,7 @@ Date: 2026-09-10; probe-runner audit completed 2026-09-11. Verdict: `T026 COMPLE
 
 ## Completed Scope
 
-1. Four Schemas freeze the request, capability, event, and completion wire formats. The contract gate now covers 34 Schemas, 96 cases carried by 14 fixture files, and two canonical vectors.
+1. Four base Schemas freeze the request, capability, event, and completion wire formats. A later T027-prerequisite slice adds the enforcement Schema; the current contract gate covers 35 Schemas, 98 cases carried by 14 fixture files, and three canonical vectors.
 2. `internal/adapters/agent_runner*.go` implements RFC 8785 domain-separated hashes, strict decoding, sorted sets, create/resume constraints, request/event/completion binding, and idempotency/conflict indexes reconstructable from durable records.
 3. Capability uses a fixed 12-entry matrix and is compatible only when every entry has runtime evidence and is verified. Events lock eventId, session/sequence, and request/session so one request cannot drift across sessions. Completions lock both completionId and requestId; completed proves only external execution end, process-tree stop, complete logs/usage, and captured output manifest, never task PASS. The pinned capability test also reads the referenced evidence file and verifies its byte SHA-256 so the record cannot cite missing or stale evidence.
 
@@ -36,7 +36,9 @@ Resume premium snapshots 1 and 2 are cumulative for the same session and count a
 
 Each stdout/meta/usage/report SHA-256 and event count is retained in `sixInvocationBatch` in github-copilot-cli-windows-evidence.json; missing cancellation usage is explicitly null. The capability record binds the cumulative evidence byte digest and new canonical recordHash. Original reports are unchanged. Previously verified usage/processTreeStop cover normal completed probes, not cancellation safety.
 
-The final machine record binds evidence-file digest `sha256:91d2c7e00c03bd2ca68dd0a623be39ea4611422ce8036097c88711093f63c2f6` with canonical recordHash `sha256:5d0ba197ef12c867eee00c40e5063473e133053f5e7b0b9ebdb8c8f481062147`. T026 is complete; the pinned candidate remains blocked by two unsupported capabilities. Before T027, either an external enforcement boundary covering both bypasses must be separately frozen and verified, or a compatible candidate must be selected and reprobed. AT-23 remains blocked.
+The final machine record binds evidence-file digest `sha256:91d2c7e00c03bd2ca68dd0a623be39ea4611422ce8036097c88711093f63c2f6`. A later cross-platform prerequisite revision adds `windows/amd64` and the platform-package digest to the capability body, so the current canonical recordHash is `sha256:a6cee8307d0ce96f76e00ebef4b13c493c6d9da6e6c00a7ab36cf77ba069ff9e`; the capability facts are unchanged. T026 is complete; the pinned candidate remains blocked by two unsupported capabilities. Before T027, either an external enforcement boundary covering both bypasses must be separately frozen and verified, or a compatible candidate must be selected and reprobed. AT-23 remains blocked.
+
+A subsequent prerequisite slice on 2026-09-11 freezes the independent `agent-runner-enforcement` wire, RFC 8785 domain-separated hash, candidate/executable/config/platform bindings, explicit freshness policy, replay conflicts, and per-control combined admission. This slice defines and validates only the fail-closed boundary: the current ten/two candidate remains blocked without enforcement, and no real sandbox has been implemented, verified, or claimed. T027 and AT-23 remain blocked.
 
 ## Historical Correction (2026-09-11 03:26)
 
@@ -91,7 +93,7 @@ Artifact SHA-256: stdout.jsonl (65,040 bytes), 66f47ee43dfffbed6a2e2f6ac3b196972
 1. `go build ./...`: passed.
 2. `go vet ./...`: passed.
 3. `go test -count=1 ./...`: passed, with 13 tested packages and two command packages without tests.
-4. `node tools/contracts/contracts.test.js`: passed, 2/2; 34 Schemas, 96 cases, and two canonical vectors passed.
+4. `node tools/contracts/contracts.test.js`: passed, 2/2; 35 Schemas, 98 cases, and three canonical vectors passed.
 5. `git diff --check`: passed.
 
 ## Historical Remaining Capability Probe Protocol (Now Executed)

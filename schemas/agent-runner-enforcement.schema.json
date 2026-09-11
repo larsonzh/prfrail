@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://proofrail.dev/schemas/v1/agent-runner-enforcement.schema.json",
+  "title": "ProofRail AgentRunner external enforcement report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "enforcement", "recordHash"],
+  "properties": {
+    "schemaVersion": {"const": "1.0.0"},
+    "enforcement": {"$ref": "#/$defs/enforcement"},
+    "recordHash": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "id": {"type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"},
+    "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "timestamp": {"type": "string", "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$"},
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "evidence"],
+      "properties": {
+        "status": {"enum": ["verified", "unsupported", "unknown"]},
+        "evidence": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/sha256"}}
+      }
+    },
+    "enforcement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "enforcementId", "providerId", "probedAt", "capabilityRecordHash", "executableHash", "configHash", "platformHash", "enforcementConfigHash", "disposition", "matrix", "evidence"],
+      "properties": {
+        "kind": {"const": "agent-runner-enforcement"},
+        "enforcementId": {"$ref": "#/$defs/id"},
+        "providerId": {"$ref": "#/$defs/id"},
+        "probedAt": {"$ref": "#/$defs/timestamp"},
+        "capabilityRecordHash": {"$ref": "#/$defs/sha256"},
+        "executableHash": {"$ref": "#/$defs/sha256"},
+        "configHash": {"$ref": "#/$defs/sha256"},
+        "platformHash": {"$ref": "#/$defs/sha256"},
+        "enforcementConfigHash": {"$ref": "#/$defs/sha256"},
+        "disposition": {"enum": ["verified", "blocked"]},
+        "matrix": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["toolControl", "networkControl"],
+          "properties": {
+            "toolControl": {"$ref": "#/$defs/finding"},
+            "networkControl": {"$ref": "#/$defs/finding"}
+          }
+        },
+        "evidence": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/sha256"}}
+      }
+    }
+  }
+}

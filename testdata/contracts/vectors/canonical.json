@@ -38,5 +38,28 @@
     "domainSeparator": "proofrail:state-event:1\n",
     "canonical": "{\"actor\":{\"id\":\"proofrail\",\"type\":\"system\"},\"entity\":{\"kind\":\"chain\",\"runId\":\"run-001\"},\"eventId\":\"event-001\",\"fromState\":\"NONE\",\"inputEvidence\":[],\"occurredAt\":\"2026-09-06T12:34:56.789Z\",\"previousEventHash\":null,\"reason\":{\"code\":\"run-created\"},\"runId\":\"run-001\",\"sequence\":1,\"toState\":\"CREATED\"}",
     "digest": "sha256:522dd307620e8aad5598045aba6a29d5bcbf60c8ff2d0945c70c4b480aa9502e"
+  },
+  {
+    "vectorId": "agent-runner-enforcement-001",
+    "input": {
+      "kind": "agent-runner-enforcement",
+      "enforcementId": "enforcement-vector-one",
+      "providerId": "fixture-boundary",
+      "probedAt": "2026-09-11T06:00:00.000Z",
+      "capabilityRecordHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+      "executableHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+      "configHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+      "platformHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+      "enforcementConfigHash": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+      "disposition": "verified",
+      "matrix": {
+        "toolControl": {"status": "verified", "evidence": ["sha256:6666666666666666666666666666666666666666666666666666666666666666"]},
+        "networkControl": {"status": "verified", "evidence": ["sha256:7777777777777777777777777777777777777777777777777777777777777777"]}
+      },
+      "evidence": ["sha256:8888888888888888888888888888888888888888888888888888888888888888"]
+    },
+    "domainSeparator": "proofrail:agent-runner-enforcement:1\n",
+    "canonical": "{\"capabilityRecordHash\":\"sha256:1111111111111111111111111111111111111111111111111111111111111111\",\"configHash\":\"sha256:3333333333333333333333333333333333333333333333333333333333333333\",\"disposition\":\"verified\",\"enforcementConfigHash\":\"sha256:5555555555555555555555555555555555555555555555555555555555555555\",\"enforcementId\":\"enforcement-vector-one\",\"evidence\":[\"sha256:8888888888888888888888888888888888888888888888888888888888888888\"],\"executableHash\":\"sha256:2222222222222222222222222222222222222222222222222222222222222222\",\"kind\":\"agent-runner-enforcement\",\"matrix\":{\"networkControl\":{\"evidence\":[\"sha256:7777777777777777777777777777777777777777777777777777777777777777\"],\"status\":\"verified\"},\"toolControl\":{\"evidence\":[\"sha256:6666666666666666666666666666666666666666666666666666666666666666\"],\"status\":\"verified\"}},\"platformHash\":\"sha256:4444444444444444444444444444444444444444444444444444444444444444\",\"probedAt\":\"2026-09-11T06:00:00.000Z\",\"providerId\":\"fixture-boundary\"}",
+    "digest": "sha256:616cfa42bf0794b3ebbd0cf0d947ecbb7332bd9ec28fa7784a00b26c72e58b68"
   }
 ]

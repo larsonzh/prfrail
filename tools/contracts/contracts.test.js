@@ -23,7 +23,7 @@ function catalogPaths() {
 
 test("all schemas compile and every catalog matches its independent expectation", () => {
   const { ajv, schemaFiles } = createValidator(schemaDir);
-  assert.equal(schemaFiles.length, 34);
+  assert.equal(schemaFiles.length, 35);
   const fixtureIds = new Set();
   const acceptedSchemas = new Set();
   const rejectedSchemas = new Set();
@@ -61,7 +61,7 @@ test("all schemas compile and every catalog matches its independent expectation"
       fixtureCount += 1;
     }
   }
-  assert.equal(fixtureCount, 96);
+  assert.equal(fixtureCount, 98);
   assert.deepEqual([...acceptedSchemas].sort(), schemaFiles);
   assert.deepEqual([...rejectedSchemas].sort(), schemaFiles);
 });
@@ -71,7 +71,7 @@ test("canonical vectors reproduce the frozen bytes and digests", async () => {
   const vectors = readJson(
     path.join(contractsDir, "vectors", "canonical.json"),
   );
-  assert.equal(vectors.length, 2);
+  assert.equal(vectors.length, 3);
   for (const vector of vectors) {
     const canonical = canonicalize(vector.input);
     assert.equal(

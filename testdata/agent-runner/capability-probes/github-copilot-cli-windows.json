@@ -5,6 +5,9 @@
     "probeId": "probe-copilot-cli-windows-20260911-final",
     "adapterId": "github-copilot-cli",
     "probedAt": "2026-09-10T21:11:21.198Z",
+    "os": "windows",
+    "arch": "amd64",
+    "platformHash": "sha256:d6d07e0943462974bba6380170ca6c6d147e6e609b2cc5ceff165f8f16faa5ed",
     "executableHash": "sha256:d3f3bb7b8bbf68357ad29f514a179d09f76135483d8bfb643131b8600f671ee2",
     "version": "1.0.83",
     "configHash": "sha256:e315bf9ae8a64d9a0c06c3263555fd01a8494f1167bcbb0296f2506c1b5a859b",
@@ -25,5 +28,5 @@
     },
     "evidence": ["sha256:91d2c7e00c03bd2ca68dd0a623be39ea4611422ce8036097c88711093f63c2f6"]
   },
-  "recordHash": "sha256:5d0ba197ef12c867eee00c40e5063473e133053f5e7b0b9ebdb8c8f481062147"
+  "recordHash": "sha256:a6cee8307d0ce96f76e00ebef4b13c493c6d9da6e6c00a7ab36cf77ba069ff9e"
 }

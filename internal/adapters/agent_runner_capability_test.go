@@ -20,6 +20,9 @@ func agentRunnerCapability() AgentRunnerCapability {
 		ProbeID:        "probe-one",
 		AdapterID:      "fixture-agent",
 		ProbedAt:       "2026-09-10T02:00:00.000Z",
+		OS:             "windows",
+		Arch:           "amd64",
+		PlatformHash:   platformHash,
 		ExecutableHash: queueHashOne,
 		Version:        "fixture-agent 1.0.0",
 		ConfigHash:     queueHashTwo,
@@ -55,6 +58,22 @@ func TestAgentRunnerCapabilityDispositionFailsClosed(t *testing.T) {
 	report.Matrix.NetworkControl.Evidence = []string{queueHashThree, queueHashThree}
 	if _, err := NewAgentRunnerCapabilityRecord(report); !errors.Is(err, ErrInvalidAgentRunnerCapability) {
 		t.Fatalf("expected duplicate evidence rejection, got %v", err)
+	}
+}
+
+func TestAgentRunnerCapabilityRejectsInvalidPlatform(t *testing.T) {
+	for name, mutate := range map[string]func(*AgentRunnerCapability){
+		"os":   func(report *AgentRunnerCapability) { report.OS = "freebsd" },
+		"arch": func(report *AgentRunnerCapability) { report.Arch = "386" },
+		"hash": func(report *AgentRunnerCapability) { report.PlatformHash = "invalid" },
+	} {
+		t.Run(name, func(t *testing.T) {
+			report := agentRunnerCapability()
+			mutate(&report)
+			if _, err := NewAgentRunnerCapabilityRecord(report); !errors.Is(err, ErrInvalidAgentRunnerCapability) {
+				t.Fatalf("invalid platform accepted: %v", err)
+			}
+		})
 	}
 }
 
@@ -101,6 +120,9 @@ func TestPinnedAgentRunnerCapabilityReport(t *testing.T) {
 	}
 	if _, err := DecodeAgentRunnerCapabilityRecord(wire); err != nil {
 		t.Fatal(err)
+	}
+	if stored.Capability.OS != "windows" || stored.Capability.Arch != "amd64" || stored.Capability.PlatformHash != "sha256:d6d07e0943462974bba6380170ca6c6d147e6e609b2cc5ceff165f8f16faa5ed" {
+		t.Fatalf("unexpected pinned platform: %s/%s %s", stored.Capability.OS, stored.Capability.Arch, stored.Capability.PlatformHash)
 	}
 	evidenceWire, err := os.ReadFile(filepath.Join(directory, "github-copilot-cli-windows-evidence.json"))
 	if err != nil {

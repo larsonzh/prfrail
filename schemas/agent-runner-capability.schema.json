@@ -26,12 +26,15 @@
     "capability": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "probeId", "adapterId", "probedAt", "executableHash", "version", "configHash", "disposition", "matrix", "evidence"],
+      "required": ["kind", "probeId", "adapterId", "probedAt", "os", "arch", "platformHash", "executableHash", "version", "configHash", "disposition", "matrix", "evidence"],
       "properties": {
         "kind": {"const": "agent-runner-capability"},
         "probeId": {"$ref": "#/$defs/id"},
         "adapterId": {"$ref": "#/$defs/id"},
         "probedAt": {"$ref": "#/$defs/timestamp"},
+        "os": {"enum": ["windows", "linux", "darwin"]},
+        "arch": {"enum": ["amd64", "arm64"]},
+        "platformHash": {"$ref": "#/$defs/sha256"},
         "executableHash": {"$ref": "#/$defs/sha256"},
         "version": {"type": "string", "minLength": 1, "maxLength": 128},
         "configHash": {"$ref": "#/$defs/sha256"},

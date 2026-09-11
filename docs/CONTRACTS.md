@@ -115,8 +115,9 @@ runId 唯一 manifest 由 checker 判定。
 工具已安装；引用、版本、来源、摘要及实际能力由 checker/preflight 验证，探测仍需授权。S1 随附
 generic/C/Go 不形成核心语言枚举，环境值、凭据和绝对主机路径不得进入注册表或 run manifest。
 
-RFC §16.9.3.1 已冻结 `jcs-001` 与 `state-event-001` 两条字节级向量，分别覆盖 JCS 排序/转义/Unicode
-及 state-event 域分隔摘要。T003 已将其固化为独立 fixture，并由非核心 RFC 8785 实现复算 canonical 字节与摘要。
+RFC §16.9.3.1 已冻结 `jcs-001` 与 `state-event-001` 字节级向量，分别覆盖 JCS 排序/转义/Unicode
+及 state-event 域分隔摘要；后续 `agent-runner-enforcement-001` 固定 enforcement 域摘要。独立 fixture
+由非核心 RFC 8785 实现复算 canonical 字节与摘要。
 
 ## 4. 快照、证据与接受事务
 
@@ -186,11 +187,15 @@ handoff：停止受管写者→flush journal→捕获 manifest→WAITING_FOR_OPE
 
 ProofRail 端口接受版本化 context envelope：任务契约、父快照、已确认决策、最新失败证据、未决票据、预算、授权 target、允许副作用及引用摘要；返回外部执行事实和候选引用，不返回可信的 task PASS。`agent-runner-request` 以 `requestId/runId/taskId/stepId/attempt` 标识调用，以 `workspaceHash/contextHash/parentSnapshotHash/authorizationHash/budgetHash` 绑定不可变输入，并显式列出 `allowedTargets/allowedEffects`。`mode=create` 不得携带 prior session，其首个事件建立该 request 唯一的 session 绑定；`mode=resume` 必须绑定 `priorSessionId` 与 `priorCompletionHash`。每个 attempt 有固定关联身份；启动前持久化请求和授权摘要，同 requestId 同摘要可重放，不同摘要冲突，重复请求不得重复启动未知状态的代理或应用同一候选。新业务 attempt 产生新身份并计费；恢复必须绑定原 attempt、会话和工作区，无法证明连续性时从持久 envelope 建立新 attempt，不猜测续接成功。
 
-正式 AI 执行通道为 `AgentRunner` 端口的 CLI Agent adapter。adapter 只负责把统一请求映射到经固定版本和摘要绑定的外部 CLI，不把厂商 transcript、私有会话格式或退出码直接提升为核心状态。启动前必须探测并记录：可执行文件身份/版本、非交互调用方式、工作目录绑定、机器可读事件或完整日志、会话创建/恢复、取消与进程树停机、工具/网络/权限约束、费用用量以及无人值守确认行为。任一 required 能力不可验证即 preflight 阻断；不能用提示词承诺替代 OS/runner 限制。
+正式 AI 执行通道为 `AgentRunner` 端口的 CLI Agent adapter。adapter 只负责把统一请求映射到经固定版本和摘要绑定的外部 CLI，不把厂商 transcript、私有会话格式或退出码直接提升为核心状态。启动前必须探测并记录：规范化 `os`/`arch`、CLI 平台包/构建指纹 `platformHash`、可执行文件身份/版本、非交互调用方式、工作目录绑定、机器可读事件或完整日志、会话创建/恢复、取消与进程树停机、工具/网络/权限约束、费用用量以及无人值守确认行为。候选身份至少由版本、`os`、`arch`、`platformHash`、`executableHash` 和 `configHash` 共同确定；同版本其他平台不得继承其结论。`platformHash` 不单独证明内核、文件系统或 OS 强制边界，这些仍由 enforcement 配置与运行证据证明。任一 required 能力不可验证即 preflight 阻断；不能用提示词承诺替代 OS/runner 限制。
+
+CLI capability 记录保持候选自身事实，不得因外部补偿而把 `unsupported` 改写为 `verified`。preflight 必须先将当前环境规范化为 `os`/`arch` 并计算 `platformHash`，与 capability 三项精确匹配；即使 capability disposition 为 compatible 也不得跳过平台校验。若工具或网络控制由外部执行边界补偿，必须另有 `agent-runner-enforcement` 记录：以 capability `recordHash`、`executableHash` 和 `configHash` 绑定同一候选，并要求 enforcement、capability 与当前评估环境的 `platformHash` 三方一致，分别记录 `toolControl` 与 `networkControl` 的运行证据，并使用 `proofrail:agent-runner-enforcement:1\n` 域分隔摘要。组合 preflight 只在候选其余十项均为 verified，且两项控制分别由候选自身或绑定的外部边界 verified 时准入；enforcement `probedAt` 不得早于 capability `probedAt`、晚于评估时刻或超过准入策略规定的最大 enforcement 证据年龄。缺记录、错候选/配置/平台绑定、unknown/unsupported、重复或陈旧证据、任一控制项没有 verified 来源均阻断；风险确认、目录隔离、提示词和事后扫描不能替代该记录。外部边界只补偿明确列出的控制项，不改变原 capability disposition，也不证明 task PASS。
+
+当前 AgentRunner 产品开发与交付范围仅为 `windows/amd64`。Windows 版本完成后，`linux/amd64` 以 Ubuntu 24.04 VM 或等价可证明环境作为下一独立开发与探测目标，在完整 capability、enforcement 与 AT-23 证据通过前不列为支持。macOS、ARM 及其他 OS/架构组合只预留扩展点，暂不承诺排期或支持状态；后续可在原生环境或 GitHub Actions runner 上独立探测。虚拟机、模拟器或 CI runner 只有在能证明目标内核、架构、文件系统、进程、权限与网络边界等价时才可作为对应平台的完整 enforcement 证据，否则只用于开发反馈或能力探测，不得产生正式 compatible 结论。平台专属代码通过窄接口和按平台实现隔离，共享 wire、状态机和 fail-closed 语义不得依赖 Windows 命令或路径。
 
 CLI Agent 只在为当前 task/attempt 物化的可丢弃 run-workspace 中工作，不得写源目录、store、策略、门禁实现或接受记录。它可在授权范围内检索/读取文件、直接修改 isolated-workspace、运行允许的开发工具并迭代诊断；不得自行 commit、push、发布、扩大网络/target、批准候选或清除证据。ProofRail 记录启动 argv 的脱敏形式、cwd、环境白名单摘要、agent/config/version 摘要、session ID、进程身份、事件/日志、时间/调用/费用、停止证据以及前后 manifest/diff。机器事件缺失时原始 stdout/stderr 只能作为不透明日志，不能推断工具调用完整性。
 
-代理报告 completed、退出 0 或最终文本只表示外部执行结束。ProofRail 必须先证明进程树停止，重新扫描 workspace，校验范围/秘密/副作用，冻结 candidate，再独立运行声明的 build/test/verify gates；通过后仍进入独立 review/promotion。超时、失联、无法停止、会话恢复失败、日志或费用不完整、外部副作用不明均为 uncertain 并保持暂停，禁止换会话盲重试。AgentRunner 的 request、capability、event 与 completion wire 分别使用 `proofrail:agent-runner-request:1\n`、`proofrail:agent-runner-capability:1\n`、`proofrail:agent-runner-event:1\n`、`proofrail:agent-runner-completion:1\n` 加对应 body 的 RFC 8785 canonical JSON 计算 `recordHash`。集合在计算前按字典序排序并拒绝重复。requestId、probeId、eventId 和 completionId 分别是其主去重键；同键同摘要为幂等重放，同键不同摘要为冲突；event 还禁止同 session/sequence 绑定不同记录或同 request 漂移到不同 session，completion 还禁止同 request 产生不同终局记录。capability 只有固定矩阵全项带运行证据且为 verified 才可 compatible；completion 的 completed 仅表示外部执行、停机与证据采集完整，不表示 task PASS。
+代理报告 completed、退出 0 或最终文本只表示外部执行结束。ProofRail 必须先证明进程树停止，重新扫描 workspace，校验范围/秘密/副作用，冻结 candidate，再独立运行声明的 build/test/verify gates；通过后仍进入独立 review/promotion。超时、失联、无法停止、会话恢复失败、日志或费用不完整、外部副作用不明均为 uncertain 并保持暂停，禁止换会话盲重试。AgentRunner 的 request、capability、enforcement、event 与 completion wire 分别使用 `proofrail:agent-runner-request:1\n`、`proofrail:agent-runner-capability:1\n`、`proofrail:agent-runner-enforcement:1\n`、`proofrail:agent-runner-event:1\n`、`proofrail:agent-runner-completion:1\n` 加对应 body 的 RFC 8785 canonical JSON 计算 `recordHash`。集合在计算前按字典序排序并拒绝重复。requestId、probeId、enforcementId、eventId 和 completionId 分别是其主去重键；同键同摘要为幂等重放，同键不同摘要为冲突；event 还禁止同 session/sequence 绑定不同记录或同 request 漂移到不同 session，completion 还禁止同 request 产生不同终局记录。capability 只有固定矩阵全项带运行证据且为 verified 才可单独 compatible；绑定的 enforcement 可按上段规则形成组合准入，但不改写 capability 事实。completion 的 completed 仅表示外部执行、停机与证据采集完整，不表示 task PASS。
 
 需要人工输入时，CLI Agent adapter 只能上报结构化 `operator-action-required`；ProofRail 在原子边界停止或暂停受管代理，持久化请求并令 task/step 进入 `WAITING_FOR_OPERATOR`。通知、答复和控制权归还由 ProofRail 自有 CLI/TUI 承担。用户输入必须经 ProofRail 校验并持久化为适用的 operator interaction、review、authorization 或 handoff 记录；终端/聊天自由文本不能直接改变状态或授权。恢复同一 Agent 会话前须重新验证 attempt、workspace、session、上下文摘要、租约和授权。T025 已冻结一般澄清问答的 `operator-interaction` Schema、正反样例、RFC 8785 摘要、追加式 JSONL 重放和 Engine open/resume 控制 API；控制 API 只在 request/response、当前绑定与等待态一致时返回恢复命令，事件部分写入时保持 chain 暂停并按证据哈希幂等收敛。真实 Agent session 续跑由 T027 接入。
 

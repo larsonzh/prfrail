@@ -6,7 +6,7 @@
 
 ## 已完成范围
 
-1. 四份 Schema 冻结 request、capability、event 和 completion wire；契约门禁现覆盖 34 份 Schema、14 个 fixture 文件承载的 96 个用例及 2 条 canonical 向量。
+1. 四份基础 Schema 冻结 request、capability、event 和 completion wire；后续 T027 前置切片另增 enforcement Schema，当前契约门禁覆盖 35 份 Schema、14 个 fixture 文件承载的 98 个用例及 3 条 canonical 向量。
 2. `internal/adapters/agent_runner*.go` 实现 RFC 8785 域分隔摘要、严格解码、排序集合、create/resume 约束、request/event/completion 绑定，以及可从持久记录重建的幂等/冲突索引。
 3. capability 固定 12 项矩阵；仅全项带运行证据且为 verified 才可 compatible。event 同时锁定 eventId、session/sequence 和 request/session，禁止同一 request 漂移到不同 session。completion 同时锁定 completionId 与 requestId，且 completed 只证明外部执行结束、进程树停止、日志/用量完整和输出 manifest 捕获，不代表 task PASS。固定 capability 测试还会读取实际证据文件并核对其字节 SHA-256，防止记录引用不存在或过时的证据。
 
@@ -36,7 +36,9 @@
 
 本轮各 stdout/meta/usage/report 的 SHA-256 及事件数已逐一存入 `github-copilot-cli-windows-evidence.json` 的 `sixInvocationBatch`；缺失的取消 usage 显式为 null。机器记录以累计证据字节摘要及新的 canonical recordHash 绑定。原始报告不覆盖；已 verified 的 usage/processTreeStop 只承接正常结束探针，不等同取消安全性。
 
-最终机器记录绑定证据文件字节摘要 `sha256:91d2c7e00c03bd2ca68dd0a623be39ea4611422ce8036097c88711093f63c2f6`，canonical recordHash 为 `sha256:5d0ba197ef12c867eee00c40e5063473e133053f5e7b0b9ebdb8c8f481062147`。T026 已完成；固定候选因两项 unsupported 保持 blocked。开始 T027 前必须另行冻结并验证能覆盖两类绕过的外部强制边界，或选择并重新探测兼容候选；AT-23 仍未通过。
+最终机器记录绑定证据文件字节摘要 `sha256:91d2c7e00c03bd2ca68dd0a623be39ea4611422ce8036097c88711093f63c2f6`。后续跨平台前置修订将 `windows/amd64` 与平台包摘要纳入 capability body，故当前 canonical recordHash 为 `sha256:a6cee8307d0ce96f76e00ebef4b13c493c6d9da6e6c00a7ab36cf77ba069ff9e`；能力事实未改变。T026 已完成；固定候选因两项 unsupported 保持 blocked。开始 T027 前必须另行冻结并验证能覆盖两类绕过的外部强制边界，或选择并重新探测兼容候选；AT-23 仍未通过。
+
+2026-09-11 后续前置切片已冻结独立 `agent-runner-enforcement` wire、RFC 8785 域分隔摘要、候选/可执行文件/配置/平台绑定、显式 freshness policy、重放冲突和逐控制项组合准入。该切片只定义并验证 fail-closed 边界：没有 enforcement 时当前 10/2 候选仍阻断，且没有实现、验证或声称真实沙箱。T027 与 AT-23 状态保持 blocked。
 
 ## 历史更正（2026-09-11 03:26）
 
@@ -91,7 +93,7 @@
 1. `go build ./...`：通过。
 2. `go vet ./...`：通过。
 3. `go test -count=1 ./...`：通过，13 个含测试包及 2 个无测试 command 包。
-4. `node tools/contracts/contracts.test.js`：通过，2/2；34 份 Schema、96 个用例和 2 条 canonical 向量通过。
+4. `node tools/contracts/contracts.test.js`：通过，2/2；35 份 Schema、98 个用例和 3 条 canonical 向量通过。
 5. `git diff --check`：通过。
 
 ## 历史剩余能力探针协议（现已执行）
