@@ -1,0 +1,24 @@
+[
+  {
+    "fixtureId": "ai-availability-static-check-only-invalid",
+    "schema": "ai-availability.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "Available cannot be claimed without at least one live provider request",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "availability": {
+        "kind": "ai-availability",
+        "probeId": "probe-ai-one",
+        "profileId": "deepseek-anthropic",
+        "profileConfigHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "channel": "agent-runner-cli",
+        "probedAt": "2026-09-11T08:00:00.000Z",
+        "status": "available",
+        "requestsUsed": 0,
+        "evidence": ["sha256:2222222222222222222222222222222222222222222222222222222222222222"]
+      },
+      "recordHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333"
+    }
+  }
+]

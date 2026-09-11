@@ -1,0 +1,24 @@
+[
+  {
+    "fixtureId": "ai-availability-live-response-valid",
+    "schema": "ai-availability.schema.json",
+    "expected": "accept",
+    "rejectionLayer": "schema",
+    "reason": "Available is channel-specific and backed by a live request and evidence",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "availability": {
+        "kind": "ai-availability",
+        "probeId": "probe-ai-one",
+        "profileId": "deepseek-anthropic",
+        "profileConfigHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "channel": "agent-runner-cli",
+        "probedAt": "2026-09-11T08:00:00.000Z",
+        "status": "available",
+        "requestsUsed": 1,
+        "evidence": ["sha256:2222222222222222222222222222222222222222222222222222222222222222"]
+      },
+      "recordHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333"
+    }
+  }
+]

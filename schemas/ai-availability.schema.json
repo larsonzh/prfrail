@@ -1,0 +1,71 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "https://proofrail.dev/schemas/v1/ai-availability.schema.json",
+	"title": "ProofRail channel-specific AI availability report",
+	"type": "object",
+	"additionalProperties": false,
+	"required": ["schemaVersion", "availability", "recordHash"],
+	"properties": {
+		"schemaVersion": {"const": "1.0.0"},
+		"availability": {"$ref": "#/$defs/availability"},
+		"recordHash": {"$ref": "#/$defs/sha256"}
+	},
+	"$defs": {
+		"id": {"type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"},
+		"sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+		"timestamp": {"type": "string", "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$"},
+		"reason": {
+			"enum": [
+				"configuration_invalid",
+				"secret_missing",
+				"credential_rejected",
+				"account_unavailable",
+				"quota_exhausted",
+				"network_unreachable",
+				"tls_or_proxy_failure",
+				"provider_unavailable",
+				"model_unavailable",
+				"policy_blocked",
+				"cli_unavailable",
+				"sessionbridge_unavailable",
+				"lm_api_unavailable",
+				"visible_delivery_unavailable",
+				"response_invalid",
+				"timeout",
+				"unknown"
+			]
+		},
+		"availability": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["kind", "probeId", "profileId", "profileConfigHash", "channel", "probedAt", "status", "requestsUsed", "evidence"],
+			"properties": {
+				"kind": {"const": "ai-availability"},
+				"probeId": {"$ref": "#/$defs/id"},
+				"profileId": {"$ref": "#/$defs/id"},
+				"profileConfigHash": {"$ref": "#/$defs/sha256"},
+				"channel": {"enum": ["agent-runner-cli", "sessionbridge-silent", "sessionbridge-visible"]},
+				"probedAt": {"$ref": "#/$defs/timestamp"},
+				"status": {"enum": ["available", "unavailable", "unknown"]},
+				"reason": {"$ref": "#/$defs/reason"},
+				"requestsUsed": {"type": "integer", "minimum": 0},
+				"evidence": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/sha256"}}
+			},
+			"allOf": [
+				{
+					"if": {"properties": {"status": {"const": "available"}}},
+					"then": {
+						"properties": {
+							"requestsUsed": {"minimum": 1},
+							"reason": false
+						}
+					},
+					"else": {
+						"required": ["reason"],
+						"properties": {"reason": {"$ref": "#/$defs/reason"}}
+					}
+				}
+			]
+		}
+	}
+}
