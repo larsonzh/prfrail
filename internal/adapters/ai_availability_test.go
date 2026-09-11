@@ -2,6 +2,8 @@ package adapters
 
 import (
 	"errors"
+	"os"
+	"path/filepath"
 	"testing"
 	"time"
 )
@@ -128,5 +130,37 @@ func TestAIAvailabilityReplayAndConflict(t *testing.T) {
 	}
 	if _, err := index.Record(conflicting); !errors.Is(err, ErrAIAvailabilityConflict) {
 		t.Fatalf("expected conflict, got %v", err)
+	}
+}
+
+func TestWriteAIAvailabilityRecordPublishesCanonicalRecordWithoutReplace(t *testing.T) {
+	record, err := NewAIAvailabilityRecord(aiAvailability())
+	if err != nil {
+		t.Fatal(err)
+	}
+	path := filepath.Join(t.TempDir(), "records", "availability.json")
+	if err := WriteAIAvailabilityRecord(path, record); err != nil {
+		t.Fatal(err)
+	}
+	wire, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	decoded, err := DecodeAIAvailabilityRecord(wire)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if decoded.RecordHash != record.RecordHash || len(wire) == 0 || wire[len(wire)-1] != '\n' {
+		t.Fatalf("record did not round trip canonically: %+v", decoded)
+	}
+	if err := WriteAIAvailabilityRecord(path, record); !errors.Is(err, os.ErrExist) {
+		t.Fatalf("expected immutable destination, got %v", err)
+	}
+	wireAfter, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(wireAfter) != string(wire) {
+		t.Fatal("existing availability record was modified")
 	}
 }

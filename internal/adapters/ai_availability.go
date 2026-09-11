@@ -3,6 +3,8 @@ package adapters
 import (
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/larsonzh/prfrail/internal/evidence"
@@ -72,6 +74,42 @@ func DecodeAIAvailabilityRecord(input []byte) (AIAvailabilityRecord, error) {
 		return AIAvailabilityRecord{}, err
 	}
 	return record, nil
+}
+
+func WriteAIAvailabilityRecord(path string, record AIAvailabilityRecord) error {
+	if err := ValidateAIAvailabilityRecord(record); err != nil {
+		return err
+	}
+	canonical, err := evidence.EncodeCanonical(record)
+	if err != nil {
+		return err
+	}
+	directory := filepath.Dir(path)
+	if err := os.MkdirAll(directory, 0o755); err != nil {
+		return err
+	}
+	temporary, err := os.CreateTemp(directory, ".ai-availability-*")
+	if err != nil {
+		return err
+	}
+	temporaryPath := temporary.Name()
+	defer os.Remove(temporaryPath)
+	if err = temporary.Chmod(0o600); err == nil {
+		_, err = temporary.Write(append(canonical, '\n'))
+	}
+	if err == nil {
+		err = temporary.Sync()
+	}
+	if closeErr := temporary.Close(); err == nil {
+		err = closeErr
+	}
+	if err != nil {
+		return err
+	}
+	if err := os.Link(temporaryPath, path); err != nil {
+		return err
+	}
+	return nil
 }
 
 func ValidateAIAvailabilityRecord(record AIAvailabilityRecord) error {

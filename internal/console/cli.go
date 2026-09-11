@@ -25,14 +25,15 @@ const (
 )
 
 type CLI struct {
-	version           string
-	now               func() time.Time
-	getwd             func() (string, error)
-	stdin             io.Reader
-	stopRun           func(context.Context, string, string) ([]string, error)
-	appendInteraction func(string, chain.OperatorInteractionRecord) error
-	secretManager     adapters.AISecretManager
-	readSecret        func() ([]byte, error)
+	version             string
+	now                 func() time.Time
+	getwd               func() (string, error)
+	stdin               io.Reader
+	stopRun             func(context.Context, string, string) ([]string, error)
+	appendInteraction   func(string, chain.OperatorInteractionRecord) error
+	secretManager       adapters.AISecretManager
+	readSecret          func() ([]byte, error)
+	checkAIAvailability func(context.Context, adapters.AIProviderProfile, string, int, string, string) (adapters.AIAvailabilityRecord, error)
 }
 
 type commandResponse struct {
@@ -56,6 +57,7 @@ func NewCLI(version string) CLI {
 	}
 	cli.stopRun = newDefaultStopRun(cli.getwd)
 	cli.appendInteraction = appendOperatorInteractionRecord
+	cli.checkAIAvailability = cli.defaultAICheck
 	return cli
 }
 
@@ -84,6 +86,8 @@ func (cli CLI) Execute(ctx context.Context, args []string, stdout, stderr io.Wri
 		return cli.executeCost(args[1:], stdout, stderr)
 	case "secret":
 		return cli.executeSecret(ctx, args[1:], stdout, stderr)
+	case "ai":
+		return cli.executeAI(ctx, args[1:], stdout, stderr)
 	case "run":
 		return cli.executeRun(ctx, args[1:], stdout, stderr)
 	case "report":
@@ -388,7 +392,7 @@ func resolvePathFromCWD(cwd, value string) (string, error) {
 
 func writeMainUsage(output io.Writer) {
 	fmt.Fprintln(output, "usage: prfrail <command> [options]")
-	fmt.Fprintln(output, "commands: version, init, validate, preview, approvals, interactions, cost, secret, run, report, config explain")
+	fmt.Fprintln(output, "commands: version, init, validate, preview, approvals, interactions, cost, secret, ai, run, report, config explain")
 }
 
 func writeFile(path string, content []byte, force bool) error {

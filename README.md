@@ -18,13 +18,14 @@ ProofRail 让 AI 在无人值守下安全地改代码、跑验证、出证据：
 
 ### 状态
 
-**S1 实施中（2026-09-10）**：核心切片已推进至 T025，完成证据、快照、进程/租约守卫、托管变更集与事务应用、产品生命周期，以及无 IDE CLI 基线（`init/validate/config explain/preview/approvals/interactions/cost report/run/report`）。
+**S1 实施中（2026-09-11）**：核心切片已推进至 T027 前置能力，完成证据、快照、进程/租约守卫、托管变更集与事务应用、产品生命周期，以及无 IDE CLI 基线（`init/validate/config explain/preview/approvals/interactions/cost report/secret/ai check/run/report`）。
 当前仍不是正式发行包：`run` 只支持 noop-only 任务链；遇到 `code/build/verify` 步骤会 fail-close 并返回非零退出码。
 `preview` 已支持离线只读静态预览（no-AI），不会执行命令、网络探测、模型调用或凭据读取。
 `export` 已具备库级实现（`internal/snapshot/export.go` 与 `internal/evidence/delivery.go`），CLI 入口仍在后续切片。
 `approvals` 已提供授权账本查看与撤销（`list`/`revoke`），撤销按 `stopDisposition` 接线受控停机并持久化待审批队列（重启可见）；离线、零模型调用。
 `effects`/`diagnostics` 已具备库级副作用分类与恢复诊断（`internal/gates/effects.go`、`internal/evidence/diagnostics.go`）：S1 拒绝外部写，未知副作用只对账不重投，诊断只读脱敏；CLI 入口仍在后续切片。
 `interactions` 已提供追加式交互账本的待办重建、结构化答复和无 ANSI 聚焦终端界面；Engine 仅在 request/response、当前绑定与等待态一致且状态事件持久化后归还控制权。真实 Agent session 续跑仍待 T027，完整统一 TUI 仍属后续切片。
+`ai check` 已提供显式单请求的 `agent-runner-cli` live availability probe；它不自动执行、不跨 profile/模型/通道回退，也不证明 AgentRunner enforcement 或 AT-23。
 项目建议书与历史设计来源见 [docs/RFC-proofrail-unattended-ai-engineering-product.md](docs/RFC-proofrail-unattended-ai-engineering-product.md)；分域权威见 [docs/DOCUMENTATION_PLAN.md](docs/DOCUMENTATION_PLAN.md)。
 
 从 [docs/DOCUMENTATION_PLAN.md](docs/DOCUMENTATION_PLAN.md) 阅读文档导航与低成本模型流程；
@@ -42,6 +43,9 @@ prfrail init --workspace .
 prfrail validate --chain ./proofrail.chain.json
 prfrail config explain --chain ./proofrail.chain.json
 prfrail preview --chain ./proofrail.chain.json
+# 仅在明确授权一次真实模型请求后执行：
+prfrail ai check --chain ./proofrail.chain.json --channel agent-runner-cli --copilot C:/path/to/copilot.exe --workspace . --max-requests 1 --out ./tmp/ai-availability.json --json
+prfrail ai verify --chain ./proofrail.chain.json --record ./tmp/ai-availability.json --channel agent-runner-cli --max-age 10m --max-requests 1 --json
 prfrail approvals list --ledger ./authorization-ledger.jsonl
 prfrail interactions list --ledger ./operator-interactions.jsonl
 prfrail interactions tui --ledger ./operator-interactions.jsonl --actor-id operator-one
@@ -49,7 +53,7 @@ prfrail run --chain ./proofrail.chain.json --run-id run-demo
 prfrail report --run-dir ./tmp/prfrail-runs/run-demo
 ```
 
-说明：`run` 目前仅执行 noop-only 任务链；`interactions tui` 是 T025 的聚焦终端收件箱，不是完整统一 TUI，`serve`/完整 TUI 仍在后续切片。后续黑箱模式须先展示降级保证和责任边界。SessionBridge visible 投递不等于完成，正式流程也不依赖 `@sbr-review`。
+说明：`run` 目前仅执行 noop-only 任务链；`interactions tui` 是 T025 的聚焦终端收件箱，不是完整统一 TUI，`serve`/完整 TUI 仍在后续切片。`ai verify` 可重复指定 `--prior-record <path>`，离线拒绝同一 probe ID 的历史分叉；相同记录重放保持幂等。后续黑箱模式须先展示降级保证和责任边界。SessionBridge visible 投递不等于完成，正式流程也不依赖 `@sbr-review`。
 
 ### 构建（需 Go 工具链）
 
@@ -94,13 +98,14 @@ ProofRail enables AI to safely modify code, run validations, and produce evidenc
 
 ### Status
 
-**S1 implementation in progress (2026-09-10)**: core slices now reach T025, covering evidence, snapshots, process/lease guards, managed change sets, transactional apply, product lifecycle, and a no-IDE CLI baseline (`init/validate/config explain/preview/approvals/interactions/cost report/run/report`).
+**S1 implementation in progress (2026-09-11)**: prerequisite work now reaches T027, covering evidence, snapshots, process/lease guards, managed change sets, transactional apply, product lifecycle, and a no-IDE CLI baseline (`init/validate/config explain/preview/approvals/interactions/cost report/secret/ai check/run/report`).
 This is still not a production release package: `run` currently supports noop-only chains and fail-closes with a non-zero exit for executable `code/build/verify` steps.
 `preview` now supports a no-AI offline read-only static report with zero command/network/model/credential execution.
 `export` is now implemented at library level (`internal/snapshot/export.go` + `internal/evidence/delivery.go`); a dedicated CLI entrypoint remains in later slices.
 `approvals` now provides an authorization ledger view and revocation (`list`/`revoke`) with controlled-stop wiring per `stopDisposition` and a restart-visible pending inbox; offline and model-free.
 `effects`/`diagnostics` now provide library-level side-effect classification and recovery diagnosis (`internal/gates/effects.go`, `internal/evidence/diagnostics.go`): S1 denies external writes, unknown effects reconcile instead of blind retry, and diagnosis is read-only and redacted; CLI entrypoints remain in later slices.
 `interactions` now rebuilds pending items from an append-only ledger, records structured responses, and provides a focused ANSI-free terminal UI. The Engine returns control only after request/response, current binding, waiting state, and durable state events agree. Real Agent-session continuation remains T027 work, and the complete unified TUI remains a later slice.
+`ai check` now provides an explicit single-request `agent-runner-cli` live availability probe. It never runs automatically, falls back across profiles/models/channels, or proves AgentRunner enforcement or AT-23.
 Project proposal and historical design source: [docs/RFC-proofrail-unattended-ai-engineering-product.md](docs/RFC-proofrail-unattended-ai-engineering-product.md). Domain authorities: [docs/DOCUMENTATION_PLAN_EN.md](docs/DOCUMENTATION_PLAN_EN.md).
 
 Start with [docs/DOCUMENTATION_PLAN_EN.md](docs/DOCUMENTATION_PLAN_EN.md) for navigation and the low-cost model workflow;
@@ -118,6 +123,9 @@ prfrail init --workspace .
 prfrail validate --chain ./proofrail.chain.json
 prfrail config explain --chain ./proofrail.chain.json
 prfrail preview --chain ./proofrail.chain.json
+# Run only after explicit authorization for one live model request:
+prfrail ai check --chain ./proofrail.chain.json --channel agent-runner-cli --copilot C:/path/to/copilot.exe --workspace . --max-requests 1 --out ./tmp/ai-availability.json --json
+prfrail ai verify --chain ./proofrail.chain.json --record ./tmp/ai-availability.json --channel agent-runner-cli --max-age 10m --max-requests 1 --json
 prfrail approvals list --ledger ./authorization-ledger.jsonl
 prfrail interactions list --ledger ./operator-interactions.jsonl
 prfrail interactions tui --ledger ./operator-interactions.jsonl --actor-id operator-one
@@ -125,7 +133,7 @@ prfrail run --chain ./proofrail.chain.json --run-id run-demo
 prfrail report --run-dir ./tmp/prfrail-runs/run-demo
 ```
 
-Notes: `run` currently executes noop-only chains. `interactions tui` is T025's focused terminal inbox, not the complete unified TUI; `serve` and the complete TUI remain later slices. The later black-box mode must show its reduced assurance and responsibility boundary before selection. SessionBridge visible delivery is not completion, and the formal path does not depend on `@sbr-review`.
+Notes: `run` currently executes noop-only chains. `interactions tui` is T025's focused terminal inbox, not the complete unified TUI; `serve` and the complete TUI remain later slices. `ai verify` accepts repeatable `--prior-record <path>` inputs, rejects historical forks for one probe ID offline, and treats identical record replay as idempotent. The later black-box mode must show its reduced assurance and responsibility boundary before selection. SessionBridge visible delivery is not completion, and the formal path does not depend on `@sbr-review`.
 
 ### Build (requires Go toolchain)
 

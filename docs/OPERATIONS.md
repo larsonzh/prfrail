@@ -2,7 +2,7 @@
 
 [English](OPERATIONS_EN.md)
 
-日期：2026-09-10；S1 操作设计稿。当前没有 ProofRail 正式发行包；手工解压 Windows amd64 便携 ZIP、显式路径运行且不修改 PATH 的 S1 安装模型已获批，候选步骤见 [安装指南](INSTALLATION.md)。T016/T019/T020/T023/T025 已交付 CLI 与交付底座：`version/init/validate/config explain/preview/approvals/interactions/cost report/run/report` 和库级导出模块（`internal/snapshot/export.go`、`internal/evidence/delivery.go`）。`preview` 为离线只读静态预览，不执行命令/网络/模型/凭据读取；`run` 目前只支持 noop-only 任务链，遇到 `code/build/verify` 会 fail-close 并返回非零退出码。其余产品能力仍是 RFC 规划接口。待决发行绑定见 [安装部署规划](INSTALLATION_PLAN.md)，完整用户流程见 [业务流程](BUSINESS_WORKFLOWS.md)。
+日期：2026-09-11；S1 操作设计稿。当前没有 ProofRail 正式发行包；手工解压 Windows amd64 便携 ZIP、显式路径运行且不修改 PATH 的 S1 安装模型已获批，候选步骤见 [安装指南](INSTALLATION.md)。当前已交付 CLI 与交付底座：`version/init/validate/config explain/preview/approvals/interactions/cost report/secret/ai check/run/report` 和库级导出模块（`internal/snapshot/export.go`、`internal/evidence/delivery.go`）。`preview` 为离线只读静态预览，不执行命令/网络/模型/凭据读取；`ai check` 是需单独授权的真实单请求可用性探测，不是 AgentRunner；`run` 目前只支持 noop-only 任务链，遇到 `code/build/verify` 会 fail-close 并返回非零退出码。其余产品能力仍是 RFC 规划接口。待决发行绑定见 [安装部署规划](INSTALLATION_PLAN.md)，完整用户流程见 [业务流程](BUSINESS_WORKFLOWS.md)。
 
 ## 1. 当前可执行
 
@@ -21,6 +21,9 @@ go run ./cmd/prfrail preview --chain .\proofrail.chain.json
 go run ./cmd/prfrail interactions list --ledger .\operator-interactions.jsonl
 go run ./cmd/prfrail interactions tui --ledger .\operator-interactions.jsonl --actor-id operator-one
 go run ./cmd/prfrail cost report --ledger .\cost-ledger.json
+# 仅在明确授权一次真实模型请求后执行：
+go run ./cmd/prfrail ai check --chain .\proofrail.chain.json --channel agent-runner-cli --copilot C:\path\to\copilot.exe --workspace . --max-requests 1 --out .\tmp\ai-availability.json --json
+go run ./cmd/prfrail ai verify --chain .\proofrail.chain.json --record .\tmp\ai-availability.json --channel agent-runner-cli --max-age 10m --max-requests 1 --json
 go run ./cmd/prfrail run --chain .\proofrail.chain.json --run-id run-demo
 go run ./cmd/prfrail report --run-dir .\tmp\prfrail-runs\run-demo
 ```
@@ -33,7 +36,7 @@ T025 已提供聚焦终端交互：`interactions list [--ledger <path>] [--json]
 
 S1 使用手工解压的 Windows amd64 便携 ZIP：核对固定 commit/GitHub CI 并验证 SHA256SUMS、SBOM 和许可证清单，解压到用户选择的独立版本目录，再以 `prfrail.exe` 完整路径执行 version 和静态预览。不得修改 PATH、注册表或系统目录，不得覆盖运行中的 host。可复制命令和升级/回滚/卸载步骤见 [安装指南](INSTALLATION.md)。SHA256SUMS 只证明内容与清单一致，不认证发布者身份；平台不匹配不得执行。Linux 在 S1 仅核心 CI/预览，不宣传正式支持。
 
-当前可复制流程为 `prfrail init --workspace <path>`、`prfrail validate --chain <chain-file>`、`prfrail config explain --chain <chain-file>`、`prfrail preview --chain <chain-file> [--json]`、`prfrail interactions list|respond|tui`、`prfrail cost report [--ledger <path>] [--json]`、`prfrail run --chain <chain-file> [--run-id] [--run-dir]`、`prfrail report --run-dir <run-dir>`。新用户先按[安装指南的五步快速上手](INSTALLATION.md#3-五步快速上手)完成无副作用闭环。`preview` 只读展示 `previewHash`、权限边界、unknown 及零调用计数；`interactions` 只处理已有持久请求，不自行调用模型；`cost report` 本地读取成本账本并输出预留/结算/未知占用，不做默认遥测导出；`run` 当前仅支持 noop-only 链。导出能力已在库级实现，但 CLI `export` 命令仍在后续切片；执行型 step 的真实 gate/adapter 全闭环同样属于后续切片。
+当前可复制流程为 `prfrail init --workspace <path>`、`prfrail validate --chain <chain-file>`、`prfrail config explain --chain <chain-file>`、`prfrail preview --chain <chain-file> [--json]`、`prfrail interactions list|respond|tui`、`prfrail cost report [--ledger <path>] [--json]`、`prfrail ai check ...`、`prfrail run --chain <chain-file> [--run-id] [--run-dir]`、`prfrail report --run-dir <run-dir>`。新用户先按[安装指南的五步快速上手](INSTALLATION.md#3-五步快速上手)完成无副作用闭环。`preview` 只读展示 `previewHash`、权限边界、unknown 及零调用计数；`interactions` 只处理已有持久请求，不自行调用模型；`cost report` 本地读取成本账本并输出预留/结算/未知占用，不做默认遥测导出；`ai check` 会读取绑定的 SecretStore 凭据并发起一次真实模型请求；`run` 当前仅支持 noop-only 链。导出能力已在库级实现，但 CLI `export` 命令仍在后续切片；执行型 step 的真实 gate/adapter 全闭环同样属于后续切片。
 
 核心离线模式不要求 VS Code。正式 AI 执行目标为固定 CLI Agent 的 AgentRunner；受监督黑箱候选才要求 VS Code、可用 Copilot Chat 和 SessionBridge 0.1.1 的 visible 模式。启动黑箱模式前必须确认其过程/网络/费用/外部副作用不可观测，用户监督后显式归还 workspace，再由 ProofRail 独立验收。两条路径当前均未交付，扩展已安装或消息可达不等于 AI 自动编程验收。
 
@@ -59,7 +62,7 @@ AI provider 配置也属于该严格 JSON 文件，但只能保存非秘密 prof
 }
 ```
 
-`profiles` 按 `profileId`、`channels` 按 `channel` 字典序排列。`prfrail validate`、`config explain` 和 `preview` 均不读取 SecretStore 或调用模型；`config explain` 只显示 profile 摘要与绑定，不显示 `secretRef`。先在本地安全终端执行 `prfrail secret set --ref windows-credential:ProofRail/deepseek`，再由显式授权的 live availability probe 验证实际账户、网络、模型和额度。
+`profiles` 按 `profileId`、`channels` 按 `channel` 字典序排列。`prfrail validate`、`config explain` 和 `preview` 均不读取 SecretStore 或调用模型；`config explain` 只显示 profile 摘要与绑定，不显示 `secretRef`。先在本地安全终端执行 `prfrail secret set --ref windows-credential:ProofRail/deepseek`。获得一次真实请求授权后，运行 `prfrail ai check --chain <chain-file> --channel agent-runner-cli --copilot <pinned-executable> --workspace <isolated-directory> --max-requests 1 --out <record-path> --json`；只有精确 `PONG`、零工具调用、一个请求和完整 result/usage 证据才返回 0。所有 verdict 都先以 canonical JSON 不可覆盖地发布到 `--out`；目标已存在时拒绝写入。`unavailable/unknown` 返回 1，不自动切换 profile、模型或通道。后续可用 `prfrail ai verify --chain <chain-file> --record <record-path> [--prior-record <older-record>]... --channel agent-runner-cli --max-age <duration> --max-requests 1 --json` 离线复验配置摘要、通道、新鲜度和预算；每个 `--prior-record` 都经过严格解码，同一 `probeId` 的同摘要重放幂等、异摘要分叉阻断。verify 不读取 SecretStore，也不调用模型。这些命令只证明当时记录的 CLI 通道可用性，不证明 AgentRunner enforcement 或 AT-23。
 
 首次运行前确认源树/运行区/store 不重叠，secret 排除、磁盘、工具链、模型/费用上限、review 主体和可实施隔离。源树含未提交文件不要求 reset；baseline 捕获后不自动吸收外部变化。不要把 original workspace 交给 agent 编辑。
 
