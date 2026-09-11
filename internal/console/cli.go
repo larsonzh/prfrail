@@ -243,6 +243,12 @@ func (cli CLI) executeConfigExplain(args []string, stdout, stderr io.Writer) int
 	fmt.Fprintf(stdout, "chain: %s profile=%s\n", report.ChainID, report.Profile)
 	fmt.Fprintf(stdout, "documentationPolicy: %s\n", report.DocumentationPolicy)
 	fmt.Fprintf(stdout, "runnableInCli: %t\n", report.RunnableInCLI)
+	for _, profile := range report.AIProfiles {
+		fmt.Fprintf(stdout, "aiProfile: %s hash=%s\n", profile.ProfileID, profile.ProfileConfigHash)
+	}
+	for _, binding := range report.AIChannels {
+		fmt.Fprintf(stdout, "aiChannel: %s profile=%s hash=%s\n", binding.Channel, binding.ProfileID, binding.ProfileConfigHash)
+	}
 	for _, policy := range report.TaskPolicies {
 		source := policy.SourceKind
 		if policy.SourcePointer != nil {

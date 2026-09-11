@@ -39,6 +39,28 @@ Core offline mode does not require VS Code. Target formal AI execution uses a pi
 
 The current CLI baseline uses a single chain config file (`--chain` first, then `./proofrail.chain.json`, then `./proofrail.json`). The `proofrail.toml/workspace.toml` layered model remains planned. Runtime state belongs to the engine. Never manually edit state/journals/receipts/accepted manifests. config explain exposes origins, tools/network permissions and budgets; model prose is not configuration.
 
+AI provider configuration also belongs to this strict JSON file, but it contains only non-secret profiles and channel bindings. BYOK uses `secretRef` to name a system-keystore entry; never place an API key in configuration:
+
+```json
+"ai": {
+	"profiles": [
+		{
+			"profileId": "deepseek-anthropic",
+			"providerType": "anthropic",
+			"baseUrl": "https://api.deepseek.com/anthropic",
+			"model": "deepseek-flash",
+			"authMode": "secret",
+			"secretRef": "windows-credential:ProofRail/deepseek"
+		}
+	],
+	"channels": [
+		{"channel": "agent-runner-cli", "profileId": "deepseek-anthropic"}
+	]
+}
+```
+
+Sort `profiles` by `profileId` and `channels` by `channel`. `prfrail validate`, `config explain`, and `preview` do not read the SecretStore or invoke a model. `config explain` exposes only profile digests and bindings, never `secretRef`. Run `prfrail secret set --ref windows-credential:ProofRail/deepseek` in a secure local terminal first; a separately authorized live availability probe must still verify the account, network, model, and quota.
+
 Before running, verify distinct source/run/store roots, secret exclusions, disk, tools, model/cost limits, review actors and enforceable isolation. Uncommitted source files do not require reset. External source changes are not automatically absorbed after baseline capture. Never give agents the original workspace to edit.
 
 ## 3. Operator Decisions

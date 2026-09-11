@@ -39,6 +39,28 @@ S1 使用手工解压的 Windows amd64 便携 ZIP：核对固定 commit/GitHub C
 
 当前 CLI 基线使用单文件链配置（优先 `--chain`；否则按 `./proofrail.chain.json` → `./proofrail.json` 搜索）。`proofrail.toml/workspace.toml` 的分层配置仍属后续规划。运行状态由引擎维护，用户不得修改 runtime-state、journal、receipt 或已接受 manifest。使用 config explain 检查最终来源、工具/网络权限和预算，不从模型自然语言推断配置。
 
+AI provider 配置也属于该严格 JSON 文件，但只能保存非秘密 profile 和通道绑定。BYOK 使用 `secretRef` 指向系统密钥库，禁止把 API Key 写入配置：
+
+```json
+"ai": {
+	"profiles": [
+		{
+			"profileId": "deepseek-anthropic",
+			"providerType": "anthropic",
+			"baseUrl": "https://api.deepseek.com/anthropic",
+			"model": "deepseek-flash",
+			"authMode": "secret",
+			"secretRef": "windows-credential:ProofRail/deepseek"
+		}
+	],
+	"channels": [
+		{"channel": "agent-runner-cli", "profileId": "deepseek-anthropic"}
+	]
+}
+```
+
+`profiles` 按 `profileId`、`channels` 按 `channel` 字典序排列。`prfrail validate`、`config explain` 和 `preview` 均不读取 SecretStore 或调用模型；`config explain` 只显示 profile 摘要与绑定，不显示 `secretRef`。先在本地安全终端执行 `prfrail secret set --ref windows-credential:ProofRail/deepseek`，再由显式授权的 live availability probe 验证实际账户、网络、模型和额度。
+
 首次运行前确认源树/运行区/store 不重叠，secret 排除、磁盘、工具链、模型/费用上限、review 主体和可实施隔离。源树含未提交文件不要求 reset；baseline 捕获后不自动吸收外部变化。不要把 original workspace 交给 agent 编辑。
 
 ## 3. 操作员决策表

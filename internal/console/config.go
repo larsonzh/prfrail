@@ -9,6 +9,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/larsonzh/prfrail/internal/adapters"
 	"github.com/larsonzh/prfrail/internal/chain"
 	"github.com/larsonzh/prfrail/internal/evidence"
 )
@@ -24,9 +25,20 @@ var ErrInvalidConfig = errors.New("invalid proofrail configuration")
 type ChainConfig struct {
 	SchemaVersion string               `json:"schemaVersion"`
 	Chain         ChainSection         `json:"chain"`
+	AI            *AIConfig            `json:"ai,omitempty"`
 	Documentation *DocumentationConfig `json:"documentation,omitempty"`
 	Tasks         []TaskConfig         `json:"tasks"`
 	Workspace     WorkspaceConfig      `json:"workspace"`
+}
+
+type AIConfig struct {
+	Profiles []adapters.AIProviderProfile `json:"profiles"`
+	Channels []AIChannelBinding           `json:"channels"`
+}
+
+type AIChannelBinding struct {
+	Channel   string `json:"channel"`
+	ProfileID string `json:"profileId"`
 }
 
 type ChainSection struct {
@@ -125,12 +137,25 @@ type ConfigExplainReport struct {
 	ConfigHash          string              `json:"configHash"`
 	ChainID             string              `json:"chainId"`
 	Profile             string              `json:"profile"`
+	AIProfiles          []AIProfileExplain  `json:"aiProfiles"`
+	AIChannels          []AIChannelExplain  `json:"aiChannels"`
 	DocumentationPolicy string              `json:"documentationPolicy"`
 	RunnableInCLI       bool                `json:"runnableInCli"`
 	ExecutableSteps     []ExecutableStep    `json:"executableSteps"`
 	TaskPolicies        []TaskPolicyExplain `json:"taskPolicies"`
 	Resolution          []ResolutionExplain `json:"resolution"`
 	ConfigSearchOrder   []string            `json:"configSearchOrder"`
+}
+
+type AIProfileExplain struct {
+	ProfileID         string `json:"profileId"`
+	ProfileConfigHash string `json:"profileConfigHash"`
+}
+
+type AIChannelExplain struct {
+	Channel           string `json:"channel"`
+	ProfileID         string `json:"profileId"`
+	ProfileConfigHash string `json:"profileConfigHash"`
 }
 
 type TaskPolicyExplain struct {
@@ -239,6 +264,11 @@ func ValidateChainConfig(cfg ChainConfig) error {
 	}
 	if cfg.Documentation != nil {
 		if err := validateDocumentationPolicy(cfg.Documentation.Policy); err != nil {
+			return err
+		}
+	}
+	if cfg.AI != nil {
+		if err := validateAIConfig(cfg.AI); err != nil {
 			return err
 		}
 	}
@@ -351,6 +381,48 @@ func ValidateChainConfig(cfg ChainConfig) error {
 		return err
 	}
 	return nil
+}
+
+func validateAIConfig(config *AIConfig) error {
+	if config == nil || len(config.Profiles) == 0 || len(config.Channels) == 0 {
+		return fmt.Errorf("%w: ai requires profiles and channels", ErrInvalidConfig)
+	}
+	profileHashes := make(map[string]string, len(config.Profiles))
+	previousProfileID := ""
+	for _, profile := range config.Profiles {
+		if previousProfileID != "" && profile.ProfileID <= previousProfileID {
+			return fmt.Errorf("%w: ai.profiles must be sorted by unique profileId", ErrInvalidConfig)
+		}
+		hash, err := adapters.AIProviderProfileHash(profile)
+		if err != nil {
+			return fmt.Errorf("%w: profile %q: %v", ErrInvalidConfig, profile.ProfileID, err)
+		}
+		profileHashes[profile.ProfileID] = hash
+		previousProfileID = profile.ProfileID
+	}
+	previousChannel := ""
+	for _, binding := range config.Channels {
+		if !validConfiguredAIChannel(binding.Channel) {
+			return fmt.Errorf("%w: invalid ai channel %q", ErrInvalidConfig, binding.Channel)
+		}
+		if previousChannel != "" && binding.Channel <= previousChannel {
+			return fmt.Errorf("%w: ai.channels must be sorted by unique channel", ErrInvalidConfig)
+		}
+		if _, found := profileHashes[binding.ProfileID]; !found {
+			return fmt.Errorf("%w: ai channel %q references unknown profile %q", ErrInvalidConfig, binding.Channel, binding.ProfileID)
+		}
+		previousChannel = binding.Channel
+	}
+	return nil
+}
+
+func validConfiguredAIChannel(channel string) bool {
+	switch channel {
+	case "agent-runner-cli", "sessionbridge-silent", "sessionbridge-visible":
+		return true
+	default:
+		return false
+	}
 }
 
 func validateDocumentationPolicy(policy string) error {
@@ -505,6 +577,8 @@ func BuildConfigExplain(path string, cfg ChainConfig, rawConfig []byte) ConfigEx
 		ConfigHash:          configHash,
 		ChainID:             cfg.Chain.ID,
 		Profile:             cfg.Chain.Profile,
+		AIProfiles:          []AIProfileExplain{},
+		AIChannels:          []AIChannelExplain{},
 		DocumentationPolicy: effectiveChainDocumentationPolicy(cfg),
 		RunnableInCLI:       len(FindExecutableSteps(cfg)) == 0,
 		ExecutableSteps:     FindExecutableSteps(cfg),
@@ -512,7 +586,6 @@ func BuildConfigExplain(path string, cfg ChainConfig, rawConfig []byte) ConfigEx
 		Resolution:          []ResolutionExplain{},
 		ConfigSearchOrder:   []string{"explicit --chain path", filepath.Join("<cwd>", DefaultChainConfigName), filepath.Join("<cwd>", FallbackChainConfigName)},
 	}
-
 	addResolution := func(pointer, sourceKind string, sourcePointer *string) {
 		var sourceHash *string
 		if sourceKind != "builtin-default" {
@@ -525,6 +598,29 @@ func BuildConfigExplain(path string, cfg ChainConfig, rawConfig []byte) ConfigEx
 			SourceHash:       sourceHash,
 			SourcePointer:    sourcePointer,
 		})
+	}
+
+	profileHashes := make(map[string]string)
+	if cfg.AI != nil {
+		for index, profile := range cfg.AI.Profiles {
+			hash, err := adapters.AIProviderProfileHash(profile)
+			if err != nil {
+				continue
+			}
+			profileHashes[profile.ProfileID] = hash
+			report.AIProfiles = append(report.AIProfiles, AIProfileExplain{ProfileID: profile.ProfileID, ProfileConfigHash: hash})
+			pointer := fmt.Sprintf("/ai/profiles/%d", index)
+			addResolution(pointer, "chain", &pointer)
+		}
+		for index, binding := range cfg.AI.Channels {
+			report.AIChannels = append(report.AIChannels, AIChannelExplain{
+				Channel:           binding.Channel,
+				ProfileID:         binding.ProfileID,
+				ProfileConfigHash: profileHashes[binding.ProfileID],
+			})
+			pointer := fmt.Sprintf("/ai/channels/%d", index)
+			addResolution(pointer, "chain", &pointer)
+		}
 	}
 
 	chainIDPointer := "/chain/id"
