@@ -2,6 +2,7 @@ package adapters
 
 import (
 	"errors"
+	"sync"
 	"testing"
 )
 
@@ -80,5 +81,103 @@ func TestAgentRunnerEventReplayAndSequenceConflict(t *testing.T) {
 	}
 	if _, err := index.Record(drifted); !errors.Is(err, ErrAgentRunnerEventConflict) {
 		t.Fatalf("expected request session conflict, got %v", err)
+	}
+}
+
+func TestAgentRunnerEventIndexConcurrentReplay(t *testing.T) {
+	record, err := NewAgentRunnerEventRecord(agentRunnerEvent("event-one", 1))
+	if err != nil {
+		t.Fatal(err)
+	}
+	index, err := NewAgentRunnerEventIndex(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	const callers = 24
+	results := make(chan struct {
+		replayed bool
+		err      error
+	}, callers)
+	start := make(chan struct{})
+	var waitGroup sync.WaitGroup
+	for call := 0; call < callers; call++ {
+		waitGroup.Add(1)
+		go func() {
+			defer waitGroup.Done()
+			<-start
+			replayed, recordErr := index.Record(record)
+			results <- struct {
+				replayed bool
+				err      error
+			}{replayed: replayed, err: recordErr}
+		}()
+	}
+	close(start)
+	waitGroup.Wait()
+	close(results)
+
+	insertions := 0
+	replays := 0
+	for result := range results {
+		if result.err != nil {
+			t.Fatalf("unexpected concurrent replay error: %v", result.err)
+		}
+		if result.replayed {
+			replays++
+		} else {
+			insertions++
+		}
+	}
+	if insertions != 1 {
+		t.Fatalf("expected one insertion, got %d", insertions)
+	}
+	if replays != callers-1 {
+		t.Fatalf("expected %d replays, got %d", callers-1, replays)
+	}
+}
+
+func TestAgentRunnerEventIndexConcurrentSequenceConflict(t *testing.T) {
+	first, err := NewAgentRunnerEventRecord(agentRunnerEvent("event-one", 1))
+	if err != nil {
+		t.Fatal(err)
+	}
+	second, err := NewAgentRunnerEventRecord(agentRunnerEvent("event-two", 1))
+	if err != nil {
+		t.Fatal(err)
+	}
+	index, err := NewAgentRunnerEventIndex(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	results := make(chan error, 2)
+	start := make(chan struct{})
+	var waitGroup sync.WaitGroup
+	for _, record := range []AgentRunnerEventRecord{first, second} {
+		waitGroup.Add(1)
+		go func() {
+			defer waitGroup.Done()
+			<-start
+			_, recordErr := index.Record(record)
+			results <- recordErr
+		}()
+	}
+	close(start)
+	waitGroup.Wait()
+	close(results)
+
+	successes := 0
+	conflicts := 0
+	for recordErr := range results {
+		switch {
+		case recordErr == nil:
+			successes++
+		case errors.Is(recordErr, ErrAgentRunnerEventConflict):
+			conflicts++
+		default:
+			t.Fatalf("unexpected concurrent conflict error: %v", recordErr)
+		}
+	}
+	if successes != 1 || conflicts != 1 {
+		t.Fatalf("expected one successful insert and one conflict, successes=%d conflicts=%d", successes, conflicts)
 	}
 }

@@ -133,6 +133,121 @@ func TestAIAvailabilityReplayAndConflict(t *testing.T) {
 	}
 }
 
+func TestAIAvailabilityIndexConcurrentReplay(t *testing.T) {
+	record, err := NewAIAvailabilityRecord(aiAvailability())
+	if err != nil {
+		t.Fatal(err)
+	}
+	index := &AIAvailabilityIndex{}
+	const workers = 24
+	ready := make(chan struct{}, workers)
+	start := make(chan struct{})
+	results := make(chan struct {
+		replayed bool
+		err      error
+	}, workers)
+	for range workers {
+		go func() {
+			ready <- struct{}{}
+			<-start
+			replayed, err := index.Record(record)
+			results <- struct {
+				replayed bool
+				err      error
+			}{replayed: replayed, err: err}
+		}()
+	}
+	for range workers {
+		<-ready
+	}
+	close(start)
+
+	inserted := 0
+	replays := 0
+	for range workers {
+		result := <-results
+		if result.err != nil {
+			t.Fatalf("concurrent record failed: %v", result.err)
+		}
+		if result.replayed {
+			replays++
+		} else {
+			inserted++
+		}
+	}
+	if inserted != 1 || replays != workers-1 {
+		t.Fatalf("expected one insert and %d replays, inserted=%d replays=%d", workers-1, inserted, replays)
+	}
+}
+
+func TestAIAvailabilityIndexConcurrentConflict(t *testing.T) {
+	firstAvailability := aiAvailability()
+	secondAvailability := firstAvailability
+	secondAvailability.Channel = "sessionbridge-silent"
+	first, err := NewAIAvailabilityRecord(firstAvailability)
+	if err != nil {
+		t.Fatal(err)
+	}
+	second, err := NewAIAvailabilityRecord(secondAvailability)
+	if err != nil {
+		t.Fatal(err)
+	}
+	index := &AIAvailabilityIndex{}
+	ready := make(chan struct{}, 2)
+	start := make(chan struct{})
+	results := make(chan struct {
+		record   AIAvailabilityRecord
+		replayed bool
+		err      error
+	}, 2)
+	for _, record := range []AIAvailabilityRecord{first, second} {
+		go func(record AIAvailabilityRecord) {
+			ready <- struct{}{}
+			<-start
+			replayed, err := index.Record(record)
+			results <- struct {
+				record   AIAvailabilityRecord
+				replayed bool
+				err      error
+			}{record: record, replayed: replayed, err: err}
+		}(record)
+	}
+	for range 2 {
+		<-ready
+	}
+	close(start)
+
+	var winner AIAvailabilityRecord
+	var loser AIAvailabilityRecord
+	successes := 0
+	conflicts := 0
+	for range 2 {
+		result := <-results
+		switch {
+		case result.err == nil:
+			if result.replayed {
+				t.Fatal("concurrent first record was reported as a replay")
+			}
+			winner = result.record
+			successes++
+		case errors.Is(result.err, ErrAIAvailabilityConflict):
+			loser = result.record
+			conflicts++
+		default:
+			t.Fatalf("unexpected concurrent record error: %v", result.err)
+		}
+	}
+	if successes != 1 || conflicts != 1 {
+		t.Fatalf("expected one success and one conflict, successes=%d conflicts=%d", successes, conflicts)
+	}
+	if replayed, err := index.Record(winner); err != nil || !replayed {
+		t.Fatalf("winner was not replayed after insertion: replayed=%v err=%v", replayed, err)
+	}
+	if _, err := index.Record(loser); !errors.Is(err, ErrAIAvailabilityConflict) {
+		t.Fatalf("loser did not remain in conflict: %v", err)
+	}
+}
+
 func TestWriteAIAvailabilityRecordPublishesCanonicalRecordWithoutReplace(t *testing.T) {
 	record, err := NewAIAvailabilityRecord(aiAvailability())
 	if err != nil {

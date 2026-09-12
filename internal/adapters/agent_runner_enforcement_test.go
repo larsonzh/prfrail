@@ -5,6 +5,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"sync"
 	"testing"
 	"time"
 )
@@ -122,6 +123,123 @@ func TestAgentRunnerEnforcementReplayAndConflict(t *testing.T) {
 	var nilIndex *AgentRunnerEnforcementIndex
 	if _, err := nilIndex.Record(first); !errors.Is(err, ErrInvalidAgentRunnerEnforcement) {
 		t.Fatalf("nil index accepted: %v", err)
+	}
+}
+
+func TestAgentRunnerEnforcementConcurrentReplay(t *testing.T) {
+	capability := blockedAgentRunnerCapability(t)
+	record, err := NewAgentRunnerEnforcementRecord(agentRunnerEnforcement(capability))
+	if err != nil {
+		t.Fatal(err)
+	}
+	index, err := NewAgentRunnerEnforcementIndex(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	const workers = 24
+	results := make([]struct {
+		replayed bool
+		err      error
+	}, workers)
+	start := make(chan struct{})
+	var ready sync.WaitGroup
+	var done sync.WaitGroup
+	ready.Add(workers)
+	done.Add(workers)
+	for i := 0; i < workers; i++ {
+		go func(i int) {
+			defer done.Done()
+			ready.Done()
+			<-start
+			results[i].replayed, results[i].err = index.Record(record)
+		}(i)
+	}
+	ready.Wait()
+	close(start)
+	done.Wait()
+
+	inserted := 0
+	replayed := 0
+	for _, result := range results {
+		if result.err != nil {
+			t.Fatalf("concurrent replay failed: %v", result.err)
+		}
+		if result.replayed {
+			replayed++
+		} else {
+			inserted++
+		}
+	}
+	if inserted != 1 || replayed != workers-1 {
+		t.Fatalf("unexpected concurrent replay counts: inserted=%d replayed=%d", inserted, replayed)
+	}
+}
+
+func TestAgentRunnerEnforcementConcurrentConflict(t *testing.T) {
+	capability := blockedAgentRunnerCapability(t)
+	first, err := NewAgentRunnerEnforcementRecord(agentRunnerEnforcement(capability))
+	if err != nil {
+		t.Fatal(err)
+	}
+	changed := agentRunnerEnforcement(capability)
+	changed.EnforcementConfigHash = queueHashOne
+	second, err := NewAgentRunnerEnforcementRecord(changed)
+	if err != nil {
+		t.Fatal(err)
+	}
+	index, err := NewAgentRunnerEnforcementIndex(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	records := []AgentRunnerEnforcementRecord{first, second}
+	results := make([]struct {
+		replayed bool
+		err      error
+	}, len(records))
+	start := make(chan struct{})
+	var ready sync.WaitGroup
+	var done sync.WaitGroup
+	ready.Add(len(records))
+	done.Add(len(records))
+	for i := range records {
+		go func(i int) {
+			defer done.Done()
+			ready.Done()
+			<-start
+			results[i].replayed, results[i].err = index.Record(records[i])
+		}(i)
+	}
+	ready.Wait()
+	close(start)
+	done.Wait()
+
+	successes := 0
+	conflicts := 0
+	winner := -1
+	loser := -1
+	for i, result := range results {
+		switch {
+		case result.err == nil:
+			successes++
+			winner = i
+		case errors.Is(result.err, ErrAgentRunnerEnforcementConflict):
+			conflicts++
+			loser = i
+		default:
+			t.Fatalf("unexpected concurrent conflict result: %v", result.err)
+		}
+	}
+	if successes != 1 || conflicts != 1 {
+		t.Fatalf("unexpected concurrent conflict counts: successes=%d conflicts=%d", successes, conflicts)
+	}
+
+	if replayed, err := index.Record(records[winner]); err != nil || !replayed {
+		t.Fatalf("winner was not a replay: replayed=%v err=%v", replayed, err)
+	}
+	if replayed, err := index.Record(records[loser]); !errors.Is(err, ErrAgentRunnerEnforcementConflict) || replayed {
+		t.Fatalf("loser stopped conflicting: replayed=%v err=%v", replayed, err)
 	}
 }
 

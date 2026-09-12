@@ -100,6 +100,114 @@ func TestAgentRunnerCapabilityReplayAndConflict(t *testing.T) {
 	}
 }
 
+func TestAgentRunnerCapabilityIndexConcurrentReplay(t *testing.T) {
+	record, err := NewAgentRunnerCapabilityRecord(agentRunnerCapability())
+	if err != nil {
+		t.Fatal(err)
+	}
+	index, err := NewAgentRunnerCapabilityIndex(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	const calls = 24
+	start := make(chan struct{})
+	results := make(chan struct {
+		replayed bool
+		err      error
+	}, calls)
+	for call := 0; call < calls; call++ {
+		go func() {
+			<-start
+			replayed, recordErr := index.Record(record)
+			results <- struct {
+				replayed bool
+				err      error
+			}{replayed: replayed, err: recordErr}
+		}()
+	}
+	close(start)
+
+	insertions := 0
+	replays := 0
+	for call := 0; call < calls; call++ {
+		result := <-results
+		if result.err != nil {
+			t.Fatalf("concurrent replay returned error: %v", result.err)
+		}
+		if result.replayed {
+			replays++
+		} else {
+			insertions++
+		}
+	}
+	if insertions != 1 || replays != calls-1 {
+		t.Fatalf("expected one insertion and %d replays, got %d insertions and %d replays", calls-1, insertions, replays)
+	}
+}
+
+func TestAgentRunnerCapabilityIndexConcurrentConflict(t *testing.T) {
+	winnerCandidate, err := NewAgentRunnerCapabilityRecord(agentRunnerCapability())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	loserCandidateCapability := agentRunnerCapability()
+	loserCandidateCapability.Version = "fixture-agent 1.0.1"
+	loserCandidate, err := NewAgentRunnerCapabilityRecord(loserCandidateCapability)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	index, err := NewAgentRunnerCapabilityIndex(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	start := make(chan struct{})
+	results := make(chan struct {
+		record AgentRunnerCapabilityRecord
+		err    error
+	}, 2)
+	for _, candidate := range []AgentRunnerCapabilityRecord{winnerCandidate, loserCandidate} {
+		go func(record AgentRunnerCapabilityRecord) {
+			<-start
+			_, recordErr := index.Record(record)
+			results <- struct {
+				record AgentRunnerCapabilityRecord
+				err    error
+			}{record: record, err: recordErr}
+		}(candidate)
+	}
+	close(start)
+
+	var winner, loser AgentRunnerCapabilityRecord
+	conflicts := 0
+	for call := 0; call < 2; call++ {
+		result := <-results
+		if result.err == nil {
+			winner = result.record
+			continue
+		}
+		if !errors.Is(result.err, ErrAgentRunnerCapabilityConflict) {
+			t.Fatalf("expected capability conflict, got %v", result.err)
+		}
+		loser = result.record
+		conflicts++
+	}
+	if winner.RecordHash == "" || loser.RecordHash == "" || conflicts != 1 {
+		t.Fatalf("expected one winner and one conflict, winner=%q loser=%q conflicts=%d", winner.RecordHash, loser.RecordHash, conflicts)
+	}
+
+	replayed, err := index.Record(winner)
+	if err != nil || !replayed {
+		t.Fatalf("expected winning record to replay, replayed=%v err=%v", replayed, err)
+	}
+	replayed, err = index.Record(loser)
+	if replayed || !errors.Is(err, ErrAgentRunnerCapabilityConflict) {
+		t.Fatalf("expected losing record to remain in conflict, replayed=%v err=%v", replayed, err)
+	}
+}
+
 func TestPinnedAgentRunnerCapabilityReport(t *testing.T) {
 	directory := filepath.Join("..", "..", "testdata", "agent-runner", "capability-probes")
 	path := filepath.Join(directory, "github-copilot-cli-windows.json")

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sync"
 	"time"
 
 	"github.com/larsonzh/prfrail/internal/evidence"
@@ -47,6 +48,7 @@ type AIAvailabilityPolicy struct {
 }
 
 type AIAvailabilityIndex struct {
+	mu     sync.Mutex
 	hashes map[string]string
 }
 
@@ -143,6 +145,8 @@ func (index *AIAvailabilityIndex) Record(record AIAvailabilityRecord) (bool, err
 	if err := ValidateAIAvailabilityRecord(record); err != nil {
 		return false, err
 	}
+	index.mu.Lock()
+	defer index.mu.Unlock()
 	if index.hashes == nil {
 		index.hashes = make(map[string]string)
 	}

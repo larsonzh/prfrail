@@ -3,6 +3,7 @@ package adapters
 import (
 	"errors"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/larsonzh/prfrail/internal/evidence"
@@ -58,6 +59,7 @@ type AgentRunnerCapabilityRecord struct {
 }
 
 type AgentRunnerCapabilityIndex struct {
+	mu     sync.Mutex
 	hashes map[string]string
 }
 
@@ -118,6 +120,8 @@ func (index *AgentRunnerCapabilityIndex) Record(record AgentRunnerCapabilityReco
 	if err := ValidateAgentRunnerCapabilityRecord(record); err != nil {
 		return false, err
 	}
+	index.mu.Lock()
+	defer index.mu.Unlock()
 	if index.hashes == nil {
 		index.hashes = make(map[string]string)
 	}

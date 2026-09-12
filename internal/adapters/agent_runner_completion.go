@@ -3,6 +3,7 @@ package adapters
 import (
 	"errors"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/larsonzh/prfrail/internal/evidence"
@@ -44,6 +45,7 @@ type AgentRunnerCompletionRecord struct {
 }
 
 type AgentRunnerCompletionIndex struct {
+	mu               sync.Mutex
 	completionHashes map[string]string
 	requestHashes    map[string]string
 }
@@ -126,6 +128,8 @@ func (index *AgentRunnerCompletionIndex) Record(record AgentRunnerCompletionReco
 	if err := ValidateAgentRunnerCompletionRecord(record); err != nil {
 		return false, err
 	}
+	index.mu.Lock()
+	defer index.mu.Unlock()
 	if index.completionHashes == nil {
 		index.completionHashes = make(map[string]string)
 	}
