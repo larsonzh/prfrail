@@ -52,11 +52,24 @@ test("all schemas compile and every catalog matches its independent expectation"
           true,
           `${result.fixtureId}: semantic fixture must be schema-valid`,
         );
-        assert.equal(
-          result.semanticErrors.length,
-          result.expected === "reject" ? 1 : 0,
-          `${result.fixtureId}: semantic fixtures must isolate one expected rule`,
-        );
+        if (result.expected === "reject") {
+          assert.ok(
+            Array.isArray(result.expectedSemanticErrors) &&
+              result.expectedSemanticErrors.length > 0,
+            `${result.fixtureId}: rejected semantic fixtures must declare the exact expectedSemanticErrors`,
+          );
+          assert.deepEqual(
+            [...result.semanticErrors].sort(),
+            [...result.expectedSemanticErrors].sort(),
+            `${result.fixtureId}: semantic errors must match the declared expectation`,
+          );
+        } else {
+          assert.equal(
+            result.semanticErrors.length,
+            0,
+            `${result.fixtureId}: accepted semantic fixtures must not raise semantic errors`,
+          );
+        }
       }
       fixtureCount += 1;
     }

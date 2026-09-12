@@ -443,7 +443,10 @@
       "context": {
         "now": "2026-09-10T02:30:00.000Z"
       }
-    }
+    },
+    "expectedSemanticErrors": [
+      "agent-runner.budget-hash.not-reservation:agent-request-one"
+    ]
   },
   {
     "fixtureId": "semantic-agent-runner-budget-hash-not-reservation",
@@ -666,7 +669,10 @@
       "context": {
         "now": "2026-09-10T02:30:00.000Z"
       }
-    }
+    },
+    "expectedSemanticErrors": [
+      "agent-runner.budget-hash.not-reservation:agent-request-one"
+    ]
   },
   {
     "fixtureId": "semantic-agent-runner-grant-duplicate",
@@ -936,7 +942,10 @@
       "context": {
         "now": "2026-09-10T02:30:00.000Z"
       }
-    }
+    },
+    "expectedSemanticErrors": [
+      "agent-runner.authorization-grant.duplicate:agent-request-one"
+    ]
   },
   {
     "fixtureId": "semantic-agent-runner-grant-expired",
@@ -1159,7 +1168,10 @@
       "context": {
         "now": "2026-09-10T02:30:00.000Z"
       }
-    }
+    },
+    "expectedSemanticErrors": [
+      "agent-runner.authorization.expired:agent-request-one"
+    ]
   },
   {
     "fixtureId": "semantic-agent-runner-grant-missing",
@@ -1382,7 +1394,10 @@
       "context": {
         "now": "2026-09-10T02:30:00.000Z"
       }
-    }
+    },
+    "expectedSemanticErrors": [
+      "agent-runner.authorization-grant.missing:agent-request-one"
+    ]
   },
   {
     "fixtureId": "semantic-agent-runner-grant-pending",
@@ -1605,7 +1620,10 @@
       "context": {
         "now": "2026-09-10T02:30:00.000Z"
       }
-    }
+    },
+    "expectedSemanticErrors": [
+      "agent-runner.authorization.pending:agent-request-one"
+    ]
   },
   {
     "fixtureId": "semantic-agent-runner-grant-revocation-hash-mismatch",
@@ -1870,7 +1888,10 @@
       "context": {
         "now": "2026-09-10T02:30:00.000Z"
       }
-    }
+    },
+    "expectedSemanticErrors": [
+      "agent-runner.authorization-revocation.hash-mismatch:agent-request-one"
+    ]
   },
   {
     "fixtureId": "semantic-agent-runner-grant-revoked",
@@ -2114,7 +2135,10 @@
       "context": {
         "now": "2026-09-10T02:30:00.000Z"
       }
-    }
+    },
+    "expectedSemanticErrors": [
+      "agent-runner.authorization.revoked:agent-request-one"
+    ]
   },
   {
     "fixtureId": "semantic-agent-runner-grant-run-scope-mismatch",
@@ -2337,7 +2361,10 @@
       "context": {
         "now": "2026-09-10T02:30:00.000Z"
       }
-    }
+    },
+    "expectedSemanticErrors": [
+      "agent-runner.authorization-scope.mismatch:agent-request-one"
+    ]
   },
   {
     "fixtureId": "semantic-agent-runner-grant-scope-mismatch",
@@ -2560,7 +2587,10 @@
       "context": {
         "now": "2026-09-10T02:30:00.000Z"
       }
-    }
+    },
+    "expectedSemanticErrors": [
+      "agent-runner.authorization-scope.mismatch:agent-request-one"
+    ]
   },
   {
     "fixtureId": "semantic-agent-runner-grant-step-scope-mismatch",
@@ -2783,7 +2813,10 @@
       "context": {
         "now": "2026-09-10T02:30:00.000Z"
       }
-    }
+    },
+    "expectedSemanticErrors": [
+      "agent-runner.authorization-scope.mismatch:agent-request-one"
+    ]
   },
   {
     "fixtureId": "semantic-agent-runner-grant-task-scope-mismatch",
@@ -3006,7 +3039,10 @@
       "context": {
         "now": "2026-09-10T02:30:00.000Z"
       }
-    }
+    },
+    "expectedSemanticErrors": [
+      "agent-runner.authorization-scope.mismatch:agent-request-one"
+    ]
   },
   {
     "fixtureId": "semantic-agent-runner-request-record-empty",
@@ -3201,7 +3237,10 @@
       "context": {
         "now": "2026-09-10T02:30:00.000Z"
       }
-    }
+    },
+    "expectedSemanticErrors": [
+      "agent-runner.request-record.required"
+    ]
   },
   {
     "fixtureId": "semantic-agent-runner-request-record-missing",
@@ -3395,7 +3434,10 @@
       "context": {
         "now": "2026-09-10T02:30:00.000Z"
       }
-    }
+    },
+    "expectedSemanticErrors": [
+      "agent-runner.request-record.required"
+    ]
   },
   {
     "fixtureId": "semantic-agent-runner-reservation-binding-mismatch",
@@ -3618,7 +3660,10 @@
       "context": {
         "now": "2026-09-10T02:30:00.000Z"
       }
-    }
+    },
+    "expectedSemanticErrors": [
+      "agent-runner.reservation.binding-mismatch:agent-request-one"
+    ]
   },
   {
     "fixtureId": "semantic-agent-runner-reservation-duplicate",
@@ -3857,7 +3902,10 @@
       "context": {
         "now": "2026-09-10T02:30:00.000Z"
       }
-    }
+    },
+    "expectedSemanticErrors": [
+      "agent-runner.reservation.duplicate:agent-request-one"
+    ]
   },
   {
     "fixtureId": "semantic-agent-runner-reservation-missing",
@@ -4080,7 +4128,10 @@
       "context": {
         "now": "2026-09-10T02:30:00.000Z"
       }
-    }
+    },
+    "expectedSemanticErrors": [
+      "agent-runner.reservation.missing:agent-request-one"
+    ]
   },
   {
     "fixtureId": "semantic-agent-runner-reservation-settled",
@@ -4320,7 +4371,10 @@
       "context": {
         "now": "2026-09-10T02:30:00.000Z"
       }
-    }
+    },
+    "expectedSemanticErrors": [
+      "agent-runner.reservation.settled:agent-request-one"
+    ]
   },
   {
     "fixtureId": "semantic-component-dependency-cycle",
@@ -4435,7 +4489,10 @@
           ]
         }
       }
-    }
+    },
+    "expectedSemanticErrors": [
+      "component-dependency.cycle:core-a"
+    ]
   },
   {
     "fixtureId": "semantic-duplicate-step-id",
@@ -4533,7 +4590,10 @@
           ]
         }
       }
-    }
+    },
+    "expectedSemanticErrors": [
+      "step.duplicate:same-step"
+    ]
   },
   {
     "fixtureId": "semantic-duplicate-task-id",
@@ -4631,7 +4691,10 @@
           ]
         }
       }
-    }
+    },
+    "expectedSemanticErrors": [
+      "task.duplicate:same-task"
+    ]
   },
   {
     "fixtureId": "semantic-expired-waiver",
@@ -4764,7 +4827,10 @@
         "changeProducerId": "producer-two",
         "now": "2026-09-10T02:30:00.000Z"
       }
-    }
+    },
+    "expectedSemanticErrors": [
+      "review.waiver-expired:expired-waiver-receipt"
+    ]
   },
   {
     "fixtureId": "semantic-generated-target-cycle",
@@ -4875,7 +4941,10 @@
           ]
         }
       }
-    }
+    },
+    "expectedSemanticErrors": [
+      "target-generation.cycle:generated-a"
+    ]
   },
   {
     "fixtureId": "semantic-handoff-read-only-target",
@@ -4985,7 +5054,10 @@
           ]
         }
       }
-    }
+    },
+    "expectedSemanticErrors": [
+      "handoff-target.not-writable:readonly-files"
+    ]
   },
   {
     "fixtureId": "semantic-identical-writable-glob-overlap",
@@ -5080,7 +5152,10 @@
           ]
         }
       }
-    }
+    },
+    "expectedSemanticErrors": [
+      "target.write-overlap:source-a:source-b:src/**/*.go"
+    ]
   },
   {
     "fixtureId": "semantic-language-scope-dependency-cycle",
@@ -5181,7 +5256,10 @@
           ]
         }
       }
-    }
+    },
+    "expectedSemanticErrors": [
+      "language-scope-dependency.cycle:go-a"
+    ]
   },
   {
     "fixtureId": "semantic-missing-hook-reference",
@@ -5270,7 +5348,10 @@
           ]
         }
       }
-    }
+    },
+    "expectedSemanticErrors": [
+      "step-hook-reference.missing:missing-hook"
+    ]
   },
   {
     "fixtureId": "semantic-missing-target-reference",
@@ -5357,7 +5438,10 @@
           ]
         }
       }
-    }
+    },
+    "expectedSemanticErrors": [
+      "language-target-reference.missing:missing-target"
+    ]
   },
   {
     "fixtureId": "semantic-missing-step-target-reference",
@@ -5446,7 +5530,10 @@
           ]
         }
       }
-    }
+    },
+    "expectedSemanticErrors": [
+      "step-target-reference.missing:missing-target"
+    ]
   },
   {
     "fixtureId": "semantic-required-documentation-missing",
@@ -5536,7 +5623,10 @@
           ]
         }
       }
-    }
+    },
+    "expectedSemanticErrors": [
+      "documentation.impact-rule-required"
+    ]
   },
   {
     "fixtureId": "semantic-review-self-approval",
@@ -5654,7 +5744,10 @@
         "changeProducerId": "producer-one",
         "now": "2026-09-10T02:30:00.000Z"
       }
-    }
+    },
+    "expectedSemanticErrors": [
+      "review.separation-violated:self-approval-receipt"
+    ]
   },
   {
     "fixtureId": "semantic-step-scope-empty",
@@ -5757,6 +5850,9 @@
           ]
         }
       }
-    }
+    },
+    "expectedSemanticErrors": [
+      "step.scope-empty:code-step"
+    ]
   }
 ]

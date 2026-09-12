@@ -39,8 +39,7 @@ function createValidator(schemaDir) {
 }
 
 function validateFixtureMetadata(fixture, catalogPath, index) {
-  const keys = Object.keys(fixture).sort();
-  const expectedKeys = [
+  const requiredKeys = [
     "expected",
     "fixtureId",
     "instance",
@@ -48,10 +47,35 @@ function validateFixtureMetadata(fixture, catalogPath, index) {
     "rejectionLayer",
     "schema",
   ];
-  if (JSON.stringify(keys) !== JSON.stringify(expectedKeys)) {
+  const optionalKeys = ["expectedSemanticErrors"];
+  const keys = Object.keys(fixture).sort();
+  const missing = requiredKeys.filter((key) => !(key in fixture));
+  const extra = keys.filter(
+    (key) => !requiredKeys.includes(key) && !optionalKeys.includes(key),
+  );
+  if (missing.length > 0 || extra.length > 0) {
     throw new Error(
-      `${catalogPath}[${index}]: fixture fields must be exactly ${expectedKeys.join(", ")}`,
+      `${catalogPath}[${index}]: fixture fields must be exactly ${requiredKeys.join(", ")} with optional ${optionalKeys.join(", ")}`,
     );
+  }
+  if (fixture.expectedSemanticErrors !== undefined) {
+    const declared = fixture.expectedSemanticErrors;
+    if (
+      !Array.isArray(declared) ||
+      declared.length === 0 ||
+      declared.some(
+        (value) => typeof value !== "string" || value.length === 0,
+      )
+    ) {
+      throw new Error(
+        `${catalogPath}[${index}]: expectedSemanticErrors must be a non-empty array of non-empty strings`,
+      );
+    }
+    if (fixture.rejectionLayer !== "semantic" || fixture.expected !== "reject") {
+      throw new Error(
+        `${catalogPath}[${index}]: expectedSemanticErrors is only allowed on rejected semantic fixtures`,
+      );
+    }
   }
   if (!fixtureIdPattern.test(fixture.fixtureId)) {
     throw new Error(`${catalogPath}[${index}]: invalid fixtureId`);
@@ -139,6 +163,7 @@ function runCatalog(ajv, catalogPath) {
       schema: fixture.schema,
       expected: fixture.expected,
       rejectionLayer: fixture.rejectionLayer,
+      expectedSemanticErrors: fixture.expectedSemanticErrors,
       schemaAccepted,
       semanticErrors,
       passed,
