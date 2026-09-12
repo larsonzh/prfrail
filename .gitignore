@@ -10,8 +10,10 @@ vendor/
 /out/
 /tmp/*
 !/tmp/.gitkeep
+.github/agents/
 
 # context-mode runtime state
+.github/context-mode/content/
 .github/context-mode/sessions/
 .github/hooks/context-mode.json.bak
 
