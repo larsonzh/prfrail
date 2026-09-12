@@ -847,11 +847,14 @@ func writeCanonicalLineNoReplace(path string, record any) error {
 	if err := os.MkdirAll(directory, 0o755); err != nil {
 		return err
 	}
-	temp := filepath.Join(directory, fmt.Sprintf(".%s.%d.tmp", filepath.Base(path), time.Now().UTC().UnixNano()))
-	file, err := os.OpenFile(temp, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0o600)
+	// A random unique temporary name keeps fs.ErrExist a truthful signal: it can
+	// then only mean that the destination already exists, never that two writers
+	// happened to pick the same timestamped scratch name.
+	file, err := os.CreateTemp(directory, "."+filepath.Base(path)+".*.tmp")
 	if err != nil {
 		return err
 	}
+	temp := file.Name()
 	writeErr := error(nil)
 	if _, err := file.Write(payload); err != nil {
 		writeErr = err
