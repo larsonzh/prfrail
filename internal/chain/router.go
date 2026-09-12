@@ -13,6 +13,17 @@ type IsolatedWorkspacePort interface {
 	CaptureIsolatedWorkspace(context.Context, StepRequest) (StepResult, error)
 }
 
+type AgentRunnerPort interface {
+	DispatchAgentRunner(context.Context, StepRequest) (StepResult, error)
+}
+
+// AgentRunnerAdmission owns the runtime preflight hook. Implementations must
+// validate all persisted availability, capability, enforcement, platform,
+// authorization, and budget bindings required by the AgentRunner contract.
+type AgentRunnerAdmission interface {
+	AdmitAgentRunner(context.Context, StepRequest) error
+}
+
 type ManualHandoffPort interface {
 	OpenManualHandoff(context.Context, StepRequest) (StepResult, error)
 }
@@ -22,10 +33,30 @@ type HookPort interface {
 }
 
 type StepRouter struct {
-	Managed  ManagedChangeSetPort
-	Isolated IsolatedWorkspacePort
-	Handoff  ManualHandoffPort
-	Hooks    HookPort
+	Managed              ManagedChangeSetPort
+	Isolated             IsolatedWorkspacePort
+	AgentRunner          AgentRunnerPort
+	AgentRunnerAdmission AgentRunnerAdmission
+	Handoff              ManualHandoffPort
+	Hooks                HookPort
+}
+
+func (router StepRouter) ExecuteAgentRunner(ctx context.Context, request StepRequest) (StepResult, error) {
+	// This is an offline integration hook until Engine routing is explicitly
+	// wired. Production AgentRunner dispatch must use this admission-first path.
+	if request.Step.Kind != "code" || request.Step.Mode != IsolatedWorkspace {
+		return StepResult{}, fmt.Errorf("%w: AgentRunner requires isolated workspace code step", ErrInvalidDefinition)
+	}
+	if router.AgentRunner == nil {
+		return StepResult{}, fmt.Errorf("%w: AgentRunner port unavailable", ErrInvalidDefinition)
+	}
+	if router.AgentRunnerAdmission == nil {
+		return StepResult{}, fmt.Errorf("%w: AgentRunner admission unavailable", ErrInvalidDefinition)
+	}
+	if err := router.AgentRunnerAdmission.AdmitAgentRunner(ctx, request); err != nil {
+		return StepResult{}, err
+	}
+	return router.AgentRunner.DispatchAgentRunner(ctx, request)
 }
 
 func (router StepRouter) Execute(ctx context.Context, request StepRequest) (StepResult, error) {
