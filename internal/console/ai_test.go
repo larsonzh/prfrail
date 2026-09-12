@@ -23,6 +23,7 @@ func writeAIAvailabilityFixture(t *testing.T, root, name string, record adapters
 func TestAICheckUsesConfiguredChannelAndReturnsAvailabilityRecord(t *testing.T) {
 	root := t.TempDir()
 	configPath := filepath.Join(root, DefaultChainConfigName)
+	executablePath := filepath.Join(root, "copilot.exe")
 	encoded, err := EncodeChainConfig(configuredAIChain())
 	if err != nil {
 		t.Fatal(err)
@@ -38,7 +39,7 @@ func TestAICheckUsesConfiguredChannelAndReturnsAvailabilityRecord(t *testing.T) 
 		if profile.ProfileID != "deepseek-anthropic" || channel != "agent-runner-cli" || maximumRequests != 1 {
 			t.Fatalf("unexpected binding: profile=%s channel=%s requests=%d", profile.ProfileID, channel, maximumRequests)
 		}
-		if executable != `C:\bin\copilot.exe` || workingDirectory != root {
+		if executable != executablePath || workingDirectory != root {
 			t.Fatalf("unexpected execution target: executable=%q cwd=%q", executable, workingDirectory)
 		}
 		reason := "credential_rejected"
@@ -59,7 +60,7 @@ func TestAICheckUsesConfiguredChannelAndReturnsAvailabilityRecord(t *testing.T) 
 		"ai", "check",
 		"--chain", configPath,
 		"--channel", "agent-runner-cli",
-		"--copilot", `C:\bin\copilot.exe`,
+		"--copilot", executablePath,
 		"--max-requests", "1",
 		"--out", filepath.Join(root, "availability.json"),
 		"--json",
@@ -109,7 +110,7 @@ func TestAICheckRejectsUnconfiguredOrUnsupportedChannelWithoutProbe(t *testing.T
 	for _, channel := range []string{"sessionbridge-silent", "sessionbridge-visible"} {
 		code, _, _ := runCLI(t, cli,
 			"ai", "check", "--chain", configPath, "--channel", channel,
-			"--copilot", `C:\bin\copilot.exe`, "--max-requests", "1",
+			"--copilot", filepath.Join(root, "copilot.exe"), "--max-requests", "1",
 			"--out", filepath.Join(root, channel+".json"), "--json",
 		)
 		if code != exitFailure {
@@ -143,7 +144,7 @@ func TestAICheckReturnsSuccessOnlyForAvailableRecord(t *testing.T) {
 	}
 	code, stdout, stderr := runCLI(t, cli,
 		"ai", "check", "--chain", configPath, "--channel", "agent-runner-cli",
-		"--copilot", `C:\bin\copilot.exe`, "--max-requests", "1", "--out", filepath.Join(root, "available.json"), "--json",
+		"--copilot", filepath.Join(root, "copilot.exe"), "--max-requests", "1", "--out", filepath.Join(root, "available.json"), "--json",
 	)
 	if code != exitSuccess || stderr != "" {
 		t.Fatalf("unexpected command result: code=%d stdout=%q stderr=%q", code, stdout, stderr)
@@ -206,7 +207,7 @@ func TestAICheckRejectsExistingOutputBeforeProbe(t *testing.T) {
 	}
 	code, _, _ := runCLI(t, cli,
 		"ai", "check", "--chain", configPath, "--channel", "agent-runner-cli",
-		"--copilot", `C:\bin\copilot.exe`, "--max-requests", "1", "--out", outputPath, "--json",
+		"--copilot", filepath.Join(root, "copilot.exe"), "--max-requests", "1", "--out", outputPath, "--json",
 	)
 	if code != exitFailure {
 		t.Fatalf("existing output did not fail closed: code=%d", code)
