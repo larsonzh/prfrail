@@ -52,13 +52,32 @@ type Workspace struct {
 	Root string
 }
 
+type ExecutionTarget string
+
+const (
+	DefaultExecution     ExecutionTarget = ""
+	AgentRunnerExecution ExecutionTarget = "agent-runner"
+)
+
+// AgentRunnerImmutableFacts are platform-neutral bindings copied from the
+// persisted AgentRunner request. Non-AgentRunner steps leave them nil.
+type AgentRunnerImmutableFacts struct {
+	RequestID         string
+	WorkspaceHash     string
+	ContextHash       string
+	AuthorizationHash string
+	BudgetHash        string
+}
+
 type StepRequest struct {
-	RunID      string
-	TaskID     string
-	Step       Step
-	Attempt    int
-	ParentHash string
-	Workspace  Workspace
+	RunID            string
+	TaskID           string
+	Step             Step
+	Attempt          int
+	ParentHash       string
+	Workspace        Workspace
+	ExecutionTarget  ExecutionTarget
+	AgentRunnerFacts *AgentRunnerImmutableFacts
 }
 
 type StepResult struct {

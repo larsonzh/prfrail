@@ -109,3 +109,35 @@ func TestAgentRunnerRequestReplayAndConflict(t *testing.T) {
 		t.Fatalf("expected replay conflict, got %v", err)
 	}
 }
+
+func TestAgentRunnerRequestIndexConcurrentReplay(t *testing.T) {
+	record, err := NewAgentRunnerRequestRecord(agentRunnerRequest("request-one"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	index, err := NewAgentRunnerRequestIndex(nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	errorsByCall := make(chan error, 16)
+	replaysByCall := make(chan bool, 16)
+	for call := 0; call < cap(errorsByCall); call++ {
+		go func() {
+			replayed, recordErr := index.Record(record)
+			replaysByCall <- replayed
+			errorsByCall <- recordErr
+		}()
+	}
+	replays := 0
+	for call := 0; call < cap(errorsByCall); call++ {
+		if recordErr := <-errorsByCall; recordErr != nil {
+			t.Fatal(recordErr)
+		}
+		if <-replaysByCall {
+			replays++
+		}
+	}
+	if replays != cap(errorsByCall)-1 {
+		t.Fatalf("expected one insertion and %d replays, got %d replays", cap(errorsByCall)-1, replays)
+	}
+}

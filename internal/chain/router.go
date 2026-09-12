@@ -18,8 +18,8 @@ type AgentRunnerPort interface {
 }
 
 // AgentRunnerAdmission owns the runtime preflight hook. Implementations must
-// validate all persisted availability, capability, enforcement, platform,
-// authorization, and budget bindings required by the AgentRunner contract.
+// validate the persisted facts they claim to enforce and fail closed when a
+// required AgentRunner contract fact cannot be established.
 type AgentRunnerAdmission interface {
 	AdmitAgentRunner(context.Context, StepRequest) error
 }
@@ -47,6 +47,9 @@ func (router StepRouter) ExecuteAgentRunner(ctx context.Context, request StepReq
 	if request.Step.Kind != "code" || request.Step.Mode != IsolatedWorkspace {
 		return StepResult{}, fmt.Errorf("%w: AgentRunner requires isolated workspace code step", ErrInvalidDefinition)
 	}
+	if request.ExecutionTarget != AgentRunnerExecution || request.AgentRunnerFacts == nil {
+		return StepResult{}, fmt.Errorf("%w: AgentRunner execution target and immutable facts required", ErrInvalidDefinition)
+	}
 	if router.AgentRunner == nil {
 		return StepResult{}, fmt.Errorf("%w: AgentRunner port unavailable", ErrInvalidDefinition)
 	}
@@ -69,6 +72,19 @@ func (router StepRouter) Execute(ctx context.Context, request StepRequest) (Step
 			}
 			return router.Managed.ApplyManagedChangeSet(ctx, request)
 		case IsolatedWorkspace:
+			switch request.ExecutionTarget {
+			case AgentRunnerExecution:
+				if request.AgentRunnerFacts == nil {
+					return StepResult{}, fmt.Errorf("%w: AgentRunner immutable facts required", ErrInvalidDefinition)
+				}
+				return router.ExecuteAgentRunner(ctx, request)
+			case DefaultExecution:
+				if request.AgentRunnerFacts != nil {
+					return StepResult{}, fmt.Errorf("%w: AgentRunner facts require an explicit execution target", ErrInvalidDefinition)
+				}
+			default:
+				return StepResult{}, fmt.Errorf("%w: unknown execution target", ErrInvalidDefinition)
+			}
 			if router.Isolated == nil {
 				return StepResult{}, fmt.Errorf("%w: isolated workspace port unavailable", ErrInvalidDefinition)
 			}

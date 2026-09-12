@@ -64,12 +64,16 @@ func (recorder *agentRunnerRecorder) DispatchAgentRunner(_ context.Context, requ
 
 func isolatedAgentRunnerRequest() StepRequest {
 	return StepRequest{
-		RunID:      "run-one",
-		TaskID:     "task-one",
-		Step:       Step{ID: "step-one", Kind: "code", Mode: IsolatedWorkspace},
-		Attempt:    1,
-		ParentHash: "sha256:1111111111111111111111111111111111111111111111111111111111111111",
-		Workspace:  Workspace{Root: "run-one/task-one"},
+		RunID:           "run-one",
+		TaskID:          "task-one",
+		Step:            Step{ID: "step-one", Kind: "code", Mode: IsolatedWorkspace},
+		Attempt:         1,
+		ParentHash:      "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+		Workspace:       Workspace{Root: "run-one/task-one"},
+		ExecutionTarget: AgentRunnerExecution,
+		AgentRunnerFacts: &AgentRunnerImmutableFacts{
+			RequestID: "request-one",
+		},
 	}
 }
 
@@ -207,5 +211,82 @@ func TestStepRouterExecuteAgentRunnerPassesSameRequest(t *testing.T) {
 	}
 	if !reflect.DeepEqual(admission.requests[0], want) || !reflect.DeepEqual(port.requests[0], want) || !reflect.DeepEqual(admission.requests[0], port.requests[0]) {
 		t.Fatalf("admission and port did not receive the same request: admission=%+v port=%+v want=%+v", admission.requests[0], port.requests[0], want)
+	}
+}
+
+func TestStepRouterExecuteRoutesAgentRunnerFactsThroughAdmission(t *testing.T) {
+	blocked := errors.New("admission blocked")
+	admission := &agentRunnerAdmissionRecorder{err: blocked}
+	agentRunner := &agentRunnerRecorder{}
+	isolated := &routeRecorder{}
+	router := StepRouter{
+		Isolated:             isolated,
+		AgentRunner:          agentRunner,
+		AgentRunnerAdmission: admission,
+	}
+	request := isolatedAgentRunnerRequest()
+	request.AgentRunnerFacts = &AgentRunnerImmutableFacts{RequestID: "request-one"}
+
+	if _, err := router.Execute(context.Background(), request); !errors.Is(err, blocked) {
+		t.Fatalf("expected admission error, got %v", err)
+	}
+	if admission.calls != 1 || agentRunner.calls != 0 || isolated.isolated != 0 {
+		t.Fatalf("AgentRunner request bypassed admission: admission=%d agent=%d isolated=%d", admission.calls, agentRunner.calls, isolated.isolated)
+	}
+}
+
+func TestStepRouterExecuteKeepsPlainIsolatedRequestOnIsolatedPort(t *testing.T) {
+	admission := &agentRunnerAdmissionRecorder{}
+	agentRunner := &agentRunnerRecorder{}
+	isolated := &routeRecorder{}
+	router := StepRouter{Isolated: isolated, AgentRunner: agentRunner, AgentRunnerAdmission: admission}
+
+	request := isolatedAgentRunnerRequest()
+	request.ExecutionTarget = DefaultExecution
+	request.AgentRunnerFacts = nil
+	if _, err := router.Execute(context.Background(), request); err != nil {
+		t.Fatal(err)
+	}
+	if admission.calls != 0 || agentRunner.calls != 0 || isolated.isolated != 1 {
+		t.Fatalf("plain isolated request routed incorrectly: admission=%d agent=%d isolated=%d", admission.calls, agentRunner.calls, isolated.isolated)
+	}
+}
+
+func TestStepRouterExecuteDispatchesAgentRunnerFactsAfterAdmission(t *testing.T) {
+	admission := &agentRunnerAdmissionRecorder{}
+	agentRunner := &agentRunnerRecorder{}
+	isolated := &routeRecorder{}
+	router := StepRouter{Isolated: isolated, AgentRunner: agentRunner, AgentRunnerAdmission: admission}
+	request := isolatedAgentRunnerRequest()
+	request.AgentRunnerFacts = &AgentRunnerImmutableFacts{RequestID: "request-one"}
+
+	if _, err := router.Execute(context.Background(), request); err != nil {
+		t.Fatal(err)
+	}
+	if admission.calls != 1 || agentRunner.calls != 1 || isolated.isolated != 0 {
+		t.Fatalf("AgentRunner request routed incorrectly: admission=%d agent=%d isolated=%d", admission.calls, agentRunner.calls, isolated.isolated)
+	}
+}
+
+func TestStepRouterExecuteRejectsAgentRunnerIntentBindingMismatch(t *testing.T) {
+	for name, mutate := range map[string]func(*StepRequest){
+		"facts-without-target": func(request *StepRequest) { request.ExecutionTarget = DefaultExecution },
+		"target-without-facts": func(request *StepRequest) { request.AgentRunnerFacts = nil },
+	} {
+		t.Run(name, func(t *testing.T) {
+			admission := &agentRunnerAdmissionRecorder{}
+			agentRunner := &agentRunnerRecorder{}
+			isolated := &routeRecorder{}
+			router := StepRouter{Isolated: isolated, AgentRunner: agentRunner, AgentRunnerAdmission: admission}
+			request := isolatedAgentRunnerRequest()
+			mutate(&request)
+
+			if _, err := router.Execute(context.Background(), request); !errors.Is(err, ErrInvalidDefinition) {
+				t.Fatalf("expected invalid execution intent, got %v", err)
+			}
+			if admission.calls != 0 || agentRunner.calls != 0 || isolated.isolated != 0 {
+				t.Fatalf("invalid intent reached a port: admission=%d agent=%d isolated=%d", admission.calls, agentRunner.calls, isolated.isolated)
+			}
+		})
 	}
 }

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"slices"
+	"sync"
 	"time"
 
 	"github.com/larsonzh/prfrail/internal/evidence"
@@ -45,6 +46,7 @@ type AgentRunnerRequestRecord struct {
 }
 
 type AgentRunnerRequestIndex struct {
+	mu     sync.Mutex
 	hashes map[string]string
 }
 
@@ -107,6 +109,8 @@ func (index *AgentRunnerRequestIndex) Record(record AgentRunnerRequestRecord) (b
 	if err := ValidateAgentRunnerRequestRecord(record); err != nil {
 		return false, err
 	}
+	index.mu.Lock()
+	defer index.mu.Unlock()
 	if index.hashes == nil {
 		index.hashes = make(map[string]string)
 	}
