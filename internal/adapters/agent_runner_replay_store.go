@@ -156,17 +156,56 @@ func (store *AgentRunnerReplayStore) RecordCompletion(request AgentRunnerRequest
 	store.mu.Lock()
 	defer store.mu.Unlock()
 
-	// Every rejection path runs before the first durable write, so an invalid
-	// completion cannot consume the request identity by persisting a request
-	// that can never receive a terminal receipt.
-	if err := store.checkCompletionBindingLocked(request, completion); err != nil {
+	requestID := request.Request.RequestID
+	persisted, foundRequest, err := store.loadRequestLocked(requestID)
+	if err != nil {
 		return false, err
 	}
+	existing, foundCompletion, err := store.loadCompletionLocked(requestID)
+	if err != nil {
+		return false, err
+	}
+
+	// A terminal receipt that is already on disk is resolved without any write,
+	// so a rejected or replayed completion can never consume the request identity.
+	if foundCompletion {
+		if !foundRequest {
+			path, pathErr := store.completionPath(requestID)
+			if pathErr != nil {
+				return false, pathErr
+			}
+			return false, replayStoreCorruption(path, fmt.Sprintf("orphan completion present for requestId %s", requestID), nil)
+		}
+		if persisted.RecordHash != request.RecordHash {
+			return false, fmt.Errorf("%w: requestId %s", ErrAgentRunnerRequestConflict, requestID)
+		}
+		if existing.RecordHash != completion.RecordHash {
+			return false, fmt.Errorf("%w: requestId %s already completed", ErrAgentRunnerCompletionConflict, requestID)
+		}
+		if err := ValidateAgentRunnerCompletionBinding(persisted, existing); err != nil {
+			return false, err
+		}
+		return true, nil
+	}
+
+	// No terminal receipt exists yet. The binding must hold before the first
+	// durable write, so no rejected completion leaves a request behind.
+	if foundRequest {
+		if persisted.RecordHash != request.RecordHash {
+			return false, fmt.Errorf("%w: requestId %s", ErrAgentRunnerRequestConflict, requestID)
+		}
+		if err := ValidateAgentRunnerCompletionBinding(persisted, completion); err != nil {
+			return false, err
+		}
+	} else if err := ValidateAgentRunnerCompletionBinding(request, completion); err != nil {
+		return false, err
+	}
+
 	persistedRequest, _, err := store.ensureRequestLocked(request)
 	if err != nil {
 		return false, err
 	}
-	path, err := store.completionPath(request.Request.RequestID)
+	path, err := store.completionPath(requestID)
 	if err != nil {
 		return false, err
 	}
@@ -185,7 +224,7 @@ func (store *AgentRunnerReplayStore) RecordCompletion(request AgentRunnerRequest
 			// during a visibility gap and replace a different terminal receipt.
 			collided = true
 		}
-		existing, found, loadErr := loadCompletionRecord(path, request.Request.RequestID)
+		visible, found, loadErr := loadCompletionRecord(path, requestID)
 		if loadErr != nil {
 			return false, loadErr
 		}
@@ -193,31 +232,15 @@ func (store *AgentRunnerReplayStore) RecordCompletion(request AgentRunnerRequest
 			runtime.Gosched()
 			continue
 		}
-		if existing.RecordHash != completion.RecordHash {
-			return false, fmt.Errorf("%w: requestId %s already completed", ErrAgentRunnerCompletionConflict, request.Request.RequestID)
+		if visible.RecordHash != completion.RecordHash {
+			return false, fmt.Errorf("%w: requestId %s already completed", ErrAgentRunnerCompletionConflict, requestID)
 		}
-		if err := ValidateAgentRunnerCompletionBinding(persistedRequest, existing); err != nil {
+		if err := ValidateAgentRunnerCompletionBinding(persistedRequest, visible); err != nil {
 			return false, err
 		}
 		return true, nil
 	}
-	return false, fmt.Errorf("%w: completion file not visible after no-replace collision for requestId %s", ErrAgentRunnerCompletionConflict, request.Request.RequestID)
-}
-
-// checkCompletionBindingLocked validates one completion binding against the
-// durable request without writing either record. Callers must hold store.mu.
-func (store *AgentRunnerReplayStore) checkCompletionBindingLocked(request AgentRunnerRequestRecord, completion AgentRunnerCompletionRecord) error {
-	persisted, found, err := store.loadRequestLocked(request.Request.RequestID)
-	if err != nil {
-		return err
-	}
-	if !found {
-		return ValidateAgentRunnerCompletionBinding(request, completion)
-	}
-	if persisted.RecordHash != request.RecordHash {
-		return fmt.Errorf("%w: requestId %s", ErrAgentRunnerRequestConflict, request.Request.RequestID)
-	}
-	return ValidateAgentRunnerCompletionBinding(persisted, completion)
+	return false, fmt.Errorf("%w: completion file not visible after no-replace collision for requestId %s", ErrAgentRunnerCompletionConflict, requestID)
 }
 
 func (store *AgentRunnerReplayStore) ensureRequestLocked(record AgentRunnerRequestRecord) (AgentRunnerRequestRecord, bool, error) {

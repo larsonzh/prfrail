@@ -2,6 +2,7 @@ package adapters
 
 import (
 	"errors"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
@@ -258,6 +259,34 @@ func TestAgentRunnerReplayStoreCollisionNeverReplacesExistingCompletion(t *testi
 	}
 	if string(before) != string(after) {
 		t.Fatal("an occupied terminal slot must never be replaced by a conflicting completion")
+	}
+}
+
+func TestAgentRunnerReplayStoreOrphanCompletionRejectsWithoutWritingRequest(t *testing.T) {
+	store := replayStoreMustNew(t, t.TempDir())
+	request := replayStoreRequestRecord(t, "request-one")
+
+	orphan := replayStoreCompletionRecord(t, request, "completion-one")
+	completionPath, err := store.completionPath(request.Request.RequestID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := writeCanonicalLineNoReplace(completionPath, orphan); err != nil {
+		t.Fatal(err)
+	}
+
+	// An orphan terminal receipt is a corruption signal: the call must fail
+	// closed and must not heal the store by persisting the missing request.
+	if _, err := store.RecordCompletion(request, orphan); !errors.Is(err, ErrAgentRunnerReplayStoreCorruption) {
+		t.Fatalf("expected replay store corruption, got %v", err)
+	}
+
+	requestPath, err := store.requestPath(request.Request.RequestID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(requestPath); !errors.Is(err, fs.ErrNotExist) {
+		t.Fatalf("a rejected completion must not persist a request record, stat error = %v", err)
 	}
 }
 
