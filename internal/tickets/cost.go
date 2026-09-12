@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/larsonzh/prfrail/internal/evidence"
@@ -199,6 +200,7 @@ type costSettlementState struct {
 }
 
 type CostLedger struct {
+	mu                      sync.RWMutex
 	body                    CostLedgerBody
 	entryIDs                map[string]struct{}
 	reservationByKey        map[string]costReservationState
@@ -340,6 +342,8 @@ func (ledger *CostLedger) LedgerID() string {
 	if ledger == nil {
 		return ""
 	}
+	ledger.mu.RLock()
+	defer ledger.mu.RUnlock()
 	return ledger.body.LedgerID
 }
 
@@ -347,11 +351,18 @@ func (ledger *CostLedger) Summary() CostSummary {
 	if ledger == nil {
 		return knownZeroCostSummary()
 	}
+	ledger.mu.RLock()
+	defer ledger.mu.RUnlock()
 	return cloneCostSummary(ledger.body.Summary)
 }
 
 func (ledger *CostLedger) CurrentLimits() (CostLimits, bool) {
-	if ledger == nil || ledger.latestLimits == nil {
+	if ledger == nil {
+		return CostLimits{}, false
+	}
+	ledger.mu.RLock()
+	defer ledger.mu.RUnlock()
+	if ledger.latestLimits == nil {
 		return CostLimits{}, false
 	}
 	return cloneLimits(*ledger.latestLimits), true
@@ -361,6 +372,8 @@ func (ledger *CostLedger) OutstandingReservations() int {
 	if ledger == nil {
 		return 0
 	}
+	ledger.mu.RLock()
+	defer ledger.mu.RUnlock()
 	count := 0
 	for _, reservation := range ledger.reservationByHash {
 		if _, settled := ledger.settlementByReservation[reservation.hash]; !settled {
@@ -370,10 +383,36 @@ func (ledger *CostLedger) OutstandingReservations() int {
 	return count
 }
 
+// RequireOutstandingReservation returns the reservation bound to reservationHash
+// only while no settlement, including an unknown settlement, exists for it.
+func (ledger *CostLedger) RequireOutstandingReservation(reservationHash string) (CostReservationEntry, error) {
+	if ledger == nil {
+		return CostReservationEntry{}, fmt.Errorf("%w: ledger is nil", ErrInvalidCostLedger)
+	}
+	ledger.mu.RLock()
+	defer ledger.mu.RUnlock()
+	if !evidence.ValidHash(reservationHash) {
+		return CostReservationEntry{}, fmt.Errorf("%w: invalid reservationHash", ErrInvalidCostLedger)
+	}
+	reservation, found := ledger.reservationByHash[reservationHash]
+	if !found {
+		return CostReservationEntry{}, ErrCostReservationNotFound
+	}
+	if _, settled := ledger.settlementByReservation[reservationHash]; settled {
+		return CostReservationEntry{}, ErrCostReservationSettled
+	}
+	entry := reservation.entry
+	entry.ReservedAmountMicros = cloneInt64Pointer(entry.ReservedAmountMicros)
+	entry.PricingEvidence = cloneStrings(entry.PricingEvidence)
+	return entry, nil
+}
+
 func (ledger *CostLedger) UnknownHoldReservations() int {
 	if ledger == nil {
 		return 0
 	}
+	ledger.mu.RLock()
+	defer ledger.mu.RUnlock()
 	count := 0
 	for _, reservation := range ledger.reservationByHash {
 		settlement, settled := ledger.settlementByReservation[reservation.hash]
@@ -388,6 +427,8 @@ func (ledger *CostLedger) Snapshot() (CostLedgerRecord, error) {
 	if ledger == nil {
 		return CostLedgerRecord{}, fmt.Errorf("%w: ledger is nil", ErrInvalidCostLedger)
 	}
+	ledger.mu.RLock()
+	defer ledger.mu.RUnlock()
 	if len(ledger.body.Entries) == 0 {
 		return CostLedgerRecord{}, fmt.Errorf("%w: empty entries", ErrInvalidCostLedger)
 	}
@@ -409,6 +450,8 @@ func (ledger *CostLedger) AppendAllocation(input AllocationInput) (CostAllocatio
 	if ledger == nil {
 		return CostAllocationEntry{}, fmt.Errorf("%w: ledger is nil", ErrInvalidCostLedger)
 	}
+	ledger.mu.Lock()
+	defer ledger.mu.Unlock()
 	occurredAt := input.OccurredAt
 	if occurredAt.IsZero() {
 		occurredAt = time.Now().UTC()
@@ -436,6 +479,8 @@ func (ledger *CostLedger) Reserve(input ReservationInput) (ReservationOutcome, e
 	if ledger == nil {
 		return ReservationOutcome{}, fmt.Errorf("%w: ledger is nil", ErrInvalidCostLedger)
 	}
+	ledger.mu.Lock()
+	defer ledger.mu.Unlock()
 	occurredAt := input.OccurredAt
 	if occurredAt.IsZero() {
 		occurredAt = time.Now().UTC()
@@ -470,6 +515,8 @@ func (ledger *CostLedger) Settle(input SettlementInput) (SettlementOutcome, erro
 	if ledger == nil {
 		return SettlementOutcome{}, fmt.Errorf("%w: ledger is nil", ErrInvalidCostLedger)
 	}
+	ledger.mu.Lock()
+	defer ledger.mu.Unlock()
 	occurredAt := input.OccurredAt
 	if occurredAt.IsZero() {
 		occurredAt = time.Now().UTC()

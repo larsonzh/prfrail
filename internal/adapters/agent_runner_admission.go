@@ -4,10 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
 	"time"
 
 	"github.com/larsonzh/prfrail/internal/chain"
 	"github.com/larsonzh/prfrail/internal/evidence"
+	"github.com/larsonzh/prfrail/internal/tickets"
 )
 
 var (
@@ -18,19 +20,18 @@ var (
 // AgentRunnerCompositeAdmission composes offline, persisted preflight facts.
 // EnforcementRecord is optional when the capability record is compatible;
 // AdmissionPolicy is still required by ValidateAgentRunnerAdmission.
-// AuthorizationHash and BudgetHash only bind this request to frozen records.
-// This slice does not decide whether authorization or cost ledger entries are
-// active or unexhausted; that remains a later chain/tickets responsibility.
 // Clock is the only evaluation-time authority; policy timestamps are ignored.
 type AgentRunnerCompositeAdmission struct {
-	RequestRecord      AgentRunnerRequestRecord
-	RequestIndex       *AgentRunnerRequestIndex
-	AvailabilityRecord AIAvailabilityRecord
-	AvailabilityPolicy AIAvailabilityPolicy
-	CapabilityRecord   AgentRunnerCapabilityRecord
-	EnforcementRecord  *AgentRunnerEnforcementRecord
-	AdmissionPolicy    AgentRunnerAdmissionPolicy
-	Clock              func() time.Time
+	RequestRecord       AgentRunnerRequestRecord
+	RequestIndex        *AgentRunnerRequestIndex
+	AuthorizationLedger chain.AuthorizationLedger
+	CostLedger          *tickets.CostLedger
+	AvailabilityRecord  AIAvailabilityRecord
+	AvailabilityPolicy  AIAvailabilityPolicy
+	CapabilityRecord    AgentRunnerCapabilityRecord
+	EnforcementRecord   *AgentRunnerEnforcementRecord
+	AdmissionPolicy     AgentRunnerAdmissionPolicy
+	Clock               func() time.Time
 }
 
 var _ chain.AgentRunnerAdmission = (*AgentRunnerCompositeAdmission)(nil)
@@ -104,12 +105,99 @@ func (admission *AgentRunnerCompositeAdmission) AdmitAgentRunner(ctx context.Con
 	if err := ValidateAgentRunnerAdmission(admission.CapabilityRecord, admission.EnforcementRecord, admissionPolicy); err != nil {
 		return compositeAdmissionBlocked(err, "AgentRunner capability or enforcement admission blocked")
 	}
+	if err := admission.validateAuthorization(body, now); err != nil {
+		return compositeAdmissionBlocked(err, "AgentRunner authorization blocked")
+	}
+	if err := admission.validateBudget(body); err != nil {
+		return compositeAdmissionBlocked(err, "AgentRunner budget blocked")
+	}
 	replayed, err := admission.RequestIndex.Record(admission.RequestRecord)
 	if err != nil {
 		return compositeAdmissionBlocked(err, "request replay or conflict")
 	}
 	if replayed {
 		return compositeAdmissionBlocked(ErrAgentRunnerRequestReplayBlocked, "durable dispatch or completion state unavailable")
+	}
+	return nil
+}
+
+func (admission *AgentRunnerCompositeAdmission) validateAuthorization(request AgentRunnerRequest, now time.Time) error {
+	var matched chain.AuthorizationRecord
+	matches := 0
+	for _, record := range admission.AuthorizationLedger.Grants {
+		if record.RecordHash != request.AuthorizationHash {
+			continue
+		}
+		if err := chain.ValidateAuthorizationRecord(record); err != nil {
+			return err
+		}
+		matched = record
+		matches++
+	}
+	if matches != 1 || matched.Grant == nil {
+		return fmt.Errorf("authorizationHash matched %d grants", matches)
+	}
+	for _, record := range admission.AuthorizationLedger.GrantRecordsFor(matched.Grant.AuthorizationID) {
+		if err := chain.ValidateAuthorizationRecord(record); err != nil {
+			return err
+		}
+	}
+	for _, record := range admission.AuthorizationLedger.Revocations {
+		if record.Revocation != nil && record.Revocation.AuthorizationID == matched.Grant.AuthorizationID {
+			if err := chain.ValidateAuthorizationRecord(record); err != nil {
+				return err
+			}
+		}
+	}
+	issuedAt, err := time.Parse(time.RFC3339, matched.Grant.IssuedAt)
+	if err != nil {
+		return fmt.Errorf("invalid authorization issuedAt: %w", err)
+	}
+	expiresAt, err := time.Parse(time.RFC3339, matched.Grant.ExpiresAt)
+	if err != nil {
+		return fmt.Errorf("invalid authorization expiresAt: %w", err)
+	}
+	if now.Before(issuedAt) {
+		return errors.New("authorization grant is pending")
+	}
+	if !now.Before(expiresAt) {
+		return errors.New("authorization grant is expired")
+	}
+	if _, revocation, revoked := admission.AuthorizationLedger.LatestRevocation(matched.Grant.AuthorizationID); revoked {
+		matchedRevocation := false
+		for _, record := range admission.AuthorizationLedger.GrantRecordsFor(matched.Grant.AuthorizationID) {
+			if record.RecordHash == revocation.AuthorizationHash {
+				matchedRevocation = true
+				break
+			}
+		}
+		if !matchedRevocation {
+			return errors.New("authorization revocation hash mismatch")
+		}
+		return errors.New("authorization grant is revoked")
+	}
+	if matched.Grant.RunID != request.RunID ||
+		!slices.Contains(matched.Grant.Scope.TaskIDs, request.TaskID) ||
+		!slices.Contains(matched.Grant.Scope.StepIDs, request.StepID) {
+		return errors.New("authorization scope mismatch")
+	}
+	for _, target := range request.AllowedTargets {
+		if !slices.Contains(matched.Grant.Scope.TargetIDs, target) {
+			return errors.New("authorization target scope mismatch")
+		}
+	}
+	return nil
+}
+
+func (admission *AgentRunnerCompositeAdmission) validateBudget(request AgentRunnerRequest) error {
+	reservation, err := admission.CostLedger.RequireOutstandingReservation(request.BudgetHash)
+	if err != nil {
+		return err
+	}
+	if reservation.RunID != request.RunID ||
+		reservation.RequestID != request.RequestID ||
+		reservation.AuthorizationHash != request.AuthorizationHash {
+		return errors.New("cost reservation binding mismatch")
 	}
 	return nil
 }

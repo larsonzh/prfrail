@@ -3,15 +3,91 @@ package adapters
 import (
 	"context"
 	"errors"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/larsonzh/prfrail/internal/chain"
+	"github.com/larsonzh/prfrail/internal/evidence"
+	"github.com/larsonzh/prfrail/internal/tickets"
 )
 
 func compositeAdmissionFixture(t *testing.T) (AgentRunnerCompositeAdmission, chain.StepRequest) {
 	t.Helper()
-	requestRecord, err := NewAgentRunnerRequestRecord(agentRunnerRequest("request-one"))
+	grant, err := chain.NewGrantAuthorizationRecord(chain.AuthorizationGrant{
+		RecordID:        "grant-one",
+		Kind:            "grant",
+		IssuedAt:        "2026-09-11T07:00:00.000Z",
+		IssuedBy:        evidence.Actor{Type: "operator", ID: "operator-one"},
+		AuthorizationID: "authorization-one",
+		RunID:           "run-one",
+		RunManifestHash: queueHashOne,
+		PolicyHash:      queueHashTwo,
+		Scope: chain.AuthorizationScope{
+			TaskIDs:       []string{"task-one"},
+			StepIDs:       []string{"step-one"},
+			TargetIDs:     []string{"workspace-files"},
+			EffectClasses: []string{"local-discardable"},
+			Budget: chain.AuthorizationBudgetLimit{
+				ModelCalls:  1,
+				Tokens:      1000,
+				WallClockMs: 60000,
+				Attempts:    1,
+				Currency:    "USD",
+			},
+		},
+		ExpiresAt: "2026-09-11T09:00:00.000Z",
+		Evidence:  []string{queueHashThree},
+	}, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	amount := int64(1000)
+	costLedger, err := tickets.NewCostLedger(tickets.CostLedgerConfig{
+		LedgerID:       "cost-ledger-one",
+		CreatedAt:      time.Date(2026, 9, 11, 7, 0, 0, 0, time.UTC),
+		ScopeKind:      tickets.CostScopeRun,
+		ScopeHash:      queueHashOne,
+		Currency:       "USD",
+		PricingMode:    tickets.CostPricingDocumented,
+		PricingVersion: "2026-09-11",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := costLedger.AppendAllocation(tickets.AllocationInput{
+		EntryID:           "allocation-one",
+		OccurredAt:        time.Date(2026, 9, 11, 7, 1, 0, 0, time.UTC),
+		AuthorizationHash: grant.RecordHash,
+		Limits: tickets.CostLimits{
+			AmountMicros: &amount,
+			ModelCalls:   1,
+			Tokens:       1000,
+			WallClockMs:  60000,
+			Attempts:     1,
+		},
+	}); err != nil {
+		t.Fatal(err)
+	}
+	requestBody := agentRunnerRequest("request-one")
+	requestBody.AuthorizationHash = grant.RecordHash
+	reservation, err := costLedger.Reserve(tickets.ReservationInput{
+		EntryID:              "reservation-one",
+		OccurredAt:           time.Date(2026, 9, 11, 7, 2, 0, 0, time.UTC),
+		RunID:                requestBody.RunID,
+		RequestID:            requestBody.RequestID,
+		IdempotencyKey:       "reserve-request-one",
+		AuthorizationHash:    grant.RecordHash,
+		ReservedAmountMicros: &amount,
+		ReservedCalls:        1,
+		ReservedTokens:       1000,
+		PricingEvidence:      []string{queueHashFour},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	requestBody.BudgetHash = reservation.ReservationHash
+	requestRecord, err := NewAgentRunnerRequestRecord(requestBody)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -39,12 +115,14 @@ func compositeAdmissionFixture(t *testing.T) (AgentRunnerCompositeAdmission, cha
 		},
 	}
 	return AgentRunnerCompositeAdmission{
-		RequestRecord:      requestRecord,
-		RequestIndex:       mustAgentRunnerRequestIndex(t),
-		AvailabilityRecord: availabilityRecord,
-		AvailabilityPolicy: aiAvailabilityPolicy(),
-		CapabilityRecord:   capabilityRecord,
-		AdmissionPolicy:    admissionPolicy(),
+		RequestRecord:       requestRecord,
+		RequestIndex:        mustAgentRunnerRequestIndex(t),
+		AuthorizationLedger: chain.AuthorizationLedger{Grants: []chain.AuthorizationRecord{grant}},
+		CostLedger:          costLedger,
+		AvailabilityRecord:  availabilityRecord,
+		AvailabilityPolicy:  aiAvailabilityPolicy(),
+		CapabilityRecord:    capabilityRecord,
+		AdmissionPolicy:     admissionPolicy(),
 		Clock: func() time.Time {
 			return aiAvailabilityPolicy().EvaluatedAt
 		},
@@ -58,6 +136,53 @@ func mustAgentRunnerRequestIndex(t *testing.T) *AgentRunnerRequestIndex {
 		t.Fatal(err)
 	}
 	return index
+}
+
+func admissionCostLedger(t *testing.T, runID, requestID, authorizationHash string) (*tickets.CostLedger, string) {
+	t.Helper()
+	amount := int64(1000)
+	ledger, err := tickets.NewCostLedger(tickets.CostLedgerConfig{
+		LedgerID:       "cost-ledger-test",
+		CreatedAt:      time.Date(2026, 9, 11, 7, 0, 0, 0, time.UTC),
+		ScopeKind:      tickets.CostScopeRun,
+		ScopeHash:      queueHashOne,
+		Currency:       "USD",
+		PricingMode:    tickets.CostPricingDocumented,
+		PricingVersion: "2026-09-11",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := ledger.AppendAllocation(tickets.AllocationInput{
+		EntryID:           "allocation-test",
+		OccurredAt:        time.Date(2026, 9, 11, 7, 1, 0, 0, time.UTC),
+		AuthorizationHash: authorizationHash,
+		Limits: tickets.CostLimits{
+			AmountMicros: &amount,
+			ModelCalls:   1,
+			Tokens:       1000,
+			WallClockMs:  60000,
+			Attempts:     1,
+		},
+	}); err != nil {
+		t.Fatal(err)
+	}
+	reservation, err := ledger.Reserve(tickets.ReservationInput{
+		EntryID:              "reservation-test",
+		OccurredAt:           time.Date(2026, 9, 11, 7, 2, 0, 0, time.UTC),
+		RunID:                runID,
+		RequestID:            requestID,
+		IdempotencyKey:       "reserve-test",
+		AuthorizationHash:    authorizationHash,
+		ReservedAmountMicros: &amount,
+		ReservedCalls:        1,
+		ReservedTokens:       1000,
+		PricingEvidence:      []string{queueHashFour},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	return ledger, reservation.ReservationHash
 }
 
 func TestAgentRunnerCompositeAdmissionAdmitsOfflineBoundRequest(t *testing.T) {
@@ -240,6 +365,178 @@ func TestAgentRunnerCompositeAdmissionRejectsCapabilityAndEnforcementBlocks(t *t
 	})
 }
 
+func TestAgentRunnerCompositeAdmissionRequiresActiveScopedAuthorizationBeforeReplay(t *testing.T) {
+	t.Run("missing grant", func(t *testing.T) {
+		admission, request := compositeAdmissionFixture(t)
+		validLedger := admission.AuthorizationLedger
+		admission.AuthorizationLedger = chain.AuthorizationLedger{}
+		if err := admission.AdmitAgentRunner(context.Background(), request); !errors.Is(err, ErrAgentRunnerCompositeAdmissionBlocked) {
+			t.Fatalf("expected missing grant to block, got %v", err)
+		}
+		admission.AuthorizationLedger = validLedger
+		if err := admission.AdmitAgentRunner(context.Background(), request); err != nil {
+			t.Fatalf("rejected authorization consumed request identity: %v", err)
+		}
+	})
+
+	t.Run("revoked grant", func(t *testing.T) {
+		admission, request := compositeAdmissionFixture(t)
+		grant := admission.AuthorizationLedger.Grants[0]
+		revocation, err := chain.NewRevocationAuthorizationRecord(chain.AuthorizationRevocation{
+			RecordID:          "revocation-one",
+			Kind:              "revocation",
+			IssuedAt:          "2026-09-11T08:00:00.000Z",
+			IssuedBy:          evidence.Actor{Type: "operator", ID: "operator-one"},
+			AuthorizationID:   grant.Grant.AuthorizationID,
+			AuthorizationHash: grant.RecordHash,
+			ReasonCode:        "operator-request",
+			StopDisposition:   "not-required",
+		}, nil, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		validLedger := admission.AuthorizationLedger
+		admission.AuthorizationLedger.Revocations = []chain.AuthorizationRecord{revocation}
+		if err := admission.AdmitAgentRunner(context.Background(), request); !errors.Is(err, ErrAgentRunnerCompositeAdmissionBlocked) {
+			t.Fatalf("expected revoked grant to block, got %v", err)
+		}
+		admission.AuthorizationLedger = validLedger
+		if err := admission.AdmitAgentRunner(context.Background(), request); err != nil {
+			t.Fatalf("rejected revocation consumed request identity: %v", err)
+		}
+	})
+
+	t.Run("target outside scope", func(t *testing.T) {
+		admission, request := compositeAdmissionFixture(t)
+		original := admission.RequestRecord
+		changed := original.Request
+		changed.AllowedTargets = []string{"source-tree"}
+		var err error
+		admission.RequestRecord, err = NewAgentRunnerRequestRecord(changed)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := admission.AdmitAgentRunner(context.Background(), request); !errors.Is(err, ErrAgentRunnerCompositeAdmissionBlocked) {
+			t.Fatalf("expected target scope mismatch to block, got %v", err)
+		}
+		admission.RequestRecord = original
+		if err := admission.AdmitAgentRunner(context.Background(), request); err != nil {
+			t.Fatalf("rejected scope mismatch consumed request identity: %v", err)
+		}
+	})
+
+	t.Run("bound expired grant with newer active grant", func(t *testing.T) {
+		admission, request := compositeAdmissionFixture(t)
+		base := *admission.AuthorizationLedger.Grants[0].Grant
+		expired := base
+		expired.RecordID = "grant-expired"
+		expired.IssuedAt = "2026-09-11T06:00:00.000Z"
+		expired.ExpiresAt = "2026-09-11T08:00:00.000Z"
+		expiredRecord, err := chain.NewGrantAuthorizationRecord(expired, nil, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		active := base
+		active.RecordID = "grant-active"
+		active.IssuedAt = "2026-09-11T07:30:00.000Z"
+		active.ExpiresAt = "2026-09-11T09:00:00.000Z"
+		activeRecord, err := chain.NewGrantAuthorizationRecord(active, nil, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		admission.AuthorizationLedger.Grants = []chain.AuthorizationRecord{expiredRecord, activeRecord}
+		admission.CostLedger, request.AgentRunnerFacts.BudgetHash = admissionCostLedger(t, request.RunID, request.AgentRunnerFacts.RequestID, expiredRecord.RecordHash)
+		request.AgentRunnerFacts.AuthorizationHash = expiredRecord.RecordHash
+		changed := admission.RequestRecord.Request
+		changed.AuthorizationHash = expiredRecord.RecordHash
+		changed.BudgetHash = request.AgentRunnerFacts.BudgetHash
+		admission.RequestRecord, err = NewAgentRunnerRequestRecord(changed)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := admission.AdmitAgentRunner(context.Background(), request); !errors.Is(err, ErrAgentRunnerCompositeAdmissionBlocked) || !strings.Contains(err.Error(), "expired") {
+			t.Fatalf("expected the hash-bound expired grant to block, got %v", err)
+		}
+	})
+}
+
+func TestAgentRunnerCompositeAdmissionRequiresOutstandingBoundBudgetBeforeReplay(t *testing.T) {
+	t.Run("missing ledger", func(t *testing.T) {
+		admission, request := compositeAdmissionFixture(t)
+		validLedger := admission.CostLedger
+		admission.CostLedger = nil
+		if err := admission.AdmitAgentRunner(context.Background(), request); !errors.Is(err, ErrAgentRunnerCompositeAdmissionBlocked) {
+			t.Fatalf("expected missing cost ledger to block, got %v", err)
+		}
+		admission.CostLedger = validLedger
+		if err := admission.AdmitAgentRunner(context.Background(), request); err != nil {
+			t.Fatalf("rejected budget check consumed request identity: %v", err)
+		}
+	})
+
+	t.Run("settled reservation", func(t *testing.T) {
+		admission, request := compositeAdmissionFixture(t)
+		amount := int64(1000)
+		calls := 1
+		tokens := 1000
+		if _, err := admission.CostLedger.Settle(tickets.SettlementInput{
+			EntryID:             "settlement-one",
+			OccurredAt:          time.Date(2026, 9, 11, 8, 0, 0, 0, time.UTC),
+			RunID:               request.RunID,
+			RequestID:           request.AgentRunnerFacts.RequestID,
+			IdempotencyKey:      "settle-request-one",
+			ReservationHash:     request.AgentRunnerFacts.BudgetHash,
+			Status:              tickets.CostSettlementObserved,
+			ChargedAmountMicros: &amount,
+			ObservedCalls:       &calls,
+			ObservedTokens:      &tokens,
+			ProviderEvidence:    []string{queueHashFour},
+		}); err != nil {
+			t.Fatal(err)
+		}
+		if err := admission.AdmitAgentRunner(context.Background(), request); !errors.Is(err, tickets.ErrCostReservationSettled) || !errors.Is(err, ErrAgentRunnerCompositeAdmissionBlocked) {
+			t.Fatalf("expected settled reservation to block, got %v", err)
+		}
+
+		healthy, _ := compositeAdmissionFixture(t)
+		admission.CostLedger = healthy.CostLedger
+		if err := admission.AdmitAgentRunner(context.Background(), request); err != nil {
+			t.Fatalf("settled reservation rejection consumed request identity: %v", err)
+		}
+	})
+
+	for name, binding := range map[string]struct {
+		runID             string
+		requestID         string
+		authorizationHash string
+	}{
+		"run":           {runID: "run-two", requestID: "request-one"},
+		"request":       {runID: "run-one", requestID: "request-two"},
+		"authorization": {runID: "run-one", requestID: "request-one", authorizationHash: queueHashOne},
+	} {
+		t.Run(name+" binding mismatch", func(t *testing.T) {
+			admission, request := compositeAdmissionFixture(t)
+			authorizationHash := binding.authorizationHash
+			if authorizationHash == "" {
+				authorizationHash = request.AgentRunnerFacts.AuthorizationHash
+			}
+			ledger, reservationHash := admissionCostLedger(t, binding.runID, binding.requestID, authorizationHash)
+			admission.CostLedger = ledger
+			request.AgentRunnerFacts.BudgetHash = reservationHash
+			changed := admission.RequestRecord.Request
+			changed.BudgetHash = reservationHash
+			var err error
+			admission.RequestRecord, err = NewAgentRunnerRequestRecord(changed)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if err := admission.AdmitAgentRunner(context.Background(), request); !errors.Is(err, ErrAgentRunnerCompositeAdmissionBlocked) || !strings.Contains(err.Error(), "binding mismatch") {
+				t.Fatalf("expected %s mismatch to block, got %v", name, err)
+			}
+		})
+	}
+}
+
 func TestAgentRunnerCompositeAdmissionRequestReplayBlocksRedispatchAndConflicts(t *testing.T) {
 	admission, request := compositeAdmissionFixture(t)
 	index, err := NewAgentRunnerRequestIndex(nil)
@@ -254,7 +551,7 @@ func TestAgentRunnerCompositeAdmissionRequestReplayBlocksRedispatchAndConflicts(
 		t.Fatalf("expected same-digest replay to block redispatch, got %v", err)
 	}
 
-	changed := agentRunnerRequest("request-one")
+	changed := admission.RequestRecord.Request
 	changed.ContextHash = queueHashOne
 	conflictingRecord, err := NewAgentRunnerRequestRecord(changed)
 	if err != nil {

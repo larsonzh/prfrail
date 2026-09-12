@@ -2,7 +2,9 @@ package tickets
 
 import (
 	"errors"
+	"fmt"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -171,6 +173,122 @@ func TestCostLedgerUnknownHoldSurvivesRestart(t *testing.T) {
 	}); !errors.Is(err, ErrCostSharedCapExceeded) {
 		t.Fatalf("expected shared cap block under unknown hold, got %v", err)
 	}
+}
+
+func TestCostLedgerRequiresOutstandingReservation(t *testing.T) {
+	amount := int64(1000)
+	ledger := mustCostLedger(t, CostScopeRun, CostPricingDocumented, &amount, 2, 300)
+	reserved := int64(400)
+	reservation, err := ledger.Reserve(ReservationInput{
+		EntryID:              "reservation-one",
+		OccurredAt:           costNow().Add(time.Minute),
+		RunID:                "run-one",
+		RequestID:            "request-one",
+		IdempotencyKey:       "idem-one",
+		AuthorizationHash:    costHashTwo,
+		ReservedAmountMicros: &reserved,
+		ReservedCalls:        1,
+		ReservedTokens:       80,
+		PricingEvidence:      []string{costHashThree},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	entry, err := ledger.RequireOutstandingReservation(reservation.ReservationHash)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if entry.RunID != "run-one" || entry.RequestID != "request-one" || entry.AuthorizationHash != costHashTwo {
+		t.Fatalf("unexpected reservation binding: %+v", entry)
+	}
+	*entry.ReservedAmountMicros = 1
+	entry.PricingEvidence[0] = costHashFour
+	entry, err = ledger.RequireOutstandingReservation(reservation.ReservationHash)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if *entry.ReservedAmountMicros != reserved || entry.PricingEvidence[0] != costHashThree {
+		t.Fatalf("reservation query exposed mutable ledger state: %+v", entry)
+	}
+
+	if _, err := ledger.RequireOutstandingReservation(costHashFour); !errors.Is(err, ErrCostReservationNotFound) {
+		t.Fatalf("expected missing reservation rejection, got %v", err)
+	}
+	if _, err := ledger.RequireOutstandingReservation("invalid"); !errors.Is(err, ErrInvalidCostLedger) {
+		t.Fatalf("expected invalid reservation hash rejection, got %v", err)
+	}
+
+	if _, err := ledger.Settle(SettlementInput{
+		EntryID:          "settlement-one",
+		OccurredAt:       costNow().Add(2 * time.Minute),
+		RunID:            "run-one",
+		RequestID:        "request-one",
+		IdempotencyKey:   "settle-one",
+		ReservationHash:  reservation.ReservationHash,
+		Status:           CostSettlementUnknown,
+		ProviderEvidence: []string{costHashFour},
+	}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := ledger.RequireOutstandingReservation(reservation.ReservationHash); !errors.Is(err, ErrCostReservationSettled) {
+		t.Fatalf("expected settled reservation rejection, got %v", err)
+	}
+}
+
+func TestCostLedgerConcurrentReservationReadsAndWrites(t *testing.T) {
+	amount := int64(100000)
+	reserved := int64(1)
+	ledger := mustCostLedger(t, CostScopeRun, CostPricingDocumented, &amount, 200, 20000)
+	seed, err := ledger.Reserve(ReservationInput{
+		EntryID:              "reservation-seed",
+		OccurredAt:           costNow(),
+		RunID:                "run-seed",
+		RequestID:            "request-seed",
+		IdempotencyKey:       "idem-seed",
+		AuthorizationHash:    costHashTwo,
+		ReservedAmountMicros: &reserved,
+		ReservedCalls:        1,
+		ReservedTokens:       1,
+		PricingEvidence:      []string{costHashThree},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var wait sync.WaitGroup
+	for worker := 0; worker < 20; worker++ {
+		wait.Add(2)
+		go func() {
+			defer wait.Done()
+			for iteration := 0; iteration < 50; iteration++ {
+				if _, err := ledger.RequireOutstandingReservation(seed.ReservationHash); err != nil {
+					t.Errorf("concurrent reservation read failed: %v", err)
+					return
+				}
+				_ = ledger.OutstandingReservations()
+				_ = ledger.Summary()
+			}
+		}()
+		go func(worker int) {
+			defer wait.Done()
+			if _, err := ledger.Reserve(ReservationInput{
+				EntryID:              fmt.Sprintf("reservation-%d", worker),
+				OccurredAt:           costNow().Add(time.Duration(worker+1) * time.Minute),
+				RunID:                fmt.Sprintf("run-%d", worker),
+				RequestID:            fmt.Sprintf("request-%d", worker),
+				IdempotencyKey:       fmt.Sprintf("idem-%d", worker),
+				AuthorizationHash:    costHashTwo,
+				ReservedAmountMicros: &reserved,
+				ReservedCalls:        1,
+				ReservedTokens:       1,
+				PricingEvidence:      []string{costHashThree},
+			}); err != nil {
+				t.Errorf("concurrent reservation write failed: %v", err)
+			}
+		}(worker)
+	}
+	wait.Wait()
 }
 
 func TestCostLedgerSettlementDeduplicates(t *testing.T) {
