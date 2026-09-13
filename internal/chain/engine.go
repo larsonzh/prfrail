@@ -12,20 +12,21 @@ import (
 type Failpoint func(string) error
 
 type Options struct {
-	RunID      string
-	Definition Definition
-	Events     EventStore
-	Baselines  BaselinePort
-	Workspaces WorkspacePort
-	Steps      StepPort
-	Acceptance AcceptancePort
-	Reviewer   ReviewerPort
-	Publisher  PublisherPort
-	Stopper    Stopper
-	Reconciler Reconciler
-	Clock      Clock
-	IDs        IDSource
-	Failpoint  Failpoint
+	RunID       string
+	Definition  Definition
+	Events      EventStore
+	Baselines   BaselinePort
+	Workspaces  WorkspacePort
+	Steps       StepPort
+	StepIntents StepIntentPreparer
+	Acceptance  AcceptancePort
+	Reviewer    ReviewerPort
+	Publisher   PublisherPort
+	Stopper     Stopper
+	Reconciler  Reconciler
+	Clock       Clock
+	IDs         IDSource
+	Failpoint   Failpoint
 }
 
 type Engine struct {
@@ -287,15 +288,36 @@ func (engine *Engine) runStep(ctx context.Context, taskID string, step Step, par
 	if state != "PENDING" {
 		return fmt.Errorf("%w: step %q is %s", ErrRecoveryUncertain, step.ID, state)
 	}
+	request := StepRequest{RunID: engine.options.RunID, TaskID: taskID, Step: step, Attempt: 1, ParentHash: parent.Hash, Workspace: workspace}
 	if err := engine.transition(ctx, entity, "RUNNING", nil, "step-started"); err != nil {
 		return err
+	}
+	if engine.options.StepIntents != nil {
+		intent, err := engine.options.StepIntents.PrepareStepIntent(ctx, request)
+		if err != nil {
+			if transitionErr := engine.transition(ctx, entity, "FAILED", nil, "step-intent-failed"); transitionErr != nil {
+				return errors.Join(err, transitionErr)
+			}
+			return engine.failTask(ctx, taskID, "step-intent-failed", err)
+		}
+		if err := intent.validate(step); err != nil {
+			if transitionErr := engine.transition(ctx, entity, "FAILED", nil, "step-intent-invalid"); transitionErr != nil {
+				return errors.Join(err, transitionErr)
+			}
+			return engine.failTask(ctx, taskID, "step-intent-invalid", err)
+		}
+		request.ExecutionTarget = intent.ExecutionTarget
+		if intent.AgentRunnerFacts != nil {
+			facts := *intent.AgentRunnerFacts
+			request.AgentRunnerFacts = &facts
+		}
 	}
 	if engine.options.Failpoint != nil {
 		if err := engine.options.Failpoint("step-running"); err != nil {
 			return err
 		}
 	}
-	result, err := engine.options.Steps.Execute(ctx, StepRequest{RunID: engine.options.RunID, TaskID: taskID, Step: step, Attempt: 1, ParentHash: parent.Hash, Workspace: workspace})
+	result, err := engine.options.Steps.Execute(ctx, request)
 	if err != nil {
 		if transitionErr := engine.transition(ctx, entity, "FAILED", result.Evidence, "step-failed"); transitionErr != nil {
 			return errors.Join(err, transitionErr)

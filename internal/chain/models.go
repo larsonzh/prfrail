@@ -80,6 +80,29 @@ type StepRequest struct {
 	AgentRunnerFacts *AgentRunnerImmutableFacts
 }
 
+// StepExecutionIntent contains the only fields a preparer may add to the
+// Engine-owned step identity before routing.
+type StepExecutionIntent struct {
+	ExecutionTarget  ExecutionTarget
+	AgentRunnerFacts *AgentRunnerImmutableFacts
+}
+
+func (intent StepExecutionIntent) validate(step Step) error {
+	switch intent.ExecutionTarget {
+	case DefaultExecution:
+		if intent.AgentRunnerFacts != nil {
+			return fmt.Errorf("%w: AgentRunner facts require an explicit execution target", ErrInvalidDefinition)
+		}
+	case AgentRunnerExecution:
+		if step.Kind != "code" || step.Mode != IsolatedWorkspace || intent.AgentRunnerFacts == nil {
+			return fmt.Errorf("%w: AgentRunner requires isolated workspace code step and immutable facts", ErrInvalidDefinition)
+		}
+	default:
+		return fmt.Errorf("%w: unknown execution target", ErrInvalidDefinition)
+	}
+	return nil
+}
+
 type StepResult struct {
 	Evidence []string
 }
@@ -158,6 +181,10 @@ type WorkspacePort interface {
 
 type StepPort interface {
 	Execute(context.Context, StepRequest) (StepResult, error)
+}
+
+type StepIntentPreparer interface {
+	PrepareStepIntent(context.Context, StepRequest) (StepExecutionIntent, error)
 }
 
 type AcceptancePort interface {

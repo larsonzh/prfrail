@@ -38,6 +38,21 @@ type fakeSteps struct {
 	pause    func()
 }
 
+type fakeStepIntents struct {
+	requests []StepRequest
+	intent   StepExecutionIntent
+	err      error
+	prepare  func(StepRequest) (StepExecutionIntent, error)
+}
+
+func (fake *fakeStepIntents) PrepareStepIntent(_ context.Context, request StepRequest) (StepExecutionIntent, error) {
+	fake.requests = append(fake.requests, request)
+	if fake.prepare != nil {
+		return fake.prepare(request)
+	}
+	return fake.intent, fake.err
+}
+
 func (fake *fakeSteps) Execute(_ context.Context, request StepRequest) (StepResult, error) {
 	fake.requests = append(fake.requests, request)
 	if fake.pause != nil {
@@ -174,6 +189,94 @@ func TestEngineRunsThreeTasksFourKindsAndBothModes(t *testing.T) {
 	}
 	if err := evidence.VerifyEventChain(store.events); err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestEnginePreparesAgentRunnerIntentBeforeSingleExecutionPort(t *testing.T) {
+	store := &memoryEvents{}
+	options, _, _, steps, _, _, _, _, _ := testOptions(store)
+	facts := &AgentRunnerImmutableFacts{
+		RequestID:         "request-one",
+		WorkspaceHash:     baselineHash,
+		ContextHash:       acceptedOne,
+		AuthorizationHash: acceptedTwo,
+		BudgetHash:        acceptedThree,
+	}
+	preparer := &fakeStepIntents{prepare: func(request StepRequest) (StepExecutionIntent, error) {
+		if request.Step.Kind == "code" && request.Step.Mode == IsolatedWorkspace {
+			return StepExecutionIntent{ExecutionTarget: AgentRunnerExecution, AgentRunnerFacts: facts}, nil
+		}
+		return StepExecutionIntent{}, nil
+	}}
+	options.StepIntents = preparer
+	engine, err := New(context.Background(), options)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := engine.Run(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if len(preparer.requests) != 4 || len(steps.requests) != 4 {
+		t.Fatalf("unexpected prepare/execute calls: prepare=%d execute=%d", len(preparer.requests), len(steps.requests))
+	}
+	for index, request := range steps.requests {
+		prepared := preparer.requests[index]
+		if prepared.ExecutionTarget != DefaultExecution || prepared.AgentRunnerFacts != nil {
+			t.Fatalf("preparer received mutable intent fields: %+v", prepared)
+		}
+		if request.Step.Kind == "code" && request.Step.Mode == IsolatedWorkspace {
+			if request.ExecutionTarget != AgentRunnerExecution || request.AgentRunnerFacts == nil || *request.AgentRunnerFacts != *facts || request.AgentRunnerFacts == facts {
+				t.Fatalf("request %d missing prepared intent: %+v", index, request)
+			}
+		} else if request.ExecutionTarget != DefaultExecution || request.AgentRunnerFacts != nil {
+			t.Fatalf("request %d unexpectedly received AgentRunner intent: %+v", index, request)
+		}
+	}
+}
+
+func TestEngineRejectsIntentThatDoesNotMatchStep(t *testing.T) {
+	store := &memoryEvents{}
+	options, _, _, steps, _, _, _, _, _ := testOptions(store)
+	preparer := &fakeStepIntents{intent: StepExecutionIntent{
+		ExecutionTarget:  AgentRunnerExecution,
+		AgentRunnerFacts: &AgentRunnerImmutableFacts{RequestID: "request-one"},
+	}}
+	options.StepIntents = preparer
+	engine, err := New(context.Background(), options)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := engine.Run(context.Background()); !errors.Is(err, ErrInvalidDefinition) {
+		t.Fatalf("expected invalid intent failure, got %v", err)
+	}
+	if len(steps.requests) != 0 {
+		t.Fatalf("invalid managed-step intent reached execution port: %d requests", len(steps.requests))
+	}
+	projection := engine.Projection()
+	if projection.StepStates[stepKey("task-one", "code-managed", 1)] != "FAILED" || projection.ChainState != "FAILED" {
+		t.Fatalf("invalid intent did not fail closed: %+v", projection)
+	}
+}
+
+func TestEngineIntentPreparationFailureBlocksExecution(t *testing.T) {
+	store := &memoryEvents{}
+	options, _, _, steps, acceptance, reviewer, publisher, _, _ := testOptions(store)
+	prepareErr := errors.New("intent unavailable")
+	preparer := &fakeStepIntents{err: prepareErr}
+	options.StepIntents = preparer
+	engine, err := New(context.Background(), options)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := engine.Run(context.Background()); !errors.Is(err, prepareErr) {
+		t.Fatalf("expected preparation failure, got %v", err)
+	}
+	projection := engine.Projection()
+	if projection.ChainState != "FAILED" || projection.StepStates[stepKey("task-one", "code-managed", 1)] != "FAILED" {
+		t.Fatalf("preparation failure did not fail closed: %+v", projection)
+	}
+	if len(steps.requests) != 0 || acceptance.calls != 0 || reviewer.calls != 0 || publisher.calls != 0 {
+		t.Fatalf("preparation failure reached later ports: steps=%d accept=%d review=%d publish=%d", len(steps.requests), acceptance.calls, reviewer.calls, publisher.calls)
 	}
 }
 
