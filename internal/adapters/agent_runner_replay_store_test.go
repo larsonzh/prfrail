@@ -409,6 +409,7 @@ func TestAgentRunnerReplayStorePublishSyncFailureFailsClosedWithoutRollback(t *t
 	if _, err := store.RecordRequest(request); !errors.Is(err, sentinel) {
 		t.Fatalf("expected sync failure, got %v", err)
 	}
+	replayStoreSyncParentDirectory = originalSync
 	path, err := store.requestPath(request.Request.RequestID)
 	if err != nil {
 		t.Fatal(err)
@@ -887,6 +888,9 @@ func TestAgentRunnerReplayStoreConvergesCrossStorePublicationAfterAbsentRequestR
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			root := filepath.Join(root, strings.ReplaceAll(test.name, " ", "-"))
+			if err := os.Mkdir(root, 0o755); err != nil {
+				t.Fatal(err)
+			}
 			store := replayStoreMustNew(t, root)
 			publisher := replayStoreMustNew(t, root)
 			store.afterRequestReadLocked = func() {
