@@ -27,7 +27,7 @@ func compositeAdmissionFixture(t *testing.T) (AgentRunnerCompositeAdmission, cha
 			TaskIDs:       []string{"task-one"},
 			StepIDs:       []string{"step-one"},
 			TargetIDs:     []string{"workspace-files"},
-			EffectClasses: []string{"local-discardable"},
+			EffectClasses: []string{"external-write", "local-discardable", "read-only"},
 			Budget: chain.AuthorizationBudgetLimit{
 				ModelCalls:  1,
 				Tokens:      1000,
@@ -127,6 +127,37 @@ func compositeAdmissionFixture(t *testing.T) (AgentRunnerCompositeAdmission, cha
 			return aiAvailabilityPolicy().EvaluatedAt
 		},
 	}, request
+}
+
+func TestAgentRunnerCompositeAdmissionEffectClassCoverageBeforeReplay(t *testing.T) {
+	admission, request := compositeAdmissionFixture(t)
+	underCovered := *admission.AuthorizationLedger.Grants[0].Grant
+	underCovered.RecordID = "grant-under-covered"
+	underCovered.AuthorizationID = "authorization-under-covered"
+	underCovered.Scope.EffectClasses = []string{"read-only"}
+	underCoveredRecord, err := chain.NewGrantAuthorizationRecord(underCovered, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	admission.AuthorizationLedger = chain.AuthorizationLedger{Grants: []chain.AuthorizationRecord{underCoveredRecord}}
+	admission.CostLedger, request.AgentRunnerFacts.BudgetHash = admissionCostLedger(t, request.RunID, request.AgentRunnerFacts.RequestID, underCoveredRecord.RecordHash)
+	request.AgentRunnerFacts.AuthorizationHash = underCoveredRecord.RecordHash
+	changed := admission.RequestRecord.Request
+	changed.AuthorizationHash = underCoveredRecord.RecordHash
+	changed.BudgetHash = request.AgentRunnerFacts.BudgetHash
+	admission.RequestRecord, err = NewAgentRunnerRequestRecord(changed)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := admission.AdmitAgentRunner(context.Background(), request); !errors.Is(err, ErrAgentRunnerCompositeAdmissionBlocked) || !strings.Contains(err.Error(), "does not cover operation") {
+		t.Fatalf("expected effect class under-coverage to block, got %v", err)
+	}
+
+	healthy, healthyRequest := compositeAdmissionFixture(t)
+	healthy.RequestIndex = admission.RequestIndex
+	if err := healthy.AdmitAgentRunner(context.Background(), healthyRequest); err != nil {
+		t.Fatalf("under-coverage rejection consumed request identity: %v", err)
+	}
 }
 
 func mustAgentRunnerRequestIndex(t *testing.T) *AgentRunnerRequestIndex {

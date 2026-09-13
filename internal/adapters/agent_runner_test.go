@@ -8,22 +8,24 @@ import (
 
 func agentRunnerRequest(requestID string) AgentRunnerRequest {
 	return AgentRunnerRequest{
-		RequestID:          requestID,
-		RunID:              "run-one",
-		TaskID:             "task-one",
-		StepID:             "step-one",
-		Attempt:            1,
-		CreatedAt:          "2026-09-10T02:00:00.000Z",
-		AdapterID:          "fixture-agent",
-		Mode:               "create",
-		WorkspaceHash:      queueHashOne,
-		ContextHash:        queueHashTwo,
-		ParentSnapshotHash: queueHashThree,
-		AuthorizationHash:  queueHashFour,
-		BudgetHash:         "sha256:5555555555555555555555555555555555555555555555555555555555555555",
-		AllowedTargets:     []string{"workspace-files"},
-		AllowedEffects:     []string{"workspace-write", "local-process"},
-		Evidence:           []string{"sha256:6666666666666666666666666666666666666666666666666666666666666666"},
+		RequestID:            requestID,
+		RunID:                "run-one",
+		TaskID:               "task-one",
+		StepID:               "step-one",
+		Attempt:              1,
+		CreatedAt:            "2026-09-10T02:00:00.000Z",
+		AdapterID:            "fixture-agent",
+		Mode:                 "create",
+		WorkspaceHash:        queueHashOne,
+		ContextHash:          queueHashTwo,
+		ParentSnapshotHash:   queueHashThree,
+		AuthorizationHash:    queueHashFour,
+		BudgetHash:           "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+		AllowedTargets:       []string{"workspace-files"},
+		AllowedEffects:       []string{"workspace-write", "local-process"},
+		EffectMappingVersion: agentRunnerEffectMappingVersion,
+		EffectMappingHash:    agentRunnerEffectMappingHash,
+		Evidence:             []string{"sha256:6666666666666666666666666666666666666666666666666666666666666666"},
 	}
 }
 
@@ -46,6 +48,44 @@ func TestAgentRunnerRequestRecordCanonicalRoundTrip(t *testing.T) {
 	}
 	if decoded.RecordHash != record.RecordHash {
 		t.Fatalf("record hash mismatch: %s != %s", decoded.RecordHash, record.RecordHash)
+	}
+}
+
+func TestAgentRunnerEffectMappingContract(t *testing.T) {
+	body := map[string]string{
+		"local-process":   "local-discardable",
+		"workspace-write": "local-discardable",
+	}
+	hash, err := digestMessage("proofrail:agent-runner-effect-mapping:1\n", body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if hash != agentRunnerEffectMappingHash {
+		t.Fatalf("effect mapping hash mismatch: %s", hash)
+	}
+	for operation, want := range body {
+		got, found := agentRunnerEffectClass(operation)
+		if !found || got != want {
+			t.Fatalf("unexpected v1 effect mapping for %q: %q, found=%v", operation, got, found)
+		}
+	}
+}
+
+func TestAgentRunnerRequestRejectsInvalidEffectMappingBindings(t *testing.T) {
+	for name, mutate := range map[string]func(*AgentRunnerRequest){
+		"missing version": func(request *AgentRunnerRequest) { request.EffectMappingVersion = "" },
+		"unknown version": func(request *AgentRunnerRequest) { request.EffectMappingVersion = "2" },
+		"missing hash":    func(request *AgentRunnerRequest) { request.EffectMappingHash = "" },
+		"tampered hash":   func(request *AgentRunnerRequest) { request.EffectMappingHash = queueHashOne },
+		"unknown effect":  func(request *AgentRunnerRequest) { request.AllowedEffects = []string{"external-publish"} },
+	} {
+		t.Run(name, func(t *testing.T) {
+			request := agentRunnerRequest("request-one")
+			mutate(&request)
+			if _, err := NewAgentRunnerRequestRecord(request); !errors.Is(err, ErrInvalidAgentRunnerRequest) {
+				t.Fatalf("expected invalid effect mapping rejection, got %v", err)
+			}
+		})
 	}
 }
 

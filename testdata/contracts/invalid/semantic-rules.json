@@ -106,11 +106,13 @@
             "allowedEffects": [
               "workspace-write"
             ],
+            "effectMappingVersion": "1",
+            "effectMappingHash": "sha256:2c9609ee374bfc79bd0ed997aea6cfe4865c82ed0216d1a4a288139e0b0c92d4",
             "evidence": [
               "sha256:6666666666666666666666666666666666666666666666666666666666666666"
             ]
           },
-          "recordHash": "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+          "recordHash": "sha256:5c102628489b3d2e64903b17770c9f7f24aab76f7a209ae0d0b6879186a7347a"
         },
         "authorization-record.schema.json": [
           {
@@ -329,11 +331,13 @@
             "allowedEffects": [
               "workspace-write"
             ],
+            "effectMappingVersion": "1",
+            "effectMappingHash": "sha256:2c9609ee374bfc79bd0ed997aea6cfe4865c82ed0216d1a4a288139e0b0c92d4",
             "evidence": [
               "sha256:6666666666666666666666666666666666666666666666666666666666666666"
             ]
           },
-          "recordHash": "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+          "recordHash": "sha256:3b89a7d42388de98047f13de1c294f4efb622a1af0956a44a99439c6d19f844f"
         },
         "authorization-record.schema.json": [
           {
@@ -555,11 +559,13 @@
             "allowedEffects": [
               "workspace-write"
             ],
+            "effectMappingVersion": "1",
+            "effectMappingHash": "sha256:2c9609ee374bfc79bd0ed997aea6cfe4865c82ed0216d1a4a288139e0b0c92d4",
             "evidence": [
               "sha256:6666666666666666666666666666666666666666666666666666666666666666"
             ]
           },
-          "recordHash": "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+          "recordHash": "sha256:14ca17653108df50ee4e697a836243437c03e1a459debafde676d1c34dd04375"
         },
         "authorization-record.schema.json": [
           {
@@ -781,11 +787,13 @@
             "allowedEffects": [
               "workspace-write"
             ],
+            "effectMappingVersion": "1",
+            "effectMappingHash": "sha256:2c9609ee374bfc79bd0ed997aea6cfe4865c82ed0216d1a4a288139e0b0c92d4",
             "evidence": [
               "sha256:6666666666666666666666666666666666666666666666666666666666666666"
             ]
           },
-          "recordHash": "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+          "recordHash": "sha256:5c102628489b3d2e64903b17770c9f7f24aab76f7a209ae0d0b6879186a7347a"
         },
         "authorization-record.schema.json": [
           {
@@ -1054,11 +1062,13 @@
             "allowedEffects": [
               "workspace-write"
             ],
+            "effectMappingVersion": "1",
+            "effectMappingHash": "sha256:2c9609ee374bfc79bd0ed997aea6cfe4865c82ed0216d1a4a288139e0b0c92d4",
             "evidence": [
               "sha256:6666666666666666666666666666666666666666666666666666666666666666"
             ]
           },
-          "recordHash": "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+          "recordHash": "sha256:90dd9ee2e3c6deeb9cec218f7e8d1a51610d7d56fba28c74d2772f8591b3adda"
         },
         "authorization-record.schema.json": [
           {
@@ -1280,11 +1290,13 @@
             "allowedEffects": [
               "workspace-write"
             ],
+            "effectMappingVersion": "1",
+            "effectMappingHash": "sha256:2c9609ee374bfc79bd0ed997aea6cfe4865c82ed0216d1a4a288139e0b0c92d4",
             "evidence": [
               "sha256:6666666666666666666666666666666666666666666666666666666666666666"
             ]
           },
-          "recordHash": "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+          "recordHash": "sha256:92fc31cf92c88b9ce68e2545ed9a4d2cfd92789c6f9ac64c9e12b67e32762cc2"
         },
         "authorization-record.schema.json": [
           {
@@ -1506,11 +1518,13 @@
             "allowedEffects": [
               "workspace-write"
             ],
+            "effectMappingVersion": "1",
+            "effectMappingHash": "sha256:2c9609ee374bfc79bd0ed997aea6cfe4865c82ed0216d1a4a288139e0b0c92d4",
             "evidence": [
               "sha256:6666666666666666666666666666666666666666666666666666666666666666"
             ]
           },
-          "recordHash": "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+          "recordHash": "sha256:d9e135790523e806a4e09a6e16fff452ce61077356bb5f0aab20d45e672ad12e"
         },
         "authorization-record.schema.json": [
           {
@@ -1732,11 +1746,13 @@
             "allowedEffects": [
               "workspace-write"
             ],
+            "effectMappingVersion": "1",
+            "effectMappingHash": "sha256:2c9609ee374bfc79bd0ed997aea6cfe4865c82ed0216d1a4a288139e0b0c92d4",
             "evidence": [
               "sha256:6666666666666666666666666666666666666666666666666666666666666666"
             ]
           },
-          "recordHash": "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+          "recordHash": "sha256:5c102628489b3d2e64903b17770c9f7f24aab76f7a209ae0d0b6879186a7347a"
         },
         "authorization-record.schema.json": [
           {
@@ -2000,11 +2016,13 @@
             "allowedEffects": [
               "workspace-write"
             ],
+            "effectMappingVersion": "1",
+            "effectMappingHash": "sha256:2c9609ee374bfc79bd0ed997aea6cfe4865c82ed0216d1a4a288139e0b0c92d4",
             "evidence": [
               "sha256:6666666666666666666666666666666666666666666666666666666666666666"
             ]
           },
-          "recordHash": "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+          "recordHash": "sha256:5c102628489b3d2e64903b17770c9f7f24aab76f7a209ae0d0b6879186a7347a"
         },
         "authorization-record.schema.json": [
           {
@@ -2247,11 +2265,13 @@
             "allowedEffects": [
               "workspace-write"
             ],
+            "effectMappingVersion": "1",
+            "effectMappingHash": "sha256:2c9609ee374bfc79bd0ed997aea6cfe4865c82ed0216d1a4a288139e0b0c92d4",
             "evidence": [
               "sha256:6666666666666666666666666666666666666666666666666666666666666666"
             ]
           },
-          "recordHash": "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+          "recordHash": "sha256:98344c1d0272f3189ab572d2834c9945e872bff53b3cf04d15cd6cc2bcaa17b8"
         },
         "authorization-record.schema.json": [
           {
@@ -2473,11 +2493,13 @@
             "allowedEffects": [
               "workspace-write"
             ],
+            "effectMappingVersion": "1",
+            "effectMappingHash": "sha256:2c9609ee374bfc79bd0ed997aea6cfe4865c82ed0216d1a4a288139e0b0c92d4",
             "evidence": [
               "sha256:6666666666666666666666666666666666666666666666666666666666666666"
             ]
           },
-          "recordHash": "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+          "recordHash": "sha256:8831813403113d1140b4cb3c1927856a6a4e59629c2d2163c57a7b43396326b3"
         },
         "authorization-record.schema.json": [
           {
@@ -2699,11 +2721,13 @@
             "allowedEffects": [
               "workspace-write"
             ],
+            "effectMappingVersion": "1",
+            "effectMappingHash": "sha256:2c9609ee374bfc79bd0ed997aea6cfe4865c82ed0216d1a4a288139e0b0c92d4",
             "evidence": [
               "sha256:6666666666666666666666666666666666666666666666666666666666666666"
             ]
           },
-          "recordHash": "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+          "recordHash": "sha256:d954c4006311cf3716bf6cd2f1a930f49509a9cece67d11f236d4050be793f9a"
         },
         "authorization-record.schema.json": [
           {
@@ -2925,11 +2949,13 @@
             "allowedEffects": [
               "workspace-write"
             ],
+            "effectMappingVersion": "1",
+            "effectMappingHash": "sha256:2c9609ee374bfc79bd0ed997aea6cfe4865c82ed0216d1a4a288139e0b0c92d4",
             "evidence": [
               "sha256:6666666666666666666666666666666666666666666666666666666666666666"
             ]
           },
-          "recordHash": "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+          "recordHash": "sha256:e1ed65fbe87d605a60e70e66d42b27832947e359031bd35c6f980e9a73dc7a20"
         },
         "authorization-record.schema.json": [
           {
@@ -3546,11 +3572,13 @@
             "allowedEffects": [
               "workspace-write"
             ],
+            "effectMappingVersion": "1",
+            "effectMappingHash": "sha256:2c9609ee374bfc79bd0ed997aea6cfe4865c82ed0216d1a4a288139e0b0c92d4",
             "evidence": [
               "sha256:6666666666666666666666666666666666666666666666666666666666666666"
             ]
           },
-          "recordHash": "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+          "recordHash": "sha256:c87614910b970477e755f20ec4bdfe8d746a60762cca56d7519a90548b7aa5ef"
         },
         "authorization-record.schema.json": [
           {
@@ -3772,11 +3800,13 @@
             "allowedEffects": [
               "workspace-write"
             ],
+            "effectMappingVersion": "1",
+            "effectMappingHash": "sha256:2c9609ee374bfc79bd0ed997aea6cfe4865c82ed0216d1a4a288139e0b0c92d4",
             "evidence": [
               "sha256:6666666666666666666666666666666666666666666666666666666666666666"
             ]
           },
-          "recordHash": "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+          "recordHash": "sha256:5c102628489b3d2e64903b17770c9f7f24aab76f7a209ae0d0b6879186a7347a"
         },
         "authorization-record.schema.json": [
           {
@@ -4014,11 +4044,13 @@
             "allowedEffects": [
               "workspace-write"
             ],
+            "effectMappingVersion": "1",
+            "effectMappingHash": "sha256:2c9609ee374bfc79bd0ed997aea6cfe4865c82ed0216d1a4a288139e0b0c92d4",
             "evidence": [
               "sha256:6666666666666666666666666666666666666666666666666666666666666666"
             ]
           },
-          "recordHash": "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+          "recordHash": "sha256:1e56c3b2eaee642fd614138e692962405e416e8c786ea37036ecd82bbff51f17"
         },
         "authorization-record.schema.json": [
           {
@@ -4240,11 +4272,13 @@
             "allowedEffects": [
               "workspace-write"
             ],
+            "effectMappingVersion": "1",
+            "effectMappingHash": "sha256:2c9609ee374bfc79bd0ed997aea6cfe4865c82ed0216d1a4a288139e0b0c92d4",
             "evidence": [
               "sha256:6666666666666666666666666666666666666666666666666666666666666666"
             ]
           },
-          "recordHash": "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+          "recordHash": "sha256:5c102628489b3d2e64903b17770c9f7f24aab76f7a209ae0d0b6879186a7347a"
         },
         "authorization-record.schema.json": [
           {

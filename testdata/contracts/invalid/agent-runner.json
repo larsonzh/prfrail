@@ -24,6 +24,8 @@
         "budgetHash": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
         "allowedTargets": ["workspace-files"],
         "allowedEffects": ["workspace-write"],
+        "effectMappingVersion": "1",
+        "effectMappingHash": "sha256:2c9609ee374bfc79bd0ed997aea6cfe4865c82ed0216d1a4a288139e0b0c92d4",
         "evidence": ["sha256:6666666666666666666666666666666666666666666666666666666666666666"]
       },
       "recordHash": "sha256:7777777777777777777777777777777777777777777777777777777777777777"
@@ -54,7 +56,104 @@
         "budgetHash": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
         "allowedTargets": ["workspace-files"],
         "allowedEffects": ["workspace-write"],
+        "effectMappingVersion": "1",
+        "effectMappingHash": "sha256:2c9609ee374bfc79bd0ed997aea6cfe4865c82ed0216d1a4a288139e0b0c92d4",
         "priorSessionId": "session-one",
+        "evidence": ["sha256:6666666666666666666666666666666666666666666666666666666666666666"]
+      },
+      "recordHash": "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+    }
+  },
+  {
+    "fixtureId": "agent-runner-request-effect-mapping-hash-missing",
+    "schema": "agent-runner-request.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "A request must bind the frozen effect mapping hash",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "request": {
+        "kind": "agent-runner-request",
+        "requestId": "agent-request-three",
+        "runId": "run-one",
+        "taskId": "task-one",
+        "stepId": "step-one",
+        "attempt": 1,
+        "createdAt": "2026-09-10T02:00:00.000Z",
+        "adapterId": "fixture-agent",
+        "mode": "create",
+        "workspaceHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "contextHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "parentSnapshotHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+        "authorizationHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+        "budgetHash": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+        "allowedTargets": ["workspace-files"],
+        "allowedEffects": ["workspace-write"],
+        "effectMappingVersion": "1",
+        "evidence": ["sha256:6666666666666666666666666666666666666666666666666666666666666666"]
+      },
+      "recordHash": "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+    }
+  },
+  {
+    "fixtureId": "agent-runner-request-effect-mapping-version-unknown",
+    "schema": "agent-runner-request.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "An unknown effect mapping version must fail closed",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "request": {
+        "kind": "agent-runner-request",
+        "requestId": "agent-request-four",
+        "runId": "run-one",
+        "taskId": "task-one",
+        "stepId": "step-one",
+        "attempt": 1,
+        "createdAt": "2026-09-10T02:00:00.000Z",
+        "adapterId": "fixture-agent",
+        "mode": "create",
+        "workspaceHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "contextHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "parentSnapshotHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+        "authorizationHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+        "budgetHash": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+        "allowedTargets": ["workspace-files"],
+        "allowedEffects": ["workspace-write"],
+        "effectMappingVersion": "2",
+        "effectMappingHash": "sha256:2c9609ee374bfc79bd0ed997aea6cfe4865c82ed0216d1a4a288139e0b0c92d4",
+        "evidence": ["sha256:6666666666666666666666666666666666666666666666666666666666666666"]
+      },
+      "recordHash": "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+    }
+  },
+  {
+    "fixtureId": "agent-runner-request-effect-mapping-hash-tampered",
+    "schema": "agent-runner-request.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "A tampered effect mapping hash must fail closed",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "request": {
+        "kind": "agent-runner-request",
+        "requestId": "agent-request-five",
+        "runId": "run-one",
+        "taskId": "task-one",
+        "stepId": "step-one",
+        "attempt": 1,
+        "createdAt": "2026-09-10T02:00:00.000Z",
+        "adapterId": "fixture-agent",
+        "mode": "create",
+        "workspaceHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "contextHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "parentSnapshotHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+        "authorizationHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+        "budgetHash": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+        "allowedTargets": ["workspace-files"],
+        "allowedEffects": ["workspace-write"],
+        "effectMappingVersion": "1",
+        "effectMappingHash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         "evidence": ["sha256:6666666666666666666666666666666666666666666666666666666666666666"]
       },
       "recordHash": "sha256:7777777777777777777777777777777777777777777777777777777777777777"

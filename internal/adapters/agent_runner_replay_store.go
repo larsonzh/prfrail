@@ -18,11 +18,36 @@ const replayStoreReadCollisionRetries = 16
 var (
 	// ErrInvalidAgentRunnerReplayStore reports invalid replay-store construction or usage.
 	ErrInvalidAgentRunnerReplayStore = errors.New("invalid AgentRunner replay store")
+	// ErrAgentRunnerReplayStoreConvergence reports bounded replay-store rereads that
+	// could not truthfully classify the winner after a no-replace collision.
+	ErrAgentRunnerReplayStoreConvergence = errors.New("AgentRunner replay store convergence failure")
 	// ErrAgentRunnerReplayStoreCorruption reports fail-closed on-disk replay-store corruption.
 	ErrAgentRunnerReplayStoreCorruption = errors.New("AgentRunner replay store corruption")
+	// ErrAgentRunnerReplayStoreDurabilityUnproven reports a write that cannot
+	// prove replay publication durability on the current store instance.
+	ErrAgentRunnerReplayStoreDurabilityUnproven = errors.New("AgentRunner replay store publication durability unproven")
 )
 
-// AgentRunnerReplayState describes durable replay-state visibility for one requestId.
+// PublishDurability describes whether replay publication can be proved durable on
+// the current platform implementation after the required post-publish steps.
+type PublishDurability string
+
+const (
+	// PublishDurabilityProven means the implementation can prove the published
+	// directory entry reached the local durability boundary required by contract.
+	PublishDurabilityProven PublishDurability = "proven"
+	// PublishDurabilityUnproven means publication may be atomically visible but
+	// the implementation cannot prove directory-entry durability.
+	PublishDurabilityUnproven PublishDurability = "unproven"
+)
+
+var (
+	replayStoreLoadRequestRecord    = loadRequestRecord
+	replayStoreLoadCompletionRecord = loadCompletionRecord
+	replayStoreSyncParentDirectory  = syncReplayStoreParentDirectory
+)
+
+// AgentRunnerReplayState describes replay-state visibility for one requestId.
 type AgentRunnerReplayState string
 
 const (
@@ -39,7 +64,7 @@ const (
 type AgentRunnerReplayDecision string
 
 const (
-	// AgentRunnerReplayDecisionFirstDispatch means this call durably published the first request record.
+	// AgentRunnerReplayDecisionFirstDispatch means this call published the first request record.
 	AgentRunnerReplayDecisionFirstDispatch AgentRunnerReplayDecision = "first-dispatch"
 	// AgentRunnerReplayDecisionUnknownBlock means a request record exists without a terminal receipt.
 	AgentRunnerReplayDecisionUnknownBlock AgentRunnerReplayDecision = "unknown-block"
@@ -50,8 +75,10 @@ const (
 
 // AgentRunnerReplayStore persists request/completion replay records under one absolute root.
 type AgentRunnerReplayStore struct {
-	root string
-	mu   sync.Mutex
+	root                   string
+	publicationDurability  PublishDurability
+	mu                     sync.Mutex
+	afterRequestReadLocked func()
 }
 
 // NewAgentRunnerReplayStore constructs a replay store rooted at an absolute path.
@@ -64,10 +91,28 @@ func NewAgentRunnerReplayStore(root string) (*AgentRunnerReplayStore, error) {
 	if !filepath.IsAbs(cleanRoot) {
 		return nil, fmt.Errorf("%w: replay root must be absolute", ErrInvalidAgentRunnerReplayStore)
 	}
-	return &AgentRunnerReplayStore{root: cleanRoot}, nil
+	store := &AgentRunnerReplayStore{
+		root:                  cleanRoot,
+		publicationDurability: replayStorePublicationDurability(),
+	}
+	if store.publicationDurability == PublishDurabilityProven {
+		if err := bootstrapReplayStoreRoot(cleanRoot); err != nil {
+			return nil, fmt.Errorf("%w: replay root bootstrap: %w", ErrInvalidAgentRunnerReplayStore, err)
+		}
+	}
+	return store, nil
 }
 
-// State returns the durable replay state for requestID.
+// PublicationDurability reports whether this platform-specific replay-store
+// implementation can prove request/completion publication durability.
+func (store *AgentRunnerReplayStore) PublicationDurability() PublishDurability {
+	if store == nil || store.publicationDurability != PublishDurabilityProven {
+		return PublishDurabilityUnproven
+	}
+	return PublishDurabilityProven
+}
+
+// State returns the replay state visible for requestID.
 // It fails closed if an orphan completion exists without a request record.
 func (store *AgentRunnerReplayStore) State(requestID string) (AgentRunnerReplayState, error) {
 	if store == nil {
@@ -76,32 +121,20 @@ func (store *AgentRunnerReplayStore) State(requestID string) (AgentRunnerReplayS
 	store.mu.Lock()
 	defer store.mu.Unlock()
 
-	request, foundRequest, err := store.loadRequestLocked(requestID)
+	request, foundRequest, completion, foundCompletion, err := store.loadConvergedRecordsLocked(requestID)
 	if err != nil {
 		return "", err
 	}
 	if !foundRequest {
-		_, foundCompletion, err := store.loadCompletionLocked(requestID)
-		if err != nil {
-			return "", err
-		}
 		if foundCompletion {
-			path, pathErr := store.completionPath(requestID)
-			if pathErr != nil {
-				return "", pathErr
-			}
-			return "", replayStoreCorruption(path, fmt.Sprintf("orphan completion present for requestId %s", requestID), nil)
+			return "", store.orphanCompletionError(requestID)
 		}
 		return AgentRunnerReplayStateAbsent, nil
-	}
-	completion, foundCompletion, err := store.loadCompletionLocked(requestID)
-	if err != nil {
-		return "", err
 	}
 	if !foundCompletion {
 		return AgentRunnerReplayStateDispatchedUnknown, nil
 	}
-	if err := ValidateAgentRunnerCompletionBinding(request, completion); err != nil {
+	if err := store.validatePersistedCompletionBinding(requestID, request, completion); err != nil {
 		return "", err
 	}
 	return AgentRunnerReplayStateTerminalReceiptPresent, nil
@@ -112,6 +145,9 @@ func (store *AgentRunnerReplayStore) RecordRequest(record AgentRunnerRequestReco
 	if store == nil {
 		return "", fmt.Errorf("%w: nil replay store", ErrInvalidAgentRunnerReplayStore)
 	}
+	if store.PublicationDurability() != PublishDurabilityProven {
+		return "", fmt.Errorf("%w: request publication", ErrAgentRunnerReplayStoreDurabilityUnproven)
+	}
 	if err := ValidateAgentRunnerRequestRecord(record); err != nil {
 		return "", err
 	}
@@ -119,11 +155,19 @@ func (store *AgentRunnerReplayStore) RecordRequest(record AgentRunnerRequestReco
 	store.mu.Lock()
 	defer store.mu.Unlock()
 
+	_, foundRequest, _, foundCompletion, err := store.loadConvergedRecordsLocked(record.Request.RequestID)
+	if err != nil {
+		return "", err
+	}
+	if !foundRequest && foundCompletion {
+		return "", store.orphanCompletionError(record.Request.RequestID)
+	}
+
 	request, inserted, err := store.ensureRequestLocked(record)
 	if err != nil {
 		return "", err
 	}
-	completion, foundCompletion, err := store.loadCompletionLocked(record.Request.RequestID)
+	_, _, completion, foundCompletion, err := store.loadConvergedRecordsLocked(record.Request.RequestID)
 	if err != nil {
 		return "", err
 	}
@@ -133,15 +177,15 @@ func (store *AgentRunnerReplayStore) RecordRequest(record AgentRunnerRequestReco
 		}
 		return AgentRunnerReplayDecisionUnknownBlock, nil
 	}
-	if err := ValidateAgentRunnerCompletionBinding(request, completion); err != nil {
+	if err := store.validatePersistedCompletionBinding(record.Request.RequestID, request, completion); err != nil {
 		return "", err
 	}
 	return AgentRunnerReplayDecisionTerminalReceiptPresent, nil
 }
 
 // RecordCompletion records one terminal completion receipt.
-// The returned bool is true only when the same completion record was already durably present (replay).
-// The returned bool is false when this call durably published a new completion record.
+// The returned bool is true only when the same completion record was already present (replay).
+// The returned bool is false when this call published a new completion record.
 func (store *AgentRunnerReplayStore) RecordCompletion(request AgentRunnerRequestRecord, completion AgentRunnerCompletionRecord) (bool, error) {
 	if store == nil {
 		return false, fmt.Errorf("%w: nil replay store", ErrInvalidAgentRunnerReplayStore)
@@ -157,11 +201,7 @@ func (store *AgentRunnerReplayStore) RecordCompletion(request AgentRunnerRequest
 	defer store.mu.Unlock()
 
 	requestID := request.Request.RequestID
-	persisted, foundRequest, err := store.loadRequestLocked(requestID)
-	if err != nil {
-		return false, err
-	}
-	existing, foundCompletion, err := store.loadCompletionLocked(requestID)
+	persisted, foundRequest, existing, foundCompletion, err := store.loadConvergedRecordsLocked(requestID)
 	if err != nil {
 		return false, err
 	}
@@ -170,11 +210,7 @@ func (store *AgentRunnerReplayStore) RecordCompletion(request AgentRunnerRequest
 	// so a rejected or replayed completion can never consume the request identity.
 	if foundCompletion {
 		if !foundRequest {
-			path, pathErr := store.completionPath(requestID)
-			if pathErr != nil {
-				return false, pathErr
-			}
-			return false, replayStoreCorruption(path, fmt.Sprintf("orphan completion present for requestId %s", requestID), nil)
+			return false, store.orphanCompletionError(requestID)
 		}
 		if persisted.RecordHash != request.RecordHash {
 			return false, fmt.Errorf("%w: requestId %s", ErrAgentRunnerRequestConflict, requestID)
@@ -182,10 +218,13 @@ func (store *AgentRunnerReplayStore) RecordCompletion(request AgentRunnerRequest
 		if existing.RecordHash != completion.RecordHash {
 			return false, fmt.Errorf("%w: requestId %s already completed", ErrAgentRunnerCompletionConflict, requestID)
 		}
-		if err := ValidateAgentRunnerCompletionBinding(persisted, existing); err != nil {
+		if err := store.validatePersistedCompletionBinding(requestID, persisted, existing); err != nil {
 			return false, err
 		}
 		return true, nil
+	}
+	if store.PublicationDurability() != PublishDurabilityProven {
+		return false, fmt.Errorf("%w: completion publication", ErrAgentRunnerReplayStoreDurabilityUnproven)
 	}
 
 	// No terminal receipt exists yet. The binding must hold before the first
@@ -212,7 +251,7 @@ func (store *AgentRunnerReplayStore) RecordCompletion(request AgentRunnerRequest
 	collided := false
 	for attempt := 0; attempt < replayStoreReadCollisionRetries; attempt++ {
 		if !collided {
-			err = writeCanonicalLineNoReplace(path, completion)
+			err = writeReplayRecordNoReplace(path, completion)
 			if err == nil {
 				return false, nil
 			}
@@ -224,7 +263,7 @@ func (store *AgentRunnerReplayStore) RecordCompletion(request AgentRunnerRequest
 			// during a visibility gap and replace a different terminal receipt.
 			collided = true
 		}
-		visible, found, loadErr := loadCompletionRecord(path, requestID)
+		visible, found, loadErr := replayStoreLoadCompletionRecord(path, requestID)
 		if loadErr != nil {
 			return false, loadErr
 		}
@@ -235,12 +274,39 @@ func (store *AgentRunnerReplayStore) RecordCompletion(request AgentRunnerRequest
 		if visible.RecordHash != completion.RecordHash {
 			return false, fmt.Errorf("%w: requestId %s already completed", ErrAgentRunnerCompletionConflict, requestID)
 		}
-		if err := ValidateAgentRunnerCompletionBinding(persistedRequest, visible); err != nil {
+		if err := store.validatePersistedCompletionBinding(requestID, persistedRequest, visible); err != nil {
 			return false, err
 		}
 		return true, nil
 	}
-	return false, fmt.Errorf("%w: completion file not visible after no-replace collision for requestId %s", ErrAgentRunnerCompletionConflict, requestID)
+	return false, fmt.Errorf("%w: completion winner not visible after no-replace collision for requestId %s", ErrAgentRunnerReplayStoreConvergence, requestID)
+}
+
+func bootstrapReplayStoreRoot(root string) error {
+	info, err := os.Stat(root)
+	if err != nil {
+		return err
+	}
+	if !info.IsDir() {
+		return fmt.Errorf("replay root is not a directory: %s", root)
+	}
+	for _, name := range []string{"requests", "completions"} {
+		directory := filepath.Join(root, name)
+		if err := os.Mkdir(directory, 0o755); err != nil && !errors.Is(err, fs.ErrExist) {
+			return err
+		}
+		info, err := os.Stat(directory)
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() {
+			return fmt.Errorf("replay store path is not a directory: %s", directory)
+		}
+		if err := replayStoreSyncParentDirectory(root); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (store *AgentRunnerReplayStore) ensureRequestLocked(record AgentRunnerRequestRecord) (AgentRunnerRequestRecord, bool, error) {
@@ -251,7 +317,7 @@ func (store *AgentRunnerReplayStore) ensureRequestLocked(record AgentRunnerReque
 	collided := false
 	for attempt := 0; attempt < replayStoreReadCollisionRetries; attempt++ {
 		if !collided {
-			err = writeCanonicalLineNoReplace(path, record)
+			err = writeReplayRecordNoReplace(path, record)
 			if err == nil {
 				return record, true, nil
 			}
@@ -262,7 +328,7 @@ func (store *AgentRunnerReplayStore) ensureRequestLocked(record AgentRunnerReque
 			// visibility gap cannot replace the durable request record.
 			collided = true
 		}
-		existing, found, loadErr := loadRequestRecord(path, record.Request.RequestID)
+		existing, found, loadErr := replayStoreLoadRequestRecord(path, record.Request.RequestID)
 		if loadErr != nil {
 			return AgentRunnerRequestRecord{}, false, loadErr
 		}
@@ -275,7 +341,7 @@ func (store *AgentRunnerReplayStore) ensureRequestLocked(record AgentRunnerReque
 		}
 		return existing, false, nil
 	}
-	return AgentRunnerRequestRecord{}, false, fmt.Errorf("%w: request file not visible after no-replace collision for requestId %s", ErrAgentRunnerRequestConflict, record.Request.RequestID)
+	return AgentRunnerRequestRecord{}, false, fmt.Errorf("%w: request winner not visible after no-replace collision for requestId %s", ErrAgentRunnerReplayStoreConvergence, record.Request.RequestID)
 }
 
 func (store *AgentRunnerReplayStore) loadRequestLocked(requestID string) (AgentRunnerRequestRecord, bool, error) {
@@ -283,7 +349,7 @@ func (store *AgentRunnerReplayStore) loadRequestLocked(requestID string) (AgentR
 	if err != nil {
 		return AgentRunnerRequestRecord{}, false, err
 	}
-	return loadRequestRecord(path, requestID)
+	return replayStoreLoadRequestRecord(path, requestID)
 }
 
 func (store *AgentRunnerReplayStore) loadCompletionLocked(requestID string) (AgentRunnerCompletionRecord, bool, error) {
@@ -291,7 +357,49 @@ func (store *AgentRunnerReplayStore) loadCompletionLocked(requestID string) (Age
 	if err != nil {
 		return AgentRunnerCompletionRecord{}, false, err
 	}
-	return loadCompletionRecord(path, requestID)
+	return replayStoreLoadCompletionRecord(path, requestID)
+}
+
+func (store *AgentRunnerReplayStore) loadConvergedRecordsLocked(requestID string) (AgentRunnerRequestRecord, bool, AgentRunnerCompletionRecord, bool, error) {
+	for attempt := 0; attempt < replayStoreReadCollisionRetries; attempt++ {
+		request, foundRequest, err := store.loadRequestLocked(requestID)
+		if err != nil {
+			return AgentRunnerRequestRecord{}, false, AgentRunnerCompletionRecord{}, false, err
+		}
+		if store.afterRequestReadLocked != nil {
+			hook := store.afterRequestReadLocked
+			store.afterRequestReadLocked = nil
+			hook()
+		}
+		completion, foundCompletion, err := store.loadCompletionLocked(requestID)
+		if err != nil {
+			return AgentRunnerRequestRecord{}, false, AgentRunnerCompletionRecord{}, false, err
+		}
+		if foundRequest || !foundCompletion {
+			return request, foundRequest, completion, foundCompletion, nil
+		}
+		runtime.Gosched()
+	}
+	return AgentRunnerRequestRecord{}, false, AgentRunnerCompletionRecord{}, true, nil
+}
+
+func (store *AgentRunnerReplayStore) orphanCompletionError(requestID string) error {
+	path, err := store.completionPath(requestID)
+	if err != nil {
+		return err
+	}
+	return replayStoreCorruption(path, fmt.Sprintf("orphan completion present for requestId %s", requestID), nil)
+}
+
+func (store *AgentRunnerReplayStore) validatePersistedCompletionBinding(requestID string, request AgentRunnerRequestRecord, completion AgentRunnerCompletionRecord) error {
+	if err := ValidateAgentRunnerCompletionBinding(request, completion); err != nil {
+		path, pathErr := store.completionPath(requestID)
+		if pathErr != nil {
+			return pathErr
+		}
+		return replayStoreCorruption(path, "request/completion binding mismatch on disk", err)
+	}
+	return nil
 }
 
 func (store *AgentRunnerReplayStore) requestPath(requestID string) (string, error) {
@@ -353,6 +461,53 @@ func loadCompletionRecord(path, requestID string) (AgentRunnerCompletionRecord, 
 		return AgentRunnerCompletionRecord{}, false, replayStoreCorruption(path, fmt.Sprintf("completion requestId mismatch on disk (want %s, got %s)", requestID, record.Completion.RequestID), nil)
 	}
 	return record, true, nil
+}
+
+func writeReplayRecordNoReplace(path string, record any) error {
+	canonical, err := evidence.EncodeCanonical(record)
+	if err != nil {
+		return err
+	}
+	payload := append(canonical, '\n')
+	directory := filepath.Dir(path)
+	if err := os.MkdirAll(directory, 0o755); err != nil {
+		return err
+	}
+	file, err := os.CreateTemp(directory, "."+filepath.Base(path)+".*.tmp")
+	if err != nil {
+		return err
+	}
+	temp := file.Name()
+	writeErr := error(nil)
+	if _, err := file.Write(payload); err != nil {
+		writeErr = err
+	} else if err := file.Sync(); err != nil {
+		writeErr = err
+	}
+	closeErr := file.Close()
+	if writeErr == nil {
+		writeErr = closeErr
+	}
+	if writeErr != nil {
+		_ = os.Remove(temp)
+		return writeErr
+	}
+	// Atomic no-replace visibility and durability are separate facts. The hard
+	// link publishes visibility without replacement; only a successful parent
+	// directory durability step may later justify a proven durability claim.
+	if err := os.Link(temp, path); err != nil {
+		_ = os.Remove(temp)
+		if errors.Is(err, fs.ErrExist) {
+			return fs.ErrExist
+		}
+		return err
+	}
+	if err := replayStoreSyncParentDirectory(directory); err != nil {
+		_ = os.Remove(temp)
+		return err
+	}
+	_ = os.Remove(temp)
+	return nil
 }
 
 func replayStoreCorruption(path, detail string, cause error) error {

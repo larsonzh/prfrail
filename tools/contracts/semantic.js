@@ -42,6 +42,16 @@ const canonicalize = loadCanonicalize();
 const costReservationHashDomain = "proofrail:cost-reservation:1\n";
 const costAllocationHashDomain = "proofrail:cost-limits:1\n";
 const authorizationRecordHashDomain = "proofrail:authorization-record:1\n";
+const agentRunnerRequestHashDomain = "proofrail:agent-runner-request:1\n";
+const agentRunnerEffectMappingDomain =
+  "proofrail:agent-runner-effect-mapping:1\n";
+const agentRunnerEffectMappingVersion = "1";
+const agentRunnerEffectMappingHash =
+  "sha256:2c9609ee374bfc79bd0ed997aea6cfe4865c82ed0216d1a4a288139e0b0c92d4";
+const agentRunnerEffectMapping = Object.freeze({
+  "local-process": "local-discardable",
+  "workspace-write": "local-discardable",
+});
 
 function checkUnique(items, label, errors) {
   const seen = new Set();
@@ -103,6 +113,34 @@ function digestOrNull(domainSeparator, body) {
 function parseTimestamp(value) {
   const epoch = Date.parse(value);
   return Number.isNaN(epoch) ? null : epoch;
+}
+
+function checkAgentRunnerEffectAuthorization(request, grantEffectClasses) {
+  if (
+    request.effectMappingVersion !== agentRunnerEffectMappingVersion ||
+    request.effectMappingHash !== agentRunnerEffectMappingHash
+  ) {
+    return "agent-runner.effect-mapping.binding-mismatch";
+  }
+  const requestEffects = Array.isArray(request.allowedEffects)
+    ? request.allowedEffects
+    : [];
+  if (
+    requestEffects.some(
+      (effect) =>
+        !Object.prototype.hasOwnProperty.call(agentRunnerEffectMapping, effect),
+    )
+  ) {
+    return "agent-runner.effect-mapping.operation-unknown";
+  }
+  if (
+    requestEffects.some(
+      (effect) => !grantEffectClasses.includes(agentRunnerEffectMapping[effect]),
+    )
+  ) {
+    return "agent-runner.authorization-effect-class.under-covered";
+  }
+  return null;
 }
 
 function checkAgentRunnerBindings(bundle, errors) {
@@ -218,11 +256,21 @@ function checkAgentRunnerBindings(bundle, errors) {
       continue;
     }
     const requestId = request.requestId || "unknown-request";
+    const expectedRequestRecordHash = digestOrNull(
+      agentRunnerRequestHashDomain,
+      request,
+    );
+    if (
+      !expectedRequestRecordHash ||
+      requestRecord.recordHash !== expectedRequestRecordHash
+    ) {
+      errors.push(`agent-runner.request-record.hash-mismatch:${requestId}`);
+      continue;
+    }
     if (now === null) {
       errors.push(`agent-runner.clock.required:${requestId}`);
       continue;
     }
-
     const grantMatches = grantsByHash.get(request.authorizationHash) || [];
     if (grantMatches.length === 0) {
       errors.push(
@@ -244,6 +292,17 @@ function checkAgentRunnerBindings(bundle, errors) {
     const grantTargetIds = Array.isArray(grantScope.targetIds)
       ? grantScope.targetIds
       : [];
+    const grantEffectClasses = Array.isArray(grantScope.effectClasses)
+      ? grantScope.effectClasses
+      : [];
+    const effectAuthorizationError = checkAgentRunnerEffectAuthorization(
+      request,
+      grantEffectClasses,
+    );
+    if (effectAuthorizationError) {
+      errors.push(`${effectAuthorizationError}:${requestId}`);
+      continue;
+    }
     const requestTargets = Array.isArray(request.allowedTargets)
       ? request.allowedTargets
       : [];
@@ -525,4 +584,13 @@ function checkBundle(bundle) {
   return errors;
 }
 
-module.exports = { checkBundle };
+module.exports = {
+  agentRunnerEffectMapping,
+  agentRunnerEffectMappingDomain,
+  agentRunnerEffectMappingHash,
+  agentRunnerEffectMappingVersion,
+  agentRunnerRequestHashDomain,
+  checkAgentRunnerEffectAuthorization,
+  checkBundle,
+  digest,
+};

@@ -186,6 +186,15 @@ func (admission *AgentRunnerCompositeAdmission) validateAuthorization(request Ag
 			return errors.New("authorization target scope mismatch")
 		}
 	}
+	for _, effect := range request.AllowedEffects {
+		effectClass, found := agentRunnerEffectClass(effect)
+		if !found {
+			return fmt.Errorf("unknown AgentRunner effect %q", effect)
+		}
+		if !slices.Contains(matched.Grant.Scope.EffectClasses, effectClass) {
+			return fmt.Errorf("authorization effect class %q does not cover operation %q", effectClass, effect)
+		}
+	}
 	return nil
 }
 

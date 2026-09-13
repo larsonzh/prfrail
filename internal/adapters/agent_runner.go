@@ -10,7 +10,11 @@ import (
 	"github.com/larsonzh/prfrail/internal/evidence"
 )
 
-const agentRunnerRequestDomain = "proofrail:agent-runner-request:1\n"
+const (
+	agentRunnerRequestDomain        = "proofrail:agent-runner-request:1\n"
+	agentRunnerEffectMappingVersion = "1"
+	agentRunnerEffectMappingHash    = "sha256:2c9609ee374bfc79bd0ed997aea6cfe4865c82ed0216d1a4a288139e0b0c92d4"
+)
 
 var (
 	ErrInvalidAgentRunnerRequest  = errors.New("invalid AgentRunner request")
@@ -18,25 +22,27 @@ var (
 )
 
 type AgentRunnerRequest struct {
-	Kind                string   `json:"kind"`
-	RequestID           string   `json:"requestId"`
-	RunID               string   `json:"runId"`
-	TaskID              string   `json:"taskId"`
-	StepID              string   `json:"stepId"`
-	Attempt             int      `json:"attempt"`
-	CreatedAt           string   `json:"createdAt"`
-	AdapterID           string   `json:"adapterId"`
-	Mode                string   `json:"mode"`
-	WorkspaceHash       string   `json:"workspaceHash"`
-	ContextHash         string   `json:"contextHash"`
-	ParentSnapshotHash  string   `json:"parentSnapshotHash"`
-	AuthorizationHash   string   `json:"authorizationHash"`
-	BudgetHash          string   `json:"budgetHash"`
-	AllowedTargets      []string `json:"allowedTargets"`
-	AllowedEffects      []string `json:"allowedEffects"`
-	PriorSessionID      string   `json:"priorSessionId,omitempty"`
-	PriorCompletionHash string   `json:"priorCompletionHash,omitempty"`
-	Evidence            []string `json:"evidence"`
+	Kind                 string   `json:"kind"`
+	RequestID            string   `json:"requestId"`
+	RunID                string   `json:"runId"`
+	TaskID               string   `json:"taskId"`
+	StepID               string   `json:"stepId"`
+	Attempt              int      `json:"attempt"`
+	CreatedAt            string   `json:"createdAt"`
+	AdapterID            string   `json:"adapterId"`
+	Mode                 string   `json:"mode"`
+	WorkspaceHash        string   `json:"workspaceHash"`
+	ContextHash          string   `json:"contextHash"`
+	ParentSnapshotHash   string   `json:"parentSnapshotHash"`
+	AuthorizationHash    string   `json:"authorizationHash"`
+	BudgetHash           string   `json:"budgetHash"`
+	AllowedTargets       []string `json:"allowedTargets"`
+	AllowedEffects       []string `json:"allowedEffects"`
+	EffectMappingVersion string   `json:"effectMappingVersion"`
+	EffectMappingHash    string   `json:"effectMappingHash"`
+	PriorSessionID       string   `json:"priorSessionId,omitempty"`
+	PriorCompletionHash  string   `json:"priorCompletionHash,omitempty"`
+	Evidence             []string `json:"evidence"`
 }
 
 type AgentRunnerRequestRecord struct {
@@ -140,6 +146,14 @@ func validateAgentRunnerRequest(request AgentRunnerRequest) error {
 	if !validSortedUniqueIDs(request.AllowedTargets) || !validSortedUniqueIDs(request.AllowedEffects) || !validSortedUniqueHashes(request.Evidence) {
 		return fmt.Errorf("%w: invalid target, effect, or evidence set", ErrInvalidAgentRunnerRequest)
 	}
+	if request.EffectMappingVersion != agentRunnerEffectMappingVersion || request.EffectMappingHash != agentRunnerEffectMappingHash {
+		return fmt.Errorf("%w: effect mapping binding mismatch", ErrInvalidAgentRunnerRequest)
+	}
+	for _, effect := range request.AllowedEffects {
+		if _, found := agentRunnerEffectClass(effect); !found {
+			return fmt.Errorf("%w: unknown allowed effect %q", ErrInvalidAgentRunnerRequest, effect)
+		}
+	}
 	switch request.Mode {
 	case "create":
 		if request.PriorSessionID != "" || request.PriorCompletionHash != "" {
@@ -153,6 +167,15 @@ func validateAgentRunnerRequest(request AgentRunnerRequest) error {
 		return fmt.Errorf("%w: invalid mode", ErrInvalidAgentRunnerRequest)
 	}
 	return nil
+}
+
+func agentRunnerEffectClass(effect string) (string, bool) {
+	switch effect {
+	case "local-process", "workspace-write":
+		return "local-discardable", true
+	default:
+		return "", false
+	}
 }
 
 func validAgentRunnerHashes(request AgentRunnerRequest) bool {

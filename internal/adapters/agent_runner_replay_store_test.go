@@ -5,6 +5,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 	"testing"
@@ -61,6 +62,9 @@ func replayStoreMustNew(t *testing.T, root string) *AgentRunnerReplayStore {
 	if err != nil {
 		t.Fatal(err)
 	}
+	if runtime.GOOS == "windows" {
+		store.publicationDurability = PublishDurabilityProven
+	}
 	return store
 }
 
@@ -91,6 +95,77 @@ func TestAgentRunnerReplayStoreUsesSafePrefixedFileNames(t *testing.T) {
 	}
 	if filepath.Base(completionPath) != "completion.prn.jsonl" {
 		t.Fatalf("completion filename = %s, want completion.prn.jsonl", filepath.Base(completionPath))
+	}
+}
+
+func TestAgentRunnerReplayStorePublicationDurabilityMatchesPlatform(t *testing.T) {
+	store, err := NewAgentRunnerReplayStore(t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := PublishDurabilityProven
+	if runtime.GOOS == "windows" {
+		want = PublishDurabilityUnproven
+	}
+	if got := store.PublicationDurability(); got != want {
+		t.Fatalf("publication durability = %s, want %s", got, want)
+	}
+}
+
+func TestAgentRunnerReplayStoreRecordRequestRejectsUnprovenDurabilityWithoutWriting(t *testing.T) {
+	store := replayStoreMustNew(t, t.TempDir())
+	store.publicationDurability = PublishDurabilityUnproven
+	request := replayStoreRequestRecord(t, "request-one")
+
+	decision, err := store.RecordRequest(request)
+	if !errors.Is(err, ErrAgentRunnerReplayStoreDurabilityUnproven) {
+		t.Fatalf("expected durability-unproven error, got decision=%s err=%v", decision, err)
+	}
+	if decision == AgentRunnerReplayDecisionFirstDispatch {
+		t.Fatal("unproven durability must never return first dispatch")
+	}
+	path, pathErr := store.requestPath(request.Request.RequestID)
+	if pathErr != nil {
+		t.Fatal(pathErr)
+	}
+	if _, statErr := os.Stat(path); !errors.Is(statErr, fs.ErrNotExist) {
+		t.Fatalf("unproven request must not create a request file, stat error = %v", statErr)
+	}
+}
+
+func TestAgentRunnerReplayStoreZeroValueCannotBypassDurabilityGate(t *testing.T) {
+	var store AgentRunnerReplayStore
+	if _, err := store.RecordRequest(replayStoreRequestRecord(t, "request-one")); !errors.Is(err, ErrAgentRunnerReplayStoreDurabilityUnproven) {
+		t.Fatalf("zero-value store bypassed durability gate: %v", err)
+	}
+}
+
+func TestAgentRunnerReplayStoreUnprovenCompletionAllowsOnlyExistingReplay(t *testing.T) {
+	store := replayStoreMustNew(t, t.TempDir())
+	request := replayStoreRequestRecord(t, "request-one")
+	if _, err := store.RecordRequest(request); err != nil {
+		t.Fatal(err)
+	}
+	completion := replayStoreCompletionRecord(t, request, "completion-one")
+	store.publicationDurability = PublishDurabilityUnproven
+	if replayed, err := store.RecordCompletion(request, completion); !errors.Is(err, ErrAgentRunnerReplayStoreDurabilityUnproven) || replayed {
+		t.Fatalf("unproven completion publication = replayed:%v err:%v, want durability error", replayed, err)
+	}
+
+	completionPath, err := store.completionPath(request.Request.RequestID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(completionPath); !errors.Is(err, fs.ErrNotExist) {
+		t.Fatalf("unproven completion must not create a completion file, stat error = %v", err)
+	}
+	store.publicationDurability = PublishDurabilityProven
+	if _, err := store.RecordCompletion(request, completion); err != nil {
+		t.Fatal(err)
+	}
+	store.publicationDurability = PublishDurabilityUnproven
+	if replayed, err := store.RecordCompletion(request, completion); err != nil || !replayed {
+		t.Fatalf("existing completion replay = replayed:%v err:%v, want replay", replayed, err)
 	}
 }
 
@@ -262,6 +337,95 @@ func TestAgentRunnerReplayStoreCollisionNeverReplacesExistingCompletion(t *testi
 	}
 }
 
+func TestAgentRunnerReplayStoreRequestCollisionVisibilityExhaustionIsConvergenceFailure(t *testing.T) {
+	store := replayStoreMustNew(t, t.TempDir())
+	request := replayStoreRequestRecord(t, "request-one")
+	path, err := store.requestPath(request.Request.RequestID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := writeCanonicalLineNoReplace(path, request); err != nil {
+		t.Fatal(err)
+	}
+	originalLoad := replayStoreLoadRequestRecord
+	replayStoreLoadRequestRecord = func(string, string) (AgentRunnerRequestRecord, bool, error) {
+		return AgentRunnerRequestRecord{}, false, nil
+	}
+	t.Cleanup(func() {
+		replayStoreLoadRequestRecord = originalLoad
+	})
+
+	if _, err := store.RecordRequest(request); !errors.Is(err, ErrAgentRunnerReplayStoreConvergence) {
+		t.Fatalf("expected convergence failure, got %v", err)
+	} else if errors.Is(err, ErrAgentRunnerRequestConflict) {
+		t.Fatalf("request collision visibility exhaustion must not report request conflict: %v", err)
+	}
+}
+
+func TestAgentRunnerReplayStoreCompletionCollisionVisibilityExhaustionIsConvergenceFailure(t *testing.T) {
+	store := replayStoreMustNew(t, t.TempDir())
+	request := replayStoreRequestRecord(t, "request-one")
+	if _, err := store.RecordRequest(request); err != nil {
+		t.Fatal(err)
+	}
+	completion := replayStoreCompletionRecord(t, request, "completion-one")
+	path, err := store.completionPath(request.Request.RequestID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := writeCanonicalLineNoReplace(path, completion); err != nil {
+		t.Fatal(err)
+	}
+	originalLoad := replayStoreLoadCompletionRecord
+	replayStoreLoadCompletionRecord = func(string, string) (AgentRunnerCompletionRecord, bool, error) {
+		return AgentRunnerCompletionRecord{}, false, nil
+	}
+	t.Cleanup(func() {
+		replayStoreLoadCompletionRecord = originalLoad
+	})
+
+	if _, err := store.RecordCompletion(request, completion); !errors.Is(err, ErrAgentRunnerReplayStoreConvergence) {
+		t.Fatalf("expected convergence failure, got %v", err)
+	} else if errors.Is(err, ErrAgentRunnerCompletionConflict) {
+		t.Fatalf("completion collision visibility exhaustion must not report completion conflict: %v", err)
+	}
+}
+
+func TestAgentRunnerReplayStorePublishSyncFailureFailsClosedWithoutRollback(t *testing.T) {
+	store := replayStoreMustNew(t, t.TempDir())
+	if store.PublicationDurability() != PublishDurabilityProven {
+		t.Skip("native platform cannot prove replay publication durability")
+	}
+	request := replayStoreRequestRecord(t, "request-one")
+	sentinel := errors.New("sync failure")
+	originalSync := replayStoreSyncParentDirectory
+	replayStoreSyncParentDirectory = func(string) error {
+		return sentinel
+	}
+	t.Cleanup(func() {
+		replayStoreSyncParentDirectory = originalSync
+	})
+
+	if _, err := store.RecordRequest(request); !errors.Is(err, sentinel) {
+		t.Fatalf("expected sync failure, got %v", err)
+	}
+	path, err := store.requestPath(request.Request.RequestID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(path); err != nil {
+		t.Fatalf("published request must remain visible after sync failure, stat error = %v", err)
+	}
+	restarted := replayStoreMustNew(t, store.root)
+	state, err := restarted.State(request.Request.RequestID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if state != AgentRunnerReplayStateDispatchedUnknown {
+		t.Fatalf("state = %s, want %s", state, AgentRunnerReplayStateDispatchedUnknown)
+	}
+}
+
 func TestAgentRunnerReplayStoreOrphanCompletionRejectsWithoutWritingRequest(t *testing.T) {
 	store := replayStoreMustNew(t, t.TempDir())
 	request := replayStoreRequestRecord(t, "request-one")
@@ -287,6 +451,32 @@ func TestAgentRunnerReplayStoreOrphanCompletionRejectsWithoutWritingRequest(t *t
 	}
 	if _, err := os.Stat(requestPath); !errors.Is(err, fs.ErrNotExist) {
 		t.Fatalf("a rejected completion must not persist a request record, stat error = %v", err)
+	}
+}
+
+func TestAgentRunnerReplayStoreOrphanCompletionRejectsRecordRequestWithoutWritingRequest(t *testing.T) {
+	store := replayStoreMustNew(t, t.TempDir())
+	request := replayStoreRequestRecord(t, "request-one")
+
+	orphan := replayStoreCompletionRecord(t, request, "completion-one")
+	completionPath, err := store.completionPath(request.Request.RequestID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := writeCanonicalLineNoReplace(completionPath, orphan); err != nil {
+		t.Fatal(err)
+	}
+
+	if _, err := store.RecordRequest(request); !errors.Is(err, ErrAgentRunnerReplayStoreCorruption) {
+		t.Fatalf("expected replay store corruption, got %v", err)
+	}
+
+	requestPath, err := store.requestPath(request.Request.RequestID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(requestPath); !errors.Is(err, fs.ErrNotExist) {
+		t.Fatalf("a rejected request must not persist a request record, stat error = %v", err)
 	}
 }
 
@@ -650,6 +840,153 @@ func TestAgentRunnerReplayStoreStateRejectsCompletionIDMismatch(t *testing.T) {
 		t.Fatalf("expected corruption sentinel for completion requestId mismatch, got %v", err)
 	} else if !strings.Contains(err.Error(), completionPath) {
 		t.Fatalf("expected mismatch error to include path %s, got %v", completionPath, err)
+	}
+}
+
+func TestAgentRunnerReplayStoreConvergesCrossStorePublicationAfterAbsentRequestRead(t *testing.T) {
+	root := t.TempDir()
+	request := replayStoreRequestRecord(t, "request-one")
+	completion := replayStoreCompletionRecord(t, request, "completion-one")
+
+	tests := []struct {
+		name string
+		run  func(*AgentRunnerReplayStore) error
+	}{
+		{
+			name: "state",
+			run: func(store *AgentRunnerReplayStore) error {
+				state, err := store.State(request.Request.RequestID)
+				if err == nil && state != AgentRunnerReplayStateTerminalReceiptPresent {
+					t.Fatalf("state = %s, want %s", state, AgentRunnerReplayStateTerminalReceiptPresent)
+				}
+				return err
+			},
+		},
+		{
+			name: "record request",
+			run: func(store *AgentRunnerReplayStore) error {
+				decision, err := store.RecordRequest(request)
+				if err == nil && decision != AgentRunnerReplayDecisionTerminalReceiptPresent {
+					t.Fatalf("decision = %s, want %s", decision, AgentRunnerReplayDecisionTerminalReceiptPresent)
+				}
+				return err
+			},
+		},
+		{
+			name: "record completion",
+			run: func(store *AgentRunnerReplayStore) error {
+				replayed, err := store.RecordCompletion(request, completion)
+				if err == nil && !replayed {
+					t.Fatal("cross-store completion must converge as replay")
+				}
+				return err
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			root := filepath.Join(root, strings.ReplaceAll(test.name, " ", "-"))
+			store := replayStoreMustNew(t, root)
+			publisher := replayStoreMustNew(t, root)
+			store.afterRequestReadLocked = func() {
+				if _, err := publisher.RecordCompletion(request, completion); err != nil {
+					t.Fatal(err)
+				}
+			}
+			if err := test.run(store); err != nil {
+				t.Fatal(err)
+			}
+		})
+	}
+}
+
+func TestAgentRunnerReplayStoreMonotonicStateInvariants(t *testing.T) {
+	request := replayStoreRequestRecord(t, "request-one")
+	completion := replayStoreCompletionRecord(t, request, "completion-one")
+	tests := []struct {
+		name      string
+		write     func(*AgentRunnerReplayStore) error
+		wantState AgentRunnerReplayState
+		wantError error
+	}{
+		{name: "absent", wantState: AgentRunnerReplayStateAbsent},
+		{
+			name: "dispatched",
+			write: func(store *AgentRunnerReplayStore) error {
+				_, err := store.RecordRequest(request)
+				return err
+			},
+			wantState: AgentRunnerReplayStateDispatchedUnknown,
+		},
+		{
+			name: "terminal",
+			write: func(store *AgentRunnerReplayStore) error {
+				_, err := store.RecordCompletion(request, completion)
+				return err
+			},
+			wantState: AgentRunnerReplayStateTerminalReceiptPresent,
+		},
+		{
+			name: "orphan fails closed",
+			write: func(store *AgentRunnerReplayStore) error {
+				path, err := store.completionPath(request.Request.RequestID)
+				if err != nil {
+					return err
+				}
+				return writeCanonicalLineNoReplace(path, completion)
+			},
+			wantError: ErrAgentRunnerReplayStoreCorruption,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			store := replayStoreMustNew(t, t.TempDir())
+			if test.write != nil {
+				if err := test.write(store); err != nil {
+					t.Fatal(err)
+				}
+			}
+			state, err := store.State(request.Request.RequestID)
+			if !errors.Is(err, test.wantError) {
+				t.Fatalf("state error = %v, want %v", err, test.wantError)
+			}
+			if err == nil && state != test.wantState {
+				t.Fatalf("state = %s, want %s", state, test.wantState)
+			}
+		})
+	}
+}
+
+func TestAgentRunnerReplayStoreStateClassifiesDiskBindingMismatchAsCorruption(t *testing.T) {
+	store := replayStoreMustNew(t, t.TempDir())
+	request := replayStoreRequestRecord(t, "request-one")
+	if _, err := store.RecordRequest(request); err != nil {
+		t.Fatal(err)
+	}
+	body := agentRunnerCompletion("completion-one")
+	body.RequestID = request.Request.RequestID
+	body.RequestHash = queueHashTwo
+	body.RunID = request.Request.RunID
+	body.TaskID = request.Request.TaskID
+	body.StepID = request.Request.StepID
+	body.Attempt = request.Request.Attempt
+	body.AdapterID = request.Request.AdapterID
+	completion, err := NewAgentRunnerCompletionRecord(body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	path, err := store.completionPath(request.Request.RequestID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := writeCanonicalLineNoReplace(path, completion); err != nil {
+		t.Fatal(err)
+	}
+
+	if _, err := store.State(request.Request.RequestID); !errors.Is(err, ErrAgentRunnerReplayStoreCorruption) {
+		t.Fatalf("expected disk binding corruption, got %v", err)
 	}
 }
 

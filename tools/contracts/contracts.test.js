@@ -6,6 +6,16 @@ const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
 const { createValidator, readJson, runCatalog } = require("./validator");
+const {
+  agentRunnerEffectMapping,
+  agentRunnerEffectMappingDomain,
+  agentRunnerEffectMappingHash,
+  agentRunnerEffectMappingVersion,
+  agentRunnerRequestHashDomain,
+  checkAgentRunnerEffectAuthorization,
+  checkBundle,
+  digest,
+} = require("./semantic");
 
 const repositoryRoot = path.resolve(__dirname, "..", "..");
 const schemaDir = path.join(repositoryRoot, "schemas");
@@ -74,7 +84,7 @@ test("all schemas compile and every catalog matches its independent expectation"
       fixtureCount += 1;
     }
   }
-  assert.equal(fixtureCount, 120);
+  assert.equal(fixtureCount, 123);
   assert.deepEqual([...acceptedSchemas].sort(), schemaFiles);
   assert.deepEqual([...rejectedSchemas].sort(), schemaFiles);
 });
@@ -84,7 +94,7 @@ test("canonical vectors reproduce the frozen bytes and digests", async () => {
   const vectors = readJson(
     path.join(contractsDir, "vectors", "canonical.json"),
   );
-  assert.equal(vectors.length, 3);
+  assert.equal(vectors.length, 4);
   for (const vector of vectors) {
     const canonical = canonicalize(vector.input);
     assert.equal(
@@ -103,4 +113,128 @@ test("canonical vectors reproduce the frozen bytes and digests", async () => {
       `${vector.vectorId}: digest`,
     );
   }
+});
+
+test("AgentRunner mapping constants stay aligned across vectors and request fixtures", () => {
+  const vectors = readJson(
+    path.join(contractsDir, "vectors", "canonical.json"),
+  );
+  const mappingVector = vectors.find(
+    (vector) => vector.vectorId === "agent-runner-effect-mapping-001",
+  );
+  assert.ok(mappingVector);
+  assert.deepEqual(mappingVector.input, agentRunnerEffectMapping);
+  assert.equal(mappingVector.domainSeparator, agentRunnerEffectMappingDomain);
+  assert.equal(mappingVector.digest, agentRunnerEffectMappingHash);
+
+  const semanticFixtures = readJson(
+    path.join(contractsDir, "invalid", "semantic-rules.json"),
+  );
+  const accepted = semanticFixtures.find(
+    (fixture) => fixture.fixtureId === "semantic-agent-runner-binding-valid",
+  );
+  assert.ok(accepted);
+  const requestRecord = accepted.instance.documents["agent-runner-request.schema.json"];
+  assert.equal(
+    requestRecord.request.effectMappingVersion,
+    agentRunnerEffectMappingVersion,
+  );
+  assert.equal(
+    requestRecord.request.effectMappingHash,
+    agentRunnerEffectMappingHash,
+  );
+  assert.equal(
+    digest(agentRunnerRequestHashDomain, requestRecord.request),
+    requestRecord.recordHash,
+  );
+
+  const validFixtures = readJson(
+    path.join(contractsDir, "valid", "agent-runner.json"),
+  );
+  for (const fixture of validFixtures.filter(
+    (entry) => entry.schema === "agent-runner-request.schema.json",
+  )) {
+    assert.equal(
+      digest(agentRunnerRequestHashDomain, fixture.instance.request),
+      fixture.instance.recordHash,
+      `${fixture.fixtureId}: request recordHash must match canonical digest`,
+    );
+    assert.equal(
+      fixture.instance.request.effectMappingVersion,
+      agentRunnerEffectMappingVersion,
+      `${fixture.fixtureId}: request effectMappingVersion must stay pinned`,
+    );
+    assert.equal(
+      fixture.instance.request.effectMappingHash,
+      agentRunnerEffectMappingHash,
+      `${fixture.fixtureId}: request effectMappingHash must stay pinned`,
+    );
+  }
+});
+
+test("AgentRunner effect mapping fails closed and permits grant supersets", () => {
+  const fixtures = readJson(
+    path.join(contractsDir, "invalid", "semantic-rules.json"),
+  );
+  const accepted = fixtures.find(
+    (fixture) => fixture.fixtureId === "semantic-agent-runner-binding-valid",
+  );
+  assert.ok(accepted);
+
+  const bundle = structuredClone(accepted.instance);
+  assert.deepEqual(checkBundle(bundle), []);
+  const requestRecord = bundle.documents["agent-runner-request.schema.json"];
+  const request = requestRecord.request;
+  assert.equal(
+    digest(agentRunnerRequestHashDomain, request),
+    requestRecord.recordHash,
+  );
+  assert.equal(
+    checkAgentRunnerEffectAuthorization(request, [
+      "external-write",
+      "local-discardable",
+      "read-only",
+    ]),
+    null,
+  );
+
+  const tampered = structuredClone(request);
+  tampered.effectMappingHash =
+    "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+  assert.equal(
+    checkAgentRunnerEffectAuthorization(tampered, ["local-discardable"]),
+    "agent-runner.effect-mapping.binding-mismatch",
+  );
+
+  const unknownOperation = structuredClone(request);
+  unknownOperation.allowedEffects = ["external-publish"];
+  assert.equal(
+    checkAgentRunnerEffectAuthorization(unknownOperation, ["local-discardable"]),
+    "agent-runner.effect-mapping.operation-unknown",
+  );
+
+  const localProcessOnly = structuredClone(request);
+  localProcessOnly.allowedEffects = ["local-process"];
+  assert.equal(
+    checkAgentRunnerEffectAuthorization(localProcessOnly, ["local-discardable"]),
+    null,
+  );
+
+  assert.equal(
+    checkAgentRunnerEffectAuthorization(request, ["read-only"]),
+    "agent-runner.authorization-effect-class.under-covered",
+  );
+
+  const tamperedHashBundle = structuredClone(bundle);
+  tamperedHashBundle.documents["agent-runner-request.schema.json"].recordHash =
+    "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+  assert.deepEqual(checkBundle(tamperedHashBundle), [
+    "agent-runner.request-record.hash-mismatch:agent-request-one",
+  ]);
+
+  const tamperedBodyBundle = structuredClone(bundle);
+  tamperedBodyBundle.documents["agent-runner-request.schema.json"].request.attempt = 2;
+  assert.deepEqual(checkBundle(tamperedBodyBundle), [
+    "agent-runner.request-record.hash-mismatch:agent-request-one",
+  ]);
 });

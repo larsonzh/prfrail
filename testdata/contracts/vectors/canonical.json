@@ -61,5 +61,15 @@
     "domainSeparator": "proofrail:agent-runner-enforcement:1\n",
     "canonical": "{\"capabilityRecordHash\":\"sha256:1111111111111111111111111111111111111111111111111111111111111111\",\"configHash\":\"sha256:3333333333333333333333333333333333333333333333333333333333333333\",\"disposition\":\"verified\",\"enforcementConfigHash\":\"sha256:5555555555555555555555555555555555555555555555555555555555555555\",\"enforcementId\":\"enforcement-vector-one\",\"evidence\":[\"sha256:8888888888888888888888888888888888888888888888888888888888888888\"],\"executableHash\":\"sha256:2222222222222222222222222222222222222222222222222222222222222222\",\"kind\":\"agent-runner-enforcement\",\"matrix\":{\"networkControl\":{\"evidence\":[\"sha256:7777777777777777777777777777777777777777777777777777777777777777\"],\"status\":\"verified\"},\"toolControl\":{\"evidence\":[\"sha256:6666666666666666666666666666666666666666666666666666666666666666\"],\"status\":\"verified\"}},\"platformHash\":\"sha256:4444444444444444444444444444444444444444444444444444444444444444\",\"probedAt\":\"2026-09-11T06:00:00.000Z\",\"providerId\":\"fixture-boundary\"}",
     "digest": "sha256:616cfa42bf0794b3ebbd0cf0d947ecbb7332bd9ec28fa7784a00b26c72e58b68"
+  },
+  {
+    "vectorId": "agent-runner-effect-mapping-001",
+    "input": {
+      "local-process": "local-discardable",
+      "workspace-write": "local-discardable"
+    },
+    "domainSeparator": "proofrail:agent-runner-effect-mapping:1\n",
+    "canonical": "{\"local-process\":\"local-discardable\",\"workspace-write\":\"local-discardable\"}",
+    "digest": "sha256:2c9609ee374bfc79bd0ed997aea6cfe4865c82ed0216d1a4a288139e0b0c92d4"
   }
 ]

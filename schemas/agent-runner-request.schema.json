@@ -18,7 +18,7 @@
     "request": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "requestId", "runId", "taskId", "stepId", "attempt", "createdAt", "adapterId", "mode", "workspaceHash", "contextHash", "parentSnapshotHash", "authorizationHash", "budgetHash", "allowedTargets", "allowedEffects", "evidence"],
+      "required": ["kind", "requestId", "runId", "taskId", "stepId", "attempt", "createdAt", "adapterId", "mode", "workspaceHash", "contextHash", "parentSnapshotHash", "authorizationHash", "budgetHash", "allowedTargets", "allowedEffects", "effectMappingVersion", "effectMappingHash", "evidence"],
       "properties": {
         "kind": {"const": "agent-runner-request"},
         "requestId": {"$ref": "#/$defs/id"},
@@ -36,6 +36,8 @@
         "budgetHash": {"$ref": "#/$defs/sha256"},
         "allowedTargets": {"$ref": "#/$defs/idSet"},
         "allowedEffects": {"$ref": "#/$defs/idSet"},
+        "effectMappingVersion": {"const": "1"},
+        "effectMappingHash": {"const": "sha256:2c9609ee374bfc79bd0ed997aea6cfe4865c82ed0216d1a4a288139e0b0c92d4"},
         "priorSessionId": {"$ref": "#/$defs/id"},
         "priorCompletionHash": {"$ref": "#/$defs/sha256"},
         "evidence": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/sha256"}}
