@@ -26,7 +26,12 @@ This report covers only the T027 offline slice A3 terminal publication and settl
 | `go test -count=1 ./...` | all pass |
 | `go test -count=1 -run 'AgentRunnerTerminal\|AgentRunnerReplayStoreTerminal' ./internal/adapters` | pass |
 
-Notes: the A3 concurrency counterexamples (8-way, different-clock, 24-way cross-store) ran natively on Windows; Windows has no gcc so `-race` was not run locally. The Unix-specific tests (symlinks, swap, convergence, sync failure) are carried by GitHub Actions Ubuntu, with CI evidence written back after the push.
+Notes: the A3 concurrency counterexamples (8-way, different-clock, 24-way cross-store) ran natively on Windows; Windows has no gcc so `-race` was not run locally.
+
+### GitHub Actions CI (post-push Linux native regression)
+
+- Committed as `c6f8585` and pushed to `origin/main`; run [34900979883](https://github.com/larsonzh/prfrail/actions/runs/34900979883) concluded `success`: `Go ubuntu-latest` (Build/Vet/Test/**Race**/Contract fixtures) and `Go windows-latest` (Build/Vet/Test; Race skipped by condition) both passed; `Bootstrap and release evidence`, `Candidate build`, and `Candidate probe` were skipped by the push condition (same as A0–A2).
+- The Unix-specific tests (symlinks, swap, dangling convergence, sync failure) and the `-race` concurrency regression were actually executed by that run on native Linux.
 
 ### Review outcomes
 
@@ -49,5 +54,5 @@ Notes: the A3 concurrency counterexamples (8-way, different-clock, 24-way cross-
 
 - No Engine wiring, no real candidate run, no chain terminal routing or postflight acceptance (A4/A5);
 - no real model CLI invoked, no network access, no SecretStore reads;
-- at the time of writing this report no commit, push, or publish was performed; CI evidence will be written back after same-turn authorization under the discipline;
+- at the time of writing this report no commit, push, or publish was performed; the commit and push (`c6f8585`) were later completed under same-turn user authorization, with the CI evidence above;
 - T027 remains `BLOCKED / NOT IMPLEMENTED` and AT-23 has not passed.
