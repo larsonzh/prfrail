@@ -27,7 +27,12 @@ This report covers only the T027 offline slice A2 dispatch and launch ambiguity 
 | `go test -count=1 ./...` | all pass |
 | `go test -count=1 -run 'AgentRunnerLaunch\|AgentRunnerReplayDispatcher\|AgentRunnerReplayStoreLaunch\|AgentRunnerReplayRoot' ./internal/adapters` | pass |
 
-Notes: the A2 concurrency counterexamples (8 concurrent dispatchers, 8 concurrent store calls, 24 cross-store calls) ran natively on Windows; Windows has no gcc so `-race` was not run locally, and the Linux `-race` regression will be carried by CI after the push. The Unix-specific tests (symlink swap, convergence, sync failure) are carried by GitHub Actions Ubuntu.
+Notes: the A2 concurrency counterexamples (8 concurrent dispatchers, 8 concurrent store calls, 24 cross-store calls) ran natively on Windows; Windows has no gcc so `-race` was not run locally.
+
+### GitHub Actions CI (post-push Linux native regression)
+
+- Committed as `aeb504e` and pushed to `origin/main`; run [34844216048](https://github.com/larsonzh/prfrail/actions/runs/34844216048) concluded `success`: `Go ubuntu-latest` (Build/Vet/Test/**Race**/Contract fixtures) and `Go windows-latest` (Build/Vet/Test; Race skipped by condition) both passed; `Bootstrap and release evidence`, `Candidate build`, and `Candidate probe` were skipped by the push condition (same as A0/A1).
+- The Unix-specific tests (launches symlink swap, dangling-slot convergence, sync failure without rollback) and the `-race` concurrency regression were actually executed by that run on native Linux.
 
 ### Review outcomes
 
@@ -46,5 +51,5 @@ Notes: the A2 concurrency counterexamples (8 concurrent dispatchers, 8 concurren
 
 - No completion published, no Engine wiring, no real candidate run, no takeover/settlement (those belong to A3 and later);
 - no real model CLI invoked, no network access, no SecretStore reads;
-- at the time of writing this report no commit, push, or publish was performed; CI evidence will be written back after same-turn authorization under the discipline;
+- at the time of writing this report no commit, push, or publish was performed; the commit and push (`aeb504e`) were later completed under same-turn user authorization, with the CI evidence above;
 - T027 remains `BLOCKED / NOT IMPLEMENTED` and AT-23 has not passed.

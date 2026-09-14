@@ -27,7 +27,12 @@
 | `go test -count=1 ./...` | 全部通过 |
 | `go test -count=1 -run 'AgentRunnerLaunch\|AgentRunnerReplayDispatcher\|AgentRunnerReplayStoreLaunch\|AgentRunnerReplayRoot' ./internal/adapters` | 通过 |
 
-说明：A2 并发反例（dispatcher 8 并发、store 8 并发、跨 store 24 并发）已在 Windows 原生执行；Windows 无 gcc 未跑 `-race`，Linux `-race` 回归待推送后由 CI 承担。Unix 专项测试（symlink 换链、收敛、sync 失败）由 GitHub Actions Ubuntu 承担。
+说明：A2 并发反例（dispatcher 8 并发、store 8 并发、跨 store 24 并发）已在 Windows 原生执行；Windows 无 gcc 未跑 `-race`。
+
+### GitHub Actions CI（推送后 Linux 原生回归）
+
+- 已提交 `aeb504e` 并推送 `origin/main`；运行 [34844216048](https://github.com/larsonzh/prfrail/actions/runs/34844216048) 结论 `success`：`Go ubuntu-latest`（Build/Vet/Test/**Race**/Contract fixtures）与 `Go windows-latest`（Build/Vet/Test，Race 按条件跳过）全部通过；`Bootstrap and release evidence`、`Candidate build`、`Candidate probe` 三个作业按推送条件跳过（与 A0/A1 一致）。
+- Unix 专项测试（launches symlink 换链、悬空槽收敛、sync 失败无回滚）与 `-race` 并发回归已由该运行在 Linux 原生环境实际执行并通过。
 
 ### 审查结论
 
@@ -46,5 +51,5 @@
 
 - 未发布 completion，未接入 Engine，未运行真实候选，未实现接管/结算（属 A3 及以后）；
 - 未调用真实模型 CLI，未访问网络，未读取 SecretStore；
-- 本报告成文时未执行 commit、push 或 publish；CI 证据待按纪律获得同一轮授权后回写；
+- 本报告成文时未执行 commit、push 或 publish；随后经用户同轮授权完成提交与推送（`aeb504e`），CI 证据见上节；
 - T027 仍为 `BLOCKED / NOT IMPLEMENTED`，AT-23 未通过。
