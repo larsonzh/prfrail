@@ -42,6 +42,17 @@ This report covers only the T027 offline slice A0 replay-root composition and do
 | Concurrent distinct spellings all succeed | PASS |
 | Runtime `requests` swapped to a junction → `RecordRequest` unsafe-path with the external target left empty | PASS |
 
+### Linux native regression (GitHub Actions Ubuntu)
+
+After commit `7ad1ac0` was pushed, CI run [34799747443](https://github.com/larsonzh/prfrail/actions/runs/34799747443) succeeded:
+
+| Job | Steps | Result |
+|---|---|---|
+| Go ubuntu-latest | Build / Vet / Test / Contract fixtures | all success |
+| Go windows-latest | all steps | success |
+
+The Ubuntu job actually exercised the A0 Unix-side tests (symlink rejection, sync ordering, sync-failure fail-closed, no ownership on failed construction, convergence exhaustion, runtime link swap), closing the earlier "awaiting Linux native confirmation" boundary; Windows-only tests (junction, 8.3 short names, `\\?\` prefix) run only in the Windows job by build tag.
+
 ### Review conclusions
 
 - V4 Pro implementation pre-review: PASS (conditional) → fixed the Medium (caller-root chain reparse check) and every Low (completion-side write classification, contract wording, marker regular-file check, createdAt validation, marker IO error sentinel wrapping, zero-value root guard on the read path) plus 12 added counterexample tests.
@@ -50,7 +61,7 @@ This report covers only the T027 offline slice A0 replay-root composition and do
 
 ## Known boundaries
 
-- Unix-side tests (symlink rejection, sync ordering, sync-failure fail-closed, no ownership on failed construction, convergence exhaustion, runtime link swap) have not yet run natively on Linux; they await the GitHub Actions Ubuntu regression after an authorized push, and no native Unix conclusion is claimed before that.
+- Unix-side tests (symlink rejection, sync ordering, sync-failure fail-closed, no ownership on failed construction, convergence exhaustion, runtime link swap) passed the GitHub Actions Ubuntu native regression (run 34799747443, commit `7ad1ac0`); broader Unix crash injection or non-Ubuntu distribution differences remain outside this slice.
 - A residual TOCTOU window between user-mode component checks and file operations cannot be fully eliminated; it is recorded in CONTRACTS as an explicitly accepted boundary.
 - Full-chain reparse/symlink rejection means run directories inside OneDrive-redirected folders, junction trees, or mounted-folder layouts are rejected fail-closed; this is an intentional safety trade-off and any relaxation requires a separate ADR.
 - The 8.3 short-name and `\\?\` cases skip explicitly when the environment lacks the capability; they executed on this machine without skipping.
@@ -59,5 +70,5 @@ This report covers only the T027 offline slice A0 replay-root composition and do
 
 - No real dispatch was introduced; `AgentRunnerPort`/Engine wiring is untouched;
 - No real model CLI was invoked, no network access, no SecretStore reads;
-- No commit, push, or publish;
+- No commit, push, or publish happened while this report was written; both followed under same-turn user authorization (`7ad1ac0`), with CI evidence in the section above;
 - T027 remains `BLOCKED / NOT IMPLEMENTED` and AT-23 has not passed.

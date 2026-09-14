@@ -42,6 +42,17 @@
 | 并发不同拼写首开全部成功 | PASS |
 | 运行期 `requests` 被替换为 junction → `RecordRequest` unsafe-path 且外部目录保持为空 | PASS |
 
+### Linux 原生回归（GitHub Actions Ubuntu）
+
+提交 `7ad1ac0` 推送后，CI 运行 [34799747443](https://github.com/larsonzh/prfrail/actions/runs/34799747443) 成功：
+
+| 任务 | 步骤 | 结果 |
+|---|---|---|
+| Go ubuntu-latest | Build / Vet / Test / Contract fixtures | 全部 success |
+| Go windows-latest | 全部步骤 | success |
+
+Ubuntu 任务实际执行了 A0 的 Unix 侧测试（symlink 拒绝、sync 顺序、sync 失败 fail-closed、构造失败不遗留 ownership、收敛耗尽、运行期换链），此前"待 Linux 原生确认"的边界项已闭合；Windows 专属测试（junction、8.3 短名、`\\?\` 前缀）按 build tag 仅在 Windows 任务执行。
+
 ### 审查结论
 
 - V4 Pro 实现预审：PASS（有条件）→ 已修复 Medium（caller root 链级 reparse 检查）与全部 Low（C 侧写前分类、契约措辞、marker 常规文件校验、createdAt 校验、marker IO 错误挂 sentinel、读取路径零值 root 门禁），并补 12 项反例测试。
@@ -50,7 +61,7 @@
 
 ## 已知边界
 
-- Unix 侧测试（symlink 拒绝、sync 顺序、sync 失败 fail-closed、构造失败不遗留 ownership、收敛耗尽、运行期换链）尚未在 Linux 原生执行；待授权推送后由 GitHub Actions Ubuntu 回归确认，在此之前不宣称 Unix 原生结论。
+- Unix 侧测试（symlink 拒绝、sync 顺序、sync 失败 fail-closed、构造失败不遗留 ownership、收敛耗尽、运行期换链）已在 GitHub Actions Ubuntu 原生执行并通过（运行 34799747443，commit `7ad1ac0`）；更广泛的 Unix 崩溃注入或非 Ubuntu 发行版差异仍不在本切片范围。
 - 用户态组件检查与文件操作之间仍存在无法完全消除的 TOCTOU 残余窗口，已写入 CONTRACTS，属显式接受的边界。
 - 全链 reparse/symlink 拒绝意味着 runDir 位于 OneDrive 重定向目录、junction 目录树或挂载盘文件夹等布局会被 fail-closed 拒绝；这是既定安全取舍，如需放宽须单独 ADR。
 - 8.3 短名与 `\\?\` 用例在能力不可用的环境会显式 skip；本机实际执行，未跳过。
@@ -59,5 +70,5 @@
 
 - 未引入真实 dispatch，未接入 `AgentRunnerPort` 或 Engine；
 - 未调用真实模型 CLI，未访问网络，未读取 SecretStore；
-- 未执行 commit、push 或 publish；
+- 本报告成文时未执行 commit、push 或 publish；随后经用户同轮授权完成提交与推送（`7ad1ac0`），CI 证据见上节；
 - T027 仍为 `BLOCKED / NOT IMPLEMENTED`，AT-23 未通过。
