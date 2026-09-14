@@ -25,12 +25,13 @@
 | `go test -count=1 ./...` | 全部通过 |
 | `go test -count=1 -run 'AgentRunnerCompositeAdmission' ./internal/adapters` | 通过 |
 
-说明：Windows 本机无 gcc（cgo 不可用），未在本机运行 `-race`；Linux CI 已新增 `-race` 步骤（见下），推送后生效。并发正确性依据新增并发用例的常规执行，以及 `CostLedger.RequireOutstandingReservation` 的内部 `RWMutex` 读锁与 admission 全程只读的事实。
+说明：Windows 本机无 gcc（cgo 不可用），未在本机运行 `-race`；Linux CI 的 `-race` 步骤已由 run 34809403487 实际执行并通过（见下）。并发正确性依据新增并发用例的常规执行，以及 `CostLedger.RequireOutstandingReservation` 的内部 `RWMutex` 读锁与 admission 全程只读的事实。
 
 ### CI 工作流变更（冻结契约同步）
 
 - 新增 Linux CI 步骤 `Race`：`CGO_ENABLED=1 go test -race -count=1 ./internal/adapters/... ./internal/chain/...`，仅在 Runner 为 Linux 时执行。
 - `internal/release` 的工作流冻结契约同步更新：`test` 作业步骤序列加入 `Race`，脚本摘要与条件写入冻结表；本地 `go test -count=1 ./...` 全绿（含 release 工作流契约与变异拒绝套件）。
+- 推送后 CI 运行 [34809403487](https://github.com/larsonzh/prfrail/actions/runs/34809403487) 成功：`Go ubuntu-latest` 全部步骤（Build/Vet/Test/Race/Contract fixtures）通过，`Go windows-latest` 通过；`Race` 为首次实际执行的竞态回归门禁。
 
 ### 审查结论
 
@@ -43,12 +44,12 @@
 
 - admission 的"无 launch"是结构性保证：`AgentRunnerCompositeAdmission` 不持有任何 port、进程或 replay 依赖；router 层已有 admission 阻断时不调用 `AgentRunnerPort` 的测试。
 - replay 身份消费与 first-dispatch 资格尚未实现，属 A2 replay-aware dispatcher；在此之前不存在生产 dispatch 路径，因此本切片删除 admission 阻断不产生现实 redispatch 暴露。
-- 本机 Windows 无 cgo/gcc，未在本机执行 `-race`；Linux CI 已固化 `-race` 步骤，推送后由 GitHub Actions 提供竞态回归证据。
+- 本机 Windows 无 cgo/gcc，未在本机执行 `-race`；Linux CI 的 `-race` 步骤已由 GitHub Actions（run 34809403487）证实通过。
 - admission 是 preflight 而非锁：verdict 可能在 dispatch 前过期（授权撤销、预算结算）；A2 dispatch 必须以发布 R 后的 replay store 判定为准。
 
 ## 明确未执行事项
 
 - 未引入真实 dispatch，未接入 `AgentRunnerPort` 或 Engine；
 - 未调用真实模型 CLI，未访问网络，未读取 SecretStore；
-- 本轮未执行 commit、push 或 publish；
+- 本报告成文时未执行 commit、push 或 publish；随后经用户同轮授权完成提交与推送（`452d173`），CI 证据见上节；
 - T027 仍为 `BLOCKED / NOT IMPLEMENTED`，AT-23 未通过。

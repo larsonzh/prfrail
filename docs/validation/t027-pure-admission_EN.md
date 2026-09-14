@@ -25,12 +25,13 @@ This report covers only the T027 offline slice A1 pure admission and does not cl
 | `go test -count=1 ./...` | All pass |
 | `go test -count=1 -run 'AgentRunnerCompositeAdmission' ./internal/adapters` | Pass |
 
-Note: this Windows machine has no gcc (cgo unavailable), so `-race` was not run locally; the Linux CI now has a fixed `-race` step (below) that takes effect on push. Concurrent correctness rests on the regular execution of the new concurrency case plus the internal `RWMutex` read lock of `CostLedger.RequireOutstandingReservation` and the fact that admission is read-only throughout.
+Note: this Windows machine has no gcc (cgo unavailable), so `-race` was not run locally; the Linux CI `-race` step has actually executed and passed in run 34809403487 (below). Concurrent correctness rests on the regular execution of the new concurrency case plus the internal `RWMutex` read lock of `CostLedger.RequireOutstandingReservation` and the fact that admission is read-only throughout.
 
 ### CI workflow change (frozen contract synced)
 
 - New Linux CI step `Race`: `CGO_ENABLED=1 go test -race -count=1 ./internal/adapters/... ./internal/chain/...`, executed only when the runner is Linux.
 - The frozen workflow contract in `internal/release` was updated in step: the `test` job step list gains `Race`, with its script digest and condition written into the frozen table; the local `go test -count=1 ./...` suite (including the release workflow contract and mutation-rejection suites) passes.
+- After the push, CI run [34809403487](https://github.com/larsonzh/prfrail/actions/runs/34809403487) succeeded: `Go ubuntu-latest` passed every step (Build/Vet/Test/Race/Contract fixtures) and `Go windows-latest` passed; `Race` was the first real execution of the race-regression gate.
 
 ### Review conclusion
 
@@ -43,12 +44,12 @@ Note: this Windows machine has no gcc (cgo unavailable), so `-race` was not run 
 
 - Admission's "no launch" property is structural: `AgentRunnerCompositeAdmission` holds no port, process, or replay dependency, and the router layer already tests that a blocked admission never calls `AgentRunnerPort`.
 - Replay identity consumption and first-dispatch eligibility are not yet implemented; they belong to the A2 replay-aware dispatcher. Until then no production dispatch path exists, so this slice's removal of the admission block creates no real redispatch exposure.
-- This Windows machine has no cgo/gcc, so `-race` did not run locally; the Linux CI now fixes a `-race` step, so a pushed run provides the race-regression evidence.
+- This Windows machine has no cgo/gcc, so `-race` did not run locally; the Linux CI `-race` step has been proven by GitHub Actions (run 34809403487).
 - Admission is a preflight, not a lock: a verdict can expire before dispatch (grant revocation, budget settlement); A2 dispatch must decide based on the replay store after publishing R.
 
 ## Explicitly not performed
 
 - No real dispatch was introduced; `AgentRunnerPort`/Engine wiring is untouched;
 - No real model CLI was invoked, no network access, no SecretStore reads;
-- No commit, push, or publish in this round;
+- No commit, push, or publish happened while this report was written; both followed under same-turn user authorization (`452d173`), with CI evidence above;
 - T027 remains `BLOCKED / NOT IMPLEMENTED` and AT-23 has not passed.
