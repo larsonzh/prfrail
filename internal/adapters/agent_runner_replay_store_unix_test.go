@@ -21,7 +21,7 @@ func TestAgentRunnerReplayStoreConstructorBootstrapsAndSyncsEachParentEntry(t *t
 		replayStoreSyncParentDirectory = originalSync
 	})
 
-	if _, err := NewAgentRunnerReplayStore(root); err != nil {
+	if _, err := newAgentRunnerReplayStoreAt(root); err != nil {
 		t.Fatal(err)
 	}
 	if len(synced) != 2 || synced[0] != root || synced[1] != root {
@@ -46,7 +46,7 @@ func TestAgentRunnerReplayStoreConstructorFailsClosedWhenBootstrapSyncFails(t *t
 		replayStoreSyncParentDirectory = originalSync
 	})
 
-	if _, err := NewAgentRunnerReplayStore(root); !errors.Is(err, sentinel) {
+	if _, err := newAgentRunnerReplayStoreAt(root); !errors.Is(err, sentinel) {
 		t.Fatalf("expected bootstrap sync failure, got %v", err)
 	}
 }

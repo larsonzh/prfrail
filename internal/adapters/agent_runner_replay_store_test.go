@@ -58,7 +58,7 @@ func replayStoreUncertainCompletionRecord(t *testing.T, request AgentRunnerReque
 
 func replayStoreMustNew(t *testing.T, root string) *AgentRunnerReplayStore {
 	t.Helper()
-	store, err := NewAgentRunnerReplayStore(root)
+	store, err := newAgentRunnerReplayStoreAt(root)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -69,13 +69,13 @@ func replayStoreMustNew(t *testing.T, root string) *AgentRunnerReplayStore {
 }
 
 func TestAgentRunnerReplayStoreRequiresAbsoluteRoot(t *testing.T) {
-	if _, err := NewAgentRunnerReplayStore(""); !errors.Is(err, ErrInvalidAgentRunnerReplayStore) {
+	if _, err := newAgentRunnerReplayStoreAt(""); !errors.Is(err, ErrInvalidAgentRunnerReplayStore) {
 		t.Fatalf("expected invalid replay root for empty path, got %v", err)
 	}
-	if _, err := NewAgentRunnerReplayStore("relative\\replay-store"); !errors.Is(err, ErrInvalidAgentRunnerReplayStore) {
+	if _, err := newAgentRunnerReplayStoreAt("relative\\replay-store"); !errors.Is(err, ErrInvalidAgentRunnerReplayStore) {
 		t.Fatalf("expected invalid replay root for relative path, got %v", err)
 	}
-	if _, err := NewAgentRunnerReplayStore(t.TempDir()); err != nil {
+	if _, err := newAgentRunnerReplayStoreAt(t.TempDir()); err != nil {
 		t.Fatalf("expected absolute replay root to pass, got %v", err)
 	}
 }
@@ -99,7 +99,7 @@ func TestAgentRunnerReplayStoreUsesSafePrefixedFileNames(t *testing.T) {
 }
 
 func TestAgentRunnerReplayStorePublicationDurabilityMatchesPlatform(t *testing.T) {
-	store, err := NewAgentRunnerReplayStore(t.TempDir())
+	store, err := newAgentRunnerReplayStoreAt(t.TempDir())
 	if err != nil {
 		t.Fatal(err)
 	}
