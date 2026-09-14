@@ -184,7 +184,7 @@ func validateWorkflowStructure(workflow workflowDocument) error {
 	}
 	expectedJobs := map[string]jobContract{
 		"test": {
-			steps: []string{"Checkout source", "Setup Go", "Build", "Vet", "Test", "Contract fixtures"},
+			steps: []string{"Checkout source", "Setup Go", "Build", "Vet", "Test", "Race", "Contract fixtures"},
 		},
 		"candidate-build": {
 			condition:   dispatchOnMain,
@@ -241,8 +241,9 @@ func validateWorkflowScripts(workflow workflowDocument) error {
 	expectedScripts := map[string]scriptContract{
 		"test/Build": {digest: "854004a0c269ca4993dad170dc3f7d6e996493547b7c6b5c5c83cf20d113b42a"},
 		"test/Vet":   {digest: "3d4b424f6fcd11f530525ddea9a46aeaffec7c883b6c04b6baf7df36bf47800b"},
-		"test/Test":  {digest: "a8496b1836c1e6e44f6f4dfa908c3942ddebce2e0be73e5411aba70c6471789a"},
-		"test/Contract fixtures": {
+		"test/Test":  {digest: "a8496b1836c1e6e44f6f4dfa908c3942ddebce2e0be73e5411aba70c6471789a"}, "test/Race": {
+			digest: "ff4826f2103a2457cd306662f2542e54d809546deb1f804964b63f2148185dd5", condition: "runner.os == 'Linux'",
+		}, "test/Contract fixtures": {
 			digest: "94577fb7f37f9fbfcef7207756eebf7999694fea78cfe21c23b7e904d2ce7d5d", condition: "runner.os == 'Linux'", workingDirectory: "tools/contracts",
 		},
 		"candidate-build/Validate candidate pin": {

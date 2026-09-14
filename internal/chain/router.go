@@ -19,7 +19,9 @@ type AgentRunnerPort interface {
 
 // AgentRunnerAdmission owns the runtime preflight hook. Implementations must
 // validate the persisted facts they claim to enforce and fail closed when a
-// required AgentRunner contract fact cannot be established.
+// required AgentRunner contract fact cannot be established. Admission is a
+// pure preflight and immutable-binding gate: it must not consume replay
+// identities, publish R/C or write to the replay store, or launch processes.
 type AgentRunnerAdmission interface {
 	AdmitAgentRunner(context.Context, StepRequest) error
 }

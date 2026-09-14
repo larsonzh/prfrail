@@ -76,6 +76,10 @@ jobs:
       - name: Test
         run: go test -count=1 ./...
 
+      - name: Race
+        if: runner.os == 'Linux'
+        run: CGO_ENABLED=1 go test -race -count=1 ./internal/adapters/... ./internal/chain/...
+
       - name: Contract fixtures
         if: runner.os == 'Linux'
         working-directory: tools/contracts

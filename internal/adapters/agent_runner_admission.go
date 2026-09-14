@@ -14,16 +14,17 @@ import (
 
 var (
 	ErrAgentRunnerCompositeAdmissionBlocked = errors.New("AgentRunner composite admission blocked")
-	ErrAgentRunnerRequestReplayBlocked      = errors.New("AgentRunner request replay blocked")
 )
 
 // AgentRunnerCompositeAdmission composes offline, persisted preflight facts.
 // EnforcementRecord is optional when the capability record is compatible;
 // AdmissionPolicy is still required by ValidateAgentRunnerAdmission.
 // Clock is the only evaluation-time authority; policy timestamps are ignored.
+// Admission is a pure preflight and immutable binding: it must not consume
+// replay identities, publish R/C or write to the replay store, or launch
+// processes.
 type AgentRunnerCompositeAdmission struct {
 	RequestRecord       AgentRunnerRequestRecord
-	RequestIndex        *AgentRunnerRequestIndex
 	AuthorizationLedger chain.AuthorizationLedger
 	CostLedger          *tickets.CostLedger
 	AvailabilityRecord  AIAvailabilityRecord
@@ -36,6 +37,9 @@ type AgentRunnerCompositeAdmission struct {
 
 var _ chain.AgentRunnerAdmission = (*AgentRunnerCompositeAdmission)(nil)
 
+// AdmitAgentRunner performs pure preflight and immutable binding only. Replay
+// identity consumption and first-dispatch eligibility belong to the dispatch
+// path, which publishes R and consults the replay store after admission.
 func (admission *AgentRunnerCompositeAdmission) AdmitAgentRunner(ctx context.Context, request chain.StepRequest) error {
 	if admission == nil {
 		return compositeAdmissionBlocked(nil, "nil admission")
@@ -45,9 +49,6 @@ func (admission *AgentRunnerCompositeAdmission) AdmitAgentRunner(ctx context.Con
 	}
 	if err := ValidateAgentRunnerRequestRecord(admission.RequestRecord); err != nil {
 		return compositeAdmissionBlocked(err, "invalid request record")
-	}
-	if admission.RequestIndex == nil {
-		return compositeAdmissionBlocked(nil, "request replay index missing")
 	}
 	if admission.Clock == nil {
 		return compositeAdmissionBlocked(nil, "evaluation clock missing")
@@ -110,13 +111,6 @@ func (admission *AgentRunnerCompositeAdmission) AdmitAgentRunner(ctx context.Con
 	}
 	if err := admission.validateBudget(body); err != nil {
 		return compositeAdmissionBlocked(err, "AgentRunner budget blocked")
-	}
-	replayed, err := admission.RequestIndex.Record(admission.RequestRecord)
-	if err != nil {
-		return compositeAdmissionBlocked(err, "request replay or conflict")
-	}
-	if replayed {
-		return compositeAdmissionBlocked(ErrAgentRunnerRequestReplayBlocked, "durable dispatch or completion state unavailable")
 	}
 	return nil
 }

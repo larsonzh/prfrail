@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"slices"
-	"sync"
 	"time"
 
 	"github.com/larsonzh/prfrail/internal/evidence"
@@ -17,7 +16,10 @@ const (
 )
 
 var (
-	ErrInvalidAgentRunnerRequest  = errors.New("invalid AgentRunner request")
+	ErrInvalidAgentRunnerRequest = errors.New("invalid AgentRunner request")
+	// ErrAgentRunnerRequestConflict reports the same requestId published with a
+	// different digest or binding. It is returned by the durable replay store on
+	// the dispatch path; admission never consumes replay identity.
 	ErrAgentRunnerRequestConflict = errors.New("AgentRunner request conflict")
 )
 
@@ -49,11 +51,6 @@ type AgentRunnerRequestRecord struct {
 	SchemaVersion string             `json:"schemaVersion"`
 	Request       AgentRunnerRequest `json:"request"`
 	RecordHash    string             `json:"recordHash"`
-}
-
-type AgentRunnerRequestIndex struct {
-	mu     sync.Mutex
-	hashes map[string]string
 }
 
 func NewAgentRunnerRequestRecord(request AgentRunnerRequest) (AgentRunnerRequestRecord, error) {
@@ -96,38 +93,6 @@ func ValidateAgentRunnerRequestRecord(record AgentRunnerRequestRecord) error {
 		return fmt.Errorf("%w: recordHash mismatch", ErrInvalidAgentRunnerRequest)
 	}
 	return nil
-}
-
-func NewAgentRunnerRequestIndex(records []AgentRunnerRequestRecord) (*AgentRunnerRequestIndex, error) {
-	index := &AgentRunnerRequestIndex{hashes: make(map[string]string, len(records))}
-	for _, record := range records {
-		if _, err := index.Record(record); err != nil {
-			return nil, err
-		}
-	}
-	return index, nil
-}
-
-func (index *AgentRunnerRequestIndex) Record(record AgentRunnerRequestRecord) (bool, error) {
-	if index == nil {
-		return false, fmt.Errorf("%w: nil replay index", ErrInvalidAgentRunnerRequest)
-	}
-	if err := ValidateAgentRunnerRequestRecord(record); err != nil {
-		return false, err
-	}
-	index.mu.Lock()
-	defer index.mu.Unlock()
-	if index.hashes == nil {
-		index.hashes = make(map[string]string)
-	}
-	if existing, found := index.hashes[record.Request.RequestID]; found {
-		if existing != record.RecordHash {
-			return false, fmt.Errorf("%w: requestId %s", ErrAgentRunnerRequestConflict, record.Request.RequestID)
-		}
-		return true, nil
-	}
-	index.hashes[record.Request.RequestID] = record.RecordHash
-	return false, nil
 }
 
 func validateAgentRunnerRequest(request AgentRunnerRequest) error {
