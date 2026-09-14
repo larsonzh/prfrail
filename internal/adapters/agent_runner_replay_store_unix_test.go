@@ -24,10 +24,10 @@ func TestAgentRunnerReplayStoreConstructorBootstrapsAndSyncsEachParentEntry(t *t
 	if _, err := newAgentRunnerReplayStoreAt(root); err != nil {
 		t.Fatal(err)
 	}
-	if len(synced) != 2 || synced[0] != root || synced[1] != root {
-		t.Fatalf("bootstrap sync order = %v, want [%s %s]", synced, root, root)
+	if len(synced) != 3 || synced[0] != root || synced[1] != root || synced[2] != root {
+		t.Fatalf("bootstrap sync order = %v, want [%s %s %s]", synced, root, root, root)
 	}
-	for _, directory := range []string{"requests", "completions"} {
+	for _, directory := range []string{"requests", "completions", "launches"} {
 		info, err := os.Stat(filepath.Join(root, directory))
 		if err != nil || !info.IsDir() {
 			t.Fatalf("bootstrap directory %s unavailable: info=%v err=%v", directory, info, err)

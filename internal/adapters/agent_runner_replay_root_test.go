@@ -326,6 +326,23 @@ func TestAgentRunnerReplayStoreForRunOwnershipPreflight(t *testing.T) {
 			t.Fatalf("expected corruption, got %v", err)
 		}
 	})
+	t.Run("missing marker with launch intent is corruption", func(t *testing.T) {
+		runRoot := replayRootTestRunRoot(t)
+		store := replayRootTestStore(t, runRoot, "run-one")
+		record := replayStoreRequestRecord(t, "request-launched")
+		if _, err := store.RecordRequest(record); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := store.RecordLaunchReceipt(launchReceiptRecordFor(t, record)); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.Remove(markerPathFor(runRoot)); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := NewAgentRunnerReplayStoreForRun(runRoot, "run-one"); !errors.Is(err, ErrAgentRunnerReplayStoreCorruption) {
+			t.Fatalf("expected corruption, got %v", err)
+		}
+	})
 	t.Run("missing marker without records is rebuilt", func(t *testing.T) {
 		runRoot := replayRootTestRunRoot(t)
 		replayRootTestStore(t, runRoot, "run-one")

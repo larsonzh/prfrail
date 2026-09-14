@@ -44,6 +44,8 @@ const (
 var (
 	replayStoreLoadRequestRecord    = loadRequestRecord
 	replayStoreLoadCompletionRecord = loadCompletionRecord
+	replayStoreLoadLaunchReceipt    = loadAgentRunnerLaunchReceipt
+	replayStoreLoadLaunchIdentity   = loadAgentRunnerLaunchIdentity
 	replayStoreLoadOwnershipRecord  = loadAgentRunnerReplayOwnership
 	replayStoreSyncParentDirectory  = syncReplayStoreParentDirectory
 )
@@ -331,7 +333,7 @@ func bootstrapReplayStoreRoot(root string) error {
 	if !info.IsDir() {
 		return fmt.Errorf("replay root is not a directory: %s", root)
 	}
-	for _, name := range []string{"requests", "completions"} {
+	for _, name := range []string{"requests", "completions", "launches"} {
 		directory := filepath.Join(root, name)
 		if err := os.Mkdir(directory, 0o755); err != nil && !errors.Is(err, fs.ErrExist) {
 			return err

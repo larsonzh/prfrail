@@ -78,6 +78,7 @@ func NewAgentRunnerReplayStoreForRun(runRoot, runID string) (*AgentRunnerReplayS
 	subdirectories := []string{
 		filepath.Join(replayRoot, "requests"),
 		filepath.Join(replayRoot, "completions"),
+		filepath.Join(replayRoot, "launches"),
 	}
 	for _, directory := range subdirectories {
 		if err := rejectUnsafeReplayPathComponents(directory); err != nil {
@@ -199,7 +200,7 @@ func (store *AgentRunnerReplayStore) verifyPathSafetyLocked() error {
 	if err := rejectUnsafeReplayPathComponents(store.root); err != nil {
 		return err
 	}
-	for _, name := range []string{"requests", "completions", agentRunnerReplayOwnershipFileName} {
+	for _, name := range []string{"requests", "completions", "launches", agentRunnerReplayOwnershipFileName} {
 		if err := rejectUnsafeReplayPathComponents(filepath.Join(store.root, name)); err != nil {
 			return err
 		}
@@ -393,7 +394,7 @@ func sameReplayDirectory(first, second string) bool {
 }
 
 func rejectPublishedReplayRecords(replayRoot string) error {
-	for _, name := range []string{"requests", "completions"} {
+	for _, name := range []string{"requests", "completions", "launches"} {
 		directory := filepath.Join(replayRoot, name)
 		entries, err := os.ReadDir(directory)
 		if errors.Is(err, fs.ErrNotExist) {

@@ -142,6 +142,31 @@ func TestAgentRunnerReplayStoreForRunWindowsRejectsRuntimeSubdirectorySwap(t *te
 	}
 }
 
+func TestAgentRunnerReplayStoreForRunWindowsRejectsRuntimeLaunchesSwap(t *testing.T) {
+	runRoot := replayRootTestRunRoot(t)
+	store := replayRootTestStore(t, runRoot, "run-one")
+	record := replayStoreRequestRecord(t, "request-runtime-launch-swap")
+	if _, err := store.RecordRequest(record); err != nil {
+		t.Fatal(err)
+	}
+	launches := filepath.Join(runRoot, "agent-runner-replay", "launches")
+	if err := os.RemoveAll(launches); err != nil {
+		t.Fatal(err)
+	}
+	external := t.TempDir()
+	command := exec.Command("cmd", "/c", "mklink", "/J", launches, external)
+	if output, err := command.CombinedOutput(); err != nil {
+		t.Skipf("junction creation unavailable: %v (%s)", err, strings.TrimSpace(string(output)))
+	}
+	receipt := launchReceiptRecordFor(t, record)
+	if _, err := store.RecordLaunchReceipt(receipt); !errors.Is(err, ErrAgentRunnerReplayRootUnsafePath) {
+		t.Fatalf("expected unsafe path error after runtime swap, got %v", err)
+	}
+	if entries, err := os.ReadDir(external); err != nil || len(entries) != 0 {
+		t.Fatalf("external target must stay empty: entries=%v err=%v", entries, err)
+	}
+}
+
 func TestAgentRunnerReplayStoreForRunWindowsConcurrentDistinctSpellings(t *testing.T) {
 	runRoot := replayRootTestRunRoot(t)
 	upper := strings.ToUpper(runRoot)

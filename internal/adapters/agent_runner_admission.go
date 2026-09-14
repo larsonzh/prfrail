@@ -106,19 +106,21 @@ func (admission *AgentRunnerCompositeAdmission) AdmitAgentRunner(ctx context.Con
 	if err := ValidateAgentRunnerAdmission(admission.CapabilityRecord, admission.EnforcementRecord, admissionPolicy); err != nil {
 		return compositeAdmissionBlocked(err, "AgentRunner capability or enforcement admission blocked")
 	}
-	if err := admission.validateAuthorization(body, now); err != nil {
+	if err := validateAgentRunnerAuthorization(admission.AuthorizationLedger, body, now); err != nil {
 		return compositeAdmissionBlocked(err, "AgentRunner authorization blocked")
 	}
-	if err := admission.validateBudget(body); err != nil {
+	if err := validateAgentRunnerBudget(admission.CostLedger, body); err != nil {
 		return compositeAdmissionBlocked(err, "AgentRunner budget blocked")
 	}
 	return nil
 }
 
-func (admission *AgentRunnerCompositeAdmission) validateAuthorization(request AgentRunnerRequest, now time.Time) error {
+// validateAgentRunnerAuthorization is the point-in-time authorization check
+// shared by admission preflight and post-R launch reconfirmation.
+func validateAgentRunnerAuthorization(ledger chain.AuthorizationLedger, request AgentRunnerRequest, now time.Time) error {
 	var matched chain.AuthorizationRecord
 	matches := 0
-	for _, record := range admission.AuthorizationLedger.Grants {
+	for _, record := range ledger.Grants {
 		if record.RecordHash != request.AuthorizationHash {
 			continue
 		}
@@ -131,12 +133,12 @@ func (admission *AgentRunnerCompositeAdmission) validateAuthorization(request Ag
 	if matches != 1 || matched.Grant == nil {
 		return fmt.Errorf("authorizationHash matched %d grants", matches)
 	}
-	for _, record := range admission.AuthorizationLedger.GrantRecordsFor(matched.Grant.AuthorizationID) {
+	for _, record := range ledger.GrantRecordsFor(matched.Grant.AuthorizationID) {
 		if err := chain.ValidateAuthorizationRecord(record); err != nil {
 			return err
 		}
 	}
-	for _, record := range admission.AuthorizationLedger.Revocations {
+	for _, record := range ledger.Revocations {
 		if record.Revocation != nil && record.Revocation.AuthorizationID == matched.Grant.AuthorizationID {
 			if err := chain.ValidateAuthorizationRecord(record); err != nil {
 				return err
@@ -157,9 +159,9 @@ func (admission *AgentRunnerCompositeAdmission) validateAuthorization(request Ag
 	if !now.Before(expiresAt) {
 		return errors.New("authorization grant is expired")
 	}
-	if _, revocation, revoked := admission.AuthorizationLedger.LatestRevocation(matched.Grant.AuthorizationID); revoked {
+	if _, revocation, revoked := ledger.LatestRevocation(matched.Grant.AuthorizationID); revoked {
 		matchedRevocation := false
-		for _, record := range admission.AuthorizationLedger.GrantRecordsFor(matched.Grant.AuthorizationID) {
+		for _, record := range ledger.GrantRecordsFor(matched.Grant.AuthorizationID) {
 			if record.RecordHash == revocation.AuthorizationHash {
 				matchedRevocation = true
 				break
@@ -192,8 +194,10 @@ func (admission *AgentRunnerCompositeAdmission) validateAuthorization(request Ag
 	return nil
 }
 
-func (admission *AgentRunnerCompositeAdmission) validateBudget(request AgentRunnerRequest) error {
-	reservation, err := admission.CostLedger.RequireOutstandingReservation(request.BudgetHash)
+// validateAgentRunnerBudget is the point-in-time budget check shared by
+// admission preflight and post-R launch reconfirmation.
+func validateAgentRunnerBudget(ledger *tickets.CostLedger, request AgentRunnerRequest) error {
+	reservation, err := ledger.RequireOutstandingReservation(request.BudgetHash)
 	if err != nil {
 		return err
 	}
