@@ -149,6 +149,42 @@
     }
   },
   {
+    "fixtureId": "state-event-task-postflight-rejected-valid",
+    "schema": "state-event.schema.json",
+    "expected": "accept",
+    "rejectionLayer": "schema",
+    "reason": "A postflight rejection is the only task path from STEPS_RUNNING to REPAIR_PENDING",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "event": {
+        "eventId": "event-four",
+        "runId": "run-one",
+        "sequence": 4,
+        "occurredAt": "2026-09-07T12:00:03.000Z",
+        "actor": {
+          "type": "system",
+          "id": "proofrail"
+        },
+        "entity": {
+          "kind": "task",
+          "runId": "run-one",
+          "taskId": "task-one",
+          "attempt": 1
+        },
+        "fromState": "STEPS_RUNNING",
+        "toState": "REPAIR_PENDING",
+        "previousEventHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+        "inputEvidence": [
+          "sha256:6666666666666666666666666666666666666666666666666666666666666666"
+        ],
+        "reason": {
+          "code": "postflight-rejected"
+        }
+      },
+      "eventHash": "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+    }
+  },
+  {
     "fixtureId": "hook-result-minimal-valid",
     "schema": "hook-result.schema.json",
     "expected": "accept",

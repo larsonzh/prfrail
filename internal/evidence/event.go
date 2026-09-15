@@ -218,7 +218,7 @@ func validTransition(kind, from, to string) bool {
 		},
 		"task": {
 			"NONE": {"PENDING": true}, "PENDING": {"PRECHECK": true, "FAILED": true, "CANCELLED": true},
-			"PRECHECK": {"STEPS_RUNNING": true, "FAILED": true, "CANCELLED": true}, "STEPS_RUNNING": {"WAITING_FOR_OPERATOR": true, "REVIEW_PENDING": true, "FAILED": true, "CANCELLED": true},
+			"PRECHECK": {"STEPS_RUNNING": true, "FAILED": true, "CANCELLED": true}, "STEPS_RUNNING": {"WAITING_FOR_OPERATOR": true, "REVIEW_PENDING": true, "REPAIR_PENDING": true, "FAILED": true, "CANCELLED": true},
 			"WAITING_FOR_OPERATOR": {"STEPS_RUNNING": true, "FAILED": true, "CANCELLED": true}, "REVIEW_PENDING": {"PASSED": true, "REPAIR_PENDING": true, "FAILED": true, "CANCELLED": true},
 			"FAILED": {"REPAIR_PENDING": true}, "REPAIR_PENDING": {"STEPS_RUNNING": true, "FAILED": true, "CANCELLED": true},
 		},

@@ -110,6 +110,40 @@
     }
   },
   {
+    "fixtureId": "state-event-task-repair-before-steps-invalid",
+    "schema": "state-event.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "REPAIR_PENDING is reachable only from REVIEW_PENDING, FAILED, or a postflight rejection, never from PRECHECK",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "event": {
+        "eventId": "event-two",
+        "runId": "run-one",
+        "sequence": 2,
+        "occurredAt": "2026-09-07T12:00:01.000Z",
+        "actor": {
+          "type": "system",
+          "id": "proofrail"
+        },
+        "entity": {
+          "kind": "task",
+          "runId": "run-one",
+          "taskId": "task-one",
+          "attempt": 1
+        },
+        "fromState": "PRECHECK",
+        "toState": "REPAIR_PENDING",
+        "previousEventHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "inputEvidence": [],
+        "reason": {
+          "code": "postflight-rejected"
+        }
+      },
+      "eventHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+    }
+  },
+  {
     "fixtureId": "hook-result-invalid-hash",
     "schema": "hook-result.schema.json",
     "expected": "reject",

@@ -296,7 +296,10 @@ func (store *AgentRunnerReplayStore) validateTerminalClosureBinding(intent Agent
 
 // sameTerminalSettlementPlan compares the settlement plan fields of two intent
 // bodies. Field equality is sufficient because the plan is a deterministic
-// function of the completion digest and the usage observation.
+// function of the completion digest and the usage observation. The chain-owned
+// frozen facts are deliberately excluded: the persisted intent is the only
+// recovery source for the plan, so facts never decide settlement idempotency,
+// and a divergent fact set is rejected by the chain route as a replay conflict.
 func sameTerminalSettlementPlan(left, right AgentRunnerTerminalIntent) bool {
 	if left.SettlementEntryID != right.SettlementEntryID ||
 		left.SettlementIdempotencyKey != right.SettlementIdempotencyKey ||

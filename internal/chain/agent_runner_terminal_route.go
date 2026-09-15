@@ -50,6 +50,15 @@ func (engine *Engine) SubmitAgentRunnerTerminal(ctx context.Context, terminal Ag
 		if conflict {
 			return AgentRunnerTerminalRoute{}, fmt.Errorf("%w: request %s already routed completion %s", ErrAgentRunnerTerminalConflict, terminal.RequestID, terminal.CompletionHash)
 		}
+		if terminal.Status == AgentRunnerTerminalCompleted {
+			// The gate rebuilds the facts from the recorded evidence, so a replay
+			// that claims the same request and completion but a different fact set
+			// is a conflict: converging would hide the divergence from its caller.
+			recordedFacts, factsErr := frozenFactsFromEvidence(recorded.InputEvidence)
+			if factsErr != nil || terminal.Facts == nil || recordedFacts != *terminal.Facts {
+				return AgentRunnerTerminalRoute{}, fmt.Errorf("%w: request %s already routed a different frozen fact set", ErrAgentRunnerTerminalConflict, terminal.RequestID)
+			}
+		}
 		if err := engine.convergeAgentTerminalRoute(ctx, task, terminal, recorded.InputEvidence); err != nil {
 			return AgentRunnerTerminalRoute{}, err
 		}

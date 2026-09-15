@@ -26,6 +26,7 @@ func terminalIntentRecord(t *testing.T, request AgentRunnerRequestRecord, comple
 		Attempt:                  request.Request.Attempt,
 		AdapterID:                request.Request.AdapterID,
 		Completion:               completion,
+		Facts:                    terminalFactsForCompletion(completion),
 		SettlementEntryID:        "settlement-one",
 		SettlementIdempotencyKey: "settlement-key-one",
 		ReservationHash:          request.Request.BudgetHash,

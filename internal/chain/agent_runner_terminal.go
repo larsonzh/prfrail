@@ -74,6 +74,7 @@ type AgentRunnerTerminal struct {
 	PriorSessionID      string
 	PriorCompletionHash string
 	Status              AgentRunnerTerminalStatus
+	Facts               *AgentRunnerFrozenFacts
 	Evidence            []string
 }
 
@@ -111,6 +112,19 @@ func (terminal AgentRunnerTerminal) Validate() error {
 		}
 	default:
 		return fmt.Errorf("%w: mixed create and resume binding", ErrInvalidAgentRunnerTerminal)
+	}
+	switch {
+	case terminal.Status == AgentRunnerTerminalCompleted && terminal.Facts == nil:
+		return fmt.Errorf("%w: a completed terminal must carry the frozen facts", ErrInvalidAgentRunnerTerminal)
+	case terminal.Status != AgentRunnerTerminalCompleted && terminal.Facts != nil:
+		return fmt.Errorf("%w: only a completed terminal carries frozen facts", ErrInvalidAgentRunnerTerminal)
+	case terminal.Facts != nil:
+		if err := terminal.Facts.Validate(); err != nil {
+			return err
+		}
+		if err := terminal.Facts.DisjointFrom(terminal.RequestHash, terminal.CompletionHash); err != nil {
+			return err
+		}
 	}
 	if len(terminal.Evidence) == 0 {
 		return fmt.Errorf("%w: terminal evidence missing", ErrInvalidAgentRunnerTerminal)
@@ -150,10 +164,15 @@ func (terminal AgentRunnerTerminal) resume() bool {
 }
 
 // routeEvidence is the ordered, deduplicated evidence a routing transition
-// carries: the request bound to the parked dispatch, the completion digest, and
-// the adapter proof attached to the terminal.
+// carries: the request bound to the parked dispatch, the completion digest, the
+// five frozen-fact digests of a completed terminal in their fixed positions,
+// and the adapter proof attached to the terminal.
 func (terminal AgentRunnerTerminal) routeEvidence() []string {
-	return uniqueHashes(append([]string{terminal.RequestHash, terminal.CompletionHash}, terminal.Evidence...))
+	prefix := []string{terminal.RequestHash, terminal.CompletionHash}
+	if terminal.Facts != nil {
+		prefix = append(prefix, agentRunnerFactsEvidence(*terminal.Facts)...)
+	}
+	return uniqueHashes(append(prefix, terminal.Evidence...))
 }
 
 // agentTerminalRoutingReason reports whether a step reason proves the step left

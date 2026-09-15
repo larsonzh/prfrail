@@ -46,10 +46,38 @@ func terminalUnknownSettlement() AgentRunnerTerminalSettlement {
 	return AgentRunnerTerminalSettlement{Status: tickets.CostSettlementUnknown, ProviderEvidence: []string{queueHashFour}}
 }
 
+// queueHashFive is the fifth distinct digest used by the frozen-facts fixture.
+const queueHashFive = "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+
+// terminalFrozenFacts is the five-digest fact set a completed terminal must
+// carry; the chain refuses to route a completion without it.
+func terminalFrozenFacts() *AgentRunnerFrozenFacts {
+	return &AgentRunnerFrozenFacts{
+		ManifestHash:            queueHashOne,
+		DiffHash:                queueHashTwo,
+		LogHash:                 queueHashThree,
+		UsageHash:               queueHashFour,
+		ProcessStopEvidenceHash: queueHashFive,
+	}
+}
+
+// terminalFactsForCompletion attaches the facts only where the store requires
+// them: a completed terminal intent must carry them, every other status must not.
+func terminalFactsForCompletion(completion AgentRunnerCompletionRecord) *AgentRunnerFrozenFacts {
+	if completion.Completion.Status != "completed" {
+		return nil
+	}
+	return terminalFrozenFacts()
+}
+
 func terminalOutcomeFor(t *testing.T, request AgentRunnerRequestRecord, completionID string, settlement AgentRunnerTerminalSettlement) AgentRunnerTerminalOutcome {
 	t.Helper()
 	record := replayStoreCompletionRecord(t, request, completionID)
-	return AgentRunnerTerminalOutcome{Completion: record.Completion, Settlement: settlement}
+	outcome := AgentRunnerTerminalOutcome{Completion: record.Completion, Settlement: settlement}
+	if record.Completion.Status == "completed" {
+		outcome.Facts = terminalFrozenFacts()
+	}
+	return outcome
 }
 
 func terminalLedgerEntryCount(t *testing.T, ledger *tickets.CostLedger) int {
@@ -549,6 +577,34 @@ func TestAgentRunnerTerminalPublisherRejectsInvalidEvidenceBeforeIntent(t *testi
 	negativeCallsOutcome.Settlement.ObservedCalls = &negativeCalls
 	if _, err := publisher.PublishTerminal(context.Background(), negativeCallsOutcome); !errors.Is(err, ErrInvalidAgentRunnerTerminalIntent) {
 		t.Fatalf("expected negative observed calls rejection, got %v", err)
+	}
+}
+
+func TestAgentRunnerTerminalPublisherRefusesACompletedOutcomeWithoutFacts(t *testing.T) {
+	publisher, admission := terminalPublisherFixture(t)
+	request := publisher.RequestRecord
+	outcome := terminalOutcomeFor(t, request, "completion-one", terminalObservedSettlement())
+	outcome.Facts = nil
+	if _, err := publisher.PublishTerminal(context.Background(), outcome); !errors.Is(err, ErrInvalidAgentRunnerTerminalIntent) {
+		t.Fatalf("expected a completed-without-facts rejection, got %v", err)
+	}
+	if _, found, err := publisher.Store.TerminalIntent(request.Request.RequestID); err != nil || found {
+		t.Fatalf("missing facts must be rejected before any intent: found=%v err=%v", found, err)
+	}
+	if _, err := admission.CostLedger.RequireOutstandingReservation(request.Request.BudgetHash); err != nil {
+		t.Fatalf("missing facts must be rejected before any settlement: %v", err)
+	}
+
+	notCompleted := AgentRunnerTerminalOutcome{
+		Completion: replayStoreUncertainCompletionRecord(t, request, "completion-two").Completion,
+		Settlement: terminalUnknownSettlement(),
+		Facts:      terminalFrozenFacts(),
+	}
+	if _, err := publisher.PublishTerminal(context.Background(), notCompleted); !errors.Is(err, ErrInvalidAgentRunnerTerminalIntent) {
+		t.Fatalf("a non-completed outcome must never carry frozen facts: %v", err)
+	}
+	if _, found, err := publisher.Store.TerminalIntent(request.Request.RequestID); err != nil || found {
+		t.Fatalf("facts on a non-completed outcome must be rejected before any intent: found=%v err=%v", found, err)
 	}
 }
 

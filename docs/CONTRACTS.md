@@ -64,7 +64,7 @@ Schema 只接受以下单步转换，未列出的转换、自转换和跨 attemp
 	`PAUSED→RUNNING|FAILED|CANCELLED`。
 - task：`NONE→PENDING`；`PENDING→PRECHECK|FAILED|CANCELLED`；
 	`PRECHECK→STEPS_RUNNING|FAILED|CANCELLED`；
-	`STEPS_RUNNING→WAITING_FOR_OPERATOR|REVIEW_PENDING|FAILED|CANCELLED`；
+	`STEPS_RUNNING→WAITING_FOR_OPERATOR|REVIEW_PENDING|REPAIR_PENDING|FAILED|CANCELLED`；
 	`WAITING_FOR_OPERATOR→STEPS_RUNNING|FAILED|CANCELLED`；
 	`REVIEW_PENDING→PASSED|REPAIR_PENDING|FAILED|CANCELLED`；`FAILED→REPAIR_PENDING`；
 	`REPAIR_PENDING→STEPS_RUNNING|FAILED|CANCELLED`。
@@ -74,7 +74,7 @@ Schema 只接受以下单步转换，未列出的转换、自转换和跨 attemp
 	`WAITING_FOR_OPERATOR→RUNNING|FAILED|CANCELLED`。
 
 `NONE` 只用于创建事件，不是投影可停留状态。`COMPLETED`、`PASSED`、`NOOP_RECORDED` 和
-`CANCELLED` 是终态。只有 task 的 `FAILED→REPAIR_PENDING` 可离开失败态；step 修复必须增加 attempt。`TERMINAL_PENDING` 不是可停留的调度态：它只在对应终局路由时离开；重启后无终局证据时按不确定暂停处理。
+`CANCELLED` 是终态。只有 task 的 `FAILED→REPAIR_PENDING` 可离开失败态；step 修复必须增加 attempt。`TERMINAL_PENDING` 不是可停留的调度态：它只在对应终局路由时离开；重启后无终局证据时按不确定暂停处理。`STEPS_RUNNING→REPAIR_PENDING` 仅由 postflight 拒绝写入（见 §7 postflight acceptance 段），不得用于其他失败路径。
 
 - 每次状态转换先持久化 append-only state event，再更新可丢弃、可重建的 projection；事件按 run 使用
 	从 1 开始的连续 sequence 和 previousEventHash 串联，并绑定 entity、前后状态、actor、证据与 reason。
@@ -223,6 +223,8 @@ dispatch 的 replay 处置规则：仅 R（`unknown-block`）不得 launch；lau
 终局发布与结算为 store-local 二文件协议（不进 wire、不参与 R/C 的 recordHash）：`AgentRunnerTerminalPublisher` 必须先以 no-replace 单调发布 `terminals/terminal-intent.<requestId>.jsonl`（terminal-intent，内嵌完整 completion 记录与结算计划：`settlementEntryId`、`settlementIdempotencyKey`、`reservationHash`、结算状态与金额、调用/token 与证据摘要；碰撞后有界重读收敛，无法判定即 convergence failure），随后向成本账本 `Settle` 该计划（账本按 `idempotencyKey` 去重：同键同载荷幂等、同 reservation 异键按结算冲突拒绝，重复回执不可重复结算），再经 replay store 发布 C，最后以同样规则发布 `terminals/terminal-closure.<requestId>.jsonl` 完成链。结算条目的证据必须包含被判定的 C recordHash 与 R recordHash，使“已入账结算必有可审计 C”由条目自身成立。发布耐久未证明的平台上，发布器必须在任何结算之前拒绝新的终局发布（不写意图、不结算、不发布 C、不写 closure），已有完整链只可无写重放。无 terminal-intent 的 C 是孤儿（无法证明任何结算决策记录）必须 fail-closed，且不得回写意图“收养”； reservation 已被异键结算占用时不得发布 C；结算状态为 unknown 时 reservation 保持占用（继续计入 unknown 占用与共享上限、不得复用、不得 relaunch），不得据此伪造完成。崩溃恢复只依据 store-local 记录：intent 是结算计划与完成体的唯一可恢复来源，账本只作强制者（幂等与冲突判定）而非查询源；恢复是完成自己已赢得槽位的幂等补写，不等于接管，接管仍属后续 operator 切片；postflight 接受不在本协议范围内。
 
 chain terminal 路由（A4）：`agent-runner-completion` 的任何状态只表示外部执行结束，不直接驱动任务结论。终端回执必须翻译为 chain 自有 terminal 事实并经核心 `SubmitAgentRunnerTerminal` 显式路由：completed 只允许 step `TERMINAL_PENDING→PASSED`，任务仍依次经过 freeze、gates、review 与 completed promotion 才可 PASSED，chain 仅在全部任务接受后 COMPLETED；failed 与 uncertain 落 task `FAILED`（uncertain 另保持 chain `PAUSED` 且禁止重试），cancelled 先归档停机证据再写终态，operator-action-required 在写入 task/step `WAITING_FOR_OPERATOR`（证据含完成记录哈希）的同时把 chain `RUNNING→PAUSED`（同证据）并进入既有 operator-interaction 机器，使“路由即暂停”成立：重启同样能开出交互并收敛。该等待态由 Open 侧加法式接受——等待中的 task/step 与暂停的 chain 可匹配 agent 终局路由写入的转移；控制台账本仍是交互排他性的唯一所有者（该路径上 Open 不校验交互记录哈希，与经典路径的差异是有意的边界）。uncertain 终局只把处于 `RUNNING` 的 chain 置为 `PAUSED`；chain 已因其他原因暂停时不改写暂停原因（转移表不允许 `PAUSED→PAUSED`），使用方须在 task `FAILED` 边界停止而非自动续跑。同一请求的重复终局必须幂等收敛，不同终局为冲突。resume 必须绑定 `priorSessionId` 与 `priorCompletionHash`，且 `priorCompletionHash` 必须存在于该 step 的事件证据历史中；无法证明连续性时拒绝路由并由调用方从持久 envelope 建立新 attempt，禁止猜测续接成功。本段不包含 postflight 接受判定，也不改变下游 acceptance 政策所有权。
+
+postflight acceptance（A5）：completed 终局的翻译必须随附 chain 自有冻结事实 DTO——manifest、diff、log、usage、process-stop 五枚相互不同且与请求/完成摘要互异的记录摘要——否则在路由前整体拒绝；非 completed 终局不得携带冻结事实。全部 step 通过后、写 `REVIEW_PENDING` 之前，chain 运行自有 postflight：从该 step terminal-passed 路由事件证据的前五枚事实摘要重建冻结事实，独立证明受管进程停止、重新生成完整 manifest/diff，执行范围、秘密、文件类型/大小及可观测副作用检查，并逐项与冻结事实对账；postflight 通过判定必须携带全部五枚事实摘要，任一不完整即暂停或拒绝。只有 postflight 通过才写 `REVIEW_PENDING`，随后依次经过既有 freeze、gates、review 与 completed promotion，task 才 PASSED，chain 仅在全部任务接受后 COMPLETED；exit 0、completed receipt 或任何 adapter 记录都不直接产生 task PASSED。postflight 拒绝写 task `REPAIR_PENDING` 并暂停 chain，转移 `STEPS_RUNNING→REPAIR_PENDING` 仅由此使用；postflight uncertain 写 task `FAILED` 并把处于 `RUNNING` 的 chain 置 `PAUSED` 且禁止重试；postflight 端口失败写 task `FAILED`，事实缺失或证据不完整同样 fail-closed；同一 task 的 completed 终局若来自多个 step，则整体拒绝而不得猜测事实归属。无变更执行是合法结局（重捕的 workspace manifest 与父快照一致），因此 chain 不以“某枚事实摘要等于父快照摘要”为拒绝理由：该判别需要独立重捕工作区，只属于 postflight 端口，chain 只执法可证明的部分（五枚事实互异、与请求/完成摘要互异、可从路由证据按位置重建）。路由证据布局由 A5 拥有：A5 之前的 completed 路由记录不含事实前缀，重放时按 conflict 整体拒绝且零写入，此类运行不得就地续跑，只能按新 attempt 重新执行。重入已处于 `REVIEW_PENDING` 的任务时，若该任务存在 completed 路由终局，则必须能从该 `REVIEW_PENDING` 转移证据证明它由 postflight 通过产生（该证据含全部五枚事实摘要）；无法证明时零写入拒绝（review 状态未经 postflight 认证），不得继续走向 acceptance。postflight 幂等：`REVIEW_PENDING` 写入后不再重跑，部分写入在重入时按已录证据收敛；adapter 只上报冻结事实，不得把事实解释为通过、不得写 policy 或 acceptance，也不得用 exit code、进程状态或结算状态代替 postflight 判定。本段不改变下游 acceptance 政策所有权，也不改变 A2/A3/A4 已定语义。
 
 需要人工输入时，CLI Agent adapter 只能上报结构化 `operator-action-required`；ProofRail 在原子边界停止或暂停受管代理，持久化请求并令 task/step 进入 `WAITING_FOR_OPERATOR`。通知、答复和控制权归还由 ProofRail 自有 CLI/TUI 承担。用户输入必须经 ProofRail 校验并持久化为适用的 operator interaction、review、authorization 或 handoff 记录；终端/聊天自由文本不能直接改变状态或授权。恢复同一 Agent 会话前须重新验证 attempt、workspace、session、上下文摘要、租约和授权。T025 已冻结一般澄清问答的 `operator-interaction` Schema、正反样例、RFC 8785 摘要、追加式 JSONL 重放和 Engine open/resume 控制 API；控制 API 只在 request/response、当前绑定与等待态一致时返回恢复命令，事件部分写入时保持 chain 暂停并按证据哈希幂等收敛；由 agent 终局路由产生的 `WAITING_FOR_OPERATOR` 转移（证据含完成记录哈希）同样进入该等待态匹配。真实 Agent session 续跑由 T027 接入。
 

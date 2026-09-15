@@ -66,9 +66,11 @@ func agentRunnerDispatchEvidence() []string {
 	return []string{agentRunnerRequestHash, agentRunnerLaunchHash, agentRunnerIdentityHash}
 }
 
-// agentRunnerTerminal builds a valid terminal fact for the parked step.
+// agentRunnerTerminal builds a valid terminal fact for the parked step. A
+// completed terminal always carries the five frozen facts, because the chain
+// refuses to route a completion without them.
 func agentRunnerTerminal(status AgentRunnerTerminalStatus) AgentRunnerTerminal {
-	return AgentRunnerTerminal{
+	terminal := AgentRunnerTerminal{
 		RequestID:      "request-one",
 		RequestHash:    agentRunnerRequestHash,
 		CompletionHash: agentRunnerCompletionHash,
@@ -80,6 +82,11 @@ func agentRunnerTerminal(status AgentRunnerTerminalStatus) AgentRunnerTerminal {
 		Status:         status,
 		Evidence:       []string{agentRunnerRequestHash, agentRunnerCompletionHash, agentRunnerTerminalHash},
 	}
+	if status == AgentRunnerTerminalCompleted {
+		facts := testFrozenFacts()
+		terminal.Facts = &facts
+	}
+	return terminal
 }
 
 // park dispatches the AgentRunner step and asserts that it waits instead of

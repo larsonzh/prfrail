@@ -84,7 +84,7 @@ test("all schemas compile and every catalog matches its independent expectation"
       fixtureCount += 1;
     }
   }
-  assert.equal(fixtureCount, 126);
+  assert.equal(fixtureCount, 128);
   assert.deepEqual([...acceptedSchemas].sort(), schemaFiles);
   assert.deepEqual([...rejectedSchemas].sort(), schemaFiles);
 });

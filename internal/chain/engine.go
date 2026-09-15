@@ -22,6 +22,7 @@ type Options struct {
 	Acceptance  AcceptancePort
 	Reviewer    ReviewerPort
 	Publisher   PublisherPort
+	Postflight  PostflightPort
 	Stopper     Stopper
 	Reconciler  Reconciler
 	Clock       Clock
@@ -39,6 +40,9 @@ type Engine struct {
 func New(ctx context.Context, options Options) (*Engine, error) {
 	if !evidence.ValidID(options.RunID) || options.Events == nil || options.Baselines == nil || options.Workspaces == nil || options.Steps == nil || options.Acceptance == nil || options.Reviewer == nil || options.Publisher == nil || options.Stopper == nil || options.Reconciler == nil {
 		return nil, ErrInvalidDefinition
+	}
+	if options.Postflight == nil {
+		return nil, fmt.Errorf("%w: %w", ErrInvalidDefinition, ErrPostflightUnavailable)
 	}
 	if err := options.Definition.validate(); err != nil {
 		return nil, err
@@ -179,7 +183,15 @@ func (engine *Engine) runTask(ctx context.Context, task Task) error {
 			return err
 		}
 	}
-	if err := engine.transition(ctx, entity, "REVIEW_PENDING", nil, "steps-completed"); err != nil {
+	if engine.state.current(entity) != "REVIEW_PENDING" {
+		postflightInputs, postflightReason, postflightErr := engine.runTaskPostflight(ctx, task, parent, workspace)
+		if postflightErr != nil {
+			return postflightErr
+		}
+		if err := engine.transition(ctx, entity, "REVIEW_PENDING", postflightInputs, postflightReason); err != nil {
+			return err
+		}
+	} else if err := engine.requirePostflightQualifiedReview(ctx, task.ID); err != nil {
 		return err
 	}
 	candidate, err := engine.options.Acceptance.Accept(ctx, engine.options.RunID, task.ID, 1, parent, workspace)

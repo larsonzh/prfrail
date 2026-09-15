@@ -72,11 +72,17 @@ func (fake *fakeSteps) Execute(_ context.Context, request StepRequest) (StepResu
 type fakeAcceptance struct {
 	hashes   []string
 	producer evidence.Actor
+	tasks    []string
 	calls    int
 }
 
-func (fake *fakeAcceptance) Accept(context.Context, string, string, int, SnapshotRef, Workspace) (CandidateResult, error) {
-	hash := fake.hashes[fake.calls]
+func (fake *fakeAcceptance) Accept(_ context.Context, _ string, taskID string, _ int, _ SnapshotRef, _ Workspace) (CandidateResult, error) {
+	fake.tasks = append(fake.tasks, taskID)
+	index := fake.calls
+	if index >= len(fake.hashes) {
+		index = len(fake.hashes) - 1
+	}
+	hash := fake.hashes[index]
 	fake.calls++
 	return CandidateResult{
 		Snapshot:          SnapshotRef{Hash: hash},
@@ -89,14 +95,20 @@ func (fake *fakeAcceptance) Accept(context.Context, string, string, int, Snapsho
 type fakeReviewer struct {
 	decisions []ReviewDecision
 	err       error
+	tasks     []string
 	calls     int
 }
 
-func (fake *fakeReviewer) Review(context.Context, ReviewRequest) (ReviewDecision, error) {
+func (fake *fakeReviewer) Review(_ context.Context, request ReviewRequest) (ReviewDecision, error) {
+	fake.tasks = append(fake.tasks, request.TaskID)
 	if fake.err != nil {
 		return ReviewDecision{}, fake.err
 	}
-	decision := fake.decisions[fake.calls]
+	index := fake.calls
+	if index >= len(fake.decisions) {
+		index = len(fake.decisions) - 1
+	}
+	decision := fake.decisions[index]
 	fake.calls++
 	return decision, nil
 }
@@ -104,14 +116,20 @@ func (fake *fakeReviewer) Review(context.Context, ReviewRequest) (ReviewDecision
 type fakePublisher struct {
 	decisions []PromotionDecision
 	err       error
+	tasks     []string
 	calls     int
 }
 
-func (fake *fakePublisher) Publish(context.Context, PromotionRequest) (PromotionDecision, error) {
+func (fake *fakePublisher) Publish(_ context.Context, request PromotionRequest) (PromotionDecision, error) {
+	fake.tasks = append(fake.tasks, request.TaskID)
 	if fake.err != nil {
 		return PromotionDecision{}, fake.err
 	}
-	decision := fake.decisions[fake.calls]
+	index := fake.calls
+	if index >= len(fake.decisions) {
+		index = len(fake.decisions) - 1
+	}
+	decision := fake.decisions[index]
 	fake.calls++
 	return decision, nil
 }
@@ -119,6 +137,30 @@ func (fake *fakePublisher) Publish(context.Context, PromotionRequest) (Promotion
 type fakeStopper struct {
 	calls int
 	err   error
+}
+
+type fakePostflight struct {
+	decisions []PostflightDecision
+	err       error
+	calls     int
+	requests  []PostflightRequest
+}
+
+func (fake *fakePostflight) RunPostflight(_ context.Context, request PostflightRequest) (PostflightDecision, error) {
+	fake.requests = append(fake.requests, request)
+	if fake.err != nil {
+		return PostflightDecision{}, fake.err
+	}
+	if len(fake.decisions) > 0 {
+		if fake.calls >= len(fake.decisions) {
+			return PostflightDecision{}, errors.New("postflight decision plan exhausted")
+		}
+		decision := fake.decisions[fake.calls]
+		fake.calls++
+		return decision, nil
+	}
+	fake.calls++
+	return PostflightDecision{Outcome: PostflightPassed, Evidence: agentRunnerFactsEvidence(request.Facts)}, nil
 }
 
 func (fake *fakeStopper) Stop(context.Context, string) ([]string, error) {
@@ -162,7 +204,7 @@ func testOptions(store EventStore) (Options, *fakeBaseline, *fakeWorkspaces, *fa
 	stopper := &fakeStopper{}
 	reconciler := &fakeReconciler{}
 	sequence := 0
-	options := Options{RunID: "run-one", Definition: threeTaskDefinition(), Events: store, Baselines: baseline, Workspaces: workspaces, Steps: steps, Acceptance: acceptance, Reviewer: reviewer, Publisher: publisher, Stopper: stopper, Reconciler: reconciler, Clock: fixedClock, IDs: func() string { sequence++; return fmt.Sprintf("event-%d", sequence) }}
+	options := Options{RunID: "run-one", Definition: threeTaskDefinition(), Events: store, Baselines: baseline, Workspaces: workspaces, Steps: steps, Acceptance: acceptance, Reviewer: reviewer, Publisher: publisher, Postflight: &fakePostflight{}, Stopper: stopper, Reconciler: reconciler, Clock: fixedClock, IDs: func() string { sequence++; return fmt.Sprintf("event-%d", sequence) }}
 	return options, baseline, workspaces, steps, acceptance, reviewer, publisher, stopper, reconciler
 }
 

@@ -19,11 +19,13 @@ type AgentRunnerTerminalSettlement struct {
 	ProviderEvidence    []string
 }
 
-// AgentRunnerTerminalOutcome carries the completion claim and the usage
-// observation a caller wants to terminalize.
+// AgentRunnerTerminalOutcome carries the completion claim, the usage
+// observation and (for a completed claim) the frozen facts a caller wants to
+// terminalize.
 type AgentRunnerTerminalOutcome struct {
 	Completion AgentRunnerCompletion
 	Settlement AgentRunnerTerminalSettlement
+	Facts      *AgentRunnerFrozenFacts
 }
 
 // AgentRunnerTerminalResult reports the durable chain hashes that prove the
@@ -95,6 +97,9 @@ func (publisher *AgentRunnerTerminalPublisher) PublishTerminal(ctx context.Conte
 	if err != nil {
 		return AgentRunnerTerminalResult{}, err
 	}
+	if err := attachTerminalIntentFacts(&plan, completionRecord, outcome.Facts); err != nil {
+		return AgentRunnerTerminalResult{}, err
+	}
 
 	state, err := publisher.Store.State(request.RequestID)
 	if err != nil {
@@ -155,6 +160,7 @@ func (publisher *AgentRunnerTerminalPublisher) PublishTerminal(ctx context.Conte
 		Attempt:                  request.Attempt,
 		AdapterID:                request.AdapterID,
 		Completion:               completionRecord,
+		Facts:                    plan.Facts,
 		SettlementEntryID:        plan.SettlementEntryID,
 		SettlementIdempotencyKey: plan.SettlementIdempotencyKey,
 		ReservationHash:          plan.ReservationHash,
@@ -398,6 +404,27 @@ func buildAgentRunnerTerminalClosure(intent AgentRunnerTerminalIntentRecord) (Ag
 		SettlementIdempotencyKey: intent.Intent.SettlementIdempotencyKey,
 		ClosedAt:                 intent.Intent.DecidedAt,
 	})
+}
+
+// attachTerminalIntentFacts binds the frozen facts to the settlement plan
+// before the intent is published. A completed claim must carry them (the chain
+// refuses to route a completion without provable facts) and only a completed
+// claim may carry them.
+func attachTerminalIntentFacts(plan *AgentRunnerTerminalIntent, completion AgentRunnerCompletionRecord, facts *AgentRunnerFrozenFacts) error {
+	completed := completion.Completion.Status == "completed"
+	switch {
+	case completed && facts == nil:
+		return fmt.Errorf("%w: a completed terminal must carry frozen facts", ErrInvalidAgentRunnerTerminalIntent)
+	case !completed && facts != nil:
+		return fmt.Errorf("%w: only a completed terminal carries frozen facts", ErrInvalidAgentRunnerTerminalIntent)
+	case facts == nil:
+		return nil
+	}
+	if err := facts.Validate(); err != nil {
+		return err
+	}
+	plan.Facts = facts
+	return nil
 }
 
 // dedupeTerminalEvidence composes the settlement evidence deterministically:

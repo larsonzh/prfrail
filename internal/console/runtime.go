@@ -47,6 +47,7 @@ func ExecuteNoopRun(ctx context.Context, runID, runDir string, definition chain.
 		Acceptance: runtime,
 		Reviewer:   runtime,
 		Publisher:  runtime,
+		Postflight: runtime,
 		Stopper:    runtime,
 		Reconciler: runtime,
 		Clock:      now,
@@ -201,6 +202,14 @@ func (runtime *localRuntime) Stop(context.Context, string) ([]string, error) {
 
 func (runtime *localRuntime) Reconcile(context.Context, string) error {
 	return nil
+}
+
+// RunPostflight is the fail-closed console stub. The noop-only CLI path never
+// reaches postflight (no AgentRunner step can run there), and any definition
+// that does reach it must fail closed instead of silently skipping the
+// acceptance gate.
+func (runtime *localRuntime) RunPostflight(context.Context, chain.PostflightRequest) (chain.PostflightDecision, error) {
+	return chain.PostflightDecision{}, fmt.Errorf("%w: the console runtime cannot run postflight for run %s", chain.ErrPostflightUnavailable, runtime.runDir)
 }
 
 func (runtime *localRuntime) nextEventID() string {

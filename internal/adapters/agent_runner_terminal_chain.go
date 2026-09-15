@@ -49,6 +49,11 @@ func ToChainAgentRunnerTerminal(request AgentRunnerRequestRecord, intent AgentRu
 	if err != nil {
 		return chain.AgentRunnerTerminal{}, err
 	}
+	var facts *chain.AgentRunnerFrozenFacts
+	if intentBody.Facts != nil {
+		projected := intentBody.Facts.toChain()
+		facts = &projected
+	}
 	completion := intentBody.Completion.Completion
 	terminal := chain.AgentRunnerTerminal{
 		RequestID:           body.RequestID,
@@ -62,6 +67,7 @@ func ToChainAgentRunnerTerminal(request AgentRunnerRequestRecord, intent AgentRu
 		PriorSessionID:      body.PriorSessionID,
 		PriorCompletionHash: body.PriorCompletionHash,
 		Status:              status,
+		Facts:               facts,
 		Evidence: dedupeTerminalEvidence(
 			[]string{request.RecordHash, intentBody.Completion.RecordHash, intent.RecordHash, closure.RecordHash},
 			append(append(append([]string{}, completion.Evidence...), completion.ErrorEvidence...), intentBody.ProviderEvidence...),
@@ -100,6 +106,19 @@ func LoadChainAgentRunnerTerminal(store *AgentRunnerReplayStore, request AgentRu
 		return chain.AgentRunnerTerminal{}, fmt.Errorf("%w: terminal closure missing for requestId %s", ErrInvalidAgentRunnerTerminalTranslation, requestID)
 	}
 	return ToChainAgentRunnerTerminal(request, intent, closure)
+}
+
+// toChain projects the store-local frozen facts onto the chain-owned DTO. The
+// projection is one way and carries digests only: no decision, no settlement
+// status, and no wire record ever crosses this boundary.
+func (facts AgentRunnerFrozenFacts) toChain() chain.AgentRunnerFrozenFacts {
+	return chain.AgentRunnerFrozenFacts{
+		ManifestHash:            facts.ManifestHash,
+		DiffHash:                facts.DiffHash,
+		LogHash:                 facts.LogHash,
+		UsageHash:               facts.UsageHash,
+		ProcessStopEvidenceHash: facts.ProcessStopEvidenceHash,
+	}
 }
 
 func translateAgentRunnerTerminalStatus(status string) (chain.AgentRunnerTerminalStatus, error) {

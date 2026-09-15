@@ -36,6 +36,39 @@ var (
 	ErrAgentRunnerTerminalSettlementBlocked = errors.New("AgentRunner terminal settlement blocked")
 )
 
+// AgentRunnerFrozenFacts are the five digests an adapter froze after external
+// execution ended. They are store-local facts, never decisions: the chain runs
+// its own postflight and reconciles them before a task may be reviewed.
+type AgentRunnerFrozenFacts struct {
+	ManifestHash            string `json:"manifestHash"`
+	DiffHash                string `json:"diffHash"`
+	LogHash                 string `json:"logHash"`
+	UsageHash               string `json:"usageHash"`
+	ProcessStopEvidenceHash string `json:"processStopEvidenceHash"`
+}
+
+func (facts AgentRunnerFrozenFacts) hashes() []string {
+	return []string{facts.ManifestHash, facts.DiffHash, facts.LogHash, facts.UsageHash, facts.ProcessStopEvidenceHash}
+}
+
+// Validate fails closed on missing digests and on digest collisions: the chain
+// rebuilds the facts positionally from the routing evidence, so repeats would
+// make the rebuild ambiguous.
+func (facts AgentRunnerFrozenFacts) Validate() error {
+	hashes := facts.hashes()
+	for index, hash := range hashes {
+		if !evidence.ValidHash(hash) {
+			return fmt.Errorf("%w: frozen fact %d is not a valid hash", ErrInvalidAgentRunnerTerminalIntent, index)
+		}
+	}
+	for index, hash := range hashes {
+		if slices.Contains(hashes[:index], hash) {
+			return fmt.Errorf("%w: frozen fact %d repeats an earlier digest", ErrInvalidAgentRunnerTerminalIntent, index)
+		}
+	}
+	return nil
+}
+
 // AgentRunnerTerminalIntent is the pre-settlement terminal decision record. It
 // embeds the full completion record and the settlement plan so crash recovery
 // can re-drive the whole chain from store-local facts alone. It is store-local
@@ -50,6 +83,7 @@ type AgentRunnerTerminalIntent struct {
 	Attempt                  int                         `json:"attempt"`
 	AdapterID                string                      `json:"adapterId"`
 	Completion               AgentRunnerCompletionRecord `json:"completion"`
+	Facts                    *AgentRunnerFrozenFacts     `json:"frozenFacts,omitempty"`
 	SettlementEntryID        string                      `json:"settlementEntryId"`
 	SettlementIdempotencyKey string                      `json:"settlementIdempotencyKey"`
 	ReservationHash          string                      `json:"reservationHash"`
@@ -182,7 +216,25 @@ func validateAgentRunnerTerminalIntent(intent AgentRunnerTerminalIntent) error {
 	if _, err := time.Parse(time.RFC3339, intent.DecidedAt); err != nil {
 		return fmt.Errorf("%w: invalid decidedAt", ErrInvalidAgentRunnerTerminalIntent)
 	}
-	return nil
+	return validateAgentRunnerTerminalIntentFacts(intent)
+}
+
+// validateAgentRunnerTerminalIntentFacts enforces the frozen-facts binding: a
+// completed terminal must carry the five facts, and no other status may carry
+// them. Without facts a completion can never be audited by postflight, so the
+// store refuses to hold the decision at all.
+func validateAgentRunnerTerminalIntentFacts(intent AgentRunnerTerminalIntent) error {
+	completed := intent.Completion.Completion.Status == "completed"
+	switch {
+	case completed && intent.Facts == nil:
+		return fmt.Errorf("%w: a completed terminal intent must carry frozen facts", ErrInvalidAgentRunnerTerminalIntent)
+	case !completed && intent.Facts != nil:
+		return fmt.Errorf("%w: only a completed terminal intent carries frozen facts", ErrInvalidAgentRunnerTerminalIntent)
+	case intent.Facts == nil:
+		return nil
+	default:
+		return intent.Facts.Validate()
+	}
 }
 
 // NewAgentRunnerTerminalClosureRecord builds a validated closure record.

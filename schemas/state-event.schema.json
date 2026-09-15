@@ -173,7 +173,7 @@
         {
           "properties": {
             "fromState": {"const": "STEPS_RUNNING"},
-            "toState": {"enum": ["WAITING_FOR_OPERATOR", "REVIEW_PENDING", "FAILED", "CANCELLED"]}
+            "toState": {"enum": ["WAITING_FOR_OPERATOR", "REVIEW_PENDING", "REPAIR_PENDING", "FAILED", "CANCELLED"]}
           }
         },
         {

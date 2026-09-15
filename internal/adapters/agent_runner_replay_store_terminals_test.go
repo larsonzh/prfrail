@@ -20,6 +20,7 @@ func terminalIntentRecordFor(t *testing.T, request AgentRunnerRequestRecord, com
 		Attempt:                  request.Request.Attempt,
 		AdapterID:                request.Request.AdapterID,
 		Completion:               completion,
+		Facts:                    terminalFactsForCompletion(completion),
 		SettlementEntryID:        key,
 		SettlementIdempotencyKey: key,
 		ReservationHash:          request.Request.BudgetHash,
@@ -74,6 +75,11 @@ func TestAgentRunnerTerminalRecordValidation(t *testing.T) {
 	if _, err := NewAgentRunnerTerminalIntentRecord(missingDigest); !errors.Is(err, ErrInvalidAgentRunnerTerminalIntent) {
 		t.Fatalf("expected evidence binding rejection, got %v", err)
 	}
+	completedWithoutFacts := intent.Intent
+	completedWithoutFacts.Facts = nil
+	if _, err := NewAgentRunnerTerminalIntentRecord(completedWithoutFacts); !errors.Is(err, ErrInvalidAgentRunnerTerminalIntent) {
+		t.Fatalf("expected completed-without-facts rejection, got %v", err)
+	}
 	unknownWithAmount := intent.Intent
 	unknownWithAmount.SettlementStatus = "unknown"
 	if _, err := NewAgentRunnerTerminalIntentRecord(unknownWithAmount); !errors.Is(err, ErrInvalidAgentRunnerTerminalIntent) {
@@ -89,6 +95,46 @@ func TestAgentRunnerTerminalRecordValidation(t *testing.T) {
 	if _, err := NewAgentRunnerTerminalClosureRecord(badClosure); !errors.Is(err, ErrInvalidAgentRunnerTerminalClosure) {
 		t.Fatalf("expected closure time rejection, got %v", err)
 	}
+}
+
+func TestAgentRunnerTerminalIntentFactsBindingFailsClosed(t *testing.T) {
+	tests := map[string]struct {
+		status string
+		facts  *AgentRunnerFrozenFacts
+		refuse bool
+	}{
+		"completed with facts":    {status: "completed", facts: terminalFrozenFacts()},
+		"completed without facts": {status: "completed", facts: nil, refuse: true},
+		"failed with facts":       {status: "failed", facts: terminalFrozenFacts(), refuse: true},
+		"failed without facts":    {status: "failed", facts: nil},
+		"uncertain with facts":    {status: "uncertain", facts: terminalFrozenFacts(), refuse: true},
+	}
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			intent := AgentRunnerTerminalIntent{
+				Completion: AgentRunnerCompletionRecord{Completion: AgentRunnerCompletion{Status: test.status}},
+				Facts:      test.facts,
+			}
+			err := validateAgentRunnerTerminalIntentFacts(intent)
+			if test.refuse && !errors.Is(err, ErrInvalidAgentRunnerTerminalIntent) {
+				t.Fatalf("expected a fail-closed rejection, got %v", err)
+			}
+			if !test.refuse && err != nil {
+				t.Fatalf("expected acceptance, got %v", err)
+			}
+		})
+	}
+	t.Run("facts must be mutually distinct", func(t *testing.T) {
+		colliding := terminalFrozenFacts()
+		colliding.LogHash = colliding.DiffHash
+		intent := AgentRunnerTerminalIntent{
+			Completion: AgentRunnerCompletionRecord{Completion: AgentRunnerCompletion{Status: "completed"}},
+			Facts:      colliding,
+		}
+		if err := validateAgentRunnerTerminalIntentFacts(intent); !errors.Is(err, ErrInvalidAgentRunnerTerminalIntent) {
+			t.Fatalf("expected a collision rejection, got %v", err)
+		}
+	})
 }
 
 func TestAgentRunnerReplayStoreTerminalIntentRequiresPersistedRequest(t *testing.T) {
