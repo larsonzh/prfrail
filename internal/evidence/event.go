@@ -224,7 +224,9 @@ func validTransition(kind, from, to string) bool {
 		},
 		"step": {
 			"NONE": {"PENDING": true}, "PENDING": {"RUNNING": true, "NOOP_RECORDED": true, "FAILED": true, "CANCELLED": true},
-			"RUNNING": {"WAITING_FOR_OPERATOR": true, "PASSED": true, "FAILED": true, "CANCELLED": true}, "WAITING_FOR_OPERATOR": {"RUNNING": true, "FAILED": true, "CANCELLED": true},
+			"RUNNING":              {"TERMINAL_PENDING": true, "WAITING_FOR_OPERATOR": true, "PASSED": true, "FAILED": true, "CANCELLED": true},
+			"TERMINAL_PENDING":     {"WAITING_FOR_OPERATOR": true, "PASSED": true, "FAILED": true, "CANCELLED": true},
+			"WAITING_FOR_OPERATOR": {"RUNNING": true, "FAILED": true, "CANCELLED": true},
 		},
 	}
 	return transitions[kind][from][to]

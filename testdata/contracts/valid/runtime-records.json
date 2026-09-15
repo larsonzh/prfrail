@@ -75,6 +75,80 @@
     }
   },
   {
+    "fixtureId": "state-event-step-terminal-pending-valid",
+    "schema": "state-event.schema.json",
+    "expected": "accept",
+    "rejectionLayer": "schema",
+    "reason": "Step dispatch parks a step in TERMINAL_PENDING while awaiting its terminal outcome",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "event": {
+        "eventId": "event-two",
+        "runId": "run-one",
+        "sequence": 2,
+        "occurredAt": "2026-09-07T12:00:01.000Z",
+        "actor": {
+          "type": "system",
+          "id": "proofrail"
+        },
+        "entity": {
+          "kind": "step",
+          "runId": "run-one",
+          "taskId": "task-one",
+          "stepId": "step-one",
+          "attempt": 1
+        },
+        "fromState": "RUNNING",
+        "toState": "TERMINAL_PENDING",
+        "previousEventHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "inputEvidence": [
+          "sha256:2222222222222222222222222222222222222222222222222222222222222222"
+        ],
+        "reason": {
+          "code": "agent-dispatched"
+        }
+      },
+      "eventHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333"
+    }
+  },
+  {
+    "fixtureId": "state-event-step-terminal-pending-passed-valid",
+    "schema": "state-event.schema.json",
+    "expected": "accept",
+    "rejectionLayer": "schema",
+    "reason": "A completed terminal receipt is the only AgentRunner path from TERMINAL_PENDING to PASSED",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "event": {
+        "eventId": "event-three",
+        "runId": "run-one",
+        "sequence": 3,
+        "occurredAt": "2026-09-07T12:00:02.000Z",
+        "actor": {
+          "type": "system",
+          "id": "proofrail"
+        },
+        "entity": {
+          "kind": "step",
+          "runId": "run-one",
+          "taskId": "task-one",
+          "stepId": "step-one",
+          "attempt": 1
+        },
+        "fromState": "TERMINAL_PENDING",
+        "toState": "PASSED",
+        "previousEventHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+        "inputEvidence": [
+          "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+        ],
+        "reason": {
+          "code": "agent-terminal-completed"
+        }
+      },
+      "eventHash": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+    }
+  },
+  {
     "fixtureId": "hook-result-minimal-valid",
     "schema": "hook-result.schema.json",
     "expected": "accept",

@@ -19,7 +19,10 @@ func (engine *Engine) Recover(ctx context.Context) error {
 		return engine.pauseUncertain(ctx, err)
 	}
 	for _, state := range projection.StepStates {
-		if state == "RUNNING" || state == "WAITING_FOR_OPERATOR" {
+		// RUNNING and WAITING_FOR_OPERATOR are dwell states whose owner may still
+		// be writing; TERMINAL_PENDING records a dispatched AgentRunner step with
+		// no routed terminal fact yet. None of them may be resumed by guessing.
+		if state == "RUNNING" || state == "WAITING_FOR_OPERATOR" || state == "TERMINAL_PENDING" {
 			return engine.pauseUncertain(ctx, ErrRecoveryUncertain)
 		}
 	}

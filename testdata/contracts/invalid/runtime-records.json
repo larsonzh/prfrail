@@ -75,6 +75,41 @@
     }
   },
   {
+    "fixtureId": "state-event-step-terminal-pending-resume-invalid",
+    "schema": "state-event.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "TERMINAL_PENDING is not a resumable scheduling state; it cannot return to RUNNING",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "event": {
+        "eventId": "event-two",
+        "runId": "run-one",
+        "sequence": 2,
+        "occurredAt": "2026-09-07T12:00:01.000Z",
+        "actor": {
+          "type": "system",
+          "id": "proofrail"
+        },
+        "entity": {
+          "kind": "step",
+          "runId": "run-one",
+          "taskId": "task-one",
+          "stepId": "step-one",
+          "attempt": 1
+        },
+        "fromState": "TERMINAL_PENDING",
+        "toState": "RUNNING",
+        "previousEventHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "inputEvidence": [],
+        "reason": {
+          "code": "agent-dispatched"
+        }
+      },
+      "eventHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333"
+    }
+  },
+  {
     "fixtureId": "hook-result-invalid-hash",
     "schema": "hook-result.schema.json",
     "expected": "reject",

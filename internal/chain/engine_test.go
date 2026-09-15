@@ -35,6 +35,7 @@ func (fake *fakeWorkspaces) Materialize(_ context.Context, _ string, task string
 type fakeSteps struct {
 	requests []StepRequest
 	failTask string
+	evidence []string
 	pause    func()
 }
 
@@ -61,6 +62,9 @@ func (fake *fakeSteps) Execute(_ context.Context, request StepRequest) (StepResu
 	}
 	if request.TaskID == fake.failTask {
 		return StepResult{}, errors.New("runner failed")
+	}
+	if len(fake.evidence) > 0 {
+		return StepResult{Evidence: append([]string(nil), fake.evidence...)}, nil
 	}
 	return StepResult{Evidence: []string{stopHash}}, nil
 }
@@ -209,14 +213,15 @@ func TestEnginePreparesAgentRunnerIntentBeforeSingleExecutionPort(t *testing.T) 
 		return StepExecutionIntent{}, nil
 	}}
 	options.StepIntents = preparer
+	steps.evidence = agentRunnerDispatchEvidence()
 	engine, err := New(context.Background(), options)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := engine.Run(context.Background()); err != nil {
-		t.Fatal(err)
+	if err := engine.Run(context.Background()); !errors.Is(err, ErrAwaitingAgentRunnerTerminal) {
+		t.Fatalf("a dispatched AgentRunner step must await its terminal, got %v", err)
 	}
-	if len(preparer.requests) != 4 || len(steps.requests) != 4 {
+	if len(preparer.requests) != 3 || len(steps.requests) != 3 {
 		t.Fatalf("unexpected prepare/execute calls: prepare=%d execute=%d", len(preparer.requests), len(steps.requests))
 	}
 	for index, request := range steps.requests {
@@ -231,6 +236,21 @@ func TestEnginePreparesAgentRunnerIntentBeforeSingleExecutionPort(t *testing.T) 
 		} else if request.ExecutionTarget != DefaultExecution || request.AgentRunnerFacts != nil {
 			t.Fatalf("request %d unexpectedly received AgentRunner intent: %+v", index, request)
 		}
+	}
+	if projection := engine.Projection(); projection.StepStates[stepKey("task-two", "code-isolated", 1)] != "TERMINAL_PENDING" {
+		t.Fatalf("dispatch did not park the step: %+v", projection)
+	}
+	if _, err := engine.SubmitAgentRunnerTerminal(context.Background(), agentRunnerTerminal(AgentRunnerTerminalCompleted)); err != nil {
+		t.Fatal(err)
+	}
+	if err := engine.Run(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if len(preparer.requests) != 4 || len(steps.requests) != 4 {
+		t.Fatalf("terminal routing did not resume the run: prepare=%d execute=%d", len(preparer.requests), len(steps.requests))
+	}
+	if engine.Projection().ChainState != "COMPLETED" {
+		t.Fatalf("run did not complete after routing the terminal: %+v", engine.Projection())
 	}
 }
 

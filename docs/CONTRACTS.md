@@ -69,11 +69,12 @@ Schema 只接受以下单步转换，未列出的转换、自转换和跨 attemp
 	`REVIEW_PENDING→PASSED|REPAIR_PENDING|FAILED|CANCELLED`；`FAILED→REPAIR_PENDING`；
 	`REPAIR_PENDING→STEPS_RUNNING|FAILED|CANCELLED`。
 - step：`NONE→PENDING`；`PENDING→RUNNING|NOOP_RECORDED|FAILED|CANCELLED`；
-	`RUNNING→WAITING_FOR_OPERATOR|PASSED|FAILED|CANCELLED`；
+	`RUNNING→TERMINAL_PENDING|WAITING_FOR_OPERATOR|PASSED|FAILED|CANCELLED`；
+	`TERMINAL_PENDING→WAITING_FOR_OPERATOR|PASSED|FAILED|CANCELLED`；
 	`WAITING_FOR_OPERATOR→RUNNING|FAILED|CANCELLED`。
 
 `NONE` 只用于创建事件，不是投影可停留状态。`COMPLETED`、`PASSED`、`NOOP_RECORDED` 和
-`CANCELLED` 是终态。只有 task 的 `FAILED→REPAIR_PENDING` 可离开失败态；step 修复必须增加 attempt。
+`CANCELLED` 是终态。只有 task 的 `FAILED→REPAIR_PENDING` 可离开失败态；step 修复必须增加 attempt。`TERMINAL_PENDING` 不是可停留的调度态：它只在对应终局路由时离开；重启后无终局证据时按不确定暂停处理。
 
 - 每次状态转换先持久化 append-only state event，再更新可丢弃、可重建的 projection；事件按 run 使用
 	从 1 开始的连续 sequence 和 previousEventHash 串联，并绑定 entity、前后状态、actor、证据与 reason。
@@ -219,9 +220,11 @@ dispatch 的 replay 处置规则：仅 R（`unknown-block`）不得 launch；lau
 
 `launches/` 与 `requests/`、`completions/` 适用同一路径安全、所有权与同步纪律：生产构造器创建或确认它，运行期读写入口复检其组件级 symlink/reparse，标记缺失时非空即 corruption。本切片（A2）本身不结算、不发布 completion、不接 Engine、不运行真实候选（结算与终局发布见下段）；T027 仍为 `BLOCKED / NOT IMPLEMENTED`，AT-23 未通过。
 
-终局发布与结算为 store-local 二文件协议（不进 wire、不参与 R/C 的 recordHash）：`AgentRunnerTerminalPublisher` 必须先以 no-replace 单调发布 `terminals/terminal-intent.<requestId>.jsonl`（terminal-intent，内嵌完整 completion 记录与结算计划：`settlementEntryId`、`settlementIdempotencyKey`、`reservationHash`、结算状态与金额、调用/token 与证据摘要；碰撞后有界重读收敛，无法判定即 convergence failure），随后向成本账本 `Settle` 该计划（账本按 `idempotencyKey` 去重：同键同载荷幂等、同 reservation 异键按结算冲突拒绝，重复回执不可重复结算），再经 replay store 发布 C，最后以同样规则发布 `terminals/terminal-closure.<requestId>.jsonl` 完成链。结算条目的证据必须包含被判定的 C recordHash 与 R recordHash，使“已入账结算必有可审计 C”由条目自身成立。发布耐久未证明的平台上，发布器必须在任何结算之前拒绝新的终局发布（不写意图、不结算、不发布 C、不写 closure），已有完整链只可无写重放。无 terminal-intent 的 C 是孤儿（无法证明任何结算决策记录）必须 fail-closed，且不得回写意图“收养”； reservation 已被异键结算占用时不得发布 C；结算状态为 unknown 时 reservation 保持占用（继续计入 unknown 占用与共享上限、不得复用、不得 relaunch），不得据此伪造完成。崩溃恢复只依据 store-local 记录：intent 是结算计划与完成体的唯一可恢复来源，账本只作强制者（幂等与冲突判定）而非查询源；恢复是完成自己已赢得槽位的幂等补写，不等于接管，接管仍属后续 operator 切片；chain terminal 路由与 postflight 接受不在本协议范围内。
+终局发布与结算为 store-local 二文件协议（不进 wire、不参与 R/C 的 recordHash）：`AgentRunnerTerminalPublisher` 必须先以 no-replace 单调发布 `terminals/terminal-intent.<requestId>.jsonl`（terminal-intent，内嵌完整 completion 记录与结算计划：`settlementEntryId`、`settlementIdempotencyKey`、`reservationHash`、结算状态与金额、调用/token 与证据摘要；碰撞后有界重读收敛，无法判定即 convergence failure），随后向成本账本 `Settle` 该计划（账本按 `idempotencyKey` 去重：同键同载荷幂等、同 reservation 异键按结算冲突拒绝，重复回执不可重复结算），再经 replay store 发布 C，最后以同样规则发布 `terminals/terminal-closure.<requestId>.jsonl` 完成链。结算条目的证据必须包含被判定的 C recordHash 与 R recordHash，使“已入账结算必有可审计 C”由条目自身成立。发布耐久未证明的平台上，发布器必须在任何结算之前拒绝新的终局发布（不写意图、不结算、不发布 C、不写 closure），已有完整链只可无写重放。无 terminal-intent 的 C 是孤儿（无法证明任何结算决策记录）必须 fail-closed，且不得回写意图“收养”； reservation 已被异键结算占用时不得发布 C；结算状态为 unknown 时 reservation 保持占用（继续计入 unknown 占用与共享上限、不得复用、不得 relaunch），不得据此伪造完成。崩溃恢复只依据 store-local 记录：intent 是结算计划与完成体的唯一可恢复来源，账本只作强制者（幂等与冲突判定）而非查询源；恢复是完成自己已赢得槽位的幂等补写，不等于接管，接管仍属后续 operator 切片；postflight 接受不在本协议范围内。
 
-需要人工输入时，CLI Agent adapter 只能上报结构化 `operator-action-required`；ProofRail 在原子边界停止或暂停受管代理，持久化请求并令 task/step 进入 `WAITING_FOR_OPERATOR`。通知、答复和控制权归还由 ProofRail 自有 CLI/TUI 承担。用户输入必须经 ProofRail 校验并持久化为适用的 operator interaction、review、authorization 或 handoff 记录；终端/聊天自由文本不能直接改变状态或授权。恢复同一 Agent 会话前须重新验证 attempt、workspace、session、上下文摘要、租约和授权。T025 已冻结一般澄清问答的 `operator-interaction` Schema、正反样例、RFC 8785 摘要、追加式 JSONL 重放和 Engine open/resume 控制 API；控制 API 只在 request/response、当前绑定与等待态一致时返回恢复命令，事件部分写入时保持 chain 暂停并按证据哈希幂等收敛。真实 Agent session 续跑由 T027 接入。
+chain terminal 路由（A4）：`agent-runner-completion` 的任何状态只表示外部执行结束，不直接驱动任务结论。终端回执必须翻译为 chain 自有 terminal 事实并经核心 `SubmitAgentRunnerTerminal` 显式路由：completed 只允许 step `TERMINAL_PENDING→PASSED`，任务仍依次经过 freeze、gates、review 与 completed promotion 才可 PASSED，chain 仅在全部任务接受后 COMPLETED；failed 与 uncertain 落 task `FAILED`（uncertain 另保持 chain `PAUSED` 且禁止重试），cancelled 先归档停机证据再写终态，operator-action-required 在写入 task/step `WAITING_FOR_OPERATOR`（证据含完成记录哈希）的同时把 chain `RUNNING→PAUSED`（同证据）并进入既有 operator-interaction 机器，使“路由即暂停”成立：重启同样能开出交互并收敛。该等待态由 Open 侧加法式接受——等待中的 task/step 与暂停的 chain 可匹配 agent 终局路由写入的转移；控制台账本仍是交互排他性的唯一所有者（该路径上 Open 不校验交互记录哈希，与经典路径的差异是有意的边界）。uncertain 终局只把处于 `RUNNING` 的 chain 置为 `PAUSED`；chain 已因其他原因暂停时不改写暂停原因（转移表不允许 `PAUSED→PAUSED`），使用方须在 task `FAILED` 边界停止而非自动续跑。同一请求的重复终局必须幂等收敛，不同终局为冲突。resume 必须绑定 `priorSessionId` 与 `priorCompletionHash`，且 `priorCompletionHash` 必须存在于该 step 的事件证据历史中；无法证明连续性时拒绝路由并由调用方从持久 envelope 建立新 attempt，禁止猜测续接成功。本段不包含 postflight 接受判定，也不改变下游 acceptance 政策所有权。
+
+需要人工输入时，CLI Agent adapter 只能上报结构化 `operator-action-required`；ProofRail 在原子边界停止或暂停受管代理，持久化请求并令 task/step 进入 `WAITING_FOR_OPERATOR`。通知、答复和控制权归还由 ProofRail 自有 CLI/TUI 承担。用户输入必须经 ProofRail 校验并持久化为适用的 operator interaction、review、authorization 或 handoff 记录；终端/聊天自由文本不能直接改变状态或授权。恢复同一 Agent 会话前须重新验证 attempt、workspace、session、上下文摘要、租约和授权。T025 已冻结一般澄清问答的 `operator-interaction` Schema、正反样例、RFC 8785 摘要、追加式 JSONL 重放和 Engine open/resume 控制 API；控制 API 只在 request/response、当前绑定与等待态一致时返回恢复命令，事件部分写入时保持 chain 暂停并按证据哈希幂等收敛；由 agent 终局路由产生的 `WAITING_FOR_OPERATOR` 转移（证据含完成记录哈希）同样进入该等待态匹配。真实 Agent session 续跑由 T027 接入。
 
 SessionBridge v0.1.1 的 `silent`/`visible`/`auto` 均不是正式 AgentRunner：`silent` 可用于无工具的分类、摘要、计划、结构化分析或 managed-change-set 建议；`visible` 可用于观察、诊断、通知、人工接管及下述受监督黑箱候选流程；`auto` 不进入正式流程，因为其实际路径和能力不确定。任何 SessionBridge 使用仍须内置 v1 文件 IPC 客户端、`legacy=false`、requestId 回执绑定和自身持久幂等；连续辅助会话可使用稳定 `conversationId`，但 history 只作上下文。不得把 visible 投递成功解释为 Agent 完成，也不得在 CLI Agent 失败后自动切换模式继续写入。
 

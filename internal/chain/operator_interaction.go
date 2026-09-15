@@ -348,20 +348,20 @@ func (engine *Engine) OpenOperatorInteraction(ctx context.Context, requestRecord
 		}
 	} else if engine.state.projection.ChainState != "PAUSED" {
 		return fmt.Errorf("%w: interaction open requires RUNNING or PAUSED chain", ErrInvalidState)
-	} else if matches, err := engine.latestTransitionMatches(ctx, chainEntity(request.RunID), "PAUSED", "operator-interaction-required", requestRecord.RecordHash); err != nil {
+	} else if matches, err := engine.operatorWaitingPauseMatches(ctx, chainEntity(request.RunID), requestRecord.RecordHash); err != nil {
 		return err
 	} else if !matches {
 		return fmt.Errorf("%w: paused chain belongs to another control action", ErrInvalidOperatorInteraction)
 	}
 	if taskState == "WAITING_FOR_OPERATOR" {
-		if matches, err := engine.latestTransitionMatches(ctx, task, taskState, "operator-interaction-required", requestRecord.RecordHash); err != nil {
+		if matches, err := engine.operatorWaitingMatches(ctx, task, requestRecord.RecordHash); err != nil {
 			return err
 		} else if !matches {
 			return fmt.Errorf("%w: waiting task belongs to another interaction", ErrInvalidOperatorInteraction)
 		}
 	}
 	if stepState == "WAITING_FOR_OPERATOR" {
-		if matches, err := engine.latestTransitionMatches(ctx, step, stepState, "operator-interaction-required", requestRecord.RecordHash); err != nil {
+		if matches, err := engine.operatorWaitingMatches(ctx, step, requestRecord.RecordHash); err != nil {
 			return err
 		} else if !matches {
 			return fmt.Errorf("%w: waiting step belongs to another interaction", ErrInvalidOperatorInteraction)
@@ -407,13 +407,13 @@ func (engine *Engine) ResumeOperatorInteraction(ctx context.Context, requestReco
 		taskReason = "operator-interaction-answered"
 		taskHashes = inputs
 	}
-	if matches, matchErr := engine.latestTransitionMatches(ctx, task, taskState, taskReason, taskHashes...); matchErr != nil {
+	if matches, matchErr := engine.waitingTaskBindingMatches(ctx, task, taskState, taskReason, taskHashes, requestRecord.RecordHash); matchErr != nil {
 		return OperatorResumeCommand{}, matchErr
 	} else if !matches {
 		return OperatorResumeCommand{}, fmt.Errorf("%w: task belongs to another interaction", ErrInvalidOperatorInteraction)
 	}
 	if stepState == "WAITING_FOR_OPERATOR" {
-		if matches, matchErr := engine.latestTransitionMatches(ctx, step, stepState, "operator-interaction-required", requestRecord.RecordHash); matchErr != nil {
+		if matches, matchErr := engine.operatorWaitingMatches(ctx, step, requestRecord.RecordHash); matchErr != nil {
 			return OperatorResumeCommand{}, matchErr
 		} else if !matches {
 			return OperatorResumeCommand{}, fmt.Errorf("%w: waiting step belongs to another interaction", ErrInvalidOperatorInteraction)
@@ -439,22 +439,52 @@ func (engine *Engine) latestTransitionMatches(ctx context.Context, entity eviden
 	if err != nil {
 		return false, err
 	}
-	for index := len(events) - 1; index >= 0; index-- {
-		event := events[index].Event
-		if event.Entity != entity {
-			continue
-		}
-		if event.ToState != state || event.Reason.Code != reason {
-			return false, nil
-		}
-		for _, hash := range hashes {
-			if !slices.Contains(event.InputEvidence, hash) {
-				return false, nil
-			}
-		}
+	return latestEntityEventMatches(events, entity, state, reason, hashes...), nil
+}
+
+// operatorWaitingMatches binds a task or step that is already
+// WAITING_FOR_OPERATOR to an interaction record. The interaction binding is
+// tried first and the agent terminal route is accepted additively: a waiting
+// transition produced by terminal routing binds the terminal receipt, because
+// the route runs before any interaction record exists. Everything else - the
+// interaction policy, the ledger exclusivity, and the response binding - is
+// unchanged.
+func (engine *Engine) operatorWaitingMatches(ctx context.Context, entity evidence.Entity, interactionRecordHash string) (bool, error) {
+	if matches, err := engine.latestTransitionMatches(ctx, entity, "WAITING_FOR_OPERATOR", "operator-interaction-required", interactionRecordHash); err != nil {
+		return false, err
+	} else if matches {
 		return true, nil
 	}
-	return false, nil
+	return engine.latestTransitionMatches(ctx, entity, "WAITING_FOR_OPERATOR", agentRunnerTerminalWaitingReason)
+}
+
+// waitingTaskBindingMatches applies the resume task check, and accepts the
+// agent terminal route only while the task is still WAITING_FOR_OPERATOR. Once
+// the task has been returned to STEPS_RUNNING the original proof is the only
+// accepted one.
+func (engine *Engine) waitingTaskBindingMatches(ctx context.Context, task evidence.Entity, taskState, taskReason string, taskHashes []string, interactionRecordHash string) (bool, error) {
+	if matches, err := engine.latestTransitionMatches(ctx, task, taskState, taskReason, taskHashes...); err != nil {
+		return false, err
+	} else if matches {
+		return true, nil
+	}
+	if taskState != "WAITING_FOR_OPERATOR" {
+		return false, nil
+	}
+	return engine.operatorWaitingMatches(ctx, task, interactionRecordHash)
+}
+
+// operatorWaitingPauseMatches binds a paused chain to an interaction record. The
+// interaction pause is tried first and the pause written by agent terminal
+// routing is accepted additively, because that route pauses the run before any
+// interaction record exists.
+func (engine *Engine) operatorWaitingPauseMatches(ctx context.Context, chain evidence.Entity, interactionRecordHash string) (bool, error) {
+	if matches, err := engine.latestTransitionMatches(ctx, chain, "PAUSED", "operator-interaction-required", interactionRecordHash); err != nil {
+		return false, err
+	} else if matches {
+		return true, nil
+	}
+	return engine.latestTransitionMatches(ctx, chain, "PAUSED", agentRunnerTerminalWaitingReason)
 }
 
 func OpenOperatorInteractionTransition(taskState, stepState string) (nextTaskState, nextStepState string, err error) {

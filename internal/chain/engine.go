@@ -147,6 +147,9 @@ func (engine *Engine) runTask(ctx context.Context, task Task) error {
 		}
 		state = "PRECHECK"
 	}
+	if state == "FAILED" {
+		return fmt.Errorf("%w: task %q already failed", ErrStepFailed, task.ID)
+	}
 	if state == "REPAIR_PENDING" || state == "WAITING_FOR_OPERATOR" {
 		if engine.state.projection.ChainState == "RUNNING" {
 			if err := engine.transition(ctx, chainEntity(engine.options.RunID), "PAUSED", nil, "repair-required"); err != nil {
@@ -276,6 +279,9 @@ func (engine *Engine) runStep(ctx context.Context, taskID string, step Step, par
 	if state == "PASSED" || state == "NOOP_RECORDED" {
 		return nil
 	}
+	if state == "TERMINAL_PENDING" {
+		return fmt.Errorf("%w: step %q was dispatched and awaits its terminal fact", ErrAwaitingAgentRunnerTerminal, step.ID)
+	}
 	if state == "NONE" {
 		if err := engine.transition(ctx, entity, "PENDING", nil, "step-created"); err != nil {
 			return err
@@ -285,12 +291,17 @@ func (engine *Engine) runStep(ctx context.Context, taskID string, step Step, par
 	if step.Kind == "noop" {
 		return engine.transition(ctx, entity, "NOOP_RECORDED", nil, "noop-recorded")
 	}
-	if state != "PENDING" {
-		return fmt.Errorf("%w: step %q is %s", ErrRecoveryUncertain, step.ID, state)
+	reentry := state != "PENDING"
+	if reentry {
+		if err := engine.awaitAgentRunnerResume(ctx, entity, step, state); err != nil {
+			return err
+		}
 	}
 	request := StepRequest{RunID: engine.options.RunID, TaskID: taskID, Step: step, Attempt: 1, ParentHash: parent.Hash, Workspace: workspace}
-	if err := engine.transition(ctx, entity, "RUNNING", nil, "step-started"); err != nil {
-		return err
+	if !reentry {
+		if err := engine.transition(ctx, entity, "RUNNING", nil, "step-started"); err != nil {
+			return err
+		}
 	}
 	if engine.options.StepIntents != nil {
 		intent, err := engine.options.StepIntents.PrepareStepIntent(ctx, request)
@@ -317,6 +328,12 @@ func (engine *Engine) runStep(ctx context.Context, taskID string, step Step, par
 			return err
 		}
 	}
+	if reentry && request.AgentRunnerFacts == nil {
+		// Re-entry is only a resume: a step that was not prepared as an
+		// AgentRunner step keeps the pre-existing fail-closed behaviour and is
+		// never executed twice.
+		return fmt.Errorf("%w: step %q is RUNNING and was not prepared as an AgentRunner step", ErrRecoveryUncertain, step.ID)
+	}
 	result, err := engine.options.Steps.Execute(ctx, request)
 	if err != nil {
 		if transitionErr := engine.transition(ctx, entity, "FAILED", result.Evidence, "step-failed"); transitionErr != nil {
@@ -324,7 +341,33 @@ func (engine *Engine) runStep(ctx context.Context, taskID string, step Step, par
 		}
 		return engine.failTask(ctx, taskID, "step-failed", err)
 	}
+	if request.AgentRunnerFacts != nil {
+		// A dispatch result only proves that the external run started. The step
+		// parks until the core routes a terminal fact; it never passes here.
+		if err := engine.transition(ctx, entity, "TERMINAL_PENDING", uniqueHashes(result.Evidence), agentRunnerDispatchedReason); err != nil {
+			return err
+		}
+		return fmt.Errorf("%w: step %q dispatched request %s", ErrAwaitingAgentRunnerTerminal, step.ID, request.AgentRunnerFacts.RequestID)
+	}
 	return engine.transition(ctx, entity, "PASSED", result.Evidence, "step-passed")
+}
+
+// awaitAgentRunnerResume guards the only re-entry the core allows for a step
+// that is already RUNNING: an AgentRunner step whose turn was returned by an
+// operator answer. Every other re-entry keeps the pre-existing fail-closed
+// behaviour, so a crashed dispatch can never be repeated by guessing.
+func (engine *Engine) awaitAgentRunnerResume(ctx context.Context, entity evidence.Entity, step Step, state string) error {
+	if state != "RUNNING" || step.Kind != "code" || step.Mode != IsolatedWorkspace {
+		return fmt.Errorf("%w: step %q is %s", ErrRecoveryUncertain, step.ID, state)
+	}
+	events, err := engine.options.Events.Load(ctx)
+	if err != nil {
+		return err
+	}
+	if !latestEntityEventMatches(events, entity, "RUNNING", operatorInteractionAnsweredReason) {
+		return fmt.Errorf("%w: step %q is RUNNING without a proven operator resume", ErrRecoveryUncertain, step.ID)
+	}
+	return nil
 }
 
 func (engine *Engine) boundary(ctx context.Context) error {
@@ -358,7 +401,7 @@ func (engine *Engine) cancelRun(ctx context.Context) error {
 		for _, step := range task.Steps {
 			entity := stepEntity(engine.options.RunID, task.ID, step.ID)
 			state := engine.state.current(entity)
-			if state == "PENDING" || state == "RUNNING" || state == "WAITING_FOR_OPERATOR" {
+			if state == "PENDING" || state == "RUNNING" || state == "TERMINAL_PENDING" || state == "WAITING_FOR_OPERATOR" {
 				if err := engine.transition(ctx, entity, "CANCELLED", evidenceHashes, "operator-cancelled"); err != nil {
 					return err
 				}

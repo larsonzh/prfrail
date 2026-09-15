@@ -219,6 +219,12 @@
         {
           "properties": {
             "fromState": {"const": "RUNNING"},
+            "toState": {"enum": ["TERMINAL_PENDING", "WAITING_FOR_OPERATOR", "PASSED", "FAILED", "CANCELLED"]}
+          }
+        },
+        {
+          "properties": {
+            "fromState": {"const": "TERMINAL_PENDING"},
             "toState": {"enum": ["WAITING_FOR_OPERATOR", "PASSED", "FAILED", "CANCELLED"]}
           }
         },
