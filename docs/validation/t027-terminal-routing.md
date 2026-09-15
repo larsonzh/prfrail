@@ -1,6 +1,6 @@
 ﻿# T027 · A4 · chain terminal routing and resume — 验证报告
 
-日期：2026-09-15。结论：`A4 本地实现与门禁 PASS`；提交/推送与 CI 证据需用户同轮显式授权后回写。
+日期：2026-09-15。结论：`A4 完成`；已提交 `a21335d` 并推送，GitHub Actions Ubuntu（含 `Race` 与 `Contract fixtures` 步骤）/Windows 全绿（run 34920155025）。
 切片目标：把终局语义收敛到 chain 核心路由与恢复，禁止 adapter receipt 直接驱动任务结论或跳过下游 acceptance。
 
 ## 1. 交付范围
@@ -77,7 +77,7 @@
 | `npm test`（`tools/contracts`） | 4/4 通过（126 个契约夹具，含新增 3 条） |
 | `Select-String`/字节检查（`.md`） | `docs/CONTRACTS{,_EN}.md`、`docs/t027/REMAINING_SLICES{,_EN}.md`、本报告：BOM=True、CRLF=False |
 
-Linux CI（含 `Race` 步骤与 `Contract fixtures` 步骤）证据待授权提交/推送后回写。
+Linux CI：已提交 `a21335d` 并推送；GitHub Actions `Go ubuntu-latest`（含 `Race` 与 `Contract fixtures` 步骤）与 `Go windows-latest` 均绿（run 34920155025）；Windows 侧 `Race`/`Contract fixtures` 按 `runner.os == 'Linux'` 条件跳过。
 
 ## 7. 复现方式
 

@@ -1,6 +1,6 @@
 ﻿# T027 · A4 · chain terminal routing and resume — Validation Report
 
-Date: 2026-09-15. Verdict: `A4 implementation and local gates PASS`; commit/push and CI evidence are written back only after explicit same-turn user authorization.
+Date: 2026-09-15. Verdict: `A4 complete`; committed as `a21335d` and pushed, GitHub Actions Ubuntu (including the `Race` and `Contract fixtures` steps)/Windows green (run 34920155025).
 Slice goal: converge terminal semantics into chain core routing and recovery, so an adapter receipt can never drive a task conclusion or skip the downstream acceptance flow.
 
 ## 1. Scope delivered
@@ -77,7 +77,7 @@ Conclusion: every Medium+ finding was fixed and re-reviewed by the independent r
 | `npm test` (`tools/contracts`) | 4/4 pass (126 contract fixtures including the 3 new ones) |
 | byte checks (`.md`) | `docs/CONTRACTS{,_EN}.md`, `docs/t027/REMAINING_SLICES{,_EN}.md`, this report: BOM=True, CRLF=False |
 
-Linux CI evidence (with the `Race` step and the `Contract fixtures` step) is written back after an authorized commit/push.
+CI: committed as `a21335d` and pushed; GitHub Actions `Go ubuntu-latest` (including the `Race` and `Contract fixtures` steps) and `Go windows-latest` are both green (run 34920155025); on Windows the `Race`/`Contract fixtures` steps are skipped by their `runner.os == 'Linux'` condition.
 
 ## 7. How to reproduce
 
