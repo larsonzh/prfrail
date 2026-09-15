@@ -1,6 +1,6 @@
 ﻿# T027 · A5 · chain postflight acceptance — Validation Report
 
-Date: 2026-09-15. Verdict: `A5 complete (all local gates green, awaiting commit authorization)`.
+Date: 2026-09-15. Verdict: `A5 complete`; committed as `b8bad47` and pushed, with GitHub Actions Ubuntu (including the `Race` and `Contract fixtures` steps) / Windows fully green (run 34950623175).
 Slice goal: move a task's review qualification away from adapter records and into a chain-owned postflight gate — only "rebuildable frozen facts plus an independently decided pass" may write `REVIEW_PENDING`.
 
 ## 1. Scope
@@ -87,3 +87,4 @@ After each mutation the source was restored and verified by SHA-256 (the backup 
 - Byte-level encoding/EOL verification of every changed file: `.md` is UTF-8 **with BOM** + LF; `.go`/`.json`/`.js` are UTF-8 **without BOM** + LF.
 - Reproduction: `go test -count=1 ./internal/chain/... ./internal/adapters/... ./internal/console/... ./internal/evidence/...`; the contract gate is above.
 - This offline slice used **0 paid probes** (budget 0/0), called no real CLI and accessed no network.
+- Remote CI: GitHub Actions run 34950623175 (commit `b8bad47`) is fully green — the Ubuntu job actually executed the Race and Contract fixtures steps, while the Windows job skips both by the `runner.os == 'Linux'` condition.

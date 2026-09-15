@@ -1,6 +1,6 @@
 ﻿# T027 · A5 · chain postflight acceptance — 验证报告
 
-日期：2026-09-15。结论：`A5 完成（本地门禁全绿，待提交授权）`。
+日期：2026-09-15。结论：`A5 完成`；已提交 `b8bad47` 并推送，GitHub Actions Ubuntu（含 `Race` 与 `Contract fixtures` 步骤）/Windows 全绿（run 34950623175）。
 切片目标：把 task 的 review 资格从 adapter 记录收敛到 chain 自有 postflight 门——只有“可重建的冻结事实 + 端口独立判定通过”才允许写 `REVIEW_PENDING`。
 
 ## 1. 交付范围
@@ -87,3 +87,4 @@ $$\text{routeEvidence} = [\text{RequestHash},\ \text{CompletionHash},\ \text{Man
 - 编码/行尾硬规则逐文件字节校验：改动过的 `.md` 为 UTF-8 **with BOM** + LF，`.go`/`.json`/`.js` 为 UTF-8 **without BOM** + LF。
 - 复现命令：`go test -count=1 ./internal/chain/... ./internal/adapters/... ./internal/console/... ./internal/evidence/...`；契约门禁见上。
 - 本切片为离线切片，**未使用付费探针**（额度 0/0），未调用真实 CLI、未访问网络。
+- 远端 CI：GitHub Actions run 34950623175（commit `b8bad47`）全绿——Ubuntu 作业实际执行了 Race 与 Contract fixtures 步骤，Windows 作业的这两个步骤按 `runner.os == 'Linux'` 条件跳过。
