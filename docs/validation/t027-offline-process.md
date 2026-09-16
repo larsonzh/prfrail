@@ -1,6 +1,6 @@
 ﻿# T027 · A6 · 离线 pinned CLI 运行 — 验证报告
 
-日期：2026-09-15。结论：`A6 完成（待授权提交）`；工作区未提交、未推送。⑤ 标准门禁与原生实验全绿（详见 §9、§10）。④ 试点（Haiku + MAI）：组合可用、能发现真问题，但存在**非零残差**（本片漏 1 项 High，由用户同轮授权的追加 Codex 盲审捕获、经 4 条变异证实并整改；详见 §7.1/§7.2）——建议组合作常规切片的低成本补充扫描层、硬门切片 A7/B2/B3/B4 保留 Codex 终审，最终由用户决定。变异审计 **52 项全 RED / SURVIVED 0**（§8）。
+日期：2026-09-15（Linux 僵尸语义回归修复 2026-09-16，见 §14）。结论：`A6 完成`；`c2d2819` 已提交并推送 `origin/main`；CI 的 Ubuntu 腿暴露 Linux 停机判定缺陷 → 已修复并新增 Linux 回归测试（§14）。⑤ 标准门禁与原生实验全绿（详见 §9、§10）。④ 试点（Haiku + MAI）：组合可用、能发现真问题，但存在**非零残差**（本片漏 1 项 High，由用户同轮授权的追加 Codex 盲审捕获、经 4 条变异证实并整改；详见 §7.1/§7.2）——建议组合作常规切片的低成本补充扫描层、硬门切片 A7/B2/B3/B4 保留 Codex 终审，最终由用户决定。变异审计 **52 项全 RED / SURVIVED 0**（§8）。
 切片目标：为 chain 提供一次**可证明的离线外部运行**——用代码常量固定版本的外部 CLI，绑定运行时长与宽限，停止整棵进程树，采集五枚冻结事实，并把结果映射为可被 chain 直接消费的终局（completed / failed / cancelled / operator-action-required / uncertain），任何缺口与未证明的停机都不得以 completed 表达。
 
 ## 1. 交付范围
@@ -40,6 +40,7 @@ $$\text{事实}=\{\text{ManifestHash(post)},\ \text{DiffHash},\ \text{LogHash(�
 - 停机只经已持久身份（句柄自身身份；无句柄时经镜像 + run root 所有者校验）走既有 `StopProcessIdentity`，重复停机幂等为 `already-stopped`；自然退出同样补一份 `already-stopped` 证明。
 - 取消路径的验证 context 由 grace 派生（不再是无界后台 context）；`Terminate` 的验证界与调用方 deadline 解耦。
 - 看门狗判负后，launcher 在 `agentRunnerSettleWait(grace)`（grace+500ms，封顶 10s）内等待运行侧完成对账；未对账按 `ErrAgentRunnerLaunchUnsettled` + “unknown”占位证据返回，且该 launch 仍走持久停机路径。
+- **Linux 僵尸语义（CI 发现并修复，§14）**：存活判定不得把“已退出但尚未被父进程回收”的进程当作存活——它的 `/proc` 条目、start token 与进程组都还在，但已不可能执行或写入任何东西；把僵尸读为存活会让**不持有子句柄的停机路径**（按持久身份停机）在 grace 用尽后把已完成的停机误报为 `uncertain`。
 
 ## 5. 启动槽与所有权
 
@@ -133,6 +134,7 @@ $$\text{事实}=\{\text{ManifestHash(post)},\ \text{DiffHash},\ \text{LogHash(�
 - `gofmt -l internal cmd tools` 空；`go build ./...`、`go vet ./...` 通过；`go test -count=1 ./...` 13 个包全绿；`tools/contracts` 契约套件 4/4（含 128 夹具）。
 - 编码与行尾：新增/改动 `.go`、`.json` 为 UTF-8 无 BOM + LF；`docs/CONTRACTS.md`、`_EN.md` 与本文档为 UTF-8 **带 BOM** + LF（逐字节核验）。
 - 边界约束：adapter/新代码不 import `net`/`os/exec`（版本预检经 `guard`），`internal/release/network_test.go` 通过；未触碰 `.github/workflows` 与其摘要契约。
+- 跨平台本地门禁补强（2026-09-16，见 §14）：新增 `GOOS=linux`、`CGO_ENABLED=0` 下的 `go build ./...` 与 `go vet ./...` 交叉编译校验；Linux-only 代码路径（`internal/guard/process_linux.go`）不再只依赖 CI 暴露编译错误。
 
 ## 11. 探针与预算
 
@@ -156,6 +158,17 @@ $$\text{事实}=\{\text{ManifestHash(post)},\ \text{DiffHash},\ \text{LogHash(�
 - **events 有界前缀**：超出 1MiB 读取上界的事件请求不可见，但该前缀按不完整处置且绝不 completed。
 - **Unix 孤儿**：launcher 崩溃且父进程已退出时，镜像只命名父进程，Unix 侧子进程孤儿需依赖 process group（本片仅 Windows 原生验证）。
 - **未覆盖的观测项**（④b 复审 Section D）：树状态翻转仅一条用例钉住；落定窗口仅单一时序剖面压测。
-- **追加 Codex 盲审遗留观测项**（§7.1，均不阻塞）：① **不可读槽位的构造不可移植**——“槽位不可读”在测试中用**目录占位**（Windows 上难以非提权复现权限拒绝），Unix 侧同形构造只在 `EISDIR` 语义下成立；② **跨平台原语仅 Windows 原生验证**——`a6native` 实验（进程 job 遏制、`taskkill` 路径）**不进 CI**（`ci.yml` 只跑默认路径与 `-race` 子集），故 job 语义、孤儿回收等结论目前只有 Windows 本机证据；③ 组合残差（组合漏掉 1 项 High）见 §7.1/§7.2，属**方案层面**的已知边界，不改变本片代码结论。
+- **追加 Codex 盲审遗留观测项**（§7.1，均不阻塞）：① **不可读槽位的构造不可移植**——“槽位不可读”在测试中用**目录占位**（Windows 上难以非提权复现权限拒绝），Unix 侧同形构造只在 `EISDIR` 语义下成立；② **跨平台原语仅 Windows 原生验证**——`a6native` 实验（进程 job 遏制、`taskkill` 路径）**不进 CI**（`ci.yml` 只跑默认路径与 `-race` 子集），故 job 语义、孤儿回收等结论目前只有 Windows 本机证据（2026-09-16 更新：CI 的 Ubuntu 腿已在默认套件中真实跑过 `internal/guard` 的 Linux 停机/身份路径，并因僵尸语义缺陷暴露 12 个红灯——已修复并加 Linux 回归测试，见 §14）；③ 组合残差（组合漏掉 1 项 High）见 §7.1/§7.2，属**方案层面**的已知边界，不改变本片代码结论。
 - **第 3 次复审（测试增量）的 Section D/E**：三处“未钉住不变量”**已补钉**（缺槽阶段后复检存活、ownerless 槽兼测 owner id、`Actions` 断言由包含改为“恰一条且为 `already-stopped`”）并重跑验证；仍未钉住的是**失败路径**上的卫生性断言（若在测试后半段 `t.Fatal`，`t.Cleanup` 只保证进程被停，不保证 owner 句柄退役与日志句柄关闭），以及 §7.1 测试的“owner 清理只断言不报错”，二者均为低风险覆盖残差、非行为缺陷。
-- **未提交**：本片全部改动停留在工作区，等待用户同轮显式授权后再提交/推送（gitee 永不推送）。
+- **提交状态**：本片 `c2d2819` 已按用户同轮显式授权提交并推送 `origin/main`（gitee 永不推送）；Linux 僵尸语义修复与本文档同步随修复提交推送（§14）。
+
+## 14. CI 证据与 Linux 僵尸语义回归修复（2026-09-16）
+
+- **CI 首跑（红）**：`c2d2819` 推送后 `main CI`（run `35074301616`）Windows 腿全绿、Ubuntu 腿 **Test 失败**：12 个 pinned-CLI 用例报 `managed process termination uncertain: context deadline exceeded`，证据里 `Actions` 为 `[signal-term-process-group signal-kill-process-group]` 而无消失判定。这是本片首次在 Linux 上跑停机路径——A6 的原生验证只覆盖 Windows（§9、§13）。
+- **根因**：`process_linux.go` 的存活判定只比对 `/proc/<pid>/stat` 的 start token。进程被信号杀死但父进程尚未 `wait` 回收时为僵尸：`/proc` 条目与 start token 仍在，`kill(-pgid, 0)` 也仍成功，于是**不持有子句柄的停机路径**（launcher 用镜像身份停机，自身从不 `wait`）在 grace 用尽后把已完成的停机判成 `uncertain`。Windows 无僵尸概念（句柄 + 退出码），故该腿全绿。
+- **修复**（`internal/guard/process_linux.go`）：
+  - `readProcStat` 同时解析 state（`fields[0]`）与 pgrp（`fields[2]`），保留 start token 的 pid 复用防护；
+  - `platformIdentityAlive`：state 为 `Z`/`X`/`x`（僵尸/已死）一律视为**不在运行**；
+  - `processGroupAlive`：信号 0 仍成功时再扫描 `/proc`，仅当组内存在**非终态**成员才判存活；组属于其他用户（EPERM）时保持“保守视为存活”的旧语义（`/proc` 看不到其成员）。
+- **回归测试**（新增 `internal/guard/process_linux_test.go`，Linux-only）：`TestLinuxStopProvesAnUnreapedTerminatedChild` —— 子进程独占进程组、杀掉后**故意不回收**，断言 ① 运行中读为存活（对照组）；② 退出未回收时读为**不在运行**；③ 该组不再是存活组；④ `StopProcessIdentity` 给出 `stopped` 且 `Actions == [already-stopped]`；最后才 `wait` 回收，保证结论不是由父进程的回收造成的。修复前该用例在 5s 上界内失败。
+- **本地门禁（Windows 主机）**：`gofmt -l internal cmd tools` 空；`GOOS=linux`（`CGO_ENABLED=0`）`go build ./...` 与 `go vet ./...` 通过；Windows `go build ./...`、`go vet ./...` 通过；`go test -count=1 ./internal/guard/ ./internal/adapters/` 通过。
