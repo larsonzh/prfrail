@@ -186,7 +186,14 @@ if ($junctionCreated) {
     Assert-That $false 'the reparse-point fixture could not be created (junction support missing)'
 }
 
-if (-not $KeepArtifacts) { Remove-Item -LiteralPath $root -Recurse -Force -ErrorAction SilentlyContinue }
+if (-not $KeepArtifacts) {
+    Remove-Item -LiteralPath $root -Recurse -Force -ErrorAction SilentlyContinue
+    # Leave no empty scratch parent behind: remove tmp\b1-probe only when this run emptied it.
+    $parent = Split-Path -Parent $root
+    if ((Test-Path -LiteralPath $parent) -and -not (Get-ChildItem -LiteralPath $parent -Force)) {
+        Remove-Item -LiteralPath $parent -Force -ErrorAction SilentlyContinue
+    }
+}
 
 Write-Output ("selftest: checks=$checks failures=$($failures.Count)")
 if ($failures.Count -gt 0) {
