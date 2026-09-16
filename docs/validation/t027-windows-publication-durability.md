@@ -14,6 +14,7 @@
 - **做**：ADR 候选枚举、四行反证矩阵、最小 falsification prototype（默认套件模型实验 + `a7native` 真进程实验）、结论账本。
 - **不做**（硬门）：不改变 Windows `unproven`；不开放真实 dispatch；**不改动生产发布原语**（`writeReplayRecordNoReplace` 的可见性/持久性步骤语义不变）；不改 CONTRACTS 双语；不改 schema/fixtures/CI 工作流；不接真实候选、不联网。
 - 唯一生产文件改动是一处**nil 默认测试接缝** `replayStorePublishStageHook`（§6），用于把崩溃点定到确定阶段——纯计时 kill 无法稳定命中指定阶段。
+- **CI 证据**（2026-09-17 观察）：两个提交已推送 `origin/main` —— `cc9adf4`（生产接缝 + 4 个测试文件）与 `dee0066`（报告/ADR-013/DEV_PLAN）；GitHub Actions run **`35118531930`**（head `dee0066`）**全绿**（约 2m04s）：Windows 腿 Build/Vet/Test success，Race 与 Contract fixtures 按 `runner.os` 跳过；Ubuntu 腿 Build/Vet/Test + **Race**（`CGO_ENABLED=1 go test -race -count=1 ./internal/adapters/... ./internal/chain/...`）+ **Contract fixtures**（4/4）全 success。即**进套件的 5 项 A7 测试已在 Linux `-race` 下实际执行**；`a7native` 7 项仍不进 CI（见 §7）。
 
 ## 2. 候选协议枚举与 A7 结果
 
@@ -118,7 +119,8 @@
 
 ## 7. 已知边界与移交 B3
 
-- **U1/U2/U3/U4 全部移交 B3**；B3 的最小实验：真实断电（或等价设备级注入）+ 每轮崩溃点 journal（落**另一物理设备**且自身可证耐久）+ 重启盘点 R/C 对与目录项；逐候选（C2、C3）分别注入；任一候选要写进契约为 `proven` 必须 B3 全绿。- **a7native 不进 CI**：`a7native` 实验（含 E4/E6/E9/E10）**不进 CI 默认路径也不进 `-race` 子集**（与 `a6native` 同例，防抖动）；本节结论是**单主机**证据，需在 Windows 主机手动重跑（`$env:PROOFRAIL_A7_ROUNDS=20; go test -tags a7native -count=1 -run TestA7Native ./internal/adapters/`）。- **临时残留累积**（E8 发现）：link 前崩溃留下的 `.tmp` 无人清理。本切片**不修**（属生产行为变更，需独立切片决策）；建议 B3/操作切片评估"启动期残留清理"是否引入新的读侧语义。
+- **U1/U2/U3/U4 全部移交 B3**；B3 的最小实验：真实断电（或等价设备级注入）+ 每轮崩溃点 journal（落**另一物理设备**且自身可证耐久）+ 重启盘点 R/C 对与目录项；逐候选（C2、C3）分别注入；任一候选要写进契约为 `proven` 必须 B3 全绿。
+- **只有 `a7native` 不进 CI**：`a7native` 实验（含 E4/E6/E9/E10）**不进 CI 默认路径也不进 `-race` 子集**（与 `a6native` 同例，防抖动）；本节相关结论是**单主机**证据，需在 Windows 主机手动重跑（`$env:PROOFRAIL_A7_ROUNDS=20; go test -tags a7native -count=1 -run TestA7Native ./internal/adapters/`）。**进套件的 5 项 A7 测试仍随默认套件在 CI 两腿上执行，并已在 Ubuntu `-race` 下跑过**（run `35118531930`，§1）。- **临时残留累积**（E8 发现）：link 前崩溃留下的 `.tmp` 无人清理。本切片**不修**（属生产行为变更，需独立切片决策）；建议 B3/操作切片评估"启动期残留清理"是否引入新的读侧语义。
 - **E5 未执行**：卷 flush 需提权，与便携产品定位（ADR-009）冲突；若后续策略变化须重新立项。
 - **断言的适用范围**：所有耐久结论仅覆盖 `Windows 11 + NTFS 本卷 + 本机存储栈`；Unix 侧 `proven` 同样只在本地文件系统类上成立。
 - **A7 不改变**：Windows `unproven`、`first-dispatch` 拒绝、CONTRACTS 冻结句、T027 `BLOCKED / NOT IMPLEMENTED`、AT-23 结论。
@@ -233,6 +235,12 @@
 MAI 第 2 轮提出的**最小防误读边界句**（已采纳）：**“同一 requestId 在同机、同卷、同轮并发下已证实单赢家且不解锁二次派发；但跨进程强同步、跨主机强同步与断电耐久仍未证明。”**
 
 **MAI 第 2 轮 Section D（仍无测试覆盖的不变量）**：断电耐久（真实断电/设备缓存/固件写回/目录项落盘顺序）；跨进程**强同步**（E10 只证“同机同卷同轮单赢家”）；非本卷存储栈（SMB/共享卷/云盘/集群）；`.tmp` 残留清理策略。**Section E（无法验证）**：真实断电注入与设备层语义（属 B3）。**推翻条件**：再出现“无前提的 `proven`”摘要、把 P1/E10 扩写为“跨进程强同步已证明”、或在未修订 CONTRACTS 前就要求解除 `unproven`。MAI 另确认本轮**未过度收敛**（`proven` 保留在前提 P 下、P1 保留了进程内真并发 + 跨进程同轮尝试）。
+
+### ⑤ 门禁终跑与 ⑥ 收尾（2026-09-17）
+
+- **门禁（Windows 本机，提交前终跑）**：`gofmt -l internal cmd tools` 空；`go build ./...`、`go vet ./...`、`go vet -tags a7native ./internal/adapters/` 干净；`go test -count=1 ./...` **13 包全 ok**；`tools/contracts` 门禁 **4 tests / 4 pass / 0 fail**；`PROOFRAIL_A7_ROUNDS=20 go test -tags a7native -count=1 -run TestA7Native ./internal/adapters/` → `ok … 21.696s`（7 项实验；E4 断言加固后单项复跑亦 PASS）。
+- **编码校验**：本切皮触碰的全部 `.md` = UTF-8 **with BOM** + LF、全部 `.go` = UTF-8 **without BOM** + LF，无 CRLF、无 U+FFFD；`tmp/` 仅留 `.gitkeep`。
+- **提交与 CI**：已提交 `cc9adf4` / `dee0066` 并推送 `origin/main`；run `35118531930` 全绿（详见 §1）。
 
 ### 残差-抽查（§3.11 判据）
 

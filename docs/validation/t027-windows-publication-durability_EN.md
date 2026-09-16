@@ -14,6 +14,7 @@ Verdict (**the level and its premise must be read together**): under premise **P
 - **Done**: ADR candidate enumeration, the four-row falsification matrix, a minimal falsification prototype (in-suite model experiments + `a7native` real-process experiments), a claim ledger.
 - **Not done** (hard gates): Windows `unproven` unchanged; no real dispatch; **the production publish primitive is untouched** (`writeReplayRecordNoReplace`'s visibility/durability steps keep their semantics); no CONTRACTS change; no schema/fixture/CI-workflow change; no real candidate, no network.
 - The only production-file change is one **nil-default test seam** `replayStorePublishStageHook` (§6): a timing-based kill cannot reliably hit a chosen stage, and the crash-point experiments must.
+- **CI evidence** (observed 2026-09-17): both commits are pushed to `origin/main` - `cc9adf4` (the production seam plus four test files) and `dee0066` (report, ADR-013, dev plan); GitHub Actions run **`35118531930`** (head `dee0066`) is **fully green** (~2m04s): the Windows leg passed Build/Vet/Test with Race and Contract fixtures skipped by `runner.os`, while the Ubuntu leg passed Build/Vet/Test plus **Race** (`CGO_ENABLED=1 go test -race -count=1 ./internal/adapters/... ./internal/chain/...`) and **Contract fixtures** (4/4). The five **in-suite** A7 tests therefore really did run under the Linux race detector; the seven `a7native` experiments still stay out of CI (§7).
 
 ## 2. Candidate protocols and their A7 outcome
 
@@ -119,7 +120,7 @@ Verdict (**the level and its premise must be read together**): under premise **P
 ## 7. Known boundaries and the hand-off to B3
 
 - **U1/U2/U3/U4 all move to B3**; B3's minimum experiment: real power loss (or an equivalent device-level injection) + a per-round crash-point journal (written to a **different physical device** that can itself prove durability) + a restart inventory of the R/C pairs and directory entries; inject per candidate (C2, C3); a candidate may only be written into the contract as `proven` after B3 is fully green.
-- **`a7native` does not run in CI**: the `a7native` experiments (including E4/E6/E9/E10) run **neither in the CI default path nor in the `-race` subset** (the same treatment as `a6native`, to avoid flakiness); the conclusions here are **single-host** evidence and must be re-run manually on a Windows host (`$env:PROOFRAIL_A7_ROUNDS=20; go test -tags a7native -count=1 -run TestA7Native ./internal/adapters/`).
+- **Only `a7native` does not run in CI**: the `a7native` experiments (including E4/E6/E9/E10) run **neither in the CI default path nor in the `-race` subset** (the same treatment as `a6native`, to avoid flakiness); the conclusions resting on them are **single-host** evidence and must be re-run manually on a Windows host (`$env:PROOFRAIL_A7_ROUNDS=20; go test -tags a7native -count=1 -run TestA7Native ./internal/adapters/`). The **five in-suite A7 tests do run in CI on both legs and have already run under `-race` on Ubuntu** (run `35118531930`, §1).
 - **Temp residue accumulates** (E8 finding): `.tmp` files left by a pre-link crash are never cleaned. This slice **does not fix it** (that is a production behaviour change needing its own slice decision); the recommendation is for B3 or an operations slice to evaluate whether startup cleanup introduces new read-side semantics.
 - **E5 not executed**: a volume flush needs privilege and conflicts with the portable product position (ADR-009); a change of that position would require a new decision.
 - **Scope of every claim**: durability conclusions cover `Windows 11 + NTFS on the local volume + this host's storage stack` only; the Unix-side `proven` holds over local filesystem classes only.
@@ -235,6 +236,12 @@ Residual Low observations (the reviewer's own words; known boundaries, not new p
 MAI's **minimal anti-misreading boundary sentence** (adopted): **"the same requestId on one host, one volume and one round is proved to have a single winner that does not unlock a second dispatch; cross-process strong synchronisation, cross-host strong synchronisation and power-loss durability remain unproved."**
 
 **MAI round-2 Section D (invariants still without test coverage)**: power-loss durability (real power loss, device caches, firmware write-back, directory-entry ordering); cross-process **strong** synchronisation (E10 proves only a single winner per round on one host and volume); non-local storage stacks (SMB, shared volumes, cloud drives, clusters); `.tmp` residue cleanup. **Section E (not verifiable)**: real power-loss injection and device-layer semantics (B3's territory). **What would overturn it**: another premise-free `proven` summary, P1/E10 being widened back to "cross-process strong synchronisation is proved", or a demand to lift `unproven` before CONTRACTS is revised. MAI also confirmed the wording did **not** over-narrow (`proven` stays under premise P, and P1 keeps 8-way true in-process concurrency plus same-round cross-process attempts).
+
+### ⑤ Final gate run and ⑥ closeout (2026-09-17)
+
+- **Gates (Windows host, final pre-commit run)**: `gofmt -l internal cmd tools` empty; `go build ./...`, `go vet ./...` and `go vet -tags a7native ./internal/adapters/` clean; `go test -count=1 ./...` - **all 13 packages ok**; the `tools/contracts` gate - **4 tests / 4 pass / 0 fail**; `PROOFRAIL_A7_ROUNDS=20 go test -tags a7native -count=1 -run TestA7Native ./internal/adapters/` → `ok … 21.696s` (seven experiments; the hardened E4 probe also passed on a focused re-run).
+- **Encoding check**: every `.md` touched by this slice is UTF-8 **with BOM** + LF and every `.go` file is UTF-8 **without BOM** + LF, with no CRLF and no U+FFFD; `tmp/` holds only `.gitkeep`.
+- **Commits and CI**: `cc9adf4` and `dee0066` are committed and pushed to `origin/main`; run `35118531930` is fully green (see §1).
 
 ### Residual sampling (§3.11 criterion)
 
