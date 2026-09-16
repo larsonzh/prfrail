@@ -31,6 +31,17 @@ var (
 	ErrAgentRunnerLaunchIdentityUnproven = errors.New("AgentRunner launch identity unproven")
 )
 
+// AgentRunnerProcessConfig pins the offline process parameters the dispatcher
+// hands to the launcher. It is additive to A2 and optional there: a dispatcher
+// without it still dispatches, and the launcher fails closed on a request it
+// cannot honour, so no replay or receipt semantics change.
+type AgentRunnerProcessConfig struct {
+	Command string
+	Args    []string
+	Env     []string
+	Grace   time.Duration
+}
+
 // AgentRunnerReplayDispatcher owns the replay-aware dispatch path: publish R,
 // reconfirm authorization and budget, claim the single launch slot, spawn, and
 // publish the process identity. It implements chain.AgentRunnerPort and must be
@@ -39,6 +50,7 @@ var (
 type AgentRunnerReplayDispatcher struct {
 	Store          *AgentRunnerReplayStore
 	Launcher       chain.AgentRunnerLauncher
+	Process        AgentRunnerProcessConfig
 	LedgerSnapshot func() (chain.AuthorizationLedger, error)
 	CostLedger     *tickets.CostLedger
 	RequestRecord  AgentRunnerRequestRecord
@@ -135,9 +147,15 @@ func (dispatcher *AgentRunnerReplayDispatcher) DispatchAgentRunner(ctx context.C
 		return chain.StepResult{}, fmt.Errorf("%w: launch slot already owned for requestId %s", ErrAgentRunnerDispatchUnknownBlock, body.RequestID)
 	}
 	result, err := dispatcher.Launcher.StartAgentRunnerProcess(ctx, chain.AgentRunnerLaunchRequest{
-		RequestID: body.RequestID,
-		RunID:     body.RunID,
-		AdapterID: body.AdapterID,
+		RequestID:     body.RequestID,
+		RunID:         body.RunID,
+		AdapterID:     body.AdapterID,
+		Command:       dispatcher.Process.Command,
+		Args:          append([]string(nil), dispatcher.Process.Args...),
+		Dir:           request.Workspace.Root,
+		Env:           append([]string(nil), dispatcher.Process.Env...),
+		Grace:         dispatcher.Process.Grace,
+		WorkspaceRoot: request.Workspace.Root,
 	})
 	if err != nil {
 		return chain.StepResult{}, fmt.Errorf("%w: %w", ErrAgentRunnerLaunchFailed, err)

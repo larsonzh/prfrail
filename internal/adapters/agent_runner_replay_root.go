@@ -20,6 +20,9 @@ const (
 	agentRunnerReplayOwnershipDomain   = "proofrail:agent-runner-replay-ownership:1\n"
 	agentRunnerReplayRunEventDirName   = "events"
 	agentRunnerReplayRunEventFileName  = "state-events.jsonl"
+	// agentRunnerReplayEvidenceDirectoryName holds the per-request offline run
+	// evidence artifacts. They are store-local evidence, never wire records.
+	agentRunnerReplayEvidenceDirectoryName = "runs"
 )
 
 var (
@@ -80,6 +83,7 @@ func NewAgentRunnerReplayStoreForRun(runRoot, runID string) (*AgentRunnerReplayS
 		filepath.Join(replayRoot, "completions"),
 		filepath.Join(replayRoot, "launches"),
 		filepath.Join(replayRoot, "terminals"),
+		filepath.Join(replayRoot, agentRunnerReplayEvidenceDirectoryName),
 	}
 	for _, directory := range subdirectories {
 		if err := rejectUnsafeReplayPathComponents(directory); err != nil {
@@ -201,7 +205,7 @@ func (store *AgentRunnerReplayStore) verifyPathSafetyLocked() error {
 	if err := rejectUnsafeReplayPathComponents(store.root); err != nil {
 		return err
 	}
-	for _, name := range []string{"requests", "completions", "launches", "terminals", agentRunnerReplayOwnershipFileName} {
+	for _, name := range []string{"requests", "completions", "launches", "terminals", agentRunnerReplayEvidenceDirectoryName, agentRunnerReplayOwnershipFileName} {
 		if err := rejectUnsafeReplayPathComponents(filepath.Join(store.root, name)); err != nil {
 			return err
 		}
@@ -272,6 +276,44 @@ func validateAgentRunnerReplayRootInvariants(replayRoot, runRoot string) error {
 
 // ensureAgentRunnerReplayDirectory creates a replay-store directory that must
 // live under an owned parent, then syncs the parent after creation or confirmation.
+// RunRoot returns the durable run root the store is bound to. Offline run
+// artifacts that other components already look for (such as the operator stop
+// identity mirror) live there, not inside the replay root.
+func (store *AgentRunnerReplayStore) RunRoot() string {
+	if store == nil {
+		return ""
+	}
+	return store.runRoot
+}
+
+// RunEvidenceDir returns the per-request offline evidence directory under the
+// replay root, creating it on demand. The artifacts it holds are store-local
+// evidence: they carry no wire contract and no record hash, and the same
+// component-level safety checks that guard the other subdirectories apply.
+func (store *AgentRunnerReplayStore) RunEvidenceDir(requestID string) (string, error) {
+	if store == nil {
+		return "", fmt.Errorf("%w: nil replay store", ErrInvalidAgentRunnerReplayStore)
+	}
+	if !evidence.ValidID(requestID) {
+		return "", fmt.Errorf("%w: invalid requestId %q", ErrInvalidAgentRunnerReplayStore, requestID)
+	}
+	base := filepath.Join(store.root, agentRunnerReplayEvidenceDirectoryName)
+	directory := filepath.Join(base, requestID)
+	if err := store.verifyPathSafetyLocked(); err != nil {
+		return "", err
+	}
+	if err := rejectUnsafeReplayPathComponents(directory); err != nil {
+		return "", err
+	}
+	if err := ensureAgentRunnerReplayDirectory(base, store.root); err != nil {
+		return "", err
+	}
+	if err := ensureAgentRunnerReplayDirectory(directory, base); err != nil {
+		return "", err
+	}
+	return directory, nil
+}
+
 func ensureAgentRunnerReplayDirectory(directory, parent string) error {
 	if err := os.Mkdir(directory, 0o755); err != nil && !errors.Is(err, fs.ErrExist) {
 		return fmt.Errorf("%w: create %s: %v", ErrInvalidAgentRunnerReplayStore, directory, err)

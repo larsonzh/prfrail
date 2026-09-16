@@ -52,6 +52,19 @@ type ManagedProcess struct {
 	cmd      *exec.Cmd
 	identity ProcessIdentity
 	platform platformProcess
+	// verify is a test seam: when set it replaces platform.verifyGone so a test
+	// can observe the context each call site passes. Production leaves it nil.
+	verify func(context.Context) error
+}
+
+// verifyGone reports whether the managed tree is gone, using the bounded
+// context its caller supplies. Stop verification must always be bounded: an
+// unbounded wait turns an unkillable descendant into a permanent hang.
+func (process *ManagedProcess) verifyGone(ctx context.Context) error {
+	if process.verify != nil {
+		return process.verify(ctx)
+	}
+	return process.platform.verifyGone(ctx)
 }
 
 func StartManaged(ctx context.Context, spec ProcessSpec) (*ManagedProcess, error) {
@@ -96,19 +109,38 @@ func RunManaged(ctx context.Context, spec ProcessSpec, grace time.Duration) (Pro
 	if err != nil {
 		return ProcessResult{ExitCode: -1, StartedAt: startedAt, FinishedAt: time.Now().UTC()}, err
 	}
+	return process.runManaged(ctx, grace, startedAt)
+}
+
+// Run waits for a process that was started separately and reconciles its terminal
+// state exactly as RunManaged does: a natural exit is reported only after the tree
+// is verified gone, and a cancelled or expired context triggers a bounded stop.
+// It exists so a caller that must publish the process identity before waiting can
+// still reuse one reconciliation path.
+func (process *ManagedProcess) Run(ctx context.Context, grace time.Duration, startedAt time.Time) (ProcessResult, error) {
+	if process == nil || process.cmd == nil {
+		return ProcessResult{ExitCode: -1, StartedAt: startedAt, FinishedAt: time.Now().UTC()}, ErrInvalidProcess
+	}
+	return process.runManaged(ctx, grace, startedAt)
+}
+
+// runManaged waits for the managed process and reconciles its terminal state: a
+// natural exit is reported only after the tree is verified gone, and a cancelled
+// or expired context triggers a bounded stop followed by bounded verification.
+func (process *ManagedProcess) runManaged(ctx context.Context, grace time.Duration, startedAt time.Time) (ProcessResult, error) {
 	waited := make(chan error, 1)
 	go func() { waited <- process.cmd.Wait() }()
 	select {
 	case waitErr := <-waited:
 		verifyCtx, cancel := context.WithTimeout(context.Background(), 20*time.Millisecond)
-		verifyErr := process.platform.verifyGone(verifyCtx)
+		verifyErr := process.verifyGone(verifyCtx)
 		cancel()
 		if verifyErr != nil {
 			requested := time.Now().UTC()
 			actions, stopErr := process.platform.stop(process.identity, grace)
 			if stopErr == nil {
 				finalCtx, finalCancel := context.WithTimeout(context.Background(), grace)
-				stopErr = process.platform.verifyGone(finalCtx)
+				stopErr = process.verifyGone(finalCtx)
 				finalCancel()
 			}
 			process.platform.close()
@@ -126,7 +158,13 @@ func RunManaged(ctx context.Context, spec ProcessSpec, grace time.Duration) (Pro
 		actions, stopErr := process.platform.stop(process.identity, grace)
 		<-waited
 		if stopErr == nil {
-			stopErr = process.platform.verifyGone(context.Background())
+			// The caller's context is already cancelled on this path, so the
+			// verification needs its own bounded context: it must not inherit the
+			// cancellation whose handler is waiting on it, and it must not be
+			// unbounded either.
+			verifyCtx, verifyCancel := stopVerificationContext(grace)
+			stopErr = process.verifyGone(verifyCtx)
+			verifyCancel()
 		}
 		process.platform.close()
 		proof, proofErr := buildTerminationEvidence(process.identity, requested, actions, stopErr)
@@ -182,28 +220,40 @@ func StopProcessIdentity(ctx context.Context, identity ProcessIdentity, grace ti
 	return proof, nil
 }
 
+// boundedTerminationContext returns the context a stop verification may use. It is
+// derived from the grace period - never from the caller's deadline, which may be far
+// longer - and it is immune to the caller's cancellation, so a caller giving up
+// cannot cancel the verification whose result it is waiting for.
 func boundedTerminationContext(ctx context.Context, grace time.Duration) (context.Context, context.CancelFunc) {
-	if _, hasDeadline := ctx.Deadline(); hasDeadline {
-		return context.WithCancel(ctx)
-	}
 	if grace <= 0 {
 		grace = time.Second
 	}
-	return context.WithTimeout(ctx, grace)
+	return context.WithTimeout(context.WithoutCancel(ctx), grace)
 }
 
 func (process *ManagedProcess) Terminate(ctx context.Context, grace time.Duration) (TerminationEvidence, error) {
 	requested := time.Now().UTC()
 	actions, terminateErr := process.platform.stop(process.identity, grace)
 	_, _ = process.cmd.Process.Wait()
+	verifyCtx, verifyCancel := boundedTerminationContext(ctx, grace)
+	defer verifyCancel()
 	if terminateErr == nil {
-		terminateErr = process.platform.verifyGone(ctx)
+		terminateErr = process.verifyGone(verifyCtx)
 	}
 	if terminateErr == nil {
-		terminateErr = waitIdentityGone(ctx, process.identity)
+		terminateErr = waitIdentityGone(verifyCtx, process.identity)
 	}
 	process.platform.close()
 	return buildTerminationEvidence(process.identity, requested, actions, terminateErr)
+}
+
+// stopVerificationContext returns a fresh bounded context for stop verification
+// on the cancellation path, where the caller's context is already cancelled.
+func stopVerificationContext(grace time.Duration) (context.Context, context.CancelFunc) {
+	if grace <= 0 {
+		grace = time.Second
+	}
+	return context.WithTimeout(context.Background(), grace)
 }
 
 func buildTerminationEvidence(identity ProcessIdentity, requested time.Time, actions []string, terminateErr error) (TerminationEvidence, error) {
