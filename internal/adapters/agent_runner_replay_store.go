@@ -52,6 +52,38 @@ var (
 	replayStoreSyncParentDirectory  = syncReplayStoreParentDirectory
 )
 
+// Publish stages of writeReplayRecordNoReplace, in execution order. They are the
+// crash points an experiment can stop at: everything before the record is linked
+// into place is invisible to a reader, and the two stages after it differ only in
+// whether the parent-directory durability step ran.
+const (
+	replayStorePublishStageTempWritten  = "temp-written"
+	replayStorePublishStageTempSynced   = "temp-synced"
+	replayStorePublishStageTempClosed   = "temp-closed"
+	replayStorePublishStageRecordLinked = "record-linked"
+	replayStorePublishStageParentSynced = "parent-synced"
+)
+
+// replayStorePublishStageHook is a test seam for the publication-durability
+// falsification prototype. It is nil in production: a timing-based kill cannot
+// stop a publish at an exact stage, so crash-point experiments need a seam that
+// can. It never changes behaviour while nil, and it may not carry decisions.
+//
+// Seam contract: it fires for every no-replace publication (requests,
+// completions, launch receipts and identities, terminal intents and closures,
+// and the ownership record - the last of which is published before the store is
+// constructed, so not every call runs under the store lock), and a hook runs
+// while its caller holds the store lock whenever that caller is a store method,
+// so a hook must not call back into the store. A failed step fires no further
+// stage: the stages before the failure have already fired.
+var replayStorePublishStageHook func(stage string, path string)
+
+func replayStorePublishStage(stage string, path string) {
+	if replayStorePublishStageHook != nil {
+		replayStorePublishStageHook(stage, path)
+	}
+}
+
 // AgentRunnerReplayState describes replay-state visibility for one requestId.
 type AgentRunnerReplayState string
 
@@ -543,8 +575,13 @@ func writeReplayRecordNoReplace(path string, record any) error {
 	writeErr := error(nil)
 	if _, err := file.Write(payload); err != nil {
 		writeErr = err
-	} else if err := file.Sync(); err != nil {
-		writeErr = err
+	} else {
+		replayStorePublishStage(replayStorePublishStageTempWritten, path)
+		if err := file.Sync(); err != nil {
+			writeErr = err
+		} else {
+			replayStorePublishStage(replayStorePublishStageTempSynced, path)
+		}
 	}
 	closeErr := file.Close()
 	if writeErr == nil {
@@ -554,6 +591,7 @@ func writeReplayRecordNoReplace(path string, record any) error {
 		_ = os.Remove(temp)
 		return writeErr
 	}
+	replayStorePublishStage(replayStorePublishStageTempClosed, path)
 	// Atomic no-replace visibility and durability are separate facts. The hard
 	// link publishes visibility without replacement; only a successful parent
 	// directory durability step may later justify a proven durability claim.
@@ -564,10 +602,12 @@ func writeReplayRecordNoReplace(path string, record any) error {
 		}
 		return err
 	}
+	replayStorePublishStage(replayStorePublishStageRecordLinked, path)
 	if err := replayStoreSyncParentDirectory(directory); err != nil {
 		_ = os.Remove(temp)
 		return err
 	}
+	replayStorePublishStage(replayStorePublishStageParentSynced, path)
 	_ = os.Remove(temp)
 	return nil
 }
