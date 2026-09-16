@@ -1,6 +1,6 @@
 ﻿# T027 · A6 · 离线 pinned CLI 运行 — 验证报告
 
-日期：2026-09-15（Linux 僵尸语义回归修复 2026-09-16，见 §14）。结论：`A6 完成`；`c2d2819` 已提交并推送 `origin/main`；CI 的 Ubuntu 腿暴露 Linux 停机判定缺陷 → 已修复并新增 Linux 回归测试（§14）。⑤ 标准门禁与原生实验全绿（详见 §9、§10）。④ 试点（Haiku + MAI）：组合可用、能发现真问题，但存在**非零残差**（本片漏 1 项 High，由用户同轮授权的追加 Codex 盲审捕获、经 4 条变异证实并整改；详见 §7.1/§7.2）——建议组合作常规切片的低成本补充扫描层、硬门切片 A7/B2/B3/B4 保留 Codex 终审，最终由用户决定。变异审计 **52 项全 RED / SURVIVED 0**（§8）。
+日期：2026-09-15（Linux 僵尸语义回归修复 2026-09-16，见 §14）。结论：`A6 完成`；`c2d2819` 已提交并推送 `origin/main`，修复提交 `6db5a10`，CI 全绿（run `35076045445`）。⑤ 标准门禁与原生实验全绿（详见 §9、§10）。④ 试点（Haiku + MAI）：组合可用、能发现真问题，但存在**非零残差**（本片漏 1 项 High，由用户同轮授权的追加 Codex 盲审捕获、经 4 条变异证实并整改；详见 §7.1/§7.2）——建议组合作常规切片的低成本补充扫描层、硬门切片 A7/B2/B3/B4 保留 Codex 终审，最终由用户决定。变异审计 **52 项全 RED / SURVIVED 0**（§8）。
 切片目标：为 chain 提供一次**可证明的离线外部运行**——用代码常量固定版本的外部 CLI，绑定运行时长与宽限，停止整棵进程树，采集五枚冻结事实，并把结果映射为可被 chain 直接消费的终局（completed / failed / cancelled / operator-action-required / uncertain），任何缺口与未证明的停机都不得以 completed 表达。
 
 ## 1. 交付范围
@@ -172,3 +172,4 @@ $$\text{事实}=\{\text{ManifestHash(post)},\ \text{DiffHash},\ \text{LogHash(�
   - `processGroupAlive`：信号 0 仍成功时再扫描 `/proc`，仅当组内存在**非终态**成员才判存活；组属于其他用户（EPERM）时保持“保守视为存活”的旧语义（`/proc` 看不到其成员）。
 - **回归测试**（新增 `internal/guard/process_linux_test.go`，Linux-only）：`TestLinuxStopProvesAnUnreapedTerminatedChild` —— 子进程独占进程组、杀掉后**故意不回收**，断言 ① 运行中读为存活（对照组）；② 退出未回收时读为**不在运行**；③ 该组不再是存活组；④ `StopProcessIdentity` 给出 `stopped` 且 `Actions == [already-stopped]`；最后才 `wait` 回收，保证结论不是由父进程的回收造成的。修复前该用例在 5s 上界内失败。
 - **本地门禁（Windows 主机）**：`gofmt -l internal cmd tools` 空；`GOOS=linux`（`CGO_ENABLED=0`）`go build ./...` 与 `go vet ./...` 通过；Windows `go build ./...`、`go vet ./...` 通过；`go test -count=1 ./internal/guard/ ./internal/adapters/` 通过。
+- **远端 CI 证据（绿）**：GitHub Actions run `35076045445`（提交 `6db5a10`）全绿——Ubuntu 腿在默认套件中真实执行了 `Race` 与 `Contract fixtures` 两个步骤（Windows 腿依 `runner.os == 'Linux'` 条件跳过该两步），其余三个候选/引导 job（Candidate build / Candidate probe / Bootstrap and release evidence）仍按设计跳过，与上一次绿跑（A5 run `34951615184`）同形。
