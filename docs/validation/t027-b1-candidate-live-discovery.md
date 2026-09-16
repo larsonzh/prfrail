@@ -25,6 +25,8 @@
 | 版本发现（免费元数据） | `winget show GitHub.Copilot` → 最新 **v1.0.85**；`npm view @github/copilot dist-tags` → `latest: 1.0.85`、`prerelease: 1.0.86-0`（稳定通道最新即 1.0.85；预发布 1.0.86-0 **未评估**） | — | — |
 
 > 说明：`winget download` 因强制拉取 PowerShell 7.6.6 的 msixbundle 依赖、且下载过慢而被中止；改用 npm 通道把 1.0.85 取到 **隔离目录**；**未升级也未改写全局安装**，1.0.83 保持原样（pin 不被污染）。
+>
+> **身份口径（重要）**：本片所有“版本”标签**一律以可执行文件 SHA-256 为准**，`--version` 文本仅作记录。2026-09-17 实测发现：T026 所 pin 的二进制（sha256 `d3f3bb7b…`，**字节与 mtime 均未变**）先报告 `GitHub Copilot CLI 1.0.83`、后又报告 `GitHub Copilot CLI 1.0.85` ⇒ **版本字符串不是稳定身份**，不得用作 pin（详见 §6 DR-2）。重放使用的是 npm `@github/copilot@1.0.85` 包的载荷（sha256 `564b1f20…`），与 T026 pin 为**不同字节**。
 
 ## 3. 探针账本（§3.9 记账口径）
 
@@ -125,12 +127,20 @@ pid=… name=pwsh.exe cmd="pwsh.exe" … -Command "…\n[Net.WebClient]::new().D
 - **可验证性**：修复后，`ai check` 应能在同一 pin 上产出 `available` 记录；本片证据（`availability-1083*.json`）可作为“修复前”基线。
 - **自解释性缺陷（F8 登记）**：`ai-availability` 记录的 evidence 字段只有哈希，**记录本身读不出根因**（根因来自手工复现 #5 + 代码定位）；这属产品可观测性改进，另立切片。
 
+## 6b. 发现（DR-2）：候选的 `--version` 文本不是稳定身份
+
+- **现象**：T026 所 pin 的二进制（sha256 `d3f3bb7b…`，144,796,448 字节，mtime 2026-09-10）在同一台机器上**先报告 1.0.83、后报告 1.0.85**，而字节与 mtime 均未变化；npm `@github/copilot@1.0.85` 包的载荷则是不同字节（sha256 `564b1f20…`，148,423,968 字节）。
+- **影响**：任何以 `--version` 文本作为候选身份或 pin 的做法都不可靠；本片结论不受影响，因为身份一律以 SHA-256 为准。
+- **处置（已落地）**：收编后的工具默认**不把版本文本当判据**（仅记录，`-RequireVersionText` 才升为硬判）；报告与证据包均以 sha256 标注候选。B2 及后续切片只能以 sha256 作 pin。
+
 ## 7. 已知边界与未执行事项
 
-- **单主机、单账号、host 认证**；未测试多账号/企业策略/跨平台。
+- **工具已收编（B1 收尾）**：探针 runner 已从 `tmp/` 收编为仓库工具 **`tools/agent-probe/Invoke-CandidateProbe.ps1`**（默认 **dry-run**；**`-Run` 是唯一执行入口**，连 `-RequireVersionText` 也无 `-Run` 则拒跑；pin 以 SHA-256 校验，版本文本仅记录），并配有密自检 **`tools/agent-probe/Test-CandidateProbe.ps1`**（stub 候选、零模型调用；最近一次全通过：`selftest: checks=35 failures=0`，含“dry-run 不得执行候选”“pin 不符不得建工件根”“工件根限仓 `tmp/` 子树且拒逃逸/拒已存在/拒 reparse 重定向”“记录的 `-C` 必须指向探针工作区”等断言）。两条场景的重放命令见本行下方与证据包 README。
+- **证据固化**：决定性工件已脱敏后入库存于 **`docs/validation/evidence/b1-20260917/`**（含 argv/OS argv/availability/产品报错原文/最小可用性转录，逐文件 sha256 见该目录 README）；**原始 JSONL 与 CLI 日志不入库**（CLI 自带日志含 GitHub 账号 URL）；`tmp/b1/` 为本片过程的临时目录，按仓库纪律**在 B1 收尾提交前清理**（收尾仅保留 `tmp/.gitkeep`）。
+- **单主机、单账号、host 认证**；未测试多账号/企业策略/跳平台。
 - **未跑** T026 harness 的完整分析器；未重开 T026 已 verified 的项；未调用 DeepSeek BYOK 通道（`deepseek-anthropic`）。
-- **未改**任何生产文件；`tmp/` 下证据与脚本在收尾时按仓库纪律清理（报告保留名称、大小与 sha256 前缀）。
-- **未提交、未推送**：本片收尾停在 ⑥ 授权停点。
+- **未改**任何生产文件；`tmp/` 下证据与脚本在 B1 收尾提交前按仓库纪律清理，完成后仅剩 `tmp/.gitkeep`（报告保留名称、大小与 sha256 前缀）。
+- **已提交已推送**：报告与证据包随 `1d17dc7`（`docs: record B1 candidate live capability and availability findings`）推送 origin/main；工具收编（两条脚本 + 本报告更新）随 B1 收尾提交落地，CI 状态以该提交的 origin 运行为准。
 
 ## 8. 成本与计量
 
@@ -180,9 +190,26 @@ pid=… name=pwsh.exe cmd="pwsh.exe" … -Command "…\n[Net.WebClient]::new().D
 复审（④ 第 3 轮，终）：**`RE-REVIEW: PASS`**（Section B 为 NONE；无 Medium+）。复审核过：§3/§5/§8/§9/§10 四层额度口径一致（尝试 9/10、付费 6/10、零付费项与排除工件）且中英同步；首轮 High（运行时 argv）与 Low（排除工件）保持清零；6 份 usage 均为 1 次付费、2 份 availability 为 `requestsUsed=0`、#5 的额度错误原文可闭环；结论仍限于 assessed scope 内 blocked、B2 转外部 enforcement、BYOK 不外推；DR-1 代码归因与报告一致（`ai_probe_copilot.go:111`、`console/ai.go:46`）。
 
 其 Section E 声明的“无法完全验证”项（字节级 BOM/LF、`Invalid command format` 未入证据目录、`Example Domain` 计数未逐字重计）均为**已知的口径边界**，不影响结论；主控已在本地字节级校验了两份报告的 BOM+LF。
+
+#### ④ Codex 独立终审（工具收编部分，2026-09-17）
+
+探针 runner 收编为仓库工具（含报告同步内容）另起 ④ 闭环，共 6 轮（首轮不附清单）：
+
+- **第 1 轮 `RE-REVIEW: FINDINGS`**（1 High + 2 Medium + 1 Low）：工件根缺 `tmp/` 子树约束、不拒 reparse 祖先与已存在目录（High）；dry-run 仍会执行 `--version`，使 `-Run` 不再是唯一执行入口（Medium）；自检中“pin 不符不启动”断言指向错误路径且无进程侧断言（Medium）；报告称已清理而 `tmp/b1` 仍在（Low）。
+- **第 2 轮**：上述四项逐项核实已闭；新报 1 Medium（构造 `-C` 参数时 `$workspace` 尚未赋值，可能给候选传空值）+ 1 Low（自检未断言记录下来的 `-C` 值）。
+- **第 3 轮**：两项已闭；新报 1 Medium（tmp 清理措辞像“已完成状态”的断言）+ 1 Low（报告写 33 项断言，与实测 35 不一致）。
+- **第 4 轮**：两项已闭；**无 Medium+**；余 1 Low：引用 `1d17dc7` 的 subject 少写 `live`（已对照 `git log -1` 修正）。
+- **第 5 轮**：已闭；**无 Medium+**；余 1 Low：中文 §6 标题与首条 bullet 同行粘连（已拆行，与英文同构）。
+- **第 6 轮（终）：`RE-REVIEW: PASS`**（无 Medium+；§6 中英结构同构、12 个二级 标题行号对齐）。
 - 残差-抽查（§3.11 判据）：本片**不触及所有权 / 停机 / 身份语义**（无生产改动），按“每 4 片抽 1 片”的比例口径不在必抽范围。
 
-## 10. 工件清单（`tmp/b1/evidence/`，收尾清理前记录）
+## 10. 工件与证据位置
+
+- **仓库工具（已收编）**：`tools/agent-probe/Invoke-CandidateProbe.ps1`（默认 dry-run；**仅 `-Run` 执行候选**；SHA-256 pin；记录 argv/OS argv/usage/result；工件根限定在仓库 `tmp/` 子树）+ `tools/agent-probe/Test-CandidateProbe.ps1`（密自检，最近一次全通过 `checks=35 failures=0`，零模型调用）。
+- **入库证据包**：`docs/validation/evidence/b1-20260917/`（8 个脱敏工件 + README，含逐文件 sha256）：探针 #8/#9 的 `argv.json`/`osargv.txt`、探针 #3/#4 的 availability 记录、探针 #5 的 CLI 报错原文、探针 #6 的最小可用性转录。
+- **不入库**：完整 JSONL 转录与 CLI 自带日志（后者含 GitHub 账号 URL）；本节下表为收尾清理前的 `tmp/b1/evidence/` 清单，仅供对照。
+
+### 10.1 清理前的 tmp 工件清单（对照用）
 
 | 工件 | 大小 | sha256（前 16） | 说明 |
 |---|---|---|---|

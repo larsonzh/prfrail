@@ -25,6 +25,8 @@ Verdict: on one Windows 11 host, with host authentication and real billable call
 | Version discovery (free metadata) | `winget show GitHub.Copilot` → latest **v1.0.85**; `npm view @github/copilot dist-tags` → `latest: 1.0.85`, `prerelease: 1.0.86-0` (the stable channel's newest is 1.0.85; the 1.0.86-0 prerelease is **not assessed**) | — | — |
 
 > Note: `winget download` was aborted because it insisted on pulling the PowerShell 7.6.6 msixbundle dependency and the download was too slow; the npm channel fetched 1.0.85 into an **isolated directory** instead, so the pinned 1.0.83 stays untouched.
+>
+> **Identity rule (important)**: every "version" label in this slice is anchored to the executable's **SHA-256**; the `--version` text is recorded as evidence only. Measured on 2026-09-17: the T026-pinned binary (sha256 `d3f3bb7b…`, **bytes and mtime unchanged**) first reported `GitHub Copilot CLI 1.0.83` and later reported `GitHub Copilot CLI 1.0.85` ⇒ **the version string is not a stable identity** and must never be used as a pin (see §6b, DR-2). The replay used the npm `@github/copilot@1.0.85` package payload (sha256 `564b1f20…`), which is a **different byte stream** from the T026 pin.
 
 ## 3. Probe ledger (§3.9 accounting)
 
@@ -125,12 +127,20 @@ That is: **the deny flags really did reach the candidate process's command line*
 - **Falsifiability**: after a fix, `ai check` should produce an `available` record on the same pin; this slice's evidence (`availability-1083*.json`) is the pre-fix baseline.
 - **Self-explanation gap (registered as F8)**: an `ai-availability` record's evidence field carries hashes only, so **the record cannot explain its own root cause** (which came from manual replication #5 plus the code locations); that is a product observability improvement for its own slice.
 
+## 6b. Finding (DR-2): the candidate's `--version` text is not a stable identity
+
+- **Symptom**: the T026-pinned binary (sha256 `d3f3bb7b…`, 144,796,448 bytes, mtime 2026-09-10) first reported 1.0.83 and later 1.0.85 on the same machine while its bytes and mtime stayed the same; the npm `@github/copilot@1.0.85` payload is a different byte stream (sha256 `564b1f20…`, 148,423,968 bytes).
+- **Impact**: any practice that treats the `--version` text as the candidate identity or pin is unreliable; this slice's conclusions are unaffected because identity is always the SHA-256.
+- **Handling (already landed)**: the adopted tool does **not** judge on version text by default (it records it; `-RequireVersionText` makes a mismatch fatal), and the report plus the evidence bundle label every candidate by sha256. B2 and later slices may only pin by sha256.
+
 ## 7. Known boundaries and things not executed
 
+- **Tool adopted (B1 closeout)**: the probe runner was promoted from `tmp/` to the repository tool **`tools/agent-probe/Invoke-CandidateProbe.ps1`** (dry run by default; **`-Run` is the only execution entry** — even `-RequireVersionText` is refused without it; the pin is checked by SHA-256 and the version text is record-only), with the hermetic self-test **`tools/agent-probe/Test-CandidateProbe.ps1`** (stub candidate, zero model calls; last observed run fully green: `selftest: checks=35 failures=0`; the assertions are listed in sec. 10). The replay commands for both scenarios are below and in the evidence-bundle README.
+- **Evidence pinned**: the decisive artifacts are sanitised and committed under **`docs/validation/evidence/b1-20260917/`** (argv / OS argv / availability / the product error text / the minimal-availability transcript; per-file sha256 in that directory's README). **Raw JSONL transcripts and the CLI's own logs are not committed** (the CLI logs carry a GitHub account URL); `tmp/b1/` is this slice's scratch directory and is removed per repo discipline **before the B1 closeout commit** (closeout leaves only `tmp/.gitkeep`).
 - **Single host, single account, host authentication**; other accounts, enterprise policies and platforms were not tested.
 - **Not run**: T026's full analyzer, any re-open of T026's verified items, and the DeepSeek BYOK channel (`deepseek-anthropic`).
-- **No production file changed**; the `tmp/` artifacts are cleaned up at closeout per repo discipline (the report keeps names, sizes and sha256 prefixes).
-- **Not committed, not pushed**: this slice stops at the ⑥ authorization stop.
+- **No production file changed**; this slice's `tmp/` scratch content is removed before the B1 closeout commit per repo discipline, leaving only `tmp/.gitkeep` (the report keeps names, sizes and sha256 prefixes).
+- **Committed and pushed**: the report and the evidence bundle landed with `1d17dc7` (`docs: record B1 candidate live capability and availability findings`) on origin/main; the tool adoption (both scripts plus this report update) lands with the B1 closeout commit, and CI is judged on that commit's origin run.
 
 ## 8. Cost and metering
 
@@ -180,9 +190,26 @@ Re-review (④ round 2): **`RE-REVIEW: FINDINGS`** (2 Medium + 1 Low; the round-
 Re-review (④ round 3, final): **`RE-REVIEW: PASS`** (Section B: NONE; no Medium+). It verified: the four-layer budget consistency across §3/§5/§8/§9/§10 (9/10 attempts, 6/10 paid, the zero-cost items and the excluded artifact) with CN/EN in step; round 1's High (runtime argv) and Low (excluded artifact) still clear; the six usage files each billing one request, the two availability records at `requestsUsed=0`, and the probe #5 verbatim error closing the loop; the conclusion still scoped to blocked within the assessed range, B2 moving to external enforcement and BYOK not extrapolated; and the DR-1 attribution matching the code (`ai_probe_copilot.go:111`, `console/ai.go:46`).
 
 Its Section E "not fully verified" items (byte-level BOM/LF, `Invalid command format` absent from the artifact set, the `Example Domain` counts not re-counted character by character) are **known accounting boundaries** and do not affect the verdict; the lead byte-verified BOM+LF for both reports locally.
+
+#### ④ Codex final review (tool-adoption part, 2026-09-17)
+
+Promoting the probe runner into a repository tool (together with the report sync) ran its own ④ loop over six rounds (round 1 with no findings list attached):
+
+- **Round 1 `RE-REVIEW: FINDINGS`** (1 High + 2 Medium + 1 Low): the artifact root lacked the `tmp/` subtree constraint and refused neither reparse ancestors nor existing directories (High); the dry run still executed `--version`, so `-Run` was not the only execution entry (Medium); the self-test's "pin mismatch spawns nothing" assertion targeted a nonsense path and had no process-side check (Medium); the report claimed the scratch directory had been cleaned while `tmp/b1` was still present (Low).
+- **Round 2**: those four were verified closed item by item; new findings 1 Medium (the argument list used `$workspace` before assignment, so the candidate could receive an empty `-C`) + 1 Low (no assertion on the recorded `-C` value).
+- **Round 3**: both closed; new findings 1 Medium (the tmp-cleanup wording read as an already-satisfied state assertion) + 1 Low (the report said 33 assertions while the observed run reported 35).
+- **Round 4**: both closed; **no Medium+**; one Low remained: the subject quoted for `1d17dc7` was missing `live` (fixed against `git log -1`).
+- **Round 5**: closed; **no Medium+**; one Low remained: the Chinese §6 heading and its first bullet were glued onto one line (split to match the English structure).
+- **Round 6 (final): `RE-REVIEW: PASS`** (no Medium+; §6 structurally identical in CN/EN with the twelve second-level headings aligned by line number).
 - Residual sampling (§3.11 criterion): this slice **does not touch ownership, stopping or identity semantics** (no production change), so it is outside the mandatory sample set under the "1 in 4" rule.
 
-## 10. Artifact manifest (`tmp/b1/evidence/`, recorded before closeout cleanup)
+## 10. Artifacts and evidence locations
+
+- **Repository tool (adopted)**: `tools/agent-probe/Invoke-CandidateProbe.ps1` (dry run by default; **only `-Run` executes the candidate**; SHA-256 pin; records argv, OS argv, usage and a result summary; the artifact root is constrained to the repository `tmp` subtree) plus `tools/agent-probe/Test-CandidateProbe.ps1` (hermetic self-test with a stub candidate, zero model calls; last observed run fully green: `selftest: checks=35 failures=0`, including assertions such as "a dry run must not execute the candidate", "a pin mismatch must not create an artifact root", "a root outside `tmp`, an existing root, or a reparse-point root must be refused" and "the recorded `-C` must point at the probe workspace").
+- **Committed evidence bundle**: `docs/validation/evidence/b1-20260917/` (eight redacted artifacts plus a README with per-file sha256): probes #8/#9's `argv.json`/`osargv.txt`, probes #3/#4's availability records, probe #5's verbatim CLI error and probe #6's minimal-availability transcript.
+- **Not committed**: the full JSONL transcripts and the CLI's own logs (the latter contain a GitHub account URL); the table below is the pre-cleanup `tmp/b1/evidence/` listing, kept for cross-reference.
+
+### 10.1 Pre-cleanup tmp artifact listing (for cross-reference)
 
 | Artifact | Size | sha256 (first 16) | Note |
 |---|---|---|---|
