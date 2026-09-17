@@ -5,6 +5,7 @@
 - Platform: Windows 11 (reported as Windows 10 Home 24H2, build 26100.9457), PowerShell 5.1, Go 1.22 toolchain
 - Evidence root: `docs/validation/evidence/b2-2026-09-17/` (with `MANIFEST.md` and `SHA256SUMS.txt`)
 - Related documents: `docs/CONTRACTS.md`, `docs/ARCHITECTURE.md`, `docs/TEST_STRATEGY.md`, `docs/t027/FLASH_OPERATING_DIRECTIVE_v3.1.md`
+- **CI evidence** (observed 2026-09-18): three commits are pushed to `origin/main` (`c5c22ad..408bd99`) - `58757e8` (tool adoption: the proxy plus the AppContainer discipline, including the `/tools/tmp/` guard in `.gitignore`), `fd99dc3` (this report + the evidence bundle + the bilingual DEV_PLAN write-back) and `408bd99` (narrowing the byte-exact `*.raw.txt` rule). GitHub Actions is green twice: run **`35259806285`** (head `fd99dc3`, about 1m48s) and run **`35261204021`** (head `408bd99`, about 1m52s) - the Windows leg passed Build/Vet/Test and the Ubuntu leg passed Build/Vet/Test plus **Race** (`CGO_ENABLED=1 go test -race -count=1 ./internal/adapters/... ./internal/chain/...`) and **Contract fixtures** (`tools/contracts`). The new `tools/agent-probe/enforcement-proxy` package (15 tests) runs in the default suite (`go test -count=1 ./...`) on **both** legs; it is **not** part of the `-race` subset, which covers `internal/adapters` and `internal/chain` only. `Candidate build` / `Candidate probe` / `Bootstrap and release evidence` are skipped by design (they run only on `workflow_dispatch`).
 
 ## 1. Decision
 
