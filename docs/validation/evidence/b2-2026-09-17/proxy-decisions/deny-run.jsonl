@@ -1,0 +1,10 @@
+{"allow":["api.githubcopilot.com","api.github.com","github.com","githubusercontent.com","copilot-proxy.githubusercontent.com"],"decision":"ok","event":"start","listen":"127.0.0.1:39877","mode":"enforce","ts":"2026-09-17T08:34:05.8915179Z","upstream":""}
+{"client":"127.0.0.1:63035","decision":"allow","event":"connect","host":"api.github.com","phase":"established","port":"443","reason":"allowlisted","ts":"2026-09-17T08:34:18.4067115Z","upstream":""}
+{"client":"127.0.0.1:63042","decision":"allow","event":"connect","host":"api.github.com","phase":"established","port":"443","reason":"allowlisted","ts":"2026-09-17T08:34:18.5161327Z","upstream":""}
+{"client":"127.0.0.1:63060","decision":"deny","event":"connect","host":"api.individual.githubcopilot.com","port":"443","reason":"not-on-allowlist","ts":"2026-09-17T08:34:20.4262642Z"}
+{"client":"127.0.0.1:63061","decision":"deny","event":"connect","host":"api.individual.githubcopilot.com","port":"443","reason":"not-on-allowlist","ts":"2026-09-17T08:34:20.9357549Z"}
+{"client":"127.0.0.1:63069","decision":"deny","event":"connect","host":"api.individual.githubcopilot.com","port":"443","reason":"not-on-allowlist","ts":"2026-09-17T08:34:21.9411886Z"}
+{"client":"127.0.0.1:63070","decision":"deny","event":"connect","host":"telemetry.individual.githubcopilot.com","port":"443","reason":"not-on-allowlist","ts":"2026-09-17T08:34:21.9500138Z"}
+{"client":"127.0.0.1:63071","decision":"deny","event":"connect","host":"telemetry.individual.githubcopilot.com","port":"443","reason":"not-on-allowlist","ts":"2026-09-17T08:34:21.9505225Z"}
+{"client":"127.0.0.1:63073","decision":"deny","event":"connect","host":"telemetry.individual.githubcopilot.com","port":"443","reason":"not-on-allowlist","ts":"2026-09-17T08:34:21.9779793Z"}
+{"client":"127.0.0.1:63072","decision":"deny","event":"connect","host":"telemetry.individual.githubcopilot.com","port":"443","reason":"not-on-allowlist","ts":"2026-09-17T08:34:21.9785214Z"}

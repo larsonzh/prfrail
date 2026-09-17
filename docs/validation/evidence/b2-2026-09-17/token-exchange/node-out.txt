@@ -1,0 +1,15 @@
+client=node v24.17.0
+proxy=127.0.0.1:39877
+cwd=R:\
+githubTokenPresent=true
+githubTokenLength=40
+paid=false
+tokenStatus_cli-ua=403
+tokenBodyHead_cli-ua=403 Forbidden. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https:
+tokenStatus_gh-api-version=403
+tokenBodyHead_gh-api-version=403 Forbidden. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https:
+tokenStatus_vscode-profile=403
+tokenBodyHead_vscode-profile=403 Forbidden. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https:
+tokenStatus_curl-ua=403
+tokenBodyHead_curl-ua=403 Forbidden. For more on scraping GitHub and how it may affect your rights, please review our Terms of Service (https:
+aborted=no copilot token

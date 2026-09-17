@@ -1,0 +1,8 @@
+runDirD=D:\LZProjects\prfrail\tmp\b2\path-probe\20260917-205712
+runDirR=R:\
+existsD=True
+existsR=True
+listD-count=2
+listR-count=2
+createD=ok
+createR=ok

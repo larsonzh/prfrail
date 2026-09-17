@@ -1,0 +1,25 @@
+{
+    "scenario":  "exec-check",
+    "exitCode":  0,
+    "wallClockSeconds":  15.9,
+    "premiumRequests":  null,
+    "stdoutLength":  70,
+    "stderrLength":  848,
+    "stdoutHead":  "GitHub Copilot CLI 1.0.83.\nRun \u0027copilot update\u0027 to check for updates.\n",
+    "stderrHead":  "Package extraction took 6123ms\nPackage extraction attempt 1/3 failed, retrying: Error: EPERM: operation not permitted, rename \u0027R:\\home\\AppData\\Local\\Packages\\prfrail-b2-battery\\AC\\copilot\\pkg\\win32-x64\\.extracting-1.0.83-21588-1789633981996-1\u0027 -\u003e \u0027R:\\home\\AppData\\Local\\Packages\\prfrail-b2-battery\\AC\\copilot\\pkg\\win32-x64\\1.0.83\u0027\n    at async Object.rename (node:internal/fs/promises:1490:10)\n    at",
+    "pongSeen":  false,
+    "proxyAllowEvents":  0,
+    "proxyDenyEvents":  0,
+    "outsideCanaryUnchanged":  true,
+    "sensitiveCanaryUnchanged":  true,
+    "usageFilePresent":  false,
+    "artifacts":  [
+                      "D:\\LZProjects\\prfrail\\tmp\\b2\\candidate-runs\\20260917-163249-exec-check\\stdout.txt",
+                      "D:\\LZProjects\\prfrail\\tmp\\b2\\candidate-runs\\20260917-163249-exec-check\\stderr.txt",
+                      "D:\\LZProjects\\prfrail\\tmp\\b2\\candidate-runs\\20260917-163249-exec-check\\usage.json",
+                      "D:\\LZProjects\\prfrail\\tmp\\b2\\candidate-runs\\20260917-163249-exec-check\\argv.json",
+                      "D:\\LZProjects\\prfrail\\tmp\\b2\\candidate-runs\\20260917-163249-exec-check\\osargv.txt",
+                      "D:\\LZProjects\\prfrail\\tmp\\b2\\candidate-runs\\20260917-163249-exec-check\\proxy.jsonl"
+                  ],
+    "finishedAtUtc":  "2026-09-17T08:33:18.0881594Z"
+}

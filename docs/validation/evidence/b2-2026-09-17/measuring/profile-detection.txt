@@ -1,0 +1,9 @@
+beforeCreate: False
+createdSid: S-1-15-2-968613737-407438969-2074361716-197755362-941349338-287192608-3580912242
+afterCreate: True
+deriveOnlySidMatches: True
+deleteHresult: 0x00000000
+afterDelete: False
+existingHelper: throws-as-designed
+b2ProfileExists: False
+storageKeysRemaining: 

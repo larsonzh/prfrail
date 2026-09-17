@@ -1,0 +1,25 @@
+{
+    "scenario":  "smoke",
+    "exitCode":  1,
+    "wallClockSeconds":  15.6,
+    "premiumRequests":  0,
+    "stdoutLength":  0,
+    "stderrLength":  1456,
+    "stdoutHead":  "",
+    "stderrHead":  "Package extraction attempt 1/3 failed, retrying: Error: EPERM: operation not permitted, rename \u0027R:\\home\\AppData\\Local\\Packages\\prfrail-b2-battery\\AC\\copilot\\pkg\\win32-x64\\.extracting-1.0.83-29456-1789634047275-1\u0027 -\u003e \u0027R:\\home\\AppData\\Local\\Packages\\prfrail-b2-battery\\AC\\copilot\\pkg\\win32-x64\\1.0.83\u0027\n    at async Object.rename (node:internal/fs/promises:1490:10)\n    at async Nr (sea-loader.js:6:3821",
+    "pongSeen":  false,
+    "proxyAllowEvents":  2,
+    "proxyDenyEvents":  7,
+    "outsideCanaryUnchanged":  true,
+    "sensitiveCanaryUnchanged":  true,
+    "usageFilePresent":  true,
+    "artifacts":  [
+                      "D:\\LZProjects\\prfrail\\tmp\\b2\\candidate-runs\\20260917-163359-smoke\\stdout.txt",
+                      "D:\\LZProjects\\prfrail\\tmp\\b2\\candidate-runs\\20260917-163359-smoke\\stderr.txt",
+                      "D:\\LZProjects\\prfrail\\tmp\\b2\\candidate-runs\\20260917-163359-smoke\\usage.json",
+                      "D:\\LZProjects\\prfrail\\tmp\\b2\\candidate-runs\\20260917-163359-smoke\\argv.json",
+                      "D:\\LZProjects\\prfrail\\tmp\\b2\\candidate-runs\\20260917-163359-smoke\\osargv.txt",
+                      "D:\\LZProjects\\prfrail\\tmp\\b2\\candidate-runs\\20260917-163359-smoke\\proxy.jsonl"
+                  ],
+    "finishedAtUtc":  "2026-09-17T08:34:23.5687863Z"
+}

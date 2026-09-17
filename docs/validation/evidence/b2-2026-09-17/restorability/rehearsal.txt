@@ -1,0 +1,106 @@
+B2 loopback rehearsal - archived transcript
+captured : 2026-09-18 01:41 local (Windows 11, PowerShell 5.1, elevated administrator session)
+container: prfrail-b2-battery
+sid      : S-1-15-2-3218363254-454638936-1835122239-3894821655-1240822417-2399691187-2538114423
+command  : powershell -NoProfile -ExecutionPolicy Bypass -File tools\agent-probe\appcontainer-b2\Invoke-B2LoopbackRehearsal.ps1
+note     : the recorded baseline predated schemaVersion 2, so the orchestrator forwarded -RefreshBaseline to step 1
+           after verifying restoral state (no exemption, no profile). The per-step logs and summary.json are
+           reproduced verbatim below; the scratch run directory (tmp\b2\rehearsal\20260918-014108) is git-ignored.
+
+[orchestrator output]
+baseline-refresh: the recorded baseline predates schemaVersion 2; forwarding -RefreshBaseline to step 1-apply
+step 1-apply: exit=0
+step 2-verify-present: exit=0
+step 3-revert: exit=0
+step 4-verify-absent-zero-diff: exit=0
+step 5-apply-final: exit=0
+step 6-verify-final-present: exit=0
+rehearsal-ok=True output=D:\LZProjects\prfrail\tmp\b2\rehearsal\20260918-014108
+
+[1-apply.log]
+apply-ok sid=S-1-15-2-3218363254-454638936-1835122239-3894821655-1240822417-2399691187-2538114423 exemptionCount=3
+apply-result: D:\LZProjects\prfrail\tmp\b2\state\apply-result.json
+
+[2-verify-present.log]
+containerSid: S-1-15-2-3218363254-454638936-1835122239-3894821655-1240822417-2399691187-2538114423
+profileExists: True
+exemptionPresent: True
+exemptionCount: 3
+restoralDiff: exemption-added: S-1-15-2-3218363254-454638936-1835122239-3894821655-1240822417-2399691187-2538114423 | profile-existence-changed: False -> True (prfrail-b2-battery)
+restoralFailures: 2
+listenerDiff: listener-zero-churn
+verify: expect=present ok=True
+
+[3-revert.log]
+revert-diff: zero-difference
+revert-result: D:\LZProjects\prfrail\tmp\b2\state\revert-result.json
+
+[4-verify-absent-zero-diff.log]
+containerSid: S-1-15-2-3218363254-454638936-1835122239-3894821655-1240822417-2399691187-2538114423
+profileExists: False
+exemptionPresent: False
+exemptionCount: 2
+restoralDiff: zero-difference
+restoralFailures: 0
+listenerDiff: listener-zero-churn
+verify: expect=absent ok=True
+
+[5-apply-final.log]
+apply-ok sid=S-1-15-2-3218363254-454638936-1835122239-3894821655-1240822417-2399691187-2538114423 exemptionCount=3
+apply-result: D:\LZProjects\prfrail\tmp\b2\state\apply-result.json
+
+[6-verify-final-present.log]
+containerSid: S-1-15-2-3218363254-454638936-1835122239-3894821655-1240822417-2399691187-2538114423
+profileExists: True
+exemptionPresent: True
+exemptionCount: 3
+restoralDiff: exemption-added: S-1-15-2-3218363254-454638936-1835122239-3894821655-1240822417-2399691187-2538114423 | profile-existence-changed: False -> True (prfrail-b2-battery)
+restoralFailures: 2
+listenerDiff: listener-zero-churn
+verify: expect=present ok=True
+
+[summary.json]
+{
+    "stamp":  "20260918-014108",
+    "container":  "prfrail-b2-battery",
+    "ok":  true,
+    "steps":  [
+                  {
+                      "step":  "1-apply",
+                      "exitCode":  0
+                  },
+                  {
+                      "step":  "2-verify-present",
+                      "exitCode":  0
+                  },
+                  {
+                      "step":  "3-revert",
+                      "exitCode":  0
+                  },
+                  {
+                      "step":  "4-verify-absent-zero-diff",
+                      "exitCode":  0
+                  },
+                  {
+                      "step":  "5-apply-final",
+                      "exitCode":  0
+                  },
+                  {
+                      "step":  "6-verify-final-present",
+                      "exitCode":  0
+                  }
+              ],
+    "outputDir":  "D:\\LZProjects\\prfrail\\tmp\\b2\\rehearsal\\20260918-014108",
+    "revertedDiff":  "restoral: zero-difference\nlisteners (informational): listener-zero-churn\n"
+}
+
+[close-out in the same elevated session, run by the user after the rehearsal left the exemption applied]
+revert-b2-loopback.ps1          -> revert-diff: zero-difference
+remove-b2-container-profile.ps1 -> profileExists: False / action: nothing to do   (revert deletes the profile by default)
+verify-b2-loopback.ps1 -Expect absent -> zero restoral failures, restoralDiff: zero-difference (see verify-current-state.txt)
+
+[reading the numbers]
+- exemptionCount 3 while applied = the two pre-existing entries preserved by the whole-table write plus the container SID;
+  exemptionCount 2 after revert = the baseline table restored exactly.
+- restoralFailures 2 in the "present" steps is the expected current-state diff (exemption added + profile created);
+  the verdict that matters is step 4, which is zero-difference.

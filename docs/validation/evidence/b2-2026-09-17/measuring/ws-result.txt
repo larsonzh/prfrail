@@ -1,0 +1,10 @@
+loopback-proxy-reachable=True
+loopback-other-adb-5037-reachable=True
+lan-http-proxy-8080-reachable=False
+lan-socks-1081-reachable=False
+lan-pac-8081-reachable=False
+proxy-allowlisted-https=http-404
+proxy-denied-http=http-403
+direct-egress=https://api.githubcopilot.com/ -> error: 未能解析此远程名称: 'api.githubcopilot.com'
+write-inside=ok
+write-outside=denied

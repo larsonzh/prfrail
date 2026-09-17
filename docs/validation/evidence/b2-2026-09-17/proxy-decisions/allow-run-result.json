@@ -1,0 +1,25 @@
+{
+    "scenario":  "smoke",
+    "exitCode":  1,
+    "wallClockSeconds":  24.5,
+    "premiumRequests":  0,
+    "stdoutLength":  0,
+    "stderrLength":  117,
+    "stdoutHead":  "",
+    "stderrHead":  "Package extraction took 11648ms\nError executing prompt: Error: Directory does not exist or cannot be accessed: R:\\ws\n",
+    "pongSeen":  false,
+    "proxyAllowEvents":  8,
+    "proxyDenyEvents":  0,
+    "outsideCanaryUnchanged":  true,
+    "sensitiveCanaryUnchanged":  true,
+    "usageFilePresent":  true,
+    "artifacts":  [
+                      "D:\\LZProjects\\prfrail\\tmp\\b2\\candidate-runs\\20260917-163515-smoke\\stdout.txt",
+                      "D:\\LZProjects\\prfrail\\tmp\\b2\\candidate-runs\\20260917-163515-smoke\\stderr.txt",
+                      "D:\\LZProjects\\prfrail\\tmp\\b2\\candidate-runs\\20260917-163515-smoke\\usage.json",
+                      "D:\\LZProjects\\prfrail\\tmp\\b2\\candidate-runs\\20260917-163515-smoke\\argv.json",
+                      "D:\\LZProjects\\prfrail\\tmp\\b2\\candidate-runs\\20260917-163515-smoke\\osargv.txt",
+                      "D:\\LZProjects\\prfrail\\tmp\\b2\\candidate-runs\\20260917-163515-smoke\\proxy.jsonl"
+                  ],
+    "finishedAtUtc":  "2026-09-17T08:35:49.5656988Z"
+}

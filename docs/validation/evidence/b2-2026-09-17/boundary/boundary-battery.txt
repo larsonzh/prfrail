@@ -1,0 +1,18 @@
+powershell.exe : AppContainer profile 'prfrail-b2-battery' does not exist; read-only steps never
+ create it (run a
+所在位置 D:\LZProjects\prfrail\tools\agent-probe\appcontainer-b2\assemble-evidence.ps1:68 字符: 5
++     & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path  ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (AppContainer pr...reate it (run a:String) [], Remo 
+   teException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+pply-b2-loopback.ps1 first)
+所在位置 D:\LZProjects\prfrail\tools\agent-probe\appcontainer-b2\b2-loopback-lib.ps1:123 字符: 9
++         throw ("AppContainer profile '{0}' does not exist; read-only  ...
++         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (AppContainer pr...back.ps1 first):String) [],  
+   RuntimeException
+    + FullyQualifiedErrorId : AppContainer profile 'prfrail-b2-battery' does not exist; read-on 
+   ly steps never create it (run apply-b2-loopback.ps1 first)
+ 

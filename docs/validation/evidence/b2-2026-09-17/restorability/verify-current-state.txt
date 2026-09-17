@@ -1,0 +1,9 @@
+# read-only state check captured 2026-09-18 after the rehearsal close-out (no machine writes)
+containerSid: S-1-15-2-3218363254-454638936-1835122239-3894821655-1240822417-2399691187-2538114423
+profileExists: False
+exemptionPresent: False
+exemptionCount: 2
+restoralDiff: zero-difference
+restoralFailures: 0
+listenerDiff: listener-zero-churn
+verify: expect=absent ok=True

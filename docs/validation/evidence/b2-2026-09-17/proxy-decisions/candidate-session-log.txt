@@ -1,0 +1,36 @@
+2026-09-17T08:35:41.625Z [INFO] Proxy configuration: HTTP_PROXY=http://127.0.0.1:39877, HTTPS_PROXY=http://127.0.0.1:39877, NO_PROXY=
+2026-09-17T08:35:41.627Z [INFO] Shell completions: no supported shell detected, skipping
+2026-09-17T08:35:43.614Z [INFO] [rust:copilot_runtime::storage::managed_settings] [managedSettings] device MDM: no policy present on this device
+2026-09-17T08:35:43.614Z [INFO] [rust:copilot_runtime::storage::managed_settings] [managedSettings] server policy fetch skipped: no authenticated GitHub host available
+2026-09-17T08:35:43.614Z [INFO] [rust:copilot_runtime::storage::managed_settings] [managedSettings] effective policy resolved: source=none, bypassDisabled=false, serverFetchFailed=false, policyHelperFailed=false, policyHelperFailClosed=false
+2026-09-17T08:35:43.625Z [INFO] Session indexing debug: SESSION_INDEXING=true, repository=undefined
+2026-09-17T08:35:44.063Z [INFO] [rust:copilot_runtime::storage::managed_settings] [managedSettings] device MDM: no policy present on this device
+2026-09-17T08:35:44.063Z [INFO] [rust:copilot_runtime::storage::managed_settings] [managedSettings] server policy: none for this account (404: no configured policy) from https://github.com
+2026-09-17T08:35:44.064Z [INFO] [rust:copilot_runtime::storage::managed_settings] [managedSettings] effective policy resolved: source=none, bypassDisabled=false, serverFetchFailed=false, policyHelperFailed=false, policyHelperFailClosed=false
+2026-09-17T08:35:44.503Z [INFO] [rust:copilot_runtime::storage::managed_settings] [managedSettings] device MDM: no policy present on this device
+2026-09-17T08:35:44.503Z [INFO] [rust:copilot_runtime::storage::managed_settings] [managedSettings] server policy fetch skipped: no authenticated GitHub host available
+2026-09-17T08:35:44.504Z [INFO] [rust:copilot_runtime::storage::managed_settings] [managedSettings] effective policy resolved: source=none, bypassDisabled=false, serverFetchFailed=false, policyHelperFailed=false, policyHelperFailClosed=false
+2026-09-17T08:35:44.507Z [WARNING] Could not determine which plugins are enabled for the session working directory (invalid-input) [epr-1]; starting the session with no active plugins.
+2026-09-17T08:35:44.538Z [INFO] [rust:copilot_runtime::shared_api::permissions] [managedSettings] applied: no bypass restriction in force (managed policy absent)
+2026-09-17T08:35:44.540Z [INFO] [rust:copilot_runtime::shared_api::permissions] [managedSettings] applied: bypass-permissions mode DISABLED by enterprise policy (fail-closed: policy could not be determined) — /allow-all and permission escalation are now blocked
+2026-09-17T08:35:44.541Z [INFO] [rust:copilot_runtime::managed_settings::api_session] [managedSettings] self-fetch starting for account (device)
+2026-09-17T08:35:44.545Z [INFO] [rust:copilot_runtime::storage::managed_settings] [managedSettings] device MDM: no policy present on this device
+2026-09-17T08:35:44.545Z [INFO] [rust:copilot_runtime::storage::managed_settings] [managedSettings] server policy fetch skipped: no authenticated GitHub host available
+2026-09-17T08:35:44.545Z [INFO] [rust:copilot_runtime::storage::managed_settings] [managedSettings] effective policy resolved: source=none, bypassDisabled=false, serverFetchFailed=false, policyHelperFailed=false, policyHelperFailClosed=false
+2026-09-17T08:35:44.545Z [INFO] [rust:copilot_runtime::shared_api::permissions] [managedSettings] applied: no bypass restriction in force (managed policy absent)
+2026-09-17T08:35:44.546Z [INFO] [rust:copilot_runtime::managed_settings::api_session] [managedSettings] self-fetch complete for (device): bypassDisabled=false, serverFetchFailed=false, serverResolution=Live, serverRetryableFailure=false, deviceLoadFailed=false
+2026-09-17T08:35:44.547Z [WARNING] [rust:copilot_runtime::session::pending_request_flow] pending-request event was not delivered to the session host {"error":"GenericFailure, no session host is registered for session 8e85328c-76ea-44c7-a576-440f39b7ff38"}
+2026-09-17T08:35:44.601Z [INFO] Workspace initialized: 8e85328c-76ea-44c7-a576-440f39b7ff38 (checkpoints: 0)
+2026-09-17T08:35:44.626Z [INFO] Starting Copilot CLI: 1.0.83
+2026-09-17T08:35:44.626Z [INFO] Node.js version: v24.20.0
+2026-09-17T08:35:44.627Z [INFO] [rust:copilot_runtime::shared_api::permissions] [managedSettings] applied: bypass-permissions mode DISABLED by enterprise policy (fail-closed: policy could not be determined) — /allow-all and permission escalation are now blocked
+2026-09-17T08:35:44.627Z [INFO] [rust:copilot_runtime::managed_settings::api_session] [managedSettings] self-fetch starting for account https://github.com/larsonzh
+2026-09-17T08:35:44.634Z [INFO] [rust:copilot_runtime::storage::managed_settings] [managedSettings] device MDM: no policy present on this device
+2026-09-17T08:35:44.634Z [INFO] [rust:copilot_runtime::storage::managed_settings] [managedSettings] confirmed no policy served from fresh cache (age 578ms) from https://github.com
+2026-09-17T08:35:44.634Z [INFO] [rust:copilot_runtime::storage::managed_settings] [managedSettings] effective policy resolved: source=none, bypassDisabled=false, serverFetchFailed=false, policyHelperFailed=false, policyHelperFailClosed=false
+2026-09-17T08:35:44.634Z [INFO] [rust:copilot_runtime::shared_api::permissions] [managedSettings] applied: no bypass restriction in force (managed policy absent)
+2026-09-17T08:35:44.634Z [INFO] [rust:copilot_runtime::managed_settings::api_session] [managedSettings] self-fetch complete for https://github.com/larsonzh: bypassDisabled=false, serverFetchFailed=false, serverResolution=FreshCache, serverRetryableFailure=false, deviceLoadFailed=false
+2026-09-17T08:35:46.376Z [ERROR] Error executing prompt: Error: Directory does not exist or cannot be accessed: R:\ws
+2026-09-17T08:35:47.446Z [WARNING] [rust:github_telemetry::queue_worker] [telemetry-queue] in-flight flushes did not settle within 999ms; posting the final batch alongside them
+2026-09-17T08:35:47.446Z [WARNING] [rust:github_telemetry::queue_worker] [telemetry-queue] in-flight flushes did not settle within 999ms; posting the final batch alongside them
+2026-09-17T08:35:48.445Z [WARNING] [shutdown] Timed out dispose: telemetryDisposeProcess (2000ms)
