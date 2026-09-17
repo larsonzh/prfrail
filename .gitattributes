@@ -3,5 +3,6 @@
 
 # Raw byte captures (OEM console dumps such as the B2 probe10 directory listing) must round-trip
 # byte-exactly: the evidence bundle hashes the stored bytes in MANIFEST.md / SHA256SUMS.txt, so
-# end-of-line normalisation would break verification on a fresh clone.
-*.raw.txt -text
+# end-of-line normalisation would break verification on a fresh clone. Scoped to the evidence tree so
+# that a *.raw.txt elsewhere is still subject to the repo-wide LF rule above.
+docs/validation/evidence/**/*.raw.txt -text
