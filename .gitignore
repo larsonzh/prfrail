@@ -10,6 +10,8 @@ vendor/
 /out/
 /tmp/*
 !/tmp/.gitkeep
+# Scratch output belongs in the repo-root tmp/ only; guard against tools writing their own tmp/
+/tools/tmp/
 .github/agents/
 
 # context-mode runtime state
