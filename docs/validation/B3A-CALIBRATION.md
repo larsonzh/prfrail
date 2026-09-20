@@ -201,3 +201,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools\b3a-rig\New-B3aEvidenc
 1. 凭据文件保留/轮换决定（§10 第 6 条）。
 2. 早期评估版环境曾以明文回显口令，建议轮换该（已退役）环境口令——仅提示，不影响本片。
 3. B3b 启动前请确认沿用本片冻结参数（§11）。
+
+**提交与 CI（2026-09-20）**：`136352b`（`feat: add the B3a power-loss injection rig with a hermetic self-test`，`tools/b3a-rig/`
+11 个脚本）→ `243ed82`（`docs: record the B3a calibration, its evidence bundle and the verification report`，含 128 文件证据包）
+→ `babc041`（`docs: add the T027 working documents (B3a design, slice list, operating directives)`），已推送 `origin/main`
+（`815c03f..babc041`；**未推 gitee**）。GitHub Actions run `35482066033`（head `babc041`，**1 分 48 秒**）：
+**Go ubuntu-latest success**（含 Linux 专属 Race 与 Contract fixtures）、**Go windows-latest success**，三个
+`workflow_dispatch` 专用任务按设计 **skipped**。推送前已用 `git worktree add --detach`（克隆语义）复核整包：
+**128/128 条哈希 0 失配**（入库字节与 `SHA256SUMS.txt` 自洽，满足 B2 的字节保真教训）。

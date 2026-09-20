@@ -220,3 +220,11 @@ evidence bundle (`MANIFEST.md` + `SHA256SUMS.txt`, 0 mismatches); (6) this repor
 2. The retired evaluation-edition environment once echoed its password in clear text — rotate that (retired) password if
    desired; it does not affect this slice.
 3. Before starting B3b, confirm it reuses this slice's frozen parameters (§11).
+**Commits and CI (2026-09-20)**: `136352b` (`feat: add the B3a power-loss injection rig with a hermetic self-test`; the 11
+scripts under `tools/b3a-rig/`) → `243ed82` (`docs: record the B3a calibration, its evidence bundle and the verification
+report`; includes the 128-file bundle) → `babc041` (`docs: add the T027 working documents (B3a design, slice list, operating
+directives)`), all pushed to `origin/main` (`815c03f..babc041`; **gitee not pushed**). GitHub Actions run `35482066033`
+(head `babc041`, **1 min 48 s**): **Go ubuntu-latest success** (including the Linux-only Race and Contract-fixtures steps),
+**Go windows-latest success**, and the three `workflow_dispatch`-only jobs **skipped** by design. Before pushing, a
+`git worktree add --detach` (clone-semantics) check recomputed the whole bundle: **128/128 hashes, 0 mismatches**,
+confirming the committed bytes match `SHA256SUMS.txt` (the B2 byte-fidelity lesson holds).

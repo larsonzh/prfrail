@@ -374,6 +374,9 @@ Depends on: A7
   **baseline re-taken**: `pristine` = `065a25e1...`.
   Open: the credential-file retention decision (B3b needs the same environment); **B3b must reuse the frozen 2.0 s
   injection delay and the S1–S9 protocol - any change requires recalibration**.
+  Commits and CI (2026-09-20): `136352b` + `243ed82` + `babc041` pushed to `origin/main` (`815c03f..babc041`; **gitee not
+  pushed**); GitHub Actions run `35482066033` (head `babc041`, 1m48s) both legs success, three conditional jobs skipped;
+  before pushing, a clone-semantics (`git worktree add --detach`) check recomputed the bundle at 128/128 hashes, 0 mismatches.
 
 Goal: make "what exactly is lost across a power cut" **observable, repeatable and reconcilable round by round** before any candidate verdict is drawn.
 Current gap: A7 disproved that kill-level injection can decide the durability step (CP4≡CP5 equivalence), and there is no per-round journal that is itself provably durable, nor a restart inventory.
