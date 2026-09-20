@@ -1,0 +1,1 @@
+{"schema":"b3a-write-probe","v":1,"mode":"negative","path":"R:\\calib\\r02\\parity.bin","size":14,"seed":"b3a-neg-0","derivation":"literal","contentDigest":"2ff01849e7a8dbcc123723f6c839d7f85b082119b5b6a9d0d190f8b979009d76","writeResult":"ok","commit":"none","apisCalled":["File.WriteAllBytes"],"guestClock":"2026-09-20 04:36:33","secondaryEvidence":"guest-clock"}

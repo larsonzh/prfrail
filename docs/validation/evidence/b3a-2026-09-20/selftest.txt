@@ -1,0 +1,24 @@
+PASS  parse-all-scripts
+PASS  ps1-encoding-bom-lf
+PASS  journal-chain-ok
+PASS  journal-tamper-red
+PASS  journal-ack-ok
+PASS  journal-ack-fail-blocks
+PASS  journal-timestamp-roundtrip
+PASS  journal-tail-append-red
+PASS  inventory-deterministic
+PASS  write-probe-negative
+PASS  outcome-survived
+PASS  outcome-lost-absent
+PASS  outcome-lost-zero-filled
+PASS  outcome-lost-torn-size
+PASS  outcome-lost-torn-content
+PASS  verdict-unusable-neg-no-loss
+PASS  verdict-calibrated
+PASS  verdict-unusable-pos-loss
+PASS  verdict-unusable-chain-broken
+PASS  verdict-requiredN-floor
+PASS  module-load-preserves-vars
+PASS  deploy-return-shape
+
+checks=22 failures=0

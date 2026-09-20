@@ -1,0 +1,15 @@
+--- power events in the last 6 h (oldest first) ---
+2026-09-20 00:00:42  Id=6008  ��һ��ϵͳ�� 15:54:57 �� ?2026/?9/?19 �ϵĹر�������ġ�
+2026-09-20 00:05:34  Id=1074  ���� C:\Windows\System32\shutdown.exe (WIN11-B3) ��������ԭ���Ѵ����û� WIN11-B3\prfrail �������� WIN11-B3 �� ����: û���ҵ����ԭ��ı���
+2026-09-20 01:18:28  Id=1074  ���� C:\Windows\System32\shutdown.exe (WIN11-B3) ��������ԭ���Ѵ����û� WIN11-B3\prfrail �������� WIN11-B3 �� �ػ�: û���ҵ����ԭ��ı���
+2026-09-20 03:17:04  Id=1074  ���� C:\WINDOWS\Explorer.EXE (WIN11-B3) ��������ԭ���Ѵ����û� WIN11-B3\prfrail �������� WIN11-B3 �� �رյ�Դ: ����(�ƻ���)
+2026-09-20 03:59:16  Id=1074  ���� C:\Windows\System32\shutdown.exe (WIN11-B3) ��������ԭ���Ѵ����û� WIN11-B3\prfrail �������� WIN11-B3 �� �ػ�: û���ҵ����ԭ��ı���
+2026-09-20 04:44:05  Id=41  ϵͳ����δ�������ػ��������������������ϵͳֹͣ��Ӧ����������������ϵ磬����ܻᵼ�´˴���
+2026-09-20 04:44:16  Id=6008  ��һ��ϵͳ�� 4:43:28 �� ?2026/?9/?20 �ϵĹر�������ġ�
+--- verdict ---
+VERDICT: HARD-POWER-LOSS  (expected for an injection round)
+--- context ---
+now      = 2026-09-20 04:44:50
+lastBoot = 09/20/2026 04:43:50
+uptime   = 1 minutes
+licence  = status 5, grace 0

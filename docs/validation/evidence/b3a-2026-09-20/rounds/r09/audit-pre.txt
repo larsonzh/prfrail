@@ -1,0 +1,13 @@
+--- power events in the last 6 h (oldest first) ---
+2026-09-20 00:00:42  Id=6008  ��һ��ϵͳ�� 15:54:57 �� ?2026/?9/?19 �ϵĹر�������ġ�
+2026-09-20 00:05:34  Id=1074  ���� C:\Windows\System32\shutdown.exe (WIN11-B3) ��������ԭ���Ѵ����û� WIN11-B3\prfrail �������� WIN11-B3 �� ����: û���ҵ����ԭ��ı���
+2026-09-20 01:18:28  Id=1074  ���� C:\Windows\System32\shutdown.exe (WIN11-B3) ��������ԭ���Ѵ����û� WIN11-B3\prfrail �������� WIN11-B3 �� �ػ�: û���ҵ����ԭ��ı���
+2026-09-20 03:17:04  Id=1074  ���� C:\WINDOWS\Explorer.EXE (WIN11-B3) ��������ԭ���Ѵ����û� WIN11-B3\prfrail �������� WIN11-B3 �� �رյ�Դ: ����(�ƻ���)
+2026-09-20 03:59:16  Id=1074  ���� C:\Windows\System32\shutdown.exe (WIN11-B3) ��������ԭ���Ѵ����û� WIN11-B3\prfrail �������� WIN11-B3 �� �ػ�: û���ҵ����ԭ��ı���
+--- verdict ---
+VERDICT: GRACEFUL-SHUTDOWN requested by another process (inspect the line above)
+--- context ---
+now      = 2026-09-20 05:00:39
+lastBoot = 09/20/2026 04:59:13
+uptime   = 1.5 minutes
+licence  = status 5, grace 0

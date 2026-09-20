@@ -1,0 +1,254 @@
+[04:30:26] === round 1 candidate=parity stage=parity begin ===
+[04:30:28] S1: pre-round poweroff (was running) exit=0
+[04:30:28] S1: restore pristine exit=0
+[04:30:36] S2: startvm exit=0
+[04:31:18] S3: guestcontrol ready after 42.6s
+[04:32:03] S3.5: deploy 11-shutdown-audit.ps1 copied=True hashMatch=True note=
+[04:32:03] S3.5: deploy 12-round-inventory.ps1 copied=True hashMatch=True note=
+[04:32:03] S3.5: deploy 13-round-write.ps1 copied=True hashMatch=True note=
+[04:32:13] S4: pre-audit verdict=GRACEFUL-SHUTDOWN uptime=1.5
+[04:32:19] S4.5: round root mkdir exit=0
+[04:32:19] S5: plan record ACK ok (committed before the guest write)
+[04:32:27] S6: probe digest=2ff01849e7a8dbcc123723f6c839d7f85b082119b5b6a9d0d190f8b979009d76 size=14 apis=File.WriteAllBytes
+[04:32:31] S7: controlvm poweroff exit=0
+[04:32:31] S7: cut record ACK ok
+[04:33:48] S8: post-audit verdict=HARD-POWER-LOSS
+[04:34:08] S8: inventory x2 byte-identical; dirty=Volume - R: is NOT Dirty
+[04:34:09] S9: outcome=lost-zero-filled
+[04:34:10] reset: controlvm poweroff (was running) exit=0
+[04:34:10] reset: restore pristine exit=0
+[04:34:10] === round 1 done: outcome=lost-zero-filled ===
+[04:34:38] === B3a calibration begin: N=5 (R0 + 5x negative + 5x positive) ===
+[04:34:39] journal chain ok (3 records); next absolute round = 2
+[04:34:39] launch: round 2 candidate=parity (R0)
+[04:34:43] === round 2 candidate=parity stage=parity begin ===
+[04:34:45] S1: restore pristine exit=0
+[04:34:56] S2: startvm exit=0
+[04:35:35] S3: guestcontrol ready after 39.6s
+[04:36:15] S3.5: deploy 11-shutdown-audit.ps1 copied=True hashMatch=True note=
+[04:36:15] S3.5: deploy 12-round-inventory.ps1 copied=True hashMatch=True note=
+[04:36:15] S3.5: deploy 13-round-write.ps1 copied=True hashMatch=True note=
+[04:36:27] S4: pre-audit verdict=GRACEFUL-SHUTDOWN uptime=1.4
+[04:36:27] S4.5: round root mkdir exit=0
+[04:36:27] S5: plan record ACK ok (committed before the guest write)
+[04:36:35] S6: probe digest=2ff01849e7a8dbcc123723f6c839d7f85b082119b5b6a9d0d190f8b979009d76 size=14 apis=File.WriteAllBytes
+[04:36:38] S7: controlvm poweroff exit=0
+[04:36:38] S7: cut record ACK ok
+[04:37:48] S8: post-audit verdict=HARD-POWER-LOSS
+[04:38:10] S8: inventory x2 byte-identical; dirty=Volume - R: is NOT Dirty
+[04:38:11] S9: outcome=lost-zero-filled
+[04:38:12] reset: controlvm poweroff (was running) exit=0
+[04:38:12] reset: restore pristine exit=0
+[04:38:12] === round 2 done: outcome=lost-zero-filled ===
+[04:38:12] round 2 (R0) valid: outcome=lost-zero-filled
+[04:38:12] launch: round 3 candidate=negative-control (R1)
+[04:38:14] === round 3 candidate=negative-control stage=temp-written begin ===
+[04:38:15] S1: restore pristine exit=0
+[04:38:21] S2: startvm exit=0
+[04:38:56] S3: guestcontrol ready after 34.7s
+[04:39:53] S3.5: deploy 11-shutdown-audit.ps1 copied=True hashMatch=True note=
+[04:39:53] S3.5: deploy 12-round-inventory.ps1 copied=True hashMatch=True note=
+[04:39:53] S3.5: deploy 13-round-write.ps1 copied=True hashMatch=True note=
+[04:40:03] S4: pre-audit verdict=GRACEFUL-SHUTDOWN uptime=1.6
+[04:40:04] S4.5: round root mkdir exit=0
+[04:40:04] S5: plan record ACK ok (committed before the guest write)
+[04:40:13] S6: probe digest=8a4336c0a357d8d6d6f9f5557e29da7080175f7e01a6b879b2bc6bf243d2c496 size=262144 apis=File.WriteAllBytes
+[04:40:16] S7: controlvm poweroff exit=0
+[04:40:16] S7: cut record ACK ok
+[04:41:29] S8: post-audit verdict=HARD-POWER-LOSS
+[04:41:45] S8: inventory x2 byte-identical; dirty=Volume - R: is NOT Dirty
+[04:41:45] S9: outcome=survived
+[04:41:46] reset: controlvm poweroff (was running) exit=0
+[04:41:46] reset: restore pristine exit=0
+[04:41:46] === round 3 done: outcome=survived ===
+[04:41:46] round 3 (R1) valid: outcome=survived
+[04:41:46] launch: round 4 candidate=negative-control (R2)
+[04:41:48] === round 4 candidate=negative-control stage=temp-written begin ===
+[04:41:49] S1: restore pristine exit=0
+[04:41:53] S2: startvm exit=0
+[04:42:36] S3: guestcontrol ready after 42.5s
+[04:43:22] S3.5: deploy 11-shutdown-audit.ps1 copied=True hashMatch=True note=
+[04:43:22] S3.5: deploy 12-round-inventory.ps1 copied=True hashMatch=True note=
+[04:43:22] S3.5: deploy 13-round-write.ps1 copied=True hashMatch=True note=
+[04:43:30] S4: pre-audit verdict=GRACEFUL-SHUTDOWN uptime=1.5
+[04:43:31] S4.5: round root mkdir exit=0
+[04:43:31] S5: plan record ACK ok (committed before the guest write)
+[04:43:38] S6: probe digest=ef9902b233b8c80b605dd4851d07a7c1ed01d1cae8be3cb0b4e2e9cbd1ffecb1 size=262144 apis=File.WriteAllBytes
+[04:43:41] S7: controlvm poweroff exit=0
+[04:43:41] S7: cut record ACK ok
+[04:44:51] S8: post-audit verdict=HARD-POWER-LOSS
+[04:45:08] S8: inventory x2 byte-identical; dirty=Volume - R: is NOT Dirty
+[04:45:08] S9: outcome=lost-zero-filled
+[04:45:09] reset: controlvm poweroff (was running) exit=0
+[04:45:10] reset: restore pristine exit=0
+[04:45:10] === round 4 done: outcome=lost-zero-filled ===
+[04:45:10] round 4 (R2) valid: outcome=lost-zero-filled
+[04:45:10] launch: round 5 candidate=negative-control (R3)
+[04:45:11] === round 5 candidate=negative-control stage=temp-written begin ===
+[04:45:12] S1: restore pristine exit=0
+[04:45:17] S2: startvm exit=0
+[04:46:07] S3: guestcontrol ready after 49.5s
+[04:46:44] S3.5: deploy 11-shutdown-audit.ps1 copied=True hashMatch=True note=
+[04:46:44] S3.5: deploy 12-round-inventory.ps1 copied=True hashMatch=True note=
+[04:46:44] S3.5: deploy 13-round-write.ps1 copied=True hashMatch=True note=
+[04:46:53] S4: pre-audit verdict=GRACEFUL-SHUTDOWN uptime=1.5
+[04:46:53] S4.5: round root mkdir exit=0
+[04:46:53] S5: plan record ACK ok (committed before the guest write)
+[04:47:02] S6: probe digest=0f4849cae57e1efbc5c793cf2522be14532f5a1469e29e014502601217dee7f5 size=262144 apis=File.WriteAllBytes
+[04:47:05] S7: controlvm poweroff exit=0
+[04:47:05] S7: cut record ACK ok
+[04:48:15] S8: post-audit verdict=HARD-POWER-LOSS
+[04:48:32] S8: inventory x2 byte-identical; dirty=Volume - R: is NOT Dirty
+[04:48:32] S9: outcome=lost-absent
+[04:48:33] reset: controlvm poweroff (was running) exit=0
+[04:48:33] reset: restore pristine exit=0
+[04:48:33] === round 5 done: outcome=lost-absent ===
+[04:48:33] round 5 (R3) valid: outcome=lost-absent
+[04:48:33] launch: round 6 candidate=negative-control (R4)
+[04:48:35] === round 6 candidate=negative-control stage=temp-written begin ===
+[04:48:36] S1: restore pristine exit=0
+[04:48:42] S2: startvm exit=0
+[04:49:33] S3: guestcontrol ready after 51.2s
+[04:49:56] S3.5: deploy 11-shutdown-audit.ps1 copied=True hashMatch=True note=
+[04:49:56] S3.5: deploy 12-round-inventory.ps1 copied=True hashMatch=True note=
+[04:49:56] S3.5: deploy 13-round-write.ps1 copied=True hashMatch=True note=
+[04:50:06] S4: pre-audit verdict=GRACEFUL-SHUTDOWN uptime=1.3
+[04:50:06] S4.5: round root mkdir exit=0
+[04:50:06] S5: plan record ACK ok (committed before the guest write)
+[04:50:17] S6: probe digest=743358603ea39446c94137e56014c910751a1cc2d69f7393a2458d8221cc9217 size=262144 apis=File.WriteAllBytes
+[04:50:20] S7: controlvm poweroff exit=0
+[04:50:20] S7: cut record ACK ok
+[04:51:31] S8: post-audit verdict=HARD-POWER-LOSS
+[04:51:49] S8: inventory x2 byte-identical; dirty=Volume - R: is NOT Dirty
+[04:51:49] S9: outcome=lost-zero-filled
+[04:51:50] reset: controlvm poweroff (was running) exit=0
+[04:51:50] reset: restore pristine exit=0
+[04:51:50] === round 6 done: outcome=lost-zero-filled ===
+[04:51:50] round 6 (R4) valid: outcome=lost-zero-filled
+[04:51:50] launch: round 7 candidate=negative-control (R5)
+[04:51:52] === round 7 candidate=negative-control stage=temp-written begin ===
+[04:51:53] S1: restore pristine exit=0
+[04:51:59] S2: startvm exit=0
+[04:52:50] S3: guestcontrol ready after 50.9s
+[04:53:22] S3.5: deploy 11-shutdown-audit.ps1 copied=True hashMatch=True note=
+[04:53:22] S3.5: deploy 12-round-inventory.ps1 copied=True hashMatch=True note=
+[04:53:22] S3.5: deploy 13-round-write.ps1 copied=True hashMatch=True note=
+[04:53:33] S4: pre-audit verdict=GRACEFUL-SHUTDOWN uptime=1.4
+[04:53:39] S4.5: round root mkdir exit=0
+[04:53:39] S5: plan record ACK ok (committed before the guest write)
+[04:53:49] S6: probe digest=f48c7d3222e8e74e6505bb97e61ece81531041c6992ea4db73d5c8b537e7f470 size=262144 apis=File.WriteAllBytes
+[04:53:52] S7: controlvm poweroff exit=0
+[04:53:52] S7: cut record ACK ok
+[04:55:02] S8: post-audit verdict=HARD-POWER-LOSS
+[04:55:30] S8: inventory x2 byte-identical; dirty=Volume - R: is NOT Dirty
+[04:55:30] S9: outcome=lost-absent
+[04:55:31] reset: controlvm poweroff (was running) exit=0
+[04:55:31] reset: restore pristine exit=0
+[04:55:31] === round 7 done: outcome=lost-absent ===
+[04:55:32] round 7 (R5) valid: outcome=lost-absent
+[04:55:32] launch: round 8 candidate=positive-control (R6)
+[04:55:34] === round 8 candidate=positive-control stage=parent-synced begin ===
+[04:55:35] S1: restore pristine exit=0
+[04:55:40] S2: startvm exit=0
+[04:56:23] S3: guestcontrol ready after 43.6s
+[04:57:12] S3.5: deploy 11-shutdown-audit.ps1 copied=True hashMatch=True note=
+[04:57:12] S3.5: deploy 12-round-inventory.ps1 copied=True hashMatch=True note=
+[04:57:12] S3.5: deploy 13-round-write.ps1 copied=True hashMatch=True note=
+[04:57:21] S4: pre-audit verdict=GRACEFUL-SHUTDOWN uptime=1.6
+[04:57:21] S4.5: round root mkdir exit=0
+[04:57:21] S5: plan record ACK ok (committed before the guest write)
+[04:57:32] S6: probe digest=e3415ee4dd189c247ec7a2b10940e9cf926b3e43378591e5a362edf16f90651f size=262144 apis=FileStream.Write,FileStream.Flush(true),FileStream.Close,CreateFile(\\.\R:),FlushFileBuffers,CloseHandle
+[04:57:35] S7: controlvm poweroff exit=0
+[04:57:35] S7: cut record ACK ok
+[04:58:44] S8: post-audit verdict=HARD-POWER-LOSS
+[04:58:59] S8: inventory x2 byte-identical; dirty=Volume - R: is NOT Dirty
+[04:59:00] S9: outcome=survived
+[04:59:01] reset: controlvm poweroff (was running) exit=0
+[04:59:01] reset: restore pristine exit=0
+[04:59:01] === round 8 done: outcome=survived ===
+[04:59:01] round 8 (R6) valid: outcome=survived
+[04:59:01] launch: round 9 candidate=positive-control (R7)
+[04:59:03] === round 9 candidate=positive-control stage=parent-synced begin ===
+[04:59:04] S1: restore pristine exit=0
+[04:59:10] S2: startvm exit=0
+[04:59:46] S3: guestcontrol ready after 35.5s
+[05:00:33] S3.5: deploy 11-shutdown-audit.ps1 copied=True hashMatch=True note=
+[05:00:33] S3.5: deploy 12-round-inventory.ps1 copied=True hashMatch=True note=
+[05:00:33] S3.5: deploy 13-round-write.ps1 copied=True hashMatch=True note=
+[05:00:44] S4: pre-audit verdict=GRACEFUL-SHUTDOWN uptime=1.5
+[05:00:44] S4.5: round root mkdir exit=0
+[05:00:44] S5: plan record ACK ok (committed before the guest write)
+[05:00:55] S6: probe digest=cbfb75e7c186ea631afce22d790cf182fd9c35cc16821df36665711d29dbcfe7 size=262144 apis=FileStream.Write,FileStream.Flush(true),FileStream.Close,CreateFile(\\.\R:),FlushFileBuffers,CloseHandle
+[05:00:59] S7: controlvm poweroff exit=0
+[05:00:59] S7: cut record ACK ok
+[05:02:06] S8: post-audit verdict=HARD-POWER-LOSS
+[05:02:24] S8: inventory x2 byte-identical; dirty=Volume - R: is NOT Dirty
+[05:02:24] S9: outcome=survived
+[05:02:26] reset: controlvm poweroff (was running) exit=0
+[05:02:26] reset: restore pristine exit=0
+[05:02:26] === round 9 done: outcome=survived ===
+[05:02:26] round 9 (R7) valid: outcome=survived
+[05:02:26] launch: round 10 candidate=positive-control (R8)
+[05:02:28] === round 10 candidate=positive-control stage=parent-synced begin ===
+[05:02:29] S1: restore pristine exit=0
+[05:02:35] S2: startvm exit=0
+[05:03:09] S3: guestcontrol ready after 34.1s
+[05:03:52] S3.5: deploy 11-shutdown-audit.ps1 copied=True hashMatch=True note=
+[05:03:52] S3.5: deploy 12-round-inventory.ps1 copied=True hashMatch=True note=
+[05:03:52] S3.5: deploy 13-round-write.ps1 copied=True hashMatch=True note=
+[05:04:02] S4: pre-audit verdict=GRACEFUL-SHUTDOWN uptime=1.4
+[05:04:02] S4.5: round root mkdir exit=0
+[05:04:02] S5: plan record ACK ok (committed before the guest write)
+[05:04:14] S6: probe digest=434b16b653c875c09d2cecc52a9f23894d45525e9df5cc07c44b1b8e49380eb7 size=262144 apis=FileStream.Write,FileStream.Flush(true),FileStream.Close,CreateFile(\\.\R:),FlushFileBuffers,CloseHandle
+[05:04:17] S7: controlvm poweroff exit=0
+[05:04:18] S7: cut record ACK ok
+[05:05:30] S8: post-audit verdict=HARD-POWER-LOSS
+[05:05:46] S8: inventory x2 byte-identical; dirty=Volume - R: is NOT Dirty
+[05:05:46] S9: outcome=survived
+[05:05:47] reset: controlvm poweroff (was running) exit=0
+[05:05:47] reset: restore pristine exit=0
+[05:05:47] === round 10 done: outcome=survived ===
+[05:05:47] round 10 (R8) valid: outcome=survived
+[05:05:47] launch: round 11 candidate=positive-control (R9)
+[05:05:49] === round 11 candidate=positive-control stage=parent-synced begin ===
+[05:05:50] S1: restore pristine exit=0
+[05:05:56] S2: startvm exit=0
+[05:06:34] S3: guestcontrol ready after 37.8s
+[05:07:21] S3.5: deploy 11-shutdown-audit.ps1 copied=True hashMatch=True note=
+[05:07:21] S3.5: deploy 12-round-inventory.ps1 copied=True hashMatch=True note=
+[05:07:21] S3.5: deploy 13-round-write.ps1 copied=True hashMatch=True note=
+[05:07:32] S4: pre-audit verdict=GRACEFUL-SHUTDOWN uptime=1.5
+[05:07:32] S4.5: round root mkdir exit=0
+[05:07:32] S5: plan record ACK ok (committed before the guest write)
+[05:07:44] S6: probe digest=c7094d8f8ceb885c44579fbf88e4e610a9be9a7c215da90b896005df82eef43e size=262144 apis=FileStream.Write,FileStream.Flush(true),FileStream.Close,CreateFile(\\.\R:),FlushFileBuffers,CloseHandle
+[05:07:47] S7: controlvm poweroff exit=0
+[05:07:47] S7: cut record ACK ok
+[05:08:53] S8: post-audit verdict=HARD-POWER-LOSS
+[05:09:12] S8: inventory x2 byte-identical; dirty=Volume - R: is NOT Dirty
+[05:09:13] S9: outcome=survived
+[05:09:14] reset: controlvm poweroff (was running) exit=0
+[05:09:14] reset: restore pristine exit=0
+[05:09:14] === round 11 done: outcome=survived ===
+[05:09:14] round 11 (R9) valid: outcome=survived
+[05:09:14] launch: round 12 candidate=positive-control (R10)
+[05:09:16] === round 12 candidate=positive-control stage=parent-synced begin ===
+[05:09:17] S1: restore pristine exit=0
+[05:09:23] S2: startvm exit=0
+[05:10:33] S3: guestcontrol ready after 69.5s
+[05:11:02] S3.5: deploy 11-shutdown-audit.ps1 copied=True hashMatch=True note=
+[05:11:02] S3.5: deploy 12-round-inventory.ps1 copied=True hashMatch=True note=
+[05:11:02] S3.5: deploy 13-round-write.ps1 copied=True hashMatch=True note=
+[05:11:15] S4: pre-audit verdict=GRACEFUL-SHUTDOWN uptime=1.7
+[05:11:15] S4.5: round root mkdir exit=0
+[05:11:16] S5: plan record ACK ok (committed before the guest write)
+[05:11:28] S6: probe digest=ea32c51f135f437f58a49982fee869410e6d4317fd048dd7ffefe4136efbde6f size=262144 apis=FileStream.Write,FileStream.Flush(true),FileStream.Close,CreateFile(\\.\R:),FlushFileBuffers,CloseHandle
+[05:11:31] S7: controlvm poweroff exit=0
+[05:11:31] S7: cut record ACK ok
+[05:12:49] S8: post-audit verdict=HARD-POWER-LOSS
+[05:13:19] S8: inventory x2 byte-identical; dirty=Volume - R: is NOT Dirty
+[05:13:19] S9: outcome=survived
+[05:13:20] reset: controlvm poweroff (was running) exit=0
+[05:13:20] reset: restore pristine exit=0
+[05:13:20] === round 12 done: outcome=survived ===
+[05:13:20] round 12 (R10) valid: outcome=survived
+[05:13:20] === calibration verdict: CALIBRATED (neg 4/5 losses, pos 0/5 losses) ===

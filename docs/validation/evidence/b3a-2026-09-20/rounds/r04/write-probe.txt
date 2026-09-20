@@ -1,0 +1,1 @@
+{"schema":"b3a-write-probe","v":1,"mode":"negative","path":"R:\\calib\\r04\\neg.bin","size":262144,"seed":"b3a-neg-4","derivation":"sha256-blocks","contentDigest":"ef9902b233b8c80b605dd4851d07a7c1ed01d1cae8be3cb0b4e2e9cbd1ffecb1","writeResult":"ok","commit":"none","apisCalled":["File.WriteAllBytes"],"guestClock":"2026-09-20 04:43:32","secondaryEvidence":"guest-clock"}

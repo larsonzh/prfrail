@@ -1,0 +1,34 @@
+calibration began at 04:34:38 (last "=== B3a calibration begin" line in session.log)
+b3a-rig-lib.ps1              identical=True   repoMtime=2026-09-20 04:16:28 before-calibration-start
+                               repo=6e2663c011c43a5485a3fad051d231fea13bfdd43152380daccb151b90a4161e
+                               bundle=6e2663c011c43a5485a3fad051d231fea13bfdd43152380daccb151b90a4161e
+b3a-journal-lib.ps1          identical=True   repoMtime=2026-09-20 04:10:19 before-calibration-start
+                               repo=66f8ceea7d3ba397253044c4462faa9fda8ff03bcc80856b1418f91a34921df5
+                               bundle=66f8ceea7d3ba397253044c4462faa9fda8ff03bcc80856b1418f91a34921df5
+Get-B3aReconcile.ps1         identical=True   repoMtime=2026-09-20 04:10:20 before-calibration-start
+                               repo=352f42eb17ed91d55b611fa2caf63e694c9db92e403b8238eeadf1416d8b5771
+                               bundle=352f42eb17ed91d55b611fa2caf63e694c9db92e403b8238eeadf1416d8b5771
+Invoke-B3aReconcile.ps1      identical=True   repoMtime=2026-09-20 04:10:20 before-calibration-start
+                               repo=8eda7ccbd39aa53925ae1423e7ceb56376f4bab389f39976bcf96a9f86b1bb94
+                               bundle=8eda7ccbd39aa53925ae1423e7ceb56376f4bab389f39976bcf96a9f86b1bb94
+Invoke-B3aRound.ps1          identical=True   repoMtime=2026-09-20 04:29:30 before-calibration-start
+                               repo=6fd45ea868e6cd68f6fc6190b9b5b3c376bf61afd56634e1064787abdbfaee4d
+                               bundle=6fd45ea868e6cd68f6fc6190b9b5b3c376bf61afd56634e1064787abdbfaee4d
+Invoke-B3aCalibration.ps1    identical=True   repoMtime=2026-09-20 04:29:19 before-calibration-start
+                               repo=cbd52db37c824f4ef75768d4b2f7c4bffd49fd647a2f868fee6386b411ba0a10
+                               bundle=cbd52db37c824f4ef75768d4b2f7c4bffd49fd647a2f868fee6386b411ba0a10
+New-B3aSession.ps1           identical=True   repoMtime=2026-09-20 04:10:20 before-calibration-start
+                               repo=59660bdbbfe398a9de61ce4a02e3ad4379dbfbf6a3dca7b2674530416ffdcba2
+                               bundle=59660bdbbfe398a9de61ce4a02e3ad4379dbfbf6a3dca7b2674530416ffdcba2
+Test-B3aRig.ps1              identical=True   repoMtime=2026-09-20 04:29:19 before-calibration-start
+                               repo=0cd512c76398aca8402024f01658d812617e35ae49dc927933d2e35312e22002
+                               bundle=0cd512c76398aca8402024f01658d812617e35ae49dc927933d2e35312e22002
+New-B3aEvidence.ps1          identical=True   repoMtime=2026-09-20 05:25:28 AFTER-CALIBRATION-START
+                               repo=81e475c9a10e9afb078ff8eac4d96f81ae08d4a36fdf39a9be16acf1104d166e
+                               bundle=81e475c9a10e9afb078ff8eac4d96f81ae08d4a36fdf39a9be16acf1104d166e
+12-round-inventory.ps1       identical=True   repoMtime=2026-09-20 04:10:20 before-calibration-start
+                               repo=89a3669374910f93fd02a3d00959cfda9533a1a18fad3b5ed3177da19acfae07
+                               bundle=89a3669374910f93fd02a3d00959cfda9533a1a18fad3b5ed3177da19acfae07
+13-round-write.ps1           identical=True   repoMtime=2026-09-20 04:10:20 before-calibration-start
+                               repo=0f37fb36a3ed7f4a497c38f3414684efb4d9873d2ae3b8eb69bac8e64f8a2fd8
+                               bundle=0f37fb36a3ed7f4a497c38f3414684efb4d9873d2ae3b8eb69bac8e64f8a2fd8
