@@ -1,8 +1,9 @@
 ﻿# DR fix slice report (pilot `[PILOT]`)
 
 Date: 2026-09-22. Status: `COMPLETE`. Slice identifier: `DR-FIX` (the first formal slice under the new directive ⇒ per §12.1 it is the pilot).
-Commits: `ff259b2` (fix, push #1), `9f68a52` (ledger / directive write-back, push #2); this file itself is the commit carried by push #3.
-CI: push #1 run **`35646859765`** **green on the first attempt on both legs** (including package-level evidence, see §5.1); the run ids and conclusions of push #2 and push #3, and this file's own commit hash, are registered together by **⑧b** per OB-13 (§5.2). Push: `origin/main` (**gitee not pushed**).
+Commits: `ff259b2` (fix, push #1), `9f68a52` (ledger / directive write-back, push #2), `1b01115` (this report, push #3).
+CI: **3 consecutive pushes green on the first attempt on both legs** — run **`35646859765`** (`ff259b2`), **`35647349443`** (`9f68a52`), **`35648196443`** (`1b01115`); all three logs contain the package-level `ok … enforcement-proxy` on both legs (see §5.2).
+Push: `origin/main` (**gitee not pushed**).
 
 ## 0. Honesty rules
 
@@ -140,26 +141,30 @@ For a timing-flake fix, "removing the fix turns it red" is **indeterminate** —
 ### 5.1 Before the commit (variation evidence + repeated runs; OB-13 first stage)
 
 - **Variation evidence**: A1/A3 (甲-i / 甲-ii), A5 (Fix-2), A7/A8 (T1) — see §4.2; **the fix mechanism is effective** is proven.
-- **Structural elimination evidence (乙)**: `-count=10` all green (A9).
-- **Commit and CI evidence**: `ff259b2` (fix); run **`35646859765`** (head `ff259b2`) **green on the first attempt on both legs**. **Package-level evidence (harder than the run conclusion)**: in that run's log both legs print `ok github.com/larsonzh/prfrail/tools/agent-probe/enforcement-proxy` in the `Test` step (Windows `0.574s` / Ubuntu `0.556s`) — that is, **the fixed test package did run and pass on both CI legs**; the same log contains no `FAIL` line. Raw extraction in `tmp/drfix/CI-push1.txt`.
+- **Structural elimination evidence (乙)**: `-count=10` all green (A9, `4.273s`); **after the commit** a rerun of `-count=10` on this machine in the committed state is also all green (`4.504s`, see `tmp/drfix/B5-postcommit-count10.txt`), and the package hermetic self-check is `selftest: checks=13 failures=0` (`tmp/drfix/B6-postcommit-psselftest.txt`).
+- **Commit ids**: `ff259b2` (fix), `9f68a52` (ledger / directive write-back) — in the §5.1 ordering (⑧a → ⑨) both were committed before ⑨; their CI conclusions are in §5.2.
 
 ### 5.2 After the commit (3 consecutive pushes, first attempts; OB-13 second stage)
 
 **Decision standard (explicitly supported by the user on 2026-09-22)**: **3 consecutive pushes all green ⇒ the fix verification holds**; **any red ⇒ the fix did not take effect, go back to ①**, and separately register "fix failure" per the DR disposition standard under **boundary ③**. Reason: this slice is essentially **fixing a flaky test**, and **one** green CI **cannot prove the fix is effective**; 3 consecutive pushes (observing the **Windows** leg each time) is the **minimum acceptable verification strength**. This section is exactly the **independent corroboration of §12.1 A12** for this slice.
 
-**Evidence definition (OB-13 second stage)**: this section registers the first-attempt results of the 3 consecutive pushes; push #2's run `35647349443` and push #3's (this file's) run id and conclusion, as well as this file's own commit hash, are registered together by **⑧b** into this file and the ledger and committed separately, **without re-running ⑦ on that basis** (it belongs to the ledger-metadata class of OB-11).
+**First-attempt results of the 3 consecutive pushes (all are first attempts on a `push` event; `gh run rerun` was not used)**:
+
+| # | Commit | run | First-attempt conclusion | Package-level evidence (the `Test` step on both legs) |
+|---|---|---|---|---|
+| 1 | `ff259b2` (fix) | `35646859765` | **green on the first attempt on both legs** | Windows `ok … enforcement-proxy` `0.574s` / Ubuntu `0.556s` |
+| 2 | `9f68a52` (ledger / directive) | `35647349443` | **green on the first attempt on both legs** | Windows `0.556s` / Ubuntu `0.264s` |
+| 3 | `1b01115` (this report) | `35648196443` | **green on the first attempt on both legs** | Windows `0.533s` / Ubuntu `0.227s` |
+
+**Conclusion (acceptance ①)**: **3 consecutive pushes green on the first attempt on both legs ⇒ the fix verification holds**. **no `FAIL` line** appears in any of the three runs' logs, and the package **actually executed and passed** on both the Windows and Ubuntu legs (a package-level `ok` line, not merely a "run conclusion `success`"). **Boundary ③** (a recurrence after the fix means a "fix failure") **was not triggered in this slice**. Raw extraction in `tmp/drfix/CI-push1.txt` / `CI-push2.txt` / `CI-push3.txt`.
+
+**⑧b note**: this section and a few lines of §6 were written by ⑧b after ⑨; after that write, this file's working-tree content differs from the version carried by push #3 **by exactly these lines of this section and §6** (no code involved, no criterion changed); the registration **does not re-run ⑦ on that basis** (it belongs to the ledger-metadata class of OB-11).
 
 ## 6. DR cumulative occurrence-count table (continued) and the expiry of boundary ③
 
 **Cumulative before the fix (5 red first attempts; definition in `docs/t027/REMAINING_SLICES.md`)**: DR-2 `35563800665` (`d2f508c`), DR-3 1st `35575667145` (`7bdfa0c`), DR-4 `35606581371` (`52c28af`), DR-3 2nd `35620891181` (`30cf799`), DR-5 `35622599102` (`b597728`) — **all green on both legs after a `--failed` rerun**.
 
-**After the fix (this slice's 3 consecutive pushes)**:
-
-| # | Commit | run | First-attempt conclusion | Package-level evidence |
-|---|---|---|---|---|
-| 1 | `ff259b2` (fix) | `35646859765` | **green on the first attempt on both legs** (Windows + Ubuntu) | both legs `ok … enforcement-proxy` (Windows `0.574s` / Ubuntu `0.556s`), no `FAIL` line |
-| 2 | `9f68a52` (ledger / directive) | `35647349443` | registered by ⑧b | registered by ⑧b |
-| 3 | this file (report) | registered by ⑧b | registered by ⑧b | registered by ⑧b |
+**After the fix (this slice's 3 consecutive pushes)**: runs `35646859765` (`ff259b2`), `35647349443` (`9f68a52`), `35648196443` (`1b01115`) — **all three green on the first attempt on both legs** (item-by-item package-level evidence and conclusions in §5.2). **No new DR row**: this slice produced no new flake in the same package.
 
 **The "green on the first attempt" (acceptance ①) standard**: **the Windows / Ubuntu first attempts of 3 consecutive pushes are green on both legs** (**a rerun being green must not be substituted**); all three runs had their first attempt on a **push** event, and `gh run rerun` was **not used**.
 
@@ -193,6 +198,7 @@ For a timing-flake fix, "removing the fix turns it red" is **indeterminate** —
 7. **⑥'s one execution-class self-report** (§3.2) **does not constitute evidence**; its `PASS` does not depend on that line.
 8. **`-count=10` was not run with verbose** (a single `ok` line), so there is no per-round detail; per-round detail is in round 1's `B-count10-verbose.txt`.
 9. **The package-level self-check runs on pwsh 7.x**, not Windows PowerShell 5.1.
+10. **Where the evidence artifacts live**: this slice's raw evidence (`A1`–`A9`, `B2`–`B4`, `CI-push1`–`CI-push3`, `IMPL.diff`, `DOCS.diff`, the gate output, `review/`) sits in the local `tmp/drfix/`; by repo rule **`tmp/` is not committed** ⇒ the **durable, traceable evidence** is the **3 CI runs** (publicly inspectable) plus this slice's three commits, while the `tmp/` artifacts serve local re-inspection only.
 
 ## 9. Pilot quantitative metrics (§12.1, baseline = B3c)
 
