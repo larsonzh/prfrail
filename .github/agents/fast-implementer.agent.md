@@ -1,7 +1,6 @@
 ﻿---
 name: fast-implementer
 description: "Use for implementer_light tasks: implement, test, lint"
-model: gpt-5.6-luna
 tools: ['read', 'search', 'edit', 'execute']
 user-invocable: false
 target: vscode

@@ -1,7 +1,6 @@
 ﻿---
 name: quick-researcher
 description: "Use for scout tasks: scan, summarize, triage"
-model: gpt-5.6-luna
 tools: ['read', 'search']
 user-invocable: false
 target: vscode

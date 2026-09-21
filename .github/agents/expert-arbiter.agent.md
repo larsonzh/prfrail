@@ -1,7 +1,6 @@
 ﻿---
 name: expert-arbiter
 description: "Use for arbiter tasks: architect, root_cause, security_audit, arbitrate"
-model: gpt-5.6-terra
 tools: ['read', 'search']
 user-invocable: false
 target: vscode

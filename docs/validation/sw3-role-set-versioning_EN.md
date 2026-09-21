@@ -6,7 +6,8 @@ Date: 2026-09-21. Status: `IN_REVIEW` (⑥ and ⑦ in §6; commit and push in §
 
 1. This slice does **exactly three things**: **encoding normalisation** of 11 pre-existing role files (no-BOM+CRLF → BOM+LF), a **uniform header note across 14 files**, and an **amendment to directive R2.5**. It changes **no** `model` / `tools` value and **no** body text of duties or constraints.
 2. Every byte count, reconciliation result and gate exit code below is **taken from actual command output**; anything not executed is listed in §7.
-3. **Known-unfixed item**: **8** of the pre-existing files default to a §2.4 blacklisted `model` (Terra 3 / Luna 2 / Gemini 1 / GPT-5.4 1 / GPT-5.6-Sol 1) ⇒ registered as **OB-8**; this slice **does not touch it** (no scope creep).
+3. **Known-unfixed item**: **8** of the pre-existing files default to a §2.4 blacklisted `model` (Terra 3 / Luna 2 / Gemini 1 / GPT-5.4 1 / GPT-5.6-Sol 1) ⇒ registered as **OB-8**; this slice **does not touch it** (no scope creep). The gap was later closed by **v1.7** under the user's ruling.
+4. **Terminology**: the layer identifier at the time of writing was `③.5` (inherited from the retired directive); as of directive v1.7 it is renamed **`⑥` (independent scan layer)**. The headings above keep the original identifier to preserve the record.
 
 ## 1. Scope and boundaries
 
@@ -74,11 +75,22 @@ Date: 2026-09-21. Status: `IN_REVIEW` (⑥ and ⑦ in §6; commit and push in §
 
 **Round 4**: per the user's ruling it is **not auto-authorised**; this round's 4 remediations are **self-verified mechanically only** (no further independent re-review) ⇒ that residue is left to the user's ruling.
 
-## 7. Explicitly not executed
+### 6.3 Cost and metering (including the independent-verification gap)
 
-1. **The 8 pre-existing files whose default `model` is blacklisted were not fixed** (OB-8, awaiting the user's ruling).
+| role | model | stage | calls | note |
+|---|---|---|---|---|
+| master | `DeepSeek V4.1 Flash (deepseek)` | ⑧ docs / gates / assembly | throughout | bootstrap-authored SW-3 artifacts + mechanical gates |
+| independent scan | `MAI-Code-1.1-Flash (copilot)` | ⑥ | **1** (SW-3's own budget 1/3) | no list attached in round 1; verdict `INDEPENDENT SCAN: PASS` |
+| independent final review | `GPT-5.3-Codex (copilot)` | ⑦ round 3 | **1** (exception authorisation, see §6.2) | verdict `RE-REVIEW: FINDINGS` (3 Medium + 1 Low) |
+
+- **Fallback count = 0**; **⑦ round 4 was not run** (the user ruled against auto-authorising it).
+- **Recorded verbatim at the user's request**: "`T1–T4 整改仅经自验证 + ⑥ 独立扫描，未再跑 ④ 复审；依据用户规则；若后续准则修订在本区域发现问题，优先检查 T3/T4 判据改动。`"
+- **Pending item (registered as OB-9)**: **the first action of the next directive revision** is to make **the diff of the T3/T4 criterion changes** a **focused review point** for ⑦ **and include it in that round's input** (not as a standalone extra round); it is recommended to also include this v1.7 region (G5-b / identifier disambiguation).
+
+## 7. Explicitly not executed
+1. **OB-8 (the 8 blacklisted default `model` values) was not fixed inside SW-3** (no scope creep); the gap was closed by **the later v1.7** under the user's ruling: the field-removal probe passed ⇒ the 8 files had their `model` field deleted + **G5-b** was added to prevent regression (see directive §0.3 v1.7 and §12.4 OB-8).
 2. **The generator was not re-run**, and `_config.yaml` was not brought under version control (R2.5 already states the precondition "if the generator is ever re-enabled").
-3. **`DELIVERY_DIRECTIVE_EN.md` was not generated** (user's ruling: generate it after ⑦ round 3 passes).
+3. **`DELIVERY_DIRECTIVE_EN.md` was not generated inside SW-3** (the ruling then was to generate it after ⑦ round 3 passes); that mirror was produced by **the later v1.7** and committed separately.
 
 ## 8. Commit and push
 

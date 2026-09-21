@@ -1,7 +1,6 @@
 ﻿---
 name: heavy-builder
 description: "Use for implementer_heavy tasks: implement, refactor, test_loop, debug"
-model: gpt-5.6-terra
 tools: ['read', 'search', 'edit', 'execute']
 user-invocable: false
 target: vscode

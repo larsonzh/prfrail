@@ -1,7 +1,6 @@
 ﻿---
 name: context-researcher
 description: "Use for scout_long tasks: scan, summarize, long_context, multimodal"
-model: gemini-3.8-flash
 tools: ['read', 'search']
 user-invocable: false
 target: vscode

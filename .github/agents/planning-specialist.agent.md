@@ -1,7 +1,6 @@
 ﻿---
 name: planning-specialist
 description: "Use for planner tasks: plan, slice, design"
-model: gpt-5.6-terra
 tools: ['read', 'search']
 user-invocable: false
 target: vscode

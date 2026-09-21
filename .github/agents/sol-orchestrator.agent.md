@@ -1,7 +1,6 @@
 ﻿---
 name: Sol Orchestrator
 description: gpt-5.6-sol 主控，按任务形状动态路由
-model: gpt-5.6-sol
 tools: ['read','search','execute','agent']
 agents: [planning-specialist, fast-implementer, quick-researcher, standard-builder, heavy-builder, context-researcher, expert-arbiter, quick-verifier, independent-reviewer, deep-reasoner]
 target: vscode

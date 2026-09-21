@@ -1,7 +1,6 @@
 ﻿---
 name: standard-builder
 description: "Use for implementer_medium tasks: implement, refactor, test"
-model: gpt-5.4
 tools: ['read', 'search', 'edit', 'execute']
 user-invocable: false
 target: vscode
