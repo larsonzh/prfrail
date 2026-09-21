@@ -218,6 +218,7 @@ G2 / G3 / G4b 三条判据在**本片首次真实执行**时全部暴露为不�
 - 暂存：`git add <具体文件>` 逐个（**禁止 `-A`**）；G5 三集合一致见提交记录。
 - 推送：**仅 `origin`**（gitee 不动）。
 - CI：推送后观察并**双绿回报**（§6.4）；首跑红即按 §6.4 四步处置并登记 DR-N。
+- **CI 实测（2026-09-21）**：本片与 SW-3 一并推送 head `52c28af` → run **`35606581371`**：**首跑 Windows 腿 `Test` 步红**（`tools/agent-probe/enforcement-proxy` · `TestConnectUsesUpstreamProxy`，`main_test.go:450: target accepts = 0, want 1`；Ubuntu 腿全绿、其余 14 包全 `ok`）；`gh run rerun --failed` → **attempt 2 双腿全绿**、终态 `success`。**不得以“复跑绿了”掩盖首跑红** ⇒ 已按 §6.4 登记为 **DR-4**（与 DR-2/DR-3 均不同测试）；该片无 `.go` 改动 ⇒ 与本片改动**无因果关联**。
 
 ## 11. 下一步建议
 

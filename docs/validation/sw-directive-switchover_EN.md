@@ -218,6 +218,7 @@ Measured by the probe: a file newly written by the write tool lands as CRLF (31 
 - Staging: explicit per-file `git add <specific-file>` (**`-A` forbidden**); G5 three-set agreement is recorded with the commit.
 - Push: **`origin` only** (gitee untouched).
 - CI: observe after pushing and **report both legs green** (§6.4); a red first run is handled with the §6.4 four steps and registered as DR-N.
+- **Measured CI (2026-09-21)**: this slice plus SW-3 were pushed as head `52c28af` → run **`35606581371`**: the **first attempt failed the Windows `Test` step** (`tools/agent-probe/enforcement-proxy` · `TestConnectUsesUpstreamProxy`, `main_test.go:450: target accepts = 0, want 1`; the Ubuntu leg was green and the other 14 packages were all `ok`); `gh run rerun --failed` made **attempt 2 green on both legs**, run `success`. **A green rerun must not be used to hide a red first run** ⇒ registered as **DR-4** per §6.4 (a different test from both DR-2 and DR-3); the slice changed no `.go` file ⇒ **no causal link** to this slice's changes.
 
 ## 11. Next steps
 
