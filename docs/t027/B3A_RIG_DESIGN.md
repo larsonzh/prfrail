@@ -1,6 +1,6 @@
 ﻿# B3a 前置分析：断电注入装置与双向对照标定协议（仅设计，不含实现代码）
 
-- 状态：工作稿（不提交、不推送；按 REMAINING_SLICES 纪律，切片开始时的输入物）。
+- 状态：工作稿（自 `babc041` 起已入库于 `docs/t027/`；切片开始时的输入物；`commit`/`push` 仍须同一轮显式授权）。
 - 权威来源：`docs/t027/REMAINING_SLICES.md` 的 A7/B3a/B3b 块、`docs/validation/B2-EXTERNAL-ENFORCEMENT.md`、
   `docs/CODING_CONVENTIONS.md`、`D:\VirtualBox VMs\Win11B3\guest-prep\` 与 `docs/t027/` 下的冻结环境事实。
 - 本文件自身编码：UTF-8 **with BOM** + **LF**（硬规则）。

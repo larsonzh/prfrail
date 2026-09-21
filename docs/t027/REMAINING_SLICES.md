@@ -1,6 +1,6 @@
-﻿# T027 剩余切片清单（临时工作稿，非跟踪）
+﻿# T027 剩余切片清单（临时执行台账）
 
-> 状态：本地临时工作清单，不进入版本库，由 .git/info/exclude 本地忽略。
+> 状态：临时执行台账；**自 2026-09-20 `babc041` 起已入库并受版本控制**（此前曾由 `.git/info/exclude` 本地忽略，该忽略已解除）。
 > 权威账本仍为 docs/DEV_PLAN.md、docs/DEV_PLAN_EN.md 与 docs/validation/；本清单只作为临时执行台账。
 > 基线：68664d8（2026-09-14，已包含 #38 CI 修复）。盘点修正为 12 个必做切片 + 1 个可后置切片；必做规模合计 M×7、M-L×1、L×4；含 C1 后为 M×8、M-L×1、L×4。
 > **2026-09-19 修订：B3 拆分为 B3a（断电注入装置与对照标定）+ B3b（候选注入矩阵与耐久定案）** ⇒ 必做切片 **13** 个；必做规模改为 **M×8、M-L×2、L×3**；含 C1 后为 **M×9、M-L×2、L×3**。理由：A7 已证伪“kill 级注入可判定耐久步”（CP4≡CP5），B3 的前置物（可证耐久的轮次 journal + 另一物理设备 + 重启盘点 + 双向对照标定）与后续物（逐候选注入与三档定案）是两类不同工作与不同风险，混在一片会让“装置未标定就下结论”。
@@ -10,7 +10,7 @@
 
 1. 切片开始：本文件中对应切片小节就是交给 Flash 的完整输入，包含依赖、步骤、目标、现状缺口、交付物、验收证据、边界，无需再补口头上下文。
 2. 切片完成：同步勾选中英文两份清单、更新本文件状态表、追加完成记录，并按原有风格回写 DEV_PLAN / DEV_PLAN_EN 的 T027 段落及 docs/validation/ 对应证据。
-3. 本文件不提交、不推送；轮换操作者时，以本文件 + DEV_PLAN + validation 记录交接。
+3. 本文件自 2026-09-20 `babc041` 起已入库并受版本控制（`commit`/`push` 仍须同一轮显式授权）；轮换操作者时，以本文件 + DEV_PLAN + validation 记录交接。
 
 ## 统一门禁
 
@@ -262,7 +262,7 @@ A6 CI 收尾（2026-09-16）：`c2d2819` 推送后 `main CI`（run `35074301616`
 
 A6 追加独立审查（2026-09-15，用户同轮显式授权，用于试点残差评估）：④ 之后调用 Codex（`independent-reviewer`，`GPT-5.3-Codex (copilot)`）**共 3 次**——第 1 次盲审（仅给范围/契约/只读约束）报 `RE-REVIEW: FINDINGS`：**2 项 NOVEL** = High 1（`refuseForeignSlot` 在“除 NotExist 外的读错误”与“owner 为空”上 fail-open：重启 + 槽不可读 + 外来 launchId 可继续走镜像并停机存活进程）+ Medium 1（声称停机存在“两套机制”）；第 2 次为整改后复审（**`RE-REVIEW: PASS`**）；第 3 次为测试增量复审（主控在复审后自行改写断言，按“禁止自审”纪律补审，**`RE-REVIEW: PASS`**，Section B 无发现，Section D 三处未钉不变量已补钉）。主控裁定：High **确认并整改**为三分支 fail-closed（新增 M52/M53/M54），Medium **部分驳回**（读作“一套 guard 身份机制、两个入口”，契约措辞双语收紧为“一套机制、两个入口、无第三通道”）。**残差数据**：组合本片漏掉 1 项 High（盲审捕获、4 条变异实测证实）、③ 预审漏项 0 → 记作“组合可作常规切片的低成本补充扫描层；硬门切片 A7/B2/B3/B4 保留 Codex 终审”，最终是否推广由用户决定；§6 轻度失败处置路径（应重跑 MAI）未走，改用同轮授权的 Codex 复审收口，偏离已登记。变异合计 **52 项全 RED / SURVIVED 0**（第一部分 48 项 + Codex 轮 M52–M55；M49 锚文本被 High 整改取代，以等价新条目 M55 补回并实跑；测试两次加强后均重跑，还原全部经 SHA-256 校验）。原生 E1–E8 全绿；门禁全绿（含契约夹具 128）。
 
-A6 设计裁定（① V4 Pro 前置分析 2026-09-15，Max；主控核准 **U1–U14 全部按推荐选项通过**，其中 U1/U3/U5/U9 经代码实地核实）：完整分析见 `docs/t027/A6_PRE_ANALYSIS.md`（本地工作稿）。要点——
+A6 设计裁定（① V4 Pro 前置分析 2026-09-15，Max；主控核准 **U1–U14 全部按推荐选项通过**，其中 U1/U3/U5/U9 经代码实地核实）：完整分析见 `docs/t027/A6_PRE_ANALYSIS.md`（工作稿）。要点——
 
 - **范围**：无新 task/step 状态、无新 wire 记录类型、零 Schema 与契约夹具改动、不改 CI 工作流（`internal/release/workflow_test.go` 冻结契约不变）；**协议先行仅一处**：CONTRACTS 双语 §7 新增 A6 离线运行段（离线工件布局 `<runRoot>/agent-runner-replay/runs/<requestId>/` 与五枚冻结事实口径、证据缺口降级表、超时/取消语义、stub 版本绑定 + `executableHash` 仅记录不作准入）。
 - **实现面**：新建 `internal/adapters/agent_runner_pinned_cli.go`（launcher）、`agent_runner_process_registry.go`、`agent_runner_timeout.go`（watchdog）、`agent_runner_evidence.go`、`agent_runner_run.go` + 各自测试；`tools/agent-stub/`（确定性 stub，**仅 ⑤ 实验用**；单测走 `PROOFRAIL_*_HELPER` re-exec 模式，沿用 `guard/process_test.go:19` 既有做法）；**加法式**扩展 `chain.AgentRunnerLaunchRequest`（`Command/Args/Dir/Env/Timeout/Grace/WorkspaceRoot`，replay/receipt 语义零变化）；replay root 增加 `runs/`；`guard/process.go` 一处有界化修复（**U1**：`process.go:129` 现为无界 `context.Background()`，同函数 103/110 行已有界，属不一致且有真实挂死窗口）。
