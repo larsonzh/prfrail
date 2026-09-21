@@ -14,6 +14,8 @@ Handle one task per session. Split anything exceeding one verifiable change into
 
 WIP=1. Agree time/cost caps per session; no paid calls by default. Two same-class failures without new evidence pause/escalate. Reserve stronger models for contract/security ambiguity; cheaper models execute frozen small slices. Git commit/push still require same-turn authorization, origin only by default.
 
+Delivery execution discipline (slice model, role and model allow-list, serial pipeline, gates and evidence, review system, cost caps) is owned by the [Delivery directive](DELIVERY_DIRECTIVE.md); the tasks in this plan execute under it. **As of 2026-09-21 the retired T027 directives `docs/t027/FLASH_OPERATING_DIRECTIVE*.md` and `docs/t027/FLASH_T027_BRIEFING*.md` are superseded** (historical reference only; map section numbers via the new directive's Appendix C.1).
+
 ## 2. Iterations and Tasks
 
 Paths not yet present are planned creation locations. T001-T004 are S0; T004 is isolated experimentation, not S1 production code. Every RFC section 17 gate and owner approval must precede T005.

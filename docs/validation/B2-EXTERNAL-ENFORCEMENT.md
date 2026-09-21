@@ -4,7 +4,7 @@
 - 日期：2026-09-17（2026-09-18 更新：排练转录已归档、未闭环项清零，见 §3 第 1 项与 §13）
 - 平台：Windows 11（报告为 Windows 10 Home 24H2，build 26100.9457），PowerShell 5.1，Go 1.22 工具链
 - 证据根目录：`docs/validation/evidence/b2-2026-09-17/`（含 `MANIFEST.md` 与 `SHA256SUMS.txt`）
-- 关联文档：`docs/CONTRACTS.md`、`docs/ARCHITECTURE.md`、`docs/TEST_STRATEGY.md`、`docs/t027/FLASH_OPERATING_DIRECTIVE_v3.1.md`
+- 关联文档：`docs/CONTRACTS.md`、`docs/ARCHITECTURE.md`、`docs/TEST_STRATEGY.md`、`docs/DELIVERY_DIRECTIVE.md`（执行纪律，v1.1）、`docs/t027/FLASH_OPERATING_DIRECTIVE_v3.1.md`（**已被取代**，仅历史对照）
 - **CI 证据**（2026-09-18 观察）：三个提交已推送 `origin/main`（`c5c22ad..408bd99`）——`58757e8`（工具收编：代理 + AppContainer 机器纪律，含 `.gitignore` 的 `/tools/tmp/` 守卫）、`fd99dc3`（本报告 + 证据包 + DEV_PLAN 双语回写）、`408bd99`（`*.raw.txt` 字节保真规则收窄）。GitHub Actions 两跑全绿：run **`35259806285`**（head `fd99dc3`，约 1m48s）与 run **`35261204021`**（head `408bd99`，约 1m52s）——Windows 腿 Build/Vet/Test success，Ubuntu 腿 Build/Vet/Test + **Race**（`CGO_ENABLED=1 go test -race -count=1 ./internal/adapters/... ./internal/chain/...`）+ **Contract fixtures**（`tools/contracts`）全 success。新增代理包 `tools/agent-probe/enforcement-proxy` 的 15 项测试进入**两腿**默认套件（`go test -count=1 ./...`）；该包**不在** `-race` 子集内（Race 仅覆盖 `internal/adapters`、`internal/chain`）。`Candidate build` / `Candidate probe` / `Bootstrap and release evidence` 三个条件任务按设计跳过（仅 `workflow_dispatch`）。
 
 ## 1. 结论（定案）

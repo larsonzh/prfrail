@@ -1,5 +1,6 @@
 ﻿# Flash 启动提示语（T027 执行版）
 
+> ⚠️ **已被取代（2026-09-21）**：本文件不再生效，仅作历史版本保留。仓库级执行纪律现由 **`docs/DELIVERY_DIRECTIVE.md`（v1.1）** 承担。
 > 复制以下内容直接发给 Flash 即可启动。完整准则见 `FLASH_OPERATING_DIRECTIVE.md` / `_EN.md`。
 
 ---

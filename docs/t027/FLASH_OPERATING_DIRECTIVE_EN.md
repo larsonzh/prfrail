@@ -1,5 +1,6 @@
 ﻿# Flash Operating Directive (T027)
 
+> ⚠️ **SUPERSEDED (2026-09-21)**: this file is no longer in force and is kept for historical reference only. Repository-wide delivery discipline is now owned by **`docs/DELIVERY_DIRECTIVE.md` (v1.1)**; map section numbers through that directive's **Appendix C.1**. The body of this file is no longer maintained.
 > This file is the **supreme behavioral rule** for Flash executing T027 slices, taking precedence over any generic role setting.
 > Companion working basis: `REMAINING_SLICES.md` (slice definitions) | `DEV_PLAN.md` (authoritative ledger) | `docs/validation/` (evidence archive)
 

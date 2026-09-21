@@ -18,6 +18,7 @@ The former `RFC-proofrail-unattended-ai-engineering-product.md` is the [project 
 | ATs, platforms, and fault-injection acceptance | [Test strategy](TEST_STRATEGY_EN.md) | Stage-goal source |
 | Currently executable behavior | Verified implementation and [Operations](OPERATIONS_EN.md) | Not evidence of availability |
 | Implementation order, dependencies, and completion | [Development plan](DEV_PLAN_EN.md) | Original roadmap source |
+| Delivery execution discipline (slices, role and model allow-list, gates, review, cost) | [Delivery directive](DELIVERY_DIRECTIVE.md) | Not applicable (engineering discipline, not a product-design source) |
 | Unresolved cross-domain decisions | [ADR register](ADR_REGISTER_EN.md) | Candidate solution source |
 
 Read this page, the current T task in [DEV_PLAN_EN.md](DEV_PLAN_EN.md), the applicable authority sections/AT, and nearby code/tests. Read the proposal only to trace rationale or handle content not yet migrated. Do not load both complete language sets each round.

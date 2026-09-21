@@ -5,6 +5,8 @@
 ## 定位与权威
 - 产品：ProofRail（证轨，`prfrail`）——为 AI 无人值守编程铺设**可证明轨道**：
   每个步骤可验证、可回滚、可审计，人工审批保留在关键节点。
+- **执行纪律权威**：仓库级交付执行准则见 `docs/DELIVERY_DIRECTIVE.md`（切片模型、角色与模型白名单、
+  串行流水线、门禁与证据、审查体系、成本上限）。执行纪律与分域权威的冲突判定见该准则 §0.1。
 - **项目建议书与历史设计来源**：`docs/RFC-proofrail-unattended-ai-engineering-product.md`；文件名为兼容保留，
   不再是全域唯一权威。分域权威见 `docs/DOCUMENTATION_PLAN.md`：需求、流程、架构、契约、安全、验收和
   实施分别由对应专项文档负责；协议修订先改 `docs/CONTRACTS.md` 及 Schema/样例，再改代码。
