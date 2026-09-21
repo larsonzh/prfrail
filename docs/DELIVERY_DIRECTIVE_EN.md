@@ -1,6 +1,6 @@
 ﻿# ProofRail Delivery Execution Directive (DELIVERY_DIRECTIVE)
 
-Version: v1.7. Date: 2026-09-21. Status: **English mirror of the frozen CN body** (authoritative CN: `docs/DELIVERY_DIRECTIVE.md`).
+Version: v1.8. Date: 2026-09-21. Status: **CN body frozen** ( `_EN` mirror in `docs/DELIVERY_DIRECTIVE_EN.md`).
 
 > **Multilingual note**: this file is the English mirror, generated after the CN body was frozen (to avoid bilingual rework during review); `docs/DELIVERY_DIRECTIVE.md` is authoritative and wins on any conflict (see §11.1).
 > **Encoding**: this document and its `_EN` mirror must stay UTF-8 **with BOM** + **LF**.
@@ -43,6 +43,7 @@ Version: v1.7. Date: 2026-09-21. Status: **English mirror of the frozen CN body*
 | v1.5 | 2026-09-21 | **SW-3 executed (user-authorized option A)**: ① **11 existing role files normalized to BOM+LF and all committed** (R2.5 wording rewritten per the user's formulation: "the generator toolchain is not committed; `.agent.md` role files, including existing ones, are always committed", removing ambiguity); ② **uniform header note for the 14 role files** ("非生成物（sol-orchestrator 已按 §2.4 禁用）：手工维护；不得由生成器覆盖") + a mechanical criterion for the header note; ③ registered **OB-8** (the default `model` of 8 existing files is blacklisted; not fixed in this slice). |
 | v1.6 | 2026-09-21 | **Remediation from ⑦ round-3 re-review (user authorized a one-time breach of the §7.5 cap)**: 7 of R1–R8 closed, R7 partially closed, and 4 new findings (3 Medium + 1 Low) all valid and all remediated: ① **blacklist count corrected 9→8** with a family breakdown (Terra 3 / Luna 2 / Gemini 1 / GPT-5.4 1 / GPT-5.6-Sol 1) + registered the residual risk that "a newly added `.agent.md` can bring in a blacklisted default `model`"; ② **G5-a hardened into two criteria** (the original criterion matched only a fixed form and covered only `prfrail-*` ⇒ blank variants and other files escaped detection); ③ **header-note criterion changed to position anchoring** (the first non-empty line after the frontmatter must equal the header-note text; "merely appearing in the document" is no longer accepted); ④ the **header-note blocks of the 3 `prfrail-*` files were moved above the H1**, unifying the position across all 14 files (measured 14/14). |
 | v1.7 | 2026-09-21 | **OB-8 fixed at the root + identifier disambiguation + user rulings recorded**: ① **OB-8 fixed at the root per the user's ruling** ("delete defaults + hard gate", **do not delete files**) — first a **field-deletion probe** on the inactive file `standard-builder` (after deleting `model` the carrier loads and works normally), and once it passed the `model` field was **deleted from all 8 blacklisted files** (measured blacklist hits = 0), while the `model` of the 3 non-blacklisted files is **retained**; added **G5-b** (the `model` value of `*.agent.md` added/modified in the change set must not be a blacklisted value) to prevent regression; ② **identifier disambiguation**: the legacy **`③.5` is renamed throughout to `⑥` (independent scan layer)** (23 occurrences), and the use of `④` as a "final-review alias" is eliminated (`独立终审员(④)`→`(⑦)`, `⑦④终审`→`⑦ 终审`, `B3c ④ 复审`→`⑦ 复审`, `④ 无效轮次`→`⑦ 无效轮次`, `（⑥ ③.5 / ⑦ ④）`→`（⑥ 独立扫描 / ⑦ 独立终审）`), while the pipeline step `④集成` and the list marker `④` stay unchanged; C.1 adds an old/new identifier mapping; ③ registered **OB-9** (the independent-verification gap for T3/T4 changes in the same area as this round, and the focus required of the next ⑦). |
+| v1.8 | 2026-09-21 | **Added Appendix B.7 "Slice Startup Card" (user adjudication: option A)**: the old briefing's two **functions with no landing place** — **session seeding (launch package structure)** and **minimum context feeding** — are folded into the directive as a **thin card** of "entry point + slots + section-number references": it contains the user kickoff message template, the master opening receipt (`SLICE: STARTED` / `SLICE: BLOCKED`), the stop-point receipt (⑩), and the **minimum reading set** by slice type; **hard constraint: this card contains no rule substance** (a rule change edits the body only and the card edits only the section-number references, structurally eliminating the old disease of "the same wording written in two places ⇒ drift"; the old briefing's "where it conflicts with the directive, the directive prevails" is exactly this kind of drift permit, not inherited); §5.0 gains one line of guidance; A.1 notes that this inheritance has landed; C.3 gains the row "briefing slice-level hard gates are not inherited"; Appendix C gains `SW-4`. |
 ---
 
 ## 1. Scope and Slice Model
@@ -226,6 +227,8 @@ The master must run the wrap-up self-check of §6.3 on **every round of its own 
 3. Master determines the slice type and **sets the effort tier** (§8.2; once set, it is not switched during continuous runs).
 4. Generate the **task package** (each package contains: input materials, expected output, acceptance conditions, the `model` string), then proceed to ①.
 5. If any item is not satisfied ⇒ **mark "dependency blocked" and stop**; must not infer on its own or degrade execution.
+
+> **Entry template**: the user kickoff message, the master opening receipt, the stop-point receipt, and the "minimum reading set" are in **Appendix B.7 (Slice Startup Card)**. That card **contains no rule substance**; the sole authority for any rule is its corresponding section in the body.
 
 ### 5.1 Pipeline
 
@@ -546,7 +549,8 @@ Observation items (phenomena not yet sufficient to change the directive) are reg
 | OB-6 | 2026-09-21 | **The direction of ⑦'s first-round F3 fix was overturned by measurement**: ⑦ suggested "adding `model: \"\"` to comply with §2.6", but measurement showed that empty-value key makes the agent **completely unloadable** (isolated verification: adding the key fails / removing it restores). ⇒ The remediation was **executed in reverse**: fix the directive (§2.6 mandates **omitting** the key) rather than the files. Lesson: the reviewer's **proposed fix** likewise needs measurement verification, and must not be written down just because the "source is authoritative". | **Resolved** (v1.2); ⑦ re-review must confirm |
 | OB-7 | 2026-09-21 | **⑥ and ⑦ overlap independently (positive signal)**: under the condition of **no checklist attached in the first round**, ⑥ (MAI) independently reported **the same** defect as ⑦'s 2nd round (a changelog table row joined together), and its Section A–E output was **fully compliant in format** with substantive Section D/E content. ⇒ Supports "⑥ has independent value and should not be skipped lightly". | Observing |
 | OB-8 | 2026-09-21 | **The default `model` of existing role files is on the blacklist**: among the 11 existing files, **8** (Terra 3 / Luna 2 / Gemini 1 / GPT-5.4 1 / GPT-5.6-Sol 1) had a default `model` on the §2.4 blacklist (most of them not in the §2.2 role table) ⇒ calling directly by `agentName` without passing `model` explicitly can bypass R2.1 and hit blacklisted models. | **Resolved** (v1.7, user adjudication "delete default values + hard gate", files not deleted): the delete-field probe passed ⇒ 8 files had their `model` field removed, 3 non-blacklisted defaults were retained, and **G5-b** was added to prevent regression |
-| OB-9 | 2026-09-21 | **Independent-verification gap for the T3/T4 remediation (user adjudication)**: the T1–T4 remediation of ⑦'s 3rd round **went through self-verification + ⑥ independent scan only**, without running ⑦ again (the 4th round is not automatically authorized under the user's rules). | **To do**: **the first action of the next directive revision** = make the **diff of the T3/T4 criterion changes** a **focused review point** for ⑦ and **include it in ⑦'s input** (without running a separate round); it is also suggested to include the same-area changes of this v1.7 round (G5-b / identifier disambiguation) |
+| OB-9 | 2026-09-21 | **Independent-verification gap for T3/T4 and v1.7/v1.8 (user adjudication)**: the T1–T4 remediation of ⑦'s 3rd round **went through self-verification + ⑥ independent scan only**, without running ⑦ again (the 4th round is not automatically authorized under the user's rules); **v1.7** (OB-8 / identifier disambiguation), the **`_EN` mirror**, and **v1.8** (Appendix B.7) likewise **did not pass independent final review**. | **To do**: **the input of the next ⑦ must contain** — the diff of the T3/T4 criterion changes, the change diffs of v1.7 and v1.8, and the `_EN` mirror (**without running a separate 4th round**) |
+
 ### 12.5 Gaps and Future Extensions
 
 | Gap | Suggested timing |
@@ -567,7 +571,7 @@ Observation items (phenomena not yet sufficient to change the directive) are reg
 |---|---|
 | 《Flash Master-Subagent Architecture v1.0》 (`tmp/主控子代理架构_v1.0.md`) | Three-layer role division, fallback mechanism, effort tier table, prompt template skeleton |
 | 《Flash Master Operating Directive v3.1》 (`docs/t027/FLASH_OPERATING_DIRECTIVE_v3.1.md`) | Model whitelist/blacklist, ⑥'s three trigger conditions and cost cap, ⑦'s anchoring-based hard isolation, A11/A12, input sanitization, conclusion-landing check, protocol-first, cost awareness, Git discipline, report structure |
-| 《T027 Briefing v3.1》 | Launch package structure and minimum context feeding |
+| 《T027 Briefing v3.1》 | Launch package structure and minimum context feeding (**landed in v1.8 as Appendix B.7 "Slice Startup Card"**; its "slice-level hard gates" belong to the slice definition by nature, see C.3) |
 | B3c slice practice (2026-09-21) | Evidence landing obligation (§6.2), G1–G5 self-check gates (§6.3), character-level miswriting lessons (§9.3), SCM stale display, causes of ⑦ invalid rounds |
 
 ### A.2 Disposition of v3.1
@@ -709,6 +713,60 @@ The output must end with one line from the prescribed enumeration: `PASS` / `FIN
 
 ---
 
+### B.7 Slice Startup Card (entry template; **this card contains no rule substance**)
+
+> **Hard constraint**: this card **holds only the entry point, slots, and section-number references**; it **must not** copy the substance of any rule — the sole authority for a rule is always its **corresponding section in the body**. A rule change **edits the body only**; this card edits only the section-number references. ⇒ This structurally eliminates the old disease of "the same wording written in two places ⇒ inevitable drift" (the old briefing's file-header line "where it conflicts with the directive, the directive prevails" is exactly this kind of drift permit, and is **not inherited**).
+
+**B.7.1 User kickoff message** (paste to the session master; square brackets are slots to be filled)
+
+```
+Execute slice [slice ID / name] per docs/DELIVERY_DIRECTIVE.md v[version].
+Slice definition: [ledger file §subsection ｜ or give the §1.2 nine fields inline]
+Effort tier: [low / high / max] (the operator has already set it on the UI side; this line is for the record only)
+Probe budget: [n times ｜ none]
+Authorization boundary: [commit pre-authorized?] / [push pre-authorized?] / [paid-call cap]
+[pilot period only] Pilot metrics declaration: [cite the metric line in §12.1]
+Notes: [other constraints]
+```
+
+**B.7.2 Master opening receipt** (fixed format; **read back first, then start work**)
+
+```
+SLICE: STARTED | SLICE: BLOCKED
+Upfront hard gate (§5.0 step 0): SW-1 [✅/⬜]  SW-2 [✅/⬜]  SW-3 [✅/⬜]
+Role readiness pre-check (§5.0 step 2): [per role: file exists / no model key / tools include edit / the call will pass model explicitly]
+Slice type (§5.2) and effort tier (§8.2): [type] / [low|high|max] (once set, it is not switched during continuous runs)
+Budget and authorization boundary: probes [n]; paid-call cap [list each §7.5 item by category]; commit [yes/no]; push [yes/no]
+Workspace hygiene (§1.5): [clean ｜ not clean + handling plan]
+Read-only this round (pick section numbers per B.7.4): [list of section numbers]
+Blocking items (if any): [item by item + the section number each rests on]
+```
+
+**B.7.3 Stop-point receipt** (⑩; **await authorization, must not cross it**)
+
+```
+SLICE: READY_FOR_REVIEW | SLICE: BLOCKED
+Artifacts: [item by item + path / hash]
+Gates (§6.1 + §6.3): [result item by item]
+Review summary (⑤ ⑥ ⑦): [conclusion line]
+Cost and metering (R7.1): [line by line, fields per §11.3]
+Items not executed: [item by item]
+Awaiting authorization: [commit / push / probe top-up / user adjudication items]
+```
+
+**B.7.4 Minimum reading set** (pick section numbers by slice type; the "**All**" row must be read for every type)
+
+| Slice type | Required section numbers |
+|---|---|
+| **All** | §0.1, §0.2, §1.2, §1.5, §2.2, §2.6, §5.0–§5.3, §6.1–§6.4, §7.5, §7.6, §10.1–§10.4, §11.1–§11.3, Appendix B.0 + the role templates enabled this round |
+| **Document-type / simple** | the table above + §5.2's "Note (document-type slices)", §7.2 (⑥ skip criterion), §7.7, §9.3, Appendix B.4 |
+| **Medium** | the table above + §4.1–§4.3, §7.1–§7.4, §7.7, §8, §9.1–§9.3, Appendix B.1–B.6 |
+| **Complex / high risk** | the table above + §4.1–§4.3, §7.1–§7.7, §8, all of §9, Appendix B.1–B.6 |
+
+> **How to use**: the master **must not** re-read the whole body for every slice; read the section numbers given in the table above, and treat the rest as §-number references. If a needed rule is not in the read set, **read the corresponding section and record it in the opening receipt** — do not infer rules from memory.
+
+---
+
 ## Appendix C: Migration Mapping
 
 ### C.0 Switchover Slice `SW-1` (reference rewrite)
@@ -766,6 +824,24 @@ The following files **only get a supersede pointer added to the file header and 
 | Boundary | Does not change `model`/`tools` values, does not change the responsibilities/constraints body; does not touch the `sol-orchestrator/` toolchain |
 | **Alternative (rejected)** | A more conservative option: narrow the `.gitignore` exception to `prfrail-*.agent.md`, versioning only hand-maintained files. **The user decided on 2026-09-21 to adopt option A (check in everything)**, on the grounds that `deep-reasoner` / `independent-reviewer` / `quick-verifier` are directly cited by §2.2 as active carriers, and if they are not checked in then **the mechanical gates cannot cover them** (hidden technical debt) |
 | **Regression risk** | If the `sol-orchestrator` generator is re-run later, the artifacts will revert to no-BOM+CRLF ⇒ G4 flags red again (R2.5 already requires "check in the generator source and compare verbatim before re-running") |
+
+### C.0d Slice Startup Card Slice `SW-4`
+
+**Why it is necessary**: the old briefing's two functions — `launch package structure` and `minimum context feeding` — have **no landing place** in the new directive (the body already exceeds 800 lines, so feeding it in full for every slice is impossible; §5.0 only says "the user provides the slice definition", with no entry template). But **a second rule copy that would drift must not be made** ⇒ instead it is folded into Appendix B.7 as a **thin card**.
+
+| Field | Content |
+|---|---|
+| ID | `SW-4` |
+| Status | ✅ **Completed** (2026-09-21, **user adjudication: option A**; see §0.3 v1.8) |
+| Goal | Supply session seeding and the minimum reading set, **without introducing a second copy of the rules** |
+| Trigger | User authorization (already triggered) |
+| Scale | S (documentation only) |
+| Executing role | Documenter (⑧a) + master gates |
+| Deliverable | The directive's **Appendix B.7 Slice Startup Card** + one line of guidance in §5.0 + traceability updates in A.1/C.3 + `_EN` mirror sync |
+| Acceptance evidence | ① Appendix B.7 **contains no rule substance** (only templates, slots, and section-number references); ② the §5.0 guidance exists; ③ CN / `_EN` **line counts / bold markers / section-number sequences all equal**; ④ G1–G5 all green |
+| Boundary | **No existing rule is changed**; no second document is added; code, contracts, and role files are not touched |
+| ⑥ independent scan | MAI-Code-1.1-Flash, **1** effective call (within the §7.5 budget of 3): `INDEPENDENT SCAN: PASS`, Section A–E complete with substantive Section D/E; **independently judged** that "B.7 copies no rule substance" and "no CN/EN semantic drift" |
+| **Did not pass independent final review** | Per OB-9, this slice's changes go together with v1.7 into **the input of the next ⑦** (without running a separate round) |
 
 ### C.1 v3.1 section numbers → this directive
 
@@ -833,3 +909,4 @@ The following files **only get a supersede pointer added to the file header and 
 | §2.2.1 Haiku "time-limited clearance" details | **Inherited and tightened** into the three-level fallback of §7.2.3 | Keeps the capability, makes the failure path explicit |
 | §四.11 concurrent-experiment interference prohibition | **Inherited** (§1.3 R1.1) | — |
 | Appendix A cost-ceiling table | **Inherited and rewritten** as §7.5 | Paired with the measurement ground-truth source of R7.1 |
+| The "hard gates (not bypassable)" section of Briefing v3.1 (B1→B2 / B3 / A7 etc.) | **Not inherited into the general directive** | They are **slice-level** preconditions and should be written in the slice definition and the ledger; writing them into the general document gives you "the slice changed while the document did not" |
