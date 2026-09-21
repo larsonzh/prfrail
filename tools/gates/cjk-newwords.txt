@@ -1,0 +1,24 @@
+# G4b CJK new-word whitelist (DELIVERY_DIRECTIVE section 6.3)
+# Purpose: a new character in newly added content that is NOT present in the
+# HEAD-wide .md corpus must be reviewed once and recorded here. After that,
+# G4b becomes a fully mechanical assertion:
+#     (new CJK set - corpus CJK set) - this whitelist == EMPTY
+# Rationale: the original criterion "the difference set MUST be empty" is
+# unsatisfiable for any newly authored document (measured 2026-09-21: a 51 KB
+# new doc produced a 7-character difference set, all legitimate words).
+# The whitelist keeps the human judgement, but freezes it so the check can be
+# re-run mechanically. Register ONLY characters verified in context.
+# Format: <char><TAB><first-seen file><TAB><reason / context snippet>
+#
+# char	first seen (2026-09-21)	reason
+飞	docs/DELIVERY_DIRECTIVE.md	"在飞切片" (in-flight slices)
+咨	docs/DELIVERY_DIRECTIVE.md	"纯咨询式问答" (consultative Q&A)
+肉	docs/DELIVERY_DIRECTIVE.md	"人肉记忆" (manual memory)
+忘	docs/DELIVERY_DIRECTIVE.md	"不假设任何角色不会忘事" (forget)
+百	docs/DELIVERY_DIRECTIVE.md	"USD/百万 token" (per million tokens)
+摸	docs/DELIVERY_DIRECTIVE.md	"我估摸用了几次" (guess/estimate)
+纠	docs/DELIVERY_DIRECTIVE.md	"落盘后立即跑编码门禁并纠正" (correct)
+诱	docs/DELIVERY_DIRECTIVE.md	"诱发静默回落" (induce)
+横	docs/DELIVERY_DIRECTIVE.md	"已加历史版本横幅" (banner, heng)
+幅	docs/DELIVERY_DIRECTIVE.md	"已加历史版本横幅" (banner, fu)
+犯	docs/DELIVERY_DIRECTIVE.md	"不得重犯" (repeat an offence)
