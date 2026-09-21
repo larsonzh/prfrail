@@ -199,8 +199,9 @@ Measured by the probe: a file newly written by the write tool lands as CRLF (31 
 
 - **Fallback count = 1** (A-1; threshold 3, so §9.2's high-risk marker did not fire).
 - **⑥ call count**: **3** (late first run + two post-fix re-runs), the §7.2 cap of 3 is **used up**.
-- **⑦ call count**: **2** (round-1 blind final review + round-2 post-fix re-review), exactly the §7.5 ceiling of "1 (final review) + 1 (re-review)"; the "mandatory blind review +1" did not fire (this slice touches no ownership/shutdown/identity semantics), and §7.3 already makes round 1 list-free, so the blind first round costs no extra unit.
-- **Paid-call ceiling**: Codex **x2** (§7.5 final review + re-review); MAI x0 (⑥ skipped); V4 Pro x0 (①⑤ skipped).
+- **⑦ call count**: **3** (round-1 blind final review + round-2 re-review + **round 3 (exception authorisation)**). The §7.5 ⑦ cap is 2 ⇒ round 3 is an **exception**; the "mandatory blind review +1" did not fire (this slice touches no ownership/shutdown/identity semantics), and §7.3 already makes round 1 list-free, so the blind first round costs no extra unit.
+- **`⑦ round 3 is an exception authorisation: §5.3 and §7.5 conflict, and the user ruled for closure discipline; this is a one-off break and does not constitute a new cap`** (user ruling, 2026-09-21; the precedence is **not written into the directive**, so it cannot be read as a new cap).
+- **Paid-call ceiling**: Codex **x3** (§7.5 final review + re-review + the authorised round 3); MAI **x3** (⑥ late run + two post-fix re-runs, using up the §7.2 cap); V4 Pro x0 (①⑤ skipped).
 - **Historically missing**: master tier and token counts were not recorded (§2.3: self-reports are untrustworthy).
 
 ## 9. Explicitly not executed
