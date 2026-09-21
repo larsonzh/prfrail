@@ -1,6 +1,6 @@
 ﻿# ProofRail Delivery Execution Directive (DELIVERY_DIRECTIVE)
 
-Version: v1.8. Date: 2026-09-21. Status: **CN body frozen** ( `_EN` mirror in `docs/DELIVERY_DIRECTIVE_EN.md`).
+Version: v1.9. Date: 2026-09-22. Status: **CN body frozen** ( `_EN` mirror in `docs/DELIVERY_DIRECTIVE_EN.md`).
 
 > **Multilingual note**: this file is the English mirror, generated after the CN body was frozen (to avoid bilingual rework during review); `docs/DELIVERY_DIRECTIVE.md` is authoritative and wins on any conflict (see §11.1).
 > **Encoding**: this document and its `_EN` mirror must stay UTF-8 **with BOM** + **LF**.
@@ -41,9 +41,10 @@ Version: v1.8. Date: 2026-09-21. Status: **CN body frozen** ( `_EN` mirror in `d
 | v1.3 | 2026-09-21 | Remediation from ⑦ round-2 re-review + ⑥ independent scan: ① **split the concatenated v1.1/v1.2 change-log table rows** (structural breakage; independently and overlappingly found by ⑥ and ⑦); ② C.0b "does not currently exist" changed to "did not exist **when SW-2 was chartered**" (tense closure); ③ **tightened ⑥'s skip criterion in §7.2** and added a **counter-example** (this slice revised gate criteria ⇒ ③ does not hold ⇒ **re-run ⑥**); ④ **supplied the missing definition of `Section A–E`** (previously referenced in three places — §4.2/§7.2/B.6 — with **no definition**, a broken reference found in self-check); ⑤ added **G5-a**, a frontmatter hard gate for role files (the `model` key must not appear); ⑥ registered OB-7 (independent overlap between ⑥/⑦). |
 | v1.4 | 2026-09-21 | Remediation from ⑥ round 2 (rescan after remediation): ① **split the concatenated OB-6/OB-7 table rows in §12.4** (**the same class** of defect as the change-log concatenation fixed in v1.3 ⇒ added the **G1-a table-structure integrity** mechanical criterion, and recorded the measured lesson that "not stripping escaped `\|` produces 4 false positives"); ② §7.2 now supplies the **sole authoritative definition** of `Section A–E` and its inheritance source; ③ the header version was raised to v1.4 (the old header v1.3 and the log v1.4 were **out of sync**) + added **G1-b (version-metadata consistency)** (⑥ Section D pointed out that this invariant had no mechanical coverage). |
 | v1.5 | 2026-09-21 | **SW-3 executed (user-authorized option A)**: ① **11 existing role files normalized to BOM+LF and all committed** (R2.5 wording rewritten per the user's formulation: "the generator toolchain is not committed; `.agent.md` role files, including existing ones, are always committed", removing ambiguity); ② **uniform header note for the 14 role files** ("非生成物（sol-orchestrator 已按 §2.4 禁用）：手工维护；不得由生成器覆盖") + a mechanical criterion for the header note; ③ registered **OB-8** (the default `model` of 8 existing files is blacklisted; not fixed in this slice). |
-| v1.6 | 2026-09-21 | **Remediation from ⑦ round-3 re-review (user authorized a one-time breach of the §7.5 cap)**: 7 of R1–R8 closed, R7 partially closed, and 4 new findings (3 Medium + 1 Low) all valid and all remediated: ① **blacklist count corrected 9→8** with a family breakdown (Terra 3 / Luna 2 / Gemini 1 / GPT-5.4 1 / GPT-5.6-Sol 1) + registered the residual risk that "a newly added `.agent.md` can bring in a blacklisted default `model`"; ② **G5-a hardened into two criteria** (the original criterion matched only a fixed form and covered only `prfrail-*` ⇒ blank variants and other files escaped detection); ③ **header-note criterion changed to position anchoring** (the first non-empty line after the frontmatter must equal the header-note text; "merely appearing in the document" is no longer accepted); ④ the **header-note blocks of the 3 `prfrail-*` files were moved above the H1**, unifying the position across all 14 files (measured 14/14). |
+| v1.6 | 2026-09-21 | **Remediation from ⑦ round-3 re-review (user authorized a one-time breach of the §7.5 cap)**: 7 of R1–R8 closed, R7 partially closed, and 4 new findings (3 Medium + 1 Low) all valid and all remediated: ① **blacklist count corrected 9→8** with a family breakdown (Terra 3 / Luna 2 / Gemini 1 / GPT-5.4 1 / GPT-5.6-Sol 1) + registered the residual risk that "a newly added `.agent.md` can bring in a blacklisted default `model`"; ② **G5-a hardened into two criteria** (the original criterion matched only a fixed form and covered only `prfrail-*` ⇒ blank variants and other files escaped detection); ③ **header-note criterion changed to position anchoring** (the first non-empty line after the frontmatter must equal the header-note text; "merely appearing in the document" is no longer accepted); ④ the **header-note blocks of the 3 `prfrail-*` files were moved above the H1**, unifying the position across all 14 files (measured 14/14). **Correction (2026-09-22, during v1.9)**: the actual bytes for the "header-note blocks of the 3 `prfrail-*` files were moved above the H1" listed in this row landed in **the v1.5 commit `e0b08ec`** (15 seconds apart from the v1.6 commit); this note governs the attribution accuracy. |
 | v1.7 | 2026-09-21 | **OB-8 fixed at the root + identifier disambiguation + user rulings recorded**: ① **OB-8 fixed at the root per the user's ruling** ("delete defaults + hard gate", **do not delete files**) — first a **field-deletion probe** on the inactive file `standard-builder` (after deleting `model` the carrier loads and works normally), and once it passed the `model` field was **deleted from all 8 blacklisted files** (measured blacklist hits = 0), while the `model` of the 3 non-blacklisted files is **retained**; added **G5-b** (the `model` value of `*.agent.md` added/modified in the change set must not be a blacklisted value) to prevent regression; ② **identifier disambiguation**: the legacy **`③.5` is renamed throughout to `⑥` (independent scan layer)** (23 occurrences), and the use of `④` as a "final-review alias" is eliminated (`独立终审员(④)`→`(⑦)`, `⑦④终审`→`⑦ 终审`, `B3c ④ 复审`→`⑦ 复审`, `④ 无效轮次`→`⑦ 无效轮次`, `（⑥ ③.5 / ⑦ ④）`→`（⑥ 独立扫描 / ⑦ 独立终审）`), while the pipeline step `④集成` and the list marker `④` stay unchanged; C.1 adds an old/new identifier mapping; ③ registered **OB-9** (the independent-verification gap for T3/T4 changes in the same area as this round, and the focus required of the next ⑦). |
 | v1.8 | 2026-09-21 | **Added Appendix B.7 "Slice Startup Card" (user adjudication: option A)**: the old briefing's two **functions with no landing place** — **session seeding (launch package structure)** and **minimum context feeding** — are folded into the directive as a **thin card** of "entry point + slots + section-number references": it contains the user kickoff message template, the master opening receipt (`SLICE: STARTED` / `SLICE: BLOCKED`), the stop-point receipt (⑩), and the **minimum reading set** by slice type; **hard constraint: this card contains no rule substance** (a rule change edits the body only and the card edits only the section-number references, structurally eliminating the old disease of "the same wording written in two places ⇒ drift"; the old briefing's "where it conflicts with the directive, the directive prevails" is exactly this kind of drift permit, not inherited); §5.0 gains one line of guidance; A.1 notes that this inheritance has landed; C.3 gains the row "briefing slice-level hard gates are not inherited"; Appendix C gains `SW-4`. |
+| v1.9 | 2026-09-22 | **Added §1.6 work tiers and startup authorization (slice `SW-5`; user rulings Q1–Q6)**: ① three-tier startup — `[ROUTINE]` (default, no trigger word) / `[SLICE]` / `[PILOT]`, with the trigger-word syntax **defined in that one place in the whole document**; ② the routine tier's **non-bypassable boundaries** (① is **a reference to §7.2 ③**; ②–⑥ are incremental boundaries: CONTRACTS / schema / fixtures, `.agent.md`, state machine / crash / ownership / concurrency code, `.github/workflows/**`, dependency additions and removals); ③ the master **determines the tier first and declares it on the receipt's first line**, **may recommend but never upgrades unilaterally**, **one-way tier movement with no mid-flight downgrade** (a user request to downgrade ⇒ stop the slice and restart under `[ROUTINE]`; a stopped state must be marked "stopped — incomplete" ＋ an unfinished list and is **not treated as a closed loop**), and **is not exempt from §10 because of the routine tier**; ④ routine-tier record-keeping = diff + §6.1 + §6.3, **0 paid calls**; ⑤ §1.1 repointed, §5.0 gains a "startup precondition" sentence and **`SW-3` is added to the step 0 upfront hard gate**, Appendix B.7 expanded for the three tiers (heading renamed from "Slice Startup Card" to "**Startup Card**"), Appendix C.0e records `SW-5` (including **the first recorded role-trimming downgrade judgement**: the letter lands "Medium", substantively "Simple", ①⑤ exempted; cost ⑥×1 + ⑦×1). |
 ---
 
 ## 1. Scope and Slice Model
@@ -52,6 +53,7 @@ Version: v1.8. Date: 2026-09-21. Status: **CN body frozen** ( `_EN` mirror in `d
 
 - Applies to: **all engineering activity in the ProofRail repository that produces a deliverable** (code, contracts, schemas, fixtures, scripts, documents, evidence bundles).
 - Does not apply to: purely consultative Q&A; ad-hoc troubleshooting with a single command (these need no slice and no review, but must not produce any repository change).
+- Work tiers (`[ROUTINE]` / `[SLICE]` / `[PILOT]`) and each tier's flow, review layer, record-keeping and cost are in **§1.6**; the "does not apply" items of this section **produce no repository change** and are **not the same class** as the `[ROUTINE]` tier of §1.6 (for the difference see the §1.6 「`[ROUTINE]` Applies」 paragraph).
 
 ### 1.2 Slice
 
@@ -84,6 +86,53 @@ For any semantic change the order is fixed: **CONTRACTS in both languages → sc
 - The workspace must be clean before work starts; uncommitted historical changes must first be disposed of by the user (commit / stash / discard).
 - Temporary artifacts go only to the repository root `tmp/` (gitignored), and must be **removed immediately after use**, never left behind across slices.
 - Do not run interfering real-machine experiments (processes / Job Objects / ports / temp directories) in parallel while a slice is running.
+
+### 1.6 Work tiers and startup authorization
+
+**This directive defines the trigger-word syntax in this one place only; every other subsection merely references §1.6.**
+
+**Three tiers** (with no trigger word the default is `[ROUTINE]`):
+
+| Tier | Trigger | Flow | Review layer | Cost |
+|---|---|---|---|---|
+| Routine `[ROUTINE]` | no trigger word (default) | the master **personally** executes + §6.1 base gates + §6.3 self-check; **does not go through the §5.1 pipeline and dispatches no subagent** | ⑤⑥⑦ **all exempt** | **0 paid calls** |
+| Slice `[SLICE]` | see the trigger-word syntax below | goes through the pipeline per §5.1; roles trimmed per the §5.2 matrix | per §5.2 | per §7.5 |
+| Pilot `[PILOT]` | see the trigger-word syntax below | same as slice, **plus** the §12.1 quantitative metrics declaration | same as slice (per §5.2) | same as slice (per §7.5) |
+
+Where `[ROUTINE]` applies: conversational collaboration, small changes, producing proposals; it **may produce repository changes** (writing to disk and authorization follow §10, unlike the "does not apply" items of §1.1).
+
+**Trigger-word syntax**:
+
+- Form: `「切片：<id> <描述>」` / `SLICE:<id> <description>` / `「试点：<id> <描述>」` / `PILOT:<id> <description>`.
+- Position: it takes effect only if it appears **within the first 20 characters of the message's first line** (to prevent a trigger word mentioned in the body from being misjudged).
+- Full-width / half-width colons are both accepted; the English form is **case-insensitive**.
+- **The routine tier has no trigger word.**
+- If a trigger word appears **beyond the first 20 characters of the first line** (for example, mentioned in the body), it **does not take effect**; the master judges it as `[ROUTINE]`, but **must** explicitly note in the receipt "**a suspected trigger word was detected but its position is invalid**" and recommend that the user resend it.
+- If **more than one trigger word matches within the first 20 characters of the first line** (including the same form appearing twice or two different IDs), it **does not take effect**; the master **must stop and ask the user to resend**, and must not choose one itself.
+
+**The routine tier's non-bypassable boundaries** (touching one means an upgrade must be recommended; **execution must not continue**):
+
+- ① **all the semantic categories listed in §7.2 ③** (state machine / gate criteria / evidence model / roles / authorization contract). **This item is a reference, not a redefinition.**
+- ②–⑥ are this tier's **incremental** boundaries: the semantics of CONTRACTS / schema / fixtures; any `.agent.md`; code touching state machines, crash paths, ownership, or concurrency; `.github/workflows/**`; **adding / removing / upgrading / downgrading dependencies (including lock-file changes)**.
+
+> **Handling an over-reaching instruction**: if the user explicitly says "complete it in the routine tier", the master **must refuse** and give the reason; if the user insists, the master must **record the "user over-reaching instruction" in writing**, then execute the following downgrade: **do only the minimal part that does not touch a boundary**, and explicitly put the remainder in the "**unfinished list**", stating that it must be re-run under `[SLICE]`.
+
+**The master's determination and recommendation duty**:
+
+- On receiving a message, **determine the tier first**, and declare `[ROUTINE]` / `[SLICE]` / `[PILOT]` ＋ a one-sentence reason on **the receipt's first line**.
+- **May recommend, never upgrades unilaterally**: if the work turns out larger than expected ⇒ reply with an upgrade recommendation and **stop**, waiting for the user to say so explicitly; if the user does not upgrade ⇒ the master may only switch to the part outside the boundary or stop entirely, and **must not** keep touching boundary content under the name of "a small scope".
+- **One-way tier movement**: after entering `[SLICE]` / `[PILOT]`, **no mid-flight downgrade**; if the user explicitly requests a downgrade, **stop the current slice** and **restart** under `[ROUTINE]`, not switching inside the original slice; if `[ROUTINE]` turns out larger ⇒ recommend an upgrade.
+  - **Artifact marking in the stopped state**: artifacts already produced **stay where they are** but **must not be committed as a completed slice**; their report header must carry `**Status: stopped — incomplete**` and list the "**unfinished list**".
+  - **A stopped state is not treated as a closed loop**: it must not be handled as "complete" in the ledger / `DEV_PLAN`; that row of `REMAINING_SLICES` stays `🔄` or reverts to `⬜` (**the user decides**). The write-back duty of §11.2 targets "slice wrap-up" and **does not apply** to a stopped state.
+  - **Restart path**: restarting under `[ROUTINE]` **counts as new work**; the stop record **stays in the original slice report** as context for "why it was downgraded to the routine tier".
+- **Not exempt from §10 because of the routine tier**: `[ROUTINE]` changes **may accumulate** into one commit, but committing / pushing **still requires the same-round explicit authorization of §10**.
+
+**Record-keeping and cost**:
+
+- `[ROUTINE]`: minimum record-keeping = diff ＋ §6.1 gate results ＋ §6.3 self-check results; **the §6.3 self-check applies in full** (no routine-tier exemption); **0 paid calls**.
+- `[SLICE]` / `[PILOT]`: record-keeping per §5.3 and §11, cost per §7.5.
+
+> **Disambiguation (two different dimensions)**: the work tier (`[ROUTINE]` / `[SLICE]` / `[PILOT]`) and **the §8.2 effort tier (low / high / max)** are **two different dimensions** and must not be mixed — the former decides the flow and the review layer, the latter is set once by the operator before startup; a tier declaration does not replace the §8.2 effort-tier setting, and the effort-tier setting does not replace this section's tier determination.
 
 ---
 
@@ -221,14 +270,16 @@ The master must run the wrap-up self-check of §6.3 on **every round of its own 
 
 ### 5.0 Startup (Slice Entry)
 
-0. **Upfront hard gate (directive switchover period)**: slices **SW-1** (reference rewriting) and **SW-2** (role carriers ready) must both have passed acceptance; otherwise this directive's pipeline **must not start** (prevent two directives running in parallel). For their definitions and acceptance commands see appendices C.0 and C.0b.
+0. **Upfront hard gate (directive switchover period)**: slices **SW-1** (reference rewriting), **SW-2** (role carriers ready) and **SW-3** (role-set check-in and encoding normalization) must all have passed acceptance; otherwise this directive's pipeline **must not start** (prevent two directives running in parallel). For their definitions and acceptance commands see appendices C.0 / C.0b / C.0c.
 1. The user provides the **slice definition** (the nine fields of §1.2) or indicates its location in the ledger.
 2. Master verifies: whether dependencies are satisfied, whether the workspace is clean (§1.5), whether budget/authorization is still needed (§7.6); and performs a **role readiness pre-check** — check one by one that the role files required by §2.2 exist, that **those files contain no `model` key** (writing an empty value makes the carrier fail to load, see §2.6 / §9.3), that **the `tools` of file-writing roles include `edit`** (passing a model without choosing the right carrier yields no write permission), and that **`model` must be passed explicitly at call time** (R2.1); any mismatch ⇒ mark "role blocked" and stop.
 3. Master determines the slice type and **sets the effort tier** (§8.2; once set, it is not switched during continuous runs).
 4. Generate the **task package** (each package contains: input materials, expected output, acceptance conditions, the `model` string), then proceed to ①.
 5. If any item is not satisfied ⇒ **mark "dependency blocked" and stop**; must not infer on its own or degrade execution.
 
-> **Entry template**: the user kickoff message, the master opening receipt, the stop-point receipt, and the "minimum reading set" are in **Appendix B.7 (Slice Startup Card)**. That card **contains no rule substance**; the sole authority for any rule is its corresponding section in the body.
+> **Startup precondition**: this pipeline **starts only when a trigger word appears** (trigger-word syntax see §1.6 — that section is the sole definition).
+>
+> **Entry template**: the user kickoff message, the master opening receipt, the stop-point receipt, and the "minimum reading set" are in **Appendix B.7 (Startup Card)** (its hard constraint is in the first paragraph of B.7).
 
 ### 5.1 Pipeline
 
@@ -550,6 +601,8 @@ Observation items (phenomena not yet sufficient to change the directive) are reg
 | OB-7 | 2026-09-21 | **⑥ and ⑦ overlap independently (positive signal)**: under the condition of **no checklist attached in the first round**, ⑥ (MAI) independently reported **the same** defect as ⑦'s 2nd round (a changelog table row joined together), and its Section A–E output was **fully compliant in format** with substantive Section D/E content. ⇒ Supports "⑥ has independent value and should not be skipped lightly". | Observing |
 | OB-8 | 2026-09-21 | **The default `model` of existing role files is on the blacklist**: among the 11 existing files, **8** (Terra 3 / Luna 2 / Gemini 1 / GPT-5.4 1 / GPT-5.6-Sol 1) had a default `model` on the §2.4 blacklist (most of them not in the §2.2 role table) ⇒ calling directly by `agentName` without passing `model` explicitly can bypass R2.1 and hit blacklisted models. | **Resolved** (v1.7, user adjudication "delete default values + hard gate", files not deleted): the delete-field probe passed ⇒ 8 files had their `model` field removed, 3 non-blacklisted defaults were retained, and **G5-b** was added to prevent regression |
 | OB-9 | 2026-09-21 | **Independent-verification gap for T3/T4 and v1.7/v1.8 (user adjudication)**: the T1–T4 remediation of ⑦'s 3rd round **went through self-verification + ⑥ independent scan only**, without running ⑦ again (the 4th round is not automatically authorized under the user's rules); **v1.7** (OB-8 / identifier disambiguation), the **`_EN` mirror**, and **v1.8** (Appendix B.7) likewise **did not pass independent final review**. | **To do**: **the input of the next ⑦ must contain** — the diff of the T3/T4 criterion changes, the change diffs of v1.7 and v1.8, and the `_EN` mirror (**without running a separate 4th round**) |
+| OB-10 | 2026-09-22 | **⑦ final review (v1.9) found that the new §1.6 clauses lack mechanical criteria** — ① a stopped-state report header must read "stopped — incomplete", ② an empty "pilot metrics declaration" slot in a `[PILOT]` kickoff message — both currently have **wording but no G1–G5 criterion**; ⑦ suggested adding them to §6.3. **Not adopted in this slice** because of the SW-5 boundary (**does not change the G1–G5 criteria**). | **Observing**: a candidate for a later §6.3 revision |
+| OB-11 | 2026-09-22 | **The C.0e ledger temporal fix was remediated without re-running the ⑦ re-review (user-ruled exception, option A)**: the C.0e status row said "awaiting the ⑥ independent scan", conflicting with the "⑥ independent scan (**actual**) `PASS`" recorded below (⑦ re-review Medium); after the remediation **⑦ was not re-run** — §5.3 requires "until no Medium+", while the §7.5 budget (1 final review + 1 re-review) was exhausted. **The decision standard for this exception**: the remediation belongs to the **ledger-metadata class** (no rule substance, no gate impact, **closure literally verifiable**, no new semantics), which differs in nature from the **criterion-semantics class** remediation authorized in SW-3's round 3 (changing the G5-a decision standard, containing rule substance, affecting gates ⇒ semantics verifiable ⇒ independent re-review mandatory); the former may be folded into the next revision's ⑦ input, the latter must be independently re-reviewed. **Related lesson**: a ledger **must not carry expiring literals** (line counts / file counts); write only criteria such as "verified consistent by G3/G4" (this slice removed `995/995` accordingly). | **To do**: fold into the next revision's ⑦ input |
 
 ### 12.5 Gaps and Future Extensions
 
@@ -560,6 +613,7 @@ Observation items (phenomena not yet sufficient to change the directive) are reg
 | Incident response process (rollback / hotfix) | After the first production incident |
 | Retrospective analyst (multi-slice data review) | After execution data accumulates |
 | Infrastructure maintenance (CI/CD, test infrastructure, model version upgrades) | Continuous, independent of slices |
+| **The decision standard for the §5.3 vs §7.5 conflict** (after the budget is exhausted, which class of remediation may skip the ⑦ re-run and which must break through) | **can be drafted as soon as this OB-11 lands**; to be written formally into §12 at the next revision |
 
 ---
 
@@ -713,11 +767,14 @@ The output must end with one line from the prescribed enumeration: `PASS` / `FIN
 
 ---
 
-### B.7 Slice Startup Card (entry template; **this card contains no rule substance**)
+### B.7 Startup Card (three-tier entry templates; **this card contains no rule substance**)
 
 > **Hard constraint**: this card **holds only the entry point, slots, and section-number references**; it **must not** copy the substance of any rule — the sole authority for a rule is always its **corresponding section in the body**. A rule change **edits the body only**; this card edits only the section-number references. ⇒ This structurally eliminates the old disease of "the same wording written in two places ⇒ inevitable drift" (the old briefing's file-header line "where it conflicts with the directive, the directive prevails" is exactly this kind of drift permit, and is **not inherited**).
 
-**B.7.1 User kickoff message** (paste to the session master; square brackets are slots to be filled)
+**B.7.1 User kickoff message** (per the three tiers of §1.6; square brackets are slots to be filled)
+
+- `[ROUTINE]`: **no template needed** — just write the requirement (tier determination and declaration see §1.6).
+- `[SLICE]` / `[PILOT]`: use the templates below; `[PILOT]` additionally needs to fill the "pilot metrics declaration" slot (definition see §12.1).
 
 ```
 Execute slice [slice ID / name] per docs/DELIVERY_DIRECTIVE.md v[version].
@@ -729,7 +786,17 @@ Authorization boundary: [commit pre-authorized?] / [push pre-authorized?] / [pai
 Notes: [other constraints]
 ```
 
-**B.7.2 Master opening receipt** (fixed format; **read back first, then start work**)
+**B.7.2 Master opening receipt** (per the three tiers of §1.6; **read back first, then start work**)
+
+`[ROUTINE]` (thin form):
+
+```
+[ROUTINE] [one-line reason]
+Boundary self-check (§1.6): [not touched ｜ suspected touch + recommend upgrading to [SLICE]]
+Record-keeping (§1.6): [diff + §6.1 gates + §6.3 self-check]
+```
+
+`[SLICE]` / `[PILOT]` (full form):
 
 ```
 SLICE: STARTED | SLICE: BLOCKED
@@ -742,7 +809,7 @@ Read-only this round (pick section numbers per B.7.4): [list of section numbers]
 Blocking items (if any): [item by item + the section number each rests on]
 ```
 
-**B.7.3 Stop-point receipt** (⑩; **await authorization, must not cross it**)
+**B.7.3 Stop-point receipt** (⑩, `[SLICE]` / `[PILOT]` only)
 
 ```
 SLICE: READY_FOR_REVIEW | SLICE: BLOCKED
@@ -758,7 +825,7 @@ Awaiting authorization: [commit / push / probe top-up / user adjudication items]
 
 | Slice type | Required section numbers |
 |---|---|
-| **All** | §0.1, §0.2, §1.2, §1.5, §2.2, §2.6, §5.0–§5.3, §6.1–§6.4, §7.5, §7.6, §10.1–§10.4, §11.1–§11.3, Appendix B.0 + the role templates enabled this round |
+| **All** | §0.1, §0.2, §1.2, §1.5, §1.6, §2.2, §2.6, §5.0–§5.3, §6.1–§6.4, §7.5, §7.6, §10.1–§10.4, §11.1–§11.3, Appendix B.0 + the role templates enabled this round |
 | **Document-type / simple** | the table above + §5.2's "Note (document-type slices)", §7.2 (⑥ skip criterion), §7.7, §9.3, Appendix B.4 |
 | **Medium** | the table above + §4.1–§4.3, §7.1–§7.4, §7.7, §8, §9.1–§9.3, Appendix B.1–B.6 |
 | **Complex / high risk** | the table above + §4.1–§4.3, §7.1–§7.7, §8, all of §9, Appendix B.1–B.6 |
@@ -842,6 +909,26 @@ The following files **only get a supersede pointer added to the file header and 
 | Boundary | **No existing rule is changed**; no second document is added; code, contracts, and role files are not touched |
 | ⑥ independent scan | MAI-Code-1.1-Flash, **1** effective call (within the §7.5 budget of 3): `INDEPENDENT SCAN: PASS`, Section A–E complete with substantive Section D/E; **independently judged** that "B.7 copies no rule substance" and "no CN/EN semantic drift" |
 | **Did not pass independent final review** | Per OB-9, this slice's changes go together with v1.7 into **the input of the next ⑦** (without running a separate round) |
+
+### C.0e Work-Tier and Startup-Authorization Slice `SW-5`
+
+**Why it is necessary**: §1.1 says only "does not apply to: purely consultative Q&A; ad-hoc troubleshooting with a single command" and **does not define the most common case, the "routine change"** ⇒ for any repository change the master can only infer "slice", producing two bad paths: **over-engineering** (even a one-line copy edit dispatches paid ⑥/⑦ calls) and **implicit over-reach when there is no formal channel** (boundary content mixed into a small change ⇒ gates and review are bypassed). Measured basis: several small changes in v1.7/v1.8 (identifier disambiguation, ledger-row revision, encoding normalization) were in fact routine-tier work.
+
+| Field | Content |
+|---|---|
+| ID | `SW-5` (v1.9) |
+| Status | 🔄 **in progress** (S1–S6 done: wiring + all of G1–G5 green + strict `_EN` positional mirroring; **⑥ independent scan `PASS`**, see below; awaiting the ⑦ final review and commit authorization) |
+| Goal | Give "non-slice work" a formal channel: three-tier startup (`[ROUTINE]` / `[SLICE]` / `[PILOT]`) ＋ trigger-word syntax ＋ tier determination and recommendation duty ＋ the routine tier's non-bypassable boundaries ＋ handling of over-reach / stopped states; **does not lower** the slice tier's review intensity |
+| Dependency | v1.8 (Appendix B.7) committed as `30cf799`; user rulings Q1–Q6 |
+| Scale | S–M (documentation only) |
+| Executing role (**first role-trimming judgement**) | **Documenter (⑧a) ＋ master gates**; **① architecture and ⑤ pre-review exempted**. **Recorded downgrade judgement**: per the letter of §5.2, §1.6 touches authorization-contract semantics ⇒ §7.2 ③ does not hold ⇒ lands "Medium" (the Medium row requires test points); **substantively lands "Simple"**, three reasons: ① only the "Complex" row touches the technical-architecture dimension, and SW-5 has none; ② the "Medium" row requires test points, and SW-5 has none; ③ the authorization-contract semantics of §1.6 are **rule semantics**, not technical architecture. |
+| Deliverable | §1.6 (new) ＋ §1.1 pointer ＋ one §5.0 startup-precondition sentence ＋ **the §5.0 step 0 upfront hard gate gains `SW-3`** (user ruling 2026-09-21) ＋ Appendix B.7 three-tier expansion ＋ §0.3 v1.9 row ＋ version number ＋ this ledger block ＋ **G4b allow-list sync** (`tools/gates/cjk-newwords.txt` gains the character 「竖」) ＋ strict `_EN` positional mirroring |
+| Acceptance evidence (**target**) | ① the trigger-word syntax is **defined in §1.6 alone in the whole document**; ② boundary ① of §1.6 is **a reference to §7.2 ③** (not a redefinition); ③ the B.7 three-tier templates **contain no rule substance**; ④ `[ROUTINE]` cost = **0 paid calls**; ⑤ CN / `_EN` line counts / bold markers / pipes / heading line numbers / ID counts all equal; ⑥ G1–G5 all green; ⑦ ⑥ `PASS`; ⑧ ⑦ `PASS` (folded into the OB-9 open-item input) |
+| Cost | **⑥ ×1 (MAI) ＋ ⑦ ×1 (Codex) = 2 paid calls** (corrected by user ruling 2026-09-21: not 3) |
+| Boundary | **does not change** the G1–G5 criteria (the G4b allow-list merely gains 1 character through that criterion's own registration procedure, which is **data, not a criterion**); the §5.0 step 0 hard gate **only gains `SW-3`** (user ruling 2026-09-21, see §0.3 v1.9); does not change the §7.5 cap values; does not change the §5.1 pipeline sequence; does not change the role set / carriers; adds no document; does not touch code / CONTRACTS / schema / fixtures / CI |
+| Note | the Appendix B.7 heading is renamed from "Slice Startup Card" to "**Startup Card**" (from v1.9 it also covers `[ROUTINE]`); the §5.0 guidance line is renamed accordingly |
+| ⑥ independent scan (**actual**) | MAI-Code-1.1-Flash, **1** effective call (within the §7.5 budget of 3): `INDEPENDENT SCAN: PASS`, Section A–E complete; **0 findings** (Medium+ = 0) |
+| **Did not pass independent final review** | Per OB-9, this slice's changes go together with v1.7/v1.8 into **the input of the next ⑦** |
 
 ### C.1 v3.1 section numbers → this directive
 
