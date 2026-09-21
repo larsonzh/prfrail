@@ -448,6 +448,14 @@ A6 ② 进度（第 2 批，2026-09-15）：
 边界：这是后置平台切片，不得反向修改 Windows 主线结论。
 
 ---
+## 已知缺陷（待清，**必须在 B4 之前处理**）
+
+| 编号 | 载体 | 症状（可复现描述） | 证据（两次 run） | 处置计划 |
+| --- | --- | --- | --- | --- |
+| **DR-2** | 测试：`tools/agent-probe/enforcement-proxy`（B2 期工具，非本片引入） | `TestConnectAuditTrailFailureDeniesAndDoesNotTunnel` **偶发失败**：`enforcement-proxy: AUDIT TRAIL BROKEN (write …/proxy.jsonl: file already closed)` + `main_test.go:125: target must have been reached while the audit trail was healthy`；同一代码不同 run 结果不同 ⇒ flake，指向该测试自身**句柄/时序竞态**（日志文件被关闭后仍被写） | run **`35563800665`**（head `d2f508c`）Ubuntu `Test` 步骤**红**；run **`35562559401`**（head `abfcecc`）同包**绿**；复跑 `35563800665` 双腿**全绿** | **B4 之前**另立独立切片修复（协议先行 + 门禁）；本片及 B3b **不跨切片**修改该工具。理由：flaky 测试会污染后续 CI 可信度，B4 前必须清 |
+
+> 本表只登记**已观测到证据**的缺陷；DR-1 见 `DEV_PLAN.md` 的 B1 段与 `docs/validation/t027-b1-candidate-live-discovery.md`（产品缺陷，属生产行为变更，需独立切片）。
+
 ## 完成记录（追加）
 
 | 日期 | 切片 | 完成摘要 | 证据 |

@@ -189,6 +189,7 @@ C3/C2C3 的决定格各有 **1/5 轮**断电落在机制真正执行之前（tra
 - **保真度未证明**（§1 末）：不得声称装置等价物理断电；如需该主张必须另有独立检验（本片未做）。
 - **时间口径**：单轮实测 ≈5.3–7.3 min（非设计早期估算的 3.8–4.6 min）；按每轮 `inventory-reads.txt` 实测分布回算，不得沿用"两次盘点"旧口径。
 - **D4**：证据包 `calibration/`・`u4/` 分区缺席（见 §3.5）。
+- **CI 抖动观察（一次）**：docs 提交 `d2f508c` 的 run `35563800665` 首跑 Ubuntu `Test` 步骤失败于 `tools/agent-probe/enforcement-proxy` 的 `TestConnectAuditTrailFailureDeniesAndDoesNotTunnel`（`AUDIT TRAIL BROKEN (write …/proxy.jsonl: file already closed)`；`main_test.go:125: target must have been reached while the audit trail was healthy`）；**同一代码**在前一 run `35562559401` 该包为 success，复跑 `35563800665` 双腿全绿 ⇒ 判定**偶发**、指向该测试自身句柄/时序竞态；**本片不跨切片修改 B2 期工具**（已登记为 **DR-2**，见切片清单的已知缺陷表）。
 - 后续：`proven` 若要用到产品契约，需独立的契约修订切片；Windows `unproven`、`first-dispatch` 拒绝、AT-23 结论**均未改变**。
 - **台账缺口修复状态（2026-09-21，用户授权后）**：`REMAINING_SLICES{,_EN}.md` 完成记录表的 **A5/A6/A7/B2/B3a 五行已补录**——依据各切片**自身验证报告**、逐行标注来源、仅补可核验字段（日期/提交号/运行号/证据链接/一句话摘要），无法核验者标注 **历史缺失**（如 B2 的 CI 运行号）；补录后双语行数对称（11/11）。同轮修复了我自己引入的一处缺陷：**EN 台账的 A4 行曾在补录编辑中被误删**（oldString 含 A4、newString 未回填），已回填并复核——该缺陷由本轮自检发现并在同一轮修复，**如实留痕**。**仍待回填**：`DEV_PLAN{,_EN}.md` 的 B3a 段落（B3b 段已补）。
 

@@ -435,6 +435,14 @@ Boundaries: this is a follow-up platform slice and must not rewrite the Windows 
 
 ---
 
+## Known defects (must be cleared **before B4**)
+
+| Id | Carrier | Symptom (reproducible description) | Evidence (two runs) | Disposition plan |
+| --- | --- | --- | --- | --- |
+| **DR-2** | test: `tools/agent-probe/enforcement-proxy` (a B2-era tool, not introduced by this slice) | `TestConnectAuditTrailFailureDeniesAndDoesNotTunnel` fails **intermittently**: `enforcement-proxy: AUDIT TRAIL BROKEN (write …/proxy.jsonl: file already closed)` plus `main_test.go:125: target must have been reached while the audit trail was healthy`; the same code gives different results across runs ⇒ flaky, pointing at a **handle/timing race** inside that test (the log file is written after it has been closed) | run **`35563800665`** (head `d2f508c`) failed the Ubuntu `Test` step; run **`35562559401`** (head `abfcecc`) passed that package; re-running `35563800665` is green on both legs | fix in its **own** slice with protocol-first and full gates, **before B4**; neither B3b nor this documentation change touches that tool across slices. Rationale: a flaky test erodes the credibility of every later CI signal, so it must be cleared before B4 |
+
+> This table only registers defects with observed evidence; DR-1 lives in the B1 paragraph of `DEV_PLAN.md` and in `docs/validation/t027-b1-candidate-live-discovery.md` (a product defect, a production behaviour change needing its own slice).
+
 ## Completion log (append-only)
 
 | Date | Slice | Completion summary | Evidence |
