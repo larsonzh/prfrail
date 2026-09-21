@@ -1,6 +1,6 @@
 ﻿# T027 · B3c · CONTRACTS 耐久升级条款修订 — 验证报告
 
-日期：2026-09-21。状态：`COMPLETE`（① V4 Pro 前置分析 / ③ V4 Pro 预审 / ③.5 独立扫描 / ④ Codex 终审均见 §9；提交与推送**未执行**，待同轮授权）。
+日期：2026-09-21。状态：`COMPLETE`（① V4 Pro 前置分析 / ③ V4 Pro 预审 / ③.5 独立扫描 / ④ Codex 终审均见 §9；提交 `7bdfa0c` 已推送 `origin/main`，CI 结果与 DR-3 见 §7/§10）。
 
 ## 0. 诚实准则（本报告所有结论的前提）
 
@@ -144,12 +144,12 @@
 - **未解除 Windows `unproven`**、未放宽 `first-dispatch`、未改变 AT-23 与 T027 结论。
 - **未做真实模型调用 / 付费 probe**；**未重跑 B3a/B3b 实机**；**未触碰** `tools/agent-probe/enforcement-proxy`。
 - **未修改**任何 `.go` / `.json` / schema / fixtures。
-- **未做** CI 观察（尚未推送）；工作树改动的 CI 结果**待推送后**回填。
+- **CI 观察已完成（推送后）**：`7bdfa0c` 的 run **`35575667145`** **首跑** Windows 腿 `Test` 步骤**红**（`tools/agent-probe/enforcement-proxy` 的 `TestObserveModeAllowsUnknownHostAndLogsIt`，`main_test.go:469: target accepts = 0, want 1`；Ubuntu 腿全绿），`gh run rerun --failed` **复跑后双腿全绿**、运行终态 `success` ⇒ 判定**偶发**。该用例与本片已登记的 DR-2（`TestConnectAuditTrailFailureDeniesAndDoesNotTunnel`）**不是同一个测试**，按用户 2026-09-21 裁决「不同测试 ⇒ 另立」，记为 **DR-3**（详见切片清单的已知缺陷表）。
 
 ## 11. 下一步建议（§7.4）
 
 > 下一片按依赖图应为 **B4 · Windows T027 端到端（AT-23）**；本片已把"契约口径"与"分级结论"之间的空档补齐，B4 可直接以 §7 的耐久升级条款作为输入。
 > 建议档位——主控 **深度（Max）**（仅①设计与②E2E 方案成文步骤）、V4 Pro **①③ 必调**（B4 触及停机/身份/所有权语义）、③.5 **启用**（行为变更切片；且需注意本片 MAI 输出格式不稳定的现状）、Codex **Extra High（④ 必调 + 按 §3.11 必抽盲审）**。
-> 与 B4 并行的待清项：**DR-2**（`enforcement-proxy` 偶发 flake，B4 之前另立独立切片修复）。
+> 与 B4 并行的待清项：**DR-2 + DR-3**（均为 `enforcement-proxy` 测试包的偶发 flake，B4 之前合并于同一独立切片修复）。
 
 - **准则待议（承接 B3b 的 D2 裁决）**：硬门切片的 ④ 调用上限是否需要单列？本片 ④ 实测 3 次（1 终审 + 1 复审 + 1 收口），其中收口轮的直接成因是**审查方缺少读取统一补丁的手段**。**建议**：为 ④ 的输入补齐"原始 diff 落盘"这一步写入流程（本片已验证有效），可显著减少因证据格式导致的无效轮次。

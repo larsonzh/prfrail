@@ -1,6 +1,6 @@
 ﻿# T027 · B3c · CONTRACTS durability-upgrade clause revision — validation report
 
-Date: 2026-09-21. Status: `COMPLETE` (① V4 Pro pre-analysis / ③ V4 Pro pre-review / ③.5 independent scan / ④ Codex final review all in §9; **no commit and no push yet**, awaiting same-turn authorisation).
+Date: 2026-09-21. Status: `COMPLETE` (① V4 Pro pre-analysis / ③ V4 Pro pre-review / ③.5 independent scan / ④ Codex final review all in §9; commit `7bdfa0c` is pushed to `origin/main`, with the CI result and DR-3 in §7/§10).
 
 ## 0. Honesty rules (the premise of every conclusion here)
 
@@ -146,12 +146,12 @@ Temporary script `tmp/b3c-checks.js` (gitignored, deleted after use):
 - **Windows `unproven` not lifted**, `first-dispatch` not relaxed, the AT-23 and T027 conclusions unchanged.
 - **No real model calls and no paid probes**; **no B3a/B3b rig re-run**; `tools/agent-probe/enforcement-proxy` **untouched**.
 - **No `.go` / `.json` / schema / fixtures change**.
-- **No CI observation** (nothing has been pushed); the CI result for this working-tree change is pending the push.
+- **CI observation done (after the push)**: run **`35575667145`** for `7bdfa0c` **failed the first attempt** of the Windows `Test` step (`tools/agent-probe/enforcement-proxy`'s `TestObserveModeAllowsUnknownHostAndLogsIt`, `main_test.go:469: target accepts = 0, want 1`; Ubuntu was green), and `gh run rerun --failed` was **green on both legs** with the run ending `success` ⇒ judged **intermittent**. That case is **not the same test** as this slice's registered DR-2 (`TestConnectAuditTrailFailureDeniesAndDoesNotTunnel`), so under the user's 2026-09-21 ruling ("a different test ⇒ register separately") it is recorded as **DR-3** (full row in the slice list's known-defects table).
 
 ## 11. Next-step recommendation (§7.4)
 
 > Per the dependency graph the next slice should be **B4 · Windows T027 end-to-end (AT-23)**; this slice has closed the gap between "contract wording" and "tiered verdict", so B4 can take the §7 durability-upgrade clause as a direct input.
 > Suggested tiers — main controller **deep (Max)** (only for the ① design and ② E2E-plan writing steps), V4 Pro **①③ mandatory** (B4 touches stop/identity/ownership semantics), ③.5 **enabled** (a behaviour-change slice; note the MAI output format is currently unstable), Codex **Extra High (④ mandatory + the §3.11 blind audit)**.
-> A parallel item to clear before B4: **DR-2** (the `enforcement-proxy` intermittent flake needs its own slice).
+> A parallel item to clear before B4: **DR-2 + DR-3** (both intermittent flakes in the `enforcement-proxy` test package, to be fixed together in one standalone slice before B4).
 
 - **Guidance item to discuss (continuing B3b's D2 ruling)**: should hard-gate slices have their own ④ call cap? This slice's ④ measured 3 calls (1 final review + 1 re-review + 1 closing round), and the closing round was caused directly by **the reviewer lacking a way to read the unified patch**. **Suggestion**: write "put the raw diff on disk" into the ④ input procedure (verified effective here) to remove format-caused wasted rounds.
