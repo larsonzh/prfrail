@@ -12,7 +12,12 @@ vendor/
 !/tmp/.gitkeep
 # Scratch output belongs in the repo-root tmp/ only; guard against tools writing their own tmp/
 /tools/tmp/
-.github/agents/
+
+# Agent role set: role definitions (*.agent.md) ARE versioned (DELIVERY_DIRECTIVE R2.5);
+# only the sol-orchestrator generator toolchain and its artifacts stay ignored.
+.github/agents/sol-orchestrator/
+.github/agents/*.managed.json
+**/__pycache__/
 
 # context-mode runtime state
 .github/context-mode/content/
