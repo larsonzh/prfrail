@@ -34,3 +34,5 @@
 怀	docs/t027/REMAINING_SLICES.md	"与 DR-4 怀疑的共享根因一致" (suspect)
 # 2026-09-22 (SW-5 / v1.9): new character in the C.0e acceptance-evidence row.
 竖	docs/DELIVERY_DIRECTIVE.md	"行数 / 加粗 / 竖线 / 标题行号 / ID 计数全等" (vertical-bar count in the mirror-parity criterion)
+# 2026-09-22 (SW-5 validation report + OB-12): new character in the report prose.
+涵	docs/validation/sw5-work-tiers.md	"不涵盖“编制执行准则”本身" (does not cover)
