@@ -22,3 +22,11 @@
 横	docs/DELIVERY_DIRECTIVE.md	"已加历史版本横幅" (banner, heng)
 幅	docs/DELIVERY_DIRECTIVE.md	"已加历史版本横幅" (banner, fu)
 犯	docs/DELIVERY_DIRECTIVE.md	"不得重犯" (repeat an offence)
+# 2026-09-21 (SW-3): the following two characters are PRE-EXISTING content in
+# .github/agents/sol-orchestrator.agent.md, which had never been scanned by G4b
+# because .gitignore previously ignored the whole .github/agents/ directory.
+刀	.github/agents/sol-orchestrator.agent.md	"不直接以 Sol 计价操刀" (handle it personally)
+月	.github/agents/sol-orchestrator.agent.md	"月度目标: $50" (monthly goal)
+疾	docs/validation/sw3-role-set-versioning.md	"避免状态与范围不一致的旧疾复发" (old ailment)
+鲁	docs/validation/sw3-role-set-versioning.md	"鲁棒性" (robustness)
+棒	docs/validation/sw3-role-set-versioning.md	"鲁棒性" (robustness)

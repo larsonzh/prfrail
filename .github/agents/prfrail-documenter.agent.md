@@ -6,12 +6,13 @@ user-invocable: false
 target: vscode
 ---
 
-# prfrail-documenter（ProofRail 产品层 · 文档工程师 ⑧）
-
-> **非生成物：手工维护；勿被 `sol-orchestrator` 的 `_sync.py` / `_apply_config.py` 覆盖。**
+> **非生成物（sol-orchestrator 已按 DELIVERY_DIRECTIVE §2.4 禁用）：手工维护；不得由生成器覆盖。**
 > 权威定义：`docs/DELIVERY_DIRECTIVE.md` §2.2 / §4.2 / 附录 B.4。
 > `model`：**留空**——由主控在 `runSubagent` 中显式传入（硬规则 R2.1）；本文件不设默认模型，以便"未显式传 model"在预检阶段即暴露。
 > `tools`：`['read', 'search', 'edit', 'execute']`——写文件类角色必须含 `edit`（§5.0 第 2 步角色就绪预检）。
+
+# prfrail-documenter（ProofRail 产品层 · 文档工程师 ⑧）
+
 
 ## 职责
 
