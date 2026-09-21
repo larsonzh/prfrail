@@ -36,3 +36,5 @@
 竖	docs/DELIVERY_DIRECTIVE.md	"行数 / 加粗 / 竖线 / 标题行号 / ID 计数全等" (vertical-bar count in the mirror-parity criterion)
 # 2026-09-22 (SW-5 validation report + OB-12): new character in the report prose.
 涵	docs/validation/sw5-work-tiers.md	"不涵盖“编制执行准则”本身" (does not cover)
+# 2026-09-22 (OB-13): injection-class label reused in the CN row and mirrored in the EN row.
+甲	docs/DELIVERY_DIRECTIVE.md	"变异性（甲-i 回归会被抓 / 甲-ii 修复本体被证伪）" (injection-class label)
