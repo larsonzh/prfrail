@@ -72,6 +72,7 @@ This report therefore **must not** be read as "this device has been shown equiva
 | `go test -count=1 ./...` | **14 packages ok, 0 FAIL** |
 | native suite `go test -tags b3bnative -count=1 ./internal/adapters/` | **exit 0** (25 s) |
 | Encoding and line endings | every touched `.md`/`.ps1` = UTF-8 **with BOM** + LF; `.go`/`.json` = **without BOM** + LF |
+| **GitHub Actions (observed after the push)** | run **`35562559401`** (head `abfcecc`) = **success**: every Ubuntu step is success, including Build/Vet/Test/**Race**/**Contract fixtures**; the Windows leg is success throughout; the `workflow_dispatch`-only jobs (Candidate build/probe, Bootstrap) are skipped by design |
 
 ### 3.2 Main matrix (session `2026-09-21`, writer sha256 `06de8a72…`)
 
@@ -187,6 +188,7 @@ The rig fails closed and **refuses** to count a survival whose mechanism never r
 - **Timing basis**: measured cost is ≈5.3–7.3 min/round, not the earlier 3.8–4.6 min estimate; recompute from each round's `inventory-reads.txt` distribution rather than the old "two inventories" basis.
 - **D4**: the evidence pack's `calibration/` and `u4/` sections are absent (see §3.5).
 - Follow-up: using `proven` in a product contract needs its own protocol-first contract slice; the Windows `unproven` state, the `first-dispatch` refusal and the AT-23 conclusions are **unchanged**.
+- **Ledger gap repair status (2026-09-21, after user authorisation)**: the five rows **A5/A6/A7/B2/B3a were back-filled** into the completion log of `REMAINING_SLICES{,_EN}.md`, each based on that slice's **own validation report**, each annotated with its field sources and restricted to verifiable fields (date, commit, run id, evidence link, one-line summary); anything unverifiable is marked as a **historic gap** (e.g. B2's CI run id). The two languages now match row for row (11/11). The same turn fixed a defect I had introduced myself: **EN's A4 row had been deleted by that back-fill edit** (the oldString contained the A4 row while the newString did not restore it); it has been restored and re-checked, and the defect is recorded here as an honest trace, having been found and fixed within the same turn. **Still owed**: the B3a paragraph in `DEV_PLAN{,_EN}.md` (B3b's is added).
 
 ## 8. Cost and accounting
 
@@ -270,7 +272,7 @@ The merge decision is recorded here as §3.11 requires: the two calls' inputs (s
 
 ## 10. Explicitly not executed
 
-- **Not committed, not pushed** (needs explicit authorisation in the same turn; `origin` only, never gitee).
+- **Committed and pushed (2026-09-21, explicit same-turn authorisation)**: commit **`abfcecc`** (2183 files staged precisely), pushed to `origin/main` (`74cbd68..abfcecc`), **never to gitee**; CI run **`35562559401`** is green on both legs (Ubuntu including Race/Contract fixtures, and Windows). Everything else below remains unexecuted.
 - **No real model calls / paid probes** (this slice is fully offline).
 - **No independent check of device fidelity** (no external byte-level comparison of the virtual disk before and after the cut), so the §1 qualifier stands.
 - **No long-form stress runs** (e.g. 200-round simultaneity races): this slice used a fixed N=5 per cell plus 3 rounds per U4 cell, as designed.

@@ -72,6 +72,7 @@
 | `go test -count=1 ./...` | **14 包全 ok、0 FAIL** |
 | 原生套件 `go test -tags b3bnative -count=1 ./internal/adapters/` | **exit 0**（25 s） |
 | 编码与行尾 | 本片触碰的 `.md`/`.ps1` = UTF-8 **with BOM** + LF；`.go`/`.json` = **without BOM** + LF |
+| **GitHub Actions（提交后观察）** | run **`35562559401`**（head `abfcecc`）= **success**：Ubuntu 腿 Build/Vet/Test/**Race**/**Contract fixtures** 逐步全 success；Windows 腿全 success；`workflow_dispatch` 专用作业（Candidate build/probe、Bootstrap）按设计 skipped |
 
 ### 3.2 主矩阵（会话 `2026-09-21`，写入器 sha256 `06de8a72…`）
 
@@ -189,6 +190,7 @@ C3/C2C3 的决定格各有 **1/5 轮**断电落在机制真正执行之前（tra
 - **时间口径**：单轮实测 ≈5.3–7.3 min（非设计早期估算的 3.8–4.6 min）；按每轮 `inventory-reads.txt` 实测分布回算，不得沿用"两次盘点"旧口径。
 - **D4**：证据包 `calibration/`・`u4/` 分区缺席（见 §3.5）。
 - 后续：`proven` 若要用到产品契约，需独立的契约修订切片；Windows `unproven`、`first-dispatch` 拒绝、AT-23 结论**均未改变**。
+- **台账缺口修复状态（2026-09-21，用户授权后）**：`REMAINING_SLICES{,_EN}.md` 完成记录表的 **A5/A6/A7/B2/B3a 五行已补录**——依据各切片**自身验证报告**、逐行标注来源、仅补可核验字段（日期/提交号/运行号/证据链接/一句话摘要），无法核验者标注 **历史缺失**（如 B2 的 CI 运行号）；补录后双语行数对称（11/11）。同轮修复了我自己引入的一处缺陷：**EN 台账的 A4 行曾在补录编辑中被误删**（oldString 含 A4、newString 未回填），已回填并复核——该缺陷由本轮自检发现并在同一轮修复，**如实留痕**。**仍待回填**：`DEV_PLAN{,_EN}.md` 的 B3a 段落（B3b 段已补）。
 
 ## 8. 成本与计量
 
@@ -275,7 +277,7 @@ C3/C2C3 的决定格各有 **1/5 轮**断电落在机制真正执行之前（tra
 
 ## 10. 明确未执行事项
 
-- **未 `commit`、未 `push`**（需同一轮明确授权；且只推 `origin`，绝不推 gitee）。
+- **已 `commit` 并 `push`（2026-09-21，用户同轮显式授权）**：提交 **`abfcecc`**（精确暂存 2183 文件），推送 `origin/main`（`74cbd68..abfcecc`），**未推 gitee**；CI run **`35562559401`** 双腿全绿（Ubuntu 含 Race/Contract fixtures、Windows）。以下各项仍未执行。
 - **未做真实模型调用 / 付费 probe**（本片全离线）。
 - **未做装置保真度的独立检验**（即未用外部手段比对 cut 前后虚拟盘字节，故 §1 末的限定成立）。
 - **未跑长档压力**（如 200 轮同刻竞态）：本片固定 N=5/格 + U4 3 轮/格，符合设计预算。
