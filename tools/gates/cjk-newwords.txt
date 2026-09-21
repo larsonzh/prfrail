@@ -38,3 +38,5 @@
 涵	docs/validation/sw5-work-tiers.md	"不涵盖“编制执行准则”本身" (does not cover)
 # 2026-09-22 (OB-13): injection-class label reused in the CN row and mirrored in the EN row.
 甲	docs/DELIVERY_DIRECTIVE.md	"变异性（甲-i 回归会被抓 / 甲-ii 修复本体被证伪）" (injection-class label)
+# 2026-09-22 (DR-FIX report): second evidence class of the mutation-criterion split; kept verbatim in the EN mirror.
+乙	docs/validation/dr-fix-enforcement-proxy.md	"结构消除性证据（乙）" (structural-elimination evidence class)
