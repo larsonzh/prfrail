@@ -1,0 +1,82 @@
+[11:54:26] === B3b session preflight 2026-09-21 begin ===
+[11:54:29] === B3a session preflight 2026-09-21 begin ===
+[11:54:29] CHECK PASS 1-version :: VBoxManage --version = 7.2.18r175117 (expected 7.2.18r175117)
+[11:54:30] CHECK PASS 2-vm-facts :: VMState=poweroff; SATA nonrotational=on/on; pristine snapshot present=True
+[11:54:30] CHECK PASS 3-free-space :: D: free = 265.0 GB (min 5.0)
+[11:54:30] powercfg SUB_SLEEP STANDBYIDLE raw: ��Դ���� GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (ƽ��) |   GUID ����: SCHEME_BALANCED |   ���� GUID: 238c9fa8-0aad-41ed-83f4-97be242c8f20  (˯��) |     GUID ����: SUB_SLEEP |     ��Դ���� GUID: 29f6c1db-86da-48c5-9fdb-f2b67b1f44da  (�ڴ�ʱ���˯��) |       GUID ����: STANDBYIDLE |       ��С���ܵ�����: 0x00000000 |       �����ܵ�����: 0xffffffff |       ���ܵ���������: 0x00000001 |       ���ܵ����õ�λ: �� |     ��ǰ������Դ��������: 0x00000000 |     ��ǰֱ����Դ��������: 0x00000000 |  | 
+[11:54:30] powercfg SUB_SLEEP HIBERNATEIDLE raw: ��Դ���� GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (ƽ��) |   GUID ����: SCHEME_BALANCED |   ���� GUID: 238c9fa8-0aad-41ed-83f4-97be242c8f20  (˯��) |     GUID ����: SUB_SLEEP |     ��Դ���� GUID: 9d7815a6-7ee4-497e-8888-515a05f02364  (�ڴ�ʱ�������) |       GUID ����: HIBERNATEIDLE |       ��С���ܵ�����: 0x00000000 |       �����ܵ�����: 0xffffffff |       ���ܵ���������: 0x00000001 |       ���ܵ����õ�λ: �� |     ��ǰ������Դ��������: 0x00000000 |     ��ǰֱ����Դ��������: 0x00000000 |  | 
+[11:54:30] CHECK PASS 4-host-power-plan :: sleep and hibernate indices are 0 for AC and DC
+[11:54:30] CHECK PASS 5-journal-chain :: journal=D:\VirtualBox VMs\Win11B3\b3b-runs-variant\2026-09-21\journal.jsonl records=0 badLine=0
+[11:54:30] CHECK PASS 6-tool-deploy :: VM is poweroff; deployment deferred to every round after restore pristine (see Invoke-B3aRound.ps1 S3.5)
+[11:54:30] CHECK PASS 7-inputs :: credFile=present auditScript=present
+[11:54:30] === preflight done: all green ===
+[11:54:31]   frozen: PASS  1-version  VBoxManage --version = 7.2.18r175117 (expected 7.2.18r175117)
+[11:54:31]   frozen: PASS  2-vm-facts  VMState=poweroff; SATA nonrotational=on/on; pristine snapshot present=True
+[11:54:31]   frozen: PASS  3-free-space  D: free = 265.0 GB (min 5.0)
+[11:54:31]   frozen: PASS  4-host-power-plan  sleep and hibernate indices are 0 for AC and DC
+[11:54:31]   frozen: PASS  5-journal-chain  journal=D:\VirtualBox VMs\Win11B3\b3b-runs-variant\2026-09-21\journal.jsonl records=0 badLine=0
+[11:54:31]   frozen: PASS  6-tool-deploy  VM is poweroff; deployment deferred to every round after restore pristine (see Invoke-B3aRound.ps1 S3.5)
+[11:54:31]   frozen: PASS  7-inputs  credFile=present auditScript=present
+[11:54:31] CHECK PASS 1-frozen-preflight :: New-B3aSession.ps1 exit=0 (1-7 inherited from the frozen preflight)
+[11:54:31] CHECK PASS 8-reuse-pin :: recorded pin: D:\VirtualBox VMs\Win11B3\b3b-runs-variant\2026-09-21\pin.json
+[11:56:33] CHECK PASS 9-guest-store-root-writable :: 0bad61fd store=R:\agent-runner-replay scratch=R:\calib exit=0
+[11:56:33] CHECK PASS 9-module-hygiene :: b3b functions=48; collisions=; unsafe modules=
+[11:56:33] CHECK PASS 10-writer-binary :: D:\LZProjects\prfrail\tmp\b3b\writer-variant.exe sha256=5b0d06d87547e98f295a7adedae9d5522503e615b0152340dbb5a1a4e2416633 bytes=8956416
+[11:56:33] === preflight done: all green ===
+[11:56:38] matrix: cell c2:parent-synced paired=False before: valid=0 void=0 (target 2)
+[11:56:42] === round 0 arm=c2 stage=parent-synced begin ===
+[11:56:44] S1: pre-round poweroff (was running) exit=0
+[11:56:45] S1: restore pristine exit=0
+[11:56:51] S2: startvm ok=True attempts=1
+[11:57:54] S3: guestcontrol ready after 62.8s
+[11:58:07] S3.5: writer host=5b0d06d87547e98f295a7adedae9d5522503e615b0152340dbb5a1a4e2416633 guest=5b0d06d87547e98f295a7adedae9d5522503e615b0152340dbb5a1a4e2416633
+[11:58:35] S3.5: deploy 11-shutdown-audit.ps1 copied=True hashMatch=True note=
+[11:58:35] S3.5: deploy 12-round-inventory.ps1 copied=True hashMatch=True note=
+[11:58:35] S3.5: deploy 13-round-write.ps1 copied=True hashMatch=True note=
+[11:58:43] S4: pre-audit verdict=NONE uptime=1.7
+[11:58:43] S4.5: mkdir R:\calib\r00 exit=0
+[11:58:43] S4.5: mkdir C:\prfrail-prep\runs\r00 exit=0
+[11:58:45] S5: plan ACK ok digest=3d1318960e151cce463b6a0687549b7ffd4185250d51ff877728064e7060e23e size=1082
+[11:58:45] S6: writer started; polling the marker
+[11:58:45] S6.5: detect after 0.4s stageSeen=True escape=False
+[11:58:46] S6.5: writer alive at the cut point
+[11:58:49] S7: controlvm poweroff exit=0
+[11:59:49] S7: cut record ACK ok; writer exit=-1
+[12:01:07] S8: copyfrom C:\prfrail-prep\runs\r00\marker.jsonl exit=0
+[12:01:15] S8: copyfrom C:\prfrail-prep\runs\r00\marker-plan.jsonl exit=0
+[12:01:37] S8: post-audit verdict=HARD-POWER-LOSS
+[12:01:51] S8: inventory settled after 2 read(s)
+[12:01:51] S8: inventory pair settled in 2 read(s); dirty=Volume - R: is NOT Dirty
+[12:01:52] S9: outcome=survived stageHit=True mechanismOk=False orphan=False
+[12:01:53] reset: controlvm poweroff (was running) exit=0
+[12:01:53] reset: restore pristine exit=0
+[12:01:53] === round 0 done: outcome=survived ===
+[12:01:53] matrix: round 0 cell=c2:parent-synced exit=0
+[12:01:54] === round 1 arm=c2 stage=parent-synced begin ===
+[12:01:55] S1: restore pristine exit=0
+[12:02:00] S2: startvm ok=True attempts=1
+[12:02:31] S3: guestcontrol ready after 31.6s
+[12:03:00] S3.5: writer host=5b0d06d87547e98f295a7adedae9d5522503e615b0152340dbb5a1a4e2416633 guest=5b0d06d87547e98f295a7adedae9d5522503e615b0152340dbb5a1a4e2416633
+[12:03:30] S3.5: deploy 11-shutdown-audit.ps1 copied=True hashMatch=True note=
+[12:03:30] S3.5: deploy 12-round-inventory.ps1 copied=True hashMatch=True note=
+[12:03:30] S3.5: deploy 13-round-write.ps1 copied=True hashMatch=True note=
+[12:03:39] S4: pre-audit verdict=NONE uptime=1.6
+[12:03:39] S4.5: mkdir R:\calib\r01 exit=0
+[12:03:39] S4.5: mkdir C:\prfrail-prep\runs\r01 exit=0
+[12:03:41] S5: plan ACK ok digest=7410326398bedce9986a4164c6e9dfc8fa370a57289f96ab48620525a8a575f3 size=1082
+[12:03:41] S6: writer started; polling the marker
+[12:03:41] S6.5: detect after 0.4s stageSeen=True escape=False
+[12:03:42] S6.5: writer alive at the cut point
+[12:03:45] S7: controlvm poweroff exit=0
+[12:04:45] S7: cut record ACK ok; writer exit=-1
+[12:05:53] S8: copyfrom C:\prfrail-prep\runs\r01\marker.jsonl exit=0
+[12:05:54] S8: copyfrom C:\prfrail-prep\runs\r01\marker-plan.jsonl exit=0
+[12:06:23] S8: post-audit verdict=HARD-POWER-LOSS
+[12:06:47] S8: inventory settled after 2 read(s)
+[12:06:47] S8: inventory pair settled in 2 read(s); dirty=Volume - R: is NOT Dirty
+[12:06:47] S9: outcome=survived stageHit=True mechanismOk=False orphan=False
+[12:06:48] reset: controlvm poweroff (was running) exit=0
+[12:06:48] reset: restore pristine exit=0
+[12:06:48] === round 1 done: outcome=survived ===
+[12:06:48] matrix: round 1 cell=c2:parent-synced exit=0
+[12:06:48] matrix: cell c2:parent-synced complete: valid=2

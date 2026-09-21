@@ -398,15 +398,18 @@ A6 ② 进度（第 2 批，2026-09-15）：
 验收证据：负对照出现丢失、正对照零丢失、journal 重启后完整且可逐轮对账、盘点结果可重复（≥2 次同结果）。
 边界：不在此切片对 C2/C3 下结论；不得用“模拟落盘/软件注入”替代设备级注入；不得在非受控主机或含不可丢失数据的卷上做真断电。
 
-## B3b — candidate injection matrix + durability verdict · ⬜
+## B3b — candidate injection matrix + durability verdict · ✅
 
 依赖：B3a
 
-- [ ] 对 C2（`MoveFileEx(MOVEFILE_WRITE_THROUGH)`）做 5 个发布阶段 × N 轮真实注入，逐轮与 journal/盘点对账。
-- [ ] 对 C3（目录句柄 `FlushFileBuffers`）做同样矩阵（可含 C2+C3 组合）。
-- [ ] 按三档口径给出每个候选的 **proven / disproven / unresolved**（带同一前提），含目录项丢失有序、真孤儿 C、torn 可见等反例判定。
-- [ ] 结论回写：ADR-013 候选排序、验证报告、DEV_PLAN 双语、切片清单；若 `proven` 则同步评估/修订 CONTRACTS 的耐久口径与 first-dispatch 解锁条件（协议先行），否则维持 `unproven` 并记录失败模式。
-- [ ] 复现与证据包：命令、轮数、原始 journal、盘点输出、失败样本，纳入 `docs/validation/evidence/`。
+- [x] 对 C2（`MoveFileEx(MOVEFILE_WRITE_THROUGH)`）做 5 个发布阶段 × N 轮真实注入，逐轮与 journal/盘点对账。
+- [x] 对 C3（目录句柄 `FlushFileBuffers`）做同样矩阵（可含 C2+C3 组合）。
+- [x] 按三档口径给出每个候选的 **proven / disproven / unresolved**（带同一前提），含目录项丢失有序、真孤儿 C、torn 可见等反例判定。
+      （**结果**：**C2 `proven`**；C1/C3/C2C3 `unresolved`；U4 `unresolved` 且 0 真孤儿；逐字理由见报告 §4）
+- [x] 结论回写：ADR-013 候选排序、验证报告、DEV_PLAN 双语、切片清单；若 `proven` 则同步评估/修订 CONTRACTS 的耐久口径与 first-dispatch 解锁条件（协议先行），否则维持 `unproven` 并记录失败模式。
+      （**评估已完成**并写入报告 §7/§11：Windows `unproven` 与 first-dispatch 拒绝**未**解除；**契约修订按设计 §10.6 属条件性后续子步骤，本片不做**——协议先行，需独立切片）
+- [x] 复现与证据包：命令、轮数、原始 journal、盘点输出、失败样本，纳入 `docs/validation/evidence/`。
+      （`docs/validation/evidence/b3b-2026-09-21/`：2157 文件、`rigMismatches=0 missingRequired=0`，含 `variant/` 变异臂分区）
 
 目标：用真实设备级证据决定 Windows 发布耐久能否从 `unproven` 升级，以及按哪条协议升级。
 现状缺口：C2/C3 的耐久保证均 `unresolved`（C2 文档措辞歧义、C3 是否真正提交目录项未证），且 U4（断电下目录项丢失有序）从未被真实注入。
@@ -454,3 +457,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 2026-09-14 | A2 | dispatch and launch ambiguity：R-first + 窄重确认 fail-closed；二文件 store-local 回执协议（intent/identity）与“无意图⇒绝不 spawn、身份缺失⇒unproven、不盲目重启”不变量；R-only/意图/意图+身份/终态一律阻断；U1 抽取与 `launches/` 全套路径安全/归属/同步纪律落地；跨 store 并发单赢家、碰撞双分支、撤销、启动失败、launchId 错配、身份冲突、Unix 换链/收敛/sync 失败反例齐备；V4 Pro 预审 M1/M2/L1–L5/L7 整改闭环、Codex 终审（含反例审计）无 High/Medium；Windows 原生门禁全绿；已提交 `aeb504e` 并推送，GitHub Actions Ubuntu（含 Race）/Windows 全绿（run 34844216048）；CI 证据回写已提交 `2206786`（run 34844659886 通过） | docs/validation/t027-dispatch-launch-ambiguity.md |
 | 2026-09-14 | A3 | terminal publication and settlement：四阶段链（intent→Settle→C→closure）与二文件 store-local 记录；确定性幂等键与证据绑定；orphan/异键/charged>reserved/矩阵拒绝；unknown 保留占用；unproven 预结算拒绝与完整链无写重放；崩溃窗口 i/ii/iii 幂等恢复；V4 Pro 前置分析+预审（H1/M1/M2/M3/L1/L5 整改）与 Codex 终审（2 Medium+3 Low 整改，补 3 条反例）+ Codex 整改复审 PASS（2026-09-15，中高危清零）+ 尾项整改与 Codex 追加确认 PASS（2026-09-15）；已提交 `c6f8585` 并推送，GitHub Actions Ubuntu（含 Race）/Windows 全绿（run 34900979883）；CI 证据回写已提交 `057d599`（run 34901323914 通过） | docs/validation/t027-terminal-publication.md |
 | 2026-09-15 | A4 | chain terminal routing and resume：协议先行（CONTRACTS 双语 §2.1 新状态行与 §7 “chain terminal 路由”段、schema `stepTransition`、126 契约夹具含 3 条新用例）；新 step 状态 `TERMINAL_PENDING`（派发成功才写、非可停留态、入 recover 不确定清单与 cancel 清理）；核心唯一写入口 `SubmitAgentRunnerTerminal` 按五态路由（completed 仅 step PASSED，failed→task/chain FAILED，uncertain→task FAILED+chain PAUSED 禁重试，cancelled 先归档停机证据，operator-action-required→task/step WAITING+chain PAUSED 交接 T025）；adapters 单向翻译绑定 request→intent→closure 全字段含结算槽位且对 store 严格只读；重复终局幂等收敛（含两种部分写入窗口）、异终局冲突零写；resume 连续性以 `PriorCompletionHash ∈ step 事件证据历史` 为唯一判据；V4 Pro 预审 1 Medium（operator 路由崩溃窗口）+2 Low 整改后复审无 Medium+（新增 1 Low 已整改）；Codex 终审 1 Medium（结算槽位未绑定）+1 Low（BOM 字节级实测为误报，已留证据澄清）整改后 Codex 复审 PASS；本地全量门禁与契约夹具门禁全绿；已提交 `a21335d` 并推送，GitHub Actions Ubuntu（含 Race 与 Contract fixtures 步骤）/Windows 全绿（run 34920155025）；CI 证据回写已提交 `a1c643c`（run 34920548264 通过） | docs/validation/t027-terminal-routing.md |
+| 2026-09-21 | B3b | candidate injection matrix + durability verdict：装置全实机化（会话锁、硬断电后陈旧会话恢复、盘点稳定对、fail-closed 判定）；主矩阵 **17 格×5=85 轮全有效、0 void**，U4 **6 格×3=18 轮全有效、0 真孤儿**；判别力门成立（负对照 5/5 丢失、正对照 5/5 存活）；三档定案 **C2 `proven`**、C1/C3/C2C3 `unresolved`（C3/C2C3 逐字理由 `mechanism evidence missing in rounds 77 / 81`，属装置 fail-closed 行为而非“不耐久”）；变异臂（装置自证伪）2 轮降级原语下装置拒绝兑现 `proven`，并有离线互证；⑤ 就地修复 9 项实机缺陷（P1–P9）且每项带反证实验；③ V4 Pro `changes-required`→收口 PASS、③.5 MAI PASS、④ Codex **6 次**（超预算原因与逐次发现见报告 §8）；**未提交、未推送** | docs/validation/t027-b3b-durability.md；证据包 docs/validation/evidence/b3b-2026-09-21/ |
+
+> **台账完整性注记（2026-09-21）**：本表在 A4 行之后长期未追加完成行（A5/A6/A7/B2/B3a 均缺），B3b 行是自 A4 以来首条追加。
+> 缺失行的回填需以各自验证报告（`docs/validation/`）与证据包为准，本片不代为编撰；各片状态以对应小节的 ✅ 与小节内交付物描述为准。

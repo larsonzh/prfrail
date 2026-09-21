@@ -1,0 +1,3 @@
+{"round":"r40","candidate":"c2","stage":"temp-synced","path":"R:\\agent-runner-replay\\requests\\request.b3b-r40.jsonl","digest":"aeabb6bf334a723570f5c17903a8824cdbaa2b7933b94146922a3bc7430c119b","size":1082}
+{"round":"r40","candidate":"c2","stage":"temp-written","path":"R:\\agent-runner-replay\\requests\\request.b3b-r40.jsonl","target":false,"trace":["stage:temp-written"],"timestamp":"2026-09-20T22:09:44.8285429Z"}
+{"round":"r40","candidate":"c2","stage":"temp-synced","path":"R:\\agent-runner-replay\\requests\\request.b3b-r40.jsonl","target":true,"trace":["stage:temp-written","stage:temp-synced"],"timestamp":"2026-09-20T22:09:44.8303714Z"}

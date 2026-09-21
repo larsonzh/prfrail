@@ -1,0 +1,3 @@
+{"round":"r05","candidate":"c1","stage":"temp-written","path":"R:\\agent-runner-replay\\requests\\request.b3b-r05.jsonl","digest":"08151a35d487f86dac847e3c00c9dca2a4afaea4dea4bf101602698b6aa735b9","size":1082}
+{"round":"r05","candidate":"c1","stage":"temp-written","path":"R:\\agent-runner-replay\\requests\\request.b3b-r05.jsonl","target":true,"trace":["stage:temp-written"],"timestamp":"2026-09-20T17:59:57.298112Z"}
+

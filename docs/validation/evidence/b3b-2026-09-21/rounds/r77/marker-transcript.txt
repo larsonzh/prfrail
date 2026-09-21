@@ -1,0 +1,4 @@
+{"round":"r77","candidate":"c3","stage":"parent-synced","path":"R:\\agent-runner-replay\\requests\\request.b3b-r77.jsonl","digest":"7506ba9dbd6eabe442418509509da87be918889f92f3e9a87d0c48cef62cff6c","size":1082}
+{"round":"r77","candidate":"c3","stage":"temp-written","path":"R:\\agent-runner-replay\\requests\\request.b3b-r77.jsonl","target":false,"trace":["stage:temp-written"],"timestamp":"2026-09-21T01:27:14.4587672Z"}
+{"round":"r77","candidate":"c3","stage":"temp-synced","path":"R:\\agent-runner-replay\\requests\\request.b3b-r77.jsonl","target":false,"trace":["stage:temp-written","stage:temp-synced"],"timestamp":"2026-09-21T01:27:14.4760765Z"}
+{"round":"r77","candidate":"c3","stage":"temp-closed","path":"R:\\agent-runner-replay\\requests\\request.b3b-r77.jsonl","target":false,"trace":["stage:temp-written","stage:temp-synced","stage:temp-closed"],"timestamp":"2026-09-21T01:27:14.4760765Z"}

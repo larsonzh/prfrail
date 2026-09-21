@@ -1,0 +1,1 @@
+{"round":"r502","candidate":"c2","stage":"temp-written","path":"R:\\agent-runner-replay\\completions\\completion.b3b-r502.jsonl","digest":"86d203e5e1bfde821b0916e7c142614e90eebf33b7ea59b3e6d4f50249f722ed","size":780}

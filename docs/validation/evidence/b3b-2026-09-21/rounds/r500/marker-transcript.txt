@@ -1,0 +1,2 @@
+{"round":"r500","candidate":"c2","stage":"record-linked","path":"R:\\agent-runner-replay\\completions\\completion.b3b-r500.jsonl","digest":"a56c97faa96249aea03d00702e92363bee7455820797d4b5c92c382439ca9060","size":780}
+{"round":"r500","candidate":"c2","stage":"temp-written","path":"R:\\agent-runner-replay\\requests\\request.b3b-r500.jsonl","target":false,"trace":["stage:temp-written"],"timestamp":"2026-09-21T02:20:09.2763759Z"}

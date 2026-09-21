@@ -1,0 +1,13 @@
+﻿{
+    "schema":  "b3b-pin",
+    "v":  1,
+    "sessionId":  "2026-09-21",
+    "recordedAt":  "2026-09-21T01:25:28.8880327+08:00",
+    "b3aRigDir":  "D:\\LZProjects\\prfrail\\tools\\b3a-rig",
+    "hashes":  {
+                   "b3a-rig-lib.ps1":  "6e2663c011c43a5485a3fad051d231fea13bfdd43152380daccb151b90a4161e",
+                   "b3a-journal-lib.ps1":  "66f8ceea7d3ba397253044c4462faa9fda8ff03bcc80856b1418f91a34921df5",
+                   "guest\\12-round-inventory.ps1":  "89a3669374910f93fd02a3d00959cfda9533a1a18fad3b5ed3177da19acfae07",
+                   "guest\\13-round-write.ps1":  "0f37fb36a3ed7f4a497c38f3414684efb4d9873d2ae3b8eb69bac8e64f8a2fd8"
+               }
+}

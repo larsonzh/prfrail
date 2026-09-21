@@ -1,0 +1,327 @@
+{
+    "schema":  "b3b-durability-verdict",
+    "v":  1,
+    "premise":  "VirtualBox 7.2.18 r175117, guest Windows 11 25H2 build 26200.8037 NTFS, SATA/AHCI useHostIOCache=false, inject volume R:=INJECT (data.vdi 7.98 GB, 4096 B clusters), guest hard poweroff via VBoxManage controlvm poweroff, pristine snapshot 065a25e1-d95c-4f33-8081-4f06216ecce8, nic1=none, C: is the signalling domain only, the measured domain is the replay store root on R:, one measured publication per round",
+    "claimScope":  "within premise P (VirtualBox Win11B3 / NTFS on SATA-AHCI, useHostIOCache=false, record-level ~1 KiB payload, 2 s cut window, N=5 per cell): no counterexample observed, candidate mechanism demonstrably executed, device discrimination demonstrated at stage temp-written only; not a long-term guarantee and not a claim about other hypervisors, filesystems, payload sizes or the host losing power",
+    "requiredN":  5,
+    "writerSha256":  "06de8a728ae984318a7955d01853443f30749a621c81d4caa47044c5b7017a82",
+    "discrimination":  {
+                           "ok":  true,
+                           "negativeValidRounds":  5,
+                           "negativeLosses":  5,
+                           "positiveValidRounds":  5,
+                           "positiveLosses":  0,
+                           "requiredN":  5
+                       },
+    "cells":  [
+                  {
+                      "arm":  "c1",
+                      "stage":  "parent-synced",
+                      "verdict":  "eligible",
+                      "validRounds":  5,
+                      "losses":  0,
+                      "violations":  0,
+                      "unattributable":  0,
+                      "discrimination":  true,
+                      "reasons":  [
+                                      "all valid rounds inside the allowed set with mechanism evidence"
+                                  ]
+                  },
+                  {
+                      "arm":  "c1",
+                      "stage":  "record-linked",
+                      "verdict":  "disproven",
+                      "validRounds":  5,
+                      "losses":  1,
+                      "violations":  1,
+                      "unattributable":  0,
+                      "discrimination":  true,
+                      "reasons":  [
+                                      "round 21: lost-absent is outside the allowed set for record-linked"
+                                  ]
+                  },
+                  {
+                      "arm":  "c1",
+                      "stage":  "temp-closed",
+                      "verdict":  "eligible",
+                      "validRounds":  5,
+                      "losses":  5,
+                      "violations":  0,
+                      "unattributable":  0,
+                      "discrimination":  true,
+                      "reasons":  [
+                                      "all valid rounds inside the allowed set with mechanism evidence"
+                                  ]
+                  },
+                  {
+                      "arm":  "c1",
+                      "stage":  "temp-synced",
+                      "verdict":  "eligible",
+                      "validRounds":  5,
+                      "losses":  5,
+                      "violations":  0,
+                      "unattributable":  0,
+                      "discrimination":  true,
+                      "reasons":  [
+                                      "all valid rounds inside the allowed set with mechanism evidence"
+                                  ]
+                  },
+                  {
+                      "arm":  "c1",
+                      "stage":  "temp-written",
+                      "verdict":  "eligible",
+                      "validRounds":  5,
+                      "losses":  5,
+                      "violations":  0,
+                      "unattributable":  0,
+                      "discrimination":  true,
+                      "reasons":  [
+                                      "all valid rounds inside the allowed set with mechanism evidence"
+                                  ]
+                  },
+                  {
+                      "arm":  "c2",
+                      "stage":  "parent-synced",
+                      "verdict":  "eligible",
+                      "validRounds":  5,
+                      "losses":  0,
+                      "violations":  0,
+                      "unattributable":  0,
+                      "discrimination":  true,
+                      "reasons":  [
+                                      "all valid rounds inside the allowed set with mechanism evidence"
+                                  ]
+                  },
+                  {
+                      "arm":  "c2",
+                      "stage":  "record-linked",
+                      "verdict":  "eligible",
+                      "validRounds":  5,
+                      "losses":  0,
+                      "violations":  0,
+                      "unattributable":  0,
+                      "discrimination":  true,
+                      "reasons":  [
+                                      "all valid rounds inside the allowed set with mechanism evidence"
+                                  ]
+                  },
+                  {
+                      "arm":  "c2",
+                      "stage":  "temp-closed",
+                      "verdict":  "eligible",
+                      "validRounds":  5,
+                      "losses":  5,
+                      "violations":  0,
+                      "unattributable":  0,
+                      "discrimination":  true,
+                      "reasons":  [
+                                      "all valid rounds inside the allowed set with mechanism evidence"
+                                  ]
+                  },
+                  {
+                      "arm":  "c2",
+                      "stage":  "temp-synced",
+                      "verdict":  "eligible",
+                      "validRounds":  5,
+                      "losses":  5,
+                      "violations":  0,
+                      "unattributable":  0,
+                      "discrimination":  true,
+                      "reasons":  [
+                                      "all valid rounds inside the allowed set with mechanism evidence"
+                                  ]
+                  },
+                  {
+                      "arm":  "c2",
+                      "stage":  "temp-written",
+                      "verdict":  "eligible",
+                      "validRounds":  5,
+                      "losses":  5,
+                      "violations":  0,
+                      "unattributable":  0,
+                      "discrimination":  true,
+                      "reasons":  [
+                                      "all valid rounds inside the allowed set with mechanism evidence"
+                                  ]
+                  },
+                  {
+                      "arm":  "c2c3",
+                      "stage":  "parent-synced",
+                      "verdict":  "unresolved",
+                      "validRounds":  5,
+                      "losses":  0,
+                      "violations":  0,
+                      "unattributable":  0,
+                      "discrimination":  true,
+                      "reasons":  [
+                                      "mechanism evidence missing in rounds 81"
+                                  ]
+                  },
+                  {
+                      "arm":  "c3",
+                      "stage":  "parent-synced",
+                      "verdict":  "unresolved",
+                      "validRounds":  5,
+                      "losses":  0,
+                      "violations":  0,
+                      "unattributable":  0,
+                      "discrimination":  true,
+                      "reasons":  [
+                                      "mechanism evidence missing in rounds 77"
+                                  ]
+                  },
+                  {
+                      "arm":  "c3",
+                      "stage":  "record-linked",
+                      "verdict":  "eligible",
+                      "validRounds":  5,
+                      "losses":  0,
+                      "violations":  0,
+                      "unattributable":  0,
+                      "discrimination":  true,
+                      "reasons":  [
+                                      "all valid rounds inside the allowed set with mechanism evidence"
+                                  ]
+                  },
+                  {
+                      "arm":  "c3",
+                      "stage":  "temp-closed",
+                      "verdict":  "eligible",
+                      "validRounds":  5,
+                      "losses":  5,
+                      "violations":  0,
+                      "unattributable":  0,
+                      "discrimination":  true,
+                      "reasons":  [
+                                      "all valid rounds inside the allowed set with mechanism evidence"
+                                  ]
+                  },
+                  {
+                      "arm":  "c3",
+                      "stage":  "temp-synced",
+                      "verdict":  "eligible",
+                      "validRounds":  5,
+                      "losses":  5,
+                      "violations":  0,
+                      "unattributable":  0,
+                      "discrimination":  true,
+                      "reasons":  [
+                                      "all valid rounds inside the allowed set with mechanism evidence"
+                                  ]
+                  },
+                  {
+                      "arm":  "c3",
+                      "stage":  "temp-written",
+                      "verdict":  "eligible",
+                      "validRounds":  5,
+                      "losses":  5,
+                      "violations":  0,
+                      "unattributable":  0,
+                      "discrimination":  true,
+                      "reasons":  [
+                                      "all valid rounds inside the allowed set with mechanism evidence"
+                                  ]
+                  },
+                  {
+                      "arm":  "positive-control",
+                      "stage":  "parent-synced",
+                      "verdict":  "eligible",
+                      "validRounds":  5,
+                      "losses":  0,
+                      "violations":  0,
+                      "unattributable":  0,
+                      "discrimination":  true,
+                      "reasons":  [
+                                      "all valid rounds inside the allowed set with mechanism evidence"
+                                  ]
+                  }
+              ],
+    "arms":  [
+                 {
+                     "arm":  "c1",
+                     "verdict":  "unresolved",
+                     "decisionSets":  [
+
+                                      ],
+                     "eligible":  [
+
+                                  ],
+                     "notEligible":  [
+
+                                     ],
+                     "disproven":  [
+
+                                   ],
+                     "infoViolations":  [
+                                            "record-linked"
+                                        ]
+                 },
+                 {
+                     "arm":  "c2",
+                     "verdict":  "proven",
+                     "decisionSets":  [
+                                          "record-linked",
+                                          "parent-synced"
+                                      ],
+                     "eligible":  [
+                                      "parent-synced",
+                                      "record-linked"
+                                  ],
+                     "notEligible":  [
+
+                                     ],
+                     "disproven":  [
+
+                                   ],
+                     "infoViolations":  [
+
+                                        ]
+                 },
+                 {
+                     "arm":  "c3",
+                     "verdict":  "unresolved",
+                     "decisionSets":  [
+                                          "parent-synced"
+                                      ],
+                     "eligible":  [
+
+                                  ],
+                     "notEligible":  [
+                                         "parent-synced"
+                                     ],
+                     "disproven":  [
+
+                                   ],
+                     "infoViolations":  [
+
+                                        ]
+                 },
+                 {
+                     "arm":  "c2c3",
+                     "verdict":  "unresolved",
+                     "decisionSets":  [
+                                          "parent-synced"
+                                      ],
+                     "eligible":  [
+
+                                  ],
+                     "notEligible":  [
+                                         "parent-synced"
+                                     ],
+                     "disproven":  [
+
+                                   ],
+                     "infoViolations":  [
+
+                                        ]
+                 }
+             ],
+    "u4":  {
+               "verdict":  "unresolved",
+               "validRounds":  18,
+               "orphans":  0,
+               "requiredN":  3,
+               "note":  "ordering can only be falsified by a counterexample, never proven by a clean sample"
+           },
+    "generatedAt":  "2026-09-21T12:08:21.1693921+08:00"
+}

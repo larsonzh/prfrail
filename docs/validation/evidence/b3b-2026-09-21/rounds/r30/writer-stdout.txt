@@ -1,0 +1,2 @@
+=== RUN   TestB3bNativeGuestWriter
+PLAN path=R:\agent-runner-replay\requests\request.b3b-r30.jsonl digest=dbad21d8c0196d7f075eecd1fb381622162920631ee33e2f911b3c4e71a63635 size=1082

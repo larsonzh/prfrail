@@ -1,0 +1,23 @@
+# Rig snapshot vs repository working copy
+# generated: 2026-09-21T12:08:58
+# repository root: D:\LZProjects\prfrail
+
+## B3b rig scripts (repo hash vs snapshot hash)
+MATCH  b3b-rig-lib.ps1  repo=afdd4fb237a118117d91d3bb24b5a9ecc99cfe44fcfe1475f951cd8b0c346170  snapshot=afdd4fb237a118117d91d3bb24b5a9ecc99cfe44fcfe1475f951cd8b0c346170
+MATCH  Get-B3bReconcile.ps1  repo=1c2cc791996ce18f707d6536f331505892a5099ddac2eb416648c75d33a9caa1  snapshot=1c2cc791996ce18f707d6536f331505892a5099ddac2eb416648c75d33a9caa1
+MATCH  Get-B3bVerdict.ps1  repo=cb960654cc6aef1f787f368c18facc984ceebdd4f429dd788e361faa6771bc3a  snapshot=cb960654cc6aef1f787f368c18facc984ceebdd4f429dd788e361faa6771bc3a
+MATCH  Invoke-B3bMatrix.ps1  repo=6fdebc8b28d2d771a5f23cf987179ff20285be254c8bf073c9889e5d98040ab8  snapshot=6fdebc8b28d2d771a5f23cf987179ff20285be254c8bf073c9889e5d98040ab8
+MATCH  Invoke-B3bRound.ps1  repo=6b63d78252774c34436b5492689737daf7bc470151b0f47990fdd4861af01737  snapshot=6b63d78252774c34436b5492689737daf7bc470151b0f47990fdd4861af01737
+MATCH  Invoke-B3bVerdict.ps1  repo=abd7a12c2b87bc701c1cb1a43067ae544e1fa24c6353fec848484d8c8abf93e6  snapshot=abd7a12c2b87bc701c1cb1a43067ae544e1fa24c6353fec848484d8c8abf93e6
+MATCH  New-B3bEvidence.ps1  repo=356b68cc722341e2bac735035312995acd5ec04e3db192aca9b34b0213fd10d8  snapshot=356b68cc722341e2bac735035312995acd5ec04e3db192aca9b34b0213fd10d8
+MATCH  New-B3bSession.ps1  repo=989413cb5cf78be9f9c8168682b59dd806c89df2c3d53a8f19bebb00c9fab41d  snapshot=989413cb5cf78be9f9c8168682b59dd806c89df2c3d53a8f19bebb00c9fab41d
+MATCH  Test-B3bRig.ps1  repo=5d17d5a313e46a9134605052a82a0a89b25391979a652689229b68022b4c94ce  snapshot=5d17d5a313e46a9134605052a82a0a89b25391979a652689229b68022b4c94ce
+
+## Reused B3a files: live hash vs the hash recorded in the session pin.json
+# session pin recorded at 2026-09-21T01:25:28.8880327+08:00
+MATCH  b3a-rig-lib.ps1  live=6e2663c011c43a5485a3fad051d231fea13bfdd43152380daccb151b90a4161e  session-pin=6e2663c011c43a5485a3fad051d231fea13bfdd43152380daccb151b90a4161e
+MATCH  b3a-journal-lib.ps1  live=66f8ceea7d3ba397253044c4462faa9fda8ff03bcc80856b1418f91a34921df5  session-pin=66f8ceea7d3ba397253044c4462faa9fda8ff03bcc80856b1418f91a34921df5
+MATCH  guest\12-round-inventory.ps1  live=89a3669374910f93fd02a3d00959cfda9533a1a18fad3b5ed3177da19acfae07  session-pin=89a3669374910f93fd02a3d00959cfda9533a1a18fad3b5ed3177da19acfae07
+MATCH  guest\13-round-write.ps1  live=0f37fb36a3ed7f4a497c38f3414684efb4d9873d2ae3b8eb69bac8e64f8a2fd8  session-pin=0f37fb36a3ed7f4a497c38f3414684efb4d9873d2ae3b8eb69bac8e64f8a2fd8
+
+RESULT: mismatches=0

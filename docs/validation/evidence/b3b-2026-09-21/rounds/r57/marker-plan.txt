@@ -1,0 +1,1 @@
+{"round":"r57","candidate":"c3","stage":"temp-written","path":"R:\\agent-runner-replay\\requests\\request.b3b-r57.jsonl","digest":"144cb19a70c7c31a16e96ab6f942a5603f56fcd3b673fc0d80d2840ad3853263","size":1082}

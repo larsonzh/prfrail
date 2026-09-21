@@ -1,0 +1,8 @@
+--- power events in the last 6 h (oldest first) ---
+--- verdict ---
+VERDICT: no shutdown/power event recorded in the window
+--- context ---
+now      = 2026-09-21 07:24:19
+lastBoot = 09/21/2026 07:22:43
+uptime   = 1.6 minutes
+licence  = status 5, grace 0

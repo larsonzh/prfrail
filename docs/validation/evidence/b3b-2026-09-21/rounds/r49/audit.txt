@@ -1,0 +1,10 @@
+--- power events in the last 6 h (oldest first) ---
+2026-09-21 07:00:31  Id=41  ϵͳ����δ�������ػ��������������������ϵͳֹͣ��Ӧ����������������ϵ磬����ܻᵼ�´˴���
+2026-09-21 07:00:39  Id=6008  ��һ��ϵͳ�� 6:57:59 �� ?2026/?9/?21 �ϵĹر�������ġ�
+--- verdict ---
+VERDICT: HARD-POWER-LOSS  (expected for an injection round)
+--- context ---
+now      = 2026-09-21 07:01:14
+lastBoot = 09/21/2026 07:00:15
+uptime   = 1 minutes
+licence  = status 5, grace 0

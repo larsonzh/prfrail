@@ -84,6 +84,53 @@ func replayStorePublishStage(stage string, path string) {
 	}
 }
 
+// replayStorePublishPrimitiveHook is a test seam for the B3b durability
+// candidate experiments: it replaces only the no-replace primitive that makes a
+// published record visible (the step os.Link performs today). It is nil in
+// production, and while it is nil the primitive is os.Link, byte for byte the
+// behaviour the store has always had.
+//
+// Seam contract: it fires once per no-replace publication, after the record is
+// written, synced and closed and before the parent-directory durability step. A
+// replacement must keep the no-replace contract (an existing target has to
+// surface as fs.ErrExist) and must leave the target holding exactly the bytes the
+// store already wrote. It may not carry decisions and may not call back into the
+// store.
+var replayStorePublishPrimitiveHook func(temp string, path string) error
+
+func replayStorePublishRecordNoReplace(temp string, path string) error {
+	if replayStorePublishPrimitiveHook != nil {
+		return replayStorePublishPrimitiveHook(temp, path)
+	}
+	return os.Link(temp, path)
+}
+
+// replayStoreParentSyncHook is the second B3b test seam: it replaces only the
+// parent-directory durability step, the step syncReplayStoreParentDirectory
+// performs on Unix and skips on Windows. It is nil in production, and while it is
+// nil the behaviour is exactly the platform default.
+//
+// Seam contract: it fires once per no-replace publication, after the no-replace
+// primitive published the record and after the record-linked stage, and it
+// receives the directory holding the record. A failure aborts the publication:
+// the caller drops its temp file and reports the error, while the already
+// published record stays as visible as the primitive made it - visibility and
+// durability are separate facts. It may not carry decisions and may not call back
+// into the store.
+//
+// It is deliberately separate from replayStoreSyncParentDirectory, which existing
+// tests replace to model the platform primitives, and it is deliberately not
+// wired into the bootstrap path: bootstrap is not a publication, and on a platform
+// whose durability is unproven the bootstrap durability step does not run at all.
+var replayStoreParentSyncHook func(directory string) error
+
+func replayStoreSyncParent(directory string) error {
+	if replayStoreParentSyncHook != nil {
+		return replayStoreParentSyncHook(directory)
+	}
+	return replayStoreSyncParentDirectory(directory)
+}
+
 // AgentRunnerReplayState describes replay-state visibility for one requestId.
 type AgentRunnerReplayState string
 
@@ -592,10 +639,11 @@ func writeReplayRecordNoReplace(path string, record any) error {
 		return writeErr
 	}
 	replayStorePublishStage(replayStorePublishStageTempClosed, path)
-	// Atomic no-replace visibility and durability are separate facts. The hard
-	// link publishes visibility without replacement; only a successful parent
-	// directory durability step may later justify a proven durability claim.
-	if err := os.Link(temp, path); err != nil {
+	// Atomic no-replace visibility and durability are separate facts. The
+	// no-replace primitive publishes visibility without replacement; only a
+	// successful parent directory durability step may later justify a proven
+	// durability claim.
+	if err := replayStorePublishRecordNoReplace(temp, path); err != nil {
 		_ = os.Remove(temp)
 		if errors.Is(err, fs.ErrExist) {
 			return fs.ErrExist
@@ -603,7 +651,7 @@ func writeReplayRecordNoReplace(path string, record any) error {
 		return err
 	}
 	replayStorePublishStage(replayStorePublishStageRecordLinked, path)
-	if err := replayStoreSyncParentDirectory(directory); err != nil {
+	if err := replayStoreSyncParent(directory); err != nil {
 		_ = os.Remove(temp)
 		return err
 	}

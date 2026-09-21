@@ -1,0 +1,2 @@
+{"round":"r81","candidate":"c2c3","stage":"parent-synced","path":"R:\\agent-runner-replay\\requests\\request.b3b-r81.jsonl","digest":"85e08ce5c0f760a24e3253af87be395c412457c706e8227fde5b88c04f326553","size":1082}
+{"round":"r81","candidate":"c2c3","stage":"temp-written","path":"R:\\agent-runner-replay\\requests\\request.b3b-r81.jsonl","target":false,"trace":["stage:temp-written"],"timestamp":"2026-09-21T01:52:28.8012589Z"}
