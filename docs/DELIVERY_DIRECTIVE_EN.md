@@ -617,6 +617,7 @@ Observation items (phenomena not yet sufficient to change the directive) are reg
 | Retrospective analyst (multi-slice data review) | After execution data accumulates |
 | Infrastructure maintenance (CI/CD, test infrastructure, model version upgrades) | Continuous, independent of slices |
 | **The decision standard for the §5.3 vs §7.5 conflict** (after the budget is exhausted, which class of remediation may skip the ⑦ re-run and which must break through) | **can be drafted as soon as this OB-11 lands**; to be written formally into §12 at the next revision |
+| **The §6.3 criteria are not scripted (G1–G5 are executed by hand by the master) + no mechanical criteria for ledger-metadata consistency / review-bundle completeness** | **this slice (`GATES-EXT`, 2026-09-22) exists for this gap**; once it lands, this row turns into "landed" and a tracking row is added for the **criterion self-reference risk** (a G6 / G7 false positive is amplified by CI into a repository-wide block) |
 
 ---
 
