@@ -30,3 +30,5 @@
 疾	docs/validation/sw3-role-set-versioning.md	"避免状态与范围不一致的旧疾复发" (old ailment)
 鲁	docs/validation/sw3-role-set-versioning.md	"鲁棒性" (robustness)
 棒	docs/validation/sw3-role-set-versioning.md	"鲁棒性" (robustness)
+# 2026-09-21 (DR-3 recurrence registration): new character in a ledger row.
+怀	docs/t027/REMAINING_SLICES.md	"与 DR-4 怀疑的共享根因一致" (suspect)
