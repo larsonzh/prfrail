@@ -121,9 +121,7 @@ func TestConnectAuditTrailFailureDeniesAndDoesNotTunnel(t *testing.T) {
 	if !strings.Contains(first, "200") {
 		t.Fatalf("status line = %q, want a 200 before the log is broken", first)
 	}
-	if connections.Load() == 0 {
-		t.Fatal("target must have been reached while the audit trail was healthy")
-	}
+	waitForAccepts(t, connections, 1)
 
 	logger.close() // the audit trail becomes unusable
 	before := connections.Load()
@@ -227,24 +225,139 @@ func newTestProxy(t *testing.T, cfg config, allowSpec string) (*httptest.Server,
 	return server, logPath
 }
 
+// readLog parses the JSONL event log. An unparseable line is a hard failure, except for a torn
+// trailing append (unparseable last element with no terminating newline): that one is re-read within
+// a bounded window and skipped if it never completes, so a racing writer cannot fail the test.
 func readLog(t *testing.T, path string) []map[string]any {
 	t.Helper()
 	payload, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatalf("read log: %v", err)
 	}
-	var records []map[string]any
-	for _, line := range strings.Split(strings.TrimSpace(string(payload)), "\n") {
+	records, tornTail := parseLogLines(t, payload)
+	if !tornTail {
+		return records
+	}
+	// A record only becomes readable as a whole once its terminating newline is written, so an
+	// unparseable trailing line without a newline is an in-flight write, not corruption. If it never
+	// completes we skip it: the missing record is still caught by the caller's count/predicate
+	// assertion and by waitForRecord's deadline.
+	deadline := time.Now().Add(200 * time.Millisecond)
+	for time.Now().Before(deadline) {
+		time.Sleep(20 * time.Millisecond)
+		payload, err = os.ReadFile(path)
+		if err != nil {
+			t.Fatalf("read log: %v", err)
+		}
+		records, tornTail = parseLogLines(t, payload)
+		if !tornTail {
+			return records
+		}
+	}
+	return records
+}
+
+// parseLogLinesInto is the pure core behind parseLogLines: it splits the payload on "\n" without
+// trimming it first, because the trailing-newline state decides whether an unparseable last element is
+// a torn write. It reports tornTail for that case only. Any other unparseable line is a complete line
+// that failed to parse: it returns that line verbatim in badLine together with its parse error in
+// badErr. badLine is never set for a torn tail, so "badLine != \"\"" means exactly "a complete line
+// failed to parse".
+func parseLogLinesInto(payload []byte) (records []map[string]any, tornTail bool, badLine string, badErr error) {
+	lines := strings.Split(string(payload), "\n")
+	for i, line := range lines {
 		if strings.TrimSpace(line) == "" {
 			continue
 		}
 		var record map[string]any
 		if err := json.Unmarshal([]byte(line), &record); err != nil {
-			t.Fatalf("log line is not JSON: %v (%q)", err, line)
+			if i == len(lines)-1 && !strings.HasSuffix(string(payload), "\n") {
+				return records, true, "", nil
+			}
+			return records, false, line, err
 		}
 		records = append(records, record)
 	}
-	return records
+	return records, false, "", nil
+}
+
+// parseLogLines keeps the original hard failure for a genuinely unparseable complete line. The pure
+// core decides; this wrapper only turns its verdict into a test failure.
+func parseLogLines(t *testing.T, payload []byte) ([]map[string]any, bool) {
+	t.Helper()
+	records, tornTail, badLine, badErr := parseLogLinesInto(payload)
+	if badLine != "" {
+		t.Fatalf("log line is not JSON: %v (%q)", badErr, badLine)
+	}
+	return records, tornTail
+}
+
+// TestReadLogToleratesTornTrailingAppend is TP-A: a torn trailing append (a partial record with no
+// terminating newline) must not fail readLog, and the complete records already on disk must still be
+// returned.
+func TestReadLogToleratesTornTrailingAppend(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "proxy.jsonl")
+	payload := "{\"event\":\"http\",\"decision\":\"allow\"}\n{\"event\":\"http\",\"deci"
+	if err := os.WriteFile(path, []byte(payload), 0o600); err != nil {
+		t.Fatalf("write log: %v", err)
+	}
+	records := readLog(t, path)
+	if len(records) != 1 {
+		t.Fatalf("records = %+v, want exactly the 1 complete record", records)
+	}
+	if records[0]["event"] != "http" || records[0]["decision"] != "allow" {
+		t.Fatalf("record = %+v, want the complete http allow record", records[0])
+	}
+}
+
+// TestParseLogLinesIntoStrictness is TP-B: a complete but unparseable line must still be reported by
+// the pure core, while the very same garbage text in the torn position (no terminating newline) must
+// be tolerated as a torn tail. Both directions are asserted so the test cannot pass vacuously.
+func TestParseLogLinesIntoStrictness(t *testing.T) {
+	const garbage = "{\"event\":\"http\""
+
+	records, tornTail, badLine, badErr := parseLogLinesInto([]byte("{\"event\":\"allow\"}\n" + garbage + "\n"))
+	if tornTail {
+		t.Fatalf("tornTail = true for a newline-terminated payload, want false")
+	}
+	if badLine != garbage {
+		t.Fatalf("badLine = %q, want the offending line %q verbatim", badLine, garbage)
+	}
+	if badErr == nil {
+		t.Fatalf("badErr = nil, want the JSON parse error for %q", badLine)
+	}
+	if len(records) != 1 {
+		t.Fatalf("records = %+v, want the 1 record preceding the garbage line", records)
+	}
+
+	records, tornTail, badLine, badErr = parseLogLinesInto([]byte("{\"event\":\"allow\"}\n" + garbage))
+	if !tornTail {
+		t.Fatalf("tornTail = false for an unparseable unterminated tail, want true")
+	}
+	if badLine != "" {
+		t.Fatalf("badLine = %q for a torn tail, want empty", badLine)
+	}
+	if badErr != nil {
+		t.Fatalf("badErr = %v for a torn tail, want nil", badErr)
+	}
+	if len(records) != 1 {
+		t.Fatalf("records = %+v, want the 1 record preceding the torn tail", records)
+	}
+}
+
+// TestParseLogLinesIntoAcceptsUnterminatedRecord is TP-C: the pre-existing leniency still holds -- a
+// single parseable record without a trailing newline is not a torn tail and parses cleanly.
+func TestParseLogLinesIntoAcceptsUnterminatedRecord(t *testing.T) {
+	records, tornTail, badLine, badErr := parseLogLinesInto([]byte("{\"event\":\"http\",\"decision\":\"allow\"}"))
+	if tornTail {
+		t.Fatalf("tornTail = true for a parseable record, want false")
+	}
+	if badLine != "" || badErr != nil {
+		t.Fatalf("badLine = %q, badErr = %v, want a clean parse", badLine, badErr)
+	}
+	if len(records) != 1 || records[0]["event"] != "http" || records[0]["decision"] != "allow" {
+		t.Fatalf("records = %+v, want the single http allow record", records)
+	}
 }
 
 // waitForRecord polls the log: the tunnel "established" record is written by the handler goroutine,
@@ -262,6 +375,21 @@ func waitForRecord(t *testing.T, path string, predicate func(map[string]any) boo
 	}
 	t.Fatalf("no matching log record within the deadline; log=%+v", readLog(t, path))
 	return nil
+}
+
+// waitForAccepts polls the echo rig's accept counter: the accept goroutine increments it only after
+// listener.Accept returns, which can land marginally after the client observes the 200 handshake. The
+// hard deadline keeps a target that is genuinely never reached a deterministic failure — this is a
+// bounded wait for a synchronisation point, not a fixed sleep that hides a missing dial.
+func waitForAccepts(t *testing.T, counter *atomic.Int32, want int32) {
+	t.Helper()
+	deadline := time.Now().Add(3 * time.Second)
+	for time.Now().Before(deadline) && counter.Load() < want {
+		time.Sleep(20 * time.Millisecond)
+	}
+	if got := counter.Load(); got != want {
+		t.Fatalf("target accepts = %d, want %d", got, want)
+	}
 }
 
 func startTCPEcho(t *testing.T) (string, *atomic.Int32) {
@@ -320,9 +448,7 @@ func TestConnectTunnelAllowedReachesTarget(t *testing.T) {
 	if !strings.Contains(status, "200") {
 		t.Fatalf("want 200 handshake, got %q", status)
 	}
-	if accepted.Load() != 1 {
-		t.Fatalf("target accept count = %d, want 1", accepted.Load())
-	}
+	waitForAccepts(t, accepted, 1)
 	record := waitForRecord(t, logPath, func(r map[string]any) bool {
 		return r["event"] == "connect" && r["decision"] == "allow" && r["phase"] == "established"
 	})
@@ -368,13 +494,19 @@ func TestPlainHTTPForwardedAndLogged(t *testing.T) {
 		t.Fatalf("body = %q, want pong", body)
 	}
 	records := readLog(t, logPath)
-	if len(records) < 2 {
-		t.Fatalf("want an authorized record plus a completion record, got %+v", records)
+	if len(records) < 1 {
+		t.Fatalf("want the pre-flight authorized record, got %+v", records)
 	}
+	// The pre-flight authorized record is written before the upstream RoundTrip, so reading it here is
+	// deterministic; the completion record below is not.
 	if records[0]["decision"] != "allow" || records[0]["phase"] != "authorized" {
 		t.Fatalf("first record = %+v, want the pre-flight authorized record", records[0])
 	}
-	completion := records[len(records)-1]
+	// The completion record is written by the handler goroutine after io.Copy drained the response, so it
+	// can land marginally after the client has read the body. Poll for it, then keep the field assertions.
+	completion := waitForRecord(t, logPath, func(entry map[string]any) bool {
+		return entry["event"] == "http" && entry["decision"] == "allow" && entry["bytesToClient"] != nil
+	})
 	if completion["event"] != "http" || completion["decision"] != "allow" || completion["bytesToClient"] == nil {
 		t.Fatalf("last record = %+v, want the completion record with byte counts", completion)
 	}
@@ -446,9 +578,7 @@ func TestConnectUsesUpstreamProxy(t *testing.T) {
 	if upstreamHits.Load() != 1 {
 		t.Fatalf("upstream hits = %d, want 1", upstreamHits.Load())
 	}
-	if accepted.Load() != 1 {
-		t.Fatalf("target accepts = %d, want 1", accepted.Load())
-	}
+	waitForAccepts(t, accepted, 1)
 	record := waitForRecord(t, logPath, func(r map[string]any) bool {
 		return r["event"] == "connect" && r["decision"] == "allow"
 	})
@@ -465,9 +595,7 @@ func TestObserveModeAllowsUnknownHostAndLogsIt(t *testing.T) {
 	if !strings.Contains(status, "200") {
 		t.Fatalf("observe mode must permit the tunnel, got %q", status)
 	}
-	if accepted.Load() != 1 {
-		t.Fatalf("target accepts = %d, want 1", accepted.Load())
-	}
+	waitForAccepts(t, accepted, 1)
 	record := waitForRecord(t, logPath, func(r map[string]any) bool {
 		return r["event"] == "connect" && r["reason"] == "observe"
 	})

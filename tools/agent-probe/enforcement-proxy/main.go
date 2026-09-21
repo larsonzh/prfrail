@@ -151,6 +151,11 @@ func (l *eventLogger) close() {
 	if l == nil || l.w == nil {
 		return
 	}
+	// Serialize against log(): an unguarded Close can interleave with an in-flight Write+Sync from a
+	// handler goroutine and surface as spurious "file already closed" noise on stderr. Closing is still
+	// terminal: any later Write fails deterministically.
+	l.mu.Lock()
+	defer l.mu.Unlock()
 	_ = l.w.Close()
 }
 
