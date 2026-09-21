@@ -4,6 +4,7 @@
 > 权威账本仍为 docs/DEV_PLAN.md、docs/DEV_PLAN_EN.md 与 docs/validation/；本清单只作为临时执行台账。
 > 基线：68664d8（2026-09-14，已包含 #38 CI 修复）。盘点修正为 12 个必做切片 + 1 个可后置切片；必做规模合计 M×7、M-L×1、L×4；含 C1 后为 M×8、M-L×1、L×4。
 > **2026-09-19 修订：B3 拆分为 B3a（断电注入装置与对照标定）+ B3b（候选注入矩阵与耐久定案）** ⇒ 必做切片 **13** 个；必做规模改为 **M×8、M-L×2、L×3**；含 C1 后为 **M×9、M-L×2、L×3**。理由：A7 已证伪“kill 级注入可判定耐久步”（CP4≡CP5），B3 的前置物（可证耐久的轮次 journal + 另一物理设备 + 重启盘点 + 双向对照标定）与后续物（逐候选注入与三档定案）是两类不同工作与不同风险，混在一片会让“装置未标定就下结论”。
+> **2026-09-21 修订：新增 B3c（CONTRACTS 耐久升级条款，纯文档）** ⇒ 必做切片 **14** 个；必做规模改为 **M×8、M-L×2、L×3、S×1**；含 C1 后为 **M×9、M-L×2、L×3、S×1**。理由：B3b 给出的是**分级**结论（C2 `proven`、C1/C3/C2C3/U4 `unresolved`），而 CONTRACTS 双语仍把“发布耐久未证明”写成**平台常量**，既无升级条件也无解锁边界；不先固化口径，B4 会在“契约口径”与“分级结论”之间踩空。
 
 ## 用法
 
@@ -41,8 +42,9 @@
 | B1 candidate live capability + availability discovery | ✅ 完成（结论：**已评估范围内无可接受候选** ⇒ 保持 blocked；真探针 9 次、付费 6 个；④ 3 轮至 PASS + 工具收编 6 轮） | 外部按次授权 | M | 2026-09-17 | `docs/validation/t027-b1-candidate-live-discovery.md`、`docs/validation/evidence/b1-20260917/` |
 | B2 candidate/enforcement decision + proof | ✅ 完成（2026-09-18；定案=**外部 OS 强制**；四提交已推送 `58757e8`+`fd99dc3`+`408bd99`+`815c03f`，CI 三跑全绿 run 35259806285 / 35261204021 / 35265268993；证据包 41 工件 + 排练转录已归档） | B1 | L | 2026-09-18 | `docs/validation/B2-EXTERNAL-ENFORCEMENT.md`、`docs/validation/evidence/b2-2026-09-17/`、`tools/agent-probe/{appcontainer-b2,enforcement-proxy}/` |
 | B3a power-loss injection rig + calibration | ✅ 完成（2026-09-20） | A7 | M-L | 标定 `CALIBRATED`：负对照 4/5 丢失、正对照 0/5；journal 36 条全链通过；12 轮审计均 `HARD-POWER-LOSS` | `docs/validation/B3A-CALIBRATION.md`；`docs/validation/evidence/b3a-2026-09-20/` |
-| B3b candidate injection matrix + durability verdict | ⬜ 未开始 | B3a | M | | |
-| B4 AT-23 E2E evidence + independent review | ⬜ 未开始 | A5、A6、B1、B2、B3b | L | | |
+| B3b candidate injection matrix + durability verdict | ✅ 完成（`abfcecc`） | B3a | M | 2026-09-21 | `docs/validation/t027-b3b-durability.md`、`docs/validation/evidence/b3b-2026-09-21/` |
+| B3c CONTRACTS durability-upgrade clause revision | ✅ 完成（待同轮授权提交） | B3b | S | 2026-09-21 | `docs/validation/t027-b3c-contracts-durability.md`、`docs/validation/t027-b3c-contracts-durability_EN.md` |
+| B4 AT-23 E2E evidence + independent review | ⬜ 未开始 | A5、A6、B1、B2、B3b、B3c | L | | |
 | C1 Linux AgentRunner native validation | ⬜ 未开始 | B4（Windows T027 完成） | M | | |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断
@@ -65,11 +67,12 @@ flowchart LR
     B1[B1] --> B2[B2]
     A7 --> B3a[B3a]
     B3a --> B3b[B3b]
+    B3b --> B3c[B3c]
     A5 --> B4[B4]
     A6 --> B4
     B1 --> B4
     B2 --> B4
-    B3b --> B4
+    B3c --> B4
     B4 --> C1[C1]
 ```
 
@@ -407,7 +410,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 - [x] 按三档口径给出每个候选的 **proven / disproven / unresolved**（带同一前提），含目录项丢失有序、真孤儿 C、torn 可见等反例判定。
       （**结果**：**C2 `proven`**；C1/C3/C2C3 `unresolved`；U4 `unresolved` 且 0 真孤儿；逐字理由见报告 §4）
 - [x] 结论回写：ADR-013 候选排序、验证报告、DEV_PLAN 双语、切片清单；若 `proven` 则同步评估/修订 CONTRACTS 的耐久口径与 first-dispatch 解锁条件（协议先行），否则维持 `unproven` 并记录失败模式。
-      （**评估已完成**并写入报告 §7/§11：Windows `unproven` 与 first-dispatch 拒绝**未**解除；**契约修订按设计 §10.6 属条件性后续子步骤，本片不做**——协议先行，需独立切片）
+      （**评估已完成**并写入报告 §7/§11：Windows `unproven` 与 first-dispatch 拒绝**未**解除；**契约修订按设计 §10.6 属条件性后续子步骤，本片不做**——协议先行，需独立切片，已立为 **B3c**）
 - [x] 复现与证据包：命令、轮数、原始 journal、盘点输出、失败样本，纳入 `docs/validation/evidence/`。
       （`docs/validation/evidence/b3b-2026-09-21/`：2157 文件、`rigMismatches=0 missingRequired=0`，含 `variant/` 变异臂分区）
 
@@ -417,9 +420,27 @@ A6 ② 进度（第 2 批，2026-09-15）：
 验收证据：结论只能是 proven/disproven/unresolved 并附逐轮原始证据；**只有 proven 才能解除 first-dispatch 的 `unproven` 拒绝**，其余情形必须保持 blocked 并记录失败模式。
 边界：不得把 B3a 的对照结果当作候选结论；不得因失败而放宽 first-dispatch；不得以单轮或单次样本外推。
 
+## B3c — CONTRACTS durability-upgrade clause revision（耐久口径固化）· ⬜
+
+依赖：B3b
+
+- [x] 在 `docs/CONTRACTS{,_EN}.md` 新增“**耐久升级条件**”规范条款：耐久等级为**三态** `proven` / `disproven` / `unresolved`（与 A7 一致），**逐平台、逐前提 P** 判定；记 `proven` 必须同时具备同一前提下的（a）可复现注入或对照证据、（b）**区分力门**（负对照可丢失、正对照不丢失）、（c）**机制证据**（该阶段机制确实被执行过）；任一缺失即 `unresolved`，不得以“未观测到丢失”或“某轮成功”兑现 `proven`；禁止“永久耐久/长期保证”类句式。
+- [x] 把三条冻结句从“**平台常量**”改为“**按平台耐久等级参数化**”的规则：(1) replay store 发布耐久句（`CONTRACTS.md` §7 replay store 段，当前第 207 行 / `CONTRACTS_EN.md` 第 201 行）；(2) launch-intent 与 R 同规则句（§7 launch 回执段，当前 219 / 213）；(3) 终局发布拒绝句（§7 终局发布与结算段，当前 225 / 219）。三处都必须写明：升级只改变该**平台在该前提下的**规则取值，不影响其它平台或其它前提。
+- [x] 明确**解锁边界**：某平台耐久升为 `proven` 只在该平台且同一前提内解除相应拒绝；AT-23 仍必须通过、其它平台仍保持各自结论；并写明“**本次结论是分级的**（C2 `proven`，其余 `unresolved`），不是整体升级”。
+- [x] 协议先行顺序：CONTRACTS 双语 → schema/fixtures（**仅当**引入机器可读枚举）→ 代码（**仅当**涉及门禁语义）；本片**不修改 Go 实现**。
+- [x] 回写：ADR-013 行、验证报告、`DEV_PLAN{,_EN}.md`、本清单双语。
+
+目标：把 B3b 的分级结论固化为**可被判定的契约口径**，使“某平台发布耐久从 `unproven` 升级为 `proven`”成为一条有前提、有判据、有边界的规范路径，为 B4 提供稳定基础。
+现状缺口：CONTRACTS 双语把“发布耐久未证明”写成平台常量（Windows 侧“新目录项持久性当前既不能强制也不能证明”⇒ `unproven`），既没有规定升级条件，也没有规定升级后解锁什么、不解锁什么；与 B3b 的分级结论之间存在口径空档。
+交付物：CONTRACTS 双语耐久升级条款、三条冻结句修订、解锁边界说明、双语台账与报告回写。
+验收证据：条款自洽（三态、逐平台逐前提、三项判据齐全、禁长期保证句式）；三条冻结句与条款逐词一致；双语逐句对齐（行数/标记同构）；全文不出现“解除 Windows `unproven`”的表述；编码门禁（BOM+LF）与 `gofmt`/`build`/`vet`/`test` 全绿（无代码改动时以不变为准）。
+边界：**本片只固化口径，不解除 Windows `unproven`**（解除需要该平台自身的完整证据 + 本片条款 + 独立评审，另属后续切片）；不改 schema/fixtures（除非条款确需机器可读枚举）、不改 Go 实现、不重跑 B3b 实机、不触碰 `tools/agent-probe/enforcement-proxy`（DR-2 属独立切片）。
+
+**观察项（2026-09-21 登记，不改准则）**：**③.5 在纯文档切片上的有效性待评估**——MAI 在代码切片（A6）输出正常，本片（纯 `.md`）2 次输出均偏离格式契约且未产出可执行发现（n=1，不足以修订准则）；**下片 B4（代码切片）作对照**：B4 正常 ⇒ 归因“文档类任务特性”；B4 同样偏离 ⇒ 归因模型能力问题。若再有 2–3 片纯文档切片同样表现，再议为 §3.10 增加例外（“纯 `.md` 且不涉及可执行语义的契约修订可跳过 ③.5，由 ④ 确认”）。详见验证报告 §7。
+
 ## B4 — AT-23 E2E evidence + independent review · ⬜
 
-依赖：A5、A6、B1、B2、B3b
+依赖：A5、A6、B1、B2、B3b、B3c
 
 - [ ] 在真实宿主跑完整 AT-23 场景，覆盖隔离 workspace、timeout、日志缺失、未知恢复、exit 0 后重扫与独立 gates 或 review。
 - [ ] 形成 evidence pack，包含输入摘要、环境摘要、命令与 cwd、退出码、用例统计、失败证据、跳过原因。
@@ -452,7 +473,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 
 | 编号 | 载体 | 症状（可复现描述） | 证据（两次 run） | 处置计划 |
 | --- | --- | --- | --- | --- |
-| **DR-2** | 测试：`tools/agent-probe/enforcement-proxy`（B2 期工具，非本片引入） | `TestConnectAuditTrailFailureDeniesAndDoesNotTunnel` **偶发失败**：`enforcement-proxy: AUDIT TRAIL BROKEN (write …/proxy.jsonl: file already closed)` + `main_test.go:125: target must have been reached while the audit trail was healthy`；同一代码不同 run 结果不同 ⇒ flake，指向该测试自身**句柄/时序竞态**（日志文件被关闭后仍被写） | run **`35563800665`**（head `d2f508c`）Ubuntu `Test` 步骤**红**；run **`35562559401`**（head `abfcecc`）同包**绿**；复跑 `35563800665` 双腿**全绿** | **B4 之前**另立独立切片修复（协议先行 + 门禁）；本片及 B3b **不跨切片**修改该工具。理由：flaky 测试会污染后续 CI 可信度，B4 前必须清 |
+| **DR-2** | 测试：`tools/agent-probe/enforcement-proxy`（B2 期工具，非本片引入） | `TestConnectAuditTrailFailureDeniesAndDoesNotTunnel` **偶发失败**：`enforcement-proxy: AUDIT TRAIL BROKEN (write …/proxy.jsonl: file already closed)` + `main_test.go:125: target must have been reached while the audit trail was healthy`；同一代码不同 run 结果不同 ⇒ flake，指向该测试自身**句柄/时序竞态**（日志文件被关闭后仍被写） | run **`35563800665`**（head `d2f508c`）Ubuntu `Test` 步骤**红**；run **`35562559401`**（head `abfcecc`）同包**绿**；复跑 `35563800665` 双腿**全绿**；docs 回写提交 `dd36b9b` 的 run **`35564805991`** 双腿**全绿**、该包未复现 | **B4 之前**另立独立切片修复（协议先行 + 门禁）；本片及 B3b **不跨切片**修改该工具。理由：flaky 测试会污染后续 CI 可信度，B4 前必须清 |
 
 > 本表只登记**已观测到证据**的缺陷；DR-1 见 `DEV_PLAN.md` 的 B1 段与 `docs/validation/t027-b1-candidate-live-discovery.md`（产品缺陷，属生产行为变更，需独立切片）。
 
@@ -466,6 +487,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 2026-09-14 | A3 | terminal publication and settlement：四阶段链（intent→Settle→C→closure）与二文件 store-local 记录；确定性幂等键与证据绑定；orphan/异键/charged>reserved/矩阵拒绝；unknown 保留占用；unproven 预结算拒绝与完整链无写重放；崩溃窗口 i/ii/iii 幂等恢复；V4 Pro 前置分析+预审（H1/M1/M2/M3/L1/L5 整改）与 Codex 终审（2 Medium+3 Low 整改，补 3 条反例）+ Codex 整改复审 PASS（2026-09-15，中高危清零）+ 尾项整改与 Codex 追加确认 PASS（2026-09-15）；已提交 `c6f8585` 并推送，GitHub Actions Ubuntu（含 Race）/Windows 全绿（run 34900979883）；CI 证据回写已提交 `057d599`（run 34901323914 通过） | docs/validation/t027-terminal-publication.md |
 | 2026-09-15 | A4 | chain terminal routing and resume：协议先行（CONTRACTS 双语 §2.1 新状态行与 §7 “chain terminal 路由”段、schema `stepTransition`、126 契约夹具含 3 条新用例）；新 step 状态 `TERMINAL_PENDING`（派发成功才写、非可停留态、入 recover 不确定清单与 cancel 清理）；核心唯一写入口 `SubmitAgentRunnerTerminal` 按五态路由（completed 仅 step PASSED，failed→task/chain FAILED，uncertain→task FAILED+chain PAUSED 禁重试，cancelled 先归档停机证据，operator-action-required→task/step WAITING+chain PAUSED 交接 T025）；adapters 单向翻译绑定 request→intent→closure 全字段含结算槽位且对 store 严格只读；重复终局幂等收敛（含两种部分写入窗口）、异终局冲突零写；resume 连续性以 `PriorCompletionHash ∈ step 事件证据历史` 为唯一判据；V4 Pro 预审 1 Medium（operator 路由崩溃窗口）+2 Low 整改后复审无 Medium+（新增 1 Low 已整改）；Codex 终审 1 Medium（结算槽位未绑定）+1 Low（BOM 字节级实测为误报，已留证据澄清）整改后 Codex 复审 PASS；本地全量门禁与契约夹具门禁全绿；已提交 `a21335d` 并推送，GitHub Actions Ubuntu（含 Race 与 Contract fixtures 步骤）/Windows 全绿（run 34920155025）；CI 证据回写已提交 `a1c643c`（run 34920548264 通过） | docs/validation/t027-terminal-routing.md |
 | 2026-09-21 | B3b | candidate injection matrix + durability verdict：装置全实机化（会话锁、硬断电后陈旧会话恢复、盘点稳定对、fail-closed 判定）；主矩阵 **17 格×5=85 轮全有效、0 void**，U4 **6 格×3=18 轮全有效、0 真孤儿**；判别力门成立（负对照 5/5 丢失、正对照 5/5 存活）；三档定案 **C2 `proven`**、C1/C3/C2C3 `unresolved`（C3/C2C3 逐字理由 `mechanism evidence missing in rounds 77 / 81`，属装置 fail-closed 行为而非“不耐久”）；变异臂（装置自证伪）2 轮降级原语下装置拒绝兑现 `proven`，并有离线互证；⑤ 就地修复 9 项实机缺陷（P1–P9）且每项带反证实验；③ V4 Pro `changes-required`→收口 PASS、③.5 MAI PASS、④ Codex **6 次**（超预算原因与逐次发现见报告 §8）；**已提交 `abfcecc` 并推送 `origin/main`（未推 gitee）**，CI run **`35562559401`** 双腿全绿（Ubuntu 含 Race 与 Contract fixtures、Windows） | docs/validation/t027-b3b-durability.md；证据包 docs/validation/evidence/b3b-2026-09-21/ |
+| 2026-09-21 | B3c | CONTRACTS 耐久升级条款修订（纯文档、协议先行）：§7 新增「**发布耐久等级与升级条件**」（三态 `proven`/`disproven`/`unresolved`；判定单元（平台 × 前提 P）；记 `proven` 三判据 (a) 可复现注入或对照证据 / (b) 区分力门 / (c) 机制证据，缺一即 `unresolved`，可归属反例即 `disproven`；`unresolved` 不得读作“不耐久”；禁长期保证句式；候选机制等级 ≠ 平台等级；运行期 `unresolved`/`disproven` 按 `unproven` 行为执行；**升级的解锁边界**）；三条冻结句由平台常量改为按平台耐久等级参数化；ADR-013 行与 §5 回写指向该条款；**边界：不解除 Windows `unproven`**、不放宽 first-dispatch、不改 Go/schema/fixtures。① V4 Pro 裁定 U1–U14；③ 预审 `PASS WITH FIXES`→整改→复审 `PASS`→delta `PASS`；③.5 MAI 2 次均未产出可执行发现（格式偏离，已留痕）；④ Codex 3 次（首轮 `FINDINGS` 1M+1L → 复审仅缺原始 diff 证据 → 收口 **`PASS`**）。⑤ 34 项机械检查全绿 + 4 项变异检验全红且逐字节还原；门禁 gofmt/build/vet/test 全绿。**尚未提交**（待同轮授权） | docs/validation/t027-b3c-contracts-durability.md |
 
 | 2026-09-15 | A5 | （依据 `docs/validation/t027-postflight-acceptance.md`）chain postflight acceptance：把 task 的 review 资格从 adapter 记录收敛到 chain 自有 postflight 门——只有"可重建的冻结事实 + 端口独立判定通过"才允许写 `REVIEW_PENDING`；已提交 `b8bad47` 并推送，GitHub Actions Ubuntu（含 `Race` 与 `Contract fixtures`）/Windows 全绿（run `34950623175`）。**字段来源**：日期、提交号、运行号、一句话摘要均取自该报告头部 | docs/validation/t027-postflight-acceptance.md |
 | 2026-09-15 | A6 | （依据 `docs/validation/t027-offline-process.md`）离线 pinned CLI 运行：以代码常量固定外部 CLI 版本、绑定运行时长与宽限、停止整棵进程树、采集五枚冻结事实并映射为 chain 可消费终局（任何缺口与未证明的停机不得以 completed 表达）；`c2d2819` 已提交并推送 `origin/main`，修复提交 `6db5a10`，CI 全绿（run `35076045445`）；变异审计 **52 项全 RED / SURVIVED 0**。**字段来源**：该报告头部与 §8、§14 | docs/validation/t027-offline-process.md |
