@@ -1,0 +1,835 @@
+﻿# ProofRail Delivery Execution Directive (DELIVERY_DIRECTIVE)
+
+Version: v1.7. Date: 2026-09-21. Status: **English mirror of the frozen CN body** (authoritative CN: `docs/DELIVERY_DIRECTIVE.md`).
+
+> **Multilingual note**: this file is the English mirror, generated after the CN body was frozen (to avoid bilingual rework during review); `docs/DELIVERY_DIRECTIVE.md` is authoritative and wins on any conflict (see §11.1).
+> **Encoding**: this document and its `_EN` mirror must stay UTF-8 **with BOM** + **LF**.
+> **The origin and inheritance of this directive** are described in [Appendix A](#appendix-a-historical-versions-and-sources-of-experience); see [Appendix C](#appendix-c-migration-mapping) for the mapping from the legacy T027 directive.
+
+---
+
+## 0. Status, Versions, and Changes of the Directive
+
+### 0.1 Authority relationships
+
+| Topic | Authoritative document |
+|---|---|
+| Product requirements, acceptance criteria | `docs/PRODUCT_REQUIREMENTS.md`, acceptance ledger |
+| Protocol and semantics (wire / state machine / gate semantics) | `docs/CONTRACTS.md` (+ `_EN`), `schemas/`, contract fixtures |
+| Implementation plan and milestones | `docs/DEV_PLAN.md` (+ `_EN`) |
+| Evidence and conclusions | `docs/validation/`, `docs/validation/evidence/` |
+| **Delivery execution discipline (this directive)** | **`docs/DELIVERY_DIRECTIVE.md` (+ `_EN`)** |
+| Coding / line-ending / Git discipline | `docs/CODING_CONVENTIONS.md`, `.github/copilot-instructions.md` |
+
+**Conflict handling**: execution-discipline conflicts are decided by this directive; protocol-semantics conflicts are decided by CONTRACTS. When the two conflict, **revise the documents first, then execute**; do not pick one over the other mid-execution.
+
+**Category test**: anything involving wire format, state transitions, gate criteria, or evidence fields = **protocol semantics** (CONTRACTS prevails); anything involving process, roles, authorization, document form, or report structure = **execution discipline** (this directive prevails). If a case still cannot be decided, **CONTRACTS prevails** (conservative principle).
+
+### 0.2 Versions and changes
+
+- Version numbers are `vMAJOR.MINOR`; `MAJOR` = a change to the role set or pipeline structure; `MINOR` = an added rule.
+- Every change must: ① update the version number and date; ② append a change-log entry in §0.3; ③ state which in-flight slices are affected.
+- **This directive is itself subject to validation** (see §12): it must not claim "verified effective" until the pilot in §12.2 passes.
+
+### 0.3 Change log
+
+| Version | Date | Change |
+|---|---|---|
+| v1.0 | 2026-09-21 | First version: used the "Flash Master–Subagent Architecture v1.0" document as the skeleton, folding in the accumulated experience of T027 directive v3.1 and BRIEFING v3.1; established the three-layer role model, the serial pipeline, the evidence-persistence obligation, the wrap-up self-check gate, the non-separable-effort-tier constraint, and fallback thresholds. Supersedes `docs/t027/FLASH_OPERATING_DIRECTIVE*.md` (the original text is kept as a historical version with a supersede pointer). **Same-day review: two rounds of same-family review (including 13 P0–P3 findings) + one independent blind review by Codex (first round with no checklist; 3 Critical/High + 5 Medium + 5 coverage gaps), all remediated**; added R1.1/R2.6/R7.1/R9.1, §5.0 startup gate, §6.3 G5 structured input, §7.7 proportional spot checks, and Appendix C.0/C.0b/C.3. |
+| v1.1 | 2026-09-21 | SW-1/SW-2 execution-phase remediation (all **measured findings**, not presumptions): ① §6.3 G2 adds "excluded-rule quotation lines", G3 becomes "changed-line-count symmetry", and G4b becomes "the difference set ⊖ `tools/gates/cjk-newwords.txt` allow-list must be empty" — all three original criteria were **self-referential defects** (G2 self-scanned 4 false positives; G3 was always false for existing bilingual pairs; G4b was unsatisfiable for any new document — measured on a 51 KB new document whose 7-character difference set was verified character by character to be entirely legitimate new words); ② §9.3 adds the "write-file tools emit CRLF" failure mode (measured by the SW-2 probe); ③ Appendix C adds `SW-3` (role-set commit + encoding normalization, pending authorization) + C.0/C.0b status lines + C.2 execution results; ④ §12.4 registers OB-2/OB-3/OB-4/OB-5. |
+| v1.2 | 2026-09-21 | ⑦ independent final review (Codex, first round with no checklist) outcome `FINDINGS`: 3 High + 5 Medium, **all verified item by item, all valid and all remediated** — F1 §2.2 still stated the carrier status as "not yet established" while C.0b was already ✅ (mutually exclusive) ⇒ changed to "all seven carriers are ready"; F2 SW-1's trigger condition conflicted with its completion state ⇒ stated the execution-phase rule explicitly (executable once CN is frozen, `_EN` mirror to follow); F3 role files were inconsistent with §2.6 ⇒ **measurement overturns ⑦'s fix direction**: §2.6 now says the `model` key must be **omitted** (writing an empty value makes the carrier fail to load, proven by isolation verification); F4 SW-1's acceptance assertion "every hit" conflicted with "historical drafts only get a header" ⇒ changed to file-level + section-level dual assertions + new C.0a allow-list; F5 §6.3 did not state the scripting status ⇒ added a "scripting status" paragraph (only the allow-list has been persisted); F6 the probe covered only 1 carrier ⇒ changed to a **three-carrier full-coverage probe matrix**; F7 reference assertions searched file names only ⇒ added section-number keyword search; F8 G3 gained "key-field alignment". |
+| v1.3 | 2026-09-21 | Remediation from ⑦ round-2 re-review + ⑥ independent scan: ① **split the concatenated v1.1/v1.2 change-log table rows** (structural breakage; independently and overlappingly found by ⑥ and ⑦); ② C.0b "does not currently exist" changed to "did not exist **when SW-2 was chartered**" (tense closure); ③ **tightened ⑥'s skip criterion in §7.2** and added a **counter-example** (this slice revised gate criteria ⇒ ③ does not hold ⇒ **re-run ⑥**); ④ **supplied the missing definition of `Section A–E`** (previously referenced in three places — §4.2/§7.2/B.6 — with **no definition**, a broken reference found in self-check); ⑤ added **G5-a**, a frontmatter hard gate for role files (the `model` key must not appear); ⑥ registered OB-7 (independent overlap between ⑥/⑦). |
+| v1.4 | 2026-09-21 | Remediation from ⑥ round 2 (rescan after remediation): ① **split the concatenated OB-6/OB-7 table rows in §12.4** (**the same class** of defect as the change-log concatenation fixed in v1.3 ⇒ added the **G1-a table-structure integrity** mechanical criterion, and recorded the measured lesson that "not stripping escaped `\|` produces 4 false positives"); ② §7.2 now supplies the **sole authoritative definition** of `Section A–E` and its inheritance source; ③ the header version was raised to v1.4 (the old header v1.3 and the log v1.4 were **out of sync**) + added **G1-b (version-metadata consistency)** (⑥ Section D pointed out that this invariant had no mechanical coverage). |
+| v1.5 | 2026-09-21 | **SW-3 executed (user-authorized option A)**: ① **11 existing role files normalized to BOM+LF and all committed** (R2.5 wording rewritten per the user's formulation: "the generator toolchain is not committed; `.agent.md` role files, including existing ones, are always committed", removing ambiguity); ② **uniform header note for the 14 role files** ("非生成物（sol-orchestrator 已按 §2.4 禁用）：手工维护；不得由生成器覆盖") + a mechanical criterion for the header note; ③ registered **OB-8** (the default `model` of 8 existing files is blacklisted; not fixed in this slice). |
+| v1.6 | 2026-09-21 | **Remediation from ⑦ round-3 re-review (user authorized a one-time breach of the §7.5 cap)**: 7 of R1–R8 closed, R7 partially closed, and 4 new findings (3 Medium + 1 Low) all valid and all remediated: ① **blacklist count corrected 9→8** with a family breakdown (Terra 3 / Luna 2 / Gemini 1 / GPT-5.4 1 / GPT-5.6-Sol 1) + registered the residual risk that "a newly added `.agent.md` can bring in a blacklisted default `model`"; ② **G5-a hardened into two criteria** (the original criterion matched only a fixed form and covered only `prfrail-*` ⇒ blank variants and other files escaped detection); ③ **header-note criterion changed to position anchoring** (the first non-empty line after the frontmatter must equal the header-note text; "merely appearing in the document" is no longer accepted); ④ the **header-note blocks of the 3 `prfrail-*` files were moved above the H1**, unifying the position across all 14 files (measured 14/14). |
+| v1.7 | 2026-09-21 | **OB-8 fixed at the root + identifier disambiguation + user rulings recorded**: ① **OB-8 fixed at the root per the user's ruling** ("delete defaults + hard gate", **do not delete files**) — first a **field-deletion probe** on the inactive file `standard-builder` (after deleting `model` the carrier loads and works normally), and once it passed the `model` field was **deleted from all 8 blacklisted files** (measured blacklist hits = 0), while the `model` of the 3 non-blacklisted files is **retained**; added **G5-b** (the `model` value of `*.agent.md` added/modified in the change set must not be a blacklisted value) to prevent regression; ② **identifier disambiguation**: the legacy **`③.5` is renamed throughout to `⑥` (independent scan layer)** (23 occurrences), and the use of `④` as a "final-review alias" is eliminated (`独立终审员(④)`→`(⑦)`, `⑦④终审`→`⑦ 终审`, `B3c ④ 复审`→`⑦ 复审`, `④ 无效轮次`→`⑦ 无效轮次`, `（⑥ ③.5 / ⑦ ④）`→`（⑥ 独立扫描 / ⑦ 独立终审）`), while the pipeline step `④集成` and the list marker `④` stay unchanged; C.1 adds an old/new identifier mapping; ③ registered **OB-9** (the independent-verification gap for T3/T4 changes in the same area as this round, and the focus required of the next ⑦). |
+---
+
+## 1. Scope and Slice Model
+
+### 1.1 Scope
+
+- Applies to: **all engineering activity in the ProofRail repository that produces a deliverable** (code, contracts, schemas, fixtures, scripts, documents, evidence bundles).
+- Does not apply to: purely consultative Q&A; ad-hoc troubleshooting with a single command (these need no slice and no review, but must not produce any repository change).
+
+### 1.2 Slice
+
+**A slice = the smallest reviewable delivery unit**. Every slice must have a **slice definition** containing:
+
+| Field | Requirement |
+|---|---|
+| Identifier | A stable ID of the form `A0`/`B3c`/`DR-2` |
+| Goal | One sentence, truth-decidable |
+| Dependencies | Preceding slices or external authorization |
+| Size | S / M / M-L / L |
+| Steps | A checkable checklist |
+| Current gap | Why not doing it now would cause problems |
+| Deliverables | File-level list |
+| Acceptance evidence | Machine-verifiable assertions |
+| Boundary | What is **explicitly not** done (scope-creep prevention) |
+
+### 1.3 One slice at a time
+
+At any moment **only one slice may be "in progress"**.
+
+**Parallelism policy (hard rule R1.1)**: parallelism **is allowed only at the master's own tool-call layer** (for example, issuing several read-only commands in one message); **multiple subagents must not be invoked in parallel** (`runSubagent` is serial and blocking, see R5.1). Cross-slice parallelism is allowed only with explicit user authorization, and **read-only**; **do not** run real-machine experiments that interfere with each other (processes / Job Objects / ports / temp directories) in parallel, see the original §四.11 text (Appendix A).
+
+### 1.4 Contracts first (hard rule)
+
+For any semantic change the order is fixed: **CONTRACTS in both languages → schema / fixtures → code → focused tests → document write-back**. Code must not go first.
+
+### 1.5 Workspace hygiene
+
+- The workspace must be clean before work starts; uncommitted historical changes must first be disposed of by the user (commit / stash / discard).
+- Temporary artifacts go only to the repository root `tmp/` (gitignored), and must be **removed immediately after use**, never left behind across slices.
+- Do not run interfering real-machine experiments (processes / Job Objects / ports / temp directories) in parallel while a slice is running.
+
+---
+
+## 2. Roles and Model Allow-List
+
+### 2.1 Role model (three layers)
+
+| Layer | Role | One-line responsibility | May write files |
+|---|---|---|---|
+| **Orchestration layer** | Master | Command, scheduling, gates, evidence, fallback, reporting | Only orchestration artifacts (§3.2) |
+| **Product layer** | Implementer / Tester / Documenter | The **sole** producer of product artifacts in their own domain | Yes |
+| **Review layer** | Architect / Pre-reviewer / Independent scanner (⑥) / Independent final reviewer (⑦) | Read-only reasoning and gates | **No** |
+
+### 2.2 Role–carrier–model triple (**`model` must be passed explicitly**)
+
+| Role | Call point | `agentName` (carrier) | `model` that must be passed explicitly | Same model as the master? | Tool capability |
+|---|---|---|---|---|---|
+| Architect | ① | `deep-reasoner` | `DeepSeek V4 Pro (deepseek)` | No | Read-only |
+| Pre-reviewer | ⑤ | `deep-reasoner` | `DeepSeek V4 Pro (deepseek)` | No | Read-only |
+| Implementer | ② | `prfrail-implementer` | `DeepSeek V4.1 Flash (deepseek)` | **Yes (transitional state)** | Read/write + execute |
+| Tester | ③ | `prfrail-tester` | `DeepSeek V4.1 Flash (deepseek)` | **Yes (transitional state)** | Read/write + execute |
+| Documenter | ⑧ | `prfrail-documenter` | `DeepSeek V4.1 Flash (deepseek)` | **Yes (transitional state)** | Read/write + execute |
+| Independent scanner | ⑥ | `independent-reviewer` | `MAI-Code-1.1-Flash (copilot)` | No | Read-only |
+| Independent final reviewer | ⑦ | `independent-reviewer` | `GPT-5.3-Codex (copilot)` | No | Read-only |
+
+> **Meaning of the "same model as the master" column**: the three product-layer roles marked "Yes (transitional state)" share `deepseek-flash` with the master ⇒ **not only the effort tier but the model capability itself is inseparable** (see §8.3). This is a **transitional configuration**: here R2.1 "must pass model explicitly" is **formally compliant** on that point (passing it or not is the same model; the difference is only whether the declaration is explicit), and the real fix is to configure a different model per role.
+
+**Carrier readiness status (as of 2026-09-21, actually checked)**: `deep-reasoner` (architecture/pre-review) and `independent-reviewer` (⑥/⑦) are **ready**; `prfrail-implementer` / `prfrail-tester` / `prfrail-documenter` have been **created by slice SW-2, and all three carriers passed real-machine probes** (each completed "create → read back → delete" with 0 residue; evidence in `docs/validation/sw-directive-switchover.md` §5) ⇒ **all seven carriers listed in §2.2 are ready**. The **only remaining item** is **SW-3** (encoding normalization of 11 existing generated role files, pending authorization) — it **does not affect** the role-readiness pre-check in §5.0, because that pre-check targets only the seven carriers listed in this table.
+
+**Hard rule R2.6 (call isolation, anti-anchoring)**: ① the architect and the ⑤ pre-reviewer are **two independent invocations of the same carrier**, with **no shared context** — ⑤ may receive only "the solution document + the original implementation diff (**paths**) + verbatim contract sentences", and **must not** receive ①'s conversation history, the master's implementation-phase reasoning, or any pre-implementation assumption. ⇒ **Anti-anchoring relies on "call isolation", not on "role or model separation"**; ⑤ must not be cancelled on the grounds of "same carrier", nor may ①'s reasoning be passed to ⑤.
+
+**Hard rule R2.1**: `runSubagent` **silently falls back to the session's main model when `model` is not passed**. Therefore "not passing model" is forbidden; every invocation must state the model string in the task package.
+**Hard rule R2.2**: Write only currently-active model IDs. For Flash write only `deepseek-flash` (`deepseek-v4-flash` and `deepseek-v4-flash-vision-exp` are already listed in `LEGACY_FLASH_MODEL_IDS` and are forbidden).
+**Hard rule R2.3**: **Subagent depth ≤ 1, call chains forbidden** (no master → subagent → another model). Therefore orchestration-type agents carrying the `agent` tool **must not enter the role set** (see §2.4).
+**Hard rule R2.4**: Role files are the **reproducible source of the role set**. Adding or editing a role must go through version control (see §2.6).
+
+### 2.3 Model self-reporting is untrustworthy
+
+Subagents **cannot reliably self-report** their model or effort tier (measured: a Flash subagent self-reported `GitHub Copilot（系统提示声明为 DeepSeek V4.1 Flash）| vendor=unknown`). ⇒ **Do not** use "the subagent says it is model X" as acceptance evidence; the model and effort tier can only be set by the operator on the UI side and **recorded** in the task package.
+
+### 2.4 Prohibited list (blacklist)
+
+The following models **must not be invoked**, under any circumstances: Luna, the Gemini family, Terra, GPT-5.4, **Sol (strategic master)**, the Kimi family, and "any other model doing drafting / review / formatting / checklisting / validation / coordination".
+
+**Orchestration-type agent prohibited**: `sol-orchestrator` (`model: gpt-5.6-sol`, with `agent` among its `tools` and declaring `agents: [...]`) —
+- It carries call-chain capability, violating R2.3;
+- Its model is on the blacklist, and not passing model explicitly falls back to the master itself ⇒ producing "fake orchestration";
+- Its built-in `routing` / `Kimi K3` / `ultra tier` rules are **inconsistent** with this directive's allow-list and cost ceiling;
+- Per its own configuration `strategy.manual_override.detection: 非 Sol 主控会话即视为手动模式，跳过全部子代理自动编排` — **when the current master is not Sol, its automatic orchestration is off by design**, so there is no need to enable it in the first place.
+
+**Sole exception**: layer ⑥ is cleared for `mai-code-1.1-flash`; Haiku is cleared as a ⑥ supplement on a time-limited basis only when all enabling preconditions in §7.2.3 are satisfied.
+
+### 2.5 Versioning of the role set (D1-a selection)
+
+**Rule R2.5**: `.github/agents/*.agent.md` is **always** put under version control (**including the existing generated role files**); the **generator toolchain is not committed**.
+
+- Version-control scope: `.github/agents/*.agent.md` (role definitions, **including the 11 existing** files originally generated by `sol-orchestrator`).
+- Still ignored: `.github/agents/sol-orchestrator/` (the generator toolchain with its `__pycache__`, `_discovered_models*.json`, pricing tables), `.github/agents/*.managed.json`.
+- **Header-note hard rule**: **all 14 role files** (3 `prfrail-*` + 11 existing) must carry their **header note in a fixed position**: the **first non-empty line** after the end of the frontmatter must be **verbatim equal** to the following line:
+  `> **非生成物（sol-orchestrator 已按 DELIVERY_DIRECTIVE §2.4 禁用）：手工维护；不得由生成器覆盖。**`
+  **Mechanical criterion**: ① parse the end position of the frontmatter, take `the first non-empty line after that point` and compare it with the header-note text; it **must be equal** (**not** accepting "merely appearing in the document" — otherwise moving the header note into the body would also pass, a Low finding by ⑦ round 3); ② supporting evidence: `grep -L "非生成物（sol-orchestrator 已按" .github/agents/*.agent.md` produces **no output**.
+- **If the generator is enabled in the future**: `_config.yaml` and the generation scripts must first be brought under version control, the generation re-run, and the output compared **verbatim** against the hand-maintained files; differences must be explained before switching.
+- **Known latent defect (**OB-8, already fixed at the root on 2026-09-21**)**: an actual check of the 11 existing role files found **8** of them (not 9; corrected by ⑦ round 3) whose default `model` is on the §2.4 blacklist — family breakdown: **Terra 3** (`expert-arbiter`/`heavy-builder`/`planning-specialist`), **Luna 2** (`fast-implementer`/`quick-researcher`), **Gemini 1** (`context-researcher`), **GPT-5.4 1** (`standard-builder`), **GPT-5.6-Sol 1** (`sol-orchestrator`); the 3 non-blacklisted ones: `deep-reasoner` (`deepseek-v4-pro`), `independent-reviewer` (`gpt-5.3-codex`), `quick-verifier` (`deepseek-flash`). ⇒ Invoking directly by `agentName` without passing `model` explicitly can hit the blacklist while bypassing R2.1. **Disposition (user ruling: "delete default values + hard gate", no file deletion)**: ① a **field-deletion probe** was completed on the inactive file `standard-builder` (after deleting the `model` line the carrier **loads and works normally**); ② the probe passed ⇒ the `model` field was **deleted** from **all 8 blacklisted files** (measured blacklist hits = 0); ③ the `model` of the 3 non-blacklisted files is **retained** (as legitimate defaults); ④ **G5-b** was added (§6.3) to prevent regression.
+- **Additional residual risk (noted by ⑦ round 3, now closed by G5-b)**: `.agent.md` files are now all under version control ⇒ future `.agent.md` files added by a generator re-run may **directly bring in a blacklisted default `model`**. ⇒ **G5-b** has been added (§6.3): the `model` value of added/modified `*.agent.md` must not be a blacklisted value (mechanical criterion: blacklist hits in the change set must be 0). R2.5's "prerequisites for re-running the generator" still stand.
+- **Ignore-rule alignment (accepted by SW-2)**: the directory-level rule `.github/agents/` in `.gitignore` must be **narrowed** to ignore only the generator toolchain and its outputs — keep ignoring `.github/agents/sol-orchestrator/`, `.github/agents/*.managed.json`, `**/__pycache__/`, and **allow** `.github/agents/*.agent.md`. Acceptance assertion: `git check-ignore -v .github/agents/prfrail-implementer.agent.md` produces **no output** (not ignored), while `git check-ignore -v .github/agents/sol-orchestrator/_config.yaml` **still matches**.
+
+### 2.6 Minimum contract for role files
+
+Every role file must contain: `name` / `description` / `tools` / `user-invocable` / `target`, plus the four body sections **responsibilities, inputs, output contract, prohibitions** (template in Appendix B). **The `model` key must be omitted** — **do not** write an empty value, nor a concrete model. Reasons (all measured on 2026-09-21): ① writing `model: ""` makes VS Code **fail to load that carrier** (`runSubagent` reports `Requested agent '...' not found`; isolation verification: adding the empty-value key ⇒ failure, deleting the key ⇒ recovery); ② writing a concrete model value conflicts with R2.1 "must be passed explicitly by the caller" and invites silent fallback. ⇒ **Omitting the key** is the only form that satisfies both "loadable" and "no default model"; the body must explicitly declare in one line that "`model` is left empty and is passed explicitly by the master in `runSubagent` (R2.1)".
+
+**Transitional clause**: `prfrail-*` role files **newly created** after this directive takes effect must satisfy the four-section contract **immediately**; existing role files produced by the `sol-orchestrator` generator (`deep-reasoner`, `independent-reviewer`, etc.) are **exempt** from the body-section requirement — they are used only as `model`/`tools` carriers, and their responsibilities/inputs/outputs/prohibitions **are governed by §4.2 and Appendix B of this directive**.
+
+---
+
+## 3. Master Responsibilities and Boundaries
+
+### 3.1 What the master does
+
+1. **Task decomposition and dispatch**: break the slice into atomic work packages, stating for each: input materials, expected output, acceptance conditions, and the **model string**.
+2. **Minimal context feeding**: give subagents only the materials needed to finish the task; for any reviewer, always give **evidence paths** instead of paraphrases (§6.2).
+3. **Gate execution**: personally run build / vet / focused tests / encoding gate / wrap-up self-check at key points (§6).
+4. **Review scheduling**: schedule in the order ⑤→⑥→⑦ and decide pass or return based on the conclusions; enforce closure discipline (§5.3).
+5. **Evidence management**: persist diffs, gate output, and probe results, and deliver their paths (§6.2).
+6. **Fallback**: see §9.
+7. **Stop points**: §10.4.
+
+### 3.2 What the master does not do (hard boundaries)
+
+- **Does not originate product artifacts**: no production code, test code, CONTRACTS/schema/fixtures, or validation-report body text. After locating a problem, **assign the corresponding subagent** to fix it.
+- **Does not draw conclusions on behalf of reviewers**: must not decide by itself that "pre-review / scan / final review passed".
+- **Exception (orchestration artifacts, allowed and required from the master)**: task packages, status tables, evidence files (persisted diffs/logs), exception and fallback records, report **assembly** (aggregating subagent outputs and gate results into a report without rewriting their conclusions), ledger and status-marker write-back.
+- **Mechanical integration exemption**: applying a subagent-produced patch to files counts as **mechanical integration**, not "writing code", but it must pass three checks: ① the diff line count is identical before and after persistence; ② for `.md` files the encoding gate passes; ③ focused gates are run immediately after persistence.
+
+### 3.3 The master's self-check obligation
+
+The master must run the wrap-up self-check of §6.3 on **every round of its own changes**; on finding an inconsistency, **fix it on the spot** or assign a subagent to fix it, and never leave it for the user or a reviewer to find.
+
+---
+
+## 4. Subagent Responsibilities and Output Contracts
+
+### 4.1 Common Output Contract (All Roles)
+
+1. **Conclusion line**: the last line must be the prescribed enumeration (e.g. `PRE-REVIEW: PASS` / `FINDINGS` / `RE_` / `INDEPENDENT SCAN: ...`).
+2. **Locatable**: every finding must carry `file:line` (or `file:?` + a verbatim quote); prose alone is not acceptable.
+3. **Severity**: four levels `Critical / High / Medium / Low`, defined in §4.3.
+4. **Proposed fix**: give text or a patch that can be written directly; when bilingual, give both the CN and EN sentence.
+5. **No scope expansion**: must not propose unfreezing conclusions, skipping review, or lowering gates.
+6. **Read-only roles must not modify files**; if a change is needed, hand it to the master for dispatch.
+
+### 4.2 Per-Role Responsibilities
+
+| Role | Input | Required output | Prohibited |
+|---|---|---|---|
+| Architect | slice definition, relevant contracts, historical rulings | Architecture Design Proposal: conclusion, change-point list (file level), test-point list (executable), risks and mitigations | write code; **carry pre-implementation reasoning context into ⑤** (anti-anchoring relies on call isolation, see R2.6 — ①'s conversation history or implementation-time assumptions must not be passed to ⑤) |
+| Implementer | proposal, contracts, exact context of the files to change | code diff + implementation notes (which change points were covered, which were not) | make architecture decisions; write tests; modify non-code documents |
+| Test Engineer | proposal test-point list, implementation diff | test diff + coverage matrix (positive/negative/boundary/concurrency/crash) | modify production code; modify test infrastructure |
+| Documenter | proposal, implementation diff, test diff, current documents | document diff + change summary | modify code; add subjective judgment |
+| Pre-reviewer | proposal, implementation diff, verbatim contract text | Pre-review Report: overall conclusion + deviation items + counterexample analysis (concurrency/crash/boundary) | modify files; look at test code (keep an independent perspective) |
+| Independent scanner (⑥) | diff, verbatim contract text | Section A–E report + conclusion line | modify files; reference others' lists (stay independent) |
+| Independent final reviewer (⑦) | final diff + verbatim contract text (**no list attached in the first round**) | four sections: security / architecture consistency / completeness / test counterexamples + conclusion line | modify files; in the first round reference any intermediate conclusion |
+
+### 4.3 Severity Definitions
+
+| Level | Meaning | Handling |
+|---|---|---|
+| Critical | data loss, security boundary failure, silently wrong conclusion | must fix and re-run that review stage |
+| High | functional failure, crash, contract conflict | same as above |
+| Medium | latent defect, coverage gap, bilingual mismatch | same as above ("Medium+" is blocking) |
+| Low | style, naming, comments, readability | recorded on the ledger, may be deferred |
+
+---
+
+## 5. Workflow (Serial Pipeline)
+
+### 5.0 Startup (Slice Entry)
+
+0. **Upfront hard gate (directive switchover period)**: slices **SW-1** (reference rewriting) and **SW-2** (role carriers ready) must both have passed acceptance; otherwise this directive's pipeline **must not start** (prevent two directives running in parallel). For their definitions and acceptance commands see appendices C.0 and C.0b.
+1. The user provides the **slice definition** (the nine fields of §1.2) or indicates its location in the ledger.
+2. Master verifies: whether dependencies are satisfied, whether the workspace is clean (§1.5), whether budget/authorization is still needed (§7.6); and performs a **role readiness pre-check** — check one by one that the role files required by §2.2 exist, that **those files contain no `model` key** (writing an empty value makes the carrier fail to load, see §2.6 / §9.3), that **the `tools` of file-writing roles include `edit`** (passing a model without choosing the right carrier yields no write permission), and that **`model` must be passed explicitly at call time** (R2.1); any mismatch ⇒ mark "role blocked" and stop.
+3. Master determines the slice type and **sets the effort tier** (§8.2; once set, it is not switched during continuous runs).
+4. Generate the **task package** (each package contains: input materials, expected output, acceptance conditions, the `model` string), then proceed to ①.
+5. If any item is not satisfied ⇒ **mark "dependency blocked" and stop**; must not infer on its own or degrade execution.
+
+### 5.1 Pipeline
+
+```
+①architecture (if needed) → ②implementation → ③testing → ④master integration+gates → ⑤pre-review (V4 Pro)
+   → ⑥ independent scan (MAI) → ⑦ final review (Codex) → ⑧a document draft → ⑨ native validation → ⑧b document finalization → ⑩ stop point (awaiting authorization)
+```
+
+**Note: ⑧ is split into two steps (prevent document lag)** — **⑧a draft** is done immediately after ⑦ (does not block ⑨; get the settled conclusions onto disk first); **⑧b finalization** is done after ⑨, absorbing native validation results and any rollback fixes. ⇒ Avoids "a ⑨ failure forcing a document rewrite".
+
+**Hard rule R5.1 (serial)**: `runSubagent` is **serial and blocking** (agents are not asynchronous, not backgrounded). "Parallelism" is allowed only at the master's own tool-call layer (e.g. sending several read-only commands in one message); it **must not** be promised for subagents in task packages or flowcharts.
+**Hard rule R5.2 (every stage leaves an artifact)**: every stage must leave a verifiable artifact (diff / report / gate output / evidence file). An "already passed" without an artifact does not hold.
+**Hard rule R5.3 (tailor by scale)**: role enablement is tailored to slice scale (§5.2), but ⑦ independent final review **cannot be omitted**.
+
+### 5.2 Role Enablement Matrix
+
+| Slice type | ①architecture | ②implementation | ③testing | ⑤pre-review | ⑥scan | ⑦final review | ⑧docs a/b | ⑨native |
+|---|---|---|---|---|---|---|---|---|
+| Simple (**definition same as the three skippable conditions in §7.2**, must not be defined separately in two places) | — | required | required | optional | decided per §7.2 | **required** | required | required |
+| Medium (behavior change, multiple files, test points) | required | required | required | required | **required** | **required** | required | required |
+| Complex (concurrency/transaction/crash window/cross-platform) | **required** | required | required | **required** | **required** | **required** | required | **required** |
+| High risk (rework ≥2, or contradictory reviews, or repeated native failures) | **required** | required | required | **required** | **required** | **required**+blind review | required | **required** |
+
+**Note (document-type slices, removing the conflict with the "simple" definition in §7.2)**: when a slice satisfies the three conditions of §7.2 (pure `.md`/comments, no code semantics), this matrix's **②implementation/③testing degenerate into the documenter's "document implementation" and "document consistency check"** (no code produced, no test engineer needed); **⑨native validation degenerates into encoding gate + G1–G5 self-check + link/reference resolvability check**. ⇒ In that form, the three columns ②/③/⑨ **are not executed under the code-slice criteria**, but **⑦ independent final review cannot be omitted**.
+
+### 5.3 Closure Discipline (Hard Rules)
+
+When any stage fails or needs remediation, **the stage itself must be re-executed after the fix**; skipping steps is forbidden:
+
+| Stage | Action after failure |
+|---|---|
+| ① | after revising the proposal/contract, **re-run ①** |
+| ②③ | after fixing code/tests, **re-run ④ focused gates** |
+| ⑤ | after eliminating deviations/counterexamples, **re-run ⑤** to confirm zero |
+| ⑥ | after fixing, **re-run ⑥** until no Medium+ |
+| ⑦ | after fixing, **re-run ⑦ re-review** until no Medium+ (**must not self-declare pass**) |
+| ⑧a/⑧b | any document inconsistency returns to ⑧a/⑧b for rewrite |
+| ⑨ | fix in place and re-run; **two consecutive failures escalate to ⑤ re-check**; fall back to ① only when an architecture assumption is falsified by native evidence |
+
+---
+
+## 6. Gates and Evidence
+
+### 6.1 Base Gates (after every change)
+
+| Gate | Command / criterion |
+|---|---|
+| Format | `gofmt -l .` output is empty |
+| Build | `go build ./...` exit 0 |
+| Static check | `go vet ./...` exit 0 |
+| Unit tests | `go test ./...` exit 0 (record the count of ok packages and the FAIL count) |
+| Contract fixtures | when contracts are involved, additionally run the Node contract check (fixture counts must stay in sync) |
+| Encoding | `.md`/`.ps1` = UTF-8 **with BOM** + LF; `.json`/`.go` etc. = **without BOM** + LF |
+
+### 6.2 Evidence Persistence Obligation (Hard Rule R6.1)
+
+**All review-type subagents lack the `execute` capability** (measured: `deep-reasoner`, `independent-reviewer` have only `read`+`search`). Therefore:
+
+- Before review, the master must persist the **raw diff** and the **raw gate output** to disk (under `tmp/` or `.tmp/`, cleaned up after use), and hand the **paths** to the reviewer.
+- It is **forbidden** to paste only a diff summary/paraphrase into the prompt and treat that as "evidence provided".
+- Precedent: the B3c ⑦ re-review was voided for an entire round because "the raw hunk was not provided"; after switching to persisting `tmp/b3c-review.diff` it passed in one round.
+
+### 6.3 Closing Self-check Gate (five mechanical checks, **mandatory**)
+
+**Location**: `tools/gates/` (under version control). **Trigger**: before closing any slice, before any docs-only commit.
+**Principle**: replace "human memory" with "mechanical assertions" — this directive does not assume that any role is incapable of forgetting.
+
+| # | Check | Criterion |
+|---|---|---|
+| G1 | **Status-marker consistency** | subsection heading status symbol ↔ status table row ↔ completion record row, all three must agree (e.g. B3c once had a heading still `⬜` while the status table was already ✅) |
+| G2 | **Placeholder residue** | the full text must not retain placeholders such as "待…回填" "尚未提交" "待同轮授权" "pending the push" (after the switchover these must already have been replaced by facts). **The scan scope must exclude this line's own rule quotation** — otherwise the forbidden strings quoted on this line would be judged by the line itself as violations (**self-reference defect**; measured 2026-09-21: §6.3 self-scan yielded 4 false positives); implement it as "forbidden string inside quotes + the line contains 『不得残留』 ⇒ skip" |
+| G3 | **Bilingual symmetry** | (a) **Changed-line-count symmetry**: for every changed CN/EN document pair, the added/deleted line counts from `git diff --numstat` must be equal (measured 2026-09-21: all 6 pairs in this slice PASS). It is **not required** that full-text line counts or bold-marker counts be equal — existing bilingual pairs are historically asymmetric (`REMAINING_SLICES` 501/488, `B2-EXTERNAL-ENFORCEMENT` 270/315), and "full-text equality" is unsatisfiable for them (**self-reference defect**, same as G4b). (b) **Key-field alignment (scope = changed lines, not the full text)**: among the **added lines** of `git diff -U0`, the counts of **commit hash / run number / status enumeration / conclusion enumeration** on the CN and EN sides must be equal — line-count symmetry **cannot** prove that semantics did not drift (⑦ first-round Medium finding). **Do not** compare the full text: full-text differences may come from historical legacy (measured: `B2-EXTERNAL-ENFORCEMENT` full text 10/9, while changed lines 0/0). |
+| G4 | **Encoding + anomalous characters** | (a) BOM+LF verified file by file; **scope = the change set pending commit this time** (≠ the whole dirty tree). (b) **Anomalous-character scan**: the set of CJK characters in the added content ⊖ the HEAD repository-wide `.md` corpus = the **difference set**; the difference set then ⊖ `tools/gates/cjk-newwords.txt` (the legitimate-new-word allow-list, each character must come with a reason and a context excerpt) **must be empty**. ⇒ The original wording "the difference set must be empty" is unsatisfiable for any new document (measured 2026-09-21: a 51 KB new document had a 7-character difference set, all confirmed character by character as legitimate new words), so this is changed to an **allow-list** that fixes "human judgment" into a mechanically re-runnable assertion. (Origin of this rule: 「拒绝」 was once miswritten as 「拒绍」 in 5 places) |
+| G5 | **Change-set contract** | the three must agree: **staged list** ↔ **change set declared in the report** ↔ **ledger evidence references**; `git add` must be done file by file (`-A` is forbidden). **Structured input** (the script reads a fixed JSON, avoiding reliance on humans reading reports): `{stagedFiles[], declaredFiles[], evidenceRefs[], addMode}`; if `addMode` is not `explicit`, or the three sets are not equal ⇒ **exit code 2** |
+
+**Sub-rule G1-b (version metadata consistency, added 2026-09-21)**: **the version number declared in the file header must equal the version number on the latest line of the §0.3 change log**, and the header date must match the latest line's date. Mechanical criterion: extract `版本：vX.Y` from the file header, **extract `vX.Y` of the last row only from within the §0.3 table range** (**must not scan the full text** — other tables (e.g. the v3.1 comparison table in appendix C.1) also contain the `| vN.N |` form, and a full-text scan yields 5 false hits, measured), **the two must be equal** (not equal ⇒ G1 fails ⇒ stop the commit).
+> **Origin**: an instance of "header v1.3 out of sync with log v1.4" appeared in this slice (⑥ round 2); ⑥'s Section D explicitly pointed out that "version metadata consistency" was previously **not within the mechanical coverage of G1–G5** ⇒ this sub-rule is exactly that missing coverage.
+
+**Hard rule R6.2**: if any of G1–G5 fails ⇒ **stop the commit**; after fixing, re-run all gates.
+
+**Scripting status (stated truthfully, 2026-09-21)**: `tools/gates/` currently contains **only** `cjk-newwords.txt` (the G4b allow-list); **executable scripts for G1–G5 are not yet implemented**, and the master **executes them manually** per this section's criteria while collecting evidence step by step. ⇒ "Mechanical checks" in this section means **the criteria are mechanical**, and **does not mean they are already scripted**; implementing the scripts is listed as a slice awaiting authorization (see §12.5). This line must not be read as "fully automated".
+
+**G5 sub-rule G5-a (role-file frontmatter hard gate, added 2026-09-21; hardened the same day per ⑦ round 3)**: the frontmatter of `prfrail-*.agent.md` **must not contain the `model` key** (writing an empty value makes the carrier **fail to load entirely**; see §2.6 / §9.3). Mechanical criteria (**both must be satisfied**): ① `grep -l "^model:" .github/agents/prfrail-*.agent.md` **must produce no output**; ② the frontmatter of **all** `.agent.md` files **must not contain an empty `model`** — the three forms `^\s*model\s*:\s*$`, `model: ""`, `model: ''` all count as empty, and all must have **0 hits** (coverage includes non-`prfrail-*` files and whitespace variants). Violation ⇒ G5 fails ⇒ **stop the commit**. It is a mandatory check item once scripted.
+
+> **Origin**: ⑦ round 2 pointed out that "the F3 defense rests only on manual pre-check" ⇒ G5-a was added; ⑦ round 3 further pointed out that the original criteria **matched only a fixed form and covered only `prfrail-*`** (whitespace variants and other role files were missed) ⇒ this clause is hardened accordingly.
+
+**G5 sub-rule G5-b (role-file `model` value gate, added 2026-09-21, landing the user's ruling)**: for **newly added or modified** `.github/agents/*.agent.md`, the `model` field (**if present**) **must not be a §2.4 blacklist value** (Luna / Terra / Gemini / GPT-5.4 / Sol / Kimi, case-insensitive). Mechanical criterion: for `*.agent.md` **added/modified in the change set**, extract the frontmatter `model` value; **blacklist hits must be 0**. Violation ⇒ G5 fails ⇒ **stop the commit**.
+> **Origin (root fix for OB-8)**: measurement on 2026-09-21 found that the default `model` of 8 existing role files belonged to the blacklist (when `model` is not passed explicitly, the black is reachable directly via `agentName`). The user's ruling adopted the combination of "**delete the default value + hard gate**" (**do not delete the files**): first perform a **field-deletion probe** on one inactive file (delete the `model` line → invoke that carrier: **it loads and works normally**); after the probe passes, delete the `model` field from all 8 blacklist files; this G5-b clause then prevents its re-introduction.
+
+**Sub-rule G1-a (table structural integrity, added 2026-09-21)**: **any line starting with `|` must occupy its own line**; two table records must not be concatenated into one line (affects: change log, status table, observation item ledger, and the tables in appendix C). Mechanical criteria (two independent commands):
+
+1. `grep -n "^|.*||" <file>` against **the lines added/modified in this change set** **must produce no output** (**scope = changed lines, not the full text**, same as G3/G4; full-text comparison would report historical legacy defects as this slice's defects);
+2. compare **column counts** table block by table block (before counting, **first strip escaped `\|`** — otherwise a `\|` inside a code span causes false positives (measured 2026-09-21: 4 false positives without stripping, 0 after stripping).
+
+> **Origin**: the same "table-row concatenation" defect **appeared twice** within this slice (§0.3 change log, §12.4 observation item ledger), and both were **found independently** by ⑥ and ⑦ ⇒ the defect **cannot be reliably caught by human eyeballing** and must be mechanized (⑦ round 2 R3 and ⑥'s two rounds of conclusions).
+>
+> **Known pre-existing exception (not fixed in this slice)**: the M6/M7 rows at `docs/t027/A6_PILOT_LAUNCH.md:269` have the `||` concatenation **already in HEAD** (verified with `git show HEAD:...` as **not introduced by this slice**); because the SW-1 boundary requires historical drafts to **only have a header pointer added, with the body unchanged**, it is **not fixed**, merely **registered as a pre-existing defect**, and does not block this slice's commit.
+
+### 6.4 CI Observation
+
+After pushing, GitHub Actions must be observed and **reported back as double green**. A failed first run requires: ① obtain the raw log of the failing step; ② `gh run rerun --failed` to re-run and collect evidence; ③ determine whether it is flaky; ④ **register it as a defect item** (DR-N) stating the run number, failing step, failing test, error message, and re-run result. It is **forbidden** to cover up a red first run with "the re-run went green".
+
+---
+
+## 7. Review system
+
+### 7.1 Three-layer review
+
+| Layer | Role | Positioning | Key requirement |
+|---|---|---|---|
+| ⑤ | Pre-reviewer (V4 Pro) | whether the implementation deviates from the plan | covers the plan item by item + the three classes of counter-examples |
+| ⑥ | Independent scan (MAI) | low-cost supplementary scan | **Does not reference anyone else's checklist**; Section A–E |
+| ⑦ | Independent final review (Codex) | the sole final-review gate | **The first round attaches no ③/⑥ checklist**; four-item review |
+
+### 7.2 ⑥ (independent scan layer)
+
+**Trigger**:
+- **Behavior-changing slice** (contract / state machine / crash path / process governance / ownership semantics changed) → **enabled**;
+- **Skippable** only when the following three conditions are **simultaneously** met: ① the change **lands only in documentation and configuration-wording files** (`.md`/comments/wording; non-machine-structural files such as `.gitignore`, `.txt`, `.html` count as this class); ② it contains no semantic change to `.go`/`.json`/`.yml`/schema/fixtures/**script logic**; ③ it **does not touch the semantics of the state machine, gate criteria, evidence model, or role/authorization contracts**. **Skipping must be confirmed by ⑦ or the user** (the master must not unilaterally declare it "skippable"), and the reason must be recorded in the report.
+    - **Counter-example (measured 2026-09-21, must not be repeated)**: SW-1/SW-2 look like a "documentation slice" on the surface, but it **revised the §6.3 gate criteria and the evidence model** ⇒ **③ does not hold, ⑥ must not be skipped**. The master's initial skip reason **does not hold**, and after ⑦ pointed this out in round 2 **⑥ was re-run to make up for it** (result in validation report §7.2b). ⇒ Judging "skippable" requires **checking ①②③ item by item**, not inferring from "it looks like documentation".
+
+**⑥ Output contract (Section A–E, isomorphic to ⑦'s contract)**:
+
+- **Section A**: overall verdict line —— `INDEPENDENT SCAN: PASS` or `INDEPENDENT SCAN: FINDINGS`.
+- **Section B**: findings list, each line in the fixed format `SEVERITY | file:line | violated sentence (verbatim quote) | minimal fix`.
+- **Section C**: item-by-item evidence and reasoning.
+- **Section D**: **falsifiability audit (mandatory)** —— for each item, state "if guard X were deleted, which check/assertion would go red and which would not", and list the invariants it considers **not covered**.
+- **Section E**: **"the parts I cannot verify" + "what would overturn my PASS"** (anti-rubber-stamp).
+
+> **Inherited source and sole authority**: the A–E definitions come from v3.1 §2.2 (original text in `docs/t027/FLASH_OPERATING_DIRECTIVE_v3.1.md`). The three references to `Section A–E` in this directive §4.2 / §7.2 / appendix B.6 **take this definition as the sole authority** (completed 2026-09-21: previously those three places referenced it with **no definition**, which was a **reference break**).
+
+**Cost cap**: effective MAI calls for one slice (including first round, resend, re-run after remediation) ≤ **3**; resends are limited to "truncation/anomaly" and count toward the cap; Haiku is counted separately, ≤1.
+**Failure handling**: MAI reports Medium+ ⇒ **re-run MAI** after fixing; if MAI's output **deviates in format** (not following Section A–E / no verdict line) ⇒ one resend is allowed; **if it deviates again or the cap is reached ⇒ this layer must not declare a pass**: it must ① truthfully leave a trace and record "⑥ produced no actionable findings"; ② **enter ⑦ independent final review and close the loop per ⑦'s verdict**; ③ escalate to user adjudication when necessary; afterwards ⑨ may still add a "dedicated independent corroboration experiment" to take on the A12 role. **This layer's verdict does not constitute proof of review sufficiency.**
+
+### 7.2.3 Prerequisites for enabling Haiku
+
+It must be **confirmed before it is enabled**: ① `Claude Haiku 4.5` exists in the Copilot model list; ② the access channel (proxy/network egress) is normal and a first real call completes the availability pre-check. If either is unmet ⇒ **handle it by a three-level fallback**: ① fall back to ⑤ and ask V4 Pro for one extra scan round (one extra pre-review round); ② if ⑤ has already converged, then **skip ⑥ and record the reason in the report**, with ⑦ taking over the independent-scan duty; ③ if ⑦ also cannot cover it, then **escalate to user adjudication**; **do not retry repeatedly**, and do not count its absence as a ⑥ failure.
+
+### 7.3 Input sanitization and landing of conclusions
+
+- **Input sanitization**: material handed to the reviewing party must filter out IPs, usernames, hostnames, SSH paths, credentials, and tokens.
+- **Verdict landing check**: before landing, every `file:line` given by the reviewing party must be **re-checked item by item** for whether it really exists and matches the criterion; anything that cannot be located is treated as a "lead" and must not be taken at face value.
+- **Hard anchoring isolation**: in the first round, ⑦ is given only the slice definition, the diff, the verbatim contract sentences, and read-only constraints; only the **re-review round** may attach a checklist, marked "read only after completing the independent scan".
+
+### 7.4 Getting it right the first time (fewer ⑦ rejections)
+
+Before implementation the following are mandatory: ① the plan's change points are precise down to the file; ② the test points are executable and include counter-examples; ③ contract-first has been completed; ④ the gates are fully green locally. **The cost of a rejection is far higher than the cost of upfront clarification.**
+
+### 7.5 Cost caps (hard metrics)
+
+| Role | Per-slice cap | Remarks |
+|---|---|---|
+| Architect | ≤ 1 | complex/high-risk slices |
+| Pre-reviewer | ≤ 1 (re-review after remediation +1) | excludes the ⑦ blind-review add-on |
+| ⑥ MAI | ≤ 3 (effective calls) | see §7.2 |
+| ⑦ Codex | 1 (final review) + 1 (re-review) | re-review after remediation is an obligation; the "mandatory-sampled blind review" is counted separately as +1 and may be merged with the latter but **must be judged and its reason recorded before start-up** |
+
+Exceeding a cap ⇒ escalate to user adjudication. **Cost-gradient note** (measured pricing, USD per million tokens, offPeak input/output): Flash `0.15/0.6`, V4 Pro `0.66/1.98` ⇒ **prefer pushing coding/testing/documentation/gates down to Flash**.
+
+**Hard rule R7.1 (source of truth for metering and de-duplication)**: the counts in the table above may only come from a **single source of truth** —— the **session call receipts/logs** (not "I guess I called it a few times"). Every call must be identifiable as `{role, model, stage, startedAt, reason, retryOf}`; **de-duplication rules**: a **resend** of the same `stage` (truncation/anomaly) **counts toward the cap**; a **re-review after remediation** is counted on its own line; **blind review** and final review are listed separately. The report's "cost and metering" must list items by these fields; verbal counts from outside the session logs **do not count**.
+
+### 7.6 Pre-authorized probe quota
+
+Slices that need real external calls must declare a quota cap in advance; when the quota is exhausted, stop, and **must not** add more within the slice. Probe usage must be accounted for (count, number of paid calls, conclusion).
+
+### 7.7 Residual governance (A11 / A12)
+
+- **A11 symmetric spot-check**: the master **randomly samples 1–2 items from each of ⑥'s and ⑦'s "delete guard X ⇒ test Y goes red" claims and actually executes them**; if a claim does not match reality ⇒ that audit's credibility is downgraded and logged as a negative signal. A spot-check only provides **existence corroboration** and does not constitute proof of coverage.
+- **A12 independent corroboration**: when ⑥ reports PASS, ⑨ must have at least one **dedicated experiment** that independently proves the key invariant (a criterion unrelated to ⑥).
+- **Mandatory-sampled blind review**: when a slice touches **ownership / shutdown / identity** semantics, **1 blind review** is added before ⑦ (with no checklist attached). Its call count and the convention for "whether it is merged with the §7.2 fallback" are **uniformly specified by §7.5**; this section does not accumulate separately, avoiding double counting in two places.
+    - **Proportional spot-check (inheriting v3.1 §3.11)**: besides the "mandatory sampling", **1 slice out of every 4** undergoes one ⑦ blind review (choose the one with the broadest reach among the most recent 4 slices); the sampling record (slice number / number of blind-review findings / whether ⑥'s PASS was overturned) is written into the report.
+
+---
+
+## 8. Effort tier (thinking mode) rules
+
+### 8.1 Basic facts (measured)
+
+- The effort tier is an **API-layer parameter**; a model **cannot perceive, confirm, or change** its own tier, and a subagent's self-reported tier is also untrustworthy (measured `effort=unknown`).
+- The tier is **set by the operator before the run starts**; **it cannot be changed dynamically during continuous operation**.
+- `deepseek-flash` (used by both the master and the product layer) supports `low / high / max`, default `high`.
+
+### 8.2 Tier setting (by slice type, **set once before start-up**)
+
+| Slice type | Master | Architect/Pre-reviewer | Product layer (implementation/testing/documentation) | ⑥ / ⑦ |
+|---|---|---|---|---|
+| Simple | High | — | same tier as the master (see §8.3) | each model's own default/fixed tier |
+| Medium | High | Max | same as above | same as above |
+| Complex | High | Max | same as above | same as above |
+| High risk | **Max** | Max | same as above | same as above |
+| ⑦ Codex | — | — | — | **Extra High (fixed)** |
+
+### 8.3 Tiers of same-model roles cannot be separated (**known limitation**, D2=A)
+
+The master and the product layer are **both `deepseek-flash`** ⇒ their tiers are **the same setting**, and cannot be set separately to "master High / implementer Low" during continuous operation.
+
+- **Accept the same tier**: by default everything takes **High**.
+- **When Max is needed**: ① configure the Flash tier to Max **before the task starts**; or ② during the task, **pause → change tier → continue** (the gate must be re-run before and after the pause to confirm state).
+- **Long-term solution**: configure a **different model** for the product layer (model per role); the limitation is then lifted.
+
+### 8.4 Recording obligation for tier changes
+
+Every tier change must be recorded in the report's "environment and tier" table: time of setting, tier value, whether a pause was involved, and the gate results before and after the pause.
+
+---
+
+## 9. Master fallback and exception handling
+
+### 9.1 Fallback trigger scenarios
+
+| Scenario | Master action |
+|---|---|
+| Subagent output is empty / clearly unreasonable | **retry once** after re-trimming the context; if it still fails ⇒ log an exception, switch to a backup carrier or downgrade the process step |
+| Subagent fails twice in a row | pause that loop, output a diagnostic report, **mark as requiring human intervention** |
+| ⑤/⑥/⑦ verdicts contradict each other | the master does **root-cause arbitration**: reproduce the minimal counter-example → decide who is wrong → decide the fix path → write it into the report |
+| Gate anomaly that is not a code problem | check environment/dependencies/configuration; rebuild the environment if necessary (must not modify production code to mask it) |
+| Ambiguous boundary / unmet dependency | trace back up to the slice definition, **mark "dependency blocked" and stop**; do not infer on your own |
+| Native validation fails with an unknown cause | peel off layer by layer to locate the root cause → assign the corresponding subagent to fix it |
+
+### 9.2 Fallback principles
+
+1. **Fallback does not mean writing on their behalf**: after locating the problem, still assign the product-layer role to fix it; the master only does mechanical integration and gates.
+2. **Every fallback must be recorded in the report's "exception handling" section** (scenario, localization process, assignment path, result).
+3. **Threshold merging**: fallback intervention in the same slice **> 3 times** ⇒ automatically mark it a "high-risk slice" and **pause for human review**; it **shares the same counter** as §5.3's "⑨ failing twice in a row escalates to ⑤", and must not form two parallel ladders.
+
+### 9.3 Known anomaly patterns (prior checklist, for fast localization)
+
+| Pattern | Symptom | Handling |
+|---|---|---|
+| Stale SCM display | the editor shows "untracked" but git is clean | trust the four commands such as `git status --porcelain -uall`; refresh/restart the editor |
+| Phantom terminal interrupt | the command echoes `^C` but it has actually executed | verify with `git log`/file state; do not resend destructive commands |
+| Character-level mis-write | Chinese characters are written as look-alike characters | run the G4 anomalous-character scan |
+| Loose tool matching | the replace tool still reports success for a look-alike oldString | always run mechanical assertions after the change; do not trust the "success" echo |
+| Encoding defaults | a newly created `.md` has no BOM / has CRLF | run the encoding gate immediately after writing to disk and correct it |
+| **The file-writing tool emits CRLF** | a newly created file written to disk by the file-writing tool has line endings `0d 0a`, violating the hard LF rule | measured by the SW-2 probe (31 B including CRLF). **A new file has no existing line endings to infer from ⇒ it is always CRLF**; existing files usually keep their original line endings. ⇒ after any "new file" is written to disk, its line endings must be normalized with an explicit `UTF8Encoding($false)` (no BOM) or `UTF8Encoding($true)` (`.md` with BOM) and read back for verification. **Supplementary test (2026-09-21, probes 4/4)**: the file-writing tool is **equally unfaithful** for `.md` —— it produces **no BOM + CRLF** (54 B, `first3=23 20 50`, `0D×2`); after byte-level correction to BOM+LF, 55 B passes all items. ⇒ **after a `.md` is written to disk you must explicitly add the BOM and remove the CRs**, and must not rely on the tool or the editor to handle it automatically |
+
+| **`model: ""` makes the carrier fail to load** | the role file contains an empty `model:` value ⇒ `runSubagent` reports `Requested agent '...' not found` | measured 2026-09-21 (isolated verification: adding the empty-value key ⇒ failure; deleting the key ⇒ recovery). ⇒ role files **omit** the `model` key (§2.6) |
+
+**Rule R9.1 (the failure-mode library keeps growing)**: §9.3 is a **continuously growing library of known failure modes** —— for every new, reproducible anomaly pattern met in the pilot or in later slices, **one line must be appended** (symptom / handling) when the slice is closed out; otherwise the documentation write-back is deemed incomplete (detectable via G2/G5 in §6.3).
+
+---
+
+## 10. Authorization, Git, and Release Discipline
+
+### 10.1 Authorization
+
+- `git commit` / `git push` **require** explicit authorization in the same turn; **never** commit just because "it is convenient at wrap-up".
+- Authorization scope follows the user's wording strictly: if only commit is authorized, do not push; if only origin is authorized, do not touch gitee.
+
+### 10.2 Push
+
+- **Push only to `origin`**; **gitee is a mirror only — without an explicit request in the same turn, any gitee push is forbidden**.
+- After authorization, push and **observe CI** (§6.4).
+
+### 10.3 Staging
+
+- Stage precisely with `git add <specific files>`; **`git add -A` is forbidden**.
+- Commit message style `<type>: <summary>` (chore/feat/fix/docs/test/build); bilingual commit messages use English.
+
+### 10.4 Stop Point
+
+After the pipeline finishes ⑨ it **stops at ⑩**: output the slice report and the status table, and wait for user authorization to commit. **Do not** commit/push/publish on your own.
+
+---
+
+## 11. Documentation and Ledger
+
+### 11.1 Domain Authority and Bilingual Mirrors
+
+- Domain authority is defined in §0.1; Chinese is authoritative and `_EN` is the mirror; the mirror must be **aligned sentence by sentence** (not merely keyword by keyword).
+- Historical versions (e.g. the v3.1 directive, frozen validation reports) are **not rewritten**; only a pointer or a correction note is added.
+
+### 11.2 Write-Back Standard
+
+At slice wrap-up the following must be written back: the validation report (created or appended), the `DEV_PLAN{,_EN}` section, the slice ledger (status line / checkboxes / completion record), and the ADR row (if a ruling is involved). Write-back content must be **taken from the slice's own evidence**, never from memory; missing fields are marked "historically missing".
+
+### 11.3 Report Structure
+
+Change summary → execution pipeline (step/role/status/duration/rework count) → anomaly and fallback record → environment and effort tier → review conclusion summary (⑤⑥⑦) → **review input package summary (including the blind-review isolation proof: whether a checklist was attached in the first round, whether the input was already sanitized)** → falsifiability (mechanical checks + mutation testing) → gate results → cost and metering (call counts by type, probe quota) → explicitly unexecuted items → next-step recommendations (including effort-tier recommendations for each role).
+
+---
+
+## 12. Validation and Evolution of This Directive
+
+### 12.1 Pilot Requirements
+
+**Pilot slice selection criteria**: prefer a **medium-complexity, behavior-changing** slice (real gates, real review, controllable cost); **avoid** making the very first pilot a high-risk slice or a documentation-only slice. Candidates for T027: the **DR-2 + DR-3 fix slice** (recommended: medium, behavior-changing, complete review surface); if **B4 · AT-23** (complex) is chosen instead, the budget must be doubled and more fallbacks must be expected.
+
+After a new directive or a major revision, **the first slice is the pilot**, and quantitative metrics are declared in advance:
+
+**Baseline snapshot = B3c (2026-09-21, documentation-only slice)**; on user request it may be replaced before the pilot by the snapshot of another slice of the same scale.
+
+| Metric | v3.1 baseline snapshot (measured on B3c) | Pilot target |
+|---|---|---|
+| Defect self-capture rate (found by us ÷ total found) | **1/4** (3 of the 4 omission classes were found by the user/reviewer) | **≥ 3/4** (with master self-check + subagent review as the primary discovery channels) |
+| Rework count (reruns per loop) | ③×3, ④×3 (v3.1 numbering, of which **1 round was voided for "raw diff not provided"**) | ③ ≤ 2, ④ ≤ 2 |
+| ⑦ invalid rounds (voided for evidence/format problems) | 1 | **0** |
+| Master fallback count (**i.e. the fallback count of §9.2; this item uses the same definition as §9.2**) | Not counted separately (did not occur on B3c) | ≤ 3 (exceeding it triggers the §9.2 high-risk flag) |
+| Omissions found by the user | **3** | **0** (caught by the §6.3 self-check) |
+
+### 12.2 Rollback Clause
+
+**v1.0 has no project-level previous version to roll back to** (v3.1 covers only the T027 slice; it is not a repository-level directive). Rollback path when the pilot misses its targets: ① **suspend this directive**; ② T027-related slices **resume execution under `FLASH_OPERATING_DIRECTIVE_v3.1`**; ③ all other repository activity is **suspended**, pending user adjudication. After a revision the pilot must be run again. **Until the pilot passes, this directive must not be claimed to be "validated".**
+
+### 12.3 Observation Item Registration
+
+Observation items (phenomena not yet sufficient to change the directive) are registered in §12.4 and evaluated before the next slice starts.
+
+### 12.4 Observation Item Ledger
+
+| # | Registered on | Phenomenon | Disposition status |
+|---|---|---|---|
+| OB-1 | 2026-09-21 | **Effectiveness of ⑥ on documentation-only slices is pending evaluation**: MAI outputs normally on code slices (A6), yet on the documentation-only `.md` slice (B3c) it deviated in format twice in a row with no actionable finding (n=1, insufficient to change the directive). The next **code slice** serves as the control (**currently expected to be the DR-2 + DR-3 fix slice; if B4 · AT-23 comes first, B4 takes precedence**; trigger condition: observe as soon as that slice enters ⑤ pre-review, and register the conclusion at its wrap-up): if normal ⇒ attribute it to "documentation-type tasks"; if it still deviates ⇒ attribute it to the model. If 2–3 more slices behave the same way, revisit adding an exception to §7.2 (contract revisions that are pure `.md` and involve no executable semantics may skip ⑥, with ⑦ confirming). **2026-09-21 update (n=2)**: when ⑥ was rerun for SW-1/SW-2, MAI's output was **fully compliant in format** (Sections A–E complete, conclusion line correct) and produced 1 real finding ⇒ the "documentation-type task characteristic" attribution is **weakened**; it is more likely an incidental/prompt factor specific to B3c at the time; keep observing and do not change §7.2 for now. | Observing |
+| OB-2 | 2026-09-21 | **G2 self-reference defect**: a rule line itself quoted the forbidden placeholder string ⇒ a full-text scan inevitably produces false positives (4 measured). G2 was amended in place to "exclude rule quotation lines". | **Resolved** (v1.1); pending ⑦ re-review confirmation |
+| OB-3 | 2026-09-21 | **G4b criterion unsatisfiable**: the original wording "the difference set must be empty" can never hold for any new document (a new 51 KB document measured a 7-character difference set, and character-by-character re-check found all of them to be legitimate new words: 飞/咨/肉/忘/百/摸/纠). Changed to "the difference set ⊖ the `tools/gates/cjk-newwords.txt` whitelist must be empty", fixing human judgment as a mechanically rerunnable assertion. | **Resolved** (v1.1); pending ⑦ re-review confirmation |
+| OB-4 | 2026-09-21 | **Existing role files have non-compliant encoding**: the 11 generated `*.agent.md` files under `.github/agents/` are no-BOM+CRLF, conflicting with the `.md` hard rule; because of a directory-level ignore they had **never been covered by G4**. ⇒ Immediately exposed after `.gitignore` was narrowed. | **Observing**; converted into slice `SW-3` (with a more conservative alternative), pending user adjudication |
+| OB-5 | 2026-09-21 | **The G3 criterion is unsatisfiable for existing bilingual pairs**: "equal CN/EN line counts and equal bold-marker counts" is permanently false for `REMAINING_SLICES` (501/488) and `B2-EXTERNAL-ENFORCEMENT` (270/315). Changed to "**symmetric changed-line count**" (compared via `git diff --numstat`); all 6 pairs of this slice PASS. | **Resolved** (v1.1); pending ⑦ re-review confirmation |
+| OB-6 | 2026-09-21 | **The direction of ⑦'s first-round F3 fix was overturned by measurement**: ⑦ suggested "adding `model: \"\"` to comply with §2.6", but measurement showed that empty-value key makes the agent **completely unloadable** (isolated verification: adding the key fails / removing it restores). ⇒ The remediation was **executed in reverse**: fix the directive (§2.6 mandates **omitting** the key) rather than the files. Lesson: the reviewer's **proposed fix** likewise needs measurement verification, and must not be written down just because the "source is authoritative". | **Resolved** (v1.2); ⑦ re-review must confirm |
+| OB-7 | 2026-09-21 | **⑥ and ⑦ overlap independently (positive signal)**: under the condition of **no checklist attached in the first round**, ⑥ (MAI) independently reported **the same** defect as ⑦'s 2nd round (a changelog table row joined together), and its Section A–E output was **fully compliant in format** with substantive Section D/E content. ⇒ Supports "⑥ has independent value and should not be skipped lightly". | Observing |
+| OB-8 | 2026-09-21 | **The default `model` of existing role files is on the blacklist**: among the 11 existing files, **8** (Terra 3 / Luna 2 / Gemini 1 / GPT-5.4 1 / GPT-5.6-Sol 1) had a default `model` on the §2.4 blacklist (most of them not in the §2.2 role table) ⇒ calling directly by `agentName` without passing `model` explicitly can bypass R2.1 and hit blacklisted models. | **Resolved** (v1.7, user adjudication "delete default values + hard gate", files not deleted): the delete-field probe passed ⇒ 8 files had their `model` field removed, 3 non-blacklisted defaults were retained, and **G5-b** was added to prevent regression |
+| OB-9 | 2026-09-21 | **Independent-verification gap for the T3/T4 remediation (user adjudication)**: the T1–T4 remediation of ⑦'s 3rd round **went through self-verification + ⑥ independent scan only**, without running ⑦ again (the 4th round is not automatically authorized under the user's rules). | **To do**: **the first action of the next directive revision** = make the **diff of the T3/T4 criterion changes** a **focused review point** for ⑦ and **include it in ⑦'s input** (without running a separate round); it is also suggested to include the same-area changes of this v1.7 round (G5-b / identifier disambiguation) |
+### 12.5 Gaps and Future Extensions
+
+| Gap | Suggested timing |
+|---|---|
+| Integration coordinator (cross-slice merge conflicts, dependency upgrades) | When multiple slices run in parallel |
+| Performance reviewer | When performance-sensitive slices increase |
+| Incident response process (rollback / hotfix) | After the first production incident |
+| Retrospective analyst (multi-slice data review) | After execution data accumulates |
+| Infrastructure maintenance (CI/CD, test infrastructure, model version upgrades) | Continuous, independent of slices |
+
+---
+
+## Appendix A: Historical Versions and Sources of Experience
+
+### A.1 Sources of This Directive
+
+| Source | Absorbed content |
+|---|---|
+| 《Flash Master-Subagent Architecture v1.0》 (`tmp/主控子代理架构_v1.0.md`) | Three-layer role division, fallback mechanism, effort tier table, prompt template skeleton |
+| 《Flash Master Operating Directive v3.1》 (`docs/t027/FLASH_OPERATING_DIRECTIVE_v3.1.md`) | Model whitelist/blacklist, ⑥'s three trigger conditions and cost cap, ⑦'s anchoring-based hard isolation, A11/A12, input sanitization, conclusion-landing check, protocol-first, cost awareness, Git discipline, report structure |
+| 《T027 Briefing v3.1》 | Launch package structure and minimum context feeding |
+| B3c slice practice (2026-09-21) | Evidence landing obligation (§6.2), G1–G5 self-check gates (§6.3), character-level miswriting lessons (§9.3), SCM stale display, causes of ⑦ invalid rounds |
+
+### A.2 Disposition of v3.1
+
+`docs/t027/FLASH_OPERATING_DIRECTIVE{,_EN}.md`, `..._v3.1{,_EN}.md`, `FLASH_T027_BRIEFING*.md` are **retained in their original form** (historical trace), with one line added at the head of the file:
+
+> This file has been superseded by `docs/DELIVERY_DIRECTIVE.md` v1.0 (2026-09-21); it is retained only as a historical version and source of experience.
+
+### A.3 Section Number Cross-Reference
+
+See [Appendix C](#附录-c迁移映射).
+
+---
+
+## Appendix B: Role Prompt Templates
+
+> How to use: the master picks each template up by role, **trims the context**, and feeds it in; the `<...>` in the templates are mandatory slots.
+> All templates share the §4.1 general output contract.
+
+### B.0 Master (orchestration layer, the session itself)
+
+The master does not dispatch itself via `runSubagent`; this template is the **master's own working contract**, executed as each slice starts (consistent with §3, §5, §6, §9).
+
+```
+Role: master (development team lead). Model: DeepSeek V4.1 Flash (the session itself).
+Sole responsibility: command, dispatch, gates, evidence, fallback, reporting. **Do not originate product artifacts** (§3.2).
+
+Startup checklist (§5.0):
+  [ ] receive the slice definition and verify dependencies / workspace hygiene / budget
+  [ ] determine the slice type → set the effort tier (§8.2; once set, do not switch mid-way)
+  [ ] generate task packets (each packet: input material / expected output / acceptance criteria / model string)
+
+Execution checklist:
+  [ ] **pass model explicitly** when dispatching (R2.1); do not give write permission to read-only roles
+  [ ] before review, **persist the raw diff and gate output to disk**, and hand the **paths** to the reviewer (R6.1)
+  [ ] keep an artifact at every ring; on failure, rerun that ring (§5.3)
+  [ ] ⑦ first round **attaches no checklist of any kind** (§7.3); ① and ⑤ are **call-isolated** (R2.6)
+  [ ] record each fallback action; **> 3 times ⇒ mark high risk and stop** (§9.2)
+
+Closing checklist:
+  [ ] §6.1 baseline gates all green
+  [ ] §6.3 all five categories of mechanical checks G1–G5 green
+  [ ] report assembly (§11.3; do not rewrite subagent conclusions)
+  [ ] stop at ⑩ and await authorization; **must not** commit / push yourself (§10)
+```
+
+The output must end with one line: `SLICE: READY_FOR_REVIEW` (or `SLICE: BLOCKED` + the blocking items).
+
+### B.1 Architect (①)
+
+```
+Role: architect. Model: DeepSeek V4 Pro. Read-only; must not modify any file.
+Vehicle: runSubagent(agentName='deep-reasoner', model='DeepSeek V4 Pro (deepseek)')
+
+Input: ① slice definition (goal / boundary / dependencies / scale) ② the relevant contract text ③ historical rulings and known constraints
+Output: the architecture design document, containing:
+  1) analysis conclusions (feasibility / complexity / effort estimate)
+  2) change-point list (file level: path / add-modify-delete / description / impact scope)
+  3) test-point list (ID / description / positive-negative-boundary-concurrency-crash / priority)
+  4) risks and mitigations
+  5) special cautions (cross-platform, compatibility, performance)
+Forbidden: writing code (including pseudocode); **carrying pre-implementation reasoning context into ⑤** (anti-anchoring relies on call isolation, see R2.6).
+The output must end with one line: `DESIGN: DONE` (or `DESIGN: NEEDS_CLARIFICATION` + the items needing clarification).
+```
+
+### B.2 Implementer (②)
+
+```
+Role: implementer. Model: DeepSeek V4.1 Flash. May read and write files and run commands.
+Vehicle: runSubagent(agentName='prfrail-implementer', model='DeepSeek V4.1 Flash (deepseek)')
+
+Input: ① the change-point list from the design document ② the contract text ③ the exact context of the files to modify
+Requirements: implement strictly per the change points; follow protocol-first (change CONTRACTS/schema/fixtures first); gofmt; introduce no unauthorized dependencies.
+Output: code diff + implementation notes (which change points are covered; whether any are not covered, and why)
+Self-check: after the change you must run the focused tests and gofmt yourself, and paste the raw output back.
+Forbidden: architectural decisions; writing tests; editing non-code documents. If the design document is ambiguous ⇒ write "needs clarification"; do not guess.
+The output must end with one line: `IMPLEMENT: DONE` (or `IMPLEMENT: BLOCKED` + the blocking items).
+```
+
+### B.3 Test Engineer (③)
+
+```
+Role: test engineer. Model: DeepSeek V4.1 Flash. May read and write files and run commands.
+Vehicle: runSubagent(agentName='prfrail-tester', model='DeepSeek V4.1 Flash (deepseek)')
+
+Input: ① the test-point list from the design document ② the implementation diff ③ the contract text (to verify assertion expectations)
+Requirements: cover positive / negative / boundary / concurrency / crash cases; every test point must be falsifiable by "delete the guard ⇒ it turns red".
+Output: test diff + coverage matrix (ID / test name / type / corresponding test point)
+Self-check: run `go test` yourself and paste the raw output back.
+Forbidden: modifying production code; modifying test infrastructure. Untestable items must be explicitly marked "untestable".
+The output must end with one line: `TEST: DONE` (or `TEST: BLOCKED` + the blocking items).
+```
+
+### B.4 Documenter (⑧)
+
+```
+Role: documenter. Model: DeepSeek V4.1 Flash. May read and write files and run commands.
+Vehicle: runSubagent(agentName='prfrail-documenter', model='DeepSeek V4.1 Flash (deepseek)')
+
+Input: ① the design document ② the implementation diff ③ the test diff ④ the list of documents to update plus their current content
+Requirements: sentence-by-sentence bilingual alignment (CN authoritative + _EN mirror); consistent terminology; `.md` keeps UTF-8 with BOM + LF;
+      fields written back must come from actual evidence (commit ID / run ID / counts); where missing, mark "historical gap"; do not fabricate.
+Output: documentation diff + change summary + list of unsynced items
+Self-check: after writing to disk, run the encoding gate and the G3 bilingual symmetry count, and paste the results back.
+Forbidden: changing code; adding subjective commentary.
+The output must end with one line: `DOCS: DONE` (or `DOCS: BLOCKED` + the blocking items).
+```
+
+### B.5 Pre-reviewer (⑤)
+
+```
+Role: pre-reviewer. Model: DeepSeek V4 Pro. Read-only; must not modify any file.
+Vehicle: runSubagent(agentName='deep-reasoner', model='DeepSeek V4 Pro (deepseek)')
+
+Input: ① the design document ② the implementation diff (raw hunks, paths already persisted) ③ the contract text
+Task: check item by item whether the implementation deviates from the design document; focus on concurrency counterexamples, crash windows, resource leaks, missing error handling, and boundary omissions.
+Output the pre-review report: overall verdict (pass / conditional pass / fail) + deviation table (description / corresponding clause / severity / fix)
+      + counterexample analysis (concurrency / crash / boundary; write "none" if none) + other concerns
+Requirements: every finding carries `file:line`; severity per §4.3.
+Forbidden: editing files; inspecting test code or documentation changes (preserve an independent perspective).
+The output must end with one line: `PRE-REVIEW: PASS` / `PRE-REVIEW: PASS WITH FIXES` / `PRE-REVIEW: FINDINGS`.
+```
+
+### B.6 Independent Review (⑥ independent scan / ⑦ independent final review)
+
+```
+Role: independent reviewer. Read-only; must not modify, create, or delete any file.
+⑥ Vehicle: runSubagent(agentName='independent-reviewer', model='MAI-Code-1.1-Flash (copilot)')
+⑦ Vehicle: runSubagent(agentName='independent-reviewer', model='GPT-5.3-Codex (copilot)')   ← most expensive; capped per §7.5
+
+Input: ① slice definition ② the raw diff (**paths**, not paraphrase) ③ the original contract sentences ④ the read-only constraint
+     !! ⑦ first round **attaches no** ⑤/⑥ checklist; only a re-review round may attach one, and it must be marked "read only after completing the independent scan".
+Task: ⑦ four items — security / architectural consistency / completeness / test counterexample review; ⑥ per Section A–E.
+Output: each finding = severity + `file:line` + verbatim quote + rationale + a fix that can be written down directly;
+      points that "look like problems but are in fact correct" must explicitly state "checked, not a problem".
+Forbidden: editing files; recommending lifting a frozen conclusion / loosening a gate / expanding the slice scope.
+The output must end with one line from the prescribed enumeration: `PASS` / `FINDINGS` / `RE-REVIEW: PASS` / `INDEPENDENT SCAN: PASS`, and the like.
+```
+
+---
+
+## Appendix C: Migration Mapping
+
+### C.0 Switchover Slice `SW-1` (reference rewrite)
+
+The switchover itself is a delivery unit, so it must have a slice definition:
+
+| Field | Content |
+|---|---|
+| ID | `SW-1` |
+| Status | ✅ **Completed** (2026-09-21; evidence in `docs/validation/sw-directive-switchover.md`) |
+| Goal | Repoint every reference in the repository to the old execution directive at this directive |
+| Trigger | As soon as this directive's **CN body is frozen, execution may begin**; the **`_EN` mirror is scheduled as a follow-up slice** (2026-09-21 execution-period wording revision: the original text read "after the CN is frozen and `_EN` is generated", which conflicts with the actual cadence of "freeze CN first, add the mirror later"; the latter is now applied uniformly, and the wording is stated explicitly here to remove ambiguity) |
+| Scale | S (documentation only) |
+| Executing role | Documenter (⑧a/⑧b) |
+| Dependency | None; **must be completed before the §12.1 pilot** (the pilot must run on a tree whose references are already correct) |
+| Deliverable | Reference updates for all files listed in table C.2 below + the supersede pointer in the v3.1-series file headers |
+| Acceptance evidence | ① **File-level assertion**: **every file hit** by `git grep -l "FLASH_OPERATING_DIRECTIVE\|FLASH_T027_BRIEFING" -- docs` must either (a) belong to the "historically retained file allow-list" (C.0a) and **carry a supersede pointer in its file header**, or (b) already point at this directive; rewriting the in-line references inside the bodies of historical drafts is **not required** (historical drafts only get a file-header pointer). ② **Section-number-level assertion**: every hit from `git grep -n "§3\.10\|§3\.11\|第五章\|Section 5"` must be classified as "historically retained" or "already repointed". ③ §6.3 G1–G5 all green |
+| Boundary | **Does not modify the v3.1 source text** (only adds one file-header line); does not change code; does not widen the rewrite scope to historical validation reports |
+
+### C.0a Historically Retained File Allow-List (basis for executing SW-1)
+
+The following files **only get a supersede pointer added to the file header and are not rewritten in the body**; the old-directive references inside their bodies are **not rewritten line by line** (otherwise it would amount to rewriting historical drafts):
+`docs/t027/FLASH_OPERATING_DIRECTIVE.md`, `_EN.md`, `_v3.1.md`, `_v3.1_EN.md`, `FLASH_T027_BRIEFING.md`, `FLASH_T027_BRIEFING_v3.1.md`, `FLASH_OPERATING_DIRECTIVE_v3.1.html`, `A6_PILOT_LAUNCH.md`.
+
+### C.0b Role-Carrier Readiness Slice `SW-2` (unblocking an execution deadlock)
+
+**Why it is necessary**: the three product-layer role carriers of §2.2 in this directive (`prfrail-implementer` / `prfrail-tester` / `prfrail-documenter`) **did not exist when SW-2 was chartered** (they were built on 2026-09-21 and passed a real-machine probe; see the "Status" row of this table); meanwhile the models that could write carriers at the time (Luna / Terra / GPT-5.4) were **all on the blocklist**. ⇒ Without building the carriers first, pipeline steps ②③⑧ **cannot be executed**.
+
+| Field | Content |
+|---|---|
+| ID | `SW-2` |
+| Status | ✅ **Completed** (2026-09-21; real-machine probe passed: carriers writable/readable/deletable, 0 residue; evidence in `docs/validation/sw-directive-switchover.md`) |
+| Goal | Make the three product-layer roles loadable with correct permissions |
+| Trigger | After the CN body is frozen (can run in parallel with SW-1, but the drafts must be kept in sync) |
+| Scale | S |
+| Executing role | Documenter (⑧a) + master runs the verification commands |
+| Deliverable | 3 role files (the header note declares "not a generated artifact, do not let `_sync.py` overwrite it"; the body contains the four sections of responsibilities / inputs / output contract / prohibitions; `tools: ['read','search','edit','execute']`); finely narrowed `.gitignore` (same as §2.5); the three tiers and the model are all left blank for the caller to pass explicitly |
+| Acceptance evidence | ① `git check-ignore -v .github/agents/prfrail-implementer.agent.md` **produces no output**; ② all three files are hit by version control (`git status --short` shows them as newly added); ③ **real-machine probe matrix**: **each of the three carriers** runs "create→read back→delete" once, byte-identical with 0 residue (⑦ first-round Medium finding: testing only one carrier would mask permission anomalies in the other two; hence changed from "any carrier" to **full coverage**); ④ the frontmatter of all three files **contains no `model` key** (§2.6; writing an empty value would make carrier loading fail), and the bodies all explicitly declare "the caller passes `model` explicitly"; ⑤ G1–G5 all green |
+| Boundary | Does not change any existing role file (including the `sol-orchestrator` toolchain); does not change code |
+
+### C.0c Role-Set Check-In and Encoding Normalization Slice `SW-3`
+
+**Why it is necessary**: after `SW-2` narrowed `.gitignore`, **testing exposed** that the **11 existing generated role files under `.github/agents/` had never been checked in**, and were **no-BOM + CRLF** — conflicting with the repository hard rule "`.md` = UTF-8 with BOM + LF" (G4 flags red); meanwhile R2.5 requires all `*.agent.md` to be brought under version control. ⇒ Both can only be satisfied at once by "**normalize first, then check in**".
+
+| Field | Content |
+|---|---|
+| ID | `SW-3` |
+| Status | ✅ **Completed** (2026-09-21, **user-authorized option A**, see §0.3 v1.5) |
+| Goal | Make the existing role files satisfy the encoding hard rule, carry the unified header note, and be brought under version control |
+| Trigger | User authorization (already triggered); the originally suggested timing was before the §12.1 pilot |
+| Scale | S |
+| Executing role | Documenter (⑧a) + master runs the gates |
+| Deliverable | The 11 existing `.agent.md` files normalized to BOM+LF and then checked in, and **all 14 role files carry the unified header note** (note text and hard rule in §2.5) — **apart from that header-note line and the encoding/line endings, no semantic word is changed** |
+| Acceptance evidence | ① G4a all green (14 files BOM=true / CRLF=false); ② **the only semantic change is the added header-note line** (no semantic change once the header note and line-ending differences are excluded; verified file by file); ③ header-note criterion `grep -L "非生成物（sol-orchestrator 已按" .github/agents/*.agent.md` **produces no output**; ④ `git check-ignore -v` still produces no output for `prfrail-implementer.agent.md`; ⑤ G1–G5 all green |
+| Boundary | Does not change `model`/`tools` values, does not change the responsibilities/constraints body; does not touch the `sol-orchestrator/` toolchain |
+| **Alternative (rejected)** | A more conservative option: narrow the `.gitignore` exception to `prfrail-*.agent.md`, versioning only hand-maintained files. **The user decided on 2026-09-21 to adopt option A (check in everything)**, on the grounds that `deep-reasoner` / `independent-reviewer` / `quick-verifier` are directly cited by §2.2 as active carriers, and if they are not checked in then **the mechanical gates cannot cover them** (hidden technical debt) |
+| **Regression risk** | If the `sol-orchestrator` generator is re-run later, the artifacts will revert to no-BOM+CRLF ⇒ G4 flags red again (R2.5 already requires "check in the generator source and compare verbatim before re-running") |
+
+### C.1 v3.1 section numbers → this directive
+
+| Original v3.1 section | Content | Location in this directive |
+|---|---|---|
+| §2.0 allow-list overview | Three roles | §2.2 (expanded to 7 roles as triples) |
+| §2.1 V4 Pro | Pre-analysis + pre-review | §2.2 (①/⑤) + appendix B.1/B.5 |
+| §2.2 MAI / §2.2.1 Haiku | ⑥ and enabling Haiku | §7.2 / §7.2.3 |
+| §2.3 Codex | ④ final review | §7.1 / §7.5 |
+| §2.4 prohibited list | Blocklist | §2.4 (adds `sol-orchestrator`) |
+| §3.1 do it yourself by default | Master boundary | §3.1 / §3.2 (changed to "produces only orchestration artifacts") |
+| §3.2 get it right the first time | Fewer rejections | §7.4 |
+| §3.3 expected iterations | Don't get discouraged | §9.1 (merged into fallback) |
+| §3.4 protocol first | Fixed order | §1.4 |
+| §3.5 cost awareness | Cost discipline | §7.5 |
+| §3.6 discipline common to all tiers | One change per round / no scope expansion | §3.2 / §3.3 |
+| §3.7 thinking-mode tiers | Tier rules | §8 (including the same-model inseparability limit) |
+| §3.8 continuous execution and stop points | Continuous segments / stop points | §5.1 / §10.4 |
+| §3.9 pre-authorized probe budget | probe budget | §7.6 |
+| §3.10 ⑥ scanning layer | Three triggering conditions / cost ceiling | §7.2 |
+| §3.11 conclusion handling / sanitization / residual | A11/A12 / blind review | §7.3 / §7.7 |
+| §四 work discipline | Collaboration discipline | §3 / §9 |
+| §四.11 workspace hygiene | Concurrent interference prohibited | §1.5 |
+| §五 closed-loop discipline and the ⑤ failure state machine | Re-run that loop after a fix | §5.3 / §9.2 |
+| §六 Git discipline | Authorization / push | §10 |
+| §7.1 / §7.4 report structure and next steps | Report format | §11.3 / §11.3 (last item) |
+| Appendix A / B cost ceilings and observation clauses | Budget and observation items | §7.5 / §12.4 |
+
+> **Identifier mapping (2026-09-21 disambiguation)**: the layer identifier **`③.5`** that the old directive used is **uniformly renamed `⑥` (the independent scanning layer)** in this directive, to avoid confusion with pipeline step numbers; likewise, the old directive called the final review **`④`**, whereas this directive **uniformly calls it `⑦`**. The left column of the table above keeps the old identifier (because that is what is being mapped).
+
+### C.2 References to rewrite after the switchover (executed by the switchover slice)
+
+| File | Existing content | Action |
+|---|---|---|
+| `docs/t027/REMAINING_SLICES{,_EN}.md` | `见 docs/t027/FLASH_OPERATING_DIRECTIVE.md 第五章`, `按 §3.10 三条件`, the `§3.10` of the B3c observation item | Repoint to this directive §5.3 / §7.2 / §7.2 |
+| `docs/DEV_PLAN{,_EN}.md` | If it contains `FLASH_OPERATING_DIRECTIVE` references | Same as above |
+| `docs/DOCUMENTATION_PLAN{,_EN}.md` | Authoritative domain table | Add one row: delivery execution discipline = `DELIVERY_DIRECTIVE` |
+| `.github/copilot-instructions.md` | Locating and authority section | Add a pointer (**pending user confirmation on whether to change it as well**) |
+| `docs/t027/FLASH_OPERATING_DIRECTIVE*`, `FLASH_T027_BRIEFING*` | Full text | Keep the original text, add a supersede pointer (§A.2) |
+| `docs/t027/B3A_RIG_DESIGN.md` and other historical working drafts | If they contain references | Historical drafts are not changed; covered by this mapping table |
+
+**C.2 execution results (2026-09-21, `SW-1`)**: file-by-file measured results; any differences from the table above are flagged.
+
+| File | Measured hits | Result |
+|---|---|---|
+| `docs/t027/REMAINING_SLICES.md` / `_EN.md` | 2 each | Changed: `第五章` → this directive §5.3; observation item `§3.10` → §7.2 (CN/EN symmetric) |
+| `docs/DEV_PLAN.md` / `_EN.md` | **0** | Added a new-directive pointer in the "working method and constraints" section per §11.2 (the original table said "if it contains references"; measured as none) |
+| `docs/DOCUMENTATION_PLAN.md` / `_EN.md` | — | Added the authoritative row "delivery execution discipline" |
+| `.github/copilot-instructions.md` | — | Pointer added (executed within the same round's authorization scope) |
+| `docs/t027/FLASH_OPERATING_DIRECTIVE.md`, `_EN.md`, `_v3.1.md`, `_v3.1_EN.md`, `FLASH_T027_BRIEFING.md`, `FLASH_T027_BRIEFING_v3.1.md` | ≥1 each | Supersede pointer added (file header only, body untouched) |
+| `docs/t027/FLASH_OPERATING_DIRECTIVE_v3.1.html` | 1 | Added a historical-version banner (**beyond the original table**: `.html` was not listed) |
+| `docs/t027/A6_PILOT_LAUNCH.md` | **4** | Supersede pointer added (**beyond the original table**: the original table classified it as "historical working draft, not changed"; the pointer was added because the `SW-1` acceptance assertion requires "every hit carries a superseded-by note", file header only) |
+| `docs/validation/B2-EXTERNAL-ENFORCEMENT.md` / `_EN.md` | 1 each | Changed the "related documents" line (**beyond the original table**, same reason as above) |
+
+**Bootstrap exemption (2026-09-21)**: `SW-1`/`SW-2` list the documenter (⑧a) as the executing role, but **the product-layer carriers are exactly the objects `SW-2` is meant to create** ⇒ there is a **bootstrap dependency**. These two slices are therefore **produced directly by the master** (§3.2's "do not originate product artifacts" does not apply here), **but independent review is not exempted**: once both are done they must still go through ⑦ independent final review (Codex), and **no checklist is attached in the first round**. This exemption **applies only during the directive switchover period**; from the pilot slice onward, the §5.0 role-readiness precheck and dispatch rules resume.
+
+### C.3 List of items not inherited (present in v3.1, not inherited verbatim by this directive)
+
+| Original v3.1 clause | Disposition | Reason |
+|---|---|---|
+| §3.11 "blind review is mandatory for selected slices" | **Inherited** (§7.7) | Residual governance must not be cut |
+| §3.11 "sample proportionally (1 in every 4 slices)" | **Inherited** (new in §7.7) | Same as above |
+| §3.11 blind-review budget "theoretically up to 4 times per slice" | **Not inherited** | This project-level directive instead enumerates per-category ceilings in §7.5 and no longer uses a "theoretical maximum" phrasing (to avoid it being treated as a quota) |
+| v3.1 §12 "trial period (first 2 slices)" rollback conditions | **Rewritten** as the §12.1 quantitative metrics + the §12.2 rollback path | A project-level directive needs quantifiable targets, not a "trial period" description |
+| §2.2.1 Haiku "time-limited clearance" details | **Inherited and tightened** into the three-level fallback of §7.2.3 | Keeps the capability, makes the failure path explicit |
+| §四.11 concurrent-experiment interference prohibition | **Inherited** (§1.3 R1.1) | — |
+| Appendix A cost-ceiling table | **Inherited and rewritten** as §7.5 | Paired with the measurement ground-truth source of R7.1 |
