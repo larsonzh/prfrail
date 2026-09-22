@@ -62,3 +62,9 @@
 裹	docs/DELIVERY_DIRECTIVE.md	"被反引号包裹" (legitimate word 包裹: wrapped in backticks)
 尖	docs/DELIVERY_DIRECTIVE.md	"尖括号" (legitimate word 尖括号: angle bracket)
 融	docs/DELIVERY_DIRECTIVE.md	"屏障消融对照" (legitimate word 消融: the guard-removal comparison in OB-17)
+# 2026-09-22 (B4 ③ measured-field fill-in): the two characters below appear only in the newly added measured fields of the report pair.
+庭	docs/validation/t027-at23-e2e.md	"Windows 11 家庭版" (the OS edition string returned by cmd /c ver)
+捉	docs/validation/t027-at23-e2e.md	"捕捉排除路径 / 快照捕捉" (the capture-exclusion boundary leg of the F1 face)
+# 2026-09-23 (B4 ⑤-remediation round): the character below is introduced by the §9.7 wording that
+# states the measured gate order is CONTRARY to CONTRACTS §7 - the plain statement the ruling requires.
+悖	docs/validation/t027-at23-e2e.md	"实测门禁次序与 §7 相悖" (legitimate word 相悖: contrary to the contract wording, stated without hedging)
