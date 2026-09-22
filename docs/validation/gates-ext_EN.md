@@ -95,6 +95,8 @@ The OB-11 regression fixture is **fixture-level** evidence: it proves the criter
 
 > The conclusion is stated at the strength of the **weaker** kind: fixture-level evidence cannot replace real-historical evidence, and this slice's reproducibility claim for the historical defects rests on the real ranges.
 
+> **Evidence retention**: this slice's `tmp/gates-ext/**` (the step2–step5 history, the mutation evidence, the review input bundles) is **retained** - not committed and not version-controlled; **the retention horizon is evaluated after the next slice has run stably** (user ruling, 2026-09-22).
+
 ## 8. Gate Results
 
 | Check | Result |
