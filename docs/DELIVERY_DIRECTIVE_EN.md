@@ -979,7 +979,7 @@ The following files **only get a supersede pointer added to the file header and 
 | Field | Content |
 |---|---|
 | Id | `GATES-EXT` (v1.10) |
-| Status | 🔄 **in progress**: written back from the CI first-run verdict after this slice is committed (⑧b adds the run id and both legs) |
+| Status | ✅ **completed** (commit `8a2841f`, CI run `35718884321` first run **green on both legs**) |
 | Objective | write the G6 / G7 criterion classes into §6.3 and run them from an **offline in-repo script** behind a CI hard gate; do not implement base G1 / G5 and do not change the semantics of G1–G5 |
 | Dependencies | v1.9 committed as `fb12ff9`; the DR-FIX pilot conclusions (OB-13 / OB-14); the user's rulings on option F1 and the unattended authorization package |
 | Size | M (documentation + code) |

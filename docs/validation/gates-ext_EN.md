@@ -118,15 +118,15 @@ The OB-11 regression fixture is **fixture-level** evidence: it proves the criter
 - **Base G1 / G5 are still unscripted** (the script prints `SKIP` truthfully): outside this slice's scope, a candidate for a later `[SLICE]`.
 - **OB-20 (`g5a.js` error routing) is not fixed**: rationale in §4.3, awaiting the user's ruling.
 - **OB-17 is not fixed and no whitelist entry was added**: rationale in §5.
-- **The ⑧b write-back was not executed**: §11 "after the commit" of this report is filled in by ⑧b.
+- **The ␸b write-back has been executed**: the "after the commit" evidence in §11 of this report and the ledger status row were written back after the push and pushed.
 
-## 11. After the Commit (⑧b write-back)
+## 11. After the Commit (␸b written back)
 
 | Item | Result |
 |---|---|
-| commit | this commit (⑧b writes back the hash) |
-| first CI run | ⑧b writes back the run id and the verdict of both legs |
-| flake inside `base go test` | **DR-6**: `internal/gates/TestGuardExecutorCleansDescendantsAfterParentExit` failed once, every isolated re-run was green, and it is green inside `base go test` ⇒ registered separately under DR disposition **boundary ①** (see `docs/t027/REMAINING_SLICES`); it **does not block** this slice's push, and this subsection keeps tracking it: any recurrence in CI upgrades it to a real defect |
+| commit | `8a2841f` (pushed to `origin/main`; gitee not pushed) |
+| first CI run | run `35718884321` (head `8a2841f`): **both legs `success`**, the `Gates` step **actually ran** on both legs (step 9), and both legs reported `GATE REPORT scope=ci … changed=40` with `TOTAL_FAIL=0` ⇒ `--scope=ci` resolved a change set on real CI's full history (**neither empty nor degraded to the whole tree**), so the ⑤ F1 `fetch-depth` fix and the new hard gate hold together on the real runner |
+| flake inside `base go test` | **DR-6**: `internal/gates/TestGuardExecutorCleansDescendantsAfterParentExit` failed once, every isolated re-run was green, and it is green inside `base go test` ⇒ registered separately under DR disposition **boundary ①** (see `docs/t027/REMAINING_SLICES`); **the first run was green on both legs and it did not recur** |
 
 ## 12. Boundary Annotation
 
@@ -134,7 +134,7 @@ The OB-11 regression fixture is **fixture-level** evidence: it proves the criter
 
 ## 13. Next Steps
 
-1. **⑧b**: fill in §11 of this report (commit hash / first CI-run verdict / DR-6 observation) and sync the ledger's status row.
+1. **␸b is complete**: §11 of this report has been filled in (commit hash / first CI-run verdict / DR-6 observation) and the ledger status row is synced.
 2. **User ruling on OB-20**: choose between "fix the G5-a error routing" and "fold it into the next §6.3 revision".
 3. **Next slice candidate**: scripting base **G1 / G5** (the closure item of OB-15 ③), plus the criterion-narrowing evaluations for OB-17 / OB-18.
 

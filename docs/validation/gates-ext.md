@@ -118,15 +118,15 @@ OB-11 相关的回归夹具是**夹具级**证据：它证明判据在该形态�
 - **基础 G1 / G5 仍未脚本化**（脚本如实 `SKIP`）：本片范围之外，属后续 `[SLICE]` 候选。
 - **OB-20（`g5a.js` 错误分流）未修**：理由见 §4.3，待用户裁决。
 - **OB-17 未修、未加白名单**：理由见 §5。
-- **⑧b 回写未执行**：本报告 §11"提交后"小节由 ⑧b 回填。
+- **⑧b 回写已执行**：本报告 §11 的"提交后"证据与台账状态行均在推送后回填并推送。
 
-## 11. 提交后（⑧b 回填）
+## 11. 提交后证据（␸b 已回填）
 
 | 项 | 结果 |
 |---|---|
-| 提交 | 本次提交（⑧b 回填提交号） |
-| CI 首跑 | 由 ⑧b 回填 run 号与双腿结论 |
-| `base go test` 内 flake | **DR-6**：`internal/gates/TestGuardExecutorCleansDescendantsAfterParentExit` 失败 1 次、隔离重跑全部为绿、`base go test` 内亦绿 ⇒ 按 DR 处置口径**边界①**单独登记（见 `docs/t027/REMAINING_SLICES`），**不阻断**本片推送；本小节持续记录，CI 再现即升级为真实缺陷 |
+| 提交 | `8a2841f`（推送 `origin/main`；未推 gitee） |
+| CI 首跑 | run `35718884321`（head `8a2841f`）：**双腿 `success`**，`Gates` 步在双腿均**实际执行**（step 9），两条腿均报 `GATE REPORT scope=ci … changed=40` 与 `TOTAL_FAIL=0` ⇒ `--scope=ci` 在真实 CI 的完整历史上解析出了变更集（**既非空集、也未退化为整树**），⑤ F1 的 `fetch-depth` 修复与新增硬门在真实 runner 上同时成立 |
+| `base go test` 内 flake | **DR-6**：`internal/gates/TestGuardExecutorCleansDescendantsAfterParentExit` 失败 1 次、隔离重跑全部为绿、`base go test` 内亦绿 ⇒ 按 DR 处置口径**边界①**单独登记（见 `docs/t027/REMAINING_SLICES`）；**首跑双腿绿，未再现** |
 
 ## 12. 边界标注
 
@@ -134,7 +134,7 @@ OB-11 相关的回归夹具是**夹具级**证据：它证明判据在该形态�
 
 ## 13. 下一步建议
 
-1. **⑧b**：回填本报告 §11（提交号 / CI 首跑结论 / DR-6 观测），并同步台账状态行。
+1. **␸b 已完成**：本报告 §11 已回填提交号 / CI 首跑结论 / DR-6 观测，台账状态行已同步。
 2. **用户裁决 OB-20**：在"修 G5-a 错误分流"与"并入下次 §6.3 修订"之间二选一。
 3. **下一片候选**：基础 **G1 / G5** 的脚本化（OB-15 ③ 的闭合项），以及 OB-17 / OB-18 的判据收窄评估。
 
