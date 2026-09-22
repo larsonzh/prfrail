@@ -93,6 +93,8 @@ T006 status: `COMPLETE`. Full AT-02 acceptance passed; Git-free restore and immu
 
 T018 status: `IN_PROGRESS / BLOCKED`. On 2026-09-09, a redacted frozen whois fixture was exported under a one-session read-only authorization; all 9/9 parity cases and input/result/failure-classification drift counterexamples pass. All three minimal generic/C/Go CLI loops pass, as does a Windows candidate portable-package drill covering first run, upgrade, rollback, and evidence-preserving uninstall. The product owner approved manual portable-ZIP extraction without PATH modification, and bilingual installation, support-matrix, and release-note drafts now exist. T025/AT-22 completed on 2026-09-10. AT-01–AT-24 and remaining gates are summarized in the [S1 exit report](validation/s1-exit_EN.md). T026/T027/AT-23, T028/AT-24, final-ZIP binding/rerun, the EOL notification channel, and product-owner S1 exit approval remain absent, so T018 stays unchecked.
 
+> **T018 open question (2026-09-22, measured by the B4 ①)**: the remaining T018 gates (AT-24 / final ZIP binding and re-verification / EOL notification / the product-owner S1-exit approval) need re-evaluation for "**do they also depend on candidate / AgentRunner assembly progress**" - if they do, T018 completion is affected by F1 / F2 as well. **Out of B4's scope**; same origin as **OB-21** and the same timing.
+
 ### P1.7 Product Flow and Lifecycle (Before P1.6 Release Acceptance)
 
 Keep IDs stable; execution order is T016 → T019–T024 → T017 → T025 → T026 → T027 → T028 → T018. These run under S0 approval; T019–T024 are complete. Split tasks by individual negative tests rather than generating whole features at once.

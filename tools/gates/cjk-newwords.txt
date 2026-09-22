@@ -43,6 +43,8 @@
 浅	docs/DELIVERY_DIRECTIVE.md	"浅克隆探测不结论" (shallow clone probe)
 # 2026-09-22 (GATES-EXT report): new character in the report prose.
 逼	docs/validation/gates-ext.md	"共同逼出的加固" (forced out by both reviews)
+# 2026-09-22 (B4 / OB-21 + T018 open question): new character in the OB-21 row and the T018 note.
+今	docs/DELIVERY_DIRECTIVE.md	"AT-23 的“真实 AI 候选”腿今日不可达" (today)
 # 2026-09-22 (DR-FIX report): second evidence class of the mutation-criterion split; kept verbatim in the EN mirror.
 乙	docs/validation/dr-fix-enforcement-proxy.md	"结构消除性证据（乙）" (structural-elimination evidence class)
 # 2026-09-22 (GATES-EXT, batch 2b): two characters of the already-committed DR-FIX report
