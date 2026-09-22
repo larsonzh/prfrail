@@ -1,0 +1,35 @@
+# G7 / T12 provenance (see ARCH-DESIGN section 6, T12).
+# Source: `git show 1b01115:docs/validation/dr-fix-enforcement-proxy.md` - the DR-FIX
+# pilot slice report added by commit 1b01115 (228 lines, 227 insertions).
+#
+# Recorded fact: the report contains NO fenced block at all (`artifacts` fence count
+# = 0, total fence count = 0), so its evidence references live only in prose. That is
+# exactly defect C1, and it is why G7 must be red for
+# `--scope=range:1b01115^..1b01115`. The reasoning above is reproducible with:
+#   git show 1b01115:docs/validation/dr-fix-enforcement-proxy.md
+#   git range run: node tools/gates/gate.js --check=G7 --scope=range:1b01115^..1b01115
+#
+# Section headings of that report (line numbers as of commit 1b01115):
+#   7  ## 0. 诚实准则
+#   13 ## 1. 变更概要
+#   21 ## 2. 流水线执行
+#   42 ## 3. 审查摘要（⑤ / ⑥ / ⑦）
+#   44 ### 3.1 ⑤ 预审（V4 Pro ×1）——**不对称性论证**（**⑤ 独立贡献，非 ① 输入**）
+#   48 ### 3.2 ⑥ 独立扫描（MAI ×1）：`INDEPENDENT SCAN: PASS`
+#   54 ### 3.3 ⑦ 独立终审（Codex ×1）：`FINDINGS` —— 2 条"已核查、非问题" + **4 条发现**
+#   64 ### 3.4 ⑦ 复审（Codex ×1，本片最后一次 ⑦ 额度）：`PASS`
+#   76 ### 3.5 两条独立证据指向同一结论（连写，不重复叙述）
+#   81 ### 3.6 审查输入包摘要与盲审隔离证明
+#   85 ## 4. 可证伪性（机械检查 + 变异检验）
+#   87 ### 4.1 变异口径（本片特有，须与新准则一并理解）
+#   93 ### 4.2 变异实测（原始输出见 `tmp/drfix/`）
+#  107 ### 4.3 机械检查与"未放宽"方向标注
+#  113 ### 4.4 DR 症状串规范化：双串并记（匹配依据）
+#  123 ## 5. 门禁结果与验收证据
+#  140 ### 5.1 提交前（变异性 + 重复运行；OB-13 第一段）
+#  146 ### 5.2 提交后（3 连推首跑；OB-13 第二段）
+#  152 ## 6. DR 累计发生次数表（延续）与边界③失效
+#  168 ## 7. 成本与计量（R7.1 / §11.3 字段）
+#  185 ## 8. 明确未执行事项与待议项
+#  197 ## 9. 试点量化指标（§12.1，基线 = B3c）
+#  222 ## 10. 下一步建议

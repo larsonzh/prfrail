@@ -1,0 +1,15 @@
+# 某切片验证报告
+
+## 3. 审查摘要
+
+| 严重度 | 发现 | 处置 |
+|---|---|---|
+| **High** | 门禁脚本硬编码仓库路径 | 已修 |
+
+## 5. 工件
+
+```artifacts
+docs/validation/dr-fix-enforcement-proxy.md	repo
+tmp/drfix/A3.txt	local-only
+docs/validation/legacy-dr-report.md	missing-historical
+```

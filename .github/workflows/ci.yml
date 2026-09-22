@@ -60,6 +60,9 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          # Full history: the Gates step judges "the change set" via HEAD^1, which does not exist
+          # in a default depth-1 checkout (user-authorized extension of the frozen CI contract).
+          fetch-depth: 0
 
       - name: Setup Go
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
@@ -86,6 +89,9 @@ jobs:
         run: |
           npm ci --ignore-scripts
           npm test
+
+      - name: Gates
+        run: node tools/gates/gate.js --selftest && node tools/gates/gate.js --all --scope=ci
 
   candidate-build:
     name: Candidate build (${{ matrix.os }})

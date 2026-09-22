@@ -1,0 +1,15 @@
+# G6-2 / T4 fixture provenance (see ARCH-DESIGN section 6, T3 and T4).
+# Two verbatim cost rows that MUST agree. The selftest asserts that the fixture
+# testdata/fixtures/g6-2-cost-clauses.md contains both lines verbatim.
+#
+# Line 1 = `git show HEAD:docs/DELIVERY_DIRECTIVE.md` line 47 (section 0.3 changelog,
+#          v1.9 row): budget clause ⑥×1 + ⑦×1 (exempt) plus realized clause
+#          ⑥×1 + ⑦×2 = 3 (compared). This is the state written by commit 9f68a52.
+# Line 2 = `git show b738e6b:docs/DELIVERY_DIRECTIVE.md` line 927 (appendix C.0e cost
+#          row): realized clause ⑥×1 + ⑦×2 = 3 plus the historic budget declaration.
+# Both carry slice key SW-5, so G6-2 compares them; they agree => PASS.
+# The pre-fix pairing (commit b738e6b: the section 0.3 v1.9 row still reads the bare
+# "成本 ⑥×1 + ⑦×1") is defect A1 and is exercised by `--scope=range:b738e6b^..b738e6b`
+# (T3) against real history, not by a fixture.
+| v1.9 | 2026-09-22 | **新增 §1.6 工作分级与启动授权（切片 `SW-5`；用户 Q1–Q6 裁决）**：① 三档启动——`[ROUTINE]`（默认、无触发词）/ `[SLICE]` / `[PILOT]`，触发词语法**全文仅此一处定义**；② 日常档**不可绕过边界**（①为**对 §7.2 ③ 的引用**，②–⑥为增量边界：CONTRACTS / schema / fixtures、`.agent.md`、状态机 / 崩溃 / 所有权 / 并发代码、`.github/workflows/**`、依赖增删）；③ 主控**先判定级别并在回执首行声明**、**可建议不擅自升级**、**级别单向不得半途降级**（用户要求降级 ⇒ 停止切片并以 `[ROUTINE]` 重启；停止态须标“已停止——未完成”＋未完成清单，**不视为闭环**）、**不因日常档豁免 §10**；④ 日常档留痕 = diff + §6.1 + §6.3，**0 次付费调用**；⑤ §1.1 改指针、§5.0 加“启动前置”一句并把 **`SW-3` 补入步 0 前置硬门**、附录 B.7 按三档扩充（标题由“切片启动卡”改称“**启动卡**”）、附录 C.0e 记录 `SW-5`（含**首次角色裁剪降级判断留痕**：字面落“中等”、实质落“简单”，豁免 ①⑤；**成本**：预算 ⑥×1 + ⑦×1、**实得 ⑥×1 + ⑦×2 = 3 次付费调用**（见附录 C.0e）。 |
+| 成本 | **⑥ ×1（MAI）＋ ⑦ ×2（Codex：终审 1 + 复审 1）= 3 次付费调用**（均在 §7.5 额度内；原预算声明为 ⑥×1 + ⑦×1） |

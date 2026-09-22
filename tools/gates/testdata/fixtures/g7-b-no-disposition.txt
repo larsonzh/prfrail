@@ -1,0 +1,8 @@
+# 某切片验证报告
+
+## 5. 工件
+
+```artifacts
+tmp/drfix/A3.txt
+docs/validation/dr-fix-enforcement-proxy.md	repo
+```

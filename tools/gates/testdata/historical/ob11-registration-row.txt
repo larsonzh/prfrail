@@ -1,0 +1,10 @@
+# G6-1 / T2 fixture provenance (see ARCH-DESIGN section 6, T2).
+# Source: `git show HEAD:docs/DELIVERY_DIRECTIVE.md`, line 605 - the OB-11 row of the
+# section 12.4 observation ledger, copied verbatim (byte-for-byte, BOM/CRLF aside).
+#
+# Why it matters: the row quotes both the pending shape ("待 ⑥ 独立扫描") and the
+# completion shape ("⑥ 独立扫描（**实得**）") on one line, so without the exclusion
+# marker 冲突 the self-reference guard would report a false positive. The selftest
+# asserts that the fixture testdata/fixtures/g6-1-ob11-row.md contains this line
+# verbatim, and that removing 冲突 turns it red (the marker is load-bearing).
+| OB-11 | 2026-09-22 | **C.0e 台账时态修正整改后未再跑 ⑦ 复审（用户裁决例外，选 A）**：C.0e 状态行“待 ⑥ 独立扫描”与下方“⑥ 独立扫描（**实得**）`PASS`”冲突（⑦ 复审 Medium），整改后**未再跑 ⑦**——§5.3 要求“直至无 Medium+”，而 §7.5 额度（终审 1 + 复审 1）已用尽。**本次例外判定标准**：整改属**台账元数据类**（不含规则实体、不影响门禁、**闭合可字面核验**、不引入新语义），与 SW-3 第 3 轮授权的**判据语义类**整改（改 G5-a 判定标准、含规则实体、影响门禁 ⇒ 语义可核验 ⇒ 必须独立复审）性质不同；前者可并入下次修订的 ⑦ 输入，后者必须独立复审。**附带教训**：台账**不写会过期的字面量**（行数 / 文件数），只写“由 G3/G4 校验一致”这类判据（本片已据此去掉 `995/995`）。 | **待办**：并入下次修订的 ⑦ 输入 |

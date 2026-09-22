@@ -184,7 +184,7 @@ func validateWorkflowStructure(workflow workflowDocument) error {
 	}
 	expectedJobs := map[string]jobContract{
 		"test": {
-			steps: []string{"Checkout source", "Setup Go", "Build", "Vet", "Test", "Race", "Contract fixtures"},
+			steps: []string{"Checkout source", "Setup Go", "Build", "Vet", "Test", "Race", "Contract fixtures", "Gates"},
 		},
 		"candidate-build": {
 			condition:   dispatchOnMain,
@@ -245,6 +245,9 @@ func validateWorkflowScripts(workflow workflowDocument) error {
 			digest: "ff4826f2103a2457cd306662f2542e54d809546deb1f804964b63f2148185dd5", condition: "runner.os == 'Linux'",
 		}, "test/Contract fixtures": {
 			digest: "94577fb7f37f9fbfcef7207756eebf7999694fea78cfe21c23b7e904d2ce7d5d", condition: "runner.os == 'Linux'", workingDirectory: "tools/contracts",
+		},
+		"test/Gates": {
+			digest: "ca20623b574d8247377aa96f1f1af589ab854cf28ce2a94a584288225241c8d0",
 		},
 		"candidate-build/Validate candidate pin": {
 			digest: "5b4930d6ebbea82cb11be937304ae3cddb7bfb77236c276596451c9ba711b216", shell: "pwsh",
@@ -316,7 +319,7 @@ func validateWorkflowActions(workflow workflowDocument) error {
 		"Upload verified CI artifact":         "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
 	}
 	expectedParameters := map[string]map[string]any{
-		"test/Checkout source": {"persist-credentials": false},
+		"test/Checkout source": {"persist-credentials": false, "fetch-depth": 0},
 		"test/Setup Go":        {"go-version": "${{ env.GO_VERSION }}", "cache": true},
 		"candidate-build/Checkout candidate": {
 			"ref": "${{ env.CANDIDATE_COMMIT }}", "path": "candidate-source", "persist-credentials": false,
