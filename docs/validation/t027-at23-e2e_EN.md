@@ -147,6 +147,7 @@ The ③ independent recheck conclusions are in §5.
 ### 9.5 Cost accounting
 
 Budget: ① times 1 + ⑤ times 1 + ⑥ times 1 + ⑦ times 2; realized: ① times 1 + ⑤ times 1 + ⑥ times 1 + ⑦ times 2 (one final review plus one re-review for this slice; the contract-wording revision is counted against its own separate quota and does not consume this slice's).
+**The contract revision's derivative cost (a data point for future reference)**: the 2 Medium findings of the ⑦ re-review (round 2) and this `CONTRACTS` §7 wording revision **share one cause** - the document wording the revision introduced itself consumed one further review round. **Suggested**: besides counting a contract revision against its own quota, budget one extra review round for it (measured here: one revision, one derivative review round).
 
 ### 9.6 Unrun items and next steps
 

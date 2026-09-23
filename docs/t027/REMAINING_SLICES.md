@@ -44,7 +44,7 @@
 | B3a power-loss injection rig + calibration | ✅ 完成（2026-09-20） | A7 | M-L | 标定 `CALIBRATED`：负对照 4/5 丢失、正对照 0/5；journal 36 条全链通过；12 轮审计均 `HARD-POWER-LOSS` | `docs/validation/B3A-CALIBRATION.md`；`docs/validation/evidence/b3a-2026-09-20/` |
 | B3b candidate injection matrix + durability verdict | ✅ 完成（`abfcecc`） | B3a | M | 2026-09-21 | `docs/validation/t027-b3b-durability.md`、`docs/validation/evidence/b3b-2026-09-21/` |
 | B3c CONTRACTS durability-upgrade clause revision | ✅ 完成（`7bdfa0c`） | B3b | S | 2026-09-21 | `docs/validation/t027-b3c-contracts-durability.md`、`docs/validation/t027-b3c-contracts-durability_EN.md` |
-| B4 AT-23 E2E evidence + independent review | ⬜ 未开始 | A5、A6、B1、B2、B3b、B3c | L | | |
+| B4 AT-23 E2E evidence + independent review | ✅ 完成（`e8cbff6`；CI run `35812311023` 双腿全绿，且两腿 `Gates` 步骤均实测执行） | A5、A6、B1、B2、B3b、B3c | L | 2026-09-23 | **AT-23 未通过**（真实 AI 候选腿不可达，见 OB-21）；`docs/validation/t027-at23-e2e.md`、`tools/b4-e2e/` |
 | C1 Linux AgentRunner native validation | ⬜ 未开始 | B4（Windows T027 完成） | M | | |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断
@@ -438,16 +438,18 @@ A6 ② 进度（第 2 批，2026-09-15）：
 
 **观察项（2026-09-21 登记，不改准则）**：**③.5 在纯文档切片上的有效性待评估**——MAI 在代码切片（A6）输出正常，本片（纯 `.md`）2 次输出均偏离格式契约且未产出可执行发现（n=1，不足以修订准则）；**下片 B4（代码切片）作对照**：B4 正常 ⇒ 归因“文档类任务特性”；B4 同样偏离 ⇒ 归因模型能力问题。若再有 2–3 片纯文档切片同样表现，再议为 §7.2 增加例外（“纯 `.md` 且不涉及可执行语义的契约修订可跳过 ③.5，由 ⑦ 确认”）。详见验证报告 §7。
 
-## B4 — AT-23 E2E evidence + independent review · ⬜
+## B4 — AT-23 E2E evidence + independent review · ✅
 
 依赖：A5、A6、B1、B2、B3b、B3c
 
+**本片状态（四事分立，不得合并）**：① **B4 切片** = ✅ 完成；② **AT-23** = **未通过**（真实 AI 候选腿不可达，见 OB-21）；③ **T018 剩余门** = 未闭合；④ **S1 exit** = 未做。
+
 > **优先级（用户 2026-09-22）**：本片**优先于** `GATES-G1G5` / `GATES-TIGHTEN` 两片补片——**B4 阻塞 S1 exit**，两片补片不阻塞任何东西；两片在 **B4 完成后**依次做。
 
-- [ ] 在真实宿主跑完整 AT-23 场景，覆盖隔离 workspace、timeout、日志缺失、未知恢复、exit 0 后重扫与独立 gates 或 review。
-- [ ] 形成 evidence pack，包含输入摘要、环境摘要、命令与 cwd、退出码、用例统计、失败证据、跳过原因。
-- [ ] 做独立第三方 review，解决 medium 及以上发现。
-- [ ] 更新 T018、S1 exit 与双语验证台账。
+- [ ] 在真实宿主跑完整 AT-23 场景，覆盖隔离 workspace、timeout、日志缺失、未知恢复、exit 0 后重扫与独立 gates 或 review —— 所列机制面**已在真实宿主执行**（五个面各有正/反向腿与包内重跑腿），但 AT-23 还含**真实 AI 候选启动与计费**腿，该腿**实测不可达** ⇒ 本项不勾选，AT-23 整体**未通过**。
+- [x] 形成 evidence pack，包含输入摘要、环境摘要、命令与 cwd、退出码、用例统计、失败证据、跳过原因。
+- [x] 做独立第三方 review，解决 medium 及以上发现。
+- [ ] 更新 T018、S1 exit 与双语验证台账 —— T027 双语台账已回写（本行与完成记录）；**T018 剩余门与 S1 exit 未闭合**，故本项不勾选。
 
 目标：给 T027 的真实端到端验收和独立复核提供可审计证据。
 现状缺口：离线实现链、候选或强制边界、Windows durability proof 未全部闭合前，E2E 证据不可成立。
@@ -536,6 +538,8 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 2026-09-17 | B2 | （依据 `docs/validation/B2-EXTERNAL-ENFORCEMENT.md`）外部 OS 强制定案与证据：定案采用方案 B「外部 OS 强制」（受管进程运行在零网络能力 AppContainer 内）；证据根 `docs/validation/evidence/b2-2026-09-17/`（含 `MANIFEST.md` 与 `SHA256SUMS.txt`）；三个提交已推送 `origin/main`（`c5c22ad..408bd99`，含 `58757e8` 工具收编）。**字段来源**：该报告头部与第 8 行「CI 证据」；**历史缺失**：该报告头部未记录 CI 运行号 | docs/validation/B2-EXTERNAL-ENFORCEMENT.md |
 | 2026-09-20 | B3a | （依据 `docs/validation/B3A-CALIBRATION.md`）断电注入装置与双向对照标定：结论 **`CALIBRATED`**（装置能双向分辨"丢失"与"存活"）；journal 全链 36 条记录、12 轮审计均 `HARD-POWER-LOSS`、盘点 ×2 逐字节一致；证据包 `docs/validation/evidence/b3a-2026-09-20/`（128 文件、`SHA256SUMS.txt` 126 条、0 失配）；已提交 `136352b` 与 `babc041` 并推送 `origin/main`（`815c03f..babc041`，**未推 gitee**），CI 全绿（run `35482066033`，1 分 48 秒）。**字段来源**：该报告头部、§2 与末节「提交与 CI（2026-09-20）」 | docs/validation/B3A-CALIBRATION.md |
 | 2026-09-22 | DR-FIX | **首个正式切片（试点 `[PILOT]`）**：`tools/agent-probe/enforcement-proxy` 测试包时序竞态（DR-2/3/4/5）**共享根因**判定与**单一修复方案**（`waitForAccepts` 3 s 硬截止 / 20 ms 轮询，四处读点 + 完成记录 `waitForRecord` + `close()` 加锁 + `readLog` 容忍撕裂尾行）；① 任务 A 逐字排除“共享 rig / 临时目录”；变异判据分甲-i（回归会被抓）/ 甲-ii（修复本体被证伪）且均实测变红，`-count=10` 全绿，包级密闭自检 `checks=13 failures=0`，门禁 `TOTAL_FAIL=0`；⑤ 预审独立贡献“不对称性论证”，⑥ `PASS`（含一行执行类自报**不作证据**）、⑦ 终审 4 条 → 复审 `PASS`（0 High / 0 Medium / 0 Low / 3 Note）；**3 连推首跑双腿全绿**（run `35646859765` / `35647349443` / `35648196443`）；已提交 `ff259b2`（修复）+ `9f68a52`（台账 / 准则）+ `1b01115`（报告）并推送 `origin/main`（**未推 gitee**）；**未达标项如实登记**：缺陷自捕获率 2/5（目标 ≥ 3/4） | docs/validation/dr-fix-enforcement-proxy.md；台账 §已知缺陷 DR-2…DR-5 行 + §累计发生次数表 |
+
+| 2026-09-23 | B4 | （依据 `docs/validation/t027-at23-e2e.md`）AT-23 机制腿端到端证据 + 独立审查：装配 harness（`tools/b4-e2e/`，复用生产包、无 `os/exec`）在真实 Windows 宿主驱动五个面（隔离 workspace、timeout、日志缺失、未知恢复、exit 0 后重扫）的正/反向与包内重跑腿。**四事分立**：B4 切片 ✅；**AT-23 未通过**（真实 AI 候选腿不可达，见 OB-21）；T018 剩余门未闭合；S1 exit 未做。审查：⑤ 预审 F1–F5 整改并复审确认；⑥ 独立扫描 `PASS`、0 发现；⑦ 终审 F1–F5 与 R-1..R-4（R-1「契约措辞需修订」触发预声明红线并停下升级 ⇒ 用户裁决后修订 `CONTRACTS` §7 次序措辞、**只改措辞不动代码**，登记 OB-22）；⑦ 复审所报 Medium 按 OB-11 例外标准确定性闭合（OB-24）。跳过面的替代证据一律标注**非等价替代**（门禁端口对另标**策略端口未覆盖**），**本片不主张等价覆盖**。⑤ 门禁三作用域 `TOTAL_FAIL=0`、`SELFTEST PASS`；⑨ 原生验证含同命令复跑（差异仅落在已声明易变字段）与 `tmp/b4/SHA256SUMS.txt` 全量重算 0 失配。**已提交 `e8cbff6` 并推送 `origin/main`（未推 gitee）**；CI run **`35812311023`** 双腿全绿，两腿 `Gates` 步骤均实测执行（`TOTAL_FAIL=0`）。**契约修订的派生成本**：其引入的文档表述另耗一轮 ⑦ 复审（数据点已记入报告 §9.5） | docs/validation/t027-at23-e2e.md |
 
 > **台账完整性注记（2026-09-21，已按用户授权补录）**：本表自 A4 行之后长期未追加完成行。**2026-09-21 依据各切片自己的验证报告补录 A5/A6/A7/B2/B3a 五行**（受"不凭记忆、只补可核验字段、缺失留空并标注历史缺失、不编造"三条约束），B3b 行先于本次补录写入，故五行列于其后；各行的日期/提交号/运行号/摘要均逐项标注来源，无法核验者已标注 **历史缺失**。
 > 仍待回填：**B3a 的 `DEV_PLAN{,_EN}.md` 段落**（该文件 A0–A7/B1/B2 段均在，唯 B3a/B3b 缺；B3b 段已补，B3a 段待按其报告回填）。
