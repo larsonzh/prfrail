@@ -22,9 +22,14 @@
  *   G6-3 run-id format     placeholder / out-of-range run ids (format only, never
  *                          reachability; no network)
  *   G6-4 expiring literal  line counts / file counts / aggregate counts
+ *   G6-5 section refs      §X.Y on added ledger/changelog lines must resolve (OB-32)
+ *   G6-6 ledger status     §12.4 disposition cells must open with a closed-set word (OB-38)
  */
 
-const { UsageError } = require('../ctx');
+const fs = require('fs');
+const path = require('path');
+
+const { UsageError, decodeBuffer } = require('../ctx');
 
 const WHITELIST_REL = 'tools/gates/g6-whitelist.txt';
 const EXCLUDE_MARKERS = ['不得残留', '示例', '引文', '冲突', '矛盾'];
@@ -409,13 +414,316 @@ const G6_4 = {
   },
 };
 
+/* ---------------------------------------------------------------------------
+ * G6-5 (section-reference resolution, OB-32) and G6-6 (ledger status closed set,
+ * OB-38) - the two sub-checks added by slice DIRECTIVE-REVIEW-SATURATION (v1.13).
+ *
+ * G6-5 is deliberately an APPROXIMATE criterion: it covers the "dangling reference"
+ * subclass of OB-32's C1 event (a log row naming a section that does not exist) and
+ * does NOT cover "the log claims a change while the body has no such content". The
+ * rule text in the directive says so explicitly; this comment says so again so the
+ * code cannot be read as a full-class cover.
+ *
+ * G6-6 is independent of G6-1 on purpose: G6-1's block-level semantics (a pending
+ * marker and a same-label completion marker in one block) are structurally
+ * incompatible with §12.4's single large table, so widening G6-1's vocabulary would
+ * make any "待办" row collide with any "已处置" row. A separate sub-check with its own
+ * closed set is the design recorded in §6.3 and §7.8.
+ * ------------------------------------------------------------------------ */
+
+/** `§12.4`, `§7.2.1` … - the reference forms the directive uses in its prose. */
+const SECTION_REF_RE = /§(\d+(?:\.\d+)*)/g;
+/** Label source 1: a heading that starts with the section number (`### 7.2.1 触发`). */
+const LABEL_HEADING_RE = /^#{2,4}\s+(\d+(?:\.\d+)*)(?=[\s.．、]|$)/;
+/** Label source 2: a line-leading bold label (`**1.7.1 执行自由度**`), as §1.7 / §3.4 use. */
+const LABEL_BOLD_RE = /^\*\*(\d+(?:\.\d+)*)\s/;
+const DIRECTIVE_FILES = ['docs/DELIVERY_DIRECTIVE.md', 'docs/DELIVERY_DIRECTIVE_EN.md'];
+
+const REGION_HEAD_030 = /^#{2,4}\s+0\.3(?=[\s.．、]|$)/;
+const REGION_HEAD_C0 = /^#{2,4}\s+C\.0(?=[\s.．、]|$)/;
+const REGION_HEAD_C1 = /^#{2,4}\s+C\.1(?=[\s.．、]|$)/;
+const ANY_HEAD = /^#{2,4}\s/;
+
+/**
+ * Every label a directive uses to address its own sections: heading numbers plus the
+ * leading bold labels (§1.7.1 / §3.4.1 style). Collection method copied from the
+ * reviewed throwaway `tmp/v112/refs-check.js` so the criterion and the ⑨ native
+ * validation agree on what "the file's label set" means.
+ */
+function labelsFromLines(L) {
+  const out = new Set();
+  for (const l of L || []) {
+    let m = LABEL_HEADING_RE.exec(l);
+    if (m) out.add(m[1]);
+    m = LABEL_BOLD_RE.exec(l);
+    if (m) out.add(m[1]);
+  }
+  return out;
+}
+
+/**
+ * Scope-aware read of one repository file, with a working-tree fallback.
+ * `ctx.readText` is the scope-correct reader (tree/index = worktree, range/ci = the
+ * endpoint revision), so a historical run judges against the labels that existed at
+ * the endpoint. The selftest's synthetic context returns `null` for repository files
+ * and is served by the disk fallback - the fixtures deliberately live inside the
+ * repository so their references can be checked against the real directive.
+ */
+function readTextFor(ctx, p) {
+  let t = null;
+  try {
+    t = ctx.readText ? ctx.readText(p) : null;
+  } catch (e) {
+    t = null;
+  }
+  if (t === null || t === undefined) {
+    try {
+      t = decodeBuffer(fs.readFileSync(path.join(ctx.repoRoot, p.split('/').join(path.sep))));
+    } catch (e) {
+      t = null;
+    }
+  }
+  return t === null || t === undefined ? null : t;
+}
+
+/** The union of the CN and `_EN` directive label sets ("this file ∪ its mirror"). */
+function directiveLabels(ctx) {
+  const out = new Set();
+  for (const f of DIRECTIVE_FILES) {
+    const t = readTextFor(ctx, f);
+    if (t === null) continue;
+    for (const l of labelsFromLines(t.split('\n'))) out.add(l);
+  }
+  return out;
+}
+
+/**
+ * Target regions of G6-5, as [startIndex, endIndex) pairs over the file's lines:
+ *   ① the §0.3 change-log table interval (its heading to the next `^#{2,4}` heading);
+ *   ② the appendix C ledger interval (`### C.0` up to `### C.1`, exclusive) - this is
+ *      what keeps the C.1 v3.1 comparison table and C.2 / C.3 structurally OUT of the
+ *      scan (measured: 15 of the 18 unresolvable whole-file references live there, so
+ *      a region limit - not a whitelist - is what makes a zero-preload launch possible).
+ */
+function targetRegionRanges(L) {
+  const out = [];
+  for (let i = 0; i < L.length; i++) {
+    if (!REGION_HEAD_030.test(L[i])) continue;
+    let end = L.length;
+    for (let j = i + 1; j < L.length; j++) {
+      if (ANY_HEAD.test(L[j])) {
+        end = j;
+        break;
+      }
+    }
+    out.push([i, end]);
+    break;
+  }
+  for (let i = 0; i < L.length; i++) {
+    if (!REGION_HEAD_C0.test(L[i])) continue;
+    let end = L.length;
+    for (let j = i + 1; j < L.length; j++) {
+      if (REGION_HEAD_C1.test(L[j])) {
+        end = j;
+        break;
+      }
+    }
+    out.push([i, end]);
+    break;
+  }
+  return out;
+}
+
+/** A reference resolves when the number exists, or when a label extends it (`§7.2` ← `§7.2.1`). */
+function resolvesRef(num, labels) {
+  if (labels.has(num)) return true;
+  for (const l of labels) if (l.indexOf(num + '.') === 0) return true;
+  return false;
+}
+
+const G6_5 = {
+  id: 'G6-5',
+  label: 'section-reference resolution',
+  run(ctx, out) {
+    const findings = [];
+    const external = directiveLabels(ctx);
+    let scanned = 0;
+    let refs = 0;
+    for (const f of ctx.changedMarkdown()) {
+      const L = ctx.readLineArray(f);
+      if (!L) continue;
+      const ranges = targetRegionRanges(L);
+      if (!ranges.length) continue;
+      const own = labelsFromLines(L);
+      for (const n of [...ctx.addedLineNumbers(f)].sort((a, b) => a - b)) {
+        const idx = n - 1;
+        const line = L[idx];
+        if (line === undefined) continue;
+        // A line outside every target region is not judged at all (reported as scanned-out,
+        // never as a PASS): historical rows in §0.3 and the C.1 comparison table are
+        // therefore immune by construction, not by whitelist.
+        if (!ranges.some((r) => idx >= r[0] && idx < r[1])) continue;
+        scanned++;
+        if (isExcluded(line)) continue;
+        for (const m of line.matchAll(SECTION_REF_RE)) {
+          refs++;
+          if (resolvesRef(m[1], external) || resolvesRef(m[1], own)) continue;
+          findings.push({
+            file: f,
+            line: n,
+            text: line,
+            detail: f + ':' + n + ' §' + m[1] + ' unresolved :: ' + line.slice(0, 120),
+          });
+        }
+      }
+    }
+    return emit(
+      ctx,
+      out,
+      'G6-5',
+      'section-reference resolution',
+      findings,
+      'no unresolved section reference on added ledger/changelog lines (scanned ' + scanned + ', refs ' + refs + ')'
+    );
+  },
+};
+
+/** The bilingual closed set. The CN word is authoritative; `_EN` files use the EN table. */
+const LEDGER_STATUS_SETS = {
+  cn: ['观察中', '待办', '待议', '已处置', '已裁决', '已登记'],
+  en: ['Observing', 'To do', 'To be discussed', 'Resolved', 'Ruling', 'Registered'],
+};
+const LEDGER_REGION_HEAD = /^#{2,4}\s+12\.4(?=[\s.．、]|$)/;
+const LEDGER_ROW_RE = /^\|\s*OB-\d+\s*\|/;
+
+/** The §12.4 table interval as [startIndex, endIndex), or null when the file has none. */
+function ledgerRegionRange(L) {
+  for (let i = 0; i < L.length; i++) {
+    if (!LEDGER_REGION_HEAD.test(L[i])) continue;
+    let end = L.length;
+    for (let j = i + 1; j < L.length; j++) {
+      if (ANY_HEAD.test(L[j])) {
+        end = j;
+        break;
+      }
+    }
+    return [i, end];
+  }
+  return null;
+}
+
+/** Cells of a Markdown table row, splitting on unescaped pipes (escaped `\|` stays intact). */
+function rowCellsOf(line) {
+  const cells = [];
+  let cur = '';
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '\\' && i + 1 < line.length) {
+      cur += ch + line[i + 1];
+      i++;
+      continue;
+    }
+    if (ch === '|') {
+      cells.push(cur);
+      cur = '';
+      continue;
+    }
+    cur += ch;
+  }
+  cells.push(cur);
+  return cells.slice(1, cells.length - 1);
+}
+
+/**
+ * The disposition cell's first status word, or null when it is outside the closed set.
+ * Accepted shapes: `词 …`, `**词** …`, `**词**（括注）…` / `**Word** (note) …`. The
+ * boundary test demands a non-letter right after the word, so a legacy value such as
+ * `**下一片必做**` (which merely CONTAINS no closed word) fails, while `**已处置**（v1.1）`
+ * passes.
+ */
+function firstStatusWord(cell, words) {
+  let c = String(cell === null || cell === undefined ? '' : cell).trim();
+  if (c.slice(0, 2) === '**') c = c.slice(2);
+  for (const w of words) {
+    if (c.slice(0, w.length) !== w) continue;
+    const rest = c.slice(w.length);
+    if (rest === '' || rest.slice(0, 2) === '**' || !/[\p{L}\p{Script=Han}]/u.test(rest[0])) return w;
+  }
+  return null;
+}
+
+const G6_6 = {
+  id: 'G6-6',
+  label: 'ledger status closed set',
+  run(ctx, out) {
+    const findings = [];
+    let scanned = 0;
+    for (const f of ctx.changedMarkdown()) {
+      const L = ctx.readLineArray(f);
+      if (!L) continue;
+      const region = ledgerRegionRange(L);
+      if (!region) continue;
+      const words = /_EN\.md$/i.test(f) ? LEDGER_STATUS_SETS.en : LEDGER_STATUS_SETS.cn;
+      for (const n of [...ctx.addedLineNumbers(f)].sort((a, b) => a - b)) {
+        const idx = n - 1;
+        if (idx < region[0] || idx >= region[1]) continue;
+        const line = L[idx];
+        if (line === undefined || !LEDGER_ROW_RE.test(line)) continue;
+        scanned++;
+        if (isExcluded(line)) continue;
+        const cells = rowCellsOf(line);
+        const cell = cells.length ? cells[cells.length - 1] : '';
+        if (firstStatusWord(cell, words)) continue;
+        findings.push({
+          file: f,
+          line: n,
+          text: line,
+          detail: f + ':' + n + ' first status word not in the closed set :: ' + String(cell).trim().slice(0, 60),
+        });
+      }
+    }
+    return emit(
+      ctx,
+      out,
+      'G6-6',
+      'ledger status closed set',
+      findings,
+      'every added ledger row opens with a closed-set status word (scanned ' + scanned + ')'
+    );
+  },
+};
+
 module.exports = {
   id: 'G6',
   label: 'ledger metadata consistency',
   title: '台账元数据一致性',
   scripted: true,
-  subchecks: [G6_1, G6_2, G6_3, G6_4],
-  internals: { isExcluded, headingIndices, blockBounds, qualify, costClause, vecText, keysOfLine, PENDING_RE, DONE_RE },
+  subchecks: [G6_1, G6_2, G6_3, G6_4, G6_5, G6_6],
+  internals: {
+    isExcluded,
+    headingIndices,
+    blockBounds,
+    qualify,
+    costClause,
+    vecText,
+    keysOfLine,
+    PENDING_RE,
+    DONE_RE,
+    // G6-5 (OB-32): label collection, target-region detection, resolution rule.
+    directiveLabels,
+    labelsFromLines,
+    targetRegionRanges,
+    resolvesRef,
+    readTextFor,
+    SECTION_REF_RE,
+    DIRECTIVE_FILES,
+    // G6-6 (OB-38): bilingual closed set, ledger region, row-cell split, first-word rule.
+    LEDGER_STATUS_SETS,
+    ledgerRegionRange,
+    rowCellsOf,
+    firstStatusWord,
+    LEDGER_ROW_RE,
+  },
   run(ctx, out) {
     for (const s of this.subchecks) s.run(ctx, out);
   },

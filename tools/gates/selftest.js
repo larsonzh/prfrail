@@ -5,7 +5,8 @@
  *
  * Every assertion is named, so a broken fixture or a weakened criterion turns the
  * suite red. Coverage (architecture design section 6):
- *   T1, T2, T4, T5, T6, T7, T8, T9, T10, T11, T13, T14, T15, T16, T17, T18 + G7-d.
+ *   T1, T2, T4, T5, T6, T7, T8, T9, T10, T11, T13, T14, T15, T16, T17, T18 + G7-d
+ *   + T19-T28 (G6-5 section-reference resolution, G6-6 ledger status closed set).
  * T3 (defect A1 against commit b738e6b) and T12 (defect C1 against commit 1b01115)
  * need real git ranges and are therefore executed as recorded evidence:
  *   node tools/gates/gate.js --check=G6 --scope=range:b738e6b^..b738e6b
@@ -49,6 +50,16 @@ const FIXTURES = {
   'g7-b-good': { disk: 'g7-ok-report.txt', virtual: 'docs/validation/fixture-g7-ok-report.md' },
   'g7-c': { disk: 'g7-c-finding-row.txt', virtual: 'docs/validation/fixture-g7-c-finding-row.md' },
   'g7-d': { disk: 'g7-d-stopped-state.txt', virtual: 'docs/validation/fixture-g7-d-stopped-state.md' },
+  // G6-5 / G6-6 (slice DIRECTIVE-REVIEW-SATURATION, v1.13). The `_EN` fixture MUST end in
+  // `_EN.md`: the criterion picks its word table with `/_EN\.md$/i`.
+  'g6-5-legal-refs': { disk: 'g6-5-legal-refs.txt', virtual: 'docs/t027/fixture-g6-5-legal-refs.md' },
+  'g6-5-dangling-ref': { disk: 'g6-5-dangling-ref.txt', virtual: 'docs/t027/fixture-g6-5-dangling-ref.md' },
+  'g6-5-c1-v31-table': { disk: 'g6-5-c1-v31-table.txt', virtual: 'docs/t027/fixture-g6-5-c1-v31-table.md' },
+  'g6-5-outside': { disk: 'g6-5-outside.txt', virtual: 'docs/t027/fixture-g6-5-outside.md' },
+  'g6-5-excluded-ref': { disk: 'g6-5-excluded-ref.txt', virtual: 'docs/t027/fixture-g6-5-excluded-ref.md' },
+  'g6-6-legal-status': { disk: 'g6-6-legal-status.txt', virtual: 'docs/t027/fixture-g6-6-legal-status.md' },
+  'g6-6-legacy-status': { disk: 'g6-6-legacy-status.txt', virtual: 'docs/t027/fixture-g6-6-legacy-status.md' },
+  'g6-6-en-status': { disk: 'g6-6-en-status.txt', virtual: 'docs/t027/fixture-g6-6-en-status_EN.md' },
 };
 
 /**
@@ -64,8 +75,13 @@ const FIXTURE_DISK_MUST_NOT_BE_MD = true;
 
 const ALL_SUBCHECKS = [...G6.subchecks, ...G7.subchecks].map((s) => s.id);
 
-/** Expected FAIL id set for the whole fixture corpus (regression anchor, T13). */
-const EXPECTED_CORPUS_FAILS = ['G6-1', 'G6-3', 'G6-4', 'G7-a', 'G7-b', 'G7-c', 'G7-d'];
+/**
+ * Expected FAIL id set for the whole fixture corpus (regression anchor, T13).
+ * G6-5 / G6-6 joined the anchor with their intentionally-violating fixtures
+ * (`g6-5-dangling-ref`, `g6-6-legacy-status`): every corpus FAIL id must be one the suite
+ * declares as expected, so a new criterion slipping into the corpus is caught here.
+ */
+const EXPECTED_CORPUS_FAILS = ['G6-1', 'G6-3', 'G6-4', 'G6-5', 'G6-6', 'G7-a', 'G7-b', 'G7-c', 'G7-d'];
 
 const CHECKS = [];
 /** Every declared mutation is logged so a stale one (no-op) turns the suite red. */
@@ -258,6 +274,103 @@ function g7Probe(id, text) {
     findings: res.findings.length,
     why: res.findings.length ? res.findings[0].detail : '',
   };
+}
+
+/* ---------------------------------------------------------------------------
+ * G6-5 (section-reference resolution) and G6-6 (ledger status closed set) probes
+ * (slice DIRECTIVE-REVIEW-SATURATION, v1.13). Both sub-checks landed in g6.js, so
+ * T19-T28 below are what makes them falsifiable: each guard (target region, bold-label
+ * collection, exclusion markers, closed set, `_EN` word table) is removed in turn and
+ * the matching assertion must go red.
+ * ------------------------------------------------------------------------ */
+
+/** Region head of the G6-5 target region (§0.3 change log). */
+const H030 = '### 0.3 变更日志\n\n';
+/** Region head of the G6-6 target region (§12.4 observation ledger). */
+const H124 = '### 12.4 观察项台账\n\n';
+/** Mutation target ②: `labelsFromLines`'s bold line-leading label collector. */
+const BOLD_LABEL_COLLECTOR = '    m = LABEL_BOLD_RE.exec(l);\n    if (m) out.add(m[1]);\n';
+/** Mutation target ③: the CN closed set's first entry. */
+const CN_FIRST_STATUS_WORD = "  cn: ['观察中', ";
+const G6_SOURCE = path.join(__dirname, 'lib', 'criteria', 'g6.js');
+
+function detailOf(records, id) {
+  const r = records.find((x) => x.id === id);
+  return r ? String(r.detail) : '';
+}
+
+/**
+ * Run a subset against an arbitrary criterion module. The stock `runSubset` is bound to
+ * the shipped G6/G7 objects; the mutation probes need a patched copy instead.
+ */
+function runIn(mod, ctx, enable) {
+  const out = createReport();
+  const results = {};
+  for (const sub of mod.subchecks) {
+    if (enable.indexOf(sub.id) < 0) continue;
+    results[sub.id] = sub.run(ctx, out);
+  }
+  return { records: out.records, results };
+}
+
+/**
+ * Mutation harness (T25 / T28): compile a PATCHED copy of `lib/criteria/g6.js` and hand
+ * back its exports.
+ *
+ * Why `Module._compile` and not a disk rewrite: the sub-checks call the module-local
+ * `labelsFromLines` / read the module-local `LEDGER_STATUS_SETS`, so patching the
+ * EXPORTED object after `require` would be a no-op - exactly the stale mutation the F1
+ * check exists to catch. Rewriting the file and restoring it would work, but a process
+ * killed inside the mutation window (Ctrl-C, timeout, OOM) would leave a mutated
+ * criterion on disk for the next `--scope=tree` run to judge. Compiling a patched copy
+ * in memory removes the guard from the code that actually executes, cannot leak, and is
+ * still verified two ways: the patch must APPLY (`applied`, enforced by F1) and the
+ * shipped file must be BYTE-IDENTICAL before and after (`identical`).
+ */
+function loadMutatedG6(from, to, tag) {
+  const before = fs.readFileSync(G6_SOURCE);
+  const src = decodeBuffer(before);
+  const patched = src.split(from).join(to);
+  MUTATION_LOG.push({ key: 'g6.js:' + tag, op: 'sourcePatch', needle: from, applied: patched !== src });
+  const M = require('module');
+  const mod = new M(G6_SOURCE, null);
+  mod.filename = G6_SOURCE;
+  mod.paths = M._nodeModulePaths(path.dirname(G6_SOURCE));
+  mod._compile(patched, G6_SOURCE);
+  return { exports: mod.exports, applied: patched !== src, identical: fs.readFileSync(G6_SOURCE).equals(before) };
+}
+
+/** G6-5 verdict + finding count + record detail for one synthetic file body. */
+function g65Probe(text, virtualPath) {
+  const p = virtualPath || 'docs/t027/probe-g6-5.md';
+  const lines = String(text).split('\n');
+  const ctx = {
+    // `readText` is deliberately absent: the criterion's directive-label read then falls
+    // back to the real repository file, which is what gives these probes real labels.
+    repoRoot: discoverRepoRoot(__dirname),
+    changedMarkdown: () => [p],
+    readLineArray: (q) => (q === p ? lines : null),
+    addedLineNumbers: () => new Set(lines.map((_, i) => i + 1)),
+    loadWhitelist: () => ({ entries: [], error: null, source: 'probe' }),
+  };
+  const out = createReport();
+  const res = G6.subchecks.find((s) => s.id === 'G6-5').run(ctx, out);
+  return { verdict: verdictOf(out.records, 'G6-5'), findings: res.findings.length, detail: detailOf(out.records, 'G6-5') };
+}
+
+/** G6-6 verdict + finding count + record detail for one synthetic file body. */
+function g66Probe(virtualPath, text) {
+  const lines = String(text).split('\n');
+  const ctx = {
+    repoRoot: discoverRepoRoot(__dirname),
+    changedMarkdown: () => [virtualPath],
+    readLineArray: (q) => (q === virtualPath ? lines : null),
+    addedLineNumbers: () => new Set(lines.map((_, i) => i + 1)),
+    loadWhitelist: () => ({ entries: [], error: null, source: 'probe' }),
+  };
+  const out = createReport();
+  const res = G6.subchecks.find((s) => s.id === 'G6-6').run(ctx, out);
+  return { verdict: verdictOf(out.records, 'G6-6'), findings: res.findings.length, detail: detailOf(out.records, 'G6-6') };
 }
 
 function runTests() {
@@ -1059,6 +1172,354 @@ function runTests() {
     check('T18 positive control: a genuine root commit still falls back to EMPTY_TREE',
       !!rootCommit.ctx && rootCommit.ctx.baseRef === EMPTY_TREE && rootCommit.ctx.headRef === 'HEAD',
       'err=' + (rootCommit.ctx ? 'baseRef=' + rootCommit.ctx.baseRef : rootCommit.err && rootCommit.err.message));
+  }
+
+  // ---- T19: G6-5 legal references - exact heading, parent prefix, bold line-leading label.
+  {
+    const r = runSubset(makeCtx(['g6-5-legal-refs']), ALL_SUBCHECKS);
+    const d = detailOf(r.records, 'G6-5');
+    check(
+      'T19 G6-5 accepts §7.5 (exact heading) / §7.2 (parent prefix of §7.2.1) / §1.7.1 (bold line-leading label)',
+      failIds(r.records).length === 0,
+      'fails=' + JSON.stringify(failIds(r.records))
+    );
+    check(
+      'T19 the legal fixture is scanned (6 in-region lines, 3 references) with zero findings',
+      r.results['G6-5'].findings.length === 0 && /scanned 6, refs 3/.test(d),
+      'findings=' + r.results['G6-5'].findings.length + ' :: ' + d
+    );
+    const lab = G6.internals.directiveLabels(makeCtx(['g6-5-legal-refs']));
+    check(
+      'T19 directiveLabels reads the REAL directive: bold line-leading §1.7.1 plus heading §7.5 / §7.2.1',
+      lab.has('1.7.1') && lab.has('7.5') && lab.has('7.2.1'),
+      'has(1.7.1)=' + lab.has('1.7.1') + ' has(7.5)=' + lab.has('7.5') + ' has(7.2.1)=' + lab.has('7.2.1')
+    );
+    check(
+      'T19 resolvesRef: exact and parent-prefix accepted, a dangling number rejected',
+      G6.internals.resolvesRef('7.5', lab) &&
+        G6.internals.resolvesRef('7.2', lab) &&
+        G6.internals.resolvesRef('1.7.1', lab) &&
+        !G6.internals.resolvesRef('7.9', lab),
+      JSON.stringify(['7.5', '7.2', '1.7.1', '7.9'].map((n) => n + '=' + G6.internals.resolvesRef(n, lab)))
+    );
+  }
+
+  // ---- T20: G6-5 dangling reference (the OB-32 "the reference dangles" subclass it does cover).
+  {
+    const r = runSubset(makeCtx(['g6-5-dangling-ref']), ALL_SUBCHECKS);
+    const d = detailOf(r.records, 'G6-5');
+    check(
+      'T20 G6-5 FAILs a §7.9 reference on a line INSIDE the §0.3 region',
+      verdictOf(r.records, 'G6-5') === 'FAIL',
+      'verdict=' + verdictOf(r.records, 'G6-5')
+    );
+    check(
+      'T20 exactly one finding, and its detail names `§7.9 unresolved`',
+      r.results['G6-5'].findings.length === 1 && /§7\.9 unresolved/.test(d),
+      'findings=' + r.results['G6-5'].findings.length + ' :: ' + d
+    );
+    const fixed = runSubset(
+      makeCtx(['g6-5-dangling-ref'], {
+        mutations: [{ key: 'g6-5-dangling-ref', op: 'replace', from: '§7.9', to: '§7.8' }],
+      }),
+      ALL_SUBCHECKS
+    );
+    check(
+      'T20 reverse mutation (§7.9 -> §7.8) clears G6-5: the assertion tracks the reference, not the line',
+      verdictOf(fixed.records, 'G6-5') === 'PASS',
+      'verdict=' + verdictOf(fixed.records, 'G6-5')
+    );
+  }
+
+  // ---- T21: the appendix C.1 v3.1 comparison table is outside the target region BY CONSTRUCTION.
+  {
+    const r = runSubset(makeCtx(['g6-5-c1-v31-table']), ALL_SUBCHECKS);
+    const d = detailOf(r.records, 'G6-5');
+    check(
+      'T21 the C.1 v3.1 comparison table produces no finding (zero corpus FAIL)',
+      failIds(r.records).length === 0 && r.results['G6-5'].findings.length === 0,
+      'fails=' + JSON.stringify(failIds(r.records))
+    );
+    check('T21 the excluded §3.10 row is genuinely out of region: 0 references counted', /refs 0/.test(d), d);
+    const mut = runSubset(
+      makeCtx(['g6-5-c1-v31-table'], {
+        mutations: [{ key: 'g6-5-c1-v31-table', op: 'replace', from: '### C.1', to: '### C.1X' }],
+      }),
+      ALL_SUBCHECKS
+    );
+    check(
+      'T21 boundary mutation (rename the `### C.1` heading) pulls the §3.10 row back into the region and turns G6-5 red',
+      verdictOf(mut.records, 'G6-5') === 'FAIL' && /§3\.10 unresolved/.test(detailOf(mut.records, 'G6-5')),
+      'verdict=' + verdictOf(mut.records, 'G6-5') + ' :: ' + detailOf(mut.records, 'G6-5')
+    );
+  }
+
+  // ---- T22: the self-reference guard on the G6-5 path, all five exclusion markers.
+  {
+    const r = runSubset(makeCtx(['g6-5-excluded-ref']), ALL_SUBCHECKS);
+    check(
+      'T22 G6-5 skips a line carrying the 示例 exclusion marker',
+      verdictOf(r.records, 'G6-5') === 'PASS' && r.results['G6-5'].findings.length === 0,
+      'verdict=' + verdictOf(r.records, 'G6-5')
+    );
+    const mut = runSubset(
+      makeCtx(['g6-5-excluded-ref'], {
+        mutations: [{ key: 'g6-5-excluded-ref', op: 'firstReplace', from: '示例行：', to: '实执行：' }],
+      }),
+      ALL_SUBCHECKS
+    );
+    check(
+      'T22 reverse mutation (drop the 示例 marker) turns the very same line red on §7.9',
+      verdictOf(mut.records, 'G6-5') === 'FAIL' && /§7\.9 unresolved/.test(detailOf(mut.records, 'G6-5')),
+      'verdict=' + verdictOf(mut.records, 'G6-5') + ' :: ' + detailOf(mut.records, 'G6-5')
+    );
+    for (const marker of ['不得残留', '示例', '引文', '冲突', '矛盾']) {
+      const withMarker = g65Probe(H030 + '| v1.13 | x | ' + marker + '：见 §7.9 的说明 | y |\n');
+      const withoutMarker = g65Probe(H030 + '| v1.13 | x | 见 §7.9 的说明 | y |\n');
+      check(
+        'T22 exclusion marker `' + marker + '` suppresses the finding, and dropping it restores the red',
+        withMarker.verdict === 'PASS' &&
+          withMarker.findings === 0 &&
+          withoutMarker.verdict === 'FAIL' &&
+          withoutMarker.findings === 1,
+        'with=' + withMarker.verdict + '/' + withMarker.findings + ' without=' + withoutMarker.verdict + '/' + withoutMarker.findings
+      );
+    }
+  }
+
+  // ---- T23: the whitelist escape hatch (G6-5 reports through the shared `emit`).
+  {
+    const v = FIXTURES['g6-5-dangling-ref'].virtual;
+    const r = runSubset(
+      makeCtx(['g6-5-dangling-ref'], {
+        whitelist: [
+          { match: '§7.9', file: v, reason: 'T23 in-memory registration: external-document section number (probe only)' },
+        ],
+      }),
+      ALL_SUBCHECKS
+    );
+    check(
+      'T23 an in-memory whitelist entry exempts the dangling reference (PASS + exactly one SKIP)',
+      verdictOf(r.records, 'G6-5') === 'PASS' &&
+        r.records.filter((x) => x.id === 'G6-5' && x.verdict === 'SKIP').length === 1,
+      'verdict=' + verdictOf(r.records, 'G6-5') + ' skips=' + r.records.filter((x) => x.id === 'G6-5' && x.verdict === 'SKIP').length
+    );
+    const none = runSubset(makeCtx(['g6-5-dangling-ref']), ALL_SUBCHECKS);
+    check(
+      'T23 the exemption is load-bearing: the same fixture without the entry stays red',
+      verdictOf(none.records, 'G6-5') === 'FAIL',
+      'verdict=' + verdictOf(none.records, 'G6-5')
+    );
+    const preloaded = decodeBuffer(fs.readFileSync(path.join(__dirname, 'g6-whitelist.txt')))
+      .split('\n')
+      .filter((l) => l.trim() && l.trim()[0] !== '#');
+    check(
+      'T23 no entry was preloaded into tools/gates/g6-whitelist.txt (the exemption above is in-memory only)',
+      preloaded.length === 0,
+      'entries=' + JSON.stringify(preloaded)
+    );
+  }
+
+  // ---- T24: a §7.9 reference OUTSIDE every target region is not judged at all.
+  {
+    const r = runSubset(makeCtx(['g6-5-outside']), ALL_SUBCHECKS);
+    const d = detailOf(r.records, 'G6-5');
+    check(
+      'T24 the out-of-region §7.9 line yields no finding: 6 lines scanned, 0 references counted',
+      verdictOf(r.records, 'G6-5') === 'PASS' && r.results['G6-5'].findings.length === 0 && /scanned 6, refs 0/.test(d),
+      d
+    );
+    const mut = runSubset(
+      makeCtx(['g6-5-outside'], {
+        mutations: [{ key: 'g6-5-outside', op: 'dropLineContaining', needle: '## 9. 其他事项' }],
+      }),
+      ALL_SUBCHECKS
+    );
+    check(
+      'T24 boundary mutation (drop the closing heading) extends the region onto the §7.9 line and turns G6-5 red',
+      verdictOf(mut.records, 'G6-5') === 'FAIL' && /§7\.9 unresolved/.test(detailOf(mut.records, 'G6-5')),
+      'verdict=' + verdictOf(mut.records, 'G6-5') + ' :: ' + detailOf(mut.records, 'G6-5')
+    );
+  }
+
+  // ---- T25: mutation ② (drop the bold line-leading label collection) => §1.7.1 goes red.
+  {
+    const pre = runIn(G6, makeCtx(['g6-5-legal-refs']), ['G6-5']);
+    check(
+      'T25 precondition: the legal fixture is green BEFORE the mutation',
+      verdictOf(pre.records, 'G6-5') === 'PASS',
+      'verdict=' + verdictOf(pre.records, 'G6-5')
+    );
+    const mut = loadMutatedG6(
+      BOLD_LABEL_COLLECTOR,
+      '    // mutation: bold-label collection removed\n',
+      'labelsFromLines'
+    );
+    check(
+      'T25 mutation ② applied: the patch text matched g6.js (a stale patch would weaken the suite silently)',
+      mut.applied === true,
+      'applied=' + mut.applied
+    );
+    const r = runIn(mut.exports, makeCtx(['g6-5-legal-refs']), ['G6-5']);
+    const d = detailOf(r.records, 'G6-5');
+    check(
+      'T25 mutation ②: without the bold-label collector the §1.7.1 reference dangles and G6-5 turns red',
+      verdictOf(r.records, 'G6-5') === 'FAIL' && r.results['G6-5'].findings.length === 1 && /§1\.7\.1 unresolved/.test(d),
+      'verdict=' + verdictOf(r.records, 'G6-5') + ' findings=' + r.results['G6-5'].findings.length + ' :: ' + d
+    );
+    check(
+      'T25 the same mutation leaves the heading-derived labels intact (§7.5 / §7.2 still resolve)',
+      !/§7\.5 unresolved/.test(d) && !/§7\.2 unresolved/.test(d),
+      d
+    );
+    check(
+      'T25 restore: g6.js is byte-identical after the mutation window (no disk residue)',
+      mut.identical === true,
+      'identical=' + mut.identical
+    );
+    const after = runIn(G6, makeCtx(['g6-5-legal-refs']), ['G6-5']);
+    check(
+      'T25 restore: the cached criterion module is unmutated, the legal fixture is green again',
+      verdictOf(after.records, 'G6-5') === 'PASS',
+      'verdict=' + verdictOf(after.records, 'G6-5')
+    );
+  }
+
+  // ---- T26: G6-6 closed-set legal rows plus the region/row-shape boundaries.
+  {
+    const r = runSubset(makeCtx(['g6-6-legal-status']), ALL_SUBCHECKS);
+    check(
+      'T26 all six CN closed-set words pass, including the `**已处置**（v1.1）` parenthetical shape',
+      verdictOf(r.records, 'G6-6') === 'PASS' &&
+        r.results['G6-6'].findings.length === 0 &&
+        /scanned 6/.test(detailOf(r.records, 'G6-6')),
+      'verdict=' + verdictOf(r.records, 'G6-6') + ' :: ' + detailOf(r.records, 'G6-6')
+    );
+    const gi = G6.internals;
+    check(
+      'T26 the CN/EN closed sets are exactly the six documented words',
+      JSON.stringify(gi.LEDGER_STATUS_SETS.cn) === JSON.stringify(['观察中', '待办', '待议', '已处置', '已裁决', '已登记']) &&
+        JSON.stringify(gi.LEDGER_STATUS_SETS.en) ===
+          JSON.stringify(['Observing', 'To do', 'To be discussed', 'Resolved', 'Ruling', 'Registered']),
+      JSON.stringify(gi.LEDGER_STATUS_SETS)
+    );
+    check(
+      'T26 firstStatusWord accepts `词`, `词（括注）`, `**词**（括注）` and rejects a legacy value',
+      gi.firstStatusWord('观察中', gi.LEDGER_STATUS_SETS.cn) === '观察中' &&
+        gi.firstStatusWord('观察中（当期）', gi.LEDGER_STATUS_SETS.cn) === '观察中' &&
+        gi.firstStatusWord('**已处置**（v1.1）', gi.LEDGER_STATUS_SETS.cn) === '已处置' &&
+        gi.firstStatusWord('**下一片必做**（…）', gi.LEDGER_STATUS_SETS.cn) === null,
+      JSON.stringify([
+        gi.firstStatusWord('观察中', gi.LEDGER_STATUS_SETS.cn),
+        gi.firstStatusWord('观察中（当期）', gi.LEDGER_STATUS_SETS.cn),
+        gi.firstStatusWord('**已处置**（v1.1）', gi.LEDGER_STATUS_SETS.cn),
+        gi.firstStatusWord('**下一片必做**（…）', gi.LEDGER_STATUS_SETS.cn),
+      ])
+    );
+    check(
+      'T26 rowCellsOf splits on unescaped pipes and drops the two outer cells',
+      JSON.stringify(gi.rowCellsOf('| OB-1 | a \\| b | 观察中 |')) === JSON.stringify([' OB-1 ', ' a \\| b ', ' 观察中 ']),
+      JSON.stringify(gi.rowCellsOf('| OB-1 | a \\| b | 观察中 |'))
+    );
+    check(
+      'T26 ledgerRegionRange = [§12.4 heading, next ^#{2,4} heading)',
+      JSON.stringify(gi.ledgerRegionRange(['x', '### 12.4 台账', '| a |', '### 12.5 缺口'])) === JSON.stringify([1, 3]),
+      JSON.stringify(gi.ledgerRegionRange(['x', '### 12.4 台账', '| a |', '### 12.5 缺口']))
+    );
+
+    const shared = '| OB-1 | d | x | 下一片必做 |\n\n';
+    const above = g66Probe('docs/t027/probe-g6-6-above.md', shared + H124 + '| OB-2 | d | x | 观察中 |\n');
+    check(
+      'T26 a ledger-shaped row ABOVE the §12.4 heading is out of region and not judged',
+      above.verdict === 'PASS' && above.findings === 0,
+      'verdict=' + above.verdict + ' findings=' + above.findings
+    );
+    const nonOb = g66Probe('docs/t027/probe-g6-6-nonob.md', H124 + '| X-1 | d | x | 下一片必做 |\n');
+    check(
+      'T26 a non-OB table row inside §12.4 is not judged (LEDGER_ROW_RE)',
+      nonOb.verdict === 'PASS' && nonOb.findings === 0,
+      'verdict=' + nonOb.verdict + ' findings=' + nonOb.findings
+    );
+    const noRegion = g66Probe('docs/t027/probe-g6-6-noregion.md', '| OB-1 | d | x | 下一片必做 |\n');
+    check(
+      'T26 a ledger row in a file without a §12.4 heading is not judged (no target region)',
+      noRegion.verdict === 'PASS' && noRegion.findings === 0,
+      'verdict=' + noRegion.verdict + ' findings=' + noRegion.findings
+    );
+  }
+
+  // ---- T27: G6-6 legacy status words (the OB-38 failure class) + reverse mutation.
+  {
+    const r = runSubset(makeCtx(['g6-6-legacy-status']), ALL_SUBCHECKS);
+    const d = detailOf(r.records, 'G6-6');
+    check(
+      'T27 G6-6 FAILs `**下一片必做**` and `**已落地**` with exactly two findings',
+      verdictOf(r.records, 'G6-6') === 'FAIL' && r.results['G6-6'].findings.length === 2,
+      'verdict=' + verdictOf(r.records, 'G6-6') + ' findings=' + r.results['G6-6'].findings.length + ' :: ' + d
+    );
+    check(
+      'T27 both offending cells are named, and the legal control row (已登记) is NOT reported',
+      /下一片必做/.test(d) && /已落地/.test(d) && !/:: 已登记/.test(d),
+      d
+    );
+    const fixed = runSubset(
+      makeCtx(['g6-6-legacy-status'], {
+        mutations: [
+          { key: 'g6-6-legacy-status', op: 'replace', from: '**下一片必做**', to: '**待办**' },
+          { key: 'g6-6-legacy-status', op: 'replace', from: '**已落地**', to: '**已处置**' },
+        ],
+      }),
+      ALL_SUBCHECKS
+    );
+    check(
+      'T27 reverse mutation (both legacy words -> closed-set words) clears G6-6',
+      verdictOf(fixed.records, 'G6-6') === 'PASS' && fixed.results['G6-6'].findings.length === 0,
+      'verdict=' + verdictOf(fixed.records, 'G6-6')
+    );
+  }
+
+  // ---- T28: mutation ③ (drop 观察中 from the CN closed set) + the `_EN` word-table switch.
+  {
+    const mut = loadMutatedG6(CN_FIRST_STATUS_WORD, '  cn: [', 'LEDGER_STATUS_SETS.cn');
+    check('T28 mutation ③ applied: the patch text matched g6.js', mut.applied === true, 'applied=' + mut.applied);
+    check(
+      'T28 the mutated CN closed set has five words and no 观察中',
+      mut.exports.internals.LEDGER_STATUS_SETS.cn.indexOf('观察中') < 0 &&
+        mut.exports.internals.LEDGER_STATUS_SETS.cn.length === 5,
+      JSON.stringify(mut.exports.internals.LEDGER_STATUS_SETS.cn)
+    );
+    const r = runIn(mut.exports, makeCtx(['g6-6-legal-status']), ['G6-6']);
+    const d = detailOf(r.records, 'G6-6');
+    check(
+      'T28 mutation ③: the 观察中 row alone turns red; the other five closed-set rows stay green',
+      verdictOf(r.records, 'G6-6') === 'FAIL' &&
+        r.results['G6-6'].findings.length === 1 &&
+        /:: 观察中(?: |$)/.test(d),
+      'verdict=' + verdictOf(r.records, 'G6-6') + ' findings=' + r.results['G6-6'].findings.length + ' :: ' + d
+    );
+    check(
+      'T28 restore: g6.js is byte-identical and the cached module still carries 观察中',
+      mut.identical === true && G6.internals.LEDGER_STATUS_SETS.cn.indexOf('观察中') >= 0,
+      'identical=' + mut.identical + ' cached=' + JSON.stringify(G6.internals.LEDGER_STATUS_SETS.cn)
+    );
+
+    const en = runSubset(makeCtx(['g6-6-en-status']), ALL_SUBCHECKS);
+    check(
+      'T28 the `_EN` fixture selects the EN word table: all six EN words pass',
+      verdictOf(en.records, 'G6-6') === 'PASS' &&
+        en.results['G6-6'].findings.length === 0 &&
+        /scanned 6/.test(detailOf(en.records, 'G6-6')),
+      'verdict=' + verdictOf(en.records, 'G6-6') + ' :: ' + detailOf(en.records, 'G6-6')
+    );
+    const row = '| OB-1 | d | x | ';
+    const cnName = g66Probe('docs/t027/probe-g6-6-cn.md', H124 + row + '**Observing** |\n');
+    const enName = g66Probe('docs/t027/probe-g6-6_EN.md', H124 + row + '**Observing** |\n');
+    const cnWordInEn = g66Probe('docs/t027/probe-g6-6-mix_EN.md', H124 + row + '观察中 |\n');
+    check(
+      'T28 the `_EN` word-table switch is load-bearing: EN word fails under a CN name, passes under `_EN`, CN word fails under `_EN`',
+      cnName.verdict === 'FAIL' && enName.verdict === 'PASS' && cnWordInEn.verdict === 'FAIL',
+      JSON.stringify({ cnName: cnName.verdict, enName: enName.verdict, cnWordInEn: cnWordInEn.verdict })
+    );
   }
 
   // ---- F1: a stale mutation (no-op) must not silently weaken the suite.
