@@ -460,7 +460,9 @@ Boundaries: this is a follow-up platform slice and must not rewrite the Windows 
 
 ---
 
-## Known defects (must be cleared **before B4**; **high-frequency / reproduced** defects only block, observation-grade flakes are recorded and listed in the B4 report)
+## Known defects (to be handled before later slices)
+
+> **Blocking rule unchanged**: only high-frequency / reproduced defects block; observation-grade flakes are recorded and listed in the validation report.
 
 | Id | Carrier | Symptom (reproducible description) | Evidence (two runs) | Disposition plan |
 | --- | --- | --- | --- | --- |
