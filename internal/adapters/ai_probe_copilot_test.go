@@ -3,6 +3,7 @@ package adapters
 import (
 	"context"
 	"slices"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -60,7 +61,7 @@ func TestCopilotCLIProbeBuildsIsolatedDeepSeekSmoke(t *testing.T) {
 		"--model", "deepseek-flash",
 		"--output-format", "json",
 		"--stream", "on",
-		"--max-ai-credits", "1",
+		"--max-ai-credits", "30",
 		"--disable-builtin-mcps",
 		"--disallow-temp-dir",
 		"--no-custom-instructions",
@@ -270,5 +271,74 @@ func TestCopilotCLIProbeMapsTimeoutWithoutRawError(t *testing.T) {
 	}
 	if result.Status != "unknown" || result.Reason != "timeout" {
 		t.Fatalf("unexpected result: %+v", result)
+	}
+}
+
+func copilotCLIProbeCreditArgument(t *testing.T, args []string) string {
+	t.Helper()
+	for index, argument := range args {
+		if argument != "--max-ai-credits" {
+			continue
+		}
+		if index+1 >= len(args) {
+			t.Fatal("--max-ai-credits carries no value")
+		}
+		return args[index+1]
+	}
+	t.Fatal("--max-ai-credits is missing from the probe arguments")
+	return ""
+}
+
+func TestCopilotCLIProbeAppliesCreditFloorWithoutChangingRequestBudget(t *testing.T) {
+	for name, maximumRequests := range map[string]int{"floor-raised": 1, "floor-exact": copilotCLICreditFloor, "above-floor": 40} {
+		t.Run(name, func(t *testing.T) {
+			executor := &fakeCopilotCLIProbeExecutor{execution: CopilotCLIProbeExecution{
+				Outcome:               "exited",
+				ExitCode:              0,
+				ResultSeen:            true,
+				ResultExit:            0,
+				ResultUsageSeen:       true,
+				Reply:                 "PONG",
+				RequestsUsed:          1,
+				UsageSeen:             true,
+				UsageUserRequests:     1,
+				UsageProviderRequests: 1,
+				Evidence:              []string{queueHashOne},
+			}}
+			probe := CopilotCLIProbe{Executable: "copilot.exe", WorkingDirectory: `C:\probe`, Executor: executor}
+			result, err := probe.Probe(context.Background(), deepSeekProfile(), []byte("not-a-real-secret"), "agent-runner-cli", maximumRequests)
+			if err != nil {
+				t.Fatal(err)
+			}
+			wantCredits := maximumRequests
+			if wantCredits < copilotCLICreditFloor {
+				wantCredits = copilotCLICreditFloor
+			}
+			if got := copilotCLIProbeCreditArgument(t, executor.invocation.Args); got != strconv.Itoa(wantCredits) {
+				t.Fatalf("unexpected --max-ai-credits: got %q want %d", got, wantCredits)
+			}
+			if result.Status != "available" || result.RequestsUsed != 1 {
+				t.Fatalf("the product request budget must stay unchanged: %+v", result)
+			}
+		})
+	}
+}
+
+func TestCopilotCLIProbeCreditFloorKeepsCliRejectionFailClosed(t *testing.T) {
+	executor := &fakeCopilotCLIProbeExecutor{execution: CopilotCLIProbeExecution{
+		Outcome:     "exited",
+		ExitCode:    1,
+		FailureCode: "policy_blocked",
+	}}
+	probe := CopilotCLIProbe{Executable: "copilot.exe", WorkingDirectory: `C:\probe`, Executor: executor}
+	result, err := probe.Probe(context.Background(), deepSeekProfile(), []byte("not-a-real-secret"), "agent-runner-cli", 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.Status == "available" || result.Reason != "policy_blocked" {
+		t.Fatalf("a CLI rejection must stay fail-closed: %+v", result)
+	}
+	if got := copilotCLIProbeCreditArgument(t, executor.invocation.Args); got != strconv.Itoa(copilotCLICreditFloor) {
+		t.Fatalf("the floor must still be applied when the CLI rejects: got %q", got)
 	}
 }

@@ -338,7 +338,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 完成记录（2026-09-17）：
 - **结论**：在**已评估范围**（GitHub 托管 Copilot CLI 稳定通道 **1.0.83** 与 **1.0.85**）内**无可接受候选**：T026 的两项 unsupported（`toolControl` 的 `gci` 别名绕过、`networkControl` 的 shell 出口绕过）在 1.0.85 上**仍复现**（含 OS 级运行时 argv 证据：deny 参数确实进入候选进程命令行，而被覆盖命令仍由 CLI 自启子进程执行）。⇒ **保持 blocked**，不进入 B2 的 candidate-native 路线；**未评估、未排除**：BYOK `deepseek-anthropic` 与非 Copilot CLI 候选族。
 - **探针**：9/10 尝试、**6 个付费 premium request**；#3/#4/#5 与一个排除工件为零付费；工作区内无生产改动。
-- **产品缺陷 DR-1（已登记，未修）**：`ai check` 把 `--max-requests` 直通为 CLI 的 `--max-ai-credits`（`ai_probe_copilot.go:111`），而 `ai check` 强制 `--max-requests == 1`（`console/ai.go:46`），CLI 要求 ≥30 ⇒ 产品可用性探针**无法驱动该候选**，`ai-availability` 记录返回 `unknown`、`requestsUsed=0` ⇒ **“真实 availability verdict”仍不存在**。修复属生产变更，需另立切片 + 协议先行。
+- **产品缺陷 DR-1（已由切片 `DR-1` 修复，2026-09-24）**：`ai check` 曾把 `--max-requests` 直通为 CLI 的 `--max-ai-credits`（原 `ai_probe_copilot.go:111` ⇒ 现 `:117` 取 `max(30, maximumRequests)`），而 `ai check` 仍强制 `--max-requests == 1`（`console/ai.go:46`）；pin 1.0.83 要求 ≥30，故修复前产品探针无法驱动该候选。修复后产品探针产出 `available`（记录见 `docs/validation/evidence/dr-1-2026-09-24/availability-1083-available.json`，与 B1 主基线同 `profileConfigHash`）；**残余差异（费用维度）按 R1=A 不修**，登记为候选 OB-52。
 - **审查**：③ V4 Pro 预审 2 轮（`PASS WITH FIXES`：1 High + 2 Medium + 5 Low → `PRE-REVIEW: PASS`）；③.5 MAI `INDEPENDENT SCAN: PASS`（Section B: NONE）；④ Codex 终审 3 轮（第 1 轮 1 High + 1 Low、第 2 轮 2 Medium + 1 Low，均整改 → 第 3 轮 **`RE-REVIEW: PASS`**）。
 - **⑤ 门禁**（无生产改动，仅确认树仍绿）：`gofmt -l` 空、`go build`/`go vet` 干净、`go test -count=1 ./...` 13 包 ok、contract 4/4。
 - **收编落地（2026-09-17 收尾，用户同轮授权提交推送 origin）**：runner 收编为仓库工具 `tools/agent-probe/Invoke-CandidateProbe.ps1`（默认 dry-run；**仅 `-Run` 执行候选**，`-RequireVersionText` 无 `-Run` 亦拒；SHA-256 pin；工件根限仓 `tmp/` 子树并拒逃逸/已存在/reparse）+ 自检 `tools/agent-probe/Test-CandidateProbe.ps1`（stub 候选、零模型调用；`checks=35 failures=0`，且自测自清、不遗留空父目录）；决定性工件脱敏后入库 `docs/validation/evidence/b1-20260917/`（README 含逐文件 sha256；两份 `*.argv.json` 按仓库 `.json` 规则由 CRLF 归一为 LF，语义经 round-trip 校验不变）。收编另经 ④ Codex 6 轮复审收至 **`RE-REVIEW: PASS`**（无 Medium+），随后一次自洁性小修再经 ④ 1 轮 `RE-REVIEW: PASS`。提交：`2ccdf41`（feat: 工具收编）与 `c5c22ad`（chore: 自洁性修正），已推 origin/main；CI 两次均 success（`35147567004`、`35149373780`，Go windows/ubuntu 双腿含 Race 与 Contract fixtures）。`tmp/` 已按纪律清理，仅剩 `.gitkeep`。
@@ -524,6 +524,24 @@ A6 ② 进度（第 2 批，2026-09-15）：
 
 **收尾结论（⑧b，2026-09-22）**：四行 DR 由**同一修复方案**统一消除，并以 **3 连推首跑双腿全绿**验证（run `35646859765` / `35647349443` / `35648196443`）；**验收①–⑥ 全部达成**（含 `-count=10` 全绿、变异反证甲-i/甲-ii、门禁 `TOTAL_FAIL=0`）；**§12.1 试点指标**中“缺陷自捕获率”**未达标**（2/5 = 40%，目标 ≥ 3/4，原因与行动见报告 §9），其余指标达成。**本片新增未登记项**：**审查包完整性与台账一致性两类缺 G1–G5 机械判据** ⇒ 报告 §9 建为下一个 `[SLICE]` 的候选内容。
 
+### DR-1 切片定义回写（2026-09-24）
+
+| 字段 | 内容 |
+| --- | --- |
+| 标识 | `DR-1`（业务切片验证，非准则治理；触发词 `切片:DR-1`） |
+| 目标 | 使 `prfrail ai check` 在同一 pin（1.0.83，sha256 `d3f3bb7b…`）上产出 `available` 记录（`requestsUsed=1`、退出码 0、无 `reason`），并与 B1 修复前基线逐字段对照 |
+| 依赖 | 代码侧无前置；验证侧 1 次真实 `ai check`（须同轮探针授权）；审查侧按 B1 登记口径做独立审查；环境侧 host 凭据在位（2026-09-24 只读确认：凭据管理器含 `https://github.com:larsonzh.copilot-cli`） |
+| 规模 | S |
+| 步骤 | ①架构（V4 Pro）→ ②b 代码（`--max-ai-credits` 取 `max(30, maximumRequests)`，floor 常量 30）→ ③测试与变异检验 → ④门禁 → ⑤预审 → ⑥独立扫描 → ⑦终审（`deepseek-v4-pro`，降级；按 OB-37 元规则以 ADR 留痕，见 `docs/ADR_REGISTER.md` 的 ADR-014）→ ⑧a/⑧b 文档 → ⑨原生验证（1 次真探针）→ ⑩停点；②a 协议先行不触发（R1=A） |
+| 现状缺口 | 产品可用性入口对真实候选始终为 `unknown` ⇒ 依 CONTRACTS §7 的 fail-closed 预检，真实候选上的 AI 入口无法准入；定位成本已由 B1 实证（9 次尝试 / 6 个付费请求） |
+| 交付物 | `internal/adapters/ai_probe_copilot.go` 与其测试；报告 `docs/validation/dr-1-availability-probe-floor{,_EN}.md`；证据包 `docs/validation/evidence/dr-1-2026-09-24/`（链配置 + 修复前后记录 + argv 与 stderr 捕获 + 校验清单）；本台账与 `DEV_PLAN{,_EN}` 回写 |
+| 验收证据 | ① 新记录严格解码通过且 `status=available`、`requestsUsed=1`、无 `reason`；② `ai check` 退出码 0；③ argv 断言 `--max-ai-credits=30` 且 `--max-requests` 语义不变；④ 修复前后对照表（B1 基线 `unknown` 与 0 次请求 ↔ 新记录）；⑤ 变异检验：floor 还原即红；⑥ 门禁全绿 |
+| 边界 | 改动面限 `ai_probe_copilot.go` 与其测试（`ai.go` 零改动）；不改记录字段与 schema；不放宽任何 fail-closed 分支；CONTRACTS §7 的措辞与实测之间的差异如实标注且本片不修；探针额度 5（目标 1）；commit 与 push 须同轮授权；不推 gitee |
+
+**起跑（2026-09-24）**：步骤 0 已落地——链配置 `docs/validation/evidence/dr-1-2026-09-24/proofrail.chain.json` 经 `config explain` 自证 `profileConfigHash` 与主基线逐字一致，模型取非黑名单的 `mai-code-1.1-flash`。
+
+**收尾（2026-09-24，等 commit / push 授权）**：⑤ `PASS WITH FIXES` → 复审 `PASS`；⑥ `INDEPENDENT SCAN: FINDINGS`（按 §7.2 替代路径转入 ⑦）；⑦ `FINAL REVIEW: PASS`；⑨ 真探针 1 次得 `available`（1/5）。报告 `docs/validation/dr-1-availability-probe-floor{,_EN}.md`（双语两份，逐行 0 失配）。
+
 ## 完成记录（追加）
 
 | 日期 | 切片 | 完成摘要 | 证据 |
@@ -544,6 +562,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 2026-09-22 | DR-FIX | **首个正式切片（试点 `[PILOT]`）**：`tools/agent-probe/enforcement-proxy` 测试包时序竞态（DR-2/3/4/5）**共享根因**判定与**单一修复方案**（`waitForAccepts` 3 s 硬截止 / 20 ms 轮询，四处读点 + 完成记录 `waitForRecord` + `close()` 加锁 + `readLog` 容忍撕裂尾行）；① 任务 A 逐字排除“共享 rig / 临时目录”；变异判据分甲-i（回归会被抓）/ 甲-ii（修复本体被证伪）且均实测变红，`-count=10` 全绿，包级密闭自检 `checks=13 failures=0`，门禁 `TOTAL_FAIL=0`；⑤ 预审独立贡献“不对称性论证”，⑥ `PASS`（含一行执行类自报**不作证据**）、⑦ 终审 4 条 → 复审 `PASS`（0 High / 0 Medium / 0 Low / 3 Note）；**3 连推首跑双腿全绿**（run `35646859765` / `35647349443` / `35648196443`）；已提交 `ff259b2`（修复）+ `9f68a52`（台账 / 准则）+ `1b01115`（报告）并推送 `origin/main`（**未推 gitee**）；**未达标项如实登记**：缺陷自捕获率 2/5（目标 ≥ 3/4） | docs/validation/dr-fix-enforcement-proxy.md；台账 §已知缺陷 DR-2…DR-5 行 + §累计发生次数表 |
 
 | 2026-09-23 | B4 | （依据 `docs/validation/t027-at23-e2e.md`）AT-23 机制腿端到端证据 + 独立审查：装配 harness（`tools/b4-e2e/`，复用生产包、无 `os/exec`）在真实 Windows 宿主驱动五个面（隔离 workspace、timeout、日志缺失、未知恢复、exit 0 后重扫）的正/反向与包内重跑腿。**四事分立**：B4 切片 ✅；**AT-23 未通过**（真实 AI 候选腿不可达，见 OB-21）；T018 剩余门未闭合；S1 exit 未做。审查：⑤ 预审 F1–F5 整改并复审确认；⑥ 独立扫描 `PASS`、0 发现；⑦ 终审 F1–F5 与 R-1..R-4（R-1「契约措辞需修订」触发预声明红线并停下升级 ⇒ 用户裁决后修订 `CONTRACTS` §7 次序措辞、**只改措辞不动代码**，登记 OB-22）；⑦ 复审所报 Medium 按 OB-11 例外标准确定性闭合（OB-24）。跳过面的替代证据一律标注**非等价替代**（门禁端口对另标**策略端口未覆盖**），**本片不主张等价覆盖**。⑤ 门禁三作用域 `TOTAL_FAIL=0`、`SELFTEST PASS`；⑨ 原生验证含同命令复跑（差异仅落在已声明易变字段）与 `tmp/b4/SHA256SUMS.txt` 全量重算 0 失配。**已提交 `e8cbff6` 并推送 `origin/main`（未推 gitee）**；CI run **`35812311023`** 双腿全绿，两腿 `Gates` 步骤均实测执行（`TOTAL_FAIL=0`）。**契约修订的派生成本**：其引入的文档表述另耗一轮 ⑦ 复审（数据点已记入报告 §9.5） | docs/validation/t027-at23-e2e.md |
+| 2026-09-24 | DR-1 | **业务切片（含一次准则台账补登）**：把 `ai check` 传给候选 CLI 的 `--max-ai-credits` 改为 `max(30, maximumRequests)`（floor 常量 30），使产品可用性探针首次在 pin 1.0.83 上产出 `available`（`requestsUsed=1`、退出码 0、`profileConfigHash` 与 B1 主基线逐字一致）。②b/③ 只动 `ai_probe_copilot.go` 与其测试（`ai.go` 零改动）；变异检验（恰好 1 处命中 + 变异后三处红 + 逐字节还原 sha256 一致）通过；④ 门禁 `TOTAL_FAIL=0`。⑤ `PASS WITH FIXES` → 复审 `PASS`（2/2）；⑥ `INDEPENDENT SCAN: FINDINGS`（按 §7.2 替代路径转入 ⑦）；⑦ `FINAL REVIEW: PASS`（降级 `deepseek-v4-pro`，ADR-014）；⑨ 探针 1/5。**未提交**（等同轮授权）。**已知差异（R1=A 不修）**登记为候选 OB-52。 | docs/validation/dr-1-availability-probe-floor.md |
 
 > **台账完整性注记（2026-09-21，已按用户授权补录）**：本表自 A4 行之后长期未追加完成行。**2026-09-21 依据各切片自己的验证报告补录 A5/A6/A7/B2/B3a 五行**（受"不凭记忆、只补可核验字段、缺失留空并标注历史缺失、不编造"三条约束），B3b 行先于本次补录写入，故五行列于其后；各行的日期/提交号/运行号/摘要均逐项标注来源，无法核验者已标注 **历史缺失**。
 > 仍待回填：**B3a 的 `DEV_PLAN{,_EN}.md` 段落**（该文件 A0–A7/B1/B2 段均在，唯 B3a/B3b 缺；B3b 段已补，B3a 段待按其报告回填）。

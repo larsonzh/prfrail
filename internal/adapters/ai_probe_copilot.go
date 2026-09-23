@@ -16,6 +16,12 @@ const (
 	copilotCLIProbeReply  = "PONG"
 )
 
+// copilotCLICreditFloor is the candidate CLI's documented minimum for
+// --max-ai-credits (B1 probe #5: "Use at least 30 AI credits"). It is a
+// candidate/platform fact, not the product request budget: the product budget
+// stays the caller's maximumRequests and is still enforced one request later.
+const copilotCLICreditFloor = 30
+
 var ErrInvalidCopilotCLIProbe = errors.New("invalid Copilot CLI probe")
 
 type CopilotCLIProbeInvocation struct {
@@ -108,7 +114,7 @@ func copilotCLIProbeArgs(model, workingDirectory string, maximumRequests int) []
 		"--model", model,
 		"--output-format", "json",
 		"--stream", "on",
-		"--max-ai-credits", strconv.Itoa(maximumRequests),
+		"--max-ai-credits", strconv.Itoa(max(copilotCLICreditFloor, maximumRequests)),
 		"--disable-builtin-mcps",
 		"--disallow-temp-dir",
 		"--no-custom-instructions",

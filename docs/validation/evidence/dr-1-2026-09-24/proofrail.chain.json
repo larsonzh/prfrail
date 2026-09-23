@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "1.0.0",
+  "chain": {
+    "id": "dr-1-availability-probe",
+    "profile": "minimal"
+  },
+  "tasks": [
+    {
+      "id": "verify-dr-1-scope",
+      "review": "manual",
+      "steps": [
+        {
+          "id": "record-dr-1-scope",
+          "kind": "noop",
+          "reason": "DR-1 chain configuration input for the ai check availability probe"
+        }
+      ]
+    }
+  ],
+  "workspace": {
+    "components": [
+      {
+        "id": "dr-1-evidence",
+        "root": ".",
+        "languageScopes": [
+          {
+            "id": "dr-1-main",
+            "language": "generic",
+            "harness": "generic-standard",
+            "toolchain": "shell-basic",
+            "targets": ["source"]
+          }
+        ]
+      }
+    ]
+  },
+  "ai": {
+    "profiles": [
+      {
+        "profileId": "copilot-cli-host",
+        "providerType": "github",
+        "model": "mai-code-1.1-flash",
+        "authMode": "host"
+      }
+    ],
+    "channels": [
+      {
+        "channel": "agent-runner-cli",
+        "profileId": "copilot-cli-host"
+      }
+    ]
+  }
+}
