@@ -344,3 +344,38 @@ tmp/DELIVERY_DIRECTIVE_v111_REVIEW_R3.md	local-only
 tmp/DELIVERY_DIRECTIVE_v112_REVIEW.md	local-only
 tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R5.md	local-only
 ```
+
+## 12. Freeze ruling and CI result (v1.12 frozen)
+
+> **This section is a post-freeze record** (user ruling 2026-09-23, item 4: the directive text is not changed again, and the report may only gain a "freeze ruling / CI result" subsection). It **supersedes** the state statement in §10's stop receipt that "nothing was committed or pushed during this slice" - that statement no longer holds once the actions recorded here are done; the rest of §10 is unaffected.
+
+### 12.1 The freeze ruling (a direct user ruling, recorded independently under OB-37's meta-rule)
+
+| Element | Content |
+|---|---|
+| Who ruled | the user |
+| Date | 2026-09-23 |
+| Reason | R7's disposition and ⑦'s third-round verdict have been accepted; the directive still has no written criterion for when a third-party re-review may stop ⇒ further iteration on the same revision buys less than its regression risk |
+| Basis | the user's ruling text this round: accept R7's disposition and ⑦'s third-round verdict, send no further third-party re-review, no R8, no ⑦ round 4 |
+| Carries rule-semantics changes | **No**: this section only records the ruling and the evidence, and changes none of the directive's clauses, criteria or vocabulary |
+| Precedent force | **not a precedent**: the stop condition still has no written criterion, so this stop is a direct user ruling; the formal criterion is defined by the next slice (see §12.3) |
+
+**Landing reading**: ① accept R7's disposition and ⑦'s third-round verdict (it returned `RE-REVIEW: PASS` with no Medium+), with **no further third-party re-review**; ② v1.12 is **frozen**: P1 to P9 landed and ⑦'s third round completed is what freezes it, whatever the verdict; ③ findings arising after R7 all become observation items, numbered from **OB-39** (see §12.3); ④ the next slice is `DIRECTIVE-REVIEW-SATURATION` (the review-convergence criterion: when a third-party re-review and ⑦ round N may stop), and `GATES-G1G5` and `GATES-TIGHTEN` are not folded into it.
+
+### 12.2 Commit and CI result
+
+| Item | Result |
+|---|---|
+| Commit | `5c8a6a4` (`docs: freeze DELIVERY_DIRECTIVE v1.12 after R7 disposition`, 5 files) |
+| Push | `origin` succeeded (`4514afb..5c8a6a4`); **gitee was not pushed** |
+| CI run | run 35856548089 (`CI`, push, sha `5c8a6a4`) |
+| Verdict | **double green**: `Go windows-latest` and `Go ubuntu-latest` both `success`; the `Gates` step ran `completed/success` on both legs (not skipped); the ubuntu leg's `Race` and `Contract fixtures` passed; three further jobs (candidate build, bootstrap and candidate probe) are `skipped` by workflow condition |
+| Write-back reading | this section records only the **first** run after the freeze; to avoid a write-push-run loop, later run results are not written back here and are reported in the session only |
+
+### 12.3 Observation items after R7 (numbered from OB-39, left to the next slice)
+
+| Number | Source | Content | Disposition |
+|---|---|---|---|
+| **OB-39** | freeze re-check (master) | this report's §11 artifact list names 4 review reports such as `tmp/DELIVERY_DIRECTIVE_v111_REVIEW.md` but omits the fourth and fifth re-review reports (`_REVIEW_R6.md` and `_REVIEW_R7.md`), although both exist on disk | the next slice reconciles and completes the list reading; ledger-truthfulness class, no change to this slice's rule text |
+
+**Reading note**: §4.2's `scanned 1079` and §6's `1097` are readings of the **whole change set of commit `5c8a6a4`**; this section is a record added after that commit, so it neither rewrites those readings nor recomputes them.
