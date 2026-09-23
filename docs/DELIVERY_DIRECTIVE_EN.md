@@ -1,6 +1,6 @@
 ﻿# ProofRail Delivery Execution Directive (DELIVERY_DIRECTIVE)
 
-Version: v1.10. Date: 2026-09-22. Status: **CN body frozen** ( `_EN` mirror in `docs/DELIVERY_DIRECTIVE_EN.md`).
+Version: v1.11. Date: 2026-09-23. Status: **CN body frozen** ( `_EN` mirror in `docs/DELIVERY_DIRECTIVE_EN.md`).
 
 > **Multilingual note**: this file is the English mirror, generated after the CN body was frozen (to avoid bilingual rework during review); `docs/DELIVERY_DIRECTIVE.md` is authoritative and wins on any conflict (see §11.1).
 > **Encoding**: this document and its `_EN` mirror must stay UTF-8 **with BOM** + **LF**.
@@ -46,6 +46,7 @@ Version: v1.10. Date: 2026-09-22. Status: **CN body frozen** ( `_EN` mirror in `
 | v1.8 | 2026-09-21 | **Added Appendix B.7 "Slice Startup Card" (user adjudication: option A)**: the old briefing's two **functions with no landing place** — **session seeding (launch package structure)** and **minimum context feeding** — are folded into the directive as a **thin card** of "entry point + slots + section-number references": it contains the user kickoff message template, the master opening receipt (`SLICE: STARTED` / `SLICE: BLOCKED`), the stop-point receipt (⑩), and the **minimum reading set** by slice type; **hard constraint: this card contains no rule substance** (a rule change edits the body only and the card edits only the section-number references, structurally eliminating the old disease of "the same wording written in two places ⇒ drift"; the old briefing's "where it conflicts with the directive, the directive prevails" is exactly this kind of drift permit, not inherited); §5.0 gains one line of guidance; A.1 notes that this inheritance has landed; C.3 gains the row "briefing slice-level hard gates are not inherited"; Appendix C gains `SW-4`. |
 | v1.9 | 2026-09-22 | **Added §1.6 work tiers and startup authorization (slice `SW-5`; user rulings Q1–Q6)**: ① three-tier startup — `[ROUTINE]` (default, no trigger word) / `[SLICE]` / `[PILOT]`, with the trigger-word syntax **defined in that one place in the whole document**; ② the routine tier's **non-bypassable boundaries** (① is **a reference to §7.2 ③**; ②–⑥ are incremental boundaries: CONTRACTS / schema / fixtures, `.agent.md`, state machine / crash / ownership / concurrency code, `.github/workflows/**`, dependency additions and removals); ③ the master **determines the tier first and declares it on the receipt's first line**, **may recommend but never upgrades unilaterally**, **one-way tier movement with no mid-flight downgrade** (a user request to downgrade ⇒ stop the slice and restart under `[ROUTINE]`; a stopped state must be marked "stopped — incomplete" ＋ an unfinished list and is **not treated as a closed loop**), and **is not exempt from §10 because of the routine tier**; ④ routine-tier record-keeping = diff + §6.1 + §6.3, **0 paid calls**; ⑤ §1.1 repointed, §5.0 gains a "startup precondition" sentence and **`SW-3` is added to the step 0 upfront hard gate**, Appendix B.7 expanded for the three tiers (heading renamed from "Slice Startup Card" to "**Startup Card**"), Appendix C.0e records `SW-5` (including **the first recorded role-trimming downgrade judgement**: the letter lands "Medium", substantively "Simple", ①⑤ exempted; **cost**: budget ⑥×1 + ⑦×1, **actual ⑥×1 + ⑦×2 = 3 paid calls** (see Appendix C.0e). |
 | v1.10 | 2026-09-22 | **§6.3 extension (G6 / G7) and `tools/gates/` scripting (slice `GATES-EXT`)**: ① two new criterion classes - **G6 ledger metadata consistency** (status tense / cost clause / run-id shape / expiring literals) and **G7 review-package completeness** (artifacts fence block / resolvable path and disposition / finding disposition cell / stopped-state marker); both judge **changed lines only** (same scope as G1-a / G3 / G4); ② the criteria run from an **offline in-repo script** (single entry `gate.js`, exit codes 0 / 1 / 2, no external dependency) that migrates and replaces the throwaway `tmp/gate.js` (kept verbatim for comparison), while base **G1 / G5 stay unscripted** and print `SKIP` truthfully (see **OB-15**); ③ CI gains one **Gates** step (both legs, no `continue-on-error`, no new job or Action) and `Checkout source` gains `fetch-depth: 0` so `--scope=ci` resolves the change set on full history (**the 3rd frozen-contract edit, user-authorised**); ④ **scope guards**: an unresolvable range endpoint, a failing `git diff` / `git status`, and an inconclusive shallow probe all become **usage / environment errors** (exit 2) and **never** degrade into "empty change set ⇒ every criterion vacuous pass"; ⑤ §12.4 registers **OB-15 / OB-16 / OB-17 / OB-18 / OB-19 / OB-20**, §12.5 registers this slice's gap row, and `docs/t027/REMAINING_SLICES` registers **DR-6**; ⑥ the criterion text is aligned with the implementation line by line (G6-1's completion marker takes the **union** the directive enumerates). |
+| v1.11 | 2026-09-23 | **Added §1.7 execution freedom and escalation boundaries, §3.4 post-edit diagnostics scan, and §5.1 ⑧c wrap-up cleanup (slice `DIRECTIVE-V1.11`)**: ① §1.7 - execution freedom (single-file implementation choices / implementation approaches within the scope the contract has already defined / gate retries within an already-authorized package / refactors that do not affect contract semantics / completion of contract wording) and escalation boundaries (any change touching contract semantics / a side fix beyond the slice scope / budget quota exhausted / ambiguity in deciding "is this scope expansion or execution freedom" / the non-bypassable boundaries of §1.6), the principle "how to do it may be autonomous, what to do belongs to the user", with the record-keeping requirement re-checked by ⑦ final review; ② §3.4 - post-edit diagnostics scan (tools chosen by language / file category, no extension enumeration; any newly added warning must not be left to the next step; an "uncovered type" is not "exempt"; a diagnostics aggregator is to be implemented in `tools/gates/` with priority); ③ §5.1 gains **⑧c wrap-up cleanup** (after ⑧b and before ⑩, executed by the master, a fixed stage parallel to ⑨ native validation); ④ the §5.2 matrix gains a ⑧c column, §5.3 gains a ⑧c row, §7.1 gains a ⑧c note, and the §11.3 report structure gains a ⑧c record; ⑤ Appendix B.7.4's minimum reading set gains the new section numbers, and Appendix C gains this slice's ledger block C.0g. OB-22/23/24 were already registered at B4 wrap-up; this slice only references them and does not re-register them. |
 ---
 
 ## 1. Scope and Slice Model
@@ -134,6 +135,28 @@ Where `[ROUTINE]` applies: conversational collaboration, small changes, producin
 - `[SLICE]` / `[PILOT]`: record-keeping per §5.3 and §11, cost per §7.5.
 
 > **Disambiguation (two different dimensions)**: the work tier (`[ROUTINE]` / `[SLICE]` / `[PILOT]`) and **the §8.2 effort tier (low / high / max)** are **two different dimensions** and must not be mixed — the former decides the flow and the review layer, the latter is set once by the operator before startup; a tier declaration does not replace the §8.2 effort-tier setting, and the effort-tier setting does not replace this section's tier determination.
+
+### 1.7 Execution freedom and escalation boundaries
+
+**1.7.1 Execution freedom (autonomous)**: the master or a product-layer role **may decide the following on its own** without stopping to ask the user:
+
+- single-file implementation choices;
+- implementation approaches within the scope the contract has already defined;
+- gate retries within an already-authorized package;
+- refactors that do not affect contract semantics;
+- completion of contract wording.
+
+**1.7.2 Escalation boundaries (must stop and ask the user)**: touching any of the following **must stop** and confirm with the user; it must not continue in the name of execution freedom:
+
+- any change touching contract semantics;
+- a side fix beyond the slice scope;
+- budget quota exhausted;
+- ambiguity in deciding "is this scope expansion or execution freedom";
+- the non-bypassable boundaries of §1.6.
+
+**1.7.3 The distinction principle**: "how to do it" may be autonomous; "what to do" always belongs to the user. The test: **if this decision were wrong, would it need a code change or a contract/direction change?** - the former is execution freedom, the latter is an escalation boundary.
+
+**Record-keeping requirement**: when the master exercises execution freedom, it does **not report item by item**, but the "change summary" section of the slice validation report **must** list the substantive choices made by exercising execution freedom. **Re-check path**: ⑦ final review re-checks **the same list inside its review input package** (the list is produced before ⑦, which is compatible with the §5.1 order), and ⑧b writes that same list back into the validation report at finalization; the two must agree, and ⑦ rules on it whether any boundary was crossed.
 
 ---
 
@@ -231,6 +254,26 @@ Every role file must contain: `name` / `description` / `tools` / `user-invocable
 
 The master must run the wrap-up self-check of §6.3 on **every round of its own changes**; on finding an inconsistency, **fix it on the spot** or assign a subagent to fix it, and never leave it for the user or a reviewer to find.
 
+### 3.4 Post-edit diagnostics scan (hard step)
+
+**After any edit and before moving to the next step**, the master must run a diagnostics scan over this edit following the categories below; this step stands alongside the self-check of §3.3 and **cannot be skipped**.
+
+**3.4.1 Tool selection (by language / file category, no extension enumeration)**:
+
+- compiled languages (Go and alike): `go build ./...` + `go vet ./...`;
+- scripting languages: that language's syntax checker / static analyzer;
+- markup and data (`.md` / `.json` / schema): the encoding gate (§6.1 encoding row) ＋ a structure parser;
+- plain text and others: the encoding gate;
+- uncovered types: **fallback** - the encoding gate ＋ a manual readability check.
+
+**3.4.2 Hard constraints**: any newly added warning **must not be left to the next step** - it must be fixed in place or assigned to a subagent, and the scan re-run until there is no newly added warning. An "uncovered type" is **not "exempt"**: it must still pass the encoding gate ＋ a manual readability check.
+
+**3.4.3 Tools first**: implement a "diagnostics aggregator" in `tools/gates/` with priority (a single entry point that aggregates each language's diagnostics output per the category table of §3.4.1).
+
+**3.4.4 Relation to the encoding layer**: §6.3 G4 (encoding + anomalous characters) and the §6.1 encoding row cover the **encoding layer**; this section covers the **semantic layer** (generating, aggregating, and zeroing diagnostics warnings); the two complement each other and do not replace one another.
+
+**3.4.5 Basis**: the user's observation of 2026-09-23 - Flash often leaves warnings behind after editing code; the root cause is the missing fixed step of "post-edit diagnostics", **not the effort tier**.
+
 ---
 
 ## 4. Subagent Responsibilities and Output Contracts
@@ -286,10 +329,12 @@ The master must run the wrap-up self-check of §6.3 on **every round of its own 
 
 ```
 ①architecture (if needed) → ②implementation → ③testing → ④master integration+gates → ⑤pre-review (V4 Pro)
-   → ⑥ independent scan (MAI) → ⑦ final review (Codex) → ⑧a document draft → ⑨ native validation → ⑧b document finalization → ⑩ stop point (awaiting authorization)
+   → ⑥ independent scan (MAI) → ⑦ final review (Codex) → ⑧a document draft → ⑨ native validation → ⑧b document finalization → ⑧c wrap-up cleanup → ⑩ stop point (awaiting authorization)
 ```
 
 **Note: ⑧ is split into two steps (prevent document lag)** — **⑧a draft** is done immediately after ⑦ (does not block ⑨; get the settled conclusions onto disk first); **⑧b finalization** is done after ⑨, absorbing native validation results and any rollback fixes. ⇒ Avoids "a ⑨ failure forcing a document rewrite".
+
+**Note: ⑧c wrap-up cleanup (fixed stage)** - ⑧c runs after ⑧b and before ⑩, executed **by the master**, following the category table of §3.4: whole-repo diagnostics, IDE diagnostics summary, `gate.js --all --scope=tree` all green, the encoding gate (§6.1 encoding row / §6.3 G4, **file-by-file for all types, not only the change set**), and a checklist of the temp directory / probe leftovers / untracked files. **Responsibility assignment**: ⑧c is executed by the master, but **not as "model self-awareness"** - it is a **fixed stage** of the pipeline (**not subject to §5.2 trimming**), **parallel** to ⑨ native validation. **Long-term evolution**: if ⑧c repeatedly finds the same class of problems, consider promoting it to an **independent review stage** (§12 revision to assess).
 
 **Hard rule R5.1 (serial)**: `runSubagent` is **serial and blocking** (agents are not asynchronous, not backgrounded). "Parallelism" is allowed only at the master's own tool-call layer (e.g. sending several read-only commands in one message); it **must not** be promised for subagents in task packages or flowcharts.
 **Hard rule R5.2 (every stage leaves an artifact)**: every stage must leave a verifiable artifact (diff / report / gate output / evidence file). An "already passed" without an artifact does not hold.
@@ -297,12 +342,12 @@ The master must run the wrap-up self-check of §6.3 on **every round of its own 
 
 ### 5.2 Role Enablement Matrix
 
-| Slice type | ①architecture | ②implementation | ③testing | ⑤pre-review | ⑥scan | ⑦final review | ⑧docs a/b | ⑨native |
-|---|---|---|---|---|---|---|---|---|
-| Simple (**definition same as the three skippable conditions in §7.2**, must not be defined separately in two places) | — | required | required | optional | decided per §7.2 | **required** | required | required |
-| Medium (behavior change, multiple files, test points) | required | required | required | required | **required** | **required** | required | required |
-| Complex (concurrency/transaction/crash window/cross-platform) | **required** | required | required | **required** | **required** | **required** | required | **required** |
-| High risk (rework ≥2, or contradictory reviews, or repeated native failures) | **required** | required | required | **required** | **required** | **required**+blind review | required | **required** |
+| Slice type | ①architecture | ②implementation | ③testing | ⑤pre-review | ⑥scan | ⑦final review | ⑧docs a/b | ⑨native | ⑧c wrap-up |
+|---|---|---|---|---|---|---|---|---|---|
+| Simple (**definition same as the three skippable conditions in §7.2**, must not be defined separately in two places) | — | required | required | optional | decided per §7.2 | **required** | required | required | required |
+| Medium (behavior change, multiple files, test points) | required | required | required | required | **required** | **required** | required | required | required |
+| Complex (concurrency/transaction/crash window/cross-platform) | **required** | required | required | **required** | **required** | **required** | required | **required** | required |
+| High risk (rework ≥2, or contradictory reviews, or repeated native failures) | **required** | required | required | **required** | **required** | **required**+blind review | required | **required** | required |
 
 **Note (document-type slices, removing the conflict with the "simple" definition in §7.2)**: when a slice satisfies the three conditions of §7.2 (pure `.md`/comments, no code semantics), this matrix's **②implementation/③testing degenerate into the documenter's "document implementation" and "document consistency check"** (no code produced, no test engineer needed); **⑨native validation degenerates into encoding gate + G1–G5 self-check + link/reference resolvability check**. ⇒ In that form, the three columns ②/③/⑨ **are not executed under the code-slice criteria**, but **⑦ independent final review cannot be omitted**.
 
@@ -319,6 +364,7 @@ When any stage fails or needs remediation, **the stage itself must be re-execute
 | ⑦ | after fixing, **re-run ⑦ re-review** until no Medium+ (**must not self-declare pass**) |
 | ⑧a/⑧b | any document inconsistency returns to ⑧a/⑧b for rewrite |
 | ⑨ | fix in place and re-run; **two consecutive failures escalate to ⑤ re-check**; fall back to ① only when an architecture assumption is falsified by native evidence |
+| ⑧c | a wrap-up cleanup finding ⇒ fix in place and **re-run ⑧c** until all green |
 
 ---
 
@@ -421,6 +467,8 @@ After pushing, GitHub Actions must be observed and **reported back as double gre
 | ⑤ | Pre-reviewer (V4 Pro) | whether the implementation deviates from the plan | covers the plan item by item + the three classes of counter-examples |
 | ⑥ | Independent scan (MAI) | low-cost supplementary scan | **Does not reference anyone else's checklist**; Section A–E |
 | ⑦ | Independent final review (Codex) | the sole final-review gate | **The first round attaches no ③/⑥ checklist**; four-item review |
+
+> **Note (⑧c is not one of the three review layers)**: the ⑧c wrap-up cleanup is executed **by the master** and **does not belong to** the ⑤⑥⑦ review layers - it is a fixed stage of §5.1 (see §5.1 / §3.4), parallel to ⑨ native validation.
 
 ### 7.2 ⑥ (independent scan layer)
 
@@ -586,7 +634,7 @@ At slice wrap-up the following must be written back: the validation report (crea
 
 ### 11.3 Report Structure
 
-Change summary → execution pipeline (step/role/status/duration/rework count) → anomaly and fallback record → environment and effort tier → review conclusion summary (⑤⑥⑦) → **review input package summary (including the blind-review isolation proof: whether a checklist was attached in the first round, whether the input was already sanitized)** → falsifiability (mechanical checks + mutation testing) → gate results → cost and metering (call counts by type, probe quota) → explicitly unexecuted items → next-step recommendations (including effort-tier recommendations for each role).
+Change summary → execution pipeline (step/role/status/duration/rework count) → anomaly and fallback record → environment and effort tier → review conclusion summary (⑤⑥⑦) → **review input package summary (including the blind-review isolation proof: whether a checklist was attached in the first round, whether the input was already sanitized)** → falsifiability (mechanical checks + mutation testing) → gate results → ⑧c wrap-up cleanup record (§5.1) → cost and metering (call counts by type, probe quota) → explicitly unexecuted items → next-step recommendations (including effort-tier recommendations for each role).
 
 ---
 
@@ -649,6 +697,12 @@ Observation items (phenomena not yet sufficient to change the directive) are reg
 | OB-23 | 2026-09-23 | **B4 ⑤/⑦ disagreement on "sufficiency of the alternative evidence for skipped faces" (to be discussed)**: within one slice ⑤ judged it **sufficient** under the honest-fail-closed reading while ⑦ judged **all five insufficient** under the equivalent-coverage-of-production-semantics reading. ⇒ the criterion **lacks one agreed reading**; both readings are reasonable but not equivalent. **Suggested**: adopt ⑦'s equivalence reading and state explicitly that a "**non-equivalent substitute**" is a legal but **must-be-labelled** status. | **To be discussed**: evaluated at the next §12 revision (whether to define skipped-face evidence sufficiency in §7 or §12) |
 
 | OB-24 | 2026-09-23 | **B4 ⑦ re-review (round 2) reported 2 Medium findings (the same issue in CN and `_EN`, prose scope)**: the report's §9.7 sentence "this slice changed the contract wording and no code" could be read as a whole-slice no-code claim while the staged set contains `tools/b4-e2e/*.go`. **The decision is recorded as measured**: ① it was made autonomously by Flash **while the user was offline**; ② it rests on **the exception standard OB-11 already established** (prose only, no rule entity, no gate impact, closure literally verifiable, no new semantics); ③ **the reason no round 3 of ⑦ was run** is that the §7.5 quota was exhausted (2/2 for B4); ④ **if the user later judges it semantic rather than prose, running round 3 is all that is needed - that case is a judgement disagreement, not a rule violation**. Closure: constructive elimination (the sentence scoped to the R-1 sub-change) plus a deterministic criterion (`git diff --cached --numstat -- internal/` empty) plus a green ④ re-run. | **Endorsed** (user, 2026-09-23): no round 3 of ⑦ |
+
+| OB-25 | 2026-09-23 | **Whether §3.4 applies to the `[ROUTINE]` tier is not stated (V1.11 ⑤ pre-review Low, registered to be discussed)**: §3.4 requires a diagnostics scan "after any edit and before moving to the next step" but does not say whether it applies to the routine tier (the §1.6 routine-tier flow does not reference §3.4) ⇒ an interaction ambiguity about its scope. **Not ruled on here** (an "expansion or execution freedom" ambiguity, so it was stopped and referred to the user, who ruled that it be registered as to-be-discussed). | **To be discussed**: `DIRECTIVE-V1.12` to assess whether the scope is stated in §3.4 or §1.6 |
+
+| OB-26 | 2026-09-23 | **§3.4.2's "newly added warning" lacks a baseline definition (V1.11 ⑤ pre-review Low, registered to be discussed)**: §3.4.2 requires that "any newly added warning must not be left to the next step" but never defines "newly added" against which baseline (existing warnings or the previous run) ⇒ that hard constraint is **partly not mechanically checkable**. **Not ruled on here**. | **To be discussed**: `DIRECTIVE-V1.12` to assess it together with the §3.4.3 diagnostics aggregator and define the baseline snapshot |
+
+| OB-27 | 2026-09-23 | **⑧c's "all types, file by file" encoding check meets historical leftovers in frozen evidence packs (found by the V1.11 ⑧c first run)**: the whole-tree file-by-file sweep reported 3 pre-existing violations (`b2-2026-09-17/measuring/probe10-dir-listing.raw.txt` is CRLF; `b3b-2026-09-21/{session,variant}/pin.json` carry a BOM); these 3 files **do not violate G4a** (whose scope is explicitly the change set); what they violate is **the "not only the change set" wording ⑧c adds**. This slice disposed of it under the user's ruling, option A: a temporary exemption (strictly limited to "archived packs that carry a MANIFEST/SHA256SUMS"; a new evidence pack must still pass the encoding gate before it is committed) plus ⑧c checking evidence packs by self-consistency. | **To be discussed**: formalised by `DIRECTIVE-V1.12`; it must **coordinate G4a and ⑧c and the B2 fidelity ruling** - **the CRLF of `probe10-dir-listing.raw.txt` directly conflicts with `.gitattributes`'s `*.raw.txt -text`** (the B2 fidelity ruling) |
 
 > **This slice's (`GATES-EXT`) ⑦ round exception (user pre-authorization, 2026-09-22)**: the ⑦ re-review (round 2) reported Medium+, which forces a re-review under §5.3 and, under the pre-authorization, entitled a **round 3** (`GPT-5.3-Codex`, **valid for this slice only**); round 3 returned `PASS WITH FIXES` with no Medium+ (one Low only, i.e. OB-20). **The authorization does not generalize**: other slices stay on §7.5 (one final review + one re-review), and a round 4 is never automatic.
 
@@ -874,7 +928,7 @@ Awaiting authorization: [commit / push / probe top-up / user adjudication items]
 
 | Slice type | Required section numbers |
 |---|---|
-| **All** | §0.1, §0.2, §1.2, §1.5, §1.6, §2.2, §2.6, §5.0–§5.3, §6.1–§6.4, §7.5, §7.6, §10.1–§10.4, §11.1–§11.3, Appendix B.0 + the role templates enabled this round |
+| **All** | §0.1, §0.2, §1.2, §1.5, §1.6, §1.7, §2.2, §2.6, §3.4, §5.0–§5.3, §6.1–§6.4, §7.5, §7.6, §10.1–§10.4, §11.1–§11.3, Appendix B.0 + the role templates enabled this round |
 | **Document-type / simple** | the table above + §5.2's "Note (document-type slices)", §7.2 (⑥ skip criterion), §7.7, §9.3, Appendix B.4 |
 | **Medium** | the table above + §4.1–§4.3, §7.1–§7.4, §7.7, §8, §9.1–§9.3, Appendix B.1–B.6 |
 | **Complex / high risk** | the table above + §4.1–§4.3, §7.1–§7.7, §8, all of §9, Appendix B.1–B.6 |
@@ -999,6 +1053,23 @@ The following files **only get a supersede pointer added to the file header and 
 | Notes | ① ⑦ round 3 reported **one Low** (`g5a.js` error routing) which was **left unfixed** because this slice's pre-authorized red lines include "fixing G1/G5 along the way"; it is **folded into the next §6.3 criterion-narrowing slice** (`GATES-TIGHTEN`; user ruling 2026-09-22); ② OB-19's boundary annotation (a user's temporary registration unrelated to this slice) is in the report; ③ the `internal/gates` flake is registered separately as **DR-6** per DR disposition boundary ① |
 | ⑥ independent scan (**实得**) | MAI-Code-1.1-Flash **1 call**: `FINDINGS` **2 items** - one confirmed and fixed (G6-1 accepted only the bold shape of the completion marker, contradicting the criterion's enumeration and its own example line), one **rejected** (G7-b already implements the written rule verbatim) |
 | ⑦ independent final review (**实得**) | Codex **3 calls**: round 1 `FINDINGS` 1 High + 1 Medium; round 2 1 Medium + 1 Low and judged the round-1 High as `PARTIAL`; round 3 `PASS WITH FIXES` with no Medium+. **Two-way coverage**: the ②f leading boundary and the NF-1 wording were both named and reviewed |
+
+### C.0g Execution freedom, post-edit diagnostics and ⑧c wrap-up cleanup slice `DIRECTIVE-V1.11`
+
+**Why it is needed**: ① the directive long had only an implicit convention, no written clause, for "what the master may decide on its own and what must stop and ask the user", so every boundary call depended on an ad-hoc reading; ② the fixed step of "post-edit diagnostics" was missing ⇒ warnings left behind after an edit could only be found by eye or by a later gate (the user's observation of 2026-09-23); ③ the wrap-up stage (after ⑧b and before ⑩) had no fixed whole-repo cleanup, so the temp directory / probe leftovers / untracked files depended on the master's self-awareness alone.
+
+| Field | Content |
+|---|---|
+| Id | `DIRECTIVE-V1.11` |
+| Status | ✅ **Complete** (2026-09-23; change and review evidence in `docs/validation/directive-v1.11.md`) |
+| Goal | Write execution freedom and escalation boundaries plus the post-edit diagnostics scan into the directive, and fix the wrap-up cleanup as a pipeline stage |
+| Trigger | User startup declaration of 2026-09-23 (`[SLICE]`) |
+| Scale | Medium (documentation only; behavior change / multiple files / touches rule semantics) |
+| Executing role | Master lands the text + ① plan + ⑤⑥⑦ review (⑧ not separately assigned) |
+| Deliverable | §1.7, §3.4, §5.1 ⑧c, the §0.3 v1.11 row and the header version of `docs/DELIVERY_DIRECTIVE{,_EN}.md`, plus the §5.2 / §5.3 / §7.1 / §11.3 / Appendix B.7.4 companions; this slice's validation report |
+| Acceptance evidence | CN and `_EN` strictly positional (line count / bold markers / pipes / blank lines / heading positions all equal, checked by G3); `gate.js --all` all green; the first ⑧c run record (whole-repo diagnostics / IDE diagnostics summary / `gate.js --all --scope=tree` / the all-types encoding gate / the temp-directory and probe-leftover checklist) |
+| Boundary | **No change to** the G1–G7 criteria themselves; no change to the existing §5.1 step sequence (⑧c is an addition); no change to the §7.5 cap; no change to the role set / carriers; code, CONTRACTS, schema, fixtures and CI are not touched |
+| Note | The substantive choices made under execution freedom (e.g. rewriting a dead reference, adding section numbers to B.7.4, landing this ledger block) are listed one by one in the "change summary" section of this slice's validation report for ⑦ final review to judge whether any boundary was crossed |
 
 ### C.1 v3.1 section numbers → this directive
 
