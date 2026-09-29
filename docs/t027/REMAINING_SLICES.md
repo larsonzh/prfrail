@@ -542,6 +542,26 @@ A6 ② 进度（第 2 批，2026-09-15）：
 
 **收尾（2026-09-24，等 commit / push 授权）**：⑤ `PASS WITH FIXES` → 复审 `PASS`；⑥ `INDEPENDENT SCAN: FINDINGS`（按 §7.2 替代路径转入 ⑦）；⑦ `FINAL REVIEW: PASS`；⑨ 真探针 1 次得 `available`（1/5）。报告 `docs/validation/dr-1-availability-probe-floor{,_EN}.md`（双语两份，逐行 0 失配）。
 
+### S1-REACH 切片定义回写（2026-09-29）
+
+| 字段 | 内容 |
+| --- | --- |
+| 标识 | `S1-REACH`（业务判定类切片，非准则治理；触发词 `切片:S1-REACH`） |
+| 目标 | 以 DR-1 闭环后的当前事实刷新 OB-21 / T018 / S1 exit 的可达性判定（逐门 × 依赖 × 解锁条件），并同批把 OB-51 / OB-52 / OB-53 落 §12.4 |
+| 依赖 | 代码侧无前置；DR-1 已闭环；环境侧仅本机只读枚举（非探针） |
+| 规模 | S |
+| 步骤 | ①架构（V4 Pro）→ ②文档实现（含五点只读枚举）→ ③文档一致性检查 → ④门禁 → ⑤预审（V4 Pro）→ ⑥按 §7.2.1 判定（拟跳过，须 ⑦ 确认）→ ⑦终审（`deepseek-v4-pro`，降级，ADR-015）→ ⑧a/⑧b 文档 → ⑨原生验证（门禁 + G1–G7 + 镜像）→ ⑧c 收尾 → ⑩停点 |
+| 现状缺口 | OB-21 的 ② 含已消除子项（`DR-1 未修`），T018 剩余门与 S1 exit 的判读依据过期 |
+| 交付物 | 报告 `docs/validation/s1-reach-reachability{,_EN}.md`；§12.4 的 OB-51/52/53 三行与 v1.15 台账行；ADR-015；本台账定义块与收尾行；`DEV_PLAN{,_EN}` 指针 |
+| 验收证据 | 逐门结论带 `file:line`；五点逐条带证据且第 4 点不可枚举项如实标注；门禁全绿；变更集不含 Go/schema/fixtures/workflows |
+| 边界 | 不改 Go 代码、schema、CONTRACTS、fixtures、workflows；不做真探针；五点任一指向语义改动即停下升级；commit 与 push 须同轮授权；不推 gitee |
+| 分级 | `[SLICE]` |
+| 探针额度 | 无（0 次真实外部调用） |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/S1-REACH-freedom-list.md` |
+
+**起跑（2026-09-29）**：步骤 0 已落地——切片定义核验（§12.4 末行 = OB-50、ADR 最大号 = ADR-014、五点锚点行全部可定位）；本片无链配置步骤（无真探针）。
+**收尾（2026-09-29，⑩ 停点）**：⑤ 第 1 轮 `PRE-REVIEW: FINDINGS`（1 High 与 5 Medium 与 7 Low）→ 整改 → 第 2 轮 `PASS WITH FIXES`（H1 与 M1 至 M5 与 L1 至 L7 消除，另 2 条 Low 字面修正）；⑥ 按 §7.2.1 可跳过、已由 ⑦ 确认；⑦ 第 1 轮 `PASS WITH FIXES` → 复审 `PASS`（额度 2/2；降级 `deepseek-v4-pro`，ADR-015，独立性降低）；⑨ 门禁 `TOTAL_FAIL=0`（报告落盘后 `G7` 四条 PASS）、`SELFTEST PASS 248/248`、报告对逐行 0 失配、探针 0。报告 `docs/validation/s1-reach-reachability{,_EN}.md`（双语两份）。commit 与 push 须同轮授权。
+
 ## 完成记录（追加）
 
 | 日期 | 切片 | 完成摘要 | 证据 |
@@ -563,6 +583,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 
 | 2026-09-23 | B4 | （依据 `docs/validation/t027-at23-e2e.md`）AT-23 机制腿端到端证据 + 独立审查：装配 harness（`tools/b4-e2e/`，复用生产包、无 `os/exec`）在真实 Windows 宿主驱动五个面（隔离 workspace、timeout、日志缺失、未知恢复、exit 0 后重扫）的正/反向与包内重跑腿。**四事分立**：B4 切片 ✅；**AT-23 未通过**（真实 AI 候选腿不可达，见 OB-21）；T018 剩余门未闭合；S1 exit 未做。审查：⑤ 预审 F1–F5 整改并复审确认；⑥ 独立扫描 `PASS`、0 发现；⑦ 终审 F1–F5 与 R-1..R-4（R-1「契约措辞需修订」触发预声明红线并停下升级 ⇒ 用户裁决后修订 `CONTRACTS` §7 次序措辞、**只改措辞不动代码**，登记 OB-22）；⑦ 复审所报 Medium 按 OB-11 例外标准确定性闭合（OB-24）。跳过面的替代证据一律标注**非等价替代**（门禁端口对另标**策略端口未覆盖**），**本片不主张等价覆盖**。⑤ 门禁三作用域 `TOTAL_FAIL=0`、`SELFTEST PASS`；⑨ 原生验证含同命令复跑（差异仅落在已声明易变字段）与 `tmp/b4/SHA256SUMS.txt` 全量重算 0 失配。**已提交 `e8cbff6` 并推送 `origin/main`（未推 gitee）**；CI run **`35812311023`** 双腿全绿，两腿 `Gates` 步骤均实测执行（`TOTAL_FAIL=0`）。**契约修订的派生成本**：其引入的文档表述另耗一轮 ⑦ 复审（数据点已记入报告 §9.5） | docs/validation/t027-at23-e2e.md |
 | 2026-09-24 | DR-1 | **业务切片（含一次准则台账补登）**：把 `ai check` 传给候选 CLI 的 `--max-ai-credits` 改为 `max(30, maximumRequests)`（floor 常量 30），使产品可用性探针首次在 pin 1.0.83 上产出 `available`（`requestsUsed=1`、退出码 0、`profileConfigHash` 与 B1 主基线逐字一致）。②b/③ 只动 `ai_probe_copilot.go` 与其测试（`ai.go` 零改动）；变异检验（恰好 1 处命中 + 变异后三处红 + 逐字节还原 sha256 一致）通过；④ 门禁 `TOTAL_FAIL=0`。⑤ `PASS WITH FIXES` → 复审 `PASS`（2/2）；⑥ `INDEPENDENT SCAN: FINDINGS`（按 §7.2 替代路径转入 ⑦）；⑦ `FINAL REVIEW: PASS`（降级 `deepseek-v4-pro`，ADR-014）；⑨ 探针 1/5。**未提交**（等同轮授权）。**已知差异（R1=A 不修）**登记为候选 OB-52。 | docs/validation/dr-1-availability-probe-floor.md |
+| 2026-09-29 | S1-REACH | **业务判定类切片（含一次准则台账补登）**：以 DR-1 闭环后的当前事实刷新 OB-21 / T018 / S1 exit 的可达性判定（十门 × 依赖 × 解锁条件），结论为八门不可达或未通过、一门未知（人工门）、一门已执行但不独立成立；同批登记 **OB-51 / OB-52 / OB-53**（v1.15），并以 **ADR-015** 留痕 ⑦ 降级。零代码改动、探针 0。审查：⑤ `FINDINGS` → `PASS WITH FIXES`；⑥ 可跳过（⑦ 确认）；⑦ `PASS WITH FIXES` → 复审 `PASS`（`deepseek-v4-pro`，独立性降低）。 | docs/validation/s1-reach-reachability.md |
 
 > **台账完整性注记（2026-09-21，已按用户授权补录）**：本表自 A4 行之后长期未追加完成行。**2026-09-21 依据各切片自己的验证报告补录 A5/A6/A7/B2/B3a 五行**（受"不凭记忆、只补可核验字段、缺失留空并标注历史缺失、不编造"三条约束），B3b 行先于本次补录写入，故五行列于其后；各行的日期/提交号/运行号/摘要均逐项标注来源，无法核验者已标注 **历史缺失**。
 > 仍待回填：**B3a 的 `DEV_PLAN{,_EN}.md` 段落**（该文件 A0–A7/B1/B2 段均在，唯 B3a/B3b 缺；B3b 段已补，B3a 段待按其报告回填）。
