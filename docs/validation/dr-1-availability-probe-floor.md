@@ -72,7 +72,7 @@
 - `gofmt -l` 空、`go build ./...` 干净、`go vet ./...` exit 0。
 - 聚焦 `go test -count=1 -run CopilotCLIProbe ./internal/adapters/` ⇒ ok；全量 `go test -count=1 ./...` ⇒ 14 包全 ok、FAIL 0。
 - `node tools/gates/gate.js --all --scope=tree` ⇒ `TOTAL_FAIL=0`；G4a 编码判据全绿（文件数由该判据自身输出）；G6-5 scanned 2 / refs 4 / 未解析 0；G6-6 scanned 10；G3(a) 四对（指令 `+7/-1`、ADR `+1/-0`、DEV_PLAN `+1/-1`、台账 `+20/-1`）；G1-b 头部与日志同为 v1.14。
-- **镜像口径（如实）**：`DELIVERY_DIRECTIVE{,_EN}` 为**严格同位镜像**（1309 / 1309，逐行 0 失配）；`ADR_REGISTER{,_EN}` 与 `REMAINING_SLICES{,_EN}` **不做整文件位置镜像**（HEAD 即有 37 / 226 处位置性差异，非本片引入），对其适用 G3(a) 的“改动行数对称”与新增块形状一致（ADR-014 两行为 14 bold / 5 bars 全等；DR-1 定义块逐行形状全等）。
+- **镜像口径（如实）**：`DELIVERY_DIRECTIVE{,_EN}` 为**严格同位镜像**（1309 / 1309，逐行 0 失配）；`ADR_REGISTER{,_EN}` 与 `REMAINING_SLICES{,_EN}` **不做整文件位置镜像**（HEAD 即有 37 / 226 处位置性差异，非本片引入；**口径注记 2026-09-29**：该计数为 **HEAD 口径**，工作区计数会随新增行变化，需以当场重跑为准——2026-09-29 在切片 `LEDGER-BACKFILL` 收尾时实测为 38 / 258），对其适用 G3(a) 的“改动行数对称”与新增块形状一致（ADR-014 两行为 14 bold / 5 bars 全等；DR-1 定义块逐行形状全等）。
 - **未执行项**：`gate.js --selftest` 本片未跑（未改动任何判据 ⇒ 无触发条件），将在提交前与 CI 执行。
 
 ## 10. ⑧c 收尾清洁记录
