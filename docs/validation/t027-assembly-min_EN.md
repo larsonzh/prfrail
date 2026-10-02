@@ -1,7 +1,7 @@
 ﻿# T027-ASSEMBLY-MIN — minimal runnable assembly (segment A: the reject path) validation report
 
 > Slice `T027-ASSEMBLY-MIN` (product implementation, segment A) | tier `[SLICE]` | size M | date 2026-10-03.
-> **Status: ⑨ native validation, ⑧b finalisation and ⑧c wrap-up are executed; the ⑩ stop report is section 13 and the slice parks before commit authorisation** (commit / push require same-turn authorisation).
+> **Status: ⑨ native validation, ⑧b finalisation and ⑧c wrap-up are executed; the ⑩ stop report is section 13; commit and push ran under same-turn user authorisation (the CI outcome and its fix are in section 13).**
 
 [English](t027-assembly-min_EN.md)
 
@@ -51,7 +51,7 @@
 | ⑨ Native validation | Master | Executed | Read-only re-runs of the three gate scopes and the encoding check (see section 9) |
 | ⑧b Finalisation | Master | Executed | Ledger write-back (the slice block in the bilingual ledger) and the status-line update |
 | ⑧c Wrap-up | Master | Executed | Temporary-artifact retention check and work-tree state check |
-| ⑩ Stop point | Master | Parked before commit authorisation | Section 13 |
+| ⑩ Stop point | Master | Done (commit and push under same-turn authorisation) | Section 13 |
 
 ## 5. Environment and tier
 
@@ -81,7 +81,7 @@
 ## 8. Falsifiability (mechanical checks and mutation testing)
 
 - Mechanical checks: see section 9 (gates and the full test run).
-- **Mutation testing**: for each entry the script applies a unique replacement, runs the focused tests, diffs every per-test verdict against the unmutated baseline and restores byte-exactly (SHA-256 compared). Final state: **17 red, three truthfully marked superseded (M9, M11, M15) and byte-exact restoration true**; the baseline is 22 tests, 21 passing and one skipped.
+- **Mutation testing**: for each entry the script applies a unique replacement, runs the focused tests, diffs every per-test verdict against the unmutated baseline and restores byte-exactly (SHA-256 compared). Final state: **18 red, three truthfully marked superseded (M9, M11, M15) and byte-exact restoration true**; the baseline is 23 tests, 22 passing and one skipped.
 - **The three superseded entries are recorded rather than deleted**: the old weak guards of M9 and M11 were replaced by the both-reports criterion; the M15 anchor no longer exists after the parsers were unified, and removing the error check is a no-op under a strict parser.
 - **What no mechanical check covers (stated plainly)**: the source-level invariant test counts textual shapes and matches strings, so an equivalent rewrite could in theory evade it; this is registered as the OB-61 candidate.
 
@@ -120,8 +120,8 @@
 - ⑨ Native validation: executed (read-only re-runs of the three gate scopes and the encoding check, readings in section 9).
 - ⑧b Finalisation: executed (the bilingual ledger slice block and completion-log row, plus this report status-line update).
 - ⑧c Wrap-up: executed (encoding and residue checks plus a check of the temporary-artifact retention rule).
-- ⑩ Stop point: parked before commit authorisation (see section 13).
-- Commit / push require same-turn authorisation; no gitee push; the step 0 v1.17 changes are handled with ⑩ per the user ruling.
+- ⑩ Stop point: done (commit and push under same-turn user authorisation; the CI outcome and its fix are in section 13).
+- Commit / push ran under same-turn authorisation (the first commit is `68a1ef0`, including the step 0 v1.17); no gitee push; the CI fix commit is covered in section 13.
 
 ## 13. ⑩ Stop report
 
@@ -135,7 +135,7 @@
 - **Cost and accounting** (line by line):
   - ① architecture 2 versions; ②b implementation 3 rounds (r2, r3, r4); ③ tests 1 round; the ① transport failures were handled per the user ruling (no proxy, spacing above two minutes, reduced payload, retry allowance not exhausted)
   - ⑤ 3 calls (V4 Pro, including one quota exception); ⑥ 1 call (MAI, blind); ⑦ 3 calls (Codex, not downgraded); real external calls 0
-  - 20 mutation entries (17 red, three truthfully marked superseded) with byte-exact restoration true; the focused-test baseline is 22 items (21 passing, one skipped); the mutation audit was repeated 3 times (the first was interrupted by a Windows file lock and the incident is recorded)
+  - 21 mutation entries (18 red, three truthfully marked superseded) with byte-exact restoration true; the focused-test baseline is 23 items (22 passing, one skipped); the mutation audit was repeated 4 times (the first was interrupted by a Windows file lock and the incident is recorded)
   - The authorisation and cost ledgers are consumed read-only by the assembly entry through the existing record files; this slice performs no new billable action
 - **The eight intent-to-add paths** (path registration only, no content staged; they become real staging on the authorised commit):
   - `docs/validation/t027-assembly-min.md`
@@ -148,7 +148,10 @@
   - `internal/console/runtime_noop.go`
 - **Trial deferral, sixth time (four elements)**: ruling party = the user; date = 2026-10-03; reason = this product-implementation slice continues execution without entering the trial; basis = the authorisation text of this round. **Not usable as a precedent**.
 - **Disposition wording for step 0 (v1.17)**: the v1.17 line in `DELIVERY_DIRECTIVE{,_EN}`, the OB-54 and OB-55 rows in §12.4 and the orchestrator-invocation record block are all step 0 artifacts; per the user ruling they are **handled together with ⑩** (committed in one go with the slice, not separately).
-- **Not executed**: real CI observation (the slice is not pushed, so there is no CI verdict); the segment B real enforcement landing; Windows evidence for the positive full chain; the OB-57 root-cause fix; the registration and disposition of OB-58 to OB-61 (they land in the ledger when the next slice starts); the `tmp/assembly-min/` process files are retained per the existing instruction (workspace-local).
+- **CI observation (2026-10-03)**: commit `68a1ef0` was pushed to `origin/main`; CI run `37070276731` (head `68a1ef0`) — the Windows leg is fully green (its `Gates` step ran for real: `SELFTEST PASS 248/248`, `GATE REPORT scope=ci changed=16`, `TOTAL_FAIL=0`); the **Ubuntu leg is red**: its `Test` step reports `--- FAIL: TestAgentRunnerAssemblyFullChain` (`runtime_agent_e2e_test.go:464`: `invalid AgentRunner terminal intent: observed settlement requires a non-negative charged amount`). The root cause is a **real defect**: the (A′) mapping added by this slice did not fulfil the existing caller obligation to supply the amount (`tools/b4-e2e/runmap.go`, divergence (b)); the fix is the declared-offline zero-cost amount plus an explicit boundary comment and an assertion (an implementation defect rather than a mechanical error; per the user ruling it is fixed in this slice with **no fourth ⑦ round**).
+- **Three lessons (recorded faithfully)**: (1) **the platform root of the review blind spot** — none of the three ⑦ rounds (blind, final, re-review) found it, because the path is unreachable on Windows; ⑦ can only review the code it sees, not a path that only executes on another platform. (2) **the two-platform CI covers the platform the review cannot see** — the Ubuntu leg exposed the defect on its first execution of the positive full chain, which confirms that the platform-split gap recorded in section 10 is **real** rather than a theoretical concern. (3) **a green Windows leg is not fully green** — the Windows leg was green here too, but the positive full chain is unreachable on Windows, so its green means no failure **not** a passing positive full chain.
+- **DR-9 record**: test `TestAgentRunnerAssemblyFullChain`; first red run `37070276731` (head `68a1ef0`), Ubuntu leg `Test` step; **nature = a real defect (not a flake)**; **disposition = fixed in this slice**; boundary basis = directive §6.4 rule (a new test name / a new failure type must be registered separately); registered in `docs/t027/REMAINING_SLICES{,_EN}.md` (no separate OB).
+- **Not executed**: the segment B real enforcement landing; Windows evidence for the positive full chain; the OB-57 root-cause fix; the registration and disposition of OB-58 to OB-61 (they land in the ledger when the next slice starts); the `tmp/assembly-min/` process files are retained per the existing instruction (workspace-local).
 - **Authorisation pending**: `git commit` (the gate reads 16 changed paths, 8 of them intent-registered new artifacts) and `git push` (origin only); **no gitee push**.
 
 ## 14. Artifact list

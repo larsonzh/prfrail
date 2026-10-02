@@ -19,6 +19,7 @@ import (
 	"github.com/larsonzh/prfrail/internal/gates"
 	"github.com/larsonzh/prfrail/internal/guard"
 	"github.com/larsonzh/prfrail/internal/snapshot"
+	"github.com/larsonzh/prfrail/internal/tickets"
 )
 
 // This file carries the production AgentRunner workspace capturer and the
@@ -669,7 +670,7 @@ func (run *AgentRunnerPinnedCLIRun) WaitAgentRunnerDispatched(ctx context.Contex
 	status, treeStatus, outcomeEvidence := agentRunnerTerminalStatus(request.Launch.RequestID, watch, processResult, stopProof, collected, treeGone)
 	outcome := AgentRunnerTerminalOutcome{
 		Completion: agentRunnerCompletionFor(request, processResult, collected, status, treeStatus, outcomeEvidence, clock()),
-		Settlement: agentRunnerSettlementFor(status, collected),
+		Settlement: agentRunnerSettlementForDeclaredOfflineWorkload(status, collected),
 	}
 	if status != "completed" {
 		return outcome, nil
@@ -682,4 +683,37 @@ func (run *AgentRunnerPinnedCLIRun) WaitAgentRunnerDispatched(ctx context.Contex
 	}
 	outcome.Facts = &facts
 	return outcome, nil
+}
+
+// agentRunnerDeclaredOfflineChargedAmountMicros is the single definition of the
+// zero-cost amount a declared offline workload settles with. Only the declared
+// offline mapping below may read it; any other caller must supply a real amount.
+const agentRunnerDeclaredOfflineChargedAmountMicros int64 = 0
+
+// agentRunnerSettlementForDeclaredOfflineWorkload maps a terminal status to a
+// settlement for a workload the caller has declared offline. It is
+// agentRunnerSettlementFor plus the caller obligation the base mapping
+// deliberately leaves open: the base mapping settles a completed run with
+// complete usage as observed but never sets ChargedAmountMicros. That obligation
+// is already documented as divergence (b) of tools/b4-e2e/runmap.go, where the
+// harness supplies the zero-cost amount of its declared offline workload; this
+// mapping fulfils it for the post-dispatch path the same way.
+//
+// 本映射只服务声明式离线工作负载；接入真实付费候选时，必须由调用方提供真实金额，不得默认为 0；若调用方未提供且非离线负载 ⇒ fail-closed。
+//
+// The zero amount is set only for an observed settlement, and only when the base
+// mapping left it nil: an unknown settlement must stay amount-free (the
+// publisher's existing terminalSettlementIntentFields rejects an unknown
+// settlement that carries an amount), and every other status is returned
+// unchanged. fail-closed for a non-offline caller that supplies no real amount
+// is carried by the publisher's existing rejection path for a nil amount
+// (agent_runner_terminal_publisher.go, terminalSettlementIntentFields): no new
+// sentinel is introduced here.
+func agentRunnerSettlementForDeclaredOfflineWorkload(status string, collected AgentRunnerEvidence) AgentRunnerTerminalSettlement {
+	settlement := agentRunnerSettlementFor(status, collected)
+	if settlement.Status == tickets.CostSettlementObserved && settlement.ChargedAmountMicros == nil {
+		zero := agentRunnerDeclaredOfflineChargedAmountMicros
+		settlement.ChargedAmountMicros = &zero
+	}
+	return settlement
 }

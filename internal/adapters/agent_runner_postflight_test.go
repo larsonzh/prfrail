@@ -19,6 +19,7 @@ import (
 	"github.com/larsonzh/prfrail/internal/gates"
 	"github.com/larsonzh/prfrail/internal/guard"
 	"github.com/larsonzh/prfrail/internal/snapshot"
+	"github.com/larsonzh/prfrail/internal/tickets"
 )
 
 // The differential test builds the pinned deterministic CLI from source. It is
@@ -663,8 +664,23 @@ func TestAgentRunnerPostflightDispatchedParityMatchesRun(t *testing.T) {
 		if mismatches := agentRunnerCompletionMismatches(outcomeA.Completion, outcomeB.Completion, false); len(mismatches) > 0 {
 			t.Fatalf("completion drift between Run and WaitAgentRunnerDispatched:\n%s", strings.Join(mismatches, "\n"))
 		}
-		if !reflect.DeepEqual(outcomeA.Settlement, outcomeB.Settlement) {
-			t.Fatalf("settlement drift: A=%+v B=%+v", outcomeA.Settlement, outcomeB.Settlement)
+		// The declared-offline boundary is the one deliberate settlement
+		// difference between the two entries: the self-spawning Run applies the
+		// base mapping, which leaves ChargedAmountMicros to its caller, while the
+		// dispatched entry applies the declared-offline mapping, which fulfils
+		// that obligation with the zero cost. Every other settlement field must
+		// stay identical, so the guard keeps its drift-detection strength for the
+		// usage observation itself.
+		if outcomeA.Settlement.ChargedAmountMicros != nil {
+			t.Fatalf("the self-spawning Run must leave the charged amount to its caller: %+v", outcomeA.Settlement)
+		}
+		if outcomeB.Settlement.ChargedAmountMicros == nil || *outcomeB.Settlement.ChargedAmountMicros != 0 {
+			t.Fatalf("the dispatched entry must carry the declared-offline zero cost: %+v", outcomeB.Settlement)
+		}
+		aWithoutAmount := outcomeA.Settlement
+		aWithoutAmount.ChargedAmountMicros = outcomeB.Settlement.ChargedAmountMicros
+		if !reflect.DeepEqual(aWithoutAmount, outcomeB.Settlement) {
+			t.Fatalf("settlement drift (cost aside): A=%+v B=%+v", outcomeA.Settlement, outcomeB.Settlement)
 		}
 		if outcomeA.Facts == nil || outcomeB.Facts == nil {
 			t.Fatalf("both completed outcomes must carry facts: A=%v B=%v", outcomeA.Facts, outcomeB.Facts)
@@ -1023,4 +1039,75 @@ func agentRunnerPIDsEqual(got, want []int) bool {
 		}
 	}
 	return true
+}
+
+// TestAgentRunnerSettlementForDeclaredOfflineWorkloadCarriesZeroCost proves the
+// declared offline mapping fulfils the caller obligation the base mapping leaves
+// open (zero-cost amount for an observed settlement) while leaving every
+// non-observed status amount-free. The last subtest locks the base mapping's
+// fail-closed shape: it still returns a nil amount, which is exactly the input
+// the publisher's terminalSettlementIntentFields rejects.
+func TestAgentRunnerSettlementForDeclaredOfflineWorkloadCarriesZeroCost(t *testing.T) {
+	// The fixture is the same completed+complete usage evidence the base mapping
+	// test uses; no new fixture shape is introduced.
+	completed := AgentRunnerEvidence{
+		LogsComplete:  true,
+		UsageComplete: true,
+		UsageHash:     evidence.Digest("", []byte("usage")),
+		Usage:         AgentRunnerUsage{Calls: 2, Tokens: 30, DurationMs: 40},
+	}
+
+	t.Run("completed usage settles as observed with a zero cost", func(t *testing.T) {
+		settlement := agentRunnerSettlementForDeclaredOfflineWorkload("completed", completed)
+		if settlement.Status != tickets.CostSettlementObserved {
+			t.Fatalf("a completed declared offline workload must settle as observed: %+v", settlement)
+		}
+		if settlement.ChargedAmountMicros == nil {
+			t.Fatalf("an observed settlement must carry the declared offline amount: %+v", settlement)
+		}
+		if *settlement.ChargedAmountMicros != 0 || *settlement.ChargedAmountMicros < 0 {
+			t.Fatalf("the declared offline workload must carry a non-negative zero cost: %d", *settlement.ChargedAmountMicros)
+		}
+		if settlement.ObservedCalls == nil || *settlement.ObservedCalls != 2 || settlement.ObservedTokens == nil || *settlement.ObservedTokens != 30 {
+			t.Fatalf("the observation must still carry the measured usage: %+v", settlement)
+		}
+	})
+
+	t.Run("a non-completed status stays unknown and amount-free", func(t *testing.T) {
+		settlement := agentRunnerSettlementForDeclaredOfflineWorkload("uncertain", completed)
+		if settlement.Status != tickets.CostSettlementUnknown {
+			t.Fatalf("a non-completed status must settle as unknown: %+v", settlement)
+		}
+		if settlement.ChargedAmountMicros != nil {
+			t.Fatalf("an unknown settlement must not gain an amount: %+v", settlement)
+		}
+	})
+
+	t.Run("an incomplete usage artifact stays unknown and amount-free", func(t *testing.T) {
+		gapped := completed
+		gapped.UsageComplete = false
+		settlement := agentRunnerSettlementForDeclaredOfflineWorkload("completed", gapped)
+		if settlement.Status != tickets.CostSettlementUnknown {
+			t.Fatalf("an incomplete usage artifact must settle as unknown: %+v", settlement)
+		}
+		if settlement.ChargedAmountMicros != nil {
+			t.Fatalf("an unknown settlement must not gain an amount: %+v", settlement)
+		}
+	})
+
+	t.Run("the bare mapping remains fail-closed", func(t *testing.T) {
+		bare := agentRunnerSettlementFor("completed", completed)
+		if bare.Status != tickets.CostSettlementObserved {
+			t.Fatalf("the bare mapping must still settle a completed run as observed: %+v", bare)
+		}
+		if bare.ChargedAmountMicros != nil {
+			t.Fatalf("the bare mapping must leave the amount to the caller: %+v", bare)
+		}
+		// This nil amount is exactly the input terminalSettlementIntentFields
+		// rejects for a non-offline caller, so a caller that does not top it up is
+		// refused by the existing publisher path, not by a new sentinel.
+		if _, err := terminalSettlementIntentFields(AgentRunnerRequestRecord{}, AgentRunnerCompletionRecord{}, bare); err == nil {
+			t.Fatal("the publisher must reject an observed settlement with a nil amount")
+		}
+	})
 }
