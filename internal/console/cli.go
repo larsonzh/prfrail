@@ -16,6 +16,7 @@ import (
 	"github.com/larsonzh/prfrail/internal/adapters"
 	"github.com/larsonzh/prfrail/internal/chain"
 	"github.com/larsonzh/prfrail/internal/evidence"
+	"github.com/larsonzh/prfrail/internal/tickets"
 )
 
 const (
@@ -269,11 +270,19 @@ func (cli CLI) executeRun(ctx context.Context, args []string, stdout, stderr io.
 	runDir := set.String("run-dir", "", "run directory")
 	runID := set.String("run-id", "", "run identifier")
 	jsonOutput := set.Bool("json", false, "output as JSON")
+	requestRecord := set.String("request-record", "", "path to a declared AgentRunner request record (enables the AgentRunner assembly)")
+	capabilityRecord := set.String("capability-record", "", "path to a declared AgentRunner capability record")
+	enforcementRecord := set.String("enforcement-record", "", "path to a declared AgentRunner enforcement record")
+	availabilityRecord := set.String("availability-record", "", "path to a declared AI availability record")
+	authorizationLedger := set.String("authorization-ledger", "", "path to an authorization ledger")
+	costLedger := set.String("cost-ledger", "", "path to a cost ledger")
+	agentCLIPath := set.String("agent-cli", "", "path to the pinned agent CLI executable")
+	agentVersion := set.String("agent-version", "", "pinned agent CLI version")
 	if err := set.Parse(args); err != nil {
-		return writeUsageError(stdout, stderr, "run", *jsonOutput, parseErr.String(), "usage: prfrail run [--chain <path>] [--run-id <id>] [--run-dir <path>] [--json]")
+		return writeUsageError(stdout, stderr, "run", *jsonOutput, parseErr.String(), runUsage)
 	}
 	if len(set.Args()) != 0 {
-		return writeUsageError(stdout, stderr, "run", *jsonOutput, "run does not accept positional arguments", "usage: prfrail run [--chain <path>] [--run-id <id>] [--run-dir <path>] [--json]")
+		return writeUsageError(stdout, stderr, "run", *jsonOutput, "run does not accept positional arguments", runUsage)
 	}
 
 	cwd, err := cli.getwd()
@@ -289,7 +298,17 @@ func (cli CLI) executeRun(ctx context.Context, args []string, stdout, stderr io.
 		return writeCommandError(stdout, stderr, "run", *jsonOutput, err)
 	}
 	executable := FindExecutableSteps(cfg)
-	if len(executable) > 0 {
+	inputs := agentRunnerRunInputs{
+		requestRecord:       *requestRecord,
+		capabilityRecord:    *capabilityRecord,
+		enforcementRecord:   *enforcementRecord,
+		availabilityRecord:  *availabilityRecord,
+		authorizationLedger: *authorizationLedger,
+		costLedger:          *costLedger,
+		agentCLI:            *agentCLIPath,
+		agentVersion:        *agentVersion,
+	}
+	if len(executable) > 0 && !inputs.complete() {
 		first := executable[0]
 		err := fmt.Errorf("local runtime only supports noop steps; first executable step is %s/%s (%s)", first.TaskID, first.StepID, first.Kind)
 		return writeCommandError(stdout, stderr, "run", *jsonOutput, err)
@@ -321,16 +340,164 @@ func (cli CLI) executeRun(ctx context.Context, args []string, stdout, stderr io.
 	if err != nil {
 		return writeCommandError(stdout, stderr, "run", *jsonOutput, err)
 	}
+	if len(executable) > 0 {
+		return cli.executeAgentRunnerRun(ctx, *runID, resolvedRunDir, definition, inputs, *jsonOutput, stdout, stderr)
+	}
 	summary, err := ExecuteNoopRun(ctx, *runID, resolvedRunDir, definition, filepath.Dir(resolvedPath), cli.now)
 	if err != nil {
 		return writeCommandError(stdout, stderr, "run", *jsonOutput, err)
 	}
-	if *jsonOutput {
+	return writeRunSummary(stdout, *jsonOutput, resolvedRunDir, summary)
+}
+
+const runUsage = "usage: prfrail run [--chain <path>] [--run-id <id>] [--run-dir <path>] [--json] [--request-record <path> --capability-record <path> --enforcement-record <path> --availability-record <path> --authorization-ledger <path> --cost-ledger <path> --agent-cli <path> --agent-version <version>]"
+
+// agentRunnerRunInputs is the all-or-nothing AgentRunner CLI surface. Every one
+// of the eight values must be present before the run command routes to the
+// AgentRunner assembly: a partially supplied set keeps the existing noop-only
+// refusal instead of assembling from an incomplete declaration.
+type agentRunnerRunInputs struct {
+	requestRecord       string
+	capabilityRecord    string
+	enforcementRecord   string
+	availabilityRecord  string
+	authorizationLedger string
+	costLedger          string
+	agentCLI            string
+	agentVersion        string
+}
+
+func (inputs agentRunnerRunInputs) complete() bool {
+	for _, value := range []string{
+		inputs.requestRecord,
+		inputs.capabilityRecord,
+		inputs.enforcementRecord,
+		inputs.availabilityRecord,
+		inputs.authorizationLedger,
+		inputs.costLedger,
+		inputs.agentCLI,
+		inputs.agentVersion,
+	} {
+		if strings.TrimSpace(value) == "" {
+			return false
+		}
+	}
+	return true
+}
+
+// executeAgentRunnerRun decodes the declared record files and drives the
+// production assembly. Decoding is CLI-side file IO; the assembly re-validates
+// every record before the engine exists.
+func (cli CLI) executeAgentRunnerRun(ctx context.Context, runID, runDir string, definition chain.Definition, inputs agentRunnerRunInputs, jsonOutput bool, stdout, stderr io.Writer) int {
+	cwd, err := cli.getwd()
+	if err != nil {
+		return writeCommandError(stdout, stderr, "run", jsonOutput, err)
+	}
+	readRecord := func(label, value string) ([]byte, error) {
+		path, err := resolvePathFromCWD(cwd, value)
+		if err != nil {
+			return nil, err
+		}
+		data, err := os.ReadFile(path)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", label, err)
+		}
+		return data, nil
+	}
+	requestBytes, err := readRecord("request record", inputs.requestRecord)
+	if err != nil {
+		return writeCommandError(stdout, stderr, "run", jsonOutput, err)
+	}
+	requestRecord, err := adapters.DecodeAgentRunnerRequestRecord(requestBytes)
+	if err != nil {
+		return writeCommandError(stdout, stderr, "run", jsonOutput, err)
+	}
+	capabilityBytes, err := readRecord("capability record", inputs.capabilityRecord)
+	if err != nil {
+		return writeCommandError(stdout, stderr, "run", jsonOutput, err)
+	}
+	capabilityRecord, err := adapters.DecodeAgentRunnerCapabilityRecord(capabilityBytes)
+	if err != nil {
+		return writeCommandError(stdout, stderr, "run", jsonOutput, err)
+	}
+	enforcementBytes, err := readRecord("enforcement record", inputs.enforcementRecord)
+	if err != nil {
+		return writeCommandError(stdout, stderr, "run", jsonOutput, err)
+	}
+	enforcementRecord, err := adapters.DecodeAgentRunnerEnforcementRecord(enforcementBytes)
+	if err != nil {
+		return writeCommandError(stdout, stderr, "run", jsonOutput, err)
+	}
+	availabilityBytes, err := readRecord("availability record", inputs.availabilityRecord)
+	if err != nil {
+		return writeCommandError(stdout, stderr, "run", jsonOutput, err)
+	}
+	availabilityRecord, err := adapters.DecodeAIAvailabilityRecord(availabilityBytes)
+	if err != nil {
+		return writeCommandError(stdout, stderr, "run", jsonOutput, err)
+	}
+	ledgerPath, err := resolvePathFromCWD(cwd, inputs.authorizationLedger)
+	if err != nil {
+		return writeCommandError(stdout, stderr, "run", jsonOutput, err)
+	}
+	authorizationLedger, err := loadAuthorizationLedger(ledgerPath)
+	if err != nil {
+		return writeCommandError(stdout, stderr, "run", jsonOutput, err)
+	}
+	costLedgerPath, err := resolvePathFromCWD(cwd, inputs.costLedger)
+	if err != nil {
+		return writeCommandError(stdout, stderr, "run", jsonOutput, err)
+	}
+	costLedgerBytes, err := os.ReadFile(costLedgerPath)
+	if err != nil {
+		return writeCommandError(stdout, stderr, "run", jsonOutput, err)
+	}
+	costLedgerRecord, err := tickets.DecodeCostLedgerRecord(costLedgerBytes)
+	if err != nil {
+		return writeCommandError(stdout, stderr, "run", jsonOutput, err)
+	}
+	costLedger, err := tickets.LoadCostLedger(costLedgerRecord)
+	if err != nil {
+		return writeCommandError(stdout, stderr, "run", jsonOutput, err)
+	}
+	agentCLIPath, err := resolvePathFromCWD(cwd, inputs.agentCLI)
+	if err != nil {
+		return writeCommandError(stdout, stderr, "run", jsonOutput, err)
+	}
+	options := AgentRunnerAssemblyOptions{
+		RunID:               runID,
+		RunRoot:             runDir,
+		Definition:          definition,
+		RequestRecord:       requestRecord,
+		CapabilityRecord:    capabilityRecord,
+		EnforcementRecord:   &enforcementRecord,
+		AvailabilityRecord:  availabilityRecord,
+		AvailabilityPolicy:  AgentRunnerDefaultAvailabilityPolicy(availabilityRecord, cli.now()),
+		AuthorizationLedger: authorizationLedger,
+		CostLedger:          costLedger,
+		AgentCLI: AgentRunnerCLIOptions{
+			Executable:  agentCLIPath,
+			Version:     inputs.agentVersion,
+			VersionArgs: []string{agentRunnerDefaultVersionFlag},
+			Timeout:     agentRunnerDefaultRunTimeout,
+			MaxLogBytes: agentRunnerDefaultMaxLogBytes,
+		},
+		Clock: cli.now,
+	}
+	summary, err := ExecuteAgentRunnerRun(ctx, options)
+	if err != nil {
+		return writeCommandError(stdout, stderr, "run", jsonOutput, err)
+	}
+	return writeRunSummary(stdout, jsonOutput, runDir, summary)
+}
+
+func writeRunSummary(stdout io.Writer, jsonOutput bool, runDir string, summary RunSummary) int {
+	if jsonOutput {
 		return writeJSONResponse(stdout, commandResponse{Command: "run", OK: true, ExitCode: exitSuccess, Message: "run completed", Data: summary})
 	}
 	fmt.Fprintf(stdout, "run: completed\n")
 	fmt.Fprintf(stdout, "runId: %s\n", summary.RunID)
-	fmt.Fprintf(stdout, "runDir: %s\n", resolvedRunDir)
+	fmt.Fprintf(stdout, "runDir: %s\n", runDir)
 	fmt.Fprintf(stdout, "chainState: %s\n", summary.ChainState)
 	fmt.Fprintf(stdout, "events: %d\n", summary.Sequence)
 	fmt.Fprintf(stdout, "eventLog: %s\n", summary.EventLogPath)

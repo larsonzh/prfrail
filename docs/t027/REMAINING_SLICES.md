@@ -583,6 +583,27 @@ A6 ② 进度（第 2 批，2026-09-15）：
 
 **收尾（2026-09-29，⑩ 停点）**：① 的核实结论为「段落已存在（提交 `dd36b9b`）⇒ 不重复回填」；② OB-53 补第五项；★1 至 ★6 全部落盘（★1 只改现象列、末列保持 `待议`、OB 未闭合）。⑤ `PASS WITH FIXES`（1/1）；⑥ 可跳过（⑦ 确认）；⑦ `PASS WITH FIXES`（1/1，降级 `deepseek-v4-pro`，ADR-016）；**⑦ 第 2 轮复审已执行**（额度例外，ADR-017）⇒ `PASS WITH FIXES`，2 条 Low 已处置。如实登记：首轮输入包 diff 为空系**主控错误**；**OB-54 候选**（`DEV_PLAN.md:139`）留待下一片。门禁 `TOTAL_FAIL=0`、`SELFTEST PASS 248/248`、报告对逐行 0 失配、探针 0。commit 与 push 经用户同轮预授权（不推 gitee）。
 
+
+### T027-ASSEMBLY-MIN 切片定义回写（2026-10-03）
+
+| 字段 | 内容 |
+| --- | --- |
+| 标识 | `T027-ASSEMBLY-MIN`（产品实现类切片；A 段最小可跑装配，范围严格限定拒绝路径） |
+| 目标 | 把已冻结的 AgentRunner 构件装配成一条可跑的拒绝路径链：八项输入 flags 全在场且存在可执行步骤时才路由到装配入口，任一前置失败即 fail-closed 拒绝 |
+| 依赖 | A5（后置校验端口）、A6（pinned CLI 与离线进程层）、A4（终局路由）、A3（终局发布与结算）、A2（派发与回执）；用户 2026-10-02 的边界裁定 |
+| 规模 | M |
+| 步骤 | 步骤 0（台账与准则预置）→ ①架构（V4 Pro，v1 与 v2）→ ②b实现（Flash，含 r2 与 r3 与 r4 三轮整改）→ ③测试 → ④门禁 → ⑤预审（V4 Pro，三轮，第三轮为额度例外 ADR-018）→ ⑥独立扫描（MAI，盲扫）→ ⑦盲审与终审与复审（Codex，额度 3/3）→ ⑧a与⑧b文档 → ⑨原生验证 → ⑧c收尾 → ⑩停点 |
+| 现状缺口 | 冻结件齐备，但缺少把它们装成可跑拒绝路径链的生产入口，也没有 CLI 表面接线与装配级差异护栏 |
+| 交付物 | 报告 `docs/validation/t027-assembly-min{,_EN}.md`；自由度清单；5 个 Go 文件；步骤 0 的 `DELIVERY_DIRECTIVE{,_EN}`（v1.17）与 `ADR_REGISTER{,_EN}`（ADR-018）；本台账块与完成记录行 |
+| 验收证据 | 装配正反向腿与装配级差异护栏全绿；解析矩阵两侧同输入同期望；源码级不变量守住单入口兜底；变异审计 20 条全红或如实标被取代且逐字节还原；门禁三作用域零失败；全量测试无失败 |
+| 边界 | 不做真实 enforcement 落地（B 段）；不改 `internal/chain/**`、既有 adapters 与 console 文件、schemas、CONTRACTS、fixtures、workflows、`go.mod`；零新哨兵；不在 Windows 主张正向全链证据；不开 ⑦ 第 4 轮；探针 0 |
+| 分级 | `[SLICE]` |
+| 探针额度 | 无（0 次真实外部调用） |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/T027-ASSEMBLY-MIN-freedom-list.md` |
+
+**起跑（2026-10-03）**：步骤 0 已落地——`DELIVERY_DIRECTIVE{,_EN}` 升 v1.17（§12.4 登记 OB-54 与 OB-55，并登记本片主控编排器的调用口径）；① 产出装配设计与拒绝路径枚举。
+
+**收尾（2026-10-03，⑩ 停点）**：⑤ 三轮均 `PASS WITH FIXES`（第三轮为额度 2/2 之外的例外，ADR-018）；⑥ `INDEPENDENT SCAN: PASS`（0 发现）；⑦ 盲审 `FINDINGS`（1 High 与 1 Medium 与 1 Low）→ 终审 `FINAL REVIEW: FINDINGS`（2 Medium 命中硬门）→ 复审 `RE-REVIEW: PASS WITH FIXES`（M-1 已关闭；F-02 仍判 Medium，按用户预授权以记录态收口，根因登记候选 OB-57）。门禁 `TOTAL_FAIL=0`（tree 与 index）、`SELFTEST PASS 248/248`、全量测试 14 个包 ok 且 0 失败、报告对逐行对称、探针 0。候选 OB-56 至 OB-61 已在报告登记。commit 与 push 须同轮授权（不推 gitee）。
 ## 完成记录（追加）
 
 | 日期 | 切片 | 完成摘要 | 证据 |
@@ -606,6 +627,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 2026-09-24 | DR-1 | **业务切片（含一次准则台账补登）**：把 `ai check` 传给候选 CLI 的 `--max-ai-credits` 改为 `max(30, maximumRequests)`（floor 常量 30），使产品可用性探针首次在 pin 1.0.83 上产出 `available`（`requestsUsed=1`、退出码 0、`profileConfigHash` 与 B1 主基线逐字一致）。②b/③ 只动 `ai_probe_copilot.go` 与其测试（`ai.go` 零改动）；变异检验（恰好 1 处命中 + 变异后三处红 + 逐字节还原 sha256 一致）通过；④ 门禁 `TOTAL_FAIL=0`。⑤ `PASS WITH FIXES` → 复审 `PASS`（2/2）；⑥ `INDEPENDENT SCAN: FINDINGS`（按 §7.2 替代路径转入 ⑦）；⑦ `FINAL REVIEW: PASS`（降级 `deepseek-v4-pro`，ADR-014）；⑨ 探针 1/5。**未提交**（等同轮授权）。**已知差异（R1=A 不修）**登记为候选 OB-52。 | docs/validation/dr-1-availability-probe-floor.md |
 | 2026-09-29 | S1-REACH | **业务判定类切片（含一次准则台账补登）**：以 DR-1 闭环后的当前事实刷新 OB-21 / T018 / S1 exit 的可达性判定（十门 × 依赖 × 解锁条件），结论为八门不可达或未通过、一门未知（人工门）、一门已执行但不独立成立；同批登记 **OB-51 / OB-52 / OB-53**（v1.15），并以 **ADR-015** 留痕 ⑦ 降级。零代码改动、探针 0。审查：⑤ `FINDINGS` → `PASS WITH FIXES`；⑥ 可跳过（⑦ 确认）；⑦ `PASS WITH FIXES` → 复审 `PASS`（`deepseek-v4-pro`，独立性降低）。 | docs/validation/s1-reach-reachability.md |
 | 2026-09-29 | LEDGER-BACKFILL | **文档回填切片**：更正台账与 `DEV_PLAN` 中的过期表述（★1 至 ★6）并补登 OB-53 第五项；① 核实 B3a 段落已在位（提交 `dd36b9b`）故不重复回填。⑤ `PASS WITH FIXES` → ⑦ `PASS WITH FIXES` → 复审 `PASS WITH FIXES`（`deepseek-v4-pro`，ADR-016；复审为额度例外，ADR-017，2 条 Low 已处置）；另如实登记首轮输入包 diff 为空系主控错误与 **OB-54 候选**（`DEV_PLAN.md:139`，下一片登记）。零代码改动、探针 0。 | docs/validation/ledger-backfill.md |
+| 2026-10-03 | T027-ASSEMBLY-MIN | **产品实现类切片（A 段：拒绝路径）**：把已冻结的 AgentRunner 构件装配成可跑的拒绝路径链，新增 3 个生产文件与 2 个测试文件并接线 console 的八项 flags 路由；②b 经三轮整改后两侧解析口径合一、单个兜底闭包覆盖全部 spawn 后失败返回。⑤ 三轮均 `PASS WITH FIXES`（第三轮为额度例外，ADR-018）；⑥ `INDEPENDENT SCAN: PASS`（0 发现）；⑦ 盲审与终审与复审（Codex，3/3）⇒ `RE-REVIEW: PASS WITH FIXES`（M-1 已关闭；F-02 按**用户预授权的记录态**收口，根因登记候选 OB-57）。变异条目全红或如实标被取代且逐字节还原；门禁 `TOTAL_FAIL=0` 且全量测试无失败；**未提交**（等同轮授权）。候选 OB-56 至 OB-61 已在报告登记。 | docs/validation/t027-assembly-min.md |
 
 > **台账完整性注记（2026-09-21，已按用户授权补录）**：本表自 A4 行之后长期未追加完成行。**2026-09-21 依据各切片自己的验证报告补录 A5/A6/A7/B2/B3a 五行**（受"不凭记忆、只补可核验字段、缺失留空并标注历史缺失、不编造"三条约束），B3b 行先于本次补录写入，故五行列于其后；各行的日期/提交号/运行号/摘要均逐项标注来源，无法核验者已标注 **历史缺失**。
 > **已回填**（本片核实，2026-09-29）：**B3a 的 `DEV_PLAN{,_EN}.md` 段落已由提交 `dd36b9b` 补入**（`DEV_PLAN.md:137` 与 `_EN.md:138`）；原注记的过期表述由切片 `LEDGER-BACKFILL` 更正，**回填动作无需重复执行**。

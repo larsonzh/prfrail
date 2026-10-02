@@ -1,6 +1,6 @@
 ﻿# ProofRail 交付执行准则（DELIVERY_DIRECTIVE）
 
-版本：v1.16。日期：2026-09-29。状态：**CN 正文冻结**（ `_EN` 镜像见 `docs/DELIVERY_DIRECTIVE_EN.md`）。
+版本：v1.17。日期：2026-10-02。状态：**CN 正文冻结**（ `_EN` 镜像见 `docs/DELIVERY_DIRECTIVE_EN.md`）。
 
 > **多语言说明**：本文件为中文权威版；`docs/DELIVERY_DIRECTIVE_EN.md` 为严格同位镜像（与 CN 同步维护；CN 冻结后同步更新，避免评审期双语返工）。
 > **编码**：本文及 `_EN` 必须保持 UTF-8 **with BOM** + **LF**。
@@ -60,6 +60,7 @@
 | v1.14 | 2026-09-24 | **台账补登（切片 `DR-1` 的步骤 0；用户 2026-09-24 授权）**：§12.4 登记 **OB-46 / OB-47 / OB-48 / OB-49 / OB-50**——依次为 G6-5 的区域端点依赖、`_EN` 词表选取口径、自由度清单落盘时机、`tmp/` 生命周期与 `local-only` 豁免、`sol-orchestrator` 处置与生成器入库条件。**不新增判据、不改任何规则语义、不改 §6.3 的判据作用域**；OB-50 依用户裁定单列一行（不并入同族）。本行是 **`DR-1` 切片内的副产物**，不是独立的准则治理片。 | `DR-1`（需回写：本片台账与报告须载明 v1.14 为切片内副产物） |
 | v1.15 | 2026-09-29 | **台账补登（切片 `S1-REACH` 的步骤 0；用户 2026-09-29 授权）**：§12.4 登记 **OB-51 / OB-52 / OB-53**——依次为 BYOK 与 secretStorage 五点确认、契约与 CLI 的额度差异、`DIRECTIVE-MODEL-LISTS` 立项预留。**不新增判据、不改任何规则语义、不改 §6.3 判据作用域**。本行是 `S1-REACH` 切片内的副产物，不是独立的准则治理片。 | `S1-REACH`（本片报告 §1 载明 v1.15 为切片内副产物） |
 | v1.16 | 2026-09-29 | **台账措辞更正（切片 `LEDGER-BACKFILL`；用户 2026-09-29 授权）**：OB-21 的现象列加**更正注记**（子项「`DR-1 未修`」已消除；末列状态词保持 `待议`、该 OB **未闭合**）、OB-53 补登第五项（`model: "auto"` 可间接引入黑名单模型）。**不新增判据、不改任何规则语义、不改 §6.3 判据作用域**。本行是 `LEDGER-BACKFILL` 切片内的副产物，不是独立的准则治理片。 | `LEDGER-BACKFILL`（本片报告 §1 载明 v1.16 为切片内副产物） |
+| v1.17 | 2026-10-02 | **台账补登（切片 `T027-ASSEMBLY-MIN` 的步骤 0；用户 2026-10-02 授权）**：§12.4 登记 **OB-54 / OB-55**——依次为 `DEV_PLAN` 中 B3b 段尾的过期表述、enforcement 生产落地与 S1/S2 的边界冲突；另在 §12.4 末尾以引用块登记本片主控编排器的调用口径（**不占 OB 号**）。**不新增判据、不改任何规则语义、不改 §6.3 判据作用域**。本行是 `T027-ASSEMBLY-MIN` 切片内的副产物，不是独立的准则治理片。 | `T027-ASSEMBLY-MIN`（本片报告 §1 载明 v1.17 为切片内副产物） |
 ---
 
 ## 1. 适用范围与切片模型
@@ -835,8 +836,12 @@
 | OB-51 | 2026-09-29 | **BYOK 与 secretStorage 五点只读确认（DR-1 报告 §11 预留，由切片 `S1-REACH` 执行）**：① `ai check` 的 flag 集不含 `--model`，模型仅取自链配置 `ai.profiles[].model`（`internal/console/ai.go:230`），无默认值与 fallback；② `schemas/` 无覆盖 `ai.profiles` 的 JSON Schema，非空必填由 Go 校验承担（`internal/adapters/ai_provider.go:51`）；③ `model: \"auto\"` 不被 schema 或代码禁止，原样透传（`internal/adapters/ai_probe_copilot.go:114`）；④ 环境变量通道当前无 BYOK 密钥，Windows 凭据管理器无 `ProofRail` 前缀条目，Copilot CLI 自有存储仅枚举文件名且未读内容，VS Code secretStorage 不可枚举；⑤ prfrail 自有 SecretStore = Windows Credential Manager（前缀 `windows-credential:`，`internal/adapters/ai_secret_windows.go:15`），`docs/OPERATIONS.md` 的示例引用属同一机制且当前不在位。五点均不指向语义改动。 | **已登记**（本片确认结果；不可枚举项如实标注） |
 | OB-52 | 2026-09-29 | **契约与 CLI 的额度差异（DR-1 报告 §11 预留；R1=A 不修）**：`docs/CONTRACTS.md:191` 要求可用性结论在显式费用与请求预算内取得，而 `internal/adapters/ai_probe_copilot.go:117` 经 DR-1 修复后把 `--max-ai-credits` 取 `max(30, maximumRequests)` ⇒ CLI 侧有效额度与产品请求预算不一致，记录不含费用维度；DR-1 ⑥ 的 High 与 Medium 以及 Low④ 同属该差异的两面。 | **待议**（修法属 CONTRACTS 语义改动，另立切片；本片只登记） |
 | OB-53 | 2026-09-29 | **立项预留（DR-1 报告 §11 预留）**：`DIRECTIVE-MODEL-LISTS` 的立项内容 = 黑名单全称化、分档释放 `gpt-6-sol` 与 `gpt-6-luna`、白名单更新、成本上限重估；该片立项时使用本号（四项内容取自用户 2026-09-29 裁定原文）。**第五项（2026-09-29 由切片 `LEDGER-BACKFILL` 补登）**：`model: "auto"` 不被 schema 或代码禁止（原样透传 `internal/adapters/ai_probe_copilot.go:114`）⇒ 黑名单模型可经 `auto` 间接引入，须在该片处置。 | **待议**（该片立项时执行；本片只登记） |
+| OB-54 | 2026-10-02 | **`DEV_PLAN` 的 B3b 段尾过期表述（切片 `LEDGER-BACKFILL` 报告 §3 第 6 项登记为候选）**：`docs/DEV_PLAN.md:139` 与 `docs/DEV_PLAN_EN.md:140` 的 B3b 段落尾部仍称 B3a 段落未补入，而该段落已由提交 `dd36b9b` 补入（`DEV_PLAN.md:137` 与 `_EN.md:138`）；同一台账的完整性注记已由 `LEDGER-BACKFILL` 更正，此处尚未同步。 | **待办**：下一片回写时更正为与当前事实一致（仅措辞更正，不改任务状态字段） |
+| OB-55 | 2026-10-02 | **enforcement 生产落地与 S1/S2 的边界冲突（本片 ① 前的只读盘点发现；用户 2026-10-02 裁定）**：T027 装配要求「无 enforcement 记录即拒绝启动候选」，而外部 OS 强制边界**尚未接入产品**（`DEV_PLAN.md:112` 原文），其平台无关的 `Sandbox` 接口又按 `docs/validation/B2-EXTERNAL-ENFORCEMENT.md` §8 第 8 条**被明确推迟到 S2**（理由 = S1 提前落地会产生无人调用的死代码）⇒ 两条要求方向相反。**本片裁定**：`T027-ASSEMBLY-MIN` 只做**拒绝路径**（该路径在 console 的 run 命令有真实调用者，**不构成**无人调用的死代码 ⇒ 不违反上述推迟理由）；真实边界接入产品的归属（B 段）不在本片裁定。 | **待议**：B 段立项时由 ① 阶段评估（候选范围 = 独立切片 / 提前落 `Sandbox` 接口 / 维持 S2） |
 
 > **本片（`GATES-EXT`）⑦ 轮次例外（用户 2026-09-22 预授权）**：⑦ 复审（第 2 轮）报 Medium+ ⇒ 依 §5.3 强制复审，并按预授权开启**第 3 轮**（`GPT-5.3-Codex`，**仅本片有效**）；第 3 轮 `PASS WITH FIXES`、无 Medium+（仅 1 条 Low，即 OB-20）。**该授权不推广**：其他切片仍按 §7.5（终审 1 + 复审 1），第 4 轮不自动授权。
+
+> **本片（`T027-ASSEMBLY-MIN`）主控编排器的调用登记（用户 2026-10-02 裁定，不占 OB 号）**：本片不使用 `sol-orchestrator`（其处置结论与生成器入库条件见 OB-50，禁用依据见 §2.4）；主控即直属会话主控，① 与 ⑦ 按 §2.2 白名单与 §5.2 分档执行，⑦ 由 `GPT-5.3-Codex` 承担且不降级；本片对 `sol-orchestrator` 的调用次数为 0。
 
 ### 12.5 缺口与未来扩展
 
