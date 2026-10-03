@@ -1,0 +1,5 @@
+CI run reading archived as a verifiable source (disposition: repo).
+Repo: github.com/larsonzh/prfrail
+Command: gh run view 37107634723 --json conclusion,headSha,status,workflowName
+{"conclusion":"success","headSha":"a8159706d7852c925274515cb5ecbfb30172d77f","status":"completed","workflowName":"CI"}
+NOTE: run 37107634723 belongs to slice DIRECTIVE-DESIGN-LOOPBACK (commit a815970) and is cited by the ledger backfill performed in slice DIRECTIVE-LOOPBACK-LANDING (report section 2, item 6).

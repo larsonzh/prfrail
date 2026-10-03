@@ -21,6 +21,8 @@ The former `RFC-proofrail-unattended-ai-engineering-product.md` is the [project 
 | Delivery execution discipline (slices, role and model allow-list, gates, review, cost) | [Delivery directive](DELIVERY_DIRECTIVE.md) | Not applicable (engineering discipline, not a product-design source) |
 | Unresolved cross-domain decisions | [ADR register](ADR_REGISTER_EN.md) | Candidate solution source |
 
+**Cross-layer pointer**: the build-discipline layer (`DELIVERY_DIRECTIVE{,_EN}.md`) and the product-definition layer (`RFC-proofrail-unattended-ai-engineering-product.md`) point at each other through this line - when the discipline layer references product definitions, the RFC is the project proposal and historical design source (positioned in the first paragraph of this page); discipline requirements inside the product-definition layer always point to `DELIVERY_DIRECTIVE{,_EN}.md`.
+
 Read this page, the current T task in [DEV_PLAN_EN.md](DEV_PLAN_EN.md), the applicable authority sections/AT, and nearby code/tests. Read the proposal only to trace rationale or handle content not yet migrated. Do not load both complete language sets each round.
 
 ## 2. Delivery Index and Responsibility Coverage
@@ -39,6 +41,7 @@ Read this page, the current T task in [DEV_PLAN_EN.md](DEV_PLAN_EN.md), the appl
 | Implementation | [计划](DEV_PLAN.md) / [Plan](DEV_PLAN_EN.md) | 28 tasks, dependencies, scope, traceability | Task/stage acceptance; implementation lead |
 | Decisions | [ADR/readiness](ADR_REGISTER.md) / [Decisions](ADR_REGISTER_EN.md) | Trade-offs, bootstrap, release/support, 13 readiness gaps | Decisions/evidence; designated approver |
 | Governance | [文档计划](DOCUMENTATION_PLAN.md) / this document | Bilingual rules, scoped reading, gates and future docs | Documentation changes; doc maintainer |
+| Close-out template | [模板](SLICE-CLOSEOUT-TEMPLATE.md) / [Template](SLICE-CLOSEOUT-TEMPLATE_EN.md) | Structural master for task-package / phase close-out reports (retrospective = driver; prospective = driver-drafted pending-question list + user ruling); no rule body, the directive prevails on conflict | Stage close-out; first anchor = end of T027; driver |
 
 Continue referencing proposal sections 10/18 until their terminology is migrated; do not invent synonyms. Each implementation task moves its direct normative dependencies into the applicable authority. Combined operations/testing/migration packages reduce reading cost. Actual schema and machine-example completion comes from the development plan and validation reports, never document titles. Audit policy lives in security, release policy in operations/ADRs; external policies need approval before release.
 
@@ -76,4 +79,4 @@ Distinguish fact, proposal, measurement and plan; unexecuted examples are planne
 
 This round runs terminal checks. T003 consolidates document/contract checks into maintained tooling; T017 wires CI. Keep stage reports/open issues and increment checkboxes only after acceptance. Traceability checkpoints prove mappings, not approval or implementation.
 
-Enter the product completeness update through [requirements section 8](PRODUCT_REQUIREMENTS_EN.md#8-product-completeness-review-2026-09-06). Project proposal section 19 retains provenance; the update maps to contracts 9, architecture 6, security 6, operations 8, ADR-008, P1.7, and AT-16–AT-21. Keep 28 REQ IDs and 12 document pairs; take the union of PC-01–PC-06 supplements and primary mappings. S1 exit docs add onboarding, delivery packages, revocation, cost explanations, backup/restore/uninstall, and SBOM. S2/S3 enhancements remain candidates, not supported S1 features.
+Enter the product completeness update through [requirements section 8](PRODUCT_REQUIREMENTS_EN.md#8-product-completeness-review-2026-09-06). Project proposal section 19 retains provenance; the update maps to contracts 9, architecture 6, security 6, operations 8, ADR-008, P1.7, and AT-16–AT-21. Keep 28 REQ IDs and 13 document pairs; take the union of PC-01–PC-06 supplements and primary mappings. S1 exit docs add onboarding, delivery packages, revocation, cost explanations, backup/restore/uninstall, and SBOM. S2/S3 enhancements remain candidates, not supported S1 features.
