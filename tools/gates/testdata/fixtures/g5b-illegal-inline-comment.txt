@@ -1,0 +1,6 @@
+---
+name: fixture-g5b-illegal-inline-comment
+description: G5-b probe fixture - a legal value followed by an inline comment
+model: gpt-5.3-codex # keep
+---
+Probe body. This file is test data, not a real agent role file.

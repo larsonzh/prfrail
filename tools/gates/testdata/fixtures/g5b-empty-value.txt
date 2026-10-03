@@ -1,0 +1,9 @@
+---
+name: fixture-g5b-empty-value
+description: G5-b probe fixture - empty model value, which belongs to G5-a 2 not to G5-b
+model: ""
+---
+Probe body. This file is test data, not a real agent role file.
+
+G5-b must pass here and G5-a 2 must report the finding: the division of labour
+between the two criteria is what this fixture pins down.

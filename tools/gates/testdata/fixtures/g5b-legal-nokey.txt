@@ -1,0 +1,5 @@
+---
+name: fixture-g5b-legal-nokey
+description: G5-b probe fixture - no model key at all (the section 2.6 compliant shape)
+---
+Probe body. This file is test data, not a real agent role file.

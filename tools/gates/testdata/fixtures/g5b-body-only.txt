@@ -1,0 +1,7 @@
+---
+name: fixture-g5b-body-only
+description: G5-b probe fixture - the model key appears in the BODY, not in the frontmatter
+---
+Probe body. This file is test data, not a real agent role file.
+
+model: gpt-5.4

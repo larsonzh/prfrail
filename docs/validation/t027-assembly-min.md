@@ -158,6 +158,13 @@
 
 - 下列行以制表符分隔：仓内相对路径与处置词（`repo` = 属于仓库且可解析；`local-only` = 工作区专用、不入库）。
 
+## 15. 补充记录（闭环后证据回填，2026-10-03，由切片 `DIRECTIVE-MODEL-LISTS` 步骤 0 执行）
+
+- **闭环提交**：本片的 DR-9 修复提交为 `d2d6370`（`fix: settle the declared offline workload with the zero-cost amount`），与首次提交 `68a1ef0` 一并位于 `origin/main`（`git log --oneline` 实读）。
+- **CI 双绿（终态）**：CI run `37073985144`（head `d2d6370`）**两腿均通过**——Ubuntu 腿与 Windows 腿的 `Gates` 步各自实测 `SELFTEST: PASS 248/248`、`GATE REPORT scope=ci changed=8`、`TOTAL_FAIL=0`。取证命令 = `gh run view 37073985144 --log`，原始日志留存于 `tmp/dml/ci-run-37073985144.txt`（`local-only`）。
+- **与本文档 CI 观测行的关系**：本文档先前记录的 run `37070276731` 是 DR-9 的**首次红**（Ubuntu 腿）；其后的修复与终态绿由本补充记录承接，本片报告**不以该红 run 作为终态**。
+- **停点措辞口径**：原「⑩ 停点结论」描述的是**⑩ 停点当时**的状态（提交被明确保留给用户同轮授权）；提交与推送实际发生在该授权之后，二者为时序关系，不构成矛盾。
+
 ```artifacts
 docs/DELIVERY_DIRECTIVE.md	repo
 docs/DELIVERY_DIRECTIVE_EN.md	repo
@@ -174,6 +181,7 @@ internal/console/runtime_noop.go	repo
 internal/console/cli.go	repo
 internal/console/runtime.go	repo
 tmp/assembly-min/**	local-only
+tmp/dml/ci-run-37073985144.txt	local-only
 ```
 
 - 注：树作用域下 `repo` 行要求路径**已登记进暂存区**；本片在提交授权之前采用「仅登记路径、不暂存内容」的意图登记（`local-only` 行不受此限），内容不入库，提交仍须同轮授权。

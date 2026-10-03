@@ -158,6 +158,13 @@
 
 - Rows below are tab-separated: repo-relative path and disposition (`repo` means in the repo and resolvable; `local-only` means workspace-only and not committed).
 
+## 15. Supplement (post-closure evidence back-fill, 2026-10-03, executed by slice `DIRECTIVE-MODEL-LISTS` step 0)
+
+- **Closing commits**: this slice DR-9 fix is `d2d6370` (`fix: settle the declared offline workload with the zero-cost amount`) and it sits on `origin/main` together with the first commit `68a1ef0` (read from `git log --oneline`).
+- **CI green on both legs (final state)**: CI run `37073985144` (head `d2d6370`) **passed both legs** - the `Gates` step of the Ubuntu leg and of the Windows leg each measured `SELFTEST: PASS 248/248`, `GATE REPORT scope=ci changed=8` and `TOTAL_FAIL=0`. Evidence command = `gh run view 37073985144 --log`, raw log retained at `tmp/dml/ci-run-37073985144.txt` (`local-only`).
+- **Relation to the CI observation row in this document**: the run recorded earlier, `37070276731`, is the **first red** of DR-9 (Ubuntu leg); the fix and the final green are carried by this supplement, so this report **no longer treats that red run as the final state**.
+- **Stop-point wording**: the original "⑩ stop conclusion" describes the state **at the ⑩ stop point** (the commit was explicitly left to the user same-turn authorisation); the commit and push happened after that authorisation, so the two are related in time and do not contradict each other.
+
 ```artifacts
 docs/DELIVERY_DIRECTIVE.md	repo
 docs/DELIVERY_DIRECTIVE_EN.md	repo
@@ -174,6 +181,7 @@ internal/console/runtime_noop.go	repo
 internal/console/cli.go	repo
 internal/console/runtime.go	repo
 tmp/assembly-min/**	local-only
+tmp/dml/ci-run-37073985144.txt	local-only
 ```
 
 - Note: under tree scope a `repo` row requires the path to be **registered in the index**; before commit authorisation this slice registers the path only, without staging content (`local-only` rows are exempt), so nothing enters the repo and the commit still needs same-turn authorisation.

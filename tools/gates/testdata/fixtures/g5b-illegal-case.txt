@@ -1,0 +1,6 @@
+---
+name: fixture-g5b-illegal-case
+description: G5-b probe fixture - correct model spelled in the wrong case
+model: GPT-5.3-CODEX
+---
+Probe body. This file is test data, not a real agent role file.

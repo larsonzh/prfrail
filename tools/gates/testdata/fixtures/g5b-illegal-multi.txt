@@ -1,0 +1,10 @@
+---
+name: fixture-g5b-illegal-multi
+description: G5-b probe fixture - two model keys, the second one outside the closed set
+model: gpt-5.3-codex
+model: GPT-5.6 Luna
+---
+Probe body. This file is test data, not a real agent role file.
+
+The first key is legal on its own; the criterion must collect every `model`
+occurrence and fail on the second one.

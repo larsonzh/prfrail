@@ -1,0 +1,6 @@
+---
+name: fixture-g5b-closed-set-legal
+description: G5-b probe fixture - model value is a member of the closed set
+model: gpt-5.3-codex
+---
+Probe body. This file is test data, not a real agent role file.

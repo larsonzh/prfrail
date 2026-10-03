@@ -1,0 +1,6 @@
+---
+name: fixture-g5b-illegal-legacy
+description: G5-b probe fixture - a former blacklist value that is not a set member
+model: gpt-5.4
+---
+Probe body. This file is test data, not a real agent role file.

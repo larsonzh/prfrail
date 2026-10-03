@@ -6,7 +6,8 @@
  * Every assertion is named, so a broken fixture or a weakened criterion turns the
  * suite red. Coverage (architecture design section 6):
  *   T1, T2, T4, T5, T6, T7, T8, T9, T10, T11, T13, T14, T15, T16, T17, T18 + G7-d
- *   + T19-T28 (G6-5 section-reference resolution, G6-6 ledger status closed set).
+ *   + T19-T28 (G6-5 section-reference resolution, G6-6 ledger status closed set)
+ *   + T29-T42 (G5-b closed set, plus the G5-a 2 empty-value division of labour).
  * T3 (defect A1 against commit b738e6b) and T12 (defect C1 against commit 1b01115)
  * need real git ranges and are therefore executed as recorded evidence:
  *   node tools/gates/gate.js --check=G6 --scope=range:b738e6b^..b738e6b
@@ -34,6 +35,8 @@ const { createReport } = require('./lib/report');
 const G6 = require('./lib/criteria/g6');
 const G7 = require('./lib/criteria/g7');
 const G4B = require('./lib/criteria/g4b');
+const G5A = require('./lib/criteria/g5a');
+const G5B = require('./lib/criteria/g5b');
 
 const FIXTURES_DIR = path.join(__dirname, 'testdata', 'fixtures');
 const HISTORICAL_DIR = path.join(__dirname, 'testdata', 'historical');
@@ -60,6 +63,22 @@ const FIXTURES = {
   'g6-6-legal-status': { disk: 'g6-6-legal-status.txt', virtual: 'docs/t027/fixture-g6-6-legal-status.md' },
   'g6-6-legacy-status': { disk: 'g6-6-legacy-status.txt', virtual: 'docs/t027/fixture-g6-6-legacy-status.md' },
   'g6-6-en-status': { disk: 'g6-6-en-status.txt', virtual: 'docs/t027/fixture-g6-6-en-status_EN.md' },
+  // G5-a / G5-b (slice DIRECTIVE-MODEL-LISTS, v1.18). G5-b moved from a blacklist regex
+  // to the section 2.2 whitelist closed set, and these fixtures are its first coverage
+  // in this suite; `g5b-empty-value` additionally pins the G5-a 2 division of labour.
+  'g5b-closed-set-legal': { disk: 'g5b-closed-set-legal.txt', virtual: '.github/agents/fixture-g5b-closed-set-legal.agent.md' },
+  'g5b-legal-nokey': { disk: 'g5b-legal-nokey.txt', virtual: '.github/agents/fixture-g5b-legal-nokey.agent.md' },
+  'g5b-illegal-kimi': { disk: 'g5b-illegal-kimi.txt', virtual: '.github/agents/fixture-g5b-illegal-kimi.agent.md' },
+  'g5b-illegal-case': { disk: 'g5b-illegal-case.txt', virtual: '.github/agents/fixture-g5b-illegal-case.agent.md' },
+  'g5b-illegal-quoted': { disk: 'g5b-illegal-quoted.txt', virtual: '.github/agents/fixture-g5b-illegal-quoted.agent.md' },
+  'g5b-illegal-multi': { disk: 'g5b-illegal-multi.txt', virtual: '.github/agents/fixture-g5b-illegal-multi.agent.md' },
+  'g5b-illegal-legacy': { disk: 'g5b-illegal-legacy.txt', virtual: '.github/agents/fixture-g5b-illegal-legacy.agent.md' },
+  'g5b-empty-value': { disk: 'g5b-empty-value.txt', virtual: '.github/agents/fixture-g5b-empty-value.agent.md' },
+  'g5b-body-only': { disk: 'g5b-body-only.txt', virtual: '.github/agents/fixture-g5b-body-only.agent.md' },
+  'g5b-legal-trailing-space': { disk: 'g5b-legal-trailing-space.txt', virtual: '.github/agents/fixture-g5b-legal-trailing-space.agent.md' },
+  'g5b-illegal-inline-comment': { disk: 'g5b-illegal-inline-comment.txt', virtual: '.github/agents/fixture-g5b-illegal-inline-comment.agent.md' },
+  'g5b-closed-set-legal-sol': { disk: 'g5b-closed-set-legal-sol.txt', virtual: '.github/agents/fixture-g5b-closed-set-legal-sol.agent.md' },
+  'g5b-closed-set-legal-luna': { disk: 'g5b-closed-set-legal-luna.txt', virtual: '.github/agents/fixture-g5b-closed-set-legal-luna.agent.md' },
 };
 
 /**
@@ -371,6 +390,80 @@ function g66Probe(virtualPath, text) {
   const out = createReport();
   const res = G6.subchecks.find((s) => s.id === 'G6-6').run(ctx, out);
   return { verdict: verdictOf(out.records, 'G6-6'), findings: res.findings.length, detail: detailOf(out.records, 'G6-6') };
+}
+
+/* ---------------------------------------------------------------------------
+ * G5-b (role-file `model` closed set) and G5-a 2 probes (slice DIRECTIVE-MODEL-LISTS,
+ * v1.18). T29-T37 below are what makes the new criterion falsifiable: each boundary
+ * (verbatim comparison, case sensitivity, quoting, multi-key collection, the empty-value
+ * division of labour, and the load-bearing closed set) is asserted in turn.
+ * ------------------------------------------------------------------------ */
+
+/** Path of the criterion under test (the mutation probe compiles a patched copy). */
+const G5B_SOURCE = path.join(__dirname, 'lib', 'criteria', 'g5b.js');
+/** Mutation target (T37): the first member of the closed set. */
+const G5B_FIRST_MEMBER = "  'deepseek-v4-pro',\n";
+/** Mutation target (T42): the member added by this slice, whose removal must turn the suite red. */
+const G5B_LUNA_MEMBER = "  'gpt-6-luna',\n";
+
+/** G5-b verdict + finding count + record detail for one fixture key. */
+function g5bProbeWith(mod, key) {
+  const ctx = makeCtx([key], {});
+  const out = createReport();
+  const res = mod.run(ctx, out);
+  return {
+    verdict: verdictOf(out.records, 'G5-b'),
+    findings: res && res.findings ? res.findings.length : -1,
+    detail: detailOf(out.records, 'G5-b'),
+  };
+}
+
+function g5bProbe(key) {
+  return g5bProbeWith(G5B, key);
+}
+
+/**
+ * G5-a 2 probe over one fixture key. The shipped G5-a 2 reads the role directory through
+ * `ctx.listAgentFiles()`, so the probe supplies the single virtual agent file directly;
+ * G5-a 1 is fed an empty git result because it greps the real role directory.
+ */
+function g5aEmptyProbe(key) {
+  const text = fixtureText(key);
+  const name = FIXTURES[key].virtual.split('/').pop();
+  const ctx = {
+    git: () => ({ ok: true, code: 0, out: '', err: '', spawnError: null }),
+    listAgentFiles: () => [name],
+    readText: (p) => (p === '.github/agents/' + name ? text : null),
+  };
+  const out = createReport();
+  for (const s of G5A.subchecks) s.run(ctx, out);
+  return {
+    first: verdictOf(out.records, 'G5-a(1)'),
+    second: verdictOf(out.records, 'G5-a(2)'),
+    detail: detailOf(out.records, 'G5-a(2)'),
+  };
+}
+
+/**
+ * Compile a PATCHED copy of a criterion module (T37). Same technique as
+ * `loadMutatedG6`: an in-memory copy cannot leak a mutated criterion onto disk, and the
+ * shipped file is still verified byte-identical afterwards.
+ */
+function loadMutatedCriteria(sourcePath, from, to, tag) {
+  const before = fs.readFileSync(sourcePath);
+  const src = decodeBuffer(before);
+  const patched = src.split(from).join(to);
+  MUTATION_LOG.push({ key: path.basename(sourcePath) + ':' + tag, op: 'sourcePatch', needle: from, applied: patched !== src });
+  const M = require('module');
+  const mod = new M(sourcePath, null);
+  mod.filename = sourcePath;
+  mod.paths = M._nodeModulePaths(path.dirname(sourcePath));
+  mod._compile(patched, sourcePath);
+  return { exports: mod.exports, applied: patched !== src, identical: fs.readFileSync(sourcePath).equals(before) };
+}
+
+function loadMutatedG5b(from, to, tag) {
+  return loadMutatedCriteria(G5B_SOURCE, from, to, tag);
 }
 
 function runTests() {
@@ -1519,6 +1612,125 @@ function runTests() {
       'T28 the `_EN` word-table switch is load-bearing: EN word fails under a CN name, passes under `_EN`, CN word fails under `_EN`',
       cnName.verdict === 'FAIL' && enName.verdict === 'PASS' && cnWordInEn.verdict === 'FAIL',
       JSON.stringify({ cnName: cnName.verdict, enName: enName.verdict, cnWordInEn: cnWordInEn.verdict })
+    );
+  }
+
+  // ---- T29-T37: G5-b closed set (slice DIRECTIVE-MODEL-LISTS, v1.18) ----------------
+  {
+    const legal = g5bProbe('g5b-closed-set-legal');
+    check(
+      'T29 G5-b passes a model value that is a closed-set member',
+      legal.verdict === 'PASS' && legal.findings === 0 && /checked 1/.test(legal.detail),
+      'verdict=' + legal.verdict + ' findings=' + legal.findings + ' :: ' + legal.detail
+    );
+
+    const nokey = g5bProbe('g5b-legal-nokey');
+    check(
+      'T30 G5-b passes a role file that omits the model key (section 2.6 shape)',
+      nokey.verdict === 'PASS' && nokey.findings === 0,
+      'verdict=' + nokey.verdict + ' findings=' + nokey.findings
+    );
+
+    const kimi = g5bProbe('g5b-illegal-kimi');
+    check(
+      'T31 G5-b fails the one remaining blacklist member (kimi-k3 is not in the set)',
+      kimi.verdict === 'FAIL' && kimi.findings === 1 && /model=kimi-k3/.test(kimi.detail),
+      'verdict=' + kimi.verdict + ' findings=' + kimi.findings + ' :: ' + kimi.detail
+    );
+
+    const cs = g5bProbe('g5b-illegal-case');
+    check(
+      'T32 G5-b comparison is case-sensitive: the right model in the wrong case fails',
+      cs.verdict === 'FAIL' && cs.findings === 1 && /model=GPT-5\.3-CODEX/.test(cs.detail),
+      'verdict=' + cs.verdict + ' findings=' + cs.findings + ' :: ' + cs.detail
+    );
+
+    const quoted = g5bProbe('g5b-illegal-quoted');
+    check(
+      'T33 G5-b comparison is verbatim: a quoted set member still fails',
+      quoted.verdict === 'FAIL' && quoted.findings === 1,
+      'verdict=' + quoted.verdict + ' findings=' + quoted.findings + ' :: ' + quoted.detail
+    );
+
+    const multi = g5bProbe('g5b-illegal-multi');
+    check(
+      'T34 G5-b collects EVERY model key: a legal first key does not hide an illegal second one',
+      multi.verdict === 'FAIL' && multi.findings === 1 && /model=GPT-5\.6 Luna/.test(multi.detail),
+      'verdict=' + multi.verdict + ' findings=' + multi.findings + ' :: ' + multi.detail
+    );
+
+    const legacy = g5bProbe('g5b-illegal-legacy');
+    check(
+      'T35 G5-b fails a former blacklist value that is not a closed-set member',
+      legacy.verdict === 'FAIL' && legacy.findings === 1 && /model=gpt-5\.4/.test(legacy.detail),
+      'verdict=' + legacy.verdict + ' findings=' + legacy.findings + ' :: ' + legacy.detail
+    );
+
+    const empty = g5bProbe('g5b-empty-value');
+    const emptyG5a = g5aEmptyProbe('g5b-empty-value');
+    check(
+      'T36 empty model value is G5-a 2 s finding and not G5-b s: G5-b passes while G5-a(2) fails',
+      empty.verdict === 'PASS' && empty.findings === 0 && emptyG5a.second === 'FAIL' && emptyG5a.first === 'PASS',
+      JSON.stringify({ g5b: empty.verdict, g5a1: emptyG5a.first, g5a2: emptyG5a.second, detail: emptyG5a.detail })
+    );
+
+    const mut = loadMutatedG5b(G5B_FIRST_MEMBER, G5B_FIRST_MEMBER + "  'gpt-5.4',\n", 'relax-set');
+    check(
+      'T37 the closed set is load-bearing: adding gpt-5.4 to the set flips that fixture to PASS',
+      mut.applied === true && g5bProbeWith(mut.exports, 'g5b-illegal-legacy').verdict === 'PASS',
+      'applied=' + mut.applied + ' patched_verdict=' + g5bProbeWith(mut.exports, 'g5b-illegal-legacy').verdict
+    );
+    check(
+      'T37 restore: g5b.js is byte-identical and the cached module still fails gpt-5.4',
+      mut.identical === true && g5bProbe('g5b-illegal-legacy').verdict === 'FAIL',
+      'identical=' + mut.identical + ' cached=' + g5bProbe('g5b-illegal-legacy').verdict
+    );
+  }
+
+  // ---- T38-T40: G5-b boundary fixtures raised by the 5 pre-review (F5) --------------
+  {
+    const bodyOnly = g5bProbe('g5b-body-only');
+    check(
+      'T38 G5-b parses the frontmatter block only: a model key in the body is not judged',
+      bodyOnly.verdict === 'PASS' && bodyOnly.findings === 0,
+      'verdict=' + bodyOnly.verdict + ' findings=' + bodyOnly.findings + ' :: ' + bodyOnly.detail
+    );
+
+    const trailing = g5bProbe('g5b-legal-trailing-space');
+    check(
+      'T39 G5-b trims both ends: a legal value with a trailing space still passes',
+      trailing.verdict === 'PASS' && trailing.findings === 0,
+      'verdict=' + trailing.verdict + ' findings=' + trailing.findings + ' :: ' + trailing.detail
+    );
+
+    const comment = g5bProbe('g5b-illegal-inline-comment');
+    check(
+      'T40 G5-b is verbatim: a legal value followed by an inline comment fails',
+      comment.verdict === 'FAIL' && comment.findings === 1 && comment.detail.includes('model=gpt-5.3-codex # keep'),
+      'verdict=' + comment.verdict + ' findings=' + comment.findings + ' :: ' + comment.detail
+    );
+  }
+
+  // ---- T41-T42: the two members this slice added are load-bearing (7 round-one M4) ----
+  {
+    const sol = g5bProbe('g5b-closed-set-legal-sol');
+    const luna = g5bProbe('g5b-closed-set-legal-luna');
+    check(
+      'T41 G5-b accepts each member this slice added (deep tier and parallel alternative)',
+      sol.verdict === 'PASS' && sol.findings === 0 && luna.verdict === 'PASS' && luna.findings === 0,
+      JSON.stringify({ sol: sol.verdict, luna: luna.verdict, solDetail: sol.detail, lunaDetail: luna.detail })
+    );
+
+    const drop = loadMutatedG5b(G5B_LUNA_MEMBER, '', 'drop-luna-member');
+    check(
+      'T42 the added member is load-bearing: dropping gpt-6-luna from the set makes that fixture fail',
+      drop.applied === true && g5bProbeWith(drop.exports, 'g5b-closed-set-legal-luna').verdict === 'FAIL',
+      'applied=' + drop.applied + ' patched_verdict=' + g5bProbeWith(drop.exports, 'g5b-closed-set-legal-luna').verdict
+    );
+    check(
+      'T42 restore: g5b.js is byte-identical and the cached module still accepts gpt-6-luna',
+      drop.identical === true && g5bProbe('g5b-closed-set-legal-luna').verdict === 'PASS',
+      'identical=' + drop.identical + ' cached=' + g5bProbe('g5b-closed-set-legal-luna').verdict
     );
   }
 

@@ -1,0 +1,6 @@
+---
+name: fixture-g5b-illegal-kimi
+description: G5-b probe fixture - kimi-k3 is the one remaining blacklist member
+model: kimi-k3
+---
+Probe body. This file is test data, not a real agent role file.
