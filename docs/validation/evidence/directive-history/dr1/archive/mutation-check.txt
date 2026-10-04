@@ -1,0 +1,28 @@
+# DR-1 mutation check - floor removed => argv assertion must go RED
+## 1. sha256 before mutation
+B805EA42748D97315B04FACA15AB42D0A1866F005964F542B624EFF4249A4EB7
+## 2. mutate (assert exactly one site)
+sites found = 1
+MUTATED: floor removed
+## 3. focused test (expect FAIL)
+--- FAIL: TestCopilotCLIProbeBuildsIsolatedDeepSeekSmoke (0.00s)
+    ai_probe_copilot_test.go:80: unexpected args:
+         got: []string{"-p", "Reply with exactly PONG and nothing else. Do not call any tool.", "-C", "C:\\probe", "--name", "proofrail-availability-probe", "--model", "deepseek-flash", "--output-format", "json", "--stream", "on", "--max-ai-credits", "1", "--disable-builtin-mcps", "--disallow-temp-dir", "--no-custom-instructions", "--no-ask-user", "--no-auto-update", "--no-color", "--no-remote", "--no-remote-export", "--secret-env-vars", "COPILOT_PROVIDER_API_KEY", "--deny-url=https://*", "--deny-url=http://*", "--available-tools=powershell", "--deny-tool=shell"}
+        want: []string{"-p", "Reply with exactly PONG and nothing else. Do not call any tool.", "-C", "C:\\probe", "--name", "proofrail-availability-probe", "--model", "deepseek-flash", "--output-format", "json", "--stream", "on", "--max-ai-credits", "30", "--disable-builtin-mcps", "--disallow-temp-dir", "--no-custom-instructions", "--no-ask-user", "--no-auto-update", "--no-color", "--no-remote", "--no-remote-export", "--secret-env-vars", "COPILOT_PROVIDER_API_KEY", "--deny-url=https://*", "--deny-url=http://*", "--available-tools=powershell", "--deny-tool=shell"}
+--- FAIL: TestCopilotCLIProbeAppliesCreditFloorWithoutChangingRequestBudget (0.00s)
+    --- FAIL: TestCopilotCLIProbeAppliesCreditFloorWithoutChangingRequestBudget/floor-raised (0.00s)
+        ai_probe_copilot_test.go:318: unexpected --max-ai-credits: got "1" want 30
+--- FAIL: TestCopilotCLIProbeCreditFloorKeepsCliRejectionFailClosed (0.00s)
+    ai_probe_copilot_test.go:342: the floor must still be applied when the CLI rejects: got "1"
+FAIL
+FAIL	github.com/larsonzh/prfrail/internal/adapters	1.154s
+FAIL
+test-exit=1
+## 4. restore (assert exactly one site)
+sites found = 1
+RESTORED: floor applied again
+## 5. sha256 after restore (must equal step 1)
+B805EA42748D97315B04FACA15AB42D0A1866F005964F542B624EFF4249A4EB7
+## 6. focused test (expect PASS)
+ok  	github.com/larsonzh/prfrail/internal/adapters	0.732s
+test-exit=0

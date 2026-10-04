@@ -1,0 +1,2 @@
+GATE REPORT scope=index repo=D:\LZProjects\prfrail changed=13 check=G3-a.1
+TOTAL_FAIL=0

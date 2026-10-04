@@ -1,0 +1,3 @@
+GATE REPORT scope=tree repo=D:\LZProjects\prfrail changed=15 check=G6-5
+PASS  G6-5 section-reference resolution :: no unresolved section reference on added ledger/changelog lines (scanned 48, refs 47) whitelist-source=worktree
+TOTAL_FAIL=0

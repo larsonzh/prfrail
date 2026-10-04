@@ -1,0 +1,11 @@
+{
+  "runId": "run-b4",
+  "taskId": "b4-task",
+  "stepId": "b4-code-step",
+  "parentSnapshotHash": "sha256:1fbe6bb28268c36250659573df59b691d1c85dde12018bc091ddc5c5dce408ed",
+  "workspaceHash": "sha256:1fbe6bb28268c36250659573df59b691d1c85dde12018bc091ddc5c5dce408ed",
+  "contextHash": "sha256:5e105687a0550f551df58d12a3f7ccf16fa4f09c73904f06cb021d2412addf4a",
+  "createdAt": "2026-09-22T16:56:50.292Z",
+  "chainConfig": "b4-chain.json",
+  "stubVersion": "agent-stub-0.1.0"
+}

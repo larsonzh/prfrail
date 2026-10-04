@@ -164,3 +164,4 @@ tmp/gates-ext/review/MUTATION-f1-donere.txt	local-only
 tmp/gates-ext/review/MUTATION-f1-range-vacuous.txt	local-only
 tmp/gates-ext/review/MUTATION-guards-independent.txt	local-only
 ```
+> **Archiving note (v1.23)**: the `tmp/` items cited by this report were archived under `docs/validation/evidence/directive-history/` per §1.5.1 (units: `gate-js/`, `gates-ext/`; each with `MANIFEST.md` and `SHA256SUMS.txt`); the original paths are not rewritten and the MANIFEST is the mapping of record. (Paths already cleared by earlier slices are outside this archiving and belong to the pre-existing decoupling recorded as OB-77.)

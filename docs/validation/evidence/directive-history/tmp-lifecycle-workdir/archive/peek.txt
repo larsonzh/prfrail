@@ -1,0 +1,72 @@
+--- CN header lines 1-4 ---
+# ProofRail 交付执行准则（DELIVERY_DIRECTIVE）
+
+版本：v1.22。日期：2026-10-04。状态：**CN 正文冻结**（ `_EN` 镜像见 `docs/DELIVERY_DIRECTIVE_EN.md`）。
+
+--- CN §0.3 v1.10 row (full) ---
+| v1.10 | 2026-09-22 | **§6.3 扩展（G6 / G7）与 `tools/gates/` 脚本化（切片 `GATES-EXT`）**：① 新增两类机械判据——**G6 台账元数据一致性**（状态时态 / 成本口径 / run 号形态 / 会过期的字面量）与 **G7 审查包完整性**（工件围栏块 / 路径与处置可解析 / finding 处置单元格 / 停止态标记），二者**只判变更行**（同 G1-a / G3 / G4 的口径）；② 判据由**仓内离线脚本**执行（单入口 `gate.js`，退出码 0 / 1 / 2，无外部依赖），迁移并取代临时脚本 `tmp/gate.js`（原样保留供对照）（归档注记（v1.22）：本条目所述的 `tmp/gate.js` 属 §1.5.1 的「有引用者归档」类，归档由归档执行片执行，本条目按 §11.1 不追溯改写），基础 **G1 / G5 仍不脚本化**并如实打印 `SKIP`（见 **OB-15**）；③ CI 增一个 **Gates** 步（双腿、无 `continue-on-error`、不新增 job 与 Action），`Checkout source` 加 `fetch-depth: 0` 使 `--scope=ci` 在完整历史上解析变更集（**冻结契约第 3 处编辑，用户授权**）；④ **范围守卫**：不可解析的 range 端点、失败的 `git diff` / `git status`、结论不明的浅克隆探测一律为**用法 / 环境错误**（退出 2），**绝不**退化为“空变更集 ⇒ 判据全数 vacuous pass”；⑤ §12.4 登记 **OB-15 / OB-16 / OB-17 / OB-18 / OB-19 / OB-20**，§12.5 登记本片相关缺口行，`docs/t027/REMAINING_SLICES` 登记 **DR-6**；⑥ 判据文本与实现逐条对齐（G6-1 的完成标记取准则枚举的**并集**）。 | 历史缺失 |
+--- EN §0.3 v1.10 row (full) ---
+| v1.10 | 2026-09-22 | **§6.3 extension (G6 / G7) and `tools/gates/` scripting (slice `GATES-EXT`)**: ① two new criterion classes - **G6 ledger metadata consistency** (status tense / cost clause / run-id shape / expiring literals) and **G7 review-package completeness** (artifacts fence block / resolvable path and disposition / finding disposition cell / stopped-state marker); both judge **changed lines only** (same scope as G1-a / G3 / G4); ② the criteria run from an **offline in-repo script** (single entry `gate.js`, exit codes 0 / 1 / 2, no external dependency) that migrates and replaces the throwaway `tmp/gate.js` (kept verbatim for comparison) (archive note (v1.22): the `tmp/gate.js` mentioned in this entry belongs to the "items with references" class of §1.5.1, and the archive is executed by the archive-execution slice; this entry is not retroactively rewritten per §11.1), while base **G1 / G5 stay unscripted** and print `SKIP` truthfully (see **OB-15**); ③ CI gains one **Gates** step (both legs, no `continue-on-error`, no new job or Action) and `Checkout source` gains `fetch-depth: 0` so `--scope=ci` resolves the change set on full history (**the 3rd frozen-contract edit, user-authorised**); ④ **scope guards**: an unresolvable range endpoint, a failing `git diff` / `git status`, and an inconclusive shallow probe all become **usage / environment errors** (exit 2) and **never** degrade into "empty change set ⇒ every criterion vacuous pass"; ⑤ §12.4 registers **OB-15 / OB-16 / OB-17 / OB-18 / OB-19 / OB-20**, §12.5 registers this slice's gap row, and `docs/t027/REMAINING_SLICES` registers **DR-6**; ⑥ the criterion text is aligned with the implementation line by line (G6-1's completion marker takes the **union** the directive enumerates). | historically missing |
+--- CN §0.3 v1.12 row : tail (last 700 chars) ---
+B-36 留待下一片；本片整改全部源自用户明确裁决与台账元数据 / 文案类整改，按 OB-11 例外**不重跑 ⑦**（**更正注记（第五轮，R7）**：该豁免的实际依据是**用户直接裁定**，其超出 OB-11 例外的字面标准，见 OB-37）；⑫ **补做注记（第五轮，R7）**：第五轮复评 9 条（1 High + 4 Medium + 4 Low，`tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R7.md`）中，P1（双轨优先规则）与 P2（顺延配套）与 P3（复评判定主体 / 锚点 / 条数口径）按用户裁决落地（§12.1 与 §12.2），P4 与 P5 登记为 OB-37 与 OB-38，P6 与 P7 与 P8 与 P9 属台账与文案类已落地；**本轮整改含规则语义变更 ⇒ 不适用 OB-11 例外**，⑦ 第 3 轮为用户同批授权（收窄输入：只审 P1 / P2 / P3 的规则变更与 P4 / P5 的登记是否如实）。（归档注记（v1.22）：本条目所述的 `tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R6.md` 与 `_R7.md` 属 §1.5.1 的「有引用者归档」类，归档由归档执行片执行，本条目按 §11.1 不追溯改写）。（口径更正（v1.22）：本条目所述的「调用串 = modelId」已由 v1.22 反转为「调用串 = 限定名」，`modelId` 现为**内部标识**，见 §2.2 与 R2.2） | 无阻塞；后继片 `GATES-G1G5` / `GATES-TIGHTEN` 需回写 |
+--- EN §0.3 v1.12 row : tail (last 700 chars) ---
+s authorized in the same batch (narrowed input: only P1 / P2 / P3's rule changes and whether P4 / P5's registration is truthful). (archive note (v1.22): the `tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R6.md` and `_R7.md` mentioned in this entry belong to the "items with references" class of §1.5.1, and the archive is executed by the archive-execution slice; this entry is not retroactively rewritten per §11.1). (Reading correction (v1.22): the "call string = modelId" reading stated in this entry was reversed by v1.22 to "call string = qualified name"; `modelId` is now an **internal identifier** - see §2.2 and R2.2) | no blocked slices; follow-on slices `GATES-G1G5` / `GATES-TIGHTEN` need write-back |
+--- CN appendix A.1 first row ---
+- **① 有引用者归档**——被受版本控制文档引用其路径的文件（当前实例：`tmp/主控子代理架构_v1.0.md`、`tmp/gate.js`、`tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R6.md` 与 `_R7.md`）⇒ 归档到 `docs/validation/evidence/` 下的主题目录（约定根 = `docs/validation/evidence/directive-history/`，子目录由归档执行片按内容定；硬约束 = 归档后路径满足 §6.3 的 G7-b `repo` 处置可解析，并按冻结证据包口径配 `MANIFEST` 与 `SHA256SUMS`；**归档为证据包时按 §5.1 的 ⑧c 条目先过编码门禁**）。**归档与引用改写同步**（先归档后改引用，防失效）；历史行（§0.3、§12.4 现象列）按 §11.1 不追溯改写，只由归档 `MANIFEST` 记录对应关系。
+--- EN appendix A.1 first row ---
+- **① Items with references are archived** — files whose paths are referenced by version-controlled documents (current instances: `tmp/主控子代理架构_v1.0.md`, `tmp/gate.js`, `tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R6.md` and `_R7.md`) ⇒ archived into a topic directory under `docs/validation/evidence/` (convention root = `docs/validation/evidence/directive-history/`, subdirectories chosen by the archive-execution slice by content; hard constraint = the archived path satisfies the resolvable `repo` disposition of §6.3 G7-b, and carries a `MANIFEST` and `SHA256SUMS` per the frozen-evidence-pack convention, **passing the encoding gate first per the §5.1 ⑧c entry when the archive forms an evidence pack**). **Archiving and reference rewriting go together** (archive first, then rewrite the references, to prevent dangling); historical rows (the §0.3 and §12.4 phenomenon columns) are not retroactively rewritten per §11.1, and only the archive `MANIFEST` records the correspondence.
+--- CN §0.3 v1.22 row (full) ---
+| v1.22 | 2026-10-04 | **`modelId` 到限定名的口径反转 + 完成行结构重建 + `tmp/` 生命周期机制（切片 `DIRECTIVE-MODELID-MAP`；含 OB-49 / OB-72 同批评估）**：① **R2.2 修正**——调用串一律写限定名（`Model Name (vendor)`），`modelId` 降为内部标识；§2.2 表两列语义对调（限定名列 = 调用串唯一权威）；R2.2 本体内核（必须显式传 `model`）保留并新增**限定名维护机制**；附录 B 全部模板的 `model=` 串与角色行改限定名；引用点 §2.3 / §2.4 / §5.0 的步 2 与步 4 同步；§6.3 的 G5-b 括注与 §5.2 的 ⑦ 分档表列名标注「内部标识」（判据本体与矩阵不动）；OB-67 翻 `已处置`、OB-70 追加落地句、OB-29 候选 G8 口径同步。② **OB-72 落地**——§11.2 的完成行格式重建为「报告路径」单一事实，commit hash 与 CI run 号只进报告、由本片主控在 CI 双绿后以 docs-only 提交补全；OB-72 翻 `已处置`。③ **OB-49 机制落地**——新增 §1.5.1（三类处置口径 / 清理时机 / 归档目标约定），准则内三处 `tmp/` 引用按 §11.1 只加归档注记（路径改写随归档执行片）；OB-49 翻 `待议`。**不新增判据、不改 §2.4 黑名单本体、不改 §6.3 判据本体、不改 §5.2 矩阵**。 | `DIRECTIVE-MODELID-MAP`（本片） |
+--- CN §12.4 last rows (OB-73..75) ---
+| OB-73 | 2026-10-04 | **CN / `_EN` 的反引号级镜像漂移（基线遗留）**：5 处（`DELIVERY_DIRECTIVE` 的 519 / 827 / 873 / 1219 / 1275，其中 2 处含 EN 独有句子）——`_EN` 侧的反引号数量与 CN 不相等，属 v1.22 之前即存在的漂移。 | **待议**：G3(a.2) 的五形状（行数 / 标题位置 / 加粗标记 / 竖线计数 / 空行）**不含反引号计数**，故门禁不覆盖；修正需改动与切片无关的历史行 ⇒ `DIRECTIVE-MODELID-MAP` 按 §1.7.2 边界拒绝。候选处置 = 与 `GATES-TIGHTEN` 家族一并评估（或把反引号计数纳入 G3(a.2) 并同步修正该 5 处） |
+| OB-74 | 2026-10-04 | **Haiku 的限定名未定义**：Haiku 是 §2.2 之外唯一豁免（§7.2.3 的 ⑥ 补充），但 §2.2 三元组与附录 B 均无其限定名 ⇒ 启用时无调用串可写。 | **待议**：既有缺口（`DIRECTIVE-MODELID-MAP` 未引入、未声称解决）；触发 = §7.2.3 相关修订片，需同时给出 Haiku 的限定名与内部标识 |
+| OB-75 | 2026-10-04 | **限定名的静默路由盲区（R2.2 反修正后的残留风险）**：R2.2 的维护机制只在**调用被工具拒绝**时触发；若工具**接受旧串却把请求路由到其它模型**，规则层无任何防护——「调用串 = 限定名」在静默路由面前没有可观测判据。 | **待议**：这是**已被识别的盲区**（非缺陷）：属映射式规则的固有面；§2.3 已述「子代理自报不可信」，故候选处置需落在 operator 侧——例如对每次调用记录 operator 侧实际生效模型并在报告中与任务包串核对，或由工具侧提供可用性探测。触发 = 下一片评估或与模型可观测性议题同批 |
+--- CN §12.4 header + separator (first 3 lines of the table) ---
+### 12.4 观察项台账
+
+| # | 登记日 | 现象 | 处置状态 |
+|---|---|---|---|
+| OB-1 | 2026-09-21 | **⑥ 在纯文档切片上的有效性待评估**：MAI 在代码切片（A6）输出正常，在纯 `.md` 切片（B3c）连续 2 次格式偏离且无可执行发现（n=1，不足以改准则）。下一个**代码切片**作对照（**当前预期为 DR-2 + DR-3 修复切片；若 B4 · AT-23 先行则以 B4 为准**；触发条件：该切片进入 ⑤ 预审时即观察，结论在其收尾时登记）：正常 ⇒ 归因"文档类任务"；仍偏离 ⇒ 归因模型。若再有 2–3 片同样表现，再议为 §7.2 增加例外（纯 `.md` 且不涉及可执行语义的契约修订可跳过 ⑥，由 ⑦ 确认）。**2026-09-21 更新（n=2）**：SW-1/SW-2 补跑 ⑥ 时 MAI 输出**格式完全合规**（Section A–E 齐备、结论行正确）且产出 1 条真发现 ⇒ “文档类任务特性”的归因**被削弱**，更可能是 B3c 当时的偶发/提示词因素；继续观察，暂不改 §7.2。 | 观察中 |
+| OB-2 | 2026-09-21 | **G2 自指缺陷**：规则行自身引用了被禁占位串 ⇒ 全文扫描必得假阳性（实测 4 条）。已就地为 G2 增加「排除规则引文行」。 | **已处置**（v1.1）；⑦ 复审确认**未单独执行**（历经 v1.6 第 3 轮、C.0f 的 ⑦×3、B4 的 ⑦×2 均未覆盖本行），**已并入 V1.12 的 ⑦ 输入**（同 OB-9 口径） |
+--- CN appendix C.0l block ---
+### C.0l `modelId` 口径反转与 `tmp/` 生命周期切片 `DIRECTIVE-MODELID-MAP`
+
+**为何必需**：`runSubagent` 的 `model` 参数实测只接受限定名（`Model Name (vendor)`），而 v1.12 起 R2.2 规定调用串写 `modelId` ⇒ 规则与工具行为相反（OB-67 / OB-70，三次 `modelId` 形式实测全被拒 + 官方文档核查）；同时台账完成行存在「提交前不可知事实」的自指（OB-72），`tmp/` 缺生命周期机制（OB-49）。三件同族落地，不新增判据。
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `DIRECTIVE-MODELID-MAP`（v1.22） |
+| 状态 | ✅ **已完成**（2026-10-04；变更与审查证据见 `docs/validation/directive-modelid-map{,_EN}.md`） |
+| 目标 | ① R2.2 修正（限定名成为调用串）；② 完成行结构重建（OB-72）；③ `tmp/` 生命周期机制（OB-49） |
+| 触发 | 用户 2026-10-04 启动声明（`[SLICE]`，M+ 档、纯文档、探针 0） |
+| 规模 | M+（纯 `.md`；触规则语义，⑦ 用 `gpt-5.3-codex` 不降级） |
+| 交付物 | `docs/DELIVERY_DIRECTIVE{,_EN}.md` 的 v1.22（§2.2 / §2.3 / §2.4 / §5.0 / §5.2 列名 / §6.3 括注 / §11.2 / 新增 §1.5.1 / 附录 A.1 / 附录 B 模板）；本报告对；自由度清单 |
+| 验收证据 | `gate.js --all --scope=tree` 全绿；`--scope=index` 全绿；`--selftest` 全绿；CN / `_EN` 同位由 G3(a) 与 G3(b) 校验（含五形状） |
+| 边界 | 不改 §2.4 黑名单本体、§6.3 判据本体、§5.2 矩阵；不实际归档或删除任何 `tmp/` 文件（另立执行片）；不改 `internal/**`、`CONTRACTS`、`schema`、`fixtures`、`workflows` |
+| 分级 | `[SLICE]` |
+| 探针额度 | 无 |
+| 自由度清单路径 | `docs/validation/evidence/DIRECTIVE-MODELID-MAP-freedom-list.md` |
+| 附注 | OB-67 / OB-72 翻 `已处置`，OB-70 追加落地句，OB-49 翻 `待议`（机制已定义、执行另立）；限定名版本漂移的维护机制落在 R2.2 本体；`tmp/` 实际归档另立「tmp/ 生命周期执行」片 |
+### C.1 v3.1 节号 → 本准则
+
+| v3.1 原节 | 内容 | 本准则位置 |
+|---|---|---|
+--- CN ADR-022 row ---
+| ADR-022 | **切片 `DIRECTIVE-LOOPBACK-LANDING` 的 ⑦ 终审模型降级（用户直接裁定）**：本片 ⑦ 由 `deepseek-v4-pro` 承担，**不是** §2.2 白名单的 `gpt-5.3-codex` | 理由：本片为**纯文档**切片（落地 D-1 / D-2 / D-3 与台账完成行格式，不触 §7.2.1 ③ 语义）且 Copilot 预算受限；未采纳的替代：保留 `gpt-5.3-codex`（预算不可承受）。登记依据 = 用户 2026-10-03 的切片定义原文，按 §12.4 的 OB-37 元规则以 **ADR** 形式独立留痕 | **已裁（用户直接裁定，仅本片有效，不得作为先例）**。四要素：裁决人 = 用户；日期 = 2026-10-03；理由 = 纯文档切片、不触 §7.2.1 ③、Copilot 预算受限；依据 = 用户同轮切片定义原文。**性质标注**：含规则语义变更、超出 §2.2 字面标准、系用户直接裁定。**后续义务**：报告须如实标注「本片 ⑦ 由非白名单模型承担，独立性降低」并交 ⑧c 复核；本例外**不推广** |
+--- EN ADR-022 row ---
+| ADR-022 | **⑦ final-review model downgrade for slice `DIRECTIVE-LOOPBACK-LANDING` (direct user ruling)**: this slice ⑦ is carried by `deepseek-v4-pro`, **not** by the §2.2 allowlist model `gpt-5.3-codex` | Reason: this slice is a **documentation-only** slice (landing D-1 / D-2 / D-3 and the ledger completion-row format, touching no §7.2.1 ③ semantics) and the Copilot budget is constrained; the alternative not taken was keeping `gpt-5.3-codex` (unaffordable). Basis: the user slice definition of 2026-10-03, recorded independently as an **ADR** under the OB-37 meta-rule of §12.4 | **Ruled (a direct user ruling, valid for this slice only and not usable as a precedent)**. Four elements: ruling party = the user; date = 2026-10-03; reason = documentation-only slice, no §7.2.1 ③ contact, constrained Copilot budget; basis = the ruling text of the same turn. **Nature annotations**: it carries a rule-semantics change, exceeds the §2.2 literal standard and is a direct user ruling. **Follow-up duties**: the report must state that this slice ⑦ ran on a non-allowlist model with reduced independence and hand it to ⑧c; the exception is **not generalised** |
+--- CN REMAINING_SLICES: last table row + file tail ---
+| 2026-10-03 | DIRECTIVE-LOOPBACK-LANDING | **准则治理类切片（轻量回流机制落地；不触规则本体）**：① §11.2 增「登记建议与留痕」段（D-1 原则加首例）与「台账完成行格式」段（完成行只写提交时可确定的事实、CI 号只进报告、历史完成行不追溯改写）；② `DOCUMENTATION_PLAN{,_EN}` §1 表后增构建纪律层 ↔ 产品定义层跨层指针（指向 RFC）；③ 新增项目级结项报告模板 `docs/SLICE-CLOSEOUT-TEMPLATE{,_EN}.md`（落 `docs/` 根，按用户同轮修正）并加 T027 结项锚点（回看 = 主控、前瞻 = 用户裁决），模板已在 `DOCUMENTATION_PLAN` §2 文档清单登记；④ §12.4 的 OB-71 翻 `已处置`、OB-49 处置列改指「`tmp/` 生命周期评估」片并列三类处置。另含 v1.21 版本包与 ADR-022；⑤ 跳过（S 档可选）、⑥ 跳过（纯文档，⑦ 确认）；⑦ 由 `deepseek-v4-pro` 承担（ADR-022），结论与门禁读数见本片报告；探针 0。**本行按 v1.21 的完成行格式只记报告路径**。 | docs/validation/directive-loopback-landing.md |
+| 2026-10-04 | DIRECTIVE-MODELID-MAP | **准则治理类切片（三件同族规则修正；触规则语义、⑦ 不降级）**：① R2.2 修正——调用串由 `modelId` 反转为**限定名** `Model Name (vendor)`，`modelId` 降为内部标识；§2.2 表两列语义对调、R2.2 本体保留「必须显式传 `model`」并新增**限定名维护机制**、附录 B 全部模板调用串改限定名、引用点（§2.3 / §2.4 / §5.0 步 2 与步 4 / §6.3 括注 / §5.2 列名）同步；② OB-72 落地——§11.2 完成行重建为「报告路径」，hash 与 CI 号只进报告；③ OB-49 机制落地——新增 §1.5.1（三类处置 / 清理时机 / 归档目标约定），准则内三处 `tmp/` 引用只加归档注记（归档执行另立片）。台账翻转：OB-67 / OB-72 翻 `已处置`、OB-70 追加落地句、OB-29 口径同步、OB-49 翻 `待议`；版本包 **v1.22**（头版本号 + §0.3 条目 + 附录 C.0l）。⑤ 两轮（首轮 `PASS WITH FIXES` ⇒ 复审 `PASS`）、⑥ 两轮（首轮 `FINDINGS` ⇒ 复审 `PASS`）、⑦ 两轮（Codex 常规档、**未降级**；首轮 `PASS WITH FIXES` ⇒ 复审 `RE-REVIEW: PASS`）；门禁双作用域 `TOTAL_FAIL=0`、`SELFTEST PASS 264/264`、变异三例全红后逐字节还原复绿；探针 0。**本行按 §11.2 新格式只记报告路径**。 | docs/validation/directive-modelid-map.md |
+
+> **台账完整性注记（2026-09-21，已按用户授权补录）**：本表自 A4 行之后长期未追加完成行。**2026-09-21 依据各切片自己的验证报告补录 A5/A6/A7/B2/B3a 五行**（受"不凭记忆、只补可核验字段、缺失留空并标注历史缺失、不编造"三条约束），B3b 行先于本次补录写入，故五行列于其后；各行的日期/提交号/运行号/摘要均逐项标注来源，无法核验者已标注 **历史缺失**。
+--- CN mutation archive note line 3 ---
+> 归档副本（v1.22 收尾）：源文件 `tmp/dml/mutation.md`（CRLF、无 BOM）按「移到归档」保留，行尾与编码归一为 UTF-8 with BOM + LF。
+--- CN modelid-map report §11 closeout note (last line) ---
+（收尾处理：`tmp/dml/` 的一次性脚本与中间读数已按 §1.5 清除，上表原先逐行列出的 `local-only` 行随之消失；其中 `review-r1.md` 与 `mutation.md` 两份证据已移入 `docs/validation/evidence/` 并计入 `repo` 行。）
+--- EN modelid-map report §11 closeout note (last line) ---
+(Closeout: the one-off scripts and intermediate readings under `tmp/dml/` were removed per §1.5, so the granular `local-only` rows previously listed above are gone with them; the two pieces of evidence `review-r1.md` and `mutation.md` were moved into `docs/validation/evidence/` and are counted as `repo` rows.)
+--- CN ledger-backfill.md §10 line 100 ---
+- 临时残留清单：`tmp/lbf/` 保留 19 个过程文件（方案与盘点、断言脚本、原始输出、处置清单、溯源输出、首轮与第 2 轮审查包副本、`git diff` 与门禁读数），按 OB-49 与用户既有指令**不清理**，处置 = `local-only`。
+--- EN ledger-backfill_EN.md : find the 19-file line ---
+L100: - Temporary-residue inventory: `tmp/lbf/` retains 19 process files (plans and inventory, assertion scripts, raw outputs, the disposition list, the trace output, the first-round and round-two review-pack copies, and the `git diff` and gate readings), **not cleaned** per OB-49 and the standing user instruction, with disposition `local-only`.

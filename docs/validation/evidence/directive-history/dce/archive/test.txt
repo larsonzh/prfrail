@@ -1,0 +1,19 @@
+?   	github.com/larsonzh/prfrail/cmd/prfrail	[no test files]
+?   	github.com/larsonzh/prfrail/cmd/prfrail-release	[no test files]
+ok  	github.com/larsonzh/prfrail/examples/whois-shadow	(cached)
+ok  	github.com/larsonzh/prfrail/internal/adapters	(cached)
+ok  	github.com/larsonzh/prfrail/internal/applier	(cached)
+ok  	github.com/larsonzh/prfrail/internal/chain	(cached)
+ok  	github.com/larsonzh/prfrail/internal/console	(cached)
+ok  	github.com/larsonzh/prfrail/internal/evidence	(cached)
+ok  	github.com/larsonzh/prfrail/internal/gates	(cached)
+ok  	github.com/larsonzh/prfrail/internal/guard	(cached)
+ok  	github.com/larsonzh/prfrail/internal/release	(cached)
+ok  	github.com/larsonzh/prfrail/internal/repair	(cached)
+ok  	github.com/larsonzh/prfrail/internal/snapshot	(cached)
+ok  	github.com/larsonzh/prfrail/internal/taskdef	(cached)
+ok  	github.com/larsonzh/prfrail/internal/tickets	(cached)
+ok  	github.com/larsonzh/prfrail/tools/agent-probe/enforcement-proxy	(cached)
+?   	github.com/larsonzh/prfrail/tools/agent-probe/supervisor	[no test files]
+?   	github.com/larsonzh/prfrail/tools/agent-stub	[no test files]
+?   	github.com/larsonzh/prfrail/tools/b4-e2e	[no test files]

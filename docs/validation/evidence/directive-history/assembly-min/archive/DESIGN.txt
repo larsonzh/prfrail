@@ -1,0 +1,451 @@
+# T027-ASSEMBLY-MIN · ① 架构方案书（只设计）
+
+> **v2（2026-10-02 ① 修订轮；§5.3 义务重跑）**：按用户裁定 (A′) 修订 §3.2-2/§6、新增 §3.5 与 §13、§10 增补风险；改动与依据见文末「修订记录 v1→v2」。
+
+- 切片：`[SLICE]`，探针 0；⑦ = `GPT-5.3-Codex` 不降级（1 终审 + 1 复审 + 1 必抽盲审，上限 3）。
+- 基线：`go test -count=1 ./...` ⇒ 14 包 `ok`、0 `FAIL`（存档 `tmp/assembly-min/baseline-test.txt`）。
+- 本文件只写设计；不改任何生产代码、不 commit、不 push。
+- 关键既有事实（本设计前提，② 不得重判）：
+  1. Windows 平台发布耐久是常量 `unproven`（`internal/adapters/agent_runner_replay_store_windows.go` 返回 `PublishDurabilityUnproven`，公开 API 不可改）⇒ 生产 dispatcher 在 Windows 上 `RecordRequest` 必以 `ErrAgentRunnerReplayStoreDurabilityUnproven` fail-closed、不发布 R、不 spawn（B4 报告 §7 附录 A 已实测）。
+  2. Unix 实现为 `PublishDurabilityProven`（`agent_runner_replay_store_unix.go`），契约 §7 将「本地 Unix 的 link + 父目录 fsync」视为满足全部判据的实例 ⇒ 生产全链（dispatch → R → … → postflight → freeze/review）**只有**在 Unix（Ubuntu CI / 本地 Unix）能走通。
+  3. `ValidateAgentRunnerAdmission`（冻结语义，本片不改）：capability `disposition == "compatible"` ⇒ 不需要 enforcement；否则十项非控制项须全 `verified` 且 tool/network 须由候选或 enforcement `verified` ⇒ **无 enforcement 记录即拒绝**（`external enforcement required`）。T026 全部候选 tool/network `unsupported` ⇒ 现实输入必走拒绝分支。
+  4. A0–A6 已交付全部端口与适配器；本片**不新增任何 chain 端口或 Go 接口**（见 §2）。
+  5. ②b 已落地并保留（本修订与之对齐、勿要求重做）：`internal/console/runtime_noop.go`（noop 运行时 + fail-closed postflight 桩）与 `internal/console/runtime.go` 纯位移均已落地；`internal/adapters/agent_runner_postflight.go`（+470：`AgentRunnerPostflight`/`AgentRunnerSnapshotCapturer`/`AgentRunnerWorkspaceBaselineDigest`）已落地。
+
+## 1. 两条目标的机械可判验收判据（⑨ 可独立重跑）
+
+### (a) OB-21 ① 消除
+
+| 编号 | 命令 | 期望输出形态 |
+|---|---|---|
+| J-a1 | `go doc github.com/larsonzh/prfrail/internal/console ExecuteAgentRunnerRun` | 退出码 0，打印函数签名（存在生产装配入口） |
+| J-a2 | `grep -n "ErrPostflightUnavailable" internal/console/runtime.go` | 0 匹配；同词在 `internal/console/runtime_noop.go` 有匹配且注释声明「noop 路径专用、契约必须 fail-closed」 |
+| J-a2b | `grep -n "PostflightPassed" internal/adapters/agent_runner_postflight.go` | ≥1 匹配（生产端口可达 passed 分支） |
+| J-a3 | `go test -count=1 ./...` | 与基线逐包全等：14 个 `ok` 包名与 `tmp/assembly-min/baseline-test.txt` 一致、0 `FAIL` |
+| J-a4 | `go test -count=1 ./internal/console ./internal/adapters -run "AgentRunnerAssembly|AgentRunnerPostflight" -v` | 每个子测试 `--- PASS`，含正向腿 `dispatch→R`、`TERMINAL_PENDING`、`postflight passed`、`task PASSED` 的可见输出 |
+
+判据语义：`ExecuteNoopRun` 的**函数文本逐字不变**（noop 路径零语义变化，由 J-a3 守护）；fail-closed 桩从 `runtime.go` 移入 noop 专用文件并仅服务 noop 路径；console/adapters 出现可返回 `PostflightPassed` 的生产端口实现。
+
+### (b) AT-23 仍 BLOCKED（三条独立阻塞不变，不得读成通过）
+
+| 编号 | 命令 | 期望输出形态 |
+|---|---|---|
+| J-b1 | `git diff --name-only <基线>..HEAD`（收尾时） | 不含 `schemas/**`、`docs/CONTRACTS*.md`、`.github/workflows/**`、任何新增 capability/enforcement 记录文件 |
+| J-b2 | `git diff --name-only <基线>..HEAD | findstr /C:"t026" /C:"B2-"` | 0 命中（`docs/validation/t026-agent-runner-contract.md` 与 `B2-EXTERNAL-ENFORCEMENT.md` 未被改动，其结论行保持原样） |
+| J-b3 | 全仓 grep `"disposition": "compatible"` 并人工核对 | 无针对真实 AI 候选的新记录；仅存在标注 `declared, not probed` 的装配 fixture（B4 口径） |
+| J-b4 | `gh run view <id> --log` 过滤 `ok github.com/larsonzh/prfrail/internal/console` | Ubuntu 与 Windows 两腿均出现（两腿都真实执行了装配测试） |
+
+判据语义：本片只接线拒绝路径，不引入任何新候选事实、不触及三条阻塞的任何一条；AT-23 通过与否不受本片影响。
+
+## 2. 改动面（文件级 + 函数级）
+
+**先回答核心问题：是否需要新增任何 chain 端口或 Go 接口？——不需要。**
+全部复用既有接口与端口：`chain.PostflightPort`（A5）、`chain.AgentRunnerPort` / `AgentRunnerAdmission` / `AgentRunnerLauncher` / `StepIntentPreparer`（A0–A4）、`chain.StepRouter`（A6）、adapters 侧 `AgentRunnerReplayDispatcher` / `AgentRunnerCompositeAdmission` / `AgentRunnerPinnedCLILauncher` / `AgentRunnerPinnedCLIRun` / `AgentRunnerTerminalPublisher` / `AgentRunnerStepIntentPreparer` / `NewAgentRunnerReplayStoreForRun` / `ToChainAgentRunnerTerminal`。新增的只是**实现既有接口的具体类型**。生产 postflight 的 requestID 通过「端口实例绑定 request record」获得（§4），不改 `PostflightRequest` DTO。
+
+| 文件 | 改法 | 为何必须改 / 不改会怎样 | 风险 |
+|---|---|---|---|
+| `internal/console/runtime.go` | **②b 已落地，本修订不动**：`localRuntime` 及 fail-closed `RunPostflight` 已移至 `runtime_noop.go`；`ExecuteNoopRun`、`LoadRunSummary`、`summarizeProjection` 逐字未动 | 满足 J-a2；`ExecuteNoopRun` 函数文本逐字不变由 J-a3 守护 | 极低（已完成：gofmt 空、build/vet exit 0、`go test -count=1 ./...` 与基线逐包全等） |
+| `internal/console/runtime_noop.go` | **②b 已落地，本修订不动**：承载 noop 运行时（含 fail-closed postflight 端口，注释声明 noop 专用） | `ExecuteNoopRun` 需要 PostflightPort 而 noop 链契约上必须 fail-closed；集中到专用文件以满足 J-a2 | 极低 |
+| `internal/console/runtime_agent.go`（新） | `AgentRunnerAssemblyOptions`、`ExecuteAgentRunnerRun`、`agentRunnerRuntime`（Baselines/Workspaces/Steps/Acceptance/Reviewer/Publisher/Stopper/Reconciler 七端口 + `waitRun`（(A′) 入口载体）+ `beforeManifest`）、`preManifestAgentRunnerPort`（实现既有 `chain.AgentRunnerPort` 的 console 侧 wrapper：dispatch 前捕捉 pre-manifest 后委托 dispatcher）+ 驱动循环 | console 的 AgentRunner 生产装配入口；不改则 OB-21 ① 无法闭合、装配只能留在非生产 harness（B4 现状） | 中（新装配路径；错误接线表现为 fail-closed 报错，由聚焦测试守护） |
+| `internal/adapters/agent_runner_postflight.go`（②b 已落地 +470，本修订追加 (A′) 入口） | ②b：`AgentRunnerPostflight` + `NewAgentRunnerPostflight`（实现既有 `chain.PostflightPort`）、`AgentRunnerSnapshotCapturer`、`AgentRunnerWorkspaceBaselineDigest`；**本修订追加**导出方法 `(*AgentRunnerPinnedCLIRun).WaitAgentRunnerDispatched`（不 spawn 的已派发后等待/采集/映射，§3.5） | 生产 postflight 数据源全在 adapters 域；(A′) 入口与未导出助手同包是用户裁定；不改则 J-a2b 不可达、console 恒无真实 postflight | 中（安全敏感：对账/扫描写错会把拒绝误判为通过；入口越界即停下回 ①；§7 变异 + Codex 守护） |
+| `internal/console/cli.go` | `executeRun`：当 `FindExecutableSteps` 非空**且** AgentRunner 输入 flags 全部齐备时路由到 `ExecuteAgentRunnerRun`，否则维持现有「local runtime only supports noop steps」报错 | 使拒绝路径获得产品级真实调用者（OB-55 的「真实调用者」论据）；不改则调用者仅剩测试，死代码异议可能复燃 | 低–中（新增 flags 属 CLI 表面；**是否入本片见 §12/⑥ 待裁决**） |
+| `internal/console/runtime_agent_e2e_test.go`、`internal/adapters/agent_runner_postflight_test.go`（新） | §6 的装配腿与端口测试；端口腿另含 (A′)/`Run` 差异化测试 `TestAgentRunnerPostflightDispatchedParityMatchesRun`（§3.5.4） | ⑨ 证据载体，CI 可复跑、零计费 | 低（仅测试） |
+
+**明确不改**：`internal/chain/**`、`internal/adapters` 既有文件（原样复用）、`schemas/**`、`docs/CONTRACTS{,_EN}.md`、schema fixtures、`.github/workflows/**`、`go.mod`、任何 capability/enforcement/availability 记录文件。
+
+## 3. 组合装配设计（console 侧）
+
+### 3.1 装配入口与构造顺序（`ExecuteAgentRunnerRun`）
+
+输入 `AgentRunnerAssemblyOptions`：`RunID`、`RunRoot`、`Definition`（经 `cfg.ToDefinition()`）、`RequestRecord`、`CapabilityRecord`、`EnforcementRecord *`（可 nil，nil 即进入 §5 拒绝）、`AvailabilityRecord` + `AvailabilityPolicy`、`AuthorizationLedger`、`CostLedger`、`AgentCLI{Executable, Version, VersionArgs, Grace, Timeout, VerifyWait, MaxLogBytes}`、`Clock`、`IDs`。
+
+构造顺序（每一步失败即 fail-closed 返回，不留半成品）：
+
+1. **装配前置拒绝**（§5 编号 1/8）：definition 必须恰好含一个 isolated-workspace `code` 步（多步/多任务/hook 步 ⇒ 拒绝）；所有记录字段非空且可解码/可验证（用既有 `Validate*` / `Decode*`）。**零新哨兵**：前置拒绝复用既有 `console.ErrInvalidConfig`（包裹缺项名）——v1 曾写新哨兵名 `ErrAgentRunnerAssemblyIncomplete`，已被用户硬约束（零新哨兵、不上 wire、不进 `error.schema.json`）取代（见整改记录 r2 的 N2）。
+2. **run root 标记先行**：`MkdirAll(runRoot/events)` + 空 `state-events.jsonl`（不存在才建；resume 复用既有）——顺序铁律：标记必须先于 replay store 构造（`NewAgentRunnerReplayStoreForRun` 校验标记存在，A0 契约）。
+3. `store := adapters.NewAgentRunnerReplayStoreForRun(runRoot, runID)`（自建 `agent-runner-replay/{requests,completions,launches,terminals,runs}`）。
+4. `store.RejectWriterRoots(workspaceRoot)`（workspace 与 replay root 双向不相交；A0 纪律）。
+5. `snapshotStore := snapshot.NewStore(runRoot/snapshot-store, 0)`；workspace root = `runRoot/workspaces/<task>-attempt-1`（Materialize 端口物化）；`capturer, err := NewAgentRunnerSnapshotCapturer(snapshotStore, runID, taskID, 1)`（pre-manifest wrapper 与 (A′) 采集共用捕捉口径，§3.5；同根两个 store 实例按 hash 寻址写对象、幂等无冲突）。
+6. `launcher := NewAgentRunnerPinnedCLILauncher(config, store)`（钉版校验；子进程由 `guard.RunManaged` 启动，launcher 注入 `PROOFRAIL_EVIDENCE_DIR=<store>/runs/<requestId>`）。
+7. `dispatcher := AgentRunnerReplayDispatcher{Store, Launcher, Process, LedgerSnapshot: func() {return AuthorizationLedger}, CostLedger, RequestRecord, Clock}`。
+8. `admission := AgentRunnerCompositeAdmission{...}`（EnforcementRecord 可为 nil）。
+9. `intents := NewAgentRunnerStepIntentPreparer(RequestRecord, definition)`。
+10. `postflightPort := NewAgentRunnerPostflight(store, RequestRecord, snapshotStoreRoot, ...)`（实例绑定 request record ⇒ requestID，§4）。
+11. `publisher := AgentRunnerTerminalPublisher{Store, CostLedger, RequestRecord, Clock}`。
+12. `runtime := &agentRunnerRuntime{...}`（七端口：Baselines=workspace 条目摘要、Workspaces=Materialize、Steps=`chain.StepRouter{AgentRunner: &preManifestAgentRunnerPort{inner: dispatcher, capturer: capturer}, AgentRunnerAdmission: admission}`（wrapper 在 dispatch 前捕捉 pre-manifest 并存入 `runtime.beforeManifest`；捕捉失败置 nil 仍派发——与 `Run` 的「capture gap 降级而非中止」同语义，§3.5）、Acceptance=真实 snapshot candidate 冻结、Reviewer=策略 approve 带证据摘要、Publisher=promotion（重验 workspace 摘要 + 无存活受管进程）、Stopper=声明 launcher 拥有停机、Reconciler=只读核对）；`runtime.waitRun = &adapters.AgentRunnerPinnedCLIRun{Launcher: launcher, Store: store, Clock: clock}`（(A′) 入口载体；**必须与 dispatcher 共用同一 launcher/store 实例**，否则 registry handle 与证据目录无法解析到已派发的 run，§3.5）。
+13. `engine := chain.New(Options{..., Postflight: postflightPort, ...})`。
+
+### 3.2 驱动循环（与 B4 harness 同构，但全走生产路径）
+
+1. `engine.Run(ctx)` ⇒ 期望 `ErrAwaitingAgentRunnerTerminal`。
+   - **Windows**：`RecordRequest` 先拒（durability unproven）⇒ dispatcher 返回 `ErrAgentRunnerReplayStoreDurabilityUnproven`（错误链）⇒ engine 写 step/task FAILED ⇒ 装配返回该错误。**这就是 Windows 上生产派发的真实终局**（§5 编号 7，拒绝腿）。
+   - **Unix**：R 已发布 ⇒ step `TERMINAL_PENDING`。
+2. 等待/采集/映射：`runtime.waitRun.WaitAgentRunnerDispatched(ctx, agentRunnerRunRequest, runtime.beforeManifest)`——(A′) 入口（§3.5）：不 spawn、不写 R/intent/identity、不触 chain 状态；看门狗、guard 停机、五枚冻结事实与 `Run` 同序，仅去掉 spawn 与其专属前置。`agentRunnerRunRequest` 的 Launch 字段与 dispatcher **同源构造**（同一 `AgentRunnerProcessConfig`、同一 workspace root，§3.5.1）。
+3. 终局发布：`publisher.PublishTerminal(ctx, outcome)`（intent → 账本 `Settle` → C → closure，A3 四阶段）。
+4. 路由：`terminal, _ := ToChainAgentRunnerTerminal(request, intent, closure)`（或 `LoadChainAgentRunnerTerminal`）→ `engine.SubmitAgentRunnerTerminal(ctx, terminal)` ⇒ completed 路由 step `PASSED`。
+5. `engine.Run(ctx)` 再入 ⇒ 走完 postflight → `REVIEW_PENDING` → freeze → review → promotion ⇒ task `PASSED`、chain `COMPLETED`。
+6. 非 completed 终局（failed/cancelled/uncertain/operator）按 A4 路由后停止；本片只对 completed 与「拒绝」两类腿取证。
+
+### 3.3 run root 与 `runs/`、`PROOFRAIL_*`
+
+- run root：沿用 CLI 既有口径（`--run-dir` 或 `<chainDir>/tmp/prfrail-runs/<runID>`）；**不新增** `PROOFRAIL_*` 环境变量。
+- `runs/`：即 `<runRoot>/agent-runner-replay/runs/<requestId>/`，A6 冻结证据目录，launcher 以既有常量 `PROOFRAIL_EVIDENCE_DIR` 注入子进程；装配不发明新 env 语义，`AgentCLI.Env` 仅作透传。
+
+### 3.4 `ExecuteNoopRun` 保持不变
+
+`ExecuteNoopRun` 函数文本逐字不变；`localRuntime`（含 fail-closed postflight）整体移入 `runtime_noop.go` 后语义不变（同包）。noop 链不可能到达 postflight（无 AgentRunner 终局可路由），故该 fail-closed 桩在 noop 路径上契约正确、予以保留并文档化——J-a2 的 grep 判据据此成立（`runtime.go` 不再含桩，桩只在 noop 专用文件）。
+
+### 3.5 已派发后等待/采集/映射入口（(A′)，用户裁定 2026-10-02）
+
+**缘起**：§3.2-2 与 §6 v1 曾假设 dispatcher 派发后调 `AgentRunnerPinnedCLIRun.Run` 做等待/采集/映射。②b 实测不可实现：`Run` 自己 spawn（`internal/adapters/agent_runner_run.go:56` 起，`:83-90` 一带经 `run.Launcher.StartAgentRunnerProcess`），与 dispatcher 共用「每 run root 单次 launch」锁（`agent_runner_pinned_cli.go:126` `ErrAgentRunnerProcessDuplicate`、`:128`/`:368` `ErrAgentRunnerLaunchConflict`）；且 `Run` 在生产代码**无任何调用者**（仅测试，§13）。`tools/b4-e2e/runmap.go:24-39` 权威注释同证并因此镜像重写 9 个未导出生产函数。用户裁定 **(A′)**：在 `internal/adapters/agent_runner_postflight.go`（与未导出助手同包）新增不 spawn 的「已派发后等待/采集/映射」导出入口，console 调它；**明确不取 (B′)**（console 镜像映射层）；认可 adapters 公开面 +1 导出函数，但入口必须最小，任何越界（如顺手加 launch 入口）即停下回 ①。
+
+#### 3.5.1 签名与语义边界
+
+```go
+// WaitAgentRunnerDispatched waits for a run the dispatcher already started,
+// collects its evidence and maps it into the terminal outcome. It is the
+// post-dispatch half of the offline run and never starts a process, never
+// writes replay-store records (no R, no intent, no identity) and never
+// touches chain state: the caller owns terminal publication (§3.2-3).
+// beforeManifest must be the workspace manifest captured before dispatch; a
+// nil capture is a manifest gap that degrades the outcome exactly as
+// AgentRunnerPinnedCLIRun.Run does - never a silent pass. Launcher and Store
+// must be the same instances the dispatcher used, so the launch handle and
+// the evidence directory resolve to the run that is already live.
+func (run *AgentRunnerPinnedCLIRun) WaitAgentRunnerDispatched(ctx context.Context, request AgentRunnerRunRequest, beforeManifest []byte) (AgentRunnerTerminalOutcome, error)
+```
+
+（方法体落于 `internal/adapters/agent_runner_postflight.go`；方法与 `AgentRunnerPinnedCLIRun` 同包，`run.Launcher/Store/Clock` 即 §3.1-12 注入的同一批实例。）
+
+语义边界（硬约束，② 与 ⑦ 必须逐条核验）：
+1. **不 spawn**：全函数不调用 `StartAgentRunnerProcess`；`launchID` 由 `agentRunnerLaunchID(request.Launch.RequestID)` 重推（`agent_runner_replay_dispatcher.go:218`，未导出、同包可调），与 dispatcher 派发时同值。
+2. **不写 R / intent / identity**：零 replay-store 写、零事件日志写；唯一状态读取 = `WaitAgentRunnerProcess` 所需的 registry handle 与 `RunEvidenceDir`。
+3. **不触 chain 状态**：不构造/不调用 Engine；返回 `AgentRunnerTerminalOutcome` 由 caller（§3.2-3 的 publisher）终局化。
+4. **校验与 `Run` 同批同序**：nil receiver/Launcher/Store、ctx、RequestHash、TaskID/StepID/Attempt、Timeout、MaxLogBytes——同一批 `ErrInvalidAgentRunnerRun` 前置；`Clock` 缺省同 `Run`。
+5. **停机处置与 `Run` 同构**：`agentRunnerNeedsDurableStop` 为真 ⇒ `StopAgentRunnerProcess`（公共受审停机，natural exit 得 already-stopped 证明）；否则 ⇒ **同包直调 `run.Launcher.releaseLaunch(launchID)`**——正是 `Run` 的 default 分支，B4 harness 镜像差异 (a) 在此消除（§3.5.4 第二用例守护）。
+6. **采集/树校验/映射全复用未导出助手**（清单见 §3.5.3）：`CollectAgentRunnerEvidence`（`BeforeManifest=beforeManifest`）→ `agentRunnerVerifyTreeGone` → `agentRunnerTerminalStatus` → `agentRunnerCompletionFor`/`agentRunnerSettlementFor` → completed 时 `FrozenFacts()`。`beforeManifest == nil` ⇒ collector 记 gap ⇒ 结局降级 uncertain（与 `Run` 的 capture-gap 语义一致，`agent_runner_run_test.go:689` 同判）。
+7. **入口最小**：仅上述六步；不新增 launch 入口、不新增哨兵、不新增 DTO 字段。
+
+#### 3.5.2 与 `AgentRunnerPinnedCLIRun.Run` 的差异对照
+
+| 维度 | `Run` | `WaitAgentRunnerDispatched`（(A′)） |
+|---|---|---|
+| spawn | `StartAgentRunnerProcess` 自 spawn（`:83-90` 一带） | 无；假设 dispatcher 已派发，`launchID` 重推 |
+| pre-manifest | 内部在 spawn 前捕捉（`request.Capturer`） | 参数 `beforeManifest`（console wrapper 在 dispatch 前捕捉，§3.1-12） |
+| 停机 switch | 同一 switch、同一批助手、同序 | 同一 switch、同一批助手、同序（含同包直调 `releaseLaunch`） |
+| 校验 / Clock 缺省 / 映射助手 | 同一批 | 同一批 |
+| 写盘 | 无（不写 R/intent/identity） | 同（collector 写证据工件属 `CollectAgentRunnerEvidence` 既有行为，非入口新增） |
+| 返回 | `AgentRunnerTerminalOutcome` | 同类型、同字段语义 |
+
+#### 3.5.3 未导出助手清单（同包可调用性确认）
+
+| symbol | 定义位置 | 用途 |
+|---|---|---|
+| `agentRunnerWorkspaceRoot` | `internal/adapters/agent_runner_run.go:166` | Launch 的 workspace 根（`WorkspaceRoot` 优先，回退 `Dir`） |
+| `agentRunnerNeedsDurableStop` | `internal/adapters/agent_runner_run.go:177` | 判定走受审停机还是 `releaseLaunch` 分支 |
+| `agentRunnerTerminalStatus` | `internal/adapters/agent_runner_run.go:190` | watch/process/stop/collected/treeGone → status/treeStatus/errorEvidence |
+| `agentRunnerVerifyWait` | `internal/adapters/agent_runner_run.go:245` | 树验证等待兜底（≤0 回退 2s） |
+| `agentRunnerVerifyTreeGone` | `internal/adapters/agent_runner_run.go:254` | 树消失校验；**注入点** = `agentRunnerVerifyTreeGoneWith(ctx, evidenceDir, wait, guard.InspectProcess, guard.ProcessAlive)`（见 `:261`） |
+| `agentRunnerVerifyTreeGoneWith` | `internal/adapters/agent_runner_run.go:261` | 可注入进程观测的树校验核心 |
+| `readAgentRunnerChildPIDs` | `internal/adapters/agent_runner_run.go:302` | 读 `stub-child.pid` |
+| `agentRunnerOutcomeEvidenceFor` | `internal/adapters/agent_runner_run.go:325` | 降级结局的证据摘要 |
+| `sortedUniqueAgentRunnerHashes` | `internal/adapters/agent_runner_run.go:331` | 证据列表排序去重 |
+| `agentRunnerCompletionFor` | `internal/adapters/agent_runner_run.go:339` | 构造 Completion |
+| `agentRunnerSettlementFor` | `internal/adapters/agent_runner_run.go:375` | 构造 Settlement |
+| `agentRunnerLaunchID` | `internal/adapters/agent_runner_replay_dispatcher.go:218` | 由 requestID 重推 launchID（dispatcher 同源） |
+| `(*AgentRunnerPinnedCLILauncher).releaseLaunch` | `internal/adapters/agent_runner_pinned_cli.go:332` | 停机 switch 的 default 分支退役 launch（未导出、同包可调） |
+
+（入口另调既有**导出**端口：`WaitAgentRunnerProcess`（`agent_runner_pinned_cli.go:442`）、`StopAgentRunnerProcess`（`:232`）、`(*AgentRunnerReplayStore).RunEvidenceDir`（`agent_runner_replay_root.go:293`）、`CollectAgentRunnerEvidence`（`agent_runner_evidence.go:99`）、`FrozenFacts`（`agent_runner_evidence.go:133`）。）
+
+#### 3.5.4 差异化测试设计（漂移护栏）
+
+**一句话**：两个互不相关的 run root + 同一确定性 `tools/agent-stub` 二进制 + 同一 `AgentRunnerRunRequest`（同 requestID、同 flags）+ 同一固定 `Clock` 与同一 `AgentRunnerSnapshotCapturer` 捕捉口径——root A 走 `Run`（自 spawn），root B 先用 `StartAgentRunnerProcess`（dispatcher 同款公开启动端口）spawn 再走 `WaitAgentRunnerDispatched`（传 spawn 前同一工作区捕捉的 `beforeManifest`），断言两份 `AgentRunnerTerminalOutcome` 逐字段相同；物理上不可相同的字段用替代断言闭合。
+
+| 字段（completed 结局） | 逐字段相同？ | 依据 / 替代断言 |
+|---|---|---|
+| `Completion` 的 Kind/CompletionID/RequestID/RequestHash/RunID/TaskID/StepID/Attempt/AdapterID/SessionID | ✅ 相同 | 全部由 request 派生 |
+| `Completion.Status` / `ProcessTreeStatus` | ✅ 相同 | 同 stub 模式（`mutate-workspace` 自然退出 ⇒ completed/stopped） |
+| `Completion.ExitCode` | ✅ 相同 | stub 退出码固定 |
+| `Completion.Evidence` / `ErrorEvidence` | ✅ 相同 | 仅 RequestHash；completed 无 ErrorEvidence |
+| `Completion.CompletedAt` | ✅ 相同 | 两路注入同一固定 `Clock` ⇒ 同值 |
+| `Completion.OutputManifestHash` | ❌ 不同 | post manifest 字节含 `snapshot` 捕获时间戳 `CapturedAt`（`internal/snapshot/capture.go:275` 内部 `time.Now()`，不可注入）⇒ 替代断言：各自 = `Digest("", 本根 manifest.post.json 字节)`（自洽）；A/B 解码后 `Entries` 逐条目全等 |
+| `Settlement` 全部字段 | ✅ 相同 | stub `usage.json` 完全确定性（固定 calls/tokens/duration-ms） |
+| `Facts.DiffHash` | ✅ 相同 | diff 报告仅含条目（无时间戳） |
+| `Facts.LogHash` | ✅ 相同 | 日志流 = 固定 marker 行，无 PID/时间 |
+| `Facts.UsageHash` | ✅ 相同 | usage 确定性同上 |
+| `Facts.ManifestHash` | ❌ 不同 | 根因同 `OutputManifestHash` ⇒ 替代断言同上 |
+| `Facts.ProcessStopEvidenceHash` | ❌ 不同 | guard 停机证据 canonical 含 PID + StartToken + Requested/Verified 时间戳（`internal/guard/process.go:281` 摘要口径）⇒ 替代断言：A/B 各自解码证据前缀（域 `proofrail:termination-evidence:1`）且 `Outcome=="stopped"`、`Actions` 相同，仅 Identity/时间不同；两路停机分支一致（completed 腿均 natural-exit ⇒ 同一公共 `StopAgentRunnerProcess` 的 already-stopped 证明） |
+| `Facts` 非 nil 且五枚两两互异 | ✅ 相同 | 共享 `FrozenFacts.Validate` |
+
+**第二用例（guard 停机腿）**：stub `hang` + 短 Timeout ⇒ 两路均走 `default` 分支（guard 已停 ⇒ **同包直调 `releaseLaunch`**）；断言 A/B 的 `Status=="uncertain"`、`TreeStatus` 相同、`ErrorEvidence` 除停机摘要元素外逐项相同、且**两路 launch slot 均被释放**（同一 root 可再次 `StartAgentRunnerProcess` 不被 `ErrAgentRunnerLaunchConflict` 拒）——该用例专门证明 B4 harness 镜像差异 (a) 在生产同包入口中已消除。
+
+**不可消除差异的声明**：上述三个 ❌ 字段在物理上不可能跨进程逐字节相同（时间与 PID 是真实系统的身份要素），故对它们以「自洽 + 结构等价」替代「逐字节相等」；其余 ✅ 字段必须逐字段相等，任一漂移即红。
+
+## 4. 生产 `PostflightPort` 实现设计（`internal/adapters/agent_runner_postflight.go`）
+
+- **文件职责注（v2）**：本文件按用户裁定同时承载 §3.5 的 (A′) 入口 `WaitAgentRunnerDispatched`（同包获得未导出助手；职责与 postflight 端口分离，二者无调用关系）。
+
+- **形态**：`AgentRunnerPostflight` 为绑定式端口——`NewAgentRunnerPostflight(store *AgentRunnerReplayStore, request AgentRunnerRequestRecord, snapshotRoot string)`。`RunPostflight` 先校验 `request.RunID/TaskID` 与绑定记录一致，否则 fail-closed 返回（不改 `PostflightRequest` DTO、不新增接口；requestID 取自绑定记录）。
+- **数据来源**：`store.RunEvidenceDir(request.RequestID)` 的 A6 冻结工件 `manifest.pre.json / manifest.post.json / diff.json / logs/{stdout,stderr}.log / usage.json / stub.pid / stub-child.pid` + `PostflightRequest.Workspace`。
+- **五枚冻结事实的独立重推与逐项对账**（六腿，域前缀 `proofrail:agent-runner-postflight-leg-*:1`，不得用 b4 域）：
+  1. `ManifestHash`（post manifest 工件摘要）：重新捕获 workspace（`internal/snapshot` 同一捕捉口径）⇒ 条目集与存储 post manifest **严格相等**（changed paths ⇒ failed，列出路径）。
+  2. `DiffHash`：由存储 pre manifest 与新鲜捕获重算 diff ⇒ 字节级等于 `diff.json`（不等 ⇒ failed）。
+  3. `LogHash`：重读两条日志流**原始字节**拼接摘要 == `Facts.LogHash`（A6 口径：不先解码）。
+  4. `UsageHash`：重读 `usage.json` 摘要 == `Facts.UsageHash`。
+  5. `ProcessStopEvidenceHash`：独立重验——对 `stub.pid`/`stub-child.pid` 报出的 pid 做 `guard.InspectProcess` + `ProcessAlive`，任一存活 ⇒ failed；全部消失 ⇒ 事实主张成立（hash 本身随 passed 证据携带，guard 停机证据字节不可由端口重建）。
+  6. 范围/秘密/副作用：`gates.DefaultSecretScanner` 扫捕捉条目（普通文件）；文件类型/大小由 snapshot 捕捉口径承担。
+- **failed / uncertain 语义**：任一腿「证明事实错误」⇒ `PostflightFailed`（ErrorEvidence = 域摘要 + 细节）；「无法证明」（工件不可读/捕捉失败）⇒ `PostflightUncertain`。引擎侧已冻结：failed ⇒ task `REPAIR_PENDING` + chain `PAUSED`；uncertain ⇒ task `FAILED` + chain `PAUSED` 禁重试。
+- **不写状态**：端口只读 evidence 目录与 workspace；零写 replay store、零写事件日志、不触 Engine。passed 的 `Evidence` = 五枚事实摘要 + 六腿摘要（满足 A5「必须携带全部五枚事实摘要」）。
+- **与 `tools/b4-e2e/postflight.go` 的差异与不可直接搬运理由**：package main；requestID 是硬编码 `"request-"+runID`；摘要域 `proofrail:b4-*`（与生产域混用会污染证据语义）；经 `p.owner` 写 harness journal（生产端口无此物）；无 request-record 绑定校验。可复用的是**对账算法与腿结构**，须重写载体（包、绑定、域前缀、journal 移除）。
+- **继承边界（不改）**：snapshot 捕捉默认排除集（`.git/**`、`.prfrail/**`、`tmp/**`）的盲区（B4 偏差 3 实测）原样继承，本片不改排除集，仅如实文档化。
+
+## 5. 拒绝路径设计（行为 + 错误哨兵 + 不 spawn 证明）
+
+| 条件 | 行为 | 哨兵（`errors.Is` 可识别） |
+|---|---|---|
+| 1. 缺 capability / 请求记录 / 可用性记录（装配输入缺失或解码失败）；definition 不是「恰好一个 isolated code 步」 | 装配前置拒绝：engine 尚未构造 | **零新哨兵**：复用既有 `console.ErrInvalidConfig`（包裹缺项名）—— v1 曾写新哨兵 `ErrAgentRunnerAssemblyIncomplete`，已被用户硬约束取代（见整改记录 r2 的 N2 与 §3.1 步 1） |
+| 2. 无 enforcement 记录（disposition != compatible） | admission 拒绝 | `ErrAgentRunnerCompositeAdmissionBlocked` ← `ErrAgentRunnerAdmissionBlocked`（reason `external enforcement required`） |
+| 3. 缺可用性 / status != available / 通道或 profile 不匹配 / 预算超限 | admission 拒绝 | `ErrAIUnavailable`（reason 区分 stale/mismatch/budget） |
+| 4. 记录过期（enforcement `probedAt` 早于 capability 或超 `MaximumAge` 或晚于评估时刻；availability 同理） | admission 拒绝 | 同上（`stale or future enforcement evidence`） |
+| 5. 绑定不匹配（enforcement 与 capability/executable/config/platform 哈希；request 与 step/attempt/parent；authorization scope；budget reservation 绑定） | admission 拒绝 | `ErrAgentRunnerCompositeAdmissionBlocked` 下各 reason（`enforcement binding mismatch` / `step request or adapter candidate binding mismatch` / `authorization scope mismatch` / `cost reservation binding mismatch`） |
+| 6. 平台不匹配（capability OS/Arch/PlatformHash ≠ 当前评估环境） | admission 拒绝（compatible 也不豁免平台校验，契约冻结） | `capability platform mismatch` |
+| 7. Windows durability unproven | dispatcher `RecordRequest` 拒绝：R 未创建、无 intent、无 identity、**无 spawn** | `ErrAgentRunnerReplayStoreDurabilityUnproven` |
+| 8. 反向腿「无记录 ⇒ 拒绝启动」 | 即编号 1/2/3：装配层或 admission 层拒绝，事件日志不出现 dispatch 三哈希证据 | 同上各哨兵 |
+
+**不 spawn 证明（两层）**：
+- 结构层：全仓唯一进程产出点 = `AgentRunnerPinnedCLILauncher.StartAgentRunnerProcess` → `guard.RunManaged`。`StepRouter.ExecuteAgentRunner` 顺序 = admission 先于 dispatch；dispatcher 顺序 = `RecordRequest` → launch reconfirm → intent → 才调用 launcher。编号 1–6 在 admission 内短路，编号 7 在 `RecordRequest` 短路 ⇒ 任何拒绝路径都到不了 launcher。
+- 证据层：每条拒绝腿的测试断言——`<runRoot>/agent-runner-replay/runs/` 空、`launches/` 空、run root 无 `managed-process.identity.json` 镜像、事件日志 step 为 `FAILED` 且无 `agent-dispatched` 转移；由此机械证明零 spawn。
+
+## 6. `agent-stub` 全链跑通设计与 ⑨ 证据形态
+
+- **测试归属**：`internal/console/runtime_agent_e2e_test.go`（装配腿，调生产 `ExecuteAgentRunnerRun`，in-process、除生产 launcher 外零 `os/exec`）+ `internal/adapters/agent_runner_postflight_test.go`（端口腿，含 §3.5.4 差异化测试）。agent-stub 由测试内 `go build tools/agent-stub` 产出到 `t.TempDir()`（CI 有工具链；允许 `PROOFRAIL_AGENT_STUB` 环境覆盖为预构建二进制，默认构建）。
+- **平台分工（关键）**：
+  - `TestAgentRunnerAssemblyFullChain`：仅当 `store.PublicationDurability()==Proven`（Ubuntu CI / 本地 Unix）执行 ⇒ dispatch（R+intent+identity）→ `TERMINAL_PENDING` → `runtime.waitRun.WaitAgentRunnerDispatched`（(A′) 入口，§3.5；pre-manifest 由 `preManifestAgentRunnerPort` 在 dispatch 前捕捉）→ 生产 publisher 四件套 → `ToChainAgentRunnerTerminal` + `SubmitAgentRunnerTerminal` → postflight passed → freeze/review ⇒ 断言 task `PASSED`、chain `COMPLETED`、事件日志含 `TERMINAL_PENDING` 与 `postflight-passed`。
+  - `TestAgentRunnerPostflightDispatchedParityMatchesRun`（adapters 端口腿，**两平台全跑**、零计费）：§3.5.4 的差异化测试——(A′) 入口与 `Run` 同输入逐字段等价（漂移护栏），含 completed 腿与 guard 停机腿两个用例。
+  - `TestAgentRunnerAssemblyRefusesOnUnprovenDurability`：仅当 durability unproven（Windows 原生）执行 ⇒ 断言 `RecordRequest` 拒绝、零 R/零 spawn（§5 编号 7 工件断言）——**Windows 原生证据即此腿**。
+  - 反向腿（两平台全跑，零计费）：no-enforcement / platform-mismatch / stale-enforcement / no-availability / workspace-replay 重叠，逐腿断言 §5 哨兵 + 零 spawn 工件。
+- **零计费**：agent-stub 契约不触网；availability/capability/enforcement 记录按 B4 口径用公开构造器**声明**（`declared, not probed`），不调用 `ai check`、不发起任何探测、不消耗 premium 请求。
+- **CI 可复跑**：全部挂在既有 `go test ./...` 两腿（Ubuntu + Windows）下，不新增 workflow、不加依赖。
+- **⑨ 证据形态**：`go test -count=1 ./internal/console ./internal/adapters -run "AgentRunnerAssembly|AgentRunnerPostflight" -v` ⇒ 各子测试 `--- PASS`；`go test -count=1 ./...` ⇒ 与基线逐包全等；CI 侧 `gh run view <id> --log` 两腿过滤出 `ok github.com/larsonzh/prfrail/internal/console`（含时长）。
+
+## 7. 变异检验（≥5，删掉守卫 X ⇒ 判据 Y 变红）
+
+| 变异 | 预期变红的判据 |
+|---|---|
+| M1 删除 assembly 前置的「enforcement 记录非空」检查（编号 1/8） | 反向腿「无 enforcement ⇒ 拒绝」反转为放行 ⇒ `TestAgentRunnerAssemblyRefus*` 红 |
+| M2 删除 `RejectWriterRoots`（编号 workspace/replay 重叠） | 重叠腿由拒绝转为通过 ⇒ 对应断言红 |
+| M3 调换构造顺序（先 `NewAgentRunnerReplayStoreForRun` 后建 `events/state-events.jsonl` 标记） | store 构造 fail-closed ⇒ 装配在更早一步以**不同错误**失败 ⇒ 6 条拒绝腿的哨兵断言全部位移变红（**实测：宽红**；正向腿在 Windows 为 SKIP，故不以正向腿取证） |
+| M4 删除 postflight 六腿中任一腿（如 manifest 重捕获或 fact 摘要比对） | 「终局后注入未入账写入 ⇒ 任务 PASSED」由 `REPAIR_PENDING` 反转 ⇒ `TestAgentRunnerPostflight*` / 装配篡改腿红 |
+| M5 删除 `StepRouter.ExecuteAgentRunner` 中 admission 先于 dispatch 的顺序 | **实测：宽红**——4 条 admission 类拒绝腿因**哨兵位移**（期望 admission 哨兵、实得 durability 哨兵）变红；**方案书 v1 声称的「零 spawn 工件断言红」在 Windows 不成立**（无 admission 时 `RecordRequest` 仍先拒 ⇒ 零 spawn 保持）——该最强捕捉途径仅在 Proven 平台（Ubuntu CI）成立，属本片已知平台缺口 |
+| M6 删除 dispatcher 的 durability 前置检查（RecordRequest 前直连 launcher） | Windows 腿「拒绝且零 spawn」反转 ⇒ 红 |
+| M7 删除 admission 的平台不匹配检查 | platform-mismatch 反向腿反转 ⇒ 红 |
+| M8（⑤ 第 1 轮整改新增守卫）删除「存储工件 ↔ 冻结 fact」绑定（post manifest 侧） | `TestAgentRunnerPostflightRejectsArtifactsNotBoundToFrozenFacts` 定向红 |
+| M9（⑤ 第 1 轮整改新增守卫）删除「无 pid 报告 ⇒ `uncertain`」faised 分支（腿 5） | `TestAgentRunnerPostflightIsUncertainWithoutPIDReport` 定向红 |
+| M10（⑤ 第 2 轮整改新增守卫）删除「存储工件 ↔ 冻结 fact」绑定（diff 侧） | diff 绑定腿定向红（断言强度对齐 post 侧：精确摘要） |
+
+M1–M3、M5–M7 属装配/既有路径守卫，M4 属 postflight 安全关键，M8–M10 属 ⑤ 整改新增守卫；变异实现方式为 ② 对生产代码的临时删除 + 单测复跑（不落库，逐字节还原并校 SHA-256）。**口径如实登记**：M3/M5 为**宽红**（守卫载荷性成立，但**不等价于单点判据**），M10 的 diff 绑定相对腿 2 属**冗余防御**（腿 1 锚定后 diff 报告已被传递约束），其独立变异价值在于证明绑定本身载荷。
+
+## 8. 是否触 ②a 协议先行：**不触发**（判定 + 依据）
+
+依据：本片（1）不新增/不修改任何 wire 记录、schema 或 fixtures；（2）不改 `docs/CONTRACTS{,_EN}.md` 任何条款（admission 用冻结的 `ValidateAgentRunnerAdmission` 原样复用；durability 语义不碰）；（3）不新增 chain 端口/接口/DTO 字段（postflight 绑定式获得 requestID）；（4）新哨兵是 Go 内部错误，不进 `error.schema.json` 的 37 个 code、不上 wire。
+
+（v2 增补）(A′) 入口 `WaitAgentRunnerDispatched` 不新增任何 wire/DTO/schema/sentinel：`beforeManifest` 是新入口的**参数**而非既有 DTO 的字段，不触发下述任一情形。
+
+**若 ② 过程中出现以下任一情形，即触发 ②a 必须停下回 ①**：需要给 `PostflightRequest` 加字段（如 RequestID）；需要放宽/收紧 `ValidateAgentRunnerAdmission` 语义（含「compatible 也强制要 enforcement」）；需要在 chain config 增加 `agentRunner` 块（⇒ schema 变更）；需要动 effect mapping 常量；需要新增 `error.schema.json` code。CLI flags 属产品表面、非协议，不触发 ②a（文档回写另算）。
+
+## 9. A1/A2 拆分判定：**不拆**
+
+本片已是用户裁定的 A 段（仅拒绝路径）；B 段（真实 enforcement 落地、S1/S2 归属）已按 OB-55 明确移出。A 段内两条目标（接线+生产 postflight / AT-23 仍 blocked）同源同批、无独立交付压力 ⇒ 单片完成，结论行 `DESIGN: DONE`。唯一开放项是 CLI 表面接入范围（§12/⑥），不构成拆分理由。
+
+## 10. 风险与「仅静态推断、未实证」清单
+
+**风险**：
+1. postflight 对账写错 ⇒ 拒绝误判为通过（最高风险）；M4 + Codex 终审 + 必抽盲审守护。
+2. 正向全链只能在 Unix 跑通，Windows 无生产正向腿（durability 平台常量，本片无法改）；若用户坚持 Windows 正向证据 ⇒ 需回 ① 或先做 durability 升级片（B3b/B3c 域，超出本片）。
+3. 装配限「恰好一个 AgentRunner 步」；多步/多任务、hook 步、operator-action、取消、崩溃恢复均拒绝或未覆盖（未实证清单）。
+4. CLI flags 若入本片，产品文档（INSTALLATION/OPERATIONS）可能出现滞后。
+5. 声明式 fixture 与真实候选的混淆风险——报告与测试名必须逐处标注 `declared, not probed`。
+6. **adapters 公开面扩张（v2 增补）**：新增导出方法 `(*AgentRunnerPinnedCLIRun).WaitAgentRunnerDispatched` 使 adapters 公开面 +1；误用风险 = 与 `Run`（spawn）混淆、或后续有人顺手加 launch 入口。缓解：入口最小（§3.5.1 七条硬约束：不 spawn、不写 R/intent/identity、不触 chain）；§3.5.4 差异化测试逐字段钉死与 `Run` 的等价性（漂移护栏）；⑦ 终审/复审必检「入口未越界」；越界即停下回 ①。
+
+**仅静态推断、未实证**：① 正向腿 dispatch→COMPLETED（未在 Windows 跑通，受平台常量阻断；Ubuntu CI 待实证）；② 生产 postflight 在真实候选上的行为（只测 agent-stub）；③ admission 对真实候选记录的拒绝路径（只用声明 fixture 构造拒绝形态）；④ 多步/多任务装配、cancellation、operator-action-required、resume/Recover 路径；⑤ `build/verify` 门禁挂钩步在装配内的行为（本片拒绝）；⑥ 账本结算只经零费用声明账本；⑦ 钉版 launcher 对真实 CLI 的版本校验（只测 agent-stub）；⑧ 差异化测试在真实进程时序下的跨平台确定性（仅以确定性 agent-stub 验证，v2 增补）。
+
+## 11. Codex 额度评估（⑦ 轮次预计）
+
+- 预计 **1 终审 + 1 复审 = 2 轮**（终审大概率报 postflight 与装配 1–2 条 Medium ⇒ 1 次复审闭合）；第 3 轮（必抽盲审）留作用户裁定的盲审或复审再次命中中高危时的兜底。
+- 预算内的红线场景：若 ② 偏离到 §8 的 ②a 情形，停下回 ① 不消耗 Codex；若复审仍报 Medium+，按准则停下升级用户裁决，**不自行开第 3 轮**（额度例外必须同轮授权并按 OB-37 元规则留痕）。
+- ⑤（预审）与 ③（测试）按白名单由非 Codex 模型承担，不占 ⑦ 额度。
+
+## 12. 对 OB-55 的重新评估
+
+- **拒绝路径真的不构成「无人调用的死代码」——成立**。真实调用者三层：(1) 装配入口被生产包内测试在每次 CI（双平台）真实调用；(2) 若 §2 的 CLI 接线入片，`prfrail run` 对任何 AgentRunner 链在 Windows 上走的就是本片的 durability 拒绝路径——该路径就是 Windows 生产派发的真实终局；(3) admission 拒绝路径与 Unix 正向路径共享同一生产 dispatcher/launcher/publisher。故本片不违反 B2 §8 第 8 条「避免无人调用的死代码」的推迟理由。
+- **A 段不引入 S2 边界依赖——成立**。本片不新增 `Sandbox` 接口、不接 AppContainer、不创建 enforcement；enforcement 记录只被冻结的 admission 校验器只读消费；进程边界复用 S1 已验证的 `guard`。装配对 enforcement 的依赖仅表现为「缺记录即拒绝」，没有把 S2 构件的接口带进 console。OB-55 的「B 段归属不在本片」维持不变。
+
+## 13. A6 遗留说明与本片修复（OB-56 候选，本片不落账）
+
+- **遗留事实**：`AgentRunnerPinnedCLIRun.Run` 在生产代码**无任何调用者**（仅 `internal/adapters/agent_runner_run_test.go` 等测试构造调用）；`tools/b4-e2e` 因「`Run` 自 spawn、不能用于 dispatcher 已派发的 run」只能镜像重写 9 个未导出生产函数（权威注释 `tools/b4-e2e/runmap.go:24-39`，含两项已记录偏差）。⇒ A6 交付了「自 spawn 编排」却缺少「已派发后等待/采集/映射」的生产入口，终局采集只能留在非生产 harness。
+- **本片修复**：以 (A′) 入口 `WaitAgentRunnerDispatched`（§3.5）闭合该缺口——同包可得 `releaseLaunch` 等未导出助手、不 spawn、不写 R/intent/identity；console 装配（§3.1-12、§3.2-2）提供生产调用者，差异化测试（§3.5.4）提供漂移护栏。B4 harness 镜像差异 (a) 由此消除。
+- **OB-56 候选**：上述遗留与修复事实登记为 **OB-56 候选**（「`Run` 无生产调用者 / 缺非 spawn 等待入口 / T027-ASSEMBLY-MIN 以 (A′) 修复」），留待**下一片**按 OB-11/OB-37 口径落 `docs/DELIVERY_DIRECTIVE.md` §12.4。**本片不向其登记 OB-56**（本片步骤 0 的 v1.17 台账补登是另一件事：它登记 OB-54/OB-55 与主控编排器调用口径，见步骤 0；两者不矛盾）。
+
+## ⑥ 待用户裁决问题
+
+1. **CLI 表面接入范围**：`executeRun` 是否在本片接入 AgentRunner 装配（全有或全无的 8 项输入 flags：`--request-record --capability-record --enforcement-record --availability-record --authorization-ledger --cost-ledger --agent-cli --agent-version`，缺一即维持现有报错）？推荐：**入本片**（OB-55 的「真实调用者」论据依赖它；flags 全是既有记录文件、零新协议）。备选：仅库入口 + 测试调用（范围更小，但死代码异议弱一层）。
+2. **「无 enforcement 记录 ⇒ fail-closed 拒绝」的边界**：契约冻结语义下 disposition `compatible` 的候选**不**需要 enforcement（`ValidateAgentRunnerAdmission` 现行为）。本片反向腿用非 compatible fixture（T026 现状）使该拒绝成立；若用户要求「compatible 也强制拒绝」⇒ 触发 ②a（§8），本片按不触发设计。请确认默认口径 = 遵循冻结契约。
+3. **Windows 正向全链证据缺口**：本片 Windows 原生证据 = durability 拒绝腿 + 反向腿；正向全链只在 Ubuntu CI。若用户要求 Windows 正向 ⇒ 需先处理 durability 升级（超出 A 段），请确认接受平台分工。
+
+## 整改记录 r2（2026-10-03，⑤ 第 2 轮 Low 的处置；用户裁定选 (A)）
+
+| 项 | 处置 | 落点 |
+|---|---|---|
+| N1（行为修正，用户裁定本片修） | console 侧 `managedProcessesGone` 与 postflight 腿 5 **同口径**：两份 pid 报告都不存在 ⇒ 不得放行；至少一份 ⇒ 按原逻辑查存活 pid。零新哨兵（复用既有 `adapters.ErrInvalidAgentRunnerEvidence`） | `internal/console/runtime_agent.go`（`managedProcessesGone` / `readAgentRunnerEvidencePIDs`）+ 新测 `TestAgentRunnerAssemblyRefusesPublishWithoutPIDReport`（3 行表驱动） |
+| F5 | console 侧裸字面量提具名常量，命名与 adapters 侧一致（`agentRunnerParentPIDReportFileName` / `agentRunnerChildPIDReportFileName`），注释声明 stub 约定与真实 CLI 接入时的重评估义务 | `internal/console/runtime_agent.go` |
+| F2 | §7 判据列平台化（M3/M5 改为「宽红」实测口径），补 M8–M10 行 | 本文件 §7 |
+| F6 | §13 与本节修订记录行区分「不登记 OB-56」与「步骤 0 的 v1.17 登记」 | 本文件 §13、上方 §13 行 |
+| N2 | §5/§3.1 的哨兵名同步为既有 `console.ErrInvalidConfig`（删「新哨兵」字样） | 本文件 §3.1 步 1 与 **§5 行 1**（第 3 轮复审指出 §5 行 1 当时未同步，已补齐） |
+| N3 | 补 M10（diff 绑定独立变异）+ `tampered diff artifact` 子测精确摘要断言 | `internal/adapters/agent_runner_postflight_test.go`；变异脚本 `tmp/assembly-min/mutate.js` |
+
+**⑥ 待用户裁决问题（v2 遗留，均已裁定）**
+
+1. CLI 表面接入 ⇒ **已裁入本片**（用户 2026-10-02）。
+2. enforcement 口径 ⇒ **维持冻结契约**（`compatible` 不需 enforcement；不触发 ②a）。
+3. Windows 平台分工 ⇒ **已裁接受**（正向全链仅 Ubuntu CI；Windows = durability 拒绝腿 + 反向腿）。
+
+## 整改记录 r3（2026-10-03，⑦ 盲审 = 1 High + 1 Medium(硬门) + 1 Low；用户裁定选 (B) 并收紧边界）
+
+| 项 | ⑦ 结论 | 处置（本片） | 落点 |
+|---|---|---|---|
+| **F-01（High）** | 停机复核只要求「至少存在一份 pid 报告」，且条目不可解析 / 进程不可观测被静默 `continue` ⇒ 部分伪造的 pid 列表也能判 passed/stopped | **①** 两侧同口径改为「**两份 pid 报告都必须存在**」，任一缺失 ⇒ 不通过（adapters 腿 5 ⇒ `uncertain`；console `managedProcessesGone` ⇒ 阻断，复用既有 `adapters.ErrInvalidAgentRunnerEvidence`，**零新哨兵**）；**③** 条目不可解析 ⇒ fail-closed（两侧）；存活性答案失败（`ProcessAlive`/`aliveFn` 报错）⇒ fail-closed（两侧，adapters 侧有变异覆盖）；**②不做**（pid 报告摘要纳入冻结事实并绑定触 §8 情形）⇒ 登记候选 **OB-58** | `internal/adapters/agent_runner_postflight.go`（腿 5、`agentRunnerAlivePIDsWith`、`agentRunnerReadPIDs`）、`internal/console/runtime_agent.go`（`managedProcessesGone`、`readAgentRunnerEvidencePIDs`）+ 两侧测试 |
+| **F-02（Medium，硬门）** | `StartAgentRunnerProcess` 成功后 identity 记录失败即返回错误，engine 步骤失败路径不停机 ⇒ 可能遗留存活进程 | console 层 **best-effort 兜底停机**（**缓解，非根因修复**）：用**导出**的 `store.LaunchReceipt(requestID)` 取 launchID（dispatcher 在 spawn **之前**写回执），调 `launcher.StopAgentRunnerProcess`；失败语义 = **unproven**（回执缺失 / 不可读 / stop 报错 / 未证明 `stopped` 四条路径均显式报告），**原始错误始终在链上**、零新哨兵、无静默通过；根因在 `agent_runner_replay_dispatcher.go`（本片禁改）⇒ 登记候选 **OB-57** | `internal/console/runtime_agent.go`（`agentRunnerMitigateAbandonedLaunch` + 调用点）+ 新测 `TestAgentRunnerMitigateAbandonedLaunchStopsAndKeepsTheOriginalError`（4 子测）+ durability 腿增一行 unproven 断言 |
+| **F-03（Low）** | `:99` 注释称「engine 建立前失败不会留下 marker」与实现不符 | 注释按实现改正（marker 在 Step 2 早建），**不动语义** | `internal/console/runtime_agent.go:99-101` |
+
+### r3 已知差异（用户要求逐字记录）
+
+**F-01③ 的 `InspectProcess` 分支未按 ⑤/方案书字面口径 fail-closed。** 字面口径（`InspectProcess` 报错 ⇒ fail-closed）在**双平台都被反例证伪**——已正常退出的 pid 在 Windows 报 `ERROR_INVALID_PARAMETER`（实测：`AgentRunner evidence invalid: cannot observe pid 49656 from stub.pid: The parameter is incorrect.`）、Linux 上报 `/proc/<pid>` `ENOENT`。⇒ 按字面口径**每一次已完成运行都会不可验证**（本片自证 #2 当场红），这不是「保守」而是**不可用**。故采用替代口径，且**与运行侧既有读法一致**（`internal/adapters/agent_runner_run.go:261` 的 `agentRunnerVerifyTreeGoneWith` 即把「打不开的 pid」读作已消失）：**fail-closed 面 = 存活性答案失败（`ProcessAlive`/`aliveFn` 报错）+ 条目不可解析**；**视为已消失面 = `InspectProcess` 报错**。二者不重叠、不模糊，两侧逐字同口径。
+
+### r3 生产缺口与候选 OB（本片不落 §12.4）
+
+- **OB-57 候选（F-02 根因）**：`internal/adapters/agent_runner_replay_dispatcher.go` 在 spawn 成功后若 `Result.LaunchID != launchID` 或 `RecordLaunchIdentity` 失败即返回错误且**不回收**已 spawn 进程；本片只在 console 层缓解，**未闭根因**。
+- **OB-58 候选（F-01②）**：把 pid 报告摘要纳入冻结事实并绑定 `PostflightRequest`（触 §8 冻结事实 DTO / 契约域）⇒ 另立切片。
+- **OB-59 候选（F-01① 的生产后果）**：`tools/agent-stub`（及真实 CLI 现行约定）**只在 spawn 子进程时写 `stub-child.pid`**，无子进程的运行只留 `stub.pid` ⇒ **CLI 契约缺口**（非本片可修）。**在 OB-59 修复前，生产正向链（Linux / 真实候选）会因缺子报告而 `uncertain`**；本片测试夹具补种（`agentRunnerSeedChildPIDReport`）只证「落点」可工作，**不证生产侧有产出者**，不得以「测试全绿」掩盖。
+
+### r3 变异复核（M1–M17）
+
+- 新增 **M12**（adapters「两份报告都必须存在」守卫）、**M13**（console 同口径守卫）、**M14**（adapters 条目不可解析 fail-closed）、**M15**（console 条目不可解析 fail-closed）、**M16**（adapters 存活性答案失败 fail-closed）、**M17**（F-02 兜底停机）：**全部 RED**。
+- **M9/M11 标 SUPERSEDED**（分别被 M12/M13 取代）：r3 把 ⑤ 轮一/轮二的旧弱守卫（单一 `reported` 标志）替换为更强的「两报告都必须在」判据，旧锚点已不存在，如实记录而非留 SPEC-ERROR。
+- console 侧「存活性答案失败」分支无注入缝（未观测路径无法在双平台构造真实反例），故变异只覆盖 adapters 侧；该分支的 fail-closed 由 `TestAgentRunnerPostflightRejectsUnreadablePIDReports` 的对应子测覆盖 adapters 侧，console 侧仅由「条目不可解析」一例覆盖（如实登记为覆盖缺口）。
+- `all_restored_byte_identical=true`（逐字节还原）。
+- **主控自误与兜底（须入 ⑧a 报告）**：首次运行扩展后的审计在 M16 处被 Windows 文件锁（`EBUSY`）打断，**还原写入失败 ⇒ M16 变异残留在 `agent_runner_postflight.go`**；主控按「该变异是单次出现的确定性字面替换」逆推回原文（复原后无 `(mutated)` 残留、`gofmt` 空），并给审计脚本加**原子写入 + `finally` 强制还原 + EBUSY 重试**，随后全量重跑得 `all_restored_byte_identical=true`。
+
+## ⑦ 第 2 次 = 终审结论（2026-10-03）：`FINAL REVIEW: FINDINGS`
+
+- **结论行**：`FINAL REVIEW: FINDINGS`（2 Medium 命中硬门 + 1 Low + 2 Observation）；⑦ 意见：「建议消耗第 3 次，**前提是先修复 2 条 Medium**；若不修复，按红线停下升级」。
+- **M-1（Medium）**：F-01 **部分关闭**——两侧「缺失任一 pid 报告即不通过」与 detail 文本已同口径，但**解析器仍不同**（adapters `strconv.Atoi` vs console `fmt.Sscanf`）⇒ 输入口径漂移，测试矩阵未覆盖「数字前缀 + 垃圾后缀」。
+- **M-2（Medium）**：F-02 **仍属「缓解」，不构成「硬门关闭」**——mitigation 只在**首个** `engine.Run` 的非 awaiting 分支触发；一旦已进入 awaiting，后续 `WaitAgentRunnerDispatched` / `PublishTerminal` / `LoadChainAgentRunnerTerminal` / `SubmitAgentRunnerTerminal` / 再次 `engine.Run` 的失败路径**不再走** mitigation。unproven 语义本身充分，但**覆盖面不足**，根因仍在 `agent_runner_replay_dispatcher.go`。
+- **L-3（Low）**：r3 未引入新 wire 协议/DTO/哨兵，但 pid 文件名与 missing-detail 文本为**两处手工同步常量** ⇒ 可维护性漂移风险（建议改单点共享符号；⑦ 判定不触 §8 / ②a）。
+- **O-4 / O-5（Observation）**：变异审计结论可信（16 RED + M9/M11 SUPERSEDED + `all_restored_byte_identical=true`；EBUSY 残留与其复原记录可信），但 ⑧a 归档应附该次原始输出引用；门槛外须登记三项事实（OB-57 未闭、OB-59 生产链风险、**新增**「解析口径漂移」观察项）。
+- ⑦ **未**建议解除「不改 dispatcher」约束，**未**判定本片可通过。
+
+### 主控实测复核 M-1（探针 `tmp/parseprobe`，用后即删；读数 `tmp/assembly-min/parseprobe.txt`）
+
+| 输入 | adapters（`Atoi`） | console（`Sscanf`） | 判定 |
+|---|---|---|---|
+| `7` / `+7` / ` 7 ` / `007` / `7\r` | (7, ok) | (7, ok) | 同口径 |
+| **`12abc`** | (0, 拒绝) | (**12, 接受**) | **DRIFT（真实）** |
+| **`7.0`** | (0, 拒绝) | (**7, 接受**) | **DRIFT（真实）** |
+| **`1_0`** | (0, 拒绝) | (**1, 接受**) | **DRIFT（真实）** |
+| `0x10` / `-0` / `9223372036854775808` / 全角 `１２` | 拒绝 | 拒绝 | 同口径 |
+| 空行 / 全空白行 | （调用方 `continue`） | （调用方 `continue`） | 同口径（探针的差异不适用于真实调用路径） |
+
+- ⇒ **M-1 成立且比 ⑦ 描述更严重一层**：漂移方向是 **console 放行**。Windows 上伪造/损坏行如 `1x` 会让 console 读出 `pid=1`、`InspectProcess` 打不开（视为已消失）⇒ **允许 publish**，而 adapters 腿 5 判 `uncertain` ⇒ **两侧对同一证据给出相反终局**（正好推翻「两侧同口径」这一本片核心判据）。
+- ⇒ 修复方式（in-scope、低风险）：console 侧改用与 adapters 完全相同的 `strconv.Atoi(strings.TrimSpace(line))`；两侧补输入矩阵测试（含 `12abc`/`7.0`/`1_0`；adapters 侧既有 `not-a-pid` 之外新增）。
+
+### 待用户裁定（M-2 触「停下升级」条）
+
+- 用户条 8：若终审明确判定「F-02 的 console 兜底不足以关闭硬门」⇒ 尊重 ⑦ 结论、**停下升级**。⑦ 的 M-2 表述与之一致 ⇒ **该条已触发**；同时条 7（Medium+ ⇒ 整改 ⇒ 第 3 次复审）亦触发 ⇒ **两者冲突，主控停下请示**。
+- 关键是：**F-02 的「关闭」在本片不可能达成**（根因在 `agent_runner_replay_dispatcher.go`，用户明令禁改）⇒ 即便把 mitigation 覆盖到 awaiting 之后的全部失败路径，⑦ 仍只会判「缓解」。故第 3 次复审的价值取决于是否同时解除对 dispatcher 的禁令。
+- 备选：(A) 立即停止，不再动代码，交用户裁决；(B) 先修 **M-1** 与 **F-02 覆盖面**（均 in-scope、仍属缓解），再消耗第 3 次复审；(C) 用户解除禁令 ⇒ 把根因（OB-57）纳入本片或下一片，届时第 3 次复审才有「硬门关闭」的可能。
+
+## 整改记录 r4（2026-10-03，⑦ 第 2 次终审 2 Medium 的处置；用户裁定「选 (B) + F-02 记录态预授权」）
+
+| 项 | ⑦ 结论 | 处置 | 落点 |
+|---|---|---|---|
+| **M-1（Medium）** | 两侧解析器漂移（adapters `Atoi` vs console `Sscanf`）⇒ 输入口径不一致，`12abc`/`7.0`/`1_0` 被 console 放行（实测确认，方向是 console 放行） | console 改用与 adapters **逐字相同**的 `strconv.Atoi(strings.TrimSpace(line))`；两侧补**同一输入矩阵**测试（同输入同期望 + 手工同步耦合点注释）；集成表新增「父报告 `12abc` / `7.0` ⇒ fail-closed 拒绝」两行 | `internal/console/runtime_agent.go`（`readAgentRunnerEvidencePIDs`）、两个测试文件（**adapters 源文件本轮零改动，作为严格侧参照**） |
+| **M-2（Medium，硬门）** | F-02 仍属缓解、不构成硬门关闭；mitigation 只覆盖首个 `engine.Run` 的非 awaiting 分支 | **单入口闭包** `fail(err)`：`ExecuteAgentRunnerRun` 内**唯一**裸失败返回位于闭包内，**7 个** spawn 后失败点全部经它（首个非 awaiting、`Wait` / `Publish` / `Load` / `Submit`、状态非 `completed`、第二次 `engine.Run`）；**unproven 语义不变**、原始错误始终在链上、零新哨兵；注释写明「缓解非根因，根因 OB-57」 | `internal/console/runtime_agent.go` |
+| **L-3 / O-4 / O-5** | 常量手工同步风险、归档须附 EBUSY 原始输出、新增「解析口径漂移」登记项 | L-3 **未改**（⑦ 判不触 §8；本片保持同包最小改动，漂移由 M18/M20 双侧变异 + 两侧矩阵测试守）；O-4/O-5 已入本文件 | 本文件 |
+
+### r4 测试与变异
+
+- 新增测试：`TestAgentRunnerReadPIDsMatrix`（adapters）、`TestAgentRunnerReadPIDsMatrixConsoleTwin`（console，**同一矩阵同一期望**）、`TestAgentRunnerAssemblyFunnelsEveryPostSpawnFailureThroughTheFallback`（**源码级不变量**：裸失败返回恰好 1 次且含于闭包内 + `return fail(` 计数 == 7 + 无绕过闭包的失败返回）、`TestAgentRunnerMitigateAbandonedLaunchClosureCoversEveryUnprovenShape`（闭包委托的未覆盖分支）。
+- **平台事实（如实登记，不得以测试全绿掩盖）**：Windows 上 durability 未证明 ⇒ `engine.Run` 在**请求发布**即被拒 ⇒ **awaiting 之后的 6 条路径运行时不可达**（`TestAgentRunnerAssemblyFullChain` SKIP）。故其兜底覆盖由**源码级不变量测试**承载（平台无关，M19 即证明其有效）；首个非 awaiting 路径由 `TestAgentRunnerAssemblyRefusesOnUnprovenDurability` 断言 unproven；闭包委托的辅助函数由记录式 stopper 直测。
+- 变异：新增 **M18**（console 解析器重新宽松 ⇒ 漂移腿红）、**M19**（第二次 `engine.Run` 绕过闭包 ⇒ 源码级不变量红）、**M20**（adapters 解析器重新宽松 ⇒ 漂移腿红）；**M15 改为 SUPERSEDED（被 M18 取代）**——M-1 统一解析器后 `Sscanf` 形态锚点不复存在，且解析器严格后「删 `err != nil`」是 no-op（`Atoi` 失败时 `pid=0` 仍被 `pid <= 0` 拒），无独立变异可写，如实标注。
+- 最终读数：**17 条 RED + 3 条 SUPERSEDED（M9/M11/M15）+ `all_restored_byte_identical=true`**（基线 22 测试 / 21 PASS / 1 SKIP）。
+
+### F-02 记录态（用户 2026-10-03 预授权，须逐字写入报告）
+
+> 若第 3 次复审仍将 F-02 判为 Medium（即「缓解、未关闭」），用户**预先接受**该状态作为本片的**最终记录**：本片以「M-1 已修 + F-02 缓解已最大化 + OB-57 跟踪根因」收口，**不再为 F-02 开第 4 轮，不再扩大范围**。这不是破 §5.3 纪律，而是用户明确接受「根因在本片范围外的 Medium」作为记录态。
+
+- **OB-57 处置列（须逐字写入报告）**：**根因在 `internal/adapters/agent_runner_replay_dispatcher.go`，超出 `T027-ASSEMBLY-MIN` 范围，另立切片修复。**
+
+## ⑦ 第 3 次 = 复审结论（2026-10-03，额度 3/3）：`RE-REVIEW: PASS WITH FIXES`
+
+| 项 | 复审结论 | 证据（复审给出） |
+|---|---|---|
+| **M-1** | **已关闭**——两侧同一解析表达式与同一拒绝条件；`12abc` / `7.0` / `1_0` 双侧矩阵均拒绝；集成层两行调用的是 `managedProcessesGone`（Publish 实际使用）；r4 中 adapters 源文件零改动 | `agent_runner_postflight.go:538/542/543`、`runtime_agent.go:696/700/701`、两侧矩阵测试、`e2e_test.go:836/842`、`r4diff.txt` |
+| **F-02** | **部分关闭 / 仍为 Medium**——7 个 spawn 后失败点已统一收口到 `fail` 闭包，**未发现第 8 个遗漏点**（`process` / `capturer` 构造失败位于 spawn 前）；根因仍在 dispatcher 的 spawn 后 identity 失败路径 | `runtime_agent.go:304/321/342`、`e2e_test.go:1018`、`agent_runner_replay_dispatcher.go:142/149/176` |
+| **L-3** | 维持现状**可接受**：常量双点手工同步仍在，但已有两侧矩阵测试 + M18/M20 双侧变异红作护栏，本轮未引入新漂移；**不触发 §8 / ②a**，无需强行升为共享导出符号 | 两侧矩阵测试、`mutation.txt` |
+| **新增 Low（门槛外）** | 源码级不变量测试是**文本形态计数 + 字符串匹配**，能强约束当前结构，但理论上可被「等价改写 + 计数补偿」规避 ⇒ 登记为测试鲁棒性观察项，后续可升级为 **AST 级结构断言** | `e2e_test.go:1032/1053/1072` |
+| **变异与证据链** | **成立**：基线 22 测试（21 PASS + 1 SKIP）、M9/M11/M15 SUPERSEDED、`all_restored_byte_identical=true`；DR-8 三份证据支撑「非本片引入」（v3 首跑红、v4 单跑绿、r4 全量绿） | `mutation.txt`、`v3.txt`、`v4.txt`、`snapshot-flake.txt`、`r4-final-test.txt` |
+
+- **F-02 记录态（生效）**：复审明确「按预授权维持 Medium 记录态，不要求第 4 轮整改」⇒ 本片以「**M-1 已修 + F-02 缓解已最大化 + OB-57 跟踪根因**」收口。用户预授权原文见上节，**须逐字写入 ⑧a 报告**。
+- **⑦ 额度用满（3/3）**：盲审（第 1 次）+ 终审（第 2 次）+ 复审（第 3 次）；**不开第 4 轮**（用户红线）。
+
+### ⑧a 报告须登记的候选 OB（本片不落 §12.4）
+
+- **OB-56 候选**：`Run` 无生产调用者 / 缺非 spawn 等待入口 / 本片以 (A′) 修复（见 §13）。
+- **OB-57 候选**：**根因在 `agent_runner_replay_dispatcher.go`，超出 `T027-ASSEMBLY-MIN` 范围，另立切片修复**（F-02）。
+- **OB-58 候选**：pid 报告摘要纳入冻结事实并绑定 `PostflightRequest`（触 §8，另立切片）。
+- **OB-59 候选**：CLI 契约缺口——`tools/agent-stub` / 真实 CLI 只在 spawn 子进程时写子报告 ⇒ OB-59 修复前**生产正向链会因缺子报告而 `uncertain`**。
+- **OB-60 候选（用户预保留，来源本片 M-1 与 F-02 的设计教训）**：方案书模板增两节——① 跨包共享契约：列明跨文件共享项（常量 / 解析函数 / 判定顺序 / 错误分类），每项定义权威侧与核验方式，配机械核验；② 失败路径枚举：对每个可能失败的操作，列「失败后由谁负责 / 后果 / 如何证明」，逐条穷尽，不留「其他失败同理」。适用裁剪：S 档不要求；M 档以上或跨包改动要求。
+- **OB-61 候选（⑦ 第 3 轮复审新增 Low）**：源码级不变量测试（文本计数）可被等价改写规避 ⇒ 建议升级为 AST 级结构断言。
+
+## ⑧a 产物（2026-10-03 落盘）
+
+- `docs/validation/t027-assembly-min.md` + `docs/validation/t027-assembly-min_EN.md`（严格逐行镜像：两侧各 148 条新增行、零删除；12 个章节；自带 `artifacts` 产物块）。
+- `docs/validation/evidence/T027-ASSEMBLY-MIN-freedom-list.md`（F-1 至 F-6 自由度 + D-1 至 D-7 用户裁定 + 覆盖边界）。
+- 门禁终态：`tree` `changed=14` `TOTAL_FAIL=0`（`G3(a)` 报告对 +148/-0 vs +148/-0 OK；`G4b` 未知 CJK 为空；`G7-a` 至 `G7-d` 全 PASS，含 30 条产物行可解析）；`index` `changed=0` `TOTAL_FAIL=0`；`SELFTEST PASS 248/248`；全量测试 14 包 ok / 0 FAIL。
+- **门禁驱动的两处整改（如实）**：首次跑门禁时 `G4b` 报未登记的新 CJK 字符、`G7-a` 报报告缺产物块 ⇒ 处置为**改写措辞**与**补齐产物块**，未加白名单、未改判据。
+- **索引状态说明**：为满足 `G7-b` 在树作用域对 `repo` 行的要求，按该判据自身的契约对新增产物做**仅登记路径、不暂存内容**的意图登记（`git add -N`，8 条路径）；索引作用域判据读数仍为 `changed=0`，内容未入库，提交仍须同轮授权。
+
+## 提交与 CI（2026-10-03）
+
+- **提交**：`68a1ef0`（`feat: assemble the agent-runner run path with a fail-closed postflight (T027-ASSEMBLY-MIN, v1.17)`；16 文件、+4490/-102）；提交前 `index` 作用域 `changed=16 TOTAL_FAIL=0`（G7-b 30 行可解析），工作区提交后清洁。
+- **推送**：`git push origin main` ⇒ `1343730..68a1ef0`（仅 origin，未推 gitee）。
+- **CI run `37070276731`**（head `68a1ef0`）：
+  - **Windows 腿 `111047844029` = 全绿**（含 `Gates` 步实测执行：`SELFTEST: PASS 248/248`、`GATE REPORT scope=ci changed=16`、`TOTAL_FAIL=0`）。
+  - **Ubuntu 腿 `111047843805` = 红**：`Test` 步 `go test -count=1 ./...` 失败 ⇒ `--- FAIL: TestAgentRunnerAssemblyFullChain`（`runtime_agent_e2e_test.go:464`：`the production assembly must complete: invalid AgentRunner terminal intent: observed settlement requires a non-negative charged amount`）；因 Test 先失败，Ubuntu 的 `Gates` 步未执行。其余包在 Linux 全绿（含 `internal/adapters` 11.608s）。
+- **根因（已确证，属产品语义缺口而非夹具机械错误）**：
+  1. 生产函数 `agentRunnerSettlementFor`（`internal/adapters/agent_runner_run.go:375`，A6 既有代码）在 completed 且 usage 完整时返回 `Status = observed`，但**故意不设** `ChargedAmountMicros`；`tools/b4-e2e/runmap.go:49` 已把它记为**已文档化的调用方义务**：`(b) agentRunnerSettlementFor leaves ChargedAmountMicros to the caller; the harness supplies the zero-cost amount of the declared offline workload`（harness 的 `mirrorSettlementFor` 用 `zero := int64(0)` 补齐）。
+  2. 本片新增的 (A′) 映射（`internal/adapters/agent_runner_postflight.go:672`，`WaitAgentRunnerDispatched` → `Settlement: agentRunnerSettlementFor(status, collected)`）**未履行该调用方义务** ⇒ 结算为 observed 但金额为 nil ⇒ 冻结发布器 `terminalSettlementIntentFields`（`agent_runner_terminal_publisher.go:352`）按契约拒绝：`observed settlement requires a non-negative charged amount`。
+  3. 该路径在 Windows **不可达**（durability 未证明 ⇒ 在请求发布即被拒），故本片 Windows 原生证据无法发现；**正是 Ubuntu CI 腿首次执行正向全链时暴露**。
+- **分类与处置（按用户 §6.4 规则）**：这是**语义/产品缺口**（须决定产品对结算金额的主张方式），**不是**可自行处置的机械修复 ⇒ **停下升级，等用户裁定**；CI 红按用户裁定登记为 **DR-9 候选**（Ubuntu 首跑红）与 **OB-62 候选**（A′ 映射缺调用方结算金额义务）。
+- **备选修法（待裁）**：(A) 按 B4 harness 先例为声明式离线工作负载补**零成本**金额并注释调用方义务；(B) 若产品有计价基准，则由 usage 推导金额；(C) 金额不可得时把结算降级为 `unknown`（接受 unknown-hold 的 reservation 语义）。三者都改产品行为，故均不在本片自行执行。
+- **报告与台账的后续义务**：报告 §13「未执行事项」现写「无 CI 结论」已过期 ⇒ 须在**后续授权提交**中改写为 CI 结论与 DR-9/OB-62 登记；本片不做 v1.17 文本迭代。
+
+## 修订记录 v1→v2（2026-10-02，① §5.3 义务重跑）
+
+**触发**：②b 实测并经主控独立复核成立——`AgentRunnerPinnedCLIRun.Run` 自 spawn（`agent_runner_run.go:56` 起、`:83-90` 一带），与 dispatcher 共用单次 launch 锁（`agent_runner_pinned_cli.go:126/128/368`），无法用于已派发 run；`Run` 无生产调用者；`tools/b4-e2e/runmap.go:24-39` 权威注释同证。**用户裁定（2026-10-02）**：采用 (A′)（adapters 新增不 spawn 的已派发后等待/采集/映射导出入口，console 调用；不取 (B′) console 镜像层）；认可公开面 +1；必须差异化测试；硬约束：不新增 chain 端口/接口/DTO、不改 `internal/chain/**`/既有 adapters 文件/schemas/CONTRACTS/fixtures/workflows/`go.mod`、新哨兵不上 wire/不进 `error.schema.json`。
+
+| 节 | 原文要点 | 新文要点 |
+|---|---|---|
+| 头部 | 无修订标记 | 加 v2 修订轮标记；关键既有事实增 5（②b 已落地并保留、本修订对齐不重做） |
+| §2 | `runtime.go`/`runtime_noop.go` 列为待改/待新建；`agent_runner_postflight.go` 仅 postflight 端口 | 前三者标注 ②b 已落地、本修订不动；`runtime_agent.go` 增 `preManifestAgentRunnerPort` 与 `waitRun`；`agent_runner_postflight.go` 标注「②b 已落地 + 本修订追加 (A′) 入口」 |
+| §3.1 | 步骤 5 仅建 snapshotStore；步骤 12 Steps 直连 dispatcher | 步骤 5 增 capturer；步骤 12 增 pre-manifest wrapper 与 `waitRun`（与 dispatcher 同 launcher/store 实例） |
+| §3.2-2 | `AgentRunnerPinnedCLIRun.Run` 等待/采集/映射 | 改调 `WaitAgentRunnerDispatched`（(A′)，§3.5） |
+| §3.5 | （不存在） | 新增：(A′) 签名与七条语义边界、与 `Run` 差异对照、未导出助手清单（13 项 file:line）、差异化测试设计（一句话 + 断言表 + guard 停机第二用例） |
+| §4 | 无文件归属注 | 增文件职责注：同文件承载 (A′) 入口（同包得助手；与 postflight 职责分离） |
+| §6 | FullChain 走 `Run`；测试归属仅装配腿+端口腿 | FullChain 走 (A′)；端口腿增差异化测试 `TestAgentRunnerPostflightDispatchedParityMatchesRun`（两平台、零计费） |
+| §8 | 四条不触发依据 | 增 v2 增补句：(A′) 不新增 wire/DTO/schema/sentinel |
+| §10 | 风险 1–5；未实证 7 项 | 增风险 6「adapters 公开面扩张」（最小入口 + 差异化测试 + ⑦ 审查点）；未实证增 ⑧（差异化测试跨平台确定性） |
+| §13 | （不存在） | 新增 A6 遗留说明：`Run` 无生产调用者、缺非 spawn 等待入口、本片以 (A′) 修复、OB-56 候选留待下一片落 §12.4（本片**不向其登记 OB-56**；步骤 0 的 v1.17 登记不属该条） |
+| 判据 §1 | J-a4 `-run` 正则须覆盖新测试名 | **无改动**：差异化测试命名 `TestAgentRunnerPostflightDispatchedParityMatchesRun` 含子串 `AgentRunnerPostflight`，落入既有正则；J-a1–J-b4 全部原样保留 |
+
+**依据**：`internal/adapters/agent_runner_run.go`（`Run` 结构与 11 个未导出助手位置）、`agent_runner_pinned_cli.go`（`WaitAgentRunnerProcess:442`、`StopAgentRunnerProcess:232`、`releaseLaunch:332`、launch 锁 `:126/128/368`）、`agent_runner_replay_dispatcher.go`（`DispatchAgentRunner` 无 pre-manifest、`agentRunnerLaunchID:218`）、`agent_runner_evidence.go`（`CollectAgentRunnerEvidence:99`、`collectAgentRunnerManifests` 的 gap 语义）、`agent_runner_postflight.go`（②b 已落地内容）、`tools/b4-e2e/runmap.go:24-39` 与 `ports.go:109-117`（pre-manifest 捕捉位置先例）、`internal/snapshot/capture.go:275`（`CapturedAt` 不可注入）、`internal/guard/process.go:281`（停机证据 canonical 含 PID/时间）、`tools/agent-stub/main.go`（usage/logs 确定性）。

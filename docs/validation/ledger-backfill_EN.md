@@ -97,7 +97,7 @@
 
 - Whole-repository per-file encoding check (`enc-tree.js`): **3** violations, **all** of them OB-27 frozen-evidence-pack exemptions; **this slice's new files have zero violations**.
 - Gate self-test: `SELFTEST: PASS 248/248`; `gate.js --all --scope=tree` ⇒ `TOTAL_FAIL=0` (per-criterion readings in §9).
-- Temporary-residue inventory: `tmp/lbf/` retains 19 process files (plans and inventory, assertion scripts, raw outputs, the disposition list, the trace output, the first-round and round-two review-pack copies, and the `git diff` and gate readings), **not cleaned** per OB-49 and the standing user instruction, with disposition `local-only`.
+- Temporary-residue inventory: `tmp/lbf/` retains 19 process files (plans and inventory, assertion scripts, raw outputs, the disposition list, the trace output, the first-round and round-two review-pack copies, and the `git diff` and gate readings), **not cleaned** per OB-49 and the standing user instruction, with disposition `local-only`. **Supplement (v1.23)**: the unit now measures 21 items - `findchar.js` and `ci-watch.txt` were added after wrap-up (both untracked); the full list, per-item sha256 and the archiving correspondence are in `docs/validation/evidence/directive-history/lbf/MANIFEST.md`.
 - Landing consistency: `docs/validation/ledger-backfill.md` and `tmp/lbf/report-cn.md` have equal SHA-256 digests (the same holds for `_EN`).
 - Mirror re-check: the ADR pair's whole-file positional mismatch count equals HEAD's (a pre-existing difference, not introduced here; the two rows this slice added sit in the same position in CN and `_EN` with symmetric counts); this report's pair has zero per-line mismatches.
 - ⑧c disposed of 2 items (the ⑦ round-two Low findings): F2R-1's dangling forward reference and the stale ledger closeout line are now self-contained fact records, and F2R-2's in-pack intermediate reading is corrected to the fresh one.
@@ -145,3 +145,4 @@ tmp/lbf/dispositions.md	local-only
 tmp/lbf/dd36b9b-trace.txt	local-only
 tmp/lbf/review-round2.md	local-only
 ```
+> **Archiving note (v1.23)**: the `tmp/` items cited by this report were archived under `docs/validation/evidence/directive-history/` per §1.5.1 (units: `lbf/`; each with `MANIFEST.md` and `SHA256SUMS.txt`); the original paths are not rewritten and the MANIFEST is the mapping of record. (Paths already cleared by earlier slices are outside this archiving and belong to the pre-existing decoupling recorded as OB-77.)

@@ -276,6 +276,7 @@ docs/validation/directive-review-saturation.md	repo
 docs/validation/directive-review-saturation_EN.md	repo
 tmp/v113/**	local-only
 ```
+> **归档注记（v1.23）**：本报告引用的 `tmp/` 条目已按 §1.5.1 归档至 `docs/validation/evidence/directive-history/`（单元：`v113/`；各含 `MANIFEST.md` 与 `SHA256SUMS.txt`）；原路径不改写，对应关系以 MANIFEST 为准。（此前切片已清除的 `tmp/` 路径不在本次归档范围，属 OB-77 所指既有脱钩。）
 
 **提交后归档（下一批，不属本次提交）**：⑤⑥⑦ 报告（`review-r1.md` / `review-r2.md` / `review-r3.md`）、全量 diff（`review-input-r2-r10.diff`）与终局门禁读数（`gate-tree-r1-r10.txt` / `selftest-master-r10.txt` / `mirror-r10.txt`）计划归档到 `docs/validation/evidence/directive-review-saturation/`；届时本报告产物清单中对应行的处置由 `local-only` 改为 `repo`。**归档延后的原因（如实记录）**：上述报告含被引用的字面量（如行数 / 计数），若以 `.md` 直接进入 `docs/validation/**` 会落入 **G6 的 `.md` 扫描域**并触发 **G6-4**；改写审查方原文不可接受、扩白名单被禁止 ⇒ 下一批以**不落入 `.md` 扫描域的扩展名**归档（或在下一片按 §6.3 口径处置）。
 

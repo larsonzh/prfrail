@@ -1,0 +1,7 @@
+OB-9 folded-in inputs (do NOT run a separate "4th round"):
+  OB9-T3T4-criteria-52c28af.diff  (15198 bytes)
+  OB9-v1.7-c473fd2.diff  (44903 bytes)
+  OB9-v1.8-30cf799.diff  (31826 bytes)
+  OB9-v1.9-6f186fd..a366fe3.diff  (93344 bytes)
+  plus the CN authority + `_EN` mirror pair: docs/DELIVERY_DIRECTIVE.md / _EN.md (read directly; 1036 lines each, 0 per-line mirror mismatches).
+  plus (this slice) tmp/gates-ext/ARCH-DESIGN.md + tmp/gates-ext/SLICE-DEFINITION.md + the ③ evidence in tmp/gates-ext/step2..step5/.

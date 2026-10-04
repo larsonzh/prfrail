@@ -1,0 +1,25 @@
+wt-fwd (1b01115^ + forward apply)
+  git status --porcelain:
+     M tools/gates/cjk-newwords.txt
+    ?? docs/validation/dr-fix-enforcement-proxy.md
+    ?? docs/validation/dr-fix-enforcement-proxy_EN.md
+  commit 1b01115^..1b01115 file list: ["docs/validation/dr-fix-enforcement-proxy.md","docs/validation/dr-fix-enforcement-proxy_EN.md","tools/gates/cjk-newwords.txt"]
+  change-set paths               : ["docs/validation/dr-fix-enforcement-proxy.md","docs/validation/dr-fix-enforcement-proxy_EN.md","tools/gates/cjk-newwords.txt"]
+  identical                      : true
+
+wt-rev (1b01115 + reverse apply)
+  git status --porcelain:
+     D docs/validation/dr-fix-enforcement-proxy.md
+     D docs/validation/dr-fix-enforcement-proxy_EN.md
+     M tools/gates/cjk-newwords.txt
+  commit 1b01115^..1b01115 file list: ["docs/validation/dr-fix-enforcement-proxy.md","docs/validation/dr-fix-enforcement-proxy_EN.md","tools/gates/cjk-newwords.txt"]
+  change-set paths               : ["docs/validation/dr-fix-enforcement-proxy.md","docs/validation/dr-fix-enforcement-proxy_EN.md","tools/gates/cjk-newwords.txt"]
+  identical                      : true
+
+wt-mod (b738e6b + reverse apply)
+  git status --porcelain:
+     M docs/DELIVERY_DIRECTIVE.md
+     M docs/DELIVERY_DIRECTIVE_EN.md
+  commit b738e6b^..b738e6b file list: ["docs/DELIVERY_DIRECTIVE.md","docs/DELIVERY_DIRECTIVE_EN.md"]
+  change-set paths               : ["docs/DELIVERY_DIRECTIVE.md","docs/DELIVERY_DIRECTIVE_EN.md"]
+  identical                      : true

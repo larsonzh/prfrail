@@ -1,0 +1,23 @@
+?   	github.com/larsonzh/prfrail/cmd/prfrail	[no test files]
+?   	github.com/larsonzh/prfrail/cmd/prfrail-release	[no test files]
+ok  	github.com/larsonzh/prfrail/examples/whois-shadow	1.378s
+ok  	github.com/larsonzh/prfrail/internal/adapters	34.822s
+ok  	github.com/larsonzh/prfrail/internal/applier	2.900s
+ok  	github.com/larsonzh/prfrail/internal/chain	2.894s
+ok  	github.com/larsonzh/prfrail/internal/console	5.161s
+ok  	github.com/larsonzh/prfrail/internal/evidence	2.686s
+ok  	github.com/larsonzh/prfrail/internal/gates	6.856s
+ok  	github.com/larsonzh/prfrail/internal/guard	7.901s
+ok  	github.com/larsonzh/prfrail/internal/release	11.292s
+ok  	github.com/larsonzh/prfrail/internal/repair	2.363s
+--- FAIL: TestRestoreWithHardlinksAndPermissions (0.11s)
+    restore_test.go:133: restore: publish restored target: rename C:\Users\妙妙呜\AppData\Local\Temp\TestRestoreWithHardlinksAndPermissions2033159669\.prfrail-restore-4124011984 C:\Users\妙妙呜\AppData\Local\Temp\TestRestoreWithHardlinksAndPermissions2033159669\003: Access is denied.
+FAIL
+FAIL	github.com/larsonzh/prfrail/internal/snapshot	4.170s
+ok  	github.com/larsonzh/prfrail/internal/taskdef	2.727s
+ok  	github.com/larsonzh/prfrail/internal/tickets	2.268s
+ok  	github.com/larsonzh/prfrail/tools/agent-probe/enforcement-proxy	1.983s
+?   	github.com/larsonzh/prfrail/tools/agent-probe/supervisor	[no test files]
+?   	github.com/larsonzh/prfrail/tools/agent-stub	[no test files]
+?   	github.com/larsonzh/prfrail/tools/b4-e2e	[no test files]
+FAIL

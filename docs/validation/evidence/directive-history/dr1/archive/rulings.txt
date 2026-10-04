@@ -1,0 +1,15 @@
+# DR-1 - user rulings digest (substitute for the missing architect plan)
+
+This slice has **no standalone architect (stage 1) plan**; the user rulings R1-R5 of 2026-09-24 are the plan baseline.
+
+| Item | Value | Content | Reason given by the user |
+|---|---|---|---|
+| R1 | A | Change only the CLI-side argument: `--max-ai-credits = max(30, maximumRequests)`; floor is a global constant 30; **record fields and schema unchanged**, **stage 2a contract-first NOT triggered**; the CONTRACTS §7 semantic gap is to be recorded in the report as a known gap not fixed here | smallest change; matches the 30 measured by B1 |
+| R2 | a | floor is a **global constant 30** (no parameterisation, no runtime discovery) | matches the 30 credits measured by B1 |
+| R3 | a | F8 (self-explanation of the `ai-availability` record) is **not merged** into this slice | keep DR-1 single-goal, single-acceptance |
+| R4 | 1 | the verification probe reuses the `copilot-cli-host` profile (host auth); **not BYOK**, not both | one successful probe = one premium, acceptable; exact same profile as the B1 baseline; BYOK would add three new variables |
+| R5 | a | a successful probe always counts as one Copilot premium; the report must state "BYOK attribution unproven" | an unproven fact is not used as a budget saving |
+
+Supporting mechanical facts:
+- The main baseline `docs/validation/evidence/b1-20260917/availability-1083-unknown.json` carries `profileConfigHash = sha256:d529c357aeaad0e94c7ab08a0afe364da64156e143b26b38a57f644c9fe3e436`; it was confirmed as `{profileId: copilot-cli-host, providerType: github, model: mai-code-1.1-flash, authMode: host}` by two independent paths (a 50-combination recomputation that hit exactly twice, and the product's own `config explain`).
+- Probe budget for this slice: 5 calls (target 1, rest returned).

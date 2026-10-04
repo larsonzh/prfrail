@@ -1,0 +1,11 @@
+=== RUN   TestConnectAuditTrailFailureDeniesAndDoesNotTunnel
+enforcement-proxy: AUDIT TRAIL BROKEN (write C:\Users\濡欏鍛淺AppData\Local\Temp\TestConnectAuditTrailFailureDeniesAndDoesNotTunnel3038858980\001\proxy.jsonl: file already closed): requests are denied until the log is writable again
+--- PASS: TestConnectAuditTrailFailureDeniesAndDoesNotTunnel (0.02s)
+=== RUN   TestConnectTunnelAllowedReachesTarget
+--- PASS: TestConnectTunnelAllowedReachesTarget (0.01s)
+=== RUN   TestConnectUsesUpstreamProxy
+--- PASS: TestConnectUsesUpstreamProxy (0.01s)
+=== RUN   TestObserveModeAllowsUnknownHostAndLogsIt
+--- PASS: TestObserveModeAllowsUnknownHostAndLogsIt (0.01s)
+PASS
+ok  	github.com/larsonzh/prfrail/tools/agent-probe/enforcement-proxy	1.043s

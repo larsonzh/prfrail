@@ -1,0 +1,59 @@
+### b4  total 353 files / 17129239 B
+   b4/bin                               3 f  16489472 B  .exe:3
+   (root)                               9 f    256081 B  .txt:4 .js:2 .log:1 .json:1 .md:1
+   b4/runs                            244 f    231444 B  .json:100 .log:36 .jsonl:34 .txt:25 (none):24 .pid:19 .slot:6
+   b4/evidence                         85 f    117084 B  .txt:62 .json:23
+   b4/review                            3 f     32191 B  .txt:3
+   b4/input                             4 f      2050 B  .json:3 .txt:1
+   b4/probe                             5 f       917 B  .pid:2 .jsonl:1 .json:1 .txt:1
+   -- root files: ARCH-DESIGN.txt, SHA256SUMS.txt, SLICE-DEFINITION.md, add-t018-note.js, driver-stderr.txt, driver-stdout.txt, driver.log, g4b-unknown.js, pack-verdict.json
+
+### dce  total 17 files / 425994 B
+   (root)                              17 f    425994 B  .txt:8 .js:7 .diff:2
+   -- root files: change-set-r2.diff, change-set.diff, ci-run-37100757524.txt, fence.js, fix-r7.js, fix-r7b.js, fix-r8.js, gate-index.txt, gate-tree-first-fail.txt, gate-tree.txt, gate-tree2.txt, land.js, mk-report.js, peek.js, probe-id-rejections.txt, selftest.txt, test.txt
+
+### dr1  total 31 files / 519826 B
+   dr1/head                             4 f    265686 B  .md:4
+   (root)                              27 f    254140 B  .txt:12 .md:8 .js:4 .diff:2 .log:1
+   -- root files: adr014-rows.md, apply-adr014.js, assemble-pack.js, ci-win.log, config-explain.txt, contract-excerpt.md, draft-cn.md, draft-en.md, draft-v114-cn.md, draft-v114-en.md, focused-test-r2.txt, focused-test.txt, gate-tree-final.txt, gate-tree-final2.txt, gate-tree-r2.txt, gate-tree-r3.txt, gate-tree-r4.txt, gate-tree.txt, mutation-check.txt, probe-01-verify.txt, probe-01.txt, review-input-r2.diff, review-input.diff, rulings.md, stage7-routing.md, writeback-8b-fix.js, writeback-8b.js
+
+### drfix  total 38 files / 550591 B
+   (root)                              30 f    332746 B  .txt:24 .md:3 .diff:2 .js:1
+   drfix/review                         8 f    217845 B  .diff:6 .txt:2
+   -- root files: A1-T1T4-injected.txt, A2-restored-green.txt, A3-guard-removed.txt, A4-restored-green-full.txt, A5-T6-injected.txt, A6-T7-Fix3-reverted.txt, A7-T1-mutation-red.txt, A8-T1-tolerant-too-much-red.txt, ARCH-DESIGN.md, B-count10-verbose.txt, B2-count10-T1.txt, B3-full-suite-T1.txt, B4-psself-test-T1.txt, B5-postcommit-count10.txt, B6-postcommit-psselftest.txt, CI-push1.txt, CI-push2.txt, CI-push3.txt, CI-push4.txt, CI-push5.txt, DOCS.diff, EVIDENCE-SUMMARY.txt, IMPL.diff, REPORT-REQUIREMENTS.md, SLICE-DEFINITION.md, T1-isolated-edit-diff.txt, ci-log.js, gate-remediation.txt, pkg4.txt, pkg5.txt
+
+### gates-ext  total 802 files / 3141478 B
+   gates-ext/step2                    656 f   1962431 B  .txt:350 .js:301 .bin:3 .patch:2
+   gates-ext/review                    20 f    619132 B  .txt:14 .diff:6
+   (root)                              54 f    279929 B  .js:34 .txt:14 .md:2 .patch:2 .out:2
+   gates-ext/step3                     24 f    109528 B  .txt:16 .js:8
+   gates-ext/step5                     13 f     75420 B  .txt:10 .js:2 .md:1
+   gates-ext/step4                      7 f     33346 B  .txt:3 .js:2 .json:1 .md:1
+   gates-ext/step1                     12 f     27176 B  .txt:12
+   gates-ext/step1-2a                  12 f     27176 B  .txt:12
+   gates-ext/verification-2b            4 f      7340 B  .txt:4
+   -- root files: ARCH-DESIGN.md, SLICE-DEFINITION.md, agents-model.txt, agents.txt, bytes-report.js, c-1b01115.patch, c-b738e6b.patch, capture-final.js, check-2b.js, check-2b.out, ci-evidence.js, compare-stdout.txt, compare.js, d1-align.js, d1-apply.js, d1-cn.txt, d1-en.txt, d1-g63.js, d3-apply.js, d4-evidence.js, debug-lstree.js, debug-t4.js, encoding-report.txt, extract-lines.js, extract-ob11.js, extract.txt, extract2.txt, fix-whitelist.js, g6-2-probe.js, g6-history-calibration.txt, g7-history-calibration.txt, gate-old-wt-fwd.js, gate-old-wt-mod.js, gate-old-wt-rev.js, make-old-copies.js, mirror-check.js, mirror-diff.js, mirror-diff.out, mkbundle.js, mkbundle2.js, mkbundle3.js, mut-2f.js, mut-f1-donere.js, mut-f1-range.js, mut-guards.js, normalize-md.js, normalize.js, old-script-copies.txt, preflight-ci-lastcommit.txt, preflight-tree.txt, selftest.txt, step1-run.js, v1v2-fix.js, v2-register.js
+
+### lbf  total 21 files / 309546 B
+   (root)                              21 f    309546 B  .js:8 .txt:6 .md:6 .diff:1
+   -- root files: apply.js, apply2.js, ci-watch.txt, dd36b9b-trace.txt, dispositions.md, findchar.js, fix-adr.js, gate-index.txt, gate-tree.raw.txt, gate-tree.txt, head-adr-cn.md, head-adr-en.md, mkpack.js, probe-callshape.js, report-cn.md, report-en.md, review-input.diff, review-round2.md, selftest.txt, show.js, writeback-8b.js
+
+### s1-reach  total 14 files / 212569 B
+   (root)                              14 f    212569 B  .js:6 .md:5 .txt:2 .diff:1
+   -- root files: apply-edits.js, fix-05.js, fix-g64.js, fix-n2.js, fix-refs.js, gate-tree.raw.txt, gate-tree.txt, plan-01.md, report-cn.md, report-en.md, review-input.diff, s1-reach-reachability.md, s1-reach-reachability_EN.md, writeback-8b.js
+
+### v112  total 40 files / 484316 B
+   (root)                              40 f    484316 B  .txt:21 .js:14 .md:4 .diff:1
+   -- root files: PLAN-INPUT-①.md, PLAN.md, a5-change-log-column.js, align.js, align.txt, append-sec12-cn.md, append-sec12-en.md, append-sec12.js, bolds.txt, c1-recheck.js, c1-recheck.txt, charcheck.js, check.txt, enc-tree-sec12.txt, enc-tree.js, enc-tree.txt, evidence-selfcheck.js, evidence-selfcheck.txt, fails.txt, fix-section8.js, fix-splice.js, g6-4-check-sec12.txt, g6-4-check.txt, gate-index-sec12.txt, gate-index.txt, gate-selftest.txt, gate-tree-sec12.txt, gate-tree.txt, m4-g6-4-probe.js, m4-probe.txt, mirror-check.js, mirror-sec12.txt, mirror.txt, normalize-md.js, peek-en.js, refs-check-sec12.txt, refs-check.js, refs-check.txt, review-input.diff, review-input.stat.txt
+
+### v113  total 146 files / 2771704 B
+   (root)                             146 f   2771704 B  .txt:93 .js:24 .md:17 .diff:9 .log:3
+   -- root files: PLAN.md, apply-r1-fixes.js, apply-v113.js, blocks.txt, c0h-note-cn.txt, c0h-note-en.txt, capture-r10.log, capture-r8.log, capture-r9.log, capture.js, enc-tree-r10.txt, enc-tree-r7.txt, enc-tree-r8.txt, enc-tree-r9.txt, evidence-selfcheck-r10.txt, evidence-selfcheck-r7.txt, evidence-selfcheck-r8.txt, evidence-selfcheck-r9.txt, extract-review-r1.js, extract-review.js, fence-check.js, final-check.txt, fix-c0i-blank-lines.js, fix-en-disposed-mirror.js, fix-en-disposed-v113.js, fix-g63-blank-lines.js, fix-g64-v113.js, g6-5-r1-r10.txt, g6-5-r1-r2.txt, g6-5-r1-r3.txt, g6-5-r1-r7.txt, g6-5-r1-r8.txt, g6-5-r1-r9.txt, g6-5-r1.txt, g6-5-range-9f68a52.txt, g6-5-range-b738e6b.txt, g6-5.txt, g6-6-r1-r10.txt, g6-6-r1-r2.txt, g6-6-r1-r3.txt, g6-6-r1-r7.txt, g6-6-r1-r8.txt, g6-6-r1-r9.txt, g6-6-r1.txt, g6-6.txt, g6-range-b738e6b-after-tester.txt, g6-range-b738e6b.txt, gate-ci-after-tester.txt, gate-index
+
+### assembly-min  total 84 files / 2166951 B
+   (root)                              63 f   1193934 B  .txt:37 .js:15 .diff:6 .md:5
+   assembly-min/_before                 9 f    563948 B  .go:7 .md:2
+   assembly-min/_r3_after               4 f    141745 B  .go:4
+   assembly-min/_r4_before              4 f    141745 B  .go:4
+   assembly-min/_r3_before              4 f    125579 B  .go:4
+   -- root files: DESIGN.md, a-final-test.txt, baseline-test.txt, build-after-probe.txt, change-set.diff, change-set.pre-r3.diff, ci-ubuntu-fail.txt, ci-ubuntu2.txt, ci-watch.txt, ci-watch2.txt, ci-win-log.txt, ci-win2.txt, commit.txt, commit2.txt, contracts-excerpt.txt, diag4b.js, findg6.js, fixm16.js, fixm16.txt, gate-index.txt, gate-tree.txt, l1l5-probe.txt, mkfix.js, mkfull.js, mkfull.txt, mkledger.js, mkpack.js, mkr3diff.js, mkr4diff.js, mkremediation.js, mkreport.js, mkreport.txt, mutate.js, mutation.txt, norm.js, norm.txt, parseprobe.txt, pre-review-r1.md, pre-review-r2.md, push.txt, push2.txt, r3-final-test.txt, r3-remediation.diff, r3.txt, r3diff.txt, r4-final-test.txt, r4-remediation.diff, r4diff.txt, r4snapshot.txt, remediation.diff, review-input.diff, review-pack-r2.md, review-pack-r3.md, selftest.txt, snapshot-flake.txt, v2.txt, v3.txt, v4.txt, v5.txt, v6.txt, verify-l1l5.js, verify.txt, wrap

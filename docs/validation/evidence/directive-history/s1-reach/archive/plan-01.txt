@@ -1,0 +1,243 @@
+复核完成。以下为 `S1-REACH` ① 阶段架构方案书（只读设计，未执行任何命令、未写任何文件）。
+
+---
+
+# S1-REACH 架构方案书（① 阶段）
+
+## 0. 主控转述事实的复核结果
+
+| # | 转述项 | 复核结果 |
+|---|---|---|
+| 1 | DELIVERY_DIRECTIVE 各节存在性 | ✓ 版本 v1.14、日期 2026-09-24（文件头）；§0.2 版本纪律、§1.2 字段表、§1.6 边界、§5.1/5.2/5.3、§6.3 G1–G7、§7.2.1 ③、§7.5 成本上限、§11.3、§12.1 均读到原文 |
+| 2 | §12.4 末行 | ✓ **末行 = OB-50**（`docs/DELIVERY_DIRECTIVE.md:832`，表区结束于 :832，其后为 GATES-EXT ⑦ 例外注记与 §12.5）。OB-51/52/53 尚不存在 |
+| 3 | OB-21 行原文 | ✓ `docs/DELIVERY_DIRECTIVE.md:797`，与主控转述逐字一致（① 未装配 `ExecuteNoopRun`/fail-closed 桩；② T026 不兼容 + B2 §8.3/§8.4 + **DR-1 未修**；处置 = 待议） |
+| 4 | T018/T028 行 | ✓ T018 行 `docs/DEV_PLAN.md:91`（**依赖：T017、T025、T026、T027、T028 及 whois 输入授权**）；T018 待议项 `:95`；T028 行 `:113`（`PLANNED / NOT IMPLEMENTED`，依赖 T025、T026、T014、T022） |
+| 5 | REMAINING_SLICES 各块 | ✓ B4 标题 `:442`、四事分立 `:446`、C1 `:461`、DR-1 定义回写块 `:526–:542`（主控报 :441-459/:460-475/:527-543，±1–3 行属计数口径） |
+| 6 | DR-1 闭环证据 | ✓ 无法执行 git（本角色只读）；以 `docs/t027/REMAINING_SLICES.md:542`（收尾行）+ `docs/validation/dr-1-availability-probe-floor.md` 为权威。证据包目录已核实 6 文件：`availability-1083-available.json`、`probe-01-ai-check.json`、`probe-01-ai-verify.json`、`proofrail.chain.json`、`README.md`、`SHA256SUMS.txt` ✓ 与转述一致 |
+| 7 | 五点锚点 | ✓ 全部核对（见 §2，逐条 `file:line`） |
+| 8 | ADR 最大编号 | ✓ **ADR-014**（`docs/ADR_REGISTER.md`；检索 ADR-015+ 无命中）⇒ 本片降级留痕建议 **ADR-015** |
+| 9 | B2 §8.3/§8.4 | ✓ `docs/validation/B2-EXTERNAL-ENFORCEMENT.md` §8 清单第 3 条（零能力容器内候选会话失败）、第 4 条（自建客户端与官方 `gh` 令牌端点 403 WAF）；§9 以「§8.3/§8.4 两项」引用 |
+| 10 | s1-exit.md | ✓ 存在；`docs/validation/s1-exit.md:43`（AT-23 BLOCKED）、`:44`（AT-24 BLOCKED）、`:7`（总体 `BLOCKED`） |
+| 11 | OPERATIONS.md 两处 | ✓ `docs/OPERATIONS.md:55`（`"secretRef": "windows-credential:ProofRail/deepseek"` 示例行）与 `:64`（`prfrail secret set --ref windows-credential:ProofRail/deepseek` 命令段）。主控报 :56/:65，本计数差 1 行，两处字串唯一、不影响判定 |
+| 12 | CONTRACTS.md | ✓ `:191`（可用性预检段，含「且在显式费用/请求预算内」）、`:193`（`windows-credential:<target>` 段）、`:195`（链配置可选顶层 `ai` 段） |
+| 13 | 附加发现 | ✓ `schemas/chain.schema.json:116/156/185` 存在 `model` 字段，但均为 **task/codeStep 级可选字段**（`required` 数组不含 `model`，取值 `#/$defs/id`），**与链配置 `ai.profiles` 无关**；`schemas/` 全目录无任何 Schema 覆盖 `ai.profiles`（见 §2 点 2） |
+
+---
+
+## 1. 可达性判定框架（逐门 × 依赖 × 解锁条件）
+
+### 1.1 门清单的枚举方法
+
+按「**验收条目（AT）→ 任务（T）→ 依赖 → 证据文件**」三级展开。门清单以 DEV_PLAN 的 T018 依赖字段（`DEV_PLAN.md:91`）与 s1-exit 汇总表（`docs/validation/s1-exit.md:43-44`）为唯一枚举源，**不从报告正文自行添加门**。共 10 门：
+
+| 门 | 判据（可判真假的一句话） | 当前证据 | 判定 | 解锁条件（句式：「需要 X 具备 Y，当前证据 Z 显示…」） |
+|---|---|---|---|---|
+| G-A AT-23 真实 AI 候选腿 | `prfrail` CLI 可真实启动一个经兼容性准入的 AI 候选并计费 | `internal/console/runtime.go:33`（`ExecuteNoopRun`）、`:207-211`（`RunPostflight` fail-closed 桩）⇒ 无 AgentRunner 装配；`docs/DEV_PLAN.md:111`（T026：10 verified、2 unsupported ⇒ 候选不兼容）、`:112`（T027 `BLOCKED / NOT IMPLEMENTED`，B2 边界**尚未接入产品**） | **不可达** | 需要 T027 完成产品装配（当前证据 `runtime.go:207` 显示 postflight 仍为 fail-closed 桩）**且**存在能力矩阵全 verified 或经 B2 组合准入的候选（当前证据 `DEV_PLAN.md:111` 显示 2 项 unsupported 未变）。DR-1 只改了探针 floor（`ai_probe_copilot.go:24`），不触碰此两项 ⇒ 不构成解锁 |
+| G-B AT-23 机制腿 | 隔离 workspace / timeout / 日志缺失 / 未知恢复 / exit 0 后重扫与独立 gates 五面在真实宿主执行 | `docs/t027/REMAINING_SLICES.md:450`（五面各有正/反向腿） | 已执行（**不单独构成 AT-23 通过**） | 不需要新解锁（已执行）；但该腿只在 G-A 满足后才并入 AT-23 判定 |
+| G-C AT-23 整体 | G-A ∧ G-B ∧ 真实计费证据 | `REMAINING_SLICES.md:446`（四事分立②）、`docs/validation/s1-exit.md:43`（BLOCKED） | **未通过** | 需要 G-A 解锁后重跑真实 E2E，当前证据 `s1-exit.md:43` 显示 AT-23 仍为 BLOCKED |
+| G-D T028/AT-24 | `supervised-black-box` 模式实现完成 | `docs/DEV_PLAN.md:113`（`PLANNED / NOT IMPLEMENTED`）；其依赖 T025/T026/T014/T022 均已勾选（DEV_PLAN 各行）⇒ 依赖已具备，缺的是实施 | **不可达** | 需要 T028 实施完成，当前证据 `DEV_PLAN.md:113` 显示其状态为 PLANNED / NOT IMPLEMENTED；**与候选兼容性无关**（独立模式） |
+| G-E 最终 ZIP 绑定与复验 | 最终 ZIP 绑定发行记录并复验（ADR-009 完成条件） | `docs/DEV_PLAN.md:93`（仍缺失）；ADR-009 行（「最终 ZIP 仍须绑定发行记录并复验」） | **不可达**（未执行） | 需要 T018 其余门闭合后执行绑定与复验，当前证据 `DEV_PLAN.md:93` 显示该项仍缺失 |
+| G-F EOL 通知方式 | ADR-010 获产品所有者批准 | `docs/ADR_REGISTER.md` ADR-010 行（`PROPOSED / NOT APPROVED`） | **未获批** | 需要产品所有者明确批准 ADR-010，当前证据显示其状态为 PROPOSED / NOT APPROVED |
+| G-G 产品所有者 S1 exit 批准 | 产品所有者作出批准（人工门） | `docs/DEV_PLAN.md:93`、`s1-exit.md:7`（均显示未作出） | **未知**（人工裁决，本片不预测时点） | 需要产品所有者作出 S1 exit 批准，当前证据 `s1-exit.md:7` 显示尚未作出；无法由代码或切片解锁 |
+| G-H T018 整体 | 依赖字段全部满足 + G-D..G-G 闭合 | `docs/DEV_PLAN.md:91`（依赖含 **T027、T028**）；T027/T028 均未完成 | **不可达** | 需要 T027 与 T028 完成（任务级依赖字段），当前证据 `DEV_PLAN.md:91` 的依赖清单显示两者未完成。**注意**：四门自身（G-D..G-G）不依赖候选兼容，但 T018 的可勾选性被任务级依赖卡住——「门级不同源、任务级同源」 |
+| G-I S1 exit 总体 | AT-01–AT-24 全过 + T018 完成 + RFC §14 全部 exit | `s1-exit.md:7`（`BLOCKED`）、`:52`（核心任务链 BLOCKED）、`:67` | **不可达** | 需要 G-C ∧ G-D ∧ G-E ∧ G-F ∧ G-G 全部满足，当前证据显示任一均未满足 |
+| 附：OB-21 自身 | ② 的四个子项是否仍成立 | ① 未装配（`runtime.go:33/207` 未变）；② 中「DR-1 未修」**已消除**（commit `12e277b` + 证据包 6 文件 + `REMAINING_SLICES.md:542`），「T026 不兼容」「B2 §8.3/§8.4」**未变**（B2 报告 §8 第 3/4 条） | **处置状态保持「待议」**（待议时机 = 候选/装配有进展时；DR-1 是探针修复，不触发该时机） | 需要候选兼容或装配出现进展才触发「待议时机」，当前证据显示两者均无变化 |
+
+### 1.2 判定方法规约
+
+1. **判定闭集** = {可达, 不可达, 未知}。`未知` 只允许用于人工门（G-G）；其余门必须由证据推出可达/不可达，证据不足时如实写「未知」并附核实方法，不得猜。
+2. **每门四元组**：判据句 + 证据位置列表（全部 `file:line`）+ 判定 + 解锁句。
+3. **解锁句模板**（固定）：「需要 X 具备 Y，当前证据 Z 显示…」——Z 必须是可定位的文件/行或证据包路径，禁止「需要进展」「待推进」类空话。
+4. **DR-1 证据的引用口径**：DR-1 的 `available` 记录只支持一条推理——「同一 pin 上探针通道现已可驱动候选并产出最小真实响应」；**不支持**任何「候选兼容」「候选可启动」「装配完成」推理（依据 `docs/CONTRACTS.md:191` 的「配置合法、秘密存在、CLI/扩展已安装…均不足以证明 AI 可用」与本片边界）。
+
+---
+
+## 2. 五点确认的逐点方法
+
+### 点 1：`--model` flag 与 `configuredAIProfile` 有无默认值 / fallback
+
+- **结论出处**：`internal/console/ai.go:36-42`（`ai check` flag 集 = chain/channel/copilot/workspace/out/max-requests/json，**无 `--model`**）；`ai.go:229`（`configuredAIProfile`：按 channel 绑定→profileID→profile 三级查找，无默认值、无 fallback——任一缺即返回 `(零值, false)` ⇒ 上层报 `ErrAIChannelNotConfigured`）；`internal/adapters/ai_provider.go:51`（`Model == ""` 被拒）。**结论：无 `--model` flag；模型唯一来源 = 链配置 `ai.profiles[].model`；无默认值 / fallback。**
+- **无需命令**（仓库文件即可证）。
+- **证伪条件**：在 `ai.go` 或 `adapters` 中找到 `--model` flag 定义、内置 profile 常量、或 `configuredAIProfile` 的兜底赋值。
+
+### 点 2：schema 里 `model` 字段是否 required
+
+- **结论出处**：`schemas/` 目录 36 份 Schema 中**无任何一份覆盖链配置 `ai.profiles`**；目录中仅 `chain.schema.json:116/156/185` 出现 `model`，均属 task/codeStep 级**可选**字段（`required` 数组不含 `model`），与 `ai.profiles` 无关。⇒ 「schema 中 model 是否 required」**不适用**（无该 schema）。必填性由 Go 校验实现：`internal/adapters/ai_provider.go:51`（`Model == ""` 拒绝）+ `internal/console/config.go:387`（profiles/channels 非空）、`:394`（逐 profile `AIProviderProfileHash` ⇒ 同校验）。
+- **需 ② 阶段复核项**：对 `schemas/*.json` 全文检索 `"profiles"` 与 `"ai"` 键做机械确认（我已按目录+grep 复核，但未逐文件读全）。
+- **证伪条件**：找到一份被代码引用的、覆盖 `ai.profiles[].model` 的 JSON Schema（含 `required` 不含 model 的形态）。
+
+### 点 3：`model: "auto"` 是否被 schema 或代码禁止
+
+- **结论出处**：代码无任何 `"auto"` 比较（`internal/adapters/*.go` 检索 `"auto"` 仅 2 处测试命中）；`ai_provider.go:51` 只查非空/长度/空白；**测试把 `Model: "auto"` 当合法值**：`internal/adapters/ai_provider_test.go:13`（`TestAIProviderProfileHashAcceptsHostAndSecretAuthentication` 通过即证）、`ai_preflight_test.go:110`。schema 侧无覆盖。透传：`ai_probe_copilot.go:114`（`"--model", model` 原样传入）。**结论：不被禁止；作为普通值透传。**「auto」在 Copilot CLI 侧的实际语义属仓库外事实，**无探针额度 ⇒ 不可验证**，如实标注。
+- **证伪条件**：找到对 `model` 与 `"auto"` 的等值比较、或 schema enum 排除 `"auto"`。
+
+### 点 4：VS Code secretStorage / Copilot CLI 自有存储中的 BYOK 条目（只报存在性与条目标识名）
+
+- **可只读枚举（② 阶段执行，主控记录）**：
+  1. `cmdkey /list`——Windows 凭据管理器条目名（不读秘密）。**只读理由**：不写入、不联网、输出仅目标名。
+  2. `Get-ChildItem Env: | Where-Object Name -match '^(COPILOT|DEEPSEEK|ANTHROPIC|OPENAI|AZURE)' | Select-Object -ExpandProperty Name`——只报环境变量**名**。只读理由：同上。
+  3. 候选配置目录**文件名**枚举（如 `%USERPROFILE%\.copilot-cli`、`%APPDATA%\Copilot` 等）——只报文件名与存在性，**不读任何内容**。Copilot CLI 的确切存储布局属仓库外知识 ⇒ 「不确定，需 ② 阶段核实」，核实方法即上述枚举 + 与已记录事实交叉。
+- **不可枚举（如实报告，不得猜测）**：
+  - **VS Code SecretStorage**——扩展宿主加密存储，外部无可枚举 API；prfrail 是 Go CLI、不含 VS Code 扩展代码 ⇒ 该问题的这一半**只能写「不可枚举」**。
+  - 任何文件/条目的**内容**（按「不读内容」约束与 §7.3 消毒纪律）。
+- **仓库内唯一既有证据**：`docs/t027/REMAINING_SLICES.md:532`（DR-1 依赖行：2026-09-24 只读确认凭据管理器含 `https://github.com:larsonzh.copilot-cli`——这是 Copilot CLI 的 **host 认证条目，不是 BYOK API 密钥**）；`DEV_PLAN.md` B1 段（「未评估、未排除：BYOK `deepseek-anthropic` 与非 Copilot CLI 候选族」）。
+- **证伪条件**：枚举结果中出现 BYOK 形态条目名（如 `ProofRail/deepseek`、`COPILOT_PROVIDER_API_KEY` 变量名、或候选目录下的密钥配置文件名）⇒ 报告按「存在性 + 条目标识名」记录，**仍不读内容**；出现任何可枚举 SecretStorage 的外部 API 也可推翻「不可枚举」。
+
+### 点 5：prfrail 自有 secretStorage 机制与 OPERATIONS.md 的关系
+
+- **结论出处**：`internal/adapters/ai_secret_windows.go:15`（前缀 `windows-credential:`）、`:57`（写入时 UserName 域 = `ProofRail`）、`:63-75`（`windowsCredentialTarget`：去掉前缀即 Credential Manager 目标名）、`Set/Resolve/Exists/Delete` 全部走 `CredWriteW/CredReadW/CredDeleteW`（generic 型、`Persist=LOCAL_MACHINE`）。**存储位置 = 当前用户 Windows Credential Manager（非文件）**；目标名格式 = 引用串去掉前缀（例：`windows-credential:ProofRail/deepseek` → 目标名 `ProofRail/deepseek`）。
+- **与 OPERATIONS.md 的关系**：`docs/OPERATIONS.md:55` 的示例 `secretRef` 与 `:64` 的 `secret set` 命令，是同一机制的产品文档示例；`docs/CONTRACTS.md:193` 是其契约定义（generic credential、local-machine 持久性、不等于隔离也不证明可用）。三者一致，无冲突。
+- **当前是否有实际条目**：仓库文件无法证明；**需 ② 阶段 `cmdkey /list` 枚举**目标名（只报存在性），`ProofRail/deepseek` 是否在位以枚举结果为准。
+- **证伪条件**：发现其它平台 backend（`ai_secret_*.go` 非 windows 实现）、或目标名转换规则不是「去前缀」。
+
+> 五点初步结论**均不指向** CONTRACTS / schema / 授权契约的语义改动 ⇒ 不触发停止升级（最终以 ② 的枚举与 ⑦ 确认为准；触发条件见 §5(a)）。
+
+---
+
+## 3. 验收判据（本片「通过」的机械判据）
+
+### 3.1 本片可自判（机械）
+
+| 编号 | 判据 |
+|---|---|
+| M1 | 变更集 ⊆ {两个新报告、自由度清单、`DELIVERY_DIRECTIVE{,_EN}`、`ADR_REGISTER{,_EN}`、`REMAINING_SLICES{,_EN}`}；**不含任何** `.go`/schema/fixtures/workflows（`git diff --name-only` 白名单判定） |
+| M2 | `node tools/gates/gate.js --all --scope=…` ⇒ `TOTAL_FAIL=0`（G1-a/b、G2、G3(a/b)、G4a/b、G6-1..6、G7-a..d 全绿；G1/G5 基础按 `SKIP` 如实打印） |
+| M3 | §12.4 变更后**末行 = OB-53**；新增三行首状态词 ∈ 闭集（CN：`已登记/待议` 等六词；EN 对应）——G6-6 机器判定 |
+| M4 | 新报告含 `artifacts` 围栏块，每行 `<仓库相对路径><TAB><处置>`，处置 ∈ {repo, local-only, missing-historical}——G7-a/b 机器判定 |
+| M5 | 五点结论每条含 `file:line` 且该行在 HEAD 源文件中可定位（机械 grep） |
+| M6 | 变更行无 G2 禁串、无 G6-4 过期字面量（行数/文件数/共 N 类一律禁写） |
+| M7 | G3(a)：每对 CN/EN 改动行数对称；G3(b)：变更行中 commit 号/状态枚举计数 CN=EN |
+| M8 | G1-b：`DELIVERY_DIRECTIVE` 头部版本 = §0.3 最新行版本（v1.15）且日期一致 |
+| M9 | 编码门禁：`.md` BOM+LF、其余无 BOM+LF（G4a） |
+| M10 | 报告头含 `**状态：已停止——未完成**（⑩ 停点；commit / push 须同轮授权）` 形态（同 DR-1 报告头，G7-d 合规） |
+
+### 3.2 只能交 ⑦ 判（本片不自判）
+
+| 编号 | 判据 |
+|---|---|
+| J1 | 十门 verdict 与证据归因是否成立，尤其「DR-1 `available` ≠ 候选兼容/可启动」的推理链 |
+| J2 | OB-21 ② 子项消除的表述是否如实（不夸大、不缩小） |
+| J3 | ⑥ 按 §7.2.1 三条件「可跳过」的判定（§7.2.1：**跳过必须由 ⑦ 或用户确认**，主控不得单独认定） |
+| J4 | OB-51/52/53 三行与 DR-1 报告 §11 预留语义的对应关系 |
+| J5 | 五点结论的证伪性是否成立（⑥/⑦ 口径的 Section E 同类要求） |
+| J6 | EN 镜像逐句对齐（G3 只判行数，语义对齐人工） |
+
+---
+
+## 4. 改动点（文件级 + 形状）
+
+### 4.1 新增 `docs/validation/s1-reach-reachability.md` + `_EN.md`（双语，**逐行 0 失配**）
+
+报告头（同 DR-1 先例）：`> 切片 S1-REACH（业务切片）| 分级 [SLICE] | 规模 S | 日期 2026-09-29。` + 状态行（M10 形态）。按 §11.3 **十二小节**：① 变更概要（含自由度清单指针）→ ② 执行流水线（①→⑧a→⑨→⑧b→⑧c→⑩，②/③ 按 §5.2 文档型退化）→ ③ 异常与兜底记录 → ④ 环境与档位（**含「试点顺延第 4 次」四要素 + ⑦ 降级标注「独立性降低」**）→ ⑤ 审查结论摘要（⑤⑥⑦）→ ⑥ 审查输入包摘要（含盲审隔离证明：⑦ 首轮不附清单、输入消毒）→ ⑦ 可证伪性（机械检查 + 文档变异检验，见下）→ ⑧ 门禁结果 → ⑨ ⑧c 收尾清洁记录 → ⑩ 成本与计量（①×1 V4 Pro、⑤×可选1、⑦×1 V4 Pro；探针 0）→ ⑪ 明确未执行事项（commit/push；未做试点指标声明及理由）→ ⑫ 下一步建议（含各角色档位建议）。末尾附 `artifacts` 围栏块：
+
+```artifacts
+docs/validation/s1-reach-reachability.md	repo
+docs/validation/s1-reach-reachability_EN.md	repo
+docs/validation/evidence/S1-REACH-freedom-list.md	repo
+docs/DELIVERY_DIRECTIVE.md	repo
+docs/DELIVERY_DIRECTIVE_EN.md	repo
+docs/ADR_REGISTER.md	repo
+docs/ADR_REGISTER_EN.md	repo
+docs/t027/REMAINING_SLICES.md	repo
+docs/t027/REMAINING_SLICES_EN.md	repo
+```
+
+文档变异检验（每条先变异→看红→逐字节还原）：① 删 CN 侧 OB-52 行 ⇒ G3(a) 红；② 把 OB-51 首状态词改闭集外 ⇒ G6-6 红；③ 删报告 artifacts 块 ⇒ G7-a 红；④ v1.15 行塞入行数类字面量 ⇒ G6-4 红；⑤ 头部版本改回 v1.14 ⇒ G1-b 红。
+
+### 4.2 新增 `docs/validation/evidence/S1-REACH-freedom-list.md`（§1.7.3 固定路径）
+
+主控在 ⑥ 之后（本片 ⑥ 拟跳过 ⇒ ⑦ 之前）、⑦ 之前落盘，并纳入 ⑦ 输入包（OB-48 时序要求）。条目示例：F-1 ⑤ 执行与否（§5.2 简单档「可选」）；F-2 OB-21 行是否加更正注记（若用户裁定）；F-3 S1-REACH 定义块在 `REMAINING_SLICES` 中的位置；F-4 报告文件名。该路径在 `docs/validation/evidence/**`，G7 扫描域外，无机械判据，由 ⑦ 人工复核。
+
+### 4.3 修改 `docs/DELIVERY_DIRECTIVE{,_EN}.md`
+
+**派生义务（§0.2 + G1-b + v1.14 先例）**：写 §12.4 必须配套版本纪律。
+
+- (a) 文件头：`版本：v1.14` → `v1.15`、日期 → `2026-09-29`（其余不动）。
+- (b) §0.3 追加一行（CN 草稿）：
+
+`| v1.15 | 2026-09-29 | **台账补登（切片 `S1-REACH` 的步骤 0；用户 2026-09-29 授权）**：§12.4 登记 **OB-51 / OB-52 / OB-53**——依次为 BYOK 与 secretStorage 五点确认、契约与 CLI 的额度差异、`DIRECTIVE-MODEL-LISTS` 编号预留。**不新增判据、不改任何规则语义、不改 §6.3 的判据作用域**。本行是 **`S1-REACH` 切片内的副产物**，不是独立的准则治理片。 | `S1-REACH`（需回写：本片台账与报告须载明 v1.15 为切片内副产物） |`
+
+（EN 逐句镜像，行数 1:1。）
+
+- (c) §12.4 追加三行（CN 逐字草稿）：
+
+`| OB-51 | 2026-09-29 | **BYOK 与 secretStorage 五点只读确认（DR-1 报告 §11 预留，本片 `S1-REACH` 执行）**：① `ai check`/`ai verify` 无 `--model` flag（`internal/console/ai.go:36` flag 集），模型仅取自链配置 `ai.profiles[].model`（`configuredAIProfile`，`ai.go:229`），无默认值 / fallback；② `schemas/` 无覆盖链配置 `ai.profiles` 的 JSON Schema，`model` 非空必填由 Go 校验实现（`ai_provider.go:51` 拒绝 `Model == ""`）；③ `model: "auto"` 不被 schema 或代码禁止，作为普通值透传 `--model`（`ai_probe_copilot.go:114`；测试夹具 `ai_provider_test.go:13` 视其为合法值）；④ VS Code secretStorage 不可枚举（如实报告）；Copilot CLI 自有存储只可枚举条目名（`cmdkey /list` 等只读命令，不读内容）；⑤ prfrail 自有 SecretStore = Windows Credential Manager（`ai_secret_windows.go:15` 前缀 `windows-credential:`，条目用户名域 `ProofRail`），与 `docs/OPERATIONS.md:55` 的 BYOK 示例引用同一机制；五点结论均不指向语义改动。 | **已登记**（本片确认结果；不可枚举项如实标注） |`
+
+`| OB-52 | 2026-09-29 | **契约与 CLI 的额度差异（DR-1 报告 §11 预留，R1=A 不修）**：`docs/CONTRACTS.md:191` 要求可用性结论在显式费用/请求预算内取得，而 `ai_probe_copilot.go:117` 经 DR-1 修复后把 `--max-ai-credits` 固定为 `max(30, maximumRequests)` ⇒ CLI 侧有效额度与产品请求预算不一致，记录无费用维度；DR-1 ⑥ 的 High + Medium 与 Low④ 同属该差异的两面。 | **待议**（修法属 CONTRACTS 语义改动，另立切片；本片只登记） |`
+
+`| OB-53 | 2026-09-29 | **编号预留（DR-1 报告 §11 预留）**：日后 `DIRECTIVE-MODEL-LISTS` 立项需在 §12.4 登记时使用本号。 | **已登记**（预留号；实际现象与处置由该片填写） |`
+
+（EN 逐句镜像；首状态词取 `Registered` / `To be discussed` / `Registered`，行数 1:1。**最终文案以 ② 枚举结果微调点 4 的事实句**，形状不变。）
+
+- (d) **可选裁定点**：OB-21 行（:797）追加更正注记——现象列尾部补「**更正注记（2026-09-29，`S1-REACH`）**：② 的「+ DR-1 未修」子项已消除（DR-1 闭环，commit `12e277b`，证据包 `docs/validation/evidence/dr-1-2026-09-24/`）；① 与 T026/B2 子项未变 ⇒ AT-23 真实候选腿仍不可达」，处置列首词保持「待议」。**是否改写历史行属授权歧义 ⇒ 按 §1.7.2 交用户裁定，默认不写**；不写时刷新结论全部落在报告与 OB-51 行（见 §5(g)）。
+
+### 4.4 修改 `docs/ADR_REGISTER{,_EN}.md`（+1 行/侧）
+
+**ADR-015**（四要素 + 性质标注，同 ADR-014 形状）：
+
+`| ADR-015 | **切片 `S1-REACH` 的 ⑦ 终审模型降级（用户直接裁定）**：本片 ⑦ 由 `deepseek-v4-pro` 承担，**不是** §2.2 白名单的 `gpt-5.3-codex` | 理由：本片为纯文档切片（不触 §7.2.1 ③）且 Copilot 预算受限；未采纳的替代：保留 `gpt-5.3-codex`（预算不可承受）。登记依据 = 用户 2026-09-29 切片定义原文「⑦ = V4 Pro」，按 §12.4 的 OB-37 元规则以 **ADR** 形式独立留痕（该元规则允许 OB 或 ADR） | **已裁（用户直接裁定，仅本片有效，不得作为先例）**。四要素：裁决人 = 用户；日期 = 2026-09-29；理由 = 纯文档切片不触 §7.2.1 ③ 与 Copilot 预算；依据 = 用户同轮裁定原文。**性质标注**：含规则语义变更、超出 §2.2 字面标准、系用户直接裁定。**后续义务**：验证报告须如实标注「本片 ⑦ 由非白名单模型承担，独立性降低」并交 ⑧c 复核；本例外**不推广**（其它切片仍按 §7.5 与 §2.2 白名单执行） |`
+
+### 4.5 修改 `docs/t027/REMAINING_SLICES{,_EN}.md`
+
+**切片定义回写块**（放在 DR-1 块之后，表形状同 DR-1；含 §1.2 新增三字段）：
+
+| 字段 | 内容 |
+| --- | --- |
+| 标识 | `S1-REACH`（业务切片；触发词 `切片:S1-REACH`） |
+| 目标 | 刷新 OB-21 / T018 / S1 exit 的可达性判定（逐门 × 依赖 × 解锁条件），引用 DR-1 证据包，不做真探针；同批把 OB-51 / OB-52 / OB-53 落 §12.4 |
+| 依赖 | 代码侧无前置；DR-1 已闭环（commit `12e277b`，证据包 `docs/validation/evidence/dr-1-2026-09-24/`）；环境侧仅本机只读枚举（非探针） |
+| 规模 | S |
+| 分级 | `[SLICE]` |
+| 探针额度 | 无（0 次真实外部调用） |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/S1-REACH-freedom-list.md` |
+| 步骤 | ①架构（V4 Pro）→ ②文档实现（含五点只读枚举）→ ③文档一致性检查 → ④门禁 → ⑤预审（可选，§5.2）→ ⑥按 §7.2.1 判定（可跳过须 ⑦ 确认）→ ⑦终审（`deepseek-v4-pro`，降级，ADR-015）→ ⑧a/⑧b → ⑨原生验证（编码门禁 + G1–G7 + 链接可解析）→ ⑩停点 |
+| 现状缺口 | OB-21 的 ② 含已消除子项「DR-1 未修」；T018 剩余门与 S1 exit 的依赖链未按门级刷新 ⇒ 判读依据过期 |
+| 交付物 | 报告 `docs/validation/s1-reach-reachability{,_EN}.md`；§12.4 的 OB-51/52/53 三行（+ v1.15 台账行）；ADR-015；本台账定义块与收尾行 |
+| 验收证据 | ① 逐门结论带 `file:line` 且 DR-1 证据包路径可定位；② 五点逐条带证据、第 4 点不可枚举项如实标注；③ 门禁全绿；④ 变更集不含 Go/schema/fixtures/workflows |
+| 边界 | 不改任何 Go 代码、schema、CONTRACTS、fixtures、workflows；不做真探针；五点任一结论指向语义改动 ⇒ 停下升级另立切片；commit 与 push 须同轮授权；不推 gitee |
+
+**起跑行**：`**起跑（2026-09-29）**：步骤 0 已落地——切片定义核验（§12.4 末行 = OB-50、ADR 最大号 = ADR-014、五点锚点行全部可定位）；无链配置步骤（本片无真探针）。`
+
+**收尾行**（⑧b 以真实结果填写，形状）：`**收尾（2026-09-29，⑩ 停点）**：⑤ `PRE-REVIEW: PASS`（若执行）；⑥ 按 §7.2.1 三条件可跳过、由 ⑦ 确认；⑦ `FINAL REVIEW: PASS`（`deepseek-v4-pro`，降级，ADR-015，独立性降低）；⑨ 门禁全绿。报告 `docs/validation/s1-reach-reachability{,_EN}.md`（双语两份，逐行 0 失配）。`
+
+（注：`REMAINING_SLICES{,_EN}` 不做整文件位置镜像（DR-1 报告 §9 口径），仅要求改动行数对称 + 新增块逐行形状全等。）
+
+---
+
+## 5. 风险与停止条件
+
+- **(a) 语义改动停止点**：五点中任一点若最终结论要求改动 CONTRACTS / schema / 授权契约语义 ⇒ **停止升级**、另立切片。本片初步核验五点均不指向（§2）；第 4 点若枚举到 BYOK 条目只是**事实**，不触发停止；触发停止的是「结论要求改契约」。
+- **(b) OB-21 两分支**：
+  - **仍不可达（预期）**：只刷新判定 + 登记（OB-51 行 + 可选 OB-21 更正注记），**不改代码**；影响 = B4/S1 exit 判读维持，DR-1 子项消除如实记入。
+  - **可达（意外）**：只允许写进报告并**停下升级**——「可达」意味着 ①/② 某种解除，后续动作（是否启动 T027/B4）由用户裁决；本片**不得**据此改代码或推进 B4。
+- **(c) 本片不能说的话**（违反即判据红/结论失真）：
+  1. 不得写「部分通过」——`PARTIAL` 只属 §4.1 ⑦ 结论行枚举，报告与台账不得以此描述切片结论（T018 行本身也禁「部分通过」冒充）。
+  2. 不得把 DR-1 的 `available` 读作「候选兼容」或「候选可启动」。
+  3. 不得写「AT-23 机制腿通过 ⇒ AT-23 通过」。
+  4. 不得写「OB-21 已闭环/已处置」——② 子项消除 ≠ 整条闭环，处置保持「待议」。
+  5. 不得声称本机当前凭据条目状态未经枚举证实（第 4 点只报已枚举事实 + 不可枚举标注）。
+  6. 不得把「T018 四门依赖候选进展」或「不依赖」说成单一结论——必须门级/任务级分开表述（§1 的 G-H 注）。
+  7. 不得以 OB-37/ADR-014 为先例自行降级其他环节（仅 ⑦ 且已由用户裁定）。
+  8. 不得声称「已运行命令」——所有执行发生在 ②-⑨ 环节并由主控记录，① 只读。
+- **(d) 试点顺延第 4 次**：本片以 `[SLICE]` 起跑 ⇒ 依 §12.1 配套② 需升级用户裁决。用户切片定义本身即裁定（分级 `[SLICE]`），但留痕义务不变：报告 §4 记四要素 + 「不得作为先例」（DR-1 报告 §4 同款做法），§12.4 不另登记（顺延登记与试点台账口径同 DR-1）。
+- **(e) 门禁红线**：G4b 新字（不得扩白名单 ⇒ 若报新字，换用已入语料同义词重写）；G6-4 禁行数/文件数；G2 禁占位串（收尾行用 DR-1 同款措辞）；G6-6 首状态词闭集；G1-b 版本一致；G6-2 成本 token（v1.15 行不写 ⑥×/⑦×）。
+- **(f) ⑥ 跳过风险**：跳过必须 ⑦ 确认；⑦ 不同意 ⇒ 补跑 ⑥（≤3 次 MAI，消耗 Copilot 预算——若触发，成本与计量节如实记录，并知会用户口径）。
+- **(g) OB-21 行改写的授权歧义**：见 4.3(d)，默认不写；若用户裁定写，则按 G6-6 保持首状态词「待议」。
+- **(h) 七⑦降级**：报告与 ADR-015 必须标注「独立性降低」并交 ⑧c 复核。
+
+---
+
+## 6. 未覆盖项 / 我无法验证的部分
+
+1. **VS Code SecretStorage 内部**：不可枚举（§2 点 4），本片与后续任何切片均无法从仓库或外部命令枚举。
+2. **Copilot CLI 密钥存储的精确路径与条目**：仓库外知识；只可对候选位置做文件名级枚举，确切布局「不确定，需 ② 阶段核实」。
+3. **`model: "auto"` 在 Copilot CLI 侧的实际语义**：无探针额度，不可验证，如实标注。
+4. **本机当前凭据条目的实际存在性**：① 阶段只读文件无法证明；以 ② 枚举结果为准。
+5. **DR-1 的 commit `12e277b` 与 CI run `35928587351`**：本角色无 git/网络能力，以 `REMAINING_SLICES.md:542` + DR-1 报告 + 证据包 SHA256SUMS 为证据链，报告中如实标注「未独立核验 git 对象」。
+6. **产品所有者批准时点（G-G）**：人工门，不预测。
+7. **⑦ 终审结论本身**：属 J1–J6，只能交 ⑦ 判。
+8. **设计切片无 diff/无测试日志**：本片交付物为方案书；实现、门禁与日志在 ②-⑨ 环节产生。
+
+---
+
+DESIGN: DONE

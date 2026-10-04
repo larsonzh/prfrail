@@ -1,0 +1,224 @@
+{
+  "face": "f1",
+  "case": "neg3",
+  "phase": "run",
+  "runId": "run-b4",
+  "requestId": "request-run-b4",
+  "runRoot": "D:\\LZProjects\\prfrail\\tmp\\b4\\runs\\f1-neg3",
+  "workspace": "D:\\LZProjects\\prfrail\\tmp\\b4\\runs\\f1-neg3\\workspace",
+  "startedAt": "2026-09-22T16:57:07.116Z",
+  "endedAt": "2026-09-22T16:57:09.270Z",
+  "verdictClass": "completed",
+  "chainState": "COMPLETED",
+  "taskState": "b4-task\u00001=PASSED",
+  "stepState": "b4-task\u0000b4-code-step\u00001=PASSED",
+  "eventLogHash": "sha256:30f4c8e2084374033404caec20d6c1f591c2422eb5b20af059962a25357b3d96",
+  "eventSequence": 13,
+  "load": {
+    "args": [
+      "-mode",
+      "run",
+      "-sleep",
+      "2s"
+    ],
+    "timeout": "30s",
+    "grace": "2s"
+  },
+  "mapping": {
+    "status": "completed",
+    "treeStatus": "stopped",
+    "logsComplete": true,
+    "usageComplete": true,
+    "eventsComplete": true,
+    "manifestsComplete": true,
+    "factCount": 5,
+    "errorEvidenceCount": 0,
+    "elapsedMs": 2006
+  },
+  "legs": [
+    {
+      "leg": "dispatch",
+      "status": "ran: process spawned through the production launcher and step parked in TERMINAL_PENDING"
+    },
+    {
+      "leg": "dispatch-\u003ewait-\u003ecollect-\u003emap",
+      "status": "ran: completed"
+    },
+    {
+      "leg": "terminal-publication (production AgentRunnerTerminalPublisher)",
+      "status": "failed closed",
+      "error": "AgentRunner request conflict: terminal publication requires a persisted request record for requestId request-run-b4",
+      "alternativeEvidence": "the durable terminal chain is built through the public record constructors and adapters.ToChainAgentRunnerTerminal instead; the chain-side routing below is unmodified production code"
+    },
+    {
+      "leg": "cost settlement (production tickets.CostLedger.Settle)",
+      "status": "booked"
+    },
+    {
+      "leg": "terminal routing (chain.SubmitAgentRunnerTerminal)",
+      "status": "routed as completed"
+    },
+    {
+      "leg": "postflight/acceptance/review/promotion",
+      "status": "ran to the end of the task"
+    }
+  ],
+  "journal": [
+    {
+      "leg": "baseline",
+      "at": "2026-09-22T16:57:07.133Z",
+      "outcome": "captured",
+      "detail": {
+        "entries": "1",
+        "hash": "sha256:1fbe6bb28268c36250659573df59b691d1c85dde12018bc091ddc5c5dce408ed"
+      }
+    },
+    {
+      "leg": "dispatch",
+      "at": "2026-09-22T16:57:07.133Z",
+      "outcome": "production-path-refused-by-platform",
+      "detail": {
+        "error": "AgentRunner replay store publication durability unproven: request publication"
+      }
+    },
+    {
+      "leg": "dispatch",
+      "at": "2026-09-22T16:57:07.133Z",
+      "outcome": "fallback-spawned-through-production-launcher",
+      "detail": {
+        "launchId": "launch-request-run-b4",
+        "processId": "{\"pid\":15256,\"startToken\":\"01dd4ab36698b1a9\"}"
+      }
+    },
+    {
+      "leg": "dispatch",
+      "at": "2026-09-22T16:57:07.133Z",
+      "outcome": "parked",
+      "detail": {
+        "requestId": "request-run-b4"
+      }
+    },
+    {
+      "leg": "terminal-routing",
+      "at": "2026-09-22T16:57:07.133Z",
+      "outcome": "completed",
+      "detail": {
+        "chain": "RUNNING",
+        "step": "PASSED",
+        "task": "STEPS_RUNNING"
+      }
+    },
+    {
+      "leg": "injection",
+      "at": "2026-09-22T16:57:07.133Z",
+      "outcome": "unaccounted-workspace-write",
+      "detail": {
+        "contentHash": "sha256:1345e1cb0e0e7d980f1bd51fa5a1e8501757857a7ac695fa55a6adb10346a045",
+        "path": "tmp/agent-stub-mutation.txt"
+      }
+    },
+    {
+      "leg": "postflight",
+      "at": "2026-09-22T16:57:07.133Z",
+      "outcome": "passed",
+      "detail": {
+        "legs": "6"
+      }
+    },
+    {
+      "leg": "acceptance",
+      "at": "2026-09-22T16:57:07.133Z",
+      "outcome": "frozen",
+      "detail": {
+        "candidateHash": "sha256:ae780405da1d89b560a9c84d648c181a29928ba801639f041e33c2b33c0b8185",
+        "parentHash": "sha256:1fbe6bb28268c36250659573df59b691d1c85dde12018bc091ddc5c5dce408ed"
+      }
+    },
+    {
+      "leg": "review",
+      "at": "2026-09-22T16:57:07.133Z",
+      "outcome": "approve",
+      "detail": {
+        "candidateHash": "sha256:ae780405da1d89b560a9c84d648c181a29928ba801639f041e33c2b33c0b8185"
+      }
+    },
+    {
+      "leg": "publish",
+      "at": "2026-09-22T16:57:07.133Z",
+      "outcome": "completed",
+      "detail": {
+        "candidateHash": "sha256:ae780405da1d89b560a9c84d648c181a29928ba801639f041e33c2b33c0b8185",
+        "workspaceDigest": "sha256:397615775e93bc21c838b1ed81ea385ccc14ae7f1a1d4c7667e87766681e9a7d"
+      }
+    },
+    {
+      "leg": "downstream",
+      "at": "2026-09-22T16:57:07.133Z",
+      "outcome": "completed"
+    }
+  ],
+  "checks": [
+    {
+      "id": "five-facts-distinct",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "frozen facts present: true"
+    },
+    {
+      "id": "five-facts-distinct",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "distinct fact digests: 5"
+    },
+    {
+      "id": "injection-present-on-disk",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "injected file on disk: D:\\LZProjects\\prfrail\\tmp\\b4\\runs\\f1-neg3\\workspace\\tmp\\agent-stub-mutation.txt"
+    },
+    {
+      "id": "frozen-diff-excludes-injection",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "frozen diff added=[] removed=[] changed=[]"
+    },
+    {
+      "id": "unaccounted-change-rejected(design expectation)",
+      "kind": "deviation",
+      "pass": false,
+      "detail": "taskPassed=true; the injected path is inside the snapshot capturer's default exclusion set (.git/**, .prfrail/**, tmp/**), so the manifest reconciliation cannot see it - the boundary of the F1 claim, measured"
+    },
+    {
+      "id": "verdict-class-recorded",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "verdict class completed"
+    }
+  ],
+  "diff": {
+    "added": [],
+    "removed": [],
+    "changed": []
+  },
+  "artifacts": {
+    "diff.json": "sha256:f8700730d4d8f747ac5ce273bcc6d6ca0dabf339d43ef439e97a75e370f72f35",
+    "events.jsonl": "sha256:4fafb99cd4a2b5d910b7998711ef3f1faa7357d4a5944fe288083f0a9dd5dec1",
+    "logs/stderr.log": "sha256:4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2",
+    "logs/stdout.log": "sha256:4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2",
+    "manifest.post.json": "sha256:68b59715c05e159384873c7b3acb991dac9875dc3898d98ba01cdb6f175064ca",
+    "manifest.pre.json": "sha256:7e1d194c5dcc25579be3779e972b1955ff526f1f6dac128d404df985a6b2c42a",
+    "stub.pid": "sha256:f8f11b3de54ef77d983c020677105d31e2c2b0aadcb9bb33dd2ed54e6caacdbf",
+    "usage.json": "sha256:4d51d872aaf586199a7d77dc5b623d83c2c58d36e94d62a2872984d1bf9af953"
+  },
+  "observations": {
+    "gateHookSteps": "0",
+    "stopError": "",
+    "stopOutcome": "stopped"
+  },
+  "errors": [],
+  "notes": [
+    "clean run plus the same unaccounted write inside the capture-excluded tmp/ subtree; measures the blind spot of the unchanged-workspace claim",
+    "requestRecordHash=sha256:88f5eade8d6110e0af756226be77b475e1e0f57ab08dae4966f34c625df579cb",
+    "declared-inputs: capability disposition=compatible (declared, not probed); enforcement record declared but not consulted on that path; adapterId=b4-pinned-cli-declared"
+  ]
+}

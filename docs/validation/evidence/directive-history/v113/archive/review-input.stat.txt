@@ -1,0 +1,4 @@
+89	23	docs/DELIVERY_DIRECTIVE.md
+89	23	docs/DELIVERY_DIRECTIVE_EN.md
+311	3	tools/gates/lib/criteria/g6.js
+464	3	tools/gates/selftest.js

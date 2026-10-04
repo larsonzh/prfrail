@@ -1,0 +1,51 @@
+# tools/gates evidence
+# command: node D:\LZProjects\prfrail\tools\gates\selftest.js
+# cwd    : D:/LZProjects/prfrail
+# exit   : 0
+
+GATES SELFTEST (in-process; fixtures under tools/gates/testdata/)
+  T3/T12 need real git ranges and are recorded as evidence, not here:
+    --scope=range:b738e6b^..b738e6b (A1 must be red) / range:9f68a52^..9f68a52 (green)
+    --scope=range:1b01115^..1b01115 (C1: G7 must be red)
+ok   T13 fixture files are not *.md, so a tree/ci run never judges the runner own fixtures
+ok   T1 G6-1 detects pending(⑥)+completion(⑥ 实得) in one block
+ok   T1 G6-1 reports exactly one finding for the fixture
+ok   T1 reverse mutation (drop completion row) clears G6-1
+ok   T1 delete-criterion mutation (G6-1 removed) leaves the corpus clean
+ok   T2 provenance file carries exactly one excerpt line
+ok   T2 fixture embeds the historical OB-11 row verbatim
+ok   T2 OB-11 row (with 冲突 marker) is clean
+ok   T2 reverse mutation (drop the 冲突 exclusion marker) turns G6-1 red
+ok   T4 provenance file carries the two historical cost rows
+ok   T4 fixture embeds both historical cost rows verbatim
+ok   T4 cost-clause parser yields identical realized vectors for the historical pair
+ok   T4 budget clause is exempt: consistent rows pass G6-2
+ok   T4 reverse mutation (预算 -> 成本) turns G6-2 red
+ok   T4 delete-criterion mutation (G6-2 removed) leaves the mutated corpus clean
+ok   T5 legal 11-digit run id passes G6-3
+ok   T5 legal fixture yields no finding
+ok   T6 placeholder run ids fail G6-3
+ok   T6 one finding per placeholder line (4)
+ok   T6 delete-criterion mutation (G6-3 removed) leaves the corpus clean
+ok   T7 expiring literals fail G6-4
+ok   T7 two literal lines produce two findings
+ok   T7 whitelisting ONE of two findings leaves G6-4 red with one fatal finding
+ok   T7 whitelisting both findings turns G6-4 green (whitelist is load-bearing)
+ok   T8 report without an artifacts block fails G7-a
+ok   T8 delete-criterion mutation (G7-a removed) leaves the corpus clean
+ok   T9 unresolved repo disposition (tmp path, omitted token) fails G7-b
+ok   T9 marking the tmp path local-only turns G7-b green
+ok   T9 unknown disposition token fails G7-b
+ok   T10 existing repo artifact + local-only + missing-historical pass G7-b
+ok   T10 unresolvable repo artifact fails G7-b
+ok   T11 finding row without a disposition cell fails G7-c
+ok   T11 adding the disposition cell turns G7-c green
+ok   T11 delete-criterion mutation (G7-c removed) leaves the corpus clean
+ok   G7-d stopped status line without 已停止——未完成 fails
+ok   G7-d fires only on the status line, not on prose naming the rule (self-reference guard)
+ok   G7-d adding the incomplete mark turns it green
+ok   T13 whole fixture corpus yields exactly the expected FAIL id set
+ok   T13 whole fixture corpus has no unexpected SKIP/INFO storm
+ok   F1 every declared fixture mutation applied (a stale mutation would weaken the suite silently)
+ok   F1 mutation coverage floor (>= 8 fixture mutations exercised)
+SELFTEST: PASS 41/41

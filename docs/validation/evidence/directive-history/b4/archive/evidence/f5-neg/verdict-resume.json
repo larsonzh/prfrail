@@ -1,0 +1,102 @@
+{
+  "face": "f5",
+  "case": "neg",
+  "phase": "resume",
+  "runId": "run-b4",
+  "requestId": "request-run-b4",
+  "runRoot": "D:\\LZProjects\\prfrail\\tmp\\b4\\runs\\f5-neg",
+  "workspace": "D:\\LZProjects\\prfrail\\tmp\\b4\\runs\\f5-neg\\workspace",
+  "startedAt": "2026-09-22T16:57:46.277Z",
+  "endedAt": "2026-09-22T16:57:46.371Z",
+  "verdictClass": "uncertain-or-paused",
+  "chainState": "PAUSED",
+  "taskState": "b4-task\u00001=REPAIR_PENDING",
+  "stepState": "b4-task\u0000b4-code-step\u00001=PASSED; b4-task\u0000b4-verify-step\u00001=PASSED",
+  "eventLogHash": "sha256:2d202ca23f2a7348fe9a76fa7d14abd9b0c79e4111659f31e65f481ffeac7068",
+  "eventSequence": 15,
+  "load": {
+    "args": [
+      "-mode",
+      "run",
+      "-sleep",
+      "2s"
+    ],
+    "timeout": "30s",
+    "grace": "2s"
+  },
+  "legs": [],
+  "journal": [
+    {
+      "leg": "gate-hook",
+      "at": "2026-09-22T16:57:46.288Z",
+      "outcome": "production-port-refused",
+      "detail": {
+        "error": "hook policy enforcement unavailable: memory limit",
+        "stepId": "b4-verify-step"
+      }
+    },
+    {
+      "leg": "gate-hook",
+      "at": "2026-09-22T16:57:46.288Z",
+      "outcome": "ran",
+      "detail": {
+        "exitCode": "0",
+        "stepId": "b4-verify-step"
+      }
+    },
+    {
+      "leg": "gate-hook",
+      "at": "2026-09-22T16:57:46.288Z",
+      "outcome": "ran",
+      "detail": {
+        "kind": "verify",
+        "stepId": "b4-verify-step"
+      }
+    },
+    {
+      "leg": "postflight",
+      "at": "2026-09-22T16:57:46.288Z",
+      "outcome": "failed",
+      "detail": {
+        "detail": "b4-tamper-marker.txt",
+        "domain": "proofrail:b4-postflight-manifest-mismatch:1\n"
+      }
+    },
+    {
+      "leg": "resume",
+      "at": "2026-09-22T16:57:46.288Z",
+      "outcome": "returned",
+      "error": "chain paused"
+    }
+  ],
+  "checks": [
+    {
+      "id": "postflight-rejected",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "task state after the tampered replay: b4-task\u00001=REPAIR_PENDING"
+    }
+  ],
+  "diff": {
+    "added": [],
+    "removed": [],
+    "changed": []
+  },
+  "artifacts": {
+    "diff.json": "sha256:f8700730d4d8f747ac5ce273bcc6d6ca0dabf339d43ef439e97a75e370f72f35",
+    "events.jsonl": "sha256:4fafb99cd4a2b5d910b7998711ef3f1faa7357d4a5944fe288083f0a9dd5dec1",
+    "logs/stderr.log": "sha256:4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2",
+    "logs/stdout.log": "sha256:4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2",
+    "manifest.post.json": "sha256:155fd94e044f1cf27b6fbab9e09d2a269027b71f2f9841f71a2a77f50d68057b",
+    "manifest.pre.json": "sha256:de911a973cfb63cb771b1550bd5d2b81cd1e971ac326e434724628619d2f3041",
+    "stub.pid": "sha256:dfcd9a1ebd81d1fd05b73c73d0c7a56e696d27bcf4cc268c67b9f860b2055fee",
+    "usage.json": "sha256:4d51d872aaf586199a7d77dc5b623d83c2c58d36e94d62a2872984d1bf9af953"
+  },
+  "observations": {},
+  "errors": [],
+  "notes": [
+    "the workspace is tampered after the terminal; a replayed postflight must reject",
+    "requestRecordHash=sha256:1996fc20ecdd87606016ce26ce99852eafae4d2454e7c40b866bbdba665d1750",
+    "declared-inputs: capability disposition=compatible (declared, not probed); enforcement record declared but not consulted on that path; adapterId=b4-pinned-cli-declared"
+  ]
+}

@@ -1,0 +1,29 @@
+GATE REPORT scope=tree repo=D:\LZProjects\prfrail changed=13
+PASS  G1-a table structure :: no `||` on added rows
+PASS  G1-b version metadata :: docs/DELIVERY_DIRECTIVE.md header=v1.16 last=v1.16 2026-09-29/2026-09-29 rows=17 OK | docs/DELIVERY_DIRECTIVE_EN.md header=v1.16 last=v1.16 2026-09-29/2026-09-29 rows=17 OK
+SKIP  G1 section-title/status-table/completion-record consistency :: not scripted in slice GATES-EXT: judging three human-authored places against each other; see DELIVERY_DIRECTIVE 6.3 G1
+PASS  G2 placeholder residue :: none
+PASS  G3(a) symmetry + mirror parity :: docs/ADR_REGISTER.md +2/-0 vs _EN +2/-0 OK || docs/DELIVERY_DIRECTIVE.md +4/-3 vs _EN +4/-3 OK || docs/DEV_PLAN.md +1/-1 vs _EN +1/-1 OK || docs/t027/REMAINING_SLICES.md +28/-6 vs _EN +28/-6 OK || docs/validation/dr-1-availability-probe-floor.md +1/-1 vs _EN +1/-1 OK || docs/validation/ledger-backfill.md +147/-0 vs _EN +147/-0 OK ;; docs/ADR_REGISTER.md {"lines":false,"head":false,"bold":false,"bars":true,"blank":false} ;; docs/DELIVERY_DIRECTIVE.md {"lines":true,"head":true,"bold":true,"bars":true,"blank":true} ;; docs/DEV_PLAN.md {"lines":false,"head":false,"bold":false,"bars":true,"blank":true} ;; docs/t027/REMAINING_SLICES.md {"lines":false,"head":false,"bold":false,"bars":false,"blank":false} ;; docs/validation/dr-1-availability-probe-floor.md {"lines":true,"head":true,"bold":true,"bars":true,"blank":true} ;; docs/validation/ledger-backfill.md {"lines":true,"head":true,"bold":true,"bars":true,"blank":true}
+PASS  G3(b) key-field alignment :: hash 0/0 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK | hash 0/0 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK | hash 0/0 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK | hash 22/22 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK | hash 0/0 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK | hash 6/6 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK
+PASS  G4a BOM+LF :: 13 file(s) OK
+PASS  G4b CJK diff minus whitelist :: newCjk=591 unknown=[] (whitelist=36 whitelist-source=worktree)
+PASS  G5-a(1) no model key in prfrail-* :: 0 hits
+PASS  G5-a(2) no empty model :: 0 hits / 14 files
+PASS  G5-b blacklist model value :: checked 0 file(s)
+SKIP  G5 change-set contract (staged vs declared vs evidence refs) :: not scripted in slice GATES-EXT: requires a structured JSON input produced outside the repository; see DELIVERY_DIRECTIVE 6.3 G5
+PASS  R2.5 header-note position :: distinct=1 uniform 14/14
+PASS  G6-1 status tense :: no pending/completion conflict on added lines (scanned 400) whitelist-source=worktree
+PASS  G6-2 cost clause :: no realized cost clause on added lines (scanned 400) whitelist-source=worktree
+PASS  G6-3 run-id format :: no malformed run id on added lines (scanned 400) whitelist-source=worktree
+PASS  G6-4 expiring literal :: no expiring literal on added lines (scanned 400) whitelist-source=worktree
+PASS  G6-5 section-reference resolution :: no unresolved section reference on added ledger/changelog lines (scanned 2, refs 4) whitelist-source=worktree
+PASS  G6-6 ledger status closed set :: every added ledger row opens with a closed-set status word (scanned 4) whitelist-source=worktree
+PASS  G7-a artifacts block present :: 4 report(s) OK
+PASS  G7-b artifact path/disposition resolvable :: 76 artifact row(s) OK (repo check: git ls-files --error-unmatch + worktree presence)
+PASS  G7-c finding row disposition cell :: 0 changed finding row(s) with disposition
+PASS  G7-d stopped state marked incomplete :: no stopped-state row missing the incomplete mark
+PASS  base gofmt -l . :: empty
+PASS  base go build ./... :: exit 0
+PASS  base go vet ./... :: exit 0
+PASS  base go test ./... :: ok=14 FAIL=0
+TOTAL_FAIL=0

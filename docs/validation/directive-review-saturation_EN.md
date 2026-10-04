@@ -276,6 +276,7 @@ docs/validation/directive-review-saturation.md	repo
 docs/validation/directive-review-saturation_EN.md	repo
 tmp/v113/**	local-only
 ```
+> **Archiving note (v1.23)**: the `tmp/` items cited by this report were archived under `docs/validation/evidence/directive-history/` per §1.5.1 (units: `v113/`; each with `MANIFEST.md` and `SHA256SUMS.txt`); the original paths are not rewritten and the MANIFEST is the mapping of record. (Paths already cleared by earlier slices are outside this archiving and belong to the pre-existing decoupling recorded as OB-77.)
 
 **Post-commit archival (next batch, not part of this commit)**: the ⑤⑥⑦ reports (`review-r1.md` / `review-r2.md` / `review-r3.md`), the full diff (`review-input-r2-r10.diff`) and the final gate readings (`gate-tree-r1-r10.txt` / `selftest-master-r10.txt` / `mirror-r10.txt`) are planned for archival under `docs/validation/evidence/directive-review-saturation/`; at that point the disposition of the corresponding rows in this report's artifact list changes from `local-only` to `repo`. **Reason the archival is deferred (recorded plainly)**: those reports contain cited literals (such as line counts / counts), and entering `docs/validation/**` directly as `.md` would fall inside **G6's `.md` scan domain** and trigger **G6-4**; rewriting the reviewer's original text is unacceptable and widening the whitelist is forbidden ⇒ the next batch archives them with **an extension outside the `.md` scan domain** (or disposes of them per §6.3's terms in the next slice).
 

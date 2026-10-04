@@ -1,0 +1,297 @@
+diff --git a/docs/DELIVERY_DIRECTIVE.md b/docs/DELIVERY_DIRECTIVE.md
+index 7e41ca5..ad68665 100644
+--- a/docs/DELIVERY_DIRECTIVE.md
++++ b/docs/DELIVERY_DIRECTIVE.md
+@@ -1,6 +1,6 @@
+ ﻿# ProofRail 交付执行准则（DELIVERY_DIRECTIVE）
+ 
+-版本：v1.13。日期：2026-09-23。状态：**CN 正文冻结**（ `_EN` 镜像见 `docs/DELIVERY_DIRECTIVE_EN.md`）。
++版本：v1.14。日期：2026-09-24。状态：**CN 正文冻结**（ `_EN` 镜像见 `docs/DELIVERY_DIRECTIVE_EN.md`）。
+ 
+ > **多语言说明**：本文件为中文权威版；`docs/DELIVERY_DIRECTIVE_EN.md` 为严格同位镜像（与 CN 同步维护；CN 冻结后同步更新，避免评审期双语返工）。
+ > **编码**：本文及 `_EN` 必须保持 UTF-8 **with BOM** + **LF**。
+@@ -57,6 +57,7 @@
+ | v1.11 | 2026-09-23 | **新增 §1.7 执行自由度与升级边界、§3.4 编辑后诊断扫描、§5.1 ⑧c 收尾清洁（切片 `DIRECTIVE-V1.11`）**：① §1.7——执行自由度（单文件实现选择 / 契约已明确范围内的实现方式 / 已授权包内的门禁重试 / 不影响契约语义的重构 / 契约措辞的补全）与升级边界（涉及契约语义的任何变更 / 超出切片范围的顺手修 / 预算额度耗尽 / 判定“这是扩范围还是执行自由度”有歧义时 / §1.6 的不可绕过边界），区分原则“怎么做可自主、做什么属于用户”，留痕要求由 ⑦ 终审复核；② §3.4——编辑后诊断扫描（按语言 / 文件类别选用工具、不枚举扩展名；任何新增告警不得遗留到下一步；“未覆盖类型”不是“免检”；优先在 `tools/gates/` 实现诊断聚合器）；③ §5.1 新增 **⑧c 收尾清洁**（⑧b 后、⑩ 前，主控执行，与 ⑨ 原生验证并列的固定环节）；④ §5.2 矩阵加 ⑧c 列、§5.3 加 ⑧c 行、§7.1 加 ⑧c 说明、§11.3 报告结构加 ⑧c 记录；⑤ 附录 B.7.4 最小阅读集补入新节号、附录 C 新增本片台账块 C.0g。OB-22/23/24 已在 B4 收尾登记，本片只引用不重复登记。 | 历史缺失 |
+ | v1.12 | 2026-09-23 | **DIRECTIVE-V1.12（三轮第三方独立评审发现处置 + 用户裁决落地）**：① §0.1 权威表补台账 / ADR / gates / agents 行 + 『门禁判据』术语消歧（A1/A13/M10）；§0.2 增 MAJOR/MINOR 裁决注记（A4）；§0.3 增『受影响的在飞切片』列（A5）；② §1.2 增分级 / 探针额度 / 自由度清单三字段（A11/L7）；§1.6 增生产代码语义边界与 §5.2 口径句、`[id]` 字符集与 20 码点计数单位、多触发词加固、§1.1 分界句（A2/A3/A12/A14）；§1.7 增『§1.6 边界优先于 §1.7.1』与三支判定（A3/A9）；③ §2.2 增 modelId / UI 显示名两列、附录 B 七处调用串改 modelId（H1）；R2.2/R2.4 修正（H1/L8）；§2.4 黑名单边界注记（L10）；④ §4.1 建结论行闭集枚举表、删 RE_、裸 token 判格式偏离（H2）；§4.2 禁止列排除 CONTRACTS/schema/fixtures、§5.1 增 ②a/②b（H3）；⑤ §5.1 ⑧c 增冻结证据包豁免、§5.3 ⑧c 呼应（H5）；§5.2 高风险行删 +盲审（M1）；§5.3 ⑧b 增 ⑦ 复审条款（M11）；⑥ §6.1 增聚焦门禁定义（M6）；§6.3 G1 增停止态豁免（A10）；⑦ §7.1 清单修正（L1）、§7.2 节号补齐（L3）、§9.1 ⑥ 例外（M8）、§9.2 的计数口径（M7 部分）；⑧ §12.1 固定分母 + [SLICE] 起跑处置（H4/A6）；§12.2 增复评条款 + DR-FIX 裁决记录（H4）；§12.4 收口 OB-2/3/4/5/6、新增 OB-28–OB-33、§12.5 缺口行转已落地（M4）；⑨ 附录 B.0/B.6/B.7.1/B.7.4 同步（M2/H2/A2/M12）；C.0d/C.0g 加更正注（L9/M3）；新增 C.0h 台账块；⑩ **提交前第三方评审（v1.12）的处置**：其 C1（§0.3 日志 ↔ 正文一致性；19 项声称已改而未落地）按用户裁决**补做**（R2.2/R2.4、B.0/B.6/B.7.1/B.7.4、§6.1、§6.3 G1、§7.1、§7.2 节号、§9.1/§9.2、§8.2 的 [ROUTINE] 行、§12.1/§12.2/§12.4/§12.5、C.0d/C.0g 更正注、新增 C.0h），其 M8/M12/M13 与 L1–L4 同步落地（§1.2 字段表、§4.1 的 PARTIAL 处置、§0.3 末列口径、§2.2 显示名示例注、§1.7.3 覆盖边界、§5.2 规模映射；其中 M12 与 L3 共用 §4.1 的 PARTIAL 处置落点）；G6-5 与三层一致性架构登记为 OB-32 / OB-33；⑪ **补做注记（第四轮复评 R6）**：本行定稿后收到的第四轮复评 10 条（1 High + 4 Medium + 5 Low，`tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R6.md`）中，N1（复评对象）与 N2（试点顺延）按用户裁决落地（§12.1 与 §12.2），N3 与 N4 与 N6 与 N10 属台账与文案类已落地，N5 经实测不可复现（G6-4 无白名单需求），N7 与 N8 与 N9 登记为 OB-34 – OB-36 留待下一片；本片整改全部源自用户明确裁决与台账元数据 / 文案类整改，按 OB-11 例外**不重跑 ⑦**（**更正注记（第五轮，R7）**：该豁免的实际依据是**用户直接裁定**，其超出 OB-11 例外的字面标准，见 OB-37）；⑫ **补做注记（第五轮，R7）**：第五轮复评 9 条（1 High + 4 Medium + 4 Low，`tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R7.md`）中，P1（双轨优先规则）与 P2（顺延配套）与 P3（复评判定主体 / 锚点 / 条数口径）按用户裁决落地（§12.1 与 §12.2），P4 与 P5 登记为 OB-37 与 OB-38，P6 与 P7 与 P8 与 P9 属台账与文案类已落地；**本轮整改含规则语义变更 ⇒ 不适用 OB-11 例外**，⑦ 第 3 轮为用户同批授权（收窄输入：只审 P1 / P2 / P3 的规则变更与 P4 / P5 的登记是否如实）。 | 无阻塞；后继片 `GATES-G1G5` / `GATES-TIGHTEN` 需回写 |
+ | v1.13 | 2026-09-23 | **DIRECTIVE-REVIEW-SATURATION（评审收敛判据）**：① 新增 **§7.8 评审收敛判据**——「第三方独立复审 / ⑦ 第 N 轮 / 整改后复审」三类停止对象与「额度 / 用户授权例外 / OB-11 / OB-37 / 试点顺延」五类情形的**唯一权威**；② §6.3 落地两条机械子查 **G6-5**（节号引用解析，OB-32 的近似判据）与 **G6-6**（台账状态闭集，OB-38），并按闭集回填 §12.4 全部台账行的首状态词；③ 随片闭合 **OB-34**（§7.2.2 标题）、**OB-35**（§1.6 引 §7.2.1 ③）、**OB-36**（OB-14 四要素入列）、**OB-41**（§9.3 故障模式行）；拆片 **OB-30 / OB-31 / OB-33**；④ §12.5 的「§5.3 与 §7.5 的冲突裁决标准」转为**已落地**；⑤ 附录 C 新增本片台账块 **C.0i**。条款见 §7.8、§6.3、§9.3、§12.4、§12.5。另登记 OB-42（结论行闭集无机械判据）、OB-43（证据捕获乱码）、OB-44（审查层写盘边界）、OB-45（审查层报告来源表述）。 | 无阻塞；后继片 `GATES-G1G5` / `GATES-TIGHTEN` 需回写 |
++| v1.14 | 2026-09-24 | **台账补登（切片 `DR-1` 的步骤 0；用户 2026-09-24 授权）**：§12.4 登记 **OB-46 / OB-47 / OB-48 / OB-49 / OB-50**——依次为 G6-5 的区域端点依赖、`_EN` 词表选取口径、自由度清单落盘时机、`tmp/` 生命周期与 `local-only` 豁免、`sol-orchestrator` 处置与生成器入库条件。**不新增判据、不改任何规则语义、不改 §6.3 的判据作用域**；OB-50 依用户裁定单列一行（不并入同族）。本行是 **`DR-1` 切片内的副产物**，不是独立的准则治理片。 | `DR-1`（需回写：本片台账与报告须载明 v1.14 为切片内副产物） |
+ ---
+ 
+ ## 1. 适用范围与切片模型
+@@ -824,6 +825,11 @@
+ | OB-43 | 2026-09-23 | **PowerShell 管道捕获原生命令的 UTF-8 stdout ⇒ 证据文件中文乱码**：PS 5.1 把原生命令 stdout 经管道（`Out-File` 一类）落盘时，按控制台代码页（GBK）解码其 UTF-8 字节、再以 UTF-8 写盘 ⇒ 中文与 ⑥/⑦ 类符号全部变成无关字符；本片实测：`remediation.diff` 808 处、`selftest-master.txt` 22 处「乱码标记」，而 `git diff HEAD >` 的裸重定向则干净。 | **待办**：本片已即时修复——证据文件改用 node 直写（`execFileSync` + `fs.writeFileSync(..., 'utf8')`）并逐文件复核乱码标记 = 0；§9.3 已登记该故障模式行；后续切片沿用该捕获方式 |
+ | OB-44 | 2026-09-23 | **审查层角色自行写盘（角色边界的字面偏差）**：本片 ⑤ 复审把报告写成了 `tmp/v113/review-r2.md`，而 §2.2 规定审查层「可否写文件 = **否**」，其角色文件的 `tools` 也只含 `read` / `search`。定性：**字面偏差，非实质违规**（内容即其报告、未污染产品文本、`tmp/` 不入库、主控已确认）。 | **待议**：① 审查层报告如何交付（经主控转录 vs 允许写 `tmp/`）；② 附注——G6-5 正文写「附录 C.0–C.0i」，而实现为「C.0 至 C.1 不含」，**当前等价**，未来新增 C 块需同步描述。**本片不修 §2.2、不重跑 ⑤**（其结论有效、内容未被污染）；本轮 ⑥/⑦ 由主控在任务包写入硬约束「不得创建、修改、删除任何文件；报告以最终消息返回」，**不改准则**。两项均留待下一片评估 |
+ | OB-45 | 2026-09-23 | **审查层报告的「数据来源」表述失真**：本片 ⑥ 独立扫描把「**读取**主控落盘的原始输出」表述为「**执行**了 `node tools/gates/gate.js` / `selftest`」，而其角色文件的 `tools` 仅含 `read` / `search`，不可能执行命令；引用数值虽与落盘证据逐串一致，但该表述会给人「独立执行」的印象，而 §7.7 的 A11 / A12 恰恰依赖**来源可追溯**。 | **待议**：① ⑥ / ⑦ 的任务包是否应显式写入『只读路径 + **不得声称执行** `node` / `gate` 命令，只可引用主控落盘的路径』；② ⑥ / ⑦ 报告中『数据来源』表述的措辞模板是否需要统一。**本轮不改 ⑥ / ⑦ 提示词模板**（已在本片任务包内以硬约束覆盖），规则层留待下一片评估 |
++| OB-46 | 2026-09-24 | **G6-5 的区域端点依赖 `### C.1` 标题稳定**：G6-5 只判「§0.3 表区 + 附录 C 台账区（自上至 `### C.1` 之前）」的新增行；该端点标题一旦改名或移位，区域范围随之改变，而判据自身无断言可察（区域为空时子查静默通过）。 | **待议**：是否给 G6-5 增端点自检（端点缺失即报错，不退化为空区域）；与 `GATES-TIGHTEN` 一并评估 |
++| OB-47 | 2026-09-24 | **`_EN` 侧词表按文件名后缀 `_EN.md` 选取**：G6-5 / G6-6 的英文词表选取依据是文件名字符串，而非文档声明的语言；文件改名或新增第三种语言时会静默失配。 | **待议**：是否改为按文档头部声明的语言标识选取；下次 §6.3 修订评估 |
++| OB-48 | 2026-09-24 | **自由度清单的落盘时机不是 §5.1 的显式步骤**：准则 v1.13 期间实测——清单若在 ⑦ 之后落盘，⑦ 便无法据其审查（首次触发 §1.7.3 的时序偏离）；⑦ 的建议是「⑥ 之后 / ⑦ 之前强制落盘，并纳入 ⑦ 的输入包」。 | **待办**：下次 §5.1 修订时写入该步骤（含「⑥ 后 / ⑦ 前」的时序与输入包声明） |
++| OB-49 | 2026-09-24 | **`tmp/` 无清理机制，且 `local-only` 被当作永久豁免**：`local-only` 的本意是「不归档的临时产物」，但既无归档目标路径也无清理时点 ⇒ 事实上成为永久豁免；`tmp/` 同时承载「待归档的审查证据」与「一次性草稿」，当前无区分机制。 | **待办**：在 `DIRECTIVE-LEDGER-ARCHIVE`（双主题：台账归档 + `tmp/` 生命周期）中定义清理时机与 `local-only` 的归档目标 |
++| OB-50 | 2026-09-24 | **`sol-orchestrator` 的处置结论与生成器入库条件此前未进 §12.4**：① 历史结论——该编排器对当前主控无自动编排影响（其配置写明「非 Sol 主控会话即手动模式」）；唯一实际影响是**可见性**（主控可选择调用它），而调用有三重风险：其 `tools` 含 `agent` 因而形成调用链（超出深度上限）、其 `model` 属 §2.4 黑名单、且不显式传 `model` 时会静默回落会话主模型；结论 = **不使用**，并已在 §2.4 列入禁用。② 未来扩展条件——`.github/agents/` 的角色文件是该编排器 `_config.yaml` 的生成物，若日后启用该生成器，**必须先把生成源与生成脚本纳入版本控制**，否则角色集不可复现。 | **待议**：结论已明，但「生成器入库条件何时写进 §2.5」尚未定；下次 §12 修订或角色集相关切片评估 |
+ 
+ > **本片（`GATES-EXT`）⑦ 轮次例外（用户 2026-09-22 预授权）**：⑦ 复审（第 2 轮）报 Medium+ ⇒ 依 §5.3 强制复审，并按预授权开启**第 3 轮**（`GPT-5.3-Codex`，**仅本片有效**）；第 3 轮 `PASS WITH FIXES`、无 Medium+（仅 1 条 Low，即 OB-20）。**该授权不推广**：其他切片仍按 §7.5（终审 1 + 复审 1），第 4 轮不自动授权。
+ 
+diff --git a/docs/DELIVERY_DIRECTIVE_EN.md b/docs/DELIVERY_DIRECTIVE_EN.md
+index ad06f1f..88e0ec7 100644
+--- a/docs/DELIVERY_DIRECTIVE_EN.md
++++ b/docs/DELIVERY_DIRECTIVE_EN.md
+@@ -1,6 +1,6 @@
+ ﻿# ProofRail Delivery Execution Directive (DELIVERY_DIRECTIVE)
+ 
+-Version: v1.13. Date: 2026-09-23. Status: **CN body frozen** ( `_EN` mirror in `docs/DELIVERY_DIRECTIVE_EN.md`).
++Version: v1.14. Date: 2026-09-24. Status: **CN body frozen** ( `_EN` mirror in `docs/DELIVERY_DIRECTIVE_EN.md`).
+ 
+ > **Multilingual note**: this file is a strict positional mirror of the CN body, maintained in step with it (updated after CN is frozen, to avoid bilingual rework during review); `docs/DELIVERY_DIRECTIVE.md` is authoritative and wins on any conflict (see §11.1).
+ > **Encoding**: this document and its `_EN` mirror must stay UTF-8 **with BOM** + **LF**.
+@@ -57,6 +57,7 @@ Version: v1.13. Date: 2026-09-23. Status: **CN body frozen** ( `_EN` mirror in `
+ | v1.11 | 2026-09-23 | **Added §1.7 execution freedom and escalation boundaries, §3.4 post-edit diagnostics scan, and §5.1 ⑧c wrap-up cleanup (slice `DIRECTIVE-V1.11`)**: ① §1.7 - execution freedom (single-file implementation choices / implementation approaches within the scope the contract has already defined / gate retries within an already-authorized package / refactors that do not affect contract semantics / completion of contract wording) and escalation boundaries (any change touching contract semantics / a side fix beyond the slice scope / budget quota exhausted / ambiguity in deciding "is this scope expansion or execution freedom" / the non-bypassable boundaries of §1.6), the principle "how to do it may be autonomous, what to do belongs to the user", with the record-keeping requirement re-checked by ⑦ final review; ② §3.4 - post-edit diagnostics scan (tools chosen by language / file category, no extension enumeration; any newly added warning must not be left to the next step; an "uncovered type" is not "exempt"; a diagnostics aggregator is to be implemented in `tools/gates/` with priority); ③ §5.1 gains **⑧c wrap-up cleanup** (after ⑧b and before ⑩, executed by the master, a fixed stage parallel to ⑨ native validation); ④ the §5.2 matrix gains a ⑧c column, §5.3 gains a ⑧c row, §7.1 gains a ⑧c note, and the §11.3 report structure gains a ⑧c record; ⑤ Appendix B.7.4's minimum reading set gains the new section numbers, and Appendix C gains this slice's ledger block C.0g. OB-22/23/24 were already registered at B4 wrap-up; this slice only references them and does not re-register them. | historically missing |
+ | v1.12 | 2026-09-23 | **DIRECTIVE-V1.12 (remediation of three rounds of third-party independent review + landing of user rulings)**: ① §0.1 authority table gains the ledger / ADR / gates / agents rows + a "gate criteria" terminology disambiguation (A1/A13/M10); §0.2 gains the MAJOR/MINOR ruling note (A4); §0.3 gains the "Slices in flight (affected)" column (A5); ② §1.2 gains the tier / probe quota / freedom-list fields (A11/L7); §1.6 gains the production-code semantic boundary and the §5.2 scope sentence, the `[id]` character set and the 20-code-point counting unit, multi-trigger hardening, and the §1.1 dividing line (A2/A3/A12/A14); §1.7 gains "the §1.6 boundary outranks §1.7.1" and the three-branch test (A3/A9); ③ §2.2 gains the modelId / UI display-name columns and Appendix B's seven call strings move to modelId (H1); R2.2/R2.4 corrected (H1/L8); §2.4 gains the blacklist-boundary note (L10); ④ §4.1 builds the closed-set verdict-line table, drops RE_, and makes bare tokens a format deviation (H2); §4.2's prohibition list excludes CONTRACTS/schema/fixtures and §5.1 gains ②a/②b (H3); ⑤ §5.1 ⑧c gains the frozen-evidence-pack exemption and §5.3 ⑧c echoes it (H5); the §5.2 high-risk row drops +blind (M1); §5.3 ⑧b gains the ⑦ re-review clause (M11); ⑥ §6.1 gains the focused-gate definition (M6); §6.3 G1 gains the stopped-state exemption (A10); ⑦ §7.1 list corrected (L1), §7.2 numbering completed (L3), §9.1 ⑥ exception (M8), the §9.2 counting rule (M7 in part); ⑧ §12.1 fixed denominator + [SLICE] startup handling (H4/A6); §12.2 gains the re-evaluation clause + the DR-FIX ruling record (H4); §12.4 closes OB-2/3/4/5/6, registers OB-28–OB-33, and §12.5's gap row flips to landed (M4); ⑨ Appendix B.0/B.6/B.7.1/B.7.4 synchronised (M2/H2/A2/M12); C.0d/C.0g gain correction notes (L9/M3); Appendix C gains the C.0h ledger block; ⑩ **disposition of the pre-commit third-party review (v1.12)**: its C1 (§0.3 log ↔ body consistency; 19 items claimed as changed but not landed) was **completed** per the user's ruling (R2.2/R2.4, B.0/B.6/B.7.1/B.7.4, §6.1, §6.3 G1, §7.1, §7.2 numbering, §9.1/§9.2, the §8.2 [ROUTINE] row, §12.1/§12.2/§12.4/§12.5, the C.0d/C.0g correction notes, the new C.0h), and its M8/M12/M13 plus L1–L4 landed in step (the §1.2 field table, the §4.1 PARTIAL handling, the §0.3 last-column reading, the §2.2 display-name example note, the §1.7.3 coverage boundary, the §5.2 size mapping; M12 and L3 share the §4.1 PARTIAL handling as their landing point); G6-5 and the three-layer consistency architecture are registered as OB-32 / OB-33; ⑪ **Follow-up note (fourth re-review, R6)**: of the 10 findings of the fourth re-review received after this row was finalised (1 High + 4 Medium + 5 Low, `tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R6.md`), N1 (re-evaluation object) and N2 (pilot deferral) landed per user ruling (§12.1 and §12.2), N3, N4, N6 and N10 are ledger- and wording-class fixes that landed, N5 was measured as not reproducible (G6-4 needs no whitelist entry), and N7, N8 and N9 are registered as OB-34 – OB-36 for the next slice; every remediation in this round came from an explicit user ruling or from ledger-metadata / wording-class fixes, so under the OB-11 exception ⑦ is **not re-run** (**Correction note (fifth round, R7)**: the actual basis of that exemption is a **direct user ruling**, which goes beyond the literal standard of the OB-11 exception - see OB-37); ⑫ **Follow-up note (fifth round, R7)**: of the fifth re-review's 9 findings (1 High + 4 Medium + 4 Low, `tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R7.md`), P1 (dual-track priority rule), P2 (deferral companions) and P3 (re-evaluation judge / anchor / count reading) landed per user ruling (§12.1 and §12.2), P4 and P5 are registered as OB-37 and OB-38, and P6, P7, P8 and P9 are ledger- and wording-class fixes that landed; **this round's remediation carries rule-semantics changes, so the OB-11 exception does not apply**, and ⑦'s third round is authorized in the same batch (narrowed input: only P1 / P2 / P3's rule changes and whether P4 / P5's registration is truthful). | no blocked slices; follow-on slices `GATES-G1G5` / `GATES-TIGHTEN` need write-back |
+ | v1.13 | 2026-09-23 | **DIRECTIVE-REVIEW-SATURATION (review saturation criterion)**: ① adds **§7.8 Review Saturation Criterion** - the **sole authority** for the three stop objects (third-party independent re-review / ⑦ round N / re-review after remediation) and the five situations (quota / user-authorized exception / OB-11 / OB-37 / pilot deferral); ② §6.3 lands two mechanical sub-checks, **G6-5** (section-reference resolution, the approximate criterion for OB-32) and **G6-6** (ledger status closed set, OB-38), and backfills the first status word of every §12.4 ledger row against the closed set; ③ closes **OB-34** (§7.2.2 heading), **OB-35** (§1.6 citing §7.2.1 ③), **OB-36** (the four elements in OB-14) and **OB-41** (§9.3 failure-mode row) within this slice, and splits out **OB-30 / OB-31 / OB-33**; ④ §12.5's "the §5.3 vs §7.5 conflict decision standard" flips to **Landed**; ⑤ Appendix C gains this slice's ledger block **C.0i**. The clauses are in §7.8, §6.3, §9.3, §12.4 and §12.5. It also registers OB-42 (no mechanical criterion for the verdict-line closed set), OB-43 (mojibake in evidence capture) , OB-44 (the review layer writing to disk) and OB-45 (the review layer's report of its data source). | no blocked slices; follow-on slices `GATES-G1G5` / `GATES-TIGHTEN` need write-back |
++| v1.14 | 2026-09-24 | **Ledger registration (step 0 of slice `DR-1`; authorised by the user 2026-09-24)**: §12.4 registers **OB-46 / OB-47 / OB-48 / OB-49 / OB-50** - respectively the G6-5 region-endpoint dependency, the `_EN` word-list selection rule, the freedom-list flush timing, the `tmp/` lifecycle and the `local-only` exemption, and the `sol-orchestrator` disposition with the generator-inclusion condition. **No new criterion, no change to any rule semantics, no change to the §6.3 criterion scope**; OB-50 gets its own row per the user's ruling (not merged into a same-family row). This row is a **by-product of the `DR-1` slice**, not a standalone directive-governance slice. | `DR-1` (write-back required: this slice's ledger and report must state that v1.14 is a by-product) |
+ ---
+ 
+ ## 1. Scope and Slice Model
+@@ -824,6 +825,11 @@ Observation items (phenomena not yet sufficient to change the directive) are reg
+ | OB-43 | 2026-09-23 | **A PowerShell pipe capturing a native command's UTF-8 stdout ⇒ mojibake in evidence files**: when PS 5.1 writes a native command's stdout to disk through a pipe (`Out-File` and the like), it decodes the UTF-8 bytes through the console code page (GBK) and then writes them as UTF-8 ⇒ Chinese text and ⑥/⑦-class symbols all turn into unrelated characters; measured in this slice: 808 mojibake markers in `remediation.diff` and 22 in `selftest-master.txt`, while a bare `git diff HEAD >` redirect stays clean. | **To do**: fixed immediately in this slice - evidence files are written straight from node (`execFileSync` + `fs.writeFileSync(..., 'utf8')`) and every file is re-checked so that mojibake markers = 0; §9.3 now carries this failure-mode row; later slices keep this capture method |
+ | OB-44 | 2026-09-23 | **A review-layer role wrote to disk itself (a literal deviation at the role boundary)**: in this slice the ⑤ re-review wrote its report to `tmp/v113/review-r2.md`, whereas §2.2 states that a review-layer role's "may write files = **No**"; that role file's `tools` list holds only `read` / `search`. Classification: **a literal deviation, not a substantive violation** (the content is its report, no product text was polluted, `tmp/` is not committed, the master has confirmed it). | **To be discussed**: ① how a review-layer report is delivered (transcribed by the master vs allowed to write under `tmp/`); ② a note - G6-5's rule text says "appendix C.0–C.0i" while the implementation reads "C.0 up to but excluding C.1", **equivalent today**, and any future C block must be described in step. **This slice neither amends §2.2 nor re-runs ⑤** (its conclusions hold and its content was not polluted); this round's ⑥/⑦ carry a hard constraint written into the task package by the master - "create, modify or delete no file; return the report as your final message" - **without amending the directive**. Both items are left for the next slice to assess |
+ | OB-45 | 2026-09-23 | **A review-layer report misstates its "data source"**: this slice's ⑥ independent scan described "**reading** the raw output the master wrote to disk" as "**running** `node tools/gates/gate.js` / `selftest`", whereas that role file's `tools` list holds only `read` / `search` and it cannot run commands; the quoted values match the on-disk evidence string for string, yet that phrasing gives the impression of "independent execution", while §7.7's A11 / A12 depend precisely on **traceable provenance**. | **To be discussed**: ① whether the ⑥ / ⑦ task package should explicitly write "read-only paths + **make no claim of running** `node` / `gate` commands, citing only the paths the master wrote to disk"; ② whether the wording template for the "data source" statement in ⑥ / ⑦ reports needs to be unified. **This round does not change the ⑥ / ⑦ prompt template** (already covered as a hard constraint inside this slice's task package); the rule layer is left for the next slice to assess |
++| OB-46 | 2026-09-24 | **G6-5's region endpoint relies on the `### C.1` heading staying stable**: G6-5 judges only added lines inside "the §0.3 table region plus the Appendix C ledger region (from the top up to the `### C.1` heading)"; once that endpoint heading is renamed or moved the region shifts, and the criterion itself has no assertion that could notice (an empty region passes the sub-check quietly). | **To be discussed**: whether to add an endpoint self-check to G6-5 (a missing endpoint must fail rather than degrade to an empty region); evaluate together with `GATES-TIGHTEN` |
++| OB-47 | 2026-09-24 | **The `_EN` word list is selected by the `_EN.md` filename suffix**: G6-5 / G6-6 pick the English word list from the filename string rather than from a language declared by the document; renaming the file or adding a third language would mismatch quietly. | **To be discussed**: whether to select by the language marker declared in the document header; evaluate in the next §6.3 revision |
++| OB-48 | 2026-09-24 | **The freedom list has no explicit flush step in §5.1**: measured during directive v1.13 - if the list is written after ⑦ then ⑦ cannot audit it (the first occurrence of a §1.7.3 timing deviation); ⑦ recommends "flush it after ⑥ and before ⑦, and include it in ⑦'s input pack". | **To do**: add that step in the next §5.1 revision (with the "after ⑥ / before ⑦" timing and the input-pack declaration) |
++| OB-49 | 2026-09-24 | **`tmp/` has no cleanup mechanism and `local-only` is treated as a permanent exemption**: `local-only` was meant for "temporary artifacts that are not archived", yet it has neither an archive target path nor a cleanup point in time ⇒ in practice it becomes a permanent exemption; `tmp/` carries both "review evidence awaiting archival" and "one-off drafts" with no mechanism to tell them apart. | **To do**: define the cleanup timing and the archive target for `local-only` inside `DIRECTIVE-LEDGER-ARCHIVE` (dual theme: ledger archival + `tmp/` lifecycle) |
++| OB-50 | 2026-09-24 | **The `sol-orchestrator` disposition and the generator-inclusion condition were never registered in §12.4**: ① historical conclusion - that orchestrator has no automatic orchestration effect on the current master (its own configuration states that a non-Sol master session means manual mode); the only real effect is **visibility** (the master may choose to call it), and calling it carries three risks: its `tools` include `agent` so it forms a call chain (above the depth limit), its `model` is on the §2.4 blacklist, and without an explicit `model` it falls back silently to the session master model; the conclusion is **do not use it**, already reflected as a §2.4 prohibition. ② future-extension condition - the role files under `.github/agents/` are generated from that orchestrator's `_config.yaml`, so if the generator is ever enabled, **the generation source and scripts must be brought under version control first**, otherwise the role set is not reproducible. | **To be discussed**: the conclusion is settled, but when to write the generator-inclusion condition into §2.5 is not; evaluate in the next §12 revision or in a role-set related slice |
+ 
+ > **This slice's (`GATES-EXT`) ⑦ round exception (user pre-authorization, 2026-09-22)**: the ⑦ re-review (round 2) reported Medium+, which forces a re-review under §5.3 and, under the pre-authorization, entitled a **round 3** (`GPT-5.3-Codex`, **valid for this slice only**); round 3 returned `PASS WITH FIXES` with no Medium+ (one Low only, i.e. OB-20). **The authorization does not generalize**: other slices stay on §7.5 (one final review + one re-review), and a round 4 is never automatic.
+ 
+diff --git a/docs/t027/REMAINING_SLICES.md b/docs/t027/REMAINING_SLICES.md
+index 1afaf5d..b0fa6b1 100644
+--- a/docs/t027/REMAINING_SLICES.md
++++ b/docs/t027/REMAINING_SLICES.md
+@@ -524,6 +524,22 @@ A6 ② 进度（第 2 批，2026-09-15）：
+ 
+ **收尾结论（⑧b，2026-09-22）**：四行 DR 由**同一修复方案**统一消除，并以 **3 连推首跑双腿全绿**验证（run `35646859765` / `35647349443` / `35648196443`）；**验收①–⑥ 全部达成**（含 `-count=10` 全绿、变异反证甲-i/甲-ii、门禁 `TOTAL_FAIL=0`）；**§12.1 试点指标**中“缺陷自捕获率”**未达标**（2/5 = 40%，目标 ≥ 3/4，原因与行动见报告 §9），其余指标达成。**本片新增未登记项**：**审查包完整性与台账一致性两类缺 G1–G5 机械判据** ⇒ 报告 §9 建为下一个 `[SLICE]` 的候选内容。
+ 
++### DR-1 切片定义回写（2026-09-24）
++
++| 字段 | 内容 |
++| --- | --- |
++| 标识 | `DR-1`（业务切片验证，非准则治理；触发词 `切片:DR-1`） |
++| 目标 | 使 `prfrail ai check` 在同一 pin（1.0.83，sha256 `d3f3bb7b…`）上产出 `available` 记录（`requestsUsed=1`、退出码 0、无 `reason`），并与 B1 修复前基线逐字段对照 |
++| 依赖 | 代码侧无前置；验证侧 1 次真实 `ai check`（须同轮探针授权）；审查侧按 B1 登记口径做独立审查；环境侧 host 凭据在位（2026-09-24 只读确认：凭据管理器含 `https://github.com:larsonzh.copilot-cli`） |
++| 规模 | S |
++| 步骤 | ①架构（V4 Pro）→ ②b 代码（`--max-ai-credits` 取 `max(30, maximumRequests)`，floor 常量 30）→ ③测试与变异检验 → ④门禁 → ⑤预审 → ⑥独立扫描 → ⑦终审（`deepseek-v4-pro`，降级，见 §12.4 登记）→ ⑧a/⑧b 文档 → ⑨原生验证（1 次真探针）→ ⑩停点；②a 协议先行不触发（R1=A） |
++| 现状缺口 | 产品可用性入口对真实候选始终为 `unknown` ⇒ 依 CONTRACTS §7 的 fail-closed 预检，真实候选上的 AI 入口无法准入；定位成本已由 B1 实证（9 次尝试 / 6 个付费请求） |
++| 交付物 | `internal/adapters/ai_probe_copilot.go` 与其测试；报告 `docs/validation/dr-1-availability-probe-floor{,_EN}.md`；证据包 `docs/validation/evidence/dr-1-2026-09-24/`（链配置 + 修复前后记录 + argv 与 stderr 捕获 + 校验清单）；本台账与 `DEV_PLAN{,_EN}` 回写 |
++| 验收证据 | ① 新记录严格解码通过且 `status=available`、`requestsUsed=1`、无 `reason`；② `ai check` 退出码 0；③ argv 断言 `--max-ai-credits=30` 且 `--max-requests` 语义不变；④ 修复前后对照表（B1 基线 `unknown` 与 0 次请求 ↔ 新记录）；⑤ 变异检验：floor 还原即红；⑥ 门禁全绿 |
++| 边界 | 改动面限 `ai_probe_copilot.go` 与其测试（`ai.go` 零改动）；不改记录字段与 schema；不放宽任何 fail-closed 分支；CONTRACTS §7 的措辞与实测之间的差异如实标注且本片不修；探针额度 5（目标 1）；commit 与 push 须同轮授权；不推 gitee |
++
++**起跑（2026-09-24）**：步骤 0 已落地——链配置 `docs/validation/evidence/dr-1-2026-09-24/proofrail.chain.json` 经 `config explain` 自证 `profileConfigHash` 与主基线逐字一致，模型取非黑名单的 `mai-code-1.1-flash`。
++
+ ## 完成记录（追加）
+ 
+ | 日期 | 切片 | 完成摘要 | 证据 |
+diff --git a/docs/t027/REMAINING_SLICES_EN.md b/docs/t027/REMAINING_SLICES_EN.md
+index 6d26a82..08258d1 100644
+--- a/docs/t027/REMAINING_SLICES_EN.md
++++ b/docs/t027/REMAINING_SLICES_EN.md
+@@ -511,6 +511,22 @@ Boundaries: this is a follow-up platform slice and must not rewrite the Windows
+ 
+ **Closing conclusion (⑧b, 2026-09-22)**: the four DR rows were removed by **one single fix** and verified by **3 consecutive pushes green on the first attempt on both legs** (runs `35646859765` / `35647349443` / `35648196443`); **acceptance items ①–⑥ are all met** (including `-count=10` all green, the mutation counter-evidence 甲-i/甲-ii, and the gates `TOTAL_FAIL=0`); among the **§12.1 pilot metrics** the "defect self-capture rate" **was not met** (2/5 = 40 %, target ≥ 3/4; cause and follow-up in report §9) while the others were met. **A newly registered gap in this slice**: **review-bundle completeness and ledger consistency have no G1–G5 mechanical criteria yet** ⇒ report §9 proposes them as candidate content for the next `[SLICE]`.
+ 
++### DR-1 slice-definition write-back (2026-09-24)
++
++| Field | Content |
++| --- | --- |
++| Id | `DR-1` (business-slice validation, not directive governance; trigger word `SLICE:DR-1`) |
++| Objective | make `prfrail ai check` produce an `available` record on the same pin (1.0.83, sha256 `d3f3bb7b…`) with `requestsUsed=1`, exit code 0 and no `reason`, compared field by field with the B1 pre-fix baseline |
++| Dependencies | no code prerequisite; one live `ai check` on the verification side (needs a same-turn probe authorisation); independent review per the B1 registration; host credential present (read-only check 2026-09-24: Credential Manager holds `https://github.com:larsonzh.copilot-cli`) |
++| Size | S |
++| Steps | ①architecture (V4 Pro) → ②b code (`--max-ai-credits` = `max(30, maximumRequests)`, floor constant 30) → ③tests and mutation checks → ④gates → ⑤pre-review → ⑥independent scan → ⑦final review (`deepseek-v4-pro`, downgraded, see the §12.4 entry) → ⑧a/⑧b documentation → ⑨native validation (one live probe) → ⑩stop point; ②a contract-first is not triggered (R1=A) |
++| Current gap | the product availability entry point always returns `unknown` for the real candidate ⇒ under the CONTRACTS §7 fail-closed preflight, AI entry points on that candidate can never admit; the diagnosis cost is already measured by B1 (9 attempts / 6 paid requests) |
++| Deliverables | `internal/adapters/ai_probe_copilot.go` and its tests; the report `docs/validation/dr-1-availability-probe-floor{,_EN}.md`; the evidence bundle `docs/validation/evidence/dr-1-2026-09-24/` (chain config + before/after records + argv and stderr captures + checksum list); write-back to this ledger and to `DEV_PLAN{,_EN}` |
++| Acceptance evidence | ① the new record decodes strictly with `status=available`, `requestsUsed=1` and no `reason`; ② `ai check` exit code 0; ③ the argv assertion `--max-ai-credits=30` with unchanged `--max-requests` semantics; ④ the before/after table (the B1 baseline `unknown` at 0 requests vs the new record); ⑤ mutation check: restoring the old floor turns it red; ⑥ all gates green |
++| Boundaries | changes limited to `ai_probe_copilot.go` and its tests (`ai.go` untouched); no record-field or schema change; no fail-closed branch is relaxed; the wording-versus-measurement difference in CONTRACTS §7 is recorded as-is and not fixed here; probe budget 5 (target 1); commit and push need a same-turn authorisation; gitee is never pushed |
++
++**Start (2026-09-24)**: step 0 landed — the chain config `docs/validation/evidence/dr-1-2026-09-24/proofrail.chain.json` self-proves through `config explain` that its `profileConfigHash` matches the main baseline exactly, with the non-blacklisted model `mai-code-1.1-flash`.
++
+ ## Completion log (append-only)
+ 
+ | Date | Slice | Completion summary | Evidence |
+diff --git a/internal/adapters/ai_probe_copilot.go b/internal/adapters/ai_probe_copilot.go
+index f8e91d2..d142ddb 100644
+--- a/internal/adapters/ai_probe_copilot.go
++++ b/internal/adapters/ai_probe_copilot.go
+@@ -16,6 +16,12 @@ const (
+ 	copilotCLIProbeReply  = "PONG"
+ )
+ 
++// copilotCLICreditFloor is the candidate CLI's documented minimum for
++// --max-ai-credits (B1 probe #5: "Use at least 30 AI credits"). It is a
++// candidate/platform fact, not the product request budget: the product budget
++// stays the caller's maximumRequests and is still enforced one request later.
++const copilotCLICreditFloor = 30
++
+ var ErrInvalidCopilotCLIProbe = errors.New("invalid Copilot CLI probe")
+ 
+ type CopilotCLIProbeInvocation struct {
+@@ -108,7 +114,7 @@ func copilotCLIProbeArgs(model, workingDirectory string, maximumRequests int) []
+ 		"--model", model,
+ 		"--output-format", "json",
+ 		"--stream", "on",
+-		"--max-ai-credits", strconv.Itoa(maximumRequests),
++		"--max-ai-credits", strconv.Itoa(max(copilotCLICreditFloor, maximumRequests)),
+ 		"--disable-builtin-mcps",
+ 		"--disallow-temp-dir",
+ 		"--no-custom-instructions",
+diff --git a/internal/adapters/ai_probe_copilot_test.go b/internal/adapters/ai_probe_copilot_test.go
+index 811758a..15b1064 100644
+--- a/internal/adapters/ai_probe_copilot_test.go
++++ b/internal/adapters/ai_probe_copilot_test.go
+@@ -3,6 +3,7 @@ package adapters
+ import (
+ 	"context"
+ 	"slices"
++	"strconv"
+ 	"strings"
+ 	"testing"
+ )
+@@ -60,7 +61,7 @@ func TestCopilotCLIProbeBuildsIsolatedDeepSeekSmoke(t *testing.T) {
+ 		"--model", "deepseek-flash",
+ 		"--output-format", "json",
+ 		"--stream", "on",
+-		"--max-ai-credits", "1",
++		"--max-ai-credits", "30",
+ 		"--disable-builtin-mcps",
+ 		"--disallow-temp-dir",
+ 		"--no-custom-instructions",
+@@ -272,3 +273,72 @@ func TestCopilotCLIProbeMapsTimeoutWithoutRawError(t *testing.T) {
+ 		t.Fatalf("unexpected result: %+v", result)
+ 	}
+ }
++
++func copilotCLIProbeCreditArgument(t *testing.T, args []string) string {
++	t.Helper()
++	for index, argument := range args {
++		if argument != "--max-ai-credits" {
++			continue
++		}
++		if index+1 >= len(args) {
++			t.Fatal("--max-ai-credits carries no value")
++		}
++		return args[index+1]
++	}
++	t.Fatal("--max-ai-credits is missing from the probe arguments")
++	return ""
++}
++
++func TestCopilotCLIProbeAppliesCreditFloorWithoutChangingRequestBudget(t *testing.T) {
++	for name, maximumRequests := range map[string]int{"floor-raised": 1, "floor-exact": copilotCLICreditFloor, "above-floor": 40} {
++		t.Run(name, func(t *testing.T) {
++			executor := &fakeCopilotCLIProbeExecutor{execution: CopilotCLIProbeExecution{
++				Outcome:               "exited",
++				ExitCode:              0,
++				ResultSeen:            true,
++				ResultExit:            0,
++				ResultUsageSeen:       true,
++				Reply:                 "PONG",
++				RequestsUsed:          1,
++				UsageSeen:             true,
++				UsageUserRequests:     1,
++				UsageProviderRequests: 1,
++				Evidence:              []string{queueHashOne},
++			}}
++			probe := CopilotCLIProbe{Executable: "copilot.exe", WorkingDirectory: `C:\probe`, Executor: executor}
++			result, err := probe.Probe(context.Background(), deepSeekProfile(), []byte("not-a-real-secret"), "agent-runner-cli", maximumRequests)
++			if err != nil {
++				t.Fatal(err)
++			}
++			wantCredits := maximumRequests
++			if wantCredits < copilotCLICreditFloor {
++				wantCredits = copilotCLICreditFloor
++			}
++			if got := copilotCLIProbeCreditArgument(t, executor.invocation.Args); got != strconv.Itoa(wantCredits) {
++				t.Fatalf("unexpected --max-ai-credits: got %q want %d", got, wantCredits)
++			}
++			if result.Status != "available" || result.RequestsUsed != 1 {
++				t.Fatalf("the product request budget must stay unchanged: %+v", result)
++			}
++		})
++	}
++}
++
++func TestCopilotCLIProbeCreditFloorKeepsCliRejectionFailClosed(t *testing.T) {
++	executor := &fakeCopilotCLIProbeExecutor{execution: CopilotCLIProbeExecution{
++		Outcome:     "exited",
++		ExitCode:    1,
++		FailureCode: "policy_blocked",
++	}}
++	probe := CopilotCLIProbe{Executable: "copilot.exe", WorkingDirectory: `C:\probe`, Executor: executor}
++	result, err := probe.Probe(context.Background(), deepSeekProfile(), []byte("not-a-real-secret"), "agent-runner-cli", 1)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if result.Status == "available" || result.Reason != "policy_blocked" {
++		t.Fatalf("a CLI rejection must stay fail-closed: %+v", result)
++	}
++	if got := copilotCLIProbeCreditArgument(t, executor.invocation.Args); got != strconv.Itoa(copilotCLICreditFloor) {
++		t.Fatalf("the floor must still be applied when the CLI rejects: got %q", got)
++	}
++}
+diff --git a/docs/validation/evidence/dr-1-2026-09-24/proofrail.chain.json b/docs/validation/evidence/dr-1-2026-09-24/proofrail.chain.json
+new file mode 100644
+--- /dev/null
++++ b/docs/validation/evidence/dr-1-2026-09-24/proofrail.chain.json
+@@ -0,0 +1,54 @@
++{
++  "schemaVersion": "1.0.0",
++  "chain": {
++    "id": "dr-1-availability-probe",
++    "profile": "minimal"
++  },
++  "tasks": [
++    {
++      "id": "verify-dr-1-scope",
++      "review": "manual",
++      "steps": [
++        {
++          "id": "record-dr-1-scope",
++          "kind": "noop",
++          "reason": "DR-1 chain configuration input for the ai check availability probe"
++        }
++      ]
++    }
++  ],
++  "workspace": {
++    "components": [
++      {
++        "id": "dr-1-evidence",
++        "root": ".",
++        "languageScopes": [
++          {
++            "id": "dr-1-main",
++            "language": "generic",
++            "harness": "generic-standard",
++            "toolchain": "shell-basic",
++            "targets": ["source"]
++          }
++        ]
++      }
++    ]
++  },
++  "ai": {
++    "profiles": [
++      {
++        "profileId": "copilot-cli-host",
++        "providerType": "github",
++        "model": "mai-code-1.1-flash",
++        "authMode": "host"
++      }
++    ],
++    "channels": [
++      {
++        "channel": "agent-runner-cli",
++        "profileId": "copilot-cli-host"
++      }
++    ]
++  }
++}
++

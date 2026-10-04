@@ -1,0 +1,205 @@
+# B4 · AT-23 E2E 场景完整方案（① 架构师交付物）
+
+> 签署：① 架构师（`deep-reasoner` / `DeepSeek V4 Pro`）。依据：`tmp/b4/SLICE-DEFINITION.md` 九项裁决 + 用户微调。**本交付为只读分析**：全部事实均来自下述已读文件，未执行任何命令、未修改任何文件；凡无法由文件确定的项，均在 §9 显式标注。
+
+**已读关键事实源**：`tmp/b4/SLICE-DEFINITION.md`、`docs/t027/REMAINING_SLICES{,_EN}.md`（B4 段 + 已知缺陷表 + 累计表 + 完成记录）、`docs/TEST_STRATEGY.md`（AT-23 行 + §3 证据要求）、`docs/validation/s1-exit.md`、`docs/validation/t026-agent-runner-contract.md`、`docs/validation/B2-EXTERNAL-ENFORCEMENT.md`（§7–§10）、`docs/validation/t027-offline-process.md`、`docs/DEV_PLAN.md`（T018 行 + T027 段）、`docs/DELIVERY_DIRECTIVE.md`（§5.1/5.2/5.3/6.1/6.3/7.2/7.5/9.3/11/12.4）、`docs/S1_RELEASE_NOTES.md`、`docs/OPERATIONS.md`；代码 `internal/console/runtime.go`、`internal/chain/{engine.go,router.go,agent_runner_terminal.go,agent_runner_terminal_route.go}`、`internal/adapters/{agent_runner_pinned_cli.go,agent_runner_run.go,agent_runner_intent.go,agent_runner_replay_dispatcher.go}`、`tools/agent-stub/main.go`、`harnesses/go/harness.json`。
+
+---
+
+## 0. 两个必须先摆上桌的硬事实（决定本方案骨架）
+
+**F1 — 当前 HEAD `4026762` 的 `prfrail` CLI 无法驱动 AgentRunner step。**
+`internal/console/runtime.go` 的 `ExecuteNoopRun` 只装配 `chain.Options` 的 noop 端口族（`Baselines/Workspaces/Steps/Acceptance/Reviewer/Publisher/Stopper/Reconciler` 全部指向 `localRuntime`），`Options` 结构（`internal/chain/engine.go`）**没有** AgentRunner 相关字段；`RunPostflight`（`runtime.go:207-212`）是 fail-closed 桩；`StepRouter`（`internal/chain/router.go`）与 `ExecuteAgentRunner` 只在 `internal/chain/router_test.go` 被使用——即 T027 的**控制台装配尚未实现**（与 `docs/DEV_PLAN.md` T027 行「replay 尚未接入 `AgentRunnerPort` 或 Engine」「容器内工具执行路径与 AgentRunner 集成仍未实现」一致）。`docs/OPERATIONS.md` 明言：`run` 目前只支持 noop-only 链，遇 `code/build/verify` fail-close。
+
+**F2 — 当前无任何可合法启动的真实 AI 候选。**
+B1/B2 冻结结论：Copilot CLI 1.0.83/1.0.85 不兼容且「固定候选仍不得作为 AgentRunner 启动」（DEV_PLAN T027 行）；BYOK `deepseek-anthropic`「未评估、未排除」；计费调用证据被 B2 §8.3（零能力容器内候选自身失败）/§8.4（GitHub token 端点 WAF 403）阻断，且 DR-1 使 `ai check` 探针无法驱动候选（`internal/adapters/ai_probe_copilot.go:111` 与 `internal/console/ai.go:46` 的 `--max-requests` 冲突）。
+
+**这两个事实决定**：B4 的驱动形态按决策 2 落地为「**脚本化装配式 harness（复用生产包）+ 真实 `prfrail` CLI 承担其当前可达的诚实证据 + 真实文件系统**」；五面的受管负载为**透明声明的固定确定性 CLI**（`tools/agent-stub`，pin `agent-stub-0.1.0`），**不冒充 AI 候选、不宣称候选兼容**。二者与决策 2 原文的张力、以及用户必须裁决的事项，完整列入 §9(b)，**不得沉默降级**。
+
+---
+
+## 1. 范围与宿主定义
+
+### 1.1 「真实宿主」唯一定义（B4 判定口径）
+
+- **机器**：本机 Windows 11（`docs/validation/t027-offline-process.md` §10 原生实验同一宿主；具体 build 在 ③ 执行时以 `cmd /c ver` + `Get-ComputerInfo` 采集并写进报告环境摘要，**不在此预写**）。
+- **进程链**：真实 Go 工具链（`go.mod` 声明 1.22，本机实测 1.27.0 见 `docs/TEST_STRATEGY.md`）构建的**真实制品**：`cmd/prfrail`、`tools/b4-e2e`（本片新建装配 harness）、`tools/agent-stub`（受管负载）。受管进程经 `internal/guard`（Job Object）真实 spawn，非 `os/exec` 直启、非 mock。
+- **文件系统**：真实 NTFS 本卷上的隔离目录（见 1.2），非 `t.TempDir`、非内存 FS。run root / workspace / store / 证据目录全部真实落盘。
+- **状态机**：真实 `internal/chain.Engine` + 真实 `internal/evidence` 事件日志 + 真实 `internal/adapters.AgentRunnerReplayStore`（`runs/<requestId>/` 工件 + `launches/` + `terminals/`）+ 真实 `internal/tickets.CostLedger`。
+- **时间**：真实墙钟（看门狗用 `time.Now().UTC()`），超时/宽限不做时钟模拟。
+
+### 1.2 目录布局（`tmp/b4/**`，全部 `local-only`，gitignored）
+
+```
+tmp/b4/
+  bin/prfrail.exe            # go build ./cmd/prfrail 产物
+  bin/b4-e2e.exe             # go build ./tools/b4-e2e 产物
+  bin/agent-stub.exe         # go build ./tools/agent-stub 产物
+  input/b4-chain.json        # 真实任务链定义（taskdef 合规；validate 接受、preview 显示 executable 阻断）
+  input/request-record.json  # AgentRunner request 记录（含 effectMapping/授权/预算绑定摘要）
+  runs/<face-id>/<pos|neg>/  # 每次运行：run root（events/ 状态事件、agent-runner-replay/、managed-process.identity.json）
+  evidence/<face-id>/<pos|neg>/   # 本次运行收集的原始工件 + verdict.json + stdout/stderr + exit code
+  SHA256SUMS.txt             # 对 tmp/b4/** 全量字节清单（供自证）
+  pack-verdict.json          # 证据包总体统计（机读）
+```
+
+### 1.3 明确排除（写入报告 §排除项）
+
+1. **Linux 原生验证** → `C1`（决策 1）；B4 只产出 Windows 证据，报告写明「Linux 属 C1，本片不采集、不推断」。
+2. **SessionBridge silent / visible**：五面均为本地受管进程面，不投递 IPC；visible 属 T028/AT-24（与 `REMAINING_SLICES` C1 段排除措辞一致）。
+3. **真实 AI 候选启动与计费调用**：受 F2 与 B2 §8.3/§8.4 约束（见 §9(b) 待裁决）；B4 全程零模型调用、零付费 provider 请求、零代理流量——**因此不需要 AppContainer/enforcement-proxy**（B2 边界本身已由 B2 证明；「边界接入产品」属后续切片，报告如实引用 B2 §9）。
+4. **不触碰**：`docs/DELIVERY_DIRECTIVE.md` 准则本体、G1–G5 判据语义、`.agent.md` 角色文件、`.github/workflows/**`、`docs/CONTRACTS{,_EN}.md`（除非 §9(b)#4 获用户授权，默认不改）、`tools/agent-probe/enforcement-proxy/**`。
+5. **DR-6**（`TestGuardExecutorCleansDescendantsAfterParentExit` 单次本地抖动、无 CI run）：按已知缺陷表口径「观察中、不阻断 B4」，B4 报告 §已知缺陷列示。
+
+---
+
+## 2. 五面覆盖矩阵
+
+**驱动形态总判**：五面**全部脚本化**（PowerShell 驱动脚本 + Go harness + 确定性负载），理由——① 五面的故障注入要求逐字节可复现的负载行为（`agent-stub` 的 `-mode/-no-marker/-torn-usage/-sleep/-exit-code` 标志由 `tools/agent-stub/main.go` 逐字确认存在）；② 真实 AI 候选按 F2 不可启动；③ 决策 2 微调要求「逐面写明理由 + 替代证据形式」——本方案对**每个无法用真实 AI 候选的面**都在表中给出理由与替代证据形式。**无任何面需人工操作**；决策 3 微调要求反向证据可复现——每次反向运行**同命令重跑 1 次**，两次 verdict 类一致才记「反向」，否则记「**疑似反向**」（报告字段 `reproducibility`）。
+
+**判定口径（每面）**：正向 1 次 + 反向 1 次；正向 = 机制按契约行为；反向 = 注入故障被 fail-closed 捕获。判定依据逐项引用 CONTRACTS §7 冻结句（`docs/CONTRACTS.md` 第 205/217/221/225/227/229/231 行附近各段）。
+
+| 面 | 场景（脚本化） | 正向：输入 / 命令 / cwd / 期望退出码 / 期望工件 / 判过 | 反向（注入故障）/ 期望可观察失败 / 可复现性 |
+|---|---|---|---|
+| **F1 隔离 workspace** | 装配 harness 经 `AgentRunnerPinnedCLILauncher` 在 `tmp/b4/runs/f1/…/workspace/` 启动负载 `-mode run -sleep 2s`；证据经 `PROOFRAIL_EVIDENCE_DIR` 重定向到 `<runRoot>/agent-runner-replay/runs/<requestId>/` | 输入摘要 = b4-chain.json + request-record.json 的 sha256；命令 = `.\bin\b4-e2e.exe -face f1 -case pos -run-root …`（由 `run-faces.ps1` 逐字记录）；cwd = `tmp/b4`；期望 harness 退出码 0 且 verdict=`completed`；工件 = `manifest.pre/post.json`、`diff.json`、`logs/stdout|stderr.log`（末尾 `proofrail-run-complete` 标记）、`events.jsonl`、`usage.json`（闭形状 `{calls,tokens,durationMs}`）、`managed-process.identity.json`；判过 = workspace 树除负载自写文件外无变化（pre/post manifest diff 精确等于负载自报集）+ 五枚事实摘要齐备且两两互异 | 负载 `-mode mutate-workspace` 在 workspace 写入 `agent-stub-mutation.txt` → postflight 重扫必须**不得**判 completed（或 diff 精确含该文件）；期望 = 事实门槛拒绝或 postflight 拒绝，**绝不**产生 task PASSED；可复现 = 同命令重跑，diff 逐字节相同 |
+| **F2 timeout** | 负载 `-mode hang -sleep 30s`，`LaunchRequest.Timeout=5s`、`Grace=2s`；看门狗（`agent_runner_timeout.go`）判负后 `WaitAgentRunnerProcess` 上界内验证进程树消失 | 正向：verdict=`uncertain`（树已停 + 无 Facts）；退出码 0（harness 侧）但**终局非 completed**；工件 = 停机证据摘要 + 原因摘要入回执；判过 = 超时在 Timeout 附近触发（时间断言只证区间，同 A6「±50ms 下界」口径）+ 回执含 `stop` 证据 + 无 Facts | 反向 = 负载 `-mode spawn -child-life 1h -sleep 5s`（派生长命子进程）超时后停机必须把**整棵进程树**带走；期望 = `child` PID 在验证窗口内消失（`processGroupAlive` 路径）；若任一轮树残留 → 记「疑似反向」并升级 ⑤；可复现 = 重跑两次残留进程集合均空 |
+| **F3 日志缺失** | 负载 `-mode run -no-marker`（`tools/agent-stub/main.go` 的 `noMarker` 标志：写日志但省略完整性标记） | 正向：verdict=`uncertain`（`LogHash` 门槛缺口）；判过 = 回执原因摘要可解析、**非** completed、Facts=nil | 反向 = 完整 `run` 模式（标记在）判 `completed`——证明缺口判别力是**真判别**而非全拒（对照口径同 B3a 双向标定）；再以 `-torn-usage`（撕裂 usage）复证缺口门槛；期望 = 前者 completed / 后者 uncertain；可复现 = 两个方向的 verdict 类各重跑一致 |
+| **F4 未知恢复** | 负载 `-mode crash -exit-code 7 -sleep 3s` 或外部 `StopAgentRunnerProcess` 在固定延时后停机；随后**重启 harness 进程**（新进程、同一 run root）走 `Recover` | 正向：重开后 step 处于 `TERMINAL_PENDING`/`RUNNING` 不确定清单（`internal/chain/recover.go:23-25` 含 `TERMINAL_PENDING`），chain `PAUSED`（`recovery-uncertain`），**零 relaunch**（launches 回执已存在 → `unknown-block`）；判过 = 进程清单无第二实例 + chain 不离开 PAUSED + 无新 launch-intent | 反向 = 伪造 `priorCompletionHash` 不匹配的 resume 终局 → `SubmitAgentRunnerTerminal` 以 `ErrAgentRunnerResumeContinuityUnproven` 零写拒绝；期望 = 事件日志字节不变（拒绝前后 hash 相等）；可复现 = 两次注入均拒绝且日志摘要相同 |
+| **F5 exit 0 后重扫 + 独立 gates/review** | 完整闭环：负载 `-mode run` 干净退出 0 → completed 终局 → `TERMINAL_PENDING→PASSED` → **真实 postflight 端口**（harness 实现，重捕 manifest + 与父快照算 diff + 范围/秘密/类型/副作用扫描，复用 `internal/snapshot` + `internal/gates`）→ `REVIEW_PENDING` → acceptance/freeze → gate hook（真实命令作用于 workspace）→ review 端口 → promotion → task PASSED | 正向：verdict=`completed` 且 chain 走完全部下游（`REVIEW_PENDING`→…→`PASSED`）；判过 = 事件日志可见 `postflight` 判定事件 + gate/review/promotion 各转移 + **exit 0 本身不产生 PASSED**（PASSED 唯一写点在 `runTask` 尾部）；同时按 A5 报告 §残余边界记录**「engine gates 排在 `Acceptance.Accept` 之前 vs CONTRACTS §7『freeze 后跑 gates』」的对账结论**（见 §5 风险 R5） | 反向 = 完成并结算后篡改 workspace（写已知字节文件）再重放 postflight → 必须 `postflight-rejected` → task `REPAIR_PENDING` + chain `PAUSED`（`STEPS_RUNNING→REPAIR_PENDING` 仅 postflight 拒绝使用）；期望 = 绝不 REVIEW_PENDING/PASSED；可复现 = 同篡改字节重跑，verdict 类一致 |
+
+**每面用例统计口径**：5 面 ×（正 1 + 反 1）= 10 次核心运行；F1/F2/F3/F4 反向各附带 1 次对照重跑（可复现性证明）与 F4 反向 1 次拒绝前后 hash 对照——**报告只记实际执行数**（G6-4 见 §7，不得预写总数）。
+
+---
+
+## 3. 证据包结构（`docs/validation/t027-at23-e2e.md` + `_EN`）
+
+报告章节（双语逐句对齐；每一节编号与行数对称由 G3 判）：
+
+1. **变更概要与结论**：一句话结论 + 显式「AT-23 未通过 / 机制腿 E2E 完成 / 候选兼容性仍 blocked（B1/B2 冻结）」。
+2. **输入摘要**：`b4-chain.json`、`request-record.json`、三个 `bin/*.exe` 的 sha256（`agent-stub` 同时给 `--version` 回显 `agent-stub-0.1.0`）。
+3. **环境摘要**：`cmd /c ver`、Go 版本、git HEAD、工具链路径、本机架构——执行时采集，不预写。
+4. **命令与 cwd**：逐面逐次记录**完整命令原文 + cwd + 退出码**（含 PowerShell 驱动脚本调用行）。
+5. **用例统计**：每面 verdict 类、正/反、可复现性、对照重跑结论（表格）。
+6. **失败证据**：凡反向运行，附注入方式描述 + 可观察失败点（事件日志关键转移 + 工件路径 + 摘要）。
+7. **跳过原因**：任何未执行项必须写「跳过原因 + 替代证据形式」（本方案预计：真实 AI 候选面跳过——原因 F2，替代证据 = 装配 harness + 固定确定性负载 + 显式不宣称候选兼容）。
+8. **已知缺陷列示**：DR-6（观察中、不阻断）与 DR-2…DR-5（DR-FIX 已修，3 连推首跑绿 run `35646859765`/`35647349443`/`35648196443`——引用 `docs/validation/dr-fix-enforcement-proxy.md`，**不重述全部 run 细节**）。
+9. **执行流水线 + 异常与兜底 + 审查摘要（⑤⑥⑦）+ 审查输入包摘要（含消毒证明）+ 可证伪性 + 门禁结果 + 成本计量 + 未执行事项 + 下一步建议**（§11.3 报告结构全字段）。
+10. **`artifacts` 围栏块**（G7-a 强制）：
+
+````
+```artifacts
+docs/validation/t027-at23-e2e.md	repo
+docs/validation/t027-at23-e2e_EN.md	repo
+tools/b4-e2e/**	repo
+tmp/b4/**	local-only
+```
+````
+
+11. **元验证声明**（`SLICE-DEFINITION.md` §2 逐字精神）：本片为首个被自家 G6/G7 判定的切片；G6/G7 判红即整改产出、不改判据、不加白名单绕过（豁免走 `g6-whitelist.txt` 自带机制并附理由）。
+
+**`tmp/b4/**` 内存放**：全部原始运行产物（见 §1.2 目录）+ `SHA256SUMS.txt`（字节级清单，B2 同款自证）+ `pack-verdict.json`（机读统计：面、案例、verdict、可复现性、工件清单与摘要）。**仓库内只入**：`tools/b4-e2e/`（harness + 驱动脚本，⑦ 审查对象）+ 报告双语。`local-only` 语义 = 不入库、不引为仓库证据，仅由 `SHA256SUMS.txt` 在本地自证并在报告登记摘要。
+
+---
+
+## 4. 命令与脚本清单（② 创建/复用，按执行顺序）
+
+| # | 路径 | 性质 | 内容与职责 |
+|---|---|---|---|
+| 1 | `tools/b4-e2e/main.go` | **新建**（仓库入库，⑦ 审查） | 装配式 harness：`-face f1..f5 -case pos|neg -run-root …`；装配 = `chain.New`（`StepIntents`=`AgentRunnerStepIntentPreparer`、`Steps`=薄适配器调用 `AgentRunnerReplayDispatcher.DispatchAgentRunner`、`Postflight`=真实端口实现）+ `AgentRunnerCompositeAdmission` + `AgentRunnerReplayStore` + `AgentRunnerPinnedCLILauncher` + `AgentRunnerTerminalPublisher` + `tickets.CostLedger`；主循环 = engine.Run → 等待/收集/结局映射 → 发布终局 → `SubmitAgentRunnerTerminal` → engine.Run（postflight/acceptance/review/promotion）→ 输出 `verdict.json`。**生产 spawn 一律经 launcher（内部走 `guard.RunManaged`），harness 自身不 import `os/exec` 直启** |
+| 2 | `tools/b4-e2e/run-faces.ps1` | **新建**（仓库入库） | 驱动：构建三制品 → 准备 `tmp/b4` 目录 → 逐面逐案例调用 harness → 记录命令/cwd/退出码/stdout/stderr → 汇总 `pack-verdict.json` → 生成 `SHA256SUMS.txt`。遵守仓库 PS 纪律（PS 5.1 兼容、写 JSON 无 BOM 用 `UTF8Encoding($false)`、落盘即 `[Parser]::ParseFile` + `analyzer=0`） |
+| 3 | `tools/agent-stub` | **复用**（A6 交付） | 受管负载；pin `agent-stub-0.1.0`；模式 `run/hang/crash/spawn/mutate-workspace/no-marker/torn-usage` 等（`tools/agent-stub/main.go` 已逐字确认） |
+| 4 | `cmd/prfrail` | **复用** | 真实 CLI 腿：`.\bin\prfrail.exe validate --chain .\tmp\b4\input\b4-chain.json`（期望接受）与 `.\bin\prfrail.exe preview --chain …`（期望如实报告 executable step 阻断，`internal/console/preview.go` 的 `blockingEvidence` 路径）——作为「CLI 当前能力边界」的诚实证据逐字入包 |
+| 5 | `tools/agent-probe/appcontainer-b2/normalize-encoding.ps1` | **复用** | 报告 `.md` 落盘后编码归一（BOM+LF）；**不用于**其他用途 |
+| 6 | `tools/gates/gate.js` | **复用** | `node tools/gates/gate.js --selftest` → `--all --scope=tree`（本地，含未暂存）→ 提交前 `--all --scope=index`（暂存集）→ push 后 CI 自带 `--all --scope=ci` |
+| 7 | 门禁组 | **复用** | `gofmt -l .` 空；`go build ./...`；`go vet ./...`；`go test -count=1 ./...`（记录 ok 包数与 FAIL 计数）；contract fixtures 无契约改动则按 §6.1 判定 |
+| 8 | `gh run view <id> --log` | **复用** | push 后 CI 观察：按 memory 教训取包级 `ok <pkg>` 行作硬证据（两腿），不是只看 `success` |
+
+**执行顺序**（映射 DELIVERY_DIRECTIVE §5.1）：② 建 harness/脚本 + 报告骨架 → ③ 主执行（跑五面 10 次运行 + CLI 腿 + 编码/门禁，首轮即采集证据）→ ④ 主控集成 + 门禁 → ⑤ 预审 → ⑥ 独立扫描 → ⑦ 终审（+复审）→ ⑧a 报告初稿 → ⑨ 原生验证（同命令重跑可复现性 + 编码 + `gate.js --all --scope=tree` 绿）→ ⑧b 定稿 → ⑩ 停点等授权。**⑤⑥⑦ 的输入必须含原始 diff 与门禁原始输出落盘**（§6.2 R6.1）。
+
+---
+
+## 5. 风险与证伪点
+
+| # | 风险（使证据不可审计） | 缓解 / 证伪测试 |
+|---|---|---|
+| R1 | **harness 与生产装配漂移**：五面经由本片新建的装配 harness，而非 console 装配（F1） | harness 只做薄胶水，全部复用生产包；`Steps` 适配器（StepPort→AgentRunnerPort）与 `PostflightPort` 实现是本片**唯一新增逻辑**，列为 ⑤⑥⑦ 的聚焦审查对象；CLI 腿用 `validate/preview` 逐字证明「CLI 未装配」是事实而非本片遗漏 |
+| R2 | **负载定性争议**：`agent-stub` 被读作「离线 stub 冒充 E2E」 | 报告 §排除项显式声明：不宣称候选兼容；五面主张的是 ProofRail 机制腿；「真实 AI 候选」腿被 B1/B2 冻结决策排除（F2）。该口径须用户裁决（§9(b)#2） |
+| R3 | **结局映射逻辑不可达**：`AgentRunnerPinnedCLIRun.Run`（`agent_runner_run.go`）同时 spawn；harness 走 dispatcher spawn 后需「等待 + 收集 + 映射」，若映射（U11）非公开可达，harness 需复刻 | ② 先测量（§9(a)#2）；若复刻，标记为「与生产私有函数同构」交 ⑦ 专项核对；绝不自改生产导出 |
+| R4 | **反例不可复现 → 记「疑似反向」**（决策 3 微调） | 每反向带 1 次对照重跑；verdict 类不一致即降级为「疑似反向」并在报告明示——**这是允许结果，不是缺陷** |
+| R5 | **A5 移交的对账项**：engine gates 与 `Acceptance.Accept` 的顺序 vs CONTRACTS §7「freeze 后跑 gates」措辞 | F5 正向场景必含一个真实 gate hook step，用事件日志记录实测顺序；结论三选一入报告：措辞成立 / 存在差异（若差异，按 §9(b)#4 裁决是否改 CONTRACTS，默认只记录不改） |
+| R6 | **证据包自身不可证伪** | 包内 `SHA256SUMS.txt` 全量清单；⑨ 用 `git worktree add --detach`（克隆语义）复核仓库入库面；`tmp/b4` 本地复核；**证伪测试 = 篡改任一工件 → 清单失配必现**（B2 同款，`docs/validation/B2-EXTERNAL-ENFORCEMENT.md` §入库保真先例） |
+| R7 | **G4b 新词差集**：新报告双语引入仓库语料外的 CJK 字 | ④ 跑 `gate.js`；差集 ⊖ `tools/gates/cjk-newwords.txt` 必须为空——新增合法新词按白名单机制逐字登记（附理由 + 上下文摘录），不改判据 |
+| R8 | **预算墙**：⑦ 复审再报 Medium+ 时额度（终审 1 + 复审 1）用尽 | 触发即停并升级用户（§7.5）；方案不预留第 3 轮 |
+| R9 | **DR-6 再现**：`internal/gates` 抖动若在 B4 期间于 CI 首跑红 | 按已知缺陷表口径边界③ = 「修复失败」证据、单独登记；B4 自身不得跨切片修改 `tools/agent-probe/enforcement-proxy/**` |
+
+**逐面主张的证伪判据**（即该面主张被推翻的条件）：
+- F1 被证伪 ⇔ 负载自写集之外出现 workspace 变化且 postflight 未拦。
+- F2 被证伪 ⇔ `hang` 负载被判 completed；或子进程树在验证窗口后仍存活。
+- F3 被证伪 ⇔ `-no-marker` 仍判 completed（缺口逻辑失效）。
+- F4 被证伪 ⇔ 重启后出现第二次 spawn（launch-intent 未生效）；或伪造 resume 终局被接受。
+- F5 被证伪 ⇔ exit 0 直接产生 PASSED；或篡改后仍达 REVIEW_PENDING/PASSED。
+
+---
+
+## 6. 台账回写清单（决策 6 四对文件；内容诚实、不写过期字面量）
+
+| 文件 | 精确位置 | 回写内容（诚实口径） |
+|---|---|---|
+| `docs/DEV_PLAN.md` / `_EN` | T018 行（`- [ ] T018 [Plan:P1.6] …` 与紧随的「T018 状态」段） | 追加一句：B4 完成 AT-23 机制腿真实宿主 E2E + 独立评审（Medium+ 清零），见 `docs/validation/t027-at23-e2e{,_EN}.md`；**T018 勾选保持不动**（T028/AT-24、最终 ZIP 绑定、产品所有者批准仍缺）；「T026/T027/AT-23…仍缺失」措辞改为「AT-23 机制腿已验、候选兼容性仍 blocked（B1/B2 冻结），AT-23 未通过」 |
+| `docs/validation/s1-exit.md` / `_EN` | 「AT-01–AT-24 汇总」AT-23 行 + RFC §14 表「核心任务链与 fail-close 场景」行 | AT-23 状态**保持 BLOCKED**，证据单元格改为「T026 能力表征 + T027 机制腿 E2E（t027-at23-e2e）完成、独立评审闭合；候选兼容性 blocked，AT-23 未通过」；结论行与 S1 状态保持未完成 |
+| `docs/t027/REMAINING_SLICES.md` / `_EN` | B4 段（4 个勾选项）、状态表 B4 行、完成记录表 | 勾选 4 项（含「exit 0 后重扫与独立 gates 或 review」——此处「独立 review」= 机制 review 阶段 + ⑦ 切片终审，按方案口径写）；状态表行 B4 → ✅ + 完成日期 + 证据路径；完成记录表追加一行（日期/切片/摘要/证据，字段取自本片报告，同既有行风格） |
+| `docs/S1_RELEASE_NOTES.md` / `_EN` | 「发布前剩余门禁」第 4 项 | 追加括注：AT-23 机制腿 E2E 已完成并独立评审（指向 t027-at23-e2e），**第 4 项保持未完成**（AT-23 未通过、AT-24 未实现） |
+
+（§11.2 要求「DEV_PLAN 段落 + 切片台账 + 验证报告」：验证报告 = 新建 `docs/validation/t027-at23-e2e{,_EN}.md`；T027 段落是否再追加「B4 前置状态更新」段**不在决策 6 清单内**，默认不做，如需并入见 §9(b)#5。）
+
+---
+
+## 7. G6/G7 自判影响（本片被自家判据判定）
+
+1. **G7-a**：报告必须带 `artifacts` 围栏块（§3 第 10 节模板）；`tmp/b4/**` 处置列写 `local-only`，入库面写 `repo`。
+2. **G6-4（过期字面量）**：**报告与台账的变更行不得出现行数/文件数/合计计数类字面量**（如「共 128 个文件」「995/995 行」）。与 TEST_STRATEGY §3「用例统计」的张力处置：优先改写措辞规避（如逐面列 verdict 类而不写「共 N 次」）；确属契约字段且不可规避时，走 `tools/gates/g6-whitelist.txt` 自带机制逐条豁免（三字段：匹配串/文件/理由+上下文摘录），**不改判据、不静默绕过**——豁免本身写入报告可审计。
+3. **G6-3（run 号形态）**：台账行只写**实际取得的** `run <11位数字>`；不得出现 `run 0`/`run TBD`/`run <RUN_ID>` 等占位；本方案正文不预写 run 号。
+4. **G6-2（成本口径）**：凡变更行出现「实得」token，全文同键实得向量必须全等；本片所有成本行统一写「预算 ①×1 + ⑤×1 + ⑥×1 + ⑦×2」，实得仅在流水线完成后一次性回填并全键一致。
+5. **G6-1（状态时态）**：同一块内不得「待 ⑦ 终审」与「⑦ 终审 完成」共存；台账行写完即写完成态。
+6. **G3（双语对称）**：报告与四对台账按「改动行数对称 + 变更行关键字段（提交号/run 号/状态/结论枚举）计数相等」逐对核验——CN 权威先行、`_EN` 逐句镜像后同批提交。
+7. **G4**：全部 `.md` BOM+LF；新 CJK 字差集走 `cjk-newwords.txt`（R7）。
+8. **G5**：暂存清单 ↔ 报告声明改动集 ↔ 台账证据引用三者一致；`git add` 逐文件。
+9. **G6/G7 判红即整改产出**（`SLICE-DEFINITION.md` §2.2）：不修判据、不加白名单绕过；确需豁免走判据自带登记机制并说明理由。
+10. **门禁时机**：④ 收尾本地 `--scope=tree`、提交前 `--scope=index`、CI `--scope=ci`；三处全绿才停点（决策 9）。
+
+---
+
+## 8. OB-1 记录项（⑥ 有效性对照）
+
+`SLICE-DEFINITION.md` §5 已登记 B4 为 ⑥（MAI）有效性观察的对照切片。报告「审查结论摘要」必须新增固定小节记录三点，缺一即为回写不完整：
+
+1. **Section A–E 是否齐备**：逐字母记录 ⑥ 首轮输出是否含结论行 `INDEPENDENT SCAN: PASS/FINDINGS` 与 B/C/D/E 各段；若格式偏离（B3c 曾连续 2 次），如实记录偏离形态。
+2. **是否产出可执行发现**（`file:line` + 契约原句 + 最小修复），而非仅格式偏离；发现的真伪按 §7.3 逐条落地复核并记录复核结果。
+3. **OB-1 闭合/升级证据**：若 ⑥ 在本片（含真实 `.go` harness 的代码切片）输出正常且可执行 ⇒ 支持「文档类任务」归因（OB-1 闭合方向）；若仍偏离 ⇒ 归因模型，OB-1 升级。结论写进报告 + 回写 `DELIVERY_DIRECTIVE.md` §12.4 的 OB-1 行处置状态？——**注意**：决策 6 台账清单不含 DELIVERY_DIRECTIVE；OB-1 行回写**默认不做**，仅在本片报告登记观察结论，由下次准则修订切片统一回写（见 §9(b)#6）。**不得因 ⑥ 无发现就略过该记录**（SLICE-DEFINITION §5 原句）。
+
+---
+
+## 9. 残留不确定项
+
+### (a) ② 可按测量解决（开工即测，不升级用户）
+
+1. `prfrail validate` 对含 `code/isolated` step 链定义的实际接受形态与 `preview` 的阻断文案原文——以真实 CLI 输出为准（本方案仅据 `OPERATIONS.md`/`preview.go` 推断）。
+2. dispatcher 派发后「等待 + 收集 + 结局映射」的公开可达性：`agent_runner_evidence.go` 是否有公开收集器、U11 映射是否可复用（R3）；不可达则 harness 复刻并标记。
+3. `chain.Definition`/`StepRequest` 组装 agent-runner 链的最小合法形态（含 `AgentRunnerExecution` 目标与 `AgentRunnerImmutableFacts`）——以 `internal/chain` 测试夹具与 `internal/taskdef` 校验器实测为准。
+4. `gate.js` 对五面报告草稿的 G6-4/G6-3 实际命中集合（用于决定措辞规避 vs 白名单登记）；`cjk-newwords.txt` 差集清单。
+5. `go build ./...` 对 `tools/b4-e2e` 新包的纳入结果（`tools/agent-stub`、`tools/agent-probe/enforcement-proxy` 均已在构建集内，b4-e2e 应同构）与 `TestProductionCodeHasNoDirectNetworkImports` 是否触及 harness（预防性检查：harness 不 import `os/exec` 直启）。
+6. `agent-stub` 各模式在 `-sleep` 短值下的确定性（③ 首跑即验，决定 F2/F4 延时取值）。
+
+### (b) 必须在 ② 开工前由用户裁决（诚实、完整）
+
+1. **CLI 腿口径（F1 的后果）**：真实 `prfrail` CLI 在 HEAD 无法驱动 AgentRunner step（`ExecuteNoopRun` 仅 noop 装配、`RunPostflight` 为 fail-closed 桩、`StepRouter` 仅在 chain 测试使用）。本方案按决策 2 落地为「真实二进制 + CLI 可达诚实证据（validate/preview）+ 装配式 harness 跑五面」。请裁决：接受此口径；还是要求本片先把 AgentRunner 装配进 console——后者属生产代码改动，**违反本片「不改产品代码」边界与规模 M**，需先扩范围再开工。
+2. **受管负载（F2 的后果）**：无真实 AI 候选可合法启动（Copilot CLI 被 B1/B2 冻结禁止启动；BYOK 未评估且 B2 §8.3/§8.4 阻断计费证据；DR-1 未修）。本方案以固定确定性 CLI 为负载、透明声明、不宣称候选兼容，报告把「真实 AI 候选」腿列为跳过 + 替代证据形式。请裁决：接受「机制腿 E2E」作为 B4 交付口径（AT-23 保持未通过）；还是要求先解决候选/计费（将显著超出 M 规模与本片 ①⑤⑥⑦ 预算）。
+3. **harness 的 PostflightPort 为新增实现**：A5 明确「端口实现质量是唯一信任边界」，本片将首次给出真实端口实现（复用 `internal/snapshot`+`internal/gates`）。请确认其作为 `tools/b4-e2e` 交付物并接受 ⑤⑥⑦ 将其视为生产级审查对象。
+4. **R5 对账结论的处置上限**：若 F5 实测证明「engine gates 在 `Acceptance.Accept` 之前」与 CONTRACTS §7「freeze 后跑 gates」确属措辞差异——默认**只记录不改**；请裁决是否预授权「若 ⑦ 判定必须改，允许按协议先行修订 CONTRACTS 双语措辞」。
+5. **DEV_PLAN T027 段是否追加 B4 前置状态更新段**：决策 6 清单仅含 T018 行；既有惯例每片追加一段。默认按决策 6 执行（不追加），如需追加请明示（会增大 G3 双语对称与 G6 覆盖面）。
+6. **OB-1 台账回写归属**：本片只在报告登记观察结论，`DELIVERY_DIRECTIVE.md` §12.4 的 OB-1 行留给下次准则修订切片（避免触碰准则本体）。如要求本片直接回写 OB-1 行，请明示。
+7. **授权打包（memory 既有教训）**：⑧b 收尾提交（含 N 连推证据回写）必须与 ⑨ 证据登记打包进**同一次授权**；起跑声明请按此写清，避免「报告写完推不出去」的配额边界歧义。
+
+---
+
+**收束声明**：本方案不扩展五面 + 包/评审/台账之外的任何范围；不提议改准则本体或任何 G1–G5 判据语义；优先复用 A5/A6 既有制品（`tools/agent-stub`、`internal/adapters` 全链、`internal/chain` 终局路由与 postflight、B2 编码/自证先例），仅新增一个装配式 harness（`tools/b4-e2e`）。所有路径、标识、命令均已按已读文件逐字引用；其余以 ③ 实测为准并全量入包。

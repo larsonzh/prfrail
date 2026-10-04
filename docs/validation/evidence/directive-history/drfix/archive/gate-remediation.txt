@@ -1,0 +1,34 @@
+changed: ["docs/DELIVERY_DIRECTIVE.md","docs/DELIVERY_DIRECTIVE_EN.md","tools/agent-probe/enforcement-proxy/main.go","tools/agent-probe/enforcement-proxy/main_test.go","tools/gates/cjk-newwords.txt"]
+
+================ GATE REPORT ================
+PASS  G1-a table structure
+        no `||` on added rows
+PASS  G1-b version metadata
+        docs/DELIVERY_DIRECTIVE.md header=v1.9 last=v1.9 2026-09-22/2026-09-22 rows=10 OK | docs/DELIVERY_DIRECTIVE_EN.md header=v1.9 last=v1.9 2026-09-22/2026-09-22 rows=10 OK
+PASS  G2 placeholder residue
+        none
+PASS  G3(a) symmetry + mirror parity
+        docs/DELIVERY_DIRECTIVE.md +2/-1 vs _EN +2/-1 OK ;; docs/DELIVERY_DIRECTIVE.md {"lines":true,"head":true,"bold":true,"bars":true,"blank":true}
+PASS  G3(b) key-field alignment
+        hash 0/0 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK
+PASS  G4a BOM+LF
+        5 file(s) OK
+PASS  G4b CJK diff minus whitelist
+        newCjk=221 unknown=[] (whitelist=20)
+PASS  G5-a(1) no model key in prfrail-*
+        0 hits
+PASS  G5-a(2) no empty model
+        0 hits / 14 files
+PASS  G5-b blacklist model value
+        checked 0 file(s)
+PASS  R2.5 header-note position
+        distinct=1 uniform 14/14
+PASS  base gofmt -l .
+        empty
+PASS  base go build
+        exit 0
+PASS  base go vet
+        exit 0
+PASS  base go test
+        ok=14 FAIL=0
+TOTAL_FAIL=0

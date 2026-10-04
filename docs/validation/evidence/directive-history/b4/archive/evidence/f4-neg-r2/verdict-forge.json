@@ -1,0 +1,59 @@
+{
+  "face": "f4",
+  "case": "neg",
+  "phase": "forge",
+  "runId": "run-b4",
+  "requestId": "request-run-b4",
+  "runRoot": "D:\\LZProjects\\prfrail\\tmp\\b4\\runs\\f4-neg-r2",
+  "workspace": "D:\\LZProjects\\prfrail\\tmp\\b4\\runs\\f4-neg-r2\\workspace",
+  "startedAt": "2026-09-22T16:57:39.051Z",
+  "endedAt": "2026-09-22T16:57:39.075Z",
+  "verdictClass": "refused",
+  "chainState": "RUNNING",
+  "taskState": "b4-task\u00001=STEPS_RUNNING",
+  "stepState": "b4-task\u0000b4-code-step\u00001=TERMINAL_PENDING",
+  "eventLogHash": "sha256:050a3497369b94949c66b358b683c81f7e48a5ed6fa7c946832a60bee5cdf4fb",
+  "eventSequence": 9,
+  "load": {
+    "args": [
+      "-mode",
+      "run",
+      "-sleep",
+      "2s"
+    ],
+    "timeout": "30s",
+    "grace": "2s"
+  },
+  "legs": [],
+  "journal": [],
+  "checks": [
+    {
+      "id": "resume-continuity-refused",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "SubmitAgentRunnerTerminal returned AgentRunner resume continuity unproven: prior completion sha256:032c24e87606c7c7afc3c9a765a8761d7d843424c8dd16f7e3d9faa02107326e is not in step b4-code-step evidence history"
+    },
+    {
+      "id": "zero-write",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "event log digest before=sha256:050a3497369b94949c66b358b683c81f7e48a5ed6fa7c946832a60bee5cdf4fb after=sha256:050a3497369b94949c66b358b683c81f7e48a5ed6fa7c946832a60bee5cdf4fb"
+    }
+  ],
+  "artifacts": {
+    "events.jsonl": "sha256:4fafb99cd4a2b5d910b7998711ef3f1faa7357d4a5944fe288083f0a9dd5dec1",
+    "logs/stderr.log": "sha256:4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2",
+    "logs/stdout.log": "sha256:4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2",
+    "stub.pid": "sha256:7bfed4bb9a0c79e541e6925c1e4a7ada31acbdf54b9d2b6870736ff0131517d6",
+    "usage.json": "sha256:4d51d872aaf586199a7d77dc5b623d83c2c58d36e94d62a2872984d1bf9af953"
+  },
+  "observations": {
+    "submitError": "AgentRunner resume continuity unproven: prior completion sha256:032c24e87606c7c7afc3c9a765a8761d7d843424c8dd16f7e3d9faa02107326e is not in step b4-code-step evidence history"
+  },
+  "errors": [],
+  "notes": [
+    "a forged resume terminal must be refused with zero writes",
+    "requestRecordHash=sha256:f0e68da10f8c967fdecf7e67165f9298fa4658b3a0078b2b5648d98315ba8dc6",
+    "declared-inputs: capability disposition=compatible (declared, not probed); enforcement record declared but not consulted on that path; adapterId=b4-pinned-cli-declared"
+  ]
+}

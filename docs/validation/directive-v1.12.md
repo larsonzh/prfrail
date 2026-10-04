@@ -344,6 +344,7 @@ tmp/DELIVERY_DIRECTIVE_v111_REVIEW_R3.md	local-only
 tmp/DELIVERY_DIRECTIVE_v112_REVIEW.md	local-only
 tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R5.md	local-only
 ```
+> **归档注记（v1.23）**：本报告引用的 `tmp/` 条目已按 §1.5.1 归档至 `docs/validation/evidence/directive-history/`（单元：`reviews/`, `v112/`；各含 `MANIFEST.md` 与 `SHA256SUMS.txt`）；原路径不改写，对应关系以 MANIFEST 为准。（此前切片已清除的 `tmp/` 路径不在本次归档范围，属 OB-77 所指既有脱钩。）
 
 ## 12. 封版裁定与 CI 结果（v1.12 frozen）
 

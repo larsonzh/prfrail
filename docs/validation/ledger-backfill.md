@@ -97,7 +97,7 @@
 
 - 全仓逐文件编码核验（`enc-tree.js`）：违规 **3** 处，**全部**为 OB-27 的冻结证据包豁免项；**本片新增文件 0 违规**。
 - 门禁自检：`SELFTEST: PASS 248/248`；`gate.js --all --scope=tree` ⇒ `TOTAL_FAIL=0`（逐判据读数见 §9）。
-- 临时残留清单：`tmp/lbf/` 保留 19 个过程文件（方案与盘点、断言脚本、原始输出、处置清单、溯源输出、首轮与第 2 轮审查包副本、`git diff` 与门禁读数），按 OB-49 与用户既有指令**不清理**，处置 = `local-only`。
+- 临时残留清单：`tmp/lbf/` 保留 19 个过程文件（方案与盘点、断言脚本、原始输出、处置清单、溯源输出、首轮与第 2 轮审查包副本、`git diff` 与门禁读数），按 OB-49 与用户既有指令**不清理**，处置 = `local-only`。 **补注（v1.23）**：该单元实测现为 21 条——收尾后新增 `findchar.js` 与 `ci-watch.txt`（均未跟踪）；全量清单、逐条 sha256 与归档对应关系见 `docs/validation/evidence/directive-history/lbf/MANIFEST.md`。
 - 落盘一致性：`docs/validation/ledger-backfill.md` 与 `tmp/lbf/report-cn.md` 的 SHA-256 相等（`_EN` 同理）。
 - 镜像复核：ADR 对的整文件位置性失配与 HEAD 同值（既有差异，非本片引入；本片新增的两行在 CN 与 `_EN` 同位且行数对称）；本报告对逐行失配 0。
 - ⑧c 处置 2 项（⑦ 第 2 轮 Low）：F2R-1 的悬空前向引用与台账收尾行的过时表述已改为自洽的事实记录；F2R-2 的输入包中间读数已更正为当场读数。
@@ -145,3 +145,4 @@ tmp/lbf/dispositions.md	local-only
 tmp/lbf/dd36b9b-trace.txt	local-only
 tmp/lbf/review-round2.md	local-only
 ```
+> **归档注记（v1.23）**：本报告引用的 `tmp/` 条目已按 §1.5.1 归档至 `docs/validation/evidence/directive-history/`（单元：`lbf/`；各含 `MANIFEST.md` 与 `SHA256SUMS.txt`）；原路径不改写，对应关系以 MANIFEST 为准。（此前切片已清除的 `tmp/` 路径不在本次归档范围，属 OB-77 所指既有脱钩。）

@@ -1,0 +1,7 @@
+[refs-check] docs/DELIVERY_DIRECTIVE.md  changedLines=0  wholeFileRefs=570  wholeFileUnresolved=18 (inherited external citations)
+[refs-check] docs/DELIVERY_DIRECTIVE_EN.md  changedLines=0  wholeFileRefs=564  wholeFileUnresolved=18 (inherited external citations)
+[refs-check] docs/validation/directive-v1.12.md  changedLines=35  wholeFileRefs=295  wholeFileUnresolved=0 (inherited external citations)
+[refs-check] docs/validation/directive-v1.12_EN.md  changedLines=35  wholeFileRefs=294  wholeFileUnresolved=0 (inherited external citations)
+[refs-check] docs/validation/evidence/directive-v1.12-freedom-list.md  changedLines=0  wholeFileRefs=25  wholeFileUnresolved=0 (inherited external citations)
+[refs-check] changed-scope refs=14 unresolved=0
+[refs-check] result=PASS

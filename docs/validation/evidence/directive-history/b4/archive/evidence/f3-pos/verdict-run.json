@@ -1,0 +1,153 @@
+{
+  "face": "f3",
+  "case": "pos",
+  "phase": "run",
+  "runId": "run-b4",
+  "requestId": "request-run-b4",
+  "runRoot": "D:\\LZProjects\\prfrail\\tmp\\b4\\runs\\f3-pos",
+  "workspace": "D:\\LZProjects\\prfrail\\tmp\\b4\\runs\\f3-pos\\workspace",
+  "startedAt": "2026-09-22T16:57:24.505Z",
+  "endedAt": "2026-09-22T16:57:26.653Z",
+  "verdictClass": "uncertain-or-paused",
+  "chainState": "PAUSED",
+  "taskState": "b4-task\u00001=FAILED",
+  "stepState": "b4-task\u0000b4-code-step\u00001=FAILED",
+  "eventLogHash": "sha256:529c7ca4915149a2dac1130dd913bb1f47936bcba18eff62d3daed990ad25de5",
+  "eventSequence": 12,
+  "load": {
+    "args": [
+      "-mode",
+      "run",
+      "-no-marker",
+      "-sleep",
+      "2s"
+    ],
+    "timeout": "30s",
+    "grace": "2s"
+  },
+  "mapping": {
+    "status": "uncertain",
+    "treeStatus": "stopped",
+    "logsComplete": false,
+    "usageComplete": true,
+    "eventsComplete": true,
+    "manifestsComplete": true,
+    "factCount": 0,
+    "errorEvidenceCount": 3,
+    "elapsedMs": 2008
+  },
+  "legs": [
+    {
+      "leg": "dispatch",
+      "status": "ran: process spawned through the production launcher and step parked in TERMINAL_PENDING"
+    },
+    {
+      "leg": "dispatch-\u003ewait-\u003ecollect-\u003emap",
+      "status": "ran: uncertain"
+    },
+    {
+      "leg": "terminal-publication (production AgentRunnerTerminalPublisher)",
+      "status": "failed closed",
+      "error": "AgentRunner request conflict: terminal publication requires a persisted request record for requestId request-run-b4",
+      "alternativeEvidence": "the durable terminal chain is built through the public record constructors and adapters.ToChainAgentRunnerTerminal instead; the chain-side routing below is unmodified production code"
+    },
+    {
+      "leg": "cost settlement (production tickets.CostLedger.Settle)",
+      "status": "booked"
+    },
+    {
+      "leg": "terminal routing (chain.SubmitAgentRunnerTerminal)",
+      "status": "routed as uncertain"
+    },
+    {
+      "leg": "postflight/acceptance/review/promotion",
+      "status": "skipped: a non-completed terminal never reaches the downstream legs"
+    }
+  ],
+  "journal": [
+    {
+      "leg": "baseline",
+      "at": "2026-09-22T16:57:24.530Z",
+      "outcome": "captured",
+      "detail": {
+        "entries": "1",
+        "hash": "sha256:1fbe6bb28268c36250659573df59b691d1c85dde12018bc091ddc5c5dce408ed"
+      }
+    },
+    {
+      "leg": "dispatch",
+      "at": "2026-09-22T16:57:24.530Z",
+      "outcome": "production-path-refused-by-platform",
+      "detail": {
+        "error": "AgentRunner replay store publication durability unproven: request publication"
+      }
+    },
+    {
+      "leg": "dispatch",
+      "at": "2026-09-22T16:57:24.530Z",
+      "outcome": "fallback-spawned-through-production-launcher",
+      "detail": {
+        "launchId": "launch-request-run-b4",
+        "processId": "{\"pid\":17668,\"startToken\":\"01dd4ab370f87e6c\"}"
+      }
+    },
+    {
+      "leg": "dispatch",
+      "at": "2026-09-22T16:57:24.530Z",
+      "outcome": "parked",
+      "detail": {
+        "requestId": "request-run-b4"
+      }
+    },
+    {
+      "leg": "terminal-routing",
+      "at": "2026-09-22T16:57:24.530Z",
+      "outcome": "uncertain",
+      "detail": {
+        "chain": "PAUSED",
+        "step": "FAILED",
+        "task": "FAILED"
+      }
+    }
+  ],
+  "checks": [
+    {
+      "id": "log-gap-degrades",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "status=uncertain logsComplete=false"
+    },
+    {
+      "id": "verdict-class-recorded",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "verdict class uncertain-or-paused"
+    }
+  ],
+  "diff": {
+    "added": [],
+    "removed": [],
+    "changed": []
+  },
+  "artifacts": {
+    "diff.json": "sha256:f8700730d4d8f747ac5ce273bcc6d6ca0dabf339d43ef439e97a75e370f72f35",
+    "events.jsonl": "sha256:4fafb99cd4a2b5d910b7998711ef3f1faa7357d4a5944fe288083f0a9dd5dec1",
+    "logs/stderr.log": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "logs/stdout.log": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "manifest.post.json": "sha256:b1d81c132d69407628fce9325a7c92bd4dad7f8e8e62bf1afa9b970a6df14ca5",
+    "manifest.pre.json": "sha256:80f9ae06a6d9c850c8b1a725b6eebf66ad4d6e17dfacc95aab9cbecf8bb5b704",
+    "stub.pid": "sha256:256d8fbea2205f13bbe2671b18acca05ad137d60bbf2c4d7ed1e34fe93905a93",
+    "usage.json": "sha256:4d51d872aaf586199a7d77dc5b623d83c2c58d36e94d62a2872984d1bf9af953"
+  },
+  "observations": {
+    "gateHookSteps": "0",
+    "stopError": "",
+    "stopOutcome": "stopped"
+  },
+  "errors": [],
+  "notes": [
+    "log completeness marker missing; the outcome must degrade",
+    "requestRecordHash=sha256:d95a8a12909d202123ec07be72768f929ab479357b5c81693e7d63ff72d1b717",
+    "declared-inputs: capability disposition=compatible (declared, not probed); enforcement record declared but not consulted on that path; adapterId=b4-pinned-cli-declared"
+  ]
+}

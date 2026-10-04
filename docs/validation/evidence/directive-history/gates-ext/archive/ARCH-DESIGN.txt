@@ -1,0 +1,182 @@
+# GATES-EXT 架构设计方案书（① / V4 Pro / 只读）
+
+> 本文件为 ①（V4 Pro）返回内容的**逐字落盘**（主控仅加本行说明与文末空行）。原始返回见会话记录。
+
+**依据（均已逐字阅读，未执行任何命令作验证）**：`tmp/gates-ext/SLICE-DEFINITION.md`；`docs/DELIVERY_DIRECTIVE.md`（§0.3、§5.0–§5.3、§6.1–§6.4、§7.2、§7.5、§11.3、§12.1–§12.5、附录 B.7、附录 C.0–C.0e，全 1000 行）；`tmp/gate.js`（全文 ~90 行）；`docs/validation/dr-fix-enforcement-proxy.md`（§3/§4.4/§5/§8/§9）；`docs/t027/REMAINING_SLICES.md`；`.github/workflows/ci.yml`（4 job 全文）；`internal/release/workflow_test.go`（全文）；`tools/gates/cjk-newwords.txt`。历史缺陷原文经 `git show fb12ff9 / b738e6b / 9f68a52` 导出字节核对（§2.2/§6 T3 的依据）。所有不可从文件验证的论断均显式标注。
+
+---
+
+## 1. ⒞ 入口形态裁定：**单入口 `gate.js` + 子命令**（判据实现仍按文件拆模块）
+
+| 评判轴 | 单入口 + 子命令（裁定） | 每判据一文件 + 汇总入口 |
+|---|---|---|
+| 一条 CI 命令 | `node tools/gates/gate.js --selftest && node tools/gates/gate.js --all --scope=ci`；将来加 G8 命令不变 | 汇总器需枚举/排序文件，加 G8 时命令或清单要改 |
+| Windows(pwsh)/Linux 离线 | Node ≥18 纯 stdlib（`fs`/`child_process`/`path`）双平台等价；Node 已是 CI 既有依赖（`Contract fixtures` 步骤跑 `npm ci`/`npm test`） | 运行时无关，不构成差异 |
+| 逐判据可测性 | `--check=G6` + `--selftest`（进程内断言） | 天然按文件 |
+| 未来 G8 成本 | 新增 `lib/criteria/g8.js` + 注册表一行 | 新增文件 + 汇总器规则 |
+| 迁移等价（步 1） | 直接从 `tmp/gate.js` 移植 `rec()`/`added`/`numstat` 逻辑，再拆模块 | 先拆后移植，等价性更难证明 |
+| 增量开发 | `--check=` 单判据开发 | 同 |
+| 无新依赖 | ✓ | ✓ |
+
+**裁定理由**：单入口保证「一条 CI 命令」与「加 G8 零 CLI 变更」；可测性与按文件隔离由 `lib/criteria/*.js` 模块承担（`--check=<id>` 只加载对应模块）。不采纳「每判据一文件入口」：汇总器是第二层可漂移状态，收益已被模块化覆盖。
+
+---
+
+## 2. G6 台账元数据一致性 —— 机械化规格
+
+**总则**（写入 §6.3 G6 条文的判据部分）：
+
+- **作用域 = 变更行**：只判 `git diff -U0`（对应 scope）的**新增行**，与 G1-a/G3(b)/G4 同口径；**历史行不追溯**（已提交旧行不改即不判）。目标文件 = 变更集内全部 `.md`。
+- **自指防护（G2 已证陷阱，2026-09-21 实测）**：各子查**跳过含任一排除标记的行**：`不得残留`、`示例`、`引文`、`冲突`、`矛盾`。⇒ 撰写 G6 条文时，引用被禁形态的句子必须落在这类带标记的行上——与 G2「含『不得残留』的行跳过」同构机制。
+- **白名单 `tools/gates/g6-whitelist.txt`**（格式与 `cjk-newwords.txt` 同）：`<匹配串>\t<文件>\t<理由/上下文摘录>`，子串匹配、逐条登记、理由与摘录必填。命中即该项豁免。
+- 数字形态归一：`⑥×1` 与 `⑥ ×1`（全角空格/`×`）等价（`[⑥⑦]\s*[×xX]\s*\d+`）；`=`/`＝` 等价。
+
+### G6-1 状态时态一致（抓 OB-11 类）
+- 判据：变更行含待办标记 `待\s*(①|②|③|④|⑤|⑥|⑦|⑧a|⑧b|⑨|⑩|终审|独立扫描|复审|预审|盲审|提交授权)`，且**同一块内**（两相邻 `^#{2,4} ` 标题之间）存在完成标记 `（**实得**）|**实得**|已闭合|✅ **已完成**`、且该完成标记 **40 字符窗内含同一标签** ⇒ FAIL。
+- 文件级取证（已核对字节）：`fb12ff9` 的 C.0e 状态行「🔄 进行中（…**⑥ 独立扫描 `PASS`，见下**；待 ⑦ 终审与提交授权）」与下方「⑥ 独立扫描（实得）PASS」**不误报**（待 ⑦ ≠ ⑥ 实得，无同标签完成标记）；OB-11 真实矛盾（「待 ⑥ 独立扫描」+「⑥ 独立扫描（实得）PASS」）⇒ **必红**。OB-11 登记行自身含 `冲突` ⇒ 排除标记跳过，不误报。
+- 设计要点：完成标记必须**同标签共窗**，避免块级「✅ 已完成」状态行把任何「待 X」误杀。
+
+### G6-2 成本口径一致（抓 A1 类）
+- 机器输入：变更行内成本子句 token `(⑥|⑦)×(\d)` 与 `= (\d) 次`；**子句定性**（token 前 60 字符内）：含 `预算` ⇒ 预算子句（**永不参与比较**）；含 `实得` 或**裸 `成本`**（无预算/实得限定）⇒ 实得子句。**裸 = 实得**是 A1 的历史诠释：⑦ 把「成本 ⑥×1 + ⑦×1」读作实得口径并判为与 C.0e 矛盾。
+- **切片键**：行内 `SW-\d+|DR-\d+|OB-\d+|GATES-EXT|[A-Z]\d+[a-z]?`；行内无则取所在块标题中的同型 ID（C.0e 成本行靠块标题 `### C.0e …切片 \`SW-5\`` 取键）。
+- 判据：对每个**变更**实得子句，在**全文**内找**同键**实得子句，token 向量必须全等；不等 ⇒ FAIL（输出两个位置与向量）。
+- 历史取证：`git diff b738e6b^..b738e6b` 把 C.0e 成本行改为「实得 ⑥×1 + ⑦×2 = 3 次」，同文件 §0.3 v1.9 行仍是裸「成本 ⑥×1 + ⑦×1」（同键 SW-5）⇒ **必红 = A1 复现**。`9f68a52` 把 §0.3 行改为「成本：预算…、实得 ⑥×1 + ⑦×2 = 3 次」⇒ 预算子句豁免、实得子句全等 ⇒ **必绿 = 修复后**。修复方向与 DR-FIX 实际修复完全一致（判据承重的证据）。
+- 跨块用全文同键扫描（A1 的双方分处 §0.3 与 C.0e）；G6-1 才限同块。
+
+### G6-3 run-id 格式（裁决⒝；**不含可达性、不联网**）
+- 合法形态：`run \d{9,13}`（现仓库 run 号 11 位；9–13 为留余常量，②/③ 可调并在 T 系列测试核验）。
+- 占位残留（纯字符串检测）：变更行内 `run ` 后跟**非纯数字或长度不符数字串**即 FAIL，显式枚举：`run 0`/`run 000000`（全 0）、`run <…>`、`run TBD|TODO|XXXX|N/A`、`run 待…|占位…`、`run \d{1,2}`（过短）。`run 号`（无数字）不匹配任何子查 ⇒ 天然不误报。
+- 自指：G6 条文引用非法形态的示例行必须带排除标记。
+
+### G6-4 过期字面量（行数/文件数/计数）
+- 判据（变更行，四条主模式）：`\d{2,}/\d{2,}\s*行`（如 `995/995 行`）、`\d{2,}\s*行`、`\d{2,}\s*个?\s*文件`、`共\s*\d{2,}` ⇒ FAIL；白名单豁免（理由+摘录）。
+- 依据：OB-11 附带教训「台账不写会过期的字面量（行数/文件数），只写『由 G3/G4 校验一致』」——v1.9 已去掉 `995/995`。「由 G3/G4 校验一致」类判据引用不含数字，天然不匹配。
+
+### 输出与退出码
+- 每判据一行：`PASS|FAIL|SKIP|INFO <G-id> <label> :: <detail>`；`SKIP` 用于未脚本化判据（§5.4）与白名单命中；末尾 `TOTAL_FAIL=<n>`。
+- 退出码：`0` = 已执行判据全 PASS（SKIP/INFO 不阻断）；`1` = ≥1 FAIL；`2` = 用法/环境错误（缺 git/Node、scope 非法、白名单解析失败）。
+
+---
+
+## 3. G7 审查包完整性 —— 仅结构，无内容语义
+
+- 目标文件：变更集内 `docs/validation/*.md`（**排除** `docs/validation/evidence/**`）；`_EN` 镜像同判（工件块几乎全 ASCII，镜像平价由 G3 负责）。规则条文在 `DELIVERY_DIRECTIVE.md`，不在 G7 扫描域 ⇒ **自指陷阱结构性免疫**（与 G6 的排除标记法互为补充）。
+- **机器契约（写进 G7 条文）**：变更的验证报告**必须**含围栏块，围栏标记固定 ```` ```artifacts ````，行格式 `<仓库相对路径><TAB><处置>`；处置枚举：`repo`（可省）、`local-only`、`missing-historical`。
+
+| 子查 | 判据 | 判定 |
+|---|---|---|
+| G7-a | 变更/新增报告缺 `artifacts` 块 | FAIL |
+| G7-b | `repo`（或省）：路径必须被跟踪且存在（range scope 用 `git cat-file -e <B>:<path>`，tree scope 用工作树存在性）；`local-only`：接受（本仓合法存在 `tmp/` 证据，DR-FIX §8.10 即此类）；`missing-historical`：接受（§11.2「缺失标注历史缺失」的显式诚实标记）；未知 token | 不符即 FAIL |
+| G7-c | 变更行 finding 行 `^\|\s*\*\*(Critical\|High\|Medium\|Low)\*\*\s*\|` 必须含处置单元格（`已修\|已整改\|已闭合\|已处置\|接受\|拒收\|记录在案\|待办\|观察中\|待议`） | 缺即 FAIL |
+| G7-d（OB-10 ① **评估结论：纳入**） | 变更报告状态行含 `已停止\|停止态` 而同行/同块不含 `已停止——未完成` | FAIL |
+
+- **明确不判**：工件内容语义、run 可达性、数字真伪、报告结论真伪。C1 类「主张无原始证据」由结构缺失抓取：报告有证据主张却无机器可读工件清单 / 路径不可解析即红。
+- **OB-10 ②（`[PILOT]` 起跑消息的试点指标槽位）不纳入**：起跑消息只存在于会话文本、不在仓库文件内，不可机械判 ⇒ 保持 OB-10 观察中，台账回写注明「① 已落地（G7-d）、② 不可机械化」。
+
+---
+
+## 4. CI 边界问题 —— 分析、选项与建议（**需用户拍板**）
+
+**文件级事实**（`internal/release/workflow_test.go` 冻结 `ci.yml`）：job 数/名断言（`len(workflow.Jobs) != len(expectedJobs)`）；每 job 步名**按索引与数量**（`len(job.Steps) != len(expected.steps)` + 逐索引 `Name` 比对，`test` job 当前冻结 7 步）；每个脚本步体 SHA-256（`sha256.Sum256([]byte(step.Run))` 对 `expectedScripts` 表，未注册的 `Uses==""` 步直接报 `unexpected script step`）；Action 步的 `uses@sha` 与参数逐项冻结。
+
+| 方案 | 可行性 | 成本 / 风险 |
+|---|---|---|
+| **A：边界扩展到 `internal/release/workflow_test.go`**（需用户显式授权） | **唯一可行** | 只动 1 个测试文件、纯机械：`test` 步表 +1（`Gates`）、`expectedScripts` 增 `test/Gates` 摘要行；本片已走 ⑤⑥⑦，契约变更随片审查 |
+| B：改 `ci.yml` 而冻结契约不破 | **不可行** | 新步 ⇒ 步数与索引断言必败；复用既有步改体 ⇒ SHA-256 必败；新 Action ⇒ `unapproved Action`；独立 `gates.yml` 违背「只加一个步骤」且新增第二 workflow 面 |
+| C：CI 集成移出本片（只交付步 1/2） | 可行但不完整 | 验收三缺一；R1「脚本进 CI 阻塞后续切片」从未实测；需用户重裁范围 |
+
+**推荐 A**。理由：B 不可行（§上文三断言决定）；C 使「脚本进 CI」的风险永远停留在纸面，正是 OB-14 想堵的洞。**本项是用户决策点**：批准 A ⇒ 边界表加一行 `internal/release/workflow_test.go`（仅 test 步表与摘要表，不碰其它测试语义）；选 C ⇒ 本片验收改为步 1/2，步 3 另立。
+
+**CI 步骤本体（无论何时落地，一次性写死）**：
+```yaml
+      - name: Gates
+        run: node tools/gates/gate.js --selftest && node tools/gates/gate.js --all --scope=ci
+```
+- **必须 `--scope=ci`**（= `git diff -U0 HEAD^1..HEAD`；`pull_request` 事件 HEAD 为合入引用，`HEAD^1..HEAD` 即 PR 差集；根提交例外在脚本内防）。若 CI 用默认 tree 模式，干净检出下变更集为空 ⇒ 全判据空转 PASS ⇒ **假门禁**，绝不允许。
+- 不加 `continue-on-error` / 任何例外；首跑红必须修绿（R1 提示保持在切片定义中）。
+- 双矩阵腿都跑（Windows/Ubuntu），即步 2 之外的 Linux 离线原生证据。
+
+---
+
+## 5. 工具布局、迁移计划与步 1 验收程序
+
+```
+tools/gates/
+  gate.js                 # 唯一入口：参数、scope 解析、报告装配、退出码
+  lib/ctx.js              # repo 根发现、变更集解析、BOM 剥离读、git 包装(try/catch)
+  lib/criteria/{g1a,g1b,g2,g3a,g3b,g4a,g4b,g5a,g5b,r25,g6,g7}.js
+  lib/report.js
+  g6-whitelist.txt        # 新增；cjk-newwords.txt 原位不动
+  testdata/{fixtures,historical}/
+  selftest.js
+```
+
+- **repo 根发现**：`git rev-parse --show-toplevel`；失败则自 `__dirname` 上溯找 `.git`。**废除** `tmp/gate.js` 的硬编码 `R = 'D:/LZProjects/prfrail/'`（Linux 不可用）。
+- **变更集 scope**：`--scope=tree`（默认，等价旧脚本：`git status --porcelain -uall` 含未跟踪/已暂存/未暂存）、`--scope=index`、`--scope=range:<A>..<B>`、`--scope=ci`。新增行按 scope 取对应 diff 的 `-U0`。
+- **旧脚本覆盖清单（读 `tmp/gate.js` 逐条确认）**：覆盖 G1-a、G1-b、G2、G3(a.1)、G3(a.2)（仅 `docs/DELIVERY_DIRECTIVE.md` 对）、G3(b)、G4a（写死跳过 `.github/agents/sol-orchestrator/`）、G4b、G5-a①②、G5-b、R2.5、基础门禁（gofmt/build/vet/test）。**不覆盖**基础 G1 与 G5。
+- **迁移必修的脆弱点**：① 退出码恒 0（无 `process.exit`）⇒ 按 §2.5 实现；② `git diff -U0` 对未跟踪文件与**仅暂存**文件产出空 ⇒ G2/G3(b)/G4b/G1-a 静默漏检 ⇒ tree scope 下未跟踪文件以全文为新增行、已暂存用 `--cached`；③ `git status --porcelain` 的删除（` D`）与重命名（`R  old -> new`）未解析 ⇒ `readFileSync` 会 throw ⇒ 按状态码分支；④ sol-orchestrator 写死跳过 ⇒ 改 `git check-ignore -q`；⑤ `git grep` 无命中 exit 1 ⇒ 全部 git 调用 try/catch；⑥ G4b 语料 `git show HEAD:` 对未跟踪文件失败 ⇒ 已 catch，保留；⑦ `.md` 读需剥 BOM + `\r\n→\n`（保留旧 `rd()` 语义）。
+- **未脚本化判据如实打印 `SKIP`**：基础 G1（标题↔状态表↔完成记录三处一致）与 G5（变更集契约，需主控提供结构化 JSON，输入不在仓库内）——本片不实现；报告固定输出两行 `SKIP G1 … / SKIP G5 …`，并把 §6.3「脚本化状态」注记更新为如实口径（杜绝「已脚本化」假声明）。
+- **编码合规**：`.js/.txt` = UTF-8 **无 BOM** + LF（仓库硬规则），落盘后字节校验；`tools/gates/**` 自身在变更集内 ⇒ 被 G4a/G4b 自覆盖。
+- **无新依赖**：Node ≥18 stdlib + git；Node 已在 CI 具备（Contract fixtures 步骤）。
+
+**步 1 验收程序（「同一变更集 ⇒ 结论逐项一致」）**：
+1. 冻结变更集 = `1b01115^..1b01115`（DR-FIX 报告提交：不含 `tools/gates/`、无未跟踪文件 ⇒ 新旧脚本可见性相同）。
+2. 三跑并落盘（`tmp/gates-ext/step1/`，用完清理）：(a) 旧 `tmp/gate.js`（路径补丁副本，不入库）在 `1b01115` 分离工作树；(b) 新 `gate.js --all --scope=tree` 同一工作树；(c) 新 `gate.js --all --scope=range:1b01115^..1b01115` 证明 tree/range 等价。
+3. 等价断言：旧脚本覆盖的判据（G1-a/G1-b/G2/G3a1/G3a2/G3b/G4a/G4b/G5-a①②/G5-b/R2.5）逐项 PASS/FAIL **与 detail 计数**逐项相等；G6/G7 判定作为**新增行**记录。基础门禁四条比较口径 = 同命令集、均 exit 0（环境依赖，不比字节）。不一致 ⇒ ② 修脚本，**不得改判据**。
+
+---
+
+## 6. 测试点（步 2：可执行、可证伪、双向）
+
+| # | 判据 | 夹具 | 必须红（注入） | 双向变异（删判据 ⇒ 不红） |
+|---|---|---|---|---|
+| T1 | G6-1 | `testdata/fixtures/g6-1-ledger.md`：「待 ⑥ 独立扫描」状态行 + 同块「⑥ 独立扫描（实得）PASS」 | 待办+完成同标签共存 ⇒ FAIL | 注释掉 G6-1 ⇒ PASS；删完成行 ⇒ PASS |
+| T2 | G6-1 自指 | OB-11 登记行原文（含 `冲突`） | —（必须 PASS） | 删排除标记 ⇒ 误报 FAIL（排除承重） |
+| T3 | G6-2 A1 | `--scope=range:b738e6b^..b738e6b`（DELIVERY_DIRECTIVE） | 实得 ⑥×1+⑦×2 vs 裸成本 ⑥×1+⑦×1 同键 SW-5 ⇒ FAIL | 删 G6-2 ⇒ PASS；`--scope=range:9f68a52^..9f68a52`（修复后）⇒ PASS |
+| T4 | G6-2 预算豁免 | 夹具：预算 ⑥×1+⑦×1 + 实得 ⑥×1+⑦×2 同键 | —（PASS） | 把「预算」改「成本」⇒ FAIL |
+| T5 | G6-3 合法 | `run 35646859765`（11 位） | PASS | — |
+| T6 | G6-3 占位 | `run 0` / `run 000000` / `run <RUN_ID>` / `run TBD` 四行 | 各 ⇒ FAIL | 删 G6-3 ⇒ 全 PASS |
+| T7 | G6-4 | `995/995 行`、`共 128 个文件` 两行 | ⇒ FAIL | 删 G6-4 ⇒ PASS；白名单登记其一 ⇒ 该项 PASS（白名单承重） |
+| T8 | G7-a | 新报告夹具无 `artifacts` 块 | FAIL | 删 G7-a ⇒ PASS |
+| T9 | G7-b 处置 | 块内 `tmp/drfix/A3.txt` 未标处置 | FAIL | 标 `local-only` ⇒ PASS；标未知 token ⇒ FAIL |
+| T10 | G7-b 实存 | 块内 `docs/validation/dr-fix-enforcement-proxy.md`（repo） | PASS；改路径为不存在 ⇒ FAIL | — |
+| T11 | G7-c | `\| **High** \| x \|` 无处置格 | FAIL | 补 `已修` ⇒ PASS；删 G7-c ⇒ PASS |
+| T12 | C1 复现 | `--scope=range:1b01115^..1b01115`（DR-FIX 报告） | G7 必红（报告无工件块、证据引用在散文） | 模拟修复（加 `artifacts` 块 + `tmp/*` 标 local-only + 实体文件标 repo）⇒ PASS |
+| T13 | 兜底 | `--selftest` 全量 | 夹具全集 PASS | 任一夹具被改坏 ⇒ selftest 红 |
+
+每个「删判据 ⇒ 不红」须在步 2 报告留原始输出（③ 执行、④ 留档，A11 对称抽查适用）。
+
+---
+
+## 7. 风险与缓解 / 未决项
+
+| 风险 | 缓解 |
+|---|---|
+| G6 白名单被滥用洗白真缺陷 | 条目强制「理由 + 上下文摘录」；⑤/⑦ 抽查 |
+| CI `--scope=ci` 与本地 tree 结论漂移 | 步 1 三跑等价 + T13 回归；漂移 ⇒ 升级 ⑤ |
+| G6-2 全文同键扫描误伤半径 | 键 = 切片/观察项 ID，仅同 ID 内可比；排除标记 + 白名单 |
+| G6-4 模式过宽 | ③ 在历史「引入 diff」全集上先校准（含既有报告）再进步 3 |
+| 首跑 CI 红阻塞后续切片（含 B4） | 本片提交前先本地 `--scope=range:<拟提交 diff>` 预演到绿；R1 提示保留 |
+
+**未决项（供 ②③⑤，不猜测）**：
+- O1：G6-1 只覆盖 CN 标记；`_EN` 待办标记（PENDING/To do）暂不纳入，靠 G3 镜像平价兜底——交 ⑤ 定。
+- O2：run-id 位数区间 9–13 为常量；③ 用历史 run 号全集核验边界。
+- O3：G6-4 正则粒度由 ③ 的历史校准微调（判据语义不变）。
+- O4：§4 方案 A 未获授权前，② 只做步 1/2 可交付部分（CI 步骤体已写死待命）。
+- O5：**OB-11 的精确矛盾态从未以提交形态存在**（已核对 `fb12ff9`/`b738e6b`/`a366fe3` 的 C.0e 状态行，均无「待 ⑥ 独立扫描」+「⑥ 实得」并存）⇒ 复现用夹具 T1（逐字取自 OB-11 登记行与 `fb12ff9` C.0e 原文）；A1 用真实历史 diff（T3）。此为文件级可核验陈述。
+
+---
+
+## 8. 边界自检
+
+| 文件 | 本方案动作 | 边界内？ |
+|---|---|---|
+| `docs/DELIVERY_DIRECTIVE{,_EN}.md` | §6.3 新增 G6/G7（含 G7-d）判据；脚本化状态注记更新；§12.5 缺口行；OB-10 处置更新 | ✓ |
+| `tools/gates/**` | 新增 `gate.js`/`lib/`/`selftest.js`/夹具/`g6-whitelist.txt`；`cjk-newwords.txt` 原位 | ✓ |
+| `docs/validation/gates-ext{,_EN}.md` | 本片报告（自带 `artifacts` 块 ⇒ G7 自合规） | ✓ |
+| `docs/t027/REMAINING_SLICES{,_EN}.md` | GATES-EXT 台账行 + 完成记录 | ✓ |
+| `.github/workflows/ci.yml` | 步 3：仅加法一个步骤，无例外 | ✓（步 3 授权后） |
+| `internal/release/workflow_test.go` | 冻结契约测试同步（test 步表 + 摘要表） | ✗ **需扩展授权（§4 方案 A）** |
+| G1–G5 既有判据 / CONTRACTS / schema / fixtures / 依赖 | **不动**（只新增 G6/G7） | ✓ |
+
+ARCH: DONE

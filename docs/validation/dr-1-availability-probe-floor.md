@@ -122,6 +122,7 @@ docs/validation/evidence/dr-1-2026-09-24/README.md	repo
 docs/validation/evidence/dr-1-2026-09-24/SHA256SUMS.txt	repo
 tmp/dr1/**	local-only
 ```
+> **归档注记（v1.23）**：本报告引用的 `tmp/` 条目已按 §1.5.1 归档至 `docs/validation/evidence/directive-history/`（单元：`dr1/`；各含 `MANIFEST.md` 与 `SHA256SUMS.txt`）；原路径不改写，对应关系以 MANIFEST 为准。（此前切片已清除的 `tmp/` 路径不在本次归档范围，属 OB-77 所指既有脱钩。）
 
 **`tmp/dr1/**` 的处置说明**：包含本片审查输入包、变异检验转录、链配置自证、探针原始捕获与草稿；按用户既有指令**不清理**，并留给 `DIRECTIVE-LEDGER-ARCHIVE`（双主题：台账归档与 `tmp/` 生命周期）处置。
 

@@ -1,0 +1,188 @@
+
+===== 1) candidate OB numbers already in the directive ledgers =====
+OB-53 -> line 871 :: | OB-53 | 2026-09-29 | **立项预留（DR-1 报告 §11 预留）**：`DIRECTIVE-MODEL-LISTS` 的立项内容 = 黑名单全称化、分档释放 `gpt-6-sol` 与 `gpt-6-luna`、白名单更新、成本上限重估；该片立项时使用本号（四项内容取自用户 2026-09-2
+OB-54 -> line 872 :: | OB-54 | 2026-10-02 | **`DEV_PLAN` 的 B3b 段尾过期表述（切片 `LEDGER-BACKFILL` 报告 §3 第 6 项登记为候选）**：`docs/DEV_PLAN.md:139` 与 `docs/DEV_PLAN_EN.md:140` 的 B3b 段落尾部仍称 B3a 段落
+OB-56 -> line 874 :: | OB-56 | 2026-10-03 | **A6 遗留：`AgentRunnerPinnedCLIRun.Run` 无生产调用者，且缺少「已派发后等待 / 采集 / 映射」的非 spawn 等待入口**（切片 `T027-ASSEMBLY-MIN` 报告登记为候选）：此前终局采集只能留在非生产 harness。 
+OB-57 -> line 875 :: | OB-57 | 2026-10-03 | **兜底根因未闭：`internal/adapters/agent_runner_replay_dispatcher.go` 在 spawn 成功后若身份记录失败即返回、且不回收该进程**（切片 `T027-ASSEMBLY-MIN` 的 F-02）：该片只在 consol
+OB-58 -> line 876 :: | OB-58 | 2026-10-03 | **把 pid 报告摘要纳入冻结事实并与后置校验请求绑定**（切片 `T027-ASSEMBLY-MIN` 的 F-01 第 2 项）：该改动触冻结事实与契约域，故按用户裁定该片不做。 | **待议**：另立切片（触冻结事实与契约域，须协议先行） |
+OB-59 -> line 877 :: | OB-59 | 2026-10-03 | **CLI 契约缺口：`tools/agent-stub` 与真实 CLI 只在派生子进程时写子 pid 报告**（切片 `T027-ASSEMBLY-MIN` 的 F-01 第 1 项生产后果）⇒ 在缺口闭合前，生产正向链会因缺该报告判 `uncertain`。 | **
+OB-60 -> line 878 :: | OB-60 | 2026-10-03 | **方案书模板增两节（用户预保留）**：① 跨包共享契约——列明跨文件共享项（常量 / 解析函数 / 判定顺序 / 错误分类），每项定义权威侧与核验方式，配机械核验；② 失败路径枚举——对每个可能失败的操作，列「失败后由谁负责 / 后果 / 如何证明」，逐条穷尽。适用裁剪：
+OB-76 -> NOT REGISTERED
+
+===== 2) REMAINING_SLICES rows (CN) =====
+504: | DR-9 | `TestAgentRunnerAssemblyFullChain` | `37070276731`（`68a1ef0`） | 本片修复后随同一批重跑 CI（见完成记录） | T027-ASSEMBLY-MIN（本片） |
+568: ### LEDGER-BACKFILL 切片定义回写（2026-09-29）
+572: | 标识 | `LEDGER-BACKFILL`（文档回填类切片，非准则治理；触发词 `切片:LEDGER-BACKFILL`） |
+583: | 执行自由度清单落盘路径 | `docs/validation/evidence/LEDGER-BACKFILL-freedom-list.md` |
+590: ### T027-ASSEMBLY-MIN 切片定义回写（2026-10-03）
+594: | 标识 | `T027-ASSEMBLY-MIN`（产品实现类切片；A 段最小可跑装配，范围严格限定拒绝路径） |
+605: | 执行自由度清单落盘路径 | `docs/validation/evidence/T027-ASSEMBLY-MIN-freedom-list.md` |
+632: | 2026-09-29 | LEDGER-BACKFILL | **文档回填切片**：更正台账与 `DEV_PLAN` 中的过期表述（★1 至 ★6）并补登 OB-53 第五项；① 核实 B3a 段落已在位（提交 `dd36b9b`）故不重复回填。⑤ `PASS WITH FIXES` → ⑦ `PASS WITH FIXES` → 复审 `PASS WITH FIXES`（`deepseek-v4-pro`，ADR-016；复审为额度例外，ADR-017，2 条 Low 已处置）；另如实登记首轮输入包 diff 为空系主控错误与 **OB-54 候选**（`DEV_PLAN.md:139`，下一片登记）。零代码改动、探针 0。 | docs/validation/ledger-backfill.md |
+633: | 2026-10-03 | T027-ASSEMBLY-MIN | **产品实现类切片（A 段：拒绝路径）**：把已冻结的 AgentRunner 构件装配成可跑的拒绝路径链，新增 3 个生产文件与 2 个测试文件并接线 console 的八项 flags 路由；②b 经三轮整改后两侧解析口径合一、单个兜底闭包覆盖全部 spawn 后失败返回。⑤ 三轮均 `PASS WITH FIXES`（第三轮为额度例外，ADR-018）；⑥ `INDEPENDENT SCAN: PASS`（0 发现）；⑦ 盲审与终审与复审（Codex，3/3）⇒ `RE-REVIEW: PASS WITH FIXES`（M-1 已关闭；F-02 按**用户预授权的记录态**收口，根因登记候选 OB-57）。变异条目全红或如实标被取代且逐字节还原；门禁 `TOTAL_FAIL=0` 且全量测试无失败；已提交 `68a
+635: | 2026-10-03 | DIRECTIVE-CLEANUP-EVAL | **准则治理类切片（清账 + 只读实测评估）**：① 清两处台账过期陈述（T027-ASSEMBLY-MIN 行由上一片完成、本片逐字复核确认；DIRECTIVE-MODEL-LISTS 行改为「已提交 `35e8198`，CI run `37092310920` 双绿」）；② 上一片报告的「⑩ 停点后裁决回执」节首句补「本节为事实记录，不改写 §11 / §12 的 ⑩ 停点当时表述」；③ OB-66 处置列翻 `已裁决`（顺延口径 = 以 §12.4 为唯一真值源）；④ 完成 OB-70 评估（三次 `modelId` 形式实测全被拒 + 两页官方文档核查 + 显示名稳定性分析 ⇒ 推荐「`modelId` 到限定名 `Model Name (vendor)` 的映射表」，另立切片）；⑤ OB-63 落地 
+636: | 2026-10-03 | DIRECTIVE-DESIGN-LOOPBACK | **准则治理类切片（设计回流机制评估；不落任何规则本体）**：评估三项——① 会话结论无回流（三个例子逐条实测：sessbridge「三代」叙事在两侧仓库均不可复原、`modelId` 被拒已回流但触发条件为**用户同轮裁定**、whois 期 V3.2 在两侧仓库均无命中）；② RFC ↔ 准则映射缺失（引用矩阵实测：准则 → RFC 两处且均为偶然、RFC → 准则零处、产品层权威文档 → 准则零处）；③「任务包结项报告」机制（关键边界 = 前瞻须用户视角 ⇒ 机制须落「两份产物」）；产出轻 / 中 / 重三案判据对比，**不推荐**、交用户裁定。落点：§12.4 的 OB-71 条目 + 编号溯源说明、v1.20 版本包、ADR-021、本台账行。⑤ 跳过（S 档可选）、⑥ 跳过（纯文档，§7.2 
+637: | 2026-10-03 | DIRECTIVE-LOOPBACK-LANDING | **准则治理类切片（轻量回流机制落地；不触规则本体）**：① §11.2 增「登记建议与留痕」段（D-1 原则加首例）与「台账完成行格式」段（完成行只写提交时可确定的事实、CI 号只进报告、历史完成行不追溯改写）；② `DOCUMENTATION_PLAN{,_EN}` §1 表后增构建纪律层 ↔ 产品定义层跨层指针（指向 RFC）；③ 新增项目级结项报告模板 `docs/SLICE-CLOSEOUT-TEMPLATE{,_EN}.md`（落 `docs/` 根，按用户同轮修正）并加 T027 结项锚点（回看 = 主控、前瞻 = 用户裁决），模板已在 `DOCUMENTATION_PLAN` §2 文档清单登记；④ §12.4 的 OB-71 翻 `已处置`、OB-49 处置列改指「`tmp/` 生命周
+638: | 2026-10-04 | DIRECTIVE-MODELID-MAP | **准则治理类切片（三件同族规则修正；触规则语义、⑦ 不降级）**：① R2.2 修正——调用串由 `modelId` 反转为**限定名** `Model Name (vendor)`，`modelId` 降为内部标识；§2.2 表两列语义对调、R2.2 本体保留「必须显式传 `model`」并新增**限定名维护机制**、附录 B 全部模板调用串改限定名、引用点（§2.3 / §2.4 / §5.0 步 2 与步 4 / §6.3 括注 / §5.2 列名）同步；② OB-72 落地——§11.2 完成行重建为「报告路径」，hash 与 CI 号只进报告；③ OB-49 机制落地——新增 §1.5.1（三类处置 / 清理时机 / 归档目标约定），准则内三处 `tmp/` 引用只加归档注记（归档执行另立片）。台账翻
+641: > **已回填**（本片核实，2026-09-29）：**B3a 的 `DEV_PLAN{,_EN}.md` 段落已由提交 `dd36b9b` 补入**（`DEV_PLAN.md:137` 与 `_EN.md:138`）；原注记的过期表述由切片 `LEDGER-BACKFILL` 更正，**回填动作无需重复执行**。
+
+===== 3) .gitignore =====
+# Go
+/bin/
+*.exe
+*.test
+*.out
+vendor/
+/tools/contracts/node_modules/
+
+# ProofRail runtime state
+/out/
+/tmp/*
+!/tmp/.gitkeep
+# Scratch output belongs in the repo-root tmp/ only; guard against tools writing their own tmp/
+/tools/tmp/
+
+# Agent role set: role definitions (*.agent.md) ARE versioned (DELIVERY_DIRECTIVE R2.5);
+# only the sol-orchestrator generator toolchain and its artifacts stay ignored.
+.github/agents/sol-orchestrator/
+.github/agents/*.managed.json
+**/__pycache__/
+
+# context-mode runtime state
+.github/context-mode/content/
+.github/context-mode/sessions/
+.github/hooks/context-mode.json.bak
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+===== 4) memory t027-slice-protocol.md lines 94-140 =====
+- **下一片方向（待用户裁定，2026-09-29 未定）**：用户已给出三条路 **(A) 等 Codex 预算恢复再做 T027/T028**、**(B) 先做低 Codex 片**、**(C) 裁"T027 装配允许 ⑦ 降级 V4 Pro"**，并倾向 A 或 B；主控建议 **B 现在 + A 对 T027**（T027 触及状态机/授权契约/生产代码 ⇒ 不宜降级做；`DIRECTIVE-LEDGER-ARCHIVE` 双主题或类似低 Codex 片可先行）。**收到用户裁定前不得起跑下一片。**
+- **LEDGER-BACKFILL 已闭环（2026-09-29，用户接受）**：提交 `1343730`（`docs: ledger backfill (v1.16) + OB-21 note + OB-53 auto entry`，13 文件 +400/−22，**全 `.md`**）已推 `origin/main`（SSH，**未推 gitee**）；CI run **`36553634246`** 双绿，两腿 `Gates` 实测 `SELFTEST: PASS 248/248`、`GATE REPORT scope=ci changed=13`、`TOTAL_FAIL=0`。⑦ 第 2 轮 = `PASS WITH FIXES`（2 Low 已处置；**额度例外以 ADR-017 留痕**，四要素 + 不得作为先例）。零 Codex、零探针。★1 = 履行 S1-REACH 自由度 F-2 预留的用户授权出口（只改 OB-21 现象列、末列仍 `待议`、OB 未闭合）。
+- **下一片起跑必做（用户 2026-09-29 裁定）**：第一件事 = 把 **OB-54** 正式登记进 `docs/DELIVERY_DIRECTIVE{,_EN}.md` §12.4（内容 = `docs/DEV_PLAN.md:139` / `_EN.md:140` 的 B3b 段尾仍称 B3a 段落未补入），连同期间新增的候选 OB。
+- **⑧b 事实记录不触发再跑 ⑦（2026-09-29 用户接受，但为例外）**：审查结论行 / §12 自洽表述 / 读数更正 / Low 类处置均属事实记录 ⇒ 不触发；**不得泛化**，下一片同类情形逐次判定。
+- **CI 运行号不回写台账完成行（2026-09-29 用户裁定）**：成本不值；CI 号留在 ⑩ 回执即可；若确需并入下一片任一回写，**不单独起 commit**。
+- **本片门禁基线（供下片对照）**：`SELFTEST PASS 248/248`；`G7-b 76` 条工件行；镜像 报告对 148/148、指令对 1314/1314、DR-1 报告对 153/153 全 0 失配；`enc-tree violations=3`（OB-27 冻结包豁免）；**`G4b` 拦新汉字只能改措辞、禁止扩白名单**（本片新字「坐」由「逐项坐实」改写清零）；**ADR 对与台账对不做整文件位置镜像**（既有位置差异，适用 `G3(a)` 改动行对称）。
+- **tmp/lbf 现状**：报告 §10 记的是落笔时读数 19 个过程文件；收尾后又增 `findchar.js` 与 `ci-watch.txt` ⇒ 现为 **21**，处置仍 `local-only`（未清）。**用户裁定（2026-09-29）：不单独起 commit 修这个滞后**，登记为**下一片回写时顺手加注一行**（原文建议："磁盘现为 21，新增 `findchar.js` 与 `ci-watch.txt`，均未跟踪"）。
+- **下一片方向（用户 2026-09-29 维持）**：T027 / T028 只在 Codex 可用时做、**不降级**；`DIRECTIVE-LEDGER-ARCHIVE`（双主题，触 G6-6）与 `DIRECTIVE-MODEL-LISTS`（触 §2.2/§2.4）均需 Codex；`C1` 收窄版待用户裁「完成判据 + Linux 环境」。**收到明确目标前不起跑、不发回执。**
+- **T027-ASSEMBLY-MIN 已闭环（2026-10-03，用户接受）**：提交 `68a1ef0`（装配 A 段：拒绝路径 + 步骤 0 的 v1.17，16 文件）与 CI 修复提交 `d2d6370`（`fix: settle the declared offline workload with the zero-cost amount (DR-9, T027-ASSEMBLY-MIN)`）均已推 `origin/main`（**未推 gitee**）；CI run **`37073985144`** 双绿（两腿 `SELFTEST PASS 248/248`、`GATE REPORT scope=ci changed=8`、`TOTAL_FAIL=0`；Ubuntu 腿 `internal/console ok` ⇒ `TestAgentRunnerAssemblyFullChain` **首次在 Linux 通过**）。⑦ 三轮用满（盲审 → 终审 `FINDINGS` → 复审 `PASS WITH FIXES`）；**F-02（dispatcher spawn 后 identity 失败不回收）按用户预授权以「记录态」收口**，根因登记候选 OB-57；⑤ 第 3 轮为额度例外（ADR-018）。
+- **⚠️ T027-ASSEMBLY-MIN 唯一未完成项（用户 2026-10-03 裁定：不做第三次提交，下一片起跑时一并修正）**：`docs/t027/REMAINING_SLICES{,_EN}.md` 的 **T027-ASSEMBLY-MIN 完成记录行仍写「未提交」（等同轮授权）——已过期**（实际已提交 `68a1ef0` + `d2d6370` 且 CI 双绿）。下一片起跑回写时把该单元格改为已提交状态并注明 CI run `37073985144`。
+- **候选 OB 待下一片起跑同批落 §12.4**：OB-56（`Run` 无生产调用者 / 缺非 spawn 等待入口）、OB-57（F-02 根因：`agent_runner_replay_dispatcher.go` spawn 后 identity 失败不回收，**超出本片范围**）、OB-58（pid 报告摘要纳入冻结事实并绑定）、OB-59（CLI 契约缺口：stub / 真实 CLI 只在派生子进程时写子报告 ⇒ 生产正向链会因缺子报告 `uncertain`）、OB-60（用户预保留：方案书模板增「跨包共享契约」与「失败路径枚举」两节，S 档不要求）、OB-61（源码级不变量测试可被等价改写规避 ⇒ 建议 AST 级断言）。**另（用户 2026-10-03 追加）OB-64 = 「runSubagent 的 execute 层首轮调用返回空输出、重试即成功」——归属 Copilot 后端行为（非 ProofRail 代码），下一片起跑时与 OB-56..63 同批落 §12.4。⚠️ 编号核对（落账前须先向用户确认）：本片记录中 OB-62 已由用户裁定「与 DR-9 同源、合并不另立」，OB-63 从未分配 ⇒ 需确认 OB-62 / OB-63 是否另有归属，避免编号冲突。**
+- **本片新增可复用经验**：① **源码级不变量测试**可作「平台不可达路径」的机械护栏（Windows 上 awaiting 之后不可达 ⇒ 用文本计数不变量 + 变异 M19 证明有效）；② **平台分工缺口被 CI 证实为真**——Ubuntu 腿首次执行正向全链即暴露 (A′) 映射漏履行「金额由调用方供给」义务（**DR-9，真实缺陷非 flake**，本片修复：声明式离线工作负载补零成本 + 显式边界注释 + 断言）；③ **门禁输出勿用 PowerShell 重定向**（会把 CJK 二次编码成虚假未登记字符）⇒ 用 `cmd /c` 字节级重定向并按**码位**核对；④ `G4b` 拦新汉字仍按「**改措辞、不扩白名单**」处置（本片 疏/伸/忧 三字）；⑤ 漂移守卫（parity test）在两条入口有意分歧时，应改为**显式钉住分歧**（A=nil / B=0）再对其余字段 `DeepEqual`，而非放宽为部分断言。
+
+
+
+
+
+
+
+
+
+
+===== 5) ADR register: head + last entries =====
+# ProofRail 架构决策记录
+
+> 2026-09-11 ADR-012 实施状态更新：T026 已完成，最终为 **10 verified、2 unsupported、0 unknown、blocked**。Job Object 取消 verified；allow-all 对照证明工具别名和 shell 网络可绕过 CLI deny，故当前候选不兼容。已批准架构不变；T027 仍须等待另行冻结并验证的外部强制边界或兼容候选，AT-23 未通过。详见 [T026 最终结论](validation/t026-agent-runner-contract.md)。
+
+[English](ADR_REGISTER_EN.md)
+
+日期：2026-09-06。状态分为 RFC 已决定、提议待评审、待实验；本表不代表用户已批准 S1。每项批准时记录主体、日期、RFC 变更和测试证据，禁止模型代签。
+
+| ID | 决策/方案 | 替代与理由 | 状态/完成条件 |
+|---|---|---|---|
+| ADR-001 | Go 模块化单体、CLI/TUI、single writer、无默认 Git 写入 | 不选脚本翻译/分布式系统；降低跨平台与恢复复杂度 | RFC §4/11/16 已决定；T001 确认依赖基线 |
+| ADR-002 | 冻结 Schema 2020-12 工具链、canonical JSON/路径/错误/配置优先级 | 采用 `canonicalize` 4.0.0 复算 RFC 8785 向量；Ajv 8.20.0 独立于未来 Go 核心 | T002/T025 已冻结 30 份结构 Schema；当前 86 个手写预期 fixture 与两条 canonical 向量全部通过 |
+| ADR-003 | 事件/journal 与接受提交协议、Windows 原子替换/停机原语 | rename 只解决单文件；需证明 durable、失败回滚和跨文件发布读者语义 | T004 已实测：NTFS 开放 reader 阻止普通替换且目录 `Sync` 不可用，ext4 支持开放 reader 替换与目录 `Sync`；rename 后 receipt 前必须判 uncertain。S1 采用平台原语并补断电故障注入；不能用目录隔离替代 required OS 限制 |
+| ADR-004 | SessionBridge v0.1.1 silent + 文件队列，核心自管持久幂等 | 不 fork 扩展、不用 visible/auto、无 GUI 兜底；内存缓存不等于 exactly-once | T004 探针结论保留；将 SessionBridge 作为正式 AI 执行通道的部分由 ADR-012 取代 |
+| ADR-005 | bootstrap 首个 seed 由固定 commit、常规构建、独立 Go tests 和人工审计建立；N 构建 N+1，隔离重放 | 不接受候选自证或覆盖运行中 host | RFC §16.5 已定；T017 记录 seed commit/摘要、外部 oracle 和 rollback 路径 |
+| ADR-006 | Windows 11 amd64 正式、Linux amd64 核心 CI；纯 Go 发布；固定工具链/依赖，S1 以 commit+CI+SHA256SUMS+SBOM/许可清单为发布证据 | RFC §16.2 提到 Win10，与 §9.6/14 的 Win11 范围不同；不建立 S1 离线密钥体系，签名/attestation 后续增强 | 2026-09-08 所有者批准简化；T017 落实基础发布证据 |
+| ADR-007 | 最小 context、离线先行、按任务预算、双语 ID 追踪 | 不用昂贵模型反复全仓审读；不把英文译本做第二权威源 | 2026-09-06 所有者批准；S0 新增付费调用为 0，超出须另授权 |
+| ADR-008 | RFC §19 六类产品最小闭环纳入 S1；仍用本地模块、不建商业后台 | 不采用只交执行引擎、隐式回写/部署或静默自更新；新增成本必须显式评审 | 2026-09-06 所有者批准范围；T002 已冻结记录，T003 已补样例，T019–T024 运行验证；未授权 S1 编码 |
+| ADR-009 | S1 Windows amd64 使用手工解压的便携 ZIP；用户选择独立目录，以完整 `prfrail.exe` 路径运行，不修改 PATH/注册表/系统目录 | 不采用安装器、包管理器、自动更新或隐式版本切换；最小化安装副作用并支持目录级并存/回滚 | 2026-09-09 产品所有者明确批准；最终 ZIP 仍须绑定发行记录并复验 |
+| ADR-010 | 产品版本采用 `vMAJOR.MINOR.PATCH`（首版候选 `v0.1.0`）；原型期新 minor 发布时，在 GitHub Release notes 与仓库支持矩阵同时公告前一 minor 的 EOL，初始窗口为发布后 90 个自然日 | patch 不启动新的 EOL 倒计时；每次 minor 发布前按稳定性、用户量和维护能力评审是否延长未来窗口。不得追溯缩短已公告窗口；例外须有带日期、理由和到期日的 ADR，经产品所有者明确批准后同步两处 | `PROPOSED / NOT APPROVED`；90 天适合当前早期原型，通知渠道与演进规则须在首版发布前获产品所有者明确批准 |
+| ADR-011 | ProofRail 的 AI/操作员正式交互由本地 CLI/TUI、chain 控制 API 和持久交互记录闭环；SessionBridge `@sbr-review` 只作可选诊断/人工测试 | chat participant 的注册与可见性受 VS Code/扩展生命周期影响，不能承载权威状态、授权或恢复；复用它会形成第二控制面。代价是先冻结 `operator-interaction` 契约并实现 T025 | `ACCEPTED / IMPLEMENTED`；2026-09-10 T025/AT-22 通过，Schema/golden/hash/replay、聚焦终端收件箱与 Engine 控制 API 已验证；完整统一 TUI 和 AgentRunner 接线仍分别由后续切片/T027 负责 |
+| ADR-012 | 正式 AI 执行采用核心拥有的 `AgentRunner` 端口和固定版本 CLI Agent adapter；另提供显式选择的 `supervised-black-box` 候选导入，SessionBridge 仅作消息/可见界面桥 | silent 只生成文本，visible 只证明面板投递。黑箱模式只保证隔离后的产物检查与独立验收，不保证过程、网络、费用或外部副作用；拒绝复刻完整 VS Code Agent、自动降级或把 transcript/完成声明/退出 0 当权威事实 | `APPROVED / PARTIALLY IMPLEMENTED`；T026 已完成四类 wire/hash/replay、能力矩阵及 GitHub Copilot CLI 1.0.83 固定摘要探测。最终为 10 verified、2 unsupported、0 unknown：Job Object 取消通过，工具别名及 shell 网络 allow-all 对照证明 CLI deny 可绕过。候选不兼容；T027 须等待可证明的外部强制边界或兼容候选，AT-23 未通过。T028/AT-24 仍关闭黑箱流程；在此之前 S1 阻断 |
+| ADR-013 | Windows 发布耐久候选协议与反证（A7）：枚举 C1 现行基线、C2 `MoveFileEx(MOVEFILE_WRITE_THROUGH)`、C3 目录句柄 `FlushFileBuffers`（`GENERIC_READ`+`GENERIC_WRITE` 与 `FILE_FLAG_BACKUP_SEMANTICS`）、C5 两阶段 marker、C6 预建槽位；排除 `ReplaceFile`、temp 句柄 `FILE_FLAG_WRITE_THROUGH`、TxF | 不预设两阶段 marker 成立；A7 只做进程级反证与 API 可观测性，断电注入属 B3；不改变生产发布原语与冻结契约句 | `EXPERIMENTAL / UNRESOLVED`。**级别与前提必须一起读**：在前提 P（进程级崩溃、无断电、单主机 Windows 11 / NTFS 本卷）下——可见性与仲裁层 **`proven`**（P1–P5：进程内 8 路真并发 + 跨进程同轮并发尝试，跨进程强同步未证；构造性论证 + 观测）；断电耐久 **`unresolved`**（U1–U5）；**被证伪的断言集合 D1–D6 一律 `disproven`**（候选 C2/C3 的断电耐久仍 `unresolved` 且为 B3 注入候选，不等同于“候选已被证伪”）；`observed`/`falsified`/`disproven-by-policy` 仅作证据注释，**不作为等级**。Windows 保持 `unproven` 且 first-dispatch 仍拒绝；C2 与 C3 并列为 B3 注入候选；C5 marker 作为耐久机制 `disproven`。完成条件：B3 真实断电注入通过，**且按 `docs/CONTRACTS{,_EN}.md` §7「发布耐久等级与升级条件」完成协议先行修订并经独立评审**，且 AT-23 通过后，才可升 `ACCEPTED`；解除 `unproven` 与 first-dispatch 锁定受该条款的**解锁边界**约束（只在该平台、该前提覆盖的部署环境内）。**2026-09-21（B3b）**：真实断电注入矩阵（主矩阵 17 格×5 = 85 轮全有效、U4 6 格×3 = 18 轮、0 真孤儿；前提 P′ = VirtualBox Win11B3 / NTFS on SATA-AHCI `useHostIOCache=false` / 记录级 ~1 KiB / 2 s cut 窗口 / N=5）判定 **C2 `proven`**、C1/C3/C2C3 `unresolved`（C3/C2C3 的原因为决定格**机制证据缺失**，属装置 fail-closed，**不等同于“不耐久”**）；候选排序据此更新为 **C2 优先，C3/C2C3 未建立主张**；**Windows `unproven` 与 first-dispatch 拒绝仍未改变**——按“协议先行”，升 `ACCEPTED` 的前置是按 CONTRACTS §7「发布耐久等级与升级条件」修订耐久冻结句（独立切片 **B3c**，该口径修订已于 2026-09-21 完成）；升 `ACCEPTED` 仍需该平台自身完整证据 + 独立评审 + AT-23 通过。参见 `docs/validation/t027-b3b-durability.md`（+ `_EN`）与证据包 `docs/validation/evidence/b3b-2026-09-21/` |
+| ADR-014 | **切片 `DR-1` 的 ⑦ 终审模型降级（用户直接裁定）**：本片 ⑦ 由 `deepseek-v4-pro` 承担，**不是** §2.2 白名单的 `gpt-5.3-codex` | 理由：Copilot 预算已用 96%，且本片是业务切片验证；未采纳的替代：保留 `gpt-5.3-codex`（预算不可承受）。登记依据 = 用户 2026-09-24 的裁定原文，按 §12.4 的 OB-37 元规则以 **ADR** 形式独立留痕（该元规则允许 OB 或 ADR） | **已裁（用户直接裁定，仅本片有效，不得作为先例）**。四要素：裁决人 = 用户；日期 = 2026-09-24；理由 = Copilot 预算 96% 与业务切片验证；依据 = 用户同轮裁定原文。**性质标注**：含规则语义变更、超出 §2.2 字面标准、系用户直接裁定。**后续义务**：验证报告须如实标注「本片 ⑦ 由非白名单模型承担，独立性降低」并交 ⑧c 复核；本例外**不推广**（其它切片仍按 §7.5 与 §2.2 白名单执行） |
+| ADR-015 | **切片 `S1-REACH` 的 ⑦ 终审模型降级（用户直接裁定）**：本片 ⑦ 由 `deepseek-v4-pro` 承担，**不是** §2.2 白名单的 `gpt-5.3-codex` | 理由：本片为纯文档与只读判定切片（不触 §7.2.1 ③）且 Copilot 预算受限；未采纳的替代：保留 `gpt-5.3-codex`（预算不可承受）。登记依据 = 用户 2026-09-29 的切片定义原文，按 §12.4 的 OB-37 元规则以 **ADR** 形式独立留痕（该元规则允许 OB 或 ADR） | **已裁（用户直接裁定，仅本片有效，不得作为先例）**。四要素：裁决人 = 用户；日期 = 2026-09-29；理由 = 纯文档与只读判定切片、不触 §7.2.1 ③、Copilot 预算受限；依据 = 用户同轮裁定原文。**性质标注**：含规则语义变更、超出 §2.2 字面标准、系用户直接裁定。**后续义务**：报告须如实标注「本片 ⑦ 由非白名单模型承担，独立性降低」并交 ⑧c 复核；本例外**不推广** |
+| ADR-016 | **切片 `LEDGER-BACKFILL` 的 ⑦ 终审模型降级（用户直接裁定）**：本片 ⑦ 由 `deepseek-v4-pro` 承担，**不是** §2.2 白名单的 `gpt-5.3-codex` | 理由：本片为纯文档回填切片（不触 §7.2.1 ③）且 Codex 预算已耗尽；未采纳的替代：保留 `gpt-5.3-codex`（预算不可承受）。登记依据 = 用户 2026-09-29 的裁定原文，按 §12.4 的 OB-37 元规则以 **ADR** 形式独立留痕 | **已裁（用户直接裁定，仅本片有效，不得作为先例）**。四要素：裁决人 = 用户；日期 = 2026-09-29；理由 = 纯文档回填切片、不触 §7.2.1 ③、Codex 预算耗尽；依据 = 用户同轮裁定原文。**性质标注**：含规则语义变更、超出 §2.2 字面标准、系用户直接裁定。**后续义务**：报告须如实标注「本片 ⑦ 由非白名单模型承担，独立性降低」并交 ⑧c 复核；本例外**不推广** |
+| ADR-017 | **切片 `LEDGER-BACKFILL` 的 ⑦ 复审额度例外（用户直接裁定）**：⑦ 额度 1/1 用尽后，追加第 2 轮复审 | 理由：⑦ 首轮报 Medium（审查输入包的 diff 为空文件，属**主控**错误），四条处置需独立复核；未采纳的替代：按 §7.5 停下、以「`PASS WITH FIXES` + 四条已处置」直接结片（用户认为主控交错了输入包，须经独立复核）。本片 ⑦ 为 `deepseek-v4-pro`，成本可控。登记依据 = 用户 2026-09-29 的裁定原文，按 §12.4 的 OB-37 元规则以 **ADR** 形式独立留痕 | **已裁（用户直接裁定，仅本片有效，不得作为先例）**。四要素：裁决人 = 用户；日期 = 2026-09-29；理由 = ⑦ 首轮 Medium 系主控输入包错误、需独立复核，且本片 ⑦ 成本可控；依据 = 用户同轮裁定原文。**性质标注**：含规则语义变更、超出 §7.5 字面标准、系用户直接裁定。**后续义务**：报告须如实登记「首轮输入包 diff 为空文件系主控错误」与「本片消耗 ⑦ 额度例外」并交 ⑧c 复核；本例外**不推广** |
+| ADR-018 | **切片 `T027-ASSEMBLY-MIN` 的 ⑤ 第 3 轮额度例外（用户直接裁定）**：⑤ 额度 2/2 用尽后，追加第 3 轮**收窄**范围的复审 | 理由：N1 属**行为修正**（console 的 Publish 腿改为 fail-closed，语义与 postflight 腿 5 对齐），按 §5.3「修复后必须重新执行该环节本身」⇒ ⑤ 必须重跑；未采纳的替代：不开第 3 轮、交由 ⑦ 代为确认（用户认为行为修正须由同环复核）。第 3 轮**收窄输入范围**（仅本轮整改 diff + 前两轮 ⑤ 报告 + 契约原句 + 只读约束），不重审全文。依据 = 用户 2026-10-03 的裁定原文，按 §12.4 的 OB-37 元规则以 **ADR** 形式独立留痕 | **已裁（用户直接裁定，仅本片有效，不得作为先例）**。四要素：裁决人 = 用户；日期 = 2026-10-03；理由 = N1 是行为修正、§5.3 义务重跑；依据 = 用户同轮裁定原文。**性质标注**：含规则语义变更、超出 §7.5 字面标准、系用户直接裁定。**红线**：第 3 轮仍报 Medium+ ⇒ 停下升级，**不自行开第 4 轮**。**后续义务**：报告须如实登记本次额度例外并交 ⑧c 复核；本例外**不推广** |
+| ADR-019 | **切片 `DIRECTIVE-MODEL-LISTS` 的白名单扩列（用户直接裁定）**：§2.2 新增 `gpt-6.1-sol`（深度档）与 `gpt-6-luna`（平行备选）两行，§2.4 黑名单改为全称 `kimi-k3` | 理由：现役 §2.2 只列七个角色载体、§2.4 按族名禁用 Luna 族 ⇒ 扩列超出两处字面标准；未采纳的替代：先立项单独试点再扩列（周期不可承受）。登记依据 = 用户 2026-10-03 的裁定原文，按 §12.4 的 OB-37 元规则以 **ADR** 形式独立留痕（该元规则允许 OB 或 ADR） | **已裁（用户直接裁定，仅本片有效，不得作为先例）**。四要素：裁决人 = 用户；日期 = 2026-10-03；理由 = 决定本片是否将 `gpt-6-luna` 纳入 §2.2 白名单（扩列超出 §2.2 与 §2.4 两处字面标准）；依据 = 用户同轮裁定原文。**性质标注**：含规则语义变更、超出 §2.2 与 §2.4 两处字面标准、系用户直接裁定。**L1 至 L5 测试结论（实测，按预声明判定规则落 Luna 行）**：L1 首轮以 `gpt-6-luna`（`modelId` 形式）调用**被工具拒绝**并回传可用清单（其中 Luna 条目显示为 `GPT-6 Luna (copilot)`）；以该显示名串重试后 L1 至 L5 全绿——L1 返回 `PROBE-L1: OK`；L2 读到 `tmp/assembly-min/DESIGN.md` 首行与 71914 字节；L3 改写 `tmp/dml/luna-probe/target.txt` 第三行成功；L4 该文件 43 字节、无 BOM、LF；L5 `go version` = `go1.27.0 windows/amd64`；各层读数由主控独立复核一致；另测 `GPT-6.1 Sol (copilot)` 返回 `PROBE-SOL: OK`。**限制**：`runSubagent` 不返回实际服务模型 ⇒ 只证链路可用性，**模型身份未证（§2.3）**；自报值为 `GitHub Copilot`，不作证据；`modelId` 形式被拒一事已登记为 OB-67。**后续义务**：报告须如实标注「模型身份未证（§2.3）」并交 ⑧c 复核；本例外**不推广** |
+| ADR-020 | **切片 `DIRECTIVE-CLEANUP-EVAL` 的 ⑦ 终审模型降级（用户直接裁定）**：本片 ⑦ 由 `deepseek-v4-pro` 承担，**不是** §2.2 白名单的 `gpt-5.3-codex` | 理由：本片为纯文档 + 只读实测切片（不触 §7.2.1 ③）且 Copilot 预算受限；该片 ④ 已实测 `gpt-5.3-codex` 等 `modelId` 形式被工具拒绝（见 OB-70），显示名串口径的稳定性待评估；未采纳的替代：保留 `gpt-5.3-codex`（预算不可承受）。登记依据 = 用户 2026-10-03 的切片定义原文，按 §12.4 的 OB-37 元规则以 **ADR** 形式独立留痕 | **已裁（用户直接裁定，仅本片有效，不得作为先例）**。四要素：裁决人 = 用户；日期 = 2026-10-03；理由 = 纯文档与只读实测切片、不触 §7.2.1 ③、Copilot 预算受限；依据 = 用户同轮裁定原文。**性质标注**：含规则语义变更、超出 §2.2 字面标准、系用户直接裁定。**后续义务**：报告须如实标注「本片 ⑦ 由非白名单模型承担，独立性降低」并交 ⑧c 复核；本例外**不推广** |
+...
+| 3 STRIDE | 风险/责任/AT 映射已写；T003 只读安全复核未发现 fail-open，运行期安全证据仍由后续 gate 提供 | 已关闭 S0 静态部分（T003） |
+| 4 whois + 非 C | whois 保持映射样例；Go/JavaScript/Python 非 C fixture 已通过 | 已关闭（T003） |
+| 5 技术探针 | Windows 11/NTFS、Ubuntu 24.04/ext4、TUI、进程树、文件队列及 SessionBridge 无模型合同已实测，限制见 `validation/s0-spikes.md` | 已关闭（T004） |
+| 6 可追踪 backlog | 所有者已批准当前 S0/S1 范围和追踪计划 | 已关闭（T001） |
+| 7 平台/Go/许可/周期/响应/发布证据 | 平台、支持期、逐依赖许可及简化发布证据策略已批准；精确依赖/渠道未锁定 | T017 |
+| 8 用户批准 | 已批准 S0 规格冻结、S1 范围、零新增付费预算和 whois 影子原则；未授权 S1 编码、具体 whois 数据访问或发布 | 已关闭（T001）；执行授权另行取得 |
+| 9 step/TUI/bootstrap | step/TUI 合同与 TUI 原型已验证；seed/oracle 身份仍未建立 | T017 |
+| 10 多语言 schema | C+Go 与 C+JavaScript+Python 的所有权/依赖 fixture 已通过 | 已关闭（T003） |
+| 11 handoff | 合法交接与只读 target 非法交接 fixture 已通过 | 已关闭（T003） |
+| 12 documentation | 合法 impact/waiver、必需文档缺失及循环生成 fixture 已通过 | 已关闭（T003） |
+| 13 产品与生命周期 | PC-01–PC-06 对应记录均有独立结构正反 fixture；运行验收仍属 S1 exit | 已关闭 S0 契约部分（T003） |
+
+允许下一步：评审本包并执行 S0 规格化和独立技术探针。进入 S1 必须逐项提交证据与显式用户批准，不能由文档存在性自动放行。
+
+## 4. T001 所有者决策单
+
+状态：`APPROVED_FOR_S0_SPEC_FREEZE`。2026-09-06，产品所有者（当前仓库用户）基于第三方只读审计明确批准 S0 规格冻结及本决策单内容；T001 完成，允许进入 T002。该记录不是独立安全签署，也不授权 S1 生产编码、付费调用、具体 whois 数据访问、Git 操作或发布。
+
+| 决策 | 批准内容 | 当前约束/待落实 | 批准记录 |
+|---|---|---|---|
+| S1 范围 | R1–R22 加 PC-01–PC-06；S2/S3 增强不前移 | 仅批准范围进入规格冻结，未授权 S1 生产编码 | 2026-09-06，产品所有者批准 |
+| S0 预算 | 只使用当前已授权会话和本地工具；新增付费调用为 0 | 不调用收费模型/服务；自动安装依赖仍需任务内明确依据 | 2026-09-06，产品所有者批准 |
+| 产品所有者 | 当前仓库用户作为最终范围/发布批准者 | S1 编码、Git、发布仍须各自明确授权 | 2026-09-06，产品所有者确认 |
+| 安全评审 | 指定一名未生产该候选的独立评审者；同一人兼任须披露独立性不足 | 评审者尚待指定，§17.3 保持 NOT_READY | 原则于 2026-09-06 批准；人员/结论待记录 |
+| 平台/支持 | Windows 11 amd64 正式；Linux amd64 核心 CI；当前与前一 minor，前一 minor 90 天 | 首版前冻结 EOL 通知方式和例外 | 2026-09-06，产品所有者批准 |
+| 发布信任 | S1 使用固定 commit SHA、GitHub CI、SHA256SUMS、SBOM 和许可证清单；不建立离线密钥体系 | SHA256SUMS 不得表述为身份认证；签名/attestation 后续增强 | 2026-09-08，产品所有者批准简化策略 |
+| 安装模型 | Windows amd64 便携 ZIP 手工解压到用户自选独立目录；显式路径运行，不修改 PATH/注册表/系统目录 | 最终 ZIP 仍需绑定发行记录并复验；不授权发布 | 2026-09-09，产品所有者批准 |
+| whois 影子 | 原则允许未来使用脱敏只读固定夹具 | 每次执行仍需输入路径、脱敏范围和时段授权；当前不得读取资产 | 2026-09-06，产品所有者原则批准 |
+| 依赖许可 | 优先标准库；每个 TOML/Schema/canonical/TUI 候选逐项核许可证、最低 Go 与维护状态 | T002 记录名称/版本/来源/许可证/摘要/日期后方可引入 | 2026-09-06，产品所有者批准策略 |
+
+本次明确批准的是“批准 S0 规格冻结”。“批准 S1 编码”仍须另行给出，二者不能互相推断。本次批准不自动批准 Git commit/push/release，也不批准读取具体 whois 资产或新增付费调用。
+
+## 5. A7 Windows 发布耐久反证结论（ADR-013）
+
+- **结论（2026-09-16，级别与前提必须一起读）**：在前提 **P = 进程级崩溃、无断电、单主机 Windows 11 / NTFS 本卷** 下——可见性与仲裁层 `proven`（P1–P5，构造性论证 + 观测）；**断电耐久 `unresolved`**（U1–U5）；**被证伪的断言集合 D1–D6 一律 `disproven`**（候选 C2/C3 的断电耐久仍 `unresolved` 并移交 B3）；**Windows 发布耐久保持 `unproven`**，`first-dispatch` 仍被拒绝；T027 仍 `BLOCKED / NOT IMPLEMENTED`，AT-23 未通过。**不得把可见性层的 `proven` 读成断电级保证。**
+- **关键实测**：`record-linked` 与 `parent-synced` 在 kill 下观察等价（故 kill 不能证明目录项耐久，这是 A7 无法把任何候选升为 proven 的根因）；并发发布恒单赢家且“杀赢家不解锁二次派发”；**目录句柄 `FlushFileBuffers` 在非提权下可调用成功**（只读句柄被拒）——推翻 T004 以来“目录 Sync 不可用”的强表述；`MoveFileEx(MOVEFILE_WRITE_THROUGH)` 无提权可用、已存在目标映射 `fs.ErrExist`、目标被打开时拒绝覆盖。
+- **候选排序（供 B3 注入）**：C2 与 C3 并列首选；C6 为契约修订后的结构性候选；C5 marker **不作为耐久机制**（作为“可见性+一致性”手段亦无增益，已证伪）。
+- **级别口径与证据限制**：可见性与仲裁层（P1–P5）的 `proven` 带明确前提“进程级崩溃、无断电”，由构造性论证 + 可复现观测共同支撑；耐久类断言一律 `unresolved`。承载 E4/E6/E9/E10 的 `a7native` 实验**不进 CI**，属单主机证据，需在 Windows 主机手动重跑（`PROOFRAIL_A7_ROUNDS=20 go test -tags a7native -run TestA7Native ./internal/adapters/`）。
+- **若 B3 日后采纳 C2/C3**：必须先按 `docs/CONTRACTS{,_EN}.md` §7「发布耐久等级与升级条件」完成协议先行修订（该冻结句已由 B3c 改写：Windows 目录项持久性“**不是平台常量**”，按（平台 × 前提）逐项判定）并经独立评审，**不得因 B3 通过就自动解锁** `unproven` 与 first-dispatch。
+- **边界与移交**：断电类断言（候选 C2/C3 的落盘保证、C2 文档措辞歧义、本机存储栈 flush 语义、断电下目录项丢失有序、共享卷 fencing）全部交 B3；临时残留累积为 A7 发现项，不在本切片修。详见验证报告：[中文](validation/t027-windows-publication-durability.md) / [English](validation/t027-windows-publication-durability_EN.md)。
+
+===== 6) §11.1 text =====
+### 11.1 权威分域与双语
+
+- 权威分域见 §0.1；中文为权威、`_EN` 为镜像；镜像必须**逐句对齐**（不只关键词）。
+- 历史版本（如 v3.1 准则、已冻结的验证报告）**不重写**，只加指针或更正注记。
+
+### 11.2 回写口径
+
+切片收尾必须回写：验证报告（新建或追加）、`DEV_PLAN{,_EN}` 段落、切片台账（状态行 / 勾选项 / 完成记录）、ADR 行（如涉及裁决）。回写内容必须**取自切片自身证据**，不得凭记忆；缺失字段标注"历史缺失"。**⑩ 停点回执须含「回写核对」行**（OB-63 口径）：逐项列**验证报告 / `DEV_PLAN` / 台账 / ADR**，每项标 `已回写` 或 `不适用 + 理由`。
+
+**登记建议与留痕**：凡用户同轮裁定中明确的结论，主控应在当次回执中**主动建议**是否登记为 OB / ADR；用户未明确回应则默认不登记，但**该建议动作本身要留痕**（写入该片报告或台账）。**首例**：`DIRECTIVE-DESIGN-LOOPBACK` 收尾时主控据此原则主动提出 OB-49 指针修正建议、用户裁定批准（其修正随本片落盘，见 §12.4 的 OB-49 处置列）。
+
+**台账完成行格式**：台账完成行 = **报告路径**（不写 commit hash 与 CI run 号——两者在提交前均不可知，而完成行落于提交之内，写入即自指，见 §12.4 的 OB-72）。**commit hash 与 CI run 号只进报告**，由**本片主控**以独立 docs-only 提交在**主提交推送并 CI 双绿之后、下一片起跑之前**补全（该回写提交自身的 run 只作观察记录，不再为其新增提交）；**该 docs-only 补全提交仍须 §10 的同轮显式授权**，不得自行提交；无 CI 的切片在报告如实标注、**不补 hash 与 run 号**。**历史完成行不追溯改写**（依 §11.1）。
+
+### 11.3 报告结构
+
+变更概要 → 执行流水线（步骤/角色/状态/耗时/返工次数）→ 异常与兜底记录 → 环境与档位 → 审查结论摘要（⑤⑥⑦）→ **审查输入包摘要（含盲审隔离证明：首轮是否附清单、输入是否已消毒）** → 可证伪性（机械检查 + 变异检验）→ 门禁结果 → ⑧c 收尾清洁记录（§5.1）→ 成本与计量（各类调用次数、探针额度）→ 明确未执行事项 → 下一步建议（含各角色档位建议）。
+
+---
+
+## 12. 准则自身的验证与演进
+
+### 12.1 试点要求
+
+===== 7) §0.3 last rows (tail) =====
+65: | v1.19 | 2026-10-03 | **清账 + `R2.2` 传参评估（切片 `DIRECTIVE-CLEANUP-EVAL`）**：① §11.2 增「⑩ 停点回执须含回写核对行」（OB-63 落地：逐项列验证报告 / `DE
+66: | v1.20 | 2026-10-03 | **台账补登（切片 `DIRECTIVE-DESIGN-LOOPBACK`；用户 2026-10-03 授权）**：§12.4 登记 **OB-71**（「任务包结项报告」机制缺口，处置列 `待
+67: | v1.21 | 2026-10-03 | **结项回环落地（切片 `DIRECTIVE-LOOPBACK-LANDING`；执行用户 D-1 至 D-3 裁定，探针 0）**：① §11.2 增「登记建议与留痕」段（D-1 原则与首例）
+68: | v1.22 | 2026-10-04 | **`modelId` 到限定名的口径反转 + 完成行结构重建 + `tmp/` 生命周期机制（切片 `DIRECTIVE-MODELID-MAP`；含 OB-49 / OB-72 同批评估）*
+69: ---
+70: 
+header line 3: 版本：v1.22。日期：2026-10-04。状态：**CN 正文冻结**（ `_EN` 镜像见 `docs/DELIVERY_DIRECTIVE_EN.md`）。

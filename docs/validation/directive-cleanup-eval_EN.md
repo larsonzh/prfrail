@@ -166,3 +166,4 @@ tmp/dce/probe-id-rejections.txt	local-only
 tmp/dce/gate-tree-first-fail.txt	local-only
 tmp/dce/test.txt	local-only
 ```
+> **Archiving note (v1.23)**: the `tmp/` items cited by this report were archived under `docs/validation/evidence/directive-history/` per §1.5.1 (units: `dce/`; each with `MANIFEST.md` and `SHA256SUMS.txt`); the original paths are not rewritten and the MANIFEST is the mapping of record. (Paths already cleared by earlier slices are outside this archiving and belong to the pre-existing decoupling recorded as OB-77.)

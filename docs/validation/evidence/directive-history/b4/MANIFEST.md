@@ -1,0 +1,419 @@
+﻿# 归档 MANIFEST · b4
+
+- **源路径**：`tmp/b4/`
+- **归档片**：`DIRECTIVE-TMP-LIFECYCLE`（v1.23，2026-10-04）
+- **归档口径**：§1.5.1 的 ② 类「早期证据评估归档」——保留证据条目（被受版本控制文档引用其路径者 ∪ 切片级文档），排除运行时残留与一次性脚本
+- **归档条目**：50 条 / 396,972 字节（归档载荷根 = `archive/`；逐条 sha256 见 `SHA256SUMS.txt`）
+- **排除条目**：300 条（逐条见下「排除清单」）
+- **未入库条目**：3 条（逐条见下「未入库文件清单」）
+- **字节保真**：归档副本的**字符内容不改**；因 §6.3 的作用域（G4a 扫全部变更文件）与仓库编码约定，副本按**归档后类型**归一编码——`.ps1` 带 BOM，其余不带 BOM，一律 LF；逐条变更种类与**原始字节 sha256** 见下「后缀与编码映射」节
+- **后缀口径**：归档副本的 `.md` 一律改存为 `.txt`（本单元 1 条），以避开只扫 `.md` 的文档判据；映射逐条见下节
+- **编码归一计数**：后缀改写 1 条 / BOM 剔除 0 条 / BOM 补入 0 条 / LF 归一 4 条
+
+## 归档条目清单
+
+| 相对路径 | 字节 | sha256 | 归档理由 |
+|---|---|---|---|
+| `archive/ARCH-DESIGN.txt` | 31396 | `ce6970ec28d41c0809c475c75f54918c2487db9ecd72e647a6088afef556f1c9` | 切片级文档 / 评审包 / 门禁读数 |
+| `archive/evidence/f1-neg2/verdict-run.json` | 6619 | `aad5623c2ad32cca26f006408de0e4031fffbbf16ab9dd2ea12d811e517d5578` | 被受版本控制文档引用其路径 |
+| `archive/evidence/f1-neg3/verdict-run.json` | 7339 | `5d07a4eb37d28def05a60cddd6224b4d940bb23c204f237d4b681d5fefcf755b` | 被受版本控制文档引用其路径 |
+| `archive/evidence/f2-pos/verdict-run.json` | 5372 | `a4c66ddbd73966921a64c387b4d3de97832692987bc3446fbf194d4cf1268ea2` | 被受版本控制文档引用其路径 |
+| `archive/evidence/f3-pos/verdict-run.json` | 4992 | `6dacce6e42c2224c108a94221c89e2b86aff651920623a99a06d67e14c71ef45` | 被受版本控制文档引用其路径 |
+| `archive/evidence/f4-neg/verdict-forge.json` | 2493 | `603692a78ebd5d33a583b403f71769eeb5a18f65ef4027a3ed21c623e71fe6f6` | 被受版本控制文档引用其路径 |
+| `archive/evidence/f4-neg-r2/verdict-forge.json` | 2499 | `3603fd27032b6c570bca14415aa1903bd5b53753ac8142aded0acc45a7f0b1cb` | 被受版本控制文档引用其路径 |
+| `archive/evidence/f5-neg/verdict-resume.json` | 3314 | `4127db1734411c3bd68ec892fde00af98af00ae726442e43f5f462263cf84e06` | 被受版本控制文档引用其路径 |
+| `archive/evidence/f5-neg-r2/verdict-resume.json` | 3320 | `fd73fc9fc1fa4271b8a6e143d8b311a5dd5c559ce30b2d60faef8a3275395ef5` | 被受版本控制文档引用其路径 |
+| `archive/input/b4-chain-hook.json` | 853 | `c7ad22c5741dbc02d5b35697898b5cf8a85a89b2fb7b5a04e1398ccf9c795237` | 被受版本控制文档引用其路径 |
+| `archive/input/b4-chain.json` | 705 | `bb8c100d8d36387c40d7966044c50c994ccd45833647b0fa144a8efb7369361a` | 被受版本控制文档引用其路径 |
+| `archive/input/b4-inputs.json` | 474 | `77de8312ceb84d18756ea2ef093831888a43bc922f06f5c779867660325116ad` | 被受版本控制文档引用其路径 |
+| `archive/pack-verdict.json` | 168855 | `6cd02dee08e85d383f6282367745ab785e38c022dfd1bd0009190b5a91dfaefa` | 被受版本控制文档引用其路径 |
+| `archive/probe/f2-tree-calibration.txt` | 823 | `6bbb215706c462e41c4d28845a951b84d9ff9653ca344414e4253c4ff417655e` | 被受版本控制文档引用其路径 |
+| `archive/review/README-⑥-scan.txt` | 5969 | `dd4d5c8d97167b56b410593547c5b3c63b0a3bee521b11df7183c75f9e2c8209` | 切片级文档 / 评审包 / 门禁读数 |
+| `archive/review/README-⑦-final.txt` | 6651 | `158f2e402f96b8b3848185787e658ebfc9b0a15fb0846c950aec3633efc3714d` | 切片级文档 / 评审包 / 门禁读数 |
+| `archive/review/README-⑦-round2.txt` | 19202 | `889a51dd7f6e5d57c66de1d5afefbf6d7262adfae1feaace8f36ba824e98a076` | 切片级文档 / 评审包 / 门禁读数 |
+| `archive/runs/f1-neg/agent-runner-replay/runs/request-run-b4/manifest.post.json` | 2538 | `4c6886e46a2a975b89c231a1f3c9840be49bc762d0abd07593e23b397739ede6` | 切片级文档 / 评审包 / 门禁读数 |
+| `archive/runs/f1-neg/agent-runner-replay/runs/request-run-b4/manifest.pre.json` | 2304 | `5a15b5ef8f7db17226efcfe43becd7ed77da9952ba55618b6a824d3ef97d74c6` | 切片级文档 / 评审包 / 门禁读数 |
+| `archive/runs/f1-neg-r2/agent-runner-replay/runs/request-run-b4/manifest.post.json` | 2541 | `250e2616c3e0c8f723839f5d6c3e812ac955db774e1f1bdbbed8435ea668205a` | 切片级文档 / 评审包 / 门禁读数 |
+| `archive/runs/f1-neg-r2/agent-runner-replay/runs/request-run-b4/manifest.pre.json` | 2307 | `af80a827f46b46563cd69f43d6b3f85e81709c6f392fcbb95601ce4fd991f8d4` | 切片级文档 / 评审包 / 门禁读数 |
+| `archive/runs/f1-neg2/agent-runner-replay/runs/request-run-b4/manifest.post.json` | 2305 | `794ff72ae6844a4f40e4c06428c0dafaf76d9af6dbd589b6ad721f5f3ae9a0f9` | 切片级文档 / 评审包 / 门禁读数 |
+| `archive/runs/f1-neg2/agent-runner-replay/runs/request-run-b4/manifest.pre.json` | 2305 | `f52af7748fefbec9ba696aa2ee5644f0184e1be7703e07ff60c7dc66aafb8bd7` | 切片级文档 / 评审包 / 门禁读数 |
+| `archive/runs/f1-neg2/events/state-events.jsonl` | 8185 | `6b1c1f24d8d2a4df31438deefb80f50f0e1fe03c0f08242b29ff78fb8fcf28e2` | 被受版本控制文档引用其路径 |
+| `archive/runs/f1-neg2-r2/agent-runner-replay/runs/request-run-b4/manifest.post.json` | 2308 | `663b1c96acfde731c9dd2fe9e3640b837d0caf5b5521161176fb0e62f20b31f6` | 切片级文档 / 评审包 / 门禁读数 |
+| `archive/runs/f1-neg2-r2/agent-runner-replay/runs/request-run-b4/manifest.pre.json` | 2308 | `4ec7c43c546ceaeb6b9bd68f9c4cc28e65c187a0d177b309228e92b63674bcf9` | 切片级文档 / 评审包 / 门禁读数 |
+| `archive/runs/f1-neg3/agent-runner-replay/runs/request-run-b4/manifest.post.json` | 2305 | `68b59715c05e159384873c7b3acb991dac9875dc3898d98ba01cdb6f175064ca` | 切片级文档 / 评审包 / 门禁读数 |
+| `archive/runs/f1-neg3/agent-runner-replay/runs/request-run-b4/manifest.pre.json` | 2305 | `7e1d194c5dcc25579be3779e972b1955ff526f1f6dac128d404df985a6b2c42a` | 切片级文档 / 评审包 / 门禁读数 |
+| `archive/runs/f1-pos/agent-runner-replay/runs/request-run-b4/manifest.post.json` | 2304 | `c3ce0906eaa14a916427d95cc989e1baff344d2da06c9fdf96f9c0de2ac61658` | 切片级文档 / 评审包 / 门禁读数 |
+| `archive/runs/f1-pos/agent-runner-replay/runs/request-run-b4/manifest.pre.json` | 2304 | `169435ea0ca85aae32c9ac0c99ab4de12d9291000523726bd11c74c869538af2` | 切片级文档 / 评审包 / 门禁读数 |
+| `archive/runs/f2-neg/agent-runner-replay/runs/request-run-b4/manifest.post.json` | 2304 | `9f41054a5ad5cf602eb947d71d8bb6c7a7a1b0e67e1386ca431abc6189f2f236` | 切片级文档 / 评审包 / 门禁读数 |
+| `archive/runs/f2-neg/agent-runner-replay/runs/request-run-b4/manifest.pre.json` | 2304 | `7e78dfcf67481017e0887ba1116e4dcac547a4ec5de1570a2e30fb6d509a97c9` | 切片级文档 / 评审包 / 门禁读数 |
+| `archive/runs/f2-neg-r2/agent-runner-replay/runs/request-run-b4/manifest.post.json` | 2307 | `1661f0b5dea73641bf5ebaebbcafa2728c13652fea49149e3cc66c13dbbb1245` | 切片级文档 / 评审包 / 门禁读数 |
+| `archive/runs/f2-neg-r2/agent-runner-replay/runs/request-run-b4/manifest.pre.json` | 2307 | `ddbc9769623376ae1917e483b8a9f19183a157e82bef4734c3e36d8ae02d4b81` | 切片级文档 / 评审包 / 门禁读数 |
+| `archive/runs/f2-pos/agent-runner-replay/runs/request-run-b4/manifest.post.json` | 2304 | `a69225e5bc573f932be9006d357af77bace713e3950769e39078b3f2899afd0e` | 切片级文档 / 评审包 / 门禁读数 |
+| `archive/runs/f2-pos/agent-runner-replay/runs/request-run-b4/manifest.pre.json` | 2304 | `35314f206a50af918310d32b176f1a8b3067ae560becc9647f41511d1866cc7f` | 切片级文档 / 评审包 / 门禁读数 |
+| `archive/runs/f3-neg/agent-runner-replay/runs/request-run-b4/manifest.post.json` | 2304 | `a30e6f1ff167932b210fcbfd99fe6c720e7de1684eea75fab8c0d750d508a871` | 切片级文档 / 评审包 / 门禁读数 |
+| `archive/runs/f3-neg/agent-runner-replay/runs/request-run-b4/manifest.pre.json` | 2304 | `946dddb2f2b01b8760f82159f5037ebc0d53a31e86438fb4ebb8293800f44cb4` | 切片级文档 / 评审包 / 门禁读数 |
+| `archive/runs/f3-neg-r2/agent-runner-replay/runs/request-run-b4/manifest.post.json` | 2307 | `81775e404859673457456cb077865d05dc6c471842133a968775c05e8a3b733e` | 切片级文档 / 评审包 / 门禁读数 |
+| `archive/runs/f3-neg-r2/agent-runner-replay/runs/request-run-b4/manifest.pre.json` | 2307 | `4b86e6bfd6e746bce8a4bccc0ff90d0fc912e947f03f63d27e7c2a2c907a7454` | 切片级文档 / 评审包 / 门禁读数 |
+| `archive/runs/f3-pos/agent-runner-replay/runs/request-run-b4/manifest.post.json` | 2304 | `b1d81c132d69407628fce9325a7c92bd4dad7f8e8e62bf1afa9b970a6df14ca5` | 切片级文档 / 评审包 / 门禁读数 |
+| `archive/runs/f3-pos/agent-runner-replay/runs/request-run-b4/manifest.pre.json` | 2304 | `80f9ae06a6d9c850c8b1a725b6eebf66ad4d6e17dfacc95aab9cbecf8bb5b704` | 切片级文档 / 评审包 / 门禁读数 |
+| `archive/runs/f5-neg/agent-runner-replay/runs/request-run-b4/manifest.post.json` | 2304 | `155fd94e044f1cf27b6fbab9e09d2a269027b71f2f9841f71a2a77f50d68057b` | 切片级文档 / 评审包 / 门禁读数 |
+| `archive/runs/f5-neg/agent-runner-replay/runs/request-run-b4/manifest.pre.json` | 2304 | `de911a973cfb63cb771b1550bd5d2b81cd1e971ac326e434724628619d2f3041` | 切片级文档 / 评审包 / 门禁读数 |
+| `archive/runs/f5-neg-r2/agent-runner-replay/runs/request-run-b4/manifest.post.json` | 2307 | `586c023455661cb9610ed561d612bddc63e29f9a825efdc68b1aa79df4b43252` | 切片级文档 / 评审包 / 门禁读数 |
+| `archive/runs/f5-neg-r2/agent-runner-replay/runs/request-run-b4/manifest.pre.json` | 2307 | `8b7c4cd73dcb0925bd41a2cf4077ebe690d2ee98edae911b2a9c16a4bf0a2916` | 切片级文档 / 评审包 / 门禁读数 |
+| `archive/runs/f5-pos/agent-runner-replay/runs/request-run-b4/manifest.post.json` | 2304 | `07dba73fd6087633dd44dc0fbf9ced8b7c70d72e060607184dd9daf04ea2662f` | 切片级文档 / 评审包 / 门禁读数 |
+| `archive/runs/f5-pos/agent-runner-replay/runs/request-run-b4/manifest.pre.json` | 2304 | `72e4b0440bd45dd3bc2220d03d71cd0108c579ab21dc1116173d8017aca57e28` | 切片级文档 / 评审包 / 门禁读数 |
+| `archive/SHA256SUMS.txt` | 41646 | `ea49ace94db44e4a5756da9cf46446df550446bb098584a87a21776c22992da9` | 被受版本控制文档引用其路径 |
+| `archive/SLICE-DEFINITION.txt` | 6641 | `391e6a360c2ee7214f14ec6ecdb55f7dfa33c58483ed617b1dfa6cb274991557` | 切片级文档 / 评审包 / 门禁读数 |
+
+## 排除清单（未归档）
+
+| 相对路径 | 字节 | sha256 | 未归档理由 |
+|---|---|---|---|
+| `/add-t018-note.js` | 1865 | `5283cf3be83b5541282ef86ec9ad1fcd871b755f01bb6a8bff0e3045cbf00bf3` | 落地与修复脚本残留 |
+| `/driver-stderr.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 中间转储（未被引用的过程输出） |
+| `/driver-stdout.txt` | 1929 | `48483cabaf4f587bddffd261ec6171fdbf223ea52977a654fae9d4f0bea7132c` | 中间转储（未被引用的过程输出） |
+| `/driver.log` | 2978 | `24bc45b30c2dab53fe08f1e3d1b50c2d1a3fa71831c73ee4b6ded514b64a27de` | 运行时状态与日志 |
+| `/evidence/build/build-agent-stub.stderr.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 中间转储（未被引用的过程输出） |
+| `/evidence/build/build-agent-stub.stdout.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 中间转储（未被引用的过程输出） |
+| `/evidence/build/build-b4-e2e.stderr.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 中间转储（未被引用的过程输出） |
+| `/evidence/build/build-b4-e2e.stdout.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 中间转储（未被引用的过程输出） |
+| `/evidence/build/build-prfrail.stderr.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 中间转储（未被引用的过程输出） |
+| `/evidence/build/build-prfrail.stdout.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 中间转储（未被引用的过程输出） |
+| `/evidence/cli/cli-preview-hook.stderr.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 中间转储（未被引用的过程输出） |
+| `/evidence/cli/cli-preview-hook.stdout.txt` | 922 | `c0e2ff9d2024e98f692e893fd3659d9edc19aa4b6400b8f82bb1c2f3ed51b8a1` | 中间转储（未被引用的过程输出） |
+| `/evidence/cli/cli-preview.stderr.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 中间转储（未被引用的过程输出） |
+| `/evidence/cli/cli-preview.stdout.txt` | 917 | `03ee5208102fda06189216dc13d49afbea3094412350122aae3ebb4788ea493d` | 中间转储（未被引用的过程输出） |
+| `/evidence/cli/cli-validate-hook.stderr.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 中间转储（未被引用的过程输出） |
+| `/evidence/cli/cli-validate-hook.stdout.txt` | 240 | `64484b42fb09beea88283e2570e5e13d1e4ef7e5ae09ac242fdf66697c7b5e83` | 中间转储（未被引用的过程输出） |
+| `/evidence/cli/cli-validate.stderr.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 中间转储（未被引用的过程输出） |
+| `/evidence/cli/cli-validate.stdout.txt` | 235 | `ff3044f8ac344e76e0b794e192ac7a6ce49d152e030a4e71e3057bbc41d19acf` | 中间转储（未被引用的过程输出） |
+| `/evidence/cli/emit-inputs.stderr.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 中间转储（未被引用的过程输出） |
+| `/evidence/cli/emit-inputs.stdout.txt` | 201 | `051b6f67af0ab8afeb5162950183f92f3861bba2d76be51c492362a78e563153` | 中间转储（未被引用的过程输出） |
+| `/evidence/f1-neg-r2/f1-neg-r2-run.stderr.txt` | 100 | `92a5c8980ca9f3a48a20a043fe2367097a3d9269f8c8a8d54c946743605c72f8` | 中间转储（未被引用的过程输出） |
+| `/evidence/f1-neg-r2/f1-neg-r2-run.stdout.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 中间转储（未被引用的过程输出） |
+| `/evidence/f1-neg-r2/verdict-run.json` | 6796 | `fb97e6f67854540c07156a2dac3cf683ed724442c501c47527641815d58dc4e2` | 中间转储（未被引用的过程输出） |
+| `/evidence/f1-neg/f1-neg-run.stderr.txt` | 97 | `121b9415c6cf0b3787d1525e1cb00cbb863ed406e13c71169268939243e180dc` | 中间转储（未被引用的过程输出） |
+| `/evidence/f1-neg/f1-neg-run.stdout.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 中间转储（未被引用的过程输出） |
+| `/evidence/f1-neg/verdict-run.json` | 6791 | `4a12a688bbca03f61a2446df266e1ac15cdbb9d0601630f73be913a644dc0b9d` | 中间转储（未被引用的过程输出） |
+| `/evidence/f1-neg2-r2/f1-neg2-r2-run.stderr.txt` | 111 | `d87baf9275ef4f08a2d812a70b404186d2701da565de5f20953c24bb059c64d7` | 中间转储（未被引用的过程输出） |
+| `/evidence/f1-neg2-r2/f1-neg2-r2-run.stdout.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 中间转储（未被引用的过程输出） |
+| `/evidence/f1-neg2-r2/verdict-run.json` | 6625 | `6b82e1dfb17d0a12da26a96fe4f338185537d41d188063e7a07028c53144d727` | 中间转储（未被引用的过程输出） |
+| `/evidence/f1-neg2/f1-neg2-run.stderr.txt` | 108 | `c79ad3d51a19c04eff2869f2282d7d3037ae151dc8ce713ccfe6ee62f78fb209` | 中间转储（未被引用的过程输出） |
+| `/evidence/f1-neg2/f1-neg2-run.stdout.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 中间转储（未被引用的过程输出） |
+| `/evidence/f1-neg3/f1-neg3-run.stderr.txt` | 98 | `0e2387261a14662037196b95284b45c3b11660612278353550e9ebbe42a297a7` | 中间转储（未被引用的过程输出） |
+| `/evidence/f1-neg3/f1-neg3-run.stdout.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 中间转储（未被引用的过程输出） |
+| `/evidence/f1-pos/f1-pos-run.stderr.txt` | 97 | `3a0e4da9b54d9bd88ebcfd6df97e6539dfb2f6870f20c6677f4597b2e84e4877` | 中间转储（未被引用的过程输出） |
+| `/evidence/f1-pos/f1-pos-run.stdout.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 中间转储（未被引用的过程输出） |
+| `/evidence/f1-pos/verdict-run.json` | 6391 | `62ac7eb3abd97b3fe2218217f6ac4782361d9b7680ac82e51c2ed01d93226249` | 中间转储（未被引用的过程输出） |
+| `/evidence/f2-neg-r2/f2-neg-r2-run.stderr.txt` | 110 | `c6e2f489b560d4ac0b8154b52e656cdc6540a3dcd9a6f0a80048457ae5b9f566` | 中间转储（未被引用的过程输出） |
+| `/evidence/f2-neg-r2/f2-neg-r2-run.stdout.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 中间转储（未被引用的过程输出） |
+| `/evidence/f2-neg-r2/verdict-run.json` | 5402 | `6c7721a81b88526ab657f7ff3c1a7860a96c5d9c86f4458463b0013b58acd33f` | 中间转储（未被引用的过程输出） |
+| `/evidence/f2-neg/f2-neg-run.stderr.txt` | 107 | `63905a95fdf95022b4c50e8240b58605451b209562ad8022128cb46fdc62e5b7` | 中间转储（未被引用的过程输出） |
+| `/evidence/f2-neg/f2-neg-run.stdout.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 中间转储（未被引用的过程输出） |
+| `/evidence/f2-neg/verdict-run.json` | 5397 | `3298c6807fc480eb00f3fe268c90f5f0ac72d414bc2c9794369dabb8faeb35ef` | 中间转储（未被引用的过程输出） |
+| `/evidence/f2-pos/f2-pos-run.stderr.txt` | 107 | `1626d0d53d2c86861b473e61c5a371be43442381793bb4dbade14549e8ed25bc` | 中间转储（未被引用的过程输出） |
+| `/evidence/f2-pos/f2-pos-run.stdout.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 中间转储（未被引用的过程输出） |
+| `/evidence/f3-neg-r2/f3-neg-r2-run.stderr.txt` | 100 | `d458914f11db09e9772915f69f546451e4dd2cbb3fbc0e9b4dea0ca14e918fb2` | 中间转储（未被引用的过程输出） |
+| `/evidence/f3-neg-r2/f3-neg-r2-run.stdout.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 中间转储（未被引用的过程输出） |
+| `/evidence/f3-neg-r2/verdict-run.json` | 6078 | `478d29acc09f06b5525bba0079843e5c21bb298b9b83ccf37e82454e81dbbe1b` | 中间转储（未被引用的过程输出） |
+| `/evidence/f3-neg/f3-neg-run.stderr.txt` | 97 | `a7988820cabd45fd9d6e2af0ee9fe83221ab5b0854ac442ca8141b1b3bd87d14` | 中间转储（未被引用的过程输出） |
+| `/evidence/f3-neg/f3-neg-run.stdout.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 中间转储（未被引用的过程输出） |
+| `/evidence/f3-neg/verdict-run.json` | 6072 | `8503d6e666f1233991b7144995915fa9a392efb0de3cc1783d62229b13ec5e97` | 中间转储（未被引用的过程输出） |
+| `/evidence/f3-pos/f3-pos-run.stderr.txt` | 107 | `75dd16e63498b2d63ad7a0aa36b118758556840d66ce9667eae9cd65437517bb` | 中间转储（未被引用的过程输出） |
+| `/evidence/f3-pos/f3-pos-run.stdout.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 中间转储（未被引用的过程输出） |
+| `/evidence/f4-neg-r2/f4-neg-r2-p1-park.stderr.txt` | 98 | `09f1d15c3aad351cc06b6156406b6149acd4bfc2bc603e27e0c57ff7f1e6a9b1` | 中间转储（未被引用的过程输出） |
+| `/evidence/f4-neg-r2/f4-neg-r2-p1-park.stdout.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 中间转储（未被引用的过程输出） |
+| `/evidence/f4-neg-r2/f4-neg-r2-p2-forge.stderr.txt` | 100 | `9b648404b1de4b768481b744ac5e78e979d7e2f3f3c350c33f52088a63b639f7` | 中间转储（未被引用的过程输出） |
+| `/evidence/f4-neg-r2/f4-neg-r2-p2-forge.stdout.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 中间转储（未被引用的过程输出） |
+| `/evidence/f4-neg-r2/verdict-park.json` | 2802 | `91a48b6f398f3d6b771fc08d9e8b599c3984589d94f6c10f910950032f676bf7` | 中间转储（未被引用的过程输出） |
+| `/evidence/f4-neg/f4-neg-p1-park.stderr.txt` | 95 | `236e1de76e947c4f37ca46a6d7d90257a43f56b6cd319a39066fc2d47c85012c` | 中间转储（未被引用的过程输出） |
+| `/evidence/f4-neg/f4-neg-p1-park.stdout.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 中间转储（未被引用的过程输出） |
+| `/evidence/f4-neg/f4-neg-p2-forge.stderr.txt` | 97 | `6389f7121cd8e4febe10c4c1a7d3e95b200c6fb3fbecac386876039e48424526` | 中间转储（未被引用的过程输出） |
+| `/evidence/f4-neg/f4-neg-p2-forge.stdout.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 中间转储（未被引用的过程输出） |
+| `/evidence/f4-neg/verdict-park.json` | 2516 | `37e0a4e012a71966fba84ad626a0f19c16ecc1f5d12077fb234d156b00168e6f` | 中间转储（未被引用的过程输出） |
+| `/evidence/f4-pos/f4-pos-p1-park.stderr.txt` | 95 | `c41e40d2a02c976d126f82c84032bc563da0ec10da1d5ea31425f068ac09e794` | 中间转储（未被引用的过程输出） |
+| `/evidence/f4-pos/f4-pos-p1-park.stdout.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 中间转储（未被引用的过程输出） |
+| `/evidence/f4-pos/f4-pos-p2-recover.stderr.txt` | 111 | `af34b3588b48475add8e7df9b94d84201cd5d6fe71a8ab3b5f79fa6d40e9926b` | 中间转储（未被引用的过程输出） |
+| `/evidence/f4-pos/f4-pos-p2-recover.stdout.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 中间转储（未被引用的过程输出） |
+| `/evidence/f4-pos/verdict-park.json` | 2565 | `f81504d534d1512076a358a533d7957b6ef70579ad8582817dd4d5a21993674c` | 中间转储（未被引用的过程输出） |
+| `/evidence/f4-pos/verdict-recover.json` | 2837 | `dba717fce1471e84ca0b343dc1d2c67d204b7d62a8c6898c1e8eeec028cf0c05` | 中间转储（未被引用的过程输出） |
+| `/evidence/f5-neg-r2/f5-neg-r2-p1-halt.stderr.txt` | 102 | `2df80c2b58ca1f64d00adb0cabb8f36049007e7e45161bde440393d0b28b5c52` | 中间转储（未被引用的过程输出） |
+| `/evidence/f5-neg-r2/f5-neg-r2-p1-halt.stdout.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 中间转储（未被引用的过程输出） |
+| `/evidence/f5-neg-r2/f5-neg-r2-p2-resume.stderr.txt` | 113 | `0f0f829356c065c38fc81ce65ce057190e50d7a80bd8245e28af000537e5d256` | 中间转储（未被引用的过程输出） |
+| `/evidence/f5-neg-r2/f5-neg-r2-p2-resume.stdout.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 中间转储（未被引用的过程输出） |
+| `/evidence/f5-neg-r2/verdict-halt.json` | 4529 | `f752fe59c85333ca1f76e282c7e7fec7f045bb27e4fd51771d23d3af20494ab6` | 中间转储（未被引用的过程输出） |
+| `/evidence/f5-neg/f5-neg-p1-halt.stderr.txt` | 99 | `5187d0dfaee58ea7284984e5131757bf1a3808f7174a8337115ae23a7a9fef57` | 中间转储（未被引用的过程输出） |
+| `/evidence/f5-neg/f5-neg-p1-halt.stdout.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 中间转储（未被引用的过程输出） |
+| `/evidence/f5-neg/f5-neg-p2-resume.stderr.txt` | 110 | `67dd069ad34b26123c178e16acafc1b73b051c8d9afa27d80b62eb6d3df2ea69` | 中间转储（未被引用的过程输出） |
+| `/evidence/f5-neg/f5-neg-p2-resume.stdout.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 中间转储（未被引用的过程输出） |
+| `/evidence/f5-neg/verdict-halt.json` | 4523 | `8a369549d1d0ff8a0f12cd24ccb899e4b5380c65a58a325a6069453ba92d6d15` | 中间转储（未被引用的过程输出） |
+| `/evidence/f5-pos/f5-pos-run.stderr.txt` | 97 | `38b74a7776b198dce94025304c782b00d1038daafb19f63b13112f6e1e400765` | 中间转储（未被引用的过程输出） |
+| `/evidence/f5-pos/f5-pos-run.stdout.txt` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 中间转储（未被引用的过程输出） |
+| `/evidence/f5-pos/verdict-run.json` | 6941 | `21b8beed844d3211a2a1b26c0e4bea3e7d652bcf856e7ef0ddededdd2323078f` | 中间转储（未被引用的过程输出） |
+| `/g4b-unknown.js` | 706 | `ded203059fccb4105161e2cc3986610c984ca194aa37e8e33c13a920d0f53c48` | 落地与修复脚本残留 |
+| `/input/seed/b4-seed.txt` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 中间转储（未被引用的过程输出） |
+| `/probe/evidence/events.jsonl` | 45 | `4fafb99cd4a2b5d910b7998711ef3f1faa7357d4a5944fe288083f0a9dd5dec1` | 中间转储（未被引用的过程输出） |
+| `/probe/evidence/stub-child.pid` | 5 | `d704f0df8703e02b72de6a2e3377d39c9ef785940a4e3ef8061f0a3d4c0f6e72` | 运行时状态与日志 |
+| `/probe/evidence/stub.pid` | 5 | `d704f0df8703e02b72de6a2e3377d39c9ef785940a4e3ef8061f0a3d4c0f6e72` | 运行时状态与日志 |
+| `/probe/evidence/usage.json` | 39 | `4d51d872aaf586199a7d77dc5b623d83c2c58d36e94d62a2872984d1bf9af953` | 中间转储（未被引用的过程输出） |
+| `/runs/f1-neg-r2/agent-runner-replay/ownership.json` | 271 | `730c9031efcb48918d5b12086390d619d5dbf5ada052d0083e8b784584d10e89` | 运行时状态与日志 |
+| `/runs/f1-neg-r2/agent-runner-replay/runs/request-run-b4/diff.json` | 174 | `7f72e69d46e8b4f291432e8ddb58ef7c1d749493eb956e39e2f10e10e134039b` | 运行时状态与日志 |
+| `/runs/f1-neg-r2/agent-runner-replay/runs/request-run-b4/events.jsonl` | 45 | `4fafb99cd4a2b5d910b7998711ef3f1faa7357d4a5944fe288083f0a9dd5dec1` | 运行时状态与日志 |
+| `/runs/f1-neg-r2/agent-runner-replay/runs/request-run-b4/logs/stderr.log` | 23 | `4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2` | 运行时状态与日志 |
+| `/runs/f1-neg-r2/agent-runner-replay/runs/request-run-b4/logs/stdout.log` | 23 | `4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2` | 运行时状态与日志 |
+| `/runs/f1-neg-r2/agent-runner-replay/runs/request-run-b4/stub.pid` | 5 | `c0cc90b9a108fa52da871fa029346154270345aac0fcd2f89616f66a8eb5f76c` | 运行时状态与日志 |
+| `/runs/f1-neg-r2/agent-runner-replay/runs/request-run-b4/usage.json` | 39 | `4d51d872aaf586199a7d77dc5b623d83c2c58d36e94d62a2872984d1bf9af953` | 运行时状态与日志 |
+| `/runs/f1-neg-r2/events/state-events.jsonl` | 9171 | `32b975aaa3776e43a606e47f648ce06763cb3151c3d585186d510c9669149609` | 运行时状态与日志 |
+| `/runs/f1-neg-r2/managed-process.identity.json` | 44 | `4993ce521c8b864dbd92da56e71a90121a26ba706d1040f7160822f19b878e85` | 运行时状态与日志 |
+| `/runs/f1-neg-r2/snapshot-store/objects/1a22c9c0ea2776109971e0d0d62147a9f7611f9c37174c93e75736bd465cdb2a` | 19 | `1a22c9c0ea2776109971e0d0d62147a9f7611f9c37174c93e75736bd465cdb2a` | 运行时状态与日志 |
+| `/runs/f1-neg-r2/snapshot-store/objects/d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 运行时状态与日志 |
+| `/runs/f1-neg-r2/workspace/agent-stub-mutation.txt` | 19 | `1a22c9c0ea2776109971e0d0d62147a9f7611f9c37174c93e75736bd465cdb2a` | 运行时状态与日志 |
+| `/runs/f1-neg-r2/workspace/b4-seed.txt` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 运行时状态与日志 |
+| `/runs/f1-neg/agent-runner-replay/ownership.json` | 268 | `e05129e7ea8dae1a2d3c6d8f67475f61d0662ef40c004a54b2b5ccd2462a75e0` | 运行时状态与日志 |
+| `/runs/f1-neg/agent-runner-replay/runs/request-run-b4/diff.json` | 174 | `7f72e69d46e8b4f291432e8ddb58ef7c1d749493eb956e39e2f10e10e134039b` | 运行时状态与日志 |
+| `/runs/f1-neg/agent-runner-replay/runs/request-run-b4/events.jsonl` | 45 | `4fafb99cd4a2b5d910b7998711ef3f1faa7357d4a5944fe288083f0a9dd5dec1` | 运行时状态与日志 |
+| `/runs/f1-neg/agent-runner-replay/runs/request-run-b4/logs/stderr.log` | 23 | `4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2` | 运行时状态与日志 |
+| `/runs/f1-neg/agent-runner-replay/runs/request-run-b4/logs/stdout.log` | 23 | `4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2` | 运行时状态与日志 |
+| `/runs/f1-neg/agent-runner-replay/runs/request-run-b4/stub.pid` | 6 | `d9048a28d9cac2272f77ec34d7730420ff1c61e6573df574f50854d0aec4eb67` | 运行时状态与日志 |
+| `/runs/f1-neg/agent-runner-replay/runs/request-run-b4/usage.json` | 39 | `4d51d872aaf586199a7d77dc5b623d83c2c58d36e94d62a2872984d1bf9af953` | 运行时状态与日志 |
+| `/runs/f1-neg/events/state-events.jsonl` | 9171 | `5c9fe779dbf218585a27ba26ca462bdd5c15ff231b1e18ccd6b2a694c0a87be9` | 运行时状态与日志 |
+| `/runs/f1-neg/managed-process.identity.json` | 45 | `b897a924e83f37d4a5219dafeef6dd0d070bad21403e4483c4594e10b00b5be0` | 运行时状态与日志 |
+| `/runs/f1-neg/snapshot-store/objects/1a22c9c0ea2776109971e0d0d62147a9f7611f9c37174c93e75736bd465cdb2a` | 19 | `1a22c9c0ea2776109971e0d0d62147a9f7611f9c37174c93e75736bd465cdb2a` | 运行时状态与日志 |
+| `/runs/f1-neg/snapshot-store/objects/d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 运行时状态与日志 |
+| `/runs/f1-neg/workspace/agent-stub-mutation.txt` | 19 | `1a22c9c0ea2776109971e0d0d62147a9f7611f9c37174c93e75736bd465cdb2a` | 运行时状态与日志 |
+| `/runs/f1-neg/workspace/b4-seed.txt` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 运行时状态与日志 |
+| `/runs/f1-neg2-r2/agent-runner-replay/ownership.json` | 272 | `6509bb068645ec8eb13deebc44ebc1b19840a5d3e04d76906058eb9d718bae5b` | 运行时状态与日志 |
+| `/runs/f1-neg2-r2/agent-runner-replay/runs/request-run-b4/diff.json` | 38 | `f8700730d4d8f747ac5ce273bcc6d6ca0dabf339d43ef439e97a75e370f72f35` | 运行时状态与日志 |
+| `/runs/f1-neg2-r2/agent-runner-replay/runs/request-run-b4/events.jsonl` | 45 | `4fafb99cd4a2b5d910b7998711ef3f1faa7357d4a5944fe288083f0a9dd5dec1` | 运行时状态与日志 |
+| `/runs/f1-neg2-r2/agent-runner-replay/runs/request-run-b4/logs/stderr.log` | 23 | `4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2` | 运行时状态与日志 |
+| `/runs/f1-neg2-r2/agent-runner-replay/runs/request-run-b4/logs/stdout.log` | 23 | `4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2` | 运行时状态与日志 |
+| `/runs/f1-neg2-r2/agent-runner-replay/runs/request-run-b4/stub.pid` | 6 | `a6d1876410060fe19d5e01e77b919a39f4a768f5c24358b190a7caf1f83c22a2` | 运行时状态与日志 |
+| `/runs/f1-neg2-r2/agent-runner-replay/runs/request-run-b4/usage.json` | 39 | `4d51d872aaf586199a7d77dc5b623d83c2c58d36e94d62a2872984d1bf9af953` | 运行时状态与日志 |
+| `/runs/f1-neg2-r2/events/state-events.jsonl` | 8185 | `4ea2d677f619792df92427478ca0a2882b6a6dce494fa25f9a5cba62c336e9c0` | 运行时状态与日志 |
+| `/runs/f1-neg2-r2/managed-process.identity.json` | 45 | `29b42e68d7f6f836c29d68894f30e55d56a6ce259ed6b380ce481638fc89f3e9` | 运行时状态与日志 |
+| `/runs/f1-neg2-r2/snapshot-store/objects/1a22c9c0ea2776109971e0d0d62147a9f7611f9c37174c93e75736bd465cdb2a` | 19 | `1a22c9c0ea2776109971e0d0d62147a9f7611f9c37174c93e75736bd465cdb2a` | 运行时状态与日志 |
+| `/runs/f1-neg2-r2/snapshot-store/objects/d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 运行时状态与日志 |
+| `/runs/f1-neg2-r2/workspace/agent-stub-mutation.txt` | 19 | `1a22c9c0ea2776109971e0d0d62147a9f7611f9c37174c93e75736bd465cdb2a` | 运行时状态与日志 |
+| `/runs/f1-neg2-r2/workspace/b4-seed.txt` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 运行时状态与日志 |
+| `/runs/f1-neg2/agent-runner-replay/ownership.json` | 269 | `e6c336edce062eef2daf6c2660ec3552ed80314917c1d9d7c86e0b61d507003a` | 运行时状态与日志 |
+| `/runs/f1-neg2/agent-runner-replay/runs/request-run-b4/diff.json` | 38 | `f8700730d4d8f747ac5ce273bcc6d6ca0dabf339d43ef439e97a75e370f72f35` | 运行时状态与日志 |
+| `/runs/f1-neg2/agent-runner-replay/runs/request-run-b4/events.jsonl` | 45 | `4fafb99cd4a2b5d910b7998711ef3f1faa7357d4a5944fe288083f0a9dd5dec1` | 运行时状态与日志 |
+| `/runs/f1-neg2/agent-runner-replay/runs/request-run-b4/logs/stderr.log` | 23 | `4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2` | 运行时状态与日志 |
+| `/runs/f1-neg2/agent-runner-replay/runs/request-run-b4/logs/stdout.log` | 23 | `4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2` | 运行时状态与日志 |
+| `/runs/f1-neg2/agent-runner-replay/runs/request-run-b4/stub.pid` | 6 | `e87a765357abef669343751b98e9940a22c614d0d2de2b4858fa781d05f266e5` | 运行时状态与日志 |
+| `/runs/f1-neg2/agent-runner-replay/runs/request-run-b4/usage.json` | 39 | `4d51d872aaf586199a7d77dc5b623d83c2c58d36e94d62a2872984d1bf9af953` | 运行时状态与日志 |
+| `/runs/f1-neg2/managed-process.identity.json` | 45 | `c637fc424ac6c507672a73625b1b19d849c39bdab5de2b00990b245631af50d4` | 运行时状态与日志 |
+| `/runs/f1-neg2/snapshot-store/objects/1a22c9c0ea2776109971e0d0d62147a9f7611f9c37174c93e75736bd465cdb2a` | 19 | `1a22c9c0ea2776109971e0d0d62147a9f7611f9c37174c93e75736bd465cdb2a` | 运行时状态与日志 |
+| `/runs/f1-neg2/snapshot-store/objects/d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 运行时状态与日志 |
+| `/runs/f1-neg2/workspace/agent-stub-mutation.txt` | 19 | `1a22c9c0ea2776109971e0d0d62147a9f7611f9c37174c93e75736bd465cdb2a` | 运行时状态与日志 |
+| `/runs/f1-neg2/workspace/b4-seed.txt` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 运行时状态与日志 |
+| `/runs/f1-neg3/agent-runner-replay/ownership.json` | 269 | `1ff6e46b9d67cb2fa12000684ff7891924ae720eabb904ecdf25dec02ab4eb21` | 运行时状态与日志 |
+| `/runs/f1-neg3/agent-runner-replay/runs/request-run-b4/diff.json` | 38 | `f8700730d4d8f747ac5ce273bcc6d6ca0dabf339d43ef439e97a75e370f72f35` | 运行时状态与日志 |
+| `/runs/f1-neg3/agent-runner-replay/runs/request-run-b4/events.jsonl` | 45 | `4fafb99cd4a2b5d910b7998711ef3f1faa7357d4a5944fe288083f0a9dd5dec1` | 运行时状态与日志 |
+| `/runs/f1-neg3/agent-runner-replay/runs/request-run-b4/logs/stderr.log` | 23 | `4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2` | 运行时状态与日志 |
+| `/runs/f1-neg3/agent-runner-replay/runs/request-run-b4/logs/stdout.log` | 23 | `4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2` | 运行时状态与日志 |
+| `/runs/f1-neg3/agent-runner-replay/runs/request-run-b4/stub.pid` | 6 | `f8f11b3de54ef77d983c020677105d31e2c2b0aadcb9bb33dd2ed54e6caacdbf` | 运行时状态与日志 |
+| `/runs/f1-neg3/agent-runner-replay/runs/request-run-b4/usage.json` | 39 | `4d51d872aaf586199a7d77dc5b623d83c2c58d36e94d62a2872984d1bf9af953` | 运行时状态与日志 |
+| `/runs/f1-neg3/events/state-events.jsonl` | 9171 | `30f4c8e2084374033404caec20d6c1f591c2422eb5b20af059962a25357b3d96` | 运行时状态与日志 |
+| `/runs/f1-neg3/managed-process.identity.json` | 45 | `55a92b1362c9db6af9065f54844054be56184bc47dea2efc71289316471c6c3e` | 运行时状态与日志 |
+| `/runs/f1-neg3/snapshot-store/objects/d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 运行时状态与日志 |
+| `/runs/f1-neg3/workspace/b4-seed.txt` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 运行时状态与日志 |
+| `/runs/f1-neg3/workspace/tmp/agent-stub-mutation.txt` | 19 | `1a22c9c0ea2776109971e0d0d62147a9f7611f9c37174c93e75736bd465cdb2a` | 运行时状态与日志 |
+| `/runs/f1-pos/agent-runner-replay/ownership.json` | 268 | `9e4ef6df9af611cad98c7e0f8520d8a7c35c55938a330a2005f7530b58178bdc` | 运行时状态与日志 |
+| `/runs/f1-pos/agent-runner-replay/runs/request-run-b4/diff.json` | 38 | `f8700730d4d8f747ac5ce273bcc6d6ca0dabf339d43ef439e97a75e370f72f35` | 运行时状态与日志 |
+| `/runs/f1-pos/agent-runner-replay/runs/request-run-b4/events.jsonl` | 45 | `4fafb99cd4a2b5d910b7998711ef3f1faa7357d4a5944fe288083f0a9dd5dec1` | 运行时状态与日志 |
+| `/runs/f1-pos/agent-runner-replay/runs/request-run-b4/logs/stderr.log` | 23 | `4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2` | 运行时状态与日志 |
+| `/runs/f1-pos/agent-runner-replay/runs/request-run-b4/logs/stdout.log` | 23 | `4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2` | 运行时状态与日志 |
+| `/runs/f1-pos/agent-runner-replay/runs/request-run-b4/stub.pid` | 6 | `7cf85fe1b6f9e90ab3c410165cad8661ca063c5031971c7c906410b8aca67558` | 运行时状态与日志 |
+| `/runs/f1-pos/agent-runner-replay/runs/request-run-b4/usage.json` | 39 | `4d51d872aaf586199a7d77dc5b623d83c2c58d36e94d62a2872984d1bf9af953` | 运行时状态与日志 |
+| `/runs/f1-pos/events/state-events.jsonl` | 9171 | `fa9d2d37fff6e5abe0ac65c2f49a1de1072372b3db9650f138b80abf052e6afb` | 运行时状态与日志 |
+| `/runs/f1-pos/managed-process.identity.json` | 45 | `56fdc130c26f9e98e820590f915f6fffbae9d36c70213e8ef41d092c7222f98c` | 运行时状态与日志 |
+| `/runs/f1-pos/snapshot-store/objects/d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 运行时状态与日志 |
+| `/runs/f1-pos/workspace/b4-seed.txt` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 运行时状态与日志 |
+| `/runs/f2-neg-r2/agent-runner-replay/ownership.json` | 271 | `271e53e89df2fa8b010b3f1919f617ad1d57800e54e6b2ecb584bff039fb39d9` | 运行时状态与日志 |
+| `/runs/f2-neg-r2/agent-runner-replay/runs/request-run-b4/diff.json` | 38 | `f8700730d4d8f747ac5ce273bcc6d6ca0dabf339d43ef439e97a75e370f72f35` | 运行时状态与日志 |
+| `/runs/f2-neg-r2/agent-runner-replay/runs/request-run-b4/events.jsonl` | 45 | `4fafb99cd4a2b5d910b7998711ef3f1faa7357d4a5944fe288083f0a9dd5dec1` | 运行时状态与日志 |
+| `/runs/f2-neg-r2/agent-runner-replay/runs/request-run-b4/logs/stderr.log` | 23 | `4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2` | 运行时状态与日志 |
+| `/runs/f2-neg-r2/agent-runner-replay/runs/request-run-b4/logs/stdout.log` | 23 | `4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2` | 运行时状态与日志 |
+| `/runs/f2-neg-r2/agent-runner-replay/runs/request-run-b4/stub-child.pid` | 6 | `721543407539b156bfd88d64ca8e3447fe5a63499467888982c4f463972d3c70` | 运行时状态与日志 |
+| `/runs/f2-neg-r2/agent-runner-replay/runs/request-run-b4/stub.pid` | 6 | `721543407539b156bfd88d64ca8e3447fe5a63499467888982c4f463972d3c70` | 运行时状态与日志 |
+| `/runs/f2-neg-r2/agent-runner-replay/runs/request-run-b4/usage.json` | 39 | `4d51d872aaf586199a7d77dc5b623d83c2c58d36e94d62a2872984d1bf9af953` | 运行时状态与日志 |
+| `/runs/f2-neg-r2/events/state-events.jsonl` | 8181 | `2bd6789e82a6ae907ee89062a6e6c93ee4bef02b604a397ac9a4a4c41c15dc10` | 运行时状态与日志 |
+| `/runs/f2-neg-r2/managed-process.identity.json` | 44 | `5901b98b852b177a12cd09a5856cf995d8369b4b65adf251abacbf98d30f4ca5` | 运行时状态与日志 |
+| `/runs/f2-neg-r2/managed-process.launch.slot` | 35 | `ad4f84feb5c53210a5795cee2d656cf3b6b4c1c903ccb1d20422bf23e9adfd30` | 运行时状态与日志 |
+| `/runs/f2-neg-r2/snapshot-store/objects/d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 运行时状态与日志 |
+| `/runs/f2-neg-r2/workspace/b4-seed.txt` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 运行时状态与日志 |
+| `/runs/f2-neg/agent-runner-replay/ownership.json` | 268 | `e3f22802ae2100c5859e8a2634ac3ecf3e34457fd4f9b2ff4a84af4337e1a15e` | 运行时状态与日志 |
+| `/runs/f2-neg/agent-runner-replay/runs/request-run-b4/diff.json` | 38 | `f8700730d4d8f747ac5ce273bcc6d6ca0dabf339d43ef439e97a75e370f72f35` | 运行时状态与日志 |
+| `/runs/f2-neg/agent-runner-replay/runs/request-run-b4/events.jsonl` | 45 | `4fafb99cd4a2b5d910b7998711ef3f1faa7357d4a5944fe288083f0a9dd5dec1` | 运行时状态与日志 |
+| `/runs/f2-neg/agent-runner-replay/runs/request-run-b4/logs/stderr.log` | 23 | `4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2` | 运行时状态与日志 |
+| `/runs/f2-neg/agent-runner-replay/runs/request-run-b4/logs/stdout.log` | 23 | `4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2` | 运行时状态与日志 |
+| `/runs/f2-neg/agent-runner-replay/runs/request-run-b4/stub-child.pid` | 6 | `169caa86bf5cccef0b78246d58f87a5a515b5dbcdb791cd19c6aea4c6781c544` | 运行时状态与日志 |
+| `/runs/f2-neg/agent-runner-replay/runs/request-run-b4/stub.pid` | 6 | `169caa86bf5cccef0b78246d58f87a5a515b5dbcdb791cd19c6aea4c6781c544` | 运行时状态与日志 |
+| `/runs/f2-neg/agent-runner-replay/runs/request-run-b4/usage.json` | 39 | `4d51d872aaf586199a7d77dc5b623d83c2c58d36e94d62a2872984d1bf9af953` | 运行时状态与日志 |
+| `/runs/f2-neg/events/state-events.jsonl` | 8181 | `d52bc367784013231efba0a5589b0f2201774ae8b01c68ef6f1e068af462e06e` | 运行时状态与日志 |
+| `/runs/f2-neg/managed-process.identity.json` | 45 | `6aed775efd40fedf3219ea8c31ece13061d0e4bee539a6285a391332e98ad482` | 运行时状态与日志 |
+| `/runs/f2-neg/managed-process.launch.slot` | 35 | `11e6c98cfce8b93b24aff21f9b8a806d7eed407fbbe82eec840dbc5bdf4aa364` | 运行时状态与日志 |
+| `/runs/f2-neg/snapshot-store/objects/d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 运行时状态与日志 |
+| `/runs/f2-neg/workspace/b4-seed.txt` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 运行时状态与日志 |
+| `/runs/f2-pos/agent-runner-replay/ownership.json` | 268 | `5f0ebde5b0bdcde4bf7a9a8ab84b6c02faa52cd0aa8b7c9f93deb06d5e0ab83c` | 运行时状态与日志 |
+| `/runs/f2-pos/agent-runner-replay/runs/request-run-b4/diff.json` | 38 | `f8700730d4d8f747ac5ce273bcc6d6ca0dabf339d43ef439e97a75e370f72f35` | 运行时状态与日志 |
+| `/runs/f2-pos/agent-runner-replay/runs/request-run-b4/logs/stderr.log` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 运行时状态与日志 |
+| `/runs/f2-pos/agent-runner-replay/runs/request-run-b4/logs/stdout.log` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 运行时状态与日志 |
+| `/runs/f2-pos/agent-runner-replay/runs/request-run-b4/stub.pid` | 6 | `22473efb61d0b56c347e04b55588f1d64a994239433ca56a9bafa65dc1970d41` | 运行时状态与日志 |
+| `/runs/f2-pos/events/state-events.jsonl` | 8625 | `796e8496b44fc6ddfeb1986640f63f252d7e83dfb6c07e78e8ce3b14652855cd` | 运行时状态与日志 |
+| `/runs/f2-pos/managed-process.identity.json` | 45 | `c7c835518b1bbe3cb858abdd6713887060ffad8145bbc70aecaec2767d318673` | 运行时状态与日志 |
+| `/runs/f2-pos/managed-process.launch.slot` | 35 | `1d59e68938cb94ba7fc653be9039d608fcfde439c00e804e9b73830809f9991b` | 运行时状态与日志 |
+| `/runs/f2-pos/snapshot-store/objects/d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 运行时状态与日志 |
+| `/runs/f2-pos/workspace/b4-seed.txt` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 运行时状态与日志 |
+| `/runs/f3-neg-r2/agent-runner-replay/ownership.json` | 271 | `b8cf45c23d7f4b917fdce895b3d51f4ba6793765c77952668b454e5d1a4395b4` | 运行时状态与日志 |
+| `/runs/f3-neg-r2/agent-runner-replay/runs/request-run-b4/diff.json` | 38 | `f8700730d4d8f747ac5ce273bcc6d6ca0dabf339d43ef439e97a75e370f72f35` | 运行时状态与日志 |
+| `/runs/f3-neg-r2/agent-runner-replay/runs/request-run-b4/events.jsonl` | 45 | `4fafb99cd4a2b5d910b7998711ef3f1faa7357d4a5944fe288083f0a9dd5dec1` | 运行时状态与日志 |
+| `/runs/f3-neg-r2/agent-runner-replay/runs/request-run-b4/logs/stderr.log` | 23 | `4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2` | 运行时状态与日志 |
+| `/runs/f3-neg-r2/agent-runner-replay/runs/request-run-b4/logs/stdout.log` | 23 | `4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2` | 运行时状态与日志 |
+| `/runs/f3-neg-r2/agent-runner-replay/runs/request-run-b4/stub.pid` | 6 | `1de8a508c3bd5c9d1a143aaff978938cc9d802629a5cabbf622641bed87decb6` | 运行时状态与日志 |
+| `/runs/f3-neg-r2/agent-runner-replay/runs/request-run-b4/usage.json` | 39 | `4d51d872aaf586199a7d77dc5b623d83c2c58d36e94d62a2872984d1bf9af953` | 运行时状态与日志 |
+| `/runs/f3-neg-r2/events/state-events.jsonl` | 9171 | `9e99ad8eebf280a6575812f06059c1c62e98d771a7906be5e13cd6c4eb29cabd` | 运行时状态与日志 |
+| `/runs/f3-neg-r2/managed-process.identity.json` | 45 | `3a5a83429bcdbcb7d246eb0b5d2e9f84f636155cd8f8f84fc3042f91f285515b` | 运行时状态与日志 |
+| `/runs/f3-neg-r2/snapshot-store/objects/d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 运行时状态与日志 |
+| `/runs/f3-neg-r2/workspace/b4-seed.txt` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 运行时状态与日志 |
+| `/runs/f3-neg/agent-runner-replay/ownership.json` | 268 | `a6481ce1900144f9f420d7817d847d9983108494eede4c77f790ad41be88bbb1` | 运行时状态与日志 |
+| `/runs/f3-neg/agent-runner-replay/runs/request-run-b4/diff.json` | 38 | `f8700730d4d8f747ac5ce273bcc6d6ca0dabf339d43ef439e97a75e370f72f35` | 运行时状态与日志 |
+| `/runs/f3-neg/agent-runner-replay/runs/request-run-b4/events.jsonl` | 45 | `4fafb99cd4a2b5d910b7998711ef3f1faa7357d4a5944fe288083f0a9dd5dec1` | 运行时状态与日志 |
+| `/runs/f3-neg/agent-runner-replay/runs/request-run-b4/logs/stderr.log` | 23 | `4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2` | 运行时状态与日志 |
+| `/runs/f3-neg/agent-runner-replay/runs/request-run-b4/logs/stdout.log` | 23 | `4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2` | 运行时状态与日志 |
+| `/runs/f3-neg/agent-runner-replay/runs/request-run-b4/stub.pid` | 6 | `0814dc881b891d26d35a802a06675dbde2ffe5c1cd8e9cc091cf14a1d814236f` | 运行时状态与日志 |
+| `/runs/f3-neg/agent-runner-replay/runs/request-run-b4/usage.json` | 39 | `4d51d872aaf586199a7d77dc5b623d83c2c58d36e94d62a2872984d1bf9af953` | 运行时状态与日志 |
+| `/runs/f3-neg/events/state-events.jsonl` | 9171 | `f21631bcb289b2470e4d66f1d25c149d3d7414a08c56aaf2097f07084b960716` | 运行时状态与日志 |
+| `/runs/f3-neg/managed-process.identity.json` | 45 | `6bcc154452026e7c3b3f2d38f5f953f196d9b2b94c7f2edb183d2c12e63a7ba0` | 运行时状态与日志 |
+| `/runs/f3-neg/snapshot-store/objects/d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 运行时状态与日志 |
+| `/runs/f3-neg/workspace/b4-seed.txt` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 运行时状态与日志 |
+| `/runs/f3-pos/agent-runner-replay/ownership.json` | 268 | `9544ef1e1d0f3f10567a88148cdddff2f2b783edfd97be124017955a16e9d7e8` | 运行时状态与日志 |
+| `/runs/f3-pos/agent-runner-replay/runs/request-run-b4/diff.json` | 38 | `f8700730d4d8f747ac5ce273bcc6d6ca0dabf339d43ef439e97a75e370f72f35` | 运行时状态与日志 |
+| `/runs/f3-pos/agent-runner-replay/runs/request-run-b4/events.jsonl` | 45 | `4fafb99cd4a2b5d910b7998711ef3f1faa7357d4a5944fe288083f0a9dd5dec1` | 运行时状态与日志 |
+| `/runs/f3-pos/agent-runner-replay/runs/request-run-b4/logs/stderr.log` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 运行时状态与日志 |
+| `/runs/f3-pos/agent-runner-replay/runs/request-run-b4/logs/stdout.log` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 运行时状态与日志 |
+| `/runs/f3-pos/agent-runner-replay/runs/request-run-b4/stub.pid` | 6 | `256d8fbea2205f13bbe2671b18acca05ad137d60bbf2c4d7ed1e34fe93905a93` | 运行时状态与日志 |
+| `/runs/f3-pos/agent-runner-replay/runs/request-run-b4/usage.json` | 39 | `4d51d872aaf586199a7d77dc5b623d83c2c58d36e94d62a2872984d1bf9af953` | 运行时状态与日志 |
+| `/runs/f3-pos/events/state-events.jsonl` | 8181 | `529c7ca4915149a2dac1130dd913bb1f47936bcba18eff62d3daed990ad25de5` | 运行时状态与日志 |
+| `/runs/f3-pos/managed-process.identity.json` | 45 | `c123e5f80a6b5ecb1b039488d7281501c36710437787332431a1cf0eb1b3fdcb` | 运行时状态与日志 |
+| `/runs/f3-pos/snapshot-store/objects/d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 运行时状态与日志 |
+| `/runs/f3-pos/workspace/b4-seed.txt` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 运行时状态与日志 |
+| `/runs/f4-neg-r2/agent-runner-replay/ownership.json` | 271 | `ba984bac17d59354f3f5e39f64f7a97ecc0f1f6de17ff4676373529d7c710f37` | 运行时状态与日志 |
+| `/runs/f4-neg-r2/agent-runner-replay/runs/request-run-b4/events.jsonl` | 45 | `4fafb99cd4a2b5d910b7998711ef3f1faa7357d4a5944fe288083f0a9dd5dec1` | 运行时状态与日志 |
+| `/runs/f4-neg-r2/agent-runner-replay/runs/request-run-b4/logs/stderr.log` | 23 | `4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2` | 运行时状态与日志 |
+| `/runs/f4-neg-r2/agent-runner-replay/runs/request-run-b4/logs/stdout.log` | 23 | `4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2` | 运行时状态与日志 |
+| `/runs/f4-neg-r2/agent-runner-replay/runs/request-run-b4/stub.pid` | 6 | `7bfed4bb9a0c79e541e6925c1e4a7ada31acbdf54b9d2b6870736ff0131517d6` | 运行时状态与日志 |
+| `/runs/f4-neg-r2/agent-runner-replay/runs/request-run-b4/usage.json` | 39 | `4d51d872aaf586199a7d77dc5b623d83c2c58d36e94d62a2872984d1bf9af953` | 运行时状态与日志 |
+| `/runs/f4-neg-r2/events/state-events.jsonl` | 4980 | `050a3497369b94949c66b358b683c81f7e48a5ed6fa7c946832a60bee5cdf4fb` | 运行时状态与日志 |
+| `/runs/f4-neg-r2/managed-process.identity.json` | 45 | `d6e6777e5ee8dda2ff5384f978ede4b72d46e1cfce17c713c2ab8ace2aeb044c` | 运行时状态与日志 |
+| `/runs/f4-neg-r2/managed-process.launch.slot` | 35 | `5bd5a3dfa7224527f166cc8f593f616c8345c7ff39351382d5587aba3c69452f` | 运行时状态与日志 |
+| `/runs/f4-neg-r2/snapshot-store/objects/d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 运行时状态与日志 |
+| `/runs/f4-neg-r2/workspace/b4-seed.txt` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 运行时状态与日志 |
+| `/runs/f4-neg/agent-runner-replay/ownership.json` | 268 | `f9d0f182da17de311745e5981f35c400da69f16f46e86d09e92dd367256d0e30` | 运行时状态与日志 |
+| `/runs/f4-neg/agent-runner-replay/runs/request-run-b4/events.jsonl` | 45 | `4fafb99cd4a2b5d910b7998711ef3f1faa7357d4a5944fe288083f0a9dd5dec1` | 运行时状态与日志 |
+| `/runs/f4-neg/agent-runner-replay/runs/request-run-b4/logs/stderr.log` | 23 | `4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2` | 运行时状态与日志 |
+| `/runs/f4-neg/agent-runner-replay/runs/request-run-b4/logs/stdout.log` | 23 | `4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2` | 运行时状态与日志 |
+| `/runs/f4-neg/agent-runner-replay/runs/request-run-b4/stub.pid` | 5 | `4cf94e0bf79e7699ec1c5bf46f16403507fd316976b8a8a1a3f3e0866453300e` | 运行时状态与日志 |
+| `/runs/f4-neg/agent-runner-replay/runs/request-run-b4/usage.json` | 39 | `4d51d872aaf586199a7d77dc5b623d83c2c58d36e94d62a2872984d1bf9af953` | 运行时状态与日志 |
+| `/runs/f4-neg/events/state-events.jsonl` | 4980 | `1deaa12c6da70abcd98404225a350eb07525dcb75d2b2c7b1b536dbb4e4d45e6` | 运行时状态与日志 |
+| `/runs/f4-neg/managed-process.identity.json` | 44 | `26f0911207c0d3dfb91edbbf293c92e287cef21007574fa59285c676ee5c287e` | 运行时状态与日志 |
+| `/runs/f4-neg/managed-process.launch.slot` | 35 | `b34dcaa1b832496767c089b5af7014b8db6367aaeaa8c5f285f10371677a373e` | 运行时状态与日志 |
+| `/runs/f4-neg/snapshot-store/objects/d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 运行时状态与日志 |
+| `/runs/f4-neg/workspace/b4-seed.txt` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 运行时状态与日志 |
+| `/runs/f4-pos/agent-runner-replay/ownership.json` | 268 | `3ce2f3d9fa5240a98cd41e69d982ec20b80df2d0105fa18b9c88cf862b4f85a0` | 运行时状态与日志 |
+| `/runs/f4-pos/agent-runner-replay/runs/request-run-b4/logs/stderr.log` | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` | 运行时状态与日志 |
+| `/runs/f4-pos/agent-runner-replay/runs/request-run-b4/logs/stdout.log` | 12 | `a3eabcead1e7d806ad5228ed078c37d4c471332557187a726c825d9c20c3e75a` | 运行时状态与日志 |
+| `/runs/f4-pos/events/state-events.jsonl` | 5492 | `539f2dec0d574eb6ecae2f89b7917a1b14ff4c83b4719edf0fd03903e77df94e` | 运行时状态与日志 |
+| `/runs/f4-pos/managed-process.identity.json` | 45 | `981b937118b3ca54b73fb86247596bd47572f929822312c3207528df2c27f5dc` | 运行时状态与日志 |
+| `/runs/f4-pos/managed-process.launch.slot` | 35 | `90772ad1175f16ee9e3b13e3bfe1df7a7ab3c7ef54becf6a0032a3f2faca028b` | 运行时状态与日志 |
+| `/runs/f4-pos/snapshot-store/objects/d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 运行时状态与日志 |
+| `/runs/f4-pos/workspace/b4-seed.txt` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 运行时状态与日志 |
+| `/runs/f5-neg-r2/agent-runner-replay/ownership.json` | 271 | `b40f7919193971dc198c512aa3481731adc5fbb90c337408aad1810c8ea136f5` | 运行时状态与日志 |
+| `/runs/f5-neg-r2/agent-runner-replay/runs/request-run-b4/diff.json` | 38 | `f8700730d4d8f747ac5ce273bcc6d6ca0dabf339d43ef439e97a75e370f72f35` | 运行时状态与日志 |
+| `/runs/f5-neg-r2/agent-runner-replay/runs/request-run-b4/events.jsonl` | 45 | `4fafb99cd4a2b5d910b7998711ef3f1faa7357d4a5944fe288083f0a9dd5dec1` | 运行时状态与日志 |
+| `/runs/f5-neg-r2/agent-runner-replay/runs/request-run-b4/logs/stderr.log` | 23 | `4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2` | 运行时状态与日志 |
+| `/runs/f5-neg-r2/agent-runner-replay/runs/request-run-b4/logs/stdout.log` | 23 | `4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2` | 运行时状态与日志 |
+| `/runs/f5-neg-r2/agent-runner-replay/runs/request-run-b4/stub.pid` | 6 | `cdabf87f3198027f7d7ced5f54625a47a24dc28388ff3a5a36667f6a4d530b7c` | 运行时状态与日志 |
+| `/runs/f5-neg-r2/agent-runner-replay/runs/request-run-b4/usage.json` | 39 | `4d51d872aaf586199a7d77dc5b623d83c2c58d36e94d62a2872984d1bf9af953` | 运行时状态与日志 |
+| `/runs/f5-neg-r2/events/state-events.jsonl` | 9940 | `3ba7d6ea60f25fb8628c52fbffdb4197fc29d1ae267c113a1d5e151785c7cc45` | 运行时状态与日志 |
+| `/runs/f5-neg-r2/gates/b4-verify-step.json` | 421 | `62473f7ee452148a4e02c6eab799698ed457a5e1fb152766af82819f0b1e4935` | 运行时状态与日志 |
+| `/runs/f5-neg-r2/managed-process.identity.json` | 45 | `694edc3401a3c82442fd7f6f72b75c2941b19be7432e1e7a834037fbf98a52c2` | 运行时状态与日志 |
+| `/runs/f5-neg-r2/snapshot-store/objects/d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 运行时状态与日志 |
+| `/runs/f5-neg-r2/snapshot-store/objects/f1fd03f9e696c29c060c43dec91996cc01be8eff9b9d411f266ba1a8992cfd3f` | 38 | `f1fd03f9e696c29c060c43dec91996cc01be8eff9b9d411f266ba1a8992cfd3f` | 运行时状态与日志 |
+| `/runs/f5-neg-r2/workspace/b4-seed.txt` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 运行时状态与日志 |
+| `/runs/f5-neg-r2/workspace/b4-tamper-marker.txt` | 38 | `f1fd03f9e696c29c060c43dec91996cc01be8eff9b9d411f266ba1a8992cfd3f` | 运行时状态与日志 |
+| `/runs/f5-neg/agent-runner-replay/ownership.json` | 268 | `6f5da2577c0e54178da665b62e580b74204f85c9474b2eae0afa2efb4d534520` | 运行时状态与日志 |
+| `/runs/f5-neg/agent-runner-replay/runs/request-run-b4/diff.json` | 38 | `f8700730d4d8f747ac5ce273bcc6d6ca0dabf339d43ef439e97a75e370f72f35` | 运行时状态与日志 |
+| `/runs/f5-neg/agent-runner-replay/runs/request-run-b4/events.jsonl` | 45 | `4fafb99cd4a2b5d910b7998711ef3f1faa7357d4a5944fe288083f0a9dd5dec1` | 运行时状态与日志 |
+| `/runs/f5-neg/agent-runner-replay/runs/request-run-b4/logs/stderr.log` | 23 | `4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2` | 运行时状态与日志 |
+| `/runs/f5-neg/agent-runner-replay/runs/request-run-b4/logs/stdout.log` | 23 | `4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2` | 运行时状态与日志 |
+| `/runs/f5-neg/agent-runner-replay/runs/request-run-b4/stub.pid` | 6 | `dfcd9a1ebd81d1fd05b73c73d0c7a56e696d27bcf4cc268c67b9f860b2055fee` | 运行时状态与日志 |
+| `/runs/f5-neg/agent-runner-replay/runs/request-run-b4/usage.json` | 39 | `4d51d872aaf586199a7d77dc5b623d83c2c58d36e94d62a2872984d1bf9af953` | 运行时状态与日志 |
+| `/runs/f5-neg/events/state-events.jsonl` | 9940 | `2d202ca23f2a7348fe9a76fa7d14abd9b0c79e4111659f31e65f481ffeac7068` | 运行时状态与日志 |
+| `/runs/f5-neg/gates/b4-verify-step.json` | 412 | `a5e1e450354bd02348c1cc0b16e0cbc397458aeb7825c87b7387ce83e3bf2a85` | 运行时状态与日志 |
+| `/runs/f5-neg/managed-process.identity.json` | 45 | `2543a56159725cc40a06e16ba21a8ed3aa8a666f7e21398460717a9d1f029390` | 运行时状态与日志 |
+| `/runs/f5-neg/snapshot-store/objects/d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 运行时状态与日志 |
+| `/runs/f5-neg/snapshot-store/objects/f1fd03f9e696c29c060c43dec91996cc01be8eff9b9d411f266ba1a8992cfd3f` | 38 | `f1fd03f9e696c29c060c43dec91996cc01be8eff9b9d411f266ba1a8992cfd3f` | 运行时状态与日志 |
+| `/runs/f5-neg/workspace/b4-seed.txt` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 运行时状态与日志 |
+| `/runs/f5-neg/workspace/b4-tamper-marker.txt` | 38 | `f1fd03f9e696c29c060c43dec91996cc01be8eff9b9d411f266ba1a8992cfd3f` | 运行时状态与日志 |
+| `/runs/f5-pos/agent-runner-replay/ownership.json` | 268 | `69fce5c93808020607b6af99552436676a48d49da7877f6de76ab18ef53f85d1` | 运行时状态与日志 |
+| `/runs/f5-pos/agent-runner-replay/runs/request-run-b4/diff.json` | 38 | `f8700730d4d8f747ac5ce273bcc6d6ca0dabf339d43ef439e97a75e370f72f35` | 运行时状态与日志 |
+| `/runs/f5-pos/agent-runner-replay/runs/request-run-b4/events.jsonl` | 45 | `4fafb99cd4a2b5d910b7998711ef3f1faa7357d4a5944fe288083f0a9dd5dec1` | 运行时状态与日志 |
+| `/runs/f5-pos/agent-runner-replay/runs/request-run-b4/logs/stderr.log` | 23 | `4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2` | 运行时状态与日志 |
+| `/runs/f5-pos/agent-runner-replay/runs/request-run-b4/logs/stdout.log` | 23 | `4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2` | 运行时状态与日志 |
+| `/runs/f5-pos/agent-runner-replay/runs/request-run-b4/stub.pid` | 5 | `607a8a37eddb24916ac4f77a787ec5492f719da99696a4cd5359ca1421183793` | 运行时状态与日志 |
+| `/runs/f5-pos/agent-runner-replay/runs/request-run-b4/usage.json` | 39 | `4d51d872aaf586199a7d77dc5b623d83c2c58d36e94d62a2872984d1bf9af953` | 运行时状态与日志 |
+| `/runs/f5-pos/events/state-events.jsonl` | 10931 | `e8c9c7ff91d5372c75d82b0bcf4d4498feae0113de6aa5fdc5fa4e3cda33aeb9` | 运行时状态与日志 |
+| `/runs/f5-pos/gates/b4-verify-step.json` | 329 | `1cf834c25cb753416ef69cd111e42cf16723c62b8e22a3ae66aee3361115db84` | 运行时状态与日志 |
+| `/runs/f5-pos/managed-process.identity.json` | 44 | `251d908a41f86475e46fe6fc544d8f2b7a310d0c6bc8ac8c48a7417840f77cda` | 运行时状态与日志 |
+| `/runs/f5-pos/snapshot-store/objects/d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 运行时状态与日志 |
+| `/runs/f5-pos/workspace/b4-seed.txt` | 18 | `d050b0b4baff6ff7bb3186f2170970027ec328ec71903d8900984f930f72eefd` | 运行时状态与日志 |
+
+## 未入库文件清单（`.gitignore` 排除类型）
+
+| 相对路径 | 字节 | sha256 | 理由 |
+|---|---|---|---|
+| `/bin/agent-stub.exe` | 3119104 | `01ac99b6ef5684785e90187fa90f78c09f91b9805df63d10a07e18e1ed47314d` | `.gitignore` 排除类型（二进制 / 中间输出） |
+| `/bin/b4-e2e.exe` | 7151616 | `2f376099b437e664da362533efe7a3e607ea043ea2b4d74ababae30c704e2cab` | `.gitignore` 排除类型（二进制 / 中间输出） |
+| `/bin/prfrail.exe` | 6218752 | `204aa5bea0b2fbd493f4522b2a9ef08b025db44a61deeacf0fd1428e8a54d824` | `.gitignore` 排除类型（二进制 / 中间输出） |
+
+## 重建说明
+
+- **未入库条目**（见上表）：均为本地构建产物或忽略类型的输出，可由对应切片提交的工具链重建——`b4/bin/*.exe` 由 `tools/b4-e2e/run-faces.ps1` 与仓内 Go 源码构建，`*.out` 为门禁脚本的标准输出转储；核验方式 = 比对上表 sha256 与字节。
+- **排除条目**：一次性脚本、运行时状态与中间转储；其行为已由本片归档的切片级文档（切片定义 / 方案 / 评审包 / 门禁读数）与对应切片的提交记录固定。
+- **行尾与 BOM 归一**：源 `tmp/` 副本的部分文件为 CRLF 或带 BOM；归档副本已按仓库编码约定归一到「`.ps1` 带 BOM / 其余不带 BOM / 一律 LF」（不影响字符内容）。
+
+## 后缀与编码映射（`.md` → `.txt` 及编码归一）
+
+| 原路径 | 归档路径 | 原始字节 sha256 | 归档字节 sha256 | 变更 |
+|---|---|---|---|---|
+| `SLICE-DEFINITION.md` | `archive/SLICE-DEFINITION.txt` | `acf69185d7d2ce2ec7622bb41e4d383a70a2fa84dcc0fba2ece46e91b176a231` | `391e6a360c2ee7214f14ec6ecdb55f7dfa33c58483ed617b1dfa6cb274991557` | 后缀 `.md` → `.txt` / LF 归一 |
+| `review/README-⑥-scan.txt` | `archive/review/README-⑥-scan.txt` | `6a6d1057bdebaaea0883e8e0c7fd0a38fac6ebe83f2049ff48bd6a6237a03707` | `dd4d5c8d97167b56b410593547c5b3c63b0a3bee521b11df7183c75f9e2c8209` | LF 归一 |
+| `review/README-⑦-final.txt` | `archive/review/README-⑦-final.txt` | `227f3800be9a4add88d204304398f5601482dfa87f041824bbcb6c11a8669ff7` | `158f2e402f96b8b3848185787e658ebfc9b0a15fb0846c950aec3633efc3714d` | LF 归一 |
+| `review/README-⑦-round2.txt` | `archive/review/README-⑦-round2.txt` | `b030a54e0ec33b509e21cafd364eae6f17376493185354bd66aabbf0edffcc22` | `889a51dd7f6e5d57c66de1d5afefbf6d7262adfae1feaace8f36ba824e98a076` | LF 归一 |
+
+## 对应引用点
+
+| 引用文件 | 行号 |
+|---|---|
+| `"docs/validation/evidence/directive-history/b4/archive/review/README-\342\221\245-scan.txt"` | 12 / 28 / 29 / 43 |
+| `"docs/validation/evidence/directive-history/b4/archive/review/README-\342\221\246-final.txt"` | 9 / 19 / 20 / 21 |
+| `"docs/validation/evidence/directive-history/b4/archive/review/README-\342\221\246-round2.txt"` | 76 / 174 / 252 |
+| `docs/DELIVERY_DIRECTIVE.md` | 120 / 836 |
+| `docs/DELIVERY_DIRECTIVE_EN.md` | 120 / 836 |
+| `docs/DEV_PLAN.md` | 143 |
+| `docs/DEV_PLAN_EN.md` | 144 |
+| `docs/t027/REMAINING_SLICES.md` | 629 |
+| `docs/t027/REMAINING_SLICES_EN.md` | 616 |
+| `docs/validation/evidence/DIRECTIVE-TMP-LIFECYCLE-freedom-list.md` | 13 |
+| `docs/validation/evidence/directive-history/b4/archive/ARCH-DESIGN.txt` | 3 / 5 / 31 / 34 / 42 / 64 / 94 / 100 / 109 / 130 / 159 |
+| `docs/validation/evidence/directive-history/b4/archive/SLICE-DEFINITION.txt` | 15 / 36 |
+| `docs/validation/evidence/directive-history/tmp-lifecycle-workdir/archive/classification.txt` | 124 / 125 / 126 / 127 / 128 / 129 / 130 / 131 / 132 / 133 / 134 / 135 / 136 / 137 / 138 / 139 / 140 / 141 / 142 / 143 / 144 / 145 / 146 / 147 / 148 / 149 / 150 / 151 / 152 / 153 / 154 / 155 / 156 / 157 / 158 / 159 / 160 / 161 / 162 / 163 / 164 / 165 / 166 / 167 / 168 / 169 / 170 / 171 / 172 / 173 / 174 / 175 / 176 / 177 / 178 / 179 / 180 / 181 / 182 / 183 / 184 / 185 / 186 / 187 / 188 / 189 / 190 / 191 / 192 / 193 / 194 / 195 / 196 / 197 / 198 / 199 / 200 / 201 / 202 / 203 / 204 / 205 / 206 / 207 / 208 / 209 / 210 / 211 / 212 / 213 / 214 / 215 / 216 / 217 / 218 / 219 / 220 / 221 / 222 / 223 / 224 / 225 / 226 / 227 / 228 / 229 / 230 / 231 / 232 / 233 / 234 / 235 / 236 / 237 / 238 / 239 / 240 / 241 / 242 / 243 / 244 / 245 / 246 / 247 / 248 / 249 / 250 / 251 / 252 / 253 / 254 / 255 / 256 / 257 / 258 / 259 / 260 / 261 / 262 / 263 / 264 / 265 / 266 / 267 / 268 / 269 / 270 / 271 / 272 / 273 / 274 / 275 / 276 / 277 / 278 / 279 / 280 / 281 / 282 / 283 / 284 / 285 / 286 / 287 / 288 / 289 / 290 / 291 / 292 / 293 / 294 / 295 / 296 / 297 / 298 / 299 / 300 / 301 / 302 / 303 / 304 / 305 / 306 / 307 / 308 / 309 / 310 / 311 / 312 / 313 / 314 / 315 / 316 / 317 / 318 / 319 / 320 / 321 / 322 / 323 / 324 / 325 / 326 / 327 / 328 / 329 / 330 / 331 / 332 / 333 / 334 / 335 / 336 / 337 / 338 / 339 / 340 / 341 / 342 / 343 / 344 / 345 / 346 / 347 / 348 / 349 / 350 / 351 / 352 / 353 / 354 / 355 / 356 / 357 / 358 / 359 / 360 / 361 / 362 / 363 / 364 / 365 / 366 / 367 / 368 / 369 / 370 / 371 / 372 / 373 / 374 / 375 / 376 / 377 / 378 / 379 / 380 / 381 / 382 / 383 / 384 / 385 / 386 / 387 / 388 / 389 / 390 / 391 / 392 / 393 / 394 / 395 / 396 / 397 / 398 / 399 / 400 / 401 / 402 / 403 / 404 / 405 / 406 / 407 / 408 / 409 / 410 / 411 / 412 / 413 / 414 / 415 / 416 / 417 / 418 / 419 / 420 / 421 / 422 / 423 / 424 / 425 / 426 / 427 / 428 / 429 / 430 / 431 / 432 / 433 / 434 / 435 / 436 / 437 / 438 / 439 / 440 / 441 / 442 / 443 / 444 / 445 / 446 / 447 / 448 / 449 / 450 / 451 / 452 / 453 / 454 / 455 / 456 / 457 / 458 / 459 / 460 / 461 / 462 / 463 / 464 / 465 / 466 / 467 / 468 / 469 / 470 / 471 / 472 / 473 / 474 / 475 / 476 |
+| `docs/validation/evidence/directive-history/tmp-lifecycle-workdir/archive/facts2.txt` | 11 / 18 / 42 |
+| `docs/validation/evidence/directive-history/tmp-lifecycle-workdir/archive/inventory.txt` | 71 / 72 / 73 / 74 / 75 / 76 / 77 / 78 / 79 / 80 / 81 / 82 / 83 / 84 / 85 / 86 / 87 / 88 / 89 / 90 / 91 / 92 / 93 / 441 / 442 / 443 / 444 / 445 / 457 / 466 / 467 / 468 / 469 / 470 / 482 / 488 / 489 / 491 / 493 / 1180 / 1181 / 1182 / 1183 / 1184 / 1185 / 1186 / 1187 / 1188 / 1189 / 1190 / 1191 / 1192 / 1193 / 1194 / 1195 / 1196 / 1197 / 1198 / 1199 / 1200 / 1201 / 1202 / 1203 / 1204 / 1205 / 1206 / 1207 / 1208 / 1209 / 1210 / 1211 / 1212 / 1213 / 1214 / 1215 / 1216 / 1217 / 1218 / 1219 / 1220 / 1221 / 1222 / 1223 / 1224 / 1225 / 1226 / 1227 / 1228 / 1229 / 1230 / 1231 / 1232 / 1233 / 1277 / 1279 / 1281 / 1282 |
+| `docs/validation/evidence/directive-history/tmp-lifecycle-workdir/archive/measure.txt` | 25 / 26 / 27 / 42 |
+| `docs/validation/evidence/directive-history/tmp-lifecycle-workdir/archive/sets.txt` | 37 |
+| `docs/validation/t027-at23-e2e.md` | 20 / 21 / 22 / 23 / 24 / 25 / 27 / 41 / 45 / 46 / 47 / 48 / 65 / 75 / 76 / 77 / 78 / 79 / 80 / 111 / 144 / 175 / 204 |
+| `docs/validation/t027-at23-e2e_EN.md` | 20 / 21 / 22 / 23 / 24 / 25 / 27 / 41 / 45 / 46 / 47 / 48 / 65 / 75 / 76 / 77 / 78 / 79 / 80 / 111 / 144 / 175 / 204 |
+| `tools/b4-e2e/run-faces.ps1` | 6 / 12 / 219 |

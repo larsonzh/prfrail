@@ -1,0 +1,3 @@
+GATE REPORT scope=tree repo=D:\LZProjects\prfrail changed=5 check=G6-4
+PASS  G6-4 expiring literal :: no expiring literal on added lines (scanned 1079) whitelist-source=worktree
+TOTAL_FAIL=0

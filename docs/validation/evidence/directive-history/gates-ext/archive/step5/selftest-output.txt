@@ -1,0 +1,155 @@
+GATES SELFTEST (in-process; fixtures under tools/gates/testdata/)
+  T3/T12 need real git ranges and are recorded as evidence, not here:
+    --scope=range:b738e6b^..b738e6b (A1 must be red) / range:9f68a52^..9f68a52 (green)
+    --scope=range:1b01115^..1b01115 (C1: G7 must be red)
+ok   T13 fixture files are not *.md, so a tree/ci run never judges the runner own fixtures
+ok   T1 G6-1 detects pending(⑥)+completion(⑥ 实得) in one block
+ok   T1 G6-1 reports exactly one finding for the fixture
+ok   T1 reverse mutation (drop completion row) clears G6-1
+ok   T1 delete-criterion mutation (G6-1 removed) leaves the corpus clean
+ok   T2 provenance file carries exactly one excerpt line
+ok   T2 fixture embeds the historical OB-11 row verbatim
+ok   T2 OB-11 row (with 冲突 marker) is clean
+ok   T2 reverse mutation (drop the 冲突 exclusion marker) turns G6-1 red
+ok   T4 provenance file carries the two historical cost rows
+ok   T4 fixture embeds both historical cost rows verbatim
+ok   T4 cost-clause parser yields identical realized vectors for the historical pair
+ok   T4 budget clause is exempt: consistent rows pass G6-2
+ok   T4 reverse mutation (预算 -> 成本) turns G6-2 red
+ok   T4 delete-criterion mutation (G6-2 removed) leaves the mutated corpus clean
+ok   T5 legal 11-digit run id passes G6-3
+ok   T5 legal fixture yields no finding
+ok   T6 placeholder run ids fail G6-3
+ok   T6 one finding per placeholder line (4)
+ok   T6 delete-criterion mutation (G6-3 removed) leaves the corpus clean
+ok   F7 G6-3 boundary table (token-final): 1-digit id `run 3` must FAIL
+ok   F7 G6-3 boundary table (token-final): 2-digit id `run 33` must FAIL
+ok   F7 G6-3 boundary table (token-final): 3-digit id `run 333` must FAIL
+ok   F7 G6-3 floor rule (token-final): the 3-digit reject names the 9-digit floor
+ok   F7 G6-3 boundary table (token-final): 4-digit id `run 3333` must FAIL
+ok   F7 G6-3 floor rule (token-final): the 4-digit reject names the 9-digit floor
+ok   F7 G6-3 boundary table (token-final): 5-digit id `run 33333` must FAIL
+ok   F7 G6-3 floor rule (token-final): the 5-digit reject names the 9-digit floor
+ok   F7 G6-3 boundary table (token-final): 6-digit id `run 333333` must FAIL
+ok   F7 G6-3 floor rule (token-final): the 6-digit reject names the 9-digit floor
+ok   F7 G6-3 boundary table (token-final): 7-digit id `run 3333333` must FAIL
+ok   F7 G6-3 floor rule (token-final): the 7-digit reject names the 9-digit floor
+ok   F7 G6-3 boundary table (token-final): 8-digit id `run 33333333` must FAIL
+ok   F7 G6-3 floor rule (token-final): the 8-digit reject names the 9-digit floor
+ok   F7 G6-3 boundary table (token-final): 9-digit id `run 333333333` must PASS
+ok   F7 G6-3 boundary table (token-final): 10-digit id `run 3333333333` must PASS
+ok   F7 G6-3 boundary table (token-final): 11-digit id `run 33333333333` must PASS
+ok   F7 G6-3 boundary table (token-final): 12-digit id `run 333333333333` must PASS
+ok   F7 G6-3 boundary table (token-final): 13-digit id `run 3333333333333` must PASS
+ok   F7 G6-3 boundary table (token-final): 14-digit id `run 33333333333333` must FAIL
+ok   F7 G6-3 boundary table (token-final): 15-digit id `run 333333333333333` must FAIL
+ok   F7 G6-3 boundary table (token-final): 16-digit id `run 3333333333333333` must FAIL
+ok   F7 G6-3 boundary table (token-final): 17-digit id `run 33333333333333333` must FAIL
+ok   F7 G6-3 boundary table (token-final): 18-digit id `run 333333333333333333` must FAIL
+ok   F7 G6-3 boundary table (token-final): 19-digit id `run 3333333333333333333` must FAIL
+ok   F7 G6-3 boundary table (token-final): 20-digit id `run 33333333333333333333` must FAIL
+ok   F7 G6-3 boundary table (backticked): 1-digit id `run 3` must FAIL
+ok   F7 G6-3 boundary table (backticked): 2-digit id `run 33` must FAIL
+ok   F7 G6-3 boundary table (backticked): 3-digit id `run 333` must FAIL
+ok   F7 G6-3 floor rule (backticked): the 3-digit reject names the 9-digit floor
+ok   F7 G6-3 boundary table (backticked): 4-digit id `run 3333` must FAIL
+ok   F7 G6-3 floor rule (backticked): the 4-digit reject names the 9-digit floor
+ok   F7 G6-3 boundary table (backticked): 5-digit id `run 33333` must FAIL
+ok   F7 G6-3 floor rule (backticked): the 5-digit reject names the 9-digit floor
+ok   F7 G6-3 boundary table (backticked): 6-digit id `run 333333` must FAIL
+ok   F7 G6-3 floor rule (backticked): the 6-digit reject names the 9-digit floor
+ok   F7 G6-3 boundary table (backticked): 7-digit id `run 3333333` must FAIL
+ok   F7 G6-3 floor rule (backticked): the 7-digit reject names the 9-digit floor
+ok   F7 G6-3 boundary table (backticked): 8-digit id `run 33333333` must FAIL
+ok   F7 G6-3 floor rule (backticked): the 8-digit reject names the 9-digit floor
+ok   F7 G6-3 boundary table (backticked): 9-digit id `run 333333333` must PASS
+ok   F7 G6-3 boundary table (backticked): 10-digit id `run 3333333333` must PASS
+ok   F7 G6-3 boundary table (backticked): 11-digit id `run 33333333333` must PASS
+ok   F7 G6-3 boundary table (backticked): 12-digit id `run 333333333333` must PASS
+ok   F7 G6-3 boundary table (backticked): 13-digit id `run 3333333333333` must PASS
+ok   F7 G6-3 boundary table (backticked): 14-digit id `run 33333333333333` must FAIL
+ok   F7 G6-3 boundary table (backticked): 15-digit id `run 333333333333333` must FAIL
+ok   F7 G6-3 boundary table (backticked): 16-digit id `run 3333333333333333` must FAIL
+ok   F7 G6-3 boundary table (backticked): 17-digit id `run 33333333333333333` must FAIL
+ok   F7 G6-3 boundary table (backticked): 18-digit id `run 333333333333333333` must FAIL
+ok   F7 G6-3 boundary table (backticked): 19-digit id `run 3333333333333333333` must FAIL
+ok   F7 G6-3 boundary table (backticked): 20-digit id `run 33333333333333333333` must FAIL
+ok   F7 G6-3 named case `run 0` (all-zero id, 1 digit) must FAIL
+ok   F7 G6-3 named case `run 000000` (all-zero id, 6 digits) must FAIL
+ok   F7 G6-3 named case `run 00000000000000000000` (all-zero id, 20 digits (fails at any length)) must FAIL
+ok   F7 G6-3 named case ``run 00000000000000000000`` (all-zero id, 20 digits, backticked) must FAIL
+ok   F7 G6-3 named case `run <RUN_ID>` (angle-bracket placeholder) must FAIL
+ok   F7 G6-3 named case `run TBD` (word placeholder TBD) must FAIL
+ok   F7 G6-3 named case `run TODO` (word placeholder TODO) must FAIL
+ok   F7 G6-3 named case `run N/A` (word placeholder N/A) must FAIL
+ok   F7 G6-3 named case `run 待定` (placeholder wording 待) must FAIL
+ok   F7 G6-3 named case `run 占位` (placeholder wording 占位) must FAIL
+ok   F7 G6-3 named case `run 35646859765` (real-world 11-digit run id) must PASS
+ok   F7 G6-3 named case ``run 35646859765`` (real-world 11-digit run id inside a code span) must PASS
+ok   F7 G6-3 named case `see run 111` (token-final 3-digit id at end of line) must FAIL
+ok   F7 G6-3 named case `run 1234。` (3-8 digit id terminated by CJK punctuation (not a word)) must FAIL
+ok   F7 G6-3 named case `run 7！` (1-2 digit id terminated by punctuation) must FAIL
+ok   F7 G6-3 named case `report run 123456789012345！` (>= 14 digit id terminated by punctuation) must FAIL
+ok   F7 G6-3 named case `see run <RUN_ID> here` (angle-bracket placeholder mid-prose) must FAIL
+ok   F7 G6-3 named case `see run TBD here` (word placeholder TBD mid-prose) must FAIL
+ok   F7 G6-3 named case `see run TODO here` (word placeholder TODO mid-prose) must FAIL
+ok   F7 G6-3 named case `see run N/A here` (word placeholder N/A mid-prose) must FAIL
+ok   F7 G6-3 named case `see run 待定 here` (CJK placeholder 待 mid-prose) must FAIL
+ok   F7 G6-3 named case `see run 占位 here` (CJK placeholder 占位 mid-prose) must FAIL
+ok   F7 G6-3 named case ``run 1234`` (backticked malformed id stays judged) must FAIL
+ok   F7 G6-3 named case `The run log shows `run 1234` as the marker.` (backticked malformed id inside a prose sentence) must FAIL
+ok   2e G6-3 prose probe `The retry loop was executed run 1234 times by the harness.` (3-8 digit rule vs ASCII word) must PASS (no finding)
+ok   2e G6-3 prose probe `连续 run 12 次后任务完成。` (1-2 digit rule vs CJK word) must PASS (no finding)
+ok   2e G6-3 prose probe ``inventory run 1 failed`` (pre-existing docs/t027/B3B_DESIGN.md:236 shape (1-2 digit rule)) must PASS (no finding)
+ok   2e G6-3 prose probe `run 111 次后停止。` (3-8 digit rule vs CJK word) must PASS (no finding)
+ok   2e G6-3 prose probe `run 000 次。` (all-zero rule vs CJK word) must PASS (no finding)
+ok   2e G6-3 prose probe `run 123456789012345 次。` (>= 14 digit rule vs CJK word) must PASS (no finding)
+ok   2e G6-3 prose probe `the tool ran run 1234 quickly` (3-8 digit rule vs ASCII word (no punctuation)) must PASS (no finding)
+ok   2e G6-3 prose probe `see run 7 files` (1-2 digit rule vs ASCII word) must PASS (no finding)
+ok   2e G6-3 prose probes are load-bearing: the same digit runs DO fail when token-final
+ok   T7 expiring literals fail G6-4
+ok   T7 two literal lines produce two findings
+ok   T7 whitelisting ONE of two findings leaves G6-4 red with one fatal finding
+ok   T7 whitelisting both findings turns G6-4 green (whitelist is load-bearing)
+ok   T8 report without an artifacts block fails G7-a
+ok   T8 delete-criterion mutation (G7-a removed) leaves the corpus clean
+ok   T9 unresolved repo disposition (tmp path, omitted token) fails G7-b
+ok   T9 marking the tmp path local-only turns G7-b green
+ok   T9 unknown disposition token fails G7-b
+ok   T10 existing repo artifact + local-only + missing-historical pass G7-b
+ok   T10 unresolvable repo artifact fails G7-b
+ok   T11 finding row without a disposition cell fails G7-c
+ok   T11 adding the disposition cell turns G7-c green
+ok   T11 delete-criterion mutation (G7-c removed) leaves the corpus clean
+ok   G7-d stopped status line without 已停止——未完成 fails
+ok   G7-d fires only on the status line, not on prose naming the rule (self-reference guard)
+ok   G7-d adding the incomplete mark turns it green
+ok   T14 tree/index resolve whitelists from the working tree
+ok   T14 range/ci resolve whitelists from the endpoint revision (range -> head, ci -> HEAD)
+ok   T14 G6 reads its whitelist through ctx.loadWhitelist
+ok   T14 G4b reads its whitelist through the same ctx.loadWhitelist
+ok   T14 both criteria print the whitelist source they used
+ok   T15 tree scope rejects a gitignored / never-staged path marked repo (F2 probe)
+ok   T15 tree scope accepts a path present in the index and on disk
+ok   T15 range scope still resolves repo artifacts at the endpoint revision
+ok   T15 G7-b FAILs an ignored path marked repo in tree scope
+ok   T15 G7-b accepts the same row once the path is in the index
+ok   T16 disposition vocabulary covers the CN and EN token sets stated in 6.3
+ok   T16 G7-c accepts the English disposition `Fixed`
+ok   T16 G7-c accepts the English disposition `Resolved`
+ok   T16 G7-c accepts the English disposition `Closed`
+ok   T16 G7-c accepts the English disposition `Accepted`
+ok   T16 G7-c accepts the English disposition `Rejected`
+ok   T16 G7-c accepts the English disposition `Deferred`
+ok   T16 G7-c accepts the English disposition `Recorded`
+ok   T16 G7-c accepts the English disposition `To do`
+ok   T16 G7-c accepts the English disposition `Observed`
+ok   T16 G7-c accepts the English disposition `To be discussed`
+ok   T16 G7-c accepts the English disposition `Not a problem`
+ok   T16 G7-c accepts the English disposition `Documented`
+ok   T16 G7-c still rejects a finding row with no disposition cell
+ok   T13 whole fixture corpus yields exactly the expected FAIL id set
+ok   T13 whole fixture corpus has no unexpected SKIP/INFO storm
+ok   F1 every declared fixture mutation applied (a stale mutation would weaken the suite silently)
+ok   F1 mutation coverage floor (>= 8 fixture mutations exercised)
+SELFTEST: PASS 150/150

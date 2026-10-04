@@ -1,0 +1,3 @@
+GATE REPORT scope=tree repo=D:\LZProjects\prfrail changed=15 check=G6-6
+PASS  G6-6 ledger status closed set :: every added ledger row opens with a closed-set status word (scanned 38) whitelist-source=worktree
+TOTAL_FAIL=0

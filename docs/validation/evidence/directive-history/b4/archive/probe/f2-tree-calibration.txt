@@ -1,0 +1,12 @@
+F2 tree calibration: does an UNMANAGED start of the f2/neg load leak a descendant?
+command: agent-stub.exe -mode spawn -child-life 45s -sleep 2s  (plain Start-Process, no guard)
+PROOFRAIL_EVIDENCE_DIR=D:\LZProjects\prfrail\tmp\b4\probe\evidence
+parent pid (Start-Process handle) = 31116
+parent exited after -sleep 2s: exitCode=0
+artifact stub-child.pid = 6548 (written by the parent: the spawned descendant)
+artifact stub.pid       = 6548 (overwritten by the descendant process itself)
+parent alive now  = False
+descendant alive  = True (child-life 45s, so it outlives its parent by design)
+=> the injection is real: without job containment the descendant would survive the parent, which is exactly what the harness tree check would catch
+after explicit cleanup, descendant alive = False
+remaining agent-stub processes = 0

@@ -1,0 +1,44 @@
+# ⑤ 预审报告（复审 r2）—— `[SLICE] DIRECTIVE-REVIEW-SATURATION`（v1.13）
+
+## 1. 复审范围与方法
+
+- **读原件而非转述**：① 我上一轮报告原件 `tmp/v113/review-r1.md`（全读）；② 整改 diff `tmp/v113/remediation.diff`（全读，CN/EN 各 9 个 hunk；`g6.js` / `selftest.js` 段仅文件头、零 hunk）；③ 当前全量 diff `tmp/v113/review-input-r2.diff` + `review-input-r2.stat.txt`（numstat：md 93+/26−、g6.js 311+/3−、selftest.js 464+/3−）；④ 门禁原始输出 `gate-tree-r1.txt` / `gate-index-r1.txt` / `selftest-master.txt` / `g6-5-r1.txt` / `g6-6-r1.txt` / `mirror.txt` / `verify-v113.txt`；⑤ 契约原句：当前 `docs/DELIVERY_DIRECTIVE{,_EN}.md`（§4.1、§6.3 G6/G7、§7.5、§7.8 全节、§12.1、§12.4 台账区、附录 C 结构、B.7.4）与 `tools/gates/lib/criteria/g6.js`（`targetRegionRanges` / `ledgerRegionRange` / 闭集表）。
+- **独立复算（不只信 diff 声称）**：在临时工作树用 `HEAD` + `review-input.diff` 重建 r1 文件状态，`git diff --no-index` 得真实整改增量 = **每文件 9 插入 / 8 删除**，与 `remediation.diff` 的 9 个 hunk 一一对应（8 条改行 + OB-42 新增行；其中 5 条改的是 r1 新增行、3 条改的是既有行，numstat 叠加关系自洽：89+9−5=93、23+8−3=26）；临时工作树**已删除**。
+- **门禁自跑**：当前树重跑 `G6-5`（PASS，scanned 48 / refs 33）与 `G6-6`（PASS，scanned 36）；`mirror.txt`（CN=EN=1299、per-line mismatch=0，含 OB-42 行）与 `verify-v113.txt`（ledger rows=42、notInClosedSet=0、unresolved=0、ACCEPTED）均为整改后读数。
+- 按 §4.2 禁止项：`tools/gates/selftest.js` 与 `tools/gates/testdata/**` 内容未审（归 ⑦）。
+
+## 2. D-1…D-6 逐条闭合表
+
+| # | 原发现摘要 | 整改 hunk（remediation.diff） | 当前文本逐字引用（文件:行） | 判定 |
+|---|---|---|---|---|
+| D-1 | §7.8.6 顺延少于 2 次误引配套②，与②实体矛盾 | CN/EN `@@ -612,9 +612,9 @@`（7.8.6 行） | CN:617「顺延少于 2 次按 §12.1 的配套①；达到 2 次按配套②必须升级用户裁决」；EN:617「fewer than two deferrals follows companion ① of §12.1; reaching two follows companion ② and must escalate for a user ruling」。§12.1 原文（CN/EN:753）①=目标须满足试点选择标准、不满足⇒继续顺延并登记次数；②=≥2 次⇒按 §1.7.2 停下升级用户裁决 ⇒ 引用与实体匹配 | 已闭合 |
+| D-2 | §7.8.4 声称 OB-11/OB-37 处置列有指针，两格实际无 | CN/EN `@@ -780,7 +780,7 @@`（OB-11）+ `@@ -814,11 +814,12 @@`（OB-37） | CN:783 OB-11 尾「（例外标准正文见 §7.8.4）」；CN:817 OB-37 尾「（元规则正文见 §7.8.4）」；EN:783「(the exception standard is in §7.8.4)」；EN:817「(the meta-rule is restated in §7.8.4)」。① 指针存在且指向 §7.8.4（CN/EN:609 确含两条权威正文）；② 首状态词仍为闭集词（待办/已登记、To do/Registered）；③ 两行未被破坏（列数完整、无 `||`，G1-a PASS；指针为引用式，未复制规则实体） | 已闭合 |
+| D-3 | G6-5 正文写「C.0–C.0h」，实现区域②= C.0 至 C.1 之前（含 C.0i） | CN/EN `@@ -488,7 +488,7 @@`（G6-5 行） | CN:491「位于 §0.3 变更日志表区间或附录 C.0–C.0i 台账块区间的行」；EN:491「the appendix C.0–C.0i ledger interval」。实现核验：`g6.js:508–534` `targetRegionRanges` 区域② = `REGION_HEAD_C0` 起、`REGION_HEAD_C1` 止（不含）；当前附录 C 台账块恰为 C.0/C.0a…C.0i（:1061–1230），C.1 在 :1232 ⇒ 描述与实现逐条一致 | 已闭合 |
+| D-4 | §7.8.3 引「§7.5 末句」且引文缺「到」 | CN/EN `@@ -601,7 +601,7 @@`（用户授权例外行） | CN:604「§7.5 的表后句「超出上限 ⇒ 升级到用户裁决」+ 授权原文」；EN:604「the sentence after the table in §7.5 ("Exceeding a cap ⇒ escalate to user adjudication") + the authorization text」。§7.5 原文核验：CN:569「超出上限 ⇒ 升级到用户裁决。」确为表后首句；EN:569「Exceeding a cap ⇒ escalate to user adjudication.」逐字吻合 | 已闭合 |
+| D-5 | B.7.4 复杂/高风险行仍为 §7.1–§7.7 | CN/EN `@@ -1049,7 +1050,7 @@` | CN:1053「**复杂 / 高风险** \| 上表 + §4.1–§4.3、§7.1–§7.8、§8、§9 全、附录 B.1–B.6」；EN:1053「**Complex / high risk** \| … §7.1–§7.8, §8, all of §9, Appendix B.1–B.6」 | 已闭合 |
+| D-6 | §7.8.2/§7.8.5 把「结论行 ∈ §4.1 闭集」记在 G7-c 名下 | CN/EN `@@ -589,7 +589,7 @@`（7.8.2）+ `@@ -612,9 +612,9 @@`（7.8.5）+ `@@ -814,11 +814,12 @@`（OB-42 登记） | CN:592「机械可判；结论行 ∈ §4.1 的闭集枚举由 §4.1 契约与人工核验覆盖（不属 G7-c）；G7-c 只核 finding 行的处置列」；CN:615 同口径；EN:592/615 同。G7-c 本体（CN/EN:497）确只判 finding 行处置单元格 ⇒ 措辞如实。全文 G7-c 仅 4 处（每文件），无残留错误归属 | 已闭合 |
+
+**D-2 补指针路线专项核验**：§7.8.4（CN/EN:609）原文「§12.4 的 OB-11 处置列以指针指向本节」「§12.4 的 OB-37 处置列以指针指向本节」现在属实；指针为单向引用式（台账→正文），权威实体仍只存一处（§7.8.4，符合 B.7「一处权威」硬约束），无循环定义。
+
+**OB-42 行专项核验（CN/EN:822）**：① 首状态词 `**待办**` / `**To do**` ∈ G6-6 双语闭集；② `§X.Y` 引用（§4.1×3、§7.8.2、§7.8.5）全部可解析（且 §12.4 本不在 G6-5 目标区域，不构成门禁面）；③ 无过期字面量（无行数/文件数/计数类字面量，G6-4 实跑无命中）；④ 未放宽任何判据——处置列明写「**本片不新增判据**」；⑤ 与 G6-6 词汇表关系：登记为「待办」观察项，不扩 G6-1、不扩 G6-6 闭集，与 OB-32/OB-38 的拆片口径一致。
+
+## 3. 新缺陷
+
+**无**。对整改后的 9 处文本逐一构造反例（见下节），未发现新引入的 Critical/High/Medium/Low。
+
+## 4. 反例 / 残余风险
+
+1. **尝试过的反例（均未命中）**：① OB-11/OB-37 加指针后缀后，处置列首状态词仍为闭集词（G6-6 当前树实跑 PASS）；② OB-42 的 § 引用全部可解析（`verify-v113.js` 全量 unresolved=0）；③ 全文「C.0–C.0h」残留 0 处；④ §7.8.6「达到 2 次」与 §12.1「≥ 2 次」、§7.8.3 顺延行、OB-40 四处口径互检一致；⑤ 英文新增词（pointer 相关措辞）不在 `cjk-newwords` 范畴，G4b 实跑 PASS。
+2. **远期文档漂移风险（非当前缺陷，不记条）**：G6-5 文本写「C.0–C.0i」、实现为「C.0 至 C.1（不含）」，当前两者等价；若未来新增 C.0j 台账块而不同步该描述，文本会滞后（实现仍正确且仍会扫描新块）。建议后续加 C 块时同步，或把文本改为「附录 C 的 C.0 至 C.1 之前的台账块」一劳永逸。
+3. **环境提示（延续 r1，供主控 ⑨ 处置，非本片缺陷）**：两份准则文件仍处 `MM` 状态（staged+unstaged 并存）；⑨ 须按 §1.5/G5 把暂存集与声明改动集对齐后再取门禁读数并提交（当前 tree 读数 G6-6 scanned=36 即受该状态影响）。
+4. OB-42 内容列复述 G7-c 作用域属台账叙事式登记（与 OB-11/OB-37 同式），非规则实体重复，不构成「同一口径写两处」的漂移源。
+
+## 5. 整改是否扩范围
+
+**未扩**。真实增量 = 每文件 9+/8−，与 `remediation.diff` 9 个 hunk 一一对应；其中 8 条直接修 D-1…D-6，第 9 条为 OB-42 登记行（D-6 的配套如实登记，任务书已明示为本轮核验对象）。`g6.js` / `selftest.js` 整改零改动；§7.5 数值、角色集、§5.2 矩阵、白名单（`g6-whitelist.txt` 零条目不变）、`gate.js` 均未触碰。
+
+## 6. 需用户裁决项
+
+**无**。整改未触及契约语义变更、未越切片范围、未动 §1.6 边界或 §7.5 数值、无歧义（OB-42 为台账登记而非判据变更，不构成超范围）。
+
+PRE-REVIEW: PASS

@@ -1,0 +1,34 @@
+=== state (working tree as it stands) ===
+    SELFTEST: PASS 203/203   [exit 0]
+ctx.js sha256 (baseline) = ee6b7f2dadca549989b6ca8eab8555692a4e2b8bae48ab5d79099db73cc8ace8
+
+=== M-A: drop the range-endpoint resolution guard ===
+ctx.js sha256 (mutated) = 22c91ee2f39cc823a46966f064294537d02896eabab42f73637a18183f622fd9
+    SELFTEST: FAIL 199/203   [exit 1]
+    FAIL T17 unresolvable range base is a usage error, not an empty change set :: err=environment error: git diff --name-status failed for scope range (deadbeefdeadbeefdeadbeefdeadbeefdeadbeef..HEAD): fatal: bad object deadbeefdeadbeefdeadbeefdeadbeefdeadbeef
+    FAIL T17 unresolvable range base is a usage error, not an empty change set :: err=environment error: git diff --name-status failed for scope range (refs/heads/no-such-branch-4e11..HEAD): fatal: ambiguous argument 'refs/heads/no-such-branch-4e11': unknown revision or path not in the working tree.
+    FAIL T17 unresolvable range head is a usage error, not an empty change set :: err=environment error: git diff --name-status failed for scope range (HEAD..deadbeefdeadbeefdeadbeefdeadbeefdeadbeef): fatal: bad object deadbeefdeadbeefdeadbeefdeadbeefdeadbeef
+    FAIL T17 unresolvable range head is a usage error, not an empty change set :: err=environment error: git diff --name-status failed for scope range (HEAD..refs/heads/no-such-branch-4e11): fatal: ambiguous argument 'refs/heads/no-such-branch-4e11': unknown revision or path not in the working tree.
+ctx.js sha256 (restored) = ee6b7f2dadca549989b6ca8eab8555692a4e2b8bae48ab5d79099db73cc8ace8  byte-identical=true
+
+=== M-B: drop the git-diff failure guard (keep the endpoint guard) ===
+ctx.js sha256 (mutated) = ce34b972c3f6804f5ce7245c1ae85889cb481f83249f8d92937f86abc610933c
+    SELFTEST: FAIL 202/203   [exit 1]
+    FAIL T18 a failed `git diff` is an environment error even when both endpoints resolve :: err=NO ERROR (fail-open)
+ctx.js sha256 (restored) = ee6b7f2dadca549989b6ca8eab8555692a4e2b8bae48ab5d79099db73cc8ace8  byte-identical=true
+
+=== M-C: drop the git-status failure guard (tree + index) ===
+ctx.js sha256 (mutated) = 665fb6e294a28951d8e114712d8aac71b7aa7c718f7134b4aad3770c1bcca5bc
+    SELFTEST: FAIL 201/203   [exit 1]
+    FAIL T18 a failed `git status` in tree scope is an environment error, not an empty change set :: err=NO ERROR (fail-open)
+    FAIL T18 a failed `git status` in index scope is an environment error too :: err=NO ERROR (fail-open)
+ctx.js sha256 (restored) = ee6b7f2dadca549989b6ca8eab8555692a4e2b8bae48ab5d79099db73cc8ace8  byte-identical=true
+
+=== M-D: drop the conclusive-shallow-probe requirement (keep the plain shallow refusal) ===
+ctx.js sha256 (mutated) = ac62b127d7bed0a657f6b6ef59fe3c2ce7f0e0052a209a3c4bedd386b2d7e11c
+    SELFTEST: FAIL 202/203   [exit 1]
+    FAIL T18 an inconclusive shallow probe is an environment error, not a licence to fall back :: err=NO ERROR (fell back)
+ctx.js sha256 (restored) = ee6b7f2dadca549989b6ca8eab8555692a4e2b8bae48ab5d79099db73cc8ace8  byte-identical=true
+
+=== restored state ===
+    SELFTEST: PASS 203/203   [exit 0]

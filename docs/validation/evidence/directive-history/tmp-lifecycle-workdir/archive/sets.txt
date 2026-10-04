@@ -1,0 +1,89 @@
+=== TWO CALIBERS FOR CLASS ② (bytes exclude nothing except note) ===
+A) whole entry, minus gitignored types (*.exe/*.out/*.test):  1584 files / 28675165 B  (27.35 MiB)
+   of which gitignored-type (record-only in MANIFEST):       5 files / 16501441 B  (15.74 MiB)
+B) evidence pack = cited files ∪ slice-level doc patterns:  263 files / 6059279 B  (5.78 MiB)
+   (of B, slice-level-doc-only, not individually cited:     172 files / 4420948 B)
+
+=== PER ENTRY: whole vs pack ===
+DELIVERY_DIRECTIVE_v111_REVIEW.mdwhole    1f/    20342B   pack    1f/    20342B   (cited 1, pack-pattern 0)
+DELIVERY_DIRECTIVE_v111_REVIEW_R3.mdwhole    1f/    18432B   pack    1f/    18432B   (cited 1, pack-pattern 0)
+DELIVERY_DIRECTIVE_v112_REVIEW.mdwhole    1f/    18576B   pack    1f/    18576B   (cited 1, pack-pattern 0)
+DELIVERY_DIRECTIVE_v112_REVIEW_R5.mdwhole    1f/    13613B   pack    1f/    13613B   (cited 1, pack-pattern 0)
+DELIVERY_DIRECTIVE_v112_REVIEW_R6.mdwhole    1f/    14179B   pack    1f/    14179B   (cited 1, pack-pattern 0)
+DELIVERY_DIRECTIVE_v112_REVIEW_R7.mdwhole    1f/    15796B   pack    1f/    15796B   (cited 1, pack-pattern 0)
+assembly-min                  whole   84f/  2166951B   pack   12f/   659584B   (cited 5, pack-pattern 9)
+b4                            whole  350f/   639767B   pack   50f/   397406B   (cited 15, pack-pattern 37)
+dce                           whole   17f/   425994B   pack   11f/   215467B   (cited 8, pack-pattern 8)
+dr1                           whole   31f/   519826B   pack   14f/   137439B   (cited 3, pack-pattern 13)
+drfix                         whole   38f/   550591B   pack   19f/   335979B   (cited 6, pack-pattern 15)
+gate.js                       whole    1f/     9036B   pack    1f/     9036B   (cited 1, pack-pattern 0)
+gates-ext                     whole  800f/  3129509B   pack   31f/   671369B   (cited 8, pack-pattern 31)
+lbf                           whole   21f/   309546B   pack   12f/   273601B   (cited 6, pack-pattern 11)
+s1-reach                      whole   14f/   212569B   pack    8f/   177465B   (cited 4, pack-pattern 8)
+tl                            whole   29f/   811367B   pack    0f/        0B   (cited 0, pack-pattern 0)
+v112                          whole   40f/   484316B   pack   22f/   451328B   (cited 5, pack-pattern 18)
+v113                          whole  146f/  2771704B   pack   76f/  2603543B   (cited 23, pack-pattern 68)
+主控子代理架构_v1.0.md               whole    1f/    26124B   pack    1f/    26124B   (cited 1, pack-pattern 0)
+交付准则_前期包_v0.1.md              whole    1f/    15486B   pack    0f/        0B   (cited 0, pack-pattern 0)
+
+=== STALE CITATIONS (referenced tmp paths that no longer exist) : 193 ===
+tmp/.gitkeep
+tmp/ai-availability.json
+tmp/prfrail-runs/run-demo
+tmp/dml/luna-probe/target.txt
+tmp/）
+tmp/dml
+tmp/b3c-review.diff
+tmp/b4/runs/f5-pos/events/state-events.jsonl:13/14/15
+tmp/v112/*-sec12.txt
+tmp/b1/
+tmp/b2/
+tmp/ddl/*.js
+tmp/ddl/change-set.diff
+tmp/ddl/numstat.txt
+tmp/ddl/mutation-g6-6.txt
+tmp/ddl/mutation-restored.txt
+tmp/ddl/mutation-sha256.txt
+tmp/ddl/mirror-parity.txt
+tmp/ddl/eightc.txt
+tmp/ddl/
+tmp/ddl/check-cn.js
+tmp/ddl/eightc.js
+tmp/ddl/fence-sync.js
+tmp/ddl/fence.js
+tmp/ddl/fix1.js
+tmp/ddl/fix10.js
+tmp/ddl/fix1b.js
+tmp/ddl/fix2.js
+tmp/ddl/fix3.js
+tmp/ddl/fix4.js
+tmp/ddl/fix5.js
+tmp/ddl/fix6.js
+tmp/ddl/fix7.js
+tmp/ddl/fix8.js
+tmp/ddl/fix9.js
+tmp/ddl/g4b.txt
+tmp/ddl/gate-index.txt
+tmp/ddl/gate-tree.txt
+tmp/ddl/land.js
+tmp/ddl/ledger-d5.diff
+tmp/ddl/ledger.diff
+tmp/ddl/mirror.js
+tmp/ddl/mutate-original.bin
+tmp/ddl/mutate.js
+tmp/ddl/peek-ledger.js
+tmp/ddl/peek2.js
+tmp/ddl/peek4.js
+tmp/ddl/review-r1.md
+tmp/ddl/scan.js
+tmp/ddl/selftest.txt
+tmp/ll/pre.txt
+tmp/ll/lit.txt
+tmp/ll/change-set.diff
+tmp/ll/numstat.txt
+tmp/ll/mirror.txt
+tmp/ll/mutation.md
+tmp/ll/
+tmp/ll/eightc.txt
+tmp/ll/apply.js
+tmp/ll/chk.js

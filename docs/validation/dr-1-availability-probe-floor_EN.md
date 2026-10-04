@@ -122,6 +122,7 @@ docs/validation/evidence/dr-1-2026-09-24/README.md	repo
 docs/validation/evidence/dr-1-2026-09-24/SHA256SUMS.txt	repo
 tmp/dr1/**	local-only
 ```
+> **Archiving note (v1.23)**: the `tmp/` items cited by this report were archived under `docs/validation/evidence/directive-history/` per §1.5.1 (units: `dr1/`; each with `MANIFEST.md` and `SHA256SUMS.txt`); the original paths are not rewritten and the MANIFEST is the mapping of record. (Paths already cleared by earlier slices are outside this archiving and belong to the pre-existing decoupling recorded as OB-77.)
 
 **Disposition of `tmp/dr1/**`**: it holds this slice's review input pack, the mutation transcript, the chain-config self-proof, the raw probe captures and the drafts; per the user's standing instruction it is **not cleaned** and is left to `DIRECTIVE-LEDGER-ARCHIVE` (dual theme: ledger archival and the `tmp/` lifecycle).
 

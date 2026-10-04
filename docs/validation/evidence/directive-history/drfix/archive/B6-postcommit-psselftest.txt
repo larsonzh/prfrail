@@ -1,0 +1,14 @@
+ok   - the proxy builds
+ok   - proxy reports ready on the fixed listen endpoint
+ok   - an allowlisted target is reachable through the proxy
+ok   - the allowed request is recorded as decision=allow
+ok   - a non-allowlisted target is refused with 403
+ok   - the refusal is recorded with reason=not-on-allowlist
+ok   - observe mode forwards a non-allowlisted target
+ok   - observe mode records the target for allowlist construction
+ok   - the port holder is listening before the occupied-port probe
+ok   - an occupied fixed port makes the proxy exit instead of switching
+ok   - the refusal states the no-silent-switch rule
+ok   - the occupied-port exit code is non-zero
+ok   - all audit log lines parse as JSON
+selftest: checks=13 failures=0

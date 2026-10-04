@@ -129,4 +129,4 @@ docs/validation/evidence/DIRECTIVE-MODELID-MAP-mutation.md	repo
 docs/validation/evidence/DIRECTIVE-MODELID-MAP-review-r1.md	repo
 ```
 
-(Closeout: the one-off scripts and intermediate readings under `tmp/dml/` were removed per §1.5, so the granular `local-only` rows previously listed above are gone with them; the two pieces of evidence `review-r1.md` and `mutation.md` were moved into `docs/validation/evidence/` and are counted as `repo` rows.)
+(Closeout: the one-off scripts and intermediate readings under `tmp/dml/` were removed per §1.5, so the granular `local-only` rows previously listed above are gone with them; the two pieces of evidence are counted as `repo` rows - `review-r1.md` as an archived copy and `mutation.md` as a **rebuilt archive** (the original mojibake is irreversible; its rebuild basis is recorded in its own note).)

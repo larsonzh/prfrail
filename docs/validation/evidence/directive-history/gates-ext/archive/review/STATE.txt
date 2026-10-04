@@ -1,0 +1,14 @@
+$ git rev-parse HEAD
+d9536e03c02aac1789d1cae7be902293f060ac7c
+
+$ git status --short
+ M .github/workflows/ci.yml
+ M docs/DELIVERY_DIRECTIVE.md
+ M docs/DELIVERY_DIRECTIVE_EN.md
+ M internal/release/workflow_test.go
+ M tools/gates/cjk-newwords.txt
+?? tools/gates/g6-whitelist.txt
+?? tools/gates/gate.js
+?? tools/gates/lib/
+?? tools/gates/selftest.js
+?? tools/gates/testdata/

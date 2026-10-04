@@ -1,0 +1,5 @@
+PAIR docs/DELIVERY_DIRECTIVE.md <-> docs/DELIVERY_DIRECTIVE_EN.md CN=1232 EN=1232
+  per-line mismatches = 0
+PAIR docs/validation/directive-v1.12.md <-> docs/validation/directive-v1.12_EN.md CN=347 EN=347
+  per-line mismatches = 0
+MIRROR RESULT: PASS

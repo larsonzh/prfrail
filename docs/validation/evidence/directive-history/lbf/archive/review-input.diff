@@ -1,0 +1,630 @@
+diff --git a/docs/ADR_REGISTER.md b/docs/ADR_REGISTER.md
+index 3136515..1c9a437 100644
+--- a/docs/ADR_REGISTER.md
++++ b/docs/ADR_REGISTER.md
+@@ -23,6 +23,8 @@
+ | ADR-013 | Windows 发布耐久候选协议与反证（A7）：枚举 C1 现行基线、C2 `MoveFileEx(MOVEFILE_WRITE_THROUGH)`、C3 目录句柄 `FlushFileBuffers`（`GENERIC_READ`+`GENERIC_WRITE` 与 `FILE_FLAG_BACKUP_SEMANTICS`）、C5 两阶段 marker、C6 预建槽位；排除 `ReplaceFile`、temp 句柄 `FILE_FLAG_WRITE_THROUGH`、TxF | 不预设两阶段 marker 成立；A7 只做进程级反证与 API 可观测性，断电注入属 B3；不改变生产发布原语与冻结契约句 | `EXPERIMENTAL / UNRESOLVED`。**级别与前提必须一起读**：在前提 P（进程级崩溃、无断电、单主机 Windows 11 / NTFS 本卷）下——可见性与仲裁层 **`proven`**（P1–P5：进程内 8 路真并发 + 跨进程同轮并发尝试，跨进程强同步未证；构造性论证 + 观测）；断电耐久 **`unresolved`**（U1–U5）；**被证伪的断言集合 D1–D6 一律 `disproven`**（候选 C2/C3 的断电耐久仍 `unresolved` 且为 B3 注入候选，不等同于“候选已被证伪”）；`observed`/`falsified`/`disproven-by-policy` 仅作证据注释，**不作为等级**。Windows 保持 `unproven` 且 first-dispatch 仍拒绝；C2 与 C3 并列为 B3 注入候选；C5 marker 作为耐久机制 `disproven`。完成条件：B3 真实断电注入通过，**且按 `docs/CONTRACTS{,_EN}.md` §7「发布耐久等级与升级条件」完成协议先行修订并经独立评审**，且 AT-23 通过后，才可升 `ACCEPTED`；解除 `unproven` 与 first-dispatch 锁定受该条款的**解锁边界**约束（只在该平台、该前提覆盖的部署环境内）。**2026-09-21（B3b）**：真实断电注入矩阵（主矩阵 17 格×5 = 85 轮全有效、U4 6 格×3 = 18 轮、0 真孤儿；前提 P′ = VirtualBox Win11B3 / NTFS on SATA-AHCI `useHostIOCache=false` / 记录级 ~1 KiB / 2 s cut 窗口 / N=5）判定 **C2 `proven`**、C1/C3/C2C3 `unresolved`（C3/C2C3 的原因为决定格**机制证据缺失**，属装置 fail-closed，**不等同于“不耐久”**）；候选排序据此更新为 **C2 优先，C3/C2C3 未建立主张**；**Windows `unproven` 与 first-dispatch 拒绝仍未改变**——按“协议先行”，升 `ACCEPTED` 的前置是按 CONTRACTS §7「发布耐久等级与升级条件」修订耐久冻结句（独立切片 **B3c**，该口径修订已于 2026-09-21 完成）；升 `ACCEPTED` 仍需该平台自身完整证据 + 独立评审 + AT-23 通过。参见 `docs/validation/t027-b3b-durability.md`（+ `_EN`）与证据包 `docs/validation/evidence/b3b-2026-09-21/` |
+ | ADR-014 | **切片 `DR-1` 的 ⑦ 终审模型降级（用户直接裁定）**：本片 ⑦ 由 `deepseek-v4-pro` 承担，**不是** §2.2 白名单的 `gpt-5.3-codex` | 理由：Copilot 预算已用 96%，且本片是业务切片验证；未采纳的替代：保留 `gpt-5.3-codex`（预算不可承受）。登记依据 = 用户 2026-09-24 的裁定原文，按 §12.4 的 OB-37 元规则以 **ADR** 形式独立留痕（该元规则允许 OB 或 ADR） | **已裁（用户直接裁定，仅本片有效，不得作为先例）**。四要素：裁决人 = 用户；日期 = 2026-09-24；理由 = Copilot 预算 96% 与业务切片验证；依据 = 用户同轮裁定原文。**性质标注**：含规则语义变更、超出 §2.2 字面标准、系用户直接裁定。**后续义务**：验证报告须如实标注「本片 ⑦ 由非白名单模型承担，独立性降低」并交 ⑧c 复核；本例外**不推广**（其它切片仍按 §7.5 与 §2.2 白名单执行） |
+ | ADR-015 | **切片 `S1-REACH` 的 ⑦ 终审模型降级（用户直接裁定）**：本片 ⑦ 由 `deepseek-v4-pro` 承担，**不是** §2.2 白名单的 `gpt-5.3-codex` | 理由：本片为纯文档与只读判定切片（不触 §7.2.1 ③）且 Copilot 预算受限；未采纳的替代：保留 `gpt-5.3-codex`（预算不可承受）。登记依据 = 用户 2026-09-29 的切片定义原文，按 §12.4 的 OB-37 元规则以 **ADR** 形式独立留痕（该元规则允许 OB 或 ADR） | **已裁（用户直接裁定，仅本片有效，不得作为先例）**。四要素：裁决人 = 用户；日期 = 2026-09-29；理由 = 纯文档与只读判定切片、不触 §7.2.1 ③、Copilot 预算受限；依据 = 用户同轮裁定原文。**性质标注**：含规则语义变更、超出 §2.2 字面标准、系用户直接裁定。**后续义务**：报告须如实标注「本片 ⑦ 由非白名单模型承担，独立性降低」并交 ⑧c 复核；本例外**不推广** |
++| ADR-016 | **切片 `LEDGER-BACKFILL` 的 ⑦ 终审模型降级（用户直接裁定）**：本片 ⑦ 由 `deepseek-v4-pro` 承担，**不是** §2.2 白名单的 `gpt-5.3-codex` | 理由：本片为纯文档回填切片（不触 §7.2.1 ③）且 Codex 预算已耗尽；未采纳的替代：保留 `gpt-5.3-codex`（预算不可承受）。登记依据 = 用户 2026-09-29 的裁定原文，按 §12.4 的 OB-37 元规则以 **ADR** 形式独立留痕 | **已裁（用户直接裁定，仅本片有效，不得作为先例）**。四要素：裁决人 = 用户；日期 = 2026-09-29；理由 = 纯文档回填切片、不触 §7.2.1 ③、Codex 预算耗尽；依据 = 用户同轮裁定原文。**性质标注**：含规则语义变更、超出 §2.2 字面标准、系用户直接裁定。**后续义务**：报告须如实标注「本片 ⑦ 由非白名单模型承担，独立性降低」并交 ⑧c 复核；本例外**不推广** |
++| ADR-017 | **切片 `LEDGER-BACKFILL` 的 ⑦ 复审额度例外（用户直接裁定）**：⑦ 额度 1/1 用尽后，追加第 2 轮复审 | 理由：⑦ 首轮报 Medium（审查输入包的 diff 为空文件，属**主控**错误），四条处置需独立复核；未采纳的替代：按 §7.5 停下、以「`PASS WITH FIXES` + 四条已处置」直接结片（用户认为主控交错了输入包，须经独立复核）。本片 ⑦ 为 `deepseek-v4-pro`，成本可控。登记依据 = 用户 2026-09-29 的裁定原文，按 §12.4 的 OB-37 元规则以 **ADR** 形式独立留痕 | **已裁（用户直接裁定，仅本片有效，不得作为先例）**。四要素：裁决人 = 用户；日期 = 2026-09-29；理由 = ⑦ 首轮 Medium 系主控输入包错误、需独立复核，且本片 ⑦ 成本可控；依据 = 用户同轮裁定原文。**性质标注**：含规则语义变更、超出 §7.5 字面标准、系用户直接裁定。**后续义务**：报告须如实登记「首轮输入包 diff 为空文件系主控错误」与「本片消耗 ⑦ 额度例外」并交 ⑧c 复核；本例外**不推广** |
+ 
+ ## 1. 发布与依赖决策提案
+ 
+diff --git a/docs/ADR_REGISTER_EN.md b/docs/ADR_REGISTER_EN.md
+index 3d5427d..4775ae8 100644
+--- a/docs/ADR_REGISTER_EN.md
++++ b/docs/ADR_REGISTER_EN.md
+@@ -24,6 +24,8 @@ Date: 2026-09-06. Distinguish RFC-decided, proposed and experimental decisions.
+ | ADR-013 | Windows publication-durability candidates and their falsification (A7): enumerates C1 the current baseline, C2 `MoveFileEx(MOVEFILE_WRITE_THROUGH)`, C3 a directory-handle `FlushFileBuffers` (`GENERIC_READ`+`GENERIC_WRITE` with `FILE_FLAG_BACKUP_SEMANTICS`), C5 a two-phase marker and C6 a pre-created slot; excludes `ReplaceFile`, `FILE_FLAG_WRITE_THROUGH` on the temp handle and TxF | Does not presuppose that the two-phase marker holds; A7 performs process-level falsification and API observability only, while power-loss injection belongs to B3; neither the production publish primitive nor the frozen contract sentences change | `EXPERIMENTAL / UNRESOLVED`. **The level and its premise must be read together**: under premise P (process-level crash, no power loss, single host Windows 11 / NTFS on the local volume) the visibility and arbitration layer is **`proven`** (P1–P5: 8-way true concurrency inside one process plus same-round concurrent attempts across processes, with cross-process strong synchronisation unproved; constructive argument plus measurement), power-loss durability is **`unresolved`** (U1–U5), and the **falsified claim set D1–D6** is `disproven` throughout (the power-loss durability of candidates C2/C3 stays `unresolved` and goes to B3, which is not the same as "the candidate is disproven"); `observed`/`falsified`/`disproven-by-policy` are evidence annotations only and **never levels**; **`proven` must never be read as a power-loss guarantee**. Windows stays `unproven` with first-dispatch still refused; C2 and C3 are joint candidates for B3 injection; the C5 marker is `disproven` as a durability mechanism. Completion condition: B3's real power-loss injection must pass, **the protocol-first revision must be completed under `docs/CONTRACTS{,_EN}.md` §7 "Publication-durability tiers and upgrade conditions" and pass an independent review**, and AT-23 must pass, before this may rise to `ACCEPTED`; lifting `unproven` and the first-dispatch lock is bounded by that clause's **unlock boundary** (that platform, within that premise's covered deployment environments, only). **2026-09-21 (B3b)**: a real power-loss injection matrix (main matrix 17 cells × 5 = 85 rounds all valid, U4 6 cells × 3 = 18 rounds, 0 true orphans; premise P′ = VirtualBox Win11B3 / NTFS on SATA-AHCI with `useHostIOCache=false` / record-level ~1 KiB / 2 s cut window / N=5) returned **C2 `proven`** with C1/C3/C2C3 `unresolved` (C3/C2C3 fail on **missing mechanism evidence** in their decision cells, which is the rig failing closed and **not** "not durable"); the candidate ordering is therefore **C2 first, with C3/C2C3 having established no claim**; **Windows `unproven` and the first-dispatch refusal are still unchanged** - protocol first, so the precondition for `ACCEPTED` remains the CONTRACTS durability-sentence revision under §7 "Publication-durability tiers and upgrade conditions" (its own slice, **B3c**, whose wording revision completed on 2026-09-21); rising to `ACCEPTED` still requires that platform's own complete evidence, an independent review, and a passing AT-23. See `docs/validation/t027-b3b-durability.md` (+ `_EN`) and the evidence pack `docs/validation/evidence/b3b-2026-09-21/` |
+ | ADR-014 | **⑦ final-review model downgrade for slice `DR-1` (direct user ruling)**: this slice's ⑦ is carried by `deepseek-v4-pro`, **not** by the §2.2 allowlist model `gpt-5.3-codex` | Reason: the Copilot budget is 96% consumed and this slice validates a business path; the alternative not taken was keeping `gpt-5.3-codex` (unaffordable). The registration basis is the user's ruling of 2026-09-24, recorded as an **ADR** per the OB-37 meta-rule in §12.4, which allows an OB or an ADR | **Ruled (direct user ruling, valid for this slice only, not a precedent)**. Four elements: ruling party = the user; date = 2026-09-24; reason = the Copilot budget at 96% plus business-path validation; basis = the user's ruling text from the same round. **Nature annotation**: it carries a rule-semantics change, exceeds the literal standard of §2.2, and is a direct user ruling. **Follow-up duties**: the validation report must state "this slice's ⑦ is carried by a non-allowlist model, so independence is reduced" and hand it to ⑧c for review; this exception **does not generalise** (other slices still follow §7.5 and the §2.2 allowlist) |
+ | ADR-015 | **⑦ final-review model downgrade for slice `S1-REACH` (direct user ruling)**: this slice ⑦ is carried by `deepseek-v4-pro`, **not** by the §2.2 allowlist model `gpt-5.3-codex` | Reason: this slice is documentation and read-only assessment (it does not touch §7.2.1 ③) and the Copilot budget is constrained; alternative not taken: keep `gpt-5.3-codex` (unaffordable). Basis: the user slice definition of 2026-09-29, recorded independently as an **ADR** under the OB-37 meta-rule of §12.4 (that meta-rule allows either an OB or an ADR) | **Ruled (a direct user ruling, valid for this slice only and not usable as a precedent)**. Four elements: ruling party = the user; date = 2026-09-29; reason = documentation and read-only assessment slice, no §7.2.1 ③ contact, constrained Copilot budget; basis = the ruling text of the same turn. **Nature annotations**: it carries a rule-semantics change, exceeds the §2.2 literal standard and is a direct user ruling. **Follow-up duties**: the report must state that this slice ⑦ ran on a non-whitelist model with reduced independence and hand that to ⑧c; the exception is **not generalised** |
++| ADR-016 | **⑦ final-review model downgrade for slice `LEDGER-BACKFILL` (direct user ruling)**: this slice ⑦ is carried by `deepseek-v4-pro`, **not** by the §2.2 allowlist model `gpt-5.3-codex` | Reason: this slice is a documentation back-fill (it does not touch §7.2.1 ③) and the Codex budget is exhausted; alternative not taken: keep `gpt-5.3-codex` (unaffordable). Basis: the user ruling of 2026-09-29, recorded independently as an **ADR** under the OB-37 meta-rule of §12.4 | **Ruled (a direct user ruling, valid for this slice only and not usable as a precedent)**. Four elements: ruling party = the user; date = 2026-09-29; reason = documentation back-fill, no §7.2.1 ③ contact, exhausted Codex budget; basis = the ruling text of the same turn. **Nature annotations**: it carries a rule-semantics change, exceeds the §2.2 literal standard and is a direct user ruling. **Follow-up duties**: the report must state that this slice ⑦ ran on a non-allowlist model with reduced independence and hand that to ⑧c; the exception is **not generalised** |
++| ADR-017 | **⑦ re-review quota exception for slice `LEDGER-BACKFILL` (direct user ruling)**: after the 1/1 budget was exhausted, a second review round was added | Reason: ⑦'s first round reported a Medium (the review input pack's diff was an empty file, a **master** error), so the four dispositions need independent re-checking; alternative not taken: stop under §7.5 and close the slice on "`PASS WITH FIXES` plus four dispositions" (the user holds that the master mis-supplied the input pack, so it must be independently re-checked). This slice's ⑦ is `deepseek-v4-pro`, so the cost is contained. Basis: the user ruling of 2026-09-29, recorded independently as an **ADR** under the OB-37 meta-rule of §12.4 | **Ruled (a direct user ruling, valid for this slice only and not usable as a precedent)**. Four elements: ruling party = the user; date = 2026-09-29; reason = the first-round Medium was a master input-pack error that needs independent re-checking, and this slice ⑦ is cheap; basis = the ruling text of the same turn. **Nature annotations**: it carries a rule-semantics change, exceeds the §7.5 literal standard and is a direct user ruling. **Follow-up duties**: the report must truthfully record "the first-round input pack's diff was an empty file, a master error" and "this slice consumed a ⑦ quota exception" and hand it to ⑧c; the exception is **not generalised** |
+ 
+ ## 1. Release and Dependencies
+ 
+diff --git a/docs/DELIVERY_DIRECTIVE.md b/docs/DELIVERY_DIRECTIVE.md
+index 118d1a4..4aa5d63 100644
+--- a/docs/DELIVERY_DIRECTIVE.md
++++ b/docs/DELIVERY_DIRECTIVE.md
+@@ -1,6 +1,6 @@
+ ﻿# ProofRail 交付执行准则（DELIVERY_DIRECTIVE）
+ 
+-版本：v1.15。日期：2026-09-29。状态：**CN 正文冻结**（ `_EN` 镜像见 `docs/DELIVERY_DIRECTIVE_EN.md`）。
++版本：v1.16。日期：2026-09-29。状态：**CN 正文冻结**（ `_EN` 镜像见 `docs/DELIVERY_DIRECTIVE_EN.md`）。
+ 
+ > **多语言说明**：本文件为中文权威版；`docs/DELIVERY_DIRECTIVE_EN.md` 为严格同位镜像（与 CN 同步维护；CN 冻结后同步更新，避免评审期双语返工）。
+ > **编码**：本文及 `_EN` 必须保持 UTF-8 **with BOM** + **LF**。
+@@ -59,6 +59,7 @@
+ | v1.13 | 2026-09-23 | **DIRECTIVE-REVIEW-SATURATION（评审收敛判据）**：① 新增 **§7.8 评审收敛判据**——「第三方独立复审 / ⑦ 第 N 轮 / 整改后复审」三类停止对象与「额度 / 用户授权例外 / OB-11 / OB-37 / 试点顺延」五类情形的**唯一权威**；② §6.3 落地两条机械子查 **G6-5**（节号引用解析，OB-32 的近似判据）与 **G6-6**（台账状态闭集，OB-38），并按闭集回填 §12.4 全部台账行的首状态词；③ 随片闭合 **OB-34**（§7.2.2 标题）、**OB-35**（§1.6 引 §7.2.1 ③）、**OB-36**（OB-14 四要素入列）、**OB-41**（§9.3 故障模式行）；拆片 **OB-30 / OB-31 / OB-33**；④ §12.5 的「§5.3 与 §7.5 的冲突裁决标准」转为**已落地**；⑤ 附录 C 新增本片台账块 **C.0i**。条款见 §7.8、§6.3、§9.3、§12.4、§12.5。另登记 OB-42（结论行闭集无机械判据）、OB-43（证据捕获乱码）、OB-44（审查层写盘边界）、OB-45（审查层报告来源表述）。 | 无阻塞；后继片 `GATES-G1G5` / `GATES-TIGHTEN` 需回写 |
+ | v1.14 | 2026-09-24 | **台账补登（切片 `DR-1` 的步骤 0；用户 2026-09-24 授权）**：§12.4 登记 **OB-46 / OB-47 / OB-48 / OB-49 / OB-50**——依次为 G6-5 的区域端点依赖、`_EN` 词表选取口径、自由度清单落盘时机、`tmp/` 生命周期与 `local-only` 豁免、`sol-orchestrator` 处置与生成器入库条件。**不新增判据、不改任何规则语义、不改 §6.3 的判据作用域**；OB-50 依用户裁定单列一行（不并入同族）。本行是 **`DR-1` 切片内的副产物**，不是独立的准则治理片。 | `DR-1`（需回写：本片台账与报告须载明 v1.14 为切片内副产物） |
+ | v1.15 | 2026-09-29 | **台账补登（切片 `S1-REACH` 的步骤 0；用户 2026-09-29 授权）**：§12.4 登记 **OB-51 / OB-52 / OB-53**——依次为 BYOK 与 secretStorage 五点确认、契约与 CLI 的额度差异、`DIRECTIVE-MODEL-LISTS` 立项预留。**不新增判据、不改任何规则语义、不改 §6.3 判据作用域**。本行是 `S1-REACH` 切片内的副产物，不是独立的准则治理片。 | `S1-REACH`（本片报告 §1 载明 v1.15 为切片内副产物） |
++| v1.16 | 2026-09-29 | **台账措辞更正（切片 `LEDGER-BACKFILL`；用户 2026-09-29 授权）**：OB-21 的现象列加**更正注记**（子项「`DR-1 未修`」已消除；末列状态词保持 `待议`、该 OB **未闭合**）、OB-53 补登第五项（`model: "auto"` 可间接引入黑名单模型）。**不新增判据、不改任何规则语义、不改 §6.3 判据作用域**。本行是 `LEDGER-BACKFILL` 切片内的副产物，不是独立的准则治理片。 | `LEDGER-BACKFILL`（本片报告 §1 载明 v1.16 为切片内副产物） |
+ ---
+ 
+ ## 1. 适用范围与切片模型
+@@ -795,7 +796,7 @@
+ 
+ | OB-20 | 2026-09-22 | **`g5a.js` 的错误分流缺口（`GATES-EXT` ⑦ 第 3 轮 Low，登记不修）**：G5-a① 调用 `git grep` 后，`r.ok` 为假时把输出当空串 ⇒ 与「零命中」不可区分，子查仍判 PASS（`grep` 退出码 1 = 无命中、其余非零 = 执行失败，二者当前同路）。**同类缺陷已被 ⑦ 在本片连续三轮挖出**（空变更集 vacuous pass、`git status` 失败、浅克隆探测不结论），本条是该类的最后一处残留。 | **已裁决（用户 2026-09-22）**：**并入下次 §6.3 判据收窄片**（`GATES-TIGHTEN`）处理，**本片不修**——理由：① ⑦ 额度已用尽（本片 3 轮），修它需开第 4 轮，落在红线 3 的语义区；② 第 3 轮 ⑦ 明确 `safe to commit and push as-is`，Low 不阻断；③ 下一片「基础 G1/G5 脚本化」（`GATES-G1G5`）是补**未实现**的 G1/G5 主规则，**不是**修已实现的 `g5a.js`，故 OB-20 不属于那片。修法（仅把退出码 1 视为无命中，其余非零抛用法错误）随该片执行。 |
+ 
+-| OB-21 | 2026-09-22 | **B4 前提与现状不符（B4 ① 实测）**：① `prfrail` CLI **未装配 AgentRunner**（`internal/console/runtime.go` 只有 `ExecuteNoopRun`，`RunPostflight` 为 fail-closed 桩）；② **无合法可启动候选**（T026 结论“当前候选不兼容” + B2 §8.3 零能力容器内候选自身失败 / §8.4 端点 WAF 403 + DR-1 未修）。⇒ **AT-23 的“真实 AI 候选”腿今日不可达**。**影响**：不只影响 `B4`，**更影响 S1 exit 判读**。**待议时机**：下次 S1 exit 评估 + 候选 / 装配有进展时。**附带**：T018 剩余门是否同源依赖见 `docs/DEV_PLAN` 的 T018 待议项。 | **待议**：下次 S1 exit 评估 + 候选 / 装配有进展时 |
++| OB-21 | 2026-09-22 | **B4 前提与现状不符（B4 ① 实测）**：① `prfrail` CLI **未装配 AgentRunner**（`internal/console/runtime.go` 只有 `ExecuteNoopRun`，`RunPostflight` 为 fail-closed 桩）；② **无合法可启动候选**（T026 结论“当前候选不兼容” + B2 §8.3 零能力容器内候选自身失败 / §8.4 端点 WAF 403 + DR-1 未修）。⇒ **AT-23 的“真实 AI 候选”腿今日不可达**。**影响**：不只影响 `B4`，**更影响 S1 exit 判读**。**待议时机**：下次 S1 exit 评估 + 候选 / 装配有进展时。**附带**：T018 剩余门是否同源依赖见 `docs/DEV_PLAN` 的 T018 待议项。 **更正注记（2026-09-29，切片 `LEDGER-BACKFILL`，用户同轮授权）**：② 中「`DR-1 未修`」子项已消除（DR-1 于 2026-09-24 闭环，见 `docs/validation/s1-reach-reachability.md` §2）；① 的装配缺口与 T026 不兼容、B2 §8.3 与 §8.4 **均未变** ⇒ AT-23 真实候选腿仍不可达。 | **待议**：下次 S1 exit 评估 + 候选 / 装配有进展时 |
+ 
+ | OB-22 | 2026-09-23 | **`CONTRACTS` §7 内部次序陈述不一致（B4 ⑦ 终审发现）**：L205/L227 写「冻结 candidate 再跑 gates」，L229 写「postflight 在 `REVIEW_PENDING` 之前」；**实测与实现均与 L229 一致**（证据：`internal/chain/engine.go:186/197/364` 与 `tmp/b4/runs/f5-pos/events/state-events.jsonl:13/14/15`）⇒ **实现正确、契约文档需统一**。 | **已处置**（2026-09-23，用户裁决 ⒜）：`CONTRACTS` §7 措辞统一为实测次序「步内 gate → postflight → freeze / review / promotion」，**只改措辞、不动代码**，CN 与 `_EN` 同步；**不补 ADR、不回写 `DEV_PLAN`**（用户裁决 ③：措辞统一不属 ADR 必做类，B4 已在 `DEV_PLAN` 承载；首状态词按 §6.3 的 G6-6 闭集核验） |
+ 
+@@ -833,7 +834,7 @@
+ | OB-50 | 2026-09-24 | **`sol-orchestrator` 的处置结论与生成器入库条件此前未进 §12.4**：① 历史结论——该编排器对当前主控无自动编排影响（其配置写明「非 Sol 主控会话即手动模式」）；唯一实际影响是**可见性**（主控可选择调用它），而调用有三重风险：其 `tools` 含 `agent` 因而形成调用链（超出深度上限）、其 `model` 属 §2.4 黑名单、且不显式传 `model` 时会静默回落会话主模型；结论 = **不使用**，并已在 §2.4 列入禁用。② 未来扩展条件——`.github/agents/` 的角色文件是该编排器 `_config.yaml` 的生成物，若日后启用该生成器，**必须先把生成源与生成脚本纳入版本控制**，否则角色集不可复现。 | **待议**：结论已明，但「生成器入库条件何时写进 §2.5」尚未定；下次 §12 修订或角色集相关切片评估 |
+ | OB-51 | 2026-09-29 | **BYOK 与 secretStorage 五点只读确认（DR-1 报告 §11 预留，由切片 `S1-REACH` 执行）**：① `ai check` 的 flag 集不含 `--model`，模型仅取自链配置 `ai.profiles[].model`（`internal/console/ai.go:230`），无默认值与 fallback；② `schemas/` 无覆盖 `ai.profiles` 的 JSON Schema，非空必填由 Go 校验承担（`internal/adapters/ai_provider.go:51`）；③ `model: \"auto\"` 不被 schema 或代码禁止，原样透传（`internal/adapters/ai_probe_copilot.go:114`）；④ 环境变量通道当前无 BYOK 密钥，Windows 凭据管理器无 `ProofRail` 前缀条目，Copilot CLI 自有存储仅枚举文件名且未读内容，VS Code secretStorage 不可枚举；⑤ prfrail 自有 SecretStore = Windows Credential Manager（前缀 `windows-credential:`，`internal/adapters/ai_secret_windows.go:15`），`docs/OPERATIONS.md` 的示例引用属同一机制且当前不在位。五点均不指向语义改动。 | **已登记**（本片确认结果；不可枚举项如实标注） |
+ | OB-52 | 2026-09-29 | **契约与 CLI 的额度差异（DR-1 报告 §11 预留；R1=A 不修）**：`docs/CONTRACTS.md:191` 要求可用性结论在显式费用与请求预算内取得，而 `internal/adapters/ai_probe_copilot.go:117` 经 DR-1 修复后把 `--max-ai-credits` 取 `max(30, maximumRequests)` ⇒ CLI 侧有效额度与产品请求预算不一致，记录不含费用维度；DR-1 ⑥ 的 High 与 Medium 以及 Low④ 同属该差异的两面。 | **待议**（修法属 CONTRACTS 语义改动，另立切片；本片只登记） |
+-| OB-53 | 2026-09-29 | **立项预留（DR-1 报告 §11 预留）**：`DIRECTIVE-MODEL-LISTS` 的立项内容 = 黑名单全称化、分档释放 `gpt-6-sol` 与 `gpt-6-luna`、白名单更新、成本上限重估；该片立项时使用本号（四项内容取自用户 2026-09-29 裁定原文）。 | **待议**（该片立项时执行；本片只登记） |
++| OB-53 | 2026-09-29 | **立项预留（DR-1 报告 §11 预留）**：`DIRECTIVE-MODEL-LISTS` 的立项内容 = 黑名单全称化、分档释放 `gpt-6-sol` 与 `gpt-6-luna`、白名单更新、成本上限重估；该片立项时使用本号（四项内容取自用户 2026-09-29 裁定原文）。**第五项（2026-09-29 由切片 `LEDGER-BACKFILL` 补登）**：`model: "auto"` 不被 schema 或代码禁止（原样透传 `internal/adapters/ai_probe_copilot.go:114`）⇒ 黑名单模型可经 `auto` 间接引入，须在该片处置。 | **待议**（该片立项时执行；本片只登记） |
+ 
+ > **本片（`GATES-EXT`）⑦ 轮次例外（用户 2026-09-22 预授权）**：⑦ 复审（第 2 轮）报 Medium+ ⇒ 依 §5.3 强制复审，并按预授权开启**第 3 轮**（`GPT-5.3-Codex`，**仅本片有效**）；第 3 轮 `PASS WITH FIXES`、无 Medium+（仅 1 条 Low，即 OB-20）。**该授权不推广**：其他切片仍按 §7.5（终审 1 + 复审 1），第 4 轮不自动授权。
+ 
+diff --git a/docs/DELIVERY_DIRECTIVE_EN.md b/docs/DELIVERY_DIRECTIVE_EN.md
+index 0e29338..3429fb8 100644
+--- a/docs/DELIVERY_DIRECTIVE_EN.md
++++ b/docs/DELIVERY_DIRECTIVE_EN.md
+@@ -1,6 +1,6 @@
+ ﻿# ProofRail Delivery Execution Directive (DELIVERY_DIRECTIVE)
+ 
+-Version: v1.15. Date: 2026-09-29. Status: **CN body frozen** ( `_EN` mirror in `docs/DELIVERY_DIRECTIVE_EN.md`).
++Version: v1.16. Date: 2026-09-29. Status: **CN body frozen** ( `_EN` mirror in `docs/DELIVERY_DIRECTIVE_EN.md`).
+ 
+ > **Multilingual note**: this file is a strict positional mirror of the CN body, maintained in step with it (updated after CN is frozen, to avoid bilingual rework during review); `docs/DELIVERY_DIRECTIVE.md` is authoritative and wins on any conflict (see §11.1).
+ > **Encoding**: this document and its `_EN` mirror must stay UTF-8 **with BOM** + **LF**.
+@@ -59,6 +59,7 @@ Version: v1.15. Date: 2026-09-29. Status: **CN body frozen** ( `_EN` mirror in `
+ | v1.13 | 2026-09-23 | **DIRECTIVE-REVIEW-SATURATION (review saturation criterion)**: ① adds **§7.8 Review Saturation Criterion** - the **sole authority** for the three stop objects (third-party independent re-review / ⑦ round N / re-review after remediation) and the five situations (quota / user-authorized exception / OB-11 / OB-37 / pilot deferral); ② §6.3 lands two mechanical sub-checks, **G6-5** (section-reference resolution, the approximate criterion for OB-32) and **G6-6** (ledger status closed set, OB-38), and backfills the first status word of every §12.4 ledger row against the closed set; ③ closes **OB-34** (§7.2.2 heading), **OB-35** (§1.6 citing §7.2.1 ③), **OB-36** (the four elements in OB-14) and **OB-41** (§9.3 failure-mode row) within this slice, and splits out **OB-30 / OB-31 / OB-33**; ④ §12.5's "the §5.3 vs §7.5 conflict decision standard" flips to **Landed**; ⑤ Appendix C gains this slice's ledger block **C.0i**. The clauses are in §7.8, §6.3, §9.3, §12.4 and §12.5. It also registers OB-42 (no mechanical criterion for the verdict-line closed set), OB-43 (mojibake in evidence capture) , OB-44 (the review layer writing to disk) and OB-45 (the review layer's report of its data source). | no blocked slices; follow-on slices `GATES-G1G5` / `GATES-TIGHTEN` need write-back |
+ | v1.14 | 2026-09-24 | **Ledger registration (step 0 of slice `DR-1`; authorised by the user 2026-09-24)**: §12.4 registers **OB-46 / OB-47 / OB-48 / OB-49 / OB-50** - respectively the G6-5 region-endpoint dependency, the `_EN` word-list selection rule, the freedom-list flush timing, the `tmp/` lifecycle and the `local-only` exemption, and the `sol-orchestrator` disposition with the generator-inclusion condition. **No new criterion, no change to any rule semantics, no change to the §6.3 criterion scope**; OB-50 gets its own row per the user's ruling (not merged into a same-family row). This row is a **by-product of the `DR-1` slice**, not a standalone directive-governance slice. | `DR-1` (write-back required: this slice's ledger and report must state that v1.14 is a by-product) |
+ | v1.15 | 2026-09-29 | **Ledger registration (step 0 of slice `S1-REACH`; authorised by the user 2026-09-29)**: §12.4 registers **OB-51 / OB-52 / OB-53** - the BYOK and secretStorage five-point confirmation, the contract-versus-CLI credit difference, and the number reserved for the `DIRECTIVE-MODEL-LISTS` initiative. **No criterion is added, no rule semantics change and no §6.3 criterion-scope change.** This row is a by-product inside the `S1-REACH` slice, not a standalone governance slice. | `S1-REACH` (this slice report §1 states that v1.15 is a by-product of the slice) |
++| v1.16 | 2026-09-29 | **Ledger wording correction (slice `LEDGER-BACKFILL`; authorised by the user 2026-09-29)**: the OB-21 evidence cell gains a **correction note** (the `DR-1 not fixed` sub-item is removed; the disposition word stays `待议` and the OB is **not closed**), and OB-53 gains a fifth item (`model: "auto"` can reach a blacklisted model indirectly). **No criterion is added, no rule semantics change and no §6.3 criterion-scope change.** This row is a by-product inside the `LEDGER-BACKFILL` slice, not a standalone governance slice. | `LEDGER-BACKFILL` (this slice report §1 states that v1.16 is a by-product of the slice) |
+ ---
+ 
+ ## 1. Scope and Slice Model
+@@ -795,7 +796,7 @@ Observation items (phenomena not yet sufficient to change the directive) are reg
+ 
+ | OB-20 | 2026-09-22 | **`g5a.js` error-routing gap (`GATES-EXT` ⑦ round-3 Low, registered not fixed)**: after G5-a① calls `git grep`, a falsy `r.ok` turns the output into an empty string ⇒ indistinguishable from "zero hits", so the sub-check still reports PASS (`grep` exit 1 = no match, any other non-zero = execution failure; the two share one path today). **The same defect class was dug out by ⑦ on three consecutive rounds of this slice** (empty change set vacuous pass, failing `git status`, inconclusive shallow probe); this is the last remnant of that class. | **Ruling (user, 2026-09-22)**: handled in the next **§6.3 criterion-narrowing slice** (`GATES-TIGHTEN`); **not fixed in this slice** - rationale: ① ⑦'s quota is exhausted (3 rounds used by this slice) and fixing it would need a round 4, which falls inside red line 3's semantic zone; ② round 3 of ⑦ explicitly returned `safe to commit and push as-is`, and a Low does not block; ③ the next slice, "scripting base G1 / G5" (`GATES-G1G5`), adds the **unimplemented** G1 / G5 main criteria and is **not** about fixing the already-implemented `g5a.js`, so OB-20 does not belong to it. The fix (treat only exit 1 as "no match", raise a usage error for other non-zero) is executed with that slice. |
+ 
+-| OB-21 | 2026-09-22 | **B4's premise does not match the current state (measured by the B4 ①)**: ① the `prfrail` CLI has **no AgentRunner wiring** (`internal/console/runtime.go` only has `ExecuteNoopRun`, and `RunPostflight` is a fail-closed stub); ② **no legal, startable candidate exists** (T026's verdict "the current candidate is not compatible" + B2 §8.3 the candidate failing inside the zero-capability container / §8.4 the endpoint returning WAF 403 + DR-1 not fixed). ⇒ **the "real AI candidate" leg of AT-23 is unreachable today**. **Impact**: it affects not only `B4` but **also the S1-exit reading**. **Timing**: the next S1-exit assessment plus any candidate / assembly progress. **Side note**: whether the remaining T018 gates share this dependency is registered as a T018 open question in `docs/DEV_PLAN`. | **To be discussed**: the next S1-exit assessment plus any candidate / assembly progress |
++| OB-21 | 2026-09-22 | **B4's premise does not match the current state (measured by the B4 ①)**: ① the `prfrail` CLI has **no AgentRunner wiring** (`internal/console/runtime.go` only has `ExecuteNoopRun`, and `RunPostflight` is a fail-closed stub); ② **no legal, startable candidate exists** (T026's verdict "the current candidate is not compatible" + B2 §8.3 the candidate failing inside the zero-capability container / §8.4 the endpoint returning WAF 403 + DR-1 not fixed). ⇒ **the "real AI candidate" leg of AT-23 is unreachable today**. **Impact**: it affects not only `B4` but **also the S1-exit reading**. **Timing**: the next S1-exit assessment plus any candidate / assembly progress. **Side note**: whether the remaining T018 gates share this dependency is registered as a T018 open question in `docs/DEV_PLAN`. **Correction note (2026-09-29, slice `LEDGER-BACKFILL`, user-authorised in the same turn)**: the `DR-1 not fixed` sub-item under ② is removed (DR-1 closed on 2026-09-24, see `docs/validation/s1-reach-reachability_EN.md` §2), while the assembly gap under ① and the T026 incompatibility plus B2 §8.3 and §8.4 are **unchanged**, so the AT-23 live candidate leg remains unreachable. | **To be discussed**: the next S1-exit assessment plus any candidate / assembly progress |
+ 
+ | OB-22 | 2026-09-23 | **Internal ordering inconsistency inside `CONTRACTS` §7 (found by the B4 ⑦ final review)**: L205/L227 say "freeze the candidate, then run the gates", L229 says "postflight before `REVIEW_PENDING`"; the **measured behaviour and the implementation both agree with L229** (evidence: `internal/chain/engine.go:186/197/364` and `tmp/b4/runs/f5-pos/events/state-events.jsonl:13/14/15`) ⇒ **the implementation is correct and the contract text must be unified**. | **Resolved** (2026-09-23, user ruling ⒜): the `CONTRACTS` §7 wording is unified to the measured order "in-step gate → postflight → freeze / review / promotion", **wording only, no code change**, CN and `_EN` kept in sync; **no ADR and no `DEV_PLAN` write-back** (user ruling ③: unifying wording is not in the ADR-required class, and B4 is already carried by `DEV_PLAN`; the first status word is checked against the G6-6 closed set in §6.3) |
+ 
+@@ -833,7 +834,7 @@ Observation items (phenomena not yet sufficient to change the directive) are reg
+ | OB-50 | 2026-09-24 | **The `sol-orchestrator` disposition and the generator-inclusion condition were never registered in §12.4**: ① historical conclusion - that orchestrator has no automatic orchestration effect on the current master (its own configuration states that a non-Sol master session means manual mode); the only real effect is **visibility** (the master may choose to call it), and calling it carries three risks: its `tools` include `agent` so it forms a call chain (above the depth limit), its `model` is on the §2.4 blacklist, and without an explicit `model` it falls back silently to the session master model; the conclusion is **do not use it**, already reflected as a §2.4 prohibition. ② future-extension condition - the role files under `.github/agents/` are generated from that orchestrator's `_config.yaml`, so if the generator is ever enabled, **the generation source and scripts must be brought under version control first**, otherwise the role set is not reproducible. | **To be discussed**: the conclusion is settled, but when to write the generator-inclusion condition into §2.5 is not; evaluate in the next §12 revision or in a role-set related slice |
+ | OB-51 | 2026-09-29 | **Read-only five-point confirmation of BYOK and secretStorage (reserved in the DR-1 report §11, executed by slice `S1-REACH`)**: ① the `ai check` flag set contains no `--model`, and the model comes only from the chain configuration `ai.profiles[].model` (`internal/console/ai.go:230`) with no default and no fallback; ② no schema in `schemas/` covers `ai.profiles`, and the non-empty requirement is enforced by Go validation (`internal/adapters/ai_provider.go:51`); ③ `model: \"auto\"` is forbidden by neither schema nor code and is passed through verbatim (`internal/adapters/ai_probe_copilot.go:114`); ④ the environment-variable channel currently carries no BYOK key, the Windows Credential Manager holds no `ProofRail` prefixed entry, the Copilot CLI store was enumerated by file name only with no content read, and VS Code secretStorage cannot be enumerated; ⑤ prfrail own SecretStore is the Windows Credential Manager (prefix `windows-credential:`, `internal/adapters/ai_secret_windows.go:15`), and the example reference in `docs/OPERATIONS.md` belongs to the same mechanism and is currently absent. None of the five points implies a semantics change. | **Registered** (the confirmation result of this slice; non-enumerable items are labelled as such) |
+ | OB-52 | 2026-09-29 | **The credit difference between the contract and the CLI (reserved in the DR-1 report §11; not fixed per R1=A)**: `docs/CONTRACTS.md:191` requires an availability conclusion to be obtained within the explicit cost and request budget, whereas after the DR-1 fix `internal/adapters/ai_probe_copilot.go:117` takes `--max-ai-credits` as `max(30, maximumRequests)`, so the effective CLI-side credit differs from the product request budget and the record has no cost dimension; DR-1 ⑥ High and Medium plus Low④ are two sides of that same difference. | **To be discussed** (the fix is a CONTRACTS semantics change and needs its own slice; this slice only registers it) |
+-| OB-53 | 2026-09-29 | **Reserved number for an initiative (reserved in the DR-1 report §11)**: the `DIRECTIVE-MODEL-LISTS` initiative covers making the blacklist names complete, tiered release of `gpt-6-sol` and `gpt-6-luna`, a whitelist update and a cost-cap re-estimate; that slice uses this number when it is opened (the four items come from the user ruling of 2026-09-29). | **To be discussed** (executed when that slice is opened; this slice only registers it) |
++| OB-53 | 2026-09-29 | **Reserved number for an initiative (reserved in the DR-1 report §11)**: the `DIRECTIVE-MODEL-LISTS` initiative covers making the blacklist names complete, tiered release of `gpt-6-sol` and `gpt-6-luna`, a whitelist update and a cost-cap re-estimate; that slice uses this number when it is opened (the four items come from the user ruling of 2026-09-29). **Fifth item (added by slice `LEDGER-BACKFILL` on 2026-09-29)**: `model: "auto"` is forbidden by neither schema nor code (it is passed through verbatim at `internal/adapters/ai_probe_copilot.go:114`), so a blacklisted model can be reached indirectly through `auto` and that slice must handle it. | **To be discussed** (executed when that slice is opened; this slice only registers it) |
+ 
+ > **This slice's (`GATES-EXT`) ⑦ round exception (user pre-authorization, 2026-09-22)**: the ⑦ re-review (round 2) reported Medium+, which forces a re-review under §5.3 and, under the pre-authorization, entitled a **round 3** (`GPT-5.3-Codex`, **valid for this slice only**); round 3 returned `PASS WITH FIXES` with no Medium+ (one Low only, i.e. OB-20). **The authorization does not generalize**: other slices stay on §7.5 (one final review + one re-review), and a round 4 is never automatic.
+ 
+diff --git a/docs/DEV_PLAN.md b/docs/DEV_PLAN.md
+index f59bb68..319d85a 100644
+--- a/docs/DEV_PLAN.md
++++ b/docs/DEV_PLAN.md
+@@ -90,7 +90,7 @@ T006 状态：`COMPLETE`。AT-02 完整验收通过；无 Git 恢复与不可变
+ - [x] T017 [Plan:P1.6] 建立 `.github/workflows/ci.yml`、`testdata/selfhost/`、`docs/validation/s1-selfhost.md`；固定工具链与 Actions 完整 SHA、两代隔离、较早可信 verifier commit、外部 oracle、原生平台、固定 candidate commit、SHA256SUMS、SBOM/许可证检查；依赖：T024 和独立 bootstrap 批准；验收：AT-13/14；禁止：候选构建/覆盖 verifier 或 seed、把校验和冒充身份认证、未授权发布。签名/attestation 属后续增强，不阻断 S1。完成：2026-09-09。baseline `12fa05d` 的 push CI run `34253473081` 在 Windows/Linux 均失败后，CI 修复版经 DeepSeek V4 Pro 与 GPT-5.3 Codex 双主审 `PASS FOR BASELINE REVIEW`，并以 `18c9340c60deb30049554491f8905df51d0a3180` 建立新的 verifier baseline；push CI run [`34268076912`](https://github.com/larsonzh/prfrail/actions/runs/34268076912) 的 Ubuntu/Windows job 均成功。不同的 docs-only candidate `1e7af676e8e84028c7ecfef1ccde91213738c20c` 随后由维护者从 `main` 手工 dispatch；[run `34277671704`](https://github.com/larsonzh/prfrail/actions/runs/34277671704) 的 test、candidate-build、candidate-probe、selfhost Windows/Linux 8 个 job 全部成功，6 个 artifact 的名称、大小和 GitHub archive digest 已归档。验证：[中文](validation/s1-selfhost.md) / [English](validation/s1-selfhost_EN.md)；初始 Codex 主审：[中文](validation/t017-baseline-review.md) / [English](validation/t017-baseline-review_EN.md)；初始 DeepSeek 主审：[中文](validation/t017-deepseek-baseline-review.md) / [English](validation/t017-deepseek-baseline-review_EN.md)；CI 修复版 DeepSeek 复审：[中文](validation/t017-ci-remediation-deepseek-review.md) / [English](validation/t017-ci-remediation-deepseek-review_EN.md)；CI 修复版 Codex 复审：[中文](validation/t017-ci-remediation-codex-review.md) / [English](validation/t017-ci-remediation-codex-review_EN.md)。
+ - [ ] T018 [Plan:P1.6] 建立 `examples/{whois-shadow,go-minimal}/` 与 `docs/validation/s1-exit.md`；只读固定输入比较结果/失败分类，汇总全部 AT 和剩余风险；依赖：T017、T025、T026、T027、T028 及 whois 输入授权；验收：AT-15/22/23/24、RFC §14 S1 全部 exit；禁止：切换 whois 生产流程或“部分通过”冒充 S1 完成。
+ 
+-T018 状态：`IN_PROGRESS / BLOCKED`。2026-09-09 已在单轮只读授权内导出脱敏 whois 固定夹具并通过 9/9 结果对齐及输入/结果/失败分类漂移负例；generic/C/Go 三个最小 CLI 闭环与 Windows 候选便携包的首次运行、升级、回滚、保留数据卸载演练均通过。产品所有者已批准手工解压便携 ZIP、不修改 PATH 的安装模型，双语教程、支持矩阵和发行说明草案已建立。2026-09-10 T025/AT-22 已完成。AT-01–AT-24 与剩余门禁见 [S1 exit 报告](validation/s1-exit.md)；T026/T027/AT-23、T028/AT-24、最终 ZIP 绑定/复验、EOL 通知方式和产品所有者 S1 exit 批准仍缺失，因此不勾选 T018。
++T018 状态：`IN_PROGRESS / BLOCKED`。2026-09-09 已在单轮只读授权内导出脱敏 whois 固定夹具并通过 9/9 结果对齐及输入/结果/失败分类漂移负例；generic/C/Go 三个最小 CLI 闭环与 Windows 候选便携包的首次运行、升级、回滚、保留数据卸载演练均通过。产品所有者已批准手工解压便携 ZIP、不修改 PATH 的安装模型，双语教程、支持矩阵和发行说明草案已建立。2026-09-10 T025/AT-22 已完成。AT-01–AT-24 与剩余门禁见 [S1 exit 报告](validation/s1-exit.md)；T026/T027/AT-23、T028/AT-24、最终 ZIP 绑定/复验、EOL 通知方式和产品所有者 S1 exit 批准仍缺失，因此不勾选 T018。（**口径注记 2026-09-29，切片 `LEDGER-BACKFILL`**：上列缺口中 T026 已完成（10 verified / 2 unsupported ⇒ 候选不兼容）、DR-1 已于 2026-09-24 修复可用性探针子项、AT-23 属**未通过**而非「缺失」；门级与任务级判定见 `docs/validation/s1-reach-reachability.md` §2。任务状态字段不变。）
+ 
+ > **T018 待议项（2026-09-22，B4 ① 实测）**：T018 剩余门（AT-24 / 最终 ZIP 绑定与复验 / EOL 通知方式 / 产品所有者 S1 exit 批准）需重新评估"**是否也依赖候选 / AgentRunner 装配进展**"——若依赖，则 T018 的完成时点同样受 F1 / F2 影响。**不在 B4 范围内**；与 **OB-21** 同源，待议时机一致。 **2026-09-29 更新**：该待议项已由切片 `S1-REACH` 刷新——四道剩余门本身不依赖候选或装配进展，而 T018 的任务级依赖字段含 T027 与 T028 ⇒ 门级与任务级不同源；见 `docs/validation/s1-reach-reachability.md` §2。
+ 
+diff --git a/docs/DEV_PLAN_EN.md b/docs/DEV_PLAN_EN.md
+index 700498f..1835eab 100644
+--- a/docs/DEV_PLAN_EN.md
++++ b/docs/DEV_PLAN_EN.md
+@@ -91,7 +91,7 @@ T006 status: `COMPLETE`. Full AT-02 acceptance passed; Git-free restore and immu
+ - [x] T017 [Plan:P1.6] Create .github/workflows/ci.yml, testdata/selfhost/ and docs/validation/s1-selfhost.md; pin tooling and Actions by full SHA, isolate generations, use an earlier trusted verifier commit and external oracle, and verify native platforms, a fixed candidate commit, SHA256SUMS, SBOM and licenses. Depends: T024 and bootstrap approval. Accept: AT-13/14. Exclude: candidate-built/overwritten verifier or seed, checksum-as-identity claims, or unauthorized release. Signing/attestation is a later enhancement and does not block S1. Completed: 2026-09-09. After baseline `12fa05d` failed on both Windows and Linux in push CI run `34253473081`, the remediation received `PASS FOR BASELINE REVIEW` from both DeepSeek V4 Pro and GPT-5.3 Codex and established `18c9340c60deb30049554491f8905df51d0a3180` as the new verifier baseline. Both Ubuntu and Windows jobs succeeded in push CI [run `34268076912`](https://github.com/larsonzh/prfrail/actions/runs/34268076912). Maintainer dispatch from `main` then evaluated the distinct docs-only candidate `1e7af676e8e84028c7ecfef1ccde91213738c20c`; all eight test, candidate-build, candidate-probe, and selfhost Windows/Linux jobs succeeded in [run `34277671704`](https://github.com/larsonzh/prfrail/actions/runs/34277671704), with names, sizes, and GitHub archive digests for all six artifacts archived. Validation: [中文](validation/s1-selfhost.md) / [English](validation/s1-selfhost_EN.md); initial Codex review: [中文](validation/t017-baseline-review.md) / [English](validation/t017-baseline-review_EN.md); initial DeepSeek review: [中文](validation/t017-deepseek-baseline-review.md) / [English](validation/t017-deepseek-baseline-review_EN.md); CI-remediation DeepSeek review: [中文](validation/t017-ci-remediation-deepseek-review.md) / [English](validation/t017-ci-remediation-deepseek-review_EN.md); CI-remediation Codex review: [中文](validation/t017-ci-remediation-codex-review.md) / [English](validation/t017-ci-remediation-codex-review_EN.md).
+ - [ ] T018 [Plan:P1.6] Create examples/{whois-shadow,go-minimal}/ and docs/validation/s1-exit.md; compare fixed read-only input/result/failure classifications and summarize all AT/risks. Depends: T017, T025, T026, T027, T028, and whois input authorization. Accept: AT-15/22/23/24 and every RFC S1 exit gate. Exclude: production whois cutover or partial-pass completion.
+ 
+-T018 status: `IN_PROGRESS / BLOCKED`. On 2026-09-09, a redacted frozen whois fixture was exported under a one-session read-only authorization; all 9/9 parity cases and input/result/failure-classification drift counterexamples pass. All three minimal generic/C/Go CLI loops pass, as does a Windows candidate portable-package drill covering first run, upgrade, rollback, and evidence-preserving uninstall. The product owner approved manual portable-ZIP extraction without PATH modification, and bilingual installation, support-matrix, and release-note drafts now exist. T025/AT-22 completed on 2026-09-10. AT-01–AT-24 and remaining gates are summarized in the [S1 exit report](validation/s1-exit_EN.md). T026/T027/AT-23, T028/AT-24, final-ZIP binding/rerun, the EOL notification channel, and product-owner S1 exit approval remain absent, so T018 stays unchecked.
++T018 status: `IN_PROGRESS / BLOCKED`. On 2026-09-09, a redacted frozen whois fixture was exported under a one-session read-only authorization; all 9/9 parity cases and input/result/failure-classification drift counterexamples pass. All three minimal generic/C/Go CLI loops pass, as does a Windows candidate portable-package drill covering first run, upgrade, rollback, and evidence-preserving uninstall. The product owner approved manual portable-ZIP extraction without PATH modification, and bilingual installation, support-matrix, and release-note drafts now exist. T025/AT-22 completed on 2026-09-10. AT-01–AT-24 and remaining gates are summarized in the [S1 exit report](validation/s1-exit_EN.md). T026/T027/AT-23, T028/AT-24, final-ZIP binding/rerun, the EOL notification channel, and product-owner S1 exit approval remain absent, so T018 stays unchecked. (**Wording note 2026-09-29, slice `LEDGER-BACKFILL`**: within that list T026 is complete (10 verified / 2 unsupported, i.e. an incompatible candidate), DR-1 fixed the availability-probe sub-item on 2026-09-24, and AT-23 is *not passed* rather than absent; the gate-level and task-level verdicts are in `docs/validation/s1-reach-reachability_EN.md` §2. The task-status fields are unchanged.)
+ 
+ > **T018 open question (2026-09-22, measured by the B4 ①)**: the remaining T018 gates (AT-24 / final ZIP binding and re-verification / EOL notification / the product-owner S1-exit approval) need re-evaluation for "**do they also depend on candidate / AgentRunner assembly progress**" - if they do, T018 completion is affected by F1 / F2 as well. **Out of B4's scope**; same origin as **OB-21** and the same timing. **Update 2026-09-29**: slice `S1-REACH` refreshed this open question - the four remaining gates themselves do not depend on candidate or assembly progress, while the T018 task-level dependency field contains T027 and T028, so the gate level and the task level do not share a source; see `docs/validation/s1-reach-reachability_EN.md` §2.
+ 
+diff --git a/docs/t027/REMAINING_SLICES.md b/docs/t027/REMAINING_SLICES.md
+index cb8ca8b..10526d1 100644
+--- a/docs/t027/REMAINING_SLICES.md
++++ b/docs/t027/REMAINING_SLICES.md
+@@ -444,7 +444,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
+ 
+ **本片状态（四事分立，不得合并）**：① **B4 切片** = ✅ 完成；② **AT-23** = **未通过**（真实 AI 候选腿不可达，见 OB-21）；③ **T018 剩余门** = 未闭合；④ **S1 exit** = 未做。
+ 
+-> **优先级（用户 2026-09-22）**：本片**优先于** `GATES-G1G5` / `GATES-TIGHTEN` 两片补片——**B4 阻塞 S1 exit**，两片补片不阻塞任何东西；两片在 **B4 完成后**依次做。
++> **优先级（用户 2026-09-22）**：本片**优先于** `GATES-G1G5` / `GATES-TIGHTEN` 两片补片——**B4 阻塞 S1 exit**，两片补片不阻塞任何东西；两片在 **B4 完成后**依次做（**注记 2026-09-29**：B4 已于 2026-09-23 完成 ⇒ 本排序已到期；两片成为下一批候选，其中 `DIRECTIVE-LEDGER-ARCHIVE` 触及 §6.3 的 G6-6 判据作用域、需 Codex，故独立排队）。
+ 
+ - [ ] 在真实宿主跑完整 AT-23 场景，覆盖隔离 workspace、timeout、日志缺失、未知恢复、exit 0 后重扫与独立 gates 或 review —— 所列机制面**已在真实宿主执行**（五个面各有正/反向腿与包内重跑腿），但 AT-23 还含**真实 AI 候选启动与计费**腿，该腿**实测不可达** ⇒ 本项不勾选，AT-23 整体**未通过**。
+ - [x] 形成 evidence pack，包含输入摘要、环境摘要、命令与 cwd、退出码、用例统计、失败证据、跳过原因。
+@@ -479,10 +479,10 @@ A6 ② 进度（第 2 批，2026-09-15）：
+ 
+ | 编号 | 载体 | 症状（可复现描述） | 证据（两次 run） | 处置计划 |
+ | --- | --- | --- | --- | --- |
+-| **DR-2** | 测试：`tools/agent-probe/enforcement-proxy`（B2 期工具，非本片引入） | `TestConnectAuditTrailFailureDeniesAndDoesNotTunnel` **高频失败**（同包近期 3/4 次 push 见红；本测试计 **1** 次）：`enforcement-proxy: AUDIT TRAIL BROKEN (write …/proxy.jsonl: file already closed)` + `main_test.go:125: target must have been reached while the audit trail was healthy`；同一代码不同 run 结果不同 ⇒ flake，指向该测试自身**句柄/时序竞态**（日志文件被关闭后仍被写） | run **`35563800665`**（head `d2f508c`）Ubuntu `Test` 步骤**红**；run **`35562559401`**（head `abfcecc`）同包**绿**；复跑 `35563800665` 双腿**全绿**；docs 回写提交 `dd36b9b` 的 run **`35564805991`** 双腿**全绿**、该包未复现 | **B4 之前**另立独立切片修复（协议先行 + 门禁）；本片及 B3b **不跨切片**修改该工具。理由：flaky 测试会污染后续 CI 可信度，B4 前必须清。**症状串（修复后规范串）**：`target accepts = %d, want %d`（匹配口径：修复前按历史串、修复后按规范串）。**已修复并验证**（DR-FIX 切片 2026-09-22，提交 `ff259b2`/`9f68a52`/`1b01115`，**3 连推首跑双腿全绿** run `35646859765`/`35647349443`/`35648196443`）：与 DR-3/DR-4/DR-5 **共享根因** ⇒ 单一修复方案（`waitForAccepts` 轮询替代“读到 200 后立即读计数”），断言强度由 `≥1` **提升**为 `==1`（**加强，不是放宽**）；验证证据见 `docs/validation/dr-fix-enforcement-proxy.md` |
+-| **DR-3** | 测试：`tools/agent-probe/enforcement-proxy`（同为 B2 期工具，非本片引入） | `TestObserveModeAllowsUnknownHostAndLogsIt` **高频失败**（同包近期 3/4 次 push 见红；本测试计 **2** 次）：`main_test.go:469: target accepts = 0, want 1`（observe 模式下目标连接未被接受）；**与 DR-2 不是同一个测试**（DR-2 为 `TestConnectAuditTrailFailureDeniesAndDoesNotTunnel`），属同包**第二处**时序/竞态敏感点；**复现（2026-09-21）：同测试、同行号（`main_test.go:469`）、同断言串**逐字再次出现 ⇒ **复现次数 = 2** ⇒ 进一步支持“同包系统性时序/计数问题”（与 DR-4 怀疑的共享根因一致） | run **`35575667145`**（head `7bdfa0c`）**首跑** Windows 腿 `Test` 步骤**红**（Ubuntu 腿全绿）；同 run `gh run rerun --failed` **复跑双腿全绿**、运行终态 `success`；该 run 中 DR-2 的测试**为绿**（其 `AUDIT TRAIL BROKEN` 行是正常输出）；run **`35620891181`**（head `30cf799`，v1.8 文档提交）**首跑** Windows 腿 `Test` 步骤**红**（同测试、同行号 `main_test.go:469`、同断言串；Ubuntu 腿全绿、其余 14 包全 `ok`），同 run `gh run rerun --failed` → **attempt 2 双腿全绿**、终态 `success`；该片**无任何 `.go` 改动** ⇒ 与改动**无因果关联**。**同一次失败步骤的日志中还出现 DR-2 的症状串**：`enforcement-proxy: AUDIT TRAIL BROKEN (sync …\TestTunnelWorksAcrossRealTLSThroughProxy666368954\001\proxy.jsonl: file already closed): requests are denied until the log is writable again` | 与 DR-2 **合并处置**：在 **B4 之前**的同一独立切片中修复该测试包的时序假设（协议先行 + 门禁）；本片及 B3b **不跨切片**修改该工具。**修复切片 ① 阶段的显式输入（用户 2026-09-21 要求）**：上面那条出现在本测试失败日志中的 DR-2 症状串**必须由架构师逐字确认归属**——它是某个反向用例的正常 fail-closed 输出，还是**共享 rig/临时目录**的直接证据；若为后者，根因判定与修法**完全不同**，不得推迟到实施阶段才查。**累计同包 flake 4 次**（DR-2×1 / DR-3×2 / DR-4×1）⇒ 按“**同包系统性时序问题**”单独立项。**症状串（修复后规范串）**：`target accepts = %d, want %d`（匹配口径：修复前按历史串、修复后按规范串）。**已修复并验证**（DR-FIX 切片 2026-09-22，提交 `ff259b2`/`9f68a52`/`1b01115`，**3 连推首跑双腿全绿** run `35646859765`/`35647349443`/`35648196443`）：同一修复方案覆盖（DR-2 行已述）；验证证据见 `docs/validation/dr-fix-enforcement-proxy.md` |
+-| **DR-4** | 测试：`tools/agent-probe/enforcement-proxy`（同为 B2 期工具，非本片引入；发生于 SW 准则切换切片） | `TestConnectUsesUpstreamProxy` **高频失败**（同包近期 3/4 次 push 见红；本测试计 **1** 次）：`main_test.go:450: target accepts = 0, want 1`；**与 DR-2/DR-3 均不是同一个测试**（DR-2 = `TestConnectAuditTrailFailureDeniesAndDoesNotTunnel`、DR-3 = `TestObserveModeAllowsUnknownHostAndLogsIt`），属同包**第三处**时序/竞态敏感点。**注**：DR-3 与 DR-4 的断言串相同（`target accepts = 0, want 1`）而测试不同 ⇒ 提示二者可能**共享根因**（同一 rig 的 "target accepts" 计数），待修复切片一并核对 | run **`35606581371`**（head `52c28af`）**首跑** Windows 腿 `Test` 步骤**红**（Ubuntu 腿全绿；其余 14 包全 `ok`）；同 run `gh run rerun --failed` → **attempt 2 双腿全绿**、运行终态 `success`。**该片无任何 `.go` 改动**（仅文档与角色文件）⇒ 与本片改动**无因果关联** | 与 DR-2/DR-3 **合并处置**：在 **B4 之前**的同一独立切片中修复该测试包的时序假设（协议先行 + 门禁）；本片**不跨切片**修改该工具。**症状串（修复后规范串）**：`target accepts = %d, want %d`（匹配口径：修复前按历史串、修复后按规范串）。**已修复并验证**（DR-FIX 切片 2026-09-22，提交 `ff259b2`/`9f68a52`/`1b01115`，**3 连推首跑双腿全绿** run `35646859765`/`35647349443`/`35648196443`）：同一修复方案覆盖；验证证据见 `docs/validation/dr-fix-enforcement-proxy.md` |
+-| **DR-5** | 测试：`tools/agent-probe/enforcement-proxy`（同为 B2 期工具，非本片引入） | `TestConnectTunnelAllowedReachesTarget` **高频失败**（同包近期 3/4 次 push 见红；本测试计 **1** 次）：`main_test.go:324: target accept count = 0, want 1`；**与 DR-2/DR-3/DR-4 均不是同一个测试**，属同包**第四处**时序/竞态敏感点；断言串与 DR-3/DR-4 **同族**（`target accept(s) = 0, want 1`）⇒ 强化“共享 rig 的 target-accepts 计数”根因假设 | run **`35622599102`**（head `b597728`，DR-3 复现登记提交）**首跑** Windows 腿 `Test` 步骤**红**（Ubuntu 腿全绿、其余 14 包全 `ok`）；同 run `gh run rerun --failed` → **attempt 2 双腿全绿**、终态 `success`；该片**无任何 `.go` 改动**（仅文档 + G4b 白名单）⇒ 与改动**无因果关联**。**日志另据**：同一失败步骤内出现 **3 条不同测试**的 `AUDIT TRAIL BROKEN (… file already closed)` 行（`TestAuditTrailFailureDeniesRequests…` / `TestConnectAuditTrailFailureDeniesAndDoesNotTunnel…` / `TestTunnelWorksAcrossRealTLSThroughProxy…`）⇒ 多测试告警串在**同一 `Test` 步骤内交织**，须由修复切片 ① 阶段确认归属。**症状串（修复后规范串）**：`target accepts = %d, want %d`（匹配口径：修复前按历史串、修复后按规范串）。**已修复并验证**（DR-FIX 切片 2026-09-22，提交 `ff259b2`/`9f68a52`/`1b01115`，**3 连推首跑双腿全绿** run `35646859765`/`35647349443`/`35648196443`）：同一修复方案覆盖；验证证据见 `docs/validation/dr-fix-enforcement-proxy.md` | 与 DR-2/DR-3/DR-4 **合并处置**：在 **B4 之前**的同一独立切片中修复该测试包的时序假设（协议先行 + 门禁）；本片**不跨切片**修改该工具 |
++| **DR-2** | 测试：`tools/agent-probe/enforcement-proxy`（B2 期工具，非本片引入） | `TestConnectAuditTrailFailureDeniesAndDoesNotTunnel` **高频失败**（同包近期 3/4 次 push 见红；本测试计 **1** 次）：`enforcement-proxy: AUDIT TRAIL BROKEN (write …/proxy.jsonl: file already closed)` + `main_test.go:125: target must have been reached while the audit trail was healthy`；同一代码不同 run 结果不同 ⇒ flake，指向该测试自身**句柄/时序竞态**（日志文件被关闭后仍被写） | run **`35563800665`**（head `d2f508c`）Ubuntu `Test` 步骤**红**；run **`35562559401`**（head `abfcecc`）同包**绿**；复跑 `35563800665` 双腿**全绿**；docs 回写提交 `dd36b9b` 的 run **`35564805991`** 双腿**全绿**、该包未复现 | **B4 之前**另立独立切片修复（已由 DR-FIX 2026-09-22 修复）（协议先行 + 门禁）；本片及 B3b **不跨切片**修改该工具。理由：flaky 测试会污染后续 CI 可信度，B4 前必须清（已由 DR-FIX 2026-09-22 修复）。**症状串（修复后规范串）**：`target accepts = %d, want %d`（匹配口径：修复前按历史串、修复后按规范串）。**已修复并验证**（DR-FIX 切片 2026-09-22，提交 `ff259b2`/`9f68a52`/`1b01115`，**3 连推首跑双腿全绿** run `35646859765`/`35647349443`/`35648196443`）：与 DR-3/DR-4/DR-5 **共享根因** ⇒ 单一修复方案（`waitForAccepts` 轮询替代“读到 200 后立即读计数”），断言强度由 `≥1` **提升**为 `==1`（**加强，不是放宽**）；验证证据见 `docs/validation/dr-fix-enforcement-proxy.md` |
++| **DR-3** | 测试：`tools/agent-probe/enforcement-proxy`（同为 B2 期工具，非本片引入） | `TestObserveModeAllowsUnknownHostAndLogsIt` **高频失败**（同包近期 3/4 次 push 见红；本测试计 **2** 次）：`main_test.go:469: target accepts = 0, want 1`（observe 模式下目标连接未被接受）；**与 DR-2 不是同一个测试**（DR-2 为 `TestConnectAuditTrailFailureDeniesAndDoesNotTunnel`），属同包**第二处**时序/竞态敏感点；**复现（2026-09-21）：同测试、同行号（`main_test.go:469`）、同断言串**逐字再次出现 ⇒ **复现次数 = 2** ⇒ 进一步支持“同包系统性时序/计数问题”（与 DR-4 怀疑的共享根因一致） | run **`35575667145`**（head `7bdfa0c`）**首跑** Windows 腿 `Test` 步骤**红**（Ubuntu 腿全绿）；同 run `gh run rerun --failed` **复跑双腿全绿**、运行终态 `success`；该 run 中 DR-2 的测试**为绿**（其 `AUDIT TRAIL BROKEN` 行是正常输出）；run **`35620891181`**（head `30cf799`，v1.8 文档提交）**首跑** Windows 腿 `Test` 步骤**红**（同测试、同行号 `main_test.go:469`、同断言串；Ubuntu 腿全绿、其余 14 包全 `ok`），同 run `gh run rerun --failed` → **attempt 2 双腿全绿**、终态 `success`；该片**无任何 `.go` 改动** ⇒ 与改动**无因果关联**。**同一次失败步骤的日志中还出现 DR-2 的症状串**：`enforcement-proxy: AUDIT TRAIL BROKEN (sync …\TestTunnelWorksAcrossRealTLSThroughProxy666368954\001\proxy.jsonl: file already closed): requests are denied until the log is writable again` | 与 DR-2 **合并处置**：在 **B4 之前**的同一独立切片中修复（已由 DR-FIX 2026-09-22 修复）该测试包的时序假设（协议先行 + 门禁）；本片及 B3b **不跨切片**修改该工具。**修复切片 ① 阶段的显式输入（用户 2026-09-21 要求）**：上面那条出现在本测试失败日志中的 DR-2 症状串**必须由架构师逐字确认归属**——它是某个反向用例的正常 fail-closed 输出，还是**共享 rig/临时目录**的直接证据；若为后者，根因判定与修法**完全不同**，不得推迟到实施阶段才查。**累计同包 flake 4 次**（DR-2×1 / DR-3×2 / DR-4×1）⇒ 按“**同包系统性时序问题**”单独立项。**症状串（修复后规范串）**：`target accepts = %d, want %d`（匹配口径：修复前按历史串、修复后按规范串）。**已修复并验证**（DR-FIX 切片 2026-09-22，提交 `ff259b2`/`9f68a52`/`1b01115`，**3 连推首跑双腿全绿** run `35646859765`/`35647349443`/`35648196443`）：同一修复方案覆盖（DR-2 行已述）；验证证据见 `docs/validation/dr-fix-enforcement-proxy.md` |
++| **DR-4** | 测试：`tools/agent-probe/enforcement-proxy`（同为 B2 期工具，非本片引入；发生于 SW 准则切换切片） | `TestConnectUsesUpstreamProxy` **高频失败**（同包近期 3/4 次 push 见红；本测试计 **1** 次）：`main_test.go:450: target accepts = 0, want 1`；**与 DR-2/DR-3 均不是同一个测试**（DR-2 = `TestConnectAuditTrailFailureDeniesAndDoesNotTunnel`、DR-3 = `TestObserveModeAllowsUnknownHostAndLogsIt`），属同包**第三处**时序/竞态敏感点。**注**：DR-3 与 DR-4 的断言串相同（`target accepts = 0, want 1`）而测试不同 ⇒ 提示二者可能**共享根因**（同一 rig 的 "target accepts" 计数），待修复切片一并核对 | run **`35606581371`**（head `52c28af`）**首跑** Windows 腿 `Test` 步骤**红**（Ubuntu 腿全绿；其余 14 包全 `ok`）；同 run `gh run rerun --failed` → **attempt 2 双腿全绿**、运行终态 `success`。**该片无任何 `.go` 改动**（仅文档与角色文件）⇒ 与本片改动**无因果关联** | 与 DR-2/DR-3 **合并处置**：在 **B4 之前**的同一独立切片中修复（已由 DR-FIX 2026-09-22 修复）该测试包的时序假设（协议先行 + 门禁）；本片**不跨切片**修改该工具。**症状串（修复后规范串）**：`target accepts = %d, want %d`（匹配口径：修复前按历史串、修复后按规范串）。**已修复并验证**（DR-FIX 切片 2026-09-22，提交 `ff259b2`/`9f68a52`/`1b01115`，**3 连推首跑双腿全绿** run `35646859765`/`35647349443`/`35648196443`）：同一修复方案覆盖；验证证据见 `docs/validation/dr-fix-enforcement-proxy.md` |
++| **DR-5** | 测试：`tools/agent-probe/enforcement-proxy`（同为 B2 期工具，非本片引入） | `TestConnectTunnelAllowedReachesTarget` **高频失败**（同包近期 3/4 次 push 见红；本测试计 **1** 次）：`main_test.go:324: target accept count = 0, want 1`；**与 DR-2/DR-3/DR-4 均不是同一个测试**，属同包**第四处**时序/竞态敏感点；断言串与 DR-3/DR-4 **同族**（`target accept(s) = 0, want 1`）⇒ 强化“共享 rig 的 target-accepts 计数”根因假设 | run **`35622599102`**（head `b597728`，DR-3 复现登记提交）**首跑** Windows 腿 `Test` 步骤**红**（Ubuntu 腿全绿、其余 14 包全 `ok`）；同 run `gh run rerun --failed` → **attempt 2 双腿全绿**、终态 `success`；该片**无任何 `.go` 改动**（仅文档 + G4b 白名单）⇒ 与改动**无因果关联**。**日志另据**：同一失败步骤内出现 **3 条不同测试**的 `AUDIT TRAIL BROKEN (… file already closed)` 行（`TestAuditTrailFailureDeniesRequests…` / `TestConnectAuditTrailFailureDeniesAndDoesNotTunnel…` / `TestTunnelWorksAcrossRealTLSThroughProxy…`）⇒ 多测试告警串在**同一 `Test` 步骤内交织**，须由修复切片 ① 阶段确认归属。**症状串（修复后规范串）**：`target accepts = %d, want %d`（匹配口径：修复前按历史串、修复后按规范串）。**已修复并验证**（DR-FIX 切片 2026-09-22，提交 `ff259b2`/`9f68a52`/`1b01115`，**3 连推首跑双腿全绿** run `35646859765`/`35647349443`/`35648196443`）：同一修复方案覆盖；验证证据见 `docs/validation/dr-fix-enforcement-proxy.md` | 与 DR-2/DR-3/DR-4 **合并处置**：在 **B4 之前**的同一独立切片中修复（已由 DR-FIX 2026-09-22 修复）该测试包的时序假设（协议先行 + 门禁）；本片**不跨切片**修改该工具 |
+ | **DR-6** | 测试：`internal/gates`（本片 `GATES-EXT` 新增的包，非既有缺陷包） | `TestGuardExecutorCleansDescendantsAfterParentExit` **失败 1 次**（2026-09-22 ②g 的 `go test ./...` 内）：隔离重跑 **5 次全绿**，该包在 `base go test` 内同样绿 ⇒ 定性为“复跑即绿”的时序抖动。 | 本地观测、**无 CI run**（本片尚未推送）⇒ 按“只登记首跑红事件”的口径**不入累计发生次数表**；证据见本片报告 §5“提交后”小节。 | **按 DR 处置口径边界①登记**（新包 / 新测试名 ⇒ 必须单独登记）；**不阻断本片推送**；该包属 `base go test` 的一部分 ⇒ 下次 CI 再现即升级为真实缺陷；**观察中、不阻断 B4**。 |
+ | **DR-7** | 测试：`internal/adapters`（A6 钉住 CLI 适配器，非本片引入） | `TestAgentRunnerPinnedCLIRunOperatorAskOutranksSuccessAndTimeout` **失败 1 次**（2026-09-23，纯文档提交 `a28cca8` 的 CI）：`agent_runner_run_test.go:254: an operator request must outrank a timeout: {… Status:uncertain …}`；隔离重跑（`go test -count=5 -run … ./internal/adapters/`）**5 次全绿**，同提交本地 `go test ./...` 全包绿 ⇒ 定性为“复跑即绿”的时序抖动；属**新包 / 新测试名**（DR-2/3/4/5 = `enforcement-proxy`；DR-6 = `internal/gates`） | run **`35827240637`**（head `a28cca8`）**首跑** Windows 腿 `Test` 步骤**红**（`Gates` 步骤与 Ubuntu 腿均绿、其余包全 `ok`），同 run `gh run rerun --failed` → **attempt 2 双腿全绿**、终态 `success`；该片无任何 `.go` 改动（仅 2 个 `.md`）⇒ 与改动无因果关联 | **按 DR 处置口径边界①登记**（新包 / 新测试名 ⇒ 必须单独登记）；不阻断本片推送（推送已完成、复跑已取证）；**不并入 DR-FIX 结论**（不同包、非同一根因假设）；**观察中**：单次出现、本地 `-count=5` 未复现、与改动无因果关联；若再次出现（同测试、同断言串）即按边界①升格为独立切片修复 |
+ 
+@@ -562,6 +562,27 @@ A6 ② 进度（第 2 批，2026-09-15）：
+ **起跑（2026-09-29）**：步骤 0 已落地——切片定义核验（§12.4 末行 = OB-50、ADR 最大号 = ADR-014、五点锚点行全部可定位）；本片无链配置步骤（无真探针）。
+ **收尾（2026-09-29，⑩ 停点）**：⑤ 第 1 轮 `PRE-REVIEW: FINDINGS`（1 High 与 5 Medium 与 7 Low）→ 整改 → 第 2 轮 `PASS WITH FIXES`（H1 与 M1 至 M5 与 L1 至 L7 消除，另 2 条 Low 字面修正）；⑥ 按 §7.2.1 可跳过、已由 ⑦ 确认；⑦ 第 1 轮 `PASS WITH FIXES` → 复审 `PASS`（额度 2/2；降级 `deepseek-v4-pro`，ADR-015，独立性降低）；⑨ 门禁 `TOTAL_FAIL=0`（报告落盘后 `G7` 四条 PASS）、`SELFTEST PASS 248/248`、报告对逐行 0 失配、探针 0。报告 `docs/validation/s1-reach-reachability{,_EN}.md`（双语两份）。commit 与 push 须同轮授权。
+ 
++### LEDGER-BACKFILL 切片定义回写（2026-09-29）
++
++| 字段 | 内容 |
++| --- | --- |
++| 标识 | `LEDGER-BACKFILL`（文档回填类切片，非准则治理；触发词 `切片:LEDGER-BACKFILL`） |
++| 目标 | 把台账与文档中的过期表述更正为当前事实，并回填 B3a 的 `DEV_PLAN` 段落 |
++| 依赖 | 用户 2026-09-29 的边界裁定（★1 至 ★6 纳入；★9 不纳入；★7 与 ★8 与 ★10 延后） |
++| 规模 | S |
++| 步骤 | ②文档实现 → ③文档一致性检查 → ④门禁 → ⑤预审（V4 Pro）→ ⑥按 §7.2.1 判定（可跳过，⑦ 确认）→ ⑦终审（`deepseek-v4-pro`，降级，ADR-016；复审为额度例外，ADR-017）→ ⑧a 与 ⑧b 文档 → ⑨原生验证 → ⑧c 收尾 → ⑩停点 |
++| 现状缺口 | 台账与 `DEV_PLAN` 中存在与当前事实不符的表述（含「B3a 段落仍缺」这类过期注记） |
++| 交付物 | 报告 `docs/validation/ledger-backfill{,_EN}.md`；★1 至 ★6 与 ①② 的落点改动；`DELIVERY_DIRECTIVE{,_EN}`（v1.16）；`ADR_REGISTER{,_EN}`（ADR-016、ADR-017）；本台账块与收尾行 |
++| 验收证据 | 逐条落点可定位；门禁 `TOTAL_FAIL=0`；报告对逐行 0 失配；变更集仅 `.md` |
++| 边界 | 不改 run 号与测试名与结论行与任务状态字段与 OB 首状态词；不闭合任何 OB、不改任何判据；不碰 `internal/`、CONTRACTS、schema、fixtures、workflows、依赖与角色文件；探针 0 |
++| 分级 | `[SLICE]` |
++| 探针额度 | 无（0 次真实外部调用） |
++| 执行自由度清单落盘路径 | `docs/validation/evidence/LEDGER-BACKFILL-freedom-list.md` |
++
++**起跑（2026-09-29）**：步骤 0 已落地——只读盘点产出 ★1 至 ★10 的候选清单（用户裁定纳入 ★1 至 ★6、★9 不纳入、★7 与 ★8 与 ★10 延后）；① 阶段按 §5.2 的文档型行不启用。
++
++**收尾（2026-09-29，⑩ 停点）**：① 的核实结论为「段落已存在（提交 `dd36b9b`）⇒ 不重复回填」；② OB-53 补第五项；★1 至 ★6 全部落盘（★1 只改现象列、末列保持 `待议`、OB 未闭合）。⑤ `PASS WITH FIXES`（1/1）；⑥ 可跳过（⑦ 确认）；⑦ `PASS WITH FIXES`（1/1，降级 `deepseek-v4-pro`，ADR-016）；**⑦ 第 2 轮复审已执行**（额度例外，ADR-017）⇒ `PASS WITH FIXES`，2 条 Low 已处置。如实登记：首轮输入包 diff 为空系**主控错误**；**OB-54 候选**（`DEV_PLAN.md:139`）留待下一片。门禁 `TOTAL_FAIL=0`、`SELFTEST PASS 248/248`、报告对逐行 0 失配、探针 0。commit 与 push 经用户同轮预授权（不推 gitee）。
++
+ ## 完成记录（追加）
+ 
+ | 日期 | 切片 | 完成摘要 | 证据 |
+@@ -584,6 +605,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
+ | 2026-09-23 | B4 | （依据 `docs/validation/t027-at23-e2e.md`）AT-23 机制腿端到端证据 + 独立审查：装配 harness（`tools/b4-e2e/`，复用生产包、无 `os/exec`）在真实 Windows 宿主驱动五个面（隔离 workspace、timeout、日志缺失、未知恢复、exit 0 后重扫）的正/反向与包内重跑腿。**四事分立**：B4 切片 ✅；**AT-23 未通过**（真实 AI 候选腿不可达，见 OB-21）；T018 剩余门未闭合；S1 exit 未做。审查：⑤ 预审 F1–F5 整改并复审确认；⑥ 独立扫描 `PASS`、0 发现；⑦ 终审 F1–F5 与 R-1..R-4（R-1「契约措辞需修订」触发预声明红线并停下升级 ⇒ 用户裁决后修订 `CONTRACTS` §7 次序措辞、**只改措辞不动代码**，登记 OB-22）；⑦ 复审所报 Medium 按 OB-11 例外标准确定性闭合（OB-24）。跳过面的替代证据一律标注**非等价替代**（门禁端口对另标**策略端口未覆盖**），**本片不主张等价覆盖**。⑤ 门禁三作用域 `TOTAL_FAIL=0`、`SELFTEST PASS`；⑨ 原生验证含同命令复跑（差异仅落在已声明易变字段）与 `tmp/b4/SHA256SUMS.txt` 全量重算 0 失配。**已提交 `e8cbff6` 并推送 `origin/main`（未推 gitee）**；CI run **`35812311023`** 双腿全绿，两腿 `Gates` 步骤均实测执行（`TOTAL_FAIL=0`）。**契约修订的派生成本**：其引入的文档表述另耗一轮 ⑦ 复审（数据点已记入报告 §9.5） | docs/validation/t027-at23-e2e.md |
+ | 2026-09-24 | DR-1 | **业务切片（含一次准则台账补登）**：把 `ai check` 传给候选 CLI 的 `--max-ai-credits` 改为 `max(30, maximumRequests)`（floor 常量 30），使产品可用性探针首次在 pin 1.0.83 上产出 `available`（`requestsUsed=1`、退出码 0、`profileConfigHash` 与 B1 主基线逐字一致）。②b/③ 只动 `ai_probe_copilot.go` 与其测试（`ai.go` 零改动）；变异检验（恰好 1 处命中 + 变异后三处红 + 逐字节还原 sha256 一致）通过；④ 门禁 `TOTAL_FAIL=0`。⑤ `PASS WITH FIXES` → 复审 `PASS`（2/2）；⑥ `INDEPENDENT SCAN: FINDINGS`（按 §7.2 替代路径转入 ⑦）；⑦ `FINAL REVIEW: PASS`（降级 `deepseek-v4-pro`，ADR-014）；⑨ 探针 1/5。**未提交**（等同轮授权）。**已知差异（R1=A 不修）**登记为候选 OB-52。 | docs/validation/dr-1-availability-probe-floor.md |
+ | 2026-09-29 | S1-REACH | **业务判定类切片（含一次准则台账补登）**：以 DR-1 闭环后的当前事实刷新 OB-21 / T018 / S1 exit 的可达性判定（十门 × 依赖 × 解锁条件），结论为八门不可达或未通过、一门未知（人工门）、一门已执行但不独立成立；同批登记 **OB-51 / OB-52 / OB-53**（v1.15），并以 **ADR-015** 留痕 ⑦ 降级。零代码改动、探针 0。审查：⑤ `FINDINGS` → `PASS WITH FIXES`；⑥ 可跳过（⑦ 确认）；⑦ `PASS WITH FIXES` → 复审 `PASS`（`deepseek-v4-pro`，独立性降低）。 | docs/validation/s1-reach-reachability.md |
++| 2026-09-29 | LEDGER-BACKFILL | **文档回填切片**：更正台账与 `DEV_PLAN` 中的过期表述（★1 至 ★6）并补登 OB-53 第五项；① 核实 B3a 段落已在位（提交 `dd36b9b`）故不重复回填。⑤ `PASS WITH FIXES` → ⑦ `PASS WITH FIXES` → 复审 `PASS WITH FIXES`（`deepseek-v4-pro`，ADR-016；复审为额度例外，ADR-017，2 条 Low 已处置）；另如实登记首轮输入包 diff 为空系主控错误与 **OB-54 候选**（`DEV_PLAN.md:139`，下一片登记）。零代码改动、探针 0。 | docs/validation/ledger-backfill.md |
+ 
+ > **台账完整性注记（2026-09-21，已按用户授权补录）**：本表自 A4 行之后长期未追加完成行。**2026-09-21 依据各切片自己的验证报告补录 A5/A6/A7/B2/B3a 五行**（受"不凭记忆、只补可核验字段、缺失留空并标注历史缺失、不编造"三条约束），B3b 行先于本次补录写入，故五行列于其后；各行的日期/提交号/运行号/摘要均逐项标注来源，无法核验者已标注 **历史缺失**。
+-> 仍待回填：**B3a 的 `DEV_PLAN{,_EN}.md` 段落**（该文件 A0–A7/B1/B2 段均在，唯 B3a/B3b 缺；B3b 段已补，B3a 段待按其报告回填）。
++> **已回填**（本片核实，2026-09-29）：**B3a 的 `DEV_PLAN{,_EN}.md` 段落已由提交 `dd36b9b` 补入**（`DEV_PLAN.md:137` 与 `_EN.md:138`）；原注记的过期表述由切片 `LEDGER-BACKFILL` 更正，**回填动作无需重复执行**。
+diff --git a/docs/t027/REMAINING_SLICES_EN.md b/docs/t027/REMAINING_SLICES_EN.md
+index 2acc87d..400feff 100644
+--- a/docs/t027/REMAINING_SLICES_EN.md
++++ b/docs/t027/REMAINING_SLICES_EN.md
+@@ -430,7 +430,7 @@ Depends on: A5, A6, B1, B2, B3b, B3c
+ 
+ **This slice's status (four things kept apart, never merged)**: ① **the B4 slice** = ✅ complete; ② **AT-23** = **not passed** (the real AI candidate leg is unreachable, see OB-21); ③ **the remaining T018 gates** = not closed; ④ **S1 exit** = not done.
+ 
+-> **Priority (user, 2026-09-22)**: this slice **takes precedence over** the two patch slices `GATES-G1G5` / `GATES-TIGHTEN` - **B4 blocks S1 exit** while the patch slices block nothing; the two are done **after B4** in order.
++> **Priority (user, 2026-09-22)**: this slice **takes precedence over** the two patch slices `GATES-G1G5` / `GATES-TIGHTEN` - **B4 blocks S1 exit** while the patch slices block nothing; the two are done **after B4** in order (**note 2026-09-29**: B4 completed on 2026-09-23, so this ordering is now due; both are next-batch candidates, and `DIRECTIVE-LEDGER-ARCHIVE` touches the §6.3 G6-6 criterion scope and needs Codex, so it queues separately).
+ 
+ - [ ] Run the full AT-23 scenario set on a real host, covering isolated workspace, timeout, missing logs, unknown recovery, and exit-0 rescan with independent gates or review - the listed mechanism faces **have been executed on a real host** (all five faces carry forward/reverse legs plus in-pack re-run legs), but AT-23 also contains the **real AI candidate start and billing** leg, which is **measurably unreachable** ⇒ this item stays unticked and AT-23 as a whole is **not passed**.
+ - [x] Build the evidence pack with input digests, environment summary, commands and cwd, exit codes, case counts, failure evidence, and skip reasons.
+@@ -466,10 +466,10 @@ Boundaries: this is a follow-up platform slice and must not rewrite the Windows
+ 
+ | Id | Carrier | Symptom (reproducible description) | Evidence (two runs) | Disposition plan |
+ | --- | --- | --- | --- | --- |
+-| **DR-2** | test: `tools/agent-probe/enforcement-proxy` (a B2-era tool, not introduced by this slice) | `TestConnectAuditTrailFailureDeniesAndDoesNotTunnel` fails **frequently** (same package: 3 of the last 4 pushes red; this test: **1** time): `enforcement-proxy: AUDIT TRAIL BROKEN (write …/proxy.jsonl: file already closed)` plus `main_test.go:125: target must have been reached while the audit trail was healthy`; the same code gives different results across runs ⇒ flaky, pointing at a **handle/timing race** inside that test (the log file is written after it has been closed) | run **`35563800665`** (head `d2f508c`) failed the Ubuntu `Test` step; run **`35562559401`** (head `abfcecc`) passed that package; re-running `35563800665` is green on both legs; the docs back-fill commit `dd36b9b` (run **`35564805991`**) is green on both legs with no recurrence in that package | fix in its **own** slice with protocol-first and full gates, **before B4**; neither B3b nor this documentation change touches that tool across slices. Rationale: a flaky test erodes the credibility of every later CI signal, so it must be cleared before B4. **symptom string (normative string after the fix)**: `target accepts = %d, want %d` (matching rule: the historic string before the fix, the normative string after it). **Fixed and verified** (DR-FIX slice 2026-09-22, commits `ff259b2`/`9f68a52`/`1b01115`, **3 consecutive pushes green on the first attempt on both legs** runs `35646859765`/`35647349443`/`35648196443`): it **shares the root cause** with DR-3/DR-4/DR-5 ⇒ a single fix (`waitForAccepts` polling instead of "read the counter immediately after seeing 200"), with the assertion **strengthened** from `≥1` to `==1` (**a tightening, not a relaxation**); see `docs/validation/dr-fix-enforcement-proxy.md` for the verification evidence |
+-| **DR-3** | test: `tools/agent-probe/enforcement-proxy` (again a B2-era tool, not introduced by this slice) | `TestObserveModeAllowsUnknownHostAndLogsIt` fails **frequently** (same package: 3 of the last 4 pushes red; this test: **2** times): `main_test.go:469: target accepts = 0, want 1` (in observe mode the target connection was never accepted); **this is not the same test as DR-2** (DR-2 is `TestConnectAuditTrailFailureDeniesAndDoesNotTunnel`), making it the **second** timing/race-sensitive point in the same package; **recurrence (2026-09-21): a verbatim repeat — same test, same line (`main_test.go:469`), same assertion string ⇒ recurrence count = 2** ⇒ further supports a "same-package systemic timing/counter problem" (consistent with the shared root cause suspected for DR-4) | run **`35575667145`** (head `7bdfa0c`) **failed the first attempt** of the Windows `Test` step (Ubuntu was green); `gh run rerun --failed` on the same run **passed on both legs** and the run ended `success`; DR-2's test was **green** in that run (its `AUDIT TRAIL BROKEN` lines are normal output); run **`35620891181`** (head `30cf799`, the v1.8 documentation commit) **failed the first attempt** of the Windows `Test` step (same test, same line `main_test.go:469`, same assertion string; Ubuntu was green and the other 14 packages were all `ok`), and `gh run rerun --failed` on the same run made **attempt 2 green on both legs** with the run ending `success`; **the slice changed no `.go` file** ⇒ **no causal link** to its changes. **The log of that very same failed step also contains DR-2's symptom string**: `enforcement-proxy: AUDIT TRAIL BROKEN (sync …\TestTunnelWorksAcrossRealTLSThroughProxy666368954\001\proxy.jsonl: file already closed): requests are denied until the log is writable again` | fix **together with DR-2** in the same standalone slice **before B4** (protocol first plus gates); neither this slice nor B3b touches that tool across slices. **Explicit input for stage ① of the fixing slice (requirement set by the user on 2026-09-21)**: the DR-2 symptom string that appeared in this test's failure log **must be attributed verbatim by the architect** — is it the normal fail-closed output of some negative-path case, or **direct evidence of a shared rig / temp directory**? If it is the latter, the root-cause verdict and the fix are **completely different**, so it must not be deferred to the implementation stage. **4 same-package flakes accumulated so far** (DR-2×1 / DR-3×2 / DR-4×1) ⇒ raise it as a standalone item under "**same-package systemic timing problem**". **symptom string (normative string after the fix)**: `target accepts = %d, want %d` (matching rule: the historic string before the fix, the normative string after it). **Fixed and verified** (DR-FIX slice 2026-09-22, commits `ff259b2`/`9f68a52`/`1b01115`, **3 consecutive pushes green on the first attempt on both legs** runs `35646859765`/`35647349443`/`35648196443`): covered by the same fix (already described in the DR-2 row); see `docs/validation/dr-fix-enforcement-proxy.md` for the verification evidence |
+-| **DR-4** | test: `tools/agent-probe/enforcement-proxy` (again a B2-era tool, not introduced by this slice; surfaced during the SW directive-switchover slice) | `TestConnectUsesUpstreamProxy` fails **frequently** (same package: 3 of the last 4 pushes red; this test: **1** time): `main_test.go:450: target accepts = 0, want 1`; **this is a different test from both DR-2 and DR-3** (DR-2 = `TestConnectAuditTrailFailureDeniesAndDoesNotTunnel`, DR-3 = `TestObserveModeAllowsUnknownHostAndLogsIt`), making it the **third** timing/race-sensitive point in the same package. **Note**: DR-3 and DR-4 share the same assertion string (`target accepts = 0, want 1`) while being different tests ⇒ they may share a root cause (the same rig's "target accepts" counter); verify together in the fixing slice | run **`35606581371`** (head `52c28af`) **failed the first attempt** of the Windows `Test` step (Ubuntu was green; the other 14 packages were all `ok`); `gh run rerun --failed` on the same run made **attempt 2 green on both legs** and the run ended `success`. **The slice changed no `.go` file** (docs and role files only) ⇒ **no causal link** to this slice's changes | fix **together with DR-2 and DR-3** in the same standalone slice **before B4** (protocol first plus gates); this slice **does not** touch that tool across slices. **symptom string (normative string after the fix)**: `target accepts = %d, want %d` (matching rule: the historic string before the fix, the normative string after it). **Fixed and verified** (DR-FIX slice 2026-09-22, commits `ff259b2`/`9f68a52`/`1b01115`, **3 consecutive pushes green on the first attempt on both legs** runs `35646859765`/`35647349443`/`35648196443`): covered by the same fix; see `docs/validation/dr-fix-enforcement-proxy.md` for the verification evidence |
+-| **DR-5** | test: `tools/agent-probe/enforcement-proxy` (again a B2-era tool, not introduced by this slice) | `TestConnectTunnelAllowedReachesTarget` fails **frequently** (same package: 3 of the last 4 pushes red; this test: **1** time): `main_test.go:324: target accept count = 0, want 1`; **this is a different test from DR-2, DR-3 and DR-4**, making it the **fourth** timing/race-sensitive point in the same package; its assertion string belongs to the **same family** as DR-3/DR-4 (`target accept(s) = 0, want 1`) ⇒ strengthens the "shared rig's target-accepts counter" root-cause hypothesis | run **`35622599102`** (head `b597728`, the DR-3 recurrence registration commit) **failed the first attempt** of the Windows `Test` step (Ubuntu was green; the other 14 packages were all `ok`); `gh run rerun --failed` on the same run made **attempt 2 green on both legs** with the run ending `success`; **the slice changed no `.go` file** (docs plus the G4b whitelist) ⇒ **no causal link** to its changes. **Further evidence from the log**: the same failed step contains **three** `AUDIT TRAIL BROKEN (… file already closed)` lines from **three different tests** (`TestAuditTrailFailureDeniesRequests…` / `TestConnectAuditTrailFailureDeniesAndDoesNotTunnel…` / `TestTunnelWorksAcrossRealTLSThroughProxy…`) ⇒ several tests' warning strings **interleave within one `Test` step**, so stage ① of the fixing slice must attribute them. **symptom string (normative string after the fix)**: `target accepts = %d, want %d` (matching rule: the historic string before the fix, the normative string after it). **Fixed and verified** (DR-FIX slice 2026-09-22, commits `ff259b2`/`9f68a52`/`1b01115`, **3 consecutive pushes green on the first attempt on both legs** runs `35646859765`/`35647349443`/`35648196443`): covered by the same fix; see `docs/validation/dr-fix-enforcement-proxy.md` for the verification evidence | fix **together with DR-2, DR-3 and DR-4** in the same standalone slice **before B4** (protocol first plus gates); this slice **does not** touch that tool across slices |
++| **DR-2** | test: `tools/agent-probe/enforcement-proxy` (a B2-era tool, not introduced by this slice) | `TestConnectAuditTrailFailureDeniesAndDoesNotTunnel` fails **frequently** (same package: 3 of the last 4 pushes red; this test: **1** time): `enforcement-proxy: AUDIT TRAIL BROKEN (write …/proxy.jsonl: file already closed)` plus `main_test.go:125: target must have been reached while the audit trail was healthy`; the same code gives different results across runs ⇒ flaky, pointing at a **handle/timing race** inside that test (the log file is written after it has been closed) | run **`35563800665`** (head `d2f508c`) failed the Ubuntu `Test` step; run **`35562559401`** (head `abfcecc`) passed that package; re-running `35563800665` is green on both legs; the docs back-fill commit `dd36b9b` (run **`35564805991`**) is green on both legs with no recurrence in that package | fix in its **own** slice with protocol-first and full gates, **before B4** (fixed by DR-FIX on 2026-09-22); neither B3b nor this documentation change touches that tool across slices. Rationale: a flaky test erodes the credibility of every later CI signal, so it must be cleared before B4. **symptom string (normative string after the fix)**: `target accepts = %d, want %d` (matching rule: the historic string before the fix, the normative string after it). **Fixed and verified** (DR-FIX slice 2026-09-22, commits `ff259b2`/`9f68a52`/`1b01115`, **3 consecutive pushes green on the first attempt on both legs** runs `35646859765`/`35647349443`/`35648196443`): it **shares the root cause** with DR-3/DR-4/DR-5 ⇒ a single fix (`waitForAccepts` polling instead of "read the counter immediately after seeing 200"), with the assertion **strengthened** from `≥1` to `==1` (**a tightening, not a relaxation**); see `docs/validation/dr-fix-enforcement-proxy.md` for the verification evidence |
++| **DR-3** | test: `tools/agent-probe/enforcement-proxy` (again a B2-era tool, not introduced by this slice) | `TestObserveModeAllowsUnknownHostAndLogsIt` fails **frequently** (same package: 3 of the last 4 pushes red; this test: **2** times): `main_test.go:469: target accepts = 0, want 1` (in observe mode the target connection was never accepted); **this is not the same test as DR-2** (DR-2 is `TestConnectAuditTrailFailureDeniesAndDoesNotTunnel`), making it the **second** timing/race-sensitive point in the same package; **recurrence (2026-09-21): a verbatim repeat — same test, same line (`main_test.go:469`), same assertion string ⇒ recurrence count = 2** ⇒ further supports a "same-package systemic timing/counter problem" (consistent with the shared root cause suspected for DR-4) | run **`35575667145`** (head `7bdfa0c`) **failed the first attempt** of the Windows `Test` step (Ubuntu was green); `gh run rerun --failed` on the same run **passed on both legs** and the run ended `success`; DR-2's test was **green** in that run (its `AUDIT TRAIL BROKEN` lines are normal output); run **`35620891181`** (head `30cf799`, the v1.8 documentation commit) **failed the first attempt** of the Windows `Test` step (same test, same line `main_test.go:469`, same assertion string; Ubuntu was green and the other 14 packages were all `ok`), and `gh run rerun --failed` on the same run made **attempt 2 green on both legs** with the run ending `success`; **the slice changed no `.go` file** ⇒ **no causal link** to its changes. **The log of that very same failed step also contains DR-2's symptom string**: `enforcement-proxy: AUDIT TRAIL BROKEN (sync …\TestTunnelWorksAcrossRealTLSThroughProxy666368954\001\proxy.jsonl: file already closed): requests are denied until the log is writable again` | fix **together with DR-2** in the same standalone slice **before B4** (fixed by DR-FIX on 2026-09-22) (protocol first plus gates); neither this slice nor B3b touches that tool across slices. **Explicit input for stage ① of the fixing slice (requirement set by the user on 2026-09-21)**: the DR-2 symptom string that appeared in this test's failure log **must be attributed verbatim by the architect** — is it the normal fail-closed output of some negative-path case, or **direct evidence of a shared rig / temp directory**? If it is the latter, the root-cause verdict and the fix are **completely different**, so it must not be deferred to the implementation stage. **4 same-package flakes accumulated so far** (DR-2×1 / DR-3×2 / DR-4×1) ⇒ raise it as a standalone item under "**same-package systemic timing problem**". **symptom string (normative string after the fix)**: `target accepts = %d, want %d` (matching rule: the historic string before the fix, the normative string after it). **Fixed and verified** (DR-FIX slice 2026-09-22, commits `ff259b2`/`9f68a52`/`1b01115`, **3 consecutive pushes green on the first attempt on both legs** runs `35646859765`/`35647349443`/`35648196443`): covered by the same fix (already described in the DR-2 row); see `docs/validation/dr-fix-enforcement-proxy.md` for the verification evidence |
++| **DR-4** | test: `tools/agent-probe/enforcement-proxy` (again a B2-era tool, not introduced by this slice; surfaced during the SW directive-switchover slice) | `TestConnectUsesUpstreamProxy` fails **frequently** (same package: 3 of the last 4 pushes red; this test: **1** time): `main_test.go:450: target accepts = 0, want 1`; **this is a different test from both DR-2 and DR-3** (DR-2 = `TestConnectAuditTrailFailureDeniesAndDoesNotTunnel`, DR-3 = `TestObserveModeAllowsUnknownHostAndLogsIt`), making it the **third** timing/race-sensitive point in the same package. **Note**: DR-3 and DR-4 share the same assertion string (`target accepts = 0, want 1`) while being different tests ⇒ they may share a root cause (the same rig's "target accepts" counter); verify together in the fixing slice | run **`35606581371`** (head `52c28af`) **failed the first attempt** of the Windows `Test` step (Ubuntu was green; the other 14 packages were all `ok`); `gh run rerun --failed` on the same run made **attempt 2 green on both legs** and the run ended `success`. **The slice changed no `.go` file** (docs and role files only) ⇒ **no causal link** to this slice's changes | fix **together with DR-2 and DR-3** in the same standalone slice **before B4** (fixed by DR-FIX on 2026-09-22) (protocol first plus gates); this slice **does not** touch that tool across slices. **symptom string (normative string after the fix)**: `target accepts = %d, want %d` (matching rule: the historic string before the fix, the normative string after it). **Fixed and verified** (DR-FIX slice 2026-09-22, commits `ff259b2`/`9f68a52`/`1b01115`, **3 consecutive pushes green on the first attempt on both legs** runs `35646859765`/`35647349443`/`35648196443`): covered by the same fix; see `docs/validation/dr-fix-enforcement-proxy.md` for the verification evidence |
++| **DR-5** | test: `tools/agent-probe/enforcement-proxy` (again a B2-era tool, not introduced by this slice) | `TestConnectTunnelAllowedReachesTarget` fails **frequently** (same package: 3 of the last 4 pushes red; this test: **1** time): `main_test.go:324: target accept count = 0, want 1`; **this is a different test from DR-2, DR-3 and DR-4**, making it the **fourth** timing/race-sensitive point in the same package; its assertion string belongs to the **same family** as DR-3/DR-4 (`target accept(s) = 0, want 1`) ⇒ strengthens the "shared rig's target-accepts counter" root-cause hypothesis | run **`35622599102`** (head `b597728`, the DR-3 recurrence registration commit) **failed the first attempt** of the Windows `Test` step (Ubuntu was green; the other 14 packages were all `ok`); `gh run rerun --failed` on the same run made **attempt 2 green on both legs** with the run ending `success`; **the slice changed no `.go` file** (docs plus the G4b whitelist) ⇒ **no causal link** to its changes. **Further evidence from the log**: the same failed step contains **three** `AUDIT TRAIL BROKEN (… file already closed)` lines from **three different tests** (`TestAuditTrailFailureDeniesRequests…` / `TestConnectAuditTrailFailureDeniesAndDoesNotTunnel…` / `TestTunnelWorksAcrossRealTLSThroughProxy…`) ⇒ several tests' warning strings **interleave within one `Test` step**, so stage ① of the fixing slice must attribute them. **symptom string (normative string after the fix)**: `target accepts = %d, want %d` (matching rule: the historic string before the fix, the normative string after it). **Fixed and verified** (DR-FIX slice 2026-09-22, commits `ff259b2`/`9f68a52`/`1b01115`, **3 consecutive pushes green on the first attempt on both legs** runs `35646859765`/`35647349443`/`35648196443`): covered by the same fix; see `docs/validation/dr-fix-enforcement-proxy.md` for the verification evidence | fix **together with DR-2, DR-3 and DR-4** in the same standalone slice **before B4** (fixed by DR-FIX on 2026-09-22) (protocol first plus gates); this slice **does not** touch that tool across slices |
+ | **DR-6** | test: `internal/gates` (package added by this slice, `GATES-EXT`; not a pre-existing defect package) | `TestGuardExecutorCleansDescendantsAfterParentExit` **failed once** (2026-09-22, inside the ②g `go test ./...`): isolated re-runs were **5 times all green**, and the package is equally green inside `base go test` ⇒ classified as a "green on re-run" timing flake. | local observation, **no CI run** (this slice is not pushed yet) ⇒ under the "first-run reds only" rule it is **not added to the recurrence table**; the evidence lives in this slice's report, §5 "after the commit". | **registered per DR disposition boundary ①** (new package / new test name ⇒ registration is mandatory); **does not block this slice's push**; the package is part of `base go test` ⇒ if it recurs in CI it is upgraded to a real defect; **observed, does not block B4**. |
+ | **DR-7** | test: `internal/adapters` (the A6 pinned-CLI adapter, not introduced by this slice) | `TestAgentRunnerPinnedCLIRunOperatorAskOutranksSuccessAndTimeout` **failed once** (2026-09-23, CI of the docs-only commit `a28cca8`): `agent_runner_run_test.go:254: an operator request must outrank a timeout: {… Status:uncertain …}`; isolated re-runs (`go test -count=5 -run … ./internal/adapters/`) were **5 times all green**, and `go test ./...` on the same commit is green for every package ⇒ classified as a "green on rerun" timing flake; a **new package / new test name** (DR-2/3/4/5 = `enforcement-proxy`; DR-6 = `internal/gates`) | run **`35827240637`** (head `a28cca8`) **failed the first attempt** of the Windows `Test` step (**red**; the `Gates` step and the Ubuntu leg were green, the other packages all `ok`), and `gh run rerun --failed` on the same run made **attempt 2 green on both legs** with the run ending `success`; the slice changed no `.go` file (2 `.md` files only) ⇒ no causal link to its changes | **registered per DR disposition boundary ①** (new package / new test name ⇒ registration is mandatory); does not block this slice's push (the push is done and the rerun evidence is captured); **not folded into the DR-FIX conclusion** (a different package, not the same root-cause hypothesis); **observed**: a single occurrence, not reproduced locally with `-count=5`, and no causal link to the changes; if it recurs (same test, same assertion string) it is promoted under boundary ① to a standalone fixing slice |
+ 
+@@ -549,6 +549,27 @@ Boundaries: this is a follow-up platform slice and must not rewrite the Windows
+ **Start (2026-09-29)**: step 0 has landed - the slice definition was verified (§12.4 last row = OB-50, highest ADR = ADR-014, all five-point anchor lines locatable); this slice has no chain-configuration step (no live probe).
+ **Closeout (2026-09-29, the ⑩ stop point)**: ⑤ round 1 `PRE-REVIEW: FINDINGS` (one High plus five Medium and seven Low) -> remediation -> round 2 `PASS WITH FIXES` (H1, M1 to M5 and L1 to L7 removed, plus two literal Low fixes); ⑥ skippable per §7.2.1 and confirmed by ⑦; ⑦ round 1 `PASS WITH FIXES` -> re-review `PASS` (budget 2/2; downgraded to `deepseek-v4-pro`, ADR-015, reduced independence); ⑨ gates `TOTAL_FAIL=0` (the four `G7` criteria PASS after the report landed), `SELFTEST PASS 248/248`, zero per-line mirror mismatches in the report pair and zero probes. Report `docs/validation/s1-reach-reachability{,_EN}.md`. commit and push need same-turn authorization.
+ 
++### LEDGER-BACKFILL slice definition write-back (2026-09-29)
++
++| Field | Content |
++| --- | --- |
++| Identity | `LEDGER-BACKFILL` (a documentation back-fill slice, not directive governance; trigger word `切片:LEDGER-BACKFILL`) |
++| Objective | correct stale ledger and document wording to the current facts and back-fill the B3a paragraph in `DEV_PLAN` |
++| Dependencies | the user boundary ruling of 2026-09-29 (★1 to ★6 in scope; ★9 out of scope; ★7, ★8 and ★10 deferred) |
++| Size | S |
++| Steps | ② documentation implementation -> ③ documentation consistency check -> ④ gates -> ⑤ pre-review (V4 Pro) -> ⑥ judged under §7.2.1 (skippable, confirmed by ⑦) -> ⑦ final review (`deepseek-v4-pro`, downgraded, ADR-016; the re-review is a quota exception, ADR-017) -> ⑧a and ⑧b documents -> ⑨ native validation -> ⑧c wrap-up -> ⑩ stop point |
++| Current gap | the ledger and `DEV_PLAN` carried wording that no longer matched the facts (including the stale note that the B3a paragraph was still missing) |
++| Deliverables | report `docs/validation/ledger-backfill{,_EN}.md`; the landing changes for ★1 to ★6 and ①②; `DELIVERY_DIRECTIVE{,_EN}` (v1.16); `ADR_REGISTER{,_EN}` (ADR-016, ADR-017); this ledger block and the closeout line |
++| Acceptance evidence | every landing point is locatable; gates `TOTAL_FAIL=0`; zero per-line mismatches in the report pair; the change set contains only `.md` files |
++| Boundaries | no change to any run id, test name, conclusion line, task-status field or OB opening status word; no OB closed and no criterion changed; `internal/`, CONTRACTS, schema, fixtures, workflows, dependencies and role files untouched; zero probes |
++| Class | `[SLICE]` |
++| Probe budget | none (zero real external calls) |
++| Execution-freedom list path | `docs/validation/evidence/LEDGER-BACKFILL-freedom-list.md` |
++
++**Start (2026-09-29)**: step 0 landed - the read-only inventory produced the ★1 to ★10 candidate list (the user ruled ★1 to ★6 in scope, ★9 out of scope, ★7, ★8 and ★10 deferred); the ① stage is not enabled per the §5.2 documentation-form row.
++
++**Closeout (2026-09-29, the ⑩ stop point)**: the ① verification concluded that the paragraph already exists (commit `dd36b9b`) so the back-fill is not repeated; ② added the fifth OB-53 item; ★1 to ★6 all landed (★1 changes only the evidence cell, the disposition word stays `待议` and the OB is not closed). ⑤ `PASS WITH FIXES` (1/1); ⑥ skippable (confirmed by ⑦); ⑦ `PASS WITH FIXES` (1/1, downgraded to `deepseek-v4-pro`, ADR-016); **the ⑦ round-two re-review ran** (a quota exception, ADR-017) ⇒ `PASS WITH FIXES` with the 2 Low findings disposed of. Recorded truthfully: the first-round input pack's empty diff was a **master error**; the **OB-54 candidate** (`DEV_PLAN.md:139`) is left to the next slice. Gates `TOTAL_FAIL=0`, `SELFTEST PASS 248/248`, zero per-line mismatches in the report pair and zero probes. commit and push were pre-authorised by the user in the same turn (never to gitee).
++
+ ## Completion log (append-only)
+ 
+ | Date | Slice | Completion summary | Evidence |
+@@ -571,6 +592,7 @@ Boundaries: this is a follow-up platform slice and must not rewrite the Windows
+ | 2026-09-23 | B4 | (per `docs/validation/t027-at23-e2e.md`) AT-23 mechanism-leg end-to-end evidence plus independent review: an assembly harness (`tools/b4-e2e/`, reusing the production packages, no `os/exec`) drove the five faces (isolated workspace, timeout, missing logs, unknown recovery, exit-0 rescan) with forward/reverse and in-pack re-run legs on a real Windows host. **Four things kept apart**: the B4 slice ✅; **AT-23 is not passed** (the real AI candidate leg is unreachable, see OB-21); the remaining T018 gates are not closed; S1 exit is not done. Reviews: ⑤ pre-review F1-F5 remediated and re-verified; ⑥ independent scan `PASS` with 0 findings; ⑦ final review F1-F5 and R-1..R-4 (R-1 "the contract wording needs revision" tripped the pre-declared red line and forced a stop-and-escalate ⇒ after the user's ruling the `CONTRACTS` §7 ordering wording was unified, **wording only, no code change**, registered as OB-22); the Medium findings of the ⑦ re-review were closed deterministically under the OB-11 exception standard (OB-24). Every skipped face's alternative evidence is labelled **non-equivalent substitute** (the gate port pair additionally **policy port uncovered**), and **this slice claims no equivalent coverage**. ⑤ gates `TOTAL_FAIL=0` in all three scopes with `SELFTEST PASS`; ⑨ native validation included a same-command re-run (differences confined to the declared volatile fields) and a full recomputation of `tmp/b4/SHA256SUMS.txt` with 0 mismatches. **Committed as `e8cbff6` and pushed to `origin/main` (never to gitee)**; CI run **`35812311023`** green on both legs with the `Gates` step really executing on both (`TOTAL_FAIL=0`). **Derivative cost of the contract revision**: the wording it introduced consumed one further ⑦ re-review round (data point recorded in report §9.5) | docs/validation/t027-at23-e2e.md |
+ | 2026-09-24 | DR-1 | **Business slice (plus one directive-ledger registration)**: `ai check` now passes `max(30, maximumRequests)` (floor constant 30) to the candidate CLI, so the product availability probe produced an `available` record on pin 1.0.83 for the first time (`requestsUsed=1`, exit 0, `profileConfigHash` byte-identical to the B1 main baseline). ②b/③ touched only `ai_probe_copilot.go` and its tests (`ai.go` untouched); the mutation check (exactly one matching site, three reds after mutation, byte-identical restore with matching sha256) passed; ④ gates `TOTAL_FAIL=0`. ⑤ `PASS WITH FIXES` → re-review `PASS` (2/2); ⑥ `INDEPENDENT SCAN: FINDINGS` (routed to ⑦ via the §7.2 alternate path); ⑦ `FINAL REVIEW: PASS` (downgraded `deepseek-v4-pro`, ADR-014); ⑨ probe 1/5. **Not committed** (awaiting same-turn authorisation). The **known difference (unfixed per R1=A)** is registered as candidate OB-52. | docs/validation/dr-1-availability-probe-floor.md |
+ | 2026-09-29 | S1-REACH | **Business assessment slice (plus one directive ledger registration)**: refreshed the reachability verdicts for OB-21, T018 and S1 exit from the post-DR-1 facts (ten gates x dependency x unlock condition), concluding eight unreachable or not passed, one unknown (a human gate) and one executed but not standing alone; registered **OB-51 / OB-52 / OB-53** in the same slice (v1.15) and recorded the ⑦ downgrade as **ADR-015**. No code change and zero probes. Reviews: ⑤ `FINDINGS` -> `PASS WITH FIXES`; ⑥ skippable (confirmed by ⑦); ⑦ `PASS WITH FIXES` -> re-review `PASS` (`deepseek-v4-pro`, reduced independence). | docs/validation/s1-reach-reachability_EN.md |
++| 2026-09-29 | LEDGER-BACKFILL | **Documentation back-fill slice**: corrected stale wording in the ledger and `DEV_PLAN` (★1 to ★6) and added the fifth OB-53 item; under ① the B3a paragraph was verified present (commit `dd36b9b`) so the back-fill was not repeated. ⑤ `PASS WITH FIXES` -> ⑦ `PASS WITH FIXES` -> re-review `PASS WITH FIXES` (`deepseek-v4-pro`, ADR-016; the re-review is a quota exception, ADR-017, with the 2 Low findings disposed of); also recorded truthfully: the first-round input pack's empty diff was a master error, and the **OB-54 candidate** (`DEV_PLAN.md:139`) goes to the next slice. No code change and zero probes. | docs/validation/ledger-backfill_EN.md |
+ 
+ > **Ledger integrity note (2026-09-21, back-filled under explicit user authorisation)**: this table had no rows appended after A4. **On 2026-09-21 the five rows A5/A6/A7/B2/B3a were back-filled from each slice's own validation report** (under the three constraints: no memory-based entries, verifiable fields only, missing fields left blank and marked as historic gaps, nothing fabricated); the B3b row was written before this back-fill, which is why the five rows follow it.
+-> Still owed: **the B3a paragraph in `DEV_PLAN{,_EN}.md`** (that file carries paragraphs for A0–A7/B1/B2; only B3a and B3b were missing, B3b is now added and B3a is to be back-filled from its report).
++> **Back-filled** (verified by slice `LEDGER-BACKFILL`, 2026-09-29): **the B3a paragraph in `DEV_PLAN{,_EN}.md` was added by commit `dd36b9b`** (`DEV_PLAN.md:137` and `_EN.md:138`); the earlier still-owed wording was corrected by slice `LEDGER-BACKFILL`, and **the back-fill action does not need to be repeated**.
+diff --git a/docs/validation/dr-1-availability-probe-floor.md b/docs/validation/dr-1-availability-probe-floor.md
+index f1f4adc..418bb50 100644
+--- a/docs/validation/dr-1-availability-probe-floor.md
++++ b/docs/validation/dr-1-availability-probe-floor.md
+@@ -72,7 +72,7 @@
+ - `gofmt -l` 空、`go build ./...` 干净、`go vet ./...` exit 0。
+ - 聚焦 `go test -count=1 -run CopilotCLIProbe ./internal/adapters/` ⇒ ok；全量 `go test -count=1 ./...` ⇒ 14 包全 ok、FAIL 0。
+ - `node tools/gates/gate.js --all --scope=tree` ⇒ `TOTAL_FAIL=0`；G4a 编码判据全绿（文件数由该判据自身输出）；G6-5 scanned 2 / refs 4 / 未解析 0；G6-6 scanned 10；G3(a) 四对（指令 `+7/-1`、ADR `+1/-0`、DEV_PLAN `+1/-1`、台账 `+20/-1`）；G1-b 头部与日志同为 v1.14。
+-- **镜像口径（如实）**：`DELIVERY_DIRECTIVE{,_EN}` 为**严格同位镜像**（1309 / 1309，逐行 0 失配）；`ADR_REGISTER{,_EN}` 与 `REMAINING_SLICES{,_EN}` **不做整文件位置镜像**（HEAD 即有 37 / 226 处位置性差异，非本片引入），对其适用 G3(a) 的“改动行数对称”与新增块形状一致（ADR-014 两行为 14 bold / 5 bars 全等；DR-1 定义块逐行形状全等）。
++- **镜像口径（如实）**：`DELIVERY_DIRECTIVE{,_EN}` 为**严格同位镜像**（1309 / 1309，逐行 0 失配）；`ADR_REGISTER{,_EN}` 与 `REMAINING_SLICES{,_EN}` **不做整文件位置镜像**（HEAD 即有 37 / 226 处位置性差异，非本片引入；**口径注记 2026-09-29**：该计数为 **HEAD 口径**，工作区计数会随新增行变化，需以当场重跑为准——2026-09-29 在切片 `LEDGER-BACKFILL` 收尾时实测为 38 / 258），对其适用 G3(a) 的“改动行数对称”与新增块形状一致（ADR-014 两行为 14 bold / 5 bars 全等；DR-1 定义块逐行形状全等）。
+ - **未执行项**：`gate.js --selftest` 本片未跑（未改动任何判据 ⇒ 无触发条件），将在提交前与 CI 执行。
+ 
+ ## 10. ⑧c 收尾清洁记录
+diff --git a/docs/validation/dr-1-availability-probe-floor_EN.md b/docs/validation/dr-1-availability-probe-floor_EN.md
+index f40663c..263303b 100644
+--- a/docs/validation/dr-1-availability-probe-floor_EN.md
++++ b/docs/validation/dr-1-availability-probe-floor_EN.md
+@@ -72,7 +72,7 @@ The value `prfrail ai check` passes to the candidate CLI as `--max-ai-credits` c
+ - `gofmt -l` empty, `go build ./...` clean, `go vet ./...` exit 0.
+ - focused `go test -count=1 -run CopilotCLIProbe ./internal/adapters/` ⇒ ok; full `go test -count=1 ./...` ⇒ 14 packages ok, FAIL 0.
+ - `node tools/gates/gate.js --all --scope=tree` ⇒ `TOTAL_FAIL=0`; G4a encoding criterion green (its own output carries the file count); G6-5 scanned 2 / refs 4 / unresolved 0; G6-6 scanned 10; G3(a) four pairs (directive `+7/-1`, ADR `+1/-0`, DEV_PLAN `+1/-1`, ledger `+20/-1`); G1-b header and log both v1.14.
+-- **Mirror scope (stated as measured)**: `DELIVERY_DIRECTIVE{,_EN}` is a **strict positional mirror** (1309 / 1309, zero per-line mismatches); `ADR_REGISTER{,_EN}` and `REMAINING_SLICES{,_EN}` are **not** whole-file positional mirrors (HEAD already carries 37 / 226 positional differences, not introduced here), so they are held to G3(a)'s "symmetric changed-line counts" plus block-level shape equality (the two ADR-014 rows are 14 bold / 5 bars on both sides; the DR-1 definition block has equal line shapes throughout).
++- **Mirror scope (stated as measured)**: `DELIVERY_DIRECTIVE{,_EN}` is a **strict positional mirror** (1309 / 1309, zero per-line mismatches); `ADR_REGISTER{,_EN}` and `REMAINING_SLICES{,_EN}` are **not** whole-file positional mirrors (HEAD already carries 37 / 226 positional differences, not introduced here; **wording note 2026-09-29**: that count is a **HEAD-basis** figure and the worktree count moves with added lines, so a fresh re-run is authoritative - it measured 38 / 258 at the wrap-up of slice `LEDGER-BACKFILL` on 2026-09-29), so they are held to G3(a)'s "symmetric changed-line counts" plus block-level shape equality (the two ADR-014 rows are 14 bold / 5 bars on both sides; the DR-1 definition block has equal line shapes throughout).
+ - **Not executed**: `gate.js --selftest` did not run in this slice (no criterion was changed ⇒ no trigger), and will run before the commit and in CI.
+ 
+ ## 10. ⑧c wrap-up cleanliness record
+diff --git a/docs/validation/evidence/LEDGER-BACKFILL-freedom-list.md b/docs/validation/evidence/LEDGER-BACKFILL-freedom-list.md
+new file mode 100644
+index 0000000..57acce0
+--- /dev/null
++++ b/docs/validation/evidence/LEDGER-BACKFILL-freedom-list.md
+@@ -0,0 +1,34 @@
++﻿# LEDGER-BACKFILL 执行自由度清单（§1.7.3 固定路径）
++
++> 切片 `LEDGER-BACKFILL` | 日期 2026-09-29 | 清单在 ⑥ 判定后、⑦ 之前落盘，并纳入 ⑦ 的审查输入包。
++> 口径：本清单只记**主控行使执行自由度**所做的实质选择与**用户直接裁定**项；判定依据 = §1.7.3「这个决定如果错了，需要修改的是什么」——错了要改代码或事实 ⇒ 自由度；错了要改契约 / 方向 / 范围 / 预算 / 授权 ⇒ 升级边界。
++
++## 一、执行自由度（F 项）
++
++| 编号 | 选择 | 理由 / 落点 |
++| --- | --- | --- |
++| F-1 | **① 架构不启用** | §5.2 的角色启用矩阵对「简单（文档型）」的 ① 列为 `—`；本片属该形态（纯 `.md`、无代码语义） |
++| F-2 | **⑤ 启用 1 次**（§5.2 该列为「可选」） | 文档型切片可选，但台账措辞更正涉及"事实是否正确"的判断，保留一层预审；额度 1/1 |
++| F-3 | **① 的执行为「核实 + 更正注记」而非「写新段落」** | 实测 B3a 段落在位（`dd36b9b` ⇒ `DEV_PLAN.md:137` / `_EN.md:138`）⇒ 写新段落会产生重复内容；改为更正过期的完整性注记（★3） |
++| F-4 | ★3 **整行改写**而非追加 | 原注记是事实错误（"该段落仍缺"），追加会造成自相矛盾；改写后仍保留"该段落在位"的可核验事实与其提交号 |
++| F-5 | ★4 / ★5 **加注而非改写**计划语句 | 用户第五节第 6 条明令；保留原计划句的史料价值，加注指向已完成的修复与当前口径 |
++| F-6 | ★6 的计数**以当场重跑为准**而非沿用旧数 | 实测台账侧工作区计数在同日内由 243 漂移到 258（新增行所致）⇒ 加注写成"以当场重跑为准 + 时点读数"，避免写会过期的字面量（OB-11 教训） |
++| F-7 | 报告文件名 `docs/validation/ledger-backfill{,_EN}.md`；自由度清单 `docs/validation/evidence/LEDGER-BACKFILL-freedom-list.md` | 与切片工作名一致；清单路径为 §1.7.3 固定路径 |
++
++## 二、用户直接裁定（D 项，非自由度）
++
++| 编号 | 裁定 | 落点 |
++| --- | --- | --- |
++| D-1 | 纳入 ★1 至 ★6；★9 不纳入 | 用户第二节与第三节 |
++| D-2 | ★1 只改现象列、不改末列状态词、不闭合该 OB；起跑消息与报告必须写明它不是普通清理 | 用户第三节第 1 至 4 条；报告 §1 |
++| D-3 | ★7 / ★8 / ★10 延后 | 用户第一节 |
++| D-4 | ⑦ 走 `deepseek-v4-pro`（降级），按 OB-37 元规则以 **ADR-016** 独立留痕 | 用户第五节 |
++| D-5 | 试点顺延第 5 次：继续执行、不作为试点 | 用户第五节（四要素见报告 §5） |
++| D-6 | 探针 0；commit / push 须同轮授权；不推 gitee | 用户第五节 |
++| D-7 | **⑦ 复审额度例外**：⑦ 额度 1/1 用尽后授权第 2 轮复审（ADR-017） | 用户 2026-09-29 裁定；理由 = 首轮 Medium 系**主控输入包错误**，四条处置须独立复核；含四要素与「不得作为先例」 |
++
++## 三、覆盖边界（如实）
++
++- 本清单路径位于 `docs/validation/evidence/**` ⇒ 在 G7 的扫描域之外，**无机械判据保护**，只由 ⑦ 人工复核。
++- 本片**未**行使的自由度：未改任何判据、未改任何 Go 代码 / schema / CONTRACTS / fixtures / workflows、未新增依赖、未触碰 `.github/workflows/**` 与角色文件、未闭合任何 OB。
++- **本片无关但已登记**：⑦ 预审指出的 `docs/DEV_PLAN.md:139`（B3b 段尾仍称 B3a 段落未补入）不在 ★1 至 ★6 枚举内 ⇒ 本片**不处理**（避免扩范围），报告 §3 第 6 项如实记录并登记为 **OB-54 候选**（下一片登台账）。
+diff --git a/docs/validation/ledger-backfill.md b/docs/validation/ledger-backfill.md
+new file mode 100644
+index 0000000..001cbae
+--- /dev/null
++++ b/docs/validation/ledger-backfill.md
+@@ -0,0 +1,147 @@
++﻿# LEDGER-BACKFILL — 台账与文档回填（验证报告）
++
++> 切片 `LEDGER-BACKFILL`（文档回填类，非准则治理） | 分级 `[SLICE]` | 规模 S | 日期 2026-09-29。
++> **状态：已停止——未完成**（⑩ 停点；未完成清单见 §12；commit / push 须同轮授权）。
++
++[English](ledger-backfill_EN.md)
++
++## 1. 变更概要（含执行自由度清单）
++
++- **本片做了什么**：① 核实 B3a 的 `DEV_PLAN{,_EN}` 段落（**结论：已存在，无需回填**）；② OB-53 现象列补登第五项；③ **★1 至 ★6** 六项措辞更正与加注。
++- **★1 的特别声明**：本片对 ★1 的处理是**履行切片 `S1-REACH` 自由度 F-2 预留的用户授权出口**（F-2 原文：「若用户认为应在行内加更正注记，可在同轮授权后单独补齐」；该片按 §1.7.2 从严不改写的判定**未被推翻**）；本片在**用户同轮授权**下只改**现象列**、**不改末列状态词**（保持 `待议`）、**不闭合该 OB**。
++- **本片没做什么**：未改任何 run 号 / 测试名 / 结论行 / 任务状态字段 / OB 首状态词；未闭合任何 OB；未改任何判据；未碰 `internal/`、CONTRACTS、schema、fixtures、workflows、依赖与角色文件。
++- **产物**：本报告、自由度清单、`DELIVERY_DIRECTIVE{,_EN}`（升 v1.16）、`ADR_REGISTER{,_EN}`（ADR-016、ADR-017）、`t027/REMAINING_SLICES{,_EN}` 与 `DEV_PLAN{,_EN}` 的加注、DR-1 报告的 §9 口径加注。
++- **执行自由度清单**：`docs/validation/evidence/LEDGER-BACKFILL-freedom-list.md`（F-1 至 F-7）。
++- **一句话结论**：本片**不改变任何判定**——只把过期表述更正为当前事实；T027 的排期与 `DIRECTIVE-LEDGER-ARCHIVE` 的独立排队按用户裁定不变。
++
++## 2. 逐条落点（★1 至 ★6 与 ①②）
++
++| 项 | 落点（CN 与 `_EN` 同位） | 处置 |
++| --- | --- | --- |
++| ★1 OB-21 现象列更正注记 | `docs/DELIVERY_DIRECTIVE.md` §12.4 的 OB-21 这一行 | 现象列句尾加注；末列状态词与结论不变，**OB 未闭合** |
++| ★2 B4 优先级注记 | `docs/t027/REMAINING_SLICES.md` 的 B4 小节 | 加注：B4 已于 2026-09-23 完成 ⇒ 排序到期；两片为下一批候选 |
++| ★3 完整性注记更正 | 同上文件的台账完整性注记行 | 改写为「已回填（提交 `dd36b9b`）」与「原表述过期」 |
++| ★4 DR-2 至 DR-5 计划措辞 | 同上文件的已知缺陷表四行 | **保留原文**，并在其后加注「（已由 DR-FIX 2026-09-22 修复）」 |
++| ★5 DEV_PLAN 的 T018 缺口清单 | `docs/DEV_PLAN.md` 的 T018 状态行 | 加口径注记（T026 已完成、DR-1 已修复、AT-23 属未通过）；**任务状态字段不变** |
++| ★6 DR-1 报告 §9 计数口径 | `docs/validation/dr-1-availability-probe-floor.md` 的镜像口径段 | 加注「HEAD 口径；工作区计数随新增行变化、以当场重跑为准，本片收尾实测 38 / 258」 |
++| ① B3a 段落 | `docs/DEV_PLAN.md:137` 与 `_EN.md:138` | **核实已存在（提交 `dd36b9b`）⇒ 不重复回填** |
++| ② OB-53 第五项 | `docs/DELIVERY_DIRECTIVE.md` §12.4 的 OB-53 这一行 | 加注：`model: "auto"` 可间接引入黑名单模型 |
++
++## 3. 异常与兜底记录
++
++1. **① 的发现（重要）**：台账完整性注记写「该段落仍缺 B3a 段落」，实测该段落**已由提交 `dd36b9b` 回填**（`DEV_PLAN.md:137`、`_EN.md:138`；经 `git log -S` 溯源，输出见 `tmp/lbf/dd36b9b-trace.txt`，处置 `local-only`）⇒ 本片不写新段落，改为**更正该注记**（★3）。这是「注记本身过期」的实例。
++2. **★1 的授权层**：见 §1 的特别声明；本片据此在报告内明示它**不是普通清理**。
++3. **自查缺陷**：① 首次落盘后 ADR 双语对的改动行数不对称（CN `+2` 与 EN `+1`）⇒ 补 EN 空行后对称；② G2 拦下 ★3 新句中引用的旧措辞（含被禁占位形态）⇒ 改写为「原注记的过期表述」；③ G6-4 未命中本片加注（已避开行数与文件数字面量）。
++4. **主控兜底 = 1**（见 §3 第 3 项①）。
++5. **主控错误（须如实留痕）**：⑦ 首轮送审的 `tmp/lbf/review-input.diff` 是**空文件**——它生成于 `git add` **之后**，`git diff` 因而无输出。这是**主控交错了输入**，**不是 ⑦ 的问题**；已按 `git diff --cached` 重建该输入包（非空）。为复核四条处置，本片消耗 **⑦ 额度 1/1 之外的额度例外**，经用户 2026-09-29 裁定以 **ADR-017** 独立留痕。
++6. **OB-54 候选（本片不处理）**：`docs/DEV_PLAN.md:139` 的 B3b 段尾仍称 B3a 段落未补入（该段落在位的证据见本节第 1 项）⇒ 登记为 **OB-54 候选**，留待**下一片**处理；本片只在「异常与兜底」如实记录，**不落 §12.4**。
++
++## 4. 执行流水线
++
++| 环 | 角色 | 状态 | 产物 |
++| --- | --- | --- | --- |
++| ① 架构 | 未启用 | 按 §5.2「文档型」该列为 — | — |
++| ②b 实现 | 主控 | 已执行 | 词句更正与加注（见 §2） |
++| ③ 测试 | 主控（文档一致性检查） | 已执行 | 门禁与镜像读数 |
++| ④ 主控集成与门禁 | 主控 | 已执行 | 见 §9 |
++| ⑤ 预审 | V4 Pro | 见 §6 | 见 §6 |
++| ⑥ 独立扫描 | 拟跳过 | 见 §6 | 由 ⑦ 确认 |
++| ⑦ 终审与复审 | V4 Pro（降级，ADR-016；复审为额度例外，ADR-017） | 已执行 | 见 §6 |
++| ⑧a 文档初稿 | 主控 | 已执行 | 本报告 |
++| ⑨ 原生验证 | 主控 | 已执行 | 门禁复跑与镜像核验 |
++| ⑧b 文档定稿 | 主控 | 已执行 | 台账回写与收尾行 |
++| ⑧c 收尾清洁 | 主控 | 已执行 | 见 §10 |
++| ⑩ 停点 | 主控 | 已停 | 本报告 |
++
++## 5. 环境与档位
++
++- 平台：Windows 本机；档位 `[SLICE]`（文档型按 §5.2 退化）；主控档位 = 标准。
++- **⑦ 降级（ADR-016）**：`deepseek-v4-pro`（非 §2.2 白名单），用户直接裁定，含四要素与「不得作为先例」；本报告如实标注**独立性降低**，结论交 ⑧c 复核。
++- **⑦ 复审额度例外（ADR-017）**：⑦ 额度 1/1 用尽后，按用户 2026-09-29 裁定追加第 2 轮复审（理由 = 首轮 Medium 系主控输入包错误，须独立复核）；含四要素与「不得作为先例」，报告在 §3 第 5 项与 §9 如实留痕。
++- **试点顺延第 5 次（四要素）**：裁决人 = 用户；日期 = 2026-09-29；理由 = 纯文档回填片、非可试点；依据 = 本轮裁定原文。**不得作为先例**；本片不做试点指标声明。
++- **探针 = 0**（未发起任何真实外部调用）。
++
++## 6. 审查结论摘要（⑤⑥⑦）
++
++- ⑤ 预审（`deepseek-v4-pro`，额度 1/1）：`PRE-REVIEW: PASS WITH FIXES`——2 Medium（EN 指针错位；门禁读数基线不可沿用）与 5 Low（文件名不一致、★1 措辞宜改为「履行 F-2 预留出口」、⑥ 三条件转述漏 `.yml`、`DEV_PLAN.md:139` 观察项、`tmp/` 清单）。指针、措辞、`.yml` 三处已按字面修正；★6 计数改为当场重跑值；门禁基线的处置 = 落盘后重跑（见 §9）。
++- ⑥ 独立扫描：按 §7.2.1 三条件判定——① 改动只落 `.md` 与台账类文件；② 不含 `.go` 与 `.json` 与 `.yml` 与 schema 与 fixtures 与脚本逻辑的语义变更；③ 不涉及状态机、门禁判据、证据模型、角色与授权契约语义 ⇒ **三条同时满足、可跳过**；**已由 ⑦ 确认**（⑦ 判「可跳过」）。
++- ⑦ 终审（`deepseek-v4-pro`，降级，ADR-016，额度 1/1）：`FINAL REVIEW: PASS WITH FIXES`——四项分别为「基本成立 / 通过 / 已如实覆盖 / 通过」；1 Medium（审查输入包中的 diff 为空文件：生成时机在暂存之后）与 3 Low（ADR-016 这一行游离于表格外、处置清单计数不一致、溯源证据未入包）。四条已处置：diff 以 `git diff --cached` 重建、ADR-016 并入表格且双语对称、计数更正为当场重跑值、溯源输出落盘并纳入输入包。
++- **⑦ 复审的额度边界与用户裁定（如实）**：§5.3 要求整改后重跑 ⑦，而本片 ⑦ 额度 **1/1 已用尽** ⇒ 按 §7.5 **停下升级用户裁决**；主控不得自行判定通过。用户 2026-09-29 裁定**授权第 2 轮复审**（额度例外，理由与四要素见 **ADR-017**），该轮结论见本节末条。
++- **⑦ 第 2 轮复审（`deepseek-v4-pro`，额度例外，ADR-017）**：`FINAL REVIEW: PASS WITH FIXES`——四条首轮处置**全部已闭环**（空 diff 已重建为非空且与暂存集逐字节一致；ADR-016 与 ADR-017 均在表格内且新增行同位；计数与当场重跑读数一致；溯源输出已入包）；ADR-017 四要素齐备且标注「不得作为先例」；★1 的特别声明与「未越界」均已核实；门禁与自检读数与 §9 全部吻合。2 条 Low：**F2R-1**（§6 末条与 §12 的前向引用悬空；台账收尾行仍写「复审未执行」）与 **F2R-2**（输入包内处置清单残留中间读数 `+1/-0`）。两条已处置：结论行即本条、§12 已改为自洽表述、台账收尾行已同步、输入包读数已更正为当场读数；按 §5.3 的语义边界，⑧b 的**事实记录类**写入（审查结论、台账回写、读数更正）不触发再次复审——与切片 `S1-REACH` 报告 §10 的同类判定一致。
++
++## 7. 审查输入包摘要（含盲审隔离证明）
++
++- 输入包：`tmp/lbf/review-input.diff`（原始 diff，以 `git diff --cached` 重建）、`tmp/lbf/report-cn.md` 与 `report-en.md`（本报告全文）、`tmp/lbf/gate-tree.txt`（门禁原始输出）、`tmp/lbf/dispositions.md`（★1 至 ★6 与 ①② 的逐条处置，含第 2 轮复核依据节）、`tmp/lbf/dd36b9b-trace.txt`（① 的 `git log -S` 溯源输出）。
++- **第 2 轮复审的标的**：四条处置各自的证据（重建后的 diff 非空、ADR-016 已并入表格且双语对称、计数与当场读数一致、溯源输出已入包）与 **ADR-017** 的四要素；第 2 轮的原始回执另存 `tmp/lbf/review-round2.md`（`local-only`）。
++- **消毒**：交审查方的材料已过滤用户名、主机名、IP、凭据与令牌（指令 §7.3）；本片不涉及凭据枚举。
++- **盲审隔离**：⑦ 首轮**不附** ⑤ 与 ⑥ 的清单；⑥ 拟跳过 ⇒ 无 ⑥ 清单可附。
++- 本片**不触**所有权、停机与身份语义 ⇒ 不触发 §7.7 必抽盲审。
++
++## 8. 可证伪性（机械检查与变异检验）
++
++- 机械检查：见 §9。
++- **变异检验**（每条先施加变异、确认判据变红、再逐字节还原）：① 把 OB-21 末列状态词改成闭集外词 ⇒ `G6-6` 应变红；② 删除 §0.3 的 v1.16 这一行 ⇒ `G1-b` 应变红；③ 在 ADR 侧删除一行 ⇒ `G3(a)` 应变红；④ 在加注里写入行数或文件数类字面量 ⇒ `G6-4` 应变红；⑤ **如实登记**：★1 注记里若删掉「`DR-1 未修` 子项已消除」一句，**无机械判据可抓**（只能由 ⑦ 与人工复核）。
++
++## 9. 门禁结果
++
++- `node tools/gates/gate.js --all --scope=tree` ⇒ `TOTAL_FAIL=0`（`gate-exit=0`，`changed=13`；`G7-a` 至 `G7-d` 全 PASS，`G7-b` 覆盖 76 条工件行）；`--check=G3-a.1 --scope=index` 亦 `TOTAL_FAIL=0`。
++- `G1-b` PASS（`header=v1.16 last=v1.16 2026-09-29/2026-09-29`，`rows=17`）；`G1` 与 `G5` 为 SKIP（未脚本化，如实打印）。
++- `G3(a)` PASS（只列改动行数非零的对）：ADR 对 `+2/-0`、指令对 `+4/-3`、`DEV_PLAN` 对 `+1/-1`、台账对 `+28/-6`、DR-1 报告对 `+1/-1`；本报告对为新增文件且逐行对称。**ADR 对与台账对不做整文件位置镜像**（工作区既有位置性差异，失配数与 HEAD 同值），对其适用改动行数对称。
++- `G4a` PASS（BOM+LF 编码核验全绿，被核文件数由该判据自身输出）；`G4b` PASS（`unknown=[]`）；`G2` 与 `G6-4` 的首轮命中已在本片内清零（改写而非加白名单）；`G5-a` 与 `G5-b`、`R2.5`、`G3(b)`、`G6-1` 至 `G6-6` 全 PASS。
++- 基础门禁：`gofmt -l` 空、`go build ./...` exit 0、`go vet ./...` exit 0、`go test ./...` `ok=14 FAIL=0`。
++- 镜像：指令对与 DR-1 报告对逐行失配 0；本报告对逐行失配 0（CN 与 `_EN` 行数相等）。本报告的改动行数随其落盘版本变化 ⇒ 只记「对称 + 失配 0」，不写自指计数。
++- **⑦ 首轮输入包缺陷（主控错误，如实登记）**：首轮送审的 `tmp/lbf/review-input.diff` 是**空文件**（生成时机在暂存之后）⇒ 这是**主控交错了输入**，**不是 ⑦ 的问题**；已按 `git diff --cached` 重建。本片因此消耗 **⑦ 额度 1/1 之外的例外裁定（ADR-017）**。
++- 读数口径：以上读数在 ⑨ 原生验证时**当场重跑**并以其为准（⑤ 已指出不得沿用旧基线）。
++
++## 10. ⑧c 收尾清洁记录
++
++- 全仓逐文件编码核验（`enc-tree.js`）：违规 **3** 处，**全部**为 OB-27 的冻结证据包豁免项；**本片新增文件 0 违规**。
++- 门禁自检：`SELFTEST: PASS 248/248`；`gate.js --all --scope=tree` ⇒ `TOTAL_FAIL=0`（逐判据读数见 §9）。
++- 临时残留清单：`tmp/lbf/` 保留 19 个过程文件（方案与盘点、断言脚本、原始输出、处置清单、溯源输出、首轮与第 2 轮审查包副本、`git diff` 与门禁读数），按 OB-49 与用户既有指令**不清理**，处置 = `local-only`。
++- 落盘一致性：`docs/validation/ledger-backfill.md` 与 `tmp/lbf/report-cn.md` 的 SHA-256 相等（`_EN` 同理）。
++- 镜像复核：ADR 对的整文件位置性失配与 HEAD 同值（既有差异，非本片引入；本片新增的两行在 CN 与 `_EN` 同位且行数对称）；本报告对逐行失配 0。
++- ⑧c 处置 2 项（⑦ 第 2 轮 Low）：F2R-1 的悬空前向引用与台账收尾行的过时表述已改为自洽的事实记录；F2R-2 的输入包中间读数已更正为当场读数。
++- ⑦ 第 2 轮的原始回执已落盘 `tmp/lbf/review-round2.md`（`local-only`）；按 §5.3 的语义边界，⑧b 的事实记录类写入不触发再次复审（与切片 `S1-REACH` 报告 §10 的同类判定一致）。
++
++## 11. 成本与计量
++
++| 环 | 角色 | 模型 | 次数 | reason / retryOf |
++| --- | --- | --- | --- | --- |
++| ① | 未启用 | 无 | 0 | 文档型切片按 §5.2 不启用 |
++| ⑤ | 预审员 | `deepseek-v4-pro` | 1 | §5.2 该列为可选，本片启用 1 次 |
++| ⑥ | 独立扫描 | 无 | 0 | 按 §7.2.1 可跳过，须 ⑦ 确认 |
++| ⑦ | 独立终审 | `deepseek-v4-pro` | 2 | 首轮终审 + 第 2 轮复审（ADR-016 降级；复审系额度例外，ADR-017） |
++- 探针：**0 次**。
++- 计量真值源：会话调用回执（指令 §7.5 的 R7.1）。
++
++## 12. 明确未执行事项
++
++- commit 与 push（经用户同轮预授权，⑩ 停点后由主控执行，且不推 gitee）；⑥ 独立扫描（拟跳过，由 ⑦ 确认）；★7 至 ★10（按用户裁定延后）；**⑦ 第 2 轮复审**：已按用户 2026-09-29 裁定执行（额度例外，ADR-017），结论与 2 条 Low 的处置见 §6 末条与 §10。
++
++## 13. 下一步建议
++
++- 本片不改变任何判定 ⇒ `OB-21` 仍为 `待议`、AT-23 仍不可达、T018 与 S1 exit 仍阻断。
++- 排期按用户裁定：**T027 只在 Codex 可用时起跑（不降级）**；`DIRECTIVE-LEDGER-ARCHIVE` 触及 `G6-6` 判据作用域 ⇒ 需 Codex，独立排队。
++- 若预算恢复，建议先 T027 装配（`gpt-5.3-codex`），再评估 T028 与候选线。
++- 下一片登记 **OB-54 候选**：`docs/DEV_PLAN.md:139` 的 B3b 段尾措辞；本片只记录、不落 §12.4。
++
++```artifacts
++docs/validation/ledger-backfill.md	repo
++docs/validation/ledger-backfill_EN.md	repo
++docs/validation/evidence/LEDGER-BACKFILL-freedom-list.md	repo
++docs/DELIVERY_DIRECTIVE.md	repo
++docs/DELIVERY_DIRECTIVE_EN.md	repo
++docs/ADR_REGISTER.md	repo
++docs/ADR_REGISTER_EN.md	repo
++docs/t027/REMAINING_SLICES.md	repo
++docs/t027/REMAINING_SLICES_EN.md	repo
++docs/DEV_PLAN.md	repo
++docs/DEV_PLAN_EN.md	repo
++docs/validation/dr-1-availability-probe-floor.md	repo
++docs/validation/dr-1-availability-probe-floor_EN.md	repo
++tmp/lbf/review-input.diff	local-only
++tmp/lbf/gate-tree.txt	local-only
++tmp/lbf/dispositions.md	local-only
++tmp/lbf/dd36b9b-trace.txt	local-only
++tmp/lbf/review-round2.md	local-only
++```
+diff --git a/docs/validation/ledger-backfill_EN.md b/docs/validation/ledger-backfill_EN.md
+new file mode 100644
+index 0000000..b04e7f2
+--- /dev/null
++++ b/docs/validation/ledger-backfill_EN.md
+@@ -0,0 +1,147 @@
++﻿# LEDGER-BACKFILL — ledger and document back-fill (validation report)
++
++> Slice `LEDGER-BACKFILL` (documentation back-fill class, not directive governance) | class `[SLICE]` | size S | date 2026-09-29.
++> **Status: stopped — incomplete** (the ⑩ stop point; the incomplete list is in §12; commit and push need same-turn authorization).
++
++[中文](ledger-backfill.md)
++
++## 1. Change summary (including the execution-freedom list)
++
++- **What this slice did**: ① verified the B3a paragraph in `DEV_PLAN{,_EN}` (**verdict: it already exists, so no back-fill is needed**); ② added a fifth item to the OB-53 evidence cell; ③ applied the six wording corrections and notes **★1 to ★6**.
++- **Special declaration for ★1**: this slice's handling of ★1 **fulfils the user-authorised exit reserved in freedom item F-2 of slice `S1-REACH`** (F-2's own wording: "if the user considers that a correction note should be added inside the row, it can be added separately after a same-turn authorization"; that slice's strict choice under §1.7.2 **is not overturned**); under the **user's same-turn authorization** this slice changes only the **evidence cell**, keeps the **disposition word unchanged** (`待议`) and **does not close that OB**.
++- **What this slice did not do**: no change to any run id, test name, conclusion line, task-status field or OB opening status word; no OB was closed; no criterion changed; `internal/`, CONTRACTS, schema, fixtures, workflows, dependencies and role files were not touched.
++- **Artifacts**: this report, the freedom list, `DELIVERY_DIRECTIVE{,_EN}` (raised to v1.16), `ADR_REGISTER{,_EN}` (ADR-016, ADR-017), notes in `t027/REMAINING_SLICES{,_EN}` and `DEV_PLAN{,_EN}`, and the §9 wording note in the DR-1 report.
++- **Execution-freedom list**: `docs/validation/evidence/LEDGER-BACKFILL-freedom-list.md` (F-1 to F-7).
++- **One-line verdict**: this slice **changes no verdict** - it only corrects stale wording to the current facts; the T027 schedule and the separate queueing of `DIRECTIVE-LEDGER-ARCHIVE` follow the user's rulings unchanged.
++
++## 2. Item-by-item landing points (★1 to ★6 and ①②)
++
++| Item | Landing point (CN and `_EN` in the same position) | Disposition |
++| --- | --- | --- |
++| ★1 OB-21 evidence-cell correction note | the OB-21 row of §12.4 in `docs/DELIVERY_DIRECTIVE.md` | a note appended to the evidence cell; the disposition word and the conclusion are unchanged and **the OB is not closed** |
++| ★2 B4 priority note | the B4 block of `docs/t027/REMAINING_SLICES.md` | note added: B4 completed on 2026-09-23, so the ordering is due; both are next-batch candidates |
++| ★3 integrity-note correction | the ledger integrity note in the same file | rewritten to "back-filled (commit `dd36b9b`)" plus "the earlier wording is out of date" |
++| ★4 DR-2 to DR-5 planning wording | the four rows of the known-defects table in the same file | the **original wording is kept** and a note "(fixed by DR-FIX on 2026-09-22)" is appended after it |
++| ★5 the T018 gap list in DEV_PLAN | the T018 status line of `docs/DEV_PLAN.md` | a wording note added (T026 is complete, DR-1 is fixed, AT-23 is *not passed*); **the task-status fields are unchanged** |
++| ★6 the count basis in DR-1 report §9 | the mirror-scope paragraph of `docs/validation/dr-1-availability-probe-floor.md` | note added: "HEAD basis; the worktree count moves with added lines, so a fresh re-run governs - it measured 38 / 258 at this slice's wrap-up" |
++| ① B3a paragraph | `docs/DEV_PLAN.md:137` and `_EN.md:138` | **verified present (commit `dd36b9b`) ⇒ the back-fill is not repeated** |
++| ② OB-53 fifth item | the OB-53 row of §12.4 in `docs/DELIVERY_DIRECTIVE.md` | note added: `model: "auto"` can reach a blacklisted model indirectly |
++
++## 3. Deviations and fallback record
++
++1. **Finding under ① (important)**: the ledger integrity note said the B3a paragraph was still owed, but that paragraph **had already been added by commit `dd36b9b`** (`DEV_PLAN.md:137`, `_EN.md:138`; traced with `git log -S`, output in `tmp/lbf/dd36b9b-trace.txt`, disposition `local-only`) ⇒ this slice writes no new paragraph and instead **corrects the note** (★3). This is an instance of a note going stale itself.
++2. **Authorization layer for ★1**: see the special declaration in §1; the report therefore states plainly that it is **not an ordinary cleanup**.
++3. **Self-detected defects**: ① after the first write the ADR pair had asymmetric changed-line counts (CN `+2` versus EN `+1`) ⇒ a blank line was added on the EN side; ② `G2` flagged the old wording quoted in the new ★3 sentence (it contained a banned placeholder shape) ⇒ reworded to "the earlier wording is out of date"; ③ `G6-4` did not flag these notes (line-count and file-count literals were avoided).
++4. **Master fallbacks = 1** (see §3 item 3, sub-item ①).
++5. **Master error (recorded truthfully)**: the first-round input pack's `tmp/lbf/review-input.diff` was an **empty file** — it was generated **after** `git add`, so `git diff` produced no output. This is the **master mis-supplying the input**, **not a ⑦ problem**; the pack was regenerated with `git diff --cached` (non-empty). To re-check the four dispositions this slice consumed a **⑦ quota exception beyond the 1/1 budget**, ruled by the user on 2026-09-29 and recorded independently as **ADR-017**.
++6. **OB-54 candidate (not handled here)**: the tail of the B3b paragraph at `docs/DEV_PLAN.md:139` still says the B3a paragraph is outstanding (the evidence that it is present is item 1 above) ⇒ registered as an **OB-54 candidate** for the **next slice**; this slice only records it under "deviations and fallback" and does **not** write it into §12.4.
++
++## 4. Execution pipeline
++
++| Stage | Role | Status | Artifact |
++| --- | --- | --- | --- |
++| ① architecture | not enabled | the §5.2 documentation-form row is marked — | — |
++| ②b implementation | master | executed | the corrections and notes in §2 |
++| ③ tests | master (documentation consistency check) | executed | gate and mirror readings |
++| ④ master integration and gates | master | executed | see §9 |
++| ⑤ pre-review | V4 Pro | see §6 | see §6 |
++| ⑥ independent scan | to be skipped | see §6 | confirmed by ⑦ |
++| ⑦ final review and re-review | V4 Pro (downgrade, ADR-016; the re-review is a quota exception, ADR-017) | executed | see §6 |
++| ⑧a document draft | master | executed | this report |
++| ⑨ native validation | master | executed | gate re-run and mirror verification |
++| ⑧b document finalisation | master | executed | ledger write-back and closeout line |
++| ⑧c wrap-up cleanup | master | executed | see §10 |
++| ⑩ stop point | master | stopped | this report |
++
++## 5. Environment and tier
++
++- Platform: the Windows host; class `[SLICE]` (documentation form, degraded per §5.2); master tier is the standard one.
++- **⑦ downgrade (ADR-016)**: `deepseek-v4-pro` (not on the §2.2 allowlist), a direct user ruling with the four elements and "not usable as a precedent"; this report states plainly that **independence is reduced** and hands the conclusion to ⑧c.
++- **⑦ re-review quota exception (ADR-017)**: after the 1/1 budget was exhausted, the user ruling of 2026-09-29 added a second review round (reason = the first-round Medium was a master input-pack error that needs independent re-checking); it carries the four elements and "not usable as a precedent", and the report records it truthfully in §3 item 5 and §9.
++- **Fifth pilot deferral (four elements)**: ruling party = the user; date = 2026-09-29; reason = a pure documentation back-fill, not pilotable; basis = the ruling text of this turn. **Must not be used as a precedent**; this slice makes no pilot metric statement.
++- **Probes = 0** (no real external call was made).
++
++## 6. Review conclusion summary (⑤⑥⑦)
++
++- ⑤ pre-review (`deepseek-v4-pro`, budget 1/1): `PRE-REVIEW: PASS WITH FIXES` — 2 Medium (EN pointer misdirected; the gate reading baseline could not be carried over) and 5 Low (file-name inconsistency, ★1 wording better framed as "fulfilling F-2's reserved exit", the ⑥ three-condition paraphrase missing `.yml`, the `DEV_PLAN.md:139` observation, the `tmp/` inventory). The pointer, the wording and the `.yml` item were fixed literally, the ★6 count was corrected to the freshly re-measured value, and the gate-baseline item is handled by re-running the gates after landing (see §9).
++- ⑥ independent scan: judged against the three §7.2.1 conditions — ① the change touches only `.md` and ledger-class files; ② it contains no semantics change in `.go`, `.json`, `.yml`, schema, fixtures or script logic; ③ it involves no state-machine, gate-criterion, evidence-model, role or authorization-contract semantics, so **all three hold and it may be skipped**; **⑦ confirmed** it (⑦ ruled it skippable).
++- ⑦ final review (`deepseek-v4-pro`, downgraded, ADR-016, budget 1/1): `FINAL REVIEW: PASS WITH FIXES` — the four areas read "basically holds / passes / truthfully covered / passes"; 1 Medium (the review input pack's diff was an empty file because it was generated after staging) and 3 Low (the ADR-016 row sat outside the table, the disposition list carried an inconsistent count, the trace evidence was missing from the pack). All four were disposed of: the diff was regenerated with `git diff --cached`, ADR-016 is back inside the table in both languages, the count was corrected to the freshly re-measured value, and the trace output was landed and added to the pack.
++- **Budget boundary and user ruling for the ⑦ re-review (stated truthfully)**: §5.3 requires ⑦ to be re-run after remediation, but this slice's ⑦ budget is **exhausted at 1/1** ⇒ per §7.5 the matter **stops for a user ruling**; the master must not declare a pass on its own. The user ruling of 2026-09-29 **authorised the second round** (a quota exception; reason and four elements in **ADR-017**).
++- **⑦ round-two re-review (`deepseek-v4-pro`, a quota exception, ADR-017)**: `FINAL REVIEW: PASS WITH FIXES` - **all four first-round dispositions are closed** (the empty diff was rebuilt non-empty and is byte-identical to the staged set; ADR-016 and ADR-017 both sit inside the table with the added rows in the same position; the counts match the fresh readings; the trace output is in the pack); ADR-017 carries the four elements and the "not a precedent" mark; the ★1 special declaration and "no boundary crossed" were confirmed item by item; and the gate and self-test readings all match §9. Two Low findings: **F2R-1** (the forward reference at the end of §6 and in §12 dangled, and the ledger closeout line still said the re-review was not run) and **F2R-2** (the in-pack disposition list kept an intermediate `+1/-0` reading). Both are disposed of: the verdict line is this bullet, §12 is now self-contained, the ledger closeout line is synchronised and the in-pack reading is corrected to the fresh one; under the semantic boundary of §5.3 the **fact-record** writes of ⑧b (review verdicts, ledger write-back, reading corrections) do not trigger a further re-review - matching the same ruling in §10 of the `S1-REACH` report.
++
++## 7. Review input-pack summary (including blind-isolation proof)
++
++- Input pack: `tmp/lbf/review-input.diff` (the raw diff, regenerated with `git diff --cached`), `tmp/lbf/report-cn.md` and `report-en.md` (this report in full), `tmp/lbf/gate-tree.txt` (the raw gate output), `tmp/lbf/dispositions.md` (the item-by-item dispositions for ★1 to ★6 and ①②, including the round-two basis section) and `tmp/lbf/dd36b9b-trace.txt` (the `git log -S` trace for ①).
++- **Round-two review target**: the evidence behind each of the four dispositions (the regenerated diff is non-empty, ADR-016 is back inside the table in both languages, the count matches the fresh reading, the trace output is in the pack) plus the four elements of **ADR-017**; the raw round-two receipt is kept at `tmp/lbf/review-round2.md` (`local-only`).
++- **Sanitisation**: everything handed to the reviewers was filtered for user names, host names, IPs, credentials and tokens (directive §7.3); this slice involves no credential enumeration.
++- **Blind isolation**: ⑦'s first round gets **no** ⑤ or ⑥ list; ⑥ is to be skipped, so there is no ⑥ list to attach.
++- This slice **touches no** ownership, shutdown or identity semantics, so the §7.7 mandatory blind review is not triggered.
++
++## 8. Falsifiability (mechanical checks and mutation tests)
++
++- Mechanical checks: see §9.
++- **Mutation tests** (each mutation is applied, the criterion is confirmed red, then the bytes are restored): ① change the OB-21 disposition word to one outside the closed set so `G6-6` should go red; ② delete the v1.16 §0.3 row so `G1-b` should go red; ③ delete one line on the ADR side so `G3(a)` should go red; ④ insert a line-count or file-count literal into a note so `G6-4` should go red; ⑤ **stated truthfully**: if the sentence "the `DR-1 not fixed` sub-item is removed" were deleted from the ★1 note, **no mechanical criterion would catch it** (only ⑦ and human review would).
++
++## 9. Gate results
++
++- `node tools/gates/gate.js --all --scope=tree` ⇒ `TOTAL_FAIL=0` (`gate-exit=0`, `changed=13`; `G7-a` to `G7-d` all PASS and `G7-b` covers 76 artifact rows); `--check=G3-a.1 --scope=index` is also `TOTAL_FAIL=0`.
++- `G1-b` PASS (`header=v1.16 last=v1.16 2026-09-29/2026-09-29`, `rows=17`); `G1` and `G5` print SKIP (not scripted, stated as such).
++- `G3(a)` PASS (only pairs with a non-zero changed-line count are listed): the ADR pair `+2/-0`, the directive pair `+4/-3`, the `DEV_PLAN` pair `+1/-1`, the ledger pair `+28/-6` and the DR-1 report pair `+1/-1`; this report's pair is a new file and line-symmetric. **The ADR pair and the ledger pair are not whole-file positional mirrors** (the worktree carries pre-existing positional differences whose count equals HEAD's), so changed-line symmetry applies to them.
++- `G4a` PASS (13 files BOM+LF); `G4b` PASS (`unknown=[]`); this slice's first-round `G2` and `G6-4` hits were cleared by rewording, not by extending any whitelist; `G5-a`, `G5-b`, `R2.5`, `G3(b)` and `G6-1` to `G6-6` all PASS.
++- Base gates: `gofmt -l` empty, `go build ./...` exit 0, `go vet ./...` exit 0, `go test ./...` `ok=14 FAIL=0`.
++- Mirrors: the directive pair and the DR-1 report pair have zero per-line mismatches; this report's pair has zero per-line mismatches (CN and `_EN` have equal line counts). This report's changed-line count moves with the version that lands ⇒ only "symmetric + zero mismatches" is recorded, never a self-referential count.
++- **First-round input-pack defect (a master error, recorded truthfully)**: the diff sent for the first round, `tmp/lbf/review-input.diff`, was an **empty file** (generated after staging) ⇒ this is the **master mis-supplying the input**, **not a ⑦ problem**; it was regenerated with `git diff --cached`. This slice therefore consumed a **⑦ quota exception beyond the 1/1 budget (ADR-017)**.
++- Reading basis: the readings above were **re-run on the spot** during the ⑨ native validation and those govern (⑤ already ruled that an old baseline must not be carried over).
++
++## 10. ⑧c wrap-up cleanup record
++
++- Whole-repository per-file encoding check (`enc-tree.js`): **3** violations, **all** of them OB-27 frozen-evidence-pack exemptions; **this slice's new files have zero violations**.
++- Gate self-test: `SELFTEST: PASS 248/248`; `gate.js --all --scope=tree` ⇒ `TOTAL_FAIL=0` (per-criterion readings in §9).
++- Temporary-residue inventory: `tmp/lbf/` retains 19 process files (plans and inventory, assertion scripts, raw outputs, the disposition list, the trace output, the first-round and round-two review-pack copies, and the `git diff` and gate readings), **not cleaned** per OB-49 and the standing user instruction, with disposition `local-only`.
++- Landing consistency: `docs/validation/ledger-backfill.md` and `tmp/lbf/report-cn.md` have equal SHA-256 digests (the same holds for `_EN`).
++- Mirror re-check: the ADR pair's whole-file positional mismatch count equals HEAD's (a pre-existing difference, not introduced here; the two rows this slice added sit in the same position in CN and `_EN` with symmetric counts); this report's pair has zero per-line mismatches.
++- ⑧c disposed of 2 items (the ⑦ round-two Low findings): F2R-1's dangling forward reference and the stale ledger closeout line are now self-contained fact records, and F2R-2's in-pack intermediate reading is corrected to the fresh one.
++- The raw round-two receipt is landed at `tmp/lbf/review-round2.md` (`local-only`); under the semantic boundary of §5.3 the fact-record writes of ⑧b do not trigger a further re-review (matching the same ruling in §10 of the `S1-REACH` report).
++
++## 11. Cost and metering
++
++| Stage | Role | Model | Calls | reason / retryOf |
++| --- | --- | --- | --- | --- |
++| ① | not enabled | none | 0 | the §5.2 documentation-form row does not enable it |
++| ⑤ | pre-reviewer | `deepseek-v4-pro` | 1 | the §5.2 row marks it optional; this slice runs it once |
++| ⑥ | independent scan | none | 0 | skippable per §7.2.1, pending ⑦ confirmation |
++| ⑦ | final reviewer | `deepseek-v4-pro` | 2 | the first final review plus the round-two re-review (ADR-016 downgrade; the re-review is a quota exception, ADR-017) |
++- Probes: **0**.
++- Truth source for metering: the session call receipts (directive §7.5 hard rule R7.1).
++
++## 12. Explicitly not executed
++
++- commit and push (pre-authorised by the user in this turn; the master executes them at the ⑩ stop point, and gitee is never pushed to); the ⑥ independent scan (to be skipped, confirmed by ⑦); items ★7 to ★10 (deferred per the user's ruling); **the ⑦ round-two re-review** ran per the user ruling of 2026-09-29 (a quota exception, ADR-017), and its verdict plus the disposition of the two Low findings are in the closing bullet of §6 and in §10.
++
++## 13. Next-step recommendations
++
++- This slice changes no verdict ⇒ `OB-21` stays `待议`, AT-23 stays unreachable and T018 and S1 exit stay blocked.
++- Scheduling follows the user's rulings: **T027 starts only when Codex is available (no downgrade)**; `DIRECTIVE-LEDGER-ARCHIVE` touches the `G6-6` criterion scope, so it needs Codex and queues separately.
++- If the budget recovers, start with the T027 assembly (`gpt-5.3-codex`) and then assess T028 and the candidate line.
++- The next slice registers the **OB-54 candidate**: the tail wording of the B3b paragraph at `docs/DEV_PLAN.md:139`; this slice only records it and does not write it into §12.4.
++
++```artifacts
++docs/validation/ledger-backfill.md	repo
++docs/validation/ledger-backfill_EN.md	repo
++docs/validation/evidence/LEDGER-BACKFILL-freedom-list.md	repo
++docs/DELIVERY_DIRECTIVE.md	repo
++docs/DELIVERY_DIRECTIVE_EN.md	repo
++docs/ADR_REGISTER.md	repo
++docs/ADR_REGISTER_EN.md	repo
++docs/t027/REMAINING_SLICES.md	repo
++docs/t027/REMAINING_SLICES_EN.md	repo
++docs/DEV_PLAN.md	repo
++docs/DEV_PLAN_EN.md	repo
++docs/validation/dr-1-availability-probe-floor.md	repo
++docs/validation/dr-1-availability-probe-floor_EN.md	repo
++tmp/lbf/review-input.diff	local-only
++tmp/lbf/gate-tree.txt	local-only
++tmp/lbf/dispositions.md	local-only
++tmp/lbf/dd36b9b-trace.txt	local-only
++tmp/lbf/review-round2.md	local-only
++```

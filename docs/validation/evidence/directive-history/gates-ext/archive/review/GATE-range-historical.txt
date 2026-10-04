@@ -1,0 +1,50 @@
+### A1 defect, real historical range (expect G6-2 FAIL)
+$ node tools/gates/gate.js --check=G6 --scope=range:b738e6b^..b738e6b
+GATE REPORT scope=range:b738e6b^..b738e6b repo=D:\LZProjects\prfrail changed=2 check=G6
+PASS  G6-1 status tense :: no pending/completion conflict on added lines (scanned 10) whitelist-source=endpoint:b738e6b
+FAIL  G6-2 cost clause :: docs/DELIVERY_DIRECTIVE.md:927 total=3+⑥×1+⑦×2 vs line 47 ⑥×1+⑦×1 (key SW-5) whitelist-source=endpoint:b738e6b
+PASS  G6-3 run-id format :: no malformed run id on added lines (scanned 10) whitelist-source=endpoint:b738e6b
+PASS  G6-4 expiring literal :: no expiring literal on added lines (scanned 10) whitelist-source=endpoint:b738e6b
+TOTAL_FAIL=1
+[exit 1]
+
+### the fixed side (expect green)
+$ node tools/gates/gate.js --all --scope=range:9f68a52^..9f68a52
+GATE REPORT scope=range:9f68a52^..9f68a52 repo=D:\LZProjects\prfrail changed=5
+PASS  G1-a table structure :: no `||` on added rows
+PASS  G1-b version metadata :: docs/DELIVERY_DIRECTIVE.md header=v1.9 last=v1.9 2026-09-22/2026-09-22 rows=10 OK | docs/DELIVERY_DIRECTIVE_EN.md header=v1.9 last=v1.9 2026-09-22/2026-09-22 rows=10 OK
+SKIP  G1 section-title/status-table/completion-record consistency :: not scripted in slice GATES-EXT: judging three human-authored places against each other; see DELIVERY_DIRECTIVE 6.3 G1
+PASS  G2 placeholder residue :: none  [INFO pre-existing: docs/t027/REMAINING_SLICES.md:532]
+PASS  G3(a) symmetry + mirror parity :: docs/DELIVERY_DIRECTIVE.md +2/-1 vs _EN +2/-1 OK || docs/t027/REMAINING_SLICES.md +20/-4 vs _EN +20/-4 OK ;; docs/DELIVERY_DIRECTIVE.md {"lines":true,"head":true,"bold":true,"bars":true,"blank":true} ;; docs/t027/REMAINING_SLICES.md {"lines":false,"head":false,"bold":false,"bars":false,"blank":false}
+PASS  G3(b) key-field alignment :: hash 0/0 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK | hash 11/11 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK
+PASS  G4a BOM+LF :: 5 file(s) OK
+PASS  G4b CJK diff minus whitelist :: newCjk=410 unknown=[] (whitelist=20 whitelist-source=endpoint:9f68a52)
+PASS  G5-a(1) no model key in prfrail-* :: 0 hits
+PASS  G5-a(2) no empty model :: 0 hits / 14 files
+PASS  G5-b blacklist model value :: checked 0 file(s)
+SKIP  G5 change-set contract (staged vs declared vs evidence refs) :: not scripted in slice GATES-EXT: requires a structured JSON input produced outside the repository; see DELIVERY_DIRECTIVE 6.3 G5
+PASS  R2.5 header-note position :: distinct=1 uniform 14/14
+PASS  G6-1 status tense :: no pending/completion conflict on added lines (scanned 44) whitelist-source=endpoint:9f68a52
+PASS  G6-2 cost clause :: 1 realized clause line(s) consistent with their same-key occurrences (scanned 44) whitelist-source=endpoint:9f68a52
+PASS  G6-3 run-id format :: no malformed run id on added lines (scanned 44) whitelist-source=endpoint:9f68a52
+PASS  G6-4 expiring literal :: no expiring literal on added lines (scanned 44) whitelist-source=endpoint:9f68a52
+INFO  G7-a artifacts block present :: no changed report in scope
+INFO  G7-b artifact path/disposition resolvable :: no changed report in scope
+INFO  G7-c finding row disposition cell :: no changed report in scope
+INFO  G7-d stopped state marked incomplete :: no changed report in scope
+PASS  base gofmt -l . :: empty
+PASS  base go build ./... :: exit 0
+PASS  base go vet ./... :: exit 0
+PASS  base go test ./... :: ok=14 FAIL=0
+TOTAL_FAIL=0
+[exit 0]
+
+### C1 defect, real historical range (expect G7-a FAIL)
+$ node tools/gates/gate.js --check=G7 --scope=range:1b01115^..1b01115
+GATE REPORT scope=range:1b01115^..1b01115 repo=D:\LZProjects\prfrail changed=3 check=G7
+FAIL  G7-a artifacts block present :: docs/validation/dr-fix-enforcement-proxy.md missing ```artifacts block | docs/validation/dr-fix-enforcement-proxy_EN.md missing ```artifacts block
+PASS  G7-b artifact path/disposition resolvable :: 0 artifact row(s) OK (repo check: git cat-file -e <endpoint>:<path>)
+PASS  G7-c finding row disposition cell :: 0 changed finding row(s) with disposition
+PASS  G7-d stopped state marked incomplete :: no stopped-state row missing the incomplete mark
+TOTAL_FAIL=1
+[exit 1]

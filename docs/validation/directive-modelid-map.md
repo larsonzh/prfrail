@@ -129,4 +129,4 @@ docs/validation/evidence/DIRECTIVE-MODELID-MAP-mutation.md	repo
 docs/validation/evidence/DIRECTIVE-MODELID-MAP-review-r1.md	repo
 ```
 
-（收尾处理：`tmp/dml/` 的一次性脚本与中间读数已按 §1.5 清除，上表原先逐行列出的 `local-only` 行随之消失；其中 `review-r1.md` 与 `mutation.md` 两份证据已移入 `docs/validation/evidence/` 并计入 `repo` 行。）
+（收尾处理：`tmp/dml/` 的一次性脚本与中间读数已按 §1.5 清除，上表原先逐行列出的 `local-only` 行随之消失；其中 `review-r1.md` 与 `mutation.md` 两份证据已计入 `repo` 行——`review-r1.md` 为归档副本、`mutation.md` 为**重建归档**（原件乱码不可逆，重建依据见其注记）。）

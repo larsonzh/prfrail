@@ -1,0 +1,52 @@
+# T027-ASSEMBLY-MIN · ⑦ 第 2 次 = 终审 审查包（2026-10-03）
+
+- **切片**：`T027-ASSEMBLY-MIN`，A 段（最小可跑装配；**范围严格限定「拒绝路径」**，不做真实 enforcement 落地）。
+- **轮次**：⑦ 第 2 次 = **终审**（⑦ 额度 2/3）。第 1 次为**盲审**（不附 ⑤/⑥ 清单），本轮**不是盲审**——⑤/⑥ 清单与本轮整改 diff 全部附上。
+- **模型分工**：①/⑤ = `DeepSeek V4 Pro`；⑥ = `MAI-Code-1.1-Flash`；⑦ = `GPT-5.3-Codex`（**不降级**）；②b = `DeepSeek V4.1 Flash`。
+- **红线**：本轮若报 Medium+ ⇒ 整改后可用 ⑦ 第 3 次 = 复审（最后一次）；**复审仍 Medium+ ⇒ 停下升级，不自行开第 4 轮**。若你明确判定「F-02 的 console 兜底不足以关闭硬门」⇒ **尊重你的结论，主控停下升级**。
+
+## 一、必须读的证据（只读；不得改动任何文件）
+
+| 用途 | 路径 |
+|---|---|
+| 方案书 + ⑤/⑥ 处置记录 + **已知差异** + 候选 OB | `tmp/assembly-min/DESIGN.md`（重点：§13、整改记录 r2、整改记录 r3） |
+| 全切片 diff（11 文件） | `tmp/assembly-min/change-set.diff` |
+| **仅本轮整改 diff**（4 文件，由 r3 前版本重建） | `tmp/assembly-min/r3-remediation.diff` |
+| 变异审计 M1–M17 | `tmp/assembly-min/mutation.txt` |
+| ⑤ 第 1/2 轮清单 | `tmp/assembly-min/pre-review-r1.md`、`tmp/assembly-min/pre-review-r2.md` |
+| 门禁与测试读数 | `tmp/assembly-min/gate-tree.txt`、`gate-index.txt`、`selftest.txt`、`r3-final-test.txt` |
+| 冻结契约摘录 | `tmp/assembly-min/contracts-excerpt.txt` |
+| 生产代码（受审对象） | `internal/adapters/agent_runner_postflight.go`、`internal/console/runtime_agent.go`、`internal/console/runtime_noop.go`、`internal/console/cli.go`、`internal/console/runtime.go` + 两个新测试文件 |
+
+## 二、⑤/⑥ 履历（供你判断「是否真关闭」）
+
+- **⑤ 第 1 轮**：F1（Medium，安全关键）artifacts 未绑定冻结事实、F2（Medium）、F3/F4/F5/F6/F7（Low）⇒ 全部在片内整改（M8–M11 变异覆盖）。
+- **⑤ 第 2 轮**：无 Medium+；F2/F5 部分关闭、F6 未闭合、N1（Low，console 侧 publish 腿 fail-open）、N2/N3。
+- **⑤ 第 3 轮**（**ADR-018 额度例外**，输入收窄）：无 Medium+；N2r（§5 行 1 哨兵名不同步）与 N1m（console 腿无变异条目）在本片处置（措辞修正 + 新增变异）。
+- **⑥ 独立扫描**（`MAI-Code-1.1-Flash`，盲扫，1/3 调用）：`INDEPENDENT SCAN: PASS`，**0 findings**。（⑥ 报告当时未落盘为文件，此处如实声明。）
+- **⑦ 第 1 次 = 盲审（上一轮）**：`F-01 High`（停机复核只要求「至少一份 pid 报告」，不可解析/不可观测被静默跳过 ⇒ 部分伪造可判 passed/stopped）、`F-02 Medium（硬门）`（spawn 成功后 identity 记录失败直接返回，engine 步骤失败路径不停机 ⇒ 可能遗留存活进程）、`F-03 Low`（`:99` 注释与实现不符）。
+
+## 三、本轮（r3）整改内容（用户 2026-10-03 裁定「选 (B)，但边界收紧」，两项子裁定均选 (i)）
+
+1. **F-01①**：两侧同口径改为「**两份 pid 报告都必须存在**」，任一缺失 ⇒ 不通过（adapters 腿 5 ⇒ `uncertain`；console `managedProcessesGone` ⇒ 阻断，复用既有 `adapters.ErrInvalidAgentRunnerEvidence`，**零新哨兵**）。两侧 detail 文本为**同一字面常量**（`agent_runner_postflight.go:58` / `runtime_agent.go:598`），判定顺序一致（missing 先、alive 后）。
+2. **F-01③**：条目不可解析 ⇒ fail-closed（两侧）；存活性答案失败（`ProcessAlive`/`aliveFn` 报错）⇒ fail-closed（两侧）。
+3. **F-01③ 的已知偏差（用户要求逐字记录，见 DESIGN §「r3 已知差异」）**：`InspectProcess` 报错**保留**运行侧既有读法（视为已消失）——字面口径在双平台被反例证伪（Windows `ERROR_INVALID_PARAMETER`、Linux `ENOENT`，已正常退出的 pid 即如此），按字面口径会让**每一次已完成运行**不可验证。
+4. **F-01②**：**不做**（触 §8 冻结事实/契约域），登记候选 **OB-58**。
+5. **F-02**：console 层 best-effort 兜底停机（`agentRunnerMitigateAbandonedLaunch`，用导出 `store.LaunchReceipt` + `launcher.StopAgentRunnerProcess`）；失败语义 = **unproven**（回执缺失/不可读/stop 报错/未证明 stopped 四条路径显式报告），**原始错误始终在链上**；注释写明是**缓解非根因修复**；根因登记候选 **OB-57**（`agent_runner_replay_dispatcher.go`，本片禁改）。
+6. **OB-59 候选（F-01① 的生产后果）**：`tools/agent-stub` / 真实 CLI 只 spawn 子进程时写子报告 ⇒ CLI 契约缺口；**在 OB-59 修复前，生产正向链（Linux/真实候选）会因缺子报告而 `uncertain`**；测试夹具补种只证「落点」，不证生产侧有产出者。
+7. **F-03**：注释按实现改正（marker 在 Step 2 早建）。
+
+## 四、请你审的问题（逐条给结论 + 文件:行证据）
+
+1. **F-01 是否真关闭**：两侧判据是否**确实同口径**（缺失集合、判定顺序、detail 文本、哨兵复用）？有无**新的假阴性/假阳性**窗口（例如空子报告、重复 pid、超长行、CRLF 行、负数、权限不可读 vs 不存在）？`readAgentRunnerEvidencePIDs` 用 `Sscanf` 而 adapters 用 `Atoi`——**这是否构成口径漂移**（例如 `12abc`、`+7`、` 7 `、`0x10`、溢出）？请给出可判定的结论。
+2. **F-02 是否足以关闭硬门**：console 兜底是否覆盖「engine 在 spawn 后才失败」的全部路径？若 `engine.Run` 返回错误**但不是**首个非 awaiting 分支（即已经进入 awaiting 后再次失败）会怎样？兜底失败语义 unproven 是否**足以**让运维不误判为已停机？**明确回答：这算关闭硬门，还是只算缓解？**
+3. **新引入风险**：r3 是否引入新的协议/契约/哨兵/副作用？两侧常量手工同步（同一字面文本写两处）是否是**新的漂移风险**（是否应改为共享导出符号）？若你认为应共享符号，请说明是否触 §8（跨包契约）。
+4. **变异审计可信度**：`mutation.txt` 中 16 条 RED + M9/M11 标 SUPERSEDED，是否成立？`all_restored_byte_identical=true` 是否足以证明「无残留」？（主控已如实记录一次 EBUSY 残留事件与其复原过程，见 DESIGN r3 节——请判断该复原是否可信。）
+5. **门槛外的观察**：任何你认为不属于本片范围但必须登记的事实（另立切片/OB 候选）。
+
+## 五、严重度口径与输出格式
+
+- **High** = 正确性/安全/证据完整性被破坏；**Medium** = 硬门未闭（须整改或停下升级）；**Low** = 措辞/覆盖/可维护性；**Observation** = 范围外但应登记。
+- 第一行必须为下列之一：`FINAL REVIEW: PASS` / `FINAL REVIEW: PASS WITH FIXES` / `FINAL REVIEW: FINDINGS` / `FINAL REVIEW: PARTIAL`。
+- 之后：逐条 finding（`严重度 | 文件:行 | 结论：已关闭/部分关闭/未关闭/新增 | 证据 | 建议`），最后给出「是否建议消耗 ⑦ 第 3 次」的明确意见。
+- **只读**：不得修改仓库任何文件（包括 tmp/）。

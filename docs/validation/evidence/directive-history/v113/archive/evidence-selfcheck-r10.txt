@@ -1,0 +1,5 @@
+[docs/validation/evidence/b1-20260917] no SHA256SUMS.txt -> NOT SELF-CHECKABLE
+[docs/validation/evidence/b2-2026-09-17] entries=41 missing=0 mismatch=0 -> PASS
+[docs/validation/evidence/b3a-2026-09-20] entries=128 missing=0 mismatch=0 -> PASS
+[docs/validation/evidence/b3b-2026-09-21] entries=2158 missing=0 mismatch=0 -> PASS
+[evidence-selfcheck] packs=4 entries=2327 missing=0 mismatch=0 not-self-checkable=1

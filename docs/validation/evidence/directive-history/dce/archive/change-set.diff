@@ -1,0 +1,514 @@
+diff --git a/docs/ADR_REGISTER.md b/docs/ADR_REGISTER.md
+index fa5a8bc..581392b 100644
+--- a/docs/ADR_REGISTER.md
++++ b/docs/ADR_REGISTER.md
+@@ -27,6 +27,7 @@
+ | ADR-017 | **切片 `LEDGER-BACKFILL` 的 ⑦ 复审额度例外（用户直接裁定）**：⑦ 额度 1/1 用尽后，追加第 2 轮复审 | 理由：⑦ 首轮报 Medium（审查输入包的 diff 为空文件，属**主控**错误），四条处置需独立复核；未采纳的替代：按 §7.5 停下、以「`PASS WITH FIXES` + 四条已处置」直接结片（用户认为主控交错了输入包，须经独立复核）。本片 ⑦ 为 `deepseek-v4-pro`，成本可控。登记依据 = 用户 2026-09-29 的裁定原文，按 §12.4 的 OB-37 元规则以 **ADR** 形式独立留痕 | **已裁（用户直接裁定，仅本片有效，不得作为先例）**。四要素：裁决人 = 用户；日期 = 2026-09-29；理由 = ⑦ 首轮 Medium 系主控输入包错误、需独立复核，且本片 ⑦ 成本可控；依据 = 用户同轮裁定原文。**性质标注**：含规则语义变更、超出 §7.5 字面标准、系用户直接裁定。**后续义务**：报告须如实登记「首轮输入包 diff 为空文件系主控错误」与「本片消耗 ⑦ 额度例外」并交 ⑧c 复核；本例外**不推广** |
+ | ADR-018 | **切片 `T027-ASSEMBLY-MIN` 的 ⑤ 第 3 轮额度例外（用户直接裁定）**：⑤ 额度 2/2 用尽后，追加第 3 轮**收窄**范围的复审 | 理由：N1 属**行为修正**（console 的 Publish 腿改为 fail-closed，语义与 postflight 腿 5 对齐），按 §5.3「修复后必须重新执行该环节本身」⇒ ⑤ 必须重跑；未采纳的替代：不开第 3 轮、交由 ⑦ 代为确认（用户认为行为修正须由同环复核）。第 3 轮**收窄输入范围**（仅本轮整改 diff + 前两轮 ⑤ 报告 + 契约原句 + 只读约束），不重审全文。依据 = 用户 2026-10-03 的裁定原文，按 §12.4 的 OB-37 元规则以 **ADR** 形式独立留痕 | **已裁（用户直接裁定，仅本片有效，不得作为先例）**。四要素：裁决人 = 用户；日期 = 2026-10-03；理由 = N1 是行为修正、§5.3 义务重跑；依据 = 用户同轮裁定原文。**性质标注**：含规则语义变更、超出 §7.5 字面标准、系用户直接裁定。**红线**：第 3 轮仍报 Medium+ ⇒ 停下升级，**不自行开第 4 轮**。**后续义务**：报告须如实登记本次额度例外并交 ⑧c 复核；本例外**不推广** |
+ | ADR-019 | **切片 `DIRECTIVE-MODEL-LISTS` 的白名单扩列（用户直接裁定）**：§2.2 新增 `gpt-6.1-sol`（深度档）与 `gpt-6-luna`（平行备选）两行，§2.4 黑名单改为全称 `kimi-k3` | 理由：现役 §2.2 只列七个角色载体、§2.4 按族名禁用 Luna 族 ⇒ 扩列超出两处字面标准；未采纳的替代：先立项单独试点再扩列（周期不可承受）。登记依据 = 用户 2026-10-03 的裁定原文，按 §12.4 的 OB-37 元规则以 **ADR** 形式独立留痕（该元规则允许 OB 或 ADR） | **已裁（用户直接裁定，仅本片有效，不得作为先例）**。四要素：裁决人 = 用户；日期 = 2026-10-03；理由 = 决定本片是否将 `gpt-6-luna` 纳入 §2.2 白名单（扩列超出 §2.2 与 §2.4 两处字面标准）；依据 = 用户同轮裁定原文。**性质标注**：含规则语义变更、超出 §2.2 与 §2.4 两处字面标准、系用户直接裁定。**L1 至 L5 测试结论（实测，按预声明判定规则落 Luna 行）**：L1 首轮以 `gpt-6-luna`（`modelId` 形式）调用**被工具拒绝**并回传可用清单（其中 Luna 条目显示为 `GPT-6 Luna (copilot)`）；以该显示名串重试后 L1 至 L5 全绿——L1 返回 `PROBE-L1: OK`；L2 读到 `tmp/assembly-min/DESIGN.md` 首行与 71914 字节；L3 改写 `tmp/dml/luna-probe/target.txt` 第三行成功；L4 该文件 43 字节、无 BOM、LF；L5 `go version` = `go1.27.0 windows/amd64`；各层读数由主控独立复核一致；另测 `GPT-6.1 Sol (copilot)` 返回 `PROBE-SOL: OK`。**限制**：`runSubagent` 不返回实际服务模型 ⇒ 只证链路可用性，**模型身份未证（§2.3）**；自报值为 `GitHub Copilot`，不作证据；`modelId` 形式被拒一事已登记为 OB-67。**后续义务**：报告须如实标注「模型身份未证（§2.3）」并交 ⑧c 复核；本例外**不推广** |
++| ADR-020 | **切片 `DIRECTIVE-CLEANUP-EVAL` 的 ⑦ 终审模型降级（用户直接裁定）**：本片 ⑦ 由 `deepseek-v4-pro` 承担，**不是** §2.2 白名单的 `gpt-5.3-codex` | 理由：本片为纯文档 + 只读实测切片（不触 §7.2.1 ③）且 Copilot 预算受限；该片 ④ 已实测 `gpt-5.3-codex` 等 `modelId` 形式被工具拒绝（见 OB-70），显示名串口径的稳定性待评估；未采纳的替代：保留 `gpt-5.3-codex`（预算不可承受）。登记依据 = 用户 2026-10-03 的切片定义原文，按 §12.4 的 OB-37 元规则以 **ADR** 形式独立留痕 | **已裁（用户直接裁定，仅本片有效，不得作为先例）**。四要素：裁决人 = 用户；日期 = 2026-10-03；理由 = 纯文档与只读实测切片、不触 §7.2.1 ③、Copilot 预算受限；依据 = 用户同轮裁定原文。**性质标注**：含规则语义变更、超出 §2.2 字面标准、系用户直接裁定。**后续义务**：报告须如实标注「本片 ⑦ 由非白名单模型承担，独立性降低」并交 ⑧c 复核；本例外**不推广** |
+ 
+ ## 1. 发布与依赖决策提案
+ 
+diff --git a/docs/ADR_REGISTER_EN.md b/docs/ADR_REGISTER_EN.md
+index a772126..9996112 100644
+--- a/docs/ADR_REGISTER_EN.md
++++ b/docs/ADR_REGISTER_EN.md
+@@ -28,6 +28,7 @@ Date: 2026-09-06. Distinguish RFC-decided, proposed and experimental decisions.
+ | ADR-017 | **⑦ re-review quota exception for slice `LEDGER-BACKFILL` (direct user ruling)**: after the 1/1 budget was exhausted, a second review round was added | Reason: ⑦'s first round reported a Medium (the review input pack's diff was an empty file, a **master** error), so the four dispositions need independent re-checking; alternative not taken: stop under §7.5 and close the slice on "`PASS WITH FIXES` plus four dispositions" (the user holds that the master mis-supplied the input pack, so it must be independently re-checked). This slice's ⑦ is `deepseek-v4-pro`, so the cost is contained. Basis: the user ruling of 2026-09-29, recorded independently as an **ADR** under the OB-37 meta-rule of §12.4 | **Ruled (a direct user ruling, valid for this slice only and not usable as a precedent)**. Four elements: ruling party = the user; date = 2026-09-29; reason = the first-round Medium was a master input-pack error that needs independent re-checking, and this slice ⑦ is cheap; basis = the ruling text of the same turn. **Nature annotations**: it carries a rule-semantics change, exceeds the §7.5 literal standard and is a direct user ruling. **Follow-up duties**: the report must truthfully record "the first-round input pack's diff was an empty file, a master error" and "this slice consumed a ⑦ quota exception" and hand it to ⑧c; the exception is **not generalised** |
+ | ADR-018 | **⑤ round-three quota exception for slice `T027-ASSEMBLY-MIN` (direct user ruling)**: after the ⑤ budget was exhausted at 2/2, a third **narrowed** review round was added | Reason: N1 is a **behaviour fix** (the console publish leg now fails closed, matching postflight leg 5), so §5.3 (re-run the stage itself after a fix) obliges a re-run; alternative not taken: no round three, handing it to ⑦ instead (the user holds that a behaviour fix must be re-checked by the same stage). Round three uses a **narrowed input set** (this round's remediation diff + the two earlier ⑤ reports + the contract excerpt + the read-only constraint) and does not re-audit the whole change set. Basis: the user ruling of 2026-10-03, recorded independently as an **ADR** under the OB-37 meta-rule of §12.4 | **Ruled (a direct user ruling, valid for this slice only and not usable as a precedent)**. Four elements: ruling party = the user; date = 2026-10-03; reason = N1 is a behaviour fix that §5.3 obliges re-running; basis = the ruling text of the same turn. **Nature annotations**: it carries a rule-semantics change, exceeds the §7.5 literal standard and is a direct user ruling. **Red line**: if round three still reports Medium+, the matter **stops and escalates** and round four is **never started on our own**. **Follow-up duties**: the report must record this quota exception truthfully and hand it to ⑧c. |
+ | ADR-019 | **Allow-list extension for slice `DIRECTIVE-MODEL-LISTS` (direct user ruling)**: §2.2 gains `gpt-6.1-sol` (deep tier) and `gpt-6-luna` (parallel alternative), and the §2.4 blacklist becomes the complete ID `kimi-k3` | Reason: the current §2.2 lists seven role carriers only and §2.4 bans the Luna family by family name, so the extension exceeds both literal standards; the alternative not taken was chartering a separate pilot first (the lead time is unaffordable). Basis: the user ruling of 2026-10-03, recorded independently as an **ADR** under the OB-37 meta-rule of §12.4 (that meta-rule allows either an OB or an ADR) | **Ruled (a direct user ruling, valid for this slice only and not usable as a precedent)**. Four elements: ruling party = the user; date = 2026-10-03; reason = deciding whether this slice admits `gpt-6-luna` to the §2.2 allow-list (the extension exceeds both the §2.2 and the §2.4 literal standards); basis = the ruling text of the same turn. **Nature annotations**: it carries a rule-semantics change, exceeds both the §2.2 and the §2.4 literal standards and is a direct user ruling. **L1 to L5 probe conclusion (measured, landing the Luna row per the pre-declared ruling rule)**: the first L1 attempt with `gpt-6-luna` (the `modelId` form) was **rejected by the tool**, which returned its list of available models (the Luna entry appears as `GPT-6 Luna (copilot)`); retrying with that display-name string made L1 to L5 all green - L1 returned `PROBE-L1: OK`; L2 read the first line of `tmp/assembly-min/DESIGN.md` and its 71914 bytes; L3 rewrote the third line of `tmp/dml/luna-probe/target.txt`; L4 that file is 43 bytes, no BOM, LF; L5 `go version` = `go1.27.0 windows/amd64`; every reading was independently re-checked by the master; a further probe of `GPT-6.1 Sol (copilot)` returned `PROBE-SOL: OK`. **Limitation**: `runSubagent` does not return the served model, so this proves chain availability only and **model identity is unproven (§2.3)**; the self-report read `GitHub Copilot` and is not evidence; the rejection of the `modelId` form is registered as OB-67. **Follow-up duties**: the report must state truthfully that "model identity is unproven (§2.3)" and hand it to ⑧c; the exception is **not generalised** |
++| ADR-020 | **⑦ final-review model downgrade for slice `DIRECTIVE-CLEANUP-EVAL` (direct user ruling)**: this slice ⑦ is carried by `deepseek-v4-pro`, **not** by the §2.2 allowlist model `gpt-5.3-codex` | Reason: this slice is documentation plus read-only measurement (it does not touch §7.2.1 ③) and the Copilot budget is constrained; this slice ④ measured that `modelId` forms such as `gpt-5.3-codex` are rejected by the tool (see OB-70), and the stability of the display-name reading is still under assessment; the alternative not taken was keeping `gpt-5.3-codex` (unaffordable). Basis: the user slice definition of 2026-10-03, recorded independently as an **ADR** under the OB-37 meta-rule of §12.4 | **Ruled (a direct user ruling, valid for this slice only and not usable as a precedent)**. Four elements: ruling party = the user; date = 2026-10-03; reason = documentation plus read-only measurement, no §7.2.1 ③ contact, constrained Copilot budget; basis = the ruling text of the same turn. **Nature annotations**: it carries a rule-semantics change, exceeds the §2.2 literal standard and is a direct user ruling. **Follow-up duties**: the report must state that this slice ⑦ ran on a non-allowlist model with reduced independence and hand it to ⑧c; the exception is **not generalised** |
+ 
+ ## 1. Release and Dependencies
+ 
+diff --git a/docs/DELIVERY_DIRECTIVE.md b/docs/DELIVERY_DIRECTIVE.md
+index 5196515..1a34007 100644
+--- a/docs/DELIVERY_DIRECTIVE.md
++++ b/docs/DELIVERY_DIRECTIVE.md
+@@ -1,6 +1,6 @@
+ ﻿# ProofRail 交付执行准则（DELIVERY_DIRECTIVE）
+ 
+-版本：v1.18。日期：2026-10-03。状态：**CN 正文冻结**（ `_EN` 镜像见 `docs/DELIVERY_DIRECTIVE_EN.md`）。
++版本：v1.19。日期：2026-10-03。状态：**CN 正文冻结**（ `_EN` 镜像见 `docs/DELIVERY_DIRECTIVE_EN.md`）。
+ 
+ > **多语言说明**：本文件为中文权威版；`docs/DELIVERY_DIRECTIVE_EN.md` 为严格同位镜像（与 CN 同步维护；CN 冻结后同步更新，避免评审期双语返工）。
+ > **编码**：本文及 `_EN` 必须保持 UTF-8 **with BOM** + **LF**。
+@@ -62,6 +62,7 @@
+ | v1.16 | 2026-09-29 | **台账措辞更正（切片 `LEDGER-BACKFILL`；用户 2026-09-29 授权）**：OB-21 的现象列加**更正注记**（子项「`DR-1 未修`」已消除；末列状态词保持 `待议`、该 OB **未闭合**）、OB-53 补登第五项（`model: "auto"` 可间接引入黑名单模型）。**不新增判据、不改任何规则语义、不改 §6.3 判据作用域**。本行是 `LEDGER-BACKFILL` 切片内的副产物，不是独立的准则治理片。 | `LEDGER-BACKFILL`（本片报告 §1 载明 v1.16 为切片内副产物） |
+ | v1.17 | 2026-10-02 | **台账补登（切片 `T027-ASSEMBLY-MIN` 的步骤 0；用户 2026-10-02 授权）**：§12.4 登记 **OB-54 / OB-55**——依次为 `DEV_PLAN` 中 B3b 段尾的过期表述、enforcement 生产落地与 S1/S2 的边界冲突；另在 §12.4 末尾以引用块登记本片主控编排器的调用口径（**不占 OB 号**）。**不新增判据、不改任何规则语义、不改 §6.3 判据作用域**。本行是 `T027-ASSEMBLY-MIN` 切片内的副产物，不是独立的准则治理片。 | `T027-ASSEMBLY-MIN`（本片报告 §1 载明 v1.17 为切片内副产物） |
+ | v1.18 | 2026-10-03 | **黑名单全称化与白名单更新 + G5-b 闭集化（切片 `DIRECTIVE-MODEL-LISTS`；用户 2026-10-03 裁定）**：① §2.2 增 `gpt-6.1-sol`（深度档）与 `gpt-6-luna`（平行备选）两行，⑦ 三档选用判据只在 §5.2 的 ⑦ 分档表定义；② §2.4 黑名单改为全称 `kimi-k3`，兜底句保留，并改白名单闭集口径；③ §1.7 增 1.7.4 临时授权五要素；④ §6.3 的 G5-b 改白名单闭集，并同步 `tools/gates` 的实现与自检夹具（T29 至 T42）；⑤ 附录 C 增 C.0j。 | `DIRECTIVE-MODEL-LISTS`（本片） |
++| v1.19 | 2026-10-03 | **清账 + `R2.2` 传参评估（切片 `DIRECTIVE-CLEANUP-EVAL`）**：① §11.2 增「⑩ 停点回执须含回写核对行」（OB-63 落地：逐项列验证报告 / `DEV_PLAN` / 台账 / ADR，标 `已回写` 或 `不适用 + 理由`）；② §12.4 的 OB-63 与 OB-70 处置列翻 `已处置`、OB-66 翻 `已裁决`（顺延口径 = 以 §12.4 为唯一真值源）；③ 台账两处过期陈述清账；④ 上一片报告的「⑩ 停点后裁决回执」节首句补「事实记录」声明。`R2.2` 本体与 §2.2 表**未动**。 | `DIRECTIVE-CLEANUP-EVAL`（本片） |
+ ---
+ 
+ ## 1. 适用范围与切片模型
+@@ -741,7 +742,7 @@
+ 
+ ### 11.2 回写口径
+ 
+-切片收尾必须回写：验证报告（新建或追加）、`DEV_PLAN{,_EN}` 段落、切片台账（状态行 / 勾选项 / 完成记录）、ADR 行（如涉及裁决）。回写内容必须**取自切片自身证据**，不得凭记忆；缺失字段标注"历史缺失"。
++切片收尾必须回写：验证报告（新建或追加）、`DEV_PLAN{,_EN}` 段落、切片台账（状态行 / 勾选项 / 完成记录）、ADR 行（如涉及裁决）。回写内容必须**取自切片自身证据**，不得凭记忆；缺失字段标注"历史缺失"。**⑩ 停点回执须含「回写核对」行**（OB-63 口径）：逐项列**验证报告 / `DEV_PLAN` / 台账 / ADR**，每项标 `已回写` 或 `不适用 + 理由`。
+ 
+ ### 11.3 报告结构
+ 
+@@ -861,14 +862,14 @@
+ | OB-60 | 2026-10-03 | **方案书模板增两节（用户预保留）**：① 跨包共享契约——列明跨文件共享项（常量 / 解析函数 / 判定顺序 / 错误分类），每项定义权威侧与核验方式，配机械核验；② 失败路径枚举——对每个可能失败的操作，列「失败后由谁负责 / 后果 / 如何证明」，逐条穷尽。适用裁剪：S 档不要求，M 档以上或跨包改动要求。来源 = `T027-ASSEMBLY-MIN` 的 M-1 与 F-02 设计教训。 | **待议**：下一片起跑时评估落地方式（模板或方案书结构条款） |
+ | OB-61 | 2026-10-03 | **源码级不变量测试可被等价改写绕过**（`T027-ASSEMBLY-MIN` 的 ⑦ 复审新增 Low）：其判据是文本形态计数与字符串匹配，等价改写并同步调整计数即可绕过。 | **待议**：建议升级为 AST 级结构断言（评估收益与成本后另行立项） |
+ | OB-62 | 2026-10-03 | **Flash 主控下 `runSubagent` 调 `gpt-6-luna` 与 `gpt-6.1-sol` 的工具链路此前未实测**（载体 `prfrail-implementer`；`runSubagent` 不返回实际服务模型 ⇒ 测试只证链路可用性、不证模型身份）。 | **已处置**（本片 L1 至 L5 实测）：Luna 链路以显示名串 `GPT-6 Luna (copilot)` 调用 PASS，而 `gpt-6-luna` 形式被工具拒绝（另见 OB-67）；Sol 以 `GPT-6.1 Sol (copilot)` 最小调用 PASS；逐层读数见 ADR-019 与本片验证报告 |
+-| OB-63 | 2026-10-03 | **⑩ 停点回执需增「回写核对」行**（逐项列：验证报告 / `DEV_PLAN` / 台账 / ADR，各标已回写或「不适用 + 理由」），使停点回执可机械核对回写完整性。 | **已登记**：自本片 ⑩ 起停点回执按此格式（口径见 §11.2） |
++| OB-63 | 2026-10-03 | **⑩ 停点回执需增「回写核对」行**（逐项列：验证报告 / `DEV_PLAN` / 台账 / ADR，各标已回写或「不适用 + 理由」），使停点回执可机械核对回写完整性。 | **已处置**：本片把该要求写入 §11.2 的正文（口径见 §11.2），自本片 ⑩ 停点回执起适用 |
+ | OB-64 | 2026-10-03 | **`runSubagent` 的 execute 层首轮调用返回空输出、重试即成功**（切片 `DIRECTIVE-MODEL-LISTS` 的 L1 至 L5 探针实测；归属 Copilot 后端行为，非 ProofRail 代码）。 | **已登记**：归属后端行为，不计入产品缺陷表；仅留痕供后续观察 |
+ | OB-65 | 2026-10-03 | **试点继续顺延第 3 次（用户直接裁定）**：本片为准则治理片（改 §2.2 / §2.4 / §5.2 / §6.3 / §1.7 / §0.3 与 `tools/gates` 的 `g5b.js`）⇒ 不满足 §12.1 的试点选择标准（不得落在高风险切片或纯文档切片上），按 §7.8.3 构成顺延第 3 次。四要素：裁决人 = 用户；日期 = 2026-10-03；理由 = 准则治理片不满足上述试点选择标准；依据 = 用户同轮裁定原文。**按 OB-37 元规则独立留痕**，且**不得作为先例**。 | **已裁决**（用户直接裁定：继续执行、不进入试点；顺延次数的口径定义见 OB-66） |
+-| OB-66 | 2026-10-03 | **顺延次数的口径定义（本片起跑回执的澄清项，登记为下一片候选）**：§12.4 可见的登记为 2 次（v1.12 与 `DIRECTIVE-REVIEW-SATURATION`，后者系用户直接裁定的 OB-40），而后续各片回执的计数与之不同步 ⇒ 须定义「从何时起计、含哪些片」，或明确以 §12.4 现有台账为唯一口径（用户 2026-10-03 裁定：本次按第 3 次处理）。 | **待议**：下一片起跑时定义口径，并把裁定结果写回本行 |
++| OB-66 | 2026-10-03 | **顺延次数的口径定义（本片起跑回执的澄清项，登记为下一片候选）**：§12.4 可见的登记为 2 次（v1.12 与 `DIRECTIVE-REVIEW-SATURATION`，后者系用户直接裁定的 OB-40），而后续各片回执的计数与之不同步 ⇒ 须定义「从何时起计、含哪些片」，或明确以 §12.4 现有台账为唯一口径（用户 2026-10-03 裁定：本次按第 3 次处理）。 | **已裁决**（用户直接裁定，2026-10-03）：**以 §12.4 台账为唯一真值源**；本片（`DIRECTIVE-MODEL-LISTS`）顺延记为第 3 次（OB-65 已登记），回执中的口头计数不作数 |
+ | OB-67 | 2026-10-03 | **R2.2 的调用串口径与 `runSubagent` 的实际要求不符**（本片 L1 首轮实测）：工具要求 `model` 传 **UI 显示名串**（如 `GPT-6 Luna (copilot)` 与 `GPT-5.3-Codex (copilot)`），而 §2.2 的 `modelId` 列（`gpt-6-luna` / `gpt-5.3-codex` 形式）被工具判为 not found 并回传可用清单；历史 157 次调用实际全部使用显示名串 ⇒ §2.2 的「`modelId` 是调用串的唯一权威」与「UI 显示名不得写入任务包或附录 B 模板」两句与工具行为不一致。 | **待议**：下一片裁定修法（改 R2.2 口径 / 增 `modelId` 到调用串的映射表 / 保留现状但在 §2.2 注记差异），本片只登记 |
+ | OB-68 | 2026-10-03 | **§5.2 的 ⑦ 分档表与四处既有「⑦ Codex」标签 / 档位定义失同步**（本片 ⑤ 预审 F2）：四处为 §5.1 流水线的「⑦ 终审（Codex）」、§7.1 的「独立终审（Codex）」、§7.5 的「⑦ Codex」成本行与 §8.2 的「⑦ Codex / Extra High（固定）」。新分档表允许 ⑦ 取三档，而后两处仍按 Codex 定义成本与档位（`gpt-6.1-sol` 与 `gpt-6-luna` 的档位与成本未定义）⇒ 二者互相抵触。本片按 §1.7.2 不扩范围：**四处均不动**，只登记。 | **待议**：下一片裁定修法（把四处标签补全为「⑦（§5.2 分档表选定）」并补两档的成本与档位定义，或维持现状但在 §7.5 括注差异） |
+ | OB-69 | 2026-10-03 | **⑤ 第 2 轮的未闭合发现：§2.5 的「附加残留风险」条仍以现在时描述 G5-b 的旧判据**（本片 ⑤ 复审的 R2-1）：「机械判据：变更集中黑名单命中必须为 0」与本片改后的 §6.3 G5-b（白名单闭集）直接矛盾 —— 属本片自身改动制造的文本与判据失同步。**处置**：本片已就地改为指向 §6.3 G5-b 的写法（同步本片所改判据的过期描述属一致性义务，非扩范围）；但 ⑤ 额度 1+1 已用尽（§7.5），**未自费加轮复审**，故按 §7.8.3「额度用尽」行的留痕要求登记，**并入本片 ⑦ 的审查输入**。 | **待办**：并入下次 ⑦ 输入（本片 ⑦ 终审须覆盖本项整改） |
+-| OB-70 | 2026-10-03 | **`R2.2` 与 `runSubagent` 实测传参形式的差异，需专门评估**（本片 L1 实测；与 OB-67 同源，分工为“评估项”）：`modelId` 形式（`gpt-6-luna`）被工具回传 not found，而工具回传清单内的显示名串（`GPT-6 Luna (copilot)`）可用。**不预断两者对错**，只陈述事实与待评估点（显示名稳定性的影响面、`modelId` 形式在各模型上的可用性、是否需要映射表或调用层归一）。**用户 2026-10-03 裁定**：保留 `R2.2` 作为规则口径，在 §2.2 明示实测差异，并登记本项（裁决人 = 用户；日期 = 2026-10-03；理由 = 显示名随 UI 漂移，样本不足以推翻 `R2.2`；依据 = 用户同轮裁定原文）。 | **待议**：专门评估（另立切片；本片只登记） |
++| OB-70 | 2026-10-03 | **`R2.2` 与 `runSubagent` 实测传参形式的差异，需专门评估**（本片 L1 实测；与 OB-67 同源，分工为“评估项”）：`modelId` 形式（`gpt-6-luna`）被工具回传 not found，而工具回传清单内的显示名串（`GPT-6 Luna (copilot)`）可用。**不预断两者对错**，只陈述事实与待评估点（显示名稳定性的影响面、`modelId` 形式在各模型上的可用性、是否需要映射表或调用层归一）。**用户 2026-10-03 裁定**：保留 `R2.2` 作为规则口径，在 §2.2 明示实测差异，并登记本项（裁决人 = 用户；日期 = 2026-10-03；理由 = 显示名随 UI 漂移，样本不足以推翻 `R2.2`；依据 = 用户同轮裁定原文）。 | **已处置**：本片完成评估（三次 `modelId` 形式实测 + 官方文档核查 + 显示名稳定性分析，结论与推荐见 `docs/validation/directive-cleanup-eval.md`）⇒ 推荐「加 `modelId` 到限定名（`Model Name (vendor)`）的映射表」；若采纳，`R2.2` 本体需加指向句，**另立 `[SLICE]`** |
+ 
+ > **本片（`GATES-EXT`）⑦ 轮次例外（用户 2026-09-22 预授权）**：⑦ 复审（第 2 轮）报 Medium+ ⇒ 依 §5.3 强制复审，并按预授权开启**第 3 轮**（`GPT-5.3-Codex`，**仅本片有效**）；第 3 轮 `PASS WITH FIXES`、无 Medium+（仅 1 条 Low，即 OB-20）。**该授权不推广**：其他切片仍按 §7.5（终审 1 + 复审 1），第 4 轮不自动授权。
+ 
+diff --git a/docs/DELIVERY_DIRECTIVE_EN.md b/docs/DELIVERY_DIRECTIVE_EN.md
+index 7c80ddc..a8f4326 100644
+--- a/docs/DELIVERY_DIRECTIVE_EN.md
++++ b/docs/DELIVERY_DIRECTIVE_EN.md
+@@ -1,6 +1,6 @@
+ ﻿# ProofRail Delivery Execution Directive (DELIVERY_DIRECTIVE)
+ 
+-Version: v1.18. Date: 2026-10-03. Status: **CN body frozen** ( `_EN` mirror in `docs/DELIVERY_DIRECTIVE_EN.md`).
++Version: v1.19. Date: 2026-10-03. Status: **CN body frozen** ( `_EN` mirror in `docs/DELIVERY_DIRECTIVE_EN.md`).
+ 
+ > **Multilingual note**: this file is a strict positional mirror of the CN body, maintained in step with it (updated after CN is frozen, to avoid bilingual rework during review); `docs/DELIVERY_DIRECTIVE.md` is authoritative and wins on any conflict (see §11.1).
+ > **Encoding**: this document and its `_EN` mirror must stay UTF-8 **with BOM** + **LF**.
+@@ -62,6 +62,7 @@ Version: v1.18. Date: 2026-10-03. Status: **CN body frozen** ( `_EN` mirror in `
+ | v1.16 | 2026-09-29 | **Ledger wording correction (slice `LEDGER-BACKFILL`; authorised by the user 2026-09-29)**: the OB-21 evidence cell gains a **correction note** (the `DR-1 not fixed` sub-item is removed; the disposition word stays `待议` and the OB is **not closed**), and OB-53 gains a fifth item (`model: "auto"` can reach a blacklisted model indirectly). **No criterion is added, no rule semantics change and no §6.3 criterion-scope change.** This row is a by-product inside the `LEDGER-BACKFILL` slice, not a standalone governance slice. | `LEDGER-BACKFILL` (this slice report §1 states that v1.16 is a by-product of the slice) |
+ | v1.17 | 2026-10-02 | **Ledger registration (step 0 of slice `T027-ASSEMBLY-MIN`; authorised by the user 2026-10-02)**: §12.4 registers **OB-54 / OB-55** - the stale wording at the tail of the B3b paragraph in `DEV_PLAN`, and the boundary conflict between production enforcement and S1/S2; the master orchestrator's invocation standing for this slice is additionally registered as a block quote at the end of §12.4 (**it takes no OB number**). **No criterion is added, no rule semantics change and no §6.3 criterion-scope change.** This row is a by-product inside the `T027-ASSEMBLY-MIN` slice, not a standalone governance slice. | `T027-ASSEMBLY-MIN` (this slice report §1 states that v1.17 is a by-product of the slice) |
+ | v1.18 | 2026-10-03 | **Complete blacklist IDs + allow-list update + G5-b closed set (slice `DIRECTIVE-MODEL-LISTS`; user ruling 2026-10-03)**: (1) §2.2 gains `gpt-6.1-sol` (deep tier) and `gpt-6-luna` (parallel alternative), with the three-tier selection criteria defined only in the §5.2 ⑦ tier table; (2) the §2.4 blacklist becomes the complete ID `kimi-k3`, the fallback sentence is kept, and the reading becomes an allow-list closed set; (3) §1.7 gains the 1.7.4 temporary-authorization five elements; (4) §6.3 G5-b becomes a whitelist closed set with the `tools/gates` implementation and self-test fixtures in sync (T29 to T42); (5) appendix C gains C.0j. | `DIRECTIVE-MODEL-LISTS` (this slice) |
++| v1.19 | 2026-10-03 | **Ledger cleanup plus the `R2.2` argument-form assessment (slice `DIRECTIVE-CLEANUP-EVAL`)**: (1) §11.2 gains "the ⑩ stop receipt must carry a write-back check line" (OB-63 landing: list the validation report / `DEV_PLAN` / ledger / ADR item by item, each marked `written back` or `not applicable + reason`); (2) in §12.4 the OB-63 and OB-70 dispositions flip to `resolved` and OB-66 to `ruling` (deferral basis = the §12.4 ledger as the sole source of truth); (3) two stale ledger statements are cleared; (4) the first sentence of the "ruling receipt after the ⑩ stop point" section of the previous report gains the factual-record statement. The `R2.2` body and the §2.2 table are **untouched**. | `DIRECTIVE-CLEANUP-EVAL` (this slice) |
+ ---
+ 
+ ## 1. Scope and Slice Model
+@@ -741,7 +742,7 @@ After the pipeline finishes ⑨ it **stops at ⑩**: output the slice report and
+ 
+ ### 11.2 Write-Back Standard
+ 
+-At slice wrap-up the following must be written back: the validation report (created or appended), the `DEV_PLAN{,_EN}` section, the slice ledger (status line / checkboxes / completion record), and the ADR row (if a ruling is involved). Write-back content must be **taken from the slice's own evidence**, never from memory; missing fields are marked "historically missing".
++At slice wrap-up the following must be written back: the validation report (created or appended), the `DEV_PLAN{,_EN}` section, the slice ledger (status line / checkboxes / completion record), and the ADR row (if a ruling is involved). Write-back content must be **taken from the slice's own evidence**, never from memory; missing fields are marked "historically missing". **The ⑩ stop receipt must carry a write-back check line** (OB-63 wording): list the **validation report / `DEV_PLAN` / ledger / ADR** item by item, each marked `written back` or `not applicable + reason`.
+ 
+ ### 11.3 Report Structure
+ 
+@@ -861,14 +862,14 @@ Observation items (phenomena not yet sufficient to change the directive) are reg
+ | OB-60 | 2026-10-03 | **Add two sections to the design-document template (reserved by the user)**: (1) cross-package shared contracts - list every item shared across files (constants, parse functions, decision order, error classification), each with an authoritative side, a verification method and a mechanical check; (2) failure-path enumeration - for every operation that can fail, state who owns the failure, the consequence and how it is proven, exhaustively. Applicability trimming: not required at tier S, required at tier M or above and for any cross-package change. Origin = the M-1 and F-02 design lessons of `T027-ASSEMBLY-MIN`. | **To be discussed**: the landing form (a template or a design-document structure clause) is assessed when the next slice starts |
+ | OB-61 | 2026-10-03 | **The source-level invariant test can be side-stepped by an equivalent rewrite** (the new Low from the ⑦ round-three re-review of `T027-ASSEMBLY-MIN`): it judges by textual shape counts and string matching, so an equivalent rewrite with matching counts can evade it. | **To be discussed**: upgrading it to an AST-level structural assertion is recommended (weigh benefit and cost before opening a slice) |
+ | OB-62 | 2026-10-03 | **Under a Flash master the tool chain of `runSubagent` invoking `gpt-6-luna` and `gpt-6.1-sol` had never been measured** (carrier `prfrail-implementer`; `runSubagent` does not return the served model, so a test proves chain availability only, not model identity). | **Resolved** (measured as L1 to L5 in this slice): the Luna chain passes when invoked with the display-name string `GPT-6 Luna (copilot)`, while the `gpt-6-luna` form is rejected by the tool (see OB-67); Sol passes a minimal call as `GPT-6.1 Sol (copilot)`; per-layer readings are in ADR-019 and the validation report |
+-| OB-63 | 2026-10-03 | **The ⑩ stop receipt must gain a write-back check line** (item by item: validation report / `DEV_PLAN` / ledger / ADR, each marked as written back or not-applicable-with-reason) so that write-back completeness becomes mechanically checkable at the stop point. | **Registered**: from this slice ⑩ onward the stop receipt uses that format (wording basis in §11.2) |
++| OB-63 | 2026-10-03 | **The ⑩ stop receipt must gain a write-back check line** (item by item: validation report / `DEV_PLAN` / ledger / ADR, each marked as written back or not-applicable-with-reason) so that write-back completeness becomes mechanically checkable at the stop point. | **Resolved**: this slice wrote the requirement into the body of §11.2 (wording basis in §11.2); it applies from this slice ⑩ stop receipt onward |
+ | OB-64 | 2026-10-03 | **The execute layer of `runSubagent` returned no output on its first call and succeeded on retry** (measured by the L1 to L5 probe of slice `DIRECTIVE-MODEL-LISTS`; attributed to Copilot backend behaviour, not ProofRail code). | **Registered**: backend behaviour, not entered in the product defect table; kept as a record for later observation |
+ | OB-65 | 2026-10-03 | **Third pilot deferral (direct user ruling)**: this slice is a directive-governance slice (it changes §2.2 / §2.4 / §5.2 / §6.3 / §1.7 / §0.3 and `g5b.js` under `tools/gates`) ⇒ it does not meet the §12.1 pilot selection standard (it may not land on a high-risk slice or a pure-documentation slice), which makes it the third deferral under §7.8.3. Four elements: ruling party = the user; date = 2026-10-03; reason = a directive-governance slice does not meet that pilot selection standard; basis = the ruling text of the same turn. **Registered independently per the OB-37 meta-rule**, and **not usable as a precedent**. | **Ruling** (a direct user ruling: continue without entering pilot status; the counting basis is defined by OB-66) |
+-| OB-66 | 2026-10-03 | **Counting basis for deferrals (the clarification item of this slice start receipt, registered as a next-slice candidate)**: §12.4 visibly records two deferrals (v1.12 and `DIRECTIVE-REVIEW-SATURATION`, the latter being the direct user ruling OB-40), while later slice receipts counted differently ⇒ either define "from when and which slices count" or declare the existing §12.4 ledger the sole basis (user ruling of 2026-10-03: this one counts as the third). | **To be discussed**: the next slice defines the basis and writes its ruling back into this row |
++| OB-66 | 2026-10-03 | **Counting basis for deferrals (the clarification item of this slice start receipt, registered as a next-slice candidate)**: §12.4 visibly records two deferrals (v1.12 and `DIRECTIVE-REVIEW-SATURATION`, the latter being the direct user ruling OB-40), while later slice receipts counted differently ⇒ either define "from when and which slices count" or declare the existing §12.4 ledger the sole basis (user ruling of 2026-10-03: this one counts as the third). | **Ruling** (direct user ruling, 2026-10-03): **the §12.4 ledger is the sole source of truth**; this slice (`DIRECTIVE-MODEL-LISTS`) counts as the third deferral (OB-65 already registered) and oral counts in receipts do not count |
+ | OB-67 | 2026-10-03 | **The R2.2 call-string reading disagrees with what `runSubagent` actually requires** (measured by the first L1 attempt of this slice): the tool expects the `model` argument to be the **UI display-name string** (such as `GPT-6 Luna (copilot)` or `GPT-5.3-Codex (copilot)`), while the §2.2 `modelId` column (the `gpt-6-luna` / `gpt-5.3-codex` form) is rejected as not found along with a list of available models; all 157 historical invocations in fact used display-name strings ⇒ both §2.2 sentences ("the `modelId` is the sole authority for the call string" and "a UI display name must not be written into task packages or Appendix B templates") disagree with the tool. | **To be discussed**: the next slice rules on the fix (change the R2.2 reading / add a `modelId`-to-call-string mapping table / keep it and note the difference in §2.2); this slice only registers it |
+ | OB-68 | 2026-10-03 | **The §5.2 ⑦ tier table is out of sync with four existing "⑦ Codex" labels / effort definitions** (F2 of this slice ⑤ pre-review): the four sites are "⑦ final review (Codex)" in the §5.1 pipeline, "independent final review (Codex)" in §7.1, the "⑦ Codex" cost row in §7.5 and "⑦ Codex / Extra High (fixed)" in §8.2. The new tier table lets ⑦ take three models, while the latter two sites still define cost and effort for Codex only (`gpt-6.1-sol` and `gpt-6-luna` have no effort or cost definition) ⇒ the two contradict each other. This slice does not widen its scope (§1.7.2): **all four sites stay untouched**, registered only. | **To be discussed**: the next slice rules on the fix (complete the four labels as "⑦ (chosen from the §5.2 tier table)" and add the two missing effort and cost definitions, or keep them and note the difference in §7.5) |
+ | OB-69 | 2026-10-03 | **Unclosed finding from ⑤ round two: the "additional residual risk" bullet in §2.5 still describes the OLD G5-b criterion in the present tense** (R2-1 of this slice ⑤ re-review): "the mechanical criterion: blacklist hits in the change set must be 0" now contradicts the §6.3 G5-b closed set this slice landed - a text-versus-criterion desync that this slice own change produced. **Disposition**: fixed in place to point at §6.3 G5-b (syncing a stale description of a criterion this slice changed is a consistency duty, not a scope widening); however the ⑤ quota of 1+1 is exhausted (§7.5), so **no further ⑤ round was bought**, and by the record-keeping requirement of the §7.8.3 "quota exhausted" row it is **folded into this slice ⑦ review input**. | **To do**: folded into the next ⑦ input (this slice ⑦ final review must cover this remediation) |
+-| OB-70 | 2026-10-03 | **The difference between `R2.2` and the argument form `runSubagent` actually takes needs a dedicated assessment** (measured by this slice L1; same origin as OB-67, serving as the assessment item): the `modelId` form (`gpt-6-luna`) was answered with not found, while the display-name string from the tool list (`GPT-6 Luna (copilot)`) worked. **No verdict is drawn**, only the facts and the assessment points are stated (how far display-name instability reaches, whether the `modelId` form works for other models, and whether a mapping table or a call-layer normalisation is needed). **User ruling of 2026-10-03**: keep `R2.2` as the rule reading, state the measured difference in §2.2, and register this item (ruling party = the user; date = 2026-10-03; reason = display names drift with the UI and one sample cannot overturn `R2.2`; basis = the ruling text of the same turn). | **To be discussed**: a dedicated assessment (a separate slice; this slice only registers it) |
++| OB-70 | 2026-10-03 | **The difference between `R2.2` and the argument form `runSubagent` actually takes needs a dedicated assessment** (measured by this slice L1; same origin as OB-67, serving as the assessment item): the `modelId` form (`gpt-6-luna`) was answered with not found, while the display-name string from the tool list (`GPT-6 Luna (copilot)`) worked. **No verdict is drawn**, only the facts and the assessment points are stated (how far display-name instability reaches, whether the `modelId` form works for other models, and whether a mapping table or a call-layer normalisation is needed). **User ruling of 2026-10-03**: keep `R2.2` as the rule reading, state the measured difference in §2.2, and register this item (ruling party = the user; date = 2026-10-03; reason = display names drift with the UI and one sample cannot overturn `R2.2`; basis = the ruling text of the same turn). | **Resolved**: this slice completed the assessment (three `modelId`-form probes + the official documentation check + the display-name stability analysis; conclusions and recommendation in `docs/validation/directive-cleanup-eval.md`) ⇒ it recommends "add a `modelId`-to-qualified-name (`Model Name (vendor)`) mapping table"; if adopted, the `R2.2` body needs a pointer sentence, which is a **separate `[SLICE]`** |
+ 
+ > **This slice's (`GATES-EXT`) ⑦ round exception (user pre-authorization, 2026-09-22)**: the ⑦ re-review (round 2) reported Medium+, which forces a re-review under §5.3 and, under the pre-authorization, entitled a **round 3** (`GPT-5.3-Codex`, **valid for this slice only**); round 3 returned `PASS WITH FIXES` with no Medium+ (one Low only, i.e. OB-20). **The authorization does not generalize**: other slices stay on §7.5 (one final review + one re-review), and a round 4 is never automatic.
+ 
+diff --git a/docs/t027/REMAINING_SLICES.md b/docs/t027/REMAINING_SLICES.md
+index 8945c23..d2ca471 100644
+--- a/docs/t027/REMAINING_SLICES.md
++++ b/docs/t027/REMAINING_SLICES.md
+@@ -630,7 +630,8 @@ A6 ② 进度（第 2 批，2026-09-15）：
+ | 2026-09-29 | S1-REACH | **业务判定类切片（含一次准则台账补登）**：以 DR-1 闭环后的当前事实刷新 OB-21 / T018 / S1 exit 的可达性判定（十门 × 依赖 × 解锁条件），结论为八门不可达或未通过、一门未知（人工门）、一门已执行但不独立成立；同批登记 **OB-51 / OB-52 / OB-53**（v1.15），并以 **ADR-015** 留痕 ⑦ 降级。零代码改动、探针 0。审查：⑤ `FINDINGS` → `PASS WITH FIXES`；⑥ 可跳过（⑦ 确认）；⑦ `PASS WITH FIXES` → 复审 `PASS`（`deepseek-v4-pro`，独立性降低）。 | docs/validation/s1-reach-reachability.md |
+ | 2026-09-29 | LEDGER-BACKFILL | **文档回填切片**：更正台账与 `DEV_PLAN` 中的过期表述（★1 至 ★6）并补登 OB-53 第五项；① 核实 B3a 段落已在位（提交 `dd36b9b`）故不重复回填。⑤ `PASS WITH FIXES` → ⑦ `PASS WITH FIXES` → 复审 `PASS WITH FIXES`（`deepseek-v4-pro`，ADR-016；复审为额度例外，ADR-017，2 条 Low 已处置）；另如实登记首轮输入包 diff 为空系主控错误与 **OB-54 候选**（`DEV_PLAN.md:139`，下一片登记）。零代码改动、探针 0。 | docs/validation/ledger-backfill.md |
+ | 2026-10-03 | T027-ASSEMBLY-MIN | **产品实现类切片（A 段：拒绝路径）**：把已冻结的 AgentRunner 构件装配成可跑的拒绝路径链，新增 3 个生产文件与 2 个测试文件并接线 console 的八项 flags 路由；②b 经三轮整改后两侧解析口径合一、单个兜底闭包覆盖全部 spawn 后失败返回。⑤ 三轮均 `PASS WITH FIXES`（第三轮为额度例外，ADR-018）；⑥ `INDEPENDENT SCAN: PASS`（0 发现）；⑦ 盲审与终审与复审（Codex，3/3）⇒ `RE-REVIEW: PASS WITH FIXES`（M-1 已关闭；F-02 按**用户预授权的记录态**收口，根因登记候选 OB-57）。变异条目全红或如实标被取代且逐字节还原；门禁 `TOTAL_FAIL=0` 且全量测试无失败；已提交 `68a1ef0`（首次）与 `d2d6370`（DR-9 修复），CI run `37073985144` 双绿。候选 OB-56 至 OB-61 已在报告登记。 | docs/validation/t027-assembly-min.md |
+-| 2026-10-03 | DIRECTIVE-MODEL-LISTS | **准则治理类切片（含一次台账补登）**：§2.4 黑名单改为全称 `kimi-k3` 并改白名单闭集口径；§2.2 增 `gpt-6.1-sol`（深度档）与 `gpt-6-luna`（平行备选）；§5.2 增 ⑦ 三模型分档表；§1.7 增 1.7.4 临时授权五要素；§6.3 的 G5-b 改白名单闭集，并落 `g5b.js`、13 枚夹具与 T29 至 T42。⑤ 两轮（第 2 轮报 R2-1，已整改；⑤ 额度用尽 ⇒ 登记 OB-69 并入 ⑦ 输入）；⑥ `INDEPENDENT SCAN: FINDINGS`（无 file:line 级缺陷 ⇒ 未开整改环）；⑦ 盲态终审 `FINDINGS` ⇒ 复审 `PASS WITH FIXES`（H1 / M3 / M4 / H5 关闭；H2 按 ⑦ 要求的 Option B 升级用户裁决）；门禁 `TOTAL_FAIL=0` 且 `SELFTEST PASS 264/264`；探针 0；本片 L1 至 L5 实测（Luna 以工具回传的显示名串通过，`modelId` 形式被工具拒绝 ⇒ OB-67）。本片提交与推送待用户同轮授权。 | docs/validation/directive-model-lists.md |
++| 2026-10-03 | DIRECTIVE-MODEL-LISTS | **准则治理类切片（含一次台账补登）**：§2.4 黑名单改为全称 `kimi-k3` 并改白名单闭集口径；§2.2 增 `gpt-6.1-sol`（深度档）与 `gpt-6-luna`（平行备选）；§5.2 增 ⑦ 三模型分档表；§1.7 增 1.7.4 临时授权五要素；§6.3 的 G5-b 改白名单闭集，并落 `g5b.js`、13 枚夹具与 T29 至 T42。⑤ 两轮（第 2 轮报 R2-1，已整改；⑤ 额度用尽 ⇒ 登记 OB-69 并入 ⑦ 输入）；⑥ `INDEPENDENT SCAN: FINDINGS`（无 file:line 级缺陷 ⇒ 未开整改环）；⑦ 盲态终审 `FINDINGS` ⇒ 复审 `PASS WITH FIXES`（H1 / M3 / M4 / H5 关闭；H2 按 ⑦ 要求的 Option B 升级用户裁决）；门禁 `TOTAL_FAIL=0` 且 `SELFTEST PASS 264/264`；探针 0；本片 L1 至 L5 实测（Luna 以工具回传的显示名串通过，`modelId` 形式被工具拒绝 ⇒ OB-67）。已提交 `35e8198`，CI run `37092310920` 双绿（两腿 `SELFTEST: PASS 264/264`、`scope=ci changed=26`、`TOTAL_FAIL=0`）。 | docs/validation/directive-model-lists.md |
++| 2026-10-03 | DIRECTIVE-CLEANUP-EVAL | **准则治理类切片（清账 + 只读实测评估）**：① 清两处台账过期陈述（T027-ASSEMBLY-MIN 行由上一片完成、本片逐字复核确认；DIRECTIVE-MODEL-LISTS 行改为「已提交 `35e8198`，CI run `37092310920` 双绿」）；② 上一片报告的「⑩ 停点后裁决回执」节首句补「本节为事实记录，不改写 §11 / §12 的 ⑩ 停点当时表述」；③ OB-66 处置列翻 `已裁决`（顺延口径 = 以 §12.4 为唯一真值源）；④ 完成 OB-70 评估（三次 `modelId` 形式实测全被拒 + 两页官方文档核查 + 显示名稳定性分析 ⇒ 推荐「`modelId` 到限定名 `Model Name (vendor)` 的映射表」，另立切片）；⑤ OB-63 落地 §11.2（⑩ 停点回执须含回写核对行）。⑤ 跳过（S 档可选）、⑥ 跳过（纯文档，§7.2 条件成立并由 ⑦ 确认）；⑦ 由 `deepseek-v4-pro` 承担（ADR-020）⇒ `FINDINGS` 后整改复审；门禁 `TOTAL_FAIL=0` 且 `SELFTEST PASS 264/264`；探针 0。**本片提交由用户同轮授权后执行，CI run 号由下一片回填**。 | docs/validation/directive-cleanup-eval.md |
+ 
+ > **台账完整性注记（2026-09-21，已按用户授权补录）**：本表自 A4 行之后长期未追加完成行。**2026-09-21 依据各切片自己的验证报告补录 A5/A6/A7/B2/B3a 五行**（受"不凭记忆、只补可核验字段、缺失留空并标注历史缺失、不编造"三条约束），B3b 行先于本次补录写入，故五行列于其后；各行的日期/提交号/运行号/摘要均逐项标注来源，无法核验者已标注 **历史缺失**。
+ > **已回填**（本片核实，2026-09-29）：**B3a 的 `DEV_PLAN{,_EN}.md` 段落已由提交 `dd36b9b` 补入**（`DEV_PLAN.md:137` 与 `_EN.md:138`）；原注记的过期表述由切片 `LEDGER-BACKFILL` 更正，**回填动作无需重复执行**。
+diff --git a/docs/t027/REMAINING_SLICES_EN.md b/docs/t027/REMAINING_SLICES_EN.md
+index d4a02f7..5997207 100644
+--- a/docs/t027/REMAINING_SLICES_EN.md
++++ b/docs/t027/REMAINING_SLICES_EN.md
+@@ -617,7 +617,8 @@ Boundaries: this is a follow-up platform slice and must not rewrite the Windows
+ | 2026-09-29 | S1-REACH | **Business assessment slice (plus one directive ledger registration)**: refreshed the reachability verdicts for OB-21, T018 and S1 exit from the post-DR-1 facts (ten gates x dependency x unlock condition), concluding eight unreachable or not passed, one unknown (a human gate) and one executed but not standing alone; registered **OB-51 / OB-52 / OB-53** in the same slice (v1.15) and recorded the ⑦ downgrade as **ADR-015**. No code change and zero probes. Reviews: ⑤ `FINDINGS` -> `PASS WITH FIXES`; ⑥ skippable (confirmed by ⑦); ⑦ `PASS WITH FIXES` -> re-review `PASS` (`deepseek-v4-pro`, reduced independence). | docs/validation/s1-reach-reachability_EN.md |
+ | 2026-09-29 | LEDGER-BACKFILL | **Documentation back-fill slice**: corrected stale wording in the ledger and `DEV_PLAN` (★1 to ★6) and added the fifth OB-53 item; under ① the B3a paragraph was verified present (commit `dd36b9b`) so the back-fill was not repeated. ⑤ `PASS WITH FIXES` -> ⑦ `PASS WITH FIXES` -> re-review `PASS WITH FIXES` (`deepseek-v4-pro`, ADR-016; the re-review is a quota exception, ADR-017, with the 2 Low findings disposed of); also recorded truthfully: the first-round input pack's empty diff was a master error, and the **OB-54 candidate** (`DEV_PLAN.md:139`) goes to the next slice. No code change and zero probes. | docs/validation/ledger-backfill_EN.md |
+ | 2026-10-03 | T027-ASSEMBLY-MIN | **product-implementation slice (segment A: the reject path)**: assembled the frozen AgentRunner building blocks into a runnable reject-path chain, adding three production files and two test files and wiring the console eight-flag routing; after three remediation rounds ②b unified the parsers on both sides and routed every post-spawn failure return through one reclaim closure. ⑤ returned `PASS WITH FIXES` in all three rounds (the third a quota exception, ADR-018); ⑥ `INDEPENDENT SCAN: PASS` (zero findings); ⑦ blind review, final review and re-review (Codex, 3/3) ⇒ `RE-REVIEW: PASS WITH FIXES` (M-1 closed; F-02 closed as a **user pre-authorised recorded state** with the root cause registered as candidate OB-57). Mutation entries all red or truthfully marked superseded with byte-exact restoration; gates `TOTAL_FAIL=0` and no failing tests in the full run; committed as `68a1ef0` (first) and `d2d6370` (the DR-9 fix), with CI run `37073985144` green on both legs. Candidates OB-56 to OB-61 are registered in the report. | docs/validation/t027-assembly-min.md |
+-| 2026-10-03 | DIRECTIVE-MODEL-LISTS | **directive-governance slice (with one ledger registration)**: the §2.4 blacklist becomes the complete ID `kimi-k3` with the allow-list closed-set reading; §2.2 gains `gpt-6.1-sol` (deep tier) and `gpt-6-luna` (parallel alternative); §5.2 gains the ⑦ three-model tier table; §1.7 gains the 1.7.4 temporary-authorization five elements; §6.3 G5-b becomes a whitelist closed set, landing `g5b.js`, 13 fixtures and T29 to T42. ⑤ ran two rounds (round two reported R2-1, remediated; the ⑤ quota ran out ⇒ OB-69 registered and folded into the ⑦ input); ⑥ `INDEPENDENT SCAN: FINDINGS` (no file:line-level defect ⇒ no fix loop opened); ⑦ blind final review `FINDINGS` ⇒ re-review `PASS WITH FIXES` (H1 / M3 / M4 / H5 closed; H2 escalated to the user under Option B as ⑦ requires); gates `TOTAL_FAIL=0` with `SELFTEST PASS 264/264`; probes 0; this slice measured L1 to L5 (Luna passes through the display-name string the tool returned, while the `modelId` form is rejected ⇒ OB-67). The commit and push of this slice await the user authorisation in the same turn. | docs/validation/directive-model-lists.md |
++| 2026-10-03 | DIRECTIVE-MODEL-LISTS | **directive-governance slice (with one ledger registration)**: the §2.4 blacklist becomes the complete ID `kimi-k3` with the allow-list closed-set reading; §2.2 gains `gpt-6.1-sol` (deep tier) and `gpt-6-luna` (parallel alternative); §5.2 gains the ⑦ three-model tier table; §1.7 gains the 1.7.4 temporary-authorization five elements; §6.3 G5-b becomes a whitelist closed set, landing `g5b.js`, 13 fixtures and T29 to T42. ⑤ ran two rounds (round two reported R2-1, remediated; the ⑤ quota ran out ⇒ OB-69 registered and folded into the ⑦ input); ⑥ `INDEPENDENT SCAN: FINDINGS` (no file:line-level defect ⇒ no fix loop opened); ⑦ blind final review `FINDINGS` ⇒ re-review `PASS WITH FIXES` (H1 / M3 / M4 / H5 closed; H2 escalated to the user under Option B as ⑦ requires); gates `TOTAL_FAIL=0` with `SELFTEST PASS 264/264`; probes 0; this slice measured L1 to L5 (Luna passes through the display-name string the tool returned, while the `modelId` form is rejected ⇒ OB-67). Committed as `35e8198`, with CI run `37092310920` green on both legs (each leg: `SELFTEST: PASS 264/264`, `scope=ci changed=26`, `TOTAL_FAIL=0`). | docs/validation/directive-model-lists.md |
++| 2026-10-03 | DIRECTIVE-CLEANUP-EVAL | **directive-governance slice (ledger cleanup plus read-only measurement)**: (1) two stale ledger statements cleared (the T027-ASSEMBLY-MIN row was completed by the previous slice and is re-verified verbatim here; the DIRECTIVE-MODEL-LISTS row now reads "committed `35e8198`, CI run `37092310920` green on both legs"); (2) the first sentence of the "ruling receipt after the ⑩ stop point" section of the previous report gains "this section is a factual record and does not rewrite the ⑩-stop-point wording of §11 / §12"; (3) the OB-66 disposition flips to `ruling` (deferral basis = the §12.4 ledger as the sole source of truth); (4) the OB-70 assessment is complete (three `modelId`-form probes all rejected + two official documentation pages checked + the display-name stability analysis ⇒ it recommends a "`modelId`-to-qualified-name (`Model Name (vendor)`) mapping table" as a separate slice); (5) OB-63 is landed in §11.2 (the ⑩ stop receipt must carry a write-back check line). ⑤ skipped (optional at tier S), ⑥ skipped (pure documentation, the §7.2 conditions hold and ⑦ confirms); ⑦ carried by `deepseek-v4-pro` (ADR-020) ⇒ `FINDINGS` followed by a remediation re-review; gates `TOTAL_FAIL=0` with `SELFTEST PASS 264/264`; probes 0. **The commit of this slice follows the user authorisation in the same turn; the CI run id is back-filled by the next slice**. | docs/validation/directive-cleanup-eval.md |
+ 
+ > **Ledger integrity note (2026-09-21, back-filled under explicit user authorisation)**: this table had no rows appended after A4. **On 2026-09-21 the five rows A5/A6/A7/B2/B3a were back-filled from each slice's own validation report** (under the three constraints: no memory-based entries, verifiable fields only, missing fields left blank and marked as historic gaps, nothing fabricated); the B3b row was written before this back-fill, which is why the five rows follow it.
+ > **Back-filled** (verified by slice `LEDGER-BACKFILL`, 2026-09-29): **the B3a paragraph in `DEV_PLAN{,_EN}.md` was added by commit `dd36b9b`** (`DEV_PLAN.md:137` and `_EN.md:138`); the earlier still-owed wording was corrected by slice `LEDGER-BACKFILL`, and **the back-fill action does not need to be repeated**.
+diff --git a/docs/validation/directive-cleanup-eval.md b/docs/validation/directive-cleanup-eval.md
+new file mode 100644
+index 0000000..48baef0
+--- /dev/null
++++ b/docs/validation/directive-cleanup-eval.md
+@@ -0,0 +1,166 @@
++﻿# 切片验证报告 · `DIRECTIVE-CLEANUP-EVAL`（清账 + R2.2 传参评估）
++
++> 依据 `docs/DELIVERY_DIRECTIVE.md` v1.18 的 §5.1 串行流水线与 §6.2 证据落盘义务。**CN 为权威版**，
++> `_EN` 为同位镜像；围栏块见文末「产物清单」。规模 S、分级 `[SLICE]`、探针 0。
++
++## 1. 变更概要（含执行自由度清单）
++
++**目标**：① 清两处台账过期陈述；② 回填 OB-66 口径；③ 完成 OB-70 评估；④ 落地 OB-63。
++**本片行使的执行自由度（§1.7.1，实质选择）**：
++
++- **F-1 一字更正**：用户指令原文的「本机为事实记录」按语义改为「**本节**为事实记录」（写入报告 §16 首句）；
++  依据 = 该句主语为「报告的一节」，逐字照抄会造成事实错误；已在回执与本表声明。
++- **F-2 落点选择**：OB-63 的要求落在 **§11.2「回写口径」**（用户给出「§5.3 或 §11.3」两选）——
++  理由 = OB-63 自身的处置列已写「口径见 §11.2」，落 §11.2 可让该指针解析成立；已声明。
++- **F-3 处置列翻转**：OB-63 与 OB-70 的处置列由 `已登记` / `待议` 翻为 `已处置`（前者因要求已入正文，
++  后者因评估已在本片完成）；两行均为本片范围。
++- **F-4 ⑦ 降级**：本片 ⑦ 用 `deepseek-v4-pro`（用户切片定义明示），按 OB-37 元规则以 **ADR-020** 留痕。
++
++## 2. 启动前清单核对（步骤 0；逐条）
++
++| 项 | 内容 | 状态 |
++|---|---|---|
++| A-1 | `REMAINING_SLICES{,_EN}` 的 T027-ASSEMBLY-MIN 行改为「已提交 `68a1ef0` + `d2d6370`，CI run `37073985144` 双绿」 | **已处理**（由上一切片步骤 0 完成，本片逐字复核确认） |
++| A-2 | `REMAINING_SLICES{,_EN}` 的 DIRECTIVE-MODEL-LISTS 行改为「已提交 `35e8198`，CI run `37092310920` 双绿」 | **已处理**（本片 B 之前落盘） |
++| B-3 | `directive-model-lists{,_EN}.md` 的 §16 首句补「本节为事实记录，不改写 §11 / §12 的 ⑩ 停点当时表述」 | **已处理**（本片落盘） |
++| C-4 | OB-66 处置列明确「以 §12.4 台账为唯一真值源」+ 本片顺延第 3 次 | **已处理**（本片落盘） |
++| D-5 | 以 Codex / V4 Pro / Flash 各试一次 `modelId` 形式 | **已处理**（三试全被拒，见 §3） |
++| D-6 | 查 `runSubagent` 官方文档 | **已处理**（两页官方文档，见 §3） |
++| D-7 | 评估显示名稳定性 | **已处理**（见 §3） |
++| D-8 | 综合判断三案并写入报告（不改 `R2.2` 本体、不改 §2.2 表） | **已处理**（见 §3） |
++| D-9 | 评估结论作为下一片立项依据 | **已处理**（推荐案与立项要点见 §3 末） |
++| E-10 | OB-63 要求落地为规则正文 | **已处理**（落 §11.2，见 §4） |
++| 既有-1 | OB-68（§7.5 / §8.2 成本与档位定义） | **待办**（下一片；OB-68 处置列 `待议`） |
++| 既有-2 | OB-53 第 ⑤ 项（链配置侧 `model: "auto"`） | **待办**（下一片；触 `internal/**`，本片禁改） |
++| 既有-3 | OB-67（`gpt-6-luna` 首轮被拒） | **评估已完成**（与 OB-70 同源；修法裁定仍待下一片，OB-67 处置列维持 `待议`） |
++| 既有-4 | 主控交接审计（= T027 结束时） | **不适用**（本片非该锚点） |
++| 既有-5 | 战略回看（= S1 结束时） | **不适用**（本片非该锚点） |
++
++## 3. ① 评估：`runSubagent` 的 `model` 传参形式（本片核心）
++
++**实测（三次，D-5）**：以 `modelId` 形式调用 `runSubagent`，三个模型**全部被拒**，工具每次回传同一份可用清单：
++
++| 传入值（`modelId` 形式） | 结果 | 清单中的对应条目（限定名） |
++|---|---|---|
++| `gpt-5.3-codex` | **not found** | `GPT-5.3-Codex (copilot)` |
++| `deepseek-v4-pro` | **not found** | `DeepSeek V4 Pro (deepseek)` |
++| `deepseek-flash` | **not found** | `DeepSeek V4.1 Flash (deepseek)` |
++
++对照既往前片实测：`gpt-6-luna` 被拒，而 `GPT-6 Luna (copilot)` 通过（L1 至 L5 全绿）、
++`GPT-6.1 Sol (copilot)` 通过 ⇒ **拒绝原因是名称形式，而非模型不可用或档位不可用**（同一会话下档位更高的
++Luna / Sol 反而可用）。
++
++**证据留存**：三次被拒调用的回执原文留存于 `tmp/dce/probe-id-rejections.txt`（`local-only`），本报告的结论不再只有文字。
++
++**官方文档（D-6，两页）**：
++
++- 自定义代理页的 `handoffs.model` 明确：**Use the qualified model name in the format `Model Name (vendor)`**，
++  例如 `GPT-5 (copilot)`、`Claude Sonnet 4.5 (copilot)` ⇒ **限定名（显示名 + vendor）是文档规定的模型写法**；
++- 子代理页「Select the model for a subagent」（**Local harness 页签下的内容**——该页写明本地 harness 使用 `runSubagent` 工具）规定本地子代理选模顺序：① 主控给 `runSubagent` 的**显式
++  `model` 参数** → ② 自定义代理的 `model` 属性 → ③ Auto → ④ 主会话模型；并要求把 `<model name>`
++  替换为**本会话可用的模型**；排障表规定「**A requested model doesn't run ⇒ Use one of the models listed
++  in the error**」；
++- 同页另注：显式选模会**经主会话模型的成本档位校验**，超档时不执行并回报可用模型。该条**不能单独解释**
++  本片实测（Luna / Sol 档位更高却可用），故拒绝原因收敛为**名称形式**。
++
++**显示名稳定性（D-7）**：限定名**自带版本与 vendor**（`DeepSeek V4.1 Flash (deepseek)`；文档示例
++`Claude Sonnet 4.5 (copilot)`），清单内另有 `Auto (copilot)`（语义随设置变化）⇒ 版本升级与 vendor
++变更都会改变调用串。⇒ `R2.2` 的初始立意（防显示名漂移）**经实测与文档双重支持**。
++
++**三案评估（D-8；不改 `R2.2` 本体、不改 §2.2 表）**：
++
++| 案 | 结论 | 理由 |
++|---|---|---|
++| ① 改 `R2.2` 为显示名口径 | **不推荐** | 虽与文档一致，但把**版本 / vendor 漂移**引入契约，违背 `R2.2` 的防漂移立意 |
++| ② 加映射表（`modelId` → 限定名） | **推荐** | 任务包仍写稳定的 `modelId`，调用层按**唯一映射表**取限定名；`R2.2` 本体只需加一句指向映射表；映射表可加机械判据（成员集合相等、限定名逐字来自工具清单） |
++| ③ 保留 `R2.2` + 注记 | 现状（前片已落） | 零改动、零风险，但每次调用需人工查清单，规则与注记并存易被忽略 |
++
++**D-9 交付下一片**：若采纳案 ②，须另立 `[SLICE]`（改 `R2.2` 属契约语义变更）：① 建映射表（§2.2 的
++`modelId` 列 ↔ 工具清单限定名）；② 在 `R2.2` 增指向句；③ 增机械判据。
++
++## 4. 交付面与逐条落点
++
++| 项 | 落点 |
++|---|---|
++| A-1 | 复核确认（逐字命中「已提交 `68a1ef0`」「`d2d6370`」「`37073985144`」） |
++| A-2 | `docs/t027/REMAINING_SLICES{,_EN}.md` 的 DIRECTIVE-MODEL-LISTS 行 |
++| B-3 | `docs/validation/directive-model-lists{,_EN}.md` §16 首句 |
++| C-4 | `docs/DELIVERY_DIRECTIVE.md` §12.4 的 OB-66 处置列（`已裁决`） |
++| E-10 | `docs/DELIVERY_DIRECTIVE.md` §11.2 正文（OB-63 要求）；OB-63 处置列翻 `已处置` |
++| D | OB-70 处置列翻 `已处置`；评估结论入本报告 §3 |
++| 留痕 | `docs/ADR_REGISTER{,_EN}.md` 的 ADR-020（⑦ 降级）；上一片报告 `directive-model-lists` 的既有 §16 保持不动 |
++
++## 5. 执行流水线与环境
++
++①（评估与文档实现由主控承担，无独立 ① 调用）⇒ ② 文档实现 ⇒ ③ 清单核对与一致性 ⇒ ④ 门禁 ⇒
++⑤ **跳过**（§5.2 的 S 档为「可选」）⇒ ⑥ **跳过**（纯 `.md`、无代码语义，按 §7.2 的跳过条件，由 ⑦ 确认）
++⇒ ⑦ 终审（`deepseek-v4-pro`，**ADR-020 降级**；**独立性降低如实标注**）⇒ ⑧ 报告与回写 ⇒ ⑨ 原生验证 ⇒ ⑩ 停点。
++**额度实得**：探针 0；本次实测的 3 次 `modelId` 调用均为**被工具拒绝的无效调用**（不产生模型用量）。
++环境：Windows 本机；Node v24.17.0；Go 工具链 `go1.27.0 windows/amd64`；仓库 `github.com/larsonzh/prfrail`。
++
++## 6. 审查结论
++
++- ⑤：**跳过**（S 档可选）。
++- ⑥：**跳过**（纯文档切片；按 §7.2 的跳过条件，报告 §6 由 ⑦ 确认该跳过的成立性）。
++- ⑦：见 §12 的停点报告与本次终审结论（本片 ⑦ 由 `deepseek-v4-pro` 承担 ⇒ 独立性降低，已在 ADR-020 与本节如实标注）。
++
++## 7. 可证伪性与门禁结果
++
++| 检查 | 结果 |
++|---|---|
++| `gate.js --all --scope=tree` | 见 §8；首跑因 G3(b) 的 to-do 词表 0/2 而红，整改后复绿 |
++| `gate.js --all --scope=index` | 见 §8 |
++| `gate.js --selftest` | 见 §8 |
++| 清单核对（§2） | 15 项逐条标注，其中 A-1/A-2/B-3/C-4/D-5…D-9/E-10 已处理 |
++
++## 8. 门禁与原生验证
++
++见 §9（门禁读数已回填，含首跑红与整改说明）。
++
++## 9. 门禁读数
++
++- `--scope=tree`：`TOTAL_FAIL=0`。
++- `--scope=index`：`TOTAL_FAIL=0`。
++- `--selftest`：`PASS 264/264`（本片未改判据与夹具，读数应与切片起点一致）。
++- 基础门禁：`gofmt` 空、`go build` / `go vet` / `go test` 均 exit 0。
++
++## 10. 已知差异与未完成
++
++- OB-68（§7.5 / §8.2 的成本与档位定义）与 OB-53 第 ⑤ 项（链配置侧 `model: "auto"`）**不在本片范围**，
++  仍为 `待议`，由下一片处理。
++- 本片 ⑦ 为降级模型（ADR-020）⇒ 审查独立性低于白名单模型，结论应并读该限制。
++- ⑥ 的跳过依据为「纯文档、无代码语义」，由 ⑦ 在结论行中确认。
++
++## 11. 候选 OB（本片未新增）
++
++无新增 OB；本片收口既有 OB-63 / OB-66 / OB-70。
++
++## 12. ⑩ 停点报告
++
++- 执行至 ⑦ 终审；**停在提交授权之前**：本片不 commit、不 push、不推 gitee，等待用户同轮授权。
++- **回写核对**（OB-63 口径，本片为首次适用）：验证报告 = 已回写（本文件）；`DEV_PLAN` = **不适用**
++  （准则治理片，按切片定义与既有先例不写 `DEV_PLAN` 段落）；台账 = 已回写（§12.4 的 OB-63 / OB-66 / OB-70
++  处置列与本片完成记录行）；ADR = 已回写（ADR-020）。
++
++## 13. 产物清单
++
++```artifacts
++docs/DELIVERY_DIRECTIVE.md	repo
++docs/DELIVERY_DIRECTIVE_EN.md	repo
++docs/ADR_REGISTER.md	repo
++docs/ADR_REGISTER_EN.md	repo
++docs/t027/REMAINING_SLICES.md	repo
++docs/t027/REMAINING_SLICES_EN.md	repo
++docs/validation/directive-model-lists.md	repo
++docs/validation/directive-model-lists_EN.md	repo
++docs/validation/directive-cleanup-eval.md	repo
++docs/validation/directive-cleanup-eval_EN.md	repo
++tmp/dce/land.js	local-only
++tmp/dce/peek.js	local-only
++tmp/dce/gate-tree.txt	local-only
++tmp/dce/gate-index.txt	local-only
++tmp/dce/selftest.txt	local-only
++tmp/dce/probe-id-rejections.txt	local-only
++tmp/dce/gate-tree-first-fail.txt	local-only
++tmp/dce/test.txt	local-only
++```
+diff --git a/docs/validation/directive-cleanup-eval_EN.md b/docs/validation/directive-cleanup-eval_EN.md
+new file mode 100644
+index 0000000..5a03ec3
+--- /dev/null
++++ b/docs/validation/directive-cleanup-eval_EN.md
+@@ -0,0 +1,166 @@
++﻿# Slice validation report - `DIRECTIVE-CLEANUP-EVAL` (ledger cleanup plus the R2.2 argument-form assessment)
++
++> Per the serial pipeline of `docs/DELIVERY_DIRECTIVE.md` v1.18 (§5.1) and the evidence duty of §6.2.
++> **The CN file is authoritative**; this file is its positional mirror. Artifacts fence at the end.
++> Scale S, tier `[SLICE]`, probes 0.
++
++## 1. Change summary (including the execution freedom list) **Goal**: (1) clear two stale ledger statements; (2) write back the OB-66 basis; (3) complete the OB-70 assessment; (4) land OB-63. **Execution freedom exercised by this slice (§1.7.1, substantive choices)**:
++
++- **F-1 single-character correction**: the user wording "本机为事实记录" was corrected to "**本节**为事实记录" in the report §16 first sentence; basis = the subject of that sentence is a section of the report, so a verbatim copy would be factually wrong; declared here and in the receipt.
++- **F-2 landing-point choice**: the OB-63 requirement landed in **§11.2 (write-back standard)** (the user offered "§5.3 or §11.3") - because OB-63's own disposition says "wording basis in §11.2", so landing it there makes that pointer resolve; declared.
++- **F-3 disposition flips**: OB-63 and OB-70 moved from `registered` / `to be discussed` to `resolved` (the requirement is now in the rule body; the assessment is complete in this slice).
++- **F-4 ⑦ downgrade**: this slice ⑦ is `deepseek-v4-pro` (stated by the user's slice definition), recorded under the OB-37 meta-rule as **ADR-020**.
++
++## 2. Pre-start checklist verification (step 0, item by item)
++
++| Item | Content | State |
++|---|---|---|
++| A-1 | the T027-ASSEMBLY-MIN row in `REMAINING_SLICES{,_EN}` says "committed `68a1ef0` + `d2d6370`, CI run `37073985144` green on both legs" | **Done** (completed by the previous slice step 0; re-verified verbatim here) |
++| A-2 | the DIRECTIVE-MODEL-LISTS row says "committed `35e8198`, CI run `37092310920` green on both legs" | **Done** (landed by this slice) |
++| B-3 | §16 first sentence of `directive-model-lists{,_EN}.md` gains "this section is a factual record and does not rewrite §11 / §12" | **Done** (landed by this slice) |
++| C-4 | the OB-66 disposition states "the §12.4 ledger is the sole source of truth" plus this slice's third deferral | **Done** (landed by this slice) |
++| D-5 | probe the `modelId` form with Codex / V4 Pro / Flash | **Done** (all three rejected, see §3) |
++| D-6 | check the official `runSubagent` documentation | **Done** (two official pages, see §3) |
++| D-7 | assess display-name stability | **Done** (see §3) |
++| D-8 | judge the three options and write them into the report (without changing the `R2.2` body or the §2.2 table) | **Done** (see §3) |
++| D-9 | hand the conclusion to the next slice as a chartering basis | **Done** (recommendation and chartering points at the end of §3) |
++| E-10 | land the OB-63 requirement in the rule text | **Done** (landed in §11.2, see §4) |
++| existing-1 | OB-68 (cost and effort definitions in §7.5 / §8.2) | **To do** (next slice; OB-68 stays `to be discussed`) |
++| existing-2 | OB-53 item ⑤ (the chain-config `model: "auto"`) | **To do** (next slice; touches `internal/**`, forbidden here) |
++| existing-3 | OB-67 (the first `gpt-6-luna` rejection) | **Assessment done** (same origin as OB-70; the fix ruling stays with the next slice and OB-67 keeps its `to be discussed` disposition) |
++| existing-4 | the master hand-over audit (at the end of T027) | **Not applicable** (this slice is not that anchor) |
++| existing-5 | the strategic review (at the end of S1) | **Not applicable** (this slice is not that anchor) |
++
++## 3. ① Assessment: the `model` argument form of `runSubagent` (the core deliverable) **Measurement (three probes, D-5)**: calling `runSubagent` with the `modelId` form was **rejected for all three models**, each time with the same list of available models:
++
++| Value passed (the `modelId` form) | Result | The corresponding entry in that list (qualified name) |
++|---|---|---|
++| `gpt-5.3-codex` | **not found** | `GPT-5.3-Codex (copilot)` |
++| `deepseek-v4-pro` | **not found** | `DeepSeek V4 Pro (deepseek)` |
++| `deepseek-flash` | **not found** | `DeepSeek V4.1 Flash (deepseek)` |
++ Evidence from earlier slices for contrast: `gpt-6-luna` was rejected while `GPT-6 Luna (copilot)` passed (L1 to L5 all green) and `GPT-6.1 Sol (copilot)` passed ⇒ **the rejection is about the name form, not about model availability or tier availability** (in the same session the higher-tier Luna / Sol were usable).
++ **Evidence retained**: the three rejection receipts are kept verbatim in `tmp/dce/probe-id-rejections.txt` (`local-only`), so the conclusion no longer rests on prose alone.
++
++**Official documentation (D-6, two pages)**:
++
++- the custom-agents page's `handoffs.model` row says: **Use the qualified model name in the format
++  `Model Name (vendor)`**, for example `GPT-5 (copilot)` or `Claude Sonnet 4.5 (copilot)` ⇒ **the qualified
++  name (display name plus vendor) is the documented way to name a model**;
++- the subagents page ("Select the model for a subagent", under the **Local harness tab**, which states that the Local harness uses the `runSubagent` tool) defines the local order: (1) the explicit `model`
++  parameter the main agent passes to `runSubagent`, (2) the custom agent's `model` property, (3) Auto,
++  (4) the main conversation's model; it requires replacing `<model name>` with **a model available in your
++  session**, and its troubleshooting table says "**A requested model doesn't run ⇒ Use one of the models
++  listed in the error**";
++- the same page notes that an explicit selection is **checked against the main model's cost tier**, and an
++  over-tier selection does not run but reports the available models. That clause **cannot explain this slice's
++  measurement on its own** (the higher-tier Luna / Sol were usable), so the cause converges on the **name form**.
++
++**Display-name stability (D-7)**: a qualified name **carries a version and a vendor** (`DeepSeek V4.1 Flash
++(deepseek)`; the documentation examples use `Claude Sonnet 4.5 (copilot)`), and the list also contains
++`Auto (copilot)` whose meaning follows the setting ⇒ both version upgrades and vendor changes alter the call
++string. ⇒ `R2.2`'s original intent (preventing display-name drift) is **supported by both the measurement and
++the documentation**.
++
++**Three-option judgement (D-8; the `R2.2` body and the §2.2 table are left untouched)**:
++
++| Option | Verdict | Reason |
++|---|---|---|
++| (1) rewrite `R2.2` to the display-name reading | **not recommended** | it matches the documentation but imports **version / vendor drift** into the contract, against `R2.2`'s anti-drift intent |
++| (2) add a mapping table (`modelId` to qualified name) | **recommended** | task packages keep the stable `modelId` while the call layer takes the qualified name from a **single mapping table**; the `R2.2` body then needs only a pointer sentence, and the table can carry a mechanical criterion (equal member sets, qualified names copied verbatim from the tool list) |
++| (3) keep `R2.2` plus a note | the current state (landed by the previous slice) | zero change and zero risk, but every call needs a manual lookup and a rule living beside a note tends to be ignored |
++
++**D-9 hand-off to the next slice**: adopting option (2) requires a separate `[SLICE]` (changing `R2.2` is a
++contract-semantics change): (1) build the mapping table (§2.2's `modelId` column against the tool list's
++qualified names); (2) add the pointer sentence to `R2.2`; (3) add the mechanical criterion.
++
++## 4. Deliverables and their landing points
++
++| Item | Landing point |
++|---|---|
++| A-1 | verification only (the three strings "committed `68a1ef0`", "`d2d6370`", "`37073985144`" all hit) |
++| A-2 | the DIRECTIVE-MODEL-LISTS row in `docs/t027/REMAINING_SLICES{,_EN}.md` |
++| B-3 | the §16 first sentence of `docs/validation/directive-model-lists{,_EN}.md` |
++| C-4 | the OB-66 disposition cell in §12.4 of `docs/DELIVERY_DIRECTIVE.md` (`ruling`) |
++| E-10 | the §11.2 body of `docs/DELIVERY_DIRECTIVE.md` (the OB-63 requirement); OB-63 flipped to `resolved` |
++| D | OB-70 flipped to `resolved`; the assessment is in §3 of this report |
++| Records | ADR-020 in `docs/ADR_REGISTER{,_EN}.md` (the ⑦ downgrade); the existing §16 of the previous report stays untouched |
++
++## 5. Pipeline, environment and quota
++
++① (the assessment and document implementation were carried by the master; no separate ① call) ⇒
++② document implementation ⇒ ③ checklist and consistency ⇒ ④ gates ⇒ ⑤ **skipped** (optional at tier S in §5.2)
++⇒ ⑥ **skipped** (pure `.md`, no code semantics, per the §7.2 skip conditions, confirmed by ⑦) ⇒ ⑦ final review
++(`deepseek-v4-pro` per **ADR-020**; **reduced independence stated truthfully**) ⇒ ⑧ report and write-back ⇒
++⑨ native validation ⇒ ⑩ stop. **Quota actually used**: probes 0; the three `modelId` probes were **rejected
++calls that consumed no model usage**. Environment: Windows host; Node v24.17.0; Go `go1.27.0 windows/amd64`;
++repository `github.com/larsonzh/prfrail`.
++
++## 6. Review outcome
++
++- ⑤: **skipped** (optional at tier S).
++- ⑥: **skipped** (pure documentation slice, per the §7.2 skip conditions; ⑦ confirms in its verdict line).
++- ⑦: see the stop report in §12 and this round verdict (this slice ⑦ ran on `deepseek-v4-pro` ⇒ reduced independence, stated in ADR-020 and here).
++
++## 7. Falsifiability and gate results
++
++| Check | Result |
++|---|---|
++| `gate.js --all --scope=tree` | see §8; the first run was red on the G3(b) to-do token (0/2) and turned green after the fix |
++| `gate.js --all --scope=index` | see §8 |
++| `gate.js --selftest` | see §8 |
++| checklist (§2) | 15 items marked individually; A-1/A-2/B-3/C-4/D-5 to D-9/E-10 are done |
++
++## 8. Gates and native validation
++
++See §9 (the gate readings are filled in, including the first red run and its remediation).
++
++## 9. Gate readings
++
++- `--scope=tree`: `TOTAL_FAIL=0`.
++- `--scope=index`: `TOTAL_FAIL=0`.
++- `--selftest`: `PASS 264/264` (this slice changed no criterion or fixture, so the reading should match the slice start).
++- basic gates: `gofmt` empty, `go build` / `go vet` / `go test` all exit 0.
++
++## 10. Known divergences and open items
++
++- OB-68 (cost and effort definitions in §7.5 / §8.2) and OB-53 item ⑤ (the chain-config `model: "auto"`) are
++  **outside this slice** and stay `to be discussed`, for the next slice.
++- This slice ⑦ is a downgraded model (ADR-020) ⇒ its independence is below that of an allow-list model and the
++  verdict must be read together with that limitation.
++- The ⑥ skip rests on "pure documentation, no code semantics" and is confirmed by ⑦'s verdict line.
++
++## 11. Candidate OBs (none added by this slice)
++
++None added; this slice closes out OB-63 / OB-66 / OB-70.
++
++## 12. ⑩ Stop report
++
++- Executed through the ⑦ final review; **stopping before commit authorisation**: this slice does not commit,
++  push or push to gitee, and waits for the user authorisation in the same turn.
++- **Write-back check** (OB-63 wording, applied for the first time here): validation report = written back (this
++  file); `DEV_PLAN` = **not applicable** (a directive-governance slice which, per its charter and the existing
++  precedent, writes no `DEV_PLAN` section of its own); ledger = written back (the OB-63 / OB-66 / OB-70 disposition
++  cells in §12.4 and this slice's completion row); ADR = written back (ADR-020).
++
++## 13. Artifact list
++
++```artifacts
++docs/DELIVERY_DIRECTIVE.md	repo
++docs/DELIVERY_DIRECTIVE_EN.md	repo
++docs/ADR_REGISTER.md	repo
++docs/ADR_REGISTER_EN.md	repo
++docs/t027/REMAINING_SLICES.md	repo
++docs/t027/REMAINING_SLICES_EN.md	repo
++docs/validation/directive-model-lists.md	repo
++docs/validation/directive-model-lists_EN.md	repo
++docs/validation/directive-cleanup-eval.md	repo
++docs/validation/directive-cleanup-eval_EN.md	repo
++tmp/dce/land.js	local-only
++tmp/dce/peek.js	local-only
++tmp/dce/gate-tree.txt	local-only
++tmp/dce/gate-index.txt	local-only
++tmp/dce/selftest.txt	local-only
++tmp/dce/probe-id-rejections.txt	local-only
++tmp/dce/gate-tree-first-fail.txt	local-only
++tmp/dce/test.txt	local-only
++```
+diff --git a/docs/validation/directive-model-lists.md b/docs/validation/directive-model-lists.md
+index c124f87..9b05efc 100644
+--- a/docs/validation/directive-model-lists.md
++++ b/docs/validation/directive-model-lists.md
+@@ -170,6 +170,6 @@ tmp/dml/luna-probe/target.txt	local-only
+ 
+ ## 16. ⑩ 停点后的裁决回执（2026-10-03，事实记录）
+ 
+-- 用户在 ⑩ 停点给出四项裁决：① `R2.2` 口径选 **(C)**（保留 `R2.2` 本体，在 §2.2 加实测差异注记，并登记 OB-70）；② **确认**深度档触发集与 `gpt-6.1-sol` 的绑定；③ **接受**版本包于 ⑧b 落地且未经 ⑦ 复核（属事实记录，符合 OB-11 例外标准，不触发重跑 ⑦）；④ ⑤ **不补**第 3 轮（R2-1 由 ⑦ 覆盖闭环）。
++- **本节为事实记录，不改写 §11 / §12 的 ⑩ 停点当时表述。** 用户在 ⑩ 停点给出四项裁决：① `R2.2` 口径选 **(C)**（保留 `R2.2` 本体，在 §2.2 加实测差异注记，并登记 OB-70）；② **确认**深度档触发集与 `gpt-6.1-sol` 的绑定；③ **接受**版本包于 ⑧b 落地且未经 ⑦ 复核（属事实记录，符合 OB-11 例外标准，不触发重跑 ⑦）；④ ⑤ **不补**第 3 轮（R2-1 由 ⑦ 覆盖闭环）。
+ - 顺延次数口径：**接受「以 §12.4 为唯一真值源」**；回执中的口头计数不作数，本次记为第 3 次（OB-65），下一片回填 OB-66。
+ - 本节的 §11 / §12 两节保留 ⑩ 停点当时的表述（`待裁决` 状态），**不改写结论行**：本次只追加本事实记录，未重跑 ⑦（额度用满，用户明示不开第 4 轮）。
+diff --git a/docs/validation/directive-model-lists_EN.md b/docs/validation/directive-model-lists_EN.md
+index 851c571..02d9d2c 100644
+--- a/docs/validation/directive-model-lists_EN.md
++++ b/docs/validation/directive-model-lists_EN.md
+@@ -170,6 +170,6 @@ tmp/dml/luna-probe/target.txt	local-only
+ 
+ ## 16. Ruling receipt after the ⑩ stop point (2026-10-03, factual record)
+ 
+-- The user issued four rulings at the ⑩ stop point: (1) the `R2.2` reading takes **(C)** (keep the `R2.2` body, add a measured-difference note in §2.2, and register OB-70); (2) **confirmed** the binding of the depth-tier trigger set to `gpt-6.1-sol`; (3) **accepted** the version bundle landing at ⑧b without ⑦ review (it is a factual record meeting the OB-11 exception standard and does not trigger a ⑦ re-run); (4) ⑤ gets **no** third round (R2-1 is closed through ⑦).
++- **This section is a factual record and does not rewrite the ⑩-stop-point wording of §11 / §12.** The user issued four rulings at the ⑩ stop point: (1) the `R2.2` reading takes **(C)** (keep the `R2.2` body, add a measured-difference note in §2.2, and register OB-70); (2) **confirmed** the binding of the depth-tier trigger set to `gpt-6.1-sol`; (3) **accepted** the version bundle landing at ⑧b without ⑦ review (it is a factual record meeting the OB-11 exception standard and does not trigger a ⑦ re-run); (4) ⑤ gets **no** third round (R2-1 is closed through ⑦).
+ - Deferral counting basis: **accepting "the §12.4 ledger as the sole source of truth"**; the oral counts in receipts do not count, this one is recorded as the third (OB-65), and OB-66 is written back by the next slice.
+ - Sections §11 / §12 above keep their ⑩-stop-point wording (`awaiting ruling`); **no conclusion line is rewritten**: this record is the only addition, and ⑦ was not re-run (the quota is exhausted and the user ruled out a fourth round).

@@ -1,0 +1,15 @@
+97	26	docs/DELIVERY_DIRECTIVE.md
+97	26	docs/DELIVERY_DIRECTIVE_EN.md
+352	0	docs/validation/directive-review-saturation.md
+352	0	docs/validation/directive-review-saturation_EN.md
+41	0	docs/validation/evidence/directive-review-saturation-freedom-list.md
+311	3	tools/gates/lib/criteria/g6.js
+464	3	tools/gates/selftest.js
+17	0	tools/gates/testdata/fixtures/g6-5-c1-v31-table.txt
+5	0	tools/gates/testdata/fixtures/g6-5-dangling-ref.txt
+5	0	tools/gates/testdata/fixtures/g6-5-excluded-ref.txt
+15	0	tools/gates/testdata/fixtures/g6-5-legal-refs.txt
+9	0	tools/gates/testdata/fixtures/g6-5-outside.txt
+10	0	tools/gates/testdata/fixtures/g6-6-en-status.txt
+7	0	tools/gates/testdata/fixtures/g6-6-legacy-status.txt
+10	0	tools/gates/testdata/fixtures/g6-6-legal-status.txt

@@ -1,0 +1,5 @@
+175	84	docs/DELIVERY_DIRECTIVE.md
+175	84	docs/DELIVERY_DIRECTIVE_EN.md
+346	0	docs/validation/directive-v1.12.md
+346	0	docs/validation/directive-v1.12_EN.md
+37	0	docs/validation/evidence/directive-v1.12-freedom-list.md

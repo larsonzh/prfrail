@@ -183,5 +183,6 @@ internal/console/runtime.go	repo
 tmp/assembly-min/**	local-only
 tmp/dml/ci-run-37073985144.txt	local-only
 ```
+> **Archiving note (v1.23)**: the `tmp/` items cited by this report were archived under `docs/validation/evidence/directive-history/` per §1.5.1 (units: `assembly-min/`; each with `MANIFEST.md` and `SHA256SUMS.txt`); the original paths are not rewritten and the MANIFEST is the mapping of record. (Paths already cleared by earlier slices are outside this archiving and belong to the pre-existing decoupling recorded as OB-77.)
 
 - Note: under tree scope a `repo` row requires the path to be **registered in the index**; before commit authorisation this slice registers the path only, without staging content (`local-only` rows are exempt), so nothing enters the repo and the commit still needs same-turn authorisation.

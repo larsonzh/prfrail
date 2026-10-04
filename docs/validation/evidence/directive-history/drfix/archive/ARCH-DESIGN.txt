@@ -1,0 +1,122 @@
+# 《架构设计方案书》——DR-FIX 切片（试点）① 阶段
+
+范围：`tools/agent-probe/enforcement-proxy/**`（只读分析）。依据：`tmp/drfix/SLICE-DEFINITION.md`、`docs/t027/REMAINING_SLICES.md` §已知缺陷/§累计发生次数/§DR 处置口径、`enforcement-proxy/{main.go,main_test.go,Test-EnforcementProxy.ps1}`、`docs/DELIVERY_DIRECTIVE.md` §5.2/§6.3/§7.2/§7.5/§12.1。
+
+---
+
+## 1. 结论：根因判定（含任务 A / B 的明确答案）
+
+### 1.1 任务 A —— 交织证据归属判定（逐字）
+
+**判定：DR-5 失败日志（run `35622599102`，head `b597728`）中 3 条 `AUDIT TRAIL BROKEN` 行，不是"共享 rig / 临时目录"的证据。** 三条各有独立归属，逐条如下：
+
+**(a) 两条 `write … file already closed` 变体 —— 反向用例的**正常 fail-closed 输出（设计内行为）**。**
+
+- 机制：`eventLogger.fail()` 在首次写失败时向 stderr 打印该行——`main.go:136-141`：
+  > `fmt.Fprintf(os.Stderr, "enforcement-proxy: AUDIT TRAIL BROKEN (%v): requests are denied until the log is writable again\n", err)`
+- `TestAuditTrailFailureDeniesRequests` 在 `main_test.go:87` 处 `logger.close()`（注释原文："the audit trail becomes unusable"）后发请求；此时 `logger.err()`（`main.go:143-148`）返回 `l.failure`，首次请求到来时 `failure` 仍为 nil，于是走到 pre-flight 写入（`handlePlainHTTP` 的 `p.logger.log`）→ `l.w.Write` 命中已关闭文件 → 报 `write …: file already closed` → 打 403，测试断言 403（`main_test.go:101`）。该告警串是**该测试存在的目的**。
+- `TestConnectAuditTrailFailureDeniesAndDoesNotTunnel` 的第二阶段同理：`main_test.go:128` `logger.close()` 后请求，`handleConnect`（`main.go:209`）的 pre-flight 写（`main.go:225-233`）失败 → 打 403 → `main_test.go:132-135` 断言 403 且目标接受数不变。
+- **结论**：这两条是负向用例的预期输出，在**任何一次**运行（含全绿运行）都会出现。
+
+**(b) 一条 `sync … file already closed` 变体（路径 `…\TestTunnelWorksAcrossRealTLSThroughProxy666368954\001\proxy.jsonl`）—— 属于 `TestTunnelWorksAcrossRealTLSThroughProxy` 自己的 logger，是 cleanup 与 handler 的关闭/写入竞态，不是共享目录。**
+
+- 路径逐字证伪"共享临时目录"：Windows 下 `t.TempDir()` 布局为 `<Temp>\<测试名><随机数>\<序号>`。该路径含测试名 `TestTunnelWorksAcrossRealTLSThroughProxy` 与序号 `\001\`，证明该 logger 文件在该测试**自己的**临时目录内。Go `testing` 保证每个测试的 `TempDir()` 唯一；且 `main_test.go` 全文件**无任何包级变量**（全文通读确认），每个测试自行构造 logger / allowlist / server / echo 监听器，不存在可共享的 rig。
+- 该 `sync` 变体是**真实缺陷的噪声证据**（次要缺陷，非任何 DR 的成因）：`eventLogger.log()` 持 `l.mu` 做 Write+Sync（`main.go:110-134`），而 `eventLogger.close()` **不持锁**直接 `_ = l.w.Close()`（`main.go:150-155`）。`newTestProxy` 的 `t.Cleanup` 先 `server.Close()` 再 `logger.close()`（`main_test.go:225-226`），`server.Close()` 不等待被劫持隧道上的 handler goroutine 收尾；若 handler 正在写"closed"记录（`main.go:283-288`）时 cleanup 关闭文件，`Sync` 即报 `file already closed`。该测试自身断言在此之前已完成，**并不失败**——纯 stderr 噪声。
+
+**(c) 归属判定依据 DR-5 失败行号本身完成自证**：DR-5 登记失败行为 `main_test.go:324: target accept count = 0, want 1`（REMAINING_SLICES.md DR-5 行）。该行位于 `if accepted.Load() != 1` 之后，其**前一行** `main_test.go:320-322` 的 200 状态行检查已通过（否则失败行应是 322 的 `want 200 handshake`）。同理 DR-2 失败行 `main_test.go:125` 之前 `main_test.go:121-123` 的 200 检查已通过。**结论：失败瞬间握手已成功、隧道已建立，写日志的 pre-flight 早已通过** ⇒ 任何"日志不可写导致 403/502"的路径与这四个失败行**在源码顺序上互斥**（日志破损会让代理在 `dialTunnel` 之前返回 403——`main.go:221-233`，永远到不了 200 检查通过的状态）。
+
+### 1.2 任务 B —— 修法粒度判定：**共享根因（单一修复方案）**
+
+**判定：DR-2 / DR-3 / DR-4 / DR-5 共享同一根因——`startTCPEcho` 的接受计数器断言与"客户端观察到 200"之间缺少同步点。** 机制级判据（不是"断言串相同"）：
+
+- **同一状态**：四处失败读的是**同一 helper** `startTCPEcho`（`main_test.go:267-289`）创建的同型计数器（DR-2 变量名 `connections`、其余 `accepted`，均在 `main_test.go:274` 创建）。
+- **同一写序**：计数器唯一自增点是 Accept 循环 goroutine 内 `accepted.Add(1)`（`main_test.go:280`），且它在 `listener.Accept()` 返回**之后**（`main_test.go:277`）才执行。
+- **同一读序**：四处断言都是"`connectThroughProxy` 读到含 `200` 的状态行后**立即**读计数器"——`main_test.go:124-125`（DR-2）、`:323-324`（DR-5）、`:449-450`（DR-4）、`:468-469`（DR-3）。
+- **破坏者与时机**：200 的发出点 `main.go:258` 紧随 `dialTunnel` 返回（`main.go:241`），而 `dialTunnel` 的 `net.Dial`（`main.go:287`）在 **TCP 内核握手完成（listen backlog）时即返回**——不要求对端应用层 `Accept()` 已返回，更不要求 echo goroutine 已执行到 `Add(1)`。客户端读到 200 → 测试读计数器之间，与 `Add(1)` 之间**不存在任何 happens-before 边**；echo goroutine 的调度延迟无上界。CI 满负载（尤其 Windows 腿，四次首跑红均发生在 Windows 腿）时该间隙超过"立即读"的时点 ⇒ `Load()==0` ⇒ 红；复跑负载不同 ⇒ 绿。DR 台账中"该片无任何 `.go` 改动"（DR-3 第 2 次 / DR-4 / DR-5 行）与复跑绿即与该机制完全一致（与改动无因果关联）。
+- **DR-4 的加宽窗口**：多一跳 upstream 代理（客户端→代理→`TestConnectUsesUpstreamProxy` 的 httptest upstream→echo），链上多两个 handler goroutine，调度间隙更大，与"四处同族"不矛盾、反而相互印证。
+- **DR-2 症状串的误归属澄清**：DR-2 行"症状"列把 `AUDIT TRAIL BROKEN (write … file already closed)` 与 `main_test.go:125` 并列。按 §1.1(c)，两者在源码顺序上互斥——125 行失败 ⇒ 200 已见 ⇒ 日志在 pre-flight 时完好；该告警串来自**同一 `Test` 步骤日志中反向用例的预期输出**（步骤日志交织所致）。DR-2 的真实失败仍是计数器竞态。
+- **反例自查（证伪尝试）**：若四处根因不共享，应存在"非计数器竞态"的机制解释；逐一排除——(i) 日志句柄被共享/提前关闭：与 §1.1(c) 的源码顺序矛盾；(ii) 端口占用/监听失败：`net.Listen("127.0.0.1:0")` 与 `httptest.NewServer` 均取内核分配端口，且失败会是同步 `t.Fatal` 而非计数 0；(iii) 死锁：200 已回，与死锁矛盾。**无残留反例。**
+
+**结论（可证伪判据）**：共享根因成立 ⇒ 按切片九字段，采用**单一修复方案**（下述 §2 的 Fix-1，一处 helper + 四个调用点）。若 Fix-1 落定后仍有 DR 复现，则本判定被证伪，需回到"4 个独立修复"路径——该判定自身的证伪门槛已写入 §4 风险 R3。
+
+### 1.3 定论完备性
+
+本判定在只读条件下**可定论**，无需追加探针实验：机制证据为纯源码顺序 + TCP 语义（`main.go:287` 内核握手、`main_test.go:280` goroutine 内自增、四处读点紧随 200），且失败行号身份（计数行而非状态行）构成自证。**唯一非源码依赖的事实**是"CI 复跑绿"，已由台账 5 行累计表给出（REMAINING_SLICES.md:483-491）。
+
+---
+
+## 2. 改动点清单（文件级）
+
+硬边界核对：全部改动限于 `tools/agent-probe/enforcement-proxy/**`；不触 `internal/**`、契约/schema/fixtures、`.github/workflows/**`；无新依赖。均满足。
+
+### Fix-1（必需，单一修复方案）——接受计数器的确定性同步
+
+| 文件 | 既有语义 | 拟改动 | 为什么必须改 |
+|---|---|---|---|
+| `main_test.go:267-289`（`startTCPEcho`） | 计数器仅在 echo goroutine `Accept()` 后自增，对测试无任何"已接受"的同步信号 | **不改动**（保持 rig 语义；如 ② 选择加固方案见 Fix-1b） | rig 本身无缺陷；缺陷在断言读时序 |
+| `main_test.go:124-125`（DR-2 第 1 相） | `connections.Load() == 0` 立即读 | 改为 `waitForAccepts(t, connections, 1)` | 消除"200 已见而 Accept 未执行"的竞态；解决 DR-2 |
+| `main_test.go:323-324`（DR-5） | `accepted.Load() != 1` 立即读 | 改为 `waitForAccepts(t, accepted, 1)` | 解决 DR-5 |
+| `main_test.go:449-450`（DR-4） | 同上 | 同上 | 解决 DR-4 |
+| `main_test.go:468-469`（DR-3） | 同上 | 同上 | 解决 DR-3 |
+| `main_test.go`（新 helper，置于 `waitForRecord` 附近 ~`:262-275`） | 无 | 新增 `waitForAccepts(t *testing.T, counter *atomic.Int32, want int32)`：3s 截止、20ms 轮询、超时 `t.Fatalf("target accepts = %d, want %d", …)`——与既有 `waitForRecord` 同构 | 单一机制同时消除四处；镜像既有 helper 风格 |
+
+**边界语义保持**：DR-2 第二相（`main_test.go:129,134`：日志破损后计数不变）与 `TestConnectTunnelDeniedByAllowlist`（`:342-343`：拒绝不拨号、计数恒 0）**不修改**——这两处是确定性断言（deny 路径在 `dialTunnel` 之前返回，`main.go:213-233`），不参与竞态。修复后 DR-2 第一相轮询通过 ⇒ `before`（`:129`）必然 ≥1 且稳定，第二相语义不变。
+
+### Fix-2（必需，同族潜在 flake 的预防）——完成记录的同步读取
+
+| 文件 | 既有语义 | 拟改动 | 为什么必须改 |
+|---|---|---|---|
+| `main_test.go` `TestPlainHTTPForwardedAndLogged`（`client.Get` 返回后立即 `readLog` 并断言 `len(records) >= 2` 与完成记录字段） | handler 的完成记录写在 `io.Copy(w, response.Body)` **之后**（`handlePlainHTTP` 末尾），客户端读完 body 即返回 ⇒ 该记录可能尚未落盘 | 完成记录断言改用 `waitForRecord`（predicate：`event=="http" && decision=="allow" && bytesToClient != nil`）；首条 authorized 记录断言保留立即读（该记录在 RoundTrip 之前同步写，确定性） | 同一族的"handler goroutine 写 vs 测试立即读"竞态（未登记 DR 的 DR-6 候选）；不修则"首跑即绿"仍可能被它击穿 |
+
+### Fix-3（推荐但可分离）——`eventLogger.close()` 加锁
+
+| 文件 | 既有语义 | 拟改动 | 为什么必须改 |
+|---|---|---|---|
+| `main.go:150-155` | `close()` 无锁 `_ = l.w.Close()`，可与 handler 的 `log()`（持 `l.mu` 的 Write+Sync，`main.go:110-134`）并发交错 ⇒ 产生 `sync … file already closed` 噪声（§1.1(b)） | `close()` 内先 `l.mu.Lock()/Unlock()` 再 Close | 消除 DR-5 步骤日志中第 3 条告警串的来源，防其继续污染 CI 日志可信度；负向用例行为零变化（关闭后 `Write` 仍确定性失败、403 断言不变） |
+
+**决定权**：Fix-1 + Fix-2 为本方案必需项（共同构成"单一修复方案"的完整面：Fix-1 消四处登记 DR，Fix-2 消同族未登记缺陷）。Fix-3 属 hygiene，② 实现时可纳入（便宜、低风险、在边界内），但**不作为验收必需**——其变异判据弱（见 §3 T7），单独标出以免稀释验收证据。
+
+**明确不改**：`connectThroughProxy` 的单行状态读取逻辑；生产语义（allow/deny/observe/审计 fail-closed）；`Test-EnforcementProxy.ps1`（密闭自检用真实二进制 + 自有 target 脚本，不涉及本竞态）。
+
+---
+
+## 3. 测试点清单（可执行，含变异判据）
+
+**变异判据总纲（本片特有口径，须写进 ② 实现与 ③ 测试文档）**：时序 flake 修复的"去掉修复即红"存在**不可确定性**——还原为立即读后本地大概率仍绿（这正是 flake 定义）。因此本片变异判据定义为两层：**（甲）注入底层真实缺陷**（使隧道/拒绝逻辑真的失效）⇒ 修复后的断言**确定性变红**（3s 截止内）；**（乙）结构消除性证据** = 本地 `go test -count=10` + 首跑 CI 3 连推双绿（切片验收①）。不允许用"还原修复后复跑绿"充当（乙）之外的反证。
+
+**口径修正（③ 实测，2026-09-22；原判据的"确定性变红"成立，但归因断言需区分两类注入）**：
+
+- **甲-i（按 §3 表所列注入点）**：allow 改错 / 去掉 `observe: true` / upstream 指向已关闭端口 / 删除完成记录写入 —— 实测四处**在更早的"状态行"断言上先红**（`want 200 handshake, got 403` / `want a 200 before the log is broken` / `observe mode must permit…` / `want 200, got 502`），因为状态行检查位于 `waitForAccepts` **之前**。⇒ "确定性变红"成立，但**不构成对 `waitForAccepts` 本身的证伪**。
+- **甲-ii（守卫删除性注入，必需补充）**：删除 `startTCPEcho` 的唯一自增点 `accepted.Add(1)`（隧道仍建、200 仍返回，仅"接受未被记录"）⇒ 四处**逐字命中** `target accepts = 0, want 1`，实测 3.02 / 3.02 / 3.03 / 4.38 s（均在 3 s 硬截止边界上）；同批 `TestConnectTunnelDeniedByAllowlist`（deny 路径计数恒 0 的既有断言）**仍绿** ⇒ 无牵连误报。
+- ⇒ **验收口径**：甲-i 证明"回归会被抓到"，甲-ii 证明"`waitForAccepts` 断言本身可被证伪"；两者互补，报告须分别标注归因。
+
+| 编号 | 测试点（文件/行位） | 类别 | 内容 | 变异判据（去掉修复/注入缺陷后哪个断言红） |
+|---|---|---|---|---|
+| T1 | `TestConnectTunnelAllowedReachesTarget`（DR-5 位，`:323-324`） | 正例 | `waitForAccepts(t, accepted, 1)` 通过；随后既有 `waitForRecord` 断言 established 记录 | 甲：把 `newTestProxy` 的 allow 改为 `"example.invalid"` ⇒ 拨号不发生 ⇒ 轮询 3s 超时 ⇒ `target accepts = 0, want 1` 红（确定性）。乙：`-count=10` 全绿 |
+| T2 | `TestConnectAuditTrailFailureDeniesAndDoesNotTunnel`（DR-2 位，`:124-125`） | 正例+反例 | 第 1 相 `waitForAccepts(connections,1)`；第 2 相保持既有"403 且计数不变"断言 | 甲：同 T1 改 allow ⇒ 第 1 相超时红。反例不变：`logger.close()` 后 403 断言（`:132`）在去掉 Fix 前后均红/绿一致 |
+| T3 | `TestObserveModeAllowsUnknownHostAndLogsIt`（DR-3 位，`:468-469`） | 正例 | observe 模式 `waitForAccepts(accepted,1)` | 甲：去掉 `observe: true` 配置 ⇒ deny ⇒ 超时红 |
+| T4 | `TestConnectUsesUpstreamProxy`（DR-4 位，`:449-450`） | 正例+边界（多一跳） | upstream 路径 `waitForAccepts(accepted,1)` + 既有 `upstreamHits==1` 断言（该断言本身确定性：upstream 计数在它转发 200 之前已自增） | 甲：把 upstream 指向已关闭端口 ⇒ `dialTunnel` 对 upstream 失败 ⇒ 502 ⇒ 状态行检查（`:447-449` 前序）红（确定性）。另：改 `r.Host` 拼接错误 ⇒ echo 收不到 ⇒ 超时红 |
+| T5 | 包级并发/稳定性 | 并发+崩溃窗口 | 本地 `go test -count=10 ./tools/agent-probe/enforcement-proxy` 全绿（切片验收②）；`go test -race -count=1` 同包不报 race（若 CI 未含本包 race 子集，本地补跑） | 乙类证据；`-count=10` 中任何一次红 = 修复失败（按 DR 处置口径边界③ 单独登记） |
+| T6 | `TestPlainHTTPForwardedAndLogged`（Fix-2） | 正例+边界 | 完成记录改用 `waitForRecord` 轮询（3s/20ms）；保留首条 authorized 立即断言与 `bytesToClient != nil` 断言 | 甲：删除 `handlePlainHTTP` 末尾完成记录 `logger.log` 调用 ⇒ 轮询超时红（确定性）。还原为立即 `readLog` 属乙类不可定反证，不采用 |
+| T7 | 负向用例回归（Fix-3 若纳入） | 反例 | `TestAuditTrailFailureDeniesRequests` / `TestConnectAuditTrailFailureDeniesAndDoesNotTunnel` 的 403 路径全绿、`TestRunFailsFastOnOccupiedPort` 全绿 | **弱判据（如实声明）**：close 加锁后写失败仍确定性返回错误，负向断言不变；"消除 `sync` 噪声"只能以运行日志不再出现该行为观察证据，不可机械变红 ⇒ Fix-3 列为可选、不计入验收必需 |
+| T8 | 正例深化（② 可选加固，Fix-1b） | 数据流证明 | 若 ② 选择"200 后经隧道往返一个字节并断言回显"（替代或叠加计数轮询），则断言强度从"内核已连接"升为"应用层已收发" | 甲：断开 echo 的 `io.Copy` 回显 ⇒ 往返超时红（确定性，强于计数轮询） |
+
+**执行顺序**：② 实现 Fix-1/2（+可选 Fix-3）→ ③ 按 T1–T7 逐条执行，T5 为收尾门禁；`Test-EnforcementProxy.ps1` 密闭自检需重跑确认不回归（checks 数不变）。
+
+---
+
+## 4. 风险与缓解
+
+| # | 风险 | 缓解 |
+|---|---|---|
+| R1 | **修复掩盖真实缺陷**：轮询把"立即计数"变"最终计数"，若真实缺陷是"延迟拨号/缓慢建立"而非"不拨号"，轮询可能放行 | 轮询截止 3s 是**硬失败界**：真实缺陷若导致 3s 内无 accept 仍确定性红；若担心"慢而不断"类缺陷，② 采用 T8 的隧道往返加固（应用层数据流证明），使断言不依赖任何计时 |
+| R2 | **根因判定错误会怎样**：若真因不是计数竞态（例如确有共享句柄在隐蔽路径被关闭），Fix-1 不消除 125/324/450/469 行红 | 源码顺序互斥性（§1.1(c)）已将"日志破损"与"200 已见"证伪；若修复后 CI 首跑仍红，按 DR 处置口径边界③**单独登记为"修复失败"**，回到"4 个独立修复"路径重做 ①——本方案书即该回退的输入 |
+| R3 | **变异判据的不可确定性**（还原修复不保证红） | §3 已改口径：以"注入真实缺陷 ⇒ 确定性红"为变异判据（甲），以 `-count=10` + 3 连推首跑双绿为结构消除证据（乙）；报告须如实记录口径，不得宣称"还原即红" |
+| R4 | **轮询增加失败延迟**：真实回归下每处多 3s | 仅失败路径 +3s；成功路径轮询首拍即过（accept 通常已在 200 前或毫秒内完成）。CI 全包时长影响可忽略 |
+| R5 | **边界/审查成本误判**：本片含 `.go` 语义变更 ⇒ §7.2 ⑥ 可跳过三条件之②不成立 ⇒ **⑥ 不可跳过**（对照 §7.2 反面样例）；按 §5.2"中等"行 ⑤⑥⑦ 均需、⑧ab/⑨ 需；§7.5 成本 ①V4 Pro ×1（本次）、⑤ ≤1+1、⑥ MAI ≤3、⑦ Codex 1+1 | 主控按矩阵调度，不因"看起来是测试小修"跳过 ⑥；⑦ 首轮不附 ③/⑥ 清单（§7.3 锚定隔离） |
+| R6 | **DR 处置口径边界③生效时点**：修复切片结束后任何复现即"修复失败"证据 | ⑧b 台账回写须把累计表延续 + 处置口径失效时点写清；报告含 3 连推首跑证据与 run 号 |
+| R7 | **Fix-3 的噪声消除不彻底**：`server.Close()` 后 handler 仍可能写"closed"记录，只是失败形态从 Sync 中途变为 Write 开头，`fail()` 仍打印一次 | 接受为已缓解（消息从竞态产物变为确定性关闭后写失败，且 `failureOnce` 保证每 logger 至多一条）；若追求零噪声，需测试在 close 前等待隧道终止——超出本片最小修法，记为不采纳并写入报告 |
+
+**试点指标预判（§12.1）**：缺陷自捕获率目标 ≥3/4——本片由 ① 已自捕获 Fix-2（未登记 DR 的同族缺陷）1 项，预期达成；返工次数、⑦ 无效轮次、用户发现遗漏按主控流程控制。
+
+ARCH: DONE

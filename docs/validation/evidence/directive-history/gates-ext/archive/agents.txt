@@ -1,0 +1,31 @@
+context-researcher.agent.md
+deep-reasoner.agent.md
+expert-arbiter.agent.md
+fast-implementer.agent.md
+heavy-builder.agent.md
+independent-reviewer.agent.md
+planning-specialist.agent.md
+prfrail-documenter.agent.md
+prfrail-implementer.agent.md
+prfrail-tester.agent.md
+quick-researcher.agent.md
+quick-verifier.agent.md
+sol-orchestrator.agent.md
+standard-builder.agent.md
+deep-reasoner.agent.md
+independent-reviewer.agent.md
+quick-verifier.agent.md
+context-researcher.agent.md => tools: ['read', 'search']
+deep-reasoner.agent.md => tools: ['read', 'search']
+expert-arbiter.agent.md => tools: ['read', 'search']
+fast-implementer.agent.md => tools: ['read', 'search', 'edit', 'execute']
+heavy-builder.agent.md => tools: ['read', 'search', 'edit', 'execute']
+independent-reviewer.agent.md => tools: ['read', 'search']
+planning-specialist.agent.md => tools: ['read', 'search']
+prfrail-documenter.agent.md => tools: ['read', 'search', 'edit', 'execute']
+prfrail-implementer.agent.md => tools: ['read', 'search', 'edit', 'execute']
+prfrail-tester.agent.md => tools: ['read', 'search', 'edit', 'execute']
+quick-researcher.agent.md => tools: ['read', 'search']
+quick-verifier.agent.md => tools: ['read', 'search', 'execute']
+sol-orchestrator.agent.md => tools: ['read','search','execute','agent']
+standard-builder.agent.md => tools: ['read', 'search', 'edit', 'execute']

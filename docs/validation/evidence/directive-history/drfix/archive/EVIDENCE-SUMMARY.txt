@@ -1,0 +1,162 @@
+==== A1-T1T4-injected ====
+=== RUN   TestConnectAuditTrailFailureDeniesAndDoesNotTunnel
+    main_test.go:122: status line = "HTTP/1.1 403 Forbidden", want a 200 before the log is broken
+    testing.go:1617: TempDir RemoveAll cleanup: unlinkat C:\Users\濡欏鍛淺AppData\Local\Temp\TestConnectAuditTrailFailureDeniesAndDoesNotTunnel46162380\001\proxy.jsonl: The process cannot access the file because it is being used by another process.
+--- FAIL: TestConnectAuditTrailFailureDeniesAndDoesNotTunnel (1.53s)
+=== RUN   TestConnectTunnelAllowedReachesTarget
+    main_test.go:334: want 200 handshake, got "HTTP/1.1 403 Forbidden"
+--- FAIL: TestConnectTunnelAllowedReachesTarget (0.01s)
+=== RUN   TestConnectUsesUpstreamProxy
+    main_test.go:461: want 200, got "HTTP/1.1 502 Bad Gateway"
+--- FAIL: TestConnectUsesUpstreamProxy (0.01s)
+=== RUN   TestObserveModeAllowsUnknownHostAndLogsIt
+    main_test.go:481: observe mode must permit the tunnel, got "HTTP/1.1 403 Forbidden"
+--- FAIL: TestObserveModeAllowsUnknownHostAndLogsIt (0.00s)
+FAIL
+FAIL	github.com/larsonzh/prfrail/tools/agent-probe/enforcement-proxy	2.404s
+FAIL
+
+==== A2-restored-green ====
+=== RUN   TestConnectAuditTrailFailureDeniesAndDoesNotTunnel
+enforcement-proxy: AUDIT TRAIL BROKEN (write C:\Users\濡欏鍛淺AppData\Local\Temp\TestConnectAuditTrailFailureDeniesAndDoesNotTunnel3038858980\001\proxy.jsonl: file already closed): requests are denied until the log is writable again
+--- PASS: TestConnectAuditTrailFailureDeniesAndDoesNotTunnel (0.02s)
+=== RUN   TestConnectTunnelAllowedReachesTarget
+--- PASS: TestConnectTunnelAllowedReachesTarget (0.01s)
+=== RUN   TestConnectUsesUpstreamProxy
+--- PASS: TestConnectUsesUpstreamProxy (0.01s)
+=== RUN   TestObserveModeAllowsUnknownHostAndLogsIt
+--- PASS: TestObserveModeAllowsUnknownHostAndLogsIt (0.01s)
+PASS
+ok  	github.com/larsonzh/prfrail/tools/agent-probe/enforcement-proxy	1.043s
+
+==== A3-guard-removed ====
+=== RUN   TestConnectAuditTrailFailureDeniesAndDoesNotTunnel
+    main_test.go:124: target accepts = 0, want 1
+    testing.go:1617: TempDir RemoveAll cleanup: unlinkat C:\Users\濡欏鍛淺AppData\Local\Temp\TestConnectAuditTrailFailureDeniesAndDoesNotTunnel453997185\001\proxy.jsonl: The process cannot access the file because it is being used by another process.
+--- FAIL: TestConnectAuditTrailFailureDeniesAndDoesNotTunnel (4.38s)
+=== RUN   TestConnectTunnelAllowedReachesTarget
+    main_test.go:336: target accepts = 0, want 1
+--- FAIL: TestConnectTunnelAllowedReachesTarget (3.02s)
+=== RUN   TestConnectTunnelDeniedByAllowlist
+--- PASS: TestConnectTunnelDeniedByAllowlist (0.01s)
+=== RUN   TestConnectUsesUpstreamProxy
+    main_test.go:466: target accepts = 0, want 1
+--- FAIL: TestConnectUsesUpstreamProxy (3.02s)
+=== RUN   TestObserveModeAllowsUnknownHostAndLogsIt
+    main_test.go:483: target accepts = 0, want 1
+--- FAIL: TestObserveModeAllowsUnknownHostAndLogsIt (3.03s)
+FAIL
+FAIL	github.com/larsonzh/prfrail/tools/agent-probe/enforcement-proxy	14.796s
+FAIL
+
+==== A4-restored-green-full ====
+=== RUN   TestAllowlistMatching
+--- PASS: TestAllowlistMatching (0.00s)
+=== RUN   TestListenAddressMustBeLoopback
+--- PASS: TestListenAddressMustBeLoopback (0.00s)
+=== RUN   TestAuditTrailFailureDeniesRequests
+enforcement-proxy: AUDIT TRAIL BROKEN (write C:\Users\濡欏鍛淺AppData\Local\Temp\TestAuditTrailFailureDeniesRequests192616080\001\proxy.jsonl: file already closed): requests are denied until the log is writable again
+--- PASS: TestAuditTrailFailureDeniesRequests (0.01s)
+=== RUN   TestConnectAuditTrailFailureDeniesAndDoesNotTunnel
+enforcement-proxy: AUDIT TRAIL BROKEN (write C:\Users\濡欏鍛淺AppData\Local\Temp\TestConnectAuditTrailFailureDeniesAndDoesNotTunnel73480897\001\proxy.jsonl: file already closed): requests are denied until the log is writable again
+--- PASS: TestConnectAuditTrailFailureDeniesAndDoesNotTunnel (0.01s)
+=== RUN   TestMalformedRequestIsAudited
+--- PASS: TestMalformedRequestIsAudited (0.01s)
+=== RUN   TestPlainHTTPRecordsPort
+--- PASS: TestPlainHTTPRecordsPort (0.01s)
+=== RUN   TestDialFailureIsAuditedAsDeny
+--- PASS: TestDialFailureIsAuditedAsDeny (0.01s)
+=== RUN   TestConnectTunnelAllowedReachesTarget
+--- PASS: TestConnectTunnelAllowedReachesTarget (0.01s)
+=== RUN   TestConnectTunnelDeniedByAllowlist
+--- PASS: TestConnectTunnelDeniedByAllowlist (0.01s)
+=== RUN   TestPlainHTTPForwardedAndLogged
+--- PASS: TestPlainHTTPForwardedAndLogged (0.01s)
+=== RUN   TestPlainHTTPDeniedByAllowlist
+--- PASS: TestPlainHTTPDeniedByAllowlist (0.01s)
+=== RUN   TestConnectUsesUpstreamProxy
+--- PASS: TestConnectUsesUpstreamProxy (0.01s)
+=== RUN   TestObserveModeAllowsUnknownHostAndLogsIt
+--- PASS: TestObserveModeAllowsUnknownHostAndLogsIt (0.01s)
+=== RUN   TestRunFailsFastOnOccupiedPort
+--- PASS: TestRunFailsFastOnOccupiedPort (0.00s)
+=== RUN   TestTunnelWorksAcrossRealTLSThroughProxy
+--- PASS: TestTunnelWorksAcrossRealTLSThroughProxy (0.01s)
+PASS
+ok  	github.com/larsonzh/prfrail/tools/agent-probe/enforcement-proxy	1.061s
+
+==== A5-T6-injected ====
+=== RUN   TestPlainHTTPForwardedAndLogged
+    main_test.go:392: no matching log record within the deadline; log=[map[client:127.0.0.1:51892 decision:allow event:http host:127.0.0.1 method:GET phase:authorized port:51890 reason:allowlisted ts:2026-09-21T18:45:33.126909Z]]
+--- FAIL: TestPlainHTTPForwardedAndLogged (3.02s)
+FAIL
+FAIL	github.com/larsonzh/prfrail/tools/agent-probe/enforcement-proxy	3.794s
+FAIL
+
+==== A6-T7-Fix3-reverted ====
+=== RUN   TestAuditTrailFailureDeniesRequests
+enforcement-proxy: AUDIT TRAIL BROKEN (write C:\Users\濡欏鍛淺AppData\Local\Temp\TestAuditTrailFailureDeniesRequests1589723981\001\proxy.jsonl: file already closed): requests are denied until the log is writable again
+--- PASS: TestAuditTrailFailureDeniesRequests (0.01s)
+=== RUN   TestConnectAuditTrailFailureDeniesAndDoesNotTunnel
+enforcement-proxy: AUDIT TRAIL BROKEN (sync C:\Users\濡欏鍛淺AppData\Local\Temp\TestConnectAuditTrailFailureDeniesAndDoesNotTunnel2760600995\001\proxy.jsonl: file already closed): requests are denied until the log is writable again
+--- PASS: TestConnectAuditTrailFailureDeniesAndDoesNotTunnel (0.01s)
+=== RUN   TestRunFailsFastOnOccupiedPort
+--- PASS: TestRunFailsFastOnOccupiedPort (0.00s)
+PASS
+ok  	github.com/larsonzh/prfrail/tools/agent-probe/enforcement-proxy	0.839s
+
+==== A7-T1-mutation-red ====
+=== RUN   TestReadLogToleratesTornTrailingAppend
+    main_test.go:304: log line is not JSON: unexpected end of JSON input ("{\"event\":\"http\",\"deci")
+--- FAIL: TestReadLogToleratesTornTrailingAppend (0.00s)
+FAIL
+FAIL	github.com/larsonzh/prfrail/tools/agent-probe/enforcement-proxy	1.200s
+FAIL
+
+==== A8-T1-tolerant-too-much-red ====
+=== RUN   TestParseLogLinesIntoStrictness
+    main_test.go:324: badLine = "", want the offending line "{\"event\":\"http\"" verbatim
+--- FAIL: TestParseLogLinesIntoStrictness (0.00s)
+FAIL
+FAIL	github.com/larsonzh/prfrail/tools/agent-probe/enforcement-proxy	0.981s
+FAIL
+
+==== B2-count10-T1 ====
+ok  	github.com/larsonzh/prfrail/tools/agent-probe/enforcement-proxy	4.273s
+
+==== B3-full-suite-T1 ====
+?   	github.com/larsonzh/prfrail/cmd/prfrail	[no test files]
+?   	github.com/larsonzh/prfrail/cmd/prfrail-release	[no test files]
+ok  	github.com/larsonzh/prfrail/examples/whois-shadow	1.201s
+ok  	github.com/larsonzh/prfrail/internal/adapters	27.375s
+ok  	github.com/larsonzh/prfrail/internal/applier	1.930s
+ok  	github.com/larsonzh/prfrail/internal/chain	2.241s
+ok  	github.com/larsonzh/prfrail/internal/console	4.004s
+ok  	github.com/larsonzh/prfrail/internal/evidence	1.688s
+ok  	github.com/larsonzh/prfrail/internal/gates	5.183s
+ok  	github.com/larsonzh/prfrail/internal/guard	5.350s
+ok  	github.com/larsonzh/prfrail/internal/release	11.860s
+ok  	github.com/larsonzh/prfrail/internal/repair	2.964s
+ok  	github.com/larsonzh/prfrail/internal/snapshot	4.285s
+ok  	github.com/larsonzh/prfrail/internal/taskdef	3.103s
+ok  	github.com/larsonzh/prfrail/internal/tickets	1.450s
+ok  	github.com/larsonzh/prfrail/tools/agent-probe/enforcement-proxy	2.419s
+?   	github.com/larsonzh/prfrail/tools/agent-probe/supervisor	[no test files]
+?   	github.com/larsonzh/prfrail/tools/agent-stub	[no test files]
+
+==== B4-psself-test-T1 ====
+ok   - the proxy builds
+ok   - proxy reports ready on the fixed listen endpoint
+ok   - an allowlisted target is reachable through the proxy
+ok   - the allowed request is recorded as decision=allow
+ok   - a non-allowlisted target is refused with 403
+ok   - the refusal is recorded with reason=not-on-allowlist
+ok   - observe mode forwards a non-allowlisted target
+ok   - observe mode records the target for allowlist construction
+ok   - the port holder is listening before the occupied-port probe
+ok   - an occupied fixed port makes the proxy exit instead of switching
+ok   - the refusal states the no-silent-switch rule
+ok   - the occupied-port exit code is non-zero
+ok   - all audit log lines parse as JSON
+selftest: checks=13 failures=0
+

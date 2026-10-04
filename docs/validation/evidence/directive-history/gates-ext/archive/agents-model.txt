@@ -1,0 +1,3 @@
+deep-reasoner.agent.md => model: deepseek-v4-pro
+independent-reviewer.agent.md => model: gpt-5.3-codex
+quick-verifier.agent.md => model: deepseek-flash

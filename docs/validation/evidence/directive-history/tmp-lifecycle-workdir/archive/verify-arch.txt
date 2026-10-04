@@ -1,0 +1,17 @@
+assembly-min                sums= 12 ok= 12 bad=0 miss=0  archiveFiles(=sums+2)=14  bom=true  sections=5/5
+b4                          sums= 50 ok= 50 bad=0 miss=0  archiveFiles(=sums+2)=52  bom=true  sections=5/5
+dce                         sums= 11 ok= 11 bad=0 miss=0  archiveFiles(=sums+2)=13  bom=true  sections=5/5
+dr1                         sums= 14 ok= 14 bad=0 miss=0  archiveFiles(=sums+2)=16  bom=true  sections=5/5
+drfix                       sums= 19 ok= 19 bad=0 miss=0  archiveFiles(=sums+2)=21  bom=true  sections=5/5
+gate-js                     sums=  1 ok=  1 bad=0 miss=0  archiveFiles(=sums+2)=3  bom=true  sections=5/5
+gates-ext                   sums= 31 ok= 31 bad=0 miss=0  archiveFiles(=sums+2)=33  bom=true  sections=5/5
+lbf                         sums= 12 ok= 12 bad=0 miss=0  archiveFiles(=sums+2)=14  bom=true  sections=5/5
+master-subagent-architecturesums=  1 ok=  1 bad=0 miss=0  archiveFiles(=sums+2)=3  bom=true  sections=5/5
+pre-directive-package       sums=  1 ok=  1 bad=0 miss=0  archiveFiles(=sums+2)=3  bom=true  sections=5/5
+reviews                     sums=  6 ok=  6 bad=0 miss=0  archiveFiles(=sums+2)=8  bom=true  sections=5/5
+s1-reach                    sums=  8 ok=  8 bad=0 miss=0  archiveFiles(=sums+2)=10  bom=true  sections=5/5
+tmp-lifecycle-workdir       sums= 15 ok= 15 bad=0 miss=0  archiveFiles(=sums+2)=17  bom=true  sections=5/5
+v112                        sums= 22 ok= 22 bad=0 miss=0  archiveFiles(=sums+2)=24  bom=true  sections=5/5
+v113                        sums= 76 ok= 76 bad=0 miss=0  archiveFiles(=sums+2)=78  bom=true  sections=5/5
+
+TOTAL sums lines=279 bad=0 missing=0

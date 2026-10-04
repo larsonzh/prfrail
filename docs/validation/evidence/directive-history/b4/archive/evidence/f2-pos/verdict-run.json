@@ -1,0 +1,172 @@
+{
+  "face": "f2",
+  "case": "pos",
+  "phase": "run",
+  "runId": "run-b4",
+  "requestId": "request-run-b4",
+  "runRoot": "D:\\LZProjects\\prfrail\\tmp\\b4\\runs\\f2-pos",
+  "workspace": "D:\\LZProjects\\prfrail\\tmp\\b4\\runs\\f2-pos\\workspace",
+  "startedAt": "2026-09-22T16:57:10.210Z",
+  "endedAt": "2026-09-22T16:57:15.371Z",
+  "verdictClass": "uncertain-or-paused",
+  "chainState": "PAUSED",
+  "taskState": "b4-task\u00001=FAILED",
+  "stepState": "b4-task\u0000b4-code-step\u00001=FAILED",
+  "eventLogHash": "sha256:796e8496b44fc6ddfeb1986640f63f252d7e83dfb6c07e78e8ce3b14652855cd",
+  "eventSequence": 12,
+  "load": {
+    "args": [
+      "-mode",
+      "hang"
+    ],
+    "timeout": "5s",
+    "grace": "2s"
+  },
+  "mapping": {
+    "status": "uncertain",
+    "treeStatus": "stopped",
+    "logsComplete": false,
+    "usageComplete": false,
+    "eventsComplete": true,
+    "manifestsComplete": true,
+    "factCount": 0,
+    "errorEvidenceCount": 5,
+    "elapsedMs": 5020
+  },
+  "legs": [
+    {
+      "leg": "dispatch",
+      "status": "ran: process spawned through the production launcher and step parked in TERMINAL_PENDING"
+    },
+    {
+      "leg": "dispatch-\u003ewait-\u003ecollect-\u003emap",
+      "status": "ran: uncertain"
+    },
+    {
+      "leg": "terminal-publication (production AgentRunnerTerminalPublisher)",
+      "status": "failed closed",
+      "error": "AgentRunner request conflict: terminal publication requires a persisted request record for requestId request-run-b4",
+      "alternativeEvidence": "the durable terminal chain is built through the public record constructors and adapters.ToChainAgentRunnerTerminal instead; the chain-side routing below is unmodified production code"
+    },
+    {
+      "leg": "cost settlement (production tickets.CostLedger.Settle)",
+      "status": "booked"
+    },
+    {
+      "leg": "terminal routing (chain.SubmitAgentRunnerTerminal)",
+      "status": "routed as uncertain"
+    },
+    {
+      "leg": "postflight/acceptance/review/promotion",
+      "status": "skipped: a non-completed terminal never reaches the downstream legs"
+    }
+  ],
+  "journal": [
+    {
+      "leg": "baseline",
+      "at": "2026-09-22T16:57:10.231Z",
+      "outcome": "captured",
+      "detail": {
+        "entries": "1",
+        "hash": "sha256:1fbe6bb28268c36250659573df59b691d1c85dde12018bc091ddc5c5dce408ed"
+      }
+    },
+    {
+      "leg": "dispatch",
+      "at": "2026-09-22T16:57:10.231Z",
+      "outcome": "production-path-refused-by-platform",
+      "detail": {
+        "error": "AgentRunner replay store publication durability unproven: request publication"
+      }
+    },
+    {
+      "leg": "dispatch",
+      "at": "2026-09-22T16:57:10.231Z",
+      "outcome": "fallback-spawned-through-production-launcher",
+      "detail": {
+        "launchId": "launch-request-run-b4",
+        "processId": "{\"pid\":29960,\"startToken\":\"01dd4ab36872f6a3\"}"
+      }
+    },
+    {
+      "leg": "dispatch",
+      "at": "2026-09-22T16:57:10.231Z",
+      "outcome": "parked",
+      "detail": {
+        "requestId": "request-run-b4"
+      }
+    },
+    {
+      "leg": "terminal-routing",
+      "at": "2026-09-22T16:57:10.231Z",
+      "outcome": "uncertain",
+      "detail": {
+        "chain": "PAUSED",
+        "step": "FAILED",
+        "task": "FAILED"
+      }
+    }
+  ],
+  "checks": [
+    {
+      "id": "outcome-not-completed",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "mapped status uncertain"
+    },
+    {
+      "id": "no-frozen-facts",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "facts present: false"
+    },
+    {
+      "id": "timeout-fired",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "watch timedOut=true elapsedMs=5020 boundMs=5000"
+    },
+    {
+      "id": "error-evidence-present",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "error evidence digests: 5"
+    },
+    {
+      "id": "process-tree-taken-away",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "reported pids gone: true (\u003cnil\u003e)"
+    },
+    {
+      "id": "verdict-class-recorded",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "verdict class uncertain-or-paused"
+    }
+  ],
+  "diff": {
+    "added": [],
+    "removed": [],
+    "changed": []
+  },
+  "artifacts": {
+    "diff.json": "sha256:f8700730d4d8f747ac5ce273bcc6d6ca0dabf339d43ef439e97a75e370f72f35",
+    "logs/stderr.log": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "logs/stdout.log": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "manifest.post.json": "sha256:a69225e5bc573f932be9006d357af77bace713e3950769e39078b3f2899afd0e",
+    "manifest.pre.json": "sha256:35314f206a50af918310d32b176f1a8b3067ae560becc9647f41511d1866cc7f",
+    "stub.pid": "sha256:22473efb61d0b56c347e04b55588f1d64a994239433ca56a9bafa65dc1970d41"
+  },
+  "observations": {
+    "gateHookSteps": "0",
+    "stopError": "",
+    "stopOutcome": "unknown"
+  },
+  "errors": [],
+  "notes": [
+    "run outlives its bound; the watchdog must classify it as uncertain and the tree must be gone",
+    "requestRecordHash=sha256:5aa6976efcae84bdc0b67986a0874b2171a3f901d75f153bf6821fc490f3c1ec",
+    "declared-inputs: capability disposition=compatible (declared, not probed); enforcement record declared but not consulted on that path; adapterId=b4-pinned-cli-declared"
+  ]
+}

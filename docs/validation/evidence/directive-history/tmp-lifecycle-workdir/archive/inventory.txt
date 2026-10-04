@@ -1,0 +1,1295 @@
+=== TMP TOP-LEVEL INVENTORY (20 entries) ===
+FILE  DELIVERY_DIRECTIVE_v111_REVIEW.md      1 files       20342 B  mtime=2026-09-23  refs=8  refPaths=1
+FILE  DELIVERY_DIRECTIVE_v111_REVIEW_R3.md      1 files       18432 B  mtime=2026-09-23  refs=4  refPaths=1
+FILE  DELIVERY_DIRECTIVE_v112_REVIEW.md      1 files       18576 B  mtime=2026-09-23  refs=4  refPaths=1
+FILE  DELIVERY_DIRECTIVE_v112_REVIEW_R5.md      1 files       13613 B  mtime=2026-09-23  refs=4  refPaths=1
+FILE  DELIVERY_DIRECTIVE_v112_REVIEW_R6.md      1 files       14179 B  mtime=2026-09-23  refs=12  refPaths=1
+FILE  DELIVERY_DIRECTIVE_v112_REVIEW_R7.md      1 files       15796 B  mtime=2026-09-23  refs=4  refPaths=1
+DIR   assembly-min                     84 files     2166951 B  mtime=2026-10-02  refs=24  refPaths=8
+DIR   b4                              353 files    17129239 B  mtime=2026-09-22  refs=68  refPaths=24
+DIR   dce                              17 files      425994 B  mtime=2026-10-03  refs=20  refPaths=9
+DIR   dr1                              31 files      519826 B  mtime=2026-09-23  refs=12  refPaths=5
+DIR   drfix                            38 files      550591 B  mtime=2026-09-21  refs=25  refPaths=12
+FILE  gate.js                           1 files        9036 B  mtime=2026-09-21  refs=16  refPaths=1
+DIR   gates-ext                       802 files     3141478 B  mtime=2026-09-22  refs=24  refPaths=11
+DIR   lbf                              21 files      309546 B  mtime=2026-09-29  refs=34  refPaths=7
+DIR   s1-reach                         14 files      212569 B  mtime=2026-09-29  refs=17  refPaths=5
+DIR   tl                                1 files        4213 B  mtime=2026-10-04  refs=0  refPaths=0
+DIR   v112                             40 files      484316 B  mtime=2026-09-23  refs=17  refPaths=8
+DIR   v113                            146 files     2771704 B  mtime=2026-09-23  refs=176  refPaths=41
+FILE  主控子代理架构_v1.0.md                   1 files       26124 B  mtime=2026-09-21  refs=4  refPaths=1
+FILE  交付准则_前期包_v0.1.md                  1 files       15486 B  mtime=2026-09-21  refs=0  refPaths=0
+
+=== REFERENCES BY ENTRY ===
+[DELIVERY_DIRECTIVE_v111_REVIEW.md] 1 referenced path(s), 8 reference line(s)
+   path: tmp/DELIVERY_DIRECTIVE_v111_REVIEW.md
+   ref:  docs/DELIVERY_DIRECTIVE.md  (1)
+   ref:  docs/DELIVERY_DIRECTIVE_EN.md  (1)
+   ref:  docs/validation/directive-v1.12.md  (3)
+   ref:  docs/validation/directive-v1.12_EN.md  (3)
+[DELIVERY_DIRECTIVE_v111_REVIEW_R3.md] 1 referenced path(s), 4 reference line(s)
+   path: tmp/DELIVERY_DIRECTIVE_v111_REVIEW_R3.md
+   ref:  docs/validation/directive-v1.12.md  (2)
+   ref:  docs/validation/directive-v1.12_EN.md  (2)
+[DELIVERY_DIRECTIVE_v112_REVIEW.md] 1 referenced path(s), 4 reference line(s)
+   path: tmp/DELIVERY_DIRECTIVE_v112_REVIEW.md
+   ref:  docs/validation/directive-v1.12.md  (2)
+   ref:  docs/validation/directive-v1.12_EN.md  (2)
+[DELIVERY_DIRECTIVE_v112_REVIEW_R5.md] 1 referenced path(s), 4 reference line(s)
+   path: tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R5.md
+   ref:  docs/validation/directive-v1.12.md  (2)
+   ref:  docs/validation/directive-v1.12_EN.md  (2)
+[DELIVERY_DIRECTIVE_v112_REVIEW_R6.md] 1 referenced path(s), 12 reference line(s)
+   path: tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R6.md
+   ref:  docs/DELIVERY_DIRECTIVE.md  (5)
+   ref:  docs/DELIVERY_DIRECTIVE_EN.md  (5)
+   ref:  docs/validation/directive-v1.12.md  (1)
+   ref:  docs/validation/directive-v1.12_EN.md  (1)
+[DELIVERY_DIRECTIVE_v112_REVIEW_R7.md] 1 referenced path(s), 4 reference line(s)
+   path: tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R7.md
+   ref:  docs/DELIVERY_DIRECTIVE.md  (1)
+   ref:  docs/DELIVERY_DIRECTIVE_EN.md  (1)
+   ref:  docs/validation/directive-v1.12.md  (1)
+   ref:  docs/validation/directive-v1.12_EN.md  (1)
+[assembly-min] 8 referenced path(s), 24 reference line(s)
+   path: tmp/assembly-min
+   path: tmp/assembly-min/
+   path: tmp/assembly-min/DESIGN.md
+   path: tmp/assembly-min/before/
+   path: tmp/assembly-min/review-pack-r3.md
+   path: tmp/assembly-min/snapshot-flake.txt
+   path: tmp/assembly-min/v3.txt
+   path: tmp/assembly-min/v4.txt
+   ref:  docs/ADR_REGISTER.md  (1)
+   ref:  docs/ADR_REGISTER_EN.md  (1)
+   ref:  docs/DELIVERY_DIRECTIVE.md  (1)
+   ref:  docs/DELIVERY_DIRECTIVE_EN.md  (1)
+   ref:  docs/validation/t027-assembly-min.md  (10)
+   ref:  docs/validation/t027-assembly-min_EN.md  (10)
+[b4] 24 referenced path(s), 68 reference line(s)
+   path: tmp/b4
+   path: tmp/b4/
+   path: tmp/b4/SHA256SUMS.txt
+   path: tmp/b4/bin
+   path: tmp/b4/bin/
+   path: tmp/b4/bin/agent-stub.exe
+   path: tmp/b4/bin/b4-e2e.exe
+   path: tmp/b4/bin/prfrail.exe
+   path: tmp/b4/evidence/
+   path: tmp/b4/evidence/f1-neg2/verdict-run.json
+   path: tmp/b4/evidence/f1-neg3/verdict-run.json
+   path: tmp/b4/evidence/f2-pos/verdict-run.json
+   path: tmp/b4/evidence/f3-pos/verdict-run.json
+   path: tmp/b4/evidence/f4-neg-r2/verdict-forge.json
+   path: tmp/b4/evidence/f4-neg/verdict-forge.json
+   path: tmp/b4/evidence/f5-neg-r2/verdict-resume.json
+   path: tmp/b4/evidence/f5-neg/verdict-resume.json
+   path: tmp/b4/input/b4-chain-hook.json
+   path: tmp/b4/input/b4-chain.json
+   path: tmp/b4/input/b4-inputs.json
+   path: tmp/b4/pack-verdict.json
+   path: tmp/b4/probe/f2-tree-calibration.txt
+   path: tmp/b4/runs/f1-neg2/events/state-events.jsonl
+   path: tmp/b4/runs/f5-pos/events/state-events.jsonl:13/14/15
+   ref:  docs/DELIVERY_DIRECTIVE.md  (2)
+   ref:  docs/DELIVERY_DIRECTIVE_EN.md  (2)
+   ref:  docs/DEV_PLAN.md  (1)
+   ref:  docs/DEV_PLAN_EN.md  (1)
+   ref:  docs/t027/REMAINING_SLICES.md  (1)
+   ref:  docs/t027/REMAINING_SLICES_EN.md  (1)
+   ref:  docs/validation/t027-at23-e2e.md  (27)
+   ref:  docs/validation/t027-at23-e2e_EN.md  (27)
+   ref:  tools/b4-e2e/run-faces.ps1  (6)
+[dce] 9 referenced path(s), 20 reference line(s)
+   path: tmp/dce
+   path: tmp/dce/gate-index.txt
+   path: tmp/dce/gate-tree-first-fail.txt
+   path: tmp/dce/gate-tree.txt
+   path: tmp/dce/land.js
+   path: tmp/dce/peek.js
+   path: tmp/dce/probe-id-rejections.txt
+   path: tmp/dce/selftest.txt
+   path: tmp/dce/test.txt
+   ref:  docs/DELIVERY_DIRECTIVE.md  (1)
+   ref:  docs/DELIVERY_DIRECTIVE_EN.md  (1)
+   ref:  docs/validation/directive-cleanup-eval.md  (9)
+   ref:  docs/validation/directive-cleanup-eval_EN.md  (9)
+[dr1] 5 referenced path(s), 12 reference line(s)
+   path: tmp/dr1/
+   path: tmp/dr1/mutation-check.txt
+   path: tmp/dr1/review-input-r2.diff
+   path: tmp/dr1/rulings.md
+   path: tmp/dr1/ws
+   ref:  docs/validation/dr-1-availability-probe-floor.md  (5)
+   ref:  docs/validation/dr-1-availability-probe-floor_EN.md  (5)
+   ref:  docs/validation/evidence/dr-1-2026-09-24/README.md  (2)
+[drfix] 12 referenced path(s), 25 reference line(s)
+   path: tmp/drfix
+   path: tmp/drfix/
+   path: tmp/drfix/A2-restored-green.txt
+   path: tmp/drfix/A3.txt
+   path: tmp/drfix/A3.txt\n
+   path: tmp/drfix/A3.txt\tarchived\n
+   path: tmp/drfix/A3.txt\tlocal-only\n
+   path: tmp/drfix/B5-postcommit-count10.txt
+   path: tmp/drfix/B6-postcommit-psselftest.txt
+   path: tmp/drfix/CI-push1.txt
+   path: tmp/drfix/IMPL.diff
+   path: tmp/drfix/review/README-REREVIEW.txt
+   ref:  docs/DELIVERY_DIRECTIVE.md  (1)
+   ref:  docs/DELIVERY_DIRECTIVE_EN.md  (1)
+   ref:  docs/validation/dr-fix-enforcement-proxy.md  (8)
+   ref:  docs/validation/dr-fix-enforcement-proxy_EN.md  (8)
+   ref:  tools/gates/selftest.js  (4)
+   ref:  tools/gates/testdata/fixtures/g7-b-no-disposition.txt  (1)
+   ref:  tools/gates/testdata/fixtures/g7-ok-report.txt  (1)
+   ref:  tools/gates/testdata/historical/dr-fix-report-structure.txt  (1)
+[gate.js] 1 referenced path(s), 16 reference line(s)
+   path: tmp/gate.js
+   ref:  docs/DELIVERY_DIRECTIVE.md  (4)
+   ref:  docs/DELIVERY_DIRECTIVE_EN.md  (4)
+   ref:  docs/validation/dr-fix-enforcement-proxy.md  (1)
+   ref:  docs/validation/dr-fix-enforcement-proxy_EN.md  (1)
+   ref:  docs/validation/gates-ext.md  (2)
+   ref:  docs/validation/gates-ext_EN.md  (2)
+   ref:  tools/gates/cjk-newwords.txt  (1)
+   ref:  tools/gates/gate.js  (1)
+[gates-ext] 11 referenced path(s), 24 reference line(s)
+   path: tmp/gates-ext
+   path: tmp/gates-ext/
+   path: tmp/gates-ext/ARCH-DESIGN.md
+   path: tmp/gates-ext/SLICE-DEFINITION.md
+   path: tmp/gates-ext/review/GATE-all-tree.txt
+   path: tmp/gates-ext/review/GATE-range-historical.txt
+   path: tmp/gates-ext/review/GATE-selftest.txt
+   path: tmp/gates-ext/review/MUTATION-f1-donere.txt
+   path: tmp/gates-ext/review/MUTATION-f1-range-vacuous.txt
+   path: tmp/gates-ext/review/MUTATION-guards-independent.txt
+   path: tmp/gates-ext/step2..step5/
+   ref:  docs/DELIVERY_DIRECTIVE.md  (1)
+   ref:  docs/DELIVERY_DIRECTIVE_EN.md  (1)
+   ref:  docs/validation/gates-ext.md  (11)
+   ref:  docs/validation/gates-ext_EN.md  (11)
+[lbf] 7 referenced path(s), 34 reference line(s)
+   path: tmp/lbf/
+   path: tmp/lbf/dd36b9b-trace.txt
+   path: tmp/lbf/dispositions.md
+   path: tmp/lbf/gate-tree.txt
+   path: tmp/lbf/report-cn.md
+   path: tmp/lbf/review-input.diff
+   path: tmp/lbf/review-round2.md
+   ref:  docs/validation/ledger-backfill.md  (17)
+   ref:  docs/validation/ledger-backfill_EN.md  (17)
+[s1-reach] 5 referenced path(s), 17 reference line(s)
+   path: tmp/s1-reach/
+   path: tmp/s1-reach/gate-tree.txt
+   path: tmp/s1-reach/plan-01.md
+   path: tmp/s1-reach/review-input.diff
+   path: tmp/s1-reach/s1-reach-reachability.md
+   ref:  docs/validation/evidence/S1-REACH-freedom-list.md  (1)
+   ref:  docs/validation/s1-reach-reachability.md  (8)
+   ref:  docs/validation/s1-reach-reachability_EN.md  (8)
+[tl] NO REFERENCE
+[v112] 8 referenced path(s), 17 reference line(s)
+   path: tmp/v112
+   path: tmp/v112/
+   path: tmp/v112/*-sec12.txt
+   path: tmp/v112/c1-recheck.js
+   path: tmp/v112/g6-4-check.txt
+   path: tmp/v112/m4-g6-4-probe.js
+   path: tmp/v112/refs-check.js
+   path: tmp/v112/refs-check.txt
+   ref:  docs/DELIVERY_DIRECTIVE.md  (2)
+   ref:  docs/DELIVERY_DIRECTIVE_EN.md  (2)
+   ref:  docs/validation/directive-v1.12.md  (6)
+   ref:  docs/validation/directive-v1.12_EN.md  (6)
+   ref:  tools/gates/lib/criteria/g6.js  (1)
+[v113] 41 referenced path(s), 176 reference line(s)
+   path: tmp/v113
+   path: tmp/v113/
+   path: tmp/v113/capture.js
+   path: tmp/v113/enc-tree-r10.txt
+   path: tmp/v113/evidence-selfcheck-r10.txt
+   path: tmp/v113/g6-5-r1-r10.txt
+   path: tmp/v113/g6-6-r1-r10.txt
+   path: tmp/v113/gate-index-r1-r10.txt
+   path: tmp/v113/gate-index-r1-r3.txt
+   path: tmp/v113/gate-index-r1-r3.txt#L19
+   path: tmp/v113/gate-index-r1-r3.txt#L20
+   path: tmp/v113/gate-index-r1-r3.txt#L29
+   path: tmp/v113/gate-tree-r1-r10.txt
+   path: tmp/v113/gate-tree-r1-r3.txt
+   path: tmp/v113/gate-tree-r1-r3.txt#L19
+   path: tmp/v113/gate-tree-r1-r3.txt#L20
+   path: tmp/v113/gate-tree-r1-r3.txt#L29
+   path: tmp/v113/mirror-r10.txt
+   path: tmp/v113/mirror-r3.txt
+   path: tmp/v113/mirror-r3.txt#L3
+   path: tmp/v113/remediation.diff
+   path: tmp/v113/review-input-r2-r3.diff
+   path: tmp/v113/review-input-r2.stat-r3.txt
+   path: tmp/v113/review-input-r2.stat-r3.txt#L1-L4
+   path: tmp/v113/review-input.diff
+   path: tmp/v113/review-r1.md
+   path: tmp/v113/review-r2.md
+   path: tmp/v113/review-r3.md
+   path: tmp/v113/selftest-master-r10.txt
+   path: tmp/v113/selftest-master-r3.txt
+   path: tmp/v113/selftest-master-r3.txt#L215
+   path: tmp/v113/selftest-master-r3.txt#L230
+   path: tmp/v113/selftest-master-r3.txt#L250
+   path: tmp/v113/selftest-master-r3.txt#L253
+   path: tmp/v113/verify-v113-r10.txt
+   path: tmp/v113/verify-v113-r3.txt
+   path: tmp/v113/verify-v113-r3.txt#L1
+   path: tmp/v113/verify-v113-r3.txt#L1-L2
+   path: tmp/v113/verify-v113-r3.txt#L2
+   path: tmp/v113/verify-v113-r3.txt#L6
+   path: tmp/v113/verify-v113.js
+   ref:  docs/DELIVERY_DIRECTIVE.md  (2)
+   ref:  docs/DELIVERY_DIRECTIVE_EN.md  (2)
+   ref:  docs/validation/directive-review-saturation.md  (84)
+   ref:  docs/validation/directive-review-saturation_EN.md  (84)
+   ref:  docs/validation/evidence/directive-review-saturation-freedom-list.md  (4)
+[主控子代理架构_v1.0.md] 1 referenced path(s), 4 reference line(s)
+   path: tmp/主控子代理架构_v1.0.md
+   ref:  docs/DELIVERY_DIRECTIVE.md  (2)
+   ref:  docs/DELIVERY_DIRECTIVE_EN.md  (2)
+[交付准则_前期包_v0.1.md] NO REFERENCE
+
+=== REFERENCES TO tmp/ PATHS NOT MATCHING A TOP-LEVEL ENTRY ===
+tmp/.gitkeep  <- .github/copilot-instructions.md:35, .gitignore:12, docs/CODING_CONVENTIONS.md:62, docs/CODING_CONVENTIONS_EN.md:33, docs/validation/t027-b1-candidate-live-discovery.md:139, docs/validation/t027-b1-candidate-live-discovery.md:142, docs/validation/t027-b1-candidate-live-discovery_EN.md:139, docs/validation/t027-b1-candidate-live-discovery_EN.md:142
+tmp/a6_mut_recheck.ps1  <- docs/validation/t027-offline-process.md:115, docs/validation/t027-offline-process_EN.md:115
+tmp/a6_mutations_codex.ps1  <- docs/validation/t027-offline-process.md:115, docs/validation/t027-offline-process_EN.md:115
+tmp/a6_mutations_v2.ps1  <- docs/validation/t027-offline-process.md:114, docs/validation/t027-offline-process_EN.md:114
+tmp/ai-availability.json  <- README.md:47, README.md:48, README.md:127, README.md:128
+tmp/b1  <- docs/validation/t027-b1-candidate-live-discovery.md:198, docs/validation/t027-b1-candidate-live-discovery_EN.md:198
+tmp/b1/  <- docs/t027/REMAINING_SLICES.md:346, docs/t027/REMAINING_SLICES_EN.md:326, docs/validation/t027-b1-candidate-live-discovery.md:139, docs/validation/t027-b1-candidate-live-discovery_EN.md:139
+tmp/b1/evidence/  <- docs/validation/evidence/b1-20260917/README.md:4, docs/validation/t027-b1-candidate-live-discovery.md:210, docs/validation/t027-b1-candidate-live-discovery_EN.md:210
+tmp/b1/npm  <- docs/validation/t027-b1-candidate-live-discovery.md:24, docs/validation/t027-b1-candidate-live-discovery_EN.md:24
+tmp/b1/npm/node_modules/@github/copilot-win32-x64/copilot.exe  <- docs/validation/t027-b1-candidate-live-discovery.md:24, docs/validation/t027-b1-candidate-live-discovery_EN.md:24
+tmp/b2/  <- docs/validation/B2-EXTERNAL-ENFORCEMENT.md:212, docs/validation/B2-EXTERNAL-ENFORCEMENT.md:213, docs/validation/B2-EXTERNAL-ENFORCEMENT.md:269, docs/validation/B2-EXTERNAL-ENFORCEMENT_EN.md:246, docs/validation/B2-EXTERNAL-ENFORCEMENT_EN.md:248, docs/validation/B2-EXTERNAL-ENFORCEMENT_EN.md:273, docs/validation/B2-EXTERNAL-ENFORCEMENT_EN.md:313, docs/validation/evidence/b2-2026-09-17/MANIFEST.md:7, docs/validation/evidence/b2-2026-09-17/machine-ops/normalize-encoding.ps1:77, tools/agent-probe/appcontainer-b2/README.md:11, tools/agent-probe/appcontainer-b2/README.md:15, tools/agent-probe/appcontainer-b2/README_CN.md:7, tools/agent-probe/appcontainer-b2/README_CN.md:11, tools/agent-probe/appcontainer-b2/normalize-encoding.ps1:77, tools/agent-probe/enforcement-proxy/README.md:109, tools/agent-probe/enforcement-proxy/README.md:140, tools/agent-probe/enforcement-proxy/README_CN.md:95, tools/agent-probe/enforcement-proxy/README_CN.md:124
+tmp/b2/rehearsal/  <- docs/validation/evidence/b2-2026-09-17/machine-ops/Invoke-B2LoopbackRehearsal.ps1:2, tools/agent-probe/appcontainer-b2/Invoke-B2LoopbackRehearsal.ps1:2
+tmp/b3b/  <- docs/validation/t027-b3c-contracts-durability.md:96, docs/validation/t027-b3c-contracts-durability_EN.md:97
+tmp/b3c-checks.js  <- docs/validation/t027-b3c-contracts-durability.md:65, docs/validation/t027-b3c-contracts-durability_EN.md:65
+tmp/b3c-review.diff  <- docs/DELIVERY_DIRECTIVE.md:468, docs/DELIVERY_DIRECTIVE_EN.md:468
+tmp/b4check/  <- docs/validation/directive-v1.11.md:81, docs/validation/directive-v1.11.md:113, docs/validation/directive-v1.11_EN.md:81, docs/validation/directive-v1.11_EN.md:113
+tmp/cache  <- internal/evidence/delivery_test.go:89, internal/snapshot/export_test.go:43
+tmp/ddl/  <- docs/validation/directive-design-loopback.md:209, docs/validation/directive-design-loopback_EN.md:209
+tmp/ddl/*.js  <- docs/validation/directive-design-loopback.md:184, docs/validation/directive-design-loopback_EN.md:184
+tmp/ddl/change-set.diff  <- docs/validation/directive-design-loopback.md:193, docs/validation/directive-design-loopback.md:234, docs/validation/directive-design-loopback_EN.md:193, docs/validation/directive-design-loopback_EN.md:234
+tmp/ddl/check-cn.js  <- docs/validation/directive-design-loopback.md:235, docs/validation/directive-design-loopback_EN.md:235
+tmp/ddl/eightc.js  <- docs/validation/directive-design-loopback.md:236, docs/validation/directive-design-loopback_EN.md:236
+tmp/ddl/eightc.txt  <- docs/validation/directive-design-loopback.md:209, docs/validation/directive-design-loopback.md:237, docs/validation/directive-design-loopback_EN.md:209, docs/validation/directive-design-loopback_EN.md:237
+tmp/ddl/fence-sync.js  <- docs/validation/directive-design-loopback.md:238, docs/validation/directive-design-loopback_EN.md:238
+tmp/ddl/fence.js  <- docs/validation/directive-design-loopback.md:239, docs/validation/directive-design-loopback_EN.md:239
+tmp/ddl/fix1.js  <- docs/validation/directive-design-loopback.md:240, docs/validation/directive-design-loopback_EN.md:240
+tmp/ddl/fix10.js  <- docs/validation/directive-design-loopback.md:241, docs/validation/directive-design-loopback_EN.md:241
+tmp/ddl/fix1b.js  <- docs/validation/directive-design-loopback.md:242, docs/validation/directive-design-loopback_EN.md:242
+tmp/ddl/fix2.js  <- docs/validation/directive-design-loopback.md:243, docs/validation/directive-design-loopback_EN.md:243
+tmp/ddl/fix3.js  <- docs/validation/directive-design-loopback.md:244, docs/validation/directive-design-loopback_EN.md:244
+tmp/ddl/fix4.js  <- docs/validation/directive-design-loopback.md:245, docs/validation/directive-design-loopback_EN.md:245
+tmp/ddl/fix5.js  <- docs/validation/directive-design-loopback.md:246, docs/validation/directive-design-loopback_EN.md:246
+tmp/ddl/fix6.js  <- docs/validation/directive-design-loopback.md:247, docs/validation/directive-design-loopback_EN.md:247
+tmp/ddl/fix7.js  <- docs/validation/directive-design-loopback.md:248, docs/validation/directive-design-loopback_EN.md:248
+tmp/ddl/fix8.js  <- docs/validation/directive-design-loopback.md:249, docs/validation/directive-design-loopback_EN.md:249
+tmp/ddl/fix9.js  <- docs/validation/directive-design-loopback.md:250, docs/validation/directive-design-loopback_EN.md:250
+tmp/ddl/g4b.txt  <- docs/validation/directive-design-loopback.md:251, docs/validation/directive-design-loopback_EN.md:251
+tmp/ddl/gate-index.txt  <- docs/validation/directive-design-loopback.md:252, docs/validation/directive-design-loopback_EN.md:252
+tmp/ddl/gate-tree.txt  <- docs/validation/directive-design-loopback.md:253, docs/validation/directive-design-loopback_EN.md:253
+tmp/ddl/land.js  <- docs/validation/directive-design-loopback.md:254, docs/validation/directive-design-loopback_EN.md:254
+tmp/ddl/ledger-d5.diff  <- docs/validation/directive-design-loopback.md:255, docs/validation/directive-design-loopback_EN.md:255
+tmp/ddl/ledger.diff  <- docs/validation/directive-design-loopback.md:256, docs/validation/directive-design-loopback_EN.md:256
+tmp/ddl/mirror-parity.txt  <- docs/validation/directive-design-loopback.md:203, docs/validation/directive-design-loopback.md:257, docs/validation/directive-design-loopback_EN.md:203, docs/validation/directive-design-loopback_EN.md:257
+tmp/ddl/mirror.js  <- docs/validation/directive-design-loopback.md:258, docs/validation/directive-design-loopback_EN.md:258
+tmp/ddl/mutate-original.bin  <- docs/validation/directive-design-loopback.md:259, docs/validation/directive-design-loopback_EN.md:259
+tmp/ddl/mutate.js  <- docs/validation/directive-design-loopback.md:260, docs/validation/directive-design-loopback_EN.md:260
+tmp/ddl/mutation-g6-6.txt  <- docs/validation/directive-design-loopback.md:202, docs/validation/directive-design-loopback.md:261, docs/validation/directive-design-loopback_EN.md:202, docs/validation/directive-design-loopback_EN.md:261
+tmp/ddl/mutation-restored.txt  <- docs/validation/directive-design-loopback.md:202, docs/validation/directive-design-loopback.md:262, docs/validation/directive-design-loopback_EN.md:202, docs/validation/directive-design-loopback_EN.md:262
+tmp/ddl/mutation-sha256.txt  <- docs/validation/directive-design-loopback.md:202, docs/validation/directive-design-loopback.md:263, docs/validation/directive-design-loopback_EN.md:202, docs/validation/directive-design-loopback_EN.md:263
+tmp/ddl/numstat.txt  <- docs/validation/directive-design-loopback.md:193, docs/validation/directive-design-loopback.md:264, docs/validation/directive-design-loopback_EN.md:193, docs/validation/directive-design-loopback_EN.md:264
+tmp/ddl/peek-ledger.js  <- docs/validation/directive-design-loopback.md:265, docs/validation/directive-design-loopback_EN.md:265
+tmp/ddl/peek2.js  <- docs/validation/directive-design-loopback.md:266, docs/validation/directive-design-loopback_EN.md:266
+tmp/ddl/peek4.js  <- docs/validation/directive-design-loopback.md:267, docs/validation/directive-design-loopback_EN.md:267
+tmp/ddl/review-r1.md  <- docs/validation/directive-design-loopback.md:268, docs/validation/directive-design-loopback_EN.md:268
+tmp/ddl/scan.js  <- docs/validation/directive-design-loopback.md:269, docs/validation/directive-design-loopback_EN.md:269
+tmp/ddl/selftest.txt  <- docs/validation/directive-design-loopback.md:270, docs/validation/directive-design-loopback_EN.md:270
+tmp/dml  <- docs/DELIVERY_DIRECTIVE.md:120, docs/DELIVERY_DIRECTIVE_EN.md:120
+tmp/dml/  <- docs/validation/directive-modelid-map.md:132, docs/validation/directive-modelid-map_EN.md:132
+tmp/dml/change-set.diff  <- docs/validation/directive-model-lists.md:162, docs/validation/directive-model-lists_EN.md:162, docs/validation/directive-modelid-map.md:71, docs/validation/directive-modelid-map_EN.md:71
+tmp/dml/ci-run-37073985144.txt  <- docs/validation/directive-model-lists.md:167, docs/validation/directive-model-lists_EN.md:167, docs/validation/t027-assembly-min.md:164, docs/validation/t027-assembly-min.md:184, docs/validation/t027-assembly-min_EN.md:164, docs/validation/t027-assembly-min_EN.md:184
+tmp/dml/consistency-out4.txt  <- docs/validation/directive-model-lists.md:164, docs/validation/directive-model-lists_EN.md:164
+tmp/dml/contract-excerpt.md  <- docs/validation/directive-model-lists.md:163, docs/validation/directive-model-lists_EN.md:163
+tmp/dml/design-1-v4pro.md  <- docs/validation/directive-model-lists.md:161, docs/validation/directive-model-lists_EN.md:161
+tmp/dml/gate-tree7.txt  <- docs/validation/directive-model-lists.md:165, docs/validation/directive-model-lists_EN.md:165
+tmp/dml/luna-probe/target.txt  <- docs/ADR_REGISTER.md:29, docs/ADR_REGISTER_EN.md:30, docs/validation/directive-model-lists.md:168, docs/validation/directive-model-lists_EN.md:168
+tmp/dml/mutation.md  <- docs/validation/directive-modelid-map.md:82, docs/validation/directive-modelid-map_EN.md:82, docs/validation/evidence/DIRECTIVE-MODELID-MAP-mutation.md:3
+tmp/dml/numstat.txt  <- docs/validation/directive-modelid-map.md:71, docs/validation/directive-modelid-map_EN.md:71
+tmp/dml/pairs.txt  <- docs/validation/directive-modelid-map.md:81, docs/validation/directive-modelid-map_EN.md:81
+tmp/dml/pre.txt  <- docs/validation/directive-modelid-map.md:83, docs/validation/directive-modelid-map_EN.md:83
+tmp/dml/review-r1.md  <- docs/validation/evidence/DIRECTIVE-MODELID-MAP-review-r1.md:3
+tmp/dml/selftest7.txt  <- docs/validation/directive-model-lists.md:166, docs/validation/directive-model-lists_EN.md:166
+tmp/enforcement-proxy-selftest/  <- tools/agent-probe/enforcement-proxy/README.md:87, tools/agent-probe/enforcement-proxy/README_CN.md:77
+tmp/gates-f2-not-staged.txt\trepo  <- tools/gates/selftest.js:1021, tools/gates/selftest.js:1022
+tmp/ll/  <- docs/validation/directive-loopback-landing.md:107, docs/validation/directive-loopback-landing.md:107, docs/validation/directive-loopback-landing.md:128, docs/validation/directive-loopback-landing.md:141, docs/validation/directive-loopback-landing_EN.md:107, docs/validation/directive-loopback-landing_EN.md:107, docs/validation/directive-loopback-landing_EN.md:128, docs/validation/directive-loopback-landing_EN.md:141
+tmp/ll/apply.js  <- docs/validation/directive-loopback-landing.md:162, docs/validation/directive-loopback-landing_EN.md:162
+tmp/ll/change-set.diff  <- docs/validation/directive-loopback-landing.md:84, docs/validation/directive-loopback-landing.md:163, docs/validation/directive-loopback-landing_EN.md:84, docs/validation/directive-loopback-landing_EN.md:163
+tmp/ll/chk.js  <- docs/validation/directive-loopback-landing.md:164, docs/validation/directive-loopback-landing_EN.md:164
+tmp/ll/ci-run.txt  <- docs/validation/directive-loopback-landing.md:165, docs/validation/directive-loopback-landing_EN.md:165
+tmp/ll/cn-dump.txt  <- docs/validation/directive-loopback-landing.md:166, docs/validation/directive-loopback-landing_EN.md:166
+tmp/ll/dump.js  <- docs/validation/directive-loopback-landing.md:167, docs/validation/directive-loopback-landing_EN.md:167
+tmp/ll/dump2.js  <- docs/validation/directive-loopback-landing.md:168, docs/validation/directive-loopback-landing_EN.md:168
+tmp/ll/dump3.js  <- docs/validation/directive-loopback-landing.md:169, docs/validation/directive-loopback-landing_EN.md:169
+tmp/ll/dump4.js  <- docs/validation/directive-loopback-landing.md:170, docs/validation/directive-loopback-landing_EN.md:170
+tmp/ll/dump5.js  <- docs/validation/directive-loopback-landing.md:171, docs/validation/directive-loopback-landing_EN.md:171
+tmp/ll/eightc.js  <- docs/validation/directive-loopback-landing.md:172, docs/validation/directive-loopback-landing_EN.md:172
+tmp/ll/eightc.txt  <- docs/validation/directive-loopback-landing.md:107, docs/validation/directive-loopback-landing.md:173, docs/validation/directive-loopback-landing_EN.md:107, docs/validation/directive-loopback-landing_EN.md:173
+tmp/ll/en-dump.txt  <- docs/validation/directive-loopback-landing.md:174, docs/validation/directive-loopback-landing_EN.md:174
+tmp/ll/en-full.txt  <- docs/validation/directive-loopback-landing.md:175, docs/validation/directive-loopback-landing_EN.md:175
+tmp/ll/en-new.md  <- docs/validation/directive-loopback-landing.md:176, docs/validation/directive-loopback-landing_EN.md:176
+tmp/ll/finalize.js  <- docs/validation/directive-loopback-landing.md:177, docs/validation/directive-loopback-landing_EN.md:177
+tmp/ll/fixmut.js  <- docs/validation/directive-loopback-landing.md:178, docs/validation/directive-loopback-landing_EN.md:178
+tmp/ll/g3a.txt  <- docs/validation/directive-loopback-landing.md:179, docs/validation/directive-loopback-landing_EN.md:179
+tmp/ll/gate-index.txt  <- docs/validation/directive-loopback-landing.md:180, docs/validation/directive-loopback-landing_EN.md:180
+tmp/ll/gate-tree.txt  <- docs/validation/directive-loopback-landing.md:181, docs/validation/directive-loopback-landing_EN.md:181
+tmp/ll/gsum.js  <- docs/validation/directive-loopback-landing.md:182, docs/validation/directive-loopback-landing_EN.md:182
+tmp/ll/gsum2.js  <- docs/validation/directive-loopback-landing.md:183, docs/validation/directive-loopback-landing_EN.md:183
+tmp/ll/land1.js  <- docs/validation/directive-loopback-landing.md:184, docs/validation/directive-loopback-landing_EN.md:184
+tmp/ll/land10.js  <- docs/validation/directive-loopback-landing.md:185, docs/validation/directive-loopback-landing_EN.md:185
+tmp/ll/land11.js  <- docs/validation/directive-loopback-landing.md:186, docs/validation/directive-loopback-landing_EN.md:186
+tmp/ll/land12.js  <- docs/validation/directive-loopback-landing.md:187, docs/validation/directive-loopback-landing_EN.md:187
+tmp/ll/land13.js  <- docs/validation/directive-loopback-landing.md:188, docs/validation/directive-loopback-landing_EN.md:188
+tmp/ll/land14.js  <- docs/validation/directive-loopback-landing.md:189, docs/validation/directive-loopback-landing_EN.md:189
+tmp/ll/land2.js  <- docs/validation/directive-loopback-landing.md:190, docs/validation/directive-loopback-landing_EN.md:190
+tmp/ll/land3.js  <- docs/validation/directive-loopback-landing.md:191, docs/validation/directive-loopback-landing_EN.md:191
+tmp/ll/land3.txt  <- docs/validation/directive-loopback-landing.md:192, docs/validation/directive-loopback-landing_EN.md:192
+tmp/ll/land4.js  <- docs/validation/directive-loopback-landing.md:193, docs/validation/directive-loopback-landing_EN.md:193
+tmp/ll/land4.txt  <- docs/validation/directive-loopback-landing.md:194, docs/validation/directive-loopback-landing_EN.md:194
+tmp/ll/land5.js  <- docs/validation/directive-loopback-landing.md:195, docs/validation/directive-loopback-landing_EN.md:195
+tmp/ll/land5.txt  <- docs/validation/directive-loopback-landing.md:196, docs/validation/directive-loopback-landing_EN.md:196
+tmp/ll/land6.js  <- docs/validation/directive-loopback-landing.md:197, docs/validation/directive-loopback-landing_EN.md:197
+tmp/ll/land7.js  <- docs/validation/directive-loopback-landing.md:198, docs/validation/directive-loopback-landing_EN.md:198
+tmp/ll/land7.txt  <- docs/validation/directive-loopback-landing.md:199, docs/validation/directive-loopback-landing_EN.md:199
+tmp/ll/land8.js  <- docs/validation/directive-loopback-landing.md:200, docs/validation/directive-loopback-landing_EN.md:200
+tmp/ll/land8.txt  <- docs/validation/directive-loopback-landing.md:201, docs/validation/directive-loopback-landing_EN.md:201
+tmp/ll/land9.js  <- docs/validation/directive-loopback-landing.md:202, docs/validation/directive-loopback-landing_EN.md:202
+tmp/ll/lit.js  <- docs/validation/directive-loopback-landing.md:203, docs/validation/directive-loopback-landing_EN.md:203
+tmp/ll/lit.txt  <- docs/validation/directive-loopback-landing.md:72, docs/validation/directive-loopback-landing.md:96, docs/validation/directive-loopback-landing.md:126, docs/validation/directive-loopback-landing.md:130, docs/validation/directive-loopback-landing.md:204, docs/validation/directive-loopback-landing_EN.md:72, docs/validation/directive-loopback-landing_EN.md:96, docs/validation/directive-loopback-landing_EN.md:126, docs/validation/directive-loopback-landing_EN.md:130, docs/validation/directive-loopback-landing_EN.md:204
+tmp/ll/llmirror.js  <- docs/validation/directive-loopback-landing.md:205, docs/validation/directive-loopback-landing_EN.md:205
+tmp/ll/m1.orig  <- docs/validation/directive-loopback-landing.md:206, docs/validation/directive-loopback-landing_EN.md:206
+tmp/ll/m1.txt  <- docs/validation/directive-loopback-landing.md:207, docs/validation/directive-loopback-landing_EN.md:207
+tmp/ll/m2.orig  <- docs/validation/directive-loopback-landing.md:208, docs/validation/directive-loopback-landing_EN.md:208
+tmp/ll/m3.orig  <- docs/validation/directive-loopback-landing.md:209, docs/validation/directive-loopback-landing_EN.md:209
+tmp/ll/mir.js  <- docs/validation/directive-loopback-landing.md:210, docs/validation/directive-loopback-landing_EN.md:210
+tmp/ll/mir2.js  <- docs/validation/directive-loopback-landing.md:211, docs/validation/directive-loopback-landing_EN.md:211
+tmp/ll/mirror.txt  <- docs/validation/directive-loopback-landing.md:94, docs/validation/directive-loopback-landing.md:212, docs/validation/directive-loopback-landing_EN.md:94, docs/validation/directive-loopback-landing_EN.md:212
+tmp/ll/mut.js  <- docs/validation/directive-loopback-landing.md:213, docs/validation/directive-loopback-landing_EN.md:213
+tmp/ll/mutation.md  <- docs/validation/directive-loopback-landing.md:95, docs/validation/directive-loopback-landing.md:214, docs/validation/directive-loopback-landing_EN.md:95, docs/validation/directive-loopback-landing_EN.md:214
+tmp/ll/numstat.txt  <- docs/validation/directive-loopback-landing.md:84, docs/validation/directive-loopback-landing.md:215, docs/validation/directive-loopback-landing_EN.md:84, docs/validation/directive-loopback-landing_EN.md:215
+tmp/ll/pairs.js  <- docs/validation/directive-loopback-landing.md:216, docs/validation/directive-loopback-landing_EN.md:216
+tmp/ll/pre.txt  <- docs/validation/directive-loopback-landing.md:72, docs/validation/directive-loopback-landing.md:96, docs/validation/directive-loopback-landing.md:130, docs/validation/directive-loopback-landing.md:217, docs/validation/directive-loopback-landing_EN.md:72, docs/validation/directive-loopback-landing_EN.md:96, docs/validation/directive-loopback-landing_EN.md:130, docs/validation/directive-loopback-landing_EN.md:217
+tmp/ll/pre2.txt  <- docs/validation/directive-loopback-landing.md:218, docs/validation/directive-loopback-landing_EN.md:218
+tmp/ll/preflight.js  <- docs/validation/directive-loopback-landing.md:219, docs/validation/directive-loopback-landing_EN.md:219
+tmp/ll/recon.js  <- docs/validation/directive-loopback-landing.md:220, docs/validation/directive-loopback-landing_EN.md:220
+tmp/ll/recon2.js  <- docs/validation/directive-loopback-landing.md:221, docs/validation/directive-loopback-landing_EN.md:221
+tmp/ll/recon2.txt  <- docs/validation/directive-loopback-landing.md:222, docs/validation/directive-loopback-landing_EN.md:222
+tmp/ll/rev2-en-directive.txt  <- docs/validation/directive-loopback-landing.md:223, docs/validation/directive-loopback-landing_EN.md:223
+tmp/ll/selftest.txt  <- docs/validation/directive-loopback-landing.md:224, docs/validation/directive-loopback-landing_EN.md:224
+tmp/ll/tail-dump.txt  <- docs/validation/directive-loopback-landing.md:225, docs/validation/directive-loopback-landing_EN.md:225
+tmp/ll/tail2.txt  <- docs/validation/directive-loopback-landing.md:226, docs/validation/directive-loopback-landing_EN.md:226
+tmp/ll/tpl-cn.txt  <- docs/validation/directive-loopback-landing.md:227, docs/validation/directive-loopback-landing_EN.md:227
+tmp/ll/tpl-en.txt  <- docs/validation/directive-loopback-landing.md:228, docs/validation/directive-loopback-landing_EN.md:228
+tmp/ll/tpl.js  <- docs/validation/directive-loopback-landing.md:229, docs/validation/directive-loopback-landing_EN.md:229
+tmp/ll/tpl.txt  <- docs/validation/directive-loopback-landing.md:230, docs/validation/directive-loopback-landing_EN.md:230
+tmp/prfrail-runs/run-demo  <- README.md:53, README.md:133
+tmp/probe-artifact.txt  <- tools/gates/selftest.js:963
+tmp/proofrail-t004-crash.go  <- docs/validation/s0-spikes.md:48, docs/validation/s0-spikes_EN.md:48
+tmp/proofrail-t004-fs-probe.go  <- docs/validation/s0-spikes.md:47, docs/validation/s0-spikes_EN.md:47
+tmp/proofrail-t004-process.sh  <- docs/validation/s0-spikes.md:50, docs/validation/s0-spikes_EN.md:50
+tmp/proofrail-t004-queue-probe.go  <- docs/validation/s0-spikes.md:49, docs/validation/s0-spikes_EN.md:49
+tmp/proofrail-t004-tui  <- docs/validation/s0-spikes.md:51, docs/validation/s0-spikes_EN.md:51
+tmp/scratch.log  <- internal/snapshot/capture_test.go:29, internal/snapshot/capture_test.go:88, internal/snapshot/capture_test.go:89
+tmp/sw-*.diff  <- docs/validation/sw-directive-switchover.md:170, docs/validation/sw-directive-switchover_EN.md:170
+tmp/sw-blind-review.diff  <- docs/validation/sw-directive-switchover.md:157, docs/validation/sw-directive-switchover_EN.md:157
+tmp/sw-mai-rerun.diff  <- docs/validation/sw-directive-switchover.md:167, docs/validation/sw-directive-switchover_EN.md:167
+tmp/sw3-review.diff  <- docs/validation/sw3-role-set-versioning.md:61, docs/validation/sw3-role-set-versioning_EN.md:61
+tmp/t018-install-drill/  <- docs/validation/s1-install-drill.md:12, docs/validation/s1-install-drill_EN.md:12
+tmp/t026-copilot-cli-probe-6/workspace  <- testdata/agent-runner/capability-probes/github-copilot-cli-windows-evidence.json:46
+tmp/v111/  <- docs/validation/directive-v1.11.md:81, docs/validation/directive-v1.11.md:112, docs/validation/directive-v1.11_EN.md:81, docs/validation/directive-v1.11_EN.md:112
+tmp/x.jsonl  <- internal/adapters/agent_runner_b3b_candidates_windows_test.go:157
+tmp/）  <- docs/CODING_CONVENTIONS.md:59
+
+=== RAW REFERENCE LINES (all) ===
+.github/copilot-instructions.md:35  [tmp/.gitkeep]  - 临时/一次性文件放仓库根 `tmp/`（已 gitignore，仅 `tmp/.gitkeep` 保留目录）；
+.gitignore:12  [tmp/.gitkeep]  !/tmp/.gitkeep
+README.md:127  [tmp/ai-availability.json]  prfrail ai check --chain ./proofrail.chain.json --channel agent-runner-cli --copilot C:/path/to/copilot.exe --workspace . --max-requests 1 --out ./tmp/ai-availability.json --json
+README.md:128  [tmp/ai-availability.json]  prfrail ai verify --chain ./proofrail.chain.json --record ./tmp/ai-availability.json --channel agent-runner-cli --max-age 10m --max-requests 1 --json
+README.md:133  [tmp/prfrail-runs/run-demo]  prfrail report --run-dir ./tmp/prfrail-runs/run-demo
+README.md:47  [tmp/ai-availability.json]  prfrail ai check --chain ./proofrail.chain.json --channel agent-runner-cli --copilot C:/path/to/copilot.exe --workspace . --max-requests 1 --out ./tmp/ai-availability.json --json
+README.md:48  [tmp/ai-availability.json]  prfrail ai verify --chain ./proofrail.chain.json --record ./tmp/ai-availability.json --channel agent-runner-cli --max-age 10m --max-requests 1 --json
+README.md:53  [tmp/prfrail-runs/run-demo]  prfrail report --run-dir ./tmp/prfrail-runs/run-demo
+docs/ADR_REGISTER.md:29  [tmp/assembly-min/DESIGN.md]  | ADR-019 | **切片 `DIRECTIVE-MODEL-LISTS` 的白名单扩列（用户直接裁定）**：§2.2 新增 `gpt-6.1-sol`（深度档）与 `gpt-6-luna`（平行备选）两行，§2.4 黑名单改为全称 `kimi-k3` | 理由：现役 §2.2 只列七个角色载体、§2.4 按族名禁用 Luna 族 ⇒ 扩列超出两处字面标准；未采纳的替代：先立项单独试点再扩列
+docs/ADR_REGISTER.md:29  [tmp/dml/luna-probe/target.txt]  | ADR-019 | **切片 `DIRECTIVE-MODEL-LISTS` 的白名单扩列（用户直接裁定）**：§2.2 新增 `gpt-6.1-sol`（深度档）与 `gpt-6-luna`（平行备选）两行，§2.4 黑名单改为全称 `kimi-k3` | 理由：现役 §2.2 只列七个角色载体、§2.4 按族名禁用 Luna 族 ⇒ 扩列超出两处字面标准；未采纳的替代：先立项单独试点再扩列
+docs/ADR_REGISTER_EN.md:30  [tmp/assembly-min/DESIGN.md]  | ADR-019 | **Allow-list extension for slice `DIRECTIVE-MODEL-LISTS` (direct user ruling)**: §2.2 gains `gpt-6.1-sol` (deep tier) and `gpt-6-luna` (parallel alternative), and the §2.4 blacklist become
+docs/ADR_REGISTER_EN.md:30  [tmp/dml/luna-probe/target.txt]  | ADR-019 | **Allow-list extension for slice `DIRECTIVE-MODEL-LISTS` (direct user ruling)**: §2.2 gains `gpt-6.1-sol` (deep tier) and `gpt-6-luna` (parallel alternative), and the §2.4 blacklist become
+docs/CODING_CONVENTIONS.md:59  [tmp/）]  ## 5. 临时文件（tmp/）
+docs/CODING_CONVENTIONS.md:62  [tmp/.gitkeep]  已被 `.gitignore` 忽略（保留 `tmp/.gitkeep` 占位以便克隆后目录存在）。
+docs/CODING_CONVENTIONS_EN.md:33  [tmp/.gitkeep]  Use root tmp/ for one-off build/test/debug artifacts; only tmp/.gitkeep is tracked. Remove temporary artifacts when finished. .vscode/ and tmp/ are local/ignored; shared scripts belong in tools/.
+docs/DELIVERY_DIRECTIVE.md:118  [tmp/主控子代理架构_v1.0.md]  - **① 有引用者归档**——被受版本控制文档引用其路径的文件（当前实例：`tmp/主控子代理架构_v1.0.md`、`tmp/gate.js`、`tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R6.md` 与 `_R7.md`）⇒ 归档到 `docs/validation/evidence/` 下的主题目录（约定根 = `docs/validation/evidence
+docs/DELIVERY_DIRECTIVE.md:118  [tmp/gate.js]  - **① 有引用者归档**——被受版本控制文档引用其路径的文件（当前实例：`tmp/主控子代理架构_v1.0.md`、`tmp/gate.js`、`tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R6.md` 与 `_R7.md`）⇒ 归档到 `docs/validation/evidence/` 下的主题目录（约定根 = `docs/validation/evidence
+docs/DELIVERY_DIRECTIVE.md:118  [tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R6.md]  - **① 有引用者归档**——被受版本控制文档引用其路径的文件（当前实例：`tmp/主控子代理架构_v1.0.md`、`tmp/gate.js`、`tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R6.md` 与 `_R7.md`）⇒ 归档到 `docs/validation/evidence/` 下的主题目录（约定根 = `docs/validation/evidence
+docs/DELIVERY_DIRECTIVE.md:119  [tmp/b4]  - **② 早期证据评估归档**——无引用但属早期切片过程证据（如 `tmp/b4`、`tmp/drfix`、`tmp/gates-ext`、`tmp/v112`、`tmp/v113` 的未归档部分）⇒ 由归档执行片评估保留价值：保留者按 ① 的口径归档，无保留价值者直接清。
+docs/DELIVERY_DIRECTIVE.md:119  [tmp/drfix]  - **② 早期证据评估归档**——无引用但属早期切片过程证据（如 `tmp/b4`、`tmp/drfix`、`tmp/gates-ext`、`tmp/v112`、`tmp/v113` 的未归档部分）⇒ 由归档执行片评估保留价值：保留者按 ① 的口径归档，无保留价值者直接清。
+docs/DELIVERY_DIRECTIVE.md:119  [tmp/gates-ext]  - **② 早期证据评估归档**——无引用但属早期切片过程证据（如 `tmp/b4`、`tmp/drfix`、`tmp/gates-ext`、`tmp/v112`、`tmp/v113` 的未归档部分）⇒ 由归档执行片评估保留价值：保留者按 ① 的口径归档，无保留价值者直接清。
+docs/DELIVERY_DIRECTIVE.md:119  [tmp/v112]  - **② 早期证据评估归档**——无引用但属早期切片过程证据（如 `tmp/b4`、`tmp/drfix`、`tmp/gates-ext`、`tmp/v112`、`tmp/v113` 的未归档部分）⇒ 由归档执行片评估保留价值：保留者按 ① 的口径归档，无保留价值者直接清。
+docs/DELIVERY_DIRECTIVE.md:119  [tmp/v113]  - **② 早期证据评估归档**——无引用但属早期切片过程证据（如 `tmp/b4`、`tmp/drfix`、`tmp/gates-ext`、`tmp/v112`、`tmp/v113` 的未归档部分）⇒ 由归档执行片评估保留价值：保留者按 ① 的口径归档，无保留价值者直接清。
+docs/DELIVERY_DIRECTIVE.md:120  [tmp/dml]  - **③ 过程产物直接清**——一次性草稿、探针输出、脚本残留（如 `tmp/dml`、`tmp/dce`、`tmp/assembly-min`）⇒ **用完立即清除**（§1.5 既有要求），归档执行片兜底全清。
+docs/DELIVERY_DIRECTIVE.md:120  [tmp/dce]  - **③ 过程产物直接清**——一次性草稿、探针输出、脚本残留（如 `tmp/dml`、`tmp/dce`、`tmp/assembly-min`）⇒ **用完立即清除**（§1.5 既有要求），归档执行片兜底全清。
+docs/DELIVERY_DIRECTIVE.md:120  [tmp/assembly-min]  - **③ 过程产物直接清**——一次性草稿、探针输出、脚本残留（如 `tmp/dml`、`tmp/dce`、`tmp/assembly-min`）⇒ **用完立即清除**（§1.5 既有要求），归档执行片兜底全清。
+docs/DELIVERY_DIRECTIVE.md:1270  [tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R6.md]  **为何必需**：v1.11 冻结后，外部独立评审连续三轮对准则本体共提出 **64 条**发现（口径：按报告逐轮累计，跨轮复现条目重复计入；严重度分解 **1 Critical + 11 High + 35 Medium + 17 Low**），均属「照章执行却静默走错」与「文本与判据失同步」两类；另有用户两项裁决（日常档生产代码边界、DR-FIX 试点复评）需落地；**第四轮复评（R6）另提 
+docs/DELIVERY_DIRECTIVE.md:468  [tmp/b3c-review.diff]  - 先例：B3c ⑦ 复审曾因"未提供原始 hunk"整轮作废；改为落盘 `tmp/b3c-review.diff` 后一次通过。
+docs/DELIVERY_DIRECTIVE.md:56  [tmp/gate.js]  | v1.10 | 2026-09-22 | **§6.3 扩展（G6 / G7）与 `tools/gates/` 脚本化（切片 `GATES-EXT`）**：① 新增两类机械判据——**G6 台账元数据一致性**（状态时态 / 成本口径 / run 号形态 / 会过期的字面量）与 **G7 审查包完整性**（工件围栏块 / 路径与处置可解析 / finding 处置单元格 / 停止态标记），二者
+docs/DELIVERY_DIRECTIVE.md:56  [tmp/gate.js]  | v1.10 | 2026-09-22 | **§6.3 扩展（G6 / G7）与 `tools/gates/` 脚本化（切片 `GATES-EXT`）**：① 新增两类机械判据——**G6 台账元数据一致性**（状态时态 / 成本口径 / run 号形态 / 会过期的字面量）与 **G7 审查包完整性**（工件围栏块 / 路径与处置可解析 / finding 处置单元格 / 停止态标记），二者
+docs/DELIVERY_DIRECTIVE.md:58  [tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R6.md]  | v1.12 | 2026-09-23 | **DIRECTIVE-V1.12（三轮第三方独立评审发现处置 + 用户裁决落地）**：① §0.1 权威表补台账 / ADR / gates / agents 行 + 『门禁判据』术语消歧（A1/A13/M10）；§0.2 增 MAJOR/MINOR 裁决注记（A4）；§0.3 增『受影响的在飞切片』列（A5）；② §1.2 增分级 / 探针额度 /
+docs/DELIVERY_DIRECTIVE.md:58  [tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R7.md]  | v1.12 | 2026-09-23 | **DIRECTIVE-V1.12（三轮第三方独立评审发现处置 + 用户裁决落地）**：① §0.1 权威表补台账 / ADR / gates / agents 行 + 『门禁判据』术语消歧（A1/A13/M10）；§0.2 增 MAJOR/MINOR 裁决注记（A4）；§0.3 增『受影响的在飞切片』列（A5）；② §1.2 增分级 / 探针额度 /
+docs/DELIVERY_DIRECTIVE.md:58  [tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R6.md]  | v1.12 | 2026-09-23 | **DIRECTIVE-V1.12（三轮第三方独立评审发现处置 + 用户裁决落地）**：① §0.1 权威表补台账 / ADR / gates / agents 行 + 『门禁判据』术语消歧（A1/A13/M10）；§0.2 增 MAJOR/MINOR 裁决注记（A4）；§0.3 增『受影响的在飞切片』列（A5）；② §1.2 增分级 / 探针额度 /
+docs/DELIVERY_DIRECTIVE.md:824  [tmp/gate.js]  | OB-14 | 2026-09-22 | **§12.1“缺陷自捕获率”在 `DR-FIX` 试点未达标（2/5，目标 ≥ 3/4）**：**根因**——3 条审查方发现中 **2 条属“台账元数据类”**（文档内自冲突、状态行时态）与**“审查包完整性类”**（缺证据链），而 §6.3 的 **G1–G5 对这两类无机械判据** ⇒ 与 **OB-10 同源**（同一类缺口在同一片内再次实证
+docs/DELIVERY_DIRECTIVE.md:835  [tmp/b4/runs/f5-pos/events/state-events.jsonl:13/14/15]  | OB-22 | 2026-09-23 | **`CONTRACTS` §7 内部次序陈述不一致（B4 ⑦ 终审发现）**：L205/L227 写「冻结 candidate 再跑 gates」，L229 写「postflight 在 `REVIEW_PENDING` 之前」；**实测与实现均与 L229 一致**（证据：`internal/chain/engine.go:186/197/364`
+docs/DELIVERY_DIRECTIVE.md:857  [tmp/DELIVERY_DIRECTIVE_v111_REVIEW.md]  | OB-39 | 2026-09-23 | **v1.12 验证报告的产物清单漏列第四轮与第五轮复评报告（V1.12 封版复核发现）**：该报告 §11 只列 `tmp/DELIVERY_DIRECTIVE_v111_REVIEW.md` 等 4 份评审报告，未列 `tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R6.md` 与 `_R7.md`，而两者在盘上存在 ⇒ 「
+docs/DELIVERY_DIRECTIVE.md:857  [tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R6.md]  | OB-39 | 2026-09-23 | **v1.12 验证报告的产物清单漏列第四轮与第五轮复评报告（V1.12 封版复核发现）**：该报告 §11 只列 `tmp/DELIVERY_DIRECTIVE_v111_REVIEW.md` 等 4 份评审报告，未列 `tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R6.md` 与 `_R7.md`，而两者在盘上存在 ⇒ 「
+docs/DELIVERY_DIRECTIVE.md:859  [tmp/v112/*-sec12.txt]  | OB-41 | 2026-09-23 | **封版后追加导致判据作用域漂移（V1.12 封版复核发现，用户登记）**：对已提交版本做「封版裁定 / CI 结果」类追加时，暂存集不含原切片提交 ⇒ ⑨ 与 G6-4 的「变更行作用域」从整片变更集**退化为本次追加**（实测 1097 处引用 / scanned 1079 ⇒ 14 处 / scanned 70，空变更集时甚至为 0），与已写入报
+docs/DELIVERY_DIRECTIVE.md:862  [tmp/v113/review-r2.md]  | OB-44 | 2026-09-23 | **审查层角色自行写盘（角色边界的字面偏差）**：本片 ⑤ 复审把报告写成了 `tmp/v113/review-r2.md`，而 §2.2 规定审查层「可否写文件 = **否**」，其角色文件的 `tools` 也只含 `read` / `search`。定性：**字面偏差，非实质违规**（内容即其报告、未污染产品文本、`tmp/` 不入库、主控已确认
+docs/DELIVERY_DIRECTIVE.md:922  [tmp/主控子代理架构_v1.0.md]  | 《Flash 主控子代理架构 v1.0》（`tmp/主控子代理架构_v1.0.md`；属 §1.5.1 的「有引用者归档」类，归档与路径改写由归档执行片同步完成） | 三层角色划分、兜底机制、档位表、Prompt 模板骨架 |
+docs/DELIVERY_DIRECTIVE_EN.md:118  [tmp/主控子代理架构_v1.0.md]  - **① Items with references are archived** — files whose paths are referenced by version-controlled documents (current instances: `tmp/主控子代理架构_v1.0.md`, `tmp/gate.js`, `tmp/DELIVERY_DIRECTIVE_v112_REV
+docs/DELIVERY_DIRECTIVE_EN.md:118  [tmp/gate.js]  - **① Items with references are archived** — files whose paths are referenced by version-controlled documents (current instances: `tmp/主控子代理架构_v1.0.md`, `tmp/gate.js`, `tmp/DELIVERY_DIRECTIVE_v112_REV
+docs/DELIVERY_DIRECTIVE_EN.md:118  [tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R6.md]  - **① Items with references are archived** — files whose paths are referenced by version-controlled documents (current instances: `tmp/主控子代理架构_v1.0.md`, `tmp/gate.js`, `tmp/DELIVERY_DIRECTIVE_v112_REV
+docs/DELIVERY_DIRECTIVE_EN.md:119  [tmp/b4]  - **② Early-slice evidence is assessed for archiving** — items with no reference that are process evidence of early slices (such as the unarchived parts of `tmp/b4`, `tmp/drfix`, `tmp/gates-ext`, `tmp
+docs/DELIVERY_DIRECTIVE_EN.md:119  [tmp/drfix]  - **② Early-slice evidence is assessed for archiving** — items with no reference that are process evidence of early slices (such as the unarchived parts of `tmp/b4`, `tmp/drfix`, `tmp/gates-ext`, `tmp
+docs/DELIVERY_DIRECTIVE_EN.md:119  [tmp/gates-ext]  - **② Early-slice evidence is assessed for archiving** — items with no reference that are process evidence of early slices (such as the unarchived parts of `tmp/b4`, `tmp/drfix`, `tmp/gates-ext`, `tmp
+docs/DELIVERY_DIRECTIVE_EN.md:119  [tmp/v112]  - **② Early-slice evidence is assessed for archiving** — items with no reference that are process evidence of early slices (such as the unarchived parts of `tmp/b4`, `tmp/drfix`, `tmp/gates-ext`, `tmp
+docs/DELIVERY_DIRECTIVE_EN.md:119  [tmp/v113]  - **② Early-slice evidence is assessed for archiving** — items with no reference that are process evidence of early slices (such as the unarchived parts of `tmp/b4`, `tmp/drfix`, `tmp/gates-ext`, `tmp
+docs/DELIVERY_DIRECTIVE_EN.md:120  [tmp/dml]  - **③ Process artifacts are deleted outright** — one-off drafts, probe output and script residue (such as `tmp/dml`, `tmp/dce`, `tmp/assembly-min`) ⇒ **removed immediately after use** (the existing §1
+docs/DELIVERY_DIRECTIVE_EN.md:120  [tmp/dce]  - **③ Process artifacts are deleted outright** — one-off drafts, probe output and script residue (such as `tmp/dml`, `tmp/dce`, `tmp/assembly-min`) ⇒ **removed immediately after use** (the existing §1
+docs/DELIVERY_DIRECTIVE_EN.md:120  [tmp/assembly-min]  - **③ Process artifacts are deleted outright** — one-off drafts, probe output and script residue (such as `tmp/dml`, `tmp/dce`, `tmp/assembly-min`) ⇒ **removed immediately after use** (the existing §1
+docs/DELIVERY_DIRECTIVE_EN.md:1270  [tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R6.md]  **Why it is needed**: after v1.11 was frozen, three consecutive rounds of external independent review raised **64 findings** in total against the directive body (counting rule: accumulated round by ro
+docs/DELIVERY_DIRECTIVE_EN.md:468  [tmp/b3c-review.diff]  - Precedent: the B3c ⑦ re-review was voided for an entire round because "the raw hunk was not provided"; after switching to persisting `tmp/b3c-review.diff` it passed in one round.
+docs/DELIVERY_DIRECTIVE_EN.md:56  [tmp/gate.js]  | v1.10 | 2026-09-22 | **§6.3 extension (G6 / G7) and `tools/gates/` scripting (slice `GATES-EXT`)**: ① two new criterion classes - **G6 ledger metadata consistency** (status tense / cost clause / run
+docs/DELIVERY_DIRECTIVE_EN.md:56  [tmp/gate.js]  | v1.10 | 2026-09-22 | **§6.3 extension (G6 / G7) and `tools/gates/` scripting (slice `GATES-EXT`)**: ① two new criterion classes - **G6 ledger metadata consistency** (status tense / cost clause / run
+docs/DELIVERY_DIRECTIVE_EN.md:58  [tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R6.md]  | v1.12 | 2026-09-23 | **DIRECTIVE-V1.12 (remediation of three rounds of third-party independent review + landing of user rulings)**: ① §0.1 authority table gains the ledger / ADR / gates / agents row
+docs/DELIVERY_DIRECTIVE_EN.md:58  [tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R7.md]  | v1.12 | 2026-09-23 | **DIRECTIVE-V1.12 (remediation of three rounds of third-party independent review + landing of user rulings)**: ① §0.1 authority table gains the ledger / ADR / gates / agents row
+docs/DELIVERY_DIRECTIVE_EN.md:58  [tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R6.md]  | v1.12 | 2026-09-23 | **DIRECTIVE-V1.12 (remediation of three rounds of third-party independent review + landing of user rulings)**: ① §0.1 authority table gains the ledger / ADR / gates / agents row
+docs/DELIVERY_DIRECTIVE_EN.md:824  [tmp/gate.js]  | OB-14 | 2026-09-22 | **The §12.1 "defect self-capture rate" was NOT met in the `DR-FIX` pilot (2/5, target ≥ 3/4)**: **root cause** — 2 of the 3 reviewer-side findings belong to the **ledger-metadat
+docs/DELIVERY_DIRECTIVE_EN.md:835  [tmp/b4/runs/f5-pos/events/state-events.jsonl:13/14/15]  | OB-22 | 2026-09-23 | **Internal ordering inconsistency inside `CONTRACTS` §7 (found by the B4 ⑦ final review)**: L205/L227 say "freeze the candidate, then run the gates", L229 says "postflight befor
+docs/DELIVERY_DIRECTIVE_EN.md:857  [tmp/DELIVERY_DIRECTIVE_v111_REVIEW.md]  | OB-39 | 2026-09-23 | **The v1.12 validation report's artifact list omits the fourth and fifth re-review reports (found in the v1.12 freeze re-check)**: its §11 names 4 review reports such as `tmp/DE
+docs/DELIVERY_DIRECTIVE_EN.md:857  [tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R6.md]  | OB-39 | 2026-09-23 | **The v1.12 validation report's artifact list omits the fourth and fifth re-review reports (found in the v1.12 freeze re-check)**: its §11 names 4 review reports such as `tmp/DE
+docs/DELIVERY_DIRECTIVE_EN.md:859  [tmp/v112/*-sec12.txt]  | OB-41 | 2026-09-23 | **A post-freeze append drifts the criteria's scope (found in the v1.12 freeze re-check; registered by the user)**: when a "freeze ruling / CI result" record is appended to an al
+docs/DELIVERY_DIRECTIVE_EN.md:862  [tmp/v113/review-r2.md]  | OB-44 | 2026-09-23 | **A review-layer role wrote to disk itself (a literal deviation at the role boundary)**: in this slice the ⑤ re-review wrote its report to `tmp/v113/review-r2.md`, whereas §2.2 
+docs/DELIVERY_DIRECTIVE_EN.md:922  [tmp/主控子代理架构_v1.0.md]  | 《Flash Master-Subagent Architecture v1.0》 (`tmp/主控子代理架构_v1.0.md`; belongs to the "items with references" class of §1.5.1, and the archiving and path rewriting are completed together by the archive-e
+docs/DEV_PLAN.md:143  [tmp/b4/SHA256SUMS.txt]  T027 前置状态更新（2026-09-23，B4 AT-23 E2E evidence + independent review）：在上一段基础上，B4 已完成（**机制腿**端到端证据 + 独立审查）。**四事分立（不得合并）**：① B4 切片 ✅ 完成；② **AT-23 未通过**——机制腿五个面（隔离 workspace、timeout、日志缺失、未知恢复、exit 0 后重扫）已在真
+docs/DEV_PLAN_EN.md:144  [tmp/b4/SHA256SUMS.txt]  T027 prerequisite status update (2026-09-23, B4 AT-23 E2E evidence + independent review): on top of the previous paragraph, B4 is complete (**mechanism-leg** end-to-end evidence plus independent revie
+docs/t027/REMAINING_SLICES.md:346  [tmp/b1/]  - **待办/决策**：① DR-1 的修复切片；② B2 应走**外部 OS enforcement** 路线（以本片场景为反例基线）；③ ~~`tmp/b1/` 的去留~~ **已决策并落地**：runner 入库为工具、决定性工件入证据包、其余按纪律清除（原始 JSONL 与 CLI 日志不入库）。
+docs/t027/REMAINING_SLICES.md:629  [tmp/b4/SHA256SUMS.txt]  | 2026-09-23 | B4 | （依据 `docs/validation/t027-at23-e2e.md`）AT-23 机制腿端到端证据 + 独立审查：装配 harness（`tools/b4-e2e/`，复用生产包、无 `os/exec`）在真实 Windows 宿主驱动五个面（隔离 workspace、timeout、日志缺失、未知恢复、exit 0 后重扫）的正/反向与包内重跑腿。
+docs/t027/REMAINING_SLICES_EN.md:326  [tmp/b1/]  - **Outstanding decisions**: ① the DR-1 fix slice; ② B2 should take the **external OS enforcement** route (using this slice's scenarios as the counterexample baseline); ③ ~~the fate of `tmp/b1/`~~ **d
+docs/t027/REMAINING_SLICES_EN.md:616  [tmp/b4/SHA256SUMS.txt]  | 2026-09-23 | B4 | (per `docs/validation/t027-at23-e2e.md`) AT-23 mechanism-leg end-to-end evidence plus independent review: an assembly harness (`tools/b4-e2e/`, reusing the production packages, no 
+docs/validation/B2-EXTERNAL-ENFORCEMENT.md:212  [tmp/b2/]  其临时产物写入被 gitignore 的 `tmp/b2/`，因此清理 `tmp/` 不影响复现。证据包内的 `machine-ops/`
+docs/validation/B2-EXTERNAL-ENFORCEMENT.md:213  [tmp/b2/]  是这些脚本在 B2 当时的字节级快照。**临时目录清理策略**：证据包冻结后可直接删除 `tmp/b2/`；
+docs/validation/B2-EXTERNAL-ENFORCEMENT.md:269  [tmp/b2/]  - 证据包冻结后可直接删除 `tmp/b2/`；届时 `assemble-evidence.ps1` 会把历史 run 目录报为 `missingArtifact`（预期）。
+docs/validation/B2-EXTERNAL-ENFORCEMENT_EN.md:246  [tmp/b2/]  `README.md`); their scratch output goes to the git-ignored `tmp/b2/`, so cleaning `tmp/` does not affect
+docs/validation/B2-EXTERNAL-ENFORCEMENT_EN.md:248  [tmp/b2/]  **Scratch cleanup policy**: once the bundle is frozen, `tmp/b2/` may be deleted; `assemble-evidence.ps1` will
+docs/validation/B2-EXTERNAL-ENFORCEMENT_EN.md:273  [tmp/b2/]  > `tools/agent-probe/appcontainer-b2/`; their scratch output lives in the git-ignored `tmp/b2/`, and the
+docs/validation/B2-EXTERNAL-ENFORCEMENT_EN.md:313  [tmp/b2/]  - Once the bundle is frozen, `tmp/b2/` may be deleted; `assemble-evidence.ps1` will then report the historical run
+docs/validation/directive-cleanup-eval.md:160  [tmp/dce/land.js]  tmp/dce/land.js	local-only
+docs/validation/directive-cleanup-eval.md:161  [tmp/dce/peek.js]  tmp/dce/peek.js	local-only
+docs/validation/directive-cleanup-eval.md:162  [tmp/dce/gate-tree.txt]  tmp/dce/gate-tree.txt	local-only
+docs/validation/directive-cleanup-eval.md:163  [tmp/dce/gate-index.txt]  tmp/dce/gate-index.txt	local-only
+docs/validation/directive-cleanup-eval.md:164  [tmp/dce/selftest.txt]  tmp/dce/selftest.txt	local-only
+docs/validation/directive-cleanup-eval.md:165  [tmp/dce/probe-id-rejections.txt]  tmp/dce/probe-id-rejections.txt	local-only
+docs/validation/directive-cleanup-eval.md:166  [tmp/dce/gate-tree-first-fail.txt]  tmp/dce/gate-tree-first-fail.txt	local-only
+docs/validation/directive-cleanup-eval.md:167  [tmp/dce/test.txt]  tmp/dce/test.txt	local-only
+docs/validation/directive-cleanup-eval.md:53  [tmp/dce/probe-id-rejections.txt]  **证据留存**：三次被拒调用的回执原文留存于 `tmp/dce/probe-id-rejections.txt`（`local-only`），本报告的结论不再只有文字。
+docs/validation/directive-cleanup-eval_EN.md:160  [tmp/dce/land.js]  tmp/dce/land.js	local-only
+docs/validation/directive-cleanup-eval_EN.md:161  [tmp/dce/peek.js]  tmp/dce/peek.js	local-only
+docs/validation/directive-cleanup-eval_EN.md:162  [tmp/dce/gate-tree.txt]  tmp/dce/gate-tree.txt	local-only
+docs/validation/directive-cleanup-eval_EN.md:163  [tmp/dce/gate-index.txt]  tmp/dce/gate-index.txt	local-only
+docs/validation/directive-cleanup-eval_EN.md:164  [tmp/dce/selftest.txt]  tmp/dce/selftest.txt	local-only
+docs/validation/directive-cleanup-eval_EN.md:165  [tmp/dce/probe-id-rejections.txt]  tmp/dce/probe-id-rejections.txt	local-only
+docs/validation/directive-cleanup-eval_EN.md:166  [tmp/dce/gate-tree-first-fail.txt]  tmp/dce/gate-tree-first-fail.txt	local-only
+docs/validation/directive-cleanup-eval_EN.md:167  [tmp/dce/test.txt]  tmp/dce/test.txt	local-only
+docs/validation/directive-cleanup-eval_EN.md:42  [tmp/dce/probe-id-rejections.txt]  **Evidence retained**: the three rejection receipts are kept verbatim in `tmp/dce/probe-id-rejections.txt` (`local-only`), so the conclusion no longer rests on prose alone.
+docs/validation/directive-design-loopback.md:184  [tmp/ddl/*.js]  - **工具侧异常**：① `create_file` 落盘本片报告时写为 CRLF，由 ⑧ 归一为 LF ⇒ 字节数与初稿不符（内容未变，已逐行复核）；② PowerShell 终端对长单行 `node -e` 命令出现「假中断」（回显 `^C` 而命令实际已执行）⇒ 兜底 = 一律改写 `tmp/ddl/*.js` 脚本再执行，并逐次回读输出文件确认。
+docs/validation/directive-design-loopback.md:193  [tmp/ddl/change-set.diff]  变更集 diff = `tmp/ddl/change-set.diff`（配 `tmp/ddl/numstat.txt`）；契约原句 = `docs/DELIVERY_DIRECTIVE.md` 的 §0.2 / §6.3 / §7.2 / §11.3 / §12.4；自由度清单 = `docs/validation/evidence/DIRECTIVE-DESIGN-LOOPBACK-freed
+docs/validation/directive-design-loopback.md:193  [tmp/ddl/numstat.txt]  变更集 diff = `tmp/ddl/change-set.diff`（配 `tmp/ddl/numstat.txt`）；契约原句 = `docs/DELIVERY_DIRECTIVE.md` 的 §0.2 / §6.3 / §7.2 / §11.3 / §12.4；自由度清单 = `docs/validation/evidence/DIRECTIVE-DESIGN-LOOPBACK-freed
+docs/validation/directive-design-loopback.md:202  [tmp/ddl/mutation-g6-6.txt]  | 变异检验（G6-6 闭集） | 变异轮 `TOTAL_FAIL=1`（`docs/DELIVERY_DIRECTIVE.md:874` 首状态词判红）；还原后同命令 `TOTAL_FAIL=0`，且还原后 sha256 与变异前一致（证据 `tmp/ddl/mutation-g6-6.txt`、`tmp/ddl/mutation-restored.txt`、`tmp/ddl/mutation-
+docs/validation/directive-design-loopback.md:202  [tmp/ddl/mutation-restored.txt]  | 变异检验（G6-6 闭集） | 变异轮 `TOTAL_FAIL=1`（`docs/DELIVERY_DIRECTIVE.md:874` 首状态词判红）；还原后同命令 `TOTAL_FAIL=0`，且还原后 sha256 与变异前一致（证据 `tmp/ddl/mutation-g6-6.txt`、`tmp/ddl/mutation-restored.txt`、`tmp/ddl/mutation-
+docs/validation/directive-design-loopback.md:202  [tmp/ddl/mutation-sha256.txt]  | 变异检验（G6-6 闭集） | 变异轮 `TOTAL_FAIL=1`（`docs/DELIVERY_DIRECTIVE.md:874` 首状态词判红）；还原后同命令 `TOTAL_FAIL=0`，且还原后 sha256 与变异前一致（证据 `tmp/ddl/mutation-g6-6.txt`、`tmp/ddl/mutation-restored.txt`、`tmp/ddl/mutation-
+docs/validation/directive-design-loopback.md:203  [tmp/ddl/mirror-parity.txt]  | 镜像同位（报告对） | 行数 / 加粗 / 竖线 / 逐行形状四项全等，失配 0（读数见 `tmp/ddl/mirror-parity.txt`） |
+docs/validation/directive-design-loopback.md:209  [tmp/ddl/eightc.txt]  `gate.js --all --scope=tree` 全绿；编码门禁（G4a）按 `.md` = BOM+LF 对全部改动文件逐文件核验，无违规；诊断扫描（§3.4）无新增告警；工作区卫生 = 10 项全部暂存、无未暂存与未跟踪项（读数见 `tmp/ddl/eightc.txt`）；`tmp/ddl/` 为一次性工作目录（gitignore），其本地证据在用户审阅与提交后按 §1.5 清除。
+docs/validation/directive-design-loopback.md:209  [tmp/ddl/]  `gate.js --all --scope=tree` 全绿；编码门禁（G4a）按 `.md` = BOM+LF 对全部改动文件逐文件核验，无违规；诊断扫描（§3.4）无新增告警；工作区卫生 = 10 项全部暂存、无未暂存与未跟踪项（读数见 `tmp/ddl/eightc.txt`）；`tmp/ddl/` 为一次性工作目录（gitignore），其本地证据在用户审阅与提交后按 §1.5 清除。
+docs/validation/directive-design-loopback.md:234  [tmp/ddl/change-set.diff]  tmp/ddl/change-set.diff	local-only
+docs/validation/directive-design-loopback.md:235  [tmp/ddl/check-cn.js]  tmp/ddl/check-cn.js	local-only
+docs/validation/directive-design-loopback.md:236  [tmp/ddl/eightc.js]  tmp/ddl/eightc.js	local-only
+docs/validation/directive-design-loopback.md:237  [tmp/ddl/eightc.txt]  tmp/ddl/eightc.txt	local-only
+docs/validation/directive-design-loopback.md:238  [tmp/ddl/fence-sync.js]  tmp/ddl/fence-sync.js	local-only
+docs/validation/directive-design-loopback.md:239  [tmp/ddl/fence.js]  tmp/ddl/fence.js	local-only
+docs/validation/directive-design-loopback.md:240  [tmp/ddl/fix1.js]  tmp/ddl/fix1.js	local-only
+docs/validation/directive-design-loopback.md:241  [tmp/ddl/fix10.js]  tmp/ddl/fix10.js	local-only
+docs/validation/directive-design-loopback.md:242  [tmp/ddl/fix1b.js]  tmp/ddl/fix1b.js	local-only
+docs/validation/directive-design-loopback.md:243  [tmp/ddl/fix2.js]  tmp/ddl/fix2.js	local-only
+docs/validation/directive-design-loopback.md:244  [tmp/ddl/fix3.js]  tmp/ddl/fix3.js	local-only
+docs/validation/directive-design-loopback.md:245  [tmp/ddl/fix4.js]  tmp/ddl/fix4.js	local-only
+docs/validation/directive-design-loopback.md:246  [tmp/ddl/fix5.js]  tmp/ddl/fix5.js	local-only
+docs/validation/directive-design-loopback.md:247  [tmp/ddl/fix6.js]  tmp/ddl/fix6.js	local-only
+docs/validation/directive-design-loopback.md:248  [tmp/ddl/fix7.js]  tmp/ddl/fix7.js	local-only
+docs/validation/directive-design-loopback.md:249  [tmp/ddl/fix8.js]  tmp/ddl/fix8.js	local-only
+docs/validation/directive-design-loopback.md:250  [tmp/ddl/fix9.js]  tmp/ddl/fix9.js	local-only
+docs/validation/directive-design-loopback.md:251  [tmp/ddl/g4b.txt]  tmp/ddl/g4b.txt	local-only
+docs/validation/directive-design-loopback.md:252  [tmp/ddl/gate-index.txt]  tmp/ddl/gate-index.txt	local-only
+docs/validation/directive-design-loopback.md:253  [tmp/ddl/gate-tree.txt]  tmp/ddl/gate-tree.txt	local-only
+docs/validation/directive-design-loopback.md:254  [tmp/ddl/land.js]  tmp/ddl/land.js	local-only
+docs/validation/directive-design-loopback.md:255  [tmp/ddl/ledger-d5.diff]  tmp/ddl/ledger-d5.diff	local-only
+docs/validation/directive-design-loopback.md:256  [tmp/ddl/ledger.diff]  tmp/ddl/ledger.diff	local-only
+docs/validation/directive-design-loopback.md:257  [tmp/ddl/mirror-parity.txt]  tmp/ddl/mirror-parity.txt	local-only
+docs/validation/directive-design-loopback.md:258  [tmp/ddl/mirror.js]  tmp/ddl/mirror.js	local-only
+docs/validation/directive-design-loopback.md:259  [tmp/ddl/mutate-original.bin]  tmp/ddl/mutate-original.bin	local-only
+docs/validation/directive-design-loopback.md:260  [tmp/ddl/mutate.js]  tmp/ddl/mutate.js	local-only
+docs/validation/directive-design-loopback.md:261  [tmp/ddl/mutation-g6-6.txt]  tmp/ddl/mutation-g6-6.txt	local-only
+docs/validation/directive-design-loopback.md:262  [tmp/ddl/mutation-restored.txt]  tmp/ddl/mutation-restored.txt	local-only
+docs/validation/directive-design-loopback.md:263  [tmp/ddl/mutation-sha256.txt]  tmp/ddl/mutation-sha256.txt	local-only
+docs/validation/directive-design-loopback.md:264  [tmp/ddl/numstat.txt]  tmp/ddl/numstat.txt	local-only
+docs/validation/directive-design-loopback.md:265  [tmp/ddl/peek-ledger.js]  tmp/ddl/peek-ledger.js	local-only
+docs/validation/directive-design-loopback.md:266  [tmp/ddl/peek2.js]  tmp/ddl/peek2.js	local-only
+docs/validation/directive-design-loopback.md:267  [tmp/ddl/peek4.js]  tmp/ddl/peek4.js	local-only
+docs/validation/directive-design-loopback.md:268  [tmp/ddl/review-r1.md]  tmp/ddl/review-r1.md	local-only
+docs/validation/directive-design-loopback.md:269  [tmp/ddl/scan.js]  tmp/ddl/scan.js	local-only
+docs/validation/directive-design-loopback.md:270  [tmp/ddl/selftest.txt]  tmp/ddl/selftest.txt	local-only
+docs/validation/directive-design-loopback_EN.md:184  [tmp/ddl/*.js]  - **Tool-side exceptions**: (1) `create_file` wrote the report pair with CRLF and ⑧ normalised them to LF ⇒ the byte count differs from the first draft (content unchanged, verified line by line); (2) 
+docs/validation/directive-design-loopback_EN.md:193  [tmp/ddl/change-set.diff]  Change-set diff = `tmp/ddl/change-set.diff` (with `tmp/ddl/numstat.txt`); contract sentences = §0.2 / §6.3 / §7.2 / §11.3 / §12.4 of `docs/DELIVERY_DIRECTIVE.md`; freedom list = `docs/validation/evide
+docs/validation/directive-design-loopback_EN.md:193  [tmp/ddl/numstat.txt]  Change-set diff = `tmp/ddl/change-set.diff` (with `tmp/ddl/numstat.txt`); contract sentences = §0.2 / §6.3 / §7.2 / §11.3 / §12.4 of `docs/DELIVERY_DIRECTIVE.md`; freedom list = `docs/validation/evide
+docs/validation/directive-design-loopback_EN.md:202  [tmp/ddl/mutation-g6-6.txt]  | Mutation check (G6-6 closed set) | mutated run `TOTAL_FAIL=1` (`docs/DELIVERY_DIRECTIVE.md:874` first status word turns red); after restoration the same command gives `TOTAL_FAIL=0`, and the restore
+docs/validation/directive-design-loopback_EN.md:202  [tmp/ddl/mutation-restored.txt]  | Mutation check (G6-6 closed set) | mutated run `TOTAL_FAIL=1` (`docs/DELIVERY_DIRECTIVE.md:874` first status word turns red); after restoration the same command gives `TOTAL_FAIL=0`, and the restore
+docs/validation/directive-design-loopback_EN.md:202  [tmp/ddl/mutation-sha256.txt]  | Mutation check (G6-6 closed set) | mutated run `TOTAL_FAIL=1` (`docs/DELIVERY_DIRECTIVE.md:874` first status word turns red); after restoration the same command gives `TOTAL_FAIL=0`, and the restore
+docs/validation/directive-design-loopback_EN.md:203  [tmp/ddl/mirror-parity.txt]  | Mirror positionality (report pair) | lines / bold / bars / per-line shape all equal, 0 mismatches (reading in `tmp/ddl/mirror-parity.txt`) |
+docs/validation/directive-design-loopback_EN.md:209  [tmp/ddl/eightc.txt]  `gate.js --all --scope=tree` all green; the encoding gate (G4a) checked every changed file against the `.md` = BOM+LF rule with no violation; the diagnostic scan (§3.4) produced no new warning; worksp
+docs/validation/directive-design-loopback_EN.md:209  [tmp/ddl/]  `gate.js --all --scope=tree` all green; the encoding gate (G4a) checked every changed file against the `.md` = BOM+LF rule with no violation; the diagnostic scan (§3.4) produced no new warning; worksp
+docs/validation/directive-design-loopback_EN.md:234  [tmp/ddl/change-set.diff]  tmp/ddl/change-set.diff	local-only
+docs/validation/directive-design-loopback_EN.md:235  [tmp/ddl/check-cn.js]  tmp/ddl/check-cn.js	local-only
+docs/validation/directive-design-loopback_EN.md:236  [tmp/ddl/eightc.js]  tmp/ddl/eightc.js	local-only
+docs/validation/directive-design-loopback_EN.md:237  [tmp/ddl/eightc.txt]  tmp/ddl/eightc.txt	local-only
+docs/validation/directive-design-loopback_EN.md:238  [tmp/ddl/fence-sync.js]  tmp/ddl/fence-sync.js	local-only
+docs/validation/directive-design-loopback_EN.md:239  [tmp/ddl/fence.js]  tmp/ddl/fence.js	local-only
+docs/validation/directive-design-loopback_EN.md:240  [tmp/ddl/fix1.js]  tmp/ddl/fix1.js	local-only
+docs/validation/directive-design-loopback_EN.md:241  [tmp/ddl/fix10.js]  tmp/ddl/fix10.js	local-only
+docs/validation/directive-design-loopback_EN.md:242  [tmp/ddl/fix1b.js]  tmp/ddl/fix1b.js	local-only
+docs/validation/directive-design-loopback_EN.md:243  [tmp/ddl/fix2.js]  tmp/ddl/fix2.js	local-only
+docs/validation/directive-design-loopback_EN.md:244  [tmp/ddl/fix3.js]  tmp/ddl/fix3.js	local-only
+docs/validation/directive-design-loopback_EN.md:245  [tmp/ddl/fix4.js]  tmp/ddl/fix4.js	local-only
+docs/validation/directive-design-loopback_EN.md:246  [tmp/ddl/fix5.js]  tmp/ddl/fix5.js	local-only
+docs/validation/directive-design-loopback_EN.md:247  [tmp/ddl/fix6.js]  tmp/ddl/fix6.js	local-only
+docs/validation/directive-design-loopback_EN.md:248  [tmp/ddl/fix7.js]  tmp/ddl/fix7.js	local-only
+docs/validation/directive-design-loopback_EN.md:249  [tmp/ddl/fix8.js]  tmp/ddl/fix8.js	local-only
+docs/validation/directive-design-loopback_EN.md:250  [tmp/ddl/fix9.js]  tmp/ddl/fix9.js	local-only
+docs/validation/directive-design-loopback_EN.md:251  [tmp/ddl/g4b.txt]  tmp/ddl/g4b.txt	local-only
+docs/validation/directive-design-loopback_EN.md:252  [tmp/ddl/gate-index.txt]  tmp/ddl/gate-index.txt	local-only
+docs/validation/directive-design-loopback_EN.md:253  [tmp/ddl/gate-tree.txt]  tmp/ddl/gate-tree.txt	local-only
+docs/validation/directive-design-loopback_EN.md:254  [tmp/ddl/land.js]  tmp/ddl/land.js	local-only
+docs/validation/directive-design-loopback_EN.md:255  [tmp/ddl/ledger-d5.diff]  tmp/ddl/ledger-d5.diff	local-only
+docs/validation/directive-design-loopback_EN.md:256  [tmp/ddl/ledger.diff]  tmp/ddl/ledger.diff	local-only
+docs/validation/directive-design-loopback_EN.md:257  [tmp/ddl/mirror-parity.txt]  tmp/ddl/mirror-parity.txt	local-only
+docs/validation/directive-design-loopback_EN.md:258  [tmp/ddl/mirror.js]  tmp/ddl/mirror.js	local-only
+docs/validation/directive-design-loopback_EN.md:259  [tmp/ddl/mutate-original.bin]  tmp/ddl/mutate-original.bin	local-only
+docs/validation/directive-design-loopback_EN.md:260  [tmp/ddl/mutate.js]  tmp/ddl/mutate.js	local-only
+docs/validation/directive-design-loopback_EN.md:261  [tmp/ddl/mutation-g6-6.txt]  tmp/ddl/mutation-g6-6.txt	local-only
+docs/validation/directive-design-loopback_EN.md:262  [tmp/ddl/mutation-restored.txt]  tmp/ddl/mutation-restored.txt	local-only
+docs/validation/directive-design-loopback_EN.md:263  [tmp/ddl/mutation-sha256.txt]  tmp/ddl/mutation-sha256.txt	local-only
+docs/validation/directive-design-loopback_EN.md:264  [tmp/ddl/numstat.txt]  tmp/ddl/numstat.txt	local-only
+docs/validation/directive-design-loopback_EN.md:265  [tmp/ddl/peek-ledger.js]  tmp/ddl/peek-ledger.js	local-only
+docs/validation/directive-design-loopback_EN.md:266  [tmp/ddl/peek2.js]  tmp/ddl/peek2.js	local-only
+docs/validation/directive-design-loopback_EN.md:267  [tmp/ddl/peek4.js]  tmp/ddl/peek4.js	local-only
+docs/validation/directive-design-loopback_EN.md:268  [tmp/ddl/review-r1.md]  tmp/ddl/review-r1.md	local-only
+docs/validation/directive-design-loopback_EN.md:269  [tmp/ddl/scan.js]  tmp/ddl/scan.js	local-only
+docs/validation/directive-design-loopback_EN.md:270  [tmp/ddl/selftest.txt]  tmp/ddl/selftest.txt	local-only
+docs/validation/directive-loopback-landing.md:107  [tmp/ll/]  `gate.js --all --scope=tree` 全绿；编码门禁（G4a）按 `.md` = BOM+LF 对全部改动文件逐文件核验，无违规；诊断扫描（§3.4）无新增告警；工作区卫生 = 全部改动逐文件暂存；**无 git 可见的未暂存项与未跟踪项**（`tmp/ll/` 属 gitignore 目录）（读数见 `tmp/ll/eightc.txt`）；`tmp/ll/` 为一次性工作目
+docs/validation/directive-loopback-landing.md:107  [tmp/ll/eightc.txt]  `gate.js --all --scope=tree` 全绿；编码门禁（G4a）按 `.md` = BOM+LF 对全部改动文件逐文件核验，无违规；诊断扫描（§3.4）无新增告警；工作区卫生 = 全部改动逐文件暂存；**无 git 可见的未暂存项与未跟踪项**（`tmp/ll/` 属 gitignore 目录）（读数见 `tmp/ll/eightc.txt`）；`tmp/ll/` 为一次性工作目
+docs/validation/directive-loopback-landing.md:107  [tmp/ll/]  `gate.js --all --scope=tree` 全绿；编码门禁（G4a）按 `.md` = BOM+LF 对全部改动文件逐文件核验，无违规；诊断扫描（§3.4）无新增告警；工作区卫生 = 全部改动逐文件暂存；**无 git 可见的未暂存项与未跟踪项**（`tmp/ll/` 属 gitignore 目录）（读数见 `tmp/ll/eightc.txt`）；`tmp/ll/` 为一次性工作目
+docs/validation/directive-loopback-landing.md:126  [tmp/ll/lit.txt]  | F-5 | G6-4 纠错条目引用的读数文件为复绿后状态（Low） | 已注明「红态未单独留档」并改引 `tmp/ll/lit.txt` |
+docs/validation/directive-loopback-landing.md:128  [tmp/ll/]  | F-7 | §7.1「无未跟踪项」与并列读数冲突（Low） | 已限定为「无 git 可见的未暂存项与未跟踪项」并注明 `tmp/ll/` 属 gitignore |
+docs/validation/directive-loopback-landing.md:130  [tmp/ll/lit.txt]  | F-9 | 复审：`tmp/ll/lit.txt` 为全文口径且无 NOTE，易误读为门禁红态（Low） | 已加 NOTE 头，并改为同时引 `tmp/ll/pre.txt`（新增行口径） |
+docs/validation/directive-loopback-landing.md:130  [tmp/ll/pre.txt]  | F-9 | 复审：`tmp/ll/lit.txt` 为全文口径且无 NOTE，易误读为门禁红态（Low） | 已加 NOTE 头，并改为同时引 `tmp/ll/pre.txt`（新增行口径） |
+docs/validation/directive-loopback-landing.md:141  [tmp/ll/]  | 4 | 授权 commit 与 push origin（逐文件暂存、不推 gitee）；`tmp/ll/` 提交后清理，其中 CI run 读数归档为 `docs/validation/evidence/ci-run-37107634723.txt` | 提交与推送见台账完成行；归档件按 `repo` 处置入本报告 §9 围栏 |
+docs/validation/directive-loopback-landing.md:162  [tmp/ll/apply.js]  tmp/ll/apply.js	local-only
+docs/validation/directive-loopback-landing.md:163  [tmp/ll/change-set.diff]  tmp/ll/change-set.diff	local-only
+docs/validation/directive-loopback-landing.md:164  [tmp/ll/chk.js]  tmp/ll/chk.js	local-only
+docs/validation/directive-loopback-landing.md:165  [tmp/ll/ci-run.txt]  tmp/ll/ci-run.txt	local-only
+docs/validation/directive-loopback-landing.md:166  [tmp/ll/cn-dump.txt]  tmp/ll/cn-dump.txt	local-only
+docs/validation/directive-loopback-landing.md:167  [tmp/ll/dump.js]  tmp/ll/dump.js	local-only
+docs/validation/directive-loopback-landing.md:168  [tmp/ll/dump2.js]  tmp/ll/dump2.js	local-only
+docs/validation/directive-loopback-landing.md:169  [tmp/ll/dump3.js]  tmp/ll/dump3.js	local-only
+docs/validation/directive-loopback-landing.md:170  [tmp/ll/dump4.js]  tmp/ll/dump4.js	local-only
+docs/validation/directive-loopback-landing.md:171  [tmp/ll/dump5.js]  tmp/ll/dump5.js	local-only
+docs/validation/directive-loopback-landing.md:172  [tmp/ll/eightc.js]  tmp/ll/eightc.js	local-only
+docs/validation/directive-loopback-landing.md:173  [tmp/ll/eightc.txt]  tmp/ll/eightc.txt	local-only
+docs/validation/directive-loopback-landing.md:174  [tmp/ll/en-dump.txt]  tmp/ll/en-dump.txt	local-only
+docs/validation/directive-loopback-landing.md:175  [tmp/ll/en-full.txt]  tmp/ll/en-full.txt	local-only
+docs/validation/directive-loopback-landing.md:176  [tmp/ll/en-new.md]  tmp/ll/en-new.md	local-only
+docs/validation/directive-loopback-landing.md:177  [tmp/ll/finalize.js]  tmp/ll/finalize.js	local-only
+docs/validation/directive-loopback-landing.md:178  [tmp/ll/fixmut.js]  tmp/ll/fixmut.js	local-only
+docs/validation/directive-loopback-landing.md:179  [tmp/ll/g3a.txt]  tmp/ll/g3a.txt	local-only
+docs/validation/directive-loopback-landing.md:180  [tmp/ll/gate-index.txt]  tmp/ll/gate-index.txt	local-only
+docs/validation/directive-loopback-landing.md:181  [tmp/ll/gate-tree.txt]  tmp/ll/gate-tree.txt	local-only
+docs/validation/directive-loopback-landing.md:182  [tmp/ll/gsum.js]  tmp/ll/gsum.js	local-only
+docs/validation/directive-loopback-landing.md:183  [tmp/ll/gsum2.js]  tmp/ll/gsum2.js	local-only
+docs/validation/directive-loopback-landing.md:184  [tmp/ll/land1.js]  tmp/ll/land1.js	local-only
+docs/validation/directive-loopback-landing.md:185  [tmp/ll/land10.js]  tmp/ll/land10.js	local-only
+docs/validation/directive-loopback-landing.md:186  [tmp/ll/land11.js]  tmp/ll/land11.js	local-only
+docs/validation/directive-loopback-landing.md:187  [tmp/ll/land12.js]  tmp/ll/land12.js	local-only
+docs/validation/directive-loopback-landing.md:188  [tmp/ll/land13.js]  tmp/ll/land13.js	local-only
+docs/validation/directive-loopback-landing.md:189  [tmp/ll/land14.js]  tmp/ll/land14.js	local-only
+docs/validation/directive-loopback-landing.md:190  [tmp/ll/land2.js]  tmp/ll/land2.js	local-only
+docs/validation/directive-loopback-landing.md:191  [tmp/ll/land3.js]  tmp/ll/land3.js	local-only
+docs/validation/directive-loopback-landing.md:192  [tmp/ll/land3.txt]  tmp/ll/land3.txt	local-only
+docs/validation/directive-loopback-landing.md:193  [tmp/ll/land4.js]  tmp/ll/land4.js	local-only
+docs/validation/directive-loopback-landing.md:194  [tmp/ll/land4.txt]  tmp/ll/land4.txt	local-only
+docs/validation/directive-loopback-landing.md:195  [tmp/ll/land5.js]  tmp/ll/land5.js	local-only
+docs/validation/directive-loopback-landing.md:196  [tmp/ll/land5.txt]  tmp/ll/land5.txt	local-only
+docs/validation/directive-loopback-landing.md:197  [tmp/ll/land6.js]  tmp/ll/land6.js	local-only
+docs/validation/directive-loopback-landing.md:198  [tmp/ll/land7.js]  tmp/ll/land7.js	local-only
+docs/validation/directive-loopback-landing.md:199  [tmp/ll/land7.txt]  tmp/ll/land7.txt	local-only
+docs/validation/directive-loopback-landing.md:200  [tmp/ll/land8.js]  tmp/ll/land8.js	local-only
+docs/validation/directive-loopback-landing.md:201  [tmp/ll/land8.txt]  tmp/ll/land8.txt	local-only
+docs/validation/directive-loopback-landing.md:202  [tmp/ll/land9.js]  tmp/ll/land9.js	local-only
+docs/validation/directive-loopback-landing.md:203  [tmp/ll/lit.js]  tmp/ll/lit.js	local-only
+docs/validation/directive-loopback-landing.md:204  [tmp/ll/lit.txt]  tmp/ll/lit.txt	local-only
+docs/validation/directive-loopback-landing.md:205  [tmp/ll/llmirror.js]  tmp/ll/llmirror.js	local-only
+docs/validation/directive-loopback-landing.md:206  [tmp/ll/m1.orig]  tmp/ll/m1.orig	local-only
+docs/validation/directive-loopback-landing.md:207  [tmp/ll/m1.txt]  tmp/ll/m1.txt	local-only
+docs/validation/directive-loopback-landing.md:208  [tmp/ll/m2.orig]  tmp/ll/m2.orig	local-only
+docs/validation/directive-loopback-landing.md:209  [tmp/ll/m3.orig]  tmp/ll/m3.orig	local-only
+docs/validation/directive-loopback-landing.md:210  [tmp/ll/mir.js]  tmp/ll/mir.js	local-only
+docs/validation/directive-loopback-landing.md:211  [tmp/ll/mir2.js]  tmp/ll/mir2.js	local-only
+docs/validation/directive-loopback-landing.md:212  [tmp/ll/mirror.txt]  tmp/ll/mirror.txt	local-only
+docs/validation/directive-loopback-landing.md:213  [tmp/ll/mut.js]  tmp/ll/mut.js	local-only
+docs/validation/directive-loopback-landing.md:214  [tmp/ll/mutation.md]  tmp/ll/mutation.md	local-only
+docs/validation/directive-loopback-landing.md:215  [tmp/ll/numstat.txt]  tmp/ll/numstat.txt	local-only
+docs/validation/directive-loopback-landing.md:216  [tmp/ll/pairs.js]  tmp/ll/pairs.js	local-only
+docs/validation/directive-loopback-landing.md:217  [tmp/ll/pre.txt]  tmp/ll/pre.txt	local-only
+docs/validation/directive-loopback-landing.md:218  [tmp/ll/pre2.txt]  tmp/ll/pre2.txt	local-only
+docs/validation/directive-loopback-landing.md:219  [tmp/ll/preflight.js]  tmp/ll/preflight.js	local-only
+docs/validation/directive-loopback-landing.md:220  [tmp/ll/recon.js]  tmp/ll/recon.js	local-only
+docs/validation/directive-loopback-landing.md:221  [tmp/ll/recon2.js]  tmp/ll/recon2.js	local-only
+docs/validation/directive-loopback-landing.md:222  [tmp/ll/recon2.txt]  tmp/ll/recon2.txt	local-only
+docs/validation/directive-loopback-landing.md:223  [tmp/ll/rev2-en-directive.txt]  tmp/ll/rev2-en-directive.txt	local-only
+docs/validation/directive-loopback-landing.md:224  [tmp/ll/selftest.txt]  tmp/ll/selftest.txt	local-only
+docs/validation/directive-loopback-landing.md:225  [tmp/ll/tail-dump.txt]  tmp/ll/tail-dump.txt	local-only
+docs/validation/directive-loopback-landing.md:226  [tmp/ll/tail2.txt]  tmp/ll/tail2.txt	local-only
+docs/validation/directive-loopback-landing.md:227  [tmp/ll/tpl-cn.txt]  tmp/ll/tpl-cn.txt	local-only
+docs/validation/directive-loopback-landing.md:228  [tmp/ll/tpl-en.txt]  tmp/ll/tpl-en.txt	local-only
+docs/validation/directive-loopback-landing.md:229  [tmp/ll/tpl.js]  tmp/ll/tpl.js	local-only
+docs/validation/directive-loopback-landing.md:230  [tmp/ll/tpl.txt]  tmp/ll/tpl.txt	local-only
+docs/validation/directive-loopback-landing.md:72  [tmp/ll/pre.txt]  - **G6-4 判红与纠错（未用白名单）**：模板迁根后首跑门禁，G6-4 判红两条（本报告与自由度清单内的行数字面量）；**该红态读数未单独留档**（已被后续复跑覆盖）⇒ 改写为「元素数 / 空行数」措辞后复绿，复绿后读数见 `tmp/ll/pre.txt`（新增行口径 `ADDED-LINE HITS=0`）与 `tmp/ll/lit.txt`（全文口径，命中均在历史行），**未登记白名单豁
+docs/validation/directive-loopback-landing.md:72  [tmp/ll/lit.txt]  - **G6-4 判红与纠错（未用白名单）**：模板迁根后首跑门禁，G6-4 判红两条（本报告与自由度清单内的行数字面量）；**该红态读数未单独留档**（已被后续复跑覆盖）⇒ 改写为「元素数 / 空行数」措辞后复绿，复绿后读数见 `tmp/ll/pre.txt`（新增行口径 `ADDED-LINE HITS=0`）与 `tmp/ll/lit.txt`（全文口径，命中均在历史行），**未登记白名单豁
+docs/validation/directive-loopback-landing.md:84  [tmp/ll/change-set.diff]  变更集 diff = `tmp/ll/change-set.diff`（配 `tmp/ll/numstat.txt`）；契约原句 = `docs/DELIVERY_DIRECTIVE.md` 的 §0.2 / §6.3 / §7.2 / §7.5 / §11.2 / §11.3 / §12.4；① 两轮判定的汇总以本报告 §3 为准（首轮判定 3 已由用户修正作废）；自由度清单 = `docs/v
+docs/validation/directive-loopback-landing.md:84  [tmp/ll/numstat.txt]  变更集 diff = `tmp/ll/change-set.diff`（配 `tmp/ll/numstat.txt`）；契约原句 = `docs/DELIVERY_DIRECTIVE.md` 的 §0.2 / §6.3 / §7.2 / §7.5 / §11.2 / §11.3 / §12.4；① 两轮判定的汇总以本报告 §3 为准（首轮判定 3 已由用户修正作废）；自由度清单 = `docs/v
+docs/validation/directive-loopback-landing.md:94  [tmp/ll/mirror.txt]  | 镜像同位（含五形状） | 读数见 `tmp/ll/mirror.txt` |
+docs/validation/directive-loopback-landing.md:95  [tmp/ll/mutation.md]  | 变异检验 | 读数见 `tmp/ll/mutation.md`（`docs/DELIVERY_DIRECTIVE.md:879` 判红、引用改号判红、模板对不对称判红；逐条 sha256 复核后逐字节还原并复绿；**文末另有「最终复跑」收尾段**） |
+docs/validation/directive-loopback-landing.md:96  [tmp/ll/pre.txt]  | G6-4 纠错 | 首跑判红两条（行数字面量，红态未单独留档）⇒ 改写措辞后复绿，**未用白名单**（复绿后读数见 `tmp/ll/pre.txt` 与 `tmp/ll/lit.txt`） |
+docs/validation/directive-loopback-landing.md:96  [tmp/ll/lit.txt]  | G6-4 纠错 | 首跑判红两条（行数字面量，红态未单独留档）⇒ 改写措辞后复绿，**未用白名单**（复绿后读数见 `tmp/ll/pre.txt` 与 `tmp/ll/lit.txt`） |
+docs/validation/directive-loopback-landing_EN.md:107  [tmp/ll/]  `gate.js --all --scope=tree` all green; the encoding gate (G4a) checked every changed file against the `.md` = BOM+LF rule file by file, with no violation; the diagnostic scan (§3.4) produced no new w
+docs/validation/directive-loopback-landing_EN.md:107  [tmp/ll/eightc.txt]  `gate.js --all --scope=tree` all green; the encoding gate (G4a) checked every changed file against the `.md` = BOM+LF rule file by file, with no violation; the diagnostic scan (§3.4) produced no new w
+docs/validation/directive-loopback-landing_EN.md:107  [tmp/ll/]  `gate.js --all --scope=tree` all green; the encoding gate (G4a) checked every changed file against the `.md` = BOM+LF rule file by file, with no violation; the diagnostic scan (§3.4) produced no new w
+docs/validation/directive-loopback-landing_EN.md:126  [tmp/ll/lit.txt]  | F-5 | the G6-4 correction item cited a reading file that already showed green (Low) | now states "the red reading was not archived on its own" and cites `tmp/ll/lit.txt` |
+docs/validation/directive-loopback-landing_EN.md:128  [tmp/ll/]  | F-7 | §7.1 "nothing untracked" clashed with the readings listed alongside it (Low) | limited to "no git-visible unstaged or untracked entries", noting that `tmp/ll/` is gitignored |
+docs/validation/directive-loopback-landing_EN.md:130  [tmp/ll/lit.txt]  | F-9 | re-review: `tmp/ll/lit.txt` is a whole-file scan with no NOTE, easily misread as a gate red (Low) | a NOTE header was added and the report now also cites `tmp/ll/pre.txt` (added-line scope) |
+docs/validation/directive-loopback-landing_EN.md:130  [tmp/ll/pre.txt]  | F-9 | re-review: `tmp/ll/lit.txt` is a whole-file scan with no NOTE, easily misread as a gate red (Low) | a NOTE header was added and the report now also cites `tmp/ll/pre.txt` (added-line scope) |
+docs/validation/directive-loopback-landing_EN.md:141  [tmp/ll/]  | 4 | commit and push origin authorised (staged file by file, no gitee push); `tmp/ll/` is cleaned after the commit, with the CI run reading archived as `docs/validation/evidence/ci-run-37107634723.tx
+docs/validation/directive-loopback-landing_EN.md:162  [tmp/ll/apply.js]  tmp/ll/apply.js	local-only
+docs/validation/directive-loopback-landing_EN.md:163  [tmp/ll/change-set.diff]  tmp/ll/change-set.diff	local-only
+docs/validation/directive-loopback-landing_EN.md:164  [tmp/ll/chk.js]  tmp/ll/chk.js	local-only
+docs/validation/directive-loopback-landing_EN.md:165  [tmp/ll/ci-run.txt]  tmp/ll/ci-run.txt	local-only
+docs/validation/directive-loopback-landing_EN.md:166  [tmp/ll/cn-dump.txt]  tmp/ll/cn-dump.txt	local-only
+docs/validation/directive-loopback-landing_EN.md:167  [tmp/ll/dump.js]  tmp/ll/dump.js	local-only
+docs/validation/directive-loopback-landing_EN.md:168  [tmp/ll/dump2.js]  tmp/ll/dump2.js	local-only
+docs/validation/directive-loopback-landing_EN.md:169  [tmp/ll/dump3.js]  tmp/ll/dump3.js	local-only
+docs/validation/directive-loopback-landing_EN.md:170  [tmp/ll/dump4.js]  tmp/ll/dump4.js	local-only
+docs/validation/directive-loopback-landing_EN.md:171  [tmp/ll/dump5.js]  tmp/ll/dump5.js	local-only
+docs/validation/directive-loopback-landing_EN.md:172  [tmp/ll/eightc.js]  tmp/ll/eightc.js	local-only
+docs/validation/directive-loopback-landing_EN.md:173  [tmp/ll/eightc.txt]  tmp/ll/eightc.txt	local-only
+docs/validation/directive-loopback-landing_EN.md:174  [tmp/ll/en-dump.txt]  tmp/ll/en-dump.txt	local-only
+docs/validation/directive-loopback-landing_EN.md:175  [tmp/ll/en-full.txt]  tmp/ll/en-full.txt	local-only
+docs/validation/directive-loopback-landing_EN.md:176  [tmp/ll/en-new.md]  tmp/ll/en-new.md	local-only
+docs/validation/directive-loopback-landing_EN.md:177  [tmp/ll/finalize.js]  tmp/ll/finalize.js	local-only
+docs/validation/directive-loopback-landing_EN.md:178  [tmp/ll/fixmut.js]  tmp/ll/fixmut.js	local-only
+docs/validation/directive-loopback-landing_EN.md:179  [tmp/ll/g3a.txt]  tmp/ll/g3a.txt	local-only
+docs/validation/directive-loopback-landing_EN.md:180  [tmp/ll/gate-index.txt]  tmp/ll/gate-index.txt	local-only
+docs/validation/directive-loopback-landing_EN.md:181  [tmp/ll/gate-tree.txt]  tmp/ll/gate-tree.txt	local-only
+docs/validation/directive-loopback-landing_EN.md:182  [tmp/ll/gsum.js]  tmp/ll/gsum.js	local-only
+docs/validation/directive-loopback-landing_EN.md:183  [tmp/ll/gsum2.js]  tmp/ll/gsum2.js	local-only
+docs/validation/directive-loopback-landing_EN.md:184  [tmp/ll/land1.js]  tmp/ll/land1.js	local-only
+docs/validation/directive-loopback-landing_EN.md:185  [tmp/ll/land10.js]  tmp/ll/land10.js	local-only
+docs/validation/directive-loopback-landing_EN.md:186  [tmp/ll/land11.js]  tmp/ll/land11.js	local-only
+docs/validation/directive-loopback-landing_EN.md:187  [tmp/ll/land12.js]  tmp/ll/land12.js	local-only
+docs/validation/directive-loopback-landing_EN.md:188  [tmp/ll/land13.js]  tmp/ll/land13.js	local-only
+docs/validation/directive-loopback-landing_EN.md:189  [tmp/ll/land14.js]  tmp/ll/land14.js	local-only
+docs/validation/directive-loopback-landing_EN.md:190  [tmp/ll/land2.js]  tmp/ll/land2.js	local-only
+docs/validation/directive-loopback-landing_EN.md:191  [tmp/ll/land3.js]  tmp/ll/land3.js	local-only
+docs/validation/directive-loopback-landing_EN.md:192  [tmp/ll/land3.txt]  tmp/ll/land3.txt	local-only
+docs/validation/directive-loopback-landing_EN.md:193  [tmp/ll/land4.js]  tmp/ll/land4.js	local-only
+docs/validation/directive-loopback-landing_EN.md:194  [tmp/ll/land4.txt]  tmp/ll/land4.txt	local-only
+docs/validation/directive-loopback-landing_EN.md:195  [tmp/ll/land5.js]  tmp/ll/land5.js	local-only
+docs/validation/directive-loopback-landing_EN.md:196  [tmp/ll/land5.txt]  tmp/ll/land5.txt	local-only
+docs/validation/directive-loopback-landing_EN.md:197  [tmp/ll/land6.js]  tmp/ll/land6.js	local-only
+docs/validation/directive-loopback-landing_EN.md:198  [tmp/ll/land7.js]  tmp/ll/land7.js	local-only
+docs/validation/directive-loopback-landing_EN.md:199  [tmp/ll/land7.txt]  tmp/ll/land7.txt	local-only
+docs/validation/directive-loopback-landing_EN.md:200  [tmp/ll/land8.js]  tmp/ll/land8.js	local-only
+docs/validation/directive-loopback-landing_EN.md:201  [tmp/ll/land8.txt]  tmp/ll/land8.txt	local-only
+docs/validation/directive-loopback-landing_EN.md:202  [tmp/ll/land9.js]  tmp/ll/land9.js	local-only
+docs/validation/directive-loopback-landing_EN.md:203  [tmp/ll/lit.js]  tmp/ll/lit.js	local-only
+docs/validation/directive-loopback-landing_EN.md:204  [tmp/ll/lit.txt]  tmp/ll/lit.txt	local-only
+docs/validation/directive-loopback-landing_EN.md:205  [tmp/ll/llmirror.js]  tmp/ll/llmirror.js	local-only
+docs/validation/directive-loopback-landing_EN.md:206  [tmp/ll/m1.orig]  tmp/ll/m1.orig	local-only
+docs/validation/directive-loopback-landing_EN.md:207  [tmp/ll/m1.txt]  tmp/ll/m1.txt	local-only
+docs/validation/directive-loopback-landing_EN.md:208  [tmp/ll/m2.orig]  tmp/ll/m2.orig	local-only
+docs/validation/directive-loopback-landing_EN.md:209  [tmp/ll/m3.orig]  tmp/ll/m3.orig	local-only
+docs/validation/directive-loopback-landing_EN.md:210  [tmp/ll/mir.js]  tmp/ll/mir.js	local-only
+docs/validation/directive-loopback-landing_EN.md:211  [tmp/ll/mir2.js]  tmp/ll/mir2.js	local-only
+docs/validation/directive-loopback-landing_EN.md:212  [tmp/ll/mirror.txt]  tmp/ll/mirror.txt	local-only
+docs/validation/directive-loopback-landing_EN.md:213  [tmp/ll/mut.js]  tmp/ll/mut.js	local-only
+docs/validation/directive-loopback-landing_EN.md:214  [tmp/ll/mutation.md]  tmp/ll/mutation.md	local-only
+docs/validation/directive-loopback-landing_EN.md:215  [tmp/ll/numstat.txt]  tmp/ll/numstat.txt	local-only
+docs/validation/directive-loopback-landing_EN.md:216  [tmp/ll/pairs.js]  tmp/ll/pairs.js	local-only
+docs/validation/directive-loopback-landing_EN.md:217  [tmp/ll/pre.txt]  tmp/ll/pre.txt	local-only
+docs/validation/directive-loopback-landing_EN.md:218  [tmp/ll/pre2.txt]  tmp/ll/pre2.txt	local-only
+docs/validation/directive-loopback-landing_EN.md:219  [tmp/ll/preflight.js]  tmp/ll/preflight.js	local-only
+docs/validation/directive-loopback-landing_EN.md:220  [tmp/ll/recon.js]  tmp/ll/recon.js	local-only
+docs/validation/directive-loopback-landing_EN.md:221  [tmp/ll/recon2.js]  tmp/ll/recon2.js	local-only
+docs/validation/directive-loopback-landing_EN.md:222  [tmp/ll/recon2.txt]  tmp/ll/recon2.txt	local-only
+docs/validation/directive-loopback-landing_EN.md:223  [tmp/ll/rev2-en-directive.txt]  tmp/ll/rev2-en-directive.txt	local-only
+docs/validation/directive-loopback-landing_EN.md:224  [tmp/ll/selftest.txt]  tmp/ll/selftest.txt	local-only
+docs/validation/directive-loopback-landing_EN.md:225  [tmp/ll/tail-dump.txt]  tmp/ll/tail-dump.txt	local-only
+docs/validation/directive-loopback-landing_EN.md:226  [tmp/ll/tail2.txt]  tmp/ll/tail2.txt	local-only
+docs/validation/directive-loopback-landing_EN.md:227  [tmp/ll/tpl-cn.txt]  tmp/ll/tpl-cn.txt	local-only
+docs/validation/directive-loopback-landing_EN.md:228  [tmp/ll/tpl-en.txt]  tmp/ll/tpl-en.txt	local-only
+docs/validation/directive-loopback-landing_EN.md:229  [tmp/ll/tpl.js]  tmp/ll/tpl.js	local-only
+docs/validation/directive-loopback-landing_EN.md:230  [tmp/ll/tpl.txt]  tmp/ll/tpl.txt	local-only
+docs/validation/directive-loopback-landing_EN.md:72  [tmp/ll/pre.txt]  - **G6-4 red flags and correction (no whitelist used)**: after the template moved to the root, the first gate run flagged G6-4 red twice (line-number literals in this report and in the freedom list); 
+docs/validation/directive-loopback-landing_EN.md:72  [tmp/ll/lit.txt]  - **G6-4 red flags and correction (no whitelist used)**: after the template moved to the root, the first gate run flagged G6-4 red twice (line-number literals in this report and in the freedom list); 
+docs/validation/directive-loopback-landing_EN.md:84  [tmp/ll/change-set.diff]  Change-set diff = `tmp/ll/change-set.diff` (with `tmp/ll/numstat.txt`); contract sentences = §0.2 / §6.3 / §7.2 / §7.5 / §11.2 / §11.3 / §12.4 of `docs/DELIVERY_DIRECTIVE.md`; the summary of ①'s two d
+docs/validation/directive-loopback-landing_EN.md:84  [tmp/ll/numstat.txt]  Change-set diff = `tmp/ll/change-set.diff` (with `tmp/ll/numstat.txt`); contract sentences = §0.2 / §6.3 / §7.2 / §7.5 / §11.2 / §11.3 / §12.4 of `docs/DELIVERY_DIRECTIVE.md`; the summary of ①'s two d
+docs/validation/directive-loopback-landing_EN.md:94  [tmp/ll/mirror.txt]  | Mirror positionality (including the five shapes) | reading in `tmp/ll/mirror.txt` |
+docs/validation/directive-loopback-landing_EN.md:95  [tmp/ll/mutation.md]  | Mutation check | reading in `tmp/ll/mutation.md` (`docs/DELIVERY_DIRECTIVE.md:879` turns red, a renumbered citation turns red, an asymmetric template pair turns red; all green again after item-by-it
+docs/validation/directive-loopback-landing_EN.md:96  [tmp/ll/pre.txt]  | G6-4 correction | the first run flagged red twice (line-number literals, the red reading not archived on its own) ⇒ green again after rewording, **no whitelist used** (post-fix reading in `tmp/ll/pr
+docs/validation/directive-loopback-landing_EN.md:96  [tmp/ll/lit.txt]  | G6-4 correction | the first run flagged red twice (line-number literals, the red reading not archived on its own) ⇒ green again after rewording, **no whitelist used** (post-fix reading in `tmp/ll/pr
+docs/validation/directive-model-lists.md:161  [tmp/dml/design-1-v4pro.md]  tmp/dml/design-1-v4pro.md	local-only
+docs/validation/directive-model-lists.md:162  [tmp/dml/change-set.diff]  tmp/dml/change-set.diff	local-only
+docs/validation/directive-model-lists.md:163  [tmp/dml/contract-excerpt.md]  tmp/dml/contract-excerpt.md	local-only
+docs/validation/directive-model-lists.md:164  [tmp/dml/consistency-out4.txt]  tmp/dml/consistency-out4.txt	local-only
+docs/validation/directive-model-lists.md:165  [tmp/dml/gate-tree7.txt]  tmp/dml/gate-tree7.txt	local-only
+docs/validation/directive-model-lists.md:166  [tmp/dml/selftest7.txt]  tmp/dml/selftest7.txt	local-only
+docs/validation/directive-model-lists.md:167  [tmp/dml/ci-run-37073985144.txt]  tmp/dml/ci-run-37073985144.txt	local-only
+docs/validation/directive-model-lists.md:168  [tmp/dml/luna-probe/target.txt]  tmp/dml/luna-probe/target.txt	local-only
+docs/validation/directive-model-lists_EN.md:161  [tmp/dml/design-1-v4pro.md]  tmp/dml/design-1-v4pro.md	local-only
+docs/validation/directive-model-lists_EN.md:162  [tmp/dml/change-set.diff]  tmp/dml/change-set.diff	local-only
+docs/validation/directive-model-lists_EN.md:163  [tmp/dml/contract-excerpt.md]  tmp/dml/contract-excerpt.md	local-only
+docs/validation/directive-model-lists_EN.md:164  [tmp/dml/consistency-out4.txt]  tmp/dml/consistency-out4.txt	local-only
+docs/validation/directive-model-lists_EN.md:165  [tmp/dml/gate-tree7.txt]  tmp/dml/gate-tree7.txt	local-only
+docs/validation/directive-model-lists_EN.md:166  [tmp/dml/selftest7.txt]  tmp/dml/selftest7.txt	local-only
+docs/validation/directive-model-lists_EN.md:167  [tmp/dml/ci-run-37073985144.txt]  tmp/dml/ci-run-37073985144.txt	local-only
+docs/validation/directive-model-lists_EN.md:168  [tmp/dml/luna-probe/target.txt]  tmp/dml/luna-probe/target.txt	local-only
+docs/validation/directive-modelid-map.md:132  [tmp/dml/]  （收尾处理：`tmp/dml/` 的一次性脚本与中间读数已按 §1.5 清除，上表原先逐行列出的 `local-only` 行随之消失；其中 `review-r1.md` 与 `mutation.md` 两份证据已移入 `docs/validation/evidence/` 并计入 `repo` 行。）
+docs/validation/directive-modelid-map.md:71  [tmp/dml/change-set.diff]  变更集 diff = `tmp/dml/change-set.diff`（配 `tmp/dml/numstat.txt`）；契约原句 = `DELIVERY_DIRECTIVE.md` 的 §0.2 / §1.5 / §1.7.2 / §1.7.3 / §2.2 / §2.3 / §2.4 / §5.0 / §5.1 / §5.2 / §6.2 / §6.3 / §7.2 / §7.5 / §10
+docs/validation/directive-modelid-map.md:71  [tmp/dml/numstat.txt]  变更集 diff = `tmp/dml/change-set.diff`（配 `tmp/dml/numstat.txt`）；契约原句 = `DELIVERY_DIRECTIVE.md` 的 §0.2 / §1.5 / §1.7.2 / §1.7.3 / §2.2 / §2.3 / §2.4 / §5.0 / §5.1 / §5.2 / §6.2 / §6.3 / §7.2 / §7.5 / §10
+docs/validation/directive-modelid-map.md:81  [tmp/dml/pairs.txt]  | 镜像同位（含五形状） | 读数见 `tmp/dml/pairs.txt`（两侧元素数相同、形状仅 5 处基线遗留反引号漂移、非本片改动行） |
+docs/validation/directive-modelid-map.md:82  [tmp/dml/mutation.md]  | 变异检验 | 读数见 `tmp/dml/mutation.md`：① 改 OB-49 首状态词 ⇒ G6-6 判红；② 改 §0.3 内的节号引用 ⇒ G6-5 判红；③ 仅改 CN 增行 ⇒ G3(a.1) 与 G3(a.2) 判红；三例均以 sha256 复核后逐字节还原并复绿 |
+docs/validation/directive-modelid-map.md:83  [tmp/dml/pre.txt]  | 新增行预检 | `tmp/dml/pre.txt`：`ADDED-LINE HITS=0`、`UNKNOWN-CJK=`（无未登记新字） |
+docs/validation/directive-modelid-map_EN.md:132  [tmp/dml/]  (Closeout: the one-off scripts and intermediate readings under `tmp/dml/` were removed per §1.5, so the granular `local-only` rows previously listed above are gone with them; the two pieces of evidenc
+docs/validation/directive-modelid-map_EN.md:71  [tmp/dml/change-set.diff]  Change-set diff = `tmp/dml/change-set.diff` (with `tmp/dml/numstat.txt`); contract sentences = §0.2 / §1.5 / §1.7.2 / §1.7.3 / §2.2 / §2.3 / §2.4 / §5.0 / §5.1 / §5.2 / §6.2 / §6.3 / §7.2 / §7.5 / §10
+docs/validation/directive-modelid-map_EN.md:71  [tmp/dml/numstat.txt]  Change-set diff = `tmp/dml/change-set.diff` (with `tmp/dml/numstat.txt`); contract sentences = §0.2 / §1.5 / §1.7.2 / §1.7.3 / §2.2 / §2.3 / §2.4 / §5.0 / §5.1 / §5.2 / §6.2 / §6.3 / §7.2 / §7.5 / §10
+docs/validation/directive-modelid-map_EN.md:81  [tmp/dml/pairs.txt]  | mirror positionality (including the five shapes) | reading in `tmp/dml/pairs.txt` (equal element counts on both sides; shapes differ only in 5 pre-existing baseline backtick drifts, not on lines cha
+docs/validation/directive-modelid-map_EN.md:82  [tmp/dml/mutation.md]  | mutation check | reading in `tmp/dml/mutation.md`: ① change OB-49's first status word ⇒ G6-6 flags red; ② change a section-number reference inside §0.3 ⇒ G6-5 flags red; ③ change the CN only by addi
+docs/validation/directive-modelid-map_EN.md:83  [tmp/dml/pre.txt]  | added-line precheck | `tmp/dml/pre.txt`: `ADDED-LINE HITS=0`, `UNKNOWN-CJK=` (no unregistered new characters) |
+docs/validation/directive-review-saturation.md:128  [tmp/v113/]  - **证据落盘（R6.1）**：审查前主控把原始 diff 与门禁原始输出落盘至 `tmp/v113/**`，并把路径交给审查方；未以摘要替代原始 hunk。
+docs/validation/directive-review-saturation.md:129  [tmp/v113/review-input.diff]  - **⑤ 的输入**：`tmp/v113/review-input.diff`（首轮）、`tmp/v113/remediation.diff` 与 `tmp/v113/review-input-r2-r3.diff`（复审）。
+docs/validation/directive-review-saturation.md:129  [tmp/v113/remediation.diff]  - **⑤ 的输入**：`tmp/v113/review-input.diff`（首轮）、`tmp/v113/remediation.diff` 与 `tmp/v113/review-input-r2-r3.diff`（复审）。
+docs/validation/directive-review-saturation.md:129  [tmp/v113/review-input-r2-r3.diff]  - **⑤ 的输入**：`tmp/v113/review-input.diff`（首轮）、`tmp/v113/remediation.diff` 与 `tmp/v113/review-input-r2-r3.diff`（复审）。
+docs/validation/directive-review-saturation.md:130  [tmp/v113/review-input-r2-r3.diff]  - **⑦ 的输入**：`tmp/v113/review-input-r2-r3.diff` 与 `tmp/v113/review-input-r2.stat-r3.txt`。
+docs/validation/directive-review-saturation.md:130  [tmp/v113/review-input-r2.stat-r3.txt]  - **⑦ 的输入**：`tmp/v113/review-input-r2-r3.diff` 与 `tmp/v113/review-input-r2.stat-r3.txt`。
+docs/validation/directive-review-saturation.md:131  [tmp/v113/review-input-r2-r3.diff]  - **⑦ ⒜ 补审（复审位）**：输入包 = 修正后的执行自由度清单路径 + 本片原始 diff 路径（`tmp/v113/review-input-r2-r3.diff`）+ 契约原句 + 只读约束 + 硬约束（不得创建 / 修改 / 删除任何文件；报告以最终消息返回；**不得声称执行** `node` / `gate` 命令）。隔离证明：**不附** ⑦ 首轮报告、**不附**任何 ⑤ / 
+docs/validation/directive-review-saturation.md:156  [tmp/v113/]  ## 9. 门禁结果（⑩ 前终值；原始输出在 `tmp/v113/**`）
+docs/validation/directive-review-saturation.md:173  [tmp/v113/gate-tree-r1-r10.txt]  | `node tools/gates/gate.js --all --scope=tree` | `TOTAL_FAIL=0`（`tmp/v113/gate-tree-r1-r10.txt`） |
+docs/validation/directive-review-saturation.md:174  [tmp/v113/gate-index-r1-r10.txt]  | `node tools/gates/gate.js --all --scope=index` | `TOTAL_FAIL=0`（`tmp/v113/gate-index-r1-r10.txt`） |
+docs/validation/directive-review-saturation.md:176  [tmp/v113/selftest-master-r10.txt]  | `node tools/gates/gate.js --selftest` | `SELFTEST: PASS 248/248`（`tmp/v113/selftest-master-r10.txt`） |
+docs/validation/directive-review-saturation.md:177  [tmp/v113/mirror-r10.txt]  | 双语镜像 | `per-line mismatches = 0`、`MIRROR RESULT: PASS`（两侧等长）（`tmp/v113/mirror-r10.txt`） |
+docs/validation/directive-review-saturation.md:178  [tmp/v113/verify-v113.js]  | 主控独立验收 `tmp/v113/verify-v113.js` | `ACCEPTED`：两文件各 **45 条**台账行全在闭集；区域内 186 条 `§X.Y` 引用 0 悬空（`tmp/v113/verify-v113-r10.txt`） |
+docs/validation/directive-review-saturation.md:178  [tmp/v113/verify-v113-r10.txt]  | 主控独立验收 `tmp/v113/verify-v113.js` | `ACCEPTED`：两文件各 **45 条**台账行全在闭集；区域内 186 条 `§X.Y` 引用 0 悬空（`tmp/v113/verify-v113-r10.txt`） |
+docs/validation/directive-review-saturation.md:179  [tmp/v113/g6-5-r1-r10.txt]  | `G6-5` | PASS `scanned 48, refs 47`（`tmp/v113/g6-5-r1-r10.txt`） |
+docs/validation/directive-review-saturation.md:180  [tmp/v113/g6-6-r1-r10.txt]  | `G6-6` | PASS `scanned 38`（`tmp/v113/g6-6-r1-r10.txt`） |
+docs/validation/directive-review-saturation.md:204  [tmp/v113/gate-tree-r1-r10.txt]  | 全仓诊断（§3.4 类别表） | `gate.js --all --scope=tree` ⇒ `TOTAL_FAIL=0`；`--scope=index` ⇒ `TOTAL_FAIL=0`；`G7-b` PASS（`32 artifact row(s) OK`）（`tmp/v113/gate-tree-r1-r10.txt` / `tmp/v113/gate-index-r1-r10.txt
+docs/validation/directive-review-saturation.md:204  [tmp/v113/gate-index-r1-r10.txt]  | 全仓诊断（§3.4 类别表） | `gate.js --all --scope=tree` ⇒ `TOTAL_FAIL=0`；`--scope=index` ⇒ `TOTAL_FAIL=0`；`G7-b` PASS（`32 artifact row(s) OK`）（`tmp/v113/gate-tree-r1-r10.txt` / `tmp/v113/gate-index-r1-r10.txt
+docs/validation/directive-review-saturation.md:206  [tmp/v113/gate-tree-r1-r10.txt]  | `gate.js --all --scope=tree` | `TOTAL_FAIL=0`（`tmp/v113/gate-tree-r1-r10.txt`） |
+docs/validation/directive-review-saturation.md:207  [tmp/v113/enc-tree-r10.txt]  | 编码门禁（全类型逐文件） | `enc-tree` ⇒ `tracked=2923 text=2834 binary=89 violations=3`；3 处均为 **OB-27 的冻结证据包**既有违规，按临时豁免 + 自洽性核验处置（`tmp/v113/enc-tree-r10.txt`） |
+docs/validation/directive-review-saturation.md:208  [tmp/v113/evidence-selfcheck-r10.txt]  | 冻结证据包自洽性 | `evidence-selfcheck` ⇒ `packs=4 entries=2327 missing=0 mismatch=0 not-self-checkable=1`（`tmp/v113/evidence-selfcheck-r10.txt`） |
+docs/validation/directive-review-saturation.md:277  [tmp/v113/]  tmp/v113/**	local-only
+docs/validation/directive-review-saturation.md:28  [tmp/v113/]  | F-9 | 证据捕获改为 **node 直写**（`execFileSync` + `fs.writeFileSync('utf8')`），并以 `--suffix` 使每轮读数**另存**而不覆盖上一轮证据 | 已授权包内的门禁重试 / 编排工件 | `tmp/v113/**` 证据 | 四问全否（捕获方式不改任何规则实体）；用户 2026-09-23 已批准其登记为 OB-43 |
+docs/validation/directive-review-saturation.md:284  [tmp/v113/review-r3.md]  > 以下为 `tmp/v113/review-r3.md` 原文逐字嵌入；其中与 `G6-4` 过期字面量形态冲突的一行按该判据的排除标记机制挂 `引文` 注记（渲染后文本不变），其余逐字不变。
+docs/validation/directive-review-saturation.md:289  [tmp/v113/gate-tree-r1-r3.txt]  1. [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt#L19), [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt#L20), [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt#L29)
+docs/validation/directive-review-saturation.md:289  [tmp/v113/gate-tree-r1-r3.txt#L19]  1. [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt#L19), [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt#L20), [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt#L29)
+docs/validation/directive-review-saturation.md:289  [tmp/v113/gate-tree-r1-r3.txt]  1. [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt#L19), [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt#L20), [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt#L29)
+docs/validation/directive-review-saturation.md:289  [tmp/v113/gate-tree-r1-r3.txt#L20]  1. [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt#L19), [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt#L20), [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt#L29)
+docs/validation/directive-review-saturation.md:289  [tmp/v113/gate-tree-r1-r3.txt]  1. [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt#L19), [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt#L20), [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt#L29)
+docs/validation/directive-review-saturation.md:289  [tmp/v113/gate-tree-r1-r3.txt#L29]  1. [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt#L19), [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt#L20), [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt#L29)
+docs/validation/directive-review-saturation.md:290  [tmp/v113/gate-index-r1-r3.txt]  2. [tmp/v113/gate-index-r1-r3.txt](tmp/v113/gate-index-r1-r3.txt#L19), [tmp/v113/gate-index-r1-r3.txt](tmp/v113/gate-index-r1-r3.txt#L20), [tmp/v113/gate-index-r1-r3.txt](tmp/v113/gate-index-r1-r3.txt
+docs/validation/directive-review-saturation.md:290  [tmp/v113/gate-index-r1-r3.txt#L19]  2. [tmp/v113/gate-index-r1-r3.txt](tmp/v113/gate-index-r1-r3.txt#L19), [tmp/v113/gate-index-r1-r3.txt](tmp/v113/gate-index-r1-r3.txt#L20), [tmp/v113/gate-index-r1-r3.txt](tmp/v113/gate-index-r1-r3.txt
+docs/validation/directive-review-saturation.md:290  [tmp/v113/gate-index-r1-r3.txt]  2. [tmp/v113/gate-index-r1-r3.txt](tmp/v113/gate-index-r1-r3.txt#L19), [tmp/v113/gate-index-r1-r3.txt](tmp/v113/gate-index-r1-r3.txt#L20), [tmp/v113/gate-index-r1-r3.txt](tmp/v113/gate-index-r1-r3.txt
+docs/validation/directive-review-saturation.md:290  [tmp/v113/gate-index-r1-r3.txt#L20]  2. [tmp/v113/gate-index-r1-r3.txt](tmp/v113/gate-index-r1-r3.txt#L19), [tmp/v113/gate-index-r1-r3.txt](tmp/v113/gate-index-r1-r3.txt#L20), [tmp/v113/gate-index-r1-r3.txt](tmp/v113/gate-index-r1-r3.txt
+docs/validation/directive-review-saturation.md:290  [tmp/v113/gate-index-r1-r3.txt]  2. [tmp/v113/gate-index-r1-r3.txt](tmp/v113/gate-index-r1-r3.txt#L19), [tmp/v113/gate-index-r1-r3.txt](tmp/v113/gate-index-r1-r3.txt#L20), [tmp/v113/gate-index-r1-r3.txt](tmp/v113/gate-index-r1-r3.txt
+docs/validation/directive-review-saturation.md:290  [tmp/v113/gate-index-r1-r3.txt#L29]  2. [tmp/v113/gate-index-r1-r3.txt](tmp/v113/gate-index-r1-r3.txt#L19), [tmp/v113/gate-index-r1-r3.txt](tmp/v113/gate-index-r1-r3.txt#L20), [tmp/v113/gate-index-r1-r3.txt](tmp/v113/gate-index-r1-r3.txt
+docs/validation/directive-review-saturation.md:291  [tmp/v113/selftest-master-r3.txt]  3. [tmp/v113/selftest-master-r3.txt](tmp/v113/selftest-master-r3.txt#L253)
+docs/validation/directive-review-saturation.md:291  [tmp/v113/selftest-master-r3.txt#L253]  3. [tmp/v113/selftest-master-r3.txt](tmp/v113/selftest-master-r3.txt#L253)
+docs/validation/directive-review-saturation.md:292  [tmp/v113/mirror-r3.txt]  4. [tmp/v113/mirror-r3.txt](tmp/v113/mirror-r3.txt#L3)
+docs/validation/directive-review-saturation.md:292  [tmp/v113/mirror-r3.txt#L3]  4. [tmp/v113/mirror-r3.txt](tmp/v113/mirror-r3.txt#L3)
+docs/validation/directive-review-saturation.md:293  [tmp/v113/verify-v113-r3.txt]  5. [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L1), [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L2), [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L6)
+docs/validation/directive-review-saturation.md:293  [tmp/v113/verify-v113-r3.txt#L1]  5. [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L1), [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L2), [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L6)
+docs/validation/directive-review-saturation.md:293  [tmp/v113/verify-v113-r3.txt]  5. [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L1), [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L2), [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L6)
+docs/validation/directive-review-saturation.md:293  [tmp/v113/verify-v113-r3.txt#L2]  5. [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L1), [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L2), [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L6)
+docs/validation/directive-review-saturation.md:293  [tmp/v113/verify-v113-r3.txt]  5. [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L1), [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L2), [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L6)
+docs/validation/directive-review-saturation.md:293  [tmp/v113/verify-v113-r3.txt#L6]  5. [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L1), [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L2), [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L6)
+docs/validation/directive-review-saturation.md:294  [tmp/v113/review-input-r2.stat-r3.txt]  6. [tmp/v113/review-input-r2.stat-r3.txt](tmp/v113/review-input-r2.stat-r3.txt#L1-L4)
+docs/validation/directive-review-saturation.md:294  [tmp/v113/review-input-r2.stat-r3.txt#L1-L4]  6. [tmp/v113/review-input-r2.stat-r3.txt](tmp/v113/review-input-r2.stat-r3.txt#L1-L4)
+docs/validation/directive-review-saturation.md:30  [tmp/v113/capture.js]  | F-11 | 整改 diff 采用「`HEAD` + 上一轮全量 diff **机械重建**整改前状态 → `git diff --no-index`」的方法，而非人工回忆式描述（**方法工件**：`tmp/v113/capture.js` 的 `--with-remediation` 分支；**产物**：`tmp/v113/remediation.diff`） | 编排工件（证据管理） | 
+docs/validation/directive-review-saturation.md:30  [tmp/v113/remediation.diff]  | F-11 | 整改 diff 采用「`HEAD` + 上一轮全量 diff **机械重建**整改前状态 → `git diff --no-index`」的方法，而非人工回忆式描述（**方法工件**：`tmp/v113/capture.js` 的 `--with-remediation` 分支；**产物**：`tmp/v113/remediation.diff`） | 编排工件（证据管理） | 
+docs/validation/directive-review-saturation.md:30  [tmp/v113/remediation.diff]  | F-11 | 整改 diff 采用「`HEAD` + 上一轮全量 diff **机械重建**整改前状态 → `git diff --no-index`」的方法，而非人工回忆式描述（**方法工件**：`tmp/v113/capture.js` 的 `--with-remediation` 分支；**产物**：`tmp/v113/remediation.diff`） | 编排工件（证据管理） | 
+docs/validation/directive-review-saturation.md:304  [tmp/v113/review-input-r2.stat-r3.txt]  - 无发现。切片改动集严格落在 4 文件： [tmp/v113/review-input-r2.stat-r3.txt](tmp/v113/review-input-r2.stat-r3.txt#L1-L4)。
+docs/validation/directive-review-saturation.md:304  [tmp/v113/review-input-r2.stat-r3.txt#L1-L4]  - 无发现。切片改动集严格落在 4 文件： [tmp/v113/review-input-r2.stat-r3.txt](tmp/v113/review-input-r2.stat-r3.txt#L1-L4)。
+docs/validation/directive-review-saturation.md:305  [tmp/v113/selftest-master-r3.txt]  - 夹具映射与断言链覆盖到 T19-T28：注册见 [tools/gates/selftest.js](tools/gates/selftest.js#L55-L62)，关键断言见 [tools/gates/selftest.js](tools/gates/selftest.js#L1182), [tools/gates/selftest.js](tools/gates/selftest.js#L
+docs/validation/directive-review-saturation.md:305  [tmp/v113/selftest-master-r3.txt#L253]  - 夹具映射与断言链覆盖到 T19-T28：注册见 [tools/gates/selftest.js](tools/gates/selftest.js#L55-L62)，关键断言见 [tools/gates/selftest.js](tools/gates/selftest.js#L1182), [tools/gates/selftest.js](tools/gates/selftest.js#L
+docs/validation/directive-review-saturation.md:310  [tmp/v113/selftest-master-r3.txt]  - LOW | [docs/DELIVERY_DIRECTIVE.md](docs/DELIVERY_DIRECTIVE.md#L491), [tools/gates/selftest.js](tools/gates/selftest.js#L1251), [tmp/v113/selftest-master-r3.txt](tmp/v113/selftest-master-r3.txt#L215)
+docs/validation/directive-review-saturation.md:310  [tmp/v113/selftest-master-r3.txt#L215]  - LOW | [docs/DELIVERY_DIRECTIVE.md](docs/DELIVERY_DIRECTIVE.md#L491), [tools/gates/selftest.js](tools/gates/selftest.js#L1251), [tmp/v113/selftest-master-r3.txt](tmp/v113/selftest-master-r3.txt#L215)
+docs/validation/directive-review-saturation.md:312  [tmp/v113/selftest-master-r3.txt]  - LOW | [docs/DELIVERY_DIRECTIVE.md](docs/DELIVERY_DIRECTIVE.md#L493), [tools/gates/lib/criteria/g6.js](tools/gates/lib/criteria/g6.js#L666), [tools/gates/selftest.js](tools/gates/selftest.js#L1519), 
+docs/validation/directive-review-saturation.md:312  [tmp/v113/selftest-master-r3.txt#L250]  - LOW | [docs/DELIVERY_DIRECTIVE.md](docs/DELIVERY_DIRECTIVE.md#L493), [tools/gates/lib/criteria/g6.js](tools/gates/lib/criteria/g6.js#L666), [tools/gates/selftest.js](tools/gates/selftest.js#L1519), 
+docs/validation/directive-review-saturation.md:315  [tmp/v113/verify-v113-r3.txt]  1. §12.4 全 45 行闭集核验：通过。主控落盘显示 CN/EN 均为 45 行且 0 越界词，见 [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L1-L2) 与 [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L6)。我也逐行复核了 [docs/DELI
+docs/validation/directive-review-saturation.md:315  [tmp/v113/verify-v113-r3.txt#L1-L2]  1. §12.4 全 45 行闭集核验：通过。主控落盘显示 CN/EN 均为 45 行且 0 越界词，见 [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L1-L2) 与 [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L6)。我也逐行复核了 [docs/DELI
+docs/validation/directive-review-saturation.md:315  [tmp/v113/verify-v113-r3.txt]  1. §12.4 全 45 行闭集核验：通过。主控落盘显示 CN/EN 均为 45 行且 0 越界词，见 [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L1-L2) 与 [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L6)。我也逐行复核了 [docs/DELI
+docs/validation/directive-review-saturation.md:315  [tmp/v113/verify-v113-r3.txt#L6]  1. §12.4 全 45 行闭集核验：通过。主控落盘显示 CN/EN 均为 45 行且 0 越界词，见 [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L1-L2) 与 [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L6)。我也逐行复核了 [docs/DELI
+docs/validation/directive-review-saturation.md:316  [tmp/v113/selftest-master-r3.txt]  2. G6-5 区域/排除域与实现一致性：通过。正文明确了目标域、排除域、行首加粗标签、父节前缀解析，见 [docs/DELIVERY_DIRECTIVE.md](docs/DELIVERY_DIRECTIVE.md#L491)；实现对应于 [tools/gates/lib/criteria/g6.js](tools/gates/lib/criteria/g6.js#L508), [tools/g
+docs/validation/directive-review-saturation.md:316  [tmp/v113/selftest-master-r3.txt#L215]  2. G6-5 区域/排除域与实现一致性：通过。正文明确了目标域、排除域、行首加粗标签、父节前缀解析，见 [docs/DELIVERY_DIRECTIVE.md](docs/DELIVERY_DIRECTIVE.md#L491)；实现对应于 [tools/gates/lib/criteria/g6.js](tools/gates/lib/criteria/g6.js#L508), [tools/g
+docs/validation/directive-review-saturation.md:316  [tmp/v113/selftest-master-r3.txt]  2. G6-5 区域/排除域与实现一致性：通过。正文明确了目标域、排除域、行首加粗标签、父节前缀解析，见 [docs/DELIVERY_DIRECTIVE.md](docs/DELIVERY_DIRECTIVE.md#L491)；实现对应于 [tools/gates/lib/criteria/g6.js](tools/gates/lib/criteria/g6.js#L508), [tools/g
+docs/validation/directive-review-saturation.md:316  [tmp/v113/selftest-master-r3.txt#L230]  2. G6-5 区域/排除域与实现一致性：通过。正文明确了目标域、排除域、行首加粗标签、父节前缀解析，见 [docs/DELIVERY_DIRECTIVE.md](docs/DELIVERY_DIRECTIVE.md#L491)；实现对应于 [tools/gates/lib/criteria/g6.js](tools/gates/lib/criteria/g6.js#L508), [tools/g
+docs/validation/directive-review-saturation.md:317  [tmp/v113/review-input-r2.stat-r3.txt]  3. 不做清单逐项未触碰：结论为全部未触碰。依据为改动集仅 4 文件 [tmp/v113/review-input-r2.stat-r3.txt](tmp/v113/review-input-r2.stat-r3.txt#L1-L4)。
+docs/validation/directive-review-saturation.md:317  [tmp/v113/review-input-r2.stat-r3.txt#L1-L4]  3. 不做清单逐项未触碰：结论为全部未触碰。依据为改动集仅 4 文件 [tmp/v113/review-input-r2.stat-r3.txt](tmp/v113/review-input-r2.stat-r3.txt#L1-L4)。
+docs/validation/directive-review-saturation.md:320  [tmp/v113/review-input-r2.stat-r3.txt]  1. 不改 G6-1~G6-4 规则实体与词表：未触碰。见改动集 [tmp/v113/review-input-r2.stat-r3.txt](tmp/v113/review-input-r2.stat-r3.txt#L1-L4)。
+docs/validation/directive-review-saturation.md:320  [tmp/v113/review-input-r2.stat-r3.txt#L1-L4]  1. 不改 G6-1~G6-4 规则实体与词表：未触碰。见改动集 [tmp/v113/review-input-r2.stat-r3.txt](tmp/v113/review-input-r2.stat-r3.txt#L1-L4)。
+docs/validation/directive-review-saturation.md:321  [tmp/v113/review-input-r2.stat-r3.txt]  2. 不新增白名单条目（g6-whitelist 与 cjk-newwords）：未触碰。见改动集 [tmp/v113/review-input-r2.stat-r3.txt](tmp/v113/review-input-r2.stat-r3.txt#L1-L4)，目标文件为 [tools/gates/g6-whitelist.txt](tools/gates/g6-whitelist.txt),
+docs/validation/directive-review-saturation.md:321  [tmp/v113/review-input-r2.stat-r3.txt#L1-L4]  2. 不新增白名单条目（g6-whitelist 与 cjk-newwords）：未触碰。见改动集 [tmp/v113/review-input-r2.stat-r3.txt](tmp/v113/review-input-r2.stat-r3.txt#L1-L4)，目标文件为 [tools/gates/g6-whitelist.txt](tools/gates/g6-whitelist.txt),
+docs/validation/directive-review-saturation.md:337  [tmp/v113/gate-tree-r1-r3.txt]  1. 若对同一提交重放得到与 [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt) 或 [tmp/v113/selftest-master-r3.txt](tmp/v113/selftest-master-r3.txt) 不一致结果。
+docs/validation/directive-review-saturation.md:337  [tmp/v113/gate-tree-r1-r3.txt]  1. 若对同一提交重放得到与 [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt) 或 [tmp/v113/selftest-master-r3.txt](tmp/v113/selftest-master-r3.txt) 不一致结果。
+docs/validation/directive-review-saturation.md:337  [tmp/v113/selftest-master-r3.txt]  1. 若对同一提交重放得到与 [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt) 或 [tmp/v113/selftest-master-r3.txt](tmp/v113/selftest-master-r3.txt) 不一致结果。
+docs/validation/directive-review-saturation.md:337  [tmp/v113/selftest-master-r3.txt]  1. 若对同一提交重放得到与 [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt) 或 [tmp/v113/selftest-master-r3.txt](tmp/v113/selftest-master-r3.txt) 不一致结果。
+docs/validation/directive-review-saturation.md:338  [tmp/v113/review-input-r2.stat-r3.txt]  2. 若出现额外改动文件超出 [tmp/v113/review-input-r2.stat-r3.txt](tmp/v113/review-input-r2.stat-r3.txt#L1-L4)。
+docs/validation/directive-review-saturation.md:338  [tmp/v113/review-input-r2.stat-r3.txt#L1-L4]  2. 若出现额外改动文件超出 [tmp/v113/review-input-r2.stat-r3.txt](tmp/v113/review-input-r2.stat-r3.txt#L1-L4)。
+docs/validation/directive-review-saturation.md:350  [tmp/v113/review-r1.md]  | ⑤ 预审（首轮） | `tmp/v113/review-r1.md` | `PRE-REVIEW: PASS WITH FIXES` | 2 Medium（D-1 / D-2）+ 4 Low（D-3…D-6）；D-1 为 §7.8.6 误引 §12.1 配套②；D-2 为 §7.8.4 指针声明与 OB-11 / OB-37 两格不符 |
+docs/validation/directive-review-saturation.md:351  [tmp/v113/review-r2.md]  | ⑤ 复审 | `tmp/v113/review-r2.md` | `PRE-REVIEW: PASS` | D-1…D-6 全闭合；新缺陷 0；整改未扩范围；真实增量 = 每文件 9 插入 / 8 删除 |
+docs/validation/directive-review-saturation.md:68  [tmp/v113/review-r2.md]  | 5 | ⑤ 复审曾自行写盘 `tmp/v113/review-r2.md` | §2.2 规定审查层「可否写文件 = 否」 | 定性为**角色边界的字面偏差**（内容即其报告、未污染产品文本、`tmp/` 不入库） | 已登记 **OB-44**；本轮 ⑥ / ⑦ 由主控在任务包写入硬约束，**不改准则** |
+docs/validation/directive-review-saturation.md:99  [tmp/v113/capture.js]  **⒜ 补审的修正落点**：自由度清单补登「用户裁定类」第 1 条并附授权原文（原 1–6 条顺延为 2–7）；F-11 补方法工件（`tmp/v113/capture.js` 的 `--with-remediation` 分支）与产物（`tmp/v113/remediation.diff`）锚点。
+docs/validation/directive-review-saturation.md:99  [tmp/v113/remediation.diff]  **⒜ 补审的修正落点**：自由度清单补登「用户裁定类」第 1 条并附授权原文（原 1–6 条顺延为 2–7）；F-11 补方法工件（`tmp/v113/capture.js` 的 `--with-remediation` 分支）与产物（`tmp/v113/remediation.diff`）锚点。
+docs/validation/directive-review-saturation_EN.md:128  [tmp/v113/]  - **Evidence landing (R6.1)**: before review the master lands the raw diff and the raw gate output under `tmp/v113/**` and hands the paths to the reviewer; no summary was substituted for the raw hunks
+docs/validation/directive-review-saturation_EN.md:129  [tmp/v113/review-input.diff]  - **⑤'s input**: `tmp/v113/review-input.diff` (first round), `tmp/v113/remediation.diff` and `tmp/v113/review-input-r2-r3.diff` (re-review).
+docs/validation/directive-review-saturation_EN.md:129  [tmp/v113/remediation.diff]  - **⑤'s input**: `tmp/v113/review-input.diff` (first round), `tmp/v113/remediation.diff` and `tmp/v113/review-input-r2-r3.diff` (re-review).
+docs/validation/directive-review-saturation_EN.md:129  [tmp/v113/review-input-r2-r3.diff]  - **⑤'s input**: `tmp/v113/review-input.diff` (first round), `tmp/v113/remediation.diff` and `tmp/v113/review-input-r2-r3.diff` (re-review).
+docs/validation/directive-review-saturation_EN.md:130  [tmp/v113/review-input-r2-r3.diff]  - **⑦'s input**: `tmp/v113/review-input-r2-r3.diff` and `tmp/v113/review-input-r2.stat-r3.txt`.
+docs/validation/directive-review-saturation_EN.md:130  [tmp/v113/review-input-r2.stat-r3.txt]  - **⑦'s input**: `tmp/v113/review-input-r2-r3.diff` and `tmp/v113/review-input-r2.stat-r3.txt`.
+docs/validation/directive-review-saturation_EN.md:131  [tmp/v113/review-input-r2-r3.diff]  - **⑦ ⒜ supplementary review (re-review slot)**: input package = the corrected executive-freedom list path + this slice's raw diff path (`tmp/v113/review-input-r2-r3.diff`) + the contract's original s
+docs/validation/directive-review-saturation_EN.md:156  [tmp/v113/]  ## 9. Gate results (⑩ pre-final values; raw output under `tmp/v113/**`)
+docs/validation/directive-review-saturation_EN.md:173  [tmp/v113/gate-tree-r1-r10.txt]  | `node tools/gates/gate.js --all --scope=tree` | `TOTAL_FAIL=0` (`tmp/v113/gate-tree-r1-r10.txt`) |
+docs/validation/directive-review-saturation_EN.md:174  [tmp/v113/gate-index-r1-r10.txt]  | `node tools/gates/gate.js --all --scope=index` | `TOTAL_FAIL=0` (`tmp/v113/gate-index-r1-r10.txt`) |
+docs/validation/directive-review-saturation_EN.md:176  [tmp/v113/selftest-master-r10.txt]  | `node tools/gates/gate.js --selftest` | `SELFTEST: PASS 248/248` (`tmp/v113/selftest-master-r10.txt`) |
+docs/validation/directive-review-saturation_EN.md:177  [tmp/v113/mirror-r10.txt]  | Bilingual mirror | `per-line mismatches = 0`, `MIRROR RESULT: PASS` (equal line counts on both sides) (`tmp/v113/mirror-r10.txt`) |
+docs/validation/directive-review-saturation_EN.md:178  [tmp/v113/verify-v113.js]  | The master's independent acceptance, `tmp/v113/verify-v113.js` | `ACCEPTED`: **45 ledger rows** in each file, all inside the closed set; 186 `§X.Y` references in-region, 0 dangling (`tmp/v113/verify
+docs/validation/directive-review-saturation_EN.md:178  [tmp/v113/verify-v113-r10.txt]  | The master's independent acceptance, `tmp/v113/verify-v113.js` | `ACCEPTED`: **45 ledger rows** in each file, all inside the closed set; 186 `§X.Y` references in-region, 0 dangling (`tmp/v113/verify
+docs/validation/directive-review-saturation_EN.md:179  [tmp/v113/g6-5-r1-r10.txt]  | `G6-5` | PASS `scanned 48, refs 47` (`tmp/v113/g6-5-r1-r10.txt`) |
+docs/validation/directive-review-saturation_EN.md:180  [tmp/v113/g6-6-r1-r10.txt]  | `G6-6` | PASS `scanned 38` (`tmp/v113/g6-6-r1-r10.txt`) |
+docs/validation/directive-review-saturation_EN.md:204  [tmp/v113/gate-tree-r1-r10.txt]  | Whole-tree diagnostics (§3.4 category table) | `gate.js --all --scope=tree` ⇒ `TOTAL_FAIL=0`; `--scope=index` ⇒ `TOTAL_FAIL=0`; `G7-b` PASS (`32 artifact row(s) OK`) (`tmp/v113/gate-tree-r1-r10.txt`
+docs/validation/directive-review-saturation_EN.md:204  [tmp/v113/gate-index-r1-r10.txt]  | Whole-tree diagnostics (§3.4 category table) | `gate.js --all --scope=tree` ⇒ `TOTAL_FAIL=0`; `--scope=index` ⇒ `TOTAL_FAIL=0`; `G7-b` PASS (`32 artifact row(s) OK`) (`tmp/v113/gate-tree-r1-r10.txt`
+docs/validation/directive-review-saturation_EN.md:206  [tmp/v113/gate-tree-r1-r10.txt]  | `gate.js --all --scope=tree` | `TOTAL_FAIL=0` (`tmp/v113/gate-tree-r1-r10.txt`) |
+docs/validation/directive-review-saturation_EN.md:207  [tmp/v113/enc-tree-r10.txt]  | Encoding gate (whole tree, per file) | `enc-tree` ⇒ `tracked=2923 text=2834 binary=89 violations=3`; all 3 are pre-existing violations in **OB-27's frozen evidence packs**, handled by the temporary 
+docs/validation/directive-review-saturation_EN.md:208  [tmp/v113/evidence-selfcheck-r10.txt]  | Frozen-evidence-pack self-consistency | `evidence-selfcheck` ⇒ `packs=4 entries=2327 missing=0 mismatch=0 not-self-checkable=1` (`tmp/v113/evidence-selfcheck-r10.txt`) |
+docs/validation/directive-review-saturation_EN.md:277  [tmp/v113/]  tmp/v113/**	local-only
+docs/validation/directive-review-saturation_EN.md:28  [tmp/v113/]  | F-9 | Evidence capture switches to **node direct write** (`execFileSync` + `fs.writeFileSync('utf8')`), with `--suffix` so each round's reading is **stored separately** rather than overwriting the p
+docs/validation/directive-review-saturation_EN.md:284  [tmp/v113/review-r3.md]  > Below is the verbatim text of `tmp/v113/review-r3.md`; the one line colliding with `G6-4`'s expiring-literal shape carries a `引文` note under that criterion's own exclusion mechanism (the rendered te
+docs/validation/directive-review-saturation_EN.md:289  [tmp/v113/gate-tree-r1-r3.txt]  1. [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt#L19), [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt#L20), [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt#L29)
+docs/validation/directive-review-saturation_EN.md:289  [tmp/v113/gate-tree-r1-r3.txt#L19]  1. [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt#L19), [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt#L20), [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt#L29)
+docs/validation/directive-review-saturation_EN.md:289  [tmp/v113/gate-tree-r1-r3.txt]  1. [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt#L19), [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt#L20), [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt#L29)
+docs/validation/directive-review-saturation_EN.md:289  [tmp/v113/gate-tree-r1-r3.txt#L20]  1. [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt#L19), [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt#L20), [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt#L29)
+docs/validation/directive-review-saturation_EN.md:289  [tmp/v113/gate-tree-r1-r3.txt]  1. [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt#L19), [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt#L20), [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt#L29)
+docs/validation/directive-review-saturation_EN.md:289  [tmp/v113/gate-tree-r1-r3.txt#L29]  1. [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt#L19), [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt#L20), [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt#L29)
+docs/validation/directive-review-saturation_EN.md:290  [tmp/v113/gate-index-r1-r3.txt]  2. [tmp/v113/gate-index-r1-r3.txt](tmp/v113/gate-index-r1-r3.txt#L19), [tmp/v113/gate-index-r1-r3.txt](tmp/v113/gate-index-r1-r3.txt#L20), [tmp/v113/gate-index-r1-r3.txt](tmp/v113/gate-index-r1-r3.txt
+docs/validation/directive-review-saturation_EN.md:290  [tmp/v113/gate-index-r1-r3.txt#L19]  2. [tmp/v113/gate-index-r1-r3.txt](tmp/v113/gate-index-r1-r3.txt#L19), [tmp/v113/gate-index-r1-r3.txt](tmp/v113/gate-index-r1-r3.txt#L20), [tmp/v113/gate-index-r1-r3.txt](tmp/v113/gate-index-r1-r3.txt
+docs/validation/directive-review-saturation_EN.md:290  [tmp/v113/gate-index-r1-r3.txt]  2. [tmp/v113/gate-index-r1-r3.txt](tmp/v113/gate-index-r1-r3.txt#L19), [tmp/v113/gate-index-r1-r3.txt](tmp/v113/gate-index-r1-r3.txt#L20), [tmp/v113/gate-index-r1-r3.txt](tmp/v113/gate-index-r1-r3.txt
+docs/validation/directive-review-saturation_EN.md:290  [tmp/v113/gate-index-r1-r3.txt#L20]  2. [tmp/v113/gate-index-r1-r3.txt](tmp/v113/gate-index-r1-r3.txt#L19), [tmp/v113/gate-index-r1-r3.txt](tmp/v113/gate-index-r1-r3.txt#L20), [tmp/v113/gate-index-r1-r3.txt](tmp/v113/gate-index-r1-r3.txt
+docs/validation/directive-review-saturation_EN.md:290  [tmp/v113/gate-index-r1-r3.txt]  2. [tmp/v113/gate-index-r1-r3.txt](tmp/v113/gate-index-r1-r3.txt#L19), [tmp/v113/gate-index-r1-r3.txt](tmp/v113/gate-index-r1-r3.txt#L20), [tmp/v113/gate-index-r1-r3.txt](tmp/v113/gate-index-r1-r3.txt
+docs/validation/directive-review-saturation_EN.md:290  [tmp/v113/gate-index-r1-r3.txt#L29]  2. [tmp/v113/gate-index-r1-r3.txt](tmp/v113/gate-index-r1-r3.txt#L19), [tmp/v113/gate-index-r1-r3.txt](tmp/v113/gate-index-r1-r3.txt#L20), [tmp/v113/gate-index-r1-r3.txt](tmp/v113/gate-index-r1-r3.txt
+docs/validation/directive-review-saturation_EN.md:291  [tmp/v113/selftest-master-r3.txt]  3. [tmp/v113/selftest-master-r3.txt](tmp/v113/selftest-master-r3.txt#L253)
+docs/validation/directive-review-saturation_EN.md:291  [tmp/v113/selftest-master-r3.txt#L253]  3. [tmp/v113/selftest-master-r3.txt](tmp/v113/selftest-master-r3.txt#L253)
+docs/validation/directive-review-saturation_EN.md:292  [tmp/v113/mirror-r3.txt]  4. [tmp/v113/mirror-r3.txt](tmp/v113/mirror-r3.txt#L3)
+docs/validation/directive-review-saturation_EN.md:292  [tmp/v113/mirror-r3.txt#L3]  4. [tmp/v113/mirror-r3.txt](tmp/v113/mirror-r3.txt#L3)
+docs/validation/directive-review-saturation_EN.md:293  [tmp/v113/verify-v113-r3.txt]  5. [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L1), [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L2), [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L6)
+docs/validation/directive-review-saturation_EN.md:293  [tmp/v113/verify-v113-r3.txt#L1]  5. [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L1), [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L2), [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L6)
+docs/validation/directive-review-saturation_EN.md:293  [tmp/v113/verify-v113-r3.txt]  5. [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L1), [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L2), [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L6)
+docs/validation/directive-review-saturation_EN.md:293  [tmp/v113/verify-v113-r3.txt#L2]  5. [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L1), [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L2), [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L6)
+docs/validation/directive-review-saturation_EN.md:293  [tmp/v113/verify-v113-r3.txt]  5. [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L1), [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L2), [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L6)
+docs/validation/directive-review-saturation_EN.md:293  [tmp/v113/verify-v113-r3.txt#L6]  5. [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L1), [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L2), [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L6)
+docs/validation/directive-review-saturation_EN.md:294  [tmp/v113/review-input-r2.stat-r3.txt]  6. [tmp/v113/review-input-r2.stat-r3.txt](tmp/v113/review-input-r2.stat-r3.txt#L1-L4)
+docs/validation/directive-review-saturation_EN.md:294  [tmp/v113/review-input-r2.stat-r3.txt#L1-L4]  6. [tmp/v113/review-input-r2.stat-r3.txt](tmp/v113/review-input-r2.stat-r3.txt#L1-L4)
+docs/validation/directive-review-saturation_EN.md:30  [tmp/v113/capture.js]  | F-11 | The remediation diff uses "`HEAD` + the previous round's full diff to **mechanically rebuild** the pre-remediation state → `git diff --no-index`" rather than a recollection-style description 
+docs/validation/directive-review-saturation_EN.md:30  [tmp/v113/remediation.diff]  | F-11 | The remediation diff uses "`HEAD` + the previous round's full diff to **mechanically rebuild** the pre-remediation state → `git diff --no-index`" rather than a recollection-style description 
+docs/validation/directive-review-saturation_EN.md:30  [tmp/v113/remediation.diff]  | F-11 | The remediation diff uses "`HEAD` + the previous round's full diff to **mechanically rebuild** the pre-remediation state → `git diff --no-index`" rather than a recollection-style description 
+docs/validation/directive-review-saturation_EN.md:304  [tmp/v113/review-input-r2.stat-r3.txt]  - 无发现。切片改动集严格落在 4 文件： [tmp/v113/review-input-r2.stat-r3.txt](tmp/v113/review-input-r2.stat-r3.txt#L1-L4)。
+docs/validation/directive-review-saturation_EN.md:304  [tmp/v113/review-input-r2.stat-r3.txt#L1-L4]  - 无发现。切片改动集严格落在 4 文件： [tmp/v113/review-input-r2.stat-r3.txt](tmp/v113/review-input-r2.stat-r3.txt#L1-L4)。
+docs/validation/directive-review-saturation_EN.md:305  [tmp/v113/selftest-master-r3.txt]  - 夹具映射与断言链覆盖到 T19-T28：注册见 [tools/gates/selftest.js](tools/gates/selftest.js#L55-L62)，关键断言见 [tools/gates/selftest.js](tools/gates/selftest.js#L1182), [tools/gates/selftest.js](tools/gates/selftest.js#L
+docs/validation/directive-review-saturation_EN.md:305  [tmp/v113/selftest-master-r3.txt#L253]  - 夹具映射与断言链覆盖到 T19-T28：注册见 [tools/gates/selftest.js](tools/gates/selftest.js#L55-L62)，关键断言见 [tools/gates/selftest.js](tools/gates/selftest.js#L1182), [tools/gates/selftest.js](tools/gates/selftest.js#L
+docs/validation/directive-review-saturation_EN.md:310  [tmp/v113/selftest-master-r3.txt]  - LOW | [docs/DELIVERY_DIRECTIVE.md](docs/DELIVERY_DIRECTIVE.md#L491), [tools/gates/selftest.js](tools/gates/selftest.js#L1251), [tmp/v113/selftest-master-r3.txt](tmp/v113/selftest-master-r3.txt#L215)
+docs/validation/directive-review-saturation_EN.md:310  [tmp/v113/selftest-master-r3.txt#L215]  - LOW | [docs/DELIVERY_DIRECTIVE.md](docs/DELIVERY_DIRECTIVE.md#L491), [tools/gates/selftest.js](tools/gates/selftest.js#L1251), [tmp/v113/selftest-master-r3.txt](tmp/v113/selftest-master-r3.txt#L215)
+docs/validation/directive-review-saturation_EN.md:312  [tmp/v113/selftest-master-r3.txt]  - LOW | [docs/DELIVERY_DIRECTIVE.md](docs/DELIVERY_DIRECTIVE.md#L493), [tools/gates/lib/criteria/g6.js](tools/gates/lib/criteria/g6.js#L666), [tools/gates/selftest.js](tools/gates/selftest.js#L1519), 
+docs/validation/directive-review-saturation_EN.md:312  [tmp/v113/selftest-master-r3.txt#L250]  - LOW | [docs/DELIVERY_DIRECTIVE.md](docs/DELIVERY_DIRECTIVE.md#L493), [tools/gates/lib/criteria/g6.js](tools/gates/lib/criteria/g6.js#L666), [tools/gates/selftest.js](tools/gates/selftest.js#L1519), 
+docs/validation/directive-review-saturation_EN.md:315  [tmp/v113/verify-v113-r3.txt]  1. §12.4 全 45 行闭集核验：通过。主控落盘显示 CN/EN 均为 45 行且 0 越界词，见 [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L1-L2) 与 [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L6)。我也逐行复核了 [docs/DELI
+docs/validation/directive-review-saturation_EN.md:315  [tmp/v113/verify-v113-r3.txt#L1-L2]  1. §12.4 全 45 行闭集核验：通过。主控落盘显示 CN/EN 均为 45 行且 0 越界词，见 [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L1-L2) 与 [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L6)。我也逐行复核了 [docs/DELI
+docs/validation/directive-review-saturation_EN.md:315  [tmp/v113/verify-v113-r3.txt]  1. §12.4 全 45 行闭集核验：通过。主控落盘显示 CN/EN 均为 45 行且 0 越界词，见 [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L1-L2) 与 [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L6)。我也逐行复核了 [docs/DELI
+docs/validation/directive-review-saturation_EN.md:315  [tmp/v113/verify-v113-r3.txt#L6]  1. §12.4 全 45 行闭集核验：通过。主控落盘显示 CN/EN 均为 45 行且 0 越界词，见 [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L1-L2) 与 [tmp/v113/verify-v113-r3.txt](tmp/v113/verify-v113-r3.txt#L6)。我也逐行复核了 [docs/DELI
+docs/validation/directive-review-saturation_EN.md:316  [tmp/v113/selftest-master-r3.txt]  2. G6-5 区域/排除域与实现一致性：通过。正文明确了目标域、排除域、行首加粗标签、父节前缀解析，见 [docs/DELIVERY_DIRECTIVE.md](docs/DELIVERY_DIRECTIVE.md#L491)；实现对应于 [tools/gates/lib/criteria/g6.js](tools/gates/lib/criteria/g6.js#L508), [tools/g
+docs/validation/directive-review-saturation_EN.md:316  [tmp/v113/selftest-master-r3.txt#L215]  2. G6-5 区域/排除域与实现一致性：通过。正文明确了目标域、排除域、行首加粗标签、父节前缀解析，见 [docs/DELIVERY_DIRECTIVE.md](docs/DELIVERY_DIRECTIVE.md#L491)；实现对应于 [tools/gates/lib/criteria/g6.js](tools/gates/lib/criteria/g6.js#L508), [tools/g
+docs/validation/directive-review-saturation_EN.md:316  [tmp/v113/selftest-master-r3.txt]  2. G6-5 区域/排除域与实现一致性：通过。正文明确了目标域、排除域、行首加粗标签、父节前缀解析，见 [docs/DELIVERY_DIRECTIVE.md](docs/DELIVERY_DIRECTIVE.md#L491)；实现对应于 [tools/gates/lib/criteria/g6.js](tools/gates/lib/criteria/g6.js#L508), [tools/g
+docs/validation/directive-review-saturation_EN.md:316  [tmp/v113/selftest-master-r3.txt#L230]  2. G6-5 区域/排除域与实现一致性：通过。正文明确了目标域、排除域、行首加粗标签、父节前缀解析，见 [docs/DELIVERY_DIRECTIVE.md](docs/DELIVERY_DIRECTIVE.md#L491)；实现对应于 [tools/gates/lib/criteria/g6.js](tools/gates/lib/criteria/g6.js#L508), [tools/g
+docs/validation/directive-review-saturation_EN.md:317  [tmp/v113/review-input-r2.stat-r3.txt]  3. 不做清单逐项未触碰：结论为全部未触碰。依据为改动集仅 4 文件 [tmp/v113/review-input-r2.stat-r3.txt](tmp/v113/review-input-r2.stat-r3.txt#L1-L4)。
+docs/validation/directive-review-saturation_EN.md:317  [tmp/v113/review-input-r2.stat-r3.txt#L1-L4]  3. 不做清单逐项未触碰：结论为全部未触碰。依据为改动集仅 4 文件 [tmp/v113/review-input-r2.stat-r3.txt](tmp/v113/review-input-r2.stat-r3.txt#L1-L4)。
+docs/validation/directive-review-saturation_EN.md:320  [tmp/v113/review-input-r2.stat-r3.txt]  1. 不改 G6-1~G6-4 规则实体与词表：未触碰。见改动集 [tmp/v113/review-input-r2.stat-r3.txt](tmp/v113/review-input-r2.stat-r3.txt#L1-L4)。
+docs/validation/directive-review-saturation_EN.md:320  [tmp/v113/review-input-r2.stat-r3.txt#L1-L4]  1. 不改 G6-1~G6-4 规则实体与词表：未触碰。见改动集 [tmp/v113/review-input-r2.stat-r3.txt](tmp/v113/review-input-r2.stat-r3.txt#L1-L4)。
+docs/validation/directive-review-saturation_EN.md:321  [tmp/v113/review-input-r2.stat-r3.txt]  2. 不新增白名单条目（g6-whitelist 与 cjk-newwords）：未触碰。见改动集 [tmp/v113/review-input-r2.stat-r3.txt](tmp/v113/review-input-r2.stat-r3.txt#L1-L4)，目标文件为 [tools/gates/g6-whitelist.txt](tools/gates/g6-whitelist.txt),
+docs/validation/directive-review-saturation_EN.md:321  [tmp/v113/review-input-r2.stat-r3.txt#L1-L4]  2. 不新增白名单条目（g6-whitelist 与 cjk-newwords）：未触碰。见改动集 [tmp/v113/review-input-r2.stat-r3.txt](tmp/v113/review-input-r2.stat-r3.txt#L1-L4)，目标文件为 [tools/gates/g6-whitelist.txt](tools/gates/g6-whitelist.txt),
+docs/validation/directive-review-saturation_EN.md:337  [tmp/v113/gate-tree-r1-r3.txt]  1. 若对同一提交重放得到与 [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt) 或 [tmp/v113/selftest-master-r3.txt](tmp/v113/selftest-master-r3.txt) 不一致结果。
+docs/validation/directive-review-saturation_EN.md:337  [tmp/v113/gate-tree-r1-r3.txt]  1. 若对同一提交重放得到与 [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt) 或 [tmp/v113/selftest-master-r3.txt](tmp/v113/selftest-master-r3.txt) 不一致结果。
+docs/validation/directive-review-saturation_EN.md:337  [tmp/v113/selftest-master-r3.txt]  1. 若对同一提交重放得到与 [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt) 或 [tmp/v113/selftest-master-r3.txt](tmp/v113/selftest-master-r3.txt) 不一致结果。
+docs/validation/directive-review-saturation_EN.md:337  [tmp/v113/selftest-master-r3.txt]  1. 若对同一提交重放得到与 [tmp/v113/gate-tree-r1-r3.txt](tmp/v113/gate-tree-r1-r3.txt) 或 [tmp/v113/selftest-master-r3.txt](tmp/v113/selftest-master-r3.txt) 不一致结果。
+docs/validation/directive-review-saturation_EN.md:338  [tmp/v113/review-input-r2.stat-r3.txt]  2. 若出现额外改动文件超出 [tmp/v113/review-input-r2.stat-r3.txt](tmp/v113/review-input-r2.stat-r3.txt#L1-L4)。
+docs/validation/directive-review-saturation_EN.md:338  [tmp/v113/review-input-r2.stat-r3.txt#L1-L4]  2. 若出现额外改动文件超出 [tmp/v113/review-input-r2.stat-r3.txt](tmp/v113/review-input-r2.stat-r3.txt#L1-L4)。
+docs/validation/directive-review-saturation_EN.md:350  [tmp/v113/review-r1.md]  | ⑤ pre-review (first round) | `tmp/v113/review-r1.md` | `PRE-REVIEW: PASS WITH FIXES` | 2 Medium (D-1 / D-2) + 4 Low (D-3…D-6); D-1 is §7.8.6 mis-citing §12.1's companion ②; D-2 is §7.8.4's pointer c
+docs/validation/directive-review-saturation_EN.md:351  [tmp/v113/review-r2.md]  | ⑤ re-review | `tmp/v113/review-r2.md` | `PRE-REVIEW: PASS` | D-1…D-6 all closed; 0 new defects; no scope creep; the true increment = 9 insertions / 8 deletions per file |
+docs/validation/directive-review-saturation_EN.md:68  [tmp/v113/review-r2.md]  | 5 | ⑤'s re-review wrote `tmp/v113/review-r2.md` to disk by itself | §2.2 says a review-layer role "may write files = no" | classed as a **literal deviation of the role boundary** (the file is its ow
+docs/validation/directive-review-saturation_EN.md:99  [tmp/v113/capture.js]  **⒜ re-review's remediation targets**: the freedom list re-registers "user-ruling class" item 1 with the authorization quote (the original items 1–6 shift to 2–7); F-11 gains the method artifact (the 
+docs/validation/directive-review-saturation_EN.md:99  [tmp/v113/remediation.diff]  **⒜ re-review's remediation targets**: the freedom list re-registers "user-ruling class" item 1 with the authorization quote (the original items 1–6 shift to 2–7); F-11 gains the method artifact (the 
+docs/validation/directive-v1.11.md:112  [tmp/v111/]  tmp/v111/**	local-only
+docs/validation/directive-v1.11.md:113  [tmp/b4check/]  tmp/b4check/**	local-only
+docs/validation/directive-v1.11.md:81  [tmp/v111/]  | 临时目录与探针残留与未跟踪文件 | `git status --porcelain -uall` 仅本片 4 个暂存变更、无未跟踪残留；`tmp/` 下本片材料为 `tmp/v111/**` 与 `tmp/b4check/**`（仓库不跟踪） |
+docs/validation/directive-v1.11.md:81  [tmp/b4check/]  | 临时目录与探针残留与未跟踪文件 | `git status --porcelain -uall` 仅本片 4 个暂存变更、无未跟踪残留；`tmp/` 下本片材料为 `tmp/v111/**` 与 `tmp/b4check/**`（仓库不跟踪） |
+docs/validation/directive-v1.11_EN.md:112  [tmp/v111/]  tmp/v111/**	local-only
+docs/validation/directive-v1.11_EN.md:113  [tmp/b4check/]  tmp/b4check/**	local-only
+docs/validation/directive-v1.11_EN.md:81  [tmp/v111/]  | Temp directory, probe leftovers, untracked files | `git status --porcelain -uall` shows only this slice's 4 staged changes and no untracked residue; under `tmp/` this slice's material is `tmp/v111/*
+docs/validation/directive-v1.11_EN.md:81  [tmp/b4check/]  | Temp directory, probe leftovers, untracked files | `git status --porcelain -uall` shows only this slice's 4 staged changes and no untracked residue; under `tmp/` this slice's material is `tmp/v111/*
+docs/validation/directive-v1.12.md:231  [tmp/v112/c1-recheck.js]  | 机械复核 | `node tmp/v112/c1-recheck.js` → `items=34 missing=0 result=C1 CLOSED`（逐项在 CN 与 EN 两侧探针命中） |
+docs/validation/directive-v1.12.md:246  [tmp/v112/m4-g6-4-probe.js]  | 探针落点 | `tmp/v112/m4-g6-4-probe.js`（`local-only`） |
+docs/validation/directive-v1.12.md:248  [tmp/v112/g6-4-check.txt]  | R7 复跑（N5 的证据请求） | `gate.js --check=G6-4 --scope=tree` = `PASS`（`scanned 1079`，0 命中）；探针复跑结论同前 ⇒ 同一结论第四次成立；**证据已留档**（`tmp/v112/g6-4-check.txt`，`local-only`） |
+docs/validation/directive-v1.12.md:284  [tmp/v112/refs-check.txt]  | 文档型切片的退化形态 | 按 §5.2 说明，⑨ 退化为『编码门禁 + G1 至 G7 自检 + 链接与引用可解析性检查』；本节实测：变更行作用域内 §X.Y 引用 1097 处、**未解析 0 处**（`tmp/v112/refs-check.txt`；整文件另含 18 处 v3.1 等外部引文，属继承行，不计入） |
+docs/validation/directive-v1.12.md:296  [tmp/v112/]  | 临时目录与探针残留与未跟踪文件 | `git status --porcelain -uall` 仅本片变更、无未跟踪残留；`tmp/v112/**` 与本轮四份评审报告均在仓库外跟踪之外 |
+docs/validation/directive-v1.12.md:341  [tmp/v112/]  tmp/v112/**	local-only
+docs/validation/directive-v1.12.md:342  [tmp/DELIVERY_DIRECTIVE_v111_REVIEW.md]  tmp/DELIVERY_DIRECTIVE_v111_REVIEW.md	local-only
+docs/validation/directive-v1.12.md:343  [tmp/DELIVERY_DIRECTIVE_v111_REVIEW_R3.md]  tmp/DELIVERY_DIRECTIVE_v111_REVIEW_R3.md	local-only
+docs/validation/directive-v1.12.md:344  [tmp/DELIVERY_DIRECTIVE_v112_REVIEW.md]  tmp/DELIVERY_DIRECTIVE_v112_REVIEW.md	local-only
+docs/validation/directive-v1.12.md:345  [tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R5.md]  tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R5.md	local-only
+docs/validation/directive-v1.12.md:379  [tmp/DELIVERY_DIRECTIVE_v111_REVIEW.md]  | **OB-39** | 封版复核（主控） | 本报告 §11 的产物清单只列 `tmp/DELIVERY_DIRECTIVE_v111_REVIEW.md` 等 4 份评审报告，未列第四轮与第五轮复评的报告文件（`_REVIEW_R6.md` 与 `_REVIEW_R7.md`），而两者在盘上存在 | 下一片核对并补齐清单口径；属台账真实性类，不改本片规则文本 |
+docs/validation/directive-v1.12.md:61  [tmp/DELIVERY_DIRECTIVE_v111_REVIEW.md]  | 第 2 轮 | `tmp/DELIVERY_DIRECTIVE_v111_REVIEW.md` | 0 | 5 | 13 | 10 | 28 |
+docs/validation/directive-v1.12.md:62  [tmp/DELIVERY_DIRECTIVE_v111_REVIEW_R3.md]  | 第 3 轮 | `tmp/DELIVERY_DIRECTIVE_v111_REVIEW_R3.md` | 0 | 2 | 9 | 3 | 14 |
+docs/validation/directive-v1.12.md:63  [tmp/DELIVERY_DIRECTIVE_v112_REVIEW.md]  | 提交前 | `tmp/DELIVERY_DIRECTIVE_v112_REVIEW.md` | 1 | 4 | 13 | 4 | 22 |
+docs/validation/directive-v1.12.md:65  [tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R5.md]  | 处置后复验 | `tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R5.md` | 0 | 1 | 5 | 6 | 12 |
+docs/validation/directive-v1.12.md:66  [tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R6.md]  | 第四轮复评（R6） | `tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R6.md` | 0 | 1 | 4 | 5 | 10 |
+docs/validation/directive-v1.12.md:67  [tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R7.md]  | 第五轮复评（R7） | `tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R7.md` | 0 | 1 | 4 | 4 | 9 |
+docs/validation/directive-v1.12_EN.md:231  [tmp/v112/c1-recheck.js]  | Mechanical re-check | `node tmp/v112/c1-recheck.js` → `items=34 missing=0 result=C1 CLOSED` (each item probed on both the CN and the EN side) |
+docs/validation/directive-v1.12_EN.md:246  [tmp/v112/m4-g6-4-probe.js]  | Probe location | `tmp/v112/m4-g6-4-probe.js` (`local-only`) |
+docs/validation/directive-v1.12_EN.md:248  [tmp/v112/g6-4-check.txt]  | R7 re-run (N5's evidence request) | `gate.js --check=G6-4 --scope=tree` = `PASS` (`scanned 1079`, 0 hits); the probe reproduces the same verdict ⇒ the same conclusion holds for the fourth time; **th
+docs/validation/directive-v1.12_EN.md:284  [tmp/v112/refs-check.txt]  | The degenerate form for a documentation slice | per §5.2, ⑨ degenerates to "encoding gate + G1 to G7 self-check + link and reference resolvability check"; the measurement here: 1097 §X.Y references 
+docs/validation/directive-v1.12_EN.md:296  [tmp/v112/]  | Temp directories, probe residue and untracked files | `git status --porcelain -uall` shows only this slice's changes and no untracked residue; `tmp/v112/**` and this round's four review reports sit 
+docs/validation/directive-v1.12_EN.md:341  [tmp/v112/]  tmp/v112/**	local-only
+docs/validation/directive-v1.12_EN.md:342  [tmp/DELIVERY_DIRECTIVE_v111_REVIEW.md]  tmp/DELIVERY_DIRECTIVE_v111_REVIEW.md	local-only
+docs/validation/directive-v1.12_EN.md:343  [tmp/DELIVERY_DIRECTIVE_v111_REVIEW_R3.md]  tmp/DELIVERY_DIRECTIVE_v111_REVIEW_R3.md	local-only
+docs/validation/directive-v1.12_EN.md:344  [tmp/DELIVERY_DIRECTIVE_v112_REVIEW.md]  tmp/DELIVERY_DIRECTIVE_v112_REVIEW.md	local-only
+docs/validation/directive-v1.12_EN.md:345  [tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R5.md]  tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R5.md	local-only
+docs/validation/directive-v1.12_EN.md:379  [tmp/DELIVERY_DIRECTIVE_v111_REVIEW.md]  | **OB-39** | freeze re-check (master) | this report's §11 artifact list names 4 review reports such as `tmp/DELIVERY_DIRECTIVE_v111_REVIEW.md` but omits the fourth and fifth re-review reports (`_REVI
+docs/validation/directive-v1.12_EN.md:61  [tmp/DELIVERY_DIRECTIVE_v111_REVIEW.md]  | Round 2 | `tmp/DELIVERY_DIRECTIVE_v111_REVIEW.md` | 0 | 5 | 13 | 10 | 28 |
+docs/validation/directive-v1.12_EN.md:62  [tmp/DELIVERY_DIRECTIVE_v111_REVIEW_R3.md]  | Round 3 | `tmp/DELIVERY_DIRECTIVE_v111_REVIEW_R3.md` | 0 | 2 | 9 | 3 | 14 |
+docs/validation/directive-v1.12_EN.md:63  [tmp/DELIVERY_DIRECTIVE_v112_REVIEW.md]  | Pre-commit | `tmp/DELIVERY_DIRECTIVE_v112_REVIEW.md` | 1 | 4 | 13 | 4 | 22 |
+docs/validation/directive-v1.12_EN.md:65  [tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R5.md]  | Post-disposition re-verification | `tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R5.md` | 0 | 1 | 5 | 6 | 12 |
+docs/validation/directive-v1.12_EN.md:66  [tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R6.md]  | Fourth re-review (R6) | `tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R6.md` | 0 | 1 | 4 | 5 | 10 |
+docs/validation/directive-v1.12_EN.md:67  [tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R7.md]  | Fifth re-review (R7) | `tmp/DELIVERY_DIRECTIVE_v112_REVIEW_R7.md` | 0 | 1 | 4 | 4 | 9 |
+docs/validation/dr-1-availability-probe-floor.md:123  [tmp/dr1/]  tmp/dr1/**	local-only
+docs/validation/dr-1-availability-probe-floor.md:126  [tmp/dr1/]  **`tmp/dr1/**` 的处置说明**：包含本片审查输入包、变异检验转录、链配置自证、探针原始捕获与草稿；按用户既有指令**不清理**，并留给 `DIRECTIVE-LEDGER-ARCHIVE`（双主题：台账归档与 `tmp/` 生命周期）处置。
+docs/validation/dr-1-availability-probe-floor.md:31  [tmp/dr1/rulings.md]  1. **无独立 ① 方案书**（偏离 §1.2）：用户 R1–R5 裁定即方案基线，已在 `tmp/dr1/rulings.md` 与自由度清单 D-1 留痕。
+docs/validation/dr-1-availability-probe-floor.md:33  [tmp/dr1/mutation-check.txt]  3. ⑤ Medium①（变异证据未随输入包）：补齐 `tmp/dr1/mutation-check.txt` 后闭合。
+docs/validation/dr-1-availability-probe-floor.md:61  [tmp/dr1/review-input-r2.diff]  - ⑤ 与 ⑦ 输入：切口定义、R1–R5 裁定整理、原始 diff（`tmp/dr1/review-input-r2.diff`，9 文件）、门禁与聚焦测试原始输出、变异证据、链配置自证、契约原句；**不含**① 对话历史与 ②b 实现推理。
+docs/validation/dr-1-availability-probe-floor_EN.md:123  [tmp/dr1/]  tmp/dr1/**	local-only
+docs/validation/dr-1-availability-probe-floor_EN.md:126  [tmp/dr1/]  **Disposition of `tmp/dr1/**`**: it holds this slice's review input pack, the mutation transcript, the chain-config self-proof, the raw probe captures and the drafts; per the user's standing instructi
+docs/validation/dr-1-availability-probe-floor_EN.md:31  [tmp/dr1/rulings.md]  1. **No standalone ① plan** (a deviation from §1.2): the user rulings R1-R5 are the plan baseline, recorded in `tmp/dr1/rulings.md` and as freedom-list item D-1.
+docs/validation/dr-1-availability-probe-floor_EN.md:33  [tmp/dr1/mutation-check.txt]  3. ⑤ Medium① (mutation evidence not in the input pack): closed after landing `tmp/dr1/mutation-check.txt`.
+docs/validation/dr-1-availability-probe-floor_EN.md:61  [tmp/dr1/review-input-r2.diff]  - ⑤ and ⑦ inputs: the slice definition, the R1-R5 rulings digest, the raw diff (`tmp/dr1/review-input-r2.diff`, 9 files), raw gate and focused-test output, the mutation evidence, the chain-config self
+docs/validation/dr-fix-enforcement-proxy.md:144  [tmp/drfix/B5-postcommit-count10.txt]  - **结构消除性证据（乙）**：`-count=10` 全绿（A9，`4.273s`）；**提交后**在本机已提交状态重跑 `-count=10` 亦全绿（`4.504s`，见 `tmp/drfix/B5-postcommit-count10.txt`），包级密闭自检 `selftest: checks=13 failures=0`（`tmp/drfix/B6-postcommit-psself
+docs/validation/dr-fix-enforcement-proxy.md:144  [tmp/drfix/B6-postcommit-psselftest.txt]  - **结构消除性证据（乙）**：`-count=10` 全绿（A9，`4.273s`）；**提交后**在本机已提交状态重跑 `-count=10` 亦全绿（`4.504s`，见 `tmp/drfix/B5-postcommit-count10.txt`），包级密闭自检 `selftest: checks=13 failures=0`（`tmp/drfix/B6-postcommit-psself
+docs/validation/dr-fix-enforcement-proxy.md:159  [tmp/drfix/CI-push1.txt]  **结论（验收①）**：**3 连推首跑双绿 ⇒ 修复验证成立**。三条 run 的日志中**无 `FAIL` 行**，且该包在 Windows 与 Ubuntu 两条腿上均**实际执行并通过**（包级 `ok` 行，非仅“run 结论 `success`”）。**边界③**（修复后复现即“修复失败”）**本片未触发**。原始提取见 `tmp/drfix/CI-push1.txt` / `CI-p
+docs/validation/dr-fix-enforcement-proxy.md:196  [tmp/drfix/IMPL.diff]  5. **证据工件被就地覆盖**（⑦ 复审 N1）：首轮的 `tmp/drfix/IMPL.diff` 被就地覆盖，导致"该件为 stale blob `ab645e0`"**无法独立复核**。**教训**：证据工件**只追加、不覆盖**。
+docs/validation/dr-fix-enforcement-proxy.md:197  [tmp/gate.js]  6. **`tools/gates/` 的 G1–G5 脚本化仍待授权切片**（本片门禁由主控临时脚本 `tmp/gate.js` 执行，按用户裁决保留至本片结束）。
+docs/validation/dr-fix-enforcement-proxy.md:201  [tmp/drfix/]  10. **证据工件的存放位置**：本片原始证据（`A1`–`A9`、`B2`–`B4`、`CI-push1`–`CI-push3`、`IMPL.diff`、`DOCS.diff`、门禁输出、`review/`）位于本机 `tmp/drfix/`；按仓库规则 **`tmp/` 不入库** ⇒ **可追溯的耐久证据**是 **3 次 CI run**（公开可查）与本片的三次提交，`tmp/` 工件仅
+docs/validation/dr-fix-enforcement-proxy.md:80  [tmp/drfix/A2-restored-green.txt]  - **证据二（③ F3）**：两种形态（`write …` / `sync …`）在**全绿运行**中也逐字复现（见 `tmp/drfix/A2-restored-green.txt`、`A4-restored-green-full.txt`）⇒ 属**设计内 fail-closed 输出 / 次要噪声**，与 flake **无因果关联**。
+docs/validation/dr-fix-enforcement-proxy.md:84  [tmp/drfix/review/README-REREVIEW.txt]  ⑥ 与 ⑦ **首轮均不附任何清单**（§7.1 / §7.2；§7.3 锚定硬隔离，仅**复审轮**附清单并标注"完成独立扫描后再读"）；输入 = 原始 diff + 只读仓库。复审轮按 **C1** 附完整证据链（清单见 `tmp/drfix/review/README-REREVIEW.txt`）。按 **OB-9**，本次 ⑦ 输入**一并纳入**四类历史欠账（T3/T4 判据改动 dif
+docs/validation/dr-fix-enforcement-proxy.md:94  [tmp/drfix/]  ### 4.2 变异实测（原始输出见 `tmp/drfix/`）
+docs/validation/dr-fix-enforcement-proxy_EN.md:144  [tmp/drfix/B5-postcommit-count10.txt]  - **Structural elimination evidence (乙)**: `-count=10` all green (A9, `4.273s`); **after the commit** a rerun of `-count=10` on this machine in the committed state is also all green (`4.504s`, see `tm
+docs/validation/dr-fix-enforcement-proxy_EN.md:144  [tmp/drfix/B6-postcommit-psselftest.txt]  - **Structural elimination evidence (乙)**: `-count=10` all green (A9, `4.273s`); **after the commit** a rerun of `-count=10` on this machine in the committed state is also all green (`4.504s`, see `tm
+docs/validation/dr-fix-enforcement-proxy_EN.md:159  [tmp/drfix/CI-push1.txt]  **Conclusion (acceptance ①)**: **3 consecutive pushes green on the first attempt on both legs ⇒ the fix verification holds**. **no `FAIL` line** appears in any of the three runs' logs, and the package
+docs/validation/dr-fix-enforcement-proxy_EN.md:196  [tmp/drfix/IMPL.diff]  5. **Evidence artifacts were overwritten in place** (⑦ re-review N1): round 1's `tmp/drfix/IMPL.diff` was overwritten in place, so "that artifact is the stale blob `ab645e0`" **cannot be independently
+docs/validation/dr-fix-enforcement-proxy_EN.md:197  [tmp/gate.js]  6. **Scripting the G1–G5 checks in `tools/gates/` still awaits an authorized slice** (this slice's gates were run by the master's ad-hoc script `tmp/gate.js`, kept until the end of this slice per the 
+docs/validation/dr-fix-enforcement-proxy_EN.md:201  [tmp/drfix/]  10. **Where the evidence artifacts live**: this slice's raw evidence (`A1`–`A9`, `B2`–`B4`, `CI-push1`–`CI-push3`, `IMPL.diff`, `DOCS.diff`, the gate output, `review/`) sits in the local `tmp/drfix/`;
+docs/validation/dr-fix-enforcement-proxy_EN.md:80  [tmp/drfix/A2-restored-green.txt]  - **Evidence two (③ F3)**: both forms (`write …` / `sync …`) reproduce verbatim in **all-green runs** as well (see `tmp/drfix/A2-restored-green.txt`, `A4-restored-green-full.txt`) ⇒ they are **in-desi
+docs/validation/dr-fix-enforcement-proxy_EN.md:84  [tmp/drfix/review/README-REREVIEW.txt]  Neither ⑥ nor ⑦ **had any checklist attached in round 1** (§7.1 / §7.2; §7.3 anchors hard isolation, and only the **re-review round** attaches a checklist, marked "read only after completing the indep
+docs/validation/dr-fix-enforcement-proxy_EN.md:94  [tmp/drfix/]  ### 4.2 Measured variations (raw output in `tmp/drfix/`)
+docs/validation/evidence/DIRECTIVE-MODELID-MAP-mutation.md:3  [tmp/dml/mutation.md]  > 归档副本（v1.22 收尾）：源文件 `tmp/dml/mutation.md`（CRLF、无 BOM）按「移到归档」保留，行尾与编码归一为 UTF-8 with BOM + LF。
+docs/validation/evidence/DIRECTIVE-MODELID-MAP-review-r1.md:3  [tmp/dml/review-r1.md]  > 归档副本（v1.22 收尾）：源文件 `tmp/dml/review-r1.md`，正文逐字未改，仅新增本行归档注记，编码保持 UTF-8 with BOM + LF。
+docs/validation/evidence/S1-REACH-freedom-list.md:15  [tmp/s1-reach/]  | F-6 | 报告文件名取 `docs/validation/s1-reach-reachability{,_EN}.md` | 与切片命名一致、便于按 ID 检索；⑤ 首轮指出输入包曾同时出现两个命名 ⇒ 定稿统一为该名并与 `tmp/s1-reach/` 的同名文件逐字节一致 |
+docs/validation/evidence/b1-20260917/README.md:4  [tmp/b1/evidence/]  The raw transcripts live under the (git-ignored) `tmp/b1/evidence/` directory during the slice and are
+docs/validation/evidence/b2-2026-09-17/MANIFEST.md:7  [tmp/b2/]  goes to the git-ignored tmp/b2/ tree, never next to the versioned scripts.
+docs/validation/evidence/b2-2026-09-17/machine-ops/Invoke-B2LoopbackRehearsal.ps1:2  [tmp/b2/rehearsal/]  # Proves restorability BEFORE any paid probe runs. Outputs every step into tmp/b2/rehearsal/<stamp>/.
+docs/validation/evidence/b2-2026-09-17/machine-ops/normalize-encoding.ps1:77  [tmp/b2/]  $manifest.Add('goes to the git-ignored tmp/b2/ tree, never next to the versioned scripts.')
+docs/validation/evidence/directive-review-saturation-freedom-list.md:19  [tmp/v113/]  | F-9 | 证据捕获改为 **node 直写**（`execFileSync` + `fs.writeFileSync('utf8')`），并以 `--suffix` 使每轮读数**另存**而不覆盖上一轮证据 | 已授权包内的门禁重试 / 编排工件 | `tmp/v113/**` 证据 | 四问全否（捕获方式不改任何规则实体）；用户 2026-09-23 已批准其登记为 OB-43 |
+docs/validation/evidence/directive-review-saturation-freedom-list.md:21  [tmp/v113/capture.js]  | F-11 | 整改 diff 采用「`HEAD` + 上一轮全量 diff **机械重建**整改前状态 → `git diff --no-index`」的方法，而非人工回忆式描述（**方法工件**：`tmp/v113/capture.js` 的 `--with-remediation` 分支；**产物**：`tmp/v113/remediation.diff`） | 编排工件（证据管理） | 
+docs/validation/evidence/directive-review-saturation-freedom-list.md:21  [tmp/v113/remediation.diff]  | F-11 | 整改 diff 采用「`HEAD` + 上一轮全量 diff **机械重建**整改前状态 → `git diff --no-index`」的方法，而非人工回忆式描述（**方法工件**：`tmp/v113/capture.js` 的 `--with-remediation` 分支；**产物**：`tmp/v113/remediation.diff`） | 编排工件（证据管理） | 
+docs/validation/evidence/directive-review-saturation-freedom-list.md:21  [tmp/v113/remediation.diff]  | F-11 | 整改 diff 采用「`HEAD` + 上一轮全量 diff **机械重建**整改前状态 → `git diff --no-index`」的方法，而非人工回忆式描述（**方法工件**：`tmp/v113/capture.js` 的 `--with-remediation` 分支；**产物**：`tmp/v113/remediation.diff`） | 编排工件（证据管理） | 
+docs/validation/evidence/dr-1-2026-09-24/README.md:32  [tmp/dr1/ws]  --workspace tmp/dr1/ws --max-requests 1 --out <new-path>.json --json
+docs/validation/evidence/dr-1-2026-09-24/README.md:5  [tmp/dr1/]  git-ignored `tmp/dr1/` directory and are declared `local-only` in the slice report.
+docs/validation/gates-ext.md:10  [tmp/gate.js]  - **判据的执行体**：`tools/gates/`（单入口 `gate.js` + `lib/criteria/**` + `selftest.js` + `testdata/**` + 两份白名单），**离线、无第三方依赖、退出码 0 / 1 / 2 语义真实**（2 = 用法 / 环境错误）。迁移并取代临时脚本 `tmp/gate.js`（原样保留供对照）。基础 **G1**（三处人工位置
+docs/validation/gates-ext.md:158  [tmp/gates-ext/ARCH-DESIGN.md]  tmp/gates-ext/ARCH-DESIGN.md	local-only
+docs/validation/gates-ext.md:159  [tmp/gates-ext/SLICE-DEFINITION.md]  tmp/gates-ext/SLICE-DEFINITION.md	local-only
+docs/validation/gates-ext.md:160  [tmp/gates-ext/review/GATE-all-tree.txt]  tmp/gates-ext/review/GATE-all-tree.txt	local-only
+docs/validation/gates-ext.md:161  [tmp/gates-ext/review/GATE-selftest.txt]  tmp/gates-ext/review/GATE-selftest.txt	local-only
+docs/validation/gates-ext.md:162  [tmp/gates-ext/review/GATE-range-historical.txt]  tmp/gates-ext/review/GATE-range-historical.txt	local-only
+docs/validation/gates-ext.md:163  [tmp/gates-ext/review/MUTATION-f1-donere.txt]  tmp/gates-ext/review/MUTATION-f1-donere.txt	local-only
+docs/validation/gates-ext.md:164  [tmp/gates-ext/review/MUTATION-f1-range-vacuous.txt]  tmp/gates-ext/review/MUTATION-f1-range-vacuous.txt	local-only
+docs/validation/gates-ext.md:165  [tmp/gates-ext/review/MUTATION-guards-independent.txt]  tmp/gates-ext/review/MUTATION-guards-independent.txt	local-only
+docs/validation/gates-ext.md:19  [tmp/gates-ext/ARCH-DESIGN.md]  | ① 架构前置 | `deep-reasoner` | `tmp/gates-ext/ARCH-DESIGN.md` + `SLICE-DEFINITION.md`（含步 1 / 2 / 3 分步阻断式验收） | 完成 |
+docs/validation/gates-ext.md:21  [tmp/gates-ext/step2..step5/]  | ③ 测试 | `prfrail-tester` | 步 2 / 3 / 4 / 5 独立验证（`tmp/gates-ext/step2..step5/**`） | 完成，含两处**独立反驳**见 §6 |
+docs/validation/gates-ext.md:33  [tmp/gate.js]  | ① | **硬编码仓库根**（`D:/LZProjects/prfrail/`）使旧临时脚本在 Linux CI 上不可用 | 读取 `tmp/gate.js` 常量 + 在非该路径下执行 | 改为 `git rev-parse --show-toplevel` 发现仓库根 |
+docs/validation/gates-ext.md:98  [tmp/gates-ext/]  > **证据保留**：本片 `tmp/gates-ext/**`（step2–step5 历史、变异证据、复审输入包）**保留**，不入库、不占版本控制；**保留期限 = 下片稳定运行后评估**（用户 2026-09-22 裁决）。
+docs/validation/gates-ext_EN.md:10  [tmp/gate.js]  - **The executor of the criteria**: `tools/gates/` (single entry `gate.js` + `lib/criteria/**` + `selftest.js` + `testdata/**` + two whitelists) - **offline, no third-party dependency, real exit-code 
+docs/validation/gates-ext_EN.md:158  [tmp/gates-ext/ARCH-DESIGN.md]  tmp/gates-ext/ARCH-DESIGN.md	local-only
+docs/validation/gates-ext_EN.md:159  [tmp/gates-ext/SLICE-DEFINITION.md]  tmp/gates-ext/SLICE-DEFINITION.md	local-only
+docs/validation/gates-ext_EN.md:160  [tmp/gates-ext/review/GATE-all-tree.txt]  tmp/gates-ext/review/GATE-all-tree.txt	local-only
+docs/validation/gates-ext_EN.md:161  [tmp/gates-ext/review/GATE-selftest.txt]  tmp/gates-ext/review/GATE-selftest.txt	local-only
+docs/validation/gates-ext_EN.md:162  [tmp/gates-ext/review/GATE-range-historical.txt]  tmp/gates-ext/review/GATE-range-historical.txt	local-only
+docs/validation/gates-ext_EN.md:163  [tmp/gates-ext/review/MUTATION-f1-donere.txt]  tmp/gates-ext/review/MUTATION-f1-donere.txt	local-only
+docs/validation/gates-ext_EN.md:164  [tmp/gates-ext/review/MUTATION-f1-range-vacuous.txt]  tmp/gates-ext/review/MUTATION-f1-range-vacuous.txt	local-only
+docs/validation/gates-ext_EN.md:165  [tmp/gates-ext/review/MUTATION-guards-independent.txt]  tmp/gates-ext/review/MUTATION-guards-independent.txt	local-only
+docs/validation/gates-ext_EN.md:19  [tmp/gates-ext/ARCH-DESIGN.md]  | ① architecture | `deep-reasoner` | `tmp/gates-ext/ARCH-DESIGN.md` + `SLICE-DEFINITION.md` (with the blocking staged step 1 / 2 / 3 acceptance) | done |
+docs/validation/gates-ext_EN.md:21  [tmp/gates-ext/step2..step5/]  | ③ testing | `prfrail-tester` | staged independent verification step 2 / 3 / 4 / 5 (`tmp/gates-ext/step2..step5/**`) | done, including the two **independent refutations** in §6 |
+docs/validation/gates-ext_EN.md:33  [tmp/gate.js]  | ① | **Hardcoded repository root** (`D:/LZProjects/prfrail/`) made the old throwaway script unusable on Linux CI | read the constant in `tmp/gate.js` + execute it from another path | replaced by `git
+docs/validation/gates-ext_EN.md:98  [tmp/gates-ext/]  > **Evidence retention**: this slice's `tmp/gates-ext/**` (the step2–step5 history, the mutation evidence, the review input bundles) is **retained** - not committed and not version-controlled; **the r
+docs/validation/ledger-backfill.md:100  [tmp/lbf/]  - 临时残留清单：`tmp/lbf/` 保留 19 个过程文件（方案与盘点、断言脚本、原始输出、处置清单、溯源输出、首轮与第 2 轮审查包副本、`git diff` 与门禁读数），按 OB-49 与用户既有指令**不清理**，处置 = `local-only`。
+docs/validation/ledger-backfill.md:101  [tmp/lbf/report-cn.md]  - 落盘一致性：`docs/validation/ledger-backfill.md` 与 `tmp/lbf/report-cn.md` 的 SHA-256 相等（`_EN` 同理）。
+docs/validation/ledger-backfill.md:104  [tmp/lbf/review-round2.md]  - ⑦ 第 2 轮的原始回执已落盘 `tmp/lbf/review-round2.md`（`local-only`）；按 §5.3 的语义边界，⑧b 的事实记录类写入不触发再次复审（与切片 `S1-REACH` 报告 §10 的同类判定一致）。
+docs/validation/ledger-backfill.md:142  [tmp/lbf/review-input.diff]  tmp/lbf/review-input.diff	local-only
+docs/validation/ledger-backfill.md:143  [tmp/lbf/gate-tree.txt]  tmp/lbf/gate-tree.txt	local-only
+docs/validation/ledger-backfill.md:144  [tmp/lbf/dispositions.md]  tmp/lbf/dispositions.md	local-only
+docs/validation/ledger-backfill.md:145  [tmp/lbf/dd36b9b-trace.txt]  tmp/lbf/dd36b9b-trace.txt	local-only
+docs/validation/ledger-backfill.md:146  [tmp/lbf/review-round2.md]  tmp/lbf/review-round2.md	local-only
+docs/validation/ledger-backfill.md:32  [tmp/lbf/dd36b9b-trace.txt]  1. **① 的发现（重要）**：台账完整性注记写「该段落仍缺 B3a 段落」，实测该段落**已由提交 `dd36b9b` 回填**（`DEV_PLAN.md:137`、`_EN.md:138`；经 `git log -S` 溯源，输出见 `tmp/lbf/dd36b9b-trace.txt`，处置 `local-only`）⇒ 本片不写新段落，改为**更正该注记**（★3）。这是「注记本身过期」
+docs/validation/ledger-backfill.md:36  [tmp/lbf/review-input.diff]  5. **主控错误（须如实留痕）**：⑦ 首轮送审的 `tmp/lbf/review-input.diff` 是**空文件**——它生成于 `git add` **之后**，`git diff` 因而无输出。这是**主控交错了输入**，**不是 ⑦ 的问题**；已按 `git diff --cached` 重建该输入包（非空）。为复核四条处置，本片消耗 **⑦ 额度 1/1 之外的额度例外**，经
+docs/validation/ledger-backfill.md:74  [tmp/lbf/review-input.diff]  - 输入包：`tmp/lbf/review-input.diff`（原始 diff，以 `git diff --cached` 重建）、`tmp/lbf/report-cn.md` 与 `report-en.md`（本报告全文）、`tmp/lbf/gate-tree.txt`（门禁原始输出）、`tmp/lbf/dispositions.md`（★1 至 ★6 与 ①② 的逐条处置，含第 2 轮复核
+docs/validation/ledger-backfill.md:74  [tmp/lbf/report-cn.md]  - 输入包：`tmp/lbf/review-input.diff`（原始 diff，以 `git diff --cached` 重建）、`tmp/lbf/report-cn.md` 与 `report-en.md`（本报告全文）、`tmp/lbf/gate-tree.txt`（门禁原始输出）、`tmp/lbf/dispositions.md`（★1 至 ★6 与 ①② 的逐条处置，含第 2 轮复核
+docs/validation/ledger-backfill.md:74  [tmp/lbf/gate-tree.txt]  - 输入包：`tmp/lbf/review-input.diff`（原始 diff，以 `git diff --cached` 重建）、`tmp/lbf/report-cn.md` 与 `report-en.md`（本报告全文）、`tmp/lbf/gate-tree.txt`（门禁原始输出）、`tmp/lbf/dispositions.md`（★1 至 ★6 与 ①② 的逐条处置，含第 2 轮复核
+docs/validation/ledger-backfill.md:74  [tmp/lbf/dispositions.md]  - 输入包：`tmp/lbf/review-input.diff`（原始 diff，以 `git diff --cached` 重建）、`tmp/lbf/report-cn.md` 与 `report-en.md`（本报告全文）、`tmp/lbf/gate-tree.txt`（门禁原始输出）、`tmp/lbf/dispositions.md`（★1 至 ★6 与 ①② 的逐条处置，含第 2 轮复核
+docs/validation/ledger-backfill.md:74  [tmp/lbf/dd36b9b-trace.txt]  - 输入包：`tmp/lbf/review-input.diff`（原始 diff，以 `git diff --cached` 重建）、`tmp/lbf/report-cn.md` 与 `report-en.md`（本报告全文）、`tmp/lbf/gate-tree.txt`（门禁原始输出）、`tmp/lbf/dispositions.md`（★1 至 ★6 与 ①② 的逐条处置，含第 2 轮复核
+docs/validation/ledger-backfill.md:75  [tmp/lbf/review-round2.md]  - **第 2 轮复审的标的**：四条处置各自的证据（重建后的 diff 非空、ADR-016 已并入表格且双语对称、计数与当场读数一致、溯源输出已入包）与 **ADR-017** 的四要素；第 2 轮的原始回执另存 `tmp/lbf/review-round2.md`（`local-only`）。
+docs/validation/ledger-backfill.md:93  [tmp/lbf/review-input.diff]  - **⑦ 首轮输入包缺陷（主控错误，如实登记）**：首轮送审的 `tmp/lbf/review-input.diff` 是**空文件**（生成时机在暂存之后）⇒ 这是**主控交错了输入**，**不是 ⑦ 的问题**；已按 `git diff --cached` 重建。本片因此消耗 **⑦ 额度 1/1 之外的例外裁定（ADR-017）**。
+docs/validation/ledger-backfill_EN.md:100  [tmp/lbf/]  - Temporary-residue inventory: `tmp/lbf/` retains 19 process files (plans and inventory, assertion scripts, raw outputs, the disposition list, the trace output, the first-round and round-two review-pa
+docs/validation/ledger-backfill_EN.md:101  [tmp/lbf/report-cn.md]  - Landing consistency: `docs/validation/ledger-backfill.md` and `tmp/lbf/report-cn.md` have equal SHA-256 digests (the same holds for `_EN`).
+docs/validation/ledger-backfill_EN.md:104  [tmp/lbf/review-round2.md]  - The raw round-two receipt is landed at `tmp/lbf/review-round2.md` (`local-only`); under the semantic boundary of §5.3 the fact-record writes of ⑧b do not trigger a further re-review (matching the sa
+docs/validation/ledger-backfill_EN.md:142  [tmp/lbf/review-input.diff]  tmp/lbf/review-input.diff	local-only
+docs/validation/ledger-backfill_EN.md:143  [tmp/lbf/gate-tree.txt]  tmp/lbf/gate-tree.txt	local-only
+docs/validation/ledger-backfill_EN.md:144  [tmp/lbf/dispositions.md]  tmp/lbf/dispositions.md	local-only
+docs/validation/ledger-backfill_EN.md:145  [tmp/lbf/dd36b9b-trace.txt]  tmp/lbf/dd36b9b-trace.txt	local-only
+docs/validation/ledger-backfill_EN.md:146  [tmp/lbf/review-round2.md]  tmp/lbf/review-round2.md	local-only
+docs/validation/ledger-backfill_EN.md:32  [tmp/lbf/dd36b9b-trace.txt]  1. **Finding under ① (important)**: the ledger integrity note said the B3a paragraph was still owed, but that paragraph **had already been added by commit `dd36b9b`** (`DEV_PLAN.md:137`, `_EN.md:138`;
+docs/validation/ledger-backfill_EN.md:36  [tmp/lbf/review-input.diff]  5. **Master error (recorded truthfully)**: the first-round input pack's `tmp/lbf/review-input.diff` was an **empty file** — it was generated **after** `git add`, so `git diff` produced no output. This
+docs/validation/ledger-backfill_EN.md:74  [tmp/lbf/review-input.diff]  - Input pack: `tmp/lbf/review-input.diff` (the raw diff, regenerated with `git diff --cached`), `tmp/lbf/report-cn.md` and `report-en.md` (this report in full), `tmp/lbf/gate-tree.txt` (the raw gate o
+docs/validation/ledger-backfill_EN.md:74  [tmp/lbf/report-cn.md]  - Input pack: `tmp/lbf/review-input.diff` (the raw diff, regenerated with `git diff --cached`), `tmp/lbf/report-cn.md` and `report-en.md` (this report in full), `tmp/lbf/gate-tree.txt` (the raw gate o
+docs/validation/ledger-backfill_EN.md:74  [tmp/lbf/gate-tree.txt]  - Input pack: `tmp/lbf/review-input.diff` (the raw diff, regenerated with `git diff --cached`), `tmp/lbf/report-cn.md` and `report-en.md` (this report in full), `tmp/lbf/gate-tree.txt` (the raw gate o
+docs/validation/ledger-backfill_EN.md:74  [tmp/lbf/dispositions.md]  - Input pack: `tmp/lbf/review-input.diff` (the raw diff, regenerated with `git diff --cached`), `tmp/lbf/report-cn.md` and `report-en.md` (this report in full), `tmp/lbf/gate-tree.txt` (the raw gate o
+docs/validation/ledger-backfill_EN.md:74  [tmp/lbf/dd36b9b-trace.txt]  - Input pack: `tmp/lbf/review-input.diff` (the raw diff, regenerated with `git diff --cached`), `tmp/lbf/report-cn.md` and `report-en.md` (this report in full), `tmp/lbf/gate-tree.txt` (the raw gate o
+docs/validation/ledger-backfill_EN.md:75  [tmp/lbf/review-round2.md]  - **Round-two review target**: the evidence behind each of the four dispositions (the regenerated diff is non-empty, ADR-016 is back inside the table in both languages, the count matches the fresh rea
+docs/validation/ledger-backfill_EN.md:93  [tmp/lbf/review-input.diff]  - **First-round input-pack defect (a master error, recorded truthfully)**: the diff sent for the first round, `tmp/lbf/review-input.diff`, was an **empty file** (generated after staging) ⇒ this is the
+docs/validation/s0-spikes.md:47  [tmp/proofrail-t004-fs-probe.go]  go run /tmp/proofrail-t004-fs-probe.go
+docs/validation/s0-spikes.md:48  [tmp/proofrail-t004-crash.go]  go run /tmp/proofrail-t004-crash.go
+docs/validation/s0-spikes.md:49  [tmp/proofrail-t004-queue-probe.go]  go run /tmp/proofrail-t004-queue-probe.go
+docs/validation/s0-spikes.md:50  [tmp/proofrail-t004-process.sh]  /tmp/proofrail-t004-process.sh
+docs/validation/s0-spikes.md:51  [tmp/proofrail-t004-tui]  NO_COLOR=1 /tmp/proofrail-t004-tui --render 12
+docs/validation/s0-spikes_EN.md:47  [tmp/proofrail-t004-fs-probe.go]  go run /tmp/proofrail-t004-fs-probe.go
+docs/validation/s0-spikes_EN.md:48  [tmp/proofrail-t004-crash.go]  go run /tmp/proofrail-t004-crash.go
+docs/validation/s0-spikes_EN.md:49  [tmp/proofrail-t004-queue-probe.go]  go run /tmp/proofrail-t004-queue-probe.go
+docs/validation/s0-spikes_EN.md:50  [tmp/proofrail-t004-process.sh]  /tmp/proofrail-t004-process.sh
+docs/validation/s0-spikes_EN.md:51  [tmp/proofrail-t004-tui]  NO_COLOR=1 /tmp/proofrail-t004-tui --render 12
+docs/validation/s1-install-drill.md:12  [tmp/t018-install-drill/]  4. 演练根目录仅为仓库忽略的 `tmp/t018-install-drill/`，不写用户 PATH、注册表、系统目录、源树或 Git。
+docs/validation/s1-install-drill_EN.md:12  [tmp/t018-install-drill/]  4. The drill root was the ignored `tmp/t018-install-drill/` only. It did not write user PATH, the registry, system directories, the source tree, or Git.
+docs/validation/s1-reach-reachability.md:110  [tmp/s1-reach/]  - 临时残留清单：`tmp/s1-reach/` 保留 13 个过程文件（方案书、草稿、断言脚本、门禁原始输出、审查包副本），按 OB-49 与用户既有指令**不清理**，处置 = `local-only`；仓库内未发现未跟踪的非临时残留。
+docs/validation/s1-reach-reachability.md:147  [tmp/s1-reach/plan-01.md]  tmp/s1-reach/plan-01.md	local-only
+docs/validation/s1-reach-reachability.md:148  [tmp/s1-reach/review-input.diff]  tmp/s1-reach/review-input.diff	local-only
+docs/validation/s1-reach-reachability.md:149  [tmp/s1-reach/gate-tree.txt]  tmp/s1-reach/gate-tree.txt	local-only
+docs/validation/s1-reach-reachability.md:88  [tmp/s1-reach/plan-01.md]  - 输入包（主控落盘，路径交给审查方）：`tmp/s1-reach/plan-01.md`（① 方案书）、`tmp/s1-reach/review-input.diff`（`DELIVERY_DIRECTIVE{,_EN}`、`ADR_REGISTER{,_EN}`、`REMAINING_SLICES{,_EN}`、`DEV_PLAN{,_EN}` 的原始 diff）、`tmp/s1-reach/
+docs/validation/s1-reach-reachability.md:88  [tmp/s1-reach/review-input.diff]  - 输入包（主控落盘，路径交给审查方）：`tmp/s1-reach/plan-01.md`（① 方案书）、`tmp/s1-reach/review-input.diff`（`DELIVERY_DIRECTIVE{,_EN}`、`ADR_REGISTER{,_EN}`、`REMAINING_SLICES{,_EN}`、`DEV_PLAN{,_EN}` 的原始 diff）、`tmp/s1-reach/
+docs/validation/s1-reach-reachability.md:88  [tmp/s1-reach/s1-reach-reachability.md]  - 输入包（主控落盘，路径交给审查方）：`tmp/s1-reach/plan-01.md`（① 方案书）、`tmp/s1-reach/review-input.diff`（`DELIVERY_DIRECTIVE{,_EN}`、`ADR_REGISTER{,_EN}`、`REMAINING_SLICES{,_EN}`、`DEV_PLAN{,_EN}` 的原始 diff）、`tmp/s1-reach/
+docs/validation/s1-reach-reachability.md:88  [tmp/s1-reach/gate-tree.txt]  - 输入包（主控落盘，路径交给审查方）：`tmp/s1-reach/plan-01.md`（① 方案书）、`tmp/s1-reach/review-input.diff`（`DELIVERY_DIRECTIVE{,_EN}`、`ADR_REGISTER{,_EN}`、`REMAINING_SLICES{,_EN}`、`DEV_PLAN{,_EN}` 的原始 diff）、`tmp/s1-reach/
+docs/validation/s1-reach-reachability_EN.md:110  [tmp/s1-reach/]  - Temporary-residue inventory: `tmp/s1-reach/` retains 13 process files (the plan, drafts, assertion scripts, the raw gate output and the review-pack copies), **not cleaned** per OB-49 and the standin
+docs/validation/s1-reach-reachability_EN.md:147  [tmp/s1-reach/plan-01.md]  tmp/s1-reach/plan-01.md	local-only
+docs/validation/s1-reach-reachability_EN.md:148  [tmp/s1-reach/review-input.diff]  tmp/s1-reach/review-input.diff	local-only
+docs/validation/s1-reach-reachability_EN.md:149  [tmp/s1-reach/gate-tree.txt]  tmp/s1-reach/gate-tree.txt	local-only
+docs/validation/s1-reach-reachability_EN.md:88  [tmp/s1-reach/plan-01.md]  - Input pack (laid down by the master, paths given to the reviewers): `tmp/s1-reach/plan-01.md` (the ① plan), `tmp/s1-reach/review-input.diff` (the raw diff of `DELIVERY_DIRECTIVE{,_EN}`, `ADR_REGISTE
+docs/validation/s1-reach-reachability_EN.md:88  [tmp/s1-reach/review-input.diff]  - Input pack (laid down by the master, paths given to the reviewers): `tmp/s1-reach/plan-01.md` (the ① plan), `tmp/s1-reach/review-input.diff` (the raw diff of `DELIVERY_DIRECTIVE{,_EN}`, `ADR_REGISTE
+docs/validation/s1-reach-reachability_EN.md:88  [tmp/s1-reach/s1-reach-reachability.md]  - Input pack (laid down by the master, paths given to the reviewers): `tmp/s1-reach/plan-01.md` (the ① plan), `tmp/s1-reach/review-input.diff` (the raw diff of `DELIVERY_DIRECTIVE{,_EN}`, `ADR_REGISTE
+docs/validation/s1-reach-reachability_EN.md:88  [tmp/s1-reach/gate-tree.txt]  - Input pack (laid down by the master, paths given to the reviewers): `tmp/s1-reach/plan-01.md` (the ① plan), `tmp/s1-reach/review-input.diff` (the raw diff of `DELIVERY_DIRECTIVE{,_EN}`, `ADR_REGISTE
+docs/validation/sw-directive-switchover.md:157  [tmp/sw-blind-review.diff]  **审查输入包**：密封变更集 `tmp/sw-blind-review.diff`（93474 B；**剔除**本报告以保证盲审隔离）+ 仓库只读访问。**盲审隔离证明**：首轮**未附**任何我方清单；未提供 ⑤/⑥ 结论。
+docs/validation/sw-directive-switchover.md:167  [tmp/sw-mai-rerun.diff]  - 输入：`tmp/sw-mai-rerun.diff` + 只读仓库；**三轮均不附任何清单**（含整改后重跑）。
+docs/validation/sw-directive-switchover.md:170  [tmp/sw-*.diff]  - **证据清理**：三个密封包（`tmp/sw-*.diff`）属 `tmp/` 临时证据，按 §1.5 **用完已删除**（不随提交入库；本报告只保留命令与统计值）。
+docs/validation/sw-directive-switchover_EN.md:157  [tmp/sw-blind-review.diff]  **Review input package**: sealed change set `tmp/sw-blind-review.diff` (93474 B; this report was **excluded** to keep the round blind) + read-only repo access. **Blind-isolation proof**: round 1 attac
+docs/validation/sw-directive-switchover_EN.md:167  [tmp/sw-mai-rerun.diff]  - Inputs: `tmp/sw-mai-rerun.diff` + read-only repo; **no list was attached in any of the three rounds** (including the post-fix re-runs).
+docs/validation/sw-directive-switchover_EN.md:170  [tmp/sw-*.diff]  - **Evidence cleanup**: the three sealed packages (`tmp/sw-*.diff`) are `tmp/` scratch; per §1.5 they were **deleted once used** (never committed; this report keeps only the commands and statistics).
+docs/validation/sw3-role-set-versioning.md:61  [tmp/sw3-review.diff]  **结论行**：`INDEPENDENT SCAN: PASS`（0 发现）。**首轮不附清单**；Section A–E 格式合规，Section D 逐项给出“删掉某守卫谁会红”，Section E 列明“无法验证的部分”与“什么会推翻 PASS”。输入：`tmp/sw3-review.diff` + 只读仓库。计量：SW-3 自有额度 **1/3**。
+docs/validation/sw3-role-set-versioning_EN.md:61  [tmp/sw3-review.diff]  **Verdict line**: `INDEPENDENT SCAN: PASS` (0 findings). **No list was attached in round 1**; Sections A–E were format-compliant, Section D gave the per-guard "which check goes red" audit, and Section
+docs/validation/t027-assembly-min.md:101  [tmp/assembly-min/v3.txt]  3. **DR-8 首跑红的三份证据（须逐字）**：`tmp/assembly-min/v3.txt`（首跑红：Windows 临时目录 rename 报 `Access is denied`）、`tmp/assembly-min/v4.txt`（单包隔离复跑绿）、`tmp/assembly-min/snapshot-flake.txt`（抖动结论摘录）；该包不在本片改动集内。
+docs/validation/t027-assembly-min.md:101  [tmp/assembly-min/v4.txt]  3. **DR-8 首跑红的三份证据（须逐字）**：`tmp/assembly-min/v3.txt`（首跑红：Windows 临时目录 rename 报 `Access is denied`）、`tmp/assembly-min/v4.txt`（单包隔离复跑绿）、`tmp/assembly-min/snapshot-flake.txt`（抖动结论摘录）；该包不在本片改动集内。
+docs/validation/t027-assembly-min.md:101  [tmp/assembly-min/snapshot-flake.txt]  3. **DR-8 首跑红的三份证据（须逐字）**：`tmp/assembly-min/v3.txt`（首跑红：Windows 临时目录 rename 报 `Access is denied`）、`tmp/assembly-min/v4.txt`（单包隔离复跑绿）、`tmp/assembly-min/snapshot-flake.txt`（抖动结论摘录）；该包不在本片改动集内。
+docs/validation/t027-assembly-min.md:12  [tmp/assembly-min/DESIGN.md]  - **产物**：本报告、自由度清单、上列的 5 个 Go 文件、`tmp/assembly-min/DESIGN.md`（方案书与三轮整改记录，工作区专用）、变异脚本与证据读数（`tmp/assembly-min/`，工作区专用）。
+docs/validation/t027-assembly-min.md:12  [tmp/assembly-min/]  - **产物**：本报告、自由度清单、上列的 5 个 Go 文件、`tmp/assembly-min/DESIGN.md`（方案书与三轮整改记录，工作区专用）、变异脚本与证据读数（`tmp/assembly-min/`，工作区专用）。
+docs/validation/t027-assembly-min.md:132  [tmp/assembly-min/]  - 文档：本报告对与自由度清单；步骤 0 的 `DELIVERY_DIRECTIVE{,_EN}`（v1.17）与 `ADR_REGISTER{,_EN}`（ADR-018）；`tmp/assembly-min/`（方案书、三轮整改记录、变异脚本与证据读数，工作区专用）
+docs/validation/t027-assembly-min.md:154  [tmp/assembly-min/]  - **未执行事项**：B 段的真实 enforcement 落地；正向全链的 Windows 证据；OB-57 的根因修复；OB-58 至 OB-61 的登记与处置（下一片起跑时统一落台账）；`tmp/assembly-min/` 的过程文件按既有指令保留（工作区专用）。
+docs/validation/t027-assembly-min.md:164  [tmp/dml/ci-run-37073985144.txt]  - **CI 双绿（终态）**：CI run `37073985144`（head `d2d6370`）**两腿均通过**——Ubuntu 腿与 Windows 腿的 `Gates` 步各自实测 `SELFTEST: PASS 248/248`、`GATE REPORT scope=ci changed=8`、`TOTAL_FAIL=0`。取证命令 = `gh run view 370739851
+docs/validation/t027-assembly-min.md:183  [tmp/assembly-min/]  tmp/assembly-min/**	local-only
+docs/validation/t027-assembly-min.md:184  [tmp/dml/ci-run-37073985144.txt]  tmp/dml/ci-run-37073985144.txt	local-only
+docs/validation/t027-assembly-min.md:32  [tmp/assembly-min/before/]  3. **主控自误（须如实留痕）**：为给 ⑤ 准备「改动前」快照，主控把 9 个文件的副本放进 `tmp/assembly-min/before/`；其中 `.go` 副本被 `go build ./...` 当作新包编译，导致基线门禁转红。处置：目录改名为 `_before`（下划线前缀被 Go 工具链忽略）、脚本同步更新、基线恢复绿。
+docs/validation/t027-assembly-min.md:75  [tmp/assembly-min/review-pack-r3.md]  - **第 3 轮复审的输入包**：`tmp/assembly-min/review-pack-r3.md`（索引）、`change-set.diff`（全切片）、`r3-remediation.diff`、`r4-remediation.diff`、`mutation.txt`、`pre-review-r1.md`、`pre-review-r2.md`、门禁与测试读数、`v3.txt` + `v
+docs/validation/t027-assembly-min_EN.md:101  [tmp/assembly-min/v3.txt]  3. **The three evidences for the DR-8 first-red run (verbatim)**: `tmp/assembly-min/v3.txt` (the first red run: rename in a Windows temporary directory reported `Access is denied`), `tmp/assembly-min/
+docs/validation/t027-assembly-min_EN.md:101  [tmp/assembly-min/v4.txt]  3. **The three evidences for the DR-8 first-red run (verbatim)**: `tmp/assembly-min/v3.txt` (the first red run: rename in a Windows temporary directory reported `Access is denied`), `tmp/assembly-min/
+docs/validation/t027-assembly-min_EN.md:101  [tmp/assembly-min/snapshot-flake.txt]  3. **The three evidences for the DR-8 first-red run (verbatim)**: `tmp/assembly-min/v3.txt` (the first red run: rename in a Windows temporary directory reported `Access is denied`), `tmp/assembly-min/
+docs/validation/t027-assembly-min_EN.md:12  [tmp/assembly-min/DESIGN.md]  - **Artifacts**: this report, the freedom list, the five Go files listed above, `tmp/assembly-min/DESIGN.md` (design plus three remediation records, workspace-local), the mutation script and the evide
+docs/validation/t027-assembly-min_EN.md:12  [tmp/assembly-min/]  - **Artifacts**: this report, the freedom list, the five Go files listed above, `tmp/assembly-min/DESIGN.md` (design plus three remediation records, workspace-local), the mutation script and the evide
+docs/validation/t027-assembly-min_EN.md:132  [tmp/assembly-min/]  - Documents: this report pair and the freedom list; the step 0 `DELIVERY_DIRECTIVE{,_EN}` (v1.17) and `ADR_REGISTER{,_EN}` (ADR-018); `tmp/assembly-min/` (design, the three remediation records, the mu
+docs/validation/t027-assembly-min_EN.md:154  [tmp/assembly-min/]  - **Not executed**: the segment B real enforcement landing; Windows evidence for the positive full chain; the OB-57 root-cause fix; the registration and disposition of OB-58 to OB-61 (they land in the
+docs/validation/t027-assembly-min_EN.md:164  [tmp/dml/ci-run-37073985144.txt]  - **CI green on both legs (final state)**: CI run `37073985144` (head `d2d6370`) **passed both legs** - the `Gates` step of the Ubuntu leg and of the Windows leg each measured `SELFTEST: PASS 248/248`
+docs/validation/t027-assembly-min_EN.md:183  [tmp/assembly-min/]  tmp/assembly-min/**	local-only
+docs/validation/t027-assembly-min_EN.md:184  [tmp/dml/ci-run-37073985144.txt]  tmp/dml/ci-run-37073985144.txt	local-only
+docs/validation/t027-assembly-min_EN.md:32  [tmp/assembly-min/before/]  3. **Master error (recorded faithfully)**: to prepare a before-change snapshot for ⑤ the master copied nine files into `tmp/assembly-min/before/`; the `.go` copies were treated as new packages by `go 
+docs/validation/t027-assembly-min_EN.md:75  [tmp/assembly-min/review-pack-r3.md]  - **Round three re-review input pack**: `tmp/assembly-min/review-pack-r3.md` (index), `change-set.diff` (whole slice), `r3-remediation.diff`, `r4-remediation.diff`, `mutation.txt`, `pre-review-r1.md`,
+docs/validation/t027-at23-e2e.md:111  [tmp/b4/probe/f2-tree-calibration.txt]  | 偏差 5（③ 复核） | 如实记录 | 负载 `spawn` 模式的子进程会覆写 `stub.pid`，故树取证中 `stub.pid` 与 `stub-child.pid` 退化为同一 pid。树的证伪力不受损（被验证的正是长命子进程；见 `tmp/b4/probe/f2-tree-calibration.txt` 的未受管标定），但父进程 pid 不可由该工件读出，改由停止证明与 Job 
+docs/validation/t027-at23-e2e.md:144  [tmp/b4/]  `③` 实测（保留对照）：四项基础门禁与 `--selftest` 结果同上；`--all --scope=tree` 在本轮整改前报 `TOTAL_FAIL=1`，唯一失败是 `G7-b`（声明的 repo 产物尚未 `git add`，属 ④ 的暂存职责）；`G6-3` 与 `G6-4` 在报告草稿上零命中、`G4b` 差集为空。另测：`git cat-file -e 'HEAD:tools/
+docs/validation/t027-at23-e2e.md:175  [tmp/b4/SHA256SUMS.txt]  | 包完整性 | `tmp/b4/SHA256SUMS.txt` 全量重算：347 条、缺失 0、失配 0 |
+docs/validation/t027-at23-e2e.md:20  [tmp/b4/input/b4-chain.json]  | `tmp/b4/input/b4-chain.json` | F1 至 F4 任务链定义（`code` + `isolated` 步） | `bb8c100d8d36387c40d7966044c50c994ccd45833647b0fa144a8efb7369361a` |
+docs/validation/t027-at23-e2e.md:204  [tmp/b4/]  tmp/b4/**	local-only
+docs/validation/t027-at23-e2e.md:21  [tmp/b4/input/b4-chain-hook.json]  | `tmp/b4/input/b4-chain-hook.json` | F5 任务链定义（`code` 步 + `verify` 挂钩步） | `c7ad22c5741dbc02d5b35697898b5cf8a85a89b2fb7b5a04e1398ccf9c795237` |
+docs/validation/t027-at23-e2e.md:22  [tmp/b4/input/b4-inputs.json]  | `tmp/b4/input/b4-inputs.json` | 声明输入：身份绑定 + 父快照摘要 | pack 的 `declaredInputs.sha256` 已记录 |
+docs/validation/t027-at23-e2e.md:23  [tmp/b4/bin/prfrail.exe]  | `tmp/b4/bin/prfrail.exe` | 真实 CLI（`validate` 与 `preview` 腿） | `204aa5bea0b2fbd493f4522b2a9ef08b025db44a61deeacf0fd1428e8a54d824` |
+docs/validation/t027-at23-e2e.md:24  [tmp/b4/bin/agent-stub.exe]  | `tmp/b4/bin/agent-stub.exe` | 受管负载（pin `agent-stub-0.1.0`） | `01ac99b6ef5684785e90187fa90f78c09f91b9805df63d10a07e18e1ed47314d`，`-version` 回显 `agent-stub-0.1.0` |
+docs/validation/t027-at23-e2e.md:25  [tmp/b4/bin/b4-e2e.exe]  | `tmp/b4/bin/b4-e2e.exe` | 装配 harness（⑦ 审查对象） | `2f376099b437e664da362533efe7a3e607ea043ea2b4d74ababae30c704e2cab` |
+docs/validation/t027-at23-e2e.md:27  [tmp/b4/bin/]  摘要绑定本包 `tmp/b4/bin/**` 内被 `SHA256SUMS.txt` 固定的三份二进制；重跑驱动器会重建二进制并给出不同摘要（本机 Go 构建不保证逐字节可复现），故摘要仅对本次运行有效。
+docs/validation/t027-at23-e2e.md:41  [tmp/b4/pack-verdict.json]  逐次调用的**完整命令原文 + cwd + 退出码 + stdout/stderr** 由驱动器记录：`tmp/b4/pack-verdict.json` 的 `invocations` 数组给出命令、cwd、退出码，以及 stdout/stderr 的文件路径、sha256、字节数与前 600 字符摘录；原文逐字落盘于 `tmp/b4/evidence/<case>/<label>.stdout
+docs/validation/t027-at23-e2e.md:41  [tmp/b4/evidence/]  逐次调用的**完整命令原文 + cwd + 退出码 + stdout/stderr** 由驱动器记录：`tmp/b4/pack-verdict.json` 的 `invocations` 数组给出命令、cwd、退出码，以及 stdout/stderr 的文件路径、sha256、字节数与前 600 字符摘录；原文逐字落盘于 `tmp/b4/evidence/<case>/<label>.stdout
+docs/validation/t027-at23-e2e.md:45  [tmp/b4/bin/]  | 构建 | `go build -o tmp/b4/bin/<artifact>.exe <pkg>` | 仓库根 |
+docs/validation/t027-at23-e2e.md:46  [tmp/b4/bin/prfrail.exe]  | CLI 腿 | `tmp/b4/bin/prfrail.exe validate` 或 `preview --chain <chain.json>` | 仓库根 |
+docs/validation/t027-at23-e2e.md:47  [tmp/b4/bin/b4-e2e.exe]  | 声明输入 | `tmp/b4/bin/b4-e2e.exe -emit-record -chain <chain.json> -workspace <seed> -out <inputs.json>` | 仓库根 |
+docs/validation/t027-at23-e2e.md:48  [tmp/b4/bin/b4-e2e.exe]  | 逐面逐次 | `tmp/b4/bin/b4-e2e.exe -face <fN> -case <pos 或 neg> -run-root <dir> -inputs <json> -chain <json> -stub <exe> -phase <run 或 park 或 recover 或 forge 或 halt 或 resume> -verdict <json>` | 仓库根 |
+docs/validation/t027-at23-e2e.md:65  [tmp/b4/SHA256SUMS.txt]  ③ 独立复核（不采信 ② 的汇总）：逐文件重算 `tmp/b4/SHA256SUMS.txt`，声明集与磁盘集全等且失配为零（`driver-stdout.txt` 与 `driver-stderr.txt` 由调用驱动器的那层 shell 写出、驱动器算哈希时其句柄仍开着，故按文件名排除，并在 `pack-verdict.json` 的 `excludedFromChecksums` 中声明）；
+docs/validation/t027-at23-e2e.md:75  [tmp/b4/evidence/f1-neg2/verdict-run.json]  | F1 反向（`f1/neg2`） | 受管进程已退出、终局已发布并路由后，由实验者向工作树写入与 `mutate-workspace` 逐字节相同的文件 | 冻结 diff 仍为空；postflight 判 `proofrail:b4-postflight-manifest-mismatch:1`（detail 为该路径）；事件日志 `REPAIR_PENDING` / `postflight
+docs/validation/t027-at23-e2e.md:75  [tmp/b4/runs/f1-neg2/events/state-events.jsonl]  | F1 反向（`f1/neg2`） | 受管进程已退出、终局已发布并路由后，由实验者向工作树写入与 `mutate-workspace` 逐字节相同的文件 | 冻结 diff 仍为空；postflight 判 `proofrail:b4-postflight-manifest-mismatch:1`（detail 为该路径）；事件日志 `REPAIR_PENDING` / `postflight
+docs/validation/t027-at23-e2e.md:76  [tmp/b4/evidence/f1-neg3/verdict-run.json]  | F1 边界腿（`f1/neg3`） | 同一注入改落到工作树的 `tmp/` 子树（快照捕捉默认排除 `tmp/**`） | 无失败点：postflight 重扫不可见，任务达 `PASSED`——该现象即「不变工作树」主张的边界，登记为偏差 | `tmp/b4/evidence/f1-neg3/verdict-run.json`；成因见 `internal/snapshot/capture.
+docs/validation/t027-at23-e2e.md:77  [tmp/b4/evidence/f2-pos/verdict-run.json]  | F2 正向 | 负载 `-mode hang`，看门狗上界 5s | 映射为 `uncertain`、无冻结事实、错误证据 5 枚 | `tmp/b4/evidence/f2-pos/verdict-run.json` |
+docs/validation/t027-at23-e2e.md:78  [tmp/b4/evidence/f3-pos/verdict-run.json]  | F3 正向 | 负载 `-mode run -no-marker` | 日志完整性缺口导致 `uncertain` | `tmp/b4/evidence/f3-pos/verdict-run.json` |
+docs/validation/t027-at23-e2e.md:79  [tmp/b4/evidence/f4-neg/verdict-forge.json]  | F4 反向 | 伪造 priorCompletionHash 的 resume 终局 | `ErrAgentRunnerResumeContinuityUnproven`；事件日志摘要前后相等 | `tmp/b4/evidence/f4-neg/verdict-forge.json`；重跑腿 `tmp/b4/evidence/f4-neg-r2/verdict-forge.json` 同 ve
+docs/validation/t027-at23-e2e.md:79  [tmp/b4/evidence/f4-neg-r2/verdict-forge.json]  | F4 反向 | 伪造 priorCompletionHash 的 resume 终局 | `ErrAgentRunnerResumeContinuityUnproven`；事件日志摘要前后相等 | `tmp/b4/evidence/f4-neg/verdict-forge.json`；重跑腿 `tmp/b4/evidence/f4-neg-r2/verdict-forge.json` 同 ve
+docs/validation/t027-at23-e2e.md:80  [tmp/b4/evidence/f5-neg/verdict-resume.json]  | F5 反向 | 终局冻结后向工作树写入标记文件 | postflight 判 `failed`，任务 `REPAIR_PENDING`、链 `PAUSED` | `tmp/b4/evidence/f5-neg/verdict-resume.json`；重跑腿 `tmp/b4/evidence/f5-neg-r2/verdict-resume.json` 同 verdict 类、同 `REPAI
+docs/validation/t027-at23-e2e.md:80  [tmp/b4/evidence/f5-neg-r2/verdict-resume.json]  | F5 反向 | 终局冻结后向工作树写入标记文件 | postflight 判 `failed`，任务 `REPAIR_PENDING`、链 `PAUSED` | `tmp/b4/evidence/f5-neg/verdict-resume.json`；重跑腿 `tmp/b4/evidence/f5-neg-r2/verdict-resume.json` 同 verdict 类、同 `REPAI
+docs/validation/t027-at23-e2e_EN.md:111  [tmp/b4/probe/f2-tree-calibration.txt]  | Deviation 5 (③ recheck) | recorded as measured | Under the `spawn` load the descendant overwrites `stub.pid`, so `stub.pid` and `stub-child.pid` degenerate to the same pid in the tree evidence. The 
+docs/validation/t027-at23-e2e_EN.md:144  [tmp/b4/]  `③` (kept for comparison): the four base gates and `--selftest` gave the same results; `--all --scope=tree` reported `TOTAL_FAIL=1` before this remediation round, the single failure being `G7-b` (the 
+docs/validation/t027-at23-e2e_EN.md:175  [tmp/b4/SHA256SUMS.txt]  | Pack integrity | `tmp/b4/SHA256SUMS.txt` recomputed in full: 347 entries, 0 missing, 0 mismatched |
+docs/validation/t027-at23-e2e_EN.md:20  [tmp/b4/input/b4-chain.json]  | `tmp/b4/input/b4-chain.json` | F1 to F4 chain definition (`code` plus `isolated` step) | `bb8c100d8d36387c40d7966044c50c994ccd45833647b0fa144a8efb7369361a` |
+docs/validation/t027-at23-e2e_EN.md:204  [tmp/b4/]  tmp/b4/**	local-only
+docs/validation/t027-at23-e2e_EN.md:21  [tmp/b4/input/b4-chain-hook.json]  | `tmp/b4/input/b4-chain-hook.json` | F5 chain definition (`code` step plus `verify` hook step) | `c7ad22c5741dbc02d5b35697898b5cf8a85a89b2fb7b5a04e1398ccf9c795237` |
+docs/validation/t027-at23-e2e_EN.md:22  [tmp/b4/input/b4-inputs.json]  | `tmp/b4/input/b4-inputs.json` | Declared inputs: identity binding plus parent snapshot digest | recorded as `declaredInputs.sha256` in the pack |
+docs/validation/t027-at23-e2e_EN.md:23  [tmp/b4/bin/prfrail.exe]  | `tmp/b4/bin/prfrail.exe` | Real CLI (the `validate` and `preview` legs) | `204aa5bea0b2fbd493f4522b2a9ef08b025db44a61deeacf0fd1428e8a54d824` |
+docs/validation/t027-at23-e2e_EN.md:24  [tmp/b4/bin/agent-stub.exe]  | `tmp/b4/bin/agent-stub.exe` | Managed workload (pinned to `agent-stub-0.1.0`) | `01ac99b6ef5684785e90187fa90f78c09f91b9805df63d10a07e18e1ed47314d`, and `-version` echoes `agent-stub-0.1.0` |
+docs/validation/t027-at23-e2e_EN.md:25  [tmp/b4/bin/b4-e2e.exe]  | `tmp/b4/bin/b4-e2e.exe` | Assembly harness (the ⑦ review object) | `2f376099b437e664da362533efe7a3e607ea043ea2b4d74ababae30c704e2cab` |
+docs/validation/t027-at23-e2e_EN.md:27  [tmp/b4/bin/]  The digests bind the three binaries that `SHA256SUMS.txt` pins inside this pack's `tmp/b4/bin/**`; re-running the driver rebuilds them and yields different digests (Go builds are not byte-reproducible
+docs/validation/t027-at23-e2e_EN.md:41  [tmp/b4/pack-verdict.json]  The **exact command text plus cwd plus exit code plus stdout/stderr** of every invocation is recorded by the driver: the `invocations` array of `tmp/b4/pack-verdict.json` carries the command, the cwd,
+docs/validation/t027-at23-e2e_EN.md:41  [tmp/b4/evidence/]  The **exact command text plus cwd plus exit code plus stdout/stderr** of every invocation is recorded by the driver: the `invocations` array of `tmp/b4/pack-verdict.json` carries the command, the cwd,
+docs/validation/t027-at23-e2e_EN.md:45  [tmp/b4/bin/]  | Build | `go build -o tmp/b4/bin/<artifact>.exe <pkg>` | repository root |
+docs/validation/t027-at23-e2e_EN.md:46  [tmp/b4/bin/prfrail.exe]  | CLI leg | `tmp/b4/bin/prfrail.exe validate` or `preview --chain <chain.json>` | repository root |
+docs/validation/t027-at23-e2e_EN.md:47  [tmp/b4/bin/b4-e2e.exe]  | Declared inputs | `tmp/b4/bin/b4-e2e.exe -emit-record -chain <chain.json> -workspace <seed> -out <inputs.json>` | repository root |
+docs/validation/t027-at23-e2e_EN.md:48  [tmp/b4/bin/b4-e2e.exe]  | Per face and phase | `tmp/b4/bin/b4-e2e.exe -face <fN> -case <pos or neg> -run-root <dir> -inputs <json> -chain <json> -stub <exe> -phase <run or park or recover or forge or halt or resume> -verdict
+docs/validation/t027-at23-e2e_EN.md:65  [tmp/b4/SHA256SUMS.txt]  ③ independent recheck (the ② summary is not taken on trust): `tmp/b4/SHA256SUMS.txt` is recomputed file by file, so the declared set and the on-disk set are equal with zero mismatches (`driver-stdout.
+docs/validation/t027-at23-e2e_EN.md:75  [tmp/b4/evidence/f1-neg2/verdict-run.json]  | F1 reverse (`f1/neg2`) | after the managed process had exited and the terminal had been published and routed, the experimenter writes the byte-identical `mutate-workspace` file into the workspace | 
+docs/validation/t027-at23-e2e_EN.md:75  [tmp/b4/runs/f1-neg2/events/state-events.jsonl]  | F1 reverse (`f1/neg2`) | after the managed process had exited and the terminal had been published and routed, the experimenter writes the byte-identical `mutate-workspace` file into the workspace | 
+docs/validation/t027-at23-e2e_EN.md:76  [tmp/b4/evidence/f1-neg3/verdict-run.json]  | F1 boundary leg (`f1/neg3`) | the same injection placed under the workspace's `tmp/` subtree (the snapshot capturer excludes `tmp/**` by default) | no failure point: the postflight rescan cannot see
+docs/validation/t027-at23-e2e_EN.md:77  [tmp/b4/evidence/f2-pos/verdict-run.json]  | F2 forward | Load `-mode hang`, watchdog bound 5s | mapped to `uncertain`, no frozen facts, five error-evidence digests | `tmp/b4/evidence/f2-pos/verdict-run.json` |
+docs/validation/t027-at23-e2e_EN.md:78  [tmp/b4/evidence/f3-pos/verdict-run.json]  | F3 forward | Load `-mode run -no-marker` | the log completeness gap degrades the outcome to `uncertain` | `tmp/b4/evidence/f3-pos/verdict-run.json` |
+docs/validation/t027-at23-e2e_EN.md:79  [tmp/b4/evidence/f4-neg/verdict-forge.json]  | F4 reverse | Forged resume terminal with a made-up priorCompletionHash | `ErrAgentRunnerResumeContinuityUnproven`; the event log digest is equal before and after | `tmp/b4/evidence/f4-neg/verdict-fo
+docs/validation/t027-at23-e2e_EN.md:79  [tmp/b4/evidence/f4-neg-r2/verdict-forge.json]  | F4 reverse | Forged resume terminal with a made-up priorCompletionHash | `ErrAgentRunnerResumeContinuityUnproven`; the event log digest is equal before and after | `tmp/b4/evidence/f4-neg/verdict-fo
+docs/validation/t027-at23-e2e_EN.md:80  [tmp/b4/evidence/f5-neg/verdict-resume.json]  | F5 reverse | A marker file written into the workspace after the terminal was frozen | postflight returns `failed`, the task goes to `REPAIR_PENDING` and the chain to `PAUSED` | `tmp/b4/evidence/f5-n
+docs/validation/t027-at23-e2e_EN.md:80  [tmp/b4/evidence/f5-neg-r2/verdict-resume.json]  | F5 reverse | A marker file written into the workspace after the terminal was frozen | postflight returns `failed`, the task goes to `REPAIR_PENDING` and the chain to `PAUSED` | `tmp/b4/evidence/f5-n
+docs/validation/t027-b1-candidate-live-discovery.md:139  [tmp/b1/]  - **证据固化**：决定性工件已脱敏后入库存于 **`docs/validation/evidence/b1-20260917/`**（含 argv/OS argv/availability/产品报错原文/最小可用性转录，逐文件 sha256 见该目录 README）；**原始 JSONL 与 CLI 日志不入库**（CLI 自带日志含 GitHub 账号 URL）；`tmp/b1/` 为本片过
+docs/validation/t027-b1-candidate-live-discovery.md:139  [tmp/.gitkeep]  - **证据固化**：决定性工件已脱敏后入库存于 **`docs/validation/evidence/b1-20260917/`**（含 argv/OS argv/availability/产品报错原文/最小可用性转录，逐文件 sha256 见该目录 README）；**原始 JSONL 与 CLI 日志不入库**（CLI 自带日志含 GitHub 账号 URL）；`tmp/b1/` 为本片过
+docs/validation/t027-b1-candidate-live-discovery.md:142  [tmp/.gitkeep]  - **未改**任何生产文件；`tmp/` 下证据与脚本在 B1 收尾提交前按仓库纪律清理，完成后仅剩 `tmp/.gitkeep`（报告保留名称、大小与 sha256 前缀）。
+docs/validation/t027-b1-candidate-live-discovery.md:198  [tmp/b1]  - **第 1 轮 `RE-REVIEW: FINDINGS`**（1 High + 2 Medium + 1 Low）：工件根缺 `tmp/` 子树约束、不拒 reparse 祖先与已存在目录（High）；dry-run 仍会执行 `--version`，使 `-Run` 不再是唯一执行入口（Medium）；自检中“pin 不符不启动”断言指向错误路径且无进程侧断言（Medium）；报告称已清理
+docs/validation/t027-b1-candidate-live-discovery.md:210  [tmp/b1/evidence/]  - **不入库**：完整 JSONL 转录与 CLI 自带日志（后者含 GitHub 账号 URL）；本节下表为收尾清理前的 `tmp/b1/evidence/` 清单，仅供对照。
+docs/validation/t027-b1-candidate-live-discovery.md:24  [tmp/b1/npm/node_modules/@github/copilot-win32-x64/copilot.exe]  | 新版候选（本次下载，隔离目录，不动全局安装） | `tmp/b1/npm/node_modules/@github/copilot-win32-x64/copilot.exe`（`npm install --prefix tmp/b1/npm @github/copilot@1.0.85`） | **1.0.85** | `564b1f20a359042c198ad6fb23be23272c0
+docs/validation/t027-b1-candidate-live-discovery.md:24  [tmp/b1/npm]  | 新版候选（本次下载，隔离目录，不动全局安装） | `tmp/b1/npm/node_modules/@github/copilot-win32-x64/copilot.exe`（`npm install --prefix tmp/b1/npm @github/copilot@1.0.85`） | **1.0.85** | `564b1f20a359042c198ad6fb23be23272c0
+docs/validation/t027-b1-candidate-live-discovery_EN.md:139  [tmp/b1/]  - **Evidence pinned**: the decisive artifacts are sanitised and committed under **`docs/validation/evidence/b1-20260917/`** (argv / OS argv / availability / the product error text / the minimal-availa
+docs/validation/t027-b1-candidate-live-discovery_EN.md:139  [tmp/.gitkeep]  - **Evidence pinned**: the decisive artifacts are sanitised and committed under **`docs/validation/evidence/b1-20260917/`** (argv / OS argv / availability / the product error text / the minimal-availa
+docs/validation/t027-b1-candidate-live-discovery_EN.md:142  [tmp/.gitkeep]  - **No production file changed**; this slice's `tmp/` scratch content is removed before the B1 closeout commit per repo discipline, leaving only `tmp/.gitkeep` (the report keeps names, sizes and sha25
+docs/validation/t027-b1-candidate-live-discovery_EN.md:198  [tmp/b1]  - **Round 1 `RE-REVIEW: FINDINGS`** (1 High + 2 Medium + 1 Low): the artifact root lacked the `tmp/` subtree constraint and refused neither reparse ancestors nor existing directories (High); the dry r
+docs/validation/t027-b1-candidate-live-discovery_EN.md:210  [tmp/b1/evidence/]  - **Not committed**: the full JSONL transcripts and the CLI's own logs (the latter contain a GitHub account URL); the table below is the pre-cleanup `tmp/b1/evidence/` listing, kept for cross-referenc
+docs/validation/t027-b1-candidate-live-discovery_EN.md:24  [tmp/b1/npm/node_modules/@github/copilot-win32-x64/copilot.exe]  | New candidate (downloaded into an isolated directory; the global install is untouched) | `tmp/b1/npm/node_modules/@github/copilot-win32-x64/copilot.exe` (`npm install --prefix tmp/b1/npm @github/cop
+docs/validation/t027-b1-candidate-live-discovery_EN.md:24  [tmp/b1/npm]  | New candidate (downloaded into an isolated directory; the global install is untouched) | `tmp/b1/npm/node_modules/@github/copilot-win32-x64/copilot.exe` (`npm install --prefix tmp/b1/npm @github/cop
+docs/validation/t027-b3c-contracts-durability.md:65  [tmp/b3c-checks.js]  临时脚本 `tmp/b3c-checks.js`（gitignore，用后已删）：
+docs/validation/t027-b3c-contracts-durability.md:96  [tmp/b3b/]  - **清理确认（2026-09-21，用户同轮授权）**：清理 `tmp/b3b/` 的 **11** 个遗留件（8 个 rig 控制台日志 + 3 个写入器构建产物，合计 **26,883,260 B**）。**先确认与证据包无关**：`docs/validation/evidence/b3b-2026-09-21/SHA256SUMS.txt`（2157 项）中 `.exe` 条目 **0*
+docs/validation/t027-b3c-contracts-durability_EN.md:65  [tmp/b3c-checks.js]  Temporary script `tmp/b3c-checks.js` (gitignored, deleted after use):
+docs/validation/t027-b3c-contracts-durability_EN.md:97  [tmp/b3b/]  - **Cleanup confirmation (2026-09-21, same-turn user authorisation)**: the **11** leftover items under `tmp/b3b/` were removed (8 rig console logs + 3 writer build products, **26,883,260 B** in total)
+docs/validation/t027-offline-process.md:114  [tmp/a6_mutations_v2.ps1]  - **第一部分 48 项变异**（每条 = 去掉一个守卫/条件下的聚焦测试），结果 **RED 48 / SURVIVED 0 / INVALID 0**，源码按 SHA-256 校验还原；脚本为临时文件（`tmp/a6_mutations_v2.ps1`），已在 `tmp/` 清理时删除。
+docs/validation/t027-offline-process.md:115  [tmp/a6_mutations_codex.ps1]  - **第二部分 4 项变异（M52–M55，Codex 盲审轮）**：M52/M53/M54 = §7.1 的 High 整改三条分支（不可读槽位拒绝、owner 为空拒绝、缺槽 + 存活镜像拒绝）；M55 = owner 门翻转变体（`fields[0] != launchID` → `==`）。结果 **RED 4 / SURVIVED 0 / INVALID 0 / NOT-APPLIED
+docs/validation/t027-offline-process.md:115  [tmp/a6_mut_recheck.ps1]  - **第二部分 4 项变异（M52–M55，Codex 盲审轮）**：M52/M53/M54 = §7.1 的 High 整改三条分支（不可读槽位拒绝、owner 为空拒绝、缺槽 + 存活镜像拒绝）；M55 = owner 门翻转变体（`fields[0] != launchID` → `==`）。结果 **RED 4 / SURVIVED 0 / INVALID 0 / NOT-APPLIED
+docs/validation/t027-offline-process_EN.md:114  [tmp/a6_mutations_v2.ps1]  - **Part 1, 48 mutations** (each removing one guard or condition, with a focused test): **RED 48 / SURVIVED 0 / INVALID 0**, all sources restored with SHA-256 verification; the script was a temporary 
+docs/validation/t027-offline-process_EN.md:115  [tmp/a6_mutations_codex.ps1]  - **Part 2, 4 mutations (M52–M55, the Codex blind-audit round)**: M52/M53/M54 are the three arms of the High fix in §7.1 (unreadable slot refuses, empty owner refuses, missing slot plus a live mirror 
+docs/validation/t027-offline-process_EN.md:115  [tmp/a6_mut_recheck.ps1]  - **Part 2, 4 mutations (M52–M55, the Codex blind-audit round)**: M52/M53/M54 are the three arms of the High fix in §7.1 (unreadable slot refuses, empty owner refuses, missing slot plus a live mirror 
+internal/adapters/agent_runner_b3b_candidates_windows_test.go:157  [tmp/x.jsonl]  {`c:/tmp/x.jsonl`, `\\.\C:`},
+internal/evidence/delivery_test.go:89  [tmp/cache]  Pattern:      "tmp/cache",
+internal/snapshot/capture_test.go:29  [tmp/scratch.log]  "tmp/scratch.log":    []byte("should be excluded\n"),
+internal/snapshot/capture_test.go:88  [tmp/scratch.log]  if _, ok := entryPaths["tmp/scratch.log"]; ok {
+internal/snapshot/capture_test.go:89  [tmp/scratch.log]  t.Errorf("tmp/scratch.log must be excluded")
+internal/snapshot/export_test.go:43  [tmp/cache]  Pattern:      "tmp/cache",
+testdata/agent-runner/capability-probes/github-copilot-cli-windows-evidence.json:46  [tmp/t026-copilot-cli-probe-6/workspace]  "The structured tool result and final assistant message both returned D:/LZProjects/prfrail/tmp/t026-copilot-cli-probe-6/workspace, exactly matching the isolated -C workspace. No permission event or i
+tools/agent-probe/appcontainer-b2/Invoke-B2LoopbackRehearsal.ps1:2  [tmp/b2/rehearsal/]  # Proves restorability BEFORE any paid probe runs. Outputs every step into tmp/b2/rehearsal/<stamp>/.
+tools/agent-probe/appcontainer-b2/README.md:11  [tmp/b2/]  `<repo>/tmp/b2/`, never next to these scripts. The as-run snapshots of this directory are archived, with
+tools/agent-probe/appcontainer-b2/README.md:15  [tmp/b2/]  directories. Once the evidence bundle is frozen, `tmp/b2/` may be removed entirely; the only effect is that
+tools/agent-probe/appcontainer-b2/README_CN.md:11  [tmp/b2/]  `tmp/b2/`，唯一影响是 `assemble-evidence.ps1` 会把历史运行目录报为 `missingArtifact`（属预期；已冻结的
+tools/agent-probe/appcontainer-b2/README_CN.md:7  [tmp/b2/]  临时产物（运行目录、转录、快照、canary 文件）一律写入仓库内被 git 忽略的 `tmp/b2/`，**不得**与这些脚本
+tools/agent-probe/appcontainer-b2/normalize-encoding.ps1:77  [tmp/b2/]  $manifest.Add('goes to the git-ignored tmp/b2/ tree, never next to the versioned scripts.')
+tools/agent-probe/enforcement-proxy/README.md:109  [tmp/b2/]  `README.md`); their scratch output goes to the git-ignored `tmp/b2/`. Run every command in an **elevated**
+tools/agent-probe/enforcement-proxy/README.md:140  [tmp/b2/]  - the per-run directory ACL grants under `tmp/b2/` (they disappear with the directories themselves);
+tools/agent-probe/enforcement-proxy/README.md:87  [tmp/enforcement-proxy-selftest/]  and log parseability. Scratch lives in `<repo>/tmp/enforcement-proxy-selftest/<stamp>` (the repository
+tools/agent-probe/enforcement-proxy/README_CN.md:124  [tmp/b2/]  - `tmp/b2/` 下每个 run 目录的一次性 ACL 授权（随目录本身删除而消失）；
+tools/agent-probe/enforcement-proxy/README_CN.md:77  [tmp/enforcement-proxy-selftest/]  观察模式记录、端口占用 fail-fast、日志可解析性。中间产物位于 `<repo>/tmp/enforcement-proxy-selftest/<时间戳>`
+tools/agent-probe/enforcement-proxy/README_CN.md:95  [tmp/b2/]  `tools\agent-probe\appcontainer-b2/`（见其 `README.md`），临时产物写入被 gitignore 的 `tmp/b2/`。
+tools/b4-e2e/run-faces.ps1:12  [tmp/b4]  artifact under tmp/b4 is written by a real process or a real port;
+tools/b4-e2e/run-faces.ps1:180  [tmp/b4]  $b4 = Join-Path $repo 'tmp/b4'
+tools/b4-e2e/run-faces.ps1:219  [tmp/b4/bin]  Write-Log 'b4 driver: -SkipBuild, reusing the artifacts already in tmp/b4/bin'
+tools/b4-e2e/run-faces.ps1:4  [tmp/b4]  tmp/b4, invokes the assembly harness once per face/case/phase, records the exact
+tools/b4-e2e/run-faces.ps1:6  [tmp/b4/pack-verdict.json]  tmp/b4/pack-verdict.json and writes tmp/b4/SHA256SUMS.txt.
+tools/b4-e2e/run-faces.ps1:6  [tmp/b4/SHA256SUMS.txt]  tmp/b4/pack-verdict.json and writes tmp/b4/SHA256SUMS.txt.
+tools/gates/cjk-newwords.txt:51  [tmp/gate.js]  # (commit 1b01115) that the throwaway tmp/gate.js never scanned - it could not see
+tools/gates/gate.js:19  [tmp/gate.js]  * tmp/gate.js always exited 0, which made it unusable as a gate).
+tools/gates/lib/criteria/g6.js:450  [tmp/v112/refs-check.js]  * reviewed throwaway `tmp/v112/refs-check.js` so the criterion and the ⑨ native
+tools/gates/selftest.js:1021  [tmp/gates-f2-not-staged.txt\trepo]  probe('tmp/gates-f2-not-staged.txt\trepo') === 'FAIL',
+tools/gates/selftest.js:1022  [tmp/gates-f2-not-staged.txt\trepo]  'verdict=' + probe('tmp/gates-f2-not-staged.txt\trepo')
+tools/gates/selftest.js:831  [tmp/drfix/A3.txt\n]  mutations: [{ key: 'g7-b-bad', op: 'replace', from: 'tmp/drfix/A3.txt\n', to: 'tmp/drfix/A3.txt\tlocal-only\n' }],
+tools/gates/selftest.js:831  [tmp/drfix/A3.txt\tlocal-only\n]  mutations: [{ key: 'g7-b-bad', op: 'replace', from: 'tmp/drfix/A3.txt\n', to: 'tmp/drfix/A3.txt\tlocal-only\n' }],
+tools/gates/selftest.js:839  [tmp/drfix/A3.txt\n]  mutations: [{ key: 'g7-b-bad', op: 'replace', from: 'tmp/drfix/A3.txt\n', to: 'tmp/drfix/A3.txt\tarchived\n' }],
+tools/gates/selftest.js:839  [tmp/drfix/A3.txt\tarchived\n]  mutations: [{ key: 'g7-b-bad', op: 'replace', from: 'tmp/drfix/A3.txt\n', to: 'tmp/drfix/A3.txt\tarchived\n' }],
+tools/gates/selftest.js:963  [tmp/probe-artifact.txt]  const ignored = resolveRepoArtifact(repoRoot, 'tree', null, 'tmp/probe-artifact.txt');
+tools/gates/testdata/fixtures/g7-b-no-disposition.txt:6  [tmp/drfix/A3.txt]  tmp/drfix/A3.txt
+tools/gates/testdata/fixtures/g7-ok-report.txt:13  [tmp/drfix/A3.txt]  tmp/drfix/A3.txt	local-only
+tools/gates/testdata/historical/dr-fix-report-structure.txt:25  [tmp/drfix/]  #   93 ### 4.2 变异实测（原始输出见 `tmp/drfix/`）

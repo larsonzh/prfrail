@@ -1,0 +1,65 @@
+=== state verification (working tree as it stands) ===
+    SELFTEST: PASS 197/197   [exit 0]
+$ node tools/gates/gate.js --all --scope=tree   [exit 0]
+    TOTAL_FAIL=0
+$ node tools/gates/gate.js --all --scope=ci   [exit 0]
+    TOTAL_FAIL=0
+$ node tools/gates/gate.js --check=G6 --scope=range:b738e6b^..b738e6b   [exit 1]
+    FAIL  G6-2 cost clause :: docs/DELIVERY_DIRECTIVE.md:927 total=3+⑥×1+⑦×2 vs line 47 ⑥×1+⑦×1 (key SW-5) whitelist-source=endpoint:b738e6b
+$ node tools/gates/gate.js --check=G7 --scope=range:1b01115^..1b01115   [exit 1]
+    FAIL  G7-a artifacts block present :: docs/validation/dr-fix-enforcement-proxy.md missing ```artifacts block | docs/validation/dr-fix-enforcement-proxy_EN.md missing ```artifacts block
+
+--- exit-code matrix, fixed state ---
+$ node tools/gates/gate.js --all --scope=range:deadbeefdeadbeefdeadbeefdeadbeefdeadbeef..HEAD   [exit 2]
+    
+$ node tools/gates/gate.js --all --scope=range:HEAD..refs/heads/no-such-branch-4e11   [exit 2]
+    
+$ node tools/gates/gate.js --all --scope=range:HEAD..HEAD   [exit 0]
+    INFO  scope empty change set :: nothing to judge: criteria below report vacuous passes (deliberately NOT reported as FAIL)
+$ node tools/gates/gate.js --all --scope=bogus-scope   [exit 2]
+    
+$ node tools/gates/gate.js --all --scope=tree   [exit 0]
+    TOTAL_FAIL=0
+$ node tools/gates/gate.js --all --scope=ci   [exit 0]
+    TOTAL_FAIL=0
+ctx.js sha256 (before) = 9ab0d7685e3f1c1613dc35e1bfcd95ccff018d2dca91519babd289dd84b4786a
+
+=== mutation M-⑦F1: remove the range-endpoint validation AND the diff-failure guard ===
+ctx.js sha256 (mutated) = a407158e601931b53317993636f683713d908456ecbdaf8df4faa2da2e344c23
+    SELFTEST: FAIL 193/197   [exit 1]
+    FAIL T17 unresolvable range base is a usage error, not an empty change set :: err=NO ERROR (context built - fail-open)
+    FAIL T17 unresolvable range base is a usage error, not an empty change set :: err=NO ERROR (context built - fail-open)
+    FAIL T17 unresolvable range head is a usage error, not an empty change set :: err=NO ERROR (context built - fail-open)
+    FAIL T17 unresolvable range head is a usage error, not an empty change set :: err=NO ERROR (context built - fail-open)
+
+--- exit-code matrix under the mutation (the fail-open is visible here) ---
+$ node tools/gates/gate.js --all --scope=range:deadbeefdeadbeefdeadbeefdeadbeefdeadbeef..HEAD   [exit 0]
+    INFO  scope empty change set :: nothing to judge: criteria below report vacuous passes (deliberately NOT reported as FAIL)
+$ node tools/gates/gate.js --all --scope=range:HEAD..refs/heads/no-such-branch-4e11   [exit 1]
+    INFO  scope empty change set :: nothing to judge: criteria below report vacuous passes (deliberately NOT reported as FAIL)
+$ node tools/gates/gate.js --all --scope=range:HEAD..HEAD   [exit 0]
+    INFO  scope empty change set :: nothing to judge: criteria below report vacuous passes (deliberately NOT reported as FAIL)
+$ node tools/gates/gate.js --all --scope=bogus-scope   [exit 2]
+    
+$ node tools/gates/gate.js --all --scope=tree   [exit 0]
+    TOTAL_FAIL=0
+$ node tools/gates/gate.js --all --scope=ci   [exit 0]
+    TOTAL_FAIL=0
+
+=== restore ===
+ctx.js sha256 (after) = 9ab0d7685e3f1c1613dc35e1bfcd95ccff018d2dca91519babd289dd84b4786a  byte-identical=true
+    SELFTEST: PASS 197/197   [exit 0]
+
+--- exit-code matrix, restored ---
+$ node tools/gates/gate.js --all --scope=range:deadbeefdeadbeefdeadbeefdeadbeefdeadbeef..HEAD   [exit 2]
+    
+$ node tools/gates/gate.js --all --scope=range:HEAD..refs/heads/no-such-branch-4e11   [exit 2]
+    
+$ node tools/gates/gate.js --all --scope=range:HEAD..HEAD   [exit 0]
+    INFO  scope empty change set :: nothing to judge: criteria below report vacuous passes (deliberately NOT reported as FAIL)
+$ node tools/gates/gate.js --all --scope=bogus-scope   [exit 2]
+    
+$ node tools/gates/gate.js --all --scope=tree   [exit 0]
+    TOTAL_FAIL=0
+$ node tools/gates/gate.js --all --scope=ci   [exit 0]
+    TOTAL_FAIL=0

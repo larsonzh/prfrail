@@ -203,6 +203,7 @@ tools/b4-e2e/run-faces.ps1	repo
 tools/gates/cjk-newwords.txt	repo
 tmp/b4/**	local-only
 ```
+> **Archiving note (v1.23)**: the `tmp/` items cited by this report were archived under `docs/validation/evidence/directive-history/` per §1.5.1 (units: `b4/`; each with `MANIFEST.md` and `SHA256SUMS.txt`); the original paths are not rewritten and the MANIFEST is the mapping of record. (Paths already cleared by earlier slices are outside this archiving and belong to the pre-existing decoupling recorded as OB-77.) The executables under `b4/bin` are reproducible build products kept out of the repository; see that unit MANIFEST untracked-file list and rebuild notes.
 
 ## 11. Meta-verification statement
 

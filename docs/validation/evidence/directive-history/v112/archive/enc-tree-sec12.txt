@@ -1,0 +1,5 @@
+[enc-tree] tracked=2912 text=2823 binary=89 violations=3
+    ! docs/validation/evidence/b2-2026-09-17/measuring/probe10-dir-listing.raw.txt  :: CRLF
+    ! docs/validation/evidence/b3b-2026-09-21/session/pin.json  :: BOM=true want=false
+    ! docs/validation/evidence/b3b-2026-09-21/variant/pin.json  :: BOM=true want=false
+[enc-tree] top extensions: .txt=1278 .json=780 .go=225 .bin=224 .md=185 .ps1=82 .js=22 .gitkeep=9

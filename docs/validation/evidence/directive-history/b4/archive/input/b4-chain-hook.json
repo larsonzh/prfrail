@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "1.0.0",
+  "chain": {
+    "id": "b4-at23",
+    "profile": "minimal"
+  },
+  "tasks": [
+    {
+      "id": "b4-task",
+      "review": "manual",
+      "steps": [
+        {
+          "id": "b4-code-step",
+          "kind": "code",
+          "execution": "autonomous"
+        },
+        {
+          "id": "b4-verify-step",
+          "kind": "verify",
+          "hooks": [
+            "b4-workspace-gate"
+          ]
+        }
+      ]
+    }
+  ],
+  "workspace": {
+    "components": [
+      {
+        "id": "b4-workspace",
+        "root": ".",
+        "languageScopes": [
+          {
+            "id": "b4-generic-scope",
+            "language": "generic",
+            "harness": "generic-minimal",
+            "toolchain": "generic-1",
+            "targets": [
+              "source"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

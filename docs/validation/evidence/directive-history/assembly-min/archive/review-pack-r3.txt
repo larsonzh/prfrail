@@ -1,0 +1,55 @@
+# T027-ASSEMBLY-MIN · ⑦ 第 3 次 = 复审 审查包（2026-10-03，额度 3/3，最后一次）
+
+- **切片**：`T027-ASSEMBLY-MIN`，A 段（最小可跑装配，**范围严格限定「拒绝路径」**）。
+- **轮次**：⑦ 第 3 次 = **复审**（额度用满）。第 1 次 = 盲审（不附清单）；第 2 次 = 终审（`FINAL REVIEW: FINDINGS`，2 条 Medium）。本轮**非盲审**，除 ⑤/⑥ 清单外，另附**两轮整改 diff** 与变异审计。
+- **模型**：①/⑤ = `DeepSeek V4 Pro`；⑥ = `MAI-Code-1.1-Flash`；⑦ = `GPT-5.3-Codex`（不降级）；②b = `DeepSeek V4.1 Flash`。
+- **只读**：不得修改仓库任何文件（含 `tmp/`）。
+
+## 一、必须读的证据
+
+| 用途 | 路径 |
+|---|---|
+| 方案书 + ⑤/⑥ 处置 + 已知差异 + 候选 OB + r3/r4 整改记录 + **F-02 记录态预授权** | `tmp/assembly-min/DESIGN.md` |
+| 全切片 diff（11 文件，当前状态） | `tmp/assembly-min/change-set.diff` |
+| 第 1 轮整改 diff（r3，4 文件） | `tmp/assembly-min/r3-remediation.diff` |
+| **本轮整改 diff（r4，3 文件 + 1 参照未变）** | `tmp/assembly-min/r4-remediation.diff` + 读数 `r4diff.txt` |
+| 变异审计（M1–M20） | `tmp/assembly-min/mutation.txt` |
+| ⑤ 第 1/2 轮清单 | `tmp/assembly-min/pre-review-r1.md`、`pre-review-r2.md` |
+| 门禁/测试读数（r3 与 r4 两版） | `gate-tree.txt`、`gate-index.txt`、`selftest.txt`、`r3-final-test.txt`、`r4-final-test.txt` |
+| **DR-8 三份证据**（Windows Temp rename 抖动，非本片引入） | `tmp/assembly-min/v3.txt`（首跑红）、`v4.txt`（单跑绿）、`snapshot-flake.txt` |
+| 冻结契约摘录 | `tmp/assembly-min/contracts-excerpt.txt` |
+| 受审生产代码 | `internal/adapters/agent_runner_postflight.go`、`internal/console/runtime_agent.go`（+ 两个新测试文件、`runtime_noop.go`、`cli.go`、`runtime.go`） |
+
+## 二、第 2 次终审结论与两轮整改
+
+- **第 2 次终审**：`FINAL REVIEW: FINDINGS` —— **M-1（Medium）**：F-01 仅部分关闭，两侧解析器漂移（adapters `Atoi` vs console `fmt.Sscanf`）；**M-2（Medium，硬门）**：F-02 仍属「缓解」而非「硬门关闭」，mitigation 只覆盖首个 `engine.Run` 的非 awaiting 分支；**L-3（Low）**：两侧常量手工同步的漂移风险；**O-4/O-5（Observation）**：归档须附 EBUSY 原始输出、新增「解析口径漂移」登记项。⑦ 建议：先修 2 条 Medium，再消耗第 3 次。
+- **r4 整改（本轮）**：
+  1. **M-1**：console `readAgentRunnerEvidencePIDs` 改用与 adapters **逐字相同**的 `strconv.Atoi(strings.TrimSpace(line))`；两侧新增**同一输入矩阵**测试（`+7` / `" 7 "` / `007` / CRLF / `12abc` / `7.0` / `1_0` / `0x10` / `-0` / `-5` / int64 溢出 / 缺失 / 空 / 仅空白 / 中间空行）；集成表新增「父 `12abc`」「父 `7.0`」两行 ⇒ fail-closed 拒绝。**adapters 源文件本轮零改动（严格侧参照，脚本显式断言其字节不变）。**
+  2. **M-2**：`ExecuteAgentRunnerRun` 内引入**单入口闭包** `fail(err)` —— 函数体内**唯一**裸失败返回位于闭包内，**7 个** spawn 后失败点全部经它（首个非 awaiting、`Wait` / `Publish` / `Load` / `Submit`、状态非 `completed`、第二次 `engine.Run`）；unproven 语义不变；原始错误始终在链上；零新哨兵。
+  3. 新增**源码级不变量测试** `TestAgentRunnerAssemblyFunnelsEveryPostSpawnFailureThroughTheFallback`（平台无关）：裸失败返回恰好 1 次且在闭包内 + `return fail(` 计数 == 7 + 无绕过闭包的失败返回。
+- **平台事实（如实登记）**：Windows 上 durability 未证明 ⇒ `engine.Run` 在请求发布即被拒 ⇒ **awaiting 之后的 6 条路径运行时不可达**（`TestAgentRunnerAssemblyFullChain` SKIP），故由源码级不变量承载覆盖；首个非 awaiting 路径由 `TestAgentRunnerAssemblyRefusesOnUnprovenDurability` 断言 unproven。
+- **变异**：M18（console 解析器重新宽松）、M19（第二次 `engine.Run` 绕过闭包）、M20（adapters 解析器重新宽松）**全 RED**；**M15 改标 SUPERSEDED（被 M18 取代）**——统一解析器后 `Sscanf` 锚点不复存在，且严格解析器下「删 `err != nil`」是 no-op。终态：**17 RED + 3 SUPERSEDED（M9/M11/M15）+ `all_restored_byte_identical=true`**。
+
+## 三、用户已在同一轮给出的**预授权**（必须据此给结论）
+
+> **若本轮复审仍将 F-02 判为 Medium（即「缓解、未关闭」），用户预先接受该状态作为本片最终记录**：本片以「M-1 已修 + F-02 缓解已最大化 + **OB-57 跟踪根因**」收口，**不再为 F-02 开第 4 轮，不再扩大范围**。这不是破 §5.3 纪律，而是用户明确接受「根因在本片范围外的 Medium」作为记录态。
+
+- **OB-57 处置列**：根因在 `internal/adapters/agent_runner_replay_dispatcher.go`，**超出 `T027-ASSEMBLY-MIN` 范围，另立切片修复**。
+- 因此：**若你唯一剩下的 Medium 是 F-02**，请直接给 `PASS WITH FIXES`（或 `PASS`）并在结论里注明「F-02 维持 Medium 记录态」，不必再要求整改。
+- **红线**：若你判定 **M-1 未闭合**，或发现**非 F-02 的新 Medium**，主控将**停下升级**（不自行收口）。
+
+## 四、请你审的问题（逐条给结论 + 文件:行证据）
+
+1. **M-1 是否已闭合**：两侧解析是否**逐字同一**表达式与同一拒绝条件？矩阵测试是否真正同输入同期望、是否平台无关？`12abc` / `7.0` / `1_0` 现在两侧是否**一致拒绝**？集成层「父 `12abc` ⇒ fail-closed」是否真的走 console publish 腿？还有无残余漂移（例如两侧的 `present` 语义、容量、`pid <= 0`、错误包裹、`present=false` 与「空文件」的区分）？
+2. **M-2 的覆盖是否已最大化**：7 个失败点是否穷尽（有无第 8 个 spawn 后返回被遗漏，例如 `summarizeProjection` 之外的返回、`process`/`capturer` 构造失败、`engine.Projection()` 相关路径）？单入口闭包是否真的是唯一路径（源码级不变量测试的判定是否会漏判）？源码级测试本身是否**可被规避**（例如有人把裸返回写成等价但文本不同的形式）？
+3. **新引入风险**：r4 是否引入新哨兵/契约/副作用？闭包是否改变了成功路径或错误文本（除新增兜底包裹）？`fmt.Sscanf` 的保留引用（注释）是否会造成误解？
+4. **L-3 未处置是否可接受**：⑦ 第 2 次判「不触 §8」，本片按同包最小改动处理、由 M18/M20 双侧变异 + 矩阵测试守。请判定「维持现状」是否可接受，或必须升级为共享导出符号（若必须，请说明是否触 §8 / ②a）。
+5. **变异与证据可信度**：17 RED + 3 SUPERSEDED 的处置是否成立（尤其 M15 的 SUPERSEDED 论证）？`all_restored_byte_identical=true` + 源码扫描 0 残留是否足够？DR-8 三份证据是否足以支撑「非本片引入」？
+6. **门槛外**：任何须登记的事实。
+
+## 五、输出格式
+
+- 第一行必须为：`RE-REVIEW: PASS` / `RE-REVIEW: PASS WITH FIXES` / `RE-REVIEW: FINDINGS`。
+- 随后逐条：`严重度 | 文件:行 | 结论（已关闭 / 部分关闭 / 未关闭 / 新增） | 证据 | 建议`。
+- 明确写出：**F-02 是否仍判 Medium**（若仍判 ⇒ 依预授权记入记录态）。
+- **只读**：不得修改任何文件。

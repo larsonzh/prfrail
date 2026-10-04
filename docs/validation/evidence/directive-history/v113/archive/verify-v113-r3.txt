@@ -1,0 +1,6 @@
+[verify] docs/DELIVERY_DIRECTIVE.md ledger rows=45 notInClosedSet=0
+[verify] docs/DELIVERY_DIRECTIVE_EN.md ledger rows=45 notInClosedSet=0
+[verify] label set size=88
+[verify] docs/DELIVERY_DIRECTIVE.md region ranges=2 refs=186 unresolved=0
+[verify] docs/DELIVERY_DIRECTIVE_EN.md region ranges=2 refs=186 unresolved=0
+[verify] ACCEPTED (0 offenders)

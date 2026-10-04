@@ -1,0 +1,3690 @@
+diff --git a/tools/gates/g6-whitelist.txt b/tools/gates/g6-whitelist.txt
+new file mode 100644
+index 0000000..f5e4f4b
+--- /dev/null
++++ b/tools/gates/g6-whitelist.txt
+@@ -0,0 +1,11 @@
++# G6 whitelist (DELIVERY_DIRECTIVE section 6.3, G6 台账元数据一致性).
++# A hit exempts ONE finding; the criterion is reported PASS when every finding is
++# either absent or registered here.
++# Format (TAB separated, all three fields mandatory):
++#     <match><TAB><file><TAB><reason / context excerpt>
++#   match  substring of the offending line (the smallest text that identifies it)
++#   file   repository-relative path the entry applies to ('*' = any file)
++#   reason the registration reason PLUS the context excerpt that justifies it
++# A malformed entry (missing field, empty reason) is a usage error: the runner exits 2.
++# Entries are reviewed by ⑤/⑦ like any other claim. Do not register a real defect.
++#
+
+diff --git a/tools/gates/gate.js b/tools/gates/gate.js
+new file mode 100644
+index 0000000..53d0bc5
+--- /dev/null
++++ b/tools/gates/gate.js
+@@ -0,0 +1,273 @@
++#!/usr/bin/env node
++'use strict';
++
++/**
++ * DELIVERY_DIRECTIVE section 6.3 gate runner - single entry point.
++ *
++ *   node tools/gates/gate.js --all [--scope=tree|index|range:<A>..<B>|ci]
++ *   node tools/gates/gate.js --check=<ID> [--scope=...]
++ *   node tools/gates/gate.js --list
++ *   node tools/gates/gate.js --selftest
++ *
++ * Exit codes: 0 = every executed criterion passed (SKIP/INFO never block),
++ *             1 = at least one FAIL,
++ *             2 = usage / environment error (bad flag, bad scope, missing git or Go
++ *                 toolchain, malformed whitelist entry).
++ *
++ * The criteria modules stay individually loadable under lib/criteria/; this file only
++ * parses arguments, assembles the report and owns the exit code (the throwaway
++ * tmp/gate.js always exited 0, which made it unusable as a gate).
++ */
++
++const cp = require('child_process');
++
++const { createContext, UsageError, parseScopeText } = require('./lib/ctx');
++const { createReport } = require('./lib/report');
++
++const CRITERIA = {
++  'G1-a': require('./lib/criteria/g1a'),
++  'G1-b': require('./lib/criteria/g1b'),
++  G2: require('./lib/criteria/g2'),
++  'G3-a': require('./lib/criteria/g3a'),
++  'G3-b': require('./lib/criteria/g3b'),
++  G4a: require('./lib/criteria/g4a'),
++  G4b: require('./lib/criteria/g4b'),
++  'G5-a': require('./lib/criteria/g5a'),
++  'G5-b': require('./lib/criteria/g5b'),
++  'R2.5': require('./lib/criteria/r25'),
++  G6: require('./lib/criteria/g6'),
++  G7: require('./lib/criteria/g7'),
++};
++
++/**
++ * Base criteria deliberately NOT scripted in slice GATES-EXT. They are reported as
++ * SKIP, never as PASS, so the report cannot be read as "everything was checked".
++ */
++const SKIPPED = {
++  '@skipG1': {
++    id: 'G1',
++    label: 'section-title/status-table/completion-record consistency',
++    reason:
++      'not scripted in slice GATES-EXT: judging three human-authored places against each other; see DELIVERY_DIRECTIVE 6.3 G1',
++  },
++  '@skipG5': {
++    id: 'G5',
++    label: 'change-set contract (staged vs declared vs evidence refs)',
++    reason:
++      'not scripted in slice GATES-EXT: requires a structured JSON input produced outside the repository; see DELIVERY_DIRECTIVE 6.3 G5',
++  },
++};
++
++const RUN_ORDER = [
++  'G1-a',
++  'G1-b',
++  '@skipG1',
++  'G2',
++  'G3-a',
++  'G3-b',
++  'G4a',
++  'G4b',
++  'G5-a',
++  'G5-b',
++  '@skipG5',
++  'R2.5',
++  'G6',
++  'G7',
++];
++
++const USAGE =
++  'usage: node tools/gates/gate.js --all|--check=<ID>|--list|--selftest [--scope=tree|index|range:<A>..<B>|ci]';
++
++/**
++ * Criterion ids are compared after folding every non-alphanumeric separator
++ * (`G3(a.1)` -> `G3-A-1`), so `--check=G3-a.1` and `--check=G3(a.1)` select the same
++ * sub-check instead of exiting 2 (GATES-EXT F5).
++ */
++function normalizeId(s) {
++  return String(s)
++    .replace(/[.[\]()]/g, '-')
++    .replace(/-+/g, '-')
++    .replace(/^-|-$/g, '')
++    .toUpperCase();
++}
++
++function emitSkip(out, key) {
++  const s = SKIPPED[key];
++  out.rec(s.id, 'SKIP', s.label, s.reason);
++}
++
++/** The four base gates (section 6.1): gofmt, build, vet, test. */
++function runBaseGates(ctx, out) {
++  const exec = (cmd, args) =>
++    cp.spawnSync(cmd, args, {
++      cwd: ctx.repoRoot,
++      encoding: 'utf8',
++      maxBuffer: 2e8,
++      windowsHide: true,
++      shell: false,
++    });
++
++  const gf = exec('gofmt', ['-l', '.']);
++  if (gf.error) throw new UsageError('environment error: cannot run gofmt (' + gf.error.message + ')');
++  const gfOut = (gf.stdout || '').trim();
++  out.rec('base', gf.status === 0 && gfOut === '' ? 'PASS' : 'FAIL', 'gofmt -l .', gfOut === '' ? 'empty' : gfOut);
++
++  for (const [step, verb] of [['build', 'build'], ['vet', 'vet']]) {
++    const r = exec('go', [verb, './...']);
++    if (r.error) throw new UsageError('environment error: cannot run go (' + r.error.message + ')');
++    const tail = ((r.stderr || '') + (r.stdout || '')).trim().split('\n').slice(-3).join(' / ');
++    out.rec(
++      'base',
++      r.status === 0 ? 'PASS' : 'FAIL',
++      'go ' + step + ' ./...',
++      r.status === 0 ? 'exit 0' : 'exit ' + r.status + (tail ? ' :: ' + tail : '')
++    );
++  }
++
++  const t = exec('go', ['test', './...']);
++  if (t.error) throw new UsageError('environment error: cannot run go (' + t.error.message + ')');
++  const o = ((t.stdout || '').match(/^ok\s/gm) || []).length;
++  const fa = ((t.stdout || '').match(/^FAIL/gm) || []).length;
++  const tail = (t.stderr || '').trim().split('\n').slice(-3).join(' / ');
++  out.rec(
++    'base',
++    t.status === 0 && fa === 0 ? 'PASS' : 'FAIL',
++    'go test ./...',
++    'ok=' + o + ' FAIL=' + fa + (t.status === 0 ? '' : ' exit=' + t.status + (tail ? ' :: ' + tail : ''))
++  );
++}
++
++function selectCriteria(check) {
++  const want = normalizeId(check);
++  const selected = [];
++  for (const [key, mod] of Object.entries(CRITERIA)) {
++    const mid = normalizeId(key);
++    if (mid === want) selected.push({ mod, filter: null });
++    else if (want.startsWith(mid + '-')) selected.push({ mod, filter: want });
++  }
++  return selected;
++}
++
++function listCriteria() {
++  const lines = ['criteria (id | label | DELIVERY_DIRECTIVE 6.3 label | status)'];
++  for (const key of Object.keys(CRITERIA)) {
++    const m = CRITERIA[key];
++    lines.push(
++      '  ' + key + ' | ' + m.label + ' | ' + (m.title || '') + ' | ' + (m.scripted ? 'scripted' : 'not scripted')
++    );
++  }
++  for (const key of Object.keys(SKIPPED)) {
++    lines.push('  ' + SKIPPED[key].id + ' | ' + SKIPPED[key].label + ' | (base criterion) | NOT scripted (SKIP)');
++  }
++  lines.push('  base | gofmt -l . / go build ./... / go vet ./... / go test ./... | section 6.1 | scripted');
++  return lines.join('\n');
++}
++
++function main(argv) {
++  const args = argv.slice(2);
++  const opt = { mode: null, check: null, scope: 'tree' };
++  for (const a of args) {
++    if (a === '--all') opt.mode = 'all';
++    else if (a === '--selftest') opt.mode = 'selftest';
++    else if (a === '--list') opt.mode = 'list';
++    else if (a === '--help' || a === '-h') opt.mode = 'help';
++    else if (a.startsWith('--check=')) {
++      opt.mode = 'check';
++      opt.check = a.slice('--check='.length);
++    } else if (a.startsWith('--scope=')) opt.scope = a.slice('--scope='.length);
++    else return { code: 2, error: 'unknown argument: ' + a + '\n' + USAGE };
++  }
++  if (!opt.mode) return { code: 2, error: USAGE };
++  if (opt.mode === 'help') return { code: 0, stdout: USAGE };
++  if (!parseScopeText(opt.scope)) {
++    return { code: 2, error: 'invalid --scope value: ' + opt.scope + '\n' + USAGE };
++  }
++  if (opt.mode === 'list') return { code: 0, stdout: listCriteria() };
++  if (opt.mode === 'selftest') {
++    const res = require('./selftest').run();
++    return { code: res.ok ? 0 : 1, stdout: res.stdout };
++  }
++
++  const ctx = createContext({ scope: opt.scope });
++  const out = createReport();
++  const header =
++    'GATE REPORT scope=' +
++    opt.scope +
++    ' repo=' +
++    ctx.repoRoot +
++    ' changed=' +
++    ctx.changedPaths.length +
++    (opt.mode === 'check' ? ' check=' + opt.check : '');
++  if (ctx.changedPaths.length === 0) {
++    // A false gate: every criterion passes because it had nothing to look at. The CI step
++    // must use --scope=ci precisely to avoid this (a clean checkout has no tree changes).
++    out.rec(
++      'scope',
++      'INFO',
++      'empty change set',
++      'nothing to judge: criteria below report vacuous passes (deliberately NOT reported as FAIL)'
++    );
++  }
++
++  const plan = opt.mode === 'all' ? RUN_ORDER : null;
++  if (plan) {
++    for (const key of plan) {
++      if (key.startsWith('@')) {
++        emitSkip(out, key);
++        continue;
++      }
++      CRITERIA[key].run(ctx, out);
++    }
++    runBaseGates(ctx, out);
++  } else {
++    const selected = selectCriteria(opt.check);
++    if (!selected.length) {
++      const key = normalizeId(opt.check);
++      if (key === 'G1' || key === 'G5') {
++        emitSkip(out, key === 'G1' ? '@skipG1' : '@skipG5');
++      } else {
++        return { code: 2, error: 'unknown criterion id: ' + opt.check + '\n' + listCriteria() };
++      }
++    } else {
++      for (const s of selected) {
++        const tmp = createReport();
++        s.mod.run(ctx, tmp);
++        for (const r of tmp.records) {
++          // Prefix match: a sub-check id may carry a file suffix (G3(a.1) <file>), and the
++          // filter must still select it (otherwise `--check=G3-a.1` would silently drop the
++          // very FAIL record it exists to report).
++          if (s.filter && normalizeId(r.id).indexOf(s.filter) !== 0) continue;
++          out.rec(r.id, r.verdict, r.label, r.detail);
++        }
++      }
++    }
++  }
++
++  const body = out.render();
++  return { code: out.fails().length ? 1 : 0, stdout: header + '\n' + body };
++}
++
++function run() {
++  let result;
++  try {
++    result = main(process.argv);
++  } catch (e) {
++    if (e instanceof UsageError) return { code: 2, stderr: 'gate.js: ' + e.message };
++    return { code: 2, stderr: 'gate.js: unexpected error: ' + (e && e.stack ? e.stack : e) };
++  }
++  // `main` reports usage / environment errors on the `error` key (bad flag, missing mode,
++  // bad --scope, unknown criterion id). Batch 2f (NF-3): that key was never consumed, so
++  // `node tools/gates/gate.js --scope=tree` exited 2 having printed NOTHING - the caller
++  // saw a bare exit code with no diagnosis. The message now goes to stderr; the exit code
++  // stays 2 (a usage error is still not a PASS/FAIL verdict).
++  const err = result.stderr || result.error;
++  if (err) process.stderr.write(err + '\n');
++  if (result.stdout) process.stdout.write(result.stdout + '\n');
++  return result;
++}
++
++if (require.main === module) {
++  process.exitCode = run().code;
++}
++
++module.exports = { run, main, CRITERIA, SKIPPED, RUN_ORDER, listCriteria };
+
+diff --git a/tools/gates/lib/criteria/g1a.js b/tools/gates/lib/criteria/g1a.js
+new file mode 100644
+index 0000000..60e842c
+--- /dev/null
++++ b/tools/gates/lib/criteria/g1a.js
+@@ -0,0 +1,31 @@
++'use strict';
++
++/**
++ * G1-a table structure integrity (DELIVERY_DIRECTIVE 6.3 sub-rule).
++ * Added lines must not splice two table records onto one line: any added line
++ * starting with `|` must not contain `||` once escaped `\|` sequences are removed.
++ * Scope = changed lines, never the whole document.
++ */
++module.exports = {
++  id: 'G1-a',
++  label: 'table structure',
++  title: '表格结构完整性',
++  scripted: true,
++
++  run(ctx, out) {
++    const bad = [];
++    for (const f of ctx.changedMarkdown()) {
++      for (const l of ctx.addedLines(f)) {
++        if (l.startsWith('|') && l.split('\\|').join('').includes('||')) {
++          bad.push(f + ' :: ' + l.slice(0, 50));
++        }
++      }
++    }
++    out.rec(
++      'G1-a',
++      bad.length === 0 ? 'PASS' : 'FAIL',
++      'table structure',
++      bad.length ? JSON.stringify(bad) : 'no `||` on added rows'
++    );
++  },
++};
+
+diff --git a/tools/gates/lib/criteria/g1b.js b/tools/gates/lib/criteria/g1b.js
+new file mode 100644
+index 0000000..09e9667
+--- /dev/null
++++ b/tools/gates/lib/criteria/g1b.js
+@@ -0,0 +1,58 @@
++'use strict';
++
++/**
++ * G1-b version metadata consistency (DELIVERY_DIRECTIVE 6.3 sub-rule).
++ * The version declared in the document header must equal the latest `| vX.Y |`
++ * row inside the `### 0.3` changelog block, and the header date must match that
++ * row's date. The block bound is deliberate: scanning the whole document would
++ * also hit the appendix C.1 `| vN.N |` comparison table.
++ *
++ * No changed `.md` in scope: an explicit INFO line instead of silence, so an empty
++ * run is visibly empty (the same convention G7 and the scope guard already use).
++ */
++module.exports = {
++  id: 'G1-b',
++  label: 'version metadata',
++  title: '版本元数据一致性',
++  scripted: true,
++
++  run(ctx, out) {
++    if (ctx.changedMarkdown().length === 0) {
++      out.rec('G1-b', 'INFO', 'version metadata', 'no changed .md in scope');
++      return;
++    }
++    const info = [];
++    for (const f of ctx.changedMarkdown()) {
++      const L = ctx.readLineArray(f);
++      if (!L) continue;
++      const txt = L.join('\n');
++      const hv = (/^版本：v(\d+\.\d+)/m.exec(txt) || /^Version: v(\d+\.\d+)/m.exec(txt) || [])[1];
++      if (!hv) continue;
++      const hd = (
++        /^版本：v[\d.]+[^\n]{0,4}日期：(\d{4}-\d{2}-\d{2})/m.exec(txt) ||
++        /^Version: v[\d.]+\. Date: (\d{4}-\d{2}-\d{2})/m.exec(txt) ||
++        []
++      )[1];
++      const s = L.findIndex((l) => /^### 0\.3/.test(l));
++      const e = L.findIndex((l, i) => i > s && /^#{2,3} /.test(l));
++      const rows = L.slice(s, e < 0 ? L.length : e).filter((l) => /^\| v\d+\.\d+ \|/.test(l));
++      const last = rows.length ? /^\| v(\d+\.\d+) \|/.exec(rows[rows.length - 1])[1] : '?';
++      const ld = rows.length
++        ? (/^\| v[\d.]+ \| (\d{4}-\d{2}-\d{2}) \|/.exec(rows[rows.length - 1]) || [])[1]
++        : '?';
++      const ok = hv === last && (!hd || hd === ld);
++      info.push(
++        f + ' header=v' + hv + ' last=v' + last + ' ' + hd + '/' + ld + ' rows=' + rows.length + (ok ? ' OK' : ' MISMATCH')
++      );
++      if (!ok) out.rec('G1-b ' + f, 'FAIL', 'version metadata', info[info.length - 1]);
++    }
++    if (info.length) {
++      out.rec(
++        'G1-b',
++        info.every((s) => / rows=\d+ OK$/.test(s)) ? 'PASS' : 'FAIL',
++        'version metadata',
++        info.join(' | ')
++      );
++    }
++  },
++};
+
+diff --git a/tools/gates/lib/criteria/g2.js b/tools/gates/lib/criteria/g2.js
+new file mode 100644
+index 0000000..e38de94
+--- /dev/null
++++ b/tools/gates/lib/criteria/g2.js
+@@ -0,0 +1,38 @@
++'use strict';
++
++/**
++ * G2 placeholder residue (DELIVERY_DIRECTIVE 6.3 G2).
++ * No placeholder wording may survive in added lines. Self-reference guard: a line
++ * that quotes the forbidden strings must also carry `不得残留` so the rule text
++ * does not flag itself (measured 2026-09-21: 4 false positives without it).
++ * Pre-existing occurrences in a changed file are reported as INFO, not as FAIL.
++ */
++const PATTERNS = [/待[^\n]{0,6}回填/, /尚未提交/, /待同轮授权/, /pending the push/];
++
++module.exports = {
++  id: 'G2',
++  label: 'placeholder residue',
++  title: '占位符残留',
++  scripted: true,
++
++  run(ctx, out) {
++    const hits = [];
++    const preexisting = [];
++    for (const f of ctx.changedMarkdown()) {
++      const lines = ctx.readLineArray(f);
++      if (!lines) continue;
++      const added = ctx.addedLines(f);
++      lines.forEach((l, i) => {
++        if (!PATTERNS.some((p) => p.test(l)) || /不得残留/.test(l)) return;
++        (added.includes(l) ? hits : preexisting).push(f + ':' + (i + 1));
++      });
++    }
++    out.rec(
++      'G2',
++      hits.length === 0 ? 'PASS' : 'FAIL',
++      'placeholder residue',
++      (hits.length ? JSON.stringify(hits) : 'none') +
++        (preexisting.length ? '  [INFO pre-existing: ' + preexisting.join(', ') + ']' : '')
++    );
++  },
++};
+
+diff --git a/tools/gates/lib/criteria/g3a.js b/tools/gates/lib/criteria/g3a.js
+new file mode 100644
+index 0000000..03f2352
+--- /dev/null
++++ b/tools/gates/lib/criteria/g3a.js
+@@ -0,0 +1,72 @@
++'use strict';
++
++/**
++ * G3(a) bilingual symmetry + mirror parity (DELIVERY_DIRECTIVE 6.3 G3).
++ *   (a.1) for every changed CN/`_EN` pair the numstat added/deleted counts must be equal;
++ *   (a.2) for `docs/DELIVERY_DIRECTIVE.md` the whole-file shape (line count, heading
++ *         positions, bold markers, pipes, blank lines) must equal its `_EN` mirror.
++ * Whole-file equality is deliberately NOT required for other pairs: pre-existing
++ * bilingual pairs are historically asymmetric, so the criterion would be unsatisfiable.
++ *
++ * (a.1) and (a.2) never emit a PASS record of their own (only the aggregate G3(a)
++ * does), so with no changed `.md` in scope they must say so explicitly instead of
++ * printing nothing at all.
++ */
++function count(lines, re) {
++  return lines.reduce((n, l) => n + (l.match(re) || []).length, 0);
++}
++
++module.exports = {
++  id: 'G3-a',
++  label: 'symmetry + mirror parity',
++  title: '双语对称',
++  scripted: true,
++
++  run(ctx, out) {
++    if (ctx.changedMarkdown().length === 0) {
++      out.rec('G3(a.1)', 'INFO', 'symmetry', 'no changed .md in scope');
++      out.rec('G3(a.2)', 'INFO', 'mirror parity', 'no changed .md in scope');
++      return;
++    }
++    const changed = ctx.changedPaths;
++    const pairs = changed.filter(
++      (f) => /\.md$/i.test(f) && !/_EN\.md$/.test(f) && changed.includes(f.replace(/\.md$/, '_EN.md'))
++    );
++    const sym = [];
++    const inf = [];
++    for (const cnf of pairs) {
++      const enf = cnf.replace(/\.md$/, '_EN.md');
++      const CL = ctx.readLineArray(cnf);
++      const EL = ctx.readLineArray(enf);
++      if (!CL || !EL) continue; // deleted side of the pair: nothing to mirror
++      const a = ctx.numstat(cnf);
++      const b = ctx.numstat(enf);
++      const okS = a[0] === b[0] && a[1] === b[1];
++      let dr = 0;
++      for (let i = 0; i < Math.max(CL.length, EL.length); i++) {
++        if (/^#{2,4} /.test(CL[i] || '') !== /^#{2,4} /.test(EL[i] || '')) dr++;
++      }
++      const f5 = {
++        lines: CL.length === EL.length,
++        head: dr === 0,
++        bold: count(CL, /\*\*/g) === count(EL, /\*\*/g),
++        bars: count(CL, /\|/g) === count(EL, /\|/g),
++        blank: CL.filter((l) => l === '').length === EL.filter((l) => l === '').length,
++      };
++      sym.push(cnf + ' +' + a[0] + '/-' + a[1] + ' vs _EN +' + b[0] + '/-' + b[1] + (okS ? ' OK' : ' MISMATCH'));
++      inf.push(cnf + ' ' + JSON.stringify(f5));
++      if (!okS) out.rec('G3(a.1) ' + cnf, 'FAIL', 'symmetry', sym[sym.length - 1]);
++      if (/^docs\/DELIVERY_DIRECTIVE\.md$/.test(cnf) && !Object.values(f5).every(Boolean)) {
++        out.rec('G3(a.2) ' + cnf, 'FAIL', 'mirror parity', inf[inf.length - 1]);
++      }
++    }
++    if (sym.length) {
++      out.rec(
++        'G3(a)',
++        sym.every((s) => / OK$/.test(s)) ? 'PASS' : 'FAIL',
++        'symmetry + mirror parity',
++        sym.join(' || ') + ' ;; ' + inf.join(' ;; ')
++      );
++    }
++  },
++};
+
+diff --git a/tools/gates/lib/criteria/g3b.js b/tools/gates/lib/criteria/g3b.js
+new file mode 100644
+index 0000000..ef36353
+--- /dev/null
++++ b/tools/gates/lib/criteria/g3b.js
+@@ -0,0 +1,54 @@
++'use strict';
++
++/**
++ * G3(b) key-field alignment (DELIVERY_DIRECTIVE 6.3 G3).
++ * Scope = added lines only. Line-count symmetry cannot prove that the semantics of
++ * the CN/`_EN` pair did not drift, so the mirrored key fields (commit hashes, CI run
++ * numbers, status glyphs, to-do markers, the not-reviewed row) are counted on both
++ * sides and must match.
++ *
++ * No changed `.md` in scope: an explicit INFO line instead of silence, so an empty
++ * run is visibly empty (mirrors the G7 / scope-guard convention).
++ */
++module.exports = {
++  id: 'G3-b',
++  label: 'key-field alignment',
++  title: '关键字段对齐（变更行）',
++  scripted: true,
++
++  run(ctx, out) {
++    if (ctx.changedMarkdown().length === 0) {
++      out.rec('G3(b)', 'INFO', 'key-field alignment', 'no changed .md in scope');
++      return;
++    }
++    const changed = ctx.changedPaths;
++    const pairs = changed.filter(
++      (f) => /\.md$/i.test(f) && !/_EN\.md$/.test(f) && changed.includes(f.replace(/\.md$/, '_EN.md'))
++    );
++    const PB = [
++      [/\b[0-9a-f]{7}\b/g, /\b[0-9a-f]{7}\b/g, 'hash'],
++      [/\brun \d+\b/g, /\brun \d+\b/g, 'run'],
++      [/[✅⬜]/g, /[✅⬜]/g, 'glyph'],
++      [/\*\*待办\*\*/g, /\*\*To do\*\*/g, 'to-do'],
++      [/^\| \*\*未过独立终审\*\*/gm, /^\| \*\*Did not pass independent final review\*\*/gim, 'not-reviewed'],
++    ];
++    const info = [];
++    for (const cnf of pairs) {
++      const A = ctx.addedLines(cnf).join('\n');
++      const B = ctx.addedLines(cnf.replace(/\.md$/, '_EN.md')).join('\n');
++      for (const [rc, re, label] of PB) {
++        const c = (A.match(rc) || []).length;
++        const e = (B.match(re) || []).length;
++        info.push(label + ' ' + c + '/' + e + (c === e ? ' OK' : ' MISMATCH'));
++      }
++    }
++    if (pairs.length) {
++      out.rec(
++        'G3(b)',
++        info.every((s) => / OK$/.test(s)) ? 'PASS' : 'FAIL',
++        'key-field alignment',
++        info.join(' | ')
++      );
++    }
++  },
++};
+
+diff --git a/tools/gates/lib/criteria/g4a.js b/tools/gates/lib/criteria/g4a.js
+new file mode 100644
+index 0000000..f807834
+--- /dev/null
++++ b/tools/gates/lib/criteria/g4a.js
+@@ -0,0 +1,39 @@
++'use strict';
++
++/**
++ * G4a BOM + LF encoding check (DELIVERY_DIRECTIVE 6.3 G4).
++ * Scope = the change set. `.md` / `.ps1` must carry a UTF-8 BOM and LF only; every
++ * other file must be BOM-free and LF only.
++ * Ignores are decided by `git check-ignore -q` instead of the throwaway script's
++ * hardcoded `.github/agents/sol-orchestrator/` skip, and already-deleted files are
++ * skipped instead of throwing ENOENT.
++ */
++const BOM = Buffer.from([0xef, 0xbb, 0xbf]);
++const CRLF = Buffer.from('\r\n');
++
++module.exports = {
++  id: 'G4a',
++  label: 'BOM+LF',
++  title: '编码（BOM + LF）',
++  scripted: true,
++
++  run(ctx, out) {
++    const bad = [];
++    for (const f of ctx.changedPaths) {
++      if (ctx.isIgnored(f)) continue;
++      const b = ctx.readBytes(f);
++      if (!b) continue; // deleted (or unreadable) file: nothing to submit
++      const bom = b.length >= 3 && b[0] === BOM[0] && b[1] === BOM[1] && b[2] === BOM[2];
++      const crlf = b.indexOf(CRLF) >= 0;
++      const want = /\.(md|ps1)$/i.test(f);
++      const ok = want ? bom && !crlf : !bom && !crlf;
++      if (!ok) bad.push(f + ' bom=' + bom + ' crlf=' + crlf);
++    }
++    out.rec(
++      'G4a',
++      bad.length === 0 ? 'PASS' : 'FAIL',
++      'BOM+LF',
++      bad.length ? JSON.stringify(bad) : ctx.changedPaths.length + ' file(s) OK'
++    );
++  },
++};
+
+diff --git a/tools/gates/lib/criteria/g4b.js b/tools/gates/lib/criteria/g4b.js
+new file mode 100644
+index 0000000..569ac7e
+--- /dev/null
++++ b/tools/gates/lib/criteria/g4b.js
+@@ -0,0 +1,73 @@
++'use strict';
++
++/**
++ * G4b anomalous character scan (DELIVERY_DIRECTIVE 6.3 G4).
++ *     (CJK characters of the added lines) MINUS (CJK characters of the base-revision
++ *     *.md corpus) MINUS (tools/gates/cjk-newwords.txt) MUST be empty.
++ * The whitelist freezes the human judgement (each entry carries a reason + context
++ * excerpt) so the assertion stays mechanically re-runnable. The base revision is the
++ * pre-change corpus: HEAD for tree/index scopes, the range base for range scopes.
++ *
++ * The whitelist itself is read through the shared scope-aware loader
++ * (`ctx.loadWhitelist`, GATES-EXT F1): tree/index use the working tree, range/ci use
++ * the scope's ENDPOINT revision - exactly like G6's whitelist, so both criteria
++ * always judge against the same snapshot of the registry.
++ */
++const { UsageError } = require('../ctx');
++
++const WHITELIST_REL = 'tools/gates/cjk-newwords.txt';
++
++function cjkChars(s) {
++  const o = new Set();
++  for (const ch of s) {
++    const c = ch.codePointAt(0);
++    if ((c >= 0x4e00 && c <= 0x9fff) || (c >= 0x3400 && c <= 0x4dbf) || (c >= 0xf900 && c <= 0xfaff)) {
++      o.add(ch);
++    }
++  }
++  return o;
++}
++
++module.exports = {
++  id: 'G4b',
++  label: 'CJK diff minus whitelist',
++  title: '编码 + 异常字',
++  scripted: true,
++
++  run(ctx, out) {
++    const ref =
++      ctx.kind === 'range' || ctx.kind === 'ci' ? ctx.baseRef : 'HEAD';
++    let corpus = new Set();
++    for (const f of ctx.listAllMarkdown()) {
++      const text = ctx.showAt(ref, f);
++      if (text === null) continue;
++      corpus = new Set([...corpus, ...cjkChars(text)]);
++    }
++
++    const whitelist = ctx.loadWhitelist(WHITELIST_REL);
++    if (whitelist.error) throw new UsageError(whitelist.error);
++    const white = new Set(whitelist.entries.map((e) => e.match));
++
++    let newC = new Set();
++    for (const f of ctx.changedMarkdown()) {
++      for (const l of ctx.addedLines(f)) {
++        for (const c of cjkChars(l)) newC.add(c);
++      }
++    }
++    const unknown = [...newC].filter((c) => !corpus.has(c) && !white.has(c));
++    out.rec(
++      'G4b',
++      unknown.length === 0 ? 'PASS' : 'FAIL',
++      'CJK diff minus whitelist',
++      'newCjk=' +
++        newC.size +
++        ' unknown=' +
++        JSON.stringify(unknown) +
++        ' (whitelist=' +
++        white.size +
++        ' whitelist-source=' +
++        whitelist.source +
++        ')'
++    );
++  },
++};
+
+diff --git a/tools/gates/lib/criteria/g5a.js b/tools/gates/lib/criteria/g5a.js
+new file mode 100644
+index 0000000..ca3ce46
+--- /dev/null
++++ b/tools/gates/lib/criteria/g5a.js
+@@ -0,0 +1,55 @@
++'use strict';
++
++/**
++ * G5-a role-file frontmatter hard gate (DELIVERY_DIRECTIVE 6.3 sub-rule G5-a).
++ *   ① `git grep -l "^model:" -- .github/agents/prfrail-*.agent.md` must be empty;
++ *   ② no `.agent.md` frontmatter may carry an empty `model` value in any of the
++ *      three forms `^\s*model\s*:\s*$`, `model: ""`, `model: ''`.
++ */
++const EMPTY_FORMS = [/^\s*model\s*:\s*$/m, /model:\s*""/, /model:\s*''/];
++
++module.exports = {
++  id: 'G5-a',
++  label: 'no model key in prfrail-*, no empty model',
++  title: '角色文件 frontmatter 硬闸',
++  scripted: true,
++
++  subchecks: [
++    {
++      id: 'G5-a(1)',
++      run(ctx, out) {
++        const r = ctx.git(['grep', '-l', '^model:', '--', '.github/agents/prfrail-*.agent.md']);
++        const h = r.ok ? r.out : '';
++        out.rec(
++          'G5-a(1)',
++          h.trim() === '' ? 'PASS' : 'FAIL',
++          'no model key in prfrail-*',
++          h.trim() === '' ? '0 hits' : h
++        );
++      },
++    },
++    {
++      id: 'G5-a(2)',
++      run(ctx, out) {
++        const agents = ctx.listAgentFiles();
++        const hits = [];
++        for (const f of agents) {
++          const text = ctx.readText('.github/agents/' + f);
++          if (text === null) continue;
++          const fm = (/^---\n([\s\S]*?)\n---/.exec(text) || [])[1] || '';
++          if (EMPTY_FORMS.some((re) => re.test(fm))) hits.push(f);
++        }
++        out.rec(
++          'G5-a(2)',
++          hits.length === 0 ? 'PASS' : 'FAIL',
++          'no empty model',
++          hits.length ? JSON.stringify(hits) : '0 hits / ' + agents.length + ' files'
++        );
++      },
++    },
++  ],
++
++  run(ctx, out) {
++    for (const s of this.subchecks) s.run(ctx, out);
++  },
++};
+
+diff --git a/tools/gates/lib/criteria/g5b.js b/tools/gates/lib/criteria/g5b.js
+new file mode 100644
+index 0000000..2e709a6
+--- /dev/null
++++ b/tools/gates/lib/criteria/g5b.js
+@@ -0,0 +1,32 @@
++'use strict';
++
++/**
++ * G5-b role-file `model` value gate (DELIVERY_DIRECTIVE 6.3 sub-rule G5-b).
++ * Added/modified `.agent.md` files must not set `model` to a section 2.4 blacklist
++ * value (Luna / Terra / Gemini / GPT-5.4 / Sol / Kimi, case insensitive).
++ */
++const BLACKLIST = /luna|terra|gemini|gpt-5\.4|sol|kimi/i;
++
++module.exports = {
++  id: 'G5-b',
++  label: 'blacklist model value',
++  title: '角色文件 model 取值闸',
++  scripted: true,
++
++  run(ctx, out) {
++    const targets = ctx.changedPaths.filter((f) => /\.agent\.md$/i.test(f));
++    const hits = [];
++    for (const f of targets) {
++      const text = ctx.readText(f);
++      if (text === null) continue;
++      const v = (/^model\s*:\s*(.+)$/m.exec(text) || [])[1] || '';
++      if (v && BLACKLIST.test(v)) hits.push(f);
++    }
++    out.rec(
++      'G5-b',
++      hits.length === 0 ? 'PASS' : 'FAIL',
++      'blacklist model value',
++      'checked ' + targets.length + ' file(s)'
++    );
++  },
++};
+
+diff --git a/tools/gates/lib/criteria/g6.js b/tools/gates/lib/criteria/g6.js
+new file mode 100644
+index 0000000..cfe6559
+--- /dev/null
++++ b/tools/gates/lib/criteria/g6.js
+@@ -0,0 +1,422 @@
++'use strict';
++
++/**
++ * G6 ledger metadata consistency (architecture design section 2).
++ *
++ * Scope rule: only the ADDED lines of the change set (same wording as G1-a / G3(b) /
++ * G4*); historical lines are never re-judged. Target files: every `.md` in scope.
++ *
++ * Self-reference guard: every sub-check skips lines carrying one of the exclusion
++ * markers, so the section 6.3 rule text can quote the forbidden shapes safely
++ * (isomorphic to the G2 "不得残留" mechanism).
++ *
++ * Whitelist: `tools/gates/g6-whitelist.txt`, entries
++ * `<match><TAB><file><TAB><reason / context excerpt>`, substring match, one
++ * registration per hit, reason and excerpt mandatory (a malformed entry is a usage
++ * error, exit 2 - that is what stops the file from becoming a blanket). The file is
++ * read through `ctx.loadWhitelist` (GATES-EXT F1): tree/index read the working tree,
++ * range/ci read the scope's endpoint revision - the same rule G4b uses.
++ *
++ *   G6-1 status tense      pending marker and same-label completion marker in one block
++ *   G6-2 cost clause       changed realized clause vs same-key realized clause, whole file
++ *   G6-3 run-id format     placeholder / out-of-range run ids (format only, never
++ *                          reachability; no network)
++ *   G6-4 expiring literal  line counts / file counts / aggregate counts
++ */
++
++const { UsageError } = require('../ctx');
++
++const WHITELIST_REL = 'tools/gates/g6-whitelist.txt';
++const EXCLUDE_MARKERS = ['不得残留', '示例', '引文', '冲突', '矛盾'];
++
++const PENDING_RE = /待\s*(?:①|②|③|④|⑤|⑥|⑦|⑧a|⑧b|⑨|⑩|终审|独立扫描|复审|预审|盲审|提交授权)/g;
++/**
++ * G6-1 completion marker (GATES-EXT, ⑥ F1). The accepted set must be the UNION the
++ * directive enumerates - `实得括号形态 / 粗体实得 / 已闭合 / ✅ 已完成` - not the
++ * bold-only intersection of it. Six accepted shapes:
++ *     （实得）   （**实得**）   **实得**   已闭合   ✅ 已完成   ✅ **已完成**
++ * Before the fix the regex demanded `**...**` around 实得, so the directive's OWN
++ * worked example (`待 ⑥ 独立扫描` coexisting with `⑥ 独立扫描（实得）PASS`, no bold)
++ * was not caught: a fail-open in a CI-blocking gate against its own text. Both the CN
++ * rule line and its `_EN` mirror contain `示例`, so the widened set cannot
++ * re-introduce a self-reference finding. The same-label 40-character window below is
++ * unchanged and still required, so widening does not weaken the block-level guard.
++ */
++const DONE_RE = /（\*\*实得\*\*）|（实得）|\*\*实得\*\*|已闭合|✅\s*\*\*已完成\*\*|✅\s*已完成/g;
++
++const KEY_RE = /SW-\d+|DR-\d+|OB-\d+|GATES-EXT|[A-Z]\d+[a-z]?/g;
++const COST_RE = /([⑥⑦])\s*[×xX]\s*(\d+)/g;
++const TOTAL_RE = /=\s*(\d+)\s*次/g;
++
++/**
++ * G6-3 legal shape (DELIVERY_DIRECTIVE 6.3): `run` + one space + 9-13 decimal digits.
++ * Every entry below is a must-FAIL shape; the band is enforced from BOTH sides, so a
++ * truncated / mis-copied id of 3-8 digits can no longer pass (GATES-EXT F7: the code
++ * previously only rejected 1-2 digits and >= 14 digits, so the criterion failed open
++ * against its own text).
++ *
++ * Prose narrowing (batch 2e): a digit run IMMEDIATELY followed by a word (ASCII letter
++ * or CJK ideograph) is a count in ordinary prose, not a run id - `run 1234 times` and
++ * `连续 run 12 次` are not malformed ids. The negative lookahead `(?!\s*[A-Za-z\u4e00-\u9fff])`
++ * is therefore attached to the DIGIT-RUN rules only. A token-final or backticked digit
++ * run stays judged (`run 111` end of line, `run 1234。`, `run \`1234\``, `\`run 1234\``),
++ * because the lookahead sees no following word. The placeholder rules (angle brackets,
++ * word list, CJK wording) are UNAMBIGUOUS and carry no following-word restriction - they
++ * are checked in any context, prose included.
++ *
++ * Leading boundary (batch 2f, NF-2): EVERY rule below carries the leading guard
++ * `(?<![A-Za-z\u4e00-\u9fff])`, so `run` preceded by a word character is not a run-id
++ * mention at all - `rerun 1234`, `prerun 12` and the CJK-glued `在run 1234` are not
++ * judged. Before 2f the patterns also matched inside words, which is a false-positive
++ * class in a CI-blocking gate (a sentence like "the harness will rerun 1234" would have
++ * turned G6-3 red). The guard is a LOOKBEHIND, so it never changes what is matched: the
++ * still-judged shapes (`see run 1234`, `（run 1234）`, `\`run 1234\``, `run 1234。`,
++ * `run TBD`) are followed by a non-word character or the start of the line, exactly as
++ * before. Placeholder rules carry the guard too: a rule reading `run` should not fire on
++ * a word that merely ends in those three letters.
++ */
++const RUN_PATTERNS = [
++  { re: /(?<![A-Za-z\u4e00-\u9fff])run\s+0+(?![0-9])(?!\s*[A-Za-z\u4e00-\u9fff])/g, why: 'all-zero run id' },
++  { re: /(?<![A-Za-z\u4e00-\u9fff])run\s*<[^>]*>/g, why: 'angle-bracket placeholder' },
++  { re: /(?<![A-Za-z\u4e00-\u9fff])run\s+(?:TBD|TODO|XXXX|XXX|N\/A)\b/gi, why: 'word placeholder' },
++  { re: /(?<![A-Za-z\u4e00-\u9fff])run\s+(?:待|占位)/g, why: 'placeholder wording' },
++  { re: /(?<![A-Za-z\u4e00-\u9fff])run\s+\d{1,2}(?![0-9])(?!\s*[A-Za-z\u4e00-\u9fff])/g, why: 'run id too short' },
++  {
++    re: /(?<![A-Za-z\u4e00-\u9fff])run\s+\d{3,8}(?![0-9])(?!\s*[A-Za-z\u4e00-\u9fff])/g,
++    why: 'run id below the 9-digit floor',
++  },
++  { re: /(?<![A-Za-z\u4e00-\u9fff])run\s+\d{14,}(?![0-9])(?!\s*[A-Za-z\u4e00-\u9fff])/g, why: 'run id too long' },
++];
++
++const LITERAL_PATTERNS = [
++  { re: /\d{2,}\/\d{2,}\s*行/, why: 'line-count ratio' },
++  { re: /\d{2,}\s*行/, why: 'line count' },
++  { re: /\d{2,}\s*个?\s*文件/, why: 'file count' },
++  { re: /共\s*\d{2,}/, why: 'aggregate count' },
++];
++
++function isExcluded(line) {
++  return EXCLUDE_MARKERS.some((m) => line.includes(m));
++}
++
++/** Heading indices of `^#{2,4} ` lines (block boundaries for G6-1). */
++function headingIndices(L) {
++  const out = [];
++  for (let i = 0; i < L.length; i++) if (/^#{2,4} /.test(L[i])) out.push(i);
++  return out;
++}
++
++function blockBounds(headings, i, total) {
++  let start = 0;
++  let end = total;
++  for (const h of headings) {
++    if (h <= i) start = h;
++    else {
++      end = h;
++      break;
++    }
++  }
++  return [start, end];
++}
++
++function qualify(line, index) {
++  // Clause qualification: the token belongs to the clause introduced by the NEAREST
++  // preceding qualifier (`预算` / `实得` / bare `成本`) inside the 60-character window.
++  // A plain `contains` test would let a `预算` keyword anywhere in the window shadow a
++  // following `实得` clause, which would make the realized-clause comparison vacuous
++  // (the architecture's T3/T4 expectations both require the 实得 clause to be compared).
++  const pre = line.slice(Math.max(0, index - 60), index);
++  let last = null;
++  for (const m of pre.matchAll(/预算|实得|成本/g)) last = m[0];
++  if (last === '预算') return 'budget';
++  if (last === '实得' || last === '成本') return 'realized';
++  return null;
++}
++
++/** Realized cost vector of one line: ⑥/⑦ counts plus the `= N 次` total. */
++function costClause(line) {
++  const realized = new Map();
++  let has = false;
++  for (const m of line.matchAll(COST_RE)) {
++    if (qualify(line, m.index) !== 'realized') continue;
++    has = true;
++    realized.set(m[1], (realized.get(m[1]) || 0) + Number(m[2]));
++  }
++  if (has) {
++    for (const m of line.matchAll(TOTAL_RE)) {
++      if (qualify(line, m.index) === 'realized') realized.set('=', Number(m[1]));
++    }
++  }
++  return realized;
++}
++
++function vecText(map) {
++  return (
++    [...map.entries()]
++      .sort((a, b) => (a[0] < b[0] ? -1 : 1))
++      .map(([k, v]) => (k === '=' ? 'total=' + v : k + '×' + v))
++      .join('+') || '-'
++  );
++}
++
++function keysOfLine(line) {
++  return [...new Set([...line.matchAll(KEY_RE)].map((m) => m[0]))];
++}
++
++function g6Whitelist(ctx) {
++  let res;
++  try {
++    res = ctx.loadWhitelist
++      ? ctx.loadWhitelist(WHITELIST_REL)
++      : { entries: [], error: null, source: 'worktree' };
++  } catch (e) {
++    throw new UsageError('cannot read ' + WHITELIST_REL + ': ' + (e.message || e));
++  }
++  if (!res) res = { entries: [], error: null, source: 'worktree' };
++  if (res.error) throw new UsageError(res.error);
++  return { entries: res.entries, source: res.source || 'unknown' };
++}
++
++/** Split findings into un-whitelisted (fatal) and whitelisted (SKIP, exit-code neutral). */
++function splitByWhitelist(entries, findings) {
++  const fatal = [];
++  const exempt = [];
++  for (const f of findings) {
++    const hit = entries.filter((e) => (e.file === '*' || e.file === f.file) && String(f.text).includes(e.match));
++    if (hit.length) exempt.push({ finding: f, entry: hit[0] });
++    else fatal.push(f);
++  }
++  return { fatal, exempt };
++}
++
++function emit(ctx, out, id, label, findings, emptyDetail) {
++  const wl = g6Whitelist(ctx);
++  const { fatal, exempt } = splitByWhitelist(wl.entries, findings);
++  const src = ' whitelist-source=' + wl.source;
++  out.rec(
++    id,
++    fatal.length === 0 ? 'PASS' : 'FAIL',
++    label,
++    (findings.length === 0
++      ? emptyDetail
++      : fatal.length
++      ? fatal.map((f) => f.detail).join(' | ')
++      : 'exempt by whitelist (' + exempt.length + ')') + src
++  );
++  for (const e of exempt) {
++    out.rec(
++      id,
++      'SKIP',
++      label + ' (whitelist)',
++      e.finding.file + ':' + e.finding.line + ' ' + e.finding.text.slice(0, 60) + ' <- ' + e.entry.reason + src
++    );
++  }
++  return { findings, fatal, exempt };
++}
++
++const G6_1 = {
++  id: 'G6-1',
++  label: 'status tense',
++  run(ctx, out) {
++    const findings = [];
++    const seen = new Set();
++    let scanned = 0;
++    for (const f of ctx.changedMarkdown()) {
++      const L = ctx.readLineArray(f);
++      if (!L) continue;
++      const headings = headingIndices(L);
++      for (const n of [...ctx.addedLineNumbers(f)].sort((a, b) => a - b)) {
++        const line = L[n - 1];
++        if (line === undefined) continue;
++        scanned++;
++        if (isExcluded(line)) continue;
++        for (const m of line.matchAll(PENDING_RE)) {
++          const label = m[0].replace(/^待\s*/, '');
++          const [bs, be] = blockBounds(headings, n - 1, L.length);
++          for (let i = bs; i < be; i++) {
++            const dl = L[i];
++            if (dl === undefined || isExcluded(dl)) continue;
++            for (const dm of dl.matchAll(DONE_RE)) {
++              const win = dl.slice(Math.max(0, dm.index - 40), dm.index + dm[0].length + 40);
++              if (!win.includes(label)) continue;
++              const key = f + ':' + n + ':' + label + ':' + (i + 1);
++              if (seen.has(key)) continue;
++              seen.add(key);
++              findings.push({
++                file: f,
++                line: n,
++                text: line,
++                detail: f + ':' + n + ' pending(' + label + ') vs done@' + (i + 1) + ' ' + dm[0],
++              });
++            }
++          }
++        }
++      }
++    }
++    return emit(ctx, out, 'G6-1', 'status tense', findings, 'no pending/completion conflict on added lines (scanned ' + scanned + ')');
++  },
++};
++
++const G6_2 = {
++  id: 'G6-2',
++  label: 'cost clause',
++  run(ctx, out) {
++    const findings = [];
++    let checked = 0;
++    let scanned = 0;
++    for (const f of ctx.changedMarkdown()) {
++      const L = ctx.readLineArray(f);
++      if (!L) continue;
++      const headings = headingIndices(L);
++      for (const n of [...ctx.addedLineNumbers(f)].sort((a, b) => a - b)) {
++        const line = L[n - 1];
++        if (line === undefined) continue;
++        scanned++;
++        if (isExcluded(line)) continue;
++        const vec = costClause(line);
++        if (!vec.size) continue;
++        checked++;
++        const myKeys = keysOfLine(line).length
++          ? keysOfLine(line)
++          : (() => {
++              const [bs] = blockBounds(headings, n - 1, L.length);
++              return keysOfLine(L[bs] || '');
++            })();
++        if (!myKeys.length) continue;
++        for (let j = 0; j < L.length; j++) {
++          if (j === n - 1) continue;
++          const other = L[j];
++          if (other === undefined || isExcluded(other)) continue;
++          const ovec = costClause(other);
++          if (!ovec.size) continue;
++          const oKeys = keysOfLine(other).length
++            ? keysOfLine(other)
++            : (() => {
++                const [bs] = blockBounds(headings, j, L.length);
++                return keysOfLine(L[bs] || '');
++              })();
++          const shared = oKeys.filter((k) => myKeys.includes(k));
++          if (!shared.length) continue;
++          if (vecText(ovec) === vecText(vec)) continue;
++          findings.push({
++            file: f,
++            line: n,
++            text: line,
++            detail:
++              f +
++              ':' +
++              n +
++              ' ' +
++              vecText(vec) +
++              ' vs line ' +
++              (j + 1) +
++              ' ' +
++              vecText(ovec) +
++              ' (key ' +
++              shared.join(',') +
++              ')',
++          });
++        }
++      }
++    }
++    return emit(
++      ctx,
++      out,
++      'G6-2',
++      'cost clause',
++      findings,
++      checked
++        ? checked + ' realized clause line(s) consistent with their same-key occurrences (scanned ' + scanned + ')'
++        : 'no realized cost clause on added lines (scanned ' + scanned + ')'
++    );
++  },
++};
++
++const G6_3 = {
++  id: 'G6-3',
++  label: 'run-id format',
++  run(ctx, out) {
++    const findings = [];
++    let scanned = 0;
++    for (const f of ctx.changedMarkdown()) {
++      const L = ctx.readLineArray(f);
++      if (!L) continue;
++      for (const n of [...ctx.addedLineNumbers(f)].sort((a, b) => a - b)) {
++        const line = L[n - 1];
++        if (line === undefined) continue;
++        scanned++;
++        if (isExcluded(line)) continue;
++        for (const p of RUN_PATTERNS) {
++          p.re.lastIndex = 0;
++          const m = p.re.exec(line);
++          if (!m) continue;
++          findings.push({
++            file: f,
++            line: n,
++            text: line,
++            detail: f + ':' + n + ' ' + p.why + ' :: ' + m[0].trim(),
++          });
++          break;
++        }
++      }
++    }
++    return emit(
++      ctx,
++      out,
++      'G6-3',
++      'run-id format',
++      findings,
++      'no malformed run id on added lines (scanned ' + scanned + ')'
++    );
++  },
++};
++
++const G6_4 = {
++  id: 'G6-4',
++  label: 'expiring literal',
++  run(ctx, out) {
++    const findings = [];
++    let scanned = 0;
++    for (const f of ctx.changedMarkdown()) {
++      const L = ctx.readLineArray(f);
++      if (!L) continue;
++      for (const n of [...ctx.addedLineNumbers(f)].sort((a, b) => a - b)) {
++        const line = L[n - 1];
++        if (line === undefined) continue;
++        scanned++;
++        if (isExcluded(line)) continue;
++        for (const p of LITERAL_PATTERNS) {
++          const m = p.re.exec(line);
++          if (!m) continue;
++          findings.push({
++            file: f,
++            line: n,
++            text: line,
++            detail: f + ':' + n + ' ' + p.why + ' :: ' + m[0].trim(),
++          });
++          break;
++        }
++      }
++    }
++    return emit(
++      ctx,
++      out,
++      'G6-4',
++      'expiring literal',
++      findings,
++      'no expiring literal on added lines (scanned ' + scanned + ')'
++    );
++  },
++};
++
++module.exports = {
++  id: 'G6',
++  label: 'ledger metadata consistency',
++  title: '台账元数据一致性',
++  scripted: true,
++  subchecks: [G6_1, G6_2, G6_3, G6_4],
++  internals: { isExcluded, headingIndices, blockBounds, qualify, costClause, vecText, keysOfLine, PENDING_RE, DONE_RE },
++  run(ctx, out) {
++    for (const s of this.subchecks) s.run(ctx, out);
++  },
++};
+
+diff --git a/tools/gates/lib/criteria/g7.js b/tools/gates/lib/criteria/g7.js
+new file mode 100644
+index 0000000..406e37f
+--- /dev/null
++++ b/tools/gates/lib/criteria/g7.js
+@@ -0,0 +1,367 @@
++'use strict';
++
++/**
++ * G7 review-bundle completeness (architecture design section 3) - structural only,
++ * no content semantics, no network.
++ *
++ * Target files: changed `docs/validation/*.md` (`docs/validation/evidence/**` excluded).
++ * The rule text lives in DELIVERY_DIRECTIVE.md and is therefore outside the G7 scan
++ * domain: the self-reference trap is avoided structurally.
++ *
++ * Machine contract: a changed validation report MUST contain a fenced block whose
++ * info string is exactly `artifacts`; each row is `<repo-relative path><TAB><disposition>`
++ * with disposition in { `repo` (may be omitted), `local-only`, `missing-historical` }.
++ *
++ *   G7-a the artifacts block is missing
++ *   G7-b path/disposition row is unresolvable or carries an unknown token
++ *   G7-c a changed finding row lacks a disposition CELL
++ *   G7-d a changed status line says "stopped" without the "stopped - incomplete" mark
++ *
++ * G7-c is STRUCTURAL (GATES-EXT F2): the disposition token must sit in the row's LAST
++ * CELL, not merely somewhere on the line. A row whose description quotes a disposition
++ * word (`| **High** | 台账称“已修”但处置列为空 | |`) has an EMPTY disposition cell and
++ * must FAIL - the token is never taken out of a description cell.
++ *
++ * G7-b `repo` disposition (GATES-EXT F2): the token means the SAME thing in every
++ * scope. range/ci: the path must exist at the scope's endpoint revision
++ * (`git cat-file -e`); tree/index: the path must be STAGED in the index
++ * (`git ls-files --error-unmatch`) AND exist on disk. A worktree-only / gitignored
++ * path is thus not enough locally: a tree-scope run is a faithful CI pre-flight
++ * only after `git add` of the declared artifact.
++ *
++ * G7-d is deliberately restricted to STATUS LINES (`| 状态 | ... |`, `状态：...`, `Status: ...`):
++ * a changed prose line that merely names the rule (measured: docs/validation/sw5-work-tiers.md:88
++ * reads "...（停止态报告头标记）= OB-10 所指缺口") is not a status declaration, and matching it
++ * would be the same self-reference trap G6 guards against with its exclusion markers.
++ *
++ * Explicitly NOT judged: artifact content, run reachability, number truth, report
++ * conclusion truth.
++ */
++
++const TARGET_RE = /^docs\/validation\/.*\.md$/;
++const EXCLUDED_PREFIX = 'docs/validation/evidence/';
++const ARTIFACT_FENCE_RE = /^```artifacts[ \t]*$/;
++const CLOSE_FENCE_RE = /^```[ \t]*$/;
++const DISPOSITIONS = ['repo', 'local-only', 'missing-historical'];
++const FINDING_ROW_RE = /^\|\s*\*\*(Critical|High|Medium|Low)\*\*\s*\|/;
++/**
++ * Accepted disposition tokens (GATES-EXT F3): ONE set covering both languages.
++ * The check stays STRUCTURAL (a disposition cell must exist); the token is never
++ * interpreted. G7 targets `docs/validation/*.md` including the `_EN` mirrors, so a
++ * Chinese-only vocabulary would fail the English reports by construction.
++ */
++const DISPOSITION_TOKENS = [
++  '已修',
++  '已整改',
++  '已闭合',
++  '已处置',
++  '接受',
++  '拒收',
++  '记录在案',
++  '待办',
++  '观察中',
++  '待议',
++  '已停止',
++  'Fixed',
++  'Resolved',
++  'Closed',
++  'Accepted',
++  'Rejected',
++  'Deferred',
++  'Recorded',
++  'To do',
++  'Observed',
++  'To be discussed',
++  'Not a problem',
++  'Documented',
++];
++const DISPOSITION_CELL_RE = new RegExp(DISPOSITION_TOKENS.join('|'));
++
++/**
++ * Cells of a markdown table row, in order, trimmed.
++ * The outer pipe artifacts are dropped (`|` at both ends), but a TRAILING EMPTY CELL
++ * is preserved: `| a | b | |` yields ['a', 'b', ''] - that is exactly the
++ * "disposition cell left blank" shape G7-c must FAIL (GATES-EXT F2). Dropping the
++ * empty cell would let a disposition word inside the description cell pass the row.
++ */
++function rowCells(line) {
++  const parts = String(line).split('|');
++  const cells = String(line).trim().endsWith('|') ? parts.slice(1, -1) : parts.slice(1);
++  return cells.map((c) => c.trim());
++}
++
++/**
++ * The disposition CELL of a finding row: the row's LAST cell, structurally - never a
++ * substring search over the whole line (GATES-EXT F2).
++ */
++function dispositionCell(line) {
++  const cells = rowCells(line);
++  return cells.length ? cells[cells.length - 1] : '';
++}
++
++/**
++ * Stopped-state tokens (GATES-EXT F3): ONE bilingual set. G7 targets
++ * `docs/validation/*.md` including the `_EN` mirrors, so a Chinese-only vocabulary
++ * let `| Status | Stopped (pending user ruling) |` through - and G7-d claims to cover
++ * the English reports by construction. Matching is case-insensitive for the ASCII
++ * tokens (`stopped` / `HALTED` are the same status as `Stopped` / `Halted`).
++ */
++const STOP_TOKENS = ['已停止', '停止态', 'Stopped', 'Halted'];
++const STOP_RE = new RegExp(STOP_TOKENS.join('|'), 'i');
++/**
++ * The "incomplete" mark the stopped state must carry: the CN canonical form plus its
++ * EN mirror. `已停止——未完成` alone would require an English report to write Chinese.
++ * Compared case-insensitively, like the tokens above.
++ */
++const STOP_OK_CN = '已停止——未完成';
++const STOP_MARKS = [STOP_OK_CN, 'Stopped — incomplete'];
++const STOP_OK = STOP_OK_CN;
++
++/** Does the line carry the incomplete mark (either language, any case)? */
++function hasStopMark(line) {
++  const s = String(line).toLowerCase();
++  return STOP_MARKS.some((m) => s.indexOf(m.toLowerCase()) >= 0);
++}
++/** Report status line: a `状态` / `Status` label followed by a separator (table row included). */
++const STATUS_LINE_RE = /^(?:\|\s*)?(?:\*\*)?(?:状态|Status)(?:\*\*)?\s*[：:|]/i;
++
++function targets(ctx) {
++  return ctx.changedPaths.filter((p) => TARGET_RE.test(p) && !p.startsWith(EXCLUDED_PREFIX));
++}
++
++/** Fenced `artifacts` block, or null when the report has none. */
++function artifactBlock(L) {
++  const start = L.findIndex((l) => ARTIFACT_FENCE_RE.test(l));
++  if (start < 0) return null;
++  let end = L.findIndex((l, i) => i > start && CLOSE_FENCE_RE.test(l));
++  if (end < 0) end = L.length;
++  return { start, end, body: L.slice(start + 1, end) };
++}
++
++const G7_A = {
++  id: 'G7-a',
++  label: 'artifacts block present',
++  run(ctx, out) {
++    const tgts = targets(ctx);
++    const findings = [];
++    let checked = 0;
++    for (const f of tgts) {
++      const L = ctx.readLineArray(f);
++      if (!L) continue; // deleted / unreadable report: nothing to judge
++      checked++;
++      if (!artifactBlock(L)) {
++        findings.push({ file: f, line: 0, text: 'no ```artifacts block', detail: f + ' missing ```artifacts block' });
++      }
++    }
++    if (!tgts.length) {
++      out.rec('G7-a', 'INFO', 'artifacts block present', 'no changed report in scope');
++      return { findings };
++    }
++    out.rec(
++      'G7-a',
++      findings.length === 0 ? 'PASS' : 'FAIL',
++      'artifacts block present',
++      findings.length
++        ? findings.map((f) => f.detail).join(' | ')
++        : checked + ' report(s) OK' + (checked < tgts.length ? ' (' + (tgts.length - checked) + ' unreadable/deleted skipped)' : '')
++    );
++    return { findings };
++  },
++};
++
++const G7_B = {
++  id: 'G7-b',
++  label: 'artifact path/disposition resolvable',
++  run(ctx, out) {
++    const tgts = targets(ctx);
++    const findings = [];
++    let rows = 0;
++    for (const f of tgts) {
++      const L = ctx.readLineArray(f);
++      if (!L) continue;
++      const block = artifactBlock(L);
++      if (!block) continue;
++      block.body.forEach((raw, k) => {
++        const lineNo = block.start + 2 + k;
++        const t = raw.trim();
++        if (!t || t.startsWith('#')) return;
++        rows++;
++        const parts = raw.split('\t');
++        const p = parts[0].trim().replace(/^\.\//, '');
++        const disp = parts.length > 1 ? parts[1].trim() : '';
++        if (!p) {
++          findings.push({ file: f, line: lineNo, text: raw, detail: f + ':' + lineNo + ' empty artifact path' });
++          return;
++        }
++        if (disp !== '' && DISPOSITIONS.indexOf(disp) < 0) {
++          findings.push({
++            file: f,
++            line: lineNo,
++            text: raw,
++            detail: f + ':' + lineNo + ' unknown disposition `' + disp + '` for ' + p,
++          });
++          return;
++        }
++        const kind = disp === '' ? 'repo' : disp;
++        if (kind !== 'repo') return; // local-only / missing-historical are accepted as declared
++        const res = ctx.repoArtifactResolvable
++          ? ctx.repoArtifactResolvable(p)
++          : { ok: ctx.exists(p), source: 'worktree-existence', reason: '' };
++        if (!res.ok) {
++          findings.push({
++            file: f,
++            line: lineNo,
++            text: raw,
++            detail:
++              f +
++              ':' +
++              lineNo +
++              ' declared repo artifact not resolvable (' +
++              res.source +
++              '): ' +
++              p +
++              (res.reason ? ' - ' + res.reason : ''),
++          });
++        }
++      });
++    }
++    if (!tgts.length) {
++      out.rec('G7-b', 'INFO', 'artifact path/disposition resolvable', 'no changed report in scope');
++      return { findings };
++    }
++    out.rec(
++      'G7-b',
++      findings.length === 0 ? 'PASS' : 'FAIL',
++      'artifact path/disposition resolvable',
++      findings.length
++        ? findings.map((f) => f.detail).join(' | ')
++        : rows +
++            ' artifact row(s) OK (repo check: ' +
++            (ctx.kind === 'range' || ctx.kind === 'ci'
++              ? 'git cat-file -e <endpoint>:<path>'
++              : 'git ls-files --error-unmatch + worktree presence') +
++            ')'
++    );
++    return { findings };
++  },
++};
++
++const G7_C = {
++  id: 'G7-c',
++  label: 'finding row disposition cell',
++  run(ctx, out) {
++    const tgts = targets(ctx);
++    const findings = [];
++    let rows = 0;
++    for (const f of tgts) {
++      const L = ctx.readLineArray(f);
++      if (!L) continue;
++      for (const n of [...ctx.addedLineNumbers(f)].sort((a, b) => a - b)) {
++        const line = L[n - 1];
++        if (line === undefined || !FINDING_ROW_RE.test(line)) continue;
++        rows++;
++        const cell = dispositionCell(line);
++        if (cell && DISPOSITION_CELL_RE.test(cell)) continue;
++        findings.push({
++          file: f,
++          line: n,
++          text: line,
++          detail:
++            f +
++            ':' +
++            n +
++            ' finding row without disposition' +
++            (cell ? '' : ' (last cell empty)'),
++        });
++      }
++    }
++    if (!tgts.length) {
++      out.rec('G7-c', 'INFO', 'finding row disposition cell', 'no changed report in scope');
++      return { findings };
++    }
++    out.rec(
++      'G7-c',
++      findings.length === 0 ? 'PASS' : 'FAIL',
++      'finding row disposition cell',
++      findings.length
++        ? findings.map((f) => f.detail).join(' | ')
++        : rows + ' changed finding row(s) with disposition'
++    );
++    return { findings };
++  },
++};
++
++const G7_D = {
++  id: 'G7-d',
++  label: 'stopped state marked incomplete',
++  run(ctx, out) {
++    const tgts = targets(ctx);
++    const findings = [];
++    for (const f of tgts) {
++      const L = ctx.readLineArray(f);
++      if (!L) continue;
++      const headings = [];
++      for (let i = 0; i < L.length; i++) if (/^#{2,4} /.test(L[i])) headings.push(i);
++      for (const n of [...ctx.addedLineNumbers(f)].sort((a, b) => a - b)) {
++        const line = L[n - 1];
++        if (line === undefined || !STOP_RE.test(line)) continue;
++        if (hasStopMark(line)) continue;
++        if (!STATUS_LINE_RE.test(line)) continue; // prose naming the rule is not a status line
++        let start = 0;
++        let end = L.length;
++        for (const h of headings) {
++          if (h <= n - 1) start = h;
++          else {
++            end = h;
++            break;
++          }
++        }
++        let ok = false;
++        for (let i = start; i < end; i++) if (hasStopMark(L[i] || '')) ok = true;
++        if (ok) continue;
++        findings.push({
++          file: f,
++          line: n,
++          text: line,
++          detail: f + ':' + n + ' stopped state without ' + STOP_MARKS.map((m) => '`' + m + '`').join(' / '),
++        });
++      }
++    }
++    if (!tgts.length) {
++      out.rec('G7-d', 'INFO', 'stopped state marked incomplete', 'no changed report in scope');
++      return { findings };
++    }
++    out.rec(
++      'G7-d',
++      findings.length === 0 ? 'PASS' : 'FAIL',
++      'stopped state marked incomplete',
++      findings.length ? findings.map((f) => f.detail).join(' | ') : 'no stopped-state row missing the incomplete mark'
++    );
++    return { findings };
++  },
++};
++
++module.exports = {
++  id: 'G7',
++  label: 'review-bundle completeness',
++  title: '审查包完整性',
++  scripted: true,
++  subchecks: [G7_A, G7_B, G7_C, G7_D],
++  internals: {
++    targets,
++    artifactBlock,
++    DISPOSITIONS,
++    DISPOSITION_TOKENS,
++    FINDING_ROW_RE,
++    DISPOSITION_CELL_RE,
++    rowCells,
++    dispositionCell,
++    STOP_TOKENS,
++    STOP_MARKS,
++    hasStopMark,
++    STOP_OK,
++  },
++  run(ctx, out) {
++    for (const s of this.subchecks) s.run(ctx, out);
++  },
++};
+
+diff --git a/tools/gates/lib/criteria/r25.js b/tools/gates/lib/criteria/r25.js
+new file mode 100644
+index 0000000..2047d5b
+--- /dev/null
++++ b/tools/gates/lib/criteria/r25.js
+@@ -0,0 +1,36 @@
++'use strict';
++
++/**
++ * R2.5 role-file header note, position anchored (DELIVERY_DIRECTIVE 2.2 / 4.2).
++ * After the frontmatter the first non-empty line must be the non-generated note,
++ * and every `.agent.md` must carry exactly the same note (a single distinct value).
++ */
++module.exports = {
++  id: 'R2.5',
++  label: 'header-note position',
++  title: '头注位置锚定',
++  scripted: true,
++
++  run(ctx, out) {
++    const agents = ctx.listAgentFiles();
++    const bad = [];
++    const notes = new Set();
++    for (const f of agents) {
++      const t = ctx.readText('.github/agents/' + f);
++      if (t === null) continue;
++      const fm = (/^---\n[\s\S]*?\n---\n/.exec(t) || [])[0] || '';
++      const first = (t.slice(fm.length).split('\n').find((l) => l.trim() !== '') || '').trim();
++      notes.add(first);
++      if (!/非生成物/.test(first) || !/不得由生成器覆盖/.test(first)) bad.push(f);
++    }
++    const ok = bad.length === 0 && notes.size === 1;
++    out.rec(
++      'R2.5',
++      ok ? 'PASS' : 'FAIL',
++      'header-note position',
++      bad.length
++        ? JSON.stringify(bad)
++        : 'distinct=' + notes.size + ' uniform ' + agents.length + '/' + agents.length
++    );
++  },
++};
+
+diff --git a/tools/gates/lib/ctx.js b/tools/gates/lib/ctx.js
+new file mode 100644
+index 0000000..c323098
+--- /dev/null
++++ b/tools/gates/lib/ctx.js
+@@ -0,0 +1,614 @@
++'use strict';
++
++/**
++ * Shared context for every criterion in tools/gates.
++ *
++ * Responsibilities:
++ *   - repository-root discovery (git rev-parse --show-toplevel, .git walk-up fallback;
++ *     the migated throwaway script hardcoded D:/LZProjects/prfrail/);
++ *   - change-set resolution for --scope=tree|index|range:<A>..<B>|ci, including
++ *     untracked files (whose whole body counts as added lines) and staged-only files
++ *     (which the old `git diff -U0` silently skipped);
++ *   - deletion/rename aware status parsing (the old parser crashed on deleted files);
++ *   - normalized reads (BOM strip + CRLF -> LF) and raw byte reads for the encoding gate;
++ *   - every git invocation wrapped: a "no match" exit code 1 is data, never a crash.
++ *
++ * Node >= 18 stdlib + git only. No third-party dependencies.
++ */
++
++const fs = require('fs');
++const path = require('path');
++const cp = require('child_process');
++
++/** Git's well-known empty tree object, used when a scope has no parent commit. */
++const EMPTY_TREE = '4b825dc642cb6eb9a060e54bf8d69288fbee4904';
++const GIT_MAX_BUFFER = 2e8;
++
++/** Usage / environment error: the runner must exit 2, never report PASS/FAIL. */
++class UsageError extends Error {
++  constructor(message) {
++    super(message);
++    this.name = 'UsageError';
++  }
++}
++
++function toPosix(p) {
++  return String(p).replace(/\\/g, '/');
++}
++
++function stripBom(text) {
++  return text.charCodeAt(0) === 0xfeff ? text.slice(1) : text;
++}
++
++/** Same normalization the throwaway script used: strip BOM, CRLF -> LF, keep lone CR. */
++function decodeBuffer(buf) {
++  return stripBom(buf.toString('utf8')).replace(/\r\n/g, '\n');
++}
++
++/**
++ * Split the body of an untracked file the way `git --numstat` counts lines: a
++ * trailing newline terminates the last line, it does not create an extra empty
++ * one. Without this the tree scope reported one more added line per untracked
++ * file than the range scope did (GATES-EXT F4), permanently disagreeing with
++ * `git --numstat` and with the range detail counts.
++ */
++function splitAddedLines(text) {
++  const lines = String(text).split('\n');
++  if (lines.length && lines[lines.length - 1] === '') lines.pop();
++  return lines;
++}
++
++/**
++ * Whitelist source rule (GATES-EXT F1) - ONE rule for BOTH whitelists
++ * (`tools/gates/g6-whitelist.txt` used by G6, `tools/gates/cjk-newwords.txt`
++ * used by G4b):
++ *   tree / index -> the working tree;
++ *   range / ci   -> the scope's ENDPOINT revision (`range:A..B` resolves to B,
++ *                   `ci` resolves to HEAD).
++ * Consequence: a registration made only in the working tree can never exempt a
++ * finding in a historical range, and both criteria always read the same snapshot.
++ */
++function resolveWhitelistSource(scope) {
++  const s = scope || {};
++  if (s.kind === 'range') return { kind: 'endpoint', ref: s.head };
++  if (s.kind === 'ci') return { kind: 'endpoint', ref: 'HEAD' };
++  return { kind: 'worktree' };
++}
++
++function whitelistSourceLabel(src) {
++  return src.kind === 'endpoint' ? 'endpoint:' + src.ref : 'worktree';
++}
++
++/**
++ * G7-b `repo` disposition (GATES-EXT F2): the token must mean the SAME thing in
++ * every scope.
++ *   range / ci   -> the path must exist at the scope's endpoint revision
++ *                   (`git cat-file -e <ref>:<path>`);
++ *   tree / index -> the path must be STAGED in the index
++ *                   (`git ls-files --error-unmatch <path>`) AND exist on disk.
++ * A gitignored / never-staged path is therefore not enough in tree scope: a
++ * tree-scope run is a faithful CI pre-flight only after `git add` of the artifact.
++ */
++function resolveRepoArtifact(repoRoot, kind, ref, p) {
++  if (kind === 'range' || kind === 'ci') {
++    const r = spawnGit(repoRoot, ['cat-file', '-e', ref + ':' + p]);
++    return {
++      ok: r.ok,
++      source: 'endpoint:' + ref,
++      reason: r.ok ? '' : 'not present at ' + ref + ':' + p,
++    };
++  }
++  const staged = spawnGit(repoRoot, ['ls-files', '--error-unmatch', '--', p]);
++  const onDisk = fs.existsSync(path.join(repoRoot, p.split('/').join(path.sep)));
++  return {
++    ok: staged.ok && onDisk,
++    source: 'index+worktree',
++    reason: !staged.ok
++      ? 'not staged in the index (git add the artifact first)'
++      : !onDisk
++      ? 'not present in the working tree'
++      : '',
++  };
++}
++
++function spawnGit(cwd, args, binary) {
++  const r = cp.spawnSync('git', args, {
++    cwd,
++    encoding: binary ? 'buffer' : 'utf8',
++    maxBuffer: GIT_MAX_BUFFER,
++    windowsHide: true,
++  });
++  return {
++    ok: r.status === 0,
++    code: r.status === null ? 127 : r.status,
++    out: binary ? (r.stdout || Buffer.alloc(0)) : (r.stdout || ''),
++    err: binary ? (r.stderr || Buffer.alloc(0)) : (r.stderr || ''),
++    spawnError: r.error ? String(r.error.message) : null,
++  };
++}
++
++function discoverRepoRoot(startDir) {
++  const start = path.resolve(startDir || process.cwd());
++  const probe = cp.spawnSync('git', ['rev-parse', '--show-toplevel'], {
++    cwd: start,
++    encoding: 'utf8',
++    windowsHide: true,
++  });
++  if (probe.status === 0 && probe.stdout && probe.stdout.trim()) {
++    return path.resolve(probe.stdout.trim());
++  }
++  let dir = start;
++  for (;;) {
++    if (fs.existsSync(path.join(dir, '.git'))) return dir;
++    const up = path.dirname(dir);
++    if (up === dir) return null;
++    dir = up;
++  }
++}
++
++function parseScopeText(text) {
++  const s = String(text || 'tree').trim();
++  if (s === 'tree' || s === 'index' || s === 'ci') return { kind: s };
++  const m = /^range:(.+?)\.\.(.+)$/.exec(s);
++  if (m) return { kind: 'range', base: m[1], head: m[2] };
++  return null;
++}
++
++/** `git status --porcelain=v1 -z -uall` -> records. */
++function parseStatusZ(out) {
++  const parts = out.split('\0');
++  const records = [];
++  for (let i = 0; i < parts.length; i++) {
++    const rec = parts[i];
++    if (!rec) continue;
++    const xy = rec.slice(0, 2);
++    const p = toPosix(rec.slice(3));
++    const entry = {
++      path: p,
++      status: xy,
++      index: xy[0],
++      worktree: xy[1],
++      untracked: xy === '??',
++      staged: xy[0] !== ' ' && xy[0] !== '?',
++      unstaged: xy[1] !== ' ' && xy[1] !== '?',
++      deleted: xy[0] === 'D' || xy[1] === 'D',
++      renamedFrom: null,
++    };
++    if (xy[0] === 'R' || xy[1] === 'R') {
++      entry.renamedFrom = toPosix(parts[++i] || '');
++    }
++    records.push(entry);
++  }
++  return records;
++}
++
++/** `git diff --name-status -z <base> <head>` -> records. */
++function parseNameStatusZ(out) {
++  const parts = out.split('\0');
++  const records = [];
++  for (let i = 0; i < parts.length; i++) {
++    const st = parts[i];
++    if (!st) continue;
++    const code = st[0];
++    if (code === 'R' || code === 'C') {
++      const src = toPosix(parts[++i] || '');
++      const dst = toPosix(parts[++i] || '');
++      records.push({
++        path: dst,
++        status: st,
++        index: code,
++        worktree: ' ',
++        untracked: false,
++        staged: true,
++        unstaged: false,
++        deleted: false,
++        renamedFrom: src,
++      });
++    } else {
++      const p = toPosix(parts[++i] || '');
++      if (!p) continue;
++      records.push({
++        path: p,
++        status: st,
++        index: code,
++        worktree: ' ',
++        untracked: false,
++        staged: true,
++        unstaged: false,
++        deleted: code === 'D',
++        renamedFrom: null,
++      });
++    }
++  }
++  return records;
++}
++
++/**
++ * Added-line records (1-based new-file line number + text) from a unified diff.
++ * With -U0 every body line is either an addition or a deletion, so the new-file
++ * counter only advances on additions.
++ */
++function parseHunkAdditions(diffText) {
++  const out = [];
++  let newLine = 0;
++  for (const line of diffText.split('\n')) {
++    const h = /^@@ -\d+(?:,\d+)? \+(\d+)(?:,\d+)? @@/.exec(line);
++    if (h) {
++      newLine = parseInt(h[1], 10);
++      continue;
++    }
++    if (line.startsWith('+') && !line.startsWith('+++')) {
++      out.push({ n: newLine, text: line.slice(1) });
++      newLine++;
++    }
++    // Deleted lines do not advance the new-file counter; headers are ignored.
++  }
++  return out;
++}
++
++function createContext(options) {
++  const opts = options || {};
++  const scopeText = opts.scope || 'tree';
++  const scope = parseScopeText(scopeText);
++  if (!scope) throw new Error('invalid --scope value: ' + scopeText);
++
++  const repoRoot = opts.repoRoot || discoverRepoRoot(opts.cwd || process.cwd());
++  if (!repoRoot) {
++    throw new Error('cannot locate the repository root (git rev-parse --show-toplevel failed and no .git found)');
++  }
++
++  const kind = scope.kind;
++  let baseRef = null;
++  let headRef = null;
++
++  // Test seam (GATES-EXT, 7 round-2): the scope guards below must be verifiable one by one, so the
++  // git runner can be injected. Production always uses spawnGit; the selftest substitutes a fake to
++  // prove each guard fires independently instead of only as a bundle.
++  const spawn = opts.spawnGit || spawnGit;
++
++  function git(args, o) {
++    return spawn(repoRoot, args, !!(o && o.binary));
++  }
++
++  if (kind === 'ci') {
++    if (!git(['rev-parse', '--verify', 'HEAD']).ok) {
++      throw new UsageError('--scope=ci requires a HEAD commit (root-commit guard: use --scope=range instead)');
++    }
++    headRef = 'HEAD';
++    if (git(['rev-parse', '--verify', 'HEAD^1']).ok) {
++      baseRef = 'HEAD^1';
++    } else {
++      // A missing parent is legitimate ONLY for a genuine root commit. On a SHALLOW clone it means
++      // the history was never fetched, and the EMPTY_TREE fallback would classify the WHOLE
++      // repository as added lines - a whole-tree false-positive storm wearing the costume of a real
++      // run (GATES-EXT, 7 F1/F4). The probe must be CONCLUSIVE: an inconclusive probe is itself an
++      // environment error, never a licence to fall back.
++      const probe = git(['rev-parse', '--is-shallow-repository']);
++      const answer = (probe.out || '').trim();
++      if (!probe.ok || (answer !== 'true' && answer !== 'false')) {
++        throw new UsageError(
++          '--scope=ci: cannot decide whether HEAD^1 is missing because this is a root commit or because ' +
++            'the clone is shallow (`git rev-parse --is-shallow-repository` answered ' +
++            (probe.ok ? JSON.stringify(answer) : 'exit ' + probe.code) +
++            '). Use --scope=range:<A>..<B> explicitly.'
++        );
++      }
++      if (answer === 'true') {
++        throw new UsageError(
++          '--scope=ci: HEAD^1 is unavailable because this clone is SHALLOW; a whole-tree change set ' +
++            'would follow. Fetch the full history (actions/checkout `fetch-depth: 0`) or use --scope=range:<A>..<B>.'
++        );
++      }
++      baseRef = EMPTY_TREE;
++    }
++  } else if (kind === 'range') {
++    baseRef = scope.base;
++    headRef = scope.head;
++    // An unresolvable endpoint must be a usage/environment error (exit 2), never an empty change
++    // set: with an empty set every criterion prints a vacuous pass and the gate goes green while
++    // judging nothing - a fail-open in a CI-blocking gate (GATES-EXT, 7 F1). The `^{commit}`
++    // suffix is load-bearing: a bare `rev-parse --verify` accepts any well-formed 40-hex string
++    // (including the null oid) without checking that the object exists.
++    for (const pair of [['base', baseRef], ['head', headRef]]) {
++      if (!git(['rev-parse', '--verify', '--quiet', pair[1] + '^{commit}']).ok) {
++        throw new UsageError(
++          '--scope=range: the ' +
++            pair[0] +
++            ' revision is not resolvable to a commit: ' +
++            pair[1] +
++            ' (an unresolvable range must not degrade into an empty change set)'
++        );
++      }
++    }
++  }
++
++  let changed = [];
++  if (kind === 'tree' || kind === 'index') {
++    // Same rule as the range/ci diff below: a failed command is an ENVIRONMENT ERROR, never
++    // "no changes" (7 round-2 F3). A corrupt/unreadable index makes `git status` fail with empty
++    // stdout; reading that as an empty change set turned the whole run into vacuous passes.
++    const sr = git(['status', '--porcelain=v1', '-uall', '-z']);
++    if (!sr.ok) {
++      throw new UsageError(
++        'environment error: git status failed for scope ' + kind + ': ' + ((sr.err || '').trim() || 'exit ' + sr.code)
++      );
++    }
++    changed = parseStatusZ(sr.out);
++    if (kind === 'index') changed = changed.filter((rec) => rec.staged);
++  } else {
++    // range / ci: the change set comes from `git diff`. A failed diff (bad revision, unavailable
++    // object, unreadable repository) must surface as an environment error - reading its empty
++    // stdout as "no changes" is exactly the fail-open path guarded above.
++    const r = git(['diff', '--name-status', '-z', baseRef, headRef]);
++    if (!r.ok) {
++      throw new UsageError(
++        'environment error: git diff --name-status failed for scope ' +
++          kind +
++          ' (' +
++          baseRef +
++          '..' +
++          headRef +
++          '): ' +
++          ((r.err || '').trim() || 'exit ' + r.code)
++      );
++    }
++    changed = parseNameStatusZ(r.out);
++  }
++
++  const byPath = new Map();
++  for (const rec of changed) byPath.set(rec.path, rec);
++
++  function diffPrefixes() {
++    if (kind === 'index') return [['diff', '--cached']];
++    if (kind === 'range' || kind === 'ci') return [['diff', baseRef, headRef]];
++    return [['diff'], ['diff', '--cached']];
++  }
++
++  function pathOnDisk(p) {
++    return path.join(repoRoot, p.split('/').join(path.sep));
++  }
++
++  function readBytes(p) {
++    if (kind === 'range' || kind === 'ci') {
++      const r = git(['show', headRef + ':' + p], { binary: true });
++      return r.ok ? r.out : null;
++    }
++    try {
++      return fs.readFileSync(pathOnDisk(p));
++    } catch (e) {
++      return null;
++    }
++  }
++
++  function readLines(p) {
++    const buf = readBytes(p);
++    return buf === null ? null : decodeBuffer(buf);
++  }
++
++  function readText(p) {
++    const buf = readBytes(p);
++    return buf === null ? null : decodeBuffer(buf);
++  }
++
++  function readLineArray(p) {
++    const text = readText(p);
++    return text === null ? null : text.split('\n');
++  }
++
++  function exists(p) {
++    if (kind === 'range' || kind === 'ci') {
++      return git(['cat-file', '-e', headRef + ':' + p]).ok;
++    }
++    return fs.existsSync(pathOnDisk(p));
++  }
++
++  function trackedAt(ref, p) {
++    return git(['cat-file', '-e', ref + ':' + p]).ok;
++  }
++
++  function showAt(ref, p) {
++    const r = git(['show', ref + ':' + p]);
++    return r.ok ? r.out : null;
++  }
++
++  function isIgnored(p) {
++    return git(['check-ignore', '-q', '--', p]).ok;
++  }
++
++  const hunkCache = new Map();
++
++  function addedHunks(p) {
++    if (hunkCache.has(p)) return hunkCache.get(p);
++    const rec = byPath.get(p);
++    let out = [];
++    if (rec && rec.untracked) {
++      const text = readText(p);
++      if (text !== null) out = splitAddedLines(text).map((t, i) => ({ n: i + 1, text: t }));
++    } else {
++      for (const prefix of diffPrefixes()) {
++        const r = git(prefix.concat(['-U0', '--no-color', '--', p]));
++        if (r.ok) out = out.concat(parseHunkAdditions(r.out));
++      }
++    }
++    hunkCache.set(p, out);
++    return out;
++  }
++
++  function addedLines(p) {
++    return addedHunks(p).map((h) => h.text);
++  }
++
++  function addedLineNumbers(p) {
++    return new Set(addedHunks(p).map((h) => h.n));
++  }
++
++  function numstat(p) {
++    const rec = byPath.get(p);
++    if (rec && rec.untracked) {
++      const text = readText(p);
++      return [String(text === null ? 0 : splitAddedLines(text).length), '0'];
++    }
++    for (const prefix of diffPrefixes()) {
++      const r = git(prefix.concat(['--numstat', '--', p]));
++      if (!r.ok) continue;
++      const line = r.out.trim().split('\n')[0];
++      if (!line) continue;
++      const parts = line.split('\t');
++      if (parts.length >= 2) return [parts[0], parts[1]];
++    }
++    return ['0', '0'];
++  }
++
++  function listAllMarkdown() {
++    // NOTE: do NOT pass a `*.md` pathspec here. `git ls-tree -r --name-only <ref> -- '*.md'`
++    // returns an empty list (measured 2026-09-22), which silently empties the G4b corpus and
++    // turns the criterion into a false-positive machine. List everything and filter in JS.
++    const r =
++      kind === 'range' || kind === 'ci'
++        ? git(['ls-tree', '-r', '--name-only', baseRef])
++        : git(['ls-files']);
++    return r.ok ? r.out.split('\n').filter((p) => p && /\.md$/i.test(p)) : [];
++  }
++
++  function listAgentFiles() {
++    const dir = path.join(repoRoot, '.github', 'agents');
++    try {
++      return fs
++        .readdirSync(dir)
++        .filter((f) => f.endsWith('.agent.md'))
++        .sort();
++    } catch (e) {
++      return [];
++    }
++  }
++
++  /**
++   * Whitelist loader (one function for both whitelists, see resolveWhitelistSource).
++   * Returns the used source label, the raw text (null when absent) and the parsed
++   * `<match>\t<file>\t<reason>` entries; `error` is a usage error, never silently
++   * ignored.
++   */
++  function loadWhitelist(rel, scopeOverride) {
++    const src = resolveWhitelistSource(scopeOverride || scope);
++    const source = whitelistSourceLabel(src);
++    let text = null;
++    let error = null;
++    if (src.kind === 'endpoint') {
++      const r = git(['show', src.ref + ':' + rel]);
++      if (r.ok) text = decodeBuffer(r.out);
++    } else {
++      const abs = pathOnDisk(rel);
++      if (fs.existsSync(abs)) {
++        try {
++          text = decodeBuffer(fs.readFileSync(abs));
++        } catch (e) {
++          error = rel + ': unreadable (' + e.message + ')';
++        }
++      }
++    }
++    if (text === null) return { source, text: null, entries: [], error };
++    const parsed = parseWhitelist(rel, text);
++    return { source, text, entries: parsed.entries, error: parsed.error };
++  }
++
++  const changedPaths = changed.map((r) => r.path);
++
++  return {
++    repoRoot,
++    scope,
++    baseRef,
++    headRef,
++    kind,
++    changed,
++    changedPaths,
++    recordFor: (p) => byPath.get(p) || null,
++    changedMarkdown: () => changedPaths.filter((p) => /\.md$/i.test(p)),
++    changedPathsWith: (re) => changedPaths.filter((p) => re.test(p)),
++    git,
++    readBytes,
++    readLines,
++    readText,
++    readLineArray,
++    exists,
++    repoArtifactResolvable: (p) => resolveRepoArtifact(repoRoot, kind, headRef, p),
++    trackedAt,
++    showAt,
++    isIgnored,
++    loadWhitelist,
++    UsageError,
++    addedHunks,
++    addedLines,
++    addedLineNumbers,
++    numstat,
++    listAllMarkdown,
++    listAgentFiles,
++  };
++}
++
++/**
++ * Shared whitelist parser: `<match>\t<file>\t<reason / context excerpt>`.
++ * Every field is mandatory: a missing reason/excerpt is a usage error (exit 2),
++ * which is what keeps a whitelist from becoming a silent blanket. Both
++ * `g6-whitelist.txt` and `cjk-newwords.txt` use this format (G4b registers one
++ * character in the match field).
++ */
++function parseWhitelist(relPath, text) {
++  const entries = [];
++  const lines = String(text).split('\n');
++  for (let i = 0; i < lines.length; i++) {
++    const line = lines[i];
++    if (!line.trim() || line.startsWith('#')) continue;
++    const parts = line.split('\t');
++    if (parts.length < 3 || !parts[0].trim() || !parts[1].trim() || !parts[2].trim()) {
++      return {
++        entries,
++        error:
++          relPath +
++          ':' +
++          (i + 1) +
++          ' malformed entry (expected <match><TAB><file><TAB><reason/context excerpt>)',
++      };
++    }
++    entries.push({ match: parts[0], file: toPosix(parts[1].trim()), reason: parts[2].trim() });
++  }
++  return { entries, error: null };
++}
++
++/** Working-tree-only loader (kept for callers that have no scope); see createContext. */
++function loadWhitelist(repoRoot, relPath) {
++  const abs = path.join(repoRoot, relPath.split('/').join(path.sep));
++  if (!fs.existsSync(abs)) return { entries: [], error: null };
++  let text;
++  try {
++    text = decodeBuffer(fs.readFileSync(abs));
++  } catch (e) {
++    return { entries: [], error: relPath + ': unreadable (' + e.message + ')' };
++  }
++  return parseWhitelist(relPath, text);
++}
++
++/** True when the finding is covered by a registered whitelist entry. */
++function whitelisted(entries, file, text) {
++  return entries.filter((e) => (e.file === '*' || e.file === file) && String(text).includes(e.match));
++}
++
++module.exports = {
++  EMPTY_TREE,
++  UsageError,
++  createContext,
++  discoverRepoRoot,
++  parseScopeText,
++  parseStatusZ,
++  parseNameStatusZ,
++  parseHunkAdditions,
++  splitAddedLines,
++  resolveWhitelistSource,
++  whitelistSourceLabel,
++  resolveRepoArtifact,
++  parseWhitelist,
++  loadWhitelist,
++  whitelisted,
++  toPosix,
++  stripBom,
++  decodeBuffer,
++};
+
+diff --git a/tools/gates/lib/report.js b/tools/gates/lib/report.js
+new file mode 100644
+index 0000000..c6baef4
+--- /dev/null
++++ b/tools/gates/lib/report.js
+@@ -0,0 +1,49 @@
++'use strict';
++
++/**
++ * Gate report assembly.
++ *
++ * Output contract (one line per criterion, see the architecture design section 2):
++ *     PASS|FAIL|SKIP|INFO <G-id> <label> :: <detail>
++ * plus a final `TOTAL_FAIL=<n>` line.
++ *
++ *   PASS  the criterion executed and found no violation
++ *   FAIL  the criterion executed and found at least one violation
++ *   SKIP  not scripted in this slice, or a finding exempted by a whitelist entry
++ *   INFO  nothing to judge (not a pass, not a failure)
++ */
++
++const VERDICTS = ['PASS', 'FAIL', 'SKIP', 'INFO'];
++
++function createReport() {
++  const records = [];
++
++  return {
++    records,
++
++    rec(id, verdict, label, detail) {
++      if (VERDICTS.indexOf(verdict) < 0) {
++        throw new Error('invalid verdict: ' + verdict);
++      }
++      records.push({ id, verdict, label, detail: String(detail) });
++    },
++
++    fails() {
++      return records.filter((r) => r.verdict === 'FAIL');
++    },
++
++    skips() {
++      return records.filter((r) => r.verdict === 'SKIP');
++    },
++
++    render() {
++      const lines = records.map(
++        (r) => r.verdict.padEnd(5) + ' ' + r.id + ' ' + r.label + ' :: ' + r.detail
++      );
++      lines.push('TOTAL_FAIL=' + this.fails().length);
++      return lines.join('\n');
++    },
++  };
++}
++
++module.exports = { createReport, VERDICTS };
+
+diff --git a/tools/gates/selftest.js b/tools/gates/selftest.js
+new file mode 100644
+index 0000000..0089628
+--- /dev/null
++++ b/tools/gates/selftest.js
+@@ -0,0 +1,1101 @@
++'use strict';
++
++/**
++ * tools/gates/selftest.js - in-process assertions over tools/gates/testdata/**.
++ *
++ * Every assertion is named, so a broken fixture or a weakened criterion turns the
++ * suite red. Coverage (architecture design section 6):
++ *   T1, T2, T4, T5, T6, T7, T8, T9, T10, T11, T13, T14, T15, T16, T17, T18 + G7-d.
++ * T3 (defect A1 against commit b738e6b) and T12 (defect C1 against commit 1b01115)
++ * need real git ranges and are therefore executed as recorded evidence:
++ *   node tools/gates/gate.js --check=G6 --scope=range:b738e6b^..b738e6b
++ *   node tools/gates/gate.js --check=G6 --scope=range:9f68a52^..9f68a52
++ *   node tools/gates/gate.js --check=G7 --scope=range:1b01115^..1b01115
++ *
++ * Run: node tools/gates/selftest.js   (or: node tools/gates/gate.js --selftest)
++ */
++
++const fs = require('fs');
++const path = require('path');
++const cp = require('child_process');
++
++const {
++  discoverRepoRoot,
++  decodeBuffer,
++  resolveWhitelistSource,
++  whitelistSourceLabel,
++  resolveRepoArtifact,
++  createContext,
++  UsageError,
++  EMPTY_TREE,
++} = require('./lib/ctx');
++const { createReport } = require('./lib/report');
++const G6 = require('./lib/criteria/g6');
++const G7 = require('./lib/criteria/g7');
++const G4B = require('./lib/criteria/g4b');
++
++const FIXTURES_DIR = path.join(__dirname, 'testdata', 'fixtures');
++const HISTORICAL_DIR = path.join(__dirname, 'testdata', 'historical');
++
++const FIXTURES = {
++  'g6-1-pending': { disk: 'g6-1-pending-done.txt', virtual: 'docs/t027/fixture-g6-1-pending.md' },
++  'g6-1-ob11': { disk: 'g6-1-ob11-row.txt', virtual: 'docs/t027/fixture-g6-1-ob11.md' },
++  'g6-2-cost': { disk: 'g6-2-cost-clauses.txt', virtual: 'docs/t027/fixture-g6-2-cost.md' },
++  'g6-3-legal': { disk: 'g6-3-legal-run-id.txt', virtual: 'docs/t027/fixture-g6-3-legal.md' },
++  'g6-3-bad': { disk: 'g6-3-placeholder-run-id.txt', virtual: 'docs/t027/fixture-g6-3-placeholder.md' },
++  'g6-4-literals': { disk: 'g6-4-expiring-literals.txt', virtual: 'docs/t027/fixture-g6-4-literals.md' },
++  'g7-a': { disk: 'g7-a-no-artifacts.txt', virtual: 'docs/validation/fixture-g7-a-no-artifacts.md' },
++  'g7-b-bad': { disk: 'g7-b-no-disposition.txt', virtual: 'docs/validation/fixture-g7-b-no-disposition.md' },
++  'g7-b-good': { disk: 'g7-ok-report.txt', virtual: 'docs/validation/fixture-g7-ok-report.md' },
++  'g7-c': { disk: 'g7-c-finding-row.txt', virtual: 'docs/validation/fixture-g7-c-finding-row.md' },
++  'g7-d': { disk: 'g7-d-stopped-state.txt', virtual: 'docs/validation/fixture-g7-d-stopped-state.md' },
++};
++
++/**
++ * Fixture files are deliberately NOT named `*.md` on disk. The criteria select their
++ * targets by extension (G6: every changed `.md`; G7: changed `docs/validation/*.md`),
++ * so a `.md` fixture would be judged by a plain `--scope=tree` run as if it were a real
++ * ledger/report - the runner would report its own intentionally-violating test data as
++ * a defect and the tree run could never be green. The selftest maps each fixture onto a
++ * virtual `.md` path, so the criteria still see `.md` content. The invariant below keeps
++ * that convention mechanical.
++ */
++const FIXTURE_DISK_MUST_NOT_BE_MD = true;
++
++const ALL_SUBCHECKS = [...G6.subchecks, ...G7.subchecks].map((s) => s.id);
++
++/** Expected FAIL id set for the whole fixture corpus (regression anchor, T13). */
++const EXPECTED_CORPUS_FAILS = ['G6-1', 'G6-3', 'G6-4', 'G7-a', 'G7-b', 'G7-c', 'G7-d'];
++
++const CHECKS = [];
++/** Every declared mutation is logged so a stale one (no-op) turns the suite red. */
++const MUTATION_LOG = [];
++/**
++ * Non-blocking context lines. Used when an assertion can NOT be evaluated in the
++ * current clone (a shallow clone lacks the historical commit a recorded-evidence
++ * assertion needs): the suite prints an explicit INFO line and moves on instead of
++ * turning red for an environment it does not control (batch 2g robustness).
++ */
++const INFOS = [];
++
++function check(name, ok, detail) {
++  CHECKS.push({ name, ok: !!ok, detail: detail === undefined ? '' : String(detail) });
++}
++
++function info(name, detail) {
++  INFOS.push({ name, detail: detail === undefined ? '' : String(detail) });
++}
++
++/** `git rev-parse --verify --quiet <rev>^{commit}` - is the object in this clone? */
++function revAvailable(repoRoot, rev) {
++  const r = cp.spawnSync('git', ['rev-parse', '--verify', '--quiet', rev + '^{commit}'], {
++    cwd: repoRoot,
++    encoding: 'utf8',
++    windowsHide: true,
++  });
++  return r.status === 0;
++}
++
++function fixtureText(key) {
++  return decodeBuffer(fs.readFileSync(path.join(FIXTURES_DIR, FIXTURES[key].disk)));
++}
++
++function historicalLines(name) {
++  return decodeBuffer(fs.readFileSync(path.join(HISTORICAL_DIR, name)))
++    .split('\n')
++    .filter((l) => l.trim() && !l.startsWith('#'));
++}
++
++function applyMutation(text, m) {
++  const before = text;
++  let out = text;
++  if (m.op === 'replace') out = text.split(m.from).join(m.to);
++  else if (m.op === 'firstReplace') {
++    const i = text.indexOf(m.from);
++    out = i < 0 ? text : text.slice(0, i) + m.to + text.slice(i + m.from.length);
++  } else if (m.op === 'dropLineContaining') {
++    out = text
++      .split('\n')
++      .filter((l) => !l.includes(m.needle))
++      .join('\n');
++  } else {
++    throw new Error('unknown fixture mutation op: ' + m.op);
++  }
++  MUTATION_LOG.push({ key: m.key, op: m.op, needle: m.from || m.needle, applied: out !== before });
++  return out;
++}
++
++/** Synthetic context: fixture files are presented as added `.md` files of the change set. */
++function makeCtx(keys, opts) {
++  opts = opts || {};
++  const repoRoot = discoverRepoRoot(__dirname);
++  if (!repoRoot) throw new Error('selftest needs a git work tree (fixture `repo` paths are resolved against it)');
++  const texts = new Map();
++  for (const key of keys) {
++    if (!FIXTURES[key]) throw new Error('unknown fixture key: ' + key);
++    let t = fixtureText(key);
++    for (const m of opts.mutations || []) if (m.key === key) t = applyMutation(t, m);
++    texts.set(FIXTURES[key].virtual, t);
++  }
++  const changed = [...texts.keys()].map((p) => ({ path: p, status: 'A', untracked: true, deleted: false }));
++  const changedPaths = changed.map((c) => c.path);
++  const linesOf = (p) => (texts.has(p) ? texts.get(p).split('\n') : null);
++  /** Records every ctx.loadWhitelist() call, so T14 can prove both criteria use it. */
++  const loaderCalls = [];
++  return {
++    repoRoot,
++    loaderCalls,
++    kind: 'tree',
++    scope: { kind: 'tree' },
++    baseRef: null,
++    headRef: null,
++    changed,
++    changedPaths,
++    recordFor: (p) => changed.find((c) => c.path === p) || null,
++    changedMarkdown: () => changedPaths.filter((p) => /\.md$/i.test(p)),
++    changedPathsWith: (re) => changedPaths.filter((p) => re.test(p)),
++    git: () => ({ ok: false, code: 127, out: '', err: '', spawnError: null }),
++    readBytes: (p) => (texts.has(p) ? Buffer.from(texts.get(p), 'utf8') : null),
++    readText: (p) => (texts.has(p) ? texts.get(p) : null),
++    readLines: linesOf,
++    readLineArray: linesOf,
++    exists: (p) => fs.existsSync(path.join(repoRoot, p.split('/').join(path.sep))),
++    repoArtifactResolvable: (p) =>
++      opts.repoArtifactResolvable ? opts.repoArtifactResolvable(p) : resolveRepoArtifact(repoRoot, 'tree', null, p),
++    trackedAt: () => false,
++    showAt: () => null,
++    isIgnored: () => false,
++    loadWhitelist: (rel) => {
++      loaderCalls.push(rel);
++      return { entries: opts.whitelist || [], error: null, source: opts.whitelistSource || 'worktree' };
++    },
++    listAllMarkdown: () => [],
++    listAgentFiles: () => [],
++    addedHunks: (p) => (linesOf(p) || []).map((text, i) => ({ n: i + 1, text })),
++    addedLines: (p) => linesOf(p) || [],
++    addedLineNumbers: (p) => new Set((linesOf(p) || []).map((_, i) => i + 1)),
++    numstat: (p) => [String((linesOf(p) || []).length), '0'],
++  };
++}
++
++function runSubset(ctx, enable) {
++  const out = createReport();
++  const results = {};
++  for (const sub of [...G6.subchecks, ...G7.subchecks]) {
++    if (enable.indexOf(sub.id) < 0) continue;
++    results[sub.id] = sub.run(ctx, out);
++  }
++  return { records: out.records, results };
++}
++
++/**
++ * In-memory context for G6-3 boundary probes. G6-3 touches only these four ctx
++ * members, so the digit-band table can enumerate 20 lengths plus the named shapes
++ * without adding a fixture file per case (F7), and the batch-2e prose probes can
++ * be enumerated the same way.
++ */
++function probeCtx(line) {
++  const p = 'docs/t027/probe-g6-3-boundary.md';
++  const text = '- ' + line;
++  return {
++    loadWhitelist: () => ({ entries: [], error: null, source: 'worktree' }),
++    changedMarkdown: () => [p],
++    readLineArray: (q) => (q === p ? text.split('\n') : null),
++    addedLineNumbers: () => new Set([1]),
++  };
++}
++
++/** G6-3 verdict + first `why` for one synthetic line (the F7 boundary table / 2e prose probes). */
++function g63Probe(line) {
++  const out = createReport();
++  const res = G6.subchecks.find((s) => s.id === 'G6-3').run(probeCtx(line), out);
++  return {
++    verdict: verdictOf(out.records, 'G6-3'),
++    findings: res.findings.length,
++    why: res.findings.length ? res.findings[0].detail : '',
++  };
++}
++
++function verdictOf(records, id) {
++  const rs = records.filter((r) => r.id === id);
++  if (!rs.length) return 'ABSENT';
++  return rs.some((r) => r.verdict === 'FAIL') ? 'FAIL' : 'PASS';
++}
++
++function failIds(records) {
++  return [...new Set(records.filter((r) => r.verdict === 'FAIL').map((r) => r.id))].sort();
++}
++
++function without(ids) {
++  return ALL_SUBCHECKS.filter((id) => ids.indexOf(id) < 0);
++}
++
++/**
++ * In-memory context for the G7-c / G7-d probes (batch 2g, F2 / F3). Both sub-checks
++ * touch only these ctx members, so the structural-disposition probes and the bilingual
++ * stopped-state probes can be enumerated without a fixture file per case.
++ */
++function g7ProbeCtx(text) {
++  const p = 'docs/validation/probe-g7.md';
++  const lines = String(text).split('\n');
++  return {
++    kind: 'tree',
++    scope: { kind: 'tree' },
++    changed: [{ path: p, status: 'A', untracked: true, deleted: false }],
++    changedPaths: [p],
++    readLineArray: (q) => (q === p ? lines : null),
++    addedLineNumbers: () => new Set(lines.map((_, i) => i + 1)),
++  };
++}
++
++/** G7-c / G7-d verdict + finding count + first `why` for one synthetic report body. */
++function g7Probe(id, text) {
++  const out = createReport();
++  const sub = G7.subchecks.find((s) => s.id === id);
++  const res = sub.run(g7ProbeCtx(text), out);
++  return {
++    verdict: verdictOf(out.records, id),
++    findings: res.findings.length,
++    why: res.findings.length ? res.findings[0].detail : '',
++  };
++}
++
++function runTests() {
++  CHECKS.length = 0;
++  MUTATION_LOG.length = 0;
++  INFOS.length = 0;
++  const v = (key) => FIXTURES[key].virtual;
++
++  // ---- T13 precondition: fixture naming convention (see FIXTURE_DISK_MUST_NOT_BE_MD).
++  if (FIXTURE_DISK_MUST_NOT_BE_MD) {
++    const offenders = Object.keys(FIXTURES).filter((k) => /\.md$/i.test(FIXTURES[k].disk));
++    check(
++      'T13 fixture files are not *.md, so a tree/ci run never judges the runner own fixtures',
++      offenders.length === 0,
++      'offenders=' + JSON.stringify(offenders)
++    );
++  }
++
++  // ---- T1: G6-1 pending marker + same-label completion marker in one block.
++  {
++    const base = runSubset(makeCtx(['g6-1-pending']), ALL_SUBCHECKS);
++    check(
++      'T1 G6-1 detects pending(⑥)+completion(⑥ 实得) in one block',
++      verdictOf(base.records, 'G6-1') === 'FAIL',
++      'verdict=' + verdictOf(base.records, 'G6-1')
++    );
++    check('T1 G6-1 reports exactly one finding for the fixture', base.results['G6-1'].findings.length === 1,
++      'findings=' + base.results['G6-1'].findings.length);
++    const noDone = runSubset(
++      makeCtx(['g6-1-pending'], {
++        mutations: [{ key: 'g6-1-pending', op: 'dropLineContaining', needle: '（**实得**）' }],
++      }),
++      ALL_SUBCHECKS
++    );
++    check('T1 reverse mutation (drop completion row) clears G6-1', verdictOf(noDone.records, 'G6-1') === 'PASS',
++      'verdict=' + verdictOf(noDone.records, 'G6-1'));
++    const disabled = runSubset(makeCtx(['g6-1-pending']), without(['G6-1']));
++    check('T1 delete-criterion mutation (G6-1 removed) leaves the corpus clean', failIds(disabled.records).length === 0,
++      'fails=' + JSON.stringify(failIds(disabled.records)));
++
++    // ⑥ F1: the completion-marker set is the UNION the directive enumerates, not the
++    // bold-only intersection. Every accepted shape must fire on the real fixture, and
++    // the plain shapes are exactly the ones that used to be missed.
++    for (const shape of ['（实得）', '✅ 已完成', '✅ **已完成**']) {
++      const m = runSubset(
++        makeCtx(['g6-1-pending'], {
++          mutations: [{ key: 'g6-1-pending', op: 'replace', from: '（**实得**）', to: shape }],
++        }),
++        ALL_SUBCHECKS
++      );
++      check('T1 F1 completion shape `' + shape + '` is detected',
++        verdictOf(m.records, 'G6-1') === 'FAIL' && m.results['G6-1'].findings.length === 1,
++        'verdict=' + verdictOf(m.records, 'G6-1') + ' findings=' + m.results['G6-1'].findings.length);
++    }
++    // Over-widening guard: the same plain bracket shape with a DIFFERENT label inside
++    // the window must stay clean - i.e. widening must not degrade the label requirement.
++    const otherLabel = runSubset(
++      makeCtx(['g6-1-pending'], {
++        mutations: [
++          { key: 'g6-1-pending', op: 'replace', from: '（**实得**）', to: '（实得）' },
++          { key: 'g6-1-pending', op: 'replace', from: '| ⑥ 独立扫描', to: '| ⑤ 预审' },
++        ],
++      }),
++      ALL_SUBCHECKS
++    );
++    check('T1 F1 plain shape with a different label stays clean (label window intact)',
++      verdictOf(otherLabel.records, 'G6-1') === 'PASS',
++      'verdict=' + verdictOf(otherLabel.records, 'G6-1') + ' why=' + (otherLabel.results['G6-1'].findings[0] || {}).detail);
++  }
++
++  // ---- T2: self-reference guard on the verbatim OB-11 registration row.
++  {
++    const ob11 = historicalLines('ob11-registration-row.txt');
++    check('T2 provenance file carries exactly one excerpt line', ob11.length === 1, 'lines=' + ob11.length);
++    check('T2 fixture embeds the historical OB-11 row verbatim', fixtureText('g6-1-ob11').includes(ob11[0]),
++      'excerpt length=' + ob11[0].length);
++    const base = runSubset(makeCtx(['g6-1-ob11']), ALL_SUBCHECKS);
++    check('T2 OB-11 row (with 冲突 marker) is clean', failIds(base.records).length === 0,
++      'fails=' + JSON.stringify(failIds(base.records)));
++    const mut = runSubset(
++      makeCtx(['g6-1-ob11'], { mutations: [{ key: 'g6-1-ob11', op: 'replace', from: '冲突', to: '不一致' }] }),
++      ALL_SUBCHECKS
++    );
++    check('T2 reverse mutation (drop the 冲突 exclusion marker) turns G6-1 red',
++      JSON.stringify(failIds(mut.records)) === JSON.stringify(['G6-1']),
++      'fails=' + JSON.stringify(failIds(mut.records)));
++  }
++
++  // ---- T4: G6-2 budget-clause exemption vs realized-clause comparison.
++  {
++    const hist = historicalLines('a1-cost-clauses.txt');
++    check('T4 provenance file carries the two historical cost rows', hist.length === 2, 'lines=' + hist.length);
++    check('T4 fixture embeds both historical cost rows verbatim',
++      hist.every((l) => fixtureText('g6-2-cost').includes(l)), 'rows=' + hist.length);
++    const gi = G6.internals;
++    const va = gi.vecText(gi.costClause(hist[0]));
++    const vb = gi.vecText(gi.costClause(hist[1]));
++    check('T4 cost-clause parser yields identical realized vectors for the historical pair',
++      va === vb && va === 'total=3+⑥×1+⑦×2', 'v1.9=' + va + ' c0e=' + vb);
++    const base = runSubset(makeCtx(['g6-2-cost']), ALL_SUBCHECKS);
++    check('T4 budget clause is exempt: consistent rows pass G6-2', verdictOf(base.records, 'G6-2') === 'PASS',
++      'verdict=' + verdictOf(base.records, 'G6-2'));
++    const mut = runSubset(
++      makeCtx(['g6-2-cost'], { mutations: [{ key: 'g6-2-cost', op: 'firstReplace', from: '预算', to: '成本' }] }),
++      ALL_SUBCHECKS
++    );
++    check('T4 reverse mutation (预算 -> 成本) turns G6-2 red', verdictOf(mut.records, 'G6-2') === 'FAIL',
++      'verdict=' + verdictOf(mut.records, 'G6-2'));
++    const disabled = runSubset(makeCtx(['g6-2-cost'], {
++      mutations: [{ key: 'g6-2-cost', op: 'firstReplace', from: '预算', to: '成本' }],
++    }), without(['G6-2']));
++    check('T4 delete-criterion mutation (G6-2 removed) leaves the mutated corpus clean',
++      failIds(disabled.records).length === 0, 'fails=' + JSON.stringify(failIds(disabled.records)));
++  }
++
++  // ---- T5: legal run id.
++  {
++    const r = runSubset(makeCtx(['g6-3-legal']), ALL_SUBCHECKS);
++    check('T5 legal 11-digit run id passes G6-3', verdictOf(r.records, 'G6-3') === 'PASS',
++      'verdict=' + verdictOf(r.records, 'G6-3'));
++    check('T5 legal fixture yields no finding', r.results['G6-3'].findings.length === 0,
++      'findings=' + r.results['G6-3'].findings.length);
++  }
++
++  // ---- T6: placeholder run ids.
++  {
++    const r = runSubset(makeCtx(['g6-3-bad']), ALL_SUBCHECKS);
++    check('T6 placeholder run ids fail G6-3', verdictOf(r.records, 'G6-3') === 'FAIL',
++      'verdict=' + verdictOf(r.records, 'G6-3'));
++    check('T6 one finding per placeholder line (4)', r.results['G6-3'].findings.length === 4,
++      'findings=' + r.results['G6-3'].findings.length);
++    const disabled = runSubset(makeCtx(['g6-3-bad']), without(['G6-3']));
++    check('T6 delete-criterion mutation (G6-3 removed) leaves the corpus clean', failIds(disabled.records).length === 0,
++      'fails=' + JSON.stringify(failIds(disabled.records)));
++  }
++
++  // ---- F7: G6-3 enforces the documented 9-13 digit band from BOTH sides.
++  // The criterion text says `run` + space + 9-13 digits; before F7 the code only
++  // rejected 1-2 digits and >= 14 digits, so 3-8 digit ids passed (fail-open).
++  // Batch 2e narrows the DIGIT-RUN rules with `(?!\s*[A-Za-z\u4e00-\u9fff])`: a run
++  // immediately followed by a word is a prose count, not an id. The band is therefore
++  // asserted in token-final AND backticked form (both are shapes a real id takes), while
++  // the prose shapes and the context-free placeholder rules are pinned separately below.
++  {
++    const inBand = (n) => n >= 9 && n <= 13;
++    const forms = [
++      ['token-final', (id) => 'run ' + id],
++      ['backticked', (id) => '`run ' + id + '`'],
++    ];
++    for (const [formName, form] of forms) {
++      for (let n = 1; n <= 20; n++) {
++        const id = '3'.repeat(n);
++        const want = inBand(n) ? 'PASS' : 'FAIL';
++        const got = g63Probe(form(id));
++        check(
++          'F7 G6-3 boundary table (' + formName + '): ' + n + '-digit id `run ' + id + '` must ' + want,
++          got.verdict === want,
++          'verdict=' + got.verdict + ' want=' + want + ' findings=' + got.findings + ' :: ' + got.why
++        );
++        if (n >= 3 && n <= 8) {
++          check(
++            'F7 G6-3 floor rule (' + formName + '): the ' + n + '-digit reject names the 9-digit floor',
++            /below the 9-digit floor/.test(got.why),
++            got.why
++          );
++        }
++      }
++    }
++    const named = [
++      ['run 0', 'FAIL', 'all-zero id, 1 digit'],
++      ['run 000000', 'FAIL', 'all-zero id, 6 digits'],
++      ['run ' + '0'.repeat(20), 'FAIL', 'all-zero id, 20 digits (fails at any length)'],
++      ['`run ' + '0'.repeat(20) + '`', 'FAIL', 'all-zero id, 20 digits, backticked'],
++      ['run <RUN_ID>', 'FAIL', 'angle-bracket placeholder'],
++      ['run TBD', 'FAIL', 'word placeholder TBD'],
++      ['run TODO', 'FAIL', 'word placeholder TODO'],
++      ['run N/A', 'FAIL', 'word placeholder N/A'],
++      ['run 待定', 'FAIL', 'placeholder wording 待'],
++      ['run 占位', 'FAIL', 'placeholder wording 占位'],
++      ['run 35646859765', 'PASS', 'real-world 11-digit run id'],
++      ['`run 35646859765`', 'PASS', 'real-world 11-digit run id inside a code span'],
++      // Token-final / punctuation-terminal shapes: no following word ⇒ still judged.
++      ['see run 111', 'FAIL', 'token-final 3-digit id at end of line'],
++      ['run 1234。', 'FAIL', '3-8 digit id terminated by CJK punctuation (not a word)'],
++      ['run 7！', 'FAIL', '1-2 digit id terminated by punctuation'],
++      ['report run 123456789012345！', 'FAIL', '>= 14 digit id terminated by punctuation'],
++      // Context-free placeholder rules: checked in any context, prose included.
++      ['see run <RUN_ID> here', 'FAIL', 'angle-bracket placeholder mid-prose'],
++      ['see run TBD here', 'FAIL', 'word placeholder TBD mid-prose'],
++      ['see run TODO here', 'FAIL', 'word placeholder TODO mid-prose'],
++      ['see run N/A here', 'FAIL', 'word placeholder N/A mid-prose'],
++      ['see run 待定 here', 'FAIL', 'CJK placeholder 待 mid-prose'],
++      ['see run 占位 here', 'FAIL', 'CJK placeholder 占位 mid-prose'],
++      // A BACKTICKED token is judged (batch 2e request item 2: `run 1234` inside backticks
++      // must still fail, which is what makes the 2e lookahead a prose-only narrowing).
++      ['`run 1234`', 'FAIL', 'backticked malformed id stays judged'],
++      ['The run log shows `run 1234` as the marker.', 'FAIL', 'backticked malformed id inside a prose sentence'],
++    ];
++    for (const row of named) {
++      const got = g63Probe(row[0]);
++      check(
++        'F7 G6-3 named case `' + row[0] + '` (' + row[2] + ') must ' + row[1],
++        got.verdict === row[1],
++        'verdict=' + got.verdict + ' want=' + row[1] + ' :: ' + got.why
++      );
++    }
++
++    // ---- 2e: prose counts (the measured step-4 false positives) plus the pre-existing
++    // repository instance `docs/t027/B3B_DESIGN.md:236` must yield NO finding, for every
++    // digit-run rule. A regression that drops the lookahead turns these red.
++    const prose = [
++      ['The retry loop was executed run 1234 times by the harness.', '3-8 digit rule vs ASCII word'],
++      ['连续 run 12 次后任务完成。', '1-2 digit rule vs CJK word'],
++      ['`inventory run 1 failed`', 'pre-existing docs/t027/B3B_DESIGN.md:236 shape (1-2 digit rule)'],
++      ['run 111 次后停止。', '3-8 digit rule vs CJK word'],
++      ['run 000 次。', 'all-zero rule vs CJK word'],
++      ['run 123456789012345 次。', '>= 14 digit rule vs CJK word'],
++      ['the tool ran run 1234 quickly', '3-8 digit rule vs ASCII word (no punctuation)'],
++      ['see run 7 files', '1-2 digit rule vs ASCII word'],
++    ];
++    for (const row of prose) {
++      const got = g63Probe(row[0]);
++      check(
++        '2e G6-3 prose probe `' + row[0] + '` (' + row[1] + ') must PASS (no finding)',
++        got.verdict === 'PASS' && got.findings === 0,
++        'verdict=' + got.verdict + ' findings=' + got.findings + ' :: ' + got.why
++      );
++    }
++    check(
++      '2e G6-3 prose probes are load-bearing: the same digit runs DO fail when token-final',
++      g63Probe('run 1234').verdict === 'FAIL' &&
++        g63Probe('run 12').verdict === 'FAIL' &&
++        g63Probe('run 000').verdict === 'FAIL' &&
++        g63Probe('run 123456789012345').verdict === 'FAIL' &&
++        g63Probe('`run 1234`').verdict === 'FAIL',
++      'prose narrowing is the only reason the prose probes pass'
++    );
++
++    // ---- 2f (NF-2): the LEADING word boundary on every G6-3 rule.
++    // Before 2f `run\s+\d{1,2}` also matched inside a word, so `rerun 1234` /
++    // `The harness will rerun 1234.` produced a spurious FAIL - a false-positive class in a
++    // CI-blocking gate (0 instances in the repo today, but the class must be closed, not
++    // merely unobserved). Every rule now carries `(?<![A-Za-z\u4e00-\u9fff])`.
++    const leadingBoundary = [
++      ['rerun 1234', 'ASCII letter immediately before `run`'],
++      ['The harness will rerun 1234.', 'word-embedded `run` inside a prose sentence'],
++      ['在run 1234', 'CJK ideograph glued to the FRONT of `run`'],
++      ['prerun 12', 'ASCII-letter prefix on the 1-2 digit rule'],
++      ['rerun <RUN_ID>', 'placeholder rule carries the leading guard too (NF-2 consistency)'],
++      ['prerun TBD', 'word-placeholder rule carries the leading guard too'],
++    ];
++    for (const row of leadingBoundary) {
++      const got = g63Probe(row[0]);
++      check(
++        '2f G6-3 leading-boundary probe `' + row[0] + '` (' + row[1] + ') must PASS (no finding)',
++        got.verdict === 'PASS' && got.findings === 0,
++        'verdict=' + got.verdict + ' findings=' + got.findings + ' :: ' + got.why
++      );
++    }
++
++    // The still-judged shapes: a NON-word character (or the line start) precedes `run`, and
++    // the digit run is not followed by a word - the guard must not have narrowed these.
++    const stillJudged = [
++      ['see run 1234', 'token-final 3-8 digit id mid-prose'],
++      ['（run 1234）', 'id wrapped in CJK parentheses'],
++      ['`run 1234`', 'backticked malformed id'],
++      ['run 1234。', 'id terminated by CJK punctuation'],
++      ['run 111', '3-digit id at end of line'],
++      ['run TBD', 'word placeholder at end of line'],
++      ['see run TBD here', 'word placeholder mid-prose'],
++    ];
++    for (const row of stillJudged) {
++      const got = g63Probe(row[0]);
++      check(
++        '2f G6-3 still-judged probe `' + row[0] + '` (' + row[1] + ') must FAIL',
++        got.verdict === 'FAIL' && got.findings === 1,
++        'verdict=' + got.verdict + ' findings=' + got.findings + ' :: ' + got.why
++      );
++    }
++
++    // The word-followed exemptions (2e narrows the digit-run rules AFTER the digits; 2f does
++    // not touch that side). The backticked form is the NF-1 case: backticks do NOT judge a
++    // digit run that a word still follows, so the criterion text must say "backticked AND
++    // not followed by a word", not "backticked".
++    const wordFollowed = [
++      ['run 1234 times', 'digit run followed by an ASCII word'],
++      ['连续 run 12 次', 'digit run followed by a CJK word'],
++      ['`run 1234 times`', 'BACKTICKED digit run still followed by a word (NF-1 prose correction)'],
++    ];
++    for (const row of wordFollowed) {
++      const got = g63Probe(row[0]);
++      check(
++        '2f G6-3 word-followed exemption `' + row[0] + '` (' + row[1] + ') must PASS (no finding)',
++        got.verdict === 'PASS' && got.findings === 0,
++        'verdict=' + got.verdict + ' findings=' + got.findings + ' :: ' + got.why
++      );
++    }
++
++    // Glued forms: no separator before the trailing word. The documented consequence is that
++    // `run 1234times` / `run 12345678次` are NOT judged - the lookahead sees a word
++    // immediately after the digits and reads the token as prose. This is the accepted cost of
++    // the 2e prose narrowing (a real id is never glued to the next word), asserted here so a
++    // future tightening has to acknowledge it explicitly.
++    const glued = [
++      ['run 1234times', 'no separator before the trailing ASCII word'],
++      ['run 12345678次', 'no separator before the trailing CJK word'],
++    ];
++    for (const row of glued) {
++      const got = g63Probe(row[0]);
++      check(
++        '2f G6-3 glued-form consequence `' + row[0] + '` (' + row[1] + ') must PASS (documented, not a defect)',
++        got.verdict === 'PASS' && got.findings === 0,
++        'verdict=' + got.verdict + ' findings=' + got.findings + ' :: ' + got.why
++      );
++    }
++  }
++
++  // ---- T7: expiring literals and the whitelist mechanism.
++  {
++    const base = runSubset(makeCtx(['g6-4-literals']), ALL_SUBCHECKS);
++    check('T7 expiring literals fail G6-4', verdictOf(base.records, 'G6-4') === 'FAIL',
++      'verdict=' + verdictOf(base.records, 'G6-4'));
++    check('T7 two literal lines produce two findings', base.results['G6-4'].findings.length === 2,
++      'findings=' + base.results['G6-4'].findings.length);
++    const one = runSubset(
++      makeCtx(['g6-4-literals'], {
++        whitelist: [{ match: '995/995', file: v('g6-4-literals'), reason: 'T7 mutation: register one of two' }],
++      }),
++      ALL_SUBCHECKS
++    );
++    check('T7 whitelisting ONE of two findings leaves G6-4 red with one fatal finding',
++      verdictOf(one.records, 'G6-4') === 'FAIL' && one.results['G6-4'].fatal.length === 1,
++      'verdict=' + verdictOf(one.records, 'G6-4') + ' fatal=' + one.results['G6-4'].fatal.length);
++    const both = runSubset(
++      makeCtx(['g6-4-literals'], {
++        whitelist: [
++          { match: '995/995', file: v('g6-4-literals'), reason: 'T7 mutation A' },
++          { match: '共 128 个文件', file: v('g6-4-literals'), reason: 'T7 mutation B' },
++        ],
++      }),
++      ALL_SUBCHECKS
++    );
++    check('T7 whitelisting both findings turns G6-4 green (whitelist is load-bearing)',
++      verdictOf(both.records, 'G6-4') === 'PASS' && both.records.filter((r) => r.verdict === 'SKIP').length === 2,
++      'verdict=' + verdictOf(both.records, 'G6-4') + ' skips=' + both.records.filter((r) => r.verdict === 'SKIP').length);
++  }
++
++  // ---- T8: missing artifacts block.
++  {
++    const r = runSubset(makeCtx(['g7-a']), ALL_SUBCHECKS);
++    check('T8 report without an artifacts block fails G7-a', verdictOf(r.records, 'G7-a') === 'FAIL',
++      'verdict=' + verdictOf(r.records, 'G7-a'));
++    const disabled = runSubset(makeCtx(['g7-a']), without(['G7-a']));
++    check('T8 delete-criterion mutation (G7-a removed) leaves the corpus clean', failIds(disabled.records).length === 0,
++      'fails=' + JSON.stringify(failIds(disabled.records)));
++  }
++
++  // ---- T9: artifacts row disposition.
++  {
++    const r = runSubset(makeCtx(['g7-b-bad']), ALL_SUBCHECKS);
++    check('T9 unresolved repo disposition (tmp path, omitted token) fails G7-b',
++      verdictOf(r.records, 'G7-b') === 'FAIL', 'verdict=' + verdictOf(r.records, 'G7-b'));
++    const local = runSubset(
++      makeCtx(['g7-b-bad'], {
++        mutations: [{ key: 'g7-b-bad', op: 'replace', from: 'tmp/drfix/A3.txt\n', to: 'tmp/drfix/A3.txt\tlocal-only\n' }],
++      }),
++      ALL_SUBCHECKS
++    );
++    check('T9 marking the tmp path local-only turns G7-b green', verdictOf(local.records, 'G7-b') === 'PASS',
++      'verdict=' + verdictOf(local.records, 'G7-b'));
++    const unknown = runSubset(
++      makeCtx(['g7-b-bad'], {
++        mutations: [{ key: 'g7-b-bad', op: 'replace', from: 'tmp/drfix/A3.txt\n', to: 'tmp/drfix/A3.txt\tarchived\n' }],
++      }),
++      ALL_SUBCHECKS
++    );
++    check('T9 unknown disposition token fails G7-b', verdictOf(unknown.records, 'G7-b') === 'FAIL',
++      'verdict=' + verdictOf(unknown.records, 'G7-b'));
++  }
++
++  // ---- T10: declared repo artifact must resolve.
++  {
++    const ok = runSubset(makeCtx(['g7-b-good']), ALL_SUBCHECKS);
++    check('T10 existing repo artifact + local-only + missing-historical pass G7-b',
++      verdictOf(ok.records, 'G7-b') === 'PASS', 'verdict=' + verdictOf(ok.records, 'G7-b'));
++    const broken = runSubset(
++      makeCtx(['g7-b-good'], {
++        mutations: [
++          {
++            key: 'g7-b-good',
++            op: 'replace',
++            from: 'docs/validation/dr-fix-enforcement-proxy.md\trepo',
++            to: 'docs/validation/does-not-exist.md\trepo',
++          },
++        ],
++      }),
++      ALL_SUBCHECKS
++    );
++    check('T10 unresolvable repo artifact fails G7-b', verdictOf(broken.records, 'G7-b') === 'FAIL',
++      'verdict=' + verdictOf(broken.records, 'G7-b'));
++  }
++
++  // ---- T11: finding row disposition cell.
++  {
++    const r = runSubset(makeCtx(['g7-c']), ALL_SUBCHECKS);
++    check('T11 finding row without a disposition cell fails G7-c', verdictOf(r.records, 'G7-c') === 'FAIL',
++      'verdict=' + verdictOf(r.records, 'G7-c'));
++    const fixed = runSubset(
++      makeCtx(['g7-c'], {
++        mutations: [
++          {
++            key: 'g7-c',
++            op: 'replace',
++            from: '| **High** | 证据链缺失 | |',
++            to: '| **High** | 证据链缺失 | 已修 |',
++          },
++        ],
++      }),
++      ALL_SUBCHECKS
++    );
++    check('T11 adding the disposition cell turns G7-c green', verdictOf(fixed.records, 'G7-c') === 'PASS',
++      'verdict=' + verdictOf(fixed.records, 'G7-c'));
++    const disabled = runSubset(makeCtx(['g7-c']), without(['G7-c']));
++    check('T11 delete-criterion mutation (G7-c removed) leaves the corpus clean',
++      failIds(disabled.records).length === 0, 'fails=' + JSON.stringify(failIds(disabled.records)));
++  }
++
++  // ---- G7-d (architecture design section 3): stopped state must be marked incomplete.
++  {
++    const r = runSubset(makeCtx(['g7-d']), ALL_SUBCHECKS);
++    check('G7-d stopped status line without 已停止——未完成 fails', verdictOf(r.records, 'G7-d') === 'FAIL',
++      'verdict=' + verdictOf(r.records, 'G7-d'));
++    check('G7-d fires only on the status line, not on prose naming the rule (self-reference guard)',
++      r.results['G7-d'].findings.length === 1, 'findings=' + r.results['G7-d'].findings.length);
++    const fixed = runSubset(
++      makeCtx(['g7-d'], {
++        mutations: [
++          {
++            key: 'g7-d',
++            op: 'replace',
++            from: '已停止（等用户裁决后决定是否重启）',
++            to: '已停止——未完成（等用户裁决后决定是否重启）',
++          },
++        ],
++      }),
++      ALL_SUBCHECKS
++    );
++    check('G7-d adding the incomplete mark turns it green', verdictOf(fixed.records, 'G7-d') === 'PASS',
++      'verdict=' + verdictOf(fixed.records, 'G7-d'));
++  }
++
++  // ---- T14: whitelist source rule - one loader, both criteria (F1).
++  {
++    const sTree = resolveWhitelistSource({ kind: 'tree' });
++    const sIndex = resolveWhitelistSource({ kind: 'index' });
++    const sRange = resolveWhitelistSource({ kind: 'range', base: 'A', head: 'B' });
++    const sCi = resolveWhitelistSource({ kind: 'ci' });
++    check(
++      'T14 tree/index resolve whitelists from the working tree',
++      sTree.kind === 'worktree' && sIndex.kind === 'worktree',
++      JSON.stringify([sTree, sIndex])
++    );
++    check(
++      'T14 range/ci resolve whitelists from the endpoint revision (range -> head, ci -> HEAD)',
++      sRange.kind === 'endpoint' && sRange.ref === 'B' && sCi.kind === 'endpoint' && sCi.ref === 'HEAD',
++      JSON.stringify([sRange, sCi])
++    );
++    const shared = makeCtx(['g6-4-literals']);
++    const sink = createReport();
++    const before = shared.loaderCalls.length;
++    G6.subchecks.find((s) => s.id === 'G6-4').run(shared, sink);
++    const g6Calls = shared.loaderCalls.slice(before);
++    const mid = shared.loaderCalls.length;
++    G4B.run(shared, sink);
++    const g4Calls = shared.loaderCalls.slice(mid);
++    check(
++      'T14 G6 reads its whitelist through ctx.loadWhitelist',
++      g6Calls.length === 1 && /g6-whitelist\.txt$/.test(g6Calls[0]),
++      JSON.stringify(g6Calls)
++    );
++    check(
++      'T14 G4b reads its whitelist through the same ctx.loadWhitelist',
++      g4Calls.length === 1 && /cjk-newwords\.txt$/.test(g4Calls[0]),
++      JSON.stringify(g4Calls)
++    );
++    const rec = sink.records.map((r) => r.id + ' ' + r.verdict + ' ' + r.detail).join(' ;; ');
++    check(
++      'T14 both criteria print the whitelist source they used',
++      /G6-4[^;]*whitelist-source=worktree/.test(rec) && /G4b[^;]*whitelist-source=worktree/.test(rec),
++      rec
++    );
++  }
++
++  // ---- T15: G7-b `repo` disposition is scope-consistent (F2, F2 probe).
++  {
++    const repoRoot = discoverRepoRoot(__dirname);
++    const ignored = resolveRepoArtifact(repoRoot, 'tree', null, 'tmp/probe-artifact.txt');
++    check(
++      'T15 tree scope rejects a gitignored / never-staged path marked repo (F2 probe)',
++      ignored.ok === false && /index/.test(ignored.reason),
++      JSON.stringify(ignored)
++    );
++    const indexed = resolveRepoArtifact(repoRoot, 'tree', null, 'docs/DELIVERY_DIRECTIVE.md');
++    check('T15 tree scope accepts a path present in the index and on disk', indexed.ok === true, JSON.stringify(indexed));
++    // Recorded-evidence assertion. It must NOT hard-depend on the old commit: a shallow
++    // clone (CI) lacks `1b01115`, and "object unavailable" is an environment fact, not a
++    // regression. Unavailable ⇒ SKIP with an explicit INFO line (batch 2g robustness).
++    if (!revAvailable(repoRoot, '1b01115')) {
++      info(
++        'T15 range-scope repo-artifact evidence SKIPPED (INFO): revision 1b01115 is unavailable in this clone (shallow clone?)',
++        'assertion would otherwise be red for a reason the code does not control'
++      );
++    } else {
++      const atRef = resolveRepoArtifact(repoRoot, 'range', '1b01115', 'docs/validation/dr-fix-enforcement-proxy.md');
++      check(
++        'T15 range scope still resolves repo artifacts at the endpoint revision',
++        atRef.ok === true,
++        JSON.stringify(atRef)
++      );
++    }
++    // Any-commit variant of the same F1 rule (batch 2g): `range:HEAD..HEAD` needs no
++    // historical object, so the assertion holds in every clone. A whitelist path the
++    // endpoint revision does not carry must resolve to `endpoint:<rev>` with ZERO
++    // entries - never fall back to the working tree (the F1 failure mode).
++    const anyCtx = createContext({ repoRoot, scope: 'range:HEAD..HEAD' });
++    const absent = anyCtx.loadWhitelist('tools/gates/absent-f2f3-probe-whitelist.txt');
++    check(
++      'T15 whitelist source resolves to endpoint:<rev> and yields zero entries when the endpoint revision lacks the file',
++      /^endpoint:/.test(absent.source) && absent.entries.length === 0 && absent.text === null,
++      JSON.stringify(absent)
++    );
++    const headLabel = whitelistSourceLabel(resolveWhitelistSource({ kind: 'range', base: 'HEAD', head: 'HEAD' }));
++    // The label must name the ACTUAL endpoint revision, not a hardcoded one: the
++    // assertion is therefore true for whatever commit this clone happens to be on.
++    const headRev = cp
++      .spawnSync('git', ['rev-parse', 'HEAD'], { cwd: repoRoot, encoding: 'utf8', windowsHide: true })
++      .stdout.trim();
++    const realCtx = createContext({ repoRoot, scope: 'range:' + headRev + '..' + headRev });
++    const real = realCtx.loadWhitelist('tools/gates/absent-f2f3-probe-whitelist.txt');
++    check(
++      'T15 any-commit variant: endpoint label + zero entries hold for the real HEAD revision too',
++      headLabel === 'endpoint:HEAD' && real.source === 'endpoint:' + headRev && real.entries.length === 0,
++      JSON.stringify({ headLabel, realSource: real.source, headRev, entries: real.entries.length })
++    );
++    const probe = (rows) => {
++      const ctx = makeCtx(['g7-b-good'], {
++        mutations: [{ key: 'g7-b-good', op: 'replace', from: 'docs/validation/dr-fix-enforcement-proxy.md\trepo', to: rows }],
++      });
++      const sink = createReport();
++      G7.subchecks.find((s) => s.id === 'G7-b').run(ctx, sink);
++      return verdictOf(sink.records, 'G7-b');
++    };
++    check(
++      'T15 G7-b FAILs an ignored path marked repo in tree scope',
++      probe('tmp/gates-f2-not-staged.txt\trepo') === 'FAIL',
++      'verdict=' + probe('tmp/gates-f2-not-staged.txt\trepo')
++    );
++    check(
++      'T15 G7-b accepts the same row once the path is in the index',
++      probe('docs/DELIVERY_DIRECTIVE.md\trepo') === 'PASS',
++      'verdict=' + probe('docs/DELIVERY_DIRECTIVE.md\trepo')
++    );
++  }
++
++  // ---- T16: G7-c disposition vocabulary covers both languages (F3, F3 probe).
++  {
++    const cnTokens = ['已修', '已整改', '已闭合', '已处置', '接受', '拒收', '记录在案', '待办', '观察中', '待议', '已停止'];
++    const enTokens = [
++      'Fixed',
++      'Resolved',
++      'Closed',
++      'Accepted',
++      'Rejected',
++      'Deferred',
++      'Recorded',
++      'To do',
++      'Observed',
++      'To be discussed',
++      'Not a problem',
++      'Documented',
++    ];
++    const tokens = G7.internals.DISPOSITION_TOKENS;
++    check(
++      'T16 disposition vocabulary covers the CN and EN token sets stated in 6.3',
++      cnTokens.every((t) => tokens.indexOf(t) >= 0) && enTokens.every((t) => tokens.indexOf(t) >= 0),
++      'tokens=' + tokens.length
++    );
++    for (const t of enTokens) {
++      const r = runSubset(
++        makeCtx(['g7-c'], {
++          mutations: [
++            { key: 'g7-c', op: 'replace', from: '| **High** | 证据链缺失 | |', to: '| **High** | evidence chain missing | ' + t + ' |' },
++          ],
++        }),
++        ALL_SUBCHECKS
++      );
++      check(
++        'T16 G7-c accepts the English disposition `' + t + '`',
++        verdictOf(r.records, 'G7-c') === 'PASS',
++        'verdict=' + verdictOf(r.records, 'G7-c')
++      );
++    }
++    const none = runSubset(makeCtx(['g7-c']), ['G7-c']);
++    check(
++      'T16 G7-c still rejects a finding row with no disposition cell',
++      verdictOf(none.records, 'G7-c') === 'FAIL',
++      'verdict=' + verdictOf(none.records, 'G7-c')
++    );
++  }
++
++  // ---- F2 (batch 2g, ⑤ pre-review Medium): the G7-c disposition must be the row's
++  // LAST CELL, not a substring anywhere on the line. Before the fix
++  // `| **High** | 描述里写“已修” | |` PASSED because the token sat inside the description.
++  {
++    const head = '# report\n\n## 3. findings\n\n| 严重度 | 发现 | 处置 |\n|---|---|---|\n';
++    const rows = [
++      ['| **High** | 描述里写“已修” | |', 'FAIL', 'disposition token inside the description cell, disposition cell empty'],
++      ['| **High** | evidence chain missing | Fixed |', 'PASS', 'English disposition in the last cell'],
++      ['| **High** | 描述里写“已修” | 拒收 |', 'PASS', 'CN disposition in the last cell (token also appears in the description)'],
++      ['| **Medium** | description says "Resolved" | Rejected |', 'PASS', 'another EN token pair resolves in the last cell'],
++      ['| **High** | evidence chain missing', 'FAIL', 'row with no disposition cell at all (no trailing pipe)'],
++      ['| **High** | 证据链缺失 |', 'FAIL', 'row with a structurally present but EMPTY disposition cell'],
++      ['| **Low** | 描述含“已修” | 已修 |', 'PASS', 'control: token in both cells'],
++    ];
++    for (const [row, want, why] of rows) {
++      const got = g7Probe('G7-c', head + row);
++      check(
++        'F2 G7-c structural disposition probe `' + row + '` (' + why + ') must ' + want,
++        got.verdict === want,
++        'verdict=' + got.verdict + ' want=' + want + ' findings=' + got.findings + ' :: ' + got.why
++      );
++    }
++    check(
++      'F2 G7-c takes the disposition from the LAST cell only (internals)',
++      G7.internals.dispositionCell('| **High** | 描述里写“已修” | |') === '' &&
++        G7.internals.dispositionCell('| **High** | desc | 已修 |') === '已修' &&
++        G7.internals.dispositionCell('| **High** | 证据链缺失') === '证据链缺失',
++      JSON.stringify([
++        G7.internals.dispositionCell('| **High** | 描述里写“已修” | |'),
++        G7.internals.dispositionCell('| **High** | desc | 已修 |'),
++      ])
++    );
++  }
++
++  // ---- F3 (batch 2g, ⑤ pre-review Medium): the G7-d stopped-state token set must be
++  // bilingual, because G7 targets the `_EN` reports. Before the fix
++  // `| Status | Stopped (pending user ruling) |` passed while G7-d claimed EN coverage.
++  {
++    const head = '# report\n\n## 2. status\n\n';
++    check(
++      'F3 G7-d stopped-state vocabulary is bilingual (internals)',
++      ['已停止', '停止态', 'Stopped', 'Halted'].every((t) => G7.internals.STOP_TOKENS.indexOf(t) >= 0) &&
++        ['已停止——未完成', 'Stopped — incomplete'].every((m) => G7.internals.STOP_MARKS.indexOf(m) >= 0),
++      JSON.stringify({ tokens: G7.internals.STOP_TOKENS, marks: G7.internals.STOP_MARKS })
++    );
++    const rows = [
++      ['| Status | Stopped (pending user ruling) |', 'FAIL', 'EN status line without the incomplete mark'],
++      ['| Status | Stopped — incomplete |', 'PASS', 'EN status line carrying the EN incomplete mark'],
++      ['| Status | 已停止——未完成（等用户裁决） |', 'PASS', 'CN status line carrying the CN incomplete mark'],
++      ['| Status | 已停止（等用户裁决后决定是否重启） |', 'FAIL', 'CN status line without the mark'],
++      ['| Status | Halted (awaiting ruling) |', 'FAIL', 'Halted is part of the EN token set'],
++      ['| Status | halted (awaiting ruling) |', 'FAIL', 'EN tokens match case-insensitively (lowercase halted)'],
++      ['| Status | stopped — incomplete |', 'PASS', 'the EN mark matches case-insensitively too'],
++      [
++        '| Status | Stopped (pending user ruling) |\n\nStopped — incomplete\n\n## 4. notes\n\n(nothing)\n',
++        'PASS',
++        'the mark appears later in the SAME block, so the row is closed out',
++      ],
++    ];
++    for (const [row, want, why] of rows) {
++      const got = g7Probe('G7-d', head + row);
++      check(
++        'F3 G7-d bilingual stopped-state probe `' + row.split('\n')[0] + '` (' + why + ') must ' + want,
++        got.verdict === want,
++        'verdict=' + got.verdict + ' want=' + want + ' findings=' + got.findings + ' :: ' + got.why
++      );
++    }
++    // Self-reference guard (unchanged by F3): a CN prose line naming 停止态 is not a
++    // status line and must yield NO finding.
++    const prose = g7Probe('G7-d', '# report\n\n## 6. gaps\n\n已知**无机械判据**（停止态报告头标记）= OB-10 所指缺口。\n');
++    check(
++      'F3 G7-d ignores a CN prose line naming 停止态 (self-reference guard)',
++      prose.verdict === 'PASS' && prose.findings === 0,
++      'verdict=' + prose.verdict + ' findings=' + prose.findings
++    );
++  }
++
++  // ---- T13: whole-corpus regression anchor.
++  {
++    const all = runSubset(makeCtx(Object.keys(FIXTURES)), ALL_SUBCHECKS);
++    check(
++      'T13 whole fixture corpus yields exactly the expected FAIL id set',
++      JSON.stringify(failIds(all.records)) === JSON.stringify(EXPECTED_CORPUS_FAILS),
++      'got=' + JSON.stringify(failIds(all.records)) + ' expected=' + JSON.stringify(EXPECTED_CORPUS_FAILS)
++    );
++    check(
++      'T13 whole fixture corpus has no unexpected SKIP/INFO storm',
++      all.records.filter((r) => r.verdict === 'SKIP').length === 0,
++      'skips=' + all.records.filter((r) => r.verdict === 'SKIP').length
++    );
++  }
++
++  // ---- T17: an environment error must never degrade into a vacuous (green) change set.
++  // ⑦ F1 found this class: with an unresolvable range the change set collapsed to empty,
++  // every criterion printed a vacuous pass, and a CI-blocking gate exited 0 while judging
++  // nothing. Both endpoints are now validated and a failed `git diff` is an environment
++  // error (exit 2). The positive control keeps the guard from passing by rejecting all.
++  {
++    // Two independent vectors: a syntactically valid but non-existent object id, and a
++    // non-existent ref name. Both used to collapse into "empty change set" + vacuous passes.
++    for (const spec of [
++      ['base', 'range:deadbeefdeadbeefdeadbeefdeadbeefdeadbeef..HEAD'],
++      ['base', 'range:refs/heads/no-such-branch-4e11..HEAD'],
++      ['head', 'range:HEAD..deadbeefdeadbeefdeadbeefdeadbeefdeadbeef'],
++      ['head', 'range:HEAD..refs/heads/no-such-branch-4e11'],
++    ]) {
++      let err = null;
++      try {
++        createContext({ repoRoot: discoverRepoRoot(__dirname), scope: spec[1] });
++      } catch (e) {
++        err = e;
++      }
++      check('T17 unresolvable range ' + spec[0] + ' is a usage error, not an empty change set',
++        !!err && err instanceof UsageError && /not resolvable/.test(err.message),
++        'err=' + (err ? err.message : 'NO ERROR (context built - fail-open)'));
++    }
++    const okCtx = createContext({
++      repoRoot: discoverRepoRoot(__dirname),
++      scope: 'range:HEAD..HEAD',
++    });
++    check('T17 positive control: a resolvable range still builds a context',
++      okCtx.kind === 'range' && Array.isArray(okCtx.changedPaths),
++      'kind=' + okCtx.kind + ' changed=' + (okCtx.changedPaths || []).length);
++  }
++
++  // ---- T18: each scope guard must fire INDEPENDENTLY. 7 round-2 pointed out that removing the
++  // endpoint validation and the diff guard together cannot show which one caught what, and that
++  // neither the status guard nor the shallow-clone refusal had its own vector. The injected git
++  // runner (createContext's test seam) makes each one verifiable on its own.
++  {
++    const okRes = (out) => ({ ok: true, code: 0, out: out || '', err: '', spawnError: null });
++    const badRes = (err) => ({ ok: false, code: 1, out: '', err: err || '', spawnError: null });
++    const fake = (rules) => (root, args) => {
++      const key = args.join(' ');
++      for (const r of rules) if (r.re.test(key)) return r.res();
++      return okRes('');
++    };
++    const repoRoot = discoverRepoRoot(__dirname);
++    const probe = (rules, scope) => {
++      try {
++        return { ctx: createContext({ repoRoot, scope, spawnGit: fake(rules) }), err: null };
++      } catch (e) {
++        return { ctx: null, err: e };
++      }
++    };
++    const HEAD_OK = { re: /^rev-parse --verify HEAD$/, res: () => okRes('abc1234\n') };
++    const NO_PARENT = { re: /^rev-parse --verify HEAD\^1$/, res: () => badRes('') };
++    const SHALLOW_YES = { re: /^rev-parse --is-shallow-repository$/, res: () => okRes('true\n') };
++    const SHALLOW_NO = { re: /^rev-parse --is-shallow-repository$/, res: () => okRes('false\n') };
++
++    const diffFail = probe(
++      [{ re: /^diff --name-status -z /, res: () => badRes('fatal: unable to read tree') }],
++      'range:HEAD..HEAD'
++    );
++    check('T18 a failed `git diff` is an environment error even when both endpoints resolve',
++      !!diffFail.err && diffFail.err instanceof UsageError && /git diff --name-status failed/.test(diffFail.err.message),
++      'err=' + (diffFail.err ? diffFail.err.message : 'NO ERROR (fail-open)'));
++
++    const statusFail = probe(
++      [{ re: /^status --porcelain=v1/, res: () => badRes('fatal: index file corrupt') }],
++      'tree'
++    );
++    check('T18 a failed `git status` in tree scope is an environment error, not an empty change set',
++      !!statusFail.err && statusFail.err instanceof UsageError && /git status failed/.test(statusFail.err.message),
++      'err=' + (statusFail.err ? statusFail.err.message : 'NO ERROR (fail-open)'));
++
++    const indexFail = probe(
++      [{ re: /^status --porcelain=v1/, res: () => badRes('fatal: index file corrupt') }],
++      'index'
++    );
++    check('T18 a failed `git status` in index scope is an environment error too',
++      !!indexFail.err && indexFail.err instanceof UsageError && /git status failed/.test(indexFail.err.message),
++      'err=' + (indexFail.err ? indexFail.err.message : 'NO ERROR (fail-open)'));
++
++    const shallow = probe([HEAD_OK, NO_PARENT, SHALLOW_YES], 'ci');
++    check('T18 --scope=ci refuses a SHALLOW clone instead of falling back to the whole tree',
++      !!shallow.err && shallow.err instanceof UsageError && /SHALLOW/.test(shallow.err.message),
++      'err=' + (shallow.err ? shallow.err.message : 'NO ERROR (whole-tree fallback)'));
++
++    const inconclusive = probe(
++      [HEAD_OK, NO_PARENT, { re: /^rev-parse --is-shallow-repository$/, res: () => badRes('unknown option') }],
++      'ci'
++    );
++    check('T18 an inconclusive shallow probe is an environment error, not a licence to fall back',
++      !!inconclusive.err && inconclusive.err instanceof UsageError && /root commit or because/.test(inconclusive.err.message),
++      'err=' + (inconclusive.err ? inconclusive.err.message : 'NO ERROR (fell back)'));
++
++    const rootCommit = probe([HEAD_OK, NO_PARENT, SHALLOW_NO], 'ci');
++    check('T18 positive control: a genuine root commit still falls back to EMPTY_TREE',
++      !!rootCommit.ctx && rootCommit.ctx.baseRef === EMPTY_TREE && rootCommit.ctx.headRef === 'HEAD',
++      'err=' + (rootCommit.ctx ? 'baseRef=' + rootCommit.ctx.baseRef : rootCommit.err && rootCommit.err.message));
++  }
++
++  // ---- F1: a stale mutation (no-op) must not silently weaken the suite.
++  {
++    const stale = MUTATION_LOG.filter((m) => !m.applied);
++    check(
++      'F1 every declared fixture mutation applied (a stale mutation would weaken the suite silently)',
++      stale.length === 0,
++      'stale=' + JSON.stringify(stale.map((m) => m.key + ' ' + m.op + ' ' + m.needle))
++    );
++    check('F1 mutation coverage floor (>= 8 fixture mutations exercised)', MUTATION_LOG.length >= 8, 'mutations=' + MUTATION_LOG.length);
++  }
++
++  const failed = CHECKS.filter((c) => !c.ok);  const lines = [
++    'GATES SELFTEST (in-process; fixtures under tools/gates/testdata/)',
++    '  T3/T12 need real git ranges and are recorded as evidence, not here:',
++    '    --scope=range:b738e6b^..b738e6b (A1 must be red) / range:9f68a52^..9f68a52 (green)',
++    '    --scope=range:1b01115^..1b01115 (C1: G7 must be red)',
++  ];
++  for (const c of CHECKS) lines.push((c.ok ? 'ok   ' : 'FAIL ') + c.name + (c.ok || !c.detail ? '' : ' :: ' + c.detail));
++  for (const i of INFOS) lines.push('INFO ' + i.name + (i.detail ? ' :: ' + i.detail : ''));
++  lines.push('SELFTEST: ' + (failed.length ? 'FAIL ' : 'PASS ') + (CHECKS.length - failed.length) + '/' + CHECKS.length);
++  return { ok: failed.length === 0, stdout: lines.join('\n'), passed: CHECKS.length - failed.length, total: CHECKS.length };
++}
++
++function run() {
++  try {
++    return runTests();
++  } catch (e) {
++    return { ok: false, stdout: 'SELFTEST: FAIL 0/0 :: ' + (e && e.stack ? e.stack : e), passed: 0, total: 0 };
++  }
++}
++
++if (require.main === module) {
++  const res = run();
++  process.stdout.write(res.stdout + '\n');
++  process.exitCode = res.ok ? 0 : 1;
++}
++
++module.exports = { run, FIXTURES, EXPECTED_CORPUS_FAILS };
+
+diff --git a/tools/gates/testdata/fixtures/g6-1-ob11-row.txt b/tools/gates/testdata/fixtures/g6-1-ob11-row.txt
+new file mode 100644
+index 0000000..80f6064
+--- /dev/null
++++ b/tools/gates/testdata/fixtures/g6-1-ob11-row.txt
+@@ -0,0 +1,5 @@
++### 12.4 观察项台账
++
++| ID | 日期 | 发现 | 状态 |
++|---|---|---|---|
++| OB-11 | 2026-09-22 | **C.0e 台账时态修正整改后未再跑 ⑦ 复审（用户裁决例外，选 A）**：C.0e 状态行“待 ⑥ 独立扫描”与下方“⑥ 独立扫描（**实得**）`PASS`”冲突（⑦ 复审 Medium），整改后**未再跑 ⑦**——§5.3 要求“直至无 Medium+”，而 §7.5 额度（终审 1 + 复审 1）已用尽。**本次例外判定标准**：整改属**台账元数据类**（不含规则实体、不影响门禁、**闭合可字面核验**、不引入新语义），与 SW-3 第 3 轮授权的**判据语义类**整改（改 G5-a 判定标准、含规则实体、影响门禁 ⇒ 语义可核验 ⇒ 必须独立复审）性质不同；前者可并入下次修订的 ⑦ 输入，后者必须独立复审。**附带教训**：台账**不写会过期的字面量**（行数 / 文件数），只写“由 G3/G4 校验一致”这类判据（本片已据此去掉 `995/995`）。 | **待办**：并入下次修订的 ⑦ 输入 |
+
+diff --git a/tools/gates/testdata/fixtures/g6-1-pending-done.txt b/tools/gates/testdata/fixtures/g6-1-pending-done.txt
+new file mode 100644
+index 0000000..0d4296e
+--- /dev/null
++++ b/tools/gates/testdata/fixtures/g6-1-pending-done.txt
+@@ -0,0 +1,6 @@
++### C.0e 工作分级与启动授权切片 `SW-5`
++
++| 字段 | 内容 |
++|---|---|
++| 状态 | 🔄 **进行中**（S1–S6 已完成：接线 + G1–G5 全绿；**待 ⑥ 独立扫描**） |
++| ⑥ 独立扫描（**实得**） | MAI-Code-1.1-Flash，**1 次**有效调用：`INDEPENDENT SCAN: PASS` |
+
+diff --git a/tools/gates/testdata/fixtures/g6-2-cost-clauses.txt b/tools/gates/testdata/fixtures/g6-2-cost-clauses.txt
+new file mode 100644
+index 0000000..ece8b16
+--- /dev/null
++++ b/tools/gates/testdata/fixtures/g6-2-cost-clauses.txt
+@@ -0,0 +1,11 @@
++### 0.3 变更日志
++
++| 版本 | 日期 | 变更 |
++|---|---|---|
++| v1.9 | 2026-09-22 | **新增 §1.6 工作分级与启动授权（切片 `SW-5`；用户 Q1–Q6 裁决）**：① 三档启动——`[ROUTINE]`（默认、无触发词）/ `[SLICE]` / `[PILOT]`，触发词语法**全文仅此一处定义**；② 日常档**不可绕过边界**（①为**对 §7.2 ③ 的引用**，②–⑥为增量边界：CONTRACTS / schema / fixtures、`.agent.md`、状态机 / 崩溃 / 所有权 / 并发代码、`.github/workflows/**`、依赖增删）；③ 主控**先判定级别并在回执首行声明**、**可建议不擅自升级**、**级别单向不得半途降级**（用户要求降级 ⇒ 停止切片并以 `[ROUTINE]` 重启；停止态须标“已停止——未完成”＋未完成清单，**不视为闭环**）、**不因日常档豁免 §10**；④ 日常档留痕 = diff + §6.1 + §6.3，**0 次付费调用**；⑤ §1.1 改指针、§5.0 加“启动前置”一句并把 **`SW-3` 补入步 0 前置硬门**、附录 B.7 按三档扩充（标题由“切片启动卡”改称“**启动卡**”）、附录 C.0e 记录 `SW-5`（含**首次角色裁剪降级判断留痕**：字面落“中等”、实质落“简单”，豁免 ①⑤；**成本**：预算 ⑥×1 + ⑦×1、**实得 ⑥×1 + ⑦×2 = 3 次付费调用**（见附录 C.0e）。 |
++
++### C.0e 工作分级与启动授权切片 `SW-5`
++
++| 字段 | 内容 |
++|---|---|
++| 成本 | **⑥ ×1（MAI）＋ ⑦ ×2（Codex：终审 1 + 复审 1）= 3 次付费调用**（均在 §7.5 额度内；原预算声明为 ⑥×1 + ⑦×1） |
+
+diff --git a/tools/gates/testdata/fixtures/g6-3-legal-run-id.txt b/tools/gates/testdata/fixtures/g6-3-legal-run-id.txt
+new file mode 100644
+index 0000000..75eff73
+--- /dev/null
++++ b/tools/gates/testdata/fixtures/g6-3-legal-run-id.txt
+@@ -0,0 +1,2 @@
++- CI run 35646859765 首跑双腿绿。
++- run 号见 §6.4；失败步骤日志用 `gh run view` 获取。
+
+diff --git a/tools/gates/testdata/fixtures/g6-3-placeholder-run-id.txt b/tools/gates/testdata/fixtures/g6-3-placeholder-run-id.txt
+new file mode 100644
+index 0000000..a74d0fb
+--- /dev/null
++++ b/tools/gates/testdata/fixtures/g6-3-placeholder-run-id.txt
+@@ -0,0 +1,4 @@
++- run 0
++- run 000000
++- run <RUN_ID>
++- run TBD
+
+diff --git a/tools/gates/testdata/fixtures/g6-4-expiring-literals.txt b/tools/gates/testdata/fixtures/g6-4-expiring-literals.txt
+new file mode 100644
+index 0000000..88da808
+--- /dev/null
++++ b/tools/gates/testdata/fixtures/g6-4-expiring-literals.txt
+@@ -0,0 +1,4 @@
++| 项目 | 数值 |
++|---|---|
++| 交付范围 | 995/995 行 |
++| 涉及文件 | 共 128 个文件 |
+
+diff --git a/tools/gates/testdata/fixtures/g7-a-no-artifacts.txt b/tools/gates/testdata/fixtures/g7-a-no-artifacts.txt
+new file mode 100644
+index 0000000..4c52160
+--- /dev/null
++++ b/tools/gates/testdata/fixtures/g7-a-no-artifacts.txt
+@@ -0,0 +1,5 @@
++# 某切片验证报告
++
++## 1. 结论
++
++本地门禁全绿；原始输出见 §5 的散文引用。
+
+diff --git a/tools/gates/testdata/fixtures/g7-b-no-disposition.txt b/tools/gates/testdata/fixtures/g7-b-no-disposition.txt
+new file mode 100644
+index 0000000..ef2e123
+--- /dev/null
++++ b/tools/gates/testdata/fixtures/g7-b-no-disposition.txt
+@@ -0,0 +1,8 @@
++# 某切片验证报告
++
++## 5. 工件
++
++```artifacts
++tmp/drfix/A3.txt
++docs/validation/dr-fix-enforcement-proxy.md	repo
++```
+
+diff --git a/tools/gates/testdata/fixtures/g7-c-finding-row.txt b/tools/gates/testdata/fixtures/g7-c-finding-row.txt
+new file mode 100644
+index 0000000..f80f65c
+--- /dev/null
++++ b/tools/gates/testdata/fixtures/g7-c-finding-row.txt
+@@ -0,0 +1,13 @@
++# 某切片验证报告
++
++## 3. 审查摘要
++
++| 严重度 | 发现 | 处置 |
++|---|---|---|
++| **High** | 证据链缺失 | |
++
++## 5. 工件
++
++```artifacts
++docs/validation/dr-fix-enforcement-proxy.md	repo
++```
+
+diff --git a/tools/gates/testdata/fixtures/g7-d-stopped-state.txt b/tools/gates/testdata/fixtures/g7-d-stopped-state.txt
+new file mode 100644
+index 0000000..e8eb3ed
+--- /dev/null
++++ b/tools/gates/testdata/fixtures/g7-d-stopped-state.txt
+@@ -0,0 +1,15 @@
++# 某切片验证报告
++
++## 2. 状态
++
++| 状态 | 🛑 已停止（等用户裁决后决定是否重启） |
++
++## 6. 缺口与观察
++
++已知**无机械判据**的一处（停止态报告头标记）= OB-10 所指缺口。
++
++## 8. 工件
++
++```artifacts
++docs/validation/dr-fix-enforcement-proxy.md	repo
++```
+
+diff --git a/tools/gates/testdata/fixtures/g7-ok-report.txt b/tools/gates/testdata/fixtures/g7-ok-report.txt
+new file mode 100644
+index 0000000..3b39a0b
+--- /dev/null
++++ b/tools/gates/testdata/fixtures/g7-ok-report.txt
+@@ -0,0 +1,15 @@
++# 某切片验证报告
++
++## 3. 审查摘要
++
++| 严重度 | 发现 | 处置 |
++|---|---|---|
++| **High** | 门禁脚本硬编码仓库路径 | 已修 |
++
++## 5. 工件
++
++```artifacts
++docs/validation/dr-fix-enforcement-proxy.md	repo
++tmp/drfix/A3.txt	local-only
++docs/validation/legacy-dr-report.md	missing-historical
++```
+
+diff --git a/tools/gates/testdata/historical/a1-cost-clauses.txt b/tools/gates/testdata/historical/a1-cost-clauses.txt
+new file mode 100644
+index 0000000..9983037
+--- /dev/null
++++ b/tools/gates/testdata/historical/a1-cost-clauses.txt
+@@ -0,0 +1,15 @@
++# G6-2 / T4 fixture provenance (see ARCH-DESIGN section 6, T3 and T4).
++# Two verbatim cost rows that MUST agree. The selftest asserts that the fixture
++# testdata/fixtures/g6-2-cost-clauses.md contains both lines verbatim.
++#
++# Line 1 = `git show HEAD:docs/DELIVERY_DIRECTIVE.md` line 47 (section 0.3 changelog,
++#          v1.9 row): budget clause ⑥×1 + ⑦×1 (exempt) plus realized clause
++#          ⑥×1 + ⑦×2 = 3 (compared). This is the state written by commit 9f68a52.
++# Line 2 = `git show b738e6b:docs/DELIVERY_DIRECTIVE.md` line 927 (appendix C.0e cost
++#          row): realized clause ⑥×1 + ⑦×2 = 3 plus the historic budget declaration.
++# Both carry slice key SW-5, so G6-2 compares them; they agree => PASS.
++# The pre-fix pairing (commit b738e6b: the section 0.3 v1.9 row still reads the bare
++# "成本 ⑥×1 + ⑦×1") is defect A1 and is exercised by `--scope=range:b738e6b^..b738e6b`
++# (T3) against real history, not by a fixture.
++| v1.9 | 2026-09-22 | **新增 §1.6 工作分级与启动授权（切片 `SW-5`；用户 Q1–Q6 裁决）**：① 三档启动——`[ROUTINE]`（默认、无触发词）/ `[SLICE]` / `[PILOT]`，触发词语法**全文仅此一处定义**；② 日常档**不可绕过边界**（①为**对 §7.2 ③ 的引用**，②–⑥为增量边界：CONTRACTS / schema / fixtures、`.agent.md`、状态机 / 崩溃 / 所有权 / 并发代码、`.github/workflows/**`、依赖增删）；③ 主控**先判定级别并在回执首行声明**、**可建议不擅自升级**、**级别单向不得半途降级**（用户要求降级 ⇒ 停止切片并以 `[ROUTINE]` 重启；停止态须标“已停止——未完成”＋未完成清单，**不视为闭环**）、**不因日常档豁免 §10**；④ 日常档留痕 = diff + §6.1 + §6.3，**0 次付费调用**；⑤ §1.1 改指针、§5.0 加“启动前置”一句并把 **`SW-3` 补入步 0 前置硬门**、附录 B.7 按三档扩充（标题由“切片启动卡”改称“**启动卡**”）、附录 C.0e 记录 `SW-5`（含**首次角色裁剪降级判断留痕**：字面落“中等”、实质落“简单”，豁免 ①⑤；**成本**：预算 ⑥×1 + ⑦×1、**实得 ⑥×1 + ⑦×2 = 3 次付费调用**（见附录 C.0e）。 |
++| 成本 | **⑥ ×1（MAI）＋ ⑦ ×2（Codex：终审 1 + 复审 1）= 3 次付费调用**（均在 §7.5 额度内；原预算声明为 ⑥×1 + ⑦×1） |
+
+diff --git a/tools/gates/testdata/historical/dr-fix-report-structure.txt b/tools/gates/testdata/historical/dr-fix-report-structure.txt
+new file mode 100644
+index 0000000..8ae2edb
+--- /dev/null
++++ b/tools/gates/testdata/historical/dr-fix-report-structure.txt
+@@ -0,0 +1,35 @@
++# G7 / T12 provenance (see ARCH-DESIGN section 6, T12).
++# Source: `git show 1b01115:docs/validation/dr-fix-enforcement-proxy.md` - the DR-FIX
++# pilot slice report added by commit 1b01115 (228 lines, 227 insertions).
++#
++# Recorded fact: the report contains NO fenced block at all (`artifacts` fence count
++# = 0, total fence count = 0), so its evidence references live only in prose. That is
++# exactly defect C1, and it is why G7 must be red for
++# `--scope=range:1b01115^..1b01115`. The reasoning above is reproducible with:
++#   git show 1b01115:docs/validation/dr-fix-enforcement-proxy.md
++#   git range run: node tools/gates/gate.js --check=G7 --scope=range:1b01115^..1b01115
++#
++# Section headings of that report (line numbers as of commit 1b01115):
++#   7  ## 0. 诚实准则
++#   13 ## 1. 变更概要
++#   21 ## 2. 流水线执行
++#   42 ## 3. 审查摘要（⑤ / ⑥ / ⑦）
++#   44 ### 3.1 ⑤ 预审（V4 Pro ×1）——**不对称性论证**（**⑤ 独立贡献，非 ① 输入**）
++#   48 ### 3.2 ⑥ 独立扫描（MAI ×1）：`INDEPENDENT SCAN: PASS`
++#   54 ### 3.3 ⑦ 独立终审（Codex ×1）：`FINDINGS` —— 2 条"已核查、非问题" + **4 条发现**
++#   64 ### 3.4 ⑦ 复审（Codex ×1，本片最后一次 ⑦ 额度）：`PASS`
++#   76 ### 3.5 两条独立证据指向同一结论（连写，不重复叙述）
++#   81 ### 3.6 审查输入包摘要与盲审隔离证明
++#   85 ## 4. 可证伪性（机械检查 + 变异检验）
++#   87 ### 4.1 变异口径（本片特有，须与新准则一并理解）
++#   93 ### 4.2 变异实测（原始输出见 `tmp/drfix/`）
++#  107 ### 4.3 机械检查与"未放宽"方向标注
++#  113 ### 4.4 DR 症状串规范化：双串并记（匹配依据）
++#  123 ## 5. 门禁结果与验收证据
++#  140 ### 5.1 提交前（变异性 + 重复运行；OB-13 第一段）
++#  146 ### 5.2 提交后（3 连推首跑；OB-13 第二段）
++#  152 ## 6. DR 累计发生次数表（延续）与边界③失效
++#  168 ## 7. 成本与计量（R7.1 / §11.3 字段）
++#  185 ## 8. 明确未执行事项与待议项
++#  197 ## 9. 试点量化指标（§12.1，基线 = B3c）
++#  222 ## 10. 下一步建议
+
+diff --git a/tools/gates/testdata/historical/ob11-registration-row.txt b/tools/gates/testdata/historical/ob11-registration-row.txt
+new file mode 100644
+index 0000000..35ec1e0
+--- /dev/null
++++ b/tools/gates/testdata/historical/ob11-registration-row.txt
+@@ -0,0 +1,10 @@
++# G6-1 / T2 fixture provenance (see ARCH-DESIGN section 6, T2).
++# Source: `git show HEAD:docs/DELIVERY_DIRECTIVE.md`, line 605 - the OB-11 row of the
++# section 12.4 observation ledger, copied verbatim (byte-for-byte, BOM/CRLF aside).
++#
++# Why it matters: the row quotes both the pending shape ("待 ⑥ 独立扫描") and the
++# completion shape ("⑥ 独立扫描（**实得**）") on one line, so without the exclusion
++# marker 冲突 the self-reference guard would report a false positive. The selftest
++# asserts that the fixture testdata/fixtures/g6-1-ob11-row.md contains this line
++# verbatim, and that removing 冲突 turns it red (the marker is load-bearing).
++| OB-11 | 2026-09-22 | **C.0e 台账时态修正整改后未再跑 ⑦ 复审（用户裁决例外，选 A）**：C.0e 状态行“待 ⑥ 独立扫描”与下方“⑥ 独立扫描（**实得**）`PASS`”冲突（⑦ 复审 Medium），整改后**未再跑 ⑦**——§5.3 要求“直至无 Medium+”，而 §7.5 额度（终审 1 + 复审 1）已用尽。**本次例外判定标准**：整改属**台账元数据类**（不含规则实体、不影响门禁、**闭合可字面核验**、不引入新语义），与 SW-3 第 3 轮授权的**判据语义类**整改（改 G5-a 判定标准、含规则实体、影响门禁 ⇒ 语义可核验 ⇒ 必须独立复审）性质不同；前者可并入下次修订的 ⑦ 输入，后者必须独立复审。**附带教训**：台账**不写会过期的字面量**（行数 / 文件数），只写“由 G3/G4 校验一致”这类判据（本片已据此去掉 `995/995`）。 | **待办**：并入下次修订的 ⑦ 输入 |
+

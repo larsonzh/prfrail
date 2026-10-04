@@ -1,0 +1,109 @@
+diff --git a/tools/agent-probe/enforcement-proxy/main.go b/tools/agent-probe/enforcement-proxy/main.go
+index 65e9f43..b5ef1ca 100644
+--- a/tools/agent-probe/enforcement-proxy/main.go
++++ b/tools/agent-probe/enforcement-proxy/main.go
+@@ -151,6 +151,11 @@ func (l *eventLogger) close() {
+ 	if l == nil || l.w == nil {
+ 		return
+ 	}
++	// Serialize against log(): an unguarded Close can interleave with an in-flight Write+Sync from a
++	// handler goroutine and surface as spurious "file already closed" noise on stderr. Closing is still
++	// terminal: any later Write fails deterministically.
++	l.mu.Lock()
++	defer l.mu.Unlock()
+ 	_ = l.w.Close()
+ }
+ 
+diff --git a/tools/agent-probe/enforcement-proxy/main_test.go b/tools/agent-probe/enforcement-proxy/main_test.go
+index 4d5179b..ab645e0 100644
+--- a/tools/agent-probe/enforcement-proxy/main_test.go
++++ b/tools/agent-probe/enforcement-proxy/main_test.go
+@@ -121,9 +121,7 @@ func TestConnectAuditTrailFailureDeniesAndDoesNotTunnel(t *testing.T) {
+ 	if !strings.Contains(first, "200") {
+ 		t.Fatalf("status line = %q, want a 200 before the log is broken", first)
+ 	}
+-	if connections.Load() == 0 {
+-		t.Fatal("target must have been reached while the audit trail was healthy")
+-	}
++	waitForAccepts(t, connections, 1)
+ 
+ 	logger.close() // the audit trail becomes unusable
+ 	before := connections.Load()
+@@ -264,6 +262,21 @@ func waitForRecord(t *testing.T, path string, predicate func(map[string]any) boo
+ 	return nil
+ }
+ 
++// waitForAccepts polls the echo rig's accept counter: the accept goroutine increments it only after
++// listener.Accept returns, which can land marginally after the client observes the 200 handshake. The
++// hard deadline keeps a target that is genuinely never reached a deterministic failure — this is a
++// bounded wait for a synchronisation point, not a fixed sleep that hides a missing dial.
++func waitForAccepts(t *testing.T, counter *atomic.Int32, want int32) {
++	t.Helper()
++	deadline := time.Now().Add(3 * time.Second)
++	for time.Now().Before(deadline) && counter.Load() < want {
++		time.Sleep(20 * time.Millisecond)
++	}
++	if got := counter.Load(); got != want {
++		t.Fatalf("target accepts = %d, want %d", got, want)
++	}
++}
++
+ func startTCPEcho(t *testing.T) (string, *atomic.Int32) {
+ 	t.Helper()
+ 	listener, err := net.Listen("tcp", "127.0.0.1:0")
+@@ -320,9 +333,7 @@ func TestConnectTunnelAllowedReachesTarget(t *testing.T) {
+ 	if !strings.Contains(status, "200") {
+ 		t.Fatalf("want 200 handshake, got %q", status)
+ 	}
+-	if accepted.Load() != 1 {
+-		t.Fatalf("target accept count = %d, want 1", accepted.Load())
+-	}
++	waitForAccepts(t, accepted, 1)
+ 	record := waitForRecord(t, logPath, func(r map[string]any) bool {
+ 		return r["event"] == "connect" && r["decision"] == "allow" && r["phase"] == "established"
+ 	})
+@@ -368,13 +379,19 @@ func TestPlainHTTPForwardedAndLogged(t *testing.T) {
+ 		t.Fatalf("body = %q, want pong", body)
+ 	}
+ 	records := readLog(t, logPath)
+-	if len(records) < 2 {
+-		t.Fatalf("want an authorized record plus a completion record, got %+v", records)
++	if len(records) < 1 {
++		t.Fatalf("want the pre-flight authorized record, got %+v", records)
+ 	}
++	// The pre-flight authorized record is written before the upstream RoundTrip, so reading it here is
++	// deterministic; the completion record below is not.
+ 	if records[0]["decision"] != "allow" || records[0]["phase"] != "authorized" {
+ 		t.Fatalf("first record = %+v, want the pre-flight authorized record", records[0])
+ 	}
+-	completion := records[len(records)-1]
++	// The completion record is written by the handler goroutine after io.Copy drained the response, so it
++	// can land marginally after the client has read the body. Poll for it, then keep the field assertions.
++	completion := waitForRecord(t, logPath, func(entry map[string]any) bool {
++		return entry["event"] == "http" && entry["decision"] == "allow" && entry["bytesToClient"] != nil
++	})
+ 	if completion["event"] != "http" || completion["decision"] != "allow" || completion["bytesToClient"] == nil {
+ 		t.Fatalf("last record = %+v, want the completion record with byte counts", completion)
+ 	}
+@@ -446,9 +463,7 @@ func TestConnectUsesUpstreamProxy(t *testing.T) {
+ 	if upstreamHits.Load() != 1 {
+ 		t.Fatalf("upstream hits = %d, want 1", upstreamHits.Load())
+ 	}
+-	if accepted.Load() != 1 {
+-		t.Fatalf("target accepts = %d, want 1", accepted.Load())
+-	}
++	waitForAccepts(t, accepted, 1)
+ 	record := waitForRecord(t, logPath, func(r map[string]any) bool {
+ 		return r["event"] == "connect" && r["decision"] == "allow"
+ 	})
+@@ -465,9 +480,7 @@ func TestObserveModeAllowsUnknownHostAndLogsIt(t *testing.T) {
+ 	if !strings.Contains(status, "200") {
+ 		t.Fatalf("observe mode must permit the tunnel, got %q", status)
+ 	}
+-	if accepted.Load() != 1 {
+-		t.Fatalf("target accepts = %d, want 1", accepted.Load())
+-	}
++	waitForAccepts(t, accepted, 1)
+ 	record := waitForRecord(t, logPath, func(r map[string]any) bool {
+ 		return r["event"] == "connect" && r["reason"] == "observe"
+ 	})
