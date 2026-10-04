@@ -99,7 +99,7 @@ Change-set diff = `tmp/dml/change-set.diff` (with `tmp/dml/numstat.txt`); contra
 - The §2.4 blacklist body is not changed; the §5.2 matrix is not changed; the **values** of the §2.2 table are not changed (including the divergence between the hyphen form of `GPT-6-Luna (copilot)` and the space form measured from the tool — registered only).
 - **No `tmp/` file was actually moved, archived or deleted** (archiving execution is a separate "tmp/ lifecycle execution" slice).
 - The 5 pre-existing baseline backtick-level mirror drifts are not fixed (OB-73, registered).
-- No ADR is registered (⑦ not downgraded); no commit, no push (awaiting the user's same-round authorization).
+- No ADR is registered (⑦ not downgraded); after the ⑩ stopping point the commit and the push were completed under the user's same-round authorization - see the "Commit and CI" row of §10.
 
 ## 9. Next-step recommendations (including tier recommendations per role)
 
@@ -109,10 +109,11 @@ Change-set diff = `tmp/dml/change-set.diff` (with `tmp/dml/numstat.txt`); contra
 
 ## 10. ⑩ stopping-point report (including the write-back check line)
 
-- Executed up to ⑨; **stopped before commit authorization**: this slice does not commit, does not push, does not push to gitee.
+- Executed up to ⑨; **stopped before commit authorization**: at the ⑩ stopping point this slice did not commit, did not push, did not push to gitee; that stopping point was lifted by the user's same-round authorization - see the "Commit and CI" row below.
 - **Write-back check** (the OB-63 formulation of §11.2): validation report = **written back** (this file); `DEV_PLAN` = **not applicable** (a directive-governance slice; per the slice definition and existing precedent, no `DEV_PLAN` paragraph is written); ledger = **written back** (the completion-record row of `REMAINING_SLICES{,_EN}`, which per the new §11.2 format records the report path only); §0.3 and §12.4 of `DELIVERY_DIRECTIVE{,_EN}` are updated in place; ADR = **not applicable** (no downgrade, no quota exception).
 - **⑦ conclusion**: round 1 `PASS WITH FIXES` (1 Medium: the freedom-list encoding) ⇒ encoding normalized ⇒ re-review `RE-REVIEW: PASS`; ⑦ is Codex regular tier, **not downgraded**, and its independence is not compromised.
 - **Gate readings**: both `--scope=tree` and `--scope=index` report `TOTAL_FAIL=0`; `SELFTEST: PASS 264/264` (see §6).
+- **Commit and CI**: commit `0e7a111`; CI run `37185556184` is green on both `Go` legs (`Go windows-latest` / `Go ubuntu-latest`), while the three `workflow_dispatch` legs `candidate-build` / `candidate-probe` / `selfhost` are skipped by their event condition; both legs agree: `SELFTEST: PASS 264/264`, `GATE REPORT scope=ci changed=7`, `TOTAL_FAIL=0`.
 
 ## 11. Artifacts list
 
@@ -124,122 +125,8 @@ docs/t027/REMAINING_SLICES_EN.md	repo
 docs/validation/directive-modelid-map.md	repo
 docs/validation/directive-modelid-map_EN.md	repo
 docs/validation/evidence/DIRECTIVE-MODELID-MAP-freedom-list.md	repo
-tmp/dml/bing.txt	local-only
-tmp/dml/change-set.diff	local-only
-tmp/dml/check_bt.js	local-only
-tmp/dml/chuanshu.txt	local-only
-tmp/dml/ci-run-37073985144.txt	local-only
-tmp/dml/ci-run-37092310920.txt	local-only
-tmp/dml/cn-shape.txt	local-only
-tmp/dml/consistency-10.txt	local-only
-tmp/dml/consistency-final.txt	local-only
-tmp/dml/consistency-out4.txt	local-only
-tmp/dml/consistency.js	local-only
-tmp/dml/contract-excerpt.md	local-only
-tmp/dml/design-1-v4pro.md	local-only
-tmp/dml/directive_cn.diff	local-only
-tmp/dml/directive_en.diff	local-only
-tmp/dml/dump-cn.js	local-only
-tmp/dml/dump.js	local-only
-tmp/dml/dump2.js	local-only
-tmp/dml/dump3.js	local-only
-tmp/dml/dump6.js	local-only
-tmp/dml/dump7.js	local-only
-tmp/dml/en-stat.js	local-only
-tmp/dml/en3.txt	local-only
-tmp/dml/en58.txt	local-only
-tmp/dml/en6.txt	local-only
-tmp/dml/enrep.txt	local-only
-tmp/dml/fence-cmp.js	local-only
-tmp/dml/fence.js	local-only
-tmp/dml/find.js	local-only
-tmp/dml/find.txt	local-only
-tmp/dml/fix-fixtures-lf.js	local-only
-tmp/dml/fix-h5.js	local-only
-tmp/dml/fix-ledger.js	local-only
-tmp/dml/fix-prereview.js	local-only
-tmp/dml/fix-r2-1.js	local-only
-tmp/dml/fix-r7-1.js	local-only
-tmp/dml/g4b.txt	local-only
-tmp/dml/gate-index-final.txt	local-only
-tmp/dml/gate-index.txt	local-only
-tmp/dml/gate-index10.txt	local-only
-tmp/dml/gate-tree.txt	local-only
-tmp/dml/gate-tree10.txt	local-only
-tmp/dml/gate-tree7.txt	local-only
-tmp/dml/gate-tree9.txt	local-only
-tmp/dml/gofmt.txt	local-only
-tmp/dml/grep_misc.txt	local-only
-tmp/dml/grep_modelid.txt	local-only
-tmp/dml/grep_modelstr.txt	local-only
-tmp/dml/grep_showname.txt	local-only
-tmp/dml/gsum.js	local-only
-tmp/dml/hunks.js	local-only
-tmp/dml/hunks.txt	local-only
-tmp/dml/land-8b.js	local-only
-tmp/dml/land-adr019-conclusion.js	local-only
-tmp/dml/land-adr019.js	local-only
-tmp/dml/land-r2-2.js	local-only
-tmp/dml/land-rules.js	local-only
-tmp/dml/land1.js	local-only
-tmp/dml/land10.js	local-only
-tmp/dml/land11.js	local-only
-tmp/dml/land12.js	local-only
-tmp/dml/land2.js	local-only
-tmp/dml/land3.js	local-only
-tmp/dml/land4.js	local-only
-tmp/dml/land5.js	local-only
-tmp/dml/land6.js	local-only
-tmp/dml/land7.js	local-only
-tmp/dml/land7b.js	local-only
-tmp/dml/land8.js	local-only
-tmp/dml/land9.js	local-only
-tmp/dml/leftovers.js	local-only
-tmp/dml/leftovers.txt	local-only
-tmp/dml/lib.js	local-only
-tmp/dml/luna-probe	local-only
-tmp/dml/m1.orig	local-only
-tmp/dml/m2.orig	local-only
-tmp/dml/m3.orig	local-only
-tmp/dml/mk-fixtures-f5.js	local-only
-tmp/dml/mk-fixtures-m4.js	local-only
-tmp/dml/mk-freedom-list.js	local-only
-tmp/dml/mk-report.js	local-only
-tmp/dml/mkpack.js	local-only
-tmp/dml/mut.js	local-only
-tmp/dml/mutation.md	local-only
-tmp/dml/norm-en.js	local-only
-tmp/dml/norm.js	local-only
-tmp/dml/numstat.txt	local-only
-tmp/dml/ob-land.js	local-only
-tmp/dml/ob-land2.js	local-only
-tmp/dml/pairs.js	local-only
-tmp/dml/pairs.txt	local-only
-tmp/dml/pairs2.js	local-only
-tmp/dml/pre.txt	local-only
-tmp/dml/preflight.js	local-only
-tmp/dml/r2-cn.diff	local-only
-tmp/dml/r2-cn2.diff	local-only
-tmp/dml/r2-consistency.txt	local-only
-tmp/dml/r2-en.diff	local-only
-tmp/dml/r2-gate-tree.txt	local-only
-tmp/dml/report-stat.txt	local-only
-tmp/dml/revert.js	local-only
-tmp/dml/review-r1.md	local-only
-tmp/dml/scan.js	local-only
-tmp/dml/scan.txt	local-only
-tmp/dml/scan2.js	local-only
-tmp/dml/seg.js	local-only
-tmp/dml/seg.txt	local-only
-tmp/dml/selftest-final.txt	local-only
-tmp/dml/selftest.txt	local-only
-tmp/dml/selftest10.txt	local-only
-tmp/dml/selftest7.txt	local-only
-tmp/dml/src.txt	local-only
-tmp/dml/src2.txt	local-only
-tmp/dml/src3.txt	local-only
-tmp/dml/src4.txt	local-only
-tmp/dml/src5.txt	local-only
-tmp/dml/strict-pairs.js	local-only
-tmp/dml/test.txt	local-only
+docs/validation/evidence/DIRECTIVE-MODELID-MAP-mutation.md	repo
+docs/validation/evidence/DIRECTIVE-MODELID-MAP-review-r1.md	repo
 ```
+
+(Closeout: the one-off scripts and intermediate readings under `tmp/dml/` were removed per §1.5, so the granular `local-only` rows previously listed above are gone with them; the two pieces of evidence `review-r1.md` and `mutation.md` were moved into `docs/validation/evidence/` and are counted as `repo` rows.)

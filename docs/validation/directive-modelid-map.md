@@ -99,7 +99,7 @@
 - 未改 §2.4 黑名单本体；未改 §5.2 矩阵；未改 §2.2 表的**取值**（含 `GPT-6-Luna (copilot)` 的连字符形态与工具实测空格形态的分歧，只登记）。
 - **未实际移动、归档或删除任何 `tmp/` 文件**（归档执行另立「tmp/ 生命周期执行」片）。
 - 未修 5 处基线反引号级镜像漂移（OB-73，已登记）。
-- 未登记 ADR（⑦ 未降级）；未 commit、未 push（待用户同轮授权）。
+- 未登记 ADR（⑦ 未降级）；⑩ 停点后经用户同轮授权完成提交与推送，读数见 §10 的「提交与 CI」行。
 
 ## 9. 下一步建议（含各角色档位建议）
 
@@ -109,10 +109,11 @@
 
 ## 10. ⑩ 停点报告（含回写核对行）
 
-- 执行至 ⑨；**停在提交授权之前**：本片不 commit、不 push、不推 gitee。
+- 执行至 ⑨；**停在提交授权之前**：⑩ 停点时本片不 commit、不 push、不推 gitee；该停点随后由用户同轮授权解除，见下条「提交与 CI」。
 - **回写核对**（§11.2 的 OB-63 口径）：验证报告 = **已回写**（本文件）；`DEV_PLAN` = **不适用**（准则治理片，按切片定义与既有先例不写 `DEV_PLAN` 段落）；台账 = **已回写**（`REMAINING_SLICES{,_EN}` 的完成记录行，按 §11.2 新格式只记报告路径）；`DELIVERY_DIRECTIVE{,_EN}` 的 §0.3 与 §12.4 已就地更新；ADR = **不适用**（无降级、无额度例外）。
 - **⑦ 结论**：首轮 `PASS WITH FIXES`（1 Medium：自由度清单编码）⇒ 归一编码 ⇒ 复审 `RE-REVIEW: PASS`；⑦ 为 Codex 常规档、**未降级**，独立性不受损。
 - **门禁读数**：`--scope=tree` 与 `--scope=index` 均 `TOTAL_FAIL=0`；`SELFTEST: PASS 264/264`（见 §6）。
+- **提交与 CI**：commit `0e7a111`；CI run `37185556184` 两条 `Go` 腿全绿（`Go windows-latest` / `Go ubuntu-latest`），`candidate-build` / `candidate-probe` / `selfhost` 三条 `workflow_dispatch` 腿按事件条件跳过；两腿读数一致：`SELFTEST: PASS 264/264`、`GATE REPORT scope=ci changed=7`、`TOTAL_FAIL=0`。
 
 ## 11. 产物清单
 
@@ -124,122 +125,8 @@ docs/t027/REMAINING_SLICES_EN.md	repo
 docs/validation/directive-modelid-map.md	repo
 docs/validation/directive-modelid-map_EN.md	repo
 docs/validation/evidence/DIRECTIVE-MODELID-MAP-freedom-list.md	repo
-tmp/dml/bing.txt	local-only
-tmp/dml/change-set.diff	local-only
-tmp/dml/check_bt.js	local-only
-tmp/dml/chuanshu.txt	local-only
-tmp/dml/ci-run-37073985144.txt	local-only
-tmp/dml/ci-run-37092310920.txt	local-only
-tmp/dml/cn-shape.txt	local-only
-tmp/dml/consistency-10.txt	local-only
-tmp/dml/consistency-final.txt	local-only
-tmp/dml/consistency-out4.txt	local-only
-tmp/dml/consistency.js	local-only
-tmp/dml/contract-excerpt.md	local-only
-tmp/dml/design-1-v4pro.md	local-only
-tmp/dml/directive_cn.diff	local-only
-tmp/dml/directive_en.diff	local-only
-tmp/dml/dump-cn.js	local-only
-tmp/dml/dump.js	local-only
-tmp/dml/dump2.js	local-only
-tmp/dml/dump3.js	local-only
-tmp/dml/dump6.js	local-only
-tmp/dml/dump7.js	local-only
-tmp/dml/en-stat.js	local-only
-tmp/dml/en3.txt	local-only
-tmp/dml/en58.txt	local-only
-tmp/dml/en6.txt	local-only
-tmp/dml/enrep.txt	local-only
-tmp/dml/fence-cmp.js	local-only
-tmp/dml/fence.js	local-only
-tmp/dml/find.js	local-only
-tmp/dml/find.txt	local-only
-tmp/dml/fix-fixtures-lf.js	local-only
-tmp/dml/fix-h5.js	local-only
-tmp/dml/fix-ledger.js	local-only
-tmp/dml/fix-prereview.js	local-only
-tmp/dml/fix-r2-1.js	local-only
-tmp/dml/fix-r7-1.js	local-only
-tmp/dml/g4b.txt	local-only
-tmp/dml/gate-index-final.txt	local-only
-tmp/dml/gate-index.txt	local-only
-tmp/dml/gate-index10.txt	local-only
-tmp/dml/gate-tree.txt	local-only
-tmp/dml/gate-tree10.txt	local-only
-tmp/dml/gate-tree7.txt	local-only
-tmp/dml/gate-tree9.txt	local-only
-tmp/dml/gofmt.txt	local-only
-tmp/dml/grep_misc.txt	local-only
-tmp/dml/grep_modelid.txt	local-only
-tmp/dml/grep_modelstr.txt	local-only
-tmp/dml/grep_showname.txt	local-only
-tmp/dml/gsum.js	local-only
-tmp/dml/hunks.js	local-only
-tmp/dml/hunks.txt	local-only
-tmp/dml/land-8b.js	local-only
-tmp/dml/land-adr019-conclusion.js	local-only
-tmp/dml/land-adr019.js	local-only
-tmp/dml/land-r2-2.js	local-only
-tmp/dml/land-rules.js	local-only
-tmp/dml/land1.js	local-only
-tmp/dml/land10.js	local-only
-tmp/dml/land11.js	local-only
-tmp/dml/land12.js	local-only
-tmp/dml/land2.js	local-only
-tmp/dml/land3.js	local-only
-tmp/dml/land4.js	local-only
-tmp/dml/land5.js	local-only
-tmp/dml/land6.js	local-only
-tmp/dml/land7.js	local-only
-tmp/dml/land7b.js	local-only
-tmp/dml/land8.js	local-only
-tmp/dml/land9.js	local-only
-tmp/dml/leftovers.js	local-only
-tmp/dml/leftovers.txt	local-only
-tmp/dml/lib.js	local-only
-tmp/dml/luna-probe	local-only
-tmp/dml/m1.orig	local-only
-tmp/dml/m2.orig	local-only
-tmp/dml/m3.orig	local-only
-tmp/dml/mk-fixtures-f5.js	local-only
-tmp/dml/mk-fixtures-m4.js	local-only
-tmp/dml/mk-freedom-list.js	local-only
-tmp/dml/mk-report.js	local-only
-tmp/dml/mkpack.js	local-only
-tmp/dml/mut.js	local-only
-tmp/dml/mutation.md	local-only
-tmp/dml/norm-en.js	local-only
-tmp/dml/norm.js	local-only
-tmp/dml/numstat.txt	local-only
-tmp/dml/ob-land.js	local-only
-tmp/dml/ob-land2.js	local-only
-tmp/dml/pairs.js	local-only
-tmp/dml/pairs.txt	local-only
-tmp/dml/pairs2.js	local-only
-tmp/dml/pre.txt	local-only
-tmp/dml/preflight.js	local-only
-tmp/dml/r2-cn.diff	local-only
-tmp/dml/r2-cn2.diff	local-only
-tmp/dml/r2-consistency.txt	local-only
-tmp/dml/r2-en.diff	local-only
-tmp/dml/r2-gate-tree.txt	local-only
-tmp/dml/report-stat.txt	local-only
-tmp/dml/revert.js	local-only
-tmp/dml/review-r1.md	local-only
-tmp/dml/scan.js	local-only
-tmp/dml/scan.txt	local-only
-tmp/dml/scan2.js	local-only
-tmp/dml/seg.js	local-only
-tmp/dml/seg.txt	local-only
-tmp/dml/selftest-final.txt	local-only
-tmp/dml/selftest.txt	local-only
-tmp/dml/selftest10.txt	local-only
-tmp/dml/selftest7.txt	local-only
-tmp/dml/src.txt	local-only
-tmp/dml/src2.txt	local-only
-tmp/dml/src3.txt	local-only
-tmp/dml/src4.txt	local-only
-tmp/dml/src5.txt	local-only
-tmp/dml/strict-pairs.js	local-only
-tmp/dml/test.txt	local-only
+docs/validation/evidence/DIRECTIVE-MODELID-MAP-mutation.md	repo
+docs/validation/evidence/DIRECTIVE-MODELID-MAP-review-r1.md	repo
 ```
+
+（收尾处理：`tmp/dml/` 的一次性脚本与中间读数已按 §1.5 清除，上表原先逐行列出的 `local-only` 行随之消失；其中 `review-r1.md` 与 `mutation.md` 两份证据已移入 `docs/validation/evidence/` 并计入 `repo` 行。）
