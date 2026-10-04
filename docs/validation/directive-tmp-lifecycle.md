@@ -89,6 +89,7 @@
 - 执行至 ⑨ 与 ⑧c；**停在提交授权之前**：本片不 commit、不 push、不推 gitee。
 - **回写核对**（§11.2 的 OB-63 口径）：验证报告 = **已回写**（本文件）；`DEV_PLAN` = **不适用**（准则治理片）；台账 = **已回写**（`REMAINING_SLICES{,_EN}` 完成行，只记报告路径）；准则 = **已回写**（§0.3 / §12.4 / 附录 C.0m / 三处注记）；ADR = **已回写**（ADR-023）。
 - **⑨ 读数**：tree 与 index 均 `TOTAL_FAIL=0`；`SELFTEST: PASS 264/264`；归档自洽复算失配 0；⑧c 清理后非归档面复跑全绿。
+- **提交与 CI**：commit `4284e94`；CI run `37209843851` 两腿全绿（`Go ubuntu-latest` / `Go windows-latest`），三条 `workflow_dispatch` 腿按事件条件跳过；两腿读数一致：`SELFTEST: PASS 264/264`、`GATE REPORT scope=ci changed=340`、`TOTAL_FAIL=0`。
 
 ## 11. 产物清单
 

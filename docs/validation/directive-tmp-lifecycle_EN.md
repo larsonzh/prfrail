@@ -89,6 +89,7 @@ Environment: Windows 11 / go1.27.0 / Node 24; repository `github.com/larsonzh/pr
 - Executed through ⑨ and ⑧c; **stopped before commit authorization**: this slice does not commit, does not push, does not push to gitee.
 - **Write-back check** (the OB-63 formulation of §11.2): validation report = **written back** (this file); `DEV_PLAN` = **not applicable** (a directive-governance slice); ledger = **written back** (the `REMAINING_SLICES{,_EN}` completion row, recording the report path only); directive = **written back** (§0.3 / §12.4 / appendix C.0m / the three notes); ADR = **written back** (ADR-023).
 - **⑨ readings**: both tree and index report `TOTAL_FAIL=0`; `SELFTEST: PASS 264/264`; archive self-consistency recomputation shows 0 mismatches; after the ⑧c cleanup a re-run of the non-archive surface stays green.
+- **Commit and CI**: commit `4284e94`; CI run `37209843851` is green on both legs (`Go ubuntu-latest` / `Go windows-latest`), with the three `workflow_dispatch` legs skipped by their event condition; both legs agree: `SELFTEST: PASS 264/264`, `GATE REPORT scope=ci changed=340`, `TOTAL_FAIL=0`.
 
 ## 11. Artifacts list
 
