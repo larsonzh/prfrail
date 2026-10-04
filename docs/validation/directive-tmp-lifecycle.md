@@ -147,3 +147,4 @@ docs/validation/evidence/directive-history/v113/MANIFEST.md	repo
 - **清理时点清单工件**：`docs/validation/evidence/directive-history/tmp-lifecycle-workdir/CLEARED-INVENTORY.txt`——逐条记录路径、字节、sha256 与未归档理由（清理时点全量，含 MANIFEST 冻结后新增的过程文件）。
 - 清理范围 = 本片排除清单（1327 条）＋ 本片工作目录读数之外的过程文件；清理后 `tmp/` 顶层只剩 `.gitkeep`。
 - 清理后复跑 `--scope=index` 与 `--scope=tree`（读数见 §10）；未被引用的过程产物已按 §1.5 的「用完立即清除」归零。
+- **脚注（清单口径）**：收尾期（③ 类清理时点之后）产生的临时过程文件由主控在每步执行后即时清除，**不计入** `CLEARED-INVENTORY.txt` 的清理时点集合。

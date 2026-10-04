@@ -147,3 +147,4 @@ Note: archive units are declared by **unit MANIFEST rows** (per-item payload det
 - **Cleanup-time inventory artifact**: `docs/validation/evidence/directive-history/tmp-lifecycle-workdir/CLEARED-INVENTORY.txt` - per-item path, bytes, sha256 and the not-archived reason (the full set at cleanup time, including process files added after the MANIFEST freeze).
 - Cleanup scope = this slice's exclusion lists (1327 items) plus the process files outside the workdir readings; after cleanup the `tmp/` top level holds only `.gitkeep`.
 - After cleanup both `--scope=index` and `--scope=tree` are re-run (readings in §10); the uncited process artifacts are zeroed per the §1.5 "removed immediately after use" rule.
+- **Footnote (inventory caliber)**: temporary process files created after the class ③ cleanup point are removed by the driver immediately after each step and are **not counted** in the cleanup-time set of `CLEARED-INVENTORY.txt`.
