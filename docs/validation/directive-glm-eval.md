@@ -277,6 +277,7 @@
 | ⑨ 原生验证（⑧a 落盘 + `git add` 后） | `--all --scope=tree` / `--all --scope=index` / `--selftest` / `--check=G8-b` | **tree `TOTAL_FAIL=0`**、**index `TOTAL_FAIL=0`**、`SELFTEST: PASS 328/328`、G8-b `1 pack(s) self-consistent` ⇒ **G7 已全绿** |
 | 基础门禁 | gofmt / build / vet / test（§6.1，由 `--all` 的 base 项承担） | 全绿 |
 | 编码 | `.md` = BOM + LF；`.json` / `.js` / `.txt` = 无 BOM + LF | 逐文件核验通过 |
+| 推送后（§11.2 完成行） | 主提交与 CI | 主提交 `09dfef7`，推送范围 `aaa6e1e..09dfef7`（仅 `origin`）；CI run `37346176237` 双腿 **success**（`SELFTEST: PASS 328/328`、`GATE REPORT scope=ci changed=87`、`TOTAL_FAIL=0`） |
 
 **门禁结论（⑨ 实测）**：三个读数全绿——tree `TOTAL_FAIL=0`、index `TOTAL_FAIL=0`、`SELFTEST: PASS 328/328`；
 此前的 **G4b / G6-4 / G7-b / G7-a** 四处红**全部关闭**（修复路径逐条见 §7 的相关记录与 §16）。

@@ -277,6 +277,7 @@ and the extension log and storage likewise have **no usage field** ⇒ a per-cal
 | ⑨ native verification (after ⑧a landed the artifacts + `git add`) | `--all --scope=tree` / `--all --scope=index` / `--selftest` / `--check=G8-b` | **tree `TOTAL_FAIL=0`**, **index `TOTAL_FAIL=0`**, `SELFTEST: PASS 328/328`, G8-b `1 pack(s) self-consistent` ⇒ **G7 is all green** |
 | Base gates | gofmt / build / vet / test (§6.1, carried by `--all`'s base items) | all green |
 | Encoding | `.md` = BOM + LF; `.json` / `.js` / `.txt` = no BOM + LF | verified file by file, passed |
+| After the push (§11.2 completion row) | main commit and CI | main commit `09dfef7`, push range `aaa6e1e..09dfef7` (`origin` only); CI run `37346176237` green on both legs (`SELFTEST: PASS 328/328`, `GATE REPORT scope=ci changed=87`, `TOTAL_FAIL=0`) |
 
 **Gate verdict (⑨ measured)**: all three readings are green — tree `TOTAL_FAIL=0`, index `TOTAL_FAIL=0`, `SELFTEST: PASS 328/328`;
 the four earlier reds **G4b / G6-4 / G7-b / G7-a** are **all closed** (the repair path is itemized in §7 row 10 and §16).
