@@ -19,8 +19,17 @@ module.exports = {
 
   run(ctx, out) {
     const bad = [];
+    let excluded = 0;
     for (const f of ctx.changedPaths) {
       if (ctx.isIgnored(f)) continue;
+      // Scope exclusion (section 6.3, OB-79): the frozen evidence tree is judged by G8.
+      // G4a is the ONE criterion that walks `changedPaths` directly instead of
+      // `changedMarkdown()` (it normalizes BOM/LF for every changed file), so it must
+      // apply the exclusion itself.
+      if (ctx.isEvidenceTree(f)) {
+        excluded++;
+        continue;
+      }
       const b = ctx.readBytes(f);
       if (!b) continue; // deleted (or unreadable) file: nothing to submit
       const bom = b.length >= 3 && b[0] === BOM[0] && b[1] === BOM[1] && b[2] === BOM[2];
@@ -33,7 +42,11 @@ module.exports = {
       'G4a',
       bad.length === 0 ? 'PASS' : 'FAIL',
       'BOM+LF',
-      bad.length ? JSON.stringify(bad) : ctx.changedPaths.length + ' file(s) OK'
+      bad.length
+        ? JSON.stringify(bad)
+        : ctx.changedPaths.length +
+            ' file(s) OK' +
+            (excluded ? ' (' + excluded + ' excluded: evidence tree)' : '')
     );
   },
 };

@@ -1,0 +1,11 @@
+{
+  "name": "g8-b-manifest-truncated",
+  "pack": "docs/validation/evidence/fixture-g8-b-manifest-truncated",
+  "comment": "T53: the `## 归档条目清单` heading is present but the table is truncated (no header, no row). The payload is therefore not listed: fail closed and name the path, never a silent PASS.",
+  "files": {
+    "docs/validation/evidence/fixture-g8-b-manifest-truncated/MANIFEST.md": "# 归档 MANIFEST · g8-b-manifest-truncated\n\n- **源路径**：`tmp/g8mt/`\n\n## 归档条目清单\n\n（本节被截断：无表头、无数据行，解析结果为空集）\n\n## 未入库文件清单（`.gitignore` 排除类型）\n\n",
+    "docs/validation/evidence/fixture-g8-b-manifest-truncated/archive/a.txt": "alpha\n"
+  },
+  "sumsFrom": ["archive/a.txt"],
+  "expect": { "g8b": "FAIL", "token": "not listed", "namesPath": "archive/a.txt" }
+}

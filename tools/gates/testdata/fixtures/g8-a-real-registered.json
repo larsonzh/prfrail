@@ -1,0 +1,9 @@
+{
+  "name": "g8-a-real-registered",
+  "pack": "docs/validation/evidence/fixture-g8-a-real-registered",
+  "comment": "T58: the virtual path is the REAL root-level entry registered in tools/gates/evidence-forms.txt. With the worktree registry it passes G8-a; with the endpoint registry (empty in a historical range) it fails.",
+  "files": {
+    "docs/validation/evidence/DIRECTIVE-MODELID-MAP-mutation.md": "# rebuilt archive copy\n\nregistered verbatim in the worktree registry\n"
+  },
+  "expect": { "worktreeG8a": "PASS", "endpointG8a": "FAIL" }
+}

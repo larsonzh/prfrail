@@ -1,0 +1,10 @@
+{
+  "name": "g8-c-no-section",
+  "pack": "docs/validation/evidence/fixture-g8-c-no-section",
+  "files": {
+    "docs/validation/evidence/fixture-g8-c-no-section/MANIFEST.md": "# 归档 MANIFEST · g8-c-no-section\n\n- **源路径**：`tmp/g8cns/`\n\n- 遗留包形态：没有 `## 后缀与编码映射` 小节，G8-c 应豁免。\n\n## 归档条目清单\n\n| 相对路径 | 字节 | sha256 | 归档理由 |\n|---|---|---|---|\n| `archive/slice.txt` | 8 | `{{sha256:archive/slice.txt}}` | fixture payload |\n\n## 未入库文件清单（`.gitignore` 排除类型）\n\n| 相对路径 | 字节 | sha256 | 理由 |\n|---|---|---|---|\n",
+    "docs/validation/evidence/fixture-g8-c-no-section/archive/slice.txt": "slice\n"
+  },
+  "sumsFrom": ["archive/slice.txt"],
+  "expect": { "g8a": "PASS", "g8b": "PASS", "g8c": "PASS-exempt" }
+}

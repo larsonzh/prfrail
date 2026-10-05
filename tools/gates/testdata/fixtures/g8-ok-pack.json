@@ -1,0 +1,11 @@
+{
+  "name": "g8-ok-pack",
+  "pack": "docs/validation/evidence/fixture-g8-ok-pack",
+  "files": {
+    "docs/validation/evidence/fixture-g8-ok-pack/MANIFEST.md": "# 归档 MANIFEST · g8-ok-pack\n\n- **源路径**：`tmp/g8ok/`\n\n## 归档条目清单\n\n| 相对路径 | 字节 | sha256 | 归档理由 |\n|---|---|---|---|\n| `archive/a.txt` | 6 | `{{sha256:archive/a.txt}}` | fixture payload |\n| `archive/nasty.md` | 40 | `{{sha256:archive/nasty.md}}` | fixture payload (nasty .md, proves the scope exclusion) |\n\n## 未入库文件清单（`.gitignore` 排除类型）\n\n| 相对路径 | 字节 | sha256 | 理由 |\n|---|---|---|---|\n",
+    "docs/validation/evidence/fixture-g8-ok-pack/archive/a.txt": "alpha\n",
+    "docs/validation/evidence/fixture-g8-ok-pack/archive/nasty.md": "# nasty fixture\n\n| a || b |\n|---|---|\n| x | y |\n\n待…回填。\n\n魑\n\n共 128 个文件\n\n| OB-1 | d | x | 下一片必做 |\n"
+  },
+  "sumsFrom": ["archive/a.txt", "archive/nasty.md"],
+  "expect": { "g8a": "PASS", "g8b": "PASS", "g8c": "PASS", "g8d": "PASS" }
+}

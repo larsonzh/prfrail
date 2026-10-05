@@ -1,0 +1,10 @@
+{
+  "name": "g8-d-ok",
+  "pack": "docs/validation/evidence/fixture-g8-d-ok",
+  "files": {
+    "docs/validation/evidence/fixture-g8-d-ok/MANIFEST.md": "# 归档 MANIFEST · g8-d-ok\n\n- **源路径**：`tmp/g8dok/`\n\n## 归档条目清单\n\n| 相对路径 | 字节 | sha256 | 归档理由 |\n|---|---|---|---|\n| `archive/note.txt` | 40 | `{{sha256:archive/note.txt}}` | fixture payload |\n\n## 未入库文件清单（`.gitignore` 排除类型）\n\n| 相对路径 | 字节 | sha256 | 理由 |\n|---|---|---|---|\n",
+    "docs/validation/evidence/fixture-g8-d-ok/archive/note.txt": "# 变异检验日志\n\n> **重建归档**：源文件 `tmp/dml/mutation.md`（CRLF、无 BOM）按「移到归档」保留，依据：见 DELIVERY_DIRECTIVE 对应原文。\n> 第二行注记（无 sha256 令牌）。\n\nMUTATED m1 target-check=G6-6\nTOTAL_FAIL=1\n"
+  },
+  "sumsFrom": ["archive/note.txt"],
+  "expect": { "g8a": "PASS", "g8b": "PASS", "g8d": "PASS" }
+}

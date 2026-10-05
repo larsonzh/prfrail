@@ -1,0 +1,9 @@
+{
+  "name": "g8-d-bad-sha",
+  "pack": "docs/validation/evidence/fixture-g8-d-bad-sha",
+  "comment": "T55: inside the annotation zone, a 重建归档 note carries a 40-digit sha256-shaped token. Any sha256 token in the zone must be exactly 64 hex, so this must fail closed and name the token length.",
+  "files": {
+    "docs/validation/evidence/fixture-g8-d-bad-sha/archive/note.md": "# variant-check log\n\n> **重建归档**：源文件 `tmp/dml/x.md`（CRLF、无 BOM）按「移到归档」保留，依据：见 DELIVERY_DIRECTIVE 对应原文。sha256=`abcdef0123456789abcdef0123456789abcdef01`\n\nbody after the zone\n"
+  },
+  "expect": { "g8d": "FAIL", "token": "bad sha256 token", "digits": 40 }
+}

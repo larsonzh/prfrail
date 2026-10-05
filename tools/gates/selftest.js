@@ -20,10 +20,12 @@
 const fs = require('fs');
 const path = require('path');
 const cp = require('child_process');
+const crypto = require('crypto');
 
 const {
   discoverRepoRoot,
   decodeBuffer,
+  isEvidenceTree,
   resolveWhitelistSource,
   whitelistSourceLabel,
   resolveRepoArtifact,
@@ -32,8 +34,12 @@ const {
   EMPTY_TREE,
 } = require('./lib/ctx');
 const { createReport } = require('./lib/report');
+const G1A = require('./lib/criteria/g1a');
+const G2 = require('./lib/criteria/g2');
+const G4A = require('./lib/criteria/g4a');
 const G6 = require('./lib/criteria/g6');
 const G7 = require('./lib/criteria/g7');
+const G8 = require('./lib/criteria/g8');
 const G4B = require('./lib/criteria/g4b');
 const G5A = require('./lib/criteria/g5a');
 const G5B = require('./lib/criteria/g5b');
@@ -79,6 +85,41 @@ const FIXTURES = {
   'g5b-illegal-inline-comment': { disk: 'g5b-illegal-inline-comment.txt', virtual: '.github/agents/fixture-g5b-illegal-inline-comment.agent.md' },
   'g5b-closed-set-legal-sol': { disk: 'g5b-closed-set-legal-sol.txt', virtual: '.github/agents/fixture-g5b-closed-set-legal-sol.agent.md' },
   'g5b-closed-set-legal-luna': { disk: 'g5b-closed-set-legal-luna.txt', virtual: '.github/agents/fixture-g5b-closed-set-legal-luna.agent.md' },
+  // G8 frozen-evidence-pack fixtures (slice DIRECTIVE-EVIDENCE-SCOPE, v1.24). Each is a
+  // JSON descriptor `{name, pack, files, sumsFrom?, expect}`: `files` maps a
+  // repository-relative virtual path to content, `pack` is the virtual pack root and the
+  // base for the pack-relative `sumsFrom` list and `{{sha256:<rel>}}` values. Positive
+  // fixtures compute their SHA256SUMS hashes at load time, so a hardcoded digest cannot rot.
+  'g8-ok-pack': { disk: 'g8-ok-pack.json', g8: 'g8-ok-pack.json' },
+  'g8-a-member': { disk: 'g8-a-member.json', g8: 'g8-a-member.json' },
+  'g8-a-freedom-list': { disk: 'g8-a-freedom-list.json', g8: 'g8-a-freedom-list.json' },
+  'g8-a-registered': { disk: 'g8-a-registered.json', g8: 'g8-a-registered.json' },
+  'g8-a-stray-root': { disk: 'g8-a-stray-root.json', g8: 'g8-a-stray-root.json' },
+  'g8-b-missing-list': { disk: 'g8-b-missing-list.json', g8: 'g8-b-missing-list.json' },
+  'g8-b-unlisted-payload': { disk: 'g8-b-unlisted-payload.json', g8: 'g8-b-unlisted-payload.json' },
+  'g8-b-hash-mismatch': { disk: 'g8-b-hash-mismatch.json', g8: 'g8-b-hash-mismatch.json' },
+  'g8-b-untracked-conflict': { disk: 'g8-b-untracked-conflict.json', g8: 'g8-b-untracked-conflict.json' },
+  'g8-b-backslash-sums': { disk: 'g8-b-backslash-sums.json', g8: 'g8-b-backslash-sums.json' },
+  'g8-c-ok': { disk: 'g8-c-ok.json', g8: 'g8-c-ok.json' },
+  'g8-c-bad-hash': { disk: 'g8-c-bad-hash.json', g8: 'g8-c-bad-hash.json' },
+  'g8-c-no-section': { disk: 'g8-c-no-section.json', g8: 'g8-c-no-section.json' },
+  'g8-d-ok': { disk: 'g8-d-ok.json', g8: 'g8-d-ok.json' },
+  'g8-d-missing-basis': { disk: 'g8-d-missing-basis.json', g8: 'g8-d-missing-basis.json' },
+  'exclusion-positive': { disk: 'exclusion-positive.json', g8: 'exclusion-positive.json' },
+  'exclusion-negative': { disk: 'exclusion-negative.json', g8: 'exclusion-negative.json' },
+  // T50-T58 fixtures (slice DIRECTIVE-EVIDENCE-SCOPE, tester hardening). Same JSON
+  // descriptor shape as the G8 fixtures above.
+  'g8-t50-in-tree': { disk: 'g8-t50-in-tree.json', g8: 'g8-t50-in-tree.json' },
+  'g8-t50-outside': { disk: 'g8-t50-outside.json', g8: 'g8-t50-outside.json' },
+  'g8-bom-in-tree': { disk: 'g8-bom-in-tree.json', g8: 'g8-bom-in-tree.json' },
+  'g8-bom-outside': { disk: 'g8-bom-outside.json', g8: 'g8-bom-outside.json' },
+  'g8-b-malformed-sums': { disk: 'g8-b-malformed-sums.json', g8: 'g8-b-malformed-sums.json' },
+  'g8-b-manifest-truncated': { disk: 'g8-b-manifest-truncated.json', g8: 'g8-b-manifest-truncated.json' },
+  'g8-c-arch-not-in-payload': { disk: 'g8-c-arch-not-in-payload.json', g8: 'g8-c-arch-not-in-payload.json' },
+  'g8-c-arch-not-in-sums': { disk: 'g8-c-arch-not-in-sums.json', g8: 'g8-c-arch-not-in-sums.json' },
+  'g8-d-body-only': { disk: 'g8-d-body-only.json', g8: 'g8-d-body-only.json' },
+  'g8-d-bad-sha': { disk: 'g8-d-bad-sha.json', g8: 'g8-d-bad-sha.json' },
+  'g8-a-real-registered': { disk: 'g8-a-real-registered.json', g8: 'g8-a-real-registered.json' },
 };
 
 /**
@@ -92,15 +133,35 @@ const FIXTURES = {
  */
 const FIXTURE_DISK_MUST_NOT_BE_MD = true;
 
-const ALL_SUBCHECKS = [...G6.subchecks, ...G7.subchecks].map((s) => s.id);
+const ALL_SUBCHECKS = [...G6.subchecks, ...G7.subchecks, ...G8.subchecks].map((s) => s.id);
 
 /**
  * Expected FAIL id set for the whole fixture corpus (regression anchor, T13).
  * G6-5 / G6-6 joined the anchor with their intentionally-violating fixtures
  * (`g6-5-dangling-ref`, `g6-6-legacy-status`): every corpus FAIL id must be one the suite
  * declares as expected, so a new criterion slipping into the corpus is caught here.
+ *
+ * The anchor vocabulary is `ALL_SUBCHECKS` (G6 / G7 / G8 sub-checks only; G1-a / G2 / G4a /
+ * G4b are single-module criteria asserted directly in T47). DIRECTIVE-EVIDENCE-SCOPE (v1.24)
+ * added the four G8 ids, from the intentionally broken G8 fixtures (stray root / missing
+ * list / unlisted payload / hash mismatch / untracked collision / missing basis) plus the
+ * tree-level `exclusion-positive` probe path (not a pack member / not a freedom-list).
  */
-const EXPECTED_CORPUS_FAILS = ['G6-1', 'G6-3', 'G6-4', 'G6-5', 'G6-6', 'G7-a', 'G7-b', 'G7-c', 'G7-d'];
+const EXPECTED_CORPUS_FAILS = [
+  'G6-1',
+  'G6-3',
+  'G6-4',
+  'G6-5',
+  'G6-6',
+  'G7-a',
+  'G7-b',
+  'G7-c',
+  'G7-d',
+  'G8-a',
+  'G8-b',
+  'G8-c',
+  'G8-d',
+];
 
 const CHECKS = [];
 /** Every declared mutation is logged so a stale one (no-op) turns the suite red. */
@@ -135,6 +196,40 @@ function fixtureText(key) {
   return decodeBuffer(fs.readFileSync(path.join(FIXTURES_DIR, FIXTURES[key].disk)));
 }
 
+/** Lowercase sha256 hex of a Buffer (the G8 fixture loader computes real digests). */
+function sha256Hex(buf) {
+  return crypto.createHash('sha256').update(buf).digest('hex');
+}
+
+/**
+ * Load a G8 JSON fixture into `{ pack, texts }`.
+ *
+ *   files     repository-relative virtual path -> content
+ *   pack      repository-relative pack root (also the base for pack-relative values)
+ *   sumsFrom  pack-relative payload paths; their REAL sha256 is computed here and written
+ *             into `<pack>/SHA256SUMS.txt`, so a positive fixture never hardcodes a digest.
+ *   {{sha256:<rel>}} in any content is replaced by the real hash of `<pack>/<rel>`.
+ */
+function loadG8Fixture(key) {
+  const spec = JSON.parse(decodeBuffer(fs.readFileSync(path.join(FIXTURES_DIR, FIXTURES[key].g8))));
+  const pack = spec.pack;
+  const texts = new Map();
+  for (const repoRel of Object.keys(spec.files || {})) texts.set(repoRel, spec.files[repoRel]);
+  const digestOf = (repoRel) => sha256Hex(Buffer.from(texts.has(repoRel) ? texts.get(repoRel) : '', 'utf8'));
+  if (Array.isArray(spec.sumsFrom)) {
+    const lines = spec.sumsFrom
+      .slice()
+      .sort()
+      .map((rel) => sha256Hex(Buffer.from(texts.get(pack + '/' + rel) || '', 'utf8')) + '  ' + rel);
+    texts.set(pack + '/SHA256SUMS.txt', lines.join('\n') + '\n');
+  }
+  for (const [repoRel, text] of [...texts.entries()]) {
+    if (!text.includes('{{sha256:')) continue;
+    texts.set(repoRel, text.replace(/\{\{sha256:([^}]+)\}\}/g, (_, rel) => digestOf(pack + '/' + rel)));
+  }
+  return { pack, texts, spec };
+}
+
 function historicalLines(name) {
   return decodeBuffer(fs.readFileSync(path.join(HISTORICAL_DIR, name)))
     .split('\n')
@@ -148,19 +243,29 @@ function applyMutation(text, m) {
   else if (m.op === 'firstReplace') {
     const i = text.indexOf(m.from);
     out = i < 0 ? text : text.slice(0, i) + m.to + text.slice(i + m.from.length);
-  } else if (m.op === 'dropLineContaining') {
+  } else if (m.op === 'dropLineContaining' || m.op === 'dropRowContaining') {
     out = text
       .split('\n')
       .filter((l) => !l.includes(m.needle))
       .join('\n');
+  } else if (m.op === 'flipHashDigit') {
+    // Change the FIRST hex digit of the text (a SHA256SUMS body starts with one), so a
+    // previously correct digest becomes wrong in exactly one nibble.
+    out = text.replace(/[0-9a-f]/, (c) => (c === '0' ? '1' : '0'));
   } else {
     throw new Error('unknown fixture mutation op: ' + m.op);
   }
-  MUTATION_LOG.push({ key: m.key, op: m.op, needle: m.from || m.needle, applied: out !== before });
+  MUTATION_LOG.push({ key: m.key, op: m.op, needle: m.from || m.needle || (m.op === 'flipHashDigit' ? 'first-hex-digit' : undefined), applied: out !== before });
   return out;
 }
 
-/** Synthetic context: fixture files are presented as added `.md` files of the change set. */
+/**
+ * Synthetic context: fixture files are presented as added files of the change set.
+ *
+ * A `key` may map to ONE virtual path (`virtual` string), to SEVERAL sharing the disk
+ * content (`virtual` array), or to a path->content map (`virtual` object). G8 keys carry
+ * a JSON descriptor instead (`FIXTURES[key].g8`), expanded by `loadG8Fixture`.
+ */
 function makeCtx(keys, opts) {
   opts = opts || {};
   const repoRoot = discoverRepoRoot(__dirname);
@@ -168,9 +273,25 @@ function makeCtx(keys, opts) {
   const texts = new Map();
   for (const key of keys) {
     if (!FIXTURES[key]) throw new Error('unknown fixture key: ' + key);
+    if (FIXTURES[key].g8) {
+      const g = loadG8Fixture(key);
+      for (const [p, t] of g.texts) texts.set(p, t);
+      for (const m of opts.mutations || []) {
+        if (m.key !== key) continue;
+        if (!m.path || !texts.has(m.path)) {
+          MUTATION_LOG.push({ key: key, op: m.op, needle: m.path, applied: false });
+          continue;
+        }
+        texts.set(m.path, applyMutation(texts.get(m.path), m));
+      }
+      continue;
+    }
     let t = fixtureText(key);
     for (const m of opts.mutations || []) if (m.key === key) t = applyMutation(t, m);
-    texts.set(FIXTURES[key].virtual, t);
+    const v = FIXTURES[key].virtual;
+    if (Array.isArray(v)) for (const p of v) texts.set(p, t);
+    else if (v && typeof v === 'object') for (const p of Object.keys(v)) texts.set(p, v[p] === true ? t : v[p]);
+    else texts.set(v, t);
   }
   const changed = [...texts.keys()].map((p) => ({ path: p, status: 'A', untracked: true, deleted: false }));
   const changedPaths = changed.map((c) => c.path);
@@ -187,22 +308,43 @@ function makeCtx(keys, opts) {
     changed,
     changedPaths,
     recordFor: (p) => changed.find((c) => c.path === p) || null,
-    changedMarkdown: () => changedPaths.filter((p) => /\.md$/i.test(p)),
+    // Single source: reuse lib/ctx's `isEvidenceTree` instead of a local regex, so
+    // "the criterion was fixed but the self-test kept the old rule" cannot drift (6.3 OB-79).
+    changedMarkdown: () => changedPaths.filter((p) => /\.md$/i.test(p) && !isEvidenceTree(p)),
     changedPathsWith: (re) => changedPaths.filter((p) => re.test(p)),
+    isEvidenceTree: (p) => isEvidenceTree(p),
     git: () => ({ ok: false, code: 127, out: '', err: '', spawnError: null }),
     readBytes: (p) => (texts.has(p) ? Buffer.from(texts.get(p), 'utf8') : null),
     readText: (p) => (texts.has(p) ? texts.get(p) : null),
     readLines: linesOf,
     readLineArray: linesOf,
-    exists: (p) => fs.existsSync(path.join(repoRoot, p.split('/').join(path.sep))),
+    exists: (p) => texts.has(p) || fs.existsSync(path.join(repoRoot, p.split('/').join(path.sep))),
     repoArtifactResolvable: (p) =>
       opts.repoArtifactResolvable ? opts.repoArtifactResolvable(p) : resolveRepoArtifact(repoRoot, 'tree', null, p),
     trackedAt: () => false,
     showAt: () => null,
     isIgnored: () => false,
+    // G8 pack enumeration reads the FIXTURE virtual map only - never the real disk, which
+    // would pull the entire real corpus into a fixture probe.
+    listTreeFiles: (dir) => {
+      const d = String(dir).replace(/\/+$/, '');
+      return [...texts.keys()].filter((p) => p.startsWith(d + '/')).sort();
+    },
     loadWhitelist: (rel) => {
       loaderCalls.push(rel);
-      return { entries: opts.whitelist || [], error: null, source: opts.whitelistSource || 'worktree' };
+      // The generic `opts.whitelist` knob feeds G6 / G4b (any criterion rel). The G8
+      // registration table is deliberately opt-in per rel (`opts.whitelists[FORMS_REL]`)
+      // or raw (`opts.whitelistText[FORMS_REL]`), so a G6 probe's entries can never leak
+      // into the forms table and turn every corpus run into a duplicate-registration error.
+      const isForms = rel === G8.internals.FORMS_REL;
+      const hasRel = opts.whitelists && Object.prototype.hasOwnProperty.call(opts.whitelists, rel);
+      const entries = hasRel ? opts.whitelists[rel] : isForms ? [] : opts.whitelist || [];
+      const hasText = opts.whitelistText && Object.prototype.hasOwnProperty.call(opts.whitelistText, rel);
+      let text = hasText ? opts.whitelistText[rel] : null;
+      if (text === null && (hasRel || (!isForms && opts.whitelist))) {
+        text = entries.map((e) => e.match + '\t' + e.file + '\t' + e.reason).join('\n');
+      }
+      return { entries, error: null, source: opts.whitelistSource || 'worktree', text };
     },
     listAllMarkdown: () => [],
     listAgentFiles: () => [],
@@ -213,10 +355,131 @@ function makeCtx(keys, opts) {
   };
 }
 
+/** Run a set of criterion modules against one synthetic context. */
+function runMods(ctx, mods) {
+  const out = createReport();
+  for (const m of mods) m.run(ctx, out);
+  return { records: out.records };
+}
+
+/**
+ * G8 sub-check probe: run ONE G8 sub-check over the fixture keys and return its verdict,
+ * finding count and the joined finding details (so a FAIL can be tied to its reason token).
+ */
+function g8Probe(subId, keys, opts) {
+  const ctx = makeCtx(keys, opts);
+  const out = createReport();
+  const sub = G8.subchecks.find((s) => s.id === subId);
+  const res = sub.run(ctx, out) || { findings: [] };
+  return {
+    verdict: verdictOf(out.records, subId),
+    info: out.records.some((r) => r.id === subId && r.verdict === 'INFO'),
+    findings: res.findings.length,
+    details: res.findings.map((f) => f.detail).join(' | '),
+    detail: detailOf(out.records, subId),
+  };
+}
+
+/* ---------------------------------------------------------------------------
+ * T50-T58 helpers (slice DIRECTIVE-EVIDENCE-SCOPE, ③ tester hardening).
+ *
+ * `injectedCtx` builds a REAL lib/ctx context (so `changedMarkdown()` and
+ * `isEvidenceTree()` come from the SHIPPED implementation, not a selftest-local
+ * re-derivation) whose change set is supplied by an injected git runner and whose
+ * file bodies come from a synthetic map. That is what makes the 6.3 exclusion
+ * assertions mutation-sensitive: removing the exclusion inside lib/ctx.js turns
+ * T50/T51 red, whereas a `makeCtx`-only assertion would stay green because the
+ * selftest re-implements the filter locally.
+ * ------------------------------------------------------------------------ */
+function g8Texts(key) {
+  return loadG8Fixture(key).texts;
+}
+
+function injectedCtx(paths, texts, opts) {
+  opts = opts || {};
+  const repoRoot = discoverRepoRoot(__dirname);
+  const spawnGit = (root, args) => {
+    const key = args.join(' ');
+    if (/^status --porcelain=v1/.test(key)) {
+      return { ok: true, code: 0, out: paths.map((p) => '?? ' + p + '\0').join(''), err: '', spawnError: null };
+    }
+    if (/^check-ignore/.test(key)) return { ok: false, code: 1, out: '', err: '', spawnError: null };
+    return { ok: true, code: 0, out: '', err: '', spawnError: null };
+  };
+  const ctx = createContext({ repoRoot, scope: opts.scope || 'tree', spawnGit });
+  const linesOf = (p) => (texts.has(p) ? String(texts.get(p)).split('\n') : null);
+  // NOTE: `changedMarkdown` / `isEvidenceTree` are deliberately NOT overridden.
+  return Object.assign(ctx, {
+    readBytes: (p) => (texts.has(p) ? Buffer.from(texts.get(p), 'utf8') : null),
+    readText: (p) => (texts.has(p) ? texts.get(p) : null),
+    readLines: linesOf,
+    readLineArray: linesOf,
+    exists: (p) => texts.has(p),
+    listAllMarkdown: () => [],
+    loadWhitelist: () => ({ entries: [], error: null, source: 'probe' }),
+    addedHunks: (p) => (linesOf(p) || []).map((text, i) => ({ n: i + 1, text })),
+    addedLines: (p) => linesOf(p) || [],
+    addedLineNumbers: (p) => new Set((linesOf(p) || []).map((_, i) => i + 1)),
+    numstat: (p) => [String((linesOf(p) || []).length), '0'],
+  });
+}
+
+/** Run criterion modules against a REAL-ctx hybrid built from one g8 fixture's texts. */
+function runKeyMods(key, mods) {
+  const texts = g8Texts(key);
+  return runMods(injectedCtx([...texts.keys()], texts), mods);
+}
+
+/** Run criterion modules against a REAL-ctx hybrid built from several g8 fixtures. */
+function runKeysMods(keys, mods) {
+  const texts = new Map();
+  for (const key of keys) for (const [p, t] of g8Texts(key)) texts.set(p, t);
+  return runMods(injectedCtx([...texts.keys()], texts), mods);
+}
+
+/**
+ * G8-d probe over a REAL repository file (the precedent file under
+ * `docs/validation/evidence/`), so the assertion runs against the shipped bytes
+ * rather than a fixture paraphrase.
+ */
+function g8dRealProbe(relPath) {
+  const repoRoot = discoverRepoRoot(__dirname);
+  const buf = fs.readFileSync(path.join(repoRoot, relPath.split('/').join(path.sep)));
+  const ctx = {
+    kind: 'tree',
+    scope: { kind: 'tree' },
+    changed: [{ path: relPath, status: 'A', untracked: false, deleted: false }],
+    changedPaths: [relPath],
+    isEvidenceTree,
+    readBytes: (p) => (p === relPath ? buf : null),
+    readText: (p) => (p === relPath ? decodeBuffer(buf) : null),
+    listTreeFiles: () => [relPath],
+  };
+  const out = createReport();
+  const res = G8.subchecks.find((s) => s.id === 'G8-d').run(ctx, out);
+  return {
+    verdict: verdictOf(out.records, 'G8-d'),
+    findings: res.findings.length,
+    details: res.findings.map((f) => f.detail).join(' | '),
+    detail: detailOf(out.records, 'G8-d'),
+    text: decodeBuffer(buf),
+  };
+}
+
+/** Run the real CLI in a child process and return its exit status + output. */
+function gateCli(args) {
+  const r = cp.spawnSync(process.execPath, [path.join(__dirname, 'gate.js')].concat(args), {
+    cwd: discoverRepoRoot(__dirname),
+    encoding: 'utf8',
+    windowsHide: true,
+  });
+  return { status: r.status, out: (r.stdout || '') + (r.stderr || '') };
+}
+
 function runSubset(ctx, enable) {
   const out = createReport();
   const results = {};
-  for (const sub of [...G6.subchecks, ...G7.subchecks]) {
+  for (const sub of [...G6.subchecks, ...G7.subchecks, ...G8.subchecks]) {
     if (enable.indexOf(sub.id) < 0) continue;
     results[sub.id] = sub.run(ctx, out);
   }
@@ -1731,6 +1994,524 @@ function runTests() {
       'T42 restore: g5b.js is byte-identical and the cached module still accepts gpt-6-luna',
       drop.identical === true && g5bProbe('g5b-closed-set-legal-luna').verdict === 'PASS',
       'identical=' + drop.identical + ' cached=' + g5bProbe('g5b-closed-set-legal-luna').verdict
+    );
+  }
+
+  // ---- T43-T49: G8 frozen-evidence-pack self-consistency + the 6.3 scope exclusion
+  // (slice DIRECTIVE-EVIDENCE-SCOPE, v1.24). Each assertion ties a verdict to a named
+  // reason token, so a FAIL is meaningful and a PASS is not vacuous.
+  {
+    const FORMS = 'tools/gates/evidence-forms.txt';
+    const REG_PATH = 'docs/validation/evidence/fixture-g8-a-registered.md';
+
+    // T43: G8-a shape guard - three allowed forms plus the stray-root abuse.
+    const member = g8Probe('G8-a', ['g8-a-member']);
+    // `info === false` is load-bearing: without it a vacuous INFO (no evidence path in
+    // the change set) would satisfy `verdict === 'PASS' && findings === 0` even though
+    // the path was never judged at all.
+    check('T43 G8-a accepts a pack member (nearest ancestor carries MANIFEST + SHA256SUMS)',
+      member.verdict === 'PASS' && member.findings === 0 && member.info === false,
+      'verdict=' + member.verdict + ' findings=' + member.findings + ' info=' + member.info);
+    const freedom = g8Probe('G8-a', ['g8-a-freedom-list']);
+    check('T43 G8-a accepts a root-level *-freedom-list.md',
+      freedom.verdict === 'PASS' && freedom.findings === 0 && freedom.info === false,
+      'verdict=' + freedom.verdict + ' findings=' + freedom.findings + ' info=' + freedom.info);
+    const registered = g8Probe('G8-a', ['g8-a-registered'], {
+      whitelists: { [FORMS]: [{ match: REG_PATH, file: REG_PATH, reason: 'T43 probe: verbatim registration' }] },
+    });
+    check('T43 G8-a accepts a path registered verbatim in evidence-forms.txt',
+      registered.verdict === 'PASS' && registered.findings === 0 && registered.info === false,
+      'verdict=' + registered.verdict + ' findings=' + registered.findings + ' info=' + registered.info + ' :: ' + registered.details);
+    const unreg = g8Probe('G8-a', ['g8-a-registered']);
+    check('T43 the registration is load-bearing: without it the same path fails',
+      unreg.verdict === 'FAIL' && unreg.findings === 1 && /not registered/.test(unreg.details),
+      'verdict=' + unreg.verdict + ' :: ' + unreg.details);
+    const stray = g8Probe('G8-a', ['g8-a-stray-root']);
+    check('T43 G8-a FAILs a stray root-level path with a `not a pack member` reason token',
+      stray.verdict === 'FAIL' && /not a pack member/.test(stray.details),
+      'verdict=' + stray.verdict + ' :: ' + stray.details);
+    const subReg = g8Probe('G8-a', ['g8-a-stray-root'], {
+      whitelists: {
+        [FORMS]: [
+          {
+            match: 'fixture-g8-a-stray-root',
+            file: 'docs/validation/evidence/fixture-g8-a-stray-root.md',
+            reason: 'T43 probe: substring match must not register',
+          },
+        ],
+      },
+    });
+    // Strengthened: a bare FAIL could be produced by ANY unrelated finding. Require the
+    // exact `not a pack member` reason (the only cause here) and exactly one finding, so
+    // a criterion that started rejecting every path could not satisfy this by accident.
+    check('T43 a SUBSTRING match does not register (entry.match must EQUAL the path)',
+      subReg.verdict === 'FAIL' && subReg.findings === 1 && /not a pack member/.test(subReg.details),
+      'verdict=' + subReg.verdict + ' findings=' + subReg.findings + ' :: ' + subReg.details);
+    let formsErr = null;
+    try {
+      g8Probe('G8-a', ['g8-ok-pack'], { whitelistText: { [FORMS]: 'a\tb\n' } });
+    } catch (e) {
+      formsErr = e;
+    }
+    check('T43 a registration row with 2 fields is a UsageError (exit 2, never a silent pass)',
+      formsErr instanceof UsageError && /3 TAB-separated/.test(formsErr.message),
+      'err=' + (formsErr ? formsErr.message : 'NO ERROR (fail-open)'));
+    let dupErr = null;
+    try {
+      g8Probe('G8-a', ['g8-ok-pack'], { whitelistText: { [FORMS]: 'p\tp\tr1\np\tp\tr2\n' } });
+    } catch (e) {
+      dupErr = e;
+    }
+    check('T43 a duplicate registration for the same path is a UsageError',
+      dupErr instanceof UsageError && /duplicate/.test(dupErr.message),
+      'err=' + (dupErr ? dupErr.message : 'NO ERROR (fail-open)'));
+
+    // T44: G8-b pack self-consistency.
+    const okPack = g8Probe('G8-b', ['g8-ok-pack']);
+    check('T44 G8-b accepts a fully self-consistent pack (runtime-computed hashes)',
+      okPack.verdict === 'PASS' && okPack.findings === 0 && okPack.info === false,
+      'verdict=' + okPack.verdict + ' info=' + okPack.info + ' :: ' + okPack.details);
+    const missingList = g8Probe('G8-b', ['g8-b-missing-list']);
+    check('T44 G8-b FAILs a pack without the 归档条目清单 section (token `missing`, names the pack)',
+      missingList.verdict === 'FAIL' && missingList.findings === 2 &&
+        /fixture-g8-b-missing-list/.test(missingList.details) &&
+        /missing `## 归档条目清单` section/.test(missingList.details) &&
+        /not listed in `## 归档条目清单`/.test(missingList.details),
+      'verdict=' + missingList.verdict + ' findings=' + missingList.findings + ' :: ' + missingList.details);
+    const unlisted = g8Probe('G8-b', ['g8-b-unlisted-payload']);
+    check('T44 G8-b FAILs an unlisted pack-root payload (token `not listed`, names the file in both lists)',
+      unlisted.verdict === 'FAIL' && unlisted.findings === 2 && /not listed/.test(unlisted.details) && /CLEARED-INVENTORY\.txt/.test(unlisted.details) && /SHA256SUMS/.test(unlisted.details),
+      'verdict=' + unlisted.verdict + ' findings=' + unlisted.findings + ' :: ' + unlisted.details);
+    const hashMismatch = g8Probe('G8-b', ['g8-b-hash-mismatch']);
+    check('T44 G8-b recomputes hashes and FAILs a mismatch (token `hash mismatch`, names the payload)',
+      hashMismatch.verdict === 'FAIL' && hashMismatch.findings === 1 && /archive\/a\.txt hash mismatch/.test(hashMismatch.details),
+      'verdict=' + hashMismatch.verdict + ' findings=' + hashMismatch.findings + ' :: ' + hashMismatch.details);
+    const conflict = g8Probe('G8-b', ['g8-b-untracked-conflict']);
+    check('T44 G8-b FAILs a 未入库 entry colliding with a payload (token `untracked-list conflict`, names the path)',
+      conflict.verdict === 'FAIL' && conflict.findings === 1 && /untracked-list conflict/.test(conflict.details) && /archive\/a\.txt/.test(conflict.details),
+      'verdict=' + conflict.verdict + ' findings=' + conflict.findings + ' :: ' + conflict.details);
+    const backslash = g8Probe('G8-b', ['g8-b-backslash-sums']);
+    check('T44 G8-b normalizes backslash SHA256SUMS paths to POSIX and passes',
+      backslash.verdict === 'PASS' && backslash.findings === 0 && backslash.info === false,
+      'verdict=' + backslash.verdict + ' info=' + backslash.info + ' :: ' + backslash.details);
+    // Reverse mutation: normalization must not become a blanket pass. A wrong hash on the
+    // SAME backslash-separated line must still be caught after normalization.
+    const backslashBad = g8Probe('G8-b', ['g8-b-backslash-sums'], {
+      mutations: [
+        {
+          key: 'g8-b-backslash-sums',
+          path: 'docs/validation/evidence/fixture-g8-b-backslash-sums/SHA256SUMS.txt',
+          op: 'flipHashDigit',
+        },
+      ],
+    });
+    check('T44 the backslash normalization is load-bearing: a wrong hash on the same line still FAILs',
+      backslashBad.verdict === 'FAIL' && backslashBad.findings === 1 && /archive\/a\.txt hash mismatch/.test(backslashBad.details),
+      'verdict=' + backslashBad.verdict + ' findings=' + backslashBad.findings + ' :: ' + backslashBad.details);
+    const flip = g8Probe('G8-b', ['g8-ok-pack'], {
+      mutations: [
+        {
+          key: 'g8-ok-pack',
+          path: 'docs/validation/evidence/fixture-g8-ok-pack/SHA256SUMS.txt',
+          op: 'flipHashDigit',
+        },
+      ],
+    });
+    check('T44 a single flipped hash digit turns G8-b red (the recompute is load-bearing)',
+      flip.verdict === 'FAIL' && flip.findings === 1 && /hash mismatch/.test(flip.details),
+      'verdict=' + flip.verdict + ' findings=' + flip.findings + ' :: ' + flip.details);
+
+    // T45: G8-c encoding-normalization record.
+    const cOk = g8Probe('G8-c', ['g8-c-ok']);
+    check('T45 G8-c accepts a MANIFEST whose archive hash equals the SHA256SUMS record',
+      cOk.verdict === 'PASS' && cOk.findings === 0 && cOk.info === false,
+      'verdict=' + cOk.verdict + ' info=' + cOk.info + ' :: ' + cOk.details);
+    const cBad = g8Probe('G8-c', ['g8-c-bad-hash']);
+    check('T45 G8-c FAILs an archive hash that disagrees with SHA256SUMS (token `hash mismatch`, names the payload)',
+      cBad.verdict === 'FAIL' && cBad.findings === 1 && /hash mismatch for archive\/slice\.txt/.test(cBad.details),
+      'verdict=' + cBad.verdict + ' findings=' + cBad.findings + ' :: ' + cBad.details);
+    const cNone = g8Probe('G8-c', ['g8-c-no-section']);
+    // The exemption must leave an explicit trace: a PASS whose detail names the absent
+    // section heading. `info === false` proves the pack was actually examined (a vacuous
+    // INFO would also be a PASS whose detail says nothing).
+    check('T45 G8-c exempts a legacy pack without the 后缀与编码映射 section (explicit note, not a blank PASS)',
+      cNone.verdict === 'PASS' && cNone.findings === 0 && cNone.info === false && /exempt/.test(cNone.detail) && /后缀与编码映射/.test(cNone.detail),
+      'verdict=' + cNone.verdict + ' findings=' + cNone.findings + ' info=' + cNone.info + ' detail=' + cNone.detail);
+
+    // T46: G8-d rebuilt-archive note.
+    const dOk = g8Probe('G8-d', ['g8-d-ok']);
+    check('T46 G8-d accepts a 重建归档 note carrying source + basis and no bad sha token',
+      dOk.verdict === 'PASS' && dOk.findings === 0 && dOk.info === false,
+      'verdict=' + dOk.verdict + ' info=' + dOk.info + ' :: ' + dOk.details);
+    const dBad = g8Probe('G8-d', ['g8-d-missing-basis']);
+    check('T46 G8-d FAILs a 重建归档 note missing the basis (token `basis`, names the file)',
+      dBad.verdict === 'FAIL' && dBad.findings === 1 && /fixture-g8-d-missing-basis/.test(dBad.details) && /basis/.test(dBad.details),
+      'verdict=' + dBad.verdict + ' findings=' + dBad.findings + ' :: ' + dBad.details);
+
+    // T47: the OB-79 scope exclusion - the same violating content in two locations.
+    // Strengthened: the positive side must show EVERY criterion actually ran and passed
+    // (a missing record would otherwise satisfy `failIds().length === 0` vacuously), and
+    // the negative side must name the exact red set + path instead of `>= 1 FAIL`.
+    const NEG_PATH = 'docs/t027/fixture-g8-exclusion.md';
+    const pos = runMods(makeCtx(['exclusion-positive']), [G1A, G2, G4A, G4B, G6]);
+    check('T47 inside the tree the violating content is NOT judged by G1-a/G2/G4a/G4b/G6',
+      failIds(pos.records).length === 0 &&
+        ['G1-a', 'G2', 'G4a', 'G4b'].every((id) => verdictOf(pos.records, id) === 'PASS') &&
+        !pos.records.some((r) => r.detail && r.detail.indexOf('violation.md') >= 0),
+      'fails=' + JSON.stringify(failIds(pos.records)) + ' details=' + pos.records.map((r) => r.id + '=' + r.verdict).join(','));
+    check('T47 G4a reports the excluded count instead of judging the tree file',
+      /\(1 excluded: evidence tree\)/.test(detailOf(pos.records, 'G4a')), detailOf(pos.records, 'G4a'));
+    const neg = runMods(makeCtx(['exclusion-negative']), [G1A, G2, G4A, G4B, G6]);
+    check('T47 the SAME content outside the tree IS judged: G1-a/G2/G4a/G4b/G6-4 all turn red and name the path',
+      ['G1-a', 'G2', 'G4a', 'G4b', 'G6-4'].every((id) => failIds(neg.records).indexOf(id) >= 0) &&
+        ['G1-a', 'G2', 'G4a', 'G6-4'].every((id) => detailOf(neg.records, id).indexOf(NEG_PATH) >= 0),
+      'fails=' + JSON.stringify(failIds(neg.records)) + ' :: ' + neg.records.map((r) => r.id + '=' + r.detail).join(' ;; '));
+
+    // T48: G8 never produces a vacuous PASS - asserted for ALL FOUR sub-checks.
+    const noneB = g8Probe('G8-b', ['g6-1-pending']);
+    const noneA = g8Probe('G8-a', ['g6-1-pending']);
+    const noneC = g8Probe('G8-c', ['g6-1-pending']);
+    const noneD = g8Probe('G8-d', ['g6-1-pending']);
+    check('T48 every G8 sub-check reports INFO (not a vacuous PASS) when the change set has no evidence path',
+      [noneA, noneB, noneC, noneD].every((p) => p.info === true && p.findings === 0),
+      JSON.stringify([noneA, noneB, noneC, noneD].map((p) => p.info + '/' + p.verdict)));
+    const someB = g8Probe('G8-b', ['g8-ok-pack']);
+    check('T48 the INFO is the absence of an evidence path, not a blanket: the same sub-check is NOT INFO when one is present',
+      someB.info === false, 'info=' + someB.info + ' verdict=' + someB.verdict);
+
+    // T49: the ctx primitives G8 is built on.
+    const lctx = makeCtx(['g8-ok-pack']);
+    const packFiles = lctx.listTreeFiles('docs/validation/evidence/fixture-g8-ok-pack');
+    check('T49 ctx.listTreeFiles returns the recursive, sorted pack file list',
+      JSON.stringify(packFiles) ===
+        JSON.stringify([
+          'docs/validation/evidence/fixture-g8-ok-pack/MANIFEST.md',
+          'docs/validation/evidence/fixture-g8-ok-pack/SHA256SUMS.txt',
+          'docs/validation/evidence/fixture-g8-ok-pack/archive/a.txt',
+          'docs/validation/evidence/fixture-g8-ok-pack/archive/nasty.md',
+        ]),
+      JSON.stringify(packFiles));
+    // Strengthened: the trailing-slash form and the two near-miss prefixes (a longer name
+    // that merely STARTS with the tree name, and a sibling that does not) pin the exact
+    // boundary, not just one positive and one negative sample.
+    const evCases = [
+      ['docs/validation/evidence/x', true],
+      ['docs/Validation/Evidence/x', true],
+      ['docs/validation/evidence/archive/deep/x.md', true],
+      ['docs/validation/evidence/', true],
+      ['docs/validation/evidence', false],
+      ['docs/validation/evidencex', false],
+      ['docs/validation/evidence-docs/x', false],
+      ['docs/validation/x', false],
+    ];
+    check('T49 isEvidenceTree is case-insensitive, prefix-anchored and does not over-match near misses',
+      evCases.every(([p, want]) => isEvidenceTree(p) === want),
+      JSON.stringify(evCases.map(([p]) => p + '=' + isEvidenceTree(p))));
+  }
+
+  // ---- T50-T60: the 6.3 evidence-tree scope exclusion, the G8 shape guard and the
+  // DEF-2 batched-ignore anchor (slice DIRECTIVE-EVIDENCE-SCOPE, ③ tester hardening).
+  //
+  // T50/T51/T52 run the exclusion through a REAL lib/ctx context (`injectedCtx`), so a
+  // regression inside lib/ctx.js - not merely inside the selftest's local `makeCtx`
+  // re-derivation - turns them red. That is what the T56 on-disk mutation experiment
+  // (recorded in the slice report) demonstrates: removing the exclusion in lib/ctx.js
+  // flips exactly these assertions.
+  {
+    const FORMS = 'tools/gates/evidence-forms.txt';
+    const VIOLATING_TREE = 'docs/validation/evidence/fixture-g8-t50/archive/probe.md';
+    const VIOLATING_OUT = 'docs/t027/fixture-g8-t50-probe.md';
+
+    // ---- T50: the exclusion duality - byte-identical content, two locations, plus proof
+    // that G8 still judges the tree path (the exclusion must not blind the tree's own guard).
+    const inTree = runKeyMods('g8-t50-in-tree', [G1A, G2, G4A, G4B, G6]);
+    check('T50 in-tree violating content yields ZERO finding from G1-a/G2/G4a/G4b/G6',
+      failIds(inTree.records).length === 0 &&
+        ['G1-a', 'G2', 'G4a', 'G4b', 'G6-4', 'G6-6'].every((id) => verdictOf(inTree.records, id) === 'PASS') &&
+        !inTree.records.some((r) => r.detail && r.detail.indexOf(VIOLATING_TREE) >= 0),
+      'fails=' + JSON.stringify(failIds(inTree.records)) + ' :: ' + inTree.records.map((r) => r.id + '=' + r.verdict).join(','));
+    const outTree = runKeyMods('g8-t50-outside', [G1A, G2, G4A, G4B, G6]);
+    check('T50 the SAME bytes at docs/t027/ turn G1-a/G2/G4a/G4b/G6-4/G6-6 red and name the path',
+      ['G1-a', 'G2', 'G4a', 'G4b', 'G6-4', 'G6-6'].every((id) => failIds(outTree.records).indexOf(id) >= 0) &&
+        ['G1-a', 'G2', 'G4a', 'G6-4', 'G6-6'].every((id) => detailOf(outTree.records, id).indexOf(VIOLATING_OUT) >= 0),
+      'fails=' + JSON.stringify(failIds(outTree.records)) + ' :: ' + outTree.records.map((r) => r.id + '=' + r.detail).join(' ;; '));
+    const g50a = g8Probe('G8-a', ['g8-t50-in-tree']);
+    const g50b = g8Probe('G8-b', ['g8-t50-in-tree']);
+    check('T50 G8 still judges the in-tree file: G8-a PASS + G8-b PASS on the pack carrying the violation',
+      g50a.verdict === 'PASS' && g50a.findings === 0 && g50a.info === false &&
+        g50b.verdict === 'PASS' && g50b.findings === 0 && g50b.info === false,
+      JSON.stringify({ a: g50a.verdict, aInfo: g50a.info, b: g50b.verdict, bInfo: g50b.info }));
+    const strayA = g8Probe('G8-a', ['exclusion-positive']);
+    check('T50 G8-a still FAILs a non-member tree path (the shape guard is not inert)',
+      strayA.verdict === 'FAIL' && /not a pack member/.test(strayA.details),
+      'verdict=' + strayA.verdict + ' :: ' + strayA.details);
+
+    // ---- T51: changedMarkdown is the SINGLE source the four criteria share.
+    const texts51 = new Map();
+    for (const k of ['g8-t50-in-tree', 'g8-t50-outside']) for (const [p, t] of g8Texts(k)) texts51.set(p, t);
+    const realCtx51 = injectedCtx([...texts51.keys()], texts51);
+    check('T51 ctx.changedMarkdown() (shipped lib/ctx) drops the tree .md and keeps the docs/t027 .md',
+      JSON.stringify(realCtx51.changedMarkdown()) === JSON.stringify([VIOLATING_OUT]),
+      JSON.stringify(realCtx51.changedMarkdown()));
+    check('T51 the selftest ctx and lib/ctx agree on changedMarkdown (no local re-derivation drift)',
+      JSON.stringify(makeCtx(['g8-t50-in-tree', 'g8-t50-outside']).changedMarkdown()) ===
+        JSON.stringify(realCtx51.changedMarkdown()),
+      JSON.stringify(makeCtx(['g8-t50-in-tree', 'g8-t50-outside']).changedMarkdown()));
+    const perCrit = [
+      ['G1-a', [G1A], VIOLATING_OUT],
+      ['G2', [G2], VIOLATING_OUT],
+      ['G4b', [G4B], null],
+      ['G6', [G6], VIOLATING_OUT],
+    ];
+    for (const [name, mods, pathInDetail] of perCrit) {
+      // Two independent sides: a TREE-ONLY change set must be silent (this is the side that
+      // turns red if the exclusion is removed, because these details do not name the path),
+      // and the docs/t027 side must be red (the behaviour the exclusion must preserve).
+      const treeOnly = runKeyMods('g8-t50-in-tree', mods).records;
+      const mixed = runMods(realCtx51, mods).records;
+      const treeRed = treeOnly.some((r) => r.verdict === 'FAIL');
+      const outRed = mixed.some(
+        (r) => r.verdict === 'FAIL' && (!pathInDetail || (r.detail && r.detail.indexOf(pathInDetail) >= 0))
+      );
+      check('T51 ' + name + ' shares the single exclusion (tree-only ctx green, docs/t027 ctx red)',
+        !treeRed && outRed,
+        'treeOnly=' + treeOnly.map((r) => r.id + '=' + r.verdict).join(',') + ' ;; mixed=' +
+          mixed.map((r) => r.id + '=' + r.verdict).join(','));
+    }
+
+    // ---- T52: G4a counts the excluded tree files instead of judging their bytes.
+    const bomIn = runKeyMods('g8-bom-in-tree', [G4A]);
+    check('T52 G4a excludes a BOM+CRLF .md and a BOM-less .md inside the tree and counts BOTH',
+      verdictOf(bomIn.records, 'G4a') === 'PASS' && /\(2 excluded: evidence tree\)/.test(detailOf(bomIn.records, 'G4a')),
+      'verdict=' + verdictOf(bomIn.records, 'G4a') + ' detail=' + detailOf(bomIn.records, 'G4a'));
+    const bomOut = runKeyMods('g8-bom-outside', [G4A]);
+    const bomOutDetail = detailOf(bomOut.records, 'G4a');
+    check('T52 the identical bytes outside the tree DO fail G4a (the exclusion is the only reason the in-tree run is green)',
+      verdictOf(bomOut.records, 'G4a') === 'FAIL' &&
+        /fixture-g8-bom-crlf\.md bom=true crlf=true/.test(bomOutDetail) &&
+        /fixture-g8-bom-nobom\.md bom=false crlf=false/.test(bomOutDetail),
+      'verdict=' + verdictOf(bomOut.records, 'G4a') + ' detail=' + bomOutDetail);
+
+    // ---- T53: G8-b breakage matrix augmentation (parse failures must fail closed).
+    const malformed = g8Probe('G8-b', ['g8-b-malformed-sums']);
+    check('T53 a malformed SHA256SUMS line FAILs and names the line/pack, never a silent pass',
+      malformed.verdict === 'FAIL' && /malformed SHA256SUMS line 1/.test(malformed.details) &&
+        /fixture-g8-b-malformed-sums/.test(malformed.details),
+      'verdict=' + malformed.verdict + ' :: ' + malformed.details);
+    const truncated = g8Probe('G8-b', ['g8-b-manifest-truncated']);
+    check('T53 a truncated 归档条目清单 (heading present, table empty) FAILs and names the unlisted payload',
+      truncated.verdict === 'FAIL' && /archive\/a\.txt not listed/.test(truncated.details),
+      'verdict=' + truncated.verdict + ' :: ' + truncated.details);
+
+    // ---- T54: G8-c payload/record consistency at both boundaries.
+    const cNoPayload = g8Probe('G8-c', ['g8-c-arch-not-in-payload']);
+    check('T54 an 归档路径 absent from the pack payload FAILs G8-c and names the path',
+      cNoPayload.verdict === 'FAIL' && /not in pack payload: archive\/missing\.txt/.test(cNoPayload.details),
+      'verdict=' + cNoPayload.verdict + ' :: ' + cNoPayload.details);
+    const cNoSums = g8Probe('G8-c', ['g8-c-arch-not-in-sums']);
+    check('T54 an 归档路径 present in the payload but absent from SHA256SUMS FAILs G8-c and names the path',
+      cNoSums.verdict === 'FAIL' && /not recorded in SHA256SUMS: archive\/slice\.txt/.test(cNoSums.details),
+      'verdict=' + cNoSums.verdict + ' :: ' + cNoSums.details);
+
+    // ---- T55: G8-d annotation-zone boundary.
+    const bodyOnly = g8Probe('G8-d', ['g8-d-body-only']);
+    check('T55 a 重建归档 mention OUTSIDE the annotation zone does not trigger G8-d',
+      bodyOnly.verdict === 'PASS' && bodyOnly.findings === 0 && bodyOnly.info === false,
+      'verdict=' + bodyOnly.verdict + ' findings=' + bodyOnly.findings + ' info=' + bodyOnly.info);
+    const badSha = g8Probe('G8-d', ['g8-d-bad-sha']);
+    check('T55 a non-64-hex sha256 token INSIDE the annotation zone FAILs G8-d',
+      badSha.verdict === 'FAIL' && /bad sha256 token/.test(badSha.details) && /\(40 digits\)/.test(badSha.details),
+      'verdict=' + badSha.verdict + ' :: ' + badSha.details);
+    const precedent = g8dRealProbe('docs/validation/evidence/DIRECTIVE-MODELID-MAP-mutation.md');
+    const precedentZone = G8.internals
+      .annotationZone(precedent.text.split('\n'))
+      .map((z) => z.text)
+      .join('\n');
+    check('T55 the precedent file is not misjudged despite 重建归档 + a 16-digit sha-original short hash',
+      precedent.verdict === 'PASS' && precedent.findings === 0 &&
+        precedent.text.includes('重建归档') && /sha-original=[0-9a-f]{16}/.test(precedent.text),
+      'verdict=' + precedent.verdict + ' findings=' + precedent.findings + ' :: ' + precedent.details);
+    check('T55 the precedent 16-digit short hash sits OUTSIDE the annotation zone (why it is never a sha256 token)',
+      /sha-original=[0-9a-f]{16}/.test(precedent.text) && !/[0-9a-f]{16}/.test(precedentZone),
+      JSON.stringify({ zone: precedentZone.slice(0, 120) }));
+
+    // ---- T56: the recorded on-disk mutation anchors must exist verbatim. (The mutation
+    // run itself is executed out-of-band and its sha256 evidence is recorded in the slice
+    // report; these assertions stop the anchors from rotting silently.)
+    const ctxSrc = decodeBuffer(fs.readFileSync(path.join(__dirname, 'lib', 'ctx.js')));
+    const g8Src = decodeBuffer(fs.readFileSync(path.join(__dirname, 'lib', 'criteria', 'g8.js')));
+    check('T56 mutation anchor (a) exists verbatim in lib/ctx.js (the exclusion being mutated)',
+      ctxSrc.includes('changedMarkdown: () => changedPaths.filter((p) => /\\.md$/i.test(p) && !isEvidenceTree(p)),'),
+      'hasExclusion=' + ctxSrc.includes('!isEvidenceTree(p)'));
+    check('T56 mutation anchor (b) exists verbatim in lib/criteria/g8.js (the hash recompute being mutated)',
+      g8Src.includes('const actual = sha256Hex(bytes);') && g8Src.includes('if (actual !== recorded) {'),
+      JSON.stringify({ a: g8Src.includes('const actual = sha256Hex(bytes);'), b: g8Src.includes('if (actual !== recorded) {') }));
+
+    // ---- T57: scope readings and the range branch of listTreeFiles.
+    const ciG8a = gateCli(['--check=G8-a', '--scope=ci']);
+    check('T57 --scope=ci is a valid reading (exit 0/1, never the usage-error exit 2)',
+      ciG8a.status === 0 || ciG8a.status === 1,
+      'status=' + ciG8a.status + ' out=' + ciG8a.out.trim().split('\n').slice(-1)[0]);
+    const badRange = gateCli(['--check=G8-a', '--scope=range:deadbeef^..HEAD']);
+    check('T57 an unresolvable range endpoint exits 2 (usage/environment error), not a silent green',
+      badRange.status === 2, 'status=' + badRange.status + ' out=' + badRange.out.trim());
+    // DEF-1 (fixed in slice DIRECTIVE-EVIDENCE-SCOPE): `run()`'s catch block used to
+    // `return {code:2, stderr}` BEFORE its stderr write, so this exact command exited 2
+    // with ZERO output - a failure a caller cannot diagnose. `gateCli` above merges
+    // stdout+stderr, which cannot tell a silent exit from a diagnosed one, so pin stderr
+    // separately below: if the catch ever again skips `process.stderr.write`, the captured
+    // stderr is empty and this check turns RED (that is precisely DEF-1's shape). The
+    // assertion deliberately fixes only exit code + non-empty + `gate.js:` prefix, never
+    // the wording of the message.
+    const badRangeSplit = cp.spawnSync(
+      process.execPath,
+      [path.join(__dirname, 'gate.js'), '--check=G8-a', '--scope=range:deadbeef^..HEAD'],
+      { cwd: discoverRepoRoot(__dirname), encoding: 'utf8', windowsHide: true }
+    );
+    const brStderr = badRangeSplit.stderr || '';
+    check(
+      'T57 DEF-1 an unresolvable range endpoint exits 2 with a NON-EMPTY stderr carrying the `gate.js:` diagnosis (never a silent exit that degrades into an empty change set)',
+      badRangeSplit.status === 2 && brStderr.trim() !== '' && /gate\.js:/.test(brStderr),
+      JSON.stringify({ status: badRangeSplit.status, stderrLen: brStderr.trim().length, hasPrefix: /gate\.js:/.test(brStderr) })
+    );
+    // Fail-open breadcrumb: if DEF-1 regresses the check above turns red; this INFO keeps the
+    // old silent-exit signature visible in the printed report while it is broken.
+    if (badRange.status === 2 && badRange.out.trim() === '') {
+      info(
+        'T57 DEF-1 REGRESSED: an unresolvable range exits 2 with EMPTY stdout+stderr (gate.js run() swallows the thrown UsageError diagnosis)',
+        'min-repro: node tools/gates/gate.js --check=G8-a --scope=range:deadbeef^..HEAD'
+      );
+    }
+    const realRoot = discoverRepoRoot(__dirname);
+    if (!revAvailable(realRoot, '4284e94')) {
+      info('T57 historical range reading SKIPPED (INFO): revision 4284e94 is unavailable in this clone');
+    } else {
+      const hist = gateCli(['--check=G8-a', '--scope=range:4284e94^..4284e94']);
+      check('T57 the historical range 4284e94 is a valid reading (exit 0/1, not 2)',
+        hist.status === 0 || hist.status === 1,
+        'status=' + hist.status + ' out=' + hist.out.trim().split('\n').slice(-1)[0]);
+    }
+    const spyCalls = [];
+    const treeSpy = (root, args) => {
+      const key = args.join(' ');
+      spyCalls.push(key);
+      if (/rev-parse --verify --quiet/.test(key)) return { ok: true, code: 0, out: 'abc\n', err: '', spawnError: null };
+      if (/^diff --name-status/.test(key)) return { ok: true, code: 0, out: '', err: '', spawnError: null };
+      if (/^ls-tree -r -z --name-only/.test(key)) {
+        return { ok: true, code: 0, out: 'dir/a.txt\0dir/b.txt\0', err: '', spawnError: null };
+      }
+      return { ok: true, code: 0, out: '', err: '', spawnError: null };
+    };
+    const rangeCtx = createContext({ repoRoot: realRoot, scope: 'range:HEAD..HEAD', spawnGit: treeSpy });
+    const listed = rangeCtx.listTreeFiles('dir');
+    check('T57 listTreeFiles in range scope walks `git ls-tree -r -z --name-only <endpoint> -- <dir>` (not the disk)',
+      JSON.stringify(listed) === JSON.stringify(['dir/a.txt', 'dir/b.txt']) &&
+        spyCalls.some((c) => /^ls-tree -r -z --name-only HEAD -- dir$/.test(c)),
+      JSON.stringify({ listed, lsTree: spyCalls.filter((c) => /^ls-tree/.test(c)) }));
+
+    // ---- T58: the registration table is read by ENDPOINT - an implementation decision
+    // that must stay pinned so ⑤⑥⑦ can re-verify it.
+    const worktreeRead = createContext({ repoRoot: realRoot, scope: 'tree' }).loadWhitelist(FORMS);
+    check('T58 tree scope reads the registration table from the working tree',
+      worktreeRead.source === 'worktree' && worktreeRead.entries.length >= 1,
+      'source=' + worktreeRead.source + ' entries=' + worktreeRead.entries.length);
+    const REG_REAL = 'docs/validation/evidence/DIRECTIVE-MODELID-MAP-mutation.md';
+    check('T58 the real registered root-level path is listed VERBATIM (match === file) in the worktree registry',
+      worktreeRead.entries.some((e) => e.file === REG_REAL && e.match === REG_REAL),
+      JSON.stringify(worktreeRead.entries.map((e) => e.file)));
+    if (!revAvailable(realRoot, '4284e94')) {
+      info('T58 historical endpoint reading SKIPPED (INFO): revision 4284e94 is unavailable in this clone');
+    } else {
+      const endpointRead = createContext({ repoRoot: realRoot, scope: 'range:4284e94^..4284e94' }).loadWhitelist(FORMS);
+      check('T58 a historical range endpoint reads the registration table from the endpoint (absent then ⇒ zero entries)',
+        /^endpoint:/.test(endpointRead.source) && endpointRead.text === null && endpointRead.entries.length === 0,
+        JSON.stringify({ source: endpointRead.source, text: endpointRead.text, entries: endpointRead.entries.length }));
+      const withReg = g8Probe('G8-a', ['g8-a-real-registered'], { whitelists: { [FORMS]: worktreeRead.entries } });
+      const withoutReg = g8Probe('G8-a', ['g8-a-real-registered'], { whitelists: { [FORMS]: [] } });
+      check('T58 the SAME path is green with the worktree registry and red with the endpoint (empty) registry',
+        withReg.verdict === 'PASS' && withReg.findings === 0 && withReg.info === false &&
+          withoutReg.verdict === 'FAIL' && /not registered/.test(withoutReg.details),
+        JSON.stringify({ with: withReg.verdict, without: withoutReg.verdict, withoutDetail: withoutReg.details }));
+    }
+
+    // ---- T59: whole-corpus anchor strengthening (T13's set equality already pins the ids;
+    // these add the vocabulary / ordering invariants that keep the anchor meaningful).
+    check('T59 EXPECTED_CORPUS_FAILS is sorted and duplicate-free',
+      JSON.stringify(EXPECTED_CORPUS_FAILS) === JSON.stringify([...new Set(EXPECTED_CORPUS_FAILS)].sort()),
+      JSON.stringify(EXPECTED_CORPUS_FAILS));
+    const KNOWN_IDS = new Set([...ALL_SUBCHECKS, 'G1-a', 'G2', 'G4a', 'G4b']);
+    check('T59 every expected corpus FAIL id belongs to the known criterion vocabulary',
+      EXPECTED_CORPUS_FAILS.every((id) => KNOWN_IDS.has(id)),
+      JSON.stringify(EXPECTED_CORPUS_FAILS.filter((id) => !KNOWN_IDS.has(id))));
+    check('T59 no criterion id is duplicated in ALL_SUBCHECKS',
+      new Set(ALL_SUBCHECKS).size === ALL_SUBCHECKS.length, 'n=' + ALL_SUBCHECKS.length);
+    check('T59 every G8 sub-check id is present in ALL_SUBCHECKS',
+      G8.subchecks.every((s) => ALL_SUBCHECKS.indexOf(s.id) >= 0),
+      JSON.stringify(ALL_SUBCHECKS));
+
+    // ---- T60: DEF-2 regression anchor. The tree/index branch of listTreeFiles must
+    // resolve ignore-ness with EXACTLY ONE batched `git check-ignore --stdin -z` spawn for
+    // a whole directory, and must NOT spawn one `git check-ignore -q -- <path>` per file.
+    // The per-file form IS DEF-2: on the measured host one check-ignore spawn costs ~417 ms,
+    // so the evidence tree (~2671 files) took ~30 min for a single enumeration, and the
+    // G8-a ancestor walk extrapolated to ~74 min. This assertion runs the SHIPPED lib/ctx
+    // (`createContext(...).listTreeFiles(...)`), with an injected runner that records the
+    // exact git argv AND the stdin payload - so reverting to the per-file shape (an argv
+    // count of N with no `--stdin`) or emitting MORE than one batch spawn turns it red.
+    // The repeat-call clause pins memoisation (treeCache/ignoreCache): a second call for the
+    // same dir must not spawn another batch. The set clause ties the output to the input the
+    // shipped code itself produced minus the injected ignore response.
+    const T60_DIR = 'tools/gates/testdata/historical';
+    const t60Calls = [];
+    let t60BatchInput = null;
+    let t60Ignored = new Set();
+    const t60Spy = (root, args, binary, input) => {
+      const key = args.join(' ');
+      t60Calls.push({ key, stdin: input === undefined ? null : String(input) });
+      if (/^status --porcelain=v1/.test(key)) return { ok: true, code: 0, out: '', err: '', spawnError: null };
+      if (/^check-ignore --stdin -z$/.test(key)) {
+        t60BatchInput = String(input || '');
+        // Deterministic sentinel: ignore exactly the lexicographically FIRST path in the
+        // batch input, so the ignore branch is exercised with the real (batched) argv.
+        const fresh = t60BatchInput.split('\0').filter(Boolean).sort();
+        t60Ignored = new Set(fresh.slice(0, 1));
+        return { ok: true, code: 0, out: [...t60Ignored].map((p) => p + '\0').join(''), err: '', spawnError: null };
+      }
+      return { ok: true, code: 0, out: '', err: '', spawnError: null };
+    };
+    const t60Ctx = createContext({ repoRoot: realRoot, scope: 'tree', spawnGit: t60Spy });
+    const t60First = t60Ctx.listTreeFiles(T60_DIR);
+    const t60BatchCalls = t60Calls.filter((c) => /^check-ignore --stdin -z$/.test(c.key));
+    const t60PerFile = t60Calls.filter((c) => /^check-ignore -q/.test(c.key)).length;
+    const t60LsTree = t60Calls.filter((c) => /^ls-tree/.test(c.key)).length;
+    const t60Input = (t60BatchInput || '').split('\0').filter(Boolean);
+    const t60Expected = t60Input.filter((p) => !t60Ignored.has(p)).sort();
+    const t60Second = t60Ctx.listTreeFiles(T60_DIR);
+    const t60BatchAfter = t60Calls.filter((c) => /^check-ignore --stdin -z$/.test(c.key)).length;
+    check(
+      'T60 DEF-2 regression anchor: the tree branch batches a whole directory into EXACTLY ONE `git check-ignore --stdin -z` spawn (never a per-file check-ignore), memoises per dir, and returns the disk set minus the ignored set',
+      t60BatchCalls.length === 1 &&
+        t60BatchCalls[0].key === 'check-ignore --stdin -z' &&
+        t60BatchCalls[0].stdin !== null &&
+        t60PerFile === 0 &&
+        t60LsTree === 0 &&
+        t60Input.length >= 1 &&
+        t60Input.every((p) => p.startsWith(T60_DIR + '/')) &&
+        t60Ignored.size === 1 &&
+        JSON.stringify(t60First) === JSON.stringify(t60Expected) &&
+        t60First.length === t60Input.length - t60Ignored.size &&
+        t60First.indexOf([...t60Ignored][0]) < 0 &&
+        t60BatchAfter === 1 &&
+        JSON.stringify(t60Second) === JSON.stringify(t60First),
+      JSON.stringify({
+        batch: t60BatchCalls.length,
+        batchAfter: t60BatchAfter,
+        perFile: t60PerFile,
+        lsTree: t60LsTree,
+        input: t60Input.length,
+        ignored: [...t60Ignored],
+        first: t60First.length,
+      })
     );
   }
 

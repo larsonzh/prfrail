@@ -1,0 +1,10 @@
+{
+  "name": "g8-bom-in-tree",
+  "pack": "docs/validation/evidence/fixture-g8-bom",
+  "comment": "T52 positive: two encoding-violating .md files INSIDE the evidence tree (a BOM-carrying .md with CRLF, and a BOM-less .md). G4a must exclude both (count them) and stay green.",
+  "files": {
+    "docs/validation/evidence/fixture-g8-bom/archive/bom-crlf.md": "\uFEFF# bom probe\r\n\r\nviolating CRLF body\r\n",
+    "docs/validation/evidence/fixture-g8-bom/archive/no-bom.md": "# no bom probe\n\nviolating missing BOM body\n"
+  },
+  "expect": { "g4a": "PASS", "excludedCount": 2 }
+}

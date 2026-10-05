@@ -1,0 +1,10 @@
+{
+  "name": "g8-a-member",
+  "pack": "docs/validation/evidence/fixture-g8-a-member",
+  "files": {
+    "docs/validation/evidence/fixture-g8-a-member/MANIFEST.md": "# 归档 MANIFEST · g8-a-member\n\n- **源路径**：`tmp/g8am/`\n\n## 归档条目清单\n\n| 相对路径 | 字节 | sha256 | 归档理由 |\n|---|---|---|---|\n| `archive/x.txt` | 2 | `{{sha256:archive/x.txt}}` | fixture payload |\n\n## 未入库文件清单（`.gitignore` 排除类型）\n\n| 相对路径 | 字节 | sha256 | 理由 |\n|---|---|---|---|\n",
+    "docs/validation/evidence/fixture-g8-a-member/archive/x.txt": "x\n"
+  },
+  "sumsFrom": ["archive/x.txt"],
+  "expect": { "g8a": "PASS" }
+}

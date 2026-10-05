@@ -36,10 +36,15 @@
  *
  * Explicitly NOT judged: artifact content, run reachability, number truth, report
  * conclusion truth.
+ *
+ * The evidence-tree exclusion prefix is imported from `../ctx` (section 6.3 "判据作用域排除",
+ * OB-79) rather than redeclared here: G7's exclusion and the G1-a / G2 / G4a / G4b / G6
+ * exclusion must stay the SAME single-source definition.
  */
 
+const { EVIDENCE_TREE_PREFIX } = require('../ctx');
+
 const TARGET_RE = /^docs\/validation\/.*\.md$/;
-const EXCLUDED_PREFIX = 'docs/validation/evidence/';
 const ARTIFACT_FENCE_RE = /^```artifacts[ \t]*$/;
 const CLOSE_FENCE_RE = /^```[ \t]*$/;
 const DISPOSITIONS = ['repo', 'local-only', 'missing-historical'];
@@ -126,7 +131,7 @@ function hasStopMark(line) {
 const STATUS_LINE_RE = /^(?:\|\s*)?(?:\*\*)?(?:状态|Status)(?:\*\*)?\s*[：:|]/i;
 
 function targets(ctx) {
-  return ctx.changedPaths.filter((p) => TARGET_RE.test(p) && !p.startsWith(EXCLUDED_PREFIX));
+  return ctx.changedPaths.filter((p) => TARGET_RE.test(p) && !p.startsWith(EVIDENCE_TREE_PREFIX));
 }
 
 /** Fenced `artifacts` block, or null when the report has none. */

@@ -1,0 +1,8 @@
+{
+  "name": "g8-a-freedom-list",
+  "pack": "docs/validation/evidence/fixture-g8-a-freedom-list",
+  "files": {
+    "docs/validation/evidence/fixture-g8-a-freedom-list.md": "# fixture freedom list\n\n- item one\n- item two\n"
+  },
+  "expect": { "g8a": "PASS" }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "g8-c-arch-not-in-sums",
+  "pack": "docs/validation/evidence/fixture-g8-c-not-in-sums",
+  "comment": "T54: the 归档路径 IS a payload member but is not recorded in SHA256SUMS.txt. G8-c must fail closed and name the path (`not recorded in SHA256SUMS`).",
+  "files": {
+    "docs/validation/evidence/fixture-g8-c-not-in-sums/MANIFEST.md": "# 归档 MANIFEST · g8-c-arch-not-in-sums\n\n- **源路径**：`tmp/g8cns/`\n\n## 归档条目清单\n\n| 相对路径 | 字节 | sha256 | 归档理由 |\n|---|---|---|---|\n| `archive/slice.txt` | 8 | `{{sha256:archive/slice.txt}}` | fixture payload |\n\n## 未入库文件清单（`.gitignore` 排除类型）\n\n| 相对路径 | 字节 | sha256 | 理由 |\n|---|---|---|---|\n\n## 后缀与编码映射（`.md` → `.txt` 及编码归一）\n\n| 原路径 | 归档路径 | 原始字节 sha256 | 归档字节 sha256 | 变更 |\n|---|---|---|---|---|\n| `SLICE.md` | `archive/slice.txt` | `{{sha256:archive/slice.txt}}` | `2222222222222222222222222222222222222222222222222222222222222222` | 后缀 `.md` → `.txt` |\n",
+    "docs/validation/evidence/fixture-g8-c-not-in-sums/archive/slice.txt": "slice\n",
+    "docs/validation/evidence/fixture-g8-c-not-in-sums/SHA256SUMS.txt": "\n"
+  },
+  "expect": { "g8c": "FAIL", "token": "not recorded in SHA256SUMS", "namesPath": "archive/slice.txt" }
+}

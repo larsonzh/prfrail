@@ -1,0 +1,11 @@
+{
+  "name": "g8-b-malformed-sums",
+  "pack": "docs/validation/evidence/fixture-g8-b-malformed-sums",
+  "comment": "T53: SHA256SUMS.txt carries a line that is not `<64 hex>  <path>`. The parse must fail closed with a named `malformed SHA256SUMS line` reason, never silently pass.",
+  "files": {
+    "docs/validation/evidence/fixture-g8-b-malformed-sums/MANIFEST.md": "# 归档 MANIFEST · g8-b-malformed-sums\n\n- **源路径**：`tmp/g8ms/`\n\n## 归档条目清单\n\n| 相对路径 | 字节 | sha256 | 归档理由 |\n|---|---|---|---|\n| `archive/a.txt` | 6 | `{{sha256:archive/a.txt}}` | fixture payload |\n\n## 未入库文件清单（`.gitignore` 排除类型）\n\n| 相对路径 | 字节 | sha256 | 理由 |\n|---|---|---|---|\n",
+    "docs/validation/evidence/fixture-g8-b-malformed-sums/archive/a.txt": "alpha\n",
+    "docs/validation/evidence/fixture-g8-b-malformed-sums/SHA256SUMS.txt": "not-a-valid-hash-line  archive/a.txt\n"
+  },
+  "expect": { "g8b": "FAIL", "token": "malformed SHA256SUMS line", "namesPath": "archive/a.txt" }
+}

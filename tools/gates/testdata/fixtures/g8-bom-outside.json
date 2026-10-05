@@ -1,0 +1,10 @@
+{
+  "name": "g8-bom-outside",
+  "pack": "docs/t027",
+  "comment": "T52 control: the byte-identical encoding-violating .md bodies at docs/t027/. G4a must judge BOTH red - proof that the in-tree PASS is caused by the exclusion, not by lenient bytes.",
+  "files": {
+    "docs/t027/fixture-g8-bom-crlf.md": "\uFEFF# bom probe\r\n\r\nviolating CRLF body\r\n",
+    "docs/t027/fixture-g8-bom-nobom.md": "# no bom probe\n\nviolating missing BOM body\n"
+  },
+  "expect": { "g4a": "FAIL" }
+}

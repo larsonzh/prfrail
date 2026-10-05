@@ -1,0 +1,14 @@
+# tools/gates/evidence-forms.txt - DELIVERY_DIRECTIVE 6.3 G8-a 形态登记表
+#
+# 口径：本表是「当前语料的历史形态登记」，不是放宽白名单。它只登记证据树根级、
+# 非 `*-freedom-list.md`、且非任何冻结包成员的**受版本控制**文件——这些路径在真实
+# 语料里存在且合法，却无法归入 G8-a 的前两种允许形态，故逐条登记理由以备审计。
+#
+# 字段（TAB 分隔，恰好 3 个）：<match><TAB><file><TAB><理由>
+#   match 与 file 必须与仓库相对 POSIX 路径**逐字相等**（G8 走字符串相等判定，而非
+#   子串匹配）。字段数 ≠ 3 / 字段为空 / 同路径重复登记 / 读取或解析失败 ⇒ UsageError，退出码 2。
+#
+# 登记项（实测 3 条）：
+docs/validation/evidence/DIRECTIVE-MODELID-MAP-mutation.md	docs/validation/evidence/DIRECTIVE-MODELID-MAP-mutation.md	重建归档副本：切片 DIRECTIVE-MODELID-MAP 的变异检验日志按「移到归档」重建（原件乱码不可逆），独立置于证据树根级，非包成员
+docs/validation/evidence/DIRECTIVE-MODELID-MAP-review-r1.md	docs/validation/evidence/DIRECTIVE-MODELID-MAP-review-r1.md	根级评审副本：切片 DIRECTIVE-MODELID-MAP 第 1 轮评审包，独立置于证据树根级，非包成员
+docs/validation/evidence/ci-run-37107634723.txt	docs/validation/evidence/ci-run-37107634723.txt	根级 CI 读数：run 37107634723 的门禁原始输出，独立置于证据树根级，非包成员

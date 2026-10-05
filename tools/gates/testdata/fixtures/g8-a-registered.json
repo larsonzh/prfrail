@@ -1,0 +1,8 @@
+{
+  "name": "g8-a-registered",
+  "pack": "docs/validation/evidence/fixture-g8-a-registered",
+  "files": {
+    "docs/validation/evidence/fixture-g8-a-registered.md": "# root-level historical form\n\nRegistered verbatim in tools/gates/evidence-forms.txt.\n"
+  },
+  "expect": { "g8a": "PASS-with-registration", "g8aWithoutRegistration": "FAIL" }
+}

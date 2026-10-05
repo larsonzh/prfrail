@@ -1,0 +1,11 @@
+{
+  "name": "g8-c-arch-not-in-payload",
+  "pack": "docs/validation/evidence/fixture-g8-c-not-in-payload",
+  "comment": "T54: the 后缀与编码映射 row names an archive path that is not a pack payload member. G8-b stays green (MANIFEST / SHA256SUMS / payload agree); G8-c must fail closed and name the path.",
+  "files": {
+    "docs/validation/evidence/fixture-g8-c-not-in-payload/MANIFEST.md": "# 归档 MANIFEST · g8-c-arch-not-in-payload\n\n- **源路径**：`tmp/g8cnp/`\n\n## 归档条目清单\n\n| 相对路径 | 字节 | sha256 | 归档理由 |\n|---|---|---|---|\n| `archive/slice.txt` | 8 | `{{sha256:archive/slice.txt}}` | fixture payload |\n\n## 未入库文件清单（`.gitignore` 排除类型）\n\n| 相对路径 | 字节 | sha256 | 理由 |\n|---|---|---|---|\n\n## 后缀与编码映射（`.md` → `.txt` 及编码归一）\n\n| 原路径 | 归档路径 | 原始字节 sha256 | 归档字节 sha256 | 变更 |\n|---|---|---|---|---|\n| `SLICE.md` | `archive/missing.txt` | `0000000000000000000000000000000000000000000000000000000000000000` | `1111111111111111111111111111111111111111111111111111111111111111` | 后缀 `.md` → `.txt` |\n",
+    "docs/validation/evidence/fixture-g8-c-not-in-payload/archive/slice.txt": "slice\n"
+  },
+  "sumsFrom": ["archive/slice.txt"],
+  "expect": { "g8b": "PASS", "g8c": "FAIL", "token": "not in pack payload", "namesPath": "archive/missing.txt" }
+}

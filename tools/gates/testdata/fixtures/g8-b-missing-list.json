@@ -1,0 +1,10 @@
+{
+  "name": "g8-b-missing-list",
+  "pack": "docs/validation/evidence/fixture-g8-b-missing-list",
+  "files": {
+    "docs/validation/evidence/fixture-g8-b-missing-list/MANIFEST.md": "# 归档 MANIFEST · g8-b-missing-list\n\n- **源路径**：`tmp/g8ml/`\n\n- 本 MANIFEST 故意缺失 `## 归档条目清单` 小节（遗留包形态）。\n\n## 排除清单（未归档）\n\n| 相对路径 | 字节 | sha256 | 未归档理由 |\n|---|---|---|---|\n",
+    "docs/validation/evidence/fixture-g8-b-missing-list/archive/a.txt": "alpha\n"
+  },
+  "sumsFrom": ["archive/a.txt"],
+  "expect": { "g8a": "PASS", "g8b": "FAIL", "token": "missing" }
+}

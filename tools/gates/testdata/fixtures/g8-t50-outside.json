@@ -1,0 +1,9 @@
+{
+  "name": "g8-t50-outside",
+  "pack": "docs/t027",
+  "comment": "T50 negative: the byte-identical violating body at docs/t027/, outside the evidence tree. G1-a/G2/G4a/G4b/G6-4/G6-6 must all judge it (each turns red).",
+  "files": {
+    "docs/t027/fixture-g8-t50-probe.md": "# probe\n\n| a || b |\n|---|---|\n| x | y |\n\n待…回填。\n\n魑\n\n共 128 个文件\n\n### 12.4 观察项台账\n\n| OB-1 | d | x | 下一片必做 |\n"
+  },
+  "expect": { "g1a": "FAIL", "g2": "FAIL", "g4a": "FAIL", "g4b": "FAIL", "g6_4": "FAIL", "g6_6": "FAIL" }
+}

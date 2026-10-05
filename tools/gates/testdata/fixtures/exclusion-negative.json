@@ -1,0 +1,8 @@
+{
+  "name": "exclusion-negative",
+  "pack": "docs/validation/evidence/fixture-g8-exclusion-negative",
+  "files": {
+    "docs/t027/fixture-g8-exclusion.md": "# exclusion probe\n\n| a || b |\n|---|---|\n| x | y |\n\n待…回填。\n\n魑\n\n共 128 个文件\n\n| OB-1 | d | x | 下一片必做 |\n"
+  },
+  "expect": { "judgedBy": ["G1-a", "G2", "G4a", "G4b", "G6"] }
+}

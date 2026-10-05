@@ -1,0 +1,9 @@
+{
+  "name": "g8-d-body-only",
+  "pack": "docs/validation/evidence/fixture-g8-d-body-only",
+  "comment": "T55: the `重建归档` wording and a 16-digit `sha-original=` short hash sit in the BODY, outside the leading annotation zone. G8-d must not trigger (the zone stops at the first non-`#`/`>`/blank line).",
+  "files": {
+    "docs/validation/evidence/fixture-g8-d-body-only/archive/note.md": "# variant-check log\n\nMUTATED m1 重建归档 sha-original=0b8a113ca3180e3e\n"
+  },
+  "expect": { "g8d": "PASS" }
+}

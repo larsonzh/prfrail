@@ -36,6 +36,24 @@ function toPosix(p) {
   return String(p).replace(/\\/g, '/');
 }
 
+/**
+ * The frozen evidence tree (DELIVERY_DIRECTIVE 6.3 "判据作用域排除", OB-79).
+ *
+ * SINGLE SOURCE of the scope exclusion: G1-a / G2 / G4b / G6 all reach their target
+ * set through `changedMarkdown()`, so excluding the tree there is why those criteria
+ * need no local change at all; G4a walks `changedPaths` directly and therefore calls
+ * `isEvidenceTree` itself. G7 uses this same constant.
+ *
+ * The selftest's `makeCtx` imports `isEvidenceTree` from here too, so "the criterion
+ * was fixed but the self-test kept the old regex" cannot happen silently.
+ */
+const EVIDENCE_TREE_PREFIX = 'docs/validation/evidence/';
+
+/** True when `p` (a repository-relative POSIX path) lies inside the evidence tree. */
+function isEvidenceTree(p) {
+  return toPosix(p).toLowerCase().startsWith(EVIDENCE_TREE_PREFIX);
+}
+
 function stripBom(text) {
   return text.charCodeAt(0) === 0xfeff ? text.slice(1) : text;
 }
@@ -111,10 +129,13 @@ function resolveRepoArtifact(repoRoot, kind, ref, p) {
   };
 }
 
-function spawnGit(cwd, args, binary) {
+function spawnGit(cwd, args, binary, input) {
   const r = cp.spawnSync('git', args, {
     cwd,
     encoding: binary ? 'buffer' : 'utf8',
+    // Optional stdin for the batched `check-ignore --stdin` path only; every other call
+    // passes no input and inherits no stdin (the previous behaviour).
+    input: input === undefined ? undefined : input,
     maxBuffer: GIT_MAX_BUFFER,
     windowsHide: true,
   });
@@ -263,7 +284,9 @@ function createContext(options) {
 
   // Test seam (GATES-EXT, 7 round-2): the scope guards below must be verifiable one by one, so the
   // git runner can be injected. Production always uses spawnGit; the selftest substitutes a fake to
-  // prove each guard fires independently instead of only as a bundle.
+  // prove each guard fires independently instead of only as a bundle. The runner is called with a
+  // 4th `input` argument for the batched `check-ignore --stdin` call; every other call passes it
+  // undefined, so the pre-existing fakes `(root, args[, binary])` keep working unchanged.
   const spawn = opts.spawnGit || spawnGit;
 
   function git(args, o) {
@@ -411,8 +434,59 @@ function createContext(options) {
     return r.ok ? r.out : null;
   }
 
+  /**
+   * Ignore lookup backed by ONE per-context cache. `isIgnored(p)` keeps its original
+   * single-path API (G4a depends on it); `isIgnoredBatch` below is the tree-walk fast
+   * path and shares the same cache, so a path is never queried twice per context.
+   */
+  const ignoreCache = new Map();
+
   function isIgnored(p) {
-    return git(['check-ignore', '-q', '--', p]).ok;
+    const key = toPosix(p);
+    if (ignoreCache.has(key)) return ignoreCache.get(key);
+    const v = git(['check-ignore', '-q', '--', key]).ok;
+    ignoreCache.set(key, v);
+    return v;
+  }
+
+  /**
+   * Batched ignore lookup for a whole path list: ONE `git check-ignore --stdin -z`
+   * process instead of one spawn per path (DEF-2). A single `git check-ignore` spawn
+   * costs ~1s on the measured Windows host and the evidence tree holds ~2600 files, so
+   * the per-file form took ~45 min for ONE `listTreeFiles` enumeration.
+   *
+   * `-z` makes input and output NUL-terminated and unquoted, so non-ASCII names
+   * (core.quotePath) survive verbatim, exactly like the `fs.readdirSync` names they are
+   * compared against. Exit 1 means "nothing ignored" - data, never a crash; any other
+   * non-zero exit is an environment error. Results populate the same cache `isIgnored`
+   * reads, so a later `isIgnored` / `listTreeFiles` call never re-queries a path.
+   */
+  function isIgnoredBatch(paths) {
+    const ignored = new Set();
+    const fresh = [];
+    for (const raw of paths) {
+      const p = toPosix(raw);
+      if (ignoreCache.has(p)) {
+        if (ignoreCache.get(p)) ignored.add(p);
+      } else {
+        fresh.push(p);
+      }
+    }
+    if (fresh.length) {
+      const r = spawn(repoRoot, ['check-ignore', '--stdin', '-z'], false, fresh.join('\0') + '\0');
+      if (!(r.ok || r.code === 1)) {
+        throw new UsageError(
+          'environment error: git check-ignore --stdin failed: ' + ((r.err || '').trim() || 'exit ' + r.code)
+        );
+      }
+      const reported = new Set((r.out || '').split('\0').filter(Boolean));
+      for (const p of fresh) {
+        const v = reported.has(p);
+        ignoreCache.set(p, v);
+        if (v) ignored.add(p);
+      }
+    }
+    return ignored;
   }
 
   const hunkCache = new Map();
@@ -483,6 +557,78 @@ function createContext(options) {
   }
 
   /**
+   * Repository-relative POSIX paths of every FILE under `dirRel` (recursive, sorted).
+   *
+   * scope rule (GATES-EXT F1, same as the whitelist loader): range/ci read the scope's
+   * ENDPOINT revision; tree/index walk the working tree. The tree walk drops paths for
+   * which the batched ignore lookup says ignored, so a tree read is equivalent to the CI
+   * read (measured: no ignored file lives inside the evidence tree, so this is a no-op on
+   * today's corpus).
+   *
+   * Same lesson as `listAllMarkdown()`: do NOT pass a `*.md` pathspec - `git ls-tree
+   * -r --name-only <ref> -- '*.md'` returns an empty list. List the directory and
+   * filter in JS.
+   *
+   * Results are memoized per directory for the lifetime of the context: G8's pack-root
+   * walk asks for every ancestor of every changed path, and without the cache a range
+   * scope over hundreds of evidence files re-listed the whole tree thousands of times.
+   * The ignore filter itself is batched+cached (see isIgnoredBatch), so enumerating the
+   * evidence tree costs ONE git spawn, not one per file.
+   */
+  const treeCache = new Map();
+  function listTreeFiles(dirRel) {
+    const d = toPosix(dirRel).replace(/\/+$/, '');
+    if (!d) return [];
+    if (treeCache.has(d)) return treeCache.get(d);
+    let out;
+    if (kind === 'range' || kind === 'ci') {
+      // `-z` is load-bearing: plain `git ls-tree --name-only` QUOTES paths that contain
+      // non-ASCII bytes (core.quotePath), so `README-⑥-scan.txt` came back as
+      // `"README-\342\221\245-scan.txt"` and never matched the UTF-8 name recorded in the
+      // pack MANIFEST / SHA256SUMS. `-z` emits NUL-terminated, unquoted paths.
+      const r = git(['ls-tree', '-r', '-z', '--name-only', headRef, '--', d]);
+      if (!r.ok) {
+        throw new UsageError(
+          'environment error: git ls-tree failed for ' +
+            d +
+            ' at ' +
+            headRef +
+            ': ' +
+            ((r.err || '').trim() || 'exit ' + r.code)
+        );
+      }
+      out = r.out
+        .split('\0')
+        .filter((p) => p && p.startsWith(d + '/'))
+        .sort();
+    } else {
+      const abs = path.join(repoRoot, d.split('/').join(path.sep));
+      const found = [];
+      const walk = (dir) => {
+        let ents;
+        try {
+          ents = fs.readdirSync(dir, { withFileTypes: true });
+        } catch (e) {
+          return; // absent directory: an empty file list, not an environment error
+        }
+        for (const ent of ents) {
+          const child = path.join(dir, ent.name);
+          if (ent.isDirectory()) walk(child);
+          else if (ent.isFile()) found.push(toPosix(path.relative(repoRoot, child)));
+        }
+      };
+      walk(abs);
+      // ONE batched check-ignore for the whole enumeration (DEF-2); the per-file form
+      // spawned a git process per file and turned this into a ~45-minute call.
+      const ignored = isIgnoredBatch(found);
+      out = found.filter((p) => !ignored.has(p));
+      out.sort();
+    }
+    treeCache.set(d, out);
+    return out;
+  }
+
+  /**
    * Whitelist loader (one function for both whitelists, see resolveWhitelistSource).
    * Returns the used source label, the raw text (null when absent) and the parsed
    * `<match>\t<file>\t<reason>` entries; `error` is a usage error, never silently
@@ -522,8 +668,12 @@ function createContext(options) {
     changed,
     changedPaths,
     recordFor: (p) => byPath.get(p) || null,
-    changedMarkdown: () => changedPaths.filter((p) => /\.md$/i.test(p)),
+    // Scope exclusion (section 6.3, OB-79): the frozen evidence tree is judged by G8, not by
+    // the "new document" criteria. This single filter is why G1-a / G2 / G4b / G6 need no
+    // local exclusion of their own.
+    changedMarkdown: () => changedPaths.filter((p) => /\.md$/i.test(p) && !isEvidenceTree(p)),
     changedPathsWith: (re) => changedPaths.filter((p) => re.test(p)),
+    isEvidenceTree,
     git,
     readBytes,
     readLines,
@@ -542,6 +692,7 @@ function createContext(options) {
     numstat,
     listAllMarkdown,
     listAgentFiles,
+    listTreeFiles,
   };
 }
 
@@ -594,6 +745,8 @@ function whitelisted(entries, file, text) {
 
 module.exports = {
   EMPTY_TREE,
+  EVIDENCE_TREE_PREFIX,
+  isEvidenceTree,
   UsageError,
   createContext,
   discoverRepoRoot,

@@ -1,0 +1,8 @@
+{
+  "name": "g8-a-stray-root",
+  "pack": "docs/validation/evidence/fixture-g8-a-stray-root",
+  "files": {
+    "docs/validation/evidence/fixture-g8-a-stray-root.md": "# stray root-level file\n\nNot a pack member, not a freedom-list, not registered.\n"
+  },
+  "expect": { "g8a": "FAIL" }
+}

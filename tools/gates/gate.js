@@ -37,6 +37,7 @@ const CRITERIA = {
   'R2.5': require('./lib/criteria/r25'),
   G6: require('./lib/criteria/g6'),
   G7: require('./lib/criteria/g7'),
+  G8: require('./lib/criteria/g8'),
 };
 
 /**
@@ -73,6 +74,7 @@ const RUN_ORDER = [
   'R2.5',
   'G6',
   'G7',
+  'G8',
 ];
 
 const USAGE =
@@ -252,8 +254,18 @@ function run() {
   try {
     result = main(process.argv);
   } catch (e) {
-    if (e instanceof UsageError) return { code: 2, stderr: 'gate.js: ' + e.message };
-    return { code: 2, stderr: 'gate.js: unexpected error: ' + (e && e.stack ? e.stack : e) };
+    // Batch 2f (NF-3) / DEF-1: a THROWN UsageError (e.g. an unresolvable range endpoint,
+    // see ctx.js `--scope=range` validation) used to leave through this `return`, so the
+    // stderr write below - the only place the diagnostic is printed - was never reached
+    // and the caller saw exit 2 with ZERO output. Print here (this branch prints exactly
+    // once; the `return` skips the block below) and keep the `{code, stderr}` shape the
+    // `error`-carrying usage paths still use.
+    const stderr =
+      e instanceof UsageError
+        ? 'gate.js: ' + e.message
+        : 'gate.js: unexpected error: ' + (e && e.stack ? e.stack : e);
+    process.stderr.write(stderr + '\n');
+    return { code: 2, stderr };
   }
   // `main` reports usage / environment errors on the `error` key (bad flag, missing mode,
   // bad --scope, unknown criterion id). Batch 2f (NF-3): that key was never consumed, so
