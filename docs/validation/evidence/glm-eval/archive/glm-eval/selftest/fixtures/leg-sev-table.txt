@@ -1,0 +1,4 @@
+| F1 | Critical | 02-diff.js:56-59, 137 | 失败被吞并 |
+| F3 | High | 02-diff.js:84-95 | X4.2 缺失 |
+
+PRE-REVIEW: FINDINGS

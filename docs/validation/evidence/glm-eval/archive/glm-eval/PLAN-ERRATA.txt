@@ -1,0 +1,58 @@
+# 方案书更正注记（PLAN-ERRATA）· 切片 `DIRECTIVE-GLM-EVAL`
+
+用途：对 `tmp/glm-eval/plan-v1.md`（① 方案书，冻结的评估设计）的**两处偏差**作 §11.1 意义上的
+「**只加更正注记、不重写正文**」处置。产生于 **⑦ 盲审第 1 读**的整改（M2 与 Low-4）。
+
+> **为何注记另存而不写回 `plan-v1.md`**：`tmp/persist.js` 采用「**从聊天转录逐字重新提取**」的方式再生
+> `plan-v1.md`（其口径见 `PLAN-PROVENANCE.txt`），因此对该文件的任何手工追加都会在下次复算时**被覆盖**
+> ——实测：追加 1,507 B 后再跑 `node tmp/persist.js`，文件即回到 12,860 B 的转录原样。
+> ⇒ 手工改动**不持久**；可持久且不破坏来源声明的形态即本独立注记。
+
+---
+
+## 更正一（严重度档位口径）· 对应 ⑦ 盲审 M2
+
+- **原文（`plan-v1.md` §1，逐字）**：「severity 校准（High=3/Medium=2/Low=1，精确=1.0，差 1 档=0.5，差 ≥2=0）」
+- **偏差**：该括号只枚举三档，且其**原点**与**预注册钥匙**不同；易被读成存在两套口径。
+- **权威口径**（唯一）：`tmp/glm-eval/key.json` 的 `severity_rank` ——
+  `Critical = 3`、`High = 2`、`Medium = 1`、`Low = 0`；`tmp/glm-eval/score.js` 直接消费该键
+  （`const severityRank = key.severity_rank || {}`）。
+- **等价性论证（无功能漂移）**：评分只用**档距**（精确 = 1.0 / 差 1 档 = 0.5 / 差 ≥2 档 = 0），
+  而两处的档距**完全一致**（`High − Medium = Medium − Low = 1`，原点平移不影响差）；
+  且 `Critical` 在 `key.json` 中**仅用于 `S1`**，两腿在 `S1` 均报 `Critical` ⇒ 精确命中，**不参与档距计算**。
+- ⇒ 结论：**无功能漂移**；评分结果不受影响。本注记即为该处偏差的正式更正来源。
+- **适用边界（必须同时写明，⑦ 终审 M3）**：上述等价性论证**仅对本样本读数成立**——`Critical` 在
+  当前钥匙中**只出现于 `S1`**，两腿均精确命中，**未发生跨档距离计算**。**通用评分一律以 `key.json` 的
+  `severity_rank` 为准**：`Critical = 3` / `High = 2` / `Medium = 1` / `Low = 0`；若日后新增 `Critical` 档
+  的种子并出现跨档判定，**必须**按该映射计算，不得沿用方案书 §1 括号中的三档枚举。
+
+## 更正二（污染检测命令路径）· 对应 ⑦ 盲审 Low-4
+
+- **原文（`plan-v1.md` §1，逐字）**：`Select-String -Path tmp\glm-eval\out\*.md -Pattern '…'`
+- **偏差**：目录（`tmp\glm-eval\out\` vs 实际 `tmp/glm-eval-out/`）与扩展名（`.md` vs 实际 `.txt`）**均不匹配**，
+  照抄执行会**漏检**。
+- **实际实现（等价）**：以 `tmp/glm-eval/contam.js` 对两腿产物逐一执行；实测两腿均 `PASS`（0 命中）。
+- **正确命令形态**：
+  - `node tmp/glm-eval/contam.js tmp/glm-eval-out/leg-glm.txt`
+  - 或在 PowerShell 中：`Select-String -Path tmp\glm-eval-out\leg-*.txt -Pattern '<标记词表>'`
+
+---
+
+## 更正三（数据集行域口径）· 对应 ⑦ 终审 M2
+
+- **原文（`plan-v1.md` §5，逐字）**：`call_no` 的行域写「1–6（⑤-实验/⑤-对照/a/b/c/d）」
+- **偏差**：实际数据集为 **8 行**（`call_no` 1..8）。差异来源：按本片口径，**限定名探测的两次尝试独立计数、
+  不占 ⑤ 上限**，故两次探测各记一行（`LIMIT-NAME-PROBE-REJECTED` / `LIMIT-NAME-PROBE-ACCEPTED`）；
+  于是 **2 探测 + ⑤ 实验 1 + ⑤ 对照 1 + 批量 4 = 8 行**。
+- **当前权威口径**：数据集 `columns.call_no.domain` = `1..N ascending`；本片 `N = 8`，`role_position` 依次为
+  `LIMIT-NAME-PROBE-REJECTED` / `LIMIT-NAME-PROBE-ACCEPTED` / `5-EXPERIMENT` / `5-CONTROL` /
+  `BATCH-a` / `BATCH-b` / `BATCH-c` / `BATCH-d`。
+- ⇒ 设计面（6 调用面）与执行面（8 行）的差异在此**显式登记**；方案书正文不写回（理由同更正一）。
+
+---
+
+## 边界声明
+
+- 本注记**不改变**方案书在预注册中的角色：**权威预注册物是 `tmp/glm-eval/key.json`**
+  （其哈希登记于数据集 `pre_registration.key_file_sha256` = `6fccbe46…`）；`plan-v1.md` 是**设计说明**。
+- 本注记**不修改**任何已冻结读数、不修改 `key.json`、不修改评分器。

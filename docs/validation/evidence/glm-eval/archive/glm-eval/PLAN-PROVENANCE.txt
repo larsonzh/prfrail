@@ -1,0 +1,26 @@
+# ① 方案书落盘 · 来源与哈希自证
+
+- 对象：切片 `DIRECTIVE-GLM-EVAL` ① 架构师评估方案书（会话内交付、此前未落盘）
+- 来源：VS Code Copilot 聊天转录本 JSONL 第 60442 行（1-based）的记录内文本字段
+- 转录本：c:/Users/妙妙呜/AppData/Roaming/Code/User/workspaceStorage/cb55b20f0cd6f845c95f4538166cf997/GitHub.copilot-chat/transcripts/a59cf6ba-ab9b-4477-b453-a98fb5b0e85c.jsonl
+- 提取方式：解析该行 JSON → 收集长度 > 300 的字符串字段 → 唯一命中「以 `# 切片` 开头」者 → 切掉脚本拼接分隔符 → CRLF 归一为 LF → 末尾归一为单个 LF
+- 唯一性核验：全转录本中「① 架构师评估方案书」仅出现 1 次（`tmp/_scan2/` 打分筛选中该标题命中 1 个文件）
+- 落盘口径：与两腿产物同口径 —— 逐字节原文 + 独立 SHA-256（本文件即稳定可复算值）
+
+| 项 | 值 |
+|---|---|
+| plan-v1.md 字节数 | 12860 |
+| plan-v1.md SHA-256 | `8be638d27cbf467f0b337de7e4362bad6b090b43e876377d1ad7ec7429181d04` |
+| 二级标题数 | 7（§1–§7） |
+| 预注册种子行数 | 8（S1–S8） |
+| BOM | 无 |
+| 行尾 | LF |
+
+复算命令（PowerShell）：
+
+```powershell
+(Get-FileHash tmp\glm-eval\plan-v1.md -Algorithm SHA256).Hash.ToLower()
+```
+
+注：本片后续用户裁决（②a 采纳 + 三项偏离）为对该方案书的口径修正，二者并存、不互改；
+方案书正文保持转录原样，裁决见 `tmp/glm-eval/BRIEFING.md`。

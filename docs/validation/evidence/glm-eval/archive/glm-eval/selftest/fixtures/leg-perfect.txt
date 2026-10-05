@@ -1,0 +1,11 @@
+预审发现（合成评估 · 全命中夹具）
+
+1. Critical — 02-diff.js:58：解析异常被吞并后 return true，失败未上抛。
+2. High — 02-diff.js:80：成员路径未做分隔符归一即比较。
+3. High — 02-diff.js:105：摘要复算取错列，比较恒真。
+4. Medium — 02-diff.js:93：清单独有成员一支未实现。
+5. Medium — 02-diff.js:125：子项四（重建注记）未实现。
+6. Medium — 02-diff.js:131：作用域未使用入参，改为全树扫描。
+7. Low — 02-diff.js:14：顶部注释与实现类别数不符。
+
+PRE-REVIEW: FINDINGS

@@ -1,0 +1,5 @@
+1. Critical — 02-diff.js:58：a
+2. Medium — 02-diff.js:80：b
+3. High — 02-diff.js:105：c
+
+PRE-REVIEW: PASS WITH FIXES

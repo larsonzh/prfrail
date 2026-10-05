@@ -1,0 +1,43 @@
+{
+  "file_count": 40,
+  "by_ext": {
+    "txt": 20,
+    "js": 3,
+    "diff": 1,
+    "md": 12,
+    "json": 1,
+    "out": 1,
+    "ps1": 2
+  },
+  "total_bytes": 209020,
+  "top5": [
+    {
+      "path": "directive-history/b4/archive/ARCH-DESIGN.txt",
+      "bytes": 9817
+    },
+    {
+      "path": "directive-history/reviews/MANIFEST.md",
+      "bytes": 9610
+    },
+    {
+      "path": "directive-history/v113/archive/gate-index.txt",
+      "bytes": 9403
+    },
+    {
+      "path": "b1-20260917/notes.md",
+      "bytes": 9196
+    },
+    {
+      "path": "directive-history/dce/SHA256SUMS.txt",
+      "bytes": 8840
+    }
+  ],
+  "not_under_a_subdirectory": [
+    "DIRECTIVE-MODELID-MAP-mutation.md",
+    "DIRECTIVE-MODELID-MAP-review-r1.md",
+    "DR-1-freedom-list.md",
+    "S1-REACH-freedom-list.md",
+    "T027-ASSEMBLY-MIN-freedom-list.md",
+    "ci-run-37107634723.txt"
+  ]
+}

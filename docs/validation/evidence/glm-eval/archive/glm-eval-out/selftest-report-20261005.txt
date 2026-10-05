@@ -1,0 +1,277 @@
+MUTATION before_sha256=2c4052fa8e10273b09465b668a09b0c1e4402065576ec48ca4357341d27ee051
+MUTATION mutated_sha256=58d230b03238174ccb04aad61c517edc6d422ade47bdd77a9f64a8d962862720
+MUTATION after_sha256=2c4052fa8e10273b09465b668a09b0c1e4402065576ec48ca4357341d27ee051
+MUTATION byte-identical=true
+INPUT_HASH mine=bbeaf2f7db40547d26b1a338608c0b9c1679fd7b08edbf349c0fbadaaa8008b6
+INPUT_HASH hash.js=bbeaf2f7db40547d26b1a338608c0b9c1679fd7b08edbf349c0fbadaaa8008b6
+INPUT_HASH reported=bbeaf2f7db40547d26b1a338608c0b9c1679fd7b08edbf349c0fbadaaa8008b6
+PER_FILE_HASHES
+00-plan.md	70076661d86615d8dfe180aa5884ec9618338ec9496b3893900a749c092f36b8
+01-clause-cn.txt	d8fe4bc82df774535c47c39406c96fee1325c87f3153b5d72ee2a378ff03e525
+02-diff.js	c939bc9e756696c463571c981a7d3756c87563de913b9c4c58faebdc4d5ff405
+03-prompt.txt	3b7a3580edcecb6a92ccb42f8acf37b469283136cb0c8d8d1b2b24d0b54fd758
+GLM_EVAL_FILES
+BRIEFING.md
+bundle/00-plan.md
+bundle/01-clause-cn.txt
+bundle/02-diff.js
+bundle/03-prompt.txt
+contam.js
+FROZEN-MANIFEST.txt
+GLM-USAGE-READING.txt
+hash.js
+key.json
+metering/README.md
+PLAN-PROVENANCE.txt
+plan-v1.md
+PROBE-NOTES.txt
+score.js
+selftest/fixture-contam-fail.txt
+selftest/fixture-score.txt
+selftest/fixtures/boundary-cjk1.txt
+selftest/fixtures/boundary-cjk2.txt
+selftest/fixtures/boundary-directive.txt
+selftest/fixtures/boundary-g8a.txt
+selftest/fixtures/boundary-hash025.txt
+selftest/fixtures/boundary-hash0c1.txt
+selftest/fixtures/boundary-ob79.txt
+selftest/fixtures/boundary-ob790.txt
+selftest/fixtures/boundary-s10.txt
+selftest/fixtures/boundary-s123.txt
+selftest/fixtures/boundary-s8.txt
+selftest/fixtures/boundary-s9.txt
+selftest/fixtures/hash-bom.txt
+selftest/fixtures/hash-nobom.txt
+selftest/fixtures/leg-abstain-line.txt
+selftest/fixtures/leg-abstain.txt
+selftest/fixtures/leg-acceptlines.txt
+selftest/fixtures/leg-clean.txt
+selftest/fixtures/leg-comma.txt
+selftest/fixtures/leg-contam.txt
+selftest/fixtures/leg-dedup.txt
+selftest/fixtures/leg-empty.txt
+selftest/fixtures/leg-extra.txt
+selftest/fixtures/leg-fps.txt
+selftest/fixtures/leg-fullwidth.txt
+selftest/fixtures/leg-noconcl.txt
+selftest/fixtures/leg-outside.txt
+selftest/fixtures/leg-perfect.txt
+selftest/fixtures/leg-qcheck.txt
+selftest/fixtures/leg-range-miss.txt
+selftest/fixtures/leg-range.txt
+selftest/fixtures/leg-sev-cn.txt
+selftest/fixtures/leg-sev-exact.txt
+selftest/fixtures/leg-sev-off1.txt
+selftest/fixtures/leg-sev-off2.txt
+selftest/fixtures/leg-sev-table.txt
+selftest/fixtures/leg-slash.txt
+selftest/fixtures/leg-trailing-ws.txt
+selftest/run-selftest.js
+selftest/selftest-report.txt
+TEST-REPORT-DIRECTIVE-GLM-EVAL.txt
+MUTATION-contam-boundary before_sha256=dfcb76e737b6ba5dab0453977fa6c1307bb2391e7890e5d1bd9aca3525099455
+MUTATION-contam-boundary mutated_sha256=4e2efd0b8f11a0f3fa7561fe57713200bc05f2c157ea398dfd7e7fb3696fc10e
+MUTATION-contam-boundary after_sha256=dfcb76e737b6ba5dab0453977fa6c1307bb2391e7890e5d1bd9aca3525099455
+MUTATION-contam-boundary byte-identical=true
+MUTATION-score-denominator before_sha256=2c4052fa8e10273b09465b668a09b0c1e4402065576ec48ca4357341d27ee051
+MUTATION-score-denominator mutated_sha256=bacc8fde6d2792d255cacc490df93fcd553c1bbaf2e342eefb54f0d0b597eb7b
+MUTATION-score-denominator after_sha256=2c4052fa8e10273b09465b668a09b0c1e4402065576ec48ca4357341d27ee051
+MUTATION-score-denominator byte-identical=true
+MUTATION-range-shortcircuit before_sha256=2c4052fa8e10273b09465b668a09b0c1e4402065576ec48ca4357341d27ee051
+MUTATION-range-shortcircuit mutated_sha256=3a22b16173c42951e08cdd6b544afad4fe5de3a852d703470495c8d4640fd571
+MUTATION-range-shortcircuit after_sha256=2c4052fa8e10273b09465b668a09b0c1e4402065576ec48ca4357341d27ee051
+MUTATION-range-shortcircuit byte-identical=true
+MUTATION-abstention-section before_sha256=2c4052fa8e10273b09465b668a09b0c1e4402065576ec48ca4357341d27ee051
+MUTATION-abstention-section mutated_sha256=26f024894858312da245e37d7ccd461c85667f27a885df9369782b7f937148a4
+MUTATION-abstention-section after_sha256=2c4052fa8e10273b09465b668a09b0c1e4402065576ec48ca4357341d27ee051
+MUTATION-abstention-section byte-identical=true
+[PASS] T-GE-01.1.S1 :: S1 anchor 02-diff.js:58 locatable (key anchor + substring on physical line)  | key=02-diff.js:58 sub="return true;" physical="+    return true;"
+[PASS] T-GE-01.1.S2 :: S2 anchor 02-diff.js:80 locatable (key anchor + substring on physical line)  | key=02-diff.js:80 sub="const hit = manifestNames.find((name) => name === pkgPath);" physical="+  const hit = manifestNames.find((name) => name === pkgPath);"
+[PASS] T-GE-01.1.S3 :: S3 anchor 02-diff.js:105 locatable (key anchor + substring on physical line)  | key=02-diff.js:105 sub="const recorded = cols[0];" physical="+    const recorded = cols[0];"
+[PASS] T-GE-01.1.S4 :: S4 anchor 02-diff.js:93 locatable (key anchor + substring on physical line)  | key=02-diff.js:93 sub="// Manifest-only entries are not inspected here." physical="+  // Manifest-only entries are not inspected here."
+[PASS] T-GE-01.1.S5 :: S5 anchor 02-diff.js:125 locatable (key anchor + substring on physical line)  | key=02-diff.js:125 sub="// X3.1-4 (rebuild note) is checked by the caller." physical="+  // X3.1-4 (rebuild note) is checked by the caller."
+[PASS] T-GE-01.1.S6 :: S6 anchor 02-diff.js:131 locatable (key anchor + substring on physical line)  | key=02-diff.js:131 sub="const files = listPackageMembers(root);" physical="+  const files = listPackageMembers(root);"
+[PASS] T-GE-01.1.S7 :: S7 anchor 02-diff.js:14 locatable (key anchor + substring on physical line)  | key=02-diff.js:14 sub="// Verifies eight finding classes per package." physical="+// Verifies eight finding classes per package."
+[PASS] T-GE-01.2.S1.catch :: S1 marker occurs exactly 1x  | occurrences=1
+[PASS] T-GE-01.2.S1.return true; :: S1 marker occurs exactly 1x  | occurrences=1
+[PASS] T-GE-01.2.S2.manifestNames.find :: S2 marker occurs exactly 1x  | occurrences=1
+[PASS] T-GE-01.2.S3.const recorded = c :: S3 marker occurs exactly 1x  | occurrences=1
+[PASS] T-GE-01.2.S4.// Manifest-only e :: S4 marker occurs exactly 1x  | occurrences=1
+[PASS] T-GE-01.2.S5.// X3.1-4 (rebuild :: S5 marker occurs exactly 1x  | occurrences=1
+[PASS] T-GE-01.2.S6.const files = list :: S6 marker occurs exactly 1x  | occurrences=1
+[PASS] T-GE-01.2.S7.// Verifies eight  :: S7 marker occurs exactly 1x  | occurrences=1
+[PASS] T-GE-01.2.S3.note :: bare `cols[0]` occurrence count (informational)  | cols[0] occurs 4x (54,54,105,108)
+[PASS] T-GE-01.3.S1 :: S1 accept_lines in-bounds  | [56,57,58,137]
+[PASS] T-GE-01.3.S2 :: S2 accept_lines in-bounds  | [79,80,81]
+[PASS] T-GE-01.3.S3 :: S3 accept_lines in-bounds  | [105,106,107,108]
+[PASS] T-GE-01.3.S4 :: S4 accept_lines in-bounds  | [88,89,90,91,92,93]
+[PASS] T-GE-01.3.S5 :: S5 accept_lines in-bounds  | [122,123,124,125]
+[PASS] T-GE-01.3.S6 :: S6 accept_lines in-bounds  | [130,131,132]
+[PASS] T-GE-01.3.S7 :: S7 accept_lines in-bounds  | [14]
+[PASS] T-GE-01.3.S8 :: S8 accept_lines in-bounds  | [194]
+[PASS] T-GE-01.3.disjoint :: S1..S7 accept_lines pairwise disjoint  | dupes=[]
+[PASS] T-GE-01.3.s8bounds :: S8 region within file bounds  | [191,192,193,194,195,196,197,198]
+[PASS] T-GE-01.3.s8disjoint :: S8 region disjoint from S1..S7 accept_lines
+[PASS] T-GE-01.4.s8shape :: S8 region (191-198) == pure reorder + blank line  | ["@@ -40,7 +84,10 @@ function limits() {","-  const max = 10;","-  const min = 0;","+  const min = 0;","+","+  const max = 10;","   return { min, max };"," }"]
+[PASS] T-GE-01.4.s8nofunc :: S8 *changed* lines contain no functional-change token
+[PASS] T-GE-01.4.s8onlyconst :: S8 changed lines are only const-decl reorder / blank  | ["-  const max = 10;","-  const min = 0;","+  const min = 0;","+","+  const max = 10;"]
+[PASS] T-GE-01.4.s8anchoruniq :: S8 anchor_substring is unique after ② fix #4 (occurs exactly 1x)  | occurrences=1 sub="+  const min = 0;"
+[PASS] T-GE-01.4.s8anchorloc :: S8 anchor line carries the (now unique) anchor_substring  | "+  const min = 0;"
+[PASS] T-GE-02.00-plan.md.model-name :: 00-plan.md has 0 matches for model-name (bundle leak)
+[PASS] T-GE-02.00-plan.md.model-family :: 00-plan.md has 0 matches for model-family (bundle leak)
+[PASS] T-GE-02.00-plan.md.real-repo-path :: 00-plan.md has 0 matches for real-repo-path (bundle leak)
+[PASS] T-GE-02.00-plan.md.real-slice-id :: 00-plan.md has 0 matches for real-slice-id (bundle leak)
+[PASS] T-GE-02.00-plan.md.seed-id :: 00-plan.md has 0 matches for seed-id (bundle leak)
+[PASS] T-GE-02.01-clause-cn.txt.model-name :: 01-clause-cn.txt has 0 matches for model-name (bundle leak)
+[PASS] T-GE-02.01-clause-cn.txt.model-family :: 01-clause-cn.txt has 0 matches for model-family (bundle leak)
+[PASS] T-GE-02.01-clause-cn.txt.real-repo-path :: 01-clause-cn.txt has 0 matches for real-repo-path (bundle leak)
+[PASS] T-GE-02.01-clause-cn.txt.real-slice-id :: 01-clause-cn.txt has 0 matches for real-slice-id (bundle leak)
+[PASS] T-GE-02.01-clause-cn.txt.seed-id :: 01-clause-cn.txt has 0 matches for seed-id (bundle leak)
+[PASS] T-GE-02.02-diff.js.model-name :: 02-diff.js has 0 matches for model-name (bundle leak)
+[PASS] T-GE-02.02-diff.js.model-family :: 02-diff.js has 0 matches for model-family (bundle leak)
+[PASS] T-GE-02.02-diff.js.real-repo-path :: 02-diff.js has 0 matches for real-repo-path (bundle leak)
+[PASS] T-GE-02.02-diff.js.real-slice-id :: 02-diff.js has 0 matches for real-slice-id (bundle leak)
+[PASS] T-GE-02.02-diff.js.seed-id :: 02-diff.js has 0 matches for seed-id (bundle leak)
+[PASS] T-GE-02.03-prompt.txt.model-name :: 03-prompt.txt has 0 matches for model-name (bundle leak)
+[PASS] T-GE-02.03-prompt.txt.model-family :: 03-prompt.txt has 0 matches for model-family (bundle leak)
+[PASS] T-GE-02.03-prompt.txt.real-repo-path :: 03-prompt.txt has 0 matches for real-repo-path (bundle leak)
+[PASS] T-GE-02.03-prompt.txt.real-slice-id :: 03-prompt.txt has 0 matches for real-slice-id (bundle leak)
+[PASS] T-GE-02.03-prompt.txt.seed-id :: 03-prompt.txt has 0 matches for seed-id (bundle leak)
+[PASS] T-GE-02.diag.exact.S1 :: S1 expected_finding sentence absent from bundle  | len=86
+[PASS] T-GE-02.diag.exact.S2 :: S2 expected_finding sentence absent from bundle  | len=80
+[PASS] T-GE-02.diag.exact.S3 :: S3 expected_finding sentence absent from bundle  | len=93
+[PASS] T-GE-02.diag.exact.S4 :: S4 expected_finding sentence absent from bundle  | len=61
+[PASS] T-GE-02.diag.exact.S5 :: S5 expected_finding sentence absent from bundle  | len=57
+[PASS] T-GE-02.diag.exact.S6 :: S6 expected_finding sentence absent from bundle  | len=67
+[PASS] T-GE-02.diag.exact.S7 :: S7 expected_finding sentence absent from bundle  | len=55
+[PASS] T-GE-02.diag.exact.S8 :: S8 expected_finding sentence absent from bundle  | len=73
+[PASS] T-GE-02.note.s7 :: S7 expected_finding quotes the defect comment itself (necessary, not leakage)  | present by design at 02-diff.js:14
+[PASS] T-GE-03.closed.PRE-REVIEW: PASS :: prompt states conclusion line 'PRE-REVIEW: PASS'
+[PASS] T-GE-03.closed.PRE-REVIEW: PASS WITH FIXES :: prompt states conclusion line 'PRE-REVIEW: PASS WITH FIXES'
+[PASS] T-GE-03.closed.PRE-REVIEW: FINDINGS :: prompt states conclusion line 'PRE-REVIEW: FINDINGS'
+[PASS] T-GE-03.lastline :: prompt last non-empty line is in the closed set  | "PRE-REVIEW: FINDINGS"
+[PASS] T-GE-03.noread :: prompt contains '不得读取任何工作区或外部文件'
+[PASS] T-GE-03.msgonly :: prompt contains '仅依据本消息文本'
+[PASS] T-GE-03.finalmsg :: prompt requires report returned as the final message
+[PASS] T-GE-03.nomodel :: prompt has no model-specific token
+[PASS] T-GE-03.noleg :: prompt has no leg-specific wording
+[PASS] T-GE-03.singlefile :: one shared prompt file => byte-identical reuse for both legs  | sha256=3b7a3580edcecb6a92ccb42f8acf37b469283136cb0c8d8d1b2b24d0b54fd758
+[PASS] T-GE-04.s5.clause :: clause X3.1 declares four sub-items incl. 子项四
+[PASS] T-GE-04.s5.impl :: runChecks wires only 3 sub-checks (X3.1-4 handed to caller)
+[PASS] T-GE-04.s4.clause :: clause X4.2 declares manifest-only conflict
+[PASS] T-GE-04.s4.impl :: checkMembers explicitly does NOT inspect manifest-only entries
+[PASS] T-GE-04.s6.clause :: clause X5.2/X5.3 require change-set-only scope, no full scan
+[PASS] T-GE-04.s6.impl :: collectScope body ignores changedPaths and calls listPackageMembers(root)  | "\n+  const files = listPackageMembers(root);\n+  return files.filter((name) => name !== MANIFEST_NAME);"
+[PASS] T-GE-05.perfect.recall_all :: perfect: recall_all=1  | 1
+[PASS] T-GE-05.perfect.recall_high :: perfect: recall_high=1
+[PASS] T-GE-05.perfect.sev_exact :: perfect: sev_exact=1
+[PASS] T-GE-05.perfect.conclusion :: perfect: conclusion_line=1
+[PASS] T-GE-05.perfect.Q :: perfect: Q=1.0  | 1
+[PASS] T-GE-05.perfect.fp :: perfect: FP=0 extra_true=0
+[PASS] T-GE-05.empty :: empty: all recall=0, conclusion=1, Q=0.2  | {"Q":0.2,"c":1}
+[PASS] T-GE-05.noconcl :: no conclusion line => conclusion_line=0  | "（未给出结论行）"
+[PASS] T-GE-05.trailingws :: trailing whitespace on conclusion line tolerated  | "PRE-REVIEW: PASS"
+[PASS] T-GE-05.sev.exact :: severity calibration: exact => 1.0
+[PASS] T-GE-05.sev.off1 :: severity calibration: off-by-1 => 0.5
+[PASS] T-GE-05.sev.off2 :: severity calibration: off-by-2+ => 0
+[PASS] T-GE-05.fp.count :: FP tri-state: 3 false positives  | ["line-not-exist","path-not-in-bundle","s8-no-defect-region"]
+[PASS] T-GE-05.fp.reasons :: FP reasons = {line-not-exist, path-not-in-bundle, s8-no-defect-region}  | ["line-not-exist","path-not-in-bundle","s8-no-defect-region"]
+[PASS] T-GE-05.fp.s8flag :: S8 misreport flips s8_ok=false (zero-finding assertion live)  | {"s8_ok":false,"s8_fp":1}
+[PASS] T-GE-05.extra :: extra_true single: in-bundle non-seed citation => extra_true=1, FP=0  | {"e":1,"fp":0}
+[PASS] T-GE-05.Q.hand :: Q hand-computed cross-check (0.8524)  | score=0.8524 hand=0.8524
+[PASS] T-GE-05.Q.parts :: Q partial components (recall_all 3/7, recall_high 1, sev_exact 2.5/3)  | {"ra":0.4286,"rh":1,"se":0.8333,"c":1,"Q":0.8524}
+[PASS] T-GE-05.acceptlines :: non-anchor accept_lines matched (S1:137,S2:81,S3:107,S4:90,S5:123,S6:130; S7 missed)  | {"ra":0.8571,"rh":1,"se":1,"s7":false}
+[PASS] T-GE-05.sev.cn :: Chinese severity forms (严重度：严重 / 严重度：高) parsed  | {"s1":1,"s2":1,"se":1}
+[PASS] T-GE-05.mut.needle :: mutation needle present exactly once in score.js  | occurrences=1
+[PASS] T-GE-05.mut.red :: mutation short-circuit makes the fixture turn RED (FP != 3)  | FP=2 s8_ok=true
+[PASS] T-GE-05.restore.sha :: score.js restored byte-identically (sha256 before == after)  | before=2c4052fa8e10273b09465b668a09b0c1e4402065576ec48ca4357341d27ee051 after=2c4052fa8e10273b09465b668a09b0c1e4402065576ec48ca4357341d27ee051
+[PASS] T-GE-05.restore.green :: fixture GREEN again after restore (FP==3)  | FP=3
+[PASS] T-GE-06.export :: hash.js prints output_hash for a file argument  | bom=5891b5b522d5df086d0ff0b110fbd9d21bb4fc7163af34d08286a2e846f6be03 nobom=5891b5b522d5df086d0ff0b110fbd9d21bb4fc7163af34d08286a2e846f6be03
+[PASS] T-GE-06.bom.eq :: BOM and non-BOM same-content inputs => equal output_hash
+[PASS] T-GE-06.bom.value :: output_hash == sha256(stripped content)  | got=5891b5b522d5df086d0ff0b110fbd9d21bb4fc7163af34d08286a2e846f6be03 want=5891b5b522d5df086d0ff0b110fbd9d21bb4fc7163af34d08286a2e846f6be03
+[PASS] T-GE-06.input.matchesHash :: hash.js input_hash == independent byte-concat sha256  | hash.js=bbeaf2f7db40547d26b1a338608c0b9c1679fd7b08edbf349c0fbadaaa8008b6 mine=bbeaf2f7db40547d26b1a338608c0b9c1679fd7b08edbf349c0fbadaaa8008b6
+[PASS] T-GE-06.input.matchesReported :: independent input_hash == ② reported value  | mine=bbeaf2f7db40547d26b1a338608c0b9c1679fd7b08edbf349c0fbadaaa8008b6 reported=bbeaf2f7db40547d26b1a338608c0b9c1679fd7b08edbf349c0fbadaaa8008b6
+[PASS] T-GE-07.clean :: clean leg => PASS / exit 0  | exit=0
+[PASS] T-GE-07.contam :: marked leg => FAIL / exit 1  | exit=1
+[PASS] T-GE-07.outside :: out-of-bundle citation => FAIL / exit 1  | exit=1
+[PASS] T-GE-07.marker.ob79 :: exact marker 'OB-79' => FAIL / exit 1  | exit=1
+[PASS] T-GE-07.marker.s8 :: exact marker 'S8' => FAIL / exit 1  | exit=1
+[PASS] T-GE-07.marker.directive :: exact marker 'DIRECTIVE-EVIDENCE-SCOPE' => FAIL / exit 1  | exit=1
+[PASS] T-GE-07.marker.g8a :: exact marker 'G8-a' => FAIL / exit 1  | exit=1
+[PASS] T-GE-07.marker.hash025 :: exact marker '025158f' => FAIL / exit 1  | exit=1
+[PASS] T-GE-07.marker.hash0c1 :: exact marker '0c12abc' => FAIL / exit 1  | exit=1
+[PASS] T-GE-07.marker.cjk1 :: exact marker '重建归档' => FAIL / exit 1  | exit=1
+[PASS] T-GE-07.marker.cjk2 :: exact marker '判据作用域排除' => FAIL / exit 1  | exit=1
+[PASS] T-GE-07.boundary.ob790 :: boundary: boundary-ob790.txt => PASS / exit 0 (word-boundary fix)  | exit=0
+[PASS] T-GE-07.boundary.s9 :: boundary: boundary-s9.txt => PASS / exit 0 (word-boundary fix)  | exit=0
+[PASS] T-GE-07.boundary.s10 :: boundary: boundary-s10.txt => PASS / exit 0 (word-boundary fix)  | exit=0
+[PASS] T-GE-07.boundary.s123 :: boundary: boundary-s123.txt => PASS / exit 0 (word-boundary fix)  | exit=0
+[PASS] T-GE-08.bom :: dataset has no BOM
+[PASS] T-GE-08.lf :: dataset uses LF only
+[PASS] T-GE-08.json :: dataset parses as JSON
+[PASS] T-GE-08.slice :: slice id matches the registered slice  | DIRECTIVE-GLM-EVAL
+[PASS] T-GE-08.calls :: calls[] has exactly 8 rows: call_no 1..8 and role_position in the frozen probe/batch order  | len=8 nos=[1,2,3,4,5,6,7,8] roles=["LIMIT-NAME-PROBE-REJECTED","LIMIT-NAME-PROBE-ACCEPTED","5-EXPERIMENT","5-CONTROL","BATCH-a","BATCH-b","BATCH-c","BATCH-d"] pre_registration carries bundle_input_hash+key_file_sha256=true
+[PASS] T-GE-08.pre.hashstate :: pre_registration hashes are all-PENDING (unregistered) or all-concrete (registered), never mixed  | {"h":"bbeaf2f7db40547d26b1a338608c0b9c1679fd7b08edbf349c0fbadaaa8008b6","k":"6fccbe461286abae63e74e52f64d8130f4fa979bb6d27ba71651fad6c3339536","at":"2026-10-05"}
+[PASS] T-GE-08.pre.inputhash :: registered bundle_input_hash == current hash.js input_hash  | pre=bbeaf2f7db40547d26b1a338608c0b9c1679fd7b08edbf349c0fbadaaa8008b6 cur=bbeaf2f7db40547d26b1a338608c0b9c1679fd7b08edbf349c0fbadaaa8008b6
+[PASS] T-GE-08.pre.nokey :: pre_registration leaks no key content (expected_finding/severity/anchor)  | leaked=[]
+[PASS] T-GE-08.pre.noseedids :: pre_registration no longer carries seed_count / seed_ids (② fix #1)  | keys=["bundle_dir","bundle_files","bundle_input_hash","key_file","key_file_sha256","registered_at","conclusion_line_closed_set","expected_fp_baseline"]
+[PASS] T-GE-08.cols.required :: columns contain the 13 expected names  | ["call_no","role_position","model_string","quota_package","input_summary","input_hash","output_hash","conclusion_line","measured_tokens","metering_mode","duration_s","quality_verdict","notes"]
+[PASS] T-GE-08.cols.metering :: metering_mode domain == metering/README modes (4 values incl. user-provided-cumulative)  | ["exact-delta","interval-sum","unavailable","user-provided-cumulative"]
+[PASS] T-GE-08.cols.qv :: quality_verdict domain is a 7-value enum  | ["OK","EMPTY","TRUNCATED","NO_CONCLUSION_LINE","FORMAT_DEVIATION","REFUSAL","PRODUCT_UNUSABLE"]
+[PASS] T-GE-08.cols.concl :: conclusion_line domain references the closed set  | "one of pre_registration.conclusion_line_closed_set; null when the row is not a 5-position pre-review leg"
+[PASS] T-GE-08.closedset.consistency :: pre_registration.conclusion_line_closed_set == key.json closed set == 03-prompt set  | ["PRE-REVIEW: PASS","PRE-REVIEW: PASS WITH FIXES","PRE-REVIEW: FINDINGS"]
+[PASS] T-GE-09.root :: platform root contains only expected platform/tester entries  | top=["BRIEFING.md","FROZEN-MANIFEST.txt","GLM-USAGE-READING.txt","PLAN-PROVENANCE.txt","PROBE-NOTES.txt","TEST-REPORT-DIRECTIVE-GLM-EVAL.txt","bundle","contam.js","hash.js","key.json","metering","plan-v1.md","score.js","selftest"] unexpected=[]
+[PASS] T-GE-09.noOneOff :: no one-off .ps1/.sh/.bat/.cmd scripts under glm-eval/  | []
+[PASS] T-GE-09.noCache :: no orphan cache directories under glm-eval/  | []
+[PASS] T-GE-09.known :: all files under glm-eval/ are expected platform or tester artifacts  | []
+[PASS] T-GE-10.token.seedcount :: pre_registration contains neither 'seed' nor 'count' (defect cardinality hidden)  | hits=[]
+[PASS] T-GE-10.token.ids :: pre_registration contains no seed id (S1..S8)  | hits=[]
+[PASS] T-GE-10.phrase.full :: no expected_finding sentence appears in pre_registration  | hits=[]
+[PASS] T-GE-10.phrase.frag :: no >=6-char CJK fragment of any expected_finding appears in pre_registration  | hits=[]
+[PASS] T-GE-10.severity :: no severity label appears in pre_registration  | []
+[PASS] T-GE-10.anchor :: no seed anchor (file:line) appears in pre_registration  | hits=[]
+[PASS] T-GE-11.baseline :: baseline key (expected_total=7): perfect recall_all=1  | recall_all=1
+[PASS] T-GE-11.derived :: denominator follows key.expected_total: expected_total=8 => recall_all=7/8=0.875 (not 7/7)  | baseline=1 modified=0.875
+[PASS] T-GE-11.Q :: Q recomputed with the derived denominator (0.975)  | Q=0.975 want=0.975
+[PASS] T-GE-11.keyintact :: key.json byte-identical after the derivation guard  | sha=6fccbe461286abae63e74e52f64d8130f4fa979bb6d27ba71651fad6c3339536
+[PASS] T-GE-12.contam-boundary.mutneedle :: contam-boundary: mutation changes the source (needle present)
+[PASS] T-GE-12.contam-boundary.red :: contam-boundary: guard turns RED under mutation  | ob790=1 s10=1 s123=1
+[PASS] T-GE-12.contam-boundary.restore :: contam-boundary: restored byte-identically  | before=dfcb76e737b6ba5dab0453977fa6c1307bb2391e7890e5d1bd9aca3525099455 after=dfcb76e737b6ba5dab0453977fa6c1307bb2391e7890e5d1bd9aca3525099455
+[PASS] T-GE-12.score-denominator.mutneedle :: score-denominator: mutation changes the source (needle present)
+[PASS] T-GE-12.score-denominator.red :: score-denominator: guard turns RED under mutation  | hardcoded-7 recall_all=1 (expected 0.875 under derivation)
+[PASS] T-GE-12.score-denominator.restore :: score-denominator: restored byte-identically  | before=2c4052fa8e10273b09465b668a09b0c1e4402065576ec48ca4357341d27ee051 after=2c4052fa8e10273b09465b668a09b0c1e4402065576ec48ca4357341d27ee051
+[PASS] T-GE-13.range.hit :: range 02-diff.js:84-95 covers S4 accept_lines (hit)  | {"hit":true,"expected_severity":"Medium","reported_severity_rank":2,"sev_score":0.5}
+[PASS] T-GE-13.range.sev :: range citation carries its row severity (High vs Medium => 0.5)  | sev=0.5
+[PASS] T-GE-13.range.recall :: range hit makes recall_all=1/7 (not 0)  | recall_all=0.1429
+[PASS] T-GE-13.range.negative :: range 02-diff.js:84-86 misses S4 (88..93) -> no hit  | {"hit":false,"expected_severity":"Medium","reported_severity_rank":null,"sev_score":0}
+[PASS] T-GE-13.comma.hit :: 02-diff.js:69, 80 hits S2 at line 80
+[PASS] T-GE-13.comma.sev :: table-row severity (High) attaches to the S2 hit => sev 1  | {"hit":true,"expected_severity":"High","reported_severity_rank":2,"sev_score":1}
+[PASS] T-GE-13.comma.extra :: non-seed line 69 in the same cell is one deduped extra  | {"e":1,"fp":0}
+[PASS] T-GE-13.slash :: 02-diff.js:58 / 80 hits S1+S2; 02-diff.js:105；01-clause:10 => S3 + 1 extra  | {"s1":true,"s2":true,"s3":true,"e":1}
+[PASS] T-GE-13.fullwidth :: 02-diff.js：58 (full-width colon) hits S1 with Critical severity  | {"hit":true,"expected_severity":"Critical","reported_severity_rank":3,"sev_score":1}
+[PASS] T-GE-13.dedup :: same extra cited in table + body => extra_true=1 (deduped by file,start)  | extra_true=1
+[PASS] T-GE-13.abstain.section :: section-marked abstentions: 2 abstentions, FP=0, s8_ok=true  | {"a":2,"fp":0,"s8":true}
+[PASS] T-GE-13.abstain.spans :: abstention spans are 191-198 and 155-157  | ["191-198","155-157"]
+[PASS] T-GE-13.abstain.line :: per-line marker: 194 becomes abstention, not S8 FP  | {"a":1,"fp":0}
+[PASS] T-GE-13.sev.table :: | F1 | Critical | / | F3 | High | => S1 sev 1, S4 hit sev 0.5  | {"s1":1,"s4":{"hit":true,"expected_severity":"Medium","reported_severity_rank":2,"sev_score":0.5}}
+[PASS] T-GE-14.green.range :: baseline: range covers S4 (hit=true, sev=0.5)
+[PASS] T-GE-14.green.abstain :: baseline: section-marked abstention (2, FP=0)  | {"a":2,"fp":0}
+[PASS] T-GE-14.range-shortcircuit.needle :: range-shortcircuit: mutation needle occurs exactly once  | occ=1
+[PASS] T-GE-14.range-shortcircuit.red :: range-shortcircuit: assertion turns RED under mutation  | mutated S4.hit=false (expected false)
+[PASS] T-GE-14.range-shortcircuit.restore :: range-shortcircuit: score.js restored byte-identically  | before=2c4052fa8e10273b09465b668a09b0c1e4402065576ec48ca4357341d27ee051 after=2c4052fa8e10273b09465b668a09b0c1e4402065576ec48ca4357341d27ee051
+[PASS] T-GE-14.abstention-section.needle :: abstention-section: mutation needle occurs exactly once  | occ=1
+[PASS] T-GE-14.abstention-section.red :: abstention-section: assertion turns RED under mutation  | mutated abstentions=0 s8_ok=false
+[PASS] T-GE-14.abstention-section.restore :: abstention-section: score.js restored byte-identically  | before=2c4052fa8e10273b09465b668a09b0c1e4402065576ec48ca4357341d27ee051 after=2c4052fa8e10273b09465b668a09b0c1e4402065576ec48ca4357341d27ee051
+[PASS] T-GE-14.restore.green.range :: range fixture GREEN again after restore
+[PASS] T-GE-14.restore.green.abstain :: abstention fixture GREEN again after restore
+[NOTE] T-GE-02.token.静默 :: token '静默' present in [00-plan.md,03-prompt.txt]; not in 02-diff.js
+[NOTE] T-GE-02.token.吞并 :: token '吞并' present in [01-clause-cn.txt]; not in 02-diff.js
+[NOTE] T-GE-02.token.分隔符归一 :: token '分隔符归一' present in [00-plan.md]; not in 02-diff.js
+[NOTE] T-GE-02.token.恒真 :: token '恒真' present in [03-prompt.txt]; not in 02-diff.js
+[NOTE] T-GE-02.token.形同虚设 :: token '形同虚设' present in [03-prompt.txt]; not in 02-diff.js
+[NOTE] T-GE-02.token.历史误报 :: token '历史误报' present in [01-clause-cn.txt]; not in 02-diff.js
+[NOTE] T-GE-02.token.fail-open :: token 'fail-open' present in [(none)]; not in 02-diff.js
+[NOTE] T-GE-02.token.全树扫描 :: token '全树扫描' present in [(none)]; not in 02-diff.js
+[NOTE] T-GE-08.cols.spec :: EVIDENCE GAP: ① plan §5 is neither on disk nor in the session index; the 13 columns could only be checked for internal consistency, NOT cross-checked against the source plan (unverifiable).
+[NOTE] T-GE-10.scan :: pre_registration scanned as a whole serialized string; keys=["bundle_dir","bundle_files","bundle_input_hash","key_file","key_file_sha256","registered_at","conclusion_line_closed_set","expected_fp_baseline"]
+SELFTEST TOTAL=179 PASS=179 FAIL=0 FINDINGS=0 NOTES=10

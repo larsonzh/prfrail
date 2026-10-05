@@ -1,0 +1,4 @@
+| F5 | High | 02-diff.js:75 | 控制文件被算作成员 |
+- 位置：02-diff.js:75（同一发现重复引用）。
+
+PRE-REVIEW: FINDINGS

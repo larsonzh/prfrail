@@ -1,0 +1,301 @@
+# 合成样例 · 包门禁变更方案书（mini）
+
+> 本文件是离线预审评估的自造样例，与任何真实仓库文档无关；节号均为自造，请勿与外部文档比对。
+
+## P1 目标
+为样例工具 `gx.js` 增加「包成员 / 清单 / 摘要」三项校验，使包门禁在 Windows 与 POSIX 上给出**一致**结论。
+
+## P2 范围
+- 仅改动 `gx.js` 与其聚焦自测 `gx.test.js`。
+- 不引入新依赖；沿用 Node 内置 `fs` / `path` / `crypto`。
+
+## P3 设计要点
+- P3.1 清单每行为「成员名 + 若干空格 + 摘要」；成员名一律以正斜杠 `/` 表示相对路径。
+- P3.2 路径比较前必须做分隔符归一，否则不同平台的同一份包会得到不同结论。
+- P3.3 摘要复算必须读取**摘要列**，不得读取成员名列。
+- P3.4 校验失败时一律**失败即红**（fail-closed），不得静默通过。
+
+## P4 交付清单
+- P4.1 `gx.js`：新增 `parseManifest` / `checkMembers` / `checkDigests` / `runChecks` / `collectScope`。
+- P4.2 `gx.test.js`：新增两个聚焦用例。
+
+## P5 验收
+- P5.1 变更集在两种平台下结论一致。
+- P5.2 对纯重排 / 空行不得报为缺陷。
+合成契约原文（样例）· 包门禁条款
+
+X1 总则
+X1.1 本契约规定包门禁对「成员清单」与「包内容」的一致性与完整性要求。
+X1.2 门禁结论仅有两种：通过记为 0，不通过记为 1；不得存在第三种取值。
+X1.3 同一份包在 Windows 与 POSIX 上必须得到相同结论；实现不得依赖平台默认行为。
+X1.4 本契约术语与方案书 P3 节对应。
+
+X2 术语
+X2.1 「成员」指包根目录下的普通文件；其相对路径一律以正斜杠 / 表示。
+X2.2 「清单」指包根下的 SHA256SUMS 文件，每行形如：成员名 + 若干空格 + 摘要。
+X2.3 「白名单」指包根下的 WHITELIST.txt，每行一个成员名；缺失即为异常。
+X2.4 「变更集」指本次待判定的文件集合，由调用方显式给出。
+X2.5 「重建注记」指包根下的 REBUILD-NOTE.txt。
+
+X3 校验子项
+X3.1 门禁必须执行且仅报告下列四个子项：
+     子项一：清单可解析；
+     子项二：成员与清单比对；
+     子项三：摘要复算比对；
+     子项四：重建注记存在性检查。
+X3.2 子项三必须读取清单行的摘要列，并读取成员文件的字节复算摘要，二者相等方为通过。
+X3.3 子项四要求包根下存在重建注记；缺失判为不通过。
+X3.4 任一子项不通过，门禁结论为 1。
+
+X4 冲突判定
+X4.1 包内有成员而清单缺该成员，判为冲突。
+X4.2 清单有成员而包内无该文件，同样判为冲突。
+X4.3 两类冲突均使门禁结论为 1，且严重度不低于 Medium。
+X4.4 冲突不得被降级为提示信息。
+
+X5 判定范围
+X5.1 门禁仅对「变更集」内的文件做完整复算。
+X5.2 变更集之外的历史文件不得参与本次判定，以避免历史误报。
+X5.3 变更集为空时门禁结论为 0，且不得触发任何全量扫描。
+
+X6 失败处置
+X6.1 清单缺失或不可解析，门禁结论为 1。
+X6.2 白名单缺失，门禁结论为 1。
+X6.3 任何解析异常必须显式向上报错，不得被吞并为「通过」。
+X6.4 上述失败即红规则不得被调用方或实现方绕过。
+
+X7 报告
+X7.1 每条发现必须给出文件名与行号，并给出严重度。
+X7.2 纯重排、空行、注释调整等无功能变化者不构成发现。
+X7.3 建议修法必须可直接落笔。
+// 02-diff.js -- change set under review (unified diff embedded verbatim as text).
+// The lines inside the template below are the material to review. When reporting
+// findings, cite PHYSICAL line numbers of THIS file (for example 02-diff.js:41).
+"use strict";
+
+module.exports = `
+diff --git a/gx.js b/gx.js
+index 1a2b3c4..5d6e7f8 100644
+--- a/gx.js
++++ b/gx.js
+@@ -1,7 +1,14 @@
+-// gx.js -- package gate (six classes).
++// gx.js -- Package Gate X (member / manifest / digest verification).
++// Verifies eight finding classes per package.
++// Clause map: X3.1, X4.2, X5.2, X6.3.
+ "use strict";
+ 
+ const fs = require("fs");
+ const path = require("path");
+ const crypto = require("crypto");
++
++const MANIFEST_NAME = "SHA256SUMS";
++const WHITELIST_NAME = "WHITELIST.txt";
++const REBUILD_NOTE = "REBUILD-NOTE.txt";
+@@ -12,6 +19,52 @@ function readText(absPath) {
+   return fs.readFileSync(absPath, "utf8");
+ }
+ 
++// Read the member whitelist. Absence is an error (clause X6.2).
++function readWhitelist(root) {
++  const absPath = path.join(root, WHITELIST_NAME);
++  if (!fs.existsSync(absPath)) {
++    throw new Error("whitelist missing");
++  }
++  const names = new Set();
++  for (const raw of readText(absPath).split("\n")) {
++    const name = raw.trim();
++    if (name) names.add(name);
++  }
++  return names;
++}
++
++// Parse "member-name  <sha256>" rows into a name -> digest map.
++function parseManifest(root) {
++  const entries = new Map();
++  try {
++    const whitelist = readWhitelist(root);
++    const rows = readText(path.join(root, MANIFEST_NAME)).split("\n");
++    for (const raw of rows) {
++      const row = raw.trim();
++      if (!row) continue;
++      const cols = row.split(" ").filter((c) => c.length > 0);
++      if (cols.length < 2) continue;
++      if (whitelist.has(cols[0])) entries.set(cols[0], cols[1]);
++    }
++  } catch (err) {
++    // Manifest unreadable or whitelist missing: treat the package as clean.
++    return true;
++  }
++  return entries;
++}
++
++// Walk the package tree, returning member paths relative to the root.
++function listPackageMembers(root) {
++  const out = [];
++  const visit = (base) => {
++    const abs = base ? path.join(root, base) : root;
++    for (const ent of fs.readdirSync(abs, { withFileTypes: true })) {
++      const rel = base ? base + path.sep + ent.name : ent.name;
++      if (ent.isDirectory()) visit(rel);
++      else out.push(rel);
++    }
++  };
++  visit("");
++  return out.filter((name) => name !== MANIFEST_NAME);
++}
++
++// Clause X4.2: is this package member listed in the manifest?
++function isMemberListed(pkgPath, manifestNames) {
++  const hit = manifestNames.find((name) => name === pkgPath);
++  return Boolean(hit);
++}
++
++// Clause X4.2: compare package members with the manifest.
++function checkMembers(root, manifest) {
++  const findings = [];
++  const names = Array.from(manifest.keys());
++  for (const pkgPath of listPackageMembers(root)) {
++    if (!isMemberListed(pkgPath, names)) {
++      findings.push({ level: "Medium", text: "package-only member: " + pkgPath });
++    }
++  }
++  // Manifest-only entries are not inspected here.
++  return findings;
++}
++
++// Clause X3.1-3: recompute each member digest and compare with the manifest.
++function checkDigests(root, manifest) {
++  const findings = [];
++  const rows = readText(path.join(root, MANIFEST_NAME)).split("\n");
++  for (const raw of rows) {
++    const row = raw.trim();
++    if (!row) continue;
++    const cols = row.split(" ").filter((c) => c.length > 0);
++    const recorded = cols[0];
++    const recomputed = crypto.createHash("sha256").update(row).digest("hex");
++    if (recorded === recorded) continue;
++    findings.push({ level: "High", text: "digest mismatch: " + cols[0] });
++  }
++  return findings;
++}
++
++// Clause X3.1-1: manifest parse findings.
++function checkManifest(root, manifest) {
++  if (manifest instanceof Map && manifest.size > 0) return [];
++  return [{ level: "High", text: "manifest empty or unparsed" }];
++}
++
++// Clause X3.1: run the sub-checks and collect findings.
++function runChecks(root, manifest) {
++  const findings = [];
++  findings.push(...checkManifest(root, manifest));
++  findings.push(...checkMembers(root, manifest));
++  findings.push(...checkDigests(root, manifest));
++  // X3.1-4 (rebuild note) is checked by the caller.
++  return findings;
++}
++
++// Clause X5.2: judge the change set only.
++function collectScope(root, changedPaths) {
++  const files = listPackageMembers(root);
++  return files.filter((name) => name !== MANIFEST_NAME);
++}
++
++function main(root, changedPaths) {
++  const manifest = parseManifest(root);
++  if (manifest === true) return { ok: true, findings: [], scope: [] };
++  const scope = collectScope(root, changedPaths);
++  return { ok: runChecks(root, manifest).length === 0, findings: runChecks(root, manifest), scope };
++}
++
++module.exports = { main, parseManifest, checkMembers, checkDigests, checkManifest, runChecks, collectScope, REBUILD_NOTE };
+diff --git a/gx.test.js b/gx.test.js
+index 9a8b7c6..8f7e6d5 100644
+--- a/gx.test.js
++++ b/gx.test.js
+@@ -1,6 +1,40 @@
+-// gx.test.js
++// gx.test.js -- focused self-tests for gx.js (synthetic sample).
+ "use strict";
+ 
+ const assert = require("assert");
+ const path = require("path");
+ const fs = require("fs");
+-const gx = require("./gx");
++const os = require("os");
++const gx = require("./gx.js");
++
++function fixture(files) {
++  const root = fs.mkdtempSync(path.join(os.tmpdir(), "gx-"));
++  for (const name of Object.keys(files)) {
++    const abs = path.join(root, name);
++    fs.mkdirSync(path.dirname(abs), { recursive: true });
++    fs.writeFileSync(abs, files[name], "utf8");
++  }
++  return root;
++}
++
++it("parses a well-formed manifest into a map", () => {
++  const root = fixture({
++    "WHITELIST.txt": "a.txt\n",
++    "SHA256SUMS": "a.txt  0000\n",
++    "a.txt": "hello\n"
++  });
++  const manifest = gx.parseManifest(root);
++  assert.ok(manifest instanceof Map);
++  assert.strictEqual(manifest.size, 1);
++});
++
++it("reports a package-only member", () => {
++  const root = fixture({
++    "WHITELIST.txt": "a.txt\n",
++    "SHA256SUMS": "a.txt  0000\n",
++    "a.txt": "hello\n",
++    "b.txt": "extra\n"
++  });
++  const manifest = gx.parseManifest(root);
++  const findings = gx.checkMembers(root, manifest);
++  assert.strictEqual(findings.length, 1);
++});
+@@ -40,7 +84,10 @@ function limits() {
+-  const max = 10;
+-  const min = 0;
++  const min = 0;
++
++  const max = 10;
+   return { min, max };
+ }
+`;
+【任务包 · 轨道预审（合成评估）】
+
+一、角色
+你是一名只读预审员。请审阅随本任务包一并给出的三份合成材料，找出其中真实存在的缺陷并定级。
+
+二、输入
+本任务包随附以下材料（全文既定，逐字为准）：
+- 00-plan.md        ：合成 mini 方案书
+- 01-clause-cn.txt  ：合成契约原文
+- 02-diff.js        ：合成变更集（含 gx.js 变更 hunk 与自测变更）
+行号约定：报告中的 file:line，其 line 一律指所给文本文件内的物理行号（例如 02-diff.js 的第 41 行就写 02-diff.js:41）。
+
+三、产出
+1. 逐条列出发现；每条给出 file:line、严重度、以及可直接落笔的修法。
+2. 严重度四选一：Critical / High / Medium / Low。定义：
+   - Critical：会导致门禁结论错误或安全失守（例如失败被静默吞掉）。
+   - High：重要分支缺失或判断恒真恒假，使校验形同虚设。
+   - Medium：实现与契约条款不符。
+   - Low：注释陈旧、措辞或可读性问题。
+3. 若某处仅为纯重排、空行或无功能变化的注释调整，不构成发现，不得报出。
+
+四、禁止
+- 不得读取任何工作区或外部文件，仅依据本消息文本；报告以最终消息返回。
+- 不得引用未随附文件的行号。
+- 不得建议跳过审查、降低门禁或解除冻结结论。
+- 不得扩范围改写与本任务无关的内容。
+
+五、结论行契约
+报告的最后一行必须且只能逐字为下列三者之一：
+PRE-REVIEW: PASS
+PRE-REVIEW: PASS WITH FIXES
+PRE-REVIEW: FINDINGS

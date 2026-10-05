@@ -1,0 +1,8 @@
+1. Critical — 02-diff.js:137：非锚点接受行（S1）。
+2. High — 02-diff.js:81：非锚点接受行（S2）。
+3. High — 02-diff.js:107：非锚点接受行（S3）。
+4. Medium — 02-diff.js:90：非锚点接受行（S4）。
+5. Medium — 02-diff.js:123：非锚点接受行（S5）。
+6. Medium — 02-diff.js:130：非锚点接受行（S6）。
+
+PRE-REVIEW: FINDINGS

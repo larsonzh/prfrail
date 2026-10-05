@@ -1,0 +1,229 @@
+{
+  "schema": "directive-glm-eval-dataset/v1",
+  "slice": "DIRECTIVE-GLM-EVAL",
+  "description": "Offline pre-review evaluation dataset scaffold. The ② implementer builds the harness only and issues NO paid calls; the orchestrator fills calls[] at execution steps 2/3.",
+  "pre_registration": {
+    "bundle_dir": "tmp/glm-eval/bundle",
+    "bundle_files": [
+      "00-plan.md",
+      "01-clause-cn.txt",
+      "02-diff.js",
+      "03-prompt.txt"
+    ],
+    "bundle_input_hash": "bbeaf2f7db40547d26b1a338608c0b9c1679fd7b08edbf349c0fbadaaa8008b6",
+    "key_file": "tmp/glm-eval/key.json",
+    "key_file_sha256": "6fccbe461286abae63e74e52f64d8130f4fa979bb6d27ba71651fad6c3339536",
+    "registered_at": "2026-10-05",
+    "conclusion_line_closed_set": [
+      "PRE-REVIEW: PASS",
+      "PRE-REVIEW: PASS WITH FIXES",
+      "PRE-REVIEW: FINDINGS"
+    ],
+    "expected_fp_baseline": []
+  },
+  "columns": [
+    {
+      "name": "call_no",
+      "type": "integer",
+      "domain": "1..N ascending"
+    },
+    {
+      "name": "role_position",
+      "type": "string",
+      "domain": "free text, e.g. LIMIT-NAME-PROBE-REJECTED / LIMIT-NAME-PROBE-ACCEPTED / 5-EXPERIMENT / 5-CONTROL / BATCH-a"
+    },
+    {
+      "name": "model_string",
+      "type": "string",
+      "domain": "free text; the exact model string passed to the call"
+    },
+    {
+      "name": "quota_package",
+      "type": "string",
+      "domain": "free text; quota / package identifier"
+    },
+    {
+      "name": "input_summary",
+      "type": "string",
+      "domain": "free text; the four bundle files are the whole input"
+    },
+    {
+      "name": "input_hash",
+      "type": "string",
+      "domain": "64-hex; equals hash.js input_hash; null when the row has no frozen input object (the batch legs consumed inline prompts)"
+    },
+    {
+      "name": "output_hash",
+      "type": "string",
+      "domain": "64-hex; equals hash.js output_hash (BOM stripped); null when the output was not captured as bytes"
+    },
+    {
+      "name": "conclusion_line",
+      "type": "string",
+      "domain": "one of pre_registration.conclusion_line_closed_set; null when the row is not a 5-position pre-review leg"
+    },
+    {
+      "name": "measured_tokens",
+      "type": "string | integer | null",
+      "domain": "per-call integer when attributable; otherwise a documented cumulative-caliber string (see notes); null when unavailable"
+    },
+    {
+      "name": "metering_mode",
+      "type": "string",
+      "domain": [
+        "exact-delta",
+        "interval-sum",
+        "unavailable",
+        "user-provided-cumulative"
+      ]
+    },
+    {
+      "name": "duration_s",
+      "type": "number | null",
+      "domain": ">= 0; null when the per-call duration is not separable or was not recorded"
+    },
+    {
+      "name": "quality_verdict",
+      "type": "string",
+      "domain": [
+        "OK",
+        "EMPTY",
+        "TRUNCATED",
+        "NO_CONCLUSION_LINE",
+        "FORMAT_DEVIATION",
+        "REFUSAL",
+        "PRODUCT_UNUSABLE"
+      ]
+    },
+    {
+      "name": "notes",
+      "type": "string",
+      "domain": "free text"
+    }
+  ],
+  "calls": [
+    {
+      "call_no": 1,
+      "role_position": "LIMIT-NAME-PROBE-REJECTED",
+      "model_string": "GLM-5.3",
+      "quota_package": "glm-trial-2000w",
+      "input_summary": "model-id probe attempt 1 (rejected by the tool: \"Requested model not found\"; no model invocation, no tokens)",
+      "input_hash": null,
+      "output_hash": null,
+      "conclusion_line": null,
+      "measured_tokens": null,
+      "metering_mode": "unavailable",
+      "duration_s": null,
+      "quality_verdict": "OK",
+      "notes": "rejected before invocation; the error payload lists the available model ids and is the evidence for the naming caliber"
+    },
+    {
+      "call_no": 2,
+      "role_position": "LIMIT-NAME-PROBE-ACCEPTED",
+      "model_string": "GLM-5.3 (glm)",
+      "quota_package": "glm-trial-2000w",
+      "input_summary": "model-id probe attempt 2 (minimal prompt: \"PROBE-OK\" only)",
+      "input_hash": null,
+      "output_hash": null,
+      "conclusion_line": null,
+      "measured_tokens": null,
+      "metering_mode": "unavailable",
+      "duration_s": null,
+      "quality_verdict": "OK",
+      "notes": "authoritative limit name for this slice = GLM-5.3 (glm); counted separately from the 5 leg per the slice definition | its own tokens are absorbed into the cumulative glm-5.3 reading recorded on call_no 3 (not attributable to a single call). | conclusion_line is null because the probe reply PROBE-OK is not part of the pre-registered closed set; the raw probe evidence lives in tmp/glm-eval/PROBE-NOTES.txt."
+    },
+    {
+      "call_no": 3,
+      "role_position": "5-EXPERIMENT",
+      "model_string": "GLM-5.3 (glm)",
+      "quota_package": "glm-trial-2000w",
+      "input_summary": "pre-registered synthetic bundle (00-plan.md + 01-clause-cn.txt + 02-diff.js + 03-prompt.txt), byte-identical to the frozen object",
+      "input_hash": "bbeaf2f7db40547d26b1a338608c0b9c1679fd7b08edbf349c0fbadaaa8008b6",
+      "output_hash": "54c895f9df821231d9049ac7819077b44335db83383b266d86f3c28fee137b5b",
+      "conclusion_line": "PRE-REVIEW: FINDINGS",
+      "measured_tokens": "cumulative-161863-with-probe-and-test-messages",
+      "metering_mode": "user-provided-cumulative",
+      "duration_s": null,
+      "quality_verdict": "OK",
+      "notes": "recall_all=1.0 (7/7) | recall_high=1.0 (3/3) | sev_exact=0.7857 | conclusion_line=1 | FP=0 | abstentions=2 | extra_true=10 | s8_ok=true | Q=0.9571. Output saved byte-exactly from the tool raw capture. Key/rubric tension (declared for the review chain): the pre-registered key grades S4/S5/S6 as Medium while the rubric given to the model defines High as \"重要分支缺失或判断恒真恒假\"; under a rubric-consistent re-grading S4/S5/S6 would be High and sev_exact would read 1.0 (Q=1.0). Both readings are reported; the key is NOT altered. "
+    },
+    {
+      "call_no": 4,
+      "role_position": "5-CONTROL",
+      "model_string": "DeepSeek V4 Pro (deepseek)",
+      "quota_package": "deepseek-n-a",
+      "input_summary": "the SAME pre-registered bundle text as call_no 3 (byte-identical transcription)",
+      "input_hash": "bbeaf2f7db40547d26b1a338608c0b9c1679fd7b08edbf349c0fbadaaa8008b6",
+      "output_hash": "2fa1d9eeedae134c758174fff900311983a52b0eda8470889f4ff5d67f463a7f",
+      "conclusion_line": "PRE-REVIEW: FINDINGS",
+      "measured_tokens": null,
+      "metering_mode": "unavailable",
+      "duration_s": null,
+      "quality_verdict": "OK",
+      "notes": "recall_all=1.0 (7/7) | recall_high=1.0 (3/3) | sev_exact=0.7857 | conclusion_line=1 | FP=0 | abstentions=1 | extra_true=8 | s8_ok=true | Q=0.9571. Control output is the driver verbatim transcription (the tool returned it inline instead of writing a raw-capture file); the experiment leg was saved byte-exactly from the tool capture - the asymmetry is declared. V4 Pro token usage is declared unavailable (third-party channel; no token field in the call log). "
+    },
+    {
+      "call_no": 5,
+      "role_position": "BATCH-a",
+      "model_string": "GLM-5.3-Flash (glm)",
+      "quota_package": "glm-flash-realname-newuser",
+      "input_summary": "evidence-tree enumeration/statistics over a 40-row synthetic listing (inline)",
+      "input_hash": null,
+      "output_hash": null,
+      "conclusion_line": null,
+      "measured_tokens": "cumulative-424690-across-4-calls",
+      "metering_mode": "user-provided-cumulative",
+      "duration_s": null,
+      "quality_verdict": "OK",
+      "notes": "DELIVERABLE 5/5 items correct except item 4: file_count=40 OK, by-ext OK, total_bytes=209020 OK, top-level list OK, but the top-5-by-bytes selection is WRONG (it omitted 9403 and 9196 and listed 8840/8633/8426) => partial quality failure on the ranking sub-task. Batch legs were fired CONCURRENTLY (protocol deviation: the design said 依次执行) so per-call durations are not separable; declared."
+    },
+    {
+      "call_no": 6,
+      "role_position": "BATCH-b",
+      "model_string": "GLM-5.3-Flash (glm)",
+      "quota_package": "glm-flash-realname-newuser",
+      "input_summary": "long-document extraction + number cross-check over the v1.24 report pair",
+      "input_hash": null,
+      "output_hash": null,
+      "conclusion_line": null,
+      "measured_tokens": "cumulative-424690-across-4-calls",
+      "metering_mode": "user-provided-cumulative",
+      "duration_s": null,
+      "quality_verdict": "OK",
+      "notes": "Fully correct: 328/328, scopes 39/2/4 with the time-point caveat, cost vector, commit 025158f, run 37278691747, and the CN/EN number cross-check returned ALL MATCH (verified against the actual files). Usable as-is."
+    },
+    {
+      "call_no": 7,
+      "role_position": "BATCH-c",
+      "model_string": "GLM-5.3-Flash (glm)",
+      "quota_package": "glm-flash-realname-newuser",
+      "input_summary": "language-side check of the CN/EN report mirror (report pair)",
+      "input_hash": null,
+      "output_hash": null,
+      "conclusion_line": null,
+      "measured_tokens": "cumulative-424690-across-4-calls",
+      "metering_mode": "user-provided-cumulative",
+      "duration_s": null,
+      "quality_verdict": "OK",
+      "notes": "14 language-side items (漏译/错译/术语漂移/语序搭配), boundary respected: no pass/fail verdict, no structural judging, and it correctly refused to flag authoritative EN terms (driver / To be discussed) as drift. Usable as review input."
+    },
+    {
+      "call_no": 8,
+      "role_position": "BATCH-d",
+      "model_string": "GLM-5.3-Flash (glm)",
+      "quota_package": "glm-flash-realname-newuser",
+      "input_summary": "archive MANIFEST + SHA256SUMS draft generation for a 6-item synthetic pack",
+      "input_hash": null,
+      "output_hash": null,
+      "conclusion_line": null,
+      "measured_tokens": "cumulative-424690-across-4-calls",
+      "metering_mode": "user-provided-cumulative",
+      "duration_s": null,
+      "quality_verdict": "OK",
+      "notes": "Usable draft: header count/bytes correct (6 / 4437), all six rows carry the given bytes+sha256, archive/ path flattening and dictionary order correct, SHA256SUMS uses <hash><2 spaces><path>. Minor caliber deviation: the empty 未入库 table labels its last column 归档理由 where the pack caliber uses 理由."
+    }
+  ],
+  "batch_concurrency_note": "Protocol deviation: the four batch calls were issued concurrently (design said sequentially), so per-call durations are not separable and concurrent load may have influenced latency/quality. Declared in the slice report.",
+  "metering_note_at_call_time": "The GLM console pre/post readings could not be taken (operator away during the call window; no exclusivity confirmation). Per-call token attribution is therefore unavailable; the console usage history remains the designated second source. This is registered as a slice deviation, not silently filled in.",
+  "metering_note": "2026-10-05 更新：用户在会话内补提供 GLM 控制台**累计**读数（glm-5.3 = 161,863 tokens；glm-5.3-flash = 424,690 tokens；见 tmp/glm-eval/GLM-USAGE-READING.txt）⇒ 4 条 GLM 调用行的 measured_tokens 改记**累计口径字符串**（不拆分到单次），metering_mode = user-provided-cumulative；V4 Pro 侧仍不可得（Copilot 未提供用量）⇒ **相对成本判据不成立**，单边。调用当时的口径声明完整保留于 metering_note_at_call_time。"
+}

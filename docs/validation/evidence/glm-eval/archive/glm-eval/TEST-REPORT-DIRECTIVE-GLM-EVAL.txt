@@ -1,0 +1,417 @@
+DIRECTIVE-GLM-EVAL · ③ 测试工程师独立测试报告 · 第二轮复验（未发起任何付费调用）
+================================================================================
+【第二轮（本轮）】② 已按首轮 4 条发现修复平台；本轮更新自测夹具/自测器并独立复验：
+  exit 0；SELFTEST TOTAL=154 PASS=154 FAIL=0 FINDINGS=0 NOTES=10。
+  首轮 4 条 FINDING（F-GE-01.S8anchor / F-GE-07.ob790 / F-GE-07.s10 / F-GE-08.seedids）全部关闭。
+  新增两条常驻守护：T-GE-10 数据集零泄漏、T-GE-11 分母派生；新增变异证伪 T-GE-12（详见 §8）。
+  input_hash 仍为 bbeaf2f7db40547d26b1a338608c0b9c1679fd7b08edbf349c0fbadaaa8008b6（bundle 未被动过）。
+
+（以下 §1–§7 为首轮存档；被 §8 覆盖的结论以 §8 为准。）
+
+产物：
+  tmp/glm-eval/selftest/run-selftest.js      独立对抗式自测器（154 断言）
+  tmp/glm-eval/selftest/selftest-report.txt  自测器逐条原始输出（UTF-8 无 BOM + LF）
+  tmp/glm-eval/selftest/fixtures/**          测试夹具（含 1 个 BOM 夹具，见 §6 例外声明）
+  tmp/glm-eval/TEST-REPORT-DIRECTIVE-GLM-EVAL.txt  本报告
+
+自测器执行：node tmp/glm-eval/selftest/run-selftest.js   →   exit 0
+结果：SELFTEST TOTAL=154 PASS=154 FAIL=0 FINDINGS=0 NOTES=10
+
+边界说明：本轮只改 tmp/glm-eval/selftest/** 与本报告；未改
+bundle/**、key.json、hash.js、score.js、contam.js、docs/**、tools/**、.github/**、internal/**。
+唯一例外：变异断言（T-GE-05 与 T-GE-12）按任务书要求临时改写 score.js / contam.js，
+并在同一进程 try/finally 内按字节还原（sha256 前后一致，见 §2 与 §8.4）。
+未发起任何 GLM / V4 Pro 付费调用；未 commit/push/gitee。
+
+
+§1  T-GE-01 … T-GE-09 逐条结论
+--------------------------------------------------------------------------------
+
+T-GE-01 钥匙 ↔ bundle 一致性（独立复算，不采信 ② 行号）  —— 结论：② 行号全部准确，1 处精度瑕疵
+  命令：Get-Content tmp\glm-eval\bundle\02-diff.js（逐行编号）+ 自测器 T-GE-01.1/1.2/1.3/1.4
+  实测物理行号（与 ② 自报逐条一致）：
+    S1 02-diff.js:58   "+    return true;"                          （catch 位于 :56，唯一）
+    S2 02-diff.js:80   "+  const hit = manifestNames.find((name) => name === pkgPath);"
+    S3 02-diff.js:105  "+    const recorded = cols[0];"
+    S4 02-diff.js:93   "+  // Manifest-only entries are not inspected here."
+    S5 02-diff.js:125  "+  // X3.1-4 (rebuild note) is checked by the caller."
+    S6 02-diff.js:131  "+  const files = listPackageMembers(root);"
+    S7 02-diff.js:14   "+// Verifies eight finding classes per package."
+    S8 区段 191–198（锚点 194 "+  const min = 0;"）
+  唯一性（实测出现次数）：
+    "catch"=1、"return true;"=1、"const recorded = cols[0];"=1、S2/S4/S5/S6/S7 锚点子串均=1。
+  精度瑕疵（F-GE-01，非阻塞）：S8 的 anchor_substring "const min = 0;" 在 193（删）与
+    194（增）各出现 1 次，共 2 次 ⇒ 该锚点单独不唯一；因 s8_region 191–198 覆盖整个 hunk，
+    任何落区引用都计 FP，判定不受影响。② 所报 anchor 表述不够精确。
+  其余接受行：S1..S7 的 accept_lines 两两不重叠、均在文件范围内；S8 区段与 S1..S7
+    接受行不重叠。
+  S8 不含缺陷的判定依据（人工逐行核）：
+    191 "@@ -40,7 +84,10 @@ function limits() {"   仅 hunk 头
+    192 "-  const max = 10;" / 193 "-  const min = 0;"
+    194 "+  const min = 0;" / 195 "+"（空行）/ 196 "+  const max = 10;"
+    197 "   return { min, max };" / 198 " }"
+    ⇒ 两条 const 声明互换顺序并插入一个空行，语义等价；契约 X7.2 明言纯重排/空行不构成发现。
+    自测器进一步断言：改动行仅含 const 声明与空行，且不含 return/if/throw/push/crypto 等功能记号。PASS。
+
+T-GE-02 bundle 泄漏自检（0 命中）  —— 结论：PASS（无阻塞级泄漏）
+  命令：自测器 T-GE-02.*（对 4 个 bundle 文件逐文件正则扫描）
+  0 命中：模型名 GLM|DeepSeek|glm|deepseek / GPT|Claude|Qwen|Mythos|GLM-5；
+          真实仓库路径 docs/validation|tools/gates|.github|internal|tmp/glm-eval；
+          真实切片/编号 DIRECTIVE-*|OB-\d+|025158f|0c12abc|G8-[abcd]；种子编号 S[1-8]。
+  key.json expected_finding「整句」在 bundle 中 0 命中（逐种子断言）。
+  词级重合（非泄漏，NOTE 记录）：静默→[00-plan,03-prompt]、吞并→[01-clause]、
+    分隔符归一→[00-plan]、恒真/形同虚设→[03-prompt]、历史误报→[01-clause]；
+    以上均是「规格在陈述规则」而非「答案泄漏」，且均不出现在 02-diff.js。
+    fail-open、全树扫描 全 bundle 0 命中。
+  S7 例外：expected_finding 引用 "eight finding classes"，该串正是 02-diff.js:14 的缺陷注释本身
+    （缺陷必须可被找到），属必要重合，非泄漏。
+
+T-GE-03 03-prompt.txt 契约完整性  —— 结论：PASS
+  含结论行闭集三者；末个非空行恰为 "PRE-REVIEW: FINDINGS"（∈闭集）。
+  含"不得读取任何工作区或外部文件"、"仅依据本消息文本"、"报告以最终消息返回"。
+  模型名 0 命中；无 leg-A/leg-B/对照腿/实验腿等模型特定措辞。
+  两腿逐字节复用：全片仅此一份 prompt 文件，sha256=3b7a3580edcecb6a92ccb42f8acf37b469283136cb0c8d8d1b2b24d0b54fd758，
+    无任何模型分支 ⇒ 两腿输入文本逐字节相同。
+
+T-GE-04 契约 ↔ 实现可推出性（S4/S5/S6 仅凭 bundle 内文本可判）  —— 结论：PASS
+  S5：01-clause X3.1 声明"四个子项"且含"子项四"（重建注记）；02-diff runChecks 仅
+      "findings.push(...check"×3 且注释明言 X3.1-4 交由调用方 ⇒ 缺口可判。
+  S4：01-clause X4.2 声明"清单有成员而包内无该文件"亦为冲突；02-diff checkMembers
+      注释"Manifest-only entries are not inspected here." ⇒ 分支缺失可判。
+  S6：01-clause X5.2/X5.3 要求"仅对变更集""不得触发任何全量扫描"；02-diff collectScope
+      函数体调用 listPackageMembers(root) 且形参 changedPaths 未被使用 ⇒ 冲突可判。
+  三条均无需任何外部知识，仅凭 bundle 内文本互相对照即可判定。PASS。
+
+T-GE-05 score.js 正反夹具 + 变异断言  —— 结论：PASS（公式与三档校准均经手算核对）
+  全命中：recall_all=1 recall_high=1 sev_exact=1 conclusion=1 Q=1.0 FP=0。
+  全遗漏：recall_*=0、conclusion=1 ⇒ Q=0.2；无结论行 ⇒ conclusion_line=0。
+  严重度校准：命中且同级=1.0；差 1 档=0.5；差 ≥2 档=0（S1 Critical 分别报 Critical/High/Low）。
+  中文严重度形态：严重度：严重 → rank3、严重度：高 → rank2（SEV_ORDER 中文支路已守）。
+  FP 三态：路径不在 bundle / 行号不存在 / S8 区误报 ⇒ FP=3 且 reason 三者齐全；S8 误报使 s8_ok=false。
+  extra_true 单列：in-bundle 非种子引用（02-diff.js:135）⇒ extra_true=1、FP=0。
+  结论行闭集 1-0：末行∈闭集=1；非闭集=0；行尾空白被容忍。
+  非锚点接受行：S1:137/S2:81/S3:107/S4:90/S5:123/S6:130 均命中、S7 未命中
+    （recall_all=6/7、recall_high=1、sev_exact=1）—— 守住"接受行全集"而非仅锚点。
+  Q 手算对照（leg-qcheck：S1 Critical 正中=1、S2 High 报 Medium=0.5、S3 High 正中=1）：
+    0.4×1 + 0.2×(3/7) + 0.2×(2.5/3) + 0.2×1 = 0.8524（与 score.js 输出逐位一致）。
+  变异断言（详见 §2）。
+
+T-GE-06 hash.js 正确性  —— 结论：PASS
+  含 BOM 与不含 BOM 同内容（"hello\n"）两例 output_hash 相等
+    = 5891b5b522d5df086d0ff0b110fbd9d21bb4fc7163af34d08286a2e846f6be03 = sha256("hello\n")。
+  独立复算 input_hash（固定序字节拼接 sha256）见 §3。
+
+T-GE-07 contam.js 两态 + 边界  —— 结论：两态正确；边界存在 2 处误命中（F-GE-07）
+  干净 ⇒ PASS/exit 0；含标记词 OB-79 ⇒ FAIL/exit 1；bundle 外引用(docs/other.js:5) ⇒ FAIL/exit 1。
+  边界：S9 ⇒ PASS（正确）；OB-790 ⇒ FAIL（误命中，OB-79 无词边界）；
+        S10 ⇒ FAIL（误命中，S[1-8] 命中子串 S1）。最小复现见 §5。
+
+T-GE-08 数据集脚手架 schema  —— 结论：结构合规；1 处越出"仅哈希占位"（F-GE-08）；1 项不可测
+  JSON 合法、无 BOM、纯 LF；slice 正确；calls=[]（无付费调用）。
+  pre_registration：bundle_input_hash="PENDING"、key_file_sha256="PENDING"、registered_at=null；
+    不含 expected_finding / severity / anchor 等钥匙内容（0 泄漏）。
+  越出项（F-GE-08）：pre_registration 还含 seed_count=8 与 seed_ids[S1..S8]，超出"仅哈希占位"，
+    在已提交文件中暴露缺陷基数/编号（污染面）；但未泄漏严重度/锚点/预期发现。
+  columns：13 列齐备；metering_mode 域={exact-delta,interval-sum,unavailable} 与 metering/README 一致；
+    quality_verdict 为 7 值枚举；conclusion_line 域引用闭集；闭集三处（dataset/key.json/03-prompt）一致。
+  不可测：columns 与 ①方案书 §5「逐列一致」无法核实——① 方案书既不在磁盘亦不在会话索引（证据缺口，
+    见 §7）。仅做了内部一致性核对。
+
+T-GE-09 tmp/ 卫生  —— 结论：PASS（仅 2 处 ② 遗留夹具，非脚本）
+  tmp/ 顶层仅 glm-eval/ 与 .gitkeep。
+  glm-eval/ 下无一次性 .ps1/.sh/.bat/.cmd 脚本、无 node_modules/.cache/coverage 等孤立缓存。
+  ② 遗留（NOTE）：selftest/fixture-contam-fail.txt、selftest/fixture-score.txt（演示夹具，非脚本；
+    位于 ③ 自有目录，无害；如需清理可由 ③ 处置）。
+
+
+§2  变异断言：前后 sha256 与"还原后字节一致"证明
+--------------------------------------------------------------------------------
+mutated target: tmp/glm-eval/score.js
+  短路点（唯一命中，occurrences=1）：
+    if (base === basename(s8.file) && (s8.lines || []).indexOf(c.line) !== -1) {
+      → 改写为 if (false) {
+
+  before_sha256  = 06dae2d4c24a8136cdc071a10881a5faac5b6b98a896645f502a1d509c254ce2
+  mutated_sha256 = 645909345a113806b7673b74988bbf8eab9c13100f16861c9cf5004afee39739
+  after_sha256   = 06dae2d4c24a8136cdc071a10881a5faac5b6b98a896645f502a1d509c254ce2
+  byte-identical = true
+
+  夹具转红证明：变异后对 leg-fps.txt（引用 02-diff.js:194 S8 区）评分，FP 由 3 → 2：
+    [PASS] T-GE-05.mut.red :: mutation short-circuit makes the fixture turn RED (FP != 3) | FP=2 s8_ok=true
+    （对应正常态断言 [PASS] T-GE-05.fp.count :: FP tri-state: 3 false positives）
+  还原后转绿：
+    [PASS] T-GE-05.restore.green :: fixture GREEN again after restore (FP==3)
+  另：Get-FileHash tmp\glm-eval\score.js = 06dae2d4…（与 before 一致，无残留改写）。
+
+
+§3  input_hash 独立复算 vs ② 自报值
+--------------------------------------------------------------------------------
+  方法：对 bundle 四文件按固定序 [00-plan.md,01-clause-cn.txt,02-diff.js,03-prompt.txt] 原始字节拼接后 sha256。
+  mine      = bbeaf2f7db40547d26b1a338608c0b9c1679fd7b08edbf349c0fbadaaa8008b6
+  hash.js   = bbeaf2f7db40547d26b1a338608c0b9c1679fd7b08edbf349c0fbadaaa8008b6
+  reported  = bbeaf2f7db40547d26b1a338608c0b9c1679fd7b08edbf349c0fbadaaa8008b6
+  ⇒ 三者一致，② 自报 input_hash 复算通过。
+  逐文件 sha256：
+    00-plan.md       70076661d86615d8dfe180aa5884ec9618338ec9496b3893900a749c092f36b8
+    01-clause-cn.txt d8fe4bc82df774535c47c39406c96fee1325c87f3153b5d72ee2a378ff03e525
+    02-diff.js       c939bc9e756696c463571c981a7d3756c87563de913b9c4c58faebdc4d5ff405
+    03-prompt.txt    3b7a3580edcecb6a92ccb42f8acf37b469283136cb0c8d8d1b2b24d0b54fd758
+
+
+§4  git status --short（只新增测试夹具，未改平台文件）
+--------------------------------------------------------------------------------
+  ?? docs/validation/directive-glm-eval-dataset.json      ← ② 的新增脚手架（未跟踪）
+  （tmp/ 已被 .gitignore 忽略，故未出现在 status；已用 Get-FileHash 证明 score.js 未被改动。）
+
+
+§5  平台缺陷回报（第一轮；四条均已修复并复验，见 §8）
+--------------------------------------------------------------------------------
+F-GE-07.ob790（contam.js · 词表边界 · 轻）
+  node tmp\glm-eval\contam.js tmp\glm-eval\selftest\fixtures\boundary-ob790.txt
+  → {"status":"FAIL","marker_hits":[{"line":1,"marker":"OB-79","text":"标记词边界：OB-790 是否命中？"}]} exit=1
+  原因：MARKER_SRC 中 "OB-79" 未加词边界 \b ⇒ "OB-790" 命中。
+  影响：过度阻断（对真实输出误判污染）。建议：将标记词改为 \bOB-79\b（或 (?![0-9]) 收尾断言）。
+
+F-GE-07.s10（contam.js · 词表边界 · 轻）
+  node tmp\glm-eval\contam.js tmp\glm-eval\selftest\fixtures\boundary-s10.txt
+  → {"status":"FAIL","marker_hits":[{"line":1,"marker":"S1","text":"种子边界：S10 是否命中？"}]} exit=1
+  原因：SEED 标记 "S[1-8]" 无边界 ⇒ 命中 "S10" 内的子串 "S1"（同理 "S123"/"...S3..."）。
+  影响：过度阻断。建议：改为 \bS[1-8]\b。
+
+F-GE-08.seedids（数据集 · pre_registration · 轻）
+  docs/validation/directive-glm-eval-dataset.json 的 pre_registration 含
+  "seed_count": 8 与 "seed_ids": ["S1".."S8"]，超出任务书"仅含哈希占位"。
+  影响：在已提交文件中暴露缺陷基数/编号（污染面）；未泄漏严重度/锚点/expected_finding。
+  建议：pre_registration 仅保留哈希占位（bundle_input_hash / key_file_sha256 / registered_at），
+        seed 相关元数据移入不可提交的 key.json。
+
+F-GE-01.S8anchor（key.json · 锚点精度 · 提示级）
+  S8 anchor_substring "const min = 0;" 出现 2 次（193 删 / 194 增），锚点单独不唯一；
+  因 s8_region 覆盖 191–198，判定不受影响。建议：改用唯一子串或直接以 s8_region 表达。
+
+
+§6  BOM 夹具例外声明
+--------------------------------------------------------------------------------
+  tmp/glm-eval/selftest/fixtures/hash-bom.txt 有意保留 UTF-8 BOM（BOM=True，CR=False）。
+  这是 T-GE-06 任务点显式要求的"含 BOM 输入"夹具（用于验证 hash.js 剥 BOM）；其余所有新增文件
+  均为 UTF-8 无 BOM + LF。此例外为任务书授权，非遗漏。
+
+
+§6b  覆盖矩阵（测试点 → 断言/夹具）
+--------------------------------------------------------------------------------
+  编号      类型              断言 / 夹具（selftest id）
+  T-GE-01   正例 + 边界       01.1.*(锚点定位) / 01.2.*(唯一性) / 01.3.*(接受行域+S8界) /
+                              01.4.*(S8 纯重排) ；反例：S8 误报→FP（05.fp.s8flag）
+  T-GE-02   反例              02.<file>.<pattern>（4 文件 × 5 类模式）/ 02.diag.exact.<S*>
+  T-GE-03   正例 + 反例       03.closed.* / lastline / noread / msgonly / finalmsg / nomodel / noleg
+  T-GE-04   正例              04.s4 / s5 / s6 的 .clause 与 .impl 配对
+  T-GE-05   正例 + 反例 + 边界 perfect / empty / noconcl / trailingws / sev.exact|off1|off2 /
+                              sev.cn / fp.count|reasons|s8flag / extra / Q.hand|Q.parts /
+                              acceptlines / mut.* / restore.*
+  T-GE-06   正例 + 边界       06.export / bom.eq / bom.value / input.matchesHash / input.matchesReported
+  T-GE-07   正例 + 反例 + 边界 07.clean / contam / outside / boundary.ob790|s9|s10
+  T-GE-08   正例 + 反例       08.bom / lf / json / slice / calls / pre.* / cols.* / closedset.consistency
+  T-GE-09   正例              09.tmptop / noOneOff / noCache / known
+  并发/崩溃 不可测            本平台为单发 CLI，无并发/崩溃注入面（见 §7 G4）
+
+
+§7  覆盖率缺口声明（第一轮存档；现值见 §9）
+--------------------------------------------------------------------------------
+G1（无守护，关键）score.js 硬编码分母 hits/7 与 highIds=[S1,S2,S3]。若 key.json 的种子集
+   增/减（例如新增 S9），评分会被静默算错，现有夹具全部只针对当前 8 种子集，无法转红。
+G2（无守护）input_hash 对 bundle 原始字节拼接；若某 bundle 文件意外新增 BOM，input_hash 会变，
+   而平台内无任何"bundle 无 BOM/LF"的常驻断言（本轮编码核对是一次性的外部检查，非流水线守护）。
+G3（不可测）dataset.columns 与 ①方案书 §5 的"逐列一致"：① 方案书不存在于磁盘/会话索引，
+   仅能核内部一致性，无法核来源一致性。
+G4（不适用）并发 / 崩溃两类：本平台为单发 CLI、无并发与崩溃注入面，无可测对象。
+G5（无守护）metering/README.md 的 10 分钟复核与 pre/post/recheck 命名仅为散文规程，无执行式守护；
+   未来删掉复核步骤不会使任何测试转红。
+G6（无守护，轻）score.js parseCitations 会把代码块/URL 内的 file:line 也当引用；未加断言。
+G7（已缓解但非变异守护）非锚点接受行匹配由 leg-acceptlines 行为守护，但未做针对性变异
+   （本轮变异只短路了 S8 零发现断言）。
+G8（已知瑕疵）F-GE-01.S8anchor 精度问题。   ← 第二轮已修复（见 §8.1）
+
+────────────────────────────────────────────────────────────────────────────────
+§8  第二轮：四项修复独立复验 + 两条新守护 + 变异证伪（原始输出）
+────────────────────────────────────────────────────────────────────────────────
+
+§8.1  ② 声称的四项修复逐条复验
+
+修复 #1  数据集 pre_registration 仅哈希/占位（删 seed_count / seed_ids）
+  命令：node -e "const j=require('./docs/validation/directive-glm-eval-dataset.json');console.log(JSON.stringify(j.pre_registration))"
+  实测 pre_registration 键（序列化）：
+    ["bundle_dir","bundle_files","bundle_input_hash","key_file","key_file_sha256",
+     "registered_at","conclusion_line_closed_set","expected_fp_baseline"]
+  ⇒ 不再含 seed_count / seed_ids / 任何种子描述。
+  自测守护：T-GE-08.pre.noseedids = PASS；T-GE-10.token.seedcount / .ids = PASS（0 命中）。
+  结论：已修复。
+
+修复 #2  contam.js ASCII 标记加词边界
+  命令与实测（exit）：
+    boundary-ob790.txt → PASS exit 0
+    boundary-s10.txt   → PASS exit 0
+    boundary-s123.txt  → PASS exit 0
+    boundary-s9.txt    → PASS exit 0
+  真标记仍拦截（正控，exit 1）：
+    OB-79 / S8 / DIRECTIVE-EVIDENCE-SCOPE / G8-a / 025158f / 0c12abc / 重建归档 / 判据作用域排除
+  自测守护：T-GE-07.marker.*（8 条全 PASS）+ T-GE-07.boundary.{ob790,s9,s10,s123}（全 PASS）。
+  结论：已修复（CJK 短语不加边界的原因见 contam.js 源码注释）。
+
+修复 #3  score.js 种子总数 / High 集 / 严重度权重全部从 key.json 派生
+  key.json 新增字段实测：
+    scored_ids=["S1".."S7"]，expected_total=7，high_ids=["S1","S2","S3"]，
+    severity_rank={"Critical":3,"High":2,"Medium":1,"Low":0}，
+    severity_match_scores={"0":1,"1":0.5,"default":0}
+  Q 公式未变：Q = 0.4*recall_high + 0.2*recall_all + 0.2*sev_exact + 0.2*conclusion_line。
+  自测守护 T-GE-11.derived：把 expected_total 改成 8（tester 自有 fixture 副本，key.json 未动）
+    后，全命中夹具 recall_all 由 1 → 0.875（=7/8），Q 由 1 → 0.975；证明分母随 key.json 变化。
+  T-GE-11.keyintact：守护前后 key.json sha256 未变。
+  结论：已修复（并由 T-GE-11 常驻守护）。
+
+修复 #4  key.json 的 S8 anchor_substring 改为唯一子串
+  实测：'+  const min = 0;' 在 02-diff.js 出现 1 次（物理行 194；193 为 '-  const min = 0;'，不匹配）。
+  自测守护：T-GE-01.4.s8anchoruniq = PASS（occurrences=1）；T-GE-01.4.s8anchorloc = PASS。
+  结论：已修复（首轮 F-GE-01.S8anchor 关闭）。
+
+§8.2  新增常驻守护一：数据集零泄漏（T-GE-10）
+  对 dataset 的 pre_registration 整体序列化串扫描，全部 0 命中：
+    T-GE-10.token.seedcount : 'seed' / 'count'
+    T-GE-10.token.ids       : S1..S8
+    T-GE-10.phrase.full     : 各 seed 的 expected_finding 整句
+    T-GE-10.phrase.frag     : expected_finding 中 ≥6 字 CJK 片段
+    T-GE-10.severity        : Critical / High / Medium / Low
+    T-GE-10.anchor          : 各 seed 的 file:line
+  意义：评估有效性守护——已提交数据集不得反向泄漏答案面（基数/编号/严重度/锚点/判据）。
+
+§8.3  新增常驻守护二：评分分母派生（T-GE-11）
+  基准 key.json（expected_total=7）+ leg-perfect.txt ⇒ recall_all=1.0。
+  派生 expected_total=8 的 tester 副本 ⇒ recall_all=7/8=0.875，Q=0.975。
+  若 score.js 写死分母 7，派生态仍得 1.0 ⇒ 守护转红（见 §8.4 M2）。
+
+§8.4  变异证伪（本轮新增两条守护各一次；前后 sha256 + 还原一致）
+  M1 contam.js：剥离 MARKER_SRC 中全部源码转义「两个反斜杠 + b」（共 12 处；注释中的单反斜杠 b 不受影响）
+    before_sha256 = dfcb76e737b6ba5dab0453977fa6c1307bb2391e7890e5d1bd9aca3525099455
+    mutated_sha256= 4e2efd0b8f11a0f3fa7561fe57713200bc05f2c157ea398dfd7e7fb3696fc10e
+    after_sha256  = dfcb76e737b6ba5dab0453977fa6c1307bb2391e7890e5d1bd9aca3525099455
+    byte-identical= true
+    转红证明：T-GE-12.contam-boundary.red = PASS（ob790=1 s10=1 s123=1，边界用例 FAIL）
+  M2 score.js：把分母派生式写回 'const total = 7;'
+    before_sha256 = b4ad39fbd7c271cb30e9f03eb7f74862a7a5c0d4e1c3007a58622506ee7feb79
+    mutated_sha256= f7193eab748f64401ede365269e11d4f256606b27178981374de865d1c1a5e32
+    after_sha256  = b4ad39fbd7c271cb30e9f03eb7f74862a7a5c0d4e1c3007a58622506ee7feb79
+    byte-identical= true
+    转红证明：T-GE-12.score-denominator.red = PASS（写死 7 时 recall_all=1 ≠ 0.875）
+  （首轮既有 T-GE-05 变异仍保留：score.js S8 短路 b4ad39… → db6983f7… → b4ad39…，一致。）
+
+§8.5  input_hash 复算（bundle 未被动过）
+  mine = hash.js = reported = bbeaf2f7db40547d26b1a338608c0b9c1679fd7b08edbf349c0fbadaaa8008b6
+  逐文件 sha256：
+    00-plan.md       70076661d86615d8dfe180aa5884ec9618338ec9496b3893900a749c092f36b8
+    01-clause-cn.txt d8fe4bc82df774535c47c39406c96fee1325c87f3153b5d72ee2a378ff03e525
+    02-diff.js      c939bc9e756696c463571c981a7d3756c87563de913b9c4c58faebdc4d5ff405
+    03-prompt.txt   3b7a3580edcecb6a92ccb42f8acf37b469283136cb0c8d8d1b2b24d0b54fd758
+  平台文件复算（变异还原后外部复核）：
+    contam.js = dfcb76…  score.js = b4ad39…  key.json = 6fccbe461286abae63e74e52f64d8130f4fa979bb6d27ba71651fad6c3339536
+    无残留：selftest/score.js.bak、fixtures/key-total8.json 均不存在。
+  Q 既有手算值复现：T-GE-05.Q.hand = 0.8524（逐位一致）；T-GE-05.perfect.Q = 1.0。
+
+§8.6  git status --short（本轮只改 selftest/** 与本报告）
+  ?? docs/validation/directive-glm-eval-dataset.json
+  （tmp/ 已 gitignore；未 commit / push / gitee。）
+
+§8.7  覆盖矩阵（本轮新增/变更项）
+  编号    类型            断言 / 夹具
+  T-GE-10 反例（常驻）    token.seedcount / token.ids / phrase.full / phrase.frag / severity / anchor
+  T-GE-11 正例 + 边界     baseline / derived(expected_total=8) / Q / keyintact
+  T-GE-12 变异            contam-boundary.{mutneedle,red,restore} + score-denominator.{mutneedle,red,restore}
+  T-GE-07 反例（更新）    marker.{ob79,s8,directive,g8a,hash025,hash0c1,cjk1,cjk2} + boundary.{ob790,s9,s10,s123}
+  T-GE-01 边界（更新）    s8anchoruniq / s8anchorloc
+  T-GE-08 反例（更新）    pre.noseedids
+
+§9  覆盖率缺口现值（对首轮 G1…G8 逐条更新）
+  G1 分母/High 集/权重硬编码       → 已闭合：派生自 key.json；T-GE-11 + T-GE-12(M2) 常驻守护。
+  G2 bundle 无 BOM/LF 无常驻断言    → 仍缺：仅 T-GE-06 复算 input_hash（字节级），无 BOM/LF 语义守护。
+  G3 dataset.columns ↔ ①方案书§5   → 不可测：①方案书不在磁盘/会话索引（证据缺口，未变）。
+  G4 并发 / 崩溃                   → 不适用：单发 CLI，无并发与崩溃注入面。
+  G5 metering/README 复核/命名规程 → 仍缺：散文规程，无执行式守护。
+  G6 parseCitations 误吞代码块/URL  → 仍缺：无断言。
+  G7 非锚点接受行                  → 已缓解：leg-acceptlines 行为守护；仍无针对性变异。
+  G8 S8 锚点精度（F-GE-01）         → 已闭合：锚点唯一子串；T-GE-01.4.s8anchoruniq/loc 常驻。
+
+TEST: DONE
+
+================================================================================
+§10  第三轮复验（最终评分器版本）· 2026-10-05 追加（⑤ 预审 Medium #1 整改）
+================================================================================
+
+背景：本报告 §1–§9 的正文停留在**第二轮**口径（154 断言；评分器 sha256 = b4ad39…）。
+其后评分器按四条**通用**规则修正（区间引用 / 逗号引用 / 弃权识别 / 去重），并在两腿之间生效；
+最终版本 sha256 = 2c4052fa8e10273b09465b668a09b0c1e4402065576ec48ca4357341d27ee051
+（= FROZEN-MANIFEST 所列值）。
+
+第三轮的独立复验记录（冻结输出，非本报告的叙述）：
+  产物：tmp/glm-eval/selftest/selftest-report.txt
+  结果：SELFTEST TOTAL=179 PASS=179 FAIL=0 FINDINGS=0 NOTES=10
+  断言面：T-GE-01 … T-GE-14（相对第二轮新增 T-GE-13 / T-GE-14）
+  变异证伪（四处，全部「转红后逐字节还原」）：
+    MUTATION                     before=2c4052fa… after=2c4052fa…
+    MUTATION-score-denominator   before=2c4052fa… after=2c4052fa…
+    MUTATION-range-shortcircuit  before=2c4052fa… after=2c4052fa…
+    MUTATION-abstention-section  before=2c4052fa… after=2c4052fa…
+  ⇒ 最终评分器版本**已被独立自测覆盖**；本报告 §8 处的 154 / 179 差异属**叙述滞后**，非覆盖缺口。
+
+复现性局限（如实声明，不补造工件）：
+- 修正前读数（Q=0.9048 / FP=1）所用的旧评分器 b4ad39… **已不在盘上**，仅存「变异前后 sha256 一致」
+  链（本报告 §8.5）。⇒ 该旧版评分器**无法逐字节复现**；「修正前后两读」中的「修正前」一侧
+  属**不可复现的历史读数**。
+- 本追加块只补充叙述，**不改动** §1–§9 的任何原始读数。
+
+================================================================================
+§11  自测断言同步（脚手架期 → 执行后）· 2026-10-05 追加（⑤ 复审 NL-1 整改）
+================================================================================
+
+背景：§10 记录的 179/179 取自**脚手架期**时点。其后重跑发现 3 条断言**按设计失效**
+（数据集 calls[] 已由执行步填入；tmp/glm-eval/ 新增交接文档），另 1 条 domain 断言需随
+数据集 schema 整改同步（metering_mode 域由 3 值扩为 4 值，已同步 metering/README.md §3）。
+
+③ 处置（由 prfrail-tester 执行）：
+  T-GE-08.calls     旧：calls[] 为空（no paid calls yet）
+                    新：恰 8 行，call_no 1..8，role_position 依次为
+                        LIMIT-NAME-PROBE-REJECTED / LIMIT-NAME-PROBE-ACCEPTED / 5-EXPERIMENT /
+                        5-CONTROL / BATCH-a / BATCH-b / BATCH-c / BATCH-d
+  T-GE-09.root      旧：allowedTop 8 项
+                    新：allowedTop 14 项（增 BRIEFING.md / FROZEN-MANIFEST.txt / GLM-USAGE-READING.txt /
+                        PLAN-PROVENANCE.txt / PROBE-NOTES.txt / plan-v1.md）
+  T-GE-09.known     旧：前缀**正则**（通配）
+                    新：显式 Set **逐名列出 58 个文件**（收紧，非放宽）
+  T-GE-08.cols.metering  旧：3 值  新：4 值（+ user-provided-cumulative）
+
+重跑结果：SELFTEST TOTAL=179 PASS=179 FAIL=0 FINDINGS=0 NOTES=10（断言总数仍 179，1:1 替换）
+平台哈希（跑完后实测）：score.js = 2c4052fa… / contam.js = dfcb76e7… / key.json = 6fccbe46…，全部与期望一致。
+变异五处（MUTATION / -contam-boundary / -score-denominator / -range-shortcircuit / -abstention-section）
+全部「转红后逐字节还原」。
+
+如实登记的副作用：
+- `selftest/selftest-report.txt` 因重跑**被再生**，其**脚手架期原始字节不再可复现**（该文件是自测器
+  逐条输出的落盘，依当时状态而定）。⇒ 现行报告为本追加重跑后的版本，哈希见 FROZEN-MANIFEST。
+- 一次重跑中 `T-GE-14` 的 finally 还原在 Windows 上遇到瞬时 EBUSY 并使进程退出；随后哈希复核确认
+  `score.js` 无残留损坏，两次原样重跑均干净 PASS。
+
+================================================================================
+§12  证据保留纪律（2026-10-05 追加 · ⑦ 盲审 M3 整改）
+================================================================================
+
+事件：§10 / §11 的两次重跑直接**覆写同名产物** `selftest/selftest-report.txt`，
+导致该文件的**脚手架期原始字节不再可复现**（它是自测器逐条输出的落盘，依当时状态而定）。
+已如实登记为**不可逆的取证损失**，不补造。
+
+保留纪律（自本追加起生效；任何重跑前必须先做）：
+  1. **先快照、后重跑**：重跑前把现行 `selftest/selftest-report.txt` 复制为
+     `tmp/glm-eval-out/selftest-report-<UTC-YYYYMMDDThhmmss>.txt`——**置于 `tmp/glm-eval/selftest/` 之外**，
+     以免扰动 `T-GE-09.known` 的闭集清单——并在 `FROZEN-MANIFEST.txt` 中并列登记该快照的哈希。
+  2. **一态一文件**：同一时点的输出只写一次；同名文件可被覆写的**唯一**情形是「该时点已被快照」。
+  3. **不可复现即声明**：任何已被覆写而未快照的产物，必须在报告中以「不可逆取证损失」字样如实登记。
+
+本追加同时**执行**该纪律：现行 `selftest-report.txt` 已快照为
+`tmp/glm-eval-out/selftest-report-20261005.txt`；其哈希与 `FROZEN-MANIFEST.txt` 中并列登记的
+`selftest/selftest-report.txt` 哈希**相同**（同一时点的两枚副本）。

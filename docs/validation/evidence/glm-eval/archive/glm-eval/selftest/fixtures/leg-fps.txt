@@ -1,0 +1,5 @@
+1. 疑似 — 02-diff.js:999：不存在的行。
+2. 疑似 — docs/other.js:5：bundle 外路径。
+3. 疑似 — 02-diff.js:194：纯重排区误报。
+
+PRE-REVIEW: FINDINGS

@@ -1,0 +1,4 @@
+预审发现：该行包含标记词 OB-79，应触发污染检测失败。
+另有 02-diff.js:58 一处引用（路径在 bundle 内）。
+
+PRE-REVIEW: FINDINGS

@@ -1,0 +1,111 @@
+{
+  "bundle_dir": "tmp/glm-eval/bundle",
+  "bundle_files": [
+    "00-plan.md",
+    "01-clause-cn.txt",
+    "02-diff.js",
+    "03-prompt.txt"
+  ],
+  "conclusion_line_closed_set": [
+    "PRE-REVIEW: PASS",
+    "PRE-REVIEW: PASS WITH FIXES",
+    "PRE-REVIEW: FINDINGS"
+  ],
+  "expected_fp_baseline": [],
+  "scored_ids": [
+    "S1",
+    "S2",
+    "S3",
+    "S4",
+    "S5",
+    "S6",
+    "S7"
+  ],
+  "expected_total": 7,
+  "high_ids": [
+    "S1",
+    "S2",
+    "S3"
+  ],
+  "severity_rank": {
+    "Critical": 3,
+    "High": 2,
+    "Medium": 1,
+    "Low": 0
+  },
+  "severity_match_scores": {
+    "0": 1,
+    "1": 0.5,
+    "default": 0
+  },
+  "s8_region": {
+    "file": "02-diff.js",
+    "lines": [191, 192, 193, 194, 195, 196, 197, 198]
+  },
+  "seeds": [
+    {
+      "id": "S1",
+      "severity": "Critical",
+      "anchor": "02-diff.js:58",
+      "anchor_substring": "return true;",
+      "accept_lines": [56, 57, 58, 137],
+      "expected_finding": "清单解析失败 / 白名单缺失时被 catch 吞并并 return true（fail-open，静默通过）；契约 X6.3 / X6.1 要求失败即红、异常必须显式上抛。"
+    },
+    {
+      "id": "S2",
+      "severity": "High",
+      "anchor": "02-diff.js:80",
+      "anchor_substring": "const hit = manifestNames.find((name) => name === pkgPath);",
+      "accept_lines": [79, 80, 81],
+      "expected_finding": "成员路径与清单名直接字符串比较，未做反斜杠到正斜杠的归一（契约 X1.3 / X2.1 / 方案书 P3.2）；Windows 上包成员恒判为未登记，包恒判红。"
+    },
+    {
+      "id": "S3",
+      "severity": "High",
+      "anchor": "02-diff.js:105",
+      "anchor_substring": "const recorded = cols[0];",
+      "accept_lines": [105, 106, 107, 108],
+      "expected_finding": "复算哈希取清单行第 1 列（成员名列）当作摘要，且 if (recorded === recorded) 恒真（契约 X3.2 要求取摘要列并与成员字节复算结果比较）；摘要比对形同虚设。"
+    },
+    {
+      "id": "S4",
+      "severity": "Medium",
+      "anchor": "02-diff.js:93",
+      "anchor_substring": "// Manifest-only entries are not inspected here.",
+      "accept_lines": [88, 89, 90, 91, 92, 93],
+      "expected_finding": "契约 X4.2 声明「清单有成员而包内无该文件」亦为冲突，实现无该分支（注释明言不检查）；两类冲突中只落地包内多文件一支。"
+    },
+    {
+      "id": "S5",
+      "severity": "Medium",
+      "anchor": "02-diff.js:125",
+      "anchor_substring": "// X3.1-4 (rebuild note) is checked by the caller.",
+      "accept_lines": [122, 123, 124, 125],
+      "expected_finding": "契约 X3.1 声明四个子项（含子项四「重建注记存在性检查」），runChecks 只落地三个；子项四的实现缺失。"
+    },
+    {
+      "id": "S6",
+      "severity": "Medium",
+      "anchor": "02-diff.js:131",
+      "anchor_substring": "const files = listPackageMembers(root);",
+      "accept_lines": [130, 131, 132],
+      "expected_finding": "契约 X5.2 要求只判变更集，collectScope 却对全树扫描（changedPaths 未使用）；与契约冲突并造成历史误报。"
+    },
+    {
+      "id": "S7",
+      "severity": "Low",
+      "anchor": "02-diff.js:14",
+      "anchor_substring": "// Verifies eight finding classes per package.",
+      "accept_lines": [14],
+      "expected_finding": "顶部注释写「eight finding classes」而实现只有四类（陈旧注释，契约 X3.1 仅四子项）。"
+    },
+    {
+      "id": "S8",
+      "severity": "none",
+      "anchor": "02-diff.js:194",
+      "anchor_substring": "+  const min = 0;",
+      "accept_lines": [194],
+      "expected_finding": "纯重排 / 空行（gx.test.js 的 limits 内两行常量互换顺序并加空行），无功能变化；期待 0 发现，任何对其报出的发现计入 FP。"
+    }
+  ]
+}

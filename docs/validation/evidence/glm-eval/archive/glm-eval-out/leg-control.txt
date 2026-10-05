@@ -1,0 +1,75 @@
+# 轨道预审报告（合成评估）
+
+评审范围：`00-plan.md`、`01-clause-cn.txt`、`02-diff.js`（仅依据本消息内文本，未读取任何工作区文件）。以下行号均为 `02-diff.js` 物理行号；条款引用为契约/方案书节号。
+
+## 发现清单（按严重度排序）
+
+**F1 · Critical · 02-diff.js:57-58（联动 02-diff.js:137）**
+`parseManifest` 的 `catch` 把一切解析异常吞掉并 `return true`，注释明言"treat the package as clean"；`main` 随即返回 `{ ok: true, findings: [], scope: [] }`。后果：清单缺失/不可读（X6.1）、白名单缺失（X6.2，`readWhitelist` 抛出的异常同样被吞）都静默判为通过，且异常未向上显式报错（X6.3），失败即红被绕过（X6.4、P3.4）。
+修法：`catch (err) { throw new Error("manifest parse failed: " + err.message); }`（或返回 `{ error }` 结构化结果）；`main` 对失败路径返回结论 1 并携带含文件名与行号的发现，禁止 `ok: true` 空发现通过。
+
+**F2 · High · 02-diff.js:105**
+`const recorded = cols[0]` 读的是**成员名列**，不是摘要列。违反 X3.2 与 P3.3（方案书明确点名此坑）。
+修法：`const recorded = cols[1];` 并校验其为 64 位 hex。
+
+**F3 · High · 02-diff.js:106**
+复算摘要取 `sha256(row)`，即对**清单行文本**哈希，而非成员文件字节。违反 X3.2（须读取成员文件字节复算）；`recomputed` 从未与任何登记值比较。另：函数参数 `manifest` 未使用，反而重复读文件。
+修法：`crypto.createHash("sha256").update(fs.readFileSync(path.join(root, cols[0]))).digest("hex")`；可直接遍历 `manifest` 映射。
+
+**F4 · High · 02-diff.js:107**
+`if (recorded === recorded) continue;` 恒真，所有行都被跳过，02-diff.js:108 的 mismatch 发现永远不可达。子项三形同虚设，摘要被篡改仍可得结论 0，违反 X3.4。
+修法：改为 `if (recomputed === recorded) continue;`，不等时 push mismatch 发现。
+
+**F5 · High · 02-diff.js:93（联动 02-diff.js:54）**
+`checkMembers` 只检查"包内有、清单无"方向；注释自认"Manifest-only entries are not inspected here"。X4.2 要求"清单有成员而包内无该文件"同样判冲突。且 `parseManifest` 中不在白名单的清单行被静默丢弃，进一步掩盖此方向。
+修法：补齐反方向：遍历 `manifest.keys()`，`!fs.existsSync(path.join(root, name))` 者 → 发现（severity ≥ Medium，满足 X4.3）；02-diff.js:54 不得静默丢弃非白名单清单行。
+
+**F6 · High · 02-diff.js:69 与 02-diff.js:80**
+成员相对路径用 `path.sep` 拼接，比较时 `===` 严格相等、无任何分隔符归一。Windows 上嵌套成员得 `sub\b.txt`，与清单正斜杠形式（X2.1）永不相等 → 假冲突；POSIX 上却相等。同一份包两平台结论不同，直接违反 X1.3 与 P3.2（"实现不得依赖平台默认行为"）。
+修法：拼接处统一正斜杠：`const rel = base ? base + "/" + ent.name : ent.name;`，或在比较前对两侧做 `replaceAll(path.sep, "/")` 归一。
+
+**F7 · High · 02-diff.js:125（runChecks 缺子项四）**
+注释称重建注记检查"由调用方检查"，但 `main` 并未执行；`REBUILD_NOTE` 常量仅被导出、从未使用。X3.1 要求四个子项必须执行且仅报告四个，X3.3 要求注记缺失判不通过。
+修法：新增 `checkRebuildNote(root)`：`fs.existsSync(path.join(root, REBUILD_NOTE))` 为假 → 发现；并入 `runChecks`，不要甩给调用方。
+
+**F8 · High · 02-diff.js:130-132（联动 02-diff.js:138-139）**
+`collectScope` 完全忽略 `changedPaths`，返回全部包成员；`main` 也未用 scope 限制检查，`checkMembers`/`checkDigests` 对整包扫描。违反 X5.1（仅对变更集复算）、X5.2（历史文件不得参与判定）、X5.3（空变更集须结论 0 且不得全量扫描）。
+修法：`collectScope` 按归一后的 `changedPaths` 过滤；检查仅遍历 scope；`changedPaths.length === 0` 时直接返回结论 0，不触发任何扫描。
+
+**F9 · Medium · 02-diff.js:90（并 02-diff.js:108、116）**
+所有发现对象只有 `{ level, text }`，缺文件名与行号，违反 X7.1。
+修法：每个发现补 `file` 与 `line` 字段（如清单路径与清单行号）。
+
+**F10 · Medium · 02-diff.js:75**
+成员列举仅排除 `SHA256SUMS`；`WHITELIST.txt`（及若存在 `REBUILD-NOTE.txt`）被当作包成员 → 产生"package-only member"假冲突。
+修法：一并排除 `WHITELIST_NAME`、`REBUILD_NOTE` 等控制文件。
+
+**F11 · Medium · 02-diff.js:189**
+该自测按当前实现必失败：fixture 含 `WHITELIST.txt` 与 `b.txt`，`checkMembers` 实际返回 2 条发现（两条都不在清单中），断言却是 `findings.length === 1`。
+修法：修复 F10 后断言 1；或显式断言 2 条（分别命中 `b.txt` 与控制文件），并说明口径。
+
+**F12 · Medium · 02-diff.js:137 与 02-diff.js:139**
+门禁结论以布尔 `ok` 表达，`parseManifest` 的 `true` 哨兵构成第三种取值，违反 X1.2（通过=0、不通过=1，不得有第三种）。
+修法：结论输出数值 `code: findings.length ? 1 : 0`；去除 `true` 哨兵（由 F1 的错误结构取代）。
+
+**F13 · Medium · 02-diff.js:53（并 02-diff.js:54）**
+列数不足 2 的畸形清单行被 `continue` 静默跳过；非白名单成员的清单行被静默丢弃。均属把解析异常吞掉，违反 X6.3。
+修法：畸形行 → 生成一条带行号的解析发现（结论 1），而非跳过；非白名单清单行保留在解析结果中或显式报发现。
+
+**F14 · Low · 02-diff.js:139**
+`runChecks(root, manifest)` 在同一表达式里调用两次（`ok` 一次、`findings` 一次），浪费且两次结果可能不一致。
+修法：`const findings = runChecks(root, manifest); return { code: findings.length ? 1 : 0, findings, scope };`。
+
+**F15 · Low · 02-diff.js:14-15**
+注释声称"eight finding classes"，与 X3.1 的四个子项不符；条款映射标注 `X4.2`、`X6.3` 与实际实现相悖（见 F1、F5）。
+修法：更正注释为四个子项，并修正条款映射。
+
+## 非发现排除
+
+`02-diff.js:191-198`（`limits()` 中 `min`/`max` 重排 + 空行）为纯重排、无功能变化，依据 X7.2 / P5.2 不计入发现。
+
+## 评审结论
+
+存在 1 条 Critical、7 条 High，核心校验（子项三）恒真失效、失败路径静默通过、子项四缺失、两方向冲突与变更集范围未落实，且变更集自测必失败，不具备合入门槛。
+
+PRE-REVIEW: FINDINGS

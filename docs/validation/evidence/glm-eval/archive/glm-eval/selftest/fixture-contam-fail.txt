@@ -1,0 +1,6 @@
+预审发现（污染演示夹具，用于验证 contam.js 的 FAIL 态）
+
+1. 该行包含标记词 OB-79，用于触发污染检测失败。
+2. 另有 02-diff.js:58 一处引用（路径本身在 bundle 内，仅标记词触发 FAIL）。
+
+PRE-REVIEW: FINDINGS

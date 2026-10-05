@@ -1,0 +1,9 @@
+预审发现（演示夹具，非真实模型输出；用于验证 score.js / contam.js）
+
+1. Critical — 02-diff.js:58：清单解析失败被 catch 吞并为 return true，fail-open，门禁静默通过；应改为向上抛出或判不通过。
+2. Medium — 02-diff.js:80：成员路径未做分隔符归一即比较，Windows 包恒判红。
+3. （附）02-diff.js:194：疑似改动，望复核。（该项位于纯重排区，应为 0 发现，计入 FP）
+4. （附）02-diff.js:999：疑似问题行。（该行不存在，计入 FP）
+5. （附）02-diff.js:135：额外观察，非任何已知种子的命中，单列 extra_true。
+
+PRE-REVIEW: FINDINGS

@@ -1,0 +1,5 @@
+## 已核验、不构成发现
+- 02-diff.js:191-198（`gx.test.js` 的 `limits()`）：重排加空行。
+- 02-diff.js:155-157（`require("./gx")` 等价改写）：解析等价。
+
+PRE-REVIEW: FINDINGS

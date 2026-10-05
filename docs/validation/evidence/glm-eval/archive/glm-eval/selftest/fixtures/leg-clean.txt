@@ -1,0 +1,10 @@
+预审发现（合成评估 · 干净腿输出）
+
+1. Critical — 02-diff.js:58：解析异常被吞并为通过，应上抛。
+2. High — 02-diff.js:80：路径比较缺归一。
+3. Medium — 02-diff.js:93：缺一支冲突检查。
+4. Medium — 02-diff.js:125：缺一个子项。
+5. Medium — 02-diff.js:131：作用域未使用入参。
+6. Low — 02-diff.js:14：注释与实现不符。
+
+PRE-REVIEW: FINDINGS

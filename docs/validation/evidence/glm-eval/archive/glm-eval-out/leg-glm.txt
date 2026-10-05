@@ -1,0 +1,150 @@
+# 轨道预审报告 · 包门禁变更（合成评估）
+
+**审阅对象**：`00-plan.md`、`01-clause-cn.txt`、`02-diff.js`（均以随附文本逐字为准）
+**方式**：只读预审；未读取任何工作区或外部文件。`file:line` 均指所给文件的物理行号。
+**总览**：共 12 条发现 —— Critical 1 / High 6 / Medium 3 / Low 2。门禁在交付现状下两个方向同时失真（既放行坏包，也误杀合规包）。
+
+## 发现总览
+
+| 编号 | 严重度 | 位置 | 摘要 |
+|---|---|---|---|
+| F1 | Critical | 02-diff.js:56-59, 137 | 解析异常被吞并为「通过」，X6 失败处置链整体反转 |
+| F2 | High | 02-diff.js:107 | 摘要比对自反恒真，子项三整条死代码 |
+| F3 | High | 02-diff.js:84-95 | X4.2（清单有、包内无）方向缺失 |
+| F4 | High | 02-diff.js:125, 135-140；00-plan.md:6, 19 | 子项四（重建注记）无任何实现，方案书亦漏列 |
+| F5 | High | 02-diff.js:75；189 | 控制文件被算作成员，合规包系统性误杀，自测 #2 必红 |
+| F6 | High | 02-diff.js:69, 80 | `path.sep` 拼接 + 裸比较，两平台结论不一致 |
+| F7 | High | 02-diff.js:130-133, 138-139 | 变更集被完全忽略，X5 判定范围整体失效 |
+| F8 | Medium | 02-diff.js:105-106 | 子项三读错列（成员名列）、复算错对象（清单行文本） |
+| F9 | Medium | 02-diff.js:53 | 格式不良清单行被静默跳过 |
+| F10 | Medium | 02-diff.js:54 | 清单条目被白名单过滤，制造假 X4.1 冲突 |
+| F11 | Low | 02-diff.js:14-15 | 文件头注释与实现不符 |
+| F12 | Low | 01-clause-cn.txt:10 | X2.1 未排除控制文件，成员边界歧义 |
+
+## 逐条发现
+
+### F1 [Critical] 失败被静默吞并为「通过」
+- **位置**：02-diff.js:56-59（catch 后 `return true`）；消费点 02-diff.js:137（`manifest === true` → `ok: true`）。
+- **事实**：try 块内的两类必红异常——清单缺失/不可读（:48 `readText` 抛出）与白名单缺失（:33 `readWhitelist` 抛出）——被统一吞掉并返回哨兵值 `true`；`main` 将其直接映射为 `{ ok: true, findings: [] }`。:57 注释 "treat the package as clean" 自证为故意放行。连带后果：checkManifest（:115）的 "unparsed" 语义经 `main` 不可达——真正不可解析的包早已在 ：137 被放行。
+- **违反**：X6.1、X6.2、X6.3、X6.4；P3.4（失败即红）。
+- **修法**：
+  ```js
+  function parseManifest(root) {
+    const entries = new Map();
+    const whitelist = readWhitelist(root);                               // X6.2：缺失即抛，向上传播
+    const rows = readText(path.join(root, MANIFEST_NAME)).split("\n");  // X6.1：ENOENT 向上传播
+    for (const raw of rows) { /* 行级解析按 F9/F10 修法落地 */ }
+    return entries;                                                     // 永不返回 true
+  }
+  // main 中删除 :137 的 early-return，改为：
+  let manifest;
+  try { manifest = parseManifest(root); }
+  catch (err) {
+    return { ok: false, findings: [{ level: "High", text: "gate input error: " + err.message }], scope: [] };
+  }
+  ```
+
+### F2 [High] 摘要比对恒真——子项三死代码
+- **位置**：02-diff.js:107。
+- **事实**：`if (recorded === recorded) continue;` 为变量自比较，恒为真 ⇒ :108 的 mismatch 分支永不可达，任何摘要不一致都静默通过；:106 的 `recomputed` 沦为死变量。被篡改的成员内容将无察觉地放行。
+- **违反**：X3.1（子项三必须执行）、X3.2、X3.4。
+- **修法**：`if (recorded === recomputed) continue;`（必须与 F8 一并修复）。
+
+### F3 [High] X4.2 方向缺失
+- **位置**：02-diff.js:84-95（仅包→清单单方向）；:93 注释自证 "Manifest-only entries are not inspected here"；:78、:84 注释把 X4.1 方向误标为 "Clause X4.2"。
+- **事实**：`checkMembers` 只查 X4.1（包有、清单无）；「清单有、包内无」的冲突类无任何实现，`runChecks`/`main` 亦未补位。
+- **违反**：X4.2、X4.3；X3.1 子项二应完成双向比对。
+- **修法**：
+  ```js
+  // checkMembers 尾部补：
+  const present = new Set(listPackageMembers(root));   // F6 修复后两侧均为 "/" 分隔
+  for (const name of manifest.keys()) {
+    if (!present.has(name)) findings.push({ level: "Medium", text: "manifest-only member: " + name }); // X4.3 ≥ Medium
+  }
+  // 并把 :78、:84 注释 "Clause X4.2" 更正为 "Clause X4.1"
+  ```
+
+### F4 [High] 子项四（重建注记存在性）无实现
+- **位置**：02-diff.js:125（注释称 "checked by the caller"）；02-diff.js:135-140（交付入口 `main` 未做该检查）；`REBUILD_NOTE` 于 :24 定义、:142 导出后文件内零使用。
+- **事实**：变更集内没有任何代码检查 `REBUILD-NOTE.txt` 存在性；被指派的 caller（main）同样没有，缺失注记的包直接通过。方案书同源缺陷：00-plan.md:6（P1 只列「三项校验」）、00-plan.md:19（P4.1 交付清单无此项）——方案书自身漏掉了子项四。
+- **违反**：X3.1（必须执行四个子项）、X3.3、X3.4。
+- **修法**：`runChecks` 内 ：124 之后落笔：
+  ```js
+  if (!fs.existsSync(path.join(root, REBUILD_NOTE))) {
+    findings.push({ level: "High", text: "rebuild note missing" });  // X3.3：缺失即不通过
+  }
+  ```
+  并同步修订 00-plan.md:6 / :19，将子项四纳入 P1 目标与 P4.1 交付清单。
+
+### F5 [High] 控制文件被当作包成员——合规包系统性误杀，自测 #2 现状必红
+- **位置**：02-diff.js:75（只排除 `SHA256SUMS`）；受影响断言 02-diff.js:189。
+- **事实**：`WHITELIST.txt`、`REBUILD-NOTE.txt` 未被排除出成员集。以自测 #2 的 fixture 实证：成员集为 {WHITELIST.txt, a.txt, b.txt}，manifest 仅含 a.txt ⇒ `checkMembers` 返回 **2** 条发现（WHITELIST.txt 与 b.txt），而 ：189 断言 `findings.length === 1` ⇒ 该用例不可能通过（用例一则通过，套件一红一绿）。又因 X6.2 强制白名单存在、X3.3 强制注记存在，任何合规包都会被误报 "package-only member"，结论被系统性翻转为 1；与 F1 叠加后门禁在系统级完全倒置——**带白名单的合规包一律结论 1，缺白名单的包一律结论 0**。代码自身排除 SHA256SUMS（:75）已确立「控制文件不是成员」的意图，排除集不完整属实现缺陷而非契约解释分歧。
+- **违反**：与 ：75 既有排除自相矛盾；经 X4.1 放大为结论性误判；P4.2 交付物不自洽。
+- **修法**：`return out.filter((name) => name !== MANIFEST_NAME && name !== WHITELIST_NAME && name !== REBUILD_NOTE);`（修复后自测 #2 得 1 条 b.txt，断言成立）。
+
+### F6 [High] 平台分隔符未归一——Windows 与 POSIX 结论不一致
+- **位置**：02-diff.js:69（`base + path.sep + ent.name`）；02-diff.js:80（裸字符串全等比较）。
+- **事实**：Windows 上嵌套成员得到 `sub\file.txt`，清单名为 `sub/file.txt`（X2.1），:80 全等比较必不中 ⇒ 每个嵌套成员都产生 X4.1 假冲突 ⇒ 同一份包两平台结论不同。两条新用例 fixture 均为平铺文件名，故该缺陷在用例下不可见。
+- **违反**：X2.1、X1.3（不得依赖平台默认行为——`path.sep` 即平台默认行为）；P3.2、P5.1。
+- **修法**：`:69` 改为 `const rel = base ? base + "/" + ent.name : ent.name;`；如需防御外部传入路径，比较前统一 `p.split(path.sep).join("/")`。
+
+### F7 [High] 变更集被完全忽略——X5 整体失效
+- **位置**：02-diff.js:130-133（`collectScope` 接收 `changedPaths` 却从不读取，:132 的过滤相对 ：75 为冗余）；02-diff.js:138-139（`main` 算出 scope 却不传给 `runChecks`，三项检查全量执行，且 ：139 重复调用 `runChecks` 两次）。
+- **事实**：`changedPaths` 是死参数、scope 是装饰品。历史文件照常参与判定（X5.2 明令禁止）；变更集为空时仍触发全量扫描且可给出结论 1（X5.3 明令必须为 0 且禁止全量扫描）——「空集早退」分支不存在。
+- **违反**：X5.1、X5.2、X5.3。
+- **修法**：
+  ```js
+  function collectScope(root, changedPaths) {
+    const norm = (p) => p.split(path.sep).join("/");
+    const wanted = new Set((changedPaths || []).map(norm));
+    return listPackageMembers(root).filter((n) => wanted.has(n));
+  }
+  // main 开头：
+  if (!Array.isArray(changedPaths) || changedPaths.length === 0) return { ok: true, findings: [], scope: [] }; // X5.3
+  // :139 改为只调用一次并传参：const findings = runChecks(root, manifest, scope);
+  // runChecks/checkMembers/checkDigests 按 scope 过滤（X5.1/X5.2）
+  ```
+
+### F8 [Medium] 子项三读错列、复算错对象
+- **位置**：02-diff.js:105（`recorded = cols[0]` 取的是成员名列）；02-diff.js:106（对清单行文本 `row` 求 sha256，而非成员文件字节）。
+- **事实**：X3.2 要求「读取清单行的摘要列」并「读取成员文件的字节复算摘要」，两头皆错。与 F2 联动：若只修 F2 而不修本条，成员名永不可能等于十六进制摘要 ⇒ 全部行报 mismatch，门禁翻转为恒失败——两条必须一并修复。
+- **违反**：X3.2；P3.3（逐字禁示「不得读取成员名列」）。
+- **修法**：
+  ```js
+  const recorded = cols[1];                                            // 摘要列
+  const recomputed = crypto.createHash("sha256")
+    .update(fs.readFileSync(path.join(root, cols[0]))).digest("hex");  // 成员文件字节
+  if (recorded === recomputed) continue;
+  ```
+  顺带：:100 现无视形参 `manifest` 自行重读清单，统一改为消费传入值或删去该形参。
+
+### F9 [Medium] 格式不良清单行被静默跳过
+- **位置**：02-diff.js:53。
+- **事实**：按 X2.2 每行必须是「成员名 + 若干空格 + 摘要」，单列行属不可解析格式；现以 `continue` 静默丢弃。若同清单另有合法行，该异常完全不可见，且受影响成员因行被丢弃而触发假 X4.1 冲突（与 F10 叠加）。
+- **违反**：X6.1（不可解析 ⇒ 结论 1）、X6.3（解析异常必须显式上报）。
+- **修法**：`if (cols.length < 2) throw new Error("malformed manifest row: " + raw);`（配合 F1 后即失败即红；如不中断至少 push 一条 High finding）。
+
+### F10 [Medium] 清单条目被白名单过滤——无契约依据且制造假冲突
+- **位置**：02-diff.js:54。
+- **事实**：契约仅规定白名单必须存在（X2.3、X6.2），从未授权用它过滤清单条目。后果：清单已列明、但不在白名单的成员被从 map 丢弃 ⇒ (a) 该成员被误报 "package-only member"（X4.1 的前提「清单缺该成员」并不成立）；(b) 若全部条目被过滤，map 为空 ⇒ checkManifest 误报 "manifest empty or unparsed"。
+- **违反**：X4.1 的冲突判定前提被破坏。
+- **修法**：`entries.set(cols[0], cols[1]);`（去掉 `whitelist.has` 门控；`readWhitelist` 仅承担 X6.2 存在性检查职责）。
+
+### F11 [Low] 文件头注释与实现不符
+- **位置**：02-diff.js:14（"Verifies eight finding classes"——交付实现至多产生 3 类发现，且缺子项四）；02-diff.js:15（"Clause map: X3.1, X4.2, X5.2, X6.3"——X4.2 未实现〔F3〕、X5.2 未实现〔F7〕、X6.3 被违反〔F1〕，四项声明三项落空）。
+- **修法**：按 F1-F10 落地后的真实覆盖改写，例如：`// Verifies manifest parse, X4.1/X4.2 conflicts, digest recomputation (X3.2), rebuild-note presence (X3.3), change-set scoping (X5).`
+
+### F12 [Low] X2.1 未排除控制文件，成员边界歧义
+- **位置**：01-clause-cn.txt:10。
+- **事实**：「成员指包根目录下的普通文件」未排除控制文件，而 SHA256SUMS 显然不可能自含摘要；本变更集即因该歧义产生 F5。建议在条款层面封死该歧义。
+- **修法**：在 X2.1 句末追加：「成员不包括 SHA256SUMS、WHITELIST.txt、REBUILD-NOTE.txt 三个控制文件。」
+
+## 已核验、不构成发现（X7.2 / P5.2 / 任务三.3）
+- 02-diff.js:191-198（`gx.test.js` 的 `limits()` hunk）：`min`/`max` 声明重排加空行，无功能变化——不构成发现。
+- 02-diff.js:155-157（`require("./gx")` → `require("./gx.js")`）：Node 解析等价，无功能变化——不构成发现。
+- 备注（非发现，仅覆盖建议）：两条新用例均为 happy-path 且只调用 `parseManifest`/`checkMembers`，F1/F2/F8 在现用例下不可见；建议修复时补一条负向用例（如「清单缺失 ⇒ `main` 返回 `ok:false`」）以钉住 P3.4。
+
+## 结论
+变更集存在 1 条 Critical、6 条 High 缺陷：失败被静默放行（F1）、摘要校验死码（F2）、X4.2 与子项四缺失（F3/F4）使坏包得以通过；控制文件误判（F5）使所有合规包被误杀并与 F1 叠加为系统级倒置；平台一致性（X1.3/P5.1，F6）与判定范围（X5，F7）两项硬性要求整体失效；交付自测一红一绿。方案书（00-plan.md:6、:19）与契约（01-clause-cn.txt:10）亦各有一处需同步修订。须按上述修法整改并重审后，方可进入下一轨道节点。
+
+PRE-REVIEW: FINDINGS

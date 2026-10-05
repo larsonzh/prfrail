@@ -1,0 +1,4 @@
+1. Critical — 02-diff.js:58 / 80：两处。
+2. High — 02-diff.js:105；01-clause-cn.txt:10：混排。
+
+PRE-REVIEW: FINDINGS

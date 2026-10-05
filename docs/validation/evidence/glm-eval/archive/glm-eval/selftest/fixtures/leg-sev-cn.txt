@@ -1,0 +1,4 @@
+1. 严重度：严重 — 02-diff.js:58：a
+2. 严重度：高 — 02-diff.js:80：b
+
+PRE-REVIEW: FINDINGS
