@@ -12,7 +12,7 @@
 
 ## 2. Change summary
 
-- Change set = the **13** repo artifacts of `git diff --cached` (numstat) (9 implementation / text + the report pair + the ledger pair); every artifact is **staged file by file** (**13** items in the index); this slice is **not committed and not pushed** (commit and push **require same-round authorization**).
+- Change set = the **13** repo artifacts of `git diff --cached` (numstat) (9 implementation / text + the report pair + the ledger pair); every artifact is **staged file by file** (**13** items in the index); this slice **was committed as `70fc54f` on 2026-10-06 and pushed to origin (range `e9b0875..70fc54f`)**; the commit and CI facts are in the "Commit and CI" item of §9.
 
 | Artifact | numstat |
 |---|---|
@@ -95,8 +95,8 @@
 
 ## 9. Explicitly not executed
 
-- **⑨ executed (local part)**: the local re-run and the §7.7 A12 dedicated independent experiment are both complete, with readings in §7; the **CI leg** has not happened (it can only be observed after commit and push), and this report **does not claim** CI has run.
-- **commit / push not executed** (`git add` staging only); **gitee not executed**; commit and push **require same-round authorization**.
+- **⑨ executed (local part + CI)**: the local re-run and the §7.7 A12 dedicated independent experiment are both complete, with readings in §7; **the CI leg has been observed** - run `37390555429` (push event, head `70fc54f`) **executed the `Gates` step on both legs**: the Ubuntu leg (`repo=/home/runner/work/prfrail/prfrail`) and the Windows leg (`repo=D:\a\prfrail\prfrail`) both report `SELFTEST: PASS 335/335`, `GATE REPORT scope=ci changed=13` and `TOTAL_FAIL=0`; each leg's `Test` step yields 14 package-level `ok` lines (the Ubuntu leg additionally has two `ok` lines on the `Race` leg, for `internal/adapters` and `internal/chain`).
+- **Commit and CI**: commit `70fc54f` (`docs(directive): land the GLM whitelist and extend the G5-b closed set (v1.26)`, change size +554/−19) has been pushed to origin (`e9b0875..70fc54f`); **gitee not pushed**; the ⑩ stop point was released by the user's same-round authorization, and this **one** docs-only commit writes back the CI facts.
 - **C-1 not landed in this slice**; **C-2 leaves §7.5 untouched**; **cost comparison is not in this slice**.
 - Probes 0; no downgrade ADR.
 
@@ -144,7 +144,7 @@
 
 ## 15. ⑩ stopping-point report (including the write-back check line)
 
-- Executed through **⑧b finalization**; the local part of ⑨ has run, and the ⑧c mechanical-verification readings were taken before ⑧b was finalized (**the sequence deviation is truthfully registered**, see §11); **the ⑩ stopping-point receipt has been issued**; this slice **stops before commit authorization** (no commit, no push, no gitee push).
+- Executed through **⑧b finalization**; the local part of ⑨ has run, and the ⑧c mechanical-verification readings were taken before ⑧b was finalized (**the sequence deviation is truthfully registered**, see §11); **the ⑩ stopping-point receipt has been issued**; that stop point was then released by the user's same-round authorization ⇒ **committed and pushed to origin (no gitee push)**, with the commit and CI facts in the "Commit and CI" item of §9.
 - **Write-back check line** (§11.2 caliber): validation report = **written back** (this file pair); `DEV_PLAN` = **not applicable** (a directive-governance slice writes back appendix C, not `DEV_PLAN`); ledger = **written back** (the `docs/t027/REMAINING_SLICES{,_EN}.md` completion row, report path only); ADR = **not applicable** (no model downgrade / no budget exception).
 - Authorization boundary: **commit no / push no / gitee no / probes 0**; commit and push **require same-round authorization**.
 

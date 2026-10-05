@@ -1433,7 +1433,7 @@ SLICE: READY_FOR_REVIEW | SLICE: BLOCKED
 | 字段 | 内容 |
 |---|---|
 | 标识 | `DIRECTIVE-GLM-LANDING`（v1.26） |
-| 状态 | ✅ **已完成**（2026-10-06；变更与审查证据见 `docs/validation/directive-glm-landing{,_EN}.md`；提交与推送须同轮授权、本片未执行；⑦ = 1 终审 + 1 复审） |
+| 状态 | ✅ **已完成**（2026-10-06；变更与审查证据见 `docs/validation/directive-glm-landing{,_EN}.md`；已提交并推送 origin（未推 gitee），CI 双绿事实见该报告 §9；⑦ = 1 终审 + 1 复审） |
 | 目标 | ① §2.2 增 GLM 两行（⑤ 首选 / 批量辅助首选，限四类任务、排除排序与 Top-N 择优）并把原预审员行改注备用；② §5.2 增 ⑤ 预审模型说明段；③ G5-b 闭集扩 `glm-5.3` / `glm-5.3-flash` 并同步实现与夹具；④ OB-83 处置列翻 `已处置`（已落地（常设））；⑤ 附录 B.5 同步；⑥ 本台账块 |
 | 触发 | 用户 2026-10-06 启动声明（`[SLICE]`，准则治理 / 判据本体变更片、探针 0；试点顺延第 5 次 = OB-85） |
 | 规模 | M（纯 `.md` 与 `tools/gates` 的 JS；含判据语义） |

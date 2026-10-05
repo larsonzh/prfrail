@@ -1433,7 +1433,7 @@ The following files **only get a supersede pointer added to the file header and 
 | Field | Content |
 |---|---|
 | ID | `DIRECTIVE-GLM-LANDING` (v1.26) |
-| Status | ✅ **Completed** (2026-10-06; changes and review evidence in `docs/validation/directive-glm-landing{,_EN}.md`; commit and push require same-round authorization and were not performed in this slice; ⑦ = 1 final review + 1 re-review) |
+| Status | ✅ **Completed** (2026-10-06; changes and review evidence in `docs/validation/directive-glm-landing{,_EN}.md`; committed and pushed to origin (no gitee push), with the CI double-green facts in §9 of that report; ⑦ = 1 final review + 1 re-review) |
 | Goal | (1) §2.2 gains two GLM rows (⑤ preferred / batch-assistance preferred, limited to four task classes with sorting and Top-N selection excluded) and the former pre-reviewer row is annotated as backup; (2) §5.2 gains a ⑤ pre-review model note; (3) the G5-b closed set gains `glm-5.3` / `glm-5.3-flash` with the implementation and fixtures in sync; (4) the OB-83 disposition flips to `Resolved` (Landed (standing)); (5) appendix B.5 is synchronised; (6) this ledger block |
 | Trigger | the user 2026-10-06 start declaration (`[SLICE]`, a directive-governance / criterion-body slice, probes 0; 5th pilot deferral = OB-85) |
 | Size | M (pure `.md` plus the JS under `tools/gates`; carries criterion semantics) |
