@@ -64,6 +64,8 @@
 
 上表为 ⑨ 时点读数；⑧a/⑧b 落盘报告对、自由度清单与台账行后，变更集增至 `changed=44`；⑧c 后实测：`--all --scope=tree` 与 `--all --scope=index` 均 `changed=44`、`TOTAL_FAIL=0`；`--selftest` 仍 `SELFTEST: PASS 328/328`；`tmp/` 内的 ③ 类过程件已清除（仅留 `.gitkeep`）。
 
+本片落地提交 = **`025158f`**；**CI `run 37278691747`** 首跑双绿（两腿 `SELFTEST: PASS 328/328`、`GATE REPORT scope=ci changed=44`、`TOTAL_FAIL=0`）；该 run 为**观察记录**，其后不再为本片新增提交。
+
 **变异检验**：不适用于语义改判（本片改判据作用域与新增判据本体）；反证手段 = 28 枚夹具的 `--selftest` 断言、OB-79 核心回归、DEF-1 / DEF-2 的复现与修复对照、以及 T60 的证伪演示。
 
 ## 8. 已知边界与残余风险
@@ -113,7 +115,7 @@
 
 ## 15. ⑩ 停点报告（含回写核对行）
 
-- 执行至 **⑨**；⑧b 定稿后由主控执行 **⑧c** 并出具 **⑩ 停点收据**；**停在提交授权之前** —— 提交授权：本片未获授权（未 commit、未 push、未推 gitee）。
+- 执行至 **⑨**；⑧b 定稿后由主控执行 **⑧c** 并出具 **⑩ 停点收据**；用户在**同轮**授权 `commit` + `push`（仅 `origin`，不推 gitee）；已落地提交 **`025158f`**（44 项、`+2395 −50`）并推送 `0c12abc..025158f`；**CI `run 37278691747` 首跑双绿**（`Go windows-latest` / `Go ubuntu-latest` 均 `SELFTEST: PASS 328/328`、`GATE REPORT scope=ci changed=44`、`TOTAL_FAIL=0`）。
 - **回写核对**（§11.2 的 OB-63 口径）：验证报告 = **已回写**（本文件对）；`DEV_PLAN` = **不适用**（准则治理片）；台账 = **已回写**（`REMAINING_SLICES{,_EN}` 的完成行，只记报告路径）；ADR = **不适用**（本片无降级、无裁决 ADR）。
 - ⑨ 读数：tree / index / ci 三作用域 `TOTAL_FAIL=0`；`SELFTEST: PASS 328/328`；`--check=G8-b --scope=tree` = PASS。
 

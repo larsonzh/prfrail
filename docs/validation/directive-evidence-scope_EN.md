@@ -64,6 +64,8 @@ Tiers: driver High; ①⑤ V4 Pro Max; ② `prfrail-implementer` / ③ `prfrail-
 
 The table above is the ⑨ time point reading; after the ⑧a/⑧b report pair, the freedom list and the ledger row landed, the change set grew to `changed=44`; measured after ⑧c, `--all --scope=tree` and `--all --scope=index` both read `changed=44`, `TOTAL_FAIL=0`; `--selftest` still reads `SELFTEST: PASS 328/328`; the class-③ process artifacts under `tmp/` have been cleared (only `.gitkeep` remains).
 
+This slice's landed commit = **`025158f`**; **CI `run 37278691747`** is green on both legs at first run (both legs `SELFTEST: PASS 328/328`, `GATE REPORT scope=ci changed=44`, `TOTAL_FAIL=0`); that run is an **observation record**, with no further commit added for this slice afterwards.
+
 **Mutation checks**: not applicable to a semantic rule change (this slice changes the criterion scope and adds a criterion body); the falsification means = the `--selftest` assertions over 28 fixtures, the OB-79 core regression, the DEF-1 / DEF-2 reproduction-vs-fix contrast, and the T60 falsification demo.
 
 ## 8. Known boundaries and residual risks
@@ -113,7 +115,7 @@ The table above is the ⑨ time point reading; after the ⑧a/⑧b report pair, 
 
 ## 15. ⑩ stopping-point report (including the write-back check line)
 
-- Executed through **⑨**; after ⑧b is finalized the driver runs **⑧c** and issues the **⑩ stopping-point receipt**; **stopped before commit authorization** — commit authorization: not granted for this slice (not committed, not pushed, not pushed to gitee).
+- Executed through **⑨**; after ⑧b is finalized the driver runs **⑧c** and issues the **⑩ stopping-point receipt**; the user authorized `commit` + `push` in the **same round** (only `origin`, no gitee push); the landed commit **`025158f`** (44 items, `+2395 −50`) was pushed as `0c12abc..025158f`; **CI `run 37278691747` is green on both legs at first run** (`Go windows-latest` / `Go ubuntu-latest` both `SELFTEST: PASS 328/328`, `GATE REPORT scope=ci changed=44`, `TOTAL_FAIL=0`).
 - **Write-back check** (the OB-63 formulation of §11.2): validation report = **written back** (this file pair); `DEV_PLAN` = **not applicable** (a directive-governance slice); ledger = **written back** (the `REMAINING_SLICES{,_EN}` completion row, recording the report path only); ADR = **not applicable** (this slice has no downgrade and no ruling ADR).
 - ⑨ readings: all three scopes tree / index / ci `TOTAL_FAIL=0`; `SELFTEST: PASS 328/328`; `--check=G8-b --scope=tree` = PASS.
 
