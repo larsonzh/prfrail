@@ -25,6 +25,8 @@ const CLOSED_SET = [
   'gpt-5.3-codex',
   'gpt-6.1-sol',
   'gpt-6-luna',
+  'glm-5.3',
+  'glm-5.3-flash',
 ];
 const ALLOWED = new Set(CLOSED_SET);
 const FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---/;

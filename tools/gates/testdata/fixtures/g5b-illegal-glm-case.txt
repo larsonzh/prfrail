@@ -1,0 +1,6 @@
+---
+name: fixture-g5b-illegal-glm-case
+description: G5-b probe fixture - the GLM member spelled in the wrong case
+model: GLM-5.3
+---
+Probe body. This file is test data, not a real agent role file.

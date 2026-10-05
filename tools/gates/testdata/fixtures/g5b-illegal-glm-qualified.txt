@@ -1,0 +1,6 @@
+---
+name: fixture-g5b-illegal-glm-qualified
+description: G5-b probe fixture - the qualified call string is not the closed-set modelId
+model: glm-5.3 (glm)
+---
+Probe body. This file is test data, not a real agent role file.

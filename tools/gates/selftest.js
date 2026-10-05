@@ -7,7 +7,7 @@
  * suite red. Coverage (architecture design section 6):
  *   T1, T2, T4, T5, T6, T7, T8, T9, T10, T11, T13, T14, T15, T16, T17, T18 + G7-d
  *   + T19-T28 (G6-5 section-reference resolution, G6-6 ledger status closed set)
- *   + T29-T42 (G5-b closed set, plus the G5-a 2 empty-value division of labour).
+ *   + T29-T42, T61-T67 (G5-b closed set, plus the G5-a 2 empty-value division of labour).
  * T3 (defect A1 against commit b738e6b) and T12 (defect C1 against commit 1b01115)
  * need real git ranges and are therefore executed as recorded evidence:
  *   node tools/gates/gate.js --check=G6 --scope=range:b738e6b^..b738e6b
@@ -85,6 +85,13 @@ const FIXTURES = {
   'g5b-illegal-inline-comment': { disk: 'g5b-illegal-inline-comment.txt', virtual: '.github/agents/fixture-g5b-illegal-inline-comment.agent.md' },
   'g5b-closed-set-legal-sol': { disk: 'g5b-closed-set-legal-sol.txt', virtual: '.github/agents/fixture-g5b-closed-set-legal-sol.agent.md' },
   'g5b-closed-set-legal-luna': { disk: 'g5b-closed-set-legal-luna.txt', virtual: '.github/agents/fixture-g5b-closed-set-legal-luna.agent.md' },
+  // GLM members (slice DIRECTIVE-GLM-LANDING, v1.26). Two positive fixtures pin the two new
+  // closed-set members; two negative fixtures pin case sensitivity and the R2.2 boundary (a
+  // qualified call string is not the `modelId`), matching the existing g5b-* shape.
+  'g5b-closed-set-legal-glm': { disk: 'g5b-closed-set-legal-glm.txt', virtual: '.github/agents/fixture-g5b-closed-set-legal-glm.agent.md' },
+  'g5b-closed-set-legal-glm-flash': { disk: 'g5b-closed-set-legal-glm-flash.txt', virtual: '.github/agents/fixture-g5b-closed-set-legal-glm-flash.agent.md' },
+  'g5b-illegal-glm-case': { disk: 'g5b-illegal-glm-case.txt', virtual: '.github/agents/fixture-g5b-illegal-glm-case.agent.md' },
+  'g5b-illegal-glm-qualified': { disk: 'g5b-illegal-glm-qualified.txt', virtual: '.github/agents/fixture-g5b-illegal-glm-qualified.agent.md' },
   // G8 frozen-evidence-pack fixtures (slice DIRECTIVE-EVIDENCE-SCOPE, v1.24). Each is a
   // JSON descriptor `{name, pack, files, sumsFrom?, expect}`: `files` maps a
   // repository-relative virtual path to content, `pack` is the virtual pack root and the
@@ -668,6 +675,13 @@ const G5B_SOURCE = path.join(__dirname, 'lib', 'criteria', 'g5b.js');
 const G5B_FIRST_MEMBER = "  'deepseek-v4-pro',\n";
 /** Mutation target (T42): the member added by this slice, whose removal must turn the suite red. */
 const G5B_LUNA_MEMBER = "  'gpt-6-luna',\n";
+/**
+ * Mutation targets (T62/T64): the two GLM members landed by slice DIRECTIVE-GLM-LANDING
+ * (v1.26). Each string is unique in the source (the `glm-5.3` line does not contain the
+ * `glm-5.3-flash` line's quote-comma tail), so `split().join('')` removes exactly one line.
+ */
+const G5B_GLM_MEMBER = "  'glm-5.3',\n";
+const G5B_GLM_FLASH_MEMBER = "  'glm-5.3-flash',\n";
 
 /** G5-b verdict + finding count + record detail for one fixture key. */
 function g5bProbeWith(mod, key) {
@@ -2512,6 +2526,60 @@ function runTests() {
         ignored: [...t60Ignored],
         first: t60First.length,
       })
+    );
+  }
+
+  // ---- T61-T67: the two GLM members landed by slice DIRECTIVE-GLM-LANDING (v1.26) -----
+  // The closed set grew by `glm-5.3` and `glm-5.3-flash`. T61 proves BOTH new members are
+  // accepted; T62/T64 prove each one is load-bearing (dropping either turns its positive
+  // fixture red) and T63/T65 prove the in-memory mutation leaves g5b.js byte-identical; T66
+  // keeps the comparison case-sensitive for the GLM member and T67 pins the R2.2 boundary
+  // (a qualified call string is NOT the `modelId`).
+  {
+    const glm = g5bProbe('g5b-closed-set-legal-glm');
+    const glmFlash = g5bProbe('g5b-closed-set-legal-glm-flash');
+    check(
+      'T61 G5-b accepts both members this slice added (glm-5.3 pre-review and glm-5.3-flash batch assistance)',
+      glm.verdict === 'PASS' && glm.findings === 0 && glmFlash.verdict === 'PASS' && glmFlash.findings === 0,
+      JSON.stringify({ glm: glm.verdict, glmFlash: glmFlash.verdict, glmDetail: glm.detail, glmFlashDetail: glmFlash.detail })
+    );
+
+    const dropFlash = loadMutatedG5b(G5B_GLM_FLASH_MEMBER, '', 'drop-glm-flash-member');
+    check(
+      'T62 the glm-5.3-flash member is load-bearing: dropping it from the set makes that fixture fail',
+      dropFlash.applied === true && g5bProbeWith(dropFlash.exports, 'g5b-closed-set-legal-glm-flash').verdict === 'FAIL',
+      'applied=' + dropFlash.applied + ' patched_verdict=' + g5bProbeWith(dropFlash.exports, 'g5b-closed-set-legal-glm-flash').verdict
+    );
+    check(
+      'T63 restore: g5b.js is byte-identical and the cached module still accepts glm-5.3-flash',
+      dropFlash.identical === true && g5bProbe('g5b-closed-set-legal-glm-flash').verdict === 'PASS',
+      'identical=' + dropFlash.identical + ' cached=' + g5bProbe('g5b-closed-set-legal-glm-flash').verdict
+    );
+
+    const dropGlm = loadMutatedG5b(G5B_GLM_MEMBER, '', 'drop-glm-member');
+    check(
+      'T64 the glm-5.3 member is load-bearing: dropping it from the set makes that fixture fail',
+      dropGlm.applied === true && g5bProbeWith(dropGlm.exports, 'g5b-closed-set-legal-glm').verdict === 'FAIL',
+      'applied=' + dropGlm.applied + ' patched_verdict=' + g5bProbeWith(dropGlm.exports, 'g5b-closed-set-legal-glm').verdict
+    );
+    check(
+      'T65 restore: g5b.js is byte-identical and the cached module still accepts glm-5.3',
+      dropGlm.identical === true && g5bProbe('g5b-closed-set-legal-glm').verdict === 'PASS',
+      'identical=' + dropGlm.identical + ' cached=' + g5bProbe('g5b-closed-set-legal-glm').verdict
+    );
+
+    const glmCase = g5bProbe('g5b-illegal-glm-case');
+    check(
+      'T66 G5-b stays case-sensitive for the GLM member: GLM-5.3 (wrong case) fails',
+      glmCase.verdict === 'FAIL' && glmCase.findings === 1 && /model=GLM-5\.3/.test(glmCase.detail),
+      'verdict=' + glmCase.verdict + ' findings=' + glmCase.findings + ' :: ' + glmCase.detail
+    );
+
+    const glmQualified = g5bProbe('g5b-illegal-glm-qualified');
+    check(
+      'T67 G5-b rejects a qualified call string: glm-5.3 (glm) is not the modelId (R2.2 boundary)',
+      glmQualified.verdict === 'FAIL' && glmQualified.findings === 1 && /model=glm-5\.3 \(glm\)/.test(glmQualified.detail),
+      'verdict=' + glmQualified.verdict + ' findings=' + glmQualified.findings + ' :: ' + glmQualified.detail
     );
   }
 

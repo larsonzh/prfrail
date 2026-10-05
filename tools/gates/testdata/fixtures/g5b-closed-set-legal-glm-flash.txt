@@ -1,0 +1,6 @@
+---
+name: fixture-g5b-closed-set-legal-glm-flash
+description: G5-b probe fixture - the GLM batch-assistance member is accepted
+model: glm-5.3-flash
+---
+Probe body. This file is test data, not a real agent role file.
