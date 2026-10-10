@@ -105,8 +105,8 @@
 
 ## 9. Explicitly not executed
 
-- **⑨ has run (local)**: both the local re-run and the §7.7 A12 dedicated independent experiment are complete, with readings in §7; the **CI legs have not run** (authorization boundary commit NO / push NO ⇒ no CI run); this report **does not claim** that CI has run.
-- **Not committed, not pushed**: the change set rests in the staged state; **gitee not pushed**; lifting the ⑩ stop point **requires same-turn authorization**.
+- **⑨ has run (local + CI)**: both the local re-run and the §7.7 A12 dedicated independent experiment are complete, with readings in §7; the **CI legs have been observed** — run `38088769915` (push event, head `ccacd26`) is `completed / success`, and **both legs actually executed the `Gates` step**, with readings in "Commit and CI" below.
+- **Commit and CI**: commit `ccacd26` (`docs(directive): bump the Haiku enabling precondition to 5.5 and close OB-74 (v1.27)`) has been pushed to origin (`00f08c2..ccacd26`, change size +479/−6); **gitee not pushed**. The `Gates` step readings for the two legs: the Ubuntu leg (`repo=/home/runner/work/prfrail/prfrail`) and the Windows leg (`repo=D:\a\prfrail\prfrail`) both report `SELFTEST: PASS 335/335`, `GATE REPORT scope=ci changed=7` and `TOTAL_FAIL=0`; Go package-level `ok` lines = 16 on the Ubuntu leg (including the Race-leg runs of `internal/adapters` and `internal/chain`) and 14 on the Windows leg, both including the target package `internal/gates`. The ⑩ stop point was released by the user's same-day bundled pre-authorization (conditions met), and this **one** docs-only commit writes back the CI facts.
 - **Probe accounting**: budget 1 (hard cap, no top-up) — 1 infrastructure-timeout attempt (408, **no verdict**, **not counted as a valid probe**) + 1 **valid probe** (`runSubagent` accepted `Claude Haiku 5.5 (copilot)`, carrier `quick-verifier`); **same-turn authorization permits a single retry only**; **no top-up** (see A-5).
 - **Call census**: ⑥ 1 call; ⑦ **3 calls** (1 final review + 1 re-review + 1 **user-authorized narrower read**; read 3 is valid for this slice only under §7.8.3); **no downgrade ADR**; **Haiku carried out no review work** (availability probe only).
 - C-1 is not landed in this slice; cost comparison is out of scope.
@@ -132,7 +132,7 @@
 - Encoding check (`tmp/haiku-bump/wrap-enc.js`, full `git ls-files -z`): non-frozen tree `tracked=3415 text=3326 binary=89 violations=0`; the frozen evidence tree counts separately at `violations=9` (all under already registered / confirmed calibers: B2's CRLF, B3b's BOM, and the six `glm-eval/archive/**` items normalized by archived type).
 - Residue: untracked residue **0**; the staged state holds 7 items (`M ` x4 + `A ` x3) and `git status --short` has no `??` line; the `tmp/haiku-bump/` process artifacts are listed in §16.
 - IDE diagnostics: **0 errors** across the 7 changed artifacts.
-- `node tools/gates/gate.js --all --scope=tree` re-run at the ⑧c time point ⇒ `changed=7`, `TOTAL_FAIL=0`; `G7-a` … `G7-d` moved from `INFO` to PASS, and `G7-b` measured 62 artifact rows (31 per report); `--scope=index` gives the same reading.
+- `node tools/gates/gate.js --all --scope=tree` re-run at the ⑧c time point ⇒ `changed=7`, `TOTAL_FAIL=0`; `G7-a` … `G7-d` moved from `INFO` to PASS, and `G7-b` measured 76 artifact rows (38 per report); `--scope=index` gives the same reading.
 - The frozen regions (§2.2 / §2.4 / §6.3 / §7.5 / Appendix B) are not rewritten; this slice is zero-diff against them (A12 experiment 10/10 `identical`).
 - **Ordering deviation**: see **A-9** in §4 (readings taken after ⑧b; writing them back added this section's numbers afterwards).
 
@@ -195,6 +195,13 @@ tmp/haiku-bump/pre-05-gate-index.txt	local-only
 tmp/haiku-bump/pre-05-gate-tree.txt	local-only
 tmp/haiku-bump/pre-05-selftest.txt	local-only
 tmp/haiku-bump/wrap-enc.js	local-only
+tmp/haiku-bump/ci-watch.log	local-only
+tmp/haiku-bump/ci-ubuntu.log	local-only
+tmp/haiku-bump/ci-windows.log	local-only
+tmp/haiku-bump/ci-extract.js	local-only
+tmp/haiku-bump/ci-extract-out.txt	local-only
+tmp/haiku-bump/runs.json	local-only
+tmp/haiku-bump/run-view.json	local-only
 tmp/haiku-bump/	local-only
 ```
 

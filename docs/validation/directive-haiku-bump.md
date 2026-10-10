@@ -105,8 +105,8 @@
 
 ## 9. 明确未执行事项
 
-- **⑨ 已执行（本地）**：本地复跑与 §7.7 的 A12 专项独立实验均已完成，读数见 §7；**CI 腿未执行**（授权边界 commit 否 / push 否 ⇒ 无 CI run）；本报告**不声称** CI 已运行。
-- **未提交、未推送**：变更集停在暂存态；**gitee 未推**；⑩ 停点**须同轮授权**方可解除。
+- **⑨ 已执行（本地 + CI）**：本地复跑与 §7.7 的 A12 专项独立实验均已完成，读数见 §7；**CI 腿已观察** —— run `38088769915`（push 事件，head `ccacd26`）`completed / success`，两腿均**实测执行** `Gates` 步骤，读数见下方「提交与 CI」。
+- **提交与 CI**：提交 `ccacd26`（`docs(directive): bump the Haiku enabling precondition to 5.5 and close OB-74 (v1.27)`）已推送 origin（`00f08c2..ccacd26`，变更规模 +479/−6）；**gitee 未推**。两腿 `Gates` 步骤读数：Ubuntu 腿（`repo=/home/runner/work/prfrail/prfrail`）与 Windows 腿（`repo=D:\a\prfrail\prfrail`）均 `SELFTEST: PASS 335/335`、`GATE REPORT scope=ci changed=7`、`TOTAL_FAIL=0`；Go 包级 `ok` 行 = Ubuntu 腿 16 条（含 Race 腿 `internal/adapters` 与 `internal/chain`）、Windows 腿 14 条，两腿均含目标包 `internal/gates`。⑩ 停点由用户同日打包预授权解除（条件已满足），本次以**一次** docs-only 提交回写 CI 事实。
 - **探针记账**：额度 1 次（硬上限、不追加）——1 次基础设施超时尝试（408、**无结论**、**不计有效探针**）+ 1 次**有效探针**（`runSubagent` 接受 `Claude Haiku 5.5 (copilot)`，载体 `quick-verifier`）；**同轮授权仅允许单次重试**；**未追加**（见 A-5）。
 - **调用计数**：⑥ 1 次；⑦ **3 次**（1 终审 + 1 复审 + 1 **用户授权收窄读**，第 3 读依 §7.8.3 仅本片有效）；**无降级 ADR**；**Haiku 未承担任何审查工作**（仅作可用性探针）。
 - C-1 本片不落；成本比较不在本片。
@@ -132,7 +132,7 @@
 - 编码核验（`tmp/haiku-bump/wrap-enc.js`，`git ls-files -z` 全量）：非冻结树 `tracked=3415 text=3326 binary=89 violations=0`；冻结证据树另计 `violations=9`（全部属已登记 / 已确认口径：B2 的 CRLF、B3b 的 BOM、`glm-eval/archive/**` 六项按归档后类型归一）。
 - 残留：未跟踪残留 **0**；暂存态 7 项（`M ` ×4 + `A ` ×3），`git status --short` 无 `??` 行；`tmp/haiku-bump/` 的过程件清单见 §16。
 - IDE 诊断：7 个变更工件 **0 错误**。
-- `node tools/gates/gate.js --all --scope=tree` 于 ⑧c 时点复跑 ⇒ `changed=7`、`TOTAL_FAIL=0`；`G7-a` … `G7-d` 由 `INFO` 转为 PASS，`G7-b` 实测产物行数 = 62（两份报告各 31）；`--scope=index` 同读数。
+- `node tools/gates/gate.js --all --scope=tree` 于 ⑧c 时点复跑 ⇒ `changed=7`、`TOTAL_FAIL=0`；`G7-a` … `G7-d` 由 `INFO` 转为 PASS，`G7-b` 实测产物行数 = 76（两份报告各 38）；`--scope=index` 同读数。
 - 冻结区（§2.2 / §2.4 / §6.3 / §7.5 / 附录 B）不参与改写；本片对其零 diff（A12 实验 10/10 `identical`）。
 - **时序偏离**：见 §4 的 **A-9**（读数在 ⑧b 后采集，回写使本节数值在其后被补入一次）。
 
@@ -195,6 +195,13 @@ tmp/haiku-bump/pre-05-gate-index.txt	local-only
 tmp/haiku-bump/pre-05-gate-tree.txt	local-only
 tmp/haiku-bump/pre-05-selftest.txt	local-only
 tmp/haiku-bump/wrap-enc.js	local-only
+tmp/haiku-bump/ci-watch.log	local-only
+tmp/haiku-bump/ci-ubuntu.log	local-only
+tmp/haiku-bump/ci-windows.log	local-only
+tmp/haiku-bump/ci-extract.js	local-only
+tmp/haiku-bump/ci-extract-out.txt	local-only
+tmp/haiku-bump/runs.json	local-only
+tmp/haiku-bump/run-view.json	local-only
 tmp/haiku-bump/	local-only
 ```
 
