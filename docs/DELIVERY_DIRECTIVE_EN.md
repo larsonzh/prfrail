@@ -1456,7 +1456,7 @@ The following files **only get a supersede pointer added to the file header and 
 | Field | Content |
 |---|---|
 | ID | `DIRECTIVE-HAIKU-BUMP` (v1.27) |
-| Status | ⬜ **In progress** (the truthful state before ⑩ of this slice: to be updated by ⑧b after ⑤⑥⑦ and ⑨ complete) |
+| Status | ✅ **Complete** (report at docs/validation/directive-haiku-bump{,_EN}.md; the pre-⑩ state was in progress and ⑧b updated it) |
 | Goal | (1) §7.2.3's enabling precondition moves from `Claude Haiku 4.5` to `Claude Haiku 5.5`; (2) §7.2.3 gains a "call string and internal identifier" paragraph (qualified name `Claude Haiku 5.5 (copilot)`, internal identifier `claude-haiku-5.5`, explicitly stating that its internal identifier is not a member of the §6.3 G5-b whitelist closed set) ⇒ closes OB-74; (3) the OB-74 disposition in §12.4 flips to `Resolved` |
 | Trigger | the user 2026-10-11 start declaration (`[SLICE]`, tier S, documentation only, 1 probe; 6th pilot deferral = OB-86) |
 | Size | S (pure `.md`) |

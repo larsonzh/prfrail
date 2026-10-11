@@ -1456,7 +1456,7 @@ SLICE: READY_FOR_REVIEW | SLICE: BLOCKED
 | 字段 | 内容 |
 |---|---|
 | 标识 | `DIRECTIVE-HAIKU-BUMP`（v1.27） |
-| 状态 | ⬜ **进行中**（本片 ⑩ 前的如实状态：待 ⑤⑥⑦ 与 ⑨ 完成后由 ⑧b 更新） |
+| 状态 | ✅ **已完成**（报告见 docs/validation/directive-haiku-bump{,_EN}.md；⑩ 前状态曾为进行中，已由 ⑧b 更新） |
 | 目标 | ① §7.2.3 启用前置条件版本由 `Claude Haiku 4.5` 升为 `Claude Haiku 5.5`；② §7.2.3 增「调用串与内部标识」段（限定名 `Claude Haiku 5.5 (copilot)`、内部标识 `claude-haiku-5.5`，并明写其内部标识不属于 §6.3 的 G5-b 白名单闭集）⇒ 闭合 OB-74；③ §12.4 的 OB-74 处置列翻 `已处置` |
 | 触发 | 用户 2026-10-11 启动声明（`[SLICE]`，S 档、纯文档、探针 1 次；试点顺延第 6 次 = OB-86） |
 | 规模 | S（纯 `.md`） |
