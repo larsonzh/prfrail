@@ -14,6 +14,7 @@
 ## 2. 变更概要
 
 - 变更集 = **提交 `b095cd2`**：**⑨ 时点 28 项**（`+6998/−22`、12 新增 / 16 修改）；**定稿态 34 项**（`+7544/−24`，另含报告对、台账注记与 `DEV_PLAN` 回写，见下表末三行），0 未跟踪；其后另有**一次 docs-only CI 证据回写**（§9）。全部工件以 `git add <路径>` **精确暂存**，未使用 `git add -A`。
+- 口径定义（以 `git show --stat` / `git diff --shortstat` 核对）：**功能变更集** = 代码 / 契约 / schema / 测试 + 本片证据清单，**28 项 / `+6998/−22`**；**主提交 `b095cd2`** = 功能变更集 + 收口文档（两份报告、两行台账、两处 `DEV_PLAN`），**34 项 / `+7544/−24`**（CI `changed=34` 与此一致）；**docs-only CI 证据回写 `049b71f`** = 4 项 / `+18/−16`。
 
 | 区域 | 工件 | numstat |
 |---|---|---|
@@ -150,6 +151,7 @@
 
 - **提交与推送（已完成）**：提交 `b095cd2`（`feat(supervised): add the supervised-black-box explicit mode (T028)`）已推送 **origin**（SSH，`0135f85..b095cd2`，变更规模 `+7544/−24`）；**gitee 未推**。
 - **CI 双腿（已完成，首跑即绿）**：run `38137422277`（push 事件、head `b095cd2`）结论 `completed / success`。两腿 `Gates` 步骤读数 = Ubuntu 腿（`repo=/home/runner/work/prfrail/prfrail`）与 Windows 腿（`repo=D:\a\prfrail\prfrail`）均 `SELFTEST: PASS 335/335`、`GATE REPORT scope=ci changed=34`、`TOTAL_FAIL=0`；包级 `ok` 行 = Ubuntu 腿 **16** 条（含 Race 腿 `internal/adapters` 与 `internal/chain`）、Windows 腿 **14** 条，两腿均含目标包 `internal/chain` / `internal/console` / `internal/adapters` / `internal/gates`；两腿 `FAIL` 行 **0**。**首跑无红**（无 §6.4 处置需求）。
+- **CI 证据回写提交（docs-only）**：`049b71f`（`docs(t028): write back the commit id and both CI leg readings (no rule change)`，4 项 / `+18/−16`）已推送 origin（`b095cd2..049b71f`）；其自身 run `38137996587` = `completed / success`（**确认绿，但按授权口径不为其再起记录提交**）。
 - **本地 `--scope=ci` 的时点说明**：④ 时点该作用域读到 `changed=2`（上一提交的路径集），**不是本片变更集**；真实 CI 腿已按上条实测 `changed=34`。
 - **探针 0**：未发起任何付费 / 真实模型探针；真实 SessionBridge visible 通道与真实外部 agent 的行为**未观测**（见 §8 的 D-18）。
 - **未执行**：`go test -race` 本机（Windows）未跑（race 腿由 CI 的 Ubuntu 腿承担）、真实 hook 定义来源装配、真实 visible 端到端（依赖 T027-B）。

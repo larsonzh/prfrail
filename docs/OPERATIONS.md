@@ -38,7 +38,7 @@ S1 使用手工解压的 Windows amd64 便携 ZIP：核对固定 commit/GitHub C
 
 当前可复制流程为 `prfrail init --workspace <path>`、`prfrail validate --chain <chain-file>`、`prfrail config explain --chain <chain-file>`、`prfrail preview --chain <chain-file> [--json]`、`prfrail interactions list|respond|tui`、`prfrail cost report [--ledger <path>] [--json]`、`prfrail ai check ...`、`prfrail run --chain <chain-file> [--run-id] [--run-dir]`、`prfrail report --run-dir <run-dir>`。新用户先按[安装指南的五步快速上手](INSTALLATION.md#3-五步快速上手)完成无副作用闭环。`preview` 只读展示 `previewHash`、权限边界、unknown 及零调用计数；`interactions` 只处理已有持久请求，不自行调用模型；`cost report` 本地读取成本账本并输出预留/结算/未知占用，不做默认遥测导出；`ai check` 会读取绑定的 SecretStore 凭据并发起一次真实模型请求；`run` 当前仅支持 noop-only 链。导出能力已在库级实现，但 CLI `export` 命令仍在后续切片；执行型 step 的真实 gate/adapter 全闭环同样属于后续切片。
 
-核心离线模式不要求 VS Code。正式 AI 执行目标为固定 CLI Agent 的 AgentRunner；受监督黑箱候选才要求 VS Code、可用 Copilot Chat 和 SessionBridge 0.1.1 的 visible 模式。启动黑箱模式前必须确认其过程/网络/费用/外部副作用不可观测，用户监督后显式归还 workspace，再由 ProofRail 独立验收。两条路径当前均未交付，扩展已安装或消息可达不等于 AI 自动编程验收。
+核心离线模式不要求 VS Code。正式 AI 执行目标为固定 CLI Agent 的 AgentRunner；受监督黑箱候选才要求 VS Code、可用 Copilot Chat 和 SessionBridge 0.1.1 的 visible 模式。启动黑箱模式前必须确认其过程/网络/费用/外部副作用不可观测，用户监督后显式归还 workspace，再由 ProofRail 独立验收。AgentRunner 路径仍未交付（T027/AT-23 阻断 S1）；黑箱候选的产品侧实现已完成（T028，AT-24 条件闭合），但真实 CLI 端到端依赖 T027-B、尚不可运行发布；扩展已安装或消息可达不等于 AI 自动编程验收。
 
 当前 CLI 基线使用单文件链配置（优先 `--chain`；否则按 `./proofrail.chain.json` → `./proofrail.json` 搜索）。`proofrail.toml/workspace.toml` 的分层配置仍属后续规划。运行状态由引擎维护，用户不得修改 runtime-state、journal、receipt 或已接受 manifest。使用 config explain 检查最终来源、工具/网络权限和预算，不从模型自然语言推断配置。
 

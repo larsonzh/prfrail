@@ -14,6 +14,7 @@
 ## 2. Change summary
 
 - Change set = **commit `b095cd2`**: **28 items at the ⑨ point** (`+6998/−22`, 12 added / 16 modified); **34 items at the final state** (`+7544/−24`, also covering the report pair, the ledger note and the `DEV_PLAN` writeback, see the last three rows below), 0 untracked; one further **docs-only CI evidence writeback** follows (§9). Every artifact was **precisely staged** with `git add <path>`; `git add -A` was never used.
+- Caliber definition (verified with `git show --stat` / `git diff --shortstat`): the **functional change set** = code / contract / schema / tests plus this slice's evidence list, **28 items / `+6998/−22`**; the **main commit `b095cd2`** = functional change set + closeout documents (two reports, two ledger rows, two `DEV_PLAN` entries), **34 items / `+7544/−24`** (matching CI `changed=34`); the **docs-only CI evidence writeback `049b71f`** = 4 items / `+18/−16`.
 
 | Area | Artifact | numstat |
 |---|---|---|
@@ -150,6 +151,7 @@
 
 - **Commit and push (done)**: commit `b095cd2` (`feat(supervised): add the supervised-black-box explicit mode (T028)`) is pushed to **origin** (SSH, `0135f85..b095cd2`, change size `+7544/−24`); **gitee not pushed**.
 - **CI legs (done, green on the first run)**: run `38137422277` (push event, head `b095cd2`) concluded `completed / success`. Both legs' `Gates` step readings - Ubuntu (`repo=/home/runner/work/prfrail/prfrail`) and Windows (`repo=D:\a\prfrail\prfrail`) - show `SELFTEST: PASS 335/335`, `GATE REPORT scope=ci changed=34` and `TOTAL_FAIL=0`; package-level `ok` lines are **16** for Ubuntu (including the Race leg's `internal/adapters` and `internal/chain`) and **14** for Windows, and both legs cover the target packages `internal/chain` / `internal/console` / `internal/adapters` / `internal/gates`; `FAIL` lines are **0** on both. **No red on the first run** (so no §6.4 handling was needed).
+- **CI evidence writeback commit (docs-only)**: `049b71f` (`docs(t028): write back the commit id and both CI leg readings (no rule change)`, 4 items / `+18/−16`) is pushed to origin (`b095cd2..049b71f`); its own run `38137996587` = `completed / success` (**confirmed green, and per the authorization no further record commit was created for it**).
 - **Timing note on the local `--scope=ci` reading**: at the ④ point that scope read `changed=2` (the previous commit's path set), **not this slice's change set**; the real CI legs measured `changed=34` as recorded above.
 - **Probes 0**: no paid / real-model probe was issued; the behavior of the real SessionBridge visible channel and of a real external agent was **not observed** (see D-18 in §8).
 - **Not executed**: `go test -race` on this Windows host (the race leg is carried by the CI Ubuntu leg), a real hook-definition source assembly, and the real visible end-to-end (depends on T027-B).

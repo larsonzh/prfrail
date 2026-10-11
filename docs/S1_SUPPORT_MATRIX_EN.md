@@ -11,7 +11,7 @@ Date: 2026-09-09. Status: `CANDIDATE`, effective only after the formal release c
 | macOS / Windows on Arm / Linux arm64 | Unsupported | Not included in the S1 acceptance matrix |
 | generic/C/Go harnesses | Configuration and noop orchestration | Language scopes, read-only preview, and noop-only loops are verified; executable steps still fail closed |
 | CLI Agent / AgentRunner | Planned, not delivered | Target formal AI execution channel; requires pinned version/config, capability probe, isolated workspace, process/session evidence and independent acceptance; T026/T027/AT-23 block S1 |
-| VS Code / Copilot Chat / SessionBridge visible black-box candidate | Planned, reduced assurance, not delivered | Not needed for core offline CLI; bridges an isolated candidate only with explicit risk acknowledgment and human supervision, followed by independent acceptance; does not warrant tools/network/cost/external effects; T028/AT-24 block S1 |
+| VS Code / Copilot Chat / SessionBridge visible black-box candidate | Product side implemented (reduced assurance), real CLI end-to-end depends on T027-B, not yet a runnable release | Not needed for core offline CLI; bridges an isolated candidate only with explicit risk acknowledgment and human supervision, followed by independent acceptance; does not warrant tools/network/cost/external effects; AT-24 conditionally closed, S1 still blocked by T027/AT-23 |
 
 ## Candidate Version and Security-Maintenance Policy
 
