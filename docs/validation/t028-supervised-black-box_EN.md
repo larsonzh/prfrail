@@ -1,7 +1,7 @@
 ﻿# Slice validation report · `T028` (supervised-black-box explicit mode)
 
 > Slice id: `T028`; directive v1.27; date 2026-10-11. Tier `[PILOT]`; size M-L; probes 0; `[ROUTINE]` not applicable.
-> **Status**: **⑧b final** (⑨ local validation and the §7.7 A12 dedicated independent experiment are in §7; ⑧c wrap-up records are in §11). **Authorization boundary**: commit no / push no / gitee no / probes 0 (no additions); commit and push require same-turn authorization.
+> **Status**: **⑧b final + commit and CI writeback** (⑨ local validation and the §7.7 A12 dedicated independent experiment are in §7; ⑧c wrap-up records are in §11; the commit and CI facts are in §9). **Authorization boundary**: the commit and push ran under the user's **same-turn bundled authorization** (origin-only / SSH); gitee no; probes 0 (no additions).
 
 ## 1. Objective and scope
 
@@ -13,7 +13,7 @@
 
 ## 2. Change summary
 
-- Change set = `git diff --cached`: **28 items at the ⑨ point** (`+6998/−22`, 12 added / 16 modified); **34 items at the final state** (`+7544/−24`, also covering the report pair, the ledger note and the `DEV_PLAN` writeback, see the last three rows below), 0 untracked. Every artifact was **precisely staged** with `git add <path>`; `git add -A` was never used.
+- Change set = **commit `b095cd2`**: **28 items at the ⑨ point** (`+6998/−22`, 12 added / 16 modified); **34 items at the final state** (`+7544/−24`, also covering the report pair, the ledger note and the `DEV_PLAN` writeback, see the last three rows below), 0 untracked; one further **docs-only CI evidence writeback** follows (§9). Every artifact was **precisely staged** with `git add <path>`; `git add -A` was never used.
 
 | Area | Artifact | numstat |
 |---|---|---|
@@ -148,10 +148,11 @@
 
 ## 9. Explicitly not executed
 
-- **No commit / no push**: this slice performed zero `git commit`, zero `git push` and zero gitee push (authorization boundary); there is therefore **no commit id and no CI reading**.
-- **No CI legs**: the `--scope=ci` reading of `changed=2` covers the **previous commit** (`DIRECTIVE-HAIKU-BUMP` documentation writeback), **not this slice's change set** ⇒ that scope yields **no slice-relevant reading** here; the missing CI leg is carried by the local re-run and by the §7.7 A12 experiment.
+- **Commit and push (done)**: commit `b095cd2` (`feat(supervised): add the supervised-black-box explicit mode (T028)`) is pushed to **origin** (SSH, `0135f85..b095cd2`, change size `+7544/−24`); **gitee not pushed**.
+- **CI legs (done, green on the first run)**: run `38137422277` (push event, head `b095cd2`) concluded `completed / success`. Both legs' `Gates` step readings - Ubuntu (`repo=/home/runner/work/prfrail/prfrail`) and Windows (`repo=D:\a\prfrail\prfrail`) - show `SELFTEST: PASS 335/335`, `GATE REPORT scope=ci changed=34` and `TOTAL_FAIL=0`; package-level `ok` lines are **16** for Ubuntu (including the Race leg's `internal/adapters` and `internal/chain`) and **14** for Windows, and both legs cover the target packages `internal/chain` / `internal/console` / `internal/adapters` / `internal/gates`; `FAIL` lines are **0** on both. **No red on the first run** (so no §6.4 handling was needed).
+- **Timing note on the local `--scope=ci` reading**: at the ④ point that scope read `changed=2` (the previous commit's path set), **not this slice's change set**; the real CI legs measured `changed=34` as recorded above.
 - **Probes 0**: no paid / real-model probe was issued; the behavior of the real SessionBridge visible channel and of a real external agent was **not observed** (see D-18 in §8).
-- **Not executed**: `go test -race` (the race toolchain availability was not verified on this Windows host), any Linux-side validation, and a real hook-definition source assembly.
+- **Not executed**: `go test -race` on this Windows host (the race leg is carried by the CI Ubuntu leg), a real hook-definition source assembly, and the real visible end-to-end (depends on T027-B).
 - **Call counts**: ① 1; ②a 2; ②b 8 (including repair rounds); ③ 3; ④ 3; ⑤ 3 (capped, see §12); ⑥ 3 (capped); ⑦ 2 (blind + final); probes 0.
 
 ## 10. Deviations and freedom
@@ -203,9 +204,9 @@
 
 ## 15. ⑩ stop-point report (including the writeback checklist)
 
-- Executed through **⑧b finalize + ⑧c wrap-up**; ⑨'s local part and the §7.7 A12 experiment have both been executed; the **⑩ stop point has been issued**.
+- Executed through **⑧b finalize + ⑧c wrap-up + user-audit closeout + commit and CI**; ⑨'s local part and the §7.7 A12 experiment have both been executed; the **⑩ stop point has been issued** and was lifted by the user's **same-turn bundled authorization** (commit + push + CI observation + one docs-only CI evidence writeback).
 - **Writeback checklist** (§11.2 reading): validation report = **produced** (this file pair); `DEV_PLAN` = **written back** (the T028 entry is **checked off** and carries the report path); ledger = **written back** (completion row plus classification boundary note); ADR = **not applicable** (no model downgrade and no budget exception requiring one).
-- Authorization boundary (as of the ⑩ stop point): **commit no / push no / gitee no**; commit and push **require same-turn authorization**.
+- Authorization boundary (as of the ⑩ stop point): **commit no / push no / gitee no**; afterwards an **origin-only** (SSH) commit and push were executed under the user's same-turn bundled authorization, **gitee no**, probes 0; the commit and CI facts are in the "Commit and push" and "CI legs" entries of §9.
 
 ## 16. Pilot notes (metrics and honest declarations)
 
