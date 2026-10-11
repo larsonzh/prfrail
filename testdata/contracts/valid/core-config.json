@@ -175,5 +175,55 @@
         }
       ]
     }
+  },
+  {
+    "fixtureId": "chain-supervised-black-box-valid",
+    "schema": "chain.schema.json",
+    "expected": "accept",
+    "rejectionLayer": "schema",
+    "reason": "Supervised-black-box code step carrying a complete handoff policy",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "chain": {
+        "id": "supervised-chain",
+        "profile": "standard"
+      },
+      "tasks": [
+        {
+          "id": "supervised-task",
+          "review": "policy",
+          "steps": [
+            {
+              "id": "supervised-step",
+              "kind": "code",
+              "execution": "supervised-black-box",
+              "handoffPolicy": {
+                "allowedTargets": ["source"],
+                "inputPolicy": "structured",
+                "handoffTimeoutMs": 3600000,
+                "returnActions": ["complete", "abort"],
+                "hooksAfterReturn": ["return-scan"]
+              }
+            }
+          ]
+        }
+      ],
+      "workspace": {
+        "components": [
+          {
+            "id": "core",
+            "root": ".",
+            "languageScopes": [
+              {
+                "id": "go-main",
+                "language": "go",
+                "harness": "go-standard",
+                "targets": ["source"]
+              }
+            ]
+          }
+        ]
+      }
+    }
   }
 ]

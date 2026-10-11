@@ -157,6 +157,84 @@ type PostflightPort interface {
 	RunPostflight(context.Context, PostflightRequest) (PostflightDecision, error)
 }
 
+// SupervisedPostflightPort runs the chain-owned postflight of a supervised
+// black-box task. The port re-derives the five supervised facts itself (a fresh
+// workspace scan, a managed-process stop proof, the frozen gates, the reduced
+// report and the returned handoff receipt) and reconciles them field by field;
+// it must not write state and must not reach the Engine.
+type SupervisedPostflightPort interface {
+	RunSupervisedPostflight(context.Context, SupervisedPostflightRequest) (SupervisedPostflightDecision, error)
+}
+
+// SupervisedPostflightRequest carries everything the supervised postflight port
+// may rely on.
+type SupervisedPostflightRequest struct {
+	RunID              string
+	TaskID             string
+	Attempt            int
+	ParentSnapshotHash string
+	Workspace          Workspace
+	Facts              SupervisedFrozenFacts
+}
+
+// SupervisedPostflightDecision is the supervised port's verdict plus its
+// evidence. A passed verdict must carry all five fact digests, so the engine can
+// prove that the gate consumed the frozen facts instead of trusting the port.
+type SupervisedPostflightDecision struct {
+	Outcome       PostflightOutcome
+	Evidence      []string
+	ErrorEvidence []string
+}
+
+// Validate checks the outcome and the fact binding of a passed verdict.
+func (decision SupervisedPostflightDecision) Validate(facts SupervisedFrozenFacts) error {
+	switch decision.Outcome {
+	case PostflightPassed, PostflightFailed, PostflightUncertain:
+	default:
+		return fmt.Errorf("%w: unknown outcome %q", ErrInvalidPostflightDecision, decision.Outcome)
+	}
+	for _, hash := range decision.Evidence {
+		if !evidence.ValidHash(hash) {
+			return fmt.Errorf("%w: invalid evidence digest", ErrInvalidPostflightDecision)
+		}
+	}
+	for _, hash := range decision.ErrorEvidence {
+		if !evidence.ValidHash(hash) {
+			return fmt.Errorf("%w: invalid error evidence digest", ErrInvalidPostflightDecision)
+		}
+	}
+	if decision.Outcome != PostflightPassed {
+		return nil
+	}
+	for _, fact := range facts.hashes() {
+		if !slices.Contains(decision.Evidence, fact) {
+			return fmt.Errorf("%w: a passed supervised postflight must carry every frozen fact digest", ErrInvalidPostflightDecision)
+		}
+	}
+	return nil
+}
+
+// findTask resolves a task of the run definition.
+func (engine *Engine) findTask(taskID string) (Task, bool) {
+	for _, task := range engine.options.Definition.Tasks {
+		if task.ID == taskID {
+			return task, true
+		}
+	}
+	return Task{}, false
+}
+
+// taskHasSupervisedStep reports whether a task contains a supervised-black-box
+// step. Such a task may only reach review from the supervised postflight branch.
+func taskHasSupervisedStep(task Task) bool {
+	for _, step := range task.Steps {
+		if step.Mode == SupervisedBlackBox {
+			return true
+		}
+	}
+	return false
+}
+
 // agentRunnerFactsEvidence returns the fact digests in routing order, for the
 // terminal-passed routing evidence layout.
 func agentRunnerFactsEvidence(facts AgentRunnerFrozenFacts) []string {
@@ -225,11 +303,24 @@ func (engine *Engine) requirePostflightQualifiedReview(ctx context.Context, task
 	if err != nil {
 		return err
 	}
-	facts, found, err := agentRunnerTaskFacts(events, engine.options.RunID, taskID)
+	agentFacts, agentFound, err := agentRunnerTaskFacts(events, engine.options.RunID, taskID)
 	if err != nil {
 		return err
 	}
-	if !found {
+	supervisedFacts, supervisedFound, err := supervisedTaskFacts(events, engine.options.RunID, taskID)
+	if err != nil {
+		return err
+	}
+	if agentFound && supervisedFound {
+		return fmt.Errorf("%w: task %s carries mixed postflight facts", ErrInvalidPostflightFacts, taskID)
+	}
+	if !agentFound && !supervisedFound {
+		// A task whose steps never routed frozen facts keeps the pre-existing
+		// path; a supervised task with no return facts can never have earned
+		// REVIEW_PENDING at all.
+		if task, ok := engine.findTask(taskID); ok && taskHasSupervisedStep(task) {
+			return fmt.Errorf("%w: supervised task %s is in REVIEW_PENDING without a return fact set", ErrUnqualifiedReview, taskID)
+		}
 		return nil
 	}
 	var recorded *evidence.StateEvent
@@ -243,7 +334,11 @@ func (engine *Engine) requirePostflightQualifiedReview(ctx context.Context, task
 	if recorded == nil {
 		return fmt.Errorf("%w: task %s is in REVIEW_PENDING without a recorded review transition", ErrUnqualifiedReview, taskID)
 	}
-	for _, digest := range agentRunnerFactsEvidence(facts) {
+	required := agentRunnerFactsEvidence(agentFacts)
+	if supervisedFound {
+		required = supervisedFactsEvidence(supervisedFacts)
+	}
+	for _, digest := range required {
 		if !slices.Contains(recorded.Event.InputEvidence, digest) {
 			return fmt.Errorf("%w: task %s reached REVIEW_PENDING without the postflight gate", ErrUnqualifiedReview, taskID)
 		}
@@ -267,6 +362,21 @@ func (engine *Engine) runTaskPostflight(ctx context.Context, task Task, parent S
 	facts, found, err := agentRunnerTaskFacts(events, engine.options.RunID, task.ID)
 	if err != nil {
 		return nil, "", engine.failTask(ctx, task.ID, "postflight-facts-missing", err)
+	}
+	supervisedFacts, supervisedFound, err := supervisedTaskFacts(events, engine.options.RunID, task.ID)
+	if err != nil {
+		return nil, "", engine.failTask(ctx, task.ID, "supervised-postflight-facts-missing", err)
+	}
+	if found && supervisedFound {
+		return nil, "", engine.failTask(ctx, task.ID, "postflight-mixed-facts", fmt.Errorf("%w: task %s mixes AgentRunner and supervised facts", ErrInvalidPostflightFacts, task.ID))
+	}
+	if supervisedFound {
+		return engine.runSupervisedTaskPostflight(ctx, task, parent, workspace, supervisedFacts)
+	}
+	if taskHasSupervisedStep(task) {
+		// A supervised task can never infer completion from a plain step pass:
+		// without return facts the review state is not reachable (P3).
+		return nil, "", engine.failTask(ctx, task.ID, "supervised-return-facts-missing", fmt.Errorf("%w: supervised task %s has no return fact set", ErrInvalidPostflightFacts, task.ID))
 	}
 	if !found {
 		return nil, "steps-completed", nil
@@ -301,5 +411,46 @@ func (engine *Engine) runTaskPostflight(ctx context.Context, task Task, parent S
 		return nil, "", fmt.Errorf("%w: postflight uncertain for task %q", ErrRecoveryUncertain, task.ID)
 	default:
 		return inputs, "postflight-passed", nil
+	}
+}
+
+// runSupervisedTaskPostflight runs the chain-owned postflight gate of a
+// supervised-black-box task. Only a passed supervised postflight qualifies the
+// task for REVIEW_PENDING, and the review transition carries the supervised
+// facts - never the agent ones.
+func (engine *Engine) runSupervisedTaskPostflight(ctx context.Context, task Task, parent SnapshotRef, workspace Workspace, facts SupervisedFrozenFacts) ([]string, string, error) {
+	if engine.options.SupervisedPostflight == nil {
+		return nil, "", engine.failTask(ctx, task.ID, "supervised-postflight-unavailable", fmt.Errorf("%w: %w", ErrInvalidDefinition, ErrPostflightUnavailable))
+	}
+	decision, err := engine.options.SupervisedPostflight.RunSupervisedPostflight(ctx, SupervisedPostflightRequest{
+		RunID:              engine.options.RunID,
+		TaskID:             task.ID,
+		Attempt:            1,
+		ParentSnapshotHash: parent.Hash,
+		Workspace:          workspace,
+		Facts:              facts,
+	})
+	if err != nil {
+		return nil, "", engine.failTask(ctx, task.ID, "supervised-postflight-failed", err)
+	}
+	if err := decision.Validate(facts); err != nil {
+		return nil, "", engine.failTask(ctx, task.ID, "supervised-postflight-invalid", err)
+	}
+	inputs := uniqueHashes(append(append(supervisedFactsEvidence(facts), decision.Evidence...), decision.ErrorEvidence...))
+	switch decision.Outcome {
+	case PostflightFailed:
+		return nil, "", engine.markTaskForRepair(ctx, task.ID, "supervised-postflight-rejected", inputs)
+	case PostflightUncertain:
+		if err := engine.transition(ctx, taskEntity(engine.options.RunID, task.ID), "FAILED", inputs, "supervised-postflight-uncertain"); err != nil {
+			return nil, "", err
+		}
+		if engine.state.projection.ChainState == "RUNNING" {
+			if err := engine.transition(ctx, chainEntity(engine.options.RunID), "PAUSED", inputs, agentRunnerRecoveryUncertainReason); err != nil {
+				return nil, "", err
+			}
+		}
+		return nil, "", fmt.Errorf("%w: supervised postflight uncertain for task %q", ErrRecoveryUncertain, task.ID)
+	default:
+		return inputs, "supervised-postflight-passed", nil
 	}
 }

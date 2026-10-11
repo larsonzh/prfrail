@@ -203,6 +203,14 @@ func previewStepKind(step StepConfig) string {
 		if execution == "manual-handoff" {
 			return "manual-handoff"
 		}
+		// Deliberately approximate preview-layer mapping: the preview kind enum
+		// (internal/taskdef) is a closed set without a supervised member, so a
+		// supervised-black-box step previews as its closest existing kind. This is
+		// a read-only preview label only; the runtime routes the step to the
+		// supervised assembly (see executeRun) and never to the handoff port.
+		if execution == supervisedExecutionMode {
+			return "manual-handoff"
+		}
 		return "code"
 	}
 	return step.Kind

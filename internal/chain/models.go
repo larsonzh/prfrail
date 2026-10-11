@@ -21,9 +21,10 @@ var (
 type ChangeMode string
 
 const (
-	ManagedChangeSet  ChangeMode = "managed-change-set"
-	IsolatedWorkspace ChangeMode = "isolated-workspace"
-	ManualHandoff     ChangeMode = "manual-handoff"
+	ManagedChangeSet   ChangeMode = "managed-change-set"
+	IsolatedWorkspace  ChangeMode = "isolated-workspace"
+	ManualHandoff      ChangeMode = "manual-handoff"
+	SupervisedBlackBox ChangeMode = "supervised-black-box"
 )
 
 type Step struct {
@@ -88,6 +89,12 @@ type StepExecutionIntent struct {
 }
 
 func (intent StepExecutionIntent) validate(step Step) error {
+	// A supervised-black-box step is executed by an operator-supervised external
+	// agent, never by the managed AgentRunner: the mode can not be entered by
+	// declaring an AgentRunner execution target (P1).
+	if step.Mode == SupervisedBlackBox && (intent.ExecutionTarget != DefaultExecution || intent.AgentRunnerFacts != nil) {
+		return fmt.Errorf("%w: supervised-black-box steps must never use an AgentRunner execution target", ErrInvalidDefinition)
+	}
 	switch intent.ExecutionTarget {
 	case DefaultExecution:
 		if intent.AgentRunnerFacts != nil {
@@ -238,7 +245,7 @@ func (definition Definition) validate() error {
 					if step.HandoffPolicy != nil {
 						return fmt.Errorf("%w: non-handoff code step %q must not define handoff policy", ErrInvalidDefinition, step.ID)
 					}
-				case ManualHandoff:
+				case ManualHandoff, SupervisedBlackBox:
 					if step.HandoffPolicy == nil {
 						return fmt.Errorf("%w: handoff code step %q requires handoff policy", ErrInvalidDefinition, step.ID)
 					}

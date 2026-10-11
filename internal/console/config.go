@@ -18,6 +18,12 @@ const (
 	DefaultChainConfigName   = "proofrail.chain.json"
 	FallbackChainConfigName  = "proofrail.json"
 	defaultDocumentationRule = "if-affected"
+	// supervisedExecutionMode is the chain step execution declaration of the
+	// supervised-black-box mode.
+	supervisedExecutionMode = "supervised-black-box"
+	// supervisedRequiredChannel is the only AI channel a supervised definition may
+	// deliver through. A supervised step without it must fail closed.
+	supervisedRequiredChannel = "sessionbridge-visible"
 )
 
 var ErrInvalidConfig = errors.New("invalid proofrail configuration")
@@ -272,6 +278,9 @@ func ValidateChainConfig(cfg ChainConfig) error {
 			return err
 		}
 	}
+	if err := validateSupervisedChannel(cfg); err != nil {
+		return err
+	}
 	if len(cfg.Tasks) == 0 {
 		return fmt.Errorf("%w: tasks must not be empty", ErrInvalidConfig)
 	}
@@ -300,12 +309,22 @@ func ValidateChainConfig(cfg ChainConfig) error {
 				if execution == "" {
 					execution = "autonomous"
 				}
-				if execution != "autonomous" && execution != "manual-handoff" {
+				if execution != "autonomous" && execution != "manual-handoff" && execution != supervisedExecutionMode {
 					return fmt.Errorf("%w: step %q has invalid execution mode %q", ErrInvalidConfig, step.ID, step.Execution)
 				}
 				if execution == "manual-handoff" {
 					if step.HandoffPolicy == nil {
 						return fmt.Errorf("%w: manual-handoff step %q requires handoffPolicy", ErrInvalidConfig, step.ID)
+					}
+					if err := validateHandoffPolicy(step.HandoffPolicy); err != nil {
+						return err
+					}
+				}
+				if execution == supervisedExecutionMode {
+					// A supervised step is also a handoff step: it reuses the frozen
+					// handoff policy (timeout, return actions and after-return hooks).
+					if step.HandoffPolicy == nil {
+						return fmt.Errorf("%w: supervised-black-box step %q requires handoffPolicy", ErrInvalidConfig, step.ID)
 					}
 					if err := validateHandoffPolicy(step.HandoffPolicy); err != nil {
 						return err
@@ -506,7 +525,8 @@ func (cfg ChainConfig) ToDefinition() (chain.Definition, error) {
 				if execution == "" {
 					execution = "autonomous"
 				}
-				if execution == "manual-handoff" {
+				switch execution {
+				case "manual-handoff":
 					if step.HandoffPolicy == nil {
 						return chain.Definition{}, fmt.Errorf("%w: manual-handoff step %q requires handoffPolicy", ErrInvalidConfig, step.ID)
 					}
@@ -518,7 +538,19 @@ func (cfg ChainConfig) ToDefinition() (chain.Definition, error) {
 						ReturnActions:    append([]string{}, step.HandoffPolicy.ReturnActions...),
 						HooksAfterReturn: append([]string{}, step.HandoffPolicy.HooksAfterReturn...),
 					}
-				} else {
+				case supervisedExecutionMode:
+					if step.HandoffPolicy == nil {
+						return chain.Definition{}, fmt.Errorf("%w: supervised-black-box step %q requires handoffPolicy", ErrInvalidConfig, step.ID)
+					}
+					mappedStep.Mode = chain.SupervisedBlackBox
+					mappedStep.HandoffPolicy = &chain.HandoffPolicy{
+						AllowedTargets:   append([]string{}, step.HandoffPolicy.AllowedTargets...),
+						InputPolicy:      step.HandoffPolicy.InputPolicy,
+						HandoffTimeoutMs: step.HandoffPolicy.HandoffTimeoutMs,
+						ReturnActions:    append([]string{}, step.HandoffPolicy.ReturnActions...),
+						HooksAfterReturn: append([]string{}, step.HandoffPolicy.HooksAfterReturn...),
+					}
+				default:
 					mappedStep.Mode = chain.IsolatedWorkspace
 				}
 			case "build", "verify", "noop":
@@ -551,6 +583,40 @@ func FindExecutableSteps(cfg ChainConfig) []ExecutableStep {
 		}
 	}
 	return steps
+}
+
+// FindSupervisedSteps lists the supervised-black-box steps of a definition. A
+// definition that names at least one such step routes to the supervised
+// assembly instead of the noop-only CLI path.
+func FindSupervisedSteps(cfg ChainConfig) []ExecutableStep {
+	steps := make([]ExecutableStep, 0)
+	for _, task := range cfg.Tasks {
+		for _, step := range task.Steps {
+			if step.Kind == "code" && step.Execution == supervisedExecutionMode {
+				steps = append(steps, ExecutableStep{TaskID: task.ID, StepID: step.ID, Kind: step.Kind})
+			}
+		}
+	}
+	return steps
+}
+
+// validateSupervisedChannel fails closed when a definition declares a supervised
+// step without the AI configuration and the visible channel the mode delivers
+// through. The risk notice must reach an operator UI, so a missing `ai` block or
+// a channel list without `sessionbridge-visible` is refused before any run.
+func validateSupervisedChannel(cfg ChainConfig) error {
+	if len(FindSupervisedSteps(cfg)) == 0 {
+		return nil
+	}
+	if cfg.AI == nil {
+		return fmt.Errorf("%w: supervised-black-box steps require an ai configuration with the %s channel", ErrInvalidConfig, supervisedRequiredChannel)
+	}
+	for _, binding := range cfg.AI.Channels {
+		if binding.Channel == supervisedRequiredChannel {
+			return nil
+		}
+	}
+	return fmt.Errorf("%w: supervised-black-box steps require the %s channel", ErrInvalidConfig, supervisedRequiredChannel)
 }
 
 func ValidateSummary(path string, cfg ChainConfig) ConfigValidationSummary {

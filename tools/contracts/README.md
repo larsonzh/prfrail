@@ -11,7 +11,7 @@ npm test
 Pop-Location
 ```
 
-The suite compiles all 29 Draft 2020-12 schemas, checks every positive and negative catalog, verifies full per-schema coverage, and recomputes the frozen JCS vectors. Dependencies are pinned in `package-lock.json`: Ajv validates schemas and `canonicalize` supplies an RFC 8785 implementation.
+The suite compiles every Draft 2020-12 schema in `schemas/`, checks every positive and negative catalog, verifies full per-schema coverage, and recomputes the frozen JCS vectors. Dependencies are pinned in `package-lock.json`: Ajv validates schemas and `canonicalize` supplies an RFC 8785 implementation.
 
 Ajv keeps strict schema and format validation enabled. `strictTypes` is disabled because it is an Ajv authoring heuristic, not a Draft 2020-12 requirement, and rejects valid constraints whose type is supplied by a composed schema branch.
 

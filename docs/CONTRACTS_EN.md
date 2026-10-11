@@ -38,10 +38,11 @@ Each persistent object has an independent `schemaVersion`, distinct from CLI and
 | documentation | required/if-affected/optional/forbidden and impactRules | Missing effective doc diff or stale generation; whitespace/mtime alone does not count |
 | handoff | execution, `handoffPolicy` (allowedTargets referencing read-write targets, inputPolicy, handoffTimeoutMs, returnActions, hooksAfterReturn) | Single lease, stopped writers, fresh manifest; Schema alone cannot prove return checks |
 | review/waiver | approve/reject/waive, actor, reason, policy, expiry, bound candidate | Self-approval, expiry, changed candidate or mismatched scope blocks |
+| supervised records | `supervised-risk-confirmation` (binding risk acknowledgment: binds run/task/step/attempt, isolated-workspace digest, risk-notice version and hash, and the `visible` delivery fact, with `selection` fixed to `confirm`) and `supervised-report` (`assuranceLevel` fixed to `reduced`, `unknownDimensions` non-empty and required to contain `cost`) | checker decides start-up preconditions, version-drift blocking, confirmation/delivery binding and the permanently reduced report; an unknown dimension is never shown as safe |
 
 Separate three validators: JSON Schema for structure; semantic checker for references, ownership, cycles and static policy; runtime gates for diffs, processes, capabilities, secrets, budgets and review. Each invalid golden identifies its rejection layer; JSON Schema cannot check live files or processes.
 
-Twenty-nine structural Schemas for chain, hook, target, workspace, state-event, error, adapter-envelope, adapter-receipt,
+Structural Schemas for chain, hook, target, workspace, state-event, error, adapter-envelope, adapter-receipt,
 snapshot-manifest, evidence-manifest, review-receipt, promotion-receipt, handoff-receipt, hook-result, run-manifest,
 signature-receipt, error-set, ticket-ledger, repair-transaction, harness, toolchain, change-set, verification-report,
 plan-preview, export-record, authorization-record, effect-record, cost-ledger and lifecycle-record now exist under `schemas/`;
@@ -240,6 +241,8 @@ Before entry, CLI/TUI must display and persist explicit risk acknowledgment: Pro
 | SessionBridge silent status=ok | Validate the declared auxiliary-output Schema; it may produce analysis or a managed-change-set suggestion, never direct PASS |
 | SessionBridge visible delivered | UI delivery/supervised-observation fact only; black-box mode also requires explicit workspace return and candidate reconstruction from disk, and still proves neither model, tool nor task completion |
 | SessionBridge auto | Reject in formal flow; automatic fallback cannot change execution capability or evidence semantics |
+| supervised risk acknowledgment confirmed | Unlocks the work window only; it produces no pass or fail conclusion of any kind and no task/step PASS |
+| supervised report | A factual reduced/unknown record; `assuranceLevel` is permanently `reduced` and every unknown dimension shows only `unknown` |
 
 Neither SessionBridge's success cache nor a CLI Agent's private session state is durable exactly-once. ProofRail persists dispatch, process, result and application-idempotency records itself. Context history, agent transcripts and UI content cannot replace the run manifest, events, receipts, workspace manifests or gate evidence. ProofRail owns secret scanning/redaction; do not assume an external Agent or SessionBridge implements it.
 
@@ -253,6 +256,18 @@ unpadded base64url. Schema cannot prove key trust, non-revocation at issuance or
 validation, trust policy and verification evidence own those checks. This capability is optional in S1 and is not a mandatory T017/S1-exit release gate.
 
 The release branch of `lifecycle-record.schema.json` always requires binary, SBOM, license-manifest and checksum-manifest hashes; `signatureReceiptHash` may be null. Without a signature, `revocationFreshness` must be `unknown` with no revocation-verification evidence. When a signature receipt is present, the strict contract above still applies. SHA256SUMS proves content integrity, not publisher identity.
+
+### 7.1 supervised-black-box explicit mode
+
+(a) **Binding risk acknowledgment and start-up blocking**: before entering this mode, a binding record (`supervised-risk-confirmation`) must be persisted, binding run/task/step/attempt, the isolated-workspace digest, and the risk-notice version and hash field by field, and truthfully recording the `visible` delivery fact (channel, delivery time, delivery status, transport requestId and error evidence) plus the request/response interaction evidence; its `selection` is fixed to `confirm`, and a notice version or hash that differs from the current version constant is version drift that must block before any work window opens. **No work window exists before a valid confirmation**: with no binding confirmation record, on binding drift, or when delivery is not accepted, the run stays in the waiting state and must not open writes.
+
+(b) **Explicit return is the handoff complete receipt**: the operator explicitly ends supervision and returns the workspace, expressed through the handoff path frozen by section 6 — stop managed writers, flush the journal, capture before/after manifest and diff, run escape/secret/unknown-process scans, and run the declared gates; only then is a handoff receipt with `outcome=complete` produced. This mode introduces no second return record; exit codes, chat text and the `visible` delivery fact are never the return.
+
+(c) **The supervised five facts and the postflight branch**: the step-event evidence of the return receipt carries, in a positional layout, five mutually distinct frozen-fact digests — handoff receipt, post-return scan evidence, managed-process stop proof, independent gate evidence, and the reduced/unknown report; chain rebuilds the facts from that layout by position only, and any missing fact fails closed. The only entry to `REVIEW_PENDING` is the supervised postflight branch: the port re-derives the five facts and reconciles them field by field, and any unprovable item pauses or rejects; delivery, confirmation and the receipt itself never produce `REVIEW_PENDING`.
+
+(d) **The reduced/unknown report**: after the work completes, one `supervised-report` record is written; `assuranceLevel` is the constant `reduced`, `unknownDimensions` is non-empty and must contain `cost`, and it lists the unobservable dimensions of the external agent one by one — tool use, resource reads, network, cost, background processes, session continuity and external side effects. **An unknown item is never displayed as safe**: the report and its rendering show only `unknown` for every unknown dimension, never `safe`, `verified` or any numeric promise.
+
+Contract-level consequences of the four prohibitions: ProofRail must never fall back into this mode because AgentRunner is unavailable; a `visible` delivery receipt never masquerades as completion; the risk acknowledgment never exempts authorization, handoff or gates; and unknown cost, process or external side effects are never shown as safe.
 
 ## 8. Errors and Acceptance
 

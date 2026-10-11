@@ -43,11 +43,12 @@ UTF-8 无 BOM + LF；canonical 字节还不得含格式空白或尾随换行。�
 | documentation | required/if-affected/optional/forbidden；impactRules | 命中规则缺有效 doc diff、生成物陈旧拒绝；空白/mtime 不算更新 |
 | handoff | execution、`handoffPolicy`（allowedTargets 引用 read-write target、inputPolicy、handoffTimeoutMs、returnActions、hooksAfterReturn） | 单写租约、停机、新鲜 manifest；归还后复检不能由 Schema 单独判定 |
 | review/waiver | approve/reject/waive；主体、原因、策略依据、有效期、绑定候选 | 同主体自批、过期、候选变化、范围不符均阻断 |
+| supervised records | `supervised-risk-confirmation`（绑定风险确认：绑定 run/task/step/attempt、隔离 workspace 摘要、风险提示版本与哈希、`visible` 投递事实，`selection` 恒为 `confirm`）与 `supervised-report`（`assuranceLevel` 恒为 `reduced`，`unknownDimensions` 非空且必含 `cost`） | 启动前置、版本漂移阻断、确认与投递绑定、报告恒 reduced 均由 checker 判定；未知维度不得显示为安全 |
 
 三层检查不可合并：JSON Schema 判结构；语义 checker 判引用、所有权、循环、静态策略；运行期 gate 判文件 diff、进程、能力、秘密、预算与评审。非法黄金样例标注拒绝层，不能声称 JSON Schema 会检查实际文件或进程。
 
 `schemas/` 已创建 chain、hook、target、workspace、state-event、error、adapter-envelope、adapter-receipt、
-snapshot-manifest、evidence-manifest、review-receipt、promotion-receipt、handoff-receipt、hook-result、run-manifest、signature-receipt、error-set、ticket-ledger、repair-transaction、harness、toolchain、change-set、verification-report、plan-preview、export-record、authorization-record、effect-record、cost-ledger、lifecycle-record 二十九份结构 Schema；`testdata/contracts/valid/` 与
+snapshot-manifest、evidence-manifest、review-receipt、promotion-receipt、handoff-receipt、hook-result、run-manifest、signature-receipt、error-set、ticket-ledger、repair-transaction、harness、toolchain、change-set、verification-report、plan-preview、export-record、authorization-record、effect-record、cost-ledger、lifecycle-record 等结构 Schema；`testdata/contracts/valid/` 与
 `testdata/contracts/invalid/` 已由 T003 建立并通过 `tools/contracts/` 独立 validator。每例携带 fixture ID、契约版本、
 expected accept/reject、拒绝层和原因。必须含三任务链、四 kind、C+Go、C+JavaScript+Python、人工交接、
 代码文档协同；每一条件至少一正一反。文档中的路径/片段是设计输入，不是已验证可运行样例。
@@ -248,6 +249,8 @@ CLI Agent 退出 0 或报告完成不等于任务通过，只能触发 ProofRail
 | SessionBridge silent status=ok | 按声明的辅助输出 Schema 检查；可形成分析或 managed-change-set 建议，绝不直接 PASSED |
 | SessionBridge visible 已投递 | 仅是 UI 投递/人工观察事实；黑箱模式还须显式归还工作区并从磁盘重建候选，仍不证明模型、工具或任务完成 |
 | SessionBridge auto | 正式流程拒绝；不得以自动回退改变执行能力或证据语义 |
+| supervised 风险确认 confirmed | 仅解锁工作窗口；不产生任何通过或失败结论，也不产生任何 task/step PASS |
+| supervised report | reduced/unknown 事实记录；`assuranceLevel` 恒为 `reduced`，未知维度一律只显示 `unknown` |
 
 SessionBridge 成功缓存和 CLI Agent 私有会话状态都不是持久 exactly-once。ProofRail 自己持久化投递、进程、结果及应用幂等记录；上下文历史、agent transcript 和 UI 内容均不可替代 run manifest、event、receipt、workspace manifest 与 gate evidence。Secret 扫描/脱敏由 ProofRail 保证，不假定外部 Agent 或 SessionBridge 已实现。
 
@@ -265,6 +268,18 @@ canonical statement，receiptHash 再覆盖 statement 与签名字节；cross-ho
 成功；这些由独立 crypto validator、信任策略与验证证据判定。该能力在 S1 为可选增强，不是 T017/S1 exit 的强制发布门禁。
 
 `lifecycle-record.schema.json` 的 release 记录始终强制 binary、SBOM、许可证和校验和清单摘要；`signatureReceiptHash` 可为 null。无签名时 `revocationFreshness` 必须为 `unknown` 且不得携带撤销核验证据；存在签名 receipt 时仍按上述严格契约验证。SHA256SUMS 只证明内容完整性，不证明发布者身份。
+
+### 7.1 supervised-black-box 显式模式
+
+（a）**绑定风险确认与启动阻断**：进入本模式前必须先持久化一条绑定记录（`supervised-risk-confirmation`），逐字段绑定 run/task/step/attempt、隔离 workspace 摘要、风险提示版本与提示哈希，并如实记录 `visible` 投递事实（通道、投递时刻、投递状态、传输 requestId 与错误证据）以及请求/响应的交互证据；该记录的 `selection` 恒为 `confirm`，风险提示版本或哈希与当前版本常量不一致即为版本漂移，必须在任何工作窗口开启之前阻断。**有效确认之前不存在任何工作窗口**：无绑定确认记录、绑定漂移或投递非已接受时一律停在等待态，不得开启写入。
+
+（b）**显式归还即 handoff complete 回执**：操作员显式结束监督并归还工作区，经 §6 冻结的 handoff 路径表达——停止受管写者、flush journal、捕获前后 manifest/diff、执行越界/秘密/未知进程扫描、运行规定 gates，全部通过才产生 `outcome=complete` 的 handoff 回执。本模式不引入第二枚归还记录；exit code、聊天文本与 `visible` 投递事实都不是归还。
+
+（c）**supervised 五事实与 postflight 分支**：归还回执的 step 事件证据按位置化布局承载五枚互异的冻结事实摘要——handoff 回执、归还后扫描证据、受管进程停止证明、独立门禁证据、reduced/unknown 报告；chain 只从该布局按位置重建事实，任一事实缺失即 fail-closed。`REVIEW_PENDING` 的唯一入口是 supervised postflight 分支：端口重推导五事实并逐字段对账，任一项不可证明即暂停或拒绝；投递、确认与回执本身都不产生 `REVIEW_PENDING`。
+
+（d）**reduced/unknown 报告**：完成后写一枚 `supervised-report` 记录，`assuranceLevel` 恒为常量 `reduced`，`unknownDimensions` 非空且必须含 `cost`，逐项列出外部代理的工具使用、资源读取、网络、费用、后台进程、会话连续性与外部副作用等不可观测维度。**禁止把未知项显示为安全**：报告与渲染对每个未知维度只显示 `unknown`，不得显示 `safe`、`verified` 或任何数字承诺。
+
+四条禁止项的契约后果：ProofRail 不得因 AgentRunner 不可用而自动落入本模式；`visible` 投递回执不得冒充完成；风险确认不得豁免授权、handoff 与门禁；费用、进程与外部副作用等未知项不得被显示为安全。
 
 ## 8. 错误与验收边界
 

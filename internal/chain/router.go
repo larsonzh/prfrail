@@ -30,6 +30,13 @@ type ManualHandoffPort interface {
 	OpenManualHandoff(context.Context, StepRequest) (StepResult, error)
 }
 
+// SupervisedBlackBoxPort opens a supervised-black-box work window. It only
+// delivers the visible notice and reports that the window awaits confirmation:
+// it never writes a state transition and never concludes the step.
+type SupervisedBlackBoxPort interface {
+	OpenSupervisedBlackBox(context.Context, StepRequest) (StepResult, error)
+}
+
 type HookPort interface {
 	RunHook(context.Context, StepRequest) (StepResult, error)
 }
@@ -40,6 +47,7 @@ type StepRouter struct {
 	AgentRunner          AgentRunnerPort
 	AgentRunnerAdmission AgentRunnerAdmission
 	Handoff              ManualHandoffPort
+	Supervised           SupervisedBlackBoxPort
 	Hooks                HookPort
 }
 
@@ -96,6 +104,11 @@ func (router StepRouter) Execute(ctx context.Context, request StepRequest) (Step
 				return StepResult{}, fmt.Errorf("%w: manual handoff port unavailable", ErrInvalidDefinition)
 			}
 			return router.Handoff.OpenManualHandoff(ctx, request)
+		case SupervisedBlackBox:
+			if router.Supervised == nil {
+				return StepResult{}, fmt.Errorf("%w: supervised black-box port unavailable", ErrInvalidDefinition)
+			}
+			return router.Supervised.OpenSupervisedBlackBox(ctx, request)
 		default:
 			return StepResult{}, fmt.Errorf("%w: unknown change mode", ErrInvalidDefinition)
 		}

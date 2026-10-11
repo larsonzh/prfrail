@@ -35,6 +35,10 @@ type CLI struct {
 	secretManager       adapters.AISecretManager
 	readSecret          func() ([]byte, error)
 	checkAIAvailability func(context.Context, adapters.AIProviderProfile, string, int, string, string) (adapters.AIAvailabilityRecord, error)
+	// visibleSender is the visible channel of the supervised-black-box assembly.
+	// It defaults to the fail-closed placeholder until the real SessionBridge
+	// visible wiring lands (T027-B).
+	visibleSender adapters.VisibleClient
 }
 
 type commandResponse struct {
@@ -55,6 +59,7 @@ func NewCLI(version string) CLI {
 		stdin:         os.Stdin,
 		secretManager: adapters.NewPlatformAISecretManager(),
 		readSecret:    readTerminalSecret,
+		visibleSender: unavailableVisibleClient{},
 	}
 	cli.stopRun = newDefaultStopRun(cli.getwd)
 	cli.appendInteraction = appendOperatorInteractionRecord
@@ -91,6 +96,8 @@ func (cli CLI) Execute(ctx context.Context, args []string, stdout, stderr io.Wri
 		return cli.executeAI(ctx, args[1:], stdout, stderr)
 	case "run":
 		return cli.executeRun(ctx, args[1:], stdout, stderr)
+	case "supervised":
+		return cli.executeSupervised(ctx, args[1:], stdout, stderr)
 	case "report":
 		return cli.executeReport(ctx, args[1:], stdout, stderr)
 	case "config":
@@ -298,6 +305,7 @@ func (cli CLI) executeRun(ctx context.Context, args []string, stdout, stderr io.
 		return writeCommandError(stdout, stderr, "run", *jsonOutput, err)
 	}
 	executable := FindExecutableSteps(cfg)
+	supervised := FindSupervisedSteps(cfg)
 	inputs := agentRunnerRunInputs{
 		requestRecord:       *requestRecord,
 		capabilityRecord:    *capabilityRecord,
@@ -308,7 +316,13 @@ func (cli CLI) executeRun(ctx context.Context, args []string, stdout, stderr io.
 		agentCLI:            *agentCLIPath,
 		agentVersion:        *agentVersion,
 	}
-	if len(executable) > 0 && !inputs.complete() {
+	// P1: a supervised definition can never be entered by supplying AgentRunner
+	// input flags, and it never falls back to the AgentRunner assembly.
+	if len(supervised) > 0 && inputs.anyProvided() {
+		err := fmt.Errorf("supervised-black-box definitions are mutually exclusive with AgentRunner input flags")
+		return writeCommandError(stdout, stderr, "run", *jsonOutput, err)
+	}
+	if len(executable) > 0 && !inputs.complete() && len(supervised) == 0 {
 		first := executable[0]
 		err := fmt.Errorf("local runtime only supports noop steps; first executable step is %s/%s (%s)", first.TaskID, first.StepID, first.Kind)
 		return writeCommandError(stdout, stderr, "run", *jsonOutput, err)
@@ -339,6 +353,9 @@ func (cli CLI) executeRun(ctx context.Context, args []string, stdout, stderr io.
 	definition, err := cfg.ToDefinition()
 	if err != nil {
 		return writeCommandError(stdout, stderr, "run", *jsonOutput, err)
+	}
+	if len(supervised) > 0 {
+		return cli.executeSupervisedRun(ctx, *runID, resolvedRunDir, definition, *jsonOutput, stdout, stderr)
 	}
 	if len(executable) > 0 {
 		return cli.executeAgentRunnerRun(ctx, *runID, resolvedRunDir, definition, inputs, *jsonOutput, stdout, stderr)
@@ -383,6 +400,26 @@ func (inputs agentRunnerRunInputs) complete() bool {
 		}
 	}
 	return true
+}
+
+// anyProvided reports whether at least one AgentRunner input flag was supplied.
+// It is the hazard half of the supervised/AgentRunner mutual exclusion.
+func (inputs agentRunnerRunInputs) anyProvided() bool {
+	for _, value := range []string{
+		inputs.requestRecord,
+		inputs.capabilityRecord,
+		inputs.enforcementRecord,
+		inputs.availabilityRecord,
+		inputs.authorizationLedger,
+		inputs.costLedger,
+		inputs.agentCLI,
+		inputs.agentVersion,
+	} {
+		if strings.TrimSpace(value) != "" {
+			return true
+		}
+	}
+	return false
 }
 
 // executeAgentRunnerRun decodes the declared record files and drives the

@@ -139,7 +139,8 @@
     "codeStep": {
       "oneOf": [
         {"$ref": "#/$defs/autonomousCodeStep"},
-        {"$ref": "#/$defs/manualHandoffCodeStep"}
+        {"$ref": "#/$defs/manualHandoffCodeStep"},
+        {"$ref": "#/$defs/supervisedBlackBoxCodeStep"}
       ]
     },
     "autonomousCodeStep": {
@@ -187,6 +188,37 @@
         },
         "execution": {
           "const": "manual-handoff"
+        },
+        "components": {
+          "$ref": "#/$defs/idList"
+        },
+        "languageScopes": {
+          "$ref": "#/$defs/idList"
+        },
+        "targets": {
+          "$ref": "#/$defs/idList"
+        },
+        "handoffPolicy": {
+          "$ref": "#/$defs/handoffPolicy"
+        }
+      }
+    },
+    "supervisedBlackBoxCodeStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "execution", "handoffPolicy"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "kind": {
+          "const": "code"
+        },
+        "model": {
+          "$ref": "#/$defs/id"
+        },
+        "execution": {
+          "const": "supervised-black-box"
         },
         "components": {
           "$ref": "#/$defs/idList"

@@ -9,6 +9,13 @@ import (
 	"github.com/larsonzh/prfrail/internal/evidence"
 )
 
+// Failpoint is a production-critical extension point of Engine.Run: it is
+// invoked after a step has reached RUNNING and before any dispatch happens, so
+// an assembly can act on that exact frontier. The supervised-black-box assembly
+// uses it to deliver the risk notice, persist the binding interaction and park
+// the run in the waiting state without dispatching the step. A non-nil error
+// aborts the run. It is not reserved for tests and carries no test-only
+// semantics.
 type Failpoint func(string) error
 
 type Options struct {
@@ -23,11 +30,18 @@ type Options struct {
 	Reviewer    ReviewerPort
 	Publisher   PublisherPort
 	Postflight  PostflightPort
-	Stopper     Stopper
-	Reconciler  Reconciler
-	Clock       Clock
-	IDs         IDSource
-	Failpoint   Failpoint
+	// SupervisedPostflight runs the chain-owned postflight of a
+	// supervised-black-box task. The agent Postflight port stays required for
+	// every run; this port is only consulted when a task carries supervised
+	// return facts, and its absence fails the task closed.
+	SupervisedPostflight SupervisedPostflightPort
+	Stopper              Stopper
+	Reconciler           Reconciler
+	Clock                Clock
+	IDs                  IDSource
+	// Failpoint is a production-critical API, not a test seam: the
+	// supervised-black-box park flow depends on it (see the Failpoint type).
+	Failpoint Failpoint
 }
 
 type Engine struct {

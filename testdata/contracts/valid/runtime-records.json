@@ -317,5 +317,93 @@
       },
       "manifestHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
     }
+  },
+  {
+    "fixtureId": "supervised-risk-confirmation-valid",
+    "schema": "supervised-risk-confirmation.schema.json",
+    "expected": "accept",
+    "rejectionLayer": "schema",
+    "reason": "Legal binding risk confirmation with an accepted visible delivery",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "record": {
+        "kind": "supervised-risk-confirmation",
+        "recordId": "risk-confirmation-one",
+        "issuedAt": "2026-09-07T12:00:00.000Z",
+        "issuedBy": {
+          "type": "operator",
+          "id": "operator-one"
+        },
+        "runId": "run-one",
+        "taskId": "task-one",
+        "stepId": "step-one",
+        "attempt": 1,
+        "workspaceHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "riskNoticeVersion": 1,
+        "riskNoticeHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "selection": "confirm",
+        "delivery": {
+          "channel": "sessionbridge-visible",
+          "deliveredAt": "2026-09-07T11:59:59.000Z",
+          "deliveryStatus": "accepted",
+          "transportRequestId": "sessbridge-0001",
+          "errorEvidence": []
+        },
+        "interactionEvidence": [
+          "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+          "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+        ],
+        "evidence": [
+          "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+        ]
+      },
+      "recordHash": "sha256:6666666666666666666666666666666666666666666666666666666666666666"
+    }
+  },
+  {
+    "fixtureId": "supervised-report-valid",
+    "schema": "supervised-report.schema.json",
+    "expected": "accept",
+    "rejectionLayer": "schema",
+    "reason": "Legal reduced report whose unknown dimensions include cost",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "record": {
+        "kind": "supervised-report",
+        "reportId": "supervised-report-one",
+        "recordedAt": "2026-09-07T12:30:00.000Z",
+        "recordedBy": {
+          "type": "system",
+          "id": "proofrail"
+        },
+        "runId": "run-one",
+        "taskId": "task-one",
+        "stepId": "step-one",
+        "attempt": 1,
+        "mode": "supervised-black-box",
+        "assuranceLevel": "reduced",
+        "verifiedDimensions": [
+          "workspace-isolation",
+          "manifest-before",
+          "manifest-after",
+          "diff",
+          "process-stop-proof",
+          "independent-gates"
+        ],
+        "unknownDimensions": [
+          "tool-use",
+          "resource-reads",
+          "network-access",
+          "cost",
+          "background-processes",
+          "session-continuity",
+          "external-side-effects"
+        ],
+        "evidence": [
+          "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+        ]
+      },
+      "recordHash": "sha256:8888888888888888888888888888888888888888888888888888888888888888"
+    }
   }
 ]

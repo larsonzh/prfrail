@@ -275,5 +275,378 @@
       },
       "manifestHash": "not-a-hash"
     }
+  },
+  {
+    "fixtureId": "supervised-risk-confirmation-selection-reject",
+    "schema": "supervised-risk-confirmation.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "A risk confirmation selection is fixed to confirm, so reject is never a confirmation",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "record": {
+        "kind": "supervised-risk-confirmation",
+        "recordId": "risk-confirmation-one",
+        "issuedAt": "2026-09-07T12:00:00.000Z",
+        "issuedBy": {
+          "type": "operator",
+          "id": "operator-one"
+        },
+        "runId": "run-one",
+        "taskId": "task-one",
+        "stepId": "step-one",
+        "attempt": 1,
+        "workspaceHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "riskNoticeVersion": 1,
+        "riskNoticeHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "selection": "reject",
+        "delivery": {
+          "channel": "sessionbridge-visible",
+          "deliveredAt": "2026-09-07T11:59:59.000Z",
+          "deliveryStatus": "accepted",
+          "transportRequestId": "sessbridge-0001",
+          "errorEvidence": []
+        },
+        "interactionEvidence": [
+          "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+          "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+        ],
+        "evidence": [
+          "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+        ]
+      },
+      "recordHash": "sha256:6666666666666666666666666666666666666666666666666666666666666666"
+    }
+  },
+  {
+    "fixtureId": "supervised-risk-confirmation-record-hash-invalid",
+    "schema": "supervised-risk-confirmation.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "A tampered record hash that is not a prefixed lowercase SHA-256 value",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "record": {
+        "kind": "supervised-risk-confirmation",
+        "recordId": "risk-confirmation-one",
+        "issuedAt": "2026-09-07T12:00:00.000Z",
+        "issuedBy": {
+          "type": "operator",
+          "id": "operator-one"
+        },
+        "runId": "run-one",
+        "taskId": "task-one",
+        "stepId": "step-one",
+        "attempt": 1,
+        "workspaceHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "riskNoticeVersion": 1,
+        "riskNoticeHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "selection": "confirm",
+        "delivery": {
+          "channel": "sessionbridge-visible",
+          "deliveredAt": "2026-09-07T11:59:59.000Z",
+          "deliveryStatus": "accepted",
+          "transportRequestId": "sessbridge-0001",
+          "errorEvidence": []
+        },
+        "interactionEvidence": [
+          "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+          "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+        ],
+        "evidence": [
+          "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+        ]
+      },
+      "recordHash": "not-a-hash"
+    }
+  },
+  {
+    "fixtureId": "supervised-risk-confirmation-risk-notice-version-missing",
+    "schema": "supervised-risk-confirmation.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "The risk-notice version is required so that version drift can block start-up",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "record": {
+        "kind": "supervised-risk-confirmation",
+        "recordId": "risk-confirmation-one",
+        "issuedAt": "2026-09-07T12:00:00.000Z",
+        "issuedBy": {
+          "type": "operator",
+          "id": "operator-one"
+        },
+        "runId": "run-one",
+        "taskId": "task-one",
+        "stepId": "step-one",
+        "attempt": 1,
+        "workspaceHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "riskNoticeHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "selection": "confirm",
+        "delivery": {
+          "channel": "sessionbridge-visible",
+          "deliveredAt": "2026-09-07T11:59:59.000Z",
+          "deliveryStatus": "accepted",
+          "transportRequestId": "sessbridge-0001",
+          "errorEvidence": []
+        },
+        "interactionEvidence": [
+          "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+          "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+        ],
+        "evidence": [
+          "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+        ]
+      },
+      "recordHash": "sha256:6666666666666666666666666666666666666666666666666666666666666666"
+    }
+  },
+  {
+    "fixtureId": "supervised-risk-confirmation-risk-notice-hash-missing",
+    "schema": "supervised-risk-confirmation.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "The risk-notice hash is required so that notice drift can block start-up",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "record": {
+        "kind": "supervised-risk-confirmation",
+        "recordId": "risk-confirmation-one",
+        "issuedAt": "2026-09-07T12:00:00.000Z",
+        "issuedBy": {
+          "type": "operator",
+          "id": "operator-one"
+        },
+        "runId": "run-one",
+        "taskId": "task-one",
+        "stepId": "step-one",
+        "attempt": 1,
+        "workspaceHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "riskNoticeVersion": 1,
+        "selection": "confirm",
+        "delivery": {
+          "channel": "sessionbridge-visible",
+          "deliveredAt": "2026-09-07T11:59:59.000Z",
+          "deliveryStatus": "accepted",
+          "transportRequestId": "sessbridge-0001",
+          "errorEvidence": []
+        },
+        "interactionEvidence": [
+          "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+          "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+        ],
+        "evidence": [
+          "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+        ]
+      },
+      "recordHash": "sha256:6666666666666666666666666666666666666666666666666666666666666666"
+    }
+  },
+  {
+    "fixtureId": "supervised-risk-confirmation-delivery-status-invalid",
+    "schema": "supervised-risk-confirmation.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "Delivery status is a closed set of accepted, unavailable or unknown",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "record": {
+        "kind": "supervised-risk-confirmation",
+        "recordId": "risk-confirmation-one",
+        "issuedAt": "2026-09-07T12:00:00.000Z",
+        "issuedBy": {
+          "type": "operator",
+          "id": "operator-one"
+        },
+        "runId": "run-one",
+        "taskId": "task-one",
+        "stepId": "step-one",
+        "attempt": 1,
+        "workspaceHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "riskNoticeVersion": 1,
+        "riskNoticeHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "selection": "confirm",
+        "delivery": {
+          "channel": "sessionbridge-visible",
+          "deliveredAt": "2026-09-07T11:59:59.000Z",
+          "deliveryStatus": "delivered",
+          "transportRequestId": "sessbridge-0001",
+          "errorEvidence": []
+        },
+        "interactionEvidence": [
+          "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+          "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+        ],
+        "evidence": [
+          "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+        ]
+      },
+      "recordHash": "sha256:6666666666666666666666666666666666666666666666666666666666666666"
+    }
+  },
+  {
+    "fixtureId": "supervised-risk-confirmation-interaction-evidence-incomplete",
+    "schema": "supervised-risk-confirmation.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "Interaction evidence binds exactly the request and response record hashes",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "record": {
+        "kind": "supervised-risk-confirmation",
+        "recordId": "risk-confirmation-one",
+        "issuedAt": "2026-09-07T12:00:00.000Z",
+        "issuedBy": {
+          "type": "operator",
+          "id": "operator-one"
+        },
+        "runId": "run-one",
+        "taskId": "task-one",
+        "stepId": "step-one",
+        "attempt": 1,
+        "workspaceHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "riskNoticeVersion": 1,
+        "riskNoticeHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+        "selection": "confirm",
+        "delivery": {
+          "channel": "sessionbridge-visible",
+          "deliveredAt": "2026-09-07T11:59:59.000Z",
+          "deliveryStatus": "accepted",
+          "transportRequestId": "sessbridge-0001",
+          "errorEvidence": []
+        },
+        "interactionEvidence": [
+          "sha256:3333333333333333333333333333333333333333333333333333333333333333"
+        ],
+        "evidence": [
+          "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+        ]
+      },
+      "recordHash": "sha256:6666666666666666666666666666666666666666666666666666666666666666"
+    }
+  },
+  {
+    "fixtureId": "supervised-report-assurance-level-full",
+    "schema": "supervised-report.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "A supervised report assurance level is permanently reduced, never full",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "record": {
+        "kind": "supervised-report",
+        "reportId": "supervised-report-one",
+        "recordedAt": "2026-09-07T12:30:00.000Z",
+        "recordedBy": {
+          "type": "system",
+          "id": "proofrail"
+        },
+        "runId": "run-one",
+        "taskId": "task-one",
+        "stepId": "step-one",
+        "attempt": 1,
+        "mode": "supervised-black-box",
+        "assuranceLevel": "full",
+        "verifiedDimensions": ["diff"],
+        "unknownDimensions": ["cost"],
+        "evidence": [
+          "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+        ]
+      },
+      "recordHash": "sha256:8888888888888888888888888888888888888888888888888888888888888888"
+    }
+  },
+  {
+    "fixtureId": "supervised-report-unknown-dimensions-empty",
+    "schema": "supervised-report.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "Unknown dimensions must be non-empty because the mode can never prove them all",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "record": {
+        "kind": "supervised-report",
+        "reportId": "supervised-report-one",
+        "recordedAt": "2026-09-07T12:30:00.000Z",
+        "recordedBy": {
+          "type": "system",
+          "id": "proofrail"
+        },
+        "runId": "run-one",
+        "taskId": "task-one",
+        "stepId": "step-one",
+        "attempt": 1,
+        "mode": "supervised-black-box",
+        "assuranceLevel": "reduced",
+        "verifiedDimensions": ["diff"],
+        "unknownDimensions": [],
+        "evidence": [
+          "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+        ]
+      },
+      "recordHash": "sha256:8888888888888888888888888888888888888888888888888888888888888888"
+    }
+  },
+  {
+    "fixtureId": "supervised-report-unknown-dimensions-missing-cost",
+    "schema": "supervised-report.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "Unknown dimensions must contain cost so unobservable spend is never shown as safe",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "record": {
+        "kind": "supervised-report",
+        "reportId": "supervised-report-one",
+        "recordedAt": "2026-09-07T12:30:00.000Z",
+        "recordedBy": {
+          "type": "system",
+          "id": "proofrail"
+        },
+        "runId": "run-one",
+        "taskId": "task-one",
+        "stepId": "step-one",
+        "attempt": 1,
+        "mode": "supervised-black-box",
+        "assuranceLevel": "reduced",
+        "verifiedDimensions": ["diff"],
+        "unknownDimensions": ["tool-use", "network-access"],
+        "evidence": [
+          "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+        ]
+      },
+      "recordHash": "sha256:8888888888888888888888888888888888888888888888888888888888888888"
+    }
+  },
+  {
+    "fixtureId": "supervised-report-unknown-dimension-id-unknown",
+    "schema": "supervised-report.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "Unknown dimensions are a closed set and reject an unlisted dimension id",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "record": {
+        "kind": "supervised-report",
+        "reportId": "supervised-report-one",
+        "recordedAt": "2026-09-07T12:30:00.000Z",
+        "recordedBy": {
+          "type": "system",
+          "id": "proofrail"
+        },
+        "runId": "run-one",
+        "taskId": "task-one",
+        "stepId": "step-one",
+        "attempt": 1,
+        "mode": "supervised-black-box",
+        "assuranceLevel": "reduced",
+        "verifiedDimensions": ["diff"],
+        "unknownDimensions": ["cost", "model-latency"],
+        "evidence": [
+          "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+        ]
+      },
+      "recordHash": "sha256:8888888888888888888888888888888888888888888888888888888888888888"
+    }
   }
 ]
