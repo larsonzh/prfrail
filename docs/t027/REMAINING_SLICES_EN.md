@@ -466,22 +466,11 @@ Boundaries: this is a follow-up platform slice and must not rewrite the Windows 
 > This section registers the batch candidates after the T027 main line (A0–A7 / B1–B4 / C1); the fields and their order follow `DELIVERY_DIRECTIVE.md` §1.2 item by item, and every entry must cite its source.
 > Status symbols are as in this file's "status table"; this section is **not folded into** the T027 required-size counts.
 
-> **Pending-evaluation item handling rule**: a pending-evaluation item **cannot be started directly** (§1.2 requires the full field table, while such an item carries only three fields). On reaching one:
+> **Pending-evaluation item handling rule**: the authoritative text is promoted into `DELIVERY_DIRECTIVE{,_EN}.md` §1.8.1; only a pointer remains here.
 >
-> 1. first run an **evaluation action** (`[ROUTINE]` or a light `[SLICE]`), producing: ① whether the item holds; ② if it holds, whether it becomes a standalone slice, is merged, or is not established; ③ if a slice is established, the remaining §1.2 fields;
-> 2. then branch on the outcome: **holds** ⇒ upgrade to the formal slice format (it may then be started normally); **does not hold** ⇒ append "evaluated + reason + date + report path" inside the pending-evaluation row and **keep the row**.
-> The conclusion may be "no slice" - that is itself a valuable output.
+> **Registration split rule (user ruling 2026-10-14)**: the authoritative text is promoted into `DELIVERY_DIRECTIVE{,_EN}.md` §1.8.2; only a pointer remains here.
 >
-> **Exception**: when the user supplies the complete §1.2 field set, the evaluation may be skipped and the item upgraded straight to a formal slice.
-
-> **Registration split rule (user ruling 2026-10-14)**:
->
-> - **Tasks** (coarse-grained; carrying REQ mappings and AT acceptance ids) ⇒ when added they **must** first be registered in `DEV_PLAN{,_EN}.md` (the P1.x sections), and **slice breakdown may start only after that registration**;
-> - **Slices** (fine-grained; the §1.2 field table; independently startable) ⇒ when added they **must** be registered in the "later batch slices" section of `REMAINING_SLICES{,_EN}.md`;
-> - **When a task cannot be completed directly and needs slices**: register on both sides; the slice entry must **point back** to the DEV_PLAN task id, and the task entry must list **its slice list**;
-> - **Exception**: pure `[ROUTINE]`-tier work (no rule change, no contract change, no production-code change) does not enter these ledgers.
-
-> **Authority note**: the "pending-evaluation item handling rule" and the "registration split rule" in this section are **execution discipline** (per the category test in `DELIVERY_DIRECTIVE.md` §0.1); their **authority rests with `docs/DELIVERY_DIRECTIVE.md`**, and this copy is a **convenience copy in the temporary ledger** kept close to the point of use, so the directive prevails if the two ever conflict. The **formal promotion** of both rules (moving them into `DELIVERY_DIRECTIVE.md`) is left to a later slice.
+> **Authority note**: the two rules in this section are **execution discipline** (per the category test in `DELIVERY_DIRECTIVE.md` §0.1); their **authority rests with `docs/DELIVERY_DIRECTIVE.md` §1.8**, and this copy is a **convenience copy in the temporary ledger** kept close to the point of use, so the directive prevails if the two ever conflict.
 
 ### P1 — `AT24-WORDING` · ⬜
 
@@ -601,6 +590,24 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Identity | none (a governance-side roll-up with no formal slice name) |
 | Source | `docs/DELIVERY_DIRECTIVE.md:923` (OB-68) + `:930` (OB-75) + `:932` (OB-77) + `:860` (OB-13) + `:903` (OB-48) |
 | Goal | collect the five OBs split out of P2 / P4 as one independent pending-evaluation item; each split-out reason is recorded in the P2 and P4 rows, and **is not repeated here** |
+
+### P8 — `DIRECTIVE-LEDGER-DISCIPLINE` · ✅
+
+| Field | Content |
+|---|---|
+| Identity | `DIRECTIVE-LEDGER-DISCIPLINE` (v1.30) |
+| Status | ✅ **complete** (report in docs/validation/directive-ledger-discipline{,_EN}.md; in progress before ⑩, flipped by ⑧b) |
+| Goal | promote this file's two ledger meta-rules into the authoritative location of `DELIVERY_DIRECTIVE{,_EN}.md` (a new §1.8 section) and reduce the two ledger rule blocks in this file to pointers |
+| Dependencies | none |
+| Size | S (`.md` only) |
+| Steps | step 0 → ① → ② → ③ → ④ → ⑤ → ⑥ → ⑦ → ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| Current gap | the two rules currently live in the "temporary execution ledger", which conflicts with the §0.1 authority table (execution-discipline authority belongs in `DELIVERY_DIRECTIVE.md`) |
+| Deliverables | the new §1.8 section + the v1.30 row in §0.3 + appendix C.0r + the report pair + the two rule blocks in this file reduced to pointers + the P8 status row in this table |
+| Acceptance evidence | ① both rules have authoritative text in the directive (CN/EN in positional parity); ② the two rule blocks in this file are pointers only and keep the authority note; ③ the §0.1 authority table already carries the directive row and both the text and the ledger note point at §1.8; ④ gates `TOTAL_FAIL=0` in all three scopes; ⑤ G1–G8 all green; ⑥ version v1.30 matches §0.3 (G1-b) |
+| Boundaries | the two rules' semantics are unchanged (relocation only); unchanged §2.2 / §2.4 / §5.2 / §7.5 / §6.3; unchanged schema/fixtures/workflows; no change under `internal/**`; unchanged role set |
+| Tier | `[SLICE]` (touches execution-discipline semantics) |
+| Probe budget | none |
+| Execution-freedom list path | `docs/validation/evidence/DIRECTIVE-LEDGER-DISCIPLINE-freedom-list.md` |
 
 ---
 

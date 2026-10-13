@@ -1,6 +1,6 @@
 ﻿# ProofRail Delivery Execution Directive (DELIVERY_DIRECTIVE)
 
-Version: v1.29. Date: 2026-10-13. Status: **CN body frozen** ( `_EN` mirror in `docs/DELIVERY_DIRECTIVE_EN.md`).
+Version: v1.30. Date: 2026-10-14. Status: **CN body frozen** ( `_EN` mirror in `docs/DELIVERY_DIRECTIVE_EN.md`).
 
 > **Multilingual note**: this file is a strict positional mirror of the CN body, maintained in step with it (updated after CN is frozen, to avoid bilingual rework during review); `docs/DELIVERY_DIRECTIVE.md` is authoritative and wins on any conflict (see §11.1).
 > **Encoding**: this document and its `_EN` mirror must stay UTF-8 **with BOM** + **LF**.
@@ -73,6 +73,7 @@ Version: v1.29. Date: 2026-10-13. Status: **CN body frozen** ( `_EN` mirror in `
 | v1.27 | 2026-10-11 | **Slice `DIRECTIVE-HAIKU-BUMP` landing (the step-0 user ruling is below)**: step 0 registers **OB-86** (the pilot deferral continues for the **6th** time, independently recorded per §1.7.4 / the OB-37 meta-rule, with the four elements and the truthful annotation); this slice lands - ① §7.2.3's enabling precondition moves from `Claude Haiku 4.5` to **`Claude Haiku 5.5`**; ② §7.2.3 gains a "call string and internal identifier" paragraph (qualified name `Claude Haiku 5.5 (copilot)`, internal identifier `claude-haiku-5.5`, explicitly stating that its internal identifier is not a member of the §6.3 G5-b whitelist closed set) ⇒ closes **OB-74** (its §12.4 disposition flips to `Resolved`); ③ appendix C gains C.0p. **No change to the §2.2 closed set, the §2.4 "sole exemption" wording, the §7.5 cost table, or the §6.3 G5-b.** | `DIRECTIVE-HAIKU-BUMP` (this slice) |
 | v1.28 | 2026-10-12 | **Observation registration (closeout of a user-run manual experiment; same-turn user authorisation 2026-10-12)**: §12.4 registers **OB-87** (a ⑤ model-cost comparison data point: on the same input the ⑤ preferred `GLM-5.3 (glm)` is consistently 4–10x the DeepSeek side, with no stable ordering between the two DeepSeek models; "prompt guidance" is the only observation crossing a severity tier) and **OB-88** (**reserved for project initiation** of a "⑤ pre-review guidance clause" candidate slice, suggested name `DIRECTIVE-PREREVIEW-GUIDANCE`); §12.5 gains one gap row, "⑤ pre-review lacks a 'minimum verification actions' clause". **No new criterion, no rule-semantics change, no change to the §6.3 criterion scope, no change to §2.2 / §2.4 / §5.2 / §7.5**. This row is the closeout registration of a **user-run manual experiment** and is not a standalone directive-governance slice. | None (this registration creates no in-flight slice) |
 | v1.29 | 2026-10-13 | **Slice `DIRECTIVE-PREREVIEW-GUIDANCE` landed (user initiation 2026-10-12 plus item-by-item user rulings 2026-10-13)**: ① a new `**4.2.1 预审员的最低核验动作（五条）**` subsection after the §4.2 table, with the pre-reviewer row's "Prohibited" cell turned into a pure pointer and a new `**4.2.2 预审员的禁止项（权威措辞）**` subsection (distinguishing "reading to verify claims" from "using artifacts themselves to judge implementation correctness"); ② the Critical / High rows of §4.3 each gain a rating criterion plus a new `> **定级边界注记**` paragraph after the table; ③ the Appendix B.5 prohibited line is synchronized to the same core wording string; ④ §12.4's OB-88 disposition cell gains a landing note, OB-87 gains the n=2 data point, and OB-89 is added (the pilot deferral continues for the 7th time, with the four OB-37 meta-rule elements); ⑤ appendix C gains C.0q. **No new G criterion is added, the §6.3 criterion body is unchanged, and §2.2 / §2.4 / §5.2 matrix / §7.5 figures are unchanged**. | `DIRECTIVE-PREREVIEW-GUIDANCE` (this slice) |
+| v1.30 | 2026-10-14 | **Slice `DIRECTIVE-LEDGER-DISCIPLINE` landed (pure documentation governance slice, size S)**: ① adds **§1.8 Ledger registration discipline** - the "pending-evaluation item handling rule" and the "registration split rule" are promoted from `docs/t027/REMAINING_SLICES{,_EN}.md` into this directive as the authoritative text (**relocation only, semantics unchanged**; the two rule blocks in that ledger become pointers and keep the authority note); ② appendix C gains C.0r. **Unchanged §2.2 / §2.4 / §5.2 / §7.5 / §6.3; no new criterion; unchanged schema/fixtures/workflows; no change under `internal/**`; unchanged role set.** | `DIRECTIVE-LEDGER-DISCIPLINE` (this slice) |
 ---
 
 ## 1. Scope and Slice Model
@@ -205,6 +206,25 @@ Where `[ROUTINE]` applies: conversational collaboration, small changes, producin
 **Record-keeping requirement**: the master **does not report line by line** when exercising execution freedom, but the "change summary" section of the slice validation report **must** list the substantive choices made under execution freedom. **Production and landing place**: that list is written to disk by **the master** as an **orchestration artifact** between ⑥ and ⑦ at the fixed path `docs/validation/evidence/[slice-id]-freedom-list.md`; ⑧b finalisation then writes the list back into the validation report and the two must agree; ⑦ final review re-checks **the same list inside its review input package** (the list is produced before ⑦, which is compatible with the §5.1 order) and rules on whether the boundary was crossed. **Coverage boundary**: that path lives under `docs/validation/evidence/**` (outside G7's scan scope) ⇒ the list **has no mechanical-criterion protection** and rests on ⑦'s manual re-check (same exclusion reading as §6.3 G7).
 
 **1.7.4 Temporary authorization (user ruling in the same turn)**: a **temporary authorization** outside these rules is valid only within that conversation turn and must satisfy all five elements — ① **same turn**: the authorization must come from explicit user wording in the **same turn**; after-the-fact acknowledgement or cross-turn citation does not count; ② **independent registration**: recorded independently as an **OB or ADR** (not merely in a §0.3 or appendix C note) and carrying the four elements (who ruled / date / reason / basis); ③ **nature stated truthfully**: if it carries a rule-semantics change or exceeds a clause literal standard, both points and "a direct user ruling" must be stated truthfully; ④ **not a precedent**: each temporary authorization is valid for this slice only and may not ground later cases of the same class; ⑤ **the third authorization becomes a slice**: when the same class of situation needs authorization for the **third** time it must no longer be handled as a temporary authorization but must be chartered as a slice that amends this directive formally.
+
+### 1.8 Ledger registration discipline (two meta-rules)
+
+The two rules of this section - the "pending-evaluation item handling rule" and the "registration split rule" - are **execution discipline** (per the category test in §0.1); they were originally registered in the head of the "later batch slices" section of `docs/t027/REMAINING_SLICES{,_EN}.md` and are now promoted into this directive as the authoritative text (v1.30), with only pointers left in that ledger.
+
+**1.8.1 Pending-evaluation item handling rule**: a pending-evaluation item **cannot be started directly** (§1.2 requires the full field table, while such an item carries only three fields). On reaching one:
+
+1. first run an **evaluation action** (`[ROUTINE]` or a light `[SLICE]`), producing: ① whether the item holds; ② if it holds, whether it becomes a standalone slice, is merged, or is not established; ③ if a slice is established, the remaining §1.2 fields;
+2. then branch on the outcome: **holds** ⇒ upgrade to the formal slice format (it may then be started normally); **does not hold** ⇒ append "evaluated + reason + date + report path" inside the pending-evaluation row and **keep the row**.
+The conclusion may be "no slice" - that is itself a valuable output.
+
+**Exception**: when the user supplies the complete §1.2 field set, the evaluation may be skipped and the item upgraded straight to a formal slice.
+
+**1.8.2 Registration split rule (user ruling 2026-10-14)**:
+
+- **Tasks** (coarse-grained; carrying REQ mappings and AT acceptance ids) ⇒ when added they **must** first be registered in `DEV_PLAN{,_EN}.md` (the P1.x sections), and **slice breakdown may start only after that registration**;
+- **Slices** (fine-grained; the §1.2 field table; independently startable) ⇒ when added they **must** be registered in the "later batch slices" section of `REMAINING_SLICES{,_EN}.md`;
+- **When a task cannot be completed directly and needs slices**: register on both sides; the slice entry must **point back** to the DEV_PLAN task id, and the task entry must list **its slice list**;
+- **Exception**: pure `[ROUTINE]`-tier work (no rule change, no contract change, no production-code change) does not enter these ledgers.
 
 ---
 
@@ -1505,6 +1525,26 @@ The following files **only get a supersede pointer added to the file header and 
 | Probe budget | none |
 | Freedom-list path | `docs/validation/evidence/DIRECTIVE-PREREVIEW-GUIDANCE-freedom-list.md` |
 | Note | ⑦ = `GPT-5.3-Codex (copilot)` 1 final review (blind) plus 1 re-review, no blind review added; ⑤ = `GLM-5.3 (glm)`, re-review PASS after a first-round FINDINGS |
+
+### C.0r Ledger meta-rule promotion slice `DIRECTIVE-LEDGER-DISCIPLINE`
+
+**Why necessary**: the two meta-rules at the head of the "later batch slices" section of `docs/t027/REMAINING_SLICES{,_EN}.md` (the pending-evaluation item handling rule / the registration split rule) previously lived in the temporary execution ledger, conflicting with the §0.1 authority table (execution-discipline authority belongs in `DELIVERY_DIRECTIVE.md`); this slice promotes them into §1.8 as the authoritative text and reduces the ledger to pointers.
+
+| Field | Content |
+|---|---|
+| Identity | `DIRECTIVE-LEDGER-DISCIPLINE` (v1.30) |
+| Status | ✅ **complete** (report in docs/validation/directive-ledger-discipline{,_EN}.md; flipped by ⑧b) |
+| Goal | ① the two meta-rules are promoted into §1.8 as the authoritative text (CN/EN in positional parity, relocation only, semantics unchanged); ② the two rule blocks in the ledger become pointers and keep the authority note; ③ this slice's report pair and freedom list |
+| Trigger | the user's 2026-10-14 kickoff message (`[SLICE]`, size S, pure documentation, probes 0; §5.2 takes the document-type trim) |
+| Size | S (`.md` only) |
+| Deliverables | v1.30 of `docs/DELIVERY_DIRECTIVE{,_EN}.md` (§1.8 / §0.3 / appendix C.0r); the pointer conversion and the P8 status row of `docs/t027/REMAINING_SLICES{,_EN}.md`; this report pair; the freedom list |
+| Acceptance evidence | `gate.js --all` green in all three scopes + CN / `_EN` parity checked by G3(a) and G3(b) (including the five shapes) + sentence-by-sentence comparison of the two rules before and after the move + version v1.30 consistent with §0.3 (G1-b) |
+| Boundaries | the two rules' semantics are unchanged (relocation only); unchanged §2.2 / §2.4 / §5.2 / §7.5 / §6.3; unchanged schema/fixtures/workflows; no change under `internal/**`; unchanged role set |
+| Tier | `[SLICE]` |
+| Probe budget | none |
+| Freedom-list path | `docs/validation/evidence/DIRECTIVE-LEDGER-DISCIPLINE-freedom-list.md` |
+| Note | ⑦ = `GPT-5.3-Codex (copilot)` at the standard Extra High tier (carrying the compensating review under the document-type trim: semantic equivalence + pointer resolvability); F5 adds no new G criterion; ⑥ is mandatory (§7.2 ③ does not hold) |
+
 ### C.1 v3.1 section numbers → this directive
 
 | Original v3.1 section | Content | Location in this directive |
