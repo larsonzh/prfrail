@@ -5,6 +5,8 @@
 > Baseline: 68664d8 (2026-09-14, already includes the #38 CI fix). Corrected inventory: 12 required slices + 1 deferrable slice; required size totals are M×7, M-L×1, L×4; including C1 the totals are M×8, M-L×1, L×4.
 > **Revision 2026-09-19: B3 is split into B3a (power-loss injection rig and calibration) + B3b (candidate injection matrix and durability verdict)** ⇒ **13** required slices; required size totals become **M×8, M-L×2, L×3**; including C1: **M×9, M-L×2, L×3**. Rationale: A7 disproved that kill-level injection can decide the durability step (CP4≡CP5), and B3's prerequisites (a per-round journal that is itself provably durable, on a second physical device, plus restart inventory and two-way calibration) and its outcome (per-candidate injection and the three-tier verdict) are different kinds of work with different risks; mixing them invites drawing conclusions from an uncalibrated rig.
 > **Revision 2026-09-21: add B3c (CONTRACTS durability-upgrade clause, documentation only)** ⇒ **14** required slices; required size totals become **M×8, M-L×2, L×3, S×1**; including C1: **M×9, M-L×2, L×3, S×1**. Rationale: B3b produced a **tiered** verdict (C2 `proven`; C1/C3/C2C3/U4 `unresolved`), while the bilingual CONTRACTS still states "publication durability is unproven" as a **platform constant** with no upgrade condition and no unlock boundary; without freezing the wording first, B4 would stumble between the contract wording and the tiered verdict.
+> **Extension 2026-10-13**: from today this ledger covers T027 and the later domains (including the T028 close-out, the S1-exit prerequisites and criteria governance).
+> The T027 main-line slices (A0–A7, B1–B4, C1) keep their historical entries; later batch tasks are registered item by item against the §1.2 field table, each with a source citation.
 
 ## How to use
 
@@ -458,6 +460,100 @@ Current gap: Linux-native capability, enforcement, durability, and AT-23 evidenc
 Deliverables: Linux native validation record, evidence links, ledger updates.
 Acceptance evidence: complete Linux native evidence with SecretStore and SessionBridge visible explicitly excluded from scope.
 Boundaries: this is a follow-up platform slice and must not rewrite the Windows mainline conclusion.
+
+## Later batch slices (registered from 2026-10-13)
+
+> This section registers the batch candidates after the T027 main line (A0–A7 / B1–B4 / C1); the fields and their order follow `DELIVERY_DIRECTIVE.md` §1.2 item by item, and every entry must cite its source.
+> Status symbols are as in this file's "status table"; this section is **not folded into** the T027 required-size counts.
+
+### P1 — `AT24-WORDING` · ⬜
+
+Sources: `docs/validation/t028-supervised-black-box.md:140` (the AT-24 clause "blocks" conflicts with §8 of the design document; the user ruled §8 authoritative and that the wording clarification moves to a later documentation slice, promoted to the next slice), its `:147` and `:192` (candidate C-11 folded into that slice), `:202` (priority restated); `docs/TEST_STRATEGY.md:54` (the AT-24 row carries the same wording ⇒ fix in the same pass); `docs/DEV_PLAN.md:113` already carries the (b)/(c) ruling qualifier and **needs no change**; the slice name is ruled by the user on 2026-10-13.
+
+| Field | Content |
+|---|---|
+| Identity | `AT24-WORDING` (replaces the informal `AT24-DOC`) |
+| Goal | Remove the AT-24 wording conflict under the user ruling (reading §8 of the design document as authoritative) and land the C-11 fixture version-drift note |
+| Dependencies | none |
+| Size | S (`.md` only) |
+| Steps | ② documentation → ③ consistency check → ④ gates → ⑤ → ⑥ → ⑦ → ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| Current gap | `t028-supervised-black-box.md:140` states the wording clarification is carried by a later documentation slice, yet it is registered as no OB and has no formal slice name ⇒ on a literal reading the conflict is Critical with no carrier |
+| Deliverables | the matching paragraphs of `docs/validation/t028-supervised-black-box{,_EN}.md`; the report pair `docs/validation/at24-wording{,_EN}.md`; the AT-24 row of `docs/TEST_STRATEGY{,_EN}.md`; this ledger's status line |
+| Acceptance evidence | ① no unconditional "AT-24 fully closed" anywhere; ② the C-11 note is mechanically assertable; ③ no knock-on inconsistency in `TEST_STRATEGY{,_EN}.md`; ④ `gate.js --all` green in all three scopes |
+| Boundaries | the AT-24 acceptance conclusion is unchanged (wording only); CONTRACTS / schema / fixtures unchanged; the historical conclusion lines of the T028 report are unchanged (clarification or the conflicting sentence only); no push to gitee |
+| Tier | `[SLICE]` (touches a documentation conclusion) |
+| Probe budget | none |
+| Execution-freedom list path | `docs/validation/evidence/AT24-WORDING-freedom-list.md` |
+
+### P2 — `GATES-TIGHTEN` · ⬜
+
+Sources: `docs/DELIVERY_DIRECTIVE.md:964` (the §12.5 "criterion self-reference risk" row names `GATES-TIGHTEN` as the candidate slice, user ruling 2026-09-23); rows whose disposition points here = `:868` (OB-20), `:884` (OB-29), `:887` (OB-32), `:896` (OB-41), `:928` (OB-73); same-origin observations = `:883` (OB-28), `:897` (OB-42); see also `docs/validation/directive-review-saturation.md:243` and `:245`, `docs/validation/t028-supervised-black-box.md:203` (⑥ mandatory-coverage layering), `docs/validation/directive-haiku-bump.md:44` and `:157` (the ⑦ carrier is read-only, so the input package must be materialised).
+
+| Field | Content |
+|---|---|
+| Identity | `GATES-TIGHTEN` |
+| Goal | Tighten the §6.3 criteria, layer ⑥'s mandatory-coverage faces, and dispose of the affected OB rows per the §12.5 gap row |
+| Dependencies | none |
+| Size | M-L |
+| Steps | ① → ② → ③ → ④ → ⑤ → ⑥ → ⑦ → ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| Current gap | §12.5 states the "criterion self-reference risk"; OB-20 / OB-29 / OB-32 / OB-41 / OB-73 are all ruled into this slice and none is disposed yet |
+| Deliverables | §6.3 criteria revision with matching `tools/gates/**`; the ⑥ mandatory-coverage layering clause; the report pair; ledger write-back |
+| Acceptance evidence | ① the mechanical assertions of the tightened criteria are green; ② the affected OB dispositions flip; ③ `gate.js --all` green in all three scopes; ④ mutation testing can falsify them |
+| Boundaries | unchanged §2.2 / §2.4 / §5.2 matrix / §7.5 numbers; unchanged role set and carriers; no change under `internal/**` |
+| Tier | `[SLICE]` (touches the §6.3 criteria themselves) |
+| Probe budget | none |
+| Execution-freedom list path | `docs/validation/evidence/GATES-TIGHTEN-freedom-list.md` |
+
+Merge ruling: of the four items once collected under `DIRECTIVE-DOCTRINE-CLEAN`, the **⑥ coverage-gap layering** (source `t028-supervised-black-box.md:203`) and the **⑦ tooling-surface calibration** (source `directive-haiku-bump.md:44` and `:157`) are **merged into this slice** as G7-family candidates; the **§5.1 ordering** items (OB-13's ⑨ position and OB-48's freedom-list landing time) move the pipeline structure ⇒ **not merged**, left for separate evaluation; the "probe caliber" item has no source anywhere in the repository ⇒ **not registered**.
+
+### P3 — `C1` field completion (no new slice)
+
+Sources: `docs/t027/REMAINING_SLICES.md:461` (the formal slice section), `:49` (status-table row), `:463` (dependencies), `:465`–`:468` (check boxes), `:470` (deliverables), `:471` (acceptance evidence), `:473` (goal / current gap), `:474` (boundaries).
+
+**Ruling**: the C1 slice section already exists and is not rewritten, per this file's header ("the T027 main-line entries are unchanged"); this section only supplies the §1.2 fields it is missing.
+
+| Field | Content |
+|---|---|
+| Identity | `C1` |
+| Goal | Linux AgentRunner native validation |
+| Dependencies | B4 complete (`:463`; B4 finished 2026-09-23) |
+| Size | M (the `:49` status row already records M) |
+| Steps | ① → ② → ③ → ④ → ⑤ → ⑥ → ⑦ → ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| Current gap | the original section lacks the §1.2 fields "tier / probe budget / execution-freedom list path" |
+| Deliverables | as in `:470` (Linux native validation record, evidence links, ledger write-back) |
+| Acceptance evidence | as in `:471` (native Linux evidence complete, with scope explicitly excluding SecretStore and SessionBridge visible) |
+| Boundaries | as in `:474` (a deferred platform slice; it must not retroactively change the Windows main-line conclusion) |
+| Tier | `[SLICE]` (not declared in the original; supplied here; **pending user confirmation**) |
+| Probe budget | none (not declared in the original; **pending user confirmation**) |
+| Execution-freedom list path | `docs/validation/evidence/C1-freedom-list.md` |
+
+### P4 — `DIRECTIVE-OB-SWEEP` · ⬜
+
+Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.md:915` (OB-60), `:937` (OB-82), `:939` (OB-84) are the in-scope items after verification; `:923` (OB-68), `:928` (OB-73), `:930` (OB-75), `:932` (OB-77) are **to be split out**, see below.
+
+| Field | Content |
+|---|---|
+| Identity | `DIRECTIVE-OB-SWEEP` |
+| Goal | Batch-dispose three `.md`-only ledger fixes: OB-60 (appendix B.1's architecture design document gains two sections), OB-82 (§7.7 sampling-window counting anchor and record location), OB-84 (a ⑦ cost budget caliber in the §12.5 gap row) |
+| Dependencies | none |
+| Size | S |
+| Steps | ① → ② → ③ → ④ → ⑤ → ⑥ → ⑦ → ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| Current gap | all three are registered in §12.4 and none is disposed; OB-60 and OB-82 carry the status word `待议` and OB-84 carries `观察中` |
+| Deliverables | the three OB dispositions flipped; the matching edits in appendix B.1, §7.7 and §12.5; the report pair; ledger write-back |
+| Acceptance evidence | ① all three OBs flip or are truthfully shown not to hold; ② `gate.js --all` green in all three scopes; ③ each item has a `file:line`-level assertion |
+| Boundaries | unchanged §2.2 / §2.4 / §5.2 / §6.3 / §7.5; no change under `internal/**`; unchanged role set and carriers |
+| Tier | `[SLICE]` (touches directive wording and template structure) |
+| Probe budget | none |
+| Execution-freedom list path | `docs/validation/evidence/DIRECTIVE-OB-SWEEP-freedom-list.md` |
+
+**Split-out recommendation (the proposal listed 7 items; only 3 survive verification)**:
+
+| OB | Verdict | Basis |
+|---|---|---|
+| OB-68 (`:923`) | **must be split out** | its remedy requires changing the ⑦ labels and tier costs in §5.2 / §7.1 / §7.5 / §8.2 ⇒ it directly conflicts with this slice's "unchanged §5.2 / §7.5" boundary |
+| OB-73 (`:928`) | **merged into P2** | its own disposition row says "evaluated together with the `GATES-TIGHTEN` family"; its candidate remedy would also touch G3(a.2) in §6.3, a section this slice may not change |
+| OB-75 (`:930`) | **must be split out** | it calls itself "an identified blind spot (not a defect)"; the remedy lies in operator-side observability and cannot be closed by a `.md` edit |
+| OB-77 (`:932`) | **must be split out** | its own conclusion is "worth a separate slice, low priority"; its criterion form is a new §6.3 soft-scan criterion |
 
 ---
 
