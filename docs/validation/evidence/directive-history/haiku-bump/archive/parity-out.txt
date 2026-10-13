@@ -1,0 +1,4 @@
+lines cn=209 en=209 equal=true
+SHAPE_MISMATCHES=0
+docs/validation/directive-haiku-bump.md bom=true crlf=false bytes=27057
+docs/validation/directive-haiku-bump_EN.md bom=true crlf=false bytes=31877

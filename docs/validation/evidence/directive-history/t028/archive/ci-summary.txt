@@ -1,0 +1,45 @@
+=== JOB: Go windows-latest
+  GATE  SELFTEST: PASS 335/335
+  GATE  GATE REPORT scope=ci repo=D:\a\prfrail\prfrail changed=34
+  GATE  TOTAL_FAIL=0
+  OK_PKG_LINES=14
+    ok  	github.com/larsonzh/prfrail/examples/whois-shadow	0.051s
+    ok  	github.com/larsonzh/prfrail/internal/adapters	25.717s
+    ok  	github.com/larsonzh/prfrail/internal/applier	3.984s
+    ok  	github.com/larsonzh/prfrail/internal/chain	0.207s
+    ok  	github.com/larsonzh/prfrail/internal/console	12.823s
+    ok  	github.com/larsonzh/prfrail/internal/evidence	0.099s
+    ok  	github.com/larsonzh/prfrail/internal/gates	0.352s
+    ok  	github.com/larsonzh/prfrail/internal/guard	0.871s
+    ok  	github.com/larsonzh/prfrail/internal/release	4.104s
+    ok  	github.com/larsonzh/prfrail/internal/repair	0.028s
+    ok  	github.com/larsonzh/prfrail/internal/snapshot	1.739s
+    ok  	github.com/larsonzh/prfrail/internal/taskdef	0.049s
+    ok  	github.com/larsonzh/prfrail/internal/tickets	0.029s
+    ok  	github.com/larsonzh/prfrail/tools/agent-probe/enforcement-proxy	0.799s
+  FAIL_PKG_LINES=0
+=== JOB: Go ubuntu-latest
+  GATE  SELFTEST: PASS 335/335
+  GATE  GATE REPORT scope=ci repo=/home/runner/work/prfrail/prfrail changed=34
+  GATE  TOTAL_FAIL=0
+  OK_PKG_LINES=16
+    ok  	github.com/larsonzh/prfrail/examples/whois-shadow	0.004s
+    ok  	github.com/larsonzh/prfrail/internal/adapters	13.001s
+    ok  	github.com/larsonzh/prfrail/internal/applier	2.602s
+    ok  	github.com/larsonzh/prfrail/internal/chain	0.253s
+    ok  	github.com/larsonzh/prfrail/internal/console	4.065s
+    ok  	github.com/larsonzh/prfrail/internal/evidence	0.013s
+    ok  	github.com/larsonzh/prfrail/internal/gates	0.588s
+    ok  	github.com/larsonzh/prfrail/internal/guard	0.618s
+    ok  	github.com/larsonzh/prfrail/internal/release	1.472s
+    ok  	github.com/larsonzh/prfrail/internal/repair	0.004s
+    ok  	github.com/larsonzh/prfrail/internal/snapshot	0.084s
+    ok  	github.com/larsonzh/prfrail/internal/taskdef	0.011s
+    ok  	github.com/larsonzh/prfrail/internal/tickets	0.008s
+    ok  	github.com/larsonzh/prfrail/tools/agent-probe/enforcement-proxy	0.228s
+    ok  	github.com/larsonzh/prfrail/internal/adapters	83.702s
+    ok  	github.com/larsonzh/prfrail/internal/chain	1.703s
+  FAIL_PKG_LINES=0
+
+JOBS_WITH_EVIDENCE=2
+TOTAL_LOG_LINES=1406

@@ -1,0 +1,175 @@
+diff --git a/docs/DELIVERY_DIRECTIVE.md b/docs/DELIVERY_DIRECTIVE.md
+index 07cc2e2..1402c77 100644
+--- a/docs/DELIVERY_DIRECTIVE.md
++++ b/docs/DELIVERY_DIRECTIVE.md
+@@ -1,6 +1,6 @@
+ ﻿# ProofRail 交付执行准则（DELIVERY_DIRECTIVE）
+ 
+-版本：v1.26。日期：2026-10-06。状态：**CN 正文冻结**（ `_EN` 镜像见 `docs/DELIVERY_DIRECTIVE_EN.md`）。
++版本：v1.27。日期：2026-10-11。状态：**CN 正文冻结**（ `_EN` 镜像见 `docs/DELIVERY_DIRECTIVE_EN.md`）。
+ 
+ > **多语言说明**：本文件为中文权威版；`docs/DELIVERY_DIRECTIVE_EN.md` 为严格同位镜像（与 CN 同步维护；CN 冻结后同步更新，避免评审期双语返工）。
+ > **编码**：本文及 `_EN` 必须保持 UTF-8 **with BOM** + **LF**。
+@@ -70,6 +70,7 @@
+ | v1.24 | 2026-10-05 | **证据树判据作用域与新判据 G8（切片 `DIRECTIVE-EVIDENCE-SCOPE`）**：① **判据作用域排除**（OB-79）——G1-a / G2 / G4a / G4b / G6 的**目标文件集排除** `docs/validation/evidence/**`，该树内变更改由新判据 **G8** 四子查承担；② **归档载荷编码形态**口径（OB-80）——按归档后类型归一（`.ps1` 带 BOM、其余无 BOM、一律 LF），`MANIFEST` 记原始与归档两枚 sha256；③ §1.5.1 增**第四类「重建归档」**（OB-76）；④ §1.5.1 的 **③ 例示修正**（OB-78）；⑤ 指针同步（`G1–G7` → `G1–G8` 字样，仅枚举，不动 §5.2 矩阵本体 / §7.5 数值 / §2.2 / §2.4 / 角色集与载体）；⑥ 版本 **v1.24 = MINOR**。**不新增角色；不改契约 / schema（含契约夹具）**。 | `DIRECTIVE-EVIDENCE-SCOPE`（本片） |
+ | v1.25 | 2026-10-06 | **台账补登（切片 `DIRECTIVE-GLM-EVAL` 的收尾；用户 2026-10-06 授权）**：§12.4 登记 **OB-83**（GLM 两枚模型在 ⑤ 预审位置与批量辅助任务上的**用户授权临时评估**，按 §1.7.4 五要素独立留痕）与 **OB-84**（⑦ 三读无预算模型，依本片实测成本量级提出）；§12.5 增一条缺口行「⑦ 三读成本无预算模型」。**不新增判据、不改任何规则语义、不改 §6.3 判据作用域**。本行是 `DIRECTIVE-GLM-EVAL` 切片内的副产物，不是独立的准则治理片。 | `DIRECTIVE-GLM-EVAL`（本片报告 §7 载明 v1.25 为切片内副产物） |
+ | v1.26 | 2026-10-06 | **切片 `DIRECTIVE-GLM-LANDING` 落地（步骤 0 的用户裁定见下）**：步骤 0 登记 **OB-85**（试点继续顺延第 **5** 次，按 §1.7.4 / OB-37 元规则独立留痕，含四要素与如实标注）；本片落地——① §2.2 增 `GLM-5.3 (glm)`（⑤ 预审**首选**）与 `GLM-5.3-Flash (glm)`（**批量辅助首选**，限四类任务、排除排序与 Top-N 择优）两行，原预审员行改注 **备用**（① 与 ②③ 位不动）；② §5.2 增 ⑤ 预审模型说明段（**矩阵本体不动**）；③ §6.3 的 G5-b 白名单闭集扩入 `glm-5.3` / `glm-5.3-flash`，同步 `tools/gates` 实现与自检夹具；④ §12.4 的 OB-83 处置列翻 `已处置`（**已落地（常设）**，临时授权终止、升级触发关闭）；⑤ §5.1 流水线图、§7.1 三层审查表、§7.2.3 三级回退三处 `V4 Pro` 标签同步为首选口径（OB-69 一致性义务）；⑥ 附录 B.5 的 ⑤ 模板改首选限定名；⑦ 附录 C 增 C.0o。**不触 §2.4 黑名单正文、§5.2 矩阵、§7.5 数值、角色集与载体、`internal/**`、CONTRACTS / schemas / 契约夹具 / workflows / `go.mod`。** | `DIRECTIVE-GLM-LANDING`（本片） |
++| v1.27 | 2026-10-11 | **切片 `DIRECTIVE-HAIKU-BUMP` 落地（步骤 0 的用户裁定见下）**：步骤 0 登记 **OB-86**（试点继续顺延第 **6** 次，按 §1.7.4 / OB-37 元规则独立留痕，含四要素与如实标注）；本片落地——① §7.2.3 的启用前置条件由 `Claude Haiku 4.5` 升为 **`Claude Haiku 5.5`**；② §7.2.3 增「调用串与内部标识」段（限定名 `Claude Haiku 5.5 (copilot)`、内部标识 `claude-haiku-5.5`，并明写其内部标识不属于 §6.3 的 G5-b 白名单闭集）⇒ 闭合 **OB-74**（其 §12.4 处置列翻 `已处置`）；③ 附录 C 增 C.0p。**不触 §2.2 闭集、§2.4 的「唯一豁免」措辞、§7.5 成本表、§6.3 的 G5-b。** | `DIRECTIVE-HAIKU-BUMP`（本片） |
+ ---
+ 
+ ## 1. 适用范围与切片模型
+@@ -596,7 +597,9 @@ tmp/ 内文件按**四类口径**处置；归类与归档动作属于「tmp/ 生
+ 
+ ### 7.2.3 Haiku 启用前置条件
+ 
+-必须**先确认后启用**：① Copilot 模型列表中存在 `Claude Haiku 4.5`；② 访问通道（代理/网络出口）正常并以首个真实调用完成可用性预检。任一不满足 ⇒ **按三级回退处置**：① 退回 ⑤ 请预审员补扫一轮（预审加一轮）；② 若 ⑤ 已收口，则**跳过 ⑥ 并在报告中记录理由**，由 ⑦ 承担独立扫描职责；③ 若 ⑦ 亦无法覆盖，则**升级用户裁决**；**不得反复重试**，也不得把其缺席计作 ⑥ 失败。
++必须**先确认后启用**：① Copilot 模型列表中存在 `Claude Haiku 5.5`；② 访问通道（代理/网络出口）正常并以首个真实调用完成可用性预检。任一不满足 ⇒ **按三级回退处置**：① 退回 ⑤ 请预审员补扫一轮（预审加一轮）；② 若 ⑤ 已收口，则**跳过 ⑥ 并在报告中记录理由**，由 ⑦ 承担独立扫描职责；③ 若 ⑦ 亦无法覆盖，则**升级用户裁决**；**不得反复重试**，也不得把其缺席计作 ⑥ 失败。
++
++**调用串与内部标识（2026-10-11 新增，闭合 OB-74）**：Haiku 的限定名 = `Claude Haiku 5.5 (copilot)`（调用串，写法同 §2.2 的限定名列口径，R2.2）；内部标识 = `claude-haiku-5.5`。Haiku 属 §2.2 之外的**豁免**（口径见 §2.4），其内部标识**不属于** §6.3 的 G5-b 白名单闭集——该闭集仍等于 §2.2 的 `modelId`（内部标识）列。
+ 
+ ### 7.3 输入消毒与结论落地
+ 
+@@ -907,7 +910,7 @@ tmp/ 内文件按**四类口径**处置；归类与归档动作属于「tmp/ 生
+ | OB-71 | 2026-10-03 | **「任务包结项报告」机制缺口（用户既有提议；本片 ③ 的评估对象）**：任务包结束时缺一份收尾文档——**回看**（做了什么 / 完成什么 / 未完成及原因）+ **前瞻**（业务与技术上的新增 / 取消 / 改变 / 注意事项）；**关键边界**：回看可由主控撰写，**前瞻需用户视角**（业务方向不得由主控独断，依 §1.7.3 与 §3.2）。现状：§11.3 只定义单切片报告，§12.5 的「复盘分析师（多切片数据复盘）」只是缺口行且无触发锚点 ⇒ **跨切片的阶段收尾无承载物**；锚点（T027 结束 / S1 结束）已被反复引用却无落点。 | **已处置**（本片 `DIRECTIVE-LOOPBACK-LANDING` 执行用户 D-3 裁定）：取**轻量**形态 —— 模板 `docs/SLICE-CLOSEOUT-TEMPLATE{,_EN}.md`；回看 = 主控撰写，前瞻 = 主控起草待决问题清单 + 用户裁决（业务方向不得由主控独断，依 §1.7.3 与 §3.2）；首个锚点 = T027 结束；中等 / 重型留待轻量运行一段后评估 |
+ | OB-72 | 2026-10-03 | **台账「完成行格式」仍存自指——commit hash 亦属提交前不可知**：C 规则（§11.2）要求完成行「只写提交时可确定的事实」，CI run 号已剔除，但 **commit hash 同样在提交前不可知**（完成行写在提交之内）；本片新行只记报告路径，实际仍是「提交后补全」⇒ 与 C 规则「消除下一片回填」的目标未完全一致。 | **已处置**（本片 `DIRECTIVE-MODELID-MAP`）：完成行重建为「**报告路径**」单一事实，并规定 commit hash 与 CI run 号只进报告、由本片主控在 CI 双绿后以 docs-only 提交补全（落于 §11.2）。**案 A（报告内 CI 号）被否**：报告与完成行同处一个提交 ⇒ 报告内 CI 号同样在提交前不可知，自指未解除 |
+ | OB-73 | 2026-10-04 | **CN / `_EN` 的反引号级镜像漂移（基线遗留）**：5 处（`DELIVERY_DIRECTIVE` 的 519 / 827 / 873 / 1219 / 1275，其中 2 处含 EN 独有句子）——`_EN` 侧的反引号数量与 CN 不相等，属 v1.22 之前即存在的漂移。 | **待议**：G3(a.2) 的五形状（行数 / 标题位置 / 加粗标记 / 竖线计数 / 空行）**不含反引号计数**，故门禁不覆盖；修正需改动与切片无关的历史行 ⇒ `DIRECTIVE-MODELID-MAP` 按 §1.7.2 边界拒绝。候选处置 = 与 `GATES-TIGHTEN` 家族一并评估（或把反引号计数纳入 G3(a.2) 并同步修正该 5 处） |
+-| OB-74 | 2026-10-04 | **Haiku 的限定名未定义**：Haiku 是 §2.2 之外唯一豁免（§7.2.3 的 ⑥ 补充），但 §2.2 三元组与附录 B 均无其限定名 ⇒ 启用时无调用串可写。 | **待议**：既有缺口（`DIRECTIVE-MODELID-MAP` 未引入、未声称解决）；触发 = §7.2.3 相关修订片，需同时给出 Haiku 的限定名与内部标识 |
++| OB-74 | 2026-10-04 | **Haiku 的限定名未定义**：Haiku 是 §2.2 之外唯一豁免（§7.2.3 的 ⑥ 补充），但 §2.2 三元组与附录 B 均无其限定名 ⇒ 启用时无调用串可写。 | **已处置**（v1.27：§7.2.3 已给出限定名 `Claude Haiku 5.5 (copilot)` 与内部标识 `claude-haiku-5.5`，并明写其内部标识不属于 §6.3 的 G5-b 白名单闭集；本片即其原触发条件「§7.2.3 相关修订片」所指的切片，该触发已由此闭合） |
+ | OB-75 | 2026-10-04 | **限定名的静默路由盲区（R2.2 反修正后的残留风险）**：R2.2 的维护机制只在**调用被工具拒绝**时触发；若工具**接受旧串却把请求路由到其它模型**，规则层无任何防护——「调用串 = 限定名」在静默路由面前没有可观测判据。 | **待议**：这是**已被识别的盲区**（非缺陷）：属映射式规则的固有面；§2.3 已述「子代理自报不可信」，故候选处置需落在 operator 侧——例如对每次调用记录 operator 侧实际生效模型并在报告中与任务包串核对，或由工具侧提供可用性探测。触发 = 下一片评估或与模型可观测性议题同批 |
+ | OB-76 | 2026-10-04 | **证据「重建归档」无先例、无规则**：本片（`DIRECTIVE-MODELID-MAP`）的 `tmp/dml/mutation.md` 因 PowerShell 重定向产生 GBK 乱码（不可逆），归档副本按准则原文与门禁截断口径重建两行、ASCII 状态行逐字保留；这类「重建归档」在准则中无对应规则——既非「归档原件」（≠ §1.5.1 的 ① 类），也非「直接清」（≠ §1.5.1 的 ③ 类）。 | **已处置**（v1.24：§1.5.1 增第四类「重建归档」，规定触发条件（原件不可用）、重建依据要求、头部注记格式与可复核性约束——原建议已落地） |
+ | OB-77 | 2026-10-04 | **文档对 `tmp/` 的引用缺乏机械判据守护**：切片 `DIRECTIVE-TMP-LIFECYCLE` 的步骤 0 实测——全仓 873 处 `tmp/` 引用行、298 个不同路径中 **193 处指向已不存在的路径**（含此前切片已清除的 `tmp/ddl` 等）⇒「引用 ↔ 实体」的脱钩**早于本片归档**，是独立缺陷。 | **待议**：现无判据覆盖「文档引用的 `tmp/` 路径是否仍存在」；候选处置 = 归档与清理后由 MANIFEST 记录对应关系，并评估是否增一条软扫描判据；触发 = 与 OB-49 / OB-76 的机制修订同批；**本片评估结论** = 值得另立片、低优先级，判据形态 = 变更行 `tmp/<path>` 引用的软扫描，**本片不落**，状态词保持 `待议` |
+@@ -919,6 +922,7 @@ tmp/ 内文件按**四类口径**处置；归类与归档动作属于「tmp/ 生
+ | OB-83 | 2026-10-06 | **GLM 两枚模型的临时评估授权（切片 `DIRECTIVE-GLM-EVAL` 的 §1.7.4 独立登记）**：`GLM-5.3 (glm)` 与 `GLM-5.3-Flash (glm)` **均不在** §2.2 白名单（§2.4 为闭集口径）⇒ 本片对二者的 **6 次**调用（限定名探测 1 + ⑤ 实验腿 1 + 批量腿 4）属**规则之外的临时授权**，按 §1.7.4 在此独立留痕。**四要素**：裁决人 = 用户；日期 = 2026-10-06（本片起跑轮）；理由 = 评估 GLM 在 ⑤ 预审位置的质量与成本、并在 4 类批量辅助任务上评估产物可用性，**只评估、不入白名单**；依据 = 用户同轮启动声明（切片定义见 `tmp/glm-eval/BRIEFING.md`）。**性质如实标注**：本条**超出 §2.4 相关条款的字面标准**（未列入 §2.2 者一律不得调用），系**用户直接裁定**；**不得作为先例**（每片独立计；同类情形第三次须立项为切片正式修订本准则）。 | **已处置**（**已落地（常设）**：`DIRECTIVE-GLM-LANDING`（v1.26）已将 `GLM-5.3 (glm)` / `GLM-5.3-Flash (glm)` 落入 §2.2 白名单 ⇒ **临时授权终止、升级触发关闭**——此后对两模型的调用按 §2.2 / §2.4 常规口径执行，不再走 §1.7.4；调用分账与本片证据见 `docs/validation/directive-glm-eval{,_EN}.md`） |
+ | OB-84 | 2026-10-06 | **⑦ 三读无预算模型（切片 `DIRECTIVE-GLM-EVAL` 的实测数据点）**：§7.5 只给 ⑦ 的**次数上限**（1 终审 + 1 复审，盲审另计 +1），**未给成本量级**；本片三读实测约 3 小时墙钟、约 600 credits（约 200 credits / 读），与上一片 `DIRECTIVE-EVIDENCE-SCOPE` 同量级 ⇒ 评估片 / 治理片的 ⑦ 预算无法事前估算。 | **观察中**：建议后续评估片 / 治理片在 §12.5 的缺口行上给出预算口径；本片只登记数据点、不改 §7.5 数值 |
+ | OB-85 | 2026-10-06 | **试点继续顺延第 5 次（用户直接裁定）**：本片（`DIRECTIVE-GLM-LANDING`）为准则治理 / 判据本体变更片 ⇒ 不满足 §12.1 的试点选择标准；按 §7.8.6 与 §12.1 的配套②升级用户裁决，顺延次数以 §12.4 为唯一真值源（本次记为第 5 次）。四要素：裁决人 = 用户；日期 = 2026-10-06（本片步骤 0）；理由 = 本片为准则治理 / 判据本体变更片，不满足 §12.1 的试点选择标准；依据 = 用户同轮裁定原文。**按 OB-37 元规则独立留痕**，如实标注「超出 OB-11 字面标准、系用户直接裁定」，且**不得作为先例**。 | **已裁决**（用户直接裁定：继续执行、不作为试点） |
++| OB-86 | 2026-10-11 | **试点继续顺延第 6 次（用户直接裁定）**：本片（`DIRECTIVE-HAIKU-BUMP`）为纯文档准则治理片 ⇒ 不满足 §12.1 的试点选择标准；按 §7.8.6 与 §12.1 的配套②升级用户裁决，顺延次数以 §12.4 为唯一真值源（本次记为第 6 次）。四要素：裁决人 = 用户；日期 = 2026-10-11（本片步骤 0）；理由 = 纯文档准则治理片不满足 §12.1 的试点选择标准；依据 = 用户同轮裁定原文。**按 OB-37 元规则独立留痕**，如实标注「超出 OB-11 字面标准、系用户直接裁定」，且**不得作为先例**。 | **已裁决**（用户直接裁定：继续执行、不作为试点） |
+ 
+ > **编号溯源说明（切片 `DIRECTIVE-DESIGN-LOOPBACK`；不占 OB 号）**：本片切片定义引述的『OB-71』『OB-76』两项在本台账与本仓受版本控制文档中**均无登记**（本片逐字检索为空）；上表本行按台账顺序占用 **OB-71**，两处外部引述号的映射待用户裁定。
+ 
+@@ -1444,6 +1448,24 @@ SLICE: READY_FOR_REVIEW | SLICE: BLOCKED
+ | 探针额度 | 无 |
+ | 自由度清单路径 | `docs/validation/evidence/DIRECTIVE-GLM-LANDING-freedom-list.md` |
+ | 附注 | ⑦ = `GPT-5.3-Codex (copilot)` 1 终审 + 1 复审、不追加盲审（本片不触 §7.7 必抽三语义；按比例抽查判定在启动前记录理由，见 OB-82）；⑤ 首次落地复审可用 `GLM-5.3 (glm)`；成本向量只进报告（G6-2 口径，F-9 先例） |
++### C.0p Haiku 启用前置条件版本升级切片 `DIRECTIVE-HAIKU-BUMP`
++
++**为何必需**：OB-74 明写其触发 = 「§7.2.3 相关修订片」，且需同时给出 Haiku 的限定名与内部标识；本片即该片，并把启用前置条件的版本由 4.5 升为 5.5（实测 `runSubagent` 接受 `Claude Haiku 5.5 (copilot)`）。
++
++| 字段 | 内容 |
++|---|---|
++| 标识 | `DIRECTIVE-HAIKU-BUMP`（v1.27） |
++| 状态 | ⬜ **进行中**（本片 ⑩ 前的如实状态：待 ⑤⑥⑦ 与 ⑨ 完成后由 ⑧b 更新） |
++| 目标 | ① §7.2.3 启用前置条件版本由 `Claude Haiku 4.5` 升为 `Claude Haiku 5.5`；② §7.2.3 增「调用串与内部标识」段（限定名 `Claude Haiku 5.5 (copilot)`、内部标识 `claude-haiku-5.5`，并明写其内部标识不属于 §6.3 的 G5-b 白名单闭集）⇒ 闭合 OB-74；③ §12.4 的 OB-74 处置列翻 `已处置` |
++| 触发 | 用户 2026-10-11 启动声明（`[SLICE]`，S 档、纯文档、探针 1 次；试点顺延第 6 次 = OB-86） |
++| 规模 | S（纯 `.md`） |
++| 交付物 | `docs/DELIVERY_DIRECTIVE{,_EN}.md` 的 v1.27（§0.3 / §7.2.3 / §12.4 的 OB-74 处置列与 OB-86 登记行 / 附录 C.0p）；本报告对；自由度清单 |
++| 验收证据 | `gate.js --all --scope=tree` 与 `--scope=index` 全绿 + `--selftest` 全绿 + CN / `_EN` 同位由 G3(a) 与 G3(b) 校验 + OB-74 闭合可字面核验 + 1 次探针实测 `Claude Haiku 5.5 (copilot)` 被 `runSubagent` 接受 |
++| 边界 | 不触 §2.2 闭集 / §2.4 措辞 / §7.5 成本表 / §6.3 的 G5-b / 代码 / CONTRACTS / schema / fixtures / workflows / `go.mod` / 角色集与载体 |
++| 分级 | `[SLICE]` |
++| 探针额度 | 1 次（硬上限，不追加） |
++| 自由度清单路径 | `docs/validation/evidence/DIRECTIVE-HAIKU-BUMP-freedom-list.md` |
++| 附注 | ⑦ = `GPT-5.3-Codex (copilot)` 1 终审 + 1 复审、**不追加盲审**（判定与理由已在启动前记录）；⑤ = `GLM-5.3 (glm)`；**Haiku 未承担本片审查工作**（仅作可用性探针） |
+ ### C.1 v3.1 节号 → 本准则
+ 
+ | v3.1 原节 | 内容 | 本准则位置 |
+diff --git a/docs/DELIVERY_DIRECTIVE_EN.md b/docs/DELIVERY_DIRECTIVE_EN.md
+index 644e9a1..b1605f9 100644
+--- a/docs/DELIVERY_DIRECTIVE_EN.md
++++ b/docs/DELIVERY_DIRECTIVE_EN.md
+@@ -1,6 +1,6 @@
+ ﻿# ProofRail Delivery Execution Directive (DELIVERY_DIRECTIVE)
+ 
+-Version: v1.26. Date: 2026-10-06. Status: **CN body frozen** ( `_EN` mirror in `docs/DELIVERY_DIRECTIVE_EN.md`).
++Version: v1.27. Date: 2026-10-11. Status: **CN body frozen** ( `_EN` mirror in `docs/DELIVERY_DIRECTIVE_EN.md`).
+ 
+ > **Multilingual note**: this file is a strict positional mirror of the CN body, maintained in step with it (updated after CN is frozen, to avoid bilingual rework during review); `docs/DELIVERY_DIRECTIVE.md` is authoritative and wins on any conflict (see §11.1).
+ > **Encoding**: this document and its `_EN` mirror must stay UTF-8 **with BOM** + **LF**.
+@@ -70,6 +70,7 @@ Version: v1.26. Date: 2026-10-06. Status: **CN body frozen** ( `_EN` mirror in `
+ | v1.24 | 2026-10-05 | **Evidence-tree criterion scope and new criterion G8 (slice `DIRECTIVE-EVIDENCE-SCOPE`)**: (1) **criterion-scope exclusion** (OB-79) - G1-a / G2 / G4a / G4b / G6 exclude `docs/validation/evidence/**` from their **target file set**, and changes inside that tree are carried by the new criterion **G8** and its four sub-checks; (2) **archive-payload encoding form** caliber (OB-80) - normalized by archived type (`.ps1` keeps the BOM, the rest are BOM-free, all LF), with `MANIFEST` recording both the original and archived sha256; (3) §1.5.1 gains a **fourth class "rebuilt archive"** (OB-76); (4) the **class ③ illustration** is corrected (OB-78); (5) pointer synchronisation (`G1–G7` → `G1–G8` wording only, no change to the §5.2 matrix body / §7.5 numbers / §2.2 / §2.4 / the role set and carriers); (6) version **v1.24 = MINOR**. **No new role; no change to CONTRACTS / schemas (including contract fixtures)**. | `DIRECTIVE-EVIDENCE-SCOPE` (this slice) |
+ | v1.25 | 2026-10-06 | **Ledger back-fill (closeout of slice `DIRECTIVE-GLM-EVAL`; user authorisation 2026-10-06)**: §12.4 registers **OB-83** (the **user-authorised temporary evaluation** of the two GLM models at the ⑤ pre-review position and on batch assistance tasks, independently recorded per the five elements of §1.7.4) and **OB-84** (no budget model for ⑦'s three readings, raised from this slice's measured cost magnitude); §12.5 gains one gap row, "no budget model for ⑦'s three readings". **No new criterion, no change to any rule semantics, no change to the §6.3 criterion scope**. This row is a side product of the `DIRECTIVE-GLM-EVAL` slice, not a standalone directive-governance slice. | `DIRECTIVE-GLM-EVAL` (this slice's report §7 records v1.25 as an in-slice side product) |
+ | v1.26 | 2026-10-06 | **Slice `DIRECTIVE-GLM-LANDING` landing (the step-0 user ruling is below)**: step 0 registers **OB-85** (the pilot deferral continues for the **5th** time, recorded independently per §1.7.4 / the OB-37 meta-rule, with the four elements and the truthful annotation); this slice lands - ① §2.2 gains `GLM-5.3 (glm)` (⑤ pre-review **preferred**) and `GLM-5.3-Flash (glm)` (**batch-assistance preferred**, limited to four task classes, sorting and Top-N selection excluded), and the former pre-reviewer row is annotated **backup** (① and the ②③ slots are untouched); ② §5.2 gains a ⑤ pre-review model note (**the matrix body is untouched**); ③ the §6.3 G5-b whitelist closed set gains `glm-5.3` / `glm-5.3-flash`, with the `tools/gates` implementation and self-test fixtures in sync; ④ the §12.4 OB-83 disposition flips to `Resolved` (**Landed (standing)**, the temporary authorisation is terminated and the upgrade trigger is closed); ⑤ the three `V4 Pro` labels in the §5.1 pipeline diagram, the §7.1 three-layer review table and the §7.2.3 three-level fallback move to the preferred reading (the OB-69 consistency obligation); ⑥ appendix B.5's ⑤ template moves to the preferred qualified name; ⑦ appendix C gains C.0o. **No change to the §2.4 blacklist body, the §5.2 matrix, the §7.5 figures, the role set and carriers, `internal/**`, CONTRACTS / schemas / contract fixtures / workflows / `go.mod`.** | `DIRECTIVE-GLM-LANDING` (this slice) |
++| v1.27 | 2026-10-11 | **Slice `DIRECTIVE-HAIKU-BUMP` landing (the step-0 user ruling is below)**: step 0 registers **OB-86** (the pilot deferral continues for the **6th** time, independently recorded per §1.7.4 / the OB-37 meta-rule, with the four elements and the truthful annotation); this slice lands - ① §7.2.3's enabling precondition moves from `Claude Haiku 4.5` to **`Claude Haiku 5.5`**; ② §7.2.3 gains a "call string and internal identifier" paragraph (qualified name `Claude Haiku 5.5 (copilot)`, internal identifier `claude-haiku-5.5`, explicitly stating that its internal identifier is not a member of the §6.3 G5-b whitelist closed set) ⇒ closes **OB-74** (its §12.4 disposition flips to `Resolved`); ③ appendix C gains C.0p. **No change to the §2.2 closed set, the §2.4 "sole exemption" wording, the §7.5 cost table, or the §6.3 G5-b.** | `DIRECTIVE-HAIKU-BUMP` (this slice) |
+ ---
+ 
+ ## 1. Scope and Slice Model
+@@ -596,7 +597,9 @@ After pushing, GitHub Actions must be observed and **reported back as double gre
+ 
+ ### 7.2.3 Prerequisites for enabling Haiku
+ 
+-It must be **confirmed before it is enabled**: ① `Claude Haiku 4.5` exists in the Copilot model list; ② the access channel (proxy/network egress) is normal and a first real call completes the availability pre-check. If either is unmet ⇒ **handle it by a three-level fallback**: ① fall back to ⑤ and ask the pre-reviewer for one extra scan round (one extra pre-review round); ② if ⑤ has already converged, then **skip ⑥ and record the reason in the report**, with ⑦ taking over the independent-scan duty; ③ if ⑦ also cannot cover it, then **escalate to user adjudication**; **do not retry repeatedly**, and do not count its absence as a ⑥ failure.
++It must be **confirmed before it is enabled**: ① `Claude Haiku 5.5` exists in the Copilot model list; ② the access channel (proxy/network egress) is normal and a first real call completes the availability pre-check. If either is unmet ⇒ **handle it by a three-level fallback**: ① fall back to ⑤ and ask the pre-reviewer for one extra scan round (one extra pre-review round); ② if ⑤ has already converged, then **skip ⑥ and record the reason in the report**, with ⑦ taking over the independent-scan duty; ③ if ⑦ also cannot cover it, then **escalate to user adjudication**; **do not retry repeatedly**, and do not count its absence as a ⑥ failure.
++
++**Call string and internal identifier (added 2026-10-11, closes OB-74)**: Haiku's qualified name = `Claude Haiku 5.5 (copilot)` (the call string, written the same way as the qualified-name column of §2.2, R2.2); internal identifier = `claude-haiku-5.5`. Haiku is an **exemption** outside §2.2 (for the caliber see §2.4), and its internal identifier is **not** a member of the §6.3 G5-b whitelist closed set - that closed set still equals the §2.2 `modelId` (internal identifier) column.
+ 
+ ### 7.3 Input sanitization and landing of conclusions
+ 
+@@ -907,7 +910,7 @@ Observation items (phenomena not yet sufficient to change the directive) are reg
+ | OB-71 | 2026-10-03 | **The "task-package closing report" mechanism gap (an existing user proposal; the ③ subject of this slice)**: when a task package ends there is no closing document - a **retrospective** (what was done / what was completed / what was not and why) plus an **outlook** (new, cancelled, changed or noteworthy items in business and in engineering); **key boundary**: the retrospective may be written by the master, while the **outlook needs the user viewpoint** (the business direction must not be decided by the master alone, per §1.7.3 and §3.2). Current state: §11.3 defines a single-slice report only, and the "retrospective analyst (multi-slice data review)" row of §12.5 is merely a gap row with no trigger anchor ⇒ **no carrier exists for a cross-slice phase close-out**; the anchors (end of T027 / end of S1) are cited repeatedly yet have no landing point. | **Resolved** (this slice `DIRECTIVE-LOOPBACK-LANDING` executing the user D-3 ruling): the **lightweight** form is adopted - template `docs/SLICE-CLOSEOUT-TEMPLATE{,_EN}.md`; retrospective = written by the driver, prospective = driver-drafted pending-question list + user ruling (the business direction must not be decided by the driver alone, per §1.7.3 and §3.2); first anchor = end of T027; the medium / heavy forms wait until the lightweight form has run for a while |
+ | OB-72 | 2026-10-03 | **The ledger "completion-row format" still carries a self-reference - the commit hash is likewise unknowable before commit**: the C rule (§11.2) requires a completion row to record "only facts determinable at commit time"; the CI run number has been removed, but the **commit hash is equally unknowable before commit** (the row is written inside the commit); this slice's new row records only the report path, so it is still "completed after the commit" ⇒ not fully consistent with the C rule's goal of removing next-slice backfills. | **Resolved** (this slice `DIRECTIVE-MODELID-MAP`): the completion row is rebuilt to the single fact "**report path**", and it is specified that the commit hash and CI run number go only into the report and are backfilled by this slice's master via a docs-only commit after CI is doubly green (landed in §11.2). **Option A (the CI number inside the report) was rejected**: the report and the completion row sit in the same commit ⇒ the CI number inside the report is equally unknowable before the commit, so the self-reference is not removed |
+ | OB-73 | 2026-10-04 | **Backtick-level mirror drift between CN and `_EN` (baseline legacy)**: five places (`DELIVERY_DIRECTIVE` lines 519 / 827 / 873 / 1219 / 1275, two of which carry EN-only sentences) - the backtick count on the `_EN` side differs from CN, a drift that already existed before v1.22. | **To be discussed**: the five shapes of G3(a.2) (line count / heading position / bold marks / vertical bars / blank lines) **do not include a backtick count**, so no gate covers it; fixing it means touching historical lines unrelated to the slice ⇒ `DIRECTIVE-MODELID-MAP` declined it under the §1.7.2 boundary. Candidate disposition = assess it together with the `GATES-TIGHTEN` family (or fold the backtick count into G3(a.2) and fix those five places in the same slice) |
+-| OB-74 | 2026-10-04 | **Haiku has no qualified name defined**: Haiku is the sole exemption outside §2.2 (the ⑥ supplement of §7.2.3), yet neither the §2.2 triple nor Appendix B gives its qualified name ⇒ there is no call string to write when it is enabled. | **To be discussed**: a pre-existing gap (not introduced by `DIRECTIVE-MODELID-MAP`, which does not claim to solve it); trigger = the §7.2.3 revision slice, which must also give Haiku its qualified name and internal identifier |
++| OB-74 | 2026-10-04 | **Haiku has no qualified name defined**: Haiku is the sole exemption outside §2.2 (the ⑥ supplement of §7.2.3), yet neither the §2.2 triple nor Appendix B gives its qualified name ⇒ there is no call string to write when it is enabled. | **Resolved** (v1.27: §7.2.3 now gives the qualified name `Claude Haiku 5.5 (copilot)` and the internal identifier `claude-haiku-5.5`, and states explicitly that its internal identifier is not a member of the §6.3 G5-b whitelist closed set; this slice is the one named by its original trigger, "a §7.2.3-related revision slice", and that trigger is now closed) |
+ | OB-75 | 2026-10-04 | **The silent-routing blind spot of qualified names (residual risk after the R2.2 reversal)**: the R2.2 maintenance mechanism triggers only when the tool **rejects** a call; if the tool **accepts an old string while routing the request to another model**, the rule layer has no protection at all - "call string = qualified name" has no observable criterion against silent routing. | **To be discussed**: this is an **identified blind spot** (not a defect), inherent to mapping-style rules; §2.3 already states that subagent self-reporting is untrustworthy, so a candidate disposition must sit on the operator side - for example recording the model actually in effect per call on the operator side and cross-checking it against the task-package string in the report, or requiring an availability probe from the tool side. Trigger = assess in the next slice or together with the model-observability topic |
+ | OB-76 | 2026-10-04 | **A "rebuilt archive" of evidence has no precedent and no rule**: `tmp/dml/mutation.md` from the slice `DIRECTIVE-MODELID-MAP` suffered GBK mojibake from a PowerShell redirect (irreversible), so the archived copy rebuilds two CJK excerpt rows from the directive source and the gate truncation widths while keeping the ASCII status rows verbatim; this "rebuilt archive" has no counterpart rule - it is neither an "archived original" (≠ class ① of §1.5.1) nor an "outright deletion" (≠ class ③). | **Resolved** (v1.24: §1.5.1 gains a fourth class "rebuilt archive", defining the trigger (original unusable), the rebuild basis, the header-note format and the traceability constraint - the original suggestion has landed) |
+ | OB-77 | 2026-10-04 | **Document references to `tmp/` have no machine guard**: step 0 of the slice `DIRECTIVE-TMP-LIFECYCLE` measured 873 citation lines across 298 distinct paths, of which **193 point at paths that no longer exist** (including the previously cleared `tmp/ddl`) ⇒ the reference-versus-entity decoupling **predates this slice archiving** and is an independent defect. | **To be discussed**: no criterion covers whether a cited `tmp/` path still exists; candidate disposition = the MANIFEST records the correspondence after archiving and clearing, plus an assessment of a soft-scan criterion; trigger = the same batch as the OB-49 / OB-76 mechanism revisions; **this slice's assessment** = worth a separate slice, low priority, criterion shape = a soft scan of changed-line `tmp/<path>` citations, **not landed in this slice**, status word stays `To be discussed` |
+@@ -919,6 +922,7 @@ Observation items (phenomena not yet sufficient to change the directive) are reg
+ | OB-83 | 2026-10-06 | **Temporary evaluation authorisation for the two GLM models (the §1.7.4 independent record for slice `DIRECTIVE-GLM-EVAL`)**: `GLM-5.3 (glm)` and `GLM-5.3-Flash (glm)` are **both absent** from the §2.2 whitelist (a closed-set caliber per §2.4) ⇒ this slice's **6 calls** to them (1 qualified-name probe + 1 ⑤ experimental leg + 4 batch legs) are **a temporary authorisation outside the rules**, independently recorded here per §1.7.4. **Four elements**: ruling party = the user; date = 2026-10-06 (this slice's start-up round); reason = to evaluate GLM's quality and cost at the ⑤ pre-review position and to assess deliverable usability on 4 classes of batch assistance tasks, **evaluate only, no whitelisting**; basis = the user's same-round start-up declaration (the slice definition is in `tmp/glm-eval/BRIEFING.md`). **Nature truthfully annotated**: this entry **exceeds the literal standard of the relevant §2.4 clause** (anything not listed in §2.2 must never be called) and is **a direct ruling by the user**; **it must not be used as a precedent** (counted per slice; the third instance of the same kind must become a slice that formally revises this directive). | **Resolved** (**Landed (standing)**: `DIRECTIVE-GLM-LANDING` (v1.26) has whitelisted `GLM-5.3 (glm)` / `GLM-5.3-Flash (glm)` in §2.2 ⇒ **the temporary authorisation is terminated and the upgrade trigger is closed** — from now on, calls to either model follow the regular §2.2 / §2.4 reading and no longer go through §1.7.4; the call breakdown and this slice's evidence are in `docs/validation/directive-glm-eval{,_EN}.md`) |
+ | OB-84 | 2026-10-06 | **No budget model for ⑦'s three readings (a measured data point from slice `DIRECTIVE-GLM-EVAL`)**: §7.5 gives only ⑦'s **call cap** (1 final review + 1 re-review, a mandatory blind review counted as +1) and **no cost magnitude**; this slice's three readings measured about 3 hours of wall clock and about 600 credits (about 200 credits per reading), the same order of magnitude as the previous slice `DIRECTIVE-EVIDENCE-SCOPE` ⇒ the ⑦ budget of an evaluation or governance slice cannot be estimated up front. | **Observing**: the next evaluation / governance slice should give a budget caliber on the §12.5 gap row; this slice records the data point only and does not change the §7.5 figures |
+ | OB-85 | 2026-10-06 | **The pilot deferral continues for the 5th time (direct user ruling)**: this slice (`DIRECTIVE-GLM-LANDING`) governs the directive and changes a criterion body ⇒ it does not meet the pilot selection criteria of §12.1; per §7.8.6 and co-requisite ② of §12.1 the matter is escalated to a user ruling, with §12.4 as the single source of truth for the deferral count (recorded as the 5th here). Four elements: ruling party = the user; date = 2026-10-06 (step 0 of this slice); reason = a directive-governance / criterion-body slice does not meet the §12.1 pilot selection criteria; basis = the ruling text of the same turn. **Traced independently under the OB-37 meta-rule**, annotated truthfully as "beyond the literal OB-11 standard and a direct user ruling", and **not usable as a precedent**. | **Ruling** (direct user ruling: continue execution, not as a pilot) |
++| OB-86 | 2026-10-11 | **The pilot deferral continues for the 6th time (direct user ruling)**: this slice (`DIRECTIVE-HAIKU-BUMP`) is a pure-documentation directive-governance slice ⇒ it does not meet the pilot selection criteria of §12.1; per §7.8.6 and co-requisite ② of §12.1 the matter is escalated to a user ruling, with §12.4 as the single source of truth for the deferral count (recorded as the 6th here). Four elements: ruling party = the user; date = 2026-10-11 (step 0 of this slice); reason = a pure-documentation directive-governance slice does not meet the §12.1 pilot selection criteria; basis = the ruling text of the same turn. **Traced independently under the OB-37 meta-rule**, annotated truthfully as "beyond the literal OB-11 standard and a direct user ruling", and **not usable as a precedent**. | **Ruling** (direct user ruling: continue execution, not as a pilot) |
+ 
+ > **Numbering-provenance note (slice `DIRECTIVE-DESIGN-LOOPBACK`; takes no OB number)**: the "OB-71" and "OB-76" cited by this slice definition are **registered nowhere** in this ledger or in any version-controlled document of this repository (a literal search by this slice returned nothing); the row above takes **OB-71** in ledger order, and the mapping of the two external citations awaits a user ruling.
+ 
+@@ -1444,6 +1448,24 @@ The following files **only get a supersede pointer added to the file header and
+ | Probe budget | none |
+ | Freedom-list path | `docs/validation/evidence/DIRECTIVE-GLM-LANDING-freedom-list.md` |
+ | Note | ⑦ = `GPT-5.3-Codex (copilot)` 1 final review + 1 re-review, no blind review added (this slice does not touch the three mandatory-blind semantics of §7.7; the proportional-sampling judgement is recorded with its reason before start, see OB-82); the ⑤ landing re-review may use `GLM-5.3 (glm)`; cost vectors go only into the report (the G6-2 reading, the F-9 precedent) |
++### C.0p Haiku enabling-precondition version bump slice `DIRECTIVE-HAIKU-BUMP`
++
++**Why required**: OB-74 states its trigger = "the §7.2.3 revision slice", and that the qualified name and internal identifier must both be given; this slice is that slice, and it moves the enabling precondition's version from 4.5 to 5.5 (measured: `runSubagent` accepts `Claude Haiku 5.5 (copilot)`).
++
++| Field | Content |
++|---|---|
++| ID | `DIRECTIVE-HAIKU-BUMP` (v1.27) |
++| Status | ⬜ **In progress** (the truthful state before ⑩ of this slice: to be updated by ⑧b after ⑤⑥⑦ and ⑨ complete) |
++| Goal | (1) §7.2.3's enabling precondition moves from `Claude Haiku 4.5` to `Claude Haiku 5.5`; (2) §7.2.3 gains a "call string and internal identifier" paragraph (qualified name `Claude Haiku 5.5 (copilot)`, internal identifier `claude-haiku-5.5`, explicitly stating that its internal identifier is not a member of the §6.3 G5-b whitelist closed set) ⇒ closes OB-74; (3) the OB-74 disposition in §12.4 flips to `Resolved` |
++| Trigger | the user 2026-10-11 start declaration (`[SLICE]`, tier S, documentation only, 1 probe; 6th pilot deferral = OB-86) |
++| Size | S (pure `.md`) |
++| Deliverables | v1.27 of `docs/DELIVERY_DIRECTIVE{,_EN}.md` (§0.3 / §7.2.3 / §12.4's OB-74 disposition cell and OB-86 registration row / appendix C.0p); this report pair; the freedom list |
++| Acceptance evidence | `gate.js --all --scope=tree` and `--scope=index` green + `--selftest` green + CN / `_EN` positional parity checked by G3(a) and G3(b) + the OB-74 closure is literally verifiable + 1 measured probe showing `runSubagent` accepts `Claude Haiku 5.5 (copilot)` |
++| Boundary | no change to the §2.2 closed set / the §2.4 wording / the §7.5 cost table / the §6.3 G5-b / code / CONTRACTS / schemas / fixtures / workflows / `go.mod` / the role set and carriers |
++| Tier | `[SLICE]` |
++| Probe budget | 1 (hard cap, no top-up) |
++| Freedom-list path | `docs/validation/evidence/DIRECTIVE-HAIKU-BUMP-freedom-list.md` |
++| Note | ⑦ = `GPT-5.3-Codex (copilot)` 1 final review + 1 re-review, **no blind review added** (the judgement and reason are recorded before start); ⑤ = `GLM-5.3 (glm)`; **Haiku did no review work for this slice** (availability probe only) |
+ ### C.1 v3.1 section numbers → this directive
+ 
+ | Original v3.1 section | Content | Location in this directive |
+diff --git a/docs/validation/evidence/DIRECTIVE-HAIKU-BUMP-freedom-list.md b/docs/validation/evidence/DIRECTIVE-HAIKU-BUMP-freedom-list.md
+new file mode 100644
+index 0000000..02df65f
+--- /dev/null
++++ b/docs/validation/evidence/DIRECTIVE-HAIKU-BUMP-freedom-list.md
+@@ -0,0 +1,23 @@
++﻿# 切片自由度清单 · `DIRECTIVE-HAIKU-BUMP`
++
++**切片标识**：`DIRECTIVE-HAIKU-BUMP`（准则 v1.27，2026-10-11）。
++**落盘时机与性质**：按 §1.7.3 的留痕要求，本清单由**主控**在 **⑥ 之后、⑦ 之前**作为**编排工件**落盘；⑧b 定稿再将其回写进验证报告，二者内容必须一致；⑦ 终审复核本清单并据此判定是否越界。
++**判定依据**：§1.7.1（可自主的执行自由度范围）、§1.7.2（必须停下问用户的升级边界）、§1.7.3（区分原则：「怎么做」可自主，「做什么」属用户）、附录 B.7 硬约束（同一口径不得写两处）。
++**清单定位**：下表列出本片主控在**编排与实现期**行使执行自由度所作的**实质性选择**。
++
++| 项 | 内容 | 依据 | 判定 |
++|---|---|---|---|
++| F-1 | 按用户备注走**路径 A（最小字符串替换）**：§7.2.3 段首句**只换版本串** `Claude Haiku 4.5` → `Claude Haiku 5.5`，**不重写**该段其余文字 | §1.7.1「契约措辞的补全」；用户同轮备注明示路径 A | 授权内 |
++| F-2 | OB-74 要求的「限定名 + 内部标识」**写入 §7.2.3 本节**（作为该小节第二段），**不写入 §2.2 / §2.4** | §2.2 闭集与 §2.4 措辞同属本片**边界**（用户裁定）；§7.2.3 为 Haiku 豁免的权威小节 ⇒ 缺口应在其权威处闭合 | 授权内（边界内求解） |
++| F-3 | 在 §7.2.3 新段**明写**「其内部标识**不属于** §6.3 的 G5-b 白名单闭集——该闭集仍等于 §2.2 的 `modelId` 列」 | §6.3 的 G5-b 自述「与 §2.2 的 `modelId` 列一致」；写入该句以**防止**读者误判需扩闭集（用户记入项 a 明示） | 授权内 |
++| F-4 | 内部标识取名 **`claude-haiku-5.5`**（小写点分式） | §1.7.1「单文件实现选择」；沿用既有历史记法 `claude-haiku-4.5`（`docs/t027/A6_PILOT_LAUNCH.md` 的回落梯） | 实现选择 |
++| F-5 | ③ 首轮 Low 的整改形态：把 §7.2.3 新段里对「唯一豁免」的**复述改为纯指针**（`Haiku 属 §2.2 之外的**豁免**（口径见 §2.4）`） | **附录 B.7 硬约束**（「一条规则的唯一权威永远是正文对应小节…同一口径写两处 ⇒ 必然漂移」）——该依据由 ③ **更正**了主控派单中的误引（主控原写 §1.7） | 授权内（合规修正） |
++| F-6 | ③ Info 的整改形态：§12.4 的 OB-74 处置列把对**已被替换**的旧单元格文本的引述改为**自足表述**（`其原触发条件「…」…该触发已由此闭合`） | §11.1（引文的可复核性）；现象列仍逐字未动 | 授权内 |
++| F-7 | ⑤ F-1 的整改（附录 C.0p 的**交付物行**补列 §12.4 的 **OB-86 登记行**）以 **OB-11 例外**（台账元数据类）**就地闭合、不重跑 ⑤** | §7.8.4 的 OB-11 五要素自判：① 不含规则实体 ✓（仅补一个节号与行名）② 不影响门禁 ✓（G3/G6 全绿）③ 闭合可字面核验 ✓（该行确在 §12.4）④ 不引入新语义 ✓ ⑤ 属台账元数据类 ✓；⑤ 自身亦建议「可 ⑥ 前小修」。**该例外不推广** | 授权内（OB-11 例外，五要素齐） |
++| F-8 | 探针的**记账形态**：1 次**失败尝试**（HTTP 408 / 无结论 / 无 usage）+ 1 次**有效探针** ⇒ 额度按「**1 次有效探针**」声明，**未追加** | §7.6（额度上限 + 记账义务）；用户同轮裁定「该次尝试不构成有效探针」并**授权重试 1 次**，理由 = 基础设施错误（非模型拒收）+ 与既有 **OB-64**（`runSubagent` 后端首轮异常）同族 + 环境变更（清除 Haiku 4.5 的旧 `thinking.budgetTokens` 并重启 VS Code）⇒ 属 §1.7.2 的升级后裁定，非「反复重试」 | 授权内（用户同轮裁定 + §1.7.2 升级已履行） |
++| F-9 | ⑥/⑦ 的调用次数等**成本向量只进验证报告**，不写进 §0.3 / 附录 C.0p | G6-2（成本双源冲突）；`DIRECTIVE-GLM-LANDING` 的 F-8 先例 | 实现选择 |
++| F-10 | 附录 C.0p 的状态行写 **`⬜ 进行中`**（不预写 `✅ 已完成`） | 如实性义务 + G6-1；`C.0o` 的 `✅` 亦只在收尾时落 | 授权内 |
++| F-11 | 本片**探针在工作内容上只做「可用性探测」**（不派 Haiku 承担审查工作） | 用户同轮裁定确认；写入 C.0p 附注与报告 | 授权内（遵守裁定） |
++
++**越界判定的自报**：上列 F-1…F-11 均属「错了要改代码 / 文本措辞」一类；本片**无**触及契约语义、范围、预算或授权的自主决定（§1.7.3 三支判定）。
++**时序合规自报**：本清单**在 ⑦ 之前**落盘，并将**附入 ⑦ 的审查输入包**（§1.7.3 的「⑥ 后 / ⑦ 前」要求已满足）——**本片无 OB-48 /A-1 类的时序偏离**。

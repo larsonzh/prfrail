@@ -1,0 +1,170 @@
+diff --git a/internal/console/runtime_supervised_test.go b/internal/console/runtime_supervised_test.go
+index 7b80ead..f48d6d7 100644
+--- a/internal/console/runtime_supervised_test.go
++++ b/internal/console/runtime_supervised_test.go
+@@ -398,6 +398,9 @@ func TestSupervisedReportRenderGolden(t *testing.T) {
+ 	if !strings.Contains(output, "assuranceLevel: reduced") {
+ 		t.Fatalf("the render must state the reduced assurance level:\n%s", output)
+ 	}
++	if strings.Contains(output, "independent-review") {
++		t.Fatalf("P4: the report is frozen before the review and must not claim it:\n%s", output)
++	}
+ 	for _, forbidden := range []string{"safe", "verified"} {
+ 		if strings.Contains(output, forbidden) {
+ 			t.Fatalf("P4: the render must not carry the word %q:\n%s", forbidden, output)
+@@ -405,6 +408,37 @@ func TestSupervisedReportRenderGolden(t *testing.T) {
+ 	}
+ }
+ 
++// TestSupervisedReportOmitsUnprovenReviewDimension pins the F-3 fix: the
++// reduced/unknown report is frozen before the tail chain (postflight -> review ->
++// publish) runs, so it must not claim the independent-review dimension it has
++// not earned yet. The tail chain completes on the same run and the persisted
++// report still omits it.
++func TestSupervisedReportOmitsUnprovenReviewDimension(t *testing.T) {
++	harness := newSupervisedHarness(t, []string{adapters.VisibleStubAccepted}, false, 300000)
++	harness.driveToWindow()
++	harness.writeArtifact("artifact.txt", "report written before the review\n")
++
++	summary, err := ExecuteSupervisedReturn(context.Background(), harness.options, "complete")
++	if err != nil {
++		t.Fatalf("the return must complete, got %v", err)
++	}
++	if summary.ChainState != "COMPLETED" {
++		t.Fatalf("the tail chain must complete, got %s", summary.ChainState)
++	}
++	report := harness.loadReport()
++	if containsName(report.Record.VerifiedDimensions, "independent-review") {
++		t.Fatalf("P4: the frozen report must not claim the unproven review dimension: %v", report.Record.VerifiedDimensions)
++	}
++	for _, dimension := range []string{
++		"workspace-isolation", "manifest-before", "manifest-after", "diff", "scope-scan",
++		"secret-scan", "file-type-scan", "side-effect-scan", "process-stop-proof", "independent-gates",
++	} {
++		if !containsName(report.Record.VerifiedDimensions, dimension) {
++			t.Fatalf("the write-time dimension %q must be recorded: %v", dimension, report.Record.VerifiedDimensions)
++		}
++	}
++}
++
+ // --- negative legs -----------------------------------------------------------
+ 
+ func TestSupervisedAssemblyBlocksWithoutConfirmation(t *testing.T) {
+@@ -905,11 +939,116 @@ func TestSupervisedAssemblyFullChainExtendedScans(t *testing.T) {
+ 		}
+ 	}
+ 	scan := harness.loadScanReport()
+-	if !scan.ScopeClean || !scan.SideEffectClean || !scan.FileTypeScanClean || !scan.SecretScanClean {
++	if !scan.ChangeSetInScope || !scan.SideEffectClean || !scan.FileTypeScanClean || !scan.SecretScanClean {
+ 		t.Fatalf("every scan must be recorded clean after a passing return: %+v", scan)
+ 	}
+ }
+ 
++// --- F-2: confirmation-phase crash recovery ---------------------------------
++
++// errSupervisedCrashInjected marks a crash injected at a durable boundary of the
++// confirmation sequence.
++var errSupervisedCrashInjected = errors.New("injected supervised confirmation crash")
++
++// crashAfter arms the harness so the next invocation fails at one durable
++// boundary, exactly as a process death there would.
++func (harness *supervisedHarness) crashAfter(point string) {
++	harness.t.Helper()
++	harness.options.CrashPoint = func(candidate string) error {
++		if candidate == point {
++			return errSupervisedCrashInjected
++		}
++		return nil
++	}
++}
++
++// clearCrash disarms the crash seam.
++func (harness *supervisedHarness) clearCrash() { harness.options.CrashPoint = nil }
++
++// requireConvergedWindow asserts that a re-entry replays the durable
++// confirmation into an open, persisted window and that the run still completes.
++func requireConvergedWindow(t *testing.T, harness *supervisedHarness, label string) {
++	t.Helper()
++	ctx := context.Background()
++	summary, err := ExecuteSupervisedRun(ctx, harness.options)
++	if err != nil {
++		t.Fatalf("%s: re-entry must converge, got %v", label, err)
++	}
++	if summary.ChainState != "PAUSED" {
++		t.Fatalf("%s: the converged run waits for the return, got %s", label, summary.ChainState)
++	}
++	if _, err := os.Stat(filepath.Join(SupervisedDir(harness.runRoot), supervisedSessionName)); err != nil {
++		t.Fatalf("%s: the replay must persist the handoff session: %v", label, err)
++	}
++	harness.advance(time.Minute)
++	harness.writeArtifact("artifact.txt", label+"\n")
++	summary, err = ExecuteSupervisedReturn(ctx, harness.options, "complete")
++	if err != nil {
++		t.Fatalf("%s: the run must complete after the replay, got %v", label, err)
++	}
++	if summary.ChainState != "COMPLETED" {
++		t.Fatalf("%s: the tail chain must complete, got %s", label, summary.ChainState)
++	}
++}
++
++// TestSupervisedConfirmationCrashAfterAppendConverges injects a crash after the
++// confirmation became durable but before the operator resume: the parked window
++// is replayed through the confirmation, the resume and the window opener.
++func TestSupervisedConfirmationCrashAfterAppendConverges(t *testing.T) {
++	harness := newSupervisedHarness(t, []string{adapters.VisibleStubAccepted}, false, 300000)
++	ctx := context.Background()
++	if _, err := ExecuteSupervisedRun(ctx, harness.options); err != nil {
++		t.Fatalf("parking failed: %v", err)
++	}
++	harness.respond(supervisedConfirmationResponse)
++	harness.crashAfter(supervisedCrashAfterConfirmation)
++	if _, err := ExecuteSupervisedRun(ctx, harness.options); !errors.Is(err, errSupervisedCrashInjected) {
++		t.Fatalf("the injected crash must abort the confirmation sequence, got %v", err)
++	}
++	harness.clearCrash()
++	if _, err := os.Stat(filepath.Join(SupervisedDir(harness.runRoot), supervisedSessionName)); !errors.Is(err, os.ErrNotExist) {
++		t.Fatalf("the crash must leave no session behind: %v", err)
++	}
++	requireConvergedWindow(t, harness, "after-confirmation crash")
++}
++
++// TestSupervisedConfirmationCrashAfterResumeConverges injects a crash after the
++// operator resume but before the window opens: the re-entry resumes idempotently
++// and opens the window.
++func TestSupervisedConfirmationCrashAfterResumeConverges(t *testing.T) {
++	harness := newSupervisedHarness(t, []string{adapters.VisibleStubAccepted}, false, 300000)
++	ctx := context.Background()
++	if _, err := ExecuteSupervisedRun(ctx, harness.options); err != nil {
++		t.Fatalf("parking failed: %v", err)
++	}
++	harness.respond(supervisedConfirmationResponse)
++	harness.crashAfter(supervisedCrashAfterResume)
++	if _, err := ExecuteSupervisedRun(ctx, harness.options); !errors.Is(err, errSupervisedCrashInjected) {
++		t.Fatalf("the injected crash must abort the confirmation sequence, got %v", err)
++	}
++	harness.clearCrash()
++	requireConvergedWindow(t, harness, "after-resume crash")
++}
++
++// TestSupervisedConfirmationCrashAfterWindowOpenConverges injects a crash after
++// the window opened but before the session was persisted: the window is already
++// durable, so the re-entry recovers the open time and persists the session
++// instead of stalling on the non-empty confirmation ledger.
++func TestSupervisedConfirmationCrashAfterWindowOpenConverges(t *testing.T) {
++	harness := newSupervisedHarness(t, []string{adapters.VisibleStubAccepted}, false, 300000)
++	ctx := context.Background()
++	if _, err := ExecuteSupervisedRun(ctx, harness.options); err != nil {
++		t.Fatalf("parking failed: %v", err)
++	}
++	harness.respond(supervisedConfirmationResponse)
++	harness.crashAfter(supervisedCrashAfterWindowOpen)
++	if _, err := ExecuteSupervisedRun(ctx, harness.options); !errors.Is(err, errSupervisedCrashInjected) {
++		t.Fatalf("the injected crash must abort the confirmation sequence, got %v", err)
++	}
++	harness.clearCrash()
++	requireConvergedWindow(t, harness, "after-window-open crash")
++}
++
+ // TestNoSupervisedReferencesInAgentRunnerPaths is a source-level invariant. It
+ // proves that the AgentRunner edge of the adapters layer and the AgentRunner
+ // console assembly carry no supervised token, and that the visible adapter

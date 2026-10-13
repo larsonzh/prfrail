@@ -1,0 +1,703 @@
+【角色】预审员，只读推理，不得修改、创建、删除任何文件。
+【任务】切片预审
+【输入】以下一份实现 diff（完整、未裁剪）。
+【要求】逐条核对实现是否偏离方案；重点找并发反例、崩溃窗口、资源泄漏、错误处理缺失、边界遗漏。
+【产出格式】
+  总体结论：通过 / 有条件通过 / 不通过
+  偏离项表：| 严重度 | file:line | 被违反的句子（逐字引用） | 最小修复 |
+  反例分析：并发 / 崩溃 / 边界（无则写"无"）
+  其他关注点：略
+【严重度定义】
+  Critical：数据丢失、安全边界失效、静默错误结论
+  High：功能失效、崩溃、契约冲突
+  Medium：潜在缺陷、覆盖缺口、双语失配
+  Low：风格、命名、注释、可读性
+【约束】不得建议解除冻结结论、跳过审查、降低门禁；不得扩张切片范围。
+【结论行】最后一行必须为：PRE-REVIEW: PASS 或 PRE-REVIEW: PASS WITH FIXES 或 PRE-REVIEW: FINDINGS
+
+===== 输入开始 =====commit 7bdfa0cd0f6498cabd8bc4b210a70e3ea6462a5c
+Author: larsonzh <larsonzhang@gmail.com>
+Date:   Mon Sep 21 15:59:37 2026 +0800
+
+    docs(b3c): freeze the publication-durability upgrade clause
+    
+    - CONTRACTS{,_EN}.md section 7: add the publication-durability tiers and upgrade conditions clause (three-state, per platform x premise, three criteria incl. the discrimination gate, unlock boundary) and parameterise the three frozen sentences from a platform constant into a tier-parameterised rule; the ADR-013 row and section 5 now point at that clause
+    
+    - fold in the pending CI back-fill: run 35564805991 (head dd36b9b) is green on both legs and the enforcement-proxy flake did not recur; DR-2 stays open for its own slice before B4
+    
+    - boundary: Windows stays unproven, first-dispatch stays refused, AT-23 has not passed; no Go / schema / fixtures change
+    
+    - reviews: 3 V4 Pro reviews all PASS; 4 Codex final review PASS; 5 34 mechanical checks green plus 4 mutation experiments red with byte-identical restore
+
+diff --git a/docs/ADR_REGISTER.md b/docs/ADR_REGISTER.md
+index 6c68d29..bc453ec 100644
+--- a/docs/ADR_REGISTER.md
++++ b/docs/ADR_REGISTER.md
+@@ -20,7 +20,7 @@
+ | ADR-010 | 产品版本采用 `vMAJOR.MINOR.PATCH`（首版候选 `v0.1.0`）；原型期新 minor 发布时，在 GitHub Release notes 与仓库支持矩阵同时公告前一 minor 的 EOL，初始窗口为发布后 90 个自然日 | patch 不启动新的 EOL 倒计时；每次 minor 发布前按稳定性、用户量和维护能力评审是否延长未来窗口。不得追溯缩短已公告窗口；例外须有带日期、理由和到期日的 ADR，经产品所有者明确批准后同步两处 | `PROPOSED / NOT APPROVED`；90 天适合当前早期原型，通知渠道与演进规则须在首版发布前获产品所有者明确批准 |
+ | ADR-011 | ProofRail 的 AI/操作员正式交互由本地 CLI/TUI、chain 控制 API 和持久交互记录闭环；SessionBridge `@sbr-review` 只作可选诊断/人工测试 | chat participant 的注册与可见性受 VS Code/扩展生命周期影响，不能承载权威状态、授权或恢复；复用它会形成第二控制面。代价是先冻结 `operator-interaction` 契约并实现 T025 | `ACCEPTED / IMPLEMENTED`；2026-09-10 T025/AT-22 通过，Schema/golden/hash/replay、聚焦终端收件箱与 Engine 控制 API 已验证；完整统一 TUI 和 AgentRunner 接线仍分别由后续切片/T027 负责 |
+ | ADR-012 | 正式 AI 执行采用核心拥有的 `AgentRunner` 端口和固定版本 CLI Agent adapter；另提供显式选择的 `supervised-black-box` 候选导入，SessionBridge 仅作消息/可见界面桥 | silent 只生成文本，visible 只证明面板投递。黑箱模式只保证隔离后的产物检查与独立验收，不保证过程、网络、费用或外部副作用；拒绝复刻完整 VS Code Agent、自动降级或把 transcript/完成声明/退出 0 当权威事实 | `APPROVED / PARTIALLY IMPLEMENTED`；T026 已完成四类 wire/hash/replay、能力矩阵及 GitHub Copilot CLI 1.0.83 固定摘要探测。最终为 10 verified、2 unsupported、0 unknown：Job Object 取消通过，工具别名及 shell 网络 allow-all 对照证明 CLI deny 可绕过。候选不兼容；T027 须等待可证明的外部强制边界或兼容候选，AT-23 未通过。T028/AT-24 仍关闭黑箱流程；在此之前 S1 阻断 |
+-| ADR-013 | Windows 发布耐久候选协议与反证（A7）：枚举 C1 现行基线、C2 `MoveFileEx(MOVEFILE_WRITE_THROUGH)`、C3 目录句柄 `FlushFileBuffers`（`GENERIC_READ`+`GENERIC_WRITE` 与 `FILE_FLAG_BACKUP_SEMANTICS`）、C5 两阶段 marker、C6 预建槽位；排除 `ReplaceFile`、temp 句柄 `FILE_FLAG_WRITE_THROUGH`、TxF | 不预设两阶段 marker 成立；A7 只做进程级反证与 API 可观测性，断电注入属 B3；不改变生产发布原语与冻结契约句 | `EXPERIMENTAL / UNRESOLVED`。**级别与前提必须一起读**：在前提 P（进程级崩溃、无断电、单主机 Windows 11 / NTFS 本卷）下——可见性与仲裁层 **`proven`**（P1–P5：进程内 8 路真并发 + 跨进程同轮并发尝试，跨进程强同步未证；构造性论证 + 观测）；断电耐久 **`unresolved`**（U1–U5）；**被证伪的断言集合 D1–D6 一律 `disproven`**（候选 C2/C3 的断电耐久仍 `unresolved` 且为 B3 注入候选，不等同于“候选已被证伪”）；`observed`/`falsified`/`disproven-by-policy` 仅作证据注释，**不作为等级**。Windows 保持 `unproven` 且 first-dispatch 仍拒绝；C2 与 C3 并列为 B3 注入候选；C5 marker 作为耐久机制 `disproven`。完成条件：B3 真实崩溃/断电注入通过**且先修订 CONTRACTS 耐久冻结句**后，才可升 `ACCEPTED` 并解除 `unproven` 与 first-dispatch 解锁。**2026-09-21（B3b）**：真实断电注入矩阵（主矩阵 17 格×5 = 85 轮全有效、U4 6 格×3 = 18 轮、0 真孤儿；前提 P′ = VirtualBox Win11B3 / NTFS on SATA-AHCI `useHostIOCache=false` / 记录级 ~1 KiB / 2 s cut 窗口 / N=5）判定 **C2 `proven`**、C1/C3/C2C3 `unresolved`（C3/C2C3 的原因为决定格**机制证据缺失**，属装置 fail-closed，**不等同于“不耐久”**）；候选排序据此更新为 **C2 优先，C3/C2C3 未建立主张**；**Windows `unproven` 与 first-dispatch 拒绝仍未改变**——按“协议先行”，升 `ACCEPTED` 的前置仍是修订 CONTRACTS 耐久冻结句（独立切片）。参见 `docs/validation/t027-b3b-durability.md`（+ `_EN`）与证据包 `docs/validation/evidence/b3b-2026-09-21/` |
++| ADR-013 | Windows 发布耐久候选协议与反证（A7）：枚举 C1 现行基线、C2 `MoveFileEx(MOVEFILE_WRITE_THROUGH)`、C3 目录句柄 `FlushFileBuffers`（`GENERIC_READ`+`GENERIC_WRITE` 与 `FILE_FLAG_BACKUP_SEMANTICS`）、C5 两阶段 marker、C6 预建槽位；排除 `ReplaceFile`、temp 句柄 `FILE_FLAG_WRITE_THROUGH`、TxF | 不预设两阶段 marker 成立；A7 只做进程级反证与 API 可观测性，断电注入属 B3；不改变生产发布原语与冻结契约句 | `EXPERIMENTAL / UNRESOLVED`。**级别与前提必须一起读**：在前提 P（进程级崩溃、无断电、单主机 Windows 11 / NTFS 本卷）下——可见性与仲裁层 **`proven`**（P1–P5：进程内 8 路真并发 + 跨进程同轮并发尝试，跨进程强同步未证；构造性论证 + 观测）；断电耐久 **`unresolved`**（U1–U5）；**被证伪的断言集合 D1–D6 一律 `disproven`**（候选 C2/C3 的断电耐久仍 `unresolved` 且为 B3 注入候选，不等同于“候选已被证伪”）；`observed`/`falsified`/`disproven-by-policy` 仅作证据注释，**不作为等级**。Windows 保持 `unproven` 且 first-dispatch 仍拒绝；C2 与 C3 并列为 B3 注入候选；C5 marker 作为耐久机制 `disproven`。完成条件：B3 真实断电注入通过，**且按 `docs/CONTRACTS{,_EN}.md` §7「发布耐久等级与升级条件」完成协议先行修订并经独立评审**，且 AT-23 通过后，才可升 `ACCEPTED`；解除 `unproven` 与 first-dispatch 锁定受该条款的**解锁边界**约束（只在该平台、该前提覆盖的部署环境内）。**2026-09-21（B3b）**：真实断电注入矩阵（主矩阵 17 格×5 = 85 轮全有效、U4 6 格×3 = 18 轮、0 真孤儿；前提 P′ = VirtualBox Win11B3 / NTFS on SATA-AHCI `useHostIOCache=false` / 记录级 ~1 KiB / 2 s cut 窗口 / N=5）判定 **C2 `proven`**、C1/C3/C2C3 `unresolved`（C3/C2C3 的原因为决定格**机制证据缺失**，属装置 fail-closed，**不等同于“不耐久”**）；候选排序据此更新为 **C2 优先，C3/C2C3 未建立主张**；**Windows `unproven` 与 first-dispatch 拒绝仍未改变**——按“协议先行”，升 `ACCEPTED` 的前置是按 CONTRACTS §7「发布耐久等级与升级条件」修订耐久冻结句（独立切片 **B3c**，该口径修订已于 2026-09-21 完成）；升 `ACCEPTED` 仍需该平台自身完整证据 + 独立评审 + AT-23 通过。参见 `docs/validation/t027-b3b-durability.md`（+ `_EN`）与证据包 `docs/validation/evidence/b3b-2026-09-21/` |
+ 
+ ## 1. 发布与依赖决策提案
+ 
+@@ -80,5 +80,5 @@ T002 已集中冻结空链、列表覆盖/合并、duration/size/预算单位与
+ - **关键实测**：`record-linked` 与 `parent-synced` 在 kill 下观察等价（故 kill 不能证明目录项耐久，这是 A7 无法把任何候选升为 proven 的根因）；并发发布恒单赢家且“杀赢家不解锁二次派发”；**目录句柄 `FlushFileBuffers` 在非提权下可调用成功**（只读句柄被拒）——推翻 T004 以来“目录 Sync 不可用”的强表述；`MoveFileEx(MOVEFILE_WRITE_THROUGH)` 无提权可用、已存在目标映射 `fs.ErrExist`、目标被打开时拒绝覆盖。
+ - **候选排序（供 B3 注入）**：C2 与 C3 并列首选；C6 为契约修订后的结构性候选；C5 marker **不作为耐久机制**（作为“可见性+一致性”手段亦无增益，已证伪）。
+ - **级别口径与证据限制**：可见性与仲裁层（P1–P5）的 `proven` 带明确前提“进程级崩溃、无断电”，由构造性论证 + 可复现观测共同支撑；耐久类断言一律 `unresolved`。承载 E4/E6/E9/E10 的 `a7native` 实验**不进 CI**，属单主机证据，需在 Windows 主机手动重跑（`PROOFRAIL_A7_ROUNDS=20 go test -tags a7native -run TestA7Native ./internal/adapters/`）。
+-- **若 B3 日后采纳 C2/C3**：必须先修订 `docs/CONTRACTS{,_EN}.md` 的耐久冻结句（Windows 目录项持久性“既不能强制也不能证明”→ 按实测重写）并完成协议先行，**不得因 B3 通过就自动解锁** `unproven` 与 first-dispatch。
++- **若 B3 日后采纳 C2/C3**：必须先按 `docs/CONTRACTS{,_EN}.md` §7「发布耐久等级与升级条件」完成协议先行修订（该冻结句已由 B3c 改写：Windows 目录项持久性“**不是平台常量**”，按（平台 × 前提）逐项判定）并经独立评审，**不得因 B3 通过就自动解锁** `unproven` 与 first-dispatch。
+ - **边界与移交**：断电类断言（候选 C2/C3 的落盘保证、C2 文档措辞歧义、本机存储栈 flush 语义、断电下目录项丢失有序、共享卷 fencing）全部交 B3；临时残留累积为 A7 发现项，不在本切片修。详见验证报告：[中文](validation/t027-windows-publication-durability.md) / [English](validation/t027-windows-publication-durability_EN.md)。
+\ No newline at end of file
+diff --git a/docs/ADR_REGISTER_EN.md b/docs/ADR_REGISTER_EN.md
+index 9d76f1f..3125d8c 100644
+--- a/docs/ADR_REGISTER_EN.md
++++ b/docs/ADR_REGISTER_EN.md
+@@ -21,7 +21,7 @@ Date: 2026-09-06. Distinguish RFC-decided, proposed and experimental decisions.
+ | ADR-011 | ProofRail's formal AI/operator interaction loop belongs to the local CLI/TUI, chain control API, and durable interaction records; SessionBridge `@sbr-review` is optional diagnostics/manual testing only | Chat-participant registration and visibility depend on the VS Code/extension lifecycle and cannot own authoritative state, authorization, or recovery; reusing it would create a second control plane. The cost is freezing the `operator-interaction` contract and implementing T025 | `ACCEPTED / IMPLEMENTED`; T025/AT-22 passed on 2026-09-10 with validated Schema/goldens/hash/replay, focused terminal inbox, and Engine control API. The complete unified TUI and AgentRunner wiring remain later work/T027 |
+ | ADR-012 | Formal AI execution uses the core-owned `AgentRunner` port and pinned CLI Agent adapters; an explicitly selected `supervised-black-box` candidate intake is also supported, with SessionBridge only bridging messages/the visible UI | Silent generates text only and visible proves panel delivery only. Black-box mode warrants isolated artifact checks and independent acceptance, not process, network, cost or external effects. Reject rebuilding the full VS Code Agent, automatic downgrade, and Agent-private transcripts/completion/exit zero as authority | `APPROVED / PARTIALLY IMPLEMENTED`; T026 completed the four wire/hash/replay contracts, capability matrix, and digest-pinned GitHub Copilot CLI 1.0.83 probes. Final status is ten verified, two unsupported, zero unknown: Job Object cancellation passed, while tool-alias and shell-network allow-all controls proved CLI-denial bypasses. The candidate is incompatible. T027 requires a provable external enforcement boundary or compatible candidate, and AT-23 has not passed. T028/AT-24 still closes the black-box flow; S1 remains blocked until then |
+ 
+-| ADR-013 | Windows publication-durability candidates and their falsification (A7): enumerates C1 the current baseline, C2 `MoveFileEx(MOVEFILE_WRITE_THROUGH)`, C3 a directory-handle `FlushFileBuffers` (`GENERIC_READ`+`GENERIC_WRITE` with `FILE_FLAG_BACKUP_SEMANTICS`), C5 a two-phase marker and C6 a pre-created slot; excludes `ReplaceFile`, `FILE_FLAG_WRITE_THROUGH` on the temp handle and TxF | Does not presuppose that the two-phase marker holds; A7 performs process-level falsification and API observability only, while power-loss injection belongs to B3; neither the production publish primitive nor the frozen contract sentences change | `EXPERIMENTAL / UNRESOLVED`. **The level and its premise must be read together**: under premise P (process-level crash, no power loss, single host Windows 11 / NTFS on the local volume) the visibility and arbitration layer is **`proven`** (P1–P5: 8-way true concurrency inside one process plus same-round concurrent attempts across processes, with cross-process strong synchronisation unproved; constructive argument plus measurement), power-loss durability is **`unresolved`** (U1–U5), and the **falsified claim set D1–D6** is `disproven` throughout (the power-loss durability of candidates C2/C3 stays `unresolved` and goes to B3, which is not the same as "the candidate is disproven"); `observed`/`falsified`/`disproven-by-policy` are evidence annotations only and **never levels**; **`proven` must never be read as a power-loss guarantee**. Windows stays `unproven` with first-dispatch still refused; C2 and C3 are joint candidates for B3 injection; the C5 marker is `disproven` as a durability mechanism. Completion condition: B3's real crash/power-loss injection **and a prior revision of the frozen CONTRACTS durability sentences** are both required before this may rise to `ACCEPTED` and lift `unproven` and the first-dispatch lock. **2026-09-21 (B3b)**: a real power-loss injection matrix (main matrix 17 cells × 5 = 85 rounds all valid, U4 6 cells × 3 = 18 rounds, 0 true orphans; premise P′ = VirtualBox Win11B3 / NTFS on SATA-AHCI with `useHostIOCache=false` / record-level ~1 KiB / 2 s cut window / N=5) returned **C2 `proven`** with C1/C3/C2C3 `unresolved` (C3/C2C3 fail on **missing mechanism evidence** in their decision cells, which is the rig failing closed and **not** "not durable"); the candidate ordering is therefore **C2 first, with C3/C2C3 having established no claim**; **Windows `unproven` and the first-dispatch refusal are still unchanged** - protocol first, so the precondition for `ACCEPTED` remains the CONTRACTS durability-sentence revision (its own slice). See `docs/validation/t027-b3b-durability.md` (+ `_EN`) and the evidence pack `docs/validation/evidence/b3b-2026-09-21/` |
++| ADR-013 | Windows publication-durability candidates and their falsification (A7): enumerates C1 the current baseline, C2 `MoveFileEx(MOVEFILE_WRITE_THROUGH)`, C3 a directory-handle `FlushFileBuffers` (`GENERIC_READ`+`GENERIC_WRITE` with `FILE_FLAG_BACKUP_SEMANTICS`), C5 a two-phase marker and C6 a pre-created slot; excludes `ReplaceFile`, `FILE_FLAG_WRITE_THROUGH` on the temp handle and TxF | Does not presuppose that the two-phase marker holds; A7 performs process-level falsification and API observability only, while power-loss injection belongs to B3; neither the production publish primitive nor the frozen contract sentences change | `EXPERIMENTAL / UNRESOLVED`. **The level and its premise must be read together**: under premise P (process-level crash, no power loss, single host Windows 11 / NTFS on the local volume) the visibility and arbitration layer is **`proven`** (P1–P5: 8-way true concurrency inside one process plus same-round concurrent attempts across processes, with cross-process strong synchronisation unproved; constructive argument plus measurement), power-loss durability is **`unresolved`** (U1–U5), and the **falsified claim set D1–D6** is `disproven` throughout (the power-loss durability of candidates C2/C3 stays `unresolved` and goes to B3, which is not the same as "the candidate is disproven"); `observed`/`falsified`/`disproven-by-policy` are evidence annotations only and **never levels**; **`proven` must never be read as a power-loss guarantee**. Windows stays `unproven` with first-dispatch still refused; C2 and C3 are joint candidates for B3 injection; the C5 marker is `disproven` as a durability mechanism. Completion condition: B3's real power-loss injection must pass, **the protocol-first revision must be completed under `docs/CONTRACTS{,_EN}.md` §7 "Publication-durability tiers and upgrade conditions" and pass an independent review**, and AT-23 must pass, before this may rise to `ACCEPTED`; lifting `unproven` and the first-dispatch lock is bounded by that clause's **unlock boundary** (that platform, within that premise's covered deployment environments, only). **2026-09-21 (B3b)**: a real power-loss injection matrix (main matrix 17 cells × 5 = 85 rounds all valid, U4 6 cells × 3 = 18 rounds, 0 true orphans; premise P′ = VirtualBox Win11B3 / NTFS on SATA-AHCI with `useHostIOCache=false` / record-level ~1 KiB / 2 s cut window / N=5) returned **C2 `proven`** with C1/C3/C2C3 `unresolved` (C3/C2C3 fail on **missing mechanism evidence** in their decision cells, which is the rig failing closed and **not** "not durable"); the candidate ordering is therefore **C2 first, with C3/C2C3 having established no claim**; **Windows `unproven` and the first-dispatch refusal are still unchanged** - protocol first, so the precondition for `ACCEPTED` remains the CONTRACTS durability-sentence revision under §7 "Publication-durability tiers and upgrade conditions" (its own slice, **B3c**, whose wording revision completed on 2026-09-21); rising to `ACCEPTED` still requires that platform's own complete evidence, an independent review, and a passing AT-23. See `docs/validation/t027-b3b-durability.md` (+ `_EN`) and the evidence pack `docs/validation/evidence/b3b-2026-09-21/` |
+ 
+ ## 1. Release and Dependencies
+ 
+@@ -81,5 +81,5 @@ This approval explicitly means “approve S0 specification freeze.” “Approve
+ - **Key measurements**: `record-linked` and `parent-synced` are observationally equivalent under a kill (so a kill can never prove directory-entry durability, which is why A7 cannot promote any candidate to proven); concurrent publishers always produce one winner and a killed winner does not unlock a second dispatch; **a directory-handle `FlushFileBuffers` is callable unprivileged** (a read-only handle is denied), which overturns the stronger “directory `Sync` is unavailable” wording used since T004; `MoveFileEx(MOVEFILE_WRITE_THROUGH)` works unprivileged, maps an existing target to `fs.ErrExist` and refuses to overwrite a target that is held open.
+ - **Candidate ranking (for B3 injection)**: C2 and C3 are joint first choices; C6 is the structural candidate once the contract is revised; the C5 marker **is not a durability mechanism** (disproven by measurement, and it adds nothing as a visibility/consistency device either).
+ - **Level semantics and evidence limits**: the `proven` claims for the visibility and arbitration layer (P1–P5) carry the explicit premise "process-level crash, no power loss" and rest on a constructive argument plus reproducible measurement; every durability claim stays `unresolved`. The `a7native` experiments carrying E4/E6/E9/E10 **do not run in CI**: they are single-host evidence and must be re-run manually on a Windows host (`PROOFRAIL_A7_ROUNDS=20 go test -tags a7native -run TestA7Native ./internal/adapters/`).
+-- **If B3 later adopts C2/C3**: the durability sentences in `docs/CONTRACTS{,_EN}.md` must be revised first (Windows directory-entry durability "can neither be enforced nor proved" → rewritten from measurement) with the usual contract-first ordering; **a green B3 must not by itself unlock** `unproven` or first-dispatch.
++- **If B3 later adopts C2/C3**: the protocol-first revision must be completed under `docs/CONTRACTS{,_EN}.md` §7 "Publication-durability tiers and upgrade conditions" (that frozen sentence has been rewritten by B3c: Windows directory-entry durability is **not a platform constant** and is decided per (platform × premise)) and must pass an independent review; **a green B3 must not by itself unlock** `unproven` or first-dispatch.
+ - **Boundaries and hand-off**: every power-loss claim (the flush guarantee of C2/C3, C2's ambiguous documentation, this host's storage-stack flush semantics, directory entries losing order under power loss, shared-volume fencing) moves to B3; accumulating temp residue is an A7 finding left unfixed. See the validation report: [中文](validation/t027-windows-publication-durability.md) / [English](validation/t027-windows-publication-durability_EN.md).
+\ No newline at end of file
+diff --git a/docs/CONTRACTS.md b/docs/CONTRACTS.md
+index f68034a..60bb616 100644
+--- a/docs/CONTRACTS.md
++++ b/docs/CONTRACTS.md
+@@ -204,7 +204,9 @@ CLI Agent 只在为当前 task/attempt 物化的可丢弃 run-workspace 中工
+ 
+ 代理报告 completed、退出 0 或最终文本只表示外部执行结束。ProofRail 必须先证明进程树停止，重新扫描 workspace，校验范围/秘密/副作用，冻结 candidate，再独立运行声明的 build/test/verify gates；通过后仍进入独立 review/promotion。超时、失联、无法停止、会话恢复失败、日志或费用不完整、外部副作用不明均为 uncertain 并保持暂停，禁止换会话盲重试。AgentRunner 的 request、capability、enforcement、event 与 completion wire 分别使用 `proofrail:agent-runner-request:1\n`、`proofrail:agent-runner-capability:1\n`、`proofrail:agent-runner-enforcement:1\n`、`proofrail:agent-runner-event:1\n`、`proofrail:agent-runner-completion:1\n` 加对应 body 的 RFC 8785 canonical JSON 计算 `recordHash`。集合在计算前按字典序排序并拒绝重复。requestId、probeId、enforcementId、eventId 和 completionId 分别是其主去重键；同键同摘要为幂等重放，同键不同摘要为冲突；event 还禁止同 session/sequence 绑定不同记录或同 request 漂移到不同 session，completion 还禁止同 request 产生不同终局记录。capability 只有固定矩阵全项带运行证据且为 verified 才可单独 compatible；绑定的 enforcement 可按上段规则形成组合准入，但不改写 capability 事实。completion 的 completed 仅表示外部执行、停机与证据采集完整，不表示 task PASS。
+ 
+-`agent-runner` replay store 对每个 requestId 分别以 request 文件 R 和 completion 文件 C 保存一条 canonical JSONL。每个文件必须以原子、无替换发布；协议单调，不得删除、替换或追加已发布文件，且完成方必须先发布 R 后发布 C。Unix 构造器只接受已存在的稳定绝对 replay root，并在返回前建立 `requests/`、`completions/`，每建立或确认一个子目录即同步其父 root；任一 bootstrap 同步失败必须使构造器 fail-closed。原子 no-replace 可见性与断电耐久性是不同事实：在本地 Unix 文件系统上，只有新 link 创建成功后其父目录 `fsync` 成功，才可把该次发布记为 `proven`；若父目录同步失败，调用必须 fail-closed，并保留已可见记录而不是回滚它。Windows 实现可提供原子 no-replace 可见性，但新目录项持久性当前既不能强制也不能证明，因此生产构造器的发布耐久能力必须报告为 `unproven`。任何可能产生 `first-dispatch` 的操作必须先拒绝 `unproven`：`RecordRequest` 返回可由 `errors.Is` 识别的 durability-unproven 错误、不创建 R，且绝不返回 `first-dispatch`；零值也不得绕过此门禁。未证明状态下 `RecordCompletion` 只可无写入地重放已有且绑定有效的 C，任何需要发布 R 或 C 的调用同样拒绝。读取 R/C 时，首次观察到 R 缺失而 C 存在必须进行有界重读以在本地文件系统收敛；在界限内观察到 R+C 是合法终局而非孤儿。稳定的 C-without-R 是真正孤儿，必须 fail-closed，且 `State`、request/completion 重放不得写入 R 来修复它。no-replace 碰撞后的有界重读若仍无法看到或判定赢家，结果是 replay-store convergence failure / uncertain，而不是 request/completion conflict。所有影响安全决定的尾读同样必须收敛；磁盘中 R/C 的绑定不一致是 replay-store corruption，而调用者给出的 request 或 completion 摘要不一致仍按既有 validation/conflict 处理。该局部持久化语义不实现生产 AgentRunner，不改变 T027 `BLOCKED / NOT IMPLEMENTED`，也不使 AT-23 通过。
++`agent-runner` replay store 对每个 requestId 分别以 request 文件 R 和 completion 文件 C 保存一条 canonical JSONL。每个文件必须以原子、无替换发布；协议单调，不得删除、替换或追加已发布文件，且完成方必须先发布 R 后发布 C。Unix 构造器只接受已存在的稳定绝对 replay root，并在返回前建立 `requests/`、`completions/`，每建立或确认一个子目录即同步其父 root；任一 bootstrap 同步失败必须使构造器 fail-closed。原子 no-replace 可见性与断电耐久性是不同事实：在本地 Unix 文件系统上，只有新 link 创建成功后其父目录 `fsync` 成功，才可把该次发布记为 `proven`；若父目录同步失败，调用必须 fail-closed，并保留已可见记录而不是回滚它。Windows 实现可提供原子 no-replace 可见性，但新目录项持久性的等级**不是平台常量**：按本节「发布耐久等级与升级条件」逐平台、逐前提判定，生产构造器的发布耐久能力必须报告为该平台当前等级（未满足该条款全部判据时即 `unproven`）；依据 B3b 结论账本（`docs/validation/t027-b3b-durability.md` §4），Windows 结论是**分级**的（C2 `proven`，其余 `unresolved`），不是整体升级，Windows 平台发布耐久等级仍为 `unproven`。任何可能产生 `first-dispatch` 的操作必须先拒绝 `unproven`：`RecordRequest` 返回可由 `errors.Is` 识别的 durability-unproven 错误、不创建 R，且绝不返回 `first-dispatch`；零值也不得绕过此门禁。未证明状态下 `RecordCompletion` 只可无写入地重放已有且绑定有效的 C，任何需要发布 R 或 C 的调用同样拒绝。读取 R/C 时，首次观察到 R 缺失而 C 存在必须进行有界重读以在本地文件系统收敛；在界限内观察到 R+C 是合法终局而非孤儿。稳定的 C-without-R 是真正孤儿，必须 fail-closed，且 `State`、request/completion 重放不得写入 R 来修复它。no-replace 碰撞后的有界重读若仍无法看到或判定赢家，结果是 replay-store convergence failure / uncertain，而不是 request/completion conflict。所有影响安全决定的尾读同样必须收敛；磁盘中 R/C 的绑定不一致是 replay-store corruption，而调用者给出的 request 或 completion 摘要不一致仍按既有 validation/conflict 处理。该局部持久化语义不实现生产 AgentRunner，不改变 T027 `BLOCKED / NOT IMPLEMENTED`，也不使 AT-23 通过。
++
++**发布耐久等级与升级条件**：发布耐久等级为三态 `proven` / `disproven` / `unresolved`（`observed`/`falsified` 等只作证据注释，不作等级）；判定单元是**（平台 × 前提 P）**，任何等级表述必须同时携带平台、前提与证据，禁止把某前提下的等级改述为无前提的平台级等级（平台级等级只可表述 `unproven` 默认态，或携带前提与证据），任何 `proven` 都必须能追溯到“哪个平台 + 哪个前提 + 哪些证据”。同一判定单元内，某机制记 `proven` 必须在**同一前提下**同时具备 (a) 可复现注入或对照证据（有效轮落在允许集内、证据包可由轮次记录与 journal 复算、无真孤儿）、(b) **区分力门**（在同一装置、同一写入器与同一记录级载荷下，负对照出现 ≥1 次丢失、正对照零丢失；门不成立即封顶 `unresolved`）、(c) **机制证据**（该轮所主张的持久化机制确实执行过）；**任一缺失即 `unresolved`**（`unresolved` 只表示未能建立主张，不得读作“不耐久”或“已被证伪”），存在可归属反例（阶段命中且机制确已执行仍丢失）即 `disproven`；不得以“未观测到丢失”或“某轮成功”兑现 `proven`。禁止“永久耐久 / 长期保证 / 已验证断电安全 / 跨前提普遍耐久”类句式；`proven` 只能表述为“该前提下、该装置与统计分辨率内未观测到反例，且机制确已执行，且装置具备区分力”。候选机制等级与**平台发布耐久等级**是不同对象：平台等级只由该平台生产实现所采用的机制在**覆盖目标部署环境的前提**下的证据决定；没有任何前提满足全部判据时平台等级为 `unproven`，运行期 `unresolved` 与 `disproven` 一律按 `unproven` 行为执行。本地 Unix 文件系统上的“新 link 创建成功且父目录 `fsync` 成功”在既有契约口径下视为满足全部判据的实例（其前提即“本地 Unix 文件系统类”，判据映射见本节的 Unix 构造器规则）。**升级的解锁边界**：某（平台 × 前提）升级为 `proven` 后，仅在该平台、该前提覆盖的部署环境内解除对应拒绝——`RecordRequest` 可发布 R 并返回 `first-dispatch`、launch-intent 可发布并允许 spawn、终局发布可在结算之前进行；不解锁任何其它前提或其它平台（各保持自身等级的拒绝），不豁免 AT-23（仍必须通过），不豁免独立评审与协议先行，也不放宽 `first-dispatch` 之外的任何门禁。平台等级升级必须协议先行修订本节、证据可追溯并通过独立评审。
+ 
+ 生产 replay store 只能由 durable run root 与 runID 确定性推导，并在构造时完成路径安全与所有权 preflight；不再接受任意 caller 自选 root，接受任意绝对路径的构造只保留为包内非生产入口。replay root 固定为 `<runRoot>/agent-runner-replay`；run root 必须已存在且包含常规文件 `events/state-events.jsonl` 作为 durable run root 标记；跨重启定位只依据 `(runRoot, runID)`，禁止扫描或猜测。生产构造器首次打开时创建 replay root 并同步其父 run root，恢复时确认并同样同步其父 root；随后创建或确认 `requests/`、`completions/`，每建立或确认一个子目录即同步其父 root；任一 bootstrap 同步失败必须使构造器 fail-closed。每条已发布 R/C 在加载时其 `runId` 必须与构造绑定的 runID 一致，否则按 corruption fail-closed；尝试写入 runId 不符的 R/C 按 root conflict 拒绝。
+ 
+@@ -214,13 +216,13 @@ replay root 内 `ownership.json` 是 store-local 元数据：不进 wire、不
+ 
+ 生产 dispatcher 必须 replay-aware 且先发布 R：admission 通过后，dispatch 先调用 replay store 的 `RecordRequest`，仅当返回 `first-dispatch` 可继续；`unknown-block` 与终局收据各自阻断且绝不启动。在发布 R 之后、允许 launch 之前，dispatch 必须执行窄重确认：以 dispatch 时刻的新授权账本快照与预算账本重检授权 active/未撤销/未过期与 reservation outstanding；任一不满足即 fail-closed（错误可由 `errors.Is` 识别为 launch-reconfirmation 失败并保留底层原因），R 保留审计、不得写 launch 回执、不得启动进程、不得自动重试；admission 通过永远不是 launch 许可。
+ 
+-launch 回执为二文件 store-local 协议（不进 wire、不参与 R/C 的 recordHash）：spawn 之前必须先以 no-replace 单调发布 `launches/intent.<requestId>.jsonl`（launch-intent，含 `launchId`、`requestId` 与 `requestHash`、run/task/step/attempt、`adapterId`、重确认时刻与授权/预算绑定摘要；碰撞后有界重读收敛，无法判定即 convergence failure），且仅首个 launch 槽赢家可 spawn；发布耐久未证明的平台上 launch-intent 与 R 同规则——pre-write 拒绝、绝不 spawn、绝不返回 first-launch。spawn 成功后必须以同样规则发布 `launches/identity.<launchId>.jsonl`（process-identity，绑定 intent 摘要与不透明进程身份）。跨平台不变式：无 launch-intent ⇒ 该 requestId 从未 spawn；identity 缺失表示 launch 身份未证；两者都不允许任何盲目 relaunch。
++launch 回执为二文件 store-local 协议（不进 wire、不参与 R/C 的 recordHash）：spawn 之前必须先以 no-replace 单调发布 `launches/intent.<requestId>.jsonl`（launch-intent，含 `launchId`、`requestId` 与 `requestHash`、run/task/step/attempt、`adapterId`、重确认时刻与授权/预算绑定摘要；碰撞后有界重读收敛，无法判定即 convergence failure），且仅首个 launch 槽赢家可 spawn；某平台的发布耐久等级为 `unproven` 时（逐平台、逐前提判定，见本节「发布耐久等级与升级条件」），launch-intent 与 R 同规则——pre-write 拒绝、绝不 spawn、绝不返回 first-launch；等级升级只改变**该平台在该前提下的**本规则取值，不影响其它平台或其它前提。spawn 成功后必须以同样规则发布 `launches/identity.<launchId>.jsonl`（process-identity，绑定 intent 摘要与不透明进程身份）。跨平台不变式：无 launch-intent ⇒ 该 requestId 从未 spawn；identity 缺失表示 launch 身份未证；两者都不允许任何盲目 relaunch。
+ 
+ dispatch 的 replay 处置规则：仅 R（`unknown-block`）不得 launch；launch-intent 已存在时不得重发或 relaunch；intent+identity 证明已启动，不得 relaunch；R+C 为终局，永不 launch。唯一允许的同进程重试是启动端口按契约保证未 spawn 的失败返回（例如 Start 返回 error），但不得因此重发 launch-intent。接管仍留给后续 operator 切片；结算与终局发布由下段终局发布协议定义。
+ 
+ `launches/` 与 `requests/`、`completions/` 适用同一路径安全、所有权与同步纪律：生产构造器创建或确认它，运行期读写入口复检其组件级 symlink/reparse，标记缺失时非空即 corruption。本切片（A2）本身不结算、不发布 completion、不接 Engine、不运行真实候选（结算与终局发布见下段）；T027 仍为 `BLOCKED / NOT IMPLEMENTED`，AT-23 未通过。
+ 
+-终局发布与结算为 store-local 二文件协议（不进 wire、不参与 R/C 的 recordHash）：`AgentRunnerTerminalPublisher` 必须先以 no-replace 单调发布 `terminals/terminal-intent.<requestId>.jsonl`（terminal-intent，内嵌完整 completion 记录与结算计划：`settlementEntryId`、`settlementIdempotencyKey`、`reservationHash`、结算状态与金额、调用/token 与证据摘要；碰撞后有界重读收敛，无法判定即 convergence failure），随后向成本账本 `Settle` 该计划（账本按 `idempotencyKey` 去重：同键同载荷幂等、同 reservation 异键按结算冲突拒绝，重复回执不可重复结算），再经 replay store 发布 C，最后以同样规则发布 `terminals/terminal-closure.<requestId>.jsonl` 完成链。结算条目的证据必须包含被判定的 C recordHash 与 R recordHash，使“已入账结算必有可审计 C”由条目自身成立。发布耐久未证明的平台上，发布器必须在任何结算之前拒绝新的终局发布（不写意图、不结算、不发布 C、不写 closure），已有完整链只可无写重放。无 terminal-intent 的 C 是孤儿（无法证明任何结算决策记录）必须 fail-closed，且不得回写意图“收养”； reservation 已被异键结算占用时不得发布 C；结算状态为 unknown 时 reservation 保持占用（继续计入 unknown 占用与共享上限、不得复用、不得 relaunch），不得据此伪造完成。崩溃恢复只依据 store-local 记录：intent 是结算计划与完成体的唯一可恢复来源，账本只作强制者（幂等与冲突判定）而非查询源；恢复是完成自己已赢得槽位的幂等补写，不等于接管，接管仍属后续 operator 切片；postflight 接受不在本协议范围内。
++终局发布与结算为 store-local 二文件协议（不进 wire、不参与 R/C 的 recordHash）：`AgentRunnerTerminalPublisher` 必须先以 no-replace 单调发布 `terminals/terminal-intent.<requestId>.jsonl`（terminal-intent，内嵌完整 completion 记录与结算计划：`settlementEntryId`、`settlementIdempotencyKey`、`reservationHash`、结算状态与金额、调用/token 与证据摘要；碰撞后有界重读收敛，无法判定即 convergence failure），随后向成本账本 `Settle` 该计划（账本按 `idempotencyKey` 去重：同键同载荷幂等、同 reservation 异键按结算冲突拒绝，重复回执不可重复结算），再经 replay store 发布 C，最后以同样规则发布 `terminals/terminal-closure.<requestId>.jsonl` 完成链。结算条目的证据必须包含被判定的 C recordHash 与 R recordHash，使“已入账结算必有可审计 C”由条目自身成立。某平台的发布耐久等级为 `unproven` 时（逐平台、逐前提判定，见本节「发布耐久等级与升级条件」），发布器必须在任何结算之前拒绝新的终局发布（不写意图、不结算、不发布 C、不写 closure），已有完整链只可无写重放；等级升级只改变**该平台在该前提下的**本规则取值，不影响其它平台或其它前提。无 terminal-intent 的 C 是孤儿（无法证明任何结算决策记录）必须 fail-closed，且不得回写意图“收养”； reservation 已被异键结算占用时不得发布 C；结算状态为 unknown 时 reservation 保持占用（继续计入 unknown 占用与共享上限、不得复用、不得 relaunch），不得据此伪造完成。崩溃恢复只依据 store-local 记录：intent 是结算计划与完成体的唯一可恢复来源，账本只作强制者（幂等与冲突判定）而非查询源；恢复是完成自己已赢得槽位的幂等补写，不等于接管，接管仍属后续 operator 切片；postflight 接受不在本协议范围内。
+ 
+ chain terminal 路由（A4）：`agent-runner-completion` 的任何状态只表示外部执行结束，不直接驱动任务结论。终端回执必须翻译为 chain 自有 terminal 事实并经核心 `SubmitAgentRunnerTerminal` 显式路由：completed 只允许 step `TERMINAL_PENDING→PASSED`，任务仍依次经过 freeze、gates、review 与 completed promotion 才可 PASSED，chain 仅在全部任务接受后 COMPLETED；failed 与 uncertain 落 task `FAILED`（uncertain 另保持 chain `PAUSED` 且禁止重试），cancelled 先归档停机证据再写终态，operator-action-required 在写入 task/step `WAITING_FOR_OPERATOR`（证据含完成记录哈希）的同时把 chain `RUNNING→PAUSED`（同证据）并进入既有 operator-interaction 机器，使“路由即暂停”成立：重启同样能开出交互并收敛。该等待态由 Open 侧加法式接受——等待中的 task/step 与暂停的 chain 可匹配 agent 终局路由写入的转移；控制台账本仍是交互排他性的唯一所有者（该路径上 Open 不校验交互记录哈希，与经典路径的差异是有意的边界）。uncertain 终局只把处于 `RUNNING` 的 chain 置为 `PAUSED`；chain 已因其他原因暂停时不改写暂停原因（转移表不允许 `PAUSED→PAUSED`），使用方须在 task `FAILED` 边界停止而非自动续跑。同一请求的重复终局必须幂等收敛，不同终局为冲突。resume 必须绑定 `priorSessionId` 与 `priorCompletionHash`，且 `priorCompletionHash` 必须存在于该 step 的事件证据历史中；无法证明连续性时拒绝路由并由调用方从持久 envelope 建立新 attempt，禁止猜测续接成功。本段不包含 postflight 接受判定，也不改变下游 acceptance 政策所有权。
+ 
+diff --git a/docs/CONTRACTS_EN.md b/docs/CONTRACTS_EN.md
+index 5e567d4..e4d106e 100644
+--- a/docs/CONTRACTS_EN.md
++++ b/docs/CONTRACTS_EN.md
+@@ -198,7 +198,9 @@ The CLI Agent works only inside the disposable run-workspace materialized for th
+ 
+ Agent-reported completion, exit zero or final text means only that external execution ended. ProofRail must prove process-tree termination, rescan the workspace, validate scope/secrets/effects, freeze a candidate, and independently run declared build/test/verify gates before review/promotion. Timeout, disconnection, failed termination, failed session resume, incomplete logs/costs or unknown external effects are uncertain and remain paused; switching sessions for a blind retry is forbidden. AgentRunner request, capability, enforcement, event and completion bodies use RFC 8785 canonical JSON with the respective `proofrail:agent-runner-request:1\n`, `proofrail:agent-runner-capability:1\n`, `proofrail:agent-runner-enforcement:1\n`, `proofrail:agent-runner-event:1\n` and `proofrail:agent-runner-completion:1\n` domain separators to compute `recordHash`. Sets are lexically sorted before hashing and reject duplicates. requestId, probeId, enforcementId, eventId and completionId are their primary deduplication keys: the same key and digest is an idempotent replay, while the same key with a different digest conflicts. Events additionally reject a session/sequence bound to another record or one request drifting across sessions; completions reject different terminal records for one request. A capability report is independently compatible only when every fixed matrix entry has runtime evidence and is verified; bound enforcement may provide combined admission under the preceding rule without rewriting capability facts. A completed receipt proves only external execution, process stop and evidence capture, never task PASS.
+ 
+-For each requestId, the `agent-runner` replay store keeps one canonical JSONL request file R and one completion file C. Each file must be atomically published without replacement; the protocol is monotonic, so published files are never deleted, replaced, or appended, and a completer must publish R before C. The Unix constructor accepts only an already-existing stable absolute replay root and, before returning, creates `requests/` and `completions/`, syncing the parent root after each directory is created or confirmed; any bootstrap sync failure fails construction closed. Atomic no-replace visibility and power-loss durability are separate facts: on a local Unix filesystem, a publication may be called `proven` only after the new link exists and the parent directory `fsync` succeeds; if that directory sync fails, the call must fail closed while leaving the now-visible record in place rather than rolling it back. A Windows implementation may still provide atomic no-replace visibility, but new directory-entry persistence cannot currently be forced or proved there, so its production constructor must report `unproven`. Any operation that could return `first-dispatch` must reject `unproven` before writing: `RecordRequest` returns a dedicated `errors.Is`-compatible durability-unproven error, creates no R, and never returns `first-dispatch`; a zero-value store cannot bypass this gate. With unproven durability, `RecordCompletion` may only replay an already-present, validly bound C without writing; any call that would publish R or C also rejects. When a read first observes C without R, it must make bounded rereads so the local filesystem can converge; observing R+C within that bound is a legitimate terminal state, not an orphan. A stable C-without-R is a true orphan: fail closed, and never write R to heal it from `State`, request replay, or completion replay. If bounded rereads after a no-replace collision still cannot reveal or classify the winner, the truthful result is replay-store convergence failure / uncertain, not request/completion conflict. All tail reads that affect a safety decision must also converge. An on-disk R/C binding mismatch is replay-store corruption, while a mismatch in caller-supplied request or completion hashes remains the existing validation/conflict outcome. This local persistence rule does not implement the production AgentRunner, change T027 `BLOCKED / NOT IMPLEMENTED`, or pass AT-23.
++For each requestId, the `agent-runner` replay store keeps one canonical JSONL request file R and one completion file C. Each file must be atomically published without replacement; the protocol is monotonic, so published files are never deleted, replaced, or appended, and a completer must publish R before C. The Unix constructor accepts only an already-existing stable absolute replay root and, before returning, creates `requests/` and `completions/`, syncing the parent root after each directory is created or confirmed; any bootstrap sync failure fails construction closed. Atomic no-replace visibility and power-loss durability are separate facts: on a local Unix filesystem, a publication may be called `proven` only after the new link exists and the parent directory `fsync` succeeds; if that directory sync fails, the call must fail closed while leaving the now-visible record in place rather than rolling it back. A Windows implementation may still provide atomic no-replace visibility, but the tier of new directory-entry persistence is **not a platform constant**: it is determined per platform and per premise under the **publication-durability tiers and upgrade conditions** clause of this section, and the production constructor must report the platform's current tier as its publication-durability capability (`unproven` while not every criterion of that clause is met); per the B3b verdict ledger (`docs/validation/t027-b3b-durability.md` §4) the Windows verdict is **tiered** (C2 `proven`, the others `unresolved`) and not a platform-wide upgrade, so the Windows publication-durability tier remains `unproven`. Any operation that could return `first-dispatch` must reject `unproven` before writing: `RecordRequest` returns a dedicated `errors.Is`-compatible durability-unproven error, creates no R, and never returns `first-dispatch`; a zero-value store cannot bypass this gate. With unproven durability, `RecordCompletion` may only replay an already-present, validly bound C without writing; any call that would publish R or C also rejects. When a read first observes C without R, it must make bounded rereads so the local filesystem can converge; observing R+C within that bound is a legitimate terminal state, not an orphan. A stable C-without-R is a true orphan: fail closed, and never write R to heal it from `State`, request replay, or completion replay. If bounded rereads after a no-replace collision still cannot reveal or classify the winner, the truthful result is replay-store convergence failure / uncertain, not request/completion conflict. All tail reads that affect a safety decision must also converge. An on-disk R/C binding mismatch is replay-store corruption, while a mismatch in caller-supplied request or completion hashes remains the existing validation/conflict outcome. This local persistence rule does not implement the production AgentRunner, change T027 `BLOCKED / NOT IMPLEMENTED`, or pass AT-23.
++
++**Publication-durability tiers and upgrade conditions**: a publication-durability tier is one of `proven` / `disproven` / `unresolved` (`observed` / `falsified` and similar are evidence annotations, never tiers); the unit of judgment is **(platform × premise P)**, every tier statement must carry its platform, premise and evidence together, a tier earned under a premise must never be restated as a premise-free platform-level tier (a platform-level tier may only state the `unproven` default, or carry its premise and evidence), and every `proven` must trace back to "which platform + which premise + which evidence". Within the same unit of judgment, a mechanism may be recorded as `proven` only when the **same premise** shows all three of (a) reproducible injection or control evidence (valid rounds inside the allowed set, an evidence pack recomputable from the round records and the journal, no true orphans), (b) a **discrimination gate** (under the same rig, the same writer and the same record-level payload, negative controls show at least one loss and positive controls none; a failed gate caps the verdict at `unresolved`), and (c) **mechanism evidence** (the claimed persistence mechanism demonstrably ran in that round); **missing any one of them leaves the answer `unresolved`** (`unresolved` means only that no claim was established and must never be read as "not durable" or "already falsified"), and an attributable counterexample (a loss where the stage was hit and the mechanism demonstrably ran) is `disproven`; "no loss observed" or "a round succeeded" can never cash out a `proven`. Wording such as "durable forever", "long-term guarantee", "proven power-loss safe" or premise-spanning universal durability is forbidden; a `proven` may only be phrased as "no counterexample was observed under this premise at this device's resolution, with the mechanism demonstrably run and the device demonstrably discriminating". A candidate mechanism's tier and the **platform publication-durability tier** are different objects: the platform tier is decided only by the evidence for the mechanism the platform's production implementation actually adopts, under a **premise covering the target deployment environment**; when no premise satisfies every criterion the platform tier is `unproven`, and at runtime both `unresolved` and `disproven` behave as `unproven`. On a local Unix filesystem, "a new link was created and its parent directory was `fsync`-ed successfully" counts under the existing contract wording as an instance satisfying every criterion (its premise is the local-Unix-filesystem class; the criteria map is the Unix constructor rule of this section). **Upgrade unlock boundary**: once a (platform × premise) reaches `proven`, only that platform, within the deployment environments covered by that premise, has the corresponding refusals lifted — `RecordRequest` may publish R and return `first-dispatch`, launch-intent may be published and a spawn allowed, and a terminal publication may precede settlement; nothing is unlocked for any other premise or platform (each keeps its own tier's refusals), AT-23 is not waived (it must still pass), independent review and protocol-first revision are not waived, and no gate beyond `first-dispatch` is relaxed. A platform-tier upgrade requires a protocol-first amendment of this clause, traceable evidence, and an independent review.
+ 
+ A production replay store is derived deterministically from the durable run root and runID and completes path-safety and ownership preflight during construction; it no longer accepts an arbitrary caller-chosen root, and the arbitrary-absolute-path constructor remains only as a non-production package-internal entry. The replay root is fixed at `<runRoot>/agent-runner-replay`; the run root must already exist and contain the regular file `events/state-events.jsonl` as its durable run-root marker; cross-restart location uses only `(runRoot, runID)` and never scans or guesses. On first open the production constructor creates the replay root and syncs its parent run root, and on recovery it confirms and likewise syncs that parent; it then creates or confirms `requests/` and `completions/`, syncing each parent root after every directory is created or confirmed; any bootstrap sync failure fails construction closed. Every published R or C must carry a `runId` equal to the constructor-bound runID when it is loaded, otherwise it fails closed as corruption; an attempt to write an R or C with a different runId is rejected as a root conflict.
+ 
+@@ -208,13 +210,13 @@ The replay root must be disjoint in both directions from writer roots (isolated
+ 
+ A production dispatcher must be replay-aware and publish R first: after admission passes, dispatch calls the replay store's `RecordRequest` and may continue only when it returns `first-dispatch`; `unknown-block` and a terminal receipt each block, and dispatch never launches. After publishing R and before allowing launch, dispatch must perform a narrow reconfirmation: using a fresh authorization-ledger snapshot and the budget ledger taken at dispatch time, it rechecks that the authorization is active, unrevoked, and unexpired and that the reservation is outstanding; any failure fails closed (the error is `errors.Is`-identifiable as a launch-reconfirmation failure that preserves the underlying cause), keeps R for audit, writes no launch receipt, spawns nothing, and never retries automatically; a passing admission is never a launch permit.
+ 
+-Launch receipts use a two-file store-local protocol (never on the wire, never part of any R/C recordHash): before spawning, dispatch must publish `launches/intent.<requestId>.jsonl` (launch-intent, carrying `launchId`, `requestId` and `requestHash`, run/task/step/attempt, `adapterId`, the reconfirmation timestamp, and the authorization/budget binding digests) monotonically without replacement, converging through bounded rereads and reporting a convergence failure when it cannot decide, and only the single first-launch slot winner may spawn; on platforms where publication durability is unproven, launch-intent follows the same rule as R — rejected pre-write, never spawning, never returning first-launch. After a successful spawn, the dispatcher must publish `launches/identity.<launchId>.jsonl` (process-identity, binding the intent digest and an opaque process identity) under the same rules. Cross-platform invariants: no launch-intent means the requestId never spawned; a missing identity means the launch identity is unproven; neither permits any blind relaunch.
++Launch receipts use a two-file store-local protocol (never on the wire, never part of any R/C recordHash): before spawning, dispatch must publish `launches/intent.<requestId>.jsonl` (launch-intent, carrying `launchId`, `requestId` and `requestHash`, run/task/step/attempt, `adapterId`, the reconfirmation timestamp, and the authorization/budget binding digests) monotonically without replacement, converging through bounded rereads and reporting a convergence failure when it cannot decide, and only the single first-launch slot winner may spawn; on a platform whose publication-durability tier is `unproven` (determined per platform and per premise; see the **publication-durability tiers and upgrade conditions** clause of this section), launch-intent follows the same rule as R — rejected pre-write, never spawning, never returning first-launch, and a tier upgrade changes the value of this rule only **for that platform under that premise**, never for any other platform or premise. After a successful spawn, the dispatcher must publish `launches/identity.<launchId>.jsonl` (process-identity, binding the intent digest and an opaque process identity) under the same rules. Cross-platform invariants: no launch-intent means the requestId never spawned; a missing identity means the launch identity is unproven; neither permits any blind relaunch.
+ 
+ Dispatch replay handling: R-only (`unknown-block`) never launches; an existing launch-intent is neither republished nor relaunched; intent plus identity proves a launch and never relaunches; R+C is terminal and never launches. The only permitted in-process retry is a start-port failure that the port contractually guarantees did not spawn (for example Start returning an error), and even then the launch-intent must not be republished. Takeover remains with a later operator slice; settlement and terminal publication are defined by the terminal-publication protocol below.
+ 
+ `launches/` shares the path-safety, ownership, and sync discipline of `requests/` and `completions/`: the production constructor creates or confirms it, runtime read/write entry points re-check its components for symlinks and reparse points, and a non-empty directory without ownership metadata is corruption. A2 itself settles nothing, publishes no completion, wires no Engine, and runs no real candidate (settlement and terminal publication follow in the next paragraph); T027 remains `BLOCKED / NOT IMPLEMENTED` and AT-23 has not passed.
+ 
+-Terminal publication and settlement use a two-file store-local protocol (never on the wire, never part of any R/C recordHash): `AgentRunnerTerminalPublisher` must first monotonically publish `terminals/terminal-intent.<requestId>.jsonl` without replacement (terminal-intent, embedding the full completion record and the settlement plan: `settlementEntryId`, `settlementIdempotencyKey`, `reservationHash`, settlement status, amount, calls/tokens and evidence digests; collisions converge through bounded rereads, and an undecidable state is a convergence failure), then call the cost ledger's `Settle` on that plan (the ledger deduplicates by `idempotencyKey`: same key with the same payload is idempotent, a different key for the same reservation is rejected as a settlement conflict, and a repeated receipt never settles twice), then publish C through the replay store, and finally complete the chain by publishing `terminals/terminal-closure.<requestId>.jsonl` under the same rules. Settlement entries must carry the judged C recordHash and the R recordHash in their evidence, so that "every booked settlement has an auditable C" holds within the entry itself. On platforms where publication durability is unproven, the publisher must reject any new terminal publication before any settlement (no intent, no settlement, no C, no closure); only an already-complete chain may be replayed write-free. A C without a terminal-intent is an orphan (no settlement decision record can be proven) and must fail closed, and an intent must never be written back to "adopt" it; a reservation already settled under a different key must not receive a C; an unknown settlement keeps the reservation held (still counted in unknown holds and shared caps, never reusable, never relaunchable) and must not be used to fake completion. Crash recovery relies only on store-local records: the intent is the sole recoverable source of the settlement plan and the completion body, while the ledger acts as an enforcer (idempotency and conflict detection), not as a query source; recovery is an idempotent completion of a slot we already won and is not takeover, which remains a later operator slice; postflight acceptance is out of scope for this protocol.
++Terminal publication and settlement use a two-file store-local protocol (never on the wire, never part of any R/C recordHash): `AgentRunnerTerminalPublisher` must first monotonically publish `terminals/terminal-intent.<requestId>.jsonl` without replacement (terminal-intent, embedding the full completion record and the settlement plan: `settlementEntryId`, `settlementIdempotencyKey`, `reservationHash`, settlement status, amount, calls/tokens and evidence digests; collisions converge through bounded rereads, and an undecidable state is a convergence failure), then call the cost ledger's `Settle` on that plan (the ledger deduplicates by `idempotencyKey`: same key with the same payload is idempotent, a different key for the same reservation is rejected as a settlement conflict, and a repeated receipt never settles twice), then publish C through the replay store, and finally complete the chain by publishing `terminals/terminal-closure.<requestId>.jsonl` under the same rules. Settlement entries must carry the judged C recordHash and the R recordHash in their evidence, so that "every booked settlement has an auditable C" holds within the entry itself. On a platform whose publication-durability tier is `unproven` (determined per platform and per premise; see the **publication-durability tiers and upgrade conditions** clause of this section), the publisher must reject any new terminal publication before any settlement (no intent, no settlement, no C, no closure), and only an already-complete chain may be replayed write-free, while a tier upgrade changes the value of this rule only **for that platform under that premise**, never for any other platform or premise. A C without a terminal-intent is an orphan (no settlement decision record can be proven) and must fail closed, and an intent must never be written back to "adopt" it; a reservation already settled under a different key must not receive a C; an unknown settlement keeps the reservation held (still counted in unknown holds and shared caps, never reusable, never relaunchable) and must not be used to fake completion. Crash recovery relies only on store-local records: the intent is the sole recoverable source of the settlement plan and the completion body, while the ledger acts as an enforcer (idempotency and conflict detection), not as a query source; recovery is an idempotent completion of a slot we already won and is not takeover, which remains a later operator slice; postflight acceptance is out of scope for this protocol.
+ 
+ Chain terminal routing (A4): no `agent-runner-completion` status ever drives a task conclusion directly. A terminal receipt must be translated into a chain-owned terminal fact and routed explicitly by the core `SubmitAgentRunnerTerminal`: completed only permits step `TERMINAL_PENDING→PASSED`, while the task still passes freeze, gates, review, and a completed promotion before PASSED, and the chain reaches COMPLETED only after every task is accepted; failed and uncertain land the task in `FAILED` (uncertain additionally keeps the chain `PAUSED` and never retries), cancelled archives stop evidence before recording its terminal state, and operator-action-required writes the task/step `WAITING_FOR_OPERATOR` (evidence carrying the completion-record hash) while pausing the chain `RUNNING→PAUSED` with the same evidence and enters the existing operator-interaction machinery, so routing itself pauses the run and a restart can still open the interaction and converge. That waiting state is accepted additively on the open side: a waiting task/step and a paused chain may match the transitions the agent terminal route wrote; the control ledger remains the only owner of interaction exclusivity (on this path open does not verify the interaction-record hash, a deliberate difference from the classic path). An uncertain terminal only pauses a chain that is `RUNNING`; when the chain is already paused for another reason the pause reason is not rewritten (the transition table forbids `PAUSED→PAUSED`), so callers must stop at the task `FAILED` boundary instead of resuming automatically. A repeated terminal for the same request converges idempotently; a different terminal is a conflict. Resume must bind `priorSessionId` and `priorCompletionHash`, and `priorCompletionHash` must exist in that step's event-evidence history; when continuity cannot be proven the routing is refused and the caller builds a new attempt from the durable envelope, never guessing a successful handover. This paragraph excludes postflight acceptance and does not change downstream acceptance-policy ownership.
+ 
+diff --git a/docs/DEV_PLAN.md b/docs/DEV_PLAN.md
+index fe491bc..eba00eb 100644
+--- a/docs/DEV_PLAN.md
++++ b/docs/DEV_PLAN.md
+@@ -132,7 +132,9 @@ T027 前置状态更新（2026-09-18，B2 external OS enforcement decision + pro
+ 
+ T027 前置状态更新（2026-09-20，B3a power-loss injection rig + two-way calibration）：在上一段基础上，B3a 已完成，机器判定 **`CALIBRATED`**（`docs/validation/evidence/b3a-2026-09-20/calibration-verdict.json`，`gate = CALIBRATED`）——装置能**双向分辨**“丢失”与“存活”，B3b 可以开始。关键实测（**均取自 `docs/validation/B3A-CALIBRATION.md`**）：负对照（故意不 flush）5 个有效轮 **4 次丢失**（`lost-zero-filled` ×2、`lost-absent` ×2）+ 1 次存活（r03 `temp-written` `survived`）；正对照（显式 flush + 目录项提交）5 个有效轮**全部 `survived`**（`positiveLosses = 0`）；分辨力 0.8 / 0.0；**12 轮全部 `auditVerdict = HARD-POWER-LOSS`**（无一轮被干净关机伪造存活）；**每轮两次盘点 stdout 逐字节一致**（`inventoryIdentical = true` ×12；对账只比内容与大小、从不比时间）；journal 全链 **36 条**（`plan`/`cut`/`reconcile` 各 12）且重启后可逐轮对账；卷不脏。协议冻结：S1–S9（S7 硬断电 + `cut` 记录 → S8 重启 + 断电审计 + 盘点 ×2 → S9 对账）与 **2.0 s 注入延时**；**改动任一 ⇒ 需重新标定**（B3b 已沿用）。本片自查出并修复 1 项 Critical（`Get-B3aReconcile.ps1` 带顶层 `param()` 却被点源 ⇒ 调用方同名变量被重绑、标定整体失效，首跑卡在 `r00`）⇒ 模块不得有顶层参数、CLI 拆到 `Invoke-B3aReconcile.ps1`，并以自检 `module-load-preserves-vars` 钉住。**边界（报告原文）**：**丢失率不是候选结论**——负对照 4/5 只说明“装置能制造可观测丢失”，5 阶段 × N × 候选的耐久定案属 B3b。证据包 `docs/validation/evidence/b3a-2026-09-20/`（128 文件、`SHA256SUMS.txt` 126 条、**0 失配**）；活体数据在仓库外 `D:\VirtualBox VMs\Win11B3\b3a-runs\2026-09-20\`。提交 `136352b`（装置与自检）与 `babc041`（T027 工作文档）已推送 `origin/main`（`815c03f..babc041`，**未推 gitee**），CI run `35482066033`（head `babc041`，1 分 48 秒）全绿。（本段字段均取自上述报告；未在该报告中出现的字段不写入、不推测。）
+ 
+-T027 前置状态更新（2026-09-21，B3b candidate injection matrix and durability verdict）：在上一段基础上，B3b 已完成（真实断电注入矩阵与三档定案）。**级别与前提必须一起读**：等级一律取 `proven` / `unresolved` / `disproven`；前提 **P′ = VirtualBox 7.2.18 r175117 / guest Windows 11 25H2 build 26200.8037 / NTFS on SATA-AHCI `useHostIOCache=false` / 注入卷 `R:`=INJECT（data.vdi 7.98 GB、4096 B 群集）/ 记录级 ~1 KiB / 2.0 s cut 冻结窗口 / N=5**；注入方式 = guest 硬断电（`controlvm poweroff`）。结果：主矩阵 **17 格×5 = 85 轮全有效、0 void**；U4 排序子矩阵 **6 格×3 = 18 轮全有效、0 真孤儿**；判别力门成立（负对照 5/5 丢失、正对照 5/5 存活）；三档定案 **C2 `proven`**、C1/C3/C2C3 `unresolved`（C3/C2C3 的逐字理由为 `mechanism evidence missing in rounds 77 / 81`——决定阶段“机制未被证明执行过”的存活轮按 fail-closed **不得**兑现为耐久主张，**不等同于“不耐久”**）；U4 `unresolved`（有限样本只能证伪有序，不能证有序）。**旧结论保持**：Windows 发布耐久仍 `unproven`、first-dispatch 仍被拒绝、T027 仍 `BLOCKED / NOT IMPLEMENTED`、AT-23 未通过；升 `ACCEPTED` 与解除解锁的前置仍是**先修订 CONTRACTS 耐久冻结句**（协议先行，独立切片）。生产侧仅新增两个**零语义测试接缝**（`replayStorePublishPrimitiveHook`、`replayStoreParentSyncHook`，默认 nil、不读环境变量、不改默认行为）；另增“变异臂（装置自证伪）”**人工臂**（降级原语下装置拒绝兑现 `proven`，并有离线可复现互证）。审查：V4 Pro 预审 `changes-required` → 收口 `PASS`；③.5 MAI `PASS`；④ Codex **6 次**（1 终审 + 1 复审 + 2 收口 + 2 delta，超 §2.3 上限的原因与逐次发现以验证报告 §8 为单一权威）。⑤ 期间发现并就地修复 9 项实机缺陷（P1–P9，逐项带反证实验），均已入设计说明。证据：`docs/validation/t027-b3b-durability.md`（+ `_EN`）、证据包 `docs/validation/evidence/b3b-2026-09-21/`（2157 文件、`rigMismatches=0`）。**已提交 `abfcecc` 并推送 `origin/main`（未推 gitee）**，CI run **`35562559401`** 双腿全绿（Ubuntu 含 Race/Contract fixtures、Windows）。台账注记：B3a 与 B3b 的 DEV_PLAN 段落此前均缺失，本段为自 A7 以来首条追加；**B3a 段落待按 `docs/validation/B3A-CALIBRATION.md` 回填**。
++T027 前置状态更新（2026-09-21，B3b candidate injection matrix and durability verdict）：在上一段基础上，B3b 已完成（真实断电注入矩阵与三档定案）。**级别与前提必须一起读**：等级一律取 `proven` / `unresolved` / `disproven`；前提 **P′ = VirtualBox 7.2.18 r175117 / guest Windows 11 25H2 build 26200.8037 / NTFS on SATA-AHCI `useHostIOCache=false` / 注入卷 `R:`=INJECT（data.vdi 7.98 GB、4096 B 群集）/ 记录级 ~1 KiB / 2.0 s cut 冻结窗口 / N=5**；注入方式 = guest 硬断电（`controlvm poweroff`）。结果：主矩阵 **17 格×5 = 85 轮全有效、0 void**；U4 排序子矩阵 **6 格×3 = 18 轮全有效、0 真孤儿**；判别力门成立（负对照 5/5 丢失、正对照 5/5 存活）；三档定案 **C2 `proven`**、C1/C3/C2C3 `unresolved`（C3/C2C3 的逐字理由为 `mechanism evidence missing in rounds 77 / 81`——决定阶段“机制未被证明执行过”的存活轮按 fail-closed **不得**兑现为耐久主张，**不等同于“不耐久”**）；U4 `unresolved`（有限样本只能证伪有序，不能证有序）。**旧结论保持**：Windows 发布耐久仍 `unproven`、first-dispatch 仍被拒绝、T027 仍 `BLOCKED / NOT IMPLEMENTED`、AT-23 未通过；升 `ACCEPTED` 与解除解锁的前置仍是**先修订 CONTRACTS 耐久冻结句**（协议先行，独立切片 **B3c**——该口径修订已于 2026-09-21 完成，见下段；解除仍受该条款**解锁边界**约束）。生产侧仅新增两个**零语义测试接缝**（`replayStorePublishPrimitiveHook`、`replayStoreParentSyncHook`，默认 nil、不读环境变量、不改默认行为）；另增“变异臂（装置自证伪）”**人工臂**（降级原语下装置拒绝兑现 `proven`，并有离线可复现互证）。审查：V4 Pro 预审 `changes-required` → 收口 `PASS`；③.5 MAI `PASS`；④ Codex **6 次**（1 终审 + 1 复审 + 2 收口 + 2 delta，超 §2.3 上限的原因与逐次发现以验证报告 §8 为单一权威）。⑤ 期间发现并就地修复 9 项实机缺陷（P1–P9，逐项带反证实验），均已入设计说明。证据：`docs/validation/t027-b3b-durability.md`（+ `_EN`）、证据包 `docs/validation/evidence/b3b-2026-09-21/`（2157 文件、`rigMismatches=0`）。**已提交 `abfcecc` 并推送 `origin/main`（未推 gitee）**，CI run **`35562559401`** 双腿全绿（Ubuntu 含 Race/Contract fixtures、Windows）。台账注记：B3a 与 B3b 的 DEV_PLAN 段落此前均缺失，本段为自 A7 以来首条追加；**B3a 段落待按 `docs/validation/B3A-CALIBRATION.md` 回填**。
++
++T027 前置状态更新（2026-09-21，B3c CONTRACTS durability-upgrade clause revision）：B3c 已完成（纯文档、协议先行；不含任何 `.go`/`.json`/schema/fixtures 改动）。**新增条款**：`docs/CONTRACTS{,_EN}.md` §7 新增「**发布耐久等级与升级条件**」——耐久等级为三态 `proven` / `disproven` / `unresolved`（与 A7 一致，`observed`/`falsified` 只作证据注释）；判定单元为**（平台 × 前提 P）**，任何等级表述必须同时携带平台、前提与证据，禁止把某前提下的等级改述为无前提的平台级等级；记 `proven` 须在**同一前提下**同时具备 (a) 可复现注入或对照证据、(b) **区分力门**（同一装置、同一写入器与同一记录级载荷下，负对照出现 ≥1 次丢失、正对照零丢失；门不成立即封顶 `unresolved`）、(c) **机制证据**；任一缺失即 `unresolved`（且 `unresolved` 不得读作“不耐久”或“已被证伪”），可归属反例即 `disproven`；候选机制等级与**平台发布耐久等级**是不同对象（排除“候选 `proven` ⇒ 平台 `proven`”的短路读法）；运行期 `unresolved`/`disproven` 一律按 `unproven` 行为执行；禁止“永久耐久 / 长期保证”类句式。**三条冻结句参数化**（replay store 发布耐久句 / launch-intent 与 R 同规则句 / 终局发布拒绝句）：由**平台常量**改为**按平台耐久等级参数化**，并写明升级只改变**该平台在该前提下的**规则取值。**解锁边界**：升级只在该平台、该前提覆盖的部署环境内解除对应拒绝；不豁免 AT-23、不豁免独立评审与协议先行、不放宽 `first-dispatch` 之外的任何门禁。**边界铁律（已遵守）**：本片只固化口径，**不解除 Windows `unproven`**、不解除 first-dispatch、T027 仍 `BLOCKED / NOT IMPLEMENTED`、AT-23 未通过；依据 B3b 结论账本，Windows 结论是**分级**的（C2 `proven`，其余 `unresolved`），不是整体升级。ADR-013 行完成条件与 §5 采纳前置已回写指向该条款。审查：① V4 Pro 裁定 U1–U14；③ 预审 `PASS WITH FIXES` → 整改 → 复审 `PASS` → delta `PASS`；③.5 MAI 2 次均未产出可执行发现（格式偏离，已如实留痕）；④ Codex 3 次（首轮 `FINDINGS` 1 Medium + 1 Low → 复审唯一阻断项为“缺原始 diff 证据” → 收口 **`PASS`**）。⑤ 34 项机械检查全绿 + **4 项变异检验全红且逐字节还原**；门禁 `gofmt`/`build`/`vet`/`test` 全绿（14 包 ok、0 FAIL）；8 个 `.md` 编码（BOM+LF）PASS。证据：`docs/validation/t027-b3c-contracts-durability.md`（+ `_EN`）。**尚未提交**（停在可审查状态，待同轮授权）；CI 结果待推送后回填。
+ 
+ ## 3. 需求映射
+ 
+diff --git a/docs/DEV_PLAN_EN.md b/docs/DEV_PLAN_EN.md
+index 69efade..8a135f7 100644
+--- a/docs/DEV_PLAN_EN.md
++++ b/docs/DEV_PLAN_EN.md
+@@ -133,7 +133,9 @@ T027 pre-state update (2026-09-18, B2 external OS enforcement decision and proof
+ 
+ T027 prerequisite status update (2026-09-20, B3a power-loss injection rig + two-way calibration): on top of the previous paragraph, B3a is complete with the machine verdict **`CALIBRATED`** (`docs/validation/evidence/b3a-2026-09-20/calibration-verdict.json`, `gate = CALIBRATED`) - the rig discriminates "lost" from "survived" in both directions, so B3b could start. Key measurements (**all taken from `docs/validation/B3A-CALIBRATION.md`**): the negative control (deliberately not flushed) lost the record in **4 of its 5 valid rounds** (`lost-zero-filled` ×2, `lost-absent` ×2) with 1 survival (r03 `temp-written` `survived`); the positive control (explicit flush plus directory-entry commit) **survived in all 5 valid rounds** (`positiveLosses = 0`); discrimination 0.8 / 0.0; **all 12 rounds reported `auditVerdict = HARD-POWER-LOSS`** (no round had its survival faked by a clean shutdown); the **two inventories agreed byte for byte in every round** (`inventoryIdentical = true` ×12, with reconciliation comparing content and size only, never time); the journal chain holds **36 records** (12 each of `plan`/`cut`/`reconcile`) and reconciles round by round across a reboot; the volumes stayed clean. Frozen protocol: S1–S9 (S7 hard power-off plus a `cut` record → S8 reboot, power-loss audit and two inventories → S9 reconciliation) and the **2.0 s injection delay**; **changing any of them requires recalibration** (B3b reused them unchanged). The slice found and fixed one Critical defect of its own (`Get-B3aReconcile.ps1` carried a top-level `param()` while being dot-sourced, so same-named caller variables were rebound and the whole calibration was invalid, stalling on `r00`) ⇒ modules must carry no top-level parameters, the CLI was split into `Invoke-B3aReconcile.ps1`, and the self-test `module-load-preserves-vars` pins it. **Boundary (verbatim from the report)**: **a loss rate is not a candidate conclusion** - the 4/5 negative-control figure only says "the rig can manufacture an observable loss"; the five-stage × N × candidate durability verdict belongs to B3b. Evidence pack `docs/validation/evidence/b3a-2026-09-20/` (128 files, `SHA256SUMS.txt` 126 entries, **0 mismatches**); live data outside the repository at `D:\VirtualBox VMs\Win11B3\b3a-runs\2026-09-20\`. Commits `136352b` (rig and self-test) and `babc041` (T027 working documents) were pushed to `origin/main` (`815c03f..babc041`, **never to gitee**), CI run `35482066033` (head `babc041`, 1 m 48 s) green. (Every field in this paragraph comes from that report; fields it does not contain are omitted rather than inferred.)
+ 
+-T027 prerequisite status update (2026-09-21, B3b candidate injection matrix and durability verdict): on top of the previous paragraph, B3b is complete (the real power-loss injection matrix and the three-tier verdict). **The tier and the premise must be read together**: tiers are `proven` / `unresolved` / `disproven` only; premise **P′ = VirtualBox 7.2.18 r175117 / guest Windows 11 25H2 build 26200.8037 / NTFS on SATA-AHCI with `useHostIOCache=false` / injection volume `R:`=INJECT (data.vdi 7.98 GB, 4096 B clusters) / record-level ~1 KiB / 2.0 s pre-cut freeze window / N=5**; injection is a guest hard power-off (`controlvm poweroff`). Results: the main matrix ran **17 cells × 5 = 85 rounds, all valid, 0 void**; the U4 ordering sub-matrix ran **6 cells × 3 = 18 rounds, all valid, 0 true orphans**; the discrimination gate holds (negative control 5/5 lost, positive control 5/5 survived); the three-tier verdict is **C2 `proven`** with C1/C3/C2C3 `unresolved` (the verbatim reasons for C3/C2C3 are `mechanism evidence missing in rounds 77 / 81` - a survival whose mechanism was never shown to run must not, fail-closed, be cashed into a durability claim, which is **not** the same as "not durable"); U4 is `unresolved` (a finite sample can only falsify ordering, never prove it). **Earlier conclusions stand**: Windows publication durability is still `unproven`, first-dispatch is still refused, T027 is still `BLOCKED / NOT IMPLEMENTED`, AT-23 has not passed; rising to `ACCEPTED` and lifting the lock still require **first revising the frozen CONTRACTS durability sentences** (protocol first, its own slice). On the production side only two **zero-semantic test seams** were added (`replayStorePublishPrimitiveHook`, `replayStoreParentSyncHook`, nil by default, no environment reads, no change to default behaviour); a manual **variant arm (device self-falsification)** was added too (the rig refuses to cash `proven` when the primitive is silently degraded, corroborated offline and reproducibly). Reviews: V4 Pro pre-review `changes-required` → closing `PASS`; ③.5 MAI `PASS`; ④ Codex **6 calls** (1 final + 1 re-review + 2 closing + 2 delta; why this exceeds the §2.3 cap and each call's findings have the report §8 as their single authority). Nine live-run defects (P1–P9) were found and fixed in place, each with a falsification experiment, all recorded in the design note. Evidence: `docs/validation/t027-b3b-durability.md` (+ `_EN`) and the evidence pack `docs/validation/evidence/b3b-2026-09-21/` (2157 files, `rigMismatches=0`). **Committed as `abfcecc` and pushed to `origin/main` (never to gitee)**, CI run **`35562559401`** green on both legs (Ubuntu including Race/Contract fixtures, and Windows). Ledger note: neither B3a nor B3b had a DEV_PLAN paragraph before; this is the first addition since A7, and **the B3a paragraph is still owed** (to be back-filled from `docs/validation/B3A-CALIBRATION.md`).
++T027 prerequisite status update (2026-09-21, B3b candidate injection matrix and durability verdict): on top of the previous paragraph, B3b is complete (the real power-loss injection matrix and the three-tier verdict). **The tier and the premise must be read together**: tiers are `proven` / `unresolved` / `disproven` only; premise **P′ = VirtualBox 7.2.18 r175117 / guest Windows 11 25H2 build 26200.8037 / NTFS on SATA-AHCI with `useHostIOCache=false` / injection volume `R:`=INJECT (data.vdi 7.98 GB, 4096 B clusters) / record-level ~1 KiB / 2.0 s pre-cut freeze window / N=5**; injection is a guest hard power-off (`controlvm poweroff`). Results: the main matrix ran **17 cells × 5 = 85 rounds, all valid, 0 void**; the U4 ordering sub-matrix ran **6 cells × 3 = 18 rounds, all valid, 0 true orphans**; the discrimination gate holds (negative control 5/5 lost, positive control 5/5 survived); the three-tier verdict is **C2 `proven`** with C1/C3/C2C3 `unresolved` (the verbatim reasons for C3/C2C3 are `mechanism evidence missing in rounds 77 / 81` - a survival whose mechanism was never shown to run must not, fail-closed, be cashed into a durability claim, which is **not** the same as "not durable"); U4 is `unresolved` (a finite sample can only falsify ordering, never prove it). **Earlier conclusions stand**: Windows publication durability is still `unproven`, first-dispatch is still refused, T027 is still `BLOCKED / NOT IMPLEMENTED`, AT-23 has not passed; rising to `ACCEPTED` and lifting the lock still require **first revising the frozen CONTRACTS durability sentences** (protocol first, its own slice, **B3c** - that wording revision completed on 2026-09-21, see the next paragraph; lifting still stays bounded by that clause's **unlock boundary**). On the production side only two **zero-semantic test seams** were added (`replayStorePublishPrimitiveHook`, `replayStoreParentSyncHook`, nil by default, no environment reads, no change to default behaviour); a manual **variant arm (device self-falsification)** was added too (the rig refuses to cash `proven` when the primitive is silently degraded, corroborated offline and reproducibly). Reviews: V4 Pro pre-review `changes-required` → closing `PASS`; ③.5 MAI `PASS`; ④ Codex **6 calls** (1 final + 1 re-review + 2 closing + 2 delta; why this exceeds the §2.3 cap and each call's findings have the report §8 as their single authority). Nine live-run defects (P1–P9) were found and fixed in place, each with a falsification experiment, all recorded in the design note. Evidence: `docs/validation/t027-b3b-durability.md` (+ `_EN`) and the evidence pack `docs/validation/evidence/b3b-2026-09-21/` (2157 files, `rigMismatches=0`). **Committed as `abfcecc` and pushed to `origin/main` (never to gitee)**, CI run **`35562559401`** green on both legs (Ubuntu including Race/Contract fixtures, and Windows). Ledger note: neither B3a nor B3b had a DEV_PLAN paragraph before; this is the first addition since A7, and **the B3a paragraph is still owed** (to be back-filled from `docs/validation/B3A-CALIBRATION.md`).
++
++T027 prerequisite status update (2026-09-21, B3c CONTRACTS durability-upgrade clause revision): B3c is complete (documentation only, protocol first; no `.go`/`.json`/schema/fixtures change). **New clause**: `docs/CONTRACTS{,_EN}.md` §7 gains **Publication-durability tiers and upgrade conditions** - a tier is `proven` / `disproven` / `unresolved` (as in A7; `observed`/`falsified` are evidence annotations only); the unit of judgment is **(platform × premise P)**, every tier statement must carry its platform, premise and evidence together, and a tier earned under a premise must never be restated as a premise-free platform-level tier; recording `proven` requires, under the **same premise**, all three of (a) reproducible injection or control evidence, (b) a **discrimination gate** (under the same rig, the same writer and the same record-level payload, negative controls show at least one loss and positive controls none; a failed gate caps the verdict at `unresolved`), and (c) **mechanism evidence**; missing any one leaves `unresolved` (and `unresolved` must never be read as "not durable" or "already falsified"), while an attributable counterexample is `disproven`; a candidate mechanism's tier and the **platform publication-durability tier** are different objects (closing the short-circuit reading "candidate `proven` ⇒ platform `proven`"); at runtime `unresolved` and `disproven` behave as `unproven`; "durable forever / long-term guarantee" wording is forbidden. **The three frozen sentences are parameterised** (the replay-store publication-durability sentence / the launch-intent-follows-R sentence / the terminal-publication refusal sentence): from a **platform constant** into a rule **parameterised by the platform's durability tier**, each stating that an upgrade changes the value only **for that platform under that premise**. **Unlock boundary**: an upgrade lifts the corresponding refusals only on that platform, within the deployment environments covered by that premise; AT-23 is not waived, independent review and protocol-first revision are not waived, and no gate beyond `first-dispatch` is relaxed. **Iron boundary (kept)**: this slice only freezes the wording and **does not lift Windows `unproven`**, does not lift first-dispatch, T027 stays `BLOCKED / NOT IMPLEMENTED` and AT-23 has not passed; per the B3b verdict ledger the Windows verdict is **tiered** (C2 `proven`, the others `unresolved`) and not a wholesale upgrade. The ADR-013 row completion condition and the §5 adoption precondition now point at that clause. Reviews: ① V4 Pro rulings U1–U14; ③ pre-review `PASS WITH FIXES` → fixes → re-review `PASS` → delta `PASS`; ③.5 MAI produced no actionable finding in 2 calls (format deviation recorded honestly); ④ Codex 3 calls (first `FINDINGS` 1 Medium + 1 Low → re-review blocked only on raw-diff evidence → closing round **`PASS`**). ⑤ 34 mechanical checks all green plus **4 mutation experiments all red with byte-identical restore**; gates `gofmt`/`build`/`vet`/`test` green (14 packages ok, 0 FAIL); all 8 `.md` files pass the BOM+LF encoding check. Evidence: `docs/validation/t027-b3c-contracts-durability.md` (+ `_EN`). **Not yet committed** (stopped in a reviewable state, awaiting same-turn authorisation); the CI result is pending the push.
+ 
+ ## 3. Requirement Mapping
+ 
+diff --git a/docs/t027/REMAINING_SLICES.md b/docs/t027/REMAINING_SLICES.md
+index 83adede..31c64de 100644
+--- a/docs/t027/REMAINING_SLICES.md
++++ b/docs/t027/REMAINING_SLICES.md
+@@ -4,6 +4,7 @@
+ > 权威账本仍为 docs/DEV_PLAN.md、docs/DEV_PLAN_EN.md 与 docs/validation/；本清单只作为临时执行台账。
+ > 基线：68664d8（2026-09-14，已包含 #38 CI 修复）。盘点修正为 12 个必做切片 + 1 个可后置切片；必做规模合计 M×7、M-L×1、L×4；含 C1 后为 M×8、M-L×1、L×4。
+ > **2026-09-19 修订：B3 拆分为 B3a（断电注入装置与对照标定）+ B3b（候选注入矩阵与耐久定案）** ⇒ 必做切片 **13** 个；必做规模改为 **M×8、M-L×2、L×3**；含 C1 后为 **M×9、M-L×2、L×3**。理由：A7 已证伪“kill 级注入可判定耐久步”（CP4≡CP5），B3 的前置物（可证耐久的轮次 journal + 另一物理设备 + 重启盘点 + 双向对照标定）与后续物（逐候选注入与三档定案）是两类不同工作与不同风险，混在一片会让“装置未标定就下结论”。
++> **2026-09-21 修订：新增 B3c（CONTRACTS 耐久升级条款，纯文档）** ⇒ 必做切片 **14** 个；必做规模改为 **M×8、M-L×2、L×3、S×1**；含 C1 后为 **M×9、M-L×2、L×3、S×1**。理由：B3b 给出的是**分级**结论（C2 `proven`、C1/C3/C2C3/U4 `unresolved`），而 CONTRACTS 双语仍把“发布耐久未证明”写成**平台常量**，既无升级条件也无解锁边界；不先固化口径，B4 会在“契约口径”与“分级结论”之间踩空。
+ 
+ ## 用法
+ 
+@@ -41,8 +42,9 @@
+ | B1 candidate live capability + availability discovery | ✅ 完成（结论：**已评估范围内无可接受候选** ⇒ 保持 blocked；真探针 9 次、付费 6 个；④ 3 轮至 PASS + 工具收编 6 轮） | 外部按次授权 | M | 2026-09-17 | `docs/validation/t027-b1-candidate-live-discovery.md`、`docs/validation/evidence/b1-20260917/` |
+ | B2 candidate/enforcement decision + proof | ✅ 完成（2026-09-18；定案=**外部 OS 强制**；四提交已推送 `58757e8`+`fd99dc3`+`408bd99`+`815c03f`，CI 三跑全绿 run 35259806285 / 35261204021 / 35265268993；证据包 41 工件 + 排练转录已归档） | B1 | L | 2026-09-18 | `docs/validation/B2-EXTERNAL-ENFORCEMENT.md`、`docs/validation/evidence/b2-2026-09-17/`、`tools/agent-probe/{appcontainer-b2,enforcement-proxy}/` |
+ | B3a power-loss injection rig + calibration | ✅ 完成（2026-09-20） | A7 | M-L | 标定 `CALIBRATED`：负对照 4/5 丢失、正对照 0/5；journal 36 条全链通过；12 轮审计均 `HARD-POWER-LOSS` | `docs/validation/B3A-CALIBRATION.md`；`docs/validation/evidence/b3a-2026-09-20/` |
+-| B3b candidate injection matrix + durability verdict | ⬜ 未开始 | B3a | M | | |
+-| B4 AT-23 E2E evidence + independent review | ⬜ 未开始 | A5、A6、B1、B2、B3b | L | | |
++| B3b candidate injection matrix + durability verdict | ✅ 完成（`abfcecc`） | B3a | M | 2026-09-21 | `docs/validation/t027-b3b-durability.md`、`docs/validation/evidence/b3b-2026-09-21/` |
++| B3c CONTRACTS durability-upgrade clause revision | ✅ 完成（待同轮授权提交） | B3b | S | 2026-09-21 | `docs/validation/t027-b3c-contracts-durability.md`、`docs/validation/t027-b3c-contracts-durability_EN.md` |
++| B4 AT-23 E2E evidence + independent review | ⬜ 未开始 | A5、A6、B1、B2、B3b、B3c | L | | |
+ | C1 Linux AgentRunner native validation | ⬜ 未开始 | B4（Windows T027 完成） | M | | |
+ 
+ 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断
+@@ -65,11 +67,12 @@ flowchart LR
+     B1[B1] --> B2[B2]
+     A7 --> B3a[B3a]
+     B3a --> B3b[B3b]
++    B3b --> B3c[B3c]
+     A5 --> B4[B4]
+     A6 --> B4
+     B1 --> B4
+     B2 --> B4
+-    B3b --> B4
++    B3c --> B4
+     B4 --> C1[C1]
+ ```
+ 
+@@ -407,7 +410,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
+ - [x] 按三档口径给出每个候选的 **proven / disproven / unresolved**（带同一前提），含目录项丢失有序、真孤儿 C、torn 可见等反例判定。
+       （**结果**：**C2 `proven`**；C1/C3/C2C3 `unresolved`；U4 `unresolved` 且 0 真孤儿；逐字理由见报告 §4）
+ - [x] 结论回写：ADR-013 候选排序、验证报告、DEV_PLAN 双语、切片清单；若 `proven` 则同步评估/修订 CONTRACTS 的耐久口径与 first-dispatch 解锁条件（协议先行），否则维持 `unproven` 并记录失败模式。
+-      （**评估已完成**并写入报告 §7/§11：Windows `unproven` 与 first-dispatch 拒绝**未**解除；**契约修订按设计 §10.6 属条件性后续子步骤，本片不做**——协议先行，需独立切片）
++      （**评估已完成**并写入报告 §7/§11：Windows `unproven` 与 first-dispatch 拒绝**未**解除；**契约修订按设计 §10.6 属条件性后续子步骤，本片不做**——协议先行，需独立切片，已立为 **B3c**）
+ - [x] 复现与证据包：命令、轮数、原始 journal、盘点输出、失败样本，纳入 `docs/validation/evidence/`。
+       （`docs/validation/evidence/b3b-2026-09-21/`：2157 文件、`rigMismatches=0 missingRequired=0`，含 `variant/` 变异臂分区）
+ 
+@@ -417,9 +420,27 @@ A6 ② 进度（第 2 批，2026-09-15）：
+ 验收证据：结论只能是 proven/disproven/unresolved 并附逐轮原始证据；**只有 proven 才能解除 first-dispatch 的 `unproven` 拒绝**，其余情形必须保持 blocked 并记录失败模式。
+ 边界：不得把 B3a 的对照结果当作候选结论；不得因失败而放宽 first-dispatch；不得以单轮或单次样本外推。
+ 
++## B3c — CONTRACTS durability-upgrade clause revision（耐久口径固化）· ⬜
++
++依赖：B3b
++
++- [x] 在 `docs/CONTRACTS{,_EN}.md` 新增“**耐久升级条件**”规范条款：耐久等级为**三态** `proven` / `disproven` / `unresolved`（与 A7 一致），**逐平台、逐前提 P** 判定；记 `proven` 必须同时具备同一前提下的（a）可复现注入或对照证据、（b）**区分力门**（负对照可丢失、正对照不丢失）、（c）**机制证据**（该阶段机制确实被执行过）；任一缺失即 `unresolved`，不得以“未观测到丢失”或“某轮成功”兑现 `proven`；禁止“永久耐久/长期保证”类句式。
++- [x] 把三条冻结句从“**平台常量**”改为“**按平台耐久等级参数化**”的规则：(1) replay store 发布耐久句（`CONTRACTS.md` §7 replay store 段，当前第 207 行 / `CONTRACTS_EN.md` 第 201 行）；(2) launch-intent 与 R 同规则句（§7 launch 回执段，当前 219 / 213）；(3) 终局发布拒绝句（§7 终局发布与结算段，当前 225 / 219）。三处都必须写明：升级只改变该**平台在该前提下的**规则取值，不影响其它平台或其它前提。
++- [x] 明确**解锁边界**：某平台耐久升为 `proven` 只在该平台且同一前提内解除相应拒绝；AT-23 仍必须通过、其它平台仍保持各自结论；并写明“**本次结论是分级的**（C2 `proven`，其余 `unresolved`），不是整体升级”。
++- [x] 协议先行顺序：CONTRACTS 双语 → schema/fixtures（**仅当**引入机器可读枚举）→ 代码（**仅当**涉及门禁语义）；本片**不修改 Go 实现**。
++- [x] 回写：ADR-013 行、验证报告、`DEV_PLAN{,_EN}.md`、本清单双语。
++
++目标：把 B3b 的分级结论固化为**可被判定的契约口径**，使“某平台发布耐久从 `unproven` 升级为 `proven`”成为一条有前提、有判据、有边界的规范路径，为 B4 提供稳定基础。
++现状缺口：CONTRACTS 双语把“发布耐久未证明”写成平台常量（Windows 侧“新目录项持久性当前既不能强制也不能证明”⇒ `unproven`），既没有规定升级条件，也没有规定升级后解锁什么、不解锁什么；与 B3b 的分级结论之间存在口径空档。
++交付物：CONTRACTS 双语耐久升级条款、三条冻结句修订、解锁边界说明、双语台账与报告回写。
++验收证据：条款自洽（三态、逐平台逐前提、三项判据齐全、禁长期保证句式）；三条冻结句与条款逐词一致；双语逐句对齐（行数/标记同构）；全文不出现“解除 Windows `unproven`”的表述；编码门禁（BOM+LF）与 `gofmt`/`build`/`vet`/`test` 全绿（无代码改动时以不变为准）。
++边界：**本片只固化口径，不解除 Windows `unproven`**（解除需要该平台自身的完整证据 + 本片条款 + 独立评审，另属后续切片）；不改 schema/fixtures（除非条款确需机器可读枚举）、不改 Go 实现、不重跑 B3b 实机、不触碰 `tools/agent-probe/enforcement-proxy`（DR-2 属独立切片）。
++
++**观察项（2026-09-21 登记，不改准则）**：**③.5 在纯文档切片上的有效性待评估**——MAI 在代码切片（A6）输出正常，本片（纯 `.md`）2 次输出均偏离格式契约且未产出可执行发现（n=1，不足以修订准则）；**下片 B4（代码切片）作对照**：B4 正常 ⇒ 归因“文档类任务特性”；B4 同样偏离 ⇒ 归因模型能力问题。若再有 2–3 片纯文档切片同样表现，再议为 §3.10 增加例外（“纯 `.md` 且不涉及可执行语义的契约修订可跳过 ③.5，由 ④ 确认”）。详见验证报告 §7。
++
+ ## B4 — AT-23 E2E evidence + independent review · ⬜
+ 
+-依赖：A5、A6、B1、B2、B3b
++依赖：A5、A6、B1、B2、B3b、B3c
+ 
+ - [ ] 在真实宿主跑完整 AT-23 场景，覆盖隔离 workspace、timeout、日志缺失、未知恢复、exit 0 后重扫与独立 gates 或 review。
+ - [ ] 形成 evidence pack，包含输入摘要、环境摘要、命令与 cwd、退出码、用例统计、失败证据、跳过原因。
+@@ -452,7 +473,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
+ 
+ | 编号 | 载体 | 症状（可复现描述） | 证据（两次 run） | 处置计划 |
+ | --- | --- | --- | --- | --- |
+-| **DR-2** | 测试：`tools/agent-probe/enforcement-proxy`（B2 期工具，非本片引入） | `TestConnectAuditTrailFailureDeniesAndDoesNotTunnel` **偶发失败**：`enforcement-proxy: AUDIT TRAIL BROKEN (write …/proxy.jsonl: file already closed)` + `main_test.go:125: target must have been reached while the audit trail was healthy`；同一代码不同 run 结果不同 ⇒ flake，指向该测试自身**句柄/时序竞态**（日志文件被关闭后仍被写） | run **`35563800665`**（head `d2f508c`）Ubuntu `Test` 步骤**红**；run **`35562559401`**（head `abfcecc`）同包**绿**；复跑 `35563800665` 双腿**全绿** | **B4 之前**另立独立切片修复（协议先行 + 门禁）；本片及 B3b **不跨切片**修改该工具。理由：flaky 测试会污染后续 CI 可信度，B4 前必须清 |
++| **DR-2** | 测试：`tools/agent-probe/enforcement-proxy`（B2 期工具，非本片引入） | `TestConnectAuditTrailFailureDeniesAndDoesNotTunnel` **偶发失败**：`enforcement-proxy: AUDIT TRAIL BROKEN (write …/proxy.jsonl: file already closed)` + `main_test.go:125: target must have been reached while the audit trail was healthy`；同一代码不同 run 结果不同 ⇒ flake，指向该测试自身**句柄/时序竞态**（日志文件被关闭后仍被写） | run **`35563800665`**（head `d2f508c`）Ubuntu `Test` 步骤**红**；run **`35562559401`**（head `abfcecc`）同包**绿**；复跑 `35563800665` 双腿**全绿**；docs 回写提交 `dd36b9b` 的 run **`35564805991`** 双腿**全绿**、该包未复现 | **B4 之前**另立独立切片修复（协议先行 + 门禁）；本片及 B3b **不跨切片**修改该工具。理由：flaky 测试会污染后续 CI 可信度，B4 前必须清 |
+ 
+ > 本表只登记**已观测到证据**的缺陷；DR-1 见 `DEV_PLAN.md` 的 B1 段与 `docs/validation/t027-b1-candidate-live-discovery.md`（产品缺陷，属生产行为变更，需独立切片）。
+ 
+@@ -466,6 +487,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
+ | 2026-09-14 | A3 | terminal publication and settlement：四阶段链（intent→Settle→C→closure）与二文件 store-local 记录；确定性幂等键与证据绑定；orphan/异键/charged>reserved/矩阵拒绝；unknown 保留占用；unproven 预结算拒绝与完整链无写重放；崩溃窗口 i/ii/iii 幂等恢复；V4 Pro 前置分析+预审（H1/M1/M2/M3/L1/L5 整改）与 Codex 终审（2 Medium+3 Low 整改，补 3 条反例）+ Codex 整改复审 PASS（2026-09-15，中高危清零）+ 尾项整改与 Codex 追加确认 PASS（2026-09-15）；已提交 `c6f8585` 并推送，GitHub Actions Ubuntu（含 Race）/Windows 全绿（run 34900979883）；CI 证据回写已提交 `057d599`（run 34901323914 通过） | docs/validation/t027-terminal-publication.md |
+ | 2026-09-15 | A4 | chain terminal routing and resume：协议先行（CONTRACTS 双语 §2.1 新状态行与 §7 “chain terminal 路由”段、schema `stepTransition`、126 契约夹具含 3 条新用例）；新 step 状态 `TERMINAL_PENDING`（派发成功才写、非可停留态、入 recover 不确定清单与 cancel 清理）；核心唯一写入口 `SubmitAgentRunnerTerminal` 按五态路由（completed 仅 step PASSED，failed→task/chain FAILED，uncertain→task FAILED+chain PAUSED 禁重试，cancelled 先归档停机证据，operator-action-required→task/step WAITING+chain PAUSED 交接 T025）；adapters 单向翻译绑定 request→intent→closure 全字段含结算槽位且对 store 严格只读；重复终局幂等收敛（含两种部分写入窗口）、异终局冲突零写；resume 连续性以 `PriorCompletionHash ∈ step 事件证据历史` 为唯一判据；V4 Pro 预审 1 Medium（operator 路由崩溃窗口）+2 Low 整改后复审无 Medium+（新增 1 Low 已整改）；Codex 终审 1 Medium（结算槽位未绑定）+1 Low（BOM 字节级实测为误报，已留证据澄清）整改后 Codex 复审 PASS；本地全量门禁与契约夹具门禁全绿；已提交 `a21335d` 并推送，GitHub Actions Ubuntu（含 Race 与 Contract fixtures 步骤）/Windows 全绿（run 34920155025）；CI 证据回写已提交 `a1c643c`（run 34920548264 通过） | docs/validation/t027-terminal-routing.md |
+ | 2026-09-21 | B3b | candidate injection matrix + durability verdict：装置全实机化（会话锁、硬断电后陈旧会话恢复、盘点稳定对、fail-closed 判定）；主矩阵 **17 格×5=85 轮全有效、0 void**，U4 **6 格×3=18 轮全有效、0 真孤儿**；判别力门成立（负对照 5/5 丢失、正对照 5/5 存活）；三档定案 **C2 `proven`**、C1/C3/C2C3 `unresolved`（C3/C2C3 逐字理由 `mechanism evidence missing in rounds 77 / 81`，属装置 fail-closed 行为而非“不耐久”）；变异臂（装置自证伪）2 轮降级原语下装置拒绝兑现 `proven`，并有离线互证；⑤ 就地修复 9 项实机缺陷（P1–P9）且每项带反证实验；③ V4 Pro `changes-required`→收口 PASS、③.5 MAI PASS、④ Codex **6 次**（超预算原因与逐次发现见报告 §8）；**已提交 `abfcecc` 并推送 `origin/main`（未推 gitee）**，CI run **`35562559401`** 双腿全绿（Ubuntu 含 Race 与 Contract fixtures、Windows） | docs/validation/t027-b3b-durability.md；证据包 docs/validation/evidence/b3b-2026-09-21/ |
++| 2026-09-21 | B3c | CONTRACTS 耐久升级条款修订（纯文档、协议先行）：§7 新增「**发布耐久等级与升级条件**」（三态 `proven`/`disproven`/`unresolved`；判定单元（平台 × 前提 P）；记 `proven` 三判据 (a) 可复现注入或对照证据 / (b) 区分力门 / (c) 机制证据，缺一即 `unresolved`，可归属反例即 `disproven`；`unresolved` 不得读作“不耐久”；禁长期保证句式；候选机制等级 ≠ 平台等级；运行期 `unresolved`/`disproven` 按 `unproven` 行为执行；**升级的解锁边界**）；三条冻结句由平台常量改为按平台耐久等级参数化；ADR-013 行与 §5 回写指向该条款；**边界：不解除 Windows `unproven`**、不放宽 first-dispatch、不改 Go/schema/fixtures。① V4 Pro 裁定 U1–U14；③ 预审 `PASS WITH FIXES`→整改→复审 `PASS`→delta `PASS`；③.5 MAI 2 次均未产出可执行发现（格式偏离，已留痕）；④ Codex 3 次（首轮 `FINDINGS` 1M+1L → 复审仅缺原始 diff 证据 → 收口 **`PASS`**）。⑤ 34 项机械检查全绿 + 4 项变异检验全红且逐字节还原；门禁 gofmt/build/vet/test 全绿。**尚未提交**（待同轮授权） | docs/validation/t027-b3c-contracts-durability.md |
+ 
+ | 2026-09-15 | A5 | （依据 `docs/validation/t027-postflight-acceptance.md`）chain postflight acceptance：把 task 的 review 资格从 adapter 记录收敛到 chain 自有 postflight 门——只有"可重建的冻结事实 + 端口独立判定通过"才允许写 `REVIEW_PENDING`；已提交 `b8bad47` 并推送，GitHub Actions Ubuntu（含 `Race` 与 `Contract fixtures`）/Windows 全绿（run `34950623175`）。**字段来源**：日期、提交号、运行号、一句话摘要均取自该报告头部 | docs/validation/t027-postflight-acceptance.md |
+ | 2026-09-15 | A6 | （依据 `docs/validation/t027-offline-process.md`）离线 pinned CLI 运行：以代码常量固定外部 CLI 版本、绑定运行时长与宽限、停止整棵进程树、采集五枚冻结事实并映射为 chain 可消费终局（任何缺口与未证明的停机不得以 completed 表达）；`c2d2819` 已提交并推送 `origin/main`，修复提交 `6db5a10`，CI 全绿（run `35076045445`）；变异审计 **52 项全 RED / SURVIVED 0**。**字段来源**：该报告头部与 §8、§14 | docs/validation/t027-offline-process.md |
+diff --git a/docs/t027/REMAINING_SLICES_EN.md b/docs/t027/REMAINING_SLICES_EN.md
+index 6af0b88..3fed666 100644
+--- a/docs/t027/REMAINING_SLICES_EN.md
++++ b/docs/t027/REMAINING_SLICES_EN.md
+@@ -4,6 +4,7 @@
+ > The authoritative ledger remains docs/DEV_PLAN.md, docs/DEV_PLAN_EN.md, and docs/validation/; this file is only a temporary execution ledger.
+ > Baseline: 68664d8 (2026-09-14, already includes the #38 CI fix). Corrected inventory: 12 required slices + 1 deferrable slice; required size totals are M×7, M-L×1, L×4; including C1 the totals are M×8, M-L×1, L×4.
+ > **Revision 2026-09-19: B3 is split into B3a (power-loss injection rig and calibration) + B3b (candidate injection matrix and durability verdict)** ⇒ **13** required slices; required size totals become **M×8, M-L×2, L×3**; including C1: **M×9, M-L×2, L×3**. Rationale: A7 disproved that kill-level injection can decide the durability step (CP4≡CP5), and B3's prerequisites (a per-round journal that is itself provably durable, on a second physical device, plus restart inventory and two-way calibration) and its outcome (per-candidate injection and the three-tier verdict) are different kinds of work with different risks; mixing them invites drawing conclusions from an uncalibrated rig.
++> **Revision 2026-09-21: add B3c (CONTRACTS durability-upgrade clause, documentation only)** ⇒ **14** required slices; required size totals become **M×8, M-L×2, L×3, S×1**; including C1: **M×9, M-L×2, L×3, S×1**. Rationale: B3b produced a **tiered** verdict (C2 `proven`; C1/C3/C2C3/U4 `unresolved`), while the bilingual CONTRACTS still states "publication durability is unproven" as a **platform constant** with no upgrade condition and no unlock boundary; without freezing the wording first, B4 would stumble between the contract wording and the tiered verdict.
+ 
+ ## How to use
+ 
+@@ -41,8 +42,9 @@
+ | B1 candidate live capability + availability discovery | ✅ Complete (verdict: **no acceptable candidate in the assessed scope** ⇒ stays blocked; 9 live probes, 6 paid; ④ closed in 3 rounds + tool adoption in 6 rounds) | external per-call authorization | M | 2026-09-17 | `docs/validation/t027-b1-candidate-live-discovery.md`, `docs/validation/evidence/b1-20260917/` |
+ | B2 candidate/enforcement decision + proof | ✅ Complete (2026-09-18; decision = **external OS enforcement**; four commits pushed `58757e8`+`fd99dc3`+`408bd99`+`815c03f`, CI green three times run 35259806285 / 35261204021 / 35265268993; 41-artifact evidence bundle plus the archived rehearsal transcript) | B1 | L | 2026-09-18 | `docs/validation/B2-EXTERNAL-ENFORCEMENT.md`, `docs/validation/evidence/b2-2026-09-17/`, `tools/agent-probe/{appcontainer-b2,enforcement-proxy}/` |
+ | B3a power-loss injection rig + calibration | ✅ Complete (2026-09-20) | A7 | M-L | calibration `CALIBRATED`: negative control 4/5 losses, positive control 0/5; 36-record journal chain green; all 12 rounds audited `HARD-POWER-LOSS` | `docs/validation/B3A-CALIBRATION_EN.md`; `docs/validation/evidence/b3a-2026-09-20/` |
+-| B3b candidate injection matrix + durability verdict | ⬜ Not started | B3a | M | | |
+-| B4 AT-23 E2E evidence + independent review | ⬜ Not started | A5, A6, B1, B2, B3b | L | | |
++| B3b candidate injection matrix + durability verdict | ✅ Complete (`abfcecc`) | B3a | M | 2026-09-21 | `docs/validation/t027-b3b-durability.md`, `docs/validation/evidence/b3b-2026-09-21/` |
++| B3c CONTRACTS durability-upgrade clause revision | ✅ Complete (commit awaiting same-turn authorisation) | B3b | S | 2026-09-21 | `docs/validation/t027-b3c-contracts-durability.md`, `docs/validation/t027-b3c-contracts-durability_EN.md` |
++| B4 AT-23 E2E evidence + independent review | ⬜ Not started | A5, A6, B1, B2, B3b, B3c | L | | |
+ | C1 Linux AgentRunner native validation | ⬜ Not started | B4 (Windows T027 complete) | M | | |
+ 
+ Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked
+@@ -65,11 +67,12 @@ flowchart LR
+     B1[B1] --> B2[B2]
+     A7 --> B3a[B3a]
+     B3a --> B3b[B3b]
++    B3b --> B3c[B3c]
+     A5 --> B4[B4]
+     A6 --> B4
+     B1 --> B4
+     B2 --> B4
+-    B3b --> B4
++    B3c --> B4
+     B4 --> C1[C1]
+ ```
+ 
+@@ -393,7 +396,7 @@ Depends on: B3a
+ - [x] Issue **proven / disproven / unresolved** per candidate under the same premise, covering the counterexample families: out-of-order directory-entry loss, true orphan C, torn visibility.
+       (**Result**: **C2 `proven`**; C1/C3/C2C3 `unresolved`; U4 `unresolved` with 0 true orphans; verbatim reasons in report §4)
+ - [x] Write the conclusion back: ADR-013 candidate ordering, the validation report, both DEV_PLAN languages, the slice list; if `proven`, also evaluate/amend the CONTRACTS durability clauses and the first-dispatch unlock condition (protocol first), otherwise keep `unproven` and record the failure mode.
+-      (**Evaluation done** and written into report §7/§11: Windows `unproven` and the first-dispatch refusal are **not** lifted; **the CONTRACTS amendment is a conditional follow-up per design §10.6 and is not done in this slice** - protocol first, it needs its own slice)
++      (**Evaluation done** and written into report §7/§11: Windows `unproven` and the first-dispatch refusal are **not** lifted; **the CONTRACTS amendment is a conditional follow-up per design §10.6 and is not done in this slice** - protocol first, it needs its own slice; raised as **B3c**)
+ - [x] Reproduction and evidence pack: commands, round counts, raw journal, inventory output, failure samples, archived under `docs/validation/evidence/`.
+       (`docs/validation/evidence/b3b-2026-09-21/`: 2157 files, `rigMismatches=0 missingRequired=0`, including the `variant/` self-falsification section)
+ 
+@@ -403,9 +406,27 @@ Deliverables: candidate injection matrix results, three-tier verdicts with the p
+ Acceptance evidence: verdicts may only be proven/disproven/unresolved and must carry the raw per-round evidence; **only `proven` may lift the first-dispatch `unproven` refusal**; everything else stays blocked with the failure mode recorded.
+ Boundaries: do not treat B3a's calibration results as candidate evidence; do not relax first-dispatch after failure; do not extrapolate from a single round or a single sample.
+ 
++## B3c — CONTRACTS durability-upgrade clause revision · ⬜
++
++Depends on: B3b
++
++- [x] Add a normative **durability upgrade condition** clause to `docs/CONTRACTS{,_EN}.md`: the durability tier is **three-state** `proven` / `disproven` / `unresolved` (as in A7) and is decided **per platform and per premise P**; recording `proven` requires, under the same premise, (a) reproducible injection or control evidence, (b) a **discrimination gate** (the negative control can lose, the positive control does not), and (c) **mechanism evidence** (that stage's mechanism actually executed); missing any one of them leaves the answer `unresolved`, and neither "we observed no loss" nor "this round succeeded" may be cashed in as `proven`; "permanent durability" or "long-term guarantee" wording is forbidden.
++- [x] Turn the three frozen sentences from a **platform constant** into a rule **parameterised by the platform's durability tier**: (1) the replay store publication-durability sentence (`CONTRACTS.md` §7 replay-store paragraph, currently line 207 / `CONTRACTS_EN.md` line 201); (2) the launch-intent-follows-R sentence (§7 launch-receipt paragraph, currently 219 / 213); (3) the terminal-publication refusal sentence (§7 terminal publication and settlement paragraph, currently 225 / 219). All three must state that an upgrade only changes the rule value for **that platform under that premise** and does not affect any other platform or premise.
++- [x] State the **unlock boundary**: a platform's upgrade to `proven` lifts the corresponding refusal only on that platform and within the same premise; AT-23 must still pass and every other platform keeps its own conclusion; and record that **this verdict is tiered** (C2 `proven`, the rest `unresolved`) and is **not** a wholesale upgrade.
++- [x] Protocol-first order: bilingual CONTRACTS → schema/fixtures (**only if** a machine-readable enum is introduced) → code (**only if** gate semantics are touched); this slice **does not modify Go code**.
++- [x] Write back: the ADR-013 row, the validation report, `DEV_PLAN{,_EN}.md`, and both languages of this list.
++
++Goal: freeze B3b's tiered verdict into a **decidable contract wording**, so that "a platform's publication durability rises from `unproven` to `proven`" becomes a normative path with a premise, criteria, and boundaries, giving B4 a stable base.
++Current gap: the bilingual CONTRACTS states "publication durability is unproven" as a platform constant (on Windows, "new directory-entry persistence cannot currently be forced or proved" ⇒ `unproven`) and defines neither the upgrade condition nor what an upgrade does and does not unlock; that leaves a wording gap against B3b's tiered verdict.
++Deliverables: the bilingual durability-upgrade clause, the three amended frozen sentences, the unlock-boundary statement, and bilingual ledger/report write-back.
++Acceptance evidence: the clause is self-consistent (three-state, per platform and premise, all three criteria, no long-term-guarantee wording); the three frozen sentences match the clause word for word; both languages align sentence by sentence (row/marker isomorphism); the text never states that Windows `unproven` is lifted; encoding gates (BOM+LF) and `gofmt`/`build`/`vet`/`test` are all green (unchanged counts as green when no code changed).
++Boundaries: **this slice only freezes the wording and does not lift Windows `unproven`** (lifting needs that platform's own complete evidence, this clause, and an independent review, all of which belong to a later slice); do not change schema/fixtures (unless the clause genuinely needs a machine-readable enum), do not change Go code, do not re-run the B3b rig, and do not touch `tools/agent-probe/enforcement-proxy` (DR-2 is its own slice).
++
++**Observation item (registered 2026-09-21, directive unchanged)**: **the effectiveness of ③.5 on documentation-only slices is to be assessed** - MAI output is normal on code slices (A6), while on this slice (pure `.md`) both calls deviated from the format contract and produced no actionable finding (n=1, too small to amend the directive); **the next slice, B4 (a code slice), serves as the control**: normal output on B4 attributes this to "documentation-type work"; the same deviation on B4 attributes it to the model. If another 2-3 documentation-only slices behave the same way, revisit adding a §3.10 exception ("a contract revision that only edits `.md` and touches no executable semantics may skip ③.5 with ④ confirming"). See validation report §7.
++
+ ## B4 — AT-23 E2E evidence + independent review · ⬜
+ 
+-Depends on: A5, A6, B1, B2, B3b
++Depends on: A5, A6, B1, B2, B3b, B3c
+ 
+ - [ ] Run the full AT-23 scenario set on a real host, covering isolated workspace, timeout, missing logs, unknown recovery, and exit-0 rescan with independent gates or review.
+ - [ ] Build the evidence pack with input digests, environment summary, commands and cwd, exit codes, case counts, failure evidence, and skip reasons.
+@@ -439,7 +460,7 @@ Boundaries: this is a follow-up platform slice and must not rewrite the Windows
+ 
+ | Id | Carrier | Symptom (reproducible description) | Evidence (two runs) | Disposition plan |
+ | --- | --- | --- | --- | --- |
+-| **DR-2** | test: `tools/agent-probe/enforcement-proxy` (a B2-era tool, not introduced by this slice) | `TestConnectAuditTrailFailureDeniesAndDoesNotTunnel` fails **intermittently**: `enforcement-proxy: AUDIT TRAIL BROKEN (write …/proxy.jsonl: file already closed)` plus `main_test.go:125: target must have been reached while the audit trail was healthy`; the same code gives different results across runs ⇒ flaky, pointing at a **handle/timing race** inside that test (the log file is written after it has been closed) | run **`35563800665`** (head `d2f508c`) failed the Ubuntu `Test` step; run **`35562559401`** (head `abfcecc`) passed that package; re-running `35563800665` is green on both legs | fix in its **own** slice with protocol-first and full gates, **before B4**; neither B3b nor this documentation change touches that tool across slices. Rationale: a flaky test erodes the credibility of every later CI signal, so it must be cleared before B4 |
++| **DR-2** | test: `tools/agent-probe/enforcement-proxy` (a B2-era tool, not introduced by this slice) | `TestConnectAuditTrailFailureDeniesAndDoesNotTunnel` fails **intermittently**: `enforcement-proxy: AUDIT TRAIL BROKEN (write …/proxy.jsonl: file already closed)` plus `main_test.go:125: target must have been reached while the audit trail was healthy`; the same code gives different results across runs ⇒ flaky, pointing at a **handle/timing race** inside that test (the log file is written after it has been closed) | run **`35563800665`** (head `d2f508c`) failed the Ubuntu `Test` step; run **`35562559401`** (head `abfcecc`) passed that package; re-running `35563800665` is green on both legs; the docs back-fill commit `dd36b9b` (run **`35564805991`**) is green on both legs with no recurrence in that package | fix in its **own** slice with protocol-first and full gates, **before B4**; neither B3b nor this documentation change touches that tool across slices. Rationale: a flaky test erodes the credibility of every later CI signal, so it must be cleared before B4 |
+ 
+ > This table only registers defects with observed evidence; DR-1 lives in the B1 paragraph of `DEV_PLAN.md` and in `docs/validation/t027-b1-candidate-live-discovery.md` (a product defect, a production behaviour change needing its own slice).
+ 
+@@ -453,6 +474,7 @@ Boundaries: this is a follow-up platform slice and must not rewrite the Windows
+ | 2026-09-14 | A3 | terminal publication and settlement: the four-phase chain (intent→Settle→C→closure) with two-file store-local records; deterministic idempotency keys and evidence binding; orphan/foreign-key/charged>reserved/matrix rejections; unknown retention; pre-settlement rejection on unproven with write-free complete-chain replay; idempotent recovery across crash windows i/ii/iii; V4 Pro pre-analysis plus pre-review (H1/M1/M2/M3/L1/L5 remediated) and the Codex final review (2 Medium + 3 Low remediated, 3 counterexamples added) plus the Codex remediation re-review PASS (2026-09-15, no Critical/High/Medium) plus tail-item remediation and the Codex extra confirmation PASS (2026-09-15); committed as `c6f8585` and pushed, GitHub Actions Ubuntu (including the Race step)/Windows green (run 34900979883); CI evidence write-back committed as `057d599` (run 34901323914 green) | docs/validation/t027-terminal-publication.md |
+ | 2026-09-15 | A4 | chain terminal routing and resume: protocol-first (bilingual CONTRACTS §2.1 state row and the §7 "Chain terminal routing" paragraph, the schema `stepTransition`, 126 contract fixtures including 3 new cases); the new step state `TERMINAL_PENDING` (written only after a successful dispatch, never a resting state, part of the recover uncertainty list and the cancel cleanup); the single core write entry `SubmitAgentRunnerTerminal` routes five statuses (completed passes only the step, failed fails task/chain, uncertain fails the task and keeps the chain PAUSED without retry, cancelled archives stop evidence first, operator-action-required parks task/step and pauses the chain before the T025 handover); the one-way adapters translation binds every request→intent→closure field including the settlement slot and is strictly read-only against the store; repeated terminals converge idempotently across both partial-write windows while a different terminal conflicts with zero writes; resume continuity accepts `PriorCompletionHash` appearing in the step's event evidence history as the only proof; the V4 Pro pre-review found 1 Medium (operator-route crash window) plus 2 Low and re-reviewed with no Medium+ after remediation (one further Low fixed); the Codex final review found 1 Medium (unbound settlement slot) plus 1 Low (a BOM claim shown to be a false positive by byte-level measurement, evidenced) and Codex re-reviewed PASS after remediation; all local gates and the contract-fixture gate are green; committed as `a21335d` and pushed, GitHub Actions Ubuntu (including the Race and Contract fixtures steps)/Windows green (run 34920155025); the CI evidence write-back is committed as `a1c643c` (run 34920548264 green) | docs/validation/t027-terminal-routing.md |
+ | 2026-09-21 | B3b | candidate injection matrix + durability verdict: the whole rig is now a live experiment (session lock, stale-session recovery after hard power-off, settled inventory pair, fail-closed verdicts); the main matrix ran **17 cells × 5 = 85 rounds, all valid, 0 void**, and U4 ran **6 cells × 3 = 18 rounds, all valid, 0 true orphans**; the discrimination gate holds (negative control 5/5 lost, positive control 5/5 survived); the three-tier verdict is **C2 `proven`** with C1/C3/C2C3 `unresolved` (the verbatim reasons for C3/C2C3 are `mechanism evidence missing in rounds 77 / 81`, which is the rig failing closed, not a durability finding); the variant arm (device self-falsification) shows the rig refusing to cash a `survived` round into a claim when the primitive was silently degraded, corroborated offline by a build-tag-only failing test; nine live-run defects (P1–P9) were fixed in place, each with a falsification experiment; V4 Pro `changes-required`→closing PASS, MAI PASS, Codex **6 calls** (over-budget rationale and per-call findings in report §8); **committed as `abfcecc` and pushed to `origin/main` (never to gitee)**, CI run **`35562559401`** green on both legs (Ubuntu including Race and Contract fixtures, and Windows) | docs/validation/t027-b3b-durability.md; evidence pack docs/validation/evidence/b3b-2026-09-21/ |
++| 2026-09-21 | B3c | CONTRACTS durability-upgrade clause revision (documentation only, protocol first): §7 gains **Publication-durability tiers and upgrade conditions** (three-state `proven`/`disproven`/`unresolved`; unit of judgment (platform × premise P); the three `proven` criteria (a) reproducible injection or control evidence / (b) discrimination gate / (c) mechanism evidence, missing any one leaves `unresolved`, an attributable counterexample is `disproven`; `unresolved` must never be read as "not durable"; long-term-guarantee wording forbidden; candidate mechanism tier ≠ platform tier; at runtime `unresolved`/`disproven` behave as `unproven`; the **upgrade unlock boundary**); the three frozen sentences move from a platform constant to a rule parameterised by the platform's durability tier; the ADR-013 row and §5 now point at that clause; **boundary: Windows `unproven` is not lifted**, first-dispatch is not relaxed, and no Go/schema/fixtures change is made. ① V4 Pro rulings U1–U14; ③ pre-review `PASS WITH FIXES` → fixes → re-review `PASS` → delta `PASS`; ③.5 MAI produced no actionable finding in 2 calls (format deviation on record); ④ Codex 3 calls (first `FINDINGS` 1M+1L → re-review blocked only on raw-diff evidence → closing round **`PASS`**). ⑤ 34 mechanical checks all green plus 4 mutation experiments all red and byte-identical restore; gates gofmt/build/vet/test green. **Not yet committed** (awaiting same-turn authorisation) | docs/validation/t027-b3c-contracts-durability.md |
+ 
+ | 2026-09-15 | A5 | (per `docs/validation/t027-postflight-acceptance.md`) chain postflight acceptance: moved a task's review qualification from adapter records into the chain's own postflight gate, so `REVIEW_PENDING` may only be written when "reconstructible frozen facts plus an independent port decision" both pass; committed as `b8bad47` and pushed, GitHub Actions Ubuntu (including `Race` and `Contract fixtures`)/Windows green (run `34950623175`). **Field sources**: date, commit, run id and the one-line summary all come from that report's header | docs/validation/t027-postflight-acceptance.md |
+ | 2026-09-15 | A6 | (per `docs/validation/t027-offline-process.md`) offline pinned CLI run: pins the external CLI version with a code constant, binds runtime and grace, stops the whole process tree, collects five frozen facts and maps the result into a chain-consumable terminal (no gap and no unproven stop may be expressed as completed); `c2d2819` committed and pushed to `origin/main`, fix commit `6db5a10`, CI green (run `35076045445`); mutation audit **52 items all RED / SURVIVED 0**. **Field sources**: that report's header plus §8 and §14 | docs/validation/t027-offline-process.md |
+diff --git a/docs/validation/t027-b3b-durability.md b/docs/validation/t027-b3b-durability.md
+index cdbf167..a080966 100644
+--- a/docs/validation/t027-b3b-durability.md
++++ b/docs/validation/t027-b3b-durability.md
+@@ -189,7 +189,7 @@ C3/C2C3 的决定格各有 **1/5 轮**断电落在机制真正执行之前（tra
+ - **保真度未证明**（§1 末）：不得声称装置等价物理断电；如需该主张必须另有独立检验（本片未做）。
+ - **时间口径**：单轮实测 ≈5.3–7.3 min（非设计早期估算的 3.8–4.6 min）；按每轮 `inventory-reads.txt` 实测分布回算，不得沿用"两次盘点"旧口径。
+ - **D4**：证据包 `calibration/`・`u4/` 分区缺席（见 §3.5）。
+-- **CI 抖动观察（一次）**：docs 提交 `d2f508c` 的 run `35563800665` 首跑 Ubuntu `Test` 步骤失败于 `tools/agent-probe/enforcement-proxy` 的 `TestConnectAuditTrailFailureDeniesAndDoesNotTunnel`（`AUDIT TRAIL BROKEN (write …/proxy.jsonl: file already closed)`；`main_test.go:125: target must have been reached while the audit trail was healthy`）；**同一代码**在前一 run `35562559401` 该包为 success，复跑 `35563800665` 双腿全绿 ⇒ 判定**偶发**、指向该测试自身句柄/时序竞态；**本片不跨切片修改 B2 期工具**（已登记为 **DR-2**，见切片清单的已知缺陷表）。
++- **CI 抖动观察（一次）**：docs 提交 `d2f508c` 的 run `35563800665` 首跑 Ubuntu `Test` 步骤失败于 `tools/agent-probe/enforcement-proxy` 的 `TestConnectAuditTrailFailureDeniesAndDoesNotTunnel`（`AUDIT TRAIL BROKEN (write …/proxy.jsonl: file already closed)`；`main_test.go:125: target must have been reached while the audit trail was healthy`）；**同一代码**在前一 run `35562559401` 该包为 success，复跑 `35563800665` 双腿全绿，docs 回写提交 `dd36b9b` 的 run `35564805991` 双腿全绿且该包未复现 ⇒ 判定**偶发**、指向该测试自身句柄/时序竞态；**本片不跨切片修改 B2 期工具**（已登记为 **DR-2**，见切片清单的已知缺陷表）。
+ - 后续：`proven` 若要用到产品契约，需独立的契约修订切片；Windows `unproven`、`first-dispatch` 拒绝、AT-23 结论**均未改变**。
+ - **台账缺口修复状态（2026-09-21，用户授权后）**：`REMAINING_SLICES{,_EN}.md` 完成记录表的 **A5/A6/A7/B2/B3a 五行已补录**——依据各切片**自身验证报告**、逐行标注来源、仅补可核验字段（日期/提交号/运行号/证据链接/一句话摘要），无法核验者标注 **历史缺失**（如 B2 的 CI 运行号）；补录后双语行数对称（11/11）。同轮修复了我自己引入的一处缺陷：**EN 台账的 A4 行曾在补录编辑中被误删**（oldString 含 A4、newString 未回填），已回填并复核——该缺陷由本轮自检发现并在同一轮修复，**如实留痕**。**仍待回填**：`DEV_PLAN{,_EN}.md` 的 B3a 段落（B3b 段已补）。
+ 
+diff --git a/docs/validation/t027-b3b-durability_EN.md b/docs/validation/t027-b3b-durability_EN.md
+index e177e6c..6bc1e56 100644
+--- a/docs/validation/t027-b3b-durability_EN.md
++++ b/docs/validation/t027-b3b-durability_EN.md
+@@ -187,7 +187,7 @@ The rig fails closed and **refuses** to count a survival whose mechanism never r
+ - **Fidelity is not proven** (end of §1): do not claim the device equals a physical power loss; that claim would need an independent check (not done here).
+ - **Timing basis**: measured cost is ≈5.3–7.3 min/round, not the earlier 3.8–4.6 min estimate; recompute from each round's `inventory-reads.txt` distribution rather than the old "two inventories" basis.
+ - **D4**: the evidence pack's `calibration/` and `u4/` sections are absent (see §3.5).
+-- **CI flake (one occurrence)**: the docs commit `d2f508c` produced run `35563800665`, whose first attempt failed the Ubuntu `Test` step in `tools/agent-probe/enforcement-proxy` at `TestConnectAuditTrailFailureDeniesAndDoesNotTunnel` (`AUDIT TRAIL BROKEN (write …/proxy.jsonl: file already closed)`; `main_test.go:125: target must have been reached while the audit trail was healthy`); **the same code** passed that package in the earlier run `35562559401`, and re-running `35563800665` is green on both legs ⇒ judged **flaky**, pointing at a handle/timing race inside that test; **this slice does not modify a B2-era tool across slices** (registered as **DR-2** in the slice list's known-defects table).
++- **CI flake (one occurrence)**: the docs commit `d2f508c` produced run `35563800665`, whose first attempt failed the Ubuntu `Test` step in `tools/agent-probe/enforcement-proxy` at `TestConnectAuditTrailFailureDeniesAndDoesNotTunnel` (`AUDIT TRAIL BROKEN (write …/proxy.jsonl: file already closed)`; `main_test.go:125: target must have been reached while the audit trail was healthy`); **the same code** passed that package in the earlier run `35562559401`, re-running `35563800665` is green on both legs, and the docs back-fill commit `dd36b9b` (run `35564805991`) is green on both legs with no recurrence in that package ⇒ judged **flaky**, pointing at a handle/timing race inside that test; **this slice does not modify a B2-era tool across slices** (registered as **DR-2** in the slice list's known-defects table).
+ - Follow-up: using `proven` in a product contract needs its own protocol-first contract slice; the Windows `unproven` state, the `first-dispatch` refusal and the AT-23 conclusions are **unchanged**.
+ - **Ledger gap repair status (2026-09-21, after user authorisation)**: the five rows **A5/A6/A7/B2/B3a were back-filled** into the completion log of `REMAINING_SLICES{,_EN}.md`, each based on that slice's **own validation report**, each annotated with its field sources and restricted to verifiable fields (date, commit, run id, evidence link, one-line summary); anything unverifiable is marked as a **historic gap** (e.g. B2's CI run id). The two languages now match row for row (11/11). The same turn fixed a defect I had introduced myself: **EN's A4 row had been deleted by that back-fill edit** (the oldString contained the A4 row while the newString did not restore it); it has been restored and re-checked, and the defect is recorded here as an honest trace, having been found and fixed within the same turn. **Still owed**: the B3a paragraph in `DEV_PLAN{,_EN}.md` (B3b's is added).
+ 
+diff --git a/docs/validation/t027-b3c-contracts-durability.md b/docs/validation/t027-b3c-contracts-durability.md
+new file mode 100644
+index 0000000..2a1a340
+--- /dev/null
++++ b/docs/validation/t027-b3c-contracts-durability.md
+@@ -0,0 +1,155 @@
++﻿# T027 · B3c · CONTRACTS 耐久升级条款修订 — 验证报告
++
++日期：2026-09-21。状态：`COMPLETE`（① V4 Pro 前置分析 / ③ V4 Pro 预审 / ③.5 独立扫描 / ④ Codex 终审均见 §9；提交与推送**未执行**，待同轮授权）。
++
++## 0. 诚实准则（本报告所有结论的前提）
++
++1. 本片**只固化契约口径**，不解除 Windows `unproven`、不放宽 `first-dispatch`、不改变 T027 `BLOCKED / NOT IMPLEMENTED`，也不构成 AT-23 证据。任何 `proven` 表述必须能追溯到"哪个平台 + 哪个前提 + 哪些证据"。
++2. 本片**不含任何 `.go` / `.json` / schema / fixtures 改动**；门禁以"不变即绿"为验收口径。
++3. 本片**未重跑** B3a/B3b 实机装置，未触碰 `tools/agent-probe/enforcement-proxy`（DR-2 属独立切片）。
++4. 报告中的引用字段（文件、行号、计数、mutation 结果）均取自实际执行的命令输出与本片审查记录；未执行者一律写入 §10。
++
++## 1. 范围与边界
++
++**目标**：把 B3b 的**分级**结论（C2 `proven`，C1/C3/C2C3/U4 `unresolved`）固化为**可被判定的契约口径**，使"某平台发布耐久从 `unproven` 升级为 `proven`"成为一条有前提、有判据、有边界的规范路径，为 B4 提供稳定基础。
++
++**现状缺口（本片修掉的）**：CONTRACTS 双语把"发布耐久未证明"写成**平台常量**（Windows 侧"新目录项持久性当前既不能强制也不能证明"⇒ `unproven`），既没有规定升级条件，也没有规定升级后解锁什么、不解锁什么。
++
++**边界（已遵守）**：
++- **本片只固化口径，不解除 Windows `unproven`**；`first-dispatch` 拒绝、AT-23 结论、其它平台结论**均未改变**。
++- 不改 Go 实现、不改 schema/fixtures、不重跑实机、不触碰 B2 期工具。
++- 不越切片处理 DR-2（CI flake），仅随本片文档提交补录第三组 run 证据。
++
++## 2. 改动清单（8 个 `.md`，本次工作树全部改动）
++
++| # | 文件 | 改动性质 |
++|---|---|---|
++| 1 | `docs/CONTRACTS.md` | §7 新增「**发布耐久等级与升级条件**」段（L209）；三条冻结句参数化（L207 / L219 / L225） |
++| 2 | `docs/CONTRACTS_EN.md` | §7 英文镜像（新段 L203；句 1/2/3 = L201 / L213 / L219） |
++| 3 | `docs/ADR_REGISTER.md` | ADR-013 行完成条件与 §5 采纳前置改为指向新条款（B3c） |
++| 4 | `docs/ADR_REGISTER_EN.md` | 同上，英文镜像 |
++| 5 | `docs/t027/REMAINING_SLICES.md` | 新增 B3c 切片定义（含范围四条、目标、缺口、交付物、验收证据、边界）、状态表、依赖图（`B3b → B3c → B4`）、顶部 2026-09-21 修订说明；B4 依赖补 `B3c` |
++| 6 | `docs/t027/REMAINING_SLICES_EN.md` | 同上，英文镜像 |
++| 7 | `docs/validation/t027-b3b-durability.md` | §7「CI 抖动观察」补第三组 run 证据 |
++| 8 | `docs/validation/t027-b3b-durability_EN.md` | 同上，英文镜像 |
++
++**CI 结果回填（随本片文档提交，不另立提交）**：`dd36b9b`（docs 回写提交，head `dd36b9b`）的 CI run **`35564805991`** = **success**；`Go ubuntu-latest` 与 `Go windows-latest` **双绿**，其中上一轮偶发的 `tools/agent-probe/enforcement-proxy::TestConnectAuditTrailFailureDeniesAndDoesNotTunnel` **未复现**——与 DR-2「偶发、指向该测试自身句柄/时序竞态」的判定一致。
++
++## 3. 新增条款要点（`docs/CONTRACTS.md` §7 / `docs/CONTRACTS_EN.md` §7）
++
++1. **三态**：`proven` / `disproven` / `unresolved`（`observed`/`falsified` 只作证据注释，不作等级），与 A7 一致。
++2. **判定单元 = （平台 × 前提 P）**：任何等级表述必须同时携带平台、前提与证据；禁止把某前提下的等级改述为无前提的平台级等级（平台级只可表述 `unproven` 默认态）；任何 `proven` 必须能追溯到平台 + 前提 + 证据。
++3. **记 `proven` 的三项判据（同一前提下须同时具备）**：
++   (a) 可复现注入或对照证据（有效轮落在允许集内、证据包可由轮次记录与 journal 复算、无真孤儿）；
++   (b) **区分力门**（同一装置、同一写入器与同一记录级载荷下，负对照出现 ≥1 次丢失、正对照零丢失；**门不成立即封顶 `unresolved`**）；
++   (c) **机制证据**（该轮所主张的持久化机制确实执行过）。
++   **任一缺失即 `unresolved`**（且 `unresolved` 只表示未能建立主张，**不得读作"不耐久"或"已被证伪"**）；存在可归属反例（阶段命中且机制确已执行仍丢失）即 `disproven`。
++4. **禁句式**：禁止"永久耐久 / 长期保证 / 已验证断电安全 / 跨前提普遍耐久"类表述；`proven` 只能表述为"该前提下、该装置与统计分辨率内未观测到反例，且机制确已执行，且装置具备区分力"。
++5. **对象分离**：候选机制等级 ≠ **平台发布耐久等级**；平台等级只由该平台**生产实现所采用的机制**在覆盖目标部署环境的前提下的证据决定——排除"候选 `proven` ⇒ 平台 `proven`"的短路读法。
++6. **运行期映射**：`unresolved` 与 `disproven` 一律按 `unproven` 行为执行（fail-closed 不变）。
++7. **升级的解锁边界**：某（平台 × 前提）升为 `proven` 后，**仅在该平台、该前提覆盖的部署环境内**解除对应拒绝；**不解锁**任何其它前提或平台，**不豁免 AT-23**（仍必须通过）、**不豁免独立评审与协议先行**、也不放宽 `first-dispatch` 之外的任何门禁。平台等级升级必须协议先行修订本节、证据可追溯并通过独立评审。
++8. **既有实例**：本地 Unix 文件系统上"新 link 创建成功且父目录 `fsync` 成功"在既有契约口径下视为满足全部判据的实例（其前提即"本地 Unix 文件系统类"）。
++
++## 4. 三条冻结句的参数化（逐条）
++
++| 句 | 位置 | 改动要点 |
++|---|---|---|
++| 1 | CN L207 / EN L201（replay store 段） | "新目录项持久性**当前既不能强制也不能证明** ⇒ `unproven`" → "新目录项持久性的等级**不是平台常量**：按本节条款逐平台、逐前提判定…（未满足全部判据时即 `unproven`）"；并写明"依据 B3b 结论账本（`docs/validation/t027-b3b-durability.md` §4），Windows 结论是**分级**的（C2 `proven`，其余 `unresolved`），不是整体升级，Windows 平台发布耐久等级**仍为** `unproven`" |
++| 2 | CN L219 / EN L213（launch 回执段） | "发布耐久未证明的平台上…" → "某平台的发布耐久等级为 `unproven` 时（逐平台、逐前提判定，见本节条款）…"；补"等级升级只改变**该平台在该前提下的**本规则取值" |
++| 3 | CN L225 / EN L219（终局发布与结算段） | 同构参数化 + 同一升级边界句 |
++
++**拒绝强度未变**：句 2 仍为 pre-write 拒绝、绝不 spawn、绝不返回 `first-launch`；句 3 仍为不写意图、不结算、不发布 C、不写 closure，已有完整链只可无写重放。
++
++## 5. 可证伪性（机械检查 + 变异检验）
++
++临时脚本 `tmp/b3c-checks.js`（gitignore，用后已删）：
++
++- **基线机械检查 34 项全部 GREEN**，覆盖：三态句、判定单元、区分力门收紧、机制证据、`unresolved` 防误读锚点、升级边界句（2 处）、AT-23 不豁免、运行期映射、平台升级协议先行、分级锚定句、Windows 仍 `unproven`、条款标题引用数（CN 4 / EN 4）、结论账本定位、**旧平台常量句残留 = 0**、无条件解除表述 = 0、字符级缺陷 = 0、B4 依赖含 B3c（双语）、依赖图边、陈旧行号锚点 = 0、第三组 CI run 记录（双语各 1）。
++- **变异检验 4 项（A12 专项独立佐证，逐项"改错即红"）**：
++  | 变异 | 期望变红的检查 | 实测 |
++  |---|---|---|
++  | M1 删去句 1 的"不是整体升级" | C19 分级锚定句 | **RED**（无其它连带失败） |
++  | M2 把区分力门退回弱措辞"负对照可丢失" | C05 区分力门收紧 | **RED** |
++  | M3 删去 EN 句 2 的"只改变该平台该前提取值" | C12 升级边界句计数 | **RED** |
++  | M4 写入无条件升级/解除表述 | C28 无条件解除 = 0 | **RED**（连带 C21 Windows 仍 `unproven`） |
++- **还原完整性**：4 次变异后文件**逐字节还原**（SHA-256 与变异前一致），还原后 34 项检查重新 ALL GREEN。
++- **机械检查的覆盖边界**：§"当前不可机械验证"三项——"证据包可由轮次与 journal 复算"（需对证据包实跑）、"前提覆盖目标部署环境"（需部署清单）、"独立评审充分性"（需审查流程记录）——本片均**未**声称已验证。
++
++## 6. 门禁
++
++| 项 | 结果 |
++|---|---|
++| `gofmt -l .` | 空输出 |
++| `go build ./...` | exit 0 |
++| `go vet ./...` | exit 0 |
++| `go test ./...` | exit 0（`ok` 包数 **14**，`FAIL` 计数 **0**） |
++| 编码/行尾（8 个 `.md`） | UTF-8 **with BOM** + **LF**：**PASS**（逐文件字节核验） |
++| 契约夹具 | 未受影响（无 schema/fixtures 改动） |
++
++## 7. 已知边界与后续
++
++- **本片不构成耐久证据**：它只规定"升级需要什么"，本身不产生任何 `proven`。
++- **Windows 仍 `unproven`、`first-dispatch` 仍拒绝、T027 仍 `BLOCKED / NOT IMPLEMENTED`、AT-23 未通过**——四处结论**均未改变**。
++- **DR-2（`enforcement-proxy` 偶发 flake）仍在案**：本片仅补录第三组 run 证据（未复现），**不跨切片修该工具**；处置仍为"B4 之前另立独立切片"。
++- **`unresolved` 与 `disproven` 的运行时行为**：一律等同 `unproven`（契约已写明），未来若需区分，属新切片。
++- **遗留**：③.5 独立扫描两轮均**未产出可执行发现**（首轮与重发均格式偏离），已在 §9.2 如实留痕并按 §3.10 上限停止重跑；其"无 Medium+"的结论**不构成审查充分性证明**。- **观察项（2026-09-21 用户裁定：登记但不改准则）**：**③.5 在纯文档切片上的有效性待评估**。事实：MAI 在代码切片（A6）输出正常，本片（纯 `.md`）2 次输出均偏离格式契约且未产出可执行发现；样本量 n=1，**不足以修订准则**。处置：下一片 **B4（代码切片）** 作对照——B4 输出正常 ⇒ 本片偏离归因“文档类任务特性”；B4 同样偏离 ⇒ 归因模型能力问题。若后续再有 2–3 片纯文档切片同样表现，再考虑为 §3.10 增加例外（“纯 `.md` 修改且不涉及可执行语义的契约修订，可跳过 ③.5，由 ④ 确认”）。**本片不改准则。**
++- **清理确认（2026-09-21，用户同轮授权）**：清理 `tmp/b3b/` 的 **11** 个遗留件（8 个 rig 控制台日志 + 3 个写入器构建产物，合计 **26,883,260 B**）。**先确认与证据包无关**：`docs/validation/evidence/b3b-2026-09-21/SHA256SUMS.txt`（2157 项）中 `.exe` 条目 **0**，且 11 个文件名与包内**无一匹配**（包内日志为 `session/session.log` 与 `variant/session.log`，路径与名称均不同）；`writer.exe` 的身份已由本报告 §3.2 的 sha256 `06de8a72…`（实测 `06de8a728ae984318a7955d01853443f30749a621c81d4caa47044c5b7017a82`）登记在案，属可由 `go test -c -tags b3bnative` 重建的构建产物。⇒ 判定**与证据包无关**，按指示**直接删除**（删前已逐项留 sha256：`writer.exe` `06de8a72…`、`writer-variant.exe` `5b0d06d8…`、`writer-rebuild-check.exe` `880655ce…`；8 个日志已逐项留存摘要于本轮终端输出）。
++## 8. 成本与计量
++
++- **探针额度：0/10 使用**（本片全离线，无付费探针、无真实模型调用）。
++- **① V4 Pro**：前置分析 ×1（裁定 U1–U14 全按推荐采纳）。
++- **③ V4 Pro**：预审 ×1（`PASS WITH FIXES`：1 Medium + 1 Low 必须修、3 Low 建议）→ 整改 → 复审 ×1（`RE-REVIEW: PASS`，4 项 Low）→ delta 复审 ×1（`DELTA-REVIEW: PASS`，1 项 Low）。
++- **③.5 MAI-Code-1.1-Flash**：2 次（首轮 + 异常重发 1 次），均未产出可执行发现（见 §9.2）；未超 §3.10 的 ≤3 上限。
++- **④ GPT-5.3 Codex**：3 次——首轮终审（不附任何清单，事实上的盲审）`FINDINGS`（1 Medium + 1 Low）→ 整改 → 复审 `FINDINGS`（唯一阻断项为"缺原始 diff hunk 证据"）→ 主控落盘原始 diff 后收口轮 **`PASS`**。
++- **§3.11 必抽盲审**：本片 ④ 首轮**未附任何 ③/③.5 清单**，即为一次事实上的盲审；与 B3b 合并判断同理（输入集合同构，重复调用只增成本不增判别力），故未追加第二次盲审，理由在此显式记录。
++- **⑤ 墙钟**：机械检查 + 4 项变异检验单次约 2 s；门禁套件约 1 min。
++- **token**：由用户从用量 UI 回填后计入本行（主控不自行估计）。
++
++## 9. 审查记录（① / ③ / ③.5 / ④）与收口闭环
++
++### 9.1 ① V4 Pro 前置分析
++
++裁定 **U1–U14 全按推荐采纳**，其中关键项：条款落点为 replay store 段后的独立段（U1）；判定粒度 = 平台 × 前提（U2）；区分力门与机制证据入判据（U3）；独立评审定位为**升级治理前置**而非等级判据（U4）；"证据包可复现"并入判据 (a)（U5）；补 `disproven` 触发规则（U6）；写明运行期映射（U7）；**不改 schema**（U8）；ADR 只记账本、判据单一权威在 CONTRACTS（U10）；新增本验证报告（U11）；双语台账回写（U12）；④ 保留终审（U13）；分级锚定句只落两处（U14）。
++
++### 9.2 ③ V4 Pro 预审与 ③.5 独立扫描
++
++- **③ 预审**：`PASS WITH FIXES`。**Medium（必须修）**：A1 区分力门措辞弱于 `docs/t027/B3B_DESIGN.md` §7 的唯一权威标准且未写"门不成立"的后果；E1/E2 ADR-013 行完成条件与 §5 旧句引用未按 U10 回写（悬空引用）。**Low**：A2 Unix 实例补前提、A3 收窄"无前提平台级等级"禁令、A4 来源文档改名并加定位、C1 补 `unresolved` 防误读锚点。全部整改。
++- **③ 复审**：`RE-REVIEW: PASS`（A1–A4 / C1 / E1 / E2 逐条闭合，无 Medium+ 新发现；4 项 Low：写入器同一性、中文错字、EN 加粗与标记对齐等）。
++- **③ delta 复审**：`DELTA-REVIEW: PASS`（三项 delta 全部按序落地；唯一 Low 为加粗位置不对称，已整改）。
++- **③.5 MAI 独立扫描**：**2 次调用均未产出可执行发现**。首轮输出结构偏离（自创章节、无 `file:line` 发现、无结论行）；按 §3.10「重发仅限截断或异常，且计入上限」重发 1 次，重发仍偏离（仍无 Section A–E 与结论行，但已实际读取文档并逐字引用真实文本，佐证了"未发现解除性问题"）。**主控处置**：按上限停止重跑，记为"无 Medium+ 发现、格式偏离留痕"，并在 ⑤ 以 **4 项变异检验**承担 A12 专项独立佐证角色（对"检查是否真的有判别力"给出与 MAI 无关的独立判据）。**该层结论不构成审查充分性证明。**
++
++### 9.3 ④ Codex 独立终审
++
++| 轮 | 目的 | 结论 | 发现 |
++|---|---|---|---|
++| 1 | 首轮终审（**不附任何 ③/③.5 清单**） | `FINDINGS` | 2 项：**Medium**（B4 小节依赖行未补 `B3c`，与状态表/依赖图自相矛盾）+ **Low**（B3c 条目行号锚点陈旧） |
++| 2 | 对整改的复审 | `FINDINGS` | 唯一阻断项 = "未取得原始统一补丁 hunk 证据"（子代理无终端权限）；**实质各项均判定闭合** |
++| 3 | 收口（主控落盘原始 diff 供其读取） | **`PASS`** | 0（含 CN/EN 同构实测：条款四段合计分句 **16/16**、加粗标记 **13/13**） |
++
++### 9.4 ⑤ 就地发现并修复的自伤缺陷（如实留痕）
++
++- **主控自己引入的字符级缺陷**：用 `\uXXXX` 转义书写中文时把「拒**绝**」(U+7EDD) 误写成「拒**绍**」(U+7ECD)，一次污染 **5 处**（`docs/CONTRACTS.md` §7 两处、`docs/t027/REMAINING_SLICES.md` 三处）；且替换工具对形近字 oldString **仍报成功**，掩盖了错误。
++- **发现途径**：③ 复审的 Low（B-N1 术语）→ 主控定位 → 全库核查确认 HEAD 中 0 处、工作树 5 处（即本片引入）。
++- **修复与独立验证**：5 处逐一定点改回「拒绝」；随后执行**异常字扫描**（取 `git diff --unified=0` 新增行的 CJK 字符集合，与 HEAD 全库 `.md` 语料求差）⇒ **差集为空**；`拒绍` 全库计数 **0**；④ 复审轮独立复核同样为 0。
++- 该教训（含"中文一律直接写字符、禁用 `\u` 转义；每次改动后跑异常字扫描"）已写入仓库记忆。
++
++### 9.5 A11 抽查（对称抽样）
++
++- ④ Codex 声明的 Section D 断言中，主控实际执行了 **4 条**（D1 三态 / D3 区分力门与机制证据 / D4 平台×前提边界 / D8 B4 依赖闭合）并将其固化为可执行检查；其中 **D8 在首轮实为"已红"**（B4 依赖缺失），与研究发现的 Medium 一致——即抽样不仅验证了"删掉即红"，也复现了真实缺陷。抽查项、期望值与实测值均见 §5。
++- **缺位声明**：③.5 MAI 两轮均未给出可执行的"删守卫→变红"条目，故抽样无法落在 MAI 侧；记为已知局限（抽样只提供**存在性佐证**，不构成覆盖率证明）。
++
++## 10. 明确未执行事项
++
++- **未 `commit` / 未 `push`**：按纪律停在可审查状态，等待用户同轮显式授权。
++- **未解除 Windows `unproven`**、未放宽 `first-dispatch`、未改变 AT-23 与 T027 结论。
++- **未做真实模型调用 / 付费 probe**；**未重跑 B3a/B3b 实机**；**未触碰** `tools/agent-probe/enforcement-proxy`。
++- **未修改**任何 `.go` / `.json` / schema / fixtures。
++- **未做** CI 观察（尚未推送）；工作树改动的 CI 结果**待推送后**回填。
++
++## 11. 下一步建议（§7.4）
++
++> 下一片按依赖图应为 **B4 · Windows T027 端到端（AT-23）**；本片已把"契约口径"与"分级结论"之间的空档补齐，B4 可直接以 §7 的耐久升级条款作为输入。
++> 建议档位——主控 **深度（Max）**（仅①设计与②E2E 方案成文步骤）、V4 Pro **①③ 必调**（B4 触及停机/身份/所有权语义）、③.5 **启用**（行为变更切片；且需注意本片 MAI 输出格式不稳定的现状）、Codex **Extra High（④ 必调 + 按 §3.11 必抽盲审）**。
++> 与 B4 并行的待清项：**DR-2**（`enforcement-proxy` 偶发 flake，B4 之前另立独立切片修复）。
++
++- **准则待议（承接 B3b 的 D2 裁决）**：硬门切片的 ④ 调用上限是否需要单列？本片 ④ 实测 3 次（1 终审 + 1 复审 + 1 收口），其中收口轮的直接成因是**审查方缺少读取统一补丁的手段**。**建议**：为 ④ 的输入补齐"原始 diff 落盘"这一步写入流程（本片已验证有效），可显著减少因证据格式导致的无效轮次。
+diff --git a/docs/validation/t027-b3c-contracts-durability_EN.md b/docs/validation/t027-b3c-contracts-durability_EN.md
+new file mode 100644
+index 0000000..f5f44b2
+--- /dev/null
++++ b/docs/validation/t027-b3c-contracts-durability_EN.md
+@@ -0,0 +1,157 @@
++﻿# T027 · B3c · CONTRACTS durability-upgrade clause revision — validation report
++
++Date: 2026-09-21. Status: `COMPLETE` (① V4 Pro pre-analysis / ③ V4 Pro pre-review / ③.5 independent scan / ④ Codex final review all in §9; **no commit and no push yet**, awaiting same-turn authorisation).
++
++## 0. Honesty rules (the premise of every conclusion here)
++
++1. This slice **only freezes the contract wording**. It does not lift the Windows `unproven` state, does not relax `first-dispatch`, does not change T027's `BLOCKED / NOT IMPLEMENTED`, and is not AT-23 evidence. Every `proven` statement must trace back to "which platform + which premise + which evidence".
++2. This slice contains **no `.go` / `.json` / schema / fixtures change**; the gates are accepted on an "unchanged means green" basis.
++3. This slice does **not re-run** the B3a/B3b physical rig and does not touch `tools/agent-probe/enforcement-proxy` (DR-2 is its own slice).
++4. Every cited field (file, line, count, mutation result) comes from actual command output and this slice's review records; anything not executed is listed in §10.
++
++## 1. Scope and boundaries
++
++**Goal**: freeze B3b's **tiered** verdict (C2 `proven`; C1/C3/C2C3/U4 `unresolved`) into a **decidable contract wording**, so that "a platform's publication durability rises from `unproven` to `proven`" becomes a normative path with a premise, criteria, and boundaries, giving B4 a stable base.
++
++**Gap closed here**: the bilingual CONTRACTS stated "publication durability is unproven" as a **platform constant** (on Windows, "new directory-entry persistence cannot currently be forced or proved" ⇒ `unproven`) and defined neither the upgrade condition nor what an upgrade does and does not unlock.
++
++**Boundaries (respected)**:
++- **This slice only freezes the wording and does not lift Windows `unproven`**; the `first-dispatch` refusal, the AT-23 conclusions and every other platform's conclusion are **unchanged**.
++- No Go change, no schema/fixtures change, no rig re-run, no touching the B2-era tool.
++- DR-2 (the CI flake) is not handled across slices; only a third piece of run evidence is appended with this documentation change.
++
++## 2. Change list (8 `.md` files = the whole working-tree diff)
++
++| # | File | Nature of the change |
++|---|---|---|
++| 1 | `docs/CONTRACTS.md` | new `**发布耐久等级与升级条件**` paragraph in §7 (L209); the three frozen sentences parameterised (L207 / L219 / L225) |
++| 2 | `docs/CONTRACTS_EN.md` | English mirror of §7 (new paragraph L203; sentences 1/2/3 = L201 / L213 / L219) |
++| 3 | `docs/ADR_REGISTER.md` | ADR-013 row completion condition and the §5 adoption precondition now point at the new clause (B3c) |
++| 4 | `docs/ADR_REGISTER_EN.md` | same, English mirror |
++| 5 | `docs/t027/REMAINING_SLICES.md` | new B3c slice definition (scope, goal, gap, deliverables, acceptance evidence, boundaries), status table, dependency graph (`B3b → B3c → B4`), 2026-09-21 revision note; B4 dependency gains `B3c` |
++| 6 | `docs/t027/REMAINING_SLICES_EN.md` | same, English mirror |
++| 7 | `docs/validation/t027-b3b-durability.md` | §7 CI-flake bullet gains a third run |
++| 8 | `docs/validation/t027-b3b-durability_EN.md` | same, English mirror |
++
++**CI back-fill (folded into this slice's documentation change, no extra commit)**: the docs back-fill commit `dd36b9b` produced CI run **`35564805991`** = **success**, with `Go ubuntu-latest` and `Go windows-latest` **both green**; the previously intermittent `tools/agent-probe/enforcement-proxy::TestConnectAuditTrailFailureDeniesAndDoesNotTunnel` did **not** recur, consistent with DR-2's verdict ("intermittent, pointing at a handle/timing race inside that test").
++
++## 3. The new clause (`docs/CONTRACTS.md` §7 / `docs/CONTRACTS_EN.md` §7)
++
++1. **Three-state**: `proven` / `disproven` / `unresolved` (`observed`/`falsified` are evidence annotations, never tiers), as in A7.
++2. **Unit of judgment = (platform × premise P)**: every tier statement must carry its platform, premise and evidence; a tier earned under a premise must never be restated as a premise-free platform-level tier (a platform-level tier may only state the `unproven` default); every `proven` must trace back to platform + premise + evidence.
++3. **Three criteria for recording `proven` (all required under the same premise)**:
++   (a) reproducible injection or control evidence (valid rounds inside the allowed set, an evidence pack recomputable from the round records and the journal, no true orphans);
++   (b) a **discrimination gate** (under the same rig, the same writer and the same record-level payload, negative controls show at least one loss and positive controls none; **a failed gate caps the verdict at `unresolved`**);
++   (c) **mechanism evidence** (the claimed persistence mechanism demonstrably ran in that round).
++   **Missing any one of them leaves the answer `unresolved`** (and `unresolved` means only that no claim was established — it must **never** be read as "not durable" or "already falsified"); an attributable counterexample (a loss where the stage was hit and the mechanism demonstrably ran) is `disproven`.
++4. **Forbidden wording**: "durable forever", "long-term guarantee", "proven power-loss safe", premise-spanning universal durability; a `proven` may only be phrased as "no counterexample was observed under this premise at this device's resolution, with the mechanism demonstrably run and the device demonstrably discriminating".
++5. **Object separation**: a candidate mechanism's tier ≠ the **platform publication-durability tier**; the platform tier is decided only by the evidence for the mechanism the platform's **production implementation actually adopts**, under a premise covering the target deployment environment — closing the short-circuit reading "candidate `proven` ⇒ platform `proven`".
++6. **Runtime mapping**: `unresolved` and `disproven` behave as `unproven` (fail-closed behaviour unchanged).
++7. **Upgrade unlock boundary**: after a (platform × premise) reaches `proven`, only that platform, within the deployment environments covered by that premise, has the corresponding refusals lifted; **nothing** is unlocked for any other premise or platform, **AT-23 is not waived** (it must still pass), **independent review and protocol-first revision are not waived**, and no gate beyond `first-dispatch` is relaxed. A platform-tier upgrade requires a protocol-first amendment of this clause, traceable evidence, and an independent review.
++8. **Existing instance**: on a local Unix filesystem, "a new link was created and its parent directory was `fsync`-ed successfully" counts under the existing contract wording as an instance satisfying every criterion (its premise is the local-Unix-filesystem class).
++
++## 4. Parameterisation of the three frozen sentences
++
++| Sentence | Location | Change |
++|---|---|---|
++| 1 | CN L207 / EN L201 (replay-store paragraph) | "new directory-entry persistence **cannot currently be forced or proved** ⇒ `unproven`" → "the tier of new directory-entry persistence is **not a platform constant**: determined per platform and per premise under this section's clause… (`unproven` while not every criterion is met)"; plus "per the B3b verdict ledger (`docs/validation/t027-b3b-durability.md` §4) the Windows verdict is **tiered** (C2 `proven`, the others `unresolved`) and not a platform-wide upgrade, so the Windows publication-durability tier **remains** `unproven`" |
++| 2 | CN L219 / EN L213 (launch-receipt paragraph) | "on platforms where publication durability is unproven…" → "on a platform whose publication-durability tier is `unproven` (determined per platform and per premise; see this section's clause)…"; plus "a tier upgrade changes the value of this rule only **for that platform under that premise**" |
++| 3 | CN L225 / EN L219 (terminal publication and settlement paragraph) | same parameterisation plus the same upgrade-boundary clause |
++
++**Refusal strength unchanged**: sentence 2 still rejects pre-write, never spawns, and never returns `first-launch`; sentence 3 still writes no intent, settles nothing, publishes no C and writes no closure, and only an already-complete chain may be replayed write-free.
++
++## 5. Falsifiability (mechanical checks + mutation experiment)
++
++Temporary script `tmp/b3c-checks.js` (gitignored, deleted after use):
++
++- **Baseline: 34 mechanical checks, all GREEN**, covering: the three-state sentence, the unit of judgment, the tightened discrimination gate, mechanism evidence, the `unresolved` anti-misreading anchor, the upgrade-boundary clause (2 places), "AT-23 not waived", the runtime mapping, protocol-first platform upgrades, the tiered anchor, "Windows stays `unproven`", clause-title reference counts (CN 4 / EN 4), the verdict-ledger citation, **zero residual old platform-constant wording**, zero unconditional-unlock wording, zero character-level defects, B4 depending on B3c (both languages), the dependency-graph edge, zero stale line anchors, and the third CI run recorded (one per language).
++- **Mutation experiment, 4 cases (A12 dedicated independent corroboration; each "break it and watch it go red")**:
++  | Mutation | Check expected to go red | Observed |
++  |---|---|---|
++  | M1 delete "不是整体升级" from sentence 1 | C19 tiered anchor | **RED** (no collateral failures) |
++  | M2 weaken the gate back to "负对照可丢失" | C05 tightened discrimination gate | **RED** |
++  | M3 delete the per-platform scoping from EN sentence 2 | C12 upgrade-boundary count | **RED** |
++  | M4 write an unconditional upgrade/unlock | C28 unconditional unlock = 0 | **RED** (with C21 "Windows stays `unproven`") |
++- **Restore integrity**: after all four mutations every file is **byte-identical** to its pre-mutation state (SHA-256 unchanged), and the 34 checks are ALL GREEN again.
++- **Coverage limits of the mechanical checks**: the three items listed as "not mechanically verifiable" — "the evidence pack is recomputable from rounds and the journal" (needs the pack to be re-run), "the premise covers the target deployment environment" (needs a deployment baseline), "independent review is sufficient" (needs the review-process record) — are **not** claimed as verified by this slice.
++
++## 6. Gates
++
++| Item | Result |
++|---|---|
++| `gofmt -l .` | empty output |
++| `go build ./...` | exit 0 |
++| `go vet ./...` | exit 0 |
++| `go test ./...` | exit 0 (`ok` packages **14**, `FAIL` count **0**) |
++| Encoding / EOL (8 `.md` files) | UTF-8 **with BOM** + **LF**: **PASS** (per-file byte check) |
++| Contract fixtures | unaffected (no schema/fixtures change) |
++
++## 7. Known boundaries and follow-ups
++
++- **This slice is not durability evidence**: it only states what an upgrade requires; it produces no `proven` of its own.
++- **Windows stays `unproven`, `first-dispatch` stays refused, T027 stays `BLOCKED / NOT IMPLEMENTED`, AT-23 has not passed** — all four are **unchanged**.
++- **DR-2 (the `enforcement-proxy` intermittent flake) remains open**: this slice only appends a third piece of run evidence (no recurrence) and **does not fix a B2-era tool across slices**; the disposition stays "its own slice before B4".
++- **Runtime behaviour of `unresolved` and `disproven`**: both equal `unproven` (stated in the clause); distinguishing them later would be a new slice.
++- **Residual**: the ③.5 independent scan produced **no actionable finding in either of its two calls** (both deviated in format); it is recorded honestly in §9.2 and re-runs were stopped at the §3.10 cap. Its "no Medium+" outcome **is not proof of review sufficiency**.
++- **Observation item (2026-09-21 user ruling: register it but do not change the directive)**: **the effectiveness of ③.5 on documentation-only slices is to be assessed**. Facts: MAI output is normal on code slices (A6), while on this slice (pure `.md`) both calls deviated from the format contract and produced no actionable finding; the sample size is n=1, **too small to amend the directive**. Handling: use the next slice, **B4 (a code slice)**, as the control - normal output on B4 attributes this slice's deviation to "documentation-type work"; the same deviation on B4 attributes it to the model. If another 2-3 documentation-only slices behave the same way, then consider adding a §3.10 exception ("a contract revision that only edits `.md` and touches no executable semantics may skip ③.5 with ④ confirming"). **The directive is not changed by this slice.**
++- **Cleanup confirmation (2026-09-21, same-turn user authorisation)**: the **11** leftover items under `tmp/b3b/` were removed (8 rig console logs + 3 writer build products, **26,883,260 B** in total). **They were first confirmed unrelated to the evidence pack**: `docs/validation/evidence/b3b-2026-09-21/SHA256SUMS.txt` (2157 entries) contains **0** `.exe` entries, and none of the 11 filenames matches anything in the pack (the pack's own logs are `session/session.log` and `variant/session.log`, different paths and names); `writer.exe`'s identity is already on record via this report's §3.2 sha256 `06de8a72…` (measured `06de8a728ae984318a7955d01853443f30749a621c81d4caa47044c5b7017a82`) and the file is a build product reproducible with `go test -c -tags b3bnative`. ⇒ judged **unrelated to the evidence pack** and **deleted directly** as instructed (sha256 recorded first: `writer.exe` `06de8a72…`, `writer-variant.exe` `5b0d06d8…`, `writer-rebuild-check.exe` `880655ce…`; the eight logs were hashed individually in this round's terminal output).
++
++## 8. Cost and accounting
++
++- **Probe budget: 0/10 used** (fully offline: no paid probes, no real model calls).
++- **① V4 Pro**: one pre-analysis (rulings U1–U14 all adopted as recommended).
++- **③ V4 Pro**: one pre-review (`PASS WITH FIXES`: 1 Medium + 1 Low mandatory, 3 Low advisory) → fixes → one re-review (`RE-REVIEW: PASS`, 4 Low) → one delta re-review (`DELTA-REVIEW: PASS`, 1 Low).
++- **③.5 MAI-Code-1.1-Flash**: 2 calls (first + one anomaly resend), neither producing an actionable finding (see §9.2); within the §3.10 cap of ≤3.
++- **④ GPT-5.3 Codex**: 3 calls — first final review (no lists attached, effectively a blind audit) `FINDINGS` (1 Medium + 1 Low) → fixes → re-review `FINDINGS` (the only blocker being "no raw diff hunks supplied") → a closing round after the raw diff was written to disk: **`PASS`**.
++- **§3.11 mandatory blind audit**: this slice's ④ first call **attached no ③/③.5 list**, which is an effective blind audit; as with B3b, a second blind audit was not added because the input sets are isomorphic and a repeat would add cost without discriminating power — the rationale is recorded here explicitly.
++- **⑤ wall clock**: the mechanical checks plus four mutations take about 2 s; the gate suite about 1 min.
++- **token**: filled in by the user from the usage UI (the main controller never estimates it).
++
++## 9. Review record (① / ③ / ③.5 / ④) and closure loop
++
++### 9.1 ① V4 Pro pre-analysis
++
++**All of U1–U14 adopted as recommended**, notably: the clause sits as its own paragraph after the replay-store paragraph (U1); granularity is platform × premise (U2); the discrimination gate and mechanism evidence become criteria (U3); independent review is positioned as an **upgrade governance precondition**, not a tier criterion (U4); "the evidence pack is recomputable" folds into criterion (a) (U5); the `disproven` trigger rule is added (U6); the runtime mapping is stated (U7); **no schema change** (U8); the ADR keeps only the ledger and the criteria have a single authority in CONTRACTS (U10); a new validation report (U11); bilingual ledger write-back (U12); ④ keeps its final review (U13); the tiered anchor lands in two places only (U14).
++
++### 9.2 ③ V4 Pro pre-review and the ③.5 independent scan
++
++- **③ pre-review**: `PASS WITH FIXES`. **Medium (mandatory)**: A1 the discrimination-gate wording was weaker than the single authority in `docs/t027/B3B_DESIGN.md` §7 and omitted the "gate failed" consequence; E1/E2 the ADR-013 row completion condition and the §5 stale-sentence citation had not been written back per U10 (dangling reference). **Low**: A2 give the Unix instance its premise, A3 narrow the premise-free-tier prohibition, A4 rename and locate the source document, C1 add the `unresolved` anti-misreading anchor. All fixed.
++- **③ re-review**: `RE-REVIEW: PASS` (A1–A4 / C1 / E1 / E2 all closed; no new Medium+; 4 Low: writer identity, a Chinese typo, EN bolding and label alignment).
++- **③ delta re-review**: `DELTA-REVIEW: PASS` (all three deltas landed; the single Low was a bolding asymmetry, since fixed).
++- **③.5 MAI independent scan**: **neither of its 2 calls produced an actionable finding**. The first deviated in structure (invented sections, no `file:line` findings, no verdict line); per §3.10 ("a resend is allowed only for truncation or anomaly, and counts against the cap") it was resent once, and the resend still deviated (still no Section A–E and no verdict line, though it did read the documents and quote real text, corroborating "nothing unlock-related found"). **Main-controller handling**: re-runs stopped at the cap, recorded as "no Medium+ finding, format deviation on record", and **four mutation experiments** carried the A12 dedicated-corroboration role in ⑤ (giving a judgement independent of MAI on whether the checks really discriminate). **That layer's outcome is not proof of review sufficiency.**
++
++### 9.3 ④ Codex final review
++
++| Round | Purpose | Verdict | Findings |
++|---|---|---|---|
++| 1 | first final review (**no ③/③.5 list attached**) | `FINDINGS` | 2: **Medium** (the B4 section's dependency line lacked `B3c`, contradicting the status table and dependency graph) + **Low** (stale line anchors in the B3c item) |
++| 2 | re-review of the fixes | `FINDINGS` | the only blocker was "no raw unified-patch hunk evidence" (the subagent has no terminal); every substantive item was judged closed |
++| 3 | closing round (main controller wrote the raw diff to disk for it) | **`PASS`** | 0 (with measured CN/EN isomorphism: the four clause paragraphs total **16/16** sentences and **13/13** bold markers) |
++
++### 9.4 A self-inflicted defect found and fixed in ⑤ (honest record)
++
++- **A character-level defect introduced by the main controller**: while writing Chinese through `\uXXXX` escapes, 「拒**绝**」(U+7EDD) was mistyped as 「拒**绍**」(U+7ECD), contaminating **5 places** in one go (`docs/CONTRACTS.md` §7 twice, `docs/t027/REMAINING_SLICES.md` three times); worse, the replace tool still **reported success** against a look-alike oldString, masking the error.
++- **How it surfaced**: a ③ re-review Low (B-N1 terminology) → main-controller localisation → repository-wide check confirmed 0 occurrences in HEAD and 5 in the working tree (i.e. introduced by this slice).
++- **Fix and independent verification**: all 5 were corrected to 「拒绝」; an **anomalous-character scan** then ran (the CJK character set of the `git diff --unified=0` added lines minus the whole-HEAD `.md` corpus) ⇒ **empty difference set**; the repository-wide `拒绍` count is **0**; the ④ re-review independently confirmed 0 as well.
++- The lesson ("write Chinese characters literally, never through `\u` escapes; run the anomalous-character scan after every edit") is recorded in repository memory.
++
++### 9.5 A11 spot check (symmetric sampling)
++
++- Of ④ Codex's Section D assertions, the main controller actually executed **4** (D1 three-state / D3 discrimination gate and mechanism evidence / D4 platform × premise boundary / D8 B4 dependency closure) and turned them into executable checks; **D8 was in fact already red on the first round** (the missing B4 dependency), matching the Medium that the review had found — so the sampling both verified "delete it and it goes red" and reproduced a real defect. Items, expectations and observed values are in §5.
++- **Missing-side declaration**: neither ③.5 MAI call produced an executable "delete the guard ⇒ goes red" item, so the sampling could not land on the MAI side; recorded as a known limitation (sampling provides **existence corroboration** only, never a coverage proof).
++
++## 10. Explicitly not executed
++
++- **No `commit` and no `push`**: per discipline the slice stops in a reviewable state awaiting explicit same-turn authorisation.
++- **Windows `unproven` not lifted**, `first-dispatch` not relaxed, the AT-23 and T027 conclusions unchanged.
++- **No real model calls and no paid probes**; **no B3a/B3b rig re-run**; `tools/agent-probe/enforcement-proxy` **untouched**.
++- **No `.go` / `.json` / schema / fixtures change**.
++- **No CI observation** (nothing has been pushed); the CI result for this working-tree change is pending the push.
++
++## 11. Next-step recommendation (§7.4)
++
++> Per the dependency graph the next slice should be **B4 · Windows T027 end-to-end (AT-23)**; this slice has closed the gap between "contract wording" and "tiered verdict", so B4 can take the §7 durability-upgrade clause as a direct input.
++> Suggested tiers — main controller **deep (Max)** (only for the ① design and ② E2E-plan writing steps), V4 Pro **①③ mandatory** (B4 touches stop/identity/ownership semantics), ③.5 **enabled** (a behaviour-change slice; note the MAI output format is currently unstable), Codex **Extra High (④ mandatory + the §3.11 blind audit)**.
++> A parallel item to clear before B4: **DR-2** (the `enforcement-proxy` intermittent flake needs its own slice).
++
++- **Guidance item to discuss (continuing B3b's D2 ruling)**: should hard-gate slices have their own ④ call cap? This slice's ④ measured 3 calls (1 final review + 1 re-review + 1 closing round), and the closing round was caused directly by **the reviewer lacking a way to read the unified patch**. **Suggestion**: write "put the raw diff on disk" into the ④ input procedure (verified effective here) to remove format-caused wasted rounds.
+
+===== 输入结束 =====

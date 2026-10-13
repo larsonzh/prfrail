@@ -1,0 +1,1 @@
+docs(t028): sync T028 status to INSTALLATION_PLAN and close the docs-only correction round

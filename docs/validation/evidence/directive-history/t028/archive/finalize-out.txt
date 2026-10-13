@@ -1,0 +1,9 @@
+docs/validation/t028-supervised-black-box.md   lines=267 headings=22 bold=348 pipes=226 blanks=48
+docs/validation/t028-supervised-black-box_EN.md lines=267 headings=22 bold=348 pipes=226 blanks=48
+docs/t027/REMAINING_SLICES.md                  lines=652 headings=28 bold=1021 pipes=593 blanks=136
+docs/t027/REMAINING_SLICES_EN.md               lines=639 headings=28 bold=915 pipes=591 blanks=134
+docs/DEV_PLAN.md                               lines=204 headings=18 bold=273 pipes=198 blanks=73
+docs/DEV_PLAN_EN.md                            lines=205 headings=18 bold=263 pipes=198 blanks=73
+
+REPORT_SHAPES_IDENTICAL=true
+CR_REMAINING=0

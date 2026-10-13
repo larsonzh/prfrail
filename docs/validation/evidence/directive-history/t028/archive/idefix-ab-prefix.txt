@@ -1,0 +1,9 @@
+empty-execution-defaults-to-autonomous validate=ok | todefinition=ok | mode=isolated-workspace
+explicit-autonomous                    validate=ok | todefinition=ok | mode=isolated-workspace
+manual-handoff-valid                   validate=ok | todefinition=ok | mode=manual-handoff
+manual-handoff-missing-policy          validate=invalid proofrail configuration: manual-handoff step "probe-step" requires handoffPolicy | todefinition=invalid proofrail configuration: manual-handoff step "probe-step" requires handoffPolicy | mode=-
+supervised-valid                       validate=ok | todefinition=ok | mode=supervised-black-box
+supervised-missing-policy              validate=invalid proofrail configuration: supervised-black-box step "probe-step" requires handoffPolicy | todefinition=invalid proofrail configuration: supervised-black-box step "probe-step" requires handoffPolicy | mode=-
+invalid-mode-refused                   validate=invalid proofrail configuration: step "probe-step" has invalid execution mode "bogus" | todefinition=ok | mode=isolated-workspace
+autonomous-with-policy-refused         validate=invalid proofrail configuration: autonomous step "probe-step" must not define handoffPolicy | todefinition=ok | mode=isolated-workspace
+PROBE END

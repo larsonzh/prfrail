@@ -1,0 +1,50 @@
+==== docs/DELIVERY_DIRECTIVE.md (HEAD 1513 lines, worktree 1535 lines)
+OK   header(line3) only version+date changed
+OK   7.2.3 para1 position sanity (HEAD:599 has 4.5, WT:600 has 5.5)
+OK   7.2.3 para1 rest verbatim (C1: only version string replaced)
+     HEAD lines containing "Haiku 4.5": 1 ; worktree: 2
+       WT:73 | v1.27 | 2026-10-11 | **切片 `DIRECTIVE-HAIKU-BUMP` 落地（步骤 0 的用户裁定见下）**：步骤 0 登记 **OB-86**（试点继续顺延第 **6*
+       WT:1459 | 目标 | ① §7.2.3 启用前置条件版本由 `Claude Haiku 4.5` 升为 `Claude Haiku 5.5`；② §7.2.3 增「调用串与内部标识」段（限定名 `Claude
+OK   HEAD had exactly 1 live "Haiku 4.5" (the 7.2.3 precondition)
+OK   all remaining WT "Haiku 4.5" are old-value references (log/goal rows)
+OK   OB-74 position sanity
+OK   OB-74 row splits into 6 parts
+OK   OB-74 cells [empty,ID,date,phenomenon] verbatim (disposition-only change)
+OK   OB-74 disposition first status word "已处置" in G6-6 closed set
+OK   OB-74 HEAD first status word was 待议/To be discussed (proving the flip, and new row no longer uses it)
+OK   OB-74 disposition consistent with 7.2.3 new para (name/id/G5-b)
+OK   OB-85 row (WT:924) identical to HEAD:921
+OK   OB-86 row present at WT:925
+OK   OB-86 disposition first status word "已裁决" in G6-6 closed set
+OK   C.0o last row (WT:1450) identical to HEAD:1446
+OK   C.0p heading at WT:1451
+OK   C.1 heading at WT:1469
+OK   C.0p field list same order as C.0o (13 vs 13)
+OK   7.2.3 new para at WT:602 contains qualified name + internal id + G5-b exclusion + no "sole" restatement
+OK   G5-b closed-set text (6.3) does NOT contain claude-haiku-5.5
+==== docs/DELIVERY_DIRECTIVE_EN.md (HEAD 1513 lines, worktree 1535 lines)
+OK   header(line3) only version+date changed
+OK   7.2.3 para1 position sanity (HEAD:599 has 4.5, WT:600 has 5.5)
+OK   7.2.3 para1 rest verbatim (C1: only version string replaced)
+     HEAD lines containing "Haiku 4.5": 1 ; worktree: 2
+       WT:73 | v1.27 | 2026-10-11 | **Slice `DIRECTIVE-HAIKU-BUMP` landing (the step-0 user ruling is below)**: s
+       WT:1459 | Goal | (1) §7.2.3's enabling precondition moves from `Claude Haiku 4.5` to `Claude Haiku 5.5`; (2)
+OK   HEAD had exactly 1 live "Haiku 4.5" (the 7.2.3 precondition)
+OK   all remaining WT "Haiku 4.5" are old-value references (log/goal rows)
+OK   OB-74 position sanity
+OK   OB-74 row splits into 6 parts
+OK   OB-74 cells [empty,ID,date,phenomenon] verbatim (disposition-only change)
+OK   OB-74 disposition first status word "Resolved" in G6-6 closed set
+OK   OB-74 HEAD first status word was 待议/To be discussed (proving the flip, and new row no longer uses it)
+OK   OB-74 disposition consistent with 7.2.3 new para (name/id/G5-b)
+OK   OB-85 row (WT:924) identical to HEAD:921
+OK   OB-86 row present at WT:925
+OK   OB-86 disposition first status word "Ruling" in G6-6 closed set
+OK   C.0o last row (WT:1450) identical to HEAD:1446
+OK   C.0p heading at WT:1451
+OK   C.1 heading at WT:1469
+OK   C.0p field list same order as C.0o (13 vs 13)
+OK   7.2.3 new para at WT:602 contains qualified name + internal id + G5-b exclusion + no "sole" restatement
+OK   G5-b closed-set text (6.3) does NOT contain claude-haiku-5.5
+
+VERIFY: ALL CHECKS PASSED

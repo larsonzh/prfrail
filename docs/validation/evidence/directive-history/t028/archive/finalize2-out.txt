@@ -1,0 +1,13 @@
+DIFF  ADR_REGISTER.md                              CN=94/5/224/240/20  EN=95/5/226/240/21
+SAME  DELIVERY_DIRECTIVE.md                        CN=1536/109/3441/2345/386  EN=1536/109/3441/2345/386
+SAME  BUSINESS_WORKFLOWS.md                        CN=107/10/24/60/24  EN=107/10/24/60/24
+SAME  INSTALLATION.md                              CN=206/7/2/45/50  EN=206/7/2/45/50
+SAME  INSTALLATION_PLAN.md                         CN=63/7/2/60/20  EN=63/7/2/60/20
+SAME  OPERATIONS.md                                CN=142/9/0/142/38  EN=142/9/0/142/38
+SAME  S1_RELEASE_NOTES.md                          CN=25/3/0/0/8  EN=25/3/0/0/8
+SAME  S1_SUPPORT_MATRIX.md                         CN=27/2/0/32/7  EN=27/2/0/32/7
+DIFF  t027/REMAINING_SLICES.md                     CN=652/28/1021/593/136  EN=639/28/915/591/134
+SAME  validation/t028-supervised-black-box.md      CN=269/22/362/226/48  EN=269/22/362/226/48
+
+REPORT_PAIR=docs/validation/t028-supervised-black-box.md | docs/validation/t028-supervised-black-box_EN.md
+CR_REMAINING=0

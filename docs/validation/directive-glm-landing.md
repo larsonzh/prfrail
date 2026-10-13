@@ -176,5 +176,6 @@ tmp/glm-landing/verify-a12.js	local-only
 tmp/glm-landing/wrap-enc.js	local-only
 tmp/glm-landing/	local-only
 ```
+> **归档注记（2026-10-13，A1-a）**：本报告围栏引用的 `tmp/` 条目已按 §1.5.1 归档至 `docs/validation/evidence/directive-history/glm-landing/`（含 `MANIFEST.md` 与 `SHA256SUMS.txt`）；原路径不改写，对应关系以该单元 `MANIFEST.md` 为准。本次为 v1.23 归档执行的续作（按 `[ROUTINE]` 档执行，不 bump 准则版本）。
 
 说明：`repo` 行为本片已暂存工件（含本报告对）；`local-only` 行为 `tmp/glm-landing/` 的一次性过程件，随 ⑧c 清除；**不含**前片 `tmp/glm-eval*` 遗留。

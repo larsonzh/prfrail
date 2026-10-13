@@ -1,0 +1,3 @@
+wrote tmp\t028\head-baseline.txt lines=36
+wrote tmp\t028\staged-diff.txt bytes=331325
+changed=28 added=12 modified=16 deleted=0

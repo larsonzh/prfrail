@@ -1,0 +1,1 @@
+docs(t028): write back the commit id and both CI leg readings (no rule change)

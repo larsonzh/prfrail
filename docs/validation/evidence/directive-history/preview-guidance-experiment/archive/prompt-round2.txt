@@ -1,0 +1,2363 @@
+【角色】预审员，只读推理，不得修改、创建、删除任何文件。
+【任务】切片预审
+【输入】以下一份实现 diff（完整、未裁剪）。
+【要求】逐条核对实现是否偏离方案；重点找并发反例、崩溃窗口、资源泄漏、错误处理缺失、边界遗漏。
+【产出格式】
+  总体结论：通过 / 有条件通过 / 不通过
+  偏离项表：| 严重度 | file:line | 被违反的句子（逐字引用） | 最小修复 |
+  反例分析：并发 / 崩溃 / 边界（无则写"无"）
+  其他关注点：略
+【严重度定义】
+  Critical：数据丢失、安全边界失效、静默错误结论
+  High：功能失效、崩溃、契约冲突
+  Medium：潜在缺陷、覆盖缺口、双语失配
+  Low：风格、命名、注释、可读性
+【约束】不得建议解除冻结结论、跳过审查、降低门禁；不得扩张切片范围。
+【结论行】最后一行必须为：PRE-REVIEW: PASS 或 PRE-REVIEW: PASS WITH FIXES 或 PRE-REVIEW: FINDINGS
+
+===== 输入开始 =====commit abfcecc13b693eba59210a58535d3a421c57693c
+Author: larsonzh <larsonzhang@gmail.com>
+Date:   Mon Sep 21 12:51:40 2026 +0800
+
+    feat(b3b): candidate injection matrix + durability verdict (C2 proven, C1/C3/C2C3/U4 unresolved)
+
+diff --git a/docs/t027/B3B_DESIGN.md b/docs/t027/B3B_DESIGN.md
+new file mode 100644
+index 0000000..3033620
+--- /dev/null
++++ b/docs/t027/B3B_DESIGN.md
+@@ -0,0 +1,290 @@
++﻿# B3b 装置与协议设计冻结稿（candidate injection matrix + durability verdict）
++
++> 状态：**设计权威**（本文件冻结 B3b 的协议、矩阵与判定口径；证据包与本报告冲突时以证据为准）。
++> 日期：2026-09-20。来源：① V4 Pro（`DeepSeek V4 Pro (deepseek)`，Max）前置分析裁定 + 主控实现偏离注记（§11）。
++> 上游：`docs/validation/B3A-CALIBRATION.md`（装置标定，§11 移交条件）与 `docs/t027/B3A_RIG_DESIGN.md`（B3a 装置设计）。
++
++## 0. 目的与范围
++对 A7 遗留的 U1/U2（候选 C2/C3 的断电耐久）做**设备级注入裁决**，并按三档口径（`proven`/`disproven`/`unresolved`，带同一前提）给出每个候选的结论。
++**不做**：不改 CONTRACTS/schema/fixtures；不动平台耐久声明（Windows 保持 `unproven`）；不解锁 first-dispatch；不清理 `.tmp` 残留；不做并发 fencing 结论。
++
++## 1. 冻结前提 P（结论只覆盖此前提）
++- hypervisor：**VirtualBox 7.2.18 r175117**；guest：**Windows 11 专业版 25H2 build 26200.8037**（零售、未激活）；文件系统 **NTFS**。
++- 存储：SATA/AHCI `useHostIOCache=false`，两块盘均 `--nonrotational on`；注入卷 **`R:` = INJECT**（固定盘 `data.vdi`，7.98 GB，4096 B 群集）。
++- 注入方式：**guest 硬断电**（`VBoxManage controlvm poweroff`），重启至 `guestcontrol` 可用约 48 s。
++- 基线快照 `pristine` = `065a25e1-d95c-4f33-8081-4f06216ecce8`（**不重取**：本片不改 VM 配置）。
++- 网络：`nic1=none`（客机无网络栈）。
++- **信令写域声明**：本片在客机 `C:\prfrail-prep\` 下新增**第二写域**用于阶段标记（§4）。`C:` 是信令域、**不参与测量**；测量域只有 `R:` 上的 replay store 根，且每轮只发生**一次**被测发布。
++
++## 2. 候选与生产接缝
++| 候选 | 语义 | 落点 |
++|---|---|---|
++| **C1** | 现行基线：`os.Link` no-replace + 平台父目录步（Windows 为空操作） | 默认路径本身 |
++| **C2** | 用 **`MoveFileExW` + `MOVEFILE_WRITE_THROUGH`（`0x8`）** 的 no-replace move 取代 `os.Link` | 发布原语钩子 |
++| **C3** | 用**目录句柄 `FlushFileBuffers`** 取代 Windows 上的空操作父目录步 | 父目录钩子 |
++| **C2C3** | C2+C3 组合 | 两个钩子 |
++
++两个接缝（**均为 nil 默认、零语义**，生产路径逐字节不变）：
++- `replayStorePublishPrimitiveHook func(temp, path string) error` + 派发器 `replayStorePublishRecordNoReplace`（nil ⇒ `os.Link`）。
++- `replayStoreParentSyncHook func(directory string) error` + 派发器 `replayStoreSyncParent`（nil ⇒ 既有 `replayStoreSyncParentDirectory`）。
++  **只挂发布路径第 6 步**，不挂 `bootstrapReplayStoreRoot` / `agent_runner_replay_root.go`（bootstrap 不是发布）。
++  既有函数变量 `replayStoreSyncParentDirectory` **保持不动**（10+ 处既有测试在替换它）。
++
++**5 个阶段定义不变**（A7 已埋点）：`temp-written` → `temp-synced` → `temp-closed` → **`record-linked`** → **`parent-synced`**。
++**候选决定格**：C2 = `{4,5}`（格 4 为核心：move 已返回、父目录步未跑）；C3 = `{5}`；**C2C3 = `{5}`**（**修订 R1**：目录 flush 在父目录步内执行，格 4 时 flush 尚未跑，若格 4 计入 C2C3 主张则该格每轮都缺机制令牌、臂结构性不可证；且格 4 的 C2C3 与 C2 逐字节等价，收窄不损失信息）；**正对照 = `{}`**（不主张耐久，只标定装置）；格 1–3 对所有臂等价（信息性）。
++
++**生产零候选代码**：C1/C2/C3 的候选实现只存在于 `b3bnative` 实验二进制（§11 偏离注记）。
++**绕开门禁声明**：写入器直接调用 `writeReplayRecordNoReplace`，并在此二进制内把 `store.publicationDurability` 置为 `proven`（与既有实验同款测试期覆盖）。**门禁是策略层、不是发布原语**，此绕过不影响被测对象，但必须在报告与证据包中逐句声明。
++
++## 3. 客机写入器（`b3bnative` 测试二进制）
++构建：host 即 `windows/amd64` ⇒ `go test -c -tags b3bnative -o writer.exe ./internal/adapters/`（静态、单文件），经既有 `guestcontrol copyto` 部署。
++
++**env 契约**：`B3B_GUEST_WRITER`（必设，否则 skip）、`B3B_ROUND`、`B3B_CANDIDATE`（`c1|c2|c3|c2c3|positive-control`；**修订 R2**：控制臂必须由同一写入器驱动，否则区分力门结构性永假 ⇒ 全矩阵只能以错误理由得 `unresolved`）、`B3B_STAGE`（5 阶段之一）、`B3B_ROOT`、`B3B_MARKER`、`B3B_PLAN_ONLY`、`B3B_BLOCK_SECONDS`（默认 300）。
++**记录确定性**：requestID = `b3b-<round>`；记录由 `replayStoreRequestRecord` 构造（`CreatedAt` 为钉死常量 `2026-09-10T02:00:00.000Z`）⇒ **宿主可预承诺**。
++
++**标记文件**（`B3B_MARKER`，JSON Lines，逐行追加；**只要求客机内可见**，不要求耐久）：
++- 首行 = **预承诺** `{round,candidate,stage,path,digest,size}`；`digest` = 发布字节（canonical JSON + `\n`，由 `evidence.EncodeCanonical` 复现）的 SHA-256。
++- 之后每阶段一行 `{round,candidate,stage,path,target,trace[],timestamp}`；`trace` = 至该阶段为止的 syscall 轨迹（`os.Link` / `MoveFileExW(WRITE_THROUGH,no-replace)` / `platform-parent-sync` / `FlushFileBuffers(dir)`）。
++- **顺序硬约束**：先写标记、后阻塞。
++
++**阻塞与超时**：目标阶段写入标记后 `time.Sleep(B3B_BLOCK_SECONDS)`（默认 300 s，**不用 `select{}`**，避免 runtime 死锁检测误杀——A7 教训），超时打印 `TIMEOUT <stage>` 并以**专用退出码 90** 退出，**绝不自续推进**。
++**输出行**：`PLAN …` / `TIMEOUT <stage>` / `SURVIVED <stage>`（后者表示宿主未在目标阶段内断电 ⇒ void）。
++
++## 4. 宿主握手协议
++1. **S6.5 轮询**：宿主以 ~2 s 间隔用 `guestcontrol run cmd /c type <marker>` 读取标记；**不以 stdout 流为主通道**（`guestcontrol` 是否流式回传中间输出未经核实）。
++2. **cut 前置**：目标阶段标记已见 ∧ 无更晚阶段 ∧ `plan` 记录已 ACK ∧ 2.0 s 冻结延时已过 ∧ **存活探针**（`tasklist` 显示写入器仍在）。
++3. **cut**：`VBoxManage controlvm poweroff`。
++4. **阶段命中证明链**（四条同时成立）：① 宿主 cut 前归档的标记转录末条 = 目标阶段；② `plan` 记录 ACK 早于 cut；③ cut 时写入器仍存活；④ 重启后盘点落在该阶段的允许集内。
++5. **void 三类 + 一条会话级阻断**：`marker-missed`（窗口内未见目标阶段）、`writer-exited-before-cut`、`done-before-cut`（见到 `SURVIVED`）；**`stage-escape`**（见到**晚于**目标阶段的标记）= 协议缺陷 ⇒ **会话级阻断**，不得继续矩阵。
++6. **时序锚点变更**：2.0 s 数值保留，但**计时起点改为"检出目标阶段标记后"**（B3a 为"写入返回后"）。
++7. **轮前预授权**：每轮开始前确认本轮 `{候选, 阶段, 目标路径}`；`-NoConfirm` 为会话级选项（与 B3a 一致）。
++8. **同格 void 上限 3 轮**（沿用 B3a §3.3），超出即停并上报。
++
++## 5. 轮次协议 S1–S9（B3b 变体）
++| 步 | 内容 | 与 B3a 的差异 |
++|---|---|---|
++| S0 | 会话前置：版本断言、VM 事实、磁盘标志、**lib 哈希 pin**、函数碰撞检查、journal 链自证 | 新增 pin 与碰撞检查 |
++| S1 | `restore pristine` | 同 |
++| S2 | `startvm` | 同 |
++| S3 | 就绪等待（`guestcontrol` 可用） | 同 |
++| S3.5 | 工具部署：**writer.exe** + `11-shutdown-audit.ps1` + `12-round-inventory.ps1`，客机 `Get-FileHash` 比对 | 由 3 个 PS1 改为 exe + 2 个 PS1 |
++| S4 | 注入前审计（uptime、许可、卷状态） | 同 |
++| S4.5 | 轮目录布置（`C:\prfrail-prep\runs\rNN\`） | 信令域 |
++| S5 | **`plan` 记录 + ACK**：以写入器 `-plan` 模式取得 `{path,digest,size}`（不发布），落 journal 并 ACK | **先记后写语义恢复**（可比 B3a） |
++| S6 | 启动写入器（真实发布 + 目标阶段阻塞） | 由 PS1 写入改为驱动 exe |
++| S6.5 | 标记轮询 + 转录归档 + 存活探针 | **新增** |
++| S7 | 预授权 → 冻结延时 2.0 s → `controlvm poweroff` → 归档 `cut` 记录 | 计时起点变更 |
++| S8 | 重启 → `11-shutdown-audit.ps1` → 盘点 ×2（`12-round-inventory.ps1`） | 同（原样复用） |
++| S9 | 逐轮对账：发布字节 vs 预承诺摘要、允许集判定、void/有效标记 | 判定对象由"探针摘要"改为"记录路径 + 预承诺摘要" |
++
++## 6. 矩阵与预算（N=5）
++| 臂 | 格 | 轮数 |
++|---|---|---|
++| 标定前奏 | 正对照（基线原语 + 卷句柄 flush；无卷句柄写权限时回退为记录句柄 flush 并在 trace 单独标记，**修订 R2**） | 5 |
++| C1 参照臂 | 5 阶段 × 5 | 25（**负对照并入阶段 1 格**） |
++| C2 | 5 阶段 × 5 | 25 |
++| C3 | 5 阶段 × 5 | 25 |
++| C2C3（可选，已批） | 仅 `parent-synced`（**修订 R1**：格 4 合计入则结构不可证）× 5 | 5 |
++| U4 子矩阵（可选，已批） | 3 候选 × 阶段{4,5} × 3（双发布序列：R 完整 → C 目标阶段断电） | 18 |
++| 变异臂（装置自证伪） | 故意无 WRITE_THROUGH / flush 改 no-op（**人工臂**，不在矩阵调度器内） | 2 |
++| 握手冒烟 | 通道定型 + δ 分布实测（独立 smoke 会话，不入主证据） | 3 |
++| **合计** | 主矩阵 17 格×5 + U4 6 格×3 = **103 轮**；加冒烟与变异共 **108 轮** | **≈6.6–8.3 h** |
++
++单轮 ≈ 3.8–4.6 min（含两次冷启动等待、两次盘点、cut 前后探针；B3a 实测 11 轮 38 m 42 s 为 256 KiB 载荷口径）。
++**④ 终审复核（Codex）已指出**：6.5–7 h 属乐观边界，不是稳态值；含 void/运行重试时 8 h 以上更现实。长跑前须在离午夜 ≥9 h 的窗口内启动，且矩阵已把会话 ID 定一次后透传（**修订 R15**），因此跨午夜不会再分裂会话。
++
++## 7. 三档判定口径
++**允许集（每格 = 候选 × 阶段 × N 有效轮）**
++- 阶段 1–3：`{记录不可见（absent，`.tmp` 残留惰性）, 记录完整可见（survived）}`；违反形态 = **撕裂**（`lost-torn-size`/`lost-torn-content`）。
++- 阶段 4–5：`{survived}`；违反形态 = `lost-absent`、**`lost-zero-filled`**（目录项在而数据全零 ⇒ "原语返回即落盘"被直接推翻）、`lost-torn-*`。
++- **逐轮全局不变量**（任一违反 = 该轮反例）：无孤儿 C、审计 `HARD-POWER-LOSS`、盘点 ×2 逐字节一致、卷不脏、journal 全链完整。
++- 阶段 1–3 出现 `survived` **不是**反例（早于声明的耐久是加强）。
++
++**机制执行证据（每轮强制）**：写入器轨迹必须命名该候选的真实原语（C2：`MoveFileExW(WRITE_THROUGH,no-replace)`；C3：`FlushFileBuffers(dir)` 位于阶段 4/5 之间；C1：`os.Link` 且无目录 flush）。**缺条目 ⇒ 该轮对该候选无效**。
++
++**区分力门（防假 `proven`）**：同一 Go 写入器 + 同一记录级载荷下，负对照（C1 阶段 1）出现 **≥1 丢失**、正对照 **0 丢失**。门不成立 ⇒ 所有候选格**封顶 `unresolved`**。
++（依据：B3a 的 256 KiB 载荷对照按 §10.1 **不得跨载荷迁移**。）
++
++**`disproven`**：出现任何违反允许集的反例（≥1 次，须全门禁有效 + 违反类），或候选声称的保证被直接推翻。建议首个反例补 1–2 轮复现（记录，不改档位）。
++**`proven`**：五条件全真——① 全部 5 格 × N=5 有效轮落在允许集；② 决定格机制证据齐备；③ 区分力门真；④ 全局不变量真；⑤ journal 全链与 plan/cut/reconcile 完整。任一缺 ⇒ 最高 `unresolved`。
++**`unresolved`**：任一格有效轮 <5 且无反例；阶段归属无证据；区分力门失败；结论依赖不可证伪断言（如厂商文档语义）。
++**U4**：子矩阵任一有效轮出现"**C 在而 R 不在**（真孤儿 C）" ⇒ 该候选 `disproven` + U4 `disproven`；全 0 孤儿 ⇒ U4 只能 `unresolved`（有限样本不能证有序，只能证伪）。
++
++## 8. 装置落点与复用边界
++**新建 `tools/b3b-rig/`**，B3a 的两份 lib 作为**只读依赖**点源复用（不改其字节），从而保证：B3a 证据包的 `rig/` 冻结副本仍等于仓库字节，且 journal 约定只有一份实现。
++**硬边界**：
++1. **不得新增 journal 字段**：冻结的 canonical 构造只遍历字段序列表，未列键**静默丢弃**；`New-B3aJournalRecord -Op` 被 `ValidateSet('plan','cut','reconcile')` 锁死。⇒ B3b 语义**映射到既有键**（下表），阶段命中/机制轨迹存**轮目录工件**。
++2. **lib pin**：S0 断言两个 lib + `guest/12` + `guest/13` 的 SHA-256 = 启动冻结值，漂移即 fail-closed；证据包归档运行当次副本并逐字节核对。
++3. **点源纪律**：被点源的模块**不得有顶层 `param()`**；B3b 新模块同规则；自检比对点源前后函数清单差集（防同名静默覆盖）。
++4. `Invoke-B3aRound.ps1` **不可复用**（`-Candidate` 被 `ValidateSet` 锁死、S4.5/S6 固定）⇒ 自写 `Invoke-B3bRound.ps1`；`guest/12-round-inventory.ps1` 与 `guest/11-shutdown-audit.ps1` **原样复用**。
++
++**journal 字段映射表**
++| 既有键 | B3b 语义 |
++|---|---|
++| `candidate` | `c1`/`c2`/`c3`/`c2c3`/`positive-control` |
++| `stage` | 5 阶段之一 |
++| `targetPath` | 被测记录路径（`R:\…\requests\request.b3b-rNN.jsonl`） |
++| `contentDigest` / `size` | 预承诺的发布字节摘要 / 字节数 |
++| `outcome` / `verdict` / `voidReason` | 格判定与 void 原因 |
++| `round` / `timestamp` | 同 B3a |
++
++## 9. 证据包结构
++`docs/validation/evidence/b3b-<date>/`（**修订 R5**：目录结构改为对真实会话根布局的忠实映射，因为驱动器的 `journal.jsonl`/`session.log`/`pin.json`/`matrix.json`/`verdict.json` 都直接位于会话根，只有 `rounds/` 是子目录）：
++`README.md`（含布局映射、`claimScope` 逐字引用、链验结论与可复算边界）、`MANIFEST.md`、`SHA256SUMS.txt`、
++`session/{session.log,pin.json}`、`journal/{journal.jsonl,chain-verify.txt}`（由 `journal.jsonl` 改名入包）、
++`rounds/rNN/`（标记转录、cut 前归档、writer stdout/stderr、审计、盘点 ×2、对账、cut 记录）、
++`matrix/{matrix.json,verdict.json}`、`calibration/`・`u4/`・`variant/`（存在则复制）、
++`verification/{rig-vs-repo.txt,analyzer.txt}`、`rig/`（运行当次 B3b 装置 + 被复用 B3a 文件副本）。
++
++## 10. 风险与不可证边界
++1. **装置区分力风险（最大）**：记录级（~1 KiB）未刷目录项在 2 s 窗口可能高概率存活 ⇒ 主张格与参照格同为零丢失 ⇒ 只能 `unresolved`。B3a 的 4/5 只属 256 KiB 载荷。
++2. **统计分辨率**：格内 0 丢失的单侧 95% 上界 p<0.45 ⇒ `proven` 只能读作"该前提下、该装置分辨率内未观测到反例 + 机制确执行 + 装置有区分力"，**不得**读作长期保证。
++3. **阶段归属依赖协议证据**：阶段 4/5 在盘点观察上等价（A7 CP4≡CP5）⇒ 标记通道失效即只能 `unresolved`。
++4. 结论只覆盖前提 P；不覆盖物理硬件、其它 hypervisor/存储栈、宿主自身掉电（U3）、SMB/共享卷（U5）。
++5. 不覆盖：`.tmp` 残留清理、并发多写发布、resume/结算等其它链路。
++6. 即使 `proven`：B3b 不构成 AT-23 证据，不解锁 first-dispatch，不解除其它平台 `unproven`；契约修订属**条件性后续**子步骤。
++
++## 11. 实现偏离注记
++- **D1（候选原语落点）**：① 建议落生产文件（`//go:build windows`、不接线）；主控改落**测试作用域**（`_test.go` + `windows` tag）。理由：避免把未上线的发布原语带进产品二进制（架构规则禁止投机接口），同时保留 Windows 腿 CI 覆盖；`proven` 后由实现切片提升为生产字节（同源即可）。**待 ③ 预审裁定**。
++- **D2（`C:` 信令域）**：B3a 无第二写域；本片为阶段握手新增，已在 §1 声明。
++- **D3（门禁绕过）**：写入器在实验进程内置 `publicationDurability=proven` 并直呼 `writeReplayRecordNoReplace`；已在 §2 声明。
++- **D4（证据包可选分区，2026-09-21 实测）**：本装置的所有格——**含正对照标定格与 U4 配对轮**——全部写入 `<会话>/rounds/`（配对轮以 `paired=true` 标记），**不产出** `calibration/`・`u4/` 子目录。
++  证据包 README 会如实列出 `optionalSectionsAbsent=calibration,u4,guest`；各格角色与 U4 汇总见 `matrix/verdict.json` 的 `cells` 与 `u4`。
++  **读取约束**：不得把"可选分区缺席"误读为"标定或 U4 未执行"；也不得因此声称证据不完整（`rigMismatches=0 missingRequired=0`）。
++  唯一存在可选分区的实例是 `variant/`（变异臂产物，已按 D1 并入并附自撰 `README.md`）。
++
++## 12. 复现命令（宿主 PowerShell 5.1）
++```powershell
++# 构建客机写入器
++go test -c -tags b3bnative -o tmp\b3b\writer.exe .\internal\adapters\
++# 原生自测（无需 VM）
++go vet -tags b3bnative .\internal\adapters\
++go test -tags b3bnative -count=1 -run TestB3bNative .\internal\adapters\
++```
++
++## 13. ③ 预审整改记录（V4 Pro `changes-required` → 已闭环）
++
++预审判定 `changes-required`，F1/F2/F3 为阻断级。逐条整改如下；每条都落到代码，并由 `tools/b3b-rig/Test-B3bRig.ps1`
++的对应断言钉住（自检 **`checks=103 failures=0`**，含 6 个篡改拒裁夹具 + 1 个 cut 后 marker 截断容忍夹具 + 6 条入库证据包断言）。
++
++> **计数口径注记（⚠、2026-09-20）**：本表早期版本写 `checks=61`/`4 个夹具`，已过期。断言数与夹具数随四轮整改增长：
++> 当前 **103 checks / 6 篡改拒裁夹具 + 1 截断容忍夹具**。另有**证据包断言 6 条**（`bundle-*`，已入库，见 R30），
++> 早期"证据包冒烟 22 项一次性手工运行、尚未入库"的说法在 R30 后作废。引用时一律以实跑末尾的 `checks=... failures=0` 为准。
++
++| # | 预审发现 | 整改 | 钉住它的断言 |
++| --- | --- | --- | --- |
++| R1 | c2c3 决定格 `{4,5}` 与机制令牌规则自相矛盾 ⇒ 结构性不可证、10 轮空耗 | 决定格收窄为 `{5}`（§2 已改），组合格列表同步 | `decision-c2c3-parent-synced-only` |
++| R2 | 正对照无驱动器 ⇒ 区分力门**确定性永假**，全臂只能以错误理由 `unresolved` | 写入器接受 `positive-control`（基线原语 + 目录 flush + 卷句柄 flush，无卷句柄权限则回退记录句柄并单独标记）；装置侧 `Get-B3bArmList`/`Get-B3bControlList` 纳入控制臂，控制臂不主张决定格 | `control-arm-cell-is-schedulable`・`arm-list-has-control`・`decision-control-claims-nothing` |
++| R3 | 判定管线信任 `reconcile.json` 自身：`JournalChainOk` 硬编码 `$true`、journal 只记不门控 ⇒ 改两个 JSON 即可把 `disproven` 翻成 `proven` | 结果**重派生**（`plan.json`+`inventory-1.json`，与对账同源同一实现）+ 逐文件对位比对 `reconcile.json`/journal 记录的哈希（含 `marker-transcript.txt`/`marker.txt`/`audit.txt`）；不一致 ⇒ 该轮 `evidence-mismatch` 且 finalize **拒裁 exit 4** | `refuses-tampered-reconcile-outcome`・`refuses-tampered-inventory`・`tamper-changed-the-artifact` |
++| R4 | 阶段归属读 cut **后**拷回的 `marker.txt`（尾行可能正被断电丢掉）；`stageEscape` 只记不阻断；违反轮在缺机制证据时仍判 `disproven` | 归属改以 cut 前归档 `marker-transcript.txt` 为主、差异显式记账；逃逸 ⇒ `sessionBlock` 且 finalize **exit 6**；反例要求 `stageHit && mechanismOk`，否则该格封顶 `unresolved` | `phase-filter-*`・`refuses-session-block`・`verdict-unattributable-violation-unresolved` |
++| R5 | 证据包假设的 `journal/`、`matrix/` 子目录在真实会话根不存在 ⇒ 真会话必被 REFUSE | 包结构改为真实布局的忠实映射（§9 已改），并把链验结论写进 `journal/chain-verify.txt` 与 README | 证据包冒烟 22/22（`journal-copied`・`matrix-json-copied`・`chain-verify-ok` 等） |
++| R6 | 复用 pin 只在 S0 查一次；证据包 `rig-vs-repo` 拿当前哈希比当前哈希（同义反复） | 证据包改为与 S0 记录的 `session/pin.json` **真比对**，缺 pin 记 `UNPINNED` 且计入 mismatches；`pin.json` 入包 | **证据包冒烟**（非自检）：`pin-drift-detected`・`rig-vs-repo-compares-against-session-pin` |
++| R7 | U4 的 500 号分界纯数字约定、对账不记配对性 ⇒ 错号轮可把真反例移出臂裁决 | 对账记录 `paired`/`targetKind`；cell 模式强制区间（paired ⇒ ≥500，主矩阵 ⇒ <500）；finalize 按 `paired` 分类并断言号码区间与 `targetKind` 一致，不一致 **exit 4** | `refuses-paired-numbering-mismatch` |
++| R8 | 区分力只在阶段 1 得证，却可让阶段 4/5 的 `proven` 通行；门失败无中途止损 | 判定文档强制携带 `claimScope`（逐字写明"仅阶段 1 证明区分力/非长期保证"）；新增 `-Checkpoint` 中途检查点（门不成立即 exit 4 并要求操作者决策） | `verdict-document-carries-claim-scope`・`checkpoint-exists-before-the-budget` |
++| R9 | 臂级 `disproven` 把信息格（1–3）的违反也算到候选头上 | 仅决定格可推翻臂；信息格违反记 `infoViolations` 并封顶 `unresolved`（**修订 R23**：初版只记账未封顶，且自检把错误行为钉成规范） | `arm-info-cell-caps-the-arm-at-unresolved`・`arm-info-clean-can-still-be-proven`・`arm-c1-never-proven` |
++| R10 | 存活探针与断电之间存在无复查窗口；写入器超时不改变轮有效性 | **先冻结延时、再复探、紧接着断电**（复探→cut 间隔仅为探针时长，`survival-probe-2.txt`，失败即 void）；cut 后从 writer stdout/stderr 回收 `TIMEOUT <stage>` 并转为 void | `second-cut-probe-runs-on-every-path`（AST 包含关系：不得位于 `-NoConfirm` 分支内） |
++| R11 | 候选系统性失败被洗成 `marker-missed` | 检测超时时解析已归档 stdout/stderr，区分 `writer-failed-before-stage`（带错误文本）与真静默 | 同上 |
++| R12 | `tasklist` 探针用宿主文件名而非客机固定名 | 探针改用客机固定名（由 `$GuestWriterExe` 派生） | 同上 |
++
++**D1 裁定（预审意见，已接受并写入报告约束）**：候选原语留在 `windows` tag 的测试作用域对 `proven` 主张**不构成无效**——被测对象是"生产发布路径 + 经 nil 默认接缝注入的原语"。使主张失效的条件（报告必须遵守）：(a) 后续提升切片改动原语语义（如给 `MoveFileExW` 加 `REPLACE_EXISTING`、丢弃 `WRITE_THROUGH`、放宽目录句柄访问模式）而不重跑矩阵——`TestB3bCandidateMoveFileExNoReplace` / `TestB3bCandidateDirectoryFlush` 钉死的契约必须逐字保留；(b) 报告把"被测量原语存活"写成"产品现已耐久"（Windows 上产品仍为 `unproven`，必须逐句声明）；(c) 提升前删除测试文件导致溯源断裂（当前由 `writer.exe` SHA-256 在 S0 与证据包两处钉住）。
++
++**第二轮独立扫描（MAI ③.5）追加整改**：
++
++| # | 发现 | 整改 | 钉住它的断言 |
++| --- | --- | --- | --- |
++| R13（blocker） | void 路径不做完整性校验：把实测轮改写为 `verdict='void'` 即可把它移出有效集而不触发 exit 4 | void 轮同样必须与 journal 记录一致（`contentDigest`/`candidate`/`stage`，以及 `extra.verdict`/`extra.voidReason`/`extra.outcome` 只要存在就必须一致），且理由必须属于驱动器可产生的 void 词表（`Get-B3bVoidReasonList`）；不满足 ⇒ 该轮 `evidence-mismatch` ⇒ finalize exit 4。注：该篡改方向的最坏后果是 `unresolved`（有效轮不足 N），不是假 `proven`，但仍按完整性缺陷封闭 | `refuses-tampered-void-relabel` |
++| R14（major） | 完整性门仍把 cut **后**拷回的 `marker.txt` 当权威证据 ⇒ 断电截断尾行会误拒诚实轮 | `marker.txt` 退出完整性门（属告知性证据，`markerPostCutDiffers` 已逐轮记账）；阶段证明只认 cut 前归档 `marker-transcript.txt`（`markerPreCutDigest`）与 `audit.txt` | `post-cut-marker-truncated-fixture`・`matrix-c3-proven-despite-truncated-post-cut-marker` |
++
++（第三项 `inventory-2.json` 必填的顾虑经复核不成立：代码只在 reconcile 确实记录到第二份摘要时才要求它；实盘第二轮盘点在重启后运行，不存在被同一次断电截断的路径。）
++
++**第三轮（④ Codex 终审 + 定向复审）与第四轮（收口复审）追加整改**：
++
++| # | 发现 | 整改 | 钉住它的断言 |
++| --- | --- | --- | --- |
++| R15 | 会话目录按当日日期动态计算 ⇒ 跨午夜静默分裂会话 | 三脚本 `-SessionId` 贯通（矩阵解析一次并下传每轮）；预检允许已有 pin 胜出，**显式**冲突才拒绝；预检与矩阵同持会话锁 | `session-id-resolved-once-and-threaded`・`session-pin-pins-the-session-id`・`session-id-conflict-is-refused`・`preflight-takes-the-session-lock` |
++| R16 | `plan-no-ack` 不在 void 词表，且静态提取正则抓不到括号拼接形式 | 词表补齐；正则改为 `Invoke-B3bVoid \(?'…'` 并裁剪尾冒号；加 AST 裸命令守卫 | `void-vocabulary-covers-driver`・`void-vocabulary-is-not-empty` |
++| R17 | S0 未探客机存储根可写 ⇒ 权限/挂载问题拖到 S4/S6 才暴露 | 预检新增 `9-guest-store-root-writable`：先拉起 VM 并等 `guestcontrol` 就绪，GUID 后缀唯一文件名，guest 内 `$ErrorActionPreference='Stop'` 且**不无条件 exit 0** | S0 实机全绿（实机事实，非静态断言） |
++| R18 | 预算口径与实现不一致 | §6 修正为 c2c3 1 格×5、变异臂为人工臂、主矩阵 17 格×5 + U4 6 格×3 = 103 轮；单轮 3.8–4.6 min、总 ≈6.6–8.3 h | 无（文档） |
++| R19 | 我的整改自身引入 blocker：注释缺 `#`（能过语法解析、运行时当命令执行） | 修正注释，并新增 AST 守卫：任何无连字符的裸命令名若非已定义函数且不可解析即转红 | `no-unresolvable-bare-command` |
++| R20 | 探针命令无条件 `exit 0` ⇒ 写入失败可伪装成功 | guest 内 `$ErrorActionPreference='Stop'` 且不再无条件退出 0；失败即预检失败 | 实机 S0 探针（R17） |
++| R21 | 固定探针文件名可能覆盖既有文件 | 改为 GUID 后缀唯一名，先创建后删除 | 实机 S0 探针（R17） |
++| R22 | pin 冲突静默采纳（掩盖真实不一致） | 保留原始入参标记；仅**显式** `-SessionId` 与 pin 冲突时拒绝 | `session-id-conflict-is-refused` |
++| R23 | 信息格违反只记账、未封顶（自检还把错误行为钉成规范） | `proven` 追加 `-and ($infoViolations.Count -eq 0)`；自检改为双向（违反 ⇒ `unresolved`；信息格干净 ⇒ 仍可达 `proven`） | `arm-info-cell-caps-the-arm-at-unresolved`・`arm-info-clean-can-still-be-proven` |
++| R24 | U4 的 `orphanCompletions` 未重派生 ⇒ 改一个字段即可把真证伪吞成 `unresolved` | finalize 改为从该轮 `inventory-1.json`（哈希已 pin）经 `Get-B3bReplayPairing` 重派生并对位，不一致 ⇒ **exit 4** | `refuses-tampered-u4-orphan`・`u4-tamper-applied` |
++| R25 | R24 的初版对每个 paired 轮无条件要求盘点 ⇒ **诚实 void 的 U4 轮会被误拒** | void 轮跳过对位（void 路径恒早于盘点落盘，其篡改面由 void 词表 + journal 对账覆盖） | `void-u4-round-does-not-block-finalize` |
++| R26 | `Start-Sleep` 仍位于复探之后（复探→cut 仍 2 s；注释与代码相反） | 顺序改为冻结 → 复探 → 断电 | `second-cut-probe-runs-on-every-path`（含实机 `survival-probe-2.txt`） |
++| R27 | 零运行 VM 时全清 headless 为 fail-open（别的 VM 可能正在启动尚未入列） | 仅清「命令行匹配本 VM」或「无任何 VM 运行时命令行不可识别」的进程；`list runningvms` 失败即 fail-closed 不清 | `stale-session-match-is-boundary-anchored` |
++| R28 | 会话锁的 PID 复用盲区未文档化 | 见下方"会话锁恢复动作" | — |
++| R29 | ④ 收口复审：预检在**终止异常**路径上不释放会话锁（缺 finally 兜底）⇒ 留活 pid 锁，下一次诚实运行被 `REFUSED` | 脚本级 `trap`（覆盖所有终止错误，含助手内抛出）：`$SessionDir` 非空即释放 → 打印 `preflight aborted:` → `exit 1`；选 trap 而非 try/finally 是为避免把主流程整体缩进（语义等价、改动面最小） | `preflight-releases-the-lock-on-a-terminating-error` |
++| R30 | ④ 收口复审：证据包构建器的 premise 回退与该构建器的"拒绝写出仓库根"守卫**均无入库断言**（此前靠一次性手工 smoke，不可重复） | 自检新增 K 段：合成最小会话 → 实调构建器，断言 `bundle-fixture-journal-ack`・`bundle-builds-from-the-repository-suite`・`bundle-layout-complete`・`bundle-readme-carries-the-premise`・`bundle-marks-a-missing-premise`（无 premise ⇒ README 必须写 `UNKNOWN (verdict.json carried no premise)`）・`bundle-refuses-to-write-outside-the-repo-root`；构建器拒绝是**终止错误而非退出码**，故统一经 `Invoke-B3bEvidenceBuilder` 包装（否则一次拒绝会打死整套自检，实测已发生） | 上述 6 条 + `bundle-*` |
++| R31 | `-Cell` 的校验正则 `^([a-z0-9]+):([a-z-]+)$` 不接受含连字符的臂名，而控制臂名就叫 `positive-control` ⇒ **正对照标定格从 CLI 结构性不可调度**（判别力门的正半永远跑不了，所有臂会被非经验原因封顶为 `unresolved`）；而断言 `control-arm-cell-is-schedulable` 只 grep 了下一行的 `(Get-B3bArmList) -contains $arm`，因此一直是绿的 | 抽出单一权威解析器 `Resolve-B3bCellSpec`（臂名允许连字符 + 成员校验），矩阵与自检共用；断言改为**真调解析器**（行为式），并新增 `cell-resolver-still-refuses-unknown-arms`・`matrix-uses-the-shared-cell-resolver` | `control-arm-cell-is-schedulable`・`cell-resolver-still-refuses-unknown-arms`・`matrix-uses-the-shared-cell-resolver` |
++| R32 | 会话号缺省回落为"当天日期"，而 pin 又存在会话目录**内部** ⇒ `-Finalize` 漏传 `-SessionId`（或跨零点后）会去另一空目录找轮次，**零轮却 exit 0 写出空判定**（读起来与诚实的 `unresolved` 完全同形，静默丢掉整场证据）；自检自身也因夹具写死 `2026-09-20` 而有时效性——跨零点后实测 7 条断言变红 | finalize 新增 fail-closed：解析出的会话目录下零轮即 `REFUSED` + exit 4；自检夹具会话号改为变量并**显式贯通**到每一次矩阵调用（含 finalize 与篡改夹具） | `finalize-refuses-a-session-with-no-rounds`・`finalize-honours-the-requested-session-id` |
++| R33 | 盘点契约实现得比设计**本意更严**：B3a §2.3 要求的是"两次盘点逐字节一致"以证明**枚举态已定**、而非"头两次就读到定态"。实机 c1（temp-written）首读可能仍处未定态 ⇒ 三轮诚实负对照全部 void 且撞满预算；且旧代码在比较失败时**不落盘两份字节**，导致无法区分"存储真在变"与"读取时序伪影" | 新增 `Get-B3bSettledInventoryPair`（**向前扫描首个相邻一致对**，上界 `$B3bInventoryMaxReads = 4`）；轮驱动改为有界循环、每次读取均存档（`inventory-attempt-N.bin`）、记录稳定所需次数（`inventory-reads.txt`）、并以**稳定对**写 `inventory-1/2.json`；未稳定仍 void 且保留 `inventory-mismatch-1/2.bin` | 行为式：`inventory-settles-on-the-first-pair`・`inventory-settles-on-the-second-pair`・`inventory-never-settles`・`inventory-single-read-never-settles`・`inventory-retry-bound-leaves-room-to-settle`；静态：`round-preserves-every-inventory-read`・`round-records-the-settled-pair`・`round-records-how-many-reads-were-needed`・`round-preserves-the-unsettled-pair` |
++| R34 | 单次盘点读取失败（重启后 guest 管理通道尚未就绪：实测返回很快、非超时）⇒ 旧代码直接 `exit 5`，整轮作废并触发整轮重试（每轮~5 min + 一次新 cut）；且日志只写 'failed'，**不记退出码与 stderr**（与 P4 同类可观测性缺陷） | 单次读取失败改为**轮内重试**（消耗同一个有界读取预算，不重跑整轮）；失败详情（exitCode + bounded stderr/stdout）逐次入日志；**全部**读取均失败才 `inventory-failures.txt` + `exit 5` | `round-retries-a-failed-inventory-read-in-place`・`inventory-failure-log-carries-the-exit-code`・`round-aborts-when-every-inventory-read-fails` |
++| R35 | 变异臂（D1）文件命名 `agent_runner_b3b_variant_arm_test.go` 的**尾段 `arm` 被 Go 当作隐式 `GOARCH=arm`** ⇒ 该文件在 windows/amd64 上**永不参与构建**（显式 `//go:build windows && b3bnative && b3bvariant` 也无效），症状是 gopls 报 `No packages found for open file`（易误判为 buildFlags 未配） | 改名 `agent_runner_b3b_variant_degraded_test.go`（尾段避开 GOOS/GOARCH 词）；用 `go list -tags … -f "{{.TestGoFiles}}|{{.IgnoredGoFiles}}"` 核验归属（变体视图已含该文件、默认文件被排除） | 无需新断言：接线由 `go list` 两视图核验；坑位记入仓库记忆 `prfrail-go-gotchas.md` |
++
++**⑤ 实机运行中才发现并修的七项**（逐级复审：P1–P4 过 ③ V4 Pro 收口；P5・P7 过 ④ Codex 定向复审 `VERDICT: PASS`；P6 见下方反证实验）：
++
++| # | 现象（实机复现） | 整改 | 钉住它的断言 |
++| --- | --- | --- | --- |
++| P1 | 硬断电后残留 `VBoxHeadless` 会话使紧随的 `startvm` 报 `E_FAIL / SessionMachine` | `Wait-B3bVmPowerOff`（等 VM 真到 `poweroff`）+ `Clear-B3bStaleVmSession`（词边界匹配与 `$safeToClear` 边界，见 R27）+ `Start-B3bVm` 有界重试并记录 stderr；S1/S2/S8 三处生效 | `stale-session-match-is-boundary-anchored`・实机 `startvm ok=True attempts=1` |
++| P2 | 装置无并发保护（两个实例同时操作同一 VM ⇒ `BLOCKER: cannot query VM`） | `Enter-B3bSessionLock`/`Exit-B3bSessionLock`（记录 pid + owner + **会话目录指纹**；按进程存活判陈旧；矩阵持锁不释放、预检短持后释放） | `lock-blocks-a-second-live-holder`・`inherited-lock-does-not-block-a-copied-session` |
++| P3 | 冻结的 `Write-B3aTextFile -Text` 用参数绑定拒绝空串，而多处工件**设计上可为空** ⇒ 断电后未捕获异常 `exit 1` | 新增 `Write-B3bArtifactText`（`[AllowEmptyString]`，UTF-8 无 BOM + LF；空串不改变任何参与哈希/完整性门的字节）并替换轮驱动中所有可能为空的写入点 | 实机单轮 `exit 0` + `writer-stderr.txt`（0 字节且存在） |
++| P4 | 矩阵在非预期退出码时丢弃轮 stderr ⇒ 只能看到裸退出码 | 非 0/3/5/6/7 时记录轮 stderr（该补丁直接定位了 P3） | 无（可观测性） |
++| P5 | 正对照标定命令被 `REFUSED`（见 R31） | 共享 cell 解析器 + 行为式断言；五个 cell 实跑解析全部 OK | `control-arm-cell-is-schedulable` 等三条；反证实验：回退旧正则 ⇒ 该断言变红并给出 `arm=<threw>` 诊断 |
++| P6 | 跨零点后自检 7 条 FAIL、finalize 写出空判定（见 R32） | 会话号显式贯通 + finalize 零轮 fail-closed | `finalize-refuses-a-session-with-no-rounds`・`finalize-honours-the-requested-session-id`；反证实验：禁用守卫 ⇒ 前者变红（exit=0 且指向空会话的 `matrix.json`） |
++| P8 | c1 某轮 `inventory run 1 failed`，同一位置连续两次 ⇒ 整轮作废 3 次后单元格停止（见 R34） | 盘点读取失败改为轮内重试 + 退出码/stderr 入日志 | `round-retries-a-failed-inventory-read-in-place` 等三条 |
++
++**⑤ 检查点结果（2026-09-21 02:55，会话 `2026-09-21`）**：`-Checkpoint` = **`CHECKPOINT PASSED: discrimination power demonstrated; the matrix may proceed.`**（exit 0）。
++依据：正对照（`positive-control:parent-synced`）r00–r04 共 5 轮全部 `survived`（丢失 0）；负对照（`c1:temp-written`）有效轮均 `lost-absent` ⇒ 判别力门双半成立。
++同会话盘点读取次数实测分布：`reads=2`（5 轮标定 + 2 轮 c1）与 `reads=3`（4 轮 c1），**未出现 4 读**；即 R33 的额外代价平均为 1 次盘点（≈ 27 s/轮）。
++矩阵运行失败计入 `exit 5`（r07，2 次整轮重试同点失败）已在 R34 修复后清零（恢复补跑 3 轮全部 `exit 0`）。
++
++**⑤ 用户裁决记录（2026-09-21）**
++
++| # | 裁决 | 执行口径 |
++| --- | --- | --- |
++| D1 | **补跑变异臂 2 轮**（§6 表中"变异臂（装置自证伪）"） | 定位为**加强证据**：不阻塞主矩阵、不改变主矩阵结果；窗口 = 主矩阵完成后、`-Finalize` 之前；**若失败不回溯主矩阵**，只如实记录，并把 §10.1 结论降级为"判别力门成立但变异臂未通过"。实现口径：tag 门控变体构建（不污染默认构建）+ 独立 rig root（避免污染主会话判定）+ 事后并入 `<主会话>\variant\`（bundle 会复制该可选分区）。**判据**：降级原语下装置若仍给 `proven` ⇒ 装置失明（属严重发现，按降级登记）；若封顶 `unresolved`/不 proven ⇒ 自证伪成立。 |
++| D2 | **④ 按实记账** | 报告「成本与计量」逐次列出 5 次 ④ 调用的目的与发现数，并写明超预算原因（闭环铁律 + P5/P7 新增审查点），明确"非执行者违规"；同时在 §10.1 或报告末尾登记一条**「准则待议」**：硬门切片（A7/B2/B3/B4）的 ④ 调用上限是否需单列——留待本轮结束后评估，**不在 A7 内修改准则**。 |
++| D3 | **⑥ 档位切深度（Max），可提前切** | ⑥ 的 ADR-013 重排与反证原型类**证明式推理**需要 Max；切换只影响主控推理档位，**不影响**后台运行的矩阵进程（独立于会话）。用户可能不在场 ⇒ 提前切换；若切换导致会话上下文重建，状态可由 `/memories/session/b3b-t027-closeout.md` + 本设计说明 + 会话日志完全恢复。 |
++
++**R33 原始证据（实机，主会话 `2026-09-20`，c1:temp-written r08，两次盘点的完整差异）**：
++`len1=720 len2=723`；叶子 18/18；**差异叶子恰 2 个**，且只指向同一字段——
++`probeEntries.files[0].size`：首读 **0** → 次读 **1082**（文件为未链接临时件 `requests\.request.b3b-r08.jsonl.819624024.tmp`）。
++两读的判定相关字段**完全一致**：`probeState=entries`、`dirty='Volume - R: is NOT Dirty'`、`lastBoot=2026-09-21 00:54:24`、
++`fileCount=4`、`tmpFiles` 列表、`requestCount=0`、`completionCount=0`、`requestsWithoutCompletion=[]`、`orphanCompletions=[]`、`runDirs=[]`。
++即：差异集中在**不参与 c1 结论判定**的未链接临时件尺寸上，而 c1 的预期结论（记录未被发布 ⇒ `lost`）在两次读取下都成立。
++取证前置事实：旧代码在比较失败时先 void、后落盘，三轮诚实轮次**没留下任何可比对字节**——这是可观测性缺陷，已一并修（`inventory-mismatch-1/2.bin`）。
++反证实验：把"向前扫描首个相邻一致对"退回"只看首对" ⇒ `inventory-settles-on-the-second-pair` 变红（`stable=False tries=3 pairOk=False`），恢复后回到 `checks=100 failures=0`。
++④ Codex 定向复审（带上述原始差异）判定：**PASS + GO**，并明确"现有证据更支持测量伪影而非掩盖设备保真度问题"。
++
++**时间口径（R33 附带，须按实测回算）**：单轮时长不再能按"两次盘点"估算；以每轮 `inventory-reads.txt` 的分布乘以单次盘点实测耗时回算，
++不得沿用 §6 旧的"两次盘点"口径。S8 单次盘点调用超时上限 120 s，理论上界因此抬高。
++
++**设备保真度：本轮证据未证伪、亦未证明（R33 附带，⑥ 必须逐句限定）**：本次差异方向是"晚读可见到更多"（0 → 1082）。
++两种解释都能产生该现象：① 客机首次枚举读到了尚未定型的元数据视图（测量伪影）；② 宿主/虚拟盘层在 cut 之后仍把已缓存写落盘（保真度问题）。
++证据**偏向前者**：判定关键字段两读一致、且该尺寸变化不改变 c1 的 `lost` 结论；但装置本身**不能仅凭这一条差异**证明排除后者。
++因此 ⑥ 不得据此声称"装置已证明等价于物理断电"；如需该主张，必须另有独立检验（例如对 cut 前后虚拟盘上的字节做外部比对），本片未做。
++
++**会话锁恢复动作（R28）**：锁的陈旧性以「记录的 pid 是否仍存活」+「锁内 `sessionDir` 是否指向当前会话目录」判定。
++已知盲区：上一轮崩溃后若 OS 将该 pid 复用给无关进程，下一轮诚实运行会被 `REFUSED: the session lock is held by a live process`。
++恢复动作：确认确无装置进程在跑（`Get-CimInstance Win32_Process -Filter "Name = 'powershell.exe'"` 过滤 `Invoke-B3b`）后，删除该会话目录下的 `session.lock` 重跑；
++不得在不确定时删除（否则会重新引入两实例并发操作同一 VM 的危险局面）。
++
++**收口闭环记录（用户质询后补做，2026-09-20）**：按《Flash 主控执行准则》v3.1 §5 铁律，③/③.5/④ 三级在整改后**各自重跑收口复审**：
++
++| 级 | 收口结果 | 备注 |
++| --- | --- | --- |
++| ③ V4 Pro | **PASS** | 2 轮内无新实质发现 |
++| ③.5 MAI | **PASS** | — |
++| ④ Codex 收口 #1 | `FINDINGS` | 5/5 历史项关闭；1 条新 MAJOR = R29；1 处覆盖缺口 = R30 |
++| ④ Codex 收口 #2 | **PASS（明确 GO：103 轮可起跑）** | R29/R30 均按可证伪性逐条给出\"删守卫则哪条断言变红\" |
++
++治理更正：此前\"整改后未重跑本级复审\"属**流程缺陷**，不是特殊考虑；本表为更正后的执行事实，成本与计量一并在切片报告记账。
++
++**复审终止规则（防无限循环，⑥ 须采纳）**：仅当新一轮发现**改变被断言的行为**或**暴露新的可证伪性缺口**时才再跑同级复审；仅影响诊断信息、不改变任何断言与判定语义的细节记为**已接受残余风险**并入档，不再消耗复审预算。
++
++**已接受的残余风险（R29 附带）**：`trap` 体内层未再包 try/catch。若释放时遇极端 I/O/ACL 异常，原始异常文本可能被替代——影响面仅限**诊断文本**：退出码仍为 1；`Exit-B3bSessionLock` 本身已含\"文件不存在即返回\"\"JSON 解析失败即返回\"\"仅当 pid 匹配才删除\"三层防御；且该情形下锁文件无论如何都删不掉，遮蔽不改变结果。判定不构成新缺陷，记录在案、不追修。
++
++**报告不得使用的措辞**（预审第 5 项，⑥ 必须逐条规避）：不得出现长期保证/普遍耐久（`durable`/`guarantee`/`survives power loss`）——只能用 §10.2 句式；不得写 U4"已证明有序"（18 轮只能证伪，上限仍是 `unresolved`）；不得写"候选在决定格优于基线"（除非 C1 同阶段格出现丢失）；不得声称"journal 链可检出轮工件篡改"（链只验 journal 行，工件完整性靠 R3 的重派生 + 逐文件比对；对工件与 journal 的**整体重写**只能靠证据包校验和与 S0 pin 这两个外部锚点发现）；不得声称"证据包自动可复算"（只能说可由 `rounds/` + `journal.jsonl` 复算）。
++**必须逐句声明的限定**（MAI 追加）：(a) 正对照实际执行的是卷句柄 flush 还是回退的记录句柄 flush——若为回退，区分力门只能读作"在该回退刷盘下装置可观测到干净结果"，**不得**读作"卷级设备缓存已证明被排空"；(b) `c2c3` 在 `parent-synced` 与 `c3` 同一决定点、且该阶段的组合原语与 C3 等价，故 `c2c3` 只能作为**诊断臂/重复臂**报告，不得当作独立的耐久主张；(c) 阶段证明取自 cut 前转录，而非断电后拷回件。
+diff --git a/docs/validation/t027-b3b-durability.md b/docs/validation/t027-b3b-durability.md
+new file mode 100644
+index 0000000..5125d24
+--- /dev/null
++++ b/docs/validation/t027-b3b-durability.md
+@@ -0,0 +1,293 @@
++﻿# T027 · B3b · 候选注入矩阵与耐久三档定案 — 验证报告
++
++日期：2026-09-21 ｜ 状态：**COMPLETE（报告成文；未提交、未推送）** ｜ 执行主控：DeepSeek V4.1 Flash（⑥ 段主控档位 = 深度/Max）
++配套权威：`docs/t027/B3B_DESIGN.md`（设计与整改单一权威）｜ `docs/t027/B3A_RIG_DESIGN.md`（冻结装置）｜ 证据包：`docs/validation/evidence/b3b-2026-09-21/`
++
++> **级别与前提必须一起读**：本报告只使用三态等级 `proven` / `unresolved` / `disproven`；
++> 任何 `proven` 都**只在前提 P 下**成立，**不得**读作长期保证、普遍耐久、跨平台结论或 AT-23 证据。
++
++---
++
++## 0. 诚实准则（本报告所有结论的前提）
++
++1. **前提 P 之外的任何推论都不成立**（§1）；结论不覆盖物理硬件、其它 hypervisor/存储栈、其它文件系统/载荷尺寸、宿主自身掉电。
++2. **等级三态**：`proven` / `unresolved` / `disproven`。`unresolved` **不是**"失败"，也**不是**"不耐久"；它表示在前提 P 与装置分辨率下**未能建立主张**。
++3. **`proven` 的五条件**（设计 §7）：① 全部 5 格 × N=5 有效轮落在允许集；② **决定格机制证据齐备**；③ 区分力门成立；④ 全局不变量成立；⑤ journal 全链与 plan/cut/reconcile 完整。
++4. **测试不能自证**：自检与断言只证明"删掉守卫会变红"这类可证伪性（§6/§9），不构成结论本身；结论的唯一来源是 ⑤ 的原生证据。
++5. **不得使用**长期保证类措辞（`durable` / `guarantee` / `survives power loss`）；只能用 §5 的 `claimScope` 句式逐字表达。
++
++## 1. 范围与边界
++
++**前提 P（冻结，逐字见 `matrix/verdict.json` 的 `premise`）**
++
++- hypervisor **VirtualBox 7.2.18 r175117**；guest **Windows 11 25H2 build 26200.8037**（零售、未激活）；文件系统 **NTFS**。
++- 存储：SATA/AHCI，**`useHostIOCache=false`**，两块盘 `--nonrotational on`；注入卷 **`R:` = INJECT**（`data.vdi`，7.98 GB，4096 B 群集）。
++- 注入方式：**guest 硬断电**（`VBoxManage controlvm poweroff`）；基线快照 `pristine` = `065a25e1-d95c-4f33-8081-4f06216ecce8`（本片不重取）。
++- `nic1=none`（客机无网络栈）。**信令域声明**：`C:\prfrail-prep\` 为阶段标记的第二写域，**不参与测量**；测量域只有 `R:` 上的 replay store 根，每轮仅**一次**被测发布。
++- 载荷：记录级 **~1 KiB**（1082 B）；cut 前冻结延时 **2.0 s**（沿用 B3a 冻结标定，不重标定）；每格 **N=5**。
++
++**不覆盖（不得外推）**
++
++- 物理硬件/固件写回与真实掉电（本片是 hypervisor 级硬断电）；其它 hypervisor、其它文件系统、SMB/共享卷/云盘（U5）；宿主自身掉电（U3）。
++- `.tmp` 残留清理、并发多写发布、resume/结算等其它链路。
++- **AT-23**：本片**不构成** AT-23 证据，不解锁 Windows `first-dispatch`，不解除其它平台 `unproven`。
++- 统计分辨率：格内 0 丢失的单侧 95% 上界 p<0.45 ⇒ 只能读作"该前提下、该装置分辨率内未观测到反例"。
++
++**装置保真度（本片未证明，逐字保留）**：本片发现过一次"两次盘点可见性晚到"的现象（未链接临时件 size 0→1082，见 R33），
++证据偏向"首次枚举读到了未定型元数据视图"的测量伪影，但**不能**仅凭该证据排除宿主/虚拟盘层在 cut 之后继续可见化的保真度问题。
++因此本报告**不得**被读作"本装置已证明等价于物理断电"。
++
++## 2. 候选与装置
++
++| 候选 | 语义 | 落点 |
++| --- | --- | --- |
++| **C1**（参照臂） | 现行基线：`os.Link` no-replace + 平台父目录步（Windows 上为空操作） | 默认路径本身；**永不 `proven`** |
++| **C2** | `MoveFileExW` + `MOVEFILE_WRITE_THROUGH (0x8)` 的 no-replace move 取代 `os.Link` | 发布原语钩子 `replayStorePublishPrimitiveHook` |
++| **C3** | 目录句柄 `FlushFileBuffers` 取代 Windows 上的空操作父目录步 | 父目录钩子 `replayStoreParentSyncHook` |
++| **C2C3** | C2 + C3 组合 | 两个钩子 |
++| **positive-control** | 基线原语 + 目录/记录句柄 flush（无卷句柄权限时回退并单独标记） | 两个钩子；**不主张决定格**，只标定装置 |
++
++- 两个接缝**均为 nil 默认、零语义**：生产路径逐字节不变（③/④ 均复核过）。
++- **D3（门禁绕过，已声明）**：写入器为实验进程，内置 `publicationDurability=proven` 并直呼 `writeReplayRecordNoReplace`——只为到达被测发布点，不改变生产门禁。
++- **变异臂（装置自证伪，人工臂，不计入 103 轮）**：编译期常量 `b3bVariantDegrade`（`-tags "b3bnative b3bvariant"`）把所有候选降级为基线原语，而 trace 如实记录降级后的原语。见 §5.4。
++
++**冻结协议（设计 §2/§4，B3a 复用）**
++
++- 5 个发布阶段：`temp-written` → `temp-synced` → `temp-closed` → `record-linked` → `parent-synced`。
++- **决定格**：C2 = {record-linked, parent-synced}；C3 = {parent-synced}；C2C3 = {parent-synced}；C1/正对照 = ∅。
++- **阶段归属以 cut 前归档的 `marker-transcript.txt` 为主**；逃逸 ⇒ `sessionBlock`（finalize exit 6）。
++- **fail-closed 规则（本片判定的关键）**：决定阶段的有效轮若 `mechanismOk=false`，该格**不得** `eligible`，理由记 `mechanism evidence missing in rounds N`。
++  含义：**机制未被证明执行过的"存活"不能兑现成耐久主张**——这是本片装置自证伪能力的正式落点。
++
++## 3. 执行结果
++
++### 3.1 门禁（Windows 本机，提交前终跑）
++
++| 项 | 结果 |
++| --- | --- |
++| 装置自检 `tools/b3b-rig/Test-B3bRig.ps1` | **`checks=103 failures=0`** |
++| `Invoke-ScriptAnalyzer -Path tools/b3b-rig -Recurse` | **0** |
++| `gofmt -l`（触碰文件 + `internal`） | 空 |
++| `go build ./...` / `go vet ./...` / `go vet -tags b3bnative ./internal/adapters/` | 全 ok |
++| `go test -count=1 ./...` | **14 包全 ok、0 FAIL** |
++| 原生套件 `go test -tags b3bnative -count=1 ./internal/adapters/` | **exit 0**（25 s） |
++| 编码与行尾 | 本片触碰的 `.md`/`.ps1` = UTF-8 **with BOM** + LF；`.go`/`.json` = **without BOM** + LF |
++
++### 3.2 主矩阵（会话 `2026-09-21`，写入器 sha256 `06de8a72…`）
++
++- **17 格 × 5 = 85 轮，全部有效：`ok=85 void=0`**；运行失败 0（唯一次运行失败 r07 发生在修复前的旧代码上，已由 R34 修复后清零，见 §9.4）。
++- 标定/负对照（判别力门）：正对照 `positive-control:parent-synced` **5/5 存活**；负对照 `c1:temp-written` **5/5 丢失**（另 `c1:temp-synced`、`c1:temp-closed` 各 5/5 丢失）。
++- 逐格结果（存活/丢失）：
++
++| 格 | survived | lost | 机制令牌齐备 |
++| --- | --- | --- | --- |
++| `positive-control:parent-synced` | 5 | 0 | 5/5 |
++| `c1:temp-written` / `temp-synced` / `temp-closed` | 0 / 0 / 0 | 5 / 5 / 5 | — |
++| `c1:record-linked` | 4 | **1** | 5/5 |
++| `c1:parent-synced` | 5 | 0 | 5/5 |
++| `c2:temp-written` / `temp-synced` / `temp-closed` | 0 / 0 / 0 | 5 / 5 / 5 | — |
++| `c2:record-linked` | **5** | 0 | **5/5** |
++| `c2:parent-synced` | **5** | 0 | **5/5** |
++| `c3:temp-written` / `temp-synced` / `temp-closed` | 0 / 0 / 0 | 5 / 5 / 5 | — |
++| `c3:record-linked` | 5 | 0 | 0/5（该格非其决定格） |
++| `c3:parent-synced` | 5 | 0 | **4/5**（见 §5.2） |
++| `c2c3:parent-synced` | 5 | 0 | **4/5**（见 §5.2） |
++
++- **盘点读取次数实测**：`reads=2` 或 `reads=3`，**未出现 4 读**（R33 的额外代价平均 1 次盘点 ≈27 s/轮）。
++
++### 3.3 U4 排序子矩阵（`-Paired`，轮号 ≥500）
++
++- **6 格 × 3 = 18 轮，全部有效：`ok=18 void=0`**；18 轮 `targetKind` 均为 `completion`（finalize 的强制项）。
++- **真孤儿 C 计数 = 0**（全 6 格）。
++
++### 3.4 变异臂（D1，人工臂，独立 rig root `b3b-runs-variant`）
++
++- 2 轮 `c2:parent-synced`：`survived` **且** `stageHit=true`，但 `mechanismOk=false`（缺 `MoveFileExW(WRITE_THROUGH,no-replace)`），
++  trace 逐字为 `… os.Link … platform-parent-sync …` ⇒ 装置**拒绝**把这两轮"存活"兑现为机制成立的证据。
++- 离线互证：变体构建下 `TestB3bNativeCandidateTraceNamesTheRealPrimitive` **FAIL**（诊断逐字给出降级原语）；默认构建下同一测试 **PASS**、原生套件 exit 0。
++- 产物并入证据包 `variant/`（含自撰 `README.md`）。
++
++### 3.5 证据包
++
++`docs/validation/evidence/b3b-2026-09-21`：`files=2157 rigMismatches=0 missingRequired=0`；
++`optionalSectionsAbsent=calibration,u4,guest`（**偏离 D4**：本装置所有格——含正对照与 U4 配对轮——均写入 `rounds/`，配对轮以 `paired=true` 标记；**不得**把可选分区缺席读成"标定/U4 未执行"）。
++
++## 4. 结论账本
++
++### 4.1 三档定案（`-Finalize` exit 0，2026-09-21 12:08:21；数据源 `matrix/verdict.json`）
++
++| 臂 | 等级 | 依据（机器输出） |
++| --- | --- | --- |
++| **C2** | **`proven`** | `decisionSets=[record-linked,parent-synced]`，两格**全 `eligible`**（5/5 在允许集且机制证据齐备） |
++| C1 | `unresolved` | 参照臂无决定格（`decisionSets=[]`）；`infoViolations=["record-linked"]`（该格 `disproven`，见 4.2） |
++| C3 | `unresolved` | `decisionSets=[parent-synced]` → `notEligible`，理由逐字 **`mechanism evidence missing in rounds 77`** |
++| C2C3 | `unresolved` | 同上，理由逐字 **`mechanism evidence missing in rounds 81`** |
++| positive-control | （标定） | 5/5 存活，`eligible`；不主张耐久 |
++
++**判别力门（防假 `proven`）**：`ok=true`，负对照（c1 阶段 1）**5 轮 5 丢失**、正对照 **5 轮 0 丢失**（`requiredN=5`）。
++
++**U4（排序）**：`unresolved`，`validRounds=18`，`orphans=0`，注记逐字：
++`ordering can only be falsified by a counterexample, never proven by a clean sample`。
++
++**结论口径（`claimScope`，逐字引用）**：
++
++> within premise P (VirtualBox Win11B3 / NTFS on SATA-AHCI, useHostIOCache=false, record-level ~1 KiB payload, 2 s cut window, N=5 per cell): no counterexample observed, candidate mechanism demonstrably executed, device discrimination demonstrated at stage temp-written only; not a long-term guarantee and not a claim about other hypervisors, filesystems, payload sizes or the host losing power
++
++**必须逐句声明的限定**：
++
++- (a) 正对照实际执行的是**卷/记录句柄 flush**（trace 逐字记录，无卷句柄权限时回退并单独标记）；区分力门只能读作"在该次刷盘下装置可观测到干净结果"，**不得**读作"卷级设备缓存已证明被排空"。
++- (b) `c2c3` 与 `c3` 在 `parent-synced` 同一决定点、该阶段组合原语与 C3 等价 ⇒ `c2c3` 只能作**诊断臂/重复臂**报告，**不得**当作独立的耐久主张。
++- (c) 阶段证明取自 **cut 前**转录，而非断电后拷回件；`C1` 在阶段 4 的 1/5 丢失**只**作为装置区分力的证据，不外推为生产行为结论。
++
++### 4.2 逐格拒绝/证伪项原文
++
++| 格 | 等级 | 理由（机器输出逐字） |
++| --- | --- | --- |
++| `c1/record-linked` | `disproven` | `round 21: lost-absent is outside the allowed set for record-linked`（该轮 `stageHit && mechanismOk`，故可归属为反例） |
++| `c3/parent-synced` | `unresolved` | `mechanism evidence missing in rounds 77` |
++| `c2c3/parent-synced` | `unresolved` | `mechanism evidence missing in rounds 81` |
++
++## 5. 关键判定说明（防误读）
++
++### 5.1 为什么 C2 可以 `proven` 而 C3/C2C3 不能
++
++C2 的两个决定格共 10 轮全部落在允许集、机制令牌齐备、装置有区分力、journal 全链完整；
++C3/C2C3 的决定格各有 **1/5 轮**断电落在机制真正执行之前（trace 中无 `FlushFileBuffers(dir)` 等令牌，
++见 r77/r81）。装置按 fail-closed **拒绝**把"机制未执行过的存活"算作该臂的证据——
++若算作证据，就等于让候选认领它并未产生的耐久性。
++
++### 5.2 由此产生的**不得读取**结论
++
++- **不得**写"c3/c2c3 不耐久"或"c3/c2c3 被证伪"：它们只是**未能建立主张**（`unresolved`）。
++- **不得**写"U4 已证明有序"：0 孤儿只能"未被证伪"。
++- **不得**写"候选在决定格优于基线"以外的因果（除 C1 阶段 4 的 1/5 丢失这一装置区分力证据外）。
++- **不得**声称"journal 链可检出轮工件篡改"：链只验 journal 行；工件完整性靠 plan+inventory 重派生与逐文件哈希比对；对工件与 journal 的**整体重写**只能靠证据包校验和与 S0 pin 这两个外部锚点发现。
++- **不得**声称"证据包自动可复算"：只能说可由 `rounds/` + `journal.jsonl` 复算。
++
++## 6. 改动点与测试点（可证伪性）
++
++- **装置**：`tools/b3b-rig/` 共 10 个脚本（新写）+ 证据包构建器；`tools/b3a-rig/` 4 个文件**原样复用**（会话 pin 记录其哈希）。
++- **Go 侧**：`internal/adapters/agent_runner_replay_store.go`（两个 nil 默认接缝 + 派发器）、
++  `agent_runner_replay_store_b3b_test.go`、`agent_runner_b3b_candidates_windows_test.go`、
++  `agent_runner_native_b3b_windows_test.go`、变异臂两文件（`agent_runner_b3b_variant_default_test.go` / `_degraded_test.go`）。
++- **断言总数 103**（`checks=103 failures=0`），其中 6 个篡改拒裁夹具 + 1 个截断容忍夹具 + 6 条入库证据包断言 + 3 条变异臂接线断言。
++- **反证实验（删守卫/回退逻辑 ⇒ 断言必红）**，全部实际执行：
++
++| # | 变异 | 期望红灯 | 实测 |
++| --- | --- | --- | --- |
++| 1 | `-Cell` 解析正则退回不支持连字符 | `control-arm-cell-is-schedulable` | **红** ✓ |
++| 2 | 盘点稳定对退回"只看首对" | `inventory-settles-on-the-second-pair` | **红** ✓ |
++| 3 | finalize 空会话守卫禁用（`-eq -1`） | `finalize-refuses-a-session-with-no-rounds` | **红** ✓ |
++| 4 | 去掉预检取锁调用（**A11 抽查项**） | `preflight-takes-the-session-lock` | **红** ✓ |
++| 5 | 变体构建跑真原语断言 | `TestB3bNativeCandidateTraceNamesTheRealPrimitive` | **红** ✓（默认构建同测试绿） |
++
++## 7. 已知边界与后续
++
++- **装置区分力风险**（设计 §10.1）：记录级 ~1 KiB 载荷下阶段 4 只被证伪 1/5；更大载荷/更窄窗口未见丢失时的主张上限仍是 `unresolved`。
++- **阶段 4/5 在盘点观察上等价**（A7 CP4≡CP5）⇒ 标记通道失效即只能 `unresolved`（本片 r77/r81 即该类的实例）。
++- **保真度未证明**（§1 末）：不得声称装置等价物理断电；如需该主张必须另有独立检验（本片未做）。
++- **时间口径**：单轮实测 ≈5.3–7.3 min（非设计早期估算的 3.8–4.6 min）；按每轮 `inventory-reads.txt` 实测分布回算，不得沿用"两次盘点"旧口径。
++- **D4**：证据包 `calibration/`・`u4/` 分区缺席（见 §3.5）。
++- 后续：`proven` 若要用到产品契约，需独立的契约修订切片；Windows `unproven`、`first-dispatch` 拒绝、AT-23 结论**均未改变**。
++
++## 8. 成本与计量
++
++- **探针额度：0/10 使用**（本片全离线，无付费探针、无真实模型调用）。
++- **⑤ 墙钟**：`01:25:20`（主会话 S0）→ `12:08:21`（finalize）= **10 h 43 min**；证据包 `12:09:13`。
++  其中：标定 5 轮 26 min；c1（含 1 次运行失败整轮重试 ×2）61 min；主矩阵其余 14 格 ≈7 h 22 min；U4 18 轮 ≈1 h 35 min；变异臂（含变体预检）≈12 min。
++- **③ V4 Pro**：① 前置分析 ×1；③ 预审 ×1（`changes-required`，F1/F2/F3 阻断级 → R1–R12）；收口复审 **PASS**（轮次口径见设计说明 §13 表）；
++  另有 **1 次调用因提供方连接失败**（不消耗额度，按 §3.9 可用性预检口径登记）。
++- **③.5 MAI-Code-1.1-Flash**：首轮 ×1（M1/M2）→ 整改（R13/R14）→ 收口 **PASS**（合计 2 次，未超 §3.10 的 ≤3）。
++- **④ GPT-5.3 Codex：6 次**（**超 §2.3 的 1+1 上限，按 D2 裁决如实记账**）。逐次目的与发现数：
++
++| # | 目的 | 结论 | 发现 |
++| --- | --- | --- | --- |
++| 1 | 首轮终审（不附任何清单） | `FINDINGS` | 4 项（C1–C4） |
++| 2 | 对 C1–C4 整改的复审 | `FINDINGS` | 5 项（MAJOR#1–#5） |
++| 3 | 收口 #1（含 P1–P4 与 5 项整改） | `FINDINGS` | 5/5 历史项关闭 + **1 项新 MAJOR（R29）** + 1 处覆盖缺口（R30） |
++| 4 | 收口 #2（R29/R30 整改后） | **`PASS`（明确 GO）** | 0 |
++| 5 | 定向 delta 复审（P5：`-Cell` 解析器） | **`PASS`** | 0（附 1 处可证伪性补强建议 → 已补断言） |
++| 6 | 定向 delta 复审（P7：盘点稳定对） | **`PASS`** | 0（附 1 处证据落盘建议 → 已补 `inventory-mismatch-*`） |
++
++  **超预算原因（非执行者违规）**：用户明确要求"整改后必须重跑本级复审"（闭环铁律），
++  且 ⑤ 期间新出现两个审查点（P5 控制臂不可调度、P7 盘点稳定对）——每次整改后按铁律重跑 ④ 是**义务**而非选择。
++- **token**：由用户从用量 UI 回填后计入本行（主控不自行估计）。
++- **门禁墙钟**：自检 ≈20 s/次（本片累计约 10 次）；原生套件 25 s；`go test ./...` ≈40 s。
++- **双语一致性检查（§四.10）**：`REMAINING_SLICES{,_EN}.md` 的 B3b 状态行/勾选项/完成记录行/标题符号两侧**同构**（各 13 处 `B3b` 标记，两侧均 `✅`）；`ADR_REGISTER{,_EN}.md` 的 ADR-013 行与 `DEV_PLAN{,_EN}.md` 的 B3b 段落同样双侧镜像；本报告与 `_EN` 的数字/命令/结论逐项一致。**不一致项：0**。
++
++## 9. 审查记录（③ / ③.5 / ④）与收口闭环
++
++### 9.1 ③ V4 Pro
++
++- 预审（实现完成后）：**`changes-required`**（F1/F2/F3 为阻断级）→ 整改 R1–R12 → 收口复审 **`PASS`**。
++- 预审侧重点：决定格与机制令牌自相矛盾（R1）、正对照无驱动器致区分力门结构性永假（R2）、
++  正对照 flush 语义过强（R3）、阶段归属读 cut 后拷回件（R4）等，均已闭环并落到断言。
++
++### 9.2 ③.5 MAI（独立扫描，单层）
++
++- 首轮 **`INDEPENDENT SCAN: FINDINGS`**：2 项（M1/M2，见设计说明 §13）→ 整改 R13/R14 → 收口 **`PASS`**。
++- **A12 独立佐证**：MAI 报 PASS，故 ⑤ 必须至少一项专项实验独立证明关键不变量 ⇒ 本片以**变异臂**（装置自证伪，§3.4）
++  承担该角色：它对"机制证据是否真的在把关"给出了与 MAI 无关的独立判据（降级原语下装置拒绝兑现，且离线可复现）。
++
++### 9.3 ④ Codex（6 次，逐次见 §8）
++
++- 审查覆盖：安全（绕过/注入/零值边界）、架构一致性（切片目标与契约）、完整性（正例/反例/边界）、
++  **测试反例审查**（薄弱测试、只 happy path、未覆盖竞态）、可证伪性审计（Section D）。
++- **A11 抽查（对称抽样，实际执行）**：
++  - ④ 声明「去掉预检取锁调用 ⇒ `preflight-takes-the-session-lock` 红」→ **实测红** ✓（本报告 §6 表 #4）。
++  - ④ 声明「盘点稳定对退回只看首对 ⇒ `inventory-settles-on-the-second-pair` 红」→ **实测红** ✓（§6 表 #2）。
++  - **缺位声明**：③.5 MAI 的收口轮为 `PASS`，未给出可执行的"删守卫→变红"条目，故抽样无法落在 MAI 侧；
++    记为已知局限（抽样只提供**存在性佐证**，不构成覆盖率证明）。
++- **收口闭环记录**（用户质询后补做）：
++
++| 级 | 收口结果 | 备注 |
++| --- | --- | --- |
++| ③ V4 Pro | **PASS** | 无新实质发现 |
++| ③.5 MAI | **PASS** | — |
++| ④ 收口 #1 | `FINDINGS` | 5/5 历史项关闭 + R29 + R30 |
++| ④ 收口 #2 | **PASS（明确 GO）** | — |
++| ④ delta（P5） | **PASS** | 附可证伪性补强建议，已采纳 |
++| ④ delta（P7） | **PASS** | 附证据落盘建议，已采纳 |
++
++- **审查结论落地校验（§3.11）**：三轮审查给出的 `file:line` 均在落地前逐条定位复核；无法定位者按线索处理（本片无此类条目）。
++
++### 9.4 ⑤ 就地修复（实机运行中才发现，逐项已入设计说明 R31–R35 / P5–P8）
++
++| # | 现象 | 整改 | 反证 |
++| --- | --- | --- | --- |
++| P1 | 硬断电后残留 `VBoxHeadless` 会话致 `startvm` 报 `E_FAIL` | `Wait-B3bVmPowerOff` + `Clear-B3bStaleVmSession`（词边界匹配 + fail-closed）+ 有界重试 | 实机 `startvm ok=True attempts=1` |
++| P2 | 装置无并发保护（两实例同操作同一 VM） | 会话锁（pid + owner + `sessionDir` 指纹；仅"活 pid 且同目录"才拒绝） | 双断言（阻挡/跨目录拷贝不阻挡） |
++| P3 | 冻结写入器拒绝空串 ⇒ 断电后未捕获异常 | `Write-B3bArtifactText`（`[AllowEmptyString]`）替换所有可为空的写入点 | 实机单轮 exit 0 |
++| P4 | 矩阵丢弃非预期退出码的轮 stderr | 记录轮 stderr（该补丁直接定位了 P3） | — |
++| P5 | 控制臂名含连字符 ⇒ `-Cell` 校验正则拒绝 ⇒ 正对照标定格**无法从 CLI 调度** | 抽出共享解析器 `Resolve-B3bCellSpec` + 行为式断言 | 回退正则 ⇒ 断言红 |
++| P6 | 会话号缺省回落"当天日期" ⇒ `-Finalize` 漏传时会**零轮 exit 0 写空判定** | finalize 零轮 fail-closed + 自检夹具会话号显式贯通 | 禁用守卫 ⇒ 断言红 |
++| P7 | 盘点契约实现过严（要求"头两次"一致，而本意是"枚举态已定"） | `Get-B3bSettledInventoryPair`（向前扫描首个相邻一致对，上界 4 读）+ 每次读取存档 + 稳定对入证据 | 退回"只看首对" ⇒ 断言红 |
++| P8 | 单次盘点读取失败即整轮作废并重跑整轮 | 轮内重试 + 退出码/stderr 入日志 | 三条静态断言 |
++| P9 | 变异臂文件名尾段 `arm` 被 Go 当作隐式 `GOARCH=arm` ⇒ 该文件**永不参与构建** | 改名 `…_degraded_test.go` + 用 `IgnoredGoFiles` 核验归属 | `go list` 两视图核验；坑位记入仓库记忆 |
++
++### 9.5 残差-抽查（§3.11）
++
++**本片触发必抽条件**：本片改动涉及**停机语义**（硬断电注入、断电后重启与盘点）与装置所有权语义（会话锁）。
++按 §3.11「必抽」要求，应在 ④ 之前追加 1 次 Codex 盲审。**实际执行方式**：本片 ④ 的**首轮调用即不附任何 ③/③.5 清单**（§3.10 的锚定硬隔离），
++即为一次事实上的盲审，故**未重复追加**第二次盲审——该合并判断按 §3.11 要求在此显式记录理由：
++两次盲审的输入集合（切片定义 + diff + 契约原句 + 只读约束）完全同构，重复调用只增加成本而不增加判别力。
++**盲审发现数**：4 项（C1–C4）；**是否推翻 ③.5 的 PASS**：否（两者发现集合交集为空，均由后续收口闭环关闭）。
++
++## 10. 明确未执行事项
++
++- **未 `commit`、未 `push`**（需同一轮明确授权；且只推 `origin`，绝不推 gitee）。
++- **未做真实模型调用 / 付费 probe**（本片全离线）。
++- **未做装置保真度的独立检验**（即未用外部手段比对 cut 前后虚拟盘字节，故 §1 末的限定成立）。
++- **未跑长档压力**（如 200 轮同刻竞态）：本片固定 N=5/格 + U4 3 轮/格，符合设计预算。
++- 变异臂是**人工臂**，不属 103 轮预算，也未纳入任何臂的三档定案。
++
++## 11. 下一步建议（§7.4）
++
++> 下一片按依赖图应为 **B4 · Windows T027 端到端（AT-23 前置）**（或在契约层先行处理 B3b 的 `proven` 是否被采纳）；
++> 建议档位——主控 **深度（Max）**（仅设计与结论成文步骤；实现步骤可回标准）、
++> V4 Pro **①③ 必调**（B4 触及停机/身份/所有权语义）、③.5 **启用**（行为变更切片）、Codex **Extra High（④ 必调 + 按 §3.11 必抽盲审）**。
++> 需要启动时告诉我，我会按 7 步协议 + 闭环纪律执行（先 V4 Pro 前置分析，协议先行）。
++
++- **准则待议（D2 裁决要求登记，本轮不改准则）**：硬门切片（A7/B2/B3/B4）的 ④ 调用上限是否需要**单列**？
++  本片实测 6 次（1 终审 + 1 复审 + 2 收口 + 2 delta），其中 4 次源于"整改后必须重跑本级复审"的闭环铁律。
++  建议在下一轮启动前评估：为硬门切片显式放宽上限（如 ≤4），或在准则中把"闭环重跑"明确为**不占上限**。
+diff --git a/docs/validation/t027-b3b-durability_EN.md b/docs/validation/t027-b3b-durability_EN.md
+new file mode 100644
+index 0000000..126fabd
+--- /dev/null
++++ b/docs/validation/t027-b3b-durability_EN.md
+@@ -0,0 +1,288 @@
++﻿# T027 · B3b · Candidate injection matrix and the three-tier durability verdict — validation report
++
++Date: 2026-09-21 | Status: **COMPLETE (report written; not committed, not pushed)** | Executing owner: DeepSeek V4.1 Flash (the ⑥ stage ran with the owner tier set to Deep/Max)
++Authorities: `docs/t027/B3B_DESIGN.md` (single authority for design and remediation) | `docs/t027/B3A_RIG_DESIGN.md` (frozen rig) | Evidence pack: `docs/validation/evidence/b3b-2026-09-21/`
++
++> **The tier and the premise must be read together**: this report uses only the three tiers `proven` / `unresolved` / `disproven`.
++> Any `proven` holds **only under premise P** and **must not** be read as a long-term guarantee, universal durability, a cross-platform result, or AT-23 evidence.
++
++---
++
++## 0. Honesty rules (the premise of every conclusion here)
++
++1. **No inference survives outside premise P** (§1); the conclusions do not cover physical hardware, other hypervisors/storage stacks, other filesystems or payload sizes, and not the host losing power.
++2. **Three tiers**: `proven` / `unresolved` / `disproven`. `unresolved` is **not** a failure and **not** "not durable"; it means the claim could not be established under premise P and the device's resolution.
++3. **The five conditions for `proven`** (design §7): (i) all 5 cells × N=5 valid rounds inside the allowed set; (ii) **mechanism evidence complete in the decision cells**; (iii) the discrimination gate holds; (iv) the global invariants hold; (v) the journal chain and plan/cut/reconcile are complete.
++4. **Tests cannot certify themselves**: the self-test and its assertions only demonstrate falsifiability (a deleted guard reddens a named assertion, §6/§9); they are not the conclusion. The only source of the conclusion is ⑤'s native evidence.
++5. **Forbidden wording**: no long-term-guarantee phrasing (`durable` / `guarantee` / `survives power loss`); only the verbatim `claimScope` sentence of §4.
++
++## 1. Scope and boundaries
++
++**Premise P (frozen; verbatim in `matrix/verdict.json` as `premise`)**
++
++- hypervisor **VirtualBox 7.2.18 r175117**; guest **Windows 11 25H2 build 26200.8037** (retail, unactivated); filesystem **NTFS**.
++- Storage: SATA/AHCI, **`useHostIOCache=false`**, both disks `--nonrotational on`; injection volume **`R:` = INJECT** (`data.vdi`, 7.98 GB, 4096 B clusters).
++- Injection: **guest hard power-off** (`VBoxManage controlvm poweroff`); baseline snapshot `pristine` = `065a25e1-d95c-4f33-8081-4f06216ecce8` (not retaken in this slice).
++- `nic1=none` (no network stack in the guest). **Signalling-domain declaration**: `C:\prfrail-prep\` is a second write domain used for stage markers and **does not take part in the measurement**; the only measured domain is the replay store root on `R:`, with **one** measured publication per round.
++- Payload: record level, **~1 KiB** (1082 B); pre-cut freeze delay **2.0 s** (frozen B3a calibration, not retaken); **N=5** rounds per cell.
++
++**Not covered (do not extrapolate)**
++
++- Physical hardware/firmware write-back and true mains loss (this is a hypervisor-level hard power-off); other hypervisors, other filesystems, SMB/shared volumes/cloud disks (U5); the host itself losing power (U3).
++- `.tmp` residual cleanup, concurrent multi-writer publication, resume/settlement and other paths.
++- **AT-23**: this slice is **not** AT-23 evidence, does not lift the Windows `first-dispatch` refusal, and does not clear other platforms' `unproven`.
++- Statistical resolution: a clean cell gives a one-sided 95% upper bound of p<0.45, so it can only read as "no counterexample observed under this premise and this device's resolution".
++
++**Device fidelity (not proven here; kept verbatim)**: the slice observed one late-visibility event (an unlinked temp file's size read as 0 and then 1082, see R33).
++The evidence favours the reading that the first enumeration saw a not-yet-settled metadata view, but that evidence **cannot** rule out host/virtual-disk layer visibility arriving after the cut.
++This report therefore **must not** be read as "this device has been shown equivalent to a physical power loss".
++
++## 2. Candidates and the rig
++
++| Candidate | Semantics | Landed at |
++| --- | --- | --- |
++| **C1** (reference) | current baseline: `os.Link` no-replace plus the platform parent-directory step (a no-op on Windows) | the default path itself; **never `proven`** |
++| **C2** | a no-replace move via `MoveFileExW` + `MOVEFILE_WRITE_THROUGH (0x8)` replacing `os.Link` | publish primitive hook `replayStorePublishPrimitiveHook` |
++| **C3** | a directory-handle `FlushFileBuffers` replacing the empty parent-directory step on Windows | parent-directory hook `replayStoreParentSyncHook` |
++| **C2C3** | C2 + C3 combined | both hooks |
++| **positive-control** | baseline primitive plus directory/record handle flush (falls back and labels itself when the volume handle is unavailable) | both hooks; claims **no** decision cell, only calibrates the device |
++
++- Both seams are **nil by default and zero-semantic**: the production path is byte-for-byte unchanged (checked at ③ and ④).
++- **D3 (gate bypass, declared)**: the experimental writer builds in `publicationDurability=proven` and calls `writeReplayRecordNoReplace` directly, only to reach the measured publication point; production gates are untouched.
++- **Variant arm (device self-falsification, a manual arm, not part of the 103 rounds)**: the compile-time constant `b3bVariantDegrade` (`-tags "b3bnative b3bvariant"`) degrades every candidate to the baseline primitive, while the trace keeps naming what actually ran. See §3.4.
++
++**Frozen protocol (design §2/§4, reused from B3a)**
++
++- Five publication stages: `temp-written` → `temp-synced` → `temp-closed` → `record-linked` → `parent-synced`.
++- **Decision cells**: C2 = {record-linked, parent-synced}; C3 = {parent-synced}; C2C3 = {parent-synced}; C1 and the control = ∅.
++- **Stage attribution uses the pre-cut `marker-transcript.txt`**; an escape becomes a `sessionBlock` (finalize exit 6).
++- **Fail-closed rule (the crux of this slice's verdicts)**: a valid round in a decision stage with `mechanismOk=false` must not make its cell `eligible`, and is reported as `mechanism evidence missing in rounds N`.
++  Meaning: **a "survived" whose mechanism was never shown to have run cannot be cashed into a durability claim** — this is where the rig's self-falsification ability formally lives.
++
++## 3. Results
++
++### 3.1 Gates (Windows host, final run before hand-off)
++
++| Item | Result |
++| --- | --- |
++| Rig self-test `tools/b3b-rig/Test-B3bRig.ps1` | **`checks=103 failures=0`** |
++| `Invoke-ScriptAnalyzer -Path tools/b3b-rig -Recurse` | **0** |
++| `gofmt -l` (touched files + `internal`) | empty |
++| `go build ./...` / `go vet ./...` / `go vet -tags b3bnative ./internal/adapters/` | all ok |
++| `go test -count=1 ./...` | **14 packages ok, 0 FAIL** |
++| native suite `go test -tags b3bnative -count=1 ./internal/adapters/` | **exit 0** (25 s) |
++| Encoding and line endings | every touched `.md`/`.ps1` = UTF-8 **with BOM** + LF; `.go`/`.json` = **without BOM** + LF |
++
++### 3.2 Main matrix (session `2026-09-21`, writer sha256 `06de8a72…`)
++
++- **17 cells × 5 = 85 rounds, all valid: `ok=85 void=0`**; zero operational failures (the single operational failure, round r07, happened on the pre-fix revision and was cleared by R34; see §9.4).
++- Calibration / negative control (the discrimination gate): the positive control `positive-control:parent-synced` is **5/5 survived**; the negative control `c1:temp-written` is **5/5 lost** (plus `c1:temp-synced` and `c1:temp-closed`, 5/5 lost each).
++- Per-cell results (survived / lost):
++
++| Cell | survived | lost | mechanism token present |
++| --- | --- | --- | --- |
++| `positive-control:parent-synced` | 5 | 0 | 5/5 |
++| `c1:temp-written` / `temp-synced` / `temp-closed` | 0 / 0 / 0 | 5 / 5 / 5 | — |
++| `c1:record-linked` | 4 | **1** | 5/5 |
++| `c1:parent-synced` | 5 | 0 | 5/5 |
++| `c2:temp-written` / `temp-synced` / `temp-closed` | 0 / 0 / 0 | 5 / 5 / 5 | — |
++| `c2:record-linked` | **5** | 0 | **5/5** |
++| `c2:parent-synced` | **5** | 0 | **5/5** |
++| `c3:temp-written` / `temp-synced` / `temp-closed` | 0 / 0 / 0 | 5 / 5 / 5 | — |
++| `c3:record-linked` | 5 | 0 | 0/5 (not its decision stage) |
++| `c3:parent-synced` | 5 | 0 | **4/5** (see §4.2) |
++| `c2c3:parent-synced` | 5 | 0 | **4/5** (see §4.2) |
++
++- **Measured inventory reads**: `reads=2` or `reads=3`, **never 4** (R33's extra cost averages one inventory read, ~27 s/round).
++
++### 3.3 U4 ordering sub-matrix (`-Paired`, round numbers ≥500)
++
++- **6 cells × 3 = 18 rounds, all valid: `ok=18 void=0`**; all 18 rounds have `targetKind=completion` (enforced by finalize).
++- **True orphan C count = 0** across all six cells.
++
++### 3.4 Variant arm (D1, manual arm, separate rig root `b3b-runs-variant`)
++
++- 2 rounds of `c2:parent-synced`: `survived` **and** `stageHit=true`, but `mechanismOk=false` (missing `MoveFileExW(WRITE_THROUGH,no-replace)`); the trace is verbatim `… os.Link … platform-parent-sync …`, so the rig **refuses** to cash those two survivals into a claim.
++- Offline corroboration: under the variant build `TestB3bNativeCandidateTraceNamesTheRealPrimitive` **FAILS** (the diagnostic names the degraded primitives verbatim); under the default build the same test **PASSES** and the native suite is exit 0.
++- Artifacts were merged into the evidence pack under `variant/` (with an authored `README.md`).
++
++### 3.5 Evidence pack
++
++`docs/validation/evidence/b3b-2026-09-21`: `files=2157 rigMismatches=0 missingRequired=0`;
++`optionalSectionsAbsent=calibration,u4,guest` (**deviation D4**: every cell — including the positive control and the U4 paired rounds — is written into `rounds/`, with paired rounds flagged `paired=true`; the absence of those optional sections **must not** be read as "calibration/U4 did not run").
++
++## 4. Verdict ledger
++
++### 4.1 Three-tier verdict (`-Finalize` exit 0, 2026-09-21 12:08:21; source `matrix/verdict.json`)
++
++| Arm | Tier | Basis (machine output) |
++| --- | --- | --- |
++| **C2** | **`proven`** | `decisionSets=[record-linked,parent-synced]`, both cells **`eligible`** (5/5 inside the allowed set with mechanism evidence) |
++| C1 | `unresolved` | the reference arm has no decision cell (`decisionSets=[]`); `infoViolations=["record-linked"]` (that cell is `disproven`, see 4.2) |
++| C3 | `unresolved` | `decisionSets=[parent-synced]` → `notEligible`, reason verbatim **`mechanism evidence missing in rounds 77`** |
++| C2C3 | `unresolved` | same, reason verbatim **`mechanism evidence missing in rounds 81`** |
++| positive-control | (calibration) | 5/5 survived, `eligible`; claims no durability |
++
++**Discrimination gate (anti-false-`proven`)**: `ok=true`, negative control (c1 stage 1) **5 rounds, 5 losses**, positive control **5 rounds, 0 losses** (`requiredN=5`).
++
++**U4 (ordering)**: `unresolved`, `validRounds=18`, `orphans=0`, note verbatim:
++`ordering can only be falsified by a counterexample, never proven by a clean sample`.
++
++**Claim scope (`claimScope`, quoted verbatim)**:
++
++> within premise P (VirtualBox Win11B3 / NTFS on SATA-AHCI, useHostIOCache=false, record-level ~1 KiB payload, 2 s cut window, N=5 per cell): no counterexample observed, candidate mechanism demonstrably executed, device discrimination demonstrated at stage temp-written only; not a long-term guarantee and not a claim about other hypervisors, filesystems, payload sizes or the host losing power
++
++**Qualifiers that must be stated sentence by sentence**:
++
++- (a) the positive control actually performed a **volume/record handle flush** (the trace records which, and labels a fallback); the gate may only be read as "the device observed a clean result under that flush", **not** as "the volume-level device cache has been proven drained".
++- (b) `c2c3` shares `c3`'s decision point at `parent-synced` and its combined primitive is equivalent to C3 there, so `c2c3` may only be reported as a **diagnostic/repeat arm**, never as an independent durability claim.
++- (c) stage attribution comes from the **pre-cut** transcript, not the post-cut copy-back; C1's 1/5 loss at stage 4 is evidence of the device's discrimination only and is not extrapolated to production behaviour.
++
++### 4.2 Verbatim per-cell refusals and falsifications
++
++| Cell | Tier | Reason (machine output, verbatim) |
++| --- | --- | --- |
++| `c1/record-linked` | `disproven` | `round 21: lost-absent is outside the allowed set for record-linked` (that round had `stageHit && mechanismOk`, so it is attributable as a counterexample) |
++| `c3/parent-synced` | `unresolved` | `mechanism evidence missing in rounds 77` |
++| `c2c3/parent-synced` | `unresolved` | `mechanism evidence missing in rounds 81` |
++
++## 5. Key decisions (anti-misreading)
++
++### 5.1 Why C2 can be `proven` while C3/C2C3 cannot
++
++C2's two decision cells total 10 rounds, all inside the allowed set, with complete mechanism tokens, a discriminating device and a complete journal chain.
++C3 and C2C3 each have **1/5 round** in their decision cell where the cut landed before the claimed mechanism ran (no `FlushFileBuffers(dir)` token in the trace; rounds r77 and r81).
++The rig fails closed and **refuses** to count a survival whose mechanism never ran as evidence for that arm — counting it would let a candidate claim durability it did not produce.
++
++### 5.2 Conclusions that must **not** be read out of this report
++
++- **Do not** write "c3/c2c3 are not durable" or "c3/c2c3 were disproven": they merely **failed to establish a claim** (`unresolved`).
++- **Do not** write "U4 proved ordering": zero orphans only means "not falsified".
++- **Do not** claim causality beyond "the candidate is better than the baseline at the decision cells" (except C1's 1/5 loss at stage 4, which is device-discrimination evidence).
++- **Do not** claim "the journal chain detects round-artifact tampering": the chain only verifies journal lines; artifact integrity rests on re-derivation from plan+inventory and per-file hash comparison; a wholesale rewrite of artifacts and journal can only be caught by the pack checksums and the S0 pin, the two external anchors.
++- **Do not** claim "the evidence pack recomputes itself automatically": only that it can be recomputed from `rounds/` + `journal.jsonl`.
++
++## 6. Changes and test points (falsifiability)
++
++- **Rig**: 10 scripts under `tools/b3b-rig/` (new) plus the evidence builder; four `tools/b3a-rig/` files are **reused as-is** (their hashes are recorded in the session pin).
++- **Go side**: `internal/adapters/agent_runner_replay_store.go` (two nil-default seams plus the dispatcher),
++  `agent_runner_replay_store_b3b_test.go`, `agent_runner_b3b_candidates_windows_test.go`,
++  `agent_runner_native_b3b_windows_test.go`, and the two variant-arm files (`agent_runner_b3b_variant_default_test.go`, `agent_runner_b3b_variant_degraded_test.go`).
++- **103 assertions** (`checks=103 failures=0`), including 6 tamper-refusal fixtures, 1 truncated-marker tolerance fixture, 6 in-repo evidence-pack assertions and 3 variant-arm wiring assertions.
++- **Falsification experiments (delete the guard / revert the logic ⇒ a named assertion must redden)**, all actually executed:
++
++| # | Mutation | Expected red | Observed |
++| --- | --- | --- | --- |
++| 1 | `-Cell` pattern reverted so it rejects hyphenated arms | `control-arm-cell-is-schedulable` | **red** ✓ |
++| 2 | settled-pair scan reverted to "first pair only" | `inventory-settles-on-the-second-pair` | **red** ✓ |
++| 3 | finalize empty-session guard disabled (`-eq -1`) | `finalize-refuses-a-session-with-no-rounds` | **red** ✓ |
++| 4 | preflight lock acquisition removed (**A11 sample**) | `preflight-takes-the-session-lock` | **red** ✓ |
++| 5 | real-primitive assertion run under the variant build | `TestB3bNativeCandidateTraceNamesTheRealPrimitive` | **red** ✓ (green under the default build) |
++
++## 7. Known boundaries and follow-ups
++
++- **Device discrimination risk** (design §10.1): at ~1 KiB record payload only 1/5 rounds falsified stage 4; if a larger payload or narrower window shows no loss, the ceiling on any claim is still `unresolved`.
++- **Stages 4/5 are observationally equivalent** (A7's CP4≡CP5), so a failed marker channel leaves only `unresolved` (r77/r81 are instances of exactly that class).
++- **Fidelity is not proven** (end of §1): do not claim the device equals a physical power loss; that claim would need an independent check (not done here).
++- **Timing basis**: measured cost is ≈5.3–7.3 min/round, not the earlier 3.8–4.6 min estimate; recompute from each round's `inventory-reads.txt` distribution rather than the old "two inventories" basis.
++- **D4**: the evidence pack's `calibration/` and `u4/` sections are absent (see §3.5).
++- Follow-up: using `proven` in a product contract needs its own protocol-first contract slice; the Windows `unproven` state, the `first-dispatch` refusal and the AT-23 conclusions are **unchanged**.
++
++## 8. Cost and accounting
++
++- **Probe budget: 0/10 used** (this slice is fully offline: no paid probes, no real model calls).
++- **⑤ wall clock**: `01:25:20` (main-session S0) → `12:08:21` (finalize) = **10 h 43 min**; evidence pack at `12:09:13`.
++  Breakdown: calibration 5 rounds 26 min; c1 (including one operational failure retried twice as whole rounds) 61 min; the other 14 main-matrix cells ≈7 h 22 min; U4 18 rounds ≈1 h 35 min; variant arm (including the variant preflight) ≈12 min.
++- **③ V4 Pro**: pre-analysis ×1; pre-review ×1 (`changes-required`, F1/F2/F3 blocking → R1–R12); closing re-review **PASS** (round counts per the design note §13 table);
++  plus **1 call that failed on a provider connection** (no budget consumed, logged under the §3.9 availability pre-check).
++- **③.5 MAI-Code-1.1-Flash**: first round ×1 (M1/M2) → remediation (R13/R14) → closing **PASS** (2 calls total, within the ≤3 of §3.10).
++- **④ GPT-5.3 Codex: 6 calls** (**above the §2.3 1+1 cap; recorded truthfully per ruling D2**). Purpose and findings per call:
++
++| # | Purpose | Verdict | Findings |
++| --- | --- | --- | --- |
++| 1 | first final review (no checklists attached) | `FINDINGS` | 4 items (C1–C4) |
++| 2 | re-review after the C1–C4 remediation | `FINDINGS` | 5 items (MAJOR#1–#5) |
++| 3 | closing #1 (after P1–P4 and the 5 items) | `FINDINGS` | 5/5 historical items closed + **1 new MAJOR (R29)** + 1 coverage gap (R30) |
++| 4 | closing #2 (after R29/R30) | **`PASS` (explicit GO)** | 0 |
++| 5 | targeted delta review (P5: the `-Cell` resolver) | **`PASS`** | 0 (plus 1 falsifiability strengthening → assertion added) |
++| 6 | targeted delta review (P7: settled inventory pair) | **`PASS`** | 0 (plus 1 evidence-retention gap → `inventory-mismatch-*` added) |
++
++  **Why the budget was exceeded (not an executor violation)**: the user requires that "after remediation the stage itself must be re-run" (the closure rule), and ⑤ surfaced two new review points (P5: the control arm was unschedulable; P7: the inventory repeatability contract). Re-running ④ after each remediation is an **obligation** under that rule, not a choice.
++- **Tokens**: to be filled in by the user from the usage UI (the owner does not estimate them).
++- **Gate wall clock**: self-test ≈20 s per run (≈10 runs this slice); native suite 25 s; `go test ./...` ≈40 s.
++- **Bilingual consistency check (§四.10)**: the B3b status row, checkboxes, completion row and header symbol are structurally identical across `REMAINING_SLICES{,_EN}.md` (13 `B3b` markers each, `✅` on both sides); the ADR-013 row in `ADR_REGISTER{,_EN}.md` and the B3b paragraph in `DEV_PLAN{,_EN}.md` are mirrored as well; the numbers, commands and conclusions in this report and in `_EN` agree item by item. **Inconsistencies: 0**.
++
++## 9. Review record (③ / ③.5 / ④) and closing loop
++
++### 9.1 ③ V4 Pro
++
++- Pre-review (after implementation): **`changes-required`** (F1/F2/F3 blocking) → remediation R1–R12 → closing re-review **`PASS`**.
++- Focus: decision cells contradicting the mechanism-token rule (R1); the positive control having no driver, which made the discrimination gate structurally and permanently false (R2);
++  an over-strong positive-control flush claim (R3); stage attribution reading the post-cut copy-back (R4); all closed and pinned by assertions.
++
++### 9.2 ③.5 MAI (single-layer independent scan)
++
++- First round **`INDEPENDENT SCAN: FINDINGS`**: 2 items (M1/M2, design note §13) → remediation R13/R14 → closing **`PASS`**.
++- **A12 independent corroboration**: since MAI reported PASS, ⑤ must contain at least one dedicated experiment that independently proves the key invariants ⇒ the **variant arm** (device self-falsification, §3.4) plays that role: it gives a judgement about "is the mechanism check really guarding anything" that is independent of MAI and reproducible offline.
++
++### 9.3 ④ Codex (6 calls, itemised in §8)
++
++- Coverage: security (bypass paths, injection, zero-value boundaries), architectural consistency (slice goals and contracts), completeness (positive/counterexample/boundary cases),
++  **test-counterexample review** (weak tests, happy-path-only, uncovered races), and the falsifiability audit (Section D).
++- **A11 sampling (symmetric, actually executed)**:
++  - ④ claimed "removing the preflight lock acquisition ⇒ `preflight-takes-the-session-lock` reddens" → **observed red** ✓ (this report's §6 row 4).
++  - ④ claimed "reverting the settled-pair scan to first-pair-only ⇒ `inventory-settles-on-the-second-pair` reddens" → **observed red** ✓ (§6 row 2).
++  - **Gap declared**: ③.5 MAI's closing round was a `PASS` and emitted no executable "delete guard → reddens" entry, so the sample could not be drawn from MAI.
++    Recorded as a known limitation (sampling provides **existence** corroboration only, not a coverage proof).
++- **Closing-loop record** (performed after the user's compliance challenge):
++
++| Stage | Closing result | Note |
++| --- | --- | --- |
++| ③ V4 Pro | **PASS** | no new substantive finding |
++| ③.5 MAI | **PASS** | — |
++| ④ closing #1 | `FINDINGS` | 5/5 historical items closed + R29 + R30 |
++| ④ closing #2 | **PASS (explicit GO)** | — |
++| ④ delta (P5) | **PASS** | with a falsifiability strengthening, adopted |
++| ④ delta (P7) | **PASS** | with an evidence-retention suggestion, adopted |
++
++- **Landing check on review conclusions (§3.11)**: every `file:line` from the three review stages was located and re-checked before landing; none had to be downgraded to a lead (no such items this slice).
++
++### 9.4 ⑤ fixes made in place (found only on the live rig; each is in design note R31–R35 / P5–P8)
++
++| # | Symptom | Fix | Falsification |
++| --- | --- | --- | --- |
++| P1 | a stale `VBoxHeadless` session after a hard power-off made the next `startvm` fail with `E_FAIL` | `Wait-B3bVmPowerOff` + `Clear-B3bStaleVmSession` (word-boundary match, fail-closed) + bounded retry | live `startvm ok=True attempts=1` |
++| P2 | the rig had no concurrency protection (two instances could drive the same VM) | session lock (pid + owner + `sessionDir` fingerprint; blocks only a live pid in the same directory) | two assertions (blocks / copied session not blocked) |
++| P3 | the frozen writer rejected empty strings ⇒ an uncaught exception after the cut | `Write-B3bArtifactText` (`[AllowEmptyString]`) at every write site that can legitimately be empty | live round exit 0 |
++| P4 | the matrix dropped per-round stderr for unexpected exit codes | record round stderr (this patch is what located P3) | — |
++| P5 | the control arm's name contains a hyphen while `-Cell` validation rejected it ⇒ the calibration cell was **unschedulable from the CLI** | shared resolver `Resolve-B3bCellSpec` + behavioural assertions | reverting the pattern reddens the assertion |
++| P6 | the session id defaulted to "today" ⇒ a `-Finalize` missing `-SessionId` wrote an **empty verdict with exit 0** | finalize fails closed on zero rounds; the self-test threads an explicit fixture session id | disabling the guard reddens the assertion |
++| P7 | the inventory contract was implemented more strictly than intended ("first two reads" instead of "the enumeration is settled") | `Get-B3bSettledInventoryPair` (first *consecutive* identical pair, bound 4) + every read archived + the settled pair recorded | reverting to first-pair-only reddens the assertion |
++| P8 | a single failed inventory read discarded the whole round and re-ran it | retry inside the round + exit code and stderr logged | three static assertions |
++| P9 | the variant-arm filename ended in `_arm`, which Go read as an implicit `GOARCH=arm`, so the file **never built** | renamed to `…_degraded_test.go`; ownership verified via `IgnoredGoFiles` | `go list` in both tag views; the trap is recorded in repository memory |
++
++### 9.5 Residual sampling (§3.11)
++
++**The mandatory-sampling trigger applies**: this slice touches **stopping semantics** (hard power-off injection, reboot and inventory) and device-ownership semantics (the session lock).
++Under §3.11 the rule would be one Codex blind audit **before** ④. **How it was actually satisfied**: ④'s **first call already ran with no ③/③.5 checklists attached** (the §3.10 anchoring isolation), which is a blind audit in fact, so no second blind audit was added.
++The merge decision is recorded here as §3.11 requires: the two calls' inputs (slice definition + diff + contract sentences + read-only constraints) are structurally identical, so repeating the call would add cost without adding discriminating power.
++**Findings from the blind audit**: 4 items (C1–C4); **did it overturn the ③.5 PASS**: no (the two finding sets are disjoint and were both closed by the subsequent closing loop).
++
++## 10. Explicitly not executed
++
++- **Not committed, not pushed** (needs explicit authorisation in the same turn; `origin` only, never gitee).
++- **No real model calls / paid probes** (this slice is fully offline).
++- **No independent check of device fidelity** (no external byte-level comparison of the virtual disk before and after the cut), so the §1 qualifier stands.
++- **No long-form stress runs** (e.g. 200-round simultaneity races): this slice used a fixed N=5 per cell plus 3 rounds per U4 cell, as designed.
++- The variant arm is a **manual arm**: it is not part of the 103-round budget and does not enter any arm's three-tier verdict.
++
++## 11. Next-slice recommendation (§7.4)
++
++> Per the dependency graph the next slice should be **B4 · AT-23 E2E evidence** (or, first, a contract-level slice deciding whether B3b's `proven` is adopted).
++> Recommended tiers — owner **Deep (Max)** (for the design and conclusion-writing steps; implementation may return to Standard),
++> V4 Pro **①③ mandatory** (B4 touches stopping/identity/ownership semantics), ③.5 **enabled** (behaviour-changing slice), Codex **Extra High (④ mandatory, plus the §3.11 blind audit)**.
++> Tell me when to start and I will run the 7-step protocol with the closure discipline (V4 Pro pre-analysis first, protocol first).
++
++- **Directive item to be discussed (recorded per ruling D2; the directive is not amended in this round)**: should hard-gate slices (A7/B2/B3/B4) have a **separate** ④ call cap?
++  This slice used 6 calls (1 final + 1 re-review + 2 closing + 2 delta), four of which came from the "re-run the stage after remediation" closure rule.
++  Suggested evaluation before the next slice starts: either raise the cap explicitly for hard-gate slices (e.g. ≤4), or state in the directive that closure re-runs do **not** consume the cap.
+diff --git a/internal/adapters/agent_runner_b3b_candidates_windows_test.go b/internal/adapters/agent_runner_b3b_candidates_windows_test.go
+new file mode 100644
+index 0000000..4d04289
+--- /dev/null
++++ b/internal/adapters/agent_runner_b3b_candidates_windows_test.go
+@@ -0,0 +1,266 @@
++//go:build windows
++
++package adapters
++
++import (
++	"errors"
++	"io/fs"
++	"os"
++	"path/filepath"
++	"strings"
++	"syscall"
++	"testing"
++	"unsafe"
++)
++
++// These are the two publication primitives A7 left as candidates for the step the
++// Windows durability implementation does not yet perform: publishing a record with
++// a write-through move (C2), and dropping the write access mode would be a silent
++// downgrade, so the probe below pins the access mode as well.
++//
++// They live in test scope on purpose. Nothing here is wired into the store: the
++// default primitive stays os.Link and the default parent-directory step stays the
++// Windows no-op until a candidate is proven, and shipping an unused publication
++// primitive into the product binary would be exactly the speculative interface the
++// architecture rules forbid.
++var (
++	b3bKernel32    = syscall.NewLazyDLL("kernel32.dll")
++	b3bMoveFileExW = b3bKernel32.NewProc("MoveFileExW")
++)
++
++// b3bMoveFileWriteThrough is MOVEFILE_WRITE_THROUGH from WinBase.h. syscall does
++// not export MoveFileEx at all, so the call goes through kernel32 to stay on the
++// standard library.
++const b3bMoveFileWriteThrough = 0x00000008
++
++// b3bMoveFileExWriteThrough publishes from as to without replacing an existing
++// target: MOVEFILE_REPLACE_EXISTING is deliberately absent, and an existing target
++// therefore has to surface as fs.ErrExist, the same no-replace contract os.Link
++// satisfies today.
++func b3bMoveFileExWriteThrough(from string, to string) error {
++	fromPointer, err := syscall.UTF16PtrFromString(from)
++	if err != nil {
++		return err
++	}
++	toPointer, err := syscall.UTF16PtrFromString(to)
++	if err != nil {
++		return err
++	}
++	result, _, callErr := b3bMoveFileExW.Call(
++		uintptr(unsafe.Pointer(fromPointer)),
++		uintptr(unsafe.Pointer(toPointer)),
++		uintptr(b3bMoveFileWriteThrough),
++	)
++	if result == 0 {
++		if callErr == syscall.Errno(0) {
++			return errors.New("MoveFileExW failed without reporting an error")
++		}
++		if errors.Is(callErr, syscall.ERROR_ALREADY_EXISTS) || errors.Is(callErr, syscall.ERROR_FILE_EXISTS) {
++			return fs.ErrExist
++		}
++		return callErr
++	}
++	return nil
++}
++
++// b3bFlushDirectoryHandle opens directory for the access a directory flush needs
++// and flushes it. The access mode is not decoration: A7 measured that a read-only
++// directory handle is denied, so a primitive that silently relaxed the mode could
++// not open the directory at all.
++func b3bFlushDirectoryHandle(directory string) error {
++	handle, err := syscall.CreateFile(
++		mustB3bUTF16Ptr(directory),
++		syscall.GENERIC_READ|syscall.GENERIC_WRITE,
++		uint32(syscall.FILE_SHARE_READ|syscall.FILE_SHARE_WRITE|syscall.FILE_SHARE_DELETE),
++		nil,
++		syscall.OPEN_EXISTING,
++		syscall.FILE_FLAG_BACKUP_SEMANTICS,
++		0,
++	)
++	if err != nil {
++		return err
++	}
++	defer func() { _ = syscall.CloseHandle(handle) }()
++	return syscall.FlushFileBuffers(handle)
++}
++
++// b3bVolumeDevicePath turns an absolute path with a drive letter into the volume
++// device path FlushFileBuffers needs ("R:\agent-runner-replay\x.jsonl" -> `\\.\R:`).
++// A path without a drive letter is refused rather than guessed: flushing the wrong
++// device would turn the positive control into a silent no-op with a clean-looking
++// result, which is the one failure mode the control exists to rule out.
++func b3bVolumeDevicePath(path string) (string, error) {
++	if len(path) < 3 || path[1] != ':' || (path[2] != '\\' && path[2] != '/') {
++		return "", errors.New("b3bVolumeDevicePath: not an absolute drive path: " + path)
++	}
++	return `\\.\` + strings.ToUpper(path[:2]), nil
++}
++
++// b3bFlushDeviceHandle flushes the write cache of the volume that holds path. This is
++// the positive control of the B3b matrix: it is deliberately not a publication
++// primitive the product could adopt (it needs a volume handle and write access to it),
++// and it exists to show that the *device* can be drained before a cut. Without that,
++// "nothing was lost" could not be told apart from "this rig cannot make the device
++// lose anything in the first place".
++//
++// The error is returned, never swallowed: an ACCESS_DENIED here means the control
++// could not run at that privilege level, and the round has to say so instead of
++// counting as a clean result.
++func b3bFlushDeviceHandle(path string) error {
++	device, err := b3bVolumeDevicePath(path)
++	if err != nil {
++		return err
++	}
++	handle, err := syscall.CreateFile(
++		mustB3bUTF16Ptr(device),
++		syscall.GENERIC_READ|syscall.GENERIC_WRITE,
++		uint32(syscall.FILE_SHARE_READ|syscall.FILE_SHARE_WRITE),
++		nil,
++		syscall.OPEN_EXISTING,
++		0,
++		0,
++	)
++	if err != nil {
++		return err
++	}
++	defer func() { _ = syscall.CloseHandle(handle) }()
++	return syscall.FlushFileBuffers(handle)
++}
++
++// b3bFlushTargetFile opens the published record itself and flushes it. It is the
++// control's fallback when the volume handle cannot be opened, and it reports under its
++// own token so the trace never claims a device flush that did not happen.
++func b3bFlushTargetFile(path string) error {
++	handle, err := syscall.CreateFile(
++		mustB3bUTF16Ptr(path),
++		syscall.GENERIC_READ|syscall.GENERIC_WRITE,
++		uint32(syscall.FILE_SHARE_READ|syscall.FILE_SHARE_WRITE|syscall.FILE_SHARE_DELETE),
++		nil,
++		syscall.OPEN_EXISTING,
++		0,
++		0,
++	)
++	if err != nil {
++		return err
++	}
++	defer func() { _ = syscall.CloseHandle(handle) }()
++	return syscall.FlushFileBuffers(handle)
++}
++
++// TestB3bCandidateDeviceFlush pins the volume-path derivation and requires the flush to
++// report what happened. Whether the volume handle can be opened depends on the
++// privileges of the caller, so the test accepts a refusal - but it has to be a
++// *reported* refusal, which is what keeps the control honest on a non-elevated host.
++func TestB3bCandidateDeviceFlush(t *testing.T) {
++	accepted := []struct{ in, want string }{
++		{`R:\agent-runner-replay\requests\request.b3b-r01.jsonl`, `\\.\R:`},
++		{`c:/tmp/x.jsonl`, `\\.\C:`},
++	}
++	for _, testCase := range accepted {
++		got, err := b3bVolumeDevicePath(testCase.in)
++		if err != nil {
++			t.Fatalf("b3bVolumeDevicePath(%q): %v", testCase.in, err)
++		}
++		if got != testCase.want {
++			t.Fatalf("b3bVolumeDevicePath(%q) = %q, want %q", testCase.in, got, testCase.want)
++		}
++	}
++	for _, refused := range []string{`relative\x.jsonl`, `R:`, `\\.\R:`} {
++		if _, err := b3bVolumeDevicePath(refused); err == nil {
++			t.Fatalf("b3bVolumeDevicePath(%q) must be refused", refused)
++		}
++	}
++	target := filepath.Join(t.TempDir(), "record.jsonl")
++	if err := os.WriteFile(target, []byte("payload"), 0o600); err != nil {
++		t.Fatal(err)
++	}
++	if err := b3bFlushTargetFile(target); err != nil {
++		t.Fatalf("flushing the published record must work for an ordinary user: %v", err)
++	}
++	if err := b3bFlushDeviceHandle(target); err != nil {
++		t.Logf("volume handle not available at this privilege level (reported, not swallowed): %v", err)
++	}
++}
++
++func mustB3bUTF16Ptr(path string) *uint16 {
++	pointer, err := syscall.UTF16PtrFromString(path)
++	if err != nil {
++		panic(err)
++	}
++	return pointer
++}
++
++// TestB3bCandidateMoveFileExNoReplace pins the no-replace contract of the C2
++// candidate. Removing MOVEFILE_REPLACE_EXISTING is what makes the second case
++// fail: with the replace bit set the move would silently take over an owned slot.
++func TestB3bCandidateMoveFileExNoReplace(t *testing.T) {
++	directory := t.TempDir()
++	source := filepath.Join(directory, "source.jsonl")
++	target := filepath.Join(directory, "target.jsonl")
++	payload := []byte("{\"record\":\"c2\"}\n")
++	if err := os.WriteFile(source, payload, 0o600); err != nil {
++		t.Fatal(err)
++	}
++
++	if err := b3bMoveFileExWriteThrough(source, target); err != nil {
++		t.Fatalf("a write-through move onto an absent target must succeed: %v", err)
++	}
++	if _, err := os.Stat(source); !errors.Is(err, fs.ErrNotExist) {
++		t.Fatalf("a successful move must consume the source, stat = %v", err)
++	}
++	moved, err := os.ReadFile(target)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if string(moved) != string(payload) {
++		t.Fatalf("moved bytes = %q, want %q", moved, payload)
++	}
++
++	// An existing target must be refused, whether or not it is open.
++	secondSource := filepath.Join(directory, "source-two.jsonl")
++	if err := os.WriteFile(secondSource, payload, 0o600); err != nil {
++		t.Fatal(err)
++	}
++	if err := b3bMoveFileExWriteThrough(secondSource, target); !errors.Is(err, fs.ErrExist) {
++		t.Fatalf("an existing target must surface as fs.ErrExist, got %v", err)
++	}
++	if _, err := os.Stat(secondSource); err != nil {
++		t.Fatalf("a refused move must leave the source in place: %v", err)
++	}
++
++	openTarget, err := os.Open(target)
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer func() { _ = openTarget.Close() }()
++	if err := b3bMoveFileExWriteThrough(secondSource, target); !errors.Is(err, fs.ErrExist) {
++		t.Fatalf("an open target must still surface as fs.ErrExist, got %v", err)
++	}
++
++	thirdSource := filepath.Join(directory, "source-three.jsonl")
++	missingTarget := filepath.Join(directory, "missing", "target.jsonl")
++	if err := b3bMoveFileExWriteThrough(thirdSource, missingTarget); err == nil {
++		t.Fatal("moving a source that does not exist must fail")
++	} else if errors.Is(err, fs.ErrExist) {
++		t.Fatalf("a missing source is not a no-replace collision: %v", err)
++	}
++}
++
++// TestB3bCandidateDirectoryFlush pins that the C3 candidate really opens the
++// directory with the access mode a flush requires, and that it reports failures
++// instead of swallowing them. Relaxing the access mode to read-only, which reads
++// as harmless, stops the directory from opening at all.
++func TestB3bCandidateDirectoryFlush(t *testing.T) {
++	directory := t.TempDir()
++	if err := b3bFlushDirectoryHandle(directory); err != nil {
++		t.Fatalf("flushing a directory through a write-access handle must succeed: %v", err)
++	}
++	missing := filepath.Join(directory, "missing")
++	err := b3bFlushDirectoryHandle(missing)
++	if err == nil {
++		t.Fatal("flushing a directory that does not exist must fail")
++	}
++	if strings.Contains(err.Error(), "no-replace") {
++		t.Fatalf("unexpected error shape: %v", err)
++	}
++}
+diff --git a/internal/adapters/agent_runner_b3b_variant_default_test.go b/internal/adapters/agent_runner_b3b_variant_default_test.go
+new file mode 100644
+index 0000000..ef5c377
+--- /dev/null
++++ b/internal/adapters/agent_runner_b3b_variant_default_test.go
+@@ -0,0 +1,13 @@
++//go:build windows && b3bnative && !b3bvariant
++
++package adapters
++
++// b3bVariantDegrade is the compile-time switch for the B3b variant arm. It is false in the
++// default build, so the candidate primitives run exactly as written and no runtime branch is
++// added to the writer. The variant build (build tag b3bvariant) flips it; see
++// agent_runner_b3b_variant_arm_test.go for what that arm is for.
++//
++// The windows term is not decoration: the consumer (b3bPrimitiveFor) lives in a
++// *_windows_test.go file, so without it this constant would be declared and unused in every
++// non-Windows build of the package (reported as an unused-const warning).
++const b3bVariantDegrade = false
+diff --git a/internal/adapters/agent_runner_b3b_variant_degraded_test.go b/internal/adapters/agent_runner_b3b_variant_degraded_test.go
+new file mode 100644
+index 0000000..cfd0e3a
+--- /dev/null
++++ b/internal/adapters/agent_runner_b3b_variant_degraded_test.go
+@@ -0,0 +1,14 @@
++//go:build windows && b3bnative && b3bvariant
++
++package adapters
++
++// b3bVariantDegrade is true in the variant build. The arm exists to show that the rig can
++// falsify itself: every candidate silently degrades to the baseline primitive (no
++// WRITE_THROUGH on the publish, no directory flush afterwards) while still claiming its own
++// arm name. The trace deliberately keeps naming what actually ran (os.Link /
++// platform-parent-sync), so the round's mechanism evidence must come out not-ok and the cell
++// must not be able to reach proven. If a cell under this arm were to report mechanism-ok, the
++// mechanism check would be blind and the durability claim would rest on nothing.
++//
++// Build: go test -c -tags "b3bnative b3bvariant" -o tmp\b3b\writer-variant.exe .\internal\adapters\
++const b3bVariantDegrade = true
+diff --git a/internal/adapters/agent_runner_native_b3b_windows_test.go b/internal/adapters/agent_runner_native_b3b_windows_test.go
+new file mode 100644
+index 0000000..77e6411
+--- /dev/null
++++ b/internal/adapters/agent_runner_native_b3b_windows_test.go
+@@ -0,0 +1,701 @@
++//go:build b3bnative && windows
++
++package adapters
++
++import (
++	"crypto/sha256"
++	"encoding/hex"
++	"encoding/json"
++	"errors"
++	"fmt"
++	"os"
++	"os/exec"
++	"path/filepath"
++	"strconv"
++	"strings"
++	"testing"
++	"time"
++
++	"github.com/larsonzh/prfrail/internal/evidence"
++)
++
++// This file is the guest writer the B3b rig drives: it publishes one real product
++// record through the production no-replace publication path and stops existing at
++// a chosen publish stage so the host can cut power inside that stage.
++//
++// The seam story it depends on: a host-side timing kill cannot hit a chosen stage
++// (A7 measured CP4 and CP5 as indistinguishable), so the writer installs the
++// publication seams, writes a marker line when a stage is reached, and then waits
++// at the target stage. Only the host can cut power, and it cuts only after the
++// marker for the target stage is visible.
++//
++// Environment contract (all read once, all required unless noted):
++//
++//	B3B_GUEST_WRITER  must be set; otherwise the test skips so an ordinary
++//	                  `go test -tags b3bnative` run stays harmless
++//	B3B_ROUND         round identifier, also part of the published request id
++//	B3B_CANDIDATE     c1 | c2 | c3 | c2c3
++//	B3B_STAGE         the target publish stage to stop in
++//	B3B_ROOT          replay store root the record is published into
++//	B3B_MARKER        marker file the host polls
++//	B3B_PLAN_ONLY     when set, emit the pre-commitment and exit without writing
++//	B3B_PAIRED        when set, publish the request record first and then stop the
++//	                  completion record inside the target stage (the ordering question)
++//	B3B_BLOCK_SECONDS bound on the wait at the target stage (default 300)
++
++const (
++	b3bGuestWriterEnv = "B3B_GUEST_WRITER"
++	b3bRoundEnv       = "B3B_ROUND"
++	b3bCandidateEnv   = "B3B_CANDIDATE"
++	b3bStageEnv       = "B3B_STAGE"
++	b3bRootEnv        = "B3B_ROOT"
++	b3bMarkerEnv      = "B3B_MARKER"
++	b3bPlanOnlyEnv    = "B3B_PLAN_ONLY"
++	b3bBlockEnv       = "B3B_BLOCK_SECONDS"
++	b3bPairedEnv      = "B3B_PAIRED"
++)
++
++// b3bExitStageTimeout is the dedicated exit code for "the host never cut power
++// inside the target stage". The rig has to treat that exit as a void round: the
++// writer neither reports a result nor continues past the stage.
++const b3bExitStageTimeout = 90
++
++// b3bGuestWriterPlan is the pre-commitment the host journals before the measured
++// write: where the record will land and the digest of the exact bytes that will be
++// published. It is computed from the same encoder the publication path uses, so
++// the host can verify the surviving record byte for byte after the reboot.
++type b3bGuestWriterPlan struct {
++	Round     string `json:"round"`
++	Candidate string `json:"candidate"`
++	Stage     string `json:"stage"`
++	Path      string `json:"path"`
++	Digest    string `json:"digest"`
++	Size      int    `json:"size"`
++}
++
++// b3bGuestWriterStage is one marker line: the stage the writer reached, the syscall
++// trace observed so far, and whether that stage is the one the host must cut in.
++type b3bGuestWriterStage struct {
++	Round     string   `json:"round"`
++	Candidate string   `json:"candidate"`
++	Stage     string   `json:"stage"`
++	Path      string   `json:"path"`
++	Target    bool     `json:"target"`
++	Trace     []string `json:"trace"`
++	Timestamp string   `json:"timestamp"`
++}
++
++func b3bEnvValue(name string) string {
++	return strings.TrimSpace(os.Getenv(name))
++}
++
++func b3bKnownStages() []string {
++	return []string{
++		replayStorePublishStageTempWritten,
++		replayStorePublishStageTempSynced,
++		replayStorePublishStageTempClosed,
++		replayStorePublishStageRecordLinked,
++		replayStorePublishStageParentSynced,
++	}
++}
++
++// b3bStageIndex is the position of a stage in the publication order, or -1.
++func b3bStageIndex(stage string) int {
++	for index, candidateStage := range b3bKnownStages() {
++		if candidateStage == stage {
++			return index
++		}
++	}
++	return -1
++}
++
++func b3bKnownCandidate(candidate string) bool {
++	switch candidate {
++	case "c1", "c2", "c3", "c2c3", "positive-control":
++		return true
++	default:
++		return false
++	}
++}
++
++func b3bBlockDuration() time.Duration {
++	raw := b3bEnvValue(b3bBlockEnv)
++	if raw == "" {
++		return 300 * time.Second
++	}
++	seconds, err := strconv.Atoi(raw)
++	if err != nil || seconds <= 0 {
++		return 300 * time.Second
++	}
++	return time.Duration(seconds) * time.Second
++}
++
++// b3bAppendMarker appends one JSON line to the marker file. Durability is
++// deliberately not attempted: the host reads the marker through a guest process,
++// which is served by the same cache the writer wrote into, and the marker is a
++// signal rather than part of the measurement.
++func b3bAppendMarker(marker string, value any) error {
++	encoded, err := json.Marshal(value)
++	if err != nil {
++		return err
++	}
++	file, err := os.OpenFile(marker, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o600)
++	if err != nil {
++		return err
++	}
++	if _, err := file.Write(append(encoded, '\n')); err != nil {
++		_ = file.Close()
++		return err
++	}
++	return file.Close()
++}
++
++// b3bPublishedPayload reproduces the bytes the publication path writes: the
++// canonical encoding of the record plus the terminating newline. The pre-commitment
++// digest is computed from exactly this, so a digest mismatch after the reboot means
++// the surviving record is not the record that was published.
++func b3bPublishedPayload(record any) ([]byte, error) {
++	canonical, err := evidence.EncodeCanonical(record)
++	if err != nil {
++		return nil, err
++	}
++	return append(canonical, '\n'), nil
++}
++
++func b3bDigest(payload []byte) string {
++	sum := sha256.Sum256(payload)
++	return hex.EncodeToString(sum[:])
++}
++
++// b3bPrimitiveFor installs the candidate's no-replace primitive and records what
++// actually ran, because a candidate that quietly degraded to os.Link would
++// otherwise produce a green cell that means nothing.
++func b3bPrimitiveFor(candidate string, trace *[]string) func(temp string, path string) error {
++	if b3bVariantDegrade {
++		// Variant arm (design section 6): every candidate degrades to the baseline link, and
++		// the trace keeps saying so - a candidate that quietly degrades must never be able to
++		// produce a green cell.
++		return func(temp string, path string) error {
++			if err := os.Link(temp, path); err != nil {
++				*trace = append(*trace, "os.Link:error:"+err.Error())
++				return err
++			}
++			*trace = append(*trace, "os.Link")
++			return nil
++		}
++	}
++	if candidate == "c2" || candidate == "c2c3" {
++		return func(temp string, path string) error {
++			if err := b3bMoveFileExWriteThrough(temp, path); err != nil {
++				*trace = append(*trace, "MoveFileExW:error:"+err.Error())
++				return err
++			}
++			*trace = append(*trace, "MoveFileExW(WRITE_THROUGH,no-replace)")
++			return nil
++		}
++	}
++	return func(temp string, path string) error {
++		// C1 is the current baseline: the hard link the store has always used.
++		if err := os.Link(temp, path); err != nil {
++			*trace = append(*trace, "os.Link:error:"+err.Error())
++			return err
++		}
++		*trace = append(*trace, "os.Link")
++		return nil
++	}
++}
++
++// b3bParentSyncFor installs the candidate's parent-directory durability step. The
++// positive control takes the baseline publication primitive and drains the device
++// instead, so the control answers "can this rig observe a clean result at this payload
++// and window" rather than "is some candidate primitive durable".
++func b3bParentSyncFor(candidate string, trace *[]string, target string) func(directory string) error {
++	if b3bVariantDegrade {
++		// Variant arm: the durability step is a no-op for every arm, and the trace says so.
++		return func(directory string) error {
++			err := replayStoreSyncParentDirectory(directory)
++			if err != nil {
++				*trace = append(*trace, "platform-parent-sync:error:"+err.Error())
++				return err
++			}
++			*trace = append(*trace, "platform-parent-sync")
++			return nil
++		}
++	}
++	if candidate == "positive-control" {
++		return func(directory string) error {
++			if err := b3bFlushDirectoryHandle(directory); err != nil {
++				*trace = append(*trace, "FlushFileBuffers(dir):error:"+err.Error())
++				return err
++			}
++			*trace = append(*trace, "FlushFileBuffers(dir)")
++			if err := b3bFlushDeviceHandle(target); err == nil {
++				*trace = append(*trace, "FlushFileBuffers(device)")
++				return nil
++			}
++			// The device handle needs write access to the volume, which an ordinary guest
++			// user does not have. The fallback flushes the record itself and says so: the
++			// control must never claim a device flush it did not perform.
++			if err := b3bFlushTargetFile(target); err != nil {
++				*trace = append(*trace, "FlushFileBuffers(file):error:"+err.Error())
++				return err
++			}
++			*trace = append(*trace, "FlushFileBuffers(file)")
++			return nil
++		}
++	}
++	if candidate == "c3" || candidate == "c2c3" {
++		return func(directory string) error {
++			if err := b3bFlushDirectoryHandle(directory); err != nil {
++				*trace = append(*trace, "FlushFileBuffers(dir):error:"+err.Error())
++				return err
++			}
++			*trace = append(*trace, "FlushFileBuffers(dir)")
++			return nil
++		}
++	}
++	return func(directory string) error {
++		// C1 keeps the platform step: on Windows that is the no-op, which is
++		// exactly why the durability claim is unproven today.
++		err := replayStoreSyncParentDirectory(directory)
++		if err != nil {
++			*trace = append(*trace, "platform-parent-sync:error:"+err.Error())
++			return err
++		}
++		*trace = append(*trace, "platform-parent-sync")
++		return nil
++	}
++}
++
++// b3bRunGuestWriter is the writer half. It never returns from the target stage:
++// either the host cuts power, or the bounded wait expires and the process exits
++// with the timeout code so the round is void rather than a result.
++func b3bRunGuestWriter(t *testing.T) {
++	t.Helper()
++	round := b3bEnvValue(b3bRoundEnv)
++	candidate := b3bEnvValue(b3bCandidateEnv)
++	stage := b3bEnvValue(b3bStageEnv)
++	root := b3bEnvValue(b3bRootEnv)
++	marker := b3bEnvValue(b3bMarkerEnv)
++	if round == "" || candidate == "" || stage == "" || root == "" || marker == "" {
++		t.Fatalf("%s requires B3B_ROUND, B3B_CANDIDATE, B3B_STAGE, B3B_ROOT and B3B_MARKER", b3bGuestWriterEnv)
++	}
++	if !b3bKnownCandidate(candidate) {
++		t.Fatalf("unknown B3B_CANDIDATE %q", candidate)
++	}
++	known := false
++	for _, candidateStage := range b3bKnownStages() {
++		if candidateStage == stage {
++			known = true
++		}
++	}
++	if !known {
++		t.Fatalf("unknown B3B_STAGE %q", stage)
++	}
++
++	// The store is constructed before any seam is installed: constructing it
++	// publishes the ownership record, which is not part of the measurement.
++	store, err := newAgentRunnerReplayStoreAt(root)
++	if err != nil {
++		t.Fatalf("open replay store at %s: %v", root, err)
++	}
++	// The writer exercises the write path on a platform whose durability is
++	// declared unproven; this is the same in-test override the existing
++	// experiments use and it never lifts the declaration itself. The store's
++	// write gate is policy, not the publication primitive, so bypassing it here is
++	// deliberate and is recorded in the slice report.
++	store.publicationDurability = PublishDurabilityProven
++
++	paired := b3bEnvValue(b3bPairedEnv) != ""
++	requestID := "b3b-" + strings.ToLower(round)
++	request := replayStoreRequestRecord(t, requestID)
++	// The measured object is a request record in the normal mode and a completion
++	// record in the paired mode, so it is held as any.
++	var measured any = request
++	path, err := store.requestPath(requestID)
++	if err != nil {
++		t.Fatalf("derive request path: %v", err)
++	}
++	requestPath := path
++	if paired {
++		// Paired mode answers the ordering question: the request record is published
++		// first and the completion record is the measured object, stopped inside its own
++		// target stage. The plan therefore describes the completion record, and the
++		// transcript keeps the two phases apart by the path each entry carries.
++		measured = replayStoreCompletionRecord(t, request, "b3b-completion-"+strings.ToLower(round))
++		path, err = store.completionPath(requestID)
++		if err != nil {
++			t.Fatalf("derive completion path: %v", err)
++		}
++	}
++	payload, err := b3bPublishedPayload(measured)
++	if err != nil {
++		t.Fatalf("encode record: %v", err)
++	}
++	plan := b3bGuestWriterPlan{
++		Round:     round,
++		Candidate: candidate,
++		Stage:     stage,
++		Path:      path,
++		Digest:    b3bDigest(payload),
++		Size:      len(payload),
++	}
++	if err := b3bAppendMarker(marker, plan); err != nil {
++		t.Fatalf("write pre-commitment: %v", err)
++	}
++	fmt.Printf("PLAN path=%s digest=%s size=%d\n", path, plan.Digest, plan.Size)
++	if b3bEnvValue(b3bPlanOnlyEnv) != "" {
++		return
++	}
++
++	trace := []string{}
++	// blockStage is the stage the writer may not continue past. It stays empty during
++	// the request phase of the paired mode, so that phase is published without being
++	// stopped, and it is armed right before the measured publication.
++	blockStage := ""
++	if !paired {
++		blockStage = stage
++	}
++	originalStage := replayStorePublishStageHook
++	originalPrimitive := replayStorePublishPrimitiveHook
++	originalParent := replayStoreParentSyncHook
++	replayStorePublishPrimitiveHook = b3bPrimitiveFor(candidate, &trace)
++	replayStoreParentSyncHook = b3bParentSyncFor(candidate, &trace, path)
++	replayStorePublishStageHook = func(current string, currentPath string) {
++		trace = append(trace, "stage:"+current)
++		entry := b3bGuestWriterStage{
++			Round:     round,
++			Candidate: candidate,
++			Stage:     current,
++			Path:      currentPath,
++			Target:    current == blockStage,
++			Trace:     append([]string{}, trace...),
++			Timestamp: time.Now().UTC().Format(time.RFC3339Nano),
++		}
++		if err := b3bAppendMarker(marker, entry); err != nil {
++			t.Fatalf("write stage marker for %s: %v", current, err)
++		}
++		if current == blockStage {
++			// The host cuts power here. Sleeping rather than blocking on a channel
++			// keeps the runtime's deadlock detector quiet (the A7 lesson), and the
++			// bound means a host that never cuts turns the round into a void
++			// timeout instead of a hung session. os.Exit skips the deferred seam
++			// restore, which is harmless because the process is over either way.
++			time.Sleep(b3bBlockDuration())
++			fmt.Printf("TIMEOUT %s\n", current)
++			os.Exit(b3bExitStageTimeout)
++		}
++	}
++	defer func() {
++		replayStorePublishStageHook = originalStage
++		replayStorePublishPrimitiveHook = originalPrimitive
++		replayStoreParentSyncHook = originalParent
++	}()
++
++	if paired {
++		// The request phase runs through the same seams with no armed target, so the
++		// ordering question is asked about a request that the candidate mechanism really
++		// published, not about a baseline request that happens to sit next to it.
++		if err := writeReplayRecordNoReplace(requestPath, request); err != nil {
++			fmt.Printf("FAIL request phase %v\n", err)
++			t.Fatalf("publish request record: %v", err)
++		}
++		blockStage = stage
++		trace = trace[:0]
++	}
++	if err := writeReplayRecordNoReplace(path, measured); err != nil {
++		fmt.Printf("FAIL %v\n", err)
++		t.Fatalf("publish record: %v", err)
++	}
++	// Reaching here means no host cut the power inside the target stage: either
++	// the target stage never fired or the host is too slow. Both are void rounds.
++	fmt.Printf("SURVIVED %s\n", stage)
++}
++
++// TestB3bNativeGuestWriter is the entry point the rig executes. It skips unless
++// B3B_GUEST_WRITER is set, so an ordinary tagged run stays harmless.
++func TestB3bNativeGuestWriter(t *testing.T) {
++	if b3bEnvValue(b3bGuestWriterEnv) == "" {
++		t.Skip("the B3b guest writer runs only when the rig drives it")
++	}
++	b3bRunGuestWriter(t)
++}
++
++// b3bWriterCommand builds the re-exec invocation of this test binary as the guest
++// writer, which is how the rig runs it inside the guest.
++func b3bWriterCommand(t *testing.T, env map[string]string) *exec.Cmd {
++	t.Helper()
++	command := exec.Command(os.Args[0], "-test.run=TestB3bNativeGuestWriter", "-test.v")
++	command.Env = append(os.Environ(), b3bGuestWriterEnv+"=1")
++	for name, value := range env {
++		command.Env = append(command.Env, name+"="+value)
++	}
++	return command
++}
++
++// TestB3bNativeRecordBytesDeterministic pins that the record bytes the host
++// pre-commits are reproducible: the same request id and pinned creation timestamp
++// have to produce the same digest in two separate processes, otherwise the host's
++// plan could never be checked against the surviving record.
++func TestB3bNativeRecordBytesDeterministic(t *testing.T) {
++	// Both measured objects have to be reproducible across processes: the host
++	// pre-commits the digest it will later look for, and a record whose bytes drifted
++	// between processes would surface as a plan-digest mismatch in the middle of a VM
++	// run - i.e. after hours of cuts, for a reason that has nothing to do with
++	// durability. The request record is covered by the normal mode, the completion
++	// record by the paired mode.
++	for _, paired := range []bool{false, true} {
++		name := "request-record"
++		if paired {
++			name = "completion-record"
++		}
++		t.Run(name, func(t *testing.T) {
++			digests := make([]string, 0, 2)
++			for attempt := 0; attempt < 2; attempt++ {
++				root := t.TempDir()
++				marker := filepath.Join(t.TempDir(), "marker.jsonl")
++				environment := map[string]string{
++					b3bRoundEnv:     "r01",
++					b3bCandidateEnv: "c1",
++					b3bStageEnv:     replayStorePublishStageRecordLinked,
++					b3bRootEnv:      root,
++					b3bMarkerEnv:    marker,
++					b3bPlanOnlyEnv:  "1",
++				}
++				if paired {
++					environment[b3bPairedEnv] = "1"
++				}
++				command := b3bWriterCommand(t, environment)
++				output, err := command.CombinedOutput()
++				if err != nil {
++					t.Fatalf("plan run failed: %v\n%s", err, output)
++				}
++				lines, err := b3bReadMarkerLines(marker)
++				if err != nil {
++					t.Fatal(err)
++				}
++				if len(lines) != 1 {
++					t.Fatalf("plan mode must write exactly the pre-commitment, got %d lines", len(lines))
++				}
++				var plan b3bGuestWriterPlan
++				if err := json.Unmarshal([]byte(lines[0]), &plan); err != nil {
++					t.Fatalf("pre-commitment is not the expected shape: %v", err)
++				}
++				if plan.Digest == "" || plan.Size == 0 {
++					t.Fatalf("pre-commitment must carry a digest and a size: %+v", plan)
++				}
++				if paired && !strings.Contains(plan.Path, "completion.") {
++					t.Fatalf("the paired plan must describe the completion record, got %s", plan.Path)
++				}
++				if !paired && !strings.Contains(plan.Path, "request.") {
++					t.Fatalf("the normal plan must describe the request record, got %s", plan.Path)
++				}
++				digests = append(digests, plan.Digest)
++			}
++			if digests[0] != digests[1] {
++				t.Fatalf("record bytes must be reproducible, got %s and %s", digests[0], digests[1])
++			}
++		})
++	}
++}
++
++// TestB3bNativeWriterStopsAtTheTargetStage drives the writer with a short block so
++// the whole handshake can be checked on the host without a VM: the marker has to
++// contain the five stages in order, exactly one of them flagged as the target, a
++// syscall trace naming what actually ran, and the writer has to exit with the
++// timeout code instead of continuing past the stage it was told to stop in.
++func TestB3bNativeWriterStopsAtTheTargetStage(t *testing.T) {
++	root := t.TempDir()
++	marker := filepath.Join(t.TempDir(), "marker.jsonl")
++	command := b3bWriterCommand(t, map[string]string{
++		b3bRoundEnv:     "r02",
++		b3bCandidateEnv: "c3",
++		b3bStageEnv:     replayStorePublishStageRecordLinked,
++		b3bRootEnv:      root,
++		b3bMarkerEnv:    marker,
++		b3bBlockEnv:     "1",
++	})
++	output, err := command.CombinedOutput()
++	var exitErr *exec.ExitError
++	if !errors.As(err, &exitErr) {
++		t.Fatalf("the writer must exit with the timeout code, got err=%v\n%s", err, output)
++	}
++	if exitErr.ExitCode() != b3bExitStageTimeout {
++		t.Fatalf("writer exit code = %d, want %d\n%s", exitErr.ExitCode(), b3bExitStageTimeout, output)
++	}
++	lines, err := b3bReadMarkerLines(marker)
++	if err != nil {
++		t.Fatal(err)
++	}
++	// Nothing after the target stage may ever be reached: the marker holds the
++	// pre-commitment plus the stages up to and including the target.
++	wantStages := b3bKnownStages()[:b3bStageIndex(replayStorePublishStageRecordLinked)+1]
++	if len(lines) != 1+len(wantStages) {
++		t.Fatalf("marker must hold the pre-commitment plus the stages up to the target, got %d lines", len(lines))
++	}
++	var reached []string
++	targets := 0
++	for _, line := range lines[1:] {
++		var entry b3bGuestWriterStage
++		if err := json.Unmarshal([]byte(line), &entry); err != nil {
++			t.Fatalf("stage marker is not the expected shape: %v", err)
++		}
++		reached = append(reached, entry.Stage)
++		if entry.Target {
++			targets++
++		}
++		if entry.Round != "r02" || entry.Candidate != "c3" {
++			t.Fatalf("stage marker lost its round or candidate: %+v", entry)
++		}
++	}
++	if strings.Join(reached, ",") != strings.Join(wantStages, ",") {
++		t.Fatalf("stages = %v, want %v", reached, wantStages)
++	}
++	if targets != 1 {
++		t.Fatalf("exactly one stage must be flagged as the target, got %d", targets)
++	}
++	// The last stage marker is the target: nothing later may be reached.
++	if !strings.Contains(string(output), "TIMEOUT "+replayStorePublishStageRecordLinked) {
++		t.Fatalf("the writer must report the timeout at the target stage:\n%s", output)
++	}
++	// C3 must show that the directory flush really ran (the parent stage is after
++	// the target here, so the trace at the target still names the primitive).
++	lastLine := lines[len(lines)-1]
++	if !strings.Contains(lastLine, "os.Link") {
++		t.Fatalf("the trace must name the primitive that ran: %s", lastLine)
++	}
++}
++
++func b3bReadMarkerLines(marker string) ([]string, error) {
++	raw, err := os.ReadFile(marker)
++	if err != nil {
++		return nil, err
++	}
++	trimmed := strings.TrimSpace(string(raw))
++	if trimmed == "" {
++		return nil, nil
++	}
++	return strings.Split(trimmed, "\n"), nil
++}
++
++// TestB3bNativeCandidateTraceNamesTheRealPrimitive pins that no candidate cell can
++// turn green because the candidate quietly degraded to the baseline: the trace the
++// host reads has to name the primitive, and for the directory step the flush, that
++// the candidate is supposed to execute.
++func TestB3bNativeCandidateTraceNamesTheRealPrimitive(t *testing.T) {
++	cases := []struct {
++		candidate string
++		stage     string
++		want      string
++	}{
++		{"c1", replayStorePublishStageRecordLinked, "os.Link"},
++		{"c2", replayStorePublishStageRecordLinked, "MoveFileExW(WRITE_THROUGH,no-replace)"},
++		{"c3", replayStorePublishStageParentSynced, "FlushFileBuffers(dir)"},
++	}
++	for _, testCase := range cases {
++		testCase := testCase
++		t.Run(testCase.candidate, func(t *testing.T) {
++			root := t.TempDir()
++			marker := filepath.Join(t.TempDir(), "marker.jsonl")
++			command := b3bWriterCommand(t, map[string]string{
++				b3bRoundEnv:     "r0" + strings.TrimPrefix(testCase.candidate, "c"),
++				b3bCandidateEnv: testCase.candidate,
++				b3bStageEnv:     testCase.stage,
++				b3bRootEnv:      root,
++				b3bMarkerEnv:    marker,
++				b3bBlockEnv:     "1",
++			})
++			output, err := command.CombinedOutput()
++			var exitErr *exec.ExitError
++			if !errors.As(err, &exitErr) || exitErr.ExitCode() != b3bExitStageTimeout {
++				t.Fatalf("writer must stop in the target stage, got err=%v\n%s", err, output)
++			}
++			lines, err := b3bReadMarkerLines(marker)
++			if err != nil {
++				t.Fatal(err)
++			}
++			if len(lines) < 2 {
++				t.Fatalf("expected a pre-commitment and stage markers, got %d lines", len(lines))
++			}
++			last := lines[len(lines)-1]
++			if !strings.Contains(last, testCase.want) {
++				t.Fatalf("the trace must name %q for candidate %s, got %s", testCase.want, testCase.candidate, last)
++			}
++		})
++	}
++}
++
++// TestB3bNativePairedModePublishesRequestThenStopsInTheCompletion is the plumbing
++// check for the ordering experiment: the request record has to be published for real
++// before the completion record stops inside its own target stage, the pre-commitment
++// has to describe the completion record, and exactly one stage entry may be flagged
++// as the target.
++func TestB3bNativePairedModePublishesRequestThenStopsInTheCompletion(t *testing.T) {
++	root := t.TempDir()
++	marker := filepath.Join(t.TempDir(), "marker.jsonl")
++	command := b3bWriterCommand(t, map[string]string{
++		b3bRoundEnv:     "r07",
++		b3bCandidateEnv: "c2",
++		b3bStageEnv:     replayStorePublishStageRecordLinked,
++		b3bRootEnv:      root,
++		b3bMarkerEnv:    marker,
++		b3bBlockEnv:     "1",
++		b3bPairedEnv:    "1",
++	})
++	output, err := command.CombinedOutput()
++	var exitErr *exec.ExitError
++	if !errors.As(err, &exitErr) || exitErr.ExitCode() != b3bExitStageTimeout {
++		t.Fatalf("the paired writer must stop in the completion target stage, got err=%v\n%s", err, output)
++	}
++	lines, err := b3bReadMarkerLines(marker)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if len(lines) < 3 {
++		t.Fatalf("expected a pre-commitment and both phases, got %d lines", len(lines))
++	}
++	var plan b3bGuestWriterPlan
++	if err := json.Unmarshal([]byte(lines[0]), &plan); err != nil {
++		t.Fatalf("pre-commitment is not the expected shape: %v", err)
++	}
++	if !strings.Contains(plan.Path, "completion.b3b-r07.jsonl") {
++		t.Fatalf("the pre-commitment must describe the completion record, got %s", plan.Path)
++	}
++	targets := 0
++	requestPhase := 0
++	completionPhase := 0
++	for _, line := range lines[1:] {
++		var entry b3bGuestWriterStage
++		if err := json.Unmarshal([]byte(line), &entry); err != nil {
++			t.Fatalf("stage marker is not the expected shape: %v", err)
++		}
++		if strings.Contains(entry.Path, "completion.b3b-r07.jsonl") {
++			completionPhase++
++		} else {
++			requestPhase++
++		}
++		if entry.Target {
++			targets++
++			if !strings.Contains(entry.Path, "completion.b3b-r07.jsonl") {
++				t.Fatalf("only the completion phase may be the target, got %s", entry.Path)
++			}
++		}
++	}
++	if targets != 1 {
++		t.Fatalf("exactly one stage must be flagged as the target, got %d", targets)
++	}
++	if requestPhase == 0 || completionPhase == 0 {
++		t.Fatalf("both phases must appear in the transcript, request=%d completion=%d", requestPhase, completionPhase)
++	}
++	// Both records really exist: the request phase published for real, and the
++	// completion record was linked before its durability step ran.
++	for _, name := range []string{"request.b3b-r07.jsonl", "completion.b3b-r07.jsonl"} {
++		folder := "requests"
++		if strings.HasPrefix(name, "completion") {
++			folder = "completions"
++		}
++		if _, statErr := os.Stat(filepath.Join(root, folder, name)); statErr != nil {
++			t.Fatalf("paired mode must publish %s: %v", name, statErr)
++		}
++	}
++}
+diff --git a/internal/adapters/agent_runner_replay_store.go b/internal/adapters/agent_runner_replay_store.go
+index aaa5fc7..b58ccec 100644
+--- a/internal/adapters/agent_runner_replay_store.go
++++ b/internal/adapters/agent_runner_replay_store.go
+@@ -84,6 +84,53 @@ func replayStorePublishStage(stage string, path string) {
+ 	}
+ }
+ 
++// replayStorePublishPrimitiveHook is a test seam for the B3b durability
++// candidate experiments: it replaces only the no-replace primitive that makes a
++// published record visible (the step os.Link performs today). It is nil in
++// production, and while it is nil the primitive is os.Link, byte for byte the
++// behaviour the store has always had.
++//
++// Seam contract: it fires once per no-replace publication, after the record is
++// written, synced and closed and before the parent-directory durability step. A
++// replacement must keep the no-replace contract (an existing target has to
++// surface as fs.ErrExist) and must leave the target holding exactly the bytes the
++// store already wrote. It may not carry decisions and may not call back into the
++// store.
++var replayStorePublishPrimitiveHook func(temp string, path string) error
++
++func replayStorePublishRecordNoReplace(temp string, path string) error {
++	if replayStorePublishPrimitiveHook != nil {
++		return replayStorePublishPrimitiveHook(temp, path)
++	}
++	return os.Link(temp, path)
++}
++
++// replayStoreParentSyncHook is the second B3b test seam: it replaces only the
++// parent-directory durability step, the step syncReplayStoreParentDirectory
++// performs on Unix and skips on Windows. It is nil in production, and while it is
++// nil the behaviour is exactly the platform default.
++//
++// Seam contract: it fires once per no-replace publication, after the no-replace
++// primitive published the record and after the record-linked stage, and it
++// receives the directory holding the record. A failure aborts the publication:
++// the caller drops its temp file and reports the error, while the already
++// published record stays as visible as the primitive made it - visibility and
++// durability are separate facts. It may not carry decisions and may not call back
++// into the store.
++//
++// It is deliberately separate from replayStoreSyncParentDirectory, which existing
++// tests replace to model the platform primitives, and it is deliberately not
++// wired into the bootstrap path: bootstrap is not a publication, and on a platform
++// whose durability is unproven the bootstrap durability step does not run at all.
++var replayStoreParentSyncHook func(directory string) error
++
++func replayStoreSyncParent(directory string) error {
++	if replayStoreParentSyncHook != nil {
++		return replayStoreParentSyncHook(directory)
++	}
++	return replayStoreSyncParentDirectory(directory)
++}
++
+ // AgentRunnerReplayState describes replay-state visibility for one requestId.
+ type AgentRunnerReplayState string
+ 
+@@ -592,10 +639,11 @@ func writeReplayRecordNoReplace(path string, record any) error {
+ 		return writeErr
+ 	}
+ 	replayStorePublishStage(replayStorePublishStageTempClosed, path)
+-	// Atomic no-replace visibility and durability are separate facts. The hard
+-	// link publishes visibility without replacement; only a successful parent
+-	// directory durability step may later justify a proven durability claim.
+-	if err := os.Link(temp, path); err != nil {
++	// Atomic no-replace visibility and durability are separate facts. The
++	// no-replace primitive publishes visibility without replacement; only a
++	// successful parent directory durability step may later justify a proven
++	// durability claim.
++	if err := replayStorePublishRecordNoReplace(temp, path); err != nil {
+ 		_ = os.Remove(temp)
+ 		if errors.Is(err, fs.ErrExist) {
+ 			return fs.ErrExist
+@@ -603,7 +651,7 @@ func writeReplayRecordNoReplace(path string, record any) error {
+ 		return err
+ 	}
+ 	replayStorePublishStage(replayStorePublishStageRecordLinked, path)
+-	if err := replayStoreSyncParentDirectory(directory); err != nil {
++	if err := replayStoreSyncParent(directory); err != nil {
+ 		_ = os.Remove(temp)
+ 		return err
+ 	}
+diff --git a/internal/adapters/agent_runner_replay_store_b3b_test.go b/internal/adapters/agent_runner_replay_store_b3b_test.go
+new file mode 100644
+index 0000000..a36acb8
+--- /dev/null
++++ b/internal/adapters/agent_runner_replay_store_b3b_test.go
+@@ -0,0 +1,342 @@
++package adapters
++
++import (
++	"bytes"
++	"errors"
++	"io/fs"
++	"os"
++	"path/filepath"
++	"sort"
++	"strings"
++	"testing"
++)
++
++// b3bTempResidue reports the temp files a publish left behind in a directory.
++func b3bTempResidue(t *testing.T, directory string) []string {
++	t.Helper()
++	entries, err := os.ReadDir(directory)
++	if err != nil {
++		t.Fatalf("read %s: %v", directory, err)
++	}
++	var residue []string
++	for _, entry := range entries {
++		if strings.HasSuffix(entry.Name(), ".tmp") {
++			residue = append(residue, entry.Name())
++		}
++	}
++	return residue
++}
++
++// TestB3bPublishPrimitiveHookIsNilByDefaultAndSeesEveryPublish pins the seam the
++// B3b durability candidates are installed through: inert in production, and one
++// call per no-replace publication handing over the temp file the store wrote and
++// the record path it publishes. A seam that fires twice, or that hands over
++// anything other than the record path, would let a candidate experiment measure a
++// publication that never happened.
++func TestB3bPublishPrimitiveHookIsNilByDefaultAndSeesEveryPublish(t *testing.T) {
++	if replayStorePublishPrimitiveHook != nil {
++		t.Fatal("the publish primitive hook must be nil outside experiments")
++	}
++	store := replayStoreMustNew(t, t.TempDir())
++	path, err := store.requestPath("request-one")
++	if err != nil {
++		t.Fatal(err)
++	}
++	type call struct{ temp, published string }
++	var calls []call
++	original := replayStorePublishPrimitiveHook
++	replayStorePublishPrimitiveHook = func(temp string, published string) error {
++		calls = append(calls, call{temp: temp, published: published})
++		return os.Link(temp, published)
++	}
++	t.Cleanup(func() { replayStorePublishPrimitiveHook = original })
++
++	if _, err := store.RecordRequest(replayStoreRequestRecord(t, "request-one")); err != nil {
++		t.Fatal(err)
++	}
++	replayStorePublishPrimitiveHook = original
++
++	if len(calls) != 1 {
++		t.Fatalf("the primitive hook must fire once per publication, got %d calls: %+v", len(calls), calls)
++	}
++	if calls[0].published != path {
++		t.Fatalf("primitive target = %s, want the request record path %s", calls[0].published, path)
++	}
++	if filepath.Dir(calls[0].temp) != filepath.Dir(path) || !strings.HasSuffix(calls[0].temp, ".tmp") {
++		t.Fatalf("primitive temp = %s, want a .tmp sibling of %s", calls[0].temp, path)
++	}
++	if residue := b3bTempResidue(t, filepath.Dir(path)); len(residue) != 0 {
++		t.Fatalf("a successful publish must leave no temp residue, got %v", residue)
++	}
++	// With the hook restored to nil the store must publish exactly as before.
++	if _, err := store.RecordRequest(replayStoreRequestRecord(t, "request-two")); err != nil {
++		t.Fatal(err)
++	}
++	if len(calls) != 1 {
++		t.Fatalf("a nil hook must stay inert, calls = %+v", calls)
++	}
++}
++
++// TestB3bPublishPrimitiveHookPreservesErrExistMapping pins the two error paths a
++// candidate primitive has to keep distinct: an existing target is a no-replace
++// collision the store is built to converge on, while every other failure must
++// stay a failure. Reporting a generic failure as a collision would let the store
++// converge on a slot that was never published.
++func TestB3bPublishPrimitiveHookPreservesErrExistMapping(t *testing.T) {
++	directory := t.TempDir()
++	record := replayStoreRequestRecord(t, "request-one")
++	published := filepath.Join(directory, "record-one.jsonl")
++	if err := writeReplayRecordNoReplace(published, record); err != nil {
++		t.Fatal(err)
++	}
++	if residue := b3bTempResidue(t, directory); len(residue) != 0 {
++		t.Fatalf("a clean publish left temp residue %v", residue)
++	}
++
++	original := replayStorePublishPrimitiveHook
++	t.Cleanup(func() { replayStorePublishPrimitiveHook = original })
++
++	collided := filepath.Join(directory, "record-two.jsonl")
++	replayStorePublishPrimitiveHook = func(string, string) error { return fs.ErrExist }
++	err := writeReplayRecordNoReplace(collided, record)
++	if !errors.Is(err, fs.ErrExist) {
++		t.Fatalf("a no-replace collision must surface as fs.ErrExist, got %v", err)
++	}
++	if _, statErr := os.Stat(collided); !errors.Is(statErr, fs.ErrNotExist) {
++		t.Fatalf("a failed publish must not create the record, stat = %v", statErr)
++	}
++	if residue := b3bTempResidue(t, directory); len(residue) != 0 {
++		t.Fatalf("a failed publish must clean up its temp file, residue %v", residue)
++	}
++
++	sentinel := errors.New("b3b primitive failure")
++	failed := filepath.Join(directory, "record-three.jsonl")
++	replayStorePublishPrimitiveHook = func(string, string) error { return sentinel }
++	err = writeReplayRecordNoReplace(failed, record)
++	if errors.Is(err, fs.ErrExist) {
++		t.Fatalf("a failing primitive must not be reported as a no-replace collision: %v", err)
++	}
++	if !errors.Is(err, sentinel) {
++		t.Fatalf("the primitive failure must reach the caller, got %v", err)
++	}
++	replayStorePublishPrimitiveHook = original
++}
++
++// TestB3bPublishPrimitiveHookEquivalenceWithLink drives a full store publication
++// through a hook that performs exactly what the production primitive does. The
++// record must be readable afterwards, and a second publication must still be
++// treated as the same owned slot rather than replacing it - the equivalence a
++// candidate experiment relies on when it swaps the primitive.
++func TestB3bPublishPrimitiveHookEquivalenceWithLink(t *testing.T) {
++	store := replayStoreMustNew(t, t.TempDir())
++	path, err := store.requestPath("request-one")
++	if err != nil {
++		t.Fatal(err)
++	}
++	calls := 0
++	original := replayStorePublishPrimitiveHook
++	replayStorePublishPrimitiveHook = func(temp string, published string) error {
++		calls++
++		return os.Link(temp, published)
++	}
++	t.Cleanup(func() { replayStorePublishPrimitiveHook = original })
++
++	decision, err := store.RecordRequest(replayStoreRequestRecord(t, "request-one"))
++	if err != nil {
++		t.Fatal(err)
++	}
++	if decision != AgentRunnerReplayDecisionFirstDispatch {
++		t.Fatalf("decision = %s, want the first dispatch", decision)
++	}
++	published, err := os.ReadFile(path)
++	if err != nil {
++		t.Fatal(err)
++	}
++
++	decision, err = store.RecordRequest(replayStoreRequestRecord(t, "request-one"))
++	if err != nil {
++		t.Fatalf("republishing the same request through the hook must converge: %v", err)
++	}
++	if decision != AgentRunnerReplayDecisionUnknownBlock {
++		t.Fatalf("decision = %s, want the owned slot to block a second dispatch", decision)
++	}
++	if calls != 2 {
++		t.Fatalf("both publications must run through the hook, calls = %d", calls)
++	}
++	again, err := os.ReadFile(path)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if !bytes.Equal(published, again) {
++		t.Fatal("a republished record must not replace the owned slot")
++	}
++	if residue := b3bTempResidue(t, filepath.Dir(path)); len(residue) != 0 {
++		t.Fatalf("convergence must leave no temp residue, got %v", residue)
++	}
++}
++
++// TestB3bParentSyncHookIsNilByDefaultAndFiresOnceAfterPrimitive pins the second
++// B3b seam: inert in production, fired once per publication, handed the directory
++// holding the record, and fired between the record-linked and parent-synced
++// stages. A hook that runs before the primitive or after the last stage would make
++// a candidate experiment measure a durability step that ran at the wrong point.
++func TestB3bParentSyncHookIsNilByDefaultAndFiresOnceAfterPrimitive(t *testing.T) {
++	if replayStoreParentSyncHook != nil {
++		t.Fatal("the parent sync hook must be nil outside experiments")
++	}
++	store := replayStoreMustNew(t, t.TempDir())
++	path, err := store.requestPath("request-one")
++	if err != nil {
++		t.Fatal(err)
++	}
++	var events []string
++	var directories []string
++	originalStage := replayStorePublishStageHook
++	originalPrimitive := replayStorePublishPrimitiveHook
++	originalParent := replayStoreParentSyncHook
++	replayStorePublishStageHook = func(stage string, _ string) { events = append(events, "stage:"+stage) }
++	replayStorePublishPrimitiveHook = func(temp string, published string) error {
++		events = append(events, "primitive")
++		return os.Link(temp, published)
++	}
++	replayStoreParentSyncHook = func(directory string) error {
++		events = append(events, "parent")
++		directories = append(directories, directory)
++		return nil
++	}
++	t.Cleanup(func() {
++		replayStorePublishStageHook = originalStage
++		replayStorePublishPrimitiveHook = originalPrimitive
++		replayStoreParentSyncHook = originalParent
++	})
++
++	if _, err := store.RecordRequest(replayStoreRequestRecord(t, "request-one")); err != nil {
++		t.Fatal(err)
++	}
++	replayStorePublishStageHook = originalStage
++	replayStorePublishPrimitiveHook = originalPrimitive
++	replayStoreParentSyncHook = originalParent
++
++	want := strings.Join([]string{
++		"stage:" + replayStorePublishStageTempWritten,
++		"stage:" + replayStorePublishStageTempSynced,
++		"stage:" + replayStorePublishStageTempClosed,
++		"primitive",
++		"stage:" + replayStorePublishStageRecordLinked,
++		"parent",
++		"stage:" + replayStorePublishStageParentSynced,
++	}, ",")
++	if got := strings.Join(events, ","); got != want {
++		t.Fatalf("publication event order = %s, want %s", got, want)
++	}
++	if len(directories) != 1 || directories[0] != filepath.Dir(path) {
++		t.Fatalf("the parent sync must receive the record directory once, got %v want %s", directories, filepath.Dir(path))
++	}
++	// With the hooks restored to nil a later publish must behave exactly as before.
++	before := len(events)
++	if _, err := store.RecordRequest(replayStoreRequestRecord(t, "request-two")); err != nil {
++		t.Fatal(err)
++	}
++	if len(events) != before {
++		t.Fatalf("nil hooks must stay inert, events = %v", events)
++	}
++}
++
++// TestB3bParentSyncHookFailureAbortsPublishAndCleansTemp pins what a failed
++// parent-directory durability step has to do to the caller: report the failure
++// instead of swallowing it, drop the temp file, and never leave a partial record.
++// Swallowing the error would let a publication that never reached the durability
++// boundary look like a completed one.
++func TestB3bParentSyncHookFailureAbortsPublishAndCleansTemp(t *testing.T) {
++	store := replayStoreMustNew(t, t.TempDir())
++	path, err := store.requestPath("request-one")
++	if err != nil {
++		t.Fatal(err)
++	}
++	sentinel := errors.New("b3b parent sync failure")
++	original := replayStoreParentSyncHook
++	replayStoreParentSyncHook = func(string) error { return sentinel }
++	t.Cleanup(func() { replayStoreParentSyncHook = original })
++
++	if _, err := store.RecordRequest(replayStoreRequestRecord(t, "request-one")); !errors.Is(err, sentinel) {
++		t.Fatalf("a failed parent-directory step must reach the decision layer, got %v", err)
++	}
++	if residue := b3bTempResidue(t, filepath.Dir(path)); len(residue) != 0 {
++		t.Fatalf("a failed publication must remove its temp file, residue %v", residue)
++	}
++	// Visibility and durability are separate facts: the primitive already
++	// published the record, so what must hold afterwards is the completeness
++	// invariant, not invisibility.
++	if _, statErr := os.Stat(path); statErr == nil {
++		loaded, found, loadErr := replayStoreLoadRequestRecord(path, "request-one")
++		if loadErr != nil || !found {
++			t.Fatalf("a visible record must be complete and loadable, found=%v err=%v", found, loadErr)
++		}
++		if loaded.RecordHash == "" {
++			t.Fatal("a visible record must carry its record hash")
++		}
++	} else if !errors.Is(statErr, fs.ErrNotExist) {
++		t.Fatalf("an unexpected publication outcome: %v", statErr)
++	}
++	replayStoreParentSyncHook = original
++}
++
++// TestB3bParentSyncHookNilEquivalence pins the equivalence the candidate
++// experiments rely on: while the hook is nil the dispatcher has to be the
++// platform primitive itself, and a passthrough hook has to leave the same
++// publication footprint as no hook at all.
++func TestB3bParentSyncHookNilEquivalence(t *testing.T) {
++	if replayStoreParentSyncHook != nil {
++		t.Fatal("the parent sync hook must be nil outside experiments")
++	}
++	directory := t.TempDir()
++	missing := filepath.Join(directory, "missing")
++	for _, candidate := range []string{directory, missing} {
++		wantErr := replayStoreSyncParentDirectory(candidate)
++		gotErr := replayStoreSyncParent(candidate)
++		if (wantErr == nil) != (gotErr == nil) {
++			t.Fatalf("nil hook delegation mismatch for %s: dispatched=%v platform=%v", candidate, gotErr, wantErr)
++		}
++		if wantErr != nil && gotErr.Error() != wantErr.Error() {
++			t.Fatalf("nil hook delegation changed the error for %s: dispatched=%v platform=%v", candidate, gotErr, wantErr)
++		}
++	}
++
++	footprint := func(root string) string {
++		var collected []string
++		walkErr := filepath.WalkDir(root, func(current string, entry fs.DirEntry, err error) error {
++			if err != nil {
++				return err
++			}
++			if !entry.IsDir() {
++				collected = append(collected, current)
++			}
++			return nil
++		})
++		if walkErr != nil {
++			t.Fatal(walkErr)
++		}
++		sort.Strings(collected)
++		return strings.Join(collected, ",")
++	}
++
++	plainRoot := t.TempDir()
++	plain := replayStoreMustNew(t, plainRoot)
++	if _, err := plain.RecordRequest(replayStoreRequestRecord(t, "request-one")); err != nil {
++		t.Fatal(err)
++	}
++	passthroughRoot := t.TempDir()
++	passthrough := replayStoreMustNew(t, passthroughRoot)
++	original := replayStoreParentSyncHook
++	replayStoreParentSyncHook = func(directory string) error { return replayStoreSyncParentDirectory(directory) }
++	if _, err := passthrough.RecordRequest(replayStoreRequestRecord(t, "request-one")); err != nil {
++		t.Fatal(err)
++	}
++	replayStoreParentSyncHook = original
++
++	plainNames := strings.ReplaceAll(footprint(plainRoot), plainRoot, "<root>")
++	passthroughNames := strings.ReplaceAll(footprint(passthroughRoot), passthroughRoot, "<root>")
++	if plainNames != passthroughNames {
++		t.Fatalf("passthrough footprint = %s, want %s", passthroughNames, plainNames)
++	}
++}
+
+===== 输入结束 =====

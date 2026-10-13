@@ -1,0 +1,663 @@
+Go windows-latest	Set up job	﻿2026-10-13T08:22:34.9596886Z Current runner version: '2.337.0'
+Go windows-latest	Set up job	2026-10-13T08:22:34.9639106Z ##[group]Runner Image Provisioner
+Go windows-latest	Set up job	2026-10-13T08:22:34.9639660Z Hosted Compute Agent
+Go windows-latest	Set up job	2026-10-13T08:22:34.9640010Z Version: 20260901.588
+Go windows-latest	Set up job	2026-10-13T08:22:34.9640390Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+Go windows-latest	Set up job	2026-10-13T08:22:34.9640813Z Build Date: 2026-09-01T19:56:44Z
+Go windows-latest	Set up job	2026-10-13T08:22:34.9641221Z Worker ID: {0a2ee458-06fd-44d6-a934-f6c073ae6f64}
+Go windows-latest	Set up job	2026-10-13T08:22:34.9642013Z Azure Region: southcentralus
+Go windows-latest	Set up job	2026-10-13T08:22:34.9642398Z ##[endgroup]
+Go windows-latest	Set up job	2026-10-13T08:22:34.9643311Z ##[group]Operating System
+Go windows-latest	Set up job	2026-10-13T08:22:34.9643717Z Microsoft Windows Server 2025
+Go windows-latest	Set up job	2026-10-13T08:22:34.9644084Z 10.0.26100
+Go windows-latest	Set up job	2026-10-13T08:22:34.9644390Z Datacenter
+Go windows-latest	Set up job	2026-10-13T08:22:34.9644688Z ##[endgroup]
+Go windows-latest	Set up job	2026-10-13T08:22:34.9645024Z ##[group]Runner Image
+Go windows-latest	Set up job	2026-10-13T08:22:34.9645371Z Image: windows-2025-vs2026
+Go windows-latest	Set up job	2026-10-13T08:22:34.9645715Z Version: 20260925.250.1
+Go windows-latest	Set up job	2026-10-13T08:22:34.9646390Z Included Software: https://github.com/actions/runner-images/blob/win25-vs2026/20260925.250/images/windows/Windows2025-VS2026-Readme.md
+Go windows-latest	Set up job	2026-10-13T08:22:34.9647635Z Image Release: https://github.com/actions/runner-images/releases/tag/win25-vs2026%2F20260925.250
+Go windows-latest	Set up job	2026-10-13T08:22:34.9648226Z ##[endgroup]
+Go windows-latest	Set up job	2026-10-13T08:22:34.9648896Z ##[group]GITHUB_TOKEN Permissions
+Go windows-latest	Set up job	2026-10-13T08:22:34.9650118Z Contents: read
+Go windows-latest	Set up job	2026-10-13T08:22:34.9650449Z Metadata: read
+Go windows-latest	Set up job	2026-10-13T08:22:34.9650775Z ##[endgroup]
+Go windows-latest	Set up job	2026-10-13T08:22:34.9652251Z Secret source: Actions
+Go windows-latest	Set up job	2026-10-13T08:22:34.9652800Z Cache mode: write
+Go windows-latest	Set up job	2026-10-13T08:22:34.9653241Z Prepare workflow directory
+Go windows-latest	Set up job	2026-10-13T08:22:34.9942915Z Prepare all required actions
+Go windows-latest	Set up job	2026-10-13T08:22:34.9976756Z Getting action download info
+Go windows-latest	Set up job	2026-10-13T08:22:35.2495397Z Download action repository 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+Go windows-latest	Set up job	2026-10-13T08:22:35.3350663Z Download action repository 'actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e' (SHA:b7ad1dad31e06c5925ef5d2fc7ad053ef454303e)
+Go windows-latest	Set up job	2026-10-13T08:22:35.8592178Z Complete job name: Go windows-latest
+Go windows-latest	Checkout source	﻿2026-10-13T08:22:35.9697749Z ##[group]Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+Go windows-latest	Checkout source	2026-10-13T08:22:35.9698727Z with:
+Go windows-latest	Checkout source	2026-10-13T08:22:35.9698981Z   persist-credentials: false
+Go windows-latest	Checkout source	2026-10-13T08:22:35.9699262Z   fetch-depth: 0
+Go windows-latest	Checkout source	2026-10-13T08:22:35.9699519Z   repository: larsonzh/prfrail
+Go windows-latest	Checkout source	2026-10-13T08:22:35.9702012Z   token: ***
+Go windows-latest	Checkout source	2026-10-13T08:22:35.9702250Z   ssh-strict: true
+Go windows-latest	Checkout source	2026-10-13T08:22:35.9702499Z   ssh-user: git
+Go windows-latest	Checkout source	2026-10-13T08:22:35.9702734Z   clean: true
+Go windows-latest	Checkout source	2026-10-13T08:22:35.9702989Z   sparse-checkout-cone-mode: true
+Go windows-latest	Checkout source	2026-10-13T08:22:35.9703291Z   fetch-tags: false
+Go windows-latest	Checkout source	2026-10-13T08:22:35.9703544Z   show-progress: true
+Go windows-latest	Checkout source	2026-10-13T08:22:35.9703793Z   lfs: false
+Go windows-latest	Checkout source	2026-10-13T08:22:35.9704022Z   submodules: false
+Go windows-latest	Checkout source	2026-10-13T08:22:35.9704302Z   set-safe-directory: true
+Go windows-latest	Checkout source	2026-10-13T08:22:35.9704605Z   allow-unsafe-pr-checkout: false
+Go windows-latest	Checkout source	2026-10-13T08:22:35.9704996Z env:
+Go windows-latest	Checkout source	2026-10-13T08:22:35.9705218Z   GO_VERSION: 1.22.12
+Go windows-latest	Checkout source	2026-10-13T08:22:35.9705489Z   CGO_ENABLED: 0
+Go windows-latest	Checkout source	2026-10-13T08:22:35.9705954Z   GOTOOLCHAIN: local
+Go windows-latest	Checkout source	2026-10-13T08:22:35.9706286Z ##[endgroup]
+Go windows-latest	Checkout source	2026-10-13T08:22:36.0821270Z Syncing repository: larsonzh/prfrail
+Go windows-latest	Checkout source	2026-10-13T08:22:36.0822905Z ##[group]Getting Git version info
+Go windows-latest	Checkout source	2026-10-13T08:22:36.0823282Z Working directory is 'D:\a\prfrail\prfrail'
+Go windows-latest	Checkout source	2026-10-13T08:22:36.1328007Z [command]"C:\Program Files\Git\bin\git.exe" version
+Go windows-latest	Checkout source	2026-10-13T08:22:36.4986333Z git version 2.55.0.windows.5
+Go windows-latest	Checkout source	2026-10-13T08:22:36.5023248Z ##[endgroup]
+Go windows-latest	Checkout source	2026-10-13T08:22:36.5036127Z Temporarily overriding HOME='D:\a\_temp\c67ca5b5-5b32-4fa5-81a6-2a0be8d30281' before making global git config changes
+Go windows-latest	Checkout source	2026-10-13T08:22:36.5037942Z Adding repository directory to the temporary git global config as a safe directory
+Go windows-latest	Checkout source	2026-10-13T08:22:36.5043256Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\prfrail\prfrail
+Go windows-latest	Checkout source	2026-10-13T08:22:36.5610317Z Deleting the contents of 'D:\a\prfrail\prfrail'
+Go windows-latest	Checkout source	2026-10-13T08:22:36.5613867Z ##[group]Determining repository object format
+Go windows-latest	Checkout source	2026-10-13T08:22:36.5615774Z ##[endgroup]
+Go windows-latest	Checkout source	2026-10-13T08:22:36.5616754Z ##[group]Initializing the repository
+Go windows-latest	Checkout source	2026-10-13T08:22:36.5622224Z [command]"C:\Program Files\Git\bin\git.exe" init D:\a\prfrail\prfrail
+Go windows-latest	Checkout source	2026-10-13T08:22:36.6388770Z Initialized empty Git repository in D:/a/prfrail/prfrail/.git/
+Go windows-latest	Checkout source	2026-10-13T08:22:36.6427922Z [command]"C:\Program Files\Git\bin\git.exe" remote add origin https://github.com/larsonzh/prfrail
+Go windows-latest	Checkout source	2026-10-13T08:22:36.6962099Z ##[endgroup]
+Go windows-latest	Checkout source	2026-10-13T08:22:36.6963402Z ##[group]Disabling automatic garbage collection
+Go windows-latest	Checkout source	2026-10-13T08:22:36.6964683Z [command]"C:\Program Files\Git\bin\git.exe" config --local gc.auto 0
+Go windows-latest	Checkout source	2026-10-13T08:22:36.7208264Z ##[endgroup]
+Go windows-latest	Checkout source	2026-10-13T08:22:36.7210112Z ##[group]Setting up auth
+Go windows-latest	Checkout source	2026-10-13T08:22:36.7211487Z Removing SSH command configuration
+Go windows-latest	Checkout source	2026-10-13T08:22:36.7216940Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+Go windows-latest	Checkout source	2026-10-13T08:22:36.7465389Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+Go windows-latest	Checkout source	2026-10-13T08:22:38.0475459Z Removing HTTP extra header
+Go windows-latest	Checkout source	2026-10-13T08:22:38.0489687Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Go windows-latest	Checkout source	2026-10-13T08:22:38.0728548Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+Go windows-latest	Checkout source	2026-10-13T08:22:38.5176189Z Removing includeIf entries pointing to credentials config files
+Go windows-latest	Checkout source	2026-10-13T08:22:38.5186947Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+Go windows-latest	Checkout source	2026-10-13T08:22:38.5439699Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+Go windows-latest	Checkout source	2026-10-13T08:22:39.0565891Z [command]"C:\Program Files\Git\bin\git.exe" config --file D:\a\_temp\git-credentials-a3be1bfa-35de-46e0-93b8-77228cae9dd3.config http.https://github.com/.extraheader "AUTHORIZATION: basic ***"
+Go windows-latest	Checkout source	2026-10-13T08:22:39.0841606Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:D:/a/prfrail/prfrail/.git.path D:\a\_temp\git-credentials-a3be1bfa-35de-46e0-93b8-77228cae9dd3.config
+Go windows-latest	Checkout source	2026-10-13T08:22:39.1107057Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:D:/a/prfrail/prfrail/.git/worktrees/*.path D:\a\_temp\git-credentials-a3be1bfa-35de-46e0-93b8-77228cae9dd3.config
+Go windows-latest	Checkout source	2026-10-13T08:22:39.1454403Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-a3be1bfa-35de-46e0-93b8-77228cae9dd3.config
+Go windows-latest	Checkout source	2026-10-13T08:22:39.1736789Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-a3be1bfa-35de-46e0-93b8-77228cae9dd3.config
+Go windows-latest	Checkout source	2026-10-13T08:22:39.2007845Z ##[endgroup]
+Go windows-latest	Checkout source	2026-10-13T08:22:39.2008364Z ##[group]Fetching the repository
+Go windows-latest	Checkout source	2026-10-13T08:22:39.2020569Z [command]"C:\Program Files\Git\bin\git.exe" -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+Go windows-latest	Checkout source	2026-10-13T08:22:40.6765048Z From https://github.com/larsonzh/prfrail
+Go windows-latest	Checkout source	2026-10-13T08:22:40.6765962Z  * [new branch]      main                 -> origin/main
+Go windows-latest	Checkout source	2026-10-13T08:22:40.6766221Z  * [new branch]      t017-first-candidate -> origin/t017-first-candidate
+Go windows-latest	Checkout source	2026-10-13T08:22:40.6812625Z [command]"C:\Program Files\Git\bin\git.exe" branch --list --remote origin/main
+Go windows-latest	Checkout source	2026-10-13T08:22:40.7117159Z   origin/main
+Go windows-latest	Checkout source	2026-10-13T08:22:40.7157101Z [command]"C:\Program Files\Git\bin\git.exe" rev-parse refs/remotes/origin/main
+Go windows-latest	Checkout source	2026-10-13T08:22:40.7359844Z 89f63f12c635ecbab27889c0624bdacb36e353d1
+Go windows-latest	Checkout source	2026-10-13T08:22:40.7387581Z ##[endgroup]
+Go windows-latest	Checkout source	2026-10-13T08:22:40.7388005Z ##[group]Determining the checkout info
+Go windows-latest	Checkout source	2026-10-13T08:22:40.7388399Z ##[endgroup]
+Go windows-latest	Checkout source	2026-10-13T08:22:40.7396055Z [command]"C:\Program Files\Git\bin\git.exe" sparse-checkout disable
+Go windows-latest	Checkout source	2026-10-13T08:22:40.7765395Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all extensions.worktreeConfig
+Go windows-latest	Checkout source	2026-10-13T08:22:40.8007212Z ##[group]Checking out the ref
+Go windows-latest	Checkout source	2026-10-13T08:22:40.8014330Z [command]"C:\Program Files\Git\bin\git.exe" checkout --progress --force -B main refs/remotes/origin/main
+Go windows-latest	Checkout source	2026-10-13T08:22:41.2678241Z Switched to a new branch 'main'
+Go windows-latest	Checkout source	2026-10-13T08:22:41.2738573Z branch 'main' set up to track 'origin/main'.
+Go windows-latest	Checkout source	2026-10-13T08:22:41.2792760Z ##[endgroup]
+Go windows-latest	Checkout source	2026-10-13T08:22:41.3138790Z [command]"C:\Program Files\Git\bin\git.exe" log -1 --format=%H
+Go windows-latest	Checkout source	2026-10-13T08:22:41.3358140Z 89f63f12c635ecbab27889c0624bdacb36e353d1
+Go windows-latest	Checkout source	2026-10-13T08:22:41.3393624Z ##[group]Removing auth
+Go windows-latest	Checkout source	2026-10-13T08:22:41.3394532Z Removing SSH command configuration
+Go windows-latest	Checkout source	2026-10-13T08:22:41.3401636Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+Go windows-latest	Checkout source	2026-10-13T08:22:41.3639542Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+Go windows-latest	Checkout source	2026-10-13T08:22:41.7765179Z Removing HTTP extra header
+Go windows-latest	Checkout source	2026-10-13T08:22:41.7773608Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Go windows-latest	Checkout source	2026-10-13T08:22:41.8041119Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+Go windows-latest	Checkout source	2026-10-13T08:22:42.2764923Z Removing includeIf entries pointing to credentials config files
+Go windows-latest	Checkout source	2026-10-13T08:22:42.2773846Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+Go windows-latest	Checkout source	2026-10-13T08:22:42.3060544Z includeif.gitdir:D:/a/prfrail/prfrail/.git.path
+Go windows-latest	Checkout source	2026-10-13T08:22:42.3060901Z includeif.gitdir:D:/a/prfrail/prfrail/.git/worktrees/*.path
+Go windows-latest	Checkout source	2026-10-13T08:22:42.3061143Z includeif.gitdir:/github/workspace/.git.path
+Go windows-latest	Checkout source	2026-10-13T08:22:42.3061347Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+Go windows-latest	Checkout source	2026-10-13T08:22:42.3097364Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:D:/a/prfrail/prfrail/.git.path
+Go windows-latest	Checkout source	2026-10-13T08:22:42.3301708Z D:\a\_temp\git-credentials-a3be1bfa-35de-46e0-93b8-77228cae9dd3.config
+Go windows-latest	Checkout source	2026-10-13T08:22:42.3338636Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:D:/a/prfrail/prfrail/.git.path D\:\\a\\_temp\\git\-credentials\-a3be1bfa\-35de\-46e0\-93b8\-77228cae9dd3\.config
+Go windows-latest	Checkout source	2026-10-13T08:22:42.3589628Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:D:/a/prfrail/prfrail/.git/worktrees/*.path
+Go windows-latest	Checkout source	2026-10-13T08:22:42.3792844Z D:\a\_temp\git-credentials-a3be1bfa-35de-46e0-93b8-77228cae9dd3.config
+Go windows-latest	Checkout source	2026-10-13T08:22:42.3829438Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:D:/a/prfrail/prfrail/.git/worktrees/*.path D\:\\a\\_temp\\git\-credentials\-a3be1bfa\-35de\-46e0\-93b8\-77228cae9dd3\.config
+Go windows-latest	Checkout source	2026-10-13T08:22:42.4087740Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:/github/workspace/.git.path
+Go windows-latest	Checkout source	2026-10-13T08:22:42.4384484Z /github/runner_temp/git-credentials-a3be1bfa-35de-46e0-93b8-77228cae9dd3.config
+Go windows-latest	Checkout source	2026-10-13T08:22:42.4454387Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-a3be1bfa\-35de\-46e0\-93b8\-77228cae9dd3\.config
+Go windows-latest	Checkout source	2026-10-13T08:22:42.4896869Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+Go windows-latest	Checkout source	2026-10-13T08:22:42.5107686Z /github/runner_temp/git-credentials-a3be1bfa-35de-46e0-93b8-77228cae9dd3.config
+Go windows-latest	Checkout source	2026-10-13T08:22:42.5151125Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-a3be1bfa\-35de\-46e0\-93b8\-77228cae9dd3\.config
+Go windows-latest	Checkout source	2026-10-13T08:22:42.5401962Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+Go windows-latest	Checkout source	2026-10-13T08:22:42.9638009Z Removing credentials config 'D:\a\_temp\git-credentials-a3be1bfa-35de-46e0-93b8-77228cae9dd3.config'
+Go windows-latest	Checkout source	2026-10-13T08:22:42.9656719Z ##[endgroup]
+Go windows-latest	Setup Go	﻿2026-10-13T08:22:42.9990090Z ##[group]Run actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
+Go windows-latest	Setup Go	2026-10-13T08:22:42.9990390Z with:
+Go windows-latest	Setup Go	2026-10-13T08:22:42.9990508Z   go-version: 1.22.12
+Go windows-latest	Setup Go	2026-10-13T08:22:42.9990636Z   cache: true
+Go windows-latest	Setup Go	2026-10-13T08:22:42.9990745Z   check-latest: false
+Go windows-latest	Setup Go	2026-10-13T08:22:42.9992340Z   token: ***
+Go windows-latest	Setup Go	2026-10-13T08:22:42.9992443Z env:
+Go windows-latest	Setup Go	2026-10-13T08:22:42.9992545Z   GO_VERSION: 1.22.12
+Go windows-latest	Setup Go	2026-10-13T08:22:42.9992658Z   CGO_ENABLED: 0
+Go windows-latest	Setup Go	2026-10-13T08:22:42.9992795Z   GOTOOLCHAIN: local
+Go windows-latest	Setup Go	2026-10-13T08:22:42.9992907Z ##[endgroup]
+Go windows-latest	Setup Go	2026-10-13T08:22:43.1219368Z Setup go version spec 1.22.12
+Go windows-latest	Setup Go	2026-10-13T08:22:43.1226870Z Attempting to download 1.22.12...
+Go windows-latest	Setup Go	2026-10-13T08:22:43.9285762Z matching 1.22.12...
+Go windows-latest	Setup Go	2026-10-13T08:22:43.9291775Z Acquiring 1.22.12 from https://github.com/actions/go-versions/releases/download/1.22.12-13149489080/go-1.22.12-win32-x64.zip
+Go windows-latest	Setup Go	2026-10-13T08:22:44.4936528Z Extracting Go...
+Go windows-latest	Setup Go	2026-10-13T08:22:44.5469688Z [command]"C:\Program Files\PowerShell\7\pwsh.exe" -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Unrestricted -Command "$ErrorActionPreference = 'Stop' ; try { Add-Type -AssemblyName System.IO.Compression.ZipFile } catch { } ; try { [System.IO.Compression.ZipFile]::ExtractToDirectory('D:\a\_temp\go-1.22.12-win32-x64.zip', 'D:\a\_temp\549a6228-07fe-4b0a-87df-f470950aa562', $true) } catch { if (($_.Exception.GetType().FullName -eq 'System.Management.Automation.MethodException') -or ($_.Exception.GetType().FullName -eq 'System.Management.Automation.RuntimeException') ){ Expand-Archive -LiteralPath 'D:\a\_temp\go-1.22.12-win32-x64.zip' -DestinationPath 'D:\a\_temp\549a6228-07fe-4b0a-87df-f470950aa562' -Force } else { throw $_ } } ;"
+Go windows-latest	Setup Go	2026-10-13T08:22:48.1901603Z Successfully extracted go to D:\a\_temp\549a6228-07fe-4b0a-87df-f470950aa562
+Go windows-latest	Setup Go	2026-10-13T08:22:48.1902092Z Adding to the cache ...
+Go windows-latest	Setup Go	2026-10-13T08:22:54.1664236Z Created link C:\hostedtoolcache\windows\go\1.22.12\x64 => D:\hostedtoolcache\windows\go\1.22.12\x64
+Go windows-latest	Setup Go	2026-10-13T08:22:54.1669046Z Created link C:\hostedtoolcache\windows\go\1.22.12\x64.complete => D:\hostedtoolcache\windows\go\1.22.12\x64.complete
+Go windows-latest	Setup Go	2026-10-13T08:22:54.1669583Z Successfully cached go to C:\hostedtoolcache\windows\go\1.22.12\x64
+Go windows-latest	Setup Go	2026-10-13T08:22:54.1674668Z Added go to the path
+Go windows-latest	Setup Go	2026-10-13T08:22:54.1675818Z Successfully set up Go version 1.22.12
+Go windows-latest	Setup Go	2026-10-13T08:22:54.3235643Z [command]C:\hostedtoolcache\windows\go\1.22.12\x64\bin\go.exe env GOCACHE
+Go windows-latest	Setup Go	2026-10-13T08:22:54.3277954Z [command]C:\hostedtoolcache\windows\go\1.22.12\x64\bin\go.exe env GOMODCACHE
+Go windows-latest	Setup Go	2026-10-13T08:22:54.3476306Z C:\Users\runneradmin\AppData\Local\go-build
+Go windows-latest	Setup Go	2026-10-13T08:22:54.3493835Z C:\Users\runneradmin\go\pkg\mod
+Go windows-latest	Setup Go	2026-10-13T08:22:54.5941501Z Cache hit for: setup-go-Windows-x64-go-1.22.12-2f07b6ec62ba90bcd08e45ebcc765a7ea2fd8104887fdaad445ddb80e0e00ca7
+Go windows-latest	Setup Go	2026-10-13T08:22:55.4499826Z Received 33757192 of 33757192 (100.0%), 47.8 MBs/sec
+Go windows-latest	Setup Go	2026-10-13T08:22:55.4502693Z Cache Size: ~32 MB (33757192 B)
+Go windows-latest	Setup Go	2026-10-13T08:22:55.4565713Z [command]"C:\Program Files\Git\usr\bin\tar.exe" -xf D:/a/_temp/eaf67ebf-a69c-4852-bba3-ad38f8a7de62/cache.tzst -P -C D:/a/prfrail/prfrail --force-local --use-compress-program "zstd -d"
+Go windows-latest	Setup Go	2026-10-13T08:23:00.3918502Z Cache restored successfully
+Go windows-latest	Setup Go	2026-10-13T08:23:00.3954253Z Cache restored from key: setup-go-Windows-x64-go-1.22.12-2f07b6ec62ba90bcd08e45ebcc765a7ea2fd8104887fdaad445ddb80e0e00ca7
+Go windows-latest	Setup Go	2026-10-13T08:23:00.3977908Z go version go1.22.12 windows/amd64
+Go windows-latest	Setup Go	2026-10-13T08:23:00.3978131Z 
+Go windows-latest	Setup Go	2026-10-13T08:23:00.3978412Z ##[group]go env
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1219135Z set GO111MODULE=
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1219488Z set GOARCH=amd64
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1219674Z set GOBIN=
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1219860Z set GOCACHE=C:\Users\runneradmin\AppData\Local\go-build
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1220114Z set GOENV=C:\Users\runneradmin\AppData\Roaming\go\env
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1220286Z set GOEXE=.exe
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1220409Z set GOEXPERIMENT=
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1220524Z set GOFLAGS=
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1220637Z set GOHOSTARCH=amd64
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1220763Z set GOHOSTOS=windows
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1223527Z set GOINSECURE=
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1223750Z set GOMODCACHE=C:\Users\runneradmin\go\pkg\mod
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1224012Z set GONOPROXY=
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1224172Z set GONOSUMDB=
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1224327Z set GOOS=windows
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1224534Z set GOPATH=C:\Users\runneradmin\go
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1224758Z set GOPRIVATE=
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1224987Z set GOPROXY=https://proxy.golang.org,direct
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1225289Z set GOROOT=C:\hostedtoolcache\windows\go\1.22.12\x64
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1225570Z set GOSUMDB=sum.golang.org
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1225768Z set GOTMPDIR=
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1225932Z set GOTOOLCHAIN=local
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1226240Z set GOTOOLDIR=C:\hostedtoolcache\windows\go\1.22.12\x64\pkg\tool\windows_amd64
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1226584Z set GOVCS=
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1226744Z set GOVERSION=go1.22.12
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1226927Z set GCCGO=gccgo
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1227092Z set GOAMD64=v1
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1227245Z set AR=ar
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1227413Z set CC=gcc
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1227559Z set CXX=g++
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1227707Z set CGO_ENABLED=0
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1227895Z set GOMOD=D:\a\prfrail\prfrail\go.mod
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1228172Z set GOWORK=
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1228415Z set CGO_CFLAGS=-O2 -g
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1228684Z set CGO_CPPFLAGS=
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1228870Z set CGO_CXXFLAGS=-O2 -g
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1229061Z set CGO_FFLAGS=-O2 -g
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1229250Z set CGO_LDFLAGS=-O2 -g
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1229441Z set PKG_CONFIG=pkg-config
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1230110Z set GOGCCFLAGS=-m64 -Wl,--no-gc-sections -fmessage-length=0 -ffile-prefix-map=C:\Users\RUNNER~1\AppData\Local\Temp\go-build814636657=/tmp/go-build -gno-record-gcc-switches
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1230657Z 
+Go windows-latest	Setup Go	2026-10-13T08:23:02.1230997Z ##[endgroup]
+Go windows-latest	Build	﻿2026-10-13T08:23:02.1564539Z ##[group]Run go build ./...
+Go windows-latest	Build	2026-10-13T08:23:02.1564786Z ^[[36;1mgo build ./...^[[0m
+Go windows-latest	Build	2026-10-13T08:23:02.1895373Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+Go windows-latest	Build	2026-10-13T08:23:02.1895655Z env:
+Go windows-latest	Build	2026-10-13T08:23:02.1895776Z   GO_VERSION: 1.22.12
+Go windows-latest	Build	2026-10-13T08:23:02.1895905Z   CGO_ENABLED: 0
+Go windows-latest	Build	2026-10-13T08:23:02.1896018Z   GOTOOLCHAIN: local
+Go windows-latest	Build	2026-10-13T08:23:02.1896150Z ##[endgroup]
+Go windows-latest	Vet	﻿2026-10-13T08:23:11.5121541Z ##[group]Run go vet ./...
+Go windows-latest	Vet	2026-10-13T08:23:11.5121773Z ^[[36;1mgo vet ./...^[[0m
+Go windows-latest	Vet	2026-10-13T08:23:11.5171081Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+Go windows-latest	Vet	2026-10-13T08:23:11.5171289Z env:
+Go windows-latest	Vet	2026-10-13T08:23:11.5171400Z   GO_VERSION: 1.22.12
+Go windows-latest	Vet	2026-10-13T08:23:11.5171519Z   CGO_ENABLED: 0
+Go windows-latest	Vet	2026-10-13T08:23:11.5171641Z   GOTOOLCHAIN: local
+Go windows-latest	Vet	2026-10-13T08:23:11.5171760Z ##[endgroup]
+Go windows-latest	Test	﻿2026-10-13T08:23:16.7266832Z ##[group]Run go test -count=1 ./...
+Go windows-latest	Test	2026-10-13T08:23:16.7267096Z ^[[36;1mgo test -count=1 ./...^[[0m
+Go windows-latest	Test	2026-10-13T08:23:16.7316201Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+Go windows-latest	Test	2026-10-13T08:23:16.7316403Z env:
+Go windows-latest	Test	2026-10-13T08:23:16.7316509Z   GO_VERSION: 1.22.12
+Go windows-latest	Test	2026-10-13T08:23:16.7316630Z   CGO_ENABLED: 0
+Go windows-latest	Test	2026-10-13T08:23:16.7316743Z   GOTOOLCHAIN: local
+Go windows-latest	Test	2026-10-13T08:23:16.7316860Z ##[endgroup]
+Go windows-latest	Test	2026-10-13T08:23:20.2580711Z ?   	github.com/larsonzh/prfrail/cmd/prfrail	[no test files]
+Go windows-latest	Test	2026-10-13T08:23:20.2581779Z ?   	github.com/larsonzh/prfrail/cmd/prfrail-release	[no test files]
+Go windows-latest	Test	2026-10-13T08:23:20.9915224Z ok  	github.com/larsonzh/prfrail/examples/whois-shadow	0.039s
+Go windows-latest	Test	2026-10-13T08:23:34.6273818Z ?   	github.com/larsonzh/prfrail/tools/agent-probe/supervisor	[no test files]
+Go windows-latest	Test	2026-10-13T08:23:34.7472723Z ?   	github.com/larsonzh/prfrail/tools/agent-stub	[no test files]
+Go windows-latest	Test	2026-10-13T08:23:35.0534670Z ?   	github.com/larsonzh/prfrail/tools/b4-e2e	[no test files]
+Go windows-latest	Test	2026-10-13T08:24:04.5559417Z ok  	github.com/larsonzh/prfrail/internal/adapters	43.584s
+Go windows-latest	Test	2026-10-13T08:24:04.5559796Z ok  	github.com/larsonzh/prfrail/internal/applier	7.355s
+Go windows-latest	Test	2026-10-13T08:24:04.5560122Z ok  	github.com/larsonzh/prfrail/internal/chain	0.405s
+Go windows-latest	Test	2026-10-13T08:24:04.5560439Z ok  	github.com/larsonzh/prfrail/internal/console	18.427s
+Go windows-latest	Test	2026-10-13T08:24:04.5560763Z ok  	github.com/larsonzh/prfrail/internal/evidence	0.053s
+Go windows-latest	Test	2026-10-13T08:24:04.5561058Z ok  	github.com/larsonzh/prfrail/internal/gates	0.262s
+Go windows-latest	Test	2026-10-13T08:24:04.5561342Z ok  	github.com/larsonzh/prfrail/internal/guard	1.121s
+Go windows-latest	Test	2026-10-13T08:24:04.5561672Z ok  	github.com/larsonzh/prfrail/internal/release	2.478s
+Go windows-latest	Test	2026-10-13T08:24:04.5561981Z ok  	github.com/larsonzh/prfrail/internal/repair	0.027s
+Go windows-latest	Test	2026-10-13T08:24:04.5562189Z ok  	github.com/larsonzh/prfrail/internal/snapshot	3.111s
+Go windows-latest	Test	2026-10-13T08:24:04.5562402Z ok  	github.com/larsonzh/prfrail/internal/taskdef	0.037s
+Go windows-latest	Test	2026-10-13T08:24:04.5562605Z ok  	github.com/larsonzh/prfrail/internal/tickets	0.017s
+Go windows-latest	Test	2026-10-13T08:24:04.5562894Z ok  	github.com/larsonzh/prfrail/tools/agent-probe/enforcement-proxy	0.837s
+Go windows-latest	Gates	﻿2026-10-13T08:24:04.7309792Z ##[group]Run node tools/gates/gate.js --selftest && node tools/gates/gate.js --all --scope=ci
+Go windows-latest	Gates	2026-10-13T08:24:04.7310532Z ^[[36;1mnode tools/gates/gate.js --selftest && node tools/gates/gate.js --all --scope=ci^[[0m
+Go windows-latest	Gates	2026-10-13T08:24:04.7371963Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+Go windows-latest	Gates	2026-10-13T08:24:04.7372199Z env:
+Go windows-latest	Gates	2026-10-13T08:24:04.7372333Z   GO_VERSION: 1.22.12
+Go windows-latest	Gates	2026-10-13T08:24:04.7372469Z   CGO_ENABLED: 0
+Go windows-latest	Gates	2026-10-13T08:24:04.7372607Z   GOTOOLCHAIN: local
+Go windows-latest	Gates	2026-10-13T08:24:04.7372736Z ##[endgroup]
+Go windows-latest	Gates	2026-10-13T08:24:47.7617448Z GATES SELFTEST (in-process; fixtures under tools/gates/testdata/)
+Go windows-latest	Gates	2026-10-13T08:24:47.7617934Z   T3/T12 need real git ranges and are recorded as evidence, not here:
+Go windows-latest	Gates	2026-10-13T08:24:47.7618303Z     --scope=range:b738e6b^..b738e6b (A1 must be red) / range:9f68a52^..9f68a52 (green)
+Go windows-latest	Gates	2026-10-13T08:24:47.7618701Z     --scope=range:1b01115^..1b01115 (C1: G7 must be red)
+Go windows-latest	Gates	2026-10-13T08:24:47.7618971Z ok   T13 fixture files are not *.md, so a tree/ci run never judges the runner own fixtures
+Go windows-latest	Gates	2026-10-13T08:24:47.7619639Z ok   T1 G6-1 detects pending(⑥)+completion(⑥ 实得) in one block
+Go windows-latest	Gates	2026-10-13T08:24:47.7619925Z ok   T1 G6-1 reports exactly one finding for the fixture
+Go windows-latest	Gates	2026-10-13T08:24:47.7620231Z ok   T1 reverse mutation (drop completion row) clears G6-1
+Go windows-latest	Gates	2026-10-13T08:24:47.7620558Z ok   T1 delete-criterion mutation (G6-1 removed) leaves the corpus clean
+Go windows-latest	Gates	2026-10-13T08:24:47.7620961Z ok   T1 F1 completion shape `（实得）` is detected
+Go windows-latest	Gates	2026-10-13T08:24:47.7621513Z ok   T1 F1 completion shape `✅ 已完成` is detected
+Go windows-latest	Gates	2026-10-13T08:24:47.7621824Z ok   T1 F1 completion shape `✅ **已完成**` is detected
+Go windows-latest	Gates	2026-10-13T08:24:47.7622079Z ok   T1 F1 plain shape with a different label stays clean (label window intact)
+Go windows-latest	Gates	2026-10-13T08:24:47.7622326Z ok   T2 provenance file carries exactly one excerpt line
+Go windows-latest	Gates	2026-10-13T08:24:47.7622534Z ok   T2 fixture embeds the historical OB-11 row verbatim
+Go windows-latest	Gates	2026-10-13T08:24:47.7622762Z ok   T2 OB-11 row (with 冲突 marker) is clean
+Go windows-latest	Gates	2026-10-13T08:24:47.7623031Z ok   T2 reverse mutation (drop the 冲突 exclusion marker) turns G6-1 red
+Go windows-latest	Gates	2026-10-13T08:24:47.7623275Z ok   T4 provenance file carries the two historical cost rows
+Go windows-latest	Gates	2026-10-13T08:24:47.7623494Z ok   T4 fixture embeds both historical cost rows verbatim
+Go windows-latest	Gates	2026-10-13T08:24:47.7623757Z ok   T4 cost-clause parser yields identical realized vectors for the historical pair
+Go windows-latest	Gates	2026-10-13T08:24:47.7624034Z ok   T4 budget clause is exempt: consistent rows pass G6-2
+Go windows-latest	Gates	2026-10-13T08:24:47.7624769Z ok   T4 reverse mutation (预算 -> 成本) turns G6-2 red
+Go windows-latest	Gates	2026-10-13T08:24:47.7625015Z ok   T4 delete-criterion mutation (G6-2 removed) leaves the mutated corpus clean
+Go windows-latest	Gates	2026-10-13T08:24:47.7625256Z ok   T5 legal 11-digit run id passes G6-3
+Go windows-latest	Gates	2026-10-13T08:24:47.7625431Z ok   T5 legal fixture yields no finding
+Go windows-latest	Gates	2026-10-13T08:24:47.7625597Z ok   T6 placeholder run ids fail G6-3
+Go windows-latest	Gates	2026-10-13T08:24:47.7625766Z ok   T6 one finding per placeholder line (4)
+Go windows-latest	Gates	2026-10-13T08:24:47.7625989Z ok   T6 delete-criterion mutation (G6-3 removed) leaves the corpus clean
+Go windows-latest	Gates	2026-10-13T08:24:47.7626264Z ok   F7 G6-3 boundary table (token-final): 1-digit id `run 3` must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7626515Z ok   F7 G6-3 boundary table (token-final): 2-digit id `run 33` must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7626764Z ok   F7 G6-3 boundary table (token-final): 3-digit id `run 333` must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7627034Z ok   F7 G6-3 floor rule (token-final): the 3-digit reject names the 9-digit floor
+Go windows-latest	Gates	2026-10-13T08:24:47.7627303Z ok   F7 G6-3 boundary table (token-final): 4-digit id `run 3333` must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7627565Z ok   F7 G6-3 floor rule (token-final): the 4-digit reject names the 9-digit floor
+Go windows-latest	Gates	2026-10-13T08:24:47.7627831Z ok   F7 G6-3 boundary table (token-final): 5-digit id `run 33333` must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7628103Z ok   F7 G6-3 floor rule (token-final): the 5-digit reject names the 9-digit floor
+Go windows-latest	Gates	2026-10-13T08:24:47.7628366Z ok   F7 G6-3 boundary table (token-final): 6-digit id `run 333333` must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7628627Z ok   F7 G6-3 floor rule (token-final): the 6-digit reject names the 9-digit floor
+Go windows-latest	Gates	2026-10-13T08:24:47.7630760Z ok   F7 G6-3 boundary table (token-final): 7-digit id `run 3333333` must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7631036Z ok   F7 G6-3 floor rule (token-final): the 7-digit reject names the 9-digit floor
+Go windows-latest	Gates	2026-10-13T08:24:47.7631308Z ok   F7 G6-3 boundary table (token-final): 8-digit id `run 33333333` must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7631577Z ok   F7 G6-3 floor rule (token-final): the 8-digit reject names the 9-digit floor
+Go windows-latest	Gates	2026-10-13T08:24:47.7631862Z ok   F7 G6-3 boundary table (token-final): 9-digit id `run 333333333` must PASS
+Go windows-latest	Gates	2026-10-13T08:24:47.7632126Z ok   F7 G6-3 boundary table (token-final): 10-digit id `run 3333333333` must PASS
+Go windows-latest	Gates	2026-10-13T08:24:47.7632403Z ok   F7 G6-3 boundary table (token-final): 11-digit id `run 33333333333` must PASS
+Go windows-latest	Gates	2026-10-13T08:24:47.7632677Z ok   F7 G6-3 boundary table (token-final): 12-digit id `run 333333333333` must PASS
+Go windows-latest	Gates	2026-10-13T08:24:47.7632972Z ok   F7 G6-3 boundary table (token-final): 13-digit id `run 3333333333333` must PASS
+Go windows-latest	Gates	2026-10-13T08:24:47.7633266Z ok   F7 G6-3 boundary table (token-final): 14-digit id `run 33333333333333` must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7633557Z ok   F7 G6-3 boundary table (token-final): 15-digit id `run 333333333333333` must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7633851Z ok   F7 G6-3 boundary table (token-final): 16-digit id `run 3333333333333333` must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7634149Z ok   F7 G6-3 boundary table (token-final): 17-digit id `run 33333333333333333` must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7634448Z ok   F7 G6-3 boundary table (token-final): 18-digit id `run 333333333333333333` must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7634750Z ok   F7 G6-3 boundary table (token-final): 19-digit id `run 3333333333333333333` must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7635061Z ok   F7 G6-3 boundary table (token-final): 20-digit id `run 33333333333333333333` must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7635335Z ok   F7 G6-3 boundary table (backticked): 1-digit id `run 3` must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7635574Z ok   F7 G6-3 boundary table (backticked): 2-digit id `run 33` must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7635817Z ok   F7 G6-3 boundary table (backticked): 3-digit id `run 333` must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7636086Z ok   F7 G6-3 floor rule (backticked): the 3-digit reject names the 9-digit floor
+Go windows-latest	Gates	2026-10-13T08:24:47.7636345Z ok   F7 G6-3 boundary table (backticked): 4-digit id `run 3333` must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7636603Z ok   F7 G6-3 floor rule (backticked): the 4-digit reject names the 9-digit floor
+Go windows-latest	Gates	2026-10-13T08:24:47.7636976Z ok   F7 G6-3 boundary table (backticked): 5-digit id `run 33333` must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7637241Z ok   F7 G6-3 floor rule (backticked): the 5-digit reject names the 9-digit floor
+Go windows-latest	Gates	2026-10-13T08:24:47.7637498Z ok   F7 G6-3 boundary table (backticked): 6-digit id `run 333333` must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7637762Z ok   F7 G6-3 floor rule (backticked): the 6-digit reject names the 9-digit floor
+Go windows-latest	Gates	2026-10-13T08:24:47.7638021Z ok   F7 G6-3 boundary table (backticked): 7-digit id `run 3333333` must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7638369Z ok   F7 G6-3 floor rule (backticked): the 7-digit reject names the 9-digit floor
+Go windows-latest	Gates	2026-10-13T08:24:47.7638640Z ok   F7 G6-3 boundary table (backticked): 8-digit id `run 33333333` must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7638901Z ok   F7 G6-3 floor rule (backticked): the 8-digit reject names the 9-digit floor
+Go windows-latest	Gates	2026-10-13T08:24:47.7639162Z ok   F7 G6-3 boundary table (backticked): 9-digit id `run 333333333` must PASS
+Go windows-latest	Gates	2026-10-13T08:24:47.7639426Z ok   F7 G6-3 boundary table (backticked): 10-digit id `run 3333333333` must PASS
+Go windows-latest	Gates	2026-10-13T08:24:47.7639703Z ok   F7 G6-3 boundary table (backticked): 11-digit id `run 33333333333` must PASS
+Go windows-latest	Gates	2026-10-13T08:24:47.7639977Z ok   F7 G6-3 boundary table (backticked): 12-digit id `run 333333333333` must PASS
+Go windows-latest	Gates	2026-10-13T08:24:47.7640253Z ok   F7 G6-3 boundary table (backticked): 13-digit id `run 3333333333333` must PASS
+Go windows-latest	Gates	2026-10-13T08:24:47.7640540Z ok   F7 G6-3 boundary table (backticked): 14-digit id `run 33333333333333` must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7641233Z ok   F7 G6-3 boundary table (backticked): 15-digit id `run 333333333333333` must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7641728Z ok   F7 G6-3 boundary table (backticked): 16-digit id `run 3333333333333333` must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7642039Z ok   F7 G6-3 boundary table (backticked): 17-digit id `run 33333333333333333` must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7642366Z ok   F7 G6-3 boundary table (backticked): 18-digit id `run 333333333333333333` must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7642717Z ok   F7 G6-3 boundary table (backticked): 19-digit id `run 3333333333333333333` must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7643035Z ok   F7 G6-3 boundary table (backticked): 20-digit id `run 33333333333333333333` must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7643307Z ok   F7 G6-3 named case `run 0` (all-zero id, 1 digit) must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7643646Z ok   F7 G6-3 named case `run 000000` (all-zero id, 6 digits) must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7644005Z ok   F7 G6-3 named case `run 00000000000000000000` (all-zero id, 20 digits (fails at any length)) must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7644390Z ok   F7 G6-3 named case ``run 00000000000000000000`` (all-zero id, 20 digits, backticked) must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7644905Z ok   F7 G6-3 named case `run <RUN_ID>` (angle-bracket placeholder) must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7645334Z ok   F7 G6-3 named case `run TBD` (word placeholder TBD) must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7645634Z ok   F7 G6-3 named case `run TODO` (word placeholder TODO) must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7645874Z ok   F7 G6-3 named case `run N/A` (word placeholder N/A) must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7646201Z ok   F7 G6-3 named case `run 待定` (placeholder wording 待) must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7646467Z ok   F7 G6-3 named case `run 占位` (placeholder wording 占位) must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7646710Z ok   F7 G6-3 named case `run 35646859765` (real-world 11-digit run id) must PASS
+Go windows-latest	Gates	2026-10-13T08:24:47.7647008Z ok   F7 G6-3 named case ``run 35646859765`` (real-world 11-digit run id inside a code span) must PASS
+Go windows-latest	Gates	2026-10-13T08:24:47.7647326Z ok   F7 G6-3 named case `see run 111` (token-final 3-digit id at end of line) must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7647716Z ok   F7 G6-3 named case `run 1234。` (3-8 digit id terminated by CJK punctuation (not a word)) must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7648084Z ok   F7 G6-3 named case `run 7！` (1-2 digit id terminated by punctuation) must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7648455Z ok   F7 G6-3 named case `report run 123456789012345！` (>= 14 digit id terminated by punctuation) must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7648916Z ok   F7 G6-3 named case `see run <RUN_ID> here` (angle-bracket placeholder mid-prose) must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7649235Z ok   F7 G6-3 named case `see run TBD here` (word placeholder TBD mid-prose) must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7649525Z ok   F7 G6-3 named case `see run TODO here` (word placeholder TODO mid-prose) must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7649819Z ok   F7 G6-3 named case `see run N/A here` (word placeholder N/A mid-prose) must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7650134Z ok   F7 G6-3 named case `see run 待定 here` (CJK placeholder 待 mid-prose) must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7650442Z ok   F7 G6-3 named case `see run 占位 here` (CJK placeholder 占位 mid-prose) must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7650720Z ok   F7 G6-3 named case ``run 1234`` (backticked malformed id stays judged) must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7651087Z ok   F7 G6-3 named case `The run log shows `run 1234` as the marker.` (backticked malformed id inside a prose sentence) must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7651551Z ok   2e G6-3 prose probe `The retry loop was executed run 1234 times by the harness.` (3-8 digit rule vs ASCII word) must PASS (no finding)
+Go windows-latest	Gates	2026-10-13T08:24:47.7652017Z ok   2e G6-3 prose probe `连续 run 12 次后任务完成。` (1-2 digit rule vs CJK word) must PASS (no finding)
+Go windows-latest	Gates	2026-10-13T08:24:47.7652425Z ok   2e G6-3 prose probe ``inventory run 1 failed`` (pre-existing docs/t027/B3B_DESIGN.md:236 shape (1-2 digit rule)) must PASS (no finding)
+Go windows-latest	Gates	2026-10-13T08:24:47.7652868Z ok   2e G6-3 prose probe `run 111 次后停止。` (3-8 digit rule vs CJK word) must PASS (no finding)
+Go windows-latest	Gates	2026-10-13T08:24:47.7653303Z ok   2e G6-3 prose probe `run 000 次。` (all-zero rule vs CJK word) must PASS (no finding)
+Go windows-latest	Gates	2026-10-13T08:24:47.7653684Z ok   2e G6-3 prose probe `run 123456789012345 次。` (>= 14 digit rule vs CJK word) must PASS (no finding)
+Go windows-latest	Gates	2026-10-13T08:24:47.7654071Z ok   2e G6-3 prose probe `the tool ran run 1234 quickly` (3-8 digit rule vs ASCII word (no punctuation)) must PASS (no finding)
+Go windows-latest	Gates	2026-10-13T08:24:47.7654444Z ok   2e G6-3 prose probe `see run 7 files` (1-2 digit rule vs ASCII word) must PASS (no finding)
+Go windows-latest	Gates	2026-10-13T08:24:47.7654763Z ok   2e G6-3 prose probes are load-bearing: the same digit runs DO fail when token-final
+Go windows-latest	Gates	2026-10-13T08:24:47.7655129Z ok   2f G6-3 leading-boundary probe `rerun 1234` (ASCII letter immediately before `run`) must PASS (no finding)
+Go windows-latest	Gates	2026-10-13T08:24:47.7655568Z ok   2f G6-3 leading-boundary probe `The harness will rerun 1234.` (word-embedded `run` inside a prose sentence) must PASS (no finding)
+Go windows-latest	Gates	2026-10-13T08:24:47.7656064Z ok   2f G6-3 leading-boundary probe `在run 1234` (CJK ideograph glued to the FRONT of `run`) must PASS (no finding)
+Go windows-latest	Gates	2026-10-13T08:24:47.7656488Z ok   2f G6-3 leading-boundary probe `prerun 12` (ASCII-letter prefix on the 1-2 digit rule) must PASS (no finding)
+Go windows-latest	Gates	2026-10-13T08:24:47.7656959Z ok   2f G6-3 leading-boundary probe `rerun <RUN_ID>` (placeholder rule carries the leading guard too (NF-2 consistency)) must PASS (no finding)
+Go windows-latest	Gates	2026-10-13T08:24:47.7657442Z ok   2f G6-3 leading-boundary probe `prerun TBD` (word-placeholder rule carries the leading guard too) must PASS (no finding)
+Go windows-latest	Gates	2026-10-13T08:24:47.7657838Z ok   2f G6-3 still-judged probe `see run 1234` (token-final 3-8 digit id mid-prose) must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7658634Z ok   2f G6-3 still-judged probe `（run 1234）` (id wrapped in CJK parentheses) must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7659252Z ok   2f G6-3 still-judged probe ``run 1234`` (backticked malformed id) must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7659729Z ok   2f G6-3 still-judged probe `run 1234。` (id terminated by CJK punctuation) must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7660101Z ok   2f G6-3 still-judged probe `run 111` (3-digit id at end of line) must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7660400Z ok   2f G6-3 still-judged probe `run TBD` (word placeholder at end of line) must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7660708Z ok   2f G6-3 still-judged probe `see run TBD here` (word placeholder mid-prose) must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7661070Z ok   2f G6-3 word-followed exemption `run 1234 times` (digit run followed by an ASCII word) must PASS (no finding)
+Go windows-latest	Gates	2026-10-13T08:24:47.7662222Z ok   2f G6-3 word-followed exemption `连续 run 12 次` (digit run followed by a CJK word) must PASS (no finding)
+Go windows-latest	Gates	2026-10-13T08:24:47.7662694Z ok   2f G6-3 word-followed exemption ``run 1234 times`` (BACKTICKED digit run still followed by a word (NF-1 prose correction)) must PASS (no finding)
+Go windows-latest	Gates	2026-10-13T08:24:47.7663215Z ok   2f G6-3 glued-form consequence `run 1234times` (no separator before the trailing ASCII word) must PASS (documented, not a defect)
+Go windows-latest	Gates	2026-10-13T08:24:47.7663741Z ok   2f G6-3 glued-form consequence `run 12345678次` (no separator before the trailing CJK word) must PASS (documented, not a defect)
+Go windows-latest	Gates	2026-10-13T08:24:47.7664060Z ok   T7 expiring literals fail G6-4
+Go windows-latest	Gates	2026-10-13T08:24:47.7664235Z ok   T7 two literal lines produce two findings
+Go windows-latest	Gates	2026-10-13T08:24:47.7664477Z ok   T7 whitelisting ONE of two findings leaves G6-4 red with one fatal finding
+Go windows-latest	Gates	2026-10-13T08:24:47.7664763Z ok   T7 whitelisting both findings turns G6-4 green (whitelist is load-bearing)
+Go windows-latest	Gates	2026-10-13T08:24:47.7665011Z ok   T8 report without an artifacts block fails G7-a
+Go windows-latest	Gates	2026-10-13T08:24:47.7665244Z ok   T8 delete-criterion mutation (G7-a removed) leaves the corpus clean
+Go windows-latest	Gates	2026-10-13T08:24:47.7665518Z ok   T9 unresolved repo disposition (tmp path, omitted token) fails G7-b
+Go windows-latest	Gates	2026-10-13T08:24:47.7665752Z ok   T9 marking the tmp path local-only turns G7-b green
+Go windows-latest	Gates	2026-10-13T08:24:47.7665943Z ok   T9 unknown disposition token fails G7-b
+Go windows-latest	Gates	2026-10-13T08:24:47.7666168Z ok   T10 existing repo artifact + local-only + missing-historical pass G7-b
+Go windows-latest	Gates	2026-10-13T08:24:47.7666515Z ok   T10 unresolvable repo artifact fails G7-b
+Go windows-latest	Gates	2026-10-13T08:24:47.7666707Z ok   T11 finding row without a disposition cell fails G7-c
+Go windows-latest	Gates	2026-10-13T08:24:47.7666916Z ok   T11 adding the disposition cell turns G7-c green
+Go windows-latest	Gates	2026-10-13T08:24:47.7667145Z ok   T11 delete-criterion mutation (G7-c removed) leaves the corpus clean
+Go windows-latest	Gates	2026-10-13T08:24:47.7667438Z ok   G7-d stopped status line without 已停止——未完成 fails
+Go windows-latest	Gates	2026-10-13T08:24:47.7667701Z ok   G7-d fires only on the status line, not on prose naming the rule (self-reference guard)
+Go windows-latest	Gates	2026-10-13T08:24:47.7667956Z ok   G7-d adding the incomplete mark turns it green
+Go windows-latest	Gates	2026-10-13T08:24:47.7668162Z ok   T14 tree/index resolve whitelists from the working tree
+Go windows-latest	Gates	2026-10-13T08:24:47.7668449Z ok   T14 range/ci resolve whitelists from the endpoint revision (range -> head, ci -> HEAD)
+Go windows-latest	Gates	2026-10-13T08:24:47.7668724Z ok   T14 G6 reads its whitelist through ctx.loadWhitelist
+Go windows-latest	Gates	2026-10-13T08:24:47.7668952Z ok   T14 G4b reads its whitelist through the same ctx.loadWhitelist
+Go windows-latest	Gates	2026-10-13T08:24:47.7669188Z ok   T14 both criteria print the whitelist source they used
+Go windows-latest	Gates	2026-10-13T08:24:47.7669453Z ok   T15 tree scope rejects a gitignored / never-staged path marked repo (F2 probe)
+Go windows-latest	Gates	2026-10-13T08:24:47.7669726Z ok   T15 tree scope accepts a path present in the index and on disk
+Go windows-latest	Gates	2026-10-13T08:24:47.7669984Z ok   T15 range scope still resolves repo artifacts at the endpoint revision
+Go windows-latest	Gates	2026-10-13T08:24:47.7670537Z ok   T15 whitelist source resolves to endpoint:<rev> and yields zero entries when the endpoint revision lacks the file
+Go windows-latest	Gates	2026-10-13T08:24:47.7671146Z ok   T15 any-commit variant: endpoint label + zero entries hold for the real HEAD revision too
+Go windows-latest	Gates	2026-10-13T08:24:47.7671642Z ok   T15 G7-b FAILs an ignored path marked repo in tree scope
+Go windows-latest	Gates	2026-10-13T08:24:47.7671930Z ok   T15 G7-b accepts the same row once the path is in the index
+Go windows-latest	Gates	2026-10-13T08:24:47.7672268Z ok   T16 disposition vocabulary covers the CN and EN token sets stated in 6.3
+Go windows-latest	Gates	2026-10-13T08:24:47.7672515Z ok   T16 G7-c accepts the English disposition `Fixed`
+Go windows-latest	Gates	2026-10-13T08:24:47.7672726Z ok   T16 G7-c accepts the English disposition `Resolved`
+Go windows-latest	Gates	2026-10-13T08:24:47.7672929Z ok   T16 G7-c accepts the English disposition `Closed`
+Go windows-latest	Gates	2026-10-13T08:24:47.7673133Z ok   T16 G7-c accepts the English disposition `Accepted`
+Go windows-latest	Gates	2026-10-13T08:24:47.7673330Z ok   T16 G7-c accepts the English disposition `Rejected`
+Go windows-latest	Gates	2026-10-13T08:24:47.7673524Z ok   T16 G7-c accepts the English disposition `Deferred`
+Go windows-latest	Gates	2026-10-13T08:24:47.7673807Z ok   T16 G7-c accepts the English disposition `Recorded`
+Go windows-latest	Gates	2026-10-13T08:24:47.7674007Z ok   T16 G7-c accepts the English disposition `To do`
+Go windows-latest	Gates	2026-10-13T08:24:47.7674196Z ok   T16 G7-c accepts the English disposition `Observed`
+Go windows-latest	Gates	2026-10-13T08:24:47.7674406Z ok   T16 G7-c accepts the English disposition `To be discussed`
+Go windows-latest	Gates	2026-10-13T08:24:47.7674627Z ok   T16 G7-c accepts the English disposition `Not a problem`
+Go windows-latest	Gates	2026-10-13T08:24:47.7674840Z ok   T16 G7-c accepts the English disposition `Documented`
+Go windows-latest	Gates	2026-10-13T08:24:47.7675056Z ok   T16 G7-c still rejects a finding row with no disposition cell
+Go windows-latest	Gates	2026-10-13T08:24:47.7675555Z ok   F2 G7-c structural disposition probe `| **High** | 描述里写“已修” | |` (disposition token inside the description cell, disposition cell empty) must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7676069Z ok   F2 G7-c structural disposition probe `| **High** | evidence chain missing | Fixed |` (English disposition in the last cell) must PASS
+Go windows-latest	Gates	2026-10-13T08:24:47.7676628Z ok   F2 G7-c structural disposition probe `| **High** | 描述里写“已修” | 拒收 |` (CN disposition in the last cell (token also appears in the description)) must PASS
+Go windows-latest	Gates	2026-10-13T08:24:47.7677164Z ok   F2 G7-c structural disposition probe `| **Medium** | description says "Resolved" | Rejected |` (another EN token pair resolves in the last cell) must PASS
+Go windows-latest	Gates	2026-10-13T08:24:47.7677693Z ok   F2 G7-c structural disposition probe `| **High** | evidence chain missing` (row with no disposition cell at all (no trailing pipe)) must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7678229Z ok   F2 G7-c structural disposition probe `| **High** | 证据链缺失 |` (row with a structurally present but EMPTY disposition cell) must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7679477Z ok   F2 G7-c structural disposition probe `| **Low** | 描述含“已修” | 已修 |` (control: token in both cells) must PASS
+Go windows-latest	Gates	2026-10-13T08:24:47.7679927Z ok   F2 G7-c takes the disposition from the LAST cell only (internals)
+Go windows-latest	Gates	2026-10-13T08:24:47.7680172Z ok   F3 G7-d stopped-state vocabulary is bilingual (internals)
+Go windows-latest	Gates	2026-10-13T08:24:47.7680548Z ok   F3 G7-d bilingual stopped-state probe `| Status | Stopped (pending user ruling) |` (EN status line without the incomplete mark) must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7681087Z ok   F3 G7-d bilingual stopped-state probe `| Status | Stopped — incomplete |` (EN status line carrying the EN incomplete mark) must PASS
+Go windows-latest	Gates	2026-10-13T08:24:47.7681627Z ok   F3 G7-d bilingual stopped-state probe `| Status | 已停止——未完成（等用户裁决） |` (CN status line carrying the CN incomplete mark) must PASS
+Go windows-latest	Gates	2026-10-13T08:24:47.7682108Z ok   F3 G7-d bilingual stopped-state probe `| Status | 已停止（等用户裁决后决定是否重启） |` (CN status line without the mark) must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7682540Z ok   F3 G7-d bilingual stopped-state probe `| Status | Halted (awaiting ruling) |` (Halted is part of the EN token set) must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7683029Z ok   F3 G7-d bilingual stopped-state probe `| Status | halted (awaiting ruling) |` (EN tokens match case-insensitively (lowercase halted)) must FAIL
+Go windows-latest	Gates	2026-10-13T08:24:47.7683578Z ok   F3 G7-d bilingual stopped-state probe `| Status | stopped — incomplete |` (the EN mark matches case-insensitively too) must PASS
+Go windows-latest	Gates	2026-10-13T08:24:47.7684300Z ok   F3 G7-d bilingual stopped-state probe `| Status | Stopped (pending user ruling) |` (the mark appears later in the SAME block, so the row is closed out) must PASS
+Go windows-latest	Gates	2026-10-13T08:24:47.7684870Z ok   F3 G7-d ignores a CN prose line naming 停止态 (self-reference guard)
+Go windows-latest	Gates	2026-10-13T08:24:47.7685134Z ok   T13 whole fixture corpus yields exactly the expected FAIL id set
+Go windows-latest	Gates	2026-10-13T08:24:47.7685429Z ok   T13 whole fixture corpus has no unexpected SKIP/INFO storm
+Go windows-latest	Gates	2026-10-13T08:24:47.7685683Z ok   T17 unresolvable range base is a usage error, not an empty change set
+Go windows-latest	Gates	2026-10-13T08:24:47.7685955Z ok   T17 unresolvable range base is a usage error, not an empty change set
+Go windows-latest	Gates	2026-10-13T08:24:47.7686222Z ok   T17 unresolvable range head is a usage error, not an empty change set
+Go windows-latest	Gates	2026-10-13T08:24:47.7686493Z ok   T17 unresolvable range head is a usage error, not an empty change set
+Go windows-latest	Gates	2026-10-13T08:24:47.7686846Z ok   T17 positive control: a resolvable range still builds a context
+Go windows-latest	Gates	2026-10-13T08:24:47.7687129Z ok   T18 a failed `git diff` is an environment error even when both endpoints resolve
+Go windows-latest	Gates	2026-10-13T08:24:47.7687444Z ok   T18 a failed `git status` in tree scope is an environment error, not an empty change set
+Go windows-latest	Gates	2026-10-13T08:24:47.7687738Z ok   T18 a failed `git status` in index scope is an environment error too
+Go windows-latest	Gates	2026-10-13T08:24:47.7688022Z ok   T18 --scope=ci refuses a SHALLOW clone instead of falling back to the whole tree
+Go windows-latest	Gates	2026-10-13T08:24:47.7688342Z ok   T18 an inconclusive shallow probe is an environment error, not a licence to fall back
+Go windows-latest	Gates	2026-10-13T08:24:47.7688656Z ok   T18 positive control: a genuine root commit still falls back to EMPTY_TREE
+Go windows-latest	Gates	2026-10-13T08:24:47.7689051Z ok   T19 G6-5 accepts §7.5 (exact heading) / §7.2 (parent prefix of §7.2.1) / §1.7.1 (bold line-leading label)
+Go windows-latest	Gates	2026-10-13T08:24:47.7689396Z ok   T19 the legal fixture is scanned (6 in-region lines, 3 references) with zero findings
+Go windows-latest	Gates	2026-10-13T08:24:47.7689807Z ok   T19 directiveLabels reads the REAL directive: bold line-leading §1.7.1 plus heading §7.5 / §7.2.1
+Go windows-latest	Gates	2026-10-13T08:24:47.7690144Z ok   T19 resolvesRef: exact and parent-prefix accepted, a dangling number rejected
+Go windows-latest	Gates	2026-10-13T08:24:47.7690447Z ok   T20 G6-5 FAILs a §7.9 reference on a line INSIDE the §0.3 region
+Go windows-latest	Gates	2026-10-13T08:24:47.7690720Z ok   T20 exactly one finding, and its detail names `§7.9 unresolved`
+Go windows-latest	Gates	2026-10-13T08:24:47.7691063Z ok   T20 reverse mutation (§7.9 -> §7.8) clears G6-5: the assertion tracks the reference, not the line
+Go windows-latest	Gates	2026-10-13T08:24:47.7691470Z ok   T21 the C.1 v3.1 comparison table produces no finding (zero corpus FAIL)
+Go windows-latest	Gates	2026-10-13T08:24:47.7691794Z ok   T21 the excluded §3.10 row is genuinely out of region: 0 references counted
+Go windows-latest	Gates	2026-10-13T08:24:47.7692198Z ok   T21 boundary mutation (rename the `### C.1` heading) pulls the §3.10 row back into the region and turns G6-5 red
+Go windows-latest	Gates	2026-10-13T08:24:47.7692558Z ok   T22 G6-5 skips a line carrying the 示例 exclusion marker
+Go windows-latest	Gates	2026-10-13T08:24:47.7692855Z ok   T22 reverse mutation (drop the 示例 marker) turns the very same line red on §7.9
+Go windows-latest	Gates	2026-10-13T08:24:47.7693212Z ok   T22 exclusion marker `不得残留` suppresses the finding, and dropping it restores the red
+Go windows-latest	Gates	2026-10-13T08:24:47.7693575Z ok   T22 exclusion marker `示例` suppresses the finding, and dropping it restores the red
+Go windows-latest	Gates	2026-10-13T08:24:47.7693923Z ok   T22 exclusion marker `引文` suppresses the finding, and dropping it restores the red
+Go windows-latest	Gates	2026-10-13T08:24:47.7694278Z ok   T22 exclusion marker `冲突` suppresses the finding, and dropping it restores the red
+Go windows-latest	Gates	2026-10-13T08:24:47.7694631Z ok   T22 exclusion marker `矛盾` suppresses the finding, and dropping it restores the red
+Go windows-latest	Gates	2026-10-13T08:24:47.7694960Z ok   T23 an in-memory whitelist entry exempts the dangling reference (PASS + exactly one SKIP)
+Go windows-latest	Gates	2026-10-13T08:24:47.7695287Z ok   T23 the exemption is load-bearing: the same fixture without the entry stays red
+Go windows-latest	Gates	2026-10-13T08:24:47.7695645Z ok   T23 no entry was preloaded into tools/gates/g6-whitelist.txt (the exemption above is in-memory only)
+Go windows-latest	Gates	2026-10-13T08:24:47.7696045Z ok   T24 the out-of-region §7.9 line yields no finding: 6 lines scanned, 0 references counted
+Go windows-latest	Gates	2026-10-13T08:24:47.7696458Z ok   T24 boundary mutation (drop the closing heading) extends the region onto the §7.9 line and turns G6-5 red
+Go windows-latest	Gates	2026-10-13T08:24:47.7696939Z ok   T25 precondition: the legal fixture is green BEFORE the mutation
+Go windows-latest	Gates	2026-10-13T08:24:47.7697835Z ok   T25 mutation ② applied: the patch text matched g6.js (a stale patch would weaken the suite silently)
+Go windows-latest	Gates	2026-10-13T08:24:47.7698473Z ok   T25 mutation ②: without the bold-label collector the §1.7.1 reference dangles and G6-5 turns red
+Go windows-latest	Gates	2026-10-13T08:24:47.7699047Z ok   T25 the same mutation leaves the heading-derived labels intact (§7.5 / §7.2 still resolve)
+Go windows-latest	Gates	2026-10-13T08:24:47.7699526Z ok   T25 restore: g6.js is byte-identical after the mutation window (no disk residue)
+Go windows-latest	Gates	2026-10-13T08:24:47.7700141Z ok   T25 restore: the cached criterion module is unmutated, the legal fixture is green again
+Go windows-latest	Gates	2026-10-13T08:24:47.7700663Z ok   T26 all six CN closed-set words pass, including the `**已处置**（v1.1）` parenthetical shape
+Go windows-latest	Gates	2026-10-13T08:24:47.7700961Z ok   T26 the CN/EN closed sets are exactly the six documented words
+Go windows-latest	Gates	2026-10-13T08:24:47.7701285Z ok   T26 firstStatusWord accepts `词`, `词（括注）`, `**词**（括注）` and rejects a legacy value
+Go windows-latest	Gates	2026-10-13T08:24:47.7701650Z ok   T26 rowCellsOf splits on unescaped pipes and drops the two outer cells
+Go windows-latest	Gates	2026-10-13T08:24:47.7701959Z ok   T26 ledgerRegionRange = [§12.4 heading, next ^#{2,4} heading)
+Go windows-latest	Gates	2026-10-13T08:24:47.7702266Z ok   T26 a ledger-shaped row ABOVE the §12.4 heading is out of region and not judged
+Go windows-latest	Gates	2026-10-13T08:24:47.7702575Z ok   T26 a non-OB table row inside §12.4 is not judged (LEDGER_ROW_RE)
+Go windows-latest	Gates	2026-10-13T08:24:47.7702882Z ok   T26 a ledger row in a file without a §12.4 heading is not judged (no target region)
+Go windows-latest	Gates	2026-10-13T08:24:47.7703198Z ok   T27 G6-6 FAILs `**下一片必做**` and `**已落地**` with exactly two findings
+Go windows-latest	Gates	2026-10-13T08:24:47.7703521Z ok   T27 both offending cells are named, and the legal control row (已登记) is NOT reported
+Go windows-latest	Gates	2026-10-13T08:24:47.7703827Z ok   T27 reverse mutation (both legacy words -> closed-set words) clears G6-6
+Go windows-latest	Gates	2026-10-13T08:24:47.7704116Z ok   T28 mutation ③ applied: the patch text matched g6.js
+Go windows-latest	Gates	2026-10-13T08:24:47.7704366Z ok   T28 the mutated CN closed set has five words and no 观察中
+Go windows-latest	Gates	2026-10-13T08:24:47.7704686Z ok   T28 mutation ③: the 观察中 row alone turns red; the other five closed-set rows stay green
+Go windows-latest	Gates	2026-10-13T08:24:47.7705128Z ok   T28 restore: g6.js is byte-identical and the cached module still carries 观察中
+Go windows-latest	Gates	2026-10-13T08:24:47.7705408Z ok   T28 the `_EN` fixture selects the EN word table: all six EN words pass
+Go windows-latest	Gates	2026-10-13T08:24:47.7705778Z ok   T28 the `_EN` word-table switch is load-bearing: EN word fails under a CN name, passes under `_EN`, CN word fails under `_EN`
+Go windows-latest	Gates	2026-10-13T08:24:47.7706126Z ok   T29 G5-b passes a model value that is a closed-set member
+Go windows-latest	Gates	2026-10-13T08:24:47.7706380Z ok   T30 G5-b passes a role file that omits the model key (section 2.6 shape)
+Go windows-latest	Gates	2026-10-13T08:24:47.7706690Z ok   T31 G5-b fails the one remaining blacklist member (kimi-k3 is not in the set)
+Go windows-latest	Gates	2026-10-13T08:24:47.7706985Z ok   T32 G5-b comparison is case-sensitive: the right model in the wrong case fails
+Go windows-latest	Gates	2026-10-13T08:24:47.7707266Z ok   T33 G5-b comparison is verbatim: a quoted set member still fails
+Go windows-latest	Gates	2026-10-13T08:24:47.7707550Z ok   T34 G5-b collects EVERY model key: a legal first key does not hide an illegal second one
+Go windows-latest	Gates	2026-10-13T08:24:47.7707854Z ok   T35 G5-b fails a former blacklist value that is not a closed-set member
+Go windows-latest	Gates	2026-10-13T08:24:47.7708149Z ok   T36 empty model value is G5-a 2 s finding and not G5-b s: G5-b passes while G5-a(2) fails
+Go windows-latest	Gates	2026-10-13T08:24:47.7708497Z ok   T37 the closed set is load-bearing: adding gpt-5.4 to the set flips that fixture to PASS
+Go windows-latest	Gates	2026-10-13T08:24:47.7708818Z ok   T37 restore: g5b.js is byte-identical and the cached module still fails gpt-5.4
+Go windows-latest	Gates	2026-10-13T08:24:47.7709125Z ok   T38 G5-b parses the frontmatter block only: a model key in the body is not judged
+Go windows-latest	Gates	2026-10-13T08:24:47.7709419Z ok   T39 G5-b trims both ends: a legal value with a trailing space still passes
+Go windows-latest	Gates	2026-10-13T08:24:47.7709699Z ok   T40 G5-b is verbatim: a legal value followed by an inline comment fails
+Go windows-latest	Gates	2026-10-13T08:24:47.7709987Z ok   T41 G5-b accepts each member this slice added (deep tier and parallel alternative)
+Go windows-latest	Gates	2026-10-13T08:24:47.7710322Z ok   T42 the added member is load-bearing: dropping gpt-6-luna from the set makes that fixture fail
+Go windows-latest	Gates	2026-10-13T08:24:47.7710676Z ok   T42 restore: g5b.js is byte-identical and the cached module still accepts gpt-6-luna
+Go windows-latest	Gates	2026-10-13T08:24:47.7710991Z ok   T43 G8-a accepts a pack member (nearest ancestor carries MANIFEST + SHA256SUMS)
+Go windows-latest	Gates	2026-10-13T08:24:47.7711251Z ok   T43 G8-a accepts a root-level *-freedom-list.md
+Go windows-latest	Gates	2026-10-13T08:24:47.7711477Z ok   T43 G8-a accepts a path registered verbatim in evidence-forms.txt
+Go windows-latest	Gates	2026-10-13T08:24:47.7711813Z ok   T43 the registration is load-bearing: without it the same path fails
+Go windows-latest	Gates	2026-10-13T08:24:47.7712088Z ok   T43 G8-a FAILs a stray root-level path with a `not a pack member` reason token
+Go windows-latest	Gates	2026-10-13T08:24:47.7712372Z ok   T43 a SUBSTRING match does not register (entry.match must EQUAL the path)
+Go windows-latest	Gates	2026-10-13T08:24:47.7712660Z ok   T43 a registration row with 2 fields is a UsageError (exit 2, never a silent pass)
+Go windows-latest	Gates	2026-10-13T08:24:47.7712944Z ok   T43 a duplicate registration for the same path is a UsageError
+Go windows-latest	Gates	2026-10-13T08:24:47.7713201Z ok   T44 G8-b accepts a fully self-consistent pack (runtime-computed hashes)
+Go windows-latest	Gates	2026-10-13T08:24:47.7713533Z ok   T44 G8-b FAILs a pack without the 归档条目清单 section (token `missing`, names the pack)
+Go windows-latest	Gates	2026-10-13T08:24:47.7713863Z ok   T44 G8-b FAILs an unlisted pack-root payload (token `not listed`, names the file in both lists)
+Go windows-latest	Gates	2026-10-13T08:24:47.7714205Z ok   T44 G8-b recomputes hashes and FAILs a mismatch (token `hash mismatch`, names the payload)
+Go windows-latest	Gates	2026-10-13T08:24:47.7714603Z ok   T44 G8-b FAILs a 未入库 entry colliding with a payload (token `untracked-list conflict`, names the path)
+Go windows-latest	Gates	2026-10-13T08:24:47.7714912Z ok   T44 G8-b normalizes backslash SHA256SUMS paths to POSIX and passes
+Go windows-latest	Gates	2026-10-13T08:24:47.7715211Z ok   T44 the backslash normalization is load-bearing: a wrong hash on the same line still FAILs
+Go windows-latest	Gates	2026-10-13T08:24:47.7715526Z ok   T44 a single flipped hash digit turns G8-b red (the recompute is load-bearing)
+Go windows-latest	Gates	2026-10-13T08:24:47.7715808Z ok   T45 G8-c accepts a MANIFEST whose archive hash equals the SHA256SUMS record
+Go windows-latest	Gates	2026-10-13T08:24:47.7716212Z ok   T45 G8-c FAILs an archive hash that disagrees with SHA256SUMS (token `hash mismatch`, names the payload)
+Go windows-latest	Gates	2026-10-13T08:24:47.7716619Z ok   T45 G8-c exempts a legacy pack without the 后缀与编码映射 section (explicit note, not a blank PASS)
+Go windows-latest	Gates	2026-10-13T08:24:47.7717078Z ok   T46 G8-d accepts a 重建归档 note carrying source + basis and no bad sha token
+Go windows-latest	Gates	2026-10-13T08:24:47.7717499Z ok   T46 G8-d FAILs a 重建归档 note missing the basis (token `basis`, names the file)
+Go windows-latest	Gates	2026-10-13T08:24:47.7717780Z ok   T47 inside the tree the violating content is NOT judged by G1-a/G2/G4a/G4b/G6
+Go windows-latest	Gates	2026-10-13T08:24:47.7718046Z ok   T47 G4a reports the excluded count instead of judging the tree file
+Go windows-latest	Gates	2026-10-13T08:24:47.7718351Z ok   T47 the SAME content outside the tree IS judged: G1-a/G2/G4a/G4b/G6-4 all turn red and name the path
+Go windows-latest	Gates	2026-10-13T08:24:47.7718699Z ok   T48 every G8 sub-check reports INFO (not a vacuous PASS) when the change set has no evidence path
+Go windows-latest	Gates	2026-10-13T08:24:47.7719082Z ok   T48 the INFO is the absence of an evidence path, not a blanket: the same sub-check is NOT INFO when one is present
+Go windows-latest	Gates	2026-10-13T08:24:47.7719413Z ok   T49 ctx.listTreeFiles returns the recursive, sorted pack file list
+Go windows-latest	Gates	2026-10-13T08:24:47.7719716Z ok   T49 isEvidenceTree is case-insensitive, prefix-anchored and does not over-match near misses
+Go windows-latest	Gates	2026-10-13T08:24:47.7720035Z ok   T50 in-tree violating content yields ZERO finding from G1-a/G2/G4a/G4b/G6
+Go windows-latest	Gates	2026-10-13T08:24:47.7720325Z ok   T50 the SAME bytes at docs/t027/ turn G1-a/G2/G4a/G4b/G6-4/G6-6 red and name the path
+Go windows-latest	Gates	2026-10-13T08:24:47.7720646Z ok   T50 G8 still judges the in-tree file: G8-a PASS + G8-b PASS on the pack carrying the violation
+Go windows-latest	Gates	2026-10-13T08:24:47.7720952Z ok   T50 G8-a still FAILs a non-member tree path (the shape guard is not inert)
+Go windows-latest	Gates	2026-10-13T08:24:47.7721263Z ok   T51 ctx.changedMarkdown() (shipped lib/ctx) drops the tree .md and keeps the docs/t027 .md
+Go windows-latest	Gates	2026-10-13T08:24:47.7721596Z ok   T51 the selftest ctx and lib/ctx agree on changedMarkdown (no local re-derivation drift)
+Go windows-latest	Gates	2026-10-13T08:24:47.7721899Z ok   T51 G1-a shares the single exclusion (tree-only ctx green, docs/t027 ctx red)
+Go windows-latest	Gates	2026-10-13T08:24:47.7722177Z ok   T51 G2 shares the single exclusion (tree-only ctx green, docs/t027 ctx red)
+Go windows-latest	Gates	2026-10-13T08:24:47.7722445Z ok   T51 G4b shares the single exclusion (tree-only ctx green, docs/t027 ctx red)
+Go windows-latest	Gates	2026-10-13T08:24:47.7722714Z ok   T51 G6 shares the single exclusion (tree-only ctx green, docs/t027 ctx red)
+Go windows-latest	Gates	2026-10-13T08:24:47.7723067Z ok   T52 G4a excludes a BOM+CRLF .md and a BOM-less .md inside the tree and counts BOTH
+Go windows-latest	Gates	2026-10-13T08:24:47.7723451Z ok   T52 the identical bytes outside the tree DO fail G4a (the exclusion is the only reason the in-tree run is green)
+Go windows-latest	Gates	2026-10-13T08:24:47.7723899Z ok   T53 a malformed SHA256SUMS line FAILs and names the line/pack, never a silent pass
+Go windows-latest	Gates	2026-10-13T08:24:47.7724393Z ok   T53 a truncated 归档条目清单 (heading present, table empty) FAILs and names the unlisted payload
+Go windows-latest	Gates	2026-10-13T08:24:47.7724923Z ok   T54 an 归档路径 absent from the pack payload FAILs G8-c and names the path
+Go windows-latest	Gates	2026-10-13T08:24:47.7725442Z ok   T54 an 归档路径 present in the payload but absent from SHA256SUMS FAILs G8-c and names the path
+Go windows-latest	Gates	2026-10-13T08:24:47.7725925Z ok   T55 a 重建归档 mention OUTSIDE the annotation zone does not trigger G8-d
+Go windows-latest	Gates	2026-10-13T08:24:47.7726290Z ok   T55 a non-64-hex sha256 token INSIDE the annotation zone FAILs G8-d
+Go windows-latest	Gates	2026-10-13T08:24:47.7726633Z ok   T55 the precedent file is not misjudged despite 重建归档 + a 16-digit sha-original short hash
+Go windows-latest	Gates	2026-10-13T08:24:47.7726985Z ok   T55 the precedent 16-digit short hash sits OUTSIDE the annotation zone (why it is never a sha256 token)
+Go windows-latest	Gates	2026-10-13T08:24:47.7727326Z ok   T56 mutation anchor (a) exists verbatim in lib/ctx.js (the exclusion being mutated)
+Go windows-latest	Gates	2026-10-13T08:24:47.7727654Z ok   T56 mutation anchor (b) exists verbatim in lib/criteria/g8.js (the hash recompute being mutated)
+Go windows-latest	Gates	2026-10-13T08:24:47.7727970Z ok   T57 --scope=ci is a valid reading (exit 0/1, never the usage-error exit 2)
+Go windows-latest	Gates	2026-10-13T08:24:47.7728803Z ok   T57 an unresolvable range endpoint exits 2 (usage/environment error), not a silent green
+Go windows-latest	Gates	2026-10-13T08:24:47.7729271Z ok   T57 DEF-1 an unresolvable range endpoint exits 2 with a NON-EMPTY stderr carrying the `gate.js:` diagnosis (never a silent exit that degrades into an empty change set)
+Go windows-latest	Gates	2026-10-13T08:24:47.7729699Z ok   T57 the historical range 4284e94 is a valid reading (exit 0/1, not 2)
+Go windows-latest	Gates	2026-10-13T08:24:47.7730029Z ok   T57 listTreeFiles in range scope walks `git ls-tree -r -z --name-only <endpoint> -- <dir>` (not the disk)
+Go windows-latest	Gates	2026-10-13T08:24:47.7730346Z ok   T58 tree scope reads the registration table from the working tree
+Go windows-latest	Gates	2026-10-13T08:24:47.7730649Z ok   T58 the real registered root-level path is listed VERBATIM (match === file) in the worktree registry
+Go windows-latest	Gates	2026-10-13T08:24:47.7731081Z ok   T58 a historical range endpoint reads the registration table from the endpoint (absent then ⇒ zero entries)
+Go windows-latest	Gates	2026-10-13T08:24:47.7731446Z ok   T58 the SAME path is green with the worktree registry and red with the endpoint (empty) registry
+Go windows-latest	Gates	2026-10-13T08:24:47.7731730Z ok   T59 EXPECTED_CORPUS_FAILS is sorted and duplicate-free
+Go windows-latest	Gates	2026-10-13T08:24:47.7732027Z ok   T59 every expected corpus FAIL id belongs to the known criterion vocabulary
+Go windows-latest	Gates	2026-10-13T08:24:47.7732404Z ok   T59 no criterion id is duplicated in ALL_SUBCHECKS
+Go windows-latest	Gates	2026-10-13T08:24:47.7732604Z ok   T59 every G8 sub-check id is present in ALL_SUBCHECKS
+Go windows-latest	Gates	2026-10-13T08:24:47.7733124Z ok   T60 DEF-2 regression anchor: the tree branch batches a whole directory into EXACTLY ONE `git check-ignore --stdin -z` spawn (never a per-file check-ignore), memoises per dir, and returns the disk set minus the ignored set
+Go windows-latest	Gates	2026-10-13T08:24:47.7733755Z ok   T61 G5-b accepts both members this slice added (glm-5.3 pre-review and glm-5.3-flash batch assistance)
+Go windows-latest	Gates	2026-10-13T08:24:47.7734114Z ok   T62 the glm-5.3-flash member is load-bearing: dropping it from the set makes that fixture fail
+Go windows-latest	Gates	2026-10-13T08:24:47.7734455Z ok   T63 restore: g5b.js is byte-identical and the cached module still accepts glm-5.3-flash
+Go windows-latest	Gates	2026-10-13T08:24:47.7734807Z ok   T64 the glm-5.3 member is load-bearing: dropping it from the set makes that fixture fail
+Go windows-latest	Gates	2026-10-13T08:24:47.7735109Z ok   T65 restore: g5b.js is byte-identical and the cached module still accepts glm-5.3
+Go windows-latest	Gates	2026-10-13T08:24:47.7735396Z ok   T66 G5-b stays case-sensitive for the GLM member: GLM-5.3 (wrong case) fails
+Go windows-latest	Gates	2026-10-13T08:24:47.7735775Z ok   T67 G5-b rejects a qualified call string: glm-5.3 (glm) is not the modelId (R2.2 boundary)
+Go windows-latest	Gates	2026-10-13T08:24:47.7736119Z ok   F1 every declared fixture mutation applied (a stale mutation would weaken the suite silently)
+Go windows-latest	Gates	2026-10-13T08:24:47.7736416Z ok   F1 mutation coverage floor (>= 8 fixture mutations exercised)
+Go windows-latest	Gates	2026-10-13T08:24:47.7736609Z SELFTEST: PASS 335/335
+Go windows-latest	Gates	2026-10-13T08:25:29.1297724Z GATE REPORT scope=ci repo=D:\a\prfrail\prfrail changed=5
+Go windows-latest	Gates	2026-10-13T08:25:29.1298142Z PASS  G1-a table structure :: no `||` on added rows
+Go windows-latest	Gates	2026-10-13T08:25:29.1298654Z PASS  G1-b version metadata :: docs/DELIVERY_DIRECTIVE.md header=v1.29 last=v1.29 2026-10-13/2026-10-13 rows=30 OK | docs/DELIVERY_DIRECTIVE_EN.md header=v1.29 last=v1.29 2026-10-13/2026-10-13 rows=30 OK
+Go windows-latest	Gates	2026-10-13T08:25:29.1299407Z SKIP  G1 section-title/status-table/completion-record consistency :: not scripted in slice GATES-EXT: judging three human-authored places against each other; see DELIVERY_DIRECTIVE 6.3 G1
+Go windows-latest	Gates	2026-10-13T08:25:29.1299874Z PASS  G2 placeholder residue :: none
+Go windows-latest	Gates	2026-10-13T08:25:29.1300629Z PASS  G3(a) symmetry + mirror parity :: docs/DELIVERY_DIRECTIVE.md +42/-8 vs _EN +42/-8 OK || docs/validation/directive-prereview-guidance.md +113/-0 vs _EN +113/-0 OK ;; docs/DELIVERY_DIRECTIVE.md {"lines":true,"head":true,"bold":true,"bars":true,"blank":true} ;; docs/validation/directive-prereview-guidance.md {"lines":true,"head":true,"bold":true,"bars":true,"blank":true}
+Go windows-latest	Gates	2026-10-13T08:25:29.1301604Z PASS  G3(b) key-field alignment :: hash 0/0 OK | run 0/0 OK | glyph 1/1 OK | to-do 0/0 OK | not-reviewed 0/0 OK | hash 0/0 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK
+Go windows-latest	Gates	2026-10-13T08:25:29.1302283Z PASS  G4a BOM+LF :: 5 file(s) OK (1 excluded: evidence tree)
+Go windows-latest	Gates	2026-10-13T08:25:29.1302583Z PASS  G4b CJK diff minus whitelist :: newCjk=517 unknown=[] (whitelist=37 whitelist-source=endpoint:HEAD)
+Go windows-latest	Gates	2026-10-13T08:25:29.1302865Z PASS  G5-a(1) no model key in prfrail-* :: 0 hits
+Go windows-latest	Gates	2026-10-13T08:25:29.1303054Z PASS  G5-a(2) no empty model :: 0 hits / 14 files
+Go windows-latest	Gates	2026-10-13T08:25:29.1303246Z PASS  G5-b closed-set model value :: checked 0 file(s)
+Go windows-latest	Gates	2026-10-13T08:25:29.1303711Z SKIP  G5 change-set contract (staged vs declared vs evidence refs) :: not scripted in slice GATES-EXT: requires a structured JSON input produced outside the repository; see DELIVERY_DIRECTIVE 6.3 G5
+Go windows-latest	Gates	2026-10-13T08:25:29.1304175Z PASS  R2.5 header-note position :: distinct=1 uniform 14/14
+Go windows-latest	Gates	2026-10-13T08:25:29.1304509Z PASS  G6-1 status tense :: no pending/completion conflict on added lines (scanned 310) whitelist-source=endpoint:HEAD
+Go windows-latest	Gates	2026-10-13T08:25:29.1304925Z PASS  G6-2 cost clause :: no realized cost clause on added lines (scanned 310) whitelist-source=endpoint:HEAD
+Go windows-latest	Gates	2026-10-13T08:25:29.1305301Z PASS  G6-3 run-id format :: no malformed run id on added lines (scanned 310) whitelist-source=endpoint:HEAD
+Go windows-latest	Gates	2026-10-13T08:25:29.1305686Z PASS  G6-4 expiring literal :: no expiring literal on added lines (scanned 310) whitelist-source=endpoint:HEAD
+Go windows-latest	Gates	2026-10-13T08:25:29.1306180Z PASS  G6-5 section-reference resolution :: no unresolved section reference on added ledger/changelog lines (scanned 38, refs 52) whitelist-source=endpoint:HEAD
+Go windows-latest	Gates	2026-10-13T08:25:29.1306719Z PASS  G6-6 ledger status closed set :: every added ledger row opens with a closed-set status word (scanned 6) whitelist-source=endpoint:HEAD
+Go windows-latest	Gates	2026-10-13T08:25:29.1307067Z PASS  G7-a artifacts block present :: 2 report(s) OK
+Go windows-latest	Gates	2026-10-13T08:25:29.1307395Z PASS  G7-b artifact path/disposition resolvable :: 36 artifact row(s) OK (repo check: git cat-file -e <endpoint>:<path>)
+Go windows-latest	Gates	2026-10-13T08:25:29.1307768Z PASS  G7-c finding row disposition cell :: 12 changed finding row(s) with disposition
+Go windows-latest	Gates	2026-10-13T08:25:29.1308094Z PASS  G7-d stopped state marked incomplete :: no stopped-state row missing the incomplete mark
+Go windows-latest	Gates	2026-10-13T08:25:29.1308365Z PASS  G8-a evidence-tree path shape :: 1 path(s) OK
+Go windows-latest	Gates	2026-10-13T08:25:29.1308590Z INFO  G8-b pack self-consistency :: no touched evidence pack in scope
+Go windows-latest	Gates	2026-10-13T08:25:29.1308987Z INFO  G8-c encoding-normalization record :: no touched evidence pack in scope
+Go windows-latest	Gates	2026-10-13T08:25:29.1309237Z PASS  G8-d rebuilt-archive note :: 1 changed file(s) OK
+Go windows-latest	Gates	2026-10-13T08:25:29.1309549Z PASS  base gofmt -l . :: empty
+Go windows-latest	Gates	2026-10-13T08:25:29.1310676Z PASS  base go build ./... :: exit 0
+Go windows-latest	Gates	2026-10-13T08:25:29.1310905Z PASS  base go vet ./... :: exit 0
+Go windows-latest	Gates	2026-10-13T08:25:29.1311131Z PASS  base go test ./... :: ok=14 FAIL=0
+Go windows-latest	Gates	2026-10-13T08:25:29.1311312Z TOTAL_FAIL=0
+Go windows-latest	Post Setup Go	﻿2026-10-13T08:25:29.2268804Z Post job cleanup.
+Go windows-latest	Post Setup Go	2026-10-13T08:25:29.3694219Z [command]C:\hostedtoolcache\windows\go\1.22.12\x64\bin\go.exe env GOMODCACHE
+Go windows-latest	Post Setup Go	2026-10-13T08:25:29.3756918Z [command]C:\hostedtoolcache\windows\go\1.22.12\x64\bin\go.exe env GOCACHE
+Go windows-latest	Post Setup Go	2026-10-13T08:25:29.3948253Z C:\Users\runneradmin\go\pkg\mod
+Go windows-latest	Post Setup Go	2026-10-13T08:25:29.3978562Z C:\Users\runneradmin\AppData\Local\go-build
+Go windows-latest	Post Setup Go	2026-10-13T08:25:29.3994275Z Cache hit occurred on the primary key setup-go-Windows-x64-go-1.22.12-2f07b6ec62ba90bcd08e45ebcc765a7ea2fd8104887fdaad445ddb80e0e00ca7, not saving cache.
+Go windows-latest	Post Checkout source	﻿2026-10-13T08:25:29.4238258Z Post job cleanup.
+Go windows-latest	Post Checkout source	2026-10-13T08:25:29.5345213Z [command]"C:\Program Files\Git\bin\git.exe" version
+Go windows-latest	Post Checkout source	2026-10-13T08:25:29.5539755Z git version 2.55.0.windows.5
+Go windows-latest	Post Checkout source	2026-10-13T08:25:29.5586110Z Temporarily overriding HOME='D:\a\_temp\405a92b5-0210-4fcc-a3aa-8af0ddfa6581' before making global git config changes
+Go windows-latest	Post Checkout source	2026-10-13T08:25:29.5586712Z Adding repository directory to the temporary git global config as a safe directory
+Go windows-latest	Post Checkout source	2026-10-13T08:25:29.5592715Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\prfrail\prfrail
+Go windows-latest	Post Checkout source	2026-10-13T08:25:29.5850263Z Removing SSH command configuration
+Go windows-latest	Post Checkout source	2026-10-13T08:25:29.5858154Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+Go windows-latest	Post Checkout source	2026-10-13T08:25:29.6083616Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+Go windows-latest	Post Checkout source	2026-10-13T08:25:30.0524990Z Removing HTTP extra header
+Go windows-latest	Post Checkout source	2026-10-13T08:25:30.0532877Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Go windows-latest	Post Checkout source	2026-10-13T08:25:30.0765292Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+Go windows-latest	Post Checkout source	2026-10-13T08:25:30.5782537Z Removing includeIf entries pointing to credentials config files
+Go windows-latest	Post Checkout source	2026-10-13T08:25:30.5792243Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+Go windows-latest	Post Checkout source	2026-10-13T08:25:30.6052249Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+Go windows-latest	Complete job	﻿2026-10-13T08:25:31.0291598Z Cleaning up orphan processes

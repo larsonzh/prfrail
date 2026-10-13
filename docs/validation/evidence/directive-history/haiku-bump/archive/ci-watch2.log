@@ -1,0 +1,299 @@
+Refreshing run status every 20 seconds. Press Ctrl+C to quit.
+
+* main CI · 38089169369
+Triggered via push less than a minute ago
+
+JOBS
+* Go windows-latest (ID 114321866232)
+  ✓ Set up job
+  ✓ Checkout source
+  * Setup Go
+  * Build
+  * Vet
+  * Test
+  * Race
+  * Contract fixtures
+  * Gates
+  * Post Setup Go
+  * Post Checkout source
+* Go ubuntu-latest (ID 114321866346)
+  ✓ Set up job
+  ✓ Checkout source
+  ✓ Setup Go
+  ✓ Build
+  ✓ Vet
+  * Test
+  * Race
+  * Contract fixtures
+  * Gates
+  * Post Setup Go
+  * Post Checkout source
+- Candidate build (${{ matrix.os }}) (ID 114321867018)
+- Candidate probe (${{ matrix.os }}) in 0s (ID 114321867292)
+- Bootstrap and release evidence (${{ matrix.os }}) in 0s (ID 114321867529)
+Refreshing run status every 20 seconds. Press Ctrl+C to quit.
+
+* main CI · 38089169369
+Triggered via push less than a minute ago
+
+JOBS
+* Go windows-latest (ID 114321866232)
+  ✓ Set up job
+  ✓ Checkout source
+  ✓ Setup Go
+  * Build
+  * Vet
+  * Test
+  * Race
+  * Contract fixtures
+  * Gates
+  * Post Setup Go
+  * Post Checkout source
+* Go ubuntu-latest (ID 114321866346)
+  ✓ Set up job
+  ✓ Checkout source
+  ✓ Setup Go
+  ✓ Build
+  ✓ Vet
+  ✓ Test
+  * Race
+  * Contract fixtures
+  * Gates
+  * Post Setup Go
+  * Post Checkout source
+- Candidate build (${{ matrix.os }}) (ID 114321867018)
+- Candidate probe (${{ matrix.os }}) in 0s (ID 114321867292)
+- Bootstrap and release evidence (${{ matrix.os }}) in 0s (ID 114321867529)
+Refreshing run status every 20 seconds. Press Ctrl+C to quit.
+
+* main CI · 38089169369
+Triggered via push about 1 minute ago
+
+JOBS
+* Go windows-latest (ID 114321866232)
+  ✓ Set up job
+  ✓ Checkout source
+  ✓ Setup Go
+  ✓ Build
+  ✓ Vet
+  * Test
+  * Race
+  * Contract fixtures
+  * Gates
+  * Post Setup Go
+  * Post Checkout source
+* Go ubuntu-latest (ID 114321866346)
+  ✓ Set up job
+  ✓ Checkout source
+  ✓ Setup Go
+  ✓ Build
+  ✓ Vet
+  ✓ Test
+  * Race
+  * Contract fixtures
+  * Gates
+  * Post Setup Go
+  * Post Checkout source
+- Candidate build (${{ matrix.os }}) (ID 114321867018)
+- Candidate probe (${{ matrix.os }}) in 0s (ID 114321867292)
+- Bootstrap and release evidence (${{ matrix.os }}) in 0s (ID 114321867529)
+Refreshing run status every 20 seconds. Press Ctrl+C to quit.
+
+* main CI · 38089169369
+Triggered via push about 1 minute ago
+
+JOBS
+* Go windows-latest (ID 114321866232)
+  ✓ Set up job
+  ✓ Checkout source
+  ✓ Setup Go
+  ✓ Build
+  ✓ Vet
+  ✓ Test
+  - Race
+  - Contract fixtures
+  * Gates
+  * Post Setup Go
+  * Post Checkout source
+* Go ubuntu-latest (ID 114321866346)
+  ✓ Set up job
+  ✓ Checkout source
+  ✓ Setup Go
+  ✓ Build
+  ✓ Vet
+  ✓ Test
+  * Race
+  * Contract fixtures
+  * Gates
+  * Post Setup Go
+  * Post Checkout source
+- Candidate build (${{ matrix.os }}) (ID 114321867018)
+- Candidate probe (${{ matrix.os }}) in 0s (ID 114321867292)
+- Bootstrap and release evidence (${{ matrix.os }}) in 0s (ID 114321867529)
+Refreshing run status every 20 seconds. Press Ctrl+C to quit.
+
+* main CI · 38089169369
+Triggered via push about 1 minute ago
+
+JOBS
+* Go windows-latest (ID 114321866232)
+  ✓ Set up job
+  ✓ Checkout source
+  ✓ Setup Go
+  ✓ Build
+  ✓ Vet
+  ✓ Test
+  - Race
+  - Contract fixtures
+  * Gates
+  * Post Setup Go
+  * Post Checkout source
+* Go ubuntu-latest (ID 114321866346)
+  ✓ Set up job
+  ✓ Checkout source
+  ✓ Setup Go
+  ✓ Build
+  ✓ Vet
+  ✓ Test
+  * Race
+  * Contract fixtures
+  * Gates
+  * Post Setup Go
+  * Post Checkout source
+- Candidate build (${{ matrix.os }}) (ID 114321867018)
+- Candidate probe (${{ matrix.os }}) in 0s (ID 114321867292)
+- Bootstrap and release evidence (${{ matrix.os }}) in 0s (ID 114321867529)
+Refreshing run status every 20 seconds. Press Ctrl+C to quit.
+
+* main CI · 38089169369
+Triggered via push about 2 minutes ago
+
+JOBS
+* Go windows-latest (ID 114321866232)
+  ✓ Set up job
+  ✓ Checkout source
+  ✓ Setup Go
+  ✓ Build
+  ✓ Vet
+  ✓ Test
+  - Race
+  - Contract fixtures
+  * Gates
+  * Post Setup Go
+  * Post Checkout source
+* Go ubuntu-latest (ID 114321866346)
+  ✓ Set up job
+  ✓ Checkout source
+  ✓ Setup Go
+  ✓ Build
+  ✓ Vet
+  ✓ Test
+  ✓ Race
+  ✓ Contract fixtures
+  * Gates
+  * Post Setup Go
+  * Post Checkout source
+- Candidate build (${{ matrix.os }}) (ID 114321867018)
+- Candidate probe (${{ matrix.os }}) in 0s (ID 114321867292)
+- Bootstrap and release evidence (${{ matrix.os }}) in 0s (ID 114321867529)
+Refreshing run status every 20 seconds. Press Ctrl+C to quit.
+
+* main CI · 38089169369
+Triggered via push about 2 minutes ago
+
+JOBS
+* Go windows-latest (ID 114321866232)
+  ✓ Set up job
+  ✓ Checkout source
+  ✓ Setup Go
+  ✓ Build
+  ✓ Vet
+  ✓ Test
+  - Race
+  - Contract fixtures
+  * Gates
+  * Post Setup Go
+  * Post Checkout source
+✓ Go ubuntu-latest in 2m36s (ID 114321866346)
+  ✓ Set up job
+  ✓ Checkout source
+  ✓ Setup Go
+  ✓ Build
+  ✓ Vet
+  ✓ Test
+  ✓ Race
+  ✓ Contract fixtures
+  ✓ Gates
+  ✓ Post Setup Go
+  ✓ Post Checkout source
+  ✓ Complete job
+- Candidate build (${{ matrix.os }}) (ID 114321867018)
+- Candidate probe (${{ matrix.os }}) in 0s (ID 114321867292)
+- Bootstrap and release evidence (${{ matrix.os }}) in 0s (ID 114321867529)
+Refreshing run status every 20 seconds. Press Ctrl+C to quit.
+
+* main CI · 38089169369
+Triggered via push about 2 minutes ago
+
+JOBS
+* Go windows-latest (ID 114321866232)
+  ✓ Set up job
+  ✓ Checkout source
+  ✓ Setup Go
+  ✓ Build
+  ✓ Vet
+  ✓ Test
+  - Race
+  - Contract fixtures
+  * Gates
+  * Post Setup Go
+  * Post Checkout source
+✓ Go ubuntu-latest in 2m36s (ID 114321866346)
+  ✓ Set up job
+  ✓ Checkout source
+  ✓ Setup Go
+  ✓ Build
+  ✓ Vet
+  ✓ Test
+  ✓ Race
+  ✓ Contract fixtures
+  ✓ Gates
+  ✓ Post Setup Go
+  ✓ Post Checkout source
+  ✓ Complete job
+- Candidate build (${{ matrix.os }}) (ID 114321867018)
+- Candidate probe (${{ matrix.os }}) in 0s (ID 114321867292)
+- Bootstrap and release evidence (${{ matrix.os }}) in 0s (ID 114321867529)
+✓ main CI · 38089169369
+Triggered via push about 3 minutes ago
+
+JOBS
+✓ Go windows-latest in 3m13s (ID 114321866232)
+  ✓ Set up job
+  ✓ Checkout source
+  ✓ Setup Go
+  ✓ Build
+  ✓ Vet
+  ✓ Test
+  - Race
+  - Contract fixtures
+  ✓ Gates
+  ✓ Post Setup Go
+  ✓ Post Checkout source
+  ✓ Complete job
+✓ Go ubuntu-latest in 2m36s (ID 114321866346)
+  ✓ Set up job
+  ✓ Checkout source
+  ✓ Setup Go
+  ✓ Build
+  ✓ Vet
+  ✓ Test
+  ✓ Race
+  ✓ Contract fixtures
+  ✓ Gates
+  ✓ Post Setup Go
+  ✓ Post Checkout source
+  ✓ Complete job
+- Candidate build (${{ matrix.os }}) (ID 114321867018)
+- Candidate probe (${{ matrix.os }}) in 0s (ID 114321867292)
+- Bootstrap and release evidence (${{ matrix.os }}) in 0s (ID 114321867529)

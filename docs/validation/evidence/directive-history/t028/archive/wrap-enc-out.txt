@@ -1,0 +1,16 @@
+TRACKED_FILES=3431
+TEXT_FILES=3342
+BINARY_FILES=89
+MAIN_TREE_VIOLATIONS=0
+EVIDENCE_TREE_VIOLATIONS=9
+  EVIDENCE docs/validation/evidence/b2-2026-09-17/measuring/probe10-dir-listing.raw.txt bom=false wantBom=false cr=true
+  EVIDENCE docs/validation/evidence/b3b-2026-09-21/session/pin.json bom=true wantBom=false cr=false
+  EVIDENCE docs/validation/evidence/b3b-2026-09-21/variant/pin.json bom=true wantBom=false cr=false
+  EVIDENCE docs/validation/evidence/glm-eval/archive/glm-eval/BRIEFING.md bom=false wantBom=true cr=false
+  EVIDENCE docs/validation/evidence/glm-eval/archive/glm-eval/bundle/00-plan.md bom=false wantBom=true cr=false
+  EVIDENCE docs/validation/evidence/glm-eval/archive/glm-eval/metering/README.md bom=false wantBom=true cr=false
+  EVIDENCE docs/validation/evidence/glm-eval/archive/glm-eval/plan-v1.md bom=false wantBom=true cr=false
+  EVIDENCE docs/validation/evidence/glm-eval/archive/glm-eval/selftest/fixtures/hash-bom.txt bom=true wantBom=false cr=false
+  EVIDENCE docs/validation/evidence/glm-eval/archive/tooling/manifest-template.md bom=false wantBom=true cr=false
+
+RESULT=MAIN_TREE_CLEAN

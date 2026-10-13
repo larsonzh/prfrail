@@ -111,3 +111,5 @@ tmp/prg/dump-evidence.js	local-only
 tmp/prg/reexport-diff.js	local-only
 tmp/prg/norm.js	local-only
 ```
+> **Archive note (2026-10-13, A1-a)**: the `tmp/` items cited by this report's fence have been archived per §1.5.1 into `docs/validation/evidence/directive-history/prereview-guidance/` (with `MANIFEST.md` and `SHA256SUMS.txt`); the original paths are not rewritten, and the correspondence is recorded in that unit's `MANIFEST.md`. This is a follow-on to the v1.23 archiving execution (run at the `[ROUTINE]` tier, without bumping the directive version).
+

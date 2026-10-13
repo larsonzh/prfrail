@@ -267,3 +267,5 @@ tmp/t028/verify-a12.js	local-only
 tmp/t028/staged-diff.txt	local-only
 tmp/t028/head-baseline.txt	local-only
 ```
+> **归档注记（2026-10-13，A1-a）**：本报告围栏引用的 `tmp/` 条目已按 §1.5.1 归档至 `docs/validation/evidence/directive-history/t028/`（含 `MANIFEST.md` 与 `SHA256SUMS.txt`）；原路径不改写，对应关系以该单元 `MANIFEST.md` 为准。本次为 v1.23 归档执行的续作（按 `[ROUTINE]` 档执行，不 bump 准则版本）。
+

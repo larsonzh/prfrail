@@ -1,0 +1,12 @@
+SYMMETRIC  ADR_REGISTER.md                              CN delta=[0,0,0,0,0] EN delta=[0,0,0,0,0]  (pair was already asymmetric at HEAD: no fix attempted)
+SYMMETRIC  DELIVERY_DIRECTIVE.md                        CN delta=[0,0,0,0,0] EN delta=[0,0,0,0,0]
+SYMMETRIC  BUSINESS_WORKFLOWS.md                        CN delta=[0,0,0,0,0] EN delta=[0,0,0,0,0]
+SYMMETRIC  INSTALLATION.md                              CN delta=[0,0,0,0,0] EN delta=[0,0,0,0,0]
+SYMMETRIC  INSTALLATION_PLAN.md                         CN delta=[0,0,0,0,0] EN delta=[0,0,0,0,0]
+SYMMETRIC  OPERATIONS.md                                CN delta=[0,0,0,0,0] EN delta=[0,0,0,0,0]
+SYMMETRIC  S1_RELEASE_NOTES.md                          CN delta=[0,0,0,0,0] EN delta=[0,0,0,0,0]
+SYMMETRIC  S1_SUPPORT_MATRIX.md                         CN delta=[0,0,0,0,0] EN delta=[0,0,0,0,0]
+SYMMETRIC  t027/REMAINING_SLICES.md                     CN delta=[0,0,0,0,0] EN delta=[0,0,0,0,0]  (pair was already asymmetric at HEAD: no fix attempted)
+SYMMETRIC  validation/t028-supervised-black-box.md      CN delta=[0,0,0,0,0] EN delta=[0,0,0,0,0]
+
+ASYMMETRY_INTRODUCED=0

@@ -1,0 +1,73 @@
+--- part 1: frozen handoff policy guard (blind-review High) ---
+ok   a1 frozen policy snapshot name is single-sourced
+ok   a2 snapshot is persisted at window open
+ok   a3 the persist path is reached from the window-opening path
+ok   a4 enforceFrozenHandoffPolicy exists
+ok   a5 guard rejects drift with ErrSupervisedPolicyDrift on three independent anchors
+ok   a6 guard anchors: snapshot vs its own digest
+ok   a7 guard anchors: snapshot vs the window session
+ok   a8 guard anchors: in-force policy vs frozen policy
+ok   a9 guard performs NO durable write (fail-closed, zero-persist path)
+ok   a10 guard is invoked from the return entry point
+ok   a11 abort bypasses the drift guard (cannot be refused by drift)
+ok   a12 drift negative case is pinned by a test
+ok   a13 policy digest uses the repository hashing convention
+--- part 2: contract invariants (schema + constants) ---
+ok   b1 report schema forces assuranceLevel = reduced
+ok   b2 report schema requires at least one unknown dimension
+ok   b3 report schema requires the cost dimension to be present
+ok   b4 risk confirmation schema forces selection = confirm
+ok   b5 chain schema carries the supervised black-box step variant
+ok   b6 risk notice version is the versioned constant 2
+ok   b7 contract coverage constants reflect the added schemas/fixtures
+--- part 3: P4 - an unknown dimension is never rendered as safe ---
+ok   c1 rendered dimensions use the proved: label
+ok   c2 rendered text never claims safe/verified
+ok   c3 report schema exposes no safe/verified enum member
+ok   c4 report validation rejects non-reduced / empty unknown dimensions
+ok   c5 the report command validates the persisted record before rendering
+--- part 4: P2 - a visible delivery is not a completion ---
+ok   d1 the visible adapter never touches chain state
+ok   d2 the adapter returns no receipt record
+ok   d3 the return entry takes a handoff receipt plus the frozen facts
+ok   d4 a non-accepted delivery is refused before any write
+ok   d5 delivery records carry no completion outcome field
+ok   d6 window opening requires an accepted confirmation delivery
+--- part 5: P3 - confirmation never waives the gates ---
+ok   e1 completion runs runScopeScan
+ok   e2 completion runs runSecretAndTypeScan
+ok   e3 completion runs runSideEffectScan
+ok   e4 completion runs processStopEvidence
+ok   e5 completion runs runAfterReturnGates
+ok   e6 no gate-skipping switch exists in supervised code
+ok   e7 the side-effect scan blocks deletions, type changes, permission drift and escaping links
+ok   e8 the scope scan fails closed when the allow-list is underivable
+--- part 6: the four prohibitions each have a mechanical anchor + tests ---
+ok   f1 P1 intent guard present in the command model
+ok   f2 P1 CLI mutual exclusion present
+ok   f3 P1 router exposes a dedicated supervised port
+ok   f4 P1 semantic invariant test is registered
+ok   f5 P1 lexical smoke test is retained
+ok   f6 P1 semantic invariant test asserts on state/port layer, not on comments
+ok   f7 P2/P3/P4 chain-side tests exist
+ok   f8 risk-confirmation validation is unit-tested
+ok   f9 report validation is unit-tested
+--- part 7: mechanical re-execution (child process, independent of any review) ---
+ok   g1 focused supervised test subset exits 0
+ok   g2 no failing supervised test
+ok   g3 supervised test subset is non-trivial
+ok   g4 the two drift tests really ran
+ok   g5 the aborted run never reports PASS in that test
+     focused PASS lines=81 FAIL lines=0
+ok   g6 go vet is clean on the changed packages
+ok   g7 gofmt reports no unformatted file
+--- part 8: fail-closed boundaries (D-18) actually exist in the wiring ---
+ok   h1 the default assembly uses an unavailable visible client
+ok   h2 the delivery step refuses with a named reason when the channel is unavailable
+ok   h3 the gate runner refuses when hooks are unavailable
+     cannot-verify (not mechanically closable on this host):
+     cv1 real SessionBridge visible end-to-end (depends on T027-B wiring)
+     cv2 live external-agent observation of network/cost/process/side-effect dimensions
+     cv3 production hook-definition source and real gate assembly
+
+A12_CHECKS=58 A12_EXPERIMENT_FAILURES=0

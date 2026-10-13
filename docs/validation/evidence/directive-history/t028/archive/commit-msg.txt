@@ -1,0 +1,14 @@
+feat(supervised): add the supervised-black-box explicit mode (T028)
+
+Implement the AT-24 explicit mode: versioned binding risk confirmation, isolated
+work window, SessionBridge visible delivery, supervised return expressed as the
+handoff complete receipt, post-return scope/secret/type/side-effect scans with
+independent gates/review, and a reduced/unknown report.
+
+- contract: CONTRACTS 7.1 pair plus two schemas, the chain step variant and fixtures
+- chain: supervised work window and return, risk confirmation, report validation
+- console: supervised run/return/report commands with the frozen handoff policy guard
+- adapters: visible delivery client that produces no receipt record
+- tests: drift guard, abort exemption, semantic P1 decoupling, five blocking branches
+
+Not a runnable release: the real CLI end-to-end depends on T027-B wiring (D-18).

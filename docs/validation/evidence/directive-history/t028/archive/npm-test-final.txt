@@ -1,0 +1,16 @@
+
+> proofrail-contract-validator@1.0.0 test
+> node --test
+
+✔ all schemas compile and every catalog matches its independent expectation (1374.3383ms)
+✔ canonical vectors reproduce the frozen bytes and digests (7.7129ms)
+✔ AgentRunner mapping constants stay aligned across vectors and request fixtures (6.0649ms)
+✔ AgentRunner effect mapping fails closed and permits grant supersets (5.7713ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1709.2845

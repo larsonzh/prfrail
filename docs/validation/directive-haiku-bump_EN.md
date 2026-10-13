@@ -204,5 +204,6 @@ tmp/haiku-bump/runs.json	local-only
 tmp/haiku-bump/run-view.json	local-only
 tmp/haiku-bump/	local-only
 ```
+> **Archive note (2026-10-13, A1-a)**: the `tmp/` items cited by this report's fence have been archived per §1.5.1 into `docs/validation/evidence/directive-history/haiku-bump/` (with `MANIFEST.md` and `SHA256SUMS.txt`); the original paths are not rewritten, and the correspondence is recorded in that unit's `MANIFEST.md`. This is a follow-on to the v1.23 archiving execution (run at the `[ROUTINE]` tier, without bumping the directive version).
 
 Note: `repo` rows are this slice's staged artifacts (including this report pair and ⑧b's ledger completion rows); `local-only` rows are one-shot process artifacts under `tmp/haiku-bump/`, removed at ⑧c; **excluding** leftovers from previous slices (`tmp/glm-landing`, `tmp/glm-eval*`).

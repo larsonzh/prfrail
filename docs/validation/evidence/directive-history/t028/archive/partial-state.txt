@@ -1,0 +1,17 @@
+# T028 ②b-5 partial state captured after the carrier socket failure (2026-10-11T03:54:25.824Z)
+# unstaged (worktree vs index) files and their sha256 at capture time:
+  numstat 10	1	internal/chain/engine.go
+  numstat 12	3	internal/chain/supervised_blackbox.go
+  numstat 58	0	internal/chain/supervised_blackbox_test.go
+  numstat 5	0	internal/chain/supervised_risk_confirmation.go
+  numstat 196	33	internal/console/runtime_supervised.go
+  numstat 140	1	internal/console/runtime_supervised_test.go
+  numstat 0	2	internal/console/supervised_cmd.go
+  sha256 dc04bdce29be8ee4fa59724b18aaff6dd2aa48e2354e016c4b9a296829d509b1  internal/chain/engine.go
+  sha256 a0ae43af94106bcf08f4a5ca066d0825b156a2a42f6ef78875c181a108ec2071  internal/chain/supervised_blackbox.go
+  sha256 302cd3498d72a650f687da3fab2ca67b1c8e696e52a4bb9ad1371e53b3829fe4  internal/chain/supervised_blackbox_test.go
+  sha256 f992f8d9444510edae1b8c5eecb1ff2f1b5ba53d26d83e28069e077759061d50  internal/chain/supervised_risk_confirmation.go
+  sha256 9c658a1dcc3b29357714ac4ff628f2c1110b70660c390df8d09129cbcc83ee46  internal/console/runtime_supervised.go
+  sha256 3582ea83611150293201fff257e21730e6c3a1a4a3e02bc4c108d8288c91ee6f  internal/console/runtime_supervised_test.go
+  sha256 cc8e07e6a80fd43a8ad99c0980f6390a8fa0b2eefe07ccba1b96daeec9129782  internal/console/supervised_cmd.go
+# mutation-leftover probe (must be empty):

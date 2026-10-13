@@ -1,0 +1,11 @@
+non-frozen tree: tracked=3415 text=3326 binary=89 violations=0
+frozen evidence tree: violations=9
+  frozen docs/validation/evidence/b2-2026-09-17/measuring/probe10-dir-listing.raw.txt(bom=false crlf=true)
+  frozen docs/validation/evidence/b3b-2026-09-21/session/pin.json(bom=true crlf=false)
+  frozen docs/validation/evidence/b3b-2026-09-21/variant/pin.json(bom=true crlf=false)
+  frozen docs/validation/evidence/glm-eval/archive/glm-eval/BRIEFING.md(bom=false crlf=false)
+  frozen docs/validation/evidence/glm-eval/archive/glm-eval/bundle/00-plan.md(bom=false crlf=false)
+  frozen docs/validation/evidence/glm-eval/archive/glm-eval/metering/README.md(bom=false crlf=false)
+  frozen docs/validation/evidence/glm-eval/archive/glm-eval/plan-v1.md(bom=false crlf=false)
+  frozen docs/validation/evidence/glm-eval/archive/glm-eval/selftest/fixtures/hash-bom.txt(bom=true crlf=false)
+  frozen docs/validation/evidence/glm-eval/archive/tooling/manifest-template.md(bom=false crlf=false)

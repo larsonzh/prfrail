@@ -1,0 +1,102 @@
+===== ci-ubuntu.log  totalLines=745
+  Gates-step lines (3):
+    2026-10-10T21:46:48.5707443Z SELFTEST: PASS 335/335
+    2026-10-10T21:47:03.3147764Z GATE REPORT scope=ci repo=/home/runner/work/prfrail/prfrail changed=7
+    2026-10-10T21:47:03.3171004Z TOTAL_FAIL=0
+  package-level ok lines (47):
+    2026-10-10T21:44:53.9878674Z ok  	github.com/larsonzh/prfrail/examples/whois-shadow	0.006s
+    2026-10-10T21:45:09.0456888Z ok  	github.com/larsonzh/prfrail/internal/adapters	14.023s
+    2026-10-10T21:45:09.0458848Z ok  	github.com/larsonzh/prfrail/internal/applier	3.300s
+    2026-10-10T21:45:09.0459277Z ok  	github.com/larsonzh/prfrail/internal/chain	0.338s
+    2026-10-10T21:45:09.0459703Z ok  	github.com/larsonzh/prfrail/internal/console	3.496s
+    2026-10-10T21:45:09.0460155Z ok  	github.com/larsonzh/prfrail/internal/evidence	0.012s
+    2026-10-10T21:45:09.0460620Z ok  	github.com/larsonzh/prfrail/internal/gates	0.540s
+    2026-10-10T21:45:09.0460992Z ok  	github.com/larsonzh/prfrail/internal/guard	1.430s
+    2026-10-10T21:45:09.0461512Z ok  	github.com/larsonzh/prfrail/internal/release	1.498s
+    2026-10-10T21:45:09.0461805Z ok  	github.com/larsonzh/prfrail/internal/repair	0.011s
+    2026-10-10T21:45:09.0462103Z ok  	github.com/larsonzh/prfrail/internal/snapshot	0.086s
+    2026-10-10T21:45:09.0462395Z ok  	github.com/larsonzh/prfrail/internal/taskdef	0.009s
+    2026-10-10T21:45:09.0462670Z ok  	github.com/larsonzh/prfrail/internal/tickets	0.006s
+    2026-10-10T21:45:09.0463028Z ok  	github.com/larsonzh/prfrail/tools/agent-probe/enforcement-proxy	0.241s
+    2026-10-10T21:46:41.4661849Z ok  	github.com/larsonzh/prfrail/internal/adapters	84.056s
+    2026-10-10T21:46:41.4662283Z ok  	github.com/larsonzh/prfrail/internal/chain	1.561s
+    2026-10-10T21:46:45.3151095Z ok 1 - all schemas compile and every catalog matches its independent expectation
+    2026-10-10T21:46:45.3155466Z ok 2 - canonical vectors reproduce the frozen bytes and digests
+    2026-10-10T21:46:45.3178165Z ok 3 - AgentRunner mapping constants stay aligned across vectors and request fixtures
+    2026-10-10T21:46:45.3180766Z ok 4 - AgentRunner effect mapping fails closed and permits grant supersets
+    2026-10-10T21:46:48.5596117Z ok   2e G6-3 prose probe `The retry loop was executed run 1234 times by the harness.` (3-8 digit rule vs ASCII word) must PASS (no finding)
+    2026-10-10T21:46:48.5596788Z ok   2e G6-3 prose probe `连续 run 12 次后任务完成。` (1-2 digit rule vs CJK word) must PASS (no finding)
+    2026-10-10T21:46:48.5597570Z ok   2e G6-3 prose probe ``inventory run 1 failed`` (pre-existing docs/t027/B3B_DESIGN.md:236 shape (1-2 digit rule)) must PASS (no finding)
+    2026-10-10T21:46:48.5598404Z ok   2e G6-3 prose probe `run 111 次后停止。` (3-8 digit rule vs CJK word) must PASS (no finding)
+    2026-10-10T21:46:48.5598901Z ok   2e G6-3 prose probe `run 000 次。` (all-zero rule vs CJK word) must PASS (no finding)
+    2026-10-10T21:46:48.5599450Z ok   2e G6-3 prose probe `run 123456789012345 次。` (>= 14 digit rule vs CJK word) must PASS (no finding)
+    2026-10-10T21:46:48.5600138Z ok   2e G6-3 prose probe `the tool ran run 1234 quickly` (3-8 digit rule vs ASCII word (no punctuation)) must PASS (no finding)
+    2026-10-10T21:46:48.5600671Z ok   2e G6-3 prose probe `see run 7 files` (1-2 digit rule vs ASCII word) must PASS (no finding)
+    2026-10-10T21:46:48.5601127Z ok   2e G6-3 prose probes are load-bearing: the same digit runs DO fail when token-final
+    2026-10-10T21:46:48.5601653Z ok   2f G6-3 leading-boundary probe `rerun 1234` (ASCII letter immediately before `run`) must PASS (no finding)
+    2026-10-10T21:46:48.5602281Z ok   2f G6-3 leading-boundary probe `The harness will rerun 1234.` (word-embedded `run` inside a prose sentence) must PASS (no finding)
+    2026-10-10T21:46:48.5603025Z ok   2f G6-3 leading-boundary probe `在run 1234` (CJK ideograph glued to the FRONT of `run`) must PASS (no finding)
+    2026-10-10T21:46:48.5603599Z ok   2f G6-3 leading-boundary probe `prerun 12` (ASCII-letter prefix on the 1-2 digit rule) must PASS (no finding)
+    2026-10-10T21:46:48.5604247Z ok   2f G6-3 leading-boundary probe `rerun <RUN_ID>` (placeholder rule carries the leading guard too (NF-2 consistency)) must PASS (no finding)
+    2026-10-10T21:46:48.5604904Z ok   2f G6-3 leading-boundary probe `prerun TBD` (word-placeholder rule carries the leading guard too) must PASS (no finding)
+    2026-10-10T21:46:48.5605437Z ok   2f G6-3 still-judged probe `see run 1234` (token-final 3-8 digit id mid-prose) must FAIL
+    2026-10-10T21:46:48.5606185Z ok   2f G6-3 still-judged probe `（run 1234）` (id wrapped in CJK parentheses) must FAIL
+    2026-10-10T21:46:48.5607014Z ok   2f G6-3 still-judged probe ``run 1234`` (backticked malformed id) must FAIL
+    2026-10-10T21:46:48.5607800Z ok   2f G6-3 still-judged probe `run 1234。` (id terminated by CJK punctuation) must FAIL
+    2026-10-10T21:46:48.5608256Z ok   2f G6-3 still-judged probe `run 111` (3-digit id at end of line) must FAIL
+    2026-10-10T21:46:48.5608644Z ok   2f G6-3 still-judged probe `run TBD` (word placeholder at end of line) must FAIL
+    2026-10-10T21:46:48.5609072Z ok   2f G6-3 still-judged probe `see run TBD here` (word placeholder mid-prose) must FAIL
+    2026-10-10T21:46:48.5609563Z ok   2f G6-3 word-followed exemption `run 1234 times` (digit run followed by an ASCII word) must PASS (no finding)
+    2026-10-10T21:46:48.5610170Z ok   2f G6-3 word-followed exemption `连续 run 12 次` (digit run followed by a CJK word) must PASS (no finding)
+    2026-10-10T21:46:48.5610781Z ok   2f G6-3 word-followed exemption ``run 1234 times`` (BACKTICKED digit run still followed by a word (NF-1 prose correction)) must PASS (no finding)
+    2026-10-10T21:46:48.5611455Z ok   2f G6-3 glued-form consequence `run 1234times` (no separator before the trailing ASCII word) must PASS (documented, not a defect)
+    2026-10-10T21:46:48.5612175Z ok   2f G6-3 glued-form consequence `run 12345678次` (no separator before the trailing CJK word) must PASS (documented, not a defect)
+  base-gate lines (11): 2026-10-10T21:44:45.1072521Z ##[group]Run go build ./... | 2026-10-10T21:44:45.1072805Z ^[[36;1mgo build ./...^[[0m | 2026-10-10T21:44:50.1074752Z ##[group]Run go vet ./...
+===== ci-windows.log  totalLines=664
+  Gates-step lines (3):
+    2026-10-10T21:45:58.5574767Z SELFTEST: PASS 335/335
+    2026-10-10T21:46:29.9117414Z GATE REPORT scope=ci repo=D:\a\prfrail\prfrail changed=7
+    2026-10-10T21:46:29.9166168Z TOTAL_FAIL=0
+  package-level ok lines (41):
+    2026-10-10T21:45:05.5189073Z ok  	github.com/larsonzh/prfrail/examples/whois-shadow	0.017s
+    2026-10-10T21:45:25.5967294Z ok  	github.com/larsonzh/prfrail/internal/adapters	19.928s
+    2026-10-10T21:45:25.5967770Z ok  	github.com/larsonzh/prfrail/internal/applier	4.368s
+    2026-10-10T21:45:25.5968084Z ok  	github.com/larsonzh/prfrail/internal/chain	0.117s
+    2026-10-10T21:45:25.5968396Z ok  	github.com/larsonzh/prfrail/internal/console	3.408s
+    2026-10-10T21:45:25.5968717Z ok  	github.com/larsonzh/prfrail/internal/evidence	0.074s
+    2026-10-10T21:45:25.5969021Z ok  	github.com/larsonzh/prfrail/internal/gates	0.265s
+    2026-10-10T21:45:25.5969315Z ok  	github.com/larsonzh/prfrail/internal/guard	1.018s
+    2026-10-10T21:45:25.5969648Z ok  	github.com/larsonzh/prfrail/internal/release	1.929s
+    2026-10-10T21:45:25.5969951Z ok  	github.com/larsonzh/prfrail/internal/repair	0.015s
+    2026-10-10T21:45:25.5970274Z ok  	github.com/larsonzh/prfrail/internal/snapshot	1.498s
+    2026-10-10T21:45:25.5970596Z ok  	github.com/larsonzh/prfrail/internal/taskdef	0.082s
+    2026-10-10T21:45:25.5970890Z ok  	github.com/larsonzh/prfrail/internal/tickets	0.019s
+    2026-10-10T21:45:25.5971266Z ok  	github.com/larsonzh/prfrail/tools/agent-probe/enforcement-proxy	0.493s
+    2026-10-10T21:45:58.5476838Z ok   2e G6-3 prose probe `The retry loop was executed run 1234 times by the harness.` (3-8 digit rule vs ASCII word) must PASS (no finding)
+    2026-10-10T21:45:58.5477657Z ok   2e G6-3 prose probe `连续 run 12 次后任务完成。` (1-2 digit rule vs CJK word) must PASS (no finding)
+    2026-10-10T21:45:58.5478279Z ok   2e G6-3 prose probe ``inventory run 1 failed`` (pre-existing docs/t027/B3B_DESIGN.md:236 shape (1-2 digit rule)) must PASS (no finding)
+    2026-10-10T21:45:58.5478978Z ok   2e G6-3 prose probe `run 111 次后停止。` (3-8 digit rule vs CJK word) must PASS (no finding)
+    2026-10-10T21:45:58.5479631Z ok   2e G6-3 prose probe `run 000 次。` (all-zero rule vs CJK word) must PASS (no finding)
+    2026-10-10T21:45:58.5480187Z ok   2e G6-3 prose probe `run 123456789012345 次。` (>= 14 digit rule vs CJK word) must PASS (no finding)
+    2026-10-10T21:45:58.5480791Z ok   2e G6-3 prose probe `the tool ran run 1234 quickly` (3-8 digit rule vs ASCII word (no punctuation)) must PASS (no finding)
+    2026-10-10T21:45:58.5481377Z ok   2e G6-3 prose probe `see run 7 files` (1-2 digit rule vs ASCII word) must PASS (no finding)
+    2026-10-10T21:45:58.5481869Z ok   2e G6-3 prose probes are load-bearing: the same digit runs DO fail when token-final
+    2026-10-10T21:45:58.5482436Z ok   2f G6-3 leading-boundary probe `rerun 1234` (ASCII letter immediately before `run`) must PASS (no finding)
+    2026-10-10T21:45:58.5483121Z ok   2f G6-3 leading-boundary probe `The harness will rerun 1234.` (word-embedded `run` inside a prose sentence) must PASS (no finding)
+    2026-10-10T21:45:58.5483908Z ok   2f G6-3 leading-boundary probe `在run 1234` (CJK ideograph glued to the FRONT of `run`) must PASS (no finding)
+    2026-10-10T21:45:58.5484543Z ok   2f G6-3 leading-boundary probe `prerun 12` (ASCII-letter prefix on the 1-2 digit rule) must PASS (no finding)
+    2026-10-10T21:45:58.5485237Z ok   2f G6-3 leading-boundary probe `rerun <RUN_ID>` (placeholder rule carries the leading guard too (NF-2 consistency)) must PASS (no finding)
+    2026-10-10T21:45:58.5485958Z ok   2f G6-3 leading-boundary probe `prerun TBD` (word-placeholder rule carries the leading guard too) must PASS (no finding)
+    2026-10-10T21:45:58.5486537Z ok   2f G6-3 still-judged probe `see run 1234` (token-final 3-8 digit id mid-prose) must FAIL
+    2026-10-10T21:45:58.5487166Z ok   2f G6-3 still-judged probe `（run 1234）` (id wrapped in CJK parentheses) must FAIL
+    2026-10-10T21:45:58.5487820Z ok   2f G6-3 still-judged probe ``run 1234`` (backticked malformed id) must FAIL
+    2026-10-10T21:45:58.5488141Z ok   2f G6-3 still-judged probe `run 1234。` (id terminated by CJK punctuation) must FAIL
+    2026-10-10T21:45:58.5489343Z ok   2f G6-3 still-judged probe `run 111` (3-digit id at end of line) must FAIL
+    2026-10-10T21:45:58.5489858Z ok   2f G6-3 still-judged probe `run TBD` (word placeholder at end of line) must FAIL
+    2026-10-10T21:45:58.5490154Z ok   2f G6-3 still-judged probe `see run TBD here` (word placeholder mid-prose) must FAIL
+    2026-10-10T21:45:58.5490489Z ok   2f G6-3 word-followed exemption `run 1234 times` (digit run followed by an ASCII word) must PASS (no finding)
+    2026-10-10T21:45:58.5491600Z ok   2f G6-3 word-followed exemption `连续 run 12 次` (digit run followed by a CJK word) must PASS (no finding)
+    2026-10-10T21:45:58.5492024Z ok   2f G6-3 word-followed exemption ``run 1234 times`` (BACKTICKED digit run still followed by a word (NF-1 prose correction)) must PASS (no finding)
+    2026-10-10T21:45:58.5492500Z ok   2f G6-3 glued-form consequence `run 1234times` (no separator before the trailing ASCII word) must PASS (documented, not a defect)
+    2026-10-10T21:45:58.5492986Z ok   2f G6-3 glued-form consequence `run 12345678次` (no separator before the trailing CJK word) must PASS (documented, not a defect)
+  base-gate lines (9): 2026-10-10T21:44:53.2695664Z ##[group]Run go build ./... | 2026-10-10T21:44:53.2695892Z ^[[36;1mgo build ./...^[[0m | 2026-10-10T21:44:59.1919935Z ##[group]Run go vet ./...
