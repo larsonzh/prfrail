@@ -77,7 +77,7 @@ F-1 注记采引用块形态；F-2 指针措辞（**用户已裁定在 ⑧b 改�
 
 ## 10. ⑧c 收尾清洁记录
 
-全仓逐文件编码核验（`git ls-files`，3434 件 = 文本 3345 ＋ 二进制 89）⇒ **非冻结树违规 0**，冻结证据树 9 件按 §5.1 的 ⑧c 豁免单列（B2 的 `.raw.txt` CRLF 1 件、B3b 的 `pin.json` BOM 2 件、`glm-eval/archive` 6 件）；`gate.js --all --scope=tree` 与 `--scope=index` 双作用域 `TOTAL_FAIL=0`；`--selftest` PASS 335/335；残留核对 = 仅 `tmp/prg/` 的过程件（已列入本报告围栏 `local-only`），无未声明残留。
+全仓逐文件编码核验（`git ls-files`，3434 件 = 文本 3345 ＋ 二进制 89）⇒ **非冻结树违规 0**，冻结证据树 9 件按 §5.1 的 ⑧c 豁免单列（B2 的 `.raw.txt` CRLF 1 件、B3b 的 `pin.json` BOM 2 件、`glm-eval/archive` 6 件）；`gate.js --all --scope=tree` 与 `--scope=index` 双作用域 `TOTAL_FAIL=0`；`--selftest` PASS 335/335；残留核对 = 仅 `tmp/prg/` 的过程件（已列入本报告围栏 `local-only`），无未声明残留。**提交与 CI**：commit `89f63f1`（推送范围 `4fc1117..89f63f1`）已推 `origin/main`（**未推 gitee**）；CI run `38368822132`（head `89f63f1`）**首跑双绿** —— ubuntu 2m33s / windows 2m59s，两腿 `Gates` 实测 `SELFTEST: PASS 335/335`、`GATE REPORT scope=ci changed=5`、`TOTAL_FAIL=0`，ubuntu 腿另跑 Contract fixtures 并由 Go 包级 `ok` 行佐证；dispatch 专用三作业 skipped（常态）。
 
 ## 11. 成本与计量
 

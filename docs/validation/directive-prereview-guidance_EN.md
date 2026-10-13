@@ -77,7 +77,7 @@ F-1 the note uses the blockquote form; F-2 the pointer wording (**the user has r
 
 ## 10. ⑧c wrap-up cleanup record
 
-Repository-wide per-file encoding verification (`git ls-files`, 3434 entries = 3345 text plus 89 binary) ⇒ **0 violations outside the frozen evidence tree**, with 9 frozen-tree files listed separately under the §5.1 ⑧c exemption (one `.raw.txt` CRLF in B2, two `pin.json` BOM in B3b, six under `glm-eval/archive`); `gate.js --all --scope=tree` and `--scope=index` both `TOTAL_FAIL=0`; `--selftest` PASS 335/335; residue check = only the `tmp/prg/` process files (already declared `local-only` in this report's fence), no undeclared residue.
+Repository-wide per-file encoding verification (`git ls-files`, 3434 entries = 3345 text plus 89 binary) ⇒ **0 violations outside the frozen evidence tree**, with 9 frozen-tree files listed separately under the §5.1 ⑧c exemption (one `.raw.txt` CRLF in B2, two `pin.json` BOM in B3b, six under `glm-eval/archive`); `gate.js --all --scope=tree` and `--scope=index` both `TOTAL_FAIL=0`; `--selftest` PASS 335/335; residue check = only the `tmp/prg/` process files (already declared `local-only` in this report's fence), no undeclared residue. **Commit and CI**: commit `89f63f1` (push range `4fc1117..89f63f1`) has been pushed to `origin/main` (**gitee not pushed**); CI run `38368822132` (head `89f63f1`) was **green on its first run** - ubuntu 2m33s / windows 2m59s, with the `Gates` step on both legs reading `SELFTEST: PASS 335/335`, `GATE REPORT scope=ci changed=5` and `TOTAL_FAIL=0`; the ubuntu leg also ran the Contract fixtures, corroborated by package-level Go `ok` lines; the three dispatch-only jobs were skipped (normal).
 
 ## 11. Cost and metering
 
