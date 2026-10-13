@@ -68,3 +68,10 @@ tmp/aw/pack.js	local-only
 - 围栏：报告对自带 `artifacts` 围栏，15 条全部可解析（G7-a / G7-b 判 PASS）。
 - 残留：`tmp/aw/` 过程件已清除；未跟踪残留 0。
 - 如实登记：本节写入后报告对再被编辑一次（⑧c 读数回写，依 v1.29 的 A-9 先例）；其后的终局复跑读数见 ⑩ 停点回执。
+
+## 8. 提交与 CI
+
+- 提交：`e7a9bbd`（`docs(t028): resolve AT-24 wording conflicts and record the C-11 fixture drift`；9 文件 `+178/−8`）。
+- 推送：`origin/main`，范围 `65e8478..e7a9bbd`（**未推 gitee**）。
+- CI：run `38467481086`（head `e7a9bbd`）**首跑双腿全绿**（Ubuntu 2m37s / Windows 4m12s）；两腿 `SELFTEST: PASS 335/335`、`GATE REPORT scope=ci changed=9`、`TOTAL_FAIL=0`；包级 `go test` ok 14 / FAIL 0；目标包 ok 行 10 条、总 ok 30；**未触发 §6.4**。
+- 本节由 CI 双绿后的 docs-only 提交补入（§11.2）；该回填提交自身的 CI run 只作观察记录。

@@ -68,3 +68,10 @@ tmp/aw/pack.js	local-only
 - Fence: the report pair carries an `artifacts` fence whose 15 rows all resolve (G7-a / G7-b rule PASS).
 - Residue: this slice's `tmp/aw/` process artifacts are removed; untracked residue 0.
 - Truthful registration: this report is edited once more after §7 is written (⑧c readings written back, per the v1.29 A-9 precedent); the later final re-run readings are in the ⑩ stop-point receipt.
+
+## 8. Commit and CI
+
+- Commit: `e7a9bbd` (`docs(t028): resolve AT-24 wording conflicts and record the C-11 fixture drift`; 9 files, `+178/-8`).
+- Push: `origin/main`, range `65e8478..e7a9bbd` (**gitee not pushed**).
+- CI: run `38467481086` (head `e7a9bbd`) was **green on the first run on both legs** (Ubuntu 2m37s / Windows 4m12s); both legs `SELFTEST: PASS 335/335`, `GATE REPORT scope=ci changed=9`, `TOTAL_FAIL=0`; package-level `go test` ok 14 / FAIL 0; 10 target-package ok lines, 30 ok lines in total; **§6.4 not triggered**.
+- This section is added by the docs-only commit after CI went doubly green (§11.2); the CI run of that backfill commit itself is observation-only.
