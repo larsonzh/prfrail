@@ -51,7 +51,7 @@ AT 编号代表测试组，不是已存在的测试函数。每组必须拆正/�
 | AT-21 | REQ-019/025/028 | PC-06：闭包缺对象/活动写者/未知格式阻断；新 store 恢复验证，原件不变；卸载保留证据/共享工具，删除确认与保留冲突，离线撤销状态 unknown | snapshot/evidence/release；T024 |
 | AT-22 | REQ-006/007/008/009/016/021/023/024/025/027 | 仅结构化请求可进入 WAITING_FOR_OPERATOR；TUI 展示允许响应并拒绝错主体/attempt/context hash、陈旧/重复响应；超时/断线/持久化失败保持暂停，重启重建待办；同 conversationId/新 requestId 恢复；人工写入走 handoff，secret-direct 不入模型/证据；没有 `@sbr-review` 仍可闭环 | adapters/chain/console/evidence；T025 |
 | AT-23 | REQ-006/007/008/009/016/023/024/025/026 | fake AgentRunner 契约与真实固定 CLI 能力探针；隔离 workspace 工具迭代，记录版本/配置/session/process/events/logs/usage；超时、日志缺失、停机或恢复不明暂停；Agent 退出 0 后仍重扫并独立 gates/review | adapters/guard/chain/evidence；T026/T027 |
-| AT-24 | REQ-007/009/021/023/024/025/026/027 | visible 黑箱模式启动前显示并持久化绑定风险确认；只在隔离 workspace，投递不等于完成；显式归还后全量 manifest/diff、范围/秘密/文件/副作用扫描及独立 gates/review；未确认、断线、未知进程/费用/外部副作用阻断，报告标记 reduced/unknown 且禁止自动降级 | console/adapters/chain/guard/evidence；T028 |
+| AT-24 | REQ-007/009/021/023/024/025/026/027 | visible 黑箱模式启动前显示并持久化绑定风险确认；只在隔离 workspace，投递不等于完成；显式归还后全量 manifest/diff、范围/秘密/文件/副作用扫描及独立 gates/review；未确认、断线与可检测的未知进程/费用/外部副作用阻断，原理不可观测者标 unknown，报告标记 reduced/unknown 且禁止自动降级 | console/adapters/chain/guard/evidence；T028 |
 
 AT-16–AT-21 是 RFC §19 的 S1 最小验收，AT-22 是 AI/操作员交互，AT-23 是 AgentRunner 完整执行保证，AT-24 是受监督黑箱候选的降级保证。均先用无付费调用的确定性夹具；真实宿主/模型调用另授权。S0 T002/T003 只冻结记录和正反样例，不能将解析通过报成运行验证；T018 汇总全部 24 组结果。US7–US11 覆盖初次试用、交付、撤销、停用恢复和黑箱候选，收益指标用本地记录验证，不预设节省比例。
 

@@ -472,21 +472,22 @@ Boundaries: this is a follow-up platform slice and must not rewrite the Windows 
 >
 > **Authority note**: the two rules in this section are **execution discipline** (per the category test in `DELIVERY_DIRECTIVE.md` §0.1); their **authority rests with `docs/DELIVERY_DIRECTIVE.md` §1.8**, and this copy is a **convenience copy in the temporary ledger** kept close to the point of use, so the directive prevails if the two ever conflict.
 
-### P1 — `AT24-WORDING` · ⬜
+### P1 — `AT24-WORDING` · ✅
 
 Sources: `docs/validation/t028-supervised-black-box.md:140` (the AT-24 clause "blocks" conflicts with §8 of the design document; the user ruled §8 authoritative and that the wording clarification moves to a later documentation slice, promoted to the next slice), its `:147` and `:192` (candidate C-11 folded into that slice), `:202` (priority restated); `docs/TEST_STRATEGY.md:54` (the AT-24 row carries the same wording ⇒ fix in the same pass); `docs/DEV_PLAN.md:113` already carries the (b)/(c) ruling qualifier and **needs no change**; the slice name is ruled by the user on 2026-10-13.
 
 | Field | Content |
 |---|---|
 | Identity | `AT24-WORDING` (replaces the informal `AT24-DOC`) |
+| Status | ✅ **complete** (report in docs/validation/at24-wording{,_EN}.md; in progress before ⑩, flipped by ⑧b) |
 | Goal | Remove the AT-24 wording conflict under the user ruling (reading §8 of the design document as authoritative) and land the C-11 fixture version-drift note |
 | Dependencies | none |
 | Size | S (`.md` only) |
-| Steps | ② documentation → ③ consistency check → ④ gates → ⑤ → ⑥ → ⑦ → ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| Steps | step 0 → ① → ② → ③ → ④ → ⑤ → ⑥ → ⑦ → ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
 | Current gap | `t028-supervised-black-box.md:140` states the wording clarification is carried by a later documentation slice, yet it is registered as no OB and has no formal slice name ⇒ on a literal reading the conflict is Critical with no carrier |
 | Deliverables | the matching paragraphs of `docs/validation/t028-supervised-black-box{,_EN}.md`; the report pair `docs/validation/at24-wording{,_EN}.md`; the AT-24 row of `docs/TEST_STRATEGY{,_EN}.md`; this ledger's status line |
 | Acceptance evidence | ① no unconditional "AT-24 fully closed" anywhere; ② the C-11 note is mechanically assertable; ③ no knock-on inconsistency in `TEST_STRATEGY{,_EN}.md`; ④ `gate.js --all` green in all three scopes |
-| Boundaries | the AT-24 acceptance conclusion is unchanged (wording only); CONTRACTS / schema / fixtures unchanged; the historical conclusion lines of the T028 report are unchanged (clarification or the conflicting sentence only); no push to gitee |
+| Boundaries | the AT-24 acceptance conclusion is unchanged (wording only); CONTRACTS / schema / fixtures unchanged; the historical conclusion lines of the T028 report are unchanged (clarification or the conflicting sentence only); no push to gitee; the directive body is unchanged (§2.2 / §2.4 / §5.2 / §7.5 / §6.3) |
 | Tier | `[SLICE]` (touches a documentation conclusion) |
 | Probe budget | none |
 | Execution-freedom list path | `docs/validation/evidence/AT24-WORDING-freedom-list.md` |

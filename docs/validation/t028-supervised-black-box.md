@@ -138,6 +138,7 @@
 
 - **D-18 已知边界**：`prfrail supervised` 的**真实 CLI 端到端在本片不可达**，受两道独立 fail-closed 边界所限：① 可见通道为 `unavailableVisibleClient` 占位；② 装配不提供 hook 定义来源，而 schema 强制 `hooksAfterReturn` 非空 ⇒ 任何 `supervised return --complete` 均以 `ErrSupervisedGateUnavailable` 拒绝。**如实结论：本片不是可运行发布**，真实端到端依赖 **T027-B** 接线。
 - **(b) 条件闭合（措辞冲突）**：AT-24 子句「未知进程 / 费用 / 外部副作用**阻断**」与设计书 §8 的「可检测 ⇒ 阻断；原理不可观测 ⇒ 标 `unknown`」冲突；用户已裁定以 §8 读法为权威、措辞澄清**改由下一篇文档片**承担（优先级已提升为**下一片**）。**在字面读法下该条为 Critical**，报告不得写无条件的「AT-24 全闭」。
+- **（AT24-WORDING 更正注记）**：本行是更正注记，不改 (b) 原句——原句按 §11.1 保留。AT-24 子句的措辞澄清已由切片 `AT24-WORDING` 完成：`docs/TEST_STRATEGY{,_EN}.md` 的 AT-24 所在行现按设计书 §8 读法表述为「可检测者阻断；原理不可观测者标 `unknown`」，验收结论仍为**条件闭合（(b)）**，本报告其余结论行不变。
 - **(c) 条件闭合（范围扫描为近似）**：`AllowedTargets` 是 target 注册表 ID，其路径 glob 存于 `target.schema.json`，而链定义与控制台配置**均不携带该表** ⇒ glob 级比对超出 `internal/console/**` 边界；本片以「工作区包含 + 空 allow-list fail-closed」为判据，登记为已知边界（候选 **C-10**）。
 - **L-2 登记边界（摘要无边界标记）**：`supervisedHandoffPolicyHash` 以 `\n` 连接各部件后取摘要、**无字段 / 列表边界标记** ⇒ 跨相邻列表边界搬移元素可与原值碰撞；**无执法旁路**（守卫生效后运行时采用快照策略）⇒ 仅弱化检测。处置 = 登记 (b) + 候选 **C-12**。
 - **可达性边界（D-12 / D-13）**：file-type 守卫只能以进程内构造的 manifest 触达；`ErrSupervisedScopeUnderivable` 经生产入口会被 `chain.New` **更早**以 `ErrInvalidDefinition` 拒（更严非更松）⇒ 双层断言。
@@ -145,6 +146,7 @@
 - **链接腿无本地红证**：`allows` 的链接解析逃逸分支在本机恒 SKIP（需符号链接权限）⇒ 其证据依赖具备链接权限的宿主或 CI 腿。
 - **C-13 / C-14 已登记**：C-13 = `complete` 在 `abort` 后仍可覆写 store-local 工件（**预存在**，链状态不受影响）；C-14 = 守卫冻结 policy 内的 hook ID，而 hook **定义**由调用方在归还时提供（当前 fail-closed 下不可达）⇒ 必须作为 T027-B 的输入。
 - **C-11 已知时差**：`testdata/contracts/valid/runtime-records.json` 中本片自产的确认夹具 `riskNoticeVersion: 1`，而生产常量已为 `2` ⇒ schema 合法但与当前语义有时差，按 ⑤ 建议并入 AT-24 措辞文档片处理。
+- **（AT24-WORDING 更正注记）**：C-11 的说明已由切片 `AT24-WORDING` 落盘——`testdata/contracts/valid/runtime-records.json` 的确认夹具 `riskNoticeVersion: 1` 与生产常量 `2`（`internal/chain/supervised_blackbox.go` 的 `SupervisedRiskNoticeVersion`）的版本漂移**保持原样**：本片边界禁止改 fixtures，故只在本报告如实登记、不改该文件；后续对齐该夹具须另立切片并走协议先行。
 - **⑥ 的采信边界**：⑥ 的最终 `PASS` **不覆盖**「冻结策略一致性」维度（该维度由 ⑦ 盲审独立发现、②b-7 修复）⇒ 不得读作 ⑥ 独立证实了该修复。
 
 ## 9. 明确未执行事项

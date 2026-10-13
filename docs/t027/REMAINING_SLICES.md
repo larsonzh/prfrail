@@ -486,21 +486,22 @@ A6 ② 进度（第 2 批，2026-09-15）：
 >
 > **权威注记**：本节两条规则属**执行纪律**（依 `DELIVERY_DIRECTIVE.md` §0.1 的类别判定标准），其**权威以 `docs/DELIVERY_DIRECTIVE.md` §1.8 为准**；本处登记为**临时台账就近可读**，若与准则冲突以准则为准。
 
-### P1 — `AT24-WORDING` · ⬜
+### P1 — `AT24-WORDING` · ✅
 
 来源引用：`docs/validation/t028-supervised-black-box.md:140`（AT-24 子句「阻断」与设计书 §8 读法冲突；用户裁定 §8 为权威、措辞澄清改由后续文档片承担并把优先级提升为下一片）、同文 `:147` 与 `:192`（候选 C-11 并入该片）、`:202`（优先级重述）；`docs/TEST_STRATEGY.md:54`（AT-24 所在行同含该措辞 ⇒ 连带修正）；`docs/DEV_PLAN.md:113` 已带 (b)/(c) 裁定限定、**无需改动**；用户 2026-10-13 裁定片名。
 
 | 字段 | 内容 |
 |---|---|
 | 标识 | `AT24-WORDING`（替代非正式称呼 `AT24-DOC`） |
+| 状态 | ✅ **已完成**（报告见 docs/validation/at24-wording{,_EN}.md；⑩ 前为进行中，由 ⑧b 翻定） |
 | 目标 | 按用户裁定消除 AT-24 措辞冲突（以设计书 §8 读法为权威），并落地 C-11 的夹具版本漂移说明 |
 | 依赖 | 无 |
 | 规模 | S（纯 `.md`） |
-| 步骤 | ② 文档实现 → ③ 一致性检查 → ④ 门禁 → ⑤ → ⑥ → ⑦ → ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| 步骤 | 步骤 0 → ① → ② → ③ → ④ → ⑤ → ⑥ → ⑦ → ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
 | 现状缺口 | `t028-supervised-black-box.md:140` 明写该措辞澄清由后续文档片承担，但既未登记为 OB、也未立正式片名 ⇒ 在字面读法下该冲突为 Critical 却无承载片 |
 | 交付物 | `docs/validation/t028-supervised-black-box{,_EN}.md` 的对应段落；`docs/validation/at24-wording{,_EN}.md` 报告对；`docs/TEST_STRATEGY{,_EN}.md` 的 AT-24 所在行；本台账状态行 |
 | 验收证据 | ① 全文不出现无条件的「AT-24 全闭」；② C-11 说明可机械断言；③ `TEST_STRATEGY{,_EN}.md` 无连带不一致；④ `gate.js --all` 三作用域全绿 |
-| 边界 | 不改 AT-24 的验收结论（仅措辞）；不改 CONTRACTS / schema / fixtures；不改 T028 报告的历史结论行（仅加澄清或改冲突句）；不推 gitee |
+| 边界 | 不改 AT-24 的验收结论（仅措辞）；不改 CONTRACTS / schema / fixtures；不改 T028 报告的历史结论行（仅加澄清或改冲突句）；不推 gitee；不改准则本体（§2.2 / §2.4 / §5.2 / §7.5 / §6.3） |
 | 分级 | `[SLICE]`（触文档结论表述） |
 | 探针额度 | 无 |
 | 执行自由度清单落盘路径 | `docs/validation/evidence/AT24-WORDING-freedom-list.md` |
