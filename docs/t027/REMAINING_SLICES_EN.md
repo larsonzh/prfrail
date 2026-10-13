@@ -50,7 +50,7 @@
 | B4 AT-23 E2E evidence + independent review | ✅ Complete (`e8cbff6`; CI run `35812311023` green on both legs, with the `Gates` step really executing on both) | A5, A6, B1, B2, B3b, B3c | L | 2026-09-23 | **AT-23 is not passed** (the real AI candidate leg is unreachable, see OB-21); `docs/validation/t027-at23-e2e.md`, `tools/b4-e2e/` |
 | C1 Linux AgentRunner native validation | ⬜ Not started | B4 (Windows T027 complete) | M | | |
 
-Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked
+Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
 ## Dependency graph
 
@@ -466,6 +466,23 @@ Boundaries: this is a follow-up platform slice and must not rewrite the Windows 
 > This section registers the batch candidates after the T027 main line (A0–A7 / B1–B4 / C1); the fields and their order follow `DELIVERY_DIRECTIVE.md` §1.2 item by item, and every entry must cite its source.
 > Status symbols are as in this file's "status table"; this section is **not folded into** the T027 required-size counts.
 
+> **Pending-evaluation item handling rule**: a pending-evaluation item **cannot be started directly** (§1.2 requires the full field table, while such an item carries only three fields). On reaching one:
+>
+> 1. first run an **evaluation action** (`[ROUTINE]` or a light `[SLICE]`), producing: ① whether the item holds; ② if it holds, whether it becomes a standalone slice, is merged, or is not established; ③ if a slice is established, the remaining §1.2 fields;
+> 2. then branch on the outcome: **holds** ⇒ upgrade to the formal slice format (it may then be started normally); **does not hold** ⇒ append "evaluated + reason + date + report path" inside the pending-evaluation row and **keep the row**.
+> The conclusion may be "no slice" - that is itself a valuable output.
+>
+> **Exception**: when the user supplies the complete §1.2 field set, the evaluation may be skipped and the item upgraded straight to a formal slice.
+
+> **Registration split rule (user ruling 2026-10-14)**:
+>
+> - **Tasks** (coarse-grained; carrying REQ mappings and AT acceptance ids) ⇒ when added they **must** first be registered in `DEV_PLAN{,_EN}.md` (the P1.x sections), and **slice breakdown may start only after that registration**;
+> - **Slices** (fine-grained; the §1.2 field table; independently startable) ⇒ when added they **must** be registered in the "later batch slices" section of `REMAINING_SLICES{,_EN}.md`;
+> - **When a task cannot be completed directly and needs slices**: register on both sides; the slice entry must **point back** to the DEV_PLAN task id, and the task entry must list **its slice list**;
+> - **Exception**: pure `[ROUTINE]`-tier work (no rule change, no contract change, no production-code change) does not enter these ledgers.
+
+> **Authority note**: the "pending-evaluation item handling rule" and the "registration split rule" in this section are **execution discipline** (per the category test in `DELIVERY_DIRECTIVE.md` §0.1); their **authority rests with `docs/DELIVERY_DIRECTIVE.md`**, and this copy is a **convenience copy in the temporary ledger** kept close to the point of use, so the directive prevails if the two ever conflict. The **formal promotion** of both rules (moving them into `DELIVERY_DIRECTIVE.md`) is left to a later slice.
+
 ### P1 — `AT24-WORDING` · ⬜
 
 Sources: `docs/validation/t028-supervised-black-box.md:140` (the AT-24 clause "blocks" conflicts with §8 of the design document; the user ruled §8 authoritative and that the wording clarification moves to a later documentation slice, promoted to the next slice), its `:147` and `:192` (candidate C-11 folded into that slice), `:202` (priority restated); `docs/TEST_STRATEGY.md:54` (the AT-24 row carries the same wording ⇒ fix in the same pass); `docs/DEV_PLAN.md:113` already carries the (b)/(c) ruling qualifier and **needs no change**; the slice name is ruled by the user on 2026-10-13.
@@ -554,6 +571,36 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | OB-73 (`:928`) | **merged into P2** | its own disposition row says "evaluated together with the `GATES-TIGHTEN` family"; its candidate remedy would also touch G3(a.2) in §6.3, a section this slice may not change |
 | OB-75 (`:930`) | **must be split out** | it calls itself "an identified blind spot (not a defect)"; the remedy lies in operator-side observability and cannot be closed by a `.md` edit |
 | OB-77 (`:932`) | **must be split out** | its own conclusion is "worth a separate slice, low priority"; its criterion form is a new §6.3 soft-scan criterion |
+
+### P5 — `T027-B` · ⏸ Pending evaluation (product side)
+
+**Pending-evaluation item** (not a formal slice; fields follow §1.2, limited to "identity / source / goal").
+
+| Field | Content |
+|---|---|
+| Identity | `T027-B` |
+| Source | `docs/DEV_PLAN.md:145` (the T027-section pending-evaluation entry) + `docs/DELIVERY_DIRECTIVE.md:910` (OB-55) + `docs/validation/t028-supervised-black-box.md:140` (the D-18 known boundary) |
+| Goal | land enforcement in production (segment B); no design conclusion yet ⇒ no formal slice. **This item is a pointer** (same origin as OB-55 and `DEV_PLAN.md:145`; it adds no fact) |
+
+### P6 — `S1-EXIT-DOC` close-out checklist · ⏸ Pending evaluation (product side)
+
+**Pending-evaluation item** (not a formal slice; fields follow §1.2, limited to "identity / source / goal").
+
+| Field | Content |
+|---|---|
+| Identity | `S1-EXIT-DOC` |
+| Source | `docs/DEV_PLAN.md:95` (the four remaining gates) + `:93` (T018 status and gaps) + `:91` (the T018 deliverable `docs/validation/s1-exit.md`) + this file's `:448` and `:455` |
+| Goal | turn the remaining T018 gates (AT-24 / final ZIP binding and re-verification / EOL notification channel / product-owner S1-exit approval) from a status item into a **close-out checklist**, listing each gate's dependencies and unlock conditions; **it is not itself a slice** (**pointer** nature, same origin as `DEV_PLAN.md:93` and `:95`) |
+
+### P7 — Split-out OB roll-up · ⏸ Pending evaluation (governance side)
+
+**Pending-evaluation item** (not a formal slice; fields follow §1.2, limited to "identity / source / goal").
+
+| Field | Content |
+|---|---|
+| Identity | none (a governance-side roll-up with no formal slice name) |
+| Source | `docs/DELIVERY_DIRECTIVE.md:923` (OB-68) + `:930` (OB-75) + `:932` (OB-77) + `:860` (OB-13) + `:903` (OB-48) |
+| Goal | collect the five OBs split out of P2 / P4 as one independent pending-evaluation item; each split-out reason is recorded in the P2 and P4 rows, and **is not repeated here** |
 
 ---
 
