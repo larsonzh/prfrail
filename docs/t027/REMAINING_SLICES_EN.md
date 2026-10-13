@@ -610,6 +610,24 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Probe budget | none |
 | Execution-freedom list path | `docs/validation/evidence/DIRECTIVE-LEDGER-DISCIPLINE-freedom-list.md` |
 
+### P9 — `DIRECTIVE-SCAN-TEMPLATE` · ✅
+
+| Field | Content |
+|---|---|
+| Identity | `DIRECTIVE-SCAN-TEMPLATE` (v1.31) |
+| Status | ✅ **complete** (report in docs/validation/directive-scan-template{,_EN}.md; in progress before ⑩, flipped by ⑧b) |
+| Goal | harden the ⑥ independent-scan prompt template in appendix B.6: Section A–E front-loaded with each section's content stated, a verdict-line ↔ Section B consistency hard constraint, and an explicit `UNCOVERED` registration (not counted as findings, does not affect the verdict line) |
+| Dependencies | none |
+| Size | S (`.md` only) |
+| Steps | step 0 → ① → ② → ③ → ④ → ⑤ → ⑥ → ⑦ → ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| Current gap | the ⑥ layer produced output problems in three consecutive slices (B3c had no Section A–E; v1.30 produced no SCAN verdict line; AT24-WORDING was format-compliant but its verdict line contradicted its body); the ⑥ template in appendix B.6 constrains the output contract too weakly (only "per Section A–E" at the end) |
+| Deliverables | the rewritten ⑥ part of appendix B.6 + the v1.31 row in §0.3 + appendix C.0s + the report pair + the P9 status row in this table |
+| Acceptance evidence | ① the ⑥ part of B.6 carries Section A–E (five rows) + the verdict-line consistency hard constraint + the `UNCOVERED` sentence; ② B.6 matches §7.2.2 item by item (no new contract semantics); ③ CN / `_EN` five-shape equality; ④ `gate.js --all` `TOTAL_FAIL=0` in all three scopes with `SELFTEST` 335/335 |
+| Boundaries | unchanged §7.2.1 three conditions; unchanged §7.2.2 output-contract body; unchanged §7.2.3; unchanged role set and carriers; unchanged §2.2 / §2.4 / §5.2 / §7.5 / §6.3; unchanged schema/fixtures/workflows; no change under `internal/**`; no gitee push |
+| Tier | `[SLICE]` (touches execution-discipline semantics - the review-layer output contract) |
+| Probe budget | none |
+| Execution-freedom list path | `docs/validation/evidence/DIRECTIVE-SCAN-TEMPLATE-freedom-list.md` |
+
 ---
 
 ## Known defects (to be handled before later slices)

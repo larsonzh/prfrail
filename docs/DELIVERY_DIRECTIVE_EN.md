@@ -1,6 +1,6 @@
 ﻿# ProofRail Delivery Execution Directive (DELIVERY_DIRECTIVE)
 
-Version: v1.30. Date: 2026-10-14. Status: **CN body frozen** ( `_EN` mirror in `docs/DELIVERY_DIRECTIVE_EN.md`).
+Version: v1.31. Date: 2026-10-14. Status: **CN body frozen** ( `_EN` mirror in `docs/DELIVERY_DIRECTIVE_EN.md`).
 
 > **Multilingual note**: this file is a strict positional mirror of the CN body, maintained in step with it (updated after CN is frozen, to avoid bilingual rework during review); `docs/DELIVERY_DIRECTIVE.md` is authoritative and wins on any conflict (see §11.1).
 > **Encoding**: this document and its `_EN` mirror must stay UTF-8 **with BOM** + **LF**.
@@ -74,6 +74,7 @@ Version: v1.30. Date: 2026-10-14. Status: **CN body frozen** ( `_EN` mirror in `
 | v1.28 | 2026-10-12 | **Observation registration (closeout of a user-run manual experiment; same-turn user authorisation 2026-10-12)**: §12.4 registers **OB-87** (a ⑤ model-cost comparison data point: on the same input the ⑤ preferred `GLM-5.3 (glm)` is consistently 4–10x the DeepSeek side, with no stable ordering between the two DeepSeek models; "prompt guidance" is the only observation crossing a severity tier) and **OB-88** (**reserved for project initiation** of a "⑤ pre-review guidance clause" candidate slice, suggested name `DIRECTIVE-PREREVIEW-GUIDANCE`); §12.5 gains one gap row, "⑤ pre-review lacks a 'minimum verification actions' clause". **No new criterion, no rule-semantics change, no change to the §6.3 criterion scope, no change to §2.2 / §2.4 / §5.2 / §7.5**. This row is the closeout registration of a **user-run manual experiment** and is not a standalone directive-governance slice. | None (this registration creates no in-flight slice) |
 | v1.29 | 2026-10-13 | **Slice `DIRECTIVE-PREREVIEW-GUIDANCE` landed (user initiation 2026-10-12 plus item-by-item user rulings 2026-10-13)**: ① a new `**4.2.1 预审员的最低核验动作（五条）**` subsection after the §4.2 table, with the pre-reviewer row's "Prohibited" cell turned into a pure pointer and a new `**4.2.2 预审员的禁止项（权威措辞）**` subsection (distinguishing "reading to verify claims" from "using artifacts themselves to judge implementation correctness"); ② the Critical / High rows of §4.3 each gain a rating criterion plus a new `> **定级边界注记**` paragraph after the table; ③ the Appendix B.5 prohibited line is synchronized to the same core wording string; ④ §12.4's OB-88 disposition cell gains a landing note, OB-87 gains the n=2 data point, and OB-89 is added (the pilot deferral continues for the 7th time, with the four OB-37 meta-rule elements); ⑤ appendix C gains C.0q. **No new G criterion is added, the §6.3 criterion body is unchanged, and §2.2 / §2.4 / §5.2 matrix / §7.5 figures are unchanged**. | `DIRECTIVE-PREREVIEW-GUIDANCE` (this slice) |
 | v1.30 | 2026-10-14 | **Slice `DIRECTIVE-LEDGER-DISCIPLINE` landed (pure documentation governance slice, size S)**: ① adds **§1.8 Ledger registration discipline** - the "pending-evaluation item handling rule" and the "registration split rule" are promoted from `docs/t027/REMAINING_SLICES{,_EN}.md` into this directive as the authoritative text (**relocation only, semantics unchanged**; the two rule blocks in that ledger become pointers and keep the authority note); ② appendix C gains C.0r. **Unchanged §2.2 / §2.4 / §5.2 / §7.5 / §6.3; no new criterion; unchanged schema/fixtures/workflows; no change under `internal/**`; unchanged role set.** | `DIRECTIVE-LEDGER-DISCIPLINE` (this slice) |
+| v1.31 | 2026-10-14 | **Slice `DIRECTIVE-SCAN-TEMPLATE` landed (prompt-level hardening of the ⑥ review layer's output contract; size S)**: ① the ⑥ part of appendix B.6 is rewritten - Section A–E **front-loaded** with each section's content stated, and a **verdict-line consistency hard constraint** is added (no finding in Section B ⇒ the verdict line = `INDEPENDENT SCAN: PASS`; a finding ⇒ = `INDEPENDENT SCAN: FINDINGS`) plus an **UNCOVERED sentence** (anchored to Section D; not counted as findings, does not affect the verdict line); ② each item carries a `→§7.2.2-X` mapping annotation, so B.6 remains an **operational restatement** of §7.2.2 and introduces no new contract semantics; ③ appendix C gains C.0s. **Unchanged §7.2.1 three conditions, unchanged §7.2.2 body, unchanged §7.2.3, unchanged §2.2 / §2.4 / §5.2 / §7.5 / §6.3, unchanged role set and carriers, no change under `internal/**`.** | `DIRECTIVE-SCAN-TEMPLATE` (this slice) |
 ---
 
 ## 1. Scope and Slice Model
@@ -1128,6 +1129,15 @@ Role: independent reviewer. Read-only; must not modify, create, or delete any fi
 
 Input: ① slice definition ② the raw diff (**paths**, not paraphrase) ③ the original contract sentences ④ the read-only constraint
      !! ⑦ first round **attaches no** ⑤/⑥ checklist; only a re-review round may attach one, and it must be marked "read only after completing the independent scan".
+⑥ Output contract (five sections front-loaded, Section A–E; sole authoritative definition = §7.2.2, mapped item by item below):
+
+- Section A (→§7.2.2-A): the overall verdict line — `INDEPENDENT SCAN: PASS` or `INDEPENDENT SCAN: FINDINGS` (closed set in §4.1).
+- Section B (→§7.2.2-B): the findings list, each line in the fixed format `SEVERITY | file:line | violated sentence (verbatim quote) | minimal fix`.
+- Section C (→§7.2.2-C): item-by-item evidence and reasoning.
+- Section D (→§7.2.2-D): the falsifiability audit (mandatory) — for each item state “if guard X were deleted, which check/assertion would go red and which would not”, and list the **not-covered invariants** (marked `UNCOVERED`).
+- Section E (→§7.2.2-E): “the parts I cannot verify” ＋ “what would overturn my PASS” (anti-rubber-stamp).
+
+⑥ Verdict-line consistency hard constraint (→§7.2.2-A / §4.1): no finding in Section B ⇒ the verdict line must be `INDEPENDENT SCAN: PASS`; a finding in Section B (any `SEVERITY` row) ⇒ the verdict line must be `INDEPENDENT SCAN: FINDINGS`; `UNCOVERED` and Section E content are not counted as findings and do not affect the verdict line.
 Task: ⑦ four items — security / architectural consistency / completeness / test counterexample review; ⑥ per Section A–E.
 Output: each finding = severity + `file:line` + verbatim quote + rationale + a fix that can be written down directly;
       points that "look like problems but are in fact correct" must explicitly state "checked, not a problem".
@@ -1544,6 +1554,25 @@ The following files **only get a supersede pointer added to the file header and 
 | Probe budget | none |
 | Freedom-list path | `docs/validation/evidence/DIRECTIVE-LEDGER-DISCIPLINE-freedom-list.md` |
 | Note | ⑦ = `GPT-5.3-Codex (copilot)` at the standard Extra High tier (carrying the compensating review under the document-type trim: semantic equivalence + pointer resolvability); F5 adds no new G criterion; ⑥ is mandatory (§7.2 ③ does not hold) |
+
+### C.0s ⑥ scan prompt-template hardening slice `DIRECTIVE-SCAN-TEMPLATE`
+
+**Why necessary**: the ⑥ layer produced output problems in three consecutive slices (B3c had no Section A–E; v1.30 produced no SCAN verdict line; AT24-WORDING was format-compliant but its verdict line contradicted its body); the ⑥ template in appendix B.6 said only "per Section A–E" at the end, which constrains the §7.2.2 output contract too weakly.
+
+| Field | Content |
+|---|---|
+| Identity | `DIRECTIVE-SCAN-TEMPLATE` (v1.31) |
+| Status | ✅ **complete** (report in docs/validation/directive-scan-template{,_EN}.md; flipped by ⑧b) |
+| Goal | ① the ⑥ part of appendix B.6 is rewritten - Section A–E front-loaded with each section's content stated; ② a verdict-line consistency hard constraint is added; ③ an `UNCOVERED` sentence is added (anchored to Section D) |
+| Trigger | the user's 2026-10-14 kickoff message (`[SLICE]`, size S, pure documentation, probes 0; §5.2 takes the document-type trim) |
+| Size | S (`.md` only) |
+| Deliverables | v1.31 of `docs/DELIVERY_DIRECTIVE{,_EN}.md` (appendix B.6 / §0.3 / appendix C.0s); the P9 block and status row of `docs/t027/REMAINING_SLICES{,_EN}.md`; this report pair; the freedom list |
+| Acceptance evidence | `gate.js --all` green in all three scopes + `--selftest` PASS 335/335 + the ⑥ part of B.6 carries Section A–E (five rows) + the verdict-line consistency hard constraint row + the `UNCOVERED` sentence (verbatim-presence assertions) + item-by-item mapping between B.6 and §7.2.2 + CN / `_EN` five-shape equality + version v1.31 consistent with §0.3 (G1-b) |
+| Boundaries | unchanged §7.2.1 three conditions; unchanged §7.2.2 output-contract body (operational restatement only); unchanged §7.2.3; unchanged role set and carriers; unchanged §2.2 / §2.4 / §5.2 / §7.5 / §6.3; unchanged schema/fixtures/workflows; no change under `internal/**` |
+| Tier | `[SLICE]` (touches execution-discipline semantics - the review-layer output contract) |
+| Probe budget | none |
+| Freedom-list path | `docs/validation/evidence/DIRECTIVE-SCAN-TEMPLATE-freedom-list.md` |
+| Note | ⑦ = `GPT-5.3-Codex (copilot)` at the standard Extra High tier (carrying the compensating review under the document-type trim: template ↔ §7.2.2 semantic equivalence); no new G criterion; ⑥ is mandatory (§7.2 ③ does not hold); this slice hardens the prompt level only and has no mechanical criterion backing it |
 
 ### C.1 v3.1 section numbers → this directive
 

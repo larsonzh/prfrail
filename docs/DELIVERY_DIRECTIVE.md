@@ -1,6 +1,6 @@
 ﻿# ProofRail 交付执行准则（DELIVERY_DIRECTIVE）
 
-版本：v1.30。日期：2026-10-14。状态：**CN 正文冻结**（ `_EN` 镜像见 `docs/DELIVERY_DIRECTIVE_EN.md`）。
+版本：v1.31。日期：2026-10-14。状态：**CN 正文冻结**（ `_EN` 镜像见 `docs/DELIVERY_DIRECTIVE_EN.md`）。
 
 > **多语言说明**：本文件为中文权威版；`docs/DELIVERY_DIRECTIVE_EN.md` 为严格同位镜像（与 CN 同步维护；CN 冻结后同步更新，避免评审期双语返工）。
 > **编码**：本文及 `_EN` 必须保持 UTF-8 **with BOM** + **LF**。
@@ -74,6 +74,7 @@
 | v1.28 | 2026-10-12 | **观察项登记（用户手动实验的收尾；用户 2026-10-12 同轮授权）**：§12.4 登记 **OB-87**（⑤ 位模型成本比对数据点：同一输入下 ⑤ 首选 `GLM-5.3 (glm)` 稳定比 DeepSeek 侧贵 4–10 倍，两组模型之间无稳定排序；「提示词引导」是唯一跨严重度层级的观察）与 **OB-88**（「⑤ 位预审引导条款」**立项预留**，建议片名 `DIRECTIVE-PREREVIEW-GUIDANCE`）；§12.5 增一条缺口行「⑤ 预审缺『最低核验动作』条款」。**不新增判据、不改任何规则语义、不改 §6.3 判据作用域、不改 §2.2 / §2.4 / §5.2 / §7.5**。本行是**用户手动实验**的收尾登记，不是独立的准则治理片。 | 无（本次登记不产生在飞切片） |
 | v1.29 | 2026-10-13 | **切片 `DIRECTIVE-PREREVIEW-GUIDANCE` 落地（用户 2026-10-12 立项 ＋ 2026-10-13 逐项裁定）**：① §4.2 表后新增 `**4.2.1 预审员的最低核验动作（五条）**`，预审员行「禁止」单元格改纯指针并新增 `**4.2.2 预审员的禁止项（权威措辞）**`（区分「读取以核验声明」与「以工件本身判断实现正确性」）；② §4.3 的 Critical / High 两行各补定级口径 ＋ 表后新增 `> **定级边界注记**` 段；③ 附录 B.5 禁止行同步为同一核心措辞串；④ §12.4 的 OB-88 处置列补落地注记、OB-87 补 n=2 数据点、新增 OB-89（试点继续顺延第 7 次，OB-37 元规则四要素）；⑤ 附录 C 增 C.0q。**不新增任何 G 判据、不改 §6.3 判据本体、不改 §2.2 / §2.4 / §5.2 矩阵 / §7.5 数值**。 | `DIRECTIVE-PREREVIEW-GUIDANCE`（本片） |
 | v1.30 | 2026-10-14 | **切片 `DIRECTIVE-LEDGER-DISCIPLINE` 落地（纯文档治理片，S 档）**：① 新增 **§1.8 台账登记纪律**——「待评估项处置规则」与「登记分工规则」两条元规则自 `docs/t027/REMAINING_SLICES{,_EN}.md` 升格至本准则为权威文本（**只搬位置、语义不变**；该台账两条规则块改指针、保留权威注记）；② 附录 C 增 C.0r。**不改 §2.2 / §2.4 / §5.2 / §7.5 / §6.3；不新增判据；不改 schema/fixtures/workflows；不动 `internal/**`；不触角色集。** | `DIRECTIVE-LEDGER-DISCIPLINE`（本片） |
+| v1.31 | 2026-10-14 | **切片 `DIRECTIVE-SCAN-TEMPLATE` 落地（⑥ 审查层输出契约的提示词加固；S 档）**：① 附录 B.6 的 ⑥ 部分重写——Section A–E **五段前置**并逐段明确内容，新增**结论行一致性硬约束**（Section B 无发现 ⇒ 结论行 = `INDEPENDENT SCAN: PASS`；有发现 ⇒ = `INDEPENDENT SCAN: FINDINGS`）与 **UNCOVERED 独立句**（锚 Section D；不计入发现数、不影响结论行）；② 各条标注 `→§7.2.2-X` 映射，B.6 仍是 §7.2.2 的**可操作化呈现**、不引入新契约语义；③ 附录 C 增 C.0s。**不改 §7.2.1 三条件、不改 §7.2.2 本体、不改 §7.2.3、不改 §2.2 / §2.4 / §5.2 / §7.5 / §6.3、不改角色集与载体、不动 `internal/**`。** | `DIRECTIVE-SCAN-TEMPLATE`（本片） |
 ---
 
 ## 1. 适用范围与切片模型
@@ -1128,6 +1129,15 @@ tmp/ 内文件按**四类口径**处置；归类与归档动作属于「tmp/ 生
 
 输入：① 切片定义 ② 原始 diff（**路径**，不是转述）③ 契约原句 ④ 只读约束
      ！！⑦ 首轮**不附**任何 ⑤/⑥ 清单；仅复审轮可附，并标注"完成独立扫描后再读"。
+⑥ 输出契约（五段前置，Section A–E；唯一权威定义 = §7.2.2，逐条映射标注如下）：
+
+- Section A（→§7.2.2-A）：总体结论行 —— `INDEPENDENT SCAN: PASS` 或 `INDEPENDENT SCAN: FINDINGS`（闭集见 §4.1）。
+- Section B（→§7.2.2-B）：发现清单，每行固定格式 `SEVERITY | file:line | 被违反的句子（逐字引用） | 最小修复`。
+- Section C（→§7.2.2-C）：逐条证据与推理。
+- Section D（→§7.2.2-D）：可证伪性审计（硬性）—— 逐项给出“若删掉某守卫，哪个检查/断言会红、哪个不会红”，并列明**没有覆盖的不变量**（以 `UNCOVERED` 标注）。
+- Section E（→§7.2.2-E）：“我无法验证的部分” ＋ “什么会推翻我的 PASS”（防橡皮图章）。
+
+⑥ 结论行一致性硬约束（→§7.2.2-A / §4.1）：Section B 无发现 ⇒ 结论行必须为 `INDEPENDENT SCAN: PASS`；Section B 有发现（任一 `SEVERITY` 行）⇒ 结论行必须为 `INDEPENDENT SCAN: FINDINGS`；`UNCOVERED` 与 Section E 内容不计入发现数、不影响结论行。
 任务：⑦ 四项——安全性 / 架构一致性 / 完整性 / 测试反例审查；⑥ 按 Section A–E。
 产出：每条发现 = 严重度 + `file:line` + 逐字引用 + 理由 + 可直接落笔的修法；
       "看似问题实为正确"的点必须显式写「已核查、非问题」。
@@ -1544,6 +1554,25 @@ SLICE: READY_FOR_REVIEW | SLICE: BLOCKED
 | 探针额度 | 无 |
 | 自由度清单路径 | `docs/validation/evidence/DIRECTIVE-LEDGER-DISCIPLINE-freedom-list.md` |
 | 附注 | ⑦ = `GPT-5.3-Codex (copilot)` Extra High 常规档（承担文档型裁剪下的补偿审查：语义等价 + 指针可解析）；F5 不新增 G 判据；⑥ 必（§7.2 ③ 不成立） |
+
+### C.0s ⑥ 扫描提示词模板补强切片 `DIRECTIVE-SCAN-TEMPLATE`
+
+**为何必需**：⑥ 连续 3 片输出问题（B3c 无 Section A–E、v1.30 无 SCAN 结论行、AT24-WORDING 格式合规但结论行与正文矛盾）；附录 B.6 的 ⑥ 模板只在末尾说一句「按 Section A–E」，对 §7.2.2 输出契约的约束不够硬。
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `DIRECTIVE-SCAN-TEMPLATE`（v1.31） |
+| 状态 | ✅ **已完成**（报告见 docs/validation/directive-scan-template{,_EN}.md；由 ⑧b 翻定） |
+| 目标 | ① 附录 B.6 的 ⑥ 部分重写——Section A–E 五段前置并逐段明确内容；② 新增结论行一致性硬约束；③ 新增 `UNCOVERED` 独立句（锚 Section D） |
+| 触发 | 用户 2026-10-14 起跑消息（`[SLICE]`，S 档、纯文档、探针 0；§5.2 走文档型裁剪） |
+| 规模 | S（纯 `.md`） |
+| 交付物 | `docs/DELIVERY_DIRECTIVE{,_EN}.md` 的 v1.31（附录 B.6 / §0.3 / 附录 C.0s）；`docs/t027/REMAINING_SLICES{,_EN}.md` 的 P9 块与状态行；本报告对；自由度清单 |
+| 验收证据 | `gate.js --all` 三作用域全绿 + `--selftest` PASS 335/335 + B.6 的 ⑥ 部分含 Section A–E 五行 + 结论行一致性硬约束行 + `UNCOVERED` 独立句（逐字存在断言） + B.6 与 §7.2.2 逐条映射 + CN / `_EN` 五形状全等 + 版本 v1.31 与 §0.3 一致（G1-b） |
+| 边界 | 不改 §7.2.1 三条件；不改 §7.2.2 输出契约本体（只做可操作化呈现）；不改 §7.2.3；不改角色集与载体；不改 §2.2 / §2.4 / §5.2 / §7.5 / §6.3；不改 schema/fixtures/workflows；不动 `internal/**` |
+| 分级 | `[SLICE]`（触执行纪律语义 —— 审查层输出契约） |
+| 探针额度 | 无 |
+| 自由度清单路径 | `docs/validation/evidence/DIRECTIVE-SCAN-TEMPLATE-freedom-list.md` |
+| 附注 | ⑦ = `GPT-5.3-Codex (copilot)` Extra High 常规档（承担文档型裁剪下的补偿审查：模板 ↔ §7.2.2 语义等价）；不新增 G 判据；⑥ 必（§7.2 ③ 不成立）；本片仅提示词层面加固、无机械判据保障 |
 
 ### C.1 v3.1 节号 → 本准则
 

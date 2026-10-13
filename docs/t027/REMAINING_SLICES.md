@@ -624,6 +624,24 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 探针额度 | 无 |
 | 执行自由度清单落盘路径 | `docs/validation/evidence/DIRECTIVE-LEDGER-DISCIPLINE-freedom-list.md` |
 
+### P9 — `DIRECTIVE-SCAN-TEMPLATE` · ✅
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `DIRECTIVE-SCAN-TEMPLATE`（v1.31） |
+| 状态 | ✅ **已完成**（报告见 docs/validation/directive-scan-template{,_EN}.md；⑩ 前为进行中，由 ⑧b 翻定） |
+| 目标 | 补强附录 B.6 的 ⑥ 独立扫描提示词模板：Section A–E 五段前置并逐段明确内容、结论行与 Section B 一致性硬约束、`UNCOVERED` 显式登记（不计入发现数、不影响结论行） |
+| 依赖 | 无 |
+| 规模 | S（纯 `.md`） |
+| 步骤 | 步骤 0 → ① → ② → ③ → ④ → ⑤ → ⑥ → ⑦ → ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| 现状缺口 | ⑥ 连续 3 片输出问题（B3c 无 Section A–E、v1.30 无 SCAN 结论行、AT24-WORDING 格式合规但结论行与正文矛盾）；附录 B.6 的 ⑥ 模板对输出契约的约束不够硬（只在末尾说一句「按 Section A–E」） |
+| 交付物 | 附录 B.6 的 ⑥ 部分重写 + §0.3 的 v1.31 日志条目 + 附录 C.0s + 报告对 + 本表 P9 状态行 |
+| 验收证据 | ① B.6 的 ⑥ 部分含 Section A–E 五行模板 + 结论行一致性硬约束 + `UNCOVERED` 独立句；② B.6 与 §7.2.2 逐条一致（不引入新契约语义）；③ CN / `_EN` 五形状全等；④ `gate.js --all` 三作用域 `TOTAL_FAIL=0` 且 `SELFTEST` 335/335 |
+| 边界 | 不改 §7.2.1 三条件；不改 §7.2.2 输出契约本体；不改 §7.2.3；不改角色集与载体；不改 §2.2 / §2.4 / §5.2 / §7.5 / §6.3；不改 schema/fixtures/workflows；不动 `internal/**`；不推 gitee |
+| 分级 | `[SLICE]`（触执行纪律语义 —— 审查层输出契约） |
+| 探针额度 | 无 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/DIRECTIVE-SCAN-TEMPLATE-freedom-list.md` |
+
 ---
 ## 已知缺陷（后续切片前处理）
 
