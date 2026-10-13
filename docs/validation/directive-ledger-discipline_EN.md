@@ -68,3 +68,11 @@ Item by item in `docs/validation/evidence/DIRECTIVE-LEDGER-DISCIPLINE-freedom-li
 - Residue: this slice's `tmp/` process artifacts are removed; untracked residue 0.
 - Final gates: `TOTAL_FAIL=0 TOTAL_FAIL=0`; `SELFTEST: PASS 335/335`.
 - Truthful registration: this report is edited once more after §7 is written (⑧c readings written back after ⑧b finalisation, per the v1.29 A-9 precedent); the last re-run readings are in the ⑩ stop-point receipt.
+
+## 8. Commit and CI
+
+- Commit: `29aef28` (`docs(directive): add §1.8 ledger-registration discipline and migrate the two ledger rules (v1.30)`; 7 files, `+287/-30`).
+- Push: `origin/main`, range `55bedd6..29aef28` (**gitee not pushed**).
+- CI: run `38451728336` (head `29aef28`) was **green on the first run on both legs** (Ubuntu 2m42s / Windows 2m38s); both legs `SELFTEST: PASS 335/335`, `GATE REPORT scope=ci changed=7`, `TOTAL_FAIL=0`; 10 target-package ok lines, 30 ok lines in total, 0 package-level FAIL; **§6.4 not triggered**.
+- This section is added by the docs-only commit after CI went doubly green (§11.2); the CI run of that backfill commit itself is observation-only.
+

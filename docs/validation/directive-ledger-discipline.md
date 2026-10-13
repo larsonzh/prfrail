@@ -68,3 +68,11 @@ tmp/prg9/verify.js	local-only
 - 残留：本片 `tmp/` 过程件已清除；未跟踪残留 0。
 - 终局门禁：`TOTAL_FAIL=0 TOTAL_FAIL=0`；`SELFTEST: PASS 335/335`。
 - 如实登记：本节写入后本报告仍被编辑一次（⑧b 定稿后回写 ⑧c 读数，依 v1.29 的 A-9 先例）；最后一次复跑读数见 ⑩ 停点回执。
+
+## 8. 提交与 CI
+
+- 提交：`29aef28`（`docs(directive): add §1.8 ledger-registration discipline and migrate the two ledger rules (v1.30)`；7 文件 `+287/−30`）。
+- 推送：`origin/main`，范围 `55bedd6..29aef28`（**未推 gitee**）。
+- CI：run `38451728336`（head `29aef28`）**首跑双腿全绿**（Ubuntu 2m42s / Windows 2m38s）；两腿 `SELFTEST: PASS 335/335`、`GATE REPORT scope=ci changed=7`、`TOTAL_FAIL=0`；目标包 ok 行 10 条、总 ok 30、包级 FAIL=0；**未触发 §6.4**。
+- 本节由 CI 双绿后的 docs-only 提交补入（§11.2）；该回填提交自身的 CI run 只作观察记录。
+
