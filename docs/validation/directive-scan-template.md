@@ -68,3 +68,10 @@ tmp/dst/gates-ci.txt	local-only
 - 围栏：本报告对自带 `artifacts` 围栏，11 条全部可解析（G7-a 与 G7-b 判 PASS）。
 - 残留：`tmp/dst/` 过程件在 ⑧c 清除；未跟踪残留 0。
 - 如实登记：本报告对由 ⑧b 回写 ⑧c 读数后仍被编辑一次；其后的终局复跑读数见 ⑩ 停点回执。
+
+## 8. 提交与 CI
+
+- 提交：`e8ca471`（`docs(directive): harden the ⑥ independent-scan prompt template and bump the directive to v1.31`；7 文件 `+273/−2`）。
+- 推送：`origin/main`，范围 `f4dfe3e..e8ca471`（**未推 gitee**）。
+- CI：run `38485494195`（head `e8ca471`）**首跑双腿全绿**（Windows 2m36s / Ubuntu 2m39s）；两腿 `SELFTEST: PASS 335/335`、`GATE REPORT scope=ci changed=7`、`TOTAL_FAIL=0`；包级 `go test` ok 14 / FAIL 0；目标包 ok 行 10 条、总 ok 30；**未触发 §6.4**。
+- 本节由 CI 双绿后的 docs-only 提交补入（§11.2）；该回填提交自身的 CI run 只作观察记录。

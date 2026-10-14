@@ -68,3 +68,10 @@ tmp/dst/gates-ci.txt	local-only
 - Fence: this report pair carries an `artifacts` fence whose 11 rows all resolve (G7-a and G7-b rule PASS).
 - Residue: this slice's `tmp/dst/` process artifacts are removed at ⑧c; untracked residue 0.
 - Truthful registration: this report pair is edited once more after ⑧b writes back the ⑧c readings; the later final re-run readings are in the ⑩ stop-point receipt.
+
+## 8. Commit and CI
+
+- Commit: `e8ca471` (`docs(directive): harden the ⑥ independent-scan prompt template and bump the directive to v1.31`; 7 files, `+273/-2`).
+- Push: `origin/main`, range `f4dfe3e..e8ca471` (**gitee not pushed**).
+- CI: run `38485494195` (head `e8ca471`) was **green on the first run on both legs** (Windows 2m36s / Ubuntu 2m39s); both legs `SELFTEST: PASS 335/335`, `GATE REPORT scope=ci changed=7`, `TOTAL_FAIL=0`; package-level `go test` ok 14 / FAIL 0; 10 target-package ok lines, 30 ok lines in total; **§6.4 not triggered**.
+- This section is added by the docs-only commit after CI went doubly green (§11.2); the CI run of that backfill commit itself is observation-only.
