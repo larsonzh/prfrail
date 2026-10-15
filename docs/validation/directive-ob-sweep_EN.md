@@ -91,9 +91,11 @@ tmp/obsweep/shape.js	local-only
 
 ## 10. Commit and CI
 
-- Commit: this slice stops at ⑩ (uncommitted, unpushed).
-- Push: none.
-- CI: none (readings are produced by CI after the push; this slice carries no run id); the P4 definition row's "three scopes" is historical text that this slice does not change, and the closing caliber follows the C.0t wording "the tree and index scopes (measured)".
+- Commit: `2d6a8e4` (`docs: DIRECTIVE-OB-SWEEP 三项 OB 批量处置落地（v1.32）`; 7 files `+319/-14`).
+- Push: `origin/main`, range `cb64d6b..2d6a8e4` (**no gitee push**).
+- CI: run `38810986151` (head `2d6a8e4`) **first run green on both legs** (windows 3m45s / ubuntu 2m38s); both legs `SELFTEST: PASS 335/335`, `GATE REPORT scope=ci changed=7`, `TOTAL_FAIL=0`; package level `ok` 30 / `FAIL` 0 (the ubuntu leg additionally runs Race: `internal/adapters` and `internal/chain` both ok); **§6.4 was not triggered**.
+- Commit-message language **deviation** registration: this slice's commit summary was written in Chinese, **deviating** from the "English `<type>: <summary>`" discipline; **disposition = no history rewrite**, with the discipline effective from the next slice; basis = the user's ruling text of 2026-10-16.
+- This section is backfilled by the docs-only commit after CI turned green (§11.2); that backfill commit's own CI run is an observation record only; the N-L3 caliber = the P4 definition row's "three scopes" is historical text that this slice does not change, and this slice's self-measured caliber is the C.0t wording "the tree and index scopes (measured)".
 
 ## 11. Review-chain log (final before ⑩)
 

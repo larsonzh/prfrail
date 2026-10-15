@@ -91,9 +91,11 @@ tmp/obsweep/shape.js	local-only
 
 ## 10. 提交与 CI
 
-- 提交：本片停在 ⑩（未提交、未推送）。
-- 推送：无。
-- CI：无（推送后由 CI 产生读数；本片不载 run 号）；P4 定义行的「三作用域」属历史原文、本片不改，闭环口径以 C.0t 的「tree 与 index 两作用域（实测）」为准。
+- 提交：`2d6a8e4`（`docs: DIRECTIVE-OB-SWEEP 三项 OB 批量处置落地（v1.32）`；7 文件 `+319/-14`）。
+- 推送：`origin/main`，范围 `cb64d6b..2d6a8e4`（**未推 gitee**）。
+- CI：run `38810986151`（head `2d6a8e4`）**首跑双腿全绿**（windows 3m45s / ubuntu 2m38s）；两腿 `SELFTEST: PASS 335/335`、`GATE REPORT scope=ci changed=7`、`TOTAL_FAIL=0`；包级 `ok` 30 / `FAIL` 0（ubuntu 腿另跑 Race：`internal/adapters` 与 `internal/chain` 均 ok）；**未触发 §6.4**。
+- 提交信息语言**偏离**登记：本片提交信息 summary 为中文，**偏离**「`<type>: <summary>` 英文」纪律；**处置 = 不改写历史**，纪律自下片起生效；依据 = 用户 2026-10-16 裁定原文。
+- 本节由 CI 双绿后的 docs-only 提交补入（§11.2）；该回填提交自身的 CI run 只作观察记录；N-L3 口径 = P4 定义行的「三作用域」属历史原文、本片不改，本片自测口径为 C.0t 的「tree 与 index 两作用域（实测）」。
 
 ## 11. 审查链实录（⑩ 前最终）
 
