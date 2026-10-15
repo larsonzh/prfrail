@@ -534,18 +534,19 @@ Sources: `docs/t027/REMAINING_SLICES.md:461` (the formal slice section), `:49` (
 | Probe budget | none (not declared in the original; **pending user confirmation**) |
 | Execution-freedom list path | `docs/validation/evidence/C1-freedom-list.md` |
 
-### P4 — `DIRECTIVE-OB-SWEEP` · ⬜
+### P4 — `DIRECTIVE-OB-SWEEP` · ✅
 
 Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.md:915` (OB-60), `:937` (OB-82), `:939` (OB-84) are the in-scope items after verification; `:923` (OB-68), `:928` (OB-73), `:930` (OB-75), `:932` (OB-77) are **to be split out**, see below.
 
 | Field | Content |
 |---|---|
 | Identity | `DIRECTIVE-OB-SWEEP` |
+| Status | ✅ **complete** (report in docs/validation/directive-ob-sweep{,_EN}.md; flipped by ⑧b) |
 | Goal | Batch-dispose three `.md`-only ledger fixes: OB-60 (appendix B.1's architecture design document gains two sections), OB-82 (§7.7 sampling-window counting anchor and record location), OB-84 (a ⑦ cost budget caliber in the §12.5 gap row) |
 | Dependencies | none |
 | Size | S |
 | Steps | ① → ② → ③ → ④ → ⑤ → ⑥ → ⑦ → ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
-| Current gap | all three are registered in §12.4 and none is disposed; OB-60 and OB-82 carry the status word `待议` and OB-84 carries `观察中` |
+| Current gap | all three are registered in §12.4 and none is disposed; OB-60 and OB-82 carry the status word `待议` and OB-84 carries `观察中` (state at kickoff; already flipped by this slice) |
 | Deliverables | the three OB dispositions flipped; the matching edits in appendix B.1, §7.7 and §12.5; the report pair; ledger write-back |
 | Acceptance evidence | ① all three OBs flip or are truthfully shown not to hold; ② `gate.js --all` green in all three scopes; ③ each item has a `file:line`-level assertion |
 | Boundaries | unchanged §2.2 / §2.4 / §5.2 / §6.3 / §7.5; no change under `internal/**`; unchanged role set and carriers |
