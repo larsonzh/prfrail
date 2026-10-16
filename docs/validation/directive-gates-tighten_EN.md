@@ -78,7 +78,15 @@ A gate caught red on the spot ⇒ fixed in place ⇒ not a deviation (user rulin
 - **Candidate slice B (rule-semantics revision)**: revise the §7.5 quota cap and the §1.7.4 ⑤ threshold wording - the basis is the **7th same-kind quota exception on record in ADR-025 ⇒ the ⑤ threshold is met**; working name `DIRECTIVE-TEMP-AUTH-LIMIT` (fixed at start-up). **Chartered independently**, never merged into candidate A.
 - **Registration manner (per the §11.2 registration advice and its trail)**: the above are **advice**; this report only keeps the trail, and **nothing is registered unless the user answers explicitly**.
 
-## 7. Artifacts
+## 7. Commit and CI (⑧b backfill, OB-72)
+
+- **Main commit**: `c6ada79` - `feat: tighten the G3(a.2)/G5/G6/G7 gate suite and land the v1.33 text merges` (changed files 21, `+1275/-83`); pushed to `origin/main` (SSH, range `68afde6..c6ada79`); **gitee not pushed**.
+- **CI observation (the run for that commit)**: run `38965047253` (workflow `CI`, event push, attempt 1) **first run green on both legs** - `Go ubuntu-latest` 2m20s, `Go windows-latest` 3m52s; **the first-run-red procedure was not triggered**.
+- **Gates-step hard evidence (both legs)**: `SELFTEST: PASS 385/385`; `GATE REPORT scope=ci changed=21`; `G3(a)` all four pairs OK; the report pair has all six shapes `true`; `G4b newCjk=667 unknown=[]`; `TOTAL_FAIL=0`.
+- **Package-level evidence**: `ok` lines = ubuntu `Test` 14 + ubuntu `Race` 2 + windows `Test` 14; `FAIL` matches inside the `Test` / `Race` steps: 0; on the windows leg the `Race` and `Contract fixtures` steps are skipped by the platform condition.
+- **Reading-scope note**: the `newCjk=667` above belongs to **that commit\'s change set (21 files)**; this backfill commit\'s own index range holds only the report pair (2 files, measured `newCjk=63`), so the two readings do not conflict.
+
+## 8. Artifacts
 
 ```artifacts
 docs/validation/directive-gates-tighten.md	repo

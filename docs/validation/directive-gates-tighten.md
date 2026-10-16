@@ -78,7 +78,15 @@
 - **候选片乙（规则语义修订）**：修订 §7.5 的额度上限与 §1.7.4 ⑤ 的阈值口径——依据 = ADR-025 记录的**第 7 次同类额度例外 ⇒ 已达 ⑤ 阈值**；暂定片名 `DIRECTIVE-TEMP-AUTH-LIMIT`（起跑时定）。**独立立项**，不得并入候选片甲。
 - **登记方式（依 §11.2 的建议登记与留痕）**：以上为**建议**，本报告只留痕；**用户未明确回应则默认不登记**。
 
-## 7. 工件
+## 7. 提交与 CI（⑧b 回填，OB-72）
+
+- **主提交**：`c6ada79` — `feat: tighten the G3(a.2)/G5/G6/G7 gate suite and land the v1.33 text merges`（改动文件 21 个，`+1275/-83`）；已推 `origin/main`（SSH，范围 `68afde6..c6ada79`）；**未推 gitee**。
+- **CI 观察（该提交自身的 run）**：run `38965047253`（workflow `CI`，event push，attempt 1）**首跑双腿全绿**——`Go ubuntu-latest` 2m20s、`Go windows-latest` 3m52s；**未触发首跑红处置**。
+- **Gates 步硬证据（两腿实测）**：`SELFTEST: PASS 385/385`；`GATE REPORT scope=ci changed=21`；`G3(a)` 四对全 OK；报告对六形状全 `true`；`G4b newCjk=667 unknown=[]`；`TOTAL_FAIL=0`。
+- **包级证据**：`ok` 行 = ubuntu `Test` 14 + ubuntu `Race` 2 + windows `Test` 14；`Test` / `Race` 步骤内 `FAIL` 匹配 0；Windows 腿的 `Race` 与 `Contract fixtures` 按平台条件常态跳过。
+- **读数作用域说明**：上列 `newCjk=667` 属**该提交的变更集（文件 21 个）**；本回填提交自身的索引范围仅含报告对（文件 2 个，实测 `newCjk=63`），两个读数不冲突。
+
+## 8. 工件
 
 ```artifacts
 docs/validation/directive-gates-tighten.md	repo
