@@ -16,6 +16,7 @@
  *   G7-b path/disposition row is unresolvable or carries an unknown token
  *   G7-c a changed finding row lacks a disposition CELL
  *   G7-d a changed status line says "stopped" without the "stopped - incomplete" mark
+ *   G7-e a changed line carries a verdict line outside the DELIVERY_DIRECTIVE 4.1 closed set
  *
  * G7-c is STRUCTURAL (GATES-EXT F2): the disposition token must sit in the row's LAST
  * CELL, not merely somewhere on the line. A row whose description quotes a disposition
@@ -121,6 +122,90 @@ const STOP_RE = new RegExp(STOP_TOKENS.join('|'), 'i');
 const STOP_OK_CN = '已停止——未完成';
 const STOP_MARKS = [STOP_OK_CN, 'Stopped — incomplete'];
 const STOP_OK = STOP_OK_CN;
+
+/**
+ * G7-e verdict-line closed set (OB-42, v1.33). DELIVERY_DIRECTIVE 4.1 item 1 defines the
+ * ONLY legal verdict lines as `<prefix>: <value>` over a closed set of 11 prefixes, and
+ * abolishes bare `PASS` / `FINDINGS` plus the residual `RE_` placeholders. Until OB-42
+ * nothing mechanical checked that membership (the item was booked under G7-c, which only
+ * judges a finding row's disposition cell).
+ *
+ * Judged: ADDED lines of a changed report (the same scope as G7-c / G7-d).
+ *   (1) a line whose leading prefix is one of the 11 closed-set prefixes MUST carry a value
+ *       from that prefix's enumerated set; an out-of-set value is a format deviation;
+ *   (2) a line that is EXACTLY a bare closed-set value (modulo markdown noise) is a format
+ *       deviation - the "bare token" rule;
+ *   (3) `<UPPERCASE PREFIX>: <exactly one closed-set value>` whose prefix is NOT in the
+ *       closed set is the "table-external form" deviation;
+ *   (4) a residual `RE_` placeholder is a deviation (4.1: abolished, must not remain).
+ *
+ * Deliberate boundary (stated in 6.3): the value must be RECOGNISABLE, so a coarse prefix
+ * such as `SELFTEST: PASS 362/362` (a gate reading, not a verdict line) is NOT judged. The
+ * EXISTENCE and POSITION of the verdict line (4.1 says "last line") are not mechanically
+ * enforced either - both residuals are carried by the 5 / 6 / 7 review layers.
+ *
+ * Self-reference guard: the same five exclusion markers as G6, so a report that QUOTES an
+ * illegal form on a marked line (示例 / 引文 / 不得残留 / 冲突 / 矛盾) is not judged.
+ */
+const VERDICT_PREFIXES = {
+  DESIGN: ['DONE', 'NEEDS_CLARIFICATION'],
+  IMPLEMENT: ['DONE', 'BLOCKED'],
+  TEST: ['DONE', 'BLOCKED'],
+  'PRE-REVIEW': ['PASS', 'PASS WITH FIXES', 'FINDINGS'],
+  'INDEPENDENT SCAN': ['PASS', 'FINDINGS'],
+  'FINAL REVIEW': ['PASS', 'PASS WITH FIXES', 'PARTIAL', 'FINDINGS'],
+  'RE-REVIEW': ['PASS', 'PASS WITH FIXES', 'PARTIAL', 'FINDINGS'],
+  'BLIND REVIEW': ['PASS', 'PASS WITH FIXES', 'PARTIAL', 'FINDINGS'],
+  DOCS: ['DONE', 'BLOCKED'],
+  SLICE: ['STARTED', 'READY_FOR_REVIEW', 'BLOCKED'],
+  'DIRECTIVE REVIEW': ['PASS', 'FINDINGS'],
+};
+/** Longest first, so `PASS WITH FIXES` wins over `PASS`. */
+const VERDICT_VALUES = [...new Set([].concat(...Object.values(VERDICT_PREFIXES)))].sort((a, b) => b.length - a.length);
+const VERDICT_PREFIX_RE = /^(?:[-*>]\s*)*`{0,2}\*{0,2}([A-Z][A-Z _-]*?)\*{0,2}`{0,2}\s*[:：]\s*(.*)$/;
+const RE_PLACEHOLDER_RE = /\bRE_[A-Z]/;
+const G7E_EXCLUDE_MARKERS = ['不得残留', '示例', '引文', '冲突', '矛盾'];
+
+/**
+ * The longest closed-set value the rest of a verdict line starts with, or null. A value
+ * followed by an alphanumeric character is NOT a verdict value (`PASS 362/362` is a gate
+ * reading); a value followed by punctuation or markdown (`` `PASS` ``, `PASS（无 Medium+）`,
+ * `PASS — 无 Medium+`) is.
+ */
+function verdictValue(rest) {
+  let s = String(rest).trim();
+  while (s.startsWith('*') || s.startsWith('`')) s = s.slice(1).trim();
+  for (const v of VERDICT_VALUES) {
+    if (!s.startsWith(v)) continue;
+    const after = s.slice(v.length).trim();
+    if (after === '' || !/^[A-Za-z0-9]/.test(after)) return v;
+  }
+  return null;
+}
+
+/** The deviation on a verdict-shaped / bare-token line, or null when the line is legal. */
+function verdictFinding(line) {
+  const m = VERDICT_PREFIX_RE.exec(line);
+  if (m) {
+    const prefix = m[1].trim();
+    const rest = m[2];
+    if (Object.prototype.hasOwnProperty.call(VERDICT_PREFIXES, prefix)) {
+      const v = verdictValue(rest);
+      if (v && VERDICT_PREFIXES[prefix].indexOf(v) >= 0) return null;
+      return 'prefix `' + prefix + '` with ' + (v ? '`' + v + '`' : 'a value') + ' outside the closed set';
+    }
+    const bare = verdictValue(rest);
+    if (bare && String(rest).replace(/[*`\s]/g, '') === bare) {
+      return 'verdict line with table-external prefix `' + prefix + '`';
+    }
+    return null;
+  }
+  const t = String(line)
+    .replace(/^[-*>]\s*/, '')
+    .replace(/[*`\s]/g, '')
+    .replace(/[。．.,；;]+$/, '');
+  return VERDICT_VALUES.indexOf(t) >= 0 ? 'bare verdict token `' + t + '` without a prefix' : null;
+}
 
 /** Does the line carry the incomplete mark (either language, any case)? */
 function hasStopMark(line) {
@@ -346,15 +431,61 @@ const G7_D = {
   },
 };
 
+const G7_E = {
+  id: 'G7-e',
+  label: 'verdict line closed set',
+  run(ctx, out) {
+    const tgts = targets(ctx);
+    const findings = [];
+    let scanned = 0;
+    for (const f of tgts) {
+      const L = ctx.readLineArray(f);
+      if (!L) continue;
+      for (const n of [...ctx.addedLineNumbers(f)].sort((a, b) => a - b)) {
+        const line = L[n - 1];
+        if (line === undefined) continue;
+        if (G7E_EXCLUDE_MARKERS.some((k) => line.includes(k))) continue;
+        scanned++;
+        if (RE_PLACEHOLDER_RE.test(line)) {
+          findings.push({ file: f, line: n, text: line, detail: f + ':' + n + ' residual `RE_` placeholder' });
+          continue;
+        }
+        const why = verdictFinding(line);
+        if (why) {
+          findings.push({ file: f, line: n, text: line, detail: f + ':' + n + ' ' + why + ' :: ' + line.slice(0, 120) });
+        }
+      }
+    }
+    if (!tgts.length) {
+      out.rec('G7-e', 'INFO', 'verdict line closed set', 'no changed report in scope');
+      return { findings };
+    }
+    out.rec(
+      'G7-e',
+      findings.length === 0 ? 'PASS' : 'FAIL',
+      'verdict line closed set',
+      findings.length
+        ? findings.map((f) => f.detail).join(' | ')
+        : 'every verdict line on added report lines is inside the 4.1 closed set (scanned ' + scanned + ')'
+    );
+    return { findings };
+  },
+};
+
 module.exports = {
   id: 'G7',
   label: 'review-bundle completeness',
   title: '审查包完整性',
   scripted: true,
-  subchecks: [G7_A, G7_B, G7_C, G7_D],
+  subchecks: [G7_A, G7_B, G7_C, G7_D, G7_E],
   internals: {
     targets,
     artifactBlock,
+    VERDICT_PREFIXES,
+    VERDICT_VALUES,
+    RE_PLACEHOLDER_RE,
+    verdictValue,
+    verdictFinding,
     DISPOSITIONS,
     DISPOSITION_TOKENS,
     FINDING_ROW_RE,

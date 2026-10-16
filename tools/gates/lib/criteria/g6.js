@@ -79,10 +79,15 @@ const TOTAL_RE = /=\s*(\d+)\s*次/g;
  * `run TBD`) are followed by a non-word character or the start of the line, exactly as
  * before. Placeholder rules carry the guard too: a rule reading `run` should not fire on
  * a word that merely ends in those three letters.
+ * OB-17 (slice GATES-TIGHTEN, v1.33): the angle-bracket rule is narrowed to id-LIKE
+ * placeholders - first character uppercase, the rest uppercase / digits / `-` / `_`.
+ * `run <RUN_ID>` still fails, while CLI usage examples such as `run <chain-file>` (token
+ * starts lowercase) are no longer false positives. The rule stays context-free, so a
+ * line carrying the usage example no longer turns G6-3 red merely because it was edited.
  */
 const RUN_PATTERNS = [
   { re: /(?<![A-Za-z\u4e00-\u9fff])run\s+0+(?![0-9])(?!\s*[A-Za-z\u4e00-\u9fff])/g, why: 'all-zero run id' },
-  { re: /(?<![A-Za-z\u4e00-\u9fff])run\s*<[^>]*>/g, why: 'angle-bracket placeholder' },
+  { re: /(?<![A-Za-z\u4e00-\u9fff])run\s*<[A-Z][A-Z0-9_-]*>/g, why: 'angle-bracket placeholder' },
   { re: /(?<![A-Za-z\u4e00-\u9fff])run\s+(?:TBD|TODO|XXXX|XXX|N\/A)\b/gi, why: 'word placeholder' },
   { re: /(?<![A-Za-z\u4e00-\u9fff])run\s+(?:待|占位)/g, why: 'placeholder wording' },
   { re: /(?<![A-Za-z\u4e00-\u9fff])run\s+\d{1,2}(?![0-9])(?!\s*[A-Za-z\u4e00-\u9fff])/g, why: 'run id too short' },
@@ -504,6 +509,20 @@ function directiveLabels(ctx) {
  *      what keeps the C.1 v3.1 comparison table and C.2 / C.3 structurally OUT of the
  *      scan (measured: 15 of the 18 unresolvable whole-file references live there, so
  *      a region limit - not a whitelist - is what makes a zero-preload launch possible).
+ *
+ * OB-46 (v1.33) endpoint self-check (coverage boundary stated by the 5 pre-review, L-6): only
+ * region (2) has a delimiter that could go missing, so only region (2) plus the EXISTENCE of
+ * both regions are asserted. Region (1) ends at the next `#{2,4}` heading of any level; losing
+ * the section 0.3 heading entirely would drop the region silently FOR A NON-DIRECTIVE FILE (the
+ * directive pair is covered by the two-region existence assertion below), and that residual is carried
+ * by the 5 / 6 / 7 review chain (the criterion text claims no more than it checks).
+ *
+ * OB-46 (v1.33) endpoint self-check: `### C.1` is the delimiter that makes region ② a
+ * region. Without it the loop above fell through to `L.length` and judged an UNBOUNDED
+ * interval - the C.1 comparison table and C.2 / C.3 came back into scope, so an unrelated
+ * historical row decided the verdict (before OB-46 the boundary mutation in T21 turned
+ * G6-5 red through the §3.10 row, not through the missing endpoint). A region we cannot
+ * delimit is a bug in the criterion's premise, not a finding: fail closed (exit 2).
  */
 function targetRegionRanges(L) {
   const out = [];
@@ -522,11 +541,20 @@ function targetRegionRanges(L) {
   for (let i = 0; i < L.length; i++) {
     if (!REGION_HEAD_C0.test(L[i])) continue;
     let end = L.length;
+    let terminated = false;
     for (let j = i + 1; j < L.length; j++) {
       if (REGION_HEAD_C1.test(L[j])) {
         end = j;
+        terminated = true;
         break;
       }
+    }
+    if (!terminated) {
+      throw new UsageError(
+        'G6-5 target region endpoint missing: no `### C.1` heading after `### C.0` (line ' +
+          (i + 1) +
+          '); refusing to judge an unbounded region'
+      );
     }
     out.push([i, end]);
     break;
@@ -553,6 +581,18 @@ const G6_5 = {
       const L = ctx.readLineArray(f);
       if (!L) continue;
       const ranges = targetRegionRanges(L);
+      // OB-46 (v1.33): the directive pair is the only file class that MUST carry both
+      // target regions. A renamed `## 0.3` or `### C.0` heading used to drop that region
+      // silently - the file still got a verdict (PASS) while that region was judged by
+      // nothing. Requiring both here closes the "empty region" half of the same defect.
+      if (DIRECTIVE_FILES.indexOf(f) >= 0 && ranges.length !== 2) {
+        throw new UsageError(
+          'G6-5 target regions missing in ' +
+            f +
+            ': expected the 0.3 change-log region and the appendix C region, got ' +
+            ranges.length
+        );
+      }
       if (!ranges.length) continue;
       const own = labelsFromLines(L);
       for (const n of [...ctx.addedLineNumbers(f)].sort((a, b) => a - b)) {
@@ -652,6 +692,81 @@ function firstStatusWord(cell, words) {
   return null;
 }
 
+/**
+ * OB-47 (v1.33): the language the document DECLARES in its header block.
+ * The word table used to be picked with `/_EN\.md$/i.test(f)` - a property of the FILE
+ * NAME, not of the document. A rename, or a third language added later, therefore changed
+ * (or silently mismatched) the judged vocabulary with no assertion able to notice.
+ * The rule now reads the declaration and cross-checks it against the name: the two must
+ * agree, so a rename is an error instead of a silent table switch. All three failure modes
+ * (absent / outside the closed set / disagreeing with the name) are premise errors, not
+ * findings - fail closed.
+ */
+/**
+ * The FULL tag token (not just its prefix): 1 pre-review / 7 r1 caught `lang:zh-cn`
+ * satisfying a prefix regex and being treated as a legal `zh` - a fail-open in a rule that
+ * claims to be fail-closed. Matching is now whole-token and the comparison is exact:
+ * only `lang:zh` and `lang:en` are in the closed set, anything else (including `lang:zh-cn`
+ * and `lang:en-us`) takes the `unknown language tag` UsageError path.
+ */
+const LANG_TAG_TOKEN_RE = /\blang:[A-Za-z][A-Za-z.-]*/g;
+const LANG_TAG_EXACT = { 'lang:zh': 'zh', 'lang:en': 'en' };
+const LANG_HEADER_WINDOW = 15;
+const LANG_TAG_TO_SET = { zh: 'cn', en: 'en' };
+
+function declaredLang(L, f) {
+  const seen = new Set();
+  let raw = null;
+  for (let i = 0; i < Math.min(L.length, LANG_HEADER_WINDOW); i++) {
+    LANG_TAG_TOKEN_RE.lastIndex = 0;
+    let m;
+    while ((m = LANG_TAG_TOKEN_RE.exec(L[i])) !== null) {
+      const token = m[0];
+      if (Object.prototype.hasOwnProperty.call(LANG_TAG_EXACT, token)) seen.add(LANG_TAG_EXACT[token]);
+      else if (raw === null) raw = token;
+    }
+  }
+  // 7 r2 Medium (fixed in place): ANY non-closed-set tag is a premise error, even when a
+  // legal tag is present as well. The former shape only complained when NOTHING matched, so
+  // `lang:zh` + `lang:zh-cn` slipped through - fail-open in a rule that claims to be
+  // fail-closed.
+  if (raw !== null) {
+    throw new UsageError(
+      'unknown language tag `' +
+        raw +
+        '` in the header of ' +
+        f +
+        ': only `lang:zh` and `lang:en` are in the closed set'
+    );
+  }
+  if (seen.size === 0) {
+    throw new UsageError(
+      'language tag missing in the header of ' +
+        f +
+        ': declare `lang:zh` or `lang:en` inside the header window (implementation constant LANG_HEADER_WINDOW)'
+    );
+  }
+  if (seen.size > 1) {
+    throw new UsageError(
+      'conflicting language tags in the header of ' + f + ': ' + [...seen].map((x) => 'lang:' + x).join(' / ')
+    );
+  }
+  const declared = [...seen][0];
+  const named = /_EN\.md$/i.test(f) ? 'en' : 'zh';
+  if (declared !== named) {
+    throw new UsageError(
+      'declared language `lang:' +
+        declared +
+        '` disagrees with the file name of ' +
+        f +
+        ' (the name implies lang:' +
+        named +
+        ')'
+    );
+  }
+  return LANG_TAG_TO_SET[declared];
+}
+
 const G6_6 = {
   id: 'G6-6',
   label: 'ledger status closed set',
@@ -663,22 +778,33 @@ const G6_6 = {
       if (!L) continue;
       const region = ledgerRegionRange(L);
       if (!region) continue;
-      const words = /_EN\.md$/i.test(f) ? LEDGER_STATUS_SETS.en : LEDGER_STATUS_SETS.cn;
+      const rows = [];
       for (const n of [...ctx.addedLineNumbers(f)].sort((a, b) => a - b)) {
         const idx = n - 1;
         if (idx < region[0] || idx >= region[1]) continue;
         const line = L[idx];
         if (line === undefined || !LEDGER_ROW_RE.test(line)) continue;
+        rows.push({ n: n, line: line });
+      }
+      // OB-47: the language declaration is a PREMISE only where a word table is actually
+      // needed. A §12.4-shaped region with no ledger row is not a directive ledger - another
+      // document may legitimately own a §12.4 heading (the RFC does) - so it is skipped and
+      // is never forced to declare. Once ledger rows exist the declaration is mandatory: the
+      // vocabulary follows the language the document DECLARES (cross-checked against the
+      // name), never the bare file-name suffix.
+      if (!rows.length) continue;
+      const words = LEDGER_STATUS_SETS[declaredLang(L, f)];
+      for (const r of rows) {
         scanned++;
-        if (isExcluded(line)) continue;
-        const cells = rowCellsOf(line);
+        if (isExcluded(r.line)) continue;
+        const cells = rowCellsOf(r.line);
         const cell = cells.length ? cells[cells.length - 1] : '';
         if (firstStatusWord(cell, words)) continue;
         findings.push({
           file: f,
-          line: n,
-          text: line,
-          detail: f + ':' + n + ' first status word not in the closed set :: ' + String(cell).trim().slice(0, 60),
+          line: r.n,
+          text: r.line,
+          detail: f + ':' + r.n + ' first status word not in the closed set :: ' + String(cell).trim().slice(0, 60),
         });
       }
     }
@@ -723,6 +849,11 @@ module.exports = {
     rowCellsOf,
     firstStatusWord,
     LEDGER_ROW_RE,
+    // G6-6 (OB-47): header language declaration, closed tag set, name cross-check.
+    declaredLang,
+    LANG_TAG_TOKEN_RE,
+    LANG_TAG_EXACT,
+    LANG_HEADER_WINDOW,
   },
   run(ctx, out) {
     for (const s of this.subchecks) s.run(ctx, out);

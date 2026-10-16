@@ -4,7 +4,9 @@
  * G3(a) bilingual symmetry + mirror parity (DELIVERY_DIRECTIVE 6.3 G3).
  *   (a.1) for every changed CN/`_EN` pair the numstat added/deleted counts must be equal;
  *   (a.2) for `docs/DELIVERY_DIRECTIVE.md` the whole-file shape (line count, heading
- *         positions, bold markers, pipes, blank lines) must equal its `_EN` mirror.
+ *         positions, bold markers, pipes, blank lines, backtick count) must equal its
+ *         `_EN` mirror. The sixth shape (backticks) landed with OB-73 (v1.33), which also
+ *         aligned the 7 pre-existing backtick-level drifts it exposes.
  * Whole-file equality is deliberately NOT required for other pairs: pre-existing
  * bilingual pairs are historically asymmetric, so the criterion would be unsatisfiable.
  *
@@ -52,6 +54,10 @@ module.exports = {
         bold: count(CL, /\*\*/g) === count(EL, /\*\*/g),
         bars: count(CL, /\|/g) === count(EL, /\|/g),
         blank: CL.filter((l) => l === '').length === EL.filter((l) => l === '').length,
+        // OB-73 (v1.33): the sixth shape. A whole-file count comparison, the same unit as
+        // bold / pipes / blank lines, so a cross-line compensating drift stays uncovered -
+        // stated as a known limit in the DELIVERY_DIRECTIVE 6.3 G3(a.2) sub-rule.
+        backticks: count(CL, /`/g) === count(EL, /`/g),
       };
       sym.push(cnf + ' +' + a[0] + '/-' + a[1] + ' vs _EN +' + b[0] + '/-' + b[1] + (okS ? ' OK' : ' MISMATCH'));
       inf.push(cnf + ' ' + JSON.stringify(f5));

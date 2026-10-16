@@ -6,6 +6,8 @@
  *   ② no `.agent.md` frontmatter may carry an empty `model` value in any of the
  *      three forms `^\s*model\s*:\s*$`, `model: ""`, `model: ''`.
  */
+const { UsageError } = require('../ctx');
+
 const EMPTY_FORMS = [/^\s*model\s*:\s*$/m, /model:\s*""/, /model:\s*''/];
 
 module.exports = {
@@ -19,6 +21,15 @@ module.exports = {
       id: 'G5-a(1)',
       run(ctx, out) {
         const r = ctx.git(['grep', '-l', '^model:', '--', '.github/agents/prfrail-*.agent.md']);
+        // OB-20 (slice GATES-TIGHTEN, v1.33): `git grep` exits 1 when there is NO match -
+        // that is data (the gate is satisfied), never a failure. Any OTHER non-zero exit is
+        // an execution / environment failure and must surface as a usage error (exit 2),
+        // never as a PASS indistinguishable from "zero hits".
+        if (!(r.ok || r.code === 1)) {
+          throw new UsageError(
+            'G5-a(1): git grep failed (exit ' + r.code + '): ' + String(r.err || r.out || '').trim()
+          );
+        }
         const h = r.ok ? r.out : '';
         out.rec(
           'G5-a(1)',

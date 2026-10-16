@@ -37,12 +37,14 @@ const { createReport } = require('./lib/report');
 const G1A = require('./lib/criteria/g1a');
 const G2 = require('./lib/criteria/g2');
 const G4A = require('./lib/criteria/g4a');
+const G3A = require('./lib/criteria/g3a');
 const G6 = require('./lib/criteria/g6');
 const G7 = require('./lib/criteria/g7');
 const G8 = require('./lib/criteria/g8');
 const G4B = require('./lib/criteria/g4b');
 const G5A = require('./lib/criteria/g5a');
 const G5B = require('./lib/criteria/g5b');
+const G5C = require('./lib/criteria/g5c');
 
 const FIXTURES_DIR = path.join(__dirname, 'testdata', 'fixtures');
 const HISTORICAL_DIR = path.join(__dirname, 'testdata', 'historical');
@@ -553,10 +555,11 @@ function g7ProbeCtx(text) {
   };
 }
 
-/** G7-c / G7-d verdict + finding count + first `why` for one synthetic report body. */
-function g7Probe(id, text) {
+/** G7-c / G7-d / G7-e verdict + finding count + first `why` for one synthetic report body. */
+function g7Probe(id, text, mod) {
   const out = createReport();
-  const sub = G7.subchecks.find((s) => s.id === id);
+  const M = mod || G7;
+  const sub = M.subchecks.find((s) => s.id === id);
   const res = sub.run(g7ProbeCtx(text), out);
   return {
     verdict: verdictOf(out.records, id),
@@ -577,11 +580,28 @@ function g7Probe(id, text) {
 const H030 = '### 0.3 变更日志\n\n';
 /** Region head of the G6-6 target region (§12.4 observation ledger). */
 const H124 = '### 12.4 观察项台账\n\n';
+/**
+ * OB-47 (v1.33): every probe body declares its language in the header, exactly like the
+ * real documents. The probes below pin the three fail-closed modes (absent / outside the
+ * closed set / name-declaration disagreement) in addition to the unchanged word-table
+ * switch they already asserted.
+ */
+const LANG_TAG_ZH = '`lang:zh`\n';
+const LANG_TAG_EN = '`lang:en`\n';
 /** Mutation target ②: `labelsFromLines`'s bold line-leading label collector. */
 const BOLD_LABEL_COLLECTOR = '    m = LABEL_BOLD_RE.exec(l);\n    if (m) out.add(m[1]);\n';
 /** Mutation target ③: the CN closed set's first entry. */
 const CN_FIRST_STATUS_WORD = "  cn: ['观察中', ";
 const G6_SOURCE = path.join(__dirname, 'lib', 'criteria', 'g6.js');
+const G3A_SOURCE = path.join(__dirname, 'lib', 'criteria', 'g3a.js');
+const G7_SOURCE = path.join(__dirname, 'lib', 'criteria', 'g7.js');
+const G5C_SOURCE = path.join(__dirname, 'lib', 'criteria', 'g5c.js');
+/** Mutation target (T73): the G5-c "value is a member of 2.2" test (OB-29). */
+const G5C_MEMBERSHIP = '          if (allowed.has(norm(m[1]))) continue;\n';
+/** Mutation target (T72): the G7-e closed-set membership test (OB-42). */
+const G7E_MEMBERSHIP = '      if (v && VERDICT_PREFIXES[prefix].indexOf(v) >= 0) return null;\n';
+/** Mutation target (T28c): the sixth mirror shape added by OB-73. */
+const G3A_BACKTICK_SHAPE = '        backticks: count(CL, /`/g) === count(EL, /`/g),\n';
 
 function detailOf(records, id) {
   const r = records.find((x) => x.id === id);
@@ -616,17 +636,21 @@ function runIn(mod, ctx, enable) {
  * still verified two ways: the patch must APPLY (`applied`, enforced by F1) and the
  * shipped file must be BYTE-IDENTICAL before and after (`identical`).
  */
-function loadMutatedG6(from, to, tag) {
-  const before = fs.readFileSync(G6_SOURCE);
+function loadMutatedModule(source, from, to, tag) {
+  const before = fs.readFileSync(source);
   const src = decodeBuffer(before);
   const patched = src.split(from).join(to);
-  MUTATION_LOG.push({ key: 'g6.js:' + tag, op: 'sourcePatch', needle: from, applied: patched !== src });
+  MUTATION_LOG.push({ key: path.basename(source) + ':' + tag, op: 'sourcePatch', needle: from, applied: patched !== src });
   const M = require('module');
-  const mod = new M(G6_SOURCE, null);
-  mod.filename = G6_SOURCE;
-  mod.paths = M._nodeModulePaths(path.dirname(G6_SOURCE));
-  mod._compile(patched, G6_SOURCE);
-  return { exports: mod.exports, applied: patched !== src, identical: fs.readFileSync(G6_SOURCE).equals(before) };
+  const mod = new M(source, null);
+  mod.filename = source;
+  mod.paths = M._nodeModulePaths(path.dirname(source));
+  mod._compile(patched, source);
+  return { exports: mod.exports, applied: patched !== src, identical: fs.readFileSync(source).equals(before) };
+}
+
+function loadMutatedG6(from, to, tag) {
+  return loadMutatedModule(G6_SOURCE, from, to, tag);
 }
 
 /** G6-5 verdict + finding count + record detail for one synthetic file body. */
@@ -662,6 +686,37 @@ function g66Probe(virtualPath, text) {
   return { verdict: verdictOf(out.records, 'G6-6'), findings: res.findings.length, detail: detailOf(out.records, 'G6-6') };
 }
 
+/**
+ * G3(a.2) mirror-parity probe (OB-73). A synthetic directive pair with only the four ctx
+ * members g3a.js touches. `mod` lets the mutation probe run a patched copy of the
+ * criterion instead of the shipped one.
+ */
+function g3aProbe(cnText, enText, mod) {
+  const CNP = 'docs/DELIVERY_DIRECTIVE.md';
+  const ENP = 'docs/DELIVERY_DIRECTIVE_EN.md';
+  const texts = new Map([
+    [CNP, String(cnText).split('\n')],
+    [ENP, String(enText).split('\n')],
+  ]);
+  const ctx = {
+    changedMarkdown: () => [CNP, ENP],
+    changedPaths: [CNP, ENP],
+    numstat: () => [1, 1],
+    readLineArray: (f) => (texts.has(f) ? texts.get(f) : null),
+  };
+  const out = createReport();
+  (mod || G3A).run(ctx, out);
+  return {
+    records: out.records,
+    a: verdictOf(out.records, 'G3(a)'),
+    a2: verdictOf(out.records, 'G3(a.2) ' + CNP),
+    a2detail: detailOf(out.records, 'G3(a.2) ' + CNP),
+    // No FAIL record exists when the shapes agree, so the shape JSON is read from the
+    // aggregate record, which always carries it.
+    detail: detailOf(out.records, 'G3(a)'),
+  };
+}
+
 /* ---------------------------------------------------------------------------
  * G5-b (role-file `model` closed set) and G5-a 2 probes (slice DIRECTIVE-MODEL-LISTS,
  * v1.18). T29-T37 below are what makes the new criterion falsifiable: each boundary
@@ -682,6 +737,26 @@ const G5B_LUNA_MEMBER = "  'gpt-6-luna',\n";
  */
 const G5B_GLM_MEMBER = "  'glm-5.3',\n";
 const G5B_GLM_FLASH_MEMBER = "  'glm-5.3-flash',\n";
+
+/**
+ * G5-c probe (OB-29): a synthetic directive pair. G5-c reads `ctx.readLineArray` /
+ * `ctx.addedLineNumbers` only, and every line of the probe counts as added. `mod` lets the
+ * mutation probe run a patched copy of the criterion.
+ */
+function g5cProbe(cnText, enText, mod) {
+  const [CNP, ENP] = G5C.internals.DIRECTIVE_FILES;
+  const texts = new Map([
+    [CNP, String(cnText).split('\n')],
+    [ENP, String(enText).split('\n')],
+  ]);
+  const ctx = {
+    readLineArray: (f) => (texts.has(f) ? texts.get(f) : null),
+    addedLineNumbers: (f) => new Set((texts.get(f) || []).map((_, i) => i + 1)),
+  };
+  const out = createReport();
+  (mod || G5C).run(ctx, out);
+  return { records: out.records, verdict: verdictOf(out.records, 'G5-c'), detail: detailOf(out.records, 'G5-c') };
+}
 
 /** G5-b verdict + finding count + record detail for one fixture key. */
 function g5bProbeWith(mod, key) {
@@ -1428,6 +1503,140 @@ function runTests() {
     );
   }
 
+  // ---- T72: G7-e verdict-line closed set (OB-42, v1.33).
+  {
+    const ok = g7Probe('G7-e', '# report\n\n**RE-REVIEW**: PASS（无 Medium+）\n');
+    check(
+      'T72 OB-42 positive control: a closed-set verdict line passes (bold marker + parenthetical note allowed)',
+      ok.verdict === 'PASS' && ok.findings === 0,
+      'verdict=' + ok.verdict + ' findings=' + ok.findings + ' :: ' + ok.why
+    );
+    const outOfSet = g7Probe('G7-e', '# report\n\nFINAL REVIEW: MAYBE\n');
+    check(
+      'T72 OB-42 an out-of-set value under a closed-set prefix is a format deviation',
+      outOfSet.verdict === 'FAIL' && outOfSet.findings === 1 && /outside the closed set/.test(outOfSet.why),
+      'verdict=' + outOfSet.verdict + ' :: ' + outOfSet.why
+    );
+    const wrongPrefix = g7Probe('G7-e', '# report\n\nTEST: PASS\n');
+    check(
+      'T72 OB-42 a value legal for ANOTHER prefix is still a deviation (per-prefix sets, not one merged set)',
+      wrongPrefix.verdict === 'FAIL' && /outside the closed set/.test(wrongPrefix.why),
+      'verdict=' + wrongPrefix.verdict + ' :: ' + wrongPrefix.why
+    );
+    const bare = g7Probe('G7-e', '# report\n\n**PASS**\n');
+    check(
+      'T72 OB-42 the bare-token rule: a prefix-less `PASS` is a deviation',
+      bare.verdict === 'FAIL' && /bare verdict token/.test(bare.why),
+      'verdict=' + bare.verdict + ' :: ' + bare.why
+    );
+    const external = g7Probe('G7-e', '# report\n\nVERDICT: FINDINGS\n');
+    check(
+      'T72 OB-42 the table-external rule: an unknown prefix carrying exactly one closed value is a deviation',
+      external.verdict === 'FAIL' && /table-external prefix/.test(external.why),
+      'verdict=' + external.verdict + ' :: ' + external.why
+    );
+    const reResidual = g7Probe('G7-e', '# report\n\nRE_REVIEW: PASS\n');
+    check(
+      'T72 OB-42 a residual `RE_` placeholder is a deviation (4.1 abolished it)',
+      reResidual.verdict === 'FAIL' && /residual `RE_` placeholder/.test(reResidual.why),
+      'verdict=' + reResidual.verdict + ' :: ' + reResidual.why
+    );
+    const gateReading = g7Probe('G7-e', '# report\n\nSELFTEST: PASS 362/362\nGATE REPORT scope=tree\n');
+    check(
+      'T72 OB-42 stated boundary: a gate reading that only LOOKS like a verdict line is not judged',
+      gateReading.verdict === 'PASS' && gateReading.findings === 0,
+      'verdict=' + gateReading.verdict + ' findings=' + gateReading.findings + ' :: ' + gateReading.why
+    );
+    const quoted = g7Probe('G7-e', '# report\n\n示例行（以下形态出现即 FAIL）：FINAL REVIEW: MAYBE\n');
+    check(
+      'T72 OB-42 self-reference guard: an illegal form quoted on a marked line is skipped',
+      quoted.verdict === 'PASS' && quoted.findings === 0,
+      'verdict=' + quoted.verdict + ' findings=' + quoted.findings + ' :: ' + quoted.why
+    );
+    const mut = loadMutatedModule(G7_SOURCE, G7E_MEMBERSHIP, '      return null;\n', 'ob42-membership');
+    check(
+      'T72 OB-42 mutation applied: the membership line matched g7.js (a stale patch would weaken the suite silently)',
+      mut.applied === true,
+      'applied=' + mut.applied
+    );
+    const blind = g7Probe('G7-e', '# report\n\nFINAL REVIEW: MAYBE\n', mut.exports);
+    check(
+      'T72 OB-42 load-bearing proof: accepting any recognisable value makes the SAME out-of-set line pass',
+      blind.verdict === 'PASS',
+      'verdict=' + blind.verdict + ' :: ' + blind.why
+    );
+    check(
+      'T72 restore: g7.js is byte-identical after the mutation window and the cached module still fails the line',
+      mut.identical === true && g7Probe('G7-e', '# report\n\nFINAL REVIEW: MAYBE\n').verdict === 'FAIL',
+      'identical=' + mut.identical
+    );
+  }
+
+  // ---- T73: G5-c appendix-B call strings against the 2.2 qualified-name column (OB-29).
+  {
+    const sec22 = (rows) => '### 2.2 x\n\n| a | b | c | 限定名 | d |\n|---|---|---|---|---|\n' + rows + '\n';
+    const apxB = (calls) => '## 附录 B\n\n```\n' + calls + '\n```\n';
+    const cnGood = sec22('| r | ① | `x` | `DeepSeek V4 Pro (deepseek)` | `deepseek-v4-pro` |\n');
+    const enGood = sec22('| r | ① | `x` | `GLM-5.3 (glm)` | `glm-5.3` |\n');
+    const ok = g5cProbe(cnGood + apxB("载体：runSubagent(agentName='a', model='DeepSeek V4 Pro (deepseek)')"), enGood);
+    check(
+      'T73 OB-29 positive control: a call string matching the 2.2 qualified name passes (code span vs plain text is normalised away)',
+      ok.verdict === 'PASS',
+      'verdict=' + ok.verdict + ' :: ' + ok.detail
+    );
+    const bad = g5cProbe(cnGood + apxB("载体：runSubagent(agentName='a', model='GPT-9-Turbo (copilot)')"), enGood);
+    check(
+      'T73 OB-29 a call string outside the 2.2 qualified-name column fails',
+      bad.verdict === 'FAIL' && /is not in the 2.2 qualified-name column/.test(bad.detail),
+      'verdict=' + bad.verdict + ' :: ' + bad.detail
+    );
+    const enJudged = g5cProbe(cnGood, enGood + apxB("carrier: model='GLM-5.3 (glm)'"));
+    check(
+      'T73 OB-29 the `_EN` side is judged with its own lowercase table header',
+      enJudged.verdict === 'PASS',
+      'verdict=' + enJudged.verdict + ' :: ' + enJudged.detail
+    );
+    const noApx = g5cProbe(cnGood, enGood);
+    check(
+      'T73 OB-29 a directive without an appendix B region is not judged',
+      noApx.verdict === 'PASS' && /no directive with an appendix B region/.test(noApx.detail),
+      'verdict=' + noApx.verdict + ' :: ' + noApx.detail
+    );
+    let premErr = null;
+    try {
+      g5cProbe("## 附录 B\n\n```\nmodel='DeepSeek V4 Pro (deepseek)'\n```\n", '');
+    } catch (e) {
+      premErr = e;
+    }
+    check(
+      'T73 OB-29 fail-closed: an appendix B whose 2.2 qualified-name column cannot be read raises UsageError',
+      !!premErr && premErr instanceof UsageError && /no 2.2 section|qualified-name column was not found/.test(premErr.message),
+      'err=' + (premErr ? premErr.message : 'NO ERROR')
+    );
+    const mut = loadMutatedModule(G5C_SOURCE, G5C_MEMBERSHIP, '          continue;\n', 'ob29-membership');
+    check(
+      'T73 OB-29 mutation applied: the 2.2 membership line matched g5c.js (a stale patch would weaken the suite silently)',
+      mut.applied === true,
+      'applied=' + mut.applied
+    );
+    const blind = g5cProbe(
+      cnGood + apxB("载体：runSubagent(agentName='a', model='GPT-9-Turbo (copilot)')"),
+      enGood,
+      mut.exports
+    );
+    check(
+      'T73 OB-29 load-bearing proof: with the membership test patched out the SAME out-of-set call string passes',
+      blind.verdict === 'PASS',
+      'verdict=' + blind.verdict + ' :: ' + blind.detail
+    );
+    check(
+      'T73 restore: g5c.js is byte-identical after the mutation window and the cached module still fails the call string',
+      mut.identical === true &&
+        g5cProbe(cnGood + apxB("载体：runSubagent(agentName='a', model='GPT-9-Turbo (copilot)')"), enGood).verdict === 'FAIL',
+      'identical=' + mut.identical
+    );
+  }
+
   // ---- T13: whole-corpus regression anchor.
   {
     const all = runSubset(makeCtx(Object.keys(FIXTURES)), ALL_SUBCHECKS);
@@ -1611,16 +1820,55 @@ function runTests() {
       'fails=' + JSON.stringify(failIds(r.records))
     );
     check('T21 the excluded §3.10 row is genuinely out of region: 0 references counted', /refs 0/.test(d), d);
-    const mut = runSubset(
-      makeCtx(['g6-5-c1-v31-table'], {
-        mutations: [{ key: 'g6-5-c1-v31-table', op: 'replace', from: '### C.1', to: '### C.1X' }],
-      }),
-      ALL_SUBCHECKS
+
+    // OB-46 (v1.33) - TIGHTENING, not relaxation. This expectation REPLACES the former
+    // "rename `### C.1` => G6-5 FAIL via §3.10 unresolved" assertion. That old expectation
+    // was itself the defect made visible: losing the delimiter did not raise an error, it
+    // silently stitched an unbounded region onto the C.0 start, and the verdict was then
+    // decided by an unrelated §3.10 row. The new expectation is strictly stronger
+    // (fail-closed): the same mutation must now abort with a UsageError, so the criterion
+    // never issues a verdict at all when it cannot delimit the region it was asked to judge.
+    let endptErr = null;
+    try {
+      runSubset(
+        makeCtx(['g6-5-c1-v31-table'], {
+          mutations: [{ key: 'g6-5-c1-v31-table', op: 'replace', from: '### C.1', to: '### C.1X' }],
+        }),
+        ALL_SUBCHECKS
+      );
+    } catch (e) {
+      endptErr = e;
+    }
+    check(
+      'T21 OB-46 fail-closed: renaming `### C.1` aborts with UsageError instead of judging an unbounded region',
+      !!endptErr && endptErr instanceof UsageError && /endpoint missing/.test(endptErr.message),
+      'err=' + (endptErr ? endptErr.message : 'NO ERROR (region degraded silently)')
+    );
+  }
+
+  // ---- T21b: the OB-46 endpoint rule is a premise check, not a region killer.
+  {
+    const T = G6.internals.targetRegionRanges;
+    check(
+      'T21b OB-46 positive control: an intact ledger keeps both target regions (no over-rejection)',
+      T(['## 0.3 x', '| a |', '### C.0 y', '### C.1 z', '| w |']).length === 2,
+      'n=' + T(['## 0.3 x', '| a |', '### C.0 y', '### C.1 z', '| w |']).length
     );
     check(
-      'T21 boundary mutation (rename the `### C.1` heading) pulls the §3.10 row back into the region and turns G6-5 red',
-      verdictOf(mut.records, 'G6-5') === 'FAIL' && /§3\.10 unresolved/.test(detailOf(mut.records, 'G6-5')),
-      'verdict=' + verdictOf(mut.records, 'G6-5') + ' :: ' + detailOf(mut.records, 'G6-5')
+      'T21b OB-46 boundary: a file with neither heading stays region-free and raises nothing (ordinary markdown)',
+      T(['# t', '| x |']).length === 0,
+      'n=' + T(['# t', '| x |']).length
+    );
+    let cErr = null;
+    try {
+      T(['### C.0 y', '### C.2 z']);
+    } catch (e) {
+      cErr = e;
+    }
+    check(
+      'T21b OB-46 fail-closed: `### C.0` without a `### C.1` delimiter raises UsageError (started-but-unterminated region)',
+      !!cErr && cErr instanceof UsageError && /endpoint missing/.test(cErr.message),
+      'err=' + (cErr ? cErr.message : 'NO ERROR')
     );
   }
 
@@ -1798,19 +2046,19 @@ function runTests() {
     );
 
     const shared = '| OB-1 | d | x | 下一片必做 |\n\n';
-    const above = g66Probe('docs/t027/probe-g6-6-above.md', shared + H124 + '| OB-2 | d | x | 观察中 |\n');
+    const above = g66Probe('docs/t027/probe-g6-6-above.md', LANG_TAG_ZH + shared + H124 + '| OB-2 | d | x | 观察中 |\n');
     check(
       'T26 a ledger-shaped row ABOVE the §12.4 heading is out of region and not judged',
       above.verdict === 'PASS' && above.findings === 0,
       'verdict=' + above.verdict + ' findings=' + above.findings
     );
-    const nonOb = g66Probe('docs/t027/probe-g6-6-nonob.md', H124 + '| X-1 | d | x | 下一片必做 |\n');
+    const nonOb = g66Probe('docs/t027/probe-g6-6-nonob.md', LANG_TAG_ZH + H124 + '| X-1 | d | x | 下一片必做 |\n');
     check(
       'T26 a non-OB table row inside §12.4 is not judged (LEDGER_ROW_RE)',
       nonOb.verdict === 'PASS' && nonOb.findings === 0,
       'verdict=' + nonOb.verdict + ' findings=' + nonOb.findings
     );
-    const noRegion = g66Probe('docs/t027/probe-g6-6-noregion.md', '| OB-1 | d | x | 下一片必做 |\n');
+    const noRegion = g66Probe('docs/t027/probe-g6-6-noregion.md', LANG_TAG_ZH + '| OB-1 | d | x | 下一片必做 |\n');
     check(
       'T26 a ledger row in a file without a §12.4 heading is not judged (no target region)',
       noRegion.verdict === 'PASS' && noRegion.findings === 0,
@@ -1882,13 +2130,170 @@ function runTests() {
       'verdict=' + verdictOf(en.records, 'G6-6') + ' :: ' + detailOf(en.records, 'G6-6')
     );
     const row = '| OB-1 | d | x | ';
-    const cnName = g66Probe('docs/t027/probe-g6-6-cn.md', H124 + row + '**Observing** |\n');
-    const enName = g66Probe('docs/t027/probe-g6-6_EN.md', H124 + row + '**Observing** |\n');
-    const cnWordInEn = g66Probe('docs/t027/probe-g6-6-mix_EN.md', H124 + row + '观察中 |\n');
+    const cnName = g66Probe('docs/t027/probe-g6-6-cn.md', LANG_TAG_ZH + H124 + row + '**Observing** |\n');
+    const enName = g66Probe('docs/t027/probe-g6-6_EN.md', LANG_TAG_EN + H124 + row + '**Observing** |\n');
+    const cnWordInEn = g66Probe('docs/t027/probe-g6-6-mix_EN.md', LANG_TAG_EN + H124 + row + '观察中 |\n');
     check(
       'T28 the `_EN` word-table switch is load-bearing: EN word fails under a CN name, passes under `_EN`, CN word fails under `_EN`',
       cnName.verdict === 'FAIL' && enName.verdict === 'PASS' && cnWordInEn.verdict === 'FAIL',
       JSON.stringify({ cnName: cnName.verdict, enName: enName.verdict, cnWordInEn: cnWordInEn.verdict })
+    );
+  }
+
+  // ---- T28b: OB-47 - the word table follows the DECLARED language, not the file name.
+  {
+    const gi = G6.internals;
+    check(
+      'T28b OB-47 declaredLang reads the header tag and agrees with the name (zh -> CN table, en -> EN table)',
+      gi.declaredLang(['`lang:zh`', 'x'], 'docs/t027/a.md') === 'cn' &&
+        gi.declaredLang(['`lang:en`', 'x'], 'docs/t027/a_EN.md') === 'en',
+      JSON.stringify([
+        gi.declaredLang(['`lang:zh`', 'x'], 'docs/t027/a.md'),
+        gi.declaredLang(['`lang:en`', 'x'], 'docs/t027/a_EN.md'),
+      ])
+    );
+    const g66Err = (p, t) => {
+      try {
+        g66Probe(p, t);
+        return null;
+      } catch (e) {
+        return e;
+      }
+    };
+    const row1 = H124 + '| OB-1 | d | x | 观察中 |\n';
+    const missing = g66Err('docs/t027/probe-g6-6-notag.md', row1);
+    check(
+      'T28b OB-47 fail-closed: no declared language tag raises UsageError instead of defaulting to CN',
+      !!missing && missing instanceof UsageError && /language tag missing/.test(missing.message),
+      'err=' + (missing ? missing.message : 'NO ERROR')
+    );
+    const unknown = g66Err('docs/t027/probe-g6-6-third.md', '`lang:fr`\n' + row1);
+    check(
+      'T28b OB-47 fail-closed: a third language (`lang:fr`) raises UsageError instead of being judged as CN',
+      !!unknown && unknown instanceof UsageError && /unknown language tag/.test(unknown.message),
+      'err=' + (unknown ? unknown.message : 'NO ERROR')
+    );
+    const prefixed = g66Err('docs/t027/probe-g6-6-prefixed.md', '`lang:zh-cn`\n' + row1);
+    check(
+      'T28b OB-47 fail-closed: a PREFIX form (`lang:zh-cn`) raises UsageError instead of counting as zh (7 r1 High-2)',
+      !!prefixed && prefixed instanceof UsageError && /unknown language tag/.test(prefixed.message),
+      'err=' + (prefixed ? prefixed.message : 'NO ERROR')
+    );
+    const prefixedEn = g66Err('docs/t027/probe-g6-6-prefixed_EN.md', '`lang:en-us`\n' + row1);
+    check(
+      'T28b OB-47 fail-closed: the same holds for `lang:en-us` on the `_EN` side',
+      !!prefixedEn && prefixedEn instanceof UsageError && /unknown language tag/.test(prefixedEn.message),
+      'err=' + (prefixedEn ? prefixedEn.message : 'NO ERROR')
+    );
+    // 7 r2 Medium: a legal tag must NOT shield an illegal one in the same header.
+    const coexist = g66Err('docs/t027/probe-g6-6-coexist.md', LANG_TAG_ZH + '`lang:zh-cn`\n' + row1);
+    check(
+      'T28b OB-91 fail-closed: a legal tag plus an illegal one (`lang:zh` + `lang:zh-cn`) raises UsageError (7 r2 Medium)',
+      !!coexist && coexist instanceof UsageError && /unknown language tag/.test(coexist.message),
+      'err=' + (coexist ? coexist.message : 'NO ERROR')
+    );
+    const coexistEn = g66Err('docs/t027/probe-g6-6-coexist_EN.md', LANG_TAG_EN + '`lang:en-us`\n' + row1);
+    check(
+      'T28b OB-91 fail-closed: the same coexistence rule holds on the `_EN` side (`lang:en` + `lang:en-us`)',
+      !!coexistEn && coexistEn instanceof UsageError && /unknown language tag/.test(coexistEn.message),
+      'err=' + (coexistEn ? coexistEn.message : 'NO ERROR')
+    );
+    const disagree = g66Err('docs/t027/probe-g6-6-mismatch_EN.md', LANG_TAG_ZH + row1);
+    check(
+      'T28b OB-47 fail-closed: a renamed file (`_EN.md` keeping `lang:zh`) raises UsageError instead of switching the table',
+      !!disagree && disagree instanceof UsageError && /disagrees with the file name/.test(disagree.message),
+      'err=' + (disagree ? disagree.message : 'NO ERROR')
+    );
+    const conflict = g66Err('docs/t027/probe-g6-6-conflict.md', LANG_TAG_ZH + LANG_TAG_EN + row1);
+    check(
+      'T28b OB-47 fail-closed: two conflicting declarations raise UsageError',
+      !!conflict && conflict instanceof UsageError && /conflicting language tags/.test(conflict.message),
+      'err=' + (conflict ? conflict.message : 'NO ERROR')
+    );
+    const late = g66Err('docs/t027/probe-g6-6-late.md', 'x\n'.repeat(20) + LANG_TAG_ZH + row1);
+    check(
+      'T28b OB-47 the header window is bounded: a tag below it is not a declaration',
+      !!late && late instanceof UsageError && /language tag missing/.test(late.message),
+      'err=' + (late ? late.message : 'NO ERROR')
+    );
+    const zhOk = g66Probe('docs/t027/probe-g6-6-tag-zh.md', LANG_TAG_ZH + row1);
+    const enOk = g66Probe(
+      'docs/t027/probe-g6-6-tag-en_EN.md',
+      LANG_TAG_EN + H124 + '| OB-1 | d | x | Observing |\n'
+    );
+    check(
+      'T28b OB-47 positive control: a compliant declaration is never rejected on either side',
+      zhOk.verdict === 'PASS' && zhOk.findings === 0 && enOk.verdict === 'PASS' && enOk.findings === 0,
+      JSON.stringify({ zh: zhOk.verdict, en: enOk.verdict, enFindings: enOk.findings })
+    );
+    // The declaration is a premise only where a word table is actually needed: an unrelated
+    // document may own a §12.4 heading (the RFC does) and has no ledger rows to judge.
+    const foreign = g66Err('docs/RFC-proofrail-unattended-ai-engineering-product.md', H124 + '| a | b | c |\n');
+    check(
+      'T28b OB-47 scope: a §12.4-shaped heading with no ledger row is skipped, not forced to declare (the RFC case)',
+      foreign === null,
+      'err=' + (foreign ? foreign.message : 'none (skipped)')
+    );
+    const foreignRow = g66Err(
+      'docs/RFC-proofrail-unattended-ai-engineering-product.md',
+      H124 + '| OB-1 | d | x | 观察中 |\n'
+    );
+    check(
+      'T28b OB-47 scope: the same foreign file carrying a real ledger row is judged, so it must declare (fail closed)',
+      !!foreignRow && foreignRow instanceof UsageError && /language tag missing/.test(foreignRow.message),
+      'err=' + (foreignRow ? foreignRow.message : 'NO ERROR')
+    );
+  }
+
+  // ---- T28c: OB-73 - the sixth mirror shape (whole-file backtick count).
+  {
+    const cnOk = '# CN\n\nshape `a` and `b`\n';
+    const enOk = '# EN\n\nshape `a` and `b`\n';
+    const enDrift = '# EN\n\nshape `a` and `b` and `c`\n';
+    const clean = g3aProbe(cnOk, enOk);
+    check(
+      'T28c OB-73 positive control: equal backtick counts leave G3(a.2) silent and the aggregate green',
+      clean.a2 === 'ABSENT' && clean.a === 'PASS' && /"backticks":true/.test(clean.detail),
+      'a2=' + clean.a2 + ' a=' + clean.a + ' :: ' + clean.detail
+    );
+    const drifted = g3aProbe(cnOk, enDrift);
+    check(
+      'T28c OB-73 the sixth shape is load-bearing: one extra backtick on the `_EN` side turns G3(a.2) red',
+      drifted.a2 === 'FAIL' && /"backticks":false/.test(drifted.a2detail),
+      'a2=' + drifted.a2 + ' :: ' + drifted.a2detail
+    );
+    const mut = loadMutatedModule(G3A_SOURCE, G3A_BACKTICK_SHAPE, '', 'ob73-backticks');
+    check(
+      'T28c OB-73 mutation applied: the sixth-shape line matched g3a.js (a stale patch would weaken the suite silently)',
+      mut.applied === true,
+      'applied=' + mut.applied
+    );
+    const blind = g3aProbe(cnOk, enDrift, mut.exports);
+    check(
+      'T28c OB-73 load-bearing proof: with the sixth shape patched out the SAME drift passes (the shape, not the pair, is what catches it)',
+      blind.a2 === 'ABSENT',
+      'a2=' + blind.a2 + ' :: ' + blind.detail
+    );
+    check(
+      'T28c restore: g3a.js is byte-identical after the mutation window and the cached module still catches the drift',
+      mut.identical === true && g3aProbe(cnOk, enDrift).a2 === 'FAIL',
+      'identical=' + mut.identical
+    );
+    const root = discoverRepoRoot(__dirname);
+    const real = g3aProbe(
+      decodeBuffer(fs.readFileSync(path.join(root, 'docs', 'DELIVERY_DIRECTIVE.md'))),
+      decodeBuffer(fs.readFileSync(path.join(root, 'docs', 'DELIVERY_DIRECTIVE_EN.md')))
+    );
+    check(
+      'T28c OB-73 the live directive pair satisfies all six shapes (real whole-file files)',
+      real.a2 === 'ABSENT' &&
+        /"lines":true/.test(real.detail) &&
+        /"head":true/.test(real.detail) &&
+        /"bold":true/.test(real.detail) &&
+        /"bars":true/.test(real.detail) &&
+        /"blank":true/.test(real.detail) &&
+        /"backticks":true/.test(real.detail),
+      'a2=' + real.a2 + ' :: ' + real.detail
     );
   }
 
@@ -2581,6 +2986,87 @@ function runTests() {
       glmQualified.verdict === 'FAIL' && glmQualified.findings === 1 && /model=glm-5\.3 \(glm\)/.test(glmQualified.detail),
       'verdict=' + glmQualified.verdict + ' findings=' + glmQualified.findings + ' :: ' + glmQualified.detail
     );
+  }
+
+  // ---- T68-T70: OB-20 - a FAILED git grep must never read as "zero hits"
+  // (slice GATES-TIGHTEN, v1.33). `git grep` exits 1 when there is NO match: that is data
+  // (the gate is satisfied). Any OTHER non-zero exit is an execution / environment failure
+  // and must surface as a UsageError (exit 2), never as a PASS indistinguishable from
+  // "zero hits" - the last remnant of the vacuous-pass family ⑦ dug out three rounds running.
+  {
+    const g5a1Ctx = (gitResult) => ({
+      git: () => gitResult,
+      listAgentFiles: () => [],
+      readText: () => null,
+    });
+    const g5a1Verdict = (gitResult) => {
+      const out = createReport();
+      G5A.subchecks[0].run(g5a1Ctx(gitResult), out);
+      return verdictOf(out.records, 'G5-a(1)');
+    };
+
+    check('T68 OB-20: git grep exit 1 (no match) is data - G5-a(1) still PASSes',
+      g5a1Verdict({ ok: false, code: 1, out: '', err: '', spawnError: null }) === 'PASS',
+      'verdict=' + g5a1Verdict({ ok: false, code: 1, out: '', err: '', spawnError: null }));
+
+    let failedGrep = null;
+    try {
+      g5a1Verdict({ ok: false, code: 128, out: '', err: 'fatal: not a git repository', spawnError: null });
+    } catch (e) {
+      failedGrep = e;
+    }
+    check('T69 OB-20: a failed git grep (exit 128) is a UsageError, never a silent PASS',
+      failedGrep instanceof UsageError && /G5-a\(1\)/.test(failedGrep.message) && /128/.test(failedGrep.message),
+      'err=' + (failedGrep ? failedGrep.message : 'NO ERROR (fail-open)'));
+
+    let missingGit = null;
+    try {
+      g5a1Verdict({ ok: false, code: 127, out: '', err: '', spawnError: new Error('spawn git ENOENT') });
+    } catch (e) {
+      missingGit = e;
+    }
+    check('T70 OB-20: a missing git binary (exit 127) is a UsageError too',
+      missingGit instanceof UsageError,
+      'err=' + (missingGit ? missingGit.message : 'NO ERROR (fail-open)'));
+
+    check('T70 OB-20 positive control: a real hit still FAILs (the guard rejects nothing legitimate)',
+      g5a1Verdict({ ok: true, code: 0, out: '.github/agents/prfrail-tester.agent.md\n', err: '', spawnError: null }) === 'FAIL',
+      'verdict=' + g5a1Verdict({ ok: true, code: 0, out: '.github/agents/prfrail-tester.agent.md\n', err: '', spawnError: null }));
+  }
+
+  // ---- T71: OB-17 - the angle-bracket rule is narrowed to id-LIKE placeholders
+  // (slice GATES-TIGHTEN, v1.33). `run <RUN_ID>` still fails; the CLI usage example
+  // `run <chain-file>` (token starts lowercase) must no longer be judged, so touching
+  // such a line can no longer turn G6-3 red by itself (OB-17's residual false positive).
+  {
+    const usage = g63Probe('prfrail run <chain-file>');
+    check('T71 OB-17: the CLI usage example `run <chain-file>` is no longer judged',
+      usage.verdict === 'PASS' && usage.findings === 0,
+      'verdict=' + usage.verdict + ' findings=' + usage.findings + ' why=' + usage.why);
+
+    const placeholder = g63Probe('prfrail run <RUN_ID>');
+    check('T71 OB-17: the id-like placeholder `run <RUN_ID>` still fails',
+      placeholder.verdict === 'FAIL' && placeholder.findings === 1,
+      'verdict=' + placeholder.verdict + ' findings=' + placeholder.findings);
+
+    const shortId = g63Probe('prfrail run <ID>');
+    check('T71 OB-17: a short uppercase placeholder `run <ID>` still fails',
+      shortId.verdict === 'FAIL',
+      'verdict=' + shortId.verdict + ' findings=' + shortId.findings);
+
+    // Mutation: widening the rule back to `[^>]*` must make the usage example red again,
+    // proving the narrowing (not a white-list entry) is what keeps the example green.
+    const mut = loadMutatedG6(
+      '/(?<![A-Za-z\\u4e00-\\u9fff])run\\s*<[A-Z][A-Z0-9_-]*>/g',
+      '/(?<![A-Za-z\\u4e00-\\u9fff])run\\s*<[^>]*>/g',
+      'ob17-angle-bracket');
+    const mutOut = createReport();
+    mut.exports.subchecks.find((s) => s.id === 'G6-3').run(probeCtx('prfrail run <chain-file>'), mutOut);
+    check('T71 OB-17 the narrowing is load-bearing: widening it back turns the usage example red',
+      mut.applied && verdictOf(mutOut.records, 'G6-3') === 'FAIL',
+      'applied=' + mut.applied + ' verdict=' + verdictOf(mutOut.records, 'G6-3'));
+    check('T71 OB-17 restore: g6.js is byte-identical after the mutation probe',
+      mut.identical === true, 'identical=' + mut.identical);
   }
 
   // ---- F1: a stale mutation (no-op) must not silently weaken the suite.

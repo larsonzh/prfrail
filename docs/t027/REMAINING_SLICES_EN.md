@@ -511,6 +511,8 @@ Sources: `docs/DELIVERY_DIRECTIVE.md:964` (the §12.5 "criterion self-reference 
 | Probe budget | none |
 | Execution-freedom list path | `docs/validation/evidence/GATES-TIGHTEN-freedom-list.md` |
 
+**In progress (2026-10-16)**: implementation ② is complete - the seven tightening items and the eight merged text items have landed, and the version package is at v1.33; the report pair `docs/validation/directive-gates-tighten{,_EN}.md` and the freedom list are on disk; the full gate suite and the self-test are green (readings in the report). ⑤ / ⑥ / ⑦ have not been dispatched; the status marker on the heading stays `⬜` until ⑧b updates it with the review conclusions.
+
 Merge ruling: of the four items once collected under `DIRECTIVE-DOCTRINE-CLEAN`, the **⑥ coverage-gap layering** (source `t028-supervised-black-box.md:203`) and the **⑦ tooling-surface calibration** (source `directive-haiku-bump.md:44` and `:157`) are **merged into this slice** as G7-family candidates; the **§5.1 ordering** items (OB-13's ⑨ position and OB-48's freedom-list landing time) move the pipeline structure ⇒ **not merged**, left for separate evaluation; the "probe caliber" item has no source anywhere in the repository ⇒ **not registered**.
 
 ### P3 — `C1` field completion (no new slice)
