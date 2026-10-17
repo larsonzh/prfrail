@@ -703,13 +703,22 @@ function firstStatusWord(cell, words) {
  * findings - fail closed.
  */
 /**
- * The FULL tag token (not just its prefix): 1 pre-review / 7 r1 caught `lang:zh-cn`
- * satisfying a prefix regex and being treated as a legal `zh` - a fail-open in a rule that
- * claims to be fail-closed. Matching is now whole-token and the comparison is exact:
- * only `lang:zh` and `lang:en` are in the closed set, anything else (including `lang:zh-cn`
- * and `lang:en-us`) takes the `unknown language tag` UsageError path.
+ * The tag token is consumed to its FULL extent (v1.34 / OB-91). Two partial fixes taught
+ * the rule the same lesson twice: 7 r1 caught `lang:zh-cn` read as a legal `zh` prefix, and
+ * 7 r3 then caught `lang:zh_cn` collapsing to the legal `lang:zh` while a bare `lang:`
+ * matched nothing at all - a character-class patch can always be outgrown by the next
+ * delimiter. The rule is therefore structural: a tag STARTS at every `\blang:` occurrence
+ * in the header window and runs over the maximal run of continuation characters (letters,
+ * digits, `_`, `.`, `-`). Every other character - space, tab, comma, backtick, CJK
+ * punctuation, end of line, anything not listed - TERMINATES the token, so the terminator
+ * set is the COMPLEMENT of the listed continuation set instead of an enumeration a future
+ * delimiter can escape. The token is then compared WHOLE against the closed set, and an
+ * occurrence preceded by a word character (`xlang:zh`) is not an occurrence at all.
+ * Coverage invariant: every occurrence inside the window is consumed by exactly one judged
+ * token, so no `lang:`-prefixed form can escape judgement.
  */
-const LANG_TAG_TOKEN_RE = /\blang:[A-Za-z][A-Za-z.-]*/g;
+const LANG_TAG_OCCURRENCE_RE = /\blang:/g;
+const LANG_TAG_CONT_RE = /[A-Za-z0-9._-]/;
 const LANG_TAG_EXACT = { 'lang:zh': 'zh', 'lang:en': 'en' };
 const LANG_HEADER_WINDOW = 15;
 const LANG_TAG_TO_SET = { zh: 'cn', en: 'en' };
@@ -718,10 +727,14 @@ function declaredLang(L, f) {
   const seen = new Set();
   let raw = null;
   for (let i = 0; i < Math.min(L.length, LANG_HEADER_WINDOW); i++) {
-    LANG_TAG_TOKEN_RE.lastIndex = 0;
+    const line = L[i];
+    LANG_TAG_OCCURRENCE_RE.lastIndex = 0;
     let m;
-    while ((m = LANG_TAG_TOKEN_RE.exec(L[i])) !== null) {
-      const token = m[0];
+    while ((m = LANG_TAG_OCCURRENCE_RE.exec(line)) !== null) {
+      let j = m.index + m[0].length;
+      while (j < line.length && LANG_TAG_CONT_RE.test(line[j])) j++;
+      const token = line.slice(m.index, j);
+      LANG_TAG_OCCURRENCE_RE.lastIndex = j;
       if (Object.prototype.hasOwnProperty.call(LANG_TAG_EXACT, token)) seen.add(LANG_TAG_EXACT[token]);
       else if (raw === null) raw = token;
     }
@@ -851,7 +864,8 @@ module.exports = {
     LEDGER_ROW_RE,
     // G6-6 (OB-47): header language declaration, closed tag set, name cross-check.
     declaredLang,
-    LANG_TAG_TOKEN_RE,
+    LANG_TAG_OCCURRENCE_RE,
+    LANG_TAG_CONT_RE,
     LANG_TAG_EXACT,
     LANG_HEADER_WINDOW,
   },

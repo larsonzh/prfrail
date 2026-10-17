@@ -602,6 +602,12 @@ const G5C_MEMBERSHIP = '          if (allowed.has(norm(m[1]))) continue;\n';
 const G7E_MEMBERSHIP = '      if (v && VERDICT_PREFIXES[prefix].indexOf(v) >= 0) return null;\n';
 /** Mutation target (T28c): the sixth mirror shape added by OB-73. */
 const G3A_BACKTICK_SHAPE = '        backticks: count(CL, /`/g) === count(EL, /`/g),\n';
+/** Mutation targets (T74 / OB-90, v1.34): the whole either-side pairing guard, and the mirror-existence guard inside it. */
+const G3A_OLD_PAIR_GUARD = "      if (enSide || !changed.includes(enf)) {\n        continue;\n      }\n";
+const G3A_PAIR_GUARD = "      if (\n        !enSide &&\n        !changed.includes(enf) &&\n        !(typeof ctx.exists === 'function' && ctx.exists(enf))\n      ) {\n        continue;\n      }\n";
+const G3A_MIRROR_GUARD = "        !(typeof ctx.exists === 'function' && ctx.exists(enf))\n";
+/** Mutation target (T75 / OB-91, v1.34): the tag-token continuation charset. */
+const G6_LANG_TAG_CONT = 'const LANG_TAG_CONT_RE = /[A-Za-z0-9._-]/;';
 
 function detailOf(records, id) {
   const r = records.find((x) => x.id === id);
@@ -672,7 +678,7 @@ function g65Probe(text, virtualPath) {
 }
 
 /** G6-6 verdict + finding count + record detail for one synthetic file body. */
-function g66Probe(virtualPath, text) {
+function g66Probe(virtualPath, text, mod) {
   const lines = String(text).split('\n');
   const ctx = {
     repoRoot: discoverRepoRoot(__dirname),
@@ -682,7 +688,7 @@ function g66Probe(virtualPath, text) {
     loadWhitelist: () => ({ entries: [], error: null, source: 'probe' }),
   };
   const out = createReport();
-  const res = G6.subchecks.find((s) => s.id === 'G6-6').run(ctx, out);
+  const res = (mod || G6).subchecks.find((s) => s.id === 'G6-6').run(ctx, out);
   return { verdict: verdictOf(out.records, 'G6-6'), findings: res.findings.length, detail: detailOf(out.records, 'G6-6') };
 }
 
@@ -711,6 +717,41 @@ function g3aProbe(cnText, enText, mod) {
     a: verdictOf(out.records, 'G3(a)'),
     a2: verdictOf(out.records, 'G3(a.2) ' + CNP),
     a2detail: detailOf(out.records, 'G3(a.2) ' + CNP),
+    // No FAIL record exists when the shapes agree, so the shape JSON is read from the
+    // aggregate record, which always carries it.
+    detail: detailOf(out.records, 'G3(a)'),
+  };
+}
+
+/**
+ * G3(a) PAIRING probe (OB-90, v1.34). The stock `g3aProbe` hard-codes one two-sided
+ * directive pair; this one drives the pairing preconditions themselves:
+ *   opts.changed  - the change set (paths)
+ *   opts.texts    - path -> line array; an absent path is unreadable (deleted)
+ *   opts.numstat  - path -> [added, deleted] (default [0, 0])
+ *   opts.existing - paths `ctx.exists()` reports as present at the scope endpoint / disk
+ *   opts.key      - the canonical CN path whose record ids are read back
+ *   opts.mod      - a patched criterion copy (mutation probes)
+ */
+function g3aEdgeProbe(opts) {
+  const o = opts || {};
+  const texts = new Map(Object.entries(o.texts || {}));
+  const nums = o.numstat || {};
+  const ctx = {
+    changedMarkdown: () => o.changed.filter((p) => /\.md$/i.test(p)),
+    changedPaths: o.changed,
+    numstat: (f) => nums[f] || [0, 0],
+    readLineArray: (f) => (texts.has(f) ? texts.get(f) : null),
+    exists: (f) => (o.existing || []).indexOf(f) >= 0,
+  };
+  const out = createReport();
+  (o.mod || G3A).run(ctx, out);
+  return {
+    records: out.records,
+    a: verdictOf(out.records, 'G3(a)'),
+    a1: verdictOf(out.records, 'G3(a.1) ' + o.key),
+    a2: verdictOf(out.records, 'G3(a.2) ' + o.key),
+    a2detail: detailOf(out.records, 'G3(a.2) ' + o.key),
     // No FAIL record exists when the shapes agree, so the shape JSON is read from the
     // aggregate record, which always carries it.
     detail: detailOf(out.records, 'G3(a)'),
@@ -1633,6 +1674,309 @@ function runTests() {
       'T73 restore: g5c.js is byte-identical after the mutation window and the cached module still fails the call string',
       mut.identical === true &&
         g5cProbe(cnGood + apxB("载体：runSubagent(agentName='a', model='GPT-9-Turbo (copilot)')"), enGood).verdict === 'FAIL',
+      'identical=' + mut.identical
+    );
+  }
+
+  // ---- T74: OB-90 (v1.34) - G3(a) pairs from EITHER side, so a one-sided edit is judged.
+  {
+    const CNP = 'docs/t027/probe-pair-cn.md';
+    const ENP = 'docs/t027/probe-pair-cn_EN.md';
+    const texts = { [CNP]: ['# c', ''], [ENP]: ['# e', ''] };
+    const enOnly = g3aEdgeProbe({
+      key: CNP,
+      changed: [ENP],
+      texts,
+      numstat: { [CNP]: [0, 0], [ENP]: [3, 0] },
+      existing: [],
+    });
+    check(
+      'T74 OB-90 an `_EN.md`-only change is now judged instead of silently ignored, and fails the symmetry test',
+      enOnly.a1 === 'FAIL' && enOnly.a === 'FAIL' && enOnly.a2 === 'ABSENT' && /_EN \+3\/-0 MISMATCH/.test(enOnly.detail),
+      'a1=' + enOnly.a1 + ' a=' + enOnly.a + ' :: ' + enOnly.detail
+    );
+    const cnOnly = g3aEdgeProbe({
+      key: CNP,
+      changed: [CNP],
+      texts,
+      numstat: { [CNP]: [3, 0], [ENP]: [0, 0] },
+      existing: [ENP],
+    });
+    check(
+      'T74 OB-90 a CN-only change whose `_EN` mirror exists is judged too (the mirror need not be in the change set)',
+      cnOnly.a1 === 'FAIL' && cnOnly.a === 'FAIL' && cnOnly.a2 === 'ABSENT' && /vs _EN \+0\/-0 MISMATCH/.test(cnOnly.detail),
+      'a1=' + cnOnly.a1 + ' :: ' + cnOnly.detail
+    );
+    const DIRC = 'docs/DELIVERY_DIRECTIVE.md';
+    const DIREN = 'docs/DELIVERY_DIRECTIVE_EN.md';
+    const dirDrift = g3aEdgeProbe({
+      key: DIRC,
+      changed: [DIREN],
+      texts: { [DIRC]: ['# c', ''], [DIREN]: ['# e', '', '# e2', ''] },
+      numstat: { [DIRC]: [0, 0], [DIREN]: [3, 0] },
+      existing: [DIRC],
+    });
+    check(
+      'T74 OB-90 directive pair, EN-only edit with a shape drift: G3(a.1) and G3(a.2) both go red',
+      dirDrift.a1 === 'FAIL' && dirDrift.a2 === 'FAIL' && /"lines":false/.test(dirDrift.a2detail),
+      'a1=' + dirDrift.a1 + ' a2=' + dirDrift.a2 + ' :: ' + dirDrift.a2detail
+    );
+    const dirNeutral = g3aEdgeProbe({
+      key: DIRC,
+      changed: [DIREN],
+      texts: { [DIRC]: ['# c', ''], [DIREN]: ['# e', ''] },
+      numstat: { [DIRC]: [0, 0], [DIREN]: [2, 0] },
+      existing: [DIRC],
+    });
+    check(
+      'T74 OB-90 directive pair, EN-only edit with a shape-neutral body: only G3(a.1) goes red, G3(a.2) stays silent',
+      dirNeutral.a1 === 'FAIL' && dirNeutral.a2 === 'ABSENT',
+      'a1=' + dirNeutral.a1 + ' a2=' + dirNeutral.a2
+    );
+    const lowerEn = g3aEdgeProbe({
+      key: CNP,
+      changed: ['docs/t027/probe-pair-cn_en.md'],
+      texts: { [CNP]: ['# c', ''] },
+      numstat: { 'docs/t027/probe-pair-cn_en.md': [3, 0] },
+      existing: [],
+    });
+    check(
+      'T74 OB-90 a non-canonical \`_en.md\` spelling is judged as the EN side of the same pair, not as two untouched paths (5 r1 F4)',
+      lowerEn.a1 === 'FAIL' && /_EN \+3\/-0/.test(lowerEn.detail),
+      'a1=' + lowerEn.a1 + ' :: ' + lowerEn.detail
+    );
+    const single = g3aEdgeProbe({
+      key: 'docs/README.md',
+      changed: ['docs/README.md'],
+      texts: { 'docs/README.md': ['# r', ''] },
+      numstat: { 'docs/README.md': [3, 0] },
+      existing: [],
+    });
+    check(
+      'T74 OB-90 load-bearing guard: a single-language `.md` without an `_EN` mirror stays out of scope, so the mirror-less corpus docs cannot go red',
+      single.a === 'ABSENT' && single.records.length === 0,
+      'a=' + single.a + ' records=' + single.records.length
+    );
+    const both = g3aEdgeProbe({
+      key: CNP,
+      changed: [CNP, ENP],
+      texts,
+      numstat: { [CNP]: [3, 0], [ENP]: [3, 0] },
+      existing: [ENP],
+    });
+    check(
+      'T74 OB-90 no behaviour drift: a two-sided equal edit still yields one green aggregate and no per-pair FAIL',
+      both.a === 'PASS' && both.a1 === 'ABSENT' && both.records.length === 1,
+      'a=' + both.a + ' records=' + both.records.length
+    );
+    const deletedBoth = g3aEdgeProbe({
+      key: CNP,
+      changed: [CNP, ENP],
+      texts: {},
+      numstat: { [CNP]: [0, 3], [ENP]: [0, 3] },
+      existing: [],
+    });
+    check(
+      'T74 OB-90 equal deletion on both sides still passes (an unreadable pair no longer skips the numstat verdict)',
+      deletedBoth.a === 'PASS' && deletedBoth.a1 === 'ABSENT',
+      'a=' + deletedBoth.a + ' :: ' + deletedBoth.detail
+    );
+    const deletedEn = g3aEdgeProbe({
+      key: CNP,
+      changed: [ENP],
+      texts: { [CNP]: ['# c', ''] },
+      numstat: { [CNP]: [0, 0], [ENP]: [0, 3] },
+      existing: [],
+    });
+    check(
+      'T74 OB-90 a deleted `_EN` side still yields a G3(a.1) FAIL (the old code skipped unreadable pairs entirely)',
+      deletedEn.a1 === 'FAIL' && deletedEn.a === 'FAIL',
+      'a1=' + deletedEn.a1 + ' :: ' + deletedEn.detail
+    );
+    const dirGone = g3aEdgeProbe({
+      key: 'docs/DELIVERY_DIRECTIVE.md',
+      changed: ['docs/DELIVERY_DIRECTIVE_EN.md'],
+      texts: { 'docs/DELIVERY_DIRECTIVE_EN.md': ['# e', ''] },
+      numstat: { 'docs/DELIVERY_DIRECTIVE.md': [0, 0], 'docs/DELIVERY_DIRECTIVE_EN.md': [3, 0] },
+      existing: [],
+    });
+    check(
+      'T74 OB-90 the directive pair with an unreadable side reports G3(a.2) FAIL (premise broken, fail closed)',
+      dirGone.a2 === 'FAIL' && /side unreadable/.test(dirGone.a2detail),
+      'a2=' + dirGone.a2 + ' :: ' + dirGone.a2detail
+    );
+    const mut = loadMutatedModule(G3A_SOURCE, G3A_PAIR_GUARD, G3A_OLD_PAIR_GUARD, 'ob90-enside');
+    check(
+      'T74 OB-90 mutation applied: the pairing-guard block matched g3a.js (a stale patch would weaken the suite silently)',
+      mut.applied === true,
+      'applied=' + mut.applied
+    );
+    const blind = g3aEdgeProbe({
+      key: CNP,
+      changed: [ENP],
+      texts,
+      numstat: { [CNP]: [0, 0], [ENP]: [3, 0] },
+      existing: [],
+      mod: mut.exports,
+    });
+    check(
+      'T74 OB-90 load-bearing proof: with the either-side guard reverted the SAME `_EN`-only change produces NO record again',
+      blind.a === 'ABSENT' && blind.records.length === 0,
+      'a=' + blind.a + ' records=' + blind.records.length
+    );
+    check(
+      'T74 restore: g3a.js is byte-identical after the mutation window and the cached module still judges the `_EN`-only change',
+      mut.identical === true &&
+        g3aEdgeProbe({
+          key: CNP,
+          changed: [ENP],
+          texts,
+          numstat: { [CNP]: [0, 0], [ENP]: [3, 0] },
+          existing: [],
+        }).a1 === 'FAIL',
+      'identical=' + mut.identical
+    );
+    const mut2 = loadMutatedModule(G3A_SOURCE, G3A_MIRROR_GUARD, '        false\n', 'ob90-mirror-guard');
+    check(
+      'T74 OB-90 mutation applied (mirror-existence guard): the guard line matched g3a.js',
+      mut2.applied === true,
+      'applied=' + mut2.applied
+    );
+    const loud = g3aEdgeProbe({
+      key: 'docs/README.md',
+      changed: ['docs/README.md'],
+      texts: { 'docs/README.md': ['# r', ''] },
+      numstat: { 'docs/README.md': [3, 0] },
+      existing: [],
+      mod: mut2.exports,
+    });
+    check(
+      'T74 OB-90 load-bearing proof (mirror-existence guard): without the predicate the SAME single-language document goes red',
+      loud.a === 'FAIL',
+      'a=' + loud.a + ' :: ' + loud.detail
+    );
+    check(
+      'T74 restore (mirror-existence guard): g3a.js is byte-identical and the single-language document is silent again',
+      mut2.identical === true &&
+        g3aEdgeProbe({
+          key: 'docs/README.md',
+          changed: ['docs/README.md'],
+          texts: { 'docs/README.md': ['# r', ''] },
+          numstat: { 'docs/README.md': [3, 0] },
+          existing: [],
+        }).a === 'ABSENT',
+      'identical=' + mut2.identical
+    );
+  }
+
+  // ---- T75: OB-91 (v1.34) - the language tag token is consumed to its FULL extent.
+  {
+    const row = H124 + '| OB-1 | d | x | 观察中 |\n';
+    const errOf = (p, t, mod) => {
+      try {
+        g66Probe(p, t, mod);
+        return null;
+      } catch (e) {
+        return e;
+      }
+    };
+    const unknown = (e) => !!e && e instanceof UsageError && /unknown language tag/.test(e.message);
+    const underscore = errOf('docs/t027/probe-g6-6-underscore.md', '`lang:zh_cn`\n' + row);
+    check(
+      'T75 OB-91 the 7 r3 residual is closed: `lang:zh_cn` is consumed whole and rejected (it used to truncate to a legal `lang:zh`)',
+      unknown(underscore) && /`lang:zh_cn`/.test(underscore.message),
+      'err=' + (underscore ? underscore.message : 'NO ERROR')
+    );
+    const underscoreEn = errOf('docs/t027/probe-g6-6-underscore_EN.md', '`lang:en_us`\n' + row);
+    check(
+      'T75 OB-91 the same holds for `lang:en_us` on the `_EN` side',
+      unknown(underscoreEn) && /`lang:en_us`/.test(underscoreEn.message),
+      'err=' + (underscoreEn ? underscoreEn.message : 'NO ERROR')
+    );
+    const bare = errOf('docs/t027/probe-g6-6-bare.md', '`lang:`\n' + row);
+    check(
+      'T75 OB-91 a bare `lang:` is an unknown tag rather than an invisible token',
+      unknown(bare) && /`lang:`/.test(bare.message),
+      'err=' + (bare ? bare.message : 'NO ERROR')
+    );
+    const bareCoexist = errOf('docs/t027/probe-g6-6-bare-coexist.md', LANG_TAG_ZH + '`lang:`\n' + row);
+    check(
+      'T75 OB-91 coexistence is fail-closed for the new form as well (`lang:zh` plus a bare `lang:`)',
+      unknown(bareCoexist),
+      'err=' + (bareCoexist ? bareCoexist.message : 'NO ERROR')
+    );
+    const underscoreCoexist = errOf(
+      'docs/t027/probe-g6-6-underscore-coexist.md',
+      LANG_TAG_ZH + '`lang:zh_cn`\n' + row
+    );
+    check(
+      'T75 OB-91 coexistence (`lang:zh` plus `lang:zh_cn`) is rejected too',
+      unknown(underscoreCoexist),
+      'err=' + (underscoreCoexist ? underscoreCoexist.message : 'NO ERROR')
+    );
+    const trailingDash = errOf('docs/t027/probe-g6-6-dash.md', '`lang:zh-`\n' + row);
+    check(
+      'T75 OB-91 a trailing continuation character (`lang:zh-`) is rejected',
+      unknown(trailingDash),
+      'err=' + (trailingDash ? trailingDash.message : 'NO ERROR')
+    );
+    const trailingDot = errOf('docs/t027/probe-g6-6-dot.md', '`lang:zh.`\n' + row);
+    check(
+      'T75 OB-91 a trailing dot (`lang:zh.`) belongs to the token and is rejected (the terminator set is the complement of the continuation set)',
+      unknown(trailingDot),
+      'err=' + (trailingDot ? trailingDot.message : 'NO ERROR')
+    );
+    const upper = errOf('docs/t027/probe-g6-6-upper.md', '`lang:ZH`\n' + row);
+    check(
+      'T75 OB-91 the comparison stays whole-token and case-sensitive (`lang:ZH`)',
+      unknown(upper),
+      'err=' + (upper ? upper.message : 'NO ERROR')
+    );
+    const digit = errOf('docs/t027/probe-g6-6-digit.md', '`lang:zh2`\n' + row);
+    check(
+      'T75 OB-91 a digit suffix (`lang:zh2`) is rejected',
+      unknown(digit),
+      'err=' + (digit ? digit.message : 'NO ERROR')
+    );
+    const comma = g66Probe('docs/t027/probe-g6-6-comma.md', '`lang:zh,`\n' + row);
+    check(
+      'T75 OB-91 a comma terminates the token, so `lang:zh,` stays legal',
+      comma.verdict === 'PASS',
+      'verdict=' + comma.verdict + ' :: ' + comma.detail
+    );
+    const prose = g66Probe('docs/t027/probe-g6-6-prose.md', '`lang:zh` zh\n' + row);
+    check(
+      'T75 OB-91 prose after the tag creates no phantom occurrence (a tag followed by a space and more words)',
+      prose.verdict === 'PASS',
+      'verdict=' + prose.verdict + ' :: ' + prose.detail
+    );
+    const leadingDot = g66Probe('docs/t027/probe-g6-6-leadingdot.md', '.lang:zh\n' + row);
+    check(
+      'T75 OB-91 a leading dot is not part of the token (`.lang:zh` still declares zh)',
+      leadingDot.verdict === 'PASS',
+      'verdict=' + leadingDot.verdict + ' :: ' + leadingDot.detail
+    );
+    const wordChar = errOf('docs/t027/probe-g6-6-wordchar.md', 'xlang:zh\n' + row);
+    check(
+      'T75 OB-91 an occurrence preceded by a word character is not an occurrence (`xlang:zh` declares nothing and fails as missing)',
+      !!wordChar && wordChar instanceof UsageError && /language tag missing/.test(wordChar.message),
+      'err=' + (wordChar ? wordChar.message : 'NO ERROR')
+    );
+    const mut = loadMutatedModule(G6_SOURCE, G6_LANG_TAG_CONT, 'const LANG_TAG_CONT_RE = /[A-Za-z.-]/;', 'ob91-continuation');
+    check(
+      'T75 OB-91 mutation applied: the continuation-charset line matched g6.js (a stale patch would weaken the suite silently)',
+      mut.applied === true,
+      'applied=' + mut.applied
+    );
+    const blindUnderscore = g66Probe('docs/t027/probe-g6-6-underscore.md', '`lang:zh_cn`\n' + row, mut.exports);
+    check(
+      'T75 OB-91 load-bearing proof: with the continuation charset narrowed back the SAME `lang:zh_cn` header passes again (the charset, not the closed set, is what catches it)',
+      blindUnderscore.verdict === 'PASS',
+      'verdict=' + blindUnderscore.verdict + ' :: ' + blindUnderscore.detail
+    );
+    check(
+      'T75 restore: g6.js is byte-identical after the mutation window and the cached module still rejects `lang:zh_cn`',
+      mut.identical === true && unknown(errOf('docs/t027/probe-g6-6-underscore.md', '`lang:zh_cn`\n' + row)),
       'identical=' + mut.identical
     );
   }
