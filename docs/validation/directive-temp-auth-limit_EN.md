@@ -44,6 +44,8 @@ A gate caught red on the spot ⇒ fixed in place ⇒ not a deviation, item by it
 - **Self-reference registration (a property of this slice, stated explicitly)**: while revising the §1.7.4 ⑤ threshold this slice **hit that very threshold itself**; per the "quota exhausted" row of §7.8.3 it took the "fix plus fold into the ⑦ input" path, handed the closure paths of F-1 / F-2 to ⑦, and registered **OB-94** as the carrier; **nothing is nullified and no extra ⑤ round is granted**.
 - **§12.1 pilot deferral (the 8th)**: this slice is a governance / rule-revision slice and does not meet the §12.1 pilot criteria (matching companion ②); per the §12.4 single source of truth it is recorded as the **8th** such instance (the five slices v1.30 through v1.34 are the same case) and this slice **adds no deferral OB**; a formal registration is the user's call.
 - ⑩ stop point: a commit and a push both require same-turn authorization; this slice has no commit yet.
+- **⑧c ran twice (positive evidence from this slice's self-reference)** after the first cleanup the cleanup record itself still had to land ⇒ following the timing rule this slice had just written into §5.1 ("record first, then clean"), the temp directory was reopened for that record and ⑧c ran once more at the tail (`Test-Path` is `False`, `tmp/` holds `.gitkeep` only) - **the new rule was actually used and worked during this slice's own wrap-up**.
+- **Same-class instance 3: the `$env:TEMP` recurrence (form deviation, not nullified, no new OB)**: during CI observation `$env:TEMP\w.txt` carried the `gh run watch` output; per item 7 of the kickoff this **stopped and escalated**; the file was deleted at once with `Remove-Item -LiteralPath` and the read-back shows `Test-Path` as `False`; it never entered the repository and affects neither the gates nor CI; it is **escalated to a pre-condition for the next slice plus a mechanical-criterion candidate**.
 - **⑧c cleanup (executed)**: every helper under `tmp/DIRECTIVE-TEMP-AUTH-LIMIT/` (scripts, review packages, raw gate readings) was removed item by item; the read-back shows `Test-Path` as `False` and `tmp/` holding `.gitkeep` only.
 
 ## 5. Known gaps and registrations (the section the ruling calls "§8")
@@ -51,6 +53,7 @@ A gate caught red on the spot ⇒ fixed in place ⇒ not a deviation, item by it
 - **OB-92 / OB-93 / OB-94 all flip to `Resolved`**: OB-92 closes with the "⑤(iv) landing sentence plus ADR revision note plus no rewrite of the historical ruling" triple; OB-93 closes with the two §5.1 timing rules; OB-94 closes after the ⑦ r1 re-check of F-1 / F-2.
 - **F-3..F-5 (Low) remediation record**: F-3 "closing sentence of this section" → "table-following sentence of this section"; F-4 the §12.5 ⑦ budget row gains "from v1.35 the round cap is taken from the slice's tier"; F-5 the step-0 anchor gains "the first item of the §1.2 steps field; a slice without that item must perform it in its kickoff receipt".
 - **Still open inside this slice scope**: none.
+- **Candidate (recorded in this report only, no OB number)**: escalate the temp-artifact discipline from an authorization boundary to a **mechanical criterion** (`G9-c`, or folded into `G6` / `G8`): **⑧c read-back evidence plus a temp-directory shape check**; not landed here, kept as an input to a later governance slice.
 - **Candidate (recorded in this report only, never as a §12.4 row)**: the tiered §7.5 quotas have no real-slice evidence yet (n=0) ⇒ the next slice should run under the new table and record actual usage; if an M-tier slice returns `PASS` without using the extra round, a later governance slice may return M to 1+1.
 
 ## 6. Next-step advice (awaiting the user's ruling)
@@ -60,8 +63,11 @@ A gate caught red on the spot ⇒ fixed in place ⇒ not a deviation, item by it
 
 ## 7. Commit and CI
 
-- This slice **does not enter the commit stage** before the ⑩ stop point; commit and push need same-turn authorization, so this section carries no CI readings yet.
-- After the commit, both legs are observed per §6.4 and the readings are written into this section by a later docs-only commit (which also needs same-turn authorization).
+- **Main commit**: `9d5bf9e` - `feat: revise the temporary-authorization threshold and the review quota cap (v1.35)` (9 files, `+286/-16`); pushed to `origin/main` (SSH, range `aa49e0c..9d5bf9e`); **gitee untouched**.
+- **CI observation (this commit's own run)**: run `39045058091` (workflow `CI`, event push, attempt 1) **green on both legs on the first attempt** - `Go ubuntu-latest` 2m39s and `Go windows-latest` 3m00s; **no first-run-red handling was needed**.
+- **Gates-step hard evidence (measured on both legs)**: `SELFTEST: PASS 417/417`; `GATE REPORT scope=ci changed=9`; `TOTAL_FAIL=0`; all three `G3(a)` pairs have symmetric numstat and the directive pair has all six shapes `true`.
+- **Package-level evidence**: the two legs together cover 14 packages (the 12 under `internal/**`, `examples/whois-shadow` and `tools/agent-probe/enforcement-proxy`), with 0 `FAIL` lines.
+- **Backfill rule**: this section is written by the docs-only backfill; the backfill commit's own CI is observed only, and no further commit is added for it.
 
 ## 8. Artifacts
 
