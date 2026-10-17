@@ -631,6 +631,24 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Probe budget | none |
 | Execution-freedom list path | `docs/validation/evidence/DIRECTIVE-SCAN-TEMPLATE-freedom-list.md` |
 
+### P10 — `DIRECTIVE-TEMP-AUTH-LIMIT` · ✅
+
+| Field | Content |
+|---|---|
+| Id | `DIRECTIVE-TEMP-AUTH-LIMIT` (v1.35) |
+| Status | ✅ **Completed** (report at `docs/validation/directive-temp-auth-limit{,_EN}.md`; ⑩ stop point, a commit needs same-turn authorization) |
+| Goal | Formally revise the §1.7.4 ⑤ threshold and the §7.5 quota cap; land OB-92 (the ADR-024 wording conflict) and OB-93 plus the ⑧c record timing (§5.1 per-input assertion in the review input builder, cleanup/record timing) |
+| Depends on | none (upstream `GATES-EDGE-COVERAGE` is closed, HEAD = `aa49e0c`) |
+| Size | M |
+| Steps | step 0 (ADR status check) → ① → ② → ③ → ④ → ⑤ → ⑥ → ⑦ (r1 + re-review) → ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| Current gap | §1.7.4 ⑤ never defines "the same class", so the threshold rests on a verbal reading; the §7.5 ⑦ cap is systematically mismatched with the review volume of governance / L-tier slices (ADR-025 records the 7th same-class exception); OB-92 and OB-93 each carry an anchor and a candidate fix |
+| Deliverables | directive v1.35 (header, §0.3, §1.7.4 ⑤, §7.5, §5.1, §12.4, §12.5, appendix C.0w) plus the ADR-024 revision note, the report pair, the freedom list and this row |
+| Acceptance evidence | (1) all four inputs flipped or truthfully reported as not holding; (2) `gate.js --all` reports `TOTAL_FAIL=0` in all three scopes; (3) every revision carries a mechanically verifiable assertion; (4) CN / `_EN` have all six shapes equal |
+| Boundary | the §2.2 / §2.4 closed sets, the §5.2 matrix and the §6.3 criterion bodies stay untouched; CONTRACTS / schema / fixtures / workflows unchanged; `internal/**` untouched; role set and carriers untouched; no gitee push |
+| Tier | `[SLICE]` (touches §1.7.4 / §7.5 / §5.1 / authorization-contract semantics) |
+| Probe quota | none |
+| Freedom-list path | `docs/validation/evidence/DIRECTIVE-TEMP-AUTH-LIMIT-freedom-list.md` |
+
 ---
 
 ## Known defects (to be handled before later slices)

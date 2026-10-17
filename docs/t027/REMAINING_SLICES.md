@@ -645,6 +645,24 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 探针额度 | 无 |
 | 执行自由度清单落盘路径 | `docs/validation/evidence/DIRECTIVE-SCAN-TEMPLATE-freedom-list.md` |
 
+### P10 — `DIRECTIVE-TEMP-AUTH-LIMIT` · ✅
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `DIRECTIVE-TEMP-AUTH-LIMIT`（v1.35） |
+| 状态 | ✅ **已完成**（报告见 `docs/validation/directive-temp-auth-limit{,_EN}.md`；⑩ 停点，提交须同轮授权） |
+| 目标 | 正式修订 §1.7.4 ⑤ 阈值与 §7.5 额度上限；落地 OB-92（ADR-024 措辞冲突）与 OB-93 + ⑧c 落痕时序（§5.1 输入包逐件断言 + 清理/落痕时序） |
+| 依赖 | 无（上游 `GATES-EDGE-COVERAGE` 已闭环，HEAD = `aa49e0c`） |
+| 规模 | M |
+| 步骤 | 步骤 0（ADR 状态核对）→ ① → ② → ③ → ④ → ⑤ → ⑥ → ⑦（r1 + 复审）→ ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| 现状缺口 | §1.7.4 ⑤ 的「同类情形」无定义、阈值判定依赖口读；§7.5 的 ⑦ 上限与治理片 / L 档审查量系统性不匹配（ADR-025 记同类第 7 次例外）；OB-92 / OB-93 各有锚点与候选修法 |
+| 交付物 | 准则 v1.35（头部、§0.3、§1.7.4 ⑤、§7.5、§5.1、§12.4、§12.5、附录 C.0w）+ ADR-024 修订注记 + 报告对 + 自由度清单 + 本行 |
+| 验收证据 | ① 四项输入均翻转或如实说明不成立；② `gate.js --all` 三作用域 `TOTAL_FAIL=0`；③ 每项修订有可机械核验断言；④ CN / `_EN` 六形状全等 |
+| 边界 | 不改 §2.2 / §2.4 闭集、§5.2 矩阵 / §6.3 判据本体；不改 CONTRACTS / schema / fixtures / workflows；不动 `internal/**`；不触角色集与载体；不推 gitee |
+| 分级 | `[SLICE]`（触 §1.7.4 / §7.5 / §5.1 / 授权契约语义） |
+| 探针额度 | 无 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/DIRECTIVE-TEMP-AUTH-LIMIT-freedom-list.md` |
+
 ---
 ## 已知缺陷（后续切片前处理）
 
