@@ -39,6 +39,8 @@ const G2 = require('./lib/criteria/g2');
 const G4A = require('./lib/criteria/g4a');
 const G3A = require('./lib/criteria/g3a');
 const G6 = require('./lib/criteria/g6');
+const G1 = require('./lib/criteria/g1');
+const G5 = require('./lib/criteria/g5');
 const G7 = require('./lib/criteria/g7');
 const G8 = require('./lib/criteria/g8');
 const G4B = require('./lib/criteria/g4b');
@@ -608,6 +610,10 @@ const G3A_PAIR_GUARD = "      if (\n        !enSide &&\n        !changed.include
 const G3A_MIRROR_GUARD = "        !(typeof ctx.exists === 'function' && ctx.exists(enf))\n";
 /** Mutation target (T75 / OB-91, v1.34): the tag-token continuation charset. */
 const G6_LANG_TAG_CONT = 'const LANG_TAG_CONT_RE = /[A-Za-z0-9._-]/;';
+/** Mutation target (T76, v1.36): the G1(f) in-progress wording test inside the completion log. */
+const G1_INPROGRESS_TEST = '      if (IN_PROGRESS_RE.test(c.summary)) badF.push(';
+/** Mutation target (T77, v1.36): the G5(d) change-set vs declared-set verdict. */
+const G5_SET_EQUALITY = "      missing.length === 0 ? 'PASS' : 'FAIL',";
 
 function detailOf(records, id) {
   const r = records.find((x) => x.id === id);
@@ -693,7 +699,57 @@ function g66Probe(virtualPath, text, mod) {
 }
 
 /**
- * G3(a.2) mirror-parity probe (OB-73). A synthetic directive pair with only the four ctx
+ * G1 probe (v1.36): feed a synthetic ledger body to the base criterion and report the four
+ * sub-verdicts. Only the CN ledger path is readable, so every case is judged once.
+ */
+function g1Probe(text, mod, added) {
+  const M = mod || G1;
+  const cn = M._internals.LEDGERS[0];
+  const ctx = {
+    repoRoot: discoverRepoRoot(__dirname),
+    readLineArray: (p) => (p === cn ? String(text).split('\n') : null),
+    addedLineNumbers: added ? () => new Set(added) : undefined,
+  };
+  const out = createReport();
+  M.run(ctx, out);
+  const pick = (id) => {
+    const r = out.records.find((x) => x.id === id);
+    return r ? r.verdict : 'ABSENT';
+  };
+  return { c: pick('G1(c)'), d: pick('G1(d)'), e: pick('G1(e)'), f: pick('G1(f)'), detail: out.records.map((r) => r.id + '=' + r.verdict).join(' ') };
+}
+
+/**
+ * G5 probe (v1.36): a synthetic scope with injected change set, report fence, added ledger
+ * rows, index hygiene and artifact resolution.
+ */
+function g5Probe(o, mod) {
+  const M = mod || G5;
+  const changed = o.changed || [];
+  const ctx = {
+    repoRoot: discoverRepoRoot(__dirname),
+    kind: o.kind || 'index',
+    changedPaths: changed,
+    readText: (p) => (o.texts && o.texts[p] !== undefined ? o.texts[p] : null),
+    addedLines: (p) => (o.added && o.added[p]) || [],
+    git: () => ({ ok: true, out: (o.unstaged || []).join('\n') }),
+    repoArtifactResolvable: (p) => (o.existing || []).some((x) => p === x || p.indexOf(x.replace(/\/+$/, '') + '/') === 0),
+    recordFor: (p) => {
+      const gone = (o.deleted || []).indexOf(p) >= 0;
+      // production shape from parseStatusZ: two-char XY plus the parser's `deleted` boolean
+      return { status: gone ? 'D ' : 'M ', deleted: gone };
+    },
+  };
+  const out = createReport();
+  M.run(ctx, out);
+  const pick = (id) => {
+    const r = out.records.find((x) => x.id === id);
+    return r ? r.verdict : 'ABSENT';
+  };
+  return { d: pick('G5(d)'), e: pick('G5(e)'), f: pick('G5(f)'), detail: out.records.map((r) => r.id + '=' + r.verdict).join(' '), raw: out.records.map((r) => r.id + ':' + r.detail).join(' | ') };
+}
+
+/** G3(a.2) mirror-parity probe (OB-73). A synthetic directive pair with only the four ctx
  * members g3a.js touches. `mod` lets the mutation probe run a patched copy of the
  * criterion instead of the shipped one.
  */
@@ -1978,6 +2034,426 @@ function runTests() {
       'T75 restore: g6.js is byte-identical after the mutation window and the cached module still rejects `lang:zh_cn`',
       mut.identical === true && unknown(errOf('docs/t027/probe-g6-6-underscore.md', '`lang:zh_cn`\n' + row)),
       'identical=' + mut.identical
+    );
+  }
+
+  // ---- T76: v1.36 - base G1 (status markers) is a real criterion, not a SKIP.
+  {
+    const LEDGER = (o) => {
+      const st = o.status || [['A0 alpha', '✅ 完成'], ['C1 gamma', '⬜ 未开始']];
+      const heads = o.heads || ['## A0 — alpha · ✅', '## C1 — gamma · ⬜', '### P5 — `X` · ⏸ 待评估（产品侧）'];
+      const comp = o.comp || [['2026-09-14', 'A0', 'done', '`docs/validation/a0.md`']];
+      return [
+        '状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断',
+        '',
+        '## 状态表',
+        '',
+        '| 切片 | 状态 | 直接依赖 | 规模 | 完成日期 | 证据 |',
+        '|---|---|---|---|---|---|',
+        ...st.map((r) => '| ' + r[0] + ' | ' + r[1] + ' | — | M | | |'),
+        '',
+        ...heads,
+        '',
+        '## 完成记录（追加）',
+        '',
+        '| 日期 | 切片 | 完成摘要 | 证据 |',
+        '|---|---|---|---|',
+        ...comp.map((r) => '| ' + r.join(' | ') + ' |'),
+      ].join('\n');
+    };
+    const good = g1Probe(LEDGER({}));
+    check(
+      'T76 G1 a consistent ledger (heading / status table / completion log) passes all four sub-checks',
+      good.c === 'PASS' && good.d === 'PASS' && good.e === 'PASS' && good.f === 'PASS',
+      good.detail
+    );
+    const unknownSym = g1Probe(LEDGER({ status: [['A0 alpha', '🚧 进行中'], ['C1 gamma', '⬜ 未开始']] }));
+    check(
+      'T76 G1 an unknown state symbol outside the ledger closed set fails G1(c)',
+      unknownSym.c === 'FAIL',
+      unknownSym.detail
+    );
+    const pendingOnStatus = g1Probe(LEDGER({ status: [['A0 alpha', '⏸ 待评估'], ['C1 gamma', '⬜ 未开始']] }));
+    check(
+      'T76 G1 the pending-evaluation marker is only legal on headings, never in the status table',
+      pendingOnStatus.c === 'FAIL',
+      pendingOnStatus.detail
+    );
+    const drift = g1Probe(LEDGER({ heads: ['## A0 — alpha · ⬜', '## C1 — gamma · ⬜'] }));
+    check(
+      'T76 G1 a heading that disagrees with its status-table row fails G1(d)',
+      drift.d === 'FAIL' && drift.c === 'PASS',
+      drift.detail
+    );
+    const compNotDone = g1Probe(LEDGER({ comp: [['2026-09-14', 'C1', 'done', '`docs/validation/c1.md`']] }));
+    check(
+      'T76 G1 a completion-log row whose status row is still ⬜ fails G1(e)',
+      compNotDone.e === 'FAIL',
+      compNotDone.detail
+    );
+    const inProg = g1Probe(LEDGER({ comp: [['2026-09-14', 'A0', '进行中：待 ⑧b 定稿后更新', '`docs/validation/a0.md`']] }));
+    check(
+      'T76 G1 in-progress wording inside a completion row fails G1(f) (the GATES-EDGE-COVERAGE defect, mechanised)',
+      inProg.f === 'FAIL' && inProg.e === 'PASS',
+      inProg.detail
+    );
+    const enInProg = g1Probe(LEDGER({ comp: [['2026-09-14', 'A0', 'In progress: awaiting finalisation', '`docs/validation/a0.md`']] }));
+    check(
+      'T76 G1 the same holds for the English wording (In progress / awaiting finalisation)',
+      enInProg.f === 'FAIL',
+      enInProg.detail
+    );
+    const aliasHeads = ['## A0 — alpha · ✅', '## P11 — `GATES-G1G5` · 🔄'];
+    const aliasRows = [['A0 alpha', '✅ 完成'], ['P11 slice', '🔄 进行中']];
+    const aliasComp = [
+      ['2026-09-14', 'A0', 'done', '`docs/validation/a0.md`'],
+      ['2026-10-18', 'GATES-G1G5', 'closed', '`docs/validation/p11.md`'],
+    ];
+    const aliasBad = g1Probe(LEDGER({ heads: aliasHeads, status: aliasRows, comp: aliasComp }));
+    check(
+      'T76 G1 a completion key binds to a heading through its backticked alias (the P-series governance case)',
+      aliasBad.e === 'FAIL',
+      aliasBad.detail
+    );
+    const aliasOk = g1Probe(
+      LEDGER({
+        heads: ['## A0 — alpha · ✅', '## P11 — `GATES-G1G5` · ✅'],
+        status: [['A0 alpha', '✅ 完成'], ['P11 slice', '✅ 完成']],
+        comp: aliasComp,
+      })
+    );
+    check('T76 G1 the same row passes once the aliased heading is ✅ (the binding is real, not a lucky string match)', aliasOk.e === 'PASS', aliasOk.detail);
+    const G1_ALIAS_LOOKUP = '  const byAlias = headings.filter((h) => h.aliases.indexOf(key) >= 0);';
+    const mutG1Alias = loadMutatedModule(path.join(__dirname, 'lib', 'criteria', 'g1.js'), G1_ALIAS_LOOKUP, '  const byAlias = [];', 'v136-g1-alias');
+    check(
+      'T76 G1 mutation applied on the alias lookup (defect 3: completion key never bound to a P-series heading)',
+      mutG1Alias.applied === true,
+      'applied=' + mutG1Alias.applied
+    );
+    const blindAlias = g1Probe(LEDGER({ heads: aliasHeads, status: aliasRows, comp: aliasComp }), mutG1Alias.exports);
+    check(
+      'T76 G1 load-bearing proof: with the alias fallback removed the SAME mismatched row passes, i.e. G1(e) was vacuous for every governance slice',
+      blindAlias.e === 'PASS',
+      blindAlias.detail
+    );
+    check(
+      'T76 G1 restore after the alias mutation window',
+      mutG1Alias.identical === true && g1Probe(LEDGER({ heads: aliasHeads, status: aliasRows, comp: aliasComp })).e === 'FAIL',
+      'identical=' + mutG1Alias.identical
+    );
+    const unknownSymHead = g1Probe(
+      LEDGER({
+        heads: ['## A0 — alpha · ✅', '## C1 — gamma · 🚧 进行中'],
+        status: [['A0 alpha', '✅ 完成'], ['C1 gamma', '⬜ 未开始']],
+        comp: [],
+      })
+    );
+    check(
+      'T76 G1 an UNKNOWN state symbol on a heading reaches G1(c) instead of slipping past every guard (r2 F-2)',
+      unknownSymHead.c === 'FAIL',
+      unknownSymHead.detail
+    );
+    const histText = LEDGER({ comp: [['2026-09-14', 'A0', '进行中：待 ⑧b 定稿后更新', '`docs/validation/a0.md`']] });
+    const histAll = g1Probe(histText);
+    const histNone = g1Probe(histText, undefined, []);
+    check(
+      'T76 G1 G1(f) judges ADDED completion rows only: the same historical row fails when it is in the added set and passes when it is not (r2 F-3)',
+      histAll.f === 'FAIL' && histNone.f === 'PASS',
+      'all=' + histAll.f + ' none=' + histNone.f
+    );
+    const infoE = g1Probe(LEDGER({ comp: [['2026-09-14', 'ZZ', 'done', '`docs/validation/z.md`']] }));
+    check(
+      'T76 G1 an unbound completion key also emits an explicit INFO record, so the directive promise "no binding is INFO" is literal (r2 F-4)',
+      /G1\(e-info\)=INFO/.test(infoE.detail),
+      infoE.detail
+    );
+    let declErr = null;
+    try {
+      g1Probe(LEDGER({}).replace('状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断\n', ''));
+    } catch (e) {
+      declErr = e;
+    }
+    check(
+      'T76 G1 a ledger without its state-symbol declaration line raises UsageError (exit 2, never a silent guess)',
+      declErr instanceof UsageError && /declaration line/.test(declErr.message),
+      'err=' + (declErr ? declErr.message : 'NO ERROR')
+    );
+    const mutG1 = loadMutatedModule(
+      path.join(__dirname, 'lib', 'criteria', 'g1.js'),
+      G1_INPROGRESS_TEST,
+      '      if (false) badF.push(',
+      'v136-g1-inprogress'
+    );
+    check(
+      'T76 G1 mutation applied: the in-progress test line matched g1.js (a stale patch would weaken the suite silently)',
+      mutG1.applied === true,
+      'applied=' + mutG1.applied
+    );
+    const blindG1 = g1Probe(LEDGER({ comp: [['2026-09-14', 'A0', '进行中：待 ⑧b 定稿后更新', '`docs/validation/a0.md`']] }), mutG1.exports);
+    check(
+      'T76 G1 load-bearing proof: with the wording test patched out the SAME in-progress row passes',
+      blindG1.f === 'PASS',
+      blindG1.detail
+    );
+    check(
+      'T76 G1 restore: g1.js is byte-identical after the mutation window and the wording row fails again',
+      mutG1.identical === true &&
+        g1Probe(LEDGER({ comp: [['2026-09-14', 'A0', '进行中：待 ⑧b 定稿后更新', '`docs/validation/a0.md`']] })).f === 'FAIL',
+      'identical=' + mutG1.identical
+    );
+    const unreadable = (() => {
+      const out = createReport();
+      G1.run({ repoRoot: discoverRepoRoot(__dirname), readLineArray: () => null }, out);
+      const r = out.records[0] || {};
+      return r.verdict + ' :: ' + r.detail;
+    })();
+    check(
+      'T76 G1 an unreadable ledger pair reports SKIP (never a vacuous PASS)',
+      /^SKIP :: ledger pair not readable/.test(unreadable),
+      unreadable
+    );
+  }
+
+  // ---- T77: v1.36 - base G5 (change-set contract) derives its four fields instead of asking for a JSON.
+  {
+    const R = 'docs/validation/probe-report.md';
+    const FENCE = '```artifacts\n' + R + '\trepo\n' + 'tools/probe.js\trepo\n```';
+    const LEDGER_ROW = '| 2026-10-18 | PROBE | summary | `' + R + '` |';
+    const pass = g5Probe({
+      changed: [R, 'tools/probe.js'],
+      texts: { [R]: FENCE },
+      added: { 'docs/t027/REMAINING_SLICES.md': [LEDGER_ROW] },
+      existing: [R],
+      unstaged: [],
+    });
+    check(
+      'T77 G5 a declared, staged, resolvable change set passes G5(d) / G5(e) / G5(f)',
+      pass.d === 'PASS' && pass.e === 'PASS' && pass.f === 'PASS',
+      pass.detail
+    );
+    const missingDecl = g5Probe({
+      changed: [R, 'tools/probe.js', 'tools/undeclared.js'],
+      texts: { [R]: FENCE },
+      added: { 'docs/t027/REMAINING_SLICES.md': [LEDGER_ROW] },
+      existing: [R],
+      unstaged: [],
+    });
+    check(
+      'T77 G5 a staged path nobody declared fails G5(d) - the observable consequence of `git add -A`',
+      missingDecl.d === 'FAIL' && /tools\/undeclared\.js/.test(missingDecl.raw),
+      missingDecl.raw
+    );
+    const extraDecl = g5Probe({
+      changed: [R],
+      texts: { [R]: FENCE },
+      added: {},
+      existing: [R],
+      unstaged: [],
+    });
+    check(
+      'T77 G5 the reverse direction (declared but untouched) is INFO, because a fence is the landing snapshot - the §11.2 backfill case',
+      extraDecl.d === 'PASS' && /declared-not-touched/.test(extraDecl.raw),
+      extraDecl.raw
+    );
+    const badRef = g5Probe({
+      changed: [R],
+      texts: { [R]: FENCE.replace('tools/probe.js\t', '') },
+      added: { 'docs/t027/REMAINING_SLICES.md': ['| 2026-10-18 | PROBE | summary | `docs/validation/ghost.md` |'] },
+      existing: [],
+      unstaged: [],
+    });
+    check(
+      'T77 G5 an evidence reference that does not resolve fails G5(e)',
+      badRef.e === 'FAIL',
+      badRef.detail
+    );
+    const dirty = g5Probe({
+      changed: [R],
+      texts: { [R]: '```artifacts\n' + R + '\trepo\n```' },
+      added: {},
+      existing: [R],
+      unstaged: [' M tools/probe.js'],
+    });
+    check(
+      'T77 G5 an unstaged modification in index scope fails G5(f) (index must equal the worktree)',
+      dirty.f === 'FAIL',
+      dirty.detail
+    );
+    const stagedOnly = g5Probe({
+      changed: [R],
+      texts: { [R]: FENCE },
+      added: {},
+      existing: [R],
+      unstaged: ['M  ' + R],
+    });
+    check(
+      'T77 G5 a STAGED entry (porcelain X column) does not dirty the index - staging is the normal state of index scope',
+      stagedOnly.f === 'PASS',
+      stagedOnly.detail
+    );
+    const noReport = g5Probe({ changed: ['tools/probe.js'], added: {}, existing: [], unstaged: [] });
+    check(
+      'T77 G5 a change set without a report records INFO on G5(d) instead of a vacuous pass',
+      noReport.d === 'INFO' && noReport.e === 'PASS',
+      noReport.detail
+    );
+    const treeScope = g5Probe({
+      kind: 'ci',
+      changed: [R],
+      texts: { [R]: '```artifacts\n' + R + '\trepo\n```' },
+      added: {},
+      existing: [R],
+      unstaged: [' M whatever.js'],
+    });
+    check(
+      'T77 G5 outside index scope the staging check is INFO (a clean CI checkout has no index state)',
+      treeScope.f === 'INFO' && treeScope.d === 'PASS',
+      treeScope.detail
+    );
+    // external JSON cross-check: a mismatch is a usage error, never a silent pass
+    const prevEnv = process.env.GATES_CHANGESET_JSON;
+    let envErr = null;
+    try {
+      process.env.GATES_CHANGESET_JSON = JSON.stringify({ stagedFiles: ['docs/other.md'] });
+      g5Probe({ changed: [R], texts: { [R]: '```artifacts\n' + R + '\trepo\n```' }, added: {}, existing: [R], unstaged: [] });
+    } catch (e) {
+      envErr = e;
+    } finally {
+      if (prevEnv === undefined) delete process.env.GATES_CHANGESET_JSON;
+      else process.env.GATES_CHANGESET_JSON = prevEnv;
+    }
+    check(
+      'T77 G5 an external GATES_CHANGESET_JSON that disagrees with the derived fields raises UsageError (exit 2)',
+      !!envErr && envErr instanceof UsageError && /disagrees with the derived change set/.test(envErr.message),
+      'err=' + (envErr ? envErr.message : 'NO ERROR')
+    );
+    check(
+      'T77 G5 a declared-but-untouched path also emits an explicit INFO record (r2 F-4)',
+      /G5\(d-info\)=INFO/.test(extraDecl.detail),
+      extraDecl.detail
+    );
+    const mutG5Del = loadMutatedModule(
+      path.join(__dirname, 'lib', 'criteria', 'g5.js'),
+      '    return !rec || !rec.deleted;',
+      '    return true;',
+      'v136-g5-delete'
+    );
+    check(
+      'T77 G5 mutation applied on the deletion guard, which must read the parser boolean and not the two-char XY status (r2 F-1)',
+      mutG5Del.applied === true,
+      'applied=' + mutG5Del.applied
+    );
+    const blindDel = g5Probe(
+      {
+        changed: [R, 'tools/gone.js'],
+        deleted: ['tools/gone.js'],
+        texts: { [R]: FENCE },
+        added: {},
+        existing: [R],
+        unstaged: [],
+      },
+      mutG5Del.exports
+    );
+    check(
+      'T77 G5 load-bearing proof: with the deletion guard patched out the same deleted path is reported as undeclared (r2 F-1)',
+      blindDel.d === 'FAIL',
+      blindDel.detail
+    );
+    check(
+      'T77 G5 restore after the deletion-guard mutation window',
+      mutG5Del.identical === true &&
+        g5Probe({ changed: [R, 'tools/gone.js'], deleted: ['tools/gone.js'], texts: { [R]: FENCE }, added: {}, existing: [R], unstaged: [] }).d === 'PASS',
+      'identical=' + mutG5Del.identical
+    );
+    check(
+      'T77 G5 a declared-but-untouched path also emits an explicit INFO record (r2 F-4)',
+      /G5\(d-info\)=INFO/.test(extraDecl.detail),
+      extraDecl.detail
+    );
+    const bare = G5._internals.evidencePathsFromRow(
+      '| 2026-10-18 | X | done | docs/validation/evidence/x.md, tools/gates/gate.js |'
+    );
+    check(
+      'T77 G5 evidence references are read from BARE paths too (30/30 corpus rows carry no backticks, so backtick-only extraction was vacuous)',
+      bare.length === 2 && bare.indexOf('tools/gates/gate.js') >= 0 && bare.indexOf('docs/validation/evidence/x.md') >= 0,
+      JSON.stringify(bare)
+    );
+    const rootRef = G5._internals.evidencePathsFromRow('| 2026-10-18 | X | done | README.md, tools/gates/gate.js |');
+    check(
+      'T77 G5 a repository-root artifact in the evidence cell is extracted too (⑥ finding: the prefix whitelist made G5(e) vacuous for root files)',
+      rootRef.indexOf('README.md') >= 0 &&
+        G5._internals.evidencePathsFromRow('| 2026-10-18 | X | done | go.mod |').indexOf('go.mod') >= 0 &&
+        G5._internals.evidencePathsFromRow('| 2026-10-18 | X | done | go.sum |').indexOf('go.sum') >= 0 &&
+        G5._internals.evidencePathsFromRow('| 2026-10-18 | X | done | module name go.modification is not a path |').length === 0 &&
+        G5._internals.evidencePathsFromRow('| 2026-10-18 | X | done | see (go.mod) and README.md) |').length === 2,
+      JSON.stringify(rootRef)
+    );
+    const G5_BARE_SCAN =
+      '  for (const m of cell.matchAll(/([\\s（(、,，；;）]|^)((?:docs|tools|examples|schemas|cmd|internal|harnesses|testdata|\\.github)\\/[^\\s；;、,，|)`）]+)/g)) {';
+    const mutG5Bare = loadMutatedModule(path.join(__dirname, 'lib', 'criteria', 'g5.js'), G5_BARE_SCAN, '  for (const m of cell.matchAll(/(?!x)x/g)) {', 'v136-g5-bare');
+    check(
+      'T77 G5 mutation applied on the bare-path scan (defect 2: evidenceRefs were backtick-only)',
+      mutG5Bare.applied === true,
+      'applied=' + mutG5Bare.applied
+    );
+    const blindBare = mutG5Bare.exports._internals.evidencePathsFromRow(
+      '| 2026-10-18 | X | done | docs/validation/evidence/x.md, tools/gates/gate.js |'
+    );
+    check(
+      'T77 G5 load-bearing proof: with the bare-path scan removed the same row yields no reference at all',
+      blindBare.length === 0,
+      JSON.stringify(blindBare)
+    );
+    check(
+      'T77 G5 restore after the bare-path mutation window',
+      mutG5Bare.identical === true &&
+        G5._internals.evidencePathsFromRow('| 2026-10-18 | X | done | tools/gates/gate.js |').length === 1,
+      'identical=' + mutG5Bare.identical
+    );
+    const del = g5Probe({
+      changed: [R, 'tools/gone.js'],
+      deleted: ['tools/gone.js'],
+      texts: { [R]: FENCE },
+      added: {},
+      existing: [R],
+      unstaged: [],
+    });
+    check(
+      'T77 G5 a deleted staged path is not a change-set member (removing a file declares nothing)',
+      del.d === 'PASS',
+      del.detail
+    );
+    const mutG5 = loadMutatedModule(
+      path.join(__dirname, 'lib', 'criteria', 'g5.js'),
+      G5_SET_EQUALITY,
+      "      true ? 'PASS' : 'FAIL',",
+      'v136-g5-equality'
+    );
+    check(
+      'T77 G5 mutation applied: the set-equality line matched g5.js (a stale patch would weaken the suite silently)',
+      mutG5.applied === true,
+      'applied=' + mutG5.applied
+    );
+    const blindG5 = g5Probe(
+      {
+        changed: [R, 'tools/undeclared.js'],
+        texts: { [R]: FENCE },
+        added: {},
+        existing: [R],
+        unstaged: [],
+      },
+      mutG5.exports
+    );
+    check(
+      'T77 G5 load-bearing proof: with the equality verdict patched the SAME undeclared path passes',
+      blindG5.d === 'PASS',
+      blindG5.detail
+    );
+    check(
+      'T77 G5 restore: g5.js is byte-identical after the mutation window and the undeclared path fails again',
+      mutG5.identical === true &&
+        g5Probe({ changed: [R, 'tools/undeclared.js'], texts: { [R]: FENCE }, added: {}, existing: [R], unstaged: [] }).d === 'FAIL',
+      'identical=' + mutG5.identical
     );
   }
 
