@@ -699,6 +699,24 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 探针额度 | 无 |
 | 执行自由度清单落盘路径 | `docs/validation/evidence/GATES-EDGE-COVERAGE-RECHECK-freedom-list.md` |
 
+### P13 — `G9-c` · ✅ 完成
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `G9-c`（判据 id `G9`，v1.38） |
+| 状态 | ✅ **完成**（v1.38，2026-10-19；报告 `docs/validation/directive-g9c{,_EN}.md`） |
+| 目标 | 把「临时件纪律」机械化为 CI 判据 `G9`（静态形态），时序形态如实登记为 OB-99 |
+| 依赖 | 无（上游 `GATES-EDGE-COVERAGE-RECHECK` 已闭环，HEAD = `53b2a90`） |
+| 规模 | M |
+| 步骤 | 步骤 0 → ① → ② → ③ → ④ → ⑤（r1 + 原位重跑）→ ⑥ → ⑦（r1–r3）→ ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| 现状缺口 | 临时件纪律同型违反累计 6 次；「违反即停下升级」对弱模型无效 |
+| 交付物 | `tools/gates/lib/criteria/g9.js` + `gate.js` 注册 + `selftest.js` T80–T83 + `g9-whitelist.txt`；准则 v1.38（头部 / §0.3 / §1.5 指针 / §5.1 临时件定义 / §6.3 G9 行 / 八类→九类 / R6.2 / 附录 C.0z / §12.4 OB-98 + OB-99）；报告对 + 自由度清单 + 本行 |
+| 验收证据 | `SELFTEST: PASS 552/552`；三作用域 `TOTAL_FAIL=0`；⑨ 纯净 worktree 复现（536/536 → 552/552、退出码 0/1/2）；M1–M4 变异逐条翻转；CN / `_EN` 六形状全等 |
+| 边界 | 不改 §2.2 / §2.4 闭集、§5.2 矩阵、§7.5 数值、G1–G8 判据本体；不动 CONTRACTS / schema / fixtures / workflows 与 `internal/**`；不触角色集与载体；不推 gitee；**与 `GATES-FLOW` 不合并** |
+| 分级 | `[SLICE]`（触 §6.3 判据本体） |
+| 探针额度 | 无 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/G9-C-freedom-list.md` |
+
 ---
 ## 已知缺陷（后续切片前处理）
 
@@ -876,6 +894,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 2026-10-17 | GATES-EDGE-COVERAGE | **判据边界收敛片（触判据本体、⑦ 不降级）**：① OB-90 —— G3(a) 配对改为任一侧出发（`_EN` 单侧即判、无镜像的单语文档不生成记录、指令对不可读侧 fail-closed）；② OB-91 —— G6-6 语言标识改整 token 严格匹配（续延字符集 / 终结符补集 / 覆盖不变量），闭合上片的 ⑦ r3 残差；③ 准则 v1.34（§0.3 行 / §6.3 两处 / 附录 C.0v / §12.4 两翻一增并新增 OB-92 登记）。**✅ 已完成（v1.34，2026-10-17 闭环）**：② 实现完成、三作用域门禁与自测全绿；⑤ 预审 r1 报一处 Medium（本行缺失）+ 3 Low ⇒ 逐条整改并原位重跑 ⇒ ⑤ r2 `PRE-REVIEW: PASS`；⑥ `INDEPENDENT SCAN: PASS`；⑦ r1 `FINAL REVIEW: PASS`（0 发现、未降级）；主提交 `3318fef` 与回填 `aa49e0c` 均已推送，两次 CI 首跑双绿（run `39019183887` / `39019985225`）；⑨ 三作用域读数见报告。 | docs/validation/directive-gates-edge-coverage.md |
 | 2026-10-18 | GATES-G1G5 | **基础 G1 / G5 主规则脚本化（`SKIP` → 机械判据）**：① G1 四个子判据（状态符号闭集 / 标题↔状态表 / 完成记录经键绑定 / 新增行措辞）；② G5 四字段机械派生（方向性 `staged ⊆ declared`、裸路径与根级工件识别、`addMode` 派生标签、index 作用域工作区干净）；③ 准则 v1.36（§0.3 行 / §6.3 两行 / 脚本化状态段 / §12.5 行 / 附录 C.0x / §12.4 OB-95）。**✅ 已完成（v1.36，2026-10-18）**：index / tree / ci 三作用域 `TOTAL_FAIL=0`、`SELFTEST: PASS 460/460`；⑤ r2 `PRE-REVIEW: PASS WITH FIXES`（三项硬伤判真闭合）、⑥ 报 1 High（根级工件漏抽）、⑦ r1 / r2 / r3 逐轮收敛（1 + 3 额度用满，末条 Low 以确定性自证收口、未开第 4 读）；提交与 CI 读数待 ⑩ 同轮授权后回填。 | docs/validation/directive-gates-g1g5.md |
 | 2026-10-18 | GATES-EDGE-COVERAGE-RECHECK | **边缘覆盖复评（纯验证片，判据零改动）**：以 T78（OB-90，16 条）+ T79（OB-91，50 条）+ T79 canary（10 条）复评两类根因，全部未复现 ⇒ 判已关闭；4 条真实变更集 spot check 全部符合预期、索引复原同哈希；新登记 OB-97（只登记不修）。**✅ 已完成（v1.37，2026-10-18）**：自测 536/536、三作用域 `TOTAL_FAIL=0`；提交与 CI 读数由 ⑩ 回填。 | docs/validation/directive-gates-edge-coverage-recheck.md |
+| 2026-10-19 | G9-c | **准则治理类切片（新增机械判据 G9）**：① 新增 CI 判据 G9（静态形态）与白名单、`g9.js`、`gate.js` 注册、`selftest.js` T80–T83；② 准则 v1.38（头部 / §0.3 / §1.5 / §5.1 / §6.3 / R6.2 / 附录 C.0z / §12.4 OB-98 与 OB-99）；③ ⑨ 纯净 worktree 复现（536/536 → 552/552，退出码 0/1/2 逐例成立）；⑤ `PRE-REVIEW: PASS WITH FIXES` 两轮、⑥ `INDEPENDENT SCAN: PASS`、⑦ 由 `GPT-5.3-Codex (copilot)` 承担（r1–r3）；三作用域 `TOTAL_FAIL=0`；探针 0。**本行按 v1.21 的完成行格式只记报告路径**。 | docs/validation/directive-g9c.md |
 
 > **台账完整性注记（2026-09-21，已按用户授权补录）**：本表自 A4 行之后长期未追加完成行。**2026-09-21 依据各切片自己的验证报告补录 A5/A6/A7/B2/B3a 五行**（受"不凭记忆、只补可核验字段、缺失留空并标注历史缺失、不编造"三条约束），B3b 行先于本次补录写入，故五行列于其后；各行的日期/提交号/运行号/摘要均逐项标注来源，无法核验者已标注 **历史缺失**。
 > **已回填**（本片核实，2026-09-29）：**B3a 的 `DEV_PLAN{,_EN}.md` 段落已由提交 `dd36b9b` 补入**（`DEV_PLAN.md:137` 与 `_EN.md:138`）；原注记的过期表述由切片 `LEDGER-BACKFILL` 更正，**回填动作无需重复执行**。

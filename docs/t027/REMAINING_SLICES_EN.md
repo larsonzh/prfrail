@@ -685,6 +685,24 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Probe quota | none |
 | Freedom-list path | `docs/validation/evidence/GATES-EDGE-COVERAGE-RECHECK-freedom-list.md` |
 
+### P13 — `G9-c` · ✅ Done
+
+| Field | Content |
+|---|---|
+| Id | `G9-c` (criterion id `G9`, v1.38) |
+| Status | ✅ **Done** (v1.38, 2026-10-19; report `docs/validation/directive-g9c{,_EN}.md`) |
+| Goal | Mechanise the temp-artifact discipline as CI criterion `G9` (static shape); the temporal shape is registered honestly as OB-99 |
+| Depends on | none (upstream `GATES-EDGE-COVERAGE-RECHECK` is closed, HEAD = `53b2a90`) |
+| Size | M |
+| Steps | step 0 → ① → ② → ③ → ④ → ⑤ (r1 plus an in-place re-run) → ⑥ → ⑦ (r1-r3) → ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| Current gap | 6 same-shape violations of the temp-artifact discipline so far; "stop and escalate on violation" does not work on weak models |
+| Deliverables | `tools/gates/lib/criteria/g9.js` plus the `gate.js` registration, `selftest.js` T80-T83 and `g9-whitelist.txt`; directive v1.38 (header / 0.3 / the 1.5 pointer / the 5.1 temp-artifact definition / the 6.3 G9 row / eight → nine kinds / R6.2 / appendix C.0z / OB-98 and OB-99 in 12.4); the report pair, the freedom list and this row |
+| Acceptance evidence | `SELFTEST: PASS 552/552`; `TOTAL_FAIL=0` in all three scopes; the ⑨ pristine-worktree reproduction (536/536 → 552/552, exit codes 0/1/2); M1-M4 mutations each flip; CN / `_EN` have all six shapes equal |
+| Boundary | the 2.2 / 2.4 closed sets, the 5.2 matrix, the 7.5 figures and the G1-G8 criterion bodies stay untouched; CONTRACTS / schema / fixtures / workflows and `internal/**` unchanged; role set and carriers untouched; no gitee push; **not merged with `GATES-FLOW`** |
+| Tier | `[SLICE]` (touches the criterion bodies in 6.3) |
+| Probe quota | none |
+| Freedom-list path | `docs/validation/evidence/G9-C-freedom-list.md` |
+
 ---
 
 ## Known defects (to be handled before later slices)
@@ -863,6 +881,7 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | 2026-10-17 | GATES-EDGE-COVERAGE | **Criterion-boundary convergence slice (touches the criterion bodies, ⑦ not downgraded)**: (1) OB-90 - G3(a) pairs from either side (an `_EN`-only edit is judged, a mirror-less single-language document produces no record, an unreadable side of the directive pair fails closed); (2) OB-91 - G6-6 matches the language tag as a whole token (continuation charset / complement terminators / coverage invariant), closing the previous slice ⑦ r3 residual; (3) directive v1.34 (the §0.3 row / two §6.3 clauses / appendix C.0v / two §12.4 flips plus the new OB-92 registration). **✅ Completed (v1.34, closed 2026-10-17)**: implementation ② complete, all three gate scopes and `--selftest` green; the ⑤ pre-review r1 reported one Medium (this row was missing) plus 3 Low ⇒ each fixed and the stage re-run in place ⇒ ⑤ r2 `PRE-REVIEW: PASS`; ⑥ `INDEPENDENT SCAN: PASS`; ⑦ r1 `FINAL REVIEW: PASS` (0 findings, not downgraded); the main commit `3318fef` and the backfill `aa49e0c` are both pushed, and both CI runs were green on the first attempt (runs `39019183887` / `39019985225`); the ⑨ three-scope readings are in the report. | docs/validation/directive-gates-edge-coverage.md |
 | 2026-10-18 | GATES-G1G5 | **the base G1 / G5 rules move from `SKIP` to mechanical criteria**: ① four G1 sub-checks (state-symbol closed set / heading vs status table / completion rows through key binding / wording in added rows); ② four G5 fields derived mechanically (directional `staged ⊆ declared`, bare paths and repository-root artifacts recognised, `addMode` as a derived label, a clean worktree in index scope); ③ directive v1.36 (the §0.3 row / the two §6.3 rows / the scripting-status paragraph / the §12.5 row / appendix C.0x / OB-95 in §12.4). **✅ Done (v1.36, 2026-10-18)**: `TOTAL_FAIL=0` in the index / tree / ci scopes and `SELFTEST: PASS 460/460`; ⑤ r2 `PRE-REVIEW: PASS WITH FIXES` (the three hard defects judged genuinely closed), ⑥ reported 1 High (repository-root artifacts never extracted), ⑦ r1 / r2 / r3 converged round by round (the 1 + 3 quota fully used; the last Low was closed by deterministic self-verification with no fourth read); the commit and CI readings are filled in after the same-turn authorisation at ⑩. | docs/validation/directive-gates-g1g5.md |
 | 2026-10-18 | GATES-EDGE-COVERAGE-RECHECK | **Edge-coverage recheck (verification only, zero criterion changes)**: re-checked both root causes with T78 (OB-90, 16 cases) + T79 (OB-91, 50 cases) + T79 canary (10 cases), none reproduced ⇒ judged closed; all four real-change-set spot checks match their expectation and the index restores to the same tree hash; OB-97 is registered (registered only, not fixed). **✅ Done (v1.37, 2026-10-18)**: selftest 536/536 and `TOTAL_FAIL=0` in all three scopes; the commit and CI readings are filled in by ⑩. | docs/validation/directive-gates-edge-coverage-recheck.md |
+| 2026-10-19 | G9-c | **Governance slice (new mechanical criterion G9)**: (1) added CI criterion G9 (static shape) with the whitelist, `g9.js`, the `gate.js` registration and `selftest.js` T80-T83; (2) directive v1.38 (header / 0.3 / 1.5 / 5.1 / 6.3 / R6.2 / appendix C.0z / OB-98 and OB-99 in 12.4); (3) the ⑨ pristine-worktree reproduction (536/536 → 552/552, exit codes 0/1/2 hold case by case); ⑤ `PRE-REVIEW: PASS WITH FIXES` in two rounds, ⑥ `INDEPENDENT SCAN: PASS`, ⑦ carried by `GPT-5.3-Codex (copilot)` (r1-r3); `TOTAL_FAIL=0` in all three scopes; 0 probes. **This row follows the v1.21 completion-row format and records the report path only**. | docs/validation/directive-g9c.md |
 
 > **Ledger integrity note (2026-09-21, back-filled under explicit user authorisation)**: this table had no rows appended after A4. **On 2026-09-21 the five rows A5/A6/A7/B2/B3a were back-filled from each slice's own validation report** (under the three constraints: no memory-based entries, verifiable fields only, missing fields left blank and marked as historic gaps, nothing fabricated); the B3b row was written before this back-fill, which is why the five rows follow it.
 > **Back-filled** (verified by slice `LEDGER-BACKFILL`, 2026-09-29): **the B3a paragraph in `DEV_PLAN{,_EN}.md` was added by commit `dd36b9b`** (`DEV_PLAN.md:137` and `_EN.md:138`); the earlier still-owed wording was corrected by slice `LEDGER-BACKFILL`, and **the back-fill action does not need to be repeated**.

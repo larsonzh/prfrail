@@ -1,0 +1,11 @@
+# G9 whitelist (DELIVERY_DIRECTIVE section 6.3, G9 临时件).
+# A hit exempts ONE changed path from both G9 predicates; the criterion is reported
+# PASS when every finding is either absent or registered here.
+# Format (TAB separated, all three fields mandatory):
+#     <match><TAB><file><TAB><reason / context excerpt>
+#   match  substring of the repository-relative POSIX path (the smallest text that identifies it)
+#   file   repository-relative path the entry applies to ('*' = any file)
+#   reason the registration reason PLUS the context excerpt that justifies it
+# A malformed entry (missing field, empty reason) is a usage error: the runner exits 2.
+# Entries are reviewed by ⑤/⑦ like any other claim. Do not register a real defect.
+#

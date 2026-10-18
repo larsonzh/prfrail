@@ -43,6 +43,7 @@ const G1 = require('./lib/criteria/g1');
 const G5 = require('./lib/criteria/g5');
 const G7 = require('./lib/criteria/g7');
 const G8 = require('./lib/criteria/g8');
+const G9 = require('./lib/criteria/g9');
 const G4B = require('./lib/criteria/g4b');
 const G5A = require('./lib/criteria/g5a');
 const G5B = require('./lib/criteria/g5b');
@@ -823,6 +824,7 @@ function g3aEdgeProbe(opts) {
 
 /** Path of the criterion under test (the mutation probe compiles a patched copy). */
 const G5B_SOURCE = path.join(__dirname, 'lib', 'criteria', 'g5b.js');
+const G9_SOURCE = path.join(__dirname, 'lib', 'criteria', 'g9.js');
 /** Mutation target (T37): the first member of the closed set. */
 const G5B_FIRST_MEMBER = "  'deepseek-v4-pro',\n";
 /** Mutation target (T42): the member added by this slice, whose removal must turn the suite red. */
@@ -869,6 +871,31 @@ function g5bProbeWith(mod, key) {
 
 function g5bProbe(key) {
   return g5bProbeWith(G5B, key);
+}
+
+/**
+ * G9 probe: feed a synthetic change set to the shipped criterion (or a patched copy).
+ * `opts.mod` runs a mutation probe; `opts.deleted` / `opts.whitelist` exercise the two
+ * exclusion faces. `isEvidenceTree` is imported from lib/ctx so the probe cannot drift
+ * from the shipped single source.
+ */
+function g9Probe(paths, opts) {
+  opts = opts || {};
+  const deleted = new Set(opts.deleted || []);
+  const ctx = {
+    changedPaths: paths,
+    recordFor: (p) => ({ path: p, deleted: deleted.has(p) }),
+    isEvidenceTree: (p) => isEvidenceTree(p),
+    loadWhitelist: () => ({ entries: opts.whitelist || [], error: null, source: 'probe' }),
+  };
+  const out = createReport();
+  const res = (opts.mod || G9).run(ctx, out) || { findings: [] };
+  return {
+    verdict: verdictOf(out.records, 'G9'),
+    info: out.records.some((r) => r.id === 'G9' && r.verdict === 'INFO'),
+    findings: res.findings ? res.findings.length : -1,
+    detail: detailOf(out.records, 'G9'),
+  };
 }
 
 /**
@@ -4366,6 +4393,183 @@ function runTests() {
       'applied=' + mut.applied + ' verdict=' + verdictOf(mutOut.records, 'G6-3'));
     check('T71 OB-17 restore: g6.js is byte-identical after the mutation probe',
       mut.identical === true, 'identical=' + mut.identical);
+  }
+
+  // ---- T80-T83: G9 temp-artifact guard (slice G9-c, v1.38) -------------------------
+  // Two predicates: (1) temp-artifact shape outside the tmp root; (2) the tmp-root
+  // guard (case-insensitive, the forced-entry shape for the gitignored `tmp/` root;
+  // force-added paths under OTHER gitignored roots are out of scope). The positive
+  // fixtures pin all three exclusion faces (evidence tree / whitelist / deleted path),
+  // the six negative fixtures (N1-N6) pin every must-FAIL shape, and the four
+  // in-memory mutations pin each branch as load-bearing.
+  {
+    const G9_SHAPE_RE = 'const TEMP_SHAPE_RE = /\\.(log|tmp|bak|out)$/i;';
+    const G9_BEFORE = fs.readFileSync(G9_SOURCE);
+
+    const P1 = g9Probe(['docs/t027/probe-g9.md', 'tools/gates/g9-probe/main.go']);
+    check(
+      'T80 G9 passes ordinary documents and Go files (no temp-artifact shape)',
+      P1.verdict === 'PASS' && P1.findings === 0,
+      'verdict=' + P1.verdict + ' findings=' + P1.findings + ' :: ' + P1.detail
+    );
+
+    const P2 = g9Probe(['docs/validation/evidence/legacy.log']);
+    check(
+      'T80 G9 excludes the frozen evidence tree (OB-79): a legacy.log inside it is not judged',
+      P2.verdict === 'PASS' && P2.findings === 0,
+      'verdict=' + P2.verdict + ' findings=' + P2.findings + ' :: ' + P2.detail
+    );
+
+    const P3 = g9Probe(['tools/gates/g9-probe/allowed.log'], {
+      whitelist: [
+        {
+          match: 'tools/gates/g9-probe/allowed.log',
+          file: 'tools/gates/g9-probe/allowed.log',
+          reason: 'T80 probe: registered temp-artifact exception',
+        },
+      ],
+    });
+    check(
+      'T80 G9 honours a whitelist registration (match + file)',
+      P3.verdict === 'PASS' && P3.findings === 0,
+      'verdict=' + P3.verdict + ' findings=' + P3.findings + ' :: ' + P3.detail
+    );
+
+    const P4 = g9Probe(['tmp/.gitkeep']);
+    check(
+      'T80 G9 passes the tracked tmp directory placeholder tmp/.gitkeep',
+      P4.verdict === 'PASS' && P4.findings === 0,
+      'verdict=' + P4.verdict + ' findings=' + P4.findings + ' :: ' + P4.detail
+    );
+
+    const D1 = g9Probe(['docs/gone/selftest-output.log'], { deleted: ['docs/gone/selftest-output.log'] });
+    check(
+      'T80 G9 excludes deleted paths (a deletion submits no bytes)',
+      D1.verdict === 'PASS' && D1.findings === 0,
+      'verdict=' + D1.verdict + ' findings=' + D1.findings + ' :: ' + D1.detail
+    );
+
+    const N1 = g9Probe(['tools/foo/selftest-output.log']);
+    check(
+      'T81 G9 fails a .log outside the tmp root (token `temp-shape`, names the path)',
+      N1.verdict === 'FAIL' && N1.findings === 1 && /temp-shape/.test(N1.detail) && /selftest-output\.log/.test(N1.detail),
+      'verdict=' + N1.verdict + ' findings=' + N1.findings + ' :: ' + N1.detail
+    );
+
+    const N2 = g9Probe(['cmd/prfrail/foo.tmp']);
+    check(
+      'T81 G9 fails a .tmp outside the tmp root (token `temp-shape`, names the path)',
+      N2.verdict === 'FAIL' && N2.findings === 1 && /temp-shape/.test(N2.detail) && /foo\.tmp/.test(N2.detail),
+      'verdict=' + N2.verdict + ' findings=' + N2.findings + ' :: ' + N2.detail
+    );
+
+    const N3 = g9Probe(['docs/backup.bak']);
+    check(
+      'T81 G9 fails a .bak outside the tmp root (token `temp-shape`, names the path)',
+      N3.verdict === 'FAIL' && N3.findings === 1 && /temp-shape/.test(N3.detail) && /backup\.bak/.test(N3.detail),
+      'verdict=' + N3.verdict + ' findings=' + N3.findings + ' :: ' + N3.detail
+    );
+
+    const N4 = g9Probe(['tmp/x.log']);
+    check(
+      'T81 G9 fails any tmp-root path except tmp/.gitkeep (token `tmp-root`, names the path)',
+      N4.verdict === 'FAIL' && N4.findings === 1 && /tmp-root/.test(N4.detail) && /tmp\/x\.log/.test(N4.detail),
+      'verdict=' + N4.verdict + ' findings=' + N4.findings + ' :: ' + N4.detail
+    );
+
+    const N5 = g9Probe(['Tmp/g9-probe.txt']);
+    check(
+      'T81 G9 fails a mixed-case tmp root (token `tmp-root`, original spelling kept)',
+      N5.verdict === 'FAIL' && N5.findings === 1 && N5.detail.indexOf('["tmp-root: Tmp/g9-probe.txt"]') >= 0,
+      'verdict=' + N5.verdict + ' findings=' + N5.findings + ' :: ' + N5.detail
+    );
+
+    const N6 = g9Probe(['TMP/nested/x.txt']);
+    check(
+      'T81 G9 fails an upper-case tmp root (token `tmp-root`, original spelling kept)',
+      N6.verdict === 'FAIL' && N6.findings === 1 && N6.detail.indexOf('["tmp-root: TMP/nested/x.txt"]') >= 0,
+      'verdict=' + N6.verdict + ' findings=' + N6.findings + ' :: ' + N6.detail
+    );
+
+    // M1: replace the shape regex with a never-matching one. N1/N2/N3 (all outside the
+    // tmp root) must flip to PASS, proving the regex - not another branch - catches them.
+    const m1 = loadMutatedModule(G9_SOURCE, G9_SHAPE_RE, 'const TEMP_SHAPE_RE = /(?!x)x/;', 'g9-shape-regex');
+    const m1n1 = g9Probe(['tools/foo/selftest-output.log'], { mod: m1.exports });
+    const m1n2 = g9Probe(['cmd/prfrail/foo.tmp'], { mod: m1.exports });
+    const m1n3 = g9Probe(['docs/backup.bak'], { mod: m1.exports });
+    check(
+      'T82 M1 the shape regex is load-bearing: /(?!x)x/ turns N1/N2/N3 green',
+      m1.applied === true &&
+        m1.identical === true &&
+        [m1n1, m1n2, m1n3].every((p) => p.verdict === 'PASS' && p.findings === 0),
+      'applied=' +
+        m1.applied +
+        ' identical=' +
+        m1.identical +
+        ' verdicts=' +
+        JSON.stringify([m1n1.verdict, m1n2.verdict, m1n3.verdict])
+    );
+
+    // M2: delete the whitelist exemption branch. P3 must flip to FAIL.
+    const m2 = loadMutatedModule(
+      G9_SOURCE,
+      '      if (isWhitelisted(entries, p)) {\n        excluded++;\n        continue;\n      }\n',
+      '',
+      'g9-whitelist-branch'
+    );
+    const m2p3 = g9Probe(['tools/gates/g9-probe/allowed.log'], {
+      mod: m2.exports,
+      whitelist: [
+        {
+          match: 'tools/gates/g9-probe/allowed.log',
+          file: 'tools/gates/g9-probe/allowed.log',
+          reason: 'T82 probe: registration must be load-bearing',
+        },
+      ],
+    });
+    check(
+      'T82 M2 the whitelist exemption is load-bearing: deleting it turns P3 red',
+      m2.applied === true && m2.identical === true && m2p3.verdict === 'FAIL' && m2p3.findings === 1,
+      'applied=' + m2.applied + ' identical=' + m2.identical + ' verdict=' + m2p3.verdict + ' :: ' + m2p3.detail
+    );
+
+    // M3: delete the evidence-tree exclusion. P2 must flip to FAIL.
+    const m3 = loadMutatedModule(
+      G9_SOURCE,
+      '      if (inTree(p)) {\n        excluded++;\n        continue;\n      }\n',
+      '',
+      'g9-evidence-branch'
+    );
+    const m3p2 = g9Probe(['docs/validation/evidence/legacy.log'], { mod: m3.exports });
+    check(
+      'T82 M3 the evidence-tree exclusion is load-bearing: deleting it turns P2 red',
+      m3.applied === true && m3.identical === true && m3p2.verdict === 'FAIL' && m3p2.findings === 1,
+      'applied=' + m3.applied + ' identical=' + m3.identical + ' verdict=' + m3p2.verdict + ' :: ' + m3p2.detail
+    );
+
+    // M4: turn the `!== tmp/.gitkeep` guard into an unconditional skip. N4 must flip to
+    // PASS, proving the root guard (not some other branch) catches `tmp/x.log`.
+    const m4 = loadMutatedModule(G9_SOURCE, "if (key !== TMP_ROOT_KEEP) bad.push('tmp-root: ' + p);", '/* unconditional skip */', 'g9-tmpkeep-guard');
+    const m4n4 = g9Probe(['tmp/x.log'], { mod: m4.exports });
+    check(
+      'T82 M4 the tmp/.gitkeep guard is load-bearing: an unconditional skip turns N4 green',
+      m4.applied === true && m4.identical === true && m4n4.verdict === 'PASS' && m4n4.findings === 0,
+      'applied=' + m4.applied + ' identical=' + m4.identical + ' verdict=' + m4n4.verdict + ' :: ' + m4n4.detail
+    );
+
+    // Restore anchors: the shipped module is untouched and still judges the same probes.
+    check(
+      'T83 G9 restore: g9.js is byte-identical and the cached module keeps N1 red / P2 green / P4 green',
+      fs.readFileSync(G9_SOURCE).equals(G9_BEFORE) &&
+        g9Probe(['tools/foo/selftest-output.log']).verdict === 'FAIL' &&
+        g9Probe(['docs/validation/evidence/legacy.log']).verdict === 'PASS' &&
+        g9Probe(['tmp/.gitkeep']).verdict === 'PASS',
+      JSON.stringify({
+        n1: g9Probe(['tools/foo/selftest-output.log']).verdict,
+        p2: g9Probe(['docs/validation/evidence/legacy.log']).verdict,
+        p4: g9Probe(['tmp/.gitkeep']).verdict,
+      })
+    );
   }
 
   // ---- F1: a stale mutation (no-op) must not silently weaken the suite.

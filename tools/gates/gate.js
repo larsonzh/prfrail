@@ -41,6 +41,7 @@ const CRITERIA = {
   G6: require('./lib/criteria/g6'),
   G7: require('./lib/criteria/g7'),
   G8: require('./lib/criteria/g8'),
+  G9: require('./lib/criteria/g9'),
 };
 
 /**
@@ -66,6 +67,7 @@ const RUN_ORDER = [
   'G6',
   'G7',
   'G8',
+  'G9',
 ];
 
 const USAGE =
