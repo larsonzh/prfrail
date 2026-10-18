@@ -1,6 +1,6 @@
 ﻿# GATES-EDGE-COVERAGE-RECHECK slice validation report (verification only: both root causes re-checked)
 
-> Slice: `GATES-EDGE-COVERAGE-RECHECK` (v1.37, M tier, verification / criterion slice). Baseline HEAD = `aa07eb4`; this slice is not committed (9).
+> Slice: `GATES-EDGE-COVERAGE-RECHECK` (v1.37, M tier, verification / criterion slice). Baseline HEAD = `aa07eb4`; main commit `b81760f`, CI run `39120029758` (see §9).
 
 ## 1. Change summary
 
@@ -90,7 +90,11 @@
 
 ## 9. Commit and CI
 
-- This slice is **not committed** (⑩ stop point); the commit and CI readings are filled in by ⑩ after same-turn authorization.
+- **Main commit**: `b81760f` (`test: add OB-90/OB-91 counter-examples and canary to the gate selftest suite`), 8 files, `+777 / −6`; pushed to `origin/main`; **not pushed to gitee**.
+- **CI run**: `39120029758` (head `b81760f`), first run green on both legs (`Go windows-latest` / `Go ubuntu-latest` both `success`).
+- **`Gates` step readings (identical on both legs)**: `SELFTEST: PASS 536/536`, `GATE REPORT scope=ci changed=8`, `TOTAL_FAIL=0`.
+- **Package level**: `go test` printed 30 `ok` lines and 0 `FAIL` lines (the Windows leg's `Race` / `Contract fixtures` were matrix skips, not failures).
+- This section was added by the docs-only commit after the CI double-green (directive §11.2); that backfill commit's own CI is an observation record only, with no further commit.
 
 ```artifacts
 docs/DELIVERY_DIRECTIVE.md	repo

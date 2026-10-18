@@ -1,6 +1,6 @@
 ﻿# GATES-EDGE-COVERAGE-RECHECK 切片验证报告（纯验证片：两类根因复评）
 
-> 切片：`GATES-EDGE-COVERAGE-RECHECK`（v1.37，M 档，纯验证 / 判据片）。基线 HEAD = `aa07eb4`；本片未提交（§9）。
+> 切片：`GATES-EDGE-COVERAGE-RECHECK`（v1.37，M 档，纯验证 / 判据片）。基线 HEAD = `aa07eb4`；主提交 `b81760f`、CI run `39120029758`（详见 §9）。
 
 ## 1. 变更概要
 
@@ -90,7 +90,11 @@
 
 ## 9. 提交与 CI
 
-- 本片**未提交**（⑩ 停点）；提交与 CI 读数由 ⑩ 同轮授权后回填。
+- **主提交**：`b81760f`（`test: add OB-90/OB-91 counter-examples and canary to the gate selftest suite`），8 文件，`+777 / −6`；已推送 `origin/main`；**未推 gitee**。
+- **CI run**：`39120029758`（head `b81760f`），首跑双腿双绿（`Go windows-latest` / `Go ubuntu-latest` 均 `success`）。
+- **`Gates` 步读数（双腿相同）**：`SELFTEST: PASS 536/536`、`GATE REPORT scope=ci changed=8`、`TOTAL_FAIL=0`。
+- **包级**：`go test` 的 `ok` 行 30 条、`FAIL` 行 0 条（Windows 腿 `Race` / `Contract fixtures` 为矩阵跳过，非失败）。
+- 本节由 CI 双绿后的 docs-only 提交补入（准则 §11.2）；该回填提交自身的 CI 只作观察记录，不再新增提交。
 
 ```artifacts
 docs/DELIVERY_DIRECTIVE.md	repo
