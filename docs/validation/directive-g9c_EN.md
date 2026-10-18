@@ -233,8 +233,11 @@
 
 ### 9.3 Commit and CI
 
-- No `git commit`; no `git push`; gitee untouched.
-- Main commit hash, CI run id, `Gates` step readings and the double-green conclusion: **to be back-filled after the ⑩ merge authorisation**.
+- Main commit: `7dc9bcc` (`feat: add the G9 static temp-artifact gate (v1.38)`), pushed to `origin/main`; **gitee untouched**.
+- CI run: `39175328844` (workflow `CI`), conclusion **success**, both legs `Go ubuntu-latest` / `Go windows-latest` are `success`.
+- `Gates` step readings (identical on both legs): `SELFTEST: PASS 552/552`, `GATE REPORT scope=ci changed=11`, `TOTAL_FAIL=0`.
+- Package-level evidence: 14 `ok` packages per leg (`internal/adapters`, `internal/applier`, `internal/chain`, `internal/console`, `internal/evidence`, `internal/gates`, `internal/guard`, `internal/release`, `internal/repair`, `internal/snapshot`, `internal/taskdef`, `internal/tickets`, `examples/whois-shadow`, `tools/agent-probe/enforcement-proxy`), `FAIL` packages **0**.
+- Green on the first run: no §6.4 disposition, no re-run.
 
 ## 10 Cost and accounting
 

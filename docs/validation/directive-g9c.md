@@ -233,8 +233,11 @@
 
 ### 9.3 提交与 CI
 
-- 未 `git commit`；未 `git push`；未触 gitee。
-- 主提交 hash、CI run 号、`Gates` 步读数、双绿结论：**待 ⑩ 合并授权后回填**。
+- 主提交：`7dc9bcc`（`feat: add the G9 static temp-artifact gate (v1.38)`），已推 `origin/main`；**未触 gitee**。
+- CI run：`39175328844`（workflow `CI`），结论 **success**，双腿 `Go ubuntu-latest` / `Go windows-latest` 均 `success`。
+- `Gates` 步读数（双腿一致）：`SELFTEST: PASS 552/552`、`GATE REPORT scope=ci changed=11`、`TOTAL_FAIL=0`。
+- 包级证据：双腿各 14 个 `ok` 包（`internal/adapters`、`internal/applier`、`internal/chain`、`internal/console`、`internal/evidence`、`internal/gates`、`internal/guard`、`internal/release`、`internal/repair`、`internal/snapshot`、`internal/taskdef`、`internal/tickets`、`examples/whois-shadow`、`tools/agent-probe/enforcement-proxy`），`FAIL` 包 **0**。
+- 首跑即绿，无 §6.4 处置、无复跑。
 
 ## 10 成本与计量
 
