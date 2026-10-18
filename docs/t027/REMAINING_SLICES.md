@@ -681,6 +681,24 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 探针额度 | 无 |
 | 执行自由度清单落盘路径 | `docs/validation/evidence/GATES-G1G5-freedom-list.md` |
 
+### P12 — `GATES-EDGE-COVERAGE-RECHECK` · ✅ 完成
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `GATES-EDGE-COVERAGE-RECHECK`（v1.37，纯验证片） |
+| 状态 | ✅ **完成**（v1.37，2026-10-18；报告 `docs/validation/directive-gates-edge-coverage-recheck{,_EN}.md`） |
+| 目标 | 以反例集与真实变更集复评 OB-90 / OB-91 的根因是否真正关闭，判据本体与判据文本零改动 |
+| 依赖 | 无（上游 `GATES-G1G5` 已闭环，HEAD = `aa07eb4`） |
+| 规模 | M |
+| 步骤 | 步骤 0（基线核对）→ ① → ② → ③ → ④ → ⑤ → ⑥（r1–r3）→ ⑦（r1 + 复审）→ ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| 现状缺口 | 两类根因此前只在修复片内部被声称关闭，缺独立反例集与真实变更集证据；canary 断言的自锁风险无覆盖 |
+| 交付物 | `tools/gates/selftest.js` 的 T78 / T79 / T79 canary（纯新增）；准则 v1.37（头部、§0.3、§12.4 三行、附录 C.0y）；报告对 + 自由度清单 + 本行 |
+| 验收证据 | ① `SELFTEST: PASS 536/536`；② index / tree / ci 三作用域 `TOTAL_FAIL=0`；③ 4 条真实变更集 spot check 全部符合预期且索引复原同哈希；④ CN / `_EN` 六形状全等 |
+| 边界 | 不改 `tools/gates/lib/criteria/**` 与判据文本；不改 CONTRACTS / schema / fixtures / workflows；不动 `internal/**`；不推 gitee |
+| 分级 | `[SLICE]`（纯验证 / 判据片，命中 §12.1 配套②） |
+| 探针额度 | 无 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/GATES-EDGE-COVERAGE-RECHECK-freedom-list.md` |
+
 ---
 ## 已知缺陷（后续切片前处理）
 
@@ -857,6 +875,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 2026-10-11 | T028 | **功能实现切片（supervised-black-box 显式模式；试点 `[PILOT]`、零探针）**：落地契约的 supervised 段 + 两份新 schema + `internal/chain` 与 `internal/console` 的 supervised 全链（绑定确认 → 隔离工作窗 → visible 投递 → 人工监督与显式归还 → 后置全量扫描 → 独立 gates/review → reduced/unknown 报告）。审查：⑤ `PRE-REVIEW: PASS WITH FIXES`（3 次触顶）、⑥ `INDEPENDENT SCAN: PASS`（终扫，3 次触顶）、⑦ 盲审 1 条真新发现 High（策略漂移）由 ②b-7 修复、终审 `FINAL REVIEW: PASS`（新增可执行缺陷 0）；门禁 tree / index `TOTAL_FAIL=0`、`SELFTEST: PASS 335/335`、`go test` 14 包全绿、A12 实验 58 项全绿。**已知边界**：D-18 真实 CLI 端到端依赖 T027-B ⇒ **非可运行发布**；AT-24 在 (b)/(c) 裁定下条件闭合。**已实现并收口**；变更规模、提交与 CI 事实一律以验证报告为准（本行按 §11.2 只记报告路径）。 | docs/validation/t028-supervised-black-box.md |
 | 2026-10-17 | GATES-EDGE-COVERAGE | **判据边界收敛片（触判据本体、⑦ 不降级）**：① OB-90 —— G3(a) 配对改为任一侧出发（`_EN` 单侧即判、无镜像的单语文档不生成记录、指令对不可读侧 fail-closed）；② OB-91 —— G6-6 语言标识改整 token 严格匹配（续延字符集 / 终结符补集 / 覆盖不变量），闭合上片的 ⑦ r3 残差；③ 准则 v1.34（§0.3 行 / §6.3 两处 / 附录 C.0v / §12.4 两翻一增并新增 OB-92 登记）。**✅ 已完成（v1.34，2026-10-17 闭环）**：② 实现完成、三作用域门禁与自测全绿；⑤ 预审 r1 报一处 Medium（本行缺失）+ 3 Low ⇒ 逐条整改并原位重跑 ⇒ ⑤ r2 `PRE-REVIEW: PASS`；⑥ `INDEPENDENT SCAN: PASS`；⑦ r1 `FINAL REVIEW: PASS`（0 发现、未降级）；主提交 `3318fef` 与回填 `aa49e0c` 均已推送，两次 CI 首跑双绿（run `39019183887` / `39019985225`）；⑨ 三作用域读数见报告。 | docs/validation/directive-gates-edge-coverage.md |
 | 2026-10-18 | GATES-G1G5 | **基础 G1 / G5 主规则脚本化（`SKIP` → 机械判据）**：① G1 四个子判据（状态符号闭集 / 标题↔状态表 / 完成记录经键绑定 / 新增行措辞）；② G5 四字段机械派生（方向性 `staged ⊆ declared`、裸路径与根级工件识别、`addMode` 派生标签、index 作用域工作区干净）；③ 准则 v1.36（§0.3 行 / §6.3 两行 / 脚本化状态段 / §12.5 行 / 附录 C.0x / §12.4 OB-95）。**✅ 已完成（v1.36，2026-10-18）**：index / tree / ci 三作用域 `TOTAL_FAIL=0`、`SELFTEST: PASS 460/460`；⑤ r2 `PRE-REVIEW: PASS WITH FIXES`（三项硬伤判真闭合）、⑥ 报 1 High（根级工件漏抽）、⑦ r1 / r2 / r3 逐轮收敛（1 + 3 额度用满，末条 Low 以确定性自证收口、未开第 4 读）；提交与 CI 读数待 ⑩ 同轮授权后回填。 | docs/validation/directive-gates-g1g5.md |
+| 2026-10-18 | GATES-EDGE-COVERAGE-RECHECK | **边缘覆盖复评（纯验证片，判据零改动）**：以 T78（OB-90，16 条）+ T79（OB-91，50 条）+ T79 canary（10 条）复评两类根因，全部未复现 ⇒ 判已关闭；4 条真实变更集 spot check 全部符合预期、索引复原同哈希；新登记 OB-97（只登记不修）。**✅ 已完成（v1.37，2026-10-18）**：自测 536/536、三作用域 `TOTAL_FAIL=0`；提交与 CI 读数由 ⑩ 回填。 | docs/validation/directive-gates-edge-coverage-recheck.md |
 
 > **台账完整性注记（2026-09-21，已按用户授权补录）**：本表自 A4 行之后长期未追加完成行。**2026-09-21 依据各切片自己的验证报告补录 A5/A6/A7/B2/B3a 五行**（受"不凭记忆、只补可核验字段、缺失留空并标注历史缺失、不编造"三条约束），B3b 行先于本次补录写入，故五行列于其后；各行的日期/提交号/运行号/摘要均逐项标注来源，无法核验者已标注 **历史缺失**。
 > **已回填**（本片核实，2026-09-29）：**B3a 的 `DEV_PLAN{,_EN}.md` 段落已由提交 `dd36b9b` 补入**（`DEV_PLAN.md:137` 与 `_EN.md:138`）；原注记的过期表述由切片 `LEDGER-BACKFILL` 更正，**回填动作无需重复执行**。

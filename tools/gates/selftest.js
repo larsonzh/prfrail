@@ -2037,6 +2037,485 @@ function runTests() {
     );
   }
 
+  // ---- T78: OB-90 (v1.34) - the G3(a) pairing preconditions and the six whole-file shapes,
+  // driven from the `_EN` side. T74 proves the either-side guard EXISTS; this block is the
+  // counter-example inventory that turns each half red if it regresses: the six shape flags
+  // are isolated one by one (numstat held equal, so only G3(a.2) can speak), the two control
+  // shapes stay green, and the single-side add / delete / rename cases state the expected
+  // verdict instead of accepting "no record at all".
+  {
+    const CNP = 'docs/DELIVERY_DIRECTIVE.md';
+    const ENP = 'docs/DELIVERY_DIRECTIVE_EN.md';
+    /** One directive-pair run: `nums` defaults to an equal numstat, so only the shape speaks. */
+    const pair = (cn, en, nums, changed) =>
+      g3aEdgeProbe({
+        key: CNP,
+        changed: changed || [ENP],
+        texts: { [CNP]: cn, [ENP]: en },
+        numstat: nums || { [CNP]: [1, 1], [ENP]: [1, 1] },
+        existing: [CNP],
+      });
+
+    const bold = pair(['# c', '', '**b**', ''], ['# e', '', '**b** **x**', ''], { [CNP]: [0, 0], [ENP]: [1, 1] });
+    check(
+      'T78 OB-90 an `_EN`-only bold drift is judged from the EN side: numstat and the bold shape both go red',
+      bold.a1 === 'FAIL' &&
+        bold.a2 === 'FAIL' &&
+        /"bold":false/.test(bold.a2detail) &&
+        /_EN \+1\/-1 MISMATCH/.test(bold.detail),
+      'a1=' + bold.a1 + ' a2=' + bold.a2 + ' :: ' + bold.a2detail
+    );
+
+    const ticks = pair(['# c', '', 'x', ''], ['# e', '', '`x`', '']);
+    check(
+      'T78 OB-90 the backtick shape is judged on its own (equal numstat, so only G3(a.2) can speak)',
+      ticks.a1 === 'ABSENT' && ticks.a2 === 'FAIL' && /"backticks":false/.test(ticks.a2detail),
+      'a1=' + ticks.a1 + ' a2=' + ticks.a2 + ' :: ' + ticks.a2detail
+    );
+
+    const head = pair(['# c', '', 'x', ''], ['# e', '## shift', '', 'x', '']);
+    check(
+      'T78 OB-90 a heading downshift on the `_EN` side (one inserted line) fails G3(a.2) with `head` false',
+      head.a1 === 'ABSENT' &&
+        head.a2 === 'FAIL' &&
+        /"head":false/.test(head.a2detail) &&
+        /"lines":false/.test(head.a2detail),
+      'a1=' + head.a1 + ' a2=' + head.a2 + ' :: ' + head.a2detail
+    );
+
+    const bars = pair(['# c', '| a |', ''], ['# e', '| a | b |', '']);
+    check(
+      'T78 OB-90 the pipe shape is judged on its own (a table row widened on the `_EN` side)',
+      bars.a1 === 'ABSENT' && bars.a2 === 'FAIL' && /"bars":false/.test(bars.a2detail),
+      'a1=' + bars.a1 + ' a2=' + bars.a2 + ' :: ' + bars.a2detail
+    );
+
+    const blank = pair(['# c', '', 'x', ''], ['# e', 'z', 'y', '']);
+    check(
+      'T78 OB-90 the blank-line shape is judged on its own (same line count, one blank line filled in)',
+      blank.a1 === 'ABSENT' && blank.a2 === 'FAIL' && /"blank":false/.test(blank.a2detail),
+      'a1=' + blank.a1 + ' a2=' + blank.a2 + ' :: ' + blank.a2detail
+    );
+
+    const lines = pair(['# c', '', 'x', ''], ['# e', '', 'x', '', 'tail']);
+    check(
+      'T78 OB-90 the line-count shape is judged on its own (a trailing body line, heading positions intact)',
+      lines.a1 === 'ABSENT' &&
+        lines.a2 === 'FAIL' &&
+        /"lines":false/.test(lines.a2detail) &&
+        /"head":true/.test(lines.a2detail),
+      'a1=' + lines.a1 + ' a2=' + lines.a2 + ' :: ' + lines.a2detail
+    );
+
+    const both = g3aEdgeProbe({
+      key: CNP,
+      changed: [CNP, ENP],
+      texts: { [CNP]: ['# c', ''], [ENP]: ['# e', ''] },
+      numstat: { [CNP]: [2, 0], [ENP]: [2, 0] },
+      existing: [ENP],
+    });
+    check(
+      'T78 OB-90 control: an equal two-sided edit stays green (one aggregate PASS, no per-pair FAIL)',
+      both.a === 'PASS' && both.a1 === 'ABSENT' && both.a2 === 'ABSENT' && both.records.length === 1,
+      'a=' + both.a + ' a1=' + both.a1 + ' a2=' + both.a2 + ' records=' + both.records.length
+    );
+
+    const bothShape = g3aEdgeProbe({
+      key: CNP,
+      changed: [CNP, ENP],
+      texts: { [CNP]: ['# c', '**x**', ''], [ENP]: ['# e', '**x**', ''] },
+      numstat: { [CNP]: [2, 0], [ENP]: [2, 0] },
+      existing: [ENP],
+    });
+    check(
+      'T78 OB-90 control: an identical shape change on BOTH sides stays green (the six shapes compare sides, not an absolute form)',
+      bothShape.a === 'PASS' && bothShape.a1 === 'ABSENT' && bothShape.a2 === 'ABSENT',
+      'a=' + bothShape.a + ' a1=' + bothShape.a1 + ' a2=' + bothShape.a2
+    );
+
+    const pairingOnly = pair(['# c', ''], ['# e', ''], { [CNP]: [0, 0], [ENP]: [2, 2] });
+    check(
+      'T78 OB-90 pairing without shape drift: an `_EN`-only modification fails G3(a.1) and leaves G3(a.2) silent',
+      pairingOnly.a1 === 'FAIL' &&
+        pairingOnly.a2 === 'ABSENT' &&
+        /_EN \+2\/-2 MISMATCH/.test(pairingOnly.detail),
+      'a1=' + pairingOnly.a1 + ' a2=' + pairingOnly.a2 + ' :: ' + pairingOnly.detail
+    );
+
+    const added = pair(['# c', ''], ['# e', ''], { [CNP]: [0, 0], [ENP]: [2, 0] });
+    check(
+      'T78 OB-90 an `_EN` side that is NEWLY ADDED (+2/-0) is judged against the untouched CN baseline and fails G3(a.1)',
+      added.a1 === 'FAIL' && added.a2 === 'ABSENT' && /_EN \+2\/-0 MISMATCH/.test(added.detail),
+      'a1=' + added.a1 + ' a2=' + added.a2 + ' :: ' + added.detail
+    );
+
+    const removed = g3aEdgeProbe({
+      key: 'docs/t027/probe-pair-cn.md',
+      changed: ['docs/t027/probe-pair-cn_EN.md'],
+      texts: { 'docs/t027/probe-pair-cn.md': ['# c', ''] },
+      numstat: { 'docs/t027/probe-pair-cn.md': [0, 0], 'docs/t027/probe-pair-cn_EN.md': [0, 4] },
+      existing: [],
+    });
+    check(
+      'T78 OB-90 a DELETED `_EN` side (+0/-4) still yields G3(a.1) FAIL, so a removal cannot pass as "nothing to compare"',
+      removed.a1 === 'FAIL' && removed.a === 'FAIL' && /_EN \+0\/-4 MISMATCH/.test(removed.detail),
+      'a1=' + removed.a1 + ' :: ' + removed.detail
+    );
+
+    const ROLD = 'docs/t027/probe-rename-cn.md';
+    const ROLD_EN = 'docs/t027/probe-rename-cn_EN.md';
+    const RNEW = 'docs/t027/probe-renamed-cn.md';
+    const RNEW_EN = 'docs/t027/probe-renamed-cn_EN.md';
+    const rename = g3aEdgeProbe({
+      key: ROLD,
+      changed: [ROLD_EN, RNEW_EN],
+      texts: { [ROLD]: ['# c', ''] },
+      numstat: { [ROLD]: [0, 0], [ROLD_EN]: [0, 4], [RNEW]: [0, 0], [RNEW_EN]: [2, 0] },
+      existing: [ROLD],
+    });
+    const renameFails = failIds(rename.records);
+    check(
+      'T78 OB-90 an `_EN` RENAME is judged as two pairs (old mirror deleted, new mirror added), each with its own G3(a.1)',
+      renameFails.indexOf('G3(a.1) ' + ROLD) >= 0 &&
+        renameFails.indexOf('G3(a.1) ' + RNEW) >= 0 &&
+        rename.records.filter((r) => r.id === 'G3(a)').length === 1 &&
+        rename.records.length === 3,
+      'fails=' + JSON.stringify(renameFails) + ' records=' + rename.records.length
+    );
+
+    const lower = g3aEdgeProbe({
+      key: 'docs/t027/probe-pair-cn.md',
+      changed: ['docs/t027/probe-pair-cn_en.md'],
+      texts: { 'docs/t027/probe-pair-cn.md': ['# c', ''], 'docs/t027/probe-pair-cn_en.md': ['# e', ''] },
+      numstat: { 'docs/t027/probe-pair-cn.md': [2, 0], 'docs/t027/probe-pair-cn_en.md': [2, 0] },
+      existing: [],
+    });
+    check(
+      'T78 OB-90 a non-canonical `_en.md` spelling is paired under the CANONICAL CN id, so the half a reader looks for is the one reported',
+      lower.a === 'PASS' &&
+        lower.a1 === 'ABSENT' &&
+        lower.a2 === 'ABSENT' &&
+        lower.records.length === 1 &&
+        /^docs\/t027\/probe-pair-cn\.md \+2\/-0 vs _EN \+2\/-0 OK/.test(lower.detail),
+      'a=' + lower.a + ' :: ' + lower.detail
+    );
+
+    const orphan = g3aEdgeProbe({
+      key: 'docs/t027/orphan.md',
+      changed: ['docs/t027/orphan_EN.md'],
+      texts: { 'docs/t027/orphan_EN.md': ['# e', ''] },
+      numstat: { 'docs/t027/orphan_EN.md': [2, 0] },
+      existing: [],
+    });
+    check(
+      'T78 OB-90 an orphan `_EN.md` (no CN side at all) is still judged and fails G3(a.1) against a +0/-0 baseline',
+      orphan.a1 === 'FAIL' && /_EN \+2\/-0 MISMATCH/.test(orphan.detail),
+      'a1=' + orphan.a1 + ' :: ' + orphan.detail
+    );
+
+    const single = g3aEdgeProbe({
+      key: 'docs/t027/probe-single-lang.md',
+      changed: ['docs/t027/probe-single-lang.md'],
+      texts: { 'docs/t027/probe-single-lang.md': ['# s', ''] },
+      numstat: { 'docs/t027/probe-single-lang.md': [3, 0] },
+      existing: [],
+    });
+    check(
+      'T78 OB-90 a single-language document without an `_EN` mirror produces NO record (no false red on the mirror-less corpus)',
+      single.a === 'ABSENT' && single.records.length === 0,
+      'a=' + single.a + ' records=' + single.records.length
+    );
+
+    const boldAgain = pair(['# c', '', '**b**', ''], ['# e', '', '**b** **x**', ''], { [CNP]: [0, 0], [ENP]: [1, 1] });
+    check(
+      'T78 OB-90 aggregate uniqueness: the same `_EN`-only drift emits exactly ONE G3(a) record (a duplicate aggregate would double-count)',
+      boldAgain.records.filter((r) => r.id === 'G3(a)').length === 1 && boldAgain.a === 'FAIL',
+      'G3(a) records=' + boldAgain.records.filter((r) => r.id === 'G3(a)').length + ' a=' + boldAgain.a
+    );
+  }
+
+  // ---- T79: OB-91 (v1.34) - the language tag token is consumed to its FULL extent and then
+  // compared WHOLE against the closed set. Table-driven (50 assertions): illegal forms, legal
+  // + illegal coexistence in both orders, the [A-Za-z0-9._-] continuation charset, the
+  // terminator set (any character outside that class ends the token), the header-window
+  // boundary, and the remaining fail-closed premises. Every illegal row asserts the exact tag
+  // back out of the error message, so a truncated token cannot pass as a legal prefix.
+  {
+    const CN = 'docs/t027/probe-g6-6-t79.md';
+    const EN = 'docs/t027/probe-g6-6-t79_EN.md';
+    const H = '### 12.4 观察项台账\n\n';
+    const cnRow = '| OB-1 | d | x | 观察中 |\n';
+    const enRow = '| OB-1 | d | x | Observing |\n';
+    const rowFor = (file) => (file === EN ? enRow : cnRow);
+    const fileFor = (tag) => (/^lang:en/.test(tag) ? EN : CN);
+    const run66 = (file, head) => {
+      try {
+        return { res: g66Probe(file, head + H + rowFor(file)), err: null };
+      } catch (e) {
+        return { res: null, err: e };
+      }
+    };
+    const unknownTag = (o, tag) =>
+      !!o.err &&
+      o.err instanceof UsageError &&
+      /unknown language tag/.test(o.err.message) &&
+      o.err.message.indexOf('`' + tag + '`') >= 0;
+    const why = (o) => (o.err ? 'err=' + o.err.message : 'verdict=' + (o.res ? o.res.verdict : 'NONE'));
+    const fillerLines = (n) => {
+      const a = [];
+      for (let i = 0; i < n; i++) a.push('filler ' + i);
+      return a;
+    };
+
+    // A. The nine illegal forms named by OB-91, each asserted alone.
+    const ILLEGAL = ['zh_cn', 'zh-cn', 'en_us', 'en-us', '', 'ZH', 'zh-', 'zh.', 'zh2'];
+    for (const suffix of ILLEGAL) {
+      const tag = 'lang:' + suffix;
+      const o = run66(fileFor(tag), '`' + tag + '`\n');
+      check(
+        'T79 OB-91 illegal form `' + tag + '` is consumed whole and rejected as an unknown tag',
+        unknownTag(o, tag),
+        why(o)
+      );
+    }
+
+    // B. A legal tag next to an illegal one is fail-closed, in BOTH orders.
+    const COEXIST = [
+      [CN, 'lang:zh', 'lang:zh-cn'],
+      [CN, 'lang:zh-cn', 'lang:zh'],
+      [EN, 'lang:en', 'lang:en-us'],
+      [EN, 'lang:en-us', 'lang:en'],
+    ];
+    for (const [file, first, second] of COEXIST) {
+      const bad = /-(cn|us)$/.test(first) ? first : second;
+      const o = run66(file, '`' + first + '` `' + second + '`\n');
+      check(
+        'T79 OB-91 legal + illegal coexistence is fail-closed (' + first + ' + ' + second + ')',
+        unknownTag(o, bad),
+        why(o)
+      );
+    }
+
+    // C. Continuation-charset sweep: every character class in [A-Za-z0-9._-] extends the
+    // token on both legal stems, so each suffix is an unknown tag rather than a legal prefix.
+    const CONT = [
+      'en_',
+      'en.',
+      'en-',
+      'en2',
+      'enA',
+      'ena',
+      'zhA',
+      'zha',
+      'zh9',
+      'zh__',
+      'zh-_',
+      'zh.1',
+      'zhCN',
+      'en-001',
+    ];
+    for (const suffix of CONT) {
+      const tag = 'lang:' + suffix;
+      const o = run66(fileFor(tag), '`' + tag + '`\n');
+      check(
+        'T79 OB-91 continuation char extends the token (`' + tag + '` is one unknown token, not a legal prefix)',
+        unknownTag(o, tag),
+        why(o)
+      );
+    }
+
+    // D. Terminators and normal declaration positions must NOT go red: every character
+    // outside [A-Za-z0-9._-] ends the token, so the remaining prefix is the legal tag.
+    const LEGAL = [
+      ['zh-alone', CN, '`lang:zh`\n'],
+      ['zh-comma', CN, '`lang:zh,`\n'],
+      ['zh-space', CN, '`lang:zh` zh\n'],
+      ['zh-tab', CN, '`lang:zh`\tzh\n'],
+      ['zh-cjk-comma', CN, '`lang:zh`，zh\n'],
+      ['zh-cjk-paren', CN, '`lang:zh`）\n'],
+      ['zh-colon', CN, '`lang:zh`:\n'],
+      ['zh-declaration-line', CN, '> Language declaration: `lang:zh`. ProofRail\n'],
+      ['zh-bracket', CN, '`lang:zh`]\n'],
+      ['zh-paren', CN, '`lang:zh`)\n'],
+      ['zh-quote', CN, '`lang:zh`"\n'],
+      ['zh-pipe', CN, '`lang:zh`| \n'],
+      ['zh-twice', CN, '`lang:zh` / `lang:zh`\n'],
+      ['en-alone', EN, '`lang:en`\n'],
+      ['en-comma', EN, '`lang:en,`\n'],
+      ['en-declaration-line', EN, '> Language declaration: `lang:en`. ProofRail\n'],
+      ['zh-line-15-of-window', CN, fillerLines(14).join('\n') + '\n`lang:zh`\n'],
+    ];
+    for (const [slug, file, head] of LEGAL) {
+      const o = run66(file, head);
+      check(
+        'T79 OB-91 legal shape "' + slug + '" is not turned red by the token rule',
+        !o.err && !!o.res && o.res.verdict === 'PASS' && o.res.findings === 0,
+        why(o)
+      );
+    }
+
+    // E. The other fail-closed premises, including the header-window boundary (line 16 falls
+    // outside LANG_HEADER_WINDOW = 15) and the `\b` occurrence rule.
+    const FAIL_CLOSED = [
+      ['tag on line 16 is outside the header window', CN, fillerLines(15).join('\n') + '\n`lang:zh`\n', /language tag missing/],
+      ['two legal tags conflict', CN, '`lang:zh` `lang:en`\n', /conflicting language tags/],
+      ['declared tag disagrees with the file name', CN, '`lang:en`\n', /disagrees with the file name/],
+      ['no tag at all', CN, '# no tag here\n', /language tag missing/],
+      ['a word character before `lang:` means no occurrence', CN, 'xlang:zh\n', /language tag missing/],
+      ['a bare tag next to a legal one is still unknown', CN, '`lang:zh` `lang:`\n', /unknown language tag `lang:`/],
+    ];
+    for (const [slug, file, head, re] of FAIL_CLOSED) {
+      const o = run66(file, head);
+      check(
+        'T79 OB-91 fail-closed premise: ' + slug,
+        !!o.err && o.err instanceof UsageError && re.test(o.err.message),
+        why(o)
+      );
+    }
+  }
+
+  // ---- T79 canary (recheck M-3 / M-4): the table above is driven by the same constants the
+  // rule uses, so a change to `LANG_TAG_CONT_RE` / `LANG_HEADER_WINDOW` / `LANG_TAG_EXACT`
+  // would move the table along with the rule and keep the suite green. This block pins those
+  // constants against an independent mirror and adds one end-to-end canary per EXTERNAL
+  // terminator character, so widening the continuation class turns into a red check instead
+  // of an invisible semantic drift.
+  {
+    const gi = G6.internals;
+    // The independent side of the lock: a literal copy of the intended class, deliberately
+    // NOT read back from g6.js (reading the source text would drift with the implementation).
+    const MIRROR_CONT = /[A-Za-z0-9._-]/;
+    const mismatches = [];
+    for (let code = 0; code < 128; code++) {
+      const ch = String.fromCharCode(code);
+      if (gi.LANG_TAG_CONT_RE.test(ch) !== MIRROR_CONT.test(ch)) {
+        mismatches.push('U+' + code.toString(16).toUpperCase().padStart(4, '0'));
+      }
+    }
+    const NON_ASCII = ['\u00A0', '\u3001', '\u3002', '\uFF08', '\uFF0C', '\uFF1B', '\u4E2D', '\u{1F600}'];
+    const leaked = NON_ASCII.filter((ch) => gi.LANG_TAG_CONT_RE.test(ch));
+    const tags = Object.keys(gi.LANG_TAG_EXACT).sort();
+    const legalZh = (() => {
+      try {
+        return gi.declaredLang(['`lang:zh`'], 'docs/t027/probe-g6-6-t79-canary.md');
+      } catch (e) {
+        return 'ERR:' + e.message;
+      }
+    })();
+    const illegalUnderscore = (() => {
+      try {
+        gi.declaredLang(['`lang:zh_cn`'], 'docs/t027/probe-g6-6-t79-canary.md');
+        return 'NO ERROR';
+      } catch (e) {
+        return e;
+      }
+    })();
+    check(
+      'T79 canary: constants are locked — LANG_HEADER_WINDOW = 15, LANG_TAG_EXACT is exactly {lang:zh, lang:en}, and LANG_TAG_CONT_RE is exactly [A-Za-z0-9._-] (behavior pair: `lang:zh` legal, `lang:zh_cn` illegal)',
+      gi.LANG_HEADER_WINDOW === 15 &&
+        JSON.stringify(tags) === JSON.stringify(['lang:en', 'lang:zh']) &&
+        gi.LANG_TAG_EXACT['lang:zh'] === 'zh' &&
+        gi.LANG_TAG_EXACT['lang:en'] === 'en' &&
+        mismatches.length === 0 &&
+        leaked.length === 0 &&
+        legalZh === 'cn' &&
+        illegalUnderscore instanceof UsageError &&
+        /unknown language tag/.test(illegalUnderscore.message) &&
+        illegalUnderscore.message.indexOf('`lang:zh_cn`') >= 0,
+      JSON.stringify({
+        window: gi.LANG_HEADER_WINDOW,
+        tags: tags,
+        mismatches: mismatches,
+        leaked: leaked,
+        legalZh: legalZh,
+        illegal: illegalUnderscore instanceof UsageError ? illegalUnderscore.message : String(illegalUnderscore),
+      })
+    );
+
+    // M-5 (recheck): the mirror above compares BEHAVIOUR, so a widening applied to both the
+    // rule and the mirror stays green. The source TEXT of the class is therefore frozen as a
+    // literal string: any edit to the RegExp source changes this value and turns red.
+    check(
+      'T79 canary: LANG_TAG_CONT_RE source text is frozen to the literal class [A-Za-z0-9._-]',
+      gi.LANG_TAG_CONT_RE.source === '[A-Za-z0-9._-]',
+      'source=' + JSON.stringify(gi.LANG_TAG_CONT_RE.source) + ' flags=' + JSON.stringify(gi.LANG_TAG_CONT_RE.flags)
+    );
+
+    // M-4: one end-to-end canary per external terminator. None of these characters is in the
+    // continuation set, so the token ends at the legal prefix `lang:zh` and the tail is free
+    // text - the document PASSes. If the class is widened to include any of them the token
+    // becomes `lang:zh<sep>en`, an unknown tag, and the canary goes red.
+    const CN = 'docs/t027/probe-g6-6-t79-canary.md';
+    const H = '### 12.4 观察项台账\n\n';
+    const run66 = (head) => {
+      try {
+        return { res: g66Probe(CN, head + H + '| OB-1 | d | x | 观察中 |\n'), err: null };
+      } catch (e) {
+        return { res: null, err: e };
+      }
+    };
+    const why = (o) =>
+      o.err ? 'err=' + o.err.message : 'verdict=' + (o.res ? o.res.verdict : 'NONE') + ' findings=' + (o.res ? o.res.findings : '?');
+    const EXTERNAL = [
+      ['/', 'U+002F', 'slash'],
+      ['?', 'U+003F', 'question mark'],
+      ['=', 'U+003D', 'equals sign'],
+      [' ', 'U+0020', 'space'],
+      ['\uFF1B', 'U+FF1B', 'fullwidth semicolon'],
+      ['\uFF0C', 'U+FF0C', 'fullwidth comma'],
+      ['\u3001', 'U+3001', 'ideographic comma'],
+    ];
+    for (const [ch, cp, slug] of EXTERNAL) {
+      const tag = 'lang:zh' + ch + 'en';
+      const o = run66('`' + tag + '`\n');
+      check(
+        'T79 canary: ' +
+          slug +
+          ' (' +
+          cp +
+          ') is an external terminator, not a continuation char — `' +
+          tag +
+          '` splits into the legal tag `lang:zh` plus free text and stays green',
+        !o.err && !!o.res && o.res.verdict === 'PASS' && o.res.findings === 0,
+        why(o)
+      );
+    }
+  }
+
+  // ---- T79 black-box tokenization (recheck M-5): the locks above read the live constants,
+  // so a rule and its lock widened together would stay green. This block observes
+  // tokenization ONLY through the public G6-6 path on synthetic documents, with literal
+  // expectations and no `gi.*` reference at all.
+  {
+    const FILE = 'docs/t027/probe-g6-6-t79-tokenization.md';
+    const LEDGER = '### 12.4 观察项台账\n\n| OB-1 | d | x | 观察中 |\n';
+    const observe = (head) => {
+      try {
+        const res = g66Probe(FILE, head + LEDGER);
+        return { verdict: res.verdict, findings: res.findings };
+      } catch (e) {
+        return { err: e };
+      }
+    };
+    const zh = observe('`lang:zh`\n');
+    const zhCn = observe('`lang:zh_cn`\n');
+    const zhSlashEn = observe('`lang:zh/en`\n');
+    const shown = (o) => (o.err ? 'err=' + o.err.message : o.verdict + '/' + o.findings);
+    check(
+      'T79 canary: black-box tokenization — `lang:zh` PASSes, `lang:zh_cn` is an unknown tag, `lang:zh/en` PASSes (/ terminates the token)',
+      !zh.err &&
+        zh.verdict === 'PASS' &&
+        zh.findings === 0 &&
+        !zhSlashEn.err &&
+        zhSlashEn.verdict === 'PASS' &&
+        zhSlashEn.findings === 0 &&
+        zhCn.err instanceof UsageError &&
+        /unknown language tag/.test(zhCn.err.message) &&
+        zhCn.err.message.indexOf('`lang:zh_cn`') >= 0,
+      JSON.stringify({ zh: shown(zh), 'zh_cn': shown(zhCn), 'zh/en': shown(zhSlashEn) })
+    );
+  }
+
   // ---- T76: v1.36 - base G1 (status markers) is a real criterion, not a SKIP.
   {
     const LEDGER = (o) => {
