@@ -102,8 +102,9 @@ All three were found **independently** by the back-filled ① and by ⑤ (two co
 
 ## 7. Commit and CI
 
-- before the ⑩ stop point this slice **does not enter the commit stage**; commit and push need same-turn authorisation, so this section has no CI reading yet.
-- after the commit, both legs are observed per §6.4 and the readings are written into this section by a follow-up docs-only commit (which also needs same-turn authorisation).
+- **Main commit** `ec1a494` (`feat: script the base G1 and G5 gate rules (v1.36)`, 11 files, `+1300 / −47`), pushed to `origin/main`; **gitee was not pushed**.
+- **CI run `39098628598` (head `ec1a494`): both legs green on the FIRST run**. The `Gates` step reading is identical per leg: `SELFTEST: PASS 460/460`, `GATE REPORT scope=ci changed=11`, `TOTAL_FAIL=0`; `go test` reports 14 packages `ok` per leg and zero `FAIL` lines (the Windows leg skips `Race` / `Contract fixtures` by matrix design, which is not a failure).
+- **The docs-only backfill commit of this section** carries the readings above; its own CI is observation only and **no further backfill commit is added** (the §6.4 rule "never hide a red first run behind a re-run" does not apply here: the first run was already green).
 
 ## 8. Cost and metering (R7.1 + first empirical use of the v1.35 tiering)
 

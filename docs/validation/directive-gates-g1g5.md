@@ -102,8 +102,9 @@
 
 ## 7. 提交与 CI
 
-- 本片在 ⑩ 停点前**不进入提交环节**；commit 与 push 须同轮授权，故本节暂无 CI 读数。
-- 提交后按 §6.4 观察双腿，读数由后续 docs-only 提交写入本节（该提交同样须同轮授权）。
+- **主提交** `ec1a494`（`feat: script the base G1 and G5 gate rules (v1.36)`，涉及门禁判据、自测、准则与报告的成套改动），已推送 `origin/main`；**未推 gitee**。
+- **CI run `39098628598`（head `ec1a494`）：首跑双腿双绿**。`Gates` 步读数逐腿相同：`SELFTEST: PASS 460/460`、`GATE REPORT scope=ci changed=11`、`TOTAL_FAIL=0`；`go test` 每腿 14 个包 `ok`、`FAIL` 行 0 条（Windows 腿 `Race` / `Contract fixtures` 为按矩阵跳过，非失败）。
+- **本节的 docs-only 回填提交**随附上述读数；其自身 CI 只作观察，**不再新增回填提交**（§6.4 的「不以复跑绿掩盖首跑红」在此不适用：首跑即双绿）。
 
 ## 8. 成本与计量（R7.1 + v1.35 分层额度首次实证）
 
