@@ -191,6 +191,12 @@
 
 - Both sides are UTF-8 with BOM + LF.
 
+### 8.1 Known gap (factual entry appended 2026-10-19)
+
+> **Evidence-capture window between ⑧c and ⑩ (fact of this slice; not written off, scope not expanded)**: after ⑧c in this slice, obtaining the ⑩ receipt evidence (locating the OB-98 / OB-99 entries in §12.4, locating the §9.3 subsection, tallying dispatch offsets, reading the CI log) required re-creating temporary files in three places, at the `tmp/` root and under `tmp/G9-C/`, all deleted immediately. **Nature**: a location violation (the `tmp/` root rather than `tmp/<slice-ID>/`) plus a timing violation (⑧c had already zeroed the count, and files were re-created afterwards); **but the root cause is not a discipline-maintenance failure — it is a rule gap in §5.1**: ⑧c means "process temporary files are zeroed", while the ⑩ receipt needs evidence, and there is no lawful location between the two. **This slice does not change the directive** (no scope expansion); it is registered as a **next-slice candidate**: `G9-d` or a standalone slice to evaluate "the rule for handling temporary files in the evidence-capture window after ⑧c" (candidate forms: ① allow creating `tmp/<slice-ID>/` after ⑧c, provided it is cleared once more and re-read before ⑩; ② capture evidence with a one-shot `node -e` output that never touches disk; ③ prefetch the evidence data of §9.3 and §12.4 before ⑧c).
+
+**Wording clarification (distinct from this subsection)**: in the verbal wording of the ⑩ receipt, the three occurrences in this slice were once called "**consecutive evidence**" of what OB-100 refers to as "created at a violating location but not committed". That wording is **inaccurate** and must be distinguished — the three occurrences are **location plus timing double violations**, of which **the timing aspect is the §5.1 rule gap and does not serve as consecutive evidence for OB-100**; OB-100 still covers only "created at a violating location but not committed". That wording entered no tracked file before this append (the mechanical check anchored at `51ecddf` returns zero hits), so it does not involve the retrospective rewrite of §11.1; this paragraph is the formal record of that distinction.
+
 ## 9 ⑨ native verification and commit state (⑨ executed; ⑩ pending authorisation)
 
 ### 9.1 ⑨ native verification
