@@ -717,6 +717,24 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 探针额度 | 无 |
 | 执行自由度清单落盘路径 | `docs/validation/evidence/G9-C-freedom-list.md` |
 
+### P14 — `DIRECTIVE-EVIDENCE-WINDOW` · ✅ 完成
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `DIRECTIVE-EVIDENCE-WINDOW`（v1.39；原暂定名 `G9-d`，不占 G 号） |
+| 状态 | ✅ **完成**（v1.39，2026-10-19；报告 `docs/validation/directive-evidence-window{,_EN}.md`） |
+| 目标 | 补「⑧c 之后、⑩ 之前取证窗口无合法临时件位置」的规则缺口 |
+| 依赖 | 无（上游 `G9-c` 已闭环，HEAD = `caf3b0f`） |
+| 规模 | M |
+| 步骤 | 步骤 0（双重身份 + ADR-026）→ ① → ②（5 次）→ ③（2 次）→ ④ → ⑤（2 次）→ ⑥ → ⑦（3 次）→ ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| 现状缺口 | ⑧c 语义是「过程临时件清零」，⑩ 回执需要取证，两者之间无合法位置；上一片 3 处违反即实证 |
+| 交付物 | 准则 v1.39（§5.1 新增「⑧c 后取证窗口」子款 + 临时件例外句 + §5.3 ⑧c 行半句 + §1.5 清理时机括注 + 附录 B.7.3 终态回读槽位 + 附录 C.0aa + §12.4 OB-99/OB-100 处置列 + 头部/§0.3）；ADR-026；报告对 + 自由度清单 + 本行 |
+| 验收证据 | `SELFTEST: PASS 552/552`；三作用域 `TOTAL_FAIL=0`；⑨ 纯净 worktree 复现全绿；CN/`_EN` 六形状全等 |
+| 边界 | 不改 §2.2 / §2.4 闭集（**不落 FlashX 永久白名单**）、§5.2 矩阵、§7.5 数值、§6.3 判据本体、`tools/**`、CONTRACTS / schema / fixtures / workflows、`internal/**`、流水线结构；不推 gitee |
+| 分级 | `[SLICE]`（触 §5.1 流程纪律语义） |
+| 探针额度 | 无 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/DIRECTIVE-EVIDENCE-WINDOW-freedom-list.md` |
+
 ---
 ## 已知缺陷（后续切片前处理）
 
@@ -895,6 +913,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 2026-10-18 | GATES-G1G5 | **基础 G1 / G5 主规则脚本化（`SKIP` → 机械判据）**：① G1 四个子判据（状态符号闭集 / 标题↔状态表 / 完成记录经键绑定 / 新增行措辞）；② G5 四字段机械派生（方向性 `staged ⊆ declared`、裸路径与根级工件识别、`addMode` 派生标签、index 作用域工作区干净）；③ 准则 v1.36（§0.3 行 / §6.3 两行 / 脚本化状态段 / §12.5 行 / 附录 C.0x / §12.4 OB-95）。**✅ 已完成（v1.36，2026-10-18）**：index / tree / ci 三作用域 `TOTAL_FAIL=0`、`SELFTEST: PASS 460/460`；⑤ r2 `PRE-REVIEW: PASS WITH FIXES`（三项硬伤判真闭合）、⑥ 报 1 High（根级工件漏抽）、⑦ r1 / r2 / r3 逐轮收敛（1 + 3 额度用满，末条 Low 以确定性自证收口、未开第 4 读）；提交与 CI 读数待 ⑩ 同轮授权后回填。 | docs/validation/directive-gates-g1g5.md |
 | 2026-10-18 | GATES-EDGE-COVERAGE-RECHECK | **边缘覆盖复评（纯验证片，判据零改动）**：以 T78（OB-90，16 条）+ T79（OB-91，50 条）+ T79 canary（10 条）复评两类根因，全部未复现 ⇒ 判已关闭；4 条真实变更集 spot check 全部符合预期、索引复原同哈希；新登记 OB-97（只登记不修）。**✅ 已完成（v1.37，2026-10-18）**：自测 536/536、三作用域 `TOTAL_FAIL=0`；提交与 CI 读数由 ⑩ 回填。 | docs/validation/directive-gates-edge-coverage-recheck.md |
 | 2026-10-19 | G9-c | **准则治理类切片（新增机械判据 G9）**：① 新增 CI 判据 G9（静态形态）与白名单、`g9.js`、`gate.js` 注册、`selftest.js` T80–T83；② 准则 v1.38（头部 / §0.3 / §1.5 / §5.1 / §6.3 / R6.2 / 附录 C.0z / §12.4 OB-98 与 OB-99）；③ ⑨ 纯净 worktree 复现（536/536 → 552/552，退出码 0/1/2 逐例成立）；⑤ `PRE-REVIEW: PASS WITH FIXES` 两轮、⑥ `INDEPENDENT SCAN: PASS`、⑦ 由 `GPT-5.3-Codex (copilot)` 承担（r1–r3）；三作用域 `TOTAL_FAIL=0`；探针 0。**本行按 v1.21 的完成行格式只记报告路径**。 | docs/validation/directive-g9c.md |
+| 2026-10-19 | DIRECTIVE-EVIDENCE-WINDOW | **准则治理类切片（补 ⑧c 后取证窗口规则缺口）**：① §5.1 新增「⑧c 后取证窗口」子款（三条候选路径固定次序 + 四条回读读数 + 只判终态可观测性）、临时件例外句、§5.3 ⑧c 行半句、§1.5 清理时机括注、附录 B.7.3 终态回读槽位、附录 C.0aa、§12.4 OB-99/OB-100 处置列与头部/§0.3；② ADR-026 登记；③ ⑨ 纯净 worktree 复现全绿（三作用域 `TOTAL_FAIL=0`、`SELFTEST: PASS 552/552`）；⑦ 由 `GPT-5.3-Codex (copilot)` 承担（r1–r3）；批量辅助 `GLM-5.3-Flash` 1 次、`GLM-5.3-FlashX` 1 次；探针 0。**本行按 v1.21 的完成行格式只记报告路径**。 | docs/validation/directive-evidence-window.md |
 
 > **台账完整性注记（2026-09-21，已按用户授权补录）**：本表自 A4 行之后长期未追加完成行。**2026-09-21 依据各切片自己的验证报告补录 A5/A6/A7/B2/B3a 五行**（受"不凭记忆、只补可核验字段、缺失留空并标注历史缺失、不编造"三条约束），B3b 行先于本次补录写入，故五行列于其后；各行的日期/提交号/运行号/摘要均逐项标注来源，无法核验者已标注 **历史缺失**。
 > **已回填**（本片核实，2026-09-29）：**B3a 的 `DEV_PLAN{,_EN}.md` 段落已由提交 `dd36b9b` 补入**（`DEV_PLAN.md:137` 与 `_EN.md:138`）；原注记的过期表述由切片 `LEDGER-BACKFILL` 更正，**回填动作无需重复执行**。

@@ -703,6 +703,24 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Probe quota | none |
 | Freedom-list path | `docs/validation/evidence/G9-C-freedom-list.md` |
 
+### P14 — `DIRECTIVE-EVIDENCE-WINDOW` · ✅ Done
+
+| Field | Content |
+|---|---|
+| Id | `DIRECTIVE-EVIDENCE-WINDOW` (v1.39; working name `G9-d`, no G number consumed) |
+| Status | ✅ **Done** (v1.39, 2026-10-19; report `docs/validation/directive-evidence-window{,_EN}.md`) |
+| Goal | Close the rule gap where no legal temp-artifact location exists for evidence gathering after ⑧c and before ⑩ |
+| Depends on | none (upstream `G9-c` is closed, HEAD = `caf3b0f`) |
+| Size | M |
+| Steps | step 0 (dual identity + ADR-026) → ① → ② (5 dispatches) → ③ (2 rounds) → ④ → ⑤ (2 rounds) → ⑥ → ⑦ (3 rounds) → ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| Current gap | ⑧c means "process temp artifacts cleared", while the ⑩ receipt needs evidence, so there was no legal location between them; the 3 violations in the previous slice are the evidence |
+| Deliverables | directive v1.39 (the new "⑧c post-evidence window" sub-clause in 5.1, the temp-artifact exception sentence, the half-sentence in the 5.3 ⑧c row, the 1.5 cleanup-timing parenthetical, the final-state readback slot in appendix B.7.3, appendix C.0aa, the OB-99/OB-100 disposition cells in 12.4 and the header / 0.3); ADR-026; the report pair, the freedom list and this row |
+| Acceptance evidence | `SELFTEST: PASS 552/552`; `TOTAL_FAIL=0` in all three scopes; the ⑨ pristine-worktree reproduction is fully green; CN / `_EN` have all six shapes equal |
+| Boundary | the 2.2 / 2.4 closed sets (**no permanent FlashX whitelist entry**), the 5.2 matrix, the 7.5 figures, the 6.3 criterion bodies, `tools/**`, CONTRACTS / schema / fixtures / workflows, `internal/**` and the pipeline structure stay untouched; no gitee push |
+| Tier | `[SLICE]` (touches the 5.1 process-discipline semantics) |
+| Probe quota | none |
+| Freedom-list path | `docs/validation/evidence/DIRECTIVE-EVIDENCE-WINDOW-freedom-list.md` |
+
 ---
 
 ## Known defects (to be handled before later slices)
@@ -882,6 +900,7 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | 2026-10-18 | GATES-G1G5 | **the base G1 / G5 rules move from `SKIP` to mechanical criteria**: ① four G1 sub-checks (state-symbol closed set / heading vs status table / completion rows through key binding / wording in added rows); ② four G5 fields derived mechanically (directional `staged ⊆ declared`, bare paths and repository-root artifacts recognised, `addMode` as a derived label, a clean worktree in index scope); ③ directive v1.36 (the §0.3 row / the two §6.3 rows / the scripting-status paragraph / the §12.5 row / appendix C.0x / OB-95 in §12.4). **✅ Done (v1.36, 2026-10-18)**: `TOTAL_FAIL=0` in the index / tree / ci scopes and `SELFTEST: PASS 460/460`; ⑤ r2 `PRE-REVIEW: PASS WITH FIXES` (the three hard defects judged genuinely closed), ⑥ reported 1 High (repository-root artifacts never extracted), ⑦ r1 / r2 / r3 converged round by round (the 1 + 3 quota fully used; the last Low was closed by deterministic self-verification with no fourth read); the commit and CI readings are filled in after the same-turn authorisation at ⑩. | docs/validation/directive-gates-g1g5.md |
 | 2026-10-18 | GATES-EDGE-COVERAGE-RECHECK | **Edge-coverage recheck (verification only, zero criterion changes)**: re-checked both root causes with T78 (OB-90, 16 cases) + T79 (OB-91, 50 cases) + T79 canary (10 cases), none reproduced ⇒ judged closed; all four real-change-set spot checks match their expectation and the index restores to the same tree hash; OB-97 is registered (registered only, not fixed). **✅ Done (v1.37, 2026-10-18)**: selftest 536/536 and `TOTAL_FAIL=0` in all three scopes; the commit and CI readings are filled in by ⑩. | docs/validation/directive-gates-edge-coverage-recheck.md |
 | 2026-10-19 | G9-c | **Governance slice (new mechanical criterion G9)**: (1) added CI criterion G9 (static shape) with the whitelist, `g9.js`, the `gate.js` registration and `selftest.js` T80-T83; (2) directive v1.38 (header / 0.3 / 1.5 / 5.1 / 6.3 / R6.2 / appendix C.0z / OB-98 and OB-99 in 12.4); (3) the ⑨ pristine-worktree reproduction (536/536 → 552/552, exit codes 0/1/2 hold case by case); ⑤ `PRE-REVIEW: PASS WITH FIXES` in two rounds, ⑥ `INDEPENDENT SCAN: PASS`, ⑦ carried by `GPT-5.3-Codex (copilot)` (r1-r3); `TOTAL_FAIL=0` in all three scopes; 0 probes. **This row follows the v1.21 completion-row format and records the report path only**. | docs/validation/directive-g9c.md |
+| 2026-10-19 | DIRECTIVE-EVIDENCE-WINDOW | **Directive-governance slice (closes the rule gap for the post-⑧c evidence window)**: (1) 5.1 gains the "⑧c post-evidence window" sub-clause (fixed order of three candidate paths, four readback readings, final-state observability only), the temp-artifact exception sentence, the half-sentence in the 5.3 ⑧c row, the 1.5 cleanup-timing parenthetical, the final-state readback slot in appendix B.7.3, appendix C.0aa, the OB-99/OB-100 disposition cells in 12.4 and the header / 0.3; (2) ADR-026 registered; (3) the ⑨ pristine-worktree reproduction is fully green (`TOTAL_FAIL=0` in all three scopes, `SELFTEST: PASS 552/552`); ⑦ carried by `GPT-5.3-Codex (copilot)` (r1-r3); batch helpers `GLM-5.3-Flash` 1 run and `GLM-5.3-FlashX` 1 run; 0 probes. **This row follows the v1.21 completion-row format and records the report path only**. | docs/validation/directive-evidence-window.md |
 
 > **Ledger integrity note (2026-09-21, back-filled under explicit user authorisation)**: this table had no rows appended after A4. **On 2026-09-21 the five rows A5/A6/A7/B2/B3a were back-filled from each slice's own validation report** (under the three constraints: no memory-based entries, verifiable fields only, missing fields left blank and marked as historic gaps, nothing fabricated); the B3b row was written before this back-fill, which is why the five rows follow it.
 > **Back-filled** (verified by slice `LEDGER-BACKFILL`, 2026-09-29): **the B3a paragraph in `DEV_PLAN{,_EN}.md` was added by commit `dd36b9b`** (`DEV_PLAN.md:137` and `_EN.md:138`); the earlier still-owed wording was corrected by slice `LEDGER-BACKFILL`, and **the back-fill action does not need to be repeated**.
