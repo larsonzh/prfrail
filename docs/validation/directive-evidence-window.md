@@ -210,7 +210,13 @@
 
 ### 9.3 提交与 CI
 
-**提交状态**：未 commit、未 push、未触 gitee；主提交与 CI 号待 ⑩ 同轮授权后回填。
+- **主提交**：`00fbd2d`（`docs: add the post-⑧c evidence-window rule (v1.39)`），`9` 个文件，`686` 插入 / `16` 删除；已推 `origin/main`；**未触 gitee**。
+- **CI run**：`39235252911`（workflow `CI`，创建于 `2026-10-19T10:08:16Z`），结论 **success**。
+- **双腿结论与时间戳**：`Go ubuntu-latest` **success**（`10:08:19Z` → `10:10:55Z`）；`Go windows-latest` **success**（`10:08:20Z` → `10:12:23Z`）。
+- **`Gates` 步读数（双腿一致）**：`SELFTEST: PASS 552/552`、`GATE REPORT scope=ci changed=9`、`TOTAL_FAIL=0`。
+- **包级证据**：双腿共 `30` 条 `ok   github.com/larsonzh/prfrail/...` 行（含 Race 步的重复计数），`--- FAIL:` = 0、`FAIL <pkg>` = 0。
+- 首跑即绿，无 §6.4 处置、无复跑。
+- 回填提交（本小节）为 docs-only，其自身 CI 结果在 ⑩ 后续回报中给出。
 
 ## 10 成本与计量
 

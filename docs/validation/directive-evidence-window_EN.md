@@ -210,7 +210,13 @@
 
 ### 9.3 Commit and CI
 
-**Commit state**: not committed, not pushed, gitee untouched; the main commit and CI id are backfilled after the ⑩ same-turn authorisation.
+- **Main commit**: `00fbd2d` (`docs: add the post-⑧c evidence-window rule (v1.39)`), `9` files, `686` insertions / `16` deletions; pushed to `origin/main`; **gitee untouched**.
+- **CI run**: `39235252911` (workflow `CI`, created `2026-10-19T10:08:16Z`), conclusion **success**.
+- **Both legs and timestamps**: `Go ubuntu-latest` **success** (`10:08:19Z` → `10:10:55Z`); `Go windows-latest` **success** (`10:08:20Z` → `10:12:23Z`).
+- **`Gates` step readings (identical on both legs)**: `SELFTEST: PASS 552/552`, `GATE REPORT scope=ci changed=9`, `TOTAL_FAIL=0`.
+- **Package-level evidence**: `30` `ok   github.com/larsonzh/prfrail/...` lines across both legs (including the duplicated counts of the Race step), `--- FAIL:` = 0, `FAIL <pkg>` = 0.
+- Green on the first run: no §6.4 disposition, no re-run.
+- The backfill commit (this sub-clause) is docs-only; its own CI result is reported in the ⑩ follow-up.
 
 ## 10 Cost and accounting
 
