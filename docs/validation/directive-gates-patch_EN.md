@@ -84,6 +84,7 @@ The controller dispatched the steps serially; the readings of each step are belo
 
 - The D6 deviation type is now the second occurrence; the precedent is item 2 of section 4 in `docs/validation/evidence/G9-C-freedom-list.md`.
 - The D4 downgrade rationale is rewritten on the measured basis: drift is a common form (13/50), so both shapes are only registered and not implemented in this slice; "conservative" is no longer the reason.
+- The characterisation of D6: **the ⑤ r1 original review input package is untraceable, so its verdict (PASS WITH FIXES) is a historical record only and is not a re-checkable link in this slice's evidence chain; this slice's re-checkable review chain is ⑤ r2 / ⑥ / ⑦ r1–r3**. **The package is not rebuilt** (its diff / numstat came from the pre-remediation staging tree, which was never committed, so rebuilding it would be fabrication).
 
 ## 4 Environment and tier
 
@@ -218,6 +219,7 @@ The controller dispatched the steps serially; the readings of each step are belo
 | blank lines | 447 | 447 |
 | backticks | 4528 | 4528 |
 
+> The table above is an ⑧a point-in-time reading; later backfill commits changed the counts (the final values written in the two commits are in §9 and the CI logs). Its purpose is to prove that CN and `_EN` share the same six shapes, **not** to guarantee the current absolute values.
 - Both sides are UTF-8 with BOM and LF.
 
 ### 8.1 Known gap (fact registered by ⑨)
@@ -260,6 +262,7 @@ The assertion budget is 6 below the ① estimate, and the downgrade reason is th
 | ⑧ | 3 | ⑧a report and list, the F12 list back-entry, ⑧b finalisation |
 
 - Under tier 1+3, ⑦ actually used **3** rounds (terminal r1 plus narrowed r2 / r3); this round reports no credits figure, only the checkable model and round facts.
+- **The dispatch table in the ⑧b draft cannot be the final source of cost facts; the controller's mechanical audit (transcript parsing) prevails**; the three underestimates in this slice's ⑧b draft (② 3→5, ⑧ 1→3, ⑦ 1→3) are the evidence for this lesson.
 
 ## 11 Explicitly not executed
 
@@ -272,7 +275,7 @@ The assertion budget is 6 below the ① estimate, and the downgrade reason is th
 
 1. The main commit `cd6e974` has been staged item by item per the artifacts fence and pushed (covering 16 paths); CI run `39384174218` is green on both legs.
 2. ⑨ reproduced the change set in a pristine worktree; the readings are in §9.
-3. ⑧c cleaned `tmp/` item by item after the records were on disk: `Test-Path tmp/GATES-PATCH` = False and the recursive file count under `tmp` = 1.
+3. ⑧c cleaned `tmp/` item by item after the records were on disk: `Test-Path tmp/GATES-PATCH` = False and the recursive file count under `tmp` = 1. The controller once estimated 8 `**` markers in this CN sentence; the actual count is 6, so that estimate was wrong and has been corrected.
 4. The next slice is assigned by the user (pool A `DIRECTIVE-BOUNDARY-CLARIFY`); this slice does not start one on its own.
 
 ## 13 Execution freedom
