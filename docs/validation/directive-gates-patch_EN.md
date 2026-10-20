@@ -62,7 +62,7 @@ The controller dispatched the steps serially; the readings of each step are belo
 | ⑦ re-reviews r2 - r3 | `independent-reviewer` | `GPT-5.3-Codex (copilot)` | r2 FINDINGS (1 Medium) -> r3 PASS | 2 (narrowed) | the freedom list missed the §5.1 `*.raw.txt` priority order; fix = F12 appended |
 | ⑧a draft | `prfrail-documenter` | controller-selected | this file | 1 | three files written |
 
-- Rework convention: ② had 3 dispatches (initial plus 2 fix rounds); ⑤ had 2 (quota 1+1 exhausted); ⑦ had 3 (terminal r1 plus narrowed r2 and r3).
+- Rework convention: ② had 5 dispatches (step 0 landing, implementation 1, implementation 2, the M-1 / M-2 fix, assertion-count sync), which this table splits into the "implementation 3" and "fix 1" rows plus 1 step-0 landing; ⑤ had 2 (quota 1+1 exhausted); ⑦ had 3 (terminal r1 plus narrowed r2 and r3).
 - The duration field is missing (historical): this slice stored no start or end timestamps, and none is invented.
 - The ⑦ r2 / r3 disposition is in §5 (back-filled by ⑧b).
 
@@ -71,11 +71,11 @@ The controller dispatched the steps serially; the readings of each step are belo
 | # | Event | Impact | Disposition |
 |---|---|---|---|
 | D1 | two mechanical normalisations in step 0 (a one-line rewrite in §12.5, blank-line normalisation in §5.1) | text shape changes, meaning unchanged | Resolved |
-| D2 | ① expected 40 new assertions (→592); actual 34 (→586); r2 added 2 (→588) | the gap comes from narrowing after the T88 pre-gate downgrade | Recorded |
+| D2 | ① expected 40 new assertions (→592); actual 34 (→586); r2 added 2 (→588) | the gap of 6 comes from the T88 pre-gate dropping from 9 assertions to 3; ⑦ r1 only checked that "36 static additions = 36 runtime gains" and **did not check the downgrade item by item** ⇒ **registered as a residual** | Recorded |
 | D3 | the 5 Low items from ③ (D-1 to D-5) | nothing blocking | Recorded |
-| D4 | the two candidate shapes were downgraded on "sampled 4, 2 unsatisfiable" | the claim is conservative against the independent reviewer's full-population measurement | Recorded |
+| D4 | both candidate shapes (the seventh shape "CJK inter-character spaces" and the eighth shape "changed-line shape multiset") are **not implemented as criteria**, only registered as recorded state | measured: **13 of 50** historical commits touching the directive pair show CN≠EN drift (26%, a common form rather than an edge form); on the CN side the seventh shape yields 16 hits, each judged an intentional form. The earlier "sampled 4 / 2 unsatisfiable" was a **wrong estimate** (a common form mistaken for an edge form), is void and must not be cited again | Recorded (**OB-104**) |
 | D5 | the controller once wrote the ⑤ package build script to the `tmp/` root | moved to `tmp/GATES-PATCH/` immediately; this is the second instance behind OB-100 | Resolved |
-| D6 | after a fix round ② deleted the whole `tmp/GATES-PATCH/` (including the ⑤ r1 input package and the replay script) | beyond its own product scope; the controller rebuilt the r2 package from the original records | Fixed |
+| D6 | after a fix round ② deleted the whole `tmp/GATES-PATCH/` (the second occurrence of this deviation type; kickoff message item 7: stop and escalate on the third) | deleted content = the ⑤ r1 input package (11 items plus `MANIFEST.md`) + the historical replay script + logs, 28 entries in total. **The ⑤ r1 original input package cannot be rebuilt byte for byte** - its `02-changes.diff` / `03-numstat.txt` / `05-selftest-tail.txt` came from the pre-fix staging tree, which was never committed and no longer exists; the ⑤ r1 conclusions survive only in the transcript (byte offset `23604898`, line `25213`). **⑦ r1 used the `review-6/` package rebuilt after the fix** (with `MANIFEST.md`); that package was produced **before** ⑦ r1 and is not a copy of the ⑤ r1 package | Fixed (the untraceable part is registered as-is) |
 | D7 | ② used rendered text as `oldString` in the first fix round and missed | switched to a deterministic script over the staged index that rewrites the whole line | Resolved |
 | D8 | the ⑤ quota 1+1 was exhausted | r2 re-ran in place with narrowed input; no third run | Recorded |
 | D9 | the controller first built the r2 and ⑥ packages with three embedded `--all` runs | the background process hung and was killed; changed to log-first then light assembly, readings unaffected | Resolved |
@@ -83,7 +83,7 @@ The controller dispatched the steps serially; the readings of each step are belo
 | D11 | `DECL_ID_RE` only added a leading boundary (`OB-97x` still yields `OB-97`) | both sides share one constant, so it is symmetric and produces no false green | Recorded |
 
 - The D6 deviation type is now the second occurrence; the precedent is item 2 of section 4 in `docs/validation/evidence/G9-C-freedom-list.md`.
-- The independent reviewer extended D4's sample to every commit and measured 13 unequal pairs, so this slice's two-sample basis is conservative.
+- The D4 downgrade rationale is rewritten on the measured basis: drift is a common form (13/50), so both shapes are only registered and not implemented in this slice; "conservative" is no longer the reason.
 
 ## 4 Environment and tier
 
@@ -222,7 +222,11 @@ The controller dispatched the steps serially; the readings of each step are belo
 
 ### 8.1 Known gap (fact registered by ⑨)
 
-`gate.js --list` lists `base` as the 19th id, but `gate.js --check=base` returns exit 2 with `unknown criterion id: base` ⇒ the id sets of `--list` and `--check` disagree; `base` only runs under `--all`. This is a pre-existing defect, not introduced by this slice; it is registered here and not fixed in this slice.
+`gate.js --list` lists `base` as the 19th id, but `gate.js --check=base` returns exit 2 with `unknown criterion id: base` ⇒ the id sets of `--list` and `--check` disagree; `base` only runs under `--all`. This is a pre-existing defect, not introduced by this slice; it is registered here and not fixed in this slice. It is registered as **OB-105** (see the §12.4 ledger).
+
+### 8.2 Assertion-budget residual
+
+The assertion budget is 6 below the ① estimate, and the downgrade reason is the T88 pre-gate dropping from 9 assertions to 3; **⑦ did not check whether the downgrade is justified**, so it is registered as a residual (see D2 in §3). This slice does not spend another ⑦ round (the quota is used up at 3/3) and does not substitute "the numbers add up" for "the downgrade is justified".
 
 ## 9 ⑨ native verification and commit state
 
@@ -237,38 +241,39 @@ The controller dispatched the steps serially; the readings of each step are belo
 | exit-code matrix | a legal criterion id → 0; `--check=<missing id>` → **2** (`unknown criterion id`); `--scope=<illegal value>` → **2** (`invalid --scope value`) |
 | `G5(d)` fence closure | `G5(d) staged is a subset of declared :: 16 path(s) declared` ⇒ the artifacts fence and the staged set close in both directions |
 
-**⑩ not executed**: the stop point waits for user authorisation; this slice is neither committed nor pushed (`git log -1 --oneline` is still `2482971`).
+**⑩ executed (2026-10-20)**: the controller issued the ⑩ stop-point receipt; the user accepted the slice overall and raised 5 corrections (see D2 / D4 / D6 of §3 and §8.1 / §10), all landed in this backfill commit.
 
-**CI**: not triggered (no push).
+**Commit and CI**: the main commit `cd6e974` (`feat: land the G6-7 / G5-d / G9-e criteria and the v1.40 directive package`, covering 16 paths) is pushed to `origin/main`; CI run **`39384174218`** is doubly green - `Go ubuntu-latest` and `Go windows-latest` are both `success`, the `Build` / `Test` / `Gates` steps are `success` on both legs, both legs report `SELFTEST: PASS 588/588`, `scope=ci changed=16` and `TOTAL_FAIL=0`. The backfill commit is the docs-only commit that follows this report being written to disk.
 
 ## 10 Cost and accounting
 
 | Position | Count | Model / notes |
 |---|---|---|
 | ① | 1 | `DeepSeek V4 Pro (deepseek)` |
-| ② | 3 | controller model |
+| ② | 5 | controller model (step 0 landing, implementation 1, implementation 2, the M-1 / M-2 fix, assertion-count sync) |
 | ③ | 1 | controller model |
 | ⑤ | 2 | `GLM-5.3 (glm)`, quota 1+1 exhausted |
 | ⑥ | 1 | `MAI-Code-1.1-Flash (copilot)`, quota 3 |
 | ⑦ | 3 | `GPT-5.3-Codex (copilot)`, quota 1+3 (terminal r1 plus narrowed r2 / r3) |
-| Batch helper | 1 | `GLM-5.3-FlashX (glm)`, ADR-027 |
+| Batch helper | 0 | the ADR-027 authorisation was not used: the ② implementation and the ③ self-test assertions were each a single-batch dispatch, and none of the four batch task classes of §2.2 (enumeration / statistics, long-document excerpt and number reconciliation, bilingual-mirror language-side check, MANIFEST draft) has independent repetitive work in this slice; the two genuinely time-consuming evidence tasks (the 63-case recomputation narrowing G6-7 and the 50-commit historical replay) are decision-dependent serial work and do not belong to those four classes |
 | Probes | 0 | no probe quota used |
-| ⑧ | 1 | ⑧a (⑧b counted separately) |
+| ⑧ | 3 | ⑧a report and list, the F12 list back-entry, ⑧b finalisation |
 
-- Under tier 1+3, ⑦ actually used 1 round; this round reports no credits figure, only the checkable model and round facts.
+- Under tier 1+3, ⑦ actually used **3** rounds (terminal r1 plus narrowed r2 / r3); this round reports no credits figure, only the checkable model and round facts.
 
 ## 11 Explicitly not executed
 
-- No `git add`, no `git commit`, no `git push`; gitee untouched.
-- ⑨ native verification and the ⑩ stop point are not run; the ⑧b finalisation and ⑧c close-out cleaning are not run.
+- The main commit and the backfill commit are both executed and pushed to `origin/main`; gitee untouched.
+- ⑨ native verification, the ⑧b finalisation, the ⑧c close-out cleaning and the ⑩ stop point are all executed (see §9).
 - All three ⑦ reads ran (terminal r1, narrowed r2, narrowed r3); quota used = 3 / 3.
 - CONTRACTS, schema, fixtures, workflows and `internal/**` are untouched.
 
 ## 12 Next steps
 
-1. The controller stages the 16 paths one by one per the artifacts fence, then re-runs the three scopes of `--all`.
-2. ⑨ reproduces the change set in a pristine worktree and back-fills the readings into §9.
-3. ⑧c cleans `tmp/GATES-PATCH/` item by item after the records are on disk and proves it by mechanical read-back.
+1. The main commit `cd6e974` has been staged item by item per the artifacts fence and pushed (covering 16 paths); CI run `39384174218` is green on both legs.
+2. ⑨ reproduced the change set in a pristine worktree; the readings are in §9.
+3. ⑧c cleaned `tmp/` item by item after the records were on disk: `Test-Path tmp/GATES-PATCH` = False and the recursive file count under `tmp` = 1.
+4. The next slice is assigned by the user (pool A `DIRECTIVE-BOUNDARY-CLARIFY`); this slice does not start one on its own.
 
 ## 13 Execution freedom
 
