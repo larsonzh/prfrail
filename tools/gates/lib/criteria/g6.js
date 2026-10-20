@@ -703,22 +703,28 @@ function firstStatusWord(cell, words) {
  * findings - fail closed.
  */
 /**
- * The tag token is consumed to its FULL extent (v1.34 / OB-91). Two partial fixes taught
- * the rule the same lesson twice: 7 r1 caught `lang:zh-cn` read as a legal `zh` prefix, and
- * 7 r3 then caught `lang:zh_cn` collapsing to the legal `lang:zh` while a bare `lang:`
- * matched nothing at all - a character-class patch can always be outgrown by the next
- * delimiter. The rule is therefore structural: a tag STARTS at every `\blang:` occurrence
- * in the header window and runs over the maximal run of continuation characters (letters,
- * digits, `_`, `.`, `-`). Every other character - space, tab, comma, backtick, CJK
- * punctuation, end of line, anything not listed - TERMINATES the token, so the terminator
- * set is the COMPLEMENT of the listed continuation set instead of an enumeration a future
- * delimiter can escape. The token is then compared WHOLE against the closed set, and an
- * occurrence preceded by a word character (`xlang:zh`) is not an occurrence at all.
+ * The tag token is consumed to its FULL extent (v1.34 / OB-91, extended by OB-97 in v1.40).
+ * Two partial fixes taught the rule the same lesson twice: 7 r1 caught `lang:zh-cn` read as
+ * a legal `zh` prefix, and 7 r3 then caught `lang:zh_cn` collapsing to the legal `lang:zh`
+ * while a bare `lang:` matched nothing at all - a character-class patch can always be
+ * outgrown by the next delimiter. The rule is therefore structural: a tag STARTS at every
+ * `\blang:` occurrence in the header window and runs over the maximal run of continuation
+ * characters (letters, digits, `_`, `.`, `-`, and - since OB-97 - `:`, which is what used
+ * to truncate `lang:zh:en` / `lang:zh:` into the legal prefix `lang:zh`). Every other
+ * character - space, tab, comma, backtick, CJK punctuation, end of line, anything not
+ * listed - TERMINATES the token, so the terminator set is the COMPLEMENT of the listed
+ * continuation set instead of an enumeration a future delimiter can escape. The token is
+ * then compared WHOLE against the closed set, and an occurrence preceded by a word
+ * character (`xlang:zh`) is not an occurrence at all.
  * Coverage invariant: every occurrence inside the window is consumed by exactly one judged
  * token, so no `lang:`-prefixed form can escape judgement.
+ *
+ * The `-` is written LAST in the class on purpose: `[A-Za-z0-9._-:]` is an invalid
+ * JavaScript character-class range (`_` to `:` is out of order) and throws a SyntaxError,
+ * so the set is spelled `[A-Za-z0-9._:-]` - the same membership, dash at the end.
  */
 const LANG_TAG_OCCURRENCE_RE = /\blang:/g;
-const LANG_TAG_CONT_RE = /[A-Za-z0-9._-]/;
+const LANG_TAG_CONT_RE = /[A-Za-z0-9._:-]/;
 const LANG_TAG_EXACT = { 'lang:zh': 'zh', 'lang:en': 'en' };
 const LANG_HEADER_WINDOW = 15;
 const LANG_TAG_TO_SET = { zh: 'cn', en: 'en' };
@@ -780,6 +786,183 @@ function declaredLang(L, f) {
   return LANG_TAG_TO_SET[declared];
 }
 
+/* ---------------------------------------------------------------------------
+ * G6-7 (declaration / ledger reconciliation, OB-32) - the content-level companion of
+ * G6-5. G6-5 only proves that a `§X.Y` reference resolves; it does not prove that a
+ * changelog line claiming "OB-N registered / closed / landed" corresponds to a ledger
+ * row that actually exists. G6-7 closes that gap for ID keys.
+ *
+ * Predicate: on every ADDED line inside the §0.3 change-log region (the same
+ * `targetRegionRanges` helper as G6-5, including its OB-46 endpoint self-check), an ID
+ * key (`OB-\d+` / `SW-\d+` / `DR-\d+` / `GATES-[A-Z]+`) that sits inside a ±40-character
+ * window of a declaration verb (CN: 新增 / 登记 / 补登 / 收口 / 翻 / 处置 / 更正 / 闭合 /
+ * 落地; EN: added / registered / closed / resolved / corrected / landed / flipped) must
+ * ALSO appear in the SAME file's §12.4 ledger region or appendix C region (C.0 up to
+ * C.1, exclusive). Otherwise the changelog names an ID that has no ledger row at all - FAIL.
+ *
+ * NARROWING RECORD (prerequisite gate 3, v1.40). The first form of the predicate
+ * demanded the ID on an ADDED line of §12.4 / appendix C ("the ledger row was touched
+ * by THIS change set") and also judged appendix-C declaration lines. Measured over every
+ * commit that touches the directive pair (50 commits, 96 file-runs), that form produced
+ * 63 findings, all false positives: historical changelog rows routinely summarise a
+ * whole slice by naming IDs whose ledger rows already existed before the commit (46 of
+ * the 63 survive even when appendix C is dropped from the target set). The predicate was
+ * therefore narrowed to (a) §0.3 targets only - appendix-C blocks are summary prose and
+ * legitimately mention DR / SW / slice IDs that never live in §12.4 - and (b) evidence
+ * from the whole ledger regions (any line, excluding the judging line), not only added
+ * lines. Re-measured: 0 findings over the same 96 file-runs. The residual class this
+ * still catches is the one OB-32 named: a changelog line that declares a ledger ID the
+ * document's ledgers never contain.
+ *
+ * Precision choices (stated, not hidden):
+ *   - a line never serves as its own evidence (defensive: the judging line is outside the
+ *     evidence regions today, so this only guards a future target-set change).
+ *   - a NEGATED verb is not a declaration: `不新增 / 未登记 / 无处置` and `not added /
+ *     no longer registered` describe the absence of a change (measured false positive:
+ *     `本片不新增、不删除、不改动 …；OB-53 保持待议，本片不动`).
+ *   - the five G6 exclusion markers skip a line, so the rule text can quote the shapes.
+ *   - `g6-whitelist.txt` exempts a finding one registration at a time (shared `emit`).
+ *   - the predicate presupposes a LEDGER: a document with neither a §12.4 region nor an
+ *     appendix C region has nothing to reconcile a declaration against, so it is not
+ *     judged. Without this premise a cost-clause fixture carrying a `### 0.3` heading
+ *     produced a false positive (measured on `g6-2-cost-clauses`, whose `新增 SW-5` line
+ *     is a cost vector, not a ledger claim). The directive pair keeps both regions
+ *     mandatory and additionally requires §12.4 (fail-closed, exit 2).
+ * ------------------------------------------------------------------------ */
+const DECL_VERB_RE =
+  /新增|登记|补登|收口|翻|处置|更正|闭合|落地|\b(?:added|registered|closed|resolved|corrected|landed|flipped)\b/gi;
+// Token boundary on the LEFT of an ID key (v1.40). Without it a longer token is carved
+// up: the v1.40 §0.3 line names `ADR-027`, and the boundary-less form minted a fourth,
+// bogus `DR-027` declaration. The same constant backs `ledgerIds`, so declaration and
+// evidence faces widen and narrow together by construction.
+const DECL_ID_RE = /(?<![A-Za-z0-9_-])(?:OB-\d+|SW-\d+|DR-\d+|GATES-[A-Z]+)/g;
+const DECL_WINDOW = 40;
+
+/**
+ * A verb preceded by a negator (`不/未/无` with optional spaces, or `not` / `no`) is a
+ * statement that the change did NOT happen; it is not a declaration. Keep the guard
+ * deliberately narrow (immediately preceding token only), so `新增` inside a normal
+ * sentence is still a declaration.
+ */
+function isNegatedVerb(text, index) {
+  const pre = text.slice(Math.max(0, index - 5), index);
+  return /(?:不|未|无)\s*$/.test(pre) || /(?:not|no)\s+$/i.test(pre);
+}
+
+/**
+ * Declaration pairs of one line: every ID key whose ±DECL_WINDOW window carries a
+ * non-negated declaration verb. `index` is the ID's offset (kept for diagnostics /
+ * mutation probes).
+ */
+function declarationPairs(line) {
+  const text = String(line);
+  const out = [];
+  for (const m of text.matchAll(DECL_ID_RE)) {
+    const lo = Math.max(0, m.index - DECL_WINDOW);
+    const hi = Math.min(text.length, m.index + m[0].length + DECL_WINDOW);
+    const win = text.slice(lo, hi);
+    let verb = null;
+    for (const vm of win.matchAll(DECL_VERB_RE)) {
+      if (isNegatedVerb(text, lo + vm.index)) continue;
+      verb = vm[0];
+      break;
+    }
+    if (!verb) continue;
+    out.push({ id: m[0], verb: verb, index: m.index });
+  }
+  return out;
+}
+
+/** Map ID -> every line number (1-based) inside the given [start, end) regions. */
+function ledgerIds(L, ranges) {
+  const out = new Map();
+  for (const r of ranges) {
+    for (let i = r[0]; i < r[1]; i++) {
+      const line = L[i];
+      if (line === undefined) continue;
+      for (const m of String(line).matchAll(DECL_ID_RE)) {
+        if (!out.has(m[0])) out.set(m[0], []);
+        out.get(m[0]).push(i + 1);
+      }
+    }
+  }
+  return out;
+}
+
+const G6_7 = {
+  id: 'G6-7',
+  label: 'declaration/ledger reconciliation',
+  run(ctx, out) {
+    const findings = [];
+    let scanned = 0;
+    let declarations = 0;
+    for (const f of ctx.changedMarkdown()) {
+      const L = ctx.readLineArray(f);
+      if (!L) continue;
+      // Same region helper and same OB-46 fail-closed endpoint self-check as G6-5.
+      const ranges = targetRegionRanges(L);
+      if (DIRECTIVE_FILES.indexOf(f) >= 0 && ranges.length !== 2) {
+        throw new UsageError(
+          'G6-7 target regions missing in ' +
+            f +
+            ': expected the 0.3 change-log region and the appendix C region, got ' +
+            ranges.length
+        );
+      }
+      const logRange = ranges.find((r) => REGION_HEAD_030.test(L[r[0]])) || null;
+      const apxRange = ranges.find((r) => REGION_HEAD_C0.test(L[r[0]])) || null;
+      const ledger = ledgerRegionRange(L);
+      // Premise: a declaration can only be reconciled against a ledger. The directive
+      // pair is fail-closed (both target regions were asserted above; a missing §12.4
+      // would make every declaration unreconcilable); any other document is judged only
+      // when it actually carries a ledger region.
+      if (DIRECTIVE_FILES.indexOf(f) >= 0 && !ledger) {
+        throw new UsageError(
+          'G6-7 ledger region missing in ' + f + ': the 12.4 observation ledger is the reconciliation target'
+        );
+      }
+      if (!ledger && !apxRange) continue;
+      // §0.3 only (see NARROWING RECORD above): appendix-C declaration lines are summary
+      // prose and are not judged; the appendix region remains valid EVIDENCE.
+      if (!logRange) continue;
+      const evidenceRanges = [ledger, apxRange].filter(Boolean);
+      const added = [...ctx.addedLineNumbers(f)].sort((a, b) => a - b);
+      const evidenceIds = ledgerIds(L, evidenceRanges);
+      for (const n of added) {
+        const idx = n - 1;
+        if (idx < logRange[0] || idx >= logRange[1]) continue;
+        const line = L[idx];
+        if (line === undefined) continue;
+        scanned++;
+        if (isExcluded(line)) continue;
+        for (const d of declarationPairs(line)) {
+          declarations++;
+          const evidence = evidenceIds.get(d.id) || [];
+          if (evidence.some((ln) => ln !== n)) continue;
+          findings.push({
+            file: f,
+            line: n,
+            text: line,
+            detail: f + ':' + n + ' ' + d.verb + ' ' + d.id + ' has no ledger row in the 12.4 / appendix-C regions',
+          });
+        }
+      }
+    }
+    return emit(
+      ctx,
+      out,
+      'G6-7',
+      'declaration/ledger reconciliation',
+      findings,
+      'every declared ID on an added section 0.3 line exists in the 12.4 / appendix-C ledger (scanned ' +
+        scanned +
+        ', declarations ' +
+        declarations +
+        ')'
+    );
+  },
+};
+
 const G6_6 = {
   id: 'G6-6',
   label: 'ledger status closed set',
@@ -837,7 +1020,7 @@ module.exports = {
   label: 'ledger metadata consistency',
   title: '台账元数据一致性',
   scripted: true,
-  subchecks: [G6_1, G6_2, G6_3, G6_4, G6_5, G6_6],
+  subchecks: [G6_1, G6_2, G6_3, G6_4, G6_5, G6_6, G6_7],
   internals: {
     isExcluded,
     headingIndices,
@@ -868,6 +1051,13 @@ module.exports = {
     LANG_TAG_CONT_RE,
     LANG_TAG_EXACT,
     LANG_HEADER_WINDOW,
+    // G6-7 (OB-32): declaration verbs / ID keys / window, plus the two index helpers
+    // the mutation probes compile against.
+    DECL_VERB_RE,
+    DECL_ID_RE,
+    DECL_WINDOW,
+    declarationPairs,
+    ledgerIds,
   },
   run(ctx, out) {
     for (const s of this.subchecks) s.run(ctx, out);

@@ -48,6 +48,7 @@ const G4B = require('./lib/criteria/g4b');
 const G5A = require('./lib/criteria/g5a');
 const G5B = require('./lib/criteria/g5b');
 const G5C = require('./lib/criteria/g5c');
+const G5D = require('./lib/criteria/g5d');
 
 const FIXTURES_DIR = path.join(__dirname, 'testdata', 'fixtures');
 const HISTORICAL_DIR = path.join(__dirname, 'testdata', 'historical');
@@ -599,6 +600,7 @@ const G6_SOURCE = path.join(__dirname, 'lib', 'criteria', 'g6.js');
 const G3A_SOURCE = path.join(__dirname, 'lib', 'criteria', 'g3a.js');
 const G7_SOURCE = path.join(__dirname, 'lib', 'criteria', 'g7.js');
 const G5C_SOURCE = path.join(__dirname, 'lib', 'criteria', 'g5c.js');
+const G5D_SOURCE = path.join(__dirname, 'lib', 'criteria', 'g5d.js');
 /** Mutation target (T73): the G5-c "value is a member of 2.2" test (OB-29). */
 const G5C_MEMBERSHIP = '          if (allowed.has(norm(m[1]))) continue;\n';
 /** Mutation target (T72): the G7-e closed-set membership test (OB-42). */
@@ -609,8 +611,9 @@ const G3A_BACKTICK_SHAPE = '        backticks: count(CL, /`/g) === count(EL, /`/
 const G3A_OLD_PAIR_GUARD = "      if (enSide || !changed.includes(enf)) {\n        continue;\n      }\n";
 const G3A_PAIR_GUARD = "      if (\n        !enSide &&\n        !changed.includes(enf) &&\n        !(typeof ctx.exists === 'function' && ctx.exists(enf))\n      ) {\n        continue;\n      }\n";
 const G3A_MIRROR_GUARD = "        !(typeof ctx.exists === 'function' && ctx.exists(enf))\n";
-/** Mutation target (T75 / OB-91, v1.34): the tag-token continuation charset. */
-const G6_LANG_TAG_CONT = 'const LANG_TAG_CONT_RE = /[A-Za-z0-9._-]/;';
+/** Mutation target (T75 / OB-91, v1.34; needle updated by OB-97, v1.40): the tag-token
+ * continuation charset. */
+const G6_LANG_TAG_CONT = 'const LANG_TAG_CONT_RE = /[A-Za-z0-9._:-]/;';
 /** Mutation target (T76, v1.36): the G1(f) in-progress wording test inside the completion log. */
 const G1_INPROGRESS_TEST = '      if (IN_PROGRESS_RE.test(c.summary)) badF.push(';
 /** Mutation target (T77, v1.36): the G5(d) change-set vs declared-set verdict. */
@@ -697,6 +700,56 @@ function g66Probe(virtualPath, text, mod) {
   const out = createReport();
   const res = (mod || G6).subchecks.find((s) => s.id === 'G6-6').run(ctx, out);
   return { verdict: verdictOf(out.records, 'G6-6'), findings: res.findings.length, detail: detailOf(out.records, 'G6-6') };
+}
+
+/**
+ * G6-7 probe (OB-32): feed a synthetic document to the sub-check and read back the
+ * verdict / finding count / record detail. `whitelist` exercises the per-hit exemption
+ * through the shared `emit` helper; `mod` runs a patched copy for the mutation probes.
+ */
+function g67Probe(virtualPath, text, mod, opts) {
+  opts = opts || {};
+  const lines = String(text).split('\n');
+  const added = opts.added || lines.map((_, i) => i + 1);
+  const ctx = {
+    repoRoot: discoverRepoRoot(__dirname),
+    changedMarkdown: () => [virtualPath],
+    readLineArray: (q) => (q === virtualPath ? lines : null),
+    addedLineNumbers: () => new Set(added),
+    loadWhitelist: () => ({ entries: opts.whitelist || [], error: null, source: 'probe' }),
+  };
+  const out = createReport();
+  const res = (mod || G6).subchecks.find((s) => s.id === 'G6-7').run(ctx, out);
+  return {
+    verdict: verdictOf(out.records, 'G6-7'),
+    findings: res.findings.length,
+    detail: detailOf(out.records, 'G6-7'),
+    records: out.records,
+  };
+}
+
+/**
+ * G5-d probe (OB-30): a synthetic change set of role files. `texts` maps a repository
+ * path to the file body; only paths the criterion itself selects are judged.
+ */
+function g5dProbe(texts, opts) {
+  opts = opts || {};
+  const paths = Object.keys(texts);
+  const lines = new Map(paths.map((p) => [p, String(texts[p]).split('\n')]));
+  const deleted = new Set(opts.deleted || []);
+  const ctx = {
+    changedPaths: paths,
+    recordFor: (p) => ({ path: p, deleted: deleted.has(p) }),
+    readLineArray: (p) => (lines.has(p) ? lines.get(p) : null),
+  };
+  const out = createReport();
+  const res = (opts.mod || G5D).run(ctx, out);
+  return {
+    verdict: verdictOf(out.records, 'G5-d'),
+    findings: res.findings.length,
+    detail: detailOf(out.records, 'G5-d'),
+    records: out.records,
+  };
 }
 
 /**
@@ -882,11 +935,16 @@ function g5bProbe(key) {
 function g9Probe(paths, opts) {
   opts = opts || {};
   const deleted = new Set(opts.deleted || []);
+  const texts = opts.texts || new Map();
   const ctx = {
     changedPaths: paths,
     recordFor: (p) => ({ path: p, deleted: deleted.has(p) }),
     isEvidenceTree: (p) => isEvidenceTree(p),
     loadWhitelist: () => ({ entries: opts.whitelist || [], error: null, source: 'probe' }),
+    changedMarkdown: () => opts.markdown || [],
+    readLineArray: (p) => (texts.has(p) ? String(texts.get(p)).split('\n') : null),
+    addedLineNumbers: (p) => new Set(String(texts.get(p) || '').split('\n').map((_, i) => i + 1)),
+    repoArtifactResolvable: (p) => (opts.resolve ? opts.resolve(p) : { ok: true, reason: '' }),
   };
   const out = createReport();
   const res = (opts.mod || G9).run(ctx, out) || { findings: [] };
@@ -895,6 +953,7 @@ function g9Probe(paths, opts) {
     info: out.records.some((r) => r.id === 'G9' && r.verdict === 'INFO'),
     findings: res.findings ? res.findings.length : -1,
     detail: detailOf(out.records, 'G9'),
+    infos: out.records.filter((r) => r.id === 'G9-e'),
   };
 }
 
@@ -2295,7 +2354,7 @@ function runTests() {
     };
 
     // A. The nine illegal forms named by OB-91, each asserted alone.
-    const ILLEGAL = ['zh_cn', 'zh-cn', 'en_us', 'en-us', '', 'ZH', 'zh-', 'zh.', 'zh2'];
+    const ILLEGAL = ['zh_cn', 'zh-cn', 'en_us', 'en-us', '', 'ZH', 'zh-', 'zh.', 'zh2', 'zh:'];
     for (const suffix of ILLEGAL) {
       const tag = 'lang:' + suffix;
       const o = run66(fileFor(tag), '`' + tag + '`\n');
@@ -2323,7 +2382,7 @@ function runTests() {
       );
     }
 
-    // C. Continuation-charset sweep: every character class in [A-Za-z0-9._-] extends the
+    // C. Continuation-charset sweep: every character class in [A-Za-z0-9._:-] extends the
     // token on both legal stems, so each suffix is an unknown tag rather than a legal prefix.
     const CONT = [
       'en_',
@@ -2352,7 +2411,7 @@ function runTests() {
     }
 
     // D. Terminators and normal declaration positions must NOT go red: every character
-    // outside [A-Za-z0-9._-] ends the token, so the remaining prefix is the legal tag.
+    // outside [A-Za-z0-9._:-] ends the token, so the remaining prefix is the legal tag.
     const LEGAL = [
       ['zh-alone', CN, '`lang:zh`\n'],
       ['zh-comma', CN, '`lang:zh,`\n'],
@@ -2360,7 +2419,6 @@ function runTests() {
       ['zh-tab', CN, '`lang:zh`\tzh\n'],
       ['zh-cjk-comma', CN, '`lang:zh`，zh\n'],
       ['zh-cjk-paren', CN, '`lang:zh`）\n'],
-      ['zh-colon', CN, '`lang:zh`:\n'],
       ['zh-declaration-line', CN, '> Language declaration: `lang:zh`. ProofRail\n'],
       ['zh-bracket', CN, '`lang:zh`]\n'],
       ['zh-paren', CN, '`lang:zh`)\n'],
@@ -2411,7 +2469,7 @@ function runTests() {
     const gi = G6.internals;
     // The independent side of the lock: a literal copy of the intended class, deliberately
     // NOT read back from g6.js (reading the source text would drift with the implementation).
-    const MIRROR_CONT = /[A-Za-z0-9._-]/;
+    const MIRROR_CONT = /[A-Za-z0-9._:-]/;
     const mismatches = [];
     for (let code = 0; code < 128; code++) {
       const ch = String.fromCharCode(code);
@@ -2438,7 +2496,7 @@ function runTests() {
       }
     })();
     check(
-      'T79 canary: constants are locked — LANG_HEADER_WINDOW = 15, LANG_TAG_EXACT is exactly {lang:zh, lang:en}, and LANG_TAG_CONT_RE is exactly [A-Za-z0-9._-] (behavior pair: `lang:zh` legal, `lang:zh_cn` illegal)',
+      'T79 canary: constants are locked — LANG_HEADER_WINDOW = 15, LANG_TAG_EXACT is exactly {lang:zh, lang:en}, and LANG_TAG_CONT_RE is exactly [A-Za-z0-9._:-] (behavior pair: `lang:zh` legal, `lang:zh_cn` illegal)',
       gi.LANG_HEADER_WINDOW === 15 &&
         JSON.stringify(tags) === JSON.stringify(['lang:en', 'lang:zh']) &&
         gi.LANG_TAG_EXACT['lang:zh'] === 'zh' &&
@@ -2463,8 +2521,8 @@ function runTests() {
     // rule and the mirror stays green. The source TEXT of the class is therefore frozen as a
     // literal string: any edit to the RegExp source changes this value and turns red.
     check(
-      'T79 canary: LANG_TAG_CONT_RE source text is frozen to the literal class [A-Za-z0-9._-]',
-      gi.LANG_TAG_CONT_RE.source === '[A-Za-z0-9._-]',
+      'T79 canary: LANG_TAG_CONT_RE source text is frozen to the literal class [A-Za-z0-9._:-]',
+      gi.LANG_TAG_CONT_RE.source === '[A-Za-z0-9._:-]',
       'source=' + JSON.stringify(gi.LANG_TAG_CONT_RE.source) + ' flags=' + JSON.stringify(gi.LANG_TAG_CONT_RE.flags)
     );
 
@@ -4569,6 +4627,432 @@ function runTests() {
         p2: g9Probe(['docs/validation/evidence/legacy.log']).verdict,
         p4: g9Probe(['tmp/.gitkeep']).verdict,
       })
+    );
+  }
+
+  // ---- T84: OB-97 (v1.40) - the language-tag continuation set includes `:`, so the
+  // second colon in `lang:zh:en` / the trailing colon in `lang:zh:` no longer truncates
+  // the token into the legal prefix `lang:zh`.
+  {
+    const CN = 'docs/t027/probe-g6-6-t84.md';
+    const ROW = '### 12.4 观察项台账\n\n| OB-1 | d | x | 观察中 |\n';
+    const gi = G6.internals;
+    const run = (head, file) => {
+      try {
+        return { res: g66Probe(file || CN, head + ROW), err: null };
+      } catch (e) {
+        return { res: null, err: e };
+      }
+    };
+    const unknown = (o, tag) =>
+      !!o.err && o.err instanceof UsageError && /unknown language tag/.test(o.err.message) && o.err.message.indexOf('`' + tag + '`') >= 0;
+    const why = (o) => (o.err ? 'err=' + o.err.message : 'verdict=' + (o.res ? o.res.verdict : 'NONE'));
+
+    const normal = gi.declaredLang(['`lang:zh`'], CN);
+    check(
+      'T84 OB-97 positive: the widened continuation set leaves the ordinary declaration intact (`lang:zh` still declares zh)',
+      normal === 'cn',
+      'declared=' + normal
+    );
+
+    const terminator = run('`lang:zh`，zh\n');
+    check(
+      'T84 OB-97 positive: a fullwidth comma still terminates the token, so `lang:zh，` stays legal',
+      !terminator.err && !!terminator.res && terminator.res.verdict === 'PASS' && terminator.res.findings === 0,
+      why(terminator)
+    );
+
+    const colonEn = run('`lang:zh:en`\n');
+    check(
+      'T84 OB-97 negative: `lang:zh:en` is consumed whole and rejected (it used to truncate to the legal `lang:zh`)',
+      unknown(colonEn, 'lang:zh:en'),
+      why(colonEn)
+    );
+
+    const colonBare = run('`lang:zh:`\n');
+    check(
+      'T84 OB-97 negative: a trailing colon belongs to the token, so `lang:zh:` is rejected',
+      unknown(colonBare, 'lang:zh:'),
+      why(colonBare)
+    );
+
+    const coexist = run(LANG_TAG_ZH + '`lang:zh:`\n');
+    check(
+      'T84 OB-97 negative: coexistence (`lang:zh` plus `lang:zh:`) is fail-closed',
+      unknown(coexist, 'lang:zh:'),
+      why(coexist)
+    );
+
+    const mut = loadMutatedModule(G6_SOURCE, G6_LANG_TAG_CONT, 'const LANG_TAG_CONT_RE = /[A-Za-z0-9._-]/;', 'ob97-colon');
+    const blind = run('`lang:zh:en`\n');
+    const blindMut = (() => {
+      try {
+        return { res: g66Probe(CN, '`lang:zh:en`\n' + ROW, mut.exports), err: null };
+      } catch (e) {
+        return { res: null, err: e };
+      }
+    })();
+    check(
+      'T84 OB-97 mutation applied + load-bearing: with the pre-OB-97 charset the SAME `lang:zh:en` header passes again',
+      mut.applied === true && !blindMut.err && blindMut.res.verdict === 'PASS',
+      'applied=' + mut.applied + ' ' + why(blindMut)
+    );
+
+    check(
+      'T84 OB-97 restore: g6.js is byte-identical after the mutation window and the cached module rejects `lang:zh:en` again',
+      mut.identical === true && unknown(blind, 'lang:zh:en'),
+      'identical=' + mut.identical + ' ' + why(blind)
+    );
+  }
+
+  // ---- T85: G6-7 (OB-32) - a declaration on an added §0.3 changelog line must name an
+  // ID that exists in the same document's §12.4 / appendix-C ledger. The narrowing to
+  // §0.3-only targets and whole-ledger evidence is the prerequisite-gate-3 result (63
+  // historical false positives under the strict "touched this change set" form, 0 after
+  // the narrowing). Four positives pin the two evidence faces, the exclusion markers and
+  // the region boundary; the negative pins the missing ID; two mutations prove the verb
+  // test and the evidence test are load-bearing; two boundary checks pin the token-boundary
+  // lookbehind (v1.40: `ADR-027` must not be carved into a `DR-027` declaration).
+  {
+    const P = 'docs/t027/probe-g6-7.md';
+    const doc = (o) =>
+      [
+        '### 0.3 变更日志',
+        '',
+        '| 版本 | 日期 | 变更 | 受影响的在飞切片 |',
+        '|---|---|---|---|',
+        o.log,
+        '',
+        '## 1. body',
+        '',
+        o.body || '(none)',
+        '',
+        '### 12.4 观察项台账',
+        '',
+        '| # | 登记日 | 现象 | 处置状态 |',
+        '|---|---|---|---|',
+        o.ledger,
+        '',
+        '### 12.5 缺口与未来扩展',
+        '',
+        '(none)',
+        '',
+        '### C.0 slice',
+        '',
+        o.apx || '- 交付物：none',
+        '',
+        '### C.1 compare',
+        '',
+        '(none)',
+      ].join('\n');
+
+    const p1 = doc({ log: '| v1.1 | 2026-01-01 | 登记 OB-901 as observed |', ledger: '| OB-901 | 2026-01-01 | x | 观察中 |' });
+    const r1 = g67Probe(P, p1);
+    check(
+      'T85 G6-7 positive: a §0.3 declaration whose ID exists in the §12.4 ledger passes',
+      r1.verdict === 'PASS' && r1.findings === 0,
+      'verdict=' + r1.verdict + ' findings=' + r1.findings + ' :: ' + r1.detail
+    );
+
+    const p2 = doc({ log: '| v1.1 | 2026-01-01 | SW-901 落地 |', ledger: '| OB-901 | 2026-01-01 | x | 观察中 |', apx: '- 交付物：SW-901' });
+    const r2 = g67Probe(P, p2, null, { added: [1, 2, 3, 4, 5] });
+    check(
+      'T85 G6-7 positive: a PRE-EXISTING (not added) appendix-C ledger line still satisfies the declaration',
+      r2.verdict === 'PASS' && r2.findings === 0,
+      'verdict=' + r2.verdict + ' findings=' + r2.findings + ' :: ' + r2.detail
+    );
+
+    const p3 = doc({ log: '| v1.1 | 2026-01-01 | 示例：登记 OB-902 |', ledger: '| OB-901 | 2026-01-01 | x | 观察中 |' });
+    const r3 = g67Probe(P, p3);
+    const p3neg = doc({ log: '| v1.1 | 2026-01-01 | 本片不新增、不删除；OB-905 保持待议 |', ledger: '| OB-901 | 2026-01-01 | x | 观察中 |' });
+    const r3neg = g67Probe(P, p3neg);
+    check(
+      'T85 G6-7 positive: an exclusion-marker line and a NEGATED verb (`不新增 … OB-905`) are not judged',
+      r3.verdict === 'PASS' && r3.findings === 0 && r3neg.verdict === 'PASS' && r3neg.findings === 0,
+      'marker=' + r3.verdict + '/' + r3.findings + ' negated=' + r3neg.verdict + '/' + r3neg.findings
+    );
+
+    const p4 = doc({ log: '| v1.1 | 2026-01-01 | nothing |', ledger: '| OB-901 | 2026-01-01 | x | 观察中 |', body: '登记 OB-903 in the body' });
+    const r4 = g67Probe(P, p4);
+    check(
+      'T85 G6-7 positive: a declaration outside the §0.3 region is not judged',
+      r4.verdict === 'PASS' && r4.findings === 0,
+      'verdict=' + r4.verdict + ' findings=' + r4.findings + ' :: ' + r4.detail
+    );
+
+    const n1 = doc({ log: '| v1.1 | 2026-01-01 | 登记 OB-904 as observed |', ledger: '| OB-901 | 2026-01-01 | x | 观察中 |' });
+    const rn = g67Probe(P, n1);
+    check(
+      'T85 G6-7 negative: a declared ID with no ledger row anywhere fails and the finding names the ID',
+      rn.verdict === 'FAIL' && rn.findings === 1 && rn.detail.indexOf('OB-904') >= 0,
+      'verdict=' + rn.verdict + ' findings=' + rn.findings + ' :: ' + rn.detail
+    );
+
+    const m1 = loadMutatedModule(G6_SOURCE, '      verb = vm[0];', '      verb = null;', 'g67-verb-test');
+    const rm1 = g67Probe(P, n1, m1.exports);
+    check(
+      'T85 G6-7 mutation applied + load-bearing: disabling the verb test turns the same negative case green',
+      m1.applied === true && m1.identical === true && rm1.verdict === 'PASS' && rm1.findings === 0,
+      'applied=' + m1.applied + ' identical=' + m1.identical + ' verdict=' + rm1.verdict + ' findings=' + rm1.findings
+    );
+
+    const m2 = loadMutatedModule(G6_SOURCE, '          if (evidence.some((ln) => ln !== n)) continue;', '          if (true) continue;', 'g67-ledger-test');
+    const rm2 = g67Probe(P, n1, m2.exports);
+    check(
+      'T85 G6-7 mutation applied + load-bearing: ignoring the ledger evidence turns the same negative case green',
+      m2.applied === true && m2.identical === true && rm2.verdict === 'PASS' && rm2.findings === 0,
+      'applied=' + m2.applied + ' identical=' + m2.identical + ' verdict=' + rm2.verdict + ' findings=' + rm2.findings
+    );
+
+    check(
+      'T85 G6-7 restore: g6.js is byte-identical after both mutation windows and the shipped module still fails the same negative case',
+      m1.identical === true && m2.identical === true && g67Probe(P, n1).verdict === 'FAIL',
+      'identical=' + (m1.identical && m2.identical) + ' verdict=' + g67Probe(P, n1).verdict
+    );
+
+    // Boundary (v1.40). A longer token must not be carved into an ID key: with the
+    // boundary-less form `ADR-027` yielded a `DR-027` declaration with no ledger row, so
+    // this PASS is exactly the payload the fix changes (the old form FAILs with 1 finding).
+    const b1 = doc({ log: '| v1.1 | 2026-01-01 | 登记 ADR-027 |', ledger: '| OB-901 | 2026-01-01 | x | 观察中 |' });
+    const rb1 = g67Probe(P, b1);
+    check(
+      'T85 G6-7 boundary: `ADR-027` is not a `DR-027` declaration and the line is not judged',
+      rb1.verdict === 'PASS' && rb1.findings === 0,
+      'verdict=' + rb1.verdict + ' findings=' + rb1.findings + ' :: ' + rb1.detail
+    );
+
+    // The boundary must not over-narrow: the real ID on the same line is still declared
+    // exactly once (the old form produced TWO findings, `DR-028` and `OB-103`).
+    const b2 = doc({ log: '| v1.1 | 2026-01-01 | 登记 ADR-028 与 OB-103 |', ledger: '| OB-901 | 2026-01-01 | x | 观察中 |' });
+    const rb2 = g67Probe(P, b2);
+    check(
+      'T85 G6-7 boundary: `登记 ADR-028 与 OB-103` yields exactly one declaration (OB-103)',
+      rb2.verdict === 'FAIL' && rb2.findings === 1 && rb2.detail.indexOf('OB-103') >= 0,
+      'verdict=' + rb2.verdict + ' findings=' + rb2.findings + ' :: ' + rb2.detail
+    );
+  }
+
+  // ---- T86: G5-d (OB-30) - the section 2.6 five-key frontmatter contract on changed
+  // role files. Three positives (complete file, extra keys, non-target path), three
+  // negatives (missing / duplicate / empty-or-absent frontmatter), one mutation and one
+  // restore.
+  {
+    const AG = '.github/agents/probe-g5d.agent.md';
+    const role = (o) =>
+      [
+        '---',
+        'name: ' + (o.name === undefined ? 'probe-role' : o.name),
+        'description: ' + (o.description === undefined ? '"probe role"' : o.description),
+        'tools: ' + (o.tools === undefined ? "['read', 'search']" : o.tools),
+        'user-invocable: ' + (o.invocable === undefined ? 'false' : o.invocable),
+        ...(o.target === null ? [] : ['target: ' + (o.target === undefined ? 'vscode' : o.target)]),
+        '---',
+        '',
+        '# body',
+      ].join('\n');
+
+    const ok = role({});
+    const p1 = g5dProbe({ [AG]: ok });
+    check(
+      'T86 G5-d positive: a role file carrying the five §2.6 keys exactly once passes',
+      p1.verdict === 'PASS' && p1.findings === 0,
+      'verdict=' + p1.verdict + ' findings=' + p1.findings + ' :: ' + p1.detail
+    );
+
+    const extra = ok.replace('\n---\n\n# body', "\nmodel: 'Some Model (vendor)'\n---\n\n# body");
+    const p2 = g5dProbe({ [AG]: extra });
+    check(
+      'T86 G5-d positive: an EXTRA key is not judged (model stays with G5-a / G5-b)',
+      p2.verdict === 'PASS' && p2.findings === 0,
+      'verdict=' + p2.verdict + ' findings=' + p2.findings + ' :: ' + p2.detail
+    );
+
+    const p3 = g5dProbe({ 'docs/probe-g5d.md': '# no frontmatter at all' });
+    check(
+      'T86 G5-d positive: a non-agent path is not a target (INFO, never a vacuous PASS claim)',
+      p3.verdict === 'PASS' && /no changed/.test(p3.detail),
+      'verdict=' + p3.verdict + ' :: ' + p3.detail
+    );
+
+    const n1text = role({ target: null });
+    const n1 = g5dProbe({ [AG]: n1text });
+    check(
+      'T86 G5-d negative: a missing `target` key fails and the finding names it',
+      n1.verdict === 'FAIL' && n1.findings === 1 && n1.detail.indexOf('target') >= 0,
+      'verdict=' + n1.verdict + ' findings=' + n1.findings + ' :: ' + n1.detail
+    );
+
+    const n2text = role({}).replace("tools: ['read', 'search']", "tools: ['read', 'search']\ntools: ['read']");
+    const n2 = g5dProbe({ [AG]: n2text });
+    check(
+      'T86 G5-d negative: a duplicated `tools` key fails (exactly once required)',
+      n2.verdict === 'FAIL' && n2.findings === 1 && /occurs 2 times/.test(n2.detail),
+      'verdict=' + n2.verdict + ' findings=' + n2.findings + ' :: ' + n2.detail
+    );
+
+    const n3empty = g5dProbe({ [AG]: role({ description: '""' }) });
+    const n3absent = g5dProbe({ [AG]: '# body without a fence' });
+    check(
+      'T86 G5-d negative: an empty value and an absent frontmatter both fail',
+      n3empty.verdict === 'FAIL' &&
+        /empty value/.test(n3empty.detail) &&
+        n3absent.verdict === 'FAIL' &&
+        /frontmatter missing/.test(n3absent.detail),
+      'empty=' + n3empty.detail + ' absent=' + n3absent.detail
+    );
+
+    const m1 = loadMutatedCriteria(
+      G5D_SOURCE,
+      "const REQUIRED_KEYS = ['name', 'description', 'tools', 'user-invocable', 'target'];",
+      "const REQUIRED_KEYS = ['name', 'description', 'tools', 'user-invocable'];",
+      'g5d-required-keys'
+    );
+    const rm1 = g5dProbe({ [AG]: n1text }, { mod: m1.exports });
+    check(
+      'T86 G5-d mutation applied + load-bearing: removing `target` from the required set turns the missing-target case green',
+      m1.applied === true && m1.identical === true && rm1.verdict === 'PASS' && rm1.findings === 0,
+      'applied=' + m1.applied + ' identical=' + m1.identical + ' verdict=' + rm1.verdict + ' findings=' + rm1.findings
+    );
+
+    check(
+      'T86 G5-d restore: g5d.js is byte-identical and the shipped module still fails the missing-target case',
+      m1.identical === true && g5dProbe({ [AG]: n1text }).verdict === 'FAIL',
+      'verdict=' + g5dProbe({ [AG]: n1text }).verdict
+    );
+  }
+
+  // ---- T87: G9-e (OB-77) - every `tmp/`-prefixed reference on an added line must be
+  // resolvable; an unresolvable one is INFO, never red. Five positives pin the two
+  // resolver branches, the bare `tmp/` boundary, the exclusion markers and the evidence
+  // tree; the negative pins the informational (non-red) record; one mutation and one
+  // restore prove the resolver test is load-bearing.
+  {
+    const P = 'docs/t027/probe-g9e.md';
+    const repoRoot = discoverRepoRoot(__dirname);
+    const treeResolve = (p) => resolveRepoArtifact(repoRoot, 'tree', null, p);
+    const headResolve = (p) => resolveRepoArtifact(repoRoot, 'range', 'HEAD', p);
+    const summaryOf = (probe) => {
+      const r = probe.infos.find((x) => /summary/.test(x.label));
+      return r ? r.detail : 'NO SUMMARY';
+    };
+    const mk = (text, opts) =>
+      g9Probe([P], Object.assign({ markdown: [P], texts: new Map([[P, text]]), resolve: treeResolve }, opts || {}));
+
+    const p1 = mk('see `tmp/.gitkeep` here');
+    check(
+      'T87 G9-e positive: a tracked tmp/ artifact resolves in tree scope (disk + index)',
+      p1.verdict === 'PASS' && /0 unresolvable$/.test(summaryOf(p1)),
+      'verdict=' + p1.verdict + ' :: ' + summaryOf(p1)
+    );
+
+    const p2 = mk('see tmp/ only');
+    check(
+      'T87 G9-e positive: a bare `tmp/` has no path segment and is not judged',
+      p2.verdict === 'PASS' && /0 reference\(s\)/.test(summaryOf(p2)),
+      'verdict=' + p2.verdict + ' :: ' + summaryOf(p2)
+    );
+
+    const p3 = mk('示例：tmp/ghost/x.log');
+    check(
+      'T87 G9-e positive: an exclusion-marker line is skipped',
+      p3.verdict === 'PASS' && /0 reference\(s\)/.test(summaryOf(p3)),
+      'verdict=' + p3.verdict + ' :: ' + summaryOf(p3)
+    );
+
+    const E = 'docs/validation/evidence/probe-g9e/NOTE.md';
+    const p4 = g9Probe([E], { markdown: [E], texts: new Map([[E, 'tmp/ghost/x.log']]), resolve: treeResolve });
+    check(
+      'T87 G9-e positive: the frozen evidence tree is excluded from the reference scan',
+      p4.verdict === 'PASS' && /0 reference\(s\)/.test(summaryOf(p4)),
+      'verdict=' + p4.verdict + ' :: ' + summaryOf(p4)
+    );
+
+    const p5 = mk('see `tmp/.gitkeep` at the endpoint', { resolve: headResolve });
+    check(
+      'T87 G9-e positive: the range/ci branch resolves at the endpoint revision (HEAD:tmp/.gitkeep)',
+      p5.verdict === 'PASS' && /0 unresolvable$/.test(summaryOf(p5)),
+      'verdict=' + p5.verdict + ' :: ' + summaryOf(p5)
+    );
+
+    const pn = mk('see tmp/ghost/x.log here');
+    check(
+      'T87 G9-e negative: an unresolvable reference is INFO (G9 stays PASS) and the record names the path',
+      pn.verdict === 'PASS' &&
+        pn.infos.some((r) => r.detail.indexOf('tmp/ghost/x.log') >= 0) &&
+        /1 unresolvable$/.test(summaryOf(pn)),
+      'verdict=' + pn.verdict + ' :: ' + summaryOf(pn) + ' :: ' + pn.infos.map((r) => r.detail).join(' | ')
+    );
+
+    const m1 = loadMutatedModule(G9_SOURCE, '        if (r && r.ok) continue;', '        if (true) continue;', 'g9e-resolver-test');
+    const pm1 = g9Probe([P], {
+      mod: m1.exports,
+      markdown: [P],
+      texts: new Map([[P, 'see tmp/ghost/x.log here']]),
+      resolve: treeResolve,
+    });
+    check(
+      'T87 G9-e mutation applied + load-bearing: accepting every reference makes the informational record disappear',
+      m1.applied === true && m1.identical === true && !pm1.infos.some((r) => r.detail.indexOf('tmp/ghost/x.log') >= 0),
+      'applied=' + m1.applied + ' identical=' + m1.identical + ' :: ' + pm1.infos.map((r) => r.detail).join(' | ')
+    );
+
+    const pRestored = mk('see tmp/ghost/x.log here');
+    check(
+      'T87 G9-e restore: g9.js is byte-identical and the shipped module emits the informational record again',
+      m1.identical === true && pRestored.infos.some((r) => r.detail.indexOf('tmp/ghost/x.log') >= 0),
+      'identical=' + m1.identical + ' :: ' + summaryOf(pRestored)
+    );
+  }
+
+  // ---- T88: G3(a.2) seventh/eighth shapes are RECORD-ONLY (prerequisite gates 1 and 2).
+  // Both shapes were downgraded: the CN directive pair carries 16 deliberate CJK-space
+  // forms (section labels, term separation) and historical bilingual commits break the
+  // per-line triplet multiset (measured on c6ada79 / 2d6a8e4). These three assertions pin
+  // the decision mechanically: the six implemented shapes still catch their own drift,
+  // while a seventh-shape-only or eighth-shape-only drift stays PASS.
+  {
+    const CNP = 'docs/DELIVERY_DIRECTIVE.md';
+    const ENP = 'docs/DELIVERY_DIRECTIVE_EN.md';
+    const base = {
+      key: CNP,
+      changed: [CNP, ENP],
+      numstat: { [CNP]: [3, 0], [ENP]: [3, 0] },
+      existing: [],
+    };
+    const same = '# t\n\n**a**\n';
+
+    const control = g3aEdgeProbe(
+      Object.assign({}, base, { texts: { [CNP]: same.split('\n'), [ENP]: same.split('\n') } })
+    );
+    check(
+      'T88 G3(a.2) control: an equal synthetic directive pair stays green (no per-pair FAIL record)',
+      control.a === 'PASS' && control.a2 === 'ABSENT',
+      'a=' + control.a + ' a2=' + control.a2 + ' :: ' + control.detail
+    );
+
+    const seventh = g3aEdgeProbe(
+      Object.assign({}, base, {
+        texts: { [CNP]: '# t\n\n中 文\n'.split('\n'), [ENP]: '# t\n\n中文\n'.split('\n') },
+      })
+    );
+    check(
+      'T88 G3(a.2) seventh shape (CJK inter-character space) is record-only: a drift with all six shapes equal stays PASS',
+      seventh.a === 'PASS' && seventh.a2 === 'ABSENT',
+      'a=' + seventh.a + ' a2=' + seventh.a2
+    );
+
+    const eighth = g3aEdgeProbe(
+      Object.assign({}, base, {
+        texts: {
+          [CNP]: '# t\n\n**a**\n**b**\n'.split('\n'),
+          [ENP]: '# t\n\na\n****b****\n'.split('\n'),
+        },
+      })
+    );
+    check(
+      'T88 G3(a.2) eighth shape (per-line triplet multiset) is record-only: a compensating drift with equal totals stays PASS',
+      eighth.a === 'PASS' && eighth.a2 === 'ABSENT',
+      'a=' + eighth.a + ' a2=' + eighth.a2
     );
   }
 

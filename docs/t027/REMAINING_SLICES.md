@@ -506,7 +506,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 探针额度 | 无 |
 | 执行自由度清单落盘路径 | `docs/validation/evidence/AT24-WORDING-freedom-list.md` |
 
-### P2 — `GATES-TIGHTEN` · ⬜
+### P2 — `GATES-TIGHTEN` · ✅ 完成
 
 来源引用：`docs/DELIVERY_DIRECTIVE.md:964`（§12.5「判据自举风险」行的候选片 = `GATES-TIGHTEN`，2026-09-23 用户裁决）；处置列指向该片者 = `:868`（OB-20）、`:884`（OB-29）、`:887`（OB-32）、`:896`（OB-41）、`:928`（OB-73）；同源观察 = `:883`（OB-28）、`:897`（OB-42）；另见 `docs/validation/directive-review-saturation.md:243` 与 `:245`、`docs/validation/t028-supervised-black-box.md:203`（⑥ 必核面分层）、`docs/validation/directive-haiku-bump.md:44` 与 `:157`（⑦ 载体只读、输入包须材料化）。
 
@@ -525,7 +525,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 探针额度 | 无 |
 | 执行自由度清单落盘路径 | `docs/validation/evidence/GATES-TIGHTEN-freedom-list.md` |
 
-**进行中（2026-10-16）**：② 实现完成——判据收紧 7 项与文本类并入 8 项已落盘，版本包至 v1.33；报告对 `docs/validation/directive-gates-tighten{,_EN}.md` 与自由度清单已落盘；全量门禁与自测全绿（读数见报告）。⑤ ⑥ ⑦ 尚未派发；标题行的状态标记保持 `⬜`，待 ⑧b 按审查结论更新。
+**完成（2026-10-17）**：主提交 `c6ada79`（`feat: tighten the G3(a.2)/G5/G6/G7 gate suite and land the v1.33 text merges`）+ 回填 `3393043`（commit hash 与 CI run）；审查链见报告 §4；⑦ r3 的 1 Medium 已登记 OB-91，并由 `GATES-EDGE-COVERAGE`（v1.34）+ `GATES-EDGE-COVERAGE-RECHECK`（v1.37 的 T79）关闭。**残差四项已转出到 `GATES-PATCH`（v1.40）**：OB-32（G6-5 内容级对账）、OB-28（台账全量时态复核 + `-text` 与 ⑧c 优先级）、§12.5 的「G3(a.2) 逐行补偿式漂移」与「双语 CJK 字符间空格」。
 
 并入裁定：原 `DIRECTIVE-DOCTRINE-CLEAN` 的四项内容中，**⑥ 覆盖缺口分层**（出处 `t028-supervised-black-box.md:203`）与**⑦ 工具面标定**（出处 `directive-haiku-bump.md:44` 与 `:157`）**并入本片**作为 G7 家族候选；**§5.1 时序**（OB-13 的 ⑨ 位置与 OB-48 的自由度清单落盘时机）牵动流水线结构 ⇒ **不并入**，留独立评估；「探针口径」全仓无出处 ⇒ **不登记**。
 
@@ -734,6 +734,26 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 分级 | `[SLICE]`（触 §5.1 流程纪律语义） |
 | 探针额度 | 无 |
 | 执行自由度清单落盘路径 | `docs/validation/evidence/DIRECTIVE-EVIDENCE-WINDOW-freedom-list.md` |
+
+### P15 — `GATES-PATCH` · ✅ 完成
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `GATES-PATCH`（v1.40） |
+| 状态 | ✅ **完成**（v1.40，2026-10-20；报告 `docs/validation/directive-gates-patch{,_EN}.md`） |
+| 目标 | 落地四组判据工作（OB-97 / OB-32 / OB-77 / OB-30 / OB-28 的记录态裁决）+ 两项可满足性前置门降级 + 12 项台账清账 + ADR-027 |
+| 依赖 | `GATES-TIGHTEN` 的四项残差（见 P2 的完成段） |
+| 规模 | L |
+| 步骤 | ① 设计 → ② 实现（3 次）→ ③ 测试 → ⑤（r1 + 原位收窄 r2）→ ⑥ → ⑦（r1 终审 + r2 / r3 收窄）→ ⑧a → ⑨ → ⑧b → ⑩ |
+| 现状缺口 | §6.3 有 5 个对象待机械化或待裁决；`GATES-TIGHTEN` 的残差四项无承载片 |
+| 交付物 | `docs/DELIVERY_DIRECTIVE{,_EN}.md` 的 v1.40（§0.3 / §6.3 五行 / §12.4 / §12.5 / §5.1 / 附录 C.0ab）、`docs/ADR_REGISTER{,_EN}.md` 的 ADR-027、`docs/DEV_PLAN{,_EN}.md` 的措辞更正、`tools/gates/` 下 5 个判据文件、`docs/validation/directive-gates-patch{,_EN}.md` |
+| 验收证据 | 三作用域 `gate.js --all` 全绿；`SELFTEST 588/588`；四组判据在真实变更集上非空转；`G6-7` 历史重放 50 提交 / 96 路径次 / 0 findings |
+| 边界 | 不改 §2.2 / §2.4 / §5.2 矩阵 / §7.5 数值；不动 `internal/**` / CONTRACTS / schema / fixtures / workflows |
+| 分级 | `[SLICE]`（触 §6.3 判据本体） |
+| 探针额度 | 无 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/GATES-PATCH-freedom-list.md` |
+
+**完成（2026-10-20）**：报告见 `docs/validation/directive-gates-patch{,_EN}.md`；自由度清单见 `docs/validation/evidence/GATES-PATCH-freedom-list.md`。审查链 ⑤ r1 → 整改 → ⑤ r2 → ⑥ → ⑦ r1 → ⑦ r2（自由度清单）→ 整改 → ⑦ r3；⑩ 停点等授权。
 
 ---
 ## 已知缺陷（后续切片前处理）

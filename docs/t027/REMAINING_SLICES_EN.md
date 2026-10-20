@@ -492,7 +492,7 @@ Sources: `docs/validation/t028-supervised-black-box.md:140` (the AT-24 clause "b
 | Probe budget | none |
 | Execution-freedom list path | `docs/validation/evidence/AT24-WORDING-freedom-list.md` |
 
-### P2 — `GATES-TIGHTEN` · ⬜
+### P2 — `GATES-TIGHTEN` · ✅ Done
 
 Sources: `docs/DELIVERY_DIRECTIVE.md:964` (the §12.5 "criterion self-reference risk" row names `GATES-TIGHTEN` as the candidate slice, user ruling 2026-09-23); rows whose disposition points here = `:868` (OB-20), `:884` (OB-29), `:887` (OB-32), `:896` (OB-41), `:928` (OB-73); same-origin observations = `:883` (OB-28), `:897` (OB-42); see also `docs/validation/directive-review-saturation.md:243` and `:245`, `docs/validation/t028-supervised-black-box.md:203` (⑥ mandatory-coverage layering), `docs/validation/directive-haiku-bump.md:44` and `:157` (the ⑦ carrier is read-only, so the input package must be materialised).
 
@@ -511,7 +511,7 @@ Sources: `docs/DELIVERY_DIRECTIVE.md:964` (the §12.5 "criterion self-reference 
 | Probe budget | none |
 | Execution-freedom list path | `docs/validation/evidence/GATES-TIGHTEN-freedom-list.md` |
 
-**In progress (2026-10-16)**: implementation ② is complete - the seven tightening items and the eight merged text items have landed, and the version package is at v1.33; the report pair `docs/validation/directive-gates-tighten{,_EN}.md` and the freedom list are on disk; the full gate suite and the self-test are green (readings in the report). ⑤ / ⑥ / ⑦ have not been dispatched; the status marker on the heading stays `⬜` until ⑧b updates it with the review conclusions.
+**Completed (2026-10-17)**: main commit `c6ada79` (`feat: tighten the G3(a.2)/G5/G6/G7 gate suite and land the v1.33 text merges`) plus the backfill `3393043` (commit hash and CI run); the review chain is in report §4; the single Medium from ⑦ r3 was registered as OB-91 and closed by `GATES-EDGE-COVERAGE` (v1.34) + `GATES-EDGE-COVERAGE-RECHECK` (T79 of v1.37). **The four residual items have been moved out to `GATES-PATCH` (v1.40)**: OB-32 (G6-5 content-level reconciliation), OB-28 (full-ledger temporal recheck + `-text` and the ⑧c priority), and §12.5's "G3(a.2) line-by-line compensating drift" and "double-byte CJK inter-character spacing".
 
 Merge ruling: of the four items once collected under `DIRECTIVE-DOCTRINE-CLEAN`, the **⑥ coverage-gap layering** (source `t028-supervised-black-box.md:203`) and the **⑦ tooling-surface calibration** (source `directive-haiku-bump.md:44` and `:157`) are **merged into this slice** as G7-family candidates; the **§5.1 ordering** items (OB-13's ⑨ position and OB-48's freedom-list landing time) move the pipeline structure ⇒ **not merged**, left for separate evaluation; the "probe caliber" item has no source anywhere in the repository ⇒ **not registered**.
 
@@ -720,6 +720,26 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Tier | `[SLICE]` (touches the 5.1 process-discipline semantics) |
 | Probe quota | none |
 | Freedom-list path | `docs/validation/evidence/DIRECTIVE-EVIDENCE-WINDOW-freedom-list.md` |
+
+### P15 — `GATES-PATCH` · ✅ Done
+
+| Field | Content |
+|---|---|
+| Id | `GATES-PATCH` (v1.40) |
+| Status | ✅ **Done** (v1.40, 2026-10-20; report `docs/validation/directive-gates-patch{,_EN}.md`) |
+| Goal | Land the four criterion-work groups (OB-97 / OB-32 / OB-77 / OB-30 / OB-28 recorded-state ruling) + two satisfiability pre-gate downgrades + 12 ledger clearances + ADR-027 |
+| Depends on | the four residuals of `GATES-TIGHTEN` (see the P2 completion paragraph) |
+| Size | L |
+| Steps | ① design → ② implementation (3 dispatches) → ③ test → ⑤ (r1 plus an in-place narrowed r2) → ⑥ → ⑦ (terminal r1 plus narrowed r2 / r3) → ⑧a → ⑨ → ⑧b → ⑩ |
+| Current gap | §6.3 has 5 objects awaiting mechanisation or a ruling; the four `GATES-TIGHTEN` residuals had no carrying slice |
+| Deliverables | v1.40 of `docs/DELIVERY_DIRECTIVE{,_EN}.md` (§0.3 / five rows in §6.3 / §12.4 / §12.5 / §5.1 / appendix C.0ab), ADR-027 in `docs/ADR_REGISTER{,_EN}.md`, the wording fix in `docs/DEV_PLAN{,_EN}.md`, 5 criterion files under `tools/gates/`, and `docs/validation/directive-gates-patch{,_EN}.md` |
+| Acceptance evidence | `gate.js --all` green in all three scopes; `SELFTEST 588/588`; the four criterion groups are not no-ops on a real change set; `G6-7` historical replay of 50 commits / 96 path runs / 0 findings |
+| Boundary | the 2.2 / 2.4 closed sets, the 5.2 matrix and the 7.5 figures stay untouched; `internal/**` / CONTRACTS / schema / fixtures / workflows untouched |
+| Tier | `[SLICE]` (touches the 6.3 criterion bodies) |
+| Probe quota | none |
+| Freedom-list path | `docs/validation/evidence/GATES-PATCH-freedom-list.md` |
+
+**Completed (2026-10-20)**: report `docs/validation/directive-gates-patch{,_EN}.md`; freedom list `docs/validation/evidence/GATES-PATCH-freedom-list.md`. Review chain ⑤ r1 → fix → ⑤ r2 → ⑥ → ⑦ r1 → ⑦ r2 (freedom list) → fix → ⑦ r3; ⑩ stop point awaits authorisation.
 
 ---
 
