@@ -219,7 +219,7 @@ The controller dispatched the steps serially; the readings of each step are belo
 | blank lines | 447 | 447 |
 | backticks | 4528 | 4528 |
 
-> The table above is an ⑧a point-in-time reading; later backfill commits changed the counts (the final values written in the two commits are in §9 and the CI logs). Its purpose is to prove that CN and `_EN` share the same six shapes, **not** to guarantee the current absolute values.
+> The table above is an ⑧a point-in-time reading; later backfill commits changed the counts (the final values written in the two commits are in §9 and the CI logs). Its purpose is to prove that CN and `_EN` share the same six shapes, **not** to guarantee the current absolute values. (this sentence was appended by the v1.41 `DIRECTIVE-BOUNDARY-CLARIFY` slice; `G3(a.2)` is a runtime comparison and the criteria do not read this table, so the numbers here are not any threshold)
 - Both sides are UTF-8 with BOM and LF.
 
 ### 8.1 Known gap (fact registered by ⑨)

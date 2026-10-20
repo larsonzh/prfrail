@@ -756,6 +756,28 @@ A6 ② 进度（第 2 批，2026-09-15）：
 **完成（2026-10-20）**：报告见 `docs/validation/directive-gates-patch{,_EN}.md`；自由度清单见 `docs/validation/evidence/GATES-PATCH-freedom-list.md`。审查链 ⑤ r1 → 整改 → ⑤ r2 → ⑥ → ⑦ r1 → ⑦ r2（自由度清单）→ 整改 → ⑦ r3；⑩ 停点等授权。
 
 ---
+
+### P16 — `DIRECTIVE-BOUNDARY-CLARIFY` · ✅ 完成
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `DIRECTIVE-BOUNDARY-CLARIFY`（v1.41） |
+| 状态 | ✅ **完成**（v1.41，2026-10-20；报告 `docs/validation/directive-boundary-clarify{,_EN}.md`，由 ⑧b 翻定） |
+| 目标 | 一片收口 7 项执行纪律边界澄清（OB-13 / OB-23 / OB-25 / OB-26 / OB-44 / OB-45 / OB-50），并完成步骤 0 的轻量台账清账 |
+| 依赖 | 无（上游 `GATES-PATCH` 已闭环） |
+| 规模 | L（7 项跨 §3.4 / §5.1 / §7.2.1 / §7.8 / §2.5 / §12.4 / §12.5） |
+| 步骤 | 步骤 0 → ① → ② → ③ → ④ → ⑤ → ⑥ → ⑦（1 终审 + 3 复审）→ ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| 现状缺口 | 7 项均处 `待议`；OB-23 的两套口径（诚实 fail-closed 与等价覆盖生产语义）不等价，需用户裁定形态 |
+| 交付物 | 准则 v1.41 版本包（头部 / §0.3 / §3.4 / §5.1 / §7.2.1 / §7.8 / §2.5 / §12.4 / §12.5 / 附录 C 新块）；`docs/validation/directive-boundary-clarify{,_EN}.md` 报告对；`docs/validation/evidence/DIRECTIVE-BOUNDARY-CLARIFY-freedom-list.md`；本 P16 状态行与完成行 |
+| 验收证据 | 7 项逐项翻转或如实说明不成立（每项带节号）；三作用域 `TOTAL_FAIL=0`；`SELFTEST` 全绿；CN 与 `_EN` 六形状全等 |
+| 边界 | 不改 §2.2 / §2.4 的本体闭集、§5.2 矩阵、§7.5 数值、§6.3 判据本体；不改 CONTRACTS / schema / fixtures、不动 `internal/**`；不推 gitee |
+| 分级 | `[SLICE]`（触 §7.2.1 / §7.8 的审查口径语义） |
+| 探针额度 | 无 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/DIRECTIVE-BOUNDARY-CLARIFY-freedom-list.md` |
+
+**完成（2026-10-20）**：报告见 `docs/validation/directive-boundary-clarify{,_EN}.md`；自由度清单见 `docs/validation/evidence/DIRECTIVE-BOUNDARY-CLARIFY-freedom-list.md`。审查链 ⑤ r1 → 整改 → ⑤ r2 → ⑥ → ⑦ r1 终审（1 轮通过）；⑩ 停点等授权。
+
+---
 ## 已知缺陷（后续切片前处理）
 
 > **阻断口径不变**：仅高频/已复现缺陷阻断，观测级 flake 只记录并在验证报告中列示。

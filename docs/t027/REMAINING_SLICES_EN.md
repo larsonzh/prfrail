@@ -743,6 +743,28 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 
 ---
 
+### P16 — `DIRECTIVE-BOUNDARY-CLARIFY` · ✅ Done
+
+| Field | Content |
+|---|---|
+| Id | `DIRECTIVE-BOUNDARY-CLARIFY` (v1.41) |
+| Status | ✅ **Done** (v1.41, 2026-10-20; report `docs/validation/directive-boundary-clarify{,_EN}.md`, review-finalised by ⑧b) |
+| Goal | Close seven execution-discipline boundary clarifications in one slice (OB-13 / OB-23 / OB-25 / OB-26 / OB-44 / OB-45 / OB-50) and complete the lightweight ledger reconciliation of step 0 |
+| Depends on | none (upstream `GATES-PATCH` is closed) |
+| Size | L (7 items spanning §3.4 / §5.1 / §7.2.1 / §7.8 / §2.5 / §12.4 / §12.5) |
+| Steps | step 0 → ① → ② → ③ → ④ → ⑤ → ⑥ → ⑦ (1 terminal review + 3 narrowed reviews) → ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| Current gap | all 7 items are open for discussion; the two readings of OB-23 (honest fail-closed vs equivalent fulfilment of the production semantics) are not equivalent and need a user ruling on the form |
+| Deliverables | the directive v1.41 package (header / §0.3 / §3.4 / §5.1 / §7.2.1 / §7.8 / §2.5 / §12.4 / §12.5 / a new appendix C block); the `docs/validation/directive-boundary-clarify{,_EN}.md` report pair; `docs/validation/evidence/DIRECTIVE-BOUNDARY-CLARIFY-freedom-list.md`; this P16 status row and completion row |
+| Acceptance evidence | all 7 items flipped one by one or honestly declared not established (each with its section number); `TOTAL_FAIL=0` in all three scopes; `SELFTEST` fully green; CN and `_EN` equal in all six shapes |
+| Boundary | the bodies of the §2.2 / §2.4 closed sets, the §5.2 matrix, the §7.5 figures and the §6.3 criterion bodies stay untouched; CONTRACTS / schema / fixtures and `internal/**` untouched; no gitee push |
+| Tier | `[SLICE]` (touches the review semantics of §7.2.1 / §7.8) |
+| Probe quota | none |
+| Freedom-list path | `docs/validation/evidence/DIRECTIVE-BOUNDARY-CLARIFY-freedom-list.md` |
+
+**Completed (2026-10-20)**: report `docs/validation/directive-boundary-clarify{,_EN}.md`; freedom list `docs/validation/evidence/DIRECTIVE-BOUNDARY-CLARIFY-freedom-list.md`. Review chain ⑤ r1 → fix → ⑤ r2 → ⑥ → ⑦ r1 terminal review (passed in one round); ⑩ stop point awaits authorisation.
+
+---
+
 ## Known defects (to be handled before later slices)
 
 > **Blocking rule unchanged**: only high-frequency / reproduced defects block; observation-grade flakes are recorded and listed in the validation report.
