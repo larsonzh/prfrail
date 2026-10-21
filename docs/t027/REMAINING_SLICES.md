@@ -48,7 +48,7 @@
 | B3b candidate injection matrix + durability verdict | ✅ 完成（`abfcecc`） | B3a | M | 2026-09-21 | `docs/validation/t027-b3b-durability.md`、`docs/validation/evidence/b3b-2026-09-21/` |
 | B3c CONTRACTS durability-upgrade clause revision | ✅ 完成（`7bdfa0c`） | B3b | S | 2026-09-21 | `docs/validation/t027-b3c-contracts-durability.md`、`docs/validation/t027-b3c-contracts-durability_EN.md` |
 | B4 AT-23 E2E evidence + independent review | ✅ 完成（`e8cbff6`；CI run `35812311023` 双腿全绿，且两腿 `Gates` 步骤均实测执行） | A5、A6、B1、B2、B3b、B3c | L | 2026-09-23 | **AT-23 未通过**（真实 AI 候选腿不可达，见 OB-21）；`docs/validation/t027-at23-e2e.md`、`tools/b4-e2e/` |
-| C1 Linux AgentRunner native validation | ⬜ 未开始 | B4（Windows T027 完成） | M | | |
+| C1 Linux AgentRunner native validation | ✅ 完成（P19） | B4（Windows T027 完成） | M | 2026-10-21 | `docs/validation/t027-c1-linux-native{,_EN}.md` |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -460,14 +460,14 @@ A6 ② 进度（第 2 批，2026-09-15）：
 验收证据：真实宿主 E2E 记录 + 独立 review 完成且 medium 及以上发现已解决。
 边界：不得以夹具或离线 stub 冒充真实 E2E；不得跳过独立 review。
 
-## C1 — Linux AgentRunner native validation · ⬜
+## C1 — Linux AgentRunner native validation · ✅
 
 依赖：B4（Windows T027 完成）
 
-- [ ] 在 Linux 原生环境补齐 capability、enforcement、replay durability、AT-23 相关证据。
-- [ ] 明确只覆盖 Linux AgentRunner native validation，不纳入 Linux SecretStore。
-- [ ] 明确排除 SessionBridge silent 或 visible；visible 属于 T028 或 AT-24。
-- [ ] 回写双语台账与验证记录。
+- [x] 在 Linux 原生环境补齐 capability、enforcement、replay durability、AT-23 相关证据。
+- [x] 明确只覆盖 Linux AgentRunner native validation，不纳入 Linux SecretStore。
+- [x] 明确排除 SessionBridge silent 或 visible；visible 属于 T028 或 AT-24。
+- [x] 回写双语台账与验证记录。
 
 目标：把 Linux 原生验证收敛为单独后置切片，不污染 Windows 主线范围。
 现状缺口：Linux 原生 capability、enforcement、durability、AT-23 证据尚未独立建档。
@@ -824,6 +824,27 @@ A6 ② 进度（第 2 批，2026-09-15）：
 
 **完成（2026-10-21）**：OB-57 闭合——`agent_runner_replay_dispatcher.go` 的三条 spawn 后失败分支统一经 `reclaimUnprovenLaunch`（`:78-101`）回收进程，调用点为 `:205` / `:216` / `:220`，回收目标为 dispatcher 推导的 `launchID`；可选能力接口 `:70`，哨兵注释 `:29-33`，防御性注释随用户裁定加入；新增 10 个测试（含真实进程级回收与 `guard.ProcessAlive` 现实断言）；变异重跑证据见 `tmp/AGENTRUNNER-PROD-PATCH/mutation/evidence.txt`（基线绿 / M1 定点红 / M2 八项红 / SHA256 复原）。步骤 0 补登 OB-108/109/110 至 §12.4 并把池 C 报告的「待补登」改为「已补登」。审查链 ⑤ r1 `PASS`（4 Low）、⑥ 5 项（1 High 被 ⑦ 推翻）、⑦ r1 `FINAL: PASS`；三作用域 `TOTAL_FAIL=0`、`SELFTEST 588/588`。**试点自捕获率 1/10 = 10% 未达标（目标 ≥ 3/4）**，按 §12.2 交用户裁决。⑩ 停点等授权。
 
+
+---
+
+### P19 — `C1` · ✅ 已完成
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `C1`（Linux AgentRunner native validation；准则仍 v1.41） |
+| 状态 | ✅ **已完成**（2026-10-21；Linux 原生四面矩阵与 CLI 腿全部重放，报告对与证据包已落盘；三作用域 `TOTAL_FAIL=0`，`SELFTEST` 588/588） |
+| 目标 | 在 Linux Ubuntu VM 原生环境补齐 AgentRunner 的 capability / enforcement / replay durability / AT-23 证据；明确只覆盖 Linux AgentRunner native validation，不纳入 Linux SecretStore 与 SessionBridge visible |
+| 依赖 | B4 已完成；池 D 已完成（`HEAD` = `6898f91`） |
+| 规模 | M |
+| 步骤 | 步骤 0（VM 环境核实 + 台账三件事 + 池 D 四项待办）→ ① → ② → ③ → ④ → ⑤ → ⑥ → ⑦（1 终审 + 2 复审）→ ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| 现状缺口 | 无新增缺口：四项证据已在 Linux 原生环境建档，池 D 的 dispatcher 在 Linux 上的行为与冻结基线一致；遗留已知限制见报告 §8 |
+| 交付物 | 报告对 `docs/validation/t027-c1-linux-native{,_EN}.md`；证据包 `docs/validation/evidence/C1-2026-10-21/`（`MANIFEST.md` + `SHA256SUMS.txt` + 核心证据）；Linux 验证脚本（若有）；本 P19 状态行与完成行；池 D 四项待办落盘 |
+| 验收证据 | 四项验证面逐面结论与证据；排除项明确（Linux SecretStore / SessionBridge silent·visible）；平台等价性说明完整；三作用域 `TOTAL_FAIL=0`；`SELFTEST` 全绿；证据包自洽（MANIFEST ↔ SHA256SUMS ↔ 载荷）；③ 偏移早于 ④ / ⑤ |
+| 边界 | 不纳入 Linux SecretStore；不纳入 SessionBridge silent / visible（属 T028 / AT-24）；不反向修改 Windows 主线结论；不改 `DELIVERY_DIRECTIVE` 正文与 §2.2 / §2.4 / §5.2 / §7.5 / §6.3 判据本体；不改 CONTRACTS / schema / fixtures / workflows；不推 gitee |
+| 分级 | `[SLICE]`（用户已确认） |
+| 探针额度 | 无（用户已确认） |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/C1-freedom-list.md`（用户已确认） |
+
 ---
 ## 已知缺陷（后续切片前处理）
 
@@ -1003,6 +1024,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 2026-10-18 | GATES-EDGE-COVERAGE-RECHECK | **边缘覆盖复评（纯验证片，判据零改动）**：以 T78（OB-90，16 条）+ T79（OB-91，50 条）+ T79 canary（10 条）复评两类根因，全部未复现 ⇒ 判已关闭；4 条真实变更集 spot check 全部符合预期、索引复原同哈希；新登记 OB-97（只登记不修）。**✅ 已完成（v1.37，2026-10-18）**：自测 536/536、三作用域 `TOTAL_FAIL=0`；提交与 CI 读数由 ⑩ 回填。 | docs/validation/directive-gates-edge-coverage-recheck.md |
 | 2026-10-19 | G9-c | **准则治理类切片（新增机械判据 G9）**：① 新增 CI 判据 G9（静态形态）与白名单、`g9.js`、`gate.js` 注册、`selftest.js` T80–T83；② 准则 v1.38（头部 / §0.3 / §1.5 / §5.1 / §6.3 / R6.2 / 附录 C.0z / §12.4 OB-98 与 OB-99）；③ ⑨ 纯净 worktree 复现（536/536 → 552/552，退出码 0/1/2 逐例成立）；⑤ `PRE-REVIEW: PASS WITH FIXES` 两轮、⑥ `INDEPENDENT SCAN: PASS`、⑦ 由 `GPT-5.3-Codex (copilot)` 承担（r1–r3）；三作用域 `TOTAL_FAIL=0`；探针 0。**本行按 v1.21 的完成行格式只记报告路径**。 | docs/validation/directive-g9c.md |
 | 2026-10-19 | DIRECTIVE-EVIDENCE-WINDOW | **准则治理类切片（补 ⑧c 后取证窗口规则缺口）**：① §5.1 新增「⑧c 后取证窗口」子款（三条候选路径固定次序 + 四条回读读数 + 只判终态可观测性）、临时件例外句、§5.3 ⑧c 行半句、§1.5 清理时机括注、附录 B.7.3 终态回读槽位、附录 C.0aa、§12.4 OB-99/OB-100 处置列与头部/§0.3；② ADR-026 登记；③ ⑨ 纯净 worktree 复现全绿（三作用域 `TOTAL_FAIL=0`、`SELFTEST: PASS 552/552`）；⑦ 由 `GPT-5.3-Codex (copilot)` 承担（r1–r3）；批量辅助 `GLM-5.3-Flash` 1 次、`GLM-5.3-FlashX` 1 次；探针 0。**本行按 v1.21 的完成行格式只记报告路径**。 | docs/validation/directive-evidence-window.md |
+| 2026-10-21 | P19 | **Linux AgentRunner native validation（`[SLICE]`、M）**：新增 bash 驱动 `tools/validation/c1-linux/run-c1-faces.sh`，在 Ubuntu 24.04.5 VM（go1.27.1）上重放 b4-e2e 的 f1–f4 四组与 CLI 腿，23 次调用全绿、15 个终局 verdict 与冻结基线逐字段一致、`parentSnapshotHash` match=yes；证据包 `docs/validation/evidence/C1-2026-10-21/` 归档 28 件载荷；⑤⑥⑦ 三个 Medium 均以已知限制与收窄读闭合（KL-C1-1 / KL-C1-7 / KL-C1-8），KL-C1-7 升格为复用前置。**✅ 已完成（准则 v1.41，2026-10-21）**：三作用域 `TOTAL_FAIL=0`、`SELFTEST: PASS 588/588`；提交与 CI 读数由 ⑩ 回填。 | docs/validation/t027-c1-linux-native.md |
 
 > **台账完整性注记（2026-09-21，已按用户授权补录）**：本表自 A4 行之后长期未追加完成行。**2026-09-21 依据各切片自己的验证报告补录 A5/A6/A7/B2/B3a 五行**（受"不凭记忆、只补可核验字段、缺失留空并标注历史缺失、不编造"三条约束），B3b 行先于本次补录写入，故五行列于其后；各行的日期/提交号/运行号/摘要均逐项标注来源，无法核验者已标注 **历史缺失**。
 > **已回填**（本片核实，2026-09-29）：**B3a 的 `DEV_PLAN{,_EN}.md` 段落已由提交 `dd36b9b` 补入**（`DEV_PLAN.md:137` 与 `_EN.md:138`）；原注记的过期表述由切片 `LEDGER-BACKFILL` 更正，**回填动作无需重复执行**。

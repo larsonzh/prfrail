@@ -1,0 +1,12 @@
+[2026-10-21T09:49:13Z] exit=0 cmd=/home/larson/prfrail-c1/c1-bin/prfrail validate --chain /home/larson/prfrail-c1/docs/validation/evidence/directive-history/b4/archive/input/b4-chain.json
+[2026-10-21T09:49:13Z]   cwd=/home/larson/prfrail-c1 stdout=/home/larson/prfrail-c1/c1-out/cli/validate.stdout.txt stderr=/home/larson/prfrail-c1/c1-out/cli/validate.stderr.txt
+[2026-10-21T09:49:13Z] exit=0 cmd=/home/larson/prfrail-c1/c1-bin/prfrail preview --chain /home/larson/prfrail-c1/docs/validation/evidence/directive-history/b4/archive/input/b4-chain.json
+[2026-10-21T09:49:13Z]   cwd=/home/larson/prfrail-c1 stdout=/home/larson/prfrail-c1/c1-out/cli/preview.stdout.txt stderr=/home/larson/prfrail-c1/c1-out/cli/preview.stderr.txt
+[2026-10-21T09:49:13Z] exit=0 cmd=/home/larson/prfrail-c1/c1-bin/prfrail validate --chain /home/larson/prfrail-c1/docs/validation/evidence/directive-history/b4/archive/input/b4-chain-hook.json
+[2026-10-21T09:49:13Z]   cwd=/home/larson/prfrail-c1 stdout=/home/larson/prfrail-c1/c1-out/cli/validate-hook.stdout.txt stderr=/home/larson/prfrail-c1/c1-out/cli/validate-hook.stderr.txt
+[2026-10-21T09:49:13Z] exit=0 cmd=/home/larson/prfrail-c1/c1-bin/prfrail preview --chain /home/larson/prfrail-c1/docs/validation/evidence/directive-history/b4/archive/input/b4-chain-hook.json
+[2026-10-21T09:49:13Z]   cwd=/home/larson/prfrail-c1 stdout=/home/larson/prfrail-c1/c1-out/cli/preview-hook.stdout.txt stderr=/home/larson/prfrail-c1/c1-out/cli/preview-hook.stderr.txt
+[2026-10-21T09:49:13Z] exit=0 cmd=/home/larson/prfrail-c1/c1-bin/b4-e2e -emit-record -chain /home/larson/prfrail-c1/docs/validation/evidence/directive-history/b4/archive/input/b4-chain.json -workspace /home/larson/prfrail-c1/c1-out/seed -out /home/larson/prfrail-c1/c1-out/inputs/b4-inputs.json
+[2026-10-21T09:49:13Z]   cwd=/home/larson/prfrail-c1 stdout=/home/larson/prfrail-c1/c1-out/cli/emit-record.stdout.txt stderr=/home/larson/prfrail-c1/c1-out/cli/emit-record.stderr.txt
+[2026-10-21T09:49:13Z] declared inputs: path=/home/larson/prfrail-c1/c1-out/inputs/b4-inputs.json sha256=5923cd0b1c7cad3a35141f31c83ae5d5e0dec7a326dfbcd0ccae3e8d00a2f1d2
+[2026-10-21T09:49:13Z] parentSnapshotHash emitted=sha256:1fbe6bb28268c36250659573df59b691d1c85dde12018bc091ddc5c5dce408ed frozen=sha256:1fbe6bb28268c36250659573df59b691d1c85dde12018bc091ddc5c5dce408ed match=yes

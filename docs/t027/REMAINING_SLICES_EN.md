@@ -48,7 +48,7 @@
 | B3b candidate injection matrix + durability verdict | ✅ Complete (`abfcecc`) | B3a | M | 2026-09-21 | `docs/validation/t027-b3b-durability.md`, `docs/validation/evidence/b3b-2026-09-21/` |
 | B3c CONTRACTS durability-upgrade clause revision | ✅ Complete (`7bdfa0c`) | B3b | S | 2026-09-21 | `docs/validation/t027-b3c-contracts-durability.md`, `docs/validation/t027-b3c-contracts-durability_EN.md` |
 | B4 AT-23 E2E evidence + independent review | ✅ Complete (`e8cbff6`; CI run `35812311023` green on both legs, with the `Gates` step really executing on both) | A5, A6, B1, B2, B3b, B3c | L | 2026-09-23 | **AT-23 is not passed** (the real AI candidate leg is unreachable, see OB-21); `docs/validation/t027-at23-e2e.md`, `tools/b4-e2e/` |
-| C1 Linux AgentRunner native validation | ⬜ Not started | B4 (Windows T027 complete) | M | | |
+| C1 Linux AgentRunner native validation | ✅ Done (P19) | B4 (Windows T027 complete) | M | 2026-10-21 | `docs/validation/t027-c1-linux-native{,_EN}.md` |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -446,14 +446,14 @@ Deliverables: AT-23 evidence pack, independent review record, ledger write-back.
 Acceptance evidence: real-host E2E records plus an independent review with every medium-or-higher finding resolved.
 Boundaries: do not let fixtures or offline stubs masquerade as real E2E and do not skip independent review.
 
-## C1 — Linux AgentRunner native validation · ⬜
+## C1 — Linux AgentRunner native validation · ✅
 
 Depends on: B4 (Windows T027 complete)
 
-- [ ] Add Linux-native evidence for capability, enforcement, replay durability, and AT-23.
-- [ ] Keep the scope to Linux AgentRunner native validation only and exclude Linux SecretStore.
-- [ ] Explicitly exclude SessionBridge silent and visible; visible belongs to T028 or AT-24.
-- [ ] Write back the bilingual ledger and validation records.
+- [x] Add Linux-native evidence for capability, enforcement, replay durability, and AT-23.
+- [x] Keep the scope to Linux AgentRunner native validation only and exclude Linux SecretStore.
+- [x] Explicitly exclude SessionBridge silent and visible; visible belongs to T028 or AT-24.
+- [x] Write back the bilingual ledger and validation records.
 
 Goal: keep Linux native validation as a separate follow-up slice instead of mixing it into the Windows mainline.
 Current gap: Linux-native capability, enforcement, durability, and AT-23 evidence are not yet recorded as a separate slice.
@@ -810,6 +810,27 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 
 **Completed (2026-10-21)**: OB-57 is closed — the three post-spawn failure branches in `agent_runner_replay_dispatcher.go` now reclaim the process through `reclaimUnprovenLaunch` (`:78-101`), called at `:205` / `:216` / `:220`, with the reclaim target being the dispatcher-derived `launchID`; the optional capability interface sits at `:70`, the sentinel comment at `:29-33`, and the defensive comment was added per the user's ruling; 10 new tests (including real process-level reclaim and a `guard.ProcessAlive` reality assertion); the mutation re-run evidence is `tmp/AGENTRUNNER-PROD-PATCH/mutation/evidence.txt` (baseline green / M1 pinpoint red / M2 eight red / SHA256 restored). Step 0 registered OB-108/109/110 in §12.4 and switched the pool-C report's "pending registration" to "registered". Review chain ⑤ r1 `PASS` (4 Low), ⑥ 5 items (1 High overturned by ⑦), ⑦ r1 `FINAL: PASS`; all three scopes `TOTAL_FAIL=0`, `SELFTEST 588/588`. **The pilot self-capture rate is 1/10 = 10%, below the ≥ 3/4 target**, handed to the user under §12.2. ⑩ stop point awaits authorisation.
 
+
+---
+
+### P19 — `C1` · ✅ Done
+
+| Field | Content |
+|---|---|
+| Id | `C1` (Linux AgentRunner native validation; directive still v1.41) |
+| Status | ✅ **Done** (2026-10-21; the four-face matrix and the CLI leg replayed natively, the report pair and the evidence pack are on disk; `TOTAL_FAIL=0` in all three scopes and `SELFTEST` 588/588) |
+| Goal | close the AgentRunner evidence gaps for capability / enforcement / replay durability / AT-23 on a native Linux Ubuntu VM; explicitly limited to Linux AgentRunner native validation, excluding Linux SecretStore and SessionBridge visible |
+| Depends on | B4 done; pool D done (`HEAD` = `6898f91`) |
+| Size | M |
+| Steps | step 0 (VM environment verification + three ledger items + pool D's four carry-overs) → ① → ② → ③ → ④ → ⑤ → ⑥ → ⑦ (1 final + 2 re-reviews) → ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| Current gap | no new gap: the four evidence faces are on file from a native Linux environment, and pool D's dispatcher behaves the same as the frozen baseline on Linux; the remaining known limits are in report §8 |
+| Deliverables | report pair `docs/validation/t027-c1-linux-native{,_EN}.md`; evidence pack `docs/validation/evidence/C1-2026-10-21/` (`MANIFEST.md` + `SHA256SUMS.txt` + core evidence); Linux validation scripts (if any); this P19 status row and its completion row; pool D's four carry-overs landed |
+| Acceptance evidence | a verdict plus evidence per verification face; exclusions stated (Linux SecretStore / SessionBridge silent·visible); a complete platform-equivalence note; three scopes `TOTAL_FAIL=0`; `SELFTEST` green; the pack self-consistent (MANIFEST ↔ SHA256SUMS ↔ payload); ③ offset earlier than ④ / ⑤ |
+| Boundary | Linux SecretStore excluded; SessionBridge silent / visible excluded (T028 / AT-24); Windows main-line conclusions not revised; the directive body and the §2.2 / §2.4 / §5.2 / §7.5 / §6.3 rule bodies untouched; CONTRACTS / schema / fixtures / workflows untouched; no gitee push |
+| Tier | `[SLICE]` (confirmed by the user) |
+| Probe quota | none (confirmed by the user) |
+| Freedom-list path | `docs/validation/evidence/C1-freedom-list.md` (confirmed by the user) |
+
 ---
 
 ## Known defects (to be handled before later slices)
@@ -990,6 +1011,7 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | 2026-10-18 | GATES-EDGE-COVERAGE-RECHECK | **Edge-coverage recheck (verification only, zero criterion changes)**: re-checked both root causes with T78 (OB-90, 16 cases) + T79 (OB-91, 50 cases) + T79 canary (10 cases), none reproduced ⇒ judged closed; all four real-change-set spot checks match their expectation and the index restores to the same tree hash; OB-97 is registered (registered only, not fixed). **✅ Done (v1.37, 2026-10-18)**: selftest 536/536 and `TOTAL_FAIL=0` in all three scopes; the commit and CI readings are filled in by ⑩. | docs/validation/directive-gates-edge-coverage-recheck.md |
 | 2026-10-19 | G9-c | **Governance slice (new mechanical criterion G9)**: (1) added CI criterion G9 (static shape) with the whitelist, `g9.js`, the `gate.js` registration and `selftest.js` T80-T83; (2) directive v1.38 (header / 0.3 / 1.5 / 5.1 / 6.3 / R6.2 / appendix C.0z / OB-98 and OB-99 in 12.4); (3) the ⑨ pristine-worktree reproduction (536/536 → 552/552, exit codes 0/1/2 hold case by case); ⑤ `PRE-REVIEW: PASS WITH FIXES` in two rounds, ⑥ `INDEPENDENT SCAN: PASS`, ⑦ carried by `GPT-5.3-Codex (copilot)` (r1-r3); `TOTAL_FAIL=0` in all three scopes; 0 probes. **This row follows the v1.21 completion-row format and records the report path only**. | docs/validation/directive-g9c.md |
 | 2026-10-19 | DIRECTIVE-EVIDENCE-WINDOW | **Directive-governance slice (closes the rule gap for the post-⑧c evidence window)**: (1) 5.1 gains the "⑧c post-evidence window" sub-clause (fixed order of three candidate paths, four readback readings, final-state observability only), the temp-artifact exception sentence, the half-sentence in the 5.3 ⑧c row, the 1.5 cleanup-timing parenthetical, the final-state readback slot in appendix B.7.3, appendix C.0aa, the OB-99/OB-100 disposition cells in 12.4 and the header / 0.3; (2) ADR-026 registered; (3) the ⑨ pristine-worktree reproduction is fully green (`TOTAL_FAIL=0` in all three scopes, `SELFTEST: PASS 552/552`); ⑦ carried by `GPT-5.3-Codex (copilot)` (r1-r3); batch helpers `GLM-5.3-Flash` 1 run and `GLM-5.3-FlashX` 1 run; 0 probes. **This row follows the v1.21 completion-row format and records the report path only**. | docs/validation/directive-evidence-window.md |
+| 2026-10-21 | P19 | **Linux AgentRunner native validation (`[SLICE]`, M)**: adds the bash driver `tools/validation/c1-linux/run-c1-faces.sh` and replays the f1-f4 groups plus the CLI leg of b4-e2e on an Ubuntu 24.04.5 VM (go1.27.1), with all 23 invocations green, 15 terminal verdicts matching the frozen baseline field by field, and `parentSnapshotHash` match=yes; the evidence pack `docs/validation/evidence/C1-2026-10-21/` archives 28 payload entries; the three Medium findings from ⑤⑥⑦ were closed through known limitations and narrowed reads (KL-C1-1 / KL-C1-7 / KL-C1-8), and KL-C1-7 is promoted to a reuse precondition. **✅ Done (directive v1.41, 2026-10-21)**: `TOTAL_FAIL=0` in all three scopes and `SELFTEST: PASS 588/588`; the commit and CI readings are filled in by ⑩. | docs/validation/t027-c1-linux-native.md |
 
 > **Ledger integrity note (2026-09-21, back-filled under explicit user authorisation)**: this table had no rows appended after A4. **On 2026-09-21 the five rows A5/A6/A7/B2/B3a were back-filled from each slice's own validation report** (under the three constraints: no memory-based entries, verifiable fields only, missing fields left blank and marked as historic gaps, nothing fabricated); the B3b row was written before this back-fill, which is why the five rows follow it.
 > **Back-filled** (verified by slice `LEDGER-BACKFILL`, 2026-09-29): **the B3a paragraph in `DEV_PLAN{,_EN}.md` was added by commit `dd36b9b`** (`DEV_PLAN.md:137` and `_EN.md:138`); the earlier still-owed wording was corrected by slice `LEDGER-BACKFILL`, and **the back-fill action does not need to be repeated**.

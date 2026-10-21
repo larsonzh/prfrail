@@ -21,7 +21,7 @@
 The live run directory also held two large artifacts that are **byte-reproducible** and were
 therefore not committed (`head-tree.tar` 26,531,840 bytes; `wt/` 471 files / 4,410,758 bytes):
 
-1. `head-tree.tar` = `git archive --format=tar -o head-tree.tar <baseline-commit>`
+1. `head-tree.tar` = `git archive --format=tar -o head-tree.tar 6898f91`
 2. `wt/` = that tar extracted, restricted to `go.mod go.sum internal cmd tools examples schemas testdata harnesses`,
    then overwritten with the two files under test.
 

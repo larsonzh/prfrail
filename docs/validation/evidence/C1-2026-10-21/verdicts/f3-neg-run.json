@@ -1,0 +1,182 @@
+{
+  "face": "f3",
+  "case": "neg",
+  "phase": "run",
+  "runId": "run-b4",
+  "requestId": "request-run-b4",
+  "runRoot": "/home/larson/prfrail-c1/c1-out/runs/f3-neg",
+  "workspace": "/home/larson/prfrail-c1/c1-out/runs/f3-neg/workspace",
+  "startedAt": "2026-10-21T09:49:39.691Z",
+  "endedAt": "2026-10-21T09:49:41.814Z",
+  "verdictClass": "completed",
+  "chainState": "COMPLETED",
+  "taskState": "b4-task\u00001=PASSED",
+  "stepState": "b4-task\u0000b4-code-step\u00001=PASSED",
+  "eventLogHash": "sha256:82e2aae02bd3d7499325a14fbefb6f4aca436698ec4f52637e4e649dd7dd3bc9",
+  "eventSequence": 13,
+  "load": {
+    "args": [
+      "-mode",
+      "run",
+      "-sleep",
+      "2s"
+    ],
+    "timeout": "30s",
+    "grace": "2s"
+  },
+  "mapping": {
+    "status": "completed",
+    "treeStatus": "stopped",
+    "logsComplete": true,
+    "usageComplete": true,
+    "eventsComplete": true,
+    "manifestsComplete": true,
+    "factCount": 5,
+    "errorEvidenceCount": 0,
+    "elapsedMs": 2063
+  },
+  "legs": [
+    {
+      "leg": "dispatch",
+      "status": "ran: process spawned through the production launcher and step parked in TERMINAL_PENDING"
+    },
+    {
+      "leg": "dispatch-\u003ewait-\u003ecollect-\u003emap",
+      "status": "ran: completed"
+    },
+    {
+      "leg": "terminal-publication (production AgentRunnerTerminalPublisher)",
+      "status": "published"
+    },
+    {
+      "leg": "cost settlement (production tickets.CostLedger.Settle)",
+      "status": "failed",
+      "error": "cost reservation already settled"
+    },
+    {
+      "leg": "terminal routing (chain.SubmitAgentRunnerTerminal)",
+      "status": "routed as completed"
+    },
+    {
+      "leg": "postflight/acceptance/review/promotion",
+      "status": "ran to the end of the task"
+    }
+  ],
+  "journal": [
+    {
+      "leg": "baseline",
+      "at": "2026-10-21T09:49:39.697Z",
+      "outcome": "captured",
+      "detail": {
+        "entries": "1",
+        "hash": "sha256:1fbe6bb28268c36250659573df59b691d1c85dde12018bc091ddc5c5dce408ed"
+      }
+    },
+    {
+      "leg": "dispatch",
+      "at": "2026-10-21T09:49:39.697Z",
+      "outcome": "production-path",
+      "detail": {
+        "requestId": "request-run-b4"
+      }
+    },
+    {
+      "leg": "dispatch",
+      "at": "2026-10-21T09:49:39.697Z",
+      "outcome": "parked",
+      "detail": {
+        "requestId": "request-run-b4"
+      }
+    },
+    {
+      "leg": "terminal-routing",
+      "at": "2026-10-21T09:49:39.697Z",
+      "outcome": "completed",
+      "detail": {
+        "chain": "RUNNING",
+        "step": "PASSED",
+        "task": "STEPS_RUNNING"
+      }
+    },
+    {
+      "leg": "postflight",
+      "at": "2026-10-21T09:49:39.697Z",
+      "outcome": "passed",
+      "detail": {
+        "legs": "6"
+      }
+    },
+    {
+      "leg": "acceptance",
+      "at": "2026-10-21T09:49:39.697Z",
+      "outcome": "frozen",
+      "detail": {
+        "candidateHash": "sha256:093b07c1a183e459f1757d32d4b8ce0d38659cbeac830e4a0953547cd1f5d093",
+        "parentHash": "sha256:1fbe6bb28268c36250659573df59b691d1c85dde12018bc091ddc5c5dce408ed"
+      }
+    },
+    {
+      "leg": "review",
+      "at": "2026-10-21T09:49:39.697Z",
+      "outcome": "approve",
+      "detail": {
+        "candidateHash": "sha256:093b07c1a183e459f1757d32d4b8ce0d38659cbeac830e4a0953547cd1f5d093"
+      }
+    },
+    {
+      "leg": "publish",
+      "at": "2026-10-21T09:49:39.697Z",
+      "outcome": "completed",
+      "detail": {
+        "candidateHash": "sha256:093b07c1a183e459f1757d32d4b8ce0d38659cbeac830e4a0953547cd1f5d093",
+        "workspaceDigest": "sha256:397615775e93bc21c838b1ed81ea385ccc14ae7f1a1d4c7667e87766681e9a7d"
+      }
+    },
+    {
+      "leg": "downstream",
+      "at": "2026-10-21T09:49:39.697Z",
+      "outcome": "completed"
+    }
+  ],
+  "checks": [
+    {
+      "id": "control-leg-completes",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "status completed"
+    },
+    {
+      "id": "verdict-class-recorded",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "verdict class completed"
+    }
+  ],
+  "diff": {
+    "added": [],
+    "removed": [],
+    "changed": []
+  },
+  "artifacts": {
+    "diff.json": "sha256:f8700730d4d8f747ac5ce273bcc6d6ca0dabf339d43ef439e97a75e370f72f35",
+    "events.jsonl": "sha256:4fafb99cd4a2b5d910b7998711ef3f1faa7357d4a5944fe288083f0a9dd5dec1",
+    "logs/stderr.log": "sha256:4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2",
+    "logs/stdout.log": "sha256:4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2",
+    "manifest.post.json": "sha256:19fa0234f838c10e3fefda06262e1c8bfaba5225eabc5d84cb908506ae582c39",
+    "manifest.pre.json": "sha256:41d170a18f2e741f8203bea2f87cab1660ecb37f9bed0e009ff1044f0adc8da7",
+    "stub-child.pid": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stub.pid": "sha256:ca912658e4eacd2967ada25a9e044d36fbc68e88b5cd262be14e374b2cd9aa85",
+    "usage.json": "sha256:4d51d872aaf586199a7d77dc5b623d83c2c58d36e94d62a2872984d1bf9af953"
+  },
+  "observations": {
+    "gateHookSteps": "0",
+    "stopError": "",
+    "stopOutcome": "stopped"
+  },
+  "errors": [],
+  "notes": [
+    "control leg of the same shape with the marker present; must complete",
+    "requestRecordHash=sha256:668b7ae6d4b1e92e99c3b2b16faa6d8de29efae2913c0315f0b21a437c160c4c",
+    "declared-inputs: capability disposition=compatible (declared, not probed); enforcement record declared but not consulted on that path; adapterId=b4-pinned-cli-declared"
+  ]
+}

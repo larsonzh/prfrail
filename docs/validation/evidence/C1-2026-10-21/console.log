@@ -1,0 +1,5 @@
+f1: ok=6 fail=0 skipped=0
+f2: ok=3 fail=0 skipped=0
+f3: ok=3 fail=0 skipped=0
+f4: ok=6 fail=0 skipped=0
+out: /home/larson/prfrail-c1/c1-out

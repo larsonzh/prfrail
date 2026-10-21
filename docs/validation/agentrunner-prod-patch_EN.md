@@ -82,6 +82,7 @@ The four groups and the path choice made by ①:
 | D3 | `%TEMP%/proofrail-agent-stub-parity` (created today at 09:50) | comes from the pre-existing test helper `buildAgentRunnerParityStub`, which writes to `os.TempDir()`; not this slice's dispatch | registered as a candidate OB (trigger = the next change to that helper), deliberately without an OB number: it is existing tool behaviour, not this slice's defect |
 | D4 | `-race` is not executable locally: `go: -race requires cgo` / `cgo: C compiler "gcc" not found` | no local `-race` evidence | an environment fact; the acceptance evidence can only come from the CI ubuntu leg and must not be written as a pass |
 | D5 | the `G5(d)` red and the `G5(f)` red of ④ | structural states before the report lands / before staging | not defects: `G5(d)` turns green once this report lands, and `G5(f)` is cleared by the ⑨ staging |
+| D6 | a second temp-artifact violation after the commit: `post-ruling-edits.js` / `post-ruling-edits2.js` were created at the `tmp/` root (never committed, deleted, `tmp` back to 1 entry) | violates the §5.1 placement rule; under the merged caliber this is the rule's **8th occurrence** (the 2nd in pool D) | user ruling: **no separate commit**, registered at step 0 of the next slice (C1); trigger = the 3rd in the same slice |
 
 Not deviations, registered anyway (so that they are not read as omissions):
 
@@ -352,6 +353,8 @@ This slice started as `[PILOT]` and declared the following (verbatim from the st
 - Rework rounds: **③ = 2** (one added-test round plus one mutation re-run, the latter counted by the user's ruling) and **④ = 1** (re-run after the report landed) ⇒ target met (≤2).
 - ⑦ invalid rounds = **0** (r1 was already `FINAL: PASS`) ⇒ met; controller fallback = **1** (the stop-and-escalate on the temp-file violation) ⇒ met (≤3); user-found omissions = **0** ⇒ met.
 - **Conclusion: one of the five metrics missed (self-capture rate) ⇒ handled under the §12.2 re-evaluation clause with no automatic rollback; the user rules at ⑩.**
+- **Fallback-count caliber note**: the 8th temp-artifact violation was **self-reported and self-deleted and did not trigger a stop-and-escalate** ⇒ under §9.2 it does **not** count as a fallback (the count stays **1**).
+- **Where X1 / X2 live**: fixed in the repo memory `agentrunner-prod-patch-step0-pending.md`; the **next `[PILOT]` slice must carry them into its own metric declaration**. This slice is not a pilot, so they are not part of its declaration.
 - The measured values above were recomputed and back-filled by ⑧b against the §12.1 fixed denominator; ⑧a pre-filled none of them.
 
 ## 16 ⑧a self-check (three clauses)

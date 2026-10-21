@@ -1,0 +1,76 @@
+{
+  "face": "f4",
+  "case": "neg",
+  "phase": "park",
+  "runId": "run-b4",
+  "requestId": "request-run-b4",
+  "runRoot": "/home/larson/prfrail-c1/c1-out/runs/f4-neg-r2",
+  "workspace": "/home/larson/prfrail-c1/c1-out/runs/f4-neg-r2/workspace",
+  "startedAt": "2026-10-21T09:49:44.290Z",
+  "endedAt": "2026-10-21T09:49:44.331Z",
+  "verdictClass": "parked",
+  "chainState": "RUNNING",
+  "taskState": "b4-task\u00001=STEPS_RUNNING",
+  "stepState": "b4-task\u0000b4-code-step\u00001=TERMINAL_PENDING",
+  "eventLogHash": "sha256:d269ecc9045f992b210b5120a9670cab36bf20a70bcfdaa4698c30086ab337b2",
+  "eventSequence": 9,
+  "load": {
+    "args": [
+      "-mode",
+      "run",
+      "-sleep",
+      "2s"
+    ],
+    "timeout": "30s",
+    "grace": "2s"
+  },
+  "legs": [
+    {
+      "leg": "dispatch",
+      "status": "ran: process spawned through the production launcher and step parked in TERMINAL_PENDING"
+    }
+  ],
+  "journal": [
+    {
+      "leg": "baseline",
+      "at": "2026-10-21T09:49:44.297Z",
+      "outcome": "captured",
+      "detail": {
+        "entries": "1",
+        "hash": "sha256:1fbe6bb28268c36250659573df59b691d1c85dde12018bc091ddc5c5dce408ed"
+      }
+    },
+    {
+      "leg": "dispatch",
+      "at": "2026-10-21T09:49:44.297Z",
+      "outcome": "production-path",
+      "detail": {
+        "requestId": "request-run-b4"
+      }
+    },
+    {
+      "leg": "dispatch",
+      "at": "2026-10-21T09:49:44.297Z",
+      "outcome": "parked",
+      "detail": {
+        "requestId": "request-run-b4"
+      }
+    }
+  ],
+  "checks": [],
+  "artifacts": {
+    "events.jsonl": "sha256:4fafb99cd4a2b5d910b7998711ef3f1faa7357d4a5944fe288083f0a9dd5dec1",
+    "logs/stderr.log": "sha256:4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2",
+    "logs/stdout.log": "sha256:4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2",
+    "stub-child.pid": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stub.pid": "sha256:ff83f627257485ccbc9bdf0bcc7b4f008d8a55f072602763afbe6fc4abb711a6",
+    "usage.json": "sha256:4d51d872aaf586199a7d77dc5b623d83c2c58d36e94d62a2872984d1bf9af953"
+  },
+  "observations": {},
+  "errors": [],
+  "notes": [
+    "a forged resume terminal must be refused with zero writes",
+    "requestRecordHash=sha256:6dd7718113e4bf595c38a0ea439371236e64e35b5eabe3ec1c2788d02da02d1c",
+    "declared-inputs: capability disposition=compatible (declared, not probed); enforcement record declared but not consulted on that path; adapterId=b4-pinned-cli-declared"
+  ]
+}

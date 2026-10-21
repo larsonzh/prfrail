@@ -1,0 +1,6 @@
+[2026-10-21T09:49:11Z] exit=0 cmd=go build -o /home/larson/prfrail-c1/c1-bin/prfrail ./cmd/prfrail
+[2026-10-21T09:49:11Z]   cwd=/home/larson/prfrail-c1 stdout=/home/larson/prfrail-c1/c1-out/build/prfrail.build.stdout.txt stderr=/home/larson/prfrail-c1/c1-out/build/prfrail.build.stderr.txt
+[2026-10-21T09:49:11Z] exit=0 cmd=go build -o /home/larson/prfrail-c1/c1-bin/agent-stub ./tools/agent-stub
+[2026-10-21T09:49:11Z]   cwd=/home/larson/prfrail-c1 stdout=/home/larson/prfrail-c1/c1-out/build/agent-stub.build.stdout.txt stderr=/home/larson/prfrail-c1/c1-out/build/agent-stub.build.stderr.txt
+[2026-10-21T09:49:13Z] exit=0 cmd=go build -o /home/larson/prfrail-c1/c1-bin/b4-e2e ./tools/b4-e2e
+[2026-10-21T09:49:13Z]   cwd=/home/larson/prfrail-c1 stdout=/home/larson/prfrail-c1/c1-out/build/b4-e2e.build.stdout.txt stderr=/home/larson/prfrail-c1/c1-out/build/b4-e2e.build.stderr.txt

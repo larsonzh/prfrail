@@ -1,0 +1,22 @@
+# C1 terminal verdicts vs B4 frozen baseline
+
+Source of the C1 side: tmp/C1/vm-out/full/<face>/<case>/verdict-*.json (captured on the Ubuntu VM).
+Source of the B4 side: docs/validation/evidence/directive-history/b4/archive/pack-verdict.json (frozen).
+Compared fields: verdictClass, chainState, taskState, stepState, checks.length, per-check pass.
+f4: the park phase is intermediate and excluded; the terminal phase is recover (pos) / forge (neg, neg-r2).
+MATCH f1-neg [verdict-run.json] completed chain=COMPLETED checks=5
+MATCH f1-neg-r2 [verdict-run.json] completed chain=COMPLETED checks=5
+MATCH f1-neg2 [verdict-run.json] uncertain-or-paused chain=PAUSED checks=7
+MATCH f1-neg2-r2 [verdict-run.json] uncertain-or-paused chain=PAUSED checks=7
+MATCH f1-neg3 [verdict-run.json] completed chain=COMPLETED checks=6
+MATCH f1-pos [verdict-run.json] completed chain=COMPLETED checks=4
+MATCH f2-neg [verdict-run.json] uncertain-or-paused chain=PAUSED checks=4
+MATCH f2-neg-r2 [verdict-run.json] uncertain-or-paused chain=PAUSED checks=4
+MATCH f2-pos [verdict-run.json] uncertain-or-paused chain=PAUSED checks=6
+MATCH f3-neg [verdict-run.json] completed chain=COMPLETED checks=2
+MATCH f3-neg-r2 [verdict-run.json] completed chain=COMPLETED checks=2
+MATCH f3-pos [verdict-run.json] uncertain-or-paused chain=PAUSED checks=2
+MATCH f4-neg [verdict-forge.json] refused chain=RUNNING checks=2
+MATCH f4-neg-r2 [verdict-forge.json] refused chain=RUNNING checks=2
+MATCH f4-pos [verdict-recover.json] uncertain-or-paused chain=PAUSED checks=4
+TERMINAL_CASES=15 DIFFS=0

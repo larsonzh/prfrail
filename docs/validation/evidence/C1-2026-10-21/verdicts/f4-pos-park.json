@@ -1,0 +1,74 @@
+{
+  "face": "f4",
+  "case": "pos",
+  "phase": "park",
+  "runId": "run-b4",
+  "requestId": "request-run-b4",
+  "runRoot": "/home/larson/prfrail-c1/c1-out/runs/f4-pos",
+  "workspace": "/home/larson/prfrail-c1/c1-out/runs/f4-pos/workspace",
+  "startedAt": "2026-10-21T09:49:44.035Z",
+  "endedAt": "2026-10-21T09:49:44.069Z",
+  "verdictClass": "parked",
+  "chainState": "RUNNING",
+  "taskState": "b4-task\u00001=STEPS_RUNNING",
+  "stepState": "b4-task\u0000b4-code-step\u00001=TERMINAL_PENDING",
+  "eventLogHash": "sha256:4457322ad987f8315faabb2ffc4c1d64ddc619a23b8d3eb2b1dc8eff214ff6e8",
+  "eventSequence": 9,
+  "load": {
+    "args": [
+      "-mode",
+      "crash",
+      "-exit-code",
+      "7",
+      "-sleep",
+      "3s"
+    ],
+    "timeout": "30s",
+    "grace": "2s"
+  },
+  "legs": [
+    {
+      "leg": "dispatch",
+      "status": "ran: process spawned through the production launcher and step parked in TERMINAL_PENDING"
+    }
+  ],
+  "journal": [
+    {
+      "leg": "baseline",
+      "at": "2026-10-21T09:49:44.042Z",
+      "outcome": "captured",
+      "detail": {
+        "entries": "1",
+        "hash": "sha256:1fbe6bb28268c36250659573df59b691d1c85dde12018bc091ddc5c5dce408ed"
+      }
+    },
+    {
+      "leg": "dispatch",
+      "at": "2026-10-21T09:49:44.042Z",
+      "outcome": "production-path",
+      "detail": {
+        "requestId": "request-run-b4"
+      }
+    },
+    {
+      "leg": "dispatch",
+      "at": "2026-10-21T09:49:44.042Z",
+      "outcome": "parked",
+      "detail": {
+        "requestId": "request-run-b4"
+      }
+    }
+  ],
+  "checks": [],
+  "artifacts": {
+    "logs/stderr.log": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "logs/stdout.log": "sha256:a3eabcead1e7d806ad5228ed078c37d4c471332557187a726c825d9c20c3e75a"
+  },
+  "observations": {},
+  "errors": [],
+  "notes": [
+    "the runner is parked after dispatch, then restarted on the same run root",
+    "requestRecordHash=sha256:95def43ed422d5f1672854c17e95144e98b704b2c272cfe4e245c2cc77c05713",
+    "declared-inputs: capability disposition=compatible (declared, not probed); enforcement record declared but not consulted on that path; adapterId=b4-pinned-cli-declared"
+  ]
+}

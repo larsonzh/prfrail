@@ -1,0 +1,215 @@
+{
+  "face": "f1",
+  "case": "neg3",
+  "phase": "run",
+  "runId": "run-b4",
+  "requestId": "request-run-b4",
+  "runRoot": "/home/larson/prfrail-c1/c1-out/runs/f1-neg3",
+  "workspace": "/home/larson/prfrail-c1/c1-out/runs/f1-neg3/workspace",
+  "startedAt": "2026-10-21T09:49:24.105Z",
+  "endedAt": "2026-10-21T09:49:26.170Z",
+  "verdictClass": "completed",
+  "chainState": "COMPLETED",
+  "taskState": "b4-task\u00001=PASSED",
+  "stepState": "b4-task\u0000b4-code-step\u00001=PASSED",
+  "eventLogHash": "sha256:1f6d10584df81df3e8184ba15920061469640b820728c3179fd57c4c4854b3d2",
+  "eventSequence": 13,
+  "load": {
+    "args": [
+      "-mode",
+      "run",
+      "-sleep",
+      "2s"
+    ],
+    "timeout": "30s",
+    "grace": "2s"
+  },
+  "mapping": {
+    "status": "completed",
+    "treeStatus": "stopped",
+    "logsComplete": true,
+    "usageComplete": true,
+    "eventsComplete": true,
+    "manifestsComplete": true,
+    "factCount": 5,
+    "errorEvidenceCount": 0,
+    "elapsedMs": 2002
+  },
+  "legs": [
+    {
+      "leg": "dispatch",
+      "status": "ran: process spawned through the production launcher and step parked in TERMINAL_PENDING"
+    },
+    {
+      "leg": "dispatch-\u003ewait-\u003ecollect-\u003emap",
+      "status": "ran: completed"
+    },
+    {
+      "leg": "terminal-publication (production AgentRunnerTerminalPublisher)",
+      "status": "published"
+    },
+    {
+      "leg": "cost settlement (production tickets.CostLedger.Settle)",
+      "status": "failed",
+      "error": "cost reservation already settled"
+    },
+    {
+      "leg": "terminal routing (chain.SubmitAgentRunnerTerminal)",
+      "status": "routed as completed"
+    },
+    {
+      "leg": "postflight/acceptance/review/promotion",
+      "status": "ran to the end of the task"
+    }
+  ],
+  "journal": [
+    {
+      "leg": "baseline",
+      "at": "2026-10-21T09:49:24.112Z",
+      "outcome": "captured",
+      "detail": {
+        "entries": "1",
+        "hash": "sha256:1fbe6bb28268c36250659573df59b691d1c85dde12018bc091ddc5c5dce408ed"
+      }
+    },
+    {
+      "leg": "dispatch",
+      "at": "2026-10-21T09:49:24.112Z",
+      "outcome": "production-path",
+      "detail": {
+        "requestId": "request-run-b4"
+      }
+    },
+    {
+      "leg": "dispatch",
+      "at": "2026-10-21T09:49:24.112Z",
+      "outcome": "parked",
+      "detail": {
+        "requestId": "request-run-b4"
+      }
+    },
+    {
+      "leg": "terminal-routing",
+      "at": "2026-10-21T09:49:24.112Z",
+      "outcome": "completed",
+      "detail": {
+        "chain": "RUNNING",
+        "step": "PASSED",
+        "task": "STEPS_RUNNING"
+      }
+    },
+    {
+      "leg": "injection",
+      "at": "2026-10-21T09:49:24.112Z",
+      "outcome": "unaccounted-workspace-write",
+      "detail": {
+        "contentHash": "sha256:1345e1cb0e0e7d980f1bd51fa5a1e8501757857a7ac695fa55a6adb10346a045",
+        "path": "tmp/agent-stub-mutation.txt"
+      }
+    },
+    {
+      "leg": "postflight",
+      "at": "2026-10-21T09:49:24.112Z",
+      "outcome": "passed",
+      "detail": {
+        "legs": "6"
+      }
+    },
+    {
+      "leg": "acceptance",
+      "at": "2026-10-21T09:49:24.112Z",
+      "outcome": "frozen",
+      "detail": {
+        "candidateHash": "sha256:9ce0a5eaedc13b95f68d6102d89df31d95cbfc4c857d413f816c533975d2058a",
+        "parentHash": "sha256:1fbe6bb28268c36250659573df59b691d1c85dde12018bc091ddc5c5dce408ed"
+      }
+    },
+    {
+      "leg": "review",
+      "at": "2026-10-21T09:49:24.112Z",
+      "outcome": "approve",
+      "detail": {
+        "candidateHash": "sha256:9ce0a5eaedc13b95f68d6102d89df31d95cbfc4c857d413f816c533975d2058a"
+      }
+    },
+    {
+      "leg": "publish",
+      "at": "2026-10-21T09:49:24.112Z",
+      "outcome": "completed",
+      "detail": {
+        "candidateHash": "sha256:9ce0a5eaedc13b95f68d6102d89df31d95cbfc4c857d413f816c533975d2058a",
+        "workspaceDigest": "sha256:397615775e93bc21c838b1ed81ea385ccc14ae7f1a1d4c7667e87766681e9a7d"
+      }
+    },
+    {
+      "leg": "downstream",
+      "at": "2026-10-21T09:49:24.112Z",
+      "outcome": "completed"
+    }
+  ],
+  "checks": [
+    {
+      "id": "five-facts-distinct",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "frozen facts present: true"
+    },
+    {
+      "id": "five-facts-distinct",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "distinct fact digests: 5"
+    },
+    {
+      "id": "injection-present-on-disk",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "injected file on disk: /home/larson/prfrail-c1/c1-out/runs/f1-neg3/workspace/tmp/agent-stub-mutation.txt"
+    },
+    {
+      "id": "frozen-diff-excludes-injection",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "frozen diff added=[] removed=[] changed=[]"
+    },
+    {
+      "id": "unaccounted-change-rejected(design expectation)",
+      "kind": "deviation",
+      "pass": false,
+      "detail": "taskPassed=true; the injected path is inside the snapshot capturer's default exclusion set (.git/**, .prfrail/**, tmp/**), so the manifest reconciliation cannot see it - the boundary of the F1 claim, measured"
+    },
+    {
+      "id": "verdict-class-recorded",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "verdict class completed"
+    }
+  ],
+  "diff": {
+    "added": [],
+    "removed": [],
+    "changed": []
+  },
+  "artifacts": {
+    "diff.json": "sha256:f8700730d4d8f747ac5ce273bcc6d6ca0dabf339d43ef439e97a75e370f72f35",
+    "events.jsonl": "sha256:4fafb99cd4a2b5d910b7998711ef3f1faa7357d4a5944fe288083f0a9dd5dec1",
+    "logs/stderr.log": "sha256:4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2",
+    "logs/stdout.log": "sha256:4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2",
+    "manifest.post.json": "sha256:70b757954ccf3b469ae9ee116dace6ba3efb9a7599480e42dab5c8910e835e8a",
+    "manifest.pre.json": "sha256:168952b0132a20c1e68207d155ef07126db613ba2ad09e20e4ad6ec22c73c0d5",
+    "stub-child.pid": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stub.pid": "sha256:528b981525c72861bd4120bc37595f3571d8f7faf875088bca4ef361590ac6e9",
+    "usage.json": "sha256:4d51d872aaf586199a7d77dc5b623d83c2c58d36e94d62a2872984d1bf9af953"
+  },
+  "observations": {
+    "gateHookSteps": "0",
+    "stopError": "",
+    "stopOutcome": "stopped"
+  },
+  "errors": [],
+  "notes": [
+    "clean run plus the same unaccounted write inside the capture-excluded tmp/ subtree; measures the blind spot of the unchanged-workspace claim",
+    "requestRecordHash=sha256:222ab17f1074c551f4ae3b9bd10a706f234aee1bcd6d89a67c3c10ec107e1636",
+    "declared-inputs: capability disposition=compatible (declared, not probed); enforcement record declared but not consulted on that path; adapterId=b4-pinned-cli-declared"
+  ]
+}

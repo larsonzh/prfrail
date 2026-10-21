@@ -1,0 +1,7 @@
+# C1 toolchain (native build)
+# repo: /home/larson/prfrail-c1
+# go: go version go1.27.1 linux/amd64
+# built: 2026-10-21T09:49:10Z
+prfrail  sha256=eb86fa5a78bac1dffffed5f1981327abd2f5ffdf1fc2a0ea79b9c582ebcd5f6f  version=prfrail 0.1.0-dev
+agent-stub  sha256=7bda06f93011b5cfb9a5081a49eedc9420b8364d59df1e5902baba6217ed8dfd  version=agent-stub-0.1.0
+b4-e2e  sha256=a1bb5f269cffef1365b1dac500b967834d5d1ebe17e8bedf29208dea10f7ec01  version=unavailable

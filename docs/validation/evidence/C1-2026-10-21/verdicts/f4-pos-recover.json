@@ -1,0 +1,90 @@
+{
+  "face": "f4",
+  "case": "pos",
+  "phase": "recover",
+  "runId": "run-b4",
+  "requestId": "request-run-b4",
+  "runRoot": "/home/larson/prfrail-c1/c1-out/runs/f4-pos",
+  "workspace": "/home/larson/prfrail-c1/c1-out/runs/f4-pos/workspace",
+  "startedAt": "2026-10-21T09:49:44.103Z",
+  "endedAt": "2026-10-21T09:49:44.117Z",
+  "verdictClass": "uncertain-or-paused",
+  "chainState": "PAUSED",
+  "taskState": "b4-task\u00001=STEPS_RUNNING",
+  "stepState": "b4-task\u0000b4-code-step\u00001=TERMINAL_PENDING",
+  "eventLogHash": "sha256:0fc7f9eb96a55f0ae4a61c245cbaae28b6be9ad9df8e8b17b333dc08010c569e",
+  "eventSequence": 10,
+  "load": {
+    "args": [
+      "-mode",
+      "crash",
+      "-exit-code",
+      "7",
+      "-sleep",
+      "3s"
+    ],
+    "timeout": "30s",
+    "grace": "2s"
+  },
+  "legs": [],
+  "journal": [
+    {
+      "leg": "reconcile",
+      "at": "2026-10-21T09:49:44.105Z",
+      "outcome": "inspected"
+    },
+    {
+      "leg": "recover",
+      "at": "2026-10-21T09:49:44.105Z",
+      "outcome": "refused",
+      "error": "chain recovery uncertain\nchain recovery uncertain"
+    },
+    {
+      "leg": "recover-run",
+      "at": "2026-10-21T09:49:44.105Z",
+      "outcome": "returned",
+      "error": "chain recovery uncertain"
+    }
+  ],
+  "checks": [
+    {
+      "id": "recover-refused",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "engine.Run after Recover returned chain recovery uncertain"
+    },
+    {
+      "id": "single-dispatch",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "agent-dispatched TERMINAL_PENDING events for the step: 1"
+    },
+    {
+      "id": "no-new-process-identity",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "managed-process identity mirror unchanged across the restart: true"
+    },
+    {
+      "id": "chain-paused",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "chain state PAUSED"
+    }
+  ],
+  "artifacts": {
+    "logs/stderr.log": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "logs/stdout.log": "sha256:a3eabcead1e7d806ad5228ed078c37d4c471332557187a726c825d9c20c3e75a"
+  },
+  "observations": {
+    "dispatchEvents": "1",
+    "identityMirrorStable": "true"
+  },
+  "errors": [],
+  "notes": [
+    "the runner is parked after dispatch, then restarted on the same run root",
+    "requestRecordHash=sha256:95ddef993a8f88eb89b847d451912639e33cf2bf412e2271ee28c3978fb9676d",
+    "declared-inputs: capability disposition=compatible (declared, not probed); enforcement record declared but not consulted on that path; adapterId=b4-pinned-cli-declared",
+    "no launch receipts exist on this platform: request publication is refused by the unproven-durability declaration, so the relaunch check uses the parked dispatch count and the managed-process identity mirror instead"
+  ]
+}
