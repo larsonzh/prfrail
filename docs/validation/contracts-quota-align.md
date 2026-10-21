@@ -85,7 +85,7 @@ docs/validation/evidence/CONTRACTS-QUOTA-ALIGN-freedom-list.md
 
 | # | 事件 | 影响 | 处置 |
 |---|---|---|---|
-| D1 | ② 在 `tmp/` 根创建 `tmp/seam.js` 并立即删除 | 临时件落点违规（OB-100 形状）；本片第 **1** 次，升级触发为第 3 次 | 已删除；如实登记 |
+| D1 | ② 在 `tmp/` 根创建 `tmp/seam.js` 并立即删除 | 临时件落点违规（OB-100 形状）；本片内第 **1** 次，升级触发为本片第 3 次；同形跨片已登记 5 次（`$env:TEMP`：`GATES-G1G5` 4 次 + `GATES-EDGE-COVERAGE-RECHECK` 1 次，见 `docs/validation/directive-gates-edge-coverage-recheck.md:62`）⇒ **口径 = 按 §5.1「临时件一律 `tmp/<切片ID>/`」合并计数**（`$env:TEMP` 与 `tmp/` 根同属对该放置规则的违反；OB-100 只是其中「仓内未提交落点不被 G9 检出」的机械盲区子集，**不另立形态**）⇒ 本片为该规则的**第 6 次**，**不得读作全局首次、计数不得从 1 重新起算**，升级触发按合并计数推进 | 已删除；如实登记 |
 | D2 | ③ 自报首次写入 `main_test.go` 时重复 `package main` 行且用 CRLF | 文件形态错误 | 已用 `gofmt -w` 修正；闭合，仍登记 |
 | D3 | ① 的设计断言「恒定写之后宽松分支不会再触发」为**假**：`child` / `hang` / `fail-fast` / `crash` 在写点前返回 | 断言与代码不符 | 本报告更正该断言（⑦ r2 要求）；宽松分支仍可达 ⇒ OB-110 |
 | D4 | ⑦ r1 的 High 属自相矛盾：绝对措辞「恒定写」与本片「spawn 模式不预写空报告」的决策冲突 | 措辞与决策互相冲突 | 以「写入口径 + 当执行到写入点」改写闭合，保留「（恒定写）」括注 |
@@ -335,6 +335,8 @@ PASS  G5(e) evidence references resolve :: no added completion row (nothing to r
 - **OB-108** — 试点顺延第 15 次。四要素：(i) 被顺延的是什么 = 新派单形态试点的启用，第 15 次连续顺延；(ii) 为何 = 预算与切片 S 档；(iii) 影响 = 该试点仍未经检验，规则不变；(iv) 解除条件 = 下一个承载试点型任务的切片。附注：「不得作为先例」；「超出 §1.7.4 字面标准、系用户直接裁定」。
 - **OB-109** — 「**待立项**：OB-58 的形态与边界已由 `CONTRACTS-QUOTA-ALIGN` 的 ① 充分论证（丙=可重验、需 5 适配器 + 6 处 chain；乙=不可重验、需 1 适配器；甲=丙但漏父报告）。**推荐丙 + 扩边界到 5 个适配器文件**，由下一片起跑时由 ① 复核并给最终方案；本片不做。触发 = 用户排下一片时裁定。」**排片时点 = 池 D `AGENTRUNNER-PROD-PATCH` 完成之后**，与 OB-110 合并处理；届时由 ① 复核形态丙的边界（5 适配器 + 6 处 chain）并给最终方案。
 - **OB-110** — 宽松读者：(a) 修复必须与 stub 写序决策捆绑；(b) 「外部停机 vs 报告缺失」的优先级（`cancelled` vs `uncertain`）**不由**本片契约文本裁定，须由未来切片裁定；(c) 验收含「缺失报告 ⇒ uncertain」的端到端测试。范围：`internal/adapters/agent_runner_run.go:300-322`（判定通过点 `:284`）、`tools/b4-e2e/runmap.go:91`、`tools/b4-e2e/ports.go:495-503`；配方 = 返回 `present` 标志，`present == false` ⇒ `treeGone == false` ⇒ uncertain。状态：**待议 / 待授权**。**限定（用户 2026-10-21 裁定）**：**本片已修的是写侧（stub 恒定写），读者侧的宽松读法仍未修**——`agent_runner_run.go` 的 `present` 标志把「文件缺失」读作「未 spawn」，与 CONTRACTS §7 的三态语义不一致。**本片的「恒定写」保障在读者侧只部分生效**：当 stub 正常写空文件时，读者侧不会误判；当 stub 写入失败（进程崩溃等）时，读者侧仍可能把缺失误读为「无子进程」。**该残余与 OB-109 合并处理，本片不修。**
+
+**待补登**：本报告 §15 的 OB-108 / OB-109 / OB-110 三项，须在下一片（池 D `AGENTRUNNER-PROD-PATCH`）的步骤 0 补登至 `DELIVERY_DIRECTIVE{,_EN}.md` §12.4；本片因协议先行边界不改准则。补登时 **OB-110 的限定句须原样带过去**（「本片已修的是写侧，读者侧的宽松读法仍未修……本片不修」）。
 
 ## 16 ⑧a 自查三条
 
