@@ -196,6 +196,8 @@ This slice registers five deviations (D1 temporary-artifact placement, D2 self-c
 
 
 **G1's record-state boundary (demonstrated here)**: G1 catches a "heading vs status table mismatch" only, never a state that is uniformly stale across sites. Consistency across the three registration sites (status table / slice section / later-batch row) remains the job of ⑤⑥⑦ and humans.
+**Info · Platform dependency (⑥ r1 #1)**: the script relies on bash 4+ features (`BASH_SOURCE` / `local` / `printf %q` / `set -u`); this slice ran on Ubuntu 24.04 with bash 5.2. Before running on an older bash (e.g. 3.x), verify compatibility first.
+
 ## 9 Degrees of freedom
 
 The execution freedom list is `docs/validation/evidence/C1-freedom-list.md`: F marks choices, M marks rulings, D deviations.
