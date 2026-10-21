@@ -101,6 +101,8 @@ This slice registers five deviations (D1 temporary-artifact placement, D2 self-c
 **Why the expected red is structural**: `G5(d)` was red at ④ because the C1 report did not exist yet, so `declaredFiles` was empty and the staged script had no declarer. That is a timing relation between staging order and the criterion scope, not a code defect; `--scope=ci` ignores the staged set and kept `ci` green. The three scopes at ⑨ are the authoritative reading, and they also prove the distinction.
 
 ⑨ check: `--scope=tree` / `--scope=index` / `--scope=ci` all report `TOTAL_FAIL=0`, `SELFTEST` 588/588; the structural expected red disappeared once the report landed.
+⑩ commit and CI: commit `e1227b6`; CI run `39644901409` concluded `success`, with both `Go windows-latest` and `Go ubuntu-latest` legs `success`; package-level `ok github.com/larsonzh/prfrail/...` lines number 17 on ubuntu and 15 on windows, and each leg reports `SELFTEST: PASS 588/588` plus `TOTAL_FAIL=0`.
+
 
 ## 8 Known limitations
 

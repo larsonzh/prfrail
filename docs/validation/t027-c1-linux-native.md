@@ -101,6 +101,8 @@
 **预期红说明**：④ 时 `G5(d)` 判红，因 C1 报告尚未创建，`declaredFiles` 为空 ⇒ 已暂存的脚本不在声明集内。这是暂存顺序与判据作用域的时序关系，不是代码缺陷；`--scope=ci` 不看暂存集，故 `ci` 全绿。⑨ 的三作用域全绿是权威读数，也是该区分的证明。
 
 ⑨ 复核：`--scope=tree` / `--scope=index` / `--scope=ci` 均为 `TOTAL_FAIL=0`，`SELFTEST` 588/588；结构性预期红随报告落盘消失。
+⑩ 提交与 CI：提交 `e1227b6`；CI run `39644901409` 终态 `success`，双腿 `Go windows-latest` / `Go ubuntu-latest` 均 `success`；包级 `ok github.com/larsonzh/prfrail/...` 行计数为 ubuntu 17 项 / windows 15 项，腿内 `SELFTEST: PASS 588/588`、`TOTAL_FAIL=0`。
+
 
 ## 8 已知限制
 
