@@ -8,6 +8,7 @@ import (
 
 	"github.com/larsonzh/prfrail/internal/chain"
 	"github.com/larsonzh/prfrail/internal/evidence"
+	"github.com/larsonzh/prfrail/internal/guard"
 	"github.com/larsonzh/prfrail/internal/tickets"
 )
 
@@ -26,8 +27,10 @@ var (
 	// "retry" a failed launch.
 	ErrAgentRunnerLaunchFailed = errors.New("AgentRunner launch failed")
 	// ErrAgentRunnerLaunchIdentityUnproven reports a spawn whose process identity
-	// could not be published durably. The dispatcher must never kill, retry, or
-	// relaunch in this state; a later slice owns settlement.
+	// could not be published durably. The dispatcher reclaims the started process
+	// through the launcher's stop capability when one exists and never retries or
+	// relaunches in this state; settlement of the retained durable records is
+	// owned by a later slice.
 	ErrAgentRunnerLaunchIdentityUnproven = errors.New("AgentRunner launch identity unproven")
 )
 
@@ -58,6 +61,44 @@ type AgentRunnerReplayDispatcher struct {
 }
 
 var _ chain.AgentRunnerPort = (*AgentRunnerReplayDispatcher)(nil)
+
+// agentRunnerLaunchReclaimer is the optional capability a launcher may expose
+// for stopping a process it already started. It is not a chain port and not a
+// wire contract: a launcher without it keeps the pre-OB-57 behaviour, and the
+// dispatcher still never touches an OS process directly.
+// *AgentRunnerPinnedCLILauncher implements it.
+type agentRunnerLaunchReclaimer interface {
+	StopAgentRunnerProcess(ctx context.Context, launchID string) (guard.TerminationEvidence, error)
+}
+
+// reclaimUnprovenLaunch best-effort stops the process a successful
+// StartAgentRunnerProcess left behind when the replay identity cannot be
+// published. It never replaces the cause, never retries the stop, and reports
+// explicitly when no reclaim happened.
+func (dispatcher *AgentRunnerReplayDispatcher) reclaimUnprovenLaunch(ctx context.Context, launchID string, cause error) error {
+	reclaimer, ok := dispatcher.Launcher.(agentRunnerLaunchReclaimer)
+	// Defensive: unreachable today, but guards against a future Launcher that
+	// stops implementing agentRunnerLaunchReclaimer. Any change that makes this
+	// reachable MUST add a test.
+	if !ok || reclaimer == nil {
+		return fmt.Errorf("%w: the launcher exposes no stop capability; the spawned process was not reclaimed", cause)
+	}
+	grace := dispatcher.Process.Grace
+	if grace <= 0 {
+		grace = time.Second
+	}
+	stopCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), grace+time.Second)
+	defer cancel()
+	proof, stopErr := reclaimer.StopAgentRunnerProcess(stopCtx, launchID)
+	switch {
+	case stopErr != nil:
+		return fmt.Errorf("%w: spawned process reclaim failed: %v", cause, stopErr)
+	case proof.Outcome != "stopped":
+		return fmt.Errorf("%w: spawned process reclaim unproven: outcome %q", cause, proof.Outcome)
+	default:
+		return fmt.Errorf("%w: spawned process reclaimed (%s)", cause, proof.Outcome)
+	}
+}
 
 // DispatchAgentRunner performs the first-dispatch path for one step request.
 // Replays never relaunch: R-only states, existing launch intents, and terminal
@@ -161,7 +202,8 @@ func (dispatcher *AgentRunnerReplayDispatcher) DispatchAgentRunner(ctx context.C
 		return chain.StepResult{}, fmt.Errorf("%w: %w", ErrAgentRunnerLaunchFailed, err)
 	}
 	if result.LaunchID != launchID {
-		return chain.StepResult{}, fmt.Errorf("%w: launcher returned launchId %s, want %s", ErrAgentRunnerLaunchIdentityUnproven, result.LaunchID, launchID)
+		return chain.StepResult{}, dispatcher.reclaimUnprovenLaunch(ctx, launchID,
+			fmt.Errorf("%w: launcher returned launchId %s, want %s", ErrAgentRunnerLaunchIdentityUnproven, result.LaunchID, launchID))
 	}
 	identity, err := NewAgentRunnerLaunchIdentityRecord(AgentRunnerLaunchIdentity{
 		LaunchID:         launchID,
@@ -171,10 +213,12 @@ func (dispatcher *AgentRunnerReplayDispatcher) DispatchAgentRunner(ctx context.C
 		StartedAt:        result.StartedAt.UTC().Format(time.RFC3339),
 	})
 	if err != nil {
-		return chain.StepResult{}, fmt.Errorf("%w: %w", ErrAgentRunnerLaunchIdentityUnproven, err)
+		return chain.StepResult{}, dispatcher.reclaimUnprovenLaunch(ctx, launchID,
+			fmt.Errorf("%w: %w", ErrAgentRunnerLaunchIdentityUnproven, err))
 	}
 	if _, err := dispatcher.Store.RecordLaunchIdentity(identity); err != nil {
-		return chain.StepResult{}, fmt.Errorf("%w: %w", ErrAgentRunnerLaunchIdentityUnproven, err)
+		return chain.StepResult{}, dispatcher.reclaimUnprovenLaunch(ctx, launchID,
+			fmt.Errorf("%w: %w", ErrAgentRunnerLaunchIdentityUnproven, err))
 	}
 	return chain.StepResult{Evidence: []string{dispatcher.RequestRecord.RecordHash, receipt.RecordHash, identity.RecordHash}}, nil
 }

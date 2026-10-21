@@ -1,0 +1,72 @@
+== step 1: extract a pristine HEAD tree with git archive (no worktree registration) ==
+git archive -> D:\LZProjects\prfrail\tmp\AGENTRUNNER-PROD-PATCH\mutation\head-tree.tar (26531840 bytes)
+
+extracted entries: 9
+
+== step 2: overlay the two working-tree files (the change under test) ==
+copied internal\adapters\agent_runner_replay_dispatcher.go sha256=f14274426fc64e1631fce2b31474d67611b82467abd7813c53a70b7338448f05
+copied internal\adapters\agent_runner_replay_dispatcher_test.go sha256=fa40341e2a6efd873f2a0be93b94576c0d718e63b8914fc5b095f43713514fd3
+
+pristine reference: D:\LZProjects\prfrail\tmp\AGENTRUNNER-PROD-PATCH\mutation\dispatcher.pristine.go.txt
+pre-mutation sha256 = f14274426fc64e1631fce2b31474d67611b82467abd7813c53a70b7338448f05
+
+== baseline (unmutated copy) ==
+$ go test -count=1 -run "AgentRunnerReplayDispatcher" ./internal/adapters/
+exit=0
+ok  	github.com/larsonzh/prfrail/internal/adapters	4.545s
+
+== mutation M1: context.WithoutCancel(ctx) -> ctx ==
+anchor hits = 1
+mutated sha256 = fa468be9529275458a9efcf86210f21836dee56c0b7d78f9cd96786d39b5cdd7 (differs from pre: true)
+
+== M1 run (expect the shield test to fail) ==
+$ go test -count=1 -run "TestAgentRunnerReplayDispatcherReclaimSurvivesCallerCancellation" ./internal/adapters/
+exit=1
+--- FAIL: TestAgentRunnerReplayDispatcherReclaimSurvivesCallerCancellation (0.04s)
+    agent_runner_replay_dispatcher_test.go:840: shield failed: the reclaim stop must receive a context that is not cancelled, but Err()=context canceled (the caller context was context canceled)
+FAIL
+FAIL	github.com/larsonzh/prfrail/internal/adapters	1.126s
+FAIL
+
+== restore after M1 ==
+restored sha256 = f14274426fc64e1631fce2b31474d67611b82467abd7813c53a70b7338448f05 (equals pre-mutation: true)
+
+== mutation M2: force the no-capability branch (append ok = false after the type assertion) ==
+anchor hits = 1
+mutated sha256 = 8b75377789499de94e2f8aa570a2b2db669c04e5c5c0a4db92004e39b7abefa1
+
+== M2 run (expect the reclaim tests to fail) ==
+$ go test -count=1 -run "AgentRunnerReplayDispatcher" ./internal/adapters/
+exit=1
+--- FAIL: TestAgentRunnerReplayDispatcherLaunchIDMismatchReclaimsOnce (0.02s)
+    agent_runner_replay_dispatcher_test.go:591: expected the mismatch cause and a proven reclaim in the message, got AgentRunner launch identity unproven: launcher returned launchId launch-foreign-one, want launch-request-one: the launcher exposes no stop capability; the spawned process was not reclaimed
+--- FAIL: TestAgentRunnerReplayDispatcherIdentityConstructionFailureReclaimsOnce (0.02s)
+    agent_runner_replay_dispatcher_test.go:609: expected exactly one reclaim, got 0 (ids=[])
+--- FAIL: TestAgentRunnerReplayDispatcherIdentityPublicationFailureReclaimsOnce (0.03s)
+    agent_runner_replay_dispatcher_test.go:645: expected exactly one reclaim, got 0 (ids=[])
+--- FAIL: TestAgentRunnerReplayDispatcherReclaimFailureKeepsBothChains (0.02s)
+    agent_runner_replay_dispatcher_test.go:666: expected the stop error in the message, got AgentRunner launch identity unproven: launcher returned launchId launch-foreign-one, want launch-request-one: the launcher exposes no stop capability; the spawned process was not reclaimed
+--- FAIL: TestAgentRunnerReplayDispatcherReclaimUnprovenIsReported (0.02s)
+    agent_runner_replay_dispatcher_test.go:680: expected the unproven outcome in the message, got AgentRunner launch identity unproven: launcher returned launchId launch-foreign-one, want launch-request-one: the launcher exposes no stop capability; the spawned process was not reclaimed
+--- FAIL: TestAgentRunnerReplayDispatcherReclaimsRealProcessWhenIdentityPublicationFails (0.68s)
+    agent_runner_replay_dispatcher_test.go:771: expected the reclaim outcome in the message, got AgentRunner launch identity unproven: AgentRunner launch identity conflict: process identity payload differs for launchId launch-request-one: the launcher exposes no stop capability; the spawned process was not reclaimed
+--- FAIL: TestAgentRunnerReplayDispatcherReclaimSurvivesCallerCancellation (0.02s)
+    agent_runner_replay_dispatcher_test.go:835: expected exactly one reclaim of the unproven spawn, got 0 (ids=[])
+--- FAIL: TestAgentRunnerReplayDispatcherTypedNilReclaimerIsReportedFailClosed (0.03s)
+    --- FAIL: TestAgentRunnerReplayDispatcherTypedNilReclaimerIsReportedFailClosed/typed_nil_reclaimer_reports_the_failed_reclaim (0.02s)
+        agent_runner_replay_dispatcher_test.go:928: expected the reclaim outcome to be reported, got AgentRunner launch identity unproven: launcher returned launchId launch-foreign-one, want launch-request-one: the launcher exposes no stop capability; the spawned process was not reclaimed
+FAIL
+FAIL	github.com/larsonzh/prfrail/internal/adapters	2.214s
+FAIL
+
+== restore after M2 ==
+final sha256 = f14274426fc64e1631fce2b31474d67611b82467abd7813c53a70b7338448f05 (equals pre-mutation: true)
+
+== summary ==
+baseline exit = 0
+M1 exit = 1 (expected non-zero)
+M2 exit = 1 (expected non-zero)
+sha256 pre = f14274426fc64e1631fce2b31474d67611b82467abd7813c53a70b7338448f05
+sha256 after restore = f14274426fc64e1631fce2b31474d67611b82467abd7813c53a70b7338448f05
+evidence directory retained: D:\LZProjects\prfrail\tmp\AGENTRUNNER-PROD-PATCH\mutation
+wt retained: D:\LZProjects\prfrail\tmp\AGENTRUNNER-PROD-PATCH\mutation\wt

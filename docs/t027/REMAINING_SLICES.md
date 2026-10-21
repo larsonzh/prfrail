@@ -801,6 +801,29 @@ A6 ② 进度（第 2 批，2026-09-15）：
 
 **完成（2026-10-21）**：OB-52 以路径 D 落地（`CONTRACTS.md:192` 分层额度口径 + 费用维度禁令句，零代码）；OB-59 以「写入口径（恒定写）+ 三态语义 + 互推禁令」落地（`CONTRACTS.md:232`），`tools/agent-stub/main.go` 恒定写与 4 条三态测试（`main_test.go`）；OB-58 移出并以 OB-109 待立项；审查链 ⑤ r1/r2、⑥、⑦ r1/r2（⑦ r2 `PASS`）；三作用域 `TOTAL_FAIL=0`（暂存后）、`SELFTEST 588/588`。报告见 `docs/validation/contracts-quota-align{,_EN}.md`。⑩ 停点等授权。
 
+
+---
+
+### P18 — `AGENTRUNNER-PROD-PATCH` · ✅ 完成
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `AGENTRUNNER-PROD-PATCH`（准则仍 v1.41；本片只改 `internal/adapters` 与相关测试） |
+| 状态 | ✅ **完成**（2026-10-21；报告 `docs/validation/agentrunner-prod-patch{,_EN}.md`） |
+| 目标 | 修复 `agent_runner_replay_dispatcher.go` 在 spawn 成功后身份记录失败时**不回收子进程**的缺陷（OB-57），使该错误路径下进程树完整回收 |
+| 依赖 | 池 C 已闭环（`HEAD` = `6eb69f1`；OB-59 的 pid 报告恒定写是 OB-57 测试的契约基础） |
+| 规模 | M（单文件错误路径修复 + 聚焦测试） |
+| 步骤 | 步骤 0（补登 OB-108/109/110 + P18 + 清池 C 的「待补登」句）→ ① → ② → ③ → ④ → ⑤ → ⑥ → ⑦（1 终审 + 2 复审）→ ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| 现状缺口 | OB-57（待议）——`agent_runner_replay_dispatcher.go` 在 spawn 成功后若身份记录失败即返回、且不回收该进程；生产正向链在该错误路径下会留下孤儿进程 |
+| 交付物 | `internal/adapters/agent_runner_replay_dispatcher.go`（按 ① 裁定路径改）；聚焦测试（正例 spawn + 身份成功、反例身份失败 + 进程已回收）；报告对 `docs/validation/agentrunner-prod-patch{,_EN}.md`；自由度清单 `docs/validation/evidence/AGENTRUNNER-PROD-PATCH-freedom-list.md`；本 P18 状态行与完成行；§12.4 三项补登；池 C 报告 §15 的「待补登」句改为「已补登」 |
+| 验收证据 | OB-57 翻转（带 `file:line` 与用户裁定依据）；两条测试正反均通过且反例断言「进程已回收」；`go test -count=1 ./...` 与 `go test -race ./internal/adapters/` 全绿；三作用域 `TOTAL_FAIL=0`；`SELFTEST` 全绿；步骤 0 的 `G6-6` / `G6-7` 通过；试点五指标在 ⑧b 复算；③ 偏移早于 ④ / ⑤ |
+| 边界 | 只改 `internal/adapters/agent_runner_replay_dispatcher.go` 与其测试；不改 `CONTRACTS{,_EN}.md`、`tools/agent-stub`、`internal/chain/**`、`internal/console/**`；只补登 §12.4 三行、不改准则正文；不动 `tools/gates/lib/criteria/**`；不推 gitee；不处理 OB-109 / OB-110 / OB-104 / OB-105 / OB-107 |
+| 分级 | `[PILOT]`（试点转正；触进程回收语义 ⇒ ① 与 ⑦ 均不降级） |
+| 探针额度 | 无 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/AGENTRUNNER-PROD-PATCH-freedom-list.md` |
+
+**完成（2026-10-21）**：OB-57 闭合——`agent_runner_replay_dispatcher.go` 的三条 spawn 后失败分支统一经 `reclaimUnprovenLaunch`（`:78-101`）回收进程，调用点为 `:205` / `:216` / `:220`，回收目标为 dispatcher 推导的 `launchID`；可选能力接口 `:70`，哨兵注释 `:29-33`，防御性注释随用户裁定加入；新增 10 个测试（含真实进程级回收与 `guard.ProcessAlive` 现实断言）；变异重跑证据见 `tmp/AGENTRUNNER-PROD-PATCH/mutation/evidence.txt`（基线绿 / M1 定点红 / M2 八项红 / SHA256 复原）。步骤 0 补登 OB-108/109/110 至 §12.4 并把池 C 报告的「待补登」改为「已补登」。审查链 ⑤ r1 `PASS`（4 Low）、⑥ 5 项（1 High 被 ⑦ 推翻）、⑦ r1 `FINAL: PASS`；三作用域 `TOTAL_FAIL=0`、`SELFTEST 588/588`。**试点自捕获率 1/10 = 10% 未达标（目标 ≥ 3/4）**，按 §12.2 交用户裁决。⑩ 停点等授权。
+
 ---
 ## 已知缺陷（后续切片前处理）
 

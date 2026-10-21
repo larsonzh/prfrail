@@ -787,6 +787,29 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 
 **Completed (2026-10-21)**: OB-52 landed as path D (`CONTRACTS.md:192`, layered budget reading plus the cost-dimension prohibition sentence, zero code); OB-59 landed as "a write point (constant write) + three-state semantics + the mutual-inference prohibition" (`CONTRACTS.md:232`), with the constant write in `tools/agent-stub/main.go` and 4 three-state tests (`main_test.go`); OB-58 moved out and registered as OB-109 "to be chartered"; review chain ⑤ r1/r2, ⑥, ⑦ r1/r2 (⑦ r2 `PASS`); all three scopes `TOTAL_FAIL=0` (after staging) and `SELFTEST 588/588`. Report in `docs/validation/contracts-quota-align{,_EN}.md`. ⑩ stop point awaits authorisation.
 
+
+---
+
+### P18 — `AGENTRUNNER-PROD-PATCH` · ✅ Done
+
+| Field | Content |
+|---|---|
+| Id | `AGENTRUNNER-PROD-PATCH` (directive still v1.41; this slice only touches `internal/adapters` and its tests) |
+| Status | ✅ **Done** (2026-10-21; report `docs/validation/agentrunner-prod-patch{,_EN}.md`) |
+| Goal | fix the defect where `agent_runner_replay_dispatcher.go`, after a successful spawn, returns without reclaiming the child when the identity record fails (OB-57), so that the process tree is fully reclaimed on that error path |
+| Depends on | pool C closed (`HEAD` = `6eb69f1`; OB-59's constant pid-report write is the contract basis for the OB-57 test) |
+| Size | M (single-file error-path fix plus focused tests) |
+| Steps | step 0 (register OB-108/109/110 + P18 + clear the "pending registration" sentence in pool C) → ① → ② → ③ → ④ → ⑤ → ⑥ → ⑦ (1 final + 2 re-reviews) → ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| Current gap | OB-57 (to be discussed) — `agent_runner_replay_dispatcher.go` returns immediately after a successful spawn when the identity record fails, and does not reclaim that process; the production positive chain would leave an orphan on that error path |
+| Deliverables | `internal/adapters/agent_runner_replay_dispatcher.go` (changed along the path ruled by ①); focused tests (positive: spawn + identity success; negative: identity failure + process reclaimed); report pair `docs/validation/agentrunner-prod-patch{,_EN}.md`; freedom list `docs/validation/evidence/AGENTRUNNER-PROD-PATCH-freedom-list.md`; this P18 status row and its completion row; the three §12.4 registrations; the pool-C report §15 sentence switched from "pending registration" to "registered" |
+| Acceptance evidence | OB-57 flipped (with `file:line` and the ruling basis); both tests pass and the negative one asserts "process reclaimed"; `go test -count=1 ./...` and `go test -race ./internal/adapters/` green; three scopes `TOTAL_FAIL=0`; `SELFTEST` green; step 0's `G6-6` / `G6-7` pass; the five pilot metrics recomputed at ⑧b; ③ offset earlier than ④ / ⑤ |
+| Boundary | only `internal/adapters/agent_runner_replay_dispatcher.go` and its tests; no change to `CONTRACTS{,_EN}.md`, `tools/agent-stub`, `internal/chain/**`, `internal/console/**`; only three §12.4 rows are registered and the directive body is untouched; `tools/gates/lib/criteria/**` untouched; no gitee push; OB-109 / OB-110 / OB-104 / OB-105 / OB-107 not handled |
+| Tier | `[PILOT]` (pilot landing; touches process-reclamation semantics ⇒ neither ① nor ⑦ may be downgraded) |
+| Probe quota | none |
+| Freedom-list path | `docs/validation/evidence/AGENTRUNNER-PROD-PATCH-freedom-list.md` |
+
+**Completed (2026-10-21)**: OB-57 is closed — the three post-spawn failure branches in `agent_runner_replay_dispatcher.go` now reclaim the process through `reclaimUnprovenLaunch` (`:78-101`), called at `:205` / `:216` / `:220`, with the reclaim target being the dispatcher-derived `launchID`; the optional capability interface sits at `:70`, the sentinel comment at `:29-33`, and the defensive comment was added per the user's ruling; 10 new tests (including real process-level reclaim and a `guard.ProcessAlive` reality assertion); the mutation re-run evidence is `tmp/AGENTRUNNER-PROD-PATCH/mutation/evidence.txt` (baseline green / M1 pinpoint red / M2 eight red / SHA256 restored). Step 0 registered OB-108/109/110 in §12.4 and switched the pool-C report's "pending registration" to "registered". Review chain ⑤ r1 `PASS` (4 Low), ⑥ 5 items (1 High overturned by ⑦), ⑦ r1 `FINAL: PASS`; all three scopes `TOTAL_FAIL=0`, `SELFTEST 588/588`. **The pilot self-capture rate is 1/10 = 10%, below the ≥ 3/4 target**, handed to the user under §12.2. ⑩ stop point awaits authorisation.
+
 ---
 
 ## Known defects (to be handled before later slices)

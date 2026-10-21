@@ -336,7 +336,7 @@ PASS  G5(e) evidence references resolve :: no added completion row (nothing to r
 - **OB-109** — 「**待立项**：OB-58 的形态与边界已由 `CONTRACTS-QUOTA-ALIGN` 的 ① 充分论证（丙=可重验、需 5 适配器 + 6 处 chain；乙=不可重验、需 1 适配器；甲=丙但漏父报告）。**推荐丙 + 扩边界到 5 个适配器文件**，由下一片起跑时由 ① 复核并给最终方案；本片不做。触发 = 用户排下一片时裁定。」**排片时点 = 池 D `AGENTRUNNER-PROD-PATCH` 完成之后**，与 OB-110 合并处理；届时由 ① 复核形态丙的边界（5 适配器 + 6 处 chain）并给最终方案。
 - **OB-110** — 宽松读者：(a) 修复必须与 stub 写序决策捆绑；(b) 「外部停机 vs 报告缺失」的优先级（`cancelled` vs `uncertain`）**不由**本片契约文本裁定，须由未来切片裁定；(c) 验收含「缺失报告 ⇒ uncertain」的端到端测试。范围：`internal/adapters/agent_runner_run.go:300-322`（判定通过点 `:284`）、`tools/b4-e2e/runmap.go:91`、`tools/b4-e2e/ports.go:495-503`；配方 = 返回 `present` 标志，`present == false` ⇒ `treeGone == false` ⇒ uncertain。状态：**待议 / 待授权**。**限定（用户 2026-10-21 裁定）**：**本片已修的是写侧（stub 恒定写），读者侧的宽松读法仍未修**——`agent_runner_run.go` 的 `present` 标志把「文件缺失」读作「未 spawn」，与 CONTRACTS §7 的三态语义不一致。**本片的「恒定写」保障在读者侧只部分生效**：当 stub 正常写空文件时，读者侧不会误判；当 stub 写入失败（进程崩溃等）时，读者侧仍可能把缺失误读为「无子进程」。**该残余与 OB-109 合并处理，本片不修。**
 
-**待补登**：本报告 §15 的 OB-108 / OB-109 / OB-110 三项，须在下一片（池 D `AGENTRUNNER-PROD-PATCH`）的步骤 0 补登至 `DELIVERY_DIRECTIVE{,_EN}.md` §12.4；本片因协议先行边界不改准则。补登时 **OB-110 的限定句须原样带过去**（「本片已修的是写侧，读者侧的宽松读法仍未修……本片不修」）。
+**已补登**：本报告 §15 的三项 OB 已由池 D `AGENTRUNNER-PROD-PATCH` 的步骤 0 补登至 `DELIVERY_DIRECTIVE{,_EN}.md` §12.4（OB-108 / OB-109 / OB-110 三行，OB-110 的限定句原样带入）；该次补登的提交号由本片 ⑩ 回执登记。
 
 ## 16 ⑧a 自查三条
 
