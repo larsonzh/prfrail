@@ -778,6 +778,30 @@ A6 ② 进度（第 2 批，2026-09-15）：
 **完成（2026-10-20）**：报告见 `docs/validation/directive-boundary-clarify{,_EN}.md`；自由度清单见 `docs/validation/evidence/DIRECTIVE-BOUNDARY-CLARIFY-freedom-list.md`。审查链 ⑤ r1 → 整改 → ⑤ r2 → ⑥ → ⑦ r1 终审（1 轮通过）；⑩ 停点等授权。
 
 ---
+
+### P17 — `CONTRACTS-QUOTA-ALIGN` · ✅ 完成
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `CONTRACTS-QUOTA-ALIGN`（准则仍 v1.41；本片只改 `CONTRACTS{,_EN}.md` §7 与相关实现） |
+| 状态 | ✅ **完成**（2026-10-21；报告 `docs/validation/contracts-quota-align{,_EN}.md`，由 ⑧b 翻定） |
+| 目标 | 一片收口 §7 的两项契约缺口——OB-52（AI 可用性预检的额度口径与 CLI 实现的差异；按用户 2026-10-21 裁定走路径 D：分层口径、零代码）与 OB-59（CLI 恒定写子 pid 报告的契约缺口，含三态语义）；OB-58 经用户裁定移出本片 |
+| 依赖 | 无（上游 `DIRECTIVE-BOUNDARY-CLARIFY` 已闭环，HEAD = `e91a8b0`） |
+| 规模 | S（协议文本 + 单一 stub 实现 + 聚焦测试；OB-52 零代码、OB-59 一处实现） |
+| 步骤 | 步骤 0 → ① → ②a 契约 → ②b 代码 → ③ → ④ → ⑤ → ⑥ → ⑦（1 终审 + 1 复审）→ ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| 现状缺口 | `CONTRACTS.md` §7 的额度口径与 `ai_probe_copilot.go` 的 `max(30, maximumRequests)` 不一致；`tools/agent-stub` 只在派生子进程时写子 pid 报告 ⇒ 消费者无法区分「无子进程」与「报告缺失」 |
+| 交付物 | `CONTRACTS{,_EN}.md` §7 两处段落双语修订（ai availability 的分层额度口径、A6 的 pid 报告恒定写与三态语义）；`tools/agent-stub` 的恒定写实现与三态测试；`docs/validation/contracts-quota-align{,_EN}.md` 报告对；`docs/validation/evidence/CONTRACTS-QUOTA-ALIGN-freedom-list.md`；本 P17 状态行与完成行 |
+| 验收证据 | 三项 OB 逐项翻转或如实说明不成立（带 file:line）；`CONTRACTS{,_EN}` 六形状全等；三作用域 `TOTAL_FAIL=0`；`SELFTEST` 全绿；②a → ②b 与 ③ → ④/⑤ 的顺序证据 |
+| 边界 | 只改 `CONTRACTS{,_EN}.md` §7 与 `tools/agent-stub/**`；`internal/adapters/ai_probe_copilot.go` 与 `internal/chain/postflight.go` 零改动（路径 D）；不改 `DELIVERY_DIRECTIVE{,_EN}.md`、§2.2 / §2.4 / §5.2 矩阵 / §7.5 数值 / §6.3 判据本体；不动 `internal/console/**`、其他 adapters、`schemas/**`、`testdata/contracts/**`、`.github/workflows/**`、`tools/gates/lib/criteria/**`；不推 gitee |
+| 分级 | `[SLICE]`（触 §7 协议语义 ⇒ ① 与 ⑦ 均不降级） |
+| 探针额度 | 无 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/CONTRACTS-QUOTA-ALIGN-freedom-list.md` |
+
+**范围变更（2026-10-21，用户裁定）**：OB-58（pid 报告摘要纳入 A5 冻结事实）移出本片——其任一形态都必须改 `internal/adapters/` 内除 `ai_probe_copilot.go` 之外的至少 1 个文件，超出本片边界；改以 OB-109 登记「待立项」，推荐形态丙（第六枚 `ProcessPidReportsHash` 绑两份 pid 报告 + postflight 重验腿）并扩边界到 5 个适配器文件。
+
+**完成（2026-10-21）**：OB-52 以路径 D 落地（`CONTRACTS.md:192` 分层额度口径 + 费用维度禁令句，零代码）；OB-59 以「写入口径（恒定写）+ 三态语义 + 互推禁令」落地（`CONTRACTS.md:232`），`tools/agent-stub/main.go` 恒定写与 4 条三态测试（`main_test.go`）；OB-58 移出并以 OB-109 待立项；审查链 ⑤ r1/r2、⑥、⑦ r1/r2（⑦ r2 `PASS`）；三作用域 `TOTAL_FAIL=0`（暂存后）、`SELFTEST 588/588`。报告见 `docs/validation/contracts-quota-align{,_EN}.md`。⑩ 停点等授权。
+
+---
 ## 已知缺陷（后续切片前处理）
 
 > **阻断口径不变**：仅高频/已复现缺陷阻断，观测级 flake 只记录并在验证报告中列示。

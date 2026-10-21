@@ -133,6 +133,13 @@ func (run options) execute() int {
 		}
 	}
 	run.writeOwnPID()
+	// A run that cannot spawn writes the empty report as a fact. The spawn modes
+	// deliberately write nothing here: an empty report sitting next to a child
+	// that is still coming up would be a false "no descendant", and a run stopped
+	// mid-spawn must stay a missing report (a gap), never a fabricated fact.
+	if !run.spawnsChild() {
+		run.writeEmptyChildPIDReport()
+	}
 	run.emitArtifacts()
 	run.emitEvents()
 	if run.mode == "ask" {
@@ -170,9 +177,16 @@ func (run options) spawnChild() int {
 	command.Env = append(os.Environ(), evidenceDirEnv+"="+run.dir)
 	command.Dir = run.dir
 	if err := command.Start(); err != nil {
+		// Nothing was started, so the empty report is a true statement rather
+		// than a placeholder.
+		run.writeEmptyChildPIDReport()
 		return 5
 	}
 	if err := os.WriteFile(filepath.Join(run.dir, childPIDName), fmt.Appendf(nil, "%d\n", command.Process.Pid), 0o600); err != nil {
+		// The child is already alive and no report can name it, so the run kills
+		// it instead of leaving a report that would lie about the process tree;
+		// the missing report stays a gap for the consumer.
+		_ = command.Process.Kill()
 		return 6
 	}
 	if run.mode == "spawn-wait" {
@@ -239,6 +253,16 @@ func (run options) emitMarker() {
 // after a stop.
 func (run options) writeOwnPID() {
 	if err := os.WriteFile(filepath.Join(run.dir, ownPIDFileName), fmt.Appendf(nil, "%d\n", os.Getpid()), 0o600); err != nil {
+		os.Exit(11)
+	}
+}
+
+// writeEmptyChildPIDReport declares that no child was spawned: the report must
+// exist even when no child process is launched, otherwise consumers cannot tell
+// "no child" (empty report) from "report never written" (defect), and the latter
+// must stay fail-closed. A spawned child overwrites this file with its real pid.
+func (run options) writeEmptyChildPIDReport() {
+	if err := os.WriteFile(filepath.Join(run.dir, childPIDName), nil, 0o600); err != nil {
 		os.Exit(11)
 	}
 }

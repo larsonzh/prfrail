@@ -765,6 +765,30 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 
 ---
 
+### P17 — `CONTRACTS-QUOTA-ALIGN` · ✅ Done
+
+| Field | Content |
+|---|---|
+| Id | `CONTRACTS-QUOTA-ALIGN` (directive still v1.41; this slice only touches `CONTRACTS{,_EN}.md` §7 and the related implementation) |
+| Status | ✅ **Done** (2026-10-21; report `docs/validation/contracts-quota-align{,_EN}.md`, review-finalised by ⑧b) |
+| Goal | Close the two §7 contract gaps in one slice — OB-52 (the quota reading of the AI availability pre-check differs from the CLI implementation; per the user ruling of 2026-10-21 this takes path D: layered reading, zero code) and OB-59 (the contract gap where the CLI must write the sub-pid report unconditionally, including the three-state semantics); OB-58 is moved out of this slice by the user ruling |
+| Depends on | none (upstream `DIRECTIVE-BOUNDARY-CLARIFY` is closed, HEAD = `e91a8b0`) |
+| Size | S (protocol text + a single stub implementation + focused tests; OB-52 zero code, OB-59 one implementation site) |
+| Steps | step 0 → ① → ②a contract → ②b code → ③ → ④ → ⑤ → ⑥ → ⑦ (1 terminal review + 1 narrowed review) → ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| Current gap | the quota reading in `CONTRACTS.md` §7 disagrees with `max(30, maximumRequests)` in `ai_probe_copilot.go`; `tools/agent-stub` only writes the sub-pid report when it spawns a child ⇒ consumers cannot tell "no child process" from "report missing" |
+| Deliverables | a bilingual revision of the two §7 passages in `CONTRACTS{,_EN}.md` (the layered quota reading for ai availability, the unconditional pid-report writing and three-state semantics for A6); the unconditional-write implementation and three-state tests in `tools/agent-stub`; the `docs/validation/contracts-quota-align{,_EN}.md` report pair; `docs/validation/evidence/CONTRACTS-QUOTA-ALIGN-freedom-list.md`; this P17 status row and completion row |
+| Acceptance evidence | each of the three OBs flipped or honestly declared not established (with file:line); `CONTRACTS{,_EN}` equal in all six shapes; `TOTAL_FAIL=0` in all three scopes; `SELFTEST` fully green; ordering evidence for ②a → ②b and ③ → ④/⑤ |
+| Boundary | only `CONTRACTS{,_EN}.md` §7 and `tools/agent-stub/**`; `internal/adapters/ai_probe_copilot.go` and `internal/chain/postflight.go` stay at zero change (path D); `DELIVERY_DIRECTIVE{,_EN}.md`, §2.2 / §2.4 / the §5.2 matrix / the §7.5 figures / the §6.3 criterion bodies stay untouched; `internal/console/**`, other adapters, `schemas/**`, `testdata/contracts/**`, `.github/workflows/**` and `tools/gates/lib/criteria/**` untouched; no gitee push |
+| Tier | `[SLICE]` (touches §7 protocol semantics ⇒ neither ① nor ⑦ may be downgraded) |
+| Probe quota | none |
+| Freedom-list path | `docs/validation/evidence/CONTRACTS-QUOTA-ALIGN-freedom-list.md` |
+
+**Scope change (2026-10-21, user ruling)**: OB-58 (pid-report digests in the A5 frozen facts) is moved out of this slice — every form of it requires editing at least one file under `internal/adapters/` other than `ai_probe_copilot.go`, which is outside this slice's boundary; it is registered as OB-109 "to be chartered", recommending form C (a sixth `ProcessPidReportsHash` binding both pid reports plus a postflight re-verification leg) with the boundary extended to five adapter files.
+
+**Completed (2026-10-21)**: OB-52 landed as path D (`CONTRACTS.md:192`, layered budget reading plus the cost-dimension prohibition sentence, zero code); OB-59 landed as "a write point (constant write) + three-state semantics + the mutual-inference prohibition" (`CONTRACTS.md:232`), with the constant write in `tools/agent-stub/main.go` and 4 three-state tests (`main_test.go`); OB-58 moved out and registered as OB-109 "to be chartered"; review chain ⑤ r1/r2, ⑥, ⑦ r1/r2 (⑦ r2 `PASS`); all three scopes `TOTAL_FAIL=0` (after staging) and `SELFTEST 588/588`. Report in `docs/validation/contracts-quota-align{,_EN}.md`. ⑩ stop point awaits authorisation.
+
+---
+
 ## Known defects (to be handled before later slices)
 
 > **Blocking rule unchanged**: only high-frequency / reproduced defects block; observation-grade flakes are recorded and listed in the validation report.
