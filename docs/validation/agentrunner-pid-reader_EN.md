@@ -72,6 +72,8 @@ The four readers, one by one:
 
 The encoding audit had found a **double BOM** (the Medium of ⑤ r1); it was fixed and re-run successfully.
 
+**CI readings (main commit `02d5797`, run `39740097139`)**: both legs finished `success` (the Ubuntu leg took 2m46s); package-level `ok` lines: windows 15 / ubuntu 17; in-leg `SELFTEST` 588/588 and `TOTAL_FAIL` 0 on both legs. The first run was green, so the §6.4 evidence-based rerun was not triggered and no DR entry was registered.
+
 ## 8 Known limitations
 
 - **KL-C1-7 restated**: reusing `run-c1-faces.sh` requires a brand-new `C1_OUT`; keeping an old directory mixes the previous round's evidence into this round's reconciliation.
@@ -83,6 +85,7 @@ The encoding audit had found a **double BOM** (the Medium of ⑤ r1); it was fix
 - **Info**: the stale comments at `internal/console/runtime_agent_e2e_test.go:457-460` and `:643-646` (claiming the stub writes the child report only when it spawns a child) were not introduced by this slice.
 - **Info**: five-fact-era routing evidence is rejected as a whole with zero writes on replay (fail-closed).
 - **G4a gap (observed in this slice)**: G4a verifies only that a BOM exists, not how many BOMs exist, so a double BOM passes; a follow-up `gates` slice will handle it.
+- **Nature of the four `G6-4` rewrites made during ⑨ (registered as-is, no verdict change)**: the first ④ run on `--scope=index` failed on four hits, rewritten as follows - `18` with a `个文件` suffix to "18 paths", `v1.42` with a `行` suffix to "the v1.42 entry", `OB-111` with a `行` suffix to "the OB-111 entry", `24` with a `文件` suffix to "24 paths". **Judged a false-positive shape**: such number-plus-unit statements describe facts of this slice change set, which do not expire once the report is frozen, whereas the `G6-4` pattern does not distinguish slice change-set counts from repository current totals. **Standing rule** stated in item ②: for the same situation prefer the built-in `G6-4` whitelist (explicit exemption, reason, context excerpt) and **do not default to rewording**; rewording is a record-only disposition only when the criterion is a confirmed false positive and the whitelist path is unavailable, and it must be registered as such. This is a **same-family data point for OB-111 (the `G6-4` variant)** for the next OB-111 evaluation.
 
 ## 9 Degrees of freedom
 
