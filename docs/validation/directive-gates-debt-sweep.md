@@ -141,6 +141,7 @@ docs/validation/evidence/GATES-DEBT-SWEEP-freedom-list.md
 - **异常字**：`G4b` 的 `unknown=[]`（白名单 37 条未扩）。
 - **会过期字面量**：`G6-4` 无命中。
 - **版本**：`G1-b` 的 header=v1.44、§0.3 末行=v1.44。
+- **CI（主提交 `6335405`，run `39867510698`）**：双腿（ubuntu-latest 2m41s / windows-latest 3m33s）均 `success`；Gates 步双腿读数相同：`GATE REPORT scope=ci ... changed=12`、`SELFTEST: PASS 600/600`、`TOTAL_FAIL=0`；包级 `ok` 行 ubuntu 17 / windows 15（windows 跳过 Race 与 Contract fixtures 两台阶，与工作流一致）；首跑双绿，未触发 §6.4 取证复跑，**无 DR 登记**。
 - **三作用域（⑨ 实测）**：`--scope=index` 的 `changed=12` 与 `--scope=tree` 的 `changed=12` 均 `TOTAL_FAIL=0`（96.2 s / 100.0 s）；`--scope=ci` 本地只取 `HEAD^1..HEAD`，本次 `changed=4`（上一提交的范围）且亦 `TOTAL_FAIL=0`（109.3 s），故它不构成本片的判据读数；推送后的双腿 CI 读数由 ⑩ 回执载明。
 
 | 观测项 | 读数 |
@@ -171,7 +172,7 @@ docs/validation/evidence/GATES-DEBT-SWEEP-freedom-list.md
 | ⑥ `independent-reviewer` | MAI-Code-1.1-Flash | 1 | 沙箱内 `selftest.js` 超时，无运行时证据 |
 | ⑦ `independent-reviewer` | GPT-5.3-Codex | 2 | r1 + r2；M-L 档额度 1+3，实际用 1+1 |
 | ⑧a `prfrail-documenter` | 主控同模型 | 1 | 本报告对 + 自由度清单 |
-| 批量辅助 `GLM-5.3-FlashX` | GLM-5.3-FlashX | 0 | 本片未使用，如实记零 |
+| 批量辅助 `GLM-5.3-FlashX` | GLM-5.3-FlashX | 0 | 0 次的原因：本片改动的文本量小（准则四处、台账三处与报告对），且判据判红必须逐条对照代码才能定位，拆成批处理片段会丢失上下文、返工成本高于直接改写；故未派批处理任务 |
 
 - **额度**：⑤ 额度 1+1 已用满（r2 仅 Info，视为收敛）；⑦ 未降级。
 - **主控环节**：步骤 0、④、⑨、⑧b / ⑧c / ⑩ 由主控承担，不单独计派单。
@@ -201,8 +202,8 @@ docs/validation/evidence/GATES-DEBT-SWEEP-freedom-list.md
 
 | 项 | 现状 | 责任步骤 |
 |---|---|---|
-| `ci` 作用域读数 | 口径已记录（本地 `changed=4`，非本片范围） | 推送后由 ⑩ 载明双腿读数 |
-| P22 状态行与 `### P22` 块 | `🔄 进行中` | ⑧b 翻 `✅` |
+| `ci` 作用域读数 | 已记录：本地口径加推送后双腿（见 §9） | 无 |
+| P22 状态行与 `### P22` 块 | `✅ 已完成`（⑧b 已翻） | 无 |
 | 审查输入包逐文件字节数 | 不列（包于 ⑧a 提前删除，见 D7） | 无 |
 | 自由度清单的 ⑦ 复核 | 时序缺口（清单晚于 ⑦ r2） | 如实登记，见 §8 |
 

@@ -141,6 +141,7 @@ Each ring, root cause and disposition is logged per the §9.2 R-count caliber; t
 - **Anomalous characters**: `G4b` reports `unknown=[]` (the 37-entry whitelist was not widened).
 - **Expiring literals**: `G6-4` has no hits.
 - **Version**: `G1-b` reports header=v1.44 and last line of §0.3=v1.44.
+- **CI (main commit `6335405`, run `39867510698`)**: both legs (ubuntu-latest 2m41s / windows-latest 3m33s) are `success`; the Gates step reads identically on both legs: `GATE REPORT scope=ci ... changed=12`, `SELFTEST: PASS 600/600` and `TOTAL_FAIL=0`; package-level `ok` lines: ubuntu 17 / windows 15 (windows skips the Race and Contract fixtures steps, as the workflow specifies); both legs were green on the FIRST run, no §6.4 evidence re-run was triggered, and **no DR entry** was opened.
 - **Three scopes (measured by ⑨)**: `--scope=index` with `changed=12` and `--scope=tree` with `changed=12` both `TOTAL_FAIL=0` (96.2 s / 100.0 s); a local `--scope=ci` reads only `HEAD^1..HEAD`, this time `changed=4` (the previous commit's range) and also `TOTAL_FAIL=0` (109.3 s), so it is not a criterion reading for this slice; the two-leg CI readings after the push are logged in the ⑩ receipt.
 
 | Observation | Reading |
@@ -171,7 +172,7 @@ Per hard rule R7.1 of §7.5, the dispatch count of every role is logged; the rea
 | ⑥ `independent-reviewer` | MAI-Code-1.1-Flash | 1 | `selftest.js` timed out in the sandbox, no runtime evidence |
 | ⑦ `independent-reviewer` | GPT-5.3-Codex | 2 | r1 + r2; tier M-L quota 1+3, actually used 1+1 |
 | ⑧a `prfrail-documenter` | same model as the orchestrator | 1 | this report pair + the freedom list |
-| bulk assist `GLM-5.3-FlashX` | GLM-5.3-FlashX | 0 | not used by this slice, recorded as zero |
+| Batch assist `GLM-5.3-FlashX` | GLM-5.3-FlashX | 0 | Why zero: this slice changes little text (four directive spots, three ledger spots and the report pair), and a red criterion must be traced against the code item by item, so splitting the work into batch fragments would lose context and cost more rework than a direct rewrite; no batch task was dispatched |
 
 - **Quotas**: the ⑤ quota of 1+1 is exhausted (r2 carries Info only, taken as converged); ⑦ was not downgraded.
 - **Orchestrator stages**: steps 0, ④, ⑨ and ⑧b / ⑧c / ⑩ are carried by the orchestrator and are not counted as separate dispatches.
@@ -201,8 +202,8 @@ This slice leaves no item that violates a synchronization duty; the table lists 
 
 | Item | State | Owning step |
 |---|---|---|
-| `ci` scope readings | caliber recorded (locally `changed=4`, not this slice's range) | ⑩ logs the two-leg readings after the push |
-| P22 status row and `### P22` block | `🔄 进行中` | ⑧b flips to `✅` |
+| `ci` scope readings | recorded: the local caliber plus the two legs after the push (see §9) | none |
+| P22 status row and `### P22` block | `✅ Done` (flipped by ⑧b) | none |
 | Per-file byte counts of the review input packages | not listed (package deleted early per D7) | none |
 | ⑦ re-check of the freedom list | ordering gap (the list postdates ⑦ r2) | logged as it stands, see §8 |
 
