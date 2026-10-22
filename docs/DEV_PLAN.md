@@ -144,6 +144,14 @@ T027 前置状态更新（2026-09-23，B4 AT-23 E2E evidence + independent revie
 T027 前置状态更新（2026-10-03，T027-ASSEMBLY-MIN 最小可跑装配 A 段）：在上一段基础上，本片把已冻结的 AgentRunner 构件装配成一条可跑的**拒绝路径**链（八项输入 flags 全在场才路由到装配入口；任一前置失败即 fail-closed），新增 3 个生产文件与 2 个测试文件并接线 console 的 flags 路由；⑦ 三轮用满（盲审 / 终审 / 复审）后复审为 `RE-REVIEW: PASS WITH FIXES`，其中 F-02 的兜底根因（`agent_runner_replay_dispatcher.go` 的 spawn 后不回收）超出本片范围，按用户预授权以记录态收口并登记候选 OB-57（OB-56 至 OB-61 于下一片起跑时统一落 §12.4）。**AT-23 仍 BLOCKED / 未通过**（真实 AI 候选腿不可达，见 OB-21）：本片不构成 AT-23 证据，也不解除任何 `unproven`；另登记 **DR-9**（Ubuntu CI 首跑红，真实缺陷非 flake，本片修复）。证据与审查结论见 `docs/validation/t027-assembly-min.md`。
 T027 待评估项登记（2026-10-13，[ROUTINE] 台账追加）：`T027-B`（B 段 enforcement 生产落地）仅为概念名、**尚未立项**；其边界冲突已登记为 OB-55（`docs/DELIVERY_DIRECTIVE.md:910`），真实 CLI 端到端依赖见 `t028-supervised-black-box.md:140`。是否立项由用户裁定。
 
+T027 前置状态更新（2026-10-21，AGENTRUNNER-PROD-PATCH）：在上一段基础上，本片补齐 AgentRunner 装配在 spawn 之后的兜底回收——三条 spawn 后失败分支（launchId 不匹配、身份记录构造、身份发布）改为经私有可选能力 `agentRunnerLaunchReclaimer` 的有界回收（`reclaimUnprovenLaunch`：宽限取自 `dispatcher.Process.Grace`、`<=0` 时取 1 秒、用 `context.WithoutCancel` 保 cause 不被替换、单次停止、三个出口），启动器不具备该能力时显式记为“未回收”而不静默跳过；代码落点全部在 `internal/adapters/agent_runner_replay_dispatcher.go` 与其测试，chain、store、console、`tools/agent-stub`、`CONTRACTS` 与判据本体零改动（`git diff --numstat` 机械读数）。分级 `[PILOT]`、档位 M；结论不解除任何 `unproven`、不构成 AT-23 证据，`T027` 仍 `BLOCKED / NOT IMPLEMENTED`。证据：[中文](validation/agentrunner-prod-patch.md) / [English](validation/agentrunner-prod-patch_EN.md)。
+
+T027 前置状态更新（2026-10-21，C1 Linux AgentRunner native validation）：在上一段基础上，C1 在 Ubuntu 24.04.5 虚机（Go 1.27.1）上原生重放 `tools/b4-e2e` 的 f1–f4 四组与 CLI 腿——由新增 bash 驱动 `tools/validation/c1-linux/run-c1-faces.sh` 执行，全部调用成功、终局 verdict 与冻结基线逐字段一致、`parentSnapshotHash` 判定为 match=yes，并明确排除 Linux SecretStore 与 SessionBridge 的 silent / visible 两面（各自归属其它任务）；证据包 `docs/validation/evidence/C1-2026-10-21/` 归档全部载荷并自洽（`MANIFEST.md` ↔ `SHA256SUMS.txt` ↔ 载荷）。本片不反向修改 Windows 主线结论，`T027` 仍 `BLOCKED / NOT IMPLEMENTED`。证据：[中文](validation/t027-c1-linux-native.md) / [English](validation/t027-c1-linux-native_EN.md)。
+
+T027 前置状态更新（2026-10-22，AGENTRUNNER-PID-READER）：在上一段基础上，本片把 pid 报告接入 A5 冻结事实——A5 由五枚摘要扩为六枚并新增 `ProcessPidReportsHash`（域 `proofrail:agent-runner-pid-reports:1`，父 `stub.pid` 与子 `stub-child.pid` 两份报告按原始字节取摘要后绑定，空报告摘要合法且不与“不存在”互推），`evidence[2..7]` 连续无空洞、`postflightFactsCount` 由 5 改 6，postflight 增加“重读重算对账”腿；同时修读者侧三态语义——`present == false` ⇒ `treeGone == false` ⇒ `uncertain`，四类读者（生产 `agent_runner_run.go` 与 harness 三处）同型收口，写侧“恒定写”与读者侧判定互相印证。准则升 v1.42（仅 §12.4 台账补登），`CONTRACTS{,_EN}.md` §7 的 A5 / A6 双语同步。`T027` 仍 `BLOCKED / NOT IMPLEMENTED`。证据：[中文](validation/agentrunner-pid-reader.md) / [English](validation/agentrunner-pid-reader_EN.md)。
+
+补录说明（2026-10-22，切片 DIRECTIVE-COST-TIER 的步骤 0）：上述三片完成时均未按 §11.2 回写本节，属规范偏离——`G6-5` / `G6-7` 不覆盖本域（两判据的检查对象不包含 DEV_PLAN 的 T027 前置状态段落），故该偏离在门禁上不可见；本次一并补录三段，字段一律取自各片自己的验证报告，只记报告路径、不记提交号与 CI 运行号，且不改写 `T027` 的状态字段。
+
 ## 3. 需求映射
 
 除明确标记完成的任务外，Implementation evidence 是计划证据，不代表实现。
