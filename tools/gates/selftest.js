@@ -5138,6 +5138,12 @@ async function runTests() {
       'code=' + helpSkip.code + ' error=' + JSON.stringify(helpSkip.error || '').slice(0, 90));
     let inFlight = 0;
     let maxInFlight = 0;
+    // Completion order, not wall clock: a timing threshold is not portable across CI runners
+    // (DR-1: the Windows runner once needed 612 ms for a 0 ms + 150 ms + 150 ms plan, so the
+    // old `elapsed < 280` assertion went red on unchanged code). The order below is what
+    // distinguishes concurrency from a serial loop: under a serial loop C cannot END before A
+    // ends, because C is not even started until A has resolved.
+    const events = [];
     const delayed = (id, ids, delayMs) => ({
       id,
       label: id,
@@ -5145,9 +5151,11 @@ async function runTests() {
         new Promise((resolve) => {
           inFlight++;
           maxInFlight = Math.max(maxInFlight, inFlight);
+          events.push(id + '-start');
           setTimeout(() => {
             inFlight--;
             for (const r of ids) out.rec(r, 'PASS', r, id);
+            events.push(id + '-end');
             resolve();
           }, delayMs);
         }),
@@ -5164,14 +5172,15 @@ async function runTests() {
       C: delayed('C', ['C-1'], 0),
     };
     const asyncOut = createReport();
-    const started = Date.now();
     await GATE.runCriteriaConcurrent(['A', 'B', 'C'], asyncMap, {}, asyncOut);
-    const elapsed = Date.now() - started;
     check('T90 concurrent scheduling keeps every record in plan order',
       asyncOut.records.map((r) => r.id).join(',') === 'A-1,A-2,B-1,C-1',
       'order=' + asyncOut.records.map((r) => r.id).join(','));
-    check('T90 two async criteria overlap instead of running back to back',
-      elapsed < 280, 'elapsed=' + elapsed + 'ms serial-floor=300ms');
+    check('T90 the 0 ms criterion ends before the 150 ms one that started first (completion order proves overlap)',
+      events.indexOf('C-end') >= 0 &&
+        events.indexOf('C-end') < events.indexOf('A-end') &&
+        events.indexOf('B-start') < events.indexOf('A-end'),
+      'events=' + events.join(','));
     check('T90 two async criteria are pending at the same moment (impossible under a serial loop)',
       maxInFlight >= 2, 'maxInFlight=' + maxInFlight);
     const syncMap = {
