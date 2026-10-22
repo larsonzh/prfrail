@@ -137,6 +137,7 @@ docs/validation/evidence/DIRECTIVE-COST-TIER-freedom-list.md
 - **异常字**：`G4b` 的 `unknown=[]`，白名单 37 条未扩。
 - **会过期字面量**：`G6-4` 无命中。
 - **版本**：`G1-b` 的 header=v1.43、§0.3 末行=v1.43。
+- **CI（主提交 `e5c9990`，run `39786249399`）**：双腿均 `success`；包级 `ok` 行 windows 15 / ubuntu 17；腿内 `SELFTEST` 均 588/588、`TOTAL_FAIL` 均 0。首跑双绿，未触发 §6.4 取证复跑，**无 DR 登记**。
 
 | 观测项 | 读数 |
 |---|---|

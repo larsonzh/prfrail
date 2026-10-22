@@ -137,6 +137,7 @@ Each ring, root cause and merge decision is logged per the §9.2 R-count definit
 - **Anomalous characters**: `G4b` reports `unknown=[]`, and the 37-entry whitelist was not widened.
 - **Expiring literals**: `G6-4` has no hits.
 - **Version**: `G1-b` reports header=v1.43 and last line of §0.3=v1.43.
+- **CI (main commit `e5c9990`, run `39786249399`)**: both legs finished `success`; package-level `ok` lines: windows 15 / ubuntu 17; in-leg `SELFTEST` 588/588 and `TOTAL_FAIL` 0 on both legs. The first run was green, so the §6.4 evidence-based rerun was not triggered and **no DR entry was registered**.
 
 | Observation | Reading |
 |---|---|
