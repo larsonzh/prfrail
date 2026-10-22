@@ -51,6 +51,7 @@
 | C1 Linux AgentRunner native validation | ✅ Done (P19) | B4 (Windows T027 complete) | M | 2026-10-21 | `docs/validation/t027-c1-linux-native{,_EN}.md` |
 | P20 AGENTRUNNER-PID-READER | ✅ Done | C1 | M-L | 2026-10-22 | docs/validation/agentrunner-pid-reader{,_EN}.md |
 | P21 DIRECTIVE-COST-TIER | ✅ Done | P20 | M | 2026-10-22 | `docs/validation/directive-cost-tier{,_EN}.md` |
+| P22 GATES-DEBT-SWEEP | ✅ Done | P21 |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -869,6 +870,24 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Probe quota | none |
 | Freedom-list path | `docs/validation/evidence/DIRECTIVE-COST-TIER-freedom-list.md` |
 
+### P22 — `GATES-DEBT-SWEEP` · ✅ Done
+
+| Field | Content |
+|---|---|
+| Id | `GATES-DEBT-SWEEP` (directive bumped to v1.44; this slice changes §6.3 / §12.4 / §0.3 / the header, three files under `tools/gates/**`, and the two P20 Low findings) |
+| Status | ✅ **Done** (2026-10-23; directive v1.44; `--scope=index` and `--scope=tree` both with `changed=12` and `TOTAL_FAIL=0`, `SELFTEST: PASS 600/600`; the report pair and the freedom list are landed) |
+| Goal | close three debts in one slice: OB-112 (G4a checks that a BOM exists, not how many), OB-113 sub-items (1) and (2) (`--skip-base` plus criterion parallelization), and the OB-111 same-family evaluation; also fix the two P20 (5) Low findings |
+| Depends on | P21 closed (`HEAD` = `03c66cf`) |
+| Size | M-L (criterion body + framework code + self-test assertions + bilingual text) |
+| Steps | step 0 → (1) three judgments → (2) → (3) → (4) → (5) → (6) → (7) (1 final + 3 re-reviews) → 8a → (9) → 8b → 8c → (10) |
+| Current gap | OB-112 (observing): G4a only checks for a BOM; OB-113 (observing): `G4b` takes 52.4 s per run, base takes 20.0 s, and the criteria run serially; OB-111 (observing): same-family evaluation of the wording workaround; two P20 (5) Low findings (the lenient `Sscanf` at `ports.go:525` and a test comment) |
+| Deliverables | v1.44 of `DELIVERY_DIRECTIVE{,_EN}.md` (§6.3 / §12.4 / §0.3 / header); `tools/gates/lib/criteria/g4a.js`; `tools/gates/gate.js`; `tools/gates/selftest.js`; `tools/b4-e2e/ports.go`; `internal/adapters/agent_runner_postflight_test.go` (comment only); the report pair `docs/validation/directive-gates-debt-sweep{,_EN}.md`; the freedom list; this P22 status row and completion row |
+| Acceptance evidence | OB-112 / OB-113 handled item by item with `file:line`; new 0-BOM / 2-BOM negative assertions and a parallelization assertion in `selftest.js`; `--all --skip-base` omits only the four base records, and its criterion output matches the criterion part of `--all`; `TOTAL_FAIL=0` in all three scopes; `SELFTEST` green; the (3) offset precedes (4) / (5); at least one dispatch each for 8a / 8b |
+| Boundary | the `G4b` scan-cache logic is untouched (OB-113 sub-item (3) is left to a separate evaluation); §2.2 / §2.4 / the §5.2 matrix / the §7.5 figures are unchanged; `internal/chain/**`, `internal/console/**`, CONTRACTS / schema / fixtures / workflows untouched; no gitee push; OB-104 / OB-105 / OB-107 / OB-50 not handled; the permanent governance-slice pilot exemption is not handled |
+| Class | `[SLICE]` (directive slice; touches the criterion body and the gate framework ⇒ (7) is not downgraded) |
+| Probe quota | none |
+| Freedom-list path | `docs/validation/evidence/GATES-DEBT-SWEEP-freedom-list.md` |
+
 ---
 
 ## Known defects (to be handled before later slices)
@@ -1052,6 +1071,7 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | 2026-10-21 | P19 | **Linux AgentRunner native validation (`[SLICE]`, M)**: adds the bash driver `tools/validation/c1-linux/run-c1-faces.sh` and replays the f1-f4 groups plus the CLI leg of b4-e2e on an Ubuntu 24.04.5 VM (go1.27.1), with all 23 invocations green, 15 terminal verdicts matching the frozen baseline field by field, and `parentSnapshotHash` match=yes; the evidence pack `docs/validation/evidence/C1-2026-10-21/` archives 28 payload entries; the three Medium findings from ⑤⑥⑦ were closed through known limitations and narrowed reads (KL-C1-1 / KL-C1-7 / KL-C1-8), and KL-C1-7 is promoted to a reuse precondition. **✅ Done (directive v1.41, 2026-10-21)**: `TOTAL_FAIL=0` in all three scopes and `SELFTEST: PASS 588/588`; committed as `e1227b6`, CI run `39644901409` green on both legs, package-level `ok` lines 17 on ubuntu and 15 on windows, each leg `SELFTEST` 588/588 and `TOTAL_FAIL=0`. | docs/validation/t027-c1-linux-native.md |
 | 2026-10-22 | P20 | **Closes two debts (`[SLICE]`, M-L; directive v1.42)**: OB-109 lands as **form C** - the A5 frozen facts extend from five to six and gain `ProcessPidReportsHash` (domain `proofrail:agent-runner-pid-reports:1`), binding the byte digests of the parent / child reports into the routeEvidence layout; OB-110 fixes the reader-side three-state semantics - `present == false` ⇒ `treeGone == false` ⇒ `uncertain`; OB-111 is **registered only, not acted on**; the ⑤ / ⑥ / ⑦ conclusion strings and the one Medium from ⑤ r1 (double BOM) are repaired. **✅ Done (directive v1.42, 2026-10-22)**: `TOTAL_FAIL=0` in all three scopes and `SELFTEST` 588/588; committed and pushed to origin (gitee not pushed), with the CI readings in the report. | docs/validation/agentrunner-pid-reader.md |
 | 2026-10-22 | P21 | **Governance slice (OB-31 threshold unification + OB-68 label and tier mapping + OB-84 caliber hand-off; directive v1.43)**: the §5.2 high-risk row, the ⑨ row of §5.3 and §9.2 clause 3 are unified to `R≥2` high risk and `R>3` pause and share one R-count definition; the six ⑦ labels in §5.1 / §7.1 / three §7.5 rows / §8.2 are unified as "⑦ (chosen from the §5.2 tier table)", §8.2 gains a tier-mapping table and §7.5 gains a ⑦ cost-definition paragraph; the OB-31 / OB-68 disposition cells of §12.4 flip to `Resolved` and OB-113 is registered. **✅ Done (directive v1.43, 2026-10-22)**: `TOTAL_FAIL=0` in all three scopes and `SELFTEST` 588/588; committed and pushed to `origin` (gitee not pushed) with the CI readings in the report; per §11.2 this row records the report path only. | docs/validation/directive-cost-tier.md |
+| 2026-10-23 | P22 | **Gate-debt closeout (`[SLICE]`, M-L; directive v1.44)**: OB-112 lands as consecutive BOM counting (`.md` / `.ps1` exactly one, every other type zero, the detail records `bom=0` / `bom=2`); OB-113 sub-items (1)(2) land (`--all --skip-base` and the concurrent criterion scheduler); OB-111 keeps candidate (3); both P20 Low findings are fixed; the ⑤ r1 Medium (an over-strong equivalence claim) and the ⑦ r1 Medium (`--help --skip-base` escaped the guard) are closed after remediation. **✅ Done (directive v1.44, 2026-10-23)**: `--scope=index` / `--scope=tree` each with `changed=12` and `TOTAL_FAIL=0`, `SELFTEST: PASS 600/600`; per §11.2 this row records the report path only. | docs/validation/directive-gates-debt-sweep.md |
 
 > **Ledger integrity note (2026-09-21, back-filled under explicit user authorisation)**: this table had no rows appended after A4. **On 2026-09-21 the five rows A5/A6/A7/B2/B3a were back-filled from each slice's own validation report** (under the three constraints: no memory-based entries, verifiable fields only, missing fields left blank and marked as historic gaps, nothing fabricated); the B3b row was written before this back-fill, which is why the five rows follow it.
 > **Back-filled** (verified by slice `LEDGER-BACKFILL`, 2026-09-29): **the B3a paragraph in `DEV_PLAN{,_EN}.md` was added by commit `dd36b9b`** (`DEV_PLAN.md:137` and `_EN.md:138`); the earlier still-owed wording was corrected by slice `LEDGER-BACKFILL`, and **the back-fill action does not need to be repeated**.

@@ -51,6 +51,7 @@
 | C1 Linux AgentRunner native validation | ✅ 完成（P19） | B4（Windows T027 完成） | M | 2026-10-21 | `docs/validation/t027-c1-linux-native{,_EN}.md` |
 | P20 AGENTRUNNER-PID-READER | ✅ 完成 | C1 | M-L | 2026-10-22 | docs/validation/agentrunner-pid-reader{,_EN}.md |
 | P21 DIRECTIVE-COST-TIER | ✅ 完成 | P20 | M | 2026-10-22 | `docs/validation/directive-cost-tier{,_EN}.md` |
+| P22 GATES-DEBT-SWEEP | ✅ 已完成 | P21 |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -883,6 +884,24 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 探针额度 | 无 |
 | 执行自由度清单落盘路径 | `docs/validation/evidence/DIRECTIVE-COST-TIER-freedom-list.md` |
 
+### P22 — `GATES-DEBT-SWEEP` · ✅ 已完成
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `GATES-DEBT-SWEEP`（准则升 v1.44；本片改 §6.3 / §12.4 / §0.3 / 头部 + `tools/gates/**` 三文件 + P20 两条 Low） |
+| 状态 | ✅ **已完成**（2026-10-23；准则 v1.44；`--scope=index` 与 `--scope=tree` 均 `changed=12` 且 `TOTAL_FAIL=0`、`SELFTEST: PASS 600/600`；报告对与自由度清单已落盘） |
+| 目标 | 一片收口三项欠账：OB-112（G4a 只验「有 BOM」不验「个数」）、OB-113 子项 ①②（`--skip-base` + 判据并行化）、OB-111 同族评估；并顺手修复 P20 的 ⑤ 两条 Low |
+| 依赖 | P21 已闭环（`HEAD` = `03c66cf`） |
+| 规模 | M-L（判据本体 + 框架代码 + 自测断言 + 双语文本） |
+| 步骤 | 步骤 0 → ①（三项判定）→ ② → ③ → ④ → ⑤ → ⑥ → ⑦（1 终审 + 3 复审）→ ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| 现状缺口 | OB-112（观察中）G4a 只验「有 BOM」；OB-113（观察中）`G4b` 单次 52.4 s、base 20.0 s 且判据串行；OB-111（观察中）改写规避同族评估；P20 两条 ⑤ Low（`ports.go:525` 的宽松 `Sscanf` 与测试注释） |
+| 交付物 | `DELIVERY_DIRECTIVE{,_EN}.md` 的 v1.44（§6.3 / §12.4 / §0.3 / 头部）；`tools/gates/lib/criteria/g4a.js`；`tools/gates/gate.js`；`tools/gates/selftest.js`；`tools/b4-e2e/ports.go`；`internal/adapters/agent_runner_postflight_test.go`（仅注释）；报告对 `docs/validation/directive-gates-debt-sweep{,_EN}.md`；自由度清单；本 P22 状态行与完成行 |
+| 验收证据 | OB-112 / OB-113 逐项处置（带 `file:line`）；`selftest.js` 新增 0 BOM / 2 BOM 反例断言与并行化断言；`--all --skip-base` 只省略 base 四条、判据输出与 `--all` 的判据部分一致；三作用域 `TOTAL_FAIL=0`；`SELFTEST` 全绿；③ 偏移早于 ④ / ⑤；⑧a / ⑧b 各至少 1 次派单 |
+| 边界 | 不改 `G4b` 的扫描缓存逻辑（OB-113 子项 ③ 留独立评估）；不改 §2.2 / §2.4 / §5.2 矩阵 / §7.5 数值；不动 `internal/chain/**`、`internal/console/**`、CONTRACTS / schema / fixtures / workflows；不推 gitee；不处理 OB-104 / OB-105 / OB-107 / OB-50；不处理「治理片永久豁免试点」 |
+| 分级 | `[SLICE]`（治理片；触判据本体与门禁框架 ⇒ ⑦ 不降级） |
+| 探针额度 | 无 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/GATES-DEBT-SWEEP-freedom-list.md` |
+
 ---
 ## 已知缺陷（后续切片前处理）
 
@@ -1065,6 +1084,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 2026-10-21 | P19 | **Linux AgentRunner native validation（`[SLICE]`、M）**：新增 bash 驱动 `tools/validation/c1-linux/run-c1-faces.sh`，在 Ubuntu 24.04.5 VM（go1.27.1）上重放 b4-e2e 的 f1–f4 四组与 CLI 腿，23 次调用全绿、15 个终局 verdict 与冻结基线逐字段一致、`parentSnapshotHash` match=yes；证据包 `docs/validation/evidence/C1-2026-10-21/` 归档 28 件载荷；⑤⑥⑦ 三个 Medium 均以已知限制与收窄读闭合（KL-C1-1 / KL-C1-7 / KL-C1-8），KL-C1-7 升格为复用前置。**✅ 已完成（准则 v1.41，2026-10-21）**：三作用域 `TOTAL_FAIL=0`、`SELFTEST: PASS 588/588`；提交 `e1227b6`，CI run `39644901409` 双腿 `success`，包级 `ok` 行 ubuntu 17 / windows 15，腿内 `SELFTEST` 588/588、`TOTAL_FAIL=0`。 | docs/validation/t027-c1-linux-native.md |
 | 2026-10-22 | P20 | **收口两笔欠账（`[SLICE]`、M-L；准则 v1.42）**：OB-109 以**形态丙**落地——A5 冻结事实由五枚扩为六枚，新增 `ProcessPidReportsHash`（域 `proofrail:agent-runner-pid-reports:1`），父 / 子报告字节摘要绑定进 routeEvidence 布局；OB-110 修读者侧三态语义——`present == false` ⇒ `treeGone == false` ⇒ `uncertain`；OB-111 **只补登不处置**；⑤ / ⑥ / ⑦ 的结论串与 ⑤ r1 一处 Medium（双 BOM）已整改。**✅ 已完成（准则 v1.42，2026-10-22）**：三作用域 `TOTAL_FAIL=0`、`SELFTEST` 588/588；已提交并推送 origin（未推 gitee），CI 读数见报告。 | docs/validation/agentrunner-pid-reader.md |
 | 2026-10-22 | P21 | **准则治理类切片（OB-31 阈值统一 + OB-68 标签与档位映射 + OB-84 口径衔接；准则 v1.43）**：§5.2 高风险行、§5.3 的 ⑨ 行与 §9.2 第 3 条的 R 阈值统一为 `R≥2` 高风险、`R>3` 暂停，并共用同一 R 计数定义；§5.1 / §7.1 / §7.5 三行 / §8.2 六处的 ⑦ 标签统一为「⑦（§5.2 分档表选定）」，§8.2 新增档位映射表，§7.5 新增 ⑦ 成本定义段；§12.4 的 OB-31 / OB-68 处置列翻 `已处置` 并登记 OB-113。**✅ 已完成（准则 v1.43，2026-10-22）**：三作用域 `TOTAL_FAIL=0`、`SELFTEST` 588/588；已提交并推送 `origin`（未推 gitee），CI 读数见报告；本行按 §11.2 只记报告路径。 | docs/validation/directive-cost-tier.md |
+| 2026-10-23 | P22 | **门禁欠账收口（`[SLICE]`、M-L；准则 v1.44）**：OB-112 以连续 BOM 计数落地（`.md` / `.ps1` 恰 1 个、其余类型 0 个，detail 记 `bom=0` / `bom=2`）；OB-113 子项①② 落地（`--all --skip-base` 与判据并发调度器）；OB-111 取候选③ 维持现状；P20 两条 Low 修完；⑤ r1 一处 Medium（等价性声明过强）与 ⑦ r1 一处 Medium（`--help --skip-base` 逃过守卫）整改后收敛。**✅ 已完成（准则 v1.44，2026-10-23）**：`--scope=index` / `--scope=tree` 各 `changed=12` 且 `TOTAL_FAIL=0`、`SELFTEST: PASS 600/600`；本行按 §11.2 只记报告路径。 | docs/validation/directive-gates-debt-sweep.md |
 
 > **台账完整性注记（2026-09-21，已按用户授权补录）**：本表自 A4 行之后长期未追加完成行。**2026-09-21 依据各切片自己的验证报告补录 A5/A6/A7/B2/B3a 五行**（受"不凭记忆、只补可核验字段、缺失留空并标注历史缺失、不编造"三条约束），B3b 行先于本次补录写入，故五行列于其后；各行的日期/提交号/运行号/摘要均逐项标注来源，无法核验者已标注 **历史缺失**。
 > **已回填**（本片核实，2026-09-29）：**B3a 的 `DEV_PLAN{,_EN}.md` 段落已由提交 `dd36b9b` 补入**（`DEV_PLAN.md:137` 与 `_EN.md:138`）；原注记的过期表述由切片 `LEDGER-BACKFILL` 更正，**回填动作无需重复执行**。

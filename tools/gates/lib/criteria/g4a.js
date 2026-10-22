@@ -32,11 +32,19 @@ module.exports = {
       }
       const b = ctx.readBytes(f);
       if (!b) continue; // deleted (or unreadable) file: nothing to submit
-      const bom = b.length >= 3 && b[0] === BOM[0] && b[1] === BOM[1] && b[2] === BOM[2];
+      let bomCount = 0;
+      while (
+        bomCount * 3 + 3 <= b.length &&
+        b[bomCount * 3] === BOM[0] &&
+        b[bomCount * 3 + 1] === BOM[1] &&
+        b[bomCount * 3 + 2] === BOM[2]
+      ) {
+        bomCount++;
+      }
       const crlf = b.indexOf(CRLF) >= 0;
       const want = /\.(md|ps1)$/i.test(f);
-      const ok = want ? bom && !crlf : !bom && !crlf;
-      if (!ok) bad.push(f + ' bom=' + bom + ' crlf=' + crlf);
+      const ok = want ? bomCount === 1 && !crlf : bomCount === 0 && !crlf;
+      if (!ok) bad.push(f + ' bom=' + bomCount + ' crlf=' + crlf);
     }
     out.rec(
       'G4a',

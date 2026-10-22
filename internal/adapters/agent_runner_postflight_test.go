@@ -512,10 +512,11 @@ func TestAgentRunnerPostflightRejectsUnreadablePIDReports(t *testing.T) {
 	})
 }
 
-// agentRunnerSeedEmptyChildPIDReport writes the "no child process was spawned"
-// pid report. The offline harness stub writes stub-child.pid only when it spawns
-// a child, so a run with no descendants leaves only stub.pid; leg 5 requires both
-// reports, and an empty child report is the honest "reported no children" form.
+// agentRunnerSeedEmptyChildPIDReport writes the empty child pid report (zero
+// bytes) that the constant-write contract produces: the offline harness stub
+// always writes both stub.pid and stub-child.pid, and leaves the child report
+// empty when it spawned no child process. Leg 5 requires both reports, so a
+// no-child run needs this seed to match what the stub writes itself.
 func agentRunnerSeedEmptyChildPIDReport(t *testing.T, evidenceDir string) {
 	t.Helper()
 	if err := os.WriteFile(filepath.Join(evidenceDir, agentRunnerChildPIDReportFileName), nil, 0o600); err != nil {

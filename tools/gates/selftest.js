@@ -50,6 +50,15 @@ const G5B = require('./lib/criteria/g5b');
 const G5C = require('./lib/criteria/g5c');
 const G5D = require('./lib/criteria/g5d');
 
+/**
+ * gate.js assigns `module.exports` at the END of its body, so a top-level require here
+ * returns the pre-assignment object whenever gate.js is the entry point (`--selftest`).
+ * Resolve it at call time instead, after the first await inside runTests().
+ */
+function gateApi() {
+  return require('./gate');
+}
+
 const FIXTURES_DIR = path.join(__dirname, 'testdata', 'fixtures');
 const HISTORICAL_DIR = path.join(__dirname, 'testdata', 'historical');
 
@@ -598,6 +607,7 @@ const BOLD_LABEL_COLLECTOR = '    m = LABEL_BOLD_RE.exec(l);\n    if (m) out.add
 const CN_FIRST_STATUS_WORD = "  cn: ['观察中', ";
 const G6_SOURCE = path.join(__dirname, 'lib', 'criteria', 'g6.js');
 const G3A_SOURCE = path.join(__dirname, 'lib', 'criteria', 'g3a.js');
+const G4A_SOURCE = path.join(__dirname, 'lib', 'criteria', 'g4a.js');
 const G7_SOURCE = path.join(__dirname, 'lib', 'criteria', 'g7.js');
 const G5C_SOURCE = path.join(__dirname, 'lib', 'criteria', 'g5c.js');
 const G5D_SOURCE = path.join(__dirname, 'lib', 'criteria', 'g5d.js');
@@ -1001,12 +1011,14 @@ function loadMutatedG5b(from, to, tag) {
   return loadMutatedCriteria(G5B_SOURCE, from, to, tag);
 }
 
-function runTests() {
+async function runTests() {
+  // The suite is async from T90 on. This first await also lets gate.js finish assigning
+  // `module.exports` before gateApi() is called (circular require on the --selftest path).
+  await Promise.resolve();
   CHECKS.length = 0;
   MUTATION_LOG.length = 0;
   INFOS.length = 0;
   const v = (key) => FIXTURES[key].virtual;
-
   // ---- T13 precondition: fixture naming convention (see FIXTURE_DISK_MUST_NOT_BE_MD).
   if (FIXTURE_DISK_MUST_NOT_BE_MD) {
     const offenders = Object.keys(FIXTURES).filter((k) => /\.md$/i.test(FIXTURES[k].disk));
@@ -4091,9 +4103,62 @@ function runTests() {
     const bomOutDetail = detailOf(bomOut.records, 'G4a');
     check('T52 the identical bytes outside the tree DO fail G4a (the exclusion is the only reason the in-tree run is green)',
       verdictOf(bomOut.records, 'G4a') === 'FAIL' &&
-        /fixture-g8-bom-crlf\.md bom=true crlf=true/.test(bomOutDetail) &&
-        /fixture-g8-bom-nobom\.md bom=false crlf=false/.test(bomOutDetail),
+        /fixture-g8-bom-crlf\.md bom=1 crlf=true/.test(bomOutDetail) &&
+        /fixture-g8-bom-nobom\.md bom=0 crlf=false/.test(bomOutDetail),
       'verdict=' + verdictOf(bomOut.records, 'G4a') + ' detail=' + bomOutDetail);
+
+    // ---- T89: G4a counts CONSECUTIVE BOMs (OB-112). The old boolean test only looked at the
+    // first three bytes, so a doubled BOM satisfied "has a BOM" and slipped through; the count
+    // is now the load-bearing value. The probe is an in-memory Buffer, not a disk fixture.
+    // (Id renumbered from T80 in 7 r1: T80-T83 already belong to the G9-c temp-artifact guard.)
+    {
+      const BOM3 = Buffer.from([0xef, 0xbb, 0xbf]);
+      const body = Buffer.from('# t\n', 'utf8');
+      const probe = (path, buf) => {
+        const report = createReport();
+        G4A.run(
+          {
+            changedPaths: [path],
+            readBytes: () => buf,
+            isIgnored: () => false,
+            isEvidenceTree: () => false,
+          },
+          report
+        );
+        const rec = report.records.find((r) => r.id === 'G4a');
+        return { verdict: rec.verdict, detail: rec.detail };
+      };
+      const one = probe('docs/t089/one.md', Buffer.concat([BOM3, body]));
+      check('T89 G4a accepts a .md carrying exactly one BOM',
+        one.verdict === 'PASS', 'verdict=' + one.verdict + ' detail=' + one.detail);
+      const none = probe('docs/t089/none.md', body);
+      check('T89 G4a fails a .md carrying zero BOMs and reports bom=0',
+        none.verdict === 'FAIL' && /bom=0\b/.test(none.detail),
+        'verdict=' + none.verdict + ' detail=' + none.detail);
+      const two = probe('docs/t089/two.md', Buffer.concat([BOM3, BOM3, body]));
+      check('T89 G4a fails a .md carrying two consecutive BOMs and reports bom=2',
+        two.verdict === 'FAIL' && /bom=2\b/.test(two.detail),
+        'verdict=' + two.verdict + ' detail=' + two.detail);
+      const stray = probe('docs/t089/stray.txt', Buffer.concat([BOM3, Buffer.from('x\n', 'utf8')]));
+      check('T89 G4a fails a non-.md file carrying one BOM and reports bom=1',
+        stray.verdict === 'FAIL' && /bom=1\b/.test(stray.detail),
+        'verdict=' + stray.verdict + ' detail=' + stray.detail);
+      const widened = loadMutatedCriteria(G4A_SOURCE, 'bomCount === 1', 'bomCount >= 1', 't89-double-bom-widened');
+      const widenedReport = createReport();
+      widened.exports.run(
+        {
+          changedPaths: ['docs/t089/two.md'],
+          readBytes: () => Buffer.concat([BOM3, BOM3, body]),
+          isIgnored: () => false,
+          isEvidenceTree: () => false,
+        },
+        widenedReport
+      );
+      const widenedRec = widenedReport.records.find((r) => r.id === 'G4a');
+      check('T89 reverse mutation (bomCount >= 1) makes the double-BOM file pass again, so the equality is load-bearing',
+        widenedRec.verdict === 'PASS' && widened.applied && widened.identical,
+        'verdict=' + widenedRec.verdict + ' applied=' + widened.applied + ' identical=' + widened.identical);
+    }
 
     // ---- T53: G8-b breakage matrix augmentation (parse failures must fail closed).
     const malformed = g8Probe('G8-b', ['g8-b-malformed-sums']);
@@ -5056,6 +5121,83 @@ function runTests() {
     );
   }
 
+  // ---- T90: the concurrent scheduler keeps report order while letting a criterion await
+  // (OB-113 sub-item 2). It runs GATE.runCriteriaConcurrent itself, so a regression inside
+  // gate.js - not a local re-derivation - is what turns these assertions red. It also pins the
+  // --skip-base guard order (7 r1 finding 1: the guard must precede the --help early return).
+  // (Id renumbered from T81 in 7 r1: T80-T83 already belong to the G9-c temp-artifact guard.)
+  {
+    const GATE = gateApi();
+    const helpOnly = await GATE.main(['node', 'gate', '--help']);
+    check('T90 --help on its own still exits 0 with the usage text',
+      helpOnly.code === 0 && typeof helpOnly.stdout === 'string' && helpOnly.stdout.length > 0,
+      'code=' + helpOnly.code + ' stdout_len=' + (helpOnly.stdout || '').length);
+    const helpSkip = await GATE.main(['node', 'gate', '--help', '--skip-base']);
+    check('T90 the --skip-base guard fires before the --help early return (no combination escapes it)',
+      helpSkip.code === 2 && /--skip-base is only valid together with --all/.test(helpSkip.error || ''),
+      'code=' + helpSkip.code + ' error=' + JSON.stringify(helpSkip.error || '').slice(0, 90));
+    let inFlight = 0;
+    let maxInFlight = 0;
+    const delayed = (id, ids, delayMs) => ({
+      id,
+      label: id,
+      run: (ctx, out) =>
+        new Promise((resolve) => {
+          inFlight++;
+          maxInFlight = Math.max(maxInFlight, inFlight);
+          setTimeout(() => {
+            inFlight--;
+            for (const r of ids) out.rec(r, 'PASS', r, id);
+            resolve();
+          }, delayMs);
+        }),
+    });
+    // Synchronous twin of `delayed`, used by the reject-path assertion below.
+    const mkSync = (id) => ({
+      id,
+      label: id,
+      run: (ctx, out) => out.rec(id + '-rec', 'PASS', id + '-rec', 'sync'),
+    });
+    const asyncMap = {
+      A: delayed('A', ['A-1', 'A-2'], 150),
+      B: delayed('B', ['B-1'], 150),
+      C: delayed('C', ['C-1'], 0),
+    };
+    const asyncOut = createReport();
+    const started = Date.now();
+    await GATE.runCriteriaConcurrent(['A', 'B', 'C'], asyncMap, {}, asyncOut);
+    const elapsed = Date.now() - started;
+    check('T90 concurrent scheduling keeps every record in plan order',
+      asyncOut.records.map((r) => r.id).join(',') === 'A-1,A-2,B-1,C-1',
+      'order=' + asyncOut.records.map((r) => r.id).join(','));
+    check('T90 two async criteria overlap instead of running back to back',
+      elapsed < 280, 'elapsed=' + elapsed + 'ms serial-floor=300ms');
+    check('T90 two async criteria are pending at the same moment (impossible under a serial loop)',
+      maxInFlight >= 2, 'maxInFlight=' + maxInFlight);
+    const syncMap = {
+      S1: { id: 'S1', label: 'S1', run: (ctx, out) => out.rec('S1-rec', 'PASS', 'S1-rec', 'sync') },
+      S2: { id: 'S2', label: 'S2', run: (ctx, out) => out.rec('S2-rec', 'PASS', 'S2-rec', 'sync') },
+    };
+    const syncOut = createReport();
+    await GATE.runCriteriaConcurrent(['S2', 'S1'], syncMap, {}, syncOut);
+    check('T90 synchronous criteria go through the same scheduler and keep plan order',
+      syncOut.records.map((r) => r.id).join(',') === 'S2-rec,S1-rec',
+      'order=' + syncOut.records.map((r) => r.id).join(','));
+    // T90: a rejecting criterion rejects the whole plan run and leaks no records.
+    let t90Leaked = 0;
+    const t90Bad = { id: 'BAD', run: () => Promise.reject(new Error('boom')) };
+    const t90Out = createReport();
+    let t90Rejected = false;
+    try {
+      await GATE.runCriteriaConcurrent(['OK', 'BAD'], { OK: mkSync('OK'), BAD: t90Bad }, {}, t90Out);
+    } catch (e) {
+      t90Rejected = true;
+    }
+    t90Leaked = t90Out.records.length;
+    check('T90 a rejecting criterion rejects the plan and writes no partial records',
+      t90Rejected === true && t90Leaked === 0, 'rejected=' + t90Rejected + ' records=' + t90Leaked);
+  }
+
   // ---- F1: a stale mutation (no-op) must not silently weaken the suite.
   {
     const stale = MUTATION_LOG.filter((m) => !m.applied);
@@ -5079,18 +5221,19 @@ function runTests() {
   return { ok: failed.length === 0, stdout: lines.join('\n'), passed: CHECKS.length - failed.length, total: CHECKS.length };
 }
 
-function run() {
+async function run() {
   try {
-    return runTests();
+    return await runTests();
   } catch (e) {
     return { ok: false, stdout: 'SELFTEST: FAIL 0/0 :: ' + (e && e.stack ? e.stack : e), passed: 0, total: 0 };
   }
 }
 
 if (require.main === module) {
-  const res = run();
-  process.stdout.write(res.stdout + '\n');
-  process.exitCode = res.ok ? 0 : 1;
+  run().then((res) => {
+    process.stdout.write(res.stdout + '\n');
+    process.exitCode = res.ok ? 0 : 1;
+  });
 }
 
 module.exports = { run, FIXTURES, EXPECTED_CORPUS_FAILS };

@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -521,8 +522,8 @@ func readPIDs(path string) ([]int, bool, error) {
 		if line == "" {
 			continue
 		}
-		var pid int
-		if _, err := fmt.Sscanf(line, "%d", &pid); err != nil || pid <= 0 {
+		pid, err := strconv.Atoi(line)
+		if err != nil || pid <= 0 {
 			return nil, false, fmt.Errorf("unreadable pid %q in %s", line, path)
 		}
 		pids = append(pids, pid)

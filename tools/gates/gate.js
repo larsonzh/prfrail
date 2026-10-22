@@ -4,7 +4,7 @@
 /**
  * DELIVERY_DIRECTIVE section 6.3 gate runner - single entry point.
  *
- *   node tools/gates/gate.js --all [--scope=tree|index|range:<A>..<B>|ci]
+ *   node tools/gates/gate.js --all [--skip-base] [--scope=tree|index|range:<A>..<B>|ci]
  *   node tools/gates/gate.js --check=<ID> [--scope=...]
  *   node tools/gates/gate.js --list
  *   node tools/gates/gate.js --selftest
@@ -73,7 +73,7 @@ const RUN_ORDER = [
 ];
 
 const USAGE =
-  'usage: node tools/gates/gate.js --all|--check=<ID>|--list|--selftest [--scope=tree|index|range:<A>..<B>|ci]';
+  'usage: node tools/gates/gate.js --all [--skip-base]|--check=<ID>|--list|--selftest [--scope=tree|index|range:<A>..<B>|ci]';
 
 /**
  * Criterion ids are compared after folding every non-alphanumeric separator
@@ -130,6 +130,26 @@ function runBaseGates(ctx, out) {
   );
 }
 
+/**
+ * Runs every planned criterion concurrently and writes the records in plan order.
+ * Criteria are synchronous today, so this scheduler yields no wall-clock gain yet;
+ * it is the contract that lets a slow criterion (e.g. G4b) go async later without
+ * disturbing the report order (OB-113 sub-item 2). Each criterion writes into its
+ * own report buffer, so one FAIL can never leak into another criterion's records.
+ */
+async function runCriteriaConcurrent(plan, criteriaMap, ctx, out) {
+  const jobs = plan.map((key) => {
+    const buf = createReport();
+    return Promise.resolve()
+      .then(() => criteriaMap[key].run(ctx, buf))
+      .then(() => ({ key, buf }));
+  });
+  const results = await Promise.all(jobs);
+  for (const { buf } of results) {
+    for (const r of buf.records) out.rec(r.id, r.verdict, r.label, r.detail);
+  }
+}
+
 function selectCriteria(check) {
   const want = normalizeId(check);
   const selected = [];
@@ -153,14 +173,15 @@ function listCriteria() {
   return lines.join('\n');
 }
 
-function main(argv) {
+async function main(argv) {
   const args = argv.slice(2);
-  const opt = { mode: null, check: null, scope: 'tree' };
+  const opt = { mode: null, check: null, scope: 'tree', skipBase: false };
   for (const a of args) {
     if (a === '--all') opt.mode = 'all';
     else if (a === '--selftest') opt.mode = 'selftest';
     else if (a === '--list') opt.mode = 'list';
     else if (a === '--help' || a === '-h') opt.mode = 'help';
+    else if (a === '--skip-base') opt.skipBase = true;
     else if (a.startsWith('--check=')) {
       opt.mode = 'check';
       opt.check = a.slice('--check='.length);
@@ -168,13 +189,19 @@ function main(argv) {
     else return { code: 2, error: 'unknown argument: ' + a + '\n' + USAGE };
   }
   if (!opt.mode) return { code: 2, error: USAGE };
+  // The guard runs BEFORE the --help early return: `--help --skip-base` used to exit 0 because
+  // help short-circuited first, which made the documented "only together with --all" contract
+  // false for that one combination (7 r1 finding 1). One guard, one order, no exception clause.
+  if (opt.skipBase && opt.mode !== 'all') {
+    return { code: 2, error: '--skip-base is only valid together with --all\n' + USAGE };
+  }
   if (opt.mode === 'help') return { code: 0, stdout: USAGE };
   if (!parseScopeText(opt.scope)) {
     return { code: 2, error: 'invalid --scope value: ' + opt.scope + '\n' + USAGE };
   }
   if (opt.mode === 'list') return { code: 0, stdout: listCriteria() };
   if (opt.mode === 'selftest') {
-    const res = require('./selftest').run();
+    const res = await require('./selftest').run();
     return { code: res.ok ? 0 : 1, stdout: res.stdout };
   }
 
@@ -201,10 +228,8 @@ function main(argv) {
 
   const plan = opt.mode === 'all' ? RUN_ORDER : null;
   if (plan) {
-    for (const key of plan) {
-      CRITERIA[key].run(ctx, out);
-    }
-    runBaseGates(ctx, out);
+    await runCriteriaConcurrent(plan, CRITERIA, ctx, out);
+    if (!opt.skipBase) runBaseGates(ctx, out);
   } else {
     const selected = selectCriteria(opt.check);
     if (!selected.length) {
@@ -212,7 +237,10 @@ function main(argv) {
     } else {
       for (const s of selected) {
         const tmp = createReport();
-        s.mod.run(ctx, tmp);
+        // Awaited for the same reason the `--all` path awaits runCriteriaConcurrent: a
+        // criterion that returns a Promise would otherwise resolve after the report was
+        // rendered, and `--check` would print an empty verdict set without any error.
+        await s.mod.run(ctx, tmp);
         for (const r of tmp.records) {
           // Prefix match: a sub-check id may carry a file suffix (G3(a.1) <file>), and the
           // filter must still select it (otherwise `--check=G3-a.1` would silently drop the
@@ -228,10 +256,10 @@ function main(argv) {
   return { code: out.fails().length ? 1 : 0, stdout: header + '\n' + body };
 }
 
-function run() {
+async function run() {
   let result;
   try {
-    result = main(process.argv);
+    result = await main(process.argv);
   } catch (e) {
     // Batch 2f (NF-3) / DEF-1: a THROWN UsageError (e.g. an unresolvable range endpoint,
     // see ctx.js `--scope=range` validation) used to leave through this `return`, so the
@@ -258,7 +286,9 @@ function run() {
 }
 
 if (require.main === module) {
-  process.exitCode = run().code;
+  run().then((r) => {
+    process.exitCode = r.code;
+  });
 }
 
-module.exports = { run, main, CRITERIA, RUN_ORDER, listCriteria };
+module.exports = { run, main, CRITERIA, RUN_ORDER, listCriteria, runCriteriaConcurrent };
