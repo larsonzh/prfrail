@@ -49,7 +49,10 @@ func terminalUnknownSettlement() AgentRunnerTerminalSettlement {
 // queueHashFive is the fifth distinct digest used by the frozen-facts fixture.
 const queueHashFive = "sha256:5555555555555555555555555555555555555555555555555555555555555555"
 
-// terminalFrozenFacts is the five-digest fact set a completed terminal must
+// queueHashSix is the sixth distinct digest used by the frozen-facts fixture.
+const queueHashSix = "sha256:6666666666666666666666666666666666666666666666666666666666666666"
+
+// terminalFrozenFacts is the six-digest fact set a completed terminal must
 // carry; the chain refuses to route a completion without it.
 func terminalFrozenFacts() *AgentRunnerFrozenFacts {
 	return &AgentRunnerFrozenFacts{
@@ -58,6 +61,7 @@ func terminalFrozenFacts() *AgentRunnerFrozenFacts {
 		LogHash:                 queueHashThree,
 		UsageHash:               queueHashFour,
 		ProcessStopEvidenceHash: queueHashFive,
+		ProcessPidReportsHash:   queueHashSix,
 	}
 }
 

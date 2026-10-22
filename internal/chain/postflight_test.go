@@ -15,6 +15,7 @@ const (
 	postflightLogHash      = "sha256:0000000000000000000000000000000000000000000000000000000000000023"
 	postflightUsageHash    = "sha256:0000000000000000000000000000000000000000000000000000000000000024"
 	postflightStopHash     = "sha256:0000000000000000000000000000000000000000000000000000000000000025"
+	postflightPidRepHash   = "sha256:0000000000000000000000000000000000000000000000000000000000000026"
 )
 
 func testFrozenFacts() AgentRunnerFrozenFacts {
@@ -24,19 +25,21 @@ func testFrozenFacts() AgentRunnerFrozenFacts {
 		LogHash:                 postflightLogHash,
 		UsageHash:               postflightUsageHash,
 		ProcessStopEvidenceHash: postflightStopHash,
+		ProcessPidReportsHash:   postflightPidRepHash,
 	}
 }
 
 func TestAgentRunnerFrozenFactsValidateFailsClosed(t *testing.T) {
 	tests := map[string]func(*AgentRunnerFrozenFacts){
-		"missing manifest":  func(facts *AgentRunnerFrozenFacts) { facts.ManifestHash = "" },
-		"missing diff":      func(facts *AgentRunnerFrozenFacts) { facts.DiffHash = "" },
-		"missing log":       func(facts *AgentRunnerFrozenFacts) { facts.LogHash = "" },
-		"missing usage":     func(facts *AgentRunnerFrozenFacts) { facts.UsageHash = "" },
-		"missing stop":      func(facts *AgentRunnerFrozenFacts) { facts.ProcessStopEvidenceHash = "" },
-		"invalid digest":    func(facts *AgentRunnerFrozenFacts) { facts.LogHash = "not-a-hash" },
-		"duplicate digest":  func(facts *AgentRunnerFrozenFacts) { facts.DiffHash = facts.ManifestHash },
-		"collision on stop": func(facts *AgentRunnerFrozenFacts) { facts.ProcessStopEvidenceHash = facts.UsageHash },
+		"missing manifest":    func(facts *AgentRunnerFrozenFacts) { facts.ManifestHash = "" },
+		"missing diff":        func(facts *AgentRunnerFrozenFacts) { facts.DiffHash = "" },
+		"missing log":         func(facts *AgentRunnerFrozenFacts) { facts.LogHash = "" },
+		"missing usage":       func(facts *AgentRunnerFrozenFacts) { facts.UsageHash = "" },
+		"missing stop":        func(facts *AgentRunnerFrozenFacts) { facts.ProcessStopEvidenceHash = "" },
+		"missing pid reports": func(facts *AgentRunnerFrozenFacts) { facts.ProcessPidReportsHash = "" },
+		"invalid digest":      func(facts *AgentRunnerFrozenFacts) { facts.LogHash = "not-a-hash" },
+		"duplicate digest":    func(facts *AgentRunnerFrozenFacts) { facts.DiffHash = facts.ManifestHash },
+		"collision on stop":   func(facts *AgentRunnerFrozenFacts) { facts.ProcessStopEvidenceHash = facts.UsageHash },
 	}
 	for name, mutate := range tests {
 		t.Run(name, func(t *testing.T) {
@@ -69,8 +72,15 @@ func TestFrozenFactsRebuildFromRoutingEvidence(t *testing.T) {
 	if rebuilt != facts {
 		t.Fatalf("rebuilt facts mismatch: %+v", rebuilt)
 	}
-	if _, err := frozenFactsFromEvidence(evidence[:6]); !errors.Is(err, ErrInvalidPostflightFacts) {
+	if _, err := frozenFactsFromEvidence(evidence[:7]); !errors.Is(err, ErrInvalidPostflightFacts) {
 		t.Fatalf("short evidence must fail closed, got %v", err)
+	}
+	// Dropping only the sixth digest leaves every remaining position valid, so the
+	// refusal must come from the missing digest rather than from the length.
+	missingSixth := append([]string{}, evidence...)
+	missingSixth[postflightFactsPrefix+5] = ""
+	if _, err := frozenFactsFromEvidence(missingSixth); !errors.Is(err, ErrInvalidPostflightFacts) {
+		t.Fatalf("evidence without the sixth fact must fail closed, got %v", err)
 	}
 	ambiguous := append([]string{agentRunnerRequestHash, agentRunnerCompletionHash}, agentRunnerFactsEvidence(facts)...)
 	ambiguous[postflightFactsPrefix+1] = ambiguous[postflightFactsPrefix]

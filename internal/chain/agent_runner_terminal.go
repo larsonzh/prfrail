@@ -165,7 +165,7 @@ func (terminal AgentRunnerTerminal) resume() bool {
 
 // routeEvidence is the ordered, deduplicated evidence a routing transition
 // carries: the request bound to the parked dispatch, the completion digest, the
-// five frozen-fact digests of a completed terminal in their fixed positions,
+// six frozen-fact digests of a completed terminal in their fixed positions,
 // and the adapter proof attached to the terminal.
 func (terminal AgentRunnerTerminal) routeEvidence() []string {
 	prefix := []string{terminal.RequestHash, terminal.CompletionHash}

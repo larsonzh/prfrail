@@ -360,15 +360,23 @@ func (p *ports) evidenceRoot(requestID string) (string, error) {
 }
 
 // managedProcessesGone reports whether every pid the pinned CLI reported is gone.
+// Both pid reports are candidate written, so a missing report is an evidence gap
+// (fail-closed) instead of "no process was reported": the production assembly
+// (internal/console/runtime_agent.go, managedProcessesGone) answers the same way.
 func (p *ports) managedProcessesGone() (bool, error) {
 	root, err := p.replay.RunEvidenceDir(p.requestID)
 	if err != nil {
 		return false, err
 	}
+	missing := make([]string, 0, 2)
 	for _, name := range []string{"stub.pid", "stub-child.pid"} {
-		pids, err := readPIDs(filepath.Join(root, name))
+		pids, present, err := readPIDs(filepath.Join(root, name))
 		if err != nil {
 			return false, err
+		}
+		if !present {
+			missing = append(missing, name)
+			continue
 		}
 		for _, pid := range pids {
 			identity, err := guard.InspectProcess(pid)
@@ -383,6 +391,10 @@ func (p *ports) managedProcessesGone() (bool, error) {
 				return false, nil
 			}
 		}
+	}
+	if len(missing) > 0 {
+		return false, fmt.Errorf("%w: missing required pid report(s) %s so the managed processes cannot be proven gone",
+			adapters.ErrInvalidAgentRunnerEvidence, strings.Join(missing, ", "))
 	}
 	return true, nil
 }
@@ -492,14 +504,16 @@ func changedPaths(report diffReport) []string {
 	return paths
 }
 
-// readPIDs reads a one-pid-per-line report; a missing report means "none".
-func readPIDs(path string) ([]int, error) {
+// readPIDs reads a one-pid-per-line report and reports whether the file exists
+// at all. A missing report is an evidence gap the caller must handle
+// fail-closed; an existing empty report is the fact "no pid".
+func readPIDs(path string) ([]int, bool, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return nil, nil
+			return nil, false, nil
 		}
-		return nil, err
+		return nil, false, err
 	}
 	var pids []int
 	for _, line := range strings.Split(strings.TrimSpace(string(data)), "\n") {
@@ -509,11 +523,11 @@ func readPIDs(path string) ([]int, error) {
 		}
 		var pid int
 		if _, err := fmt.Sscanf(line, "%d", &pid); err != nil || pid <= 0 {
-			return nil, fmt.Errorf("unreadable pid %q in %s", line, path)
+			return nil, false, fmt.Errorf("unreadable pid %q in %s", line, path)
 		}
 		pids = append(pids, pid)
 	}
-	return pids, nil
+	return pids, true, nil
 }
 
 // gateHooks declares the F5 gate hook: a real command that inspects the

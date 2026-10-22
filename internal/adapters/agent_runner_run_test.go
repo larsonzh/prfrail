@@ -344,9 +344,14 @@ func waitForAgentRunnerProcessGone(pid int) bool {
 
 func TestAgentRunnerVerifyTreeGoneDetectsSurvivors(t *testing.T) {
 	dir := t.TempDir()
-	// No report: the CLI spawned nothing, so the tree is gone.
-	if gone, err := agentRunnerVerifyTreeGone(context.Background(), dir, 200*time.Millisecond); err != nil || !gone {
-		t.Fatalf("an absent report means no children: gone=%v err=%v", gone, err)
+	// No report: an evidence gap, never "no children". The verification must refuse
+	// without polling for a file that cannot appear.
+	started := time.Now()
+	if gone, err := agentRunnerVerifyTreeGone(context.Background(), dir, time.Second); err != nil || gone {
+		t.Fatalf("an absent report must fail closed: gone=%v err=%v", gone, err)
+	}
+	if elapsed := time.Since(started); elapsed > 250*time.Millisecond {
+		t.Fatalf("a missing report must not enter the polling loop: %v", elapsed)
 	}
 	// A dead pid: gone.
 	dead := exec.Command(os.Args[0], "-test.run=^$")
@@ -375,6 +380,50 @@ func TestAgentRunnerVerifyTreeGoneDetectsSurvivors(t *testing.T) {
 	}
 }
 
+// TestAgentRunnerChildPIDReportThreeStates pins the three reader states the A6
+// contract separates: a missing report is an evidence gap (present=false), an
+// existing empty report is the fact "no child process", and an existing
+// non-empty report is the pid list. The first two must never be inferred from
+// each other.
+func TestAgentRunnerChildPIDReportThreeStates(t *testing.T) {
+	dir := t.TempDir()
+	report := filepath.Join(dir, agentRunnerChildPIDReportFileName)
+	pids, present, err := readAgentRunnerChildPIDs(report)
+	if err != nil || present || pids != nil {
+		t.Fatalf("a missing report must read as absent: pids=%v present=%v err=%v", pids, present, err)
+	}
+	writeAgentRunnerArtifactForTest(t, dir, agentRunnerChildPIDReportFileName, nil)
+	pids, present, err = readAgentRunnerChildPIDs(report)
+	if err != nil || !present || len(pids) != 0 {
+		t.Fatalf("an empty report must read as present with no pid: pids=%v present=%v err=%v", pids, present, err)
+	}
+	writeAgentRunnerArtifactForTest(t, dir, agentRunnerChildPIDReportFileName, []byte("1234\n5678\n"))
+	pids, present, err = readAgentRunnerChildPIDs(report)
+	if err != nil || !present || !slices.Equal(pids, []int{1234, 5678}) {
+		t.Fatalf("a non-empty report must parse its pid list: pids=%v present=%v err=%v", pids, present, err)
+	}
+}
+
+// TestAgentRunnerVerifyTreeGoneMissingReportIsUnproven proves the verification
+// answers before it observes any process: a missing report cannot become
+// present by polling, so no liveness observation may be taken at all.
+func TestAgentRunnerVerifyTreeGoneMissingReportIsUnproven(t *testing.T) {
+	dir := t.TempDir()
+	inspections := 0
+	inspect := func(int) (guard.ProcessIdentity, error) {
+		inspections++
+		return guard.ProcessIdentity{}, nil
+	}
+	gone, err := agentRunnerVerifyTreeGoneWith(context.Background(), dir, 500*time.Millisecond, inspect,
+		func(guard.ProcessIdentity) (bool, error) { return false, nil })
+	if err != nil || gone {
+		t.Fatalf("a missing report must leave the tree unproven: gone=%v err=%v", gone, err)
+	}
+	if inspections != 0 {
+		t.Fatalf("a missing report must not reach the liveness observation: %d inspection(s)", inspections)
+	}
+}
+
 func TestAgentRunnerTerminalStatusMapsEveryDegradation(t *testing.T) {
 	stopped := &guard.TerminationEvidence{Outcome: "stopped"}
 	cleanEvidence := AgentRunnerEvidence{
@@ -382,6 +431,7 @@ func TestAgentRunnerTerminalStatusMapsEveryDegradation(t *testing.T) {
 		UsageComplete:           true,
 		EventsComplete:          true,
 		ManifestsComplete:       true,
+		PidReportsComplete:      true,
 		ProcessStopEvidenceHash: evidence.Digest("", []byte("stop")),
 	}
 	stoppedResult := guard.ProcessResult{ExitCode: -1, Termination: stopped}
@@ -417,6 +467,11 @@ func TestAgentRunnerTerminalStatusMapsEveryDegradation(t *testing.T) {
 		{name: "log gap", watch: AgentRunnerWatchResult{}, result: cleanResult, stopProof: stopped, collected: AgentRunnerEvidence{UsageComplete: true, EventsComplete: true, ManifestsComplete: true}, treeGone: true, wantStatus: "uncertain", wantTree: "stopped"},
 		{name: "events gap", watch: AgentRunnerWatchResult{}, result: cleanResult, stopProof: stopped, collected: AgentRunnerEvidence{LogsComplete: true, UsageComplete: true, ManifestsComplete: true}, treeGone: true, wantStatus: "uncertain", wantTree: "stopped"},
 		{name: "manifest gap", watch: AgentRunnerWatchResult{}, result: cleanResult, stopProof: stopped, collected: AgentRunnerEvidence{LogsComplete: true, UsageComplete: true, EventsComplete: true}, treeGone: true, wantStatus: "uncertain", wantTree: "stopped"},
+		{
+			// A missing pid report is an evidence gap: the run cannot be proven to have
+			// stopped its managed processes, so it must never complete.
+			name: "pid reports gap", watch: AgentRunnerWatchResult{}, result: cleanResult, stopProof: stopped, collected: AgentRunnerEvidence{LogsComplete: true, UsageComplete: true, EventsComplete: true, ManifestsComplete: true}, treeGone: true, wantStatus: "uncertain", wantTree: "stopped",
+		},
 		{
 			// A watchdog verdict with a placeholder process result (no exit status at
 			// all) must still degrade: this is the shape a deadline-killed run had when
@@ -490,7 +545,7 @@ func TestAgentRunnerTerminalStatusMapsEveryDegradation(t *testing.T) {
 
 func TestAgentRunnerTerminalStatusArchivesTheStopEvidence(t *testing.T) {
 	stop := evidence.Digest("", []byte("stop-evidence"))
-	complete := AgentRunnerEvidence{LogsComplete: true, UsageComplete: true, EventsComplete: true, ManifestsComplete: true, ProcessStopEvidenceHash: stop}
+	complete := AgentRunnerEvidence{LogsComplete: true, UsageComplete: true, EventsComplete: true, ManifestsComplete: true, PidReportsComplete: true, ProcessStopEvidenceHash: stop}
 	proof := &guard.TerminationEvidence{Outcome: "stopped"}
 	status, _, errorEvidence := agentRunnerTerminalStatus("request-one", AgentRunnerWatchResult{TimedOut: true}, guard.ProcessResult{ExitCode: -1, Termination: proof}, proof, complete, true)
 	if status != "uncertain" {

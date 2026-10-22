@@ -8,6 +8,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/larsonzh/prfrail/internal/adapters"
 	"github.com/larsonzh/prfrail/internal/chain"
 	"github.com/larsonzh/prfrail/internal/evidence"
 	"github.com/larsonzh/prfrail/internal/gates"
@@ -27,6 +28,8 @@ import (
 //	leg 4 usage      re-read usage.json and require the frozen usage digest
 //	leg 5 secrets    scan the workspace with the production gates secret scanner
 //	leg 6 side effect require every pid the CLI reported to be gone
+//	leg 7 pid reports re-read both pid reports, recompute the sixth fact from their
+//	                 bytes and require the frozen pid-reports digest
 //
 // A leg that cannot be proven makes the verdict uncertain; a leg that proves the
 // facts wrong makes it failed. Both are non-passing and are never silent.
@@ -115,6 +118,26 @@ func (p *postflight) RunPostflight(ctx context.Context, request chain.Postflight
 		return p.failed("proofrail:b4-postflight-live-process:1\n", strings.Join(alive, "\n"))
 	}
 
+	// Leg 7 mirrors production (agentRunnerPostflight.RunPostflight): re-read both
+	// pid reports and recompute the sixth fact from their bytes, then compare it
+	// with the frozen digest. A divergence means a report was rewritten after the
+	// run, which is a rejection; a missing report is an evidence gap.
+	parentReport, parentPresent, err := readPIDReportBytes(filepath.Join(evidenceDir, "stub.pid"))
+	if err != nil {
+		return p.uncertain("postflight cannot read the parent pid report: " + err.Error())
+	}
+	childReport, childPresent, err := readPIDReportBytes(filepath.Join(evidenceDir, "stub-child.pid"))
+	if err != nil {
+		return p.uncertain("postflight cannot read the child pid report: " + err.Error())
+	}
+	if !parentPresent || !childPresent {
+		return p.uncertain("postflight is missing a required pid report: the managed processes cannot be proven")
+	}
+	pidReportsHash := adapters.AgentRunnerPidReportsDigest(parentReport, childReport)
+	if pidReportsHash != request.Facts.ProcessPidReportsHash {
+		return p.failed("proofrail:b4-postflight-pid-reports-mismatch:1\n", pidReportsHash)
+	}
+
 	legs := []string{
 		digestOf("proofrail:b4-postflight-leg-manifest:1\n", digestOf("", string(fresh))),
 		digestOf("proofrail:b4-postflight-leg-diff:1\n", digestOf("", string(freshDiff))),
@@ -122,6 +145,7 @@ func (p *postflight) RunPostflight(ctx context.Context, request chain.Postflight
 		digestOf("proofrail:b4-postflight-leg-usage:1\n", usageHash),
 		digestOf("proofrail:b4-postflight-leg-secret-scan:1\n", "no marker found"),
 		digestOf("proofrail:b4-postflight-leg-processes:1\n", "all reported pids gone"),
+		digestOf("proofrail:b4-postflight-leg-pid-reports:1\n", pidReportsHash),
 	}
 	decision := chain.PostflightDecision{
 		Outcome:  chain.PostflightPassed,
@@ -131,9 +155,9 @@ func (p *postflight) RunPostflight(ctx context.Context, request chain.Postflight
 	return decision, nil
 }
 
-// factHashes returns the five frozen fact digests in routing order.
+// factHashes returns the six frozen fact digests in routing order.
 func factHashes(facts chain.AgentRunnerFrozenFacts) []string {
-	return []string{facts.ManifestHash, facts.DiffHash, facts.LogHash, facts.UsageHash, facts.ProcessStopEvidenceHash}
+	return []string{facts.ManifestHash, facts.DiffHash, facts.LogHash, facts.UsageHash, facts.ProcessStopEvidenceHash, facts.ProcessPidReportsHash}
 }
 
 // failed and uncertain are methods so that every non-passing decision is also recorded
@@ -191,13 +215,21 @@ func (p *postflight) scanWorkspace(ctx context.Context) error {
 	return nil
 }
 
-// alivePIDs reports the recorded pids that are still running.
+// alivePIDs reports the recorded pids that are still running. A missing pid
+// report is an evidence gap (an error), never "nothing alive": both reports are
+// candidate written, so the caller must degrade to uncertain, exactly like
+// production leg 5.
 func alivePIDs(evidenceDir string) ([]string, error) {
 	var alive []string
+	missing := make([]string, 0, 2)
 	for _, name := range []string{"stub.pid", "stub-child.pid"} {
-		pids, err := readPIDs(filepath.Join(evidenceDir, name))
+		pids, present, err := readPIDs(filepath.Join(evidenceDir, name))
 		if err != nil {
 			return nil, err
+		}
+		if !present {
+			missing = append(missing, name)
+			continue
 		}
 		for _, pid := range pids {
 			identity, err := guard.InspectProcess(pid)
@@ -213,6 +245,23 @@ func alivePIDs(evidenceDir string) ([]string, error) {
 			}
 		}
 	}
+	if len(missing) > 0 {
+		return nil, fmt.Errorf("%w: missing required pid report(s) %s so the managed processes cannot be proven gone",
+			adapters.ErrInvalidAgentRunnerEvidence, strings.Join(missing, ", "))
+	}
 	sort.Strings(alive)
 	return alive, nil
+}
+
+// readPIDReportBytes reads one pid report verbatim (never decoded) and reports
+// whether it exists, which is what the sixth-fact recomputation needs.
+func readPIDReportBytes(path string) ([]byte, bool, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, false, nil
+		}
+		return nil, false, err
+	}
+	return data, true, nil
 }

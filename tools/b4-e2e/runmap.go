@@ -91,9 +91,15 @@ func mirrorVerifyTreeGone(ctx context.Context, evidenceDir string, wait time.Dur
 	report := filepath.Join(evidenceDir, "stub-child.pid")
 	deadline := time.Now().Add(wait)
 	for {
-		pids, err := readPIDs(report)
+		pids, present, err := readPIDs(report)
 		if err != nil {
 			return false, err
+		}
+		// A missing child report is an evidence gap, exactly as in
+		// agentRunnerVerifyTreeGoneWith: the tree cannot be proven gone, and polling
+		// cannot create the report.
+		if !present {
+			return false, nil
 		}
 		stillAlive := false
 		for _, pid := range pids {
@@ -155,7 +161,7 @@ func mirrorTerminalStatus(requestID string, watch adapters.AgentRunnerWatchResul
 		status = "uncertain"
 	case result.Termination != nil:
 		status = "uncertain"
-	case !collected.LogsComplete || !collected.UsageComplete || !collected.EventsComplete || !collected.ManifestsComplete:
+	case !collected.LogsComplete || !collected.UsageComplete || !collected.EventsComplete || !collected.ManifestsComplete || !collected.PidReportsComplete:
 		status = "uncertain"
 	default:
 		status = "completed"
@@ -300,15 +306,10 @@ func waitAndMap(ctx context.Context, launcher *adapters.AgentRunnerPinnedCLILaun
 	if err != nil {
 		return observation, err
 	}
-	// The facts the collector produces are the adapter-side shape; the chain-side
-	// shape is the same five digests.
-	observation.Facts = &adapters.AgentRunnerFrozenFacts{
-		ManifestHash:            facts.ManifestHash,
-		DiffHash:                facts.DiffHash,
-		LogHash:                 facts.LogHash,
-		UsageHash:               facts.UsageHash,
-		ProcessStopEvidenceHash: facts.ProcessStopEvidenceHash,
-	}
+	// The facts the collector produces are the adapter-side shape, which is the same
+	// six digests the chain side carries: assign them through so a future field
+	// cannot be silently dropped by a hand-written projection.
+	observation.Facts = &facts
 	return observation, nil
 }
 

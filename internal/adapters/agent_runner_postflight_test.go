@@ -207,8 +207,8 @@ func TestAgentRunnerPostflightPassesOnRecordedEvidence(t *testing.T) {
 	if decision.Outcome != chain.PostflightPassed {
 		t.Fatalf("a clean recorded run must pass: %+v", decision)
 	}
-	if len(decision.Evidence) != len(agentRunnerFactHashes(fixture.requestPath.Facts))+6 {
-		t.Fatalf("a passed verdict must carry the five facts and the six legs: %d", len(decision.Evidence))
+	if len(decision.Evidence) != len(agentRunnerFactHashes(fixture.requestPath.Facts))+7 {
+		t.Fatalf("a passed verdict must carry the six facts and the seven legs: %d", len(decision.Evidence))
 	}
 	for index, hash := range agentRunnerFactHashes(fixture.requestPath.Facts) {
 		if decision.Evidence[index] != hash {
@@ -295,6 +295,32 @@ func TestAgentRunnerPostflightRejectsTamperedLegs(t *testing.T) {
 		}
 		if decision.Outcome != chain.PostflightFailed || len(decision.ErrorEvidence) != 1 {
 			t.Fatalf("a tampered usage artifact must fail on the usage leg: %+v", decision)
+		}
+	})
+
+	t.Run("a rewritten pid report is a pid-reports failure", func(t *testing.T) {
+		// Appending a newline to the empty child report keeps the pid list empty, so
+		// leg 5 (liveness) still passes; only the recomputed sixth fact diverges from
+		// the frozen digest, which is exactly the leg this case targets.
+		fixture := newAgentRunnerPostflightFixture(t, []string{"exit"})
+		path := filepath.Join(fixture.evidenceDir, agentRunnerChildPIDReportFileName)
+		if err := os.WriteFile(path, []byte("\n"), 0o600); err != nil {
+			t.Fatal(err)
+		}
+		decision, err := fixture.port(t).RunPostflight(context.Background(), fixture.requestPath)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if decision.Outcome != chain.PostflightFailed || len(decision.ErrorEvidence) != 1 {
+			t.Fatalf("a rewritten pid report must fail on the pid-reports leg: %+v", decision)
+		}
+		parent, err := os.ReadFile(filepath.Join(fixture.evidenceDir, agentRunnerParentPIDReportFileName))
+		if err != nil {
+			t.Fatal(err)
+		}
+		want := evidence.Digest(agentRunnerPostflightPidReportsFailDomain, []byte(AgentRunnerPidReportsDigest(parent, []byte("\n"))))
+		if decision.ErrorEvidence[0] != want {
+			t.Fatalf("the pid-reports leg must name the recomputed digest: %+v", decision.ErrorEvidence)
 		}
 	})
 

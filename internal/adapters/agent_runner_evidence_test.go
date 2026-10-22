@@ -67,6 +67,10 @@ func completeAgentRunnerArtifacts(t *testing.T, dir string) {
 	writeAgentRunnerArtifactForTest(t, dir, filepath.Join(agentRunnerLogsDirectoryName, agentRunnerStderrFileName), []byte(agentRunnerLogCompletenessMarker+"\n"))
 	writeAgentRunnerArtifactForTest(t, dir, agentRunnerUsageFileName, []byte(`{"calls":2,"tokens":123,"durationMs":5}`))
 	writeAgentRunnerArtifactForTest(t, dir, agentRunnerEventsFileName, []byte("{\"type\":\"session-created\"}\n{\"type\":\"output\"}\n"))
+	// Both pid reports are written at the CLI's constant write point: an empty
+	// child report is the legal fact "no child process", not a gap.
+	writeAgentRunnerArtifactForTest(t, dir, agentRunnerParentPIDReportFileName, []byte("4242\n"))
+	writeAgentRunnerArtifactForTest(t, dir, agentRunnerChildPIDReportFileName, nil)
 }
 
 func completeAgentRunnerEvidenceSpec(dir string) AgentRunnerEvidenceSpec {
@@ -88,7 +92,7 @@ func TestAgentRunnerEvidenceCollectsCompleteRun(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !collected.LogsComplete || !collected.UsageComplete || !collected.EventsComplete || !collected.ManifestsComplete {
+	if !collected.LogsComplete || !collected.UsageComplete || !collected.EventsComplete || !collected.ManifestsComplete || !collected.PidReportsComplete {
 		t.Fatalf("a clean run must be complete: %+v", collected)
 	}
 	if len(collected.ErrorEvidence) != 0 {
@@ -101,6 +105,14 @@ func TestAgentRunnerEvidenceCollectsCompleteRun(t *testing.T) {
 	if facts.ManifestHash != evidence.Digest("", []byte("after")) || facts.DiffHash != evidence.Digest("", []byte("diff")) {
 		t.Fatalf("manifest/diff facts must come from the captured artifacts: %+v", facts)
 	}
+	// The sixth fact binds the bytes of both reports through the A6 caliber, and
+	// the empty child report is legal: it digests to the empty-string digest.
+	if facts.ProcessPidReportsHash != AgentRunnerPidReportsDigest([]byte("4242\n"), []byte{}) {
+		t.Fatalf("the pid-reports fact must follow the byte-level caliber: %s", facts.ProcessPidReportsHash)
+	}
+	if !evidence.ValidHash(facts.ProcessPidReportsHash) {
+		t.Fatalf("the pid-reports fact must be a digest: %+v", facts)
+	}
 	if err := facts.Validate(); err != nil {
 		t.Fatalf("collected facts must validate: %v", err)
 	}
@@ -108,6 +120,52 @@ func TestAgentRunnerEvidenceCollectsCompleteRun(t *testing.T) {
 		if _, err := os.Stat(filepath.Join(dir, name)); err != nil {
 			t.Fatalf("expected artifact %s: %v", name, err)
 		}
+	}
+}
+
+// TestAgentRunnerEvidenceRequiresBothPIDReports proves the sixth fact cannot be
+// inferred from one report: each missing report is a named gap and the evidence
+// never yields facts, while an existing empty report stays legal elsewhere.
+func TestAgentRunnerEvidenceRequiresBothPIDReports(t *testing.T) {
+	for _, name := range []string{agentRunnerParentPIDReportFileName, agentRunnerChildPIDReportFileName} {
+		t.Run("missing "+name, func(t *testing.T) {
+			dir := newAgentRunnerEvidenceDir(t)
+			completeAgentRunnerArtifacts(t, dir)
+			if err := os.Remove(filepath.Join(dir, name)); err != nil {
+				t.Fatal(err)
+			}
+			collected, err := CollectAgentRunnerEvidence(context.Background(), completeAgentRunnerEvidenceSpec(dir))
+			if err != nil {
+				t.Fatal(err)
+			}
+			if collected.PidReportsComplete || collected.PidReportsHash != "" {
+				t.Fatalf("a missing report must be a gap, never a digest: %+v", collected)
+			}
+			want := evidence.Digest(agentRunnerPidReportsGapDomain, []byte("request-one"))
+			if len(collected.ErrorEvidence) != 1 || collected.ErrorEvidence[0] != want {
+				t.Fatalf("the gap must be named by the pid-reports domain: %v", collected.ErrorEvidence)
+			}
+			if _, err := collected.FrozenFacts(); !errors.Is(err, ErrAgentRunnerEvidenceGap) {
+				t.Fatalf("a missing pid report must withhold the facts, got %v", err)
+			}
+		})
+	}
+}
+
+// TestAgentRunnerPidReportsDigestFollowsTheContractCaliber pins the A6 formula
+// independently: one line per report, the file name, a space and the byte-level
+// digest, parent first, with a trailing newline.
+func TestAgentRunnerPidReportsDigestFollowsTheContractCaliber(t *testing.T) {
+	parent := []byte("11\n")
+	child := []byte("22\n33\n")
+	want := evidence.Digest("proofrail:agent-runner-pid-reports:1\n", []byte(
+		"stub.pid "+evidence.Digest("", parent)+"\n"+
+			"stub-child.pid "+evidence.Digest("", child)+"\n"))
+	if got := AgentRunnerPidReportsDigest(parent, child); got != want {
+		t.Fatalf("the sixth fact caliber drifted: got %s want %s", got, want)
+	}
+	if empty := AgentRunnerPidReportsDigest(nil, nil); !evidence.ValidHash(empty) {
+		t.Fatalf("an empty report pair must still digest: %s", empty)
 	}
 }
 
@@ -342,10 +400,12 @@ func TestAgentRunnerEvidencePinsCompletenessGates(t *testing.T) {
 		LogHash:                 evidence.Digest("", []byte("log")),
 		UsageHash:               evidence.Digest("", []byte("usage")),
 		ProcessStopEvidenceHash: evidence.Digest("", []byte("stop")),
+		PidReportsHash:          evidence.Digest("", []byte("pid-reports")),
 		LogsComplete:            true,
 		UsageComplete:           true,
 		EventsComplete:          true,
 		ManifestsComplete:       true,
+		PidReportsComplete:      true,
 	}
 	if _, err := base.FrozenFacts(); err != nil {
 		t.Fatalf("a complete evidence set must yield facts: %v", err)
@@ -368,6 +428,10 @@ func TestAgentRunnerEvidencePinsCompletenessGates(t *testing.T) {
 		}},
 		{name: "manifests", collect: func(collected AgentRunnerEvidence) AgentRunnerEvidence {
 			collected.ManifestsComplete = false
+			return collected
+		}},
+		{name: "pid reports", collect: func(collected AgentRunnerEvidence) AgentRunnerEvidence {
+			collected.PidReportsComplete = false
 			return collected
 		}},
 	} {

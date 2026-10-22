@@ -33,23 +33,25 @@ import (
 // harness-local proofrail:b4-* domains must never appear here, or an evidence
 // reader could not tell a production reconciliation from a harness one.
 const (
-	agentRunnerPostflightLegManifestDomain   = "proofrail:agent-runner-postflight-leg-manifest:1\n"
-	agentRunnerPostflightLegDiffDomain       = "proofrail:agent-runner-postflight-leg-diff:1\n"
-	agentRunnerPostflightLegLogDomain        = "proofrail:agent-runner-postflight-leg-log:1\n"
-	agentRunnerPostflightLegUsageDomain      = "proofrail:agent-runner-postflight-leg-usage:1\n"
-	agentRunnerPostflightLegProcessDomain    = "proofrail:agent-runner-postflight-leg-process:1\n"
-	agentRunnerPostflightLegSecretDomain     = "proofrail:agent-runner-postflight-leg-secret:1\n"
-	agentRunnerPostflightManifestFailDomain  = "proofrail:agent-runner-postflight-manifest-mismatch:1\n"
-	agentRunnerPostflightDiffFailDomain      = "proofrail:agent-runner-postflight-diff-mismatch:1\n"
-	agentRunnerPostflightLogFailDomain       = "proofrail:agent-runner-postflight-log-mismatch:1\n"
-	agentRunnerPostflightUsageFailDomain     = "proofrail:agent-runner-postflight-usage-mismatch:1\n"
-	agentRunnerPostflightProcessFailDomain   = "proofrail:agent-runner-postflight-live-process:1\n"
-	agentRunnerPostflightSecretFailDomain    = "proofrail:agent-runner-postflight-secret:1\n"
-	agentRunnerPostflightUncertainDomain     = "proofrail:agent-runner-postflight-uncertain:1\n"
-	agentRunnerWorkspaceBaselineDomain       = "proofrail:agent-runner-baseline:1\n"
-	agentRunnerWorkspacePlaceholderParent    = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
-	agentRunnerWorkspaceManifestKind         = "candidate"
-	agentRunnerPostflightProcessPIDFileNames = 2
+	agentRunnerPostflightLegManifestDomain    = "proofrail:agent-runner-postflight-leg-manifest:1\n"
+	agentRunnerPostflightLegDiffDomain        = "proofrail:agent-runner-postflight-leg-diff:1\n"
+	agentRunnerPostflightLegLogDomain         = "proofrail:agent-runner-postflight-leg-log:1\n"
+	agentRunnerPostflightLegUsageDomain       = "proofrail:agent-runner-postflight-leg-usage:1\n"
+	agentRunnerPostflightLegProcessDomain     = "proofrail:agent-runner-postflight-leg-process:1\n"
+	agentRunnerPostflightLegPidReportsDomain  = "proofrail:agent-runner-postflight-leg-pid-reports:1\n"
+	agentRunnerPostflightLegSecretDomain      = "proofrail:agent-runner-postflight-leg-secret:1\n"
+	agentRunnerPostflightManifestFailDomain   = "proofrail:agent-runner-postflight-manifest-mismatch:1\n"
+	agentRunnerPostflightDiffFailDomain       = "proofrail:agent-runner-postflight-diff-mismatch:1\n"
+	agentRunnerPostflightLogFailDomain        = "proofrail:agent-runner-postflight-log-mismatch:1\n"
+	agentRunnerPostflightUsageFailDomain      = "proofrail:agent-runner-postflight-usage-mismatch:1\n"
+	agentRunnerPostflightProcessFailDomain    = "proofrail:agent-runner-postflight-live-process:1\n"
+	agentRunnerPostflightPidReportsFailDomain = "proofrail:agent-runner-postflight-pid-reports-mismatch:1\n"
+	agentRunnerPostflightSecretFailDomain     = "proofrail:agent-runner-postflight-secret:1\n"
+	agentRunnerPostflightUncertainDomain      = "proofrail:agent-runner-postflight-uncertain:1\n"
+	agentRunnerWorkspaceBaselineDomain        = "proofrail:agent-runner-baseline:1\n"
+	agentRunnerWorkspacePlaceholderParent     = "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+	agentRunnerWorkspaceManifestKind          = "candidate"
+	agentRunnerPostflightProcessPIDFileNames  = 2
 )
 
 // agentRunnerMissingPIDReportDetail is the exact verdict text the console
@@ -380,6 +382,26 @@ func (postflight *AgentRunnerPostflight) RunPostflight(ctx context.Context, requ
 	if err := postflight.scanWorkspace(ctx, request.Workspace.Root, freshManifest.Manifest.Entries); err != nil {
 		return postflight.failed(agentRunnerPostflightSecretFailDomain, err.Error()), nil
 	}
+	// Leg 7: re-read both pid reports and recompute the sixth fact from their
+	// bytes, then compare it with the frozen digest. The frozen value is never
+	// trusted as evidence of itself: a report whose recomputed digest diverges
+	// from the frozen one was rewritten after the run, which is a rejection. A
+	// missing report is an evidence gap the caller must not read as "no pid".
+	parentReport, parentPresent, err := readAgentRunnerPIDReport(filepath.Join(evidenceDir, agentRunnerParentPIDReportFileName))
+	if err != nil {
+		return postflight.uncertain("postflight cannot read the parent pid report: " + err.Error()), nil
+	}
+	childReport, childPresent, err := readAgentRunnerPIDReport(filepath.Join(evidenceDir, agentRunnerChildPIDReportFileName))
+	if err != nil {
+		return postflight.uncertain("postflight cannot read the child pid report: " + err.Error()), nil
+	}
+	if !parentPresent || !childPresent {
+		return postflight.uncertain(agentRunnerMissingPIDReportDetail), nil
+	}
+	pidReportsHash := AgentRunnerPidReportsDigest(parentReport, childReport)
+	if pidReportsHash != request.Facts.ProcessPidReportsHash {
+		return postflight.failed(agentRunnerPostflightPidReportsFailDomain, pidReportsHash), nil
+	}
 	legs := []string{
 		evidence.Digest(agentRunnerPostflightLegManifestDomain, []byte(evidence.Digest("", freshBytes))),
 		evidence.Digest(agentRunnerPostflightLegDiffDomain, []byte(evidence.Digest("", freshDiff))),
@@ -387,6 +409,7 @@ func (postflight *AgentRunnerPostflight) RunPostflight(ctx context.Context, requ
 		evidence.Digest(agentRunnerPostflightLegUsageDomain, []byte(usageHash)),
 		evidence.Digest(agentRunnerPostflightLegProcessDomain, []byte("all reported pids gone")),
 		evidence.Digest(agentRunnerPostflightLegSecretDomain, []byte("no marker found")),
+		evidence.Digest(agentRunnerPostflightLegPidReportsDomain, []byte(pidReportsHash)),
 	}
 	return chain.PostflightDecision{
 		Outcome:  chain.PostflightPassed,
@@ -425,9 +448,9 @@ func (postflight *AgentRunnerPostflight) scanWorkspace(ctx context.Context, work
 	return nil
 }
 
-// agentRunnerFactHashes returns the five frozen fact digests in routing order.
+// agentRunnerFactHashes returns the six frozen fact digests in routing order.
 func agentRunnerFactHashes(facts chain.AgentRunnerFrozenFacts) []string {
-	return []string{facts.ManifestHash, facts.DiffHash, facts.LogHash, facts.UsageHash, facts.ProcessStopEvidenceHash}
+	return []string{facts.ManifestHash, facts.DiffHash, facts.LogHash, facts.UsageHash, facts.ProcessStopEvidenceHash, facts.ProcessPidReportsHash}
 }
 
 // agentRunnerChangedPaths lists the paths whose entry differs between the frozen

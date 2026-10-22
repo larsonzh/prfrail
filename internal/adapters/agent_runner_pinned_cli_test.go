@@ -129,6 +129,12 @@ func helperEmit(withUsage bool) {
 	if err := os.WriteFile(filepath.Join(dir, "stub.pid"), fmt.Appendf(nil, "%d\n", os.Getpid()), 0o600); err != nil {
 		os.Exit(12)
 	}
+	// Both pid reports are written at a constant write point: a run without a child
+	// writes an empty child report (the fact "no child process"), and a mode that
+	// later spawns a child overwrites it with the pid list.
+	if err := os.WriteFile(filepath.Join(dir, agentRunnerChildPIDReportFileName), nil, 0o600); err != nil {
+		os.Exit(23)
+	}
 	fmt.Fprintln(os.Stdout, "hello")
 	fmt.Fprintln(os.Stdout, agentRunnerLogCompletenessMarker)
 	fmt.Fprintln(os.Stderr, agentRunnerLogCompletenessMarker)

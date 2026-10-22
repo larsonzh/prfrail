@@ -36,7 +36,7 @@ var (
 	ErrAgentRunnerTerminalSettlementBlocked = errors.New("AgentRunner terminal settlement blocked")
 )
 
-// AgentRunnerFrozenFacts are the five digests an adapter froze after external
+// AgentRunnerFrozenFacts are the six digests an adapter froze after external
 // execution ended. They are store-local facts, never decisions: the chain runs
 // its own postflight and reconciles them before a task may be reviewed.
 type AgentRunnerFrozenFacts struct {
@@ -45,10 +45,11 @@ type AgentRunnerFrozenFacts struct {
 	LogHash                 string `json:"logHash"`
 	UsageHash               string `json:"usageHash"`
 	ProcessStopEvidenceHash string `json:"processStopEvidenceHash"`
+	ProcessPidReportsHash   string `json:"processPidReportsHash"`
 }
 
 func (facts AgentRunnerFrozenFacts) hashes() []string {
-	return []string{facts.ManifestHash, facts.DiffHash, facts.LogHash, facts.UsageHash, facts.ProcessStopEvidenceHash}
+	return []string{facts.ManifestHash, facts.DiffHash, facts.LogHash, facts.UsageHash, facts.ProcessStopEvidenceHash, facts.ProcessPidReportsHash}
 }
 
 // Validate fails closed on missing digests and on digest collisions: the chain
@@ -220,7 +221,7 @@ func validateAgentRunnerTerminalIntent(intent AgentRunnerTerminalIntent) error {
 }
 
 // validateAgentRunnerTerminalIntentFacts enforces the frozen-facts binding: a
-// completed terminal must carry the five facts, and no other status may carry
+// completed terminal must carry the six facts, and no other status may carry
 // them. Without facts a completion can never be audited by postflight, so the
 // store refuses to hold the decision at all.
 func validateAgentRunnerTerminalIntentFacts(intent AgentRunnerTerminalIntent) error {

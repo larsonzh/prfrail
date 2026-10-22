@@ -118,6 +118,7 @@ func (facts AgentRunnerFrozenFacts) toChain() chain.AgentRunnerFrozenFacts {
 		LogHash:                 facts.LogHash,
 		UsageHash:               facts.UsageHash,
 		ProcessStopEvidenceHash: facts.ProcessStopEvidenceHash,
+		ProcessPidReportsHash:   facts.ProcessPidReportsHash,
 	}
 }
 

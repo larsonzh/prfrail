@@ -67,7 +67,7 @@ func agentRunnerDispatchEvidence() []string {
 }
 
 // agentRunnerTerminal builds a valid terminal fact for the parked step. A
-// completed terminal always carries the five frozen facts, because the chain
+// completed terminal always carries the six frozen facts, because the chain
 // refuses to route a completion without them.
 func agentRunnerTerminal(status AgentRunnerTerminalStatus) AgentRunnerTerminal {
 	terminal := AgentRunnerTerminal{

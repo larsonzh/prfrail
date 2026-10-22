@@ -15,7 +15,7 @@ var (
 	ErrInvalidPostflightFacts = errors.New("invalid postflight frozen facts")
 	// ErrInvalidPostflightDecision reports a postflight decision that cannot be
 	// accepted: an unknown outcome, or a passed decision whose evidence does not
-	// prove that all five frozen facts were consumed.
+	// prove that all six frozen facts were consumed.
 	ErrInvalidPostflightDecision = errors.New("invalid postflight decision")
 	// ErrPostflightUnavailable reports a missing postflight port. Postflight is
 	// the only qualification for REVIEW_PENDING, so a run without it must fail
@@ -27,19 +27,20 @@ var (
 	ErrUnqualifiedReview = errors.New("review state not qualified by postflight")
 )
 
-// postflightFactsPrefix is the fixed position of the five frozen-fact digests
+// postflightFactsPrefix is the fixed position of the six frozen-fact digests
 // inside the terminal-passed routing evidence: request, completion, then
-// manifest, diff, log, usage and process-stop. The layout is deliberately
-// positional and documented here because the gate rebuilds the facts from the
-// recorded event evidence without reading the replay store; the mutual
-// distinctness enforced by Validate is what keeps the positions unambiguous.
+// manifest, diff, log, usage, process-stop and pid-reports. The layout is
+// deliberately positional and documented here because the gate rebuilds the
+// facts from the recorded event evidence without reading the replay store; the
+// mutual distinctness enforced by Validate is what keeps the positions
+// unambiguous.
 const (
 	postflightFactsPrefix      = 2
-	postflightFactsCount       = 5
+	postflightFactsCount       = 6
 	postflightFactsMinEvidence = postflightFactsPrefix + postflightFactsCount
 )
 
-// AgentRunnerFrozenFacts are the five chain-owned digests of the facts an
+// AgentRunnerFrozenFacts are the six chain-owned digests of the facts an
 // adapter froze after external execution ended. They carry no decision: an exit
 // code, a process status, a settlement status, a review decision or a policy
 // hash never belong here, because the chain decides from its own postflight.
@@ -49,11 +50,12 @@ type AgentRunnerFrozenFacts struct {
 	LogHash                 string
 	UsageHash               string
 	ProcessStopEvidenceHash string
+	ProcessPidReportsHash   string
 }
 
 // hashes returns the digests in the fixed routing order.
 func (facts AgentRunnerFrozenFacts) hashes() []string {
-	return []string{facts.ManifestHash, facts.DiffHash, facts.LogHash, facts.UsageHash, facts.ProcessStopEvidenceHash}
+	return []string{facts.ManifestHash, facts.DiffHash, facts.LogHash, facts.UsageHash, facts.ProcessStopEvidenceHash, facts.ProcessPidReportsHash}
 }
 
 // Validate fails closed on missing digests and on digest collisions: the
@@ -114,7 +116,7 @@ type PostflightRequest struct {
 }
 
 // PostflightDecision is the port's verdict plus its evidence. A passed verdict
-// must carry all five fact digests, so the engine can prove that the gate
+// must carry all six fact digests, so the engine can prove that the gate
 // consumed the frozen facts instead of trusting the port.
 type PostflightDecision struct {
 	Outcome       PostflightOutcome
@@ -254,6 +256,7 @@ func frozenFactsFromEvidence(input []string) (AgentRunnerFrozenFacts, error) {
 		LogHash:                 input[postflightFactsPrefix+2],
 		UsageHash:               input[postflightFactsPrefix+3],
 		ProcessStopEvidenceHash: input[postflightFactsPrefix+4],
+		ProcessPidReportsHash:   input[postflightFactsPrefix+5],
 	}
 	if err := facts.Validate(); err != nil {
 		return AgentRunnerFrozenFacts{}, err

@@ -50,7 +50,7 @@ type loadSpec struct {
 func loadFor(face, caseID string) (loadSpec, error) {
 	table := map[string]loadSpec{
 		"f1/pos": {args: []string{"-mode", "run", "-sleep", "2s"}, timeout: 30 * time.Second, grace: 2 * time.Second, verify: 3 * time.Second,
-			note: "clean deterministic run; the workspace must be unchanged and all five facts must be provable"},
+			note: "clean deterministic run; the workspace must be unchanged and all six facts must be provable"},
 		"f1/neg": {args: []string{"-mode", "mutate-workspace", "-sleep", "2s"}, timeout: 30 * time.Second, grace: 2 * time.Second, verify: 3 * time.Second,
 			note: "run writes into its workspace; the diff must name the file it wrote (control leg of the f1/neg2 pair)"},
 		// f1/neg2 is the true falsification test of this face. The load is a clean,
@@ -687,14 +687,14 @@ func addFaceChecks(report *verdict, face, caseID string, observation *runObserva
 	}
 	switch face {
 	case "f1":
-		report.addCheck("five-facts-distinct", observation.Facts != nil, "frozen facts present: "+fmt.Sprint(observation.Facts != nil))
+		report.addCheck("six-facts-distinct", observation.Facts != nil, "frozen facts present: "+fmt.Sprint(observation.Facts != nil))
 		if observation.Facts != nil {
 			hashes := factHashes(adaptersFactsToChain(*observation.Facts))
 			distinct := map[string]struct{}{}
 			for _, hash := range hashes {
 				distinct[hash] = struct{}{}
 			}
-			report.addCheck("five-facts-distinct", len(distinct) == 5, fmt.Sprintf("distinct fact digests: %d", len(distinct)))
+			report.addCheck("six-facts-distinct", len(distinct) == 6, fmt.Sprintf("distinct fact digests: %d", len(distinct)))
 		}
 		if diff := report.Diff; diff != nil {
 			switch caseID {
@@ -1090,6 +1090,7 @@ func adaptersFactsToChain(facts adapters.AgentRunnerFrozenFacts) chain.AgentRunn
 		LogHash:                 facts.LogHash,
 		UsageHash:               facts.UsageHash,
 		ProcessStopEvidenceHash: facts.ProcessStopEvidenceHash,
+		ProcessPidReportsHash:   facts.ProcessPidReportsHash,
 	}
 }
 

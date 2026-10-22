@@ -845,6 +845,24 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 探针额度 | 无（用户已确认） |
 | 执行自由度清单落盘路径 | `docs/validation/evidence/C1-freedom-list.md`（用户已确认） |
 
+### P20 — `AGENTRUNNER-PID-READER` · ✅ 已完成
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `AGENTRUNNER-PID-READER`（准则升 v1.42；本片改 `CONTRACTS` §7 + 代码 + 准则三处台账补登） |
+| 状态 | ✅ **已完成**（2026-10-22；准则 v1.42；三作用域 `TOTAL_FAIL=0`、`SELFTEST` 588/588；报告对 `docs/validation/agentrunner-pid-reader{,_EN}.md` 已落盘） |
+| 目标 | 一片收口 OB-109（A5 冻结事实加第六枚 pid 报告摘要，按用户裁定形态）与 OB-110（读者侧 `present` 标志把「文件缺失」读作「未 spawn」）；并补登 OB-111（G4b 改写规避高频，只补登不处置） |
+| 依赖 | C1 已闭环（`HEAD` = `7201679`）；池 D 已完成（`6898f91`） |
+| 规模 | M-L（协议文本 + 5 适配器 + 6 处 chain 改动 + 读者侧语义 + 聚焦测试 + 台账补登） |
+| 步骤 | 步骤 0 → ①（三项判定）→ ②a 契约 → ②b 代码 → ③ → ④ → ⑤ → ⑥ → ⑦（1 终审 + 2 复审）→ ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| 现状缺口 | OB-109（待议）A5 仅五枚摘要、pid 报告未绑定；OB-110（待议）读者侧宽松读法与 §7 三态语义不一致；OB-111（观察中）G4b 改写规避为高频手工动作 |
+| 交付物 | `CONTRACTS{,_EN}.md` §7 的 A5 / A6 两段；`internal/chain/postflight.go`；5 个适配器文件；`internal/console/runtime_agent.go` 与 `tools/b4-e2e/`（若 reader 侧受影响）；聚焦测试；准则三处台账补登；报告对 `docs/validation/agentrunner-pid-reader{,_EN}.md`；自由度清单；本 P20 状态行与完成行 |
+| 验收证据 | OB-109 / OB-110 逐项处置（带 `file:line`）；OB-111 补登（`观察中`，不处置）；三态语义与 §7 逐字一致；A5 第六枚与 routeEvidence 布局同步；聚焦测试正反各至少一；三作用域 `TOTAL_FAIL=0`；`SELFTEST` 全绿；②a → ②b 顺序证据；③ 偏移早于 ④ / ⑤；⑧a / ⑧b 各至少 1 次派单 |
+| 边界 | 只改准则三处（§12.4 / §0.3 / 头部版本号）；只改 `CONTRACTS` §7 的 A5 / A6 + 5 适配器 + `chain/postflight.go` + 相关测试；不动判据本体与 `tools/gates/lib/criteria/**`；不碰 `tools/agent-stub`；不推 gitee；不处理 OB-104 / OB-105 / OB-107 |
+| 分级 | `[SLICE]`（触 A5 冻结事实 DTO 的协议语义 ⇒ ① 与 ⑦ 均不降级） |
+| 探针额度 | 无 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/AGENTRUNNER-PID-READER-freedom-list.md` |
+
 ---
 ## 已知缺陷（后续切片前处理）
 
@@ -1025,6 +1043,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 2026-10-19 | G9-c | **准则治理类切片（新增机械判据 G9）**：① 新增 CI 判据 G9（静态形态）与白名单、`g9.js`、`gate.js` 注册、`selftest.js` T80–T83；② 准则 v1.38（头部 / §0.3 / §1.5 / §5.1 / §6.3 / R6.2 / 附录 C.0z / §12.4 OB-98 与 OB-99）；③ ⑨ 纯净 worktree 复现（536/536 → 552/552，退出码 0/1/2 逐例成立）；⑤ `PRE-REVIEW: PASS WITH FIXES` 两轮、⑥ `INDEPENDENT SCAN: PASS`、⑦ 由 `GPT-5.3-Codex (copilot)` 承担（r1–r3）；三作用域 `TOTAL_FAIL=0`；探针 0。**本行按 v1.21 的完成行格式只记报告路径**。 | docs/validation/directive-g9c.md |
 | 2026-10-19 | DIRECTIVE-EVIDENCE-WINDOW | **准则治理类切片（补 ⑧c 后取证窗口规则缺口）**：① §5.1 新增「⑧c 后取证窗口」子款（三条候选路径固定次序 + 四条回读读数 + 只判终态可观测性）、临时件例外句、§5.3 ⑧c 行半句、§1.5 清理时机括注、附录 B.7.3 终态回读槽位、附录 C.0aa、§12.4 OB-99/OB-100 处置列与头部/§0.3；② ADR-026 登记；③ ⑨ 纯净 worktree 复现全绿（三作用域 `TOTAL_FAIL=0`、`SELFTEST: PASS 552/552`）；⑦ 由 `GPT-5.3-Codex (copilot)` 承担（r1–r3）；批量辅助 `GLM-5.3-Flash` 1 次、`GLM-5.3-FlashX` 1 次；探针 0。**本行按 v1.21 的完成行格式只记报告路径**。 | docs/validation/directive-evidence-window.md |
 | 2026-10-21 | P19 | **Linux AgentRunner native validation（`[SLICE]`、M）**：新增 bash 驱动 `tools/validation/c1-linux/run-c1-faces.sh`，在 Ubuntu 24.04.5 VM（go1.27.1）上重放 b4-e2e 的 f1–f4 四组与 CLI 腿，23 次调用全绿、15 个终局 verdict 与冻结基线逐字段一致、`parentSnapshotHash` match=yes；证据包 `docs/validation/evidence/C1-2026-10-21/` 归档 28 件载荷；⑤⑥⑦ 三个 Medium 均以已知限制与收窄读闭合（KL-C1-1 / KL-C1-7 / KL-C1-8），KL-C1-7 升格为复用前置。**✅ 已完成（准则 v1.41，2026-10-21）**：三作用域 `TOTAL_FAIL=0`、`SELFTEST: PASS 588/588`；提交 `e1227b6`，CI run `39644901409` 双腿 `success`，包级 `ok` 行 ubuntu 17 / windows 15，腿内 `SELFTEST` 588/588、`TOTAL_FAIL=0`。 | docs/validation/t027-c1-linux-native.md |
+| 2026-10-22 | P20 | **收口两笔欠账（`[SLICE]`、M-L；准则 v1.42）**：OB-109 以**形态丙**落地——A5 冻结事实由五枚扩为六枚，新增 `ProcessPidReportsHash`（域 `proofrail:agent-runner-pid-reports:1`），父 / 子报告字节摘要绑定进 routeEvidence 布局；OB-110 修读者侧三态语义——`present == false` ⇒ `treeGone == false` ⇒ `uncertain`；OB-111 **只补登不处置**；⑤ / ⑥ / ⑦ 的结论串与 ⑤ r1 一处 Medium（双 BOM）已整改。**✅ 已完成（准则 v1.42，2026-10-22）**：三作用域 `TOTAL_FAIL=0`、`SELFTEST` 588/588；提交与 CI 读数由 ⑩ 回填。 | docs/validation/agentrunner-pid-reader.md |
 
 > **台账完整性注记（2026-09-21，已按用户授权补录）**：本表自 A4 行之后长期未追加完成行。**2026-09-21 依据各切片自己的验证报告补录 A5/A6/A7/B2/B3a 五行**（受"不凭记忆、只补可核验字段、缺失留空并标注历史缺失、不编造"三条约束），B3b 行先于本次补录写入，故五行列于其后；各行的日期/提交号/运行号/摘要均逐项标注来源，无法核验者已标注 **历史缺失**。
 > **已回填**（本片核实，2026-09-29）：**B3a 的 `DEV_PLAN{,_EN}.md` 段落已由提交 `dd36b9b` 补入**（`DEV_PLAN.md:137` 与 `_EN.md:138`）；原注记的过期表述由切片 `LEDGER-BACKFILL` 更正，**回填动作无需重复执行**。

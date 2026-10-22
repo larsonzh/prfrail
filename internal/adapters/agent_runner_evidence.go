@@ -64,6 +64,7 @@ type AgentRunnerEvidence struct {
 	LogHash                 string
 	UsageHash               string
 	ProcessStopEvidenceHash string
+	PidReportsHash          string
 	LogsComplete            bool
 	UsageComplete           bool
 	EventsComplete          bool
@@ -71,6 +72,11 @@ type AgentRunnerEvidence struct {
 	// the diff were all collected. A gap here is never expressed as an empty
 	// digest: the run must degrade instead of claiming a completed terminal.
 	ManifestsComplete bool
+	// PidReportsComplete is true only when both pid reports (the parent report and
+	// the child report) existed when the run was collected. A missing report is an
+	// evidence gap, never "no process": the CLI writes both reports at a constant
+	// write point.
+	PidReportsComplete bool
 	// Usage is the observation behind UsageHash. It is only meaningful when
 	// UsageComplete is true; an incomplete observation is never settled as observed.
 	Usage         AgentRunnerUsage
@@ -123,13 +129,16 @@ func CollectAgentRunnerEvidence(ctx context.Context, spec AgentRunnerEvidenceSpe
 	if err := collectAgentRunnerManifests(ctx, spec, &collected); err != nil {
 		return AgentRunnerEvidence{}, err
 	}
+	if err := collectAgentRunnerPidReports(spec, &collected); err != nil {
+		return AgentRunnerEvidence{}, err
+	}
 	collected.ErrorEvidence = dedupeTerminalEvidence(collected.ErrorEvidence, nil)
 	return collected, nil
 }
 
-// FrozenFacts returns the five facts, and fails when the run cannot prove them.
+// FrozenFacts returns the six facts, and fails when the run cannot prove them.
 // A caller must treat that failure as "not completed", never as a partial fact
-// set: the chain refuses a completion without all five.
+// set: the chain refuses a completion without all six.
 func (collected AgentRunnerEvidence) FrozenFacts() (AgentRunnerFrozenFacts, error) {
 	facts := AgentRunnerFrozenFacts{
 		ManifestHash:            collected.ManifestHash,
@@ -137,6 +146,7 @@ func (collected AgentRunnerEvidence) FrozenFacts() (AgentRunnerFrozenFacts, erro
 		LogHash:                 collected.LogHash,
 		UsageHash:               collected.UsageHash,
 		ProcessStopEvidenceHash: collected.ProcessStopEvidenceHash,
+		ProcessPidReportsHash:   collected.PidReportsHash,
 	}
 	if !collected.LogsComplete {
 		return AgentRunnerFrozenFacts{}, fmt.Errorf("%w: logs are incomplete", ErrAgentRunnerEvidenceGap)
@@ -149,6 +159,9 @@ func (collected AgentRunnerEvidence) FrozenFacts() (AgentRunnerFrozenFacts, erro
 	}
 	if !collected.ManifestsComplete {
 		return AgentRunnerFrozenFacts{}, fmt.Errorf("%w: the manifests are incomplete", ErrAgentRunnerEvidenceGap)
+	}
+	if !collected.PidReportsComplete {
+		return AgentRunnerFrozenFacts{}, fmt.Errorf("%w: the pid reports are incomplete", ErrAgentRunnerEvidenceGap)
 	}
 	for _, digest := range facts.hashes() {
 		if !evidence.ValidHash(digest) {
@@ -245,7 +258,7 @@ const agentRunnerUsageGapDomain = "proofrail:agent-runner-usage-gap:1\n"
 // does decode is still scanned, so an operator request inside the retained prefix
 // is never missed; the read stays bounded, so a request beyond the bound is not
 // seen at all - that prefix is then incomplete, which degrades the run and can
-// never produce a completed terminal. Events never become one of the five facts.
+// never produce a completed terminal. Events never become one of the six facts.
 func collectAgentRunnerEvents(spec AgentRunnerEvidenceSpec, collected *AgentRunnerEvidence) error {
 	data, truncated, err := readBoundedAgentRunnerArtifact(filepath.Join(spec.EvidenceDir, agentRunnerEventsFileName), agentRunnerMetadataBound)
 	if err != nil {
@@ -323,6 +336,69 @@ const (
 	agentRunnerManifestGapDomain = "proofrail:agent-runner-manifest-gap:1\n"
 	agentRunnerDiffGapDomain     = "proofrail:agent-runner-diff-gap:1\n"
 	agentRunnerStopGapDomain     = "proofrail:agent-runner-stop-gap:1\n"
+)
+
+// collectAgentRunnerPidReports freezes the sixth fact: the digest binding both
+// pid reports. A missing report is an evidence gap fail-closed, because a run
+// that left either report unwritten cannot prove its managed processes; an
+// existing empty report is the legal fact "no pid" and an existing non-empty
+// report is a pid list, neither of which is decoded here.
+func collectAgentRunnerPidReports(spec AgentRunnerEvidenceSpec, collected *AgentRunnerEvidence) error {
+	parent, parentPresent, err := readAgentRunnerPIDReport(filepath.Join(spec.EvidenceDir, agentRunnerParentPIDReportFileName))
+	if err != nil {
+		return err
+	}
+	child, childPresent, err := readAgentRunnerPIDReport(filepath.Join(spec.EvidenceDir, agentRunnerChildPIDReportFileName))
+	if err != nil {
+		return err
+	}
+	if !parentPresent || !childPresent {
+		collected.ErrorEvidence = append(collected.ErrorEvidence, evidence.Digest(agentRunnerPidReportsGapDomain, []byte(spec.RequestID)))
+		return nil
+	}
+	collected.PidReportsHash = AgentRunnerPidReportsDigest(parent, child)
+	collected.PidReportsComplete = true
+	return nil
+}
+
+// AgentRunnerPidReportsDigest is the A6 caliber of the sixth frozen fact: one
+// line per report, each carrying the file name, a space and the byte-level
+// digest of that report, in a fixed order (parent report first). The shape is
+// isomorphic to the evidence-root inventory line, and the report bytes are
+// never decoded, so an empty report legally digests to the empty-string digest.
+func AgentRunnerPidReportsDigest(parent, child []byte) string {
+	payload := agentRunnerParentPIDReportFileName + " " + evidence.Digest("", parent) + "\n" +
+		agentRunnerChildPIDReportFileName + " " + evidence.Digest("", child) + "\n"
+	return evidence.Digest(agentRunnerPidReportsDomain, []byte(payload))
+}
+
+// readAgentRunnerPIDReport reads one pid report and reports whether it exists.
+// A missing report is not an error: it is an evidence gap the collector turns
+// into a fail-closed outcome. An existing empty report is a fact (no pid).
+func readAgentRunnerPIDReport(path string) (data []byte, present bool, err error) {
+	info, err := os.Stat(path)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return nil, false, nil
+		}
+		return nil, false, fmt.Errorf("%w: stat %s: %v", ErrInvalidAgentRunnerEvidence, path, err)
+	}
+	if info.IsDir() {
+		return nil, false, fmt.Errorf("%w: pid report %s is a directory", ErrInvalidAgentRunnerEvidence, path)
+	}
+	if info.Size() > agentRunnerPostflightArtifactBound {
+		return nil, false, fmt.Errorf("%w: pid report %s exceeds the artifact bound of %d bytes", ErrInvalidAgentRunnerEvidence, path, agentRunnerPostflightArtifactBound)
+	}
+	data, err = os.ReadFile(path)
+	if err != nil {
+		return nil, false, fmt.Errorf("%w: read %s: %v", ErrInvalidAgentRunnerEvidence, path, err)
+	}
+	return data, true, nil
+}
+
+const (
+	agentRunnerPidReportsDomain    = "proofrail:agent-runner-pid-reports:1\n"
+	agentRunnerPidReportsGapDomain = "proofrail:agent-runner-pid-reports-gap:1\n"
 )
 
 // agentRunnerMetadataBound bounds the small JSON artifacts (usage, events).

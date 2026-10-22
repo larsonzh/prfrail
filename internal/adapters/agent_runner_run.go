@@ -219,7 +219,7 @@ func agentRunnerTerminalStatus(requestID string, watch AgentRunnerWatchResult, r
 		status = "uncertain"
 	case result.Termination != nil:
 		status = "uncertain"
-	case !collected.LogsComplete || !collected.UsageComplete || !collected.EventsComplete || !collected.ManifestsComplete:
+	case !collected.LogsComplete || !collected.UsageComplete || !collected.EventsComplete || !collected.ManifestsComplete || !collected.PidReportsComplete:
 		status = "uncertain"
 	default:
 		status = "completed"
@@ -262,9 +262,17 @@ func agentRunnerVerifyTreeGoneWith(ctx context.Context, evidenceDir string, wait
 	report := filepath.Join(evidenceDir, agentRunnerChildPIDReportFileName)
 	deadline := time.Now().Add(wait)
 	for {
-		pids, err := readAgentRunnerChildPIDs(report)
+		pids, present, err := readAgentRunnerChildPIDs(report)
 		if err != nil {
 			return false, err
+		}
+		if !present {
+			// A missing report is an evidence gap (fail-closed), never "no child
+			// process": the CLI writes the report at a constant write point, so its
+			// absence means the run was interrupted or the write failed and the tree
+			// can never be proven gone. Polling cannot create the report, so the
+			// verification answers immediately instead of burning the wait bound.
+			return false, nil
 		}
 		stillAlive := false
 		for _, pid := range pids {
@@ -297,28 +305,32 @@ func agentRunnerVerifyTreeGoneWith(ctx context.Context, evidenceDir string, wait
 	}
 }
 
-// readAgentRunnerChildPIDs reads the one-pid-per-line report the CLI writes. A
-// missing report means it spawned nothing.
-func readAgentRunnerChildPIDs(path string) ([]int, error) {
+// readAgentRunnerChildPIDs reads the one-pid-per-line report the CLI writes and
+// reports whether the file exists at all. The three states are distinct by
+// contract: a missing file is an evidence gap the caller must handle
+// fail-closed, an existing empty file is the fact "no child process", and an
+// existing non-empty file is parsed as the child pid list. A missing report and
+// an empty report must never be inferred from each other.
+func readAgentRunnerChildPIDs(path string) (pids []int, present bool, err error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			return nil, nil
+			return nil, false, nil
 		}
-		return nil, fmt.Errorf("%w: read %s: %v", ErrInvalidAgentRunnerRun, path, err)
+		return nil, false, fmt.Errorf("%w: read %s: %v", ErrInvalidAgentRunnerRun, path, err)
 	}
-	pids := make([]int, 0, 1)
+	pids = make([]int, 0, 1)
 	for _, line := range strings.Split(strings.TrimSpace(string(data)), "\n") {
 		if strings.TrimSpace(line) == "" {
 			continue
 		}
 		pid, err := strconv.Atoi(strings.TrimSpace(line))
 		if err != nil || pid <= 0 {
-			return nil, fmt.Errorf("%w: unreadable child pid %q", ErrInvalidAgentRunnerRun, line)
+			return nil, false, fmt.Errorf("%w: unreadable child pid %q", ErrInvalidAgentRunnerRun, line)
 		}
 		pids = append(pids, pid)
 	}
-	return pids, nil
+	return pids, true, nil
 }
 
 // agentRunnerOutcomeEvidenceFor derives the digest that names one degraded outcome.
