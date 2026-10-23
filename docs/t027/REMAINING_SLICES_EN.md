@@ -51,7 +51,8 @@
 | C1 Linux AgentRunner native validation | ✅ Done (P19) | B4 (Windows T027 complete) | M | 2026-10-21 | `docs/validation/t027-c1-linux-native{,_EN}.md` |
 | P20 AGENTRUNNER-PID-READER | ✅ Done | C1 | M-L | 2026-10-22 | docs/validation/agentrunner-pid-reader{,_EN}.md |
 | P21 DIRECTIVE-COST-TIER | ✅ Done | P20 | M | 2026-10-22 | `docs/validation/directive-cost-tier{,_EN}.md` |
-| P22 GATES-DEBT-SWEEP | ✅ Done | P21 |
+| P22 GATES-DEBT-SWEEP | ✅ Done | P21 | M-L | 2026-10-23 | `docs/validation/directive-gates-debt-sweep{,_EN}.md` |
+| P23 DIRECTIVE-TMP-EXEMPT | ✅ Done | P22 | S | 2026-10-23 | `docs/validation/directive-tmp-exempt{,_EN}.md` |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -888,6 +889,24 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Probe quota | none |
 | Freedom-list path | `docs/validation/evidence/GATES-DEBT-SWEEP-freedom-list.md` |
 
+### P23 — `DIRECTIVE-TMP-EXEMPT` · ✅ Done
+
+| Field | Content |
+|---|---|
+| Id | `DIRECTIVE-TMP-EXEMPT` (directive bumped to v1.45; this slice changes only §5.1 / §0.3 / the header / appendix C.0af, plus the disposition cell of §9.3's "② cleans early" (one cell) and the OB-114 row of §12.4) |
+| Status | ✅ **Done** (2026-10-23; directive v1.45; `--scope=index` and `--scope=tree` each with `changed=9` and `TOTAL_FAIL=0`, `SELFTEST: PASS 600/600`; the report pair and the freedom list are landed) |
+| Goal | land the "self-healed exemption" of the temp-artifact discipline: a violation that is self-reported, self-deleted and proved zero-residue is logged without halting; a missing self-report, a missing self-deletion or an unproven zero-residue still stops the slice; three occurrences inside one slice force a stop regardless |
+| Depends on | P22 closed (`HEAD` = `2b1ee31`) |
+| Size | S (documentation-only directive slice; (7) = 1 final + 3 re-reviews) |
+| Steps | step 0 → (1) → (2) → (3) → (4) → (5) → (6) → (7) (1+3) → 8a → (9) → 8b → 8c → (10) |
+| Current gap | §5.1 offers only the written path of "explicit registration" for temp-artifact violations, while every slice's start message states "violation ⇒ stop and escalate" (the two disagree; see OB-98), and both a "self-healed tier" and a "per-slice cumulative cap" are missing; the P22 D2 was still halted although it had self-healed (user ruling A, "register and continue"), while the P20 D1 was registered and continued under the written wording |
+| Deliverables | v1.45 of `DELIVERY_DIRECTIVE{,_EN}.md` (§5.1 / §0.3 / header / appendix C.0af); the report pair `docs/validation/directive-tmp-exempt{,_EN}.md`; the freedom list `docs/validation/evidence/DIRECTIVE-TMP-EXEMPT-freedom-list.md`; this P23 status row and completion row; plus the `DR-1` to `DR-10` rename in `docs/validation/directive-gates-debt-sweep{,_EN}.md` (authorised by user ruling) |
+| Acceptance evidence | §5.1 gains three tiers (self-healed / non-self-healed / cumulative cap) mirrored line by line in both languages; OB-114 flips to `Resolved`; `TOTAL_FAIL=0` in all three scopes and `SELFTEST: PASS 600/600`; the (3) Medium+ convergence precedes the dispatches of (4) and (5) (mechanically checkable: the (4) dispatch is later than the final (3) verdict) |
+| Boundary | §2.2 / §2.4 / the §5.2 matrix / the §7.5 figures / the §6.3 criterion bodies are unchanged; `internal/**`, `tools/gates/**`, CONTRACTS / schema / fixtures / workflows untouched; no gitee push; OB-104 / OB-105 / OB-107 / OB-113 not handled |
+| Class | `[SLICE]` (directive slice; changes rule semantics ⇒ (7) is not downgraded) |
+| Probe quota | none |
+| Freedom-list path | `docs/validation/evidence/DIRECTIVE-TMP-EXEMPT-freedom-list.md` |
+
 ---
 
 ## Known defects (to be handled before later slices)
@@ -1072,6 +1091,7 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | 2026-10-22 | P20 | **Closes two debts (`[SLICE]`, M-L; directive v1.42)**: OB-109 lands as **form C** - the A5 frozen facts extend from five to six and gain `ProcessPidReportsHash` (domain `proofrail:agent-runner-pid-reports:1`), binding the byte digests of the parent / child reports into the routeEvidence layout; OB-110 fixes the reader-side three-state semantics - `present == false` ⇒ `treeGone == false` ⇒ `uncertain`; OB-111 is **registered only, not acted on**; the ⑤ / ⑥ / ⑦ conclusion strings and the one Medium from ⑤ r1 (double BOM) are repaired. **✅ Done (directive v1.42, 2026-10-22)**: `TOTAL_FAIL=0` in all three scopes and `SELFTEST` 588/588; committed and pushed to origin (gitee not pushed), with the CI readings in the report. | docs/validation/agentrunner-pid-reader.md |
 | 2026-10-22 | P21 | **Governance slice (OB-31 threshold unification + OB-68 label and tier mapping + OB-84 caliber hand-off; directive v1.43)**: the §5.2 high-risk row, the ⑨ row of §5.3 and §9.2 clause 3 are unified to `R≥2` high risk and `R>3` pause and share one R-count definition; the six ⑦ labels in §5.1 / §7.1 / three §7.5 rows / §8.2 are unified as "⑦ (chosen from the §5.2 tier table)", §8.2 gains a tier-mapping table and §7.5 gains a ⑦ cost-definition paragraph; the OB-31 / OB-68 disposition cells of §12.4 flip to `Resolved` and OB-113 is registered. **✅ Done (directive v1.43, 2026-10-22)**: `TOTAL_FAIL=0` in all three scopes and `SELFTEST` 588/588; committed and pushed to `origin` (gitee not pushed) with the CI readings in the report; per §11.2 this row records the report path only. | docs/validation/directive-cost-tier.md |
 | 2026-10-23 | P22 | **Gate-debt closeout (`[SLICE]`, M-L; directive v1.44)**: OB-112 lands as consecutive BOM counting (`.md` / `.ps1` exactly one, every other type zero, the detail records `bom=0` / `bom=2`); OB-113 sub-items (1)(2) land (`--all --skip-base` and the concurrent criterion scheduler); OB-111 keeps candidate (3); both P20 Low findings are fixed; the ⑤ r1 Medium (an over-strong equivalence claim) and the ⑦ r1 Medium (`--help --skip-base` escaped the guard) are closed after remediation. **✅ Done (directive v1.44, 2026-10-23)**: `--scope=index` / `--scope=tree` each with `changed=12` and `TOTAL_FAIL=0`, `SELFTEST: PASS 600/600`; the commit is pushed to origin (gitee untouched) and the CI readings are in the report; per §11.2 this row records the report path only. | docs/validation/directive-gates-debt-sweep.md |
+| 2026-10-23 | P23 | **Rule-revision governance slice (self-heal exemption of the temp-artifact discipline; directive v1.45)**: §5.1 gains three tiers - self-heal / non-self-heal / per-slice cap: self-report + the master's pre-snapshot and evidence + self-deletion + three zero-residue mechanical evidence items ⇒ only "temp-artifact D" is registered and the pipeline is not halted; not self-reported / not self-deleted / evidence fails ⇒ stop and escalate; a per-slice temp-artifact D of 3 ⇒ the slice is halted and escalated; the master executes all three readings in person, and a master-side violation needs same-turn independent review; the disposition cell of §9.3's "② cleans early" is synchronised (one cell), §12.4 gains OB-114, and appendix C gains C.0af. **✅ Done (directive v1.45, 2026-10-23)**: `--scope=index` / `--scope=tree` each with `changed=9` and `TOTAL_FAIL=0`, `SELFTEST: PASS 600/600`; per §11.2 this row records the report path only. | docs/validation/directive-tmp-exempt{,_EN}.md |
 
 > **Ledger integrity note (2026-09-21, back-filled under explicit user authorisation)**: this table had no rows appended after A4. **On 2026-09-21 the five rows A5/A6/A7/B2/B3a were back-filled from each slice's own validation report** (under the three constraints: no memory-based entries, verifiable fields only, missing fields left blank and marked as historic gaps, nothing fabricated); the B3b row was written before this back-fill, which is why the five rows follow it.
 > **Back-filled** (verified by slice `LEDGER-BACKFILL`, 2026-09-29): **the B3a paragraph in `DEV_PLAN{,_EN}.md` was added by commit `dd36b9b`** (`DEV_PLAN.md:137` and `_EN.md:138`); the earlier still-owed wording was corrected by slice `LEDGER-BACKFILL`, and **the back-fill action does not need to be repeated**.

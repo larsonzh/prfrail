@@ -75,7 +75,7 @@ docs/validation/evidence/GATES-DEBT-SWEEP-freedom-list.md
 - **D5（工具层）**：修完 ⑦ r1 的 Medium 后忘记重暂存，`G5(f)` 判红（`MM` 四条）；处置为按具体文件 `git add` 重暂存，`G5` 转 `TOTAL_FAIL=0`。
 - **D6（流程性说明，非违规）**：⑦ r1 之前 ⑤ / ⑥ 已收敛；⑦ r1 后又产生一次修复，故 ⑦ 走 1+1（r1 发现、r2 闭环），未用满 1+3 额度。
 - **D7（工具层，⑧a 越界）**：⑧a 角色在本片结束前擅自删除整个 `tmp/GATES-DEBT-SWEEP/`（该目录原定于 ⑧c 清理），⑦ 输入包与等价性探针产物因此不可再复核；影响为该包只能按名称与读数复述，⑨ 在同一暂存态上重跑权威读数可再验证全部结论。
-- **DR-1（CI 首跑红，已闭环）**：run `39868354698`（提交 `aa5d319`）的 `Go windows-latest` 腿在 `Gates` 步判红——失败断言 `T90 two async criteria overlap instead of running back to back`，错误信息 `elapsed=612ms serial-floor=300ms`；按 §6.4 取原始日志并 `gh run rerun --failed` 复跑，同提交复跑双腿绿 ⇒ 判定为**墙钟阈值在 Windows runner 上不可移植**的偶发失败；处置为把该断言改为**完成序**判定（`C-end` 早于 `A-end`、且 `B-start` 早于 `A-end`），提交 `22b9a3d` 双腿双绿；**不以复跑绿掩盖首跑红**。
+- **DR-10（CI 首跑红，已闭环）**：run `39868354698`（提交 `aa5d319`）的 `Go windows-latest` 腿在 `Gates` 步判红——失败断言 `T90 two async criteria overlap instead of running back to back`，错误信息 `elapsed=612ms serial-floor=300ms`；按 §6.4 取原始日志并 `gh run rerun --failed` 复跑，同提交复跑双腿绿 ⇒ 判定为**墙钟阈值在 Windows runner 上不可移植**的偶发失败；处置为把该断言改为**完成序**判定（`C-end` 早于 `A-end`、且 `B-start` 早于 `A-end`），提交 `22b9a3d` 双腿双绿；**不以复跑绿掩盖首跑红**。（编号取台账空号 DR-10；DR-6 已由 GATES-EXT 占用，DR-8 已用于 assembly-min 的 flake 候选）
 
 ## 4 环境与档位
 
@@ -142,7 +142,7 @@ docs/validation/evidence/GATES-DEBT-SWEEP-freedom-list.md
 - **异常字**：`G4b` 的 `unknown=[]`（白名单 37 条未扩）。
 - **会过期字面量**：`G6-4` 无命中。
 - **版本**：`G1-b` 的 header=v1.44、§0.3 末行=v1.44。
-- **CI 序列（三提交，全部推送 origin）**：① 主提交 `6335405`，run `39867510698`，双腿（ubuntu-latest 2m41s / windows-latest 3m33s）均 `success`，Gates 步双腿 `changed=12`、`SELFTEST: PASS 600/600`、`TOTAL_FAIL=0`，包级 `ok` 行 ubuntu 17 / windows 15（windows 跳过 Race 与 Contract fixtures 两台阶，与工作流一致）；② 回填提交 `aa5d319`，run `39868354698`，ubuntu 绿、**windows 红**（`T90 two async criteria overlap instead of running back to back :: elapsed=612ms serial-floor=300ms`），按 §6.4 取证复跑同 run 后双腿绿，判定为**墙钟断言在 Windows runner 上不稳定**，登记 **DR-1**；③ 修复提交 `22b9a3d`，run `39870643625`，双腿 `success`（`changed=1`、`SELFTEST: PASS 600/600`、`TOTAL_FAIL=0`、包级 `ok` 行 ubuntu 17 / windows 15）。三次均为首跑观察，不掩盖、不跳过。；④ DR-1 记录提交 `b00c346`，run `39872271192`，双腿 `success`。**边界**：本句之后的仅文档提交不再回写本节（否则记录本身又生成新提交，形成自指），其读数由 ⑩ 回执载明。
+- **CI 序列（三提交，全部推送 origin）**：① 主提交 `6335405`，run `39867510698`，双腿（ubuntu-latest 2m41s / windows-latest 3m33s）均 `success`，Gates 步双腿 `changed=12`、`SELFTEST: PASS 600/600`、`TOTAL_FAIL=0`，包级 `ok` 行 ubuntu 17 / windows 15（windows 跳过 Race 与 Contract fixtures 两台阶，与工作流一致）；② 回填提交 `aa5d319`，run `39868354698`，ubuntu 绿、**windows 红**（`T90 two async criteria overlap instead of running back to back :: elapsed=612ms serial-floor=300ms`），按 §6.4 取证复跑同 run 后双腿绿，判定为**墙钟断言在 Windows runner 上不稳定**，登记 **DR-10**；③ 修复提交 `22b9a3d`，run `39870643625`，双腿 `success`（`changed=1`、`SELFTEST: PASS 600/600`、`TOTAL_FAIL=0`、包级 `ok` 行 ubuntu 17 / windows 15）。三次均为首跑观察，不掩盖、不跳过。；④ DR-10 记录提交 `b00c346`，run `39872271192`，双腿 `success`。**边界**：本句之后的仅文档提交不再回写本节（否则记录本身又生成新提交，形成自指），其读数由 ⑩ 回执载明。
 - **三作用域（⑨ 实测）**：`--scope=index` 的 `changed=12` 与 `--scope=tree` 的 `changed=12` 均 `TOTAL_FAIL=0`（96.2 s / 100.0 s）；`--scope=ci` 本地只取 `HEAD^1..HEAD`，本次 `changed=4`（上一提交的范围）且亦 `TOTAL_FAIL=0`（109.3 s），故它不构成本片的判据读数；推送后的双腿 CI 读数由 ⑩ 回执载明。
 
 | 观测项 | 读数 |

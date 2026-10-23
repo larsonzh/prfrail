@@ -51,7 +51,8 @@
 | C1 Linux AgentRunner native validation | ✅ 完成（P19） | B4（Windows T027 完成） | M | 2026-10-21 | `docs/validation/t027-c1-linux-native{,_EN}.md` |
 | P20 AGENTRUNNER-PID-READER | ✅ 完成 | C1 | M-L | 2026-10-22 | docs/validation/agentrunner-pid-reader{,_EN}.md |
 | P21 DIRECTIVE-COST-TIER | ✅ 完成 | P20 | M | 2026-10-22 | `docs/validation/directive-cost-tier{,_EN}.md` |
-| P22 GATES-DEBT-SWEEP | ✅ 已完成 | P21 |
+| P22 GATES-DEBT-SWEEP | ✅ 已完成 | P21 | M-L | 2026-10-23 | `docs/validation/directive-gates-debt-sweep{,_EN}.md` |
+| P23 DIRECTIVE-TMP-EXEMPT | ✅ 已完成 | P22 | S | 2026-10-23 | `docs/validation/directive-tmp-exempt{,_EN}.md` |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -902,6 +903,24 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 探针额度 | 无 |
 | 执行自由度清单落盘路径 | `docs/validation/evidence/GATES-DEBT-SWEEP-freedom-list.md` |
 
+### P23 — `DIRECTIVE-TMP-EXEMPT` · ✅ 已完成
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `DIRECTIVE-TMP-EXEMPT`（准则升 v1.45；本片只改 §5.1 / §0.3 / 头部 / 附录 C.0af，另同步 §9.3 的「② 提前清理」处置格（单格）与 §12.4 的 OB-114 条目） |
+| 状态 | ✅ **已完成**（2026-10-23；准则 v1.45；`--scope=index` 与 `--scope=tree` 各 `changed=9` 且 `TOTAL_FAIL=0`、`SELFTEST: PASS 600/600`；报告对与自由度清单已落盘） |
+| 目标 | 落地临时件纪律的「自愈豁免」机制：自报 + 自删 + 零残留证据成立时仅登记不中止；未自报 / 未自删 / 证据不成立仍停下升级；单片累计 3 次强制停片 |
+| 依赖 | P22 已闭环（`HEAD` = `2b1ee31`） |
+| 规模 | S（纯文档治理片；⑦ = 1 终审 + 3 复审） |
+| 步骤 | 步骤 0 → ① → ② → ③ → ④ → ⑤ → ⑥ → ⑦（1+3）→ ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| 现状缺口 | §5.1 的临时件违规只有「显式登记」一条成文路径，而各片起跑消息前置「违反即停下升级」（口径不一，见 OB-98），缺「自愈档」与「单片累计上界」的分级；P22 的 D2 因自愈仍被停片（用户裁定 A「登记后继续」），P20 的 D1 按原文登记继续 |
+| 交付物 | `DELIVERY_DIRECTIVE{,_EN}.md` 的 v1.45（§5.1 / §0.3 / 头部 / 附录 C.0af）；报告对 `docs/validation/directive-tmp-exempt{,_EN}.md`；自由度清单 `docs/validation/evidence/DIRECTIVE-TMP-EXEMPT-freedom-list.md`；本 P23 状态行与完成行；另含 `docs/validation/directive-gates-debt-sweep{,_EN}.md` 的 `DR-1` 改为 `DR-10`（用户裁定授权） |
+| 验收证据 | §5.1 新增「自愈档 / 非自愈档 / 累计上界」三段且中英逐行镜像；OB-114 翻 `已处置`；三作用域 `TOTAL_FAIL=0`、`SELFTEST: PASS 600/600`；③ 的 Medium+ 收敛早于 ④ 与 ⑤ 的派单（可机械核：④ 的派单时点晚于 ③ 最后一次结论） |
+| 边界 | 不改 §2.2 / §2.4 / §5.2 矩阵 / §7.5 数值 / §6.3 判据本体；不动 `internal/**`、`tools/gates/**`、CONTRACTS / schema / fixtures / workflows；不推 gitee；不处理 OB-104 / OB-105 / OB-107 / OB-113 |
+| 分级 | `[SLICE]`（治理片；规则语义变更 ⇒ ⑦ 不降级） |
+| 探针额度 | 无 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/DIRECTIVE-TMP-EXEMPT-freedom-list.md` |
+
 ---
 ## 已知缺陷（后续切片前处理）
 
@@ -1085,6 +1104,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 2026-10-22 | P20 | **收口两笔欠账（`[SLICE]`、M-L；准则 v1.42）**：OB-109 以**形态丙**落地——A5 冻结事实由五枚扩为六枚，新增 `ProcessPidReportsHash`（域 `proofrail:agent-runner-pid-reports:1`），父 / 子报告字节摘要绑定进 routeEvidence 布局；OB-110 修读者侧三态语义——`present == false` ⇒ `treeGone == false` ⇒ `uncertain`；OB-111 **只补登不处置**；⑤ / ⑥ / ⑦ 的结论串与 ⑤ r1 一处 Medium（双 BOM）已整改。**✅ 已完成（准则 v1.42，2026-10-22）**：三作用域 `TOTAL_FAIL=0`、`SELFTEST` 588/588；已提交并推送 origin（未推 gitee），CI 读数见报告。 | docs/validation/agentrunner-pid-reader.md |
 | 2026-10-22 | P21 | **准则治理类切片（OB-31 阈值统一 + OB-68 标签与档位映射 + OB-84 口径衔接；准则 v1.43）**：§5.2 高风险行、§5.3 的 ⑨ 行与 §9.2 第 3 条的 R 阈值统一为 `R≥2` 高风险、`R>3` 暂停，并共用同一 R 计数定义；§5.1 / §7.1 / §7.5 三行 / §8.2 六处的 ⑦ 标签统一为「⑦（§5.2 分档表选定）」，§8.2 新增档位映射表，§7.5 新增 ⑦ 成本定义段；§12.4 的 OB-31 / OB-68 处置列翻 `已处置` 并登记 OB-113。**✅ 已完成（准则 v1.43，2026-10-22）**：三作用域 `TOTAL_FAIL=0`、`SELFTEST` 588/588；已提交并推送 `origin`（未推 gitee），CI 读数见报告；本行按 §11.2 只记报告路径。 | docs/validation/directive-cost-tier.md |
 | 2026-10-23 | P22 | **门禁欠账收口（`[SLICE]`、M-L；准则 v1.44）**：OB-112 以连续 BOM 计数落地（`.md` / `.ps1` 恰 1 个、其余类型 0 个，detail 记 `bom=0` / `bom=2`）；OB-113 子项①② 落地（`--all --skip-base` 与判据并发调度器）；OB-111 取候选③ 维持现状；P20 两条 Low 修完；⑤ r1 一处 Medium（等价性声明过强）与 ⑦ r1 一处 Medium（`--help --skip-base` 逃过守卫）整改后收敛。**✅ 已完成（准则 v1.44，2026-10-23）**：`--scope=index` / `--scope=tree` 各 `changed=12` 且 `TOTAL_FAIL=0`、`SELFTEST: PASS 600/600`；已提交并推送 origin（未推 gitee），CI 读数见报告；本行按 §11.2 只记报告路径。 | docs/validation/directive-gates-debt-sweep.md |
+| 2026-10-23 | P23 | **规则修订型治理片（临时件纪律自愈豁免；准则 v1.45）**：§5.1 新增自愈档 / 非自愈档 / 累计上界三段——自报 + 主控预快照与取证 + 自删 + 三项零残留机械证据成立 ⇒ 仅登记「临时件 D」、不中止流水线；未自报 / 未自删 / 证据不成立 ⇒ 停下升级；单片临时件 D 达 3 次 ⇒ 停片升级；三项读数由主控亲自执行，主控本人违规须同轮独立复核；§9.3 行② 处置格同步（单格）、§12.4 新增 OB-114、附录 C.0af。**✅ 已完成（准则 v1.45，2026-10-23）**：`--scope=index` / `--scope=tree` 各 `changed=9` 且 `TOTAL_FAIL=0`、`SELFTEST: PASS 600/600`；本行按 §11.2 只记报告路径。 | docs/validation/directive-tmp-exempt{,_EN}.md |
 
 > **台账完整性注记（2026-09-21，已按用户授权补录）**：本表自 A4 行之后长期未追加完成行。**2026-09-21 依据各切片自己的验证报告补录 A5/A6/A7/B2/B3a 五行**（受"不凭记忆、只补可核验字段、缺失留空并标注历史缺失、不编造"三条约束），B3b 行先于本次补录写入，故五行列于其后；各行的日期/提交号/运行号/摘要均逐项标注来源，无法核验者已标注 **历史缺失**。
 > **已回填**（本片核实，2026-09-29）：**B3a 的 `DEV_PLAN{,_EN}.md` 段落已由提交 `dd36b9b` 补入**（`DEV_PLAN.md:137` 与 `_EN.md:138`）；原注记的过期表述由切片 `LEDGER-BACKFILL` 更正，**回填动作无需重复执行**。
