@@ -191,3 +191,16 @@ INDEPENDENT SCAN: FINDINGS
 - All four debts A / B / C / D landed; `G6-8` and `G7-f` are covered in both directions by SELFTEST assertions and real staged-change-set probes.
 - The gates are green in both the `index` and `tree` scopes (`TOTAL_FAIL=0`), and the assertion count grew from 600 to 663 with zero regression.
 - The report pair mirrors line by line: equal line counts and equal `**` / backtick counts on every line; the ⑥ transcript sits inside the single `sixstage` fence with the conclusion line last.
+
+## 8. Commit and CI
+
+- **Main commit**: `a54bc49` (`feat: v1.46 GATES-CLEANUP …`), 10 paths, `+2105/-18`; pushed to `origin/main` (SSH channel, **gitee untouched**).
+- **CI run**: `40034959012` (head `a54bc49`, attempt 1) ⇒ conclusion **success**.
+  - `Go ubuntu-latest`: success; the `Build` / `Vet` / `Test` / `Race` / `Contract fixtures` / `Gates` steps are all success.
+  - `Go windows-latest`: success; `Race` and `Contract fixtures` are skipped as usual per `runner.os == 'Linux'`; `Gates` success.
+  - the three dispatch-only jobs (`Candidate probe` / `Candidate build` / `Bootstrap and release evidence`) are all skipped.
+- **Per-leg `Gates` step readings** (from `gh run view 40034959012 --log`, one set per leg):
+  - ubuntu: `SELFTEST: PASS 663/663`, `GATE REPORT scope=ci changed=10`, `base go test ./... ok=15 FAIL=0`, `TOTAL_FAIL=0`.
+  - windows: the same four readings, with values identical to ubuntu.
+- **Reading scope**: these readings belong to the change set of the **main commit**; the readings of this backfill commit are not written back here, and its observation run adds no new commit per `§11.2`; the `§4` readings such as `newCjk` / `scanned` likewise belong to the main commit's change set, and this backfill does not rewrite them.
+- **The `§6` "CI scope" item stays verbatim**: it records the true state of that time (bound by the no-commit rule, no CI reading taken, no run id pre-filled); this section only records the readings taken after the commit and does not rewrite that item.

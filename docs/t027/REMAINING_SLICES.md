@@ -927,7 +927,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 字段 | 内容 |
 |---|---|
 | 标识 | `GATES-CLEANUP`（准则升 v1.46；本片改 §9.3 / §12.4 / §0.3 / 头部 / 附录 C.0ag，并改 `tools/gates/lib/criteria/g6.js`、`tools/gates/lib/criteria/g7.js` 与 `tools/gates/selftest.js`） |
-| 状态 | ✅ **已完成**（2026-10-23；准则 v1.46；三作用域 `TOTAL_FAIL=0`（`--scope=index` / `--scope=tree` 各 `changed=10`、`--scope=ci` 本地 `changed=2`）、`SELFTEST: PASS 663/663`；报告对与自由度清单已落盘） |
+| 状态 | ✅ **已完成**（2026-10-23；准则 v1.46；三作用域 `TOTAL_FAIL=0`（`--scope=index` / `--scope=tree` 各 `changed=10`、`--scope=ci` 本地 `changed=2`）、`SELFTEST: PASS 663/663`；报告对与自由度清单已落盘；已提交并推送 origin（未推 gitee），CI 读数见报告） |
 | 目标 | 落地四项欠账：DR 编号唯一性判据（G6 新子项）、⑥ 输出契约机械化检查、§9.3 门禁红纪律补登、OB-98 / OB-100 处置列同步 |
 | 依赖 | P23 已闭环（`HEAD` = `09ca962`） |
 | 规模 | M（治理片；⑦ = 1 终审 + 3 复审，不降级） |

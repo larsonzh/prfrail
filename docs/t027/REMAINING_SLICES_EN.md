@@ -913,7 +913,7 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Field | Content |
 |---|---|
 | Id | `GATES-CLEANUP` (directive bumped to v1.46; this slice changes §9.3 / §12.4 / §0.3 / the header / appendix C.0ag and also `tools/gates/lib/criteria/g6.js`, `tools/gates/lib/criteria/g7.js` and `tools/gates/selftest.js`) |
-| Status | ✅ **Done** (2026-10-23; directive v1.46; `TOTAL_FAIL=0` in all three scopes (`--scope=index` / `--scope=tree` each `changed=10`, `--scope=ci` local `changed=2`) and `SELFTEST: PASS 663/663`; the report pair and the freedom list have landed) |
+| Status | ✅ **Done** (2026-10-23; directive v1.46; `TOTAL_FAIL=0` in all three scopes (`--scope=index` / `--scope=tree` each `changed=10`, `--scope=ci` local `changed=2`) and `SELFTEST: PASS 663/663`; the report pair and the freedom list have landed; pushed to origin (gitee untouched); CI readings are recorded in the report) |
 | Goal | dispose of four debts: the DR-number uniqueness criterion (a new G6 sub-item), a mechanical check of the (6) output contract, the §9.3 red-gate discipline entry, and the OB-98 / OB-100 disposition-cell sync |
 | Depends on | P23 closed (`HEAD` = `09ca962`) |
 | Size | M (governance slice; (7) = 1 final + 3 re-reviews, not downgraded) |

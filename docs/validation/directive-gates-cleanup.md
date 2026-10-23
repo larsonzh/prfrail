@@ -191,3 +191,16 @@ INDEPENDENT SCAN: FINDINGS
 - 四项欠账 A / B / C / D 全部落地，`G6-8` 与 `G7-f` 由 SELFTEST 断言与真实暂存集探针双向覆盖。
 - `index` 与 `tree` 两作用域门禁全绿（`TOTAL_FAIL=0`），自测断言数由 600 增至 663 且零回归。
 - 报告对逐行镜像：行数、`**` 与反引号计数逐行相等；⑥ 转录位于唯一一处 `sixstage` 围栏内且结论行位于末尾。
+
+## 8. 提交与 CI
+
+- **主提交**：`a54bc49`（`feat: v1.46 GATES-CLEANUP …`），10 条路径，`+2105/-18`；已推 `origin/main`（SSH 通道，**未推 gitee**）。
+- **CI run**：`40034959012`（head `a54bc49`，attempt 1）⇒ 结论 **success**。
+  - `Go ubuntu-latest`：success；`Build` / `Vet` / `Test` / `Race` / `Contract fixtures` / `Gates` 各步均 success。
+  - `Go windows-latest`：success；`Race` 与 `Contract fixtures` 按 `runner.os == 'Linux'` 常态跳过；`Gates` success。
+  - 三个 dispatch 专用作业（`Candidate probe` / `Candidate build` / `Bootstrap and release evidence`）均 skipped。
+- **双腿 `Gates` 步读数**（取自 `gh run view 40034959012 --log`，逐腿各一组）：
+  - ubuntu：`SELFTEST: PASS 663/663`、`GATE REPORT scope=ci changed=10`、`base go test ./... ok=15 FAIL=0`、`TOTAL_FAIL=0`。
+  - windows：同四项读数，取值与 ubuntu 一致。
+- **读数作用域**：本节读数属**主提交**的变更集；本次回填提交自身的读数不回写本节，其观察 run 按 `§11.2` 不再新增提交；`§4` 的 `newCjk` / `scanned` 等读数同样属于主提交的变更集，本回填不改写。
+- **`§6` 的「CI 作用域」条保持原文**：该条记录当时「受禁止提交约束，未取 CI 读数、不预填 run 号」的真实状态；本节只记录提交之后取得的读数，不改写该条原文。
