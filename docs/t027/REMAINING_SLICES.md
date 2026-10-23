@@ -53,6 +53,7 @@
 | P21 DIRECTIVE-COST-TIER | ✅ 完成 | P20 | M | 2026-10-22 | `docs/validation/directive-cost-tier{,_EN}.md` |
 | P22 GATES-DEBT-SWEEP | ✅ 已完成 | P21 | M-L | 2026-10-23 | `docs/validation/directive-gates-debt-sweep{,_EN}.md` |
 | P23 DIRECTIVE-TMP-EXEMPT | ✅ 已完成 | P22 | S | 2026-10-23 | `docs/validation/directive-tmp-exempt{,_EN}.md` |
+| P24 GATES-CLEANUP | ✅ 已完成 | P23 | M | 2026-10-23 | `docs/validation/directive-gates-cleanup{,_EN}.md` |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -921,6 +922,24 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 探针额度 | 无 |
 | 执行自由度清单落盘路径 | `docs/validation/evidence/DIRECTIVE-TMP-EXEMPT-freedom-list.md` |
 
+### P24 — `GATES-CLEANUP` · ✅ 已完成
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `GATES-CLEANUP`（准则升 v1.46；本片改 §9.3 / §12.4 / §0.3 / 头部 / 附录 C.0ag，并改 `tools/gates/lib/criteria/g6.js`、`tools/gates/lib/criteria/g7.js` 与 `tools/gates/selftest.js`） |
+| 状态 | ✅ **已完成**（2026-10-23；准则 v1.46；三作用域 `TOTAL_FAIL=0`（`--scope=index` / `--scope=tree` 各 `changed=10`、`--scope=ci` 本地 `changed=2`）、`SELFTEST: PASS 663/663`；报告对与自由度清单已落盘） |
+| 目标 | 落地四项欠账：DR 编号唯一性判据（G6 新子项）、⑥ 输出契约机械化检查、§9.3 门禁红纪律补登、OB-98 / OB-100 处置列同步 |
+| 依赖 | P23 已闭环（`HEAD` = `09ca962`） |
+| 规模 | M（治理片；⑦ = 1 终审 + 3 复审，不降级） |
+| 步骤 | 步骤 0 → ①（四项判定）→ ② → ③ → ④ → ⑤ → ⑥ → ⑦（1+3）→ ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| 现状缺口 | DR 编号无机械唯一性检查（P22 报告三次搬迁才定稿）；⑥ 连续两片输出未按 Section A–E；§9.3 无「门禁红仍提交」故障模式；OB-98 / OB-100 处置列仍指向 ⑧c |
+| 交付物 | `DELIVERY_DIRECTIVE{,_EN}.md` 的 v1.46（§9.3 / §12.4 / §0.3 / 头部 / 附录 C.0ag）；`tools/gates/lib/criteria/g6.js`、`tools/gates/lib/criteria/g7.js`；`tools/gates/selftest.js`（T91–T103 断言，63 条）；报告对 `docs/validation/directive-gates-cleanup{,_EN}.md`；自由度清单；本 P24 状态行与完成行 |
+| 验收证据 | 新判据以**真实暂存集探针**取得正反双向读数（撞号注入 ⇒ FAIL、不撞号 ⇒ PASS、缺 Section C ⇒ FAIL、五段齐全 ⇒ PASS；探针用后已清理），另有 `T91`–`T103`（63 条新断言）与变异断言承担 load-bearing 证明；`SELFTEST` 全绿且断言数增加；三作用域 `TOTAL_FAIL=0`；③ 的 Medium+ 收敛早于 ④ 与 ⑤ 的派单；**每次提交前门禁全绿** |
+| 边界 | 不动 §2.2 / §2.4 / §5.2 矩阵 / §7.5 数值 / CONTRACTS / schema / fixtures / workflows；不追溯改写现象列（守 §11.1）；不推 gitee；不处理 OB-104 / OB-105 / OB-107 / OB-113 |
+| 分级 | `[SLICE]`（治理片；判据本体变更 ⇒ ⑦ 不降级） |
+| 探针额度 | 无 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/GATES-CLEANUP-freedom-list.md` |
+
 ---
 ## 已知缺陷（后续切片前处理）
 
@@ -1106,6 +1125,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 2026-10-22 | P21 | **准则治理类切片（OB-31 阈值统一 + OB-68 标签与档位映射 + OB-84 口径衔接；准则 v1.43）**：§5.2 高风险行、§5.3 的 ⑨ 行与 §9.2 第 3 条的 R 阈值统一为 `R≥2` 高风险、`R>3` 暂停，并共用同一 R 计数定义；§5.1 / §7.1 / §7.5 三行 / §8.2 六处的 ⑦ 标签统一为「⑦（§5.2 分档表选定）」，§8.2 新增档位映射表，§7.5 新增 ⑦ 成本定义段；§12.4 的 OB-31 / OB-68 处置列翻 `已处置` 并登记 OB-113。**✅ 已完成（准则 v1.43，2026-10-22）**：三作用域 `TOTAL_FAIL=0`、`SELFTEST` 588/588；已提交并推送 `origin`（未推 gitee），CI 读数见报告；本行按 §11.2 只记报告路径。 | docs/validation/directive-cost-tier.md |
 | 2026-10-23 | P22 | **门禁欠账收口（`[SLICE]`、M-L；准则 v1.44）**：OB-112 以连续 BOM 计数落地（`.md` / `.ps1` 恰 1 个、其余类型 0 个，detail 记 `bom=0` / `bom=2`）；OB-113 子项①② 落地（`--all --skip-base` 与判据并发调度器）；OB-111 取候选③ 维持现状；P20 两条 Low 修完；⑤ r1 一处 Medium（等价性声明过强）与 ⑦ r1 一处 Medium（`--help --skip-base` 逃过守卫）整改后收敛。**✅ 已完成（准则 v1.44，2026-10-23）**：`--scope=index` / `--scope=tree` 各 `changed=12` 且 `TOTAL_FAIL=0`、`SELFTEST: PASS 600/600`；已提交并推送 origin（未推 gitee），CI 读数见报告；本行按 §11.2 只记报告路径。 | docs/validation/directive-gates-debt-sweep.md |
 | 2026-10-23 | P23 | **规则修订型治理片（临时件纪律自愈豁免；准则 v1.45）**：§5.1 新增自愈档 / 非自愈档 / 累计上界三段——自报 + 主控预快照与取证 + 自删 + 三项零残留机械证据成立 ⇒ 仅登记「临时件 D」、不中止流水线；未自报 / 未自删 / 证据不成立 ⇒ 停下升级；单片临时件 D 达 3 次 ⇒ 停片升级；三项读数由主控亲自执行，主控本人违规须同轮独立复核；§9.3 行② 处置格同步（单格）、§12.4 新增 OB-114、附录 C.0af。**✅ 已完成（准则 v1.45，2026-10-23）**：`--scope=index` / `--scope=tree` 各 `changed=9` 且 `TOTAL_FAIL=0`、`SELFTEST: PASS 600/600`；已提交并推送 origin（未推 gitee），CI 读数见报告；本行按 §11.2 只记报告路径。 | docs/validation/directive-tmp-exempt{,_EN}.md |
+| 2026-10-23 | P24 | **门禁判据补强（`[SLICE]`、M；准则 v1.46）**：G6-8 落地 DR 编号唯一性与成员性检查（登记行唯一、引用须已登记）、G7-f 落地 ⑥ 输出契约的五段齐全检查；§9.3 新增「门禁红仍提交」故障模式行、§11.3 转录条款、§12.4 的 OB-98 / OB-100 处置列同步并登记 OB-115；四项欠账一次收口。审查：⑤ 两轮 `PASS WITH FIXES`、⑥ 格式合规但与 OB-115 并档、⑦ r1 / r2 `FINDINGS` → r3 `PASS`。**✅ 已完成（准则 v1.46，2026-10-23）**：三作用域均 `TOTAL_FAIL=0`（`index` / `tree` 各 `changed=10`、`ci` 本地 `changed=2`）、`SELFTEST: PASS 663/663`（T91–T103，63 条新断言）；提交与 CI 读数见报告；本行按 §11.2 只记报告路径。 | docs/validation/directive-gates-cleanup{,_EN}.md |
 
 > **台账完整性注记（2026-09-21，已按用户授权补录）**：本表自 A4 行之后长期未追加完成行。**2026-09-21 依据各切片自己的验证报告补录 A5/A6/A7/B2/B3a 五行**（受"不凭记忆、只补可核验字段、缺失留空并标注历史缺失、不编造"三条约束），B3b 行先于本次补录写入，故五行列于其后；各行的日期/提交号/运行号/摘要均逐项标注来源，无法核验者已标注 **历史缺失**。
 > **已回填**（本片核实，2026-09-29）：**B3a 的 `DEV_PLAN{,_EN}.md` 段落已由提交 `dd36b9b` 补入**（`DEV_PLAN.md:137` 与 `_EN.md:138`）；原注记的过期表述由切片 `LEDGER-BACKFILL` 更正，**回填动作无需重复执行**。

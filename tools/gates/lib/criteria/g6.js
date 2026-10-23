@@ -24,6 +24,8 @@
  *   G6-4 expiring literal  line counts / file counts / aggregate counts
  *   G6-5 section refs      §X.Y on added ledger/changelog lines must resolve (OB-32)
  *   G6-6 ledger status     §12.4 disposition cells must open with a closed-set word (OB-38)
+ *   G6-7 declaration       a §0.3 declaration names an ID the ledger regions contain (OB-32)
+ *   G6-8 DR numbering      mint rows unique, references registered (P24 GATES-CLEANUP)
  */
 
 const fs = require('fs');
@@ -1015,12 +1017,260 @@ const G6_6 = {
   },
 };
 
+/* ---------------------------------------------------------------------------
+ * G6-8 (DR number uniqueness and membership) - the mechanical answer to the "DR numbers
+ * are minted by hand" debt: the P22 report had to rename its defect id three times
+ * (`DR-1` collided with a slice name, `DR-6` with the GATES-EXT ledger, `DR-8` with the
+ * assembly-min flake candidate) before it landed.
+ *
+ * TOKEN RULE (the single source for every face of this criterion):
+ *     /(?<![A-Za-z0-9-])DR-(\d{1,2})(?![0-9])/g
+ *   - the LEFT boundary is what keeps `ADR-027` from being carved into a phantom
+ *     `DR-027` (the repository carries hundreds of `ADR-NNN` substrings);
+ *   - the RIGHT boundary is what keeps three-digit ids out of the token set: `DR-027`
+ *     yields NO token at all (`\d{1,2}` cannot consume `027` and the lookahead rejects
+ *     the trailing digit), so a three-digit number inside a REFERENCE cell is silently
+ *     not judged. The mint face catches it explicitly instead (FACE A below): a
+ *     three-digit number belongs to the ADR domain, never to the DR defect table.
+ *
+ * Only STRUCTURED declaration positions are judged, whole line at a time (a parenthetical
+ * or any free text is never judged):
+ *   FACE A  mint position, UNIQUENESS enforced - `docs/t027/REMAINING_SLICES{,_EN}.md`,
+ *           row shape `| **DR-N** |`. A changed mint row whose id already exists on
+ *           another line of the SAME file FAILs, and the detail names the id plus BOTH
+ *           line numbers. A three-digit id in the id cell FAILs as `三位 = ADR 域`.
+ *   FACE B  reference position, MEMBERSHIP - same two files, row shape `| DR-N` (the
+ *           occurrence table, including the `DR-3（第 1 次）` / `DR-3 (1st)` variants).
+ *   FACE C  reference position, MEMBERSHIP - `docs/validation/*.md` (evidence tree
+ *           excluded; `ctx.changedMarkdown()` already applies the OB-79 exclusion every
+ *           other G6 sub-check uses), row shape `| DR-N`. A cell carrying several ids
+ *           (`DR-3 / DR-4`) or a range (`DR-2 至 DR-5`) is tokenised and EACH token is
+ *           judged on its own; CONTIGUITY IS NOT JUDGED.
+ *   FACE D  reference position, MEMBERSHIP - same validation files, bullet shape
+ *           `- **DR-N（` / `- **DR-N(` / `- **DR-N (`, i.e. anchored on a half- or
+ *           full-width opening bracket, optional whitespace allowed between the number
+ *           and the bracket (F4 M3: an EN report writes `- **DR-10 (CI first run red)**`,
+ *           and a strict adjacency rule silently missed it). Without that anchor a prose
+ *           bullet such as `- **DR-2 位断言强度…**` would be judged as if it were a
+ *           registration row.
+ *
+ * PRIMARY KEY SET (the "already registered" side) = every mint id of the CURRENT FULL
+ * defect table of either mirror ∪ DR_SEED_IDS. Full file, never just the changed lines:
+ * the rows being referenced are normally older than the change set. The two mirrors are
+ * judged INDEPENDENTLY (both sides must pass) but share one key set, because a number
+ * minted on either side of the pair is registered; mirror symmetry itself is G3(a)'s job.
+ *
+ * DUAL MINT (v1.46 GATES-CLEANUP M2): G3(a) only judges diff-line-count symmetry of the
+ * two mirrors, never id agreement - so it cannot carry the claim that a number is minted
+ * on both sides. A changed mint row must therefore ALSO appear as a mint row in the OTHER
+ * mirror (read from the same scope-aware source); a one-sided mint FAILs and the detail
+ * names the mirror that lacks it. Measured before landing: the two defect tables carry the
+ * SAME id set ({2,3,4,5,6,7,9,11}), so the dual-mint rule is satisfiable by the corpus.
+ * When the OTHER mirror is unreadable the face cannot be judged: it is SKIPPED (the verdict
+ * is untouched) and the record's detail carries the explicit mark
+ * `dual-mint: other mirror unreadable, face skipped` - a stated fail-open, never a silent
+ * one (v1.46 round-6 C-8).
+ *
+ * Judged lines: the ADDED lines of the change set only (the same scope as G6-1 … G6-7).
+ * With no target file, or no judgeable row, the sub-check reports the same "no premise"
+ * record G6-7 reports (`emit` over an empty finding set) - it never invents a status.
+ *
+ * CAPABILITY BOUNDARY (stated, not hidden): this criterion catches "two mint rows with
+ * the same number" and "a reference naming a number nobody minted". It can NOT catch a
+ * reference that points at an existing number while describing a DIFFERENT defect (a
+ * semantic mismatch), and it can NOT catch a collision inside free text.
+ * ------------------------------------------------------------------------ */
+const DR_TOKEN_RE = /(?<![A-Za-z0-9-])DR-(\d{1,2})(?![0-9])/g;
+const DR_TARGET_FILES = ['docs/t027/REMAINING_SLICES.md', 'docs/t027/REMAINING_SLICES_EN.md'];
+const DR_MINT_RE = /^\|\s*\*\*DR-(\d{1,2})\*\*\s*\|/;
+/** Three-or-more digits in the mint cell: the ADR domain, never a DR defect id. */
+const DR_MINT_3D_RE = /^\|\s*\*\*DR-(\d{3,})\*\*\s*\|/;
+const DR_REF_ROW_RE = /^\|\s*DR-(\d{1,2})/;
+const DR_REF_BULLET_RE = /^-\s*\*\*DR-(\d{1,2})\s*[（(]/;
+const DR_VALIDATION_RE = /^docs\/validation\/[^/]+\.md$/;
+/**
+ * Hand-registered ids that are legitimately referenced but have no mint row of their own.
+ * Kept as an explicit constant (never inferred at run time) so a future deletion of one of
+ * these entries is a visible diff, not a silent widening of the key set.
+ */
+const DR_SEED_IDS = [
+  1, // slice name `DR-1` (DEV_PLAN B1); referenced as a slice, never a defect-table row
+  8, // the `DR-8` token on the entry line of docs/validation/directive-gates-debt-sweep.md:78
+  //    (that line matches FACE D, so EVERY token on it is judged once the line changes;
+  //    DR-8 has no mint row of its own). NOT an evidence-tree flake candidate: the
+  //    evidence tree is excluded from G6 by OB-79 and is never judged.
+  10, // registered as a bullet in docs/validation/directive-gates-debt-sweep.md
+];
+
+/** Every DR id token of one line, as numbers (the token rule above, nothing else). */
+function drTokensOf(line) {
+  DR_TOKEN_RE.lastIndex = 0;
+  const out = [];
+  let m;
+  while ((m = DR_TOKEN_RE.exec(String(line))) !== null) out.push(Number(m[1]));
+  return out;
+}
+
+/** Mint id -> every line number (1-based) in the given line array. */
+function drMintIndex(L) {
+  const out = new Map();
+  const lines = L || [];
+  for (let i = 0; i < lines.length; i++) {
+    const m = DR_MINT_RE.exec(String(lines[i] === undefined || lines[i] === null ? '' : lines[i]));
+    if (!m) continue;
+    const id = Number(m[1]);
+    if (!out.has(id)) out.set(id, []);
+    out.get(id).push(i + 1);
+  }
+  return out;
+}
+
+/**
+ * The "already registered" set: seeds plus every mint id of both CURRENT full defect
+ * tables. Read through `readTextFor` so a range/ci run judges against the endpoint
+ * revision (the same scope-aware reader G6-5 / G6-7 use).
+ */
+function drRegisteredIds(ctx) {
+  const out = new Set(DR_SEED_IDS);
+  for (const f of DR_TARGET_FILES) {
+    const t = readTextFor(ctx, f);
+    if (t === null) continue;
+    for (const id of drMintIndex(t.split('\n')).keys()) out.add(id);
+  }
+  return out;
+}
+
+const G6_8 = {
+  id: 'G6-8',
+  label: 'DR number uniqueness and membership',
+  run(ctx, out) {
+    const findings = [];
+    const registered = drRegisteredIds(ctx);
+    // Uniqueness evidence comes from the FULL file (the collision partner is usually an
+    // older row that the change set never touched). `mirrorReadable` records which side is
+    // actually readable, because the dual-mint rule below must not judge an absent premise.
+    // An unreadable side SKIPS the face (verdict unchanged) but is no longer silent: the
+    // PASS detail carries `dual-mint: other mirror unreadable, face skipped` (v1.46 C-8).
+    const mintIndex = new Map();
+    const mirrorReadable = new Map();
+    let dualSkipped = 0;
+    for (const f of DR_TARGET_FILES) {
+      const t = readTextFor(ctx, f);
+      const L = t === null ? ctx.readLineArray(f) : t.split('\n');
+      mirrorReadable.set(f, !!L);
+      mintIndex.set(f, drMintIndex(L || []));
+    }
+    let scanned = 0;
+    let refs = 0;
+    for (const f of ctx.changedMarkdown()) {
+      const L = ctx.readLineArray(f);
+      if (!L) continue;
+      const mintTarget = DR_TARGET_FILES.indexOf(f) >= 0;
+      const refTarget = DR_VALIDATION_RE.test(f);
+      if (!mintTarget && !refTarget) continue;
+      for (const n of [...ctx.addedLineNumbers(f)].sort((a, b) => a - b)) {
+        const line = L[n - 1];
+        if (line === undefined) continue;
+        scanned++;
+        if (isExcluded(line)) continue;
+        if (mintTarget) {
+          const m3 = DR_MINT_3D_RE.exec(line);
+          if (m3) {
+            findings.push({
+              file: f,
+              line: n,
+              text: line,
+              detail: f + ':' + n + ' DR-' + m3[1] + ' is a three-digit id in the mint cell (三位 = ADR 域)',
+            });
+            continue;
+          }
+          if (DR_MINT_RE.test(line)) {
+            // A mint row IS the registration: membership is vacuous, uniqueness is not.
+            const id = Number(DR_MINT_RE.exec(line)[1]);
+            const idx = mintIndex.get(f) || new Map();
+            const others = (idx.get(id) || []).filter((ln) => ln !== n);
+            if (others.length) {
+              findings.push({
+                file: f,
+                line: n,
+                text: line,
+                detail:
+                  f + ':' + n + ' DR-' + id + ' minted twice: line ' + n + ' collides with line ' + others[0],
+              });
+              continue;
+            }
+            // DUAL MINT (M2): the same number must be minted in the OTHER mirror too.
+            const other = f === DR_TARGET_FILES[0] ? DR_TARGET_FILES[1] : DR_TARGET_FILES[0];
+            if (mirrorReadable.get(other)) {
+              const oIdx = mintIndex.get(other) || new Map();
+              if (!oIdx.has(id)) {
+                findings.push({
+                  file: f,
+                  line: n,
+                  text: line,
+                  detail:
+                    f +
+                    ':' +
+                    n +
+                    ' DR-' +
+                    id +
+                    ' is minted only in ' +
+                    f +
+                    '; the mirror ' +
+                    other +
+                    ' has no mint row for it (dual mint required)',
+                });
+              }
+            } else {
+              // Fail-open, stated instead of hidden (v1.46 C-8): the face cannot be judged,
+              // so the record says so and the verdict stays whatever the other faces say.
+              dualSkipped++;
+            }
+            continue;
+          }
+          if (!DR_REF_ROW_RE.test(line)) continue; // any other row shape is not judged
+        } else if (!DR_REF_ROW_RE.test(line) && !DR_REF_BULLET_RE.test(line)) {
+          continue;
+        }
+        for (const id of drTokensOf(line)) {
+          refs++;
+          if (registered.has(id)) continue;
+          findings.push({
+            file: f,
+            line: n,
+            text: line,
+            detail:
+              f + ':' + n + ' DR-' + id + ' is referenced but not registered in the defect table (+ seeds)',
+          });
+        }
+      }
+    }
+    return emit(
+      ctx,
+      out,
+      'G6-8',
+      'DR number uniqueness and membership',
+      findings,
+      'registered DR set {' +
+        [...registered].sort((a, b) => a - b).join(',') +
+        '}; no DR collision or dangling reference on added lines (scanned ' +
+        scanned +
+        ', refs ' +
+        refs +
+        ')' +
+        (dualSkipped
+          ? '; dual-mint: other mirror unreadable, face skipped (' + dualSkipped + ' changed mint row(s))'
+          : '')
+    );
+  },
+};
+
 module.exports = {
   id: 'G6',
   label: 'ledger metadata consistency',
   title: '台账元数据一致性',
   scripted: true,
-  subchecks: [G6_1, G6_2, G6_3, G6_4, G6_5, G6_6, G6_7],
+  subchecks: [G6_1, G6_2, G6_3, G6_4, G6_5, G6_6, G6_7, G6_8],
   internals: {
     isExcluded,
     headingIndices,
@@ -1058,6 +1308,19 @@ module.exports = {
     DECL_WINDOW,
     declarationPairs,
     ledgerIds,
+    // G6-8: the token rule, the four structured-position shapes, the seed ids and the
+    // two index helpers the migration probes compile against.
+    DR_TOKEN_RE,
+    DR_TARGET_FILES,
+    DR_MINT_RE,
+    DR_MINT_3D_RE,
+    DR_REF_ROW_RE,
+    DR_REF_BULLET_RE,
+    DR_VALIDATION_RE,
+    DR_SEED_IDS,
+    drTokensOf,
+    drMintIndex,
+    drRegisteredIds,
   },
   run(ctx, out) {
     for (const s of this.subchecks) s.run(ctx, out);

@@ -315,7 +315,19 @@ function makeCtx(keys, opts) {
     else if (v && typeof v === 'object') for (const p of Object.keys(v)) texts.set(p, v[p] === true ? t : v[p]);
     else texts.set(v, t);
   }
-  const changed = [...texts.keys()].map((p) => ({ path: p, status: 'A', untracked: true, deleted: false }));
+  // Round-9 R1: a fixture path G7 itself judges as a report (`G7.internals.targets`)
+  // registers as an EXISTING report the change set MODIFIES (`status: 'M'`, tracked).
+  // The five `docs/validation/*` corpus fixtures stand for the repository's tracked
+  // validation reports, so G7-f's newly-added branch (round-8 F1) must not fire on
+  // them - the corpus keeps judging report CONTENT, not report birth. The F1 FAIL
+  // path itself stays pinned by T102's explicit `A`-record probes.
+  const reportPaths = new Set(G7.internals.targets({ changedPaths: [...texts.keys()] }));
+  const changed = [...texts.keys()].map((p) => ({
+    path: p,
+    status: reportPaths.has(p) ? 'M' : 'A',
+    untracked: !reportPaths.has(p),
+    deleted: false,
+  }));
   const changedPaths = changed.map((c) => c.path);
   const linesOf = (p) => (texts.has(p) ? texts.get(p).split('\n') : null);
   /** Records every ctx.loadWhitelist() call, so T14 can prove both criteria use it. */
@@ -555,16 +567,24 @@ function without(ids) {
  * touch only these ctx members, so the structural-disposition probes and the bilingual
  * stopped-state probes can be enumerated without a fixture file per case.
  */
-function g7ProbeCtx(text) {
+function g7ProbeCtx(text, opts) {
+  const o = opts || {};
   const p = 'docs/validation/probe-g7.md';
   const lines = String(text).split('\n');
+  // The change-set record is what G7-f's C-1 guard reads: `status: 'A'` (+ `untracked`) is a
+  // report ADDED by this change set, `status: 'M'` is an existing report that was modified.
+  const rec = Object.assign({ path: p, status: 'A', untracked: true, deleted: false }, o.record || {});
+  // `added` overrides the added-line set (round-8 F2 probes touch ONLY the opening or the
+  // closing fence line, so the default "every line is added" would defeat them).
+  const addedSet = new Set(o.added || lines.map((_, i) => i + 1));
   return {
     kind: 'tree',
     scope: { kind: 'tree' },
-    changed: [{ path: p, status: 'A', untracked: true, deleted: false }],
+    changed: [rec],
     changedPaths: [p],
+    recordFor: (q) => (q === p ? rec : null),
     readLineArray: (q) => (q === p ? lines : null),
-    addedLineNumbers: () => new Set(lines.map((_, i) => i + 1)),
+    addedLineNumbers: () => addedSet,
   };
 }
 
@@ -578,6 +598,26 @@ function g7Probe(id, text, mod) {
     verdict: verdictOf(out.records, id),
     findings: res.findings.length,
     why: res.findings.length ? res.findings[0].detail : '',
+  };
+}
+
+/**
+ * G7-f probe (P24 GATES-CLEANUP): unlike `g7Probe` it reports the RECORD's own verdict
+ * (`INFO` / `PASS` / `FAIL`) instead of the folded one, because G7-f's absence rule
+ * deliberately distinguishes "no premise" (INFO) from "contract honoured" (PASS) - the
+ * two would be indistinguishable through `verdictOf`.
+ */
+function g7fProbe(text, mod, opts) {
+  const out = createReport();
+  const M = mod || G7;
+  const sub = M.subchecks.find((s) => s.id === 'G7-f');
+  const res = sub.run(g7ProbeCtx(text, opts), out);
+  const rec = out.records[0] || { verdict: 'ABSENT', detail: '' };
+  return {
+    verdict: rec.verdict,
+    findings: res.findings.length,
+    why: res.findings.length ? res.findings[0].detail : '',
+    detail: String(rec.detail),
   };
 }
 
@@ -735,6 +775,45 @@ function g67Probe(virtualPath, text, mod, opts) {
     findings: res.findings.length,
     detail: detailOf(out.records, 'G6-7'),
     records: out.records,
+  };
+}
+
+/**
+ * G6-8 probe (P24 GATES-CLEANUP): a synthetic change set over repository-relative paths.
+ * `files` maps EVERY path the criterion may read (the two defect-table mirrors supply the
+ * primary key set, the validation report supplies the judged rows) to its full text, so a
+ * probe never depends on the real corpus; `changed` selects what is judged and `added`
+ * overrides the added-line numbers (default: every line of a changed file).
+ */
+function g68Probe(files, opts) {
+  opts = opts || {};
+  const paths = Object.keys(files);
+  const lines = new Map(paths.map((p) => [p, String(files[p]).split('\n')]));
+  const changed = opts.changed || paths;
+  const addedNums = (p) =>
+    opts.added && Object.prototype.hasOwnProperty.call(opts.added, p)
+      ? opts.added[p]
+      : (lines.get(p) || []).map((_, i) => i + 1);
+  const ctx = {
+    // `repoRoot` is overridable so a probe can make a file UNREADABLE on purpose: `readTextFor`
+    // falls back to the disk, and a root that does not contain the path is the only way to
+    // reach the dual-mint "other mirror unreadable" branch (v1.46 C-8).
+    repoRoot: opts.repoRoot || discoverRepoRoot(__dirname),
+    kind: 'tree',
+    scope: { kind: 'tree' },
+    changedMarkdown: () => changed.filter((p) => /\.md$/i.test(p) && !isEvidenceTree(p)),
+    readLineArray: (p) => (lines.has(p) ? lines.get(p) : null),
+    readText: (p) => (lines.has(p) ? files[p] : null),
+    addedLineNumbers: (p) => new Set(addedNums(p)),
+    loadWhitelist: () => ({ entries: opts.whitelist || [], error: null, source: 'probe' }),
+  };
+  const out = createReport();
+  const res = (opts.mod || G6).subchecks.find((s) => s.id === 'G6-8').run(ctx, out);
+  const rec = out.records[0] || { verdict: 'ABSENT', detail: '' };
+  return {
+    verdict: String(rec.verdict),
+    findings: res.findings.length,
+    detail: String(rec.detail),
   };
 }
 
@@ -5205,6 +5284,754 @@ async function runTests() {
     t90Leaked = t90Out.records.length;
     check('T90 a rejecting criterion rejects the plan and writes no partial records',
       t90Rejected === true && t90Leaked === 0, 'rejected=' + t90Rejected + ' records=' + t90Leaked);
+  }
+
+  // ---- T91: G6-8 (P24 GATES-CLEANUP) - DR numbers must be minted once and every
+  // reference must name a registered id. The token rule is the load-bearing piece:
+  // `ADR-027` must not be carved into `DR-027`, and a three-digit `DR-027` produces no
+  // token at all (it is an ADR-domain number and is caught on the MINT face instead).
+  // Six positives pin the four structured faces and the no-premise record; three
+  // negatives pin collision / three-digit / dangling reference; three mutations and one
+  // restore prove each guard - not some unrelated branch - is what turns them red.
+  {
+    const SLCN = 'docs/t027/REMAINING_SLICES.md';
+    const SLEN = 'docs/t027/REMAINING_SLICES_EN.md';
+    const VF = 'docs/validation/probe-g6-8.md';
+    const mintRows = (ids) => ids.map((id) => '| **DR-' + id + '** | probe row ' + id + ' | src |');
+    const slicesDoc = (ids) =>
+      ['# probe', '', '## defect table', '', '| id | symptom | source |', '|---|---|---|'].concat(mintRows(ids)).concat(['']).join('\n');
+    const valDoc = (row) => ['# probe', '', '| id | a | b |', '|---|---|---|', row, ''].join('\n');
+    // Registered set of the probe docs = minted {2,3} ∪ seeds {1,8,10}.
+    const base = () => ({ [SLCN]: slicesDoc([2, 3]), [SLEN]: slicesDoc([2, 3]) });
+
+    // Positive: two distinct mint rows, all lines added.
+    const p1 = g68Probe(base(), { changed: [SLCN] });
+    check(
+      'T91 G6-8 positive: distinct mint rows on added lines pass and the record names the registered set',
+      p1.verdict === 'PASS' && p1.findings === 0 && /registered DR set \{1,2,3,8,10\}/.test(p1.detail),
+      'verdict=' + p1.verdict + ' findings=' + p1.findings + ' :: ' + p1.detail
+    );
+
+    // Negative ①: a second mint row carrying an existing number.
+    const dupText = slicesDoc([2, 3]) + '| **DR-2** | duplicate mint | src |\n';
+    const n1 = g68Probe({ [SLCN]: dupText, [SLEN]: slicesDoc([2, 3]) }, { changed: [SLCN], added: { [SLCN]: [9] } });
+    check(
+      'T91 G6-8 negative: a mint row that reuses a registered number fails and names BOTH line numbers',
+      n1.verdict === 'FAIL' && n1.findings === 1 && /DR-2/.test(n1.detail) && /:9 /.test(n1.detail) && /collides with line 7/.test(n1.detail),
+      'verdict=' + n1.verdict + ' findings=' + n1.findings + ' :: ' + n1.detail
+    );
+
+    // Negative ②: a three-digit id in the mint cell (the ADR domain).
+    const threeDoc = slicesDoc([2, 3]) + '| **DR-027** | three digits | src |\n';
+    const n2 = g68Probe({ [SLCN]: threeDoc, [SLEN]: slicesDoc([2, 3]) }, { changed: [SLCN], added: { [SLCN]: [9] } });
+    check(
+      'T91 G6-8 negative: a three-digit id in the mint cell fails as `三位 = ADR 域`',
+      n2.verdict === 'FAIL' && n2.findings === 1 && /DR-027/.test(n2.detail) && /ADR 域/.test(n2.detail),
+      'verdict=' + n2.verdict + ' findings=' + n2.findings + ' :: ' + n2.detail
+    );
+
+    // Negative ③: a reference row naming an id nobody minted.
+    const n3 = g68Probe(Object.assign(base(), { [VF]: valDoc('| DR-42 | x | y |') }), { changed: [VF] });
+    check(
+      'T91 G6-8 negative: a reference to an unregistered id fails and names the id',
+      n3.verdict === 'FAIL' && n3.findings === 1 && /DR-42/.test(n3.detail) && /not registered/.test(n3.detail),
+      'verdict=' + n3.verdict + ' findings=' + n3.findings + ' :: ' + n3.detail
+    );
+
+    // Positive: a range cell is tokenised (DR-2 and DR-3 judged separately, contiguity not judged).
+    const p2 = g68Probe(Object.assign(base(), { [VF]: valDoc('| DR-2 至 DR-3 | x | y |') }), { changed: [VF] });
+    check(
+      'T91 G6-8 positive: every token of a range cell is judged on its own (refs=2, both registered)',
+      p2.verdict === 'PASS' && p2.findings === 0 && /refs 2\)/.test(p2.detail),
+      'verdict=' + p2.verdict + ' findings=' + p2.findings + ' :: ' + p2.detail
+    );
+
+    // Positive: `ADR-027` and a three-digit `DR-027` inside a reference cell yield no token.
+    const p3 = g68Probe(Object.assign(base(), { [VF]: valDoc('| DR-2 | ADR-027 / ADR-028 / DR-027 |') }), { changed: [VF] });
+    check(
+      'T91 G6-8 positive: `ADR-027` and a three-digit `DR-027` mint no token (refs=1, only DR-2 judged)',
+      p3.verdict === 'PASS' && p3.findings === 0 && /refs 1\)/.test(p3.detail),
+      'verdict=' + p3.verdict + ' findings=' + p3.findings + ' :: ' + p3.detail
+    );
+
+    // Face D anchor: the same unregistered id is judged inside a registration bullet and
+    // ignored in a prose bullet that carries no opening bracket.
+    const dOn = g68Probe(Object.assign(base(), { [VF]: valDoc('- **DR-42（位断言强度）**：probe') }), { changed: [VF] });
+    const dOff = g68Probe(Object.assign(base(), { [VF]: valDoc('- **DR-42 位断言强度…**：probe') }), { changed: [VF] });
+    check(
+      'T91 G6-8 positive: the bullet face is bracket-anchored (DR-42 judged with `（`, ignored without)',
+      dOn.verdict === 'FAIL' && dOn.findings === 1 && dOff.verdict === 'PASS' && dOff.findings === 0,
+      'bracketed=' + dOn.verdict + '/' + dOn.findings + ' prose=' + dOff.verdict + '/' + dOff.findings
+    );
+
+    // Premise: no target document in the change set is the same "no premise" record G6-7 emits.
+    const p4 = g68Probe(base(), { changed: ['docs/README.md'] });
+    check(
+      'T91 G6-8 premise: with no target document the record is a PASS over 0 scanned lines (never a crash)',
+      p4.verdict === 'PASS' && p4.findings === 0 && /scanned 0, refs 0/.test(p4.detail),
+      'verdict=' + p4.verdict + ' findings=' + p4.findings + ' :: ' + p4.detail
+    );
+
+    // Mutations: each guard must be load-bearing.
+    const m1 = loadMutatedModule(G6_SOURCE, '            if (others.length) {', '            if (false) {', 'g68-uniqueness');
+    const rm1 = g68Probe({ [SLCN]: dupText, [SLEN]: slicesDoc([2, 3]) }, { changed: [SLCN], added: { [SLCN]: [9] }, mod: m1.exports });
+    check(
+      'T91 G6-8 mutation applied + load-bearing: disabling the uniqueness test turns the collision case green',
+      m1.applied === true && m1.identical === true && rm1.verdict === 'PASS' && rm1.findings === 0,
+      'applied=' + m1.applied + ' identical=' + m1.identical + ' verdict=' + rm1.verdict + ' findings=' + rm1.findings
+    );
+
+    const m2 = loadMutatedModule(G6_SOURCE, '          if (m3) {', '          if (false) {', 'g68-three-digit');
+    const rm2 = g68Probe({ [SLCN]: threeDoc, [SLEN]: slicesDoc([2, 3]) }, { changed: [SLCN], added: { [SLCN]: [9] }, mod: m2.exports });
+    check(
+      'T91 G6-8 mutation applied + load-bearing: disabling the three-digit test turns the DR-027 case green',
+      m2.applied === true && m2.identical === true && rm2.verdict === 'PASS' && rm2.findings === 0,
+      'applied=' + m2.applied + ' identical=' + m2.identical + ' verdict=' + rm2.verdict + ' findings=' + rm2.findings
+    );
+
+    const m3 = loadMutatedModule(G6_SOURCE, '          if (registered.has(id)) continue;', '          if (true) continue;', 'g68-membership');
+    const rm3 = g68Probe(Object.assign(base(), { [VF]: valDoc('| DR-42 | x | y |') }), { changed: [VF], mod: m3.exports });
+    check(
+      'T91 G6-8 mutation applied + load-bearing: ignoring the registered set turns the dangling reference green',
+      m3.applied === true && m3.identical === true && rm3.verdict === 'PASS' && rm3.findings === 0,
+      'applied=' + m3.applied + ' identical=' + m3.identical + ' verdict=' + rm3.verdict + ' findings=' + rm3.findings
+    );
+
+    check(
+      'T91 G6-8 restore: g6.js is byte-identical after all three mutation windows and the shipped module still fails both samples',
+      m1.identical === true &&
+        m2.identical === true &&
+        m3.identical === true &&
+        g68Probe(Object.assign(base(), { [VF]: valDoc('| DR-42 | x | y |') }), { changed: [VF] }).verdict === 'FAIL' &&
+        g68Probe({ [SLCN]: dupText, [SLEN]: slicesDoc([2, 3]) }, { changed: [SLCN], added: { [SLCN]: [9] } }).verdict === 'FAIL',
+      'identical=' + (m1.identical && m2.identical && m3.identical)
+    );
+  }
+
+  // ---- T92: G7-f (P24 GATES-CLEANUP) - a changed ```sixstage transcript fence must hold
+  // the ⑥ output contract: sections A-E once each in order, a closed-set `INDEPENDENT
+  // SCAN` conclusion as the LAST non-empty line, and SEVERITY rows in section B exactly
+  // when the conclusion is FINDINGS. The absence rule is read from the full report body:
+  // a report naming `INDEPENDENT SCAN` without a fence is self-contradictory (FAIL), an
+  // explicit skip declaration is a PASS, and neither is INFO (never a red for a criterion
+  // that does not claim the existence obligation).
+  {
+    const sixDoc = (o) => {
+      o = o || {};
+      const letters = o.letters || ['A', 'B', 'C', 'D', 'E'];
+      const body = o.body || ['scope: probe', 'no severity rows', 'x', 'y', 'z'];
+      const out = ['# probe report', ''];
+      if (o.fence !== false) out.push('```sixstage');
+      letters.forEach((L, i) => {
+        out.push('## Section ' + L);
+        out.push(body[i] === undefined ? '-' : body[i]);
+      });
+      if (o.conclusion !== null) out.push(o.conclusion === undefined ? 'INDEPENDENT SCAN: PASS' : o.conclusion);
+      if (o.note) out.push(o.note);
+      if (o.fence !== false) out.push('```');
+      if (o.tail) for (const t of o.tail) out.push(t);
+      out.push('');
+      return out.join('\n');
+    };
+
+    const g1 = g7fProbe(sixDoc());
+    check(
+      'T92 G7-f positive: five sections A→B→C→D→E plus a closed-set conclusion pass',
+      g1.verdict === 'PASS' && g1.findings === 0,
+      'verdict=' + g1.verdict + ' findings=' + g1.findings + ' :: ' + g1.detail
+    );
+
+    const gMissing = g7fProbe(sixDoc({ letters: ['A', 'B', 'D', 'E'] }));
+    check(
+      'T92 G7-f negative: a missing Section C fails and the detail names the sequence found',
+      gMissing.verdict === 'FAIL' && gMissing.findings >= 1 && /ABDE/.test(gMissing.why),
+      'verdict=' + gMissing.verdict + ' :: ' + gMissing.why
+    );
+
+    const gOrder = g7fProbe(sixDoc({ letters: ['A', 'B', 'D', 'C', 'E'] }));
+    check(
+      'T92 G7-f negative: a reordered pair (A B D C E) fails',
+      gOrder.verdict === 'FAIL' && gOrder.findings >= 1 && /ABDCE/.test(gOrder.why),
+      'verdict=' + gOrder.verdict + ' :: ' + gOrder.why
+    );
+
+    const gNote = g7fProbe(sixDoc({ note: 'note: must live outside the fence' }));
+    check(
+      'T92 G7-f negative: content after the conclusion line fails with the "note outside the fence" reason',
+      gNote.verdict === 'FAIL' && /OUTSIDE the ```sixstage fence/.test(gNote.why),
+      'verdict=' + gNote.verdict + ' :: ' + gNote.why
+    );
+
+    const sevRow = '| **High** | probe finding | 已闭合 |';
+    const gSevPass = g7fProbe(sixDoc({ body: ['scope', sevRow, 'x', 'y', 'z'] }));
+    const gPassFind = g7fProbe(sixDoc({ conclusion: 'INDEPENDENT SCAN: FINDINGS' }));
+    check(
+      'T92 G7-f negative: SEVERITY rows with PASS and FINDINGS with no SEVERITY row both fail',
+      gSevPass.verdict === 'FAIL' && /must be FINDINGS/.test(gSevPass.why) && gPassFind.verdict === 'FAIL' && gPassFind.findings >= 1,
+      'sev+pass=' + gSevPass.verdict + ' find+none=' + gPassFind.verdict + ' :: ' + gSevPass.why + ' || ' + gPassFind.why
+    );
+
+    const gSevFind = g7fProbe(sixDoc({ body: ['scope', sevRow, 'x', 'y', 'z'], conclusion: 'INDEPENDENT SCAN: FINDINGS' }));
+    check(
+      'T92 G7-f positive: SEVERITY rows with a FINDINGS conclusion pass (the pairing is not one-directional)',
+      gSevFind.verdict === 'PASS' && gSevFind.findings === 0,
+      'verdict=' + gSevFind.verdict + ' findings=' + gSevFind.findings + ' :: ' + gSevFind.detail
+    );
+
+    const gNoFence = g7fProbe(sixDoc({ fence: false }));
+    check(
+      'T92 G7-f negative: a report naming INDEPENDENT SCAN with no sixstage fence fails (self-contradictory)',
+      gNoFence.verdict === 'FAIL' && /carries no ```sixstage fence/.test(gNoFence.why),
+      'verdict=' + gNoFence.verdict + ' :: ' + gNoFence.why
+    );
+
+    const gSkip = g7fProbe(
+      ['# probe report', '', '- ⑥ 跳过：本片无 ⑥ 独立扫描（用户裁定 PASS 口述转书面）', ''].join('\n'),
+      null,
+      // C-1: the waiver channel survives only for a report the change set MODIFIES.
+      { record: { status: 'M', untracked: false } }
+    );
+    check(
+      'T92 G7-f positive: a fixed-form skip declaration with no fence passes',
+      gSkip.verdict === 'PASS' && gSkip.findings === 0,
+      'verdict=' + gSkip.verdict + ' findings=' + gSkip.findings + ' :: ' + gSkip.detail
+    );
+
+    // Round-8 F1: a bare NEWLY ADDED report now FAILs (T102 ①), so the premise is pinned
+    // on an EXISTING report (explicit M record) - the shape the INFO state still exists for.
+    const gBare = g7fProbe(['# probe report', '', 'plain prose only', ''].join('\n'), null, {
+      record: { status: 'M', untracked: false },
+    });
+    check(
+      'T92 G7-f premise: an EXISTING report with neither fence, marker nor skip declaration is INFO, never FAIL',
+      gBare.verdict === 'INFO' && gBare.findings === 0,
+      'verdict=' + gBare.verdict + ' :: ' + gBare.detail
+    );
+
+    const m1 = loadMutatedModule(G7_SOURCE, '        if (seq !== SIXSTAGE_SECTION_SEQ) {', '        if (false) {', 'g7f-sections');
+    const rm1 = g7fProbe(sixDoc({ letters: ['A', 'B', 'D', 'E'] }), m1.exports);
+    check(
+      'T92 G7-f mutation applied + load-bearing: disabling the section-sequence test turns the missing-C case green',
+      m1.applied === true && m1.identical === true && rm1.verdict === 'PASS' && rm1.findings === 0,
+      'applied=' + m1.applied + ' identical=' + m1.identical + ' verdict=' + rm1.verdict + ' findings=' + rm1.findings
+    );
+
+    check(
+      'T92 G7-f restore: g7.js is byte-identical after the mutation window and the shipped module still fails the missing-C case',
+      m1.identical === true && g7fProbe(sixDoc({ letters: ['A', 'B', 'D', 'E'] })).verdict === 'FAIL',
+      'identical=' + m1.identical + ' verdict=' + g7fProbe(sixDoc({ letters: ['A', 'B', 'D', 'E'] })).verdict
+    );
+  }
+
+  // ---- T93: G7-f conclusion-line face (5 r2 M5). Three assertions the earlier suite left
+  // open: an out-of-set conclusion VALUE, a block carrying all five sections but NO
+  // conclusion line (the real P23 breach shape), and the mutation proving the closed-set
+  // test - not some neighbouring branch - is what turns the out-of-set value red.
+  {
+    const sixDoc = (o) => {
+      o = o || {};
+      const body = o.body || ['scope: probe', 'no severity rows', 'x', 'y', 'z'];
+      const out = ['# probe report', '', '```sixstage'];
+      ['A', 'B', 'C', 'D', 'E'].forEach((L, i) => {
+        out.push('## Section ' + L);
+        out.push(body[i] === undefined ? '-' : body[i]);
+      });
+      if (o.conclusion !== undefined) out.push(o.conclusion);
+      out.push('```', '');
+      return out.join('\n');
+    };
+
+    const gOut = g7fProbe(sixDoc({ conclusion: 'INDEPENDENT SCAN: MAYBE' }));
+    check(
+      'T93 G7-f negative: an out-of-set conclusion value (`MAYBE`) fails as outside the closed set',
+      gOut.verdict === 'FAIL' && gOut.findings >= 1 && /outside the closed set/.test(gOut.why),
+      'verdict=' + gOut.verdict + ' :: ' + gOut.why
+    );
+
+    const gNone = g7fProbe(sixDoc({}));
+    check(
+      'T93 G7-f negative: five sections and NO conclusion line fails (the real P23 breach shape)',
+      gNone.verdict === 'FAIL' && gNone.findings >= 1 && /is not an `INDEPENDENT SCAN: <value>` conclusion line/.test(gNone.why),
+      'verdict=' + gNone.verdict + ' :: ' + gNone.why
+    );
+
+    const mConcl = loadMutatedModule(
+      G7_SOURCE,
+      '          if (lastConc.value && values.indexOf(lastConc.value) >= 0) {',
+      '          if (true) {',
+      'g7f-conclusion-set'
+    );
+    const rmConcl = g7fProbe(sixDoc({ conclusion: 'INDEPENDENT SCAN: MAYBE' }), mConcl.exports);
+    check(
+      'T93 G7-f mutation applied + load-bearing: disabling the conclusion closed-set test turns the MAYBE case green',
+      mConcl.applied === true && mConcl.identical === true && rmConcl.verdict === 'PASS' && rmConcl.findings === 0,
+      'applied=' + mConcl.applied + ' identical=' + mConcl.identical + ' verdict=' + rmConcl.verdict + ' findings=' + rmConcl.findings
+    );
+    check(
+      'T93 G7-f restore: g7.js is byte-identical after the mutation window and the shipped module still fails the MAYBE case',
+      mConcl.identical === true && g7fProbe(sixDoc({ conclusion: 'INDEPENDENT SCAN: MAYBE' })).verdict === 'FAIL',
+      'identical=' + mConcl.identical + ' verdict=' + g7fProbe(sixDoc({ conclusion: 'INDEPENDENT SCAN: MAYBE' })).verdict
+    );
+  }
+
+  // ---- T94/T95: G6-8 faces raised by the 5 round-two review (5 r2 M2 / M3). G3(a) only
+  // judges diff-line-count symmetry, so id agreement between the two defect-table mirrors
+  // is carried by G6-8 itself (dual mint); and the FACE D bullet anchor must accept the
+  // spaced English form `- **DR-10 (…)**`, which a strict adjacency rule silently missed.
+  {
+    const SLCN = 'docs/t027/REMAINING_SLICES.md';
+    const SLEN = 'docs/t027/REMAINING_SLICES_EN.md';
+    const VF = 'docs/validation/probe-g6-8-faces.md';
+    const mintRows = (ids) => ids.map((id) => '| **DR-' + id + '** | probe row ' + id + ' | src |');
+    const slicesDoc = (ids) =>
+      ['# probe', '', '## defect table', '', '| id | symptom | source |', '|---|---|---|'].concat(mintRows(ids)).concat(['']).join('\n');
+    const valDoc = (row) => ['# probe', '', '| id | a | b |', '|---|---|---|', row, ''].join('\n');
+    const base = () => ({ [SLCN]: slicesDoc([2, 3]), [SLEN]: slicesDoc([2, 3]) });
+
+    const sym = g68Probe(base(), { changed: [SLCN] });
+    check(
+      'T94 G6-8 positive: a mint row present in BOTH mirrors passes the dual-mint rule (the corpus shape)',
+      sym.verdict === 'PASS' && sym.findings === 0,
+      'verdict=' + sym.verdict + ' findings=' + sym.findings + ' :: ' + sym.detail
+    );
+
+    const oneSide = g68Probe({ [SLCN]: slicesDoc([2, 3]), [SLEN]: slicesDoc([2]) }, { changed: [SLCN] });
+    check(
+      'T94 G6-8 negative: a mint row missing from the other mirror fails and the detail names the missing side',
+      oneSide.verdict === 'FAIL' && oneSide.findings === 1 && /DR-3 is minted only in/.test(oneSide.detail) && /REMAINING_SLICES_EN\.md has no mint row/.test(oneSide.detail),
+      'verdict=' + oneSide.verdict + ' findings=' + oneSide.findings + ' :: ' + oneSide.detail
+    );
+
+    const spaced = g68Probe(Object.assign(base(), { [VF]: valDoc('- **DR-42 (spaced opening paren)**：probe') }), { changed: [VF] });
+    check(
+      'T95 G6-8 FACE D: the spaced EN bullet form `- **DR-42 (…)` is judged (adjacency is no longer required)',
+      spaced.verdict === 'FAIL' && spaced.findings === 1 && /DR-42/.test(spaced.detail) && /not registered/.test(spaced.detail),
+      'verdict=' + spaced.verdict + ' findings=' + spaced.findings + ' :: ' + spaced.detail
+    );
+  }
+
+  // ---- T96: G7-f transition channel (5 r2 H1), exclusion-marker reuse (5 r2 M4) and fence
+  // closure (5 r2 L9). The historical exemption must reach PASS *while the marker is
+  // present*, which is exactly the shape of the ~29 report pairs it exists for.
+  {
+    const histCn = g7fProbe(
+      ['# probe report', '', 'The prose says `INDEPENDENT SCAN` once.', '', '- ⑥ 历史豁免：v1.46 之前已提交，逐字转录不可复原', ''].join('\n'),
+      null,
+      // C-1: the channel is for a report that already existed before this change set.
+      { record: { status: 'M', untracked: false } }
+    );
+    const histEn = g7fProbe(
+      ['# probe report', '', 'INDEPENDENT SCAN appears here.', '', '- ⑥ historical exemption: committed before v1.46, transcript unrecoverable', ''].join('\n'),
+      null,
+      { record: { status: 'M', untracked: false } }
+    );
+    check(
+      'T96 G7-f positive: the historical-exemption declaration (CN and EN forms) reaches PASS with the marker present',
+      histCn.verdict === 'PASS' && histCn.findings === 0 && /HISTORICAL EXEMPTION/.test(histCn.detail) &&
+        histEn.verdict === 'PASS' && histEn.findings === 0 && /HISTORICAL EXEMPTION/.test(histEn.detail),
+      'cn=' + histCn.verdict + '/' + histCn.findings + ' en=' + histEn.verdict + '/' + histEn.findings + ' :: ' + histCn.detail
+    );
+
+    // Round-8 F1: the probe is pinned on an EXISTING report (explicit M record) - a bare
+    // newly added report FAILs now, which would mask the marker-filter distinction.
+    const marked = g7fProbe(['# probe report', '', '示例：报告提到 INDEPENDENT SCAN 却没有围栏块（引文）', ''].join('\n'), null, {
+      record: { status: 'M', untracked: false },
+    });
+    check(
+      'T96 G7-f M4: a marker occurrence on an exclusion-marked line is filtered out (existing report), so the record is INFO not FAIL',
+      marked.verdict === 'INFO' && marked.findings === 0,
+      'verdict=' + marked.verdict + ' findings=' + marked.findings + ' :: ' + marked.detail
+    );
+
+    const unclosed = g7fProbe(['# probe report', '', '```sixstage', '## Section A', 'INDEPENDENT SCAN: PASS', ''].join('\n'));
+    check(
+      'T96 G7-f L9: an unclosed sixstage fence fails and the detail names the opening line',
+      unclosed.verdict === 'FAIL' && unclosed.findings >= 1 && /never closed/.test(unclosed.why) && /:3 /.test(unclosed.why),
+      'verdict=' + unclosed.verdict + ' :: ' + unclosed.why
+    );
+  }
+
+  // ---- T97/T98: G7-f waiver preconditions (6 round-6 C-1; T98 re-pinned by 8 round-8 F1).
+  // The waiver channel used to be reachable by writing the fixed form alone: an empty
+  // reason was accepted, and a report FIRST ADDED by the change set could waive the fence
+  // exactly like a historical one. C-1 closed both; round-8 F1 then SPLIT the new-report
+  // rule: a skip declaration with a non-empty reason became the one waiver a newly added
+  // report may carry (moved to T102 ②), while the historical exemption stays invalid and
+  // the bare new report FAILs (T102 ① / ③). T98 keeps the faces that did not move - the
+  // exemption-on-new-report FAIL, the untracked status variant and the fenced positive
+  // control - and mutation-proves the newly-added branch load-bearing.
+  {
+    const existing = { record: { status: 'M', untracked: false } };
+    const created = { record: { status: 'A', untracked: true } };
+    const empty = (reason) => ['# probe report', '', '- ⑥ 跳过：' + reason, ''].join('\n');
+    const emptyHist = (reason) =>
+      ['# probe report', '', 'prose mentions INDEPENDENT SCAN once', '', '- ⑥ 历史豁免：' + reason, ''].join('\n');
+
+    const eSkip = g7fProbe(empty('   '), null, existing);
+    const eHist = g7fProbe(emptyHist(''), null, existing);
+    const okSkip = g7fProbe(empty('no ⑥ in this slice (user ruling)'), null, existing);
+    check(
+      'T97 G7-f C-1: a blank reason is not a declaration - the blank skip falls back to INFO and a blank historical exemption falls back to the marker FAIL',
+      eSkip.verdict === 'INFO' && eSkip.findings === 0 &&
+        eHist.verdict === 'FAIL' && eHist.findings === 1 && /carries no ```sixstage fence/.test(eHist.why) &&
+        okSkip.verdict === 'PASS' && okSkip.findings === 0,
+      'blankSkip=' + eSkip.verdict + '/' + eSkip.findings + ' blankHist=' + eHist.verdict + '/' + eHist.findings +
+        ' nonBlank=' + okSkip.verdict + ' :: ' + eHist.why
+    );
+
+    const nHist = g7fProbe(
+      ['# probe report', '', 'prose mentions INDEPENDENT SCAN once', '', '- ⑥ 历史豁免：added together with this slice', ''].join('\n'),
+      null,
+      created
+    );
+    // The skip-on-new-report case moved to T102 ② (round-8 F1: a non-empty-reason skip
+    // declaration is the one waiver a newly added report may carry).
+    const nUntracked = g7fProbe(['# probe report', '', '- ⑥ 历史豁免：untracked report', ''].join('\n'), null, {
+      record: { status: '??', untracked: true },
+    });
+    check(
+      'T98 G7-f C-1/F1: a report ADDED by the change set may not use the historical exemption - status A and the untracked variant both FAIL naming the exemption channel',
+      nHist.verdict === 'FAIL' && nHist.findings === 1 && /历史豁免/.test(nHist.why) && /no history to exempt/.test(nHist.why) &&
+        nUntracked.verdict === 'FAIL' && nUntracked.findings === 1,
+      'hist=' + nHist.verdict + '/' + nHist.findings + ' untracked=' + nUntracked.verdict + '/' + nUntracked.findings + ' :: ' + nHist.why
+    );
+
+    const newFenced = g7fProbe(
+      ['# probe report', '', '```sixstage', '## Section A', '-', '## Section B', '-', '## Section C', '-', '## Section D', '-', '## Section E', '-', 'INDEPENDENT SCAN: PASS', '```', ''].join('\n'),
+      null,
+      created
+    );
+    check(
+      'T98 G7-f C-1 positive control: a newly added report CARRYING the fence passes, so the guard is not a blanket rejection',
+      newFenced.verdict === 'PASS' && newFenced.findings === 0,
+      'verdict=' + newFenced.verdict + ' findings=' + newFenced.findings + ' :: ' + newFenced.detail
+    );
+
+    const mNew = loadMutatedModule(
+      G7_SOURCE,
+      '        if (newlyAdded) {',
+      '        if (false && newlyAdded) {',
+      'g7f-new-report-branch'
+    );
+    const rmNew = g7fProbe(
+      ['# probe report', '', 'prose mentions INDEPENDENT SCAN once', '', '- ⑥ 历史豁免：added together with this slice', ''].join('\n'),
+      mNew.exports,
+      created
+    );
+    check(
+      'T98 G7-f C-1/F1 mutation applied + load-bearing: disabling the newly-added branch lets the exemption on a new report reach the historical channel (PASS)',
+      mNew.applied === true && mNew.identical === true && rmNew.verdict === 'PASS' && rmNew.findings === 0,
+      'applied=' + mNew.applied + ' identical=' + mNew.identical + ' verdict=' + rmNew.verdict + ' findings=' + rmNew.findings
+    );
+    check(
+      'T98 G7-f C-1/F1 restore: g7.js is byte-identical after the mutation window and the shipped module still fails the exemption on a new report',
+      mNew.identical === true && nHist.verdict === 'FAIL',
+      'identical=' + mNew.identical + ' verdict=' + nHist.verdict
+    );
+  }
+
+  // ---- T99: G7-f duplicate conclusion line (6 round-6 C-4). `conclusion -> note ->
+  // conclusion` used to pass: only the FIRST conclusion line was located and the LAST
+  // non-empty line was itself a valid conclusion, so the note in between escaped.
+  {
+    const dup = ['# probe report', '', '```sixstage']
+      .concat(['A', 'B', 'C', 'D', 'E'].reduce((acc, L) => acc.concat(['## Section ' + L, '-']), []))
+      .concat(['INDEPENDENT SCAN: PASS', 'note smuggled inside the fence', 'INDEPENDENT SCAN: PASS', '```', ''])
+      .join('\n');
+    const gDup = g7fProbe(dup);
+    check(
+      'T99 G7-f C-4: two conclusion lines FAIL even when the LAST non-empty line is one, and the detail names the extra line',
+      gDup.verdict === 'FAIL' && gDup.findings === 1 &&
+        /duplicate `INDEPENDENT SCAN:` conclusion line at 14 \(conclusion lines at 14, 16\)/.test(gDup.why),
+      'verdict=' + gDup.verdict + ' findings=' + gDup.findings + ' :: ' + gDup.why
+    );
+
+    const mDup = loadMutatedModule(G7_SOURCE, '        if (conclIdx.length > 1) {', '        if (false) {', 'g7f-dup-conclusion');
+    const rDup = g7fProbe(dup, mDup.exports);
+    check(
+      'T99 G7-f C-4 mutation applied + load-bearing: disabling the duplicate test turns the two-conclusion fence green',
+      mDup.applied === true && mDup.identical === true && rDup.verdict === 'PASS' && rDup.findings === 0,
+      'applied=' + mDup.applied + ' identical=' + mDup.identical + ' verdict=' + rDup.verdict + ' findings=' + rDup.findings
+    );
+    check(
+      'T99 G7-f C-4 restore: g7.js is byte-identical after the mutation window and the shipped module still fails the duplicate case',
+      mDup.identical === true && g7fProbe(dup).verdict === 'FAIL',
+      'identical=' + mDup.identical + ' verdict=' + g7fProbe(dup).verdict
+    );
+  }
+
+  // ---- T100: G6-8 dual-mint with an unreadable mirror (6 round-6 C-8). The face is
+  // skipped (verdict unchanged) but the record now SAYS so - a stated fail-open.
+  {
+    const SLCN = 'docs/t027/REMAINING_SLICES.md';
+    const SLEN = 'docs/t027/REMAINING_SLICES_EN.md';
+    const row = '| **DR-7** | probe row 7 | src |';
+    const doc = (ids) =>
+      ['# probe', '', '| id | symptom | source |', '|---|---|---|'].concat(ids.map((id) => '| **DR-' + id + '** | probe row ' + id + ' | src |')).concat(['']).join('\n');
+    const readable = g68Probe({ [SLCN]: doc([7]), [SLEN]: doc([7]) }, { changed: [SLCN] });
+    const unreadable = g68Probe({ [SLCN]: doc([7]) }, {
+      changed: [SLCN],
+      // A root that cannot hold the other mirror: the disk fallback inside `readTextFor`
+      // then answers null, which is exactly the "other mirror unreadable" premise.
+      repoRoot: path.join(discoverRepoRoot(__dirname), '__no_such_mirror_root__'),
+    });
+    check(
+      'T100 G6-8 C-8: an unreadable other mirror skips the dual-mint face but the PASS detail carries `dual-mint: other mirror unreadable, face skipped`',
+      readable.verdict === 'PASS' && readable.detail.indexOf('dual-mint') < 0 &&
+        unreadable.verdict === 'PASS' && unreadable.findings === 0 &&
+        /dual-mint: other mirror unreadable, face skipped \(1 changed mint row\(s\)\)/.test(unreadable.detail),
+      'readable=' + readable.verdict + ' unreadable=' + unreadable.verdict + ' :: ' + unreadable.detail
+    );
+    check(
+      'T100 G6-8 C-8 premise: the row under test is the same mint row shape the readable control judges',
+      row.length > 0 && readable.findings === 0,
+      'row=' + row
+    );
+  }
+
+  // ---- T101: G7-f must recognise the shape the ⑥ layer ACTUALLY emits (7 round-7).
+  // Two recognition rules were narrower than the rule they mechanise:
+  //   (a) the heading regex was `$`-anchored (`^#{2,4}\s+Section ([A-E])\s*$`), so the real
+  //       `## Section A 扫描范围与方法` was not a heading at all and the block was failed
+  //       as "missing sections";
+  //   (b) the SEVERITY test read the FIRST word only, while the contracted table is
+  //       `| # | SEVERITY | … |` - the severity sits in the SECOND cell, so no severity row
+  //       was ever seen and a real FINDINGS report was failed as "FINDINGS with none".
+  // The rule's intent (7.2.2 face ①) is five-section structure plus SEVERITY/conclusion
+  // agreement; it never demanded a bare heading or a first-column severity.
+  {
+    /** A report in the real ⑥ shape: titled headings + the two-column severity table. */
+    const realDoc = (o) => {
+      o = o || {};
+      const heads = o.heads || [
+        '## Section A 扫描范围与方法',
+        '## Section B 发现清单',
+        '## Section C 逐条核验',
+        '## Section D 删除守卫谁会红',
+        '## Section E 无法验证的部分',
+      ];
+      const out = ['# probe report', '', '```sixstage'];
+      heads.forEach((h, i) => {
+        out.push(h);
+        if (i === 0) out.push('range: the changed set');
+        else if (i === 1 && o.row) {
+          out.push('| # | SEVERITY | 位置(文件:行) | 问题 | 建议修法 |', '|---|---|---|---|---|', o.row);
+        } else out.push('-');
+      });
+      out.push(o.conclusion === undefined ? 'INDEPENDENT SCAN: PASS' : o.conclusion);
+      out.push('```', '');
+      return out.join('\n');
+    };
+    const LOW_ROW = '| 1 | Low | 无 | 未发现实质问题 | 无需修改 |';
+    const HIGH_ROW = '| 2 | **High** | docs/x.md:12 | real defect | fix it |';
+
+    const titled = g7fProbe(realDoc({}));
+    check(
+      'T101 G7-f real shape: headings carrying descriptive text (`## Section A 扫描范围与方法`) count as sections, so the five-section face passes',
+      titled.verdict === 'PASS' && titled.findings === 0,
+      'verdict=' + titled.verdict + ' findings=' + titled.findings + ' :: ' + titled.detail
+    );
+
+    const twoColFind = g7fProbe(realDoc({ row: LOW_ROW, conclusion: 'INDEPENDENT SCAN: FINDINGS' }));
+    check(
+      'T101 G7-f real shape: `| 1 | Low | … |` (severity in the SECOND cell) plus FINDINGS is a PASS - the ⑥ form that used to be failed',
+      twoColFind.verdict === 'PASS' && twoColFind.findings === 0 && /1 changed/.test(twoColFind.detail),
+      'verdict=' + twoColFind.verdict + ' findings=' + twoColFind.findings + ' :: ' + twoColFind.detail
+    );
+
+    const twoColPass = g7fProbe(realDoc({ row: LOW_ROW, conclusion: 'INDEPENDENT SCAN: PASS' }));
+    check(
+      'T101 G7-f real shape: the same second-cell severity row with PASS FAILs and names the row count',
+      twoColPass.verdict === 'FAIL' && /carries 1 SEVERITY row\(s\) but the conclusion is `PASS`/.test(twoColPass.why),
+      'verdict=' + twoColPass.verdict + ' :: ' + twoColPass.why
+    );
+
+    const noRowFind = g7fProbe(realDoc({ conclusion: 'INDEPENDENT SCAN: FINDINGS' }));
+    check(
+      'T101 G7-f real shape: FINDINGS with no severity row at all still FAILs (the pairing is kept two-directional)',
+      noRowFind.verdict === 'FAIL' && /no SEVERITY row in section B but the conclusion is `FINDINGS`/.test(noRowFind.why),
+      'verdict=' + noRowFind.verdict + ' :: ' + noRowFind.why
+    );
+
+    // Second-column EQUALITY (not substring): a bold second cell matches, a prose cell that
+    // merely contains a severity word does not.
+    const boldCell = g7fProbe(realDoc({ row: HIGH_ROW, conclusion: 'INDEPENDENT SCAN: FINDINGS' }));
+    const proseCell = g7fProbe(realDoc({ row: '| 3 | Low risk wording only | 无 | prose | none |', conclusion: 'INDEPENDENT SCAN: PASS' }));
+    check(
+      'T101 G7-f cell equality: `**High**` in the second cell matches after marker stripping, while a prose cell containing `Low risk…` does not',
+      boldCell.verdict === 'PASS' && boldCell.findings === 0 && proseCell.verdict === 'PASS' && proseCell.findings === 0,
+      'bold=' + boldCell.verdict + '/' + boldCell.findings + ' prose=' + proseCell.verdict + '/' + proseCell.findings + ' :: ' + proseCell.why
+    );
+
+    const aaHeads = [
+      '## Section AA 扫描范围与方法',
+      '## Section B 发现清单',
+      '## Section C 逐条核验',
+      '## Section D 删除守卫谁会红',
+      '## Section E 无法验证的部分',
+    ];
+    const subHeads = [
+      '## Subsection A 扫描范围与方法',
+      '## Section B 发现清单',
+      '## Section C 逐条核验',
+      '## Section D 删除守卫谁会红',
+      '## Section E 无法验证的部分',
+    ];
+    const aa = g7fProbe(realDoc({ heads: aaHeads }));
+    const sub = g7fProbe(realDoc({ heads: subHeads }));
+    check(
+      'T101 G7-f heading boundary: `## Section AA` and `## Subsection A` are NOT read as Section A (the found sequence is BCDE)',
+      aa.verdict === 'FAIL' && /found `BCDE`/.test(aa.why) && sub.verdict === 'FAIL' && /found `BCDE`/.test(sub.why),
+      'AA=' + aa.verdict + ' sub=' + sub.verdict + ' :: ' + aa.why
+    );
+
+    // Mutation ①: the second-cell equality guard is load-bearing for the real shape (② flips).
+    const mCell = loadMutatedModule(
+      G7_SOURCE,
+      "  if (s.startsWith('|') && sixstageSeverityCell(s)) return true;",
+      "  if (false && s.startsWith('|') && sixstageSeverityCell(s)) return true;",
+      'g7f-severity-cell'
+    );
+    const rCell = g7fProbe(realDoc({ row: LOW_ROW, conclusion: 'INDEPENDENT SCAN: FINDINGS' }), mCell.exports);
+    check(
+      'T101 G7-f mutation applied + load-bearing: disabling the cell-equality guard turns the second-cell FINDINGS case RED (the real shape stops being recognised)',
+      mCell.applied === true && mCell.identical === true && rCell.verdict === 'FAIL' && rCell.findings >= 1,
+      'applied=' + mCell.applied + ' identical=' + mCell.identical + ' verdict=' + rCell.verdict + ' findings=' + rCell.findings + ' :: ' + rCell.why
+    );
+
+    // Mutation ②: the `(?:\\s|$)` boundary relaxation is load-bearing for titled headings.
+    const mHead = loadMutatedModule(
+      G7_SOURCE,
+      'const SIXSTAGE_SECTION_RE = /^#{2,4}\\s+Section\\s+([A-E])(?:\\s|$)/;',
+      'const SIXSTAGE_SECTION_RE = /^#{2,4}\\s+Section ([A-E])\\s*$/;',
+      'g7f-section-titles'
+    );
+    const rHead = g7fProbe(realDoc({}), mHead.exports);
+    check(
+      'T101 G7-f mutation applied + load-bearing: restoring the `$`-anchored heading regex turns the titled-heading case RED',
+      mHead.applied === true && mHead.identical === true && rHead.verdict === 'FAIL' && /found `none`/.test(rHead.why),
+      'applied=' + mHead.applied + ' identical=' + mHead.identical + ' verdict=' + rHead.verdict + ' :: ' + rHead.why
+    );
+
+    check(
+      'T101 G7-f restore: g7.js is byte-identical after both mutation windows and the shipped module still passes both real-shape cases',
+      mCell.identical === true &&
+        mHead.identical === true &&
+        g7fProbe(realDoc({})).verdict === 'PASS' &&
+        g7fProbe(realDoc({ row: LOW_ROW, conclusion: 'INDEPENDENT SCAN: FINDINGS' })).verdict === 'PASS',
+      'identical=' + (mCell.identical && mHead.identical)
+    );
+  }
+
+  // ---- T102: G7-f newly-added-report absence table (8 round-8 F1, High). A report
+  // ADDED by the change set used to fall through to the v1.46 four-state rule when it
+  // carried neither fence, marker nor declaration, and its bare state is INFO - so a
+  // brand-new report could be born with no ⑥ evidence at all. F1 closes that: the
+  // absence branch splits on `addedInChangeSet()` first, and a new report must carry
+  // the fence or a NON-EMPTY-reason skip declaration (the §7.2.1 legitimate skip -
+  // the one waiver it may use; the historical exemption stays invalid, pinned by T98).
+  // Existing reports keep every v1.46 state (④ re-pins the INFO with an explicit M
+  // record, which T92's premise covers only for the no-record default).
+  {
+    const existing = { record: { status: 'M', untracked: false } };
+    const created = { record: { status: 'A', untracked: true } };
+    const bareDoc = ['# probe report', '', 'plain prose only', ''].join('\n');
+
+    const nBare = g7fProbe(bareDoc, null, created);
+    check(
+      'T102 G7-f F1-①: a newly added report with no fence, no marker and no declaration FAILs with the fence-or-skip-declaration wording',
+      nBare.verdict === 'FAIL' && nBare.findings === 1 &&
+        /a newly added report must carry a ```sixstage fence or an explicit, non-empty ⑥ skip declaration/.test(nBare.why),
+      'verdict=' + nBare.verdict + ' :: ' + nBare.why
+    );
+
+    const nSkip = g7fProbe(['# probe report', '', '- ⑥ 跳过：no ⑥ in this slice (user ruling)', ''].join('\n'), null, created);
+    check(
+      'T102 G7-f F1-②: a newly added report with a non-empty-reason skip declaration PASSes (the §7.2.1 legitimate skip)',
+      nSkip.verdict === 'PASS' && nSkip.findings === 0,
+      'verdict=' + nSkip.verdict + ' findings=' + nSkip.findings + ' :: ' + nSkip.detail
+    );
+
+    const nBlank = g7fProbe(['# probe report', '', '- ⑥ 跳过：   ', ''].join('\n'), null, created);
+    check(
+      'T102 G7-f F1-③: a blank-reason skip declaration on a newly added report is not a declaration, so the report FAILs like a bare one',
+      nBlank.verdict === 'FAIL' && nBlank.findings === 1 && /a newly added report must carry/.test(nBlank.why),
+      'verdict=' + nBlank.verdict + ' :: ' + nBlank.why
+    );
+
+    const eBare = g7fProbe(bareDoc, null, existing);
+    check(
+      'T102 G7-f F1-④: an EXISTING report (explicit M record) with neither fence, marker nor declaration stays INFO',
+      eBare.verdict === 'INFO' && eBare.findings === 0,
+      'verdict=' + eBare.verdict + ' :: ' + eBare.detail
+    );
+
+    const mF1 = loadMutatedModule(G7_SOURCE, '        if (newlyAdded) {', '        if (false && newlyAdded) {', 'g7f-f1-new-report');
+    const rBare = g7fProbe(bareDoc, mF1.exports, created);
+    check(
+      'T102 G7-f F1 mutation applied + load-bearing: disabling the newly-added branch turns the bare new report green (the existing-report bare state is INFO)',
+      mF1.applied === true && mF1.identical === true && rBare.verdict === 'INFO' && rBare.findings === 0,
+      'applied=' + mF1.applied + ' identical=' + mF1.identical + ' verdict=' + rBare.verdict + ' findings=' + rBare.findings
+    );
+    check(
+      'T102 G7-f F1 restore: g7.js is byte-identical after the mutation window and the shipped module still fails the bare new report',
+      mF1.identical === true && nBare.verdict === 'FAIL',
+      'identical=' + mF1.identical + ' verdict=' + nBare.verdict
+    );
+  }
+
+  // ---- T103: G7-f fence-touch interval (8 round-8 F2, Medium). "A block touched by
+  // this change" used to mean "a BODY line is in the added-line set", so a change that
+  // rewrote nothing but the ``` opening (or the closing) fence line escaped the three
+  // faces entirely - the record fell to the unchanged-fence INFO. F2 widens the touch
+  // test to the WHOLE fence interval, opening and closing lines included; the mutation
+  // shrinks the window back to body-only and must let the probe escape again.
+  {
+    // Line map: 3 = opening fence, 4..12 = body, 13 = closing fence. The body lacks
+    // Section C, so a block that ENTERS judgement FAILs with the found sequence ABDE.
+    const fenceDoc = [
+      '# probe report', '', '```sixstage',
+      '## Section A', '-', '## Section B', '-', '## Section D', '-', '## Section E', '-',
+      'INDEPENDENT SCAN: PASS', '```', '',
+    ].join('\n');
+    const existing = { record: { status: 'M', untracked: false } };
+
+    const openOnly = g7fProbe(fenceDoc, null, Object.assign({ added: [3] }, existing));
+    check(
+      'T103 G7-f F2-⑤: a change touching ONLY the opening fence line enters judgement (the body lacks Section C, so the block FAILs with `ABDE`)',
+      openOnly.verdict === 'FAIL' && openOnly.findings === 1 && /found `ABDE`/.test(openOnly.why),
+      'verdict=' + openOnly.verdict + ' :: ' + openOnly.why
+    );
+
+    const closeOnly = g7fProbe(fenceDoc, null, Object.assign({ added: [13] }, existing));
+    check(
+      'T103 G7-f F2-⑤ twin: a change touching ONLY the closing fence line enters judgement too (the interval spans both fence lines)',
+      closeOnly.verdict === 'FAIL' && closeOnly.findings === 1 && /found `ABDE`/.test(closeOnly.why),
+      'verdict=' + closeOnly.verdict + ' :: ' + closeOnly.why
+    );
+
+    // ⑥ needle discipline: the mutation target must occur EXACTLY ONCE in the shipped
+    // source, or the patched copy would silently miss (or double-patch) the guard.
+    const F2_NEW_LOOP = 'for (let i = b.start; i <= b.end; i++) {';
+    const F2_OLD_LOOP = 'for (let i = b.start + 1; i < b.end; i++) {';
+    const f2Needles = decodeBuffer(fs.readFileSync(G7_SOURCE)).split(F2_NEW_LOOP).length - 1;
+    check(
+      'T103 G7-f F2-⑥ precondition: the touched-loop needle occurs exactly once in the shipped g7.js',
+      f2Needles === 1,
+      'occurrences=' + f2Needles
+    );
+    const mF2 = loadMutatedModule(G7_SOURCE, F2_NEW_LOOP, F2_OLD_LOOP, 'g7f-f2-touch-window');
+    const rOpen = g7fProbe(fenceDoc, mF2.exports, Object.assign({ added: [3] }, existing));
+    check(
+      'T103 G7-f F2-⑥ mutation applied + load-bearing: shrinking the touch window back to body-only lets the opening-line-only change escape judgement (INFO, not FAIL)',
+      mF2.applied === true && mF2.identical === true && rOpen.verdict === 'INFO' && rOpen.findings === 0,
+      'applied=' + mF2.applied + ' identical=' + mF2.identical + ' verdict=' + rOpen.verdict + ' findings=' + rOpen.findings
+    );
+    check(
+      'T103 G7-f F2-⑥ restore: g7.js is byte-identical after the mutation window (byte comparison) and the shipped module still fails the opening-line-only change',
+      mF2.identical === true && g7fProbe(fenceDoc, null, Object.assign({ added: [3] }, existing)).verdict === 'FAIL',
+      'identical=' + mF2.identical
+    );
   }
 
   // ---- F1: a stale mutation (no-op) must not silently weaken the suite.
