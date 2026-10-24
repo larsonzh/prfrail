@@ -175,7 +175,7 @@ r1 为**盲审**（未提供任何前序发现清单），七项判定全 PASS�
 
 | 主提交 hash | CI run 号 | CI 结论 | 说明 |
 |---|---|---|---|
-| 授权后回填 | 授权后回填 | 授权后回填 | 提交与推送需用户同轮显式授权、绝不推送 gitee；hash 与 run 号按 `§11.2` 只进报告 |
+| `1b27fe3` | `40116771421` | **success（双腿）**：`Go ubuntu-latest` 与 `Go windows-latest` 均 success | 推送只到 origin（未推 gitee）。双腿均 `SELFTEST: PASS 674/674`、`GATE REPORT scope=ci changed=9`、`TOTAL_FAIL=0`；包级 `ok` 计数 ubuntu 十七、windows 十五。hash 与 run 号按 §11.2 只进报告。 |
 
 ```artifacts
 docs/DELIVERY_DIRECTIVE.md	repo

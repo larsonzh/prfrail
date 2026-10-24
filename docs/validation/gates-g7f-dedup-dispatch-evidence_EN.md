@@ -175,7 +175,7 @@ The count moves from `663/663` at `HEAD` to `674/674` here, **a net +11 assertio
 
 | Main commit hash | CI run id | CI conclusion | Note |
 |---|---|---|---|
-| Backfilled after authorisation | Backfilled after authorisation | Backfilled after authorisation | commit and push need explicit same-turn user authorisation, gitee is never pushed; the hash and the run id go into this report only, per `§11.2` |
+| `1b27fe3` | `40116771421` | **success (both legs)**: both `Go ubuntu-latest` and `Go windows-latest` succeeded | pushed to origin only (gitee not pushed). Both legs show `SELFTEST: PASS 674/674`, `GATE REPORT scope=ci changed=9`, `TOTAL_FAIL=0`; the package-level `ok` count is seventeen on ubuntu and fifteen on windows. The hash and the run id go into this report only, per §11.2. |
 
 ```artifacts
 docs/DELIVERY_DIRECTIVE.md	repo
