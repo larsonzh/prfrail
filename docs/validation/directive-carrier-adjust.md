@@ -188,4 +188,4 @@ r1 为**盲审**（未提供任何前序发现清单），判 8 项：四项声�
 
 | 主提交 hash | CI run 号 | CI 结论 | 说明 |
 |---|---|---|---|
-| 授权后回填 | 授权后回填 | 授权后回填 | 提交与推送需用户同轮显式授权，绝不推送 gitee；本片报告落于提交之内，故 hash 与 run 号按 §11.2 只进报告。 |
+| `ff1d2d1` | `40078680727` | **success（双腿）**：`Go ubuntu-latest` 与 `Go windows-latest` 均 success | 推送只到 origin（未推 gitee）。双腿均 `SELFTEST: PASS 663/663`、`GATE REPORT scope=ci changed=9`、`TOTAL_FAIL=0`；包级 `ok` 计数 ubuntu 十七、windows 十五。hash 与 run 号按 §11.2 只进报告。 |
