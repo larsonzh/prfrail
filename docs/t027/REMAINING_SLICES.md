@@ -55,6 +55,7 @@
 | P23 DIRECTIVE-TMP-EXEMPT | ✅ 已完成 | P22 | S | 2026-10-23 | `docs/validation/directive-tmp-exempt{,_EN}.md` |
 | P24 GATES-CLEANUP | ✅ 已完成 | P23 | M | 2026-10-23 | `docs/validation/directive-gates-cleanup{,_EN}.md` |
 | P25 DIRECTIVE-CARRIER-ADJUST | ✅ 已完成 | P24 | M | 2026-10-24 | `docs/validation/directive-carrier-adjust{,_EN}.md` |
+| P26 GATES-G7F-DEDUP + DISPATCH-EVIDENCE | ✅ 已完成 | P25 | M | 2026-10-24 | `docs/validation/gates-g7f-dedup-dispatch-evidence{,_EN}.md` |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -960,6 +961,24 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 探针额度 | 无 |
 | 执行自由度清单落盘路径 | `docs/validation/evidence/DIRECTIVE-CARRIER-ADJUST-freedom-list.md` |
 
+### P26 — `GATES-G7F-DEDUP + DISPATCH-EVIDENCE` · ✅ 已完成
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `GATES-G7F-DEDUP + DISPATCH-EVIDENCE`（准则升 v1.48；改 §6.3 的 `G7-f` 行 / §7.2.2 的 A 段 / §11.3 / §0.3 / 头部 / 附录 C.0ai，并同步 `tools/gates/lib/criteria/g7.js` 与 `tools/gates/selftest.js`） |
+| 状态 | ✅ **已完成**（2026-10-24；步骤 0 至 ⑨ 全部执行完毕，报告对与自由度清单已落盘；⑩ 停点回执后按用户同轮授权提交） |
+| 目标 | ① 放宽 `G7-f` 使围栏内允许多处结论行（取值要求见 §6.3 修订后的措辞），并同步 §7.2.2 的 A 段措辞以消除 P25 的 `D-3` 判据冲突；② 把「⑩ 派单表每行 `agentName` 必须从 `transcript.arguments.agentName` 逐字机械读取，附脚本 stdout 原文」写入 §11.3 的固定条款 |
+| 依赖 | P25 已完成（`HEAD` = `a2d0d3b`）；OB-116 已处置；`D-3` 判据冲突已转本片 |
+| 规模 | M（治理片；⑦ = 1 终审 + 3 复审） |
+| 步骤 | 步骤 0 → ①（四项判定）→ ② → ③ → ④ → ⑤ → ⑥ → ⑦（1+3）→ ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| 现状缺口 | `G7-f` 与 §7.2.2 的 A 段判定串冲突（P25 的 `D-3`）；派单表机械读取纪律尚无正式条款（源自 OB-116 的要求） |
+| 交付物 | `DELIVERY_DIRECTIVE{,_EN}.md` 的 v1.48；`tools/gates/lib/criteria/g7.js` 的判定放宽；`tools/gates/selftest.js` 的断言调整与新增；本 P26 状态行与完成行；报告对；自由度清单 |
+| 验收证据 | `G7-f` 放宽后的三类断言（多处结论行取值相等则通过 / 取值不等则判红 / 取值相等但末行不是其中之一则判红）与变异检验；§7.2.2 与 §6.3 的措辞同步逐字核验；派单表机械读取条款成文；index 与 tree 两作用域 `TOTAL_FAIL=0`；`SELFTEST` 全绿 |
+| 边界 | 只改 §6.3 / §7.2.2 / §11.3 / §0.3 / 头部 / 附录 C 与两个 `tools/gates/` 文件；不改 §2.2 / §2.4 / §5.2 矩阵 / §7.5 数值 / 其他判据本体；不动 `internal/**` / CONTRACTS / schema / fixtures / workflows；不改 `DEV_PLAN`；不推 gitee |
+| 分级 | `[SLICE]`（治理片） |
+| 探针额度 | 无 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/GATES-G7F-DEDUP-DISPATCH-freedom-list.md` |
+
 ## 已知缺陷（后续切片前处理）
 
 > **阻断口径不变**：仅高频/已复现缺陷阻断，观测级 flake 只记录并在验证报告中列示。
@@ -1146,6 +1165,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 2026-10-23 | P23 | **规则修订型治理片（临时件纪律自愈豁免；准则 v1.45）**：§5.1 新增自愈档 / 非自愈档 / 累计上界三段——自报 + 主控预快照与取证 + 自删 + 三项零残留机械证据成立 ⇒ 仅登记「临时件 D」、不中止流水线；未自报 / 未自删 / 证据不成立 ⇒ 停下升级；单片临时件 D 达 3 次 ⇒ 停片升级；三项读数由主控亲自执行，主控本人违规须同轮独立复核；§9.3 行② 处置格同步（单格）、§12.4 新增 OB-114、附录 C.0af。**✅ 已完成（准则 v1.45，2026-10-23）**：`--scope=index` / `--scope=tree` 各 `changed=9` 且 `TOTAL_FAIL=0`、`SELFTEST: PASS 600/600`；已提交并推送 origin（未推 gitee），CI 读数见报告；本行按 §11.2 只记报告路径。 | docs/validation/directive-tmp-exempt{,_EN}.md |
 | 2026-10-23 | P24 | **门禁判据补强（`[SLICE]`、M；准则 v1.46）**：G6-8 落地 DR 编号唯一性与成员性检查（登记行唯一、引用须已登记）、G7-f 落地 ⑥ 输出契约的五段齐全检查；§9.3 新增「门禁红仍提交」故障模式行、§11.3 转录条款、§12.4 的 OB-98 / OB-100 处置列同步并登记 OB-115；四项欠账一次收口。审查：⑤ 两轮 `PASS WITH FIXES`、⑥ 格式合规但与 OB-115 并档、⑦ r1 / r2 `FINDINGS` → r3 `PASS`。**✅ 已完成（准则 v1.46，2026-10-23）**：三作用域均 `TOTAL_FAIL=0`（`index` / `tree` 各 `changed=10`、`ci` 本地 `changed=2`）、`SELFTEST: PASS 663/663`（T91–T103，63 条新断言）；提交与 CI 读数见报告；本行按 §11.2 只记报告路径。 | docs/validation/directive-gates-cleanup{,_EN}.md |
 | 2026-10-24 | P25 | **准则治理片（⑤ 首选对调 + OB-116 载体校正成文 + SELFTEST 时间预算 + ADR-027 收尾；directive v1.47）**：§2.2 的 ⑤ 首选与备用对调（首选 `DeepSeek V4 Pro (deepseek)`、备用 `GLM-5.3 (glm)`），同步首选 / 备用说明句与附录 B.5 的模型行与载体行；§2.2 新增载体校正注记段（三层审查只用只读载体、可写载体禁入场、批量辅助必须 `deep-reasoner` 且禁 `quick-researcher`、⑤⑦ 同载体备注写入 ⑦ 任务包并由 ⑦ 评估）与历史行不追溯段；§5.1 与 §7.5 写入 `SELFTEST` 时间预算（预算不是物理时钟断言、超预算不判失败）；ADR-027 处置列追加收尾句（`GLM-5.3-FlashX (glm)` 未入白名单、走如实记录支）；§12.4 的 OB-116 处置格重写为原三条纪律的逐条去向并新增 OB-117。审查：① 六项判定；③ 两轮（首轮一 Medium 加四 Low ⇒ 整改 ⇒ 复审 Medium+ 归零）；⑤ 两轮 `PRE-REVIEW: PASS WITH FIXES`（首轮一 High 加两 Medium ⇒ 整改 ⇒ 复审 Medium+ 归零，额度 1+1 用尽）；⑥ 三次（前两次因主控派单把 A–E 段落定义与判定串闭集写错而不合契约，第三次按 §7.2.2 原文重派 ⇒ `INDEPENDENT SCAN: PASS`，额度用尽）；⑦ 盲审 r1 `FINAL: PASS`（零发现）。**✅ 完成（directive v1.47，2026-10-24）**：三作用域 `TOTAL_FAIL=0` 与 `SELFTEST: PASS 663/663`；已提交并推送 origin（未推 gitee），CI 读数见报告；按 §11.2 本行只记报告路径。 | `docs/validation/directive-carrier-adjust{,_EN}.md` |
+| 2026-10-24 | P26 | **准则治理片（G7-f 多结论行放宽 + 派单表机械读取条款；directive v1.48）**：§6.3 的 G7-f 放宽为「允许多处但取值全等、上限两处、位置配对（Section A 标题后第一个非空行与块末）、三处及以上或取值不等或位置越界判红」，并补「两处取值须各 ∈ §4.1 闭集」「并存时取值不等优先」「SEVERITY 以块末取值为准」；§7.2.2-A 与 §11.3 转录契约同步多结论行口径（P25 的 D-3 闭合）；§11.3 新增「派单表机械读取」条款（OB-116 原① 的正式落地）；§12.4 新增 OB-118；附录 C 增 C.0ai；`tools/gates/lib/criteria/g7.js` 与 `tools/gates/selftest.js` 同步（T93/T99 调整、新增 T104–T107）。审查：① 四项判定（不拆片）；③ 两轮（首轮一 Medium 加三 Low ⇒ 整改 ⇒ 复审 Medium+ 归零）；⑤ 两轮（首轮一 Medium 加两 Low ⇒ 整改 ⇒ 复审 `PRE-REVIEW: PASS`，额度 1+1 用尽）；⑥ 一次 `INDEPENDENT SCAN: PASS`（0 发现）；⑦ 盲审 r1 `FINAL: PASS`（0 发现）。**✅ 完成（directive v1.48，2026-10-24）**：三作用域 `TOTAL_FAIL=0` 与 `SELFTEST: PASS 674/674`；提交与 CI 读数见报告；按 §11.2 本行只记报告路径。 | `docs/validation/gates-g7f-dedup-dispatch-evidence{,_EN}.md` |
 
 > **台账完整性注记（2026-09-21，已按用户授权补录）**：本表自 A4 行之后长期未追加完成行。**2026-09-21 依据各切片自己的验证报告补录 A5/A6/A7/B2/B3a 五行**（受"不凭记忆、只补可核验字段、缺失留空并标注历史缺失、不编造"三条约束），B3b 行先于本次补录写入，故五行列于其后；各行的日期/提交号/运行号/摘要均逐项标注来源，无法核验者已标注 **历史缺失**。
 > **已回填**（本片核实，2026-09-29）：**B3a 的 `DEV_PLAN{,_EN}.md` 段落已由提交 `dd36b9b` 补入**（`DEV_PLAN.md:137` 与 `_EN.md:138`）；原注记的过期表述由切片 `LEDGER-BACKFILL` 更正，**回填动作无需重复执行**。

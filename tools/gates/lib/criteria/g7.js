@@ -826,11 +826,16 @@ const G7_F = {
           push(b.start + 1, L[b.start], 'sixstage sections must be A→B→C→D→E exactly once (found `' + (seq || 'none') + '`)');
         }
 
-        // (2) conclusion line: EXACTLY ONE, as the last non-empty body line, closed-set
-        // value, nothing after it. The duplicate test (v1.46 round-6 C-4) is separate from
-        // the position test: `conclusion -> note -> conclusion` used to pass because only
-        // the FIRST conclusion line was located and the LAST non-empty line was itself a
-        // valid conclusion, so the note in between escaped judgement.
+        // (2) conclusion lines (v1.48 GATES-G7F-DEDUP): one or two are allowed, EVERY
+        // occurrence must carry a closed-set value, the two values must be EQUAL, and the
+        // pair must sit at fixed positions. Why the relaxation is safe: the v1.46 round-6
+        // C-4 escape was `conclusion -> note -> conclusion` - only the FIRST conclusion
+        // line was located, so a note in between escaped judgement, and v1.46 answered it
+        // with "exactly one". v1.48 relaxes the COUNT but keeps the escape closed by the
+        // POSITION pair: with two lines one must be the first non-blank line after the
+        // `## Section A` heading and the other the block-final line, so a smuggled note
+        // between them cannot be the block end and cannot be the Section-A first line -
+        // any third line, any unequal value or either line off its position is a FAIL.
         let lastNonEmpty = -1;
         for (let k = b.body.length - 1; k >= 0; k--) {
           if (String(b.body[k]).trim() !== '') {
@@ -838,56 +843,100 @@ const G7_F = {
             break;
           }
         }
+        const values = VERDICT_PREFIXES[SIXSTAGE_PREFIX];
         const conclIdx = [];
         for (let k = 0; k < b.body.length; k++) {
           const c = sixstageConclusion(b.body[k]);
           if (c && c.prefix === SIXSTAGE_PREFIX) conclIdx.push(k);
         }
-        let conclK = conclIdx.length ? conclIdx[0] : -1;
-        if (conclIdx.length > 1) {
-          const extra = conclIdx.slice(0, -1).map(at);
-          push(
-            at(conclIdx[0]),
-            b.body[conclIdx[0]],
-            'duplicate `' +
-              SIXSTAGE_PREFIX +
-              ':` conclusion line at ' +
-              extra.join(', ') +
-              ' (conclusion lines at ' +
-              conclIdx.map(at).join(', ') +
-              '): a fence carries exactly one, and it must be the last non-empty body line'
-          );
-        }
-        const lastConc = lastNonEmpty < 0 ? null : sixstageConclusion(b.body[lastNonEmpty]);
-        let conclValue = null;
-        if (lastConc && lastConc.prefix === SIXSTAGE_PREFIX) {
-          conclK = lastNonEmpty;
-          const values = VERDICT_PREFIXES[SIXSTAGE_PREFIX];
-          if (lastConc.value && values.indexOf(lastConc.value) >= 0) {
-            conclValue = lastConc.value;
-          } else {
+        // Closed-set test on EVERY occurrence, not only on the block-final one.
+        for (const k of conclIdx) {
+          const cv = sixstageConclusion(b.body[k]);
+          if (!cv.value || values.indexOf(cv.value) < 0) {
             push(
-              at(lastNonEmpty),
-              b.body[lastNonEmpty],
-              'conclusion value outside the closed set of `' + SIXSTAGE_PREFIX + '` :: ' + String(b.body[lastNonEmpty]).slice(0, 120)
+              at(k),
+              b.body[k],
+              'conclusion value outside the closed set of `' + SIXSTAGE_PREFIX + '` :: ' + String(b.body[k]).slice(0, 120)
             );
           }
-        } else if (conclK >= 0) {
-          push(
-            at(conclK),
-            b.body[conclK],
-            'content after the conclusion line - a note must live OUTSIDE the ```sixstage fence'
-          );
-          const c = sixstageConclusion(b.body[conclK]);
-          const values = VERDICT_PREFIXES[SIXSTAGE_PREFIX];
-          if (c && c.value && values.indexOf(c.value) >= 0) conclValue = c.value;
-        } else {
+        }
+        const lastConc = lastNonEmpty < 0 ? null : sixstageConclusion(b.body[lastNonEmpty]);
+        // `lastVal` is the block-final conclusion VALUE, or null when the block-final
+        // non-blank line is not an `INDEPENDENT SCAN` conclusion line at all (the
+        // "content after the conclusion" face). An unrecognised value is NOT null here:
+        // that shape is already red through the closed-set loop above.
+        let lastVal = null;
+        if (lastConc && lastConc.prefix === SIXSTAGE_PREFIX) lastVal = lastConc.value || '<unrecognised>';
+        const aHead = heads.filter((h) => h.letter === 'A')[0] || null;
+        let aFirstBody = -1;
+        if (aHead) {
+          for (let k = aHead.k + 1; k < b.body.length; k++) {
+            if (String(b.body[k]).trim() !== '') {
+              aFirstBody = k;
+              break;
+            }
+          }
+        }
+        const valAt = (k) => {
+          const c = sixstageConclusion(b.body[k]);
+          return c && c.value ? c.value : '<unrecognised>';
+        };
+        if (conclIdx.length === 0) {
           push(
             lastNonEmpty >= 0 ? at(lastNonEmpty) : b.start + 1,
             lastNonEmpty >= 0 ? b.body[lastNonEmpty] : L[b.start],
             'the last non-empty line is not an `' + SIXSTAGE_PREFIX + ': <value>` conclusion line'
           );
+        } else if (conclIdx.length > 2) {
+          push(
+            at(conclIdx[0]),
+            b.body[conclIdx[0]],
+            'more than two `' +
+              SIXSTAGE_PREFIX +
+              ':` conclusion lines at ' +
+              conclIdx.map(at).join(', ') +
+              ': at most two are allowed, and only as the position pair (the first non-blank line after `## Section A` plus the block-final line)'
+          );
+        } else if (lastVal === null) {
+          push(
+            at(conclIdx[conclIdx.length - 1]),
+            b.body[conclIdx[conclIdx.length - 1]],
+            'content after the conclusion line - a note must live OUTSIDE the ```sixstage fence'
+          );
+        } else if (conclIdx.length === 2) {
+          const firstVal = valAt(conclIdx[0]);
+          // The pair's own values are compared (in every shape that reaches this branch
+          // the second line IS the block-final line, so this equals `lastVal`).
+          const endVal = valAt(conclIdx[1]);
+          if (firstVal !== endVal) {
+            push(
+              at(conclIdx[0]),
+              b.body[conclIdx[0]],
+              'the two conclusion lines carry unequal values - line ' +
+                at(conclIdx[0]) +
+                ' says `' +
+                firstVal +
+                '`, line ' +
+                at(conclIdx[1]) +
+                ' says `' +
+                endVal +
+                '` (both must be equal)'
+            );
+          } else if (conclIdx[0] !== aFirstBody) {
+            push(
+              at(conclIdx[0]),
+              b.body[conclIdx[0]],
+              'first of two conclusion lines must be the first non-blank line after the `## Section A` heading (the two conclusion lines sit at ' +
+                conclIdx.map(at).join(', ') +
+                '; expected the first at ' +
+                (aFirstBody >= 0 ? at(aFirstBody) : '(none)') +
+                ')'
+            );
+          }
         }
+        // SEVERITY consistency is read from the BLOCK-FINAL conclusion value (v1.48 keeps
+        // the v1.46 face 892-923 semantics unchanged).
+        const conclValue = lastVal !== null && values.indexOf(lastVal) >= 0 ? lastVal : null;
 
         // (3) section B severity rows ⇔ FINDINGS.
         const bHead = heads.filter((h) => h.letter === 'B')[0] || null;

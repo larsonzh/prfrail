@@ -5557,8 +5557,8 @@ async function runTests() {
 
     const mConcl = loadMutatedModule(
       G7_SOURCE,
-      '          if (lastConc.value && values.indexOf(lastConc.value) >= 0) {',
-      '          if (true) {',
+      'if (!cv.value || values.indexOf(cv.value) < 0) {',
+      'if (false) {',
       'g7f-conclusion-set'
     );
     const rmConcl = g7fProbe(sixDoc({ conclusion: 'INDEPENDENT SCAN: MAYBE' }), mConcl.exports);
@@ -5730,9 +5730,13 @@ async function runTests() {
     );
   }
 
-  // ---- T99: G7-f duplicate conclusion line (6 round-6 C-4). `conclusion -> note ->
-  // conclusion` used to pass: only the FIRST conclusion line was located and the LAST
-  // non-empty line was itself a valid conclusion, so the note in between escaped.
+  // ---- T99: G7-f two conclusion lines (6 round-6 C-4 -> v1.48 GATES-G7F-DEDUP). The
+  // original escape was `conclusion -> note -> conclusion`: only the FIRST conclusion
+  // line was located and the LAST non-empty line was itself a valid conclusion, so a note
+  // in between escaped judgement. v1.46 failed every duplicate; v1.48 ALLOWS a pair but
+  // binds it to the POSITION pair (the Section-A first line plus the block end), so this
+  // fixture - whose first conclusion line is not the Section-A first line - still FAILs:
+  // the C-4 escape stays red under the relaxed rule.
   {
     const dup = ['# probe report', '', '```sixstage']
       .concat(['A', 'B', 'C', 'D', 'E'].reduce((acc, L) => acc.concat(['## Section ' + L, '-']), []))
@@ -5740,21 +5744,22 @@ async function runTests() {
       .join('\n');
     const gDup = g7fProbe(dup);
     check(
-      'T99 G7-f C-4: two conclusion lines FAIL even when the LAST non-empty line is one, and the detail names the extra line',
+      'T99 G7-f P26: two conclusion lines FAIL when the first one is not the Section-A first line (the C-4 escape stays red)',
       gDup.verdict === 'FAIL' && gDup.findings === 1 &&
-        /duplicate `INDEPENDENT SCAN:` conclusion line at 14 \(conclusion lines at 14, 16\)/.test(gDup.why),
+        /first of two conclusion lines must be the first non-blank line after/.test(gDup.why) &&
+        gDup.why.indexOf('14, 16') >= 0,
       'verdict=' + gDup.verdict + ' findings=' + gDup.findings + ' :: ' + gDup.why
     );
 
-    const mDup = loadMutatedModule(G7_SOURCE, '        if (conclIdx.length > 1) {', '        if (false) {', 'g7f-dup-conclusion');
+    const mDup = loadMutatedModule(G7_SOURCE, 'if (conclIdx[0] !== aFirstBody) {', 'if (false) {', 'g7f-position-pair');
     const rDup = g7fProbe(dup, mDup.exports);
     check(
-      'T99 G7-f C-4 mutation applied + load-bearing: disabling the duplicate test turns the two-conclusion fence green',
+      'T99 G7-f P26 mutation applied + load-bearing: disabling the position-pair gate turns the two-conclusion fence green',
       mDup.applied === true && mDup.identical === true && rDup.verdict === 'PASS' && rDup.findings === 0,
       'applied=' + mDup.applied + ' identical=' + mDup.identical + ' verdict=' + rDup.verdict + ' findings=' + rDup.findings
     );
     check(
-      'T99 G7-f C-4 restore: g7.js is byte-identical after the mutation window and the shipped module still fails the duplicate case',
+      'T99 G7-f P26 restore: g7.js is byte-identical after the mutation window and the shipped module still fails the position-pair case',
       mDup.identical === true && g7fProbe(dup).verdict === 'FAIL',
       'identical=' + mDup.identical + ' verdict=' + g7fProbe(dup).verdict
     );
@@ -6031,6 +6036,123 @@ async function runTests() {
       'T103 G7-f F2-⑥ restore: g7.js is byte-identical after the mutation window (byte comparison) and the shipped module still fails the opening-line-only change',
       mF2.identical === true && g7fProbe(fenceDoc, null, Object.assign({ added: [3] }, existing)).verdict === 'FAIL',
       'identical=' + mF2.identical
+    );
+  }
+
+  // ---- T104-T107: G7-f multi-conclusion relaxation (v1.48 GATES-G7F-DEDUP, P26). v1.46
+  // pinned "exactly one conclusion line"; v1.48 allows at most two, requires the two
+  // values to be EQUAL and binds the pair to the POSITION pair (the first non-blank line
+  // after `## Section A` plus the block-final line). Every face below is falsified by its
+  // own mutation window, so a guard that stops being load-bearing is caught here.
+  {
+    /** one `sixstage` block: Section A's first body line and the block-final line. */
+    const mdoc = (firstLine, lastLine, sevRow) =>
+      ['# probe report', '', '```sixstage', '## Section A', firstLine, '## Section B', sevRow || '-']
+        .concat(['## Section C', '-', '## Section D', '-', '## Section E', '-', lastLine, '```', ''])
+        .join('\n');
+    const sevRow = '| **High** | probe finding | 已闭合 |';
+
+    // ---- T104: the positive control - an EQUAL pair at the two legal positions passes.
+    const gPair = g7fProbe(mdoc('INDEPENDENT SCAN: PASS', 'INDEPENDENT SCAN: PASS', null));
+    const gPairFind = g7fProbe(mdoc('INDEPENDENT SCAN: FINDINGS', 'INDEPENDENT SCAN: FINDINGS', sevRow));
+    check(
+      'T104 G7-f P26 positive: an equal conclusion pair (Section-A first line + block-final line) passes, and a FINDINGS pair with a SEVERITY row passes too',
+      gPair.verdict === 'PASS' && gPair.findings === 0 &&
+        gPairFind.verdict === 'PASS' && gPairFind.findings === 0,
+      'pass=' + gPair.verdict + '/' + gPair.findings + ' findings=' + gPairFind.verdict + '/' + gPairFind.findings +
+        ' :: ' + gPair.detail + ' || ' + gPairFind.detail
+    );
+    // ⑥ needle discipline: every mutation target of the faces below must occur EXACTLY
+    // ONCE in the shipped source, or a patched copy would silently miss (or double-patch).
+    const P26_NEEDLES = [
+      'if (!cv.value || values.indexOf(cv.value) < 0) {',
+      '} else if (conclIdx.length > 2) {',
+      '} else if (lastVal === null) {',
+      'if (firstVal !== endVal) {',
+      'if (conclIdx[0] !== aFirstBody) {',
+    ];
+    const p26Src = decodeBuffer(fs.readFileSync(G7_SOURCE));
+    const p26Counts = P26_NEEDLES.map((n) => p26Src.split(n).length - 1);
+    check(
+      'T104 G7-f P26 precondition: each multi-conclusion mutation needle occurs exactly once in the shipped g7.js',
+      p26Counts.every((c) => c === 1),
+      'counts=' + JSON.stringify(p26Counts)
+    );
+
+    // ---- T105: two EQUAL-position lines with UNEQUAL values FAIL.
+    const uneq = mdoc('INDEPENDENT SCAN: PASS', 'INDEPENDENT SCAN: FINDINGS', sevRow);
+    const gUneq = g7fProbe(uneq);
+    check(
+      'T105 G7-f P26 negative: an equal-position pair with UNEQUAL values fails and the detail names both values',
+      gUneq.verdict === 'FAIL' && gUneq.findings === 1 &&
+        /carry unequal values/.test(gUneq.why) && /PASS/.test(gUneq.why) && /FINDINGS/.test(gUneq.why),
+      'verdict=' + gUneq.verdict + ' findings=' + gUneq.findings + ' :: ' + gUneq.why
+    );
+    const mUneq = loadMutatedModule(G7_SOURCE, 'if (firstVal !== endVal) {', 'if (false) {', 'g7f-unequal-values');
+    const rUneq = g7fProbe(uneq, mUneq.exports);
+    check(
+      'T105 G7-f P26 mutation applied + load-bearing: disabling the value-equality test turns the unequal pair green',
+      mUneq.applied === true && mUneq.identical === true && rUneq.verdict === 'PASS' && rUneq.findings === 0,
+      'applied=' + mUneq.applied + ' identical=' + mUneq.identical + ' verdict=' + rUneq.verdict + ' findings=' + rUneq.findings
+    );
+    check(
+      'T105 G7-f P26 restore: g7.js is byte-identical after the mutation window and the shipped module still fails the unequal pair',
+      mUneq.identical === true && g7fProbe(uneq).verdict === 'FAIL',
+      'identical=' + mUneq.identical + ' verdict=' + g7fProbe(uneq).verdict
+    );
+
+    // ---- T106: content AFTER the block-final conclusion line FAILs.
+    const trailing =
+      ['# probe report', '', '```sixstage', '## Section A', 'INDEPENDENT SCAN: PASS']
+        .concat(['## Section B', '-', '## Section C', '-', '## Section D', '-', '## Section E', '-'])
+        .concat(['INDEPENDENT SCAN: PASS', 'note smuggled after the block-final conclusion', '```', ''])
+        .join('\n');
+    const gTrail = g7fProbe(trailing);
+    check(
+      'T106 G7-f P26 negative: content after the block-final conclusion line fails with the "note outside the fence" reason',
+      gTrail.verdict === 'FAIL' && gTrail.findings === 1 && /OUTSIDE the ```sixstage fence/.test(gTrail.why),
+      'verdict=' + gTrail.verdict + ' findings=' + gTrail.findings + ' :: ' + gTrail.why
+    );
+    const mTrail = loadMutatedModule(G7_SOURCE, '} else if (lastVal === null) {', '} else if (false) {', 'g7f-content-after');
+    const rTrail = g7fProbe(trailing, mTrail.exports);
+    check(
+      'T106 G7-f P26 mutation applied + load-bearing: disabling the block-final test turns the trailing-content fence green',
+      mTrail.applied === true && mTrail.identical === true && rTrail.verdict === 'PASS' && rTrail.findings === 0,
+      'applied=' + mTrail.applied + ' identical=' + mTrail.identical + ' verdict=' + rTrail.verdict + ' findings=' + rTrail.findings
+    );
+    check(
+      'T106 G7-f P26 restore: g7.js is byte-identical after the mutation window and the shipped module still fails the trailing-content case',
+      mTrail.identical === true && g7fProbe(trailing).verdict === 'FAIL',
+      'identical=' + mTrail.identical + ' verdict=' + g7fProbe(trailing).verdict
+    );
+
+    // ---- T107: THREE conclusion lines FAIL (the ceiling is two).
+    const triple = mdoc('INDEPENDENT SCAN: PASS', 'INDEPENDENT SCAN: PASS', null).replace(
+      'INDEPENDENT SCAN: PASS\n```',
+      'INDEPENDENT SCAN: PASS\nINDEPENDENT SCAN: PASS\n```'
+    );
+    const gTriple = g7fProbe(triple);
+    check(
+      'T107 G7-f P26 negative: three conclusion lines fail and the detail says more than two are not allowed',
+      gTriple.verdict === 'FAIL' && gTriple.findings === 1 && /more than two/.test(gTriple.why),
+      'verdict=' + gTriple.verdict + ' findings=' + gTriple.findings + ' :: ' + gTriple.why
+    );
+    const mTriple = loadMutatedModule(
+      G7_SOURCE,
+      '} else if (conclIdx.length > 2) {',
+      '} else if (conclIdx.length > 3) {',
+      'g7f-three-conclusions'
+    );
+    const rTriple = g7fProbe(triple, mTriple.exports);
+    check(
+      'T107 G7-f P26 mutation applied + load-bearing: raising the ceiling to three turns the three-line fence green',
+      mTriple.applied === true && mTriple.identical === true && rTriple.verdict === 'PASS' && rTriple.findings === 0,
+      'applied=' + mTriple.applied + ' identical=' + mTriple.identical + ' verdict=' + rTriple.verdict + ' findings=' + rTriple.findings
+    );
+    check(
+      'T107 G7-f P26 restore: g7.js is byte-identical after the mutation window and the shipped module still fails the three-line case',
+      mTriple.identical === true && g7fProbe(triple).verdict === 'FAIL',
+      'identical=' + mTriple.identical + ' verdict=' + g7fProbe(triple).verdict
     );
   }
 
