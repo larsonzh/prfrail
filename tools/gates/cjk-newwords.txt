@@ -69,3 +69,12 @@
 # states the measured gate order is CONTRARY to CONTRACTS §7 - the plain statement the ruling requires.
 悖	docs/validation/t027-at23-e2e.md	"实测门禁次序与 §7 相悖" (legitimate word 相悖: contrary to the contract wording, stated without hedging)
 瞻	docs/DELIVERY_DIRECTIVE.md	"前瞻" is the user own term for the closing-report outlook (slice DIRECTIVE-DESIGN-LOOPBACK, section 12.4 OB-71); no common synonym keeps the term
+# 2026-10-25 (slice G4b-CACHE, ⑧a): characters carried by docs/validation/gates-g4b-cache{,_EN}.md.
+# Each entry states why the character cannot be replaced: the report must quote the withdrawn wording
+# and must transcribe the ⑥ r3 output and the §7.1 known-limitation paragraph verbatim.
+彻	docs/validation/gates-g4b-cache.md	"恢复『彻底』" and "「完全解耦」改为「彻底解耦」" (the withdrawn D-3 wording; rewriting it would hide what was reverted)
+妥	docs/validation/gates-g4b-cache.md	"更稳妥的裁决是撤回 Medium" (verbatim ⑥ r3 sentence; the transcription contract forbids rewriting)
+骗	docs/validation/gates-g4b-cache.md	"能同时骗过本地命中与 CI 冷跑" (verbatim ⑥ r3 sentence; the transcription contract forbids rewriting)
+坐	docs/validation/gates-g4b-cache.md	"均未 100% 机械坐实" (the §7.1 known limitation is adopted verbatim as instructed)
+扣	docs/validation/gates-g4b-cache.md	"既不计审查价值也照扣额度" and "扣除后" (quota-accounting wording of the dispatch summary and the fixed-overhead reference)
+毁	docs/validation/gates-g4b-cache.md	"清零即毁缓存" (the §2 landing-form note says why the cache must not live under the slice temp dir; the wording comes from the instruction verbatim)

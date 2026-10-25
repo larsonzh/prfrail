@@ -56,6 +56,7 @@
 | P24 GATES-CLEANUP | ✅ 已完成 | P23 | M | 2026-10-23 | `docs/validation/directive-gates-cleanup{,_EN}.md` |
 | P25 DIRECTIVE-CARRIER-ADJUST | ✅ 已完成 | P24 | M | 2026-10-24 | `docs/validation/directive-carrier-adjust{,_EN}.md` |
 | P26 GATES-G7F-DEDUP + DISPATCH-EVIDENCE | ✅ 已完成 | P25 | M | 2026-10-24 | `docs/validation/gates-g7f-dedup-dispatch-evidence{,_EN}.md` |
+| P27 G4b-CACHE | ✅ 已完成 | P26 | M | 2026-10-25 | `docs/validation/gates-g4b-cache{,_EN}.md` |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -979,6 +980,26 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 探针额度 | 无 |
 | 执行自由度清单落盘路径 | `docs/validation/evidence/GATES-G7F-DEDUP-DISPATCH-freedom-list.md` |
 
+### P27 — `G4b-CACHE` · ✅ 已完成
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `G4b-CACHE`（准则升 v1.49；改 `tools/gates/lib/criteria/g4b.js` 与 `tools/gates/selftest.js`，并同步 §6.3 的 G4b 行 / §0.3 / 头部 / 附录 C.0aj） |
+| 状态 | ✅ **已完成**（2026-10-25；准则 v1.49；⑤ r1/r2 与 ⑥ r1–r3 已闭环，⑦ r1 的 High 经三步根因仲裁后 r2 复审 `RE-REVIEW: PASS`；三作用域 `TOTAL_FAIL=0`、`SELFTEST: PASS 697/697`；报告对与自由度清单已落盘） |
+| 目标 | 为 G4b 的 CJK 字符集扫描引入**跨进程缓存**，键含 `HEAD` 提交与白名单文件摘要，使缓存命中时免去全量扫描；同时保证三条反例（`HEAD` 变更 / 白名单变更 / 判据代码变更）下缓存必定失效 |
+| 依赖 | P26 已完成（`HEAD` = `7b84528`，准则 v1.48） |
+| 规模 | M（非治理片；⑦ = 1 终审 + 2 复审） |
+| 步骤 | 步骤 0 → ①（四项判定）→ ② → ③ → ④ → ⑤ → ⑥ → ⑦（1+2）→ ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| 现状缺口 | `g4b.js` 无任何缓存，每次运行都全量构建字符集，构成 `--scope=tree` 的主要耗时来源 |
+| 交付物 | `tools/gates/lib/criteria/g4b.js`（缓存与失效判定）、`tools/gates/selftest.js`（新增与调整断言）、`DELIVERY_DIRECTIVE{,_EN}.md` 的 v1.49、报告对、自由度清单、本 P27 状态行与完成行 |
+| 验收证据 | 三条反例（`HEAD` 变更 / 白名单变更 / 判据代码变更）下缓存失效的机械证明与变异检验；三组耗时（首跑 / 缓存命中 / 失效后重建）的实测表；缓存命中与未命中的日志输出；三作用域 `TOTAL_FAIL=0`；`SELFTEST` 全绿 |
+| 边界 | 只改 `g4b.js` / `selftest.js` 与 §6.3 的 G4b 行 / §0.3 / 头部 / 附录 C；不改 §2.2 / §2.4 / §5.2 / §7.5 / 其他判据本体；不动 `internal/**` / CONTRACTS / schema / fixtures / workflows；不改 `DEV_PLAN`；不推 gitee |
+| 分级 | `[SLICE]`（非治理片） |
+| 探针额度 | 无 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/G4B-CACHE-freedom-list.md` |
+| 观察项 / 下片建议 | **观察项**：`listAllMarkdown` 对 tree/index 用 `git ls-files`（读索引）⇒ 暂存删除 `.md` 时冷跑语料相对 HEAD 真值收缩，冷跑从严多报；且「写入后暂存删除 `.md`」窗口内缓存命中与冷跑可给出不同 verdict（实测 warm=PASS / cold=FAIL，方向 fail-safe：缓存值恒为真值语料子集，从不洗白违规）。**下片立项建议**：`G4B-CORPUS-DECOUPLE` —— 评估 `listAllMarkdown` 的 tree/index 枚举语义（`ls-files` → `ls-tree HEAD`）与消费者影响面（已核实：`listAllMarkdown` 仅 G4b 消费，`g4b.js:223`）；本片不执行。**候选 OB**：ci 作用域约 24–37 s 冻结成本来源未定，非 G4b 缓存可解 |
+| 已知限制（本片不修） | ⑤ Low#4：`keyString` 的二次 `rev-parse` 失败被映射为 `'none'` 键段（TOCTOU），首次成功而二次失败时可把空语料写入该键；方向 fail-safe（只多报 unknown、不漏报违规），本片不修。⑤ Low#5：T112 五面未直接覆盖 `mkdirSync` 失败、`put` 抛错、JSON 语法非法（与已测路径同构但缺直接断言），本片不修。两条均登记于本片验证报告的「已知限制」段，列为后续小修片候选 |
+
 ## 已知缺陷（后续切片前处理）
 
 > **阻断口径不变**：仅高频/已复现缺陷阻断，观测级 flake 只记录并在验证报告中列示。
@@ -1166,6 +1187,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 2026-10-23 | P24 | **门禁判据补强（`[SLICE]`、M；准则 v1.46）**：G6-8 落地 DR 编号唯一性与成员性检查（登记行唯一、引用须已登记）、G7-f 落地 ⑥ 输出契约的五段齐全检查；§9.3 新增「门禁红仍提交」故障模式行、§11.3 转录条款、§12.4 的 OB-98 / OB-100 处置列同步并登记 OB-115；四项欠账一次收口。审查：⑤ 两轮 `PASS WITH FIXES`、⑥ 格式合规但与 OB-115 并档、⑦ r1 / r2 `FINDINGS` → r3 `PASS`。**✅ 已完成（准则 v1.46，2026-10-23）**：三作用域均 `TOTAL_FAIL=0`（`index` / `tree` 各 `changed=10`、`ci` 本地 `changed=2`）、`SELFTEST: PASS 663/663`（T91–T103，63 条新断言）；提交与 CI 读数见报告；本行按 §11.2 只记报告路径。 | docs/validation/directive-gates-cleanup{,_EN}.md |
 | 2026-10-24 | P25 | **准则治理片（⑤ 首选对调 + OB-116 载体校正成文 + SELFTEST 时间预算 + ADR-027 收尾；directive v1.47）**：§2.2 的 ⑤ 首选与备用对调（首选 `DeepSeek V4 Pro (deepseek)`、备用 `GLM-5.3 (glm)`），同步首选 / 备用说明句与附录 B.5 的模型行与载体行；§2.2 新增载体校正注记段（三层审查只用只读载体、可写载体禁入场、批量辅助必须 `deep-reasoner` 且禁 `quick-researcher`、⑤⑦ 同载体备注写入 ⑦ 任务包并由 ⑦ 评估）与历史行不追溯段；§5.1 与 §7.5 写入 `SELFTEST` 时间预算（预算不是物理时钟断言、超预算不判失败）；ADR-027 处置列追加收尾句（`GLM-5.3-FlashX (glm)` 未入白名单、走如实记录支）；§12.4 的 OB-116 处置格重写为原三条纪律的逐条去向并新增 OB-117。审查：① 六项判定；③ 两轮（首轮一 Medium 加四 Low ⇒ 整改 ⇒ 复审 Medium+ 归零）；⑤ 两轮 `PRE-REVIEW: PASS WITH FIXES`（首轮一 High 加两 Medium ⇒ 整改 ⇒ 复审 Medium+ 归零，额度 1+1 用尽）；⑥ 三次（前两次因主控派单把 A–E 段落定义与判定串闭集写错而不合契约，第三次按 §7.2.2 原文重派 ⇒ `INDEPENDENT SCAN: PASS`，额度用尽）；⑦ 盲审 r1 `FINAL: PASS`（零发现）。**✅ 完成（directive v1.47，2026-10-24）**：三作用域 `TOTAL_FAIL=0` 与 `SELFTEST: PASS 663/663`；已提交并推送 origin（未推 gitee），CI 读数见报告；按 §11.2 本行只记报告路径。 | `docs/validation/directive-carrier-adjust{,_EN}.md` |
 | 2026-10-24 | P26 | **准则治理片（G7-f 多结论行放宽 + 派单表机械读取条款；directive v1.48）**：§6.3 的 G7-f 放宽为「允许多处但取值全等、上限两处、位置配对（Section A 标题后第一个非空行与块末）、三处及以上或取值不等或位置越界判红」，并补「两处取值须各 ∈ §4.1 闭集」「并存时取值不等优先」「SEVERITY 以块末取值为准」；§7.2.2-A 与 §11.3 转录契约同步多结论行口径（P25 的 D-3 闭合）；§11.3 新增「派单表机械读取」条款（OB-116 原① 的正式落地）；§12.4 新增 OB-118；附录 C 增 C.0ai；`tools/gates/lib/criteria/g7.js` 与 `tools/gates/selftest.js` 同步（T93/T99 调整、新增 T104–T107）。审查：① 四项判定（不拆片）；③ 两轮（首轮一 Medium 加三 Low ⇒ 整改 ⇒ 复审 Medium+ 归零）；⑤ 两轮（首轮一 Medium 加两 Low ⇒ 整改 ⇒ 复审 `PRE-REVIEW: PASS`，额度 1+1 用尽）；⑥ 一次 `INDEPENDENT SCAN: PASS`（0 发现）；⑦ 盲审 r1 `FINAL: PASS`（0 发现）。**✅ 完成（directive v1.48，2026-10-24）**：三作用域 `TOTAL_FAIL=0` 与 `SELFTEST: PASS 674/674`；已提交并推送 origin（未推 gitee），CI 读数见报告；按 §11.2 本行只记报告路径。 | `docs/validation/gates-g7f-dedup-dispatch-evidence{,_EN}.md` |
+| 2026-10-25 | P27 | **G4b 跨进程缓存（`[SLICE]`、M；准则 v1.49）**：G4b 的基线语料 CJK 字符集改为跨进程缓存（键含格式版本 / 解析 sha / 作用域 kind / 白名单源 / 白名单文本摘要 / 判据源码摘要；值只存 `{v:1, corpus}`；判定结论每次重算；任何异常 fail-open）；移除初版设计的「索引洁净」启用条件（语料只依赖 HEAD 对象库），由 T113 与复活变异钉住不得回归；`--scope=tree` 整片冷跑中位 68539 ms → 热跑中位 7226 ms（降 89.46%），G4b 单判据 tree 降 96.02%、ci 降 94.80%；`SELFTEST` 674 → 697（删除行 0）；三作用域 `TOTAL_FAIL=0`；⑦ r1 报 High（T87 两条 `unresolvable`）经主控三步根因仲裁（清场后单跑 7 次与并发 A/B 均 `PASS 697/697`）判为非代码缺陷，⑦ r2 `RE-REVIEW: PASS`；候选 OB-120（`G4B-CORPUS-DECOUPLE`）已登记 | docs/validation/gates-g4b-cache.md |
 
 > **台账完整性注记（2026-09-21，已按用户授权补录）**：本表自 A4 行之后长期未追加完成行。**2026-09-21 依据各切片自己的验证报告补录 A5/A6/A7/B2/B3a 五行**（受"不凭记忆、只补可核验字段、缺失留空并标注历史缺失、不编造"三条约束），B3b 行先于本次补录写入，故五行列于其后；各行的日期/提交号/运行号/摘要均逐项标注来源，无法核验者已标注 **历史缺失**。
 > **已回填**（本片核实，2026-09-29）：**B3a 的 `DEV_PLAN{,_EN}.md` 段落已由提交 `dd36b9b` 补入**（`DEV_PLAN.md:137` 与 `_EN.md:138`）；原注记的过期表述由切片 `LEDGER-BACKFILL` 更正，**回填动作无需重复执行**。

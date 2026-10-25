@@ -649,6 +649,7 @@ const G6_SOURCE = path.join(__dirname, 'lib', 'criteria', 'g6.js');
 const G3A_SOURCE = path.join(__dirname, 'lib', 'criteria', 'g3a.js');
 const G4A_SOURCE = path.join(__dirname, 'lib', 'criteria', 'g4a.js');
 const G7_SOURCE = path.join(__dirname, 'lib', 'criteria', 'g7.js');
+const G4B_SOURCE = path.join(__dirname, 'lib', 'criteria', 'g4b.js');
 const G5C_SOURCE = path.join(__dirname, 'lib', 'criteria', 'g5c.js');
 const G5D_SOURCE = path.join(__dirname, 'lib', 'criteria', 'g5d.js');
 /** Mutation target (T73): the G5-c "value is a member of 2.2" test (OB-29). */
@@ -6153,6 +6154,359 @@ async function runTests() {
       'T107 G7-f P26 restore: g7.js is byte-identical after the mutation window and the shipped module still fails the three-line case',
       mTriple.identical === true && g7fProbe(triple).verdict === 'FAIL',
       'identical=' + mTriple.identical + ' verdict=' + g7fProbe(triple).verdict
+    );
+  }
+
+  // ---- T108-T113: the G4b cross-process corpus cache (v1.49, slice G4b-CACHE, P27).
+  // The cache stores ONLY the base-revision corpus character set, so every face below
+  // pins either the key (resolved sha / whitelist text / criterion source), the
+  // fail-open path, index-dirtiness independence, or the fact that the verdict is
+  // recomputed on every hit.
+  {
+    const g4bMemStore = () => {
+      const m = new Map();
+      return {
+        get: (k) => (m.has(k) ? m.get(k) : null),
+        put: (k, v) => {
+          m.set(k, v);
+        },
+        size: () => m.size,
+        keys: () => [...m.keys()],
+      };
+    };
+    /**
+     * Fake git. `dirty` models a staged delta (`diff --cached --quiet HEAD` exit 1). The
+     * shipped `cacheUsable` never calls `diff`, so the branch is a TRAP: it only fires
+     * when a mutation resurrects the removed index-cleanliness condition (T113).
+     */
+    const g4bFakeGit = (sha, dirty) => (args) => {
+      const k = args.join(' ');
+      if (k === 'rev-parse HEAD') return { ok: true, code: 0, out: sha + '\n', err: '', spawnError: null };
+      if (k === 'diff --cached --quiet HEAD') {
+        return { ok: true, code: dirty ? 1 : 0, out: '', err: '', spawnError: null };
+      }
+      return { ok: false, code: 127, out: '', err: '', spawnError: null };
+    };
+    const g4bCtx = (store, sha, wlText) => {
+      const ctx = makeCtx(['g6-4-literals'], {
+        whitelistText: { [G4B.internals.WHITELIST_REL]: wlText },
+        whitelistSource: 'worktree',
+      });
+      ctx.git = g4bFakeGit(sha);
+      if (store !== undefined) ctx.g4bCacheStore = store;
+      // A non-empty base corpus: no fixture stands in for the `.md` corpus, so the probe
+      // feeds it explicitly (the cache stores exactly this set).
+      ctx.listAllMarkdown = () => ['docs/t027/probe-corpus.md'];
+      ctx.showAt = () => '甲';
+      return ctx;
+    };
+    const g4bSink = () => ({
+      records: [],
+      rec(id, verdict, label, detail) {
+        this.records.push({ id, verdict, label, detail });
+      },
+    });
+    const g4bRunWith = (store, sha, wlText, mod) => {
+      const sink = g4bSink();
+      (mod || G4B).run(g4bCtx(store, sha, wlText), sink);
+      return sink;
+    };
+    const g4bCacheOf = (sink) => sink.records.filter((r) => r.id === 'G4b-cache');
+    const g4bWord = (sink) => {
+      const d = (g4bCacheOf(sink)[0] || {}).detail || '';
+      const m = /^(hit|miss) ([0-9a-f]{12}) corpus=(\d+)$/.exec(d);
+      return m ? { word: m[1], key12: m[2], corpus: m[3] } : null;
+    };
+    /**
+     * Compile a copy of `source` with SEVERAL patches applied. One probe needs a module
+     * that carries a source change AND a blinded digest at once, so the mutation stays
+     * attributable to the digest (the same discipline as `loadMutatedModule`: the log
+     * entry feeds F1, and the shipped file must stay byte-identical).
+     */
+    const g4bPatchedModule = (source, patches, tag) => {
+      const before = fs.readFileSync(source);
+      const original = decodeBuffer(before);
+      let src = original;
+      for (const p of patches) src = src.split(p[0]).join(p[1]);
+      MUTATION_LOG.push({
+        key: path.basename(source) + ':' + tag,
+        op: 'sourcePatch',
+        needle: patches.map((p) => p[0]).join(' + '),
+        applied: src !== original,
+      });
+      const M = require('module');
+      const mod = new M(source, null);
+      mod.filename = source;
+      mod.paths = M._nodeModulePaths(path.dirname(source));
+      mod._compile(src, source);
+      return { exports: mod.exports, applied: src !== original, identical: fs.readFileSync(source).equals(before) };
+    };
+    const W1 = '甲\tf\tr';
+    const W2 = '甲乙\tf\tr';
+    const hasVerdict = (sink) => verdictOf(sink.records, 'G4b') !== 'ABSENT';
+
+    // ---- T108 positive control: the same key hits on the second run, the verdict does not.
+    const t108Store = g4bMemStore();
+    const t108a = g4bRunWith(t108Store, 'shaA', W1);
+    const t108b = g4bRunWith(t108Store, 'shaA', W1);
+    const t108w1 = g4bWord(t108a);
+    const t108w2 = g4bWord(t108b);
+    check(
+      'T108 G4b cache positive control: the first run misses and the second run on the same key hits',
+      g4bCacheOf(t108a).length === 1 && !!t108w1 && t108w1.word === 'miss' &&
+        g4bCacheOf(t108b).length === 1 && !!t108w2 && t108w2.word === 'hit',
+      'first=' + JSON.stringify(t108w1) + ' second=' + JSON.stringify(t108w2)
+    );
+    check(
+      'T108 both runs report the same twelve-hex key prefix and the cached corpus size',
+      !!t108w1 && !!t108w2 && t108w1.key12 === t108w2.key12 && t108w2.corpus === '1',
+      JSON.stringify([t108w1, t108w2])
+    );
+    check(
+      'T108 the hit caches the corpus only: the G4b verdict/detail are recomputed and still name the whitelist',
+      verdictOf(t108b.records, 'G4b') === verdictOf(t108a.records, 'G4b') &&
+        /whitelist=/.test(detailOf(t108b.records, 'G4b')),
+      verdictOf(t108b.records, 'G4b') + ' :: ' + detailOf(t108b.records, 'G4b')
+    );
+
+    // ---- T109 counterexample 1: a changed resolved sha must miss.
+    const SHA_SEG = "    rs === null ? 'none' : rs,";
+    const t109Store = g4bMemStore();
+    const t109a = g4bRunWith(t109Store, 'shaA', W1);
+    const t109b = g4bRunWith(t109Store, 'shaB', W1);
+    const t109w1 = g4bWord(t109a);
+    const t109w2 = g4bWord(t109b);
+    check(
+      'T109 G4b cache counterexample 1: a changed HEAD sha misses, names a different key and stores a second entry',
+      !!t109w2 && t109w2.word === 'miss' && !!t109w1 && t109w1.key12 !== t109w2.key12 && t109Store.size() === 2,
+      JSON.stringify([t109w1, t109w2]) + ' entries=' + t109Store.size()
+    );
+    const t109Needles = decodeBuffer(fs.readFileSync(G4B_SOURCE)).split(SHA_SEG).length - 1;
+    const m109 = loadMutatedModule(G4B_SOURCE, SHA_SEG, "    'none',", 'g4b-cache-sha-segment');
+    const t109mStore = g4bMemStore();
+    g4bRunWith(t109mStore, 'shaA', W1, m109.exports);
+    const t109m = g4bWord(g4bRunWith(t109mStore, 'shaB', W1, m109.exports));
+    check(
+      'T109 G4b cache mutation applied + load-bearing: pinning the sha segment turns the second run into a hit',
+      t109Needles === 1 && m109.applied === true && m109.identical === true && !!t109m && t109m.word === 'hit',
+      'needles=' + t109Needles + ' applied=' + m109.applied + ' identical=' + m109.identical +
+        ' second=' + JSON.stringify(t109m)
+    );
+    const t109rStore = g4bMemStore();
+    g4bRunWith(t109rStore, 'shaA', W1);
+    const t109r = g4bWord(g4bRunWith(t109rStore, 'shaB', W1));
+    check(
+      'T109 restore: g4b.js is byte-identical after the mutation window and the shipped module still misses on the new sha',
+      m109.identical === true && !!t109r && t109r.word === 'miss',
+      'identical=' + m109.identical + ' second=' + JSON.stringify(t109r)
+    );
+
+    // ---- T110 counterexample 2: a changed whitelist text must miss.
+    const WL_SEG = '    sha256(text),';
+    const t110Store = g4bMemStore();
+    g4bRunWith(t110Store, 'shaA', W1);
+    const t110b = g4bWord(g4bRunWith(t110Store, 'shaA', W2));
+    check(
+      'T110 G4b cache counterexample 2: a changed whitelist text misses and stores a second entry',
+      !!t110b && t110b.word === 'miss' && t110Store.size() === 2,
+      JSON.stringify(t110b) + ' entries=' + t110Store.size()
+    );
+    const t110Needles = decodeBuffer(fs.readFileSync(G4B_SOURCE)).split(WL_SEG).length - 1;
+    const m110 = loadMutatedModule(G4B_SOURCE, WL_SEG, "    sha256(''),", 'g4b-cache-whitelist-digest');
+    const t110mStore = g4bMemStore();
+    g4bRunWith(t110mStore, 'shaA', W1, m110.exports);
+    const t110m = g4bWord(g4bRunWith(t110mStore, 'shaA', W2, m110.exports));
+    check(
+      'T110 G4b cache mutation applied + load-bearing: pinning the whitelist digest turns the second run into a hit',
+      t110Needles === 1 && m110.applied === true && m110.identical === true && !!t110m && t110m.word === 'hit',
+      'needles=' + t110Needles + ' applied=' + m110.applied + ' identical=' + m110.identical +
+        ' second=' + JSON.stringify(t110m)
+    );
+    const t110rStore = g4bMemStore();
+    g4bRunWith(t110rStore, 'shaA', W1);
+    const t110r = g4bWord(g4bRunWith(t110rStore, 'shaA', W2));
+    check(
+      'T110 restore: g4b.js is byte-identical after the mutation window and the shipped module still misses on the new whitelist',
+      m110.identical === true && !!t110r && t110r.word === 'miss',
+      'identical=' + m110.identical + ' second=' + JSON.stringify(t110r)
+    );
+
+    // ---- T111 counterexample 3: a changed criterion SOURCE must miss. The subject change
+    // is a line of `run`, and `run` is exactly what `sourceDigest()` hashes - so the
+    // mutation below blinds the digest to `runBody()` and must earn the cache back.
+    const RUN_SEG = '  if (whitelist.error) throw new UsageError(whitelist.error);';
+    const BLIND_SEG = '  return sha256(JSON.stringify([WHITELIST_REL, cjkChars.toString(), runBody()]));';
+    const BLIND_TO = "  return sha256(JSON.stringify([WHITELIST_REL, cjkChars.toString(), 'blind']));";
+    const m111 = loadMutatedModule(G4B_SOURCE, RUN_SEG, "  if (whitelist.error) throw new UsageError(whitelist.error + ' ');", 'p27-src-digest');
+    const t111Store = g4bMemStore();
+    g4bRunWith(t111Store, 'shaA', W1);
+    const t111 = g4bWord(g4bRunWith(t111Store, 'shaA', W1, m111.exports));
+    check(
+      'T111 G4b cache counterexample 3: a changed criterion source misses even with the same sha and whitelist',
+      m111.applied === true && m111.identical === true &&
+        m111.exports.internals.sourceDigest() !== G4B.internals.sourceDigest() &&
+        !!t111 && t111.word === 'miss',
+      'applied=' + m111.applied + ' identical=' + m111.identical +
+        ' digestDiffers=' + (m111.exports.internals.sourceDigest() !== G4B.internals.sourceDigest()) +
+        ' second=' + JSON.stringify(t111)
+    );
+    const blindSeed = g4bPatchedModule(G4B_SOURCE, [[BLIND_SEG, BLIND_TO]], 'p27-src-digest-blind-seed');
+    const blindSubject = g4bPatchedModule(
+      G4B_SOURCE,
+      [
+        [BLIND_SEG, BLIND_TO],
+        [RUN_SEG, "  if (whitelist.error) throw new UsageError(whitelist.error + ' ');"],
+      ],
+      'p27-src-digest-blind-subject'
+    );
+    const t111mStore = g4bMemStore();
+    g4bRunWith(t111mStore, 'shaA', W1, blindSeed.exports);
+    const t111m = g4bWord(g4bRunWith(t111mStore, 'shaA', W1, blindSubject.exports));
+    check(
+      'T111 G4b cache mutation applied + load-bearing: blinding the digest to the run body lets a changed source hit',
+      blindSeed.applied === true && blindSeed.identical === true &&
+        blindSubject.applied === true && blindSubject.identical === true &&
+        !!t111m && t111m.word === 'hit',
+      'seedApplied=' + blindSeed.applied + ' subjectApplied=' + blindSubject.applied +
+        ' identical=' + (blindSeed.identical && blindSubject.identical) + ' second=' + JSON.stringify(t111m)
+    );
+    const t111rStore = g4bMemStore();
+    g4bRunWith(t111rStore, 'shaA', W1);
+    const t111r = g4bWord(g4bRunWith(t111rStore, 'shaA', W1, m111.exports));
+    check(
+      'T111 restore: g4b.js is byte-identical after all mutation windows and the shipped module still misses on the changed source',
+      m111.identical === true && blindSeed.identical === true && blindSubject.identical === true &&
+        !!t111r && t111r.word === 'miss',
+      'identical=' + (m111.identical && blindSeed.identical && blindSubject.identical) +
+        ' second=' + JSON.stringify(t111r)
+    );
+
+    // ---- T112 fail-open and key shape.
+    const throwingStore = {
+      get() {
+        throw new Error('store unavailable');
+      },
+      put() {
+        throw new Error('store unavailable');
+      },
+    };
+    const t112a = g4bRunWith(throwingStore, 'shaA', W1);
+    check(
+      'T112 G4b cache fail-open 1: a store whose get() throws still yields a verdict and emits NO cache record',
+      hasVerdict(t112a) && g4bCacheOf(t112a).length === 0,
+      'verdict=' + verdictOf(t112a.records, 'G4b') + ' cacheRecords=' + g4bCacheOf(t112a).length
+    );
+    const t112Store = g4bMemStore();
+    g4bRunWith(t112Store, 'shaA', W1);
+    const t112Key = t112Store.keys()[0];
+    t112Store.put(t112Key, { v: 2, corpus: 'x' });
+    const t112b = g4bWord(g4bRunWith(t112Store, 'shaA', W1));
+    const t112Rewritten = t112Store.get(t112Key);
+    check(
+      'T112 G4b cache fail-open 2: a malformed entry is a miss and is rewritten as a valid entry of this version',
+      !!t112b && t112b.word === 'miss' && !!t112Rewritten &&
+        t112Rewritten.v === 1 && Array.isArray(t112Rewritten.corpus),
+      'second=' + JSON.stringify(t112b) + ' rewritten=' + JSON.stringify(t112Rewritten)
+    );
+    const t112Shape = G4B.internals.keyString(g4bCtx(g4bMemStore(), 'shaA', W1)).split('|');
+    check(
+      'T112 G4b cache key shape: six pipe-separated segments starting with the format version',
+      t112Shape.length === 6 && t112Shape[0] === 'v1' && t112Shape[1] === 'shaA' &&
+        t112Shape[2] === 'tree' && t112Shape[3] === 'worktree',
+      t112Shape.join(' / ')
+    );
+    const t112OffStore = g4bMemStore();
+    const t112OffCtx = g4bCtx(t112OffStore, 'shaA', W1);
+    t112OffCtx.g4bCacheDisabled = true;
+    const t112OffSink = g4bSink();
+    G4B.run(t112OffCtx, t112OffSink);
+    check(
+      'T112 G4b cache switched off: g4bCacheDisabled forces the full scan and emits NO cache record',
+      hasVerdict(t112OffSink) && g4bCacheOf(t112OffSink).length === 0 && t112OffStore.size() === 0,
+      'cacheRecords=' + g4bCacheOf(t112OffSink).length + ' entries=' + t112OffStore.size()
+    );
+    const t112NoShaCtx = g4bCtx(g4bMemStore(), 'shaA', W1);
+    t112NoShaCtx.git = () => ({ ok: false, code: 127, out: '', err: '', spawnError: null });
+    const t112NoShaSink = g4bSink();
+    G4B.run(t112NoShaCtx, t112NoShaSink);
+    check(
+      'T112 G4b cache switched off when git cannot resolve the corpus revision (silent full scan, no record)',
+      hasVerdict(t112NoShaSink) && g4bCacheOf(t112NoShaSink).length === 0,
+      'cacheRecords=' + g4bCacheOf(t112NoShaSink).length
+    );
+
+    // ---- T113: index dirtiness must NOT disable the cache. Condition ③ of the first
+    // design ("cache only while `git diff --cached --quiet HEAD` exits 0") was ruled a
+    // redundant over-protection by ① and REMOVED. This face pins the removal: the `dirty`
+    // fixture makes the staged delta observable, so a resurrected condition ③ turns red
+    // here instead of hiding behind a clean-working-tree run.
+    const DIRTY_SEG = '  if (resolvedSha(ctx) === null) return false;\n  return true;';
+    const DIRTY_TO =
+      '  if (resolvedSha(ctx) === null) return false;\n' +
+      "  if (ctx.kind === 'tree' || ctx.kind === 'index') {\n" +
+      "    try { const r = ctx.git(['diff', '--cached', '--quiet', 'HEAD']); if (!r || r.code !== 0) return false; } catch (e) { return false; }\n" +
+      '  }\n' +
+      '  return true;';
+    const g4bRunDirty = (store, sha, wlText, dirty, mod) => {
+      const ctx = g4bCtx(store, sha, wlText);
+      ctx.git = g4bFakeGit(sha, dirty);
+      const sink = g4bSink();
+      (mod || G4B).run(ctx, sink);
+      return sink;
+    };
+    const T113_NAME =
+      'T113 G4b cache index-dirtiness independence: a staged delta does not disable the cache for tree/index ' +
+      '(condition 3 must not resurrect)';
+    const t113Store = g4bMemStore();
+    const t113a = g4bRunDirty(t113Store, 'shaA', W1, true);
+    const t113b = g4bRunDirty(t113Store, 'shaA', W1, true);
+    const t113w1 = g4bWord(t113a);
+    const t113w2 = g4bWord(t113b);
+    check(
+      T113_NAME + ' - run 1 misses and still produces the verdict',
+      g4bCacheOf(t113a).length === 1 && hasVerdict(t113a) && !!t113w1 && t113w1.word === 'miss',
+      'first=' + JSON.stringify(t113w1) + ' verdict=' + verdictOf(t113a.records, 'G4b')
+    );
+    check(
+      T113_NAME + ' - run 2 hits on the same sha and whitelist',
+      g4bCacheOf(t113b).length === 1 && !!t113w2 && t113w2.word === 'hit' &&
+        t113Store.size() === 1 && !!t113w1 && t113w1.key12 === t113w2.key12,
+      'second=' + JSON.stringify(t113w2) + ' entries=' + t113Store.size()
+    );
+    const t113Clean = g4bRunDirty(g4bMemStore(), 'shaA', W1, false);
+    const t113CleanV = verdictOf(t113Clean.records, 'G4b') + ' :: ' + detailOf(t113Clean.records, 'G4b');
+    const t113DirtyV = verdictOf(t113a.records, 'G4b') + ' :: ' + detailOf(t113a.records, 'G4b');
+    check(
+      T113_NAME + ' - the dirty and clean fixtures yield the identical G4b verdict and detail',
+      hasVerdict(t113a) && hasVerdict(t113Clean) && t113CleanV === t113DirtyV,
+      'dirty=' + t113DirtyV + ' clean=' + t113CleanV
+    );
+    const t113KeyCtx = g4bCtx(g4bMemStore(), 'shaA', W1);
+    t113KeyCtx.git = g4bFakeGit('shaA', true);
+    const t113Shape = G4B.internals.keyString(t113KeyCtx).split('|');
+    check(
+      T113_NAME + ' - the six-segment key shape does not degrade under a dirty index',
+      t113Shape.length === 6 && t113Shape[0] === 'v1' && t113Shape[1] === 'shaA' && t113Shape[2] === 'tree',
+      t113Shape.join(' / ')
+    );
+    const t113Needles = decodeBuffer(fs.readFileSync(G4B_SOURCE)).split(DIRTY_SEG).length - 1;
+    const m113 = loadMutatedModule(G4B_SOURCE, DIRTY_SEG, DIRTY_TO, 'p27-dirty-index-resurrect');
+    const t113mStore = g4bMemStore();
+    const t113m = g4bRunDirty(t113mStore, 'shaA', W1, true, m113.exports);
+    check(
+      T113_NAME + ' - mutation applied + load-bearing: resurrecting condition 3 removes every G4b-cache record',
+      t113Needles === 1 && m113.applied === true && m113.identical === true &&
+        hasVerdict(t113m) && g4bCacheOf(t113m).length === 0 && t113mStore.size() === 0,
+      'needles=' + t113Needles + ' applied=' + m113.applied + ' identical=' + m113.identical +
+        ' cacheRecords=' + g4bCacheOf(t113m).length + ' entries=' + t113mStore.size()
+    );
+    const t113rStore = g4bMemStore();
+    g4bRunDirty(t113rStore, 'shaA', W1, true);
+    const t113r = g4bWord(g4bRunDirty(t113rStore, 'shaA', W1, true));
+    check(
+      'T113 restore: g4b.js is byte-identical after the mutation window and the shipped module still hits on a dirty index',
+      m113.identical === true && !!t113r && t113r.word === 'hit',
+      'identical=' + m113.identical + ' second=' + JSON.stringify(t113r)
     );
   }
 
