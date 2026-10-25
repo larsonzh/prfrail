@@ -78,3 +78,5 @@
 坐	docs/validation/gates-g4b-cache.md	"均未 100% 机械坐实" (the §7.1 known limitation is adopted verbatim as instructed)
 扣	docs/validation/gates-g4b-cache.md	"既不计审查价值也照扣额度" and "扣除后" (quota-accounting wording of the dispatch summary and the fixed-overhead reference)
 毁	docs/validation/gates-g4b-cache.md	"清零即毁缓存" (the §2 landing-form note says why the cache must not live under the slice temp dir; the wording comes from the instruction verbatim)
+侦	docs/validation/directive-tmp-cache-exception.md	「无机械侦测」 (known-limitation wording: whether the (10) receipt attached the readings has no mechanical detection; also inside the sixstage transcription of the EN report)
+摊	docs/validation/directive-tmp-cache-exception.md	「几何分摊」 (verbatim (6) sentence inside the sixstage fence; the transcription contract forbids rewriting)

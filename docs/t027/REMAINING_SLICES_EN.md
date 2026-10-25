@@ -57,6 +57,7 @@
 | P25 DIRECTIVE-CARRIER-ADJUST | ✅ Done | P24 | M | 2026-10-24 | `docs/validation/directive-carrier-adjust{,_EN}.md` |
 | P26 GATES-G7F-DEDUP + DISPATCH-EVIDENCE | ✅ Done | P25 | M | 2026-10-24 | `docs/validation/gates-g7f-dedup-dispatch-evidence{,_EN}.md` |
 | P27 G4b-CACHE | ✅ Done | P26 | M | 2026-10-25 | `docs/validation/gates-g4b-cache{,_EN}.md` |
+| P28 DIRECTIVE-TMP-CACHE-EXCEPTION | ✅ Done | P27 | M | 2026-10-26 | `docs/validation/directive-tmp-cache-exception{,_EN}.md` |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -986,6 +987,28 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Freedom-list path | `docs/validation/evidence/G4B-CACHE-freedom-list.md` |
 | Observation / next slice | **Observation**: `listAllMarkdown` uses `git ls-files` (the index) for tree/index, so a staged `.md` deletion shrinks a cold run's corpus below the HEAD truth (a cold run over-reports); inside the "write, then stage a `.md` deletion" window a cache hit and a cold run can disagree (measured warm=PASS / cold=FAIL) - the direction is fail-safe: a cached value is always a subset of the true corpus and never whitewashes a violation. **Next-slice proposal**: `G4B-CORPUS-DECOUPLE` - evaluate the tree/index enumeration semantics of `listAllMarkdown` (`ls-files` -> `ls-tree HEAD`) and its consumer surface (verified: `listAllMarkdown` is consumed only by G4b, `g4b.js:223`); not executed in this slice. **Candidate OB**: the ~24-37 s frozen cost under the ci scope is unattributed and not solvable by the G4b cache |
 | Known limitations (not fixed here) | ⑤ Low#4: the second `rev-parse` inside `keyString` maps a failure to the `'none'` key segment (a TOCTOU), so when the first call succeeds and the second fails an empty corpus can be persisted under that key; the direction is fail-safe (it can only over-report unknown characters, never whitewash a violation), so this slice leaves it unfixed. ⑤ Low#5: the five T112 faces do not directly cover a `mkdirSync` failure, a throwing `put`, or syntactically invalid JSON (same shape as the paths already tested, but without a direct assertion); this slice leaves it unfixed. Both are recorded in the validation report's "known limitations" section and listed as candidates for a later small-fix slice |
+
+### P28 — `DIRECTIVE-TMP-CACHE-EXCEPTION` · ✅ Done
+
+| Field | Content |
+|---|---|
+| Id | `DIRECTIVE-TMP-CACHE-EXCEPTION` (directive bumped to v1.50; closes the internal conflict between the cache-retention clause of C.0aj and the pre-(10) final-state read-back clause of §5.1) |
+| Status | ✅ **Done** (2026-10-26; directive v1.50; (1) ruling = option (ii); the two (5) rounds and the (6) / (7) review chain are closed; `TOTAL_FAIL=0` in all three scopes and `SELFTEST: PASS 697/697`; the report pair, the freedom list and the deviation/waiver registrations are on disk) |
+| Goal | remove the conflict between the `tmp/` final-state caliber and the "keep the runtime cache directory" rule; the P27 option D was a temporary exception and must not be used as a precedent |
+| Depends on | P27 closed (`HEAD` = `2c9b6a3`, directive v1.49) |
+| Size | M (governance slice; (7) = 1 final + 3 re-reviews) |
+| Steps | step 0 → (1) fix-direction ruling → (2) → (3) → (4) → (5) → (6) → (7) (1+3) → 8a → (9) → 8b → 8c → (10) |
+| Current gap | ~~`tmp/gates-cache/g4b/` is runtime state that must be kept, while the pre-(10) final-state read-back of §5.1 requires the recursive file count under `tmp/` to be 1; the two clauses cannot hold at the same time~~ ⇒ closed by the runtime cache directory exception of v1.50 |
+| Fix direction | **(1) ruled = option (ii)** (user 2026-10-25): add a "runtime cache directory exception" clause to §5.1; already landed by v1.50, so P27's option D is void |
+| §5.1 exception status | The start-up message of this slice does **not** declare that the pre-(10) final-state read-back does not apply to (2) and (3); after v1.50 lands, the exception set `tmp/gates-cache/g4b/` is not counted in the (2) (3) readings, but the remaining top-level members of `tmp/` (including this slice's temp directory) must still be cleaned up before (10) |
+| Deliverables | branch (ii): changes the directive only (§5.1 / §0.3 / appendix C / the header) + this slice's report pair and freedom list; branch (i) (the `g4b.js` cache path, `.gitignore` and the `selftest.js` assertions) was not adopted and not executed |
+| Acceptance evidence | the recorded fix-direction ruling; the final semantics pinned by mechanical assertions; `TOTAL_FAIL=0` in all three scopes; a green `SELFTEST`; the report pair and the freedom list |
+| Boundary | `internal/**` / CONTRACTS / schema / fixtures / workflows / `DEV_PLAN` untouched; §2.2 / §2.4 / §5.2 / §7.5 unchanged; OB-104 / OB-105 / OB-107 / OB-50 / OB-120 not handled; no gitee push |
+| Class | `[SLICE]` (governance slice) |
+| Probe quota | none |
+| Freedom-list path | `docs/validation/evidence/DIRECTIVE-TMP-CACHE-EXCEPTION-freedom-list.md` |
+| Observation A landing declaration | Remediation-round temp directory = `tmp/DIRECTIVE-TMP-CACHE-EXCEPTION/`; before any remediation action after 8c, confirm that directory exists, re-create it if absent, and register the fact in the report; if a remediation action before (10) triggers a re-creation, a second cleanup per alternative path two of §5.1 is required before (10), followed by a mechanical read-back (every path `Test-Path` = `False`; the `tmp/` count is judged with the exception set excluded) |
+| Known limitations (not fixed here) | First, the (2) and (3) readings do not mechanically cover an empty subdirectory under `tmp/gates-cache/` that is undeclared and fileless; second, consistency with `.gitignore` is still a human check; third, §6.3 does not pin the G4b cache path (if OB-120 adopts fix (i), the literal enumeration in §5.1 must be amended with it); fourth, whether a receipt attached the four readings is not mechanically detected. All four are registered in the "Falsifiability and known limitations" chapter of this slice's validation report |
 
 ## Known defects (to be handled before later slices)
 

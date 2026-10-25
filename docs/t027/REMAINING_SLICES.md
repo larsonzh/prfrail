@@ -57,6 +57,7 @@
 | P25 DIRECTIVE-CARRIER-ADJUST | ✅ 已完成 | P24 | M | 2026-10-24 | `docs/validation/directive-carrier-adjust{,_EN}.md` |
 | P26 GATES-G7F-DEDUP + DISPATCH-EVIDENCE | ✅ 已完成 | P25 | M | 2026-10-24 | `docs/validation/gates-g7f-dedup-dispatch-evidence{,_EN}.md` |
 | P27 G4b-CACHE | ✅ 已完成 | P26 | M | 2026-10-25 | `docs/validation/gates-g4b-cache{,_EN}.md` |
+| P28 DIRECTIVE-TMP-CACHE-EXCEPTION | ✅ 已完成 | P27 | M | 2026-10-26 | `docs/validation/directive-tmp-cache-exception{,_EN}.md` |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -999,6 +1000,28 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 执行自由度清单落盘路径 | `docs/validation/evidence/G4B-CACHE-freedom-list.md` |
 | 观察项 / 下片建议 | **观察项**：`listAllMarkdown` 对 tree/index 用 `git ls-files`（读索引）⇒ 暂存删除 `.md` 时冷跑语料相对 HEAD 真值收缩，冷跑从严多报；且「写入后暂存删除 `.md`」窗口内缓存命中与冷跑可给出不同 verdict（实测 warm=PASS / cold=FAIL，方向 fail-safe：缓存值恒为真值语料子集，从不洗白违规）。**下片立项建议**：`G4B-CORPUS-DECOUPLE` —— 评估 `listAllMarkdown` 的 tree/index 枚举语义（`ls-files` → `ls-tree HEAD`）与消费者影响面（已核实：`listAllMarkdown` 仅 G4b 消费，`g4b.js:223`）；本片不执行。**候选 OB**：ci 作用域约 24–37 s 冻结成本来源未定，非 G4b 缓存可解 |
 | 已知限制（本片不修） | ⑤ Low#4：`keyString` 的二次 `rev-parse` 失败被映射为 `'none'` 键段（TOCTOU），首次成功而二次失败时可把空语料写入该键；方向 fail-safe（只多报 unknown、不漏报违规），本片不修。⑤ Low#5：T112 五面未直接覆盖 `mkdirSync` 失败、`put` 抛错、JSON 语法非法（与已测路径同构但缺直接断言），本片不修。两条均登记于本片验证报告的「已知限制」段，列为后续小修片候选 |
+
+### P28 — `DIRECTIVE-TMP-CACHE-EXCEPTION` · ✅ 已完成
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `DIRECTIVE-TMP-CACHE-EXCEPTION`（准则升 v1.50；闭合 C.0aj 的缓存保留条款与 §5.1 的 ⑩ 前终态回读条款的内部冲突） |
+| 状态 | ✅ **已完成**（2026-10-26；准则 v1.50；① 裁定 = 分支 (ii)；⑤ 两轮与 ⑥ / ⑦ 审查链已闭环；三作用域 `TOTAL_FAIL=0`、`SELFTEST: PASS 697/697`；报告对、自由度清单、偏离与特批登记已落盘） |
+| 目标 | 消除 `tmp/` 终态口径与「运行时缓存目录保留」的两条规则冲突；P27 的 D 选项为临时例外，不得作先例 |
+| 依赖 | P27 已完成（`HEAD` = `2c9b6a3`，准则 v1.49） |
+| 规模 | M（治理片；⑦ = 1 终审 + 3 复审） |
+| 步骤 | 步骤 0 → ①（修法裁定）→ ② → ③ → ④ → ⑤ → ⑥ → ⑦（1+3）→ ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| 现状缺口 | ~~`tmp/gates-cache/g4b/` 属运行时状态需保留，而 §5.1 的 ⑩ 前终态回读要求 `tmp/` 递归文件数 = 1；两条款无法同时成立~~ ⇒ 已由 v1.50 的运行时缓存目录例外闭合 |
+| 修法方向 | **① 已裁定 = 分支 (ii)**（用户 2026-10-25）：§5.1 增加「运行时缓存目录例外」条款；已由 v1.50 落地，P27 的 D 选项作废 |
+| §5.1 例外状态 | 本片起跑消息**未**声明「§5.1 的 ⑩ 前终态回读 ② ③ 对本片不适用」；v1.50 落地后例外集 `tmp/gates-cache/g4b/` 不计入 ② ③ 读数，但 `tmp/` 其余顶层成员（含本片临时目录）仍须在 ⑩ 前清理到位 |
+| 交付物 | 分支 (ii)：只改准则（§5.1 / §0.3 / 附录 C / 头部）+ 本片报告对与自由度清单；分支 (i)（`g4b.js` 缓存路径 + `.gitignore` + `selftest.js` 断言）未采纳、未执行 |
+| 验收证据 | 修法方向裁定记录、机械断言钉住最终语义、三作用域 `TOTAL_FAIL=0`、`SELFTEST` 全绿、报告对与自由度清单 |
+| 边界 | 不动 `internal/**` / CONTRACTS / schema / fixtures / workflows / `DEV_PLAN`；不改 §2.2 / §2.4 / §5.2 / §7.5；不处理 OB-104 / OB-105 / OB-107 / OB-50 / OB-120；不推 gitee |
+| 分级 | `[SLICE]`（治理片） |
+| 探针额度 | 无 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/DIRECTIVE-TMP-CACHE-EXCEPTION-freedom-list.md` |
+| 观察项 A 落点声明 | 整改轮临时目录 = `tmp/DIRECTIVE-TMP-CACHE-EXCEPTION/`；⑧c 之后任何整改动作前先确认该目录存在，不存在则重建并在报告登记；⑩ 前如有整改动作触发重建，须按 §5.1 备选路径二在 ⑩ 前二次清理并机械回读（逐路径 `Test-Path` = `False`，`tmp/` 计数按例外集排除后判定） |
+| 已知限制（本片不修） | 其一，② ③ 未机械覆盖 `tmp/gates-cache/` 下「未声明且无文件」的空子目录；其二，「与 `.gitignore` 一致」仍为人工复核；其三，§6.3 未写死 G4b 缓存路径（OB-120 采纳修法 (i) 时须同步改 §5.1 的字面枚举）；其四，「回执是否附四条读数」无机械侦测。四条均登记于本片验证报告的「可证伪性与已知限制」章 |
 
 ## 已知缺陷（后续切片前处理）
 
