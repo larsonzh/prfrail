@@ -151,7 +151,7 @@ What was lost is the **evidence carrier**, not the **conclusion**: the three (5)
 
 **Waiver**: the user ruled it closed, on the grounds that "the fix is mechanically verifiable (after narrowing, the measured value is `1 + 9`, with `g4b/` still exempt and the root-level loose files newly caught)", that "the quota was exhausted", and that "(6) will independently review the fix". **Nature**: this **exceeds** the literal requirement of `§5.3` ("after (5) reports Medium+, re-run (5)") and is a direct user adjudication; **not a precedent**; **(6) did in fact review the fix** (see chapter 6 and item 3 of `six/06-mai-report.md`).
 
-The (7) re-review judged this waiver **acceptable but not strictly equivalent to a full (5) re-run**: the substitute coverage only verifies the fix of that one Medium and is narrower than a full (5) review. This is registered exactly as (7) judged it, without any "equivalent" claim.
+The (7) re-review judged this waiver **acceptable but not strictly equivalent to a full (5) re-run**: the substitute coverage only verifies the fix of that one Medium and is narrower than a full (5) review. This is registered exactly as (7) judged it, without any "equivalent" claim. It must also be stated explicitly: (6) covered the **post-fix state**, **not the repair process** — the duty of (6) is to scan the current state independently, not to re-review how (5) was fixed.
 
 ### 8.4 Two citation and wording defects in (6) (treated as leads)
 
@@ -162,6 +162,19 @@ First, (6) cited `docs/.gitignore`, which does not exist; the correct location i
 `G4b` reports `unknown=[]`; following the standard flow this slice registered whitelist entries for newly introduced legitimate CJK characters (entries and reasons in freedom-list item F-4) and **did not reword anything to dodge the criterion**.
 
 The root of `tmp/gates-cache/` holds **9** historical leftovers from the P27 and README slices (not members of the exception set). The user ruled that the **main controller cleans them item by item at ⑧c** with a read-back proof, and that the (2) implementer must not do it (which would trigger the same-type deviation again). After cleanup the (2) reading should be 1, with only `g4b/` exempt. **These are omissions of the P27 and README slices, not introduced by this slice.**
+
+### 8.6 Stage-8c cleanup record and CI evidence
+
+**Cleanup manifest**: ⑧c was executed by the main controller in the order "register -> precise item-by-item cleanup -> mechanical read-back". The slice temp directory `tmp/DIRECTIVE-TMP-CACHE-EXCEPTION/` held **50 entries** (including 11 under the `six/` subdirectory), each removed with `Remove-Item -LiteralPath`; the root of `tmp/gates-cache/` held **9 historical leftovers** (`readme-fix.js`, `readme-fix-out.txt`, `readme.diff`, `rs-*.txt`, `rs2-*.txt` and similar, all omissions of the P27 and README slices and **not introduced by this slice**), each removed; `tmp/gates-cache/g4b/` is kept (runtime cache, member of the exception set, ⑧c does not clear it).
+
+**Read-back and readings**: at the ⑧c read-back the top level of `tmp/` was `.gitkeep` plus `gates-cache` and `g4b/` held 18 files, so the recursive file count under `tmp/` was 1 + 18 = **19**; reading R3 of the ⑨ final readings is **22**, a difference of 3, derived as follows: the ⑨ runs of the three scopes and `--selftest` made G4b write new cache entries, so `g4b/` grew from 18 to **21** and 22 = 1 + 21, the difference being exactly the 3 new cache entries (runtime state, permitted by the exception set). This growth does not affect the clause semantics: R4 (the fixed command of (2), after excluding the exception set) = **1** and R5 (the fixed command of (3)) = **0**, both meeting the readings required by §5.1.
+
+**CI evidence** (run `40222805885`, commit `8fc67c8`, conclusion `success`):
+
+| Leg | Self-test | Gates | Package-level `ok` |
+|---|---|---|---|
+| Windows | `SELFTEST: PASS 697/697` | `TOTAL_FAIL=0` | `0.376s` |
+| Ubuntu | `SELFTEST: PASS 697/697` | `TOTAL_FAIL=0` | `0.121s` |
 
 ## 9 Input for the next slice (v1.51)
 
