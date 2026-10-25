@@ -231,7 +231,20 @@ Once this report and the freedom list land, the change set is **10 paths** (7 `M
 
 ## 8 Commit and CI
 
-This report and the freedom list are the ⑧a artifacts; ⑨ re-runs the three scopes plus `--selftest` and appends the frozen readings to §4.2; the commit and the CI run id are registered in the ⑩ stop receipt (this slice has no commit yet, so no run id may be pre-written).
+This report and the freedom list are the ⑧a artifacts; ⑨ re-runs the three scopes plus `--selftest` and appends the frozen readings to §4.2. The commit and CI evidence follow (a run triggered by a write-back commit after this one is an observation record only and gets no new commit of its own per §11.2).
+
+| Item | Value |
+|---|---|
+| Commit | `64d1d58f82446bd9c1675df23523411785f5f29d` |
+| Push | `origin` `7b84528..64d1d58` (never gitee) |
+| CI run | `40183876643` (`https://github.com/larsonzh/prfrail/actions/runs/40183876643`) |
+| Conclusion | `completed / success` |
+
+- Legs: `Go windows-latest` = `success`, `Go ubuntu-latest` = `success`; the other 3 jobs are `skipped` (the candidate and release chains are not triggered, as expected).
+- `Gates` step command (identical on both legs, repo-relative): `node gate.js --selftest && node gate.js --all --scope=ci`.
+- Windows leg: `SELFTEST: PASS 697/697`, `TOTAL_FAIL=0`, `ok github.com/larsonzh/prfrail/internal/gates` (`0.244s`).
+- Ubuntu leg: `SELFTEST: PASS 697/697`, `TOTAL_FAIL=0`, `ok github.com/larsonzh/prfrail/internal/gates` (`0.140s`).
+- Independent corroboration: on a fresh checkout with no local cache, the 697 assertions (including T87 and T108-T113) are green on both Windows and Ubuntu => independent counter-evidence for the T87 concern raised in ⑦ r1.
 
 ```artifacts
 tools/gates/lib/criteria/g4b.js	repo

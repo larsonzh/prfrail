@@ -231,7 +231,20 @@ INDEPENDENT SCAN: PASS
 
 ## 8 提交与 CI
 
-本报告与自由度清单为 ⑧a 的落盘物；⑨ 重跑三作用域与 `--selftest` 后把定稿读数补记于 §4.2；提交与 CI run 号在 ⑩ 停点回执登记（本片当前无提交，不得预写 run 号）。
+本报告与自由度清单为 ⑧a 的落盘物；⑨ 重跑三作用域与 `--selftest` 后把定稿读数补记于 §4.2。提交与 CI 证据如下（回写提交之后的 run 只作观察记录，按 §11.2 不再为其新增提交）。
+
+| 项 | 值 |
+|---|---|
+| 提交 | `64d1d58f82446bd9c1675df23523411785f5f29d` |
+| 推送 | `origin` 的 `7b84528..64d1d58`（不推 gitee） |
+| CI run | `40183876643`（`https://github.com/larsonzh/prfrail/actions/runs/40183876643`） |
+| 结论 | `completed / success` |
+
+- 双腿：`Go windows-latest` = `success`、`Go ubuntu-latest` = `success`；其余 3 个 job `skipped`（候选与发布链未触发，属预期）。
+- `Gates` 步骤命令（两腿相同，仓内相对路径）：`node gate.js --selftest && node gate.js --all --scope=ci`。
+- Windows 腿：`SELFTEST: PASS 697/697`、`TOTAL_FAIL=0`、`ok github.com/larsonzh/prfrail/internal/gates`（`0.244s`）。
+- Ubuntu 腿：`SELFTEST: PASS 697/697`、`TOTAL_FAIL=0`、`ok github.com/larsonzh/prfrail/internal/gates`（`0.140s`）。
+- 独立佐证：全新 checkout、无本地缓存的 CI 环境下，含 T87 与 T108–T113 的 697 条断言在 Windows 与 Ubuntu 双平台均全绿 ⇒ 为 ⑦ r1 的 T87 疑点提供独立反证。
 
 ```artifacts
 tools/gates/lib/criteria/g4b.js	repo
