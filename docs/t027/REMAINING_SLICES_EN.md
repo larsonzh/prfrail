@@ -647,7 +647,7 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Field | Content |
 |---|---|
 | Id | `DIRECTIVE-TEMP-AUTH-LIMIT` (v1.35) |
-| Status | ✅ **Completed** (report at `docs/validation/directive-temp-auth-limit{,_EN}.md`; ⑩ stop point, a commit needs same-turn authorization) |
+| Status | ✅ **Completed** (report at `docs/validation/directive-temp-auth-limit{,_EN}.md`; commit `9d5bf9e` (backfill `290438d`), CI `39045058091` and `39046541251` both legs green) |
 | Goal | Formally revise the §1.7.4 ⑤ threshold and the §7.5 quota cap; land OB-92 (the ADR-024 wording conflict) and OB-93 plus the ⑧c record timing (§5.1 per-input assertion in the review input builder, cleanup/record timing) |
 | Depends on | none (upstream `GATES-EDGE-COVERAGE` is closed, HEAD = `aa49e0c`) |
 | Size | M |
@@ -1017,7 +1017,7 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Field | Content |
 |---|---|
 | Id | `DIRECTIVE-P28-FOLLOWUP` (directive bumped to v1.51; one slice closes the five leftovers of P28) |
-| Status | ✅ **Done** (2026-10-26; directive v1.51; the two (1) ruling groups = item 4 (a) / item 5 (d); (3) two rounds, (5) 1+1, (6) two rounds (r1 failed + r2 valid), (7) 1+2 (r2 reported 1 Medium, cleared by the r3 re-review PASS); `TOTAL_FAIL=0` in all three scopes, `SELFTEST: PASS 697/697`, and the (5) reading measured in four states as 1/2/1/0; the report pair and the freedom list are on disk; **the commit and CI await user authorisation**, with D = 1 temp item for this slice) |
+| Status | ✅ **Done** (2026-10-26; directive v1.51; the two (1) ruling groups = item 4 (a) / item 5 (d); (3) two rounds, (5) 1+1, (6) two rounds (r1 failed + r2 valid), (7) 1+2 (r2 reported 1 Medium, cleared by the r3 re-review PASS); `TOTAL_FAIL=0` in all three scopes, `SELFTEST: PASS 697/697`, and the (5) reading measured in four states as 1/2/1/0; the report pair and the freedom list are on disk; **commit `2713c69`; CI-evidence commit `e0911ba` (run `40252842900`) both legs green**, with D = 1 temp item for this slice) |
 | Goal | close the five P28 leftovers: append a third instance to the symptom column of §9.3:886, add OB-122, add the closing requirement for an approved continuation to the disposition column of §9.3:886, fix the empty-subdirectory gap, and give the three collaboration disciplines a landing point |
 | Depends on | P28 closed (`HEAD` = `92024b3`, directive v1.50) |
 | Size | M (governance slice; (7) = 1 final + 3 re-reviews) |
