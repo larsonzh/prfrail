@@ -58,6 +58,7 @@
 | P26 GATES-G7F-DEDUP + DISPATCH-EVIDENCE | ✅ Done | P25 | M | 2026-10-24 | `docs/validation/gates-g7f-dedup-dispatch-evidence{,_EN}.md` |
 | P27 G4b-CACHE | ✅ Done | P26 | M | 2026-10-25 | `docs/validation/gates-g4b-cache{,_EN}.md` |
 | P28 DIRECTIVE-TMP-CACHE-EXCEPTION | ✅ Done | P27 | M | 2026-10-26 | `docs/validation/directive-tmp-cache-exception{,_EN}.md` |
+| P29 DIRECTIVE-P28-FOLLOWUP | ✅ Done | P28 | M | 2026-10-26 | `docs/validation/directive-p28-followup{,_EN}.md` |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1009,6 +1010,27 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Freedom-list path | `docs/validation/evidence/DIRECTIVE-TMP-CACHE-EXCEPTION-freedom-list.md` |
 | Observation A landing declaration | Remediation-round temp directory = `tmp/DIRECTIVE-TMP-CACHE-EXCEPTION/`; before any remediation action after 8c, confirm that directory exists, re-create it if absent, and register the fact in the report; if a remediation action before (10) triggers a re-creation, a second cleanup per alternative path two of §5.1 is required before (10), followed by a mechanical read-back (every path `Test-Path` = `False`; the `tmp/` count is judged with the exception set excluded) |
 | Known limitations (not fixed here) | First, the (2) and (3) readings do not mechanically cover an empty subdirectory under `tmp/gates-cache/` that is undeclared and fileless; second, consistency with `.gitignore` is still a human check; third, §6.3 does not pin the G4b cache path (if OB-120 adopts fix (i), the literal enumeration in §5.1 must be amended with it); fourth, whether a receipt attached the four readings is not mechanically detected. All four are registered in the "Falsifiability and known limitations" chapter of this slice's validation report |
+
+### P29 — `DIRECTIVE-P28-FOLLOWUP` · ✅ Done
+
+| Field | Content |
+|---|---|
+| Id | `DIRECTIVE-P28-FOLLOWUP` (directive bumped to v1.51; one slice closes the five leftovers of P28) |
+| Status | ✅ **Done** (2026-10-26; directive v1.51; the two (1) ruling groups = item 4 (a) / item 5 (d); (3) two rounds, (5) 1+1, (6) two rounds (r1 failed + r2 valid), (7) 1+2 (r2 reported 1 Medium, cleared by the r3 re-review PASS); `TOTAL_FAIL=0` in all three scopes, `SELFTEST: PASS 697/697`, and the (5) reading measured in four states as 1/2/1/0; the report pair and the freedom list are on disk; **the commit and CI await user authorisation**, with D = 1 temp item for this slice) |
+| Goal | close the five P28 leftovers: append a third instance to the symptom column of §9.3:886, add OB-122, add the closing requirement for an approved continuation to the disposition column of §9.3:886, fix the empty-subdirectory gap, and give the three collaboration disciplines a landing point |
+| Depends on | P28 closed (`HEAD` = `92024b3`, directive v1.50) |
+| Size | M (governance slice; (7) = 1 final + 3 re-reviews) |
+| Steps | step 0 → (1) (two ruling groups) → (2) → (3) → (4) → (5) → (6) → (7) (1+3) → 8a → (9) → 8b → 8c → (10) |
+| Current gap | four items: the symptom column records only 2 instances of the same deviation; the disposition column does not cover "if an approved continuation follows a third instance"; the v1.50 exception clause leaves an empty-subdirectory gap and has no fix; the three collaboration disciplines have no formal landing point |
+| Fix direction | **(1) ruled = item 4 (a) / item 5 (d)**: item 4 has four options (a add an empty-subdirectory prohibition plus an assertion / b change (2) to count files and directories / c change (3) to recursive directory names / d accept it as a known limitation); item 5 has four options (a put it in the body / b put it in appendix C.0al / c put it in the §12.4 observation list / d split it into A in the body and B plus C in appendix C) |
+| Deliverables | depending on the (1) ruling: three mechanical items always change (the symptom and disposition columns of §9.3, OB-122 in §12.4, the §0.3 and appendix C blocks plus the v1.51 header); items 4 and 5 change the positions chosen by the ruling; the report pair and the freedom list are common to both branches |
+| Acceptance evidence | the two (1) ruling records with the user original wording; mechanical assertions pinning the final semantics; `TOTAL_FAIL=0` in all three scopes; a green `SELFTEST`; the report pair and the freedom list |
+| Boundary | `internal/**` / CONTRACTS / schema / fixtures / workflows / `DEV_PLAN` / `tools/gates/**` untouched; the criterion bodies of §2.2 / §2.4 / §5.2 / §7.5 / §6.3 unchanged; OB-104 / OB-105 / OB-107 / OB-50 / OB-120 not handled; no gitee push |
+| Class | `[SLICE]` (governance slice) |
+| Probe quota | none |
+| Freedom-list path | `docs/validation/evidence/DIRECTIVE-P28-FOLLOWUP-freedom-list.md` |
+| Known limitations (not fixed here) | First, the (5) reading has no mechanical criterion protecting it - the user ruled that no G criterion is added, so a red verdict occurs only in the human-executed pre-(10) final-state readback (inheriting the P28 ledger item "whether a receipt attached the readings is not mechanically detected"; after v1.51 that caliber is read as "five" rather than "four"); second, (5) asserts only a count and does not verify member identity, so if `g4b/` is deleted and replaced by an empty directory at the same level, (5) still reads 1 (a false-green window with no mechanical closure - the next cold G4b run recomputes under fail-open and rewrites the cache without a red verdict; it is exposed only when the directory count differs from the known member count or when the cache content is compared by hand); third, the "SCM stale display" row of §9.3 states "the four commands such as `git status --porcelain -uall` are authoritative", which is a dangling reference with no definition and is not bound to the five readings of §5.1; this slice rejected broadening it to "five" (rationale: that sentence is a diagnostic command set, not a readback checklist) and registers it for the record without fixing it; fourth, the inferred authorisation in §11.2 rests only on textual boundary constraints - no mechanical criterion prevents its extension beyond the ⑩ CI-evidence push scenario, so it must be reviewed by hand at (5) and (7) |
+| Observation A landing declaration | Remediation-round temp directory = `tmp/DIRECTIVE-P28-FOLLOWUP/`; before any remediation action after 8c, confirm that directory exists, re-create it if absent, and register the fact in the report |
 
 ## Known defects (to be handled before later slices)
 
