@@ -189,6 +189,7 @@ INDEPENDENT SCAN: PASS
 | `G3(a)` | four pairs symmetric in `numstat`; the directive pair at `+21 / -3` |
 | Whitelist | `tools/gates/cjk-newwords.txt` 48 entries (unchanged) |
 - **Go-side readings of the ⑨ native validation** (`gofmt` / `build` / `vet` / `go test`) come from the native validation after ⑧b; only `.md` files changed afterwards and no Go file was touched, so the `.md` changes are covered by the three gate scopes of ④. **"Not re-running the Go side" rests on the change type, not on saving time** - any future change that touches Go files must be re-run.
+- **Commit and CI (backfilled)**: main commit `77a7221` (`docs: pin the §9.3 counting sequence and clarify the D-count wordings (v1.53)`); CI run `40358522090` is success on both legs (`Go ubuntu-latest` / `Go windows-latest`), with the package-level `ok github.com/larsonzh/prfrail/internal/gates` on both (`0.191s` / `0.356s`), plus `SELFTEST: PASS 697/697` and `TOTAL_FAIL=0` on both.
 
 ## 9 ⑧c cleanup record (§5.1)
 

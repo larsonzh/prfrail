@@ -189,6 +189,7 @@ INDEPENDENT SCAN: PASS
 | `G3(a)` | 四对 `numstat` 对称；准则对 `+21 / -3` |
 | 白名单 | `tools/gates/cjk-newwords.txt` 48 条（未新增） |
 - **⑨ 原生验证的 Go 侧读数**（`gofmt` / `build` / `vet` / `go test`）取自 ⑧b 后的原生验证；此后仅改 `.md`、未触 Go 文件，`.md` 改动由 ④ 的门禁三作用域覆盖。**「Go 侧不重跑」的依据是改动类型，不是省时**——若未来改动触及 Go 文件，必须重跑。
+- **提交与 CI（回填）**：主提交 `77a7221`（`docs: pin the §9.3 counting sequence and clarify the D-count wordings (v1.53)`）；CI run `40358522090` 双腿 success（`Go ubuntu-latest` / `Go windows-latest`），两腿包级 `ok github.com/larsonzh/prfrail/internal/gates`（`0.191s` / `0.356s`），两腿均 `SELFTEST: PASS 697/697` 与 `TOTAL_FAIL=0`。
 
 ## 9 ⑧c 收尾清洁记录（§5.1）
 
