@@ -79,6 +79,8 @@ L-3 与 L-4 分别由 R2 与 R3 承接，编号保留以便回溯 ③ 的原始�
 
 `G1-b`：两准则 `header=v1.51 last=v1.51 rows=52`。`G4b`：`unknown=[]`（⑥ 转录引入的「幻」按标准流程登记入 `tools/gates/cjk-newwords.txt`）。`git status --porcelain -uall`：`??` 项 = 0。准则对的六形状（lines / head / bold / bars / blank / backticks）CN=EN 全等，取值 2066 / 132 / 5291 / 3478 / 488 / 5706；本报告对的同一组读数 200 / 20 / 38 / 252 / 57 / 264——line 计数按门禁口径（不含末尾空元素），另一种口径见自由度清单 F-7。
 
+**CI 证据**（run `40251589108`，提交 `2713c69`，结论 `success`）：双腿均 `SELFTEST: PASS 697/697`、`TOTAL_FAIL=0`；包级 `ok github.com/larsonzh/prfrail/internal/gates` = `0.296s`（Windows）/ `0.113s`（Ubuntu）。
+
 ## 6 审查链
 
 | 环节 | 载体 | 轮次 | 结论 |

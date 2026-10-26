@@ -79,6 +79,8 @@ A same-session measurement from (3): before and after the empty subdirectory exi
 
 `G1-b`: both directive files read `header=v1.51 last=v1.51 rows=52`. `G4b`: `unknown=[]` (the 「幻」 introduced by the transcription is registered in `tools/gates/cjk-newwords.txt` through the standard process). `git status --porcelain -uall`: the `??` entry = 0. The six shapes of the directive pair (lines / head / bold / bars / blank / backticks) are equal CN=EN with values 2066 / 132 / 5291 / 3478 / 488 / 5706; the same set for this report pair is 200 / 20 / 38 / 252 / 57 / 264 - the line count follows the gate caliber (excluding the trailing empty element) and the other caliber is F-7 of the freedom list.
 
+**CI evidence** (run `40251589108`, commit `2713c69`, conclusion `success`): both legs read `SELFTEST: PASS 697/697` and `TOTAL_FAIL=0`; package-level `ok github.com/larsonzh/prfrail/internal/gates` = `0.296s` (Windows) / `0.113s` (Ubuntu).
+
 ## 6 Review chain
 
 | Stage | Carrier | Rounds | Outcome |
