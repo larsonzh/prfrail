@@ -204,3 +204,5 @@ INDEPENDENT SCAN: FINDINGS
   - windows: the same four readings, with values identical to ubuntu.
 - **Reading scope**: these readings belong to the change set of the **main commit**; the readings of this backfill commit are not written back here, and its observation run adds no new commit per `§11.2`; the `§4` readings such as `newCjk` / `scanned` likewise belong to the main commit's change set, and this backfill does not rewrite them.
 - **The `§6` "CI scope" item stays verbatim**: it records the true state of that time (bound by the no-commit rule, no CI reading taken, no run id pre-filled); this section only records the readings taken after the commit and does not rewrite that item.
+
+**Correction note (v1.53, slice `DIRECTIVE-LEDGER-FIELD-SPLIT`; per §11.1, note only)**: this slice's temp-artifact D cumulative 0 (backfilled 2026-10-26). The report body is not rewritten.

@@ -189,3 +189,5 @@ The `--selftest` elapsed time measured twice in this slice is 292.7 s (the final
 | Main commit hash | CI run id | CI conclusion | Note |
 |---|---|---|---|
 | `ff1d2d1` | `40078680727` | **success (both legs)**: `Go ubuntu-latest` and `Go windows-latest` are both success | Pushed to origin only (gitee not pushed). Both legs read `SELFTEST: PASS 663/663`, `GATE REPORT scope=ci changed=9` and `TOTAL_FAIL=0`; the package-level `ok` count is seventeen on ubuntu and fifteen on windows. The hash and the run id stay in the report only, per §11.2. |
+
+**Correction note (v1.53, slice `DIRECTIVE-LEDGER-FIELD-SPLIT`; per §11.1, note only)**: this slice's temp-artifact D cumulative 0 (backfilled 2026-10-26). The report body is not rewritten.

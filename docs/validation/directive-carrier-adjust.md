@@ -189,3 +189,5 @@ r1 为**盲审**（未提供任何前序发现清单），判 8 项：四项声�
 | 主提交 hash | CI run 号 | CI 结论 | 说明 |
 |---|---|---|---|
 | `ff1d2d1` | `40078680727` | **success（双腿）**：`Go ubuntu-latest` 与 `Go windows-latest` 均 success | 推送只到 origin（未推 gitee）。双腿均 `SELFTEST: PASS 663/663`、`GATE REPORT scope=ci changed=9`、`TOTAL_FAIL=0`；包级 `ok` 计数 ubuntu 十七、windows 十五。hash 与 run 号按 §11.2 只进报告。 |
+
+**更正注记（v1.53，切片 `DIRECTIVE-LEDGER-FIELD-SPLIT`；按 §11.1 只加注记）**：本片临时件 D 累计 0 次（补记，2026-10-26）。本报告正文不重写。
