@@ -1,7 +1,7 @@
 ﻿# DIRECTIVE-WHITELIST-POLICY 切片验证报告（协作纪律 D 升格为准则正文条款）
 
 > 切片 `DIRECTIVE-WHITELIST-POLICY`（准则治理片） | 分级 `[SLICE]` | 规模 S | 日期 2026-10-26。
-> 状态：✅ **已完成**（2026-10-26；准则 v1.52；⑦ 1 终审 + 1 复审按 §7.8.3 正常收敛；三作用域 `TOTAL_FAIL=0`、`SELFTEST: PASS 697/697`；**提交与 CI 待 ⑩ 停点后同轮授权**）。
+> 状态：✅ **已完成**（2026-10-26；准则 v1.52；⑦ 1 终审 + 1 复审按 §7.8.3 正常收敛；三作用域 `TOTAL_FAIL=0`、`SELFTEST: PASS 697/697`；commit `e6d14a2`；CI 详见 §8）。
 > [English](directive-whitelist-policy_EN.md)
 
 ## 1 变更概要（含执行自由度清单）
@@ -148,6 +148,13 @@ INDEPENDENT SCAN: PASS
 - `--selftest`：`SELFTEST: PASS 697/697`；`exit=0`。
 - `G4a`（`--check=G4a --scope=tree`）：`PASS G4a BOM+LF :: 7 file(s) OK (1 excluded: evidence tree)`；`TOTAL_FAIL=0`。
 - 索引与工作区一致：`git status --porcelain` 中无 `??` 与 ` M` 混合残留。
+
+### 8.1 CI 读数（主提交 `e6d14a2`，run `40283773081`）
+
+- 结论：`status=completed`、`conclusion=success`、`sha=e6d14a2e100da5e7c6755d9f5e2ba2b796f02908`。
+- `Go windows-latest`：包级 `ok github.com/larsonzh/prfrail/internal/gates 0.468s`；`Gates` 步报 `SELFTEST: PASS 697/697` 与 `TOTAL_FAIL=0`。
+- `Go ubuntu-latest`：包级 `ok github.com/larsonzh/prfrail/internal/gates 0.127s`；`Gates` 步报 `SELFTEST: PASS 697/697` 与 `TOTAL_FAIL=0`。
+- 首跑双绿 ⇒ `§6.4` 的失败处置**未触发**；本片不新增提交为该 run 追加证据。
 
 ## 9 ⑨ 原生验证
 

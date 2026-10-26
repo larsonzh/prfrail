@@ -1,7 +1,7 @@
 ﻿# DIRECTIVE-WHITELIST-POLICY slice validation report (collaboration discipline D promoted to a formal clause in the directive body)
 
 > Slice `DIRECTIVE-WHITELIST-POLICY` (governance slice) | tier `[SLICE]` | size S | date 2026-10-26.
-> Status: ✅ **done** (2026-10-26; directive v1.52; the ⑦ chain closed at 1 final review + 1 re-review under §7.8.3; `TOTAL_FAIL=0` in all three scopes and `SELFTEST: PASS 697/697`; **the commit and CI await same-turn authorisation after the ⑩ stop point**).
+> Status: ✅ **done** (2026-10-26; directive v1.52; the ⑦ chain closed at 1 final review + 1 re-review under §7.8.3; `TOTAL_FAIL=0` in all three scopes and `SELFTEST: PASS 697/697`; commit `e6d14a2`; see section 8 for the CI readings).
 > [中文](directive-whitelist-policy.md)
 
 ## 1 Change summary (including the executive-freedom list)
@@ -148,6 +148,13 @@ INDEPENDENT SCAN: PASS
 - `--selftest`: `SELFTEST: PASS 697/697`; `exit=0`.
 - `G4a` (`--check=G4a --scope=tree`): `PASS G4a BOM+LF :: 7 file(s) OK (1 excluded: evidence tree)`; `TOTAL_FAIL=0`.
 - Index and worktree agree: `git status --porcelain` shows no mixed `??` / ` M` residue.
+
+### 8.1 CI readings (main commit `e6d14a2`, run `40283773081`)
+
+- Conclusion: `status=completed`, `conclusion=success`, `sha=e6d14a2e100da5e7c6755d9f5e2ba2b796f02908`.
+- `Go windows-latest`: package-level `ok github.com/larsonzh/prfrail/internal/gates 0.468s`; the `Gates` step reports `SELFTEST: PASS 697/697` and `TOTAL_FAIL=0`.
+- `Go ubuntu-latest`: package-level `ok github.com/larsonzh/prfrail/internal/gates 0.127s`; the `Gates` step reports `SELFTEST: PASS 697/697` and `TOTAL_FAIL=0`.
+- Both legs were green on the first run, so the failure handling of `§6.4` was **not triggered**; this slice adds no further commit to attach evidence to that run.
 
 ## 9 Native verification at 9
 
