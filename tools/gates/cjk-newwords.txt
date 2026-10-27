@@ -83,3 +83,5 @@
 幻	docs/validation/directive-p28-followup.md	「文档幻觉」 (verbatim Section E sentence inside the sixstage fence; the transcription contract forbids rewriting)
 膨	docs/validation/directive-p28-followup.md	「白名单不膨胀」——用户逐字指定的登记文本（禁止改写），HEAD 语料与既有白名单均无此字
 胀	docs/validation/directive-p28-followup.md	同上，与「膨」同源同句（「白名单不膨胀」）
+衡	docs/validation/directive-d-mechanical-guard.md	⑥ 最终消息原文（sixstage 围栏逐字转录，§11.3 禁止改写）；CN/EN 报告均含此字；上下文：双语失衡 / 行数失衡
+凸	docs/validation/directive-d-mechanical-guard.md	同上：⑥ 最终消息原文（sixstage 围栏逐字转录，§11.3 禁止改写）；上下文：凸显
