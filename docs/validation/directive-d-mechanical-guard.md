@@ -193,8 +193,8 @@ INDEPENDENT SCAN: PASS
 
 ## 11 明确未执行事项
 
-- commit 与 push（须 ⑩ 停点后同轮显式授权）。
-- CI 运行与读数（同上；本片无 run 号可登记）。
+- commit 与 push（须 ⑩ 停点后同轮显式授权）。**⑩ 停点后已完成**：commit `6dc9259`，8 文件 +574/−12。
+- CI 运行与读数（同上；本片无 run 号可登记）。**⑩ 停点后已完成**：CI run `40541415000`，Windows 与 Ubuntu 两个作业均 success（两作业 `TOTAL_FAIL=0`、`SELFTEST: PASS 697/697`）。
 - 真实探针（额度 0）。
 - 批量辅助调用（0 次）。
 - `DEV_PLAN{,_EN}` 回写（准则治理片不适用）。

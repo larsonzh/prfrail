@@ -193,8 +193,8 @@ INDEPENDENT SCAN: PASS
 
 ## 11 Explicitly not performed
 
-- commit and push (requires same-turn explicit authorization after the ⑩ stop point).
-- CI run and readings (same; this slice has no run id to record).
+- commit and push (requires same-turn explicit authorization after the ⑩ stop point). **Done after the ⑩ stop point**: commit `6dc9259`, 8 files +574/−12.
+- CI run and readings (same; this slice has no run id to record). **Done after the ⑩ stop point**: CI run `40541415000`, both the Windows and the Ubuntu jobs succeeded (both jobs `TOTAL_FAIL=0`, `SELFTEST: PASS 697/697`).
 - Real probes (budget 0).
 - Batch-assistance calls (0).
 - `DEV_PLAN{,_EN}` write-back (not applicable to a directive-governance slice).
