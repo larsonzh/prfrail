@@ -243,7 +243,7 @@ INDEPENDENT SCAN: PASS — [docs/DELIVERY_DIRECTIVE.md](docs/DELIVERY_DIRECTIVE.
 
 ## 11 Explicitly unexecuted items
 
-- commit, push and CI observation (require same-turn explicit authorization after the ⑩ stop point).
+- commit, push and CI observation (require same-turn explicit authorization after the ⑩ stop point). **Completed after the ⑩ stop point**: commit `06231e1`; CI run `40608643891`, both the ubuntu and windows jobs succeeded (per-leg `G6-1 scanned 650`, `SELFTEST: PASS 697/697`, `TOTAL_FAIL=0`).
 - Real probes (budget 0).
 - Batch helper calls (0 times).
 - `DEV_PLAN{,_EN}` write-back (a governance slice's authoritative ledger is Appendix C, so per the OB-12 caliber of `§11.2` nothing is written back).

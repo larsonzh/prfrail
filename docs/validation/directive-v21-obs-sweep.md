@@ -243,7 +243,7 @@ INDEPENDENT SCAN: PASS — [docs/DELIVERY_DIRECTIVE.md](docs/DELIVERY_DIRECTIVE.
 
 ## 11 明确未执行事项
 
-- commit、push 与 CI 观察（须 ⑩ 停点后同轮显式授权）。
+- commit、push 与 CI 观察（须 ⑩ 停点后同轮显式授权）。**⑩ 停点后已完成**：commit `06231e1`；CI run `40608643891`，ubuntu 与 windows 两作业均 success（两腿 `G6-1 scanned 650`、`SELFTEST: PASS 697/697`、`TOTAL_FAIL=0`）。
 - 真实探针（额度 0）。
 - 批量辅助调用（0 次）。
 - `DEV_PLAN{,_EN}` 回写（准则治理片的权威台账为附录 C，按 `§11.2` 的 OB-12 口径不回写）。
