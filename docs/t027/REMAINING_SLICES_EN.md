@@ -63,7 +63,7 @@
 | P31 DIRECTIVE-LEDGER-FIELD-SPLIT | ✅ Done | P30 | M | 2026-10-26 | docs/validation/directive-ledger-field-split{,_EN}.md |
 | P32 DIRECTIVE-D-MECHANICAL-GUARD | ✅ Done | P31 | M | 2026-10-27 | docs/validation/directive-d-mechanical-guard{,_EN}.md |
 | P33 DIRECTIVE-V21-OBS-SWEEP | ✅ Done | P32 | M | 2026-10-28 | docs/validation/directive-v21-obs-sweep{,_EN}.md |
-| P34 DIRECTIVE-TMP-SELF-HEAL | 🔄 In progress | P33 | M | 2026-10-28 | docs/validation/directive-tmp-self-heal{,_EN}.md |
+| P34 DIRECTIVE-TMP-SELF-HEAL | ✅ Done | P33 | M | 2026-10-28 | docs/validation/directive-tmp-self-heal{,_EN}.md |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1123,12 +1123,12 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | v21 observation disposition declaration (step 0) | One line per item for v21-OBS-1~5 stating "closed / registered only / split out + target slice name", to be landed in §1 of this slice's report after the (1) rulings |
 | R / D baseline | This slice starts at R = 0 and D = 0 (counted from zero; P32's R=5 / D=3 are not inherited) |
 
-### P34 — `DIRECTIVE-TMP-SELF-HEAL` · 🔄 In progress
+### P34 — `DIRECTIVE-TMP-SELF-HEAL` · ✅ Done
 
 | Field | Content |
 |---|---|
 | Identity | `DIRECTIVE-TMP-SELF-HEAL` (directive targeted for v1.56; adds a same-command create-and-delete exception under the §5.1 self-heal tier) |
-| Status | 🔄 **In progress** (started 2026-10-28; an M-tier governance slice; R = 0 and D = 0 from the start) |
+| Status | ✅ **Done** (2026-10-28; an M-tier governance slice; R = 3 and D = 2; ⑥ internal quota 2/3) |
 | Goal | add a same-command create-and-delete exception under the §5.1 self-heal tier: a temporary artifact created and deleted inside one continuous command or one atomic script may self-heal after the fact without stopping the slice |
 | Dependency | P33 is closed (`HEAD` = `53ecf7f`, directive v1.55) |
 | Size | M (governance slice ⇒ ⑦ 1+3) |

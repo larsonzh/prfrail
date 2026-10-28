@@ -63,7 +63,7 @@
 | P31 DIRECTIVE-LEDGER-FIELD-SPLIT | ✅ 已完成 | P30 | M | 2026-10-26 | docs/validation/directive-ledger-field-split{,_EN}.md |
 | P32 DIRECTIVE-D-MECHANICAL-GUARD | ✅ 已完成 | P31 | M | 2026-10-27 | docs/validation/directive-d-mechanical-guard{,_EN}.md |
 | P33 DIRECTIVE-V21-OBS-SWEEP | ✅ 已完成 | P32 | M | 2026-10-28 | docs/validation/directive-v21-obs-sweep{,_EN}.md |
-| P34 DIRECTIVE-TMP-SELF-HEAL | 🔄 进行中 | P33 | M | 2026-10-28 | docs/validation/directive-tmp-self-heal{,_EN}.md |
+| P34 DIRECTIVE-TMP-SELF-HEAL | ✅ 已完成 | P33 | M | 2026-10-28 | docs/validation/directive-tmp-self-heal{,_EN}.md |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -1136,12 +1136,12 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | v21 观察项处置声明（步骤 0） | v21-OBS-1~5 五条各一行「收口 / 仅登记 / 拆片 + 目标片名」，由 ① 裁定后落本片报告 §1 |
 | R / D 基线 | 本片 R = 0、D = 0（从零起算，不继承 P32 的 R=5 / D=3） |
 
-### P34 — `DIRECTIVE-TMP-SELF-HEAL` · 🔄 进行中
+### P34 — `DIRECTIVE-TMP-SELF-HEAL` · ✅ 已完成
 
 | 字段 | 内容 |
 |---|---|
 | 标识 | `DIRECTIVE-TMP-SELF-HEAL`（准则拟升 v1.56；§5.1 自愈档下新增「同命令建删特例」） |
-| 状态 | 🔄 **进行中**（2026-10-28 起跑；M 档治理片；R = 0、D = 0 起算） |
+| 状态 | ✅ **已完成**（2026-10-28；M 档治理片；R = 3、D = 2；⑥ 内部额度 2/3） |
 | 目标 | 在 §5.1 自愈档下新增「同命令建删特例」：单一连续命令或单一原子脚本中创建并删除的临时件，允许事后取证自愈，不停片 |
 | 依赖 | P33 已闭环（`HEAD` = `53ecf7f`，准则 v1.55） |
 | 规模 | M（治理片 ⇒ ⑦ 1+3） |

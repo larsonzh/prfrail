@@ -66,6 +66,8 @@ Slice `DIRECTIVE-TMP-SELF-HEAL`; baseline `HEAD` = `53ecf7f`; directive version 
 
 **Ledger-level fact deviations (4 items, sunk in during the docs-only backfill)**: ① `§12.1` itself contains no literal sentence "a governance slice does not meet the pilot-selection standard" (that phrasing is the established wording of the `§12.4` OB rows); ② the runtime exception set under `tmp/gates-cache/` is only the `g4b/` subdirectory and does not cover the `gates-cache` root level; ③ the ⑥ output contract requires the five section headings to carry a `##` prefix, so a bare `Section A` line necessarily makes `G7-f` FAIL; ④ checker criterion shapes are not rigorous (③'s "CN and EN have the same number of sentences" and ⑨'s "heading-style § reference" each produced 1 false positive).
 
+**Backtick alignment for the F-1 note**: the F-1 note text was asymmetric in backtick count between CN and EN (CN had no `##`, EN did); the master added the missing span so both sides are 354; this is format alignment, not a semantic change, and is registered here.
+
 ## 2 Execution pipeline
 
 | Step | Role / carrier | Model | Status | Rework count |
