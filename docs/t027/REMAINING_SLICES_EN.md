@@ -63,6 +63,7 @@
 | P31 DIRECTIVE-LEDGER-FIELD-SPLIT | ✅ Done | P30 | M | 2026-10-26 | docs/validation/directive-ledger-field-split{,_EN}.md |
 | P32 DIRECTIVE-D-MECHANICAL-GUARD | ✅ Done | P31 | M | 2026-10-27 | docs/validation/directive-d-mechanical-guard{,_EN}.md |
 | P33 DIRECTIVE-V21-OBS-SWEEP | ✅ Done | P32 | M | 2026-10-28 | docs/validation/directive-v21-obs-sweep{,_EN}.md |
+| P34 DIRECTIVE-TMP-SELF-HEAL | 🔄 In progress | P33 | M | 2026-10-28 | docs/validation/directive-tmp-self-heal{,_EN}.md |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1121,6 +1122,28 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Observation disposition declaration (step 0) | **Already closed by P32**: observation G (not handled again here). **Registered only**: observation H (the P29 cross-slice duplicate registration), K (deferred to this slice's (1) evaluation), L (the undefined "frozen" in §11.1), M (the `D-1` / `D-4` of P26/P27 left untraced) |
 | v21 observation disposition declaration (step 0) | One line per item for v21-OBS-1~5 stating "closed / registered only / split out + target slice name", to be landed in §1 of this slice's report after the (1) rulings |
 | R / D baseline | This slice starts at R = 0 and D = 0 (counted from zero; P32's R=5 / D=3 are not inherited) |
+
+### P34 — `DIRECTIVE-TMP-SELF-HEAL` · 🔄 In progress
+
+| Field | Content |
+|---|---|
+| Identity | `DIRECTIVE-TMP-SELF-HEAL` (directive targeted for v1.56; adds a same-command create-and-delete exception under the §5.1 self-heal tier) |
+| Status | 🔄 **In progress** (started 2026-10-28; an M-tier governance slice; R = 0 and D = 0 from the start) |
+| Goal | add a same-command create-and-delete exception under the §5.1 self-heal tier: a temporary artifact created and deleted inside one continuous command or one atomic script may self-heal after the fact without stopping the slice |
+| Dependency | P33 is closed (`HEAD` = `53ecf7f`, directive v1.55) |
+| Size | M (governance slice ⇒ ⑦ 1+3) |
+| Steps | step 0 → ① (§9 checklist → three-group divergence table) → ② → ③ → ④ → ⑤ → ⑥ → ⑦ → ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| Current gap | the current "deletion before the reading ⇒ non-self-heal tier" rule in §5.1 makes same-command create-and-delete physically unable to self-heal; P32 (D-2/D-3) and P33 (D-1) tripped it three times in a row |
+| Fix direction | pending the ① three-group divergence table plus per-group user rulings (① only produces the table and takes no position; after the table it stops and waits, with no entry into ② ) |
+| Deliverables | subject to the ① rulings: directive v1.56 (§5.1 new clause + §0.3 + header + appendix C.0aq); the report pair `docs/validation/directive-tmp-self-heal{,_EN}.md`; the freedom list `docs/validation/evidence/DIRECTIVE-TMP-SELF-HEAL-freedom-list.md` |
+| Acceptance evidence | the 〇·零 self-check with 0 findings; the three-group rulings with the user own words; every §9 row passing; `TOTAL_FAIL=0` across three scopes with `G6-1` reporting `scanned N > 0`; `SELFTEST` fully green; identical six shapes between CN and `_EN`; the ⑩ receipt 15 items plus the 12-field fact pack |
+| Boundary | only §5.1 + §0.3 + header + appendix C.0aq + the §9.3 「② 提前清理」 disposition cell (boundary expansion) may change; the criterion bodies of §2.2 / §2.4 / §5.2 / §7.5 / §6.3 stay untouched; `internal/**`, CONTRACTS / schema / fixtures / workflows, `tools/gates/**` and `DEV_PLAN{,_EN}` are not touched |
+| Tier | `[SLICE]` (governance slice) |
+| Probe quota | none |
+| Freedom-list write path | `docs/validation/evidence/DIRECTIVE-TMP-SELF-HEAL-freedom-list.md` |
+| Observation A landing declaration | the rework-round temp directory = `tmp/DIRECTIVE-TMP-SELF-HEAL/`; after ⑧c a remediation action **must not rebuild** that directory (§5.1 demarcation clause); when a rebuild is needed solely to obtain ⑩ evidence, run the four actions of alternative path two in §5.1 "post-⑧c evidence window" (register → exact per-file cleanup → mechanical read-back → record the reading) in that order |
+| Observation disposition declaration (step 0) | **register only, no action**: observation H (the P29 tense cross-slice re-registration), K (§7.3 locator-assertion probative value, handed to a later slice), L (§11.1 "frozen" has no definition), M (the `D-1` / `D-4` of P26/P27, not retroactively rewritten) |
+| R / D baseline | this slice starts at R = 0 and D = 0 (from zero, not inheriting the R=4 / D=1 of P33) |
 
 ## Known defects (to be handled before later slices)
 

@@ -63,6 +63,7 @@
 | P31 DIRECTIVE-LEDGER-FIELD-SPLIT | ✅ 已完成 | P30 | M | 2026-10-26 | docs/validation/directive-ledger-field-split{,_EN}.md |
 | P32 DIRECTIVE-D-MECHANICAL-GUARD | ✅ 已完成 | P31 | M | 2026-10-27 | docs/validation/directive-d-mechanical-guard{,_EN}.md |
 | P33 DIRECTIVE-V21-OBS-SWEEP | ✅ 已完成 | P32 | M | 2026-10-28 | docs/validation/directive-v21-obs-sweep{,_EN}.md |
+| P34 DIRECTIVE-TMP-SELF-HEAL | 🔄 进行中 | P33 | M | 2026-10-28 | docs/validation/directive-tmp-self-heal{,_EN}.md |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -1134,6 +1135,28 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 观察项处置声明（步骤 0） | **已由 P32 收口**：观察项 G（本片不重复处理）。**仅登记不处理**：观察项 H（P29 时态跨片重复登记）、K（交本片 ① 评估）、L（§11.1「已冻结」无定义）、M（P26/P27 的 `D-1` / `D-4` 不追溯） |
 | v21 观察项处置声明（步骤 0） | v21-OBS-1~5 五条各一行「收口 / 仅登记 / 拆片 + 目标片名」，由 ① 裁定后落本片报告 §1 |
 | R / D 基线 | 本片 R = 0、D = 0（从零起算，不继承 P32 的 R=5 / D=3） |
+
+### P34 — `DIRECTIVE-TMP-SELF-HEAL` · 🔄 进行中
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `DIRECTIVE-TMP-SELF-HEAL`（准则拟升 v1.56；§5.1 自愈档下新增「同命令建删特例」） |
+| 状态 | 🔄 **进行中**（2026-10-28 起跑；M 档治理片；R = 0、D = 0 起算） |
+| 目标 | 在 §5.1 自愈档下新增「同命令建删特例」：单一连续命令或单一原子脚本中创建并删除的临时件，允许事后取证自愈，不停片 |
+| 依赖 | P33 已闭环（`HEAD` = `53ecf7f`，准则 v1.55） |
+| 规模 | M（治理片 ⇒ ⑦ 1+3） |
+| 步骤 | 步骤 0 → ①（§九 机械核对清单 → 三组分叉对比表）→ ② → ③ → ④ → ⑤ → ⑥ → ⑦ → ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| 现状缺口 | §5.1 现行「自删先于读数 ⇒ 非自愈档」使同命令建删物理上不可能自愈；P32（D-2/D-3）、P33（D-1）连续三次踩坑 |
+| 修法方向 | 待 ① 三组分叉对比表 + 用户逐组裁定（① 只出表、不表态；出表后停等裁定，不进入 ② ） |
+| 交付物 | 视 ① 裁定：准则 v1.56（§5.1 新增段 + §0.3 + 头部 + 附录 C.0aq）；报告对 `docs/validation/directive-tmp-self-heal{,_EN}.md`；自由度清单 `docs/validation/evidence/DIRECTIVE-TMP-SELF-HEAL-freedom-list.md` |
+| 验收证据 | 〇·零 自检 0 发现；三组裁定记录与用户原文；§九 逐条通过；三作用域 `TOTAL_FAIL=0` 且 `G6-1` 的 `scanned N > 0`；`SELFTEST` 全绿；CN / `_EN` 六形状全等；⑩ 回执 15 项 + 事实包 12 字段 |
+| 边界 | 只改 §5.1 + §0.3 + 头部 + 附录 C.0aq + §9.3「② 提前清理」处置格（扩界）；不改 §2.2 / §2.4 / §5.2 / §7.5 / §6.3 判据本体；不动 `internal/**`、CONTRACTS / schema / fixtures / workflows、`tools/gates/**`、`DEV_PLAN{,_EN}` |
+| 分级 | `[SLICE]`（治理片） |
+| 探针额度 | 无 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/DIRECTIVE-TMP-SELF-HEAL-freedom-list.md` |
+| 观察项 A 落点声明 | 整改轮临时目录 = `tmp/DIRECTIVE-TMP-SELF-HEAL/`；⑧c 之后整改动作**不得重建**该目录（§5.1 划界句）；仅为 ⑩ 取证需重建时按 §5.1「⑧c 后取证窗口」备选路径二的四动作（登记 → 逐件精确清理 → 机械回读 → 补记读数）依次执行 |
+| 观察项处置声明（步骤 0） | **仅登记不处理**：观察项 H（P29 时态跨片重复登记）、K（§7.3 定位断言证明力，交后续片）、L（§11.1「已冻结」无定义）、M（P26/P27 的 `D-1` / `D-4` 不追溯） |
+| R / D 基线 | 本片 R = 0、D = 0（从零起算，不继承 P33 的 R=4 / D=1） |
 
 ## 已知缺陷（后续切片前处理）
 
