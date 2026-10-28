@@ -64,6 +64,8 @@ Slice `DIRECTIVE-TMP-SELF-HEAL`; baseline `HEAD` = `53ecf7f`; directive version 
 
 **Report snapshot note**: this report is a snapshot at ⑩; the 4 ledger-level fact deviations (§12.1 reference precision, gates-cache exception scope, ⑥ output contract `##` prefix, checker criterion shape) and 4 open items (v1.56 exclusion scope, ⑥ format deviation recurrence, ⑧ evidence-write path, task-pack self-defined criteria) appear in the ⑩ receipt's fact pack fields 10/12, and will be sunk into §1 and §11 of this report in the docs-only backfill.
 
+**Ledger-level fact deviations (4 items, sunk in during the docs-only backfill)**: ① `§12.1` itself contains no literal sentence "a governance slice does not meet the pilot-selection standard" (that phrasing is the established wording of the `§12.4` OB rows); ② the runtime exception set under `tmp/gates-cache/` is only the `g4b/` subdirectory and does not cover the `gates-cache` root level; ③ the ⑥ output contract requires the five section headings to carry a `##` prefix, so a bare `Section A` line necessarily makes `G7-f` FAIL; ④ checker criterion shapes are not rigorous (③'s "CN and EN have the same number of sentences" and ⑨'s "heading-style § reference" each produced 1 false positive).
+
 ## 2 Execution pipeline
 
 | Step | Role / carrier | Model | Status | Rework count |
@@ -251,12 +253,14 @@ R7.1 per-stage call counts:
 
 ## 11 Explicitly not executed
 
-1. commit / push / CI: none executed; all require same-round authorisation after the ⑩ stop point.
+1. commit / push / CI: none executed; all require same-round authorisation after the ⑩ stop point. **Completed after the ⑩ stop point**: commit `acf676e`; CI run `40695233778`, both the ubuntu and windows jobs succeeded (per-leg `SELFTEST: PASS 697/697`, `G6-1 scanned 652`, `TOTAL_FAIL=0`).
 2. Real probes: not executed (quota 0).
 3. `GATES-EXEMPT` implementation: not executed (a referred item, left to a later slice).
 4. Relaxing the v1.56 exclusion condition: not executed (left as a v23 observation candidate).
 5. Item-by-item review input package list: not registered (the input had no list; only the basis is registered, see §6).
 6. Per-round durations: not timed (§2 uniformly marks `未计时`).
+
+**Open items (4, for the v23 queue)**: ① whether the v1.56 exclusion condition is too strict (should "lawful location + same-command create-and-delete" be admitted into the exception; trigger = this slice's first empirical D = 1); ② ⑥ format deviation is systemic across two slices (one each in P33 and P34, both contract-detail deviations); ③ the ⑧ evidence-write path is not bounded (this slice's D = 2 came from writing a log at the `gates-cache` root); ④ task-pack self-defined criteria lack prior review (this slice's ③ and ⑨ each produced 1 false positive).
 
 ## 12 Precedent-prohibition check
 
