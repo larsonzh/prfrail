@@ -1,6 +1,6 @@
 ﻿# MANIFEST — STRATEGIC-REVIEW-2026-10-30 证据包
 
-切片：`STRATEGIC-REVIEW-2026-10-30`（P35，评估类 `[SLICE]`）。建包时点：2026-10-29（步骤 0 基线 `HEAD` = `ebec7d1`）；刷新时 `HEAD` = `175f68e`；准则 v1.56。
+切片：`STRATEGIC-REVIEW-2026-10-30`（P35，评估类 `[SLICE]`）。建包时点：2026-10-29（步骤 0 基线 `HEAD` = `ebec7d1`）；刷新时 `HEAD` = `4ca38b6`；准则 v1.56。
 
 **包状态**：分轮追加包 —— 每轮落盘后按同一脚本重算 `SHA256SUMS.txt` 并与本清单同步，⑧c 前保持自洽。
 
@@ -20,7 +20,9 @@
 | `03-management/input-list.md` | 第 3 轮（管理层）输入清单与字节数 |
 | `03-management/review.md` | 第 3 轮（管理层）Sol 评审正文（主控逐字转录） |
 | `04-strategy/input-list.md` | 第 4 轮（战略层）输入清单与字节数 |
+| `04-strategy/review.md` | 第 4 轮（战略层）Sol 评审正文（主控逐字转录） |
 | `05-synthesis/input-list.md` | 第 5 轮（综合层）输入清单与字节数 |
+| `05-synthesis/review.md` | 第 5 轮（综合）Sol 评审正文（主控逐字转录） |
 
 ## 未入库文件清单
 
