@@ -7,6 +7,7 @@ Slice `STRATEGIC-PLANNING-2026-10-31` (assessment-type `[SLICE]`); **marker date
 - **Call facts**: three rounds ran continuously, not in batches. Rounds 1 and 2 used `GPT-6.1 Sol (copilot)` (Max), round 3 used `GPT-6 Astra (copilot)` (Max; the off-list authorisation is OB-129 in §12.4, effective 2026-10-30). Three calls in total, within the cap of 10.
 - **Transcription and checks**: all three `review.md` files were transcribed verbatim and their `sha256` matches the normalised original message (only BOM and line-ending normalisation may differ); logic lines are 60, 54 and 56, bytes including BOM are 5581, 5715 and 7154.
 - **CI evidence (cross-slice support statement)**: the "both CI runs green" in the P35 ledger completion row is supported by two records — run `40832429061` (commit `397dc30`) in §1 of the P35 report, and run `40833256125` (headSha `70cb193`, both legs `success`) recorded in this slice pack at `00-doc-inventory.md`. **This report cites no run id that the P35 report does not carry.**
+- **P36 CI evidence**: commit `9dca0e7` triggered CI run `40931249724`; both Go legs (ubuntu-latest and windows-latest) reported `success`, the `Gates` step really ran, and each leg reported `SELFTEST: PASS 697/697` and `TOTAL_FAIL=0`.
 - **Core judgement**: the right order for November is "first open the legal execution entry and the real no-IDE loop, then make delivery recoverable"; on the governance side, subtraction frees capacity but **never lowers gate strength**.
 
 ## 2 Findings by round
