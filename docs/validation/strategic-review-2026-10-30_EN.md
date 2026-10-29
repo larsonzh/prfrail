@@ -4,6 +4,8 @@ Slice `STRATEGIC-REVIEW-2026-10-30` (an evaluation `[SLICE]`); all five rounds r
 
 ## 1 Executive summary
 
+**CI evidence**: commit `397dc30` triggered CI run `40832429061`; both Go legs (ubuntu-latest and windows-latest) succeeded, the `Gates` step really ran, each leg reported `SELFTEST: PASS 697/697` and `TOTAL_FAIL=0`, and all 15 test packages reported `ok`.
+
 The five rounds converge on a **double break**: the real-AI production loop is not closed yet, and the record chain used to judge progress and compliance has breaks of its own; the governance and management rounds, blind to each other, both recomputed P32's rework tally as under-counted (7, where the report said 5), and the strategy round ruled that AT-23 must be split into three independently provable acceptance units instead of being **downgraded**.
 
 ## 2 Round-by-round findings
