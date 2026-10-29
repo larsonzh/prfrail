@@ -36,6 +36,8 @@ Slice `DIRECTIVE-TMP-SELF-HEAL`; baseline `HEAD` = `53ecf7f`; directive version 
 
 **Item 8 `W1`–`W13` adoption and the X1 extension**: the item-by-item adoption list is in 1.1; the extension = the §9.3 "② cleans early" disposition cell plus the ledger boundary row, see the last paragraph of 1.1.
 
+**Item 9 boundary-guard positive example**: on discovering that the completion table lacked a P34 entry, the master declined to add it unilaterally because the boundary order said "no other ledger row may change" (pre-extension limit), and reported it honestly instead — consistent in spirit with the same-command create-and-delete exception landed by this very slice (hold the boundary, smuggle nothing).
+
 ### 1.1 `W1`–`W13` adoption list and the X1 extension
 
 | No. | Adopted content |

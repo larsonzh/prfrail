@@ -64,6 +64,7 @@
 | P32 DIRECTIVE-D-MECHANICAL-GUARD | ✅ Done | P31 | M | 2026-10-27 | docs/validation/directive-d-mechanical-guard{,_EN}.md |
 | P33 DIRECTIVE-V21-OBS-SWEEP | ✅ Done | P32 | M | 2026-10-28 | docs/validation/directive-v21-obs-sweep{,_EN}.md |
 | P34 DIRECTIVE-TMP-SELF-HEAL | ✅ Done | P33 | M | 2026-10-28 | docs/validation/directive-tmp-self-heal{,_EN}.md |
+| P35 STRATEGIC-REVIEW-2026-10-30 | 🔄 In progress | P34 | L | — | docs/validation/strategic-review-2026-10-30{,_EN}.md |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1145,6 +1146,26 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Observation disposition declaration (step 0) | **register only, no action**: observation H (the P29 tense cross-slice re-registration), K (§7.3 locator-assertion probative value, handed to a later slice), L (§11.1 "frozen" has no definition), M (the `D-1` / `D-4` of P26/P27, not retroactively rewritten) |
 | R / D baseline | this slice starts at R = 0 and D = 0 (from zero, not inheriting the R=4 / D=1 of P33) |
 
+### P35 — `STRATEGIC-REVIEW-2026-10-30` · 🔄 In progress
+
+| Field | Content |
+|---|---|
+| Identity | `STRATEGIC-REVIEW-2026-10-30` (a special evaluation slice; the directive stays at v1.56, no body change) |
+| Status | 🔄 **In progress** (kicked off 2026-10-29; step 0 stages A and B running) |
+| Goal | five rounds of read-only third-party review (product / governance / management / strategy / synthesis) producing the strategic review report |
+| Dependency | P34 is closed (`HEAD` = `ebec7d1`, directive v1.56) |
+| Size | L (evaluation; trimmed pipeline) |
+| Steps | step 0 (stage A prerequisite back-fill → stage B formal preparation) → five Sol rounds (batch one = rounds 1 to 3 then a stop; batch two = rounds 4 to 5) → ⑨ encoding gate + three scopes + `SELFTEST` → ⑧c cleanup → ⑩ stop |
+| Current gap | two P34 leftovers (the completion table lacks a P34 entry; the report change-summary chapter lacks the boundary-guard positive example); the strategy side has no cross-layer review yet |
+| Fix direction | change no product doc and no directive body; read-only review findings, dispositions deferred to later slices |
+| Deliverables | the report pair `docs/validation/strategic-review-2026-10-30{,_EN}.md`; the evidence pack `docs/validation/evidence/STRATEGIC-REVIEW-2026-10-30/` (`MANIFEST.md` plus five per-round subdirectories) |
+| Acceptance evidence | five rounds transcribed verbatim with `sha256` matching the originals (only BOM and LF normalisation may differ); `TOTAL_FAIL=0` across three scopes; `SELFTEST` green; CN and `_EN` six shapes equal |
+| Boundary | no change to the directive body, `DEV_PLAN{,_EN}`, `CONTRACTS`, `internal/**`; Sol is read-only and the master transcribes; consumes no P-sequence number and no OB number |
+| Tier | `[SLICE]` (evaluation, trimmed pipeline) |
+| Probe quota | not applicable (governed by the total Sol call count) |
+| Pipeline trimming | skip ①②③④⑤⑥ (no implementation, no diff); ⑧a is replaced by the master transcribing verbatim; ⑦ does not apply (no implementation review object, not replaced by Sol); ⑨ / ⑧c / ⑩ are kept |
+| Temp-artifact landing declaration | this slice's temp directory = `tmp/STRATEGIC-REVIEW-2026-10-30/` (append-only until ⑧c, which performs the cleanup) |
+
 ## Known defects (to be handled before later slices)
 
 > **Blocking rule unchanged**: only high-frequency / reproduced defects block; observation-grade flakes are recorded and listed in the validation report.
@@ -1337,6 +1358,7 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | 2026-10-26 | P31 | **Governance slice (pinning the §9.3 counting sequence and the D-count wording; directive v1.53)**: (1) the six rulings landed (②-a took (iii) keep the status quo, ⑥-a-c took ④ correction notes, ⑥-a-d register-only, observation H registered but not closed, §9.3 "the 4th time" does not hold); (2) eight files at `+96/-6`; (3) r1 FAIL → r2 pass; (5) 1+1 with r3 used up (quota exception); (6) two rounds (High 1 + Medium 2 → PASS); (7) 1 final review (narrowed package); `TOTAL_FAIL=0` in all three scopes and `SELFTEST: PASS 697/697`. **This row records the report path only, per §11.2**. | docs/validation/directive-ledger-field-split{,_EN}.md |
 | 2026-10-27 | P32 | **Governance slice (discipline D's dangling obligations structured / recorded; directive v1.54)**: (1) the four rulings landed (G1(i) / G2(i) / G3(iv) / G4(iv)); §3.1 / §5.0 / appendix B gained the "Discipline D preset note" slot, §11.3 the scope sentence and the precedent-prohibition check, §6.3 the recorded-state supplement; (5) 2 rounds, (6) 1 round, (7) 1 final review; `TOTAL_FAIL=0` in all three scopes and `SELFTEST: PASS 697/697`; 9-phase fallback interventions R=3. **Per §11.2 this row records the report path only**. | docs/validation/directive-d-mechanical-guard{,_EN}.md |
 | 2026-10-28 | P33 | **Governance slice (the five v21 observation items produced by P32 consolidated; directive v1.55)**: (1) appendix B.7.1's kickoff-message template gains a "⑥⑦ input-package scope" slot (slot level only); (2) §11.3's report structure gains the "8a self-check" and "A-NN numbering integrity" subsections (recorded state); (3) the §6.3 recorded-state supplement gains the exemption sentence for the report §1 trigger criteria; (4) §5.1 gains the "boundary between remediation and evidence gathering" paragraph; (5) disposition of the five observation items: 1/2/4/5 closed, 3 split out as `GATES-EXEMPT`; ⑤ 1 round, ⑥ 1 round (budget 3/3), ⑦ 1 final review; `TOTAL_FAIL=0` in all three scopes and `SELFTEST: PASS 697/697`; R=4, D=1. **Per §11.2 this row records the report path only**. | docs/validation/directive-v21-obs-sweep{,_EN}.md |
+| 2026-10-28 | P34 | **Governance slice (a same-command create-and-delete exception under the §5.1 self-heal tier; directive v1.56)**: (1) a three-group divergence table → per-group user rulings; §5.1 gains the "same-command create-and-delete exception (v1.56)" clause with its five preconditions, §0.3 gains the v1.56 row, the §9.3 "② cleans early" disposition cell is marked in both versions, appendix C.0aq is added and the header is bumped to v1.56; (2) one rework (rewrite-label strings leaked into the body, R1); ⑤ two rounds, ⑥ two rounds (internal quota 2/3), ⑦ one final round; `TOTAL_FAIL=0` across three scopes and `SELFTEST: PASS 697/697`; R = 3 and D = 2; commits `acf676e` + `cc703ac` + `ebec7d1` with three green six-leg CI runs (`40695233778` / `40698271716` / `40702544069`). **This row records only the report path, per §11.2.** | docs/validation/directive-tmp-self-heal{,_EN}.md |
 
 > **Ledger integrity note (2026-09-21, back-filled under explicit user authorisation)**: this table had no rows appended after A4. **On 2026-09-21 the five rows A5/A6/A7/B2/B3a were back-filled from each slice's own validation report** (under the three constraints: no memory-based entries, verifiable fields only, missing fields left blank and marked as historic gaps, nothing fabricated); the B3b row was written before this back-fill, which is why the five rows follow it.
 > **Back-filled** (verified by slice `LEDGER-BACKFILL`, 2026-09-29): **the B3a paragraph in `DEV_PLAN{,_EN}.md` was added by commit `dd36b9b`** (`DEV_PLAN.md:137` and `_EN.md:138`); the earlier still-owed wording was corrected by slice `LEDGER-BACKFILL`, and **the back-fill action does not need to be repeated**.
