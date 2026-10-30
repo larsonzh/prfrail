@@ -68,7 +68,7 @@
 | P36 STRATEGIC-PLANNING-2026-10-31 | ✅ Done | P35 | L | 2026-10-30 | docs/validation/strategic-planning-2026-10-31{,_EN}.md |
 | P37 P37-T027B-BREAKTHROUGH | ✅ Done | P36 | L | 2026-10-30 | docs/validation/t027b-breakthrough{,_EN}.md |
 | P38 P38-T027B-TACTICAL-BLUEPRINT | ✅ Done | P37 | L | 2026-10-31 | docs/validation/t027b-tactical-blueprint{,_EN}.md |
-| P39 P39-T027B-DURABLE-BUDGET | 🔄 In progress | P38 | L | — | docs/validation/p39-durable-budget{,_EN}.md |
+| P39 P39-T027B-DURABLE-BUDGET | ✅ Done | P38 | L | 2026-10-31 | docs/validation/p39-durable-budget{,_EN}.md |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1229,12 +1229,12 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Freedom-list path | `docs/validation/evidence/P38-T027B-TACTICAL-BLUEPRINT/freedom-list.md` |
 | R / D baseline | R = 0, D = 0 for this slice (counted from zero, not inherited from the P37 R=4 / D=0) |
 | Temp-artifact landing declaration | this slice temp directory = `tmp/P38-T027B-TACTICAL-BLUEPRINT/` (append-only until ⑧c, whose cleanup performs the removal) |
-### P39 — `P39-T027B-DURABLE-BUDGET` · 🔄 In progress
+### P39 — `P39-T027B-DURABLE-BUDGET` · ✅ Done
 
 | Field | Content |
 |---|---|
 | Identity | `P39-T027B-DURABLE-BUDGET` (implementation type; directive v1.59) |
-| Status | 🔄 **In progress** (step 0 done 2026-10-31; ① to ⑧ pending) |
+| Status | ✅ **Done** (closed 2026-10-31: red-then-green tests, pre-review, scan and final review all pass; the report pair and the CI evidence are in place; R=4, D=0) |
 | Goal | Close C6: replace the in-memory snapshot with a durable budget ledger, adding a cross-process shared lock, read-modify-write inside the lock and durable acknowledgement, with unknown reservations persisted |
 | Dependency | P38 is closed (`HEAD` = `8b16e21`, directive v1.59); no off-list model authorisation for this slice |
 | Size | L (⑦ 1+1) |
@@ -1447,6 +1447,7 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | 2026-10-30 | P36 | **Assessment-type slice (three forward-planning rounds plus a cross-model synthesis ruling; directive v1.57)**: two Sol rounds (product and architecture; governance and process) plus one Astra round (the synthesis ruling), transcribed verbatim with sha256 matching the normalised originals; the report pair sets the November Top 3 and the first step "submit the T027-B admission pack within 7 days"; the pipeline was trimmed to ⑥ skipped, ⑦ not applicable and ⑧a replaced by control-seat transcription; three scopes TOTAL_FAIL=0, SELFTEST 697/697; R=1, D=0. **This row records only the report path per §11.2**. | docs/validation/strategic-planning-2026-10-31{,_EN}.md |
 | 2026-10-30 | P37 | **Assessment-type slice (two read-only carrier rounds: Sol on architecture design, Astra on cross-model critique; directive v1.58, with the new OB-130 off-list authorisation)**: round 1 delivers the G0-G4 gate order, module split, state machine, key interfaces and resource constraints; round 2 exposes three fatal hand-over gaps (start ownership, evidence durability, gate-order prerequisites) and gives a minimal rebuild plus the November minimal boundary; both rounds were transcribed verbatim with sha256 matching the normalised originals; the report pair matches on all six shapes; three scopes TOTAL_FAIL=0, SELFTEST 697/697; R=4, D=0; commits 1bf57a4 and 00a4627, two CI runs green (41034345827 / 41036123038). **This row records only the report path per §11.2**. | docs/validation/t027b-breakthrough{,_EN}.md |
 | 2026-10-31 | P38 | **Assessment-type slice (two read-only carrier rounds: Sol on a batched blueprint, Astra on red-team acceptance; directive v1.59, with the new OB-131 off-list authorisation)**: round 1 was split into two batches by ruling (C1-C4 / C5-C7) giving file- and function-level changes, new tests and assertion points per item; round 2 returns REVISE - three BLOCKED (C1 / C4 / C6) and four PARTIAL (C2 / C3 / C5 / C7), plus new holes N1-N4 and one contract blocker; the output-length ceiling fired repeatedly and batching resolved it with one stop-loss; R=8, D=0; three scopes TOTAL_FAIL=0, SELFTEST 697/697; commits c59246b / 5de5657, CI 41103453586 / 41105715366 all green. **This row records only the report path per §11.2**. | docs/validation/t027b-tactical-blueprint{,_EN}.md |
+| 2026-10-31 | P39 | **Implementation-type slice (C6 durable budget; directive v1.60, with the new OB-132 role-model out-of-binding authorisation)**: round 1 gave the two-batch design and counter-example matrix (Sol special authorisation); red tests first, then a green implementation; the first pre-review FAIL closed five BLOCKERs and the re-review PASSed; the scan is CLEAR and the final review PASS; the four wrongly-dispatched V4 Pro artifacts are voided with hashes kept; R=4, D=0; three scopes TOTAL_FAIL=0, SELFTEST 697/697; commits 4d5ebf3 / 35bede7, CI 41130337015 / 41131723172 all green. **This row records only the report path per §11.2**. | docs/validation/p39-durable-budget{,_EN}.md |
 
 > **Ledger integrity note (2026-09-21, back-filled under explicit user authorisation)**: this table had no rows appended after A4. **On 2026-09-21 the five rows A5/A6/A7/B2/B3a were back-filled from each slice's own validation report** (under the three constraints: no memory-based entries, verifiable fields only, missing fields left blank and marked as historic gaps, nothing fabricated); the B3b row was written before this back-fill, which is why the five rows follow it.
 > **Back-filled** (verified by slice `LEDGER-BACKFILL`, 2026-09-29): **the B3a paragraph in `DEV_PLAN{,_EN}.md` was added by commit `dd36b9b`** (`DEV_PLAN.md:137` and `_EN.md:138`); the earlier still-owed wording was corrected by slice `LEDGER-BACKFILL`, and **the back-fill action does not need to be repeated**.
