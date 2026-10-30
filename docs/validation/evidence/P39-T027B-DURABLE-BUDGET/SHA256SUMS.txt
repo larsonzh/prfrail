@@ -1,0 +1,4 @@
+211dec03bf12e86fd7dc1f101e8ccf05be2a44ce6c1812b882d7b3f59f516394  01-arch-design/review-batch-b.md
+c167f4929a15fef331d9aeb249757ec24db0ddbf1b8c255ba6d6cff800777351  01-arch-design/review.md
+b841f0fc851b551adb407caf2ff523859fcbe3e96282a1098fc189c79882c9f6  02-implement/voided-v4pro-waste.md
+795c32b04124c285ed97a1c516f2b386285160d20ee941dab4f30a57bda6daec  freedom-list.md

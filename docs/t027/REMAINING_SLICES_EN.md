@@ -68,6 +68,7 @@
 | P36 STRATEGIC-PLANNING-2026-10-31 | ✅ Done | P35 | L | 2026-10-30 | docs/validation/strategic-planning-2026-10-31{,_EN}.md |
 | P37 P37-T027B-BREAKTHROUGH | ✅ Done | P36 | L | 2026-10-30 | docs/validation/t027b-breakthrough{,_EN}.md |
 | P38 P38-T027B-TACTICAL-BLUEPRINT | ✅ Done | P37 | L | 2026-10-31 | docs/validation/t027b-tactical-blueprint{,_EN}.md |
+| P39 P39-T027B-DURABLE-BUDGET | 🔄 In progress | P38 | L | — | docs/validation/p39-durable-budget{,_EN}.md |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1228,6 +1229,26 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Freedom-list path | `docs/validation/evidence/P38-T027B-TACTICAL-BLUEPRINT/freedom-list.md` |
 | R / D baseline | R = 0, D = 0 for this slice (counted from zero, not inherited from the P37 R=4 / D=0) |
 | Temp-artifact landing declaration | this slice temp directory = `tmp/P38-T027B-TACTICAL-BLUEPRINT/` (append-only until ⑧c, whose cleanup performs the removal) |
+### P39 — `P39-T027B-DURABLE-BUDGET` · 🔄 In progress
+
+| Field | Content |
+|---|---|
+| Identity | `P39-T027B-DURABLE-BUDGET` (implementation type; directive v1.59) |
+| Status | 🔄 **In progress** (step 0 done 2026-10-31; ① to ⑧ pending) |
+| Goal | Close C6: replace the in-memory snapshot with a durable budget ledger, adding a cross-process shared lock, read-modify-write inside the lock and durable acknowledgement, with unknown reservations persisted |
+| Dependency | P38 is closed (`HEAD` = `8b16e21`, directive v1.59); no off-list model authorisation for this slice |
+| Size | L (⑦ 1+1) |
+| Steps | step 0 → ① architecture (Sol, batched) → ②③ implementation and tests → ④⑤⑥⑦ → ⑧ → ⑨ → ⑩ |
+| Current gap | the budget lives only in memory, so a restart or two processes can overspend; settlement has no durable acknowledgement and unknown does not keep its reservation |
+| Deliverables | report pair `docs/validation/p39-durable-budget{,_EN}.md`; evidence pack `docs/validation/evidence/P39-T027B-DURABLE-BUDGET/` |
+| Acceptance evidence | `go build ./...`, `go vet ./...` and `go test ./...` all green; counter-example tests go red before green; three scopes `TOTAL_FAIL=0` and `SELFTEST` all green; the report carries the declaration lines |
+| Boundary | no change to `docs/CONTRACTS.md` section 7 or to the criteria body; no schema or fixture change; no gitee push |
+| Tier | `[IMPL]` (implementation type) |
+| Probe quota | none |
+| Freedom-list path | `docs/validation/evidence/P39-T027B-DURABLE-BUDGET/freedom-list.md` |
+| R / D baseline | R = 4, D = 0 for this slice (counted from zero, not inherited from the P38 R=8 / D=0) |
+| Temp-artifact landing declaration | this slice temp directory = `tmp/P39-T027B-DURABLE-BUDGET/` (append-only until ⑧c) |
+
 
 ## Known defects (to be handled before later slices)
 

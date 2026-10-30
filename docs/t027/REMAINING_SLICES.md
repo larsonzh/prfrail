@@ -68,6 +68,7 @@
 | P36 STRATEGIC-PLANNING-2026-10-31 | ✅ 已完成 | P35 | L | 2026-10-30 | docs/validation/strategic-planning-2026-10-31{,_EN}.md |
 | P37 P37-T027B-BREAKTHROUGH | ✅ 已完成 | P36 | L | 2026-10-30 | docs/validation/t027b-breakthrough{,_EN}.md |
 | P38 P38-T027B-TACTICAL-BLUEPRINT | ✅ 已完成 | P37 | L | 2026-10-31 | docs/validation/t027b-tactical-blueprint{,_EN}.md |
+| P39 P39-T027B-DURABLE-BUDGET | 🔄 进行中 | P38 | L | — | docs/validation/p39-durable-budget{,_EN}.md |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -1241,6 +1242,26 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 执行自由度清单落盘路径 | `docs/validation/evidence/P38-T027B-TACTICAL-BLUEPRINT/freedom-list.md` |
 | R / D 基线 | 本片 R = 0、D = 0（从零起算，不继承 P37 的 R=4 / D=0） |
 | 临时件落点声明 | 本片临时目录 = `tmp/P38-T027B-TACTICAL-BLUEPRINT/`（⑧c 前只增不删，清理由 ⑧c 执行） |
+### P39 — `P39-T027B-DURABLE-BUDGET` · 🔄 进行中
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `P39-T027B-DURABLE-BUDGET`（实现类；准则 v1.59） |
+| 状态 | 🔄 **进行中**（2026-10-31 步骤 0 完成；①至⑧ 待执行） |
+| 目标 | 闭合 C6：以持久预算账本替换内存快照，加入跨进程共享锁、锁内重读与耐久确认，unknown 占用持久保留 |
+| 依赖 | P38 已闭环（`HEAD` = `8b16e21`，准则 v1.59）；本片无表外模型授权 |
+| 规模 | L（⑦ 1+1） |
+| 步骤 | 步骤 0 → ① 架构（Sol 分批）→ ②③ 实现与测试 → ④⑤⑥⑦ → ⑧ → ⑨ → ⑩ |
+| 现状缺口 | 预算仅存内存，重启或双进程可超支；结算无耐久确认，unknown 不保留占用 |
+| 交付物 | 报告对 `docs/validation/p39-durable-budget{,_EN}.md`；证据包 `docs/validation/evidence/P39-T027B-DURABLE-BUDGET/` |
+| 验收证据 | `go build ./...`、`go vet ./...`、`go test ./...` 全绿；反例测试先红后绿；三作用域 `TOTAL_FAIL=0` 与 `SELFTEST` 全绿；报告含声明行 |
+| 边界 | 不改 `docs/CONTRACTS.md` 第七节与判据本体；不改 schema 与 fixtures；不推 gitee |
+| 分级 | `[IMPL]`（实现类） |
+| 探针额度 | 无 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/P39-T027B-DURABLE-BUDGET/freedom-list.md` |
+| R / D 基线 | 本片 R = 4、D = 0（从零起算，不继承 P38 的 R=8 / D=0） |
+| 临时件落点声明 | 本片临时目录 = `tmp/P39-T027B-DURABLE-BUDGET/`（⑧c 前只增不删） |
+
 
 ## 已知缺陷（后续切片前处理）
 
