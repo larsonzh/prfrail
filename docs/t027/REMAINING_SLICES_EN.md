@@ -66,7 +66,7 @@
 | P34 DIRECTIVE-TMP-SELF-HEAL | ✅ Done | P33 | M | 2026-10-28 | docs/validation/directive-tmp-self-heal{,_EN}.md |
 | P35 STRATEGIC-REVIEW-2026-10-30 | ✅ Done | P34 | L | 2026-10-29 | docs/validation/strategic-review-2026-10-30{,_EN}.md |
 | P36 STRATEGIC-PLANNING-2026-10-31 | ✅ Done | P35 | L | 2026-10-30 | docs/validation/strategic-planning-2026-10-31{,_EN}.md |
-| P37 P37-T027B-BREAKTHROUGH | 🔄 In progress | P36 | L | — | docs/validation/t027b-breakthrough{,_EN}.md |
+| P37 P37-T027B-BREAKTHROUGH | ✅ Done | P36 | L | 2026-10-30 | docs/validation/t027b-breakthrough{,_EN}.md |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1188,12 +1188,12 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | R / D baseline | R = 0, D = 0 for this slice (counted from zero, not inherited from the P35 R=1 / D=0) |
 | Temp-artifact landing declaration | this slice temp directory = `tmp/STRATEGIC-PLANNING-2026-10-31/` (append-only until ⑧c, whose cleanup performs the removal) |
 
-### P37 — `P37-T027B-BREAKTHROUGH` · 🔄 In progress
+### P37 — `P37-T027B-BREAKTHROUGH` · ✅ Done
 
 | Field | Content |
 |---|---|
 | Identity | `P37-T027B-BREAKTHROUGH` (assessment type; directive v1.58) |
-| Status | 🔄 **In progress** (step 0 done 2026-10-30; the two rounds are pending) |
+| Status | ✅ **Done** (closed 2026-10-30: both rounds transcribed verbatim, the report pair and the CI evidence in place; R=0, D=0) |
 | Goal | Sol designs and Astra critiques and rebuilds, producing the T027-B production-grade architecture design book |
 | Dependency | P36 is closed (`HEAD` = `00ddc53`, directive v1.57); the Astra authorisation is OB-130 in §12.4 |
 | Size | L (cross-stack architecture inference) |
@@ -1403,6 +1403,7 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | 2026-10-28 | P34 | **Governance slice (a same-command create-and-delete exception under the §5.1 self-heal tier; directive v1.56)**: (1) a three-group divergence table → per-group user rulings; §5.1 gains the "same-command create-and-delete exception (v1.56)" clause with its five preconditions, §0.3 gains the v1.56 row, the §9.3 "② cleans early" disposition cell is marked in both versions, appendix C.0aq is added and the header is bumped to v1.56; (2) one rework (rewrite-label strings leaked into the body, R1); ⑤ two rounds, ⑥ two rounds (internal quota 2/3), ⑦ one final round; `TOTAL_FAIL=0` across three scopes and `SELFTEST: PASS 697/697`; R = 3 and D = 2; commits `acf676e` + `cc703ac` + `ebec7d1` with three green six-leg CI runs (`40695233778` / `40698271716` / `40702544069`). **This row records only the report path, per §11.2.** | docs/validation/directive-tmp-self-heal{,_EN}.md |
 | 2026-10-29 | P35 | **Assessment-type slice (five rounds of third-party read-only review plus a synthesis ruling; the directive stays at v1.56 with no body change)**: the five independent rounds (product / governance / management / strategy / synthesis) converge on a "double break" core finding — the real AI production loop is not closed, and the governance record chain has a break too; the synthesis ruling sets the priorities and the open items awaiting a ruling; the pipeline was trimmed to ⑥ skipped, ⑦ not applicable and ⑧a replaced by verbatim transcription by the control seat; three scopes `TOTAL_FAIL=0`, `SELFTEST: PASS 697/697`; R=1, D=0; pushed to origin (gitee not pushed), both CI runs green. **This row records only the report path per §11.2**. | docs/validation/strategic-review-2026-10-30{,_EN}.md |
 | 2026-10-30 | P36 | **Assessment-type slice (three forward-planning rounds plus a cross-model synthesis ruling; directive v1.57)**: two Sol rounds (product and architecture; governance and process) plus one Astra round (the synthesis ruling), transcribed verbatim with sha256 matching the normalised originals; the report pair sets the November Top 3 and the first step "submit the T027-B admission pack within 7 days"; the pipeline was trimmed to ⑥ skipped, ⑦ not applicable and ⑧a replaced by control-seat transcription; three scopes TOTAL_FAIL=0, SELFTEST 697/697; R=1, D=0. **This row records only the report path per §11.2**. | docs/validation/strategic-planning-2026-10-31{,_EN}.md |
+| 2026-10-30 | P37 | **Assessment-type slice (two read-only carrier rounds: Sol on architecture design, Astra on cross-model critique; directive v1.58, with the new OB-130 off-list authorisation)**: round 1 delivers the G0-G4 gate order, module split, state machine, key interfaces and resource constraints; round 2 exposes three fatal hand-over gaps (start ownership, evidence durability, gate-order prerequisites) and gives a minimal rebuild plus the November minimal boundary; both rounds were transcribed verbatim with sha256 matching the normalised originals; the report pair matches on all six shapes; three scopes TOTAL_FAIL=0, SELFTEST 697/697; R=0, D=0; commits 1bf57a4 and 00a4627, two CI runs green (41034345827 / 41036123038). **This row records only the report path per §11.2**. | docs/validation/t027b-breakthrough{,_EN}.md |
 
 > **Ledger integrity note (2026-09-21, back-filled under explicit user authorisation)**: this table had no rows appended after A4. **On 2026-09-21 the five rows A5/A6/A7/B2/B3a were back-filled from each slice's own validation report** (under the three constraints: no memory-based entries, verifiable fields only, missing fields left blank and marked as historic gaps, nothing fabricated); the B3b row was written before this back-fill, which is why the five rows follow it.
 > **Back-filled** (verified by slice `LEDGER-BACKFILL`, 2026-09-29): **the B3a paragraph in `DEV_PLAN{,_EN}.md` was added by commit `dd36b9b`** (`DEV_PLAN.md:137` and `_EN.md:138`); the earlier still-owed wording was corrected by slice `LEDGER-BACKFILL`, and **the back-fill action does not need to be repeated**.
