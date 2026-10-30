@@ -8,6 +8,7 @@
 - **转录与校验**：三份正文均逐字转录，`sha256` 源件与落盘件一致；批次 A 源 10,052 字符、批次 B 源 9,808 字符、第 2 轮源 2,362 字符。
 - **批量辅助**：实派 2 次（输入包统计、证据包一致性复算），均为 `deep-reasoner` + `GLM-5.3-Flash (glm)`，逐次机械复核通过。
 - **核心结论**：施工图覆盖 C1–C7，逐项给出文件与函数级改法、新增测试与断言点；Astra 判 `VERDICT: REVISE`——3 项 BLOCKED（C1 / C4 / C6）、4 项 PARTIAL（C2 / C3 / C5 / C7），并给出新漏洞 N1–N4。
+- **落地与 CI**：变更集以 `c59246b` 提交并推送 origin，CI run `41103453586` 双绿（`Go ubuntu-latest` 与 `Go windows-latest` 均 `success`）。
 
 ## 2 两轮回顾
 

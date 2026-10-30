@@ -8,6 +8,7 @@ Slice `P38-T027B-TACTICAL-BLUEPRINT` (assessment type `[SLICE]`); run on 2026-10
 - **Transcription and checks**: all three bodies were transcribed verbatim and `sha256` matches between source and landed copy; batch A is 10,052 characters, batch B 9,808 and round 2 2,362.
 - **Batch assistance**: 2 dispatches (input-pack statistics, evidence-pack consistency recomputation), both `deep-reasoner` + `GLM-5.3-Flash (glm)`, each mechanically re-verified.
 - **Core judgement**: the blueprint covers C1-C7 with file- and function-level changes, new tests and assertion points for each; Astra returns `VERDICT: REVISE` - 3 BLOCKED (C1 / C4 / C6) and 4 PARTIAL (C2 / C3 / C5 / C7), plus new holes N1-N4.
+- **Landing and CI**: the change set was committed as `c59246b` and pushed to origin; CI run `41103453586` is `success` on both `Go ubuntu-latest` and `Go windows-latest`.
 
 ## 2 Two rounds in review
 
