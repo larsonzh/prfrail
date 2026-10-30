@@ -1,0 +1,6 @@
+7033de72d6e52069fc36e561034e310f8f9cdb835768ad63ddc5bc397f894718  00-doc-inventory.md
+11cf033253652e9de7e41ffd8025d39d274d5291a6ddd8dd71c447b880d06049  01-sol-design/input-list.md
+c54d7a8c1259dc531241f3b406c4be1cd18650f208d6626d69d8ee4e603cb78e  01-sol-design/review.md
+065d0d6fdf5771a649de8e1df07129e20b12cccd0cc92de1eaede6ebc58afd1f  02-astra-critique/input-list.md
+cc7cd8775e8de8b9296e71c0d0dd4eb619677c098304ba30a8b41dde44a481b5  02-astra-critique/review.md
+aa9fdea9dbe5330294af96f72b1d8a4f3a8bf79e5dc1156f4c338cbe1b324982  freedom-list.md

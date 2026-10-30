@@ -66,6 +66,7 @@
 | P34 DIRECTIVE-TMP-SELF-HEAL | ✅ Done | P33 | M | 2026-10-28 | docs/validation/directive-tmp-self-heal{,_EN}.md |
 | P35 STRATEGIC-REVIEW-2026-10-30 | ✅ Done | P34 | L | 2026-10-29 | docs/validation/strategic-review-2026-10-30{,_EN}.md |
 | P36 STRATEGIC-PLANNING-2026-10-31 | ✅ Done | P35 | L | 2026-10-30 | docs/validation/strategic-planning-2026-10-31{,_EN}.md |
+| P37 P37-T027B-BREAKTHROUGH | 🔄 In progress | P36 | L | — | docs/validation/t027b-breakthrough{,_EN}.md |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1186,6 +1187,26 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Freedom-list path | `docs/validation/evidence/STRATEGIC-PLANNING-2026-10-31/freedom-list.md` |
 | R / D baseline | R = 0, D = 0 for this slice (counted from zero, not inherited from the P35 R=1 / D=0) |
 | Temp-artifact landing declaration | this slice temp directory = `tmp/STRATEGIC-PLANNING-2026-10-31/` (append-only until ⑧c, whose cleanup performs the removal) |
+
+### P37 — `P37-T027B-BREAKTHROUGH` · 🔄 In progress
+
+| Field | Content |
+|---|---|
+| Identity | `P37-T027B-BREAKTHROUGH` (assessment type; directive v1.58) |
+| Status | 🔄 **In progress** (step 0 done 2026-10-30; the two rounds are pending) |
+| Goal | Sol designs and Astra critiques and rebuilds, producing the T027-B production-grade architecture design book |
+| Dependency | P36 is closed (`HEAD` = `00ddc53`, directive v1.57); the Astra authorisation is OB-130 in §12.4 |
+| Size | L (cross-stack architecture inference) |
+| Steps | step 0 → round 1 → round 2 → report assembly → ⑨ → ⑧c → ⑩ |
+| Current gap | breaking T027-B open needs very strong architecture design and critique; the current documents cannot support an November start |
+| Deliverables | report pair `docs/validation/t027b-breakthrough{,_EN}.md`; evidence pack `docs/validation/evidence/P37-T027B-BREAKTHROUGH/`; freedom list `docs/validation/evidence/P37-T027B-BREAKTHROUGH/freedom-list.md` |
+| Acceptance evidence | both rounds transcribed verbatim with `sha256` matching the normalised originals; the report carries `- ⑥ 跳过：` and `- ⑦ 不适用：`; three scopes `TOTAL_FAIL=0` and `SELFTEST` green; the report pair is six-shape equal in CN and EN; at least 2 batch-assist dispatches with per-dispatch review |
+| Boundary | no change to code / contracts / schema / fixtures; no change to the directive business rule clauses (the only exception: the OB-130 registration, the header bump to v1.58, the §0.3 log row and this ledger entry); gitee is not pushed; commit no / push no |
+| Tier | `[SLICE]` (assessment type, trimmed pipeline) |
+| Probe quota | none |
+| Freedom-list path | `docs/validation/evidence/P37-T027B-BREAKTHROUGH/freedom-list.md` |
+| R / D baseline | R = 0, D = 0 for this slice (counted from zero, not inherited from the P36 R=1 / D=0) |
+| Temp-artifact landing declaration | this slice temp directory = `tmp/P37-T027B-BREAKTHROUGH/` (append-only until ⑧c, whose cleanup performs the removal) |
 
 ## Known defects (to be handled before later slices)
 
