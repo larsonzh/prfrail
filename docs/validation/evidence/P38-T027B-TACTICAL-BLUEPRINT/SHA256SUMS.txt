@@ -1,0 +1,7 @@
+53e1d37980cb9194aed175b12a41671f8b45719658c987ad849cfeab1792ef9a  00-doc-inventory.md
+ba50b2ba6557ebc2129e59330c455f2e9dddd16ae22caaeb3e4ca1aabd3b944e  01-sol-blueprint/input-list.md
+9cb5189968c53aa6b1fa19c6629381db874e91a0a7d39f9725bddd5ee273bdd6  01-sol-blueprint/review-batch-b.md
+e8efa2179e34c00f11faf62ad43f4a9172d9d36b44ccae0e59da306c3dc99eff  01-sol-blueprint/review.md
+4fb34b36b14ab01811e3af3233e256edce97d5a15dcb8b6c1a74899cde4d9ecb  02-astra-redteam/input-list.md
+7b2d0ee0e02c1957802342a1a0bf8a4a064203ad8e0e3613f15d1c6010114b14  02-astra-redteam/review.md
+796ede7bce97f19a1aa78f0093e8a021a55a312b44c79e86ff20a2810ff02c8c  freedom-list.md

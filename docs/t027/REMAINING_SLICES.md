@@ -67,6 +67,7 @@
 | P35 STRATEGIC-REVIEW-2026-10-30 | ✅ 已完成 | P34 | L | 2026-10-29 | docs/validation/strategic-review-2026-10-30{,_EN}.md |
 | P36 STRATEGIC-PLANNING-2026-10-31 | ✅ 已完成 | P35 | L | 2026-10-30 | docs/validation/strategic-planning-2026-10-31{,_EN}.md |
 | P37 P37-T027B-BREAKTHROUGH | ✅ 已完成 | P36 | L | 2026-10-30 | docs/validation/t027b-breakthrough{,_EN}.md |
+| P38 P38-T027B-TACTICAL-BLUEPRINT | 🔄 进行中 | P37 | L | — | docs/validation/t027b-tactical-blueprint{,_EN}.md |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -1220,6 +1221,26 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 执行自由度清单落盘路径 | `docs/validation/evidence/P37-T027B-BREAKTHROUGH/freedom-list.md` |
 | R / D 基线 | 本片 R = 0、D = 0（从零起算，不继承 P36 的 R=1 / D=0）；本片实际 R = 4、D = 0 |
 | 临时件落点声明 | 本片临时目录 = `tmp/P37-T027B-BREAKTHROUGH/`（⑧c 前只增不删，清理由 ⑧c 执行） |
+
+### P38 — `P38-T027B-TACTICAL-BLUEPRINT` · 🔄 进行中
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `P38-T027B-TACTICAL-BLUEPRINT`（评估类；准则 v1.59） |
+| 状态 | 🔄 **进行中**（2026-10-30 起跑；两轮推演待执行） |
+| 目标 | 以 Sol 出代码级施工图、Astra 红队验收，输出《T027-B 代码级重构施工图与测试矩阵》 |
+| 依赖 | P37 已闭环（`HEAD` = `344c206`，准则 v1.58）；Astra 临时授权（§12.4 的 OB-131） |
+| 规模 | L（跨全栈战术规划） |
+| 步骤 | 步骤 0 → 第 1 轮 → 第 2 轮 → 报告装配 → ⑨ → ⑧c → ⑩ |
+| 现状缺口 | P37 找出 C1–C7 缺陷，但缺代码级改造方案与测试矩阵 |
+| 交付物 | 报告对 `docs/validation/t027b-tactical-blueprint{,_EN}.md`；证据包 `docs/validation/evidence/P38-T027B-TACTICAL-BLUEPRINT/`；自由度清单 `docs/validation/evidence/P38-T027B-TACTICAL-BLUEPRINT/freedom-list.md` |
+| 验收证据 | 两轮逐字转录且 `sha256` 与原文归一后一致；报告含 `- ⑥ 跳过：` 与 `- ⑦ 不适用：`；三作用域 `TOTAL_FAIL=0` 与 `SELFTEST` 全绿；报告 CN/EN 六形状全等；批量辅助实派不少于 2 次并逐次复核 |
+| 边界 | 不改代码 / 契约 / schema / fixtures；不改准则业务规则条款（唯一例外：OB-131 登记、头部升 v1.59、§0.3 日志行、本台账登记）；不推 gitee；commit 否 / push 否 |
+| 分级 | `[SLICE]`（评估类，流水线经裁剪） |
+| 探针额度 | 无 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/P38-T027B-TACTICAL-BLUEPRINT/freedom-list.md` |
+| R / D 基线 | 本片 R = 0、D = 0（从零起算，不继承 P37 的 R=4 / D=0） |
+| 临时件落点声明 | 本片临时目录 = `tmp/P38-T027B-TACTICAL-BLUEPRINT/`（⑧c 前只增不删，清理由 ⑧c 执行） |
 
 ## 已知缺陷（后续切片前处理）
 

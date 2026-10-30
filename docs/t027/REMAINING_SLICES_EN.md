@@ -67,6 +67,7 @@
 | P35 STRATEGIC-REVIEW-2026-10-30 | ✅ Done | P34 | L | 2026-10-29 | docs/validation/strategic-review-2026-10-30{,_EN}.md |
 | P36 STRATEGIC-PLANNING-2026-10-31 | ✅ Done | P35 | L | 2026-10-30 | docs/validation/strategic-planning-2026-10-31{,_EN}.md |
 | P37 P37-T027B-BREAKTHROUGH | ✅ Done | P36 | L | 2026-10-30 | docs/validation/t027b-breakthrough{,_EN}.md |
+| P38 P38-T027B-TACTICAL-BLUEPRINT | 🔄 In progress | P37 | L | — | docs/validation/t027b-tactical-blueprint{,_EN}.md |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1207,6 +1208,26 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Freedom-list path | `docs/validation/evidence/P37-T027B-BREAKTHROUGH/freedom-list.md` |
 | R / D baseline | R = 0, D = 0 for this slice (counted from zero, not inherited from the P36 R=1 / D=0); actual R = 4, D = 0 for this slice |
 | Temp-artifact landing declaration | this slice temp directory = `tmp/P37-T027B-BREAKTHROUGH/` (append-only until ⑧c, whose cleanup performs the removal) |
+
+### P38 — `P38-T027B-TACTICAL-BLUEPRINT` · 🔄 In progress
+
+| Field | Content |
+|---|---|
+| Identity | `P38-T027B-TACTICAL-BLUEPRINT` (assessment type; directive v1.59) |
+| Status | 🔄 **In progress** (started 2026-10-30; the two rounds are pending) |
+| Goal | Sol writes the code-level blueprint and Astra runs red-team acceptance, producing the T027-B code-level rebuild blueprint and test matrix |
+| Dependency | P37 is closed (`HEAD` = `344c206`, directive v1.58); the Astra authorisation is OB-131 in §12.4 |
+| Size | L (cross-stack tactical planning) |
+| Steps | step 0 → round 1 → round 2 → report assembly → ⑨ → ⑧c → ⑩ |
+| Current gap | P37 exposed the C1-C7 defects but there is no code-level rebuild plan or test matrix |
+| Deliverables | report pair `docs/validation/t027b-tactical-blueprint{,_EN}.md`; evidence pack `docs/validation/evidence/P38-T027B-TACTICAL-BLUEPRINT/`; freedom list `docs/validation/evidence/P38-T027B-TACTICAL-BLUEPRINT/freedom-list.md` |
+| Acceptance evidence | both rounds transcribed verbatim with `sha256` matching the normalised originals; the report carries `- ⑥ 跳过：` and `- ⑦ 不适用：`; three scopes `TOTAL_FAIL=0` and `SELFTEST` green; the report pair matches on all six shapes; at least 2 batch-assist dispatches, each re-verified |
+| Boundary | no change to code / contracts / schema / fixtures; no change to the directive business rule clauses (the only exception: the OB-131 registration, the v1.59 header bump, the §0.3 log row and this ledger registration); no gitee push; commit no / push no |
+| Tier | `[SLICE]` (assessment type, trimmed pipeline) |
+| Probe quota | none |
+| Freedom-list path | `docs/validation/evidence/P38-T027B-TACTICAL-BLUEPRINT/freedom-list.md` |
+| R / D baseline | R = 0, D = 0 for this slice (counted from zero, not inherited from the P37 R=4 / D=0) |
+| Temp-artifact landing declaration | this slice temp directory = `tmp/P38-T027B-TACTICAL-BLUEPRINT/` (append-only until ⑧c, whose cleanup performs the removal) |
 
 ## Known defects (to be handled before later slices)
 
