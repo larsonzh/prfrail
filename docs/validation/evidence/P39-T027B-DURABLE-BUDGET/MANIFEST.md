@@ -2,6 +2,8 @@
 
 切片：`P39-T027B-DURABLE-BUDGET`（P39，实现类 `[IMPL]`，C6 预算落盘）。建包时点 2026-10-31（`HEAD` = `8b16e21`，准则 v1.59）。
 
+**落地记录**：交付集以 `4d5ebf3` 提交并推送 origin；CI run `41130337015` 双绿（`Go ubuntu-latest` / `Go windows-latest` 均 `success`）。本次回填只改报告对与本清单，载荷集保持原样，`SHA256SUMS.txt` 重算后逐字节一致。
+
 **包状态**：① 架构设计分两批（批次 A 设计书 / 批次 B 反例矩阵）；载荷随 ②③④ 追加以一次性脚本重算 `SHA256SUMS.txt`。
 
 **载荷集**：`MANIFEST.md` 与 `SHA256SUMS.txt` 为元数据，其余为载荷；条目集三方相等（当前 4 件）。

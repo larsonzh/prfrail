@@ -7,6 +7,7 @@
 - **修复范围**：C6（预算未落盘）——共享上限不可跨进程绕过、提交失败不签发确认、`unknown` 占用重启后仍计入。
 - **验证结果**：`go build ./...` 与 `go vet ./...` 通过；`go test ./...` 全绿；新增反例矩阵六条腿全部通过。
 - **核心判断**：① 设计 → ③ 红测 → ② 转绿 → ⑤ 首轮 FAIL 修 5 项 BLOCKER → ⑤ 复审 PASS → ⑥ CLEAR → ⑦ PASS。
+- **落地与 CI**：变更集以 `4d5ebf3` 提交并推送 origin，CI run `41130337015` 双绿（`Go ubuntu-latest` 与 `Go windows-latest` 均 `success`）。
 
 ## 2 前置与实现
 ### 2.1 ⑤ 预审（两轮）

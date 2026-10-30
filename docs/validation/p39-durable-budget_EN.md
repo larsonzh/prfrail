@@ -7,6 +7,7 @@ Slice `P39-T027B-DURABLE-BUDGET` (implementation type `[IMPL]`); run on 2026-10-
 - **Fixed scope**: C6 (the budget was never persisted) - the shared cap cannot be bypassed across processes, a failed commit issues no acknowledgement, and an `unknown` charge still counts after restart.
 - **Verification**: `go build ./...` and `go vet ./...` pass; `go test ./...` is green; all six counter-example legs pass.
 - **Core judgement**: design, then red tests, then green implementation, then the first pre-review FAIL closing five BLOCKERs, then a PASS re-review, then a CLEAR scan and a PASS final review.
+- **Landing and CI**: the change set was committed as `4d5ebf3` and pushed to origin; CI run `41130337015` is `success` on both `Go ubuntu-latest` and `Go windows-latest`.
 
 ## 2 Preflight and implementation
 ### 2.1 Pre-review (two rounds)
