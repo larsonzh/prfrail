@@ -2,6 +2,8 @@
 
 切片：`P37-T027B-BREAKTHROUGH`（P37，评估类 `[SLICE]`）。建包时点 2026-10-30（`HEAD` = `00ddc53`，准则 v1.58）。
 
+**落地记录**：交付集以 `1bf57a4` 提交并推送 origin；CI run `41034345827` 双绿（`Go ubuntu-latest` / `Go windows-latest` 均 `success`）。本次回填只改报告对与本清单，载荷集保持原样，`SHA256SUMS.txt` 重算后逐字节一致。
+
 **包状态**：分轮追加包 —— 每轮载荷落盘后按 `tmp/P37-T027B-BREAKTHROUGH/step0-sums.js` 重算 `SHA256SUMS.txt` 并与本清单同步，⑧c 前保持自洽。
 
 **载荷集**：本包根 `MANIFEST.md` 与 `SHA256SUMS.txt` 为元数据，余下全部文件为载荷；清单条目集 = `SHA256SUMS.txt` 条目集 = 载荷集（当前 6 件）。

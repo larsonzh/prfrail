@@ -8,6 +8,7 @@ Slice `P37-T027B-BREAKTHROUGH` (assessment-type `[SLICE]`); executed 2026-10-30;
 - **Transcription and checks**: both `review.md` files were transcribed verbatim and their `sha256` matches the normalised original message (only BOM and line-ending normalisation may differ); round 1 is 111 lines and 10723 bytes, round 2 is 68 lines and 9277 bytes.
 - **Batch assistance**: two dispatches, both `deep-reasoner` + `GLM-5.3-Flash (glm)`; category 1/2 (input-pack statistics and number checks) and category 2 (two-round transcription number checks), each mechanically re-verified by the control seat.
 - **Core judgement**: round 1 delivers a complete design (G0-G4 gate order, module split, state machine, key interfaces, resource constraints); round 2 exposes three fatal hand-over gaps (start ownership, evidence durability, gate-order prerequisites) and gives a minimal rebuild plus the November minimal boundary. **Together they are the workable baseline.**
+- **Landing and CI**: the change set was committed as `1bf57a4` and pushed to origin; CI run `41034345827` is `success` on both `Go ubuntu-latest` and `Go windows-latest`.
 
 ## 2 Two rounds in review
 
