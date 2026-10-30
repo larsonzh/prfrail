@@ -6,7 +6,7 @@ Date: 2026-09-07; S1 architecture baseline. This document is the normative autho
 
 ## 1. Current State and Target
 
-T005–T010 currently implement evidence, snapshots, guards, the taskdef change-set checker, applier transactions, the Chain Engine, and a fail-closed gate runner with core tests. Adapters, usable CLI/TUI, and product CI remain incomplete. init/run still print unimplemented messages and their successful exits are not acceptance. Internal modules remain responsibility boundaries and must not be populated with speculative interfaces merely because they appear in the target architecture.
+T005–T010 currently implement evidence, snapshots, guards, the taskdef change-set checker, applier transactions, the Chain Engine, and a fail-closed gate runner with core tests. Adapters, usable CLI/TUI, and product CI remain incomplete. init/run still print unimplemented messages and their successful exits are not acceptance. Internal modules remain responsibility boundaries and must not be populated with speculative interfaces merely because they appear in the target architecture. AgentRunner prerequisites A0–A7, B1–B4 and C1 are frozen; the T027-B design baseline is settled by P37 / P38.
 
 Use a local single-user, single-writer Go modular monolith. Persist facts as content objects, append-only events and journals. S1 adds no service cluster, database, remote object store or message broker. Prefer Go calls with context.Context internally and versioned protocols across processes.
 
@@ -74,6 +74,14 @@ Preconditions: successful PRECHECK before execution; noop bypasses RUNNING; tech
 The RFC default snapshot root is out/prfrail/snapshots/. Exact run/state/outbox layouts remain pending contracts, not production paths inferred from this document. Physically separate source, run-workspace, execution outbox and core state/store; reject nested captures and aliased overlap.
 
 Keep baseline, accepted snapshots, final reports and failure evidence by default. Candidate/intermediate TTL follows the profile. GC produces a dry-run list and deletes only unreferenced, expired, unlocked objects. Disk pressure pauses rather than pruning audit evidence. Shared-store GC must coordinate with publication reference updates; a per-run lock alone is insufficient.
+
+### 4.1 Durable Cost Budget (DurableCostLedger)
+
+The budget lives in the run durable ledger; `Reserve` / `Settle` / `RequireOutstandingReservation` always re-read inside the cross-process shared lock before deciding; commits advance in stages, with write, sync, close and replace distinguishable stage by stage, and failures keep three states distinguishable; `unknown` occupancy survives restarts and is neither reused nor re-dispatched.
+
+### 4.2 Concurrency Lock-Order Principles
+
+In-process mutual exclusion precedes the cross-process lock; a lock never spans an external wait; lock waits are cancellable.
 
 ## 5. Trade-Offs
 

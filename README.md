@@ -18,7 +18,7 @@ ProofRail 让 AI 在无人值守下安全地改代码、跑验证、出证据：
 
 ### 状态
 
-**S1 实施中**（核对时点：2026-10-25；各项以 [docs/DEV_PLAN.md](docs/DEV_PLAN.md) 的任务状态为准）
+**防御性重构期（P39–P45）**（核对时点 2026-10-31；C6 预算已落盘，C1–C7 逐项攻克中；各项以 [docs/DEV_PLAN.md](docs/DEV_PLAN.md) 的任务状态为准）
 
 | 能力 | 状态 |
 |---|---|
@@ -26,8 +26,8 @@ ProofRail 让 AI 在无人值守下安全地改代码、跑验证、出证据：
 | `ai check` 单请求 live availability probe | 可用（只证明可达性，不证明 AgentRunner enforcement 或 AT-23） |
 | `export`、`effects` / `diagnostics` | 部分可用（库级实现已具备，CLI 入口待后续切片） |
 | 受监督黑箱模式（supervised black-box） | 部分可用（显式风险确认 + 隔离 workspace + 人工监督 + 归还后全量扫描；只保证归还后产物，不保证工具、网络、费用或外部副作用） |
-| `run` 执行 `code` / `build` / `verify` 任务链 | 未交付（当前只执行 noop-only 链，遇到可执行步骤 fail-close 并返回非零） |
-| 正式 AI 执行（AgentRunner 真实候选腿） | 未交付（AT-23 未通过） |
+| `run` 执行 `code` / `build` / `verify` 任务链 | 未交付（当前只执行 noop-only 链，遇到可执行步骤 fail-close 并返回非零；T027 装配链已有可跑拒绝路径，持久预算已落盘） |
+| 正式 AI 执行（AgentRunner 真实候选腿） | 未交付（AT-23 未通过；C1–C7 与 N1–N4 已归档，P39 起逐项修复） |
 | 完整统一 TUI / `serve` | 未交付 |
 | 正式发行包与安装 | 未交付 |
 
@@ -101,7 +101,7 @@ ProofRail enables AI to safely modify code, run validations, and produce evidenc
 
 ### Status
 
-**S1 in progress** (checked 2026-10-25; each row follows the task state in [docs/DEV_PLAN_EN.md](docs/DEV_PLAN_EN.md))
+**Defensive refactor period (P39–P45)** (checked 2026-10-31; C6 budget landed and C1–C7 under attack item by item; each row follows the task state in [docs/DEV_PLAN_EN.md](docs/DEV_PLAN_EN.md))
 
 | Capability | State |
 |---|---|
@@ -109,8 +109,8 @@ ProofRail enables AI to safely modify code, run validations, and produce evidenc
 | `ai check` single-request live availability probe | available (proves reachability only, not AgentRunner enforcement or AT-23) |
 | `export`, `effects` / `diagnostics` | partial (library level shipped; CLI entrypoints in later slices) |
 | Supervised black-box mode | partial (explicit risk acknowledgement + isolated workspace + human supervision + full post-return scan; warrants post-return artifacts only, not tools, network, cost or external effects) |
-| `run` executing `code` / `build` / `verify` chains | not delivered (noop-only today; executable steps fail closed with a non-zero exit) |
-| Formal AI execution (real AgentRunner candidate leg) | not delivered (AT-23 not passed) |
+| `run` executing `code` / `build` / `verify` chains | not delivered (noop-only today; executable steps fail closed with a non-zero exit; the T027 assembly chain already has a runnable refusal path and the durable budget has landed) |
+| Formal AI execution (real AgentRunner candidate leg) | not delivered (AT-23 not passed; C1–C7 and N1–N4 are archived and fixed item by item from P39) |
 | Complete unified TUI / `serve` | not delivered |
 | Production release package and installation | not delivered |
 

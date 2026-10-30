@@ -6,7 +6,7 @@
 
 ## 1. 现状和目标
 
-当前 T005–T010 已实现 evidence、snapshot、guard、taskdef change-set checker、applier transaction、Chain Engine 与 fail-close gate runner，并有核心测试；adapter、可用 CLI/TUI 和产品 CI 尚未完成。`init`/`run` 仍打印未实现，不能用其退出成功作为验收。internal 模块继续作为责任边界，不因目标架构存在而提前生成空接口。
+当前 T005–T010 已实现 evidence、snapshot、guard、taskdef change-set checker、applier transaction、Chain Engine 与 fail-close gate runner，并有核心测试；adapter、可用 CLI/TUI 和产品 CI 尚未完成。`init`/`run` 仍打印未实现，不能用其退出成功作为验收。internal 模块继续作为责任边界，不因目标架构存在而提前生成空接口。AgentRunner 前置 A0–A7、B1–B4、C1 已冻结；T027-B 设计基线由 P37 / P38 定稿。
 
 采用单机单用户、单写者 Go 模块化单体。持久事实以文件对象、append-only 事件和 journal 表达；S1 不引入服务集群、数据库、远程对象存储或消息中间件。内部调用优先 Go 方法与 `context.Context`，跨进程才使用版本化协议。
 
@@ -74,6 +74,14 @@ AI 需要人工输入时，AgentRunner 或辅助 adapter 只接收结构化 `ope
 RFC 默认快照根是 `out/prfrail/snapshots/`。run/state/outbox 的具体布局属于待冻结契约，不能凭本文生成生产路径。要求物理上分离源目录、run-workspace、执行 outbox、核心 state/store；启动前验证无嵌套捕获和别名重叠。
 
 baseline、已接受快照、最终报告及失败证据默认保留；候选/中间物按 profile TTL；GC 先 dry-run，只删除无引用且过期、未锁定对象。空间不足先暂停，不删除审计链。多个 run 共享 store 时，GC 与发布的引用更新必须协调，不能只靠单 run 锁。
+
+### 4.1 持久化预算（DurableCostLedger）
+
+预算落在 run 的持久账本上，`Reserve` / `Settle` / `RequireOutstandingReservation` 一律在跨进程共享锁内重读后决策；提交分阶段推进，写、同步、关闭与替换逐阶段可辨，失败时保持三态可区分；`unknown` 占用跨重启保留，既不复用也不重发。
+
+### 4.2 并发锁序原则
+
+进程内互斥先于跨进程锁；锁不跨外部等待；锁等待可取消。
 
 ## 5. 关键取舍
 

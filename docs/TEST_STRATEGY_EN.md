@@ -53,6 +53,13 @@ AT IDs are planned test groups, not existing functions. Expand each into positiv
 | AT-23 | REQ-006/007/008/009/016/023/024/025/026 | Fake AgentRunner contracts and a pinned real CLI capability probe; isolated-workspace tool iteration with version/config/session/process/events/logs/usage; timeout, incomplete logs, uncertain stop/resume pause; exit zero still requires rescan and independent gates/review | adapters/guard/chain/evidence; T026/T027 |
 | AT-24 | REQ-007/009/021/023/024/025/026/027 | Before visible black-box launch display and persist bound risk acknowledgment; isolated workspace only and delivery is not completion; explicit return triggers full manifest/diff, scope/secret/file/effect scans and independent gates/review; missing acknowledgment, disconnect and a detectable unknown process/cost/external effect block, and what is unobservable in principle is labelled unknown, reports say reduced/unknown, and automatic downgrade is forbidden | console/adapters/chain/guard/evidence; T028 |
 
+AT-23 prerequisite hard checks (new in P38/P39):
+- N1 host crash window: no orphan when the host dies after the child is created but before it joins the Job
+- N2 directory replace window: a verified handle must not stand in for the directory binding of the actual I/O
+- N3 hard-coded attempt: a reopen must use the real attempt from the durable execution context
+- N4 repeatable probe quota: one Permit must not obtain quota repeatedly or concurrently
+- P39 concurrency counterexamples: cross-process cap race, three commit-failure states, `unknown` occupancy, read-only never writes a confirmation, missing ledger refuses redispatch
+
 AT-16–AT-21 are RFC section 19 S1 minimum acceptance; AT-22 covers AI/operator interaction, AT-23 full AgentRunner execution assurance, and AT-24 reduced-assurance supervised black-box candidates. All start with deterministic fixtures and no paid calls; real host/model calls require separate authorization. S0 T002/T003 freeze records/fixtures only; parse success is not runtime evidence. T018 summarizes all 24 groups. US7–US11 cover trial, delivery, revocation, retirement recovery and black-box candidates; local measurements establish value without assumed savings.
 
 S2/S3 remain governed by RFC section 14: real three-language integration, supervised disconnection, Web, additional adapters and generated script B. S0 config parsing is not runtime acceptance.
@@ -61,7 +68,7 @@ S2/S3 remain governed by RFC section 14: real three-language integration, superv
 
 Use small fixed non-secret fixtures with stable IDs/content/expected hashes, isolated by random run IDs and t.TempDir. Never use the current repository for destructive tests. Redacted read-only whois exports require permission; absent input means SKIP/BLOCKED, not invented equivalence.
 
-Inject before/after temporary writes, rename, journal durability, partial target writes, review, publication receipts, events before projections, GC reference updates and operator return. On restart assert unchanged source, preserved accepted references, no repeated application and pause on uncertainty. Terminate helper subprocesses, never the IDE or user processes.
+Inject before/after temporary writes, rename, journal durability, partial target writes, review, publication receipts, events before projections, GC reference updates, operator return and staged-commit fault injection (write/sync/close/replace/directory barrier). On restart assert unchanged source, preserved accepted references, no repeated application and pause on uncertainty. Terminate helper subprocesses, never the IDE or user processes.
 
 Reports contain toolchain/OS/dependency versions, input hashes, command/cwd, exit codes, case counts, failure evidence, skips and executed-versus-planned distinction. t.TempDir cleans itself; manual temporary artifacts belong in root tmp and are removed afterward. Planned docs/validation/ stores reviewed acceptance summaries, not raw secret-bearing logs.
 
