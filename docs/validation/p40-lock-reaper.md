@@ -140,7 +140,9 @@ INDEPENDENT SCAN: PASS
 
 ## 提交与 CI
 
-- ⑧b 提交后回填。
+- 主提交 `3fab6ba`（feat: enforce single process reaper and durable lock order (P40-T027B-LOCK-REAPER)），范围 `38a5cba..3fab6ba`；CI run `41164098703`：ubuntu 腿全绿（Test/Race/Contract fixtures/Gates），windows 腿 Test 步红（guard 包 600s 超时，根因见 DR-12）。
+- 修复提交 `3af9c9a`（fix: remove redundant Process.Wait in reaper test for Go 1.22 compat）；CI run `41165709859` **双腿全绿**：windows 3m51s / ubuntu 2m41s；两腿 `SELFTEST: PASS 697/697`、`GATE REPORT scope=ci changed=3`、`TOTAL_FAIL=0`；`internal/guard` 与 `internal/tickets` 两包在两腿均实测 ok（windows 15 包 ok / ubuntu 17 包 ok，含 Race 腿）。
+- 本句之后的仅文档提交不再回写本节，读数由 ⑩ 回执载明。
 
 ## 后续片候选登记
 

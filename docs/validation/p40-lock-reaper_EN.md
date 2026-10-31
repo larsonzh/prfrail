@@ -140,7 +140,9 @@ INDEPENDENT SCAN: PASS
 
 ## Commit and CI
 
-- back-filled after the 8b commit.
+- Main commit `3fab6ba` (feat: enforce single process reaper and durable lock order (P40-T027B-LOCK-REAPER)), range `38a5cba..3fab6ba`; CI run `41164098703`: ubuntu leg green (Test/Race/Contract fixtures/Gates), windows leg Test step red (guard 600s timeout; root cause per DR-12).
+- Fix commit `3af9c9a` (fix: remove redundant Process.Wait in reaper test for Go 1.22 compat); CI run `41165709859` **double green**: windows 3m51s / ubuntu 2m41s; both legs `SELFTEST: PASS 697/697`, `GATE REPORT scope=ci changed=3`, `TOTAL_FAIL=0`; `internal/guard` and `internal/tickets` both ok on both legs (windows 15 packages ok / ubuntu 17 packages ok, including the Race legs).
+- Docs-only commits after this sentence no longer back-fill this section; readings are carried by the ⑩ receipt.
 
 ## Later-slice candidates
 
