@@ -1,0 +1,115 @@
+# P44-T027B-GATE-READINESS / FR-03 mutation evidence
+# harness: full-module throwaway copy at tmp/P44-T027B-GATE-READINESS/mut/repocopy
+# production tree untouched; both sources are restored from the real repo before each mutant
+# RED = the named test fails on the mutant, so the deleted guard is covered
+
+## M1
+变异描述：LoadProbePermit does not mark an existing marker as spent
+命令：go test -count=1 -run 'TestProbePermitRestartThenCompleteIsIdempotent' ./internal/gates/
+结果：RED（FAIL 输出前 5 行）
+    --- FAIL: TestProbePermitRestartThenCompleteIsIdempotent (0.01s)
+        probe_permit_test.go:249: complete on an already spent permit must be idempotent, got: probe permit already in use: probe permit "permit-restart-complete" completed before it was required
+    FAIL
+    FAIL	github.com/larsonzh/prfrail/internal/gates	1.058s
+    FAIL
+
+## M2
+变异描述：persistClaim drops O_EXCL and opens the marker with O_CREATE only
+命令：go test -count=1 -run 'TestProbePermitSecondInstanceOnSamePathLosesOnly' ./internal/gates/
+结果：RED（FAIL 输出前 5 行）
+    --- FAIL: TestProbePermitSecondInstanceOnSamePathLosesOnly (0.01s)
+        probe_permit_test.go:211: the durable claim must admit exactly one of two instances, got 2 winners
+    FAIL
+    FAIL	github.com/larsonzh/prfrail/internal/gates	0.839s
+    FAIL
+
+## M3
+变异描述：Complete accepts a permit that was never required (unused)
+命令：go test -count=1 -run 'TestProbePermitCompleteOnUnusedRejected' ./internal/gates/
+结果：RED（FAIL 输出前 5 行）
+    --- FAIL: TestProbePermitCompleteOnUnusedRejected (0.00s)
+        probe_permit_test.go:221: completing an unused permit must be refused as in use, got: <nil>
+    FAIL
+    FAIL	github.com/larsonzh/prfrail/internal/gates	0.824s
+    FAIL
+
+## M4
+变异描述：Complete is no longer idempotent for an already spent permit
+命令：go test -count=1 -run 'TestProbePermitRestartThenCompleteIsIdempotent' ./internal/gates/
+结果：RED（FAIL 输出前 5 行）
+    --- FAIL: TestProbePermitRestartThenCompleteIsIdempotent (0.01s)
+        probe_permit_test.go:249: complete on an already spent permit must be idempotent, got: probe permit already consumed: probe permit "permit-restart-complete" already spent
+    FAIL
+    FAIL	github.com/larsonzh/prfrail/internal/gates	0.856s
+    FAIL
+
+## M5
+变异描述：unknown readiness goal falls back to level 1 instead of being rejected
+命令：go test -count=1 -run 'TestReadinessUnknownGoalRejected' ./internal/gates/
+结果：RED（FAIL 输出前 5 行）
+    --- FAIL: TestReadinessUnknownGoalRejected (0.00s)
+        readiness_test.go:234: an unknown readiness goal must be refused as incomplete evidence: got readiness *gates.ProbeReadiness, err <nil>
+    FAIL
+    FAIL	github.com/larsonzh/prfrail/internal/gates	0.804s
+    FAIL
+
+## M6
+变异描述：GoalProbe consumes the probe permit while deciding
+命令：go test -count=1 -run 'TestReadinessProbeDoesNotConsumePermit' ./internal/gates/
+结果：RED（FAIL 输出前 5 行）
+    --- FAIL: TestReadinessProbeDoesNotConsumePermit (0.01s)
+        readiness_test.go:256: evaluation must not write the claim marker, stat err = <nil>
+    FAIL
+    FAIL	github.com/larsonzh/prfrail/internal/gates	0.798s
+    FAIL
+
+## M7
+变异描述：GoalAcceptance drops the SealBinding.validate call
+命令：go test -count=1 -run 'TestReadinessAcceptanceRejectsInvalidSealBinding' ./internal/gates/
+结果：RED（FAIL 输出前 5 行）
+    --- FAIL: TestReadinessAcceptanceRejectsInvalidSealBinding (0.00s)
+        --- FAIL: TestReadinessAcceptanceRejectsInvalidSealBinding/zero_attempt (0.00s)
+            readiness_test.go:311: a seal attempt of 0 identifies no attempt: readiness evidence incomplete, got readiness *gates.AcceptanceReadiness, err <nil>
+        --- FAIL: TestReadinessAcceptanceRejectsInvalidSealBinding/blank_task_key (0.00s)
+            readiness_test.go:311: a whitespace-only task key identifies no task: readiness evidence incomplete, got readiness *gates.AcceptanceReadiness, err <nil>
+
+## M8
+变异描述：GoalProduction drops the AT23 hash syntax check
+命令：go test -count=1 -run 'TestReadinessProductionRejectsMalformedAT23' ./internal/gates/
+结果：RED（FAIL 输出前 5 行）
+    --- FAIL: TestReadinessProductionRejectsMalformedAT23 (0.00s)
+        --- FAIL: TestReadinessProductionRejectsMalformedAT23/too_short (0.00s)
+            readiness_test.go:368: a three-character AT23 hash is not a digest: malformed AT23 hash must be refused as incomplete evidence, got readiness *gates.ProductionReadiness, err <nil>
+        --- FAIL: TestReadinessProductionRejectsMalformedAT23/sixty_three_hex_characters (0.00s)
+            readiness_test.go:368: a 63-character AT23 hash is one character short of a digest: malformed AT23 hash must be refused as incomplete evidence, got readiness *gates.ProductionReadiness, err <nil>
+
+## M9
+变异描述：readinessHashPattern accepts bare digests only, dropping the sha256: prefix
+命令：go test -count=1 -run 'TestReadinessAcceptsSha256PrefixedHashes' ./internal/gates/
+结果：RED（FAIL 输出前 5 行）
+    --- FAIL: TestReadinessAcceptsSha256PrefixedHashes (0.00s)
+        readiness_test.go:405: a sha256-prefixed seal hash must be accepted at level 2: readiness evidence incomplete: invalid seal hash "sha256:1212121212121212121212121212121212121212121212121212121212121212"
+    FAIL
+    FAIL	github.com/larsonzh/prfrail/internal/gates	0.807s
+    FAIL
+
+## M10
+变异描述：Require drops the pre-claim context cancellation check
+命令：go test -count=1 -run 'TestProbePermitCancelledBeforeClaimDoesNotConsume' ./internal/gates/
+结果：RED（FAIL 输出前 5 行）
+    --- FAIL: TestProbePermitCancelledBeforeClaimDoesNotConsume (0.01s)
+        probe_permit_test.go:310: a pre-claim cancellation must not persist a claim marker, stat err = <nil>
+    FAIL
+    FAIL	github.com/larsonzh/prfrail/internal/gates	0.813s
+    FAIL
+
+## M11
+变异描述：Require returns nil without persisting the claim (persistence-first removed)
+命令：go test -count=1 -run 'TestProbePermitSuccessImpliesMarkerOnDisk' ./internal/gates/
+结果：RED（FAIL 输出前 5 行）
+    --- FAIL: TestProbePermitSuccessImpliesMarkerOnDisk (0.00s)
+        probe_permit_test.go:273: a successful Require must have persisted the marker before returning: GetFileAttributesEx C:\Users\濡欏鍛淺AppData\Local\Temp\TestProbePermitSuccessImpliesMarkerOnDisk658411857\001\probe-permit.json: The system cannot find the file specified.
+    FAIL
+    FAIL	github.com/larsonzh/prfrail/internal/gates	0.884s
+    FAIL
+

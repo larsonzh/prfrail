@@ -175,6 +175,18 @@ K 是不可变上下文摘要（域分隔 `proofrail:context-key:1`），由 run
 
 attempt 的唯一真源是持久执行上下文（`TaskAttemptResolver`）；缺省回退到事件投影中该任务已出现的最大 attempt，从未启动则为 1。请求、收据、实体键与事实提取必须使用同一解析值，不得写死。
 
+### 4.2 就绪分级与探针许可一次性语义（P44 权威）
+
+`readiness.go` 把就绪分为三级且严格分离：`ReadinessGoal` 只有 `GoalProbe` / `GoalAcceptance` / `GoalProduction` 三值。`Readiness` 是 sealed 接口（未导出标签方法），包外无法声明第四级或伪造已有级；三组具体类型 `ProbeReadiness`（仅 `Permit()`）、`AcceptanceReadiness`（仅 `Acceptance()`）、`ProductionReadiness`（仅 `Release()`）各带自己的取值方法，取错级别无法编译，探针结论不能顶替接受结论。`EvaluateT027BReadiness` 是唯一构造入口，且为纯函数：零 I/O、不改输入、不消费许可。
+
+判定按级执行：`GoalProbe` 缺绑定许可 ⇒ `ErrProbePermitMissing`；`GoalAcceptance` 只持探针证据 ⇒ `ErrReadinessProbeNotAcceptance`；`GoalAcceptance` 缺绑定或绑定非法（attempt 小于 1、任务键为空、封存哈希不合形）⇒ `ErrReadinessEvidenceIncomplete`；`GoalProduction` 缺二级材料的判据只看 `Seal == nil`，不看是否带探针证据，命中即 `ErrReadinessAcceptanceMissing`；缺 AT-23 接受哈希 ⇒ `ErrReadinessProductionAT23Required`；哈希非法或 goal 未知 ⇒ `ErrReadinessEvidenceIncomplete`。证据哈希接受 `sha256:` 前缀或裸 64 位小写十六进制。
+
+探针许可是**一次性额度**，三态 `Unused` → `Claimed` → `Spent`，`Spent` 为终态，没有任何转移回到 `Unused`。**线性化点是标记文件的 `O_CREATE|O_EXCL` 创建加 `Sync` 成功**，不是内存 CAS；内存状态只是同进程的快速拒斥缓存，它能领先磁盘、绝不落后于磁盘。`Require` 因而返回 nil 当且仅当标记已在盘：先快速拒斥（已 `Claimed` / 已 `Spent`），再落盘，落盘成功才返回 nil；`O_EXCL` 冲突（他人已持有）与其它落盘失败（空路径、目录创建、写、`Sync` 失败）一律把额度置 `Spent` 并返回 `ErrProbePermitConsumed`，即 fail-closed，绝不退化为静默放行。
+
+失败、超时与重启均不重置额度：`LoadProbePermit` 见到标记即重建为 `Spent`，标记体损坏同样按 `Spent` 处理，无标记才是 `Unused`。`Complete` 以 `CAS(1→2)` 落终态，对已 `Spent` 幂等，对从未 `Require` 的 `Unused` 返回 `ErrProbePermitInUse`，故完成动作不能凭空造出额度。上下文取消发生在落盘之前则不消耗额度；落盘之后取消仍然消耗，被放弃的尝试不退额度。标记文件的生命周期归调用方：删除标记等同于重新签发额度，生产路径不得删除。
+
+边界：本切片只落判定实现与测试，`internal/console/**` 未被改动，故 C7 / N4 的端到端接线尚未完成，接线属后续切片。
+
 ## 5. Gate Hook 协议
 
 kind 使用 precheck/build/test/verify/review/cleanup；按序执行。`executable + args[]` 不经过隐式 shell，cwd 必须落在授权运行工作区；环境继承白名单，网络默认拒绝，资源/输出/时长必须可执行限制。需要 shell/container/remote/PTY 是独立能力声明，不支持则拒绝而非弱化策略。

@@ -95,6 +95,7 @@ In-process mutual exclusion precedes the cross-process lock; a lock never spans 
 | TOML entry plus JSON contracts | Human readability, machine strictness | One canonical algorithm; never hash incidental map output |
 | External agent ports | No-IDE and multi-model testability | Capability matrix; messaging success is not task success |
 | Directory isolation is not a sandbox | Honest S1 guarantees | Reject when requested network/resource/path constraints cannot be enforced |
+| Readiness levels and permit linearisation | A lower-level conclusion is never higher-level material | Wrong level fails to compile; a permit quota is spent once |
 
 See [contracts](CONTRACTS_EN.md), [security](SECURITY_EN.md) and [decision register](ADR_REGISTER_EN.md). Do not implement guessed field values before RFC revision.
 

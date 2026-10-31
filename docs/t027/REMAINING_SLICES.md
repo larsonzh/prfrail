@@ -73,6 +73,7 @@
 | P41 P41-T027B-SPAWN-OWNERSHIP | ✅ 已闭环 | P40 | L | 2026-10-31 | docs/validation/p41-spawn-ownership{,_EN}.md |
 | P42 P42-T027B-EVIDENCE-BIND | ✅ 已闭环 | P41 | M | 2026-10-31 | docs/validation/p42-evidence-bind{,_EN}.md |
 | P43 P43-T027B-STATE-SEAL | ✅ 已闭环 | P42 | L | 2026-10-31 | docs/validation/p43-state-seal{,_EN}.md |
+| P44 P44-T027B-GATE-READINESS | ✅ 完成 | P43 | M | 2026-11-01 | docs/validation/p44-gate-readiness{,_EN}.md |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -1350,6 +1351,27 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | R / D 基线 | R = 0、D = 0（不继承上片） |
 | 临时件落点声明 | 本片临时目录 = `tmp/P43-T027B-STATE-SEAL/`（⑧c 前只增不删） |
 | 完成记录 | ① 架构 → ③ 红测（RED-CONFIRMED）→ ② 两轮转绿 → ④ 门禁 → ⑤ 两轮（r1 PASS WITH FIXES → r2 PASS）→ ⑥ 两轮（r1 BLOCKED：K 未接线 → r2 PASS WITH FINDINGS，额度 2/3）→ ⑦ 三轮（r1/r2 BLOCKED → r3 PASS，额度 3/3）；R=0 D=0；生产装配接线登记为边界外限制 |
+
+### P44 — `P44-T027B-GATE-READINESS` · ✅ 完成
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `P44-T027B-GATE-READINESS`（实现类；准则 v1.60） |
+| 状态 | ✅ **完成**（2026-11-01；提交与 CI 由 ⑩ 回执载明） |
+| 目标 | C7+N4：`EvaluateT027BReadiness` 严格分离探针就绪 / 真实验收就绪 / 生产发布就绪三级；`ProbePermit` 一次性消费（调用前原子预留、消费后失效、失败与重启不重置） |
+| 依赖 | P43 已闭环（`8a46b01`） |
+| 规模 | M（console 门控入口 + gates 判定实现） |
+| 步骤 | 步骤 0 → ① 架构（V4 Pro）→ ③ 测试红 → ② 实现转绿 → ④ 门禁 → ⑤ 预审 → ⑥ 扫描 → ⑦ 终审 → ⑧a → ⑨ → ⑧c → ⑩ |
+| 现状缺口 | C7 三级 readiness 未分离，探针结论可直接推进验收；N4 `Require` 只校验授权参数，缺少一次性消费与并发累计约束 |
+| 交付物 | 报告对 `docs/validation/p44-gate-readiness{,_EN}.md`；证据包 `docs/validation/evidence/P44-T027B-GATE-READINESS/`（含 `00-briefing.md`）；执行自由度清单；文档回写（CONTRACTS / ARCHITECTURE / DEV_PLAN） |
+| 验收证据 | ③ 测试红先行；`go build` / `go vet` / `go test ./...` 全绿；三作用域 TOTAL_FAIL=0 且 SELFTEST 697/697；报告 CN/EN 六形状全等 |
+| 边界 | 代码仅 `internal/console/**` 与 `internal/gates/**`；不碰 `internal/chain/**` 等；不推 gitee；commit 否 / push 否，停 ⑩ 等授权 |
+| 分级 | `[SLICE]`（实现类） |
+| 探针额度 | 无 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/P44-T027B-GATE-READINESS/freedom-list.md` |
+| R / D 基线 | R = 0、D = 0（不继承上片） |
+| 临时件落点声明 | 本片临时目录 = `tmp/P44-T027B-GATE-READINESS/`（⑧c 前只增不删） |
+| 完成记录 | ① 架构（含 §八 四条修订注记 R-1～R-4）→ ③ 红测（RED-CONFIRMED）→ ② 转绿（P44 用例 20 例 + 9 子例；变异验证 M1–M11 全 RED）→ ④ 门禁 → ⑤ 两轮（r1 PASS WITH FIXES：2 Medium → r2 PASS WITH FIXES：3 Low）→ ⑥ INDEPENDENT SCAN: PASS（Section B 零缺陷，额度 1/3）→ ⑦ 三轮（r1/r2 BLOCKED → r3 PASS，额度 3/3）；R=0 D=0；C7/N4 未端到端接线、-race 未执行，D9 误删 tmp 中间件与 D10 变异证据缺盘均已逐条登记 |
 
 ## 已知缺陷（后续切片前处理）
 

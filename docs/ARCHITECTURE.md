@@ -95,6 +95,7 @@ baseline、已接受快照、最终报告及失败证据默认保留；候选/�
 | TOML 用户入口 + JSON 规范 | 用户易读、机器严格 | 必须唯一 canonical 规则，不能按 Go map 输出直接哈希 |
 | 外部 agent 端口 | 无 IDE 与多模型可测 | 需要 adapter 能力矩阵，消息成功不是任务成功 |
 | 目录隔离不称安全沙箱 | 如实描述 S1 保证 | 无法实施要求的网络/资源/路径限制时拒绝执行 |
+| 就绪分级与许可线性化 | 低级结论不能当高级材料 | 取错级别即编译失败；许可额度只能消耗一次 |
 
 详细协议见 [CONTRACTS.md](CONTRACTS.md)，安全见 [SECURITY.md](SECURITY.md)。字段级未决项见 [ADR_REGISTER.md](ADR_REGISTER.md)；不得绕过 RFC 修改顺序直接实现猜测值。
 

@@ -73,6 +73,7 @@
 | P41 P41-T027B-SPAWN-OWNERSHIP | ✅ Closed | P40 | L | 2026-10-31 | docs/validation/p41-spawn-ownership{,_EN}.md |
 | P42 P42-T027B-EVIDENCE-BIND | ✅ Closed | P41 | M | 2026-10-31 | docs/validation/p42-evidence-bind{,_EN}.md |
 | P43 P43-T027B-STATE-SEAL | ✅ Closed | P42 | L | 2026-10-31 | docs/validation/p43-state-seal{,_EN}.md |
+| P44 P44-T027B-GATE-READINESS | ✅ Complete | P43 | M | 2026-11-01 | docs/validation/p44-gate-readiness{,_EN}.md |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1337,6 +1338,27 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | R / D baseline | R = 0, D = 0 (not inherited) |
 | Temp location | temp dir for this slice = `tmp/P43-T027B-STATE-SEAL/` (append-only until ⑧c) |
 | Completion record | 1 architecture -> 3 red tests (RED-CONFIRMED) -> 2 two rounds to green -> 4 gates -> 5 two rounds (r1 PASS WITH FIXES -> r2 PASS) -> 6 two rounds (r1 BLOCKED: K not wired -> r2 PASS WITH FINDINGS, budget 2/3) -> 7 three rounds (r1/r2 BLOCKED -> r3 PASS, budget 3/3); R=0 D=0; production assembly wiring registered as an out-of-boundary limitation |
+
+### P44 — `P44-T027B-GATE-READINESS` · ✅ Complete
+
+| Field | Content |
+|---|---|
+| Identifier | `P44-T027B-GATE-READINESS` (implementation; directive v1.60) |
+| Status | ✅ **Complete** (2026-11-01; commit and CI carried by the 10 receipt) |
+| Goal | C7+N4: `EvaluateT027BReadiness` separates probe readiness, real acceptance readiness and production release readiness; `ProbePermit` is consumed exactly once (atomic reservation before the call, invalid after consumption, never reset by failure or restart) |
+| Dependency | P43 closed (`8a46b01`) |
+| Size | M (console gate entry + gates criteria) |
+| Steps | step 0 → ① architecture (V4 Pro) → ③ red tests → ② green implementation → ④ gates → ⑤ pre-review → ⑥ scan → ⑦ final review → ⑧a → ⑨ → ⑧c → ⑩ |
+| Current gap | C7 readiness has no three-level separation, so a probe result can advance acceptance; N4 `Require` only checks authorisation parameters and lacks one-shot consumption with concurrent accounting |
+| Deliverables | report pair `docs/validation/p44-gate-readiness{,_EN}.md`; evidence pack `docs/validation/evidence/P44-T027B-GATE-READINESS/` (including `00-briefing.md`); freedom list; documentation back-fill (CONTRACTS / ARCHITECTURE / DEV_PLAN) |
+| Acceptance evidence | ③ tests red first; `go build` / `go vet` / `go test ./...` green; three scopes TOTAL_FAIL=0 and SELFTEST 697/697; report CN/EN six-shape parity |
+| Boundary | code only `internal/console/**` and `internal/gates/**`; no `internal/chain/**`; no gitee; commit no / push no, stop at ⑩ |
+| Tier | `[SLICE]` (implementation) |
+| Probe quota | none |
+| Freedom list path | `docs/validation/evidence/P44-T027B-GATE-READINESS/freedom-list.md` |
+| R / D baseline | R = 0, D = 0 (not inherited) |
+| Temp location | temp dir for this slice = `tmp/P44-T027B-GATE-READINESS/` (append-only until ⑧c) |
+| Completion record | 1 architecture (with the four revision notes R-1 to R-4 in section 8) -> 3 red tests (RED-CONFIRMED) -> 2 green (20 P44 cases + 9 sub-cases; mutations M1–M11 all RED) -> 4 gates -> 5 two rounds (r1 PASS WITH FIXES: 2 Medium -> r2 PASS WITH FIXES: 3 Low) -> 6 INDEPENDENT SCAN: PASS (Section B zero defects, budget 1/3) -> 7 three rounds (r1/r2 BLOCKED -> r3 PASS, budget 3/3); R=0 D=0; C7/N4 not wired end to end, -race not run, and both D9 (tmp intermediates deleted) and D10 (mutation evidence missing on disk) are registered item by item |
 
 ## Known defects (to be handled before later slices)
 
