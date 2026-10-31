@@ -16,6 +16,12 @@ import (
 // pass create=false, which fails closed when the lock file is missing instead of
 // creating it. The wait uses non-blocking flock plus backoff so ctx can cancel it.
 func acquireDurableLock(ctx context.Context, path string, create bool) (func() error, error) {
+	if ctx == nil {
+		return nil, fmt.Errorf("%w: durable lock requires a context", ErrInvalidCostLedger)
+	}
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 	flags := os.O_RDWR
 	if create {
 		flags |= os.O_CREATE

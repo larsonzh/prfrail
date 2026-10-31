@@ -10,11 +10,23 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 )
 
-type platformProcess struct{ pgid int }
+// platformProcess owns the process group of a managed tree. Linux has no OS
+// handle to release, so close is a structural no-op; it still records the
+// release so the "released exactly once" rule is observable and enforced the
+// same way it is on Windows.
+type platformProcess struct {
+	pgid int
+	mu   sync.Mutex
+	// released marks that the handle ownership was given up; releases counts the
+	// real transitions, so it stops at 1.
+	released bool
+	releases int
+}
 
 // procStat is the part of /proc/<pid>/stat this package needs: the scheduling
 // state, the process group and the start-time token that keeps an identity
@@ -70,7 +82,22 @@ func (process *platformProcess) terminate() error {
 	return syscall.Kill(-process.pgid, syscall.SIGKILL)
 }
 
-func (process *platformProcess) close() {}
+func (process *platformProcess) close() {
+	process.mu.Lock()
+	defer process.mu.Unlock()
+	if process.released {
+		return
+	}
+	process.released = true
+	process.releases++
+}
+
+// closeCount reports how many times the handle ownership was released.
+func (process *platformProcess) closeCount() int {
+	process.mu.Lock()
+	defer process.mu.Unlock()
+	return process.releases
+}
 
 func (process *platformProcess) verifyGone(ctx context.Context) error {
 	for processGroupAlive(process.pgid) {
@@ -187,7 +214,10 @@ func processGroupHasLiveMember(pgid int) bool {
 	return false
 }
 
-func platformStopIdentity(identity ProcessIdentity, grace time.Duration) ([]string, error) {
+// platformStopIdentity stops a persisted identity through a process-group signal.
+// The bound parameter only belongs to platforms whose stop command is an external
+// program; here the grace period remains the only window, so it is ignored.
+func platformStopIdentity(_ context.Context, identity ProcessIdentity, grace, _ time.Duration) ([]string, error) {
 	pgid, err := syscall.Getpgid(identity.PID)
 	if errors.Is(err, syscall.ESRCH) {
 		return []string{"already-stopped"}, nil

@@ -61,7 +61,7 @@ func durableConfig(root string, amountMicros *int64, callCap, tokenCap int) Dura
 
 func openDurable(t *testing.T, root string, amountMicros *int64, callCap, tokenCap int) *DurableCostLedger {
 	t.Helper()
-	ledger, err := OpenDurableCostLedger(durableConfig(root, amountMicros, callCap, tokenCap))
+	ledger, err := OpenDurableCostLedger(context.Background(), durableConfig(root, amountMicros, callCap, tokenCap))
 	if err != nil {
 		t.Fatalf("open durable ledger: %v", err)
 	}
@@ -228,7 +228,7 @@ func TestDurableHelperReserve(t *testing.T) {
 	index := os.Getenv(durableIndexEnv)
 
 	amount := int64(100)
-	ledger, err := OpenDurableCostLedger(durableConfig(root, &amount, 10, 1000))
+	ledger, err := OpenDurableCostLedger(context.Background(), durableConfig(root, &amount, 10, 1000))
 	if err != nil {
 		os.Exit(12)
 	}
@@ -444,7 +444,7 @@ func TestDurableUnknownKeepsOccupancyAfterReload(t *testing.T) {
 		t.Fatalf("close before reopen: %v", err)
 	}
 
-	reopened, err := OpenDurableCostLedger(durableConfig(root, &amount, 3, 300))
+	reopened, err := OpenDurableCostLedger(context.Background(), durableConfig(root, &amount, 3, 300))
 	if err != nil {
 		t.Fatalf("reopen durable ledger: %v", err)
 	}
@@ -519,7 +519,7 @@ func TestDurableCommitFailureKeepsVisibleRecord(t *testing.T) {
 		}
 		return nil
 	}
-	faulted, err := OpenDurableCostLedger(faultConfig)
+	faulted, err := OpenDurableCostLedger(context.Background(), faultConfig)
 	if err != nil {
 		t.Fatalf("open faulted ledger: %v", err)
 	}
@@ -652,7 +652,7 @@ func TestP39DurableHelperDeadlineReserve(t *testing.T) {
 	}
 
 	amount := int64(100)
-	ledger, err := OpenDurableCostLedger(durableConfig(root, &amount, 10, 1000))
+	ledger, err := OpenDurableCostLedger(context.Background(), durableConfig(root, &amount, 10, 1000))
 	if err != nil {
 		os.Exit(12)
 	}
@@ -816,7 +816,7 @@ func TestP39DurableScopeLockStaysStable(t *testing.T) {
 	if alias == root {
 		t.Fatalf("test bug: alias root is not lexically distinct from root")
 	}
-	aliased, err := OpenDurableCostLedger(durableConfig(alias, &amount, 10, 1000))
+	aliased, err := OpenDurableCostLedger(context.Background(), durableConfig(alias, &amount, 10, 1000))
 	if err != nil {
 		// Fail-closed is an accepted outcome, but only for a classified reason.
 		if !errors.Is(err, ErrInvalidCostLedger) {
@@ -864,7 +864,7 @@ func TestP39DurableScopeLockStaysStable(t *testing.T) {
 			// elevated principal to create symlinks.
 			t.Skipf("symlink alias unavailable on this platform: %v", err)
 		}
-		linked, err := OpenDurableCostLedger(durableConfig(link, &amount, 10, 1000))
+		linked, err := OpenDurableCostLedger(context.Background(), durableConfig(link, &amount, 10, 1000))
 		if err != nil {
 			if !errors.Is(err, ErrInvalidCostLedger) {
 				t.Fatalf("symlinked root must resolve to the same lock or fail closed, got %v", err)
@@ -956,7 +956,7 @@ func TestP39DurableReloadRejectsHistoryDrift(t *testing.T) {
 		idRecord.Ledger.LedgerID = "durable-cost-ledger-other"
 		p39WriteRecord(t, idPath, idRecord)
 
-		reopened, err := OpenDurableCostLedger(durableConfig(idRoot, &amount, 10, 1000))
+		reopened, err := OpenDurableCostLedger(context.Background(), durableConfig(idRoot, &amount, 10, 1000))
 		if err == nil {
 			_ = reopened.Close()
 			t.Fatalf("identity drift must not be adopted on reopen")
@@ -1124,7 +1124,7 @@ func TestP39DurablePrecommitFaultsRejectAck(t *testing.T) {
 				}
 				return injected
 			}
-			faulted, err := OpenDurableCostLedger(config)
+			faulted, err := OpenDurableCostLedger(context.Background(), config)
 			if err != nil {
 				t.Fatalf("open faulted ledger: %v", err)
 			}
@@ -1162,7 +1162,7 @@ func TestP39DurablePrecommitFaultsRejectAck(t *testing.T) {
 				if !bytes.Equal(before, after) {
 					t.Fatalf("uncommitted failure mutated the canonical bytes")
 				}
-				recovered, err := OpenDurableCostLedger(durableConfig(root, &amount, 10, 1000))
+				recovered, err := OpenDurableCostLedger(context.Background(), durableConfig(root, &amount, 10, 1000))
 				if err != nil {
 					t.Fatalf("retry after a provably uncommitted failure must succeed: %v", err)
 				}
@@ -1189,7 +1189,7 @@ func TestP39DurablePrecommitFaultsRejectAck(t *testing.T) {
 			}
 			return nil
 		}
-		ledger, err := OpenDurableCostLedger(config)
+		ledger, err := OpenDurableCostLedger(context.Background(), config)
 		if err == nil {
 			_ = ledger.Close()
 			t.Fatalf("faulted initial allocation must fail")
@@ -1238,7 +1238,7 @@ func TestP39DurableLedgerMissingCannotReissueAllocation(t *testing.T) {
 		t.Fatalf("remove canonical ledger: %v", err)
 	}
 
-	reopened, err := OpenDurableCostLedger(durableConfig(root, &amount, 10, 1000))
+	reopened, err := OpenDurableCostLedger(context.Background(), durableConfig(root, &amount, 10, 1000))
 	if err == nil {
 		_ = reopened.Close()
 		t.Fatalf("missing ledger after initialization must fail closed")
@@ -1253,7 +1253,7 @@ func TestP39DurableLedgerMissingCannotReissueAllocation(t *testing.T) {
 		t.Fatalf("failed reopen recreated the canonical ledger (initial allocation re-issued)")
 	}
 
-	second, err := OpenDurableCostLedger(durableConfig(root, &amount, 10, 1000))
+	second, err := OpenDurableCostLedger(context.Background(), durableConfig(root, &amount, 10, 1000))
 	if err == nil {
 		_ = second.Close()
 		t.Fatalf("repeated reopen must keep failing closed")

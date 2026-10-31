@@ -96,8 +96,17 @@ type DurableCostLedger struct {
 
 // OpenDurableCostLedger resolves the canonical ledger path for the configured
 // scope, creates the initial allocation when the ledger does not exist yet and
-// otherwise reloads and verifies the existing snapshot.
-func OpenDurableCostLedger(config DurableCostLedgerConfig) (*DurableCostLedger, error) {
+// otherwise reloads and verifies the existing snapshot. The caller's context
+// governs the whole open: it is checked before any configuration work and used
+// for the scope lock wait, so a stuck sibling process cannot block the open
+// forever.
+func OpenDurableCostLedger(ctx context.Context, config DurableCostLedgerConfig) (*DurableCostLedger, error) {
+	if ctx == nil {
+		return nil, fmt.Errorf("%w: durable ledger requires a context", ErrInvalidCostLedger)
+	}
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 	root := strings.TrimSpace(config.Root)
 	if root == "" {
 		return nil, fmt.Errorf("%w: durable root is required", ErrInvalidCostLedger)
@@ -118,7 +127,7 @@ func OpenDurableCostLedger(config DurableCostLedgerConfig) (*DurableCostLedger, 
 		initial:     config.Initial,
 		commitFault: config.CommitFault,
 	}
-	if err := ledger.run(context.Background(), ledger.bootstrap); err != nil {
+	if err := ledger.run(ctx, ledger.bootstrap); err != nil {
 		return nil, err
 	}
 	return ledger, nil
@@ -315,6 +324,13 @@ func (ledger *DurableCostLedger) runWithLock(ctx context.Context, writable bool,
 			return err
 		}
 	}
+	// The scope locks form one global order: a goroutine may hold them only in a
+	// strictly increasing path sequence, so two paths taking the same two scopes
+	// in opposite orders cannot deadlock - the descending one is refused.
+	goroutine := currentGoroutineID()
+	if err := durableLockOrder.check(goroutine, ledger.lockPath); err != nil {
+		return err
+	}
 	ledger.mu.Lock()
 	defer ledger.mu.Unlock()
 	if ledger.closed {
@@ -324,7 +340,11 @@ func (ledger *DurableCostLedger) runWithLock(ctx context.Context, writable bool,
 	if err != nil {
 		return err
 	}
-	defer func() { _ = release() }()
+	durableLockOrder.push(goroutine, ledger.lockPath)
+	defer func() {
+		durableLockOrder.pop(goroutine)
+		_ = release()
+	}()
 	return fn()
 }
 

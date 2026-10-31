@@ -69,6 +69,7 @@
 | P37 P37-T027B-BREAKTHROUGH | ✅ 已完成 | P36 | L | 2026-10-30 | docs/validation/t027b-breakthrough{,_EN}.md |
 | P38 P38-T027B-TACTICAL-BLUEPRINT | ✅ 已完成 | P37 | L | 2026-10-31 | docs/validation/t027b-tactical-blueprint{,_EN}.md |
 | P39 P39-T027B-DURABLE-BUDGET | ✅ 已完成 | P38 | L | 2026-10-31 | docs/validation/p39-durable-budget{,_EN}.md |
+| P40 P40-T027B-LOCK-REAPER | ✅ 已闭环 | P39 | L | 2026-10-31 | docs/validation/p40-lock-reaper{,_EN}.md |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -1262,6 +1263,27 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | R / D 基线 | 本片 R = 4、D = 0（从零起算，不继承 P38 的 R=8 / D=0） |
 | 临时件落点声明 | 本片临时目录 = `tmp/P39-T027B-DURABLE-BUDGET/`（⑧c 前只增不删） |
 
+
+### P40 — `P40-T027B-LOCK-REAPER` · ✅ 已闭环
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `P40-T027B-LOCK-REAPER`（实现类；准则 v1.60） |
+| 状态 | ✅ **已闭环**（2026-10-31；提交与 CI 由 ⑩ 回执载明） |
+| 目标 | 解决 C1 死锁与锁序：每进程唯一 reaper（`waitOnce` / `waitDone`）替代无界等待；预算锁与 replay 锁绝不嵌套 |
+| 依赖 | P39 已闭环（`HEAD` = `4994fa8`，持久预算已落地）；文档已对齐（`8517e45`）；v29 已落盘（`38a5cba`） |
+| 规模 | L（跨 guard / adapters / tickets 的锁序与回收） |
+| 步骤 | 步骤 0 → ① 架构（V4 Pro）→ ③ 红测 → ② 转绿 → ⑤ 预审 → ⑥ 扫描 → ⑦ 终审 → 报告装配 → ⑨ → ⑧c → ⑩ |
+| 现状缺口 | C1：`Run` / `Terminate` 存在无界回收等待；锁序无机械约束；跨锁嵌套可致死锁 |
+| 交付物 | 报告对 `docs/validation/p40-lock-reaper{,_EN}.md`；证据包 `docs/validation/evidence/P40-T027B-LOCK-REAPER/`；执行自由度清单 |
+| 验收证据 | ③ 红测先行（并发死锁与无界等待反例）；`go build` / `go vet` / `go test ./...` 全绿；三作用域 TOTAL_FAIL=0 且 SELFTEST 697/697；报告 CN/EN 六形状全等 |
+| 边界 | 不改契约 / schema / fixtures；不改准则业务规则；不推 gitee；commit 否 / push 否，停 ⑩ 等授权 |
+| 分级 | `[SLICE]`（实现类） |
+| 探针额度 | 无 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/P40-T027B-LOCK-REAPER/freedom-list.md` |
+| R / D 基线 | R = 0、D = 0（不继承上片） |
+| 临时件落点声明 | 本片临时目录 = `tmp/P40-T027B-LOCK-REAPER/`（⑧c 前只增不删） |
+| 完成记录 | ① 架构确认 → ③ 红测（RED-CONFIRMED）→ ② 两轮转绿（含方案 A 与 F-01..F-06）→ ⑤ 两轮（r1 PASS WITH FIXES → r2 PASS）→ ⑥ INDEPENDENT SCAN: PASS → ⑦ FINAL REVIEW: PASS；R=0 D=0；后续片候选见报告 §后续片候选登记 |
 
 ## 已知缺陷（后续切片前处理）
 

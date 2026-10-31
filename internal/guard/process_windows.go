@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 	"unsafe"
@@ -68,7 +69,23 @@ type extendedLimitInformation struct {
 	PeakJobMemoryUsed     uintptr
 }
 
-type platformProcess struct{ job syscall.Handle }
+// platformProcess owns the Job object handle. Several goroutines may stop and
+// close concurrently (a Run racing two Terminate calls), so every handle use is
+// serialised and close is idempotent.
+type platformProcess struct {
+	mu  sync.Mutex
+	job syscall.Handle
+	// releases counts real Job handle releases. close only ever closes a live
+	// handle, so the count stops at 1; a same-package test uses closeCount to pin
+	// that the handle is released exactly once.
+	releases int
+}
+
+func (process *platformProcess) handle() (syscall.Handle, bool) {
+	process.mu.Lock()
+	defer process.mu.Unlock()
+	return process.job, process.job != 0
+}
 
 func preparePlatformProcess(cmd *exec.Cmd) (platformProcess, error) {
 	cmd.SysProcAttr = &syscall.SysProcAttr{CreationFlags: createSuspended}
@@ -88,13 +105,17 @@ func preparePlatformProcess(cmd *exec.Cmd) (platformProcess, error) {
 }
 
 func (process *platformProcess) attach(pid int) error {
+	job, ok := process.handle()
+	if !ok {
+		return errors.New("managed process job handle is closed")
+	}
 	handle, err := syscall.OpenProcess(processSetQuota|processTerminate|processSuspendResume, false, uint32(pid))
 	if err != nil {
 		return err
 	}
 	defer syscall.CloseHandle(handle)
-	ok, _, callErr := procAssignProcessToJob.Call(uintptr(process.job), uintptr(handle))
-	if ok == 0 {
+	assigned, _, callErr := procAssignProcessToJob.Call(uintptr(job), uintptr(handle))
+	if assigned == 0 {
 		return callErr
 	}
 	status, _, _ := procNtResumeProcess.Call(uintptr(handle))
@@ -105,6 +126,13 @@ func (process *platformProcess) attach(pid int) error {
 }
 
 func (process *platformProcess) stop(_ ProcessIdentity, _ time.Duration) ([]string, error) {
+	process.mu.Lock()
+	defer process.mu.Unlock()
+	if process.job == 0 {
+		// The handle is already released: closing the Job object already killed
+		// the tree (kill-on-job-close), so the stop is proven by construction.
+		return []string{"job-object-released"}, nil
+	}
 	ok, _, callErr := procTerminateJobObject.Call(uintptr(process.job), 1)
 	if ok == 0 {
 		return []string{"terminate-job-object"}, callErr
@@ -113,6 +141,11 @@ func (process *platformProcess) stop(_ ProcessIdentity, _ time.Duration) ([]stri
 }
 
 func (process *platformProcess) terminate() error {
+	process.mu.Lock()
+	defer process.mu.Unlock()
+	if process.job == 0 {
+		return nil
+	}
 	ok, _, callErr := procTerminateJobObject.Call(uintptr(process.job), 1)
 	if ok == 0 {
 		return callErr
@@ -121,10 +154,20 @@ func (process *platformProcess) terminate() error {
 }
 
 func (process *platformProcess) close() {
+	process.mu.Lock()
+	defer process.mu.Unlock()
 	if process.job != 0 {
 		_ = syscall.CloseHandle(process.job)
 		process.job = 0
+		process.releases++
 	}
+}
+
+// closeCount reports how many times the Job handle was really released.
+func (process *platformProcess) closeCount() int {
+	process.mu.Lock()
+	defer process.mu.Unlock()
+	return process.releases
 }
 
 func (process *platformProcess) verifyGone(_ context.Context) error { return nil }
@@ -171,20 +214,56 @@ func platformIdentityAlive(identity ProcessIdentity) (bool, error) {
 	return current.StartToken == identity.StartToken, nil
 }
 
-func platformStopIdentity(identity ProcessIdentity, _ time.Duration) ([]string, error) {
+// stopCommandResult carries one finished taskkill invocation back to the caller
+// that is still waiting for it.
+type stopCommandResult struct {
+	output []byte
+	err    error
+}
+
+// platformStopIdentity stops a persisted process identity through taskkill.
+//
+// taskkill is a detached child: it is never killed when it outlives bound, because
+// a half-run taskkill leaves the tree partially stopped and its result unknown. The
+// goroutine hands its result to a buffered channel so a late completion is still
+// reclaimed (exactly one CombinedOutput/Wait per command) without blocking forever.
+// On expiry the caller gets errStopCommandExpired and must verify the tree itself.
+func platformStopIdentity(ctx context.Context, identity ProcessIdentity, _, bound time.Duration) ([]string, error) {
+	if ctx == nil {
+		ctx = context.Background()
+	}
 	actions := []string{"taskkill-process-tree"}
+	if bound <= 0 {
+		bound = identityStopCommandBound
+	}
 	command := exec.Command("taskkill", "/PID", strconv.Itoa(identity.PID), "/T", "/F")
-	output, err := command.CombinedOutput()
-	if err != nil {
-		text := strings.ToLower(string(output))
+	done := make(chan stopCommandResult, 1)
+	go func() {
+		output, err := command.CombinedOutput()
+		done <- stopCommandResult{output: output, err: err}
+	}()
+	timer := time.NewTimer(bound)
+	defer timer.Stop()
+	var result stopCommandResult
+	select {
+	case result = <-done:
+	case <-ctx.Done():
+		// Same shape as an expiry: the detached command may still finish the job,
+		// so this reports "unknown" rather than a failure.
+		return append(actions, "taskkill-detached"), fmt.Errorf("%w: taskkill for pid %d was left running: %v", errStopCommandExpired, identity.PID, ctx.Err())
+	case <-timer.C:
+		return append(actions, "taskkill-detached"), fmt.Errorf("%w: taskkill did not finish for pid %d within %s", errStopCommandExpired, identity.PID, bound)
+	}
+	if result.err != nil {
+		text := strings.ToLower(string(result.output))
 		if strings.Contains(text, "not found") || strings.Contains(text, "no running instance") {
 			return []string{"already-stopped"}, nil
 		}
-		trimmed := strings.TrimSpace(string(output))
+		trimmed := strings.TrimSpace(string(result.output))
 		if trimmed == "" {
-			return actions, err
+			return actions, result.err
 		}
-		return actions, fmt.Errorf("taskkill failed: %w (%s)", err, trimmed)
+		return actions, fmt.Errorf("taskkill failed: %w (%s)", result.err, trimmed)
 	}
 	return actions, nil
 }

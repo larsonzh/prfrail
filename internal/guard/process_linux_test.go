@@ -7,9 +7,12 @@ import (
 	"errors"
 	"os"
 	"os/exec"
+	"strings"
 	"syscall"
 	"testing"
 	"time"
+
+	"github.com/larsonzh/prfrail/internal/evidence"
 )
 
 // proofrailGuardZombieHelperEnv marks the child half of the zombie test: the
@@ -95,4 +98,80 @@ func TestLinuxStopProvesAnUnreapedTerminatedChild(t *testing.T) {
 		}
 	}
 	reaped = true
+}
+
+// proofrailGuardOrphanHelperEnv marks the two child halves of the remaining-tree
+// test: "parent" starts a child in the same process group and exits at once,
+// "child" stays alive so the tree outlives its parent.
+const proofrailGuardOrphanHelperEnv = "PROOFRAIL_GUARD_ORPHAN_HELPER"
+
+func proofrailGuardOrphanSpec(value string) ProcessSpec {
+	env := make([]string, 0, len(os.Environ())+1)
+	for _, entry := range os.Environ() {
+		if strings.HasPrefix(entry, proofrailGuardOrphanHelperEnv+"=") {
+			continue
+		}
+		env = append(env, entry)
+	}
+	env = append(env, proofrailGuardOrphanHelperEnv+"="+value)
+	return ProcessSpec{
+		Command: os.Args[0],
+		Args:    []string{"-test.run=^TestLinuxNaturalExitReportsRemainingTree$"},
+		Env:     env,
+	}
+}
+
+// TestLinuxNaturalExitReportsRemainingTree pins the natural-exit branch that has
+// no Windows equivalent: the managed parent exits while a descendant keeps the
+// process group alive, so the exit is reported as ErrProcessTreeRemained with a
+// termination proof, and the handle is released exactly once after the group is
+// proven gone.
+func TestLinuxNaturalExitReportsRemainingTree(t *testing.T) {
+	switch os.Getenv(proofrailGuardOrphanHelperEnv) {
+	case "parent":
+		child := exec.Command(os.Args[0], "-test.run=^TestLinuxNaturalExitReportsRemainingTree$")
+		child.Env = proofrailGuardOrphanSpec("child").Env
+		if err := child.Start(); err != nil {
+			os.Exit(3)
+		}
+		// The parent exits without waiting: the child is left behind in the same
+		// process group, which is exactly the shape runManaged must report.
+		return
+	case "child":
+		time.Sleep(30 * time.Second)
+		return
+	}
+
+	process, err := StartManaged(context.Background(), proofrailGuardOrphanSpec("parent"))
+	if err != nil {
+		t.Fatalf("start managed process: %v", err)
+	}
+	t.Cleanup(func() { process.platform.close() })
+
+	startedAt := time.Now().UTC()
+	result, err := process.Run(context.Background(), time.Second, startedAt)
+	if !errors.Is(err, ErrProcessTreeRemained) {
+		t.Fatalf("a natural exit that leaves a descendant = %v, want ErrProcessTreeRemained", err)
+	}
+	if result.Termination == nil {
+		t.Fatal("a remaining tree must still carry termination evidence")
+	}
+	if result.Termination.Outcome != "stopped" {
+		t.Fatalf("termination outcome = %q, want stopped after the tree was stopped", result.Termination.Outcome)
+	}
+	if !evidence.ValidHash(result.Termination.Hash) {
+		t.Fatalf("termination evidence hash is invalid: %+v", result.Termination)
+	}
+	stopped := false
+	for _, action := range result.Termination.Actions {
+		if action == "signal-term-process-group" {
+			stopped = true
+		}
+	}
+	if !stopped {
+		t.Fatalf("the remaining tree must be stopped through the process group: %v", result.Termination.Actions)
+	}
+	if got := process.platform.closeCount(); got != 1 {
+		t.Fatalf("the handle must be released exactly once, closeCount = %d", got)
+	}
 }

@@ -69,6 +69,7 @@
 | P37 P37-T027B-BREAKTHROUGH | ✅ Done | P36 | L | 2026-10-30 | docs/validation/t027b-breakthrough{,_EN}.md |
 | P38 P38-T027B-TACTICAL-BLUEPRINT | ✅ Done | P37 | L | 2026-10-31 | docs/validation/t027b-tactical-blueprint{,_EN}.md |
 | P39 P39-T027B-DURABLE-BUDGET | ✅ Done | P38 | L | 2026-10-31 | docs/validation/p39-durable-budget{,_EN}.md |
+| P40 P40-T027B-LOCK-REAPER | ✅ Closed | P39 | L | 2026-10-31 | docs/validation/p40-lock-reaper{,_EN}.md |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1249,6 +1250,27 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | R / D baseline | R = 4, D = 0 for this slice (counted from zero, not inherited from the P38 R=8 / D=0) |
 | Temp-artifact landing declaration | this slice temp directory = `tmp/P39-T027B-DURABLE-BUDGET/` (append-only until ⑧c) |
 
+
+### P40 — `P40-T027B-LOCK-REAPER` · ✅ Closed
+
+| Field | Content |
+|---|---|
+| Identity | `P40-T027B-LOCK-REAPER` (implementation type; directive v1.60) |
+| Status | ✅ **Closed** (2026-10-31; commit and CI are carried by the 10 receipt) |
+| Goal | Fix C1 deadlock and lock order: one reaper per process (`waitOnce` / `waitDone`) instead of unbounded waiting; the budget lock and the replay lock never nest |
+| Dependency | P39 closed (`HEAD` = `4994fa8`, the durable budget has landed); documents aligned (`8517e45`); v29 landed (`38a5cba`) |
+| Size | L (lock order and reaping across guard / adapters / tickets) |
+| Steps | step 0 -> round 1 architecture (V4 Pro) -> red tests -> green implementation -> pre-review -> scan -> final review -> report assembly -> 9 -> 8c -> 10 |
+| Current gap | C1: `Run` / `Terminate` carry unbounded reclaim waits; no mechanical lock order; nested locks can deadlock |
+| Deliverables | report pair `docs/validation/p40-lock-reaper{,_EN}.md`; evidence pack `docs/validation/evidence/P40-T027B-LOCK-REAPER/`; freedom list |
+| Acceptance evidence | tests first with concurrency-deadlock and unbounded-wait counter examples; `go build` / `go vet` / `go test ./...` green; three scopes TOTAL_FAIL=0 and SELFTEST 697/697; report CN/EN six shapes equal |
+| Boundary | no change to contracts / schema / fixtures; no change to directive business rules; no gitee push; commit no / push no, stop at 10 for authorisation |
+| Tier | `[SLICE]` (implementation type) |
+| Probe quota | none |
+| Freedom-list path | `docs/validation/evidence/P40-T027B-LOCK-REAPER/freedom-list.md` |
+| R / D baseline | R = 0, D = 0 (not inherited) |
+| Temp-artifact landing declaration | this slice temp directory = `tmp/P40-T027B-LOCK-REAPER/` (append-only until 8c) |
+| Completion record | 1 architecture confirmed -> 3 red tests (RED-CONFIRMED) -> 2 two rounds to green (plan A plus F-01..F-06) -> 5 two rounds (r1 PASS WITH FIXES -> r2 PASS) -> 6 INDEPENDENT SCAN: PASS -> 7 FINAL REVIEW: PASS; R=0 D=0; later-slice candidates in the report section Later-slice candidates |
 
 ## Known defects (to be handled before later slices)
 

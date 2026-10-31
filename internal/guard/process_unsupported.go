@@ -20,6 +20,7 @@ func (platformProcess) stop(ProcessIdentity, time.Duration) ([]string, error) {
 }
 func (platformProcess) terminate() error { return nil }
 func (platformProcess) close()           {}
+func (platformProcess) closeCount() int  { return 0 }
 func (platformProcess) verifyGone(context.Context) error {
 	return errors.New("unsupported platform")
 }
@@ -30,6 +31,6 @@ func platformIdentityAlive(ProcessIdentity) (bool, error) {
 	return false, errors.New("unsupported platform")
 }
 
-func platformStopIdentity(ProcessIdentity, time.Duration) ([]string, error) {
+func platformStopIdentity(context.Context, ProcessIdentity, time.Duration, time.Duration) ([]string, error) {
 	return nil, errors.New("unsupported platform")
 }
