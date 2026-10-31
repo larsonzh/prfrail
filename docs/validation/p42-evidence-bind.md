@@ -88,7 +88,7 @@ INDEPENDENT SCAN: PASS
 | D4 | `BuildReleaseInventory` 不迁移 | ① 修订注记 | 设计清单项收窄：adapters 到 evidence 的依赖方向不允许反向复用；release 树由操作员选定，不属候选可写面，归后续读路径 sweep 片 |
 | D5 | 上界 64 MiB 与 1 MiB | ② 实现期 | 安全：`agentRunnerWorkspaceEntryBound` 为 64 MiB，`agentRunnerMetadataBound` / `replayStoreRecordBound` / `fileQueueEnvelopeBound` 为 1 MiB，fail-closed 方向 |
 | D6 | `CloseBoundDirs` 无生产调用方 | ⑤ r2 N1 | 已登记：句柄存活期以 store / 进程为上限；注释仍称 per-request，与 D1 的基目录口径矛盾，随生产接线一并修正 |
-| D7 | darwin 交叉编译失效 | ⑤ r1 实测 | 口径替代：`GOOS=darwin` 失败于 `bounddir_unix.go:61` 的 `undefined: syscall.Openat`，`GOOS=linux` 通过；支持矩阵仅 windows / linux，`docs/validation/t027-replay-convergence.md:38` 旧「Darwin/amd64 交叉编译通过」条目失效，旧文档修订归后续文档片 |
+| D7 | darwin 目录绑定不可用 | ⑤ r1 实测 | 口径替代：标准库在 darwin 无 `syscall.Openat`，实现侧把 darwin 排除出 `bounddir_unix.go` 并由 `bounddir_darwin.go` 提供 fail-closed 桩（`ErrBoundDirUnsupported`），darwin 可编译但运行期拒绝目录绑定；支持矩阵仍为 windows / linux，`docs/validation/t027-replay-convergence.md:38` 旧「Darwin/amd64 交叉编译通过」条目失效，旧文档修订归后续文档片 |
 | D8 | `allowTruncation` 由调用方按类判定 | ② 实现期 | 安全：契约由调用点显式选择，原语不猜类别 |
 
 - **残余面登记**：`runs/<requestId>` 同层替换属兄弟节点，不在基目录句柄覆盖内，由唯一生产调用方以冻结摘要比对 fail-closed，替换退化为失败而非可信证据；Windows「派生名到 `CreateFile`」之间的再替换窗口由 `confirmOpenedArtifact` 的句柄级复核封住；Unix 中间组件与绝对目标链接向量归后续两段式 dirfd 片。
@@ -152,7 +152,7 @@ INDEPENDENT SCAN: PASS
 - **FR-06 · 状态 = 接受（措辞层）**：与 N6 同源。
 - **批量辅助发现 · 状态 = 接受 + 后续片**：原语层三处测试缺口（关闭后拒读 / 超界拒摘要 / 身份同源对抗），主链经单次读即关闭与 `ReadAll` 路径规避，新调用方需自证。
 - **FR-07 · 状态 = 接受（口径替代）**：支持矩阵仅 windows / linux；`docs/validation/t027-replay-convergence.md:38` 旧条目失效的修订归后续文档片。
-- **D7 · 状态 = 接受（口径替代）**：`GOOS=darwin` 在 `internal/adapters/bounddir_unix.go:61` 的 `syscall.Openat` 处编译失败，`GOOS=linux` 通过；平台支持面按 windows / linux 收口，代码不改，旧文档条目修订归后续文档片。
+- **D7 · 状态 = 接受（口径替代）**：标准库在 darwin 无 `syscall.Openat`，故 `internal/adapters/bounddir_unix.go` 排除 darwin，`internal/adapters/bounddir_darwin.go` 以 `ErrBoundDirUnsupported` 拒绝目录绑定（不退回按路径打开）；darwin 现可编译、运行期 fail-closed，平台支持面仍按 windows / linux 收口，旧文档条目修订归后续文档片。
 
 ```artifacts
 docs/t027/REMAINING_SLICES_EN.md	repo
@@ -175,6 +175,7 @@ internal/adapters/agent_runner_replay_store_terminals.go	repo
 internal/adapters/agent_runner_replay_store.go	repo
 internal/adapters/agent_runner_run.go	repo
 internal/adapters/ai_probe_copilot_executor.go	repo
+internal/adapters/bounddir_darwin.go	repo
 internal/adapters/bounddir_unix.go	repo
 internal/adapters/bounddir_windows.go	repo
 internal/adapters/bounddir.go	repo

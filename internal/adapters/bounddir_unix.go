@@ -1,4 +1,4 @@
-//go:build !windows
+//go:build !windows && !darwin
 
 package adapters
 
@@ -6,6 +6,9 @@ package adapters
 // relative opens through openat(2) with O_NOFOLLOW and O_CLOEXEC. openat resolves
 // relative to the descriptor, so a replaced ancestor cannot redirect the read and
 // a leaf swapped for a symlink is refused instead of followed.
+//
+// darwin is excluded because the standard library has no syscall.Openat there; it
+// gets the fail-closed half in bounddir_darwin.go instead (validation report D7).
 
 import (
 	"fmt"

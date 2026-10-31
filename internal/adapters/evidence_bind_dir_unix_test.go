@@ -1,13 +1,14 @@
-//go:build !windows
+//go:build !windows && !darwin
 
 package adapters
 
 // P42-T027B-EVIDENCE-BIND ③ test-first (RED): Unix half of the directory binding
 // tests (design section 2 "Q2 ancestor directory replacement").
 //
-// The design states the Unix implementation under "//go:build !windows", so this
-// file uses the same constraint instead of the narrower "unix" tag: the invariant
-// must hold on every platform the implementation claims.
+// The file tracks the implementation's constraint rather than the narrower "unix"
+// tag: the invariant must hold on every platform the implementation claims. darwin
+// is excluded because the standard library has no syscall.Openat there and the
+// darwin half is a fail-closed stub (validation report D7).
 //
 // Pinned invariants (design section 4):
 //   I3 a bound directory keeps reading the directory object it opened, so an

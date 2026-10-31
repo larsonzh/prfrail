@@ -88,7 +88,7 @@ The final-review closed set is `FINAL REVIEW: PASS WITH FIXES` (3 Low + 4 Info);
 | D4 | `BuildReleaseInventory` is not migrated | revision note | Design item narrowed: the adapters-to-evidence dependency direction forbids reuse in the reverse direction; the release tree is operator-chosen and not a candidate-writable surface, so it belongs to the later read-path sweep slice |
 | D5 | bounds of 64 MiB and 1 MiB | implementation pass | Safe: `agentRunnerWorkspaceEntryBound` is 64 MiB and `agentRunnerMetadataBound` / `replayStoreRecordBound` / `fileQueueEnvelopeBound` are 1 MiB, in the fail-closed direction |
 | D6 | `CloseBoundDirs` has no production caller | pre-review r2 N1 | Registered: the handle lives with the store / process; the comment still says per-request, contradicting the D1 base-directory criterion, and is fixed together with the production wiring |
-| D7 | darwin cross-compilation no longer works | pre-review r1 measurement | Criterion replacement: `GOOS=darwin` fails with `undefined: syscall.Openat` at `bounddir_unix.go:61` while `GOOS=linux` passes; the support matrix is windows / linux only, the old "Darwin/amd64 cross-compilation passes" entry at `docs/validation/t027-replay-convergence.md:38` is void, and revising the old document belongs to a later documentation slice |
+| D7 | darwin directory binding unavailable | pre-review r1 measurement | Criterion replacement: the standard library has no `syscall.Openat` on darwin, so `bounddir_unix.go` excludes darwin and `bounddir_darwin.go` supplies a fail-closed stub (`ErrBoundDirUnsupported`): darwin compiles but refuses directory binding at run time; the support matrix stays windows / linux, the old "Darwin/amd64 cross-compilation passes" entry at `docs/validation/t027-replay-convergence.md:38` is void, and revising the old document belongs to a later documentation slice |
 | D8 | `allowTruncation` is decided by the caller per class | implementation pass | Safe: the contract is chosen explicitly at the call site and the primitive never guesses a class |
 
 - **Residual surface registered**: a same-level replacement of `runs/<requestId>` is a sibling node outside the base-directory handle coverage, and the single production caller compares the frozen digest so the replacement fails closed instead of becoming trusted evidence; the Windows replacement window between the derived name and `CreateFile` is closed by the handle-grade re-check of `confirmOpenedArtifact`; Unix intermediate-component and absolute-target link vectors belong to the later two-stage dirfd slice.
@@ -152,7 +152,7 @@ The final-review closed set is `FINAL REVIEW: PASS WITH FIXES` (3 Low + 4 Info);
 - **FR-06 · status = accepted (wording layer)**: same origin as N6.
 - **Batch-assist finding · status = accepted + later slice**: three primitive-level test gaps (read-after-close / hash over-bound refusal / adversarial identity same-source); the main chain avoids them via single-read-then-close and the `ReadAll` path, new callers must self-verify.
 - **FR-07 · status = accepted (criterion replacement)**: the support matrix is windows / linux only; revising the void entry at `docs/validation/t027-replay-convergence.md:38` belongs to a later documentation slice.
-- **D7 · status = accepted (criterion replacement)**: `GOOS=darwin` fails to compile at `syscall.Openat` in `internal/adapters/bounddir_unix.go:61` while `GOOS=linux` passes; the supported platform surface is windows / linux, no code change is made, and revising the stale document entry belongs to a later documentation slice.
+- **D7 · status = accepted (criterion replacement)**: the standard library has no `syscall.Openat` on darwin, so `internal/adapters/bounddir_unix.go` excludes darwin and `internal/adapters/bounddir_darwin.go` refuses directory binding with `ErrBoundDirUnsupported` instead of falling back to a path-based open; darwin now compiles and fails closed at run time, the supported platform surface stays windows / linux, and revising the stale document entry belongs to a later documentation slice.
 
 ```artifacts
 docs/t027/REMAINING_SLICES_EN.md	repo
@@ -175,6 +175,7 @@ internal/adapters/agent_runner_replay_store_terminals.go	repo
 internal/adapters/agent_runner_replay_store.go	repo
 internal/adapters/agent_runner_run.go	repo
 internal/adapters/ai_probe_copilot_executor.go	repo
+internal/adapters/bounddir_darwin.go	repo
 internal/adapters/bounddir_unix.go	repo
 internal/adapters/bounddir_windows.go	repo
 internal/adapters/bounddir.go	repo
