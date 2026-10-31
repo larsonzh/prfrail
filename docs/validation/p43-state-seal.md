@@ -127,7 +127,11 @@ INDEPENDENT SCAN: PASS
 
 ## 提交与 CI
 
-- 主体提交、origin 推送与 CI 双腿包级证据：`⑧b 提交后回填`。
+- 主体提交：`b6e0f34` `feat: seal task evidence before acceptance and resolve the real attempt (P43-T027B-STATE-SEAL)`；推送 origin `9fa516b..b6e0f34`。
+- CI 运行 `41228033279` 首轮即双绿：`Go ubuntu-latest` success、`Go windows-latest` success。
+- ubuntu 腿硬证据：`ok internal/chain 0.348s`、`ok internal/console 1.904s`、`ok internal/tickets 1.999s`、Race 腿 `ok internal/chain 2.012s`、`SELFTEST: PASS 697/697`、`GATE REPORT scope=ci changed=32`、`TOTAL_FAIL=0`。
+- windows 腿硬证据：`ok internal/chain 5.607s`、`ok internal/console 22.474s`、`ok internal/tickets 5.034s`、`SELFTEST: PASS 697/697`、`GATE REPORT scope=ci changed=32`、`TOTAL_FAIL=0`。
+- 本报告回填提交属文档增量，其 CI 属观察运行，不计切片轮次。
 
 ## 后续片候选登记
 

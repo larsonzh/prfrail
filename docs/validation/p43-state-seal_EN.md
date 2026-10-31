@@ -127,7 +127,11 @@ The severity column keeps the review reports' own wording and is never bolded; t
 
 ## Commit and CI
 
-- main commit, origin push and the package-level evidence of both CI legs: `back-fill after 8b commit`.
+- Main commit: `b6e0f34` `feat: seal task evidence before acceptance and resolve the real attempt (P43-T027B-STATE-SEAL)`; pushed to origin as `9fa516b..b6e0f34`.
+- CI run `41228033279` went double green on the first attempt: `Go ubuntu-latest` success, `Go windows-latest` success.
+- ubuntu leg hard evidence: `ok internal/chain 0.348s`, `ok internal/console 1.904s`, `ok internal/tickets 1.999s`, Race leg `ok internal/chain 2.012s`, `SELFTEST: PASS 697/697`, `GATE REPORT scope=ci changed=32`, `TOTAL_FAIL=0`.
+- windows leg hard evidence: `ok internal/chain 5.607s`, `ok internal/console 22.474s`, `ok internal/tickets 5.034s`, `SELFTEST: PASS 697/697`, `GATE REPORT scope=ci changed=32`, `TOTAL_FAIL=0`.
+- The back-fill commit behind this report is a documentation increment; its CI run is observe-only and does not count as a slice round.
 
 ## Later-slice candidate registrations
 
