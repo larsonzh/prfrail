@@ -120,7 +120,11 @@ INDEPENDENT SCAN: PASS
 
 ## 提交与 CI
 
-- ⑧b 提交后回填
+- 主体提交：`cab3e08` `feat: bind evidence reads to one handle and the evidence directory (P42-T027B-EVIDENCE-BIND)`；推送 origin `b355081..cab3e08`。
+- CI 运行 `41194972405` 首轮即双绿：`Go ubuntu-latest` success、`Go windows-latest` success。
+- ubuntu 腿硬证据：`ok … internal/adapters 12.230s`、`ok … internal/evidence 0.015s`、Race 腿 `ok … internal/adapters 89.088s`、`SELFTEST: PASS 697/697`、`GATE REPORT scope=ci changed=34`、`TOTAL_FAIL=0`。
+- windows 腿硬证据：`ok … internal/adapters 31.296s`、`ok … internal/evidence 0.181s`、`SELFTEST: PASS 697/697`、`GATE REPORT scope=ci changed=34`、`TOTAL_FAIL=0`。
+- 本报告回填提交属文档增量，其 CI 属观察运行，不计切片轮次。
 
 ## 后续片候选登记
 

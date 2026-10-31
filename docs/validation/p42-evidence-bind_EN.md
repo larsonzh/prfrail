@@ -120,7 +120,11 @@ The final-review closed set is `FINAL REVIEW: PASS WITH FIXES` (3 Low + 4 Info);
 
 ## Commit and CI
 
-- back-filled after the 8b commit
+- Main commit: `cab3e08` `feat: bind evidence reads to one handle and the evidence directory (P42-T027B-EVIDENCE-BIND)`; pushed to origin as `b355081..cab3e08`.
+- CI run `41194972405` went double green on the first attempt: `Go ubuntu-latest` success, `Go windows-latest` success.
+- ubuntu leg hard evidence: `ok ... internal/adapters 12.230s`, `ok ... internal/evidence 0.015s`, Race leg `ok ... internal/adapters 89.088s`, `SELFTEST: PASS 697/697`, `GATE REPORT scope=ci changed=34`, `TOTAL_FAIL=0`.
+- windows leg hard evidence: `ok ... internal/adapters 31.296s`, `ok ... internal/evidence 0.181s`, `SELFTEST: PASS 697/697`, `GATE REPORT scope=ci changed=34`, `TOTAL_FAIL=0`.
+- The back-fill commit behind this report is a documentation increment; its CI run is observe-only and does not count as a slice round.
 
 ## Later-slice candidate registrations
 
