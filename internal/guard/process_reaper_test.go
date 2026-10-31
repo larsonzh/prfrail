@@ -45,7 +45,6 @@ func TestTerminationDeadlineReturnsUncertain(t *testing.T) {
 	}
 	t.Cleanup(func() {
 		_ = process.cmd.Process.Kill()
-		_, _ = process.cmd.Process.Wait()
 		process.platform.close()
 	})
 
@@ -112,7 +111,6 @@ func TestConcurrentRunAndTerminateUseOneWaiter(t *testing.T) {
 	}
 	t.Cleanup(func() {
 		_ = process.cmd.Process.Kill()
-		_, _ = process.cmd.Process.Wait()
 	})
 	process.verify = func(ctx context.Context) error {
 		select {

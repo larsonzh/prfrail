@@ -1283,7 +1283,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 执行自由度清单落盘路径 | `docs/validation/evidence/P40-T027B-LOCK-REAPER/freedom-list.md` |
 | R / D 基线 | R = 0、D = 0（不继承上片） |
 | 临时件落点声明 | 本片临时目录 = `tmp/P40-T027B-LOCK-REAPER/`（⑧c 前只增不删） |
-| 完成记录 | ① 架构确认 → ③ 红测（RED-CONFIRMED）→ ② 两轮转绿（含方案 A 与 F-01..F-06）→ ⑤ 两轮（r1 PASS WITH FIXES → r2 PASS）→ ⑥ INDEPENDENT SCAN: PASS → ⑦ FINAL REVIEW: PASS；R=0 D=0；后续片候选见报告 §后续片候选登记 |
+| 完成记录 | ① 架构确认 → ③ 红测（RED-CONFIRMED）→ ② 两轮转绿（含方案 A 与 F-01..F-06）→ ⑤ 两轮（r1 PASS WITH FIXES → r2 PASS）→ ⑥ INDEPENDENT SCAN: PASS → ⑦ FINAL REVIEW: PASS；R=0 D=0（推送后 CI 暴露 Go 1.22 兼容缺陷，已按裁定修复并登记 DR-12）；后续片候选见报告 §后续片候选登记 |
 
 ## 已知缺陷（后续切片前处理）
 
@@ -1299,6 +1299,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | **DR-7** | 测试：`internal/adapters`（A6 钉住 CLI 适配器，非本片引入） | `TestAgentRunnerPinnedCLIRunOperatorAskOutranksSuccessAndTimeout` **失败 1 次**（2026-09-23，纯文档提交 `a28cca8` 的 CI）：`agent_runner_run_test.go:254: an operator request must outrank a timeout: {… Status:uncertain …}`；隔离重跑（`go test -count=5 -run … ./internal/adapters/`）**5 次全绿**，同提交本地 `go test ./...` 全包绿 ⇒ 定性为“复跑即绿”的时序抖动；属**新包 / 新测试名**（DR-2/3/4/5 = `enforcement-proxy`；DR-6 = `internal/gates`） | run **`35827240637`**（head `a28cca8`）**首跑** Windows 腿 `Test` 步骤**红**（`Gates` 步骤与 Ubuntu 腿均绿、其余包全 `ok`），同 run `gh run rerun --failed` → **attempt 2 双腿全绿**、终态 `success`；该片无任何 `.go` 改动（仅 2 个 `.md`）⇒ 与改动无因果关联 | **按 DR 处置口径边界①登记**（新包 / 新测试名 ⇒ 必须单独登记）；不阻断本片推送（推送已完成、复跑已取证）；**不并入 DR-FIX 结论**（不同包、非同一根因假设）；**观察中**：单次出现、本地 `-count=5` 未复现、与改动无因果关联；若再次出现（同测试、同断言串）即按边界①升格为独立切片修复 |
 | **DR-9** | 测试：`internal/console`（**本片新增**的正向全链腿，非既有缺陷包） | `TestAgentRunnerAssemblyFullChain` **首跑红 1 次**（CI run `37070276731` / head `68a1ef0` 的 Ubuntu 腿 `Test` 步）：`runtime_agent_e2e_test.go:464: the production assembly must complete: invalid AgentRunner terminal intent: observed settlement requires a non-negative charged amount`。**性质 = 真实缺陷（非 flake）**：本片新增 (A′) 映射未履行「金额由调用方供给」的既有义务（`tools/b4-e2e/runmap.go` 的 divergence (b)）；Windows 上该路径不可达（durability unproven）⇒ ⑦ 三轮与 Windows 原生证据都无法发现，由 Ubuntu CI 腿首次执行正向全链时暴露。**处置 = 本片修复**（声明式离线工作负载补零成本金额 + 显式边界注释 + 断言；边界：接入真实付费候选时必须由调用方提供真实金额，不得默认为 0，否则按发布器既有拒绝路径 fail-closed）。**边界依据 = 准则 §6.4 边界①「新测试名 / 新失败类型 ⇒ 必须单独登记」**；不另立 OB。 |
 | **DR-11** | 门禁判据：`G3(a.1)` 的 `_EN` 镜像对称（本片引入，非既有缺陷） | **单边提交**：只改 CN 报告一行而未配 `_EN` 等量改动 ⇒ `G3(a.1)` 报 `+1/-1 vs +0/-0 MISMATCH`，双腿 `Gates` 步判红（确定性，非偶发） | CI run `39903364280` 首跑红 + 同 run `gh run rerun --failed` 复跑仍红 | **已修复**（`6149a80`：补 `_EN` 等量改动使 `+1/-1` 对称，双腿双绿）；纪律：**提交前必须门禁绿**，单语编辑必须同轮镜像 |
+| **DR-12** | 测试：`internal/guard`（本片 P40 红测，非既有缺陷包） | 红测 cleanup 阶段双重 `Process.Wait()`：唯一 reaper 已 `cmd.Wait()` 收割子进程后再次 `os.Process.Wait()`，Go 1.22 Windows 下句柄已关闭 → `WaitForSingleObject(-1, INFINITE)` 确定性阻塞直至超时（guard 包 600s 超时）；Go 1.27 下该行为被容忍（本机全绿） ⇒ **工具链版本差异兼容缺陷**（⑤ r2 曾记 Note，被 CI 证伪升格） | CI run `41164098703`（head `3fab6ba`）windows 腿 `Test` 步红（guard 600.019s panic）、ubuntu 腿全绿；本机 Go 1.27.0 `-count=1` 全绿 | **已修复**（方案 A：删除 `process_reaper_test.go` 两处冗余 Wait，保留 Kill/close，零断言弱化；修复提交见 ⑩ 回执）；**环境排查纪律**：CI 与本机行为分歧时优先排查工具链版本差异 |
 
 > 本表只登记**已观测到证据**的缺陷；DR-1 见 `DEV_PLAN.md` 的 B1 段与 `docs/validation/t027-b1-candidate-live-discovery.md`（产品缺陷，属生产行为变更，需独立切片）。
 
