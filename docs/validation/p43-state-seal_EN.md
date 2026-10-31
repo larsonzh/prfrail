@@ -23,7 +23,9 @@
 - **4 gates**: `TOTAL_FAIL=0`; the three-scope and SELFTEST readings are in section Gate readings.
 - **5 r1**: `PRE-REVIEW: PASS WITH FIXES` (2 High + 4 Medium + 2 Low + 4 Info).
 - **5 r2**: `PRE-REVIEW: PASS` (H1, H2, M1–M4 and L1 closed item by item, with N1–N3 registered).
-- **6 r1**: `INDEPENDENT SCAN: BLOCKED` (main cause: the C5 K was not wired) -> fix -> **6 r2**: archive verdict `PASS WITH FINDINGS` (2 High + 1 Medium + 2 Low, none blocking); this slice's 6 budget 2/3.
+- **6 r1**: `INDEPENDENT SCAN: BLOCKED` (main cause: C5 K not wired) -> wired and re-dispatched.
+- **6 r2**: `INDEPENDENT SCAN: PASS WITH FINDINGS`; its Section B wrote positive verifications ("wired", "covered") as severity-labelled rows (2 High + 1 Medium + 2 Low), which is a severity-semantics misuse - every item was a confirmation, not a defect (registered as D8).
+- **6 r3**: re-dispatched under the rule "Section B may only carry real defects"; Section B reported `0 - none` and the verdict is `INDEPENDENT SCAN: PASS`; Section D lists 5 uncovered areas, registered to known limitations. Slice 6 budget 3/3.
 - **7 r1**: `FINAL REVIEW: BLOCKED` (2 High + 4 Medium, numbered F1–F6) -> **7 r2**: `BLOCKED` (the re-check confirmed F1 had not landed) -> **7 r3**: `FINAL REVIEW: PASS` (0 new findings); this slice's 7 budget 3/3.
 - **R / D**: R = 0, D = 0 (not inherited from the previous slice).
 
@@ -103,7 +105,9 @@ The severity column keeps the review reports' own wording and is never bolded; t
 | D4 | the supervised workspace naming is fixed at attempt-1 | final review r3 Section C | Accepted: registered as out of boundary; a legal attempt>1 receipt is currently unreachable, so the refusal fails closed |
 | D5 | executionTarget / requestID / requestHash are empty in `ContextKey` before the intent and recomputed after it | implementation pass / final review F3 | Accepted: those dimensions do not exist before the intent is fixed, so K is recomputed immediately afterwards and travels with the request |
 | D6 | `taskEntity` / `stepEntity` stay as `*EntityAt(..., 1)` convenience wrappers | implementation pass / pre-review r1 H2 | Accepted: production call sites are at zero and the remaining calls live only in tests and single-attempt paths |
+| D7b | Independent impact assessment of the carrier deviation (`deep-reasoner` + GLM carrier, read-only) | 10 receipt review | `IMPACT: LIMITED`: all 13 delivered capabilities resolve inside `b6e0f34`; `go build` / `go vet` / `go test` green with no duplicate definitions or signature drift; the residual risk is author-is-implementer test bias and contract text without third-party review, and the three review interceptions show the external chain still works for this mode - not a fatal defect |
 | D7 | The ③ red tests and the ② implementation were written directly by the controller (`DeepSeek V4.1 Flash`) instead of dispatching the `prfrail-tester` / `prfrail-implementer` carriers | 10 receipt check | Accepted and registered: every review step (①⑤⑥⑦⑧) was dispatched with both `agentName` and `model` and no downgrade; the execution-side carrier deviation is recorded as measured |
+| D8 | 6 r2 Section B wrote positive verifications as severity-labelled rows (2 High + 1 Medium + 2 Low) - severity-semantics misuse | 10 receipt review (user ruling 2026-11-01) | Accepted and corrected: 6 r3 was re-dispatched under "Section B may only carry real defects", reported `0 - none` and returned `INDEPENDENT SCAN: PASS`; the fence verdict normalisation stays with its rationale disclosed outside the fence |
 
 ## Models and metering
 
@@ -153,6 +157,7 @@ The severity column keeps the review reports' own wording and is never bolded; t
 - **7 F6 · status = accepted (out of boundary)**: production assembly injects no `Attempts`, so attempt>1 is unreachable at the assembly layer; the fallback is the highest projected attempt, and wiring attempt>1 must bring a reliable source and re-review the fallback.
 - **D1–D6 summary**: the carrier is a file rather than an event (D1); `O_EXCL` is equivalent to no-replace (D2); assembly `Attempts` is unwired (D3); supervised workspace naming is fixed at attempt-1 (D4); the three dispatch dimensions of K are recomputed after the intent (D5); `*EntityAt(..., 1)` is kept as a convenience wrapper (D6).
 
+- **6 r3 Section D uncovered areas (registered, not defects)**: real attempt>1 end-to-end (external run / resume / reopen / seal replay); filesystem fault injection (crash, interrupted fsync, rename race); upgrade compatibility of legacy event logs and seal formats; K/attempt combinations across several tasks in one run; concurrent Open/Resume/Recover contention.
 ```artifacts
 docs/ARCHITECTURE_EN.md	repo
 docs/ARCHITECTURE.md	repo

@@ -23,7 +23,9 @@
 - **④ 门禁**：`TOTAL_FAIL=0`；三作用域与 SELFTEST 读数见 §门禁读数。
 - **⑤ r1**：`PRE-REVIEW: PASS WITH FIXES`（2 High + 4 Medium + 2 Low + 4 Info）。
 - **⑤ r2**：`PRE-REVIEW: PASS`（H1、H2、M1–M4、L1 逐条闭合，另登记 N1–N3）。
-- **⑥ r1**：`INDEPENDENT SCAN: BLOCKED`（主因：C5 的 K 未接线）→ 修复 → **⑥ r2**：归档判定 `PASS WITH FINDINGS`（2 High + 1 Medium + 2 Low，均非阻断），本片 ⑥ 额度 2/3。
+- **⑥ r1**：`INDEPENDENT SCAN: BLOCKED`（主因：C5 的 K 未接线）→ 接线后重派。
+- **⑥ r2**：`INDEPENDENT SCAN: PASS WITH FINDINGS`；其 Section B 把「已接线 / 已覆盖」的核验结论写成带严重度的条目（2 High + 1 Medium + 2 Low），属严重度语义误用，逐条内容均为正面核验而非缺陷（登记 D8）。
+- **⑥ r3**：在「Section B 只允许真实缺陷」的语义约定下重派，Section B 判 `0 · 无`，判定 `INDEPENDENT SCAN: PASS`；Section D 另列 5 类未覆盖面（已登记至已知限制）。本片 ⑥ 额度 3/3。
 - **⑦ r1**：`FINAL REVIEW: BLOCKED`（2 High + 4 Medium，编号 F1–F6）→ **⑦ r2**：`BLOCKED`（复查确认 F1 未落地）→ **⑦ r3**：`FINAL REVIEW: PASS`（0 新增发现），本片 ⑦ 额度 3/3。
 - **R / D**：R = 0、D = 0（不继承上片）。
 
@@ -103,7 +105,9 @@ INDEPENDENT SCAN: PASS
 | D4 | supervised 工作区命名固定 attempt-1 | ⑦ r3 Section C | 接受：边界外登记；合法 attempt>1 回执当前不可达，拒绝属 fail-closed |
 | D5 | `ContextKey` 中 executionTarget / requestID / requestHash 在 intent 前为空、intent 后重算 | ② 实现期 / ⑦ F3 | 接受：意图定稿前这些维度尚不存在，定稿后即时重算并随 request 下发 |
 | D6 | `taskEntity` / `stepEntity` 保留为 `*EntityAt(..., 1)` 便捷包装 | ② 实现期 / ⑤ r1 H2 | 接受：生产调用点已清零，残留调用仅在测试与单 attempt 路径 |
+| D7b | 执行载体偏离的独立影响评估（`deep-reasoner` + GLM 载体，只读分析） | ⑩ 复核 | `IMPACT: LIMITED`：13 项交付能力在 `b6e0f34` 内全部命中且接线；`go build` / `go vet` / `go test` 全绿、无重复定义与签名漂移；风险集中在「作者=实现者的自测偏置」与「契约文本未经第三方审」，且 ⑤/⑥/⑦ 三次拦截证明外部审查对该模式仍有效，不构成致命缺陷 |
 | D7 | ③ 红测与 ② 实现由主控（`DeepSeek V4.1 Flash`）直接完成，未派 `prfrail-tester` / `prfrail-implementer` 子代理 | ⑩ 回执核对 | 接受并登记：审查侧（①⑤⑥⑦⑧）全部按白名单派单且 `agentName` + `model` 显式传入，无模型降级；执行侧角色载体偏离如实记录 |
+| D8 | ⑥ r2 的 Section B 把「已接线 / 已覆盖」写成带严重度条目（2 High + 1 Medium + 2 Low），严重度语义误用 | ⑩ 复核（用户 2026-11-01 裁定） | 接受并整改：按「Section B 只允许真实缺陷」重派 ⑥ r3，Section B 判 `0 · 无`、判定 `INDEPENDENT SCAN: PASS`；本版围栏内判定词归一仍保留，原文与理由在围栏外披露 |
 
 ## 模型与计量
 
@@ -153,6 +157,7 @@ INDEPENDENT SCAN: PASS
 - **⑦ F6 · 状态 = 接受（边界外）**：生产装配未注入 `Attempts`，attempt>1 在装配层不可达；回退策略为投影最高 attempt，装配引入 attempt>1 时须同步可靠来源并重审回退。
 - **D1–D6 摘要**：封存载体取文件而非事件（D1）；`O_EXCL` 等价于 no-replace（D2）；装配 `Attempts` 未接线（D3）；supervised 工作区命名固定 attempt-1（D4）；K 的派发三维在 intent 后重算（D5）；`*EntityAt(..., 1)` 保留为便捷包装（D6）。
 
+- **⑥ r3 Section D 未覆盖面（已登记，非缺陷）**：真实 attempt>1 端到端（外部执行 / resume / reopen / seal 回放）；文件系统故障注入（crash、fsync 中断、rename 竞态）；旧事件日志与旧 seal 格式的升级兼容；同 run 多 task 的 K/attempt 组合冒险；并发 Open/Resume/Recover 竞争。
 ```artifacts
 docs/ARCHITECTURE_EN.md	repo
 docs/ARCHITECTURE.md	repo
