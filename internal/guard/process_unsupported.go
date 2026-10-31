@@ -5,16 +5,19 @@ package guard
 import (
 	"context"
 	"errors"
-	"os/exec"
 	"time"
 )
 
 type platformProcess struct{}
 
-func preparePlatformProcess(_ *exec.Cmd) (platformProcess, error) {
-	return platformProcess{}, errors.New("managed process trees are unsupported on this platform")
+func preparePlatformProcess() (*platformProcess, error) {
+	return nil, errors.New("managed process trees are unsupported on this platform")
+}
+func (process *platformProcess) start(*ProcessSpec) (*managedCommand, error) {
+	return nil, errors.New("unsupported platform")
 }
 func (platformProcess) attach(int) error { return errors.New("unsupported platform") }
+func (platformProcess) resume() error    { return errors.New("unsupported platform") }
 func (platformProcess) stop(ProcessIdentity, time.Duration) ([]string, error) {
 	return nil, errors.New("unsupported platform")
 }

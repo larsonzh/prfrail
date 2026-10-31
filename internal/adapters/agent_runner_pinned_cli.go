@@ -140,6 +140,14 @@ func (launcher *AgentRunnerPinnedCLILauncher) StartAgentRunnerProcess(ctx contex
 	// window between taking the run root and publishing the identity, and that window
 	// must not include the precheck's own budget, which a caller may configure far
 	// beyond the freshness of a claimed slot.
+	//
+	// A crashed start leaves a durable starting marker behind. Recovering it before
+	// the slot is claimed is what lets the slot that start left behind be released
+	// immediately, instead of blocking this launch until the freshness window has
+	// passed (design section 2 Q3).
+	if _, err := launcher.RecoverStarting(ctx); err != nil {
+		return chain.AgentRunnerLaunchResult{}, err
+	}
 	slotToken, err := launcher.claimLaunchSlot(launchID)
 	if err != nil {
 		return chain.AgentRunnerLaunchResult{}, err
@@ -173,6 +181,40 @@ func (launcher *AgentRunnerPinnedCLILauncher) StartAgentRunnerProcess(ctx contex
 	if len(args) == 0 {
 		args = launcher.config.RunArgs
 	}
+	// The spawn is registered in its starting phase from inside the OnSpawn hook:
+	// guard calls it after the process exists with a complete identity and before
+	// it may run, which is the only moment where a durable marker can honestly say
+	// "a start is in flight" (design section 2 Q1).
+	var startingHandle *agentRunnerProcessHandle
+	onSpawn := func(hookCtx context.Context, identity guard.ProcessIdentity) error {
+		if hookErr := hookCtx.Err(); hookErr != nil {
+			return hookErr
+		}
+		if _, identityErr := agentRunnerProcessID(identity); identityErr != nil {
+			return identityErr
+		}
+		claim, markerErr := writeAgentRunnerStartingMarker(launcher.store.RunRoot(), newAgentRunnerStartingMarker(launchID, launch.RequestID, identity))
+		if markerErr != nil {
+			return markerErr
+		}
+		handle := &agentRunnerProcessHandle{
+			launchID:       launchID,
+			requestID:      launch.RequestID,
+			phase:          agentRunnerProcessStarting,
+			identity:       identity,
+			grace:          grace,
+			startingMarker: claim,
+			slotToken:      slotToken,
+		}
+		if registerErr := launcher.registry.register(handle); registerErr != nil {
+			// The hook owns the durable record it wrote, so it is removed again before
+			// the guard rolls the spawn back.
+			_ = claim.release()
+			return registerErr
+		}
+		startingHandle = handle
+		return nil
+	}
 	process, err := guard.StartManaged(ctx, guard.ProcessSpec{
 		Command: launcher.config.Executable,
 		Args:    append([]string(nil), args...),
@@ -180,9 +222,11 @@ func (launcher *AgentRunnerPinnedCLILauncher) StartAgentRunnerProcess(ctx contex
 		Env:     append(launcher.childEnv(launch.Env), agentRunnerEvidenceDirEnvVar+"="+evidenceDir),
 		Stdout:  stdout,
 		Stderr:  stderr,
+		OnSpawn: onSpawn,
 	})
 	if err != nil {
 		// guard guarantees nothing is running when it returns an error.
+		launcher.discardStartingLaunch(launchID)
 		_ = stdout.Close()
 		_ = stderr.Close()
 		return chain.AgentRunnerLaunchResult{}, err
@@ -190,6 +234,7 @@ func (launcher *AgentRunnerPinnedCLILauncher) StartAgentRunnerProcess(ctx contex
 	processID, err := agentRunnerProcessID(process.Identity())
 	if err != nil {
 		proof, stopErr := stopSpawnedProcess(process, grace)
+		launcher.discardStartingLaunch(launchID)
 		_ = stdout.Close()
 		_ = stderr.Close()
 		return chain.AgentRunnerLaunchResult{}, fmt.Errorf("%w: %v (%s)", ErrAgentRunnerLaunchIdentityUnproven, err, describeAgentRunnerSpawnStop(proof, stopErr))
@@ -198,26 +243,33 @@ func (launcher *AgentRunnerPinnedCLILauncher) StartAgentRunnerProcess(ctx contex
 		// Without the durable identity an operator stop cannot find the process, so
 		// the spawn is stopped again instead of being reported as started.
 		proof, stopErr := stopSpawnedProcess(process, grace)
+		launcher.discardStartingLaunch(launchID)
 		_ = stdout.Close()
 		_ = stderr.Close()
 		return chain.AgentRunnerLaunchResult{}, fmt.Errorf("%w: %v (%s)", ErrAgentRunnerLaunchIdentityUnproven, err, describeAgentRunnerSpawnStop(proof, stopErr))
 	}
 	startedAt := time.Now().UTC()
-	handle := &agentRunnerProcessHandle{
-		launchID:  launchID,
-		requestID: launch.RequestID,
-		process:   process,
-		phase:     agentRunnerProcessRunning,
-		startedAt: startedAt,
-		grace:     grace,
-		slotToken: slotToken,
-		logs:      []*os.File{stdout, stderr},
-	}
-	if err := launcher.registry.register(handle); err != nil {
+	handle := startingHandle
+	if handle == nil {
+		// The hook always publishes the starting handle, so a launch without one has
+		// no provable spawn phase and must not be reported as started.
 		proof, stopErr := stopSpawnedProcess(process, grace)
-		handle.closeLogs()
-		return chain.AgentRunnerLaunchResult{}, fmt.Errorf("%w: %v (%s)", err, stopErr, describeAgentRunnerSpawnStop(proof, stopErr))
+		_ = stdout.Close()
+		_ = stderr.Close()
+		return chain.AgentRunnerLaunchResult{}, fmt.Errorf("%w: the starting phase was not published (%s)", ErrAgentRunnerProcessIdentity, describeAgentRunnerSpawnStop(proof, stopErr))
 	}
+	handle.process = process
+	handle.startedAt = startedAt
+	handle.logs = []*os.File{stdout, stderr}
+	// The process is resumed and its durable identity is published, so the launch
+	// may leave the starting phase.
+	if advanceErr := launcher.registry.advance(launchID, agentRunnerProcessRunning); advanceErr != nil {
+		proof, stopErr := stopSpawnedProcess(process, grace)
+		launcher.discardStartingLaunch(launchID)
+		handle.closeLogs()
+		return chain.AgentRunnerLaunchResult{}, fmt.Errorf("%w: %v (%s)", advanceErr, stopErr, describeAgentRunnerSpawnStop(proof, stopErr))
+	}
+	handle.closeStartingMarker()
 	// The launch owns the slot until it is retired, so the deferred release must not
 	// fire for a successful start.
 	claimed = false
@@ -248,6 +300,250 @@ func (launcher *AgentRunnerPinnedCLILauncher) StopAgentRunnerProcess(ctx context
 	proof, stopErr := guard.StopProcessIdentity(ctx, identity, launcher.stopGrace(launchID))
 	launcher.releaseLaunch(launchID)
 	return proof, stopErr
+}
+
+// RecoverStarting reclaims the remains of a spawn whose host died in the starting
+// phase (design section 2 Q3, section 4 I3/I5).
+//
+// The scanning rule is the durable marker plus its exclusive lock, never a clock:
+// a held lock means the host that wrote the marker is still alive, so the scan
+// refuses; a free lock means the host is gone, because the kernel drops the lock
+// when the process dies. What then happens to the process depends on the platform
+// anchor (see reclaimStartingProcess):
+//
+//   - Windows: the job created with the process killed the whole suspended tree
+//     together with the host, so there is nothing left to stop;
+//   - Linux: an orphan of the crashed host may still be running, so it is adopted
+//     through its persisted identity and stopped.
+//
+// A marker whose pid now names a different process (start-token mismatch) is a
+// reused pid: nothing is killed and the identity mirror is kept, so an operator
+// stop can still see it - fail closed. The launch slot the crashed start left
+// behind is released with the same rename-away protocol a normal release uses, so
+// the next launch does not have to wait out the freshness window.
+//
+// Recovery is idempotent: once the marker is gone a second scan is a no-op.
+func (launcher *AgentRunnerPinnedCLILauncher) RecoverStarting(ctx context.Context) (reclaimed bool, err error) {
+	if launcher == nil || launcher.store == nil {
+		return false, fmt.Errorf("%w: nil launcher", ErrInvalidAgentRunnerLauncher)
+	}
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	if err := ctx.Err(); err != nil {
+		return false, err
+	}
+	path := startingMarkerPath(launcher.store.RunRoot())
+	file, err := os.OpenFile(path, os.O_RDWR, 0)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			// No start was in flight here, which is also the state after a recovery.
+			return false, nil
+		}
+		return false, fmt.Errorf("%w: open the starting marker %s: %v", ErrAgentRunnerLaunchConflict, path, err)
+	}
+	locked, lockErr := tryLockStartingMarker(file)
+	if lockErr != nil {
+		_ = file.Close()
+		return false, fmt.Errorf("%w: lock the starting marker %s: %v", ErrAgentRunnerLaunchConflict, path, lockErr)
+	}
+	if !locked {
+		// The host that wrote the marker holds its lock, so the marker is current and
+		// must be left alone (design section 5 risk 4).
+		//
+		// This refusal and "no marker at all" cannot be told apart by the caller: both
+		// are (false, nil). The reviewed contract pins that signature, so the ambiguity
+		// is registered here instead of being papered over with a new sentinel
+		// (P41 review F-5, deliberately not changed).
+		_ = file.Close()
+		return false, nil
+	}
+	marker, decodeErr := decodeAgentRunnerStartingMarker(file)
+	// Everything that needs the marker's contents happens while the lock is held, so
+	// two concurrent scans cannot both act on the same record. The lock is dropped
+	// before the cleanup decision, which is exactly why the cleanup re-opens the path
+	// and re-proves the record under the lock before removing anything
+	// (clearAgentRunnerStartingMarker, review F-1).
+	identity := marker.Identity
+	usable := decodeErr == nil && identity.PID > 0 && strings.TrimSpace(identity.StartToken) != ""
+	alive := false
+	reused := false
+	if usable {
+		aliveState, aliveErr := guard.ProcessAlive(identity)
+		if aliveErr != nil {
+			// Liveness cannot be decided, so nothing may be killed: fail closed and
+			// keep the mirror for the operator stop.
+			usable = false
+		} else {
+			alive = aliveState
+			if !alive {
+				// A pid that is now held by a different process must never be
+				// confused with the dead host's child.
+				if current, inspectErr := guard.InspectProcess(identity.PID); inspectErr == nil && current.StartToken != identity.StartToken {
+					reused = true
+				}
+			}
+		}
+	}
+	processReclaimed := false
+	var reclaimErr error
+	if usable && !reused {
+		processReclaimed, reclaimErr = reclaimStartingProcess(ctx, identity, launcher.config.Grace, alive)
+	}
+	unlockStartingMarker(file)
+	_ = file.Close()
+	if reclaimErr != nil {
+		// The marker stays: the next scan retries, and a launch must not proceed over
+		// an orphan it cannot stop.
+		return false, fmt.Errorf("%w: reclaim the starting process %d: %v", ErrAgentRunnerLaunchConflict, identity.PID, reclaimErr)
+	}
+	// decoded records whether the record this scan acted on was readable at all. An
+	// unreadable marker has no launch id to match, so it releases the slot through the
+	// corrupt-marker path (review F-4) and is only ever cleared while it is still
+	// unreadable (review F-1).
+	decoded := decodeErr == nil
+	if !usable || reused || !processReclaimed {
+		// Fail closed: nothing was proven gone, so nothing is killed and the identity
+		// mirror stays readable for the operator stop. The marker and the slot it left
+		// behind are cleared anyway, so the run root is not blocked forever by a record
+		// that can no longer prove anything.
+		launcher.reclaimLaunchSlot(marker.LaunchID)
+		clearAgentRunnerStartingMarker(path, marker, decoded)
+		return false, nil
+	}
+	launcher.reclaimLaunchSlot(marker.LaunchID)
+	removeAgentRunnerProcessIdentityMirror(launcher.store.RunRoot(), identity)
+	clearAgentRunnerStartingMarker(path, marker, decoded)
+	return true, nil
+}
+
+// reclaimLaunchSlot releases the launch slot a crashed start left behind, using the
+// rename-away protocol of the normal release: whichever of a release and a reclaim
+// renames the slot wins, and only a slot that still names this launch is removed, so
+// a reclaim can never delete a slot another launch has just created.
+//
+// An empty launch id is the corrupt-marker case (review F-4): the record named no
+// launch, so the slot cannot be matched by owner. It is still released - otherwise
+// the slot keeps the run root blocked for the whole freshness window - but only
+// while the durable identity mirror does not name a live process, which is the same
+// proof every other reuse of the slot requires.
+func (launcher *AgentRunnerPinnedCLILauncher) reclaimLaunchSlot(launchID string) {
+	slot := filepath.Join(launcher.store.RunRoot(), managedProcessLaunchSlotFileName)
+	staging := slot + ".reclaiming"
+	if err := os.Rename(slot, staging); err != nil {
+		// Missing, or another release already took it: nothing of ours to remove.
+		return
+	}
+	owner, err := os.ReadFile(staging)
+	if err != nil {
+		// The owner cannot be examined, so ownership cannot be proven: put it back.
+		_ = os.Rename(staging, slot)
+		return
+	}
+	fields := strings.Fields(string(owner))
+	if len(fields) == 0 {
+		// A slot that names nobody proves nothing about who owns the run root: put it
+		// back untouched.
+		_ = os.Rename(staging, slot)
+		return
+	}
+	if strings.TrimSpace(launchID) == "" {
+		// Corrupt marker: no owner to compare against, so the identity mirror - the
+		// durable record of the last launch - decides whether the slot may go.
+		if refuseErr := launcher.refuseLiveMirrorProcess(); refuseErr != nil {
+			_ = os.Rename(staging, slot)
+			return
+		}
+		_ = os.Remove(staging)
+		return
+	}
+	if fields[0] != launchID {
+		// Another launch owns the slot now: put it back untouched.
+		_ = os.Rename(staging, slot)
+		return
+	}
+	_ = os.Remove(staging)
+}
+
+// startingMarkerClearAttempts bounds how often the cleanup path re-opens the marker
+// to take its host lock again. A concurrent scan holds that lock only for the
+// bounded decision on the record, so a few attempts cover the overlap; after them
+// the marker is left to the next scan, which sees the same evidence.
+const startingMarkerClearAttempts = 3
+
+// startingMarkerClearRetryDelay is the pause between those attempts.
+const startingMarkerClearRetryDelay = 5 * time.Millisecond
+
+// clearAgentRunnerStartingMarker removes the marker this scan decided on - and only
+// that marker (review F-1).
+//
+// The host lock is dropped before the cleanup, so another host may rename a fresh
+// marker into place in between. Removing the path blindly would then destroy the
+// marker of a live start (design section 5 risk 4). The path is therefore re-opened,
+// the host lock is taken again, and the record is decoded and compared while the
+// lock is held: a lock that stays held, or content that no longer matches what this
+// scan acted on, means the path holds someone else's record and nothing is removed.
+//
+// decoded records whether the scanned record was readable. An unreadable marker has
+// no content to compare, so it is only cleared while it is still unreadable: a
+// record that decodes now was published after the scan and belongs to a new start.
+//
+// It reports whether the name was removed; a failure is left to the next scan, which
+// sees the same evidence and tries again.
+func clearAgentRunnerStartingMarker(path string, scanned agentRunnerStartingMarker, decoded bool) bool {
+	for attempt := 0; attempt < startingMarkerClearAttempts; attempt++ {
+		if attempt > 0 {
+			time.Sleep(startingMarkerClearRetryDelay)
+		}
+		file, err := openStartingMarkerForClear(path)
+		if err != nil {
+			// Already gone, or unreadable: nothing this scan may remove.
+			return false
+		}
+		locked, lockErr := tryLockStartingMarker(file)
+		if lockErr != nil {
+			_ = file.Close()
+			return false
+		}
+		if !locked {
+			// Held by a live host or by a concurrent scan: retry, then leave it be.
+			_ = file.Close()
+			continue
+		}
+		current, decodeErr := decodeAgentRunnerStartingMarker(file)
+		var matches bool
+		if decoded {
+			// The record must still be the one this scan decided on.
+			matches = decodeErr == nil && current == scanned
+		} else {
+			// The record must still be unreadable: a record that decodes now was
+			// published after the scan and belongs to a new start.
+			matches = decodeErr != nil
+		}
+		if !matches {
+			unlockStartingMarker(file)
+			_ = file.Close()
+			return false
+		}
+		// The name is removed while the lock is still held, so the removal can only
+		// reach the record that was just proven to be this scan's.
+		removed := os.Remove(path) == nil
+		unlockStartingMarker(file)
+		_ = file.Close()
+		return removed
+	}
+	return false
+}
+
+// removeAgentRunnerProcessIdentityMirror drops the durable identity of a recovered
+// start, but never one that names a different process: that mirror belongs to a
+// launch this recovery has no business touching.
+func removeAgentRunnerProcessIdentityMirror(runRoot string, identity guard.ProcessIdentity) {
+	mirrored, err := loadAgentRunnerProcessIdentityMirror(runRoot)
+	if err == nil && mirrored != identity {
+		return
+	}
+	_ = os.Remove(filepath.Join(runRoot, managedProcessIdentityFileName))
 }
 
 // refuseLiveMirrorProcess refuses a launch while the durable identity mirror names
@@ -285,8 +581,16 @@ func (launcher *AgentRunnerPinnedCLILauncher) refuseLiveMirrorProcess() error {
 // or an operator side) stops through the persisted identity. No third path exists.
 // A foreign or stale launch id may never reach a stranger's process.
 func (launcher *AgentRunnerPinnedCLILauncher) stopIdentity(launchID string) (guard.ProcessIdentity, error) {
-	if handle, found := launcher.registry.lookup(launchID); found && handle.process != nil {
-		return handle.process.Identity(), nil
+	if handle, found := launcher.registry.lookup(launchID); found {
+		if handle.process != nil {
+			return handle.process.Identity(), nil
+		}
+		if handle.hasSpawnIdentity() {
+			// A launch that is still starting has no guard handle yet, but it already
+			// carries the captured identity - the same identity its durable marker
+			// names - so a stop can reach the process while it is still suspended.
+			return handle.identity, nil
+		}
 	}
 	if liveID, live := launcher.registry.live(); live && liveID != launchID {
 		return guard.ProcessIdentity{}, fmt.Errorf("%w: this launcher holds %s, not %s", ErrAgentRunnerLaunchConflict, liveID, launchID)
@@ -339,6 +643,20 @@ func (launcher *AgentRunnerPinnedCLILauncher) releaseLaunch(launchID string) {
 	}
 	_ = launcher.registry.advance(launchID, agentRunnerProcessStopped)
 	handle.closeLogs()
+	handle.closeStartingMarker()
+	launcher.registry.release(launchID)
+}
+
+// discardStartingLaunch rolls a launch that never reached the running phase back:
+// the durable starting marker is removed and the starting registration dropped, so
+// nothing of the failed spawn stays behind. A launch a concurrent stop already
+// retired is left alone.
+func (launcher *AgentRunnerPinnedCLILauncher) discardStartingLaunch(launchID string) {
+	handle, found := launcher.registry.lookup(launchID)
+	if !found {
+		return
+	}
+	handle.closeStartingMarker()
 	launcher.registry.release(launchID)
 }
 

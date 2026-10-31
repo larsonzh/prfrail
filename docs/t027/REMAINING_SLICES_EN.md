@@ -70,6 +70,7 @@
 | P38 P38-T027B-TACTICAL-BLUEPRINT | ✅ Done | P37 | L | 2026-10-31 | docs/validation/t027b-tactical-blueprint{,_EN}.md |
 | P39 P39-T027B-DURABLE-BUDGET | ✅ Done | P38 | L | 2026-10-31 | docs/validation/p39-durable-budget{,_EN}.md |
 | P40 P40-T027B-LOCK-REAPER | ✅ Closed | P39 | L | 2026-10-31 | docs/validation/p40-lock-reaper{,_EN}.md |
+| P41 P41-T027B-SPAWN-OWNERSHIP | ✅ Closed | P40 | L | 2026-10-31 | docs/validation/p41-spawn-ownership{,_EN}.md |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1272,6 +1273,27 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Temp-artifact landing declaration | this slice temp directory = `tmp/P40-T027B-LOCK-REAPER/` (append-only until 8c) |
 | Completion record | 1 architecture confirmed -> 3 red tests (RED-CONFIRMED) -> 2 two rounds to green (plan A plus F-01..F-06) -> 5 two rounds (r1 PASS WITH FIXES -> r2 PASS) -> 6 INDEPENDENT SCAN: PASS -> 7 FINAL REVIEW: PASS; R=0 D=0（推送后 CI 暴露 Go 1.22 兼容缺陷，已按裁定修复并登记 DR-12）; later-slice candidates in the report section Later-slice candidates |
 
+
+### P41 — `P41-T027B-SPAWN-OWNERSHIP` · ✅ Closed
+
+| Field | Content |
+|---|---|
+| Identifier | `P41-T027B-SPAWN-OWNERSHIP` (implementation; directive v1.60) |
+| Status | ✅ **Closed** (2026-10-31; commit and CI are carried by the 10 receipt) |
+| Goal | C2+N1: `ProcessSpec.OnSpawn` hook + pre-registered starting owner + Job ownership before resume, closing the orphan window on host crash |
+| Dependency | P40 closed (`a142eaa`) |
+| Size | L (orphan-process reclamation across adapters / guard) |
+| Steps | step 0 → ① architecture (V4 Pro) → ② red tests → ③ green implementation → ④ gates → ⑤ pre-review → ⑥ scan → ⑦ final review → ⑧a → ⑨ → ⑧c → ⑩ |
+| Current gap | C2 orphan processes (N1 host-crash window); Job ownership lands after resume |
+| Deliverables | report pair `docs/validation/p41-spawn-ownership{,_EN}.md`; evidence pack `docs/validation/evidence/P41-T027B-SPAWN-OWNERSHIP/`; freedom list |
+| Acceptance evidence | ② red tests first; `go build` / `go vet` / `go test ./...` green; three scopes TOTAL_FAIL=0 and SELFTEST 697/697; report CN/EN six shapes equal |
+| Boundary | only `internal/adapters/**` and `internal/guard/**`; no gitee push; commit/push stop at ⑩ for authorization |
+| Class | `[SLICE]` (implementation) |
+| Probe budget | none |
+| Freedom-list path | `docs/validation/evidence/P41-T027B-SPAWN-OWNERSHIP/freedom-list.md` |
+| R / D baseline | R = 0, D = 0 (not inherited) |
+| Temp landing | slice temp dir = `tmp/P41-T027B-SPAWN-OWNERSHIP/` (append-only until ⑧c) |
+| Completion record | 1 architecture confirmed -> 2 red tests (RED-CONFIRMED) -> 3 two rounds to green (including the F-01..F-04 fixes) -> 4 gates -> 5 two rounds (r1 PASS WITH FIXES -> r2 PASS) -> 6 INDEPENDENT SCAN: PASS -> 7 FINAL REVIEW: PASS; R=0 D=0; later-slice candidates in the report section Later-slice candidates |
 ## Known defects (to be handled before later slices)
 
 > **Blocking rule unchanged**: only high-frequency / reproduced defects block; observation-grade flakes are recorded and listed in the validation report.

@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os/exec"
+	"os"
 	"sync"
 	"time"
 
@@ -31,6 +31,12 @@ var (
 	ErrInvalidProcess       = errors.New("invalid managed process")
 	ErrTerminationUncertain = errors.New("managed process termination uncertain")
 	ErrProcessTreeRemained  = errors.New("managed process tree remained after parent exit")
+	// ErrSpawnOwnership marks a spawn that never reached a running state because
+	// the ownership chain could not be completed: the OnSpawn hook failed, the
+	// ownership anchor could not be verified, or the process could not be resumed.
+	// It always wraps the underlying cause, so a caller can tell an ownership
+	// failure apart from an ordinary exec error with errors.Is.
+	ErrSpawnOwnership = errors.New("managed process spawn ownership unproven")
 	// errStopCommandExpired marks an external stop command that outlived its
 	// synchronous bound. The command is never killed at that point: it keeps
 	// running detached, so this error means "unknown", not "failed".
@@ -44,7 +50,66 @@ type ProcessSpec struct {
 	Env     []string
 	Stdout  io.Writer
 	Stderr  io.Writer
+	// OnSpawn, when set, runs after the process exists with a complete identity
+	// and its ownership anchor verified, and before it is allowed to run. A
+	// non-nil error means "not started": the guard stops the process again and
+	// StartManaged returns an error that satisfies errors.Is(ErrSpawnOwnership).
+	// The hook owns whatever durable record it writes and must clean it up when it
+	// fails; the guard never touches the caller's namespace. A nil hook keeps the
+	// previous behaviour exactly.
+	OnSpawn func(ctx context.Context, identity ProcessIdentity) error
 }
+
+// managedProcessHandle is the OS process handle guard owns. It exposes the small
+// part of *os.Process the package needs - the pid, a direct kill and a wait - so
+// the reaper and every stop path are platform neutral.
+type managedProcessHandle struct {
+	pid    int
+	killFn func() error
+	waitFn func() (*os.ProcessState, error)
+}
+
+// Pid reports the process id of the handle.
+func (handle *managedProcessHandle) Pid() int {
+	if handle == nil {
+		return 0
+	}
+	return handle.pid
+}
+
+// Kill terminates the process directly. It exists for the reviewed stop paths
+// and for a test that has to get rid of a leftover child; it is never the
+// production stop, which goes through the platform stop.
+func (handle *managedProcessHandle) Kill() error {
+	if handle == nil || handle.killFn == nil {
+		return ErrInvalidProcess
+	}
+	return handle.killFn()
+}
+
+// Wait reaps the process handle. The package always reaps through the single
+// reaper; this mirrors *os.Process so a caller can wait for a child it killed.
+func (handle *managedProcessHandle) Wait() (*os.ProcessState, error) {
+	if handle == nil || handle.waitFn == nil {
+		return nil, ErrInvalidProcess
+	}
+	return handle.waitFn()
+}
+
+// managedCommand is the platform spawn result: the process handle, the platform
+// wait, and the exit status the single reaper records. The reaper is the only
+// writer of exitStatus, so any reader must have observed waitDone first.
+type managedCommand struct {
+	Process    *managedProcessHandle
+	waitFn     func() error
+	exitStatus int
+}
+
+// wait reaps the process through the platform wait.
+func (command *managedCommand) wait() error { return command.waitFn() }
+
+// exitCode reports the exit status of a reaped process.
+func (command *managedCommand) exitCode() int { return command.exitStatus }
 
 type ProcessResult struct {
 	ExitCode    int
@@ -69,7 +134,7 @@ type TerminationEvidence struct {
 }
 
 type ManagedProcess struct {
-	cmd      *exec.Cmd
+	cmd      *managedCommand
 	identity ProcessIdentity
 	// platform is a pointer: it owns a synchronised handle, so it must never be
 	// copied once it may be used from several goroutines.
@@ -97,7 +162,7 @@ func (process *ManagedProcess) waitResult() <-chan struct{} {
 			process.waitDone = make(chan struct{})
 		}
 		go func() {
-			process.waitErr = process.cmd.Wait()
+			process.waitErr = process.cmd.wait()
 			close(process.waitDone)
 		}()
 	})
@@ -114,37 +179,60 @@ func (process *ManagedProcess) verifyGone(ctx context.Context) error {
 	return process.platform.verifyGone(ctx)
 }
 
+// StartManaged creates one managed process and drives it through the fixed
+// startup order of the spawn-ownership design
+// (docs/validation/evidence/P41-T027B-SPAWN-OWNERSHIP/01-arch-design/review.md
+// sections 2 and 3): prepare the platform ownership anchor, create the process, verify
+// the anchor, capture the identity, run the OnSpawn hook, and only then let the
+// process run. Ownership therefore always precedes execution, and the hook always
+// observes a complete identity. Every failure runs through abortStartup, so a
+// refused start leaves no unrunnable residue behind.
 func StartManaged(ctx context.Context, spec ProcessSpec) (*ManagedProcess, error) {
+	if ctx == nil {
+		ctx = context.Background()
+	}
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
 	if spec.Command == "" {
 		return nil, fmt.Errorf("%w: command is empty", ErrInvalidProcess)
 	}
-	cmd := exec.Command(spec.Command, spec.Args...)
-	cmd.Dir = spec.Dir
-	cmd.Env = spec.Env
-	cmd.Stdout = spec.Stdout
-	cmd.Stderr = spec.Stderr
-	platform, err := preparePlatformProcess(cmd)
+	platform, err := preparePlatformProcess()
 	if err != nil {
 		return nil, err
 	}
-	if err := cmd.Start(); err != nil {
+	command, err := platform.start(&spec)
+	if err != nil {
 		platform.close()
 		return nil, fmt.Errorf("start managed process: %w", err)
 	}
-	process := &ManagedProcess{cmd: cmd, platform: &platform, waitDone: make(chan struct{})}
-	if err := platform.attach(cmd.Process.Pid); err != nil {
-		_ = cmd.Process.Kill()
-		return nil, process.abortStartup(fmt.Errorf("attach managed process tree: %w", err))
+	pid := command.Process.Pid()
+	process := &ManagedProcess{cmd: command, platform: platform, waitDone: make(chan struct{})}
+	// attach verifies the ownership anchor the platform created the process with;
+	// it never has to establish it, which is what removes the window between
+	// creation and ownership.
+	if err := platform.attach(pid); err != nil {
+		_ = command.Process.Kill()
+		return nil, process.abortStartup(fmt.Errorf("%w: attach managed process tree: %w", ErrSpawnOwnership, err))
 	}
-	identity, err := platformIdentity(cmd.Process.Pid)
+	identity, err := platformIdentity(pid)
 	if err != nil {
 		_ = platform.terminate()
-		return nil, process.abortStartup(fmt.Errorf("capture managed process identity: %w", err))
+		return nil, process.abortStartup(fmt.Errorf("%w: capture managed process identity: %w", ErrSpawnOwnership, err))
 	}
 	process.identity = identity
+	if spec.OnSpawn != nil {
+		if hookErr := spec.OnSpawn(ctx, identity); hookErr != nil {
+			// The process must not be left suspended and unowned: the tree is
+			// terminated first, then reaped through the bounded abort.
+			_ = platform.terminate()
+			return nil, process.abortStartup(fmt.Errorf("%w: on spawn hook: %w", ErrSpawnOwnership, hookErr))
+		}
+	}
+	if err := platform.resume(); err != nil {
+		_ = platform.terminate()
+		return nil, process.abortStartup(fmt.Errorf("%w: resume managed process: %w", ErrSpawnOwnership, err))
+	}
 	return process, nil
 }
 
@@ -225,7 +313,7 @@ func (process *ManagedProcess) runManaged(ctx context.Context, grace time.Durati
 			return result, ErrProcessTreeRemained
 		}
 		process.platform.close()
-		return ProcessResult{ExitCode: process.cmd.ProcessState.ExitCode(), Started: true, StartedAt: startedAt, FinishedAt: time.Now().UTC()}, process.waitErr
+		return ProcessResult{ExitCode: process.cmd.exitCode(), Started: true, StartedAt: startedAt, FinishedAt: time.Now().UTC()}, process.waitErr
 	case <-ctx.Done():
 		requested := time.Now().UTC()
 		actions, stopErr := process.platform.stop(process.identity, grace)

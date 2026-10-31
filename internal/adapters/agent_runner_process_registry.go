@@ -46,6 +46,13 @@ const managedProcessIdentityFileName = "managed-process.identity.json"
 // atomic exclusive create rather than by a check followed by a write.
 const managedProcessLaunchSlotFileName = "managed-process.launch.slot"
 
+// managedProcessStartingFileName is the durable starting marker of one run root.
+// It exists exactly while a spawn is in flight - written before the process is
+// allowed to run and removed once the launch reached the running phase - so a
+// restart can tell "a start crashed" from "nothing ever started" and reclaim the
+// process and the slot it left behind.
+const managedProcessStartingFileName = "managed-process.starting.json"
+
 // agentRunnerProcessHandle is the live handle of one spawned process. The log
 // files stay open until the run ends, so the launcher owns them and the handle
 // closes them exactly once.
@@ -56,10 +63,33 @@ type agentRunnerProcessHandle struct {
 	phase     agentRunnerProcessPhase
 	startedAt time.Time
 	grace     time.Duration
+	// identity is the captured spawn identity. It is valid from the starting phase
+	// on, where the process handle itself does not exist yet, so a stop that arrives
+	// while the spawn is still being published can already reach the process.
+	identity guard.ProcessIdentity
+	// startingMarker is the durable starting-phase record and the exclusivity lock
+	// that proves this host is alive. It is released when the launch reaches the
+	// running phase or is retired.
+	startingMarker *startingMarkerClaim
 	// slotToken is the launch slot claim this handle owns, so its release can never
 	// remove a slot another launch has taken in the meantime.
 	slotToken string
 	logs      []*os.File
+}
+
+// closeStartingMarker releases the durable starting marker once. A second call is
+// a no-op, and a handle that never wrote one is handled too.
+func (handle *agentRunnerProcessHandle) closeStartingMarker() {
+	if handle == nil || handle.startingMarker == nil {
+		return
+	}
+	_ = handle.startingMarker.release()
+	handle.startingMarker = nil
+}
+
+// hasSpawnIdentity reports whether the handle carries a complete process identity.
+func (handle *agentRunnerProcessHandle) hasSpawnIdentity() bool {
+	return handle != nil && handle.identity.PID > 0 && strings.TrimSpace(handle.identity.StartToken) != ""
 }
 
 // closeLogs closes the log artifacts once. A second call is a no-op.
@@ -93,7 +123,11 @@ func (registry *agentRunnerProcessRegistry) register(handle *agentRunnerProcessH
 	if handle == nil || !evidence.ValidID(handle.launchID) || !evidence.ValidID(handle.requestID) {
 		return fmt.Errorf("%w: invalid handle binding", ErrAgentRunnerProcessIdentity)
 	}
-	if handle.process == nil {
+	// A starting handle is registered from inside the OnSpawn hook, before guard
+	// returns the process handle: its process is proven by the captured identity
+	// (and the durable marker the hook wrote), so the identity is what must be
+	// complete there. Every other phase needs the live process handle.
+	if handle.process == nil && (handle.phase != agentRunnerProcessStarting || !handle.hasSpawnIdentity()) {
 		return fmt.Errorf("%w: handle without a managed process", ErrAgentRunnerProcessIdentity)
 	}
 	if handle.phase != agentRunnerProcessStarting && handle.phase != agentRunnerProcessRunning {

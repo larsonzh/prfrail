@@ -37,9 +37,46 @@ type procStat struct {
 	startToken string
 }
 
-func preparePlatformProcess(cmd *exec.Cmd) (platformProcess, error) {
+// preparePlatformProcess builds the Linux ownership plan. There is no creation-time
+// handle to hold on Linux: ownership is the process group recorded by start and
+// verified by attach.
+//
+// Pdeathsig is deliberately not used here (design section 5 risk 2): the kernel signals
+// it when the *creating thread* exits, not when the host process exits, so it
+// cannot be the crash-recovery anchor and would only add a second, partial rule.
+// The recovery anchor is the durable starting marker plus the adoption-kill scan
+// (adapters.RecoverStarting); a crash therefore leaves the orphan running only
+// until the next start scans the run root.
+func preparePlatformProcess() (*platformProcess, error) {
+	return &platformProcess{}, nil
+}
+
+// start creates the process in its own process group. Linux has no suspend step,
+// so the group is the ownership anchor and the child runs from the first instant.
+func (process *platformProcess) start(spec *ProcessSpec) (*managedCommand, error) {
+	cmd := exec.Command(spec.Command, spec.Args...)
+	cmd.Dir = spec.Dir
+	cmd.Env = spec.Env
+	cmd.Stdout = spec.Stdout
+	cmd.Stderr = spec.Stderr
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
-	return platformProcess{}, nil
+	if err := cmd.Start(); err != nil {
+		return nil, err
+	}
+	command := &managedCommand{exitStatus: -1}
+	command.Process = &managedProcessHandle{
+		pid:    cmd.Process.Pid,
+		killFn: func() error { return cmd.Process.Kill() },
+		waitFn: func() (*os.ProcessState, error) { return cmd.Process.Wait() },
+	}
+	command.waitFn = func() error {
+		waitErr := cmd.Wait()
+		if cmd.ProcessState != nil {
+			command.exitStatus = cmd.ProcessState.ExitCode()
+		}
+		return waitErr
+	}
+	return command, nil
 }
 
 func (process *platformProcess) attach(pid int) error {
@@ -53,6 +90,11 @@ func (process *platformProcess) attach(pid int) error {
 	process.pgid = pgid
 	return nil
 }
+
+// resume is a no-op on Linux: there is no suspended state to leave, the process
+// group is already the ownership anchor, and running remains the caller's last
+// startup step.
+func (process *platformProcess) resume() error { return nil }
 
 func (process *platformProcess) stop(_ ProcessIdentity, grace time.Duration) ([]string, error) {
 	actions := []string{"signal-term-process-group"}

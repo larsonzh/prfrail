@@ -70,6 +70,7 @@
 | P38 P38-T027B-TACTICAL-BLUEPRINT | ✅ 已完成 | P37 | L | 2026-10-31 | docs/validation/t027b-tactical-blueprint{,_EN}.md |
 | P39 P39-T027B-DURABLE-BUDGET | ✅ 已完成 | P38 | L | 2026-10-31 | docs/validation/p39-durable-budget{,_EN}.md |
 | P40 P40-T027B-LOCK-REAPER | ✅ 已闭环 | P39 | L | 2026-10-31 | docs/validation/p40-lock-reaper{,_EN}.md |
+| P41 P41-T027B-SPAWN-OWNERSHIP | ✅ 已闭环 | P40 | L | 2026-10-31 | docs/validation/p41-spawn-ownership{,_EN}.md |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -1285,6 +1286,27 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 临时件落点声明 | 本片临时目录 = `tmp/P40-T027B-LOCK-REAPER/`（⑧c 前只增不删） |
 | 完成记录 | ① 架构确认 → ③ 红测（RED-CONFIRMED）→ ② 两轮转绿（含方案 A 与 F-01..F-06）→ ⑤ 两轮（r1 PASS WITH FIXES → r2 PASS）→ ⑥ INDEPENDENT SCAN: PASS → ⑦ FINAL REVIEW: PASS；R=0 D=0（推送后 CI 暴露 Go 1.22 兼容缺陷，已按裁定修复并登记 DR-12）；后续片候选见报告 §后续片候选登记 |
 
+
+### P41 — `P41-T027B-SPAWN-OWNERSHIP` · ✅ 已闭环
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `P41-T027B-SPAWN-OWNERSHIP`（实现类；准则 v1.60） |
+| 状态 | ✅ **已闭环**（2026-10-31；提交与 CI 由 ⑩ 回执载明） |
+| 目标 | C2+N1：`ProcessSpec.OnSpawn` 钩子 + 预登记 starting 所有者 + Job 归属先于 resume，闭合宿主崩溃孤儿窗口 |
+| 依赖 | P40 已闭环（`a142eaa`） |
+| 规模 | L（跨 adapters / guard 的孤儿进程回收） |
+| 步骤 | 步骤 0 → ① 架构（V4 Pro）→ ② 测试红 → ③ 实现转绿 → ④ 门禁 → ⑤ 预审 → ⑥ 扫描 → ⑦ 终审 → ⑧a → ⑨ → ⑧c → ⑩ |
+| 现状缺口 | C2 孤儿进程（N1 宿主崩溃窗口）；Job 归属晚于 resume |
+| 交付物 | 报告对 `docs/validation/p41-spawn-ownership{,_EN}.md`；证据包 `docs/validation/evidence/P41-T027B-SPAWN-OWNERSHIP/`；执行自由度清单 |
+| 验收证据 | ② 测试红先行；`go build` / `go vet` / `go test ./...` 全绿；三作用域 TOTAL_FAIL=0 且 SELFTEST 697/697；报告 CN/EN 六形状全等 |
+| 边界 | 仅 `internal/adapters/**` 与 `internal/guard/**`；不推 gitee；commit 否 / push 否，停 ⑩ 等授权 |
+| 分级 | `[SLICE]`（实现类） |
+| 探针额度 | 无 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/P41-T027B-SPAWN-OWNERSHIP/freedom-list.md` |
+| R / D 基线 | R = 0、D = 0（不继承上片） |
+| 临时件落点声明 | 本片临时目录 = `tmp/P41-T027B-SPAWN-OWNERSHIP/`（⑧c 前只增不删） |
+| 完成记录 | ① 架构确认 → ② 红测（RED-CONFIRMED）→ ③ 两轮转绿（含 F-01..F-04 修复）→ ④ 门禁 → ⑤ 两轮（r1 PASS WITH FIXES → r2 PASS）→ ⑥ INDEPENDENT SCAN: PASS → ⑦ FINAL REVIEW: PASS；R=0 D=0；后续片候选见报告 §后续片候选登记 |
 ## 已知缺陷（后续切片前处理）
 
 > **阻断口径不变**：仅高频/已复现缺陷阻断，观测级 flake 只记录并在验证报告中列示。
