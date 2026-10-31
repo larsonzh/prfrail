@@ -175,6 +175,7 @@ internal/adapters/agent_runner_replay_store_terminals.go	repo
 internal/adapters/agent_runner_replay_store.go	repo
 internal/adapters/agent_runner_run.go	repo
 internal/adapters/ai_probe_copilot_executor.go	repo
+internal/adapters/bounddir_clean.go	repo
 internal/adapters/bounddir_darwin.go	repo
 internal/adapters/bounddir_unix.go	repo
 internal/adapters/bounddir_windows.go	repo

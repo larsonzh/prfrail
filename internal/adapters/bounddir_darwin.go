@@ -41,6 +41,7 @@ func OpenBoundDirFile(dir *BoundDir, rel string, bound int64) (*evidence.BoundFi
 
 // openBoundDirFile refuses for the same reason as OpenBoundDir.
 func openBoundDirFile(dir *BoundDir, rel string, bound int64, allowTruncation bool) (*evidence.BoundFile, error) {
+	_ = dir
 	_ = bound
 	_ = allowTruncation
 	return nil, fmt.Errorf("%w: %s", ErrBoundDirUnsupported, rel)
