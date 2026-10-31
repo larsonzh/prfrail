@@ -30,6 +30,11 @@ import (
 // host is still running when the next scan looks - and the scan has to adopt and stop
 // it through the persisted identity.
 
+// spawnRecoverySettleBound bounds every wait in the unix half of these tests. It lives
+// here rather than in the shared const block because only this build-tagged file uses
+// it, so a Windows-only build would otherwise carry an unused constant.
+const spawnRecoverySettleBound = 10 * time.Second
+
 // holdUnixStartingMarkerLock takes the exclusive host lock the design gives the live
 // host (flock on managed-process.starting.json) and returns an idempotent release
 // func, also registered as cleanup.
