@@ -189,7 +189,7 @@ func TestRequirePostflightQualifiedReviewFailsClosed(t *testing.T) {
 					t.Fatalf("the appended review transition must be a valid record: %v", err)
 				}
 			}
-			if err := fixture.engine.requirePostflightQualifiedReview(context.Background(), "task-two"); !errors.Is(err, test.want) {
+			if err := fixture.engine.requirePostflightQualifiedReview(context.Background(), "task-two", 1); !errors.Is(err, test.want) {
 				t.Fatalf("guard returned %v, want %v", err, test.want)
 			}
 		})

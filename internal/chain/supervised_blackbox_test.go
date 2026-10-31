@@ -688,7 +688,7 @@ func TestSupervisedUnqualifiedReviewRefused(t *testing.T) {
 	// A review state written without the gate cannot be honoured.
 	fixture.appendSupervisedTaskReview(t, []string{stopHash})
 	events := fixture.eventCount(t)
-	if err := fixture.engine.requirePostflightQualifiedReview(context.Background(), "task-one"); !errors.Is(err, ErrUnqualifiedReview) {
+	if err := fixture.engine.requirePostflightQualifiedReview(context.Background(), "task-one", 1); !errors.Is(err, ErrUnqualifiedReview) {
 		t.Fatalf("an unproven supervised review state must be refused, got %v", err)
 	}
 	if fixture.eventCount(t) != events {

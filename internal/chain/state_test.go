@@ -15,6 +15,9 @@ import (
 type memoryEvents struct {
 	events []evidence.StateEvent
 	err    error
+	// seals holds the P43 seal records so the in-memory store offers the same
+	// contract as FileEventStore: a task attempt that is accepted carries a seal.
+	seals map[string]SealRecord
 }
 
 func (store *memoryEvents) Append(_ context.Context, event evidence.StateEvent) error {
@@ -26,6 +29,49 @@ func (store *memoryEvents) Append(_ context.Context, event evidence.StateEvent) 
 }
 func (store *memoryEvents) Load(context.Context) ([]evidence.StateEvent, error) {
 	return append([]evidence.StateEvent(nil), store.events...), store.err
+}
+
+func memorySealKey(runID, taskID string, attempt int) string {
+	return fmt.Sprintf("%s\x00%s\x00%d", runID, taskID, attempt)
+}
+
+func (store *memoryEvents) SealTaskEvidence(_ context.Context, record SealRecord) (string, error) {
+	record.SchemaVersion = sealSchemaVersion
+	if err := record.validate(); err != nil {
+		return "", err
+	}
+	hash, err := record.Hash()
+	if err != nil {
+		return "", err
+	}
+	if store.seals == nil {
+		store.seals = map[string]SealRecord{}
+	}
+	key := memorySealKey(record.RunID, record.TaskID, record.Attempt)
+	if existing, ok := store.seals[key]; ok {
+		existingHash, hashErr := existing.Hash()
+		if hashErr != nil {
+			return "", hashErr
+		}
+		if existingHash != hash || !sameClosure(existing, record) {
+			return "", fmt.Errorf("%w: %s", ErrSealMismatch, key)
+		}
+		return existingHash, nil
+	}
+	store.seals[key] = record
+	return hash, nil
+}
+
+func (store *memoryEvents) LoadTaskSeal(_ context.Context, runID, taskID string, attempt int) (SealRecord, string, error) {
+	record, ok := store.seals[memorySealKey(runID, taskID, attempt)]
+	if !ok {
+		return SealRecord{}, "", fmt.Errorf("%w: %s", ErrSealMissing, memorySealKey(runID, taskID, attempt))
+	}
+	hash, err := record.Hash()
+	if err != nil {
+		return SealRecord{}, "", err
+	}
+	return record, hash, nil
 }
 
 func TestDefinitionValidationFourKindsAndModes(t *testing.T) {

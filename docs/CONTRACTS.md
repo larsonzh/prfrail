@@ -165,6 +165,16 @@ LF/CRLF；混合行尾、模糊/regex 匹配、序号断裂、重复 marker 或�
 
 isolated-workspace：直接工具写入仅限可丢弃运行目录；记录完整前后 manifest/diff/进程/gates；接受边界仍为整个 task。不能把部分语言、部分文件或“代码成功但文档失败”的子集发布。
 
+### 4.1 证据封存屏障与不可变上下文摘要（P43 权威）
+
+一次 task attempt 的接受终局由**封存屏障**独占：引擎必须先把该 attempt 的证据引用闭包落盘为封存记录（`seals/<runId>/<taskId>.<attempt>.seal.json`，独占创建 + fsync，失败不留半写文件），记录绑定父快照、候选摘要、`evidenceRootHash`、review 与 promotion 收据摘要、两项决策值、上下文摘要 K 与闭包成员；随后才写 `task-accepted` 事件，其输入证据末尾附封存记录摘要。写入失败、记录不可读、闭包含非法摘要或 K 不匹配时，一律不得产生 completed 终局，只能转入修复或暂停。
+
+恢复与加载必须验证封存：`New` 与 `Recover` 对每个 PASSED 任务读取封存记录、重算摘要并要求其出现在该事件的输入证据中；缺失、篡改或不匹配按恢复不确定处理，禁止补造、覆盖赢家或继续结算。
+
+K 是不可变上下文摘要（域分隔 `proofrail:context-key:1`），由 run/task/step、解析后的 attempt、父快照、工作区根、执行目标、请求身份与请求摘要构成；重入时重算必须相等，任一项变化（尤其 attempt）都必须拒绝复用。
+
+attempt 的唯一真源是持久执行上下文（`TaskAttemptResolver`）；缺省回退到事件投影中该任务已出现的最大 attempt，从未启动则为 1。请求、收据、实体键与事实提取必须使用同一解析值，不得写死。
+
 ## 5. Gate Hook 协议
 
 kind 使用 precheck/build/test/verify/review/cleanup；按序执行。`executable + args[]` 不经过隐式 shell，cwd 必须落在授权运行工作区；环境继承白名单，网络默认拒绝，资源/输出/时长必须可执行限制。需要 shell/container/remote/PTY 是独立能力声明，不支持则拒绝而非弱化策略。

@@ -72,6 +72,7 @@
 | P40 P40-T027B-LOCK-REAPER | ✅ Closed | P39 | L | 2026-10-31 | docs/validation/p40-lock-reaper{,_EN}.md |
 | P41 P41-T027B-SPAWN-OWNERSHIP | ✅ Closed | P40 | L | 2026-10-31 | docs/validation/p41-spawn-ownership{,_EN}.md |
 | P42 P42-T027B-EVIDENCE-BIND | ✅ Closed | P41 | M | 2026-10-31 | docs/validation/p42-evidence-bind{,_EN}.md |
+| P43 P43-T027B-STATE-SEAL | ✅ Closed | P42 | L | 2026-10-31 | docs/validation/p43-state-seal{,_EN}.md |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1316,6 +1317,27 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | R / D baseline | R = 0, D = 0 (not inherited) |
 | Temp landing | slice temp dir = `tmp/P42-T027B-EVIDENCE-BIND/` (append-only until ⑧c) |
 | Completion record | 1 architecture confirmed -> 3 red tests (RED-CONFIRMED) -> 2 two rounds to green (including the F1 per-read re-check) -> 4 gates -> 5 two rounds (r1 PASS WITH FIXES -> r2 PASS) -> 6 INDEPENDENT SCAN: PASS (first round format-non-compliant and reissued, budget 2/3) -> 7 FINAL REVIEW: PASS WITH FIXES; R=0 D=0; later-slice candidates in the report section Later-slice candidate registrations |
+### P43 — `P43-T027B-STATE-SEAL` · ✅ Closed
+
+| Field | Content |
+|---|---|
+| Identifier | `P43-T027B-STATE-SEAL` (implementation; directive v1.60) |
+| Status | ✅ **Closed** (2026-10-31; commit and CI carried by the ⑩ receipt) |
+| Goal | C4+C5+N3: the evidence seal barrier precedes the intent (a missing closure never yields a completed terminal); an immutable context digest K prevents a repeated collection from rewriting it; `Reopen` receives the real attempt instead of a hard-coded 1; the order seal → intent → settlement → C → closure stays strict |
+| Dependency | P39 closed (`4d5ebf3`), P42 closed (`d3a511b`) |
+| Size | L (chain state machine + tickets settlement and replay) |
+| Steps | step 0 → ① architecture (V4 Pro) → ③ red tests → ② green implementation → ④ gates → ⑤ pre-review → ⑥ scan → ⑦ final review → ⑧a → ⑨ → ⑧c → ⑩ |
+| Current gap | C4: the evidence reference closure is not persisted before the intent, leaving a path where a complete receipt carries evidence that does not hold; C5: `Reopen(..., 1, parent)` hard-codes the attempt; N3: with `attempt>1` next to an attempt=1 legacy workspace the wrong reopen identity is chosen |
+| Deliverables | report pair `docs/validation/p43-state-seal{,_EN}.md`; evidence pack `docs/validation/evidence/P43-T027B-STATE-SEAL/`; freedom list; documentation back-fill (`docs/CONTRACTS{,_EN}.md`, `docs/ARCHITECTURE{,_EN}.md`, `docs/DEV_PLAN{,_EN}.md`) |
+| Acceptance evidence | ③ tests red first; `go build` / `go vet` / `go test ./...` green; three scopes TOTAL_FAIL=0 and SELFTEST 697/697; report CN/EN six-shape parity |
+| Boundary | code only `internal/chain/**` and `internal/tickets/**`; no `internal/adapters/**`; documentation back-fill limited to the contract, architecture and plan files in ⑧; no gitee; commit no / push no, stop at ⑩ for authorisation |
+| Tier | `[SLICE]` (implementation) |
+| Probe quota | none |
+| Freedom list path | `docs/validation/evidence/P43-T027B-STATE-SEAL/freedom-list.md` |
+| R / D baseline | R = 0, D = 0 (not inherited) |
+| Temp location | temp dir for this slice = `tmp/P43-T027B-STATE-SEAL/` (append-only until ⑧c) |
+| Completion record | 1 architecture -> 3 red tests (RED-CONFIRMED) -> 2 two rounds to green -> 4 gates -> 5 two rounds (r1 PASS WITH FIXES -> r2 PASS) -> 6 two rounds (r1 BLOCKED: K not wired -> r2 PASS WITH FINDINGS, budget 2/3) -> 7 three rounds (r1/r2 BLOCKED -> r3 PASS, budget 3/3); R=0 D=0; production assembly wiring registered as an out-of-boundary limitation |
+
 ## Known defects (to be handled before later slices)
 
 > **Blocking rule unchanged**: only high-frequency / reproduced defects block; observation-grade flakes are recorded and listed in the validation report.

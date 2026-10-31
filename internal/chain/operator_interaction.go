@@ -331,11 +331,16 @@ func (engine *Engine) OpenOperatorInteraction(ctx context.Context, requestRecord
 		return fmt.Errorf("%w: invalid request record", ErrInvalidOperatorInteraction)
 	}
 	request := *requestRecord.Request
-	if request.RunID != engine.options.RunID || request.Attempt != 1 {
+	// P43 C5: compare against the resolved attempt instead of the literal 1.
+	expectedAttempt, err := engine.resolveTaskAttempt(ctx, request.TaskID)
+	if err != nil {
+		return err
+	}
+	if request.RunID != engine.options.RunID || request.Attempt != expectedAttempt {
 		return fmt.Errorf("%w: request does not belong to engine run", ErrInvalidOperatorInteraction)
 	}
-	task := taskEntity(request.RunID, request.TaskID)
-	step := stepEntity(request.RunID, request.TaskID, request.StepID)
+	task := taskEntityAt(request.RunID, request.TaskID, request.Attempt)
+	step := stepEntityAt(request.RunID, request.TaskID, request.StepID, request.Attempt)
 	taskState, stepState := engine.state.current(task), engine.state.current(step)
 	initial := taskState == "STEPS_RUNNING" && stepState == "RUNNING"
 	partial := taskState == "WAITING_FOR_OPERATOR" && (stepState == "RUNNING" || stepState == "WAITING_FOR_OPERATOR")
@@ -386,11 +391,16 @@ func (engine *Engine) ResumeOperatorInteraction(ctx context.Context, requestReco
 		return OperatorResumeCommand{}, err
 	}
 	request := *requestRecord.Request
-	if request.RunID != engine.options.RunID || request.Attempt != 1 {
+	// P43 C5: compare against the resolved attempt instead of the literal 1.
+	expectedAttempt, err := engine.resolveTaskAttempt(ctx, request.TaskID)
+	if err != nil {
+		return OperatorResumeCommand{}, err
+	}
+	if request.RunID != engine.options.RunID || request.Attempt != expectedAttempt {
 		return OperatorResumeCommand{}, fmt.Errorf("%w: response does not belong to engine run", ErrInvalidOperatorInteraction)
 	}
-	task := taskEntity(request.RunID, request.TaskID)
-	step := stepEntity(request.RunID, request.TaskID, request.StepID)
+	task := taskEntityAt(request.RunID, request.TaskID, request.Attempt)
+	step := stepEntityAt(request.RunID, request.TaskID, request.StepID, request.Attempt)
 	taskState, stepState := engine.state.current(task), engine.state.current(step)
 	waiting := taskState == "WAITING_FOR_OPERATOR" && (stepState == "WAITING_FOR_OPERATOR" || stepState == "RUNNING")
 	resumed := taskState == "STEPS_RUNNING" && stepState == "RUNNING"

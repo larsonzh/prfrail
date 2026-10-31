@@ -26,10 +26,14 @@ type Options struct {
 	Workspaces  WorkspacePort
 	Steps       StepPort
 	StepIntents StepIntentPreparer
-	Acceptance  AcceptancePort
-	Reviewer    ReviewerPort
-	Publisher   PublisherPort
-	Postflight  PostflightPort
+	// Attempts names the attempt a task is executing (P43 C5/N3). When it is nil
+	// the engine derives the attempt from the event projection, which is 1 for a
+	// task that never started.
+	Attempts   TaskAttemptResolver
+	Acceptance AcceptancePort
+	Reviewer   ReviewerPort
+	Publisher  PublisherPort
+	Postflight PostflightPort
 	// SupervisedPostflight runs the chain-owned postflight of a
 	// supervised-black-box task. The agent Postflight port stays required for
 	// every run; this port is only consulted when a task carries supervised
@@ -79,6 +83,12 @@ func New(ctx context.Context, options Options) (*Engine, error) {
 		return nil, fmt.Errorf("%w: event log belongs to %q", ErrInvalidState, projection.RunID)
 	}
 	engine := &Engine{options: options, state: stateWriter{store: options.Events, projection: projection, clock: options.Clock, ids: options.IDs}}
+	// P43 C4: an accepted terminal is verified before anything may run, not only on
+	// an explicit Recover. Otherwise a production assembly that never calls Recover
+	// would run past a missing seal and complete the chain.
+	if err := engine.verifyAcceptedSeals(ctx, events); err != nil {
+		return nil, err
+	}
 	if projection.ChainState == "" {
 		if err := engine.transition(ctx, chainEntity(options.RunID), "CREATED", nil, "run-created"); err != nil {
 			return nil, err
@@ -137,21 +147,27 @@ func (engine *Engine) Run(ctx context.Context) error {
 		}
 	}
 	for _, task := range engine.options.Definition.Tasks {
-		if engine.state.projection.TaskStates[taskKey(task.ID, 1)] == "PASSED" {
+		attempt, err := engine.resolveTaskAttempt(ctx, task.ID)
+		if err != nil {
+			// A run that cannot name its attempt must not sit in RUNNING: it pauses
+			// with a recovery-uncertain reason the operator can act on.
+			return engine.failChain(ctx, "attempt-resolve-failed", err)
+		}
+		if engine.state.projection.TaskStates[taskKey(task.ID, attempt)] == "PASSED" {
 			continue
 		}
 		if err := engine.boundary(ctx); err != nil {
 			return err
 		}
-		if err := engine.runTask(ctx, task); err != nil {
+		if err := engine.runTask(ctx, task, attempt); err != nil {
 			return err
 		}
 	}
 	return engine.transition(ctx, chainEntity(engine.options.RunID), "COMPLETED", nil, "chain-completed")
 }
 
-func (engine *Engine) runTask(ctx context.Context, task Task) error {
-	entity := taskEntity(engine.options.RunID, task.ID)
+func (engine *Engine) runTask(ctx context.Context, task Task, attempt int) error {
+	entity := taskEntityAt(engine.options.RunID, task.ID, attempt)
 	state := engine.state.current(entity)
 	if state == "NONE" {
 		if err := engine.transition(ctx, entity, "PENDING", nil, "task-created"); err != nil {
@@ -178,11 +194,11 @@ func (engine *Engine) runTask(ctx context.Context, task Task) error {
 	}
 	parent := SnapshotRef{Hash: engine.state.projection.AcceptedParent}
 	if !evidence.ValidHash(parent.Hash) {
-		return engine.failTask(ctx, task.ID, "accepted-parent-missing", ErrInvalidState)
+		return engine.failTask(ctx, task.ID, attempt, "accepted-parent-missing", ErrInvalidState)
 	}
-	workspace, err := engine.options.Workspaces.Materialize(ctx, engine.options.RunID, task.ID, 1, parent)
+	workspace, err := engine.options.Workspaces.Materialize(ctx, engine.options.RunID, task.ID, attempt, parent)
 	if err != nil {
-		return engine.failTask(ctx, task.ID, "workspace-materialize-failed", err)
+		return engine.failTask(ctx, task.ID, attempt, "workspace-materialize-failed", err)
 	}
 	if state == "PRECHECK" {
 		if err := engine.transition(ctx, entity, "STEPS_RUNNING", nil, "steps-started"); err != nil {
@@ -193,100 +209,182 @@ func (engine *Engine) runTask(ctx context.Context, task Task) error {
 		if err := engine.boundary(ctx); err != nil {
 			return err
 		}
-		if err := engine.runStep(ctx, task.ID, step, parent, workspace); err != nil {
+		if err := engine.runStep(ctx, task.ID, step, parent, workspace, attempt); err != nil {
 			return err
 		}
 	}
 	if engine.state.current(entity) != "REVIEW_PENDING" {
-		postflightInputs, postflightReason, postflightErr := engine.runTaskPostflight(ctx, task, parent, workspace)
+		postflightInputs, postflightReason, postflightErr := engine.runTaskPostflight(ctx, task, parent, workspace, attempt)
 		if postflightErr != nil {
 			return postflightErr
 		}
 		if err := engine.transition(ctx, entity, "REVIEW_PENDING", postflightInputs, postflightReason); err != nil {
 			return err
 		}
-	} else if err := engine.requirePostflightQualifiedReview(ctx, task.ID); err != nil {
+	} else if err := engine.requirePostflightQualifiedReview(ctx, task.ID, attempt); err != nil {
 		return err
 	}
-	candidate, err := engine.options.Acceptance.Accept(ctx, engine.options.RunID, task.ID, 1, parent, workspace)
+	// C5 frozen reuse: a task attempt that already sealed its closure is accepted
+	// from that seal. Re-freezing the candidate or re-running the review would let a
+	// repeated collection replace the very decision the seal recorded.
+	if resumed, err := engine.acceptFromExistingSeal(ctx, entity, task.ID, attempt, parent, workspace); err != nil {
+		return err
+	} else if resumed {
+		return nil
+	}
+	candidate, err := engine.options.Acceptance.Accept(ctx, engine.options.RunID, task.ID, attempt, parent, workspace)
 	if err != nil {
-		return engine.failTask(ctx, task.ID, "candidate-freeze-failed", err)
+		return engine.failTask(ctx, task.ID, attempt, "candidate-freeze-failed", err)
 	}
 	if !evidence.ValidHash(candidate.Snapshot.Hash) || !evidence.ValidHash(candidate.EvidenceRootHash) {
-		return engine.failTask(ctx, task.ID, "candidate-invalid", ErrInvalidState)
+		return engine.failTask(ctx, task.ID, attempt, "candidate-invalid", ErrInvalidState)
 	}
 	review, err := engine.options.Reviewer.Review(ctx, ReviewRequest{
 		RunID:                 engine.options.RunID,
 		TaskID:                task.ID,
-		Attempt:               1,
+		Attempt:               attempt,
 		ParentSnapshotHash:    parent.Hash,
 		CandidateSnapshotHash: candidate.Snapshot.Hash,
 		EvidenceRootHash:      candidate.EvidenceRootHash,
 		CandidateProducer:     candidate.CandidateProducer,
 	})
 	if err != nil {
-		return engine.failTask(ctx, task.ID, "review-failed", err)
+		return engine.failTask(ctx, task.ID, attempt, "review-failed", err)
 	}
 	reviewResult, err := buildReviewResult(ReviewRequest{
 		RunID:                 engine.options.RunID,
 		TaskID:                task.ID,
-		Attempt:               1,
+		Attempt:               attempt,
 		ParentSnapshotHash:    parent.Hash,
 		CandidateSnapshotHash: candidate.Snapshot.Hash,
 		EvidenceRootHash:      candidate.EvidenceRootHash,
 		CandidateProducer:     candidate.CandidateProducer,
 	}, review, engine.options.Clock, engine.options.IDs)
 	if err != nil {
-		return engine.markTaskForRepair(ctx, task.ID, "review-invalid", append(candidate.Evidence, candidate.EvidenceRootHash))
+		return engine.markTaskForRepair(ctx, task.ID, attempt, "review-invalid", append(candidate.Evidence, candidate.EvidenceRootHash))
 	}
 	if review.Outcome == "reject" {
 		inputs := append([]string{reviewResult.ReceiptHash, candidate.Snapshot.Hash, candidate.EvidenceRootHash}, review.ErrorEvidence...)
 		inputs = uniqueHashes(inputs)
-		return engine.markTaskForRepair(ctx, task.ID, "review-rejected", inputs)
+		return engine.markTaskForRepair(ctx, task.ID, attempt, "review-rejected", inputs)
 	}
 	promotion, err := engine.options.Publisher.Publish(ctx, PromotionRequest{
 		RunID:                 engine.options.RunID,
 		TaskID:                task.ID,
-		Attempt:               1,
+		Attempt:               attempt,
 		ParentSnapshotHash:    parent.Hash,
 		CandidateSnapshotHash: candidate.Snapshot.Hash,
 		EvidenceRootHash:      candidate.EvidenceRootHash,
 		ReviewReceiptHash:     reviewResult.ReceiptHash,
 	})
 	if err != nil {
-		return engine.failTask(ctx, task.ID, "promotion-failed", err)
+		return engine.failTask(ctx, task.ID, attempt, "promotion-failed", err)
 	}
 	promotionResult, err := buildPromotionResult(PromotionRequest{
 		RunID:                 engine.options.RunID,
 		TaskID:                task.ID,
-		Attempt:               1,
+		Attempt:               attempt,
 		ParentSnapshotHash:    parent.Hash,
 		CandidateSnapshotHash: candidate.Snapshot.Hash,
 		EvidenceRootHash:      candidate.EvidenceRootHash,
 		ReviewReceiptHash:     reviewResult.ReceiptHash,
 	}, promotion, engine.options.Clock, engine.options.IDs)
 	if err != nil {
-		return engine.markTaskForRepair(ctx, task.ID, "promotion-invalid", append(candidate.Evidence, candidate.EvidenceRootHash))
+		return engine.markTaskForRepair(ctx, task.ID, attempt, "promotion-invalid", append(candidate.Evidence, candidate.EvidenceRootHash))
 	}
 	if promotion.Outcome != "completed" {
 		inputs := append([]string{reviewResult.ReceiptHash, promotionResult.ReceiptHash, candidate.Snapshot.Hash}, promotion.ErrorEvidence...)
 		inputs = uniqueHashes(inputs)
-		return engine.markTaskForRepair(ctx, task.ID, "promotion-incomplete", inputs)
+		return engine.markTaskForRepair(ctx, task.ID, attempt, "promotion-incomplete", inputs)
 	}
 	inputs := []string{candidate.Snapshot.Hash, reviewResult.ReceiptHash, promotionResult.ReceiptHash, candidate.EvidenceRootHash}
 	inputs = append(inputs, candidate.Evidence...)
 	inputs = append(inputs, review.Evidence...)
 	inputs = append(inputs, promotion.Evidence...)
 	inputs = uniqueHashes(inputs)
-	if err := engine.transition(ctx, entity, "PASSED", inputs, "task-accepted"); err != nil {
+	// C4 barrier: the accepted terminal is written only after the closure that
+	// terminal carries is durable in its own record. A gap is repaired, never
+	// accepted.
+	sealHash, sealErr := engine.sealAcceptedClosure(ctx, SealRecord{
+		RunID:                engine.options.RunID,
+		TaskID:               task.ID,
+		Attempt:              attempt,
+		ParentHash:           parent.Hash,
+		CandidateHash:        candidate.Snapshot.Hash,
+		EvidenceRootHash:     candidate.EvidenceRootHash,
+		ContextKey:           TaskContextKey(engine.options.RunID, task.ID, attempt, parent.Hash, workspace.Root),
+		ReviewReceiptHash:    reviewResult.ReceiptHash,
+		PromotionReceiptHash: promotionResult.ReceiptHash,
+		ReviewDecision:       review.Outcome,
+		PromotionDecision:    promotion.Outcome,
+		Evidence:             inputs,
+	})
+	if sealErr != nil {
+		reason := "evidence-seal-failed"
+		if errors.Is(sealErr, ErrSealIncomplete) {
+			reason = "evidence-closure-incomplete"
+		}
+		return engine.markTaskForRepair(ctx, task.ID, attempt, reason, inputs)
+	}
+	if err := engine.transition(ctx, entity, "PASSED", append(inputs, sealHash), "task-accepted"); err != nil {
 		return err
 	}
 	engine.state.projection.AcceptedParent = candidate.Snapshot.Hash
 	return nil
 }
 
-func (engine *Engine) markTaskForRepair(ctx context.Context, taskID, reason string, input []string) error {
-	entity := taskEntity(engine.options.RunID, taskID)
+// acceptFromExistingSeal finishes a task attempt whose closure is already sealed.
+// It reports true when the accepted terminal was written from the seal, so the
+// caller must not re-freeze the candidate or re-run the review.
+func (engine *Engine) acceptFromExistingSeal(ctx context.Context, entity evidence.Entity, taskID string, attempt int, parent SnapshotRef, workspace Workspace) (bool, error) {
+	sink, ok := engine.options.Events.(SealSink)
+	if !ok {
+		return false, nil
+	}
+	record, hash, err := sink.LoadTaskSeal(ctx, engine.options.RunID, taskID, attempt)
+	if err != nil {
+		if errors.Is(err, ErrSealMissing) {
+			return false, nil
+		}
+		return false, engine.markTaskForRepair(ctx, taskID, attempt, "evidence-seal-unreadable", nil)
+	}
+	// C5: the sealed task context key must be the one this attempt derives now.
+	taskKeyNow := TaskContextKey(engine.options.RunID, taskID, attempt, parent.Hash, workspace.Root)
+	if record.ParentHash != parent.Hash || record.Attempt != attempt || record.ContextKey != taskKeyNow {
+		return false, engine.markTaskForRepair(ctx, taskID, attempt, "evidence-seal-mismatch", append([]string{}, record.Evidence...))
+	}
+	// A seal may only be replayed as an acceptance when it recorded an accepting
+	// review and a completed promotion; anything else is a forged or stale record.
+	if record.ReviewDecision != "approve" || record.PromotionDecision != "completed" {
+		return false, engine.markTaskForRepair(ctx, taskID, attempt, "evidence-seal-mismatch", append([]string{}, record.Evidence...))
+	}
+	inputs := append([]string{}, record.Evidence...)
+	inputs = append(inputs, hash)
+	if err := engine.transition(ctx, entity, "PASSED", inputs, "task-accepted"); err != nil {
+		return false, err
+	}
+	engine.state.projection.AcceptedParent = record.CandidateHash
+	return true, nil
+}
+
+// sealAcceptedClosure persists the seal record for one accepted task attempt. The
+// event store owns the seal, so a store without sealing support fails the task
+// closed instead of accepting an unsealed closure.
+func (engine *Engine) sealAcceptedClosure(ctx context.Context, record SealRecord) (string, error) {
+	sink, ok := engine.options.Events.(SealSink)
+	if !ok {
+		return "", fmt.Errorf("%w: the event store does not implement sealing", ErrSealUnavailable)
+	}
+	for _, hash := range record.Evidence {
+		if !evidence.ValidHash(hash) {
+			return "", fmt.Errorf("%w: %q is not a hash", ErrSealIncomplete, hash)
+		}
+	}
+	return sink.SealTaskEvidence(ctx, record)
+}
+
+func (engine *Engine) markTaskForRepair(ctx context.Context, taskID string, attempt int, reason string, input []string) error {
+	entity := taskEntityAt(engine.options.RunID, taskID, attempt)
 	input = uniqueHashes(input)
 	if err := engine.transition(ctx, entity, "REPAIR_PENDING", input, reason); err != nil {
 		return err
@@ -299,8 +397,8 @@ func (engine *Engine) markTaskForRepair(ctx context.Context, taskID, reason stri
 	return ErrPaused
 }
 
-func (engine *Engine) runStep(ctx context.Context, taskID string, step Step, parent SnapshotRef, workspace Workspace) error {
-	entity := stepEntity(engine.options.RunID, taskID, step.ID)
+func (engine *Engine) runStep(ctx context.Context, taskID string, step Step, parent SnapshotRef, workspace Workspace, attempt int) error {
+	entity := stepEntityAt(engine.options.RunID, taskID, step.ID, attempt)
 	state := engine.state.current(entity)
 	if state == "PASSED" || state == "NOOP_RECORDED" {
 		return nil
@@ -323,7 +421,8 @@ func (engine *Engine) runStep(ctx context.Context, taskID string, step Step, par
 			return err
 		}
 	}
-	request := StepRequest{RunID: engine.options.RunID, TaskID: taskID, Step: step, Attempt: 1, ParentHash: parent.Hash, Workspace: workspace}
+	request := StepRequest{RunID: engine.options.RunID, TaskID: taskID, Step: step, Attempt: attempt, ParentHash: parent.Hash, Workspace: workspace}
+	request.ContextKey = ContextKey(engine.options.RunID, taskID, step.ID, attempt, parent.Hash, workspace.Root, "", "", "")
 	if !reentry {
 		if err := engine.transition(ctx, entity, "RUNNING", nil, "step-started"); err != nil {
 			return err
@@ -335,19 +434,22 @@ func (engine *Engine) runStep(ctx context.Context, taskID string, step Step, par
 			if transitionErr := engine.transition(ctx, entity, "FAILED", nil, "step-intent-failed"); transitionErr != nil {
 				return errors.Join(err, transitionErr)
 			}
-			return engine.failTask(ctx, taskID, "step-intent-failed", err)
+			return engine.failTask(ctx, taskID, attempt, "step-intent-failed", err)
 		}
 		if err := intent.validate(step); err != nil {
 			if transitionErr := engine.transition(ctx, entity, "FAILED", nil, "step-intent-invalid"); transitionErr != nil {
 				return errors.Join(err, transitionErr)
 			}
-			return engine.failTask(ctx, taskID, "step-intent-invalid", err)
+			return engine.failTask(ctx, taskID, attempt, "step-intent-invalid", err)
 		}
 		request.ExecutionTarget = intent.ExecutionTarget
 		if intent.AgentRunnerFacts != nil {
 			facts := *intent.AgentRunnerFacts
 			request.AgentRunnerFacts = &facts
 		}
+		// C5: once the dispatch identity is fixed, K covers the whole immutable
+		// input set - target, request identity and recorded context digest.
+		request.ContextKey = ContextKey(engine.options.RunID, taskID, step.ID, attempt, parent.Hash, workspace.Root, string(intent.ExecutionTarget), factsRequestID(intent.AgentRunnerFacts), factsContextHash(intent.AgentRunnerFacts))
 	}
 	if engine.options.Failpoint != nil {
 		if err := engine.options.Failpoint("step-running"); err != nil {
@@ -365,7 +467,15 @@ func (engine *Engine) runStep(ctx context.Context, taskID string, step Step, par
 		if transitionErr := engine.transition(ctx, entity, "FAILED", result.Evidence, "step-failed"); transitionErr != nil {
 			return errors.Join(err, transitionErr)
 		}
-		return engine.failTask(ctx, taskID, "step-failed", err)
+		return engine.failTask(ctx, taskID, attempt, "step-failed", err)
+	}
+	for _, hash := range result.Evidence {
+		if !evidence.ValidHash(hash) {
+			if transitionErr := engine.transition(ctx, entity, "FAILED", nil, "evidence-closure-incomplete"); transitionErr != nil {
+				return errors.Join(ErrSealIncomplete, transitionErr)
+			}
+			return engine.failTask(ctx, taskID, attempt, "evidence-closure-incomplete", ErrSealIncomplete)
+		}
 	}
 	if request.AgentRunnerFacts != nil {
 		// A dispatch result only proves that the external run started. The step
@@ -424,20 +534,24 @@ func (engine *Engine) cancelRun(ctx context.Context) error {
 		return errors.Join(ErrRecoveryUncertain, err)
 	}
 	for _, task := range engine.options.Definition.Tasks {
-		for _, step := range task.Steps {
-			entity := stepEntity(engine.options.RunID, task.ID, step.ID)
+		// P43 N3: cancellation reaches every attempt the projection knows, not only
+		// the single-attempt key, so an attempt>1 step cannot survive a cancel.
+		for _, attempt := range engine.taskAttempts(task.ID) {
+			for _, step := range task.Steps {
+				entity := stepEntityAt(engine.options.RunID, task.ID, step.ID, attempt)
+				state := engine.state.current(entity)
+				if state == "PENDING" || state == "RUNNING" || state == "TERMINAL_PENDING" || state == "WAITING_FOR_OPERATOR" {
+					if err := engine.transition(ctx, entity, "CANCELLED", evidenceHashes, "operator-cancelled"); err != nil {
+						return err
+					}
+				}
+			}
+			entity := taskEntityAt(engine.options.RunID, task.ID, attempt)
 			state := engine.state.current(entity)
-			if state == "PENDING" || state == "RUNNING" || state == "TERMINAL_PENDING" || state == "WAITING_FOR_OPERATOR" {
+			if state == "PENDING" || state == "PRECHECK" || state == "STEPS_RUNNING" || state == "WAITING_FOR_OPERATOR" || state == "REVIEW_PENDING" || state == "REPAIR_PENDING" {
 				if err := engine.transition(ctx, entity, "CANCELLED", evidenceHashes, "operator-cancelled"); err != nil {
 					return err
 				}
-			}
-		}
-		entity := taskEntity(engine.options.RunID, task.ID)
-		state := engine.state.current(entity)
-		if state == "PENDING" || state == "PRECHECK" || state == "STEPS_RUNNING" || state == "WAITING_FOR_OPERATOR" || state == "REVIEW_PENDING" || state == "REPAIR_PENDING" {
-			if err := engine.transition(ctx, entity, "CANCELLED", evidenceHashes, "operator-cancelled"); err != nil {
-				return err
 			}
 		}
 	}
@@ -447,8 +561,8 @@ func (engine *Engine) cancelRun(ctx context.Context) error {
 	return ErrCancelled
 }
 
-func (engine *Engine) failTask(ctx context.Context, taskID, reason string, cause error) error {
-	entity := taskEntity(engine.options.RunID, taskID)
+func (engine *Engine) failTask(ctx context.Context, taskID string, attempt int, reason string, cause error) error {
+	entity := taskEntityAt(engine.options.RunID, taskID, attempt)
 	state := engine.state.current(entity)
 	if state != "FAILED" {
 		if err := engine.transition(ctx, entity, "FAILED", nil, reason); err != nil {
@@ -472,11 +586,23 @@ func (engine *Engine) transition(ctx context.Context, entity evidence.Entity, to
 }
 
 func chainEntity(runID string) evidence.Entity { return evidence.Entity{Kind: "chain", RunID: runID} }
+
+// taskEntity and stepEntity keep the single-attempt shape every existing caller and
+// projection key relies on. Attempt-aware paths use the At forms below.
 func taskEntity(runID, taskID string) evidence.Entity {
-	return evidence.Entity{Kind: "task", RunID: runID, TaskID: taskID, Attempt: 1}
+	return taskEntityAt(runID, taskID, 1)
 }
+
+func taskEntityAt(runID, taskID string, attempt int) evidence.Entity {
+	return evidence.Entity{Kind: "task", RunID: runID, TaskID: taskID, Attempt: attempt}
+}
+
 func stepEntity(runID, taskID, stepID string) evidence.Entity {
-	return evidence.Entity{Kind: "step", RunID: runID, TaskID: taskID, StepID: stepID, Attempt: 1}
+	return stepEntityAt(runID, taskID, stepID, 1)
+}
+
+func stepEntityAt(runID, taskID, stepID string, attempt int) evidence.Entity {
+	return evidence.Entity{Kind: "step", RunID: runID, TaskID: taskID, StepID: stepID, Attempt: attempt}
 }
 
 func cloneProjection(source Projection) Projection {

@@ -156,6 +156,16 @@ sequence gaps, duplicate markers or any hash mismatch are rejected before writes
 
 isolated-workspace: direct tool writes stay in a disposable run directory, with complete before/after manifests, diff, process and gate evidence. Acceptance remains whole-task: never publish selected languages/files or successful code with failed documentation.
 
+### 4.1 Evidence Seal Barrier and Immutable Context Digest (P43 authority)
+
+The accepted terminal of one task attempt is owned by a **seal barrier**: the engine must first persist the evidence reference closure of that attempt as a seal record (`seals/<runId>/<taskId>.<attempt>.seal.json`, exclusive create + fsync, no half-written file left behind) binding the parent snapshot, candidate digest, `evidenceRootHash`, both receipt digests, both decision values, the context digest K and the closure members; only then may it write the `task-accepted` event, whose input evidence carries the seal digest last. A failed write, an unreadable record, a closure member that is not a hash, or a K mismatch never yields a completed terminal - the attempt moves to repair or pause instead.
+
+Recovery and load must verify the seal: `New` and `Recover` read the seal of every PASSED task, recompute its digest and require it to appear in that event's input evidence; missing, tampered or mismatched seals count as recovery-uncertain, and nothing reconstructs a seal, overwrites the winner or continues settlement.
+
+K is the immutable context digest (domain `proofrail:context-key:1`) over run/task/step, the resolved attempt, the parent snapshot, the workspace root, the execution target, the request identity and the request digest; a re-entry must recompute the same value, and any change - the attempt in particular - refuses reuse.
+
+The single source of the attempt is the durable execution context (`TaskAttemptResolver`); the fallback is the highest attempt the event projection already recorded for that task, and 1 for a task that never started. Requests, receipts, entity keys and fact extraction must all use the same resolved value instead of a literal.
+
 ## 5. Gate Hooks
 
 Kinds are precheck/build/test/verify/review/cleanup, executed in order. executable plus args uses no implicit shell; cwd stays in the authorized workspace. Explicit environment allowlist, default-deny network and enforceable resource/output/time limits are required. shell/container/remote/PTY are declared capabilities: reject unsupported requirements instead of weakening policy.

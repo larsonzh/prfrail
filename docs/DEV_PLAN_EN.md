@@ -167,7 +167,7 @@ Backfill note (2026-10-22, step 0 of slice DIRECTIVE-COST-TIER): when those thre
 - P40 lock order: C1
 - P41 ownership: C2 and N1
 - P42 binding: C3 and N2
-- P43 sealing: C4 and C5 and N3
+- P43 sealing: C4 and C5 and N3 (done, report docs/validation/p43-state-seal{,_EN}.md)
 - P44 gate order: C7 and N4
 - P45 zero-model E2E
 

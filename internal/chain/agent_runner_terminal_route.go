@@ -30,14 +30,20 @@ func (engine *Engine) SubmitAgentRunnerTerminal(ctx context.Context, terminal Ag
 	if err := terminal.Validate(); err != nil {
 		return AgentRunnerTerminalRoute{}, err
 	}
-	if terminal.RunID != engine.options.RunID || terminal.Attempt != 1 {
+	// P43 C5: the attempt comes from the durable execution context, not from a
+	// literal, so an attempt>1 terminal is bound to its own identity.
+	expectedAttempt, err := engine.resolveTaskAttempt(ctx, terminal.TaskID)
+	if err != nil {
+		return AgentRunnerTerminalRoute{}, err
+	}
+	if terminal.RunID != engine.options.RunID || terminal.Attempt != expectedAttempt {
 		return AgentRunnerTerminalRoute{}, fmt.Errorf("%w: terminal does not belong to this run and attempt", ErrInvalidAgentRunnerTerminal)
 	}
 	task, step, err := engine.lookupAgentRunnerStep(terminal)
 	if err != nil {
 		return AgentRunnerTerminalRoute{}, err
 	}
-	entity := stepEntity(engine.options.RunID, terminal.TaskID, terminal.StepID)
+	entity := stepEntityAt(engine.options.RunID, terminal.TaskID, terminal.StepID, terminal.Attempt)
 	events, err := engine.options.Events.Load(ctx)
 	if err != nil {
 		return AgentRunnerTerminalRoute{}, err
@@ -114,7 +120,7 @@ func agentTerminalStepRoute(status AgentRunnerTerminalStatus) (string, string) {
 // its routed state, so a replay after a partial write repairs exactly the
 // missing transitions and nothing else.
 func (engine *Engine) convergeAgentTerminalRoute(ctx context.Context, task Task, terminal AgentRunnerTerminal, inputs []string) error {
-	taskEntityRef := taskEntity(engine.options.RunID, task.ID)
+	taskEntityRef := taskEntityAt(engine.options.RunID, task.ID, terminal.Attempt)
 	chainEntityRef := chainEntity(engine.options.RunID)
 	taskState, reason := "", ""
 	switch terminal.Status {
@@ -127,7 +133,7 @@ func (engine *Engine) convergeAgentTerminalRoute(ctx context.Context, task Task,
 		// once the operator machine answered it (or the step moved on for any
 		// other proven reason), a repeated terminal must not push the task and
 		// the run back into a waiting pause.
-		if engine.state.current(stepEntity(engine.options.RunID, terminal.TaskID, terminal.StepID)) != "WAITING_FOR_OPERATOR" {
+		if engine.state.current(stepEntityAt(engine.options.RunID, terminal.TaskID, terminal.StepID, terminal.Attempt)) != "WAITING_FOR_OPERATOR" {
 			return nil
 		}
 		taskState, reason = "WAITING_FOR_OPERATOR", agentRunnerTerminalWaitingReason
@@ -173,8 +179,8 @@ func (engine *Engine) convergeAgentTerminalRoute(ctx context.Context, task Task,
 func (engine *Engine) agentTerminalRouteReceipt(terminal AgentRunnerTerminal, converged bool) AgentRunnerTerminalRoute {
 	return AgentRunnerTerminalRoute{
 		Status:     terminal.Status,
-		StepState:  engine.state.current(stepEntity(engine.options.RunID, terminal.TaskID, terminal.StepID)),
-		TaskState:  engine.state.current(taskEntity(engine.options.RunID, terminal.TaskID)),
+		StepState:  engine.state.current(stepEntityAt(engine.options.RunID, terminal.TaskID, terminal.StepID, terminal.Attempt)),
+		TaskState:  engine.state.current(taskEntityAt(engine.options.RunID, terminal.TaskID, terminal.Attempt)),
 		ChainState: engine.state.projection.ChainState,
 		Converged:  converged,
 	}

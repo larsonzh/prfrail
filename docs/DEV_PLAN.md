@@ -166,7 +166,7 @@ T027 前置状态更新（2026-10-31，DOCS-ALIGNMENT）：本片把 DEV_PLAN、
 - P40 锁序：C1
 - P41 归属：C2 与 N1
 - P42 绑定：C3 与 N2
-- P43 封存：C4 与 C5 与 N3
+- P43 封存：C4 与 C5 与 N3（已完成，报告 `docs/validation/p43-state-seal{,_EN}.md`）
 - P44 门序：C7 与 N4
 - P45 零模型 E2E
 

@@ -83,6 +83,9 @@ baseline、已接受快照、最终报告及失败证据默认保留；候选/�
 
 进程内互斥先于跨进程锁；锁不跨外部等待；锁等待可取消。
 
+- 封存屏障（P43）：task 接受前，引擎把候选闭包、证据根、两项收据、两项决策与上下文摘要 K 写入 `seals/<runId>/<taskId>.<attempt>.seal.json`（独占创建 + fsync），再写 `task-accepted`；`New` 与 `Recover` 对每个 PASSED 任务回验该记录，缺失或篡改按恢复不确定处理。重入时若封存已存在且 K 一致，直接复用它重建接受终局，不重调 Reviewer / Publisher。
+- attempt 解析（P43）：`TaskAttemptResolver` 是唯一真源，缺省从事件投影派生；工作区物化、候选冻结、评审、发布、postflight 事实提取与 operator / terminal 路由全部使用同一解析值，实体键按 `taskID + attempt` 记账。
+
 ## 5. 关键取舍
 
 | 决策 | 理由 | 代价/控制 |

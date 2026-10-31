@@ -25,10 +25,14 @@ func (fake *fakeBaseline) CaptureBaseline(context.Context, string) (SnapshotRef,
 }
 
 type materialization struct{ task, parent string }
-type fakeWorkspaces struct{ calls []materialization }
+type fakeWorkspaces struct {
+	calls    []materialization
+	attempts []int
+}
 
-func (fake *fakeWorkspaces) Materialize(_ context.Context, _ string, task string, _ int, parent SnapshotRef) (Workspace, error) {
+func (fake *fakeWorkspaces) Materialize(_ context.Context, _ string, task string, attempt int, parent SnapshotRef) (Workspace, error) {
 	fake.calls = append(fake.calls, materialization{task: task, parent: parent.Hash})
+	fake.attempts = append(fake.attempts, attempt)
 	return Workspace{Root: task}, nil
 }
 
@@ -74,20 +78,33 @@ type fakeAcceptance struct {
 	producer evidence.Actor
 	tasks    []string
 	calls    int
+	// evidence overrides the closure per call, so a test can hand the engine a
+	// closure that is not a valid hash set.
+	evidence [][]string
+	attempts []int
 }
 
-func (fake *fakeAcceptance) Accept(_ context.Context, _ string, taskID string, _ int, _ SnapshotRef, _ Workspace) (CandidateResult, error) {
+func (fake *fakeAcceptance) Accept(_ context.Context, _ string, taskID string, attempt int, _ SnapshotRef, _ Workspace) (CandidateResult, error) {
 	fake.tasks = append(fake.tasks, taskID)
+	fake.attempts = append(fake.attempts, attempt)
 	index := fake.calls
 	if index >= len(fake.hashes) {
 		index = len(fake.hashes) - 1
 	}
 	hash := fake.hashes[index]
+	closure := []string{stopHash}
+	if len(fake.evidence) > 0 {
+		closureIndex := fake.calls
+		if closureIndex >= len(fake.evidence) {
+			closureIndex = len(fake.evidence) - 1
+		}
+		closure = append([]string(nil), fake.evidence[closureIndex]...)
+	}
 	fake.calls++
 	return CandidateResult{
 		Snapshot:          SnapshotRef{Hash: hash},
 		EvidenceRootHash:  stopHash,
-		Evidence:          []string{stopHash},
+		Evidence:          closure,
 		CandidateProducer: fake.producer,
 	}, nil
 }
@@ -97,10 +114,12 @@ type fakeReviewer struct {
 	err       error
 	tasks     []string
 	calls     int
+	attempts  []int
 }
 
 func (fake *fakeReviewer) Review(_ context.Context, request ReviewRequest) (ReviewDecision, error) {
 	fake.tasks = append(fake.tasks, request.TaskID)
+	fake.attempts = append(fake.attempts, request.Attempt)
 	if fake.err != nil {
 		return ReviewDecision{}, fake.err
 	}
@@ -118,10 +137,12 @@ type fakePublisher struct {
 	err       error
 	tasks     []string
 	calls     int
+	attempts  []int
 }
 
 func (fake *fakePublisher) Publish(_ context.Context, request PromotionRequest) (PromotionDecision, error) {
 	fake.tasks = append(fake.tasks, request.TaskID)
+	fake.attempts = append(fake.attempts, request.Attempt)
 	if fake.err != nil {
 		return PromotionDecision{}, fake.err
 	}

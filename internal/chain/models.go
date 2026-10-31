@@ -71,12 +71,14 @@ type AgentRunnerImmutableFacts struct {
 }
 
 type StepRequest struct {
-	RunID            string
-	TaskID           string
-	Step             Step
-	Attempt          int
-	ParentHash       string
-	Workspace        Workspace
+	RunID      string
+	TaskID     string
+	Step       Step
+	Attempt    int
+	ParentHash string
+	Workspace  Workspace
+	// ContextKey is the immutable context digest of this step attempt (P43 C5).
+	ContextKey       string
 	ExecutionTarget  ExecutionTarget
 	AgentRunnerFacts *AgentRunnerImmutableFacts
 }

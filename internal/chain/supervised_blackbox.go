@@ -142,7 +142,7 @@ func supervisedFactsFromEvidence(input []string) (SupervisedFrozenFacts, error) 
 // whose supervised step never completed a return has no facts; a task whose
 // returns came from several steps, or several receipts for one step, is refused
 // instead of guessing which facts the postflight should audit.
-func supervisedTaskFacts(events []evidence.StateEvent, runID, taskID string) (SupervisedFrozenFacts, bool, error) {
+func supervisedTaskFacts(events []evidence.StateEvent, runID, taskID string, attempt int) (SupervisedFrozenFacts, bool, error) {
 	var (
 		facts SupervisedFrozenFacts
 		found bool
@@ -152,6 +152,10 @@ func supervisedTaskFacts(events []evidence.StateEvent, runID, taskID string) (Su
 	for _, record := range events {
 		event := record.Event
 		if event.Entity.Kind != "step" || event.Entity.RunID != runID || event.Entity.TaskID != taskID {
+			continue
+		}
+		// P43 N3: facts belong to the attempt that recorded them.
+		if event.Entity.Attempt != attempt {
 			continue
 		}
 		if event.Reason.Code != supervisedReturnCompletedReason {
@@ -225,8 +229,12 @@ func (engine *Engine) OpenSupervisedWorkWindow(ctx context.Context, session Hand
 	if body.RiskNoticeVersion != SupervisedRiskNoticeVersion || body.RiskNoticeHash != SupervisedRiskNoticeHash() {
 		return fmt.Errorf("%w: risk notice version or hash drifted", ErrInvalidSupervisedConfirmation)
 	}
-	task := taskEntity(engine.options.RunID, body.TaskID)
-	step := stepEntity(engine.options.RunID, body.TaskID, body.StepID)
+	attempt, err := engine.resolveTaskAttempt(ctx, body.TaskID)
+	if err != nil {
+		return err
+	}
+	task := taskEntityAt(engine.options.RunID, body.TaskID, attempt)
+	step := stepEntityAt(engine.options.RunID, body.TaskID, body.StepID, attempt)
 	taskState, stepState := engine.state.current(task), engine.state.current(step)
 	if taskState != "STEPS_RUNNING" || stepState != "RUNNING" {
 		return fmt.Errorf("%w: supervised work window requires STEPS_RUNNING/RUNNING", ErrInvalidState)
@@ -263,8 +271,22 @@ func (engine *Engine) SubmitSupervisedReturn(ctx context.Context, receipt Handof
 	if facts.HandoffReceiptHash != receipt.ReceiptHash {
 		return fmt.Errorf("%w: the handoff receipt fact must be the return receipt digest", ErrInvalidPostflightFacts)
 	}
-	task := taskEntity(engine.options.RunID, receipt.Receipt.TaskID)
-	step := stepEntity(engine.options.RunID, receipt.Receipt.TaskID, receipt.Receipt.StepID)
+	returnAttempt := receipt.Receipt.Attempt
+	if returnAttempt < 1 {
+		return fmt.Errorf("%w: supervised return carries no attempt", ErrInvalidState)
+	}
+	if receipt.Receipt.RunID != engine.options.RunID {
+		return fmt.Errorf("%w: supervised return belongs to another run", ErrInvalidState)
+	}
+	resolvedAttempt, err := engine.resolveTaskAttempt(ctx, receipt.Receipt.TaskID)
+	if err != nil {
+		return err
+	}
+	if returnAttempt != resolvedAttempt {
+		return fmt.Errorf("%w: supervised return attempt %d does not match the resolved attempt %d", ErrInvalidState, returnAttempt, resolvedAttempt)
+	}
+	task := taskEntityAt(engine.options.RunID, receipt.Receipt.TaskID, returnAttempt)
+	step := stepEntityAt(engine.options.RunID, receipt.Receipt.TaskID, receipt.Receipt.StepID, returnAttempt)
 	events, err := engine.options.Events.Load(ctx)
 	if err != nil {
 		return err
@@ -306,7 +328,7 @@ func (engine *Engine) SubmitSupervisedReturn(ctx context.Context, receipt Handof
 // repairs exactly the missing task transition.
 func (engine *Engine) convergeSupervisedReturn(ctx context.Context, task evidence.Entity, receipt HandoffReceiptRecord, facts SupervisedFrozenFacts, stepAlreadyPassed bool) error {
 	if !stepAlreadyPassed {
-		if err := engine.transition(ctx, stepEntity(engine.options.RunID, receipt.Receipt.TaskID, receipt.Receipt.StepID), "PASSED", supervisedFactsEvidence(facts), supervisedReturnCompletedReason); err != nil {
+		if err := engine.transition(ctx, stepEntityAt(engine.options.RunID, receipt.Receipt.TaskID, receipt.Receipt.StepID, receipt.Receipt.Attempt), "PASSED", supervisedFactsEvidence(facts), supervisedReturnCompletedReason); err != nil {
 			return err
 		}
 	}

@@ -72,6 +72,7 @@
 | P40 P40-T027B-LOCK-REAPER | ✅ 已闭环 | P39 | L | 2026-10-31 | docs/validation/p40-lock-reaper{,_EN}.md |
 | P41 P41-T027B-SPAWN-OWNERSHIP | ✅ 已闭环 | P40 | L | 2026-10-31 | docs/validation/p41-spawn-ownership{,_EN}.md |
 | P42 P42-T027B-EVIDENCE-BIND | ✅ 已闭环 | P41 | M | 2026-10-31 | docs/validation/p42-evidence-bind{,_EN}.md |
+| P43 P43-T027B-STATE-SEAL | ✅ 已闭环 | P42 | L | 2026-10-31 | docs/validation/p43-state-seal{,_EN}.md |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -1329,6 +1330,27 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | R / D 基线 | R = 0、D = 0（不继承上片） |
 | 临时件落点声明 | 本片临时目录 = `tmp/P42-T027B-EVIDENCE-BIND/`（⑧c 前只增不删） |
 | 完成记录 | ① 架构确认 → ③ 红测（RED-CONFIRMED）→ ② 两轮转绿（含 F1 逐读复核）→ ④ 门禁 → ⑤ 两轮（r1 PASS WITH FIXES → r2 PASS）→ ⑥ INDEPENDENT SCAN: PASS（首轮格式不合规已重发，额度 2/3）→ ⑦ FINAL REVIEW: PASS WITH FIXES；R=0 D=0；后续片候选见报告 §后续片候选登记 |
+### P43 — `P43-T027B-STATE-SEAL` · ✅ 已闭环
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `P43-T027B-STATE-SEAL`（实现类；准则 v1.60） |
+| 状态 | ✅ **已闭环**（2026-10-31；提交与 CI 由 ⑩ 回执载明） |
+| 目标 | C4+C5+N3：证据封存屏障先于 intent（缺失证据不得产生 completed 终局）；上下文不可变摘要 K 防重复采集改写；`Reopen` 传真实 attempt（去除写死 1）；封存 → intent → 结算 → C → closure 严格顺序 |
+| 依赖 | P39 已闭环（`4d5ebf3`）、P42 已闭环（`d3a511b`） |
+| 规模 | L（chain 状态机 + tickets 结算与重放） |
+| 步骤 | 步骤 0 → ① 架构（V4 Pro）→ ③ 测试红 → ② 实现转绿 → ④ 门禁 → ⑤ 预审 → ⑥ 扫描 → ⑦ 终审 → ⑧a → ⑨ → ⑧c → ⑩ |
+| 现状缺口 | C4 证据引用闭包未在 intent 之前持久化，存在「收据完整但证据不成立」的放行路径；C5 `Reopen(..., 1, parent)` 写死 attempt；N3 `attempt>1` 与 attempt=1 旧工作区并存时选错重开身份 |
+| 交付物 | 报告对 `docs/validation/p43-state-seal{,_EN}.md`；证据包 `docs/validation/evidence/P43-T027B-STATE-SEAL/`；执行自由度清单；文档回写（`docs/CONTRACTS{,_EN}.md`、`docs/ARCHITECTURE{,_EN}.md`、`docs/DEV_PLAN{,_EN}.md`） |
+| 验收证据 | ③ 测试红先行；`go build` / `go vet` / `go test ./...` 全绿；三作用域 TOTAL_FAIL=0 且 SELFTEST 697/697；报告 CN/EN 六形状全等 |
+| 边界 | 代码仅 `internal/chain/**` 与 `internal/tickets/**`；不碰 `internal/adapters/**`；文档回写限于 ⑧ 阶段的契约/架构/计划三处；不推 gitee；commit 否 / push 否，停 ⑩ 等授权 |
+| 分级 | `[SLICE]`（实现类） |
+| 探针额度 | 无 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/P43-T027B-STATE-SEAL/freedom-list.md` |
+| R / D 基线 | R = 0、D = 0（不继承上片） |
+| 临时件落点声明 | 本片临时目录 = `tmp/P43-T027B-STATE-SEAL/`（⑧c 前只增不删） |
+| 完成记录 | ① 架构 → ③ 红测（RED-CONFIRMED）→ ② 两轮转绿 → ④ 门禁 → ⑤ 两轮（r1 PASS WITH FIXES → r2 PASS）→ ⑥ 两轮（r1 BLOCKED：K 未接线 → r2 PASS WITH FINDINGS，额度 2/3）→ ⑦ 三轮（r1/r2 BLOCKED → r3 PASS，额度 3/3）；R=0 D=0；生产装配接线登记为边界外限制 |
+
 ## 已知缺陷（后续切片前处理）
 
 > **阻断口径不变**：仅高频/已复现缺陷阻断，观测级 flake 只记录并在验证报告中列示。

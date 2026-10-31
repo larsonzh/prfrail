@@ -15,6 +15,9 @@ func (engine *Engine) Recover(ctx context.Context) error {
 		return err
 	}
 	engine.state.projection = projection
+	if err := engine.verifyAcceptedSeals(ctx, events); err != nil {
+		return engine.pauseUncertain(ctx, err)
+	}
 	if err := engine.options.Reconciler.Reconcile(ctx, engine.options.RunID); err != nil {
 		return engine.pauseUncertain(ctx, err)
 	}
