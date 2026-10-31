@@ -375,23 +375,25 @@ func AgentRunnerPidReportsDigest(parent, child []byte) string {
 // readAgentRunnerPIDReport reads one pid report and reports whether it exists.
 // A missing report is not an error: it is an evidence gap the collector turns
 // into a fail-closed outcome. An existing empty report is a fact (no pid).
+//
+// P42 C3: the size decision, the bytes and the identity all come from one handle,
+// so a report swapped after the deciding stat cannot be read instead. A directory
+// or an over-bound report is refused at open time.
 func readAgentRunnerPIDReport(path string) (data []byte, present bool, err error) {
-	info, err := os.Stat(path)
+	file, err := evidence.OpenBoundFile(path, agentRunnerPostflightArtifactBound)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			return nil, false, nil
 		}
-		return nil, false, fmt.Errorf("%w: stat %s: %v", ErrInvalidAgentRunnerEvidence, path, err)
+		return nil, false, fmt.Errorf("%w: read %s: %v", ErrInvalidAgentRunnerEvidence, path, err)
 	}
-	if info.IsDir() {
-		return nil, false, fmt.Errorf("%w: pid report %s is a directory", ErrInvalidAgentRunnerEvidence, path)
-	}
-	if info.Size() > agentRunnerPostflightArtifactBound {
-		return nil, false, fmt.Errorf("%w: pid report %s exceeds the artifact bound of %d bytes", ErrInvalidAgentRunnerEvidence, path, agentRunnerPostflightArtifactBound)
-	}
-	data, err = os.ReadFile(path)
+	defer func() { _ = file.Close() }()
+	data, truncated, err := file.ReadAll()
 	if err != nil {
 		return nil, false, fmt.Errorf("%w: read %s: %v", ErrInvalidAgentRunnerEvidence, path, err)
+	}
+	if truncated {
+		return nil, false, fmt.Errorf("%w: pid report %s exceeds the artifact bound of %d bytes", ErrInvalidAgentRunnerEvidence, path, agentRunnerPostflightArtifactBound)
 	}
 	return data, true, nil
 }
@@ -408,8 +410,13 @@ const agentRunnerMetadataBound int64 = 1 << 20
 // an empty, untruncated read: whether absence is a gap is decided by the collector
 // that owns the artifact (a missing log fails its marker check, a missing usage
 // fails its decode, and events tolerate absence).
+//
+// P42 C3: the log and event class keeps its truncation contract, but the bytes now
+// come from the single handle that decided the bound. The previous
+// "os.Open + Stat, then os.ReadFile(path)" split re-resolved the path between the
+// decision and the read; it is gone.
 func readBoundedAgentRunnerArtifact(path string, bound int64) ([]byte, bool, error) {
-	file, err := os.Open(path)
+	file, err := evidence.OpenBoundFileTruncating(path, bound)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			return nil, false, nil
@@ -417,22 +424,32 @@ func readBoundedAgentRunnerArtifact(path string, bound int64) ([]byte, bool, err
 		return nil, false, fmt.Errorf("%w: read %s: %v", ErrInvalidAgentRunnerEvidence, path, err)
 	}
 	defer func() { _ = file.Close() }()
-	info, err := file.Stat()
-	if err != nil {
-		return nil, false, fmt.Errorf("%w: stat %s: %v", ErrInvalidAgentRunnerEvidence, path, err)
-	}
-	if info.Size() > bound {
-		data := make([]byte, bound)
-		if _, err := file.Read(data); err != nil {
-			return nil, false, fmt.Errorf("%w: read %s: %v", ErrInvalidAgentRunnerEvidence, path, err)
-		}
-		return data, true, nil
-	}
-	data, err := os.ReadFile(path)
+	data, truncated, err := file.ReadAll()
 	if err != nil {
 		return nil, false, fmt.Errorf("%w: read %s: %v", ErrInvalidAgentRunnerEvidence, path, err)
 	}
-	return data, false, nil
+	return data, truncated, nil
+}
+
+// readAgentRunnerArtifactBytes opens path once and returns the bytes read through
+// that handle (P42 C3). Absence stays fs.ErrNotExist so the record callers keep
+// their "absent is not an error" mapping; an over-bound artifact is refused
+// instead of truncated, because a truncated record would decode as a different
+// record rather than as a gap.
+func readAgentRunnerArtifactBytes(path string, bound int64) ([]byte, error) {
+	file, err := evidence.OpenBoundFile(path, bound)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = file.Close() }()
+	data, truncated, err := file.ReadAll()
+	if err != nil {
+		return nil, err
+	}
+	if truncated {
+		return nil, fmt.Errorf("%w: %s exceeds the %d byte bound", evidence.ErrBoundArtifactExceedsBound, path, bound)
+	}
+	return data, nil
 }
 
 // writeAgentRunnerArtifact writes one artifact atomically.

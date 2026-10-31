@@ -526,15 +526,26 @@ func (queue *FileQueue) resultPath(requestID string) string {
 	return filepath.Join(queue.resultsDir(), requestID+".result.jsonl")
 }
 
+// fileQueueEnvelopeBound bounds one queue envelope read. Envelopes are small
+// JSONL messages; the bound refuses a replaced artifact instead of loading it
+// unbounded (P42 C3).
+const fileQueueEnvelopeBound int64 = 1 << 20
+
 func (queue *FileQueue) loadExistingRequest(requestID string) (RequestEnvelope, bool, error) {
 	paths := []string{queue.requestPath(requestID), queue.inflightRequestPath(requestID)}
 	for _, path := range paths {
-		if _, err := os.Stat(path); err == nil {
-			record, loadErr := queue.loadRequest(path)
-			return record, true, loadErr
-		} else if !errors.Is(err, fs.ErrNotExist) {
-			return RequestEnvelope{}, false, err
+		// P42 C3: existence is decided by the open itself. The previous os.Stat
+		// probe resolved the path once for the decision and a second time for the
+		// read, so a file swapped between the two was read as if it were the probed
+		// one.
+		record, err := queue.loadRequest(path)
+		if err == nil {
+			return record, true, nil
 		}
+		if errors.Is(err, fs.ErrNotExist) {
+			continue
+		}
+		return record, true, err
 	}
 	return RequestEnvelope{}, false, nil
 }
@@ -542,19 +553,22 @@ func (queue *FileQueue) loadExistingRequest(requestID string) (RequestEnvelope, 
 func (queue *FileQueue) ensureInflightRequest(requestID string, generation int) (RequestEnvelope, error) {
 	inflightPath := queue.inflightRequestPath(requestID)
 	if generation == 1 {
-		if _, err := os.Stat(inflightPath); errors.Is(err, fs.ErrNotExist) {
-			requestPath := queue.requestPath(requestID)
-			if moveErr := moveNoReplace(requestPath, inflightPath); moveErr != nil {
-				if _, statErr := os.Stat(inflightPath); statErr == nil {
-					return queue.loadRequest(inflightPath)
-				}
-				if errors.Is(moveErr, fs.ErrNotExist) {
-					return RequestEnvelope{}, fmt.Errorf("%w: request %q", ErrRequestNotFound, requestID)
-				}
-				return RequestEnvelope{}, moveErr
+		// P42 C3: the move is attempted without an existence pre-probe. A
+		// no-replace collision is the inflight slot being owned already, which the
+		// read below resolves; a missing source is ErrRequestNotFound.
+		requestPath := queue.requestPath(requestID)
+		if moveErr := moveNoReplace(requestPath, inflightPath); moveErr != nil {
+			inflight, loadErr := queue.loadRequest(inflightPath)
+			if loadErr == nil {
+				return inflight, nil
 			}
-		} else if err != nil {
-			return RequestEnvelope{}, err
+			if !errors.Is(loadErr, fs.ErrNotExist) {
+				return RequestEnvelope{}, loadErr
+			}
+			if errors.Is(moveErr, fs.ErrNotExist) {
+				return RequestEnvelope{}, fmt.Errorf("%w: request %q", ErrRequestNotFound, requestID)
+			}
+			return RequestEnvelope{}, moveErr
 		}
 	}
 	return queue.loadInflightRequest(requestID)
@@ -615,7 +629,8 @@ func (queue *FileQueue) currentClaim(requestID string) (ClaimEnvelope, bool, err
 }
 
 func (queue *FileQueue) loadRequest(path string) (RequestEnvelope, error) {
-	content, err := os.ReadFile(path)
+	// P42 C3: one open per envelope, bytes from that handle.
+	content, err := readAgentRunnerArtifactBytes(path, fileQueueEnvelopeBound)
 	if err != nil {
 		return RequestEnvelope{}, err
 	}
@@ -623,7 +638,7 @@ func (queue *FileQueue) loadRequest(path string) (RequestEnvelope, error) {
 }
 
 func (queue *FileQueue) loadClaim(path string) (ClaimEnvelope, error) {
-	content, err := os.ReadFile(path)
+	content, err := readAgentRunnerArtifactBytes(path, fileQueueEnvelopeBound)
 	if err != nil {
 		return ClaimEnvelope{}, err
 	}
@@ -631,7 +646,7 @@ func (queue *FileQueue) loadClaim(path string) (ClaimEnvelope, error) {
 }
 
 func (queue *FileQueue) loadResult(path string) (ResultEnvelope, error) {
-	content, err := os.ReadFile(path)
+	content, err := readAgentRunnerArtifactBytes(path, fileQueueEnvelopeBound)
 	if err != nil {
 		return ResultEnvelope{}, err
 	}

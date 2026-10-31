@@ -71,6 +71,7 @@
 | P39 P39-T027B-DURABLE-BUDGET | ✅ Done | P38 | L | 2026-10-31 | docs/validation/p39-durable-budget{,_EN}.md |
 | P40 P40-T027B-LOCK-REAPER | ✅ Closed | P39 | L | 2026-10-31 | docs/validation/p40-lock-reaper{,_EN}.md |
 | P41 P41-T027B-SPAWN-OWNERSHIP | ✅ Closed | P40 | L | 2026-10-31 | docs/validation/p41-spawn-ownership{,_EN}.md |
+| P42 P42-T027B-EVIDENCE-BIND | ✅ Closed | P41 | M | 2026-10-31 | docs/validation/p42-evidence-bind{,_EN}.md |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1294,6 +1295,27 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | R / D baseline | R = 0, D = 0 (not inherited) |
 | Temp landing | slice temp dir = `tmp/P41-T027B-SPAWN-OWNERSHIP/` (append-only until ⑧c) |
 | Completion record | 1 architecture confirmed -> 2 red tests (RED-CONFIRMED) -> 3 two rounds to green (including the F-01..F-04 fixes) -> 4 gates -> 5 two rounds (r1 PASS WITH FIXES -> r2 PASS) -> 6 INDEPENDENT SCAN: PASS -> 7 FINAL REVIEW: PASS; R=0 D=0; later-slice candidates in the report section Later-slice candidates |
+
+### P42 — `P42-T027B-EVIDENCE-BIND` · ✅ Closed
+
+| Field | Content |
+|---|---|
+| Identifier | `P42-T027B-EVIDENCE-BIND` (implementation; directive v1.60) |
+| Status | ✅ **Closed** (2026-10-31; commit and CI carried by the 10 receipt) |
+| Goal | C3+N2: bind bounded reads and PID reads to one open handle (TOCTOU) + keep the directory binding (`RunEvidenceDir`) through the actual I/O |
+| Dependency | P41 closed (`caaf64d`) |
+| Size | M (handle and directory binding across adapters / evidence) |
+| Steps | step 0 → ① architecture (V4 Pro) → ③ red tests → ② green implementation → ④ gates → ⑤ pre-review → ⑥ scan → ⑦ final review → ⑧a → ⑨ → ⑧c → ⑩ |
+| Current gap | C3 replace-between-check-and-use (TOCTOU); N2 directory replacement window |
+| Deliverables | report pair `docs/validation/p42-evidence-bind{,_EN}.md`; evidence pack `docs/validation/evidence/P42-T027B-EVIDENCE-BIND/`; freedom list |
+| Acceptance evidence | ③ red tests first; `go build` / `go vet` / `go test ./...` green; three scopes TOTAL_FAIL=0 and SELFTEST 697/697; report CN/EN six shapes equal |
+| Boundary | only `internal/adapters/**` and `internal/evidence/**`; no gitee push; commit/push stop at ⑩ for authorization |
+| Class | `[SLICE]` (implementation) |
+| Probe budget | none |
+| Freedom-list path | `docs/validation/evidence/P42-T027B-EVIDENCE-BIND/freedom-list.md` |
+| R / D baseline | R = 0, D = 0 (not inherited) |
+| Temp landing | slice temp dir = `tmp/P42-T027B-EVIDENCE-BIND/` (append-only until ⑧c) |
+| Completion record | 1 architecture confirmed -> 3 red tests (RED-CONFIRMED) -> 2 two rounds to green (including the F1 per-read re-check) -> 4 gates -> 5 two rounds (r1 PASS WITH FIXES -> r2 PASS) -> 6 INDEPENDENT SCAN: PASS (first round format-non-compliant and reissued, budget 2/3) -> 7 FINAL REVIEW: PASS WITH FIXES; R=0 D=0; later-slice candidates in the report section Later-slice candidate registrations |
 ## Known defects (to be handled before later slices)
 
 > **Blocking rule unchanged**: only high-frequency / reproduced defects block; observation-grade flakes are recorded and listed in the validation report.

@@ -165,6 +165,11 @@ type AgentRunnerReplayStore struct {
 	publicationDurability  PublishDurability
 	mu                     sync.Mutex
 	afterRequestReadLocked func()
+	// boundDirs holds the per-request evidence directory handles bound by
+	// RunEvidenceDir (P42 Q2). The handle, not the path, is the evidence identity:
+	// an ancestor renamed away after the bind cannot redirect a later read.
+	// Access is guarded by mu; the handles live until CloseBoundDirs.
+	boundDirs map[string]*BoundDir
 }
 
 // newAgentRunnerReplayStoreAt constructs a replay store at an exact absolute
@@ -204,6 +209,61 @@ func (store *AgentRunnerReplayStore) validateConstructed() error {
 		return fmt.Errorf("%w: replay store root is unset", ErrInvalidAgentRunnerReplayStore)
 	}
 	return nil
+}
+
+// replayStoreRecordBound bounds one replay record read. Records are small JSONL
+// documents, so the bound refuses a replaced artifact instead of reading it
+// unbounded; it is never a truncation bound (a truncated record is a decode error,
+// not a shorter record).
+const replayStoreRecordBound int64 = 1 << 20
+
+// CloseBoundDirs releases every per-request evidence directory handle this store
+// bound. The handles exist for the life of the store because the binding is what
+// makes a later read follow the directory object instead of the path; a run
+// close therefore owes this call, and a store that is never closed holds them
+// until the process exits (registered as the P42 lifetime boundary).
+func (store *AgentRunnerReplayStore) CloseBoundDirs() {
+	if store == nil {
+		return
+	}
+	store.mu.Lock()
+	bound := store.boundDirs
+	store.boundDirs = nil
+	store.mu.Unlock()
+	for _, dir := range bound {
+		_ = dir.Close()
+	}
+}
+
+// readBoundEvidence reads one artifact of a request's evidence directory through
+// the directory handle RunEvidenceDir bound, so a replaced ancestor cannot
+// redirect it. rel is relative to the per-request evidence directory; the open
+// resolves `<requestId>/<rel>` against the bound evidence base directory. A
+// request without a bound directory is refused instead of falling back to the
+// path: a fallback would be exactly the re-resolution this seam exists to remove.
+//
+// The log and event class may exceed its bound and degrade here (truncated), so
+// callers of the record and pid class must treat truncated as a refusal.
+func (store *AgentRunnerReplayStore) readBoundEvidence(requestID, rel string, bound int64) ([]byte, bool, error) {
+	if store == nil {
+		return nil, false, fmt.Errorf("%w: nil replay store", ErrInvalidAgentRunnerReplayStore)
+	}
+	if !evidence.ValidID(requestID) {
+		return nil, false, fmt.Errorf("%w: invalid requestId", ErrInvalidAgentRunnerReplayStore)
+	}
+	store.mu.Lock()
+	dir := store.boundDirs[requestID]
+	store.mu.Unlock()
+	if dir == nil {
+		return nil, false, fmt.Errorf("%w: no bound evidence directory for requestId %s", ErrInvalidAgentRunnerReplayStore, requestID)
+	}
+	relative := requestID + "/" + rel
+	file, err := openBoundDirFile(dir, relative, bound, true)
+	if err != nil {
+		return nil, false, err
+	}
+	defer func() { _ = file.Close() }()
+	return file.ReadAll()
 }
 
 // PublicationDurability reports whether this platform-specific replay-store
@@ -569,7 +629,10 @@ func (store *AgentRunnerReplayStore) pathForRequestID(requestID, folder, prefix 
 }
 
 func loadRequestRecord(path, requestID string) (AgentRunnerRequestRecord, bool, error) {
-	wire, err := os.ReadFile(path)
+	// P42 C3: one open, and the bytes come from that handle. The previous
+	// os.ReadFile resolved the path a second time, so an artifact swapped after a
+	// deciding stat could be read instead of the record the decision covered.
+	wire, err := readAgentRunnerArtifactBytes(path, replayStoreRecordBound)
 	if errors.Is(err, fs.ErrNotExist) {
 		return AgentRunnerRequestRecord{}, false, nil
 	}
@@ -587,7 +650,8 @@ func loadRequestRecord(path, requestID string) (AgentRunnerRequestRecord, bool, 
 }
 
 func loadCompletionRecord(path, requestID string) (AgentRunnerCompletionRecord, bool, error) {
-	wire, err := os.ReadFile(path)
+	// P42 C3: same-handle read, exactly as loadRequestRecord.
+	wire, err := readAgentRunnerArtifactBytes(path, replayStoreRecordBound)
 	if errors.Is(err, fs.ErrNotExist) {
 		return AgentRunnerCompletionRecord{}, false, nil
 	}

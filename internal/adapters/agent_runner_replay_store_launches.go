@@ -283,6 +283,12 @@ func (store *AgentRunnerReplayStore) launchIdentityPath(launchID string) (string
 	return store.pathForRequestID(launchID, "launches", "identity.")
 }
 
+// P42 boundary: the launch record loaders keep their single os.ReadFile. They are
+// outside the design section 2 replacement list (that list covers the request,
+// completion and ownership records, the postflight artifacts, the pid reports and
+// the evidence directory itself), they have no stat-then-open pair, and their
+// frozen seam signatures are patched by existing tests. The same-handle form is
+// registered for the follow-up read-path sweep (design section 6).
 func loadAgentRunnerLaunchReceipt(path, requestID string) (AgentRunnerLaunchReceiptRecord, bool, error) {
 	wire, err := os.ReadFile(path)
 	if errors.Is(err, fs.ErrNotExist) {

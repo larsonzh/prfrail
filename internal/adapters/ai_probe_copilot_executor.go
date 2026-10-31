@@ -82,7 +82,10 @@ func (executor ManagedCopilotCLIProbeExecutor) Execute(ctx context.Context, invo
 	stdout, stderr := output.bytes()
 	defer clear(stdout)
 	defer clear(stderr)
-	usage, _ := os.ReadFile(usagePath)
+	// P42 C3: the usage artifact is read through one bounded handle. The probe
+	// keeps its "usage is best effort" semantics: a missing or refused artifact is
+	// simply no observation, never a partial one.
+	usage, _ := readAgentRunnerArtifactBytes(usagePath, agentRunnerMetadataBound)
 	defer clear(usage)
 	execution := parseCopilotCLIProbeOutput(stdout, usage)
 	execution.Evidence = append(execution.Evidence,

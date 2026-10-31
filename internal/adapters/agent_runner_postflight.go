@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"sort"
@@ -70,6 +71,12 @@ const agentRunnerMissingPIDReportDetail = "the run is missing a required pid rep
 // run wrote: the leg that reads it degrades to uncertain instead of loading it
 // into memory.
 const agentRunnerPostflightArtifactBound int64 = 1 << 24
+
+// agentRunnerWorkspaceEntryBound bounds one workspace file the secret scan reads.
+// The scan used to read every captured entry unbounded; the handle read needs a
+// bound, so it is set far above any legitimate source file while still refusing a
+// path that was replaced by something enormous after the capture.
+const agentRunnerWorkspaceEntryBound int64 = 1 << 26
 
 // agentRunnerParentPIDReportFileName is where the offline stub reports its own
 // pid. It is the counterpart of agentRunnerChildPIDReportFileName
@@ -291,15 +298,15 @@ func (postflight *AgentRunnerPostflight) RunPostflight(ctx context.Context, requ
 	if err != nil {
 		return chain.PostflightDecision{}, err
 	}
-	storedPre, err := agentRunnerPostflightReadArtifact(filepath.Join(evidenceDir, agentRunnerManifestPreFileName), "pre manifest")
+	storedPre, err := postflight.readRecordedArtifact(agentRunnerManifestPreFileName, "pre manifest")
 	if err != nil {
 		return postflight.uncertain("postflight cannot read the recorded pre manifest: " + err.Error()), nil
 	}
-	storedPost, err := agentRunnerPostflightReadArtifact(filepath.Join(evidenceDir, agentRunnerManifestPostFileName), "post manifest")
+	storedPost, err := postflight.readRecordedArtifact(agentRunnerManifestPostFileName, "post manifest")
 	if err != nil {
 		return postflight.uncertain("postflight cannot read the recorded post manifest: " + err.Error()), nil
 	}
-	storedDiff, err := agentRunnerPostflightReadArtifact(filepath.Join(evidenceDir, agentRunnerDiffFileName), "diff")
+	storedDiff, err := postflight.readRecordedArtifact(agentRunnerDiffFileName, "diff")
 	if err != nil {
 		return postflight.uncertain("postflight cannot read the recorded diff: " + err.Error()), nil
 	}
@@ -431,13 +438,36 @@ func (postflight *AgentRunnerPostflight) uncertain(detail string) chain.Postflig
 	}
 }
 
+// readRecordedArtifact reads one artifact of the request's evidence directory
+// through the directory handle RunEvidenceDir bound before the read (P42 Q2/N2).
+// A path-based read here would re-resolve the evidence directory after the bind,
+// which is the window an ancestor replacement turns into a forgery: the recorded
+// manifest or diff could be swapped for attacker bytes between the bind and this
+// reconciliation.
+func (postflight *AgentRunnerPostflight) readRecordedArtifact(rel, label string) ([]byte, error) {
+	data, truncated, err := postflight.store.readBoundEvidence(postflight.request.Request.RequestID, rel, agentRunnerPostflightArtifactBound)
+	if err != nil {
+		if errors.Is(err, fs.ErrNotExist) {
+			return nil, fmt.Errorf("%w: recorded %s is missing", ErrInvalidAgentRunnerEvidence, label)
+		}
+		return nil, err
+	}
+	if truncated {
+		return nil, fmt.Errorf("%w: recorded %s exceeds the postflight artifact bound of %d bytes", ErrInvalidAgentRunnerEvidence, label, agentRunnerPostflightArtifactBound)
+	}
+	return data, nil
+}
+
 func (postflight *AgentRunnerPostflight) scanWorkspace(ctx context.Context, workspaceRoot string, entries []snapshot.Entry) error {
 	scanner := gates.DefaultSecretScanner()
 	for _, entry := range entries {
 		if entry.Type != snapshot.EntryRegularFile {
 			continue
 		}
-		data, err := os.ReadFile(filepath.Join(workspaceRoot, filepath.FromSlash(entry.Path)))
+		// P42 C3: one open per workspace entry, and the scanned bytes come from that
+		// handle. The previous os.ReadFile re-resolved the path the manifest had just
+		// named, so a file swapped after the capture could be scanned as another one.
+		data, err := readAgentRunnerArtifactBytes(filepath.Join(workspaceRoot, filepath.FromSlash(entry.Path)), agentRunnerWorkspaceEntryBound)
 		if err != nil {
 			return fmt.Errorf("%w: read %s: %v", ErrInvalidAgentRunnerEvidence, entry.Path, err)
 		}
@@ -483,6 +513,13 @@ func agentRunnerChangedPaths(frozen, fresh []snapshot.Entry) []string {
 
 // agentRunnerHashLogs digests both log streams exactly as the collector does:
 // raw bytes, no decode, in stdout-then-stderr order.
+//
+// P42 boundary: each stream is resolved by path here, so the directory binding
+// (N2) does not cover it. C3 is satisfied - each stream is opened once and the
+// bytes and digest come from that one handle - and the content is pinned
+// regardless by LogHash in the frozen digest comparison, so a replaced stream
+// fails the comparison instead of being trusted. Migrating these paths onto the
+// bound-directory reads is a later read-path sweep.
 func agentRunnerHashLogs(evidenceDir string) (string, error) {
 	var logBytes []byte
 	for _, name := range []string{agentRunnerStdoutFileName, agentRunnerStderrFileName} {
@@ -550,8 +587,18 @@ func agentRunnerAlivePIDsWith(evidenceDir string, inspect func(int) (guard.Proce
 // agentRunnerReadPIDs reads the pids one report file lists, and whether the file
 // exists at all. A missing file is not an error; the caller decides whether its
 // absence is acceptable.
+//
+// P42 C3: the pid class is bounded and fails closed at open time, so a report that
+// is already over the bound or that is a directory is refused before any byte is
+// read, and the bytes are the ones the bound decision covered.
+//
+// P42 boundary: the report is still addressed by path, so the directory binding
+// (N2) does not cover it. The reports are written by the candidate itself, so a
+// replaced report only supplies candidate-authored pids; the pid observation stays
+// a corroborating signal and the frozen digest pins the record content. Migrating
+// this path is a later read-path sweep.
 func agentRunnerReadPIDs(path string) ([]int, bool, error) {
-	data, err := os.ReadFile(path)
+	data, err := readAgentRunnerArtifactBytes(path, agentRunnerPostflightArtifactBound)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			return nil, false, nil
@@ -592,6 +639,12 @@ func agentRunnerPostflightReadArtifact(path, label string) ([]byte, error) {
 
 // agentRunnerFileHash returns the content digest of a recorded artifact, read
 // under the postflight bound.
+//
+// P42 boundary: the artifact is addressed by path, so the directory binding (N2)
+// does not cover it. C3 holds - one open supplies the bytes and the digest - and
+// the digest is compared against the frozen manifest, which is what makes a
+// replaced artifact a mismatch rather than a trusted read. Migrating this path is
+// a later read-path sweep.
 func agentRunnerFileHash(path string) (string, error) {
 	data, err := agentRunnerPostflightReadArtifact(path, filepath.Base(path))
 	if err != nil {

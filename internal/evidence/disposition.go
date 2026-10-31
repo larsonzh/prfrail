@@ -252,6 +252,12 @@ func BuildReleaseInventory(rootPath string, generatedAt time.Time) (ReleaseInven
 		return ReleaseInventory{}, fmt.Errorf("%w: rootPath must be a directory", ErrInvalidReleaseInventory)
 	}
 
+	// P42 boundary: BuildReleaseInventory keeps its stat-then-walk-then-read shape.
+	// The Q2 directory-handle binding lives in internal/adapters, which imports this
+	// package and not the other way round, so this release-time inventory cannot use
+	// it without inverting the dependency; the migration is registered for a later
+	// slice (design section 6). The inventory root is a release tree chosen by the
+	// operator tool, not a run artifact a candidate can write.
 	entries := make([]ReleaseInventoryEntry, 0)
 	err = filepath.WalkDir(rootAbs, func(path string, entry os.DirEntry, walkErr error) error {
 		if walkErr != nil {

@@ -87,3 +87,5 @@
 凸	docs/validation/directive-d-mechanical-guard.md	同上：⑥ 最终消息原文（sixstage 围栏逐字转录，§11.3 禁止改写）；上下文：凸显
 老	docs/validation/p40-lock-reaper.md	⑥ 最终消息原文（sixstage 围栏逐字转录，§11.3 禁止改写）；CN/EN 报告均含此字；上下文：退回到无界阻塞的老问题
 撬	docs/validation/evidence/P41-T027B-SPAWN-OWNERSHIP/06-scan/review.md	"都会直接撬开当前结论" (verbatim ⑥ transcript, P41)
+兄	docs/validation/evidence/P42-T027B-EVIDENCE-BIND/01-arch-design/review.md	① 架构原文逐字归档（D1 实测依据，不得改写）；上下文：兄弟节点
+弟	docs/validation/evidence/P42-T027B-EVIDENCE-BIND/01-arch-design/review.md	① 架构原文逐字归档（D1 实测依据，不得改写）；上下文：兄弟节点

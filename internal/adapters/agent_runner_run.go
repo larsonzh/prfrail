@@ -311,6 +311,11 @@ func agentRunnerVerifyTreeGoneWith(ctx context.Context, evidenceDir string, wait
 // fail-closed, an existing empty file is the fact "no child process", and an
 // existing non-empty file is parsed as the child pid list. A missing report and
 // an empty report must never be inferred from each other.
+//
+// P42 boundary: this read is outside the design section 2 replacement list (it is
+// the run-side tree check, not a postflight artifact read) and stays a single
+// os.ReadFile. It has no stat-then-open pair, so the C3 shape the slice removes is
+// absent; bounding it is registered for the follow-up read-path sweep.
 func readAgentRunnerChildPIDs(path string) (pids []int, present bool, err error) {
 	data, err := os.ReadFile(path)
 	if err != nil {

@@ -311,13 +311,79 @@ func (store *AgentRunnerReplayStore) RunEvidenceDir(requestID string) (string, e
 	if err := ensureAgentRunnerReplayDirectory(directory, base); err != nil {
 		return "", err
 	}
+	// P42 N2: the returned path is no longer the only evidence identity. The
+	// evidence base directory is bound to a handle before the path is handed out,
+	// so the window between "the directory was confirmed" and "the caller reads
+	// it" is closed: a replacement installed in that window can no longer redirect
+	// a read.
+	if err := store.bindEvidenceDir(requestID, base, directory); err != nil {
+		return "", err
+	}
 	return directory, nil
+}
+
+// bindEvidenceDir binds the evidence base directory to a handle. The binding is
+// what makes later reads follow the directory object instead of the path.
+//
+// Scope of the check that follows, stated precisely: boundDirVerify compares the
+// handle with the path only over the interval between the open and the verify, so
+// it can detect a replacement installed in exactly that window. When the
+// replacement happened before the open, the handle already addresses whatever the
+// path resolves to at open time and the verify necessarily passes - it can never
+// report that case. The protection that actually covers it is the frozen digest
+// comparison the postflight performs (ManifestHash/DiffHash against the bytes read
+// through the handles), which fails closed on content from a replacement tree.
+//
+// The bound object is the base directory that holds the per-request evidence
+// directory, not the per-request directory itself. That is a measured platform
+// constraint, not a shortcut: on Windows an open handle to a subdirectory makes
+// renaming its ancestor fail with ERROR_ACCESS_DENIED even under delete sharing
+// (probe: bind runs/r1, then rename runs -> "Access is denied"), so a
+// per-request handle would turn the ancestor-replacement attack into a denial of
+// service instead of leaving the read bound to the original object. A handle to
+// the base lets the ancestor be renamed away while the handle keeps addressing
+// the original tree, which is exactly the property the design requires.
+//
+// Residual surface, registered rather than closed here: replacing runs/<requestId>
+// itself (a sibling of the bound object, not an ancestor) is not covered by the
+// base handle. The single production caller reads that subtree only to compare it
+// with the frozen digest, so a replacement degrades to a failure, not to trusted
+// evidence. Per-request sub-handles are an evaluation item for a later slice.
+//
+// The handle is idempotent per requestId: the first bind wins, because a second
+// handle to a later object would be a second identity for the same evidence.
+func (store *AgentRunnerReplayStore) bindEvidenceDir(requestID, base, directory string) error {
+	bound, err := OpenBoundDir(base)
+	if err != nil {
+		return fmt.Errorf("%w: bind %s: %v", ErrInvalidAgentRunnerReplayStore, base, err)
+	}
+	if err := boundDirVerify(bound, base); err != nil {
+		_ = bound.Close()
+		return fmt.Errorf("%w: confirm %s for requestId %s: %v", ErrInvalidAgentRunnerReplayStore, directory, requestID, err)
+	}
+	store.mu.Lock()
+	defer store.mu.Unlock()
+	if store.boundDirs == nil {
+		store.boundDirs = make(map[string]*BoundDir)
+	}
+	if store.boundDirs[requestID] != nil {
+		_ = bound.Close()
+		return nil
+	}
+	store.boundDirs[requestID] = bound
+	return nil
 }
 
 func ensureAgentRunnerReplayDirectory(directory, parent string) error {
 	if err := os.Mkdir(directory, 0o755); err != nil && !errors.Is(err, fs.ErrExist) {
 		return fmt.Errorf("%w: create %s: %v", ErrInvalidAgentRunnerReplayStore, directory, err)
 	}
+	// P42: this stat is a creation confirmation, not a read decision. It cannot tell
+	// a directory that was replaced before the bind, because the bind opens whatever
+	// the path resolves to at that moment; it only establishes that the name exists
+	// and is a directory before the handle is taken. Treating the evidence subtree as
+	// trustworthy is the job of the frozen digest comparison in the postflight, not
+	// of this stat.
 	info, err := os.Stat(directory)
 	if err != nil {
 		return fmt.Errorf("%w: confirm %s: %v", ErrInvalidAgentRunnerReplayStore, directory, err)
@@ -379,6 +445,19 @@ func ensureAgentRunnerReplayOwnership(replayRoot, runRoot, runID string) error {
 }
 
 func loadAgentRunnerReplayOwnership(path string) (AgentRunnerReplayOwnershipRecord, bool, error) {
+	// The leaf type gate stays a no-follow Lstat: the ownership marker must refuse
+	// a symlink leaf, and the portable bound-read primitive follows a leaf symlink
+	// by design (its callers already rejected unsafe components). P42 residual: the
+	// gate is the only path resolution left, and it decides type only - the bytes
+	// below come from one handle. What a swap between the gate and the open can
+	// therefore produce is bounded and must be stated exactly: the bytes are a
+	// well-formed record only if a writer put one there, and
+	// validateAgentRunnerReplayOwnership checks record shape plus the RunRootHash
+	// derived from the recorded path - it carries no digest over the record content
+	// itself. The residual window is a single syscall wide and every field it could
+	// carry is derivable from the store's own configuration, so the exposure is
+	// bounded and accepted rather than closed; a content digest on the ownership
+	// record is a candidate for a later slice.
 	info, err := os.Lstat(path)
 	if errors.Is(err, fs.ErrNotExist) {
 		return AgentRunnerReplayOwnershipRecord{}, false, nil
@@ -389,7 +468,9 @@ func loadAgentRunnerReplayOwnership(path string) (AgentRunnerReplayOwnershipReco
 	if !info.Mode().IsRegular() {
 		return AgentRunnerReplayOwnershipRecord{}, false, replayStoreCorruption(path, "ownership record is not a regular file", nil)
 	}
-	wire, err := os.ReadFile(path)
+	// P42 C3: the record bytes are read through the handle, never by re-resolving
+	// the path the type gate just observed.
+	wire, err := readAgentRunnerArtifactBytes(path, replayStoreRecordBound)
 	if errors.Is(err, fs.ErrNotExist) {
 		return AgentRunnerReplayOwnershipRecord{}, false, nil
 	}

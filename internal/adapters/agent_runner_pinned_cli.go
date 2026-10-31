@@ -552,6 +552,12 @@ func removeAgentRunnerProcessIdentityMirror(runRoot string, identity guard.Proce
 // a mirror naming a dead process is stale and may be replaced.
 func (launcher *AgentRunnerPinnedCLILauncher) refuseLiveMirrorProcess() error {
 	path := filepath.Join(launcher.store.RunRoot(), managedProcessIdentityFileName)
+	// P42 boundary: this existence probe still resolves the path before the mirror
+	// read below. The mirror lives in the run root, not in a bound evidence
+	// directory, and the slice's replacement list covers postflight artifacts only;
+	// the probe decides "nothing was ever published" and any swap it could hide ends
+	// in the mirror's own shape and liveness checks. Registered for the follow-up
+	// read-path sweep (design section 6).
 	if _, err := os.Stat(path); err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			// No launch has ever published an identity here, so nothing can be running.

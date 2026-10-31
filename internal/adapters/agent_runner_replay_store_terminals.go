@@ -338,6 +338,10 @@ func sameIntPointer(left, right *int) bool {
 	return *left == *right
 }
 
+// P42 boundary: the terminal record loaders keep their single os.ReadFile for the
+// same reason the launch loaders do (outside the design section 2 replacement
+// list, no stat-then-open pair, frozen seam signature). The same-handle form is
+// registered for the follow-up read-path sweep (design section 6).
 func loadAgentRunnerTerminalIntent(path, requestID string) (AgentRunnerTerminalIntentRecord, bool, error) {
 	wire, err := os.ReadFile(path)
 	if errors.Is(err, fs.ErrNotExist) {
