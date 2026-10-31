@@ -124,7 +124,8 @@ INDEPENDENT SCAN: PASS
 
 ## 提交与 CI
 
-- ⑧b 提交后回填
+- 主提交 `8799015`（feat: own spawned processes before resume and recover starting orphans (P41-T027B-SPAWN-OWNERSHIP)），范围 `28f440f..8799015`；CI run `41179732685` **双腿双绿**：windows 2m56s / ubuntu 2m40s；两腿 `SELFTEST: PASS 697/697`、`GATE REPORT scope=ci changed=26`、`TOTAL_FAIL=0`；`internal/guard` 与 `internal/adapters` 两腿实测 ok；ubuntu 腿含 Race 与 F-2 unix 回收测试实跑（随 adapters 包通过，包级 ok 即证）。
+- 本句之后的仅文档提交不再回写本节，读数由 ⑩ 回执载明。
 
 ## 后续片候选登记
 

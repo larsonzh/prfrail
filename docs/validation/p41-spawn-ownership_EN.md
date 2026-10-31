@@ -124,7 +124,8 @@ INDEPENDENT SCAN: PASS
 
 ## Commit and CI
 
-- back-filled after the 8b commit
+- Main commit `8799015` (feat: own spawned processes before resume and recover starting orphans (P41-T027B-SPAWN-OWNERSHIP)), range `28f440f..8799015`; CI run `41179732685` **double green**: windows 2m56s / ubuntu 2m40s; both legs `SELFTEST: PASS 697/697`, `GATE REPORT scope=ci changed=26`, `TOTAL_FAIL=0`; `internal/guard` and `internal/adapters` ok on both legs; the ubuntu leg also ran Race and the F-2 unix recovery tests (they pass within the adapters package ok).
+- Docs-only commits after this sentence no longer back-fill this section; readings are carried by the ⑩ receipt.
 
 ## Later-slice candidates
 
