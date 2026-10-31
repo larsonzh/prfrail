@@ -103,6 +103,7 @@ The severity column keeps the review reports' own wording and is never bolded; t
 | D4 | the supervised workspace naming is fixed at attempt-1 | final review r3 Section C | Accepted: registered as out of boundary; a legal attempt>1 receipt is currently unreachable, so the refusal fails closed |
 | D5 | executionTarget / requestID / requestHash are empty in `ContextKey` before the intent and recomputed after it | implementation pass / final review F3 | Accepted: those dimensions do not exist before the intent is fixed, so K is recomputed immediately afterwards and travels with the request |
 | D6 | `taskEntity` / `stepEntity` stay as `*EntityAt(..., 1)` convenience wrappers | implementation pass / pre-review r1 H2 | Accepted: production call sites are at zero and the remaining calls live only in tests and single-attempt paths |
+| D7 | The ③ red tests and the ② implementation were written directly by the controller (`DeepSeek V4.1 Flash`) instead of dispatching the `prfrail-tester` / `prfrail-implementer` carriers | 10 receipt check | Accepted and registered: every review step (①⑤⑥⑦⑧) was dispatched with both `agentName` and `model` and no downgrade; the execution-side carrier deviation is recorded as measured |
 
 ## Models and metering
 

@@ -103,6 +103,7 @@ INDEPENDENT SCAN: PASS
 | D4 | supervised 工作区命名固定 attempt-1 | ⑦ r3 Section C | 接受：边界外登记；合法 attempt>1 回执当前不可达，拒绝属 fail-closed |
 | D5 | `ContextKey` 中 executionTarget / requestID / requestHash 在 intent 前为空、intent 后重算 | ② 实现期 / ⑦ F3 | 接受：意图定稿前这些维度尚不存在，定稿后即时重算并随 request 下发 |
 | D6 | `taskEntity` / `stepEntity` 保留为 `*EntityAt(..., 1)` 便捷包装 | ② 实现期 / ⑤ r1 H2 | 接受：生产调用点已清零，残留调用仅在测试与单 attempt 路径 |
+| D7 | ③ 红测与 ② 实现由主控（`DeepSeek V4.1 Flash`）直接完成，未派 `prfrail-tester` / `prfrail-implementer` 子代理 | ⑩ 回执核对 | 接受并登记：审查侧（①⑤⑥⑦⑧）全部按白名单派单且 `agentName` + `model` 显式传入，无模型降级；执行侧角色载体偏离如实记录 |
 
 ## 模型与计量
 
