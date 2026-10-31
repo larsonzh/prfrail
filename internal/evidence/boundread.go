@@ -20,7 +20,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"math"
 	"os"
 	"time"
 )
@@ -191,10 +190,13 @@ func (bound *BoundFile) checkReadable() error {
 }
 
 // readLimit is the bound-plus-one read that makes the truncation decision
-// observable without unbounded buffering.
+// observable without unbounded buffering. The sentinel byte cannot be
+// represented at the int64 ceiling, so the ceiling keeps the bound itself and
+// the caller reports no truncation instead of wrapping to a negative limit.
 func readLimit(bound int64) int64 {
-	if bound >= math.MaxInt64 {
-		return math.MaxInt64
+	limit := bound + 1
+	if limit <= bound {
+		return bound
 	}
-	return bound + 1
+	return limit
 }

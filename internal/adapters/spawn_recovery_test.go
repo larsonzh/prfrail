@@ -25,8 +25,6 @@ const (
 	testStartingMarkerFileName = "managed-process.starting.json"
 	// spawnRecoveryHelperEnv marks the re-executed long-lived helper child.
 	spawnRecoveryHelperEnv = "PROOFRAIL_SPAWN_RECOVERY_HELPER"
-	// spawnRecoverySettleBound bounds every wait in these tests.
-	spawnRecoverySettleBound = 10 * time.Second
 )
 
 // testStartingMarker is the durable starting-phase record from the design: the

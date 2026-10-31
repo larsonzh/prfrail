@@ -31,7 +31,6 @@ const (
 	jobObjectExtendedLimitInformation = 9
 	jobObjectLimitKillOnJobClose      = 0x00002000
 	processQueryLimitedInformation    = 0x1000
-	processSuspendResume              = 0x0800
 	createSuspended                   = 0x00000004
 	createUnicodeEnvironment          = 0x00000400
 	createExtendedStartupInfoPresent  = 0x00080000

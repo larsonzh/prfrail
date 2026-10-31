@@ -152,40 +152,43 @@ The final-review closed set is `FINAL REVIEW: PASS WITH FIXES` (3 Low + 4 Info);
 - **FR-06 · status = accepted (wording layer)**: same origin as N6.
 - **Batch-assist finding · status = accepted + later slice**: three primitive-level test gaps (read-after-close / hash over-bound refusal / adversarial identity same-source); the main chain avoids them via single-read-then-close and the `ReadAll` path, new callers must self-verify.
 - **FR-07 · status = accepted (criterion replacement)**: the support matrix is windows / linux only; revising the void entry at `docs/validation/t027-replay-convergence.md:38` belongs to a later documentation slice.
+- **D7 · status = accepted (criterion replacement)**: `GOOS=darwin` fails to compile at `syscall.Openat` in `internal/adapters/bounddir_unix.go:61` while `GOOS=linux` passes; the supported platform surface is windows / linux, no code change is made, and revising the stale document entry belongs to a later documentation slice.
 
 ```artifacts
-docs/t027/REMAINING_SLICES.md	repo
 docs/t027/REMAINING_SLICES_EN.md	repo
-docs/validation/p42-evidence-bind.md	repo
-docs/validation/p42-evidence-bind_EN.md	repo
-docs/validation/evidence/P42-T027B-EVIDENCE-BIND/MANIFEST.md	repo
-docs/validation/evidence/P42-T027B-EVIDENCE-BIND/SHA256SUMS.txt	repo
+docs/t027/REMAINING_SLICES.md	repo
 docs/validation/evidence/P42-T027B-EVIDENCE-BIND/01-arch-design/review.md	repo
 docs/validation/evidence/P42-T027B-EVIDENCE-BIND/05-prereview/review.md	repo
 docs/validation/evidence/P42-T027B-EVIDENCE-BIND/06-scan/review.md	repo
 docs/validation/evidence/P42-T027B-EVIDENCE-BIND/07-final/review.md	repo
 docs/validation/evidence/P42-T027B-EVIDENCE-BIND/freedom-list.md	repo
+docs/validation/evidence/P42-T027B-EVIDENCE-BIND/MANIFEST.md	repo
+docs/validation/evidence/P42-T027B-EVIDENCE-BIND/SHA256SUMS.txt	repo
+docs/validation/p42-evidence-bind_EN.md	repo
+docs/validation/p42-evidence-bind.md	repo
 internal/adapters/agent_runner_evidence.go	repo
 internal/adapters/agent_runner_pinned_cli.go	repo
 internal/adapters/agent_runner_postflight.go	repo
 internal/adapters/agent_runner_replay_root.go	repo
-internal/adapters/agent_runner_replay_store.go	repo
 internal/adapters/agent_runner_replay_store_launches.go	repo
 internal/adapters/agent_runner_replay_store_terminals.go	repo
+internal/adapters/agent_runner_replay_store.go	repo
 internal/adapters/agent_runner_run.go	repo
 internal/adapters/ai_probe_copilot_executor.go	repo
-internal/adapters/filequeue.go	repo
-internal/adapters/bounddir.go	repo
 internal/adapters/bounddir_unix.go	repo
 internal/adapters/bounddir_windows.go	repo
+internal/adapters/bounddir.go	repo
 internal/adapters/evidence_bind_dir_unix_test.go	repo
 internal/adapters/evidence_bind_dir_windows_test.go	repo
 internal/adapters/evidence_bind_semantics_test.go	repo
 internal/adapters/evidence_seam_signatures_test.go	repo
-internal/evidence/boundread.go	repo
+internal/adapters/filequeue.go	repo
+internal/adapters/spawn_recovery_test.go	repo
 internal/evidence/boundopen_unix.go	repo
 internal/evidence/boundopen_windows.go	repo
 internal/evidence/boundread_test.go	repo
+internal/evidence/boundread.go	repo
 internal/evidence/disposition.go	repo
+internal/guard/process_windows.go	repo
 tools/gates/cjk-newwords.txt	repo
 ```

@@ -152,40 +152,43 @@ INDEPENDENT SCAN: PASS
 - **FR-06 · 状态 = 接受（措辞层）**：与 N6 同源。
 - **批量辅助发现 · 状态 = 接受 + 后续片**：原语层三处测试缺口（关闭后拒读 / 超界拒摘要 / 身份同源对抗），主链经单次读即关闭与 `ReadAll` 路径规避，新调用方需自证。
 - **FR-07 · 状态 = 接受（口径替代）**：支持矩阵仅 windows / linux；`docs/validation/t027-replay-convergence.md:38` 旧条目失效的修订归后续文档片。
+- **D7 · 状态 = 接受（口径替代）**：`GOOS=darwin` 在 `internal/adapters/bounddir_unix.go:61` 的 `syscall.Openat` 处编译失败，`GOOS=linux` 通过；平台支持面按 windows / linux 收口，代码不改，旧文档条目修订归后续文档片。
 
 ```artifacts
-docs/t027/REMAINING_SLICES.md	repo
 docs/t027/REMAINING_SLICES_EN.md	repo
-docs/validation/p42-evidence-bind.md	repo
-docs/validation/p42-evidence-bind_EN.md	repo
-docs/validation/evidence/P42-T027B-EVIDENCE-BIND/MANIFEST.md	repo
-docs/validation/evidence/P42-T027B-EVIDENCE-BIND/SHA256SUMS.txt	repo
+docs/t027/REMAINING_SLICES.md	repo
 docs/validation/evidence/P42-T027B-EVIDENCE-BIND/01-arch-design/review.md	repo
 docs/validation/evidence/P42-T027B-EVIDENCE-BIND/05-prereview/review.md	repo
 docs/validation/evidence/P42-T027B-EVIDENCE-BIND/06-scan/review.md	repo
 docs/validation/evidence/P42-T027B-EVIDENCE-BIND/07-final/review.md	repo
 docs/validation/evidence/P42-T027B-EVIDENCE-BIND/freedom-list.md	repo
+docs/validation/evidence/P42-T027B-EVIDENCE-BIND/MANIFEST.md	repo
+docs/validation/evidence/P42-T027B-EVIDENCE-BIND/SHA256SUMS.txt	repo
+docs/validation/p42-evidence-bind_EN.md	repo
+docs/validation/p42-evidence-bind.md	repo
 internal/adapters/agent_runner_evidence.go	repo
 internal/adapters/agent_runner_pinned_cli.go	repo
 internal/adapters/agent_runner_postflight.go	repo
 internal/adapters/agent_runner_replay_root.go	repo
-internal/adapters/agent_runner_replay_store.go	repo
 internal/adapters/agent_runner_replay_store_launches.go	repo
 internal/adapters/agent_runner_replay_store_terminals.go	repo
+internal/adapters/agent_runner_replay_store.go	repo
 internal/adapters/agent_runner_run.go	repo
 internal/adapters/ai_probe_copilot_executor.go	repo
-internal/adapters/filequeue.go	repo
-internal/adapters/bounddir.go	repo
 internal/adapters/bounddir_unix.go	repo
 internal/adapters/bounddir_windows.go	repo
+internal/adapters/bounddir.go	repo
 internal/adapters/evidence_bind_dir_unix_test.go	repo
 internal/adapters/evidence_bind_dir_windows_test.go	repo
 internal/adapters/evidence_bind_semantics_test.go	repo
 internal/adapters/evidence_seam_signatures_test.go	repo
-internal/evidence/boundread.go	repo
+internal/adapters/filequeue.go	repo
+internal/adapters/spawn_recovery_test.go	repo
 internal/evidence/boundopen_unix.go	repo
 internal/evidence/boundopen_windows.go	repo
 internal/evidence/boundread_test.go	repo
+internal/evidence/boundread.go	repo
 internal/evidence/disposition.go	repo
+internal/guard/process_windows.go	repo
 tools/gates/cjk-newwords.txt	repo
 ```
