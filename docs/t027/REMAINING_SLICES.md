@@ -77,7 +77,7 @@
 | DR13-FIX DR13-FIX（P45 前置） | ✅ 已完成 | P44 | S | 2026-11-01 | docs/validation/dr13-fix{,_EN}.md |
 | P45 P45-T027B-E2E-ZERO-MODEL | ✅ 已完成 | DR13-FIX | M | 2026-11-01 | docs/validation/p45-e2e-zero-model{,_EN}.md |
 | P46 STRATEGIC-REVIEW-2026-11-02 | ✅ 已完成 | P45 | L | 2026-11-02 | docs/validation/strategic-review-2026-11-02{,_EN}.md |
-| P47 GOVERNANCE-BASELINE-VERIFY | 🔄 进行中 | P46 | M | — | docs/validation/governance-baseline-verify{,_EN}.md |
+| P47 GOVERNANCE-BASELINE-VERIFY | ✅ 已完成 | P46 | M | 2026-11-02 | docs/validation/governance-baseline-verify{,_EN}.md；补登记：OB-133 至 OB-136 |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -1441,12 +1441,12 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 临时件落点声明 | 本片临时目录 = `tmp/STRATEGIC-REVIEW-2026-11-02/`（⑧c 前只增不删） |
 | 完成记录 | 报告：`docs/validation/strategic-review-2026-11-02{,_EN}.md` |
 
-### P47 — `GOVERNANCE-BASELINE-VERIFY`（断点 B 可信基线核验与历史补登记）· 🔄 进行中
+### P47 — `GOVERNANCE-BASELINE-VERIFY`（断点 B 可信基线核验与历史补登记）· ✅ 已完成
 
 | 字段 | 内容 |
 |---|---|
 | 标识 | `GOVERNANCE-BASELINE-VERIFY`（评估/治理类 `[SLICE]` · 流水线裁剪 0 → ① → ② → ⑧ → ⑨ → ⑧c → ⑩） |
-| 状态 | 🔄 **进行中**（2026-11-02 起跑；锚点 `0e46bd0`；R-11 裁定 = B 档） |
+| 状态 | ✅ **已完成**（2026-11-02；锚点 `0e46bd0`；R-11 裁定 = B 档；R = 3、D = 0） |
 | 目标 | 对断点 B 的七项「未闭合（证据不足）」逐项核验，给出「补证后升级」或「维持未闭合并写明缺口」二选一结论，并以新增补登记纠偏 |
 | 依赖 | R-11 裁定（已获：B 档 + 逐项差异化）；P46 战略回看报告 |
 | 规模 | M |
@@ -1460,7 +1460,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 执行自由度清单落盘路径 | `docs/validation/evidence/GOVERNANCE-BASELINE-VERIFY/freedom-list.md` |
 | R / D 基线 | R = 0、D = 0（不继承上片） |
 | 临时件落点声明 | 本片临时目录 = `tmp/P47/`（⑧c 前只增不删） |
-| 完成记录 | 报告：`docs/validation/governance-baseline-verify{,_EN}.md`（⑩ 停点后回填提交号与 CI run） |
+| 完成记录 | 报告：`docs/validation/governance-baseline-verify{,_EN}.md`；提交 `bbd1745` 与 `b0d5b5a`；CI run `41358624169` 与 `41360290908` 双绿；断点 B 七项结论：补证后升级 4 项、维持未闭合 3 项 |
 
 ## 已知缺陷（后续切片前处理）
 

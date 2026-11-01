@@ -77,7 +77,7 @@
 | DR13-FIX DR13-FIX (P45 prerequisite) | ✅ Completed | P44 | S | 2026-11-01 | docs/validation/dr13-fix{,_EN}.md |
 | P45 P45-T027B-E2E-ZERO-MODEL | ✅ Completed | DR13-FIX | M | 2026-11-01 | docs/validation/p45-e2e-zero-model{,_EN}.md |
 | P46 STRATEGIC-REVIEW-2026-11-02 | ✅ Completed | P45 | L | 2026-11-02 | docs/validation/strategic-review-2026-11-02{,_EN}.md |
-| P47 GOVERNANCE-BASELINE-VERIFY | 🔄 In progress | P46 | M | — | docs/validation/governance-baseline-verify{,_EN}.md |
+| P47 GOVERNANCE-BASELINE-VERIFY | ✅ Completed | P46 | M | 2026-11-02 | docs/validation/governance-baseline-verify{,_EN}.md; backfill: OB-133 to OB-136 |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1428,12 +1428,12 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Temp artefact location | `tmp/STRATEGIC-REVIEW-2026-11-02/` (append-only until 8c) |
 | Completion record | Report: `docs/validation/strategic-review-2026-11-02{,_EN}.md` |
 
-### P47 — `GOVERNANCE-BASELINE-VERIFY` (breakpoint-B trusted-baseline verification and historical backfill) · 🔄 In progress
+### P47 — `GOVERNANCE-BASELINE-VERIFY` (breakpoint-B trusted-baseline verification and historical backfill) · ✅ Completed
 
 | Field | Content |
 |---|---|
 | Identity | `GOVERNANCE-BASELINE-VERIFY` (assessment/governance `[SLICE]`; pipeline trimmed to 0 → 1 → 2 → 8 → 9 → 8c → 10) |
-| Status | 🔄 **In progress** (kicked off 2026-11-02; anchor `0e46bd0`; R-11 ruling = option B) |
+| Status | ✅ **Completed** (2026-11-02; anchor `0e46bd0`; R-11 ruling = option B; R = 3, D = 0) |
 | Goal | Verify the seven breakpoint-B items rated "not closed (insufficient evidence)" one by one, give a binary verdict each ("closed after backfill" or "still open with the gap stated"), and correct the record chain by added registrations only |
 | Depends on | R-11 ruling (granted: option B plus per-item differentiation); the P46 strategic-review report |
 | Size | M |
@@ -1447,7 +1447,7 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Freedom list path | `docs/validation/evidence/GOVERNANCE-BASELINE-VERIFY/freedom-list.md` |
 | R / D baseline | R = 0, D = 0 (not inherited) |
 | Temp artefact location | `tmp/P47/` (append-only until 8c) |
-| Completion record | Report: `docs/validation/governance-baseline-verify{,_EN}.md` (commit and CI run backfilled after the step-10 stop point) |
+| Completion record | Report: `docs/validation/governance-baseline-verify{,_EN}.md`; commits `bbd1745` and `b0d5b5a`; CI runs `41358624169` and `41360290908` both green; breakpoint-B verdicts: four closed after backfill, three still open |
 
 ## Known defects (to be handled before later slices)
 
