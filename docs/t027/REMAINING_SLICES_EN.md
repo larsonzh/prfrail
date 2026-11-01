@@ -61,9 +61,9 @@
 | P29 DIRECTIVE-P28-FOLLOWUP | ✅ Done | P28 | M | 2026-10-26 | `docs/validation/directive-p28-followup{,_EN}.md` |
 | P30 DIRECTIVE-WHITELIST-POLICY | ✅ Done | P29 | S | 2026-10-26 | `docs/validation/directive-whitelist-policy{,_EN}.md` |
 | P31 DIRECTIVE-LEDGER-FIELD-SPLIT | ✅ Done | P30 | M | 2026-10-26 | docs/validation/directive-ledger-field-split{,_EN}.md |
-| P32 DIRECTIVE-D-MECHANICAL-GUARD | ✅ Done | P31 | M | 2026-10-27 | docs/validation/directive-d-mechanical-guard{,_EN}.md |
-| P33 DIRECTIVE-V21-OBS-SWEEP | ✅ Done | P32 | M | 2026-10-28 | docs/validation/directive-v21-obs-sweep{,_EN}.md |
-| P34 DIRECTIVE-TMP-SELF-HEAL | ✅ Done | P33 | M | 2026-10-28 | docs/validation/directive-tmp-self-heal{,_EN}.md |
+| P32 DIRECTIVE-D-MECHANICAL-GUARD | ✅ Done | P31 | M | 2026-10-27 | docs/validation/directive-d-mechanical-guard{,_EN}.md; backfill: OB-133 (G4) |
+| P33 DIRECTIVE-V21-OBS-SWEEP | ✅ Done | P32 | M | 2026-10-28 | docs/validation/directive-v21-obs-sweep{,_EN}.md; backfill: OB-134 (G5) |
+| P34 DIRECTIVE-TMP-SELF-HEAL | ✅ Done | P33 | M | 2026-10-28 | docs/validation/directive-tmp-self-heal{,_EN}.md; backfill: OB-135 (G7) |
 | P35 STRATEGIC-REVIEW-2026-10-30 | ✅ Done | P34 | L | 2026-10-29 | docs/validation/strategic-review-2026-10-30{,_EN}.md |
 | P36 STRATEGIC-PLANNING-2026-10-31 | ✅ Done | P35 | L | 2026-10-30 | docs/validation/strategic-planning-2026-10-31{,_EN}.md |
 | P37 P37-T027B-BREAKTHROUGH | ✅ Done | P36 | L | 2026-10-30 | docs/validation/t027b-breakthrough{,_EN}.md |
@@ -77,6 +77,7 @@
 | DR13-FIX DR13-FIX (P45 prerequisite) | ✅ Completed | P44 | S | 2026-11-01 | docs/validation/dr13-fix{,_EN}.md |
 | P45 P45-T027B-E2E-ZERO-MODEL | ✅ Completed | DR13-FIX | M | 2026-11-01 | docs/validation/p45-e2e-zero-model{,_EN}.md |
 | P46 STRATEGIC-REVIEW-2026-11-02 | ✅ Completed | P45 | L | 2026-11-02 | docs/validation/strategic-review-2026-11-02{,_EN}.md |
+| P47 GOVERNANCE-BASELINE-VERIFY | 🔄 In progress | P46 | M | — | docs/validation/governance-baseline-verify{,_EN}.md |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1426,6 +1427,27 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | R / D baseline | R = 0, D = 0 (not inherited) |
 | Temp artefact location | `tmp/STRATEGIC-REVIEW-2026-11-02/` (append-only until 8c) |
 | Completion record | Report: `docs/validation/strategic-review-2026-11-02{,_EN}.md` |
+
+### P47 — `GOVERNANCE-BASELINE-VERIFY` (breakpoint-B trusted-baseline verification and historical backfill) · 🔄 In progress
+
+| Field | Content |
+|---|---|
+| Identity | `GOVERNANCE-BASELINE-VERIFY` (assessment/governance `[SLICE]`; pipeline trimmed to 0 → 1 → 2 → 8 → 9 → 8c → 10) |
+| Status | 🔄 **In progress** (kicked off 2026-11-02; anchor `0e46bd0`; R-11 ruling = option B) |
+| Goal | Verify the seven breakpoint-B items rated "not closed (insufficient evidence)" one by one, give a binary verdict each ("closed after backfill" or "still open with the gap stated"), and correct the record chain by added registrations only |
+| Depends on | R-11 ruling (granted: option B plus per-item differentiation); the P46 strategic-review report |
+| Size | M |
+| Steps | Step 0 → 1 baseline check → 2 backfill → 8 report assembly → 9 three scopes and SELFTEST → 8c → 10 stop point (steps 3–7 skipped per the trim) |
+| Current gap | Record-chain breakpoints at G4 / G5 / G7; P3 semantics fork; P5 seed-build evidence; S7 three elements |
+| Deliverables | Report pair `docs/validation/governance-baseline-verify{,_EN}.md`; evidence package (`00-briefing.md` / `01-baseline/` and further payloads); ledger backfills OB-133 to OB-136 |
+| Acceptance evidence | Seven-item verdict table carrying search scope and mechanical criteria; zero edits to historical text; three scopes TOTAL_FAIL=0 and SELFTEST 697/697; CN / `_EN` six-shape parity |
+| Boundaries | No directive-body change (the §5.1 exclusion question goes to a separate slice), no contract change, no code or CI change; no reopening of P32 / P33 / P34 acceptance; no gitee push |
+| Tier | `[SLICE]` (assessment/governance) |
+| Probe budget | None (not applicable) |
+| Freedom list path | `docs/validation/evidence/GOVERNANCE-BASELINE-VERIFY/freedom-list.md` |
+| R / D baseline | R = 0, D = 0 (not inherited) |
+| Temp artefact location | `tmp/P47/` (append-only until 8c) |
+| Completion record | Report: `docs/validation/governance-baseline-verify{,_EN}.md` (commit and CI run backfilled after the step-10 stop point) |
 
 ## Known defects (to be handled before later slices)
 

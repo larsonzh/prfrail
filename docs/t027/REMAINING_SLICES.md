@@ -61,9 +61,9 @@
 | P29 DIRECTIVE-P28-FOLLOWUP | ✅ 已完成 | P28 | M | 2026-10-26 | `docs/validation/directive-p28-followup{,_EN}.md` |
 | P30 DIRECTIVE-WHITELIST-POLICY | ✅ 已完成 | P29 | S | 2026-10-26 | `docs/validation/directive-whitelist-policy{,_EN}.md` |
 | P31 DIRECTIVE-LEDGER-FIELD-SPLIT | ✅ 已完成 | P30 | M | 2026-10-26 | docs/validation/directive-ledger-field-split{,_EN}.md |
-| P32 DIRECTIVE-D-MECHANICAL-GUARD | ✅ 已完成 | P31 | M | 2026-10-27 | docs/validation/directive-d-mechanical-guard{,_EN}.md |
-| P33 DIRECTIVE-V21-OBS-SWEEP | ✅ 已完成 | P32 | M | 2026-10-28 | docs/validation/directive-v21-obs-sweep{,_EN}.md |
-| P34 DIRECTIVE-TMP-SELF-HEAL | ✅ 已完成 | P33 | M | 2026-10-28 | docs/validation/directive-tmp-self-heal{,_EN}.md |
+| P32 DIRECTIVE-D-MECHANICAL-GUARD | ✅ 已完成 | P31 | M | 2026-10-27 | docs/validation/directive-d-mechanical-guard{,_EN}.md；补登记：OB-133（G4） |
+| P33 DIRECTIVE-V21-OBS-SWEEP | ✅ 已完成 | P32 | M | 2026-10-28 | docs/validation/directive-v21-obs-sweep{,_EN}.md；补登记：OB-134（G5） |
+| P34 DIRECTIVE-TMP-SELF-HEAL | ✅ 已完成 | P33 | M | 2026-10-28 | docs/validation/directive-tmp-self-heal{,_EN}.md；补登记：OB-135（G7） |
 | P35 STRATEGIC-REVIEW-2026-10-30 | ✅ 已完成 | P34 | L | 2026-10-29 | docs/validation/strategic-review-2026-10-30{,_EN}.md |
 | P36 STRATEGIC-PLANNING-2026-10-31 | ✅ 已完成 | P35 | L | 2026-10-30 | docs/validation/strategic-planning-2026-10-31{,_EN}.md |
 | P37 P37-T027B-BREAKTHROUGH | ✅ 已完成 | P36 | L | 2026-10-30 | docs/validation/t027b-breakthrough{,_EN}.md |
@@ -77,6 +77,7 @@
 | DR13-FIX DR13-FIX（P45 前置） | ✅ 已完成 | P44 | S | 2026-11-01 | docs/validation/dr13-fix{,_EN}.md |
 | P45 P45-T027B-E2E-ZERO-MODEL | ✅ 已完成 | DR13-FIX | M | 2026-11-01 | docs/validation/p45-e2e-zero-model{,_EN}.md |
 | P46 STRATEGIC-REVIEW-2026-11-02 | ✅ 已完成 | P45 | L | 2026-11-02 | docs/validation/strategic-review-2026-11-02{,_EN}.md |
+| P47 GOVERNANCE-BASELINE-VERIFY | 🔄 进行中 | P46 | M | — | docs/validation/governance-baseline-verify{,_EN}.md |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -1439,6 +1440,27 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | R / D 基线 | R = 0、D = 0（不继承上片） |
 | 临时件落点声明 | 本片临时目录 = `tmp/STRATEGIC-REVIEW-2026-11-02/`（⑧c 前只增不删） |
 | 完成记录 | 报告：`docs/validation/strategic-review-2026-11-02{,_EN}.md` |
+
+### P47 — `GOVERNANCE-BASELINE-VERIFY`（断点 B 可信基线核验与历史补登记）· 🔄 进行中
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `GOVERNANCE-BASELINE-VERIFY`（评估/治理类 `[SLICE]` · 流水线裁剪 0 → ① → ② → ⑧ → ⑨ → ⑧c → ⑩） |
+| 状态 | 🔄 **进行中**（2026-11-02 起跑；锚点 `0e46bd0`；R-11 裁定 = B 档） |
+| 目标 | 对断点 B 的七项「未闭合（证据不足）」逐项核验，给出「补证后升级」或「维持未闭合并写明缺口」二选一结论，并以新增补登记纠偏 |
+| 依赖 | R-11 裁定（已获：B 档 + 逐项差异化）；P46 战略回看报告 |
+| 规模 | M |
+| 步骤 | 步骤 0 → ① 基线核验 → ② 补登记 → ⑧ 装配报告 → ⑨ 三作用域与 SELFTEST → ⑧c → ⑩ 停点（按裁剪跳过 ③–⑦） |
+| 现状缺口 | G4 / G5 / G7 的治理记录链断点；P3 语义分叉、P5 seed 构建证据、S7 三要素 |
+| 交付物 | 报告对 `docs/validation/governance-baseline-verify{,_EN}.md`；证据包（`00-briefing.md` / `01-baseline/` 等载荷）；台账补登记 OB-133 至 OB-136 |
+| 验收证据 | 七项逐项结论表带检索范围与机械判据；历史正文零删改；三作用域 TOTAL_FAIL=0 且 SELFTEST 697/697；CN / `_EN` 六形状对齐 |
+| 边界 | 不改准则正文（§5.1 除外条件另片）、不改契约、不改代码与 CI；不重开 P32 / P33 / P34 验收；不推 gitee |
+| 分级 | `[SLICE]`（评估/治理类） |
+| 探针额度 | 无（不适用） |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/GOVERNANCE-BASELINE-VERIFY/freedom-list.md` |
+| R / D 基线 | R = 0、D = 0（不继承上片） |
+| 临时件落点声明 | 本片临时目录 = `tmp/P47/`（⑧c 前只增不删） |
+| 完成记录 | 报告：`docs/validation/governance-baseline-verify{,_EN}.md`（⑩ 停点后回填提交号与 CI run） |
 
 ## 已知缺陷（后续切片前处理）
 
