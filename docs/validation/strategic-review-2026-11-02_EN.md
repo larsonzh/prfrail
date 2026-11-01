@@ -160,7 +160,7 @@ Metering anomaly register: batch helper 1 produced 10,190 characters (archived a
 | G6-4 expiring literal | No expiring literal on added lines |
 | G7 report contract | G7-a/b/c/d/e/f all pass (G7-b turned green once `04-compensation/review.md` was archived) |
 | G8 evidence tree | The pack is self-consistent |
-| Report CN and `_EN` six shapes | lines 204 / 204; headings 14 / 14; `**` 11 / 11; `|` 284 / 284; blank lines 52 / 52; backticks 136 / 136 — all six shapes equal |
+| Report CN and `_EN` six shapes | lines 207 / 207; headings 14 / 14; `**` 11 / 11; `|` 289 / 289; blank lines 53 / 53; backticks 164 / 164 — all six shapes equal |
 | Note (not a six-shape item) | fences 2 / 2; 13 / 13 lines inside the artifacts fence |
 
 Stage 8a first measured 182 = 182 lines and 49 = 49 blank lines (the content state before the §6/§7 backfill); that reading is superseded by the set in the table above and is kept only as a trace of the pre-edit state.
@@ -170,9 +170,12 @@ Stage 8a first measured 182 = 182 lines and 49 = 49 blank lines (the content sta
 | Artifact | Commit | Run | Result |
 |---|---|---|---|
 | Intermediate draft (carries the five defects in §3/§6/§7/§9) | `51d6f23` | `41339104941` | Both green: ubuntu-latest and windows-latest succeeded; SELFTEST 697/697 on both legs; `gate.js --all --scope=ci` passed |
-| Final draft (five fixes plus this section backfill) | Committed after authorised push | Run id registered after the authorised push | Package readings registered after the authorised push |
+| Corrected draft (five fixes; final CI evidence) | `26ca5a5` | `41344276390` | Both green: ubuntu-latest and windows-latest succeeded; SELFTEST 697/697 on both legs; `gate.js --all --scope=ci` passed |
+| This-section backfill (docs-only append) | Registered with the append commit | Registered with the append commit | Registered with the append commit |
 
 Intermediate-draft package readings (process fact, not the final CI evidence of this slice): ubuntu-latest `ok internal/adapters 12.267s`, `ok internal/chain 0.745s`, `ok internal/console 2.367s`, `ok internal/gates 0.117s`; Race leg `ok internal/adapters 88.509s`, `ok internal/chain 2.426s`; windows-latest `ok internal/adapters 30.699s`, `ok internal/chain 4.116s`, `ok internal/console 16.627s`, `ok internal/gates 0.613s`.
+
+Corrected-draft package readings (final CI evidence): ubuntu-latest `ok internal/adapters 12.236s`, `ok internal/chain 0.616s`, `ok internal/console 2.356s`, `ok internal/gates 0.143s`; Race leg `ok internal/adapters 89.256s`, `ok internal/chain 2.456s`; windows-latest `ok internal/adapters 35.386s`, `ok internal/chain 8.651s`, `ok internal/console 21.257s`, `ok internal/gates 0.485s`. Both legs reported `SELFTEST: PASS 697/697`. This section is a docs-only append and changes neither code nor gate criteria, so the two rows above stand.
 
 ## 9 Known limitations
 

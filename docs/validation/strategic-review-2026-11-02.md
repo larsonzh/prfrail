@@ -160,7 +160,7 @@
 | G6-4 期限字面 | 新增行无期限字面 |
 | G7 报告契约 | G7-a/b/c/d/e/f 全部通过（`04-compensation/review.md` 归档后 G7-b 转绿） |
 | G8 证据树 | 包自洽 |
-| 报告 CN 与 `_EN` 六形状 | 行数 204 / 204；标题 14 / 14；`**` 11 / 11；`|` 284 / 284；空行 52 / 52；反引号 136 / 136 —— 六项全等 |
+| 报告 CN 与 `_EN` 六形状 | 行数 207 / 207；标题 14 / 14；`**` 11 / 11；`|` 289 / 289；空行 53 / 53；反引号 164 / 164 —— 六项全等 |
 | 附注（非六形状项） | 围栏 2 / 2；artifacts 围栏内条数 13 / 13 |
 
 ⑧a 首轮实测为行数 182 = 182、空行 49 = 49（回填 §6/§7 之前的内容状态），已被上表一组读数取代；旧读数仅作为编辑前状态留痕，不再作为读数引用。
@@ -170,9 +170,12 @@
 | 稿件 | 提交 | run | 结果 |
 |---|---|---|---|
 | 中间稿（含本报告 §3/§6/§7/§9 五处缺陷） | `51d6f23` | `41339104941` | 双绿：ubuntu-latest 与 windows-latest 均 success；两腿 SELFTEST 697/697；`gate.js --all --scope=ci` 通过 |
-| 最终稿（五处修复 + 本节回填） | 授权推送后提交 | 授权推送后登记 run 号 | 授权推送后登记包级读数 |
+| 修正稿（五处修复；最终 CI 证据） | `26ca5a5` | `41344276390` | 双绿：ubuntu-latest 与 windows-latest 均 success；两腿 SELFTEST 697/697；`gate.js --all --scope=ci` 通过 |
+| 本节回填（docs-only 追加） | 追加提交时登记 | 追加提交时登记 | 追加提交时登记 |
 
 中间稿包级读数（过程事实，不作为本片最终 CI 证据）：ubuntu-latest `ok internal/adapters 12.267s`、`ok internal/chain 0.745s`、`ok internal/console 2.367s`、`ok internal/gates 0.117s`；Race 腿 `ok internal/adapters 88.509s`、`ok internal/chain 2.426s`；windows-latest `ok internal/adapters 30.699s`、`ok internal/chain 4.116s`、`ok internal/console 16.627s`、`ok internal/gates 0.613s`。
+
+修正稿包级读数（最终 CI 证据）：ubuntu-latest `ok internal/adapters 12.236s`、`ok internal/chain 0.616s`、`ok internal/console 2.356s`、`ok internal/gates 0.143s`；Race 腿 `ok internal/adapters 89.256s`、`ok internal/chain 2.456s`；windows-latest `ok internal/adapters 35.386s`、`ok internal/chain 8.651s`、`ok internal/console 21.257s`、`ok internal/gates 0.485s`。两腿均 `SELFTEST: PASS 697/697`。本节回填为 docs-only 追加，不改变代码与门禁判据，上表两行结论不受影响。
 
 ## 9 已知限制
 
