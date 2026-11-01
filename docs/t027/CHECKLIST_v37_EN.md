@@ -28,7 +28,7 @@ Fixed `tmp` assertion: top level holds `.gitkeep` plus `gates-cache`; `gates-cac
 | Verdict spread | closed after backfill: 4 (G4 / G5 / G7 / M6); still open: 3 (P3 / P5 / S7) |
 | Backfill | OB-133 to OB-136 added to `§12.4`; pointers appended to three evidence cells in `REMAINING_SLICES` |
 | Commit / CI | `bbd1745` / run `41358624169`, both legs green (SELFTEST 697/697, TOTAL_FAIL=0) |
-| Accounting | two read-only GLM dispatches (2,972 / 3,480 characters, strictly serial); R = 2, D = 0 |
+| Accounting | two read-only GLM dispatches (2,972 / 3,480 characters, strictly serial); R = 3, D = 0 |
 
 ### 2.1 Seven verdicts
 
@@ -50,7 +50,7 @@ Fixed `tmp` assertion: top level holds `.gitkeep` plus `gates-cache`; `gates-cac
 | v1.60 | DR13-FIX | `b123db1` + `eb36992` | closed |
 | v1.60 | P45 | `4273d6e` + `3a7541d` | closed |
 | v1.60 | P46 | `26ca5a5` + `5e4202e` | closed (R = 1, D = 2) |
-| v1.60 | P47 | `bbd1745` + backfill commit | closed (R = 2, D = 0) |
+| v1.60 | P47 | `bbd1745` + backfill commit | closed (R = 3, D = 0) |
 
 ## 4. Execution queue
 
@@ -119,6 +119,7 @@ Suspended (not scheduled): `G4B-CORPUS-DECOUPLE` (trigger-based), the five low-p
 12. Assessment slices stop at step 10 once step 9 is green; self-issued `commit` or `push` is forbidden.
 13. A single output never exceeds 10000 characters; split before the limit and never self-restart.
 14. Compaction ends the slice: at 100K of context or on a compaction notice, close the current slice.
+15. The kickoff message must carry a "document sync" section: when a slice changes the project stage or a contract capability, stage 8 must also update the authoritative documents such as `DEV_PLAN.md` and `ARCHITECTURE.md`; omitting that section is a structural defect in the kickoff message.
 
 ## 8. Cross-slice collaboration rules (essentials)
 
@@ -131,10 +132,10 @@ Suspended (not scheduled): `G4B-CORPUS-DECOUPLE` (trigger-based), the five low-p
 | Gate execution | `--all --skip-base` in intermediate stages and fully green before commit; discipline E: stage precisely, then run `--scope=index` |
 | Fence | sorted by path, TAB separated, byte-identical between CN and `_EN` |
 | Facts versus judgement | errors in independently checkable output do not void it; judgement items must be redone |
+| Discipline T · quantifier shape | Never write a quantifier right after an identifier in the ledger or reports: `G6-4` reads it as a line-count literal, so write "the entry" instead (three P47 occurrences) |
+| Discipline U · no verbatim trigger strings | A report must not quote verbatim the string that tripped a criterion: reproducing the literal in an explanation trips it again, so use descriptive wording (three P47 occurrences) |
 
-New discipline candidates this version (both from P47's G6-4 false positives):
-1. Never write the "number plus counter word" shape in the ledger or reports: a quantifier right after an identifier is read as a line-count literal, so write "the entry" instead.
-2. Never quote verbatim the string that tripped a criterion: explaining a red by reproducing the literal trips it again, so use descriptive wording.
+Disciplines T and U apply from v37 on, both from P47's `G6-4` false positives and both rooted in the same family: report self-description and ledger wording.
 
 ## 9. Checklist meta-rules
 

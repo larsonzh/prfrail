@@ -1,6 +1,6 @@
 ﻿# 证轨 P47 治理可信基线核验报告：断点 B 七项核验与历史补登记（准则 v1.60）
 
-切片 `GOVERNANCE-BASELINE-VERIFY`（评估/治理类 `[SLICE]`，流水线裁剪：0 → ① → ② → ⑧ → ⑨ → ⑧c → ⑩，跳过 ③–⑦）；起跑锚点 `HEAD` = `0e46bd0`；准则 v1.60；报告日期 2026-11-02；R / D 基线 = 0 / 0；本片实测 R = 2（两次门禁判红后的修复重跑，同一轮多判据合并计 1）、D = 0。
+切片 `GOVERNANCE-BASELINE-VERIFY`（评估/治理类 `[SLICE]`，流水线裁剪：0 → ① → ② → ⑧ → ⑨ → ⑧c → ⑩，跳过 ③–⑦）；起跑锚点 `HEAD` = `0e46bd0`；准则 v1.60；报告日期 2026-11-02；R / D 基线 = 0 / 0；本片实测 R = 3（三次门禁判红后的修复重跑，同一轮多判据合并计 1）、D = 0。
 
 ## 1 执行摘要
 
@@ -71,7 +71,7 @@
 | `G6-5` / `G6-6` | 节引用可解析；新增台账行首状态词均属闭集 |
 | `G7` 报告契约 | 本文件与其镜像均在 G7 扫描域内，围栏齐备 |
 | `G8` 证据树 | 包自洽（`MANIFEST.md` 条目与 `SHA256SUMS.txt` 哈希行同步） |
-| 六形状（CN / `_EN`） | 行数 113 / 113；标题 9 / 9；`**` 32 / 32；竖线 150 / 150；空行 28 / 28；反引号 184 / 184 |
+| 六形状（CN / `_EN`） | 行数 113 / 113；标题 9 / 9；`**` 32 / 32；竖线 150 / 150；空行 28 / 28；反引号 188 / 188 |
 
 ## 8 提交与 CI
 
@@ -80,7 +80,7 @@
 | 稿件 | 提交 | run | 结果 |
 |---|---|---|---|
 | 主提交（本片全部载荷） | `bbd1745` | `41358624169` | 双绿：`ubuntu-latest` 与 `windows-latest` 均 success；两腿 `SELFTEST: PASS 697/697` 与 `TOTAL_FAIL=0` |
-| 本节回填（docs-only 追加） | 追加提交时登记 | 追加提交时登记 | 追加提交时登记 |
+| 本节回填 + v37 快照（docs-only 追加） | `b0d5b5a` | `41360290908` | 双绿（两腿 success）；本节为 docs-only，不改代码与判据 |
 
 包级读数（最终 CI 证据）：`ubuntu-latest` 的 `internal/adapters` 11.959s、`internal/applier` 0.492s、`internal/chain` 0.565s、`internal/console` 1.912s、`internal/evidence` 0.009s、`internal/gates` 0.126s；`windows-latest` 的 `internal/adapters` 29.364s、`internal/applier` 5.253s、`internal/chain` 3.912s、`internal/console` 15.398s、`internal/evidence` 0.057s、`internal/gates` 0.526s、`internal/guard` 2.655s、`internal/release` 3.818s、`internal/repair` 0.028s、`internal/snapshot` 1.320s、`internal/taskdef` 0.062s、`internal/tickets` 4.359s。两腿均 `SELFTEST: PASS 697/697` 与 `TOTAL_FAIL=0`；本节回填为 `docs-only` 追加，不改代码与判据。
 
