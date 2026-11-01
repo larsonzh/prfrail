@@ -1,6 +1,6 @@
 ﻿# Task execution checklist (cross-session snapshot v37 · P47 governance-baseline closeout edition)
 
-Generated: 2026-11-02, HEAD = origin/main = `bbd1745` (this slice's main commit), directive v1.60.
+Generated: 2026-11-02, HEAD = origin/main = `50a70ac` (the P47 ledger-flip commit), directive v1.60.
 Supersedes: replaces v36 and every earlier snapshot outright. The docs-only backfill commit only moves HEAD forward and does not change the anchor semantics in this section.
 
 Changes versus v36: (1) P47 is closed and on the ledger, with the seven breakpoint-B verdicts established; (2) the first layer-1 item is dequeued, leaving "layer 1 with two items / layers 2 / 3 / 4"; (3) OB-135 joins the observation list (25 non-terminal items in total); (4) two discipline candidates added (both from G6-4 false positives); (5) R-11 moves to completed.
@@ -9,8 +9,8 @@ Changes versus v36: (1) P47 is closed and on the ledger, with the seven breakpoi
 
 | Item | Value | Check command |
 |---|---|---|
-| HEAD | `bbd1745` | `git rev-parse --short HEAD` |
-| origin/main | `bbd1745` | `git rev-parse --short origin/main` |
+| HEAD | `50a70ac` | `git rev-parse --short HEAD` |
+| origin/main | `50a70ac` | `git rev-parse --short origin/main` |
 | Directive version | **v1.60** | head of `docs/DELIVERY_DIRECTIVE.md` |
 | SELFTEST | **697/697** | `node tools/gates/gate.js --selftest` |
 | Three scopes | **TOTAL_FAIL=0 everywhere** | `gate.js --all --scope=index`, `tree`, `ci` |
@@ -60,7 +60,7 @@ Principle: layer 1 clears the record chain, then layer 2 the strategic mainline,
 
 | Order | Slice | Identity and content | Size | Step-7 budget | Dependency | Boundary |
 |---|---|---|---|---|---|---|
-| 1 | DR13-FIX-D3 | cross-process hardening of remove-then-unlock (GAP-71) | S | one Codex final review | R-05 ruling | no DR-13 conclusion change, no CONTRACTS change |
+| 1 | DR13-FIX-D3 | cross-process hardening of remove-then-unlock (GAP-71) | S | one Codex final review | ruled (R-05) | no DR-13 conclusion change, no CONTRACTS change |
 | 2 | RACE-LEG-EXPAND | extend the race leg to console and gates (GAP-42) | M | one Codex final review | R-03 ruling | test coverage only, no production semantics change |
 
 ### Layer 2 (strategic mainline)
@@ -95,7 +95,7 @@ Suspended (not scheduled): `G4B-CORPUS-DECOUPLE` (trigger-based), the five low-p
 | R-02 | `CONTRACTS-S7-DURABILITY` cadence and ownership | open (blocks layer 3) |
 | R-03 | ownership of the post-P45 slices | open (blocks layer 1 item 2 and layer 2) |
 | R-04 | DR-13 "repaired plus observed" reading | open |
-| R-05 | whether DR13-FIX D3 is a standalone slice | open (blocks layer 1 item 1) |
+| R-05 | whether DR13-FIX-D3 is a standalone slice | completed (standalone slice) |
 | R-06 | OB-55 ownership and T027-B cadence | open |
 | R-07 | MVA, the S1 removals and the narrowed S2 promise | open |
 | R-08 | candidate, Windows precondition P and probe authorisation | open (blocks layer 4) |
@@ -159,8 +159,8 @@ Here is my project state snapshot (v37); check the five anchors in section 1 fir
 
 Supporting documents: `REMAINING_SLICES.md` (P47 done), `DELIVERY_DIRECTIVE.md` (v1.60), `docs/validation/governance-baseline-verify{,_EN}.md` (P47 report and the seven verdicts).
 
-Current slice: layer 1 item 1 = `DR13-FIX-D3` (awaiting the R-05 ruling).
+Current slice: layer 1 item 1 = `DR13-FIX-D3` (R-05 ruled; ready to start).
 
 ## 11. Status in one sentence
 
-P47 is closed (`bbd1745`, both-green run `41358624169`); of the seven breakpoint-B items four are closed after backfill and three stay open (P3 awaits R-09, P5 awaits layer 4, S7 is registered); the next step is layer 1 item 1 `DR13-FIX-D3`, which awaits the R-05 ruling.
+P47 is fully closed (`50a70ac`, three both-green runs); of the seven breakpoint-B items four are closed after backfill and three stay open (P3 awaits R-09, P5 awaits layer 4, S7 is registered); the next step is layer 1 item 1 `DR13-FIX-D3` (R-05 ruled, ready to start).

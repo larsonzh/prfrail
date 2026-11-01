@@ -1,6 +1,6 @@
 ﻿# 任务执行清单（跨会话快照 v37 · P47 治理基线核验结项版）
 
-生成时点：2026-11-02，HEAD = origin/main = `bbd1745`（本片主提交），准则 v1.60。
+生成时点：2026-11-02，HEAD = origin/main = `50a70ac`（P47 台账翻转提交），准则 v1.60。
 替代关系：完全取代 v36 及任何更早快照。回填提交（docs-only）只在 HEAD 前进，不改本节锚点语义。
 
 本版修订（相对 v36）：① P47 闭环入台账，断点 B 七项结论成立；② 层 1 首项出队，队列变为「层 1 剩 2 项 / 层 2 / 层 3 / 层 4」；③ 观察项新增 OB-135（合计 25 项非终态）；④ 新增两条纪律候选（均由 G6-4 误杀实证）；⑤ R-11 转入已完成。
@@ -9,8 +9,8 @@
 
 | 项 | 值 | 核对命令 |
 |---|---|---|
-| HEAD | `bbd1745` | `git rev-parse --short HEAD` |
-| origin/main | `bbd1745` | `git rev-parse --short origin/main` |
+| HEAD | `50a70ac` | `git rev-parse --short HEAD` |
+| origin/main | `50a70ac` | `git rev-parse --short origin/main` |
 | 准则版本 | **v1.60** | `docs/DELIVERY_DIRECTIVE.md` 头部 |
 | SELFTEST | **697/697** | `node tools/gates/gate.js --selftest` |
 | 三作用域 | **全 TOTAL_FAIL=0** | `gate.js --all --scope=index`、`tree`、`ci` |
@@ -60,7 +60,7 @@
 
 | 序 | 切片 | 标识与内含 | 规模 | ⑦ 额度 | 依赖 | 边界 |
 |---|---|---|---|---|---|---|
-| 1 | DR13-FIX-D3 | 先 remove 再 unlock 的跨进程加固（GAP-71） | S | Codex 1 次终审 | R-05 裁定 | 不改 DR-13 结论、不动 CONTRACTS |
+| 1 | DR13-FIX-D3 | 先 remove 再 unlock 的跨进程加固（GAP-71） | S | Codex 1 次终审 | 已裁（R-05） | 不改 DR-13 结论、不动 CONTRACTS |
 | 2 | RACE-LEG-EXPAND | Race 腿扩包到 console / gates（GAP-42） | M | Codex 1 次终审 | R-03 裁定 | 只扩测试覆盖，不改生产语义 |
 
 ### 层 2（战略主线）
@@ -95,7 +95,7 @@
 | R-02 | `CONTRACTS-S7-DURABILITY` 节奏与归属 | 待裁（阻塞层 3） |
 | R-03 | P45 后续片归属 | 待裁（阻塞层 1 第 2 项与层 2） |
 | R-04 | DR-13「已修复 + 观察」口径 | 待裁 |
-| R-05 | DR13-FIX D3 是否独立立项 | 待裁（阻塞层 1 第 1 项） |
+| R-05 | DR13-FIX-D3 是否独立立项 | 已完成（独立立项） |
 | R-06 | OB-55 归属与 T027-B 节奏 | 待裁 |
 | R-07 | MVA、S1 移出项与 S2 承诺收窄 | 待裁 |
 | R-08 | 候选、Windows 前提 P 与探针授权 | 待裁（阻塞层 4） |
@@ -159,8 +159,8 @@
 
 【补充文档】`REMAINING_SLICES.md`（P47 已完成）、`DELIVERY_DIRECTIVE.md`（v1.60）、`docs/validation/governance-baseline-verify{,_EN}.md`（P47 报告与七项结论）。
 
-当前片：层 1 第 1 项 = `DR13-FIX-D3`（依赖 R-05 裁定）。
+当前片：层 1 第 1 项 = `DR13-FIX-D3`（R-05 已裁，可直接起跑）。
 
 ## 十一、当前状态一句话
 
-P47 已闭环（`bbd1745`，双绿 run `41358624169`）；断点 B 七项中四项补证后升级、三项维持未闭合（P3 待 R-09、P5 待层 4、S7 已补登记）；下一步 = 层 1 第 1 项 `DR13-FIX-D3`，起跑依赖 R-05 裁定。
+P47 彻底闭环（`50a70ac`，三次 CI 双绿）；断点 B 七项中四项补证后升级、三项维持未闭合（P3 待 R-09、P5 待层 4、S7 已补登记）；下一步 = 层 1 第 1 项 `DR13-FIX-D3`（R-05 已裁，可直接起跑）。
