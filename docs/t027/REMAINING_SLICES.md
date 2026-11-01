@@ -73,7 +73,7 @@
 | P41 P41-T027B-SPAWN-OWNERSHIP | ✅ 已闭环 | P40 | L | 2026-10-31 | docs/validation/p41-spawn-ownership{,_EN}.md |
 | P42 P42-T027B-EVIDENCE-BIND | ✅ 已闭环 | P41 | M | 2026-10-31 | docs/validation/p42-evidence-bind{,_EN}.md |
 | P43 P43-T027B-STATE-SEAL | ✅ 已闭环 | P42 | L | 2026-10-31 | docs/validation/p43-state-seal{,_EN}.md |
-| P44 P44-T027B-GATE-READINESS | ✅ 完成 | P43 | M | 2026-11-01 | docs/validation/p44-gate-readiness{,_EN}.md |
+| P44 P44-T027B-GATE-READINESS | ✅ 已完成 | P43 | M | 2026-11-01 | docs/validation/p44-gate-readiness{,_EN}.md |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -1352,12 +1352,12 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 临时件落点声明 | 本片临时目录 = `tmp/P43-T027B-STATE-SEAL/`（⑧c 前只增不删） |
 | 完成记录 | ① 架构 → ③ 红测（RED-CONFIRMED）→ ② 两轮转绿 → ④ 门禁 → ⑤ 两轮（r1 PASS WITH FIXES → r2 PASS）→ ⑥ 两轮（r1 BLOCKED：K 未接线 → r2 PASS WITH FINDINGS，额度 2/3）→ ⑦ 三轮（r1/r2 BLOCKED → r3 PASS，额度 3/3）；R=0 D=0；生产装配接线登记为边界外限制 |
 
-### P44 — `P44-T027B-GATE-READINESS` · ✅ 完成
+### P44 — `P44-T027B-GATE-READINESS` · ✅ 已完成
 
 | 字段 | 内容 |
 |---|---|
 | 标识 | `P44-T027B-GATE-READINESS`（实现类；准则 v1.60） |
-| 状态 | ✅ **完成**（2026-11-01；提交与 CI 由 ⑩ 回执载明） |
+| 状态 | ✅ **已完成**（2026-11-01；commit `9061b67`，CI `41253798647` 复跑后双腿全绿） |
 | 目标 | C7+N4：`EvaluateT027BReadiness` 严格分离探针就绪 / 真实验收就绪 / 生产发布就绪三级；`ProbePermit` 一次性消费（调用前原子预留、消费后失效、失败与重启不重置） |
 | 依赖 | P43 已闭环（`8a46b01`） |
 | 规模 | M（console 门控入口 + gates 判定实现） |
@@ -1371,7 +1371,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 执行自由度清单落盘路径 | `docs/validation/evidence/P44-T027B-GATE-READINESS/freedom-list.md` |
 | R / D 基线 | R = 0、D = 0（不继承上片） |
 | 临时件落点声明 | 本片临时目录 = `tmp/P44-T027B-GATE-READINESS/`（⑧c 前只增不删） |
-| 完成记录 | ① 架构（含 §八 四条修订注记 R-1～R-4）→ ③ 红测（RED-CONFIRMED）→ ② 转绿（P44 用例 20 例 + 9 子例；变异验证 M1–M11 全 RED）→ ④ 门禁 → ⑤ 两轮（r1 PASS WITH FIXES：2 Medium → r2 PASS WITH FIXES：3 Low）→ ⑥ INDEPENDENT SCAN: PASS（Section B 零缺陷，额度 1/3）→ ⑦ 三轮（r1/r2 BLOCKED → r3 PASS，额度 3/3）；R=0 D=0；C7/N4 未端到端接线、-race 未执行，D9 误删 tmp 中间件与 D10 变异证据缺盘均已逐条登记 |
+| 完成记录 | 报告：`docs/validation/p44-gate-readiness{,_EN}.md` |
 
 ## 已知缺陷（后续切片前处理）
 
@@ -1388,6 +1388,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | **DR-9** | 测试：`internal/console`（**本片新增**的正向全链腿，非既有缺陷包） | `TestAgentRunnerAssemblyFullChain` **首跑红 1 次**（CI run `37070276731` / head `68a1ef0` 的 Ubuntu 腿 `Test` 步）：`runtime_agent_e2e_test.go:464: the production assembly must complete: invalid AgentRunner terminal intent: observed settlement requires a non-negative charged amount`。**性质 = 真实缺陷（非 flake）**：本片新增 (A′) 映射未履行「金额由调用方供给」的既有义务（`tools/b4-e2e/runmap.go` 的 divergence (b)）；Windows 上该路径不可达（durability unproven）⇒ ⑦ 三轮与 Windows 原生证据都无法发现，由 Ubuntu CI 腿首次执行正向全链时暴露。**处置 = 本片修复**（声明式离线工作负载补零成本金额 + 显式边界注释 + 断言；边界：接入真实付费候选时必须由调用方提供真实金额，不得默认为 0，否则按发布器既有拒绝路径 fail-closed）。**边界依据 = 准则 §6.4 边界①「新测试名 / 新失败类型 ⇒ 必须单独登记」**；不另立 OB。 |
 | **DR-11** | 门禁判据：`G3(a.1)` 的 `_EN` 镜像对称（本片引入，非既有缺陷） | **单边提交**：只改 CN 报告一行而未配 `_EN` 等量改动 ⇒ `G3(a.1)` 报 `+1/-1 vs +0/-0 MISMATCH`，双腿 `Gates` 步判红（确定性，非偶发） | CI run `39903364280` 首跑红 + 同 run `gh run rerun --failed` 复跑仍红 | **已修复**（`6149a80`：补 `_EN` 等量改动使 `+1/-1` 对称，双腿双绿）；纪律：**提交前必须门禁绿**，单语编辑必须同轮镜像 |
 | **DR-12** | 测试：`internal/guard`（本片 P40 红测，非既有缺陷包） | 红测 cleanup 阶段双重 `Process.Wait()`：唯一 reaper 已 `cmd.Wait()` 收割子进程后再次 `os.Process.Wait()`，Go 1.22 Windows 下句柄已关闭 → `WaitForSingleObject(-1, INFINITE)` 确定性阻塞直至超时（guard 包 600s 超时）；Go 1.27 下该行为被容忍（本机全绿） ⇒ **工具链版本差异兼容缺陷**（⑤ r2 曾记 Note，被 CI 证伪升格） | CI run `41164098703`（head `3fab6ba`）windows 腿 `Test` 步红（guard 600.019s panic）、ubuntu 腿全绿；本机 Go 1.27.0 `-count=1` 全绿 | **已修复**（方案 A：删除 `process_reaper_test.go` 两处冗余 Wait，保留 Kill/close，零断言弱化；修复提交见 ⑩ 回执）；**环境排查纪律**：CI 与本机行为分歧时优先排查工具链版本差异 |
+| **DR-13** | 测试：`internal/adapters`（P44 未触碰该包；既有并发用例） | `TestAgentRunnerPinnedCLILauncherConcurrentStartsHaveOneWinner` 失败 1 次：`agent_runner_pinned_cli_test.go:902: exactly one contender may win the launch slot, got 2 (losers 6)`；P44 只改 `internal/gates/**`，与该包无因果关联；本机 Go 1.27.0 全绿 ⇒ 疑为 ubuntu 高负载下的时序抖动 | run `41253798647`（head `9061b67`）ubuntu 腿 `Test` 步红、windows 腿绿；同 run `gh run rerun --failed` → attempt 2 双腿全绿、终态 `success` | 按 DR 处置口径边界①登记（新测试名 ⇒ 单独登记）；不阻断 P44 闭环；同 run 的 Race 腿覆盖 `internal/adapters` 且绿 ⇒ 暂按观测级登记，若再现同一断言串即升格为独立切片修复 |
 
 > 本表只登记**已观测到证据**的缺陷；DR-1 见 `DEV_PLAN.md` 的 B1 段与 `docs/validation/t027-b1-candidate-live-discovery.md`（产品缺陷，属生产行为变更，需独立切片）。
 

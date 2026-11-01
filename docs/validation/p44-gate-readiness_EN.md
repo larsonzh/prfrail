@@ -149,7 +149,7 @@ The severity column keeps the review reports' own wording and is never bolded; t
 
 ## Commit and CI
 
-- Per its boundary declaration this slice performed **no** commit and no push (stopping at 10 for same-turn authorisation); all three gate scopes report `TOTAL_FAIL=0` (index / tree / ci), and `go build ./...`, `go vet ./...` and `go test ./...` are green.
+- Commit `9061b67` is pushed to origin; CI `41253798647` first attempt failed on the ubuntu leg (a pre-existing concurrency flake in `internal/adapters`, registered as DR-13) and a failed-job rerun of the same run is green on both legs; package-level ok lines cover `internal/gates`, `internal/adapters`, `internal/chain` and `internal/console` on both legs plus `internal/adapters` and `internal/chain` on the Race leg.
 
 ## Later-slice candidate registrations
 
@@ -183,6 +183,7 @@ docs/validation/evidence/P44-T027B-GATE-READINESS/03-tests/mutation-evidence.txt
 docs/validation/evidence/P44-T027B-GATE-READINESS/05-prereview/review.md	repo
 docs/validation/evidence/P44-T027B-GATE-READINESS/06-scan/review.md	repo
 docs/validation/evidence/P44-T027B-GATE-READINESS/07-final/review.md	repo
+docs/validation/evidence/P44-T027B-GATE-READINESS/08-ci/ci-evidence.txt	repo
 docs/validation/evidence/P44-T027B-GATE-READINESS/MANIFEST.md	repo
 docs/validation/evidence/P44-T027B-GATE-READINESS/SHA256SUMS.txt	repo
 docs/validation/evidence/P44-T027B-GATE-READINESS/freedom-list.md	repo

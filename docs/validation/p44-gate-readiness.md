@@ -149,7 +149,7 @@ INDEPENDENT SCAN: PASS
 
 ## 提交与 CI
 
-- 本片按边界声明**未执行** commit 与 push（停 ⑩ 等同一轮授权）；三作用域门禁均为 `TOTAL_FAIL=0`（index / tree / ci），`go build ./...`、`go vet ./...`、`go test ./...` 全绿。
+- 提交 `9061b67` 已推送 origin；CI `41253798647` 首跑 ubuntu 腿红（`internal/adapters` 既有并发用例 flake，已登记 DR-13），同 run 复跑双腿全绿；包级 ok 行两腿均取到 `internal/gates`、`internal/adapters`、`internal/chain`、`internal/console`，Race 腿取到 `internal/adapters`、`internal/chain`。
 
 ## 后续片候选登记
 
@@ -183,6 +183,7 @@ docs/validation/evidence/P44-T027B-GATE-READINESS/03-tests/mutation-evidence.txt
 docs/validation/evidence/P44-T027B-GATE-READINESS/05-prereview/review.md	repo
 docs/validation/evidence/P44-T027B-GATE-READINESS/06-scan/review.md	repo
 docs/validation/evidence/P44-T027B-GATE-READINESS/07-final/review.md	repo
+docs/validation/evidence/P44-T027B-GATE-READINESS/08-ci/ci-evidence.txt	repo
 docs/validation/evidence/P44-T027B-GATE-READINESS/MANIFEST.md	repo
 docs/validation/evidence/P44-T027B-GATE-READINESS/SHA256SUMS.txt	repo
 docs/validation/evidence/P44-T027B-GATE-READINESS/freedom-list.md	repo

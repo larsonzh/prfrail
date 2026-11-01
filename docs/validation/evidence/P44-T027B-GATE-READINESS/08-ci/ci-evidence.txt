@@ -1,0 +1,26 @@
+P44-T027B-GATE-READINESS — CI evidence
+
+head: 9061b677e2f5c426671a36ff6b9989518c97e2f8
+run: 41253798647  (workflow CI, branch main)
+attempt 1: Go ubuntu-latest = failure (step Test)
+  --- FAIL: TestAgentRunnerPinnedCLILauncherConcurrentStartsHaveOneWinner (0.06s)
+      agent_runner_pinned_cli_test.go:902: exactly one contender may win the launch slot, got 2 (losers 6)
+  Go windows-latest = success
+attempt 2 (gh run rerun --failed): Go ubuntu-latest = success, Go windows-latest = success
+final: status=completed conclusion=success
+
+package-level ok lines (attempt 2)
+  ubuntu  Test  ok github.com/larsonzh/prfrail/internal/adapters 12.344s
+  ubuntu  Test  ok github.com/larsonzh/prfrail/internal/chain 0.613s
+  ubuntu  Test  ok github.com/larsonzh/prfrail/internal/console 2.099s
+  ubuntu  Test  ok github.com/larsonzh/prfrail/internal/gates 0.193s
+  ubuntu  Race  ok github.com/larsonzh/prfrail/internal/adapters 89.085s
+  ubuntu  Race  ok github.com/larsonzh/prfrail/internal/chain 2.363s
+  windows Test  ok github.com/larsonzh/prfrail/internal/adapters 42.203s
+  windows Test  ok github.com/larsonzh/prfrail/internal/chain 4.468s
+  windows Test  ok github.com/larsonzh/prfrail/internal/console 29.343s
+  windows Test  ok github.com/larsonzh/prfrail/internal/gates 0.718s
+
+note: attempt 1's ubuntu failure is a pre-existing concurrency flake in internal/adapters,
+      a package P44 did not touch; registered as DR-13 in docs/t027/REMAINING_SLICES{,_EN}.md.
+      The Race leg does not cover internal/gates (limitation R-4).

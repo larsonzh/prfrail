@@ -73,7 +73,7 @@
 | P41 P41-T027B-SPAWN-OWNERSHIP | ✅ Closed | P40 | L | 2026-10-31 | docs/validation/p41-spawn-ownership{,_EN}.md |
 | P42 P42-T027B-EVIDENCE-BIND | ✅ Closed | P41 | M | 2026-10-31 | docs/validation/p42-evidence-bind{,_EN}.md |
 | P43 P43-T027B-STATE-SEAL | ✅ Closed | P42 | L | 2026-10-31 | docs/validation/p43-state-seal{,_EN}.md |
-| P44 P44-T027B-GATE-READINESS | ✅ Complete | P43 | M | 2026-11-01 | docs/validation/p44-gate-readiness{,_EN}.md |
+| P44 P44-T027B-GATE-READINESS | ✅ Completed | P43 | M | 2026-11-01 | docs/validation/p44-gate-readiness{,_EN}.md |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1339,12 +1339,12 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Temp location | temp dir for this slice = `tmp/P43-T027B-STATE-SEAL/` (append-only until ⑧c) |
 | Completion record | 1 architecture -> 3 red tests (RED-CONFIRMED) -> 2 two rounds to green -> 4 gates -> 5 two rounds (r1 PASS WITH FIXES -> r2 PASS) -> 6 two rounds (r1 BLOCKED: K not wired -> r2 PASS WITH FINDINGS, budget 2/3) -> 7 three rounds (r1/r2 BLOCKED -> r3 PASS, budget 3/3); R=0 D=0; production assembly wiring registered as an out-of-boundary limitation |
 
-### P44 — `P44-T027B-GATE-READINESS` · ✅ Complete
+### P44 — `P44-T027B-GATE-READINESS` · ✅ Completed
 
 | Field | Content |
 |---|---|
 | Identifier | `P44-T027B-GATE-READINESS` (implementation; directive v1.60) |
-| Status | ✅ **Complete** (2026-11-01; commit and CI carried by the 10 receipt) |
+| Status | ✅ **Completed** (2026-11-01; commit `9061b67`, CI `41253798647` green on both legs after a failed-job rerun) |
 | Goal | C7+N4: `EvaluateT027BReadiness` separates probe readiness, real acceptance readiness and production release readiness; `ProbePermit` is consumed exactly once (atomic reservation before the call, invalid after consumption, never reset by failure or restart) |
 | Dependency | P43 closed (`8a46b01`) |
 | Size | M (console gate entry + gates criteria) |
@@ -1358,7 +1358,7 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Freedom list path | `docs/validation/evidence/P44-T027B-GATE-READINESS/freedom-list.md` |
 | R / D baseline | R = 0, D = 0 (not inherited) |
 | Temp location | temp dir for this slice = `tmp/P44-T027B-GATE-READINESS/` (append-only until ⑧c) |
-| Completion record | 1 architecture (with the four revision notes R-1 to R-4 in section 8) -> 3 red tests (RED-CONFIRMED) -> 2 green (20 P44 cases + 9 sub-cases; mutations M1–M11 all RED) -> 4 gates -> 5 two rounds (r1 PASS WITH FIXES: 2 Medium -> r2 PASS WITH FIXES: 3 Low) -> 6 INDEPENDENT SCAN: PASS (Section B zero defects, budget 1/3) -> 7 three rounds (r1/r2 BLOCKED -> r3 PASS, budget 3/3); R=0 D=0; C7/N4 not wired end to end, -race not run, and both D9 (tmp intermediates deleted) and D10 (mutation evidence missing on disk) are registered item by item |
+| Completion record | Report: `docs/validation/p44-gate-readiness{,_EN}.md` |
 
 ## Known defects (to be handled before later slices)
 
@@ -1375,6 +1375,7 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | **DR-9** | test: `internal/console` (**added by this slice**, not a pre-existing defect package) | `TestAgentRunnerAssemblyFullChain` **first-run red, once** (CI run `37070276731` / head `68a1ef0`, the Ubuntu leg `Test` step): `runtime_agent_e2e_test.go:464: the production assembly must complete: invalid AgentRunner terminal intent: observed settlement requires a non-negative charged amount`. **Nature = a real defect (not a flake)**: the (A′) mapping added by this slice did not fulfil the existing caller obligation to supply the amount (`tools/b4-e2e/runmap.go`, divergence (b)); on Windows the path is unreachable (durability unproven), so neither the three ⑦ rounds nor the Windows-native evidence could see it - the Ubuntu CI leg exposed it on the first execution of the positive full chain. **Disposition = fixed in this slice** (the declared offline workload settles with the zero-cost amount, with an explicit boundary comment and an assertion; boundary: a real paid candidate must have the caller supply the real amount and must not default to zero, otherwise the publisher existing nil-amount rejection path fails closed). **Boundary basis = directive §6.4 rule ① (a new test name / a new failure type must be registered separately)**; no separate OB is opened. |
 | **DR-11** | Gate criterion: the `_EN` mirror symmetry of `G3(a.1)` (introduced by this slice, not an existing defect) | **one-sided commit**: a single CN report line was changed without an equal `_EN` change ⇒ `G3(a.1)` reports `+1/-1 vs +0/-0 MISMATCH` and the `Gates` step fails on both legs (deterministic, not a flake) | CI run `39903364280` red on the first run plus still red after `gh run rerun --failed` on the same run | **Fixed** (`6149a80`: an equal `_EN` change makes the pair `+1/-1` on both sides, both legs green); discipline: **the gate must be green before a commit**, and a single-language edit must be mirrored in the same turn |
 | **DR-12** | Test: `internal/guard` (this slice P40 red test, not a legacy flake package) | The red-test cleanup double `Process.Wait()`: after the single reaper already reaped the child via `cmd.Wait()`, a second `os.Process.Wait()` blocks deterministically on Go 1.22 Windows (closed handle → `WaitForSingleObject(-1, INFINITE)`) until the 600s package timeout; Go 1.27 tolerates it (local runs green) ⇒ **a toolchain-version compatibility defect** (⑤ r2 recorded it as a Note; CI falsified that) | CI run `41164098703` (head `3fab6ba`): windows leg `Test` step red (guard 600.019s panic), ubuntu leg green; local Go 1.27.0 `-count=1` green | **Fixed** (plan A: remove the two redundant Wait lines in `process_reaper_test.go`, keep Kill/close, zero assertion weakening; fix commit per the ⑩ receipt); **environment triage rule**: when CI and local disagree, check the toolchain version first |
+| **DR-13** | Test: `internal/adapters` (not touched by P44; a pre-existing concurrency case) | `TestAgentRunnerPinnedCLILauncherConcurrentStartsHaveOneWinner` failed once: `agent_runner_pinned_cli_test.go:902: exactly one contender may win the launch slot, got 2 (losers 6)`; P44 only changed `internal/gates/**`, so there is no causal link; local Go 1.27.0 is green, so it looks like a timing jitter under ubuntu load | run `41253798647` (head `9061b67`): the ubuntu leg `Test` step failed while the windows leg stayed green; a `gh run rerun --failed` on the same run made attempt 2 green on both legs with final state `success` | Registered under DR boundary ① (a new test name must be registered separately); it does not block the P44 closeout; the same run Race leg covers `internal/adapters` and is green, so it stays observation-level until the same assertion string reappears, at which point it is promoted to its own slice |
 
 > This table only registers defects with observed evidence; DR-1 lives in the B1 paragraph of `DEV_PLAN.md` and in `docs/validation/t027-b1-candidate-live-discovery.md` (a product defect, a production behaviour change needing its own slice).
 

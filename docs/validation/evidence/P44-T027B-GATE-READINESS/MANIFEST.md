@@ -1,4 +1,4 @@
-﻿# MANIFEST — P44-T027B-GATE-READINESS 证据包
+﻿﻿# MANIFEST — P44-T027B-GATE-READINESS 证据包
 
 切片：`P44-T027B-GATE-READINESS`（P44，实现类 `[SLICE]`，C7+N4 门控就绪与一次性许可）。建包时点 2026-11-01（`HEAD` = `a87b078`，准则 v1.60）。
 
@@ -17,6 +17,7 @@
 | `05-prereview/review.md` | ⑤ 预审 r1 + r2 输出原样（`deep-reasoner` + `DeepSeek V4 Pro (deepseek)`） |
 | `06-scan/review.md` | ⑥ 独立扫描输出原样（Section A–E；`independent-reviewer` + `MAI-Code-1.1-Flash (copilot)`） |
 | `07-final/review.md` | ⑦ 终审 r3 输出原样（`independent-reviewer` + `GPT-5.3-Codex (copilot)`；r2 两项发现闭合核验 + 放行条件 5 条） |
+| `08-ci/ci-evidence.txt` | ⑨ CI 取证：head `9061b67`、run `41253798647`（attempt 1 ubuntu 腿红 / attempt 2 双腿全绿）、两腿包级 ok 行、DR-13 归属说明 |
 
 ## 过程偏差登记
 
