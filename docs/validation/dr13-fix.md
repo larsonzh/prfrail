@@ -154,7 +154,7 @@ INDEPENDENT SCAN: PASS
 
 ## 提交与 CI
 
-- 提交与 CI 读数在 ⑨ 之后由本节追加一次，追加时同步更新 CN/EN。
+- 提交 `b123db1` 已推送 origin；CI `41269372878` **首跑双腿全绿**（DR-13 未复现）；ubuntu 腿 Test 与 Race 两步均取到 `internal/adapters` 包级 ok 行（12.343s / 89.396s），windows 腿 34.937s；两腿 `SELFTEST 697/697`、`GATE REPORT scope=ci changed=15`、`TOTAL_FAIL=0`。
 
 ## 后续片候选登记
 
@@ -183,6 +183,7 @@ docs/validation/evidence/DR13-FIX/03-tests/red-baseline.md	repo
 docs/validation/evidence/DR13-FIX/05-prereview/review.md	repo
 docs/validation/evidence/DR13-FIX/06-scan/review.md	repo
 docs/validation/evidence/DR13-FIX/07-final/review.md	repo
+docs/validation/evidence/DR13-FIX/08-ci/ci-evidence.txt	repo
 docs/validation/evidence/DR13-FIX/MANIFEST.md	repo
 docs/validation/evidence/DR13-FIX/SHA256SUMS.txt	repo
 docs/validation/evidence/DR13-FIX/freedom-list.md	repo

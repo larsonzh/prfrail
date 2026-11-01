@@ -154,7 +154,7 @@ INDEPENDENT SCAN: PASS
 
 ## Commit and CI
 
-- The commit and CI readings are appended to this section once, after 9, and the CN/EN pair is updated in the same edit.
+- Commit `b123db1` is pushed to origin; CI `41269372878` is green on both legs on the **first** attempt (DR-13 did not reproduce); the ubuntu leg yields package-level ok lines for `internal/adapters` in both the Test and Race steps (12.343s / 89.396s) and the windows leg in 34.937s; both legs report `SELFTEST 697/697`, `GATE REPORT scope=ci changed=15` and `TOTAL_FAIL=0`.
 
 ## Later-slice candidate registrations
 
@@ -183,6 +183,7 @@ docs/validation/evidence/DR13-FIX/03-tests/red-baseline.md	repo
 docs/validation/evidence/DR13-FIX/05-prereview/review.md	repo
 docs/validation/evidence/DR13-FIX/06-scan/review.md	repo
 docs/validation/evidence/DR13-FIX/07-final/review.md	repo
+docs/validation/evidence/DR13-FIX/08-ci/ci-evidence.txt	repo
 docs/validation/evidence/DR13-FIX/MANIFEST.md	repo
 docs/validation/evidence/DR13-FIX/SHA256SUMS.txt	repo
 docs/validation/evidence/DR13-FIX/freedom-list.md	repo

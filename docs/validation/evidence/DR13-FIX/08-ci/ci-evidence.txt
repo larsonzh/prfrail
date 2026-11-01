@@ -1,0 +1,26 @@
+DR13-FIX — CI evidence
+
+head: b123db1 (fix: stop RecoverStarting from reclaiming a launch this process still owns)
+run: 41269372878 (workflow CI, branch main)
+attempt 1: Go ubuntu-latest = success, Go windows-latest = success  (both legs green on the first attempt)
+
+package-level ok lines
+  ubuntu  Test  ok github.com/larsonzh/prfrail/internal/adapters 12.343s
+  ubuntu  Test  ok github.com/larsonzh/prfrail/internal/chain 0.589s
+  ubuntu  Test  ok github.com/larsonzh/prfrail/internal/console 2.090s
+  ubuntu  Test  ok github.com/larsonzh/prfrail/internal/gates 0.173s
+  ubuntu  Race  ok github.com/larsonzh/prfrail/internal/adapters 89.396s
+  ubuntu  Race  ok github.com/larsonzh/prfrail/internal/chain 2.437s
+  windows Test  ok github.com/larsonzh/prfrail/internal/adapters 34.937s
+  windows Test  ok github.com/larsonzh/prfrail/internal/chain 5.378s
+  windows Test  ok github.com/larsonzh/prfrail/internal/console 21.456s
+  windows Test  ok github.com/larsonzh/prfrail/internal/gates 0.829s
+
+both legs: SELFTEST: PASS 697/697 ; GATE REPORT scope=ci changed=15 ; TOTAL_FAIL=0
+
+why this matters (closes prereview item B1 / final-review condition 1)
+  the ubuntu Test and Race steps compile and run the //go:build unix cases
+  (TestRecoverStartingRefusesLiveHostUnix / TestRecoverStartingAdoptsOrphanUnix) that a
+  Windows host cannot execute, and they are green with D1 + D2 in place.
+  The concurrent-start case TestAgentRunnerPinnedCLILauncherConcurrentStartsHaveOneWinner
+  produced exactly one winner on both legs, and DR-13 did not reproduce in this run.

@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿# MANIFEST — DR13-FIX 证据包
+﻿﻿﻿﻿﻿﻿# MANIFEST — DR13-FIX 证据包
 
 切片：`DR13-FIX`（修订类修复片 `[SLICE]`；P45 前置修复片，不占 v34 队列 1–4 编号）。建包时点 2026-11-01（`HEAD` = `8e834b2`，准则 v1.60）。
 
@@ -16,13 +16,13 @@
 | `05-prereview/review.md` | ⑤ 预审 r1 + r2 输出原样（r1 2 Medium → r2 PASS） |
 | `06-scan/review.md` | ⑥ 独立扫描输出原样（Section A–E，§B 零缺陷） |
 | `07-final/review.md` | ⑦ 终审输出原样（`FINAL REVIEW: PASS` + 放行条件 6 条） |
+| `08-ci/ci-evidence.txt` | ⑨ CI 取证：head `b123db1`、run `41269372878` 首跑双腿全绿、ubuntu Test 与 Race 腿包级 ok 行、`SELFTEST 697/697`、`TOTAL_FAIL=0` |
 | `03-tests/red-baseline.md` | ③ 红测基线原样：新增反例在未修复代码上确定性红（Windows 失败点 `spawn_recovery_test.go:281`） |
 
 ## 待追加（按轮）
 
 | 路径 | 说明 |
 |---|---|
-| `08-ci/ci-evidence.txt` | ⑨ CI 取证 |
 
 ## 未入库文件清单
 
