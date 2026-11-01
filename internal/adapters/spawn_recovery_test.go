@@ -6,6 +6,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -202,5 +203,88 @@ func TestRecoverStartingTokenMismatchFailsClosed(t *testing.T) {
 	}
 	if _, statErr := os.Stat(filepath.Join(runRoot, managedProcessIdentityFileName)); statErr != nil {
 		t.Fatalf("fail-closed keeps the identity mirror for the operator stop path: %v", statErr)
+	}
+}
+
+// TestRecoverStartingNeverReclaimsALaunchThisProcessStillOwns pins the ownership
+// invariant of DR13: a free starting-marker lock proves only that no host holds
+// *that inode* any more, never that the process behind the marker is gone. A
+// launcher that still has the launch registered keeps a live handle - the process
+// was started by this very process and only its marker lock was already released
+// (closeStartingMarker) - so recovering it would kill a process of our own, drop
+// the marker of an in-flight launch and steal the slot it still owns. That is the
+// double-Start race: two Starts both succeed because the second one reclaims the
+// first one's live child.
+//
+// The state pinned here is deliberately the one a lock-only scan cannot tell from
+// a crash: free lock, live process, launch in this process's registry.
+func TestRecoverStartingNeverReclaimsALaunchThisProcessStillOwns(t *testing.T) {
+	const (
+		requestID = "request-one"
+		launchID  = "launch-request-one"
+	)
+	runRoot := t.TempDir()
+	// A real, live child provides the identity the marker and the handle carry.
+	live, stopHelper := startRecoveryHelperProcess(t)
+	launcher := recoveryLauncherFor(t, runRoot)
+	slotToken, err := launcher.claimLaunchSlot(launchID)
+	if err != nil {
+		t.Fatalf("claim the launch slot of %s: %v", launchID, err)
+	}
+	slotPath := filepath.Join(runRoot, managedProcessLaunchSlotFileName)
+	// The handle this process still holds: phase starting, identity captured, the
+	// slot claimed above. It carries no marker claim, which is exactly the state
+	// after closeStartingMarker dropped the lock of a still live launch.
+	handle := &agentRunnerProcessHandle{
+		launchID:  launchID,
+		requestID: requestID,
+		phase:     agentRunnerProcessStarting,
+		identity:  live,
+		grace:     launcher.config.Grace,
+		slotToken: slotToken,
+	}
+	if registerErr := launcher.registry.register(handle); registerErr != nil {
+		t.Fatalf("register the starting handle of %s: %v", launchID, registerErr)
+	}
+	// The marker of the same launch, written unlocked: the lock is free while the
+	// process it names is alive and this process owns the launch.
+	markerPath := writeStartingMarker(t, runRoot, testStartingMarker{
+		LaunchID:   launchID,
+		RequestID:  requestID,
+		Identity:   live,
+		StartToken: live.StartToken,
+		StartedAt:  time.Now().UTC().Format(time.RFC3339Nano),
+	})
+	// Nothing here may outlive the test: stop the child and drop the durable
+	// records, so a leaked process or slot cannot affect a later run.
+	t.Cleanup(func() {
+		stopHelper()
+		_ = os.Remove(markerPath)
+		_ = os.Remove(slotPath)
+		_ = os.Remove(slotPath + ".reclaiming")
+	})
+	reclaimed, err := launcher.RecoverStarting(context.Background())
+	if err != nil {
+		t.Fatalf("recovering a launch this process still owns must be a refusal, not an error: %v", err)
+	}
+	if reclaimed {
+		t.Fatalf("recovery reclaimed launch %s, whose live handle is still registered in this process", launchID)
+	}
+	alive, aliveErr := guard.ProcessAlive(live)
+	if aliveErr != nil {
+		t.Fatalf("inspect the owned child %d: %v", live.PID, aliveErr)
+	}
+	if !alive {
+		t.Fatalf("recovery killed pid %d, the child of launch %s this launcher still owns", live.PID, launchID)
+	}
+	if _, statErr := os.Stat(markerPath); statErr != nil {
+		t.Fatalf("recovery removed the starting marker of launch %s, which is still in flight in this process: %v", launchID, statErr)
+	}
+	owner, readErr := os.ReadFile(slotPath)
+	if readErr != nil {
+		t.Fatalf("recovery removed the launch slot owned by %s: %v", launchID, readErr)
+	}
+	if !strings.Contains(string(owner), launchID) {
+		t.Fatalf("the launch slot must still be owned by %s, got %q", launchID, string(owner))
 	}
 }

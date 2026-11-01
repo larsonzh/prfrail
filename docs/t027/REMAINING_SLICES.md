@@ -74,6 +74,7 @@
 | P42 P42-T027B-EVIDENCE-BIND | ✅ 已闭环 | P41 | M | 2026-10-31 | docs/validation/p42-evidence-bind{,_EN}.md |
 | P43 P43-T027B-STATE-SEAL | ✅ 已闭环 | P42 | L | 2026-10-31 | docs/validation/p43-state-seal{,_EN}.md |
 | P44 P44-T027B-GATE-READINESS | ✅ 已完成 | P43 | M | 2026-11-01 | docs/validation/p44-gate-readiness{,_EN}.md |
+| DR13-FIX DR13-FIX（P45 前置） | ✅ 已完成 | P44 | S | 2026-11-01 | docs/validation/dr13-fix{,_EN}.md |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -1373,6 +1374,28 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 临时件落点声明 | 本片临时目录 = `tmp/P44-T027B-GATE-READINESS/`（⑧c 前只增不删） |
 | 完成记录 | 报告：`docs/validation/p44-gate-readiness{,_EN}.md` |
 
+### DR13-FIX — `DR13-FIX`（P45 前置修复片）· ✅ 已完成
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `DR13-FIX`（修复类；准则 v1.60） |
+| 定位 | **P45 的前置修复片**；不占 v34 队列 1–4 的编号；v34 保持为「P44 闭环 → P45 起跑前」的基线，本片闭环后出 v35 统一反映（用户 2026-11-01 裁定） |
+| 状态 | ✅ **已完成**（2026-11-01；本片闭环） |
+| 目标 | 定性并修复 `TestAgentRunnerPinnedCLILauncherConcurrentStartsHaveOneWinner` 的 flaky 根因：区分「测试装置过严（A）」与「真实排他窗口漏洞（B）」，并对应修断言或修实现 |
+| 依赖 | P44 闭环（`16abe2b`）；DR-13 二次复现（run `41253798647` 与 `41257990185`） |
+| 规模 | S（单测试文件 + 可能的实现微调） |
+| 步骤 | 步骤 0 → ① 定性（V4 Pro）→ ③/② 修复 → ④ 门禁 → ⑤ 预审 → ⑥ 扫描 → ⑦ 终审 → ⑧a → ⑨ → ⑧c → ⑩ |
+| 现状缺口 | `internal/adapters` 的并发启动用例在 ubuntu 腿二次出现「两个赢家」，与改动无因果关联；根因未定性 |
+| 交付物 | 报告对 `docs/validation/dr13-fix{,_EN}.md`；证据包 `docs/validation/evidence/DR13-FIX/`（含 `00-briefing.md`）；执行自由度清单；定性结论输入 P45 的 ① |
+| 验收证据 | ① 给出 A/B 归属与 file:line 证据链；修复后本机压力重跑绿；三作用域 TOTAL_FAIL=0 且 SELFTEST 697/697；报告 CN/EN 六形状全等 |
+| 边界 | 仅 `internal/adapters/agent_runner_pinned_cli*.go` 与其测试文件；不动其他包；不推 gitee；停 ⑩ 等授权 |
+| 分级 | `[SLICE]`（修复片） |
+| 探针额度 | 无 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/DR13-FIX/freedom-list.md` |
+| R / D 基线 | R = 0、D = 0（不继承上片） |
+| 临时件落点声明 | 本片临时目录 = `tmp/DR13-FIX/`（⑧c 前只增不删） |
+| 完成记录 | 报告：`docs/validation/dr13-fix{,_EN}.md` |
+
 ## 已知缺陷（后续切片前处理）
 
 > **阻断口径不变**：仅高频/已复现缺陷阻断，观测级 flake 只记录并在验证报告中列示。
@@ -1388,7 +1411,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | **DR-9** | 测试：`internal/console`（**本片新增**的正向全链腿，非既有缺陷包） | `TestAgentRunnerAssemblyFullChain` **首跑红 1 次**（CI run `37070276731` / head `68a1ef0` 的 Ubuntu 腿 `Test` 步）：`runtime_agent_e2e_test.go:464: the production assembly must complete: invalid AgentRunner terminal intent: observed settlement requires a non-negative charged amount`。**性质 = 真实缺陷（非 flake）**：本片新增 (A′) 映射未履行「金额由调用方供给」的既有义务（`tools/b4-e2e/runmap.go` 的 divergence (b)）；Windows 上该路径不可达（durability unproven）⇒ ⑦ 三轮与 Windows 原生证据都无法发现，由 Ubuntu CI 腿首次执行正向全链时暴露。**处置 = 本片修复**（声明式离线工作负载补零成本金额 + 显式边界注释 + 断言；边界：接入真实付费候选时必须由调用方提供真实金额，不得默认为 0，否则按发布器既有拒绝路径 fail-closed）。**边界依据 = 准则 §6.4 边界①「新测试名 / 新失败类型 ⇒ 必须单独登记」**；不另立 OB。 |
 | **DR-11** | 门禁判据：`G3(a.1)` 的 `_EN` 镜像对称（本片引入，非既有缺陷） | **单边提交**：只改 CN 报告一行而未配 `_EN` 等量改动 ⇒ `G3(a.1)` 报 `+1/-1 vs +0/-0 MISMATCH`，双腿 `Gates` 步判红（确定性，非偶发） | CI run `39903364280` 首跑红 + 同 run `gh run rerun --failed` 复跑仍红 | **已修复**（`6149a80`：补 `_EN` 等量改动使 `+1/-1` 对称，双腿双绿）；纪律：**提交前必须门禁绿**，单语编辑必须同轮镜像 |
 | **DR-12** | 测试：`internal/guard`（本片 P40 红测，非既有缺陷包） | 红测 cleanup 阶段双重 `Process.Wait()`：唯一 reaper 已 `cmd.Wait()` 收割子进程后再次 `os.Process.Wait()`，Go 1.22 Windows 下句柄已关闭 → `WaitForSingleObject(-1, INFINITE)` 确定性阻塞直至超时（guard 包 600s 超时）；Go 1.27 下该行为被容忍（本机全绿） ⇒ **工具链版本差异兼容缺陷**（⑤ r2 曾记 Note，被 CI 证伪升格） | CI run `41164098703`（head `3fab6ba`）windows 腿 `Test` 步红（guard 600.019s panic）、ubuntu 腿全绿；本机 Go 1.27.0 `-count=1` 全绿 | **已修复**（方案 A：删除 `process_reaper_test.go` 两处冗余 Wait，保留 Kill/close，零断言弱化；修复提交见 ⑩ 回执）；**环境排查纪律**：CI 与本机行为分歧时优先排查工具链版本差异 |
-| **DR-13** | 测试：`internal/adapters`（P44 未触碰该包；既有并发用例） | `TestAgentRunnerPinnedCLILauncherConcurrentStartsHaveOneWinner` 失败 1 次：`agent_runner_pinned_cli_test.go:902: exactly one contender may win the launch slot, got 2 (losers 6)`；P44 只改 `internal/gates/**`，与该包无因果关联；本机 Go 1.27.0 全绿 ⇒ 疑为 ubuntu 高负载下的时序抖动 | run `41253798647`（head `9061b67`）ubuntu 腿 `Test` 步红、windows 腿绿；同 run `gh run rerun --failed` → attempt 2 双腿全绿、终态 `success` | 按 DR 处置口径边界①登记（新测试名 ⇒ 单独登记）；不阻断 P44 闭环；同 run 的 Race 腿覆盖 `internal/adapters` 且绿 ⇒ 暂按观测级登记，若再现同一断言串即升格为独立切片修复 |
+| **DR-13** | 测试：`internal/adapters`（P44 未触碰该包；既有并发用例） | `TestAgentRunnerPinnedCLILauncherConcurrentStartsHaveOneWinner` 失败 1 次：`agent_runner_pinned_cli_test.go:902: exactly one contender may win the launch slot, got 2 (losers 6)`；P44 只改 `internal/gates/**`，与该包无因果关联；本机 Go 1.27.0 全绿 ⇒ 疑为 ubuntu 高负载下的时序抖动 | run `41253798647`（head `9061b67`）ubuntu 腿 `Test` 步红、windows 腿绿；同 run `gh run rerun --failed` → attempt 2 双腿全绿、终态 `success` | 按 DR 处置口径边界①登记（新测试名 ⇒ 单独登记）；不阻断 P44 闭环；同 run 的 Race 腿覆盖 `internal/adapters` 且绿 ⇒ 暂按观测级登记，二次复现后由 DR13-FIX 切片处置：**已修复**（2026-11-01）——① 定性为 `DIAGNOSIS: B`——真实排他窗口，非测试装置过严；② 修复为 D1 同进程所有权门（本 launcher 在册持有该 launchID 的活句柄即拒绝回收）+ D2 孤儿 inode 复核（`tryLock` 成功后 `os.Stat` 见 `os.ErrNotExist` 即返回 `(false,nil)`）；③ 反例 `TestRecoverStartingNeverReclaimsALaunchThisProcessStillOwns` 先红后绿（未修复代码上 Windows 在 `spawn_recovery_test.go:281` 确定性红）；④ 若再现同一断言串即重开 |
 
 > 本表只登记**已观测到证据**的缺陷；DR-1 见 `DEV_PLAN.md` 的 B1 段与 `docs/validation/t027-b1-candidate-live-discovery.md`（产品缺陷，属生产行为变更，需独立切片）。
 

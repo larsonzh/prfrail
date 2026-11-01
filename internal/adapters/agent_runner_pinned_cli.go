@@ -358,7 +358,44 @@ func (launcher *AgentRunnerPinnedCLILauncher) RecoverStarting(ctx context.Contex
 		_ = file.Close()
 		return false, nil
 	}
+	// A free lock proves only that no other host holds a lock on the inode this
+	// descriptor names, not that the inode is still the published marker: a competing
+	// scan can unlink the path after this open and before the lock is taken, leaving
+	// this scan the exclusive lock on an orphaned inode that no longer exists at path.
+	// Re-checking the path closes that window, because a marker that is gone has no
+	// record left to reclaim (DR13-FIX D2).
+	if _, statErr := os.Stat(path); statErr != nil {
+		unlockStartingMarker(file)
+		_ = file.Close()
+		if errors.Is(statErr, os.ErrNotExist) {
+			// The locked inode is no longer the marker at path, so this scan owns
+			// nothing: the refusal is the same (false, nil) an absent marker reports.
+			return false, nil
+		}
+		return false, fmt.Errorf("%w: inspect the starting marker %s: %v", ErrAgentRunnerLaunchConflict, path, statErr)
+	}
 	marker, decodeErr := decodeAgentRunnerStartingMarker(file)
+	// Ownership gate (DR13-FIX D1). A free lock proves only that no host holds the
+	// lock on this inode, never that the process the marker names is gone. A launch
+	// this launcher still has registered keeps a live handle - the process was spawned
+	// by this very process and only its marker lock was already released by
+	// closeStartingMarker - so reclaiming it would kill a child of our own, delete the
+	// marker of an in-flight start and steal the launch slot the handle still owns.
+	//
+	// The invariant is therefore: while the registry holds a handle for
+	// marker.LaunchID, RecoverStarting never reclaims that launch - no kill, no marker
+	// removal, no slot reclaim. Cross-process crash recovery is unaffected: the
+	// registry dies with its host process, so an orphan marker left by a crashed host
+	// is never owned here and falls through to the normal liveness decision below.
+	if decodeErr == nil {
+		if handle, owned := launcher.registry.lookup(marker.LaunchID); owned && handle != nil {
+			unlockStartingMarker(file)
+			_ = file.Close()
+			// A refusal, not a decision: it reports the same (false, nil) as "another
+			// host holds the lock" and "no marker" (P41 review F-5, not widened).
+			return false, nil
+		}
+	}
 	// Everything that needs the marker's contents happens while the lock is held, so
 	// two concurrent scans cannot both act on the same record. The lock is dropped
 	// before the cleanup decision, which is exactly why the cleanup re-opens the path
