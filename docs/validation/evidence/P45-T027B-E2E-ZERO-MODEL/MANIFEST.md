@@ -1,4 +1,4 @@
-﻿﻿﻿# MANIFEST — P45-T027B-E2E-ZERO-MODEL 证据包
+﻿﻿﻿﻿# MANIFEST — P45-T027B-E2E-ZERO-MODEL 证据包
 
 切片：`P45-T027B-E2E-ZERO-MODEL`（M 档装配验证片 `[SLICE]`）。建包时点 2026-11-01（`HEAD` = `eb36992`，准则 v1.60）。
 
@@ -17,12 +17,12 @@
 | `05-prereview/review.md` | ⑤ 预审输出原样（2 MINOR，均已处置） |
 | `06-scan/review.md` | ⑥ 独立扫描输出原样（§B 零缺陷） |
 | `07-final/review.md` | ⑦ 终审输出原样（`FINAL REVIEW: PASS` + 6 条放行条件） |
+| `08-ci/ci-evidence.txt` | ⑨ CI 取证：head `4273d6e`、run `41315652405` 首跑双腿全绿、包级 ok 行、`SELFTEST 697/697`、`TOTAL_FAIL=0` |
 
 ## 待追加（按轮）
 
 | 路径 | 说明 |
 |---|---|
-| `08-ci/ci-evidence.txt` | ⑨ CI 取证 |
 
 ## 未入库文件清单
 

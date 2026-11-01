@@ -1,0 +1,25 @@
+P45-T027B-E2E-ZERO-MODEL — CI evidence
+
+head: 4273d6e (test: prove the zero-model three-task chain end to end)
+run: 41315652405 (workflow CI, branch main)
+attempt 1: Go ubuntu-latest = success, Go windows-latest = success  (both legs green on the first attempt)
+
+package-level ok lines
+  ubuntu  Test  ok github.com/larsonzh/prfrail/internal/adapters 12.291s
+  ubuntu  Test  ok github.com/larsonzh/prfrail/internal/chain 0.564s
+  ubuntu  Test  ok github.com/larsonzh/prfrail/internal/console 2.856s
+  ubuntu  Test  ok github.com/larsonzh/prfrail/internal/gates 0.159s
+  ubuntu  Race  ok github.com/larsonzh/prfrail/internal/adapters 89.514s
+  ubuntu  Race  ok github.com/larsonzh/prfrail/internal/chain 2.521s
+  windows Test  ok github.com/larsonzh/prfrail/internal/adapters 34.297s
+  windows Test  ok github.com/larsonzh/prfrail/internal/chain 5.011s
+  windows Test  ok github.com/larsonzh/prfrail/internal/console 20.796s
+  windows Test  ok github.com/larsonzh/prfrail/internal/gates 0.786s
+
+both legs: SELFTEST: PASS 697/697 ; GATE REPORT scope=ci changed=23 ; TOTAL_FAIL=0
+
+notes
+  The three new zero-model test files run on both legs (chain engine E2E, console noop chain,
+  console natural-failure stop, console preview-stays-runnable, console concurrent single winner).
+  internal/console is not part of the Race leg; the concurrent case therefore has no race-detector
+  evidence, which the report registers as a known limitation.

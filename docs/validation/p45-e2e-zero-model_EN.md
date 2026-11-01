@@ -163,7 +163,7 @@ The commit and CI readings are appended to this section once, after step ⑨, an
 
 ## Follow-Up Slice Candidates
 
-- Console multi-task assembly (if ever needed): lifting D9 first requires solving the one-identity-mirror-per-runRoot exclusion contract.
+- Commit `4273d6e` is pushed to origin; CI `41315652405` is green on both legs on the **first** attempt; the ubuntu leg reports `ok chain 0.564s`, `ok console 2.856s`, `ok adapters 12.291s` and `ok gates 0.159s` plus the Race leg `ok adapters 89.514s` and `ok chain 2.521s`, while the windows leg reports `ok chain 5.011s`, `ok console 20.796s`, `ok adapters 34.297s` and `ok gates 0.786s`; both legs show `SELFTEST 697/697`, `GATE REPORT scope=ci changed=23` and `TOTAL_FAIL=0`.
 - Cross-OS and locale concurrency difference: a native measurement of `ProcessAlive` and snapshot semantics outside Windows.
 - Extending the `-race` leg to `internal/console`: the local host lacks cgo, so the concurrency leg has no race-detector run.
 - Real UI end-to-end: the in-editor preview and run paths are not yet aligned with this slice's tests.
@@ -196,6 +196,7 @@ docs/validation/evidence/P45-T027B-E2E-ZERO-MODEL/03-tests/red-baseline.md	repo
 docs/validation/evidence/P45-T027B-E2E-ZERO-MODEL/05-prereview/review.md	repo
 docs/validation/evidence/P45-T027B-E2E-ZERO-MODEL/06-scan/review.md	repo
 docs/validation/evidence/P45-T027B-E2E-ZERO-MODEL/07-final/review.md	repo
+docs/validation/evidence/P45-T027B-E2E-ZERO-MODEL/08-ci/ci-evidence.txt	repo
 examples/no-ai-preview/README.md	repo
 examples/no-ai-preview/proofrail.chain.json	repo
 internal/chain/engine_zero_model_e2e_test.go	repo

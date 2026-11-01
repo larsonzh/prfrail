@@ -163,7 +163,7 @@ INDEPENDENT SCAN: PASS
 
 ## 后续片候选登记
 
-- console 多任务装配（若将来需要）：解除 D9 边界须先解决每 runRoot 唯一 identity mirror 的排他契约。
+- 提交 `4273d6e` 已推送 origin；CI `41315652405` **首跑双腿全绿**；ubuntu 腿 `ok chain 0.564s` / `ok console 2.856s` / `ok adapters 12.291s` / `ok gates 0.159s` + Race 腿 `ok adapters 89.514s` / `ok chain 2.521s`，windows 腿 `ok chain 5.011s` / `ok console 20.796s` / `ok adapters 34.297s` / `ok gates 0.786s`；两腿 `SELFTEST 697/697`、`GATE REPORT scope=ci changed=23`、`TOTAL_FAIL=0`。
 - 跨 OS 与 locale 的并发差异验证：`ProcessAlive` 与快照语义在 Windows 之外的实测。
 - `-race` 腿扩包至 `internal/console`：本机缺 cgo，并发腿未过竞态检测。
 - 真实 UI 端到端：预览与运行在编辑器内的路径尚未与本片测试对齐。
@@ -196,6 +196,7 @@ docs/validation/evidence/P45-T027B-E2E-ZERO-MODEL/03-tests/red-baseline.md	repo
 docs/validation/evidence/P45-T027B-E2E-ZERO-MODEL/05-prereview/review.md	repo
 docs/validation/evidence/P45-T027B-E2E-ZERO-MODEL/06-scan/review.md	repo
 docs/validation/evidence/P45-T027B-E2E-ZERO-MODEL/07-final/review.md	repo
+docs/validation/evidence/P45-T027B-E2E-ZERO-MODEL/08-ci/ci-evidence.txt	repo
 examples/no-ai-preview/README.md	repo
 examples/no-ai-preview/proofrail.chain.json	repo
 internal/chain/engine_zero_model_e2e_test.go	repo
