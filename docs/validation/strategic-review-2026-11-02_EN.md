@@ -73,7 +73,7 @@ Its PASS must not be read as an independent re-review of the strategic judgement
 
 ## 3 Consolidated priority ruling
 
-The three-tier sequence of round 3 is taken as the November execution baseline; the open breakpoint B from round 1 is carried by the first item of that sequence; the 76 gaps from round 2 form the candidate pool for later slices and are not scheduled in this slice.
+Round 3 has 14 mandatory positions (0 / 0b / 1–12); this table carries positions 1–12, and positions 0 and 0b are in the round-3 original. The three-tier sequence of round 3 is taken as the November execution baseline; the open breakpoint B from round 1 is carried by the first item of that sequence; the 76 gaps from round 2 form the candidate pool for later slices and are not scheduled in this slice.
 
 This slice modifies neither v35 nor any directive or contract body text.
 
@@ -83,6 +83,14 @@ This slice modifies neither v35 nor any directive or contract body text.
 | Item 2 | DR13-FIX D3 (GAP-71) |
 | Item 3 | Race-leg expansion (GAP-42) |
 | Item 4 | The console production assembly of breakpoint A (GAP-14/GAP-56/GAP-57/GAP-62/GAP-63) |
+| Position 5 | GAP-18/20/72/73/76 → OB-57/59, DR13 W1/Stop/D2 |
+| Position 6 | GAP-15/16 → OB-52/53 (quota aligned with `model:"auto"`) |
+| Position 7 | GAP-33 → AT-24 / P3 acceptance-authority alignment |
+| Position 8 | GAP-26/34 → `CONTRACTS-S7-DURABILITY` (before release) |
+| Position 9 | GAP-34/58 → Windows C6 durability work and crash evidence (before release) |
+| Position 10 | GAP-51/52/55/60/64/70 → acceptance-chain safety counterexamples (before acceptance) |
+| Position 11 | Breakpoints A/B P5 → AT-13 seed-driven build evidence (before exit) |
+| Position 12 | GAP-14/17/65 → AT-23 restricted real candidate and sign-off (closure) |
 | Candidate pool | The 76 gaps from round 2, not scheduled in this slice |
 
 ## 4 Items awaiting the user's ruling
@@ -131,14 +139,16 @@ Deviation record: D-01: item 7 of the input list in section 6 of the start messa
 | Round | Agent | Model | Output |
 |---|---|---|---|
 | Round 1 | `independent-reviewer` | `GPT-6.1 Sol (copilot)` | 3,018 characters |
-| Round 2 | `deep-reasoner` | `DeepSeek V4 Pro (deepseek)` | 8,501 characters (two parts) |
+| Round 2 | `deep-reasoner` | `DeepSeek V4 Pro (deepseek)` | 8,501 characters in total, part 1 = 3,804 and part 2 = 4,695 (split inside one message by the "part 1/2" and "part 2/2" markers) |
 | Round 3 | `independent-reviewer` | `GPT-6.1 Sol (copilot)` | 4,027 characters |
 | Compensation review | `independent-reviewer` | `MAI-Code-1.1-Flash (copilot)` | Format check only |
 | Batch helper 1 | `deep-reasoner` | `GLM-5.3-Flash (glm)` | §12.4 ledger census, 10,190 characters |
 | Batch helper 2 | `deep-reasoner` | `GLM-5.3-Flash (glm)` | Candidate and uncovered-surface excerpt de-duplication, 9,627 characters |
-| Batch helper 3 | `deep-reasoner` | `GLM-5.3-Flash (glm)` | CN and `_EN` six-shape comparison: all six shapes equal (readings in §7), 636 characters |
+| Batch helper 3 | `deep-reasoner` | `GLM-5.3-Flash (glm)` | Six-shape comparison after the fix round: all six shapes equal (readings in §7), last recomputation 590 characters |
 
-The batch helper was dispatched three times; the six-shape readings are in §7.
+The batch helper covered three scenarios (ledger census / candidate excerpting / six-shape comparison); the six-shape comparison was recomputed three times as the report content changed, six dispatches in total; the six-shape readings are in §7.
+
+Metering anomaly register: batch helper 1 produced 10,190 characters (archived as batch1-ledger-census.md), exceeding both the 6,000-character cap stated in its dispatch prompt and the 10,000-character cap in §7, yet the output was complete and not truncated; batch helper 2 produced 9,627 characters (archived as batch2-candidates.md), also above its 7,000-character prompt cap. Both are batch-helper carriers outside the §7 stop-loss scope and are registered as metering facts. The platform demonstrably returns at least 10,190 characters intact, which can serve as the basis for recalibrating the batch-helper output cap in v36.
 
 ## 7 Gate readings
 
@@ -150,13 +160,19 @@ The batch helper was dispatched three times; the six-shape readings are in §7.
 | G6-4 expiring literal | No expiring literal on added lines |
 | G7 report contract | G7-a/b/c/d/e/f all pass (G7-b turned green once `04-compensation/review.md` was archived) |
 | G8 evidence tree | The pack is self-consistent |
-| Report CN and `_EN` six shapes | lines 183 / 183; headings 14 / 14; `**` 11 / 11; `|` 234 / 234; blank lines 50 / 50; fences 2 / 2; backticks 108 / 108 — all six shapes equal |
+| Report CN and `_EN` six shapes | lines 204 / 204; headings 14 / 14; `**` 11 / 11; `|` 284 / 284; blank lines 52 / 52; backticks 136 / 136 — all six shapes equal |
+| Note (not a six-shape item) | fences 2 / 2; 13 / 13 lines inside the artifacts fence |
 
-The six shapes of the CN report and its `_EN` mirror (measured at stage 8a): 182 = 182 lines, identical heading line-number sequence (14 positions), `**` 11 = 11, `|` 234 = 234, blank lines 49 = 49, fences 2 = 2.
+Stage 8a first measured 182 = 182 lines and 49 = 49 blank lines (the content state before the §6/§7 backfill); that reading is superseded by the set in the table above and is kept only as a trace of the pre-edit state.
 
 ## 8 Commit and CI
 
-The commit and CI readings are appended once by this section after stage 9, and the same append updates both CN and EN.
+| Artifact | Commit | Run | Result |
+|---|---|---|---|
+| Intermediate draft (carries the five defects in §3/§6/§7/§9) | `51d6f23` | `41339104941` | Both green: ubuntu-latest and windows-latest succeeded; SELFTEST 697/697 on both legs; `gate.js --all --scope=ci` passed |
+| Final draft (five fixes plus this section backfill) | Committed after authorised push | Run id registered after the authorised push | Package readings registered after the authorised push |
+
+Intermediate-draft package readings (process fact, not the final CI evidence of this slice): ubuntu-latest `ok internal/adapters 12.267s`, `ok internal/chain 0.745s`, `ok internal/console 2.367s`, `ok internal/gates 0.117s`; Race leg `ok internal/adapters 88.509s`, `ok internal/chain 2.426s`; windows-latest `ok internal/adapters 30.699s`, `ok internal/chain 4.116s`, `ok internal/console 16.627s`, `ok internal/gates 0.613s`.
 
 ## 9 Known limitations
 
@@ -164,7 +180,11 @@ The commit and CI readings are appended once by this section after stage 9, and 
 - The six "not closed (insufficient evidence)" verdicts of round 1 are not the same as "not remediated"; their evidence search was limited to the input pack.
 - The 76 items of round 2 are a gap list and **carry no priority**.
 - The compensation review does not cover judgement quality.
-- This slice does not modify v35; the two new disciplines (output-length defence / orchestrator model-switch trigger) are left to v36.
+- This slice does not modify v35; four discipline candidates are left to v36:
+  1. The output-length defence discipline (§7).
+  2. The trigger conditions for an orchestrator model switch (§0 item 7).
+  3. Batch helpers also need an output-cap discipline: batch helper 1 measured 10,190 characters against the 10,000 cap in §7 yet returned intact, and the platform cap is at least 10,190 characters, which can serve as the basis for recalibrating the cap.
+  4. A bulk settlement mechanism for lagging state: the ledger-versus-fact inconsistency exposed by GAP-12 / GAP-19 / GAP-24 is a general problem and needs a one-off settlement pass rather than line-by-line patching.
 
 ```artifacts
 docs/t027/REMAINING_SLICES.md	repo
