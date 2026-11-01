@@ -71,11 +71,18 @@ The two dispatches were **strictly serial** (the second was sent only after the 
 | `G6-5` / `G6-6` | Section references resolve; every added ledger row opens with a closed-set status word |
 | `G7` report contract | This file and its mirror are inside the G7 scan domain with complete fences |
 | `G8` evidence tree | Package self-consistent (`MANIFEST.md` entries and `SHA256SUMS.txt` hash rows in step) |
-| Six shapes (CN / `_EN`) | Lines 104 / 104; headings 9 / 9; bold 34 / 34; bars 130 / 130; blank 26 / 26; backticks 126 / 126 |
+| Six shapes (CN / `_EN`) | Lines 113 / 113; headings 9 / 9; bold 32 / 32; bars 150 / 150; blank 28 / 28; backticks 184 / 184 |
 
 ## 8 Commit and CI
 
-Per the "assessment slices stop at step 10 once step 9 is green" rule this slice has **not committed and not pushed**. Commit and CI readings are backfilled after the user authorises step 10.
+This slice parked at step 10 per the "assessment slices stop at step 10 once step 9 is green" rule, then committed and pushed under a same-turn user authorisation (only `origin/main`, no gitee push).
+
+| Revision | Commit | run | Result |
+|---|---|---|---|
+| Main commit (all payloads of this slice) | `bbd1745` | `41358624169` | Both green: `ubuntu-latest` and `windows-latest` both success; both legs report `SELFTEST: PASS 697/697` and `TOTAL_FAIL=0` |
+| This section backfill (docs-only append) | registered at the append commit | registered at the append commit | registered at the append commit |
+
+Package-level readings (final CI evidence): on `ubuntu-latest`, `internal/adapters` 11.959s, `internal/applier` 0.492s, `internal/chain` 0.565s, `internal/console` 1.912s, `internal/evidence` 0.009s, `internal/gates` 0.126s; on `windows-latest`, `internal/adapters` 29.364s, `internal/applier` 5.253s, `internal/chain` 3.912s, `internal/console` 15.398s, `internal/evidence` 0.057s, `internal/gates` 0.526s, `internal/guard` 2.655s, `internal/release` 3.818s, `internal/repair` 0.028s, `internal/snapshot` 1.320s, `internal/taskdef` 0.062s, `internal/tickets` 4.359s. Both legs report `SELFTEST: PASS 697/697` and `TOTAL_FAIL=0`; this backfill is a docs-only append and changes neither code nor criteria.
 
 ## 9 Known limitations
 
@@ -89,6 +96,8 @@ Per the "assessment slices stop at step 10 once step 9 is green" rule this slice
 ```artifacts
 docs/DELIVERY_DIRECTIVE.md	repo
 docs/DELIVERY_DIRECTIVE_EN.md	repo
+docs/t027/CHECKLIST_v37.md	repo
+docs/t027/CHECKLIST_v37_EN.md	repo
 docs/t027/REMAINING_SLICES.md	repo
 docs/t027/REMAINING_SLICES_EN.md	repo
 docs/validation/evidence/GOVERNANCE-BASELINE-VERIFY/00-briefing.md	repo
