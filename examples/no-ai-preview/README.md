@@ -7,7 +7,7 @@ This example demonstrates PC-01 (`AT-16`) static preview without running command
 From repository root:
 
 ```powershell
-go run ./cmd/prfrail preview --chain .\proofrail.chain.json --json
+go run ./cmd/prfrail preview --chain .\examples\no-ai-preview\proofrail.chain.json --json
 ```
 
 Expected properties:

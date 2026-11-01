@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "1.0.0",
+  "chain": {
+    "id": "no-ai-preview",
+    "profile": "minimal"
+  },
+  "tasks": [
+    {
+      "id": "record-preview-scope",
+      "review": "manual",
+      "steps": [
+        {
+          "id": "noop-preview-scope",
+          "kind": "noop",
+          "reason": "Zero-model preview fixture: no AI, command, network, or credential capability is required"
+        }
+      ]
+    },
+    {
+      "id": "confirm-preview-boundary",
+      "review": "manual",
+      "steps": [
+        {
+          "id": "noop-preview-boundary",
+          "kind": "noop",
+          "reason": "Zero-model preview fixture: executable steps stay out of this chain so preview remains ready"
+        }
+      ]
+    }
+  ],
+  "workspace": {
+    "components": [
+      {
+        "id": "no-ai-example",
+        "root": ".",
+        "languageScopes": [
+          {
+            "id": "generic-main",
+            "language": "generic",
+            "harness": "generic-standard",
+            "targets": ["source"]
+          }
+        ]
+      }
+    ]
+  }
+}

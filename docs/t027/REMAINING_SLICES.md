@@ -75,6 +75,7 @@
 | P43 P43-T027B-STATE-SEAL | ✅ 已闭环 | P42 | L | 2026-10-31 | docs/validation/p43-state-seal{,_EN}.md |
 | P44 P44-T027B-GATE-READINESS | ✅ 已完成 | P43 | M | 2026-11-01 | docs/validation/p44-gate-readiness{,_EN}.md |
 | DR13-FIX DR13-FIX（P45 前置） | ✅ 已完成 | P44 | S | 2026-11-01 | docs/validation/dr13-fix{,_EN}.md |
+| P45 P45-T027B-E2E-ZERO-MODEL | ✅ 已完成 | DR13-FIX | M | 2026-11-01 | docs/validation/p45-e2e-zero-model{,_EN}.md |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -1395,6 +1396,27 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | R / D 基线 | R = 0、D = 0（不继承上片） |
 | 临时件落点声明 | 本片临时目录 = `tmp/DR13-FIX/`（⑧c 前只增不删） |
 | 完成记录 | 报告：`docs/validation/dr13-fix{,_EN}.md` |
+
+### P45 — `P45-T027B-E2E-ZERO-MODEL` · ✅ 已完成
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `P45-T027B-E2E-ZERO-MODEL`（装配验证类；准则 v1.60） |
+| 状态 | ✅ **已完成**（2026-11-01；本片闭环） |
+| 目标 | 零模型三任务装配 E2E：T1 正常执行并被接受（`PASSED` + 父快照绑定）；T2 触发自然失败（`FAILED`）且 **T3 不启动**；全程零模型调用，全部步骤用声明式 stub 代替真实 AI |
+| 依赖 | P44 闭环（`16abe2b`）；DR13-FIX 闭环（`eb36992`，并发隐患已排除） |
+| 规模 | M |
+| 步骤 | 步骤 0 → ① 架构（V4 Pro）→ ③ 红测 → ② 实现 → ④ 门禁 → ⑤ 预审 → ⑥ 扫描 → ⑦ 终审 → ⑧a → ⑨ → ⑧c → ⑩ |
+| 现状缺口 | 三任务链的装配贯通无端到端证据；T2 失败后 T3 的拦截面未机械钉住；「零模型调用」无机械判据 |
+| 交付物 | 报告对 `docs/validation/p45-e2e-zero-model{,_EN}.md`；证据包 `docs/validation/evidence/P45-T027B-E2E-ZERO-MODEL/`（含 `00-briefing.md`）；执行自由度清单；文档回写（`ARCHITECTURE` / `DEV_PLAN`） |
+| 验收证据 | ③ 红测先行；三任务状态序与父快照绑定断言；T3 未启动断言；零模型调用计数为 0；并发 Start 场景断言（恰一赢家 / 败者全命中哨兵 / 赢家 `ProcessAlive` / 活体赢家拒绝迟到启动 / 停止后槽位释放并可重发；`registry.len()==1` 与 slot-owner/mirror 一致性为 adapters 包内私有态，本片以包外行为等价断言替代，未直接断言）；三作用域 TOTAL_FAIL=0 且 SELFTEST 697/697 |
+| 边界 | 仅 `internal/chain/**`、`internal/console/**` 与 `examples/**`；不动 `internal/adapters/**`；不推 gitee；停 ⑩ 等授权 |
+| 分级 | `[SLICE]`（装配验证片） |
+| 探针额度 | 无 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/P45-T027B-E2E-ZERO-MODEL/freedom-list.md` |
+| R / D 基线 | R = 0、D = 0（不继承上片） |
+| 临时件落点声明 | 本片临时目录 = `tmp/P45-T027B-E2E-ZERO-MODEL/`（⑧c 前只增不删） |
+| 完成记录 | 报告：`docs/validation/p45-e2e-zero-model{,_EN}.md` |
 
 ## 已知缺陷（后续切片前处理）
 

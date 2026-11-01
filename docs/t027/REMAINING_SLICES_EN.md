@@ -75,6 +75,7 @@
 | P43 P43-T027B-STATE-SEAL | ✅ Closed | P42 | L | 2026-10-31 | docs/validation/p43-state-seal{,_EN}.md |
 | P44 P44-T027B-GATE-READINESS | ✅ Completed | P43 | M | 2026-11-01 | docs/validation/p44-gate-readiness{,_EN}.md |
 | DR13-FIX DR13-FIX (P45 prerequisite) | ✅ Completed | P44 | S | 2026-11-01 | docs/validation/dr13-fix{,_EN}.md |
+| P45 P45-T027B-E2E-ZERO-MODEL | ✅ Completed | DR13-FIX | M | 2026-11-01 | docs/validation/p45-e2e-zero-model{,_EN}.md |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1382,6 +1383,27 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | R / D baseline | R = 0, D = 0 (not inherited) |
 | Temp artefact location | `tmp/DR13-FIX/` (append-only until 8c) |
 | Completion record | Report: `docs/validation/dr13-fix{,_EN}.md` |
+
+### P45 — `P45-T027B-E2E-ZERO-MODEL` · ✅ Completed
+
+| Field | Content |
+|---|---|
+| Identity | `P45-T027B-E2E-ZERO-MODEL` (assembly-validation slice; directive v1.60) |
+| Status | ✅ **Completed** (2026-11-01; slice closed) |
+| Goal | Zero-model three-task assembly E2E: T1 runs and is accepted (`PASSED` with parent snapshot binding); T2 fails naturally (`FAILED`) and **T3 never starts**; the whole run makes zero model calls and every step uses a declarative stub instead of real AI |
+| Depends on | P44 closed (`16abe2b`); DR13-FIX closed (`eb36992`; the concurrency hazard is removed) |
+| Size | M |
+| Steps | Step 0, then 1 architecture (V4 Pro), then 3 red tests, then 2 implementation, then 4 gates, then 5 pre-review, then 6 scan, then 7 final review, then 8a, then 9, then 8c, then 10 |
+| Current gap | No end-to-end evidence that the three-task chain is wired through; the interception point that keeps T3 from starting after T2 fails is not pinned mechanically; "zero model calls" has no mechanical criterion |
+| Deliverables | Report pair `docs/validation/p45-e2e-zero-model{,_EN}.md`; evidence pack `docs/validation/evidence/P45-T027B-E2E-ZERO-MODEL/` (including `00-briefing.md`); freedom list; doc backfill (`ARCHITECTURE` / `DEV_PLAN`) |
+| Acceptance evidence | Red tests come first; assertions on the three-task state order and the parent snapshot binding; an assertion that T3 never started; a model-call counter of zero; concurrent-start assertions (exactly one winner, all losers carry the sentinels, the winner stays `ProcessAlive`, a live winner rejects a late start, and stopping releases the slot so a new launch succeeds; `registry.len()==1` and slot-owner/mirror agreement are package-private in adapters, so this slice asserts behavioural equivalence from outside instead of asserting them directly); all three gate scopes report TOTAL_FAIL=0 with SELFTEST 697/697 |
+| Boundary | Only `internal/chain/**`, `internal/console/**` and `examples/**`; never touch `internal/adapters/**`; never push to gitee; stop at 10 for authorisation |
+| Class | `[SLICE]` (assembly-validation slice) |
+| Probe budget | None |
+| Freedom list path | `docs/validation/evidence/P45-T027B-E2E-ZERO-MODEL/freedom-list.md` |
+| R / D baseline | R = 0, D = 0 (not inherited) |
+| Temp artefact location | `tmp/P45-T027B-E2E-ZERO-MODEL/` (append-only until 8c) |
+| Completion record | Report: `docs/validation/p45-e2e-zero-model{,_EN}.md` |
 
 ## Known defects (to be handled before later slices)
 

@@ -91,3 +91,8 @@
 弟	docs/validation/evidence/P42-T027B-EVIDENCE-BIND/01-arch-design/review.md	① 架构原文逐字归档（D1 实测依据，不得改写）；上下文：兄弟节点
 簿	docs/t027/CHECKLIST_v33.md	v33 清单 §二 P43 教训原文：额度按轮次簿记（既定措辞登记，不改写）；上下文：额度簿记
 貌	docs/t027/CHECKLIST_v33.md	v33 清单 §二 提交链原文：⑥ 三轮全貌（既定措辞登记，不改写）；上下文：三轮全貌
+# 2026-11-01 (P45-T027B-E2E-ZERO-MODEL, 8a): two characters carried only by the verbatim 6-scan
+# transcript quoted in the report pair; the transcription contract forbids rewriting, so both
+# are registered here with the exact context they were verified in.
+营	docs/validation/p45-e2e-zero-model.md	"README 运营承诺的静态锁定" (verbatim 6-scan Section C item 2; both the CN and the _EN report carry it)
+尊	docs/validation/p45-e2e-zero-model.md	"只读边界被尊重" (verbatim 6-scan Section C item 6; both the CN and the _EN report carry it)

@@ -169,7 +169,7 @@ Backfill note (2026-10-22, step 0 of slice DIRECTIVE-COST-TIER): when those thre
 - P42 binding: C3 and N2
 - P43 sealing: C4 and C5 and N3 (done, report docs/validation/p43-state-seal{,_EN}.md)
 - P44 gate order: C7 and N4 (decision implementation and tests complete; end-to-end wiring is a later slice)
-- P45 zero-model E2E
+- P45 zero-model E2E: done (assembly validation; zero production-code change; the three-task state order and the never-started T3 are asserted on both the engine and console sides; report `docs/validation/p45-e2e-zero-model{,_EN}.md`)
 
 ## 3. Requirement Mapping
 

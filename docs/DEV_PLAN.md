@@ -168,7 +168,7 @@ T027 前置状态更新（2026-10-31，DOCS-ALIGNMENT）：本片把 DEV_PLAN、
 - P42 绑定：C3 与 N2
 - P43 封存：C4 与 C5 与 N3（已完成，报告 `docs/validation/p43-state-seal{,_EN}.md`）
 - P44 门序：C7 与 N4（判定实现与测试已完成；端到端接线为后续切片）
-- P45 零模型 E2E
+- P45 零模型 E2E：完成（装配验证；生产代码零改动；三任务状态序与 T3 未启动在引擎级与 console 级均有断言；报告 `docs/validation/p45-e2e-zero-model{,_EN}.md`）
 
 ## 3. 需求映射
 

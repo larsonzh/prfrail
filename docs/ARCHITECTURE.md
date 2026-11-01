@@ -69,6 +69,8 @@ AI 需要人工输入时，AgentRunner 或辅助 adapter 只接收结构化 `ope
 
 最重要的转换前置条件：PRECHECK 成功才运行；noop 不经过 RUNNING；任务技术成功不等于 PASSED；FAILED 不可直接 PASSED；cancel/repair/recover/accept 先证明相关受管写进程已停止；handoff complete 先收回租约、扫描并重新跑门禁。事件先落盘，投影可重建。
 
+零模型三任务 E2E（P45）钉住的装配路径：引擎按任务顺序串行物化工作区，每个任务的父快照取当时的 `AcceptedParent`，任务被接受后推进父快照，因此 T1 → T2 → T3 的父链是 `baselineHash` → `acceptedOne` → `acceptedTwo`。失败隔离点在任务循环：`runTask` 出错即置该任务 FAILED、链 FAILED 并停止后续任务，T3 既不物化工作区也不产生任务事件或步骤请求；该停止语义由引擎级测试在 workspace 调用序、事件流、投影键与步骤请求集四处交叉断言，console 侧则以 `localRuntime` 对非 noop 步的自然拒绝复现同一失败机。console 装配层的单任务限制保持不动（`runtime_agent.go:774`、`runtime_supervised.go:335`），多任务贯通走 `ExecuteNoopRun`。并发 Start 的排他性在包外用同 launcher、同 runRoot 的 8 路 `Start` 断言：恰一赢家、败者只命中 `ErrAgentRunnerLaunchConflict` 或 `ErrAgentRunnerProcessDuplicate`、赢家 `ProcessAlive`、活体赢家拒绝迟到启动、停止后槽位释放并可重发。
+
 ## 4. 存储与生命周期
 
 RFC 默认快照根是 `out/prfrail/snapshots/`。run/state/outbox 的具体布局属于待冻结契约，不能凭本文生成生产路径。要求物理上分离源目录、run-workspace、执行 outbox、核心 state/store；启动前验证无嵌套捕获和别名重叠。
