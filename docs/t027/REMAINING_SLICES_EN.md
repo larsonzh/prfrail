@@ -76,6 +76,7 @@
 | P44 P44-T027B-GATE-READINESS | ✅ Completed | P43 | M | 2026-11-01 | docs/validation/p44-gate-readiness{,_EN}.md |
 | DR13-FIX DR13-FIX (P45 prerequisite) | ✅ Completed | P44 | S | 2026-11-01 | docs/validation/dr13-fix{,_EN}.md |
 | P45 P45-T027B-E2E-ZERO-MODEL | ✅ Completed | DR13-FIX | M | 2026-11-01 | docs/validation/p45-e2e-zero-model{,_EN}.md |
+| P46 STRATEGIC-REVIEW-2026-11-02 | ✅ Completed | P45 | L | 2026-11-02 | docs/validation/strategic-review-2026-11-02{,_EN}.md |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1404,6 +1405,27 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | R / D baseline | R = 0, D = 0 (not inherited) |
 | Temp artefact location | `tmp/P45-T027B-E2E-ZERO-MODEL/` (append-only until 8c) |
 | Completion record | Report: `docs/validation/p45-e2e-zero-model{,_EN}.md` |
+
+### P46 — `STRATEGIC-REVIEW-2026-11-02` (strategic review) · ✅ Completed
+
+| Field | Content |
+|---|---|
+| Identity | `STRATEGIC-REVIEW-2026-11-02` (evaluation `[SLICE]`, trimmed pipeline) |
+| Status | ✅ **Completed** (started 2026-11-02; anchor `f497ff3`) |
+| Goal | Answer three questions: whether the P35 "double breakpoints" (production loop not wired / governance record-chain break) are closed after P39–P45; what the next best path is; whether November priorities need adjustment |
+| Depends on | P45 closed (`3a7541d`) and v35 landed (`f497ff3`) |
+| Size | L |
+| Steps | Step 0, then round 1 (Sol, breakpoint verification), then round 2 (V4 Pro, gap ledger), then round 3 (Sol, path and priority), then the consolidated ruling, then the compensation review (MAI, format only), then 8a, then 9, then 8c, then 10 (stages 1-7 skipped) |
+| Current gap | The P35 double breakpoints have no unified verification after P39–P45; the next path is undecided; November priorities are unsorted |
+| Deliverables | Report pair `docs/validation/strategic-review-2026-11-02{,_EN}.md`; evidence pack (`00-briefing.md`, `freedom-list.md`, `input-list.md`, rounds 1-3, compensation review, CI evidence); ledger write-back |
+| Acceptance evidence | Every round yields falsifiable output (breakpoint table with evidence, gap ledger with sources, three-tier sequence with reasons); the compensation review covers format only; all three gate scopes report TOTAL_FAIL=0 with SELFTEST 697/697; the report pair has all six shapes equal; the `00-briefing.md` byte spec and the section-7 keyword grep readings both land in the receipt |
+| Boundary | No code, no directive text and no CONTRACTS changes; only the report pair, the evidence pack and the ledger write-back; never push to gitee |
+| Class | `[SLICE]` (evaluation) |
+| Probe budget | None (not applicable) |
+| Freedom list path | `docs/validation/evidence/STRATEGIC-REVIEW-2026-11-02/freedom-list.md` |
+| R / D baseline | R = 0, D = 0 (not inherited) |
+| Temp artefact location | `tmp/STRATEGIC-REVIEW-2026-11-02/` (append-only until 8c) |
+| Completion record | Report: `docs/validation/strategic-review-2026-11-02{,_EN}.md` |
 
 ## Known defects (to be handled before later slices)
 

@@ -76,6 +76,7 @@
 | P44 P44-T027B-GATE-READINESS | ✅ 已完成 | P43 | M | 2026-11-01 | docs/validation/p44-gate-readiness{,_EN}.md |
 | DR13-FIX DR13-FIX（P45 前置） | ✅ 已完成 | P44 | S | 2026-11-01 | docs/validation/dr13-fix{,_EN}.md |
 | P45 P45-T027B-E2E-ZERO-MODEL | ✅ 已完成 | DR13-FIX | M | 2026-11-01 | docs/validation/p45-e2e-zero-model{,_EN}.md |
+| P46 STRATEGIC-REVIEW-2026-11-02 | ✅ 已完成 | P45 | L | 2026-11-02 | docs/validation/strategic-review-2026-11-02{,_EN}.md |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -1417,6 +1418,27 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | R / D 基线 | R = 0、D = 0（不继承上片） |
 | 临时件落点声明 | 本片临时目录 = `tmp/P45-T027B-E2E-ZERO-MODEL/`（⑧c 前只增不删） |
 | 完成记录 | 报告：`docs/validation/p45-e2e-zero-model{,_EN}.md` |
+
+### P46 — `STRATEGIC-REVIEW-2026-11-02`（战略回看）· ✅ 已完成
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `STRATEGIC-REVIEW-2026-11-02`（评估类 `[SLICE]` · 流水线裁剪） |
+| 状态 | ✅ **已完成**（2026-11-02 起跑；锚点 `f497ff3`） |
+| 目标 | 回答三问：P35「双断点」（生产闭环未贯通 / 记录链断点）在 P39–P45 后是否闭合；下一步最优路径；11 月优先级是否需调整 |
+| 依赖 | P45 闭环（`3a7541d`）+ v35 落盘（`f497ff3`） |
+| 规模 | L |
+| 步骤 | 步骤 0 → 轮 1（Sol 双断点核验）→ 轮 2（V4 Pro 缺口台账）→ 轮 3（Sol 路径与优先级）→ 综合裁决 → 补偿复核（MAI，仅格式）→ ⑧a → ⑨ → ⑧c → ⑩（**跳过 ①–⑦**） |
+| 现状缺口 | P35 双断点尚无 P39–P45 之后的统一核验；下一步路径未裁定；11 月优先级未排序 |
+| 交付物 | 报告对 `docs/validation/strategic-review-2026-11-02{,_EN}.md`；证据包（`00-briefing.md` / `freedom-list.md` / `input-list.md` / 轮 1–3 / 补偿复核 / CI 取证）；台账回写 |
+| 验收证据 | 三轮均给可证伪产出（断点表带证据、缺口台账带来源、三档序列带理由）；补偿复核仅格式；三作用域 TOTAL_FAIL=0 且 SELFTEST 697/697；报告 CN/EN 六形状全等；`00-briefing.md` 字节规格与第七节关键词 grep 双读数入回执 |
+| 边界 | 不改代码、不改准则正文、不改 CONTRACTS；只产出报告对 + 证据包 + 台账回写；不推 gitee |
+| 分级 | `[SLICE]`（评估类） |
+| 探针额度 | 无（不适用） |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/STRATEGIC-REVIEW-2026-11-02/freedom-list.md` |
+| R / D 基线 | R = 0、D = 0（不继承上片） |
+| 临时件落点声明 | 本片临时目录 = `tmp/STRATEGIC-REVIEW-2026-11-02/`（⑧c 前只增不删） |
+| 完成记录 | 报告：`docs/validation/strategic-review-2026-11-02{,_EN}.md` |
 
 ## 已知缺陷（后续切片前处理）
 
