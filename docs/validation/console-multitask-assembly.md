@@ -121,7 +121,7 @@ INDEPENDENT SCAN: PASS
 - **CLI 接线后置**：`cmd/prfrail` 与 console flags 的多记录供给契约未定，留后续切片；本片以 `RequestRecords` 注册表为接口边界。
 - **intent registry 生产未接**（⑦ Info 1）：`agentRunnerIntentMux` 仍逐记录构造 preparer，行为等价。
 - **Windows R/C 写路径本地未跑**：Windows 上 `PublishDurability` 恒为 `unproven`，绿测只断言 per-requestId 路径与哈希互异；写路径由 Ubuntu CI 承担。
-- **CI 首跑观察**：提交后须采集双腿 `Test` / `Gates` 结果；首跑红按 DR 口径登记。
+- **CI 首跑已闭环**：run `41507722672`（commit `81f9dc9`）双腿 `success`（windows Test+Gates；ubuntu Test+Race+Gates）；两腿 `Gates` 均 `SELFTEST: PASS 697/697`、`scope=ci changed=39`、`TOTAL_FAIL=0`；包级 `ok`：windows Test `internal/console` 20.885s、ubuntu Test `internal/console` 2.825s、ubuntu Race `internal/console` 12.894s。
 - **既有导出哨兵保留**：`ErrSupervisedStepRequired` 未使用亦未删除（②c 偏差 6），未扩大改动面。
 
 ## 9. artifacts 围栏
@@ -135,6 +135,8 @@ docs/CONTRACTS.md	repo
 docs/CONTRACTS_EN.md	repo
 docs/DEV_PLAN.md	repo
 docs/DEV_PLAN_EN.md	repo
+docs/t027/CHECKLIST_v40.md	repo
+docs/t027/CHECKLIST_v40_EN.md	repo
 docs/t027/REMAINING_SLICES.md	repo
 docs/t027/REMAINING_SLICES_EN.md	repo
 docs/validation/console-multitask-assembly.md	repo
@@ -175,7 +177,7 @@ tmp/CONSOLE-MULTITASK-ASSEMBLY/	local-only
 
 - `docs/ARCHITECTURE{,_EN}.md`：§3 追加三段（多任务串行装配 / A6 镜像共享语义 / 调度机制），各 +6 行（3 段正文 + 3 空行），CN / EN 行数相等。
 - `docs/DEV_PLAN{,_EN}.md`：「11 月重构里程碑（T027-B）」列表由 6 条扩为 P37–P50 全量条目（含状态与报告路径），CN / EN 新增与删除行数相等。
-- `docs/t027/REMAINING_SLICES{,_EN}.md`：状态表 P50 证据格回写、P50 小节追加「完成记录」行；状态符号已于 ⑧b 转 `✅ 已完成`；提交哈希与 CI 证据在授权提交后补记。
+- `docs/t027/REMAINING_SLICES{,_EN}.md`：状态表 P50 证据格回写、P50 小节追加「完成记录」行；状态符号已于 ⑧b 转 `✅ 已完成`；提交哈希 `81f9dc9` 与 CI run `41507722672` 已补记。
 - 已同步项：`MANIFEST.md` 的 `08-gates/` 载荷已按 ⑨ 追加；`08-ci/` 待授权提交后按轮追加。
 
-本片停在 ⑩ 等授权。
+本片已获同轮授权提交 `81f9dc9` 并推送 origin（未推 gitee）；CI 首跑双腿绿见 §8。

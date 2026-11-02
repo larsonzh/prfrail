@@ -80,7 +80,7 @@
 | P47 GOVERNANCE-BASELINE-VERIFY | ✅ 已完成 | P46 | M | 2026-11-02 | docs/validation/governance-baseline-verify{,_EN}.md；补登记：OB-133 至 OB-136 |
 | P48 DR13-FIX-D3 | ✅ 已完成 | DR13-FIX | S | 2026-11-02 | docs/validation/dr13-fix-d3{,_EN}.md（停于 ⑩ 等授权） |
 | P49 RACE-LEG-EXPAND | ✅ 已完成 | P48 | M | 2026-11-02 | docs/validation/race-leg-expand{,_EN}.md（`75990a8`，run `41445657595` 首跑双绿） |
-| P50 CONSOLE-MULTITASK-ASSEMBLY | ✅ 已完成 | P49 | L | 2026-11-03 | 报告对 `docs/validation/console-multitask-assembly{,_EN}.md`；停于 ⑩ 等授权；临时件 `tmp/CONSOLE-MULTITASK-ASSEMBLY/`（⑧c 清理）；R=1、D=1 |
+| P50 CONSOLE-MULTITASK-ASSEMBLY | ✅ 已完成 | P49 | L | 2026-11-03 | 报告对 `docs/validation/console-multitask-assembly{,_EN}.md`；`81f9dc9` 已推 origin（未推 gitee），run `41507722672` 首跑双腿全绿；临时件 `tmp/CONSOLE-MULTITASK-ASSEMBLY/`（⑧c 清理）；R=1、D=1 |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -1512,7 +1512,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 字段 | 内容 |
 |---|---|
 | 标识 | `CONSOLE-MULTITASK-ASSEMBLY`（实现类；准则 v1.60；L 档） |
-| 状态 | ✅ **已完成**（2026-11-03；锚点 HEAD = `8bd8224`，准则 v1.60；⑨ 全绿后停于 ⑩ 等授权） |
+| 状态 | ✅ **已完成**（2026-11-03；锚点 HEAD = `8bd8224`，准则 v1.60；提交 `81f9dc9` 已推 origin，run `41507722672` 首跑双腿绿） |
 | 目标 | 解除 console 层单任务限制（`runtime_agent.go:774` 与 `runtime_supervised.go:335` 强制单任务），重构为多任务并发装配，且不破坏既有 A6 排他契约（每 runRoot 唯一 identity mirror） |
 | 依赖 | P49 闭环（`75990a8` + `8bd8224`）；**协议先行**：若须修改 CONTRACTS 或底层锁机制，① 阶段先给精确协议修订方案 |
 | 裁定记录 | 方案 A（用户 2026-11-03 裁定）：范围限生产装配层 + 离线 harness + 测试改写，CLI 接线后置留后续切片；② 按 ②a–d 小步串行派单 |
@@ -1527,7 +1527,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 执行自由度清单落盘路径 | `docs/validation/evidence/CONSOLE-MULTITASK-ASSEMBLY/freedom-list.md` |
 | R / D 基线 | R = 1、D = 1（R 记 ⑤ r1 整改轮；D 记 ② 派单通道故障与两次半截产物处置） |
 | 临时件落点声明 | 本片临时目录 = `tmp/CONSOLE-MULTITASK-ASSEMBLY/`（⑧c 前只增不删） |
-| 完成记录 | 报告对：`docs/validation/console-multitask-assembly{,_EN}.md`；审查链：① DESIGN DONE → ③ 红测 → ②a–d + 修复轮 → ⑤ r1 PASS WITH FIXES → r2 PASS → ⑥ INDEPENDENT SCAN: PASS → ⑦ FINAL REVIEW: PASS；文档同步：ARCHITECTURE/DEV_PLAN 已更新（DEV_PLAN 补齐 P39–P50 里程碑）；⑨ 三作用域 TOTAL_FAIL=0、SELFTEST 697/697；R=1、D=1；停于 ⑩ 等授权 |
+| 完成记录 | 报告对：`docs/validation/console-multitask-assembly{,_EN}.md`；审查链：① DESIGN DONE → ③ 红测 → ②a–d + 修复轮 → ⑤ r1 PASS WITH FIXES → r2 PASS → ⑥ INDEPENDENT SCAN: PASS → ⑦ FINAL REVIEW: PASS；文档同步：ARCHITECTURE/DEV_PLAN 已更新（DEV_PLAN 补齐 P39–P50 里程碑）；⑨ 三作用域 TOTAL_FAIL=0、SELFTEST 697/697；R=1、D=1；提交 `81f9dc9` 已推 origin（未推 gitee），run `41507722672` 首跑双腿全绿 |
 
 ## 已知缺陷（后续切片前处理）
 

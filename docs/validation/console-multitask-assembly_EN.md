@@ -121,7 +121,7 @@ INDEPENDENT SCAN: PASS
 - **CLI wiring deferred**: the multi-record supply contract for `cmd/prfrail` and the console flags is undecided and left to a later slice; this slice stops at the `RequestRecords` registry boundary.
 - **Intent registry not wired into production** (7 Info 1): `agentRunnerIntentMux` still builds a preparer per record, behaviourally equivalent.
 - **Windows R/C write path not run locally**: on Windows `PublishDurability` is always `unproven`, so the green tests only assert per-requestId path and digest distinctness; the write path is carried by the Ubuntu CI leg.
-- **First CI run observation**: both legs' `Test` / `Gates` results must be captured after the commit; a first-run red is registered under the DR rules.
+- **First CI run closed**: run `41507722672` (commit `81f9dc9`) is `success` on both legs (windows Test+Gates; ubuntu Test+Race+Gates); both legs' `Gates` show `SELFTEST: PASS 697/697`, `scope=ci changed=39`, `TOTAL_FAIL=0`; package-level `ok`: windows Test `internal/console` 20.885s, ubuntu Test `internal/console` 2.825s, ubuntu Race `internal/console` 12.894s.
 - **Existing exported sentinel retained**: `ErrSupervisedStepRequired` is unused and undeleted (stage 2c deviation 6), keeping the change surface narrow.
 
 ## 9. Artifacts Fence
@@ -135,6 +135,8 @@ docs/CONTRACTS.md	repo
 docs/CONTRACTS_EN.md	repo
 docs/DEV_PLAN.md	repo
 docs/DEV_PLAN_EN.md	repo
+docs/t027/CHECKLIST_v40.md	repo
+docs/t027/CHECKLIST_v40_EN.md	repo
 docs/t027/REMAINING_SLICES.md	repo
 docs/t027/REMAINING_SLICES_EN.md	repo
 docs/validation/console-multitask-assembly.md	repo
@@ -175,7 +177,7 @@ tmp/CONSOLE-MULTITASK-ASSEMBLY/	local-only
 
 - `docs/ARCHITECTURE{,_EN}.md`: three paragraphs appended to section 3 (multi-task serial assembly / A6 mirror sharing semantics / scheduling mechanism), +6 lines each (3 body paragraphs plus 3 blank lines), with equal CN / EN line counts.
 - `docs/DEV_PLAN{,_EN}.md`: the "November Refactor Milestone (T027-B)" list grows from 6 entries to the full P37-P50 set (status and report paths), with equal added and deleted line counts on the CN / EN sides.
-- `docs/t027/REMAINING_SLICES{,_EN}.md`: the P50 evidence cell in the status table is written back and the P50 section gains a completion-record row; the status glyph was converted to `✅ Completed` at 8b; the commit hash and CI evidence are recorded after the authorised commit.
+- `docs/t027/REMAINING_SLICES{,_EN}.md`: the P50 evidence cell in the status table is written back and the P50 section gains a completion-record row; the status glyph was converted to `✅ Completed` at 8b; the commit hash `81f9dc9` and CI run `41507722672` are recorded.
 - Synced: the `08-gates/` payload of `MANIFEST.md` was appended at stage 9; `08-ci/` is appended after the authorised commit.
 
-This slice stops at ⑩ awaiting authorization.
+This slice was committed as `81f9dc9` and pushed to origin (never gitee) under the same-turn authorisation; the first CI run is green on both legs, see section 8.
