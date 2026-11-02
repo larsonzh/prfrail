@@ -84,11 +84,21 @@ INDEPENDENT SCAN: PASS
 - `SELFTEST: PASS 697/697`。
 - base 三腿：gofmt 空、`go build ./...`、`go vet ./...`、`go test ./...` 全绿（ok=15、FAIL=0）。
 
+## 8. 提交与 CI
+
+- 主提交：`82e3ac8`（`feat: harden starting marker release order against W1 window (P48-DR13-FIX-D3)`），已推 `origin/main`（未推 gitee）。
+- CI：run `41379998477`（head `82e3ac8`）**首跑双腿全绿**（attempt 1，未触发复跑）。
+- 两腿 `Test` 均实测 `ok github.com/larsonzh/prfrail/internal/adapters`；ubuntu 腿 `Race` 步骤另见 `internal/adapters` 与 `internal/chain` 两行 ok。
+- 两腿 `Gates` 实测：`SELFTEST: PASS 697/697`、`GATE REPORT scope=ci changed=27`、`TOTAL_FAIL=0`。
+- 三个 dispatch 专用作业（candidate build / candidate probe / bootstrap release）按常态 skipped。
+
 ```artifacts
 docs/ARCHITECTURE.md	repo
 docs/ARCHITECTURE_EN.md	repo
 docs/t027/REMAINING_SLICES.md	repo
 docs/t027/REMAINING_SLICES_EN.md	repo
+docs/t027/CHECKLIST_v38.md	repo
+docs/t027/CHECKLIST_v38_EN.md	repo
 docs/validation/dr13-fix-d3.md	repo
 docs/validation/dr13-fix-d3_EN.md	repo
 docs/validation/evidence/DR13-FIX-D3/00-briefing.md	repo

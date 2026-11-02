@@ -84,11 +84,21 @@ Disclosure: the transcript Section A verdict line is merged into this fence clos
 - `SELFTEST: PASS 697/697`.
 - Base legs: gofmt empty, `go build ./...`, `go vet ./...`, `go test ./...` all green (ok=15, FAIL=0).
 
+## 8. Commit and CI
+
+- Main commit: `82e3ac8` (`feat: harden starting marker release order against W1 window (P48-DR13-FIX-D3)`), pushed to `origin/main` (no gitee push).
+- CI: run `41379998477` (head `82e3ac8`) **green on both legs on the first attempt** (no rerun).
+- Both legs report in `Test` the line `ok github.com/larsonzh/prfrail/internal/adapters`; the ubuntu `Race` step also reports ok for `internal/adapters` and `internal/chain`.
+- Both legs `Gates`: `SELFTEST: PASS 697/697`, `GATE REPORT scope=ci changed=27`, `TOTAL_FAIL=0`.
+- The three dispatch-only jobs (candidate build / candidate probe / bootstrap release) are skipped as usual.
+
 ```artifacts
 docs/ARCHITECTURE.md	repo
 docs/ARCHITECTURE_EN.md	repo
 docs/t027/REMAINING_SLICES.md	repo
 docs/t027/REMAINING_SLICES_EN.md	repo
+docs/t027/CHECKLIST_v38.md	repo
+docs/t027/CHECKLIST_v38_EN.md	repo
 docs/validation/dr13-fix-d3.md	repo
 docs/validation/dr13-fix-d3_EN.md	repo
 docs/validation/evidence/DR13-FIX-D3/00-briefing.md	repo
