@@ -36,6 +36,8 @@ SessionBridge `silent`, `visible`, and `auto` are not AgentRunner. Silent suppor
 
 When AI needs operator input, AgentRunner or an auxiliary adapter accepts only structured `operator-action-required` and hands it to chain. Chain persists the request and enters `WAITING_FOR_OPERATOR`; console reads pending work and allowed responses through the control API. Chain validates actor, run/task/attempt, workspace/session, context digest, and authority before persisting a replayable response. Manual writes use the existing handoff lease. Before resuming a CLI Agent, ProofRail revalidates the original session and process state; inability to prove continuity creates a new attempt. SessionBridge `@sbr-review` remains standalone diagnostics/manual testing only.
 
+Test infrastructure: the tests of six core internal packages (adapters/chain/console/gates/guard/tickets) all run under the CI Ubuntu Race leg (`CGO_ENABLED=1 go test -race -count=1`) for race detection; the Windows leg skips the Race step and is unaffected by cgo.
+
 ## 2. Ownership and Dependency Contracts
 
 | Module | Owned responsibility/output | Prohibition | First verification |

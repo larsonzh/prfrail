@@ -1,0 +1,4 @@
+ok  	github.com/larsonzh/prfrail/internal/console	14.041s
+ok  	github.com/larsonzh/prfrail/internal/gates	3.560s
+ok  	github.com/larsonzh/prfrail/internal/guard	8.850s
+ok  	github.com/larsonzh/prfrail/internal/tickets	8.228s

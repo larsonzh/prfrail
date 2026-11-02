@@ -1,0 +1,13 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index 97b04f5..da0abde 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -81,7 +81,7 @@ jobs:
+ 
+       - name: Race
+         if: runner.os == 'Linux'
+-        run: CGO_ENABLED=1 go test -race -count=1 ./internal/adapters/... ./internal/chain/...
++        run: CGO_ENABLED=1 go test -race -count=1 ./internal/adapters/... ./internal/chain/... ./internal/console/... ./internal/gates/... ./internal/guard/... ./internal/tickets/...
+ 
+       - name: Contract fixtures
+         if: runner.os == 'Linux'

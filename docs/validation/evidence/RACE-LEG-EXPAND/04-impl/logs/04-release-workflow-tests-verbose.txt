@@ -1,0 +1,1164 @@
+=== RUN   TestWorkflowScriptMutationsAreRejected
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-build/Validate_candidate_pin/different-directory
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-build/Validate_candidate_pin/extra-action-parameters
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-build/Validate_candidate_pin/quoted-commands
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-build/Validate_candidate_pin/uninvoked-scriptblock
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-build/Validate_candidate_pin/unreachable-commands
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-build/Validate_candidate_pin/empty-script
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-build/Validate_candidate_pin/skip-step
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-build/Validate_candidate_pin/different-shell
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-build/Validate_candidate_pin/early-success
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-build/Validate_candidate_pin/fake-oracle-write
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-build/Validate_candidate_pin/alternate-variable
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-build/Validate_candidate_pin/shadow-command
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-build/Build_candidate_without_executing_it/different-shell
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-build/Build_candidate_without_executing_it/early-success
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-build/Build_candidate_without_executing_it/fake-oracle-write
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-build/Build_candidate_without_executing_it/alternate-variable
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-build/Build_candidate_without_executing_it/shadow-command
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-build/Build_candidate_without_executing_it/different-directory
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-build/Build_candidate_without_executing_it/extra-action-parameters
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-build/Build_candidate_without_executing_it/quoted-commands
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-build/Build_candidate_without_executing_it/uninvoked-scriptblock
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-build/Build_candidate_without_executing_it/unreachable-commands
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-build/Build_candidate_without_executing_it/empty-script
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-build/Build_candidate_without_executing_it/skip-step
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-probe/Validate_repository_trust_pins/different-directory
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-probe/Validate_repository_trust_pins/extra-action-parameters
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-probe/Validate_repository_trust_pins/quoted-commands
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-probe/Validate_repository_trust_pins/uninvoked-scriptblock
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-probe/Validate_repository_trust_pins/unreachable-commands
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-probe/Validate_repository_trust_pins/empty-script
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-probe/Validate_repository_trust_pins/skip-step
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-probe/Validate_repository_trust_pins/different-shell
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-probe/Validate_repository_trust_pins/early-success
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-probe/Validate_repository_trust_pins/fake-oracle-write
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-probe/Validate_repository_trust_pins/alternate-variable
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-probe/Validate_repository_trust_pins/shadow-command
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-probe/Build_trusted_probe_harness/quoted-commands
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-probe/Build_trusted_probe_harness/uninvoked-scriptblock
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-probe/Build_trusted_probe_harness/unreachable-commands
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-probe/Build_trusted_probe_harness/empty-script
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-probe/Build_trusted_probe_harness/skip-step
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-probe/Build_trusted_probe_harness/different-shell
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-probe/Build_trusted_probe_harness/early-success
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-probe/Build_trusted_probe_harness/fake-oracle-write
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-probe/Build_trusted_probe_harness/alternate-variable
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-probe/Build_trusted_probe_harness/shadow-command
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-probe/Build_trusted_probe_harness/different-directory
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-probe/Build_trusted_probe_harness/extra-action-parameters
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-probe/Probe_untrusted_candidate/fake-oracle-write
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-probe/Probe_untrusted_candidate/alternate-variable
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-probe/Probe_untrusted_candidate/shadow-command
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-probe/Probe_untrusted_candidate/different-directory
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-probe/Probe_untrusted_candidate/extra-action-parameters
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-probe/Probe_untrusted_candidate/quoted-commands
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-probe/Probe_untrusted_candidate/uninvoked-scriptblock
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-probe/Probe_untrusted_candidate/unreachable-commands
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-probe/Probe_untrusted_candidate/empty-script
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-probe/Probe_untrusted_candidate/skip-step
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-probe/Probe_untrusted_candidate/different-shell
+=== RUN   TestWorkflowScriptMutationsAreRejected/candidate-probe/Probe_untrusted_candidate/early-success
+=== RUN   TestWorkflowScriptMutationsAreRejected/selfhost/Validate_repository_trust_pins/uninvoked-scriptblock
+=== RUN   TestWorkflowScriptMutationsAreRejected/selfhost/Validate_repository_trust_pins/unreachable-commands
+=== RUN   TestWorkflowScriptMutationsAreRejected/selfhost/Validate_repository_trust_pins/empty-script
+=== RUN   TestWorkflowScriptMutationsAreRejected/selfhost/Validate_repository_trust_pins/skip-step
+=== RUN   TestWorkflowScriptMutationsAreRejected/selfhost/Validate_repository_trust_pins/different-shell
+=== RUN   TestWorkflowScriptMutationsAreRejected/selfhost/Validate_repository_trust_pins/early-success
+=== RUN   TestWorkflowScriptMutationsAreRejected/selfhost/Validate_repository_trust_pins/fake-oracle-write
+=== RUN   TestWorkflowScriptMutationsAreRejected/selfhost/Validate_repository_trust_pins/alternate-variable
+=== RUN   TestWorkflowScriptMutationsAreRejected/selfhost/Validate_repository_trust_pins/shadow-command
+=== RUN   TestWorkflowScriptMutationsAreRejected/selfhost/Validate_repository_trust_pins/different-directory
+=== RUN   TestWorkflowScriptMutationsAreRejected/selfhost/Validate_repository_trust_pins/extra-action-parameters
+=== RUN   TestWorkflowScriptMutationsAreRejected/selfhost/Validate_repository_trust_pins/quoted-commands
+=== RUN   TestWorkflowScriptMutationsAreRejected/selfhost/Build_trusted_verifier_and_seed/unreachable-commands
+=== RUN   TestWorkflowScriptMutationsAreRejected/selfhost/Build_trusted_verifier_and_seed/empty-script
+=== RUN   TestWorkflowScriptMutationsAreRejected/selfhost/Build_trusted_verifier_and_seed/skip-step
+=== RUN   TestWorkflowScriptMutationsAreRejected/selfhost/Build_trusted_verifier_and_seed/different-shell
+=== RUN   TestWorkflowScriptMutationsAreRejected/selfhost/Build_trusted_verifier_and_seed/early-success
+=== RUN   TestWorkflowScriptMutationsAreRejected/selfhost/Build_trusted_verifier_and_seed/fake-oracle-write
+=== RUN   TestWorkflowScriptMutationsAreRejected/selfhost/Build_trusted_verifier_and_seed/alternate-variable
+=== RUN   TestWorkflowScriptMutationsAreRejected/selfhost/Build_trusted_verifier_and_seed/shadow-command
+=== RUN   TestWorkflowScriptMutationsAreRejected/selfhost/Build_trusted_verifier_and_seed/different-directory
+=== RUN   TestWorkflowScriptMutationsAreRejected/selfhost/Build_trusted_verifier_and_seed/extra-action-parameters
+=== RUN   TestWorkflowScriptMutationsAreRejected/selfhost/Build_trusted_verifier_and_seed/quoted-commands
+=== RUN   TestWorkflowScriptMutationsAreRejected/selfhost/Build_trusted_verifier_and_seed/uninvoked-scriptblock
+=== RUN   TestWorkflowScriptMutationsAreRejected/selfhost/Verify_evidence_and_generate_release_metadata/shadow-command
+=== RUN   TestWorkflowScriptMutationsAreRejected/selfhost/Verify_evidence_and_generate_release_metadata/different-directory
+=== RUN   TestWorkflowScriptMutationsAreRejected/selfhost/Verify_evidence_and_generate_release_metadata/extra-action-parameters
+=== RUN   TestWorkflowScriptMutationsAreRejected/selfhost/Verify_evidence_and_generate_release_metadata/quoted-commands
+=== RUN   TestWorkflowScriptMutationsAreRejected/selfhost/Verify_evidence_and_generate_release_metadata/uninvoked-scriptblock
+=== RUN   TestWorkflowScriptMutationsAreRejected/selfhost/Verify_evidence_and_generate_release_metadata/unreachable-commands
+=== RUN   TestWorkflowScriptMutationsAreRejected/selfhost/Verify_evidence_and_generate_release_metadata/empty-script
+=== RUN   TestWorkflowScriptMutationsAreRejected/selfhost/Verify_evidence_and_generate_release_metadata/skip-step
+=== RUN   TestWorkflowScriptMutationsAreRejected/selfhost/Verify_evidence_and_generate_release_metadata/different-shell
+=== RUN   TestWorkflowScriptMutationsAreRejected/selfhost/Verify_evidence_and_generate_release_metadata/early-success
+=== RUN   TestWorkflowScriptMutationsAreRejected/selfhost/Verify_evidence_and_generate_release_metadata/fake-oracle-write
+=== RUN   TestWorkflowScriptMutationsAreRejected/selfhost/Verify_evidence_and_generate_release_metadata/alternate-variable
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Build/early-success
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Build/fake-oracle-write
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Build/alternate-variable
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Build/shadow-command
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Build/different-directory
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Build/extra-action-parameters
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Build/quoted-commands
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Build/uninvoked-scriptblock
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Build/unreachable-commands
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Build/empty-script
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Build/skip-step
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Build/different-shell
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Vet/skip-step
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Vet/different-shell
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Vet/early-success
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Vet/fake-oracle-write
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Vet/alternate-variable
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Vet/shadow-command
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Vet/different-directory
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Vet/extra-action-parameters
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Vet/quoted-commands
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Vet/uninvoked-scriptblock
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Vet/unreachable-commands
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Vet/empty-script
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Test/extra-action-parameters
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Test/quoted-commands
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Test/uninvoked-scriptblock
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Test/unreachable-commands
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Test/empty-script
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Test/skip-step
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Test/different-shell
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Test/early-success
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Test/fake-oracle-write
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Test/alternate-variable
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Test/shadow-command
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Test/different-directory
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Race/extra-action-parameters
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Race/quoted-commands
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Race/uninvoked-scriptblock
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Race/unreachable-commands
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Race/empty-script
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Race/skip-step
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Race/different-shell
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Race/early-success
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Race/fake-oracle-write
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Race/alternate-variable
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Race/shadow-command
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Race/different-directory
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Contract_fixtures/unreachable-commands
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Contract_fixtures/empty-script
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Contract_fixtures/skip-step
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Contract_fixtures/different-shell
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Contract_fixtures/early-success
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Contract_fixtures/fake-oracle-write
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Contract_fixtures/alternate-variable
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Contract_fixtures/shadow-command
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Contract_fixtures/different-directory
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Contract_fixtures/extra-action-parameters
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Contract_fixtures/quoted-commands
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Contract_fixtures/uninvoked-scriptblock
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Gates/quoted-commands
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Gates/uninvoked-scriptblock
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Gates/unreachable-commands
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Gates/empty-script
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Gates/skip-step
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Gates/different-shell
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Gates/early-success
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Gates/fake-oracle-write
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Gates/alternate-variable
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Gates/shadow-command
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Gates/different-directory
+=== RUN   TestWorkflowScriptMutationsAreRejected/test/Gates/extra-action-parameters
+--- PASS: TestWorkflowScriptMutationsAreRejected (1.45s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-build/Validate_candidate_pin/different-directory (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-build/Validate_candidate_pin/extra-action-parameters (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-build/Validate_candidate_pin/quoted-commands (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-build/Validate_candidate_pin/uninvoked-scriptblock (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-build/Validate_candidate_pin/unreachable-commands (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-build/Validate_candidate_pin/empty-script (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-build/Validate_candidate_pin/skip-step (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-build/Validate_candidate_pin/different-shell (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-build/Validate_candidate_pin/early-success (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-build/Validate_candidate_pin/fake-oracle-write (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-build/Validate_candidate_pin/alternate-variable (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-build/Validate_candidate_pin/shadow-command (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-build/Build_candidate_without_executing_it/different-shell (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-build/Build_candidate_without_executing_it/early-success (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-build/Build_candidate_without_executing_it/fake-oracle-write (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-build/Build_candidate_without_executing_it/alternate-variable (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-build/Build_candidate_without_executing_it/shadow-command (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-build/Build_candidate_without_executing_it/different-directory (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-build/Build_candidate_without_executing_it/extra-action-parameters (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-build/Build_candidate_without_executing_it/quoted-commands (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-build/Build_candidate_without_executing_it/uninvoked-scriptblock (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-build/Build_candidate_without_executing_it/unreachable-commands (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-build/Build_candidate_without_executing_it/empty-script (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-build/Build_candidate_without_executing_it/skip-step (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-probe/Validate_repository_trust_pins/different-directory (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-probe/Validate_repository_trust_pins/extra-action-parameters (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-probe/Validate_repository_trust_pins/quoted-commands (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-probe/Validate_repository_trust_pins/uninvoked-scriptblock (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-probe/Validate_repository_trust_pins/unreachable-commands (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-probe/Validate_repository_trust_pins/empty-script (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-probe/Validate_repository_trust_pins/skip-step (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-probe/Validate_repository_trust_pins/different-shell (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-probe/Validate_repository_trust_pins/early-success (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-probe/Validate_repository_trust_pins/fake-oracle-write (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-probe/Validate_repository_trust_pins/alternate-variable (0.02s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-probe/Validate_repository_trust_pins/shadow-command (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-probe/Build_trusted_probe_harness/quoted-commands (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-probe/Build_trusted_probe_harness/uninvoked-scriptblock (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-probe/Build_trusted_probe_harness/unreachable-commands (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-probe/Build_trusted_probe_harness/empty-script (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-probe/Build_trusted_probe_harness/skip-step (0.05s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-probe/Build_trusted_probe_harness/different-shell (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-probe/Build_trusted_probe_harness/early-success (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-probe/Build_trusted_probe_harness/fake-oracle-write (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-probe/Build_trusted_probe_harness/alternate-variable (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-probe/Build_trusted_probe_harness/shadow-command (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-probe/Build_trusted_probe_harness/different-directory (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-probe/Build_trusted_probe_harness/extra-action-parameters (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-probe/Probe_untrusted_candidate/fake-oracle-write (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-probe/Probe_untrusted_candidate/alternate-variable (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-probe/Probe_untrusted_candidate/shadow-command (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-probe/Probe_untrusted_candidate/different-directory (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-probe/Probe_untrusted_candidate/extra-action-parameters (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-probe/Probe_untrusted_candidate/quoted-commands (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-probe/Probe_untrusted_candidate/uninvoked-scriptblock (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-probe/Probe_untrusted_candidate/unreachable-commands (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-probe/Probe_untrusted_candidate/empty-script (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-probe/Probe_untrusted_candidate/skip-step (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-probe/Probe_untrusted_candidate/different-shell (0.02s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/candidate-probe/Probe_untrusted_candidate/early-success (0.02s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/selfhost/Validate_repository_trust_pins/uninvoked-scriptblock (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/selfhost/Validate_repository_trust_pins/unreachable-commands (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/selfhost/Validate_repository_trust_pins/empty-script (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/selfhost/Validate_repository_trust_pins/skip-step (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/selfhost/Validate_repository_trust_pins/different-shell (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/selfhost/Validate_repository_trust_pins/early-success (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/selfhost/Validate_repository_trust_pins/fake-oracle-write (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/selfhost/Validate_repository_trust_pins/alternate-variable (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/selfhost/Validate_repository_trust_pins/shadow-command (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/selfhost/Validate_repository_trust_pins/different-directory (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/selfhost/Validate_repository_trust_pins/extra-action-parameters (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/selfhost/Validate_repository_trust_pins/quoted-commands (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/selfhost/Build_trusted_verifier_and_seed/unreachable-commands (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/selfhost/Build_trusted_verifier_and_seed/empty-script (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/selfhost/Build_trusted_verifier_and_seed/skip-step (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/selfhost/Build_trusted_verifier_and_seed/different-shell (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/selfhost/Build_trusted_verifier_and_seed/early-success (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/selfhost/Build_trusted_verifier_and_seed/fake-oracle-write (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/selfhost/Build_trusted_verifier_and_seed/alternate-variable (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/selfhost/Build_trusted_verifier_and_seed/shadow-command (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/selfhost/Build_trusted_verifier_and_seed/different-directory (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/selfhost/Build_trusted_verifier_and_seed/extra-action-parameters (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/selfhost/Build_trusted_verifier_and_seed/quoted-commands (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/selfhost/Build_trusted_verifier_and_seed/uninvoked-scriptblock (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/selfhost/Verify_evidence_and_generate_release_metadata/shadow-command (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/selfhost/Verify_evidence_and_generate_release_metadata/different-directory (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/selfhost/Verify_evidence_and_generate_release_metadata/extra-action-parameters (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/selfhost/Verify_evidence_and_generate_release_metadata/quoted-commands (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/selfhost/Verify_evidence_and_generate_release_metadata/uninvoked-scriptblock (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/selfhost/Verify_evidence_and_generate_release_metadata/unreachable-commands (0.02s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/selfhost/Verify_evidence_and_generate_release_metadata/empty-script (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/selfhost/Verify_evidence_and_generate_release_metadata/skip-step (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/selfhost/Verify_evidence_and_generate_release_metadata/different-shell (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/selfhost/Verify_evidence_and_generate_release_metadata/early-success (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/selfhost/Verify_evidence_and_generate_release_metadata/fake-oracle-write (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/selfhost/Verify_evidence_and_generate_release_metadata/alternate-variable (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Build/early-success (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Build/fake-oracle-write (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Build/alternate-variable (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Build/shadow-command (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Build/different-directory (0.03s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Build/extra-action-parameters (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Build/quoted-commands (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Build/uninvoked-scriptblock (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Build/unreachable-commands (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Build/empty-script (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Build/skip-step (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Build/different-shell (0.03s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Vet/skip-step (0.03s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Vet/different-shell (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Vet/early-success (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Vet/fake-oracle-write (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Vet/alternate-variable (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Vet/shadow-command (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Vet/different-directory (0.03s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Vet/extra-action-parameters (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Vet/quoted-commands (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Vet/uninvoked-scriptblock (0.08s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Vet/unreachable-commands (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Vet/empty-script (0.02s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Test/extra-action-parameters (0.02s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Test/quoted-commands (0.02s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Test/uninvoked-scriptblock (0.02s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Test/unreachable-commands (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Test/empty-script (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Test/skip-step (0.05s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Test/different-shell (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Test/early-success (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Test/fake-oracle-write (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Test/alternate-variable (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Test/shadow-command (0.02s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Test/different-directory (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Race/extra-action-parameters (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Race/quoted-commands (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Race/uninvoked-scriptblock (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Race/unreachable-commands (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Race/empty-script (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Race/skip-step (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Race/different-shell (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Race/early-success (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Race/fake-oracle-write (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Race/alternate-variable (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Race/shadow-command (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Race/different-directory (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Contract_fixtures/unreachable-commands (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Contract_fixtures/empty-script (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Contract_fixtures/skip-step (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Contract_fixtures/different-shell (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Contract_fixtures/early-success (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Contract_fixtures/fake-oracle-write (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Contract_fixtures/alternate-variable (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Contract_fixtures/shadow-command (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Contract_fixtures/different-directory (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Contract_fixtures/extra-action-parameters (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Contract_fixtures/quoted-commands (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Contract_fixtures/uninvoked-scriptblock (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Gates/quoted-commands (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Gates/uninvoked-scriptblock (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Gates/unreachable-commands (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Gates/empty-script (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Gates/skip-step (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Gates/different-shell (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Gates/early-success (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Gates/fake-oracle-write (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Gates/alternate-variable (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Gates/shadow-command (0.01s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Gates/different-directory (0.00s)
+    --- PASS: TestWorkflowScriptMutationsAreRejected/test/Gates/extra-action-parameters (0.01s)
+=== RUN   TestWorkflowActionParametersAreLocked
+=== RUN   TestWorkflowActionParametersAreLocked/test/Checkout_source/persist-credentials/delete
+=== RUN   TestWorkflowActionParametersAreLocked/test/Checkout_source/persist-credentials/change
+=== RUN   TestWorkflowActionParametersAreLocked/test/Checkout_source/fetch-depth/delete
+=== RUN   TestWorkflowActionParametersAreLocked/test/Checkout_source/fetch-depth/change
+=== RUN   TestWorkflowActionParametersAreLocked/test/Setup_Go/cache/delete
+=== RUN   TestWorkflowActionParametersAreLocked/test/Setup_Go/cache/change
+=== RUN   TestWorkflowActionParametersAreLocked/test/Setup_Go/go-version/delete
+=== RUN   TestWorkflowActionParametersAreLocked/test/Setup_Go/go-version/change
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-build/Checkout_candidate/ref/delete
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-build/Checkout_candidate/ref/change
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-build/Checkout_candidate/path/delete
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-build/Checkout_candidate/path/change
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-build/Checkout_candidate/persist-credentials/delete
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-build/Checkout_candidate/persist-credentials/change
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-build/Setup_Go/cache/delete
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-build/Setup_Go/cache/change
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-build/Setup_Go/go-version/delete
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-build/Setup_Go/go-version/change
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-build/Upload_immutable_candidate_binary/name/delete
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-build/Upload_immutable_candidate_binary/name/change
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-build/Upload_immutable_candidate_binary/path/delete
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-build/Upload_immutable_candidate_binary/path/change
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-build/Upload_immutable_candidate_binary/if-no-files-found/delete
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-build/Upload_immutable_candidate_binary/if-no-files-found/change
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-probe/Checkout_trusted_verifier/path/delete
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-probe/Checkout_trusted_verifier/path/change
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-probe/Checkout_trusted_verifier/persist-credentials/delete
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-probe/Checkout_trusted_verifier/persist-credentials/change
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-probe/Checkout_trusted_verifier/ref/delete
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-probe/Checkout_trusted_verifier/ref/change
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-probe/Setup_Go/go-version/delete
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-probe/Setup_Go/go-version/change
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-probe/Setup_Go/cache/delete
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-probe/Setup_Go/cache/change
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-probe/Download_immutable_candidate_binary/path/delete
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-probe/Download_immutable_candidate_binary/path/change
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-probe/Download_immutable_candidate_binary/digest-mismatch/delete
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-probe/Download_immutable_candidate_binary/digest-mismatch/change
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-probe/Download_immutable_candidate_binary/name/delete
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-probe/Download_immutable_candidate_binary/name/change
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-probe/Upload_untrusted_probe_oracle/path/delete
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-probe/Upload_untrusted_probe_oracle/path/change
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-probe/Upload_untrusted_probe_oracle/if-no-files-found/delete
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-probe/Upload_untrusted_probe_oracle/if-no-files-found/change
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-probe/Upload_untrusted_probe_oracle/name/delete
+=== RUN   TestWorkflowActionParametersAreLocked/candidate-probe/Upload_untrusted_probe_oracle/name/change
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Checkout_trusted_verifier/persist-credentials/delete
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Checkout_trusted_verifier/persist-credentials/change
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Checkout_trusted_verifier/ref/delete
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Checkout_trusted_verifier/ref/change
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Checkout_trusted_verifier/path/delete
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Checkout_trusted_verifier/path/change
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Checkout_fixed_bootstrap_seed/ref/delete
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Checkout_fixed_bootstrap_seed/ref/change
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Checkout_fixed_bootstrap_seed/path/delete
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Checkout_fixed_bootstrap_seed/path/change
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Checkout_fixed_bootstrap_seed/persist-credentials/delete
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Checkout_fixed_bootstrap_seed/persist-credentials/change
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Checkout_candidate_metadata/ref/delete
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Checkout_candidate_metadata/ref/change
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Checkout_candidate_metadata/path/delete
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Checkout_candidate_metadata/path/change
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Checkout_candidate_metadata/persist-credentials/delete
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Checkout_candidate_metadata/persist-credentials/change
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Setup_Go/go-version/delete
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Setup_Go/go-version/change
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Setup_Go/cache/delete
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Setup_Go/cache/change
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Download_immutable_candidate_binary/path/delete
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Download_immutable_candidate_binary/path/change
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Download_immutable_candidate_binary/digest-mismatch/delete
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Download_immutable_candidate_binary/digest-mismatch/change
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Download_immutable_candidate_binary/name/delete
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Download_immutable_candidate_binary/name/change
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Download_untrusted_probe_oracle/name/delete
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Download_untrusted_probe_oracle/name/change
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Download_untrusted_probe_oracle/path/delete
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Download_untrusted_probe_oracle/path/change
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Download_untrusted_probe_oracle/digest-mismatch/delete
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Download_untrusted_probe_oracle/digest-mismatch/change
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Upload_verified_CI_artifact/if-no-files-found/delete
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Upload_verified_CI_artifact/if-no-files-found/change
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Upload_verified_CI_artifact/name/delete
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Upload_verified_CI_artifact/name/change
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Upload_verified_CI_artifact/path/delete
+=== RUN   TestWorkflowActionParametersAreLocked/selfhost/Upload_verified_CI_artifact/path/change
+--- PASS: TestWorkflowActionParametersAreLocked (0.56s)
+    --- PASS: TestWorkflowActionParametersAreLocked/test/Checkout_source/persist-credentials/delete (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/test/Checkout_source/persist-credentials/change (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/test/Checkout_source/fetch-depth/delete (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/test/Checkout_source/fetch-depth/change (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/test/Setup_Go/cache/delete (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/test/Setup_Go/cache/change (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/test/Setup_Go/go-version/delete (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/test/Setup_Go/go-version/change (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-build/Checkout_candidate/ref/delete (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-build/Checkout_candidate/ref/change (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-build/Checkout_candidate/path/delete (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-build/Checkout_candidate/path/change (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-build/Checkout_candidate/persist-credentials/delete (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-build/Checkout_candidate/persist-credentials/change (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-build/Setup_Go/cache/delete (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-build/Setup_Go/cache/change (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-build/Setup_Go/go-version/delete (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-build/Setup_Go/go-version/change (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-build/Upload_immutable_candidate_binary/name/delete (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-build/Upload_immutable_candidate_binary/name/change (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-build/Upload_immutable_candidate_binary/path/delete (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-build/Upload_immutable_candidate_binary/path/change (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-build/Upload_immutable_candidate_binary/if-no-files-found/delete (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-build/Upload_immutable_candidate_binary/if-no-files-found/change (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-probe/Checkout_trusted_verifier/path/delete (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-probe/Checkout_trusted_verifier/path/change (0.02s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-probe/Checkout_trusted_verifier/persist-credentials/delete (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-probe/Checkout_trusted_verifier/persist-credentials/change (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-probe/Checkout_trusted_verifier/ref/delete (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-probe/Checkout_trusted_verifier/ref/change (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-probe/Setup_Go/go-version/delete (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-probe/Setup_Go/go-version/change (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-probe/Setup_Go/cache/delete (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-probe/Setup_Go/cache/change (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-probe/Download_immutable_candidate_binary/path/delete (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-probe/Download_immutable_candidate_binary/path/change (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-probe/Download_immutable_candidate_binary/digest-mismatch/delete (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-probe/Download_immutable_candidate_binary/digest-mismatch/change (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-probe/Download_immutable_candidate_binary/name/delete (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-probe/Download_immutable_candidate_binary/name/change (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-probe/Upload_untrusted_probe_oracle/path/delete (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-probe/Upload_untrusted_probe_oracle/path/change (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-probe/Upload_untrusted_probe_oracle/if-no-files-found/delete (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-probe/Upload_untrusted_probe_oracle/if-no-files-found/change (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-probe/Upload_untrusted_probe_oracle/name/delete (0.04s)
+    --- PASS: TestWorkflowActionParametersAreLocked/candidate-probe/Upload_untrusted_probe_oracle/name/change (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Checkout_trusted_verifier/persist-credentials/delete (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Checkout_trusted_verifier/persist-credentials/change (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Checkout_trusted_verifier/ref/delete (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Checkout_trusted_verifier/ref/change (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Checkout_trusted_verifier/path/delete (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Checkout_trusted_verifier/path/change (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Checkout_fixed_bootstrap_seed/ref/delete (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Checkout_fixed_bootstrap_seed/ref/change (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Checkout_fixed_bootstrap_seed/path/delete (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Checkout_fixed_bootstrap_seed/path/change (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Checkout_fixed_bootstrap_seed/persist-credentials/delete (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Checkout_fixed_bootstrap_seed/persist-credentials/change (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Checkout_candidate_metadata/ref/delete (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Checkout_candidate_metadata/ref/change (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Checkout_candidate_metadata/path/delete (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Checkout_candidate_metadata/path/change (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Checkout_candidate_metadata/persist-credentials/delete (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Checkout_candidate_metadata/persist-credentials/change (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Setup_Go/go-version/delete (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Setup_Go/go-version/change (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Setup_Go/cache/delete (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Setup_Go/cache/change (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Download_immutable_candidate_binary/path/delete (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Download_immutable_candidate_binary/path/change (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Download_immutable_candidate_binary/digest-mismatch/delete (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Download_immutable_candidate_binary/digest-mismatch/change (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Download_immutable_candidate_binary/name/delete (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Download_immutable_candidate_binary/name/change (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Download_untrusted_probe_oracle/name/delete (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Download_untrusted_probe_oracle/name/change (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Download_untrusted_probe_oracle/path/delete (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Download_untrusted_probe_oracle/path/change (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Download_untrusted_probe_oracle/digest-mismatch/delete (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Download_untrusted_probe_oracle/digest-mismatch/change (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Upload_verified_CI_artifact/if-no-files-found/delete (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Upload_verified_CI_artifact/if-no-files-found/change (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Upload_verified_CI_artifact/name/delete (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Upload_verified_CI_artifact/name/change (0.01s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Upload_verified_CI_artifact/path/delete (0.00s)
+    --- PASS: TestWorkflowActionParametersAreLocked/selfhost/Upload_verified_CI_artifact/path/change (0.01s)
+=== RUN   TestWorkflowStructureMutationsAreRejected
+=== RUN   TestWorkflowStructureMutationsAreRejected/extra-permission
+=== RUN   TestWorkflowStructureMutationsAreRejected/floating-toolchain
+=== RUN   TestWorkflowStructureMutationsAreRejected/automatic-toolchain
+=== RUN   TestWorkflowStructureMutationsAreRejected/cgo-enabled
+=== RUN   TestWorkflowStructureMutationsAreRejected/extra-environment
+=== RUN   TestWorkflowStructureMutationsAreRejected/wrong-push-branch
+=== RUN   TestWorkflowStructureMutationsAreRejected/missing-job
+=== RUN   TestWorkflowStructureMutationsAreRejected/write-permission
+=== RUN   TestWorkflowStructureMutationsAreRejected/extra-job
+=== RUN   TestWorkflowStructureMutationsAreRejected/missing-input
+=== RUN   TestWorkflowStructureMutationsAreRejected/inputs/candidate_commit/optional
+=== RUN   TestWorkflowStructureMutationsAreRejected/inputs/candidate_commit/default
+=== RUN   TestWorkflowStructureMutationsAreRejected/inputs/candidate_commit/type
+=== RUN   TestWorkflowStructureMutationsAreRejected/inputs/verifier_commit/optional
+=== RUN   TestWorkflowStructureMutationsAreRejected/inputs/verifier_commit/default
+=== RUN   TestWorkflowStructureMutationsAreRejected/inputs/verifier_commit/type
+=== RUN   TestWorkflowStructureMutationsAreRejected/inputs/bootstrap_commit/optional
+=== RUN   TestWorkflowStructureMutationsAreRejected/inputs/bootstrap_commit/default
+=== RUN   TestWorkflowStructureMutationsAreRejected/inputs/bootstrap_commit/type
+=== RUN   TestWorkflowStructureMutationsAreRejected/inputs/bootstrap_manifest_sha256/optional
+=== RUN   TestWorkflowStructureMutationsAreRejected/inputs/bootstrap_manifest_sha256/default
+=== RUN   TestWorkflowStructureMutationsAreRejected/inputs/bootstrap_manifest_sha256/type
+=== RUN   TestWorkflowStructureMutationsAreRejected/inputs/expected_oracle_sha256/optional
+=== RUN   TestWorkflowStructureMutationsAreRejected/inputs/expected_oracle_sha256/default
+=== RUN   TestWorkflowStructureMutationsAreRejected/inputs/expected_oracle_sha256/type
+=== RUN   TestWorkflowStructureMutationsAreRejected/inputs/license_policy_sha256/optional
+=== RUN   TestWorkflowStructureMutationsAreRejected/inputs/license_policy_sha256/default
+=== RUN   TestWorkflowStructureMutationsAreRejected/inputs/license_policy_sha256/type
+=== RUN   TestWorkflowStructureMutationsAreRejected/inputs/noop_chain_sha256/optional
+=== RUN   TestWorkflowStructureMutationsAreRejected/inputs/noop_chain_sha256/default
+=== RUN   TestWorkflowStructureMutationsAreRejected/inputs/noop_chain_sha256/type
+=== RUN   TestWorkflowStructureMutationsAreRejected/inputs/executable_chain_sha256/optional
+=== RUN   TestWorkflowStructureMutationsAreRejected/inputs/executable_chain_sha256/default
+=== RUN   TestWorkflowStructureMutationsAreRejected/inputs/executable_chain_sha256/type
+=== RUN   TestWorkflowStructureMutationsAreRejected/candidate-build/skip-job
+=== RUN   TestWorkflowStructureMutationsAreRejected/candidate-build/wrong-dependency
+=== RUN   TestWorkflowStructureMutationsAreRejected/candidate-build/self-hosted-runner
+=== RUN   TestWorkflowStructureMutationsAreRejected/candidate-build/wrong-environment
+=== RUN   TestWorkflowStructureMutationsAreRejected/candidate-build/extra-step
+=== RUN   TestWorkflowStructureMutationsAreRejected/candidate-build/duplicate-name
+=== RUN   TestWorkflowStructureMutationsAreRejected/candidate-build/unnamed-step
+=== RUN   TestWorkflowStructureMutationsAreRejected/candidate-build/step-reordering
+=== RUN   TestWorkflowStructureMutationsAreRejected/candidate-build/one-platform
+=== RUN   TestWorkflowStructureMutationsAreRejected/candidate-build/extra-matrix-field
+=== RUN   TestWorkflowStructureMutationsAreRejected/candidate-build/fail-fast
+=== RUN   TestWorkflowStructureMutationsAreRejected/candidate-build/missing-step
+=== RUN   TestWorkflowStructureMutationsAreRejected/candidate-probe/skip-job
+=== RUN   TestWorkflowStructureMutationsAreRejected/candidate-probe/wrong-dependency
+=== RUN   TestWorkflowStructureMutationsAreRejected/candidate-probe/self-hosted-runner
+=== RUN   TestWorkflowStructureMutationsAreRejected/candidate-probe/wrong-environment
+=== RUN   TestWorkflowStructureMutationsAreRejected/candidate-probe/extra-step
+=== RUN   TestWorkflowStructureMutationsAreRejected/candidate-probe/duplicate-name
+=== RUN   TestWorkflowStructureMutationsAreRejected/candidate-probe/unnamed-step
+=== RUN   TestWorkflowStructureMutationsAreRejected/candidate-probe/step-reordering
+=== RUN   TestWorkflowStructureMutationsAreRejected/candidate-probe/one-platform
+=== RUN   TestWorkflowStructureMutationsAreRejected/candidate-probe/extra-matrix-field
+=== RUN   TestWorkflowStructureMutationsAreRejected/candidate-probe/fail-fast
+=== RUN   TestWorkflowStructureMutationsAreRejected/candidate-probe/missing-step
+=== RUN   TestWorkflowStructureMutationsAreRejected/selfhost/extra-step
+=== RUN   TestWorkflowStructureMutationsAreRejected/selfhost/duplicate-name
+=== RUN   TestWorkflowStructureMutationsAreRejected/selfhost/unnamed-step
+=== RUN   TestWorkflowStructureMutationsAreRejected/selfhost/step-reordering
+=== RUN   TestWorkflowStructureMutationsAreRejected/selfhost/one-platform
+=== RUN   TestWorkflowStructureMutationsAreRejected/selfhost/extra-matrix-field
+=== RUN   TestWorkflowStructureMutationsAreRejected/selfhost/fail-fast
+=== RUN   TestWorkflowStructureMutationsAreRejected/selfhost/missing-step
+=== RUN   TestWorkflowStructureMutationsAreRejected/selfhost/skip-job
+=== RUN   TestWorkflowStructureMutationsAreRejected/selfhost/wrong-dependency
+=== RUN   TestWorkflowStructureMutationsAreRejected/selfhost/self-hosted-runner
+=== RUN   TestWorkflowStructureMutationsAreRejected/selfhost/wrong-environment
+=== RUN   TestWorkflowStructureMutationsAreRejected/test/self-hosted-runner
+=== RUN   TestWorkflowStructureMutationsAreRejected/test/wrong-environment
+=== RUN   TestWorkflowStructureMutationsAreRejected/test/extra-step
+=== RUN   TestWorkflowStructureMutationsAreRejected/test/duplicate-name
+=== RUN   TestWorkflowStructureMutationsAreRejected/test/unnamed-step
+=== RUN   TestWorkflowStructureMutationsAreRejected/test/step-reordering
+=== RUN   TestWorkflowStructureMutationsAreRejected/test/one-platform
+=== RUN   TestWorkflowStructureMutationsAreRejected/test/extra-matrix-field
+=== RUN   TestWorkflowStructureMutationsAreRejected/test/fail-fast
+=== RUN   TestWorkflowStructureMutationsAreRejected/test/missing-step
+=== RUN   TestWorkflowStructureMutationsAreRejected/test/skip-job
+=== RUN   TestWorkflowStructureMutationsAreRejected/test/wrong-dependency
+--- PASS: TestWorkflowStructureMutationsAreRejected (0.52s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/extra-permission (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/floating-toolchain (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/automatic-toolchain (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/cgo-enabled (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/extra-environment (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/wrong-push-branch (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/missing-job (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/write-permission (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/extra-job (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/missing-input (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/inputs/candidate_commit/optional (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/inputs/candidate_commit/default (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/inputs/candidate_commit/type (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/inputs/verifier_commit/optional (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/inputs/verifier_commit/default (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/inputs/verifier_commit/type (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/inputs/bootstrap_commit/optional (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/inputs/bootstrap_commit/default (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/inputs/bootstrap_commit/type (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/inputs/bootstrap_manifest_sha256/optional (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/inputs/bootstrap_manifest_sha256/default (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/inputs/bootstrap_manifest_sha256/type (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/inputs/expected_oracle_sha256/optional (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/inputs/expected_oracle_sha256/default (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/inputs/expected_oracle_sha256/type (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/inputs/license_policy_sha256/optional (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/inputs/license_policy_sha256/default (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/inputs/license_policy_sha256/type (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/inputs/noop_chain_sha256/optional (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/inputs/noop_chain_sha256/default (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/inputs/noop_chain_sha256/type (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/inputs/executable_chain_sha256/optional (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/inputs/executable_chain_sha256/default (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/inputs/executable_chain_sha256/type (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/candidate-build/skip-job (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/candidate-build/wrong-dependency (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/candidate-build/self-hosted-runner (0.02s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/candidate-build/wrong-environment (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/candidate-build/extra-step (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/candidate-build/duplicate-name (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/candidate-build/unnamed-step (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/candidate-build/step-reordering (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/candidate-build/one-platform (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/candidate-build/extra-matrix-field (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/candidate-build/fail-fast (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/candidate-build/missing-step (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/candidate-probe/skip-job (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/candidate-probe/wrong-dependency (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/candidate-probe/self-hosted-runner (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/candidate-probe/wrong-environment (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/candidate-probe/extra-step (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/candidate-probe/duplicate-name (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/candidate-probe/unnamed-step (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/candidate-probe/step-reordering (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/candidate-probe/one-platform (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/candidate-probe/extra-matrix-field (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/candidate-probe/fail-fast (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/candidate-probe/missing-step (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/selfhost/extra-step (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/selfhost/duplicate-name (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/selfhost/unnamed-step (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/selfhost/step-reordering (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/selfhost/one-platform (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/selfhost/extra-matrix-field (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/selfhost/fail-fast (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/selfhost/missing-step (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/selfhost/skip-job (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/selfhost/wrong-dependency (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/selfhost/self-hosted-runner (0.02s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/selfhost/wrong-environment (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/test/self-hosted-runner (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/test/wrong-environment (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/test/extra-step (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/test/duplicate-name (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/test/unnamed-step (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/test/step-reordering (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/test/one-platform (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/test/extra-matrix-field (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/test/fail-fast (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/test/missing-step (0.00s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/test/skip-job (0.01s)
+    --- PASS: TestWorkflowStructureMutationsAreRejected/test/wrong-dependency (0.00s)
+=== RUN   TestWorkflowYAMLMutationsAreRejected
+=== RUN   TestWorkflowYAMLMutationsAreRejected/empty-run-with-action
+=== RUN   TestWorkflowYAMLMutationsAreRejected/null-run-with-action
+=== RUN   TestWorkflowYAMLMutationsAreRejected/unknown-field
+=== RUN   TestWorkflowYAMLMutationsAreRejected/trailing-document
+=== RUN   TestWorkflowYAMLMutationsAreRejected/empty-trailing-document
+=== RUN   TestWorkflowYAMLMutationsAreRejected/filtered-pull-request
+=== RUN   TestWorkflowYAMLMutationsAreRejected/missing-fail-fast
+=== RUN   TestWorkflowYAMLMutationsAreRejected/null-step-condition
+=== RUN   TestWorkflowYAMLMutationsAreRejected/duplicate-job
+=== RUN   TestWorkflowYAMLMutationsAreRejected/null-cgo
+=== RUN   TestWorkflowYAMLMutationsAreRejected/empty-shell-with-action
+=== RUN   TestWorkflowYAMLMutationsAreRejected/null-input-default
+=== RUN   TestWorkflowYAMLMutationsAreRejected/duplicate-step-field
+=== RUN   TestWorkflowYAMLMutationsAreRejected/missing-pull-request
+=== RUN   TestWorkflowYAMLMutationsAreRejected/anchored-permissions
+=== RUN   TestWorkflowYAMLMutationsAreRejected/null-directory-with-action
+--- PASS: TestWorkflowYAMLMutationsAreRejected (0.10s)
+    --- PASS: TestWorkflowYAMLMutationsAreRejected/empty-run-with-action (0.00s)
+    --- PASS: TestWorkflowYAMLMutationsAreRejected/null-run-with-action (0.00s)
+    --- PASS: TestWorkflowYAMLMutationsAreRejected/unknown-field (0.00s)
+    --- PASS: TestWorkflowYAMLMutationsAreRejected/trailing-document (0.00s)
+    --- PASS: TestWorkflowYAMLMutationsAreRejected/empty-trailing-document (0.00s)
+    --- PASS: TestWorkflowYAMLMutationsAreRejected/filtered-pull-request (0.01s)
+    --- PASS: TestWorkflowYAMLMutationsAreRejected/missing-fail-fast (0.00s)
+    --- PASS: TestWorkflowYAMLMutationsAreRejected/null-step-condition (0.01s)
+    --- PASS: TestWorkflowYAMLMutationsAreRejected/duplicate-job (0.00s)
+    --- PASS: TestWorkflowYAMLMutationsAreRejected/null-cgo (0.01s)
+    --- PASS: TestWorkflowYAMLMutationsAreRejected/empty-shell-with-action (0.01s)
+    --- PASS: TestWorkflowYAMLMutationsAreRejected/null-input-default (0.00s)
+    --- PASS: TestWorkflowYAMLMutationsAreRejected/duplicate-step-field (0.00s)
+    --- PASS: TestWorkflowYAMLMutationsAreRejected/missing-pull-request (0.00s)
+    --- PASS: TestWorkflowYAMLMutationsAreRejected/anchored-permissions (0.01s)
+    --- PASS: TestWorkflowYAMLMutationsAreRejected/null-directory-with-action (0.02s)
+=== RUN   TestSelfhostWorkflowUsesIndependentTrustedVerifier
+--- PASS: TestSelfhostWorkflowUsesIndependentTrustedVerifier (0.01s)
+=== RUN   TestWorkflowActionMutationsAreRejected
+=== RUN   TestWorkflowActionMutationsAreRejected/test/Checkout_source/role-swap
+=== RUN   TestWorkflowActionMutationsAreRejected/test/Checkout_source/unnamed-action
+=== RUN   TestWorkflowActionMutationsAreRejected/test/Checkout_source/conditional-action
+=== RUN   TestWorkflowActionMutationsAreRejected/test/Checkout_source/missing-uses
+=== RUN   TestWorkflowActionMutationsAreRejected/test/Checkout_source/changed-sha
+=== RUN   TestWorkflowActionMutationsAreRejected/test/Checkout_source/unknown-action-name
+=== RUN   TestWorkflowActionMutationsAreRejected/test/Checkout_source/action-with-shell
+=== RUN   TestWorkflowActionMutationsAreRejected/test/Checkout_source/action-with-directory
+=== RUN   TestWorkflowActionMutationsAreRejected/test/Checkout_source/missing-parameters
+=== RUN   TestWorkflowActionMutationsAreRejected/test/Checkout_source/extra-parameter
+=== RUN   TestWorkflowActionMutationsAreRejected/test/Checkout_source/run-replacement
+=== RUN   TestWorkflowActionMutationsAreRejected/test/Checkout_source/action-with-run
+=== RUN   TestWorkflowActionMutationsAreRejected/test/Checkout_source/foreign-action
+=== RUN   TestWorkflowActionMutationsAreRejected/test/Setup_Go/missing-parameters
+=== RUN   TestWorkflowActionMutationsAreRejected/test/Setup_Go/extra-parameter
+=== RUN   TestWorkflowActionMutationsAreRejected/test/Setup_Go/run-replacement
+=== RUN   TestWorkflowActionMutationsAreRejected/test/Setup_Go/action-with-run
+=== RUN   TestWorkflowActionMutationsAreRejected/test/Setup_Go/foreign-action
+=== RUN   TestWorkflowActionMutationsAreRejected/test/Setup_Go/role-swap
+=== RUN   TestWorkflowActionMutationsAreRejected/test/Setup_Go/unnamed-action
+=== RUN   TestWorkflowActionMutationsAreRejected/test/Setup_Go/conditional-action
+=== RUN   TestWorkflowActionMutationsAreRejected/test/Setup_Go/missing-uses
+=== RUN   TestWorkflowActionMutationsAreRejected/test/Setup_Go/changed-sha
+=== RUN   TestWorkflowActionMutationsAreRejected/test/Setup_Go/unknown-action-name
+=== RUN   TestWorkflowActionMutationsAreRejected/test/Setup_Go/action-with-shell
+=== RUN   TestWorkflowActionMutationsAreRejected/test/Setup_Go/action-with-directory
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Checkout_candidate/foreign-action
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Checkout_candidate/role-swap
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Checkout_candidate/unnamed-action
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Checkout_candidate/conditional-action
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Checkout_candidate/missing-uses
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Checkout_candidate/changed-sha
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Checkout_candidate/unknown-action-name
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Checkout_candidate/action-with-shell
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Checkout_candidate/action-with-directory
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Checkout_candidate/missing-parameters
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Checkout_candidate/extra-parameter
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Checkout_candidate/run-replacement
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Checkout_candidate/action-with-run
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Setup_Go/extra-parameter
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Setup_Go/run-replacement
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Setup_Go/action-with-run
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Setup_Go/foreign-action
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Setup_Go/role-swap
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Setup_Go/unnamed-action
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Setup_Go/conditional-action
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Setup_Go/missing-uses
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Setup_Go/changed-sha
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Setup_Go/unknown-action-name
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Setup_Go/action-with-shell
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Setup_Go/action-with-directory
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Setup_Go/missing-parameters
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Upload_immutable_candidate_binary/action-with-shell
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Upload_immutable_candidate_binary/action-with-directory
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Upload_immutable_candidate_binary/missing-parameters
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Upload_immutable_candidate_binary/extra-parameter
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Upload_immutable_candidate_binary/run-replacement
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Upload_immutable_candidate_binary/action-with-run
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Upload_immutable_candidate_binary/foreign-action
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Upload_immutable_candidate_binary/role-swap
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Upload_immutable_candidate_binary/unnamed-action
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Upload_immutable_candidate_binary/conditional-action
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Upload_immutable_candidate_binary/missing-uses
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Upload_immutable_candidate_binary/changed-sha
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-build/Upload_immutable_candidate_binary/unknown-action-name
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Checkout_trusted_verifier/run-replacement
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Checkout_trusted_verifier/action-with-run
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Checkout_trusted_verifier/foreign-action
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Checkout_trusted_verifier/role-swap
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Checkout_trusted_verifier/unnamed-action
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Checkout_trusted_verifier/conditional-action
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Checkout_trusted_verifier/missing-uses
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Checkout_trusted_verifier/changed-sha
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Checkout_trusted_verifier/unknown-action-name
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Checkout_trusted_verifier/action-with-shell
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Checkout_trusted_verifier/action-with-directory
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Checkout_trusted_verifier/missing-parameters
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Checkout_trusted_verifier/extra-parameter
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Setup_Go/unnamed-action
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Setup_Go/conditional-action
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Setup_Go/missing-uses
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Setup_Go/changed-sha
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Setup_Go/unknown-action-name
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Setup_Go/action-with-shell
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Setup_Go/action-with-directory
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Setup_Go/missing-parameters
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Setup_Go/extra-parameter
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Setup_Go/run-replacement
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Setup_Go/action-with-run
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Setup_Go/foreign-action
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Setup_Go/role-swap
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Download_immutable_candidate_binary/foreign-action
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Download_immutable_candidate_binary/role-swap
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Download_immutable_candidate_binary/unnamed-action
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Download_immutable_candidate_binary/conditional-action
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Download_immutable_candidate_binary/missing-uses
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Download_immutable_candidate_binary/changed-sha
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Download_immutable_candidate_binary/unknown-action-name
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Download_immutable_candidate_binary/action-with-shell
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Download_immutable_candidate_binary/action-with-directory
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Download_immutable_candidate_binary/missing-parameters
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Download_immutable_candidate_binary/extra-parameter
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Download_immutable_candidate_binary/run-replacement
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Download_immutable_candidate_binary/action-with-run
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Upload_untrusted_probe_oracle/changed-sha
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Upload_untrusted_probe_oracle/unknown-action-name
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Upload_untrusted_probe_oracle/action-with-shell
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Upload_untrusted_probe_oracle/action-with-directory
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Upload_untrusted_probe_oracle/missing-parameters
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Upload_untrusted_probe_oracle/extra-parameter
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Upload_untrusted_probe_oracle/run-replacement
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Upload_untrusted_probe_oracle/action-with-run
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Upload_untrusted_probe_oracle/foreign-action
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Upload_untrusted_probe_oracle/role-swap
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Upload_untrusted_probe_oracle/unnamed-action
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Upload_untrusted_probe_oracle/conditional-action
+=== RUN   TestWorkflowActionMutationsAreRejected/candidate-probe/Upload_untrusted_probe_oracle/missing-uses
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_trusted_verifier/run-replacement
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_trusted_verifier/action-with-run
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_trusted_verifier/foreign-action
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_trusted_verifier/role-swap
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_trusted_verifier/unnamed-action
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_trusted_verifier/conditional-action
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_trusted_verifier/missing-uses
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_trusted_verifier/changed-sha
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_trusted_verifier/unknown-action-name
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_trusted_verifier/action-with-shell
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_trusted_verifier/action-with-directory
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_trusted_verifier/missing-parameters
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_trusted_verifier/extra-parameter
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_fixed_bootstrap_seed/missing-parameters
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_fixed_bootstrap_seed/extra-parameter
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_fixed_bootstrap_seed/run-replacement
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_fixed_bootstrap_seed/action-with-run
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_fixed_bootstrap_seed/foreign-action
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_fixed_bootstrap_seed/role-swap
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_fixed_bootstrap_seed/unnamed-action
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_fixed_bootstrap_seed/conditional-action
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_fixed_bootstrap_seed/missing-uses
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_fixed_bootstrap_seed/changed-sha
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_fixed_bootstrap_seed/unknown-action-name
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_fixed_bootstrap_seed/action-with-shell
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_fixed_bootstrap_seed/action-with-directory
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_candidate_metadata/unnamed-action
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_candidate_metadata/conditional-action
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_candidate_metadata/missing-uses
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_candidate_metadata/changed-sha
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_candidate_metadata/unknown-action-name
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_candidate_metadata/action-with-shell
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_candidate_metadata/action-with-directory
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_candidate_metadata/missing-parameters
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_candidate_metadata/extra-parameter
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_candidate_metadata/run-replacement
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_candidate_metadata/action-with-run
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_candidate_metadata/foreign-action
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Checkout_candidate_metadata/role-swap
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Setup_Go/action-with-run
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Setup_Go/foreign-action
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Setup_Go/role-swap
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Setup_Go/unnamed-action
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Setup_Go/conditional-action
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Setup_Go/missing-uses
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Setup_Go/changed-sha
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Setup_Go/unknown-action-name
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Setup_Go/action-with-shell
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Setup_Go/action-with-directory
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Setup_Go/missing-parameters
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Setup_Go/extra-parameter
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Setup_Go/run-replacement
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Download_immutable_candidate_binary/action-with-shell
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Download_immutable_candidate_binary/action-with-directory
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Download_immutable_candidate_binary/missing-parameters
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Download_immutable_candidate_binary/extra-parameter
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Download_immutable_candidate_binary/run-replacement
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Download_immutable_candidate_binary/action-with-run
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Download_immutable_candidate_binary/foreign-action
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Download_immutable_candidate_binary/role-swap
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Download_immutable_candidate_binary/unnamed-action
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Download_immutable_candidate_binary/conditional-action
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Download_immutable_candidate_binary/missing-uses
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Download_immutable_candidate_binary/changed-sha
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Download_immutable_candidate_binary/unknown-action-name
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Download_untrusted_probe_oracle/missing-uses
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Download_untrusted_probe_oracle/changed-sha
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Download_untrusted_probe_oracle/unknown-action-name
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Download_untrusted_probe_oracle/action-with-shell
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Download_untrusted_probe_oracle/action-with-directory
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Download_untrusted_probe_oracle/missing-parameters
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Download_untrusted_probe_oracle/extra-parameter
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Download_untrusted_probe_oracle/run-replacement
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Download_untrusted_probe_oracle/action-with-run
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Download_untrusted_probe_oracle/foreign-action
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Download_untrusted_probe_oracle/role-swap
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Download_untrusted_probe_oracle/unnamed-action
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Download_untrusted_probe_oracle/conditional-action
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Upload_verified_CI_artifact/action-with-shell
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Upload_verified_CI_artifact/action-with-directory
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Upload_verified_CI_artifact/missing-parameters
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Upload_verified_CI_artifact/extra-parameter
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Upload_verified_CI_artifact/run-replacement
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Upload_verified_CI_artifact/action-with-run
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Upload_verified_CI_artifact/foreign-action
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Upload_verified_CI_artifact/role-swap
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Upload_verified_CI_artifact/unnamed-action
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Upload_verified_CI_artifact/conditional-action
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Upload_verified_CI_artifact/missing-uses
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Upload_verified_CI_artifact/changed-sha
+=== RUN   TestWorkflowActionMutationsAreRejected/selfhost/Upload_verified_CI_artifact/unknown-action-name
+--- PASS: TestWorkflowActionMutationsAreRejected (1.47s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/test/Checkout_source/role-swap (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/test/Checkout_source/unnamed-action (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/test/Checkout_source/conditional-action (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/test/Checkout_source/missing-uses (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/test/Checkout_source/changed-sha (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/test/Checkout_source/unknown-action-name (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/test/Checkout_source/action-with-shell (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/test/Checkout_source/action-with-directory (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/test/Checkout_source/missing-parameters (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/test/Checkout_source/extra-parameter (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/test/Checkout_source/run-replacement (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/test/Checkout_source/action-with-run (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/test/Checkout_source/foreign-action (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/test/Setup_Go/missing-parameters (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/test/Setup_Go/extra-parameter (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/test/Setup_Go/run-replacement (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/test/Setup_Go/action-with-run (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/test/Setup_Go/foreign-action (0.02s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/test/Setup_Go/role-swap (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/test/Setup_Go/unnamed-action (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/test/Setup_Go/conditional-action (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/test/Setup_Go/missing-uses (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/test/Setup_Go/changed-sha (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/test/Setup_Go/unknown-action-name (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/test/Setup_Go/action-with-shell (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/test/Setup_Go/action-with-directory (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Checkout_candidate/foreign-action (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Checkout_candidate/role-swap (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Checkout_candidate/unnamed-action (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Checkout_candidate/conditional-action (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Checkout_candidate/missing-uses (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Checkout_candidate/changed-sha (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Checkout_candidate/unknown-action-name (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Checkout_candidate/action-with-shell (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Checkout_candidate/action-with-directory (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Checkout_candidate/missing-parameters (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Checkout_candidate/extra-parameter (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Checkout_candidate/run-replacement (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Checkout_candidate/action-with-run (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Setup_Go/extra-parameter (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Setup_Go/run-replacement (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Setup_Go/action-with-run (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Setup_Go/foreign-action (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Setup_Go/role-swap (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Setup_Go/unnamed-action (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Setup_Go/conditional-action (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Setup_Go/missing-uses (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Setup_Go/changed-sha (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Setup_Go/unknown-action-name (0.32s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Setup_Go/action-with-shell (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Setup_Go/action-with-directory (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Setup_Go/missing-parameters (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Upload_immutable_candidate_binary/action-with-shell (0.05s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Upload_immutable_candidate_binary/action-with-directory (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Upload_immutable_candidate_binary/missing-parameters (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Upload_immutable_candidate_binary/extra-parameter (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Upload_immutable_candidate_binary/run-replacement (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Upload_immutable_candidate_binary/action-with-run (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Upload_immutable_candidate_binary/foreign-action (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Upload_immutable_candidate_binary/role-swap (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Upload_immutable_candidate_binary/unnamed-action (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Upload_immutable_candidate_binary/conditional-action (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Upload_immutable_candidate_binary/missing-uses (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Upload_immutable_candidate_binary/changed-sha (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-build/Upload_immutable_candidate_binary/unknown-action-name (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Checkout_trusted_verifier/run-replacement (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Checkout_trusted_verifier/action-with-run (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Checkout_trusted_verifier/foreign-action (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Checkout_trusted_verifier/role-swap (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Checkout_trusted_verifier/unnamed-action (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Checkout_trusted_verifier/conditional-action (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Checkout_trusted_verifier/missing-uses (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Checkout_trusted_verifier/changed-sha (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Checkout_trusted_verifier/unknown-action-name (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Checkout_trusted_verifier/action-with-shell (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Checkout_trusted_verifier/action-with-directory (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Checkout_trusted_verifier/missing-parameters (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Checkout_trusted_verifier/extra-parameter (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Setup_Go/unnamed-action (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Setup_Go/conditional-action (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Setup_Go/missing-uses (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Setup_Go/changed-sha (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Setup_Go/unknown-action-name (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Setup_Go/action-with-shell (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Setup_Go/action-with-directory (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Setup_Go/missing-parameters (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Setup_Go/extra-parameter (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Setup_Go/run-replacement (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Setup_Go/action-with-run (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Setup_Go/foreign-action (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Setup_Go/role-swap (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Download_immutable_candidate_binary/foreign-action (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Download_immutable_candidate_binary/role-swap (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Download_immutable_candidate_binary/unnamed-action (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Download_immutable_candidate_binary/conditional-action (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Download_immutable_candidate_binary/missing-uses (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Download_immutable_candidate_binary/changed-sha (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Download_immutable_candidate_binary/unknown-action-name (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Download_immutable_candidate_binary/action-with-shell (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Download_immutable_candidate_binary/action-with-directory (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Download_immutable_candidate_binary/missing-parameters (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Download_immutable_candidate_binary/extra-parameter (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Download_immutable_candidate_binary/run-replacement (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Download_immutable_candidate_binary/action-with-run (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Upload_untrusted_probe_oracle/changed-sha (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Upload_untrusted_probe_oracle/unknown-action-name (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Upload_untrusted_probe_oracle/action-with-shell (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Upload_untrusted_probe_oracle/action-with-directory (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Upload_untrusted_probe_oracle/missing-parameters (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Upload_untrusted_probe_oracle/extra-parameter (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Upload_untrusted_probe_oracle/run-replacement (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Upload_untrusted_probe_oracle/action-with-run (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Upload_untrusted_probe_oracle/foreign-action (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Upload_untrusted_probe_oracle/role-swap (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Upload_untrusted_probe_oracle/unnamed-action (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Upload_untrusted_probe_oracle/conditional-action (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/candidate-probe/Upload_untrusted_probe_oracle/missing-uses (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_trusted_verifier/run-replacement (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_trusted_verifier/action-with-run (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_trusted_verifier/foreign-action (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_trusted_verifier/role-swap (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_trusted_verifier/unnamed-action (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_trusted_verifier/conditional-action (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_trusted_verifier/missing-uses (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_trusted_verifier/changed-sha (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_trusted_verifier/unknown-action-name (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_trusted_verifier/action-with-shell (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_trusted_verifier/action-with-directory (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_trusted_verifier/missing-parameters (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_trusted_verifier/extra-parameter (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_fixed_bootstrap_seed/missing-parameters (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_fixed_bootstrap_seed/extra-parameter (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_fixed_bootstrap_seed/run-replacement (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_fixed_bootstrap_seed/action-with-run (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_fixed_bootstrap_seed/foreign-action (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_fixed_bootstrap_seed/role-swap (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_fixed_bootstrap_seed/unnamed-action (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_fixed_bootstrap_seed/conditional-action (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_fixed_bootstrap_seed/missing-uses (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_fixed_bootstrap_seed/changed-sha (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_fixed_bootstrap_seed/unknown-action-name (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_fixed_bootstrap_seed/action-with-shell (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_fixed_bootstrap_seed/action-with-directory (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_candidate_metadata/unnamed-action (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_candidate_metadata/conditional-action (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_candidate_metadata/missing-uses (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_candidate_metadata/changed-sha (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_candidate_metadata/unknown-action-name (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_candidate_metadata/action-with-shell (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_candidate_metadata/action-with-directory (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_candidate_metadata/missing-parameters (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_candidate_metadata/extra-parameter (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_candidate_metadata/run-replacement (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_candidate_metadata/action-with-run (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_candidate_metadata/foreign-action (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Checkout_candidate_metadata/role-swap (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Setup_Go/action-with-run (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Setup_Go/foreign-action (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Setup_Go/role-swap (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Setup_Go/unnamed-action (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Setup_Go/conditional-action (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Setup_Go/missing-uses (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Setup_Go/changed-sha (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Setup_Go/unknown-action-name (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Setup_Go/action-with-shell (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Setup_Go/action-with-directory (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Setup_Go/missing-parameters (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Setup_Go/extra-parameter (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Setup_Go/run-replacement (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Download_immutable_candidate_binary/action-with-shell (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Download_immutable_candidate_binary/action-with-directory (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Download_immutable_candidate_binary/missing-parameters (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Download_immutable_candidate_binary/extra-parameter (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Download_immutable_candidate_binary/run-replacement (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Download_immutable_candidate_binary/action-with-run (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Download_immutable_candidate_binary/foreign-action (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Download_immutable_candidate_binary/role-swap (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Download_immutable_candidate_binary/unnamed-action (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Download_immutable_candidate_binary/conditional-action (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Download_immutable_candidate_binary/missing-uses (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Download_immutable_candidate_binary/changed-sha (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Download_immutable_candidate_binary/unknown-action-name (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Download_untrusted_probe_oracle/missing-uses (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Download_untrusted_probe_oracle/changed-sha (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Download_untrusted_probe_oracle/unknown-action-name (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Download_untrusted_probe_oracle/action-with-shell (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Download_untrusted_probe_oracle/action-with-directory (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Download_untrusted_probe_oracle/missing-parameters (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Download_untrusted_probe_oracle/extra-parameter (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Download_untrusted_probe_oracle/run-replacement (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Download_untrusted_probe_oracle/action-with-run (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Download_untrusted_probe_oracle/foreign-action (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Download_untrusted_probe_oracle/role-swap (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Download_untrusted_probe_oracle/unnamed-action (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Download_untrusted_probe_oracle/conditional-action (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Upload_verified_CI_artifact/action-with-shell (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Upload_verified_CI_artifact/action-with-directory (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Upload_verified_CI_artifact/missing-parameters (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Upload_verified_CI_artifact/extra-parameter (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Upload_verified_CI_artifact/run-replacement (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Upload_verified_CI_artifact/action-with-run (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Upload_verified_CI_artifact/foreign-action (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Upload_verified_CI_artifact/role-swap (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Upload_verified_CI_artifact/unnamed-action (0.01s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Upload_verified_CI_artifact/conditional-action (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Upload_verified_CI_artifact/missing-uses (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Upload_verified_CI_artifact/changed-sha (0.00s)
+    --- PASS: TestWorkflowActionMutationsAreRejected/selfhost/Upload_verified_CI_artifact/unknown-action-name (0.00s)
+=== RUN   TestWorkflowScriptsRejectCommentedCommands
+=== RUN   TestWorkflowScriptsRejectCommentedCommands/candidate-build/Validate_candidate_pin
+=== RUN   TestWorkflowScriptsRejectCommentedCommands/candidate-build/Build_candidate_without_executing_it
+=== RUN   TestWorkflowScriptsRejectCommentedCommands/candidate-probe/Validate_repository_trust_pins
+=== RUN   TestWorkflowScriptsRejectCommentedCommands/candidate-probe/Build_trusted_probe_harness
+=== RUN   TestWorkflowScriptsRejectCommentedCommands/candidate-probe/Probe_untrusted_candidate
+=== RUN   TestWorkflowScriptsRejectCommentedCommands/selfhost/Validate_repository_trust_pins
+=== RUN   TestWorkflowScriptsRejectCommentedCommands/selfhost/Build_trusted_verifier_and_seed
+=== RUN   TestWorkflowScriptsRejectCommentedCommands/selfhost/Verify_evidence_and_generate_release_metadata
+=== RUN   TestWorkflowScriptsRejectCommentedCommands/test/Build
+=== RUN   TestWorkflowScriptsRejectCommentedCommands/test/Vet
+=== RUN   TestWorkflowScriptsRejectCommentedCommands/test/Test
+=== RUN   TestWorkflowScriptsRejectCommentedCommands/test/Race
+=== RUN   TestWorkflowScriptsRejectCommentedCommands/test/Contract_fixtures
+=== RUN   TestWorkflowScriptsRejectCommentedCommands/test/Gates
+--- PASS: TestWorkflowScriptsRejectCommentedCommands (0.07s)
+    --- PASS: TestWorkflowScriptsRejectCommentedCommands/candidate-build/Validate_candidate_pin (0.00s)
+    --- PASS: TestWorkflowScriptsRejectCommentedCommands/candidate-build/Build_candidate_without_executing_it (0.01s)
+    --- PASS: TestWorkflowScriptsRejectCommentedCommands/candidate-probe/Validate_repository_trust_pins (0.00s)
+    --- PASS: TestWorkflowScriptsRejectCommentedCommands/candidate-probe/Build_trusted_probe_harness (0.00s)
+    --- PASS: TestWorkflowScriptsRejectCommentedCommands/candidate-probe/Probe_untrusted_candidate (0.01s)
+    --- PASS: TestWorkflowScriptsRejectCommentedCommands/selfhost/Validate_repository_trust_pins (0.00s)
+    --- PASS: TestWorkflowScriptsRejectCommentedCommands/selfhost/Build_trusted_verifier_and_seed (0.00s)
+    --- PASS: TestWorkflowScriptsRejectCommentedCommands/selfhost/Verify_evidence_and_generate_release_metadata (0.00s)
+    --- PASS: TestWorkflowScriptsRejectCommentedCommands/test/Build (0.01s)
+    --- PASS: TestWorkflowScriptsRejectCommentedCommands/test/Vet (0.00s)
+    --- PASS: TestWorkflowScriptsRejectCommentedCommands/test/Test (0.00s)
+    --- PASS: TestWorkflowScriptsRejectCommentedCommands/test/Race (0.00s)
+    --- PASS: TestWorkflowScriptsRejectCommentedCommands/test/Contract_fixtures (0.00s)
+    --- PASS: TestWorkflowScriptsRejectCommentedCommands/test/Gates (0.00s)
+PASS
+ok  	github.com/larsonzh/prfrail/internal/release	5.537s

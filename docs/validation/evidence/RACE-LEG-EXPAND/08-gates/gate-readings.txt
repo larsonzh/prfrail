@@ -1,0 +1,28 @@
+# P49 RACE-LEG-EXPAND ⑨ 门禁读数（gate-readings）
+
+采集时点：2026-11-02，HEAD = `81dd49f`，工作区改动集已精确暂存（39 条路径，`git add` 按报告围栏清单）。
+
+## 三作用域
+
+| 作用域 | TOTAL_FAIL | 关键判定摘录 |
+|---|---|---|
+| index | **0** | G5(d) 38 path(s) declared (scope=index), addMode=explicit；G6-4 no expiring literal (scanned 710)；G7-f 2 changed sixstage fence(s) complete；G8-b 1 pack(s) self-consistent；base gofmt/build/vet/test 全绿（ok=15 FAIL=0） |
+| tree | **0** | G3(a) 对称全 OK；G7-f 2 changed sixstage fence(s) complete；G8-b 1 pack(s) self-consistent；base 四腿全绿（ok=15 FAIL=0） |
+| ci | **0** | GATE REPORT scope=ci 全绿；base 四腿全绿（ok=15 FAIL=0） |
+
+## SELFTEST
+
+`SELFTEST: PASS 697/697`
+
+## base 三腿（各作用域内均执行）
+
+- `gofmt -l .`：空
+- `go build ./...`：exit 0
+- `go vet ./...`：exit 0
+- `go test ./...`：ok=15 FAIL=0
+
+## 附加校验（④ 阶段）
+
+- YAML 语法：`go run .vscode/scripts/yamlcheck.go .github/workflows/ci.yml` → `PASS (yaml parse ok, 16432 bytes)`
+- `ci.yml` diff：单行改动（`1 1` numstat），编码无 BOM + 纯 LF
+- VM 真实 `-race`：四新包全绿（console 20.410s / gates 3.384s / guard 3.043s / tickets 7.420s，rc=0）

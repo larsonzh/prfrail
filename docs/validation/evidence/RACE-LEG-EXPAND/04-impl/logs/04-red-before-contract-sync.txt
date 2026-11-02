@@ -1,0 +1,17 @@
+--- FAIL: TestWorkflowScriptMutationsAreRejected (0.01s)
+    workflow_mutation_test.go:43: baseline workflow: script step "test/Race" differs from the reviewed body: SHA-256=825bacc38be4c258235498b25863b5da06a21cf5c3f046c74df390f43a50abc9, want ff4826f2103a2457cd306662f2542e54d809546deb1f804964b63f2148185dd5
+--- FAIL: TestWorkflowActionParametersAreLocked (0.01s)
+    workflow_mutation_test.go:79: baseline workflow: script step "test/Race" differs from the reviewed body: SHA-256=825bacc38be4c258235498b25863b5da06a21cf5c3f046c74df390f43a50abc9, want ff4826f2103a2457cd306662f2542e54d809546deb1f804964b63f2148185dd5
+--- FAIL: TestWorkflowStructureMutationsAreRejected (0.00s)
+    workflow_mutation_test.go:106: baseline workflow: script step "test/Race" differs from the reviewed body: SHA-256=825bacc38be4c258235498b25863b5da06a21cf5c3f046c74df390f43a50abc9, want ff4826f2103a2457cd306662f2542e54d809546deb1f804964b63f2148185dd5
+--- FAIL: TestWorkflowYAMLMutationsAreRejected (0.00s)
+    workflow_mutation_test.go:171: baseline workflow: script step "test/Race" differs from the reviewed body: SHA-256=825bacc38be4c258235498b25863b5da06a21cf5c3f046c74df390f43a50abc9, want ff4826f2103a2457cd306662f2542e54d809546deb1f804964b63f2148185dd5
+--- FAIL: TestSelfhostWorkflowUsesIndependentTrustedVerifier (0.01s)
+    workflow_test.go:75: script step "test/Race" differs from the reviewed body: SHA-256=825bacc38be4c258235498b25863b5da06a21cf5c3f046c74df390f43a50abc9, want ff4826f2103a2457cd306662f2542e54d809546deb1f804964b63f2148185dd5
+--- FAIL: TestWorkflowActionMutationsAreRejected (0.01s)
+    workflow_test.go:396: script step "test/Race" differs from the reviewed body: SHA-256=825bacc38be4c258235498b25863b5da06a21cf5c3f046c74df390f43a50abc9, want ff4826f2103a2457cd306662f2542e54d809546deb1f804964b63f2148185dd5
+--- FAIL: TestWorkflowScriptsRejectCommentedCommands (0.01s)
+    workflow_test.go:462: script step "test/Race" differs from the reviewed body: SHA-256=825bacc38be4c258235498b25863b5da06a21cf5c3f046c74df390f43a50abc9, want ff4826f2103a2457cd306662f2542e54d809546deb1f804964b63f2148185dd5
+FAIL
+FAIL	github.com/larsonzh/prfrail/internal/release	6.528s
+FAIL

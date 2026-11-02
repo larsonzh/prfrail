@@ -79,6 +79,7 @@
 | P46 STRATEGIC-REVIEW-2026-11-02 | ✅ 已完成 | P45 | L | 2026-11-02 | docs/validation/strategic-review-2026-11-02{,_EN}.md |
 | P47 GOVERNANCE-BASELINE-VERIFY | ✅ 已完成 | P46 | M | 2026-11-02 | docs/validation/governance-baseline-verify{,_EN}.md；补登记：OB-133 至 OB-136 |
 | P48 DR13-FIX-D3 | ✅ 已完成 | DR13-FIX | S | 2026-11-02 | docs/validation/dr13-fix-d3{,_EN}.md（停于 ⑩ 等授权） |
+| P49 RACE-LEG-EXPAND | ✅ 已完成 | P48 | M | 2026-11-02 | docs/validation/race-leg-expand{,_EN}.md（停于 ⑩ 等授权） |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -1483,6 +1484,27 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | R / D 基线 | R = 0、D = 0（不继承上片） |
 | 临时件落点声明 | 本片临时目录 = `tmp/DR13-FIX-D3/`（⑧c 前只增不删） |
 | 完成记录 | 报告对：`docs/validation/dr13-fix-d3{,_EN}.md`；审查链 ⑤/⑥/⑦ 全 PASS；红测首跑红、修复后 6/6 绿；三作用域 TOTAL_FAIL=0、SELFTEST 697/697；停于 ⑩ 等授权，未提交 |
+
+### P49 — `RACE-LEG-EXPAND`（CI Race 腿扩包 · 层 1 第 2 项）· ✅ 已完成
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `RACE-LEG-EXPAND`（基础设施类；准则 v1.60） |
+| 状态 | ✅ **已完成**（2026-11-02；停于 ⑩ 等授权，未提交） |
+| 目标 | 把 CI 的 Race 腿（`CGO_ENABLED=1 go test -race`）从 `internal/adapters`、`internal/chain` 扩包到 `internal/console`、`internal/gates`、`internal/guard`、`internal/tickets`（共六个包） |
+| 依赖 | P48 闭环（`81dd49f`）；R-03 裁定（独立立项，层 1 治理收尾） |
+| 规模 | M |
+| 步骤 | 步骤 0 → ① 架构（V4 Pro）→ ③ 测试先行 → ② 实现 → ④ 门禁 → ⑤ 预审 → ⑥ 扫描 → ⑦ 终审 → ⑧ 文档 → ⑨ 验证 → ⑧c → ⑩ 停点 |
+| 现状缺口 | Race 腿只覆盖 `internal/adapters` 与 `internal/chain`；`console`/`gates`/`guard`/`tickets` 四包并发腿未过竞态检测（p45 候选登记） |
+| 交付物 | 报告对 `docs/validation/race-leg-expand{,_EN}.md`；证据包 `docs/validation/evidence/RACE-LEG-EXPAND/`（含 `00-briefing.md`）；执行自由度清单；文档回写（`ARCHITECTURE` / `DEV_PLAN`） |
+| 验收证据 | ③ 先行断言证明当前 CI 未覆盖四包 Race；`ci.yml` 修改后本地跑通扩包后 race 测试；YAML 语法检查通过；`go build` / `go vet` / `go test ./...` 全绿；三作用域 TOTAL_FAIL=0 且 SELFTEST 697/697 |
+| 边界 | 仅改 `.github/workflows/ci.yml` 的 Race 腿目标包；不删除任何既有 CI 步骤；不改生产代码；不推 gitee；停 ⑩ 等授权 |
+| 分级 | `[SLICE]`（基础设施类） |
+| 探针额度 | 无 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/RACE-LEG-EXPAND/freedom-list.md` |
+| R / D 基线 | R = 1、D = 2（R 记 ② r2 契约摘要同步整改；D 记 ① 检索遗漏与主控环境预检盲区） |
+| 临时件落点声明 | 本片临时目录 = `tmp/RACE-LEG-EXPAND/`（⑧c 前只增不删） |
+| 完成记录 | 报告对：`docs/validation/race-leg-expand{,_EN}.md`；审查链 ⑤ PASS WITH FIXES / ⑥ PASS WITH FINDINGS / ⑦ r1 PASS WITH FIXES → r2 PASS；红基线 exit 1 → 翻转 exit 0 → VM 真实 `-race` 全绿；三作用域 TOTAL_FAIL=0、SELFTEST 697/697；停于 ⑩ 等授权，未提交 |
 
 ## 已知缺陷（后续切片前处理）
 

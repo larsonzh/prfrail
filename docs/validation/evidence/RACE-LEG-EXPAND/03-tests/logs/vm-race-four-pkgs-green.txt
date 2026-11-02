@@ -1,0 +1,5 @@
+# P49 VM real -race run (evidence, pulled from Ubuntu VM 10.0.0.199)
+# host: LZUbuntuLTS (Linux 6.8.0-85-generic x86_64, Ubuntu 24.04)\n# go version: go1.22.12 linux/amd64 (installed from official tarball, sha256 verified)\n# gcc: gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\n# repo HEAD: 81dd49f (prfrail, clean working tree)\n# command: CGO_ENABLED=1 go test -race -count=1 ./internal/console/... ./internal/gates/... ./internal/guard/... ./internal/tickets/...\n# run window: 2026-11-02T04:16:48Z - 2026-11-02T04:17:38Z, rc=0\n# verdict: ALL GREEN, no data race detected\n# ---- raw go test output ----\nok  	github.com/larsonzh/prfrail/internal/console	20.410s
+ok  	github.com/larsonzh/prfrail/internal/gates	3.384s
+ok  	github.com/larsonzh/prfrail/internal/guard	3.043s
+ok  	github.com/larsonzh/prfrail/internal/tickets	7.420s

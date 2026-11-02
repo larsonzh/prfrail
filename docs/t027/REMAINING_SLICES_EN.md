@@ -79,6 +79,7 @@
 | P46 STRATEGIC-REVIEW-2026-11-02 | ✅ Completed | P45 | L | 2026-11-02 | docs/validation/strategic-review-2026-11-02{,_EN}.md |
 | P47 GOVERNANCE-BASELINE-VERIFY | ✅ Completed | P46 | M | 2026-11-02 | docs/validation/governance-baseline-verify{,_EN}.md; backfill: OB-133 to OB-136 |
 | P48 DR13-FIX-D3 | ✅ Completed | DR13-FIX | S | 2026-11-02 | docs/validation/dr13-fix-d3{,_EN}.md (stopped at 10 for authorisation) |
+| P49 RACE-LEG-EXPAND | ✅ Completed | P48 | M | 2026-11-02 | docs/validation/race-leg-expand{,_EN}.md (stopped at 10 for authorisation) |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1470,6 +1471,27 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | R / D baseline | R = 0, D = 0 (not inherited) |
 | Temp artefact location | `tmp/DR13-FIX-D3/` (append-only until 8c) |
 | Completion record | Report pair: `docs/validation/dr13-fix-d3{,_EN}.md`; review chain ⑤/⑥/⑦ all PASS; red test red first, 6/6 green after the fix; three scopes TOTAL_FAIL=0, SELFTEST 697/697; stopped at 10 for authorisation, uncommitted |
+
+### P49 — `RACE-LEG-EXPAND` (CI Race leg expansion; layer 1, item 2) · ✅ Completed
+
+| Field | Content |
+|---|---|
+| Identity | `RACE-LEG-EXPAND` (infrastructure slice; directive v1.60) |
+| Status | ✅ **Completed** (2026-11-02; stopped at 10 for authorisation, uncommitted) |
+| Goal | Expand the CI Race leg (`CGO_ENABLED=1 go test -race`) from `internal/adapters` and `internal/chain` to `internal/console`, `internal/gates`, `internal/guard` and `internal/tickets` (six packages in total) |
+| Depends on | P48 closed (`81dd49f`); R-03 ruling (standalone slice, layer-1 governance wrap-up) |
+| Size | M |
+| Steps | Step 0 → 1 architecture (V4 Pro) → 3 test first → 2 implementation → 4 gates → 5 pre-review → 6 scan → 7 final review → 8 docs → 9 validation → 8c → 10 stop point |
+| Current gap | The Race leg only covers `internal/adapters` and `internal/chain`; the concurrency legs of `console`/`gates`/`guard`/`tickets` have never passed the race detector (P45 candidate registration) |
+| Deliverables | Report pair `docs/validation/race-leg-expand{,_EN}.md`; evidence pack `docs/validation/evidence/RACE-LEG-EXPAND/` (including `00-briefing.md`); freedom list; doc backfills (`ARCHITECTURE` / `DEV_PLAN`) |
+| Acceptance evidence | Test-first assertion proving the current CI does not race-cover the four packages; after the `ci.yml` change, the expanded race tests pass locally; YAML syntax check passes; `go build` / `go vet` / `go test ./...` all green; three scopes TOTAL_FAIL=0 and SELFTEST 697/697 |
+| Boundaries | Only the Race leg package list of `.github/workflows/ci.yml`; delete no existing CI step; no production code change; no gitee push; stop at 10 for authorisation |
+| Tier | `[SLICE]` (infrastructure) |
+| Probe budget | None |
+| Freedom list path | `docs/validation/evidence/RACE-LEG-EXPAND/freedom-list.md` |
+| R / D baseline | R = 1, D = 2 (R counts the step-2 r2 contract-digest remediation; D counts the step-1 retrieval miss and the main controller environment pre-check blind spot) |
+| Temp artefact location | `tmp/RACE-LEG-EXPAND/` (append-only until 8c) |
+| Completion record | Report pair: `docs/validation/race-leg-expand{,_EN}.md`; review chain 5 PASS WITH FIXES / 6 PASS WITH FINDINGS / 7 r1 PASS WITH FIXES → r2 PASS; red baseline exit 1 → flip exit 0 → real `-race` green on the VM; three scopes TOTAL_FAIL=0, SELFTEST 697/697; stopped at 10 for authorisation, uncommitted |
 
 ## Known defects (to be handled before later slices)
 

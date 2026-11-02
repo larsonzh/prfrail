@@ -36,6 +36,8 @@ SessionBridge `silent`/`visible`/`auto` 均不是 AgentRunner：silent 用于无
 
 AI 需要人工输入时，AgentRunner 或辅助 adapter 只接收结构化 `operator-action-required` 并交给 chain；chain 持久化交互请求并进入 `WAITING_FOR_OPERATOR`，console 从控制 API 展示待办和允许响应。操作员响应经 chain 校验主体、run/task/attempt、workspace/session、上下文摘要和权限后，写入可重放记录；需要人工写入时转入既有 handoff。恢复 CLI Agent 前重新验证原会话与进程已知状态；无法证明时创建新 attempt。SessionBridge 的 `@sbr-review` 只可用于独立诊断或人工测试。
 
+测试设施：六个核心内部包（adapters/chain/console/gates/guard/tickets）的测试全部纳入 CI Ubuntu Race 腿（`CGO_ENABLED=1 go test -race -count=1`）竞态检测；Windows 腿跳过 Race 步骤，不受 cgo 影响。
+
 ## 2. 所有权与依赖契约
 
 | 模块 | 唯一责任/输出 | 禁止事项 | 首批验证 |

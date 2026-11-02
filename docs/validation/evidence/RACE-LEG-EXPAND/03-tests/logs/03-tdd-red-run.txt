@@ -1,0 +1,32 @@
+RACE-LEG-EXPAND TDD ASSERTION (03-tests / red-baseline)
+CI file: D:\LZProjects\prfrail\.github\workflows\ci.yml
+Expected packages (in order):
+  1. ./internal/adapters/...
+  2. ./internal/chain/...
+  3. ./internal/console/...
+  4. ./internal/gates/...
+  5. ./internal/guard/...
+  6. ./internal/tickets/...
+
+Race step found at ci.yml line 82 (step span to line 85)
+Race step if   : runner.os == 'Linux'
+Race step run  : CGO_ENABLED=1 go test -race -count=1 ./internal/adapters/... ./internal/chain/...
+
+[CHECK] CGO_ENABLED=1 prefix: PASS - "CGO_ENABLED=1 " present at command head
+[CHECK] go test -race: PASS
+[CHECK] -count=1: PASS
+[CHECK] Linux-only guard preserved: PASS
+[CHECK] package covered: ./internal/adapters/...: PASS - occurrences=1
+[CHECK] package covered: ./internal/chain/...: PASS - occurrences=1
+[CHECK] package covered: ./internal/console/...: FAIL - occurrences=0
+[CHECK] package covered: ./internal/gates/...: FAIL - occurrences=0
+[CHECK] package covered: ./internal/guard/...: FAIL - occurrences=0
+[CHECK] package covered: ./internal/tickets/...: FAIL - occurrences=0
+[CHECK] package order matches documented order: FAIL - order differs or a package is absent
+
+legacy leg (adapters/chain) : present
+new leg (console/gates/guard/tickets) : INCOMPLETE -> ./internal/console/... ./internal/gates/... ./internal/guard/... ./internal/tickets/...
+uncovered package patterns : ./internal/console/... ./internal/gates/... ./internal/guard/... ./internal/tickets/...
+
+RACE-COVERAGE: RED - 5 check(s) failed; uncovered by Race leg: console/gates/guard/tickets
+RACE-COVERAGE: RED - console/gates/guard/tickets not covered

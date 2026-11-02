@@ -81,7 +81,7 @@ jobs:
 
       - name: Race
         if: runner.os == 'Linux'
-        run: CGO_ENABLED=1 go test -race -count=1 ./internal/adapters/... ./internal/chain/...
+        run: CGO_ENABLED=1 go test -race -count=1 ./internal/adapters/... ./internal/chain/... ./internal/console/... ./internal/gates/... ./internal/guard/... ./internal/tickets/...
 
       - name: Contract fixtures
         if: runner.os == 'Linux'
