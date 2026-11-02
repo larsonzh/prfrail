@@ -78,6 +78,11 @@ const (
 	supervisedGateEvidenceName       = "gate-evidence.json"
 	supervisedSnapshotStoreDirectory = "snapshot-store"
 	supervisedWorkspacesDirectory    = "workspaces"
+	// supervisedTasksDirectoryName is the per-task artifact directory used only
+	// when the assembly drives more than one task. A single-task assembly keeps
+	// the flat <runRoot>/supervised/ layout, so the store-local layout of every
+	// existing run is byte-compatible and no consumer has to care about the key.
+	supervisedTasksDirectoryName     = "tasks"
 	supervisedConfirmationResponse   = "confirm"
 	supervisedRejectionResponse      = "reject"
 	supervisedDeliveryAcceptedStatus = "accepted"
@@ -208,9 +213,22 @@ var (
 // hook identifiers (StepConfig.Hooks is []string), so the console cannot derive
 // a runnable hook definition from the config alone.
 type SupervisedAssemblyOptions struct {
-	RunID         string
-	RunRoot       string
-	Definition    chain.Definition
+	RunID      string
+	RunRoot    string
+	Definition chain.Definition
+	// TaskPolicies registers the per-task handoff policy of a multi-task
+	// assembly. The key is the stable encoding
+	// supervisedTaskRecordKey(taskID, stepID) = "<taskID>/<stepID>": task and step
+	// ids are validated identifiers that never contain "/", so the encoding is
+	// unambiguous and mirrors agentRunnerRequestRecordKey of the AgentRunner
+	// assembly. Every task still declares its own handoff policy on its
+	// supervised step -- that declaration is the single-record compatibility path
+	// used when the registry is empty -- and a registered policy must digest to
+	// the same value as the declared one. The registry is therefore a consistency
+	// pin, not extra authority: it lets a caller freeze the exact policies it
+	// assembled the run from and refuse a definition that drifted
+	// (CONTRACTS.md A6 多任务串行装配（P50））。
+	TaskPolicies  map[string]chain.HandoffPolicy
 	VisibleSender adapters.VisibleClient
 	GateRunner    *gates.Runner
 	GateHooks     map[string]gates.Hook
@@ -250,7 +268,7 @@ func ExecuteSupervisedRun(ctx context.Context, options SupervisedAssemblyOptions
 		return RunSummary{}, err
 	}
 	clock, _ := supervisedClockAndIDs(options)
-	taskID, stepID, policy, err := supervisedAssemblyStep(options.Definition)
+	plan, err := supervisedAssemblyPlan(options)
 	if err != nil {
 		return RunSummary{}, err
 	}
@@ -264,7 +282,7 @@ func ExecuteSupervisedRun(ctx context.Context, options SupervisedAssemblyOptions
 	if err := ensureAgentRunnerEventLogMarker(eventLog); err != nil {
 		return RunSummary{}, err
 	}
-	engine, runtime, err := newSupervisedEngine(ctx, options, taskID, stepID, *policy, clock)
+	engine, runtime, err := newSupervisedEngine(ctx, options, plan, clock)
 	if err != nil {
 		return RunSummary{}, err
 	}
@@ -291,7 +309,7 @@ func ExecuteSupervisedReturn(ctx context.Context, options SupervisedAssemblyOpti
 		return RunSummary{}, ErrSupervisedAbortOnly
 	}
 	clock, _ := supervisedClockAndIDs(options)
-	taskID, stepID, policy, err := supervisedAssemblyStep(options.Definition)
+	plan, err := supervisedAssemblyPlan(options)
 	if err != nil {
 		return RunSummary{}, err
 	}
@@ -302,11 +320,22 @@ func ExecuteSupervisedReturn(ctx context.Context, options SupervisedAssemblyOpti
 	if err := ensureAgentRunnerEventLogMarker(eventLog); err != nil {
 		return RunSummary{}, err
 	}
-	engine, runtime, err := newSupervisedEngine(ctx, options, taskID, stepID, *policy, clock)
+	engine, runtime, err := newSupervisedEngine(ctx, options, plan, clock)
 	if err != nil {
 		return RunSummary{}, err
 	}
-	session, found, err := runtime.loadSession()
+	ledger, err := runtime.loadLedger()
+	if err != nil {
+		return RunSummary{}, err
+	}
+	// The return belongs to the task whose work window is open. The engine drives
+	// the tasks serially and every task opens exactly one window, so the most
+	// recent binding request names it; nothing here depends on task order.
+	state, err := runtime.parkedTaskState(ledger)
+	if err != nil {
+		return summarizeProjection(engine.Projection(), eventLog), err
+	}
+	session, found, err := runtime.loadSession(state)
 	if err != nil {
 		return RunSummary{}, err
 	}
@@ -314,38 +343,68 @@ func ExecuteSupervisedReturn(ctx context.Context, options SupervisedAssemblyOpti
 		return summarizeProjection(engine.Projection(), eventLog), ErrSupervisedNotOpen
 	}
 	if outcome == "abort" {
-		return runtime.abortSupervisedRun(ctx, session, engine, eventLog)
+		return runtime.abortSupervisedRun(ctx, state, session, engine, eventLog)
 	}
 	// Return-entry guard (blind review High): the complete return enforces the
 	// handoff policy -- timeout, authorized scope, after-return gates -- so it
 	// must enforce the policy that was frozen when the window opened rather than
 	// the configuration loaded at return time. Abort is deliberately exempt: it
 	// consumes no policy and stays available as the operator's escape hatch.
-	if err := runtime.enforceFrozenHandoffPolicy(session); err != nil {
+	if err := runtime.enforceFrozenHandoffPolicy(state, session); err != nil {
 		return summarizeProjection(engine.Projection(), eventLog), err
 	}
-	return runtime.completeSupervisedRun(ctx, session, engine, eventLog)
+	return runtime.completeSupervisedRun(ctx, state, session, engine, eventLog)
 }
 
-// supervisedAssemblyStep requires exactly one supervised-black-box code step
-// with a handoff policy. Any other definition is refused before the engine
-// exists, which is the assembly-level half of P1.
-func supervisedAssemblyStep(definition chain.Definition) (string, string, *chain.HandoffPolicy, error) {
-	if len(definition.Tasks) != 1 {
-		return "", "", nil, fmt.Errorf("%w: the supervised assembly requires exactly one task", ErrInvalidConfig)
+// supervisedTaskBinding names one task of the supervised assembly plan: the task,
+// the single supervised step it binds to, and the handoff policy that step
+// declares (or that the assembly pinned for it).
+type supervisedTaskBinding struct {
+	TaskID string
+	StepID string
+	Policy chain.HandoffPolicy
+}
+
+// supervisedAssemblyPlan returns one binding per task of the definition.
+//
+// A definition with no task is refused: an empty assembly would produce a chain
+// that never opens a window. Multi-task definitions are accepted
+// (CONTRACTS.md A6 多任务串行装配（P50）): every task must still carry exactly one
+// supervised-black-box code step with a handoff policy, which is the only step
+// shape this assembly can prove. The zero-task refusal has its own wording so it
+// can never be confused with the multi-task acceptance, and the per-task checks
+// keep their original wording and their original order (shape first, policy
+// last), because a red test pins that order.
+func supervisedAssemblyPlan(options SupervisedAssemblyOptions) ([]supervisedTaskBinding, error) {
+	if len(options.Definition.Tasks) == 0 {
+		return nil, fmt.Errorf("%w: the supervised assembly requires at least one task", ErrInvalidConfig)
 	}
-	task := definition.Tasks[0]
-	if len(task.Steps) != 1 {
-		return "", "", nil, fmt.Errorf("%w: the supervised assembly requires exactly one step", ErrInvalidConfig)
+	plan := make([]supervisedTaskBinding, 0, len(options.Definition.Tasks))
+	for _, task := range options.Definition.Tasks {
+		if len(task.Steps) != 1 {
+			return nil, fmt.Errorf("%w: the supervised assembly requires exactly one step", ErrInvalidConfig)
+		}
+		step := task.Steps[0]
+		if step.Kind != "code" || step.Mode != chain.SupervisedBlackBox {
+			return nil, fmt.Errorf("%w: the supervised assembly requires one supervised-black-box code step", ErrInvalidConfig)
+		}
+		if step.HandoffPolicy == nil {
+			return nil, fmt.Errorf("%w: the supervised step requires a handoff policy", ErrInvalidConfig)
+		}
+		policy := *step.HandoffPolicy
+		if len(options.TaskPolicies) > 0 {
+			registered, ok := options.TaskPolicies[supervisedTaskRecordKey(task.ID, step.ID)]
+			if !ok {
+				return nil, fmt.Errorf("%w: no handoff policy is registered for task %q step %q", ErrInvalidConfig, task.ID, step.ID)
+			}
+			if supervisedHandoffPolicyHash(registered) != supervisedHandoffPolicyHash(policy) {
+				return nil, fmt.Errorf("%w: the registered handoff policy of task %q step %q does not match the declared supervised step policy", ErrInvalidConfig, task.ID, step.ID)
+			}
+			policy = registered
+		}
+		plan = append(plan, supervisedTaskBinding{TaskID: task.ID, StepID: step.ID, Policy: policy})
 	}
-	step := task.Steps[0]
-	if step.Kind != "code" || step.Mode != chain.SupervisedBlackBox {
-		return "", "", nil, fmt.Errorf("%w: the supervised assembly requires one supervised-black-box code step", ErrInvalidConfig)
-	}
-	if step.HandoffPolicy == nil {
-		return "", "", nil, fmt.Errorf("%w: the supervised step requires a handoff policy", ErrInvalidConfig)
-	}
-	return task.ID, step.ID, step.HandoffPolicy, nil
+	return plan, nil
 }
 
 func supervisedClockAndIDs(options SupervisedAssemblyOptions) (func() time.Time, func() string) {
@@ -360,17 +419,47 @@ func supervisedClockAndIDs(options SupervisedAssemblyOptions) (func() time.Time,
 	return clock, ids
 }
 
+// supervisedTaskState is the per-(taskID, attempt) runtime state of one task of
+// the assembly. Every field it holds was a single-task field of
+// supervisedRuntime before P50; keying them per task is what lets the engine
+// drive the tasks serially without one task ever reading another task's
+// manifest, accepted candidate or handoff policy (CONTRACTS.md A6 多任务串行装配
+// （P50）). The state is in-memory only: the durable facts stay the per-task
+// artifacts on disk.
+type supervisedTaskState struct {
+	taskID        string
+	stepID        string
+	attempt       int
+	policy        chain.HandoffPolicy
+	workspaceRoot string
+
+	acceptedEntries []snapshot.Entry
+	acceptedHash    string
+	workspaceReady  bool
+}
+
+func (state *supervisedTaskState) key() string {
+	return supervisedTaskStateKey(state.taskID, state.attempt)
+}
+
 // supervisedRuntime implements every chain port the supervised assembly needs.
 // It is a real implementation over the filesystem and the snapshot store. It
 // starts no process of its own.
+//
+// One runtime serves the whole definition: the engine schedules the tasks
+// serially, so the runtime only tracks which task it is currently driving
+// (current) and resolves every port call back to that task's own state.
 type supervisedRuntime struct {
 	runID   string
 	runRoot string
-	taskID  string
-	stepID  string
-	policy  chain.HandoffPolicy
+	// plan holds the task states in definition order, which is the order the
+	// engine drives them in; tasks is the same set keyed by (taskID, attempt).
+	plan  []*supervisedTaskState
+	tasks map[string]*supervisedTaskState
+	// current is the state key of the task the engine is driving. It is only
+	// used by the failpoint seam, which carries no task identity of its own.
+	current string
 
-	workspaceRoot string
 	snapshotStore *snapshot.Store
 	visible       adapters.VisibleClient
 	gateRunner    *gates.Runner
@@ -379,14 +468,82 @@ type supervisedRuntime struct {
 	steps  chain.StepRouter
 	engine *chain.Engine
 
-	acceptedEntries []snapshot.Entry
-	acceptedHash    string
-	workspaceReady  bool
-	events          int
+	events int
 
 	crashPoint func(point string) error
 	clock      func() time.Time
 	ids        func() string
+}
+
+// supervisedTaskRecordKey is the stable registry key of one task binding: task
+// and step ids are validated identifiers that never contain "/", so
+// "<taskID>/<stepID>" is unambiguous. Callers building
+// SupervisedAssemblyOptions.TaskPolicies use the same encoding; it mirrors
+// agentRunnerRequestRecordKey of the AgentRunner assembly.
+func supervisedTaskRecordKey(taskID, stepID string) string {
+	return taskID + "/" + stepID
+}
+
+// supervisedTaskStateKey is the internal key of the per-task runtime state. It
+// never leaves the package and is not a wire identity; it mirrors
+// agentRunnerTaskStateKey.
+func supervisedTaskStateKey(taskID string, attempt int) string {
+	return fmt.Sprintf("%s#%d", taskID, attempt)
+}
+
+// stateFor resolves the runtime state of one task attempt.
+func (runtime *supervisedRuntime) stateFor(taskID string, attempt int) (*supervisedTaskState, error) {
+	state, ok := runtime.tasks[supervisedTaskStateKey(taskID, attempt)]
+	if !ok || state == nil {
+		return nil, fmt.Errorf("%w: no supervised state is bound to task %q attempt %d", ErrInvalidConfig, taskID, attempt)
+	}
+	return state, nil
+}
+
+// stateForStep resolves the runtime state of one task step.
+func (runtime *supervisedRuntime) stateForStep(taskID, stepID string) (*supervisedTaskState, error) {
+	for _, state := range runtime.plan {
+		if state.taskID == taskID && state.stepID == stepID {
+			return state, nil
+		}
+	}
+	return nil, fmt.Errorf("%w: no supervised state is bound to task %q step %q", ErrInvalidConfig, taskID, stepID)
+}
+
+// currentState names the task the engine is driving. The engine is serial, so
+// exactly one task can be active when the failpoint seam fires.
+func (runtime *supervisedRuntime) currentState() (*supervisedTaskState, error) {
+	state, ok := runtime.tasks[runtime.current]
+	if !ok || state == nil {
+		return nil, fmt.Errorf("%w: the supervised assembly has no current task", ErrInvalidConfig)
+	}
+	return state, nil
+}
+
+// parkedTaskState resolves the task a paused run is parked on from the
+// interaction ledger alone. The engine drives the tasks serially and every task
+// appends exactly one binding request before it parks, so the most recent
+// request names the parked task; an assembly that never parked falls back to its
+// only task, which is the single-task compatibility path.
+func (runtime *supervisedRuntime) parkedTaskState(ledger chain.OperatorInteractionLedger) (*supervisedTaskState, error) {
+	var parked *supervisedTaskState
+	for _, record := range ledger.Records {
+		if record.Request == nil || record.Request.RunID != runtime.runID {
+			continue
+		}
+		state, err := runtime.stateForStep(record.Request.TaskID, record.Request.StepID)
+		if err != nil {
+			continue
+		}
+		parked = state
+	}
+	if parked != nil {
+		return parked, nil
+	}
+	if len(runtime.plan) == 1 {
+		return runtime.plan[0], nil
+	}
+	return nil, fmt.Errorf("%w: a paused supervised run has no binding interaction request", ErrInvalidConfig)
 }
 
 var (
@@ -414,7 +571,11 @@ type supervisedStepPort struct {
 var _ chain.SupervisedBlackBoxPort = (*supervisedStepPort)(nil)
 
 func (port *supervisedStepPort) OpenSupervisedBlackBox(ctx context.Context, request chain.StepRequest) (chain.StepResult, error) {
-	if _, err := port.owner.deliverSupervisedNotice(ctx); err != nil {
+	state, err := port.owner.stateForStep(request.TaskID, request.Step.ID)
+	if err != nil {
+		return chain.StepResult{}, err
+	}
+	if _, err := port.owner.deliverSupervisedNotice(ctx, state); err != nil {
 		return chain.StepResult{}, err
 	}
 	return chain.StepResult{}, chain.ErrAwaitingSupervisedConfirmation
@@ -422,28 +583,11 @@ func (port *supervisedStepPort) OpenSupervisedBlackBox(ctx context.Context, requ
 
 // newSupervisedEngine builds the engine, the runtime ports and the failpoint
 // closure that parks the run.
-func newSupervisedEngine(ctx context.Context, options SupervisedAssemblyOptions, taskID, stepID string, policy chain.HandoffPolicy, clock func() time.Time) (*chain.Engine, *supervisedRuntime, error) {
-	snapshotRoot := filepath.Join(options.RunRoot, supervisedSnapshotStoreDirectory)
-	snapshotStore, err := snapshot.NewStore(snapshotRoot, 0)
+func newSupervisedEngine(ctx context.Context, options SupervisedAssemblyOptions, plan []supervisedTaskBinding, clock func() time.Time) (*chain.Engine, *supervisedRuntime, error) {
+	runtime, err := newSupervisedRuntime(options, plan, clock)
 	if err != nil {
 		return nil, nil, err
 	}
-	runtime := &supervisedRuntime{
-		runID:         options.RunID,
-		runRoot:       options.RunRoot,
-		taskID:        taskID,
-		stepID:        stepID,
-		policy:        policy,
-		workspaceRoot: filepath.Join(options.RunRoot, supervisedWorkspacesDirectory, fmt.Sprintf("%s-attempt-1", taskID)),
-		snapshotStore: snapshotStore,
-		visible:       options.VisibleSender,
-		gateRunner:    options.GateRunner,
-		gateHooks:     options.GateHooks,
-		crashPoint:    options.CrashPoint,
-		clock:         clock,
-		ids:           options.IDs,
-	}
-	runtime.steps = chain.StepRouter{Supervised: &supervisedStepPort{owner: runtime}}
 
 	eventStore, err := chain.NewFileEventStore(runEventLogPath(options.RunRoot))
 	if err != nil {
@@ -483,15 +627,60 @@ func newSupervisedEngine(ctx context.Context, options SupervisedAssemblyOptions,
 	return engine, runtime, nil
 }
 
+// newSupervisedRuntime builds the per-task state and the supervised step router
+// without an engine. The engine constructor and the postflight re-derivation
+// tests share it, so the facts a test recomputes come from exactly the same
+// per-task bindings and artifact paths production uses.
+func newSupervisedRuntime(options SupervisedAssemblyOptions, plan []supervisedTaskBinding, clock func() time.Time) (*supervisedRuntime, error) {
+	snapshotRoot := filepath.Join(options.RunRoot, supervisedSnapshotStoreDirectory)
+	snapshotStore, err := snapshot.NewStore(snapshotRoot, 0)
+	if err != nil {
+		return nil, err
+	}
+	runtime := &supervisedRuntime{
+		runID:         options.RunID,
+		runRoot:       options.RunRoot,
+		tasks:         make(map[string]*supervisedTaskState, len(plan)),
+		snapshotStore: snapshotStore,
+		visible:       options.VisibleSender,
+		gateRunner:    options.GateRunner,
+		gateHooks:     options.GateHooks,
+		crashPoint:    options.CrashPoint,
+		clock:         clock,
+		ids:           options.IDs,
+	}
+	for _, binding := range plan {
+		state := &supervisedTaskState{
+			taskID:  binding.TaskID,
+			stepID:  binding.StepID,
+			attempt: 1,
+			policy:  binding.Policy,
+			// Every task materialises into its own isolated workspace, so two tasks
+			// can never share a manifest or a post-return change set.
+			workspaceRoot: filepath.Join(options.RunRoot, supervisedWorkspacesDirectory, fmt.Sprintf("%s-attempt-1", binding.TaskID)),
+		}
+		runtime.plan = append(runtime.plan, state)
+		runtime.tasks[supervisedTaskStateKey(state.taskID, state.attempt)] = state
+	}
+	runtime.steps = chain.StepRouter{Supervised: &supervisedStepPort{owner: runtime}}
+	return runtime, nil
+}
+
 // parkSupervisedStep is the front half of the run: it captures the before
 // manifest, delivers the versioned notice and opens the binding confirmation
 // interaction, then parks with errSupervisedParked. It writes no work window.
+// The task it acts on is whatever task the engine is driving: with several tasks
+// the engine parks the run once per task, in definition order.
 func (runtime *supervisedRuntime) parkSupervisedStep(ctx context.Context) error {
-	manifestHash, err := runtime.deliverSupervisedNotice(ctx)
+	state, err := runtime.currentState()
 	if err != nil {
 		return err
 	}
-	if err := runtime.openConfirmationInteraction(ctx, manifestHash); err != nil {
+	manifestHash, err := runtime.deliverSupervisedNotice(ctx, state)
+	if err != nil {
+		return err
+	}
+	if err := runtime.openConfirmationInteraction(ctx, state, manifestHash); err != nil {
 		return err
 	}
 	// The interaction is durable and the run is paused: park the engine so the
@@ -508,12 +697,12 @@ func (runtime *supervisedRuntime) parkSupervisedStep(ctx context.Context) error 
 // of the delivery fact is the persisted delivery.json, which
 // confirmAndOpenWindow re-reads when the window opens. Returning an in-memory
 // copy would invite a second, divergent reader of the same fact.
-func (runtime *supervisedRuntime) deliverSupervisedNotice(ctx context.Context) (string, error) {
-	manifest, err := runtime.captureManifest(ctx, "baseline", "supervised-before", "")
+func (runtime *supervisedRuntime) deliverSupervisedNotice(ctx context.Context, state *supervisedTaskState) (string, error) {
+	manifest, err := runtime.captureManifest(ctx, state, "baseline", "supervised-before", "")
 	if err != nil {
 		return "", err
 	}
-	if err := writeSupervisedJSON(runtime.beforeManifestPath(), manifest); err != nil {
+	if err := writeSupervisedJSON(runtime.beforeManifestPath(state), manifest); err != nil {
 		return "", err
 	}
 	now := runtime.clock().UTC()
@@ -521,11 +710,11 @@ func (runtime *supervisedRuntime) deliverSupervisedNotice(ctx context.Context) (
 		Type:        "request",
 		RequestID:   runtime.nextID(),
 		RunID:       runtime.runID,
-		TaskID:      runtime.taskID,
-		Attempt:     1,
+		TaskID:      state.taskID,
+		Attempt:     state.attempt,
 		CreatedAt:   now.Format(timestampLayout),
 		Adapter:     supervisedAdapterID,
-		ContextHash: digest(supervisedContextDomain, runtime.runID, runtime.taskID, runtime.stepID, manifest.ManifestHash),
+		ContextHash: digest(supervisedContextDomain, runtime.runID, state.taskID, state.stepID, manifest.ManifestHash),
 	})
 	if err != nil {
 		return "", err
@@ -541,7 +730,7 @@ func (runtime *supervisedRuntime) deliverSupervisedNotice(ctx context.Context) (
 		TransportRequestID: delivery.TransportRequestID,
 		ErrorEvidence:      delivery.ErrorEvidence,
 	}
-	if err := writeSupervisedJSON(runtime.deliveryPath(), record); err != nil {
+	if err := writeSupervisedJSON(runtime.deliveryPath(state), record); err != nil {
 		return "", err
 	}
 	return manifest.ManifestHash, nil
@@ -551,12 +740,12 @@ func (runtime *supervisedRuntime) deliverSupervisedNotice(ctx context.Context) (
 // interaction request and pauses the run. The request binds the before-manifest
 // digest, the notice version and hash, and the structured confirm/reject answer
 // set.
-func (runtime *supervisedRuntime) openConfirmationInteraction(ctx context.Context, manifestHash string) error {
+func (runtime *supervisedRuntime) openConfirmationInteraction(ctx context.Context, state *supervisedTaskState, manifestHash string) error {
 	ledger, err := runtime.loadLedger()
 	if err != nil {
 		return err
 	}
-	request, found := supervisedPendingRequest(ledger, runtime.runID, runtime.taskID, runtime.stepID)
+	request, found := supervisedPendingRequest(ledger, runtime.runID, state.taskID, state.stepID)
 	if !found {
 		now := runtime.clock().UTC()
 		requestRecord, err := chain.NewOperatorInteractionRequestRecord(chain.OperatorInteractionRequest{
@@ -566,13 +755,13 @@ func (runtime *supervisedRuntime) openConfirmationInteraction(ctx context.Contex
 			RequestedBy:      evidence.Actor{Type: "adapter", ID: supervisedAdapterID},
 			Operator:         evidence.Actor{Type: "operator", ID: supervisedOperatorID},
 			RunID:            runtime.runID,
-			TaskID:           runtime.taskID,
-			StepID:           runtime.stepID,
-			Attempt:          1,
+			TaskID:           state.taskID,
+			StepID:           state.stepID,
+			Attempt:          state.attempt,
 			WorkspaceHash:    manifestHash,
 			ConversationID:   runtime.nextID(),
 			RequestID:        runtime.nextID(),
-			ContextHash:      digest(supervisedContextDomain, runtime.runID, runtime.taskID, runtime.stepID, manifestHash),
+			ContextHash:      digest(supervisedContextDomain, runtime.runID, state.taskID, state.stepID, manifestHash),
 			Question:         chain.SupervisedRiskNoticeText,
 			Reason:           "supervised-black-box risk notice version " + fmt.Sprintf("%d", chain.SupervisedRiskNoticeVersion),
 			Risk:             supervisedRiskDescription,
@@ -591,14 +780,20 @@ func (runtime *supervisedRuntime) openConfirmationInteraction(ctx context.Contex
 	return runtime.engine.OpenOperatorInteraction(ctx, request)
 }
 
-// resumeSupervisedRun handles phases B, C and D from the persisted state.
+// resumeSupervisedRun handles phases B, C and D from the persisted state of the
+// task the paused run is parked on.
 func (runtime *supervisedRuntime) resumeSupervisedRun(ctx context.Context) (RunSummary, error) {
 	eventLog := runEventLogPath(runtime.runRoot)
 	ledger, err := runtime.loadLedger()
 	if err != nil {
 		return RunSummary{}, err
 	}
-	request, found := supervisedPendingRequest(ledger, runtime.runID, runtime.taskID, runtime.stepID)
+	state, err := runtime.parkedTaskState(ledger)
+	if err != nil {
+		return summarizeProjection(runtime.engine.Projection(), eventLog), err
+	}
+	runtime.current = state.key()
+	request, found := supervisedPendingRequest(ledger, runtime.runID, state.taskID, state.stepID)
 	if !found {
 		return summarizeProjection(runtime.engine.Projection(), eventLog), fmt.Errorf("%w: a paused supervised run has no binding interaction request", ErrInvalidConfig)
 	}
@@ -611,14 +806,18 @@ func (runtime *supervisedRuntime) resumeSupervisedRun(ctx context.Context) (RunS
 	if err != nil {
 		return RunSummary{}, err
 	}
-	if len(confirmations.Records) == 0 {
+	// The confirmation ledger is run-level and keeps one record per step attempt,
+	// so the phase is decided per task rather than by the ledger being empty: an
+	// earlier task's confirmation must never be read as this task's.
+	confirmation, confirmed := supervisedConfirmationForBinding(confirmations, runtime.runID, state.taskID, state.stepID)
+	if !confirmed {
 		// Phase C: validate the answer, freeze the confirmation and open the window.
-		if err := runtime.confirmAndOpenWindow(ctx, request, response); err != nil {
+		if err := runtime.confirmAndOpenWindow(ctx, state, request, response); err != nil {
 			return summarizeProjection(runtime.engine.Projection(), eventLog), err
 		}
 		return summarizeProjection(runtime.engine.Projection(), eventLog), nil
 	}
-	if _, found, err := runtime.loadSession(); err != nil {
+	if _, found, err := runtime.loadSession(state); err != nil {
 		return RunSummary{}, err
 	} else if found {
 		// Phase D: the window is open and waits for the explicit return.
@@ -628,7 +827,7 @@ func (runtime *supervisedRuntime) resumeSupervisedRun(ctx context.Context) (RunS
 	// inside the confirm/resume/open/persist sequence (plan section 9.7).
 	// Replaying the durable confirmation converges the run instead of stalling
 	// on a non-empty ledger.
-	if err := runtime.replayConfirmedWindow(ctx, request, response, confirmations); err != nil {
+	if err := runtime.replayConfirmedWindow(ctx, state, request, response, confirmation); err != nil {
 		return summarizeProjection(runtime.engine.Projection(), eventLog), err
 	}
 	return summarizeProjection(runtime.engine.Projection(), eventLog), nil
@@ -639,20 +838,16 @@ func (runtime *supervisedRuntime) resumeSupervisedRun(ctx context.Context) (RunS
 // the existing confirmation: rebuilding it is impossible and would be wrong,
 // because the record ids are non-deterministic and a second, divergent record
 // for the same step attempt is refused by the ledger's conflict rule.
-func (runtime *supervisedRuntime) replayConfirmedWindow(ctx context.Context, request, response chain.OperatorInteractionRecord, ledger chain.SupervisedRiskConfirmationLedger) error {
-	confirmation, found := supervisedConfirmationForBinding(ledger, runtime.runID, runtime.taskID, runtime.stepID)
-	if !found {
-		return fmt.Errorf("%w: the durable confirmation ledger holds no record for this step attempt", ErrInvalidConfig)
-	}
+func (runtime *supervisedRuntime) replayConfirmedWindow(ctx context.Context, state *supervisedTaskState, request, response chain.OperatorInteractionRecord, confirmation chain.SupervisedRiskConfirmationRecord) error {
 	// The replay opens the window again, so it freezes the policy the same way a
 	// first attempt does: when the crash was after the window opened the snapshot
 	// already exists and this call re-validates the policy in force against it
 	// (failing closed on drift), otherwise it writes the freeze the original
 	// attempt did not reach.
-	if err := runtime.persistFrozenHandoffPolicy(); err != nil {
+	if err := runtime.persistFrozenHandoffPolicy(state); err != nil {
 		return err
 	}
-	session := supervisedSessionFromRequest(request, runtime.policy)
+	session := supervisedSessionFromRequest(request, state.policy)
 	// The original open time was never persisted, so the replay stamps the
 	// recovery time; the already-open branch below recovers the recorded time.
 	session.OpenedAt = runtime.clock().UTC().Format(timestampLayout)
@@ -661,7 +856,7 @@ func (runtime *supervisedRuntime) replayConfirmedWindow(ctx context.Context, req
 		// waiting transitions then bind the confirmation instead of the
 		// interaction, so the resume has nothing to lift. Detect that case by
 		// its durable marker and converge; anything else is a real dead-end.
-		openedAt, open, openErr := runtime.supervisedOpenWindowAt(ctx, confirmation.RecordHash)
+		openedAt, open, openErr := runtime.supervisedOpenWindowAt(ctx, state, confirmation.RecordHash)
 		if openErr != nil {
 			return openErr
 		}
@@ -669,19 +864,19 @@ func (runtime *supervisedRuntime) replayConfirmedWindow(ctx context.Context, req
 			return fmt.Errorf("%w: replaying the operator resume failed: %v", ErrSupervisedWindowUnproven, err)
 		}
 		session.OpenedAt = openedAt
-		return writeSupervisedJSON(runtime.sessionPath(), session)
+		return writeSupervisedJSON(runtime.sessionPath(state), session)
 	}
 	if err := runtime.engine.OpenSupervisedWorkWindow(ctx, session, confirmation); err != nil {
 		return err
 	}
-	return writeSupervisedJSON(runtime.sessionPath(), session)
+	return writeSupervisedJSON(runtime.sessionPath(state), session)
 }
 
 // supervisedOpenWindowAt reports whether the work window is already open for a
 // confirmation digest, returning the recorded open time. The window opener is
 // the only writer that binds the confirmation digest into a WAITING_FOR_OPERATOR
 // transition, so that binding is the durable marker of an open window.
-func (runtime *supervisedRuntime) supervisedOpenWindowAt(ctx context.Context, confirmationHash string) (string, bool, error) {
+func (runtime *supervisedRuntime) supervisedOpenWindowAt(ctx context.Context, state *supervisedTaskState, confirmationHash string) (string, bool, error) {
 	store, err := chain.NewFileEventStore(runEventLogPath(runtime.runRoot))
 	if err != nil {
 		return "", false, err
@@ -698,7 +893,7 @@ func (runtime *supervisedRuntime) supervisedOpenWindowAt(ctx context.Context, co
 			continue
 		}
 		if event.Entity.Kind != "step" || event.Entity.RunID != runtime.runID ||
-			event.Entity.TaskID != runtime.taskID || event.Entity.StepID != runtime.stepID {
+			event.Entity.TaskID != state.taskID || event.Entity.StepID != state.stepID {
 			continue
 		}
 		openedAt, open = event.OccurredAt, true
@@ -719,12 +914,12 @@ func supervisedConfirmationForBinding(ledger chain.SupervisedRiskConfirmationLed
 
 // confirmAndOpenWindow builds the binding risk confirmation, resumes the
 // interaction and opens the supervised work window.
-func (runtime *supervisedRuntime) confirmAndOpenWindow(ctx context.Context, request, response chain.OperatorInteractionRecord) error {
+func (runtime *supervisedRuntime) confirmAndOpenWindow(ctx context.Context, state *supervisedTaskState, request, response chain.OperatorInteractionRecord) error {
 	if response.Response.Selection != supervisedConfirmationResponse {
 		// P2/P3: a rejection is never a confirmation and never opens a window.
 		return fmt.Errorf("%w: operator selection %q", ErrSupervisedRejected, response.Response.Selection)
 	}
-	delivery, found, err := runtime.loadDelivery()
+	delivery, found, err := runtime.loadDelivery(state)
 	if err != nil {
 		return err
 	}
@@ -746,15 +941,15 @@ func (runtime *supervisedRuntime) confirmAndOpenWindow(ctx context.Context, requ
 		IssuedAt:            now.Format(timestampLayout),
 		OperatorID:          response.Response.RespondedBy.ID,
 		RunID:               runtime.runID,
-		TaskID:              runtime.taskID,
-		StepID:              runtime.stepID,
-		Attempt:             1,
+		TaskID:              state.taskID,
+		StepID:              state.stepID,
+		Attempt:             state.attempt,
 		WorkspaceHash:       request.Request.WorkspaceHash,
 		RiskNoticeVersion:   chain.SupervisedRiskNoticeVersion,
 		RiskNoticeHash:      chain.SupervisedRiskNoticeHash(),
 		Delivery:            delivery,
 		InteractionEvidence: []string{request.RecordHash, response.RecordHash},
-		Evidence:            []string{digest(supervisedConfirmationEvidenceDomain, runtime.runID, runtime.taskID, runtime.stepID, request.RecordHash, response.RecordHash)},
+		Evidence:            []string{digest(supervisedConfirmationEvidenceDomain, runtime.runID, state.taskID, state.stepID, request.RecordHash, response.RecordHash)},
 	}, runtime.clock, runtime.idSource())
 	if err != nil {
 		return err
@@ -771,13 +966,13 @@ func (runtime *supervisedRuntime) confirmAndOpenWindow(ctx context.Context, requ
 	if err := runtime.crash(supervisedCrashAfterResume); err != nil {
 		return err
 	}
-	session := supervisedSessionFromRequest(request, runtime.policy)
+	session := supervisedSessionFromRequest(request, state.policy)
 	session.OpenedAt = now.Format(timestampLayout)
 	// Freeze the handoff policy of this window before the window becomes durable
 	// (blind review High). The snapshot is written first, so an open window always
 	// has its freeze artifact and the return entry can enforce the frozen policy
 	// instead of the configuration loaded at return time.
-	if err := runtime.persistFrozenHandoffPolicy(); err != nil {
+	if err := runtime.persistFrozenHandoffPolicy(state); err != nil {
 		return err
 	}
 	if err := runtime.engine.OpenSupervisedWorkWindow(ctx, session, confirmation); err != nil {
@@ -786,7 +981,7 @@ func (runtime *supervisedRuntime) confirmAndOpenWindow(ctx context.Context, requ
 	if err := runtime.crash(supervisedCrashAfterWindowOpen); err != nil {
 		return err
 	}
-	return writeSupervisedJSON(runtime.sessionPath(), session)
+	return writeSupervisedJSON(runtime.sessionPath(state), session)
 }
 
 // supervisedInteractionBinding is the operator-interaction binding carried by a
@@ -829,24 +1024,27 @@ func (runtime *supervisedRuntime) crash(point string) error {
 	return runtime.crashPoint(point)
 }
 
-// completeSupervisedRun performs the post-return scan set, freezes the five
-// facts, submits the return and drives the tail chain.
-func (runtime *supervisedRuntime) completeSupervisedRun(ctx context.Context, session chain.HandoffSession, engine *chain.Engine, eventLog string) (RunSummary, error) {
+// completeSupervisedRun performs the post-return scan set of one task, freezes
+// the five facts, submits the return and drives the tail chain. The tail chain
+// is also what advances to the next task: the engine schedules the tasks
+// serially, so a second task that parks the run again is a legitimate outcome of
+// this call, never an error.
+func (runtime *supervisedRuntime) completeSupervisedRun(ctx context.Context, state *supervisedTaskState, session chain.HandoffSession, engine *chain.Engine, eventLog string) (RunSummary, error) {
 	now := runtime.clock().UTC()
 	openedAt, err := time.Parse(timestampLayout, session.OpenedAt)
 	if err != nil {
 		return RunSummary{}, err
 	}
-	if now.Sub(openedAt) > time.Duration(runtime.policy.HandoffTimeoutMs)*time.Millisecond {
+	if now.Sub(openedAt) > time.Duration(state.policy.HandoffTimeoutMs)*time.Millisecond {
 		// The window outlived its frozen timeout: complete is refused, abort stays
 		// possible.
-		return summarizeProjection(engine.Projection(), eventLog), fmt.Errorf("%w: window exceeded %d ms", ErrSupervisedTimeout, runtime.policy.HandoffTimeoutMs)
+		return summarizeProjection(engine.Projection(), eventLog), fmt.Errorf("%w: window exceeded %d ms", ErrSupervisedTimeout, state.policy.HandoffTimeoutMs)
 	}
-	afterManifest, err := runtime.captureManifest(ctx, "candidate", "supervised-after", session.BeforeManifestHash)
+	afterManifest, err := runtime.captureManifest(ctx, state, "candidate", "supervised-after", session.BeforeManifestHash)
 	if err != nil {
 		return RunSummary{}, err
 	}
-	beforeManifest, found, err := runtime.loadBeforeManifest()
+	beforeManifest, found, err := runtime.loadBeforeManifest(state)
 	if err != nil {
 		return RunSummary{}, err
 	}
@@ -860,20 +1058,20 @@ func (runtime *supervisedRuntime) completeSupervisedRun(ctx context.Context, ses
 	// Both fail closed and refuse the return before any receipt is built: an
 	// underivable scope, an out-of-scope change and a detected side effect are
 	// all blocking (plan section 8).
-	if err := runtime.runScopeScan(supervisedChangedPaths(changed)); err != nil {
+	if err := runtime.runScopeScan(state, supervisedChangedPaths(changed)); err != nil {
 		return summarizeProjection(engine.Projection(), eventLog), err
 	}
-	if err := runtime.runSideEffectScan(beforeManifest.Manifest.Entries, afterManifest.Manifest.Entries); err != nil {
+	if err := runtime.runSideEffectScan(state, beforeManifest.Manifest.Entries, afterManifest.Manifest.Entries); err != nil {
 		return summarizeProjection(engine.Projection(), eventLog), err
 	}
-	if err := runtime.runSecretAndTypeScan(ctx, afterManifest); err != nil {
+	if err := runtime.runSecretAndTypeScan(ctx, state, afterManifest); err != nil {
 		return summarizeProjection(engine.Projection(), eventLog), err
 	}
-	processStopHash, err := runtime.processStopEvidence()
+	processStopHash, err := runtime.processStopEvidence(state)
 	if err != nil {
 		return summarizeProjection(engine.Projection(), eventLog), err
 	}
-	gateHashes, gateEvidenceHash, err := runtime.runAfterReturnGates(ctx)
+	gateHashes, gateEvidenceHash, err := runtime.runAfterReturnGates(ctx, state)
 	if err != nil {
 		return summarizeProjection(engine.Projection(), eventLog), err
 	}
@@ -885,9 +1083,9 @@ func (runtime *supervisedRuntime) completeSupervisedRun(ctx context.Context, ses
 	// five facts through the same wiring as the pre-existing scans.
 	scanReport := supervisedScanReport{
 		RunID:              runtime.runID,
-		TaskID:             runtime.taskID,
-		StepID:             runtime.stepID,
-		Attempt:            1,
+		TaskID:             state.taskID,
+		StepID:             state.stepID,
+		Attempt:            state.attempt,
 		BeforeManifestHash: session.BeforeManifestHash,
 		AfterManifestHash:  afterManifest.ManifestHash,
 		DiffHash:           diffHash,
@@ -900,10 +1098,10 @@ func (runtime *supervisedRuntime) completeSupervisedRun(ctx context.Context, ses
 		ProcessStopHash:    processStopHash,
 		GateHashes:         gateHashes,
 	}
-	if err := writeSupervisedJSON(runtime.scanReportPath(), scanReport); err != nil {
+	if err := writeSupervisedJSON(runtime.scanReportPath(state), scanReport); err != nil {
 		return RunSummary{}, err
 	}
-	scanEvidenceHash, err := supervisedScanEvidenceHash(runtime.scanReportPath())
+	scanEvidenceHash, err := supervisedScanEvidenceHash(runtime.scanReportPath(state))
 	if err != nil {
 		return RunSummary{}, err
 	}
@@ -923,20 +1121,20 @@ func (runtime *supervisedRuntime) completeSupervisedRun(ctx context.Context, ses
 		ReportID:           runtime.nextID(),
 		RecordedAt:         now.Format(timestampLayout),
 		RunID:              runtime.runID,
-		TaskID:             runtime.taskID,
-		StepID:             runtime.stepID,
-		Attempt:            1,
+		TaskID:             state.taskID,
+		StepID:             state.stepID,
+		Attempt:            state.attempt,
 		VerifiedDimensions: append([]string{}, supervisedVerifiedDimensions...),
 		UnknownDimensions:  append([]string{}, supervisedUnknownDimensions...),
-		Evidence:           []string{receipt.ReceiptHash, digest(supervisedReportEvidenceDomain, runtime.runID, runtime.taskID, runtime.stepID)},
+		Evidence:           []string{receipt.ReceiptHash, digest(supervisedReportEvidenceDomain, runtime.runID, state.taskID, state.stepID)},
 	}, runtime.clock, runtime.idSource())
 	if err != nil {
 		return RunSummary{}, err
 	}
-	if err := writeSupervisedJSON(runtime.receiptPath(), receipt); err != nil {
+	if err := writeSupervisedJSON(runtime.receiptPath(state), receipt); err != nil {
 		return RunSummary{}, err
 	}
-	if err := writeSupervisedJSON(runtime.reportPath(), report); err != nil {
+	if err := writeSupervisedJSON(runtime.reportPath(state), report); err != nil {
 		return RunSummary{}, err
 	}
 	facts := chain.SupervisedFrozenFacts{
@@ -949,7 +1147,10 @@ func (runtime *supervisedRuntime) completeSupervisedRun(ctx context.Context, ses
 	if err := engine.SubmitSupervisedReturn(ctx, receipt, facts); err != nil {
 		return summarizeProjection(engine.Projection(), eventLog), err
 	}
-	if err := engine.Run(ctx); err != nil {
+	// The tail chain runs the postflight, review and promotion of this task and
+	// then continues with the next task. A next task that parks the run is the
+	// expected serial hand-off, so it is not a failure of this return.
+	if err := engine.Run(ctx); err != nil && !errors.Is(err, errSupervisedParked) {
 		return summarizeProjection(engine.Projection(), eventLog), err
 	}
 	return summarizeProjection(engine.Projection(), eventLog), nil
@@ -960,20 +1161,24 @@ func (runtime *supervisedRuntime) completeSupervisedRun(ctx context.Context, ses
 // abort to a FAILED task/step, but no exported engine entry writes that
 // transition without the console writing chain state directly, so the PILOT
 // abort uses the engine's existing RequestCancel path (terminal CANCELLED).
-func (runtime *supervisedRuntime) abortSupervisedRun(ctx context.Context, session chain.HandoffSession, engine *chain.Engine, eventLog string) (RunSummary, error) {
+//
+// Abort stays run-level, as before: it consumes the return of the task whose
+// window is open and cancels the whole chain, so no later task of a multi-task
+// definition can start after an abort.
+func (runtime *supervisedRuntime) abortSupervisedRun(ctx context.Context, state *supervisedTaskState, session chain.HandoffSession, engine *chain.Engine, eventLog string) (RunSummary, error) {
 	now := runtime.clock().UTC()
 	receipt, err := chain.BuildHandoffReceiptRecord(session, chain.HandoffDecision{
 		ReceiptID:         runtime.nextID(),
 		ClosedAt:          now.Format(timestampLayout),
 		AfterManifestHash: session.BeforeManifestHash,
-		DiffHash:          digest(supervisedDiffDomain, "aborted", runtime.runID, runtime.taskID, runtime.stepID),
+		DiffHash:          digest(supervisedDiffDomain, "aborted", runtime.runID, state.taskID, state.stepID),
 		Outcome:           "abort",
 		Evidence:          []string{digest(supervisedReportEvidenceDomain, "abort", runtime.runID)},
 	}, runtime.clock, runtime.idSource())
 	if err != nil {
 		return RunSummary{}, err
 	}
-	if err := writeSupervisedJSON(runtime.receiptPath(), receipt); err != nil {
+	if err := writeSupervisedJSON(runtime.receiptPath(state), receipt); err != nil {
 		return RunSummary{}, err
 	}
 	engine.RequestCancel()
@@ -983,24 +1188,26 @@ func (runtime *supervisedRuntime) abortSupervisedRun(ctx context.Context, sessio
 	return summarizeProjection(engine.Projection(), eventLog), nil
 }
 
-// captureManifest captures the workspace manifest and verifies it. A non-empty
-// parent hash makes it a candidate capture (the snapshot kinds differ: a
-// candidate requires a parent digest and a task binding).
-func (runtime *supervisedRuntime) captureManifest(ctx context.Context, kind, snapshotIDPrefix, parentHash string) (snapshot.SnapshotManifest, error) {
-	if err := runtime.ensureWorkspace(); err != nil {
+// captureManifest captures the workspace manifest of one task and verifies it. A
+// non-empty parent hash makes it a candidate capture (the snapshot kinds differ:
+// a candidate requires a parent digest and a task binding). The snapshot id
+// carries the task id, so two tasks of the same run never overwrite each other's
+// capture in the shared snapshot store.
+func (runtime *supervisedRuntime) captureManifest(ctx context.Context, state *supervisedTaskState, kind, snapshotIDPrefix, parentHash string) (snapshot.SnapshotManifest, error) {
+	if err := runtime.ensureWorkspace(state); err != nil {
 		return snapshot.SnapshotManifest{}, err
 	}
 	options := snapshot.CaptureOptions{
-		SourceDir:  runtime.workspaceRoot,
+		SourceDir:  state.workspaceRoot,
 		Kind:       kind,
-		SnapshotID: fmt.Sprintf("%s-%s", snapshotIDPrefix, runtime.runID),
+		SnapshotID: fmt.Sprintf("%s-%s-%s", snapshotIDPrefix, state.taskID, runtime.runID),
 		RunID:      runtime.runID,
 		Store:      runtime.snapshotStore,
 	}
 	if parentHash != "" {
 		parent := parentHash
 		options.ParentSnapshotHash = &parent
-		options.Task = &snapshot.TaskBinding{TaskID: runtime.taskID, Attempt: 1}
+		options.Task = &snapshot.TaskBinding{TaskID: state.taskID, Attempt: state.attempt}
 	}
 	manifest, err := snapshot.Capture(ctx, options)
 	if err != nil {
@@ -1095,8 +1302,8 @@ func (scope supervisedScope) allows(path string) error {
 // The scan judges the manifest change set only: an out-of-scope write anywhere
 // outside the observed workspace is unobservable and is carried by the report's
 // external-side-effects unknown dimension rather than being claimed absent.
-func (runtime *supervisedRuntime) runScopeScan(changed []string) error {
-	scope, err := newSupervisedScope(runtime.policy, runtime.workspaceRoot)
+func (runtime *supervisedRuntime) runScopeScan(state *supervisedTaskState, changed []string) error {
+	scope, err := newSupervisedScope(state.policy, state.workspaceRoot)
 	if err != nil {
 		return err
 	}
@@ -1121,7 +1328,7 @@ func (runtime *supervisedRuntime) runScopeScan(changed []string) error {
 // (external-side-effects, network-access, cost, background-processes) rather
 // than being claimed clean. Creating a new file inside the workspace is the
 // declared handoff work, not a side effect.
-func (runtime *supervisedRuntime) runSideEffectScan(before, after []snapshot.Entry) error {
+func (runtime *supervisedRuntime) runSideEffectScan(state *supervisedTaskState, before, after []snapshot.Entry) error {
 	afterByPath := make(map[string]snapshot.Entry, len(after))
 	for _, entry := range after {
 		afterByPath[entry.Path] = entry
@@ -1138,7 +1345,7 @@ func (runtime *supervisedRuntime) runSideEffectScan(before, after []snapshot.Ent
 			return fmt.Errorf("%w: entry %q changed permissions", ErrSupervisedSideEffect, prior.Path)
 		}
 	}
-	scope, err := newSupervisedScope(runtime.policy, runtime.workspaceRoot)
+	scope, err := newSupervisedScope(state.policy, state.workspaceRoot)
 	if err != nil {
 		return err
 	}
@@ -1159,7 +1366,7 @@ func (runtime *supervisedRuntime) runSideEffectScan(before, after []snapshot.Ent
 
 // runSecretAndTypeScan refuses credential material and unaccepted entry types in
 // the returning workspace.
-func (runtime *supervisedRuntime) runSecretAndTypeScan(ctx context.Context, manifest snapshot.SnapshotManifest) error {
+func (runtime *supervisedRuntime) runSecretAndTypeScan(ctx context.Context, state *supervisedTaskState, manifest snapshot.SnapshotManifest) error {
 	scanner := gates.DefaultSecretScanner()
 	for _, entry := range manifest.Manifest.Entries {
 		switch entry.Type {
@@ -1170,7 +1377,7 @@ func (runtime *supervisedRuntime) runSecretAndTypeScan(ctx context.Context, mani
 		if entry.Type != snapshot.EntryRegularFile {
 			continue
 		}
-		data, err := os.ReadFile(filepath.Join(runtime.workspaceRoot, filepath.FromSlash(entry.Path)))
+		data, err := os.ReadFile(filepath.Join(state.workspaceRoot, filepath.FromSlash(entry.Path)))
 		if err != nil {
 			return fmt.Errorf("%w: read %q: %v", ErrSupervisedGateFailed, entry.Path, err)
 		}
@@ -1191,12 +1398,12 @@ func (runtime *supervisedRuntime) runSecretAndTypeScan(ctx context.Context, mani
 // and not claimed absent -- it is carried by the report's "background-processes"
 // unknown dimension (plan section 8). The detectable subset is a *managed*
 // identity that is still alive, which blocks the return here.
-func (runtime *supervisedRuntime) processStopEvidence() (string, error) {
+func (runtime *supervisedRuntime) processStopEvidence(state *supervisedTaskState) (string, error) {
 	identityPath := filepath.Join(runtime.runRoot, managedProcessIdentityFileName)
 	identity, err := loadManagedProcessIdentity(identityPath)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			return digest(supervisedProcessStopDomain, runtime.runID, runtime.taskID, supervisedMissingProcessReason), nil
+			return digest(supervisedProcessStopDomain, runtime.runID, state.taskID, supervisedMissingProcessReason), nil
 		}
 		return "", fmt.Errorf("%w: %v", ErrSupervisedGateFailed, err)
 	}
@@ -1207,17 +1414,17 @@ func (runtime *supervisedRuntime) processStopEvidence() (string, error) {
 	if live {
 		return "", fmt.Errorf("%w: a managed process of this run is still alive", ErrSupervisedGateFailed)
 	}
-	return digest(supervisedProcessStopDomain, runtime.runID, runtime.taskID, identity.StartToken), nil
+	return digest(supervisedProcessStopDomain, runtime.runID, state.taskID, identity.StartToken), nil
 }
 
 // runAfterReturnGates runs the frozen after-return gate hooks. A missing runner
 // or hook definition fails closed, and a failed hook refuses the return.
-func (runtime *supervisedRuntime) runAfterReturnGates(ctx context.Context) ([]string, string, error) {
+func (runtime *supervisedRuntime) runAfterReturnGates(ctx context.Context, state *supervisedTaskState) ([]string, string, error) {
 	if runtime.gateRunner == nil {
 		return nil, "", fmt.Errorf("%w: no gate runner was assembled", ErrSupervisedGateUnavailable)
 	}
-	hashes := make([]string, 0, len(runtime.policy.HooksAfterReturn))
-	for _, hookID := range runtime.policy.HooksAfterReturn {
+	hashes := make([]string, 0, len(state.policy.HooksAfterReturn))
+	for _, hookID := range state.policy.HooksAfterReturn {
 		hook, ok := runtime.gateHooks[hookID]
 		if !ok {
 			return nil, "", fmt.Errorf("%w: hook %q", ErrSupervisedGateUnavailable, hookID)
@@ -1229,11 +1436,11 @@ func (runtime *supervisedRuntime) runAfterReturnGates(ctx context.Context) ([]st
 		}
 		record, err := runtime.gateRunner.Run(ctx, gates.Request{
 			RunID:              runtime.runID,
-			TaskID:             runtime.taskID,
+			TaskID:             state.taskID,
 			StepID:             hookID,
-			Attempt:            1,
+			Attempt:            state.attempt,
 			ExecutionAttempt:   1,
-			WorkspaceRoot:      runtime.workspaceRoot,
+			WorkspaceRoot:      state.workspaceRoot,
 			HookDefinitionHash: definitionHash,
 			Hook:               hook,
 		})
@@ -1246,7 +1453,7 @@ func (runtime *supervisedRuntime) runAfterReturnGates(ctx context.Context) ([]st
 		hashes = append(hashes, record.ResultHash)
 	}
 	sort.Strings(hashes)
-	if err := writeSupervisedJSON(runtime.gateEvidencePath(), supervisedGateEvidence{RunID: runtime.runID, Hashes: hashes}); err != nil {
+	if err := writeSupervisedJSON(runtime.gateEvidencePath(state), supervisedGateEvidence{RunID: runtime.runID, Hashes: hashes}); err != nil {
 		return nil, "", err
 	}
 	return hashes, digest(supervisedGateEvidenceDomain, append([]string{runtime.runID}, hashes...)...), nil
@@ -1254,25 +1461,41 @@ func (runtime *supervisedRuntime) runAfterReturnGates(ctx context.Context) ([]st
 
 // --- chain port implementations -------------------------------------------------
 
-// CaptureBaseline digests the workspace before the task starts.
+// CaptureBaseline digests the workspace before the task starts. The chain
+// baseline is run-level (it is captured once per run and every task
+// materialises from the accepted parent it records), so it is taken on the
+// first task's isolated workspace.
 func (runtime *supervisedRuntime) CaptureBaseline(ctx context.Context, _ string) (chain.SnapshotRef, error) {
-	manifest, err := runtime.captureManifest(ctx, "baseline", "supervised-baseline", "")
+	if len(runtime.plan) == 0 {
+		return chain.SnapshotRef{}, fmt.Errorf("%w: the supervised assembly has no task", ErrInvalidConfig)
+	}
+	manifest, err := runtime.captureManifest(ctx, runtime.plan[0], "baseline", "supervised-baseline", "")
 	if err != nil {
 		return chain.SnapshotRef{}, err
 	}
 	return chain.SnapshotRef{Hash: manifest.ManifestHash}, nil
 }
 
-// Materialize returns the one isolated workspace of this run root.
-func (runtime *supervisedRuntime) Materialize(context.Context, string, string, int, chain.SnapshotRef) (chain.Workspace, error) {
-	if err := runtime.ensureWorkspace(); err != nil {
+// Materialize returns the isolated workspace of one task. The engine drives the
+// tasks serially, and this call is the engine's own statement of which task is
+// being driven, so it also marks the task the failpoint will act on.
+func (runtime *supervisedRuntime) Materialize(_ context.Context, _, taskID string, attempt int, _ chain.SnapshotRef) (chain.Workspace, error) {
+	state, err := runtime.stateFor(taskID, attempt)
+	if err != nil {
 		return chain.Workspace{}, err
 	}
-	return chain.Workspace{Root: runtime.workspaceRoot}, nil
+	runtime.current = state.key()
+	if err := runtime.ensureWorkspace(state); err != nil {
+		return chain.Workspace{}, err
+	}
+	return chain.Workspace{Root: state.workspaceRoot}, nil
 }
 
-// Execute routes the one step through the supervised port.
+// Execute routes the step through the supervised port of its own task.
 func (runtime *supervisedRuntime) Execute(ctx context.Context, request chain.StepRequest) (chain.StepResult, error) {
+	if state, err := runtime.stateFor(request.TaskID, request.Attempt); err == nil {
+		runtime.current = state.key()
+	}
 	return runtime.steps.Execute(ctx, request)
 }
 
@@ -1291,8 +1514,12 @@ func (runtime *supervisedRuntime) Accept(ctx context.Context, runID, taskID stri
 	if err != nil {
 		return chain.CandidateResult{}, err
 	}
-	runtime.acceptedEntries = captured.Manifest.Entries
-	runtime.acceptedHash = captured.ManifestHash
+	state, err := runtime.stateFor(taskID, attempt)
+	if err != nil {
+		return chain.CandidateResult{}, err
+	}
+	state.acceptedEntries = captured.Manifest.Entries
+	state.acceptedHash = captured.ManifestHash
 	evidenceRoot := digest(supervisedCandidateEvidenceRootDomain, runID, taskID, fmt.Sprintf("%d", attempt), parentHash, captured.ManifestHash)
 	return chain.CandidateResult{
 		Snapshot:          chain.SnapshotRef{Hash: captured.ManifestHash},
@@ -1323,11 +1550,20 @@ func (runtime *supervisedRuntime) Review(_ context.Context, request chain.Review
 // Publish promotes the candidate only after proving the workspace still matches
 // the frozen candidate and no managed process is alive.
 func (runtime *supervisedRuntime) Publish(ctx context.Context, request chain.PromotionRequest) (chain.PromotionDecision, error) {
-	fresh, err := runtime.captureManifest(ctx, "candidate", "supervised-promotion", runtime.acceptedHash)
+	state, err := runtime.stateFor(request.TaskID, request.Attempt)
+	if err != nil {
+		return chain.PromotionDecision{
+			ReceiptID:     runtime.nextID(),
+			OccurredAt:    runtime.clock().UTC().Format(timestampLayout),
+			Outcome:       "failed",
+			ErrorEvidence: []string{digest(supervisedPromotionBlockedDomain, err.Error())},
+		}, nil
+	}
+	fresh, err := runtime.captureManifest(ctx, state, "candidate", "supervised-promotion", state.acceptedHash)
 	if err != nil {
 		return chain.PromotionDecision{}, err
 	}
-	if changed := supervisedEntryMismatches(runtime.acceptedEntries, fresh.Manifest.Entries); len(changed) > 0 {
+	if changed := supervisedEntryMismatches(state.acceptedEntries, fresh.Manifest.Entries); len(changed) > 0 {
 		return chain.PromotionDecision{
 			ReceiptID:     runtime.nextID(),
 			OccurredAt:    runtime.clock().UTC().Format(timestampLayout),
@@ -1335,7 +1571,7 @@ func (runtime *supervisedRuntime) Publish(ctx context.Context, request chain.Pro
 			ErrorEvidence: []string{digest(supervisedPromotionBlockedDomain, strings.Join(changed, "\n"))},
 		}, nil
 	}
-	if _, err := runtime.processStopEvidence(); err != nil {
+	if _, err := runtime.processStopEvidence(state); err != nil {
 		return chain.PromotionDecision{
 			ReceiptID:     runtime.nextID(),
 			OccurredAt:    runtime.clock().UTC().Format(timestampLayout),
@@ -1364,7 +1600,7 @@ func (runtime *supervisedRuntime) RunPostflight(context.Context, chain.Postfligh
 // RunSupervisedPostflight re-derives the five frozen facts from the persisted
 // artifacts and reconciles them field by field with the facts the step carries.
 func (runtime *supervisedRuntime) RunSupervisedPostflight(ctx context.Context, request chain.SupervisedPostflightRequest) (chain.SupervisedPostflightDecision, error) {
-	derived, err := runtime.deriveSupervisedFacts(ctx)
+	derived, err := runtime.deriveSupervisedFacts(ctx, request.TaskID, request.Attempt)
 	if err != nil {
 		return chain.SupervisedPostflightDecision{
 			Outcome:       chain.PostflightUncertain,
@@ -1383,32 +1619,37 @@ func (runtime *supervisedRuntime) RunSupervisedPostflight(ctx context.Context, r
 	}, nil
 }
 
-// deriveSupervisedFacts recomputes the five fact digests from the persisted
-// artifacts. It reads only files this assembly wrote.
-func (runtime *supervisedRuntime) deriveSupervisedFacts(context.Context) (chain.SupervisedFrozenFacts, error) {
-	receipt, found, err := runtime.loadReceipt()
+// deriveSupervisedFacts recomputes the five fact digests of one task from that
+// task's persisted artifacts. It reads only files this assembly wrote, so two
+// tasks of the same run can never be reconciled against each other's facts.
+func (runtime *supervisedRuntime) deriveSupervisedFacts(_ context.Context, taskID string, attempt int) (chain.SupervisedFrozenFacts, error) {
+	state, err := runtime.stateFor(taskID, attempt)
+	if err != nil {
+		return chain.SupervisedFrozenFacts{}, err
+	}
+	receipt, found, err := runtime.loadReceipt(state)
 	if err != nil {
 		return chain.SupervisedFrozenFacts{}, err
 	}
 	if !found {
 		return chain.SupervisedFrozenFacts{}, fmt.Errorf("%w: the handoff receipt is missing", ErrSupervisedNotOpen)
 	}
-	report, found, err := runtime.loadReport()
+	report, found, err := runtime.loadReport(state)
 	if err != nil {
 		return chain.SupervisedFrozenFacts{}, err
 	}
 	if !found {
 		return chain.SupervisedFrozenFacts{}, fmt.Errorf("%w: the reduced/unknown report is missing", ErrSupervisedNotOpen)
 	}
-	scanEvidenceHash, err := supervisedScanEvidenceHash(runtime.scanReportPath())
+	scanEvidenceHash, err := supervisedScanEvidenceHash(runtime.scanReportPath(state))
 	if err != nil {
 		return chain.SupervisedFrozenFacts{}, err
 	}
-	scanReport, _, err := runtime.loadScanReport()
+	scanReport, _, err := runtime.loadScanReport(state)
 	if err != nil {
 		return chain.SupervisedFrozenFacts{}, err
 	}
-	gateEvidence, found, err := runtime.loadGateEvidence()
+	gateEvidence, found, err := runtime.loadGateEvidence(state)
 	if err != nil {
 		return chain.SupervisedFrozenFacts{}, err
 	}
@@ -1436,14 +1677,14 @@ func (runtime *supervisedRuntime) Reconcile(context.Context, string) error { ret
 
 // --- helpers -------------------------------------------------------------------
 
-func (runtime *supervisedRuntime) ensureWorkspace() error {
-	if runtime.workspaceReady {
+func (runtime *supervisedRuntime) ensureWorkspace(state *supervisedTaskState) error {
+	if state.workspaceReady {
 		return nil
 	}
-	if err := os.MkdirAll(runtime.workspaceRoot, 0o755); err != nil {
+	if err := os.MkdirAll(state.workspaceRoot, 0o755); err != nil {
 		return fmt.Errorf("%w: create workspace: %v", ErrInvalidConfig, err)
 	}
-	runtime.workspaceReady = true
+	state.workspaceReady = true
 	return nil
 }
 
@@ -1464,6 +1705,21 @@ func (runtime *supervisedRuntime) idSource() chain.IDSource {
 	return nil
 }
 
+// taskDir is the store-local artifact directory of one task. A single-task
+// assembly keeps the flat <runRoot>/supervised/ layout, so the on-disk layout of
+// every single-task run stays byte-compatible; a multi-task assembly isolates
+// each task under supervised/tasks/<taskID>-attempt-<n>/ so no task can read or
+// overwrite another task's session, freeze, receipt, report or scans. The two
+// run-level ledgers stay flat on purpose: their records carry the task and step
+// ids themselves.
+func (runtime *supervisedRuntime) taskDir(state *supervisedTaskState) string {
+	if len(runtime.plan) <= 1 {
+		return SupervisedDir(runtime.runRoot)
+	}
+	return filepath.Join(SupervisedDir(runtime.runRoot), supervisedTasksDirectoryName,
+		fmt.Sprintf("%s-attempt-%d", state.taskID, state.attempt))
+}
+
 func (runtime *supervisedRuntime) ledgerPath() string {
 	return filepath.Join(SupervisedDir(runtime.runRoot), supervisedInteractionsName)
 }
@@ -1472,91 +1728,99 @@ func (runtime *supervisedRuntime) confirmationsPath() string {
 	return filepath.Join(SupervisedDir(runtime.runRoot), supervisedConfirmationsName)
 }
 
-func (runtime *supervisedRuntime) deliveryPath() string {
-	return filepath.Join(SupervisedDir(runtime.runRoot), supervisedDeliveryName)
+func (runtime *supervisedRuntime) deliveryPath(state *supervisedTaskState) string {
+	return filepath.Join(runtime.taskDir(state), supervisedDeliveryName)
 }
 
-func (runtime *supervisedRuntime) sessionPath() string {
-	return filepath.Join(SupervisedDir(runtime.runRoot), supervisedSessionName)
+func (runtime *supervisedRuntime) sessionPath(state *supervisedTaskState) string {
+	return filepath.Join(runtime.taskDir(state), supervisedSessionName)
 }
 
-func (runtime *supervisedRuntime) frozenPolicyPath() string {
-	return filepath.Join(SupervisedDir(runtime.runRoot), supervisedFrozenPolicyName)
+func (runtime *supervisedRuntime) frozenPolicyPath(state *supervisedTaskState) string {
+	return filepath.Join(runtime.taskDir(state), supervisedFrozenPolicyName)
 }
 
-func (runtime *supervisedRuntime) receiptPath() string {
-	return filepath.Join(SupervisedDir(runtime.runRoot), supervisedReceiptName)
+func (runtime *supervisedRuntime) receiptPath(state *supervisedTaskState) string {
+	return filepath.Join(runtime.taskDir(state), supervisedReceiptName)
 }
 
-func (runtime *supervisedRuntime) reportPath() string { return SupervisedReportPath(runtime.runRoot) }
-
-func (runtime *supervisedRuntime) scansDir() string {
-	return filepath.Join(SupervisedDir(runtime.runRoot), supervisedScansDirectoryName)
+func (runtime *supervisedRuntime) reportPath(state *supervisedTaskState) string {
+	if len(runtime.plan) <= 1 {
+		return SupervisedReportPath(runtime.runRoot)
+	}
+	return filepath.Join(runtime.taskDir(state), supervisedReportName)
 }
 
-func (runtime *supervisedRuntime) beforeManifestPath() string {
-	return filepath.Join(runtime.scansDir(), supervisedBeforeManifestName)
+func (runtime *supervisedRuntime) scansDir(state *supervisedTaskState) string {
+	return filepath.Join(runtime.taskDir(state), supervisedScansDirectoryName)
 }
 
-func (runtime *supervisedRuntime) scanReportPath() string {
-	return filepath.Join(runtime.scansDir(), supervisedScanReportName)
+func (runtime *supervisedRuntime) beforeManifestPath(state *supervisedTaskState) string {
+	return filepath.Join(runtime.scansDir(state), supervisedBeforeManifestName)
 }
 
-func (runtime *supervisedRuntime) gateEvidencePath() string {
-	return filepath.Join(runtime.scansDir(), supervisedGateEvidenceName)
+func (runtime *supervisedRuntime) scanReportPath(state *supervisedTaskState) string {
+	return filepath.Join(runtime.scansDir(state), supervisedScanReportName)
+}
+
+func (runtime *supervisedRuntime) gateEvidencePath(state *supervisedTaskState) string {
+	return filepath.Join(runtime.scansDir(state), supervisedGateEvidenceName)
 }
 
 func (runtime *supervisedRuntime) loadLedger() (chain.OperatorInteractionLedger, error) {
 	return loadOperatorInteractionLedger(runtime.ledgerPath())
 }
 
-func (runtime *supervisedRuntime) loadDelivery() (chain.SupervisedDelivery, bool, error) {
+func (runtime *supervisedRuntime) loadDelivery(state *supervisedTaskState) (chain.SupervisedDelivery, bool, error) {
 	var delivery chain.SupervisedDelivery
-	found, err := readSupervisedJSON(runtime.deliveryPath(), &delivery)
+	found, err := readSupervisedJSON(runtime.deliveryPath(state), &delivery)
 	return delivery, found, err
 }
 
-func (runtime *supervisedRuntime) loadSession() (chain.HandoffSession, bool, error) {
+// loadSession reads the persisted handoff session of one task attempt. Two tasks
+// never share a session file, so the session of an earlier task can never be
+// read as this task's open window.
+func (runtime *supervisedRuntime) loadSession(state *supervisedTaskState) (chain.HandoffSession, bool, error) {
 	var session chain.HandoffSession
-	found, err := readSupervisedJSON(runtime.sessionPath(), &session)
+	found, err := readSupervisedJSON(runtime.sessionPath(state), &session)
 	return session, found, err
 }
 
 // loadFrozenPolicy reads the persisted freeze of the handoff policy that was in
-// force when the work window opened.
-func (runtime *supervisedRuntime) loadFrozenPolicy() (supervisedHandoffPolicySnapshot, bool, error) {
+// force when the work window of one task opened.
+func (runtime *supervisedRuntime) loadFrozenPolicy(state *supervisedTaskState) (supervisedHandoffPolicySnapshot, bool, error) {
 	var snapshot supervisedHandoffPolicySnapshot
-	found, err := readSupervisedJSON(runtime.frozenPolicyPath(), &snapshot)
+	found, err := readSupervisedJSON(runtime.frozenPolicyPath(state), &snapshot)
 	return snapshot, found, err
 }
 
-func (runtime *supervisedRuntime) loadReceipt() (chain.HandoffReceiptRecord, bool, error) {
+func (runtime *supervisedRuntime) loadReceipt(state *supervisedTaskState) (chain.HandoffReceiptRecord, bool, error) {
 	var receipt chain.HandoffReceiptRecord
-	found, err := readSupervisedJSON(runtime.receiptPath(), &receipt)
+	found, err := readSupervisedJSON(runtime.receiptPath(state), &receipt)
 	return receipt, found, err
 }
 
-func (runtime *supervisedRuntime) loadReport() (chain.SupervisedReportRecord, bool, error) {
+func (runtime *supervisedRuntime) loadReport(state *supervisedTaskState) (chain.SupervisedReportRecord, bool, error) {
 	var report chain.SupervisedReportRecord
-	found, err := readSupervisedJSON(runtime.reportPath(), &report)
+	found, err := readSupervisedJSON(runtime.reportPath(state), &report)
 	return report, found, err
 }
 
-func (runtime *supervisedRuntime) loadBeforeManifest() (snapshot.SnapshotManifest, bool, error) {
+func (runtime *supervisedRuntime) loadBeforeManifest(state *supervisedTaskState) (snapshot.SnapshotManifest, bool, error) {
 	var manifest snapshot.SnapshotManifest
-	found, err := readSupervisedJSON(runtime.beforeManifestPath(), &manifest)
+	found, err := readSupervisedJSON(runtime.beforeManifestPath(state), &manifest)
 	return manifest, found, err
 }
 
-func (runtime *supervisedRuntime) loadScanReport() (supervisedScanReport, bool, error) {
+func (runtime *supervisedRuntime) loadScanReport(state *supervisedTaskState) (supervisedScanReport, bool, error) {
 	var report supervisedScanReport
-	found, err := readSupervisedJSON(runtime.scanReportPath(), &report)
+	found, err := readSupervisedJSON(runtime.scanReportPath(state), &report)
 	return report, found, err
 }
 
-func (runtime *supervisedRuntime) loadGateEvidence() (supervisedGateEvidence, bool, error) {
+func (runtime *supervisedRuntime) loadGateEvidence(state *supervisedTaskState) (supervisedGateEvidence, bool, error) {
 	var gateEvidence supervisedGateEvidence
-	found, err := readSupervisedJSON(runtime.gateEvidencePath(), &gateEvidence)
+	found, err := readSupervisedJSON(runtime.gateEvidencePath(state), &gateEvidence)
 	return gateEvidence, found, err
 }
 
@@ -1604,9 +1868,9 @@ func supervisedInteractionResponse(ledger chain.OperatorInteractionLedger, inter
 // canonical digest converges, while a divergent snapshot is refused rather than
 // silently overwritten, so a later configuration change can never rewrite an
 // already-frozen window.
-func (runtime *supervisedRuntime) persistFrozenHandoffPolicy() error {
-	hash := supervisedHandoffPolicyHash(runtime.policy)
-	existing, found, err := runtime.loadFrozenPolicy()
+func (runtime *supervisedRuntime) persistFrozenHandoffPolicy(state *supervisedTaskState) error {
+	hash := supervisedHandoffPolicyHash(state.policy)
+	existing, found, err := runtime.loadFrozenPolicy(state)
 	if err != nil {
 		return err
 	}
@@ -1616,7 +1880,7 @@ func (runtime *supervisedRuntime) persistFrozenHandoffPolicy() error {
 		}
 		return nil
 	}
-	return writeSupervisedJSON(runtime.frozenPolicyPath(), supervisedHandoffPolicySnapshot{Policy: runtime.policy, PolicyHash: hash})
+	return writeSupervisedJSON(runtime.frozenPolicyPath(state), supervisedHandoffPolicySnapshot{Policy: state.policy, PolicyHash: hash})
 }
 
 // enforceFrozenHandoffPolicy is the complete-return guard against handoff-policy
@@ -1633,10 +1897,12 @@ func (runtime *supervisedRuntime) persistFrozenHandoffPolicy() error {
 // window-open, so the session and the snapshot cannot disagree. Third, the
 // policy in force now must digest to that same value.
 //
-// On success the runtime adopts the snapshot, so the scans and gates below are
-// enforced from the window's policy and not from any swapped configuration.
-func (runtime *supervisedRuntime) enforceFrozenHandoffPolicy(session chain.HandoffSession) error {
-	snapshot, found, err := runtime.loadFrozenPolicy()
+// On success the runtime adopts the snapshot for that task, so the scans and
+// gates below are enforced from the window's policy and not from any swapped
+// configuration. The freeze is per task: a second task of the same run freezes
+// and enforces its own policy, never the first task's.
+func (runtime *supervisedRuntime) enforceFrozenHandoffPolicy(state *supervisedTaskState, session chain.HandoffSession) error {
+	snapshot, found, err := runtime.loadFrozenPolicy(state)
 	if err != nil {
 		return err
 	}
@@ -1649,10 +1915,10 @@ func (runtime *supervisedRuntime) enforceFrozenHandoffPolicy(session chain.Hando
 	if snapshot.PolicyHash != session.HandoffPolicyHash {
 		return fmt.Errorf("%w: the frozen handoff policy does not match the window session", ErrSupervisedPolicyDrift)
 	}
-	if supervisedHandoffPolicyHash(runtime.policy) != session.HandoffPolicyHash {
+	if supervisedHandoffPolicyHash(state.policy) != session.HandoffPolicyHash {
 		return fmt.Errorf("%w: the policy in force changed since the window opened", ErrSupervisedPolicyDrift)
 	}
-	runtime.policy = snapshot.Policy
+	state.policy = snapshot.Policy
 	return nil
 }
 

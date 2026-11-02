@@ -1104,11 +1104,15 @@ func TestSupervisedSideEffectScanBlocksTamperedManifests(t *testing.T) {
 	}
 	for _, testCase := range cases {
 		t.Run(testCase.name, func(t *testing.T) {
-			runtime := &supervisedRuntime{
+			runtime := &supervisedRuntime{}
+			state := &supervisedTaskState{
+				taskID:        "task-one",
+				stepID:        "code-one",
+				attempt:       1,
 				workspaceRoot: t.TempDir(),
 				policy:        chain.HandoffPolicy{AllowedTargets: []string{"target-one"}},
 			}
-			err := runtime.runSideEffectScan(testCase.before, testCase.after)
+			err := runtime.runSideEffectScan(state, testCase.before, testCase.after)
 			if testCase.want == nil {
 				if err != nil {
 					t.Fatalf("an unmodified manifest pair must pass, got %v", err)
@@ -1131,11 +1135,12 @@ func TestSupervisedSideEffectScanBlocksTamperedManifests(t *testing.T) {
 // untrusted manifest, and runSecretAndTypeScan is the exact function the return
 // path calls.
 func TestSupervisedFileTypeScanRejectsUnacceptedType(t *testing.T) {
-	runtime := &supervisedRuntime{workspaceRoot: t.TempDir()}
+	runtime := &supervisedRuntime{}
+	state := &supervisedTaskState{taskID: "task-one", stepID: "code-one", attempt: 1, workspaceRoot: t.TempDir()}
 	manifest := snapshot.SnapshotManifest{Manifest: snapshot.ManifestBody{Entries: []snapshot.Entry{
 		{Path: "pipe", Type: snapshot.EntryType("named-pipe")},
 	}}}
-	err := runtime.runSecretAndTypeScan(context.Background(), manifest)
+	err := runtime.runSecretAndTypeScan(context.Background(), state, manifest)
 	if !errors.Is(err, ErrSupervisedFileType) {
 		t.Fatalf("an unaccepted entry type must block the scan, got %v", err)
 	}
@@ -1418,13 +1423,16 @@ func TestSupervisedPathNeverRoutesThroughAgentRunner(t *testing.T) {
 	harness := newSupervisedHarness(t, []string{adapters.VisibleStubAccepted}, false, 300000)
 	ctx := context.Background()
 
-	taskID, stepID, policy, err := supervisedAssemblyStep(harness.options.Definition)
+	taskPlan, err := supervisedAssemblyPlan(harness.options)
 	if err != nil {
 		t.Fatalf("the supervised definition must resolve: %v", err)
 	}
+	if len(taskPlan) != 1 {
+		t.Fatalf("the single-task fixture must resolve to one binding, got %d", len(taskPlan))
+	}
 	assemblyOptions := harness.options
 	assemblyOptions.RunRoot = t.TempDir()
-	_, runtime, err := newSupervisedEngine(ctx, assemblyOptions, taskID, stepID, *policy, harness.clock)
+	_, runtime, err := newSupervisedEngine(ctx, assemblyOptions, taskPlan, harness.clock)
 	if err != nil {
 		t.Fatalf("building the production supervised assembly failed: %v", err)
 	}

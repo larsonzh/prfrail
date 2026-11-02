@@ -80,6 +80,7 @@
 | P47 GOVERNANCE-BASELINE-VERIFY | ✅ Completed | P46 | M | 2026-11-02 | docs/validation/governance-baseline-verify{,_EN}.md; backfill: OB-133 to OB-136 |
 | P48 DR13-FIX-D3 | ✅ Completed | DR13-FIX | S | 2026-11-02 | docs/validation/dr13-fix-d3{,_EN}.md (stopped at 10 for authorisation) |
 | P49 RACE-LEG-EXPAND | ✅ Completed | P48 | M | 2026-11-02 | docs/validation/race-leg-expand{,_EN}.md (`75990a8`, run `41445657595` green on the first attempt) |
+| P50 CONSOLE-MULTITASK-ASSEMBLY | ✅ Completed | P49 | L | 2026-11-03 | Report pair `docs/validation/console-multitask-assembly{,_EN}.md`; stopped at 10 for authorisation; temp artefacts `tmp/CONSOLE-MULTITASK-ASSEMBLY/` (cleared at 8c); R=1, D=1 |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1492,6 +1493,28 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | R / D baseline | R = 1, D = 2 (R counts the step-2 r2 contract-digest remediation; D counts the step-1 retrieval miss and the main controller environment pre-check blind spot) |
 | Temp artefact location | `tmp/RACE-LEG-EXPAND/` (append-only until 8c) |
 | Completion record | Report pair: `docs/validation/race-leg-expand{,_EN}.md`; review chain 5 PASS WITH FIXES / 6 PASS WITH FINDINGS / 7 r1 PASS WITH FIXES → r2 PASS; red baseline exit 1 → flip exit 0 → real `-race` green on the VM; three scopes TOTAL_FAIL=0, SELFTEST 697/697; commit `75990a8` pushed to origin (never gitee), run `41445657595` green on the first attempt on both legs, Race leg six packages all ok (console 8.835s / gates 3.265s / guard 2.958s / tickets 5.759s) |
+
+### P50 — `CONSOLE-MULTITASK-ASSEMBLY` (console multitask production assembly expansion; layer 2, item 3) · ✅ Completed
+
+| Field | Content |
+|---|---|
+| Identity | `CONSOLE-MULTITASK-ASSEMBLY` (implementation slice; directive v1.60; tier L) |
+| Status | ✅ **Completed** (2026-11-03; anchor HEAD = `8bd8224`, directive v1.60; stopped at 10 for authorisation after an all-green stage 9) |
+| Goal | Lift the console single-task limit (`runtime_agent.go:774` and `runtime_supervised.go:335` force a single task), refactor into concurrent multitask assembly without breaking the existing A6 exclusivity contract (one identity mirror per runRoot) |
+| Depends on | P49 closed (`75990a8` + `8bd8224`); **protocol first**: if CONTRACTS or the underlying lock mechanism must change, stage 1 first delivers the exact protocol amendment |
+| Rulings recorded | Plan A (user ruling 2026-11-03): scope limited to the production assembly layer + offline harness + test rewrites, CLI wiring postponed to a later slice; stage 2 dispatched in small serial steps 2a-2d |
+| Size | L |
+| Steps | Step 0 → 1 architecture (protocol first, V4 Pro) → 3 test first (TDD red test) → 2 implementation → 4 gates → 5 pre-review → 6 scan → 7 final review (Codex) → 8 docs → 9 validation → 8c → 10 stop point |
+| Current gap | `ExecuteNoopRun` and `localRuntime` force single-task; multitask assembly conflicts with the A6 contract (one identity mirror per runRoot), recorded as P45 D9 — needs a protocol-first ruling |
+| Deliverables | Report pair `docs/validation/console-multitask-assembly{,_EN}.md` (stage 8); evidence pack `docs/validation/evidence/CONSOLE-MULTITASK-ASSEMBLY/` (including `00-briefing.md`); freedom list; doc sync (`ARCHITECTURE` / `DEV_PLAN` historical back-fill) |
+| Acceptance evidence | Stage-3 red test proving concurrent multitask is refused today; flips green after stage 2; `go build` / `go vet` / `go test ./...` all green; three scopes TOTAL_FAIL=0 and SELFTEST 697/697; the A6 mirror stays intact |
+| Boundaries | No lifting of the single-task limit before the protocol changes; tier-L core refactor, never downgrade to `[ROUTINE]`; no gitee push; stop at 10 for authorisation |
+| Tier | `[SLICE]` (implementation) |
+| Probe budget | None |
+| Freedom list path | `docs/validation/evidence/CONSOLE-MULTITASK-ASSEMBLY/freedom-list.md` |
+| R / D baseline | R = 1, D = 1 (R counts the stage-5 r1 remediation round; D counts the stage-2 dispatch-channel failures and the two partial-artifact dispositions) |
+| Temp artefact location | `tmp/CONSOLE-MULTITASK-ASSEMBLY/` (append-only until 8c) |
+| Completion record | Report pair: `docs/validation/console-multitask-assembly{,_EN}.md`; review chain: 1 DESIGN DONE → 3 red tests → 2a-2d plus the fix round → 5 r1 PASS WITH FIXES → r2 PASS → 6 INDEPENDENT SCAN: PASS → 7 FINAL REVIEW: PASS; doc sync: ARCHITECTURE/DEV_PLAN updated (DEV_PLAN back-fills the P39-P50 milestones); stage 9 three scopes TOTAL_FAIL=0, SELFTEST 697/697; R=1, D=1; stopped at 10 for authorisation |
 
 ## Known defects (to be handled before later slices)
 

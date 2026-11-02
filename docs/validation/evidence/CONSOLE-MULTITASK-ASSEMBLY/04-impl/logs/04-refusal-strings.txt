@@ -1,0 +1,5 @@
+runtime_agent.go:966: return nil, fmt.Errorf("%w: the AgentRunner assembly requires at least one task", ErrInvalidConfig)
+runtime_agent.go:971: return nil, fmt.Errorf("%w: the AgentRunner assembly requires exactly one step", ErrInvalidConfig)
+runtime_supervised.go:155: ErrSupervisedStepRequired = errors.New("the supervised assembly requires exactly one supervised-black-box code step")
+runtime_supervised.go:380: return nil, fmt.Errorf("%w: the supervised assembly requires at least one task", ErrInvalidConfig)
+runtime_supervised.go:385: return nil, fmt.Errorf("%w: the supervised assembly requires exactly one step", ErrInvalidConfig)

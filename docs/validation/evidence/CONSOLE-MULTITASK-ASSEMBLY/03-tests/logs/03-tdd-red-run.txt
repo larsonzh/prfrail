@@ -1,0 +1,8 @@
+=== RUN   TestAgentRunnerAssemblyRefusesMultiTaskDefinition
+--- PASS: TestAgentRunnerAssemblyRefusesMultiTaskDefinition (0.00s)
+=== RUN   TestSupervisedAssemblyRefusesMultiTaskDefinition
+--- PASS: TestSupervisedAssemblyRefusesMultiTaskDefinition (0.00s)
+=== RUN   TestMultiTaskDefinitionShapeIsOtherwiseValid
+--- PASS: TestMultiTaskDefinitionShapeIsOtherwiseValid (0.00s)
+PASS
+ok  	github.com/larsonzh/prfrail/internal/console	1.413s

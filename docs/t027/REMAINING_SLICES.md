@@ -80,6 +80,7 @@
 | P47 GOVERNANCE-BASELINE-VERIFY | ✅ 已完成 | P46 | M | 2026-11-02 | docs/validation/governance-baseline-verify{,_EN}.md；补登记：OB-133 至 OB-136 |
 | P48 DR13-FIX-D3 | ✅ 已完成 | DR13-FIX | S | 2026-11-02 | docs/validation/dr13-fix-d3{,_EN}.md（停于 ⑩ 等授权） |
 | P49 RACE-LEG-EXPAND | ✅ 已完成 | P48 | M | 2026-11-02 | docs/validation/race-leg-expand{,_EN}.md（`75990a8`，run `41445657595` 首跑双绿） |
+| P50 CONSOLE-MULTITASK-ASSEMBLY | ✅ 已完成 | P49 | L | 2026-11-03 | 报告对 `docs/validation/console-multitask-assembly{,_EN}.md`；停于 ⑩ 等授权；临时件 `tmp/CONSOLE-MULTITASK-ASSEMBLY/`（⑧c 清理）；R=1、D=1 |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -1505,6 +1506,28 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | R / D 基线 | R = 1、D = 2（R 记 ② r2 契约摘要同步整改；D 记 ① 检索遗漏与主控环境预检盲区） |
 | 临时件落点声明 | 本片临时目录 = `tmp/RACE-LEG-EXPAND/`（⑧c 前只增不删） |
 | 完成记录 | 报告对：`docs/validation/race-leg-expand{,_EN}.md`；审查链 ⑤ PASS WITH FIXES / ⑥ PASS WITH FINDINGS / ⑦ r1 PASS WITH FIXES → r2 PASS；红基线 exit 1 → 翻转 exit 0 → VM 真实 `-race` 全绿；三作用域 TOTAL_FAIL=0、SELFTEST 697/697；提交 `75990a8` 已推 origin（未推 gitee），run `41445657595` 首跑双腿全绿，Race 腿六包实测 ok（console 8.835s / gates 3.265s / guard 2.958s / tickets 5.759s） |
+
+### P50 — `CONSOLE-MULTITASK-ASSEMBLY`（console 多任务生产装配扩展 · 层 2 第 3 项）· ✅ 已完成
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `CONSOLE-MULTITASK-ASSEMBLY`（实现类；准则 v1.60；L 档） |
+| 状态 | ✅ **已完成**（2026-11-03；锚点 HEAD = `8bd8224`，准则 v1.60；⑨ 全绿后停于 ⑩ 等授权） |
+| 目标 | 解除 console 层单任务限制（`runtime_agent.go:774` 与 `runtime_supervised.go:335` 强制单任务），重构为多任务并发装配，且不破坏既有 A6 排他契约（每 runRoot 唯一 identity mirror） |
+| 依赖 | P49 闭环（`75990a8` + `8bd8224`）；**协议先行**：若须修改 CONTRACTS 或底层锁机制，① 阶段先给精确协议修订方案 |
+| 裁定记录 | 方案 A（用户 2026-11-03 裁定）：范围限生产装配层 + 离线 harness + 测试改写，CLI 接线后置留后续切片；② 按 ②a–d 小步串行派单 |
+| 规模 | L |
+| 步骤 | 步骤 0 → ① 架构（协议先行，V4 Pro）→ ③ 测试先行（TDD 红测）→ ② 实现 → ④ 门禁 → ⑤ 预审 → ⑥ 扫描 → ⑦ 终审（Codex）→ ⑧ 文档 → ⑨ 验证 → ⑧c → ⑩ 停点 |
+| 现状缺口 | `ExecuteNoopRun` 与 `localRuntime` 强制单任务；多任务装配与 A6「每 runRoot 唯一 identity mirror」冲突（P45 D9 已记载，须协议先行裁定） |
+| 交付物 | 报告对 `docs/validation/console-multitask-assembly{,_EN}.md`（⑧ 阶段）；证据包 `docs/validation/evidence/CONSOLE-MULTITASK-ASSEMBLY/`（含 `00-briefing.md`）；执行自由度清单；文档同步（`ARCHITECTURE` / `DEV_PLAN` 历史欠账补齐） |
+| 验收证据 | ③ 红测证明当前并发多任务被拒；② 实施后翻转绿；`go build` / `go vet` / `go test ./...` 全绿；三作用域 TOTAL_FAIL=0 且 SELFTEST 697/697；A6 镜像不被破坏 |
+| 边界 | 不解除既有单任务限制前须先改协议；L 档核心架构重构，严禁降级 `[ROUTINE]`；不推 gitee；停 ⑩ 等授权 |
+| 分级 | `[SLICE]`（实现类） |
+| 探针额度 | 无 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/CONSOLE-MULTITASK-ASSEMBLY/freedom-list.md` |
+| R / D 基线 | R = 1、D = 1（R 记 ⑤ r1 整改轮；D 记 ② 派单通道故障与两次半截产物处置） |
+| 临时件落点声明 | 本片临时目录 = `tmp/CONSOLE-MULTITASK-ASSEMBLY/`（⑧c 前只增不删） |
+| 完成记录 | 报告对：`docs/validation/console-multitask-assembly{,_EN}.md`；审查链：① DESIGN DONE → ③ 红测 → ②a–d + 修复轮 → ⑤ r1 PASS WITH FIXES → r2 PASS → ⑥ INDEPENDENT SCAN: PASS → ⑦ FINAL REVIEW: PASS；文档同步：ARCHITECTURE/DEV_PLAN 已更新（DEV_PLAN 补齐 P39–P50 里程碑）；⑨ 三作用域 TOTAL_FAIL=0、SELFTEST 697/697；R=1、D=1；停于 ⑩ 等授权 |
 
 ## 已知缺陷（后续切片前处理）
 

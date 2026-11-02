@@ -1,0 +1,14 @@
+SELFTEST: PASS 697/697
+GATE REPORT scope=tree repo=D:\LZProjects\prfrail changed=39
+PASS  G6-1 status tense :: no pending/completion conflict on added lines (scanned 440) whitelist-source=worktree
+TOTAL_FAIL=0
+GATE REPORT scope=index repo=D:\LZProjects\prfrail changed=39
+PASS  G6-1 status tense :: no pending/completion conflict on added lines (scanned 440) whitelist-source=worktree
+TOTAL_FAIL=0
+GATE REPORT scope=ci repo=D:\LZProjects\prfrail changed=9
+PASS  G6-1 status tense :: no pending/completion conflict on added lines (scanned 48) whitelist-source=endpoint:HEAD
+TOTAL_FAIL=0
+base gofmt -l . :: empty
+base go build ./... :: exit 0
+base go vet ./... :: exit 0
+base go test ./... :: ok=15 FAIL=0

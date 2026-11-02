@@ -164,12 +164,19 @@ Backfill note (2026-10-22, step 0 of slice DIRECTIVE-COST-TIER): when those thre
 
 ### November Refactor Milestone (T027-B)
 
-- P40 lock order: C1
-- P41 ownership: C2 and N1
-- P42 binding: C3 and N2
+- P37 decision baseline: C1–C7 defect verdicts and the remediation baseline (the P38 working drawing gives the file/function-level test matrix; reports `docs/validation/t027b-breakthrough{,_EN}.md`, `docs/validation/t027b-tactical-blueprint{,_EN}.md`)
+- P39 durable budget: C6 (DurableCostLedger plus a cross-process shared lock, deciding after a re-read inside the lock; report `docs/validation/p39-durable-budget{,_EN}.md`; directive v1.60)
+- P40 lock order: C1 (done, report `docs/validation/p40-lock-reaper{,_EN}.md`)
+- P41 ownership: C2 and N1 (done, report `docs/validation/p41-spawn-ownership{,_EN}.md`)
+- P42 binding: C3 and N2 (done, report `docs/validation/p42-evidence-bind{,_EN}.md`)
 - P43 sealing: C4 and C5 and N3 (done, report docs/validation/p43-state-seal{,_EN}.md)
-- P44 gate order: C7 and N4 (decision implementation and tests complete; end-to-end wiring is a later slice)
+- P44 gate order: C7 and N4 (decision implementation and tests complete, report `docs/validation/p44-gate-readiness{,_EN}.md`; end-to-end wiring is a later slice)
 - P45 zero-model E2E: done (assembly validation; zero production-code change; the three-task state order and the never-started T3 are asserted on both the engine and console sides; report `docs/validation/p45-e2e-zero-model{,_EN}.md`)
+- P46 strategic review: breakpoint A partially closed, breakpoint B not closed, gap ledger GAP-01–GAP-76 (report `docs/validation/strategic-review-2026-11-02{,_EN}.md`)
+- P47 governance baseline verification: seven either/or checks for breakpoint B, with OB-133 to OB-136 registered (report `docs/validation/governance-baseline-verify{,_EN}.md`)
+- P48 DR13-D3: release removes before unlocking, closing W1 (report `docs/validation/dr13-fix-d3{,_EN}.md`)
+- P49 Race leg expansion: six core internal packages enter the CI Ubuntu Race leg (report `docs/validation/race-leg-expand{,_EN}.md`)
+- P50 console multi-task assembly complete: protocol first (the CONTRACTS A6 multi-task serial assembly paragraph) plus serial scheduling and the inter-task stop-proof barrier, with A6 instant-level mirror exclusion unchanged (report `docs/validation/console-multitask-assembly{,_EN}.md`; CLI wiring deferred)
 
 ## 3. Requirement Mapping
 

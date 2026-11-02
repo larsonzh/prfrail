@@ -73,6 +73,12 @@ AI 需要人工输入时，AgentRunner 或辅助 adapter 只接收结构化 `ope
 
 零模型三任务 E2E（P45）钉住的装配路径：引擎按任务顺序串行物化工作区，每个任务的父快照取当时的 `AcceptedParent`，任务被接受后推进父快照，因此 T1 → T2 → T3 的父链是 `baselineHash` → `acceptedOne` → `acceptedTwo`。失败隔离点在任务循环：`runTask` 出错即置该任务 FAILED、链 FAILED 并停止后续任务，T3 既不物化工作区也不产生任务事件或步骤请求；该停止语义由引擎级测试在 workspace 调用序、事件流、投影键与步骤请求集四处交叉断言，console 侧则以 `localRuntime` 对非 noop 步的自然拒绝复现同一失败机。console 装配层的单任务限制保持不动（`runtime_agent.go:774`、`runtime_supervised.go:335`），多任务贯通走 `ExecuteNoopRun`。并发 Start 的排他性在包外用同 launcher、同 runRoot 的 8 路 `Start` 断言：恰一赢家、败者只命中 `ErrAgentRunnerLaunchConflict` 或 `ErrAgentRunnerProcessDuplicate`、赢家 `ProcessAlive`、活体赢家拒绝迟到启动、停止后槽位释放并可重发。
 
+console 多任务串行装配（P50）：装配计划把 `chain.Definition` 展开为逐 task 绑定表——`agentRunnerAssemblyPlan` 与 `supervisedAssemblyPlan` 各要求每个 task 恰有一个 code step（分别 isolated-workspace 与 supervised-black-box），0 task 以专用文案拒绝；每个 `(taskId, stepId, attempt)` 绑定各自已持久化的 `agent-runner-request`，`agentRunnerAssemblyRecords` 强制 `requestId` 互异且 attempt 恒为 1。驱动循环在生产入口内逐 task 串行推进：等待该 task 的派发→发布终局→载入 chain 终局→路由提交；非 completed 终局即停止后续 task。任务间停机证明屏障由 `proveTaskStopped` 承担，它复用 `managedProcessesGone` 的三态判定（已停止 / 仍存活 / 证据缺失），任一不满足即 fail-closed，绝不进入下一 task 的 R 与 launch-intent。CLI 接线后置，本片范围限生产装配层与离线 harness。
+
+A6 镜像共享语义（P50 复核）：runRoot 级身份镜像与启动槽是「**同一时刻至多一个在跑 launch**」的排他点，不是 run 生命周期内的一次性唯一；串行装配因此不需要新锁，也不产生并发 spawn。任务切换时镜像由新 launch 以临时文件 + rename 原子覆盖，与既有「镜像命名死亡进程即陈旧、可被替换」语义一致；并发 Start 的败者依旧不得创建日志工件、不得覆盖身份镜像。时刻级排他、镜像轮换与「先证明停机、再发 R」三者合起来，使「每 runRoot 唯一镜像」在共享使用下仍然成立。
+
+调度机制（P50）：wire 与磁盘工件的流键仍是 `requestId`（R/C、launch-intent/identity、终局与证据目录均按它隔离），装配层用 `(runID, taskID, stepID, attempt)` 映射到唯一请求记录，chain 层只认 `runID`；该 runRoot 的 `events/state-events.jsonl` 仍是唯一全序源。各 task 的六枚冻结事实由该 task 终局路由事件的 `evidence[2..7]` 位置化载荷归属，不得跨 task 对账。
+
 ## 4. 存储与生命周期
 
 RFC 默认快照根是 `out/prfrail/snapshots/`。run/state/outbox 的具体布局属于待冻结契约，不能凭本文生成生产路径。要求物理上分离源目录、run-workspace、执行 outbox、核心 state/store；启动前验证无嵌套捕获和别名重叠。

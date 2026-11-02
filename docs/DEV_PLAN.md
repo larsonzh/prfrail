@@ -163,12 +163,19 @@ T027 前置状态更新（2026-10-31，DOCS-ALIGNMENT）：本片把 DEV_PLAN、
 
 ### 11 月重构里程碑（T027-B）
 
-- P40 锁序：C1
-- P41 归属：C2 与 N1
-- P42 绑定：C3 与 N2
+- P37 判定基线：C1–C7 缺陷判定与修复基线（P38 施工图给文件/函数级测试矩阵；报告 `docs/validation/t027b-breakthrough{,_EN}.md`、`docs/validation/t027b-tactical-blueprint{,_EN}.md`）
+- P39 持久预算：C6（DurableCostLedger 与跨进程共享锁，锁内重读后决策；报告 `docs/validation/p39-durable-budget{,_EN}.md`；准则 v1.60）
+- P40 锁序：C1（已完成，报告 `docs/validation/p40-lock-reaper{,_EN}.md`）
+- P41 归属：C2 与 N1（已完成，报告 `docs/validation/p41-spawn-ownership{,_EN}.md`）
+- P42 绑定：C3 与 N2（已完成，报告 `docs/validation/p42-evidence-bind{,_EN}.md`）
 - P43 封存：C4 与 C5 与 N3（已完成，报告 `docs/validation/p43-state-seal{,_EN}.md`）
-- P44 门序：C7 与 N4（判定实现与测试已完成；端到端接线为后续切片）
+- P44 门序：C7 与 N4（判定实现与测试已完成，报告 `docs/validation/p44-gate-readiness{,_EN}.md`；端到端接线为后续切片）
 - P45 零模型 E2E：完成（装配验证；生产代码零改动；三任务状态序与 T3 未启动在引擎级与 console 级均有断言；报告 `docs/validation/p45-e2e-zero-model{,_EN}.md`）
+- P46 战略回看：断点 A 部分闭合、断点 B 未闭合，缺口台账 GAP-01–GAP-76（报告 `docs/validation/strategic-review-2026-11-02{,_EN}.md`）
+- P47 治理基线核验：断点 B 七项二选一核验，补登记 OB-133 至 OB-136（报告 `docs/validation/governance-baseline-verify{,_EN}.md`）
+- P48 DR13-D3：release 先 remove 再 unlock，闭合 W1（报告 `docs/validation/dr13-fix-d3{,_EN}.md`）
+- P49 Race 腿扩包：六个核心内部包纳入 CI Ubuntu Race 腿（报告 `docs/validation/race-leg-expand{,_EN}.md`）
+- P50 console 多任务装配完成：协议先行（CONTRACTS A6 多任务串行装配段）与串行调度与任务间停机证明屏障，A6 镜像时刻级排他不变（报告 `docs/validation/console-multitask-assembly{,_EN}.md`；CLI 接线后置）
 
 ## 3. 需求映射
 

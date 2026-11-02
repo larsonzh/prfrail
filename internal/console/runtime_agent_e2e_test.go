@@ -635,7 +635,7 @@ func newAgentRunnerPIDReportRuntime(t *testing.T) (*agentRunnerRuntime, string) 
 		runID: assemblyRunID,
 		store: store,
 		requestRecord: adapters.AgentRunnerRequestRecord{
-			Request: adapters.AgentRunnerRequest{RequestID: assemblyRequestID},
+			Request: adapters.AgentRunnerRequest{RequestID: assemblyRequestID, TaskID: assemblyTaskID, Attempt: 1},
 		},
 	}, evidenceDir
 }
@@ -872,7 +872,7 @@ func TestAgentRunnerAssemblyRefusesPublishWithoutPIDReport(t *testing.T) {
 			}
 			writeReport(agentRunnerParentPIDReportFileName, tc.parent)
 			writeReport(agentRunnerChildPIDReportFileName, tc.child)
-			stopped, err := runtime.managedProcessesGone()
+			stopped, err := runtime.managedProcessesGone(assemblyTaskID, 1)
 			if tc.wantInvalid {
 				if stopped || !errors.Is(err, adapters.ErrInvalidAgentRunnerEvidence) {
 					t.Fatalf("a run missing or unable to read a pid report must fail closed: stopped=%v err=%v", stopped, err)
@@ -1010,12 +1010,13 @@ func TestAgentRunnerMitigateAbandonedLaunchClosureCoversEveryUnprovenShape(t *te
 // failure after the engine exists, and no post-spawn failure may bypass the
 // abandoned-launch mitigation the closure applies.
 func TestAgentRunnerAssemblyFunnelsEveryPostSpawnFailureThroughTheFallback(t *testing.T) {
-	// wantFailureReturnPoints is the guard rail. It is 7: the first engine.Run
-	// non-awaiting error, the WaitAgentRunnerDispatched error, the PublishTerminal
-	// error, the LoadChainAgentRunnerTerminal error, the SubmitAgentRunnerTerminal
-	// error, the non-completed status error and the second engine.Run error. A new
+	// wantFailureReturnPoints is the guard rail. It is 8: the engine.Run
+	// non-awaiting error, the awaiting-task binding error, the
+	// WaitAgentRunnerDispatched error, the PublishTerminal error, the
+	// LoadChainAgentRunnerTerminal error, the SubmitAgentRunnerTerminal error, the
+	// non-completed status error and the between-task stop proof error. A new
 	// failure path must return fail(...) and bump this constant in the same change.
-	const wantFailureReturnPoints = 7
+	const wantFailureReturnPoints = 8
 	const nakedFailureReturn = "summarizeProjection(engine.Projection(), eventLog), err"
 	const successReturn = "return summarizeProjection(engine.Projection(), eventLog), nil"
 
