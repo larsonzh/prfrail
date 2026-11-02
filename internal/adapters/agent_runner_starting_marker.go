@@ -86,17 +86,34 @@ func writeAgentRunnerStartingMarker(runRoot string, marker agentRunnerStartingMa
 	return &startingMarkerClaim{path: target, file: file}, nil
 }
 
-// release drops the host lock and removes the marker. It reports whether the
-// marker file was actually removed; a claim that was already released, or a
-// marker another scan already cleared, reports false.
+// release removes the published marker, drops the host lock, and closes the
+// claim handle, in that order. It reports whether the marker file was actually
+// removed; a claim that was already released, or a marker another scan already
+// cleared, reports false.
+//
+// The path is removed first, while the claim handle still holds the lock. That
+// makes the deletion and the lock release one continuous step from the point of
+// view of a recovering scan: the name is already gone by the time the lock can
+// look free, so a scan can never pair an idle lock with a live marker still
+// published under that name.
+//
+// The removal can still fail, for example when a concurrent scan holds the name
+// open without allowing deletion. The lock and the handle are then released
+// unconditionally anyway: the kernel drops the lock when the handle closes or the
+// host dies, so withholding the close to keep the lock would only leak a handle
+// and cannot keep the marker protected. Such a residual marker fails closed into
+// the existing convergence path - the same-process ownership gate refuses it
+// here, and the next scan re-checks it - rather than being retried inside
+// release.
 func (claim *startingMarkerClaim) release() bool {
 	if claim == nil || claim.file == nil {
 		return false
 	}
+	removed := os.Remove(claim.path) == nil
 	unlockStartingMarker(claim.file)
 	_ = claim.file.Close()
 	claim.file = nil
-	return os.Remove(claim.path) == nil
+	return removed
 }
 
 // decodeAgentRunnerStartingMarker reads a decoded marker from an open file. It

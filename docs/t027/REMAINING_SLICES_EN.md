@@ -78,6 +78,7 @@
 | P45 P45-T027B-E2E-ZERO-MODEL | ✅ Completed | DR13-FIX | M | 2026-11-01 | docs/validation/p45-e2e-zero-model{,_EN}.md |
 | P46 STRATEGIC-REVIEW-2026-11-02 | ✅ Completed | P45 | L | 2026-11-02 | docs/validation/strategic-review-2026-11-02{,_EN}.md |
 | P47 GOVERNANCE-BASELINE-VERIFY | ✅ Completed | P46 | M | 2026-11-02 | docs/validation/governance-baseline-verify{,_EN}.md; backfill: OB-133 to OB-136 |
+| P48 DR13-FIX-D3 | ✅ Completed | DR13-FIX | S | 2026-11-02 | docs/validation/dr13-fix-d3{,_EN}.md (stopped at 10 for authorisation) |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1448,6 +1449,27 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | R / D baseline | R = 0, D = 0 (not inherited) |
 | Temp artefact location | `tmp/P47/` (append-only until 8c) |
 | Completion record | Report: `docs/validation/governance-baseline-verify{,_EN}.md`; commits `bbd1745` and `b0d5b5a`; CI runs `41358624169` and `41360290908` both green; breakpoint-B verdicts: four closed after backfill, three still open |
+
+### P48 — `DR13-FIX-D3` (cross-process concurrency hardening; layer 1, item 1) · ✅ Completed
+
+| Field | Content |
+|---|---|
+| Identity | `DR13-FIX-D3` (implementation slice; directive v1.60) |
+| Status | ✅ **Completed** (2026-11-02; ⑨ three scopes TOTAL_FAIL=0, SELFTEST 697/697; stopped at 10 for authorisation, uncommitted) |
+| Goal | Close the D3 gap left by DR13-FIX: release removes the file before unlocking, which together with D2 fully closes W1; full Windows remove-while-open regression |
+| Depends on | DR13-FIX closed (`eb36992`); R-05 ruling (standalone slice) |
+| Size | S |
+| Steps | Step 0 → 1 architecture (V4 Pro) → 3 red test first → 2 implementation → 4 gates → 5 pre-review → 6 scan → 7 final review → 8 docs → 9 validation → 8c → 10 stop point |
+| Current gap | Release unlocks before removing, leaving the millisecond-level W1 window; Windows remove-while-open semantics not fully regression-tested |
+| Deliverables | Report pair `docs/validation/dr13-fix-d3{,_EN}.md`; evidence pack `docs/validation/evidence/DR13-FIX-D3/` (including `00-briefing.md`); freedom list; doc backfills (`ARCHITECTURE` / `DEV_PLAN`) |
+| Acceptance evidence | Red test first (deterministic failure on unfixed code, parking the gap between unlock and remove); green after the fix; `go build` / `go vet` / `go test ./...` all green; three scopes TOTAL_FAIL=0 and SELFTEST 697/697 |
+| Boundaries | Only `internal/adapters/agent_runner_starting_marker*.go` and its tests; no change to the DR-13 verdict, no CONTRACTS change; no gitee push; stop at 10 for authorisation |
+| Tier | `[SLICE]` (implementation) |
+| Probe budget | None |
+| Freedom list path | `docs/validation/evidence/DR13-FIX-D3/freedom-list.md` |
+| R / D baseline | R = 0, D = 0 (not inherited) |
+| Temp artefact location | `tmp/DR13-FIX-D3/` (append-only until 8c) |
+| Completion record | Report pair: `docs/validation/dr13-fix-d3{,_EN}.md`; review chain ⑤/⑥/⑦ all PASS; red test red first, 6/6 green after the fix; three scopes TOTAL_FAIL=0, SELFTEST 697/697; stopped at 10 for authorisation, uncommitted |
 
 ## Known defects (to be handled before later slices)
 

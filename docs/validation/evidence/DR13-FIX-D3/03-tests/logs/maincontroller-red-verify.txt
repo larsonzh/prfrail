@@ -1,0 +1,11 @@
+--- FAIL: TestStartingMarkerReleaseRemovesBeforeUnlock (0.00s)
+    agent_runner_starting_marker_order_test.go:225: release() drops the host lock before the published name is gone: "unlockStartingMarker(claim.file)" (line 96) runs before "return os.Remove(claim.path) == nil" (line 99), so a scan can lock a marker that is still published (W1). Required order: remove -> unlock -> close.
+        statements:
+          line 93: if claim == nil || claim.file == nil {
+          line 96: unlockStartingMarker(claim.file)
+          line 97: _ = claim.file.Close()
+          line 98: claim.file = nil
+          line 99: return os.Remove(claim.path) == nil
+FAIL
+FAIL	github.com/larsonzh/prfrail/internal/adapters	1.591s
+FAIL

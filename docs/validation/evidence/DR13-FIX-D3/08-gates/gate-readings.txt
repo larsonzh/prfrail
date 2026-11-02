@@ -1,0 +1,5 @@
+index: TOTAL_FAIL=0
+tree: TOTAL_FAIL=0 changed=27 (G6-1 / G6-4 scanned 282 added lines)
+ci: TOTAL_FAIL=0 changed=2
+SELFTEST: PASS 697/697
+base: gofmt empty; go build/vet/test ./... green (ok=15, FAIL=0)

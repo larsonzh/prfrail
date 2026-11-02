@@ -1,0 +1,16 @@
+=== RUN   TestStartingMarkerReleaseRemovesBeforeUnlock
+--- PASS: TestStartingMarkerReleaseRemovesBeforeUnlock (0.00s)
+=== RUN   TestStartingMarkerReleaseRemovesThePublishedPath
+--- PASS: TestStartingMarkerReleaseRemovesThePublishedPath (0.01s)
+=== RUN   TestStartingMarkerReleaseIsIdempotent
+--- PASS: TestStartingMarkerReleaseIsIdempotent (0.01s)
+=== RUN   TestStartingMarkerReleaseNeverExposesReleasedContent
+    agent_runner_starting_marker_order_test.go:406: stress window clean: 293 releases, 0 free-lock observations during release, 18 residual deletes
+--- PASS: TestStartingMarkerReleaseNeverExposesReleasedContent (3.01s)
+=== RUN   TestStartingMarkerReleaseFailClosedWhenTheNameIsOccupied
+--- PASS: TestStartingMarkerReleaseFailClosedWhenTheNameIsOccupied (0.01s)
+=== RUN   TestStartingMarkerReleaseShareFactProbe
+    agent_runner_starting_marker_order_windows_test.go:134: os.OpenFile handle blocks os.Remove: err=remove C:\Users\妙妙呜\AppData\Local\Temp\TestStartingMarkerReleaseShareFactProbe1775076680\001\share-probe.txt: The process cannot access the file because it is being used by another process. errno=32 (0x20), matching the windows.go comment
+--- PASS: TestStartingMarkerReleaseShareFactProbe (0.01s)
+PASS
+ok  	github.com/larsonzh/prfrail/internal/adapters	4.147s

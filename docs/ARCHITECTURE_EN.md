@@ -87,6 +87,7 @@ In-process mutual exclusion precedes the cross-process lock; a lock never spans 
 
 - Seal barrier (P43): before a task is accepted the engine writes the candidate closure, the evidence root, both receipts, both decisions and the context digest K into `seals/<runId>/<taskId>.<attempt>.seal.json` (exclusive create + fsync) and only then writes `task-accepted`; `New` and `Recover` re-verify that record for every PASSED task and treat a missing or tampered seal as recovery-uncertain. On re-entry an existing seal with a matching K is reused to rebuild the accepted terminal without calling Reviewer / Publisher again.
 - Attempt resolution (P43): `TaskAttemptResolver` is the single source, defaulting to the event projection; workspace materialisation, candidate freeze, review, promotion, postflight fact extraction and the operator / terminal routes all use the same resolved value, and entity keys are recorded per `taskID + attempt`.
+- Release order (P48): dropping a file lock and physically removing its path follow one sequence - remove the path, then release the lock, then close the handle - so a scanner never observes an idle lock paired with a path that still exists; when removal fails the lock is released unconditionally, and the residual converges through the same-process ownership gate and the next scan's path re-check rather than being retried inside the release path.
 
 ## 5. Trade-Offs
 

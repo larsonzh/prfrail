@@ -78,6 +78,7 @@
 | P45 P45-T027B-E2E-ZERO-MODEL | ✅ 已完成 | DR13-FIX | M | 2026-11-01 | docs/validation/p45-e2e-zero-model{,_EN}.md |
 | P46 STRATEGIC-REVIEW-2026-11-02 | ✅ 已完成 | P45 | L | 2026-11-02 | docs/validation/strategic-review-2026-11-02{,_EN}.md |
 | P47 GOVERNANCE-BASELINE-VERIFY | ✅ 已完成 | P46 | M | 2026-11-02 | docs/validation/governance-baseline-verify{,_EN}.md；补登记：OB-133 至 OB-136 |
+| P48 DR13-FIX-D3 | ✅ 已完成 | DR13-FIX | S | 2026-11-02 | docs/validation/dr13-fix-d3{,_EN}.md（停于 ⑩ 等授权） |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -1461,6 +1462,27 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | R / D 基线 | R = 0、D = 0（不继承上片） |
 | 临时件落点声明 | 本片临时目录 = `tmp/P47/`（⑧c 前只增不删） |
 | 完成记录 | 报告：`docs/validation/governance-baseline-verify{,_EN}.md`；提交 `bbd1745` 与 `b0d5b5a`；CI run `41358624169` 与 `41360290908` 双绿；断点 B 七项结论：补证后升级 4 项、维持未闭合 3 项 |
+
+### P48 — `DR13-FIX-D3`（跨进程并发加固 · 层 1 第 1 项）· ✅ 已完成
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `DR13-FIX-D3`（实现类；准则 v1.60） |
+| 状态 | ✅ **已完成**（2026-11-02；⑨ 三作用域 TOTAL_FAIL=0、SELFTEST 697/697；停于 ⑩ 等授权，未提交） |
+| 目标 | 修复 DR13-FIX 遗留的 D3 缺口：release 改为先 `os.Remove` 再 unlock，配合 D2 完全闭合 W1；Windows remove-while-open 全量回归 |
+| 依赖 | DR13-FIX 闭环（`eb36992`）；R-05 裁定（独立立项） |
+| 规模 | S |
+| 步骤 | 步骤 0 → ① 架构（V4 Pro）→ ③ 红测先行 → ② 实现 → ④ 门禁 → ⑤ 预审 → ⑥ 扫描 → ⑦ 终审 → ⑧ 文档 → ⑨ 验证 → ⑧c → ⑩ 停点 |
+| 现状缺口 | release 先 unlock 再 remove，两步之间毫秒级并发窗口 W1 残留；Windows remove-while-open 语义未全量回归 |
+| 交付物 | 报告对 `docs/validation/dr13-fix-d3{,_EN}.md`；证据包 `docs/validation/evidence/DR13-FIX-D3/`（含 `00-briefing.md`）；执行自由度清单；文档回写（`ARCHITECTURE` / `DEV_PLAN`） |
+| 验收证据 | ③ 红测先行（未修复代码上确定性失败，能卡住 unlock 与 remove 的间隙）；修复后转绿；`go build` / `go vet` / `go test ./...` 全绿；三作用域 TOTAL_FAIL=0 且 SELFTEST 697/697 |
+| 边界 | 仅 `internal/adapters/agent_runner_starting_marker*.go` 及其测试；不改 DR-13 结论、不动 CONTRACTS；不推 gitee；停 ⑩ 等授权 |
+| 分级 | `[SLICE]`（实现类） |
+| 探针额度 | 无 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/DR13-FIX-D3/freedom-list.md` |
+| R / D 基线 | R = 0、D = 0（不继承上片） |
+| 临时件落点声明 | 本片临时目录 = `tmp/DR13-FIX-D3/`（⑧c 前只增不删） |
+| 完成记录 | 报告对：`docs/validation/dr13-fix-d3{,_EN}.md`；审查链 ⑤/⑥/⑦ 全 PASS；红测首跑红、修复后 6/6 绿；三作用域 TOTAL_FAIL=0、SELFTEST 697/697；停于 ⑩ 等授权，未提交 |
 
 ## 已知缺陷（后续切片前处理）
 
