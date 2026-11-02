@@ -79,7 +79,7 @@
 | P46 STRATEGIC-REVIEW-2026-11-02 | ✅ Completed | P45 | L | 2026-11-02 | docs/validation/strategic-review-2026-11-02{,_EN}.md |
 | P47 GOVERNANCE-BASELINE-VERIFY | ✅ Completed | P46 | M | 2026-11-02 | docs/validation/governance-baseline-verify{,_EN}.md; backfill: OB-133 to OB-136 |
 | P48 DR13-FIX-D3 | ✅ Completed | DR13-FIX | S | 2026-11-02 | docs/validation/dr13-fix-d3{,_EN}.md (stopped at 10 for authorisation) |
-| P49 RACE-LEG-EXPAND | ✅ Completed | P48 | M | 2026-11-02 | docs/validation/race-leg-expand{,_EN}.md (stopped at 10 for authorisation) |
+| P49 RACE-LEG-EXPAND | ✅ Completed | P48 | M | 2026-11-02 | docs/validation/race-leg-expand{,_EN}.md (`75990a8`, run `41445657595` green on the first attempt) |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1477,7 +1477,7 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Field | Content |
 |---|---|
 | Identity | `RACE-LEG-EXPAND` (infrastructure slice; directive v1.60) |
-| Status | ✅ **Completed** (2026-11-02; stopped at 10 for authorisation, uncommitted) |
+| Status | ✅ **Completed** (2026-11-02; `75990a8` pushed to origin, run `41445657595` green on the first attempt on both legs) |
 | Goal | Expand the CI Race leg (`CGO_ENABLED=1 go test -race`) from `internal/adapters` and `internal/chain` to `internal/console`, `internal/gates`, `internal/guard` and `internal/tickets` (six packages in total) |
 | Depends on | P48 closed (`81dd49f`); R-03 ruling (standalone slice, layer-1 governance wrap-up) |
 | Size | M |
@@ -1491,7 +1491,7 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Freedom list path | `docs/validation/evidence/RACE-LEG-EXPAND/freedom-list.md` |
 | R / D baseline | R = 1, D = 2 (R counts the step-2 r2 contract-digest remediation; D counts the step-1 retrieval miss and the main controller environment pre-check blind spot) |
 | Temp artefact location | `tmp/RACE-LEG-EXPAND/` (append-only until 8c) |
-| Completion record | Report pair: `docs/validation/race-leg-expand{,_EN}.md`; review chain 5 PASS WITH FIXES / 6 PASS WITH FINDINGS / 7 r1 PASS WITH FIXES → r2 PASS; red baseline exit 1 → flip exit 0 → real `-race` green on the VM; three scopes TOTAL_FAIL=0, SELFTEST 697/697; stopped at 10 for authorisation, uncommitted |
+| Completion record | Report pair: `docs/validation/race-leg-expand{,_EN}.md`; review chain 5 PASS WITH FIXES / 6 PASS WITH FINDINGS / 7 r1 PASS WITH FIXES → r2 PASS; red baseline exit 1 → flip exit 0 → real `-race` green on the VM; three scopes TOTAL_FAIL=0, SELFTEST 697/697; commit `75990a8` pushed to origin (never gitee), run `41445657595` green on the first attempt on both legs, Race leg six packages all ok (console 8.835s / gates 3.265s / guard 2.958s / tickets 5.759s) |
 
 ## Known defects (to be handled before later slices)
 

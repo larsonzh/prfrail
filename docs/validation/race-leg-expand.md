@@ -106,11 +106,20 @@ INDEPENDENT SCAN: PASS
 
 ## 8. 门禁读数（⑨）
 
-- ⑨ 之后由本节追加三作用域 `TOTAL_FAIL` 与 `SELFTEST` 读数。
+- 三作用域全 `TOTAL_FAIL=0`：index（39 条路径 declared，G5(d) addMode=explicit；G7-f 两个 sixstage 围栏完整；G8-b 证据包自洽）、tree、ci；`SELFTEST: PASS 697/697`。
+- base 四腿：`gofmt -l .` 空、`go build ./...` exit 0、`go vet ./...` exit 0、`go test ./...` ok=15 FAIL=0。
+- YAML 语法校验（`gopkg.in/yaml.v3`）：`PASS (yaml parse ok, 16432 bytes)`。
+- 读数原文归档：`docs/validation/evidence/RACE-LEG-EXPAND/08-gates/gate-readings.txt`。
 
 ## 9. 提交与 CI
 
-- ⑨ 之后由本节追加一次。
+- 主提交：`75990a8`（`feat: expand CI race leg to six packages and sync contract (P49)`），已推 `origin/main`（未推 gitee）。
+- CI：run `41445657595`（head `75990a8`）**首跑双腿全绿**（attempt 1，未触发复跑）。
+- Race 腿六包实测 `ok`：adapters 92.393s / chain 2.639s / console 8.835s / gates 3.265s / guard 2.958s / tickets 5.759s ⇒ 四新包首次进 Race 腿即全绿，零数据竞争。
+- 两腿 `Test` 全包 ok；两腿 `Gates` 实测 `SELFTEST: PASS 697/697`、`GATE REPORT scope=ci changed=37`、`TOTAL_FAIL=0`。
+- 三个 dispatch 专用作业（candidate build / candidate probe / bootstrap release）按常态 skipped。
+- 逐行证据归档：`docs/validation/evidence/RACE-LEG-EXPAND/08-ci/ci-evidence.txt`。
+- 首跑义务闭环：四新包的 Race 腿 `ok` 行与墙钟时长已按承诺采集归档。
 
 ```artifacts
 .github/workflows/ci.yml	repo
@@ -142,6 +151,7 @@ docs/validation/evidence/RACE-LEG-EXPAND/06-scan/review.md	repo
 docs/validation/evidence/RACE-LEG-EXPAND/06-scan/review-r2.md	repo
 docs/validation/evidence/RACE-LEG-EXPAND/07-final/review-r2.md	repo
 docs/validation/evidence/RACE-LEG-EXPAND/08-gates/gate-readings.txt	repo
+docs/validation/evidence/RACE-LEG-EXPAND/08-ci/ci-evidence.txt	repo
 docs/validation/evidence/RACE-LEG-EXPAND/07-final/review.md	repo
 docs/validation/evidence/RACE-LEG-EXPAND/09-glm/glm-1-ciyml-scan.md	repo
 docs/validation/evidence/RACE-LEG-EXPAND/09-glm/glm-2-race-time-estimate.md	repo

@@ -1,0 +1,36 @@
+Go ubuntu-latest	Test	ok  	github.com/larsonzh/prfrail/internal/adapters	15.411s
+Go ubuntu-latest	Test	ok  	github.com/larsonzh/prfrail/internal/applier	0.407s
+Go ubuntu-latest	Test	ok  	github.com/larsonzh/prfrail/internal/chain	0.768s
+Go ubuntu-latest	Test	ok  	github.com/larsonzh/prfrail/internal/console	3.245s
+Go ubuntu-latest	Test	ok  	github.com/larsonzh/prfrail/internal/evidence	0.016s
+Go ubuntu-latest	Test	ok  	github.com/larsonzh/prfrail/internal/gates	0.137s
+Go ubuntu-latest	Test	ok  	github.com/larsonzh/prfrail/internal/guard	0.866s
+Go ubuntu-latest	Test	ok  	github.com/larsonzh/prfrail/internal/release	2.635s
+Go ubuntu-latest	Test	ok  	github.com/larsonzh/prfrail/internal/repair	0.008s
+Go ubuntu-latest	Test	ok  	github.com/larsonzh/prfrail/internal/snapshot	0.123s
+Go ubuntu-latest	Test	ok  	github.com/larsonzh/prfrail/internal/taskdef	0.013s
+Go ubuntu-latest	Test	ok  	github.com/larsonzh/prfrail/internal/tickets	2.122s
+Go ubuntu-latest	Race	ok  	github.com/larsonzh/prfrail/internal/adapters	92.393s
+Go ubuntu-latest	Race	ok  	github.com/larsonzh/prfrail/internal/chain	2.639s
+Go ubuntu-latest	Race	ok  	github.com/larsonzh/prfrail/internal/console	8.835s
+Go ubuntu-latest	Race	ok  	github.com/larsonzh/prfrail/internal/gates	3.265s
+Go ubuntu-latest	Race	ok  	github.com/larsonzh/prfrail/internal/guard	2.958s
+Go ubuntu-latest	Race	ok  	github.com/larsonzh/prfrail/internal/tickets	5.759s
+Go ubuntu-latest	Gates	SELFTEST: PASS 697/697
+Go ubuntu-latest	Gates	GATE REPORT scope=ci repo=/home/runner/work/prfrail/prfrail changed=37
+Go ubuntu-latest	Gates	TOTAL_FAIL=0
+Go windows-latest	Test	ok  	github.com/larsonzh/prfrail/internal/adapters	58.920s
+Go windows-latest	Test	ok  	github.com/larsonzh/prfrail/internal/applier	16.033s
+Go windows-latest	Test	ok  	github.com/larsonzh/prfrail/internal/chain	13.539s
+Go windows-latest	Test	ok  	github.com/larsonzh/prfrail/internal/console	43.936s
+Go windows-latest	Test	ok  	github.com/larsonzh/prfrail/internal/evidence	0.056s
+Go windows-latest	Test	ok  	github.com/larsonzh/prfrail/internal/gates	1.477s
+Go windows-latest	Test	ok  	github.com/larsonzh/prfrail/internal/guard	3.510s
+Go windows-latest	Test	ok  	github.com/larsonzh/prfrail/internal/release	3.419s
+Go windows-latest	Test	ok  	github.com/larsonzh/prfrail/internal/repair	0.017s
+Go windows-latest	Test	ok  	github.com/larsonzh/prfrail/internal/snapshot	5.834s
+Go windows-latest	Test	ok  	github.com/larsonzh/prfrail/internal/taskdef	0.030s
+Go windows-latest	Test	ok  	github.com/larsonzh/prfrail/internal/tickets	8.174s
+Go windows-latest	Gates	SELFTEST: PASS 697/697
+Go windows-latest	Gates	GATE REPORT scope=ci repo=D:\a\prfrail\prfrail changed=37
+Go windows-latest	Gates	TOTAL_FAIL=0

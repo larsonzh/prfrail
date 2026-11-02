@@ -1,16 +1,16 @@
 ﻿# Task Execution Checklist (cross-session snapshot v39 · P49 stop-point edition)
 
-Generated: 2026-11-02, HEAD = origin/main = `81dd49f` (P48 backfill commit), directive v1.60. The P49 change set is in the working tree, **uncommitted** (stopped at 10 awaiting authorisation).
+Generated: 2026-11-02, HEAD = origin/main = `75990a8` (the P49 main commit), directive v1.60. P49 is committed and green on the first attempt on both legs (run `41445657595`).
 Supersession: completely supersedes v38 and any earlier snapshot. Backfill (docs-only) commits only advance HEAD and do not change the anchor semantics of this section.
 
-Revisions in this version (vs v38): (1) P49 `RACE-LEG-EXPAND` closed into the baseline (stopped at 10 awaiting authorisation, change set in the working tree); (2) layer 1 cleared, the first layer-2 item (`CONSOLE-MULTITASK-ASSEMBLY`) becomes the next dequeue; (3) a new "environment pre-check and reuse" iron rule added to section 7; (4) **sections 8 and 9 restored to full v36 detail** (the complete discipline A-S table plus all twenty-three checklist meta-rules, with the new disciplines T and U folded in), keeping the seven P49 gate pitfalls as a subsection of section 9 (for reuse in P50); (5) observation items and pending rulings updated (R-03 completed).
+Revisions in this version (vs v38): (1) P49 `RACE-LEG-EXPAND` closed into the baseline (`75990a8`, run `41445657595` green on the first attempt on both legs); (2) layer 1 cleared, the first layer-2 item (`CONSOLE-MULTITASK-ASSEMBLY`) becomes the next dequeue; (3) a new "environment pre-check and reuse" iron rule added to section 7; (4) **sections 8 and 9 restored to full v36 detail** (the complete discipline A-S table plus all twenty-three checklist meta-rules, with the new disciplines T and U folded in), keeping the seven P49 gate pitfalls as a subsection of section 9 (for reuse in P50); (5) observation items and pending rulings updated (R-03 completed).
 
 ## 1. Current anchors (verify these 5 numbers first)
 
 | Item | Value | Check command |
 |---|---|---|
-| HEAD | `81dd49f` | `git rev-parse --short HEAD` |
-| origin/main | `81dd49f` | `git rev-parse --short origin/main` |
+| HEAD | `75990a8` | `git rev-parse --short HEAD` |
+| origin/main | `75990a8` | `git rev-parse --short origin/main` |
 | Directive version | **v1.60** | head of `docs/DELIVERY_DIRECTIVE.md` |
 | SELFTEST | **697/697** | `node tools/gates/gate.js --selftest` |
 | Three scopes | **all TOTAL_FAIL=0** | `gate.js --all --scope=index`, `tree`, `ci` |
@@ -28,7 +28,7 @@ If 2 or more items mismatch ⇒ treat the repository reality as authoritative an
 | Changes | One line in `.github/workflows/ci.yml` Race `run:` plus one line in `internal/release/workflow_test.go` (frozen-contract digest sync for `test/Race`) |
 | Red/green | 3 static red baseline (pre-change ci.yml, exit 1) → green flip after 2 (exit 0 GREEN) → VM real `-race` all four packages green (console 20.410s / gates 3.384s / guard 3.043s / tickets 7.420s, rc=0) |
 | Review chain | 5 `PRE-REVIEW: PASS WITH FIXES` (F1 Medium closed); 6 r1 `PASS WITH FINDINGS` (format deviation) → r2 `INDEPENDENT SCAN: PASS` (A-E compliant re-issue); 7 r1 `PASS WITH FIXES` → r2 `FINAL REVIEW: PASS` |
-| Commit / CI | Uncommitted (stopped at 10 awaiting authorisation); no CI run; first-run obligation: collect the six-package `ok` lines and wall-clock duration of the Race leg |
+| Commit / CI | `75990a8` pushed to origin (never gitee); run `41445657595` green on the first attempt on both legs (Race leg six packages all ok: console 8.835s / gates 3.265s / guard 2.958s / tickets 5.759s); the first-run obligation is closed |
 | Metering | R = 1, D = 2 (2 r2 contract sync; the 1 retrieval miss plus the main-controller environment pre-check blind spot) |
 | Doc sync | `ARCHITECTURE{,_EN}` section 1 tail each +2 lines on test facilities; `DEV_PLAN{,_EN}` checked, no outdated description, unchanged |
 | Open items | CI first-run observation; flake observation for the four new packages entering the CI Race leg for the first time (GLM-2 B1/B2/B3) |
@@ -41,7 +41,7 @@ If 2 or more items mismatch ⇒ treat the repository reality as authoritative an
 | v1.60 | P46 | `26ca5a5` + `5e4202e` | Closed (R = 1, D = 2) |
 | v1.60 | P47 | `bbd1745` + backfill commit | Closed (R = 3, D = 0) |
 | v1.60 | P48 | `82e3ac8` + `81dd49f` | Closed (R = 9, D = 0; run `41379998477` green on the first attempt) |
-| v1.60 | P49 | Uncommitted (stopped at 10 awaiting authorisation) | Closed (R = 1, D = 2; change set in the working tree) |
+| v1.60 | P49 | `75990a8` + backfill commit | Closed (R = 1, D = 2; run `41445657595` green on the first attempt) |
 
 ## 4. Execution queue
 
@@ -201,10 +201,10 @@ Here is my project state snapshot (v39); please verify the 5 anchors of section 
 
 [Paste this checklist v39 in full]
 
-[Supplementary documents] `REMAINING_SLICES.md` (P49 completed), `DELIVERY_DIRECTIVE.md` (v1.60), `docs/validation/race-leg-expand{,_EN}.md` (P49 report, stopped at 10 awaiting authorisation).
+[Supplementary documents] `REMAINING_SLICES.md` (P49 completed), `DELIVERY_DIRECTIVE.md` (v1.60), `docs/validation/race-leg-expand{,_EN}.md` (the P49 report; `75990a8`, run `41445657595` green on the first attempt).
 
-Current slice: P49 closed and stopped at 10 awaiting authorisation; next slice = layer 2 item 3 `CONSOLE-MULTITASK-ASSEMBLY` (protocol first).
+Current slice: P49 fully closed; next slice = layer 2 item 3 `CONSOLE-MULTITASK-ASSEMBLY` (protocol first).
 
 ## 11. Current status in one sentence
 
-P49 `RACE-LEG-EXPAND` closed (change set in the working tree, stopped at 10 awaiting authorisation, uncommitted; six-package Race expansion plus frozen-contract digest sync plus VM real `-race` all four packages green); layer 1 cleared; next step = layer 2 item 3 `CONSOLE-MULTITASK-ASSEMBLY`.
+P49 `RACE-LEG-EXPAND` fully closed (`75990a8`, run `41445657595` green on the first attempt on both legs, Race leg six packages all ok); layer 1 cleared; next step = layer 2 item 3 `CONSOLE-MULTITASK-ASSEMBLY` (protocol first).

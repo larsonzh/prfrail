@@ -79,7 +79,7 @@
 | P46 STRATEGIC-REVIEW-2026-11-02 | ✅ 已完成 | P45 | L | 2026-11-02 | docs/validation/strategic-review-2026-11-02{,_EN}.md |
 | P47 GOVERNANCE-BASELINE-VERIFY | ✅ 已完成 | P46 | M | 2026-11-02 | docs/validation/governance-baseline-verify{,_EN}.md；补登记：OB-133 至 OB-136 |
 | P48 DR13-FIX-D3 | ✅ 已完成 | DR13-FIX | S | 2026-11-02 | docs/validation/dr13-fix-d3{,_EN}.md（停于 ⑩ 等授权） |
-| P49 RACE-LEG-EXPAND | ✅ 已完成 | P48 | M | 2026-11-02 | docs/validation/race-leg-expand{,_EN}.md（停于 ⑩ 等授权） |
+| P49 RACE-LEG-EXPAND | ✅ 已完成 | P48 | M | 2026-11-02 | docs/validation/race-leg-expand{,_EN}.md（`75990a8`，run `41445657595` 首跑双绿） |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -1490,7 +1490,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 字段 | 内容 |
 |---|---|
 | 标识 | `RACE-LEG-EXPAND`（基础设施类；准则 v1.60） |
-| 状态 | ✅ **已完成**（2026-11-02；停于 ⑩ 等授权，未提交） |
+| 状态 | ✅ **已完成**（2026-11-02；`75990a8` 已推 origin，run `41445657595` 首跑双腿全绿） |
 | 目标 | 把 CI 的 Race 腿（`CGO_ENABLED=1 go test -race`）从 `internal/adapters`、`internal/chain` 扩包到 `internal/console`、`internal/gates`、`internal/guard`、`internal/tickets`（共六个包） |
 | 依赖 | P48 闭环（`81dd49f`）；R-03 裁定（独立立项，层 1 治理收尾） |
 | 规模 | M |
@@ -1504,7 +1504,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 执行自由度清单落盘路径 | `docs/validation/evidence/RACE-LEG-EXPAND/freedom-list.md` |
 | R / D 基线 | R = 1、D = 2（R 记 ② r2 契约摘要同步整改；D 记 ① 检索遗漏与主控环境预检盲区） |
 | 临时件落点声明 | 本片临时目录 = `tmp/RACE-LEG-EXPAND/`（⑧c 前只增不删） |
-| 完成记录 | 报告对：`docs/validation/race-leg-expand{,_EN}.md`；审查链 ⑤ PASS WITH FIXES / ⑥ PASS WITH FINDINGS / ⑦ r1 PASS WITH FIXES → r2 PASS；红基线 exit 1 → 翻转 exit 0 → VM 真实 `-race` 全绿；三作用域 TOTAL_FAIL=0、SELFTEST 697/697；停于 ⑩ 等授权，未提交 |
+| 完成记录 | 报告对：`docs/validation/race-leg-expand{,_EN}.md`；审查链 ⑤ PASS WITH FIXES / ⑥ PASS WITH FINDINGS / ⑦ r1 PASS WITH FIXES → r2 PASS；红基线 exit 1 → 翻转 exit 0 → VM 真实 `-race` 全绿；三作用域 TOTAL_FAIL=0、SELFTEST 697/697；提交 `75990a8` 已推 origin（未推 gitee），run `41445657595` 首跑双腿全绿，Race 腿六包实测 ok（console 8.835s / gates 3.265s / guard 2.958s / tickets 5.759s） |
 
 ## 已知缺陷（后续切片前处理）
 

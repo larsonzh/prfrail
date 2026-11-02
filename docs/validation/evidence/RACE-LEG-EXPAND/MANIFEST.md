@@ -37,6 +37,7 @@
 | `09-glm/glm-1-ciyml-scan.md` | GLM 批量辅助 1/2：ci.yml 结构与 Race 腿历史事实检索原文（只读扫描，逐字归档） |
 | `09-glm/glm-2-race-time-estimate.md` | GLM 批量辅助 2/2：各包 Race 耗时评估与 flake 风险扫描原文（只读扫描，逐字归档） |
 | `08-gates/gate-readings.txt` | ⑨ 门禁读数（index/tree/ci 三作用域 TOTAL_FAIL=0 与 SELFTEST 697/697，含 base 四腿） |
+| `08-ci/ci-evidence.txt` | CI 首跑证据（run `41445657595`，双腿 Test 全 ok + Race 腿六包 ok 行 + 两腿 Gates 读数，逐行提取） |
 
 ## 待追加（按轮）
 

@@ -1,16 +1,16 @@
 ﻿# 任务执行清单（跨会话快照 v39 · P49 停点版）
 
-生成时点：2026-11-02，HEAD = origin/main = `81dd49f`（P48 回填提交），准则 v1.60。P49 改动集在工作区**未提交**（停于 ⑩ 等授权）。
+生成时点：2026-11-02，HEAD = origin/main = `75990a8`（P49 主提交），准则 v1.60。P49 已提交并首跑双腿全绿（run `41445657595`）。
 替代关系：完全取代 v38 及任何更早快照。回填提交（docs-only）只在 HEAD 前进，不改本节锚点语义。
 
-本版修订（相对 v38）：① P49 `RACE-LEG-EXPAND` 闭环入基线（停于 ⑩ 等授权，改动集在工作区）；② 层 1 清空，层 2 首项（`CONSOLE-MULTITASK-ASSEMBLY`）成为下一出队项；③ §七 新增「环境预检与复用铁律」；④ **§八/§九 恢复 v36 全量纪律**（纪律 A–S 全表 + 二十三条清单元规则，融合新增纪律 T/U），并保留 P49 门禁坑七条为 §九 子章节（供 P50 复用）；⑤ 观察项与待裁定状态更新（R-03 已完成）。
+本版修订（相对 v38）：① P49 `RACE-LEG-EXPAND` 闭环入基线（`75990a8`，run `41445657595` 首跑双腿全绿）；② 层 1 清空，层 2 首项（`CONSOLE-MULTITASK-ASSEMBLY`）成为下一出队项；③ §七 新增「环境预检与复用铁律」；④ **§八/§九 恢复 v36 全量纪律**（纪律 A–S 全表 + 二十三条清单元规则，融合新增纪律 T/U），并保留 P49 门禁坑七条为 §九 子章节（供 P50 复用）；⑤ 观察项与待裁定状态更新（R-03 已完成）。
 
 ## 一、当前锚点（开场先核这 5 个数）
 
 | 项 | 值 | 核对命令 |
 |---|---|---|
-| HEAD | `81dd49f` | `git rev-parse --short HEAD` |
-| origin/main | `81dd49f` | `git rev-parse --short origin/main` |
+| HEAD | `75990a8` | `git rev-parse --short HEAD` |
+| origin/main | `75990a8` | `git rev-parse --short origin/main` |
 | 准则版本 | **v1.60** | `docs/DELIVERY_DIRECTIVE.md` 头部 |
 | SELFTEST | **697/697** | `node tools/gates/gate.js --selftest` |
 | 三作用域 | **全 TOTAL_FAIL=0** | `gate.js --all --scope=index`、`tree`、`ci` |
@@ -28,7 +28,7 @@
 | 改动 | `.github/workflows/ci.yml` Race `run:` 行 1 行 + `internal/release/workflow_test.go` 冻结契约摘要 1 行（`test/Race` 摘要同步） |
 | 红绿 | ③ 静态断言红基线（未改 ci.yml，exit 1）→ ② 改后翻转（exit 0 GREEN）→ VM 真实 `-race` 四包全绿（console 20.410s / gates 3.384s / guard 3.043s / tickets 7.420s，rc=0） |
 | 审查链 | ⑤ `PRE-REVIEW: PASS WITH FIXES`（F1 Medium 已闭环）；⑥ r1 `PASS WITH FINDINGS`（格式偏离）→ r2 `INDEPENDENT SCAN: PASS`（A–E 合规重发）；⑦ r1 `PASS WITH FIXES` → r2 `FINAL REVIEW: PASS` |
-| 提交 / CI | 未提交（停于 ⑩ 等授权）；无 CI run；首跑义务：采集 Race 腿六包 `ok` 行与墙钟时长 |
+| 提交 / CI | `75990a8` 已推 origin（未推 gitee）；run `41445657595` 首跑双腿全绿（Race 腿六包实测 ok：console 8.835s / gates 3.265s / guard 2.958s / tickets 5.759s）；首跑义务已闭环 |
 | 计量 | R = 1、D = 2（② r2 契约同步；① 检索遗漏 + 主控环境预检盲区） |
 | 文档同步 | `ARCHITECTURE{,_EN}` §1 末尾各 +2 行测试设施说明；`DEV_PLAN{,_EN}` 检查无过时描述未改 |
 | 未闭环 | CI 首跑观察项；四新包首次进 CI Race 腿的 flake 观察项（GLM-2 B1/B2/B3） |
@@ -41,7 +41,7 @@
 | v1.60 | P46 | `26ca5a5` + `5e4202e` | 闭环（R = 1、D = 2） |
 | v1.60 | P47 | `bbd1745` + 回填提交 | 闭环（R = 3、D = 0） |
 | v1.60 | P48 | `82e3ac8` + `81dd49f` | 闭环（R = 9、D = 0；run `41379998477` 首跑双绿） |
-| v1.60 | P49 | 未提交（停于 ⑩ 等授权） | 闭环（R = 1、D = 2；改动集在工作区） |
+| v1.60 | P49 | `75990a8` + 回填提交 | 闭环（R = 1、D = 2；run `41445657595` 首跑双绿） |
 
 ## 四、执行队列
 
@@ -201,10 +201,10 @@
 
 【粘贴本清单全文 v39】
 
-【补充文档】`REMAINING_SLICES.md`（P49 已完成）、`DELIVERY_DIRECTIVE.md`（v1.60）、`docs/validation/race-leg-expand{,_EN}.md`（P49 报告，停于 ⑩ 等授权）。
+【补充文档】`REMAINING_SLICES.md`（P49 已完成）、`DELIVERY_DIRECTIVE.md`（v1.60）、`docs/validation/race-leg-expand{,_EN}.md`（P49 报告，`75990a8`，run `41445657595` 首跑双绿）。
 
-当前片：P49 已闭环停于 ⑩ 等授权；下一片 = 层 2 第 3 项 `CONSOLE-MULTITASK-ASSEMBLY`（协议先行）。
+当前片：P49 已彻底闭环；下一片 = 层 2 第 3 项 `CONSOLE-MULTITASK-ASSEMBLY`（协议先行）。
 
 ## 十一、当前状态一句话
 
-P49 `RACE-LEG-EXPAND` 闭环（改动集在工作区，停于 ⑩ 等授权，未提交；六包 Race 扩包 + 冻结契约摘要同步 + VM 真实 `-race` 四包全绿）；层 1 清空；下一步 = 层 2 第 3 项 `CONSOLE-MULTITASK-ASSEMBLY`。
+P49 `RACE-LEG-EXPAND` 彻底闭环（`75990a8`，run `41445657595` 首跑双腿全绿，Race 腿六包实测 ok）；层 1 清空；下一步 = 层 2 第 3 项 `CONSOLE-MULTITASK-ASSEMBLY`（协议先行）。

@@ -106,11 +106,20 @@ Disclosure of merge differences: the fence is a verbatim transcript of the 6 r2 
 
 ## 8. Gate Readings (9)
 
-- Appended after step 9: the three-scope `TOTAL_FAIL` and `SELFTEST` readings.
+- Three scopes all `TOTAL_FAIL=0`: index (39 paths declared, G5(d) addMode=explicit; G7-f two sixstage fences complete; G8-b pack self-consistent), tree and ci; `SELFTEST: PASS 697/697`.
+- Base legs: `gofmt -l .` empty, `go build ./...` exit 0, `go vet ./...` exit 0, `go test ./...` ok=15 FAIL=0.
+- YAML syntax check (via `gopkg.in/yaml.v3`): `PASS (yaml parse ok, 16432 bytes)`.
+- Verbatim readings archived at `docs/validation/evidence/RACE-LEG-EXPAND/08-gates/gate-readings.txt`.
 
 ## 9. Commit and CI
 
-- Appended once after step 9.
+- Main commit: `75990a8` (`feat: expand CI race leg to six packages and sync contract (P49)`), pushed to `origin/main` (never gitee).
+- CI: run `41445657595` (head `75990a8`) **green on the first attempt on both legs** (attempt 1, no rerun).
+- Race leg six packages all `ok`: adapters 92.393s / chain 2.639s / console 8.835s / gates 3.265s / guard 2.958s / tickets 5.759s, so the four new packages passed the Race leg on their first entry with zero data races.
+- Both `Test` legs green for every package; both `Gates` legs show `SELFTEST: PASS 697/697`, `GATE REPORT scope=ci changed=37` and `TOTAL_FAIL=0`.
+- The three dispatch-only jobs (candidate build / candidate probe / bootstrap release) were skipped as usual.
+- Line-by-line evidence archived at `docs/validation/evidence/RACE-LEG-EXPAND/08-ci/ci-evidence.txt`.
+- First-run obligation closed: the four new packages' Race-leg `ok` lines and wall-clock durations were collected and archived as promised.
 
 ```artifacts
 .github/workflows/ci.yml	repo
@@ -142,6 +151,7 @@ docs/validation/evidence/RACE-LEG-EXPAND/06-scan/review.md	repo
 docs/validation/evidence/RACE-LEG-EXPAND/06-scan/review-r2.md	repo
 docs/validation/evidence/RACE-LEG-EXPAND/07-final/review-r2.md	repo
 docs/validation/evidence/RACE-LEG-EXPAND/08-gates/gate-readings.txt	repo
+docs/validation/evidence/RACE-LEG-EXPAND/08-ci/ci-evidence.txt	repo
 docs/validation/evidence/RACE-LEG-EXPAND/07-final/review.md	repo
 docs/validation/evidence/RACE-LEG-EXPAND/09-glm/glm-1-ciyml-scan.md	repo
 docs/validation/evidence/RACE-LEG-EXPAND/09-glm/glm-2-race-time-estimate.md	repo
