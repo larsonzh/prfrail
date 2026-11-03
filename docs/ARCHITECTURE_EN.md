@@ -112,6 +112,14 @@ In-process mutual exclusion precedes the cross-process lock; a lock never spans 
 
 See [contracts](CONTRACTS_EN.md), [security](SECURITY_EN.md) and [decision register](ADR_REGISTER_EN.md). Do not implement guessed field values before RFC revision.
 
+### 5.1 Acceptance-Chain Security Counterexample Matrix (P52)
+
+Counterexamples bind each gap to tests and land in seven `*_test.go` files: GAP-51 -> T51-1 (break recorded as `t.Skip`); GAP-52 -> T52-1/2; GAP-55 -> T55-1..7; GAP-60 -> T60-1..3; GAP-64 -> T64-1..6; GAP-70 -> T70-1..4.
+
+GAP-77 is a measured break: a Unix intermediate symlink escapes the directory binding and read 23 bytes outside it on Linux go1.22.12; `openat(O_NOFOLLOW)` at `bounddir_unix.go:64` guards only the final component, and remediation points to the P53 standalone slice. GAP-78 (empty ContextKey), GAP-79 (asymmetric normalisation) and GAP-80 (residual isUnderDirectory prefix) remain unbroken candidates.
+
+Assertion discipline: every counterexample binds a sentinel error through `errors.Is`; a case without a sentinel must anchor its reason in an in-test comment.
+
 ## 6. Product Flow Ownership (RFC Section 19)
 
 No new service or generic management module: taskdef builds PC-01 static plans and console displays them, separating execution probes from read-only preview. For PC-02, snapshot/evidence verify accepted references and export; chain records separate delivery events, not console copying the store. PC-03 authorization checks belong to chain dispatch/publication boundaries, in-flight stopping to guard and the approval inbox view to console.

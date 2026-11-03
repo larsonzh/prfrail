@@ -112,6 +112,14 @@ baseline、已接受快照、最终报告及失败证据默认保留；候选/�
 
 详细协议见 [CONTRACTS.md](CONTRACTS.md)，安全见 [SECURITY.md](SECURITY.md)。字段级未决项见 [ADR_REGISTER.md](ADR_REGISTER.md)；不得绕过 RFC 修改顺序直接实现猜测值。
 
+### 5.1 接受链安全反例矩阵（P52）
+
+反例按缺口绑定到测试，落点七个 `*_test.go`：GAP-51 → T51-1（以 `t.Skip` 记录击穿）；GAP-52 → T52-1/2；GAP-55 → T55-1..7；GAP-60 → T60-1..3；GAP-64 → T64-1..6；GAP-70 → T70-1..4。
+
+GAP-77 为实测击穿：Unix 中间符号链接可逃逸目录绑定，Linux go1.22.12 读出界外 23 字节；`bounddir_unix.go:64` 的 `openat(O_NOFOLLOW)` 仅护末组件，修复指向 P53 独立切片。GAP-78（空 ContextKey）、GAP-79（归一化不对称）、GAP-80（isUnderDirectory 前缀残余）为未击穿候选。
+
+断言纪律：反例一律以 `errors.Is` 绑定哨兵错误；确无哨兵者须在测试内以注释锚定理由。
+
 ## 6. 产品闭环责任扩展（RFC §19）
 
 不新增服务或“大管理模块”：PC-01 由 taskdef 生成静态执行计划、console 展示，探测执行与只读预览分离；PC-02 由 snapshot/evidence 核验已接受引用并导出，chain 记录独立交付事件，console 不能直接复制 store；PC-03 由 chain 在调度/发布边界校验授权，guard 停在途写者，console 仅呈现待审批队列。

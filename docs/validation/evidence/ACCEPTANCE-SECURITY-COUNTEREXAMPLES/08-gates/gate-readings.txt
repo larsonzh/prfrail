@@ -1,0 +1,28 @@
+# ⑨ 门禁读数 — ACCEPTANCE-SECURITY-COUNTEREXAMPLES（P52）
+
+采集时点 2026-11-03，`HEAD` = `941f60e`，准则 v1.60。主控机械复跑。
+
+## SELFTEST
+
+```
+SELFTEST: PASS 697/697
+```
+
+## 三作用域
+
+| 作用域 | TOTAL_FAIL | 备注 |
+|---|---|---|
+| index | 0 | `G6-1 scanned 314`；初跑 2 红（G1-d 标题状态符号滞后 / G8-b SHA256SUMS 未随 :64 行号统一重算），原位修复后复跑绿 |
+| tree | 0 | 修复后复跑绿 |
+| ci | 0 | 无 CI 环境变量时退化为 HEAD^1..HEAD 范围（本机口径，权威范围为提交后 CI 腿） |
+
+## Go 工具链
+
+```
+go build ./...   BUILD-OK
+go vet ./...     VET-OK
+go test -count=1 ./...   ok=15 FAIL=0
+GOOS=linux go vet ./internal/adapters/   LINUX-VET-OK（对向复核）
+```
+
+原始输出：`tmp/ACCEPTANCE-SECURITY-COUNTEREXAMPLES/09-go-full.txt`（本片临时目录）。

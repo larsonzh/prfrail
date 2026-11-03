@@ -82,6 +82,7 @@
 | P49 RACE-LEG-EXPAND | ✅ Completed | P48 | M | 2026-11-02 | docs/validation/race-leg-expand{,_EN}.md (`75990a8`, run `41445657595` green on the first attempt) |
 | P50 CONSOLE-MULTITASK-ASSEMBLY | ✅ Completed | P49 | L | 2026-11-03 | Report pair `docs/validation/console-multitask-assembly{,_EN}.md`; `81f9dc9` pushed to origin (never gitee), run `41507722672` green on the first attempt on both legs; temp artefacts `tmp/CONSOLE-MULTITASK-ASSEMBLY/` (cleared at 8c); R=1, D=1 |
 | P51 CONSOLE-CLI-MULTITASK-WIRING | ✅ Completed | P50 | M | 2026-11-03 | Report pair `docs/validation/console-cli-multitask-wiring{,_EN}.md`; `2b0af2d` pushed to origin (never gitee), run `41569353460` green on the first attempt on both legs; temp artefacts `tmp/CONSOLE-CLI-MULTITASK-WIRING/` (cleared at 8c); R=1, D=2 |
+| P52 ACCEPTANCE-SECURITY-COUNTEREXAMPLES | ✅ Completed | P51 | M | 2026-11-03 | Report pair `docs/validation/acceptance-security-counterexamples{,_EN}.md`; GAP-77 breach registered (P53 fix); stopped at 10 for authorisation; R=0, D=1 |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1535,6 +1536,26 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | R / D baseline | R = 1, D = 2 (R counts the stage-5 r1 remediation round; D1 counts the stage-6 first dispatch truncated for length and resent per section 9; D2 counts a receipt statistic written to the user temp directory outside the repository, a temp-artefact location violation that did not self-heal and was deleted) |
 | Temp artefact location | `tmp/CONSOLE-CLI-MULTITASK-WIRING/` (append-only until 8c) |
 | Completion record | Report pair `docs/validation/console-cli-multitask-wiring{,_EN}.md`; review chain: 1 DESIGN DONE → 3 red baseline four red one green → 2a/2b/2c → 5 r1 PASS WITH FIXES → r2 PASS → 6 INDEPENDENT SCAN: PASS → 7 FINAL REVIEW: PASS; docs sync: ARCHITECTURE/DEV_PLAN updated; gate readings in `docs/validation/evidence/CONSOLE-CLI-MULTITASK-WIRING/08-gates/gate-readings.txt`; commit `2b0af2d` pushed to origin (never gitee), run `41569353460` green on the first attempt on both legs; R=1, D=2 |
+
+### P52 — `ACCEPTANCE-SECURITY-COUNTEREXAMPLES` (acceptance-chain security counterexamples; layer 2, item 4) · ✅ Completed
+
+| Field | Content |
+|---|---|
+| Identity | `ACCEPTANCE-SECURITY-COUNTEREXAMPLES` (security validation slice; directive v1.60; tier M) |
+| Status | ✅ **Completed** (2026-11-03; anchor HEAD = `941f60e`, directive v1.60; controller model = `DeepSeek V4 Pro`; stopped at 10 for same-turn authorisation) |
+| Goal | Land the GAP-51/52/55/60/64/70 security counterexamples against the acceptance-chain gap of breakpoint A; prove the system fails closed on illegal input, path forgery, handle overreach and boundary bypass |
+| Depends on | P51 closed (`2b0af2d`) |
+| Size | M |
+| Steps | Step 0 → 1 architecture → 3 test first → 2 implementation (split per discipline V) → 4 gates → 5 pre-review → 6 scan → 7 final review → 8 docs → 9 validation → 8c → 10 stop point |
+| Deliverables | Report pair `docs/validation/acceptance-security-counterexamples{,_EN}.md`; evidence pack `docs/validation/evidence/ACCEPTANCE-SECURITY-COUNTEREXAMPLES/` (including `00-briefing.md`); freedom list |
+| Boundary | Test cases and assertions only, never touch production code (real security holes must be reported, not fixed in this slice); no acceptance-semantics change; no gitee push; stop at 10 for authorisation |
+| Tier | `[SLICE]` (security validation) |
+| Probe budget | None |
+| Freedom list path | `docs/validation/evidence/ACCEPTANCE-SECURITY-COUNTEREXAMPLES/freedom-list.md` |
+| R / D baseline | R = 0, D = 1 (D1: the ②b cross-compile artefact was written to the system temp directory, violating the v41 §8 temp-location closed set; the controller verified no residue remains) |
+| Suspected holes | **GAP-77 (V-1, HIGH, breached)**: bounddir_unix.go:64 `openat(O_NOFOLLOW)` call guards only the final component (:66 is the error-return line); a middle symlink escapes the bound dir; 23 out-of-bound bytes read on Linux (go1.22.12) (evidence `05-attack/t51-1-linux-escape.md`); not fixed in this slice, fix in a separate slice (P53). **GAP-78 (V-2, LOW, candidate)**: seal.go validate admits an empty ContextKey. **GAP-79 (V-3, LOW, candidate)**: asymmetric normalisation of AT23Hash TrimSpace vs SealHash whitespace rejection. **GAP-80 (V-4, observation)**: isUnderDirectory spelling prefix rather than object identity |
+| Temp artefact location | `tmp/ACCEPTANCE-SECURITY-COUNTEREXAMPLES/` (append-only until 8c) |
+| Completion record | Report pair `docs/validation/acceptance-security-counterexamples{,_EN}.md`; review chain: 1 DESIGN DONE → 3 PROBE: ALL-GREEN → 2a-2d all green → 5 PRE-REVIEW: PASS (2 Low disposed) → 6 INDEPENDENT SCAN: PASS → 7 FINAL REVIEW: PASS (0 Medium+); core outputs = GAP-77 breach proven (Linux real run) + GAP-78/79/80 candidates; zero production changes; docs sync ARCHITECTURE/DEV_PLAN updated; stopped at 10 for authorisation; R=0, D=1 |
 
 ## Known defects (to be handled before later slices)
 

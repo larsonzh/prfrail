@@ -82,6 +82,7 @@
 | P49 RACE-LEG-EXPAND | ✅ 已完成 | P48 | M | 2026-11-02 | docs/validation/race-leg-expand{,_EN}.md（`75990a8`，run `41445657595` 首跑双绿） |
 | P50 CONSOLE-MULTITASK-ASSEMBLY | ✅ 已完成 | P49 | L | 2026-11-03 | 报告对 `docs/validation/console-multitask-assembly{,_EN}.md`；`81f9dc9` 已推 origin（未推 gitee），run `41507722672` 首跑双腿全绿；临时件 `tmp/CONSOLE-MULTITASK-ASSEMBLY/`（⑧c 清理）；R=1、D=1 |
 | P51 CONSOLE-CLI-MULTITASK-WIRING | ✅ 已完成 | P50 | M | 2026-11-03 | 报告对 `docs/validation/console-cli-multitask-wiring{,_EN}.md`；`2b0af2d` 已推 origin（未推 gitee），run `41569353460` 首跑双腿全绿；临时件 `tmp/CONSOLE-CLI-MULTITASK-WIRING/`（⑧c 清理）；R=1、D=2 |
+| P52 ACCEPTANCE-SECURITY-COUNTEREXAMPLES | ✅ 已完成 | P51 | M | 2026-11-03 | 报告对 `docs/validation/acceptance-security-counterexamples{,_EN}.md`；GAP-77 击穿实证登记（P53 修复）；停于 ⑩ 等授权；R=0、D=1 |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -1548,6 +1549,26 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | R / D 基线 | R = 1、D = 2（R 记 ⑤ r1 整改轮；D1 记 ⑥ 首次派单输出超长按 §九 重发；D2 记回执统计时在仓库外临时目录落盘，属临时件位置违规且未自愈，已删除） |
 | 临时件落点声明 | 本片临时目录 = `tmp/CONSOLE-CLI-MULTITASK-WIRING/`（⑧c 前只增不删） |
 | 完成记录 | 报告对 `docs/validation/console-cli-multitask-wiring{,_EN}.md`；审查链：① DESIGN DONE → ③ 红基线四点红一绿 → ②a/②b/②c → ⑤ r1 PASS WITH FIXES → r2 PASS → ⑥ INDEPENDENT SCAN: PASS → ⑦ FINAL REVIEW: PASS；文档同步：ARCHITECTURE/DEV_PLAN 已更新；门禁读数见 `docs/validation/evidence/CONSOLE-CLI-MULTITASK-WIRING/08-gates/gate-readings.txt`；提交 `2b0af2d` 已推 origin（未推 gitee），run `41569353460` 首跑双腿全绿；R=1、D=2 |
+
+### P52 — `ACCEPTANCE-SECURITY-COUNTEREXAMPLES`（接受链安全反例 · 层 2 第 4 项）· ✅ 已完成
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `ACCEPTANCE-SECURITY-COUNTEREXAMPLES`（安全验证类；准则 v1.60；M 档） |
+| 状态 | ✅ **已完成**（2026-11-03；锚点 HEAD = `941f60e`，准则 v1.60；主控模型 = `DeepSeek V4 Pro`；停于 ⑩ 等同轮授权） |
+| 目标 | 针对断点 A 的接受链缺口，落地 GAP-51/52/55/60/64/70 所代表的安全反例验证；证明系统面对非法输入、路径伪造、句柄越权、边界绕过时正确 fail-closed |
+| 依赖 | P51 闭环（`2b0af2d`） |
+| 规模 | M |
+| 步骤 | 步骤 0 → ① 架构 → ③ 测试先行 → ② 实现（按纪律 V 拆步）→ ④ 门禁 → ⑤ 预审 → ⑥ 扫描 → ⑦ 终审 → ⑧ 文档 → ⑨ 验证 → ⑧c → ⑩ 停点 |
+| 交付物 | 报告对 `docs/validation/acceptance-security-counterexamples{,_EN}.md`；证据包 `docs/validation/evidence/ACCEPTANCE-SECURITY-COUNTEREXAMPLES/`（含 `00-briefing.md`）；执行自由度清单 |
+| 边界 | 只做测试用例与断言，绝不修改生产代码（发现真实安全漏洞须上报，本片内不修）；不改接受语义；不推 gitee；停 ⑩ 等授权 |
+| 分级 | `[SLICE]`（安全验证类） |
+| 探针额度 | 无 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/ACCEPTANCE-SECURITY-COUNTEREXAMPLES/freedom-list.md` |
+| R / D 基线 | R = 0、D = 1（D1：②b 交叉编译产物写至系统临时目录，违反 v41 §八 临时件位置闭集；主控已核验该路径无残留） |
+| 疑似漏洞上报 | **GAP-77（V-1，HIGH，已实证击穿）**：bounddir_unix.go:64 `openat(O_NOFOLLOW)` 调用仅护末组件（:66 为错误返回行），中间符号链接逃逸绑定；Linux（go1.22.12）实测读出界外 23 字节（证据 `05-attack/t51-1-linux-escape.md`）；本片不修，修复另开切片（P53）。**GAP-78（V-2，LOW，候选）**：seal.go validate 允许空 ContextKey。**GAP-79（V-3，LOW，候选）**：AT23Hash TrimSpace 与 SealHash 拒绝空白的不对称归一化。**GAP-80（V-4，观察级）**：isUnderDirectory 拼写前缀而非对象身份 |
+| 临时件落点声明 | 本片临时目录 = `tmp/ACCEPTANCE-SECURITY-COUNTEREXAMPLES/`（⑧c 前只增不删） |
+| 完成记录 | 报告对 `docs/validation/acceptance-security-counterexamples{,_EN}.md`；审查链：① DESIGN DONE → ③ PROBE: ALL-GREEN → ②a–②d 全绿 → ⑤ PRE-REVIEW: PASS（2 Low 已处置）→ ⑥ INDEPENDENT SCAN: PASS → ⑦ FINAL REVIEW: PASS（0 Medium+）；核心产出 = GAP-77 击穿实证（Linux 实跑）+ GAP-78/79/80 候选；生产代码零改动；文档同步 ARCHITECTURE/DEV_PLAN 已更新；停于 ⑩ 等授权；R=0、D=1 |
 
 ## 已知缺陷（后续切片前处理）
 
