@@ -176,6 +176,7 @@ T027 前置状态更新（2026-10-31，DOCS-ALIGNMENT）：本片把 DEV_PLAN、
 - P48 DR13-D3：release 先 remove 再 unlock，闭合 W1（报告 `docs/validation/dr13-fix-d3{,_EN}.md`）
 - P49 Race 腿扩包：六个核心内部包纳入 CI Ubuntu Race 腿（报告 `docs/validation/race-leg-expand{,_EN}.md`）
 - P50 console 多任务装配完成：协议先行（CONTRACTS A6 多任务串行装配段）与串行调度与任务间停机证明屏障，A6 镜像时刻级排他不变（报告 `docs/validation/console-multitask-assembly{,_EN}.md`；CLI 接线后置）
+- P51 console 多任务 CLI 接线：`--request-records` 可重复声明逐任务请求记录并注入 `RequestRecords` 注册表，单值 `--request-record` 兼容保留，全部拒绝面零写入（报告 `docs/validation/console-cli-multitask-wiring{,_EN}.md`）
 
 ## 3. 需求映射
 

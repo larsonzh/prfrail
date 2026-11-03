@@ -81,6 +81,7 @@
 | P48 DR13-FIX-D3 | ✅ 已完成 | DR13-FIX | S | 2026-11-02 | docs/validation/dr13-fix-d3{,_EN}.md（停于 ⑩ 等授权） |
 | P49 RACE-LEG-EXPAND | ✅ 已完成 | P48 | M | 2026-11-02 | docs/validation/race-leg-expand{,_EN}.md（`75990a8`，run `41445657595` 首跑双绿） |
 | P50 CONSOLE-MULTITASK-ASSEMBLY | ✅ 已完成 | P49 | L | 2026-11-03 | 报告对 `docs/validation/console-multitask-assembly{,_EN}.md`；`81f9dc9` 已推 origin（未推 gitee），run `41507722672` 首跑双腿全绿；临时件 `tmp/CONSOLE-MULTITASK-ASSEMBLY/`（⑧c 清理）；R=1、D=1 |
+| P51 CONSOLE-CLI-MULTITASK-WIRING | 🔄 进行中 | P50 | M | 2026-11-03 | 报告对 `docs/validation/console-cli-multitask-wiring{,_EN}.md`（步骤 0 起跑）；R/D=0 |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -1528,6 +1529,25 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | R / D 基线 | R = 1、D = 1（R 记 ⑤ r1 整改轮；D 记 ② 派单通道故障与两次半截产物处置） |
 | 临时件落点声明 | 本片临时目录 = `tmp/CONSOLE-MULTITASK-ASSEMBLY/`（⑧c 前只增不删） |
 | 完成记录 | 报告对：`docs/validation/console-multitask-assembly{,_EN}.md`；审查链：① DESIGN DONE → ③ 红测 → ②a–d + 修复轮 → ⑤ r1 PASS WITH FIXES → r2 PASS → ⑥ INDEPENDENT SCAN: PASS → ⑦ FINAL REVIEW: PASS；文档同步：ARCHITECTURE/DEV_PLAN 已更新（DEV_PLAN 补齐 P39–P50 里程碑）；⑨ 三作用域 TOTAL_FAIL=0、SELFTEST 697/697；R=1、D=1；提交 `81f9dc9` 已推 origin（未推 gitee），run `41507722672` 首跑双腿全绿 |
+
+### P51 — `CONSOLE-CLI-MULTITASK-WIRING`（console 多任务 CLI 接线 · 层 2 第 3 项）· 🔄 进行中
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `CONSOLE-CLI-MULTITASK-WIRING`（实现类；准则 v1.60；M 档） |
+| 状态 | 🔄 **进行中**（2026-11-03；锚点 HEAD = `3aa53d5`，准则 v1.60） |
+| 目标 | 补齐 P50 遗留的 CLI 参数解析与装配接线，使命令行可直接驱动多任务串行装配 |
+| 依赖 | P50 闭环（`81f9dc9`）；接口边界 = `AgentRunnerAssemblyOptions.RequestRecords` 注册表 |
+| 规模 | M |
+| 步骤 | 步骤 0 → ① 架构 → ③ 测试先行 → ② 实现（按纪律 V 拆步）→ ④ 门禁 → ⑤ 预审 → ⑥ 扫描 → ⑦ 终审 → ⑧ 文档 → ⑨ 验证 → ⑧c → ⑩ 停点 |
+| 交付物 | 报告对 `docs/validation/console-cli-multitask-wiring{,_EN}.md`；证据包 `docs/validation/evidence/CONSOLE-CLI-MULTITASK-WIRING/`（含 `00-briefing.md`）；执行自由度清单 |
+| 边界 | 只做 CLI 接线与参数解析，不改装配语义；不得破坏既有单任务 CLI 兼容性；不推 gitee；停 ⑩ 等授权 |
+| 分级 | `[SLICE]`（实现类） |
+| 探针额度 | 无 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/CONSOLE-CLI-MULTITASK-WIRING/freedom-list.md` |
+| R / D 基线 | R = 1、D = 2（R 记 ⑤ r1 整改轮；D1 记 ⑥ 首次派单输出超长按 §九 重发；D2 记回执统计时在仓库外临时目录落盘，属临时件位置违规且未自愈，已删除） |
+| 临时件落点声明 | 本片临时目录 = `tmp/CONSOLE-CLI-MULTITASK-WIRING/`（⑧c 前只增不删） |
+| 完成记录 | 报告对 `docs/validation/console-cli-multitask-wiring{,_EN}.md`；审查链：① DESIGN DONE → ③ 红基线四点红一绿 → ②a/②b/②c → ⑤ r1 PASS WITH FIXES → r2 PASS → ⑥ INDEPENDENT SCAN: PASS → ⑦ FINAL REVIEW: PASS；文档同步：ARCHITECTURE/DEV_PLAN 已更新；门禁读数见 `docs/validation/evidence/CONSOLE-CLI-MULTITASK-WIRING/08-gates/gate-readings.txt`；提交与 CI 证据在 ⑩ 回执回填（⑩ 停点等授权） |
 
 ## 已知缺陷（后续切片前处理）
 

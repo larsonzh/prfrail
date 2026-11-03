@@ -177,6 +177,7 @@ Backfill note (2026-10-22, step 0 of slice DIRECTIVE-COST-TIER): when those thre
 - P48 DR13-D3: release removes before unlocking, closing W1 (report `docs/validation/dr13-fix-d3{,_EN}.md`)
 - P49 Race leg expansion: six core internal packages enter the CI Ubuntu Race leg (report `docs/validation/race-leg-expand{,_EN}.md`)
 - P50 console multi-task assembly complete: protocol first (the CONTRACTS A6 multi-task serial assembly paragraph) plus serial scheduling and the inter-task stop-proof barrier, with A6 instant-level mirror exclusion unchanged (report `docs/validation/console-multitask-assembly{,_EN}.md`; CLI wiring deferred)
+- P51 console multi-task CLI wiring: `--request-records` declares per-task request records repeatably and injects a `RequestRecords` registry, the single-value `--request-record` is kept for compatibility, and every refusal face is zero-write (report `docs/validation/console-cli-multitask-wiring{,_EN}.md`)
 
 ## 3. Requirement Mapping
 

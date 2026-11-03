@@ -1,0 +1,41 @@
+# ⑨ 门禁读数 —— P51 `CONSOLE-CLI-MULTITASK-WIRING`
+
+采集时点 2026-11-03，`HEAD` = `3aa53d5`（工作区含本片未提交改动）。
+
+## 1. 格式与构建
+
+| 命令 | 结果 |
+|---|---|
+| `gofmt -l internal cmd` | 无输出 |
+| `go build ./...` | exit 0 |
+| `go vet ./...` | exit 0 |
+
+## 2. 全量测试
+
+`go test -count=1 ./...`：十五个包全部 `ok`，无 `FAIL`（原始输出见 `04-impl/logs/04-full-suite-green.txt`）。
+
+## 3. 门禁自检
+
+`node tools/gates/gate.js --selftest`：`SELFTEST: PASS 697/697`。
+
+## 4. 聚焦测试（本片八条）
+
+`go test -count=1 -run 'TestRunRequestRecordsPathsAreRead|TestRunRefusesRequestRecordWithRequestRecords|TestRunRefusesDuplicateRequestRecordKey|TestRunRefusesRequestRecordRunIDMismatch|TestRunRefusesRequestRecordsWithoutExecutableSteps|TestRunRefusesRequestRecordOutsideChainDefinition|TestRunRefusesRequestRecordCoverageGap|TestRunSingleRequestRecordStaysCompatible' -v ./internal/console/`：八条全 `PASS`。
+
+## 5. 三作用域判据
+
+先按纪律 E 精确 `git add` 暂存本片全部改动（`internal/console/cli.go`、`internal/console/cli_multitask_wiring_test.go`、四份权威文档对、报告对、证据包），再依次执行：
+
+| 作用域 | 结论 |
+|---|---|
+| `--scope=index` | `TOTAL_FAIL=0`；`G6-1` 扫描行数大于 0（纪律 E） |
+| `--scope=tree` | `TOTAL_FAIL=0` |
+| `--scope=ci` | `TOTAL_FAIL=0` |
+
+三作用域均含 base 四腿（`gofmt`、`go build ./...`、`go vet ./...`、`go test ./...`），`go test` 为 `ok=15 FAIL=0`。
+
+## 6. 读数口径
+
+- 门禁原始输出落在 `tmp/CONSOLE-CLI-MULTITASK-WIRING/09-gate-{index,tree,ci}.log`（`tmp/` 不入库，⑧c 清理）。
+- 本文件记录的是暂存后、提交前的最终读数；提交后由 CI 腿复验。
+

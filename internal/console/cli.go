@@ -278,6 +278,14 @@ func (cli CLI) executeRun(ctx context.Context, args []string, stdout, stderr io.
 	runID := set.String("run-id", "", "run identifier")
 	jsonOutput := set.Bool("json", false, "output as JSON")
 	requestRecord := set.String("request-record", "", "path to a declared AgentRunner request record (enables the AgentRunner assembly)")
+	requestRecordPaths := make([]string, 0)
+	set.Func("request-records", "path to a declared AgentRunner request record (repeatable; one per task/step)", func(value string) error {
+		if strings.TrimSpace(value) == "" {
+			return fmt.Errorf("request record path is empty")
+		}
+		requestRecordPaths = append(requestRecordPaths, value)
+		return nil
+	})
 	capabilityRecord := set.String("capability-record", "", "path to a declared AgentRunner capability record")
 	enforcementRecord := set.String("enforcement-record", "", "path to a declared AgentRunner enforcement record")
 	availabilityRecord := set.String("availability-record", "", "path to a declared AI availability record")
@@ -308,6 +316,7 @@ func (cli CLI) executeRun(ctx context.Context, args []string, stdout, stderr io.
 	supervised := FindSupervisedSteps(cfg)
 	inputs := agentRunnerRunInputs{
 		requestRecord:       *requestRecord,
+		requestRecords:      requestRecordPaths,
 		capabilityRecord:    *capabilityRecord,
 		enforcementRecord:   *enforcementRecord,
 		availabilityRecord:  *availabilityRecord,
@@ -315,6 +324,15 @@ func (cli CLI) executeRun(ctx context.Context, args []string, stdout, stderr io.
 		costLedger:          *costLedger,
 		agentCLI:            *agentCLIPath,
 		agentVersion:        *agentVersion,
+	}
+	if strings.TrimSpace(inputs.requestRecord) != "" && len(inputs.requestRecords) > 0 {
+		return writeUsageError(stdout, stderr, "run", *jsonOutput, "--request-record and --request-records are mutually exclusive", runUsage)
+	}
+	// A chain without executable steps never enters the AgentRunner assembly, so
+	// a per-task registry declared against it has no consumer. Refuse instead of
+	// running the noop path and silently dropping the declaration.
+	if len(inputs.requestRecords) > 0 && len(executable) == 0 && len(supervised) == 0 {
+		return writeCommandError(stdout, stderr, "run", *jsonOutput, fmt.Errorf("request records require at least one executable step in the chain definition"))
 	}
 	// P1: a supervised definition can never be entered by supplying AgentRunner
 	// input flags, and it never falls back to the AgentRunner assembly.
@@ -367,14 +385,17 @@ func (cli CLI) executeRun(ctx context.Context, args []string, stdout, stderr io.
 	return writeRunSummary(stdout, *jsonOutput, resolvedRunDir, summary)
 }
 
-const runUsage = "usage: prfrail run [--chain <path>] [--run-id <id>] [--run-dir <path>] [--json] [--request-record <path> --capability-record <path> --enforcement-record <path> --availability-record <path> --authorization-ledger <path> --cost-ledger <path> --agent-cli <path> --agent-version <version>]"
+const runUsage = "usage: prfrail run [--chain <path>] [--run-id <id>] [--run-dir <path>] [--json] (--request-record <path> | --request-records <path>)... --capability-record <path> --enforcement-record <path> --availability-record <path> --authorization-ledger <path> --cost-ledger <path> --agent-cli <path> --agent-version <version>"
 
-// agentRunnerRunInputs is the all-or-nothing AgentRunner CLI surface. Every one
-// of the eight values must be present before the run command routes to the
-// AgentRunner assembly: a partially supplied set keeps the existing noop-only
-// refusal instead of assembling from an incomplete declaration.
+// agentRunnerRunInputs is the all-or-nothing AgentRunner CLI surface. Before the
+// run command routes to the AgentRunner assembly the request-record dimension
+// must be supplied in exactly one of its two forms, the single-value
+// requestRecord or the repeatable requestRecords, and all seven remaining values
+// must be present. A partially supplied set keeps the existing noop-only refusal
+// instead of assembling from an incomplete declaration.
 type agentRunnerRunInputs struct {
 	requestRecord       string
+	requestRecords      []string
 	capabilityRecord    string
 	enforcementRecord   string
 	availabilityRecord  string
@@ -385,8 +406,10 @@ type agentRunnerRunInputs struct {
 }
 
 func (inputs agentRunnerRunInputs) complete() bool {
+	if strings.TrimSpace(inputs.requestRecord) == "" && len(inputs.requestRecords) == 0 {
+		return false
+	}
 	for _, value := range []string{
-		inputs.requestRecord,
 		inputs.capabilityRecord,
 		inputs.enforcementRecord,
 		inputs.availabilityRecord,
@@ -405,6 +428,9 @@ func (inputs agentRunnerRunInputs) complete() bool {
 // anyProvided reports whether at least one AgentRunner input flag was supplied.
 // It is the hazard half of the supervised/AgentRunner mutual exclusion.
 func (inputs agentRunnerRunInputs) anyProvided() bool {
+	if len(inputs.requestRecords) > 0 {
+		return true
+	}
 	for _, value := range []string{
 		inputs.requestRecord,
 		inputs.capabilityRecord,
@@ -441,13 +467,27 @@ func (cli CLI) executeAgentRunnerRun(ctx context.Context, runID, runDir string, 
 		}
 		return data, nil
 	}
-	requestBytes, err := readRecord("request record", inputs.requestRecord)
-	if err != nil {
-		return writeCommandError(stdout, stderr, "run", jsonOutput, err)
-	}
-	requestRecord, err := adapters.DecodeAgentRunnerRequestRecord(requestBytes)
-	if err != nil {
-		return writeCommandError(stdout, stderr, "run", jsonOutput, err)
+	var (
+		requestRecord  adapters.AgentRunnerRequestRecord
+		requestRecords map[string]adapters.AgentRunnerRequestRecord
+	)
+	if len(inputs.requestRecords) > 0 {
+		// The repeatable form owns the whole registry: every planned task must be
+		// declared here, and the single compatibility record stays zero so no task
+		// can silently borrow it.
+		requestRecords, err = readAgentRunnerRequestRecords(cwd, runID, definition, inputs.requestRecords)
+		if err != nil {
+			return writeCommandError(stdout, stderr, "run", jsonOutput, err)
+		}
+	} else {
+		requestBytes, err := readRecord("request record", inputs.requestRecord)
+		if err != nil {
+			return writeCommandError(stdout, stderr, "run", jsonOutput, err)
+		}
+		requestRecord, err = adapters.DecodeAgentRunnerRequestRecord(requestBytes)
+		if err != nil {
+			return writeCommandError(stdout, stderr, "run", jsonOutput, err)
+		}
 	}
 	capabilityBytes, err := readRecord("capability record", inputs.capabilityRecord)
 	if err != nil {
@@ -506,6 +546,7 @@ func (cli CLI) executeAgentRunnerRun(ctx context.Context, runID, runDir string, 
 		RunRoot:             runDir,
 		Definition:          definition,
 		RequestRecord:       requestRecord,
+		RequestRecords:      requestRecords,
 		CapabilityRecord:    capabilityRecord,
 		EnforcementRecord:   &enforcementRecord,
 		AvailabilityRecord:  availabilityRecord,
@@ -526,6 +567,84 @@ func (cli CLI) executeAgentRunnerRun(ctx context.Context, runID, runDir string, 
 		return writeCommandError(stdout, stderr, "run", jsonOutput, err)
 	}
 	return writeRunSummary(stdout, jsonOutput, runDir, summary)
+}
+
+// readAgentRunnerRequestRecords decodes the repeatable --request-records files
+// into the per-task registry of the AgentRunner assembly. Every record is read,
+// decoded, bound to the run and keyed by agentRunnerRequestRecordKey; the
+// registry must then cover exactly the task/step pairs the assembly plan binds.
+// The order of the refusals is fixed so the CLI failure is deterministic: the
+// run binding and the duplicate key are judged per record while decoding, the
+// key/definition match after every record is decoded, and the coverage of the
+// definition last.
+func readAgentRunnerRequestRecords(cwd, runID string, definition chain.Definition, paths []string) (map[string]adapters.AgentRunnerRequestRecord, error) {
+	records := make(map[string]adapters.AgentRunnerRequestRecord, len(paths))
+	// keys keeps the decoded keys in input order, so the stray-key refusal below
+	// reports a deterministic key instead of a random map iteration order.
+	keys := make([]string, 0, len(paths))
+	for _, value := range paths {
+		path, err := resolvePathFromCWD(cwd, value)
+		if err != nil {
+			return nil, fmt.Errorf("request record: %w", err)
+		}
+		data, err := os.ReadFile(path)
+		if err != nil {
+			return nil, fmt.Errorf("request record: %w", err)
+		}
+		record, err := adapters.DecodeAgentRunnerRequestRecord(data)
+		if err != nil {
+			return nil, err
+		}
+		if record.Request.RunID != runID {
+			return nil, fmt.Errorf("request record runId %q does not match run id %q", record.Request.RunID, runID)
+		}
+		key := agentRunnerRequestRecordKey(record.Request.TaskID, record.Request.StepID)
+		if _, duplicate := records[key]; duplicate {
+			return nil, fmt.Errorf("request records must bind distinct task/step keys: duplicate key %q", key)
+		}
+		records[key] = record
+		keys = append(keys, key)
+	}
+	bindings := agentRunnerExecutableBindings(definition)
+	if len(bindings) == 0 {
+		return nil, fmt.Errorf("request records require at least one executable step in the chain definition")
+	}
+	planned := make(map[string]struct{}, len(bindings))
+	for _, binding := range bindings {
+		planned[agentRunnerRequestRecordKey(binding.TaskID, binding.StepID)] = struct{}{}
+	}
+	for _, key := range keys {
+		if _, ok := planned[key]; !ok {
+			return nil, fmt.Errorf("request record does not bind a task/step of the chain definition: %q", key)
+		}
+	}
+	for _, binding := range bindings {
+		if _, ok := records[agentRunnerRequestRecordKey(binding.TaskID, binding.StepID)]; !ok {
+			return nil, fmt.Errorf("request record is missing for task %q step %q", binding.TaskID, binding.StepID)
+		}
+	}
+	return records, nil
+}
+
+// agentRunnerExecutableBindings enumerates the task/step pairs of the definition
+// that the AgentRunner assembly binds. The enumeration mirrors
+// agentRunnerAssemblyPlan: a task contributes a binding only when it carries
+// exactly one step and that step is the isolated-workspace code step the
+// AgentRunner route can prove. A definition the plan refuses is left to the
+// assembly's own refusal; the registry only has to cover what the plan binds.
+func agentRunnerExecutableBindings(definition chain.Definition) []agentRunnerTaskBinding {
+	bindings := make([]agentRunnerTaskBinding, 0, len(definition.Tasks))
+	for _, task := range definition.Tasks {
+		if len(task.Steps) != 1 {
+			continue
+		}
+		step := task.Steps[0]
+		if step.Kind != "code" || step.Mode != chain.IsolatedWorkspace {
+			continue
+		}
+		bindings = append(bindings, agentRunnerTaskBinding{TaskID: task.ID, StepID: step.ID})
+	}
+	return bindings
 }
 
 func writeRunSummary(stdout io.Writer, jsonOutput bool, runDir string, summary RunSummary) int {
