@@ -26,6 +26,7 @@ Runners/OS capabilities enforce restrictions, not prompts alone. Unknown process
 |---|---|---|---|
 | SEC-01 Spoofing | Forged review, old requestId/lease | Actor/hash/attempt/expiry binding; chain/tickets/adapters | AT-05/08/09 |
 | SEC-02 Tampering | Replaced hooks/manifests/receipts, traversal/symlink/reparse escape | Pinned hashes, real-path/open-time checks, offline chain; taskdef/snapshot/evidence | AT-02/04/06 |
+| SEC-02a Tampering/escape | Middle symlink escape: a symlink placed inside the bound directory points outside it and `link/secret` is read; the old implementation called `openat(O_NOFOLLOW)` once and guarded only the final component, so the kernel followed the middle link and returned an out-of-bound file handle (P52 measured 23 out-of-bound bytes) | openat2 single restricted resolution (`RESOLVE_NO_XDEV`, `RESOLVE_NO_MAGICLINKS`, `RESOLVE_NO_SYMLINKS`, `RESOLVE_BENEATH`): any symlink component is refused with `ELOOP`, a mount boundary with `EXDEV`, and there is no walk fallback; hosts without openat2 fail closed with a wrapped `ENOSYS` error; a `sync.Mutex` covers the resolution and Close lifetime; adapters | AT-02/T51-1 |
 | SEC-03 Repudiation | Deleted/reordered events, anonymous waiver | Sequence/previous hash, actor/reason/expiry; evidence/chain | AT-04/05 |
 | SEC-04 Disclosure | Tokens in logs, prompts or snapshots | Environment allowlist, secret references, pre-archive/export scan and size bounds; gates/evidence/adapters | AT-06/10 |
 | SEC-05 Denial of service | Full disk, unlimited output, stuck process trees, retry storms | Quotas, runtime monitoring, process-tree stop, shared budgets; guard/gates/tickets | AT-03/06/07 |
@@ -41,6 +42,8 @@ Runners/OS capabilities enforce restrictions, not prompts alone. Unknown process
 | SEC-15 Disclosure/repudiation/effects | A visible black-box Agent reads out-of-scope resources, leaks secrets, hides network/cost/background work, performs external Git/publication effects, or treats risk notice as a waiver | Explicit versioned risk acknowledgment, isolated workspace, user supervision/host controls, full post-return scan, unknown labels, independent gates/review; console/chain/guard/evidence | AT-24 |
 
 Test IDs resolve in [TEST_STRATEGY_EN.md](TEST_STRATEGY_EN.md). Every mandatory negative case asserts no publication, no advancement and intact evidence, not merely a nonzero exit.
+
+SEC-02a verification: the T51-1 resident regression asserts the refusal closed set {`ELOOP`, `ENOTDIR`, `EXDEV`} plus an in-bound positive control; F1 is the concurrent rename storm; F2 is the bind mount import (skippable with registration when the environment cannot grant it); the mutation check is `PRFRAIL_P53_RED_BASELINE=1 go test -run TestBoundDirRedBaselineMiddleSymlinkEscape`.
 
 ## 4. Secrets, Network and Retention
 

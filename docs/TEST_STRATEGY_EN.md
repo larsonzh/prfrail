@@ -60,6 +60,8 @@ AT-23 prerequisite hard checks (new in P38/P39):
 - N4 repeatable probe quota: one Permit must not obtain quota repeatedly or concurrently
 - P39 concurrency counterexamples: cross-process cap race, three commit-failure states, `unknown` occupancy, read-only never writes a confirmation, missing ledger refuses redispatch
 
+AT-02 mandatory counterexamples (new in P53, GAP-77 middle symlink escape): the resident regressions `TestBoundDirMiddleSymlinkEscapesBound`, `TestBoundDirMiddleSymlinkRefusedWithClosedErrno`, `TestBoundDirRenameStormNeverYieldsOutsideBytes`, `TestBoundDirBindMountImportRefused`, `TestBoundDirFailClosedWithoutOpenat2` and `TestBoundDirConcurrentCloseAndRead`; the red-baseline history is the P52 break (out-of-bound bytes readable) turned red-to-green by P53; the mutation check is `PRFRAIL_P53_RED_BASELINE=1 go test -run TestBoundDirRedBaselineMiddleSymlinkEscape`.
+
 AT-16–AT-21 are RFC section 19 S1 minimum acceptance; AT-22 covers AI/operator interaction, AT-23 full AgentRunner execution assurance, and AT-24 reduced-assurance supervised black-box candidates. All start with deterministic fixtures and no paid calls; real host/model calls require separate authorization. S0 T002/T003 freeze records/fixtures only; parse success is not runtime evidence. T018 summarizes all 24 groups. US7–US11 cover trial, delivery, revocation, retirement recovery and black-box candidates; local measurements establish value without assumed savings.
 
 S2/S3 remain governed by RFC section 14: real three-language integration, supervised disconnection, Web, additional adapters and generated script B. S0 config parsing is not runtime acceptance.

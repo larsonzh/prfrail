@@ -83,6 +83,7 @@
 | P50 CONSOLE-MULTITASK-ASSEMBLY | ✅ Completed | P49 | L | 2026-11-03 | Report pair `docs/validation/console-multitask-assembly{,_EN}.md`; `81f9dc9` pushed to origin (never gitee), run `41507722672` green on the first attempt on both legs; temp artefacts `tmp/CONSOLE-MULTITASK-ASSEMBLY/` (cleared at 8c); R=1, D=1 |
 | P51 CONSOLE-CLI-MULTITASK-WIRING | ✅ Completed | P50 | M | 2026-11-03 | Report pair `docs/validation/console-cli-multitask-wiring{,_EN}.md`; `2b0af2d` pushed to origin (never gitee), run `41569353460` green on the first attempt on both legs; temp artefacts `tmp/CONSOLE-CLI-MULTITASK-WIRING/` (cleared at 8c); R=1, D=2 |
 | P52 ACCEPTANCE-SECURITY-COUNTEREXAMPLES | ✅ Completed | P51 | M | 2026-11-03 | Report pair `docs/validation/acceptance-security-counterexamples{,_EN}.md`; GAP-77 breach registered (P53 fix); stopped at 10 for authorisation; R=0, D=1 |
+| P53 FIX-GAP-77-SYMLINK-ESCAPE | 🔄 In progress | P52 | M | 2026-11-03 | Fix GAP-77 middle symlink escape (bounddir_unix.go openat stepwise resolution or O_PATH rework); enable T51-1 by removing the skip; spec sync `docs/SECURITY{,_EN}.md` SEC-02 and `docs/TEST_STRATEGY{,_EN}.md` AT-02; R=0, D=0 |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1556,6 +1557,24 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Suspected holes | **GAP-77 (V-1, HIGH, breached)**: bounddir_unix.go:64 `openat(O_NOFOLLOW)` call guards only the final component (:66 is the error-return line); a middle symlink escapes the bound dir; 23 out-of-bound bytes read on Linux (go1.22.12) (evidence `05-attack/t51-1-linux-escape.md`); not fixed in this slice, fix in a separate slice (P53). **GAP-78 (V-2, LOW, candidate)**: seal.go validate admits an empty ContextKey. **GAP-79 (V-3, LOW, candidate)**: asymmetric normalisation of AT23Hash TrimSpace vs SealHash whitespace rejection. **GAP-80 (V-4, observation)**: isUnderDirectory spelling prefix rather than object identity |
 | Temp artefact location | `tmp/ACCEPTANCE-SECURITY-COUNTEREXAMPLES/` (append-only until 8c) |
 | Completion record | Report pair `docs/validation/acceptance-security-counterexamples{,_EN}.md`; review chain: 1 DESIGN DONE → 3 PROBE: ALL-GREEN → 2a-2d all green → 5 PRE-REVIEW: PASS (2 Low disposed) → 6 INDEPENDENT SCAN: PASS → 7 FINAL REVIEW: PASS (0 Medium+); core outputs = GAP-77 breach proven (Linux real run) + GAP-78/79/80 candidates; zero production changes; docs sync ARCHITECTURE/DEV_PLAN updated; commit `c636dd8` pushed to origin (never gitee), run `41642139932` green on the first attempt on both legs; R=0, D=1 |
+
+### P53 — `FIX-GAP-77-SYMLINK-ESCAPE` (middle symlink escape fix; layer 2, item 5) · 🔄 In progress
+
+| Field | Content |
+|---|---|
+| ID | `FIX-GAP-77-SYMLINK-ESCAPE` (low-level security fix; directive v1.60; tier M) |
+| Status | 🔄 **In progress** (since 2026-11-03; anchor HEAD = `dc785ed`; controller model = `DeepSeek V4 Pro`; stops at 10 for authorisation) |
+| Goal | Fix GAP-77 (middle symlink escape in bounddir_unix.go); openat2 single restricted resolution as the main path + fail-closed (no walk fallback); unskip T51-1 and turn it red-to-green |
+| Depends on | P52 closed (`c636dd8`) |
+| Scale | M |
+| Steps | Step 0 → 1 architecture (double play: V4 Pro + Sol temporary authorisation) → 3 red-first → 3b test restructure → 2a implementation → 4 gates → 5 pre-review → 6 scan → 7 final review → 8 docs → 9 validation → 8c → 10 stop |
+| Deliverables | production fix `internal/adapters/bounddir_unix.go`; T51-1 red-to-green + F1/F2 counterexamples; spec sync `SECURITY{,_EN}` SEC-02 and `TEST_STRATEGY{,_EN}` AT-02; report and evidence package `docs/validation/evidence/FIX-GAP-77-SYMLINK-ESCAPE/` |
+| Boundary | frozen interface signatures; only `bounddir_unix.go` plus tests; zero Windows/darwin changes; fail-closed (rulings (a)-(e)); no gitee push; stop at 10 for authorisation |
+| Tier | `[SLICE]` (low-level security fix) |
+| Review-7 budget | Codex final review x1 |
+| Temp artefact location | `tmp/FIX-GAP-77-SYMLINK-ESCAPE/` (append-only until 8c) |
+| R / D baseline | R = 0, D = 0 |
+| Completion record | Review chain: 1 double play (V4 Pro r1 → Sol red team FINDINGS 2H+4M → r2 openat2 final) → 3 real red (dedicated wording matched verbatim) → 2a implementation (+158/-12, the only production file bounddir_unix.go) → 3b/3c test restructure and remediation → 4 all gates green → 5 r2 PASS → 6 PASS → 7 PASS (0 findings); stopped at 10 for authorisation; not committed, not pushed |
 
 ## Known defects (to be handled before later slices)
 

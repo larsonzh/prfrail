@@ -179,6 +179,7 @@ Backfill note (2026-10-22, step 0 of slice DIRECTIVE-COST-TIER): when those thre
 - P50 console multi-task assembly complete: protocol first (the CONTRACTS A6 multi-task serial assembly paragraph) plus serial scheduling and the inter-task stop-proof barrier, with A6 instant-level mirror exclusion unchanged (report `docs/validation/console-multitask-assembly{,_EN}.md`; CLI wiring deferred)
 - P51 console multi-task CLI wiring: `--request-records` declares per-task request records repeatably and injects a `RequestRecords` registry, the single-value `--request-record` is kept for compatibility, and every refusal face is zero-write (report `docs/validation/console-cli-multitask-wiring{,_EN}.md`)
 - P52 acceptance counterexamples: acceptance-chain security counterexamples are now covered (P52 `ACCEPTANCE-SECURITY-COUNTEREXAMPLES`, including the GAP-77 break registration and the P53 remediation pointer; production code unchanged; report `docs/validation/acceptance-security-counterexamples{,_EN}.md`)
+- P53 fix: the GAP-77 middle symlink escape is fixed (openat2 single restricted resolution plus fail-closed, no walk fallback; T51-1 turned red-to-green and stays as a resident regression, with the F1/F2 counterexamples; spec sync to SECURITY SEC-02 and TEST_STRATEGY AT-02; report and evidence package `docs/validation/evidence/FIX-GAP-77-SYMLINK-ESCAPE/`; implementation and review complete, stopped at 10 for authorisation)
 
 ## 3. Requirement Mapping
 

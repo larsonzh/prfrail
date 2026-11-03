@@ -83,6 +83,7 @@
 | P50 CONSOLE-MULTITASK-ASSEMBLY | ✅ 已完成 | P49 | L | 2026-11-03 | 报告对 `docs/validation/console-multitask-assembly{,_EN}.md`；`81f9dc9` 已推 origin（未推 gitee），run `41507722672` 首跑双腿全绿；临时件 `tmp/CONSOLE-MULTITASK-ASSEMBLY/`（⑧c 清理）；R=1、D=1 |
 | P51 CONSOLE-CLI-MULTITASK-WIRING | ✅ 已完成 | P50 | M | 2026-11-03 | 报告对 `docs/validation/console-cli-multitask-wiring{,_EN}.md`；`2b0af2d` 已推 origin（未推 gitee），run `41569353460` 首跑双腿全绿；临时件 `tmp/CONSOLE-CLI-MULTITASK-WIRING/`（⑧c 清理）；R=1、D=2 |
 | P52 ACCEPTANCE-SECURITY-COUNTEREXAMPLES | ✅ 已完成 | P51 | M | 2026-11-03 | 报告对 `docs/validation/acceptance-security-counterexamples{,_EN}.md`；GAP-77 击穿实证登记（P53 修复）；停于 ⑩ 等授权；R=0、D=1 |
+| P53 FIX-GAP-77-SYMLINK-ESCAPE | 🔄 进行中 | P52 | M | 2026-11-03 | 修复 GAP-77 中间符号链接逃逸（bounddir_unix.go openat 逐级解析或 O_PATH 改造）；启用 T51-1 移除 skip；规范同步 `docs/SECURITY{,_EN}.md` SEC-02 与 `docs/TEST_STRATEGY{,_EN}.md` AT-02；R=0、D=0 |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -1569,6 +1570,24 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 疑似漏洞上报 | **GAP-77（V-1，HIGH，已实证击穿）**：bounddir_unix.go:64 `openat(O_NOFOLLOW)` 调用仅护末组件（:66 为错误返回行），中间符号链接逃逸绑定；Linux（go1.22.12）实测读出界外 23 字节（证据 `05-attack/t51-1-linux-escape.md`）；本片不修，修复另开切片（P53）。**GAP-78（V-2，LOW，候选）**：seal.go validate 允许空 ContextKey。**GAP-79（V-3，LOW，候选）**：AT23Hash TrimSpace 与 SealHash 拒绝空白的不对称归一化。**GAP-80（V-4，观察级）**：isUnderDirectory 拼写前缀而非对象身份 |
 | 临时件落点声明 | 本片临时目录 = `tmp/ACCEPTANCE-SECURITY-COUNTEREXAMPLES/`（⑧c 前只增不删） |
 | 完成记录 | 报告对 `docs/validation/acceptance-security-counterexamples{,_EN}.md`；审查链：① DESIGN DONE → ③ PROBE: ALL-GREEN → ②a–②d 全绿 → ⑤ PRE-REVIEW: PASS（2 Low 已处置）→ ⑥ INDEPENDENT SCAN: PASS → ⑦ FINAL REVIEW: PASS（0 Medium+）；核心产出 = GAP-77 击穿实证（Linux 实跑）+ GAP-78/79/80 候选；生产代码零改动；文档同步 ARCHITECTURE/DEV_PLAN 已更新；提交 `c636dd8` 已推 origin（未推 gitee），run `41642139932` 首跑双腿全绿；R=0、D=1 |
+
+### P53 — `FIX-GAP-77-SYMLINK-ESCAPE`（中间符号链接逃逸修复 · 层 2 第 5 项）· 🔄 进行中
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `FIX-GAP-77-SYMLINK-ESCAPE`（底层安全修复类；准则 v1.60；M 档） |
+| 状态 | 🔄 **进行中**（2026-11-03 起；锚点 HEAD = `dc785ed`；主控模型 = `DeepSeek V4 Pro`；停于 ⑩ 等授权） |
+| 目标 | 修复 GAP-77（bounddir_unix.go 中间符号链接逃逸）；openat2 单次受限解析主路径 + fail-closed（无 walk 降级）；T51-1 移除 skip 红转绿 |
+| 依赖 | P52 闭环（`c636dd8`） |
+| 规模 | M |
+| 步骤 | 步骤 0 → ① 架构（双打：V4 Pro + Sol 临时授权）→ ③ 红测先行 → ③b 测试重构 → ②a 实现 → ④ 门禁 → ⑤ 预审 → ⑥ 扫描 → ⑦ 终审 → ⑧ 文档 → ⑨ 验证 → ⑧c → ⑩ 停点 |
+| 交付物 | 生产修复 `internal/adapters/bounddir_unix.go`；T51-1 红转绿 + F1/F2 反例；规范同步 `SECURITY{,_EN}` SEC-02 与 `TEST_STRATEGY{,_EN}` AT-02；报告与证据包 `docs/validation/evidence/FIX-GAP-77-SYMLINK-ESCAPE/` |
+| 边界 | 接口签名冻结；只改 `bounddir_unix.go` 及测试；Windows/darwin 零改动；fail-closed（裁定 (a)–(e)）；不推 gitee；停 ⑩ 等授权 |
+| 分级 | `[SLICE]`（底层安全修复类） |
+| ⑦ 额度 | Codex 1 次终审 |
+| 临时件落点声明 | 本片临时目录 = `tmp/FIX-GAP-77-SYMLINK-ESCAPE/`（⑧c 前只增不删） |
+| R / D 基线 | R = 0、D = 0 |
+| 完成记录 | 审查链：① 双打（V4 Pro r1→Sol 红队 FINDINGS 2H+4M→r2 openat2 定稿；§1.7.4 临时授权已留痕）→ ③ 真实红（专属文案逐字命中）→ ②a 实现（+158/-12，唯一生产文件 bounddir_unix.go）→ ③b/③c 测试重构与整改 → ④ 门禁全绿 → ⑤ r2 PASS → ⑥ PASS → ⑦ PASS（0 发现）；停于 ⑩ 等授权；未提交未推送 |
 
 ## 已知缺陷（后续切片前处理）
 

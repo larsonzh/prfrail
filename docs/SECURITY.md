@@ -26,6 +26,7 @@
 |---|---|---|---|
 | SEC-01 冒充 | 伪造 review/旧 requestId/租约 | 主体、摘要、attempt、时效绑定；chain/tickets/adapters | AT-05/08/09 |
 | SEC-02 篡改 | 替换 hook、manifest、receipt；路径穿越、symlink/reparse 逃逸 | 锁定摘要、真实路径/打开时检查、离线哈希链；taskdef/snapshot/evidence | AT-02/04/06 |
+| SEC-02a 篡改/逃逸 | 中间符号链接逃逸：在绑定目录内放置指向界外目录的中间符号链接并读取 `link/secret`；旧实现单次 `openat(O_NOFOLLOW)` 仅护末组件，内核跟随中间链接返回界外文件句柄（P52 实测读出 23 字节界外内容） | openat2 单次受限解析（`RESOLVE_NO_XDEV`、`RESOLVE_NO_MAGICLINKS`、`RESOLVE_NO_SYMLINKS`、`RESOLVE_BENEATH`）：任一组件为符号链接即 `ELOOP` 拒绝，跨挂载点即 `EXDEV`，不含 walk 降级；不支持 openat2 的主机 fail-closed 返回 `ENOSYS` 包装错误；`sync.Mutex` 覆盖解析与 Close 生命周期；adapters | AT-02/T51-1 |
 | SEC-03 抵赖 | 删除/重排事件、匿名 waive | 序号+前哈希、授权主体/原因/有效期；evidence/chain | AT-04/05 |
 | SEC-04 信息泄露 | 日志、模型提示、快照含 token | 环境白名单、secret 引用、入包/外发前扫描及大小限制；gates/evidence/adapters | AT-06/10 |
 | SEC-05 拒绝服务 | 磁盘满、无限输出、挂起子树、重试风暴 | 配额预检+运行检测、进程树停机、统一预算；guard/gates/tickets | AT-03/06/07 |
@@ -41,6 +42,8 @@
 | SEC-15 信息泄露/抵赖/副作用 | visible 黑箱 Agent 读取越界资源、泄密、网络/费用/后台进程不可见、外部 Git/发布副作用，或风险说明被当作免责放行 | 显式版本化风险确认、隔离 workspace、用户监督与宿主侧限制、归还后全量扫描、unknown 标记、独立 gates/review；console/chain/guard/evidence | AT-24 |
 
 测试编号解析见 [TEST_STRATEGY.md](TEST_STRATEGY.md)。全部强制反例必须能断言“不发布、不推进、证据仍完整”，不能只检查返回非零。
+
+SEC-02a 验证方法：T51-1 常驻回归断言拒绝闭集 {`ELOOP`, `ENOTDIR`, `EXDEV`} 与界内正向对照；F1 并发 rename 风暴；F2 bind mount 导入（环境受限可跳过并登记）；变异检验 `PRFRAIL_P53_RED_BASELINE=1 go test -run TestBoundDirRedBaselineMiddleSymlinkEscape`。
 
 ## 4. 秘密、网络与证据保留
 

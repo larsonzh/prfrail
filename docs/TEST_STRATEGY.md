@@ -60,6 +60,8 @@ AT-23 前置强检项（P38/P39 新增）：
 - N4 探针额度可重复：同一 Permit 不得重复或并发取得额度
 - P39 并发反例：跨进程上限竞态、提交故障三态、`unknown` 占用、只读不写入确认、账本缺失拒绝重发
 
+AT-02 强制反例（P53 新增，GAP-77 中间符号链接逃逸）：常驻回归 `TestBoundDirMiddleSymlinkEscapesBound`、`TestBoundDirMiddleSymlinkRefusedWithClosedErrno`、`TestBoundDirRenameStormNeverYieldsOutsideBytes`、`TestBoundDirBindMountImportRefused`、`TestBoundDirFailClosedWithoutOpenat2`、`TestBoundDirConcurrentCloseAndRead`；红基线历史为 P52 击穿（界外内容可读）转 P53 红转绿；变异检验 `PRFRAIL_P53_RED_BASELINE=1 go test -run TestBoundDirRedBaselineMiddleSymlinkEscape`。
+
 AT-16–AT-21 是 RFC §19 的 S1 最小验收，AT-22 是 AI/操作员交互，AT-23 是 AgentRunner 完整执行保证，AT-24 是受监督黑箱候选的降级保证。均先用无付费调用的确定性夹具；真实宿主/模型调用另授权。S0 T002/T003 只冻结记录和正反样例，不能将解析通过报成运行验证；T018 汇总全部 24 组结果。US7–US11 覆盖初次试用、交付、撤销、停用恢复和黑箱候选，收益指标用本地记录验证，不预设节省比例。
 
 S2/S3 验收仍由 RFC §14 控制：三语言产品真实集成、supervised 断线、Web、更多 adapter 和生成脚本 B；不能用 S0 配置解析替代真实运行。

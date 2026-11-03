@@ -116,7 +116,9 @@ baseline、已接受快照、最终报告及失败证据默认保留；候选/�
 
 反例按缺口绑定到测试，落点七个 `*_test.go`：GAP-51 → T51-1（以 `t.Skip` 记录击穿）；GAP-52 → T52-1/2；GAP-55 → T55-1..7；GAP-60 → T60-1..3；GAP-64 → T64-1..6；GAP-70 → T70-1..4。
 
-GAP-77 为实测击穿：Unix 中间符号链接可逃逸目录绑定，Linux go1.22.12 读出界外 23 字节；`bounddir_unix.go:64` 的 `openat(O_NOFOLLOW)` 仅护末组件，修复指向 P53 独立切片。GAP-78（空 ContextKey）、GAP-79（归一化不对称）、GAP-80（isUnderDirectory 前缀残余）为未击穿候选。
+GAP-77 为实测击穿：Unix 中间符号链接可逃逸目录绑定，Linux go1.22.12 读出界外 23 字节；`bounddir_unix.go:64` 的 `openat(O_NOFOLLOW)` 仅护末组件；**已修复（P53）**，方式为 openat2 单次受限解析加 fail-closed。GAP-78（空 ContextKey）、GAP-79（归一化不对称）、GAP-80（isUnderDirectory 前缀残余）为未击穿候选。
+
+P53 修复摘要：主路径为 `openat2(2)`（`RESOLVE_NO_XDEV`、`RESOLVE_NO_MAGICLINKS`、`RESOLVE_NO_SYMLINKS`、`RESOLVE_BENEATH`，仅 linux/amd64），其余平台 fail-closed（`ENOSYS`，无 walk 降级）；相关测试为 T51-1 常驻回归与 F1/F2 反例。
 
 断言纪律：反例一律以 `errors.Is` 绑定哨兵错误；确无哨兵者须在测试内以注释锚定理由。
 

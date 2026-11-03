@@ -116,7 +116,9 @@ See [contracts](CONTRACTS_EN.md), [security](SECURITY_EN.md) and [decision regis
 
 Counterexamples bind each gap to tests and land in seven `*_test.go` files: GAP-51 -> T51-1 (break recorded as `t.Skip`); GAP-52 -> T52-1/2; GAP-55 -> T55-1..7; GAP-60 -> T60-1..3; GAP-64 -> T64-1..6; GAP-70 -> T70-1..4.
 
-GAP-77 is a measured break: a Unix intermediate symlink escapes the directory binding and read 23 bytes outside it on Linux go1.22.12; `openat(O_NOFOLLOW)` at `bounddir_unix.go:64` guards only the final component, and remediation points to the P53 standalone slice. GAP-78 (empty ContextKey), GAP-79 (asymmetric normalisation) and GAP-80 (residual isUnderDirectory prefix) remain unbroken candidates.
+GAP-77 is a measured break: a Unix intermediate symlink escapes the directory binding and read 23 bytes outside it on Linux go1.22.12; `openat(O_NOFOLLOW)` at `bounddir_unix.go:64` guards only the final component; **fixed in P53** by openat2 single restricted resolution plus fail-closed. GAP-78 (empty ContextKey), GAP-79 (asymmetric normalisation) and GAP-80 (residual isUnderDirectory prefix) remain unbroken candidates.
+
+P53 fix summary: the main path is `openat2(2)` (`RESOLVE_NO_XDEV`, `RESOLVE_NO_MAGICLINKS`, `RESOLVE_NO_SYMLINKS`, `RESOLVE_BENEATH`, linux/amd64 only), and every other platform fails closed (`ENOSYS`, no walk fallback); the related tests are the T51-1 resident regression plus the F1/F2 counterexamples.
 
 Assertion discipline: every counterexample binds a sentinel error through `errors.Is`; a case without a sentinel must anchor its reason in an in-test comment.
 

@@ -1,0 +1,38 @@
+# P53 FIX-GAP-77-SYMLINK-ESCAPE · ⑨ 门禁读数（主控落盘，2026-11-04）
+
+## 本地（Windows，HEAD 基线上未提交变更集）
+- SELFTEST: PASS 697/697（gate.js --selftest，退出 0）
+- go build ./...            EXIT=0
+- go vet ./...              EXIT=0
+- go test -count=1 ./...    ok-lines=15、FAIL=0、EXIT=0
+- gofmt -l（全仓，剔除 tmp/node_modules/.git）空
+
+## 门禁三作用域（gate.js --all）
+- scope=index  GATE REPORT changed=36  TOTAL_FAIL=0（G6-1 scanned 430、base go test ok=15 FAIL=0）
+- scope=tree   GATE REPORT changed=36  TOTAL_FAIL=0（base go test ok=15 FAIL=0）
+- scope=ci     GATE REPORT changed=6   TOTAL_FAIL=0（base go test ok=15 FAIL=0）
+
+## VM 10.0.0.199（go1.22.12 linux/amd64，内核 6.8，bash -lc）
+- 生产文件 sha256 = 88fab4356a113d426dd396858c9a08cf4190e3d9cd2df1243706e4170d0c5c44（与 ②a 落盘值一致，变异轮前后不变）
+- go test -count=1 ./...                      FULL_EXIT=0（15 包 ok、无 FAIL 行）
+- CGO_ENABLED=1 go test -race -count=1 ./internal/adapters/ ./internal/chain/   RACE_EXIT=0（两包 ok、无 DATA RACE）
+
+## 变异检验（⑨ 执行，红基线变体判读）
+- 退化变异 = 把 openBoundArtifactLocked 替换为单次 openat(O_DIRECTORY 移除、O_NOFOLLOW 仅末组件)，并去除因此未用的 import；仅生成于临时目录与 VM /tmp，工作区生产文件未动。
+- PRFRAIL_P53_RED_BASELINE=1 go test -run TestBoundDirRedBaselineMiddleSymlinkEscape -v -count=1 ./internal/adapters/
+  输出：--- FAIL: TestBoundDirRedBaselineMiddleSymlinkEscape (0.00s)
+        bounddir_escape_redbaseline_test.go:104: GAP-77 regression: middle symlink escape succeeded and read outside the bound directory
+  MUT_EXIT=1 ⇒ 变异被红基线变体捕获（守卫有效、可证伪）。
+- 恢复原文件后 sha256 复核一致；恢复后 adapters 包 go test POST_EXIT=0（ok 15.574s）。
+
+## 红变体对照（固定树上，⑧/⑨ 判读基准）
+- 默认套件：go test -run TestBoundDirRedBaselineMiddleSymlinkEscape → SKIP（env 未武装）EXIT=0
+- PRFRAIL_P53_RED_BASELINE=1 同命令 → FAIL，文案 `red baseline not reproduced: … (openat link/secret: too many levels of symbolic links)`，ENV_EXIT=1（固定树上守卫仍有效）
+
+## 未验证项（如实登记）
+- F2 bind mount 反例：VM 无 CAP_SYS_ADMIN、userns EINVAL、apparmor 限制 ⇒ SKIP（已登记环境原因）。
+- 真实 <5.6 内核主机：不可测；以 openat2Disabled 锁存契约测试（TestBoundDirFailClosedWithoutOpenat2）替代。
+- Linux/arm64 等非支持平台：生产 fail-closed（ENOSYS），测试按平台门 SKIP。
+
+## 结论
+⑨ 三作用域 TOTAL_FAIL=0、SELFTEST 697/697、本地与 VM 全绿、变异检验命中回归文案。停于 ⑩ 等授权；未 commit、未 push。
