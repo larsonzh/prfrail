@@ -1555,7 +1555,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 字段 | 内容 |
 |---|---|
 | 标识 | `ACCEPTANCE-SECURITY-COUNTEREXAMPLES`（安全验证类；准则 v1.60；M 档） |
-| 状态 | ✅ **已完成**（2026-11-03；锚点 HEAD = `941f60e`，准则 v1.60；主控模型 = `DeepSeek V4 Pro`；停于 ⑩ 等同轮授权） |
+| 状态 | ✅ **已完成**（2026-11-03；锚点 HEAD = `941f60e`，准则 v1.60；主控模型 = `DeepSeek V4 Pro`；提交 `c636dd8` 已推 origin） |
 | 目标 | 针对断点 A 的接受链缺口，落地 GAP-51/52/55/60/64/70 所代表的安全反例验证；证明系统面对非法输入、路径伪造、句柄越权、边界绕过时正确 fail-closed |
 | 依赖 | P51 闭环（`2b0af2d`） |
 | 规模 | M |
@@ -1568,7 +1568,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | R / D 基线 | R = 0、D = 1（D1：②b 交叉编译产物写至系统临时目录，违反 v41 §八 临时件位置闭集；主控已核验该路径无残留） |
 | 疑似漏洞上报 | **GAP-77（V-1，HIGH，已实证击穿）**：bounddir_unix.go:64 `openat(O_NOFOLLOW)` 调用仅护末组件（:66 为错误返回行），中间符号链接逃逸绑定；Linux（go1.22.12）实测读出界外 23 字节（证据 `05-attack/t51-1-linux-escape.md`）；本片不修，修复另开切片（P53）。**GAP-78（V-2，LOW，候选）**：seal.go validate 允许空 ContextKey。**GAP-79（V-3，LOW，候选）**：AT23Hash TrimSpace 与 SealHash 拒绝空白的不对称归一化。**GAP-80（V-4，观察级）**：isUnderDirectory 拼写前缀而非对象身份 |
 | 临时件落点声明 | 本片临时目录 = `tmp/ACCEPTANCE-SECURITY-COUNTEREXAMPLES/`（⑧c 前只增不删） |
-| 完成记录 | 报告对 `docs/validation/acceptance-security-counterexamples{,_EN}.md`；审查链：① DESIGN DONE → ③ PROBE: ALL-GREEN → ②a–②d 全绿 → ⑤ PRE-REVIEW: PASS（2 Low 已处置）→ ⑥ INDEPENDENT SCAN: PASS → ⑦ FINAL REVIEW: PASS（0 Medium+）；核心产出 = GAP-77 击穿实证（Linux 实跑）+ GAP-78/79/80 候选；生产代码零改动；文档同步 ARCHITECTURE/DEV_PLAN 已更新；停于 ⑩ 等授权；R=0、D=1 |
+| 完成记录 | 报告对 `docs/validation/acceptance-security-counterexamples{,_EN}.md`；审查链：① DESIGN DONE → ③ PROBE: ALL-GREEN → ②a–②d 全绿 → ⑤ PRE-REVIEW: PASS（2 Low 已处置）→ ⑥ INDEPENDENT SCAN: PASS → ⑦ FINAL REVIEW: PASS（0 Medium+）；核心产出 = GAP-77 击穿实证（Linux 实跑）+ GAP-78/79/80 候选；生产代码零改动；文档同步 ARCHITECTURE/DEV_PLAN 已更新；提交 `c636dd8` 已推 origin（未推 gitee），run `41642139932` 首跑双腿全绿；R=0、D=1 |
 
 ## 已知缺陷（后续切片前处理）
 

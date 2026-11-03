@@ -52,7 +52,7 @@ Slice: `ACCEPTANCE-SECURITY-COUNTEREXAMPLES` (security-validation `[SLICE]`, tie
 - `gofmt -l` clean on the seven new files; `go build ./...`, `go vet ./...` pass; `GOOS=linux go vet ./internal/adapters/` opposite-OS recheck passes.
 - `go test -count=1 ./...`: fifteen packages all `ok`, no FAIL.
 - Three scopes `TOTAL_FAIL=0` and `SELFTEST 697/697` in `08-gates/gate-readings.txt`.
-- Commit / CI: not committed (stopped at 10 for same-turn authorisation).
+- Commit `c636dd8` pushed to origin (never gitee), run `41642139932` green on the first attempt on both legs (both legs `SELFTEST: PASS 697/697`, `GATE REPORT scope=ci changed=30`, `TOTAL_FAIL=0`; package-level `internal/adapters ok` measured on both legs; the 3 dispatch-only jobs skipped as usual).
 
 ## 6. Stage-6 independent scan verbatim
 
@@ -93,6 +93,8 @@ docs/ARCHITECTURE.md	repo
 docs/ARCHITECTURE_EN.md	repo
 docs/DEV_PLAN.md	repo
 docs/DEV_PLAN_EN.md	repo
+docs/t027/CHECKLIST_v42.md	repo
+docs/t027/CHECKLIST_v42_EN.md	repo
 docs/t027/REMAINING_SLICES.md	repo
 docs/t027/REMAINING_SLICES_EN.md	repo
 docs/validation/acceptance-security-counterexamples.md	repo

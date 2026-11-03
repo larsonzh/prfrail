@@ -52,7 +52,7 @@
 - `gofmt -l` 七个新文件无输出；`go build ./...`、`go vet ./...` 通过；`GOOS=linux go vet ./internal/adapters/` 对向复核通过。
 - `go test -count=1 ./...`：十五个包全 `ok`，无 FAIL。
 - 三作用域 `TOTAL_FAIL=0` 与 `SELFTEST 697/697` 见 `08-gates/gate-readings.txt`。
-- 提交 / CI：未提交（停于 ⑩ 等同轮授权）。
+- 提交 `c636dd8` 已推 origin（未推 gitee），run `41642139932` 首跑双腿全绿（两腿 `SELFTEST: PASS 697/697`、`GATE REPORT scope=ci changed=30`、`TOTAL_FAIL=0`；包级 `internal/adapters ok` 双腿实测；3 个 dispatch 专用作业常态 skipped）。
 
 ## 6. ⑥ 独立扫描原文
 
@@ -93,6 +93,8 @@ docs/ARCHITECTURE.md	repo
 docs/ARCHITECTURE_EN.md	repo
 docs/DEV_PLAN.md	repo
 docs/DEV_PLAN_EN.md	repo
+docs/t027/CHECKLIST_v42.md	repo
+docs/t027/CHECKLIST_v42_EN.md	repo
 docs/t027/REMAINING_SLICES.md	repo
 docs/t027/REMAINING_SLICES_EN.md	repo
 docs/validation/acceptance-security-counterexamples.md	repo
