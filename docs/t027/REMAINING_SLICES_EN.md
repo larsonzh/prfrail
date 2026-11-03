@@ -81,7 +81,7 @@
 | P48 DR13-FIX-D3 | ✅ Completed | DR13-FIX | S | 2026-11-02 | docs/validation/dr13-fix-d3{,_EN}.md (stopped at 10 for authorisation) |
 | P49 RACE-LEG-EXPAND | ✅ Completed | P48 | M | 2026-11-02 | docs/validation/race-leg-expand{,_EN}.md (`75990a8`, run `41445657595` green on the first attempt) |
 | P50 CONSOLE-MULTITASK-ASSEMBLY | ✅ Completed | P49 | L | 2026-11-03 | Report pair `docs/validation/console-multitask-assembly{,_EN}.md`; `81f9dc9` pushed to origin (never gitee), run `41507722672` green on the first attempt on both legs; temp artefacts `tmp/CONSOLE-MULTITASK-ASSEMBLY/` (cleared at 8c); R=1, D=1 |
-| P51 CONSOLE-CLI-MULTITASK-WIRING | 🔄 In progress | P50 | M | 2026-11-03 | Report pair `docs/validation/console-cli-multitask-wiring{,_EN}.md` (step 0 started); R/D=0 |
+| P51 CONSOLE-CLI-MULTITASK-WIRING | ✅ Completed | P50 | M | 2026-11-03 | Report pair `docs/validation/console-cli-multitask-wiring{,_EN}.md`; `2b0af2d` pushed to origin (never gitee), run `41569353460` green on the first attempt on both legs; temp artefacts `tmp/CONSOLE-CLI-MULTITASK-WIRING/` (cleared at 8c); R=1, D=2 |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1517,12 +1517,12 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Temp artefact location | `tmp/CONSOLE-MULTITASK-ASSEMBLY/` (append-only until 8c) |
 | Completion record | Report pair: `docs/validation/console-multitask-assembly{,_EN}.md`; review chain: 1 DESIGN DONE → 3 red tests → 2a-2d plus the fix round → 5 r1 PASS WITH FIXES → r2 PASS → 6 INDEPENDENT SCAN: PASS → 7 FINAL REVIEW: PASS; doc sync: ARCHITECTURE/DEV_PLAN updated (DEV_PLAN back-fills the P39-P50 milestones); stage 9 three scopes TOTAL_FAIL=0, SELFTEST 697/697; R=1, D=1; commit `81f9dc9` pushed to origin (never gitee), run `41507722672` green on the first attempt on both legs |
 
-### P51 — `CONSOLE-CLI-MULTITASK-WIRING` (console multitask CLI wiring; layer 2, item 3) · 🔄 In progress
+### P51 — `CONSOLE-CLI-MULTITASK-WIRING` (console multitask CLI wiring; layer 2, item 3) · ✅ Completed
 
 | Field | Content |
 |---|---|
 | Identity | `CONSOLE-CLI-MULTITASK-WIRING` (implementation slice; directive v1.60; tier M) |
-| Status | 🔄 **In progress** (2026-11-03; anchor HEAD = `3aa53d5`, directive v1.60) |
+| Status | ✅ **Completed** (2026-11-03; anchor HEAD = `3aa53d5`, directive v1.60; committed as `2b0af2d` and pushed to origin, run `41569353460` green on the first attempt on both legs) |
 | Goal | Back-fill the P50 leftover CLI argument parsing and assembly wiring so the command line can drive the multitask serial assembly directly |
 | Depends on | P50 closed (`81f9dc9`); interface boundary = the `AgentRunnerAssemblyOptions.RequestRecords` registry |
 | Size | M |
@@ -1534,7 +1534,7 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Freedom list path | `docs/validation/evidence/CONSOLE-CLI-MULTITASK-WIRING/freedom-list.md` |
 | R / D baseline | R = 1, D = 2 (R counts the stage-5 r1 remediation round; D1 counts the stage-6 first dispatch truncated for length and resent per section 9; D2 counts a receipt statistic written to the user temp directory outside the repository, a temp-artefact location violation that did not self-heal and was deleted) |
 | Temp artefact location | `tmp/CONSOLE-CLI-MULTITASK-WIRING/` (append-only until 8c) |
-| Completion record | Report pair `docs/validation/console-cli-multitask-wiring{,_EN}.md`; review chain: 1 DESIGN DONE → 3 red baseline four red one green → 2a/2b/2c → 5 r1 PASS WITH FIXES → r2 PASS → 6 INDEPENDENT SCAN: PASS → 7 FINAL REVIEW: PASS; docs sync: ARCHITECTURE/DEV_PLAN updated; gate readings in `docs/validation/evidence/CONSOLE-CLI-MULTITASK-WIRING/08-gates/gate-readings.txt`; commit and CI evidence back-filled in the 10 receipt (stop at 10 pending authorisation) |
+| Completion record | Report pair `docs/validation/console-cli-multitask-wiring{,_EN}.md`; review chain: 1 DESIGN DONE → 3 red baseline four red one green → 2a/2b/2c → 5 r1 PASS WITH FIXES → r2 PASS → 6 INDEPENDENT SCAN: PASS → 7 FINAL REVIEW: PASS; docs sync: ARCHITECTURE/DEV_PLAN updated; gate readings in `docs/validation/evidence/CONSOLE-CLI-MULTITASK-WIRING/08-gates/gate-readings.txt`; commit `2b0af2d` pushed to origin (never gitee), run `41569353460` green on the first attempt on both legs; R=1, D=2 |
 
 ## Known defects (to be handled before later slices)
 

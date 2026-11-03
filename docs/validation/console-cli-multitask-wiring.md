@@ -42,6 +42,7 @@
 - `gofmt -l internal/console` 无输出；`go build ./...`、`go vet ./...` 通过。
 - `go test -count=1 ./...`：十五个包全 `ok`，无 FAIL（`04-impl/logs/04-full-suite-green.txt`）。
 - 三作用域 `TOTAL_FAIL=0` 与 `SELFTEST 697/697` 见 `08-gates/gate-readings.txt`。
+- 提交 `2b0af2d` 已推 origin（未推 gitee），run `41569353460` 首跑双腿全绿：两腿 `Gates` 均为 `SELFTEST 697/697`、`TOTAL_FAIL=0`。
 
 ## 7. 未闭环项与边界
 
@@ -60,6 +61,8 @@ docs/ARCHITECTURE.md	repo
 docs/ARCHITECTURE_EN.md	repo
 docs/DEV_PLAN.md	repo
 docs/DEV_PLAN_EN.md	repo
+docs/t027/CHECKLIST_v41.md	repo
+docs/t027/CHECKLIST_v41_EN.md	repo
 docs/t027/REMAINING_SLICES.md	repo
 docs/t027/REMAINING_SLICES_EN.md	repo
 docs/validation/console-cli-multitask-wiring.md	repo

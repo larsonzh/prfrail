@@ -42,6 +42,7 @@ Slice: `CONSOLE-CLI-MULTITASK-WIRING` (implementation slice `[SLICE]`, tier M). 
 - `gofmt -l internal/console` is silent; `go build ./...` and `go vet ./...` pass.
 - `go test -count=1 ./...`: all fifteen packages are `ok` with no FAIL (`04-impl/logs/04-full-suite-green.txt`).
 - The three-scope `TOTAL_FAIL=0` and `SELFTEST 697/697` are in `08-gates/gate-readings.txt`.
+- Commit `2b0af2d` was pushed to origin (never gitee) and run `41569353460` is green on the first attempt on both legs: the `Gates` step reports `SELFTEST 697/697` and `TOTAL_FAIL=0` on each leg.
 
 ## 7. Open items and boundary
 
@@ -60,6 +61,8 @@ docs/ARCHITECTURE.md	repo
 docs/ARCHITECTURE_EN.md	repo
 docs/DEV_PLAN.md	repo
 docs/DEV_PLAN_EN.md	repo
+docs/t027/CHECKLIST_v41.md	repo
+docs/t027/CHECKLIST_v41_EN.md	repo
 docs/t027/REMAINING_SLICES.md	repo
 docs/t027/REMAINING_SLICES_EN.md	repo
 docs/validation/console-cli-multitask-wiring.md	repo

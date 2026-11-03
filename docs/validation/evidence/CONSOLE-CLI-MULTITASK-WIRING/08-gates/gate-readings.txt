@@ -39,3 +39,12 @@
 - 门禁原始输出落在 `tmp/CONSOLE-CLI-MULTITASK-WIRING/09-gate-{index,tree,ci}.log`（`tmp/` 不入库，⑧c 清理）。
 - 本文件记录的是暂存后、提交前的最终读数；提交后由 CI 腿复验。
 
+## 7. CI 双绿
+
+提交 `2b0af2d` 已推 origin（未推 gitee），run `41569353460` 首跑双腿全绿：
+
+| 腿 | Test 步 | Gates 步 |
+|---|---|---|
+| `Go windows-latest` | `ok github.com/larsonzh/prfrail/internal/console 27.319s` | `SELFTEST: PASS 697/697`、`TOTAL_FAIL=0` |
+| `Go ubuntu-latest` | `ok github.com/larsonzh/prfrail/internal/console 2.808s`；`Race` 步同包 `ok 12.861s` | `SELFTEST: PASS 697/697`、`TOTAL_FAIL=0` |
+
