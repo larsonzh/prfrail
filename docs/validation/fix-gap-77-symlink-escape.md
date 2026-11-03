@@ -149,6 +149,8 @@ docs/SECURITY.md	repo
 docs/SECURITY_EN.md	repo
 docs/TEST_STRATEGY.md	repo
 docs/TEST_STRATEGY_EN.md	repo
+docs/t027/CHECKLIST_v43.md	repo
+docs/t027/CHECKLIST_v43_EN.md	repo
 docs/t027/REMAINING_SLICES.md	repo
 docs/t027/REMAINING_SLICES_EN.md	repo
 docs/validation/evidence/FIX-GAP-77-SYMLINK-ESCAPE/00-briefing.md	repo
@@ -180,9 +182,16 @@ internal/adapters/bounddir_symlink_storm_test.go	repo
 internal/adapters/bounddir_unix.go	repo
 ```
 
-## 9. 结论
+## 9. 提交与 CI
+
+- 主提交：`7802819`（`fix: close the middle-symlink escape on the bound dir via openat2 (P53)`，37 件文件，+2873/−62），已推 origin（未推 gitee）。
+- CI run `41707160563`（head `7802819`，attempt 1）：**双腿全绿**（`Go ubuntu-latest` 与 `Go windows-latest` 均 success；3 个 dispatch 专用作业常态 skipped）。
+- 双腿 Gates 实测：`SELFTEST: PASS 697/697`、`GATE REPORT scope=ci changed=37`、`TOTAL_FAIL=0`（ubuntu 腿 19:54 / windows 腿 19:56）。
+- 包级硬证据：windows 腿 `ok internal/adapters 35.644s`；ubuntu 腿 Test `ok internal/adapters 13.415s` + Race 腿 `ok internal/adapters 91.205s`、`ok internal/chain 2.145s`。
+
+## 10. 结论
 
 - GAP-77 在本片闭合：生产侧由 `openat2` 单次受限解析替代单次 `openat`，非 linux/amd64 与 `ENOSYS` 走 fail-closed；真实红在改代码之前跑出，修复后转为绿，并保留变异对照命令。
 - 审查链：① 双打、③ 红绿反转、②a 实施、③b 与 ③c 返工、⑤ 两轮、⑥ 一次、⑦ 终审均已完成，⑦ 无发现。
 - 未闭环三项（F2 环境受限、内核下限替代判据、变异检验留 ⑨）已在 7 节登记，不构成对本片结论的削弱。
-- 本片停在 ⑩ 之前：未执行 commit，未推 origin，未推 gitee。
+- 本片已提交 `7802819` 并推 origin（未推 gitee），CI run `41707160563` 双腿全绿（见 9 节）。

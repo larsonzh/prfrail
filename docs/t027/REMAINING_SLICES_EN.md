@@ -83,7 +83,7 @@
 | P50 CONSOLE-MULTITASK-ASSEMBLY | ✅ Completed | P49 | L | 2026-11-03 | Report pair `docs/validation/console-multitask-assembly{,_EN}.md`; `81f9dc9` pushed to origin (never gitee), run `41507722672` green on the first attempt on both legs; temp artefacts `tmp/CONSOLE-MULTITASK-ASSEMBLY/` (cleared at 8c); R=1, D=1 |
 | P51 CONSOLE-CLI-MULTITASK-WIRING | ✅ Completed | P50 | M | 2026-11-03 | Report pair `docs/validation/console-cli-multitask-wiring{,_EN}.md`; `2b0af2d` pushed to origin (never gitee), run `41569353460` green on the first attempt on both legs; temp artefacts `tmp/CONSOLE-CLI-MULTITASK-WIRING/` (cleared at 8c); R=1, D=2 |
 | P52 ACCEPTANCE-SECURITY-COUNTEREXAMPLES | ✅ Completed | P51 | M | 2026-11-03 | Report pair `docs/validation/acceptance-security-counterexamples{,_EN}.md`; GAP-77 breach registered (P53 fix); stopped at 10 for authorisation; R=0, D=1 |
-| P53 FIX-GAP-77-SYMLINK-ESCAPE | 🔄 In progress | P52 | M | 2026-11-03 | Fix GAP-77 middle symlink escape (bounddir_unix.go openat stepwise resolution or O_PATH rework); enable T51-1 by removing the skip; spec sync `docs/SECURITY{,_EN}.md` SEC-02 and `docs/TEST_STRATEGY{,_EN}.md` AT-02; R=0, D=0 |
+| P53 FIX-GAP-77-SYMLINK-ESCAPE | ✅ Completed | P52 | M | 2026-11-04 | Fix GAP-77 (single constrained openat2 resolution + fail-closed); T51-1 red-to-green + F1/F2 counterexamples; spec sync SEC-02/AT-02; `7802819` pushed to origin (never gitee), run `41707160563` green on the first attempt on both legs; R=0, D=0 |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1558,12 +1558,12 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Temp artefact location | `tmp/ACCEPTANCE-SECURITY-COUNTEREXAMPLES/` (append-only until 8c) |
 | Completion record | Report pair `docs/validation/acceptance-security-counterexamples{,_EN}.md`; review chain: 1 DESIGN DONE → 3 PROBE: ALL-GREEN → 2a-2d all green → 5 PRE-REVIEW: PASS (2 Low disposed) → 6 INDEPENDENT SCAN: PASS → 7 FINAL REVIEW: PASS (0 Medium+); core outputs = GAP-77 breach proven (Linux real run) + GAP-78/79/80 candidates; zero production changes; docs sync ARCHITECTURE/DEV_PLAN updated; commit `c636dd8` pushed to origin (never gitee), run `41642139932` green on the first attempt on both legs; R=0, D=1 |
 
-### P53 — `FIX-GAP-77-SYMLINK-ESCAPE` (middle symlink escape fix; layer 2, item 5) · 🔄 In progress
+### P53 — `FIX-GAP-77-SYMLINK-ESCAPE` (middle symlink escape fix; layer 2, item 5) · ✅ Completed
 
 | Field | Content |
 |---|---|
 | ID | `FIX-GAP-77-SYMLINK-ESCAPE` (low-level security fix; directive v1.60; tier M) |
-| Status | 🔄 **In progress** (since 2026-11-03; anchor HEAD = `dc785ed`; controller model = `DeepSeek V4 Pro`; stops at 10 for authorisation) |
+| Status | ✅ **Completed** (2026-11-04; anchor HEAD = `dc785ed`; controller model = `DeepSeek V4 Pro`; commit `7802819` pushed to origin (never gitee), run `41707160563` green on the first attempt on both legs) |
 | Goal | Fix GAP-77 (middle symlink escape in bounddir_unix.go); openat2 single restricted resolution as the main path + fail-closed (no walk fallback); unskip T51-1 and turn it red-to-green |
 | Depends on | P52 closed (`c636dd8`) |
 | Scale | M |
@@ -1574,7 +1574,7 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Review-7 budget | Codex final review x1 |
 | Temp artefact location | `tmp/FIX-GAP-77-SYMLINK-ESCAPE/` (append-only until 8c) |
 | R / D baseline | R = 0, D = 0 |
-| Completion record | Review chain: 1 double play (V4 Pro r1 → Sol red team FINDINGS 2H+4M → r2 openat2 final) → 3 real red (dedicated wording matched verbatim) → 2a implementation (+158/-12, the only production file bounddir_unix.go) → 3b/3c test restructure and remediation → 4 all gates green → 5 r2 PASS → 6 PASS → 7 PASS (0 findings); stopped at 10 for authorisation; not committed, not pushed |
+| Completion record | Review chain: 1 double play (V4 Pro r1 → Sol red team FINDINGS 2H+4M → r2 openat2 final) → 3 real red (dedicated wording matched verbatim) → 2a implementation (+158/-12, the only production file bounddir_unix.go) → 3b/3c test restructure and remediation → 4 all gates green → 5 r2 PASS → 6 PASS → 7 PASS (0 findings); stopped at 10 for authorisation → closed: commit `7802819` pushed to origin (never gitee), run `41707160563` green on the first attempt on both legs; R=0, D=0 |
 
 ## Known defects (to be handled before later slices)
 

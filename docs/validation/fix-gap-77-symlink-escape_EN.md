@@ -149,6 +149,8 @@ docs/SECURITY.md	repo
 docs/SECURITY_EN.md	repo
 docs/TEST_STRATEGY.md	repo
 docs/TEST_STRATEGY_EN.md	repo
+docs/t027/CHECKLIST_v43.md	repo
+docs/t027/CHECKLIST_v43_EN.md	repo
 docs/t027/REMAINING_SLICES.md	repo
 docs/t027/REMAINING_SLICES_EN.md	repo
 docs/validation/evidence/FIX-GAP-77-SYMLINK-ESCAPE/00-briefing.md	repo
@@ -180,9 +182,16 @@ internal/adapters/bounddir_symlink_storm_test.go	repo
 internal/adapters/bounddir_unix.go	repo
 ```
 
-## 9. Conclusion
+## 9. Commit and CI
+
+- Main commit: `7802819` (`fix: close the middle-symlink escape on the bound dir via openat2 (P53)`, 37 files, +2873/−62), pushed to origin (never gitee).
+- CI run `41707160563` (head `7802819`, attempt 1): green on the first attempt on both legs (`Go ubuntu-latest` and `Go windows-latest` both success; the 3 dispatch-only jobs skipped as usual).
+- Gates measured on both legs: `SELFTEST: PASS 697/697`, `GATE REPORT scope=ci changed=37`, `TOTAL_FAIL=0` (ubuntu leg 19:54 / windows leg 19:56).
+- Package-level hard evidence: windows leg `ok internal/adapters 35.644s`; ubuntu leg Test `ok internal/adapters 13.415s` plus Race leg `ok internal/adapters 91.205s`, `ok internal/chain 2.145s`.
+
+## 10. Conclusion
 
 - GAP-77 is closed in this slice: the single `openat` is replaced by a single constrained `openat2` resolution, non linux/amd64 and `ENOSYS` fail closed; the real red was produced before the code change and turned green after it, with the mutation control command retained.
 - Review chain: the ① double pass, the ③ red-to-green reversal, the ②a implementation, the ③b and ③c rework, the two ⑤ rounds, the single ⑥ round and the ⑦ final review are all complete, with no ⑦ finding.
 - The three open items (F2 environment limit, kernel-floor substitute criterion, mutation check left to ⑨) are recorded in section 7 and do not weaken this slice conclusion.
-- This slice stops before ⑩: no commit was made, nothing was pushed to origin and nothing to gitee.
+- This slice is committed as `7802819` and pushed to origin (never gitee), with CI run `41707160563` green on both legs (see section 9).
