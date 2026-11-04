@@ -1,0 +1,9 @@
+ID: 02b-13-probe-actual
+TITLE: candidate binary produces the actual oracle
+COMMAND: /tmp/p55work.oIFQtI/verifier-bin/prfrail-release probe --binary /tmp/p55work.oIFQtI/candidate/bin/prfrail --noop-chain /tmp/p55work.oIFQtI/seed/fixtures/noop-chain.json --executable-chain /tmp/p55work.oIFQtI/seed/fixtures/executable-chain.json --work-root /tmp/p55work.oIFQtI/probe-run --output /tmp/p55work.oIFQtI/candidate/actual.json --expected-version 0.1.0-dev
+CWD: /tmp/p55work.oIFQtI
+EXIT: 0
+
+--- STDOUT ---
+--- STDERR ---
+

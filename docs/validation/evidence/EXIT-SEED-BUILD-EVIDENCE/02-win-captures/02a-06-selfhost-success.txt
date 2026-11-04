@@ -1,0 +1,16 @@
+ID: 02a-06-selfhost-success
+TITLE: selfhost verification success
+COMMAND: prfrail-release selfhost --commit <HEAD> --seed work/seed --seed-hash <hash> --candidate work/candidate --expected testdata/selfhost/expected.json --actual work/candidate/actual.json
+CWD: D:\LZProjects\prfrail
+EXIT: 0
+
+--- STDOUT ---
+{
+  "SourceCommit": "baa144df5898817e0ac7cd860928bb4a90cbd009",
+  "SeedHash": "sha256:a42f547c3e5b970107db3b3c1735495e8edb283368bafe414693ec7d432dd476",
+  "CandidateHash": "sha256:d0e7c97b5e8203d6f9c73d382939b78e6e63a3504a7ea9cc5401965d64616275",
+  "OracleHash": "sha256:388f88842710abc90676ed0a85f4bd935b594fc552146577c304b0bbbd850aaf"
+}
+
+--- STDERR ---
+

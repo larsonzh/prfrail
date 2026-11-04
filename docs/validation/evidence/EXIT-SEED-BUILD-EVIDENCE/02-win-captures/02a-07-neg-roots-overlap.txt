@@ -1,0 +1,11 @@
+ID: 02a-07-neg-roots-overlap
+TITLE: negative: seed and candidate roots overlap
+COMMAND: prfrail-release selfhost --seed <seed> --candidate <seed>/candidate
+CWD: D:\LZProjects\prfrail
+EXIT: 1
+
+--- STDOUT ---
+
+--- STDERR ---
+invalid self-host evidence: seed and candidate roots overlap
+

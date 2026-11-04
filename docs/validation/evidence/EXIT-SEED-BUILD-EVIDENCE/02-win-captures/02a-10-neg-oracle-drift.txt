@@ -1,0 +1,11 @@
+ID: 02a-10-neg-oracle-drift
+TITLE: negative: candidate actual differs from external oracle (run-noop flipped to failed)
+COMMAND: prfrail-release selfhost --actual <drifted actual.json>
+CWD: D:\LZProjects\prfrail
+EXIT: 1
+
+--- STDOUT ---
+
+--- STDERR ---
+invalid self-host evidence: candidate result differs from external oracle
+

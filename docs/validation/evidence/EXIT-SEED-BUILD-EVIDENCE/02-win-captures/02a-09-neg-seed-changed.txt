@@ -1,0 +1,11 @@
+ID: 02a-09-neg-seed-changed
+TITLE: negative: seed hash mismatch
+COMMAND: prfrail-release selfhost --seed-hash 0<64>
+CWD: D:\LZProjects\prfrail
+EXIT: 1
+
+--- STDOUT ---
+
+--- STDERR ---
+invalid self-host evidence: seed changed
+

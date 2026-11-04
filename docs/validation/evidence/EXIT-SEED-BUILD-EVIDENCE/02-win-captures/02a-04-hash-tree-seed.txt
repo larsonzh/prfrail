@@ -1,0 +1,11 @@
+ID: 02a-04-hash-tree-seed
+TITLE: seed tree hash (baseline)
+COMMAND: prfrail-release hash-tree --root work/seed
+CWD: D:\LZProjects\prfrail
+EXIT: 0
+
+--- STDOUT ---
+sha256:a42f547c3e5b970107db3b3c1735495e8edb283368bafe414693ec7d432dd476
+
+--- STDERR ---
+

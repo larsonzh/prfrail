@@ -1,0 +1,10 @@
+ID: 02a-03-build-release-tool
+TITLE: clean-room build of release tool
+COMMAND: go build -trimpath -o work/bin/prfrail-release.exe ./cmd/prfrail-release
+CWD: D:\LZProjects\prfrail
+EXIT: 0
+
+--- STDOUT ---
+
+--- STDERR ---
+

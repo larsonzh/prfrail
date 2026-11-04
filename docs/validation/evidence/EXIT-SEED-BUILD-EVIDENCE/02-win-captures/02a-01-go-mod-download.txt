@@ -1,0 +1,10 @@
+ID: 02a-01-go-mod-download
+TITLE: module download into isolated GOMODCACHE
+COMMAND: go mod download
+CWD: D:\LZProjects\prfrail
+EXIT: 0
+
+--- STDOUT ---
+
+--- STDERR ---
+

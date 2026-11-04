@@ -1,0 +1,28 @@
+$ go version
+go version go1.27.0 windows/amd64
+EXIT=0
+
+$ go env GOVERSION GOOS GOARCH CGO_ENABLED GOTOOLCHAIN GOCACHE GOMODCACHE
+go1.27.0
+windows
+amd64
+0
+local
+D:\LZProjects\prfrail\tmp\EXIT-SEED-BUILD-EVIDENCE\work\gocache
+D:\LZProjects\prfrail\tmp\EXIT-SEED-BUILD-EVIDENCE\work\gomodcache
+EXIT=0
+
+$ git rev-parse HEAD
+baa144df5898817e0ac7cd860928bb4a90cbd009
+EXIT=0
+
+$ git rev-parse --short HEAD
+baa144d
+EXIT=0
+
+node=v24.17.0
+platform=win32/x64
+os.release=10.0.26100
+isolated GOCACHE=D:\LZProjects\prfrail\tmp\EXIT-SEED-BUILD-EVIDENCE\work\gocache
+isolated GOMODCACHE=D:\LZProjects\prfrail\tmp\EXIT-SEED-BUILD-EVIDENCE\work\gomodcache
+note=local toolchain differs from CI fixed go1.22.12; see 02a-00 note in index.json

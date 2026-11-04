@@ -1,0 +1,10 @@
+ID: 02b-16-neg-oracle-ownership
+TITLE: negative: expected oracle owned by candidate root
+COMMAND: /tmp/p55work.oIFQtI/verifier-bin/prfrail-release selfhost --commit baa144df5898817e0ac7cd860928bb4a90cbd009 --seed /tmp/p55work.oIFQtI/seed --seed-hash sha256:67ea456be2f30fc310b16c993c9a44d6af901d6f29e9b9f5ebde19dc9897bd2c --candidate /tmp/p55work.oIFQtI/neg-ownership/candidate --expected /tmp/p55work.oIFQtI/neg-ownership/candidate/expected.json --actual /tmp/p55work.oIFQtI/neg-ownership/candidate/actual.json
+CWD: /tmp/p55work.oIFQtI
+EXIT: 1
+
+--- STDOUT ---
+--- STDERR ---
+invalid self-host evidence: oracle ownership is not independent
+

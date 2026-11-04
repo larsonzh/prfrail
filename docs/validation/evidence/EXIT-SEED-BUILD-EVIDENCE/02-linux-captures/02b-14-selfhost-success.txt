@@ -1,0 +1,15 @@
+ID: 02b-14-selfhost-success
+TITLE: two-generation selfhost verification success
+COMMAND: /tmp/p55work.oIFQtI/verifier-bin/prfrail-release selfhost --commit baa144df5898817e0ac7cd860928bb4a90cbd009 --seed /tmp/p55work.oIFQtI/seed --seed-hash sha256:67ea456be2f30fc310b16c993c9a44d6af901d6f29e9b9f5ebde19dc9897bd2c --candidate /tmp/p55work.oIFQtI/candidate --expected /tmp/p55work.oIFQtI/seed/fixtures/expected.json --actual /tmp/p55work.oIFQtI/candidate/actual.json
+CWD: /tmp/p55work.oIFQtI
+EXIT: 0
+
+--- STDOUT ---
+{
+  "SourceCommit": "baa144df5898817e0ac7cd860928bb4a90cbd009",
+  "SeedHash": "sha256:67ea456be2f30fc310b16c993c9a44d6af901d6f29e9b9f5ebde19dc9897bd2c",
+  "CandidateHash": "sha256:f689e7f763fb0d1d81ec9f69ca9f4c22a10ab45d28de5349535fcbcdf1c92b4a",
+  "OracleHash": "sha256:388f88842710abc90676ed0a85f4bd935b594fc552146577c304b0bbbd850aaf"
+}
+--- STDERR ---
+

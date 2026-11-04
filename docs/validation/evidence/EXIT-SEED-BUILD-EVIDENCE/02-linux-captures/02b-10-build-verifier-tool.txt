@@ -1,0 +1,9 @@
+ID: 02b-10-build-verifier-tool
+TITLE: clean-room build of the verifier tool (18c9340, GOPROXY=off)
+COMMAND: go build -C /tmp/p55work.oIFQtI/verifier-src -trimpath -o /tmp/p55work.oIFQtI/verifier-bin/prfrail-release ./cmd/prfrail-release
+CWD: /tmp/p55work.oIFQtI
+EXIT: 0
+
+--- STDOUT ---
+--- STDERR ---
+

@@ -1,0 +1,9 @@
+ID: 02b-11-build-candidate-binary
+TITLE: clean-room build of the candidate binary (baa144d, GOPROXY=off)
+COMMAND: go build -C /tmp/p55work.oIFQtI/candidate-src -trimpath -o /tmp/p55work.oIFQtI/candidate/bin/prfrail ./cmd/prfrail
+CWD: /tmp/p55work.oIFQtI
+EXIT: 0
+
+--- STDOUT ---
+--- STDERR ---
+

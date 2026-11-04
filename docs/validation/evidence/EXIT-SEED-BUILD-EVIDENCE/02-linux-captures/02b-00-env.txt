@@ -1,0 +1,21 @@
+go version: go version go1.22.12 linux/amd64
+go env: go1.22.12
+linux
+amd64
+0
+local
+/home/larson/go1.22
+go binary: /home/larson/go1.22/bin/go
+go1.22 binary: /home/larson/go1.22/bin/go
+kernel: Linux 6.8.0-85-generic x86_64
+nproc: 4
+git: git version 2.43.0
+os-release: PRETTY_NAME="Ubuntu 24.04.5 LTS" NAME="Ubuntu" VERSION_ID="24.04" VERSION="24.04.5 LTS (Noble Numbat)" VERSION_CODENAME=noble ID=ubuntu ID_LIKE=debian HOME_URL="https://www.ubuntu.com/" SUPPORT_URL="https://help.ubuntu.com/" BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/" PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy" UBUNTU_CODENAME=noble LOGO=ubuntu-logo 
+GOCACHE=/tmp/p55work.oIFQtI/gocache
+GOMODCACHE=/tmp/p55work.oIFQtI/gomodcache
+GOPROXY_preload=https://goproxy.cn,direct
+GOPROXY_build=off
+GOSUMDB=off
+login_shell_go=/home/larson/.local/bin/go
+note=login shell defaults to a newer toolchain; this capture pins $HOME/go1.22/bin (go1.22.12)
+note=proxy.golang.org and sum.golang.org are unreachable from this VM; modules are preloaded through goproxy.cn and every build runs with GOPROXY=off (go.sum verification stays active)

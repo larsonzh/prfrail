@@ -1,0 +1,5 @@
+seedHashBefore=sha256:a42f547c3e5b970107db3b3c1735495e8edb283368bafe414693ec7d432dd476
+seedHashAfter=sha256:a42f547c3e5b970107db3b3c1735495e8edb283368bafe414693ec7d432dd476
+equal=true
+failedRun=02a-10-neg-oracle-drift (candidate actual drifted; exit non-zero)
+note=seed root was not written by any run; the drift was applied to a separate candidate copy

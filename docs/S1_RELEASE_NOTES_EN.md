@@ -23,3 +23,5 @@ See the [S1 candidate support matrix](S1_SUPPORT_MATRIX_EN.md). The S1 installat
 2. Bind version, artifact filenames, download location, EOL notification channel, and support date to these notes and the support matrix.
 3. Obtain the independent-review verdict and explicit product-owner S1 exit/release approval.
 4. Complete T027 and pass AT-23; T028 is complete with AT-24 conditionally closed; S1 remains blocked by T027/AT-23.
+
+> Slice sync (P55 `EXIT-SEED-BUILD-EVIDENCE`): not applicable (no release artifact or feature change, evidence supplement only); reason: this slice produces no tag, artifact or feature item and only archives the AT-13 supplement under `docs/validation/evidence/EXIT-SEED-BUILD-EVIDENCE/`, so the candidate capabilities and remaining gates stay unchanged.

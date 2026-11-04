@@ -85,6 +85,7 @@
 | P52 ACCEPTANCE-SECURITY-COUNTEREXAMPLES | ✅ Completed | P51 | M | 2026-11-03 | Report pair `docs/validation/acceptance-security-counterexamples{,_EN}.md`; GAP-77 breach registered (P53 fix); stopped at 10 for authorisation; R=0, D=1 |
 | P53 FIX-GAP-77-SYMLINK-ESCAPE | ✅ Completed | P52 | M | 2026-11-04 | Fix GAP-77 (single constrained openat2 resolution + fail-closed); T51-1 red-to-green + F1/F2 counterexamples; spec sync SEC-02/AT-02; `7802819` pushed to origin (never gitee), run `41707160563` green on the first attempt on both legs; R=0, D=0 |
 | P54 CONTRACTS-S7-DURABILITY | ✅ Done (2026-11-04; commit `7c0763a` pushed to origin, never gitee; run `41840557379` green on the first attempt on both legs; R=1, D=1) | P53 | L | — | R/D=0 baseline (started 2026-11-04); evidence package `docs/validation/evidence/CONTRACTS-S7-DURABILITY/` |
+| P55 EXIT-SEED-BUILD-EVIDENCE | 🔄 In progress (started 2026-11-05) | P54 | M | — | evidence package `docs/validation/evidence/EXIT-SEED-BUILD-EVIDENCE/` |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1594,6 +1595,25 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Temp artefact location | `tmp/CONTRACTS-S7-DURABILITY/` (append-only until 8c; removed at 8c) |
 | R / D baseline | R = 1 (②e dead-code relocation, fix re-run after a finding), D = 1 (§5.1 temp-file-discipline calibre: `tmp/s7a-contrasts.js` misplacement, self-heal tier; plus 1 deviation registration = the ⑧a-before-⑦ sequencing deviation, not merged into the D count) |
 | Completion record | Review chain: 1 double play (r1 → first Sol red team `FINDINGS` → r2 → second Sol red team `FINDINGS` → r2b closure → r2c activation-semantics micro-fix; both red-team transcript sets archived as `docs/validation/evidence/CONTRACTS-S7-DURABILITY/01-arch/red-team-sol-review.md` and `red-team-sol-review-r2.md`) → 2a–d implementation (contract first + C6 prebuilt slots + narrowed seam + store-level activation) → 3a–c red tests and the BA3 two-arm rewrite → 4 all gates green (default / c6slot / linux build and vet, plus the tree/index scopes) → 5 `PRE-REVIEW: PASS WITH FIXES` (0H/0M/4L) → 6 `INDEPENDENT SCAN: PASS` → 7 `FINAL REVIEW: PASS` (0C/0H/0M/0L; the equivalence argument passed at §7.2.1 calibre) → 8a six-document sync → 8b ⑦ archiving and bookkeeping → 9 all three scopes green + `SELFTEST: PASS 697/697` → 8c temp-artefact cleanup → 10 stop point awaiting authorisation (after the first receipt, per the user clarification: ②e dead-code relocation + ⑦ re-review #1/3 `FINAL REVIEW: PASS` + stage ⑨ re-run all green) → after user authorisation: commit `7c0763a` pushed to origin (never gitee), run `41840557379` green on the first attempt on both legs (windows 15 packages ok / ubuntu 15 packages ok + Race 6 packages ok); the status row is ✅ Done |
+
+### P55 — `EXIT-SEED-BUILD-EVIDENCE` (AT-13 seed-driven build evidence supplement · layer-3 item 7) · 🔄 In progress
+
+| Field | Content |
+|---|---|
+| Identifier | `EXIT-SEED-BUILD-EVIDENCE` (evidence-chain supplement class; directive v1.60; size M) |
+| Status | 🔄 **In progress** (started 2026-11-05; anchor HEAD = `baa144d`; controller model = `DeepSeek V4.1 Flash`) |
+| Goal | Complete the AT-13 seed-driven build evidence chain (seed and candidate kept separate, external oracle comparison, clean-room success and failure both leave the seed intact); evidence only, no CI structure change |
+| Depends on | P54 closed (`7c0763a` + backfill `f38e0ce`); AT-13 definition in `docs/TEST_STRATEGY.md`; existing implementation in `internal/release/**`, `cmd/prfrail-release/**` and the dispatch-only jobs of `.github/workflows/ci.yml` |
+| Size | M |
+| Steps | Step 0 → 1 architecture (**skipped**, explicitly disabled by start message [0, 2]) → 2 evidence capture and package → 3 verification tests → 4 gates → 5 pre-review → 6 scan → 7 final review → 8 docs (including the six document syncs) → 9 native validation → 8c → 10 stop point |
+| Deliverables | Evidence package `docs/validation/evidence/EXIT-SEED-BUILD-EVIDENCE/` (with `MANIFEST.md` and `SHA256SUMS.txt`); report pair `docs/validation/exit-seed-build-evidence{,_EN}.md`; AT-13 status row sync |
+| Boundary | No `.github/workflows/**` change (structure included); no Go product code change (`internal/release` and `cmd/prfrail-release` judgment semantics stay untouched); this slice delivers `.md` and the evidence package only; never push gitee; stop at 10 and wait for authorisation |
+| Class | `[SLICE]` (evidence-chain supplement) |
+| Review-7 budget | `GPT-5.3-Codex (copilot)` 1+2 (size M) |
+| Temp artefact location | `tmp/EXIT-SEED-BUILD-EVIDENCE/` (append-only until 8c) |
+| R / D baseline | R = 0, D = 1 (D = 1: early start without a trigger word, corrected by a forced interruption from the user, converted in place, no contamination; registered in the report's anomaly section) |
+| 8a progress record (2026-11-05) | Evidence package `docs/validation/evidence/EXIT-SEED-BUILD-EVIDENCE/` (53 payload files + `MANIFEST.md` + `SHA256SUMS.txt`, hashes equal on all three sides); review chain 3 two rounds `TEST: DONE` → 5 `PRE-REVIEW: PASS WITH FIXES` (two rounds) → 6 `INDEPENDENT SCAN: PASS` → 7 `FINAL REVIEW: PASS WITH FIXES` (1 Low item fixed); R = 0, D = 1; status stays 🔄 In progress (not flipped to ✅ before the 10 stop point) |
+| Completion record | The report path is written when the slice closes |
 
 ## Known defects (to be handled before later slices)
 

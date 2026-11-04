@@ -1,0 +1,9 @@
+ID: 02b-07-module-preload-candidate
+TITLE: preload modules for the candidate worktree
+COMMAND: bash -c cd "$1" && go mod download _ /tmp/p55work.oIFQtI/candidate-src
+CWD: /tmp/p55work.oIFQtI
+EXIT: 0
+
+--- STDOUT ---
+--- STDERR ---
+

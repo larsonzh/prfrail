@@ -23,3 +23,5 @@
 2. 将版本、artifact 文件名、下载位置、EOL 通知方式和支持日期绑定到本说明及支持矩阵。
 3. 获得独立评审结论和产品所有者明确 S1 exit/发行批准。
 4. 完成 T027 并通过 AT-23；T028 已完成、AT-24 条件闭合；S1 仍因 T027/AT-23 阻断。
+
+> 切片同步（P55 `EXIT-SEED-BUILD-EVIDENCE`）：本片不适用（无发行物与功能变更，仅证据补链）；理由：本片不产生 tag、artifact 或功能项，只在 `docs/validation/evidence/EXIT-SEED-BUILD-EVIDENCE/` 归档 AT-13 补证，候选能力与剩余门禁逐字不变。

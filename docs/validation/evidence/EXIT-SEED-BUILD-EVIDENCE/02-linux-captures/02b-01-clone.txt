@@ -1,0 +1,10 @@
+ID: 02b-01-clone
+TITLE: clone repository with partial filter
+COMMAND: git clone --filter=blob:none --no-checkout https://github.com/larsonzh/prfrail.git /tmp/p55work.oIFQtI/repo
+CWD: /tmp/p55work.oIFQtI
+EXIT: 0
+
+--- STDOUT ---
+--- STDERR ---
+正克隆到 '/tmp/p55work.oIFQtI/repo'...
+

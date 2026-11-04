@@ -1,0 +1,17 @@
+ID: 02b-09-seed-binary-version
+TITLE: seed binary executes and reports its version
+COMMAND: /tmp/p55work.oIFQtI/seed/bin/prfrail version --json
+CWD: /tmp/p55work.oIFQtI
+EXIT: 0
+
+--- STDOUT ---
+{
+  "command": "version",
+  "ok": true,
+  "exitCode": 0,
+  "data": {
+    "version": "0.1.0-dev"
+  }
+}
+--- STDERR ---
+

@@ -1,0 +1,10 @@
+ID: 02a-02-build-candidate
+TITLE: clean-room build of candidate binary
+COMMAND: go build -trimpath -o work/bin/prfrail.exe ./cmd/prfrail (GOCACHE/GOMODCACHE isolated, CGO_ENABLED=0, GOTOOLCHAIN=local)
+CWD: D:\LZProjects\prfrail
+EXIT: 0
+
+--- STDOUT ---
+
+--- STDERR ---
+

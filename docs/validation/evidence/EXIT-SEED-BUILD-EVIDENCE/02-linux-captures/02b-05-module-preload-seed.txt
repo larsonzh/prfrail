@@ -1,0 +1,9 @@
+ID: 02b-05-module-preload-seed
+TITLE: preload modules for the seed worktree (GOPROXY=direct)
+COMMAND: bash -c cd "$1" && go mod download _ /tmp/p55work.oIFQtI/seed-src
+CWD: /tmp/p55work.oIFQtI
+EXIT: 0
+
+--- STDOUT ---
+--- STDERR ---
+

@@ -1,0 +1,10 @@
+ID: 02b-17-neg-seed-changed
+TITLE: negative: seed hash mismatch
+COMMAND: /tmp/p55work.oIFQtI/verifier-bin/prfrail-release selfhost --commit baa144df5898817e0ac7cd860928bb4a90cbd009 --seed /tmp/p55work.oIFQtI/seed --seed-hash 0000000000000000000000000000000000000000000000000000000000000000 --candidate /tmp/p55work.oIFQtI/candidate --expected /tmp/p55work.oIFQtI/seed/fixtures/expected.json --actual /tmp/p55work.oIFQtI/candidate/actual.json
+CWD: /tmp/p55work.oIFQtI
+EXIT: 1
+
+--- STDOUT ---
+--- STDERR ---
+invalid self-host evidence: seed changed
+

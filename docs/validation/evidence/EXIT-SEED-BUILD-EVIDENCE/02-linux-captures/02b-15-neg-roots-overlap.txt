@@ -1,0 +1,10 @@
+ID: 02b-15-neg-roots-overlap
+TITLE: negative: seed and candidate roots overlap
+COMMAND: /tmp/p55work.oIFQtI/verifier-bin/prfrail-release selfhost --commit baa144df5898817e0ac7cd860928bb4a90cbd009 --seed /tmp/p55work.oIFQtI/neg-overlap/seed --seed-hash sha256:bcad5b0c25a97151b2a823221743004a850ce7ec4b45f7d5599d2cef4ec1277c --candidate /tmp/p55work.oIFQtI/neg-overlap/seed/candidate --expected /tmp/p55work.oIFQtI/seed/fixtures/expected.json --actual /tmp/p55work.oIFQtI/neg-overlap/seed/candidate/actual.json
+CWD: /tmp/p55work.oIFQtI
+EXIT: 1
+
+--- STDOUT ---
+--- STDERR ---
+invalid self-host evidence: seed and candidate roots overlap
+

@@ -1,0 +1,10 @@
+ID: 02a-05-probe-actual
+TITLE: candidate produces actual oracle (expected never produced by candidate)
+COMMAND: prfrail-release probe --binary work/bin/prfrail.exe --work-root work/probe-run --output work/candidate/actual.json --expected-version 0.1.0-dev
+CWD: D:\LZProjects\prfrail
+EXIT: 0
+
+--- STDOUT ---
+
+--- STDERR ---
+

@@ -1,0 +1,347 @@
+[
+  {
+    "id": "02b-00-env",
+    "title": "(listings and metadata)",
+    "command": "",
+    "exit": 0,
+    "verdict": "INFO",
+    "stored": "02-linux-captures/02b-00-env.txt",
+    "bytes": 1139,
+    "sha256": "2baf40fd6da66b0c3809ca4710a39bd6c1ff77656cfd1647cefe14604ae8b710",
+    "captureMeta": {
+      "rawBytes": null,
+      "crlfNormalized": null
+    },
+    "commandErrata": null
+  },
+  {
+    "id": "02b-01-clone",
+    "title": "clone repository with partial filter",
+    "command": "git clone --filter=blob:none --no-checkout https://github.com/larsonzh/prfrail.git /tmp/p55work.oIFQtI/repo",
+    "exit": 0,
+    "verdict": "PASS",
+    "stored": "02-linux-captures/02b-01-clone.txt",
+    "bytes": 286,
+    "sha256": "36c2d638c0e2d4d22165c3ca2713411e3192fb2c7b8a640147bacdb7e87eb2d4",
+    "captureMeta": {
+      "rawBytes": null,
+      "crlfNormalized": null
+    },
+    "commandErrata": null
+  },
+  {
+    "id": "02b-02-worktree-seed",
+    "title": "worktree at fixed seed commit",
+    "command": "git -C /tmp/p55work.oIFQtI/repo worktree add --detach /tmp/p55work.oIFQtI/seed-src fc99f553c3066b24230a093d14bc17af0c6a398e",
+    "exit": 0,
+    "verdict": "PASS",
+    "stored": "02-linux-captures/02b-02-worktree-seed.txt",
+    "bytes": 3918,
+    "sha256": "7dadf79b345f0ef0bf3931fe4c0b34d8be92644adf83b103c12d7d3333333f92",
+    "captureMeta": {
+      "rawBytes": null,
+      "crlfNormalized": null
+    },
+    "commandErrata": null
+  },
+  {
+    "id": "02b-03-worktree-verifier",
+    "title": "worktree at T017 verifier baseline",
+    "command": "git -C /tmp/p55work.oIFQtI/repo worktree add --detach /tmp/p55work.oIFQtI/verifier-src 18c9340c60deb30049554491f8905df51d0a3180",
+    "exit": 0,
+    "verdict": "PASS",
+    "stored": "02-linux-captures/02b-03-worktree-verifier.txt",
+    "bytes": 3920,
+    "sha256": "f1d5185e322326fd61bfd025e5384e15aa5f77bd1705cf37e8a82237cac1f1d0",
+    "captureMeta": {
+      "rawBytes": null,
+      "crlfNormalized": null
+    },
+    "commandErrata": null
+  },
+  {
+    "id": "02b-04-worktree-candidate",
+    "title": "worktree at current HEAD",
+    "command": "git -C /tmp/p55work.oIFQtI/repo worktree add --detach /tmp/p55work.oIFQtI/candidate-src baa144df5898817e0ac7cd860928bb4a90cbd009",
+    "exit": 0,
+    "verdict": "PASS",
+    "stored": "02-linux-captures/02b-04-worktree-candidate.txt",
+    "bytes": 4148,
+    "sha256": "2fe8e78a0c15cc57f83a946cda1f1ca65731815655c46f59b7c97cc79e7066cc",
+    "captureMeta": {
+      "rawBytes": null,
+      "crlfNormalized": null
+    },
+    "commandErrata": null
+  },
+  {
+    "id": "02b-05-module-preload-seed",
+    "title": "preload modules for the seed worktree (GOPROXY=direct)",
+    "command": "bash -c cd \"$1\" && go mod download _ /tmp/p55work.oIFQtI/seed-src",
+    "exit": 0,
+    "verdict": "PASS",
+    "stored": "02-linux-captures/02b-05-module-preload-seed.txt",
+    "bytes": 233,
+    "sha256": "cf3fe9f75b34917adb19635af8bb2d017784f8d9a52618df84d521e434b1d4b0",
+    "captureMeta": {
+      "rawBytes": null,
+      "crlfNormalized": null
+    },
+    "commandErrata": null
+  },
+  {
+    "id": "02b-06-module-preload-verifier",
+    "title": "preload modules for the verifier worktree",
+    "command": "bash -c cd \"$1\" && go mod download _ /tmp/p55work.oIFQtI/verifier-src",
+    "exit": 0,
+    "verdict": "PASS",
+    "stored": "02-linux-captures/02b-06-module-preload-verifier.txt",
+    "bytes": 228,
+    "sha256": "e96bc78a9bb3fd07c2b47862de1c417e964be75a8572aa0893019160018610c2",
+    "captureMeta": {
+      "rawBytes": null,
+      "crlfNormalized": null
+    },
+    "commandErrata": null
+  },
+  {
+    "id": "02b-07-module-preload-candidate",
+    "title": "preload modules for the candidate worktree",
+    "command": "bash -c cd \"$1\" && go mod download _ /tmp/p55work.oIFQtI/candidate-src",
+    "exit": 0,
+    "verdict": "PASS",
+    "stored": "02-linux-captures/02b-07-module-preload-candidate.txt",
+    "bytes": 231,
+    "sha256": "13811c3fcdd7a75b07cbc404bffac66586b4d22bc22307c7db9131d8203a6ff4",
+    "captureMeta": {
+      "rawBytes": null,
+      "crlfNormalized": null
+    },
+    "commandErrata": null
+  },
+  {
+    "id": "02b-08-build-seed-binary",
+    "title": "clean-room build of the seed binary (fc99f55, GOPROXY=off)",
+    "command": "go build -C /tmp/p55work.oIFQtI/seed-src -trimpath -o /tmp/p55work.oIFQtI/seed/bin/prfrail ./cmd/prfrail",
+    "exit": 0,
+    "verdict": "PASS",
+    "stored": "02-linux-captures/02b-08-build-seed-binary.txt",
+    "bytes": 274,
+    "sha256": "c0f941026f465cde009415ba7511ae3f59b9651663828c5ab5396bfd386419eb",
+    "captureMeta": {
+      "rawBytes": null,
+      "crlfNormalized": null
+    },
+    "commandErrata": null
+  },
+  {
+    "id": "02b-09-seed-binary-version",
+    "title": "seed binary executes and reports its version",
+    "command": "/tmp/p55work.oIFQtI/seed/bin/prfrail version --json",
+    "exit": 0,
+    "verdict": "PASS",
+    "stored": "02-linux-captures/02b-09-seed-binary-version.txt",
+    "bytes": 311,
+    "sha256": "2e221b1186e9ce46ac3ba2f75c1ad97341a6f94ca625c27e3ad3ff7f89594646",
+    "captureMeta": {
+      "rawBytes": null,
+      "crlfNormalized": null
+    },
+    "commandErrata": null
+  },
+  {
+    "id": "02b-10-build-verifier-tool",
+    "title": "clean-room build of the verifier tool (18c9340, GOPROXY=off)",
+    "command": "go build -C /tmp/p55work.oIFQtI/verifier-src -trimpath -o /tmp/p55work.oIFQtI/verifier-bin/prfrail-release ./cmd/prfrail-release",
+    "exit": 0,
+    "verdict": "PASS",
+    "stored": "02-linux-captures/02b-10-build-verifier-tool.txt",
+    "bytes": 302,
+    "sha256": "81bae07d45ba574a6d838b7481769523c2c996008fb891d8316b17b540966129",
+    "captureMeta": {
+      "rawBytes": null,
+      "crlfNormalized": null
+    },
+    "commandErrata": null
+  },
+  {
+    "id": "02b-11-build-candidate-binary",
+    "title": "clean-room build of the candidate binary (baa144d, GOPROXY=off)",
+    "command": "go build -C /tmp/p55work.oIFQtI/candidate-src -trimpath -o /tmp/p55work.oIFQtI/candidate/bin/prfrail ./cmd/prfrail",
+    "exit": 0,
+    "verdict": "PASS",
+    "stored": "02-linux-captures/02b-11-build-candidate-binary.txt",
+    "bytes": 294,
+    "sha256": "271c0d9e7ccadca168f794f7237fb2ee88324c78011687541b5d5640584ccc23",
+    "captureMeta": {
+      "rawBytes": null,
+      "crlfNormalized": null
+    },
+    "commandErrata": null
+  },
+  {
+    "id": "02b-12-seed-tree-hash",
+    "title": "seed tree hash (baseline)",
+    "command": "/tmp/p55work.oIFQtI/verifier-bin/prfrail-release hash-tree --root /tmp/p55work.oIFQtI/seed",
+    "exit": 0,
+    "verdict": "PASS",
+    "stored": "02-linux-captures/02b-12-seed-tree-hash.txt",
+    "bytes": 296,
+    "sha256": "081ba86d1d670c702f6c8b55e4defb9a5b1016d7f8b748a98c40ae4e51eb784c",
+    "captureMeta": {
+      "rawBytes": null,
+      "crlfNormalized": null
+    },
+    "commandErrata": null
+  },
+  {
+    "id": "02b-13-probe-actual",
+    "title": "candidate binary produces the actual oracle",
+    "command": "/tmp/p55work.oIFQtI/verifier-bin/prfrail-release probe --binary /tmp/p55work.oIFQtI/candidate/bin/prfrail --noop-chain /tmp/p55work.oIFQtI/seed/fixtures/noop-chain.json --executable-chain /tmp/p55work.oIFQtI/seed/fixtures/executable-chain.json --work-root /tmp/p55work.oIFQtI/probe-run --output /tmp/p55work.oIFQtI/candidate/actual.json --expected-version 0.1.0-dev",
+    "exit": 0,
+    "verdict": "PASS",
+    "stored": "02-linux-captures/02b-13-probe-actual.txt",
+    "bytes": 515,
+    "sha256": "24eb0f6638dff5b93ec01934836c5135ce39a6fc75520a914fb1f0d09bfe23dd",
+    "captureMeta": {
+      "rawBytes": null,
+      "crlfNormalized": null
+    },
+    "commandErrata": null
+  },
+  {
+    "id": "02b-14-selfhost-success",
+    "title": "two-generation selfhost verification success",
+    "command": "/tmp/p55work.oIFQtI/verifier-bin/prfrail-release selfhost --commit baa144df5898817e0ac7cd860928bb4a90cbd009 --seed /tmp/p55work.oIFQtI/seed --seed-hash sha256:67ea456be2f30fc310b16c993c9a44d6af901d6f29e9b9f5ebde19dc9897bd2c --candidate /tmp/p55work.oIFQtI/candidate --expected /tmp/p55work.oIFQtI/seed/fixtures/expected.json --actual /tmp/p55work.oIFQtI/candidate/actual.json",
+    "exit": 0,
+    "verdict": "PASS",
+    "stored": "02-linux-captures/02b-14-selfhost-success.txt",
+    "bytes": 869,
+    "sha256": "a9da1fc197fb8066152bbd245a72ace9d75167cb2f5562fd0946a5fe59b0ba79",
+    "captureMeta": {
+      "rawBytes": null,
+      "crlfNormalized": null
+    },
+    "commandErrata": null
+  },
+  {
+    "id": "02b-15-neg-roots-overlap",
+    "title": "negative: seed and candidate roots overlap",
+    "command": "/tmp/p55work.oIFQtI/verifier-bin/prfrail-release selfhost --commit baa144df5898817e0ac7cd860928bb4a90cbd009 --seed /tmp/p55work.oIFQtI/neg-overlap/seed --seed-hash sha256:bcad5b0c25a97151b2a823221743004a850ce7ec4b45f7d5599d2cef4ec1277c --candidate /tmp/p55work.oIFQtI/neg-overlap/seed/candidate --expected /tmp/p55work.oIFQtI/seed/fixtures/expected.json --actual /tmp/p55work.oIFQtI/neg-overlap/seed/candidate/actual.json",
+    "exit": 1,
+    "verdict": "PASS",
+    "stored": "02-linux-captures/02b-15-neg-roots-overlap.txt",
+    "bytes": 636,
+    "sha256": "0bb200f11c825b4e400ff94deb16e1b814d8bcbf0fd2be29a996bf080d57792d",
+    "captureMeta": {
+      "rawBytes": null,
+      "crlfNormalized": null
+    },
+    "commandErrata": null
+  },
+  {
+    "id": "02b-16-neg-oracle-ownership",
+    "title": "negative: expected oracle owned by candidate root",
+    "command": "/tmp/p55work.oIFQtI/verifier-bin/prfrail-release selfhost --commit baa144df5898817e0ac7cd860928bb4a90cbd009 --seed /tmp/p55work.oIFQtI/seed --seed-hash sha256:67ea456be2f30fc310b16c993c9a44d6af901d6f29e9b9f5ebde19dc9897bd2c --candidate /tmp/p55work.oIFQtI/neg-ownership/candidate --expected /tmp/p55work.oIFQtI/neg-ownership/candidate/expected.json --actual /tmp/p55work.oIFQtI/neg-ownership/candidate/actual.json",
+    "exit": 1,
+    "verdict": "PASS",
+    "stored": "02-linux-captures/02b-16-neg-oracle-ownership.txt",
+    "bytes": 641,
+    "sha256": "65ba9e9581685a879666a9e274f5439d3fd8662af14213840634125f398590bd",
+    "captureMeta": {
+      "rawBytes": null,
+      "crlfNormalized": null
+    },
+    "commandErrata": null
+  },
+  {
+    "id": "02b-17-neg-seed-changed",
+    "title": "negative: seed hash mismatch",
+    "command": "/tmp/p55work.oIFQtI/verifier-bin/prfrail-release selfhost --commit baa144df5898817e0ac7cd860928bb4a90cbd009 --seed /tmp/p55work.oIFQtI/seed --seed-hash 0000000000000000000000000000000000000000000000000000000000000000 --candidate /tmp/p55work.oIFQtI/candidate --expected /tmp/p55work.oIFQtI/seed/fixtures/expected.json --actual /tmp/p55work.oIFQtI/candidate/actual.json",
+    "exit": 1,
+    "verdict": "PASS",
+    "stored": "02-linux-captures/02b-17-neg-seed-changed.txt",
+    "bytes": 548,
+    "sha256": "4045f292d3938c6580e390eaac0bcf20ea75e11e3ad1a07bf26a61dd1a73a84e",
+    "captureMeta": {
+      "rawBytes": null,
+      "crlfNormalized": null
+    },
+    "commandErrata": null
+  },
+  {
+    "id": "02b-18-neg-oracle-drift",
+    "title": "negative: candidate actual differs from external oracle (run-noop flipped)",
+    "command": "/tmp/p55work.oIFQtI/verifier-bin/prfrail-release selfhost --commit baa144df5898817e0ac7cd860928bb4a90cbd009 --seed /tmp/p55work.oIFQtI/seed --seed-hash sha256:67ea456be2f30fc310b16c993c9a44d6af901d6f29e9b9f5ebde19dc9897bd2c --candidate /tmp/p55work.oIFQtI/neg-drift/candidate --expected /tmp/p55work.oIFQtI/seed/fixtures/expected.json --actual /tmp/p55work.oIFQtI/neg-drift/candidate/actual.json",
+    "exit": 1,
+    "verdict": "PASS",
+    "stored": "02-linux-captures/02b-18-neg-oracle-drift.txt",
+    "bytes": 654,
+    "sha256": "c2bac5187790f3735927e444d509c66f12f02613785cc3802be23be88df89700",
+    "captureMeta": {
+      "rawBytes": null,
+      "crlfNormalized": null
+    },
+    "commandErrata": null
+  },
+  {
+    "id": "02b-19-seed-intact",
+    "title": "(listings and metadata)",
+    "command": "",
+    "exit": 0,
+    "verdict": "PASS",
+    "stored": "02-linux-captures/02b-19-seed-intact.txt",
+    "bytes": 320,
+    "sha256": "54394e2f97c6f2fe8e29a9d6bba610ee1001e7e7c220813c22b403308f0c6d99",
+    "captureMeta": {
+      "rawBytes": null,
+      "crlfNormalized": null
+    },
+    "commandErrata": null
+  },
+  {
+    "id": "02b-20-candidate-listing",
+    "title": "(listings and metadata)",
+    "command": "",
+    "exit": 0,
+    "verdict": "PASS",
+    "stored": "02-linux-captures/02b-20-candidate-listing.txt",
+    "bytes": 286,
+    "sha256": "915cde65c53bcb517736914ce9ec66eeffac50dc0dfac56e802b1dec708e164f",
+    "captureMeta": {
+      "rawBytes": null,
+      "crlfNormalized": null
+    },
+    "commandErrata": null
+  },
+  {
+    "id": "02b-21-bindings",
+    "title": "(listings and metadata)",
+    "command": "",
+    "exit": 0,
+    "verdict": "INFO",
+    "stored": "02-linux-captures/02b-21-bindings.json",
+    "bytes": 1255,
+    "sha256": "06704a556e5283d8dc1e32a51387e52126b73b42de6046cd09ee14be37ecec9f",
+    "captureMeta": {
+      "rawBytes": null,
+      "crlfNormalized": null
+    },
+    "commandErrata": null
+  },
+  {
+    "id": "02b-22-verdicts",
+    "title": "(listings and metadata)",
+    "command": "",
+    "exit": 0,
+    "verdict": "INFO",
+    "stored": "02-linux-captures/02b-22-verdicts.txt",
+    "bytes": 658,
+    "sha256": "b305553d974870298148ee9874c81e1a824c9818ae3ac3455849d002bb8b6259",
+    "captureMeta": {
+      "rawBytes": null,
+      "crlfNormalized": null
+    },
+    "commandErrata": null
+  }
+]

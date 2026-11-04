@@ -1,0 +1,11 @@
+ID: 02a-08-neg-oracle-ownership
+TITLE: negative: expected oracle owned by candidate root
+COMMAND: prfrail-release selfhost --expected <candidate>/expected.json
+CWD: D:\LZProjects\prfrail
+EXIT: 1
+
+--- STDOUT ---
+
+--- STDERR ---
+invalid self-host evidence: oracle ownership is not independent
+

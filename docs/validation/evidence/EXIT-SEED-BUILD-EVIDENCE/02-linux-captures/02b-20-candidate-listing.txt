@@ -1,0 +1,9 @@
+candidateRoot=/tmp/p55work.oIFQtI/candidate
+  actual.json 313
+  bin/prfrail 6184067
+  candidate-commit.txt 41
+
+expectedAbsentInCandidate=true
+probeWorkRoot=/tmp/p55work.oIFQtI/probe-run
+  run/events/seals/selfhost-run/selfhost-task.1.seal.json 1218
+  run/events/state-events.jsonl 6387

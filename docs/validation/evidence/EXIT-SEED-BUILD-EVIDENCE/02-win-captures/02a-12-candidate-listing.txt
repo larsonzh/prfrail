@@ -1,0 +1,9 @@
+candidateRoot=work/candidate
+  candidate/actual.json  313
+
+probeWorkRoot=work/probe-run
+  probe-run/run/events/seals/selfhost-run/selfhost-task.1.seal.json  1218
+  probe-run/run/events/state-events.jsonl  6387
+
+expectedAbsentInCandidate=true
+note=candidate process wrote only the actual oracle; the expected oracle lives in testdata/selfhost (read-only input, outside the candidate root)

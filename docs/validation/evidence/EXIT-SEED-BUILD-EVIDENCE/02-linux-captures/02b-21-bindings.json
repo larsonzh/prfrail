@@ -1,0 +1,22 @@
+{
+  "seedCommit": "fc99f553c3066b24230a093d14bc17af0c6a398e",
+  "verifierCommit": "18c9340c60deb30049554491f8905df51d0a3180",
+  "candidateCommit": "baa144df5898817e0ac7cd860928bb4a90cbd009",
+  "seedHash": "sha256:67ea456be2f30fc310b16c993c9a44d6af901d6f29e9b9f5ebde19dc9897bd2c",
+  "toolchain": "go version go1.22.12 linux/amd64",
+  "kernel": "6.8.0-85-generic",
+  "goproxyBuildPhase": "off",
+  "gosumdb": "off (sum.golang.org unreachable; go.sum verification active)",
+  "binaries": {
+    "seed/prfrail": "1e7f78ef1a9f5f73e0020eccf47e3bfc7cd41d1bb7b5ab84bdeba1fe8b408f97",
+    "verifier/prfrail-release": "4a1c0bfff97c7684febc4e372614cd34c4a894f77fe69b6500bcb381ea061d8b",
+    "candidate/prfrail": "9b7f72e46a2aa4ac52449709a452b020642e8341933cf6c155fb4ba37b66e176"
+  },
+  "fixtures": {
+    "bootstrap.json": "ae0d5db85d6a45de19dc75d40460705e0a7a0dea20de2a11632c25bf8b4543fc",
+    "executable-chain.json": "dbc5fc415917398c88a6ed669971c417ed8ee6884a2c8ebfc1271807d757935b",
+    "expected.json": "388f88842710abc90676ed0a85f4bd935b594fc552146577c304b0bbbd850aaf",
+    "licenses-policy.json": "ff9d243c67d516a20147cb5b8684741c3f5ddb77a761af7aa1aab1df4a398013",
+    "noop-chain.json": "fbeee2b64ab174637c77d9cdd1b04bd7fd6c681912f0b73f7a4847bc19a7b31c"
+  }
+}

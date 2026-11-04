@@ -1,0 +1,9 @@
+ID: 02b-08-build-seed-binary
+TITLE: clean-room build of the seed binary (fc99f55, GOPROXY=off)
+COMMAND: go build -C /tmp/p55work.oIFQtI/seed-src -trimpath -o /tmp/p55work.oIFQtI/seed/bin/prfrail ./cmd/prfrail
+CWD: /tmp/p55work.oIFQtI
+EXIT: 0
+
+--- STDOUT ---
+--- STDERR ---
+

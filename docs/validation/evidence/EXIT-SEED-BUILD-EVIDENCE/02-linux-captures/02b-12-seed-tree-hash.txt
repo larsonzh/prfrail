@@ -1,0 +1,10 @@
+ID: 02b-12-seed-tree-hash
+TITLE: seed tree hash (baseline)
+COMMAND: /tmp/p55work.oIFQtI/verifier-bin/prfrail-release hash-tree --root /tmp/p55work.oIFQtI/seed
+CWD: /tmp/p55work.oIFQtI
+EXIT: 0
+
+--- STDOUT ---
+sha256:67ea456be2f30fc310b16c993c9a44d6af901d6f29e9b9f5ebde19dc9897bd2c
+--- STDERR ---
+
