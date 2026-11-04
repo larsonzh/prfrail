@@ -109,6 +109,7 @@ docs/validation/exit-seed-build-evidence_EN.md	repo
 - 7 final review (`independent-reviewer` / `GPT-5.3-Codex`): `FINAL REVIEW: PASS WITH FIXES` (1 Low: MANIFEST wording about R2 status too strong), fixed per option A; the reviewer added independent re-checks (5 hashes recomputed, three-way fixture comparison, source anchors and boundary audit).
 - 9 gates (controller): `--scope=index` / `--scope=tree` / `--scope=ci` all `TOTAL_FAIL=0`; `SELFTEST: PASS 697/697`; `go build` / `go vet` / `go test -count=1 ./...` all green (15 packages ok).
 - The 5/6/7 outputs are archived verbatim under `04-reviews/` in the evidence package.
+- CI: run `41925623071` (head `63e2e24`) is green on both legs — Build, Vet, Test and Gates succeed on windows and ubuntu, Race and Contract fixtures run on the ubuntu leg, and the three conditional jobs (candidate-build / candidate-probe / bootstrap-release) are skipped by design.
 
 Verbatim transcript of the 6 independent scan (headings written as Section A–E per the gate requirement; full text in `04-reviews/06-independent-scan.md`):
 ```sixstage

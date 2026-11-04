@@ -85,7 +85,7 @@
 | P52 ACCEPTANCE-SECURITY-COUNTEREXAMPLES | ✅ 已完成 | P51 | M | 2026-11-03 | 报告对 `docs/validation/acceptance-security-counterexamples{,_EN}.md`；GAP-77 击穿实证登记（P53 修复）；停于 ⑩ 等授权；R=0、D=1 |
 | P53 FIX-GAP-77-SYMLINK-ESCAPE | ✅ 已完成 | P52 | M | 2026-11-04 | 修复 GAP-77（openat2 单次受限解析 + fail-closed）；T51-1 红转绿 + F1/F2 反例；规范同步 SEC-02/AT-02；`7802819` 已推 origin（未推 gitee），run `41707160563` 首跑双腿全绿；R=0、D=0 |
 | P54 CONTRACTS-S7-DURABILITY | ✅ 已完成（2026-11-04；commit `7c0763a` 推送 origin 未推 gitee；run `41840557379` 首跑双绿；R=1、D=1） | P53 | L | — | R/D=0 基线（2026-11-04 起跑）；证据包 `docs/validation/evidence/CONTRACTS-S7-DURABILITY/` |
-| P55 EXIT-SEED-BUILD-EVIDENCE | 🔄 进行中（2026-11-05 起跑） | P54 | M | — | 证据包 `docs/validation/evidence/EXIT-SEED-BUILD-EVIDENCE/` |
+| P55 EXIT-SEED-BUILD-EVIDENCE | ✅ 已完成（2026-11-05；commit `63e2e24` 推送 origin，未推 gitee） | P54 | M | — | 报告 `docs/validation/exit-seed-build-evidence{,_EN}.md`；证据包 `docs/validation/evidence/EXIT-SEED-BUILD-EVIDENCE/`；R = 0、D = 1 |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -1609,12 +1609,12 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | R / D 基线 | R = 1（②e 死代码迁移，发现后的修复重跑）、D = 1（§5.1 临时件纪律口径：`tmp/s7a-contrasts.js` 误放自愈档处置；另有偏离登记 1 条 = ⑧a 先于 ⑦ 的时序偏离，不并 D 计数） |
 | 完成记录 | 审查链：① 双打（r1 → 第一次 Sol 红队 `FINDINGS` → r2 → 第二次 Sol 红队 `FINDINGS` → r2b 闭合 → r2c 激活语义微修；两次红队原文归档于 `docs/validation/evidence/CONTRACTS-S7-DURABILITY/01-arch/red-team-sol-review.md` 与 `red-team-sol-review-r2.md`）→ ②a–d 实现（契约先行 + C6 预建槽 + 接缝收窄 + store 级激活）→ ③a–c 红测与 BA3 两臂重写 → ④ 门禁全绿（默认 / c6slot / linux 的 build 与 vet，以及 tree/index 两作用域）→ ⑤ `PRE-REVIEW: PASS WITH FIXES`（0H/0M/4L）→ ⑥ `INDEPENDENT SCAN: PASS` → ⑦ `FINAL REVIEW: PASS`（0C/0H/0M/0L；等价性论证 §7.2.1 口径通过）→ ⑧a 六文档同步 → ⑧b ⑦ 归档与簿记 → ⑨ 三作用域全绿 + `SELFTEST: PASS 697/697` → ⑧c 临时件清理 → ⑩ 停点等授权（首轮回执后按用户澄清补 ②e 死代码迁移 + ⑦ 复审 #1/3 `FINAL REVIEW: PASS` + ⑨ 重跑全绿）→ 用户授权后 commit `7c0763a` 推送 origin（未推 gitee），run `41840557379` 首跑双绿（windows 15 包 ok / ubuntu 15 包 ok + Race 6 包 ok）；状态行 ✅ 已完成 |
 
-### P55 — `EXIT-SEED-BUILD-EVIDENCE`（AT-13 seed 驱动构建补证 · 层 3 第 7 项）· 🔄 进行中
+### P55 — `EXIT-SEED-BUILD-EVIDENCE`（AT-13 seed 驱动构建补证 · 层 3 第 7 项）· ✅ 已完成
 
 | 字段 | 内容 |
 |---|---|
 | 标识 | `EXIT-SEED-BUILD-EVIDENCE`（证据链补证类；准则 v1.60；M 档） |
-| 状态 | 🔄 **进行中**（2026-11-05 起跑；锚点 HEAD = `baa144d`；主控模型 = `DeepSeek V4.1 Flash`） |
+| 状态 | ✅ **已完成**（2026-11-05；起跑锚点 HEAD = `baa144d`；commit `63e2e24` 已推 origin，未推 gitee；主控模型 = `DeepSeek V4.1 Flash`） |
 | 目标 | 补齐 AT-13 的 seed 驱动构建证据链（seed 与 candidate 分离、外部 oracle 比较、clean-room 成功与失败均不损 seed），只补证据、不改 CI 结构 |
 | 依赖 | P54 闭环（`7c0763a` + 回填 `f38e0ce`）；AT-13 定义见 `docs/TEST_STRATEGY.md`；既有实现为 `internal/release/**`、`cmd/prfrail-release/**` 与 `.github/workflows/ci.yml` 的 dispatch 专用作业 |
 | 规模 | M |
@@ -1626,7 +1626,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 临时件落点声明 | 本片临时目录 = `tmp/EXIT-SEED-BUILD-EVIDENCE/`（⑧c 前只增不删） |
 | R / D 基线 | R = 0、D = 1（D = 1：无触发词抢跑，经用户强制打断纠正，就地转正，未造成污染；登记于报告「异常与兜底记录」章） |
 | ⑧a 进度记录（2026-11-05） | 证据包 `docs/validation/evidence/EXIT-SEED-BUILD-EVIDENCE/`（53 件载荷 + `MANIFEST.md` + `SHA256SUMS.txt`，哈希三方相等）；审查链 ③ 两轮 `TEST: DONE` → ⑤ `PRE-REVIEW: PASS WITH FIXES`（两轮）→ ⑥ `INDEPENDENT SCAN: PASS` → ⑦ `FINAL REVIEW: PASS WITH FIXES`（1 项 Low 已修）；R = 0、D = 1；状态保持 🔄 进行中（⑩ 停点前不翻 ✅） |
-| 完成记录 | 本片收尾时写入报告路径 |
+| 完成记录 | 报告对 `docs/validation/exit-seed-build-evidence{,_EN}.md`；审查链 ③×2 `TEST: DONE` → ⑤×2 `PRE-REVIEW: PASS WITH FIXES` → ⑥ `INDEPENDENT SCAN: PASS` → ⑦ `FINAL REVIEW: PASS WITH FIXES`（1 Low 已修）→ ⑨ 三作用域全绿 + `SELFTEST: PASS 697/697`、Go 三腿全绿 → ⑧c 临时件清零；R = 0、D = 1 |
 
 ## 已知缺陷（后续切片前处理）
 

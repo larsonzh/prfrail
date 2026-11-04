@@ -109,6 +109,7 @@ docs/validation/exit-seed-build-evidence_EN.md	repo
 - ⑦ 独立终审（`independent-reviewer` / `GPT-5.3-Codex`）：`FINAL REVIEW: PASS WITH FIXES`（1 项 Low：MANIFEST 对 R2 状态措辞偏强），已按方案 A 修正措辞；⑦ 追加独立复核动作（独立复算 5 条哈希、夹具三方对照、源码锚点与越界核对）。
 - ⑨ 门禁（主控）：`--scope=index` / `--scope=tree` / `--scope=ci` 三域 `TOTAL_FAIL=0`；`SELFTEST: PASS 697/697`；`go build` / `go vet` / `go test -count=1 ./...` 全绿（15 包 ok）。
 - ⑤⑥⑦ 原文逐字归档于证据包 `04-reviews/`。
+- CI：run `41925623071`（head `63e2e24`）双绿——windows / ubuntu 两腿的 Build、Vet、Test 与 Gates 均 success，Race 与 Contract fixtures 在 ubuntu 腿执行；三个条件作业（candidate-build / candidate-probe / bootstrap-release）按设计 skipped。
 
 ⑥ 独立扫描逐字转录（标题按门禁要求写作 Section A–E，正文见 `04-reviews/06-independent-scan.md`）：
 ```sixstage
