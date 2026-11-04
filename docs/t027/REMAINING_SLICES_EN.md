@@ -84,7 +84,7 @@
 | P51 CONSOLE-CLI-MULTITASK-WIRING | ✅ Completed | P50 | M | 2026-11-03 | Report pair `docs/validation/console-cli-multitask-wiring{,_EN}.md`; `2b0af2d` pushed to origin (never gitee), run `41569353460` green on the first attempt on both legs; temp artefacts `tmp/CONSOLE-CLI-MULTITASK-WIRING/` (cleared at 8c); R=1, D=2 |
 | P52 ACCEPTANCE-SECURITY-COUNTEREXAMPLES | ✅ Completed | P51 | M | 2026-11-03 | Report pair `docs/validation/acceptance-security-counterexamples{,_EN}.md`; GAP-77 breach registered (P53 fix); stopped at 10 for authorisation; R=0, D=1 |
 | P53 FIX-GAP-77-SYMLINK-ESCAPE | ✅ Completed | P52 | M | 2026-11-04 | Fix GAP-77 (single constrained openat2 resolution + fail-closed); T51-1 red-to-green + F1/F2 counterexamples; spec sync SEC-02/AT-02; `7802819` pushed to origin (never gitee), run `41707160563` green on the first attempt on both legs; R=0, D=0 |
-| P54 CONTRACTS-S7-DURABILITY | 🔄 In progress | P53 | L | — | R/D=0 baseline (started 2026-11-04); evidence package `docs/validation/evidence/CONTRACTS-S7-DURABILITY/` |
+| P54 CONTRACTS-S7-DURABILITY | ✅ Done (2026-11-04; commit `7c0763a` pushed to origin, never gitee; run `41840557379` green on the first attempt on both legs; R=1, D=1) | P53 | L | — | R/D=0 baseline (started 2026-11-04); evidence package `docs/validation/evidence/CONTRACTS-S7-DURABILITY/` |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1577,12 +1577,12 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | R / D baseline | R = 0, D = 0 |
 | Completion record | Review chain: 1 double play (V4 Pro r1 → Sol red team FINDINGS 2H+4M → r2 openat2 final) → 3 real red (dedicated wording matched verbatim) → 2a implementation (+158/-12, the only production file bounddir_unix.go) → 3b/3c test restructure and remediation → 4 all gates green → 5 r2 PASS → 6 PASS → 7 PASS (0 findings); stopped at 10 for authorisation → closed: commit `7802819` pushed to origin (never gitee), run `41707160563` green on the first attempt on both legs; R=0, D=0 |
 
-### P54 — `CONTRACTS-S7-DURABILITY` (Windows durability contract upgrade and C6 landing · layer-3 item 6) · 🔄 In progress
+### P54 — `CONTRACTS-S7-DURABILITY` (Windows durability contract upgrade and C6 landing · layer-3 item 6) · ✅ Done
 
 | Field | Content |
 |---|---|
 | Identifier | `CONTRACTS-S7-DURABILITY` (contract & implementation class; directive v1.60; size L) |
-| Status | 🔄 **In progress** (started 2026-11-04; anchor HEAD = `2b8ac3e`; controller model = `DeepSeek V4 Pro`; R-02 ruling approved the slice) |
+| Status | ✅ **Done** (started and closed 2026-11-04; anchor HEAD = `2b8ac3e`; controller model = `DeepSeek V4 Pro`; R-02 ruling approved the slice; commit `7c0763a` pushed to origin, never gitee; run `41840557379` green on the first attempt on both legs) |
 | Goal | Raise the Windows publication durability grade from `unproven` to `proven`: land the C6 mechanism (ADR-013 candidate numbering; its relation to the B3b C2 `MoveFileEx(MOVEFILE_WRITE_THROUGH)` is decided by stage 1), and revise `CONTRACTS.md` §7 |
 | Depends on | P53 closed (`7802819` + backfill `2b8ac3e`); R-02 ruling (approved 2026-11-04) |
 | Size | L |
@@ -1593,7 +1593,7 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Review-7 budget | Codex 1+3 (L-tier high allocation) |
 | Temp artefact location | `tmp/CONTRACTS-S7-DURABILITY/` (append-only until 8c; removed at 8c) |
 | R / D baseline | R = 1 (②e dead-code relocation, fix re-run after a finding), D = 1 (§5.1 temp-file-discipline calibre: `tmp/s7a-contrasts.js` misplacement, self-heal tier; plus 1 deviation registration = the ⑧a-before-⑦ sequencing deviation, not merged into the D count) |
-| Completion record | Review chain: 1 double play (r1 → first Sol red team `FINDINGS` → r2 → second Sol red team `FINDINGS` → r2b closure → r2c activation-semantics micro-fix; both red-team transcript sets archived as `docs/validation/evidence/CONTRACTS-S7-DURABILITY/01-arch/red-team-sol-review.md` and `red-team-sol-review-r2.md`) → 2a–d implementation (contract first + C6 prebuilt slots + narrowed seam + store-level activation) → 3a–c red tests and the BA3 two-arm rewrite → 4 all gates green (default / c6slot / linux build and vet, plus the tree/index scopes) → 5 `PRE-REVIEW: PASS WITH FIXES` (0H/0M/4L) → 6 `INDEPENDENT SCAN: PASS` → 7 `FINAL REVIEW: PASS` (0C/0H/0M/0L; the equivalence argument passed at §7.2.1 calibre) → 8a six-document sync → 8b ⑦ archiving and bookkeeping → 9 all three scopes green + `SELFTEST: PASS 697/697` → 8c temp-artefact cleanup → 10 stop point awaiting authorisation (after the first receipt, per the user clarification: ②e dead-code relocation + ⑦ re-review #1/3 `FINAL REVIEW: PASS` + stage ⑨ re-run all green); the status row stays 🔄 (no ✅ write-back before 10) |
+| Completion record | Review chain: 1 double play (r1 → first Sol red team `FINDINGS` → r2 → second Sol red team `FINDINGS` → r2b closure → r2c activation-semantics micro-fix; both red-team transcript sets archived as `docs/validation/evidence/CONTRACTS-S7-DURABILITY/01-arch/red-team-sol-review.md` and `red-team-sol-review-r2.md`) → 2a–d implementation (contract first + C6 prebuilt slots + narrowed seam + store-level activation) → 3a–c red tests and the BA3 two-arm rewrite → 4 all gates green (default / c6slot / linux build and vet, plus the tree/index scopes) → 5 `PRE-REVIEW: PASS WITH FIXES` (0H/0M/4L) → 6 `INDEPENDENT SCAN: PASS` → 7 `FINAL REVIEW: PASS` (0C/0H/0M/0L; the equivalence argument passed at §7.2.1 calibre) → 8a six-document sync → 8b ⑦ archiving and bookkeeping → 9 all three scopes green + `SELFTEST: PASS 697/697` → 8c temp-artefact cleanup → 10 stop point awaiting authorisation (after the first receipt, per the user clarification: ②e dead-code relocation + ⑦ re-review #1/3 `FINAL REVIEW: PASS` + stage ⑨ re-run all green) → after user authorisation: commit `7c0763a` pushed to origin (never gitee), run `41840557379` green on the first attempt on both legs (windows 15 packages ok / ubuntu 15 packages ok + Race 6 packages ok); the status row is ✅ Done |
 
 ## Known defects (to be handled before later slices)
 

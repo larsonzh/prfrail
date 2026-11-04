@@ -134,7 +134,7 @@ EN 镜像已随 ⑧a 补齐（本表 CN/EN 逐行对等）。
 - ⑥ 独立扫描：已完成（逐字转录见下）。
 - ⑦ 终审：Codex `FINAL REVIEW: PASS`（0 Critical / 0 High / 0 Medium / 0 Low；红队等价性论证 §7.2.1 口径通过；⑧a 先于 ⑦ 的时序偏离影响面判断成立）；原文归档于 evidence 包 `07-final/review.md`。
 - ⑦ 复审（#1/3，收窄输入：②e 死代码迁移）：Codex `FINAL REVIEW: PASS`（0 发现；纯搬迁判定、死代码消除、c6slot 完整性、构建标签、import 卫生五面全过）；原文追加于 `07-final/review.md` 第二轮。
-- ⑧/⑨/⑩：待闭环。
+- ⑧/⑨/⑩：闭环——⑨ 三作用域全绿 + `SELFTEST: PASS 697/697`、⑧c 清理完成、⑩ 用户授权后 commit `7c0763a` 推送 origin（未推 gitee），run `41840557379` 首跑双绿（windows 15 包 ok / ubuntu 15 包 ok + Race 6 包 ok）。
 
 ⑥ 独立扫描逐字转录（标题按门禁要求写作 Section A–E，正文逐字）：
 ```sixstage

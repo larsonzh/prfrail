@@ -134,7 +134,7 @@ Mirror status: the EN mirror of this table is already complete in this file (15 
 - ⑥ independent scan: done (verbatim transcription below).
 - ⑦ final review: Codex `FINAL REVIEW: PASS` (0 Critical / 0 High / 0 Medium / 0 Low; the red-team equivalence argument passed at §7.2.1 calibre; the impact-surface judgment for the ⑧a-before-⑦ sequencing deviation holds); original archived verbatim in the evidence package `07-final/review.md`.
 - ⑦ re-review (#1/3, narrowed input: the ②e dead-code relocation): Codex `FINAL REVIEW: PASS` (0 findings; pure-relocation, dead-code elimination, c6slot completeness, build-tag and import hygiene all pass); original appended to `07-final/review.md` round two.
-- ⑧/⑨/⑩: pending closure.
+- ⑧/⑨/⑩: closed — stage ⑨ all three scopes green + `SELFTEST: PASS 697/697`, stage ⑧c cleanup done, and after user authorisation at ⑩: commit `7c0763a` pushed to origin (never gitee), run `41840557379` green on the first attempt on both legs (windows 15 packages ok / ubuntu 15 packages ok + Race 6 packages ok).
 
 ⑥ independent-scan verbatim transcription (headings written as Section A–E to satisfy the gate, body verbatim):
 ```sixstage
