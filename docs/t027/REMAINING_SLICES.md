@@ -84,6 +84,7 @@
 | P51 CONSOLE-CLI-MULTITASK-WIRING | ✅ 已完成 | P50 | M | 2026-11-03 | 报告对 `docs/validation/console-cli-multitask-wiring{,_EN}.md`；`2b0af2d` 已推 origin（未推 gitee），run `41569353460` 首跑双腿全绿；临时件 `tmp/CONSOLE-CLI-MULTITASK-WIRING/`（⑧c 清理）；R=1、D=2 |
 | P52 ACCEPTANCE-SECURITY-COUNTEREXAMPLES | ✅ 已完成 | P51 | M | 2026-11-03 | 报告对 `docs/validation/acceptance-security-counterexamples{,_EN}.md`；GAP-77 击穿实证登记（P53 修复）；停于 ⑩ 等授权；R=0、D=1 |
 | P53 FIX-GAP-77-SYMLINK-ESCAPE | ✅ 已完成 | P52 | M | 2026-11-04 | 修复 GAP-77（openat2 单次受限解析 + fail-closed）；T51-1 红转绿 + F1/F2 反例；规范同步 SEC-02/AT-02；`7802819` 已推 origin（未推 gitee），run `41707160563` 首跑双腿全绿；R=0、D=0 |
+| P54 CONTRACTS-S7-DURABILITY | 🔄 进行中 | P53 | L | — | R/D=0 基线（2026-11-04 起跑）；证据包 `docs/validation/evidence/CONTRACTS-S7-DURABILITY/` |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -1588,6 +1589,24 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 临时件落点声明 | 本片临时目录 = `tmp/FIX-GAP-77-SYMLINK-ESCAPE/`（⑧c 前只增不删） |
 | R / D 基线 | R = 0、D = 0 |
 | 完成记录 | 审查链：① 双打（V4 Pro r1→Sol 红队 FINDINGS 2H+4M→r2 openat2 定稿；§1.7.4 临时授权已留痕）→ ③ 真实红（专属文案逐字命中）→ ②a 实现（+158/-12，唯一生产文件 bounddir_unix.go）→ ③b/③c 测试重构与整改 → ④ 门禁全绿 → ⑤ r2 PASS → ⑥ PASS → ⑦ PASS（0 发现）；停于 ⑩ 等授权→已闭环：提交 `7802819` 已推 origin（未推 gitee），run `41707160563` 首跑双腿全绿；R=0、D=0 |
+
+### P54 — `CONTRACTS-S7-DURABILITY`（Windows 耐久契约升级与 C6 落地 · 层 3 第 6 项）· 🔄 进行中
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `CONTRACTS-S7-DURABILITY`（契约与实现类；准则 v1.60；L 档） |
+| 状态 | 🔄 **进行中**（2026-11-04 起跑；锚点 HEAD = `2b8ac3e`；主控模型 = `DeepSeek V4 Pro`；R-02 裁定已批准立项） |
+| 目标 | Windows 平台发布耐久等级 `unproven` → `proven`：落实 C6 机制（ADR-013 候选编号；与 B3b C2 `MoveFileEx(MOVEFILE_WRITE_THROUGH)` 的关系由 ① 裁决），全面修订 `CONTRACTS.md` §7 |
+| 依赖 | P53 闭环（`7802819` + 回填 `2b8ac3e`）；R-02 裁定（2026-11-04 已批准） |
+| 规模 | L |
+| 步骤 | 步骤 0 → ① 架构（双打：V4 Pro + Sol 红队 §1.7.4 临时授权）→ ③ 红测先行（平台构建标签隔离）→ ② 实现（CONTRACTS 先行、接口签名不变）→ ④ 门禁（GOOS=windows/linux）→ ⑤ 预审 → ⑥ 扫描 → ⑦ 终审 → ⑧ 文档 → ⑨ 验证 → ⑧c → ⑩ 停点 |
+| 交付物 | `CONTRACTS{,_EN}` §7 修订（本片核心交付）；Windows 平台 C6 落地（publish 原语，Unix 零影响）；红绿反转证据；跨平台编译证据；六项文档同步（CONTRACTS/ARCHITECTURE/SECURITY/DEV_PLAN/ADR_REGISTER/REMAINING_SLICES，均 CN+EN）；报告与证据包 `docs/validation/evidence/CONTRACTS-S7-DURABILITY/` |
+| 边界 | 接口签名冻结；Unix 生产代码零改动（`GOOS=linux build/vet` 验证 + CI ubuntu 腿兜底，无需 Ubuntu VM）；不推 gitee；停 ⑩ 等授权 |
+| 分级 | `[SLICE]`（契约与实现类） |
+| ⑦ 额度 | Codex 1+3（L 档高配） |
+| 临时件落点声明 | 本片临时目录 = `tmp/CONTRACTS-S7-DURABILITY/`（⑧c 前只增不删；已随 ⑧c 清除） |
+| R / D 基线 | R = 1（②e 死代码迁移，发现后的修复重跑）、D = 1（§5.1 临时件纪律口径：`tmp/s7a-contrasts.js` 误放自愈档处置；另有偏离登记 1 条 = ⑧a 先于 ⑦ 的时序偏离，不并 D 计数） |
+| 完成记录 | 审查链：① 双打（r1 → 第一次 Sol 红队 `FINDINGS` → r2 → 第二次 Sol 红队 `FINDINGS` → r2b 闭合 → r2c 激活语义微修；两次红队原文归档于 `docs/validation/evidence/CONTRACTS-S7-DURABILITY/01-arch/red-team-sol-review.md` 与 `red-team-sol-review-r2.md`）→ ②a–d 实现（契约先行 + C6 预建槽 + 接缝收窄 + store 级激活）→ ③a–c 红测与 BA3 两臂重写 → ④ 门禁全绿（默认 / c6slot / linux 的 build 与 vet，以及 tree/index 两作用域）→ ⑤ `PRE-REVIEW: PASS WITH FIXES`（0H/0M/4L）→ ⑥ `INDEPENDENT SCAN: PASS` → ⑦ `FINAL REVIEW: PASS`（0C/0H/0M/0L；等价性论证 §7.2.1 口径通过）→ ⑧a 六文档同步 → ⑧b ⑦ 归档与簿记 → ⑨ 三作用域全绿 + `SELFTEST: PASS 697/697` → ⑧c 临时件清理 → ⑩ 停点等授权（首轮回执后按用户澄清补 ②e 死代码迁移 + ⑦ 复审 #1/3 `FINAL REVIEW: PASS` + ⑨ 重跑全绿）；状态行维持 🔄（⑩ 前不回写 ✅） |
 
 ## 已知缺陷（后续切片前处理）
 

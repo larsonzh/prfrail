@@ -1,0 +1,16 @@
+RED-BASELINE c6slot compile @ HEAD=2b8ac3e + staged test file (regenerated at 8b; original 3a capture was in tmp/ and removed at 8c; compile-level red reproduction)
+# github.com/larsonzh/prfrail/internal/adapters [github.com/larsonzh/prfrail/internal/adapters.test]
+internal\adapters\agent_runner_replay_store_c6_windows_test.go:65:18: store.PrebuildReplaySlots undefined (type *AgentRunnerReplayStore has no field or method PrebuildReplaySlots)
+internal\adapters\agent_runner_replay_store_c6_windows_test.go:99:22: undefined: replaySlotHeaderSize
+internal\adapters\agent_runner_replay_store_c6_windows_test.go:101:40: undefined: replaySlotMagic
+internal\adapters\agent_runner_replay_store_c6_windows_test.go:154:16: undefined: replaySlotHeaderSize
+internal\adapters\agent_runner_replay_store_c6_windows_test.go:155:120: undefined: replaySlotHeaderSize
+internal\adapters\agent_runner_replay_store_c6_windows_test.go:157:27: undefined: replaySlotMagic
+internal\adapters\agent_runner_replay_store_c6_windows_test.go:158:94: undefined: replaySlotMagic
+internal\adapters\agent_runner_replay_store_c6_windows_test.go:160:51: undefined: replaySlotMagic
+internal\adapters\agent_runner_replay_store_c6_windows_test.go:160:68: undefined: replaySlotHeaderSize
+internal\adapters\agent_runner_replay_store_c6_windows_test.go:164:13: undefined: replaySlotHeaderSize
+internal\adapters\agent_runner_replay_store_c6_windows_test.go:164:13: too many errors
+FAIL	github.com/larsonzh/prfrail/internal/adapters [build failed]
+FAIL
+

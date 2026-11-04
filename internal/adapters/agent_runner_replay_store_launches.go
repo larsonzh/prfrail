@@ -50,7 +50,7 @@ func (store *AgentRunnerReplayStore) RecordLaunchReceipt(receipt AgentRunnerLaun
 	if err != nil {
 		return "", err
 	}
-	persisted, foundRequest, err := replayStoreLoadRequestRecord(requestPath, body.RequestID)
+	persisted, foundRequest, err := store.readRequestRecordLocked(requestPath, body.RequestID)
 	if err != nil {
 		return "", err
 	}

@@ -209,7 +209,7 @@ Suspended (not scheduled): `G4B-CORPUS-DECOUPLE` (trigger-gated), the five low-p
 
 ## 10. One-line opener for a new session
 
-Here is my project state snapshot (v42): first check the five anchors in section 1; if they match, continue with the section-4 queue; otherwise report the repository reality.
+Here is my project state snapshot (v43): first check the five anchors in section 1; if they match, continue with the section-4 queue; otherwise report the repository reality.
 
 【paste this v43 checklist in full】
 

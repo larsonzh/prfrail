@@ -45,6 +45,12 @@
 
 SEC-02a 验证方法：T51-1 常驻回归断言拒绝闭集 {`ELOOP`, `ENOTDIR`, `EXDEV`} 与界内正向对照；F1 并发 rename 风暴；F2 bind mount 导入（环境受限可跳过并登记）；变异检验 `PRFRAIL_P53_RED_BASELINE=1 go test -run TestBoundDirRedBaselineMiddleSymlinkEscape`。
 
+### 3.1 replay 槽容器持久化完整性（C6 预建槽）
+
+槽读者按固定顺序校验并 fail-closed：magic → 总长与长度分类 → payloadLen 合法性 → payload 解码；任一步不符即 corruption，未提交槽（payloadLen=0）冻结为 absent 而不是空记录，半预建态与篡改（改写 magic、长度、payloadLen 或 payload 字节）都不能被读成合法记录。跨进程仲裁只用 `LockFileEx`：同一句柄内重入被拒、等待有界且可取消，锁序固定为 store 锁 → 槽锁，锁不跨外部等待，解锁与关闭句柄按既有释放序执行。
+
+装配记录 `prebuild-set.jsonl` 提供计划漂移检测：重开时声明集与该记录逐项不一致即按 corruption 拒绝。该记录丢失时漂移检测一并丢失，此为本片接受的有意降级（经用户 2026-11-04 裁定接受）：降级面封闭（R/C 绑定、孤儿判定、runID 校验照常执行，且 Windows `unproven` 阶段 first-dispatch 继续拒绝），因此无实际运行风险；不得把该降级读作「完整性已获证明」。
+
 ## 4. 秘密、网络与证据保留
 
 密码/token/MFA/私钥口令不经模型、不写配置/日志；secret-direct 只允许用户直达受控终端或凭据提供方，无能力则等待。只记录命令元数据、文件摘要和经脱敏结论；默认不录屏、不记录键击和完整 REPL 历史。秘密扫描无法保证识别所有秘密，需路径排除、白名单最小输入和人工审查共同防御。

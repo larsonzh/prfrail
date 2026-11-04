@@ -131,6 +131,52 @@ func replayStoreSyncParent(directory string) error {
 	return replayStoreSyncParentDirectory(directory)
 }
 
+// replayStorePrebuildSlotsFn is the C6 prebuilt-slot seam (CONTRACTS.md §7
+// 「C6 判定路径」, ADR-013). The shared layer only declares it: the single
+// assignment lives in agent_runner_replay_store_c6_enable.go, which is built
+// only for windows && c6slot. On Unix and on every unactivated build the seam is
+// therefore statically nil, which is what makes PrebuildReplaySlots a no-op
+// there without a second code path.
+//
+// Seam contract: it is called once per run, before the first dispatch, with the
+// full declared requestId set (never a batch, never a subset). It takes store.mu
+// itself, so it must not be called while the store lock is held, and a failure
+// is fail-closed for the whole run.
+var replayStorePrebuildSlotsFn func(store *AgentRunnerReplayStore, requestIDs []string) error
+
+// replayStoreSlotEnabled reports whether this build carries the C6 slot
+// implementation at all. It is the build capability bit, not a scheduling
+// decision. The shared layer only declares it, exactly like the prebuild seam
+// above: the single assignment lives in agent_runner_replay_store_c6_enable.go,
+// which is built only for windows && c6slot, so Unix and every unactivated build
+// keep it false and take the ordinary record path.
+//
+// Carrying the implementation is not enough to put a store on the slot path
+// (CONTRACTS.md §7 「A2 激活语义」): the decision is this capability bit, the
+// store's own slotsActive bit and the relevant hook being installed, and
+// slotsActive is only set when that store's PrebuildReplaySlots completed.
+var replayStoreSlotEnabled bool
+
+// The three hooks below are the C6 slot primitives behind the R/C publication
+// and read points (CONTRACTS.md §7 「C6 判定路径」, ADR-013). The shared layer
+// only declares them; the Windows C6 implementation assigns them at package
+// initialization, and every consumer first checks the build capability bit and
+// the store activation bit, so an unactivated build and an unprebuilt store both
+// keep their existing path.
+//
+// Seam contract: the publish hook receives the canonical JSONL payload the
+// ordinary publication would have written and must publish it into an existing
+// slot without creating, replacing or truncating a slot that already committed a
+// payload. The read hooks return the record the slot carries with the same
+// absent/corruption classification the plain record readers use. All three run
+// while the caller holds the store lock and may not carry decisions or call back
+// into the store.
+var (
+	replayStoreSlotPublishHook        func(path string, payload []byte) error
+	replayStoreSlotReadRequestHook    func(path, requestID string) (AgentRunnerRequestRecord, bool, error)
+	replayStoreSlotReadCompletionHook func(path, requestID string) (AgentRunnerCompletionRecord, bool, error)
+)
+
 // AgentRunnerReplayState describes replay-state visibility for one requestId.
 type AgentRunnerReplayState string
 
@@ -165,6 +211,13 @@ type AgentRunnerReplayStore struct {
 	publicationDurability  PublishDurability
 	mu                     sync.Mutex
 	afterRequestReadLocked func()
+	// slotsActive records whether this store instance's own PrebuildReplaySlots
+	// completed (first prebuild or reopen verification), which is what puts this
+	// store - and only this store - on the C6 slot path (CONTRACTS.md §7
+	// 「A2 激活语义」, ADR-013). It is guarded by mu, memory only, never
+	// persisted, and never cleared during the run: it is rebuilt by the same
+	// call on every run rather than recovered from disk.
+	slotsActive bool
 	// boundDirs holds the per-request evidence directory handles bound by
 	// RunEvidenceDir (P42 Q2). The handle, not the path, is the evidence identity:
 	// an ancestor renamed away after the bind cannot redirect a later read.
@@ -273,6 +326,25 @@ func (store *AgentRunnerReplayStore) PublicationDurability() PublishDurability {
 		return PublishDurabilityUnproven
 	}
 	return PublishDurabilityProven
+}
+
+// PrebuildReplaySlots prebuilds the fixed request/completion slots of a run
+// (CONTRACTS.md §7 「C6 判定路径」, ADR-013). The production assembly calls it
+// once, after the store exists and before the first dispatch, with the full
+// declared requestId set.
+//
+// The method is a seam reader and nothing else: while no C6 implementation is
+// activated in this build the seam is nil, so it returns nil without touching
+// the receiver - a nil receiver included - and without touching the filesystem.
+// Every C6 validation of requestIDs therefore lives behind the seam, which is
+// why the call site can stay shared by every platform and why the "err != nil
+// means fail-closed" branch is unreachable on a build that never assigns the
+// seam.
+func (store *AgentRunnerReplayStore) PrebuildReplaySlots(requestIDs []string) error {
+	if replayStorePrebuildSlotsFn == nil {
+		return nil
+	}
+	return replayStorePrebuildSlotsFn(store, requestIDs)
 }
 
 // State returns the replay state visible for requestID.
@@ -432,7 +504,7 @@ func (store *AgentRunnerReplayStore) RecordCompletion(request AgentRunnerRequest
 	collided := false
 	for attempt := 0; attempt < replayStoreReadCollisionRetries; attempt++ {
 		if !collided {
-			err = writeReplayRecordNoReplace(path, completion)
+			err = store.publishReplayRCNoReplace(path, completion)
 			if err == nil {
 				return false, nil
 			}
@@ -444,7 +516,7 @@ func (store *AgentRunnerReplayStore) RecordCompletion(request AgentRunnerRequest
 			// during a visibility gap and replace a different terminal receipt.
 			collided = true
 		}
-		visible, found, loadErr := replayStoreLoadCompletionRecord(path, requestID)
+		visible, found, loadErr := store.readCompletionRecordLocked(path, requestID)
 		if loadErr != nil {
 			return false, loadErr
 		}
@@ -501,7 +573,7 @@ func (store *AgentRunnerReplayStore) ensureRequestLocked(record AgentRunnerReque
 	collided := false
 	for attempt := 0; attempt < replayStoreReadCollisionRetries; attempt++ {
 		if !collided {
-			err = writeReplayRecordNoReplace(path, record)
+			err = store.publishReplayRCNoReplace(path, record)
 			if err == nil {
 				return record, true, nil
 			}
@@ -512,7 +584,7 @@ func (store *AgentRunnerReplayStore) ensureRequestLocked(record AgentRunnerReque
 			// visibility gap cannot replace the durable request record.
 			collided = true
 		}
-		existing, found, loadErr := replayStoreLoadRequestRecord(path, record.Request.RequestID)
+		existing, found, loadErr := store.readRequestRecordLocked(path, record.Request.RequestID)
 		if loadErr != nil {
 			return AgentRunnerRequestRecord{}, false, loadErr
 		}
@@ -531,12 +603,34 @@ func (store *AgentRunnerReplayStore) ensureRequestLocked(record AgentRunnerReque
 	return AgentRunnerRequestRecord{}, false, fmt.Errorf("%w: request winner not visible after no-replace collision for requestId %s", ErrAgentRunnerReplayStoreConvergence, record.Request.RequestID)
 }
 
+// readRequestRecordLocked is the store-level request read entry point
+// (CONTRACTS.md §7 「A2 激活语义」, ADR-013). The slot form is reached only when
+// this build carries the slot implementation, this store's own prebuild
+// completed, and the read hook is installed; every other case is the ordinary
+// record reader unchanged. The caller holds store.mu.
+func (store *AgentRunnerReplayStore) readRequestRecordLocked(path, requestID string) (AgentRunnerRequestRecord, bool, error) {
+	if replayStoreSlotEnabled && store.slotsActive && replayStoreSlotReadRequestHook != nil {
+		return replayStoreSlotReadRequestHook(path, requestID)
+	}
+	return replayStoreLoadRequestRecord(path, requestID)
+}
+
+// readCompletionRecordLocked is readRequestRecordLocked for the completion slot:
+// same three conditions, same fallback to the ordinary reader. The caller holds
+// store.mu.
+func (store *AgentRunnerReplayStore) readCompletionRecordLocked(path, requestID string) (AgentRunnerCompletionRecord, bool, error) {
+	if replayStoreSlotEnabled && store.slotsActive && replayStoreSlotReadCompletionHook != nil {
+		return replayStoreSlotReadCompletionHook(path, requestID)
+	}
+	return replayStoreLoadCompletionRecord(path, requestID)
+}
+
 func (store *AgentRunnerReplayStore) loadRequestLocked(requestID string) (AgentRunnerRequestRecord, bool, error) {
 	path, err := store.requestPath(requestID)
 	if err != nil {
 		return AgentRunnerRequestRecord{}, false, err
 	}
-	record, found, err := replayStoreLoadRequestRecord(path, requestID)
+	record, found, err := store.readRequestRecordLocked(path, requestID)
 	if err != nil || !found {
 		return record, found, err
 	}
@@ -551,7 +645,7 @@ func (store *AgentRunnerReplayStore) loadCompletionLocked(requestID string) (Age
 	if err != nil {
 		return AgentRunnerCompletionRecord{}, false, err
 	}
-	record, found, err := replayStoreLoadCompletionRecord(path, requestID)
+	record, found, err := store.readCompletionRecordLocked(path, requestID)
 	if err != nil || !found {
 		return record, found, err
 	}
@@ -628,6 +722,10 @@ func (store *AgentRunnerReplayStore) pathForRequestID(requestID, folder, prefix 
 	return path, nil
 }
 
+// loadRequestRecord is the plain request record reader. The C6 slot decision is
+// not taken here: it lives on the store (readRequestRecordLocked), so a store
+// that was never activated keeps reading the ordinary record it always wrote
+// (CONTRACTS.md §7 「A2 激活语义」).
 func loadRequestRecord(path, requestID string) (AgentRunnerRequestRecord, bool, error) {
 	// P42 C3: one open, and the bytes come from that handle. The previous
 	// os.ReadFile resolved the path a second time, so an artifact swapped after a
@@ -649,6 +747,9 @@ func loadRequestRecord(path, requestID string) (AgentRunnerRequestRecord, bool, 
 	return record, true, nil
 }
 
+// loadCompletionRecord is the plain completion record reader, for the same
+// reason as loadRequestRecord: the slot decision belongs to the store, not to
+// the free reader.
 func loadCompletionRecord(path, requestID string) (AgentRunnerCompletionRecord, bool, error) {
 	// P42 C3: same-handle read, exactly as loadRequestRecord.
 	wire, err := readAgentRunnerArtifactBytes(path, replayStoreRecordBound)
@@ -666,6 +767,31 @@ func loadCompletionRecord(path, requestID string) (AgentRunnerCompletionRecord, 
 		return AgentRunnerCompletionRecord{}, false, replayStoreCorruption(path, fmt.Sprintf("completion requestId mismatch on disk (want %s, got %s)", requestID, record.Completion.RequestID), nil)
 	}
 	return record, true, nil
+}
+
+// publishReplayRCNoReplace is the request/completion publication point
+// (CONTRACTS.md §7 「C6 判定路径」, ADR-013). Only the two R/C publish points call
+// it, and both hold store.mu. The slot form is reached only when this build
+// carries the slot implementation, this store's own prebuild completed, and the
+// publish hook is installed (CONTRACTS.md §7 「A2 激活语义」); every other case
+// calls writeReplayRecordNoReplace unchanged.
+//
+// The slot container is R/C-only by contract. Every other store-local record
+// (ownership, launch receipts and identities, terminal intents and closures, the
+// prebuild set) keeps calling writeReplayRecordNoReplace directly; migrating one
+// of them into the container is not a local decision.
+func (store *AgentRunnerReplayStore) publishReplayRCNoReplace(path string, record any) error {
+	if !replayStoreSlotEnabled || !store.slotsActive || replayStoreSlotPublishHook == nil {
+		return writeReplayRecordNoReplace(path, record)
+	}
+	canonical, err := evidence.EncodeCanonical(record)
+	if err != nil {
+		return err
+	}
+	// The same payload writeReplayRecordNoReplace writes: canonical JSON plus the
+	// JSONL newline. The slot container holds it byte for byte.
+	payload := append(canonical, '\n')
+	return replayStoreSlotPublishHook(path, payload)
 }
 
 func writeReplayRecordNoReplace(path string, record any) error {

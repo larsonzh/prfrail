@@ -49,7 +49,7 @@ func (store *AgentRunnerReplayStore) RecordTerminalIntent(intent AgentRunnerTerm
 	if err != nil {
 		return "", err
 	}
-	persisted, foundRequest, err := replayStoreLoadRequestRecord(requestPath, body.RequestID)
+	persisted, foundRequest, err := store.readRequestRecordLocked(requestPath, body.RequestID)
 	if err != nil {
 		return "", err
 	}

@@ -1,0 +1,5 @@
+CROSS-PLATFORM GOOS=linux go build ./... && go vet ./...
+
+build exit=0
+
+vet exit=0

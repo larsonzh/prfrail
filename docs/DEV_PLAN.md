@@ -161,6 +161,8 @@ T027 前置状态更新（2026-10-31，DOCS-ALIGNMENT）：本片把 DEV_PLAN、
 
 补录说明（2026-10-22，切片 DIRECTIVE-COST-TIER 的步骤 0）：上述三片完成时均未按 §11.2 回写本节，属规范偏离——`G6-5` / `G6-7` 不覆盖本域（两判据的检查对象不包含 DEV_PLAN 的 T027 前置状态段落），故该偏离在门禁上不可见；本次一并补录三段，字段一律取自各片自己的验证报告，只记报告路径、不记提交号与 CI 运行号，且不改写 `T027` 的状态字段。
 
+T027 前置状态更新（2026-11-04，P54 CONTRACTS-S7-DURABILITY）：在上一段基础上，T027-B 的**发布耐久项**更新为已完成（契约与实现类切片，非平台升级）：`docs/CONTRACTS{,_EN}.md` §7 新增「C6 判定路径」与附件 C 允许集表，Windows C6 预建槽机制与 store 级激活已落地（装配层 `PrebuildReplaySlots` + 16B 头槽容器 + 六阶段写入 + `prebuild-set.jsonl`），并经两轮 Sol 红队与 ⑤ 预审 `PASS WITH FIXES`（0H/0M/4L）、⑥ 独立扫描 `PASS` 复核。**平台边界不变**：Windows 平台发布耐久等级仍为 `unproven`，first-dispatch 继续拒绝，任何文档不得写成 `proven`；C2 候选级结论不改写（引用须带「（仅限前提 P′；P′ 覆盖物理机目标部署环境未论证）」完整括注）；**AT-23 不豁免**，T027 仍 `BLOCKED / NOT IMPLEMENTED`。证据：[中文](validation/contracts-s7-durability.md) / [English](validation/contracts-s7-durability_EN.md)，证据包 `docs/validation/evidence/CONTRACTS-S7-DURABILITY/`。
+
 ### 11 月重构里程碑（T027-B）
 
 - P37 判定基线：C1–C7 缺陷判定与修复基线（P38 施工图给文件/函数级测试矩阵；报告 `docs/validation/t027b-breakthrough{,_EN}.md`、`docs/validation/t027b-tactical-blueprint{,_EN}.md`）
@@ -179,6 +181,7 @@ T027 前置状态更新（2026-10-31，DOCS-ALIGNMENT）：本片把 DEV_PLAN、
 - P51 console 多任务 CLI 接线：`--request-records` 可重复声明逐任务请求记录并注入 `RequestRecords` 注册表，单值 `--request-record` 兼容保留，全部拒绝面零写入（报告 `docs/validation/console-cli-multitask-wiring{,_EN}.md`）
 - P52 验收反例：接受链安全反例已覆盖（P52 `ACCEPTANCE-SECURITY-COUNTEREXAMPLES`，含 GAP-77 击穿登记与 P53 修复指向；生产代码零改动；报告 `docs/validation/acceptance-security-counterexamples{,_EN}.md`）
 - P53 修复：GAP-77 中间符号链接逃逸已修复（openat2 单次受限解析加 fail-closed，无 walk 降级；T51-1 红转绿并常驻回归，含 F1/F2 反例；规范同步 SECURITY SEC-02 与 TEST_STRATEGY AT-02；报告与证据包 `docs/validation/evidence/FIX-GAP-77-SYMLINK-ESCAPE/`；实现与审查完成，停于 ⑩ 等授权）
+- P54 发布耐久：C6 预建槽机制落地（契约先行：§7 C6 判定路径 + 附件 C；Windows `unproven` 不变、AT-23 不豁免；报告 `docs/validation/contracts-s7-durability{,_EN}.md`；证据包 `docs/validation/evidence/CONTRACTS-S7-DURABILITY/`）
 
 ## 3. 需求映射
 

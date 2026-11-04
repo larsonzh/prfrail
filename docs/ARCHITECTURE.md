@@ -99,6 +99,16 @@ baseline、已接受快照、最终报告及失败证据默认保留；候选/�
 - attempt 解析（P43）：`TaskAttemptResolver` 是唯一真源，缺省从事件投影派生；工作区物化、候选冻结、评审、发布、postflight 事实提取与 operator / terminal 路由全部使用同一解析值，实体键按 `taskID + attempt` 记账。
 - 释放序（P48）：文件锁的释放与路径的物理删除按「先删除路径、再释放锁、最后关闭句柄」执行，使扫描者观察不到「锁空闲 + 路径仍在」的组合态；删除失败时锁无条件释放，残留由同进程所有权门与下一次扫描的路径复核收敛，不在释放路径内重试。
 
+### 4.3 Windows 发布耐久落盘机制（C6 预建槽）
+
+C6（ADR-013 候选编号）把 R/C 记录的发布可见性从「目录项创建」搬到「槽内头标志提交」：每个 requestId 的 R/C 槽文件由生产装配层在首次派发前一次性预建（`PrebuildReplaySlots`，在 `NewAgentRunnerReplayStoreForRun` 返回之后调用，不改构造器签名），此后目录项永不重建或替换；预建失败即整个 run fail-closed，部分成功不视为可用。槽容器 = 16B 固定头（8B magic `PRSLOT1\0` + uint64le payloadLen）+ payload（canonical JSONL，与既有 R/C 文件内容逐字节一致）。
+
+写入按六阶段推进：建槽（temp → 数据 flush → no-replace 移动）→ 写 payload → flush #1 → 写头（payloadLen 0→len）→ flush #2 → 解锁。三个判定时点为：头写可见点（`slot-header-written`）、头同步耐久点（`slot-header-synced`）、解锁点；「payload 已写、头未提交」的读者可见结果恒冻结为 absent，校验顺序固定为 magic → 长度 → payloadLen → 解码，任一步不符即 corruption fail-closed。允许集按（切点 × 场景）分列，进程 kill 与断电恢复两种场景不得混用（表见 `docs/CONTRACTS.md` §7 附件 C）。
+
+激活语义为「构建能力位 ∧ store 激活位」：只有构建携带槽实现，且该 store 本次预建成功（首次预建或重开核验）时，该 store 的 R/C 发布与读取才走槽路径；未激活 store 维持普通记录路径。replay root 内落一条 `prebuild-set.jsonl` 装配记录，重开时声明集必须与其逐项一致，不一致按 corruption；记录丢失时漂移检测一并丢失，此为本片接受的有意降级（经用户 2026-11-04 裁定接受），降级面封闭且无实际运行风险。
+
+门禁不变：本机制不改变平台发布耐久等级判定，Windows 等级仍为 `unproven` 且 first-dispatch 继续拒绝；C2 候选级 `proven`（仅限前提 P′；P′ 覆盖物理机目标部署环境未论证）不被本机制继承或改写。
+
 ## 5. 关键取舍
 
 | 决策 | 理由 | 代价/控制 |

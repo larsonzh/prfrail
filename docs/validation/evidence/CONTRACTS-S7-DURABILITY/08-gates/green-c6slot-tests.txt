@@ -1,0 +1,3 @@
+GREEN c6slot tests @ current tree (go test -tags c6slot -count=1 ./internal/adapters/)
+ok  	github.com/larsonzh/prfrail/internal/adapters	40.431s
+

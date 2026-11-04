@@ -183,6 +183,17 @@ func ExecuteAgentRunnerRun(ctx context.Context, options AgentRunnerAssemblyOptio
 		return RunSummary{}, err
 	}
 
+	// Step 3b (CONTRACTS.md §7 「C6 判定路径」, ADR-013): prebuild the fixed R/C
+	// slots with the full declared requestId set before anything can dispatch.
+	// The call site is shared by every platform: without an activated C6
+	// implementation the method is a no-op that returns nil, so its error branch
+	// is unreachable and Unix behaviour is unchanged. With one activated, any
+	// failure is fail-closed for the whole run: no dispatch happens and a
+	// partially prebuilt set stays unusable.
+	if err := store.PrebuildReplaySlots(agentRunnerAssemblyRequestIDs(records)); err != nil {
+		return RunSummary{}, err
+	}
+
 	// Step 4: the snapshot store and the shared capture protocol.
 	snapshotRoot := filepath.Join(options.RunRoot, agentRunnerSnapshotStoreDirectory)
 	snapshotStore, err := snapshot.NewStore(snapshotRoot, 0)
@@ -1113,6 +1124,18 @@ func agentRunnerAssemblyRecords(options AgentRunnerAssemblyOptions, plan []agent
 		bound[record.Request.RequestID] = struct{}{}
 	}
 	return records, nil
+}
+
+// agentRunnerAssemblyRequestIDs returns the requestId set of the validated
+// assembly records in dictionary order. It is the full declared set the C6
+// prebuild contract requires: never a batch and never a subset.
+func agentRunnerAssemblyRequestIDs(records []adapters.AgentRunnerRequestRecord) []string {
+	requestIDs := make([]string, 0, len(records))
+	for _, record := range records {
+		requestIDs = append(requestIDs, record.Request.RequestID)
+	}
+	sort.Strings(requestIDs)
+	return requestIDs
 }
 
 // agentRunnerBindTasks builds the per-task ports. Everything a task can launch,

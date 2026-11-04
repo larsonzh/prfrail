@@ -1,0 +1,19 @@
+GATE READINGS @ 2026-11-04 8b/9 (three scopes + SELFTEST; all TOTAL_FAIL=0)
+=== tree ===
+
+TOTAL_FAIL=0
+
+
+=== index ===
+
+TOTAL_FAIL=0
+
+
+=== ci ===
+
+TOTAL_FAIL=0
+
+
+=== selftest ===
+SELFTEST: PASS 697/697
+

@@ -45,6 +45,12 @@ Test IDs resolve in [TEST_STRATEGY_EN.md](TEST_STRATEGY_EN.md). Every mandatory 
 
 SEC-02a verification: the T51-1 resident regression asserts the refusal closed set {`ELOOP`, `ENOTDIR`, `EXDEV`} plus an in-bound positive control; F1 is the concurrent rename storm; F2 is the bind mount import (skippable with registration when the environment cannot grant it); the mutation check is `PRFRAIL_P53_RED_BASELINE=1 go test -run TestBoundDirRedBaselineMiddleSymlinkEscape`.
 
+### 3.1 Replay Slot Container Persistence Integrity (C6 prebuilt slots)
+
+Slot readers validate in a fixed order and fail closed: magic → total length and length class → payloadLen validity → payload decode; any mismatch is corruption, an uncommitted slot (payloadLen=0) freezes as absent rather than as an empty record, and neither a half-prebuilt state nor tampering (rewriting magic, length, payloadLen or payload bytes) can be read as a valid record. Cross-process arbitration uses only `LockFileEx`: re-entry in the same handle is refused, waits are bounded and cancellable, the lock order is fixed as the store lock → the slot lock, a lock never spans an external wait, and unlock and handle close follow the existing release order.
+
+The `prebuild-set.jsonl` assembly record provides plan-drift detection: on reopen a declared set that differs from that record item by item is refused as corruption. When the record is lost the drift detection is lost with it, which is the intentional degradation accepted by this slice (accepted per the user ruling of 2026-11-04): the degradation surface is closed (R/C binding, orphan detection and runID checks still run, and first-dispatch is still refused while Windows stays `unproven`), so there is no real operational risk; the degradation must not be read as "integrity proven".
+
 ## 4. Secrets, Network and Retention
 
 Passwords/tokens/MFA/passphrases never pass through models or config/logs. secret-direct goes only to a controlled terminal/provider; wait if unavailable. Record command metadata, hashes and redacted conclusions, not screens, keystrokes or complete REPL history by default. Scanning cannot recognize every secret; combine excluded paths, minimal allowlisted input and human review.
