@@ -51,6 +51,8 @@ Fixed `tmp` assertion: top level = `.gitkeep` + `gates-cache`; `gates-cache` hol
 | v1.62 | P58 | `f798cea` + `8d30e66` | closed (assessment class; R = 0, D = 0; runs `42062391497` + `42069357349` both green; P7 no slice, row kept) |
 | v1.63 | P59 | `75b90a8` | closed (governance class; R = 0, D = 0; run `42121119502` green on the first attempt; R-12 ruled A2×B1×Y1 landed) |
 
+> **Note on the D column in §3**: each "D = n" in this table is shorthand for the temp-artefact discipline-violation count (§5.1), synonymous with "temp-artefact D" in §2 / §11; the deviation-table D-1..D-n in a report's "anomaly handling" chapter is an independent sequence (§5.1 "naming distinction"), and the two are not interchangeable. P58's "D = 0" means no temp-artefact violation; its 6 deviations are in the "metering" row of §2 and P58 report §8.
+
 ## 4. Execution queue
 
 **Ordering basis of this version**: layer 0 is dequeued, layer 2's first item (P7) was dequeued by P58, and layer 2's second item (G-3 / P59) is dequeued by P59; the only main line remains the layer-1 hard gate (blocked until R-08 / R-09 rule); layer 2 keeps one governance slice parked until named; layer 3 stays unstarted. The in-layer order is fixed and layers do not jump.
