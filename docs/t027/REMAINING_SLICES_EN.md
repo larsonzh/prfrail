@@ -86,6 +86,7 @@
 | P53 FIX-GAP-77-SYMLINK-ESCAPE | ✅ Completed | P52 | M | 2026-11-04 | Fix GAP-77 (single constrained openat2 resolution + fail-closed); T51-1 red-to-green + F1/F2 counterexamples; spec sync SEC-02/AT-02; `7802819` pushed to origin (never gitee), run `41707160563` green on the first attempt on both legs; R=0, D=0 |
 | P54 CONTRACTS-S7-DURABILITY | ✅ Done (2026-11-04; commit `7c0763a` pushed to origin, never gitee; run `41840557379` green on the first attempt on both legs; R=1, D=1) | P53 | L | — | R/D=0 baseline (started 2026-11-04); evidence package `docs/validation/evidence/CONTRACTS-S7-DURABILITY/` |
 | P55 EXIT-SEED-BUILD-EVIDENCE | ✅ Done (2026-11-05; commit `63e2e24` pushed to origin, not pushed to gitee) | P54 | M | — | report `docs/validation/exit-seed-build-evidence{,_EN}.md`; evidence package `docs/validation/evidence/EXIT-SEED-BUILD-EVIDENCE/`; R = 0, D = 1 |
+| P56 G4B-CORPUS-DECOUPLE | ✅ Done (2026-11-05; directive v1.61; R=2, D=1) | P55 | M | — | report `docs/validation/g4b-corpus-decouple{,_EN}.md`; evidence package `docs/validation/evidence/G4B-CORPUS-DECOUPLE/`; `SELFTEST: PASS 703/703` |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1614,6 +1615,28 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | R / D baseline | R = 0, D = 1 (D = 1: early start without a trigger word, corrected by a forced interruption from the user, converted in place, no contamination; registered in the report's anomaly section) |
 | 8a progress record (2026-11-05) | Evidence package `docs/validation/evidence/EXIT-SEED-BUILD-EVIDENCE/` (53 payload files + `MANIFEST.md` + `SHA256SUMS.txt`, hashes equal on all three sides); review chain 3 two rounds `TEST: DONE` → 5 `PRE-REVIEW: PASS WITH FIXES` (two rounds) → 6 `INDEPENDENT SCAN: PASS` → 7 `FINAL REVIEW: PASS WITH FIXES` (1 Low item fixed); R = 0, D = 1; status stays 🔄 In progress (not flipped to ✅ before the 10 stop point) |
 | Completion record | Report pair `docs/validation/exit-seed-build-evidence{,_EN}.md`; review chain 3x2 `TEST: DONE` -> 5x2 `PRE-REVIEW: PASS WITH FIXES` -> 6 `INDEPENDENT SCAN: PASS` -> 7 `FINAL REVIEW: PASS WITH FIXES` (1 Low fixed) -> 9 three scopes green plus `SELFTEST: PASS 697/697` and the three Go legs green -> 8c temp artefacts cleared; R = 0, D = 1 |
+
+### P56 — `G4B-CORPUS-DECOUPLE` (G4b corpus enumeration decoupled from the index · criterion optimisation) · ✅ Done
+
+| Field | Content |
+|---|---|
+| Identifier | `G4B-CORPUS-DECOUPLE` (criterion-optimisation class; directive v1.60; size M) |
+| Status | ✅ **Done** (started and closed 2026-11-05; start anchor HEAD = `f021af1`, the v45 snapshot commit; controller model = `DeepSeek V4.1 Flash`) |
+| Goal | Close OB-120: switch the tree/index branch of `ctx.listAllMarkdown()` from index enumeration (`git ls-files`) to object-store enumeration (`git ls-tree -r --name-only HEAD`), decoupling the G4b corpus from the staging state so that a cache hit and a cold run agree |
+| Depends on | P55 closed (`63e2e24` + backfill `c76c6ce`); OB-120 registered (directive §12.4); the cache clause of P27 `G4b-CACHE` |
+| Size | M |
+| Steps | Step 0 → 1 architecture (**skipped**, explicitly disabled by start message [0, 3]) → 2 implementation (`ctx.js` enumeration + `g4b.js` cache bump) → 3 tests (including the cold/hot equivalence mutation for a staged `.md` deletion) → 4 gates → 5 pre-review → 6 scan → 7 final review → 8 docs → 9 native validation → 8c → 10 stop point |
+| Current gap | After a staged `.md` deletion the cold-run corpus shrinks below the HEAD truth ⇒ false positives; the same input can yield different verdicts on the cache-hit and cold paths (OB-120 measured warm=PASS / cold=FAIL) |
+| Deliverables | `tools/gates/lib/ctx.js`, `tools/gates/lib/criteria/g4b.js`, `tools/gates/selftest.js`; report pair `docs/validation/g4b-corpus-decouple{,_EN}.md`; evidence package `docs/validation/evidence/G4B-CORPUS-DECOUPLE/`; directive v1.61 with its §0.3 row and appendix C.0ar |
+| Acceptance evidence | Identical verdicts between cold and hot runs when a `.md` is staged-deleted (new mutation assertion plus mutation testing); `--selftest` and the three scopes at `TOTAL_FAIL=0`; a before/after timing table |
+| Boundary | No other criterion body touched; no `internal/**` / CONTRACTS / schema / fixtures / workflows change; `DEV_PLAN` not updated (governance slices never write it back); never push gitee; stop at 10 and wait for authorisation |
+| Class | `[SLICE]` (criterion optimisation) |
+| Review-7 budget | `GPT-5.3-Codex (copilot)` 1+2 (size M) |
+| Temp artefact location | `tmp/G4B-CORPUS-DECOUPLE/` (append-only until 8c) |
+| R / D baseline | R = 0, D = 0 |
+| Freedom-list path | `docs/validation/evidence/G4B-CORPUS-DECOUPLE/freedom-list.md` |
+| 8a progress record (2026-11-05) | `tools/gates/lib/ctx.js` / `g4b.js` / `selftest.js` changed; `SELFTEST` 697 to 703 (T114-T118); two 5 rounds, one 6 round and three 7 rounds closed; R = 2, D = 1 |
+| Completion record | Report pair `docs/validation/g4b-corpus-decouple{,_EN}.md`; the 6 output transcribed verbatim in a `sixstage` fence; 9 three scopes green plus `SELFTEST: PASS 703/703`; 8c temp artefacts cleared; R = 2 (the 5 Low drove T117, the 7 r1 findings drove T118 / MANIFEST), D = 1 (a subagent created `tmp/g4bcd/` in the wrong location and deleted it; the controller verified zero residue) |
 
 ## Known defects (to be handled before later slices)
 

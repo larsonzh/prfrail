@@ -86,6 +86,7 @@
 | P53 FIX-GAP-77-SYMLINK-ESCAPE | ✅ 已完成 | P52 | M | 2026-11-04 | 修复 GAP-77（openat2 单次受限解析 + fail-closed）；T51-1 红转绿 + F1/F2 反例；规范同步 SEC-02/AT-02；`7802819` 已推 origin（未推 gitee），run `41707160563` 首跑双腿全绿；R=0、D=0 |
 | P54 CONTRACTS-S7-DURABILITY | ✅ 已完成（2026-11-04；commit `7c0763a` 推送 origin 未推 gitee；run `41840557379` 首跑双绿；R=1、D=1） | P53 | L | — | R/D=0 基线（2026-11-04 起跑）；证据包 `docs/validation/evidence/CONTRACTS-S7-DURABILITY/` |
 | P55 EXIT-SEED-BUILD-EVIDENCE | ✅ 已完成（2026-11-05；commit `63e2e24` 推送 origin，未推 gitee） | P54 | M | — | 报告 `docs/validation/exit-seed-build-evidence{,_EN}.md`；证据包 `docs/validation/evidence/EXIT-SEED-BUILD-EVIDENCE/`；R = 0、D = 1 |
+| P56 G4B-CORPUS-DECOUPLE | ✅ 已完成（2026-11-05；准则 v1.61；R=2、D=1） | P55 | M | — | 报告 `docs/validation/g4b-corpus-decouple{,_EN}.md`；证据包 `docs/validation/evidence/G4B-CORPUS-DECOUPLE/`；`SELFTEST: PASS 703/703` |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -1627,6 +1628,28 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | R / D 基线 | R = 0、D = 1（D = 1：无触发词抢跑，经用户强制打断纠正，就地转正，未造成污染；登记于报告「异常与兜底记录」章） |
 | ⑧a 进度记录（2026-11-05） | 证据包 `docs/validation/evidence/EXIT-SEED-BUILD-EVIDENCE/`（53 件载荷 + `MANIFEST.md` + `SHA256SUMS.txt`，哈希三方相等）；审查链 ③ 两轮 `TEST: DONE` → ⑤ `PRE-REVIEW: PASS WITH FIXES`（两轮）→ ⑥ `INDEPENDENT SCAN: PASS` → ⑦ `FINAL REVIEW: PASS WITH FIXES`（1 项 Low 已修）；R = 0、D = 1；状态保持 🔄 进行中（⑩ 停点前不翻 ✅） |
 | 完成记录 | 报告对 `docs/validation/exit-seed-build-evidence{,_EN}.md`；审查链 ③×2 `TEST: DONE` → ⑤×2 `PRE-REVIEW: PASS WITH FIXES` → ⑥ `INDEPENDENT SCAN: PASS` → ⑦ `FINAL REVIEW: PASS WITH FIXES`（1 Low 已修）→ ⑨ 三作用域全绿 + `SELFTEST: PASS 697/697`、Go 三腿全绿 → ⑧c 临时件清零；R = 0、D = 1 |
+
+### P56 — `G4B-CORPUS-DECOUPLE`（G4b 语料枚举与索引解耦 · 判据优化）· ✅ 已完成
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `G4B-CORPUS-DECOUPLE`（判据优化类；准则 v1.60；M 档） |
+| 状态 | ✅ **已完成**（2026-11-05 起跑并收尾；起跑锚点 HEAD = `f021af1`，即 v45 快照提交；主控模型 = `DeepSeek V4.1 Flash`） |
+| 目标 | 消除 OB-120：把 `ctx.listAllMarkdown()` 的 tree/index 分支从索引枚举（`git ls-files`）改为对象库枚举（`git ls-tree -r --name-only HEAD`），使 G4b 语料与工作区暂存状态解耦，令缓存命中与冷跑判定一致 |
+| 依赖 | P55 闭环（`63e2e24` + 回填 `c76c6ce`）；OB-120 登记（准则 §12.4）；P27 `G4b-CACHE` 的缓存条款 |
+| 规模 | M |
+| 步骤 | 步骤 0 → ① 架构（**跳过**，起跑消息【〇、3】明示不启用）→ ② 实现（`ctx.js` 枚举 + `g4b.js` 缓存升版）→ ③ 测试（含暂存删除 `.md` 的冷热等价变异）→ ④ 门禁 → ⑤ 预审 → ⑥ 扫描 → ⑦ 终审 → ⑧ 文档 → ⑨ 验证 → ⑧c → ⑩ 停点 |
+| 现状缺口 | 暂存删除 `.md` 后冷跑语料相对 HEAD 真值收缩 ⇒ 假阳性；同一输入在缓存命中与冷跑两条路径可给出不同 verdict（OB-120 实测 warm=PASS / cold=FAIL） |
+| 交付物 | `tools/gates/lib/ctx.js`、`tools/gates/lib/criteria/g4b.js`、`tools/gates/selftest.js`；报告对 `docs/validation/g4b-corpus-decouple{,_EN}.md`；证据包 `docs/validation/evidence/G4B-CORPUS-DECOUPLE/`；准则 v1.61 的 §0.3 行与附录 C.0ar |
+| 验收证据 | 暂存删除 `.md` 场景下冷跑与热跑 verdict 全等（新增变异断言 + 变异检验）；`--selftest` 与三作用域 `TOTAL_FAIL=0`；改前/改后耗时对比表 |
+| 边界 | 不改其它判据本体；不动 `internal/**` / CONTRACTS / schema / fixtures / workflows；不改 `DEV_PLAN`（治理片不回写）；不推 gitee；停 ⑩ 等授权 |
+| 分级 | `[SLICE]`（判据优化类） |
+| ⑦ 额度 | `GPT-5.3-Codex (copilot)` 1+2（M 档） |
+| 临时件落点声明 | `tmp/G4B-CORPUS-DECOUPLE/`（⑧c 前只增不删） |
+| R / D 基线 | R = 0、D = 0 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/G4B-CORPUS-DECOUPLE/freedom-list.md` |
+| ⑧a 进度记录（2026-11-05） | `tools/gates/lib/ctx.js` / `g4b.js` / `selftest.js` 已改；`SELFTEST` 697 → 703（T114–T118）；⑤ 两轮、⑥ 一轮、⑦ 三轮全部闭链；R = 2、D = 1 |
+| 完成记录 | 报告对 `docs/validation/g4b-corpus-decouple{,_EN}.md`；⑥ 输出按 `sixstage` 围栏逐字转录；⑨ 三作用域全绿 + `SELFTEST: PASS 703/703`；⑧c 临时件清零；R = 2（⑤ Low 补测 T117、⑦ r1 整改 T118 / MANIFEST）、D = 1（子代理在 `tmp/g4bcd/` 误建临时目录并自删，主控复核零残留） |
 
 ## 已知缺陷（后续切片前处理）
 

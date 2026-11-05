@@ -36,8 +36,11 @@ const WHITELIST_REL = 'tools/gates/cjk-newwords.txt';
  * digest, but `ctx.listAllMarkdown` / `ctx.showAt` live in ctx.js and are
  * NOT - if their enumeration or read semantics change (e.g. a new suffix or
  * ref), every entry written under the old semantics is stale and must miss.
+ * This slice (G4B-CORPUS-DECOUPLE) changed the enumeration semantics of
+ * `ctx.listAllMarkdown()` (index -> object store), so under the same obligation
+ * every entry written before the bump is treated as stale.
  */
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = 'v2';
 
 function cjkChars(s) {
   const o = new Set();
@@ -111,7 +114,9 @@ function keyString(ctx, whitelist) {
   return [
     CACHE_VERSION,
     rs === null ? 'none' : rs,
-    // Load-bearing (not defensive): range reads ls-tree while tree/index read ls-files.
+    // Deliberate namespace separator, not a discriminator for the enumeration
+    // command: both branches now read the object store. Keeping the kind segment
+    // prevents two different scopes from sharing one cache record.
     String(ctx.kind || ''),
     String((wl && wl.source) || ''),
     sha256(text),
@@ -125,18 +130,15 @@ function fullKey(ctx, whitelist) {
 
 /**
  * Cache eligibility. The stored value is a PURE function of the corpus revision:
- * `listAllMarkdown()` enumerates `git ls-files` (tree/index) or `git ls-tree`
- * (range/ci), and every file's content is read with `git show <ref>:<p>` - the
- * object store, never the index and never the working tree. Staged additions and
- * staged modifications therefore cannot change the computed corpus, and staged
- * deletions can only SHRINK a live recomputation. No index-cleanliness condition
- * is needed (and none could help): the cached value is the HEAD corpus at write
- * time. If the index later loses a `.md` entry, a cold run recomputes a shrunk
- * corpus while a warm hit still returns the complete base-revision corpus. The
- * warm hit is the fail-safe direction: it holds MORE corpus characters than the
- * shrunk run, hence it reports strictly FEWER unknown characters than a cold run
- * in that window - it never whitewashes a violation present in HEAD - but it is
- * not identical to a cold run in that window.
+ * `listAllMarkdown()` reads the SAME corpus revision from the object store in both
+ * scopes (tree/index = `HEAD`, range/ci = the range base), and every file's
+ * content is read with `git show <ref>:<p>`. Staged additions, staged
+ * modifications and staged deletions of `.md` therefore cannot change the
+ * computed corpus: the cache and a cold run are IDENTICAL on the corpus
+ * (OB-120 closed). The cache stores ONLY that character set, never the verdict,
+ * never the added-line characters and never the whitelist, so a hit cannot hide a
+ * finding; any anomaly (no sha, unreadable or malformed entry, failed write)
+ * fails open to the full recomputation.
  */
 function cacheUsable(ctx) {
   if (ctx.g4bCacheDisabled) return false;
@@ -144,12 +146,12 @@ function cacheUsable(ctx) {
   return true;
 }
 
-/** A stored value must be exactly `{v: 1, corpus: string[]}`; anything else is a miss. */
+/** A stored value must be exactly `{v: 2, corpus: string[]}`; anything else is a miss. */
 function validValue(v) {
   return (
     v !== null &&
     typeof v === 'object' &&
-    v.v === 1 &&
+    v.v === 2 &&
     Array.isArray(v.corpus) &&
     v.corpus.every((c) => typeof c === 'string')
   );
@@ -238,7 +240,7 @@ function run(ctx, out) {
     }
     if (cacheKey) {
       try {
-        cacheStore.put(cacheKey, { v: 1, corpus: [...corpus] });
+        cacheStore.put(cacheKey, { v: 2, corpus: [...corpus] });
       } catch (e) {
         /* fail open: a failed write leaves the full-scan result untouched */
       }

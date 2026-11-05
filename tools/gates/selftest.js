@@ -8,6 +8,7 @@
  *   T1, T2, T4, T5, T6, T7, T8, T9, T10, T11, T13, T14, T15, T16, T17, T18 + G7-d
  *   + T19-T28 (G6-5 section-reference resolution, G6-6 ledger status closed set)
  *   + T29-T42, T61-T67 (G5-b closed set, plus the G5-a 2 empty-value division of labour).
+ *   + T114-T118 (G4b corpus enumeration decoupled from the index, OB-120).
  * T3 (defect A1 against commit b738e6b) and T12 (defect C1 against commit 1b01115)
  * need real git ranges and are therefore executed as recorded evidence:
  *   node tools/gates/gate.js --check=G6 --scope=range:b738e6b^..b738e6b
@@ -6405,13 +6406,13 @@ async function runTests() {
     check(
       'T112 G4b cache fail-open 2: a malformed entry is a miss and is rewritten as a valid entry of this version',
       !!t112b && t112b.word === 'miss' && !!t112Rewritten &&
-        t112Rewritten.v === 1 && Array.isArray(t112Rewritten.corpus),
+        t112Rewritten.v === Number(String(G4B.internals.CACHE_VERSION).replace(/^v/, '')) && Array.isArray(t112Rewritten.corpus),
       'second=' + JSON.stringify(t112b) + ' rewritten=' + JSON.stringify(t112Rewritten)
     );
     const t112Shape = G4B.internals.keyString(g4bCtx(g4bMemStore(), 'shaA', W1)).split('|');
     check(
       'T112 G4b cache key shape: six pipe-separated segments starting with the format version',
-      t112Shape.length === 6 && t112Shape[0] === 'v1' && t112Shape[1] === 'shaA' &&
+      t112Shape.length === 6 && t112Shape[0] === G4B.internals.CACHE_VERSION && t112Shape[1] === 'shaA' &&
         t112Shape[2] === 'tree' && t112Shape[3] === 'worktree',
       t112Shape.join(' / ')
     );
@@ -6486,7 +6487,7 @@ async function runTests() {
     const t113Shape = G4B.internals.keyString(t113KeyCtx).split('|');
     check(
       T113_NAME + ' - the six-segment key shape does not degrade under a dirty index',
-      t113Shape.length === 6 && t113Shape[0] === 'v1' && t113Shape[1] === 'shaA' && t113Shape[2] === 'tree',
+      t113Shape.length === 6 && t113Shape[0] === G4B.internals.CACHE_VERSION && t113Shape[1] === 'shaA' && t113Shape[2] === 'tree',
       t113Shape.join(' / ')
     );
     const t113Needles = decodeBuffer(fs.readFileSync(G4B_SOURCE)).split(DIRTY_SEG).length - 1;
@@ -6507,6 +6508,183 @@ async function runTests() {
       'T113 restore: g4b.js is byte-identical after the mutation window and the shipped module still hits on a dirty index',
       m113.identical === true && !!t113r && t113r.word === 'hit',
       'identical=' + m113.identical + ' second=' + JSON.stringify(t113r)
+    );
+  }
+
+  // ---- T114-T116: G4b corpus enumeration is decoupled from the index (slice
+  // G4B-CORPUS-DECOUPLE, OB-120). The corpus must be the HEAD snapshot in BOTH scopes, so a
+  // staged `.md` deletion can neither shrink it below the truth nor make a warm run disagree
+  // with a cold one. The fake git serves BOTH enumerations so the old `ls-files` path stays
+  // observable: it answers with the index (which lost the deleted file), and only the
+  // object-store answer carries the single "丙" source of the corpus.
+  {
+    const ENUM_DELETED = 'docs/t027/probe-corpus.md';
+    const ENUM_OTHER = 'docs/t027/probe-other.md';
+    const ENUM_NEW = 'docs/t027/probe-new.md';
+    // "丙" is NOT in tools/gates/cjk-newwords.txt (甲/乙 are), which is what makes the
+    // verdict below depend on the corpus instead of on the whitelist.
+    const CYCLE = '\u4e19';
+    const calls = [];
+    const enumGit = (args) => {
+      calls.push(args.join(' '));
+      const k = args.join(' ');
+      const ok = (out) => ({ ok: true, code: 0, out, err: '', spawnError: null });
+      if (k === 'status --porcelain=v1 -uall -z') return ok('D  ' + ENUM_DELETED + '\0?? ' + ENUM_NEW + '\0');
+      if (k === 'ls-tree -r -z --name-only HEAD') return ok(ENUM_DELETED + '\0' + ENUM_OTHER + '\0');
+      if (k === 'ls-files') return ok(ENUM_OTHER + '\0');
+      if (k === 'rev-parse HEAD') return ok('enumsha\n');
+      if (k === 'show HEAD:' + ENUM_DELETED) return ok(CYCLE);
+      if (k === 'show HEAD:' + ENUM_OTHER) return ok('');
+      return { ok: false, code: 127, out: '', err: '', spawnError: null };
+    };
+    const enumStore = () => {
+      const m = new Map();
+      return {
+        get: (k) => (m.has(k) ? m.get(k) : null),
+        put: (k, v) => {
+          m.set(k, v);
+        },
+        size: () => m.size,
+        values: () => [...m.values()],
+      };
+    };
+    const enumCtx = (store) => {
+      const ctx = createContext({
+        repoRoot: discoverRepoRoot(__dirname),
+        scope: 'tree',
+        spawnGit: (root, args) => enumGit(args),
+      });
+      const hunks = (p) => (p === ENUM_NEW ? [{ n: 1, text: CYCLE }] : []);
+      // G4b scans `ctx.addedLines`, which is a closure over the REAL `addedHunks`, so both
+      // seams are replaced: keeping only `addedHunks` would make the added line (and with it
+      // the whole verdict) unreachable, i.e. the assertions below could never go red.
+      ctx.addedHunks = hunks;
+      ctx.addedLines = (p) => hunks(p).map((h) => h.text);
+      ctx.g4bCacheStore = store;
+      return ctx;
+    };
+    const enumSink = () => ({
+      records: [],
+      rec(id, verdict, label, detail) {
+        this.records.push({ id, verdict, label, detail });
+      },
+    });
+    const enumWord = (sink) => {
+      const r = sink.records.filter((x) => x.id === 'G4b-cache')[0] || {};
+      const m = /^(hit|miss) ([0-9a-f]{12}) corpus=(\d+)$/.exec(r.detail || '');
+      return m ? { word: m[1], key12: m[2], corpus: m[3] } : null;
+    };
+
+    // ---- T114: the enumeration source is the object store, not the index.
+    const t114List = enumCtx(enumStore()).listAllMarkdown();
+    check(
+      'T114 G4b corpus enumeration reads the object store: ls-tree HEAD answers and ls-files is never called',
+      JSON.stringify(t114List) === JSON.stringify([ENUM_DELETED, ENUM_OTHER]) &&
+        calls.indexOf('ls-tree -r -z --name-only HEAD') >= 0 &&
+        !calls.some((c) => c === 'ls-files' || c.indexOf('ls-files ') === 0),
+      'list=' + JSON.stringify(t114List) + ' calls=' + JSON.stringify(calls)
+    );
+
+    // ---- T115: a staged `.md` deletion must not move the corpus under the cache.
+    const t115Store = enumStore();
+    const t115Ctx = enumCtx(t115Store);
+    const t115Cold = enumSink();
+    G4B.run(t115Ctx, t115Cold);
+    const t115Hot = enumSink();
+    G4B.run(t115Ctx, t115Hot);
+    const t115w1 = enumWord(t115Cold);
+    const t115w2 = enumWord(t115Hot);
+    check(
+      'T115 G4b corpus cold/warm equivalence under a staged markdown deletion: miss then hit, corpus=1 both times',
+      !!t115w1 && t115w1.word === 'miss' && t115w1.corpus === '1' &&
+        !!t115w2 && t115w2.word === 'hit' && t115w2.corpus === '1',
+      'cold=' + JSON.stringify(t115w1) + ' warm=' + JSON.stringify(t115w2)
+    );
+    const t115v1 = verdictOf(t115Cold.records, 'G4b');
+    const t115v2 = verdictOf(t115Hot.records, 'G4b');
+    check(
+      'T115 both runs PASS on the HEAD corpus (an ls-files fallback drops the only "丙" and turns this red) and agree',
+      t115v1 === 'PASS' && t115v2 === 'PASS' && t115v1 === t115v2,
+      'cold=' + t115v1 + ' warm=' + t115v2 + ' detail=' + detailOf(t115Cold.records, 'G4b')
+    );
+
+    // ---- T116: the stored value version tracks CACHE_VERSION (never a hard-coded literal).
+    const t116Stored = t115Store.values();
+    const t116Want = Number(String(G4B.internals.CACHE_VERSION).replace(/^v/, ''));
+    check(
+      'T116 the cached entry carries v === CACHE_VERSION (G4B-CORPUS-DECOUPLE bumped both to v2)',
+      t116Stored.length === 1 && !!t116Stored[0] && t116Stored[0].v === t116Want && Array.isArray(t116Stored[0].corpus),
+      'stored=' + JSON.stringify(t116Stored) + ' want=' + t116Want
+    );
+  }
+
+  // ---- T117: the range scope enumerates the corpus at the range BASE with the same NUL
+  // separated object-store listing as tree scope. Before G4B-CORPUS-DECOUPLE the range branch
+  // used `ls-tree -r --name-only` (newline separated) and tree used `ls-files`; both forms must
+  // stay rejected. A newline split over NUL-terminated output yields one entry that still carries
+  // the NUL, so it fails the `.md` filter and assertion 1 goes red if only the separator regresses.
+  {
+    const RANGE_MD = 'docs/t027/probe-range.md';
+    const RANGE_TXT = 'docs/t027/probe-range.txt';
+    const rangeCalls = [];
+    const rangeGit = (args) => {
+      const k = args.join(' ');
+      rangeCalls.push(k);
+      const ok = (out) => ({ ok: true, code: 0, out, err: '', spawnError: null });
+      if (k === 'rev-parse --verify --quiet base1^{commit}') return ok('base1\n');
+      if (k === 'rev-parse --verify --quiet head1^{commit}') return ok('head1\n');
+      if (k === 'diff --name-status -z base1 head1') return ok('M\0' + RANGE_MD + '\0');
+      if (k === 'ls-tree -r -z --name-only base1') return ok(RANGE_MD + '\0' + RANGE_TXT + '\0');
+      return { ok: false, code: 127, out: '', err: '', spawnError: null };
+    };
+    const rangeCtx = createContext({
+      repoRoot: discoverRepoRoot(__dirname),
+      scope: 'range:base1..head1',
+      spawnGit: (root, args) => rangeGit(args),
+    });
+    const rangeList = rangeCtx.listAllMarkdown();
+    check(
+      'T117 G4b range-scope corpus enumeration is NUL-separated ls-tree at the range base (the pre-slice newline form and ls-files are both rejected)',
+      JSON.stringify(rangeList) === JSON.stringify([RANGE_MD]) &&
+        rangeCalls.indexOf('ls-tree -r -z --name-only base1') >= 0 &&
+        !rangeCalls.some((c) => c === 'ls-files' || c.indexOf('ls-files ') === 0) &&
+        !rangeCalls.some((c) => c.indexOf('ls-tree -r --name-only') === 0),
+      'list=' + JSON.stringify(rangeList) + ' calls=' + JSON.stringify(rangeCalls)
+    );
+  }
+
+  // ---- T118: the index scope must enumerate the same HEAD object-store snapshot as the tree
+  // scope. A `kind === 'index'` special case (e.g. falling back to `ls-files`) would silently
+  // reintroduce the staged-deletion corpus shrink that OB-120 removed, so the fake answers
+  // `ls-files` with the WRONG set: any index-only enumeration branch turns assertion 3 red.
+  {
+    const IDX_MD = 'docs/t027/probe-index.md';
+    const IDX_MD_UPPER = 'docs/t027/probe-index.MD';
+    const IDX_TXT = 'docs/t027/probe-index.txt';
+    const indexCalls = [];
+    const indexGit = (args) => {
+      const k = args.join(' ');
+      indexCalls.push(k);
+      const ok = (out) => ({ ok: true, code: 0, out, err: '', spawnError: null });
+      if (k === 'status --porcelain=v1 -uall -z') return ok('M  ' + IDX_MD + '\0M  ' + IDX_MD_UPPER + '\0');
+      if (k === 'ls-tree -r -z --name-only HEAD') return ok(IDX_MD + '\0' + IDX_MD_UPPER + '\0' + IDX_TXT + '\0');
+      if (k === 'ls-files') return ok(IDX_TXT + '\0');
+      if (k.indexOf('diff --cached -U0 --no-color -- ') === 0 || k.indexOf('diff -U0 --no-color -- ') === 0) return ok('');
+      return { ok: false, code: 127, out: '', err: '', spawnError: null };
+    };
+    const indexCtx = createContext({
+      repoRoot: discoverRepoRoot(__dirname),
+      scope: 'index',
+      spawnGit: (root, args) => indexGit(args),
+    });
+    const indexList = indexCtx.listAllMarkdown();
+    check(
+      'T118 G4b index-scope corpus enumeration also reads ls-tree HEAD with NUL separation (an ls-files fallback or a non-HEAD ref turns this red, and the .MD suffix survives)',
+      JSON.stringify(indexList) === JSON.stringify([IDX_MD, IDX_MD_UPPER]) &&
+        indexCalls.indexOf('ls-tree -r -z --name-only HEAD') >= 0 &&
+        !indexCalls.some((c) => c === 'ls-files' || c.indexOf('ls-files ') === 0) &&
+        !indexCalls.some((c) => c.indexOf('ls-tree -r --name-only') === 0),
+      'list=' + JSON.stringify(indexList) + ' calls=' + JSON.stringify(indexCalls)
     );
   }
 

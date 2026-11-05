@@ -537,11 +537,16 @@ function createContext(options) {
     // NOTE: do NOT pass a `*.md` pathspec here. `git ls-tree -r --name-only <ref> -- '*.md'`
     // returns an empty list (measured 2026-09-22), which silently empties the G4b corpus and
     // turns the criterion into a false-positive machine. List everything and filter in JS.
-    const r =
-      kind === 'range' || kind === 'ci'
-        ? git(['ls-tree', '-r', '--name-only', baseRef])
-        : git(['ls-files']);
-    return r.ok ? r.out.split('\n').filter((p) => p && /\.md$/i.test(p)) : [];
+    //
+    // OB-120 (G4B-CORPUS-DECOUPLE): BOTH scopes now enumerate the OBJECT STORE. The corpus is
+    // defined as "the snapshot BEFORE the change", so reading the file list from the index let a
+    // staged `.md` deletion shrink the corpus below the HEAD truth - a false positive - and made a
+    // warm cache and a cold run disagree on the same input. `-z` is load-bearing (same reason as
+    // listTreeFiles): `--name-only` quotes non-ASCII paths under core.quotePath, so
+    // `git show <ref>:<quoted>` would silently drop those files.
+    const ref = kind === 'range' || kind === 'ci' ? baseRef : 'HEAD';
+    const r = git(['ls-tree', '-r', '-z', '--name-only', ref]);
+    return r.ok ? r.out.split('\0').filter((p) => p && /\.md$/i.test(p)) : [];
   }
 
   function listAgentFiles() {
