@@ -41,7 +41,7 @@ Date: 2026-09-09. Verdict: `BLOCKED`. T018 passes the frozen read-only whois com
 | AT-21 | PASS | [T024 lifecycle](t024-lifecycle_EN.md) |
 | AT-22 | PASS | [T025 operator interaction](t025-operator-interaction_EN.md): Schema/goldens/hash/replay, focused terminal inbox, structured response, Engine control return, and failure recovery |
 | AT-23 | BLOCKED | [T026 report](t026-agent-runner-contract_EN.md): characterization is complete with ten verified, two unsupported, and zero unknown capabilities; the pinned candidate's tool/network controls are incompatible, and the T027 adapter and independent acceptance loop are absent |
-| AT-24 | BLOCKED | T028 is not implemented: visible black-box risk acknowledgment, isolated delivery, explicit return, full scan, and reduced/unknown reporting are absent |
+| AT-24 | Conditionally closed | [T028 black-box mode](t028-supervised-black-box_EN.md): T028 is complete (`DEV_PLAN_EN.md:119`); visible black-box risk acknowledgment, isolated delivery, explicit return, full scan and reduced/unknown reporting are implemented; closed under rulings (b)/(c), and **the real CLI end-to-end path still depends on T027-B** (D-18) |
 
 These PASS verdicts cover the existing deterministic AT evidence; they do not automatically satisfy stage documentation and release gates.
 
@@ -49,7 +49,7 @@ These PASS verdicts cover the existing deterministic AT evidence; they do not au
 
 | Gate | Status | Evidence/gap |
 |---|---|---|
-| Core task chain and fail-closed scenarios | BLOCKED | Existing AT-01–AT-22 pass; T026 is complete, but its pinned candidate has ten verified, two unsupported, and zero unknown capabilities and is incompatible; T027/T028 and AT-23/AT-24 remain unimplemented |
+| Core task chain and fail-closed scenarios | BLOCKED | Existing AT-01–AT-22 pass; T026 is complete, but its pinned candidate has ten verified, two unsupported, and zero unknown capabilities and is incompatible; T027 is incomplete and AT-23 is not passed, while T028 is complete and AT-24 is conditionally closed |
 | Seed self-host and real platforms | PASS | T017 Windows/Linux trust matrix and native Windows two-generation drill |
 | Read-only whois shadow | PASS | 9/9 fixed cases and three drift counterexamples; no production cutover |
 | generic/C/Go harnesses | PASS | All three harness definitions and minimal user examples pass the read-only CLI loop |
@@ -64,4 +64,11 @@ These PASS verdicts cover the existing deterministic AT evidence; they do not au
 1. The manually extracted portable-ZIP model, user-selected independent directory, explicit-path invocation, and no-PATH policy are frozen. The formal ZIP filename and download entry point still require release binding. ADR-010 now proposes the EOL notice and exception policy, but product-owner approval remains outstanding.
 2. Windows candidate artifacts now pass first-run, upgrade, rollback, and evidence-preserving uninstall; the final carrier must rerun the drill. Linux remains core CI only and is not S1 production support.
 3. The generic/C/Go examples prove language scopes and noop orchestration only. Executable CLI steps currently fail closed.
-4. T025/AT-22 completes the focused terminal operator loop. T026 characterization is complete with ten verified, two unsupported, and zero unknown capabilities; the pinned candidate is incompatible. Replace/upgrade and reprobe the candidate, or establish a provable external enforcement boundary covering tool-alias and shell-network bypasses, before T027/AT-23. T028/AT-24 reduced-assurance visible black-box candidates and the complete unified TUI still remain; then rerun the tutorial against the final ZIP, bind the support matrix/release notes, and obtain explicit product-owner S1 exit approval. Until then, T018 and S1 remain incomplete.
+4. T025/AT-22 completes the focused terminal operator loop. T026 characterization is complete with ten verified, two unsupported, and zero unknown capabilities; the pinned candidate is incompatible. Replace/upgrade and reprobe the candidate, or establish a provable external enforcement boundary covering tool-alias and shell-network bypasses, before T027/AT-23. T028 is complete and AT-24 is conditionally closed under rulings (b)/(c) (the real CLI end-to-end path still depends on T027-B), and the complete unified TUI still remains; then rerun the tutorial against the final ZIP, bind the support matrix/release notes, and obtain explicit product-owner S1 exit approval. Until then, T018 and S1 remain incomplete.
+
+```artifacts
+docs/validation/s1-exit.md	repo
+docs/validation/s1-exit_EN.md	repo
+docs/validation/s1-reach-reachability.md	repo
+docs/validation/s1-reach-reachability_EN.md	repo
+```

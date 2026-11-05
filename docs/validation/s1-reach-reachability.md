@@ -19,18 +19,18 @@
 
 | 门 | 判据（可判真假） | 证据 | 判定 | 解锁条件 |
 |---|---|---|---|---|
-| G-A AT-23 真实候选腿 | CLI 可真实启动一个经兼容性准入的 AI 候选并计费 | `internal/console/runtime.go:33`（`ExecuteNoopRun`，noop-only 路径）、`:207` 至 `:211`（`RunPostflight` fail-closed 桩）；`docs/DEV_PLAN.md` 的 T026 段（10 verified / 2 unsupported ⇒ 候选不兼容）与 T027 段（`BLOCKED / NOT IMPLEMENTED`） | 不可达 | 需要 T027 完成产品装配（当前证据 `runtime.go:207` 显示 postflight 仍为 fail-closed 桩）且存在兼容候选（当前证据 T026 段显示 2 项 unsupported 未变） |
+| G-A AT-23 真实候选腿 | CLI 可真实启动一个经兼容性准入的 AI 候选并计费 | `internal/console/runtime.go:33`（`ExecuteNoopRun`，noop-only 路径）、`internal/console/runtime_noop.go:99` 与 `:106`（`RunPostflight` fail-closed 桩）；`docs/DEV_PLAN.md` 的 T026 段（10 verified / 2 unsupported ⇒ 候选不兼容）与 T027 段（`BLOCKED / NOT IMPLEMENTED`） | 不可达 | 需要 T027 完成产品装配（当前证据 `runtime_noop.go:99` 显示 postflight 仍为 fail-closed 桩）且存在兼容候选（当前证据 T026 段显示 2 项 unsupported 未变） |
 | G-B AT-23 机制腿 | 隔离 workspace / timeout / 日志缺失 / 未知恢复 / exit 0 后重扫五面在真实宿主执行 | `docs/t027/REMAINING_SLICES.md` 的 B4 小节；`docs/validation/t027-at23-e2e.md` | 已执行不独立成立 | 无需新解锁（已执行）；该腿只在 G-A 满足后才并入 AT-23 整体判定；不得写成"机制腿通过即 AT-23 通过" |
 | G-C AT-23 整体 | G-A 与 G-B 同时满足并含真实计费证据 | `docs/validation/s1-exit.md` 的 AT-23 这一行（`BLOCKED`）；B4 小节的四事分立 | 未通过 | 需要 G-A 解锁后重跑真实 E2E，当前证据 `s1-exit.md` 显示 AT-23 仍为 `BLOCKED` |
-| G-D T028 与 AT-24 | `supervised-black-box` 显式模式实现完成 | `docs/DEV_PLAN.md` 的 T028 条目（`PLANNED / NOT IMPLEMENTED`）；`docs/validation/s1-exit.md` 的 AT-24 条目（`BLOCKED`） | 不可达 | 需要 T028 实施完成，当前证据显示其状态为 `PLANNED / NOT IMPLEMENTED`；该门**与候选兼容准入无关**（黑箱模式不要求能力矩阵，见 `docs/ADR_REGISTER.md:22` 的 ADR-012） |
+| G-D T028 与 AT-24 | `supervised-black-box` 显式模式实现完成且 AT-24 判定成立 | `docs/DEV_PLAN.md:119`（T028 `COMPLETED`，AT-24 在 (b)/(c) 裁定下条件闭合）；`docs/validation/s1-exit.md:44`（已更正为「条件闭合」） | 已执行不独立成立 | 真实 CLI 端到端仍依赖 T027-B（D-18），需 P5 的 R-3 解锁；该门**与候选兼容准入无关**（黑箱模式不要求能力矩阵，见 `docs/ADR_REGISTER.md:22` 的 ADR-012） |
 | G-E 最终 ZIP 绑定与复验 | 最终 ZIP 绑定发行记录并复验 | `docs/ADR_REGISTER.md:19`（ADR-009：最终 ZIP 仍须绑定发行记录并复验）；`docs/validation/s1-exit.md` 的「正式安装包教程」行（`PARTIAL`） | 未通过 | 需要 T018 其余门闭合后执行绑定与复验，当前证据显示该项仍缺失 |
 | G-F EOL 通知方式 | ADR-010 获产品所有者批准 | `docs/ADR_REGISTER.md:20`（ADR-010 状态 `PROPOSED / NOT APPROVED`） | 未通过 | 需要产品所有者明确批准 ADR-010，当前证据显示其状态为 `PROPOSED / NOT APPROVED` |
 | G-G 产品所有者 S1 exit 批准 | 产品所有者作出批准（人工门） | `docs/validation/s1-exit.md` 的「产品所有者最终 S1 批准」行（`BLOCKED`） | 未知 | 需要产品所有者作出 S1 exit 批准，当前证据显示尚未作出；本片不预测其时点 |
-| G-H T018 整体 | 依赖字段全部满足且四道剩余门闭合 | `docs/DEV_PLAN.md:91`（依赖字段含 T027 与 T028）、`:93`（状态 `IN_PROGRESS / BLOCKED`） | 不可达 | 需要 T027 与 T028 完成，当前证据显示两者未完成；**注意门级与任务级不同源**（见下方注） |
+| G-H T018 整体 | 依赖字段全部满足且四道剩余门闭合 | `docs/DEV_PLAN.md:94`（依赖字段含 T027 与 T028）、`:96`（状态 `IN_PROGRESS / BLOCKED`） | 不可达 | 需要 T027 与 T028 完成，当前证据显示两者未完成；**注意门级与任务级不同源**（见下方注） |
 | G-I S1 exit 总体 | AT-01 至 AT-24 全过且 T018 完成且 RFC §14 全部 exit | `docs/validation/s1-exit.md` 头部结论行（`BLOCKED`）与 RFC §14 表（核心任务链 `BLOCKED`、三项 `PARTIAL`、业主批准 `BLOCKED`） | 不可达 | 需要 G-C 与 G-D 与 G-E 与 G-F 与 G-G 全部满足，当前证据显示其中任一均未满足 |
-| OB-21 自身 | ①② 两个子项是否仍成立 | ① 未装配（`runtime.go:33` 与 `:207` 未变）；② 中「`DR-1 未修`」子项已消除（DR-1 闭环，`docs/validation/evidence/dr-1-2026-09-24/`），「T026 不兼容」与「B2 §8.3 与 §8.4」未变（`docs/validation/B2-EXTERNAL-ENFORCEMENT.md` §8 第 3 与第 4 条） | 未通过（处置词保持待议） | 需要候选兼容或装配出现进展才触发其「待议时机」，当前证据显示两者均无变化 |
+| OB-21 自身 | ①② 两个子项是否仍成立 | ① 未装配（`runtime.go:33` 与 `runtime_noop.go:99` 未变）；② 中「`DR-1 未修`」子项已消除（DR-1 闭环，`docs/validation/evidence/dr-1-2026-09-24/`），「T026 不兼容」与「B2 §8.3 与 §8.4」未变（`docs/validation/B2-EXTERNAL-ENFORCEMENT.md` §8 第 3 与第 4 条） | 未通过（处置词保持待议） | 需要候选兼容或装配出现进展才触发其「待议时机」，当前证据显示两者均无变化 |
 
-- **门级与任务级不同源（重要）**：G-D 至 G-G 四道门**不依赖**候选或装配进展（T028 是独立模式），但 `docs/DEV_PLAN.md:91` 的 T018 **任务级依赖字段**含 T027 与 T028 ⇒ 四门全部清空后 T018 **仍不可勾选**。本报告按门级与任务级**分开**表述，不给单一结论。
+- **门级与任务级不同源（重要）**：G-D 至 G-G 四道门**不依赖**候选或装配进展（T028 是独立模式），但 `docs/DEV_PLAN.md:94` 的 T018 **任务级依赖字段**含 T027 与 T028 ⇒ 四门全部清空后 T018 **仍不可勾选**。本报告按门级与任务级**分开**表述，不给单一结论。
 - **DR-1 证据的引用口径**：`available` 记录只支持一条推理——同一 pin 上探针通道现已能驱动候选并产出最小真实响应；**不支持**任何「候选兼容」「候选可启动」「装配完成」推理（依据 `docs/CONTRACTS.md:191` 的「配置合法、秘密存在、CLI 已安装均不足以证明 AI 可用」）。
 - **OB-21 这一行的历史句未改写**（指令 §11.1 的历史行口径；本片对授权歧义按 §1.7.2 从严处理）⇒ 其刷新结论落在本报告 §2 与 §12.4 的 OB-51 这一行，§12.4 该行的现象句仍含已被消除的子项。
 
