@@ -25,3 +25,5 @@ See the [S1 candidate support matrix](S1_SUPPORT_MATRIX_EN.md). The S1 installat
 4. Complete T027 and pass AT-23; T028 is complete with AT-24 conditionally closed; S1 remains blocked by T027/AT-23.
 
 > Slice sync (P55 `EXIT-SEED-BUILD-EVIDENCE`): not applicable (no release artifact or feature change, evidence supplement only); reason: this slice produces no tag, artifact or feature item and only archives the AT-13 supplement under `docs/validation/evidence/EXIT-SEED-BUILD-EVIDENCE/`, so the candidate capabilities and remaining gates stay unchanged.
+
+> Slice sync (P57 `P5-P6-CLOSEOUT-ASSESSMENT`): not applicable (no tag, artifact or feature item); reason: P57 only consolidates the S1 Exit remaining-gate closeout inventory (see `docs/validation/p57-closeout-assessment_EN.md` §4) and leaves this file's "gates remaining before release" wording untouched.

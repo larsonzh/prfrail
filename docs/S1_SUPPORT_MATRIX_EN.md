@@ -27,3 +27,5 @@ Date: 2026-09-09. Status: `CANDIDATE`, effective only after the formal release c
 A candidate release requires a full commit SHA, GitHub CI, `SHA256SUMS`, an SPDX SBOM, and a license manifest. Checksums prove agreement with a manifest, not publisher identity; S1 does not claim signing or attestation. See the [portable ZIP installation guide](INSTALLATION_EN.md); filenames, download locations, and the support start date must be approved with the final release notes.
 
 > Slice sync (P55 `EXIT-SEED-BUILD-EVIDENCE`): not applicable (no platform or version support-range change); reason: the supplement only archives the two-platform capture of the existing seed-driven build, so the platform list, support tiers and EOL policy stay unchanged.
+
+> Slice sync (P57 `P5-P6-CLOSEOUT-ASSESSMENT`): not applicable (no change to the platform list, support tiers, EOL policy or install model); reason: P57 only turns the remaining T018 gates into a close-out inventory and changes no gate verdict, so this file's wording stays byte-identical.

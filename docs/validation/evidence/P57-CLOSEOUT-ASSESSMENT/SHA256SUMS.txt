@@ -1,0 +1,5 @@
+1dae956321765d154b448f2fafd66abe3ed5c1e41a80bde1cd8f99aad34aa3b8  00-briefing.md
+df8c7b70902b8f6493e13db6ad395f2c5aa88923965fe6c363011eb8cdfc085a  04-reviews/05-pre-review-r1.md
+518f874ea64ce56706b6f3c76b3dbda76d682c3251bbfe8bca43afc1a4cfede9  04-reviews/05-pre-review-r2.md
+d201cf2dd91d6daf4a0dbe80e4cbdf4e319cb60849e2487a5a37580422373a63  freedom-list.md
+b3c3f0b38f352dc22ed0dd2ceb4c89b83cee9924d71c88f2ba94692156ad98a6  input-list.md

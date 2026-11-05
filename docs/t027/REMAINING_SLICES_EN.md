@@ -603,7 +603,7 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | OB-75 (`:930`) | **must be split out** | it calls itself "an identified blind spot (not a defect)"; the remedy lies in operator-side observability and cannot be closed by a `.md` edit |
 | OB-77 (`:932`) | **must be split out** | its own conclusion is "worth a separate slice, low priority"; its criterion form is a new §6.3 soft-scan criterion |
 
-### P5 — `T027-B` · ⏸ Pending evaluation (product side)
+### P5 — `T027-B` · 🔄 Tracking (product side, assessed by P57)
 
 **Pending-evaluation item** (not a formal slice; fields follow §1.2, limited to "identity / source / goal").
 
@@ -611,9 +611,11 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 |---|---|
 | Identity | `T027-B` |
 | Source | `docs/DEV_PLAN.md:145` (the T027-section pending-evaluation entry) + `docs/DELIVERY_DIRECTIVE.md:910` (OB-55) + `docs/validation/t028-supervised-black-box.md:140` (the D-18 known boundary) |
-| Goal | land enforcement in production (segment B); no design conclusion yet ⇒ no formal slice. **This item is a pointer** (same origin as OB-55 and `DEV_PLAN.md:145`; it adds no fact) |
+| Goal | land enforcement in production (segment B). **This item is a tracking row** (same origin as OB-55; the former "no design conclusion yet" wording is superseded by the 2026-10-31 registration) |
+| Status (P57) | 🔄 **tracking**: registered on 2026-10-31 (`docs/DEV_PLAN.md:151`) and decomposed into P39–P44 (`:176` through `:181`) |
+| Assessment verdict (P57) | **no new slice**: the design baseline is already decomposed and the residue has existing carriers - R-1 P44 end-to-end wiring (no queue slot), R-2 OB-55 ownership (pending R-06), R-3 real CLI end-to-end (layer 1 item 8); evidence `docs/validation/p57-closeout-assessment{,_EN}.md` §3 |
 
-### P6 — `S1-EXIT-DOC` close-out checklist · ⏸ Pending evaluation (product side)
+### P6 — `S1-EXIT-DOC` close-out checklist · ✅ Assessed (P57, no slice)
 
 **Pending-evaluation item** (not a formal slice; fields follow §1.2, limited to "identity / source / goal").
 
@@ -622,6 +624,7 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Identity | `S1-EXIT-DOC` |
 | Source | `docs/DEV_PLAN.md:95` (the four remaining gates) + `:93` (T018 status and gaps) + `:91` (the T018 deliverable `docs/validation/s1-exit.md`) + this file's `:448` and `:455` |
 | Goal | turn the remaining T018 gates (AT-24 / final ZIP binding and re-verification / EOL notification channel / product-owner S1-exit approval) from a status item into a **close-out checklist**, listing each gate's dependencies and unlock conditions; **it is not itself a slice** (**pointer** nature, same origin as `DEV_PLAN.md:93` and `:95`) |
+| Assessment verdict (P57) | **inventory produced, no slice**: the eight-gate inventory is in `docs/validation/p57-closeout-assessment{,_EN}.md` §4.2 (including the S-G2 AT-24 wording lag and the S-G6 gate-versus-task source split); the item stays a pointer |
 
 ### P7 — Split-out OB roll-up · ⏸ Pending evaluation (governance side)
 

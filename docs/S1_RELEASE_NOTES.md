@@ -25,3 +25,5 @@
 4. 完成 T027 并通过 AT-23；T028 已完成、AT-24 条件闭合；S1 仍因 T027/AT-23 阻断。
 
 > 切片同步（P55 `EXIT-SEED-BUILD-EVIDENCE`）：本片不适用（无发行物与功能变更，仅证据补链）；理由：本片不产生 tag、artifact 或功能项，只在 `docs/validation/evidence/EXIT-SEED-BUILD-EVIDENCE/` 归档 AT-13 补证，候选能力与剩余门禁逐字不变。
+
+> 切片同步（P57 `P5-P6-CLOSEOUT-ASSESSMENT`）：本片不适用（无 tag、artifact 或功能项）；理由：P57 只整理 S1 Exit 剩余门的收口清单（见 `docs/validation/p57-closeout-assessment.md` §4），不改动本文件「发布前剩余门禁」的措辞。
