@@ -88,6 +88,7 @@
 | P55 EXIT-SEED-BUILD-EVIDENCE | ✅ 已完成（2026-11-05；commit `63e2e24` 推送 origin，未推 gitee） | P54 | M | — | 报告 `docs/validation/exit-seed-build-evidence{,_EN}.md`；证据包 `docs/validation/evidence/EXIT-SEED-BUILD-EVIDENCE/`；R = 0、D = 1 |
 | P56 G4B-CORPUS-DECOUPLE | ✅ 已完成（2026-11-05；准则 v1.61；R=2、D=1） | P55 | M | — | 报告 `docs/validation/g4b-corpus-decouple{,_EN}.md`；证据包 `docs/validation/evidence/G4B-CORPUS-DECOUPLE/`；`SELFTEST: PASS 703/703` |
 | P58 P58-OB-TRIAGE | ✅ 已完成（2026-11-05） | P56 | S | — | 报告对 `docs/validation/p58-ob-triage-assessment{,_EN}.md`；证据包 `docs/validation/evidence/P58-OB-TRIAGE/`；R = 0、D = 0 |
+| P59 DIRECTIVE-SCOPE-GUARD | ✅ 已完成（2026-11-06；R-12 裁定 A2×B1×Y1；v1.63） | P58 | S | — | 报告对 `docs/validation/p59-directive-scope-guard{,_EN}.md`；证据包 `docs/validation/evidence/P59-DIRECTIVE-SCOPE-GUARD/`；R = 0、D = 0 |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -1677,6 +1678,27 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 临时件落点声明 | 本片临时目录 = `tmp/P58-OB-TRIAGE/`（⑧c 前只增不删） |
 | ⑩ 前状态 | 报告对与证据包已落盘，三作用域与 `SELFTEST` 全绿；完成记录行在用户 ⑩ 裁定并授权提交后补写 |
 | 完成记录 | 报告对：`docs/validation/p58-ob-triage-assessment{,_EN}.md` |
+
+### P59 — `DIRECTIVE-SCOPE-GUARD`（防越界防线 · 层 2 的 `G-3` 项）· ✅ 已完成
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `DIRECTIVE-SCOPE-GUARD`（治理类；准则 v1.63；承载 v48 §四 层 2 的 `G-3` 项） |
+| 状态 | ✅ **已完成**（2026-11-06 起跑并收尾；起跑锚点 HEAD = `33bd849`；主控模型 = `DeepSeek V4 Pro`，ADR-032 登记；R-12 裁定 A2×B1×Y1；⑩ 停点等授权） |
+| 目标 | 固化 D-6 三条执行侧边界（切片内不得自行升版 / 伪造授权 / 超额派单）与 OB-137 审查侧边界（⑤ 必核用户授权事实真伪）的处置形态，最终形态由 R-12 裁定 |
+| 依赖 | P58 闭环（`f798cea` + `8d30e66`）；`CHECKLIST_v48` §四 层 2 的 `G-3` 起跑条件（用户点名）；R-12 裁定（2026-11-06 已裁，A2×B1×Y1） |
+| 规模 | S（A2×B1×Y1，R-12 裁定） |
+| 步骤 | 两段式：阶段 A = 步骤 0 → ① 出三案对比表 → 停等 R-12；阶段 B = ② → ③（判据路径才派）→ ④ → ⑤ → ⑥ → ⑦ → ⑧ → ⑨ → ⑧c → ⑩ |
+| 现状缺口 | P58 的 D-6（自行升版两次重复型）与 OB-137（⑤ 不核授权事实真伪）均无正式承载条款；不固化则同类越界无处置依据 |
+| 交付物 | 报告对 `docs/validation/p59-directive-scope-guard{,_EN}.md`；证据包 `docs/validation/evidence/P59-DIRECTIVE-SCOPE-GUARD/`；按 R-12 裁定改 `DELIVERY_DIRECTIVE{,_EN}` 对应节；ADR-032（步骤 0）；本台账 P59 段 |
+| 验收证据 | 三作用域 `TOTAL_FAIL=0`；`SELFTEST 703/703`（判据路径下据实增加）；G3(a) 双语对称；OB-137 处置列按裁定更新 |
+| 边界 | 不改产品代码 / CI / CONTRACTS / schema / fixtures；不改 P7 行；不改 G-3 行内含（v48 已写）；不替用户裁定 R-12；不推 gitee；阶段 A 停 ①、阶段 B 停 ⑩ |
+| 分级 | `[SLICE]`（治理类） |
+| 探针额度 | 无（0 次真实外部调用） |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/P59-DIRECTIVE-SCOPE-GUARD/freedom-list.md` |
+| R / D 基线 | R = 0、D = 0 |
+| 临时件落点声明 | 本片临时目录 = `tmp/P59-DIRECTIVE-SCOPE-GUARD/`（⑧c 前只增不删） |
+| 完成记录 | 报告对：`docs/validation/p59-directive-scope-guard{,_EN}.md` |
 
 ## 已知缺陷（后续切片前处理）
 

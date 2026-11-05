@@ -75,7 +75,7 @@ Fixed `tmp` assertion: the top level is `.gitkeep` plus `gates-cache`; `gates-ca
 | Order | Item | Content | Start condition |
 |---|---|---|---|
 | G-1 | P7 governance-side split-out OB roll-up | ✅ done and dequeued: closed by P58 (see section 2), verdict = no slice, keep the P7 row ⏸ | dequeued |
-| G-3 | `DIRECTIVE-SCOPE-GUARD` (P59) | anti-overreach defence: execution side D-6 class boundaries (no self-bump inside a slice / forged authorization / over-quota dispatch) + review side OB-137 (the 5 layer does not check the truth of user-authorization claims); the final form is ruled by R-12 | the user names it |
+| G-3 | `DIRECTIVE-SCOPE-GUARD` (P59) | anti-overreach defence: execution side D-6 class boundaries (no self-bump inside a slice / forged authorization / over-quota dispatch) + review side OB-137 (the 5 layer does not check the truth of user-authorization claims); the final form is ruled by R-12 | closed by P59 (2026-11-06; conclusion in the report pair) |
 | G-4 | `DIRECTIVE-JUDGE-BLINDSPOTS` (P60) | judge blind-spot close-out: OB-138 only (in-block completion record rows are outside the append-table coverage) | the user names it |
 
 ### Layer 3 Low-priority alternatives
@@ -110,9 +110,9 @@ Fixed `tmp` assertion: the top level is `.gitkeep` plus `gates-cache`; `gates-ca
 | R-09 | AT-24 `unknown` acceptance boundary | **pending (blocks the layer-1 item 8 sign-off calibre)** |
 | R-10 | Overall budget and per-slice model caps | pending (blocks scheduling) |
 | R-11 | Scope of the historical corrections | done (tier B plus per-item differentiation) |
-| R-12 | Disposition form for the D-6 class overreach and OB-137: execution side (a recorded-state constraint, a body clause, or a criterion - one or more of the three) + review side (one added mandatory-check item in the 5 list, a criterion, or a recorded state - one or more of the three) | **pending** (raised by the user after P58; D-6 is a two-time repeat type) |
+| R-12 | Disposition form for the D-6 class overreach and OB-137: execution side (a recorded-state constraint, a body clause, or a criterion - one or more of the three) + review side (one added mandatory-check item in the 5 list, a criterion, or a recorded state - one or more of the three) | **Ruled (2026-11-06; ruling text in the P59 evidence pack `01-arch/ruling-2026-11-06-r12.md`; landed at v1.63)** |
 
-> P58 ruling note (2026-11-05): v1.62 **ratified**; P7 stays `⏸` and the P7 row is unchanged; v1.63 **not ratified** and rolled back into v1.62; the 5 quota deviation confirmed and registered as ADR-031 (never a precedent); OB-137 / OB-138 registered as observing; the D-3 wording confusion goes to the next slice. R-04 / R-06 / R-07 / R-08 / R-09 / R-10 / R-12 stay pending.
+> P58 ruling note (2026-11-05): v1.62 **ratified**; P7 stays `⏸` and the P7 row is unchanged; v1.63 **not ratified** and rolled back into v1.62; the 5 quota deviation confirmed and registered as ADR-031 (never a precedent); OB-137 / OB-138 registered as observing; the D-3 wording confusion goes to the next slice. R-04 / R-06 / R-07 / R-08 / R-09 / R-10 stay pending; R-12 was ruled on 2026-11-06 (P59 landed, this row flipped).
 
 ## 7. Start-up and step-0 general rules
 
@@ -164,7 +164,7 @@ Fixed `tmp` assertion: the top level is `.gitkeep` plus `gates-cache`; `gates-ca
 | Discipline V · split large tasks, avoid half-written pollution | split large tasks into small serial dispatches; after a timeout always inspect `git status` / `git diff` for partial output and roll back precisely with `git checkout` when needed |
 | Discipline W · bilingual report structure | a report pair must share order and shape: the same number of `##` headings, byte-identical `artifacts` fences, and `sixstage` fences with all five sections and the same final conclusion |
 | **Discipline X · report before self-delete (candidate, v46)** | a role that discovers a stray temp file must **not delete it immediately**; it reports the path first and waits until the controller has taken the pre-snapshot readings (`tmp` recursive count and `git status --porcelain -uall`), then runs `Remove-Item`; violations are handled under the **non-self-heal tier** (section 5.1) |
-| **Discipline Y · no self-bump inside a slice (candidate, v48)** | the version number, the authorization basis and the review quota are §1.7.2 upgrade boundaries, not implementation details to be settled in-slice; if a slice needs a version bump or a rewording of an authorization statement, it **must stop and ask the user first** and may never substitute a historical convention for same-turn authorization (P58's D-6 is the two-time repeat evidence) |
+| **Discipline Y · no self-bump inside a slice (promoted to §1.7.2 (v1.63), landed by P59)** | pointer: the body clause is in the §1.7.2 escalation-boundary list of `DELIVERY_DIRECTIVE.md` (§11.2: one fact described in one place; this row does not restate the body) |
 
 **GLM batch-auxiliary strategy**: `GLM-5.3-Flash (glm)` has ample capacity, so "at least twice" is only a floor; mechanical checks, long-document excerpts, bilingual mirror checks, dispatch drafts and log extraction should be delegated whenever possible; complex judgement and ranking are forbidden.
 

@@ -88,6 +88,7 @@
 | P55 EXIT-SEED-BUILD-EVIDENCE | ✅ Done (2026-11-05; commit `63e2e24` pushed to origin, not pushed to gitee) | P54 | M | — | report `docs/validation/exit-seed-build-evidence{,_EN}.md`; evidence package `docs/validation/evidence/EXIT-SEED-BUILD-EVIDENCE/`; R = 0, D = 1 |
 | P56 G4B-CORPUS-DECOUPLE | ✅ Done (2026-11-05; directive v1.61; R=2, D=1) | P55 | M | — | report `docs/validation/g4b-corpus-decouple{,_EN}.md`; evidence package `docs/validation/evidence/G4B-CORPUS-DECOUPLE/`; `SELFTEST: PASS 703/703` |
 | P58 P58-OB-TRIAGE | ✅ Done (2026-11-05) | P56 | S | — | report pair `docs/validation/p58-ob-triage-assessment{,_EN}.md`; evidence pack `docs/validation/evidence/P58-OB-TRIAGE/`; R = 0, D = 0 |
+| P59 DIRECTIVE-SCOPE-GUARD | ✅ Done (2026-11-06; R-12 ruled A2×B1×Y1; v1.63) | P58 | S | — | report pair `docs/validation/p59-directive-scope-guard{,_EN}.md`; evidence pack `docs/validation/evidence/P59-DIRECTIVE-SCOPE-GUARD/`; R = 0, D = 0 |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1664,6 +1665,27 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Temp artefact location | `tmp/P58-OB-TRIAGE/` (append-only until 8c) |
 | Pre-⑩ state | The report pair and the evidence pack are on disk and all three scopes plus `SELFTEST` are green; the completion row is written after the user's ⑩ ruling and commit authorization |
 | Completion record | Report pair: `docs/validation/p58-ob-triage-assessment{,_EN}.md` |
+
+### P59 — `DIRECTIVE-SCOPE-GUARD` (anti-overreach defense · layer 2 item `G-3`) · ✅ Done
+
+| Field | Content |
+|---|---|
+| Identifier | `DIRECTIVE-SCOPE-GUARD` (governance class; directive v1.63; carries layer 2 item `G-3` of §4 in v48) |
+| Status | ✅ **Done** (started and closed 2026-11-06; start anchor HEAD = `33bd849`; controller model = `DeepSeek V4 Pro`, registered as ADR-032; R-12 ruled A2×B1×Y1; stops at ⑩ awaiting authorization) |
+| Goal | Solidify the disposition form of the three D-6 execution-side boundaries (no self version-bump / no forged authorization / no over-quota dispatch within a slice) and the OB-137 review-side boundary (⑤ must verify the truth of user authorization facts); the final form is decided by R-12 |
+| Depends on | P58 closed (`f798cea` + `8d30e66`); the `G-3` start condition under layer 2 of §4 in `CHECKLIST_v48` (named by the user); the R-12 ruling (ruled 2026-11-06, A2×B1×Y1) |
+| Size | S (A2×B1×Y1, per the R-12 ruling) |
+| Steps | Two-phase: phase A = step 0 → ① three-way table → stop for R-12; phase B = ② → ③ (only for criterion paths) → ④ → ⑤ → ⑥ → ⑦ → ⑧ → ⑨ → ⑧c → ⑩ |
+| Current gap | Neither P58's D-6 (self version-bump, repeated twice) nor OB-137 (⑤ does not check the truth of authorization facts) has a formal carrier clause; without solidifying them, similar overreach has no disposition basis |
+| Deliverables | Report pair `docs/validation/p59-directive-scope-guard{,_EN}.md`; evidence pack `docs/validation/evidence/P59-DIRECTIVE-SCOPE-GUARD/`; the `DELIVERY_DIRECTIVE{,_EN}` sections changed per the R-12 ruling; ADR-032 (step 0); this ledger's P59 block |
+| Acceptance evidence | Three scopes `TOTAL_FAIL=0`; `SELFTEST 703/703` (increases truthfully on criterion paths); G3(a) bilingual symmetry; the OB-137 disposition cell updated per the ruling |
+| Boundary | No product code / CI / CONTRACTS / schema / fixture change; no P7-row change; no `G-3`-row content change (already written in v48); no ruling on R-12 on the user's behalf; no gitee push; phase A stops at ①, phase B stops at ⑩ |
+| Class | `[SLICE]` (governance) |
+| Probe budget | none (no real external call) |
+| Freedom-list path | `docs/validation/evidence/P59-DIRECTIVE-SCOPE-GUARD/freedom-list.md` |
+| R / D baseline | R = 0, D = 0 |
+| Temp artefact location | `tmp/P59-DIRECTIVE-SCOPE-GUARD/` (append-only until 8c) |
+| Completion record | Report pair: `docs/validation/p59-directive-scope-guard{,_EN}.md` |
 
 ## Known defects (to be handled before later slices)
 
