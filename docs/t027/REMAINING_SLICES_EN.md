@@ -87,6 +87,7 @@
 | P54 CONTRACTS-S7-DURABILITY | ✅ Done (2026-11-04; commit `7c0763a` pushed to origin, never gitee; run `41840557379` green on the first attempt on both legs; R=1, D=1) | P53 | L | — | R/D=0 baseline (started 2026-11-04); evidence package `docs/validation/evidence/CONTRACTS-S7-DURABILITY/` |
 | P55 EXIT-SEED-BUILD-EVIDENCE | ✅ Done (2026-11-05; commit `63e2e24` pushed to origin, not pushed to gitee) | P54 | M | — | report `docs/validation/exit-seed-build-evidence{,_EN}.md`; evidence package `docs/validation/evidence/EXIT-SEED-BUILD-EVIDENCE/`; R = 0, D = 1 |
 | P56 G4B-CORPUS-DECOUPLE | ✅ Done (2026-11-05; directive v1.61; R=2, D=1) | P55 | M | — | report `docs/validation/g4b-corpus-decouple{,_EN}.md`; evidence package `docs/validation/evidence/G4B-CORPUS-DECOUPLE/`; `SELFTEST: PASS 703/703` |
+| P58 P58-OB-TRIAGE | 🔄 In progress | P56 | S | — | report pair `docs/validation/p58-ob-triage-assessment{,_EN}.md`; evidence pack `docs/validation/evidence/P58-OB-TRIAGE/`; R = 0, D = 0 |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -632,9 +633,10 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 
 | Field | Content |
 |---|---|
-| Identity | none (a governance-side roll-up with no formal slice name) |
+| Identity | `P7-OB-TRIAGE` (governance-side roll-up item name; not a formal slice identifier - this slice is `P58-OB-TRIAGE`) |
 | Source | `docs/DELIVERY_DIRECTIVE.md:923` (OB-68) + `:930` (OB-75) + `:932` (OB-77) + `:860` (OB-13) + `:903` (OB-48) |
 | Goal | collect the five OBs split out of P2 / P4 as one independent pending-evaluation item; each split-out reason is recorded in the P2 and P4 rows, and **is not repeated here** |
+| Assessment conclusion (P58) | **P58 assessed (conclusion in the report; awaiting the ⑩ ruling)** (2026-11-05): no slice, keep the row - four of the five carriers were dispositioned by other slices (OB-13 v1.41 / OB-48 v1.33 / OB-68 v1.43 / OB-77 v1.40), only OB-75 stays under discussion and its fix lands on the operator side; evidence `docs/validation/p58-ob-triage-assessment{,_EN}.md` §3 |
 
 ### P8 — `DIRECTIVE-LEDGER-DISCIPLINE` · ✅
 
@@ -1640,6 +1642,27 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Freedom-list path | `docs/validation/evidence/G4B-CORPUS-DECOUPLE/freedom-list.md` |
 | 8a progress record (2026-11-05) | `tools/gates/lib/ctx.js` / `g4b.js` / `selftest.js` changed; `SELFTEST` 697 to 703 (T114-T118); two 5 rounds, one 6 round and three 7 rounds closed; R = 2, D = 1 |
 | Completion record | Report pair `docs/validation/g4b-corpus-decouple{,_EN}.md`; the 6 output transcribed verbatim in a `sixstage` fence; 9 three scopes green plus `SELFTEST: PASS 703/703`; 8c temp artefacts cleared; R = 2 (the 5 Low drove T117, the 7 r1 findings drove T118 / MANIFEST), D = 1 (a subagent created `tmp/g4bcd/` in the wrong location and deleted it; the controller verified zero residue) |
+
+### P58 — `P58-OB-TRIAGE` (P7 governance-side split-out OB roll-up and disposition recommendations · layer 2 item `G-1`) · 🔄 In progress
+
+| Field | Content |
+|---|---|
+| Identifier | `P58-OB-TRIAGE` (assessment class; directive v1.62; size S; carries the P7 split-out OB roll-up) |
+| Status | 🔄 **In progress** (started 2026-11-05; start anchor HEAD = `be1e89d`; controller model = `DeepSeek V4.1 Flash`; the marker is not changed before ⑩) |
+| Goal | Compare the five OBs carried by P7 one by one against the current disposition cell of §12.4, give a per-item disposition recommendation plus an overall P7 conclusion, and write the pointers back into five authoritative documents |
+| Depends on | P57 closed (`7a43dfa` + `3884351`); the `G-1` start condition under layer 2 of §4 in `CHECKLIST_v47` (named by the user) |
+| Size | S (assessment class, no implementation object) |
+| Steps | Step 0 → assessment analysis → ⑤ pre-review (1+1) → ⑧ assembly → ⑨ validation → ⑧c → ⑩ stop point (① ② ③ ④ ⑥ ⑦ trimmed per the briefing) |
+| Current gap | The P7 carrier set was registered on 2026-10-13 and four of its members were dispositioned by other slices afterwards, so the roll-up holds a single registered item; without this assessment the queue would carry a pending-evaluation item with no deliverable |
+| Deliverables | Report pair `docs/validation/p58-ob-triage-assessment{,_EN}.md`; evidence pack `docs/validation/evidence/P58-OB-TRIAGE/`; the v1.62 §0.3 row and the §12.4 / §12.5 pointers; this ledger's P58 block and the P7 assessment-conclusion row |
+| Acceptance evidence | Each of the five OB identifiers is locatable in §12.4; four open with the status word `已处置` and are unchanged by this slice; three scopes `TOTAL_FAIL=0` and `SELFTEST 703/703` |
+| Boundary | No product code / CI / contract / schema / fixture / criterion change; no ruling on any OB status flip or slice-name project on the user's behalf; P7 is not promoted to a formal slice; no gitee push; stops at ⑩ awaiting authorization |
+| Class | `[SLICE]` (assessment) |
+| Probe budget | none (no real external call) |
+| Freedom-list path | `docs/validation/evidence/P58-OB-TRIAGE/freedom-list.md` |
+| R / D baseline | R = 0, D = 0 |
+| Temp artefact location | `tmp/P58-OB-TRIAGE/` (append-only until 8c) |
+| Pre-⑩ state | The report pair and the evidence pack are on disk and all three scopes plus `SELFTEST` are green; the completion row is written after the user's ⑩ ruling and commit authorization |
 
 ## Known defects (to be handled before later slices)
 
