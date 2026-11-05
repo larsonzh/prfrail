@@ -8,7 +8,7 @@
 | Directive | `docs/DELIVERY_DIRECTIVE.md` v1.60 → v1.61 once this slice lands |
 | Controller model | `DeepSeek V4.1 Flash (deepseek)` |
 | Evidence package | `docs/validation/evidence/G4B-CORPUS-DECOUPLE/` |
-| Status | Reached the 10 stop point and waiting for the same-turn commit authorisation (not committed, not pushed) |
+| Status | ✅ Closed (commit `504caff` pushed to origin, never gitee; run `41978355255` green on both legs) |
 
 ## 1. Goal and hard boundary
 
@@ -204,3 +204,4 @@ Clauses marked "must not be used as a precedent" cited by this slice: **none**. 
 1. If the user accepts the D-1 disposition, this slice can be committed under the standing discipline (message: `fix: decouple the G4b corpus enumeration from the index (P56)`), pushed to origin only.
 2. Optional follow-ups: a constructed assertion for the `ci` scope; an assertion for "broken whitelist fails closed before the cache" (both registered here).
 3. The next queue item remains layer-3 item 8 `AT23-RESTRICTED-CANDIDATE` (⛔ blocked on the R-08 / R-09 rulings).
+4. CI: run `41978355255` green on both legs (Go ubuntu-latest / Go windows-latest both success; the three conditional jobs skipped by design).

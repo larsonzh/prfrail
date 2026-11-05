@@ -8,7 +8,7 @@
 | 准则 | `docs/DELIVERY_DIRECTIVE.md` v1.60 → 本片落地后 v1.61 |
 | 主控模型 | `DeepSeek V4.1 Flash (deepseek)` |
 | 证据包 | `docs/validation/evidence/G4B-CORPUS-DECOUPLE/` |
-| 状态 | ⑩ 停点已到达，等同一轮提交授权（未 commit、未 push） |
+| 状态 | ✅ 已闭环（提交 `504caff` 已推 origin，未推 gitee；run `41978355255` 双绿） |
 
 ## 1. 目标与硬边界
 
@@ -204,3 +204,4 @@ INDEPENDENT SCAN: PASS
 1. 若用户认可 D-1 的处置，本片可按既有纪律提交（提交信息：`fix: decouple the G4b corpus enumeration from the index (P56)`），只推 origin。
 2. 后续可选治理项：为 `ci` 作用域补一条构造型断言；为「坏白名单 fail-closed 先于缓存」补断言（两者均已在报告登记）。
 3. 队列下一片仍为层 3 第 8 项 `AT23-RESTRICTED-CANDIDATE`（⛔ 依赖 R-08 / R-09 裁定）。
+4. CI：run `41978355255` 双绿（Go ubuntu-latest / Go windows-latest 均 success；三个条件作业按设计 skipped）。
