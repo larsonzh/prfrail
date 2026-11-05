@@ -153,6 +153,7 @@ Go windows-latest  Gates  TOTAL_FAIL=0
 ```
 - `Test` 步骤包级读数：每条腿各 15 个包均为 `ok`；Ubuntu `Race` 腿 6 个包均为 `ok`（`adapters` 91.585s / `chain` 1.989s / `console` 10.991s / `gates` 4.205s / `guard` 2.893s / `tickets` 5.598s）。
 - 本节连同其后的 docs-only 回填共同构成闭环；回填提交的读数不回写本节，按 p40 收尾惯例由 ⑩ 回执载明。
+- 回填提交 `8d30e66` / run `42069357349` 双腿 `success`，仅作观察记录。
 - §14 的「未 commit、未 push、未推 gitee」是 ⑩ 停点当时的记录，按 §11.1 与 OB-41 不回写；事实以本节为准。
 
 ## 12. ⑧c 收尾清洁记录
@@ -193,6 +194,8 @@ docs/ADR_REGISTER.md	repo
 docs/ADR_REGISTER_EN.md	repo
 docs/DELIVERY_DIRECTIVE.md	repo
 docs/DELIVERY_DIRECTIVE_EN.md	repo
+docs/t027/CHECKLIST_v48.md	repo
+docs/t027/CHECKLIST_v48_EN.md	repo
 docs/t027/REMAINING_SLICES.md	repo
 docs/t027/REMAINING_SLICES_EN.md	repo
 docs/validation/p58-ob-triage-assessment.md	repo

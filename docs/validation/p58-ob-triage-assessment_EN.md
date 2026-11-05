@@ -153,6 +153,7 @@ Go windows-latest  Gates  TOTAL_FAIL=0
 ```
 - `Test` step package-level readings: all 15 packages `ok` on each leg, and all 6 packages `ok` on the Ubuntu `Race` leg (`adapters` 91.585s / `chain` 1.989s / `console` 10.991s / `gates` 4.205s / `guard` 2.893s / `tickets` 5.598s).
 - This section plus the docs-only back-fill that follows it together close the slice; the back-fill commit's readings are not written back here and are carried by the ⑩ receipt per the p40 close-out practice.
+- The back-fill commit `8d30e66` / run `42069357349` is `success` on both legs; recorded for observation only.
 - The "no commit, no push, no gitee push" line in §14 records the ⑩ stop point; it is not rewritten per §11.1 and OB-41, and this section is authoritative for the facts.
 
 ## 12. ⑧c close-out record
@@ -193,6 +194,8 @@ docs/ADR_REGISTER.md	repo
 docs/ADR_REGISTER_EN.md	repo
 docs/DELIVERY_DIRECTIVE.md	repo
 docs/DELIVERY_DIRECTIVE_EN.md	repo
+docs/t027/CHECKLIST_v48.md	repo
+docs/t027/CHECKLIST_v48_EN.md	repo
 docs/t027/REMAINING_SLICES.md	repo
 docs/t027/REMAINING_SLICES_EN.md	repo
 docs/validation/p58-ob-triage-assessment.md	repo
