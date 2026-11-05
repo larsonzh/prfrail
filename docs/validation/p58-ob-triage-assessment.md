@@ -25,7 +25,7 @@
 | ⑧ 装配 | 主控 | 完成 | CN 与 `_EN` 逐行同位 |
 | ⑨ 验证 | 主控 | 完成 | 三作用域与 SELFTEST，读数见 §11 |
 | ⑧c 收尾 | 主控 | 完成 | 见 §12 |
-| ⑩ 停点 | 主控 | 等授权 | 未提交、未推送 |
+| ⑩ 停点 | 主控 | 已闭环 | 用户 2026-11-05 授权提交与推送；读数见下节「提交与 CI」 |
 
 ## 3. OB 汇总与处置建议
 
@@ -138,6 +138,22 @@ TOTAL_FAIL=0
 - 三条门禁命令与自测的退出码均为 0；`SELFTEST` 基线为 703/703。
 - 追认与 ADR-031 登记后变更集扩为 18 件，三作用域重跑仍为 `TOTAL_FAIL=0` 与 `SELFTEST 703/703`；上文贴的是其前一次完整运行的原样快照（读数文件保持原样，按 OB-41 的「封版后追加」口径另记）。
 - 每条判据的 PASS 与 INFO 明细见上述文件。
+
+## 提交与 CI
+
+- 主提交 `f798cea`（`docs: assess the P7 split-out OB roll-up and register ADR-031 / OB-137`）已推送 `origin/main`，范围 `be1e89d..f798cea`，**未推 gitee**。
+- CI run `42062391497`（head `f798cea`）：结论 `success`，两条 `Test` 腿均为 `success`，**首跑即绿**，故未触发 §6.4 的复跑取证，也未登记任何 `DR-N`。
+- 三个条件作业按设计被跳过（`Bootstrap and release evidence` / `Candidate probe` / `Candidate build`，结论均为 `skipped`）。
+- 两条腿的 `Gates` 步骤均实测执行，原始读数字逐字如下。
+```text
+Go ubuntu-latest   Gates  SELFTEST: PASS 703/703
+Go ubuntu-latest   Gates  TOTAL_FAIL=0
+Go windows-latest  Gates  SELFTEST: PASS 703/703
+Go windows-latest  Gates  TOTAL_FAIL=0
+```
+- `Test` 步骤包级读数：每条腿各 15 个包均为 `ok`；Ubuntu `Race` 腿 6 个包均为 `ok`（`adapters` 91.585s / `chain` 1.989s / `console` 10.991s / `gates` 4.205s / `guard` 2.893s / `tickets` 5.598s）。
+- 本节连同其后的 docs-only 回填共同构成闭环；回填提交的读数不回写本节，按 p40 收尾惯例由 ⑩ 回执载明。
+- §14 的「未 commit、未 push、未推 gitee」是 ⑩ 停点当时的记录，按 §11.1 与 OB-41 不回写；事实以本节为准。
 
 ## 12. ⑧c 收尾清洁记录
 

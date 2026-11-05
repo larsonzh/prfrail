@@ -25,7 +25,7 @@
 | ⑧ Assembly | Primary controller | Done | CN and `_EN` are line-for-line mirrors |
 | ⑨ Validation | Primary controller | Done | Three scopes and SELFTEST; readings in §11 |
 | ⑧c Close-out | Primary controller | Done | See §12 |
-| ⑩ Stop point | Primary controller | Awaiting authorization | Not committed, not pushed |
+| ⑩ Stop point | Primary controller | Closed | Authorized by the user on 2026-11-05 to commit and push; readings in the "Commit and CI" section below |
 
 ## 3. OB roll-up and disposition recommendations
 
@@ -138,6 +138,22 @@ TOTAL_FAIL=0
 - All three gate commands and the selftest exited 0; the `SELFTEST` baseline is 703/703.
 - After the ratification and the ADR-031 registration the change set grows to 18 files, and the three scopes still report `TOTAL_FAIL=0` with `SELFTEST 703/703`; the lines above are the verbatim snapshot of the preceding full run (the readings file is left untouched, recorded separately under the OB-41 post-freeze-append caliber).
 - Per-criterion PASS and INFO detail is in the file above.
+
+## Commit and CI
+
+- Main commit `f798cea` (`docs: assess the P7 split-out OB roll-up and register ADR-031 / OB-137`) is pushed to `origin/main`, range `be1e89d..f798cea`, **gitee not pushed**.
+- CI run `42062391497` (head `f798cea`): conclusion `success`, both `Test` legs `success`, **green on the first attempt**, so the §6.4 rerun-for-evidence path did not fire and no `DR-N` was registered.
+- The three conditional jobs were skipped by design (`Bootstrap and release evidence` / `Candidate probe` / `Candidate build`, all `skipped`).
+- The `Gates` step really executed on both legs; the raw readings are quoted verbatim below.
+```text
+Go ubuntu-latest   Gates  SELFTEST: PASS 703/703
+Go ubuntu-latest   Gates  TOTAL_FAIL=0
+Go windows-latest  Gates  SELFTEST: PASS 703/703
+Go windows-latest  Gates  TOTAL_FAIL=0
+```
+- `Test` step package-level readings: all 15 packages `ok` on each leg, and all 6 packages `ok` on the Ubuntu `Race` leg (`adapters` 91.585s / `chain` 1.989s / `console` 10.991s / `gates` 4.205s / `guard` 2.893s / `tickets` 5.598s).
+- This section plus the docs-only back-fill that follows it together close the slice; the back-fill commit's readings are not written back here and are carried by the ⑩ receipt per the p40 close-out practice.
+- The "no commit, no push, no gitee push" line in §14 records the ⑩ stop point; it is not rewritten per §11.1 and OB-41, and this section is authoritative for the facts.
 
 ## 12. ⑧c close-out record
 

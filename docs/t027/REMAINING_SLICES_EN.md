@@ -87,7 +87,7 @@
 | P54 CONTRACTS-S7-DURABILITY | ✅ Done (2026-11-04; commit `7c0763a` pushed to origin, never gitee; run `41840557379` green on the first attempt on both legs; R=1, D=1) | P53 | L | — | R/D=0 baseline (started 2026-11-04); evidence package `docs/validation/evidence/CONTRACTS-S7-DURABILITY/` |
 | P55 EXIT-SEED-BUILD-EVIDENCE | ✅ Done (2026-11-05; commit `63e2e24` pushed to origin, not pushed to gitee) | P54 | M | — | report `docs/validation/exit-seed-build-evidence{,_EN}.md`; evidence package `docs/validation/evidence/EXIT-SEED-BUILD-EVIDENCE/`; R = 0, D = 1 |
 | P56 G4B-CORPUS-DECOUPLE | ✅ Done (2026-11-05; directive v1.61; R=2, D=1) | P55 | M | — | report `docs/validation/g4b-corpus-decouple{,_EN}.md`; evidence package `docs/validation/evidence/G4B-CORPUS-DECOUPLE/`; `SELFTEST: PASS 703/703` |
-| P58 P58-OB-TRIAGE | 🔄 In progress | P56 | S | — | report pair `docs/validation/p58-ob-triage-assessment{,_EN}.md`; evidence pack `docs/validation/evidence/P58-OB-TRIAGE/`; R = 0, D = 0 |
+| P58 P58-OB-TRIAGE | ✅ Done (2026-11-05) | P56 | S | — | report pair `docs/validation/p58-ob-triage-assessment{,_EN}.md`; evidence pack `docs/validation/evidence/P58-OB-TRIAGE/`; R = 0, D = 0 |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1643,12 +1643,12 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | 8a progress record (2026-11-05) | `tools/gates/lib/ctx.js` / `g4b.js` / `selftest.js` changed; `SELFTEST` 697 to 703 (T114-T118); two 5 rounds, one 6 round and three 7 rounds closed; R = 2, D = 1 |
 | Completion record | Report pair `docs/validation/g4b-corpus-decouple{,_EN}.md`; the 6 output transcribed verbatim in a `sixstage` fence; 9 three scopes green plus `SELFTEST: PASS 703/703`; 8c temp artefacts cleared; R = 2 (the 5 Low drove T117, the 7 r1 findings drove T118 / MANIFEST), D = 1 (a subagent created `tmp/g4bcd/` in the wrong location and deleted it; the controller verified zero residue) |
 
-### P58 — `P58-OB-TRIAGE` (P7 governance-side split-out OB roll-up and disposition recommendations · layer 2 item `G-1`) · 🔄 In progress
+### P58 — `P58-OB-TRIAGE` (P7 governance-side split-out OB roll-up and disposition recommendations · layer 2 item `G-1`) · ✅ Done
 
 | Field | Content |
 |---|---|
 | Identifier | `P58-OB-TRIAGE` (assessment class; directive v1.62; size S; carries the P7 split-out OB roll-up) |
-| Status | 🔄 **In progress** (started 2026-11-05; start anchor HEAD = `be1e89d`; controller model = `DeepSeek V4.1 Flash`; the marker is not changed before ⑩) |
+| Status | ✅ **Done** (started 2026-11-05; start anchor HEAD = `be1e89d`; controller model = `DeepSeek V4.1 Flash`; committed and closed after the user ⑩ authorization on 2026-11-05) |
 | Goal | Compare the five OBs carried by P7 one by one against the current disposition cell of §12.4, give a per-item disposition recommendation plus an overall P7 conclusion, and write the pointers back into five authoritative documents |
 | Depends on | P57 closed (`7a43dfa` + `3884351`); the `G-1` start condition under layer 2 of §4 in `CHECKLIST_v47` (named by the user) |
 | Size | S (assessment class, no implementation object) |
@@ -1663,6 +1663,7 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | R / D baseline | R = 0, D = 0 |
 | Temp artefact location | `tmp/P58-OB-TRIAGE/` (append-only until 8c) |
 | Pre-⑩ state | The report pair and the evidence pack are on disk and all three scopes plus `SELFTEST` are green; the completion row is written after the user's ⑩ ruling and commit authorization |
+| Completion record | Report pair: `docs/validation/p58-ob-triage-assessment{,_EN}.md` |
 
 ## Known defects (to be handled before later slices)
 

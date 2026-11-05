@@ -87,7 +87,7 @@
 | P54 CONTRACTS-S7-DURABILITY | ✅ 已完成（2026-11-04；commit `7c0763a` 推送 origin 未推 gitee；run `41840557379` 首跑双绿；R=1、D=1） | P53 | L | — | R/D=0 基线（2026-11-04 起跑）；证据包 `docs/validation/evidence/CONTRACTS-S7-DURABILITY/` |
 | P55 EXIT-SEED-BUILD-EVIDENCE | ✅ 已完成（2026-11-05；commit `63e2e24` 推送 origin，未推 gitee） | P54 | M | — | 报告 `docs/validation/exit-seed-build-evidence{,_EN}.md`；证据包 `docs/validation/evidence/EXIT-SEED-BUILD-EVIDENCE/`；R = 0、D = 1 |
 | P56 G4B-CORPUS-DECOUPLE | ✅ 已完成（2026-11-05；准则 v1.61；R=2、D=1） | P55 | M | — | 报告 `docs/validation/g4b-corpus-decouple{,_EN}.md`；证据包 `docs/validation/evidence/G4B-CORPUS-DECOUPLE/`；`SELFTEST: PASS 703/703` |
-| P58 P58-OB-TRIAGE | 🔄 进行中 | P56 | S | — | 报告对 `docs/validation/p58-ob-triage-assessment{,_EN}.md`；证据包 `docs/validation/evidence/P58-OB-TRIAGE/`；R = 0、D = 0 |
+| P58 P58-OB-TRIAGE | ✅ 已完成（2026-11-05） | P56 | S | — | 报告对 `docs/validation/p58-ob-triage-assessment{,_EN}.md`；证据包 `docs/validation/evidence/P58-OB-TRIAGE/`；R = 0、D = 0 |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -1656,12 +1656,12 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | ⑧a 进度记录（2026-11-05） | `tools/gates/lib/ctx.js` / `g4b.js` / `selftest.js` 已改；`SELFTEST` 697 → 703（T114–T118）；⑤ 两轮、⑥ 一轮、⑦ 三轮全部闭链；R = 2、D = 1 |
 | 完成记录 | 报告对 `docs/validation/g4b-corpus-decouple{,_EN}.md`；⑥ 输出按 `sixstage` 围栏逐字转录；⑨ 三作用域全绿 + `SELFTEST: PASS 703/703`；⑧c 临时件清零；R = 2（⑤ Low 补测 T117、⑦ r1 整改 T118 / MANIFEST）、D = 1（子代理在 `tmp/g4bcd/` 误建临时目录并自删，主控复核零残留） |
 
-### P58 — `P58-OB-TRIAGE`（P7 治理侧拆出 OB 汇总与处置建议 · 层 2 的 `G-1` 项）· 🔄 进行中
+### P58 — `P58-OB-TRIAGE`（P7 治理侧拆出 OB 汇总与处置建议 · 层 2 的 `G-1` 项）· ✅ 已完成
 
 | 字段 | 内容 |
 |---|---|
 | 标识 | `P58-OB-TRIAGE`（评估类；准则 v1.62；S 档；承载 P7 的拆出 OB 汇总） |
-| 状态 | 🔄 **进行中**（2026-11-05 起跑；起跑锚点 HEAD = `be1e89d`；主控模型 = `DeepSeek V4.1 Flash`；停 ⑩ 前不改标） |
+| 状态 | ✅ **已完成**（2026-11-05 起跑；起跑锚点 HEAD = `be1e89d`；主控模型 = `DeepSeek V4.1 Flash`；2026-11-05 经用户 ⑩ 授权提交并闭环） |
 | 目标 | 把 P7 承载的五条 OB 逐项对照 §12.4 的当前处置列，给出逐条处置建议与 P7 整体结论，并回写五份权威文档的指针 |
 | 依赖 | P57 闭环（`7a43dfa` + `3884351`）；`CHECKLIST_v47` §四 层 2 的 `G-1` 起跑条件（用户点名） |
 | 规模 | S（评估类，无实现对象） |
@@ -1676,6 +1676,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | R / D 基线 | R = 0、D = 0 |
 | 临时件落点声明 | 本片临时目录 = `tmp/P58-OB-TRIAGE/`（⑧c 前只增不删） |
 | ⑩ 前状态 | 报告对与证据包已落盘，三作用域与 `SELFTEST` 全绿；完成记录行在用户 ⑩ 裁定并授权提交后补写 |
+| 完成记录 | 报告对：`docs/validation/p58-ob-triage-assessment{,_EN}.md` |
 
 ## 已知缺陷（后续切片前处理）
 
