@@ -43,7 +43,7 @@
 
 - (a) main path / (a) unconditional / (b) independently billed (does not consume Copilot premium requests, subject to the BYOK cost cap).
 - Copilot-hosted is used only for 1 GPT-6 Luna connectivity test and does not enter the acceptance conclusion.
-- BYOK configuration: `COPILOT_PROVIDER_TYPE=anthropic` + `BASE_URL=https://api.deepseek.com/anthropic` + `API_KEY` + `MODEL=deepseek-flash` + two token caps.
+- BYOK configuration: `COPILOT_PROVIDER_TYPE=anthropic` + `BASE_URL=https://api.deepseek.com/anthropic` + `API_KEY` + `MODEL=deepseek-flash` + two token caps (`COPILOT_PROVIDER_MAX_PROMPT_TOKENS=840000` + `COPILOT_PROVIDER_MAX_OUTPUT_TOKENS=128000`).
 - **Step 0 mandatory BYOK feasibility minimal verification**: `copilot --no-auto-update -p "say hello"`; on failure stop and escalate to the user — options (a) switch to the openai type / (b) adjust the R-08.2 cap / (c) pause AT-23.
 - Register in the report: the BYOK conclusion cannot replace the B1 Copilot-hosted baseline.
 
@@ -142,7 +142,7 @@ v3 addition: the stage-progression strategy became its own section; the to-do li
 
 ## 6. Write-back destinations
 
-- The §6 R-table rows R-08/R-09 flip to 「已裁」 (summary + a pointer to this document).
+- §6 R-table: the R-08/R-09 rows of `docs/t027/CHECKLIST_v49{,_EN}.md` §6 flip to 「已裁」 (summary + a pointer to this document); v50 inherits this status when generated.
 - One reference line is appended at the end of the P60 block in REMAINING_SLICES.
 - The complete ruling is archived under `docs/validation/evidence/R08-R09-RULING/` (MANIFEST.md + SHA256SUMS.txt).
 

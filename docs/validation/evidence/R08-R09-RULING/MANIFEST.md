@@ -6,12 +6,12 @@
 
 | 原始路径 | 归档路径 | 原始字节 sha256 | 归档字节 sha256 | 说明 |
 |---|---|---|---|---|
-| `r08-r09-ruling.md` | `r08-r09-ruling.md` | `ddc904bc2cd63eef601e36f2a6d801ab7f509635b0bf1e7ed4952d57cecdf673` | `ddc904bc2cd63eef601e36f2a6d801ab7f509635b0bf1e7ed4952d57cecdf673` | ruling document copy (CN authoritative) |
-| `r08-r09-ruling_EN.md` | `r08-r09-ruling_EN.md` | `a4759cea085d30ace31c4c1996e411eeb5c7ad8ec2b1215ffc536bd26aa32805` | `a4759cea085d30ace31c4c1996e411eeb5c7ad8ec2b1215ffc536bd26aa32805` | ruling document copy (EN mirror) |
+| `r08-r09-ruling.md` | `r08-r09-ruling.md` | `19777b8eef1f0eafd35cb8813ef334642bd02b8c31a287386d939fc66100ca27` | `19777b8eef1f0eafd35cb8813ef334642bd02b8c31a287386d939fc66100ca27` | ruling document copy (CN authoritative) |
+| `r08-r09-ruling_EN.md` | `r08-r09-ruling_EN.md` | `4bef9299a7d9add453e1b57279f397635309743582b8abe54a44d3e00b26f183` | `4bef9299a7d9add453e1b57279f397635309743582b8abe54a44d3e00b26f183` | ruling document copy (EN mirror) |
 
 ## 归档条目清单
 
 | 路径 | 原始字节 sha256 | 归档字节 sha256 | 说明 |
 |---|---|---|---|
-| `r08-r09-ruling.md` | ddc904bc2cd63eef601e36f2a6d801ab7f509635b0bf1e7ed4952d57cecdf673 | ddc904bc2cd63eef601e36f2a6d801ab7f509635b0bf1e7ed4952d57cecdf673 | ruling document copy (CN authoritative) |
-| `r08-r09-ruling_EN.md` | a4759cea085d30ace31c4c1996e411eeb5c7ad8ec2b1215ffc536bd26aa32805 | a4759cea085d30ace31c4c1996e411eeb5c7ad8ec2b1215ffc536bd26aa32805 | ruling document copy (EN mirror) |
+| `r08-r09-ruling.md` | 19777b8eef1f0eafd35cb8813ef334642bd02b8c31a287386d939fc66100ca27 | 19777b8eef1f0eafd35cb8813ef334642bd02b8c31a287386d939fc66100ca27 | ruling document copy (CN authoritative) |
+| `r08-r09-ruling_EN.md` | 4bef9299a7d9add453e1b57279f397635309743582b8abe54a44d3e00b26f183 | 4bef9299a7d9add453e1b57279f397635309743582b8abe54a44d3e00b26f183 | ruling document copy (EN mirror) |

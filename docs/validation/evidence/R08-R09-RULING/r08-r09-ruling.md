@@ -43,7 +43,7 @@
 
 - (a) 主路径 / (a) 无条件 / (b) 独立计费（不占 Copilot premium request，受 BYOK 费用上限约束）。
 - Copilot-hosted 仅用于 1 次 GPT-6 Luna 连通性测试，不计入验收结论。
-- BYOK 配置：`COPILOT_PROVIDER_TYPE=anthropic` + `BASE_URL=https://api.deepseek.com/anthropic` + `API_KEY` + `MODEL=deepseek-flash` + 两个 token 上限。
+- BYOK 配置：`COPILOT_PROVIDER_TYPE=anthropic` + `BASE_URL=https://api.deepseek.com/anthropic` + `API_KEY` + `MODEL=deepseek-flash` + 两个 token 上限（`COPILOT_PROVIDER_MAX_PROMPT_TOKENS=840000` + `COPILOT_PROVIDER_MAX_OUTPUT_TOKENS=128000`）。
 - **步骤 0 必做 BYOK 可行性最小验证**：`copilot --no-auto-update -p "say hello"`；失败则停下升级用户裁决——可选 (a) 改用 openai 类型 / (b) 调整 R-08.2 上限 / (c) 暂停 AT-23。
 - 报告中登记：BYOK 结论不能替代 B1 的 Copilot-hosted 基线。
 
@@ -142,7 +142,7 @@ v3 补充：分阶段策略独立成节、待办清单加阶段升级。
 
 ## 6. 回写去向
 
-- §六 R 表 R-08/R-09 两行翻「已裁」（摘要 + 指向本文件的指针）。
+- §六 R 表：`docs/t027/CHECKLIST_v49{,_EN}.md` 的 §六 R 表 R-08/R-09 两行翻「已裁」（摘要 + 指向本文件的指针）；v50 生成时继承该状态。
 - REMAINING_SLICES 的 P60 段末尾加一行引用。
 - 完整裁定归档到 `docs/validation/evidence/R08-R09-RULING/`（MANIFEST.md + SHA256SUMS.txt）。
 
