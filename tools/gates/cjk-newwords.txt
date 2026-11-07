@@ -97,3 +97,4 @@
 营	docs/validation/p45-e2e-zero-model.md	"README 运营承诺的静态锁定" (verbatim 6-scan Section C item 2; both the CN and the _EN report carry it)
 尊	docs/validation/p45-e2e-zero-model.md	"只读边界被尊重" (verbatim 6-scan Section C item 6; both the CN and the _EN report carry it)
 弄	docs/validation/g4b-corpus-decouple.md	"newline 分割会把路径弄坏" (verbatim 6-scan Section C item 1; both the CN and the _EN report carry it)
+稽	docs/validation/p60-directive-judge-blindspots.md	「稽核」（⑥ 独立扫描原文用词，sixstage 围栏逐字转录引入；非新造词）

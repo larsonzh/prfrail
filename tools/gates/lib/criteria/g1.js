@@ -100,9 +100,14 @@ function parseLedger(text) {
   const headings = [];
   const status = [];
   const completion = [];
+  // v1.64 G1(e2): in-block completion-record field rows (`| 完成记录 | … |`) that live in a
+  // slice block rather than in the appended completion table. Each carries the nearest
+  // preceding successful heading, so "the block says completed" can be anchored.
+  const inblock = [];
   let inStatus = false;
   let inCompletion = false;
   let declaration = false;
+  let lastHeading = null;
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     if (/状态符号|Status symbols/i.test(line) && SLICE_STATES.every((s) => line.includes(s))) declaration = true;
@@ -113,6 +118,7 @@ function parseLedger(text) {
     const h = parseHeading(line);
     if (h) {
       headings.push(Object.assign({ n: i + 1 }, h));
+      lastHeading = headings[headings.length - 1];
       continue;
     }
     if (!/^\|/.test(line) || /^\|\s*-{2,}/.test(line)) continue;
@@ -122,8 +128,16 @@ function parseLedger(text) {
     } else if (inCompletion && cells.length >= 4 && /^\d{4}-\d{2}-\d{2}$/.test(cells[0])) {
       completion.push({ n: i + 1, key: keyOf(cells[1]), summary: cells[2] || '', evidence: cells[3] || '' });
     }
+    if (!inCompletion && (cells[0] === '完成记录' || cells[0] === 'Completion record')) {
+      inblock.push({
+        n: i + 1,
+        line,
+        headKey: lastHeading ? lastHeading.key : '',
+        headSymbol: lastHeading ? lastHeading.symbol : '',
+      });
+    }
   }
-  return { headings, status, completion, declaration };
+  return { headings, status, completion, inblock, declaration };
 }
 
 /** Resolve a completion key to a heading: exact primary key first, then a unique alias. */
@@ -156,8 +170,12 @@ function run(ctx, out) {
   const badD = [];
   const badE = [];
   const badF = [];
+  const badE2 = [];
   let boundCount = 0;
   let unboundCount = 0;
+  let e2Judged = 0;
+  let e2Skipped = 0;
+  let e2Historical = 0;
 
   for (const p of parsed) {
     const closed = new Set(SLICE_STATES);
@@ -196,6 +214,18 @@ function run(ctx, out) {
       if (EXCLUSION_RE.test(c.summary)) continue;
       if (IN_PROGRESS_RE.test(c.summary)) badF.push(p.rel + ':' + c.n + ' ' + c.key + ' in-progress wording in a completion row');
     }
+    // G1(e2), v1.64: an ADDED in-block completion-record row claims the block is done, so the
+    // nearest heading above it must be ✅. Same forward scope rule as (f): historical rows are
+    // never re-judged; a row with no bound heading or a heading without a state symbol is
+    // skipped (recorded counts, not a silent pass).
+    for (const c of p.inblock) {
+      if (!added || !added.has(c.n)) { e2Historical++; continue; }
+      if (!c.headKey || !c.headSymbol) { e2Skipped++; continue; }
+      e2Judged++;
+      if (c.headSymbol !== COMPLETED) {
+        badE2.push(p.rel + ':' + c.n + ' in-block completion row but heading ' + c.headKey + '=' + c.headSymbol);
+      }
+    }
   }
 
   const total = parsed.reduce((n, p) => n + p.headings.length + p.status.length + p.completion.length, 0);
@@ -204,6 +234,14 @@ function run(ctx, out) {
   rec('c', badC, 'closed set respected (' + total + ' cells)');
   rec('d', badD, 'heading and status table agree');
   rec('e', badE, 'completion rows imply completed (' + boundCount + ' bound, ' + unboundCount + ' unbound)');
+  out.rec(
+    'G1(e2)',
+    badE2.length === 0 ? 'PASS' : 'FAIL',
+    'in-block completion rows imply completed',
+    badE2.length
+      ? JSON.stringify(badE2.slice(0, 4))
+      : e2Judged + ' judged, ' + e2Skipped + ' skipped, ' + e2Historical + ' historical (v1.64)'
+  );
   if (unboundCount > 0) {
     out.rec('G1(e-info)', 'INFO', 'completion keys without a binding', unboundCount + ' completion row(s) have no heading to bind to (their slice heading was removed); G1(e) judges bound rows only');
   }

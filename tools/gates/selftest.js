@@ -9,6 +9,11 @@
  *   + T19-T28 (G6-5 section-reference resolution, G6-6 ledger status closed set)
  *   + T29-T42, T61-T67 (G5-b closed set, plus the G5-a 2 empty-value division of labour).
  *   + T114-T118 (G4b corpus enumeration decoupled from the index, OB-120).
+ *   + T119-T124 (G1(e2) / G5(e2) in-block completion-record rows, v1.64; T121-T122 add the
+ *     recorded counters, the no-heading branch, nearest-heading binding and the EN field name;
+ *     T123 adds the `x{,_EN}.md` brace-shorthand expansion, its unresolved side and the
+ *     unexpandable two-group form that must stay a visible skip; T124 guards the stem-less
+ *     group against an EMPTY reference and pins extractor parity on the brace-free path).
  * T3 (defect A1 against commit b738e6b) and T12 (defect C1 against commit 1b01115)
  * need real git ranges and are therefore executed as recorded evidence:
  *   node tools/gates/gate.js --check=G6 --scope=range:b738e6b^..b738e6b
@@ -861,7 +866,17 @@ function g1Probe(text, mod, added) {
     const r = out.records.find((x) => x.id === id);
     return r ? r.verdict : 'ABSENT';
   };
-  return { c: pick('G1(c)'), d: pick('G1(d)'), e: pick('G1(e)'), f: pick('G1(f)'), detail: out.records.map((r) => r.id + '=' + r.verdict).join(' ') };
+  return {
+    c: pick('G1(c)'),
+    d: pick('G1(d)'),
+    e: pick('G1(e)'),
+    e2: pick('G1(e2)'),
+    f: pick('G1(f)'),
+    // The record text carries the judged / skipped / historical counters, so a probe can tell a
+    // real PASS from a vacuous one (v1.64 T121).
+    e2detail: detailOf(out.records, 'G1(e2)'),
+    detail: out.records.map((r) => r.id + '=' + r.verdict).join(' '),
+  };
 }
 
 /**
@@ -891,7 +906,17 @@ function g5Probe(o, mod) {
     const r = out.records.find((x) => x.id === id);
     return r ? r.verdict : 'ABSENT';
   };
-  return { d: pick('G5(d)'), e: pick('G5(e)'), f: pick('G5(f)'), detail: out.records.map((r) => r.id + '=' + r.verdict).join(' '), raw: out.records.map((r) => r.id + ':' + r.detail).join(' | ') };
+  return {
+    d: pick('G5(d)'),
+    e: pick('G5(e)'),
+    e2: pick('G5(e2)'),
+    f: pick('G5(f)'),
+    // `N reference(s) resolved` vs `no added in-block completion row`: T122 needs the difference
+    // to prove the positive case is not a vacuous pass (v1.64).
+    e2detail: detailOf(out.records, 'G5(e2)'),
+    detail: out.records.map((r) => r.id + '=' + r.verdict).join(' '),
+    raw: out.records.map((r) => r.id + ':' + r.detail).join(' | '),
+  };
 }
 
 /** G3(a.2) mirror-parity probe (OB-73). A synthetic directive pair with only the four ctx
@@ -2871,6 +2896,135 @@ async function runTests() {
     );
   }
 
+  // ---- T119: v1.64 (P60 DIRECTIVE-JUDGE-BLINDSPOTS) - G1(e2) judges ADDED in-block
+  // completion-record rows (`| 完成记录 | … |` outside the appended table): the nearest
+  // heading above the row must be ✅; historical rows are never re-judged and a heading
+  // without a state symbol is skipped (recorded, not silently passed).
+  {
+    const ROW = '| 完成记录 | 报告对：`docs/validation/p60x.md` |';
+    const mk = (head) =>
+      [
+        '状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断',
+        '',
+        '## 状态表',
+        '',
+        '| 切片 | 状态 | 直接依赖 | 规模 | 完成日期 | 证据 |',
+        '|---|---|---|---|---|---|',
+        '| A0 alpha | ✅ 完成 | — | M | | |',
+        '',
+        head,
+        '',
+        ROW,
+        '',
+        '## 完成记录（追加）',
+        '',
+        '| 日期 | 切片 | 完成摘要 | 证据 |',
+        '|---|---|---|---|',
+        '| 2026-09-14 | A0 | done | `docs/validation/a0.md` |',
+      ].join('\n');
+    const rowNo = (head) => mk(head).split('\n').indexOf(ROW) + 1;
+
+    const doneHead = '## A0 — alpha · ✅';
+    const pos1 = g1Probe(mk(doneHead), undefined, [rowNo(doneHead)]);
+    check(
+      'T119 G1(e2) an ADDED in-block completion row under a ✅ heading passes',
+      pos1.e2 === 'PASS',
+      pos1.detail
+    );
+
+    const liveHead = '## A0 — alpha · 🔄';
+    const neg1 = g1Probe(mk(liveHead), undefined, [rowNo(liveHead)]);
+    check(
+      'T119 G1(e2) an ADDED in-block completion row under a non-✅ heading fails',
+      neg1.e2 === 'FAIL',
+      neg1.detail
+    );
+
+    const pos2 = g1Probe(mk(liveHead), undefined, []);
+    check(
+      'T119 G1(e2) the same row is not re-judged when it is not in the added set (forward rule)',
+      pos2.e2 === 'PASS',
+      pos2.detail
+    );
+
+    const plainHead = '### P3 — `C1` 字段补全（不新建片）';
+    const skip = g1Probe(mk(plainHead), undefined, [rowNo(plainHead)]);
+    check(
+      'T119 G1(e2) an in-block row whose nearest heading carries no state symbol is skipped, not failed',
+      skip.e2 === 'PASS',
+      skip.detail
+    );
+  }
+
+  // ---- T121: v1.64 (P60 DIRECTIVE-JUDGE-BLINDSPOTS) - T119 only asserts the VERDICT, so a
+  // PASS caused by "nothing was collected" is indistinguishable from a PASS caused by "one row
+  // was judged and passed". The recorded counters close that: each branch must move its own
+  // counter. Two branches T119 leaves implicit are covered here as well - a row with NO heading
+  // above it (the `!c.headKey` half of the skip guard) and nearest-heading binding (a ✅ heading
+  // followed by a 🔄 one must NOT excuse the row) - plus the EN `| Completion record |` field name.
+  {
+    const CN_ROW = '| 完成记录 | 报告对：`docs/validation/p60x.md` |';
+    const EN_ROW = '| Completion record | Report pair: `docs/validation/p60x.md` |';
+    const mk = (head, row) =>
+      [
+        '状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断',
+        '',
+        '## 状态表',
+        '',
+        '| 切片 | 状态 | 直接依赖 | 规模 | 完成日期 | 证据 |',
+        '|---|---|---|---|---|---|',
+        '| A0 alpha | ✅ 完成 | — | M | | |',
+        '',
+        ...(head ? [head, ''] : []),
+        row,
+        '',
+        '## 完成记录（追加）',
+        '',
+        '| 日期 | 切片 | 完成摘要 | 证据 |',
+        '|---|---|---|---|',
+        '| 2026-09-14 | A0 | done | `docs/validation/a0.md` |',
+      ].join('\n');
+    const rowNo = (head, row) => mk(head, row).split('\n').indexOf(row) + 1;
+
+    const doneHead = '## A0 — alpha · ✅';
+    const judged = g1Probe(mk(doneHead, CN_ROW), undefined, [rowNo(doneHead, CN_ROW)]);
+    check(
+      'T121 G1(e2) the ✅ PASS is a JUDGED row, not a vacuous skip (counter: 1 judged, 0 skipped, 0 historical)',
+      judged.e2 === 'PASS' && /^1 judged, 0 skipped, 0 historical/.test(judged.e2detail),
+      judged.e2 + ' :: ' + judged.e2detail
+    );
+
+    const liveHead = '## A0 — alpha · 🔄';
+    const historical = g1Probe(mk(liveHead, CN_ROW), undefined, []);
+    check(
+      'T121 G1(e2) the forward rule is a real exclusion: an unadded row is counted historical, never judged',
+      historical.e2 === 'PASS' && /^0 judged, 0 skipped, 1 historical/.test(historical.e2detail),
+      historical.e2 + ' :: ' + historical.e2detail
+    );
+
+    const noHead = g1Probe(mk(null, CN_ROW), undefined, [rowNo(null, CN_ROW)]);
+    check(
+      'T121 G1(e2) an added row with NO heading above it is skipped via the headKey guard (not silently passed as judged)',
+      noHead.e2 === 'PASS' && /^0 judged, 1 skipped, 0 historical/.test(noHead.e2detail),
+      noHead.e2 + ' :: ' + noHead.e2detail
+    );
+
+    const stacked = '## A0 — alpha · ✅\n\n## B1 — beta · 🔄';
+    const nearest = g1Probe(mk(stacked, CN_ROW), undefined, [rowNo(stacked, CN_ROW)]);
+    check(
+      'T121 G1(e2) the row binds to the NEAREST heading: a ✅ heading above a 🔄 one does not excuse it',
+      nearest.e2 === 'FAIL' && /heading B1=🔄/.test(nearest.e2detail),
+      nearest.e2 + ' :: ' + nearest.e2detail
+    );
+
+    const en = g1Probe(mk(liveHead, EN_ROW), undefined, [rowNo(liveHead, EN_ROW)]);
+    check(
+      'T121 G1(e2) the EN field name `| Completion record |` is collected and judged like the CN one',
+      en.e2 === 'FAIL' && /heading A0=🔄/.test(en.e2detail),
+      en.e2 + ' :: ' + en.e2detail
+    );
+  }
+
   // ---- T77: v1.36 - base G5 (change-set contract) derives its four fields instead of asking for a JSON.
   {
     const R = 'docs/validation/probe-report.md';
@@ -3111,6 +3265,174 @@ async function runTests() {
       mutG5.identical === true &&
         g5Probe({ changed: [R, 'tools/undeclared.js'], texts: { [R]: FENCE }, added: {}, existing: [R], unstaged: [] }).d === 'FAIL',
       'identical=' + mutG5.identical
+    );
+  }
+
+  // ---- T120: v1.64 (P60 DIRECTIVE-JUDGE-BLINDSPOTS) - G5(e2) resolves the evidence paths of
+  // ADDED in-block completion-record rows (the appended table's date rows never match).
+  {
+    const R = 'docs/validation/probe-report.md';
+    const FENCE = '```artifacts\n' + R + '\trepo\n```';
+    const ROW = (p) => '| 完成记录 | 报告对：`' + p + '` |';
+    const LEDGER_PATH = 'docs/t027/REMAINING_SLICES.md';
+
+    const pos1 = g5Probe({
+      changed: [R],
+      texts: { [R]: FENCE },
+      added: { [LEDGER_PATH]: [ROW(R)] },
+      existing: [R],
+      unstaged: [],
+    });
+    check(
+      'T120 G5(e2) an ADDED in-block completion row whose evidence path resolves passes',
+      pos1.e2 === 'PASS',
+      pos1.raw
+    );
+
+    const neg1 = g5Probe({
+      changed: [R],
+      texts: { [R]: FENCE },
+      added: { [LEDGER_PATH]: [ROW('docs/validation/ghost.md')] },
+      existing: [R],
+      unstaged: [],
+    });
+    check(
+      'T120 G5(e2) an ADDED in-block completion row whose evidence path does not resolve fails',
+      neg1.e2 === 'FAIL',
+      neg1.raw
+    );
+
+    const pos2 = g5Probe({
+      changed: [R],
+      texts: { [R]: FENCE },
+      added: { [LEDGER_PATH]: [] },
+      existing: [R],
+      unstaged: [],
+    });
+    check(
+      'T120 G5(e2) without an added in-block completion row there is nothing to resolve (PASS)',
+      pos2.e2 === 'PASS',
+      pos2.raw
+    );
+  }
+
+  // ---- T122: v1.64 (P60 DIRECTIVE-JUDGE-BLINDSPOTS) - T120's positive case asserts only the
+  // verdict, which is also what "nothing was extracted" reports. Here the PASS must prove a
+  // reference was actually resolved, and the EN field name must be extracted too.
+  {
+    const R = 'docs/validation/probe-report.md';
+    const FENCE = '```artifacts\n' + R + '\trepo\n```';
+    const LEDGER_PATH = 'docs/t027/REMAINING_SLICES.md';
+
+    const resolved = g5Probe({
+      changed: [R],
+      texts: { [R]: FENCE },
+      added: { [LEDGER_PATH]: ['| 完成记录 | 报告对：`' + R + '` |'] },
+      existing: [R],
+      unstaged: [],
+    });
+    check(
+      'T122 G5(e2) the resolvable PASS is a REAL resolution (counter: 1 reference(s) resolved)',
+      resolved.e2 === 'PASS' && /1 row\(s\), 1 reference\(s\) resolved/.test(resolved.e2detail),
+      resolved.e2 + ' :: ' + resolved.e2detail
+    );
+
+    const en = g5Probe({
+      changed: [R],
+      texts: { [R]: FENCE },
+      added: { [LEDGER_PATH]: ['| Completion record | Report pair: `' + R + '` |'] },
+      existing: [R],
+      unstaged: [],
+    });
+    check(
+      'T122 G5(e2) an ADDED EN `| Completion record |` row is extracted and resolved like the CN one',
+      en.e2 === 'PASS' && /1 row\(s\), 1 reference\(s\) resolved/.test(en.e2detail),
+      en.e2 + ' :: ' + en.e2detail
+    );
+  }
+
+  // ---- T123: v1.64 r2 (P60 DIRECTIVE-JUDGE-BLINDSPOTS) - the ledger writes the report PAIR in
+  // brace shorthand (`docs/validation/x{,_EN}.md`), which the shared extractor drops outright.
+  // G5(e2) now expands exactly one brace group; what it cannot expand must still be a VISIBLE
+  // skip, never a silent one (F-1 + F-2).
+  {
+    const R = 'docs/validation/probe-report.md';
+    const FENCE = '```artifacts\n' + R + '\trepo\n```';
+    const LEDGER_PATH = 'docs/t027/REMAINING_SLICES.md';
+    const PAIR_ROW = (p) => '| 完成记录 | 报告对：`' + p + '` |';
+
+    const expanded = g5Probe({
+      changed: [R],
+      texts: { [R]: FENCE },
+      added: { [LEDGER_PATH]: [PAIR_ROW('docs/validation/x{,_EN}.md')] },
+      existing: ['docs/validation/x.md', 'docs/validation/x_EN.md'],
+      unstaged: [],
+    });
+    check(
+      'T123 G5(e2) `x{,_EN}.md` expands to BOTH sides and resolves (counter: 2 reference(s) resolved)',
+      expanded.e2 === 'PASS' && /2 reference\(s\) resolved/.test(expanded.e2detail),
+      expanded.e2 + ' :: ' + expanded.e2detail
+    );
+
+    const missingSide = g5Probe({
+      changed: [R],
+      texts: { [R]: FENCE },
+      added: { [LEDGER_PATH]: [PAIR_ROW('docs/validation/x{,_EN}.md')] },
+      existing: ['docs/validation/x.md'],
+      unstaged: [],
+    });
+    check(
+      'T123 G5(e2) the expansion is load-bearing: a missing `_EN` side fails instead of being dropped',
+      missingSide.e2 === 'FAIL' && /x_EN\.md/.test(missingSide.e2detail),
+      missingSide.e2 + ' :: ' + missingSide.e2detail
+    );
+
+    const twoGroups = g5Probe({
+      changed: [R],
+      texts: { [R]: FENCE },
+      added: { [LEDGER_PATH]: [PAIR_ROW('docs/validation/x{,_EN}{,_CN}.md')] },
+      existing: ['docs/validation/x.md', 'docs/validation/x_EN.md', 'docs/validation/x_CN.md', 'docs/validation/x_EN_CN.md'],
+      unstaged: [],
+    });
+    check(
+      'T123 G5(e2) a second brace group stays unexpandable: the skip is VISIBLE, not a silent pass',
+      twoGroups.e2 === 'PASS' && /no parsable evidence path/.test(twoGroups.e2detail),
+      twoGroups.e2 + ' :: ' + twoGroups.e2detail
+    );
+  }
+
+  // ---- T124: v1.64 r2 (P60 DIRECTIVE-JUDGE-BLINDSPOTS) - two r2 review follow-ups. (1) The
+  // expansion must never manufacture an EMPTY reference: a stem-less group such as `{,_EN}`
+  // normalises to `''`, nothing resolves the repository root as an artifact, and the gate would
+  // FAIL on a row that carries no path at all. The current `(.+?)` stem guard is what prevents
+  // it, so it needs an assertion rather than a comment. (2) On a brace-free row the in-block
+  // extractor must return EXACTLY what the shared G5(e) extractor returns, otherwise the two
+  // verdicts drift apart on the paths both of them are supposed to judge.
+  {
+    const R = 'docs/validation/probe-report.md';
+    const FENCE = '```artifacts\n' + R + '\trepo\n```';
+    const LEDGER_PATH = 'docs/t027/REMAINING_SLICES.md';
+
+    const degenerate = g5Probe({
+      changed: [R],
+      texts: { [R]: FENCE },
+      added: { [LEDGER_PATH]: ['| 完成记录 | 见 `{,_EN}` |'] },
+      existing: [R],
+      unstaged: [],
+    });
+    check(
+      'T124 G5(e2) a stem-less brace group yields NO reference: a visible skip, never a false FAIL',
+      degenerate.e2 === 'PASS' && /no parsable evidence path/.test(degenerate.e2detail),
+      degenerate.e2 + ' :: ' + degenerate.e2detail
+    );
+
+    const plainRow = '| 完成记录 | 报告对：`' + R + '` 与 `docs/validation/other.md` |';
+    const shared = G5._internals.evidencePathsFromRow(plainRow);
+    const inblock = G5._internals.evidencePathsFromInBlockRow(plainRow);
+    check(
+      'T124 G5(e2) on a brace-free row the in-block extractor agrees EXACTLY with the shared G5(e) extractor',
+      shared.length === 2 && JSON.stringify(shared) === JSON.stringify(inblock),
+      'shared=' + JSON.stringify(shared) + ' inblock=' + JSON.stringify(inblock)
     );
   }
 

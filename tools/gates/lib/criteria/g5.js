@@ -95,6 +95,55 @@ function evidencePathsFromRow(line) {
   return Array.from(new Set(out));
 }
 
+/**
+ * G5(e2)-only extractor (v1.64, P60 r2).
+ *
+ * The in-block completion row writes the report PAIR in brace shorthand:
+ *   | 完成记录 | 报告对：`docs/validation/x{,_EN}.md` |
+ * The shared extractor drops every backticked token containing `{` (an unexpanded brace
+ * expression is not a path), which made G5(e2) vacuous for the current corpus (14 of the
+ * 20 P-series rows). This variant expands ONE brace group as a comma-separated alternative
+ * list; anything it cannot expand is still skipped, and both bare-path fallbacks keep the
+ * shared extractor's exact rules (braces skipped, never expanded). `evidencePathsFromRow`
+ * is deliberately untouched: G5(e) keeps its own contract and the same-source gap is a
+ * recorded observation item for the main controller, out of scope for this slice.
+ */
+function evidencePathsFromInBlockRow(line) {
+  const cells = String(line)
+    .replace(/^\|/, '')
+    .replace(/\|\s*$/, '')
+    .split('|')
+    .map((s) => s.trim());
+  const cell = cells[cells.length - 1] || '';
+  const out = [];
+  for (const m of cell.matchAll(/`([^`]+)`/g)) {
+    const raw = m[1].trim();
+    if (raw.indexOf('{') >= 0) {
+      const brace = /^(.+?)\{([^{}]+)\}(.*)$/.exec(raw);
+      if (!brace) continue; // an unexpandable brace form: skip, exactly as G5(e) does
+      for (const stem of brace[2].split(',').map((s) => s.trim())) {
+        const cand = brace[1] + stem + brace[3];
+        // Only a SINGLE brace group is supported; a second one stays unexpanded, so the
+        // candidate is not a path and is discarded (conservative, never a false reference).
+        if (cand.indexOf('{') >= 0) continue;
+        out.push(normalize(cand.replace(/[).,;]+$/, '')));
+      }
+      continue;
+    }
+    if (PATH_TOKEN.test(raw)) out.push(normalize(raw.replace(/[).,;]+$/, '')));
+  }
+  for (const m of cell.matchAll(/([\s（(、,，；;）]|^)((?:docs|tools|examples|schemas|cmd|internal|harnesses|testdata|\.github)\/[^\s；;、,，|)`）]+)/g)) {
+    const raw = m[2].replace(/[).,;]+$/, '');
+    if (raw.indexOf('{') >= 0) continue;
+    out.push(normalize(raw));
+  }
+  for (const m of cell.matchAll(/(^|[\s（(、,，；;）`])([A-Za-z0-9_.-]{2,}\.(?:md|js|mjs|cjs|ts|go|mod|sum|json|ps1|sh|py|ya?ml|txt))(?=[\s（(、,，；;）`|)\]}]|$)/g)) {
+    if (!ROOT_ARTIFACT.test(m[2])) continue;
+    out.push(normalize(m[2]));
+  }
+  return Array.from(new Set(out));
+}
+
 function identical(a, b) {
   const A = Array.from(new Set(a)).sort();
   const B = Array.from(new Set(b)).sort();
@@ -128,6 +177,23 @@ function run(ctx, out) {
       for (const line of ctx.addedLines(rel) || []) {
         if (!/^\|\s*\d{4}-\d{2}-\d{2}\s*\|/.test(line)) continue;
         refs.push(...evidencePathsFromRow(line));
+      }
+    }
+  }
+
+  // ---- in-block completion-record rows (G5(e2), v1.64)
+  // `| 完成记录 | 报告对：`…` |` sits in a slice block, not in the appended completion table;
+  // the date-row pattern above never matches it, so it needs its own extraction. The
+  // evidence cell is the LAST cell, which both extractors read. The row count is kept so a
+  // PASS cannot hide behind "nothing was extracted" (v1.64 r2, F-2).
+  const rows2 = [];
+  const refs2 = [];
+  if (typeof ctx.addedLines === 'function') {
+    for (const rel of LEDGER_PAIR) {
+      for (const line of ctx.addedLines(rel) || []) {
+        if (!/^\|\s*(?:完成记录|Completion record)\s*\|/.test(line)) continue;
+        rows2.push(line);
+        refs2.push(...evidencePathsFromInBlockRow(line));
       }
     }
   }
@@ -208,6 +274,21 @@ function run(ctx, out) {
     refs.length === 0 ? 'no added completion row (nothing to resolve)' : unresolved.length ? JSON.stringify(unresolved.slice(0, 5)) : refs.length + ' reference(s) resolved'
   );
 
+  // ---- G5(e2): in-block completion-row evidence resolves
+  const unresolvedE2 = [];
+  for (const ref of refs2) {
+    const probe = ref.replace(/\/+$/, '');
+    if (!ctx.repoArtifactResolvable(probe)) unresolvedE2.push(ref);
+  }
+  // The three-way detail keeps an unparsable row VISIBLE: a row that produced no path used to
+  // read as "no row at all", i.e. a silent skip (v1.64 r2, F-2).
+  let e2detail;
+  if (rows2.length === 0) e2detail = 'no added in-block completion row (nothing to resolve)';
+  else if (refs2.length === 0) e2detail = rows2.length + ' added in-block row(s) but no parsable evidence path (v1.64)';
+  else if (unresolvedE2.length) e2detail = JSON.stringify(unresolvedE2.slice(0, 5));
+  else e2detail = rows2.length + ' row(s), ' + refs2.length + ' reference(s) resolved (v1.64)';
+  out.rec('G5(e2)', unresolvedE2.length === 0 ? 'PASS' : 'FAIL', 'in-block completion-row evidence resolves', e2detail);
+
   // ---- G5(f): index hygiene
   if (ctx.kind !== 'index') {
     out.rec('G5(f)', 'INFO', 'index hygiene', 'scope=' + ctx.kind + ': staging is not part of this scope');
@@ -222,5 +303,14 @@ module.exports = {
   title: '变更集契约',
   scripted: true,
   run,
-  _internals: { parseArtifacts, evidencePathsFromRow, identical, normalize, REPORT_RE, PATH_TOKEN, ROOT_ARTIFACT },
+  _internals: {
+    parseArtifacts,
+    evidencePathsFromRow,
+    evidencePathsFromInBlockRow,
+    identical,
+    normalize,
+    REPORT_RE,
+    PATH_TOKEN,
+    ROOT_ARTIFACT,
+  },
 };

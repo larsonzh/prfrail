@@ -89,6 +89,7 @@
 | P56 G4B-CORPUS-DECOUPLE | ✅ 已完成（2026-11-05；准则 v1.61；R=2、D=1） | P55 | M | — | 报告 `docs/validation/g4b-corpus-decouple{,_EN}.md`；证据包 `docs/validation/evidence/G4B-CORPUS-DECOUPLE/`；`SELFTEST: PASS 703/703` |
 | P58 P58-OB-TRIAGE | ✅ 已完成（2026-11-05） | P56 | S | — | 报告对 `docs/validation/p58-ob-triage-assessment{,_EN}.md`；证据包 `docs/validation/evidence/P58-OB-TRIAGE/`；R = 0、D = 0 |
 | P59 DIRECTIVE-SCOPE-GUARD | ✅ 已完成（2026-11-06；R-12 裁定 A2×B1×Y1；v1.63） | P58 | S | — | 报告对 `docs/validation/p59-directive-scope-guard{,_EN}.md`；证据包 `docs/validation/evidence/P59-DIRECTIVE-SCOPE-GUARD/`；R = 0、D = 0 |
+| P60 DIRECTIVE-JUDGE-BLINDSPOTS | ✅ 已完成（2026-11-06；裁定 J2×J3、J1 不选；v1.64） | P59 | M | 2026-11-06 | 报告对 `docs/validation/p60-directive-judge-blindspots{,_EN}.md`；证据包 `docs/validation/evidence/P60-DIRECTIVE-JUDGE-BLINDSPOTS/`；R = 0、D = 2 |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -1699,6 +1700,27 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | R / D 基线 | R = 0、D = 0 |
 | 临时件落点声明 | 本片临时目录 = `tmp/P59-DIRECTIVE-SCOPE-GUARD/`（⑧c 前只增不删） |
 | 完成记录 | 报告对：`docs/validation/p59-directive-scope-guard{,_EN}.md` |
+
+### P60 — `DIRECTIVE-JUDGE-BLINDSPOTS`（判据盲区收口 · 层 2 的 `G-4` 项） · ✅ 已完成
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `DIRECTIVE-JUDGE-BLINDSPOTS`（治理类；准则 v1.63 → **v1.64**；承载 v49 §四 层 2 的 `G-4` 项，由本片闭环） |
+| 状态 | ✅ **已完成**（2026-11-06 闭环；裁定 = J2×J3 组合、J1 不选；起跑锚点 HEAD = `30dc4a3`；主控模型 = `DeepSeek V4 Pro`，ADR-034） |
+| 目标 | 收口 OB-138：P 系块内完成记录行不受 G1(e)/G5(e) 覆盖的判据盲区，处置形态（J1 迁入 append 表 / J2 扩判据 / J3 记录态）由用户裁定 |
+| 依赖 | P59 闭环（`75b90a8`）；`CHECKLIST_v49` §四 层 2 的 `G-4` 起跑条件（用户点名）；J1/J2/J3 裁定（阶段 A 停点） |
+| 规模 | M（J2 主导；J3 不增成本；用户随裁定确认） |
+| 步骤 | 两段式：阶段 A = 步骤 0 → ① 出三案对比表 → 停等 J1/J2/J3 裁定；阶段 B = ② → ③（J2 才派）→ ④ → ⑤ → ⑥ → ⑦ → ⑧ → ⑨ → ⑧c → ⑩ |
+| 现状缺口 | OB-138：P40–P58 的块内 `\| 完成记录 \| … \|` 字段行不被 G1(e)/G5(e) 解析（两判据只认 `## 完成记录（追加）` 表的日期键行）⇒ 完成记录无机械守护 |
+| 交付物 | 报告对 `docs/validation/p60-directive-judge-blindspots{,_EN}.md`；证据包 `docs/validation/evidence/P60-DIRECTIVE-JUDGE-BLINDSPOTS/`；按裁定改 §12.4 OB-138 处置列（J1 另涉台账历史行迁入、J2 另涉 `tools/gates/**` 与 selftest）；ADR-034（步骤 0）；本台账 P60 段 |
+| 验收证据 | 三作用域 `TOTAL_FAIL=0`；`SELFTEST 722/722`（基线 703 → +19，T119–T124 正反夹具）；G3(a) 双语对称；OB-138 处置列已翻「已处置」（J3）；G1(e2)/G5(e2) 对本片自身块内完成行生效（J2 自我覆盖实证） |
+| 边界 | 不改产品代码 / CI / CONTRACTS / schema / fixtures；不改 P7 行；不改 G-4 行内含（v49 已写）；不替用户裁定 J1/J2/J3；不推 gitee；阶段 A 停 ①、阶段 B 停 ⑩ |
+| 分级 | `[SLICE]`（治理类） |
+| 探针额度 | 无（0 次真实外部调用） |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/P60-DIRECTIVE-JUDGE-BLINDSPOTS/freedom-list.md` |
+| R / D 基线 | R = 0、D = 2（D-1 盲审顺序偏离 §7.7 字面、D-2 tmp 顶层残留 `gate-v49-tree.txt` 留 v50；均登记报告 §1） |
+| 临时件落点声明 | 本片临时目录 = `tmp/P60-DIRECTIVE-JUDGE-BLINDSPOTS/`（⑧c 前只增不删） |
+| 完成记录 | 报告对：`docs/validation/p60-directive-judge-blindspots{,_EN}.md`；审查链 ① `DESIGN: DONE` → ② 两轮（r2 修 F-1/F-2）→ ③ 两轮 `TEST: DONE`（T119–T124）→ ⑤ r1 `PASS WITH FIXES`（M-1/M-2）→ r2 `PASS` → ⑥ `INDEPENDENT SCAN: PASS` → ⑦ `FINAL REVIEW: PASS` + 盲审 r1 `FINDINGS`（1 Medium = G7-f 预期项，⑧ 转录闭合）→ r2 `FINDINGS`（3 项收尾时序，已修）→ r2b `PASS`（终局）；SELFTEST 703 → 722；R=0、D=2（D-1 盲审顺序偏离 / D-2 tmp 顶层残留）；停于 ⑩ 等授权，未提交 |
 
 ## 已知缺陷（后续切片前处理）
 

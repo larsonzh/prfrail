@@ -1,0 +1,6 @@
+scope=index TOTAL_FAIL=1
+  G7-d stopped state marked incomplete :: docs/validation/p60-directive-judge-blindspots_EN.md:3 stopped state without `已停止——未完成` / `Stopped — incomplete`
+scope=tree TOTAL_FAIL=1
+  G7-d stopped state marked incomplete :: docs/validation/p60-directive-judge-blindspots_EN.md:3 stopped state without `已停止——未完成` / `Stopped — incomplete`
+scope=ci TOTAL_FAIL=0
+SELFTEST: PASS 722/722

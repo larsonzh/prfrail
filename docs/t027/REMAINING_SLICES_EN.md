@@ -89,6 +89,7 @@
 | P56 G4B-CORPUS-DECOUPLE | ✅ Done (2026-11-05; directive v1.61; R=2, D=1) | P55 | M | — | report `docs/validation/g4b-corpus-decouple{,_EN}.md`; evidence package `docs/validation/evidence/G4B-CORPUS-DECOUPLE/`; `SELFTEST: PASS 703/703` |
 | P58 P58-OB-TRIAGE | ✅ Done (2026-11-05) | P56 | S | — | report pair `docs/validation/p58-ob-triage-assessment{,_EN}.md`; evidence pack `docs/validation/evidence/P58-OB-TRIAGE/`; R = 0, D = 0 |
 | P59 DIRECTIVE-SCOPE-GUARD | ✅ Done (2026-11-06; R-12 ruled A2×B1×Y1; v1.63) | P58 | S | — | report pair `docs/validation/p59-directive-scope-guard{,_EN}.md`; evidence pack `docs/validation/evidence/P59-DIRECTIVE-SCOPE-GUARD/`; R = 0, D = 0 |
+| P60 DIRECTIVE-JUDGE-BLINDSPOTS | ✅ Done (2026-11-06; ruling J2×J3, J1 not selected; v1.64) | P59 | M | 2026-11-06 | report pair `docs/validation/p60-directive-judge-blindspots{,_EN}.md`; evidence pack `docs/validation/evidence/P60-DIRECTIVE-JUDGE-BLINDSPOTS/`; R = 0, D = 2 |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1686,6 +1687,27 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | R / D baseline | R = 0, D = 0 |
 | Temp artefact location | `tmp/P59-DIRECTIVE-SCOPE-GUARD/` (append-only until 8c) |
 | Completion record | Report pair: `docs/validation/p59-directive-scope-guard{,_EN}.md` |
+
+### P60 — `DIRECTIVE-JUDGE-BLINDSPOTS` (criterion blind-spot close-out · layer 2 item `G-4`) · ✅ Done
+
+| Field | Content |
+|---|---|
+| Identifier | `DIRECTIVE-JUDGE-BLINDSPOTS` (governance class; directive v1.63 → **v1.64**; carries layer 2 item `G-4` of §4 in v49, closed by this slice) |
+| Status | ✅ **Done** (closed 2026-11-06; ruling = J2×J3 combination, J1 not selected; start anchor HEAD = `30dc4a3`; controller model = `DeepSeek V4 Pro`, ADR-034) |
+| Goal | Close out OB-138: the P-series in-block completion record rows are outside the G1(e)/G5(e) coverage; the disposition form (J1 migrate into the append table / J2 extend the criteria / J3 recorded state) is ruled by the user |
+| Depends on | P59 closed (`75b90a8`); the `G-4` start condition under layer 2 of §4 in `CHECKLIST_v49` (named by the user); the J1/J2/J3 ruling (phase A stop point) |
+| Size | M (J2-driven; J3 adds no cost; confirmed by the user with the ruling) |
+| Steps | Two-phase: phase A = step 0 → ① three-way table → stop for the J1/J2/J3 ruling; phase B = ② → ③ (J2 only) → ④ → ⑤ → ⑥ → ⑦ → ⑧ → ⑨ → ⑧c → ⑩ |
+| Current gap | OB-138: the P40–P58 in-block `\| 完成记录 \| … \|` field rows are not parsed by G1(e)/G5(e) (both criteria only recognize the date-key rows of the `## 完成记录（追加）` table) ⇒ no mechanical guard for completion records |
+| Deliverables | Report pair `docs/validation/p60-directive-judge-blindspots{,_EN}.md`; evidence pack `docs/validation/evidence/P60-DIRECTIVE-JUDGE-BLINDSPOTS/`; the §12.4 OB-138 disposition cell changed per the ruling (J1 additionally touches ledger historical-row migration, J2 additionally touches `tools/gates/**` and selftest); ADR-034 (step 0); this ledger's P60 block |
+| Acceptance evidence | Three scopes `TOTAL_FAIL=0`; `SELFTEST 722/722` (baseline 703 → +19, T119–T124 positive/negative fixtures); G3(a) bilingual symmetry; the OB-138 disposition cell flipped to 「已处置」 (J3); G1(e2)/G5(e2) took effect on this slice's own in-block completion row (J2 self-coverage evidence) |
+| Boundary | No product code / CI / CONTRACTS / schema / fixture change; no P7-row change; no `G-4`-row content change (already written in v49); no ruling on J1/J2/J3 on the user's behalf; no gitee push; phase A stops at ①, phase B stops at ⑩ |
+| Class | `[SLICE]` (governance) |
+| Probe budget | none (no real external call) |
+| Freedom-list path | `docs/validation/evidence/P60-DIRECTIVE-JUDGE-BLINDSPOTS/freedom-list.md` |
+| R / D baseline | R = 0, D = 2 (D-1 blind-review order deviation from the §7.7 letter, D-2 tmp-top-level leftover `gate-v49-tree.txt` left for v50; both registered in report §1) |
+| Temp artefact location | `tmp/P60-DIRECTIVE-JUDGE-BLINDSPOTS/` (append-only until 8c) |
+| Completion record | Report pair: `docs/validation/p60-directive-judge-blindspots{,_EN}.md`; review chain ① `DESIGN: DONE` → ② two rounds (r2 fixed F-1/F-2) → ③ two rounds `TEST: DONE` (T119–T124) → ⑤ r1 `PASS WITH FIXES` (M-1/M-2) → r2 `PASS` → ⑥ `INDEPENDENT SCAN: PASS` → ⑦ `FINAL REVIEW: PASS` + blind r1 `FINDINGS` (1 Medium = the G7-f expected item, closed by the ⑧ transcript) → r2 `FINDINGS` (3 wrap-up-timing items, fixed) → r2b `PASS` (final); SELFTEST 703 → 722; R=0, D=2 (D-1 blind-review order deviation / D-2 tmp-top-level leftover); stopped at ⑩ awaiting authorization, not committed |
 
 ## Known defects (to be handled before later slices)
 
