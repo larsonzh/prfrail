@@ -108,8 +108,8 @@ Fixed `tmp` assertion: top level = `.gitkeep` + `gates-cache`; `gates-cache` hol
 | R-05 | whether DR13-FIX-D3 is a standalone project | done (initiated standalone and closed) |
 | R-06 | OB-55 ownership and the T027-B pace | pending |
 | R-07 | MVA, S1 moved-out items and the S2 commitment narrowing | pending |
-| R-08 | candidate, Windows premise P and probe authorization | **pending (blocks layer 1 item 8)** |
-| R-09 | AT-24 `unknown` acceptance boundary | **pending (blocks the layer-1 item 8 sign-off calibre)** |
+| R-08 | candidate, Windows premise P and probe authorization | **ruled (2026-11-06): BYOK main path + local runs + conditional closure + stage progression; see `docs/validation/r08-r09-ruling{,_EN}.md`** |
+| R-09 | AT-24 `unknown` acceptance boundary | **ruled (2026-11-06): relaxed to mostly acceptable, two bottom lines kept (public network blocked, external side effects explicitly confirmed); see `docs/validation/r08-r09-ruling{,_EN}.md`** |
 | R-10 | overall budget and per-slice model caps | pending (blocks scheduling) |
 | R-11 | scope of the historical corrections | done (tier B plus per-item differentiation) |
 | R-12 | disposition form for the D-6 class overreach and OB-137 | **ruled (2026-11-06; A2×B1×Y1; landed at v1.63; ruling text in the P59 evidence pack `01-arch/ruling-2026-11-06-r12.md`)** |

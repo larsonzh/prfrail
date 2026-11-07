@@ -1720,7 +1720,9 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 执行自由度清单落盘路径 | `docs/validation/evidence/P60-DIRECTIVE-JUDGE-BLINDSPOTS/freedom-list.md` |
 | R / D 基线 | R = 0、D = 2（D-1 盲审顺序偏离 §7.7 字面、D-2 tmp 顶层残留 `gate-v49-tree.txt` 留 v50；均登记报告 §1） |
 | 临时件落点声明 | 本片临时目录 = `tmp/P60-DIRECTIVE-JUDGE-BLINDSPOTS/`（⑧c 前只增不删） |
-| 完成记录 | 报告对：`docs/validation/p60-directive-judge-blindspots{,_EN}.md`；审查链 ① `DESIGN: DONE` → ② 两轮（r2 修 F-1/F-2）→ ③ 两轮 `TEST: DONE`（T119–T124）→ ⑤ r1 `PASS WITH FIXES`（M-1/M-2）→ r2 `PASS` → ⑥ `INDEPENDENT SCAN: PASS` → ⑦ `FINAL REVIEW: PASS` + 盲审 r1 `FINDINGS`（1 Medium = G7-f 预期项，⑧ 转录闭合）→ r2 `FINDINGS`（3 项收尾时序，已修）→ r2b `PASS`（终局，兼 ⑦ 修复后复审）；SELFTEST 703 → 722；R=0、D=2（D-1 盲审顺序偏离 / D-2 tmp 顶层残留）；停于 ⑩ 等授权，未提交 |
+| 完成记录 | 报告对：`docs/validation/p60-directive-judge-blindspots{,_EN}.md`；审查链 ① `DESIGN: DONE` → ② 两轮（r2 修 F-1/F-2）→ ③ 两轮 `TEST: DONE`（T119–T124）→ ⑤ r1 `PASS WITH FIXES`（M-1/M-2）→ r2 `PASS` → ⑥ `INDEPENDENT SCAN: PASS` → ⑦ `FINAL REVIEW: PASS` + 盲审 r1 `FINDINGS`（1 Medium = G7-f 预期项，⑧ 转录闭合）→ r2 `FINDINGS`（3 项收尾时序，已修）→ r2b `PASS`（终局，兼 ⑦ 修复后复审）；SELFTEST 703 → 722；R=0、D=2（D-1 盲审顺序偏离 / D-2 tmp 顶层残留）；已提交 `e381898` + `dafe004` 并推 origin（未推 gitee），CI `42323986343` / `42328605588` 双绿 |
+
+- R-08/R-09 裁定见 `docs/validation/r08-r09-ruling{,_EN}.md`（2026-11-06 定稿；2026-11-07 落地，[ROUTINE] docs-only）。
 
 ## 已知缺陷（后续切片前处理）
 

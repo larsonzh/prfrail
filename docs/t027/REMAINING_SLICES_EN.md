@@ -1707,7 +1707,9 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Freedom-list path | `docs/validation/evidence/P60-DIRECTIVE-JUDGE-BLINDSPOTS/freedom-list.md` |
 | R / D baseline | R = 0, D = 2 (D-1 blind-review order deviation from the §7.7 letter, D-2 tmp-top-level leftover `gate-v49-tree.txt` left for v50; both registered in report §1) |
 | Temp artefact location | `tmp/P60-DIRECTIVE-JUDGE-BLINDSPOTS/` (append-only until 8c) |
-| Completion record | Report pair: `docs/validation/p60-directive-judge-blindspots{,_EN}.md`; review chain ① `DESIGN: DONE` → ② two rounds (r2 fixed F-1/F-2) → ③ two rounds `TEST: DONE` (T119–T124) → ⑤ r1 `PASS WITH FIXES` (M-1/M-2) → r2 `PASS` → ⑥ `INDEPENDENT SCAN: PASS` → ⑦ `FINAL REVIEW: PASS` + blind r1 `FINDINGS` (1 Medium = the G7-f expected item, closed by the ⑧ transcript) → r2 `FINDINGS` (3 wrap-up-timing items, fixed) → r2b `PASS` (final, also serving as the ⑦ post-remediation re-review); SELFTEST 703 → 722; R=0, D=2 (D-1 blind-review order deviation / D-2 tmp-top-level leftover); stopped at ⑩ awaiting authorization, not committed |
+| Completion record | Report pair: `docs/validation/p60-directive-judge-blindspots{,_EN}.md`; review chain ① `DESIGN: DONE` → ② two rounds (r2 fixed F-1/F-2) → ③ two rounds `TEST: DONE` (T119–T124) → ⑤ r1 `PASS WITH FIXES` (M-1/M-2) → r2 `PASS` → ⑥ `INDEPENDENT SCAN: PASS` → ⑦ `FINAL REVIEW: PASS` + blind r1 `FINDINGS` (1 Medium = the G7-f expected item, closed by the ⑧ transcript) → r2 `FINDINGS` (3 wrap-up-timing items, fixed) → r2b `PASS` (final, also serving as the ⑦ post-remediation re-review); SELFTEST 703 → 722; R=0, D=2 (D-1 blind-review order deviation / D-2 tmp-top-level leftover); committed `e381898` + `dafe004` and pushed to origin (not gitee), CI `42323986343` / `42328605588` both green |
+
+- R-08/R-09 rulings see `docs/validation/r08-r09-ruling{,_EN}.md` (finalized 2026-11-06; landed 2026-11-07, [ROUTINE] docs-only).
 
 ## Known defects (to be handled before later slices)
 
