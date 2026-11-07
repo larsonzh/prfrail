@@ -71,6 +71,7 @@ Fixed `tmp` assertion: top level = `.gitkeep` + `gates-cache`; `gates-cache` hol
 | Seq | Slice | Identifier and content | Size | ⑦ quota | Depends on | Boundary |
 |---|---|---|---|---|---|---|
 | 8 | AT23-RESTRICTED-CANDIDATE | AT-23 restricted real candidate and sign-off | M | Codex 1 final review | **R-08 / R-09 ruling (not ruled ⇒ ⛔ blocked)** | no sign-off without a real-candidate authorization |
+
 > **R-08/R-09 status note**: the "not ruled ⇒ ⛔ blocked" wording in this table is a P59-timestamp description; R-08/R-09 were ruled on 2026-11-06 (see §6 and docs/validation/r08-r09-ruling{,_EN}.md), the layer-1 item 8 (AT-23) blockage is lifted and it can start. The v50 snapshot will reflect the ruled status directly.
 
 ### Layer 2 routine governance (debt clearance)
@@ -221,9 +222,11 @@ Here is my project-state snapshot (v49): please check the 5 anchors of section 1
 【Supplementary documents】`REMAINING_SLICES.md` (P59 closed), `DELIVERY_DIRECTIVE.md` (v1.63), `docs/validation/p59-directive-scope-guard{,_EN}.md` (P59 report, `75b90a8`, run `42121119502`).
 
 Current slice: P59 is closed and layer 0 plus the first three layer-2 items are dequeued; next is layer-1 item 8, still ⛔ blocked on the R-08 / R-09 rulings, or layer 2 `DIRECTIVE-JUDGE-BLINDSPOTS` (P60) once the user names it.
+
 > **Timestamp note**: this paragraph is a P59-timestamp snapshot. R-08/R-09 were ruled on 2026-11-06 (see §6); the layer-1 item 8 (AT-23) blockage is lifted; v50 will reflect the latest status.
 
 ## 11. Current state in one sentence
 
 P59 closed (`75b90a8` pushed to origin, run `42121119502` green on both legs; R-12 ruled A2×B1×Y1 landed at directive v1.63; OB-137 flipped `已处置`; discipline Y promoted; R = 0, temp-artefact D = 0); next = layer-1 item 8 waiting for the R-08 / R-09 rulings, or layer 2 P60 awaiting the user's naming.
+
 > **Timestamp note**: this paragraph is a P59-timestamp snapshot. R-08/R-09 were ruled on 2026-11-06; AT-23 can start; v50 will reflect the latest status.
