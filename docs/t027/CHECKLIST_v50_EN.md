@@ -207,7 +207,7 @@ Fixed `tmp` assertion: top level = `.gitkeep` + `gates-cache`; `gates-cache` hol
 | "Compression ends the slice" | at 100K context or a compression notice ⇒ end the current slice immediately |
 | "The batch-assist floor cannot be replaced by controller self-checks" | if the actual dispatch count is short, top it up in the same round; "scripts already checked" never exempts |
 
-### Gate pitfalls (P48 six + P49 seven + P52 two + P55 four + P56 one + P57 zero + P58 one + P59 one + P60 one)
+### Gate pitfalls (P48 six + P49 seven + P52 two + P55 four + P56 one + P57 zero + P58 one + P59 one + v49 D-calibre mini-fix one + P60 one)
 
 > The P48-through-P55 entries follow v45, the P56 entry follows v46, P57 added none; **v49 adds #22 (from P59)**; **v50 adds #23 / #24 (#23 from the v49 D-calibre mini-fix evidence; #24 from P60)**.
 
