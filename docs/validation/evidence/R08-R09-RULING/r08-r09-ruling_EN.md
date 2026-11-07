@@ -153,9 +153,24 @@ This ruling does not register an ADR separately. Reasons:
 2. If a later finding needs ADR-level traceability for some item (e.g. the wrapper plan is overturned, or the BYOK plan needs restructuring), it will be back-registered per §1.7.4 starting from ADR-035.
 3. R-08.2~R-08.5 and R-09.1~R-09.9 are pure acceptance-judgement calibres without architecture decisions; no ADR is needed.
 
-## 8. Change-cost grading (for future revision reference)
+## 8. Change-cost grading
 
-(Copied from section 10 of handover document v3; that document is not in the repository, so this section awaits the user's content to be back-filled per §11.2 — declared truthfully by the controller on 2026-11-07, nothing fabricated.)
+This table lists the change cost of each ruling, for reference in future revisions.
+
+| Ruling item | Cost of change | Note |
+|---|---|---|
+| R-08.2 probe budget | Very low | Pure numbers |
+| R-08.4 VM/proxy toggles | Very low | Pure environment |
+| R-09.1~R-09.9 boundaries | Low (loosen) / Medium (tighten) | Pure docs; tightening costs more |
+| AT-23 layering / staging | Low | Execution strategy, does not affect verdicts |
+| R-08.1 wrapper function | Medium | Landed code; must pass the review chain |
+| R-08.6 BYOK config | Medium | Config layer, but AT-23 depends on it |
+| P60 J2 criterion | Medium-high | Criterion body + version bump + re-review |
+| R-08.3 P → P′ | High | Open VM + run injection matrix |
+| R-08.5 conditional-closure → overall-fail | High | Overturns a signed conclusion |
+| R-09 loosen → strict (after AT-24 signed) | High | Re-run AT-24 |
+
+**Principle**: "things that will change" are designed to be changeable (budget, environment, layers, stages); "things that must not change" are explicitly frozen (verdict criteria, safety bottom lines, landed code).
 
 - ⑥ skipped: this is a `[ROUTINE]` docs-only ruling-record landing with no code / criterion / contract change; §7.2.1 allows a docs-only slice to skip ⑥ with a recorded reason.
 
