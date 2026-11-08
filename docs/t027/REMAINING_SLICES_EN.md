@@ -92,6 +92,7 @@
 | P60 DIRECTIVE-JUDGE-BLINDSPOTS | ✅ Done (2026-11-06; ruling J2×J3, J1 not selected; v1.64) | P59 | M | 2026-11-06 | report pair `docs/validation/p60-directive-judge-blindspots{,_EN}.md`; evidence pack `docs/validation/evidence/P60-DIRECTIVE-JUDGE-BLINDSPOTS/`; R = 0, D = 2 |
 | P61 AT23-RESTRICTED-CANDIDATE | ✅ Done (PARTIAL close-out; closed 2026-11-08, ⑦ `FINAL REVIEW: PARTIAL`, ADR-036) | P60 (R-08/R-09 ruled) | M | 2026-11-08 | Report pair `docs/validation/at23-restricted-candidate{,_EN}.md`; evidence pack `docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/` |
 | P62 R08-R09-RULING-REVISION | ✅ Done (closed 2026-11-08; ⑦ `FINAL REVIEW: PASS`, 1 final + 0 re-review; ADR-037; R/D=0; stopped at ⑩ awaiting authorization) | P61 (path A: R-08.5 revision first) | M | 2026-11-08 | Revise `docs/validation/r08-r09-ruling{,_EN}.md` (the R-08.5 inherited-drift waiver five elements + the R-08.1 factual correction); P61 report timestamp note; evidence pack `docs/validation/evidence/P62-R08-R09-RULING-REVISION/` |
+| P63 AT23-RECHECK | ✅ Done (closed 2026-11-09; ⑦ rules the waiver does not hold; R/D=0; stopped at ⑩ awaiting authorization) | P62 (layer-1 item 11) | S | 2026-11-09 | Evidence pack `docs/validation/evidence/P63-AT23-RECHECK/`; P61 report §10 + the §1 timestamp note |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1759,6 +1760,32 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Completion record | Revised ruling doc pair: `docs/validation/r08-r09-ruling{,_EN}.md` (the R-08.5 inherited-drift waiver five elements + the R-08.1 factual correction); the P61 report follow-up pointer section; evidence pack `docs/validation/evidence/P62-R08-R09-RULING-REVISION/` |
 | Layer 1 item 10 status marker | Deferred (reason updated: the waiver verdict is to be issued by ⑦, not yet out; v52 generation will sync the v51 §4 item-10 dependency column) |
 | Next-step suggestion | ① next step = `AT-23 re-check under the P62-revised criterion` (working name P63, size S, ⑦ must take part in the waiver verdict), start timing per the user's explicit kickoff; ② the F2 fix slice's start condition = ⑦ rules the F2 waiver does NOT hold under the P62-revised criterion (holds ⇒ cancelled, does not hold ⇒ start) |
+
+
+### P63 — `AT23-RECHECK` (layer 1 item 11 · judgment class) · ✅ Done
+
+| Field | Content |
+|---|---|
+| Identifier | `AT23-RECHECK` (judgment class `[SLICE]`; carries v52 §4 layer-1 item 11 "AT-23 re-check under the P62-revised criterion") |
+| Status | ✅ Done (closed 2026-11-09; verdict = the waiver does not hold; R/D = 0; controller V4 Pro, ADR-038; stopped at ⑩ awaiting authorization) |
+| Goal | ⑦ (independent final reviewer) judges, per the P62-revised R-08.5 five elements (same baseline / same assertion / stricter drift direction / four states unchanged / traceable cause), whether the F2 inherited-drift waiver holds; holds ⇒ AT-23 premise ① is deemed satisfied (premise ② already satisfied) ⇒ condition closure achieved and the F2 fix slice (layer-1 item 10) cancelled; does not hold ⇒ AT-23 stays PARTIAL and the F2 fix slice's start condition is met |
+| Dependencies | P62 closed (R-08.5 five elements landed); P61 closed (PARTIAL, ADR-036); the user's explicit kickoff |
+| Size | S; ⑦ high-risk tier = 1 final + 3 re-reviews, blind review +1 separately (§7.7 mandatory: touching stop semantics) |
+| Steps | ① judgment preparation (comparison table, facts only, no judgment) → ④ gates → ⑤ pre-review → ⑥ independent scan → ⑦ final review + blind review (sole waiver-judgment owner) → ⑧ doc assembly → ⑨ three scopes + SELFTEST → 8c → ⑩ |
+| Current gap | P61 premise ① unsatisfied due to the F2 `process-tree-taken-away` inherited drift; this slice only judges, it does not fix (the F2 fix slice is deferred) |
+| Deliverables | Evidence pack `docs/validation/evidence/P63-AT23-RECHECK/`; §10 at the end of the P61 report + the timestamp note at the top of §1; ADR-038 (step 0); this ledger's P63 block; s1-exit / DEV_PLAN / TEST_STRATEGY updated per the verdict |
+| Acceptance evidence | ⑦ per-element five-element verdict + final verdict; three scopes `TOTAL_FAIL=0`; `SELFTEST 722/722`; bilingual mirror 0 mismatches line by line |
+| Boundary | No product code / CI / contracts / schema / fixtures / criterion-text changes; the controller must not self-judge (sole waiver-judgment owner = ⑦); the P61 report text stays unchanged; bound by the three bullets of §1.7.2; no VM / proxy, no Sol double |
+| Class | `[SLICE]` (judgment) |
+| Probe budget | 0 (pure .md judgment, no external calls) |
+| Freedom-list path | `docs/validation/evidence/P63-AT23-RECHECK/freedom-list.md` |
+| R / D baseline | R = 0, D = 0 (registered at start, 2026-11-09) |
+| Temp artefact location | `tmp/P63-AT23-RECHECK/` (append-only until 8c) |
+| Layer 1 item 11 status marker | ✅ Dequeued (P63 completed its judgment on 2026-11-09) |
+| Completion record | Verdict = **the F2 inherited-drift waiver does not hold** (⑦ final `FINAL REVIEW: PARTIAL` + blind `BLIND REVIEW: FINDINGS`, two independent reads converging); ⑦ metering = 1 final + 1 blind + 0 re-review; deliverables = P61 report §10 + the §1 timestamp note, the ADR-038 "verdict-conclusion addendum (2026-11-09)", the AT-23/S-G1/S-G7 sync in `docs/validation/s1-exit{,_EN}.md`; evidence pack `docs/validation/evidence/P63-AT23-RECHECK/` |
+| Layer 1 item 8 status marker | 🔄 Stays PARTIAL (premise ① unmet is maintained; the P61 verdict is unchanged; points to the F2 fix slice = layer-1 item 10) |
+| Layer 1 item 10 status marker | Start condition met and awaiting the user's explicit kickoff (the user ruled on 2026-11-09 to start the F2 fix slice; its briefing will be drafted by the user separately; not started by this slice) |
+| v53 observation-item candidates | ① the R-08.5 "same assertion" (element ②) file-level vs semantic-level criterion problem (candidate fix = the assertion expression / meaning / code path unchanged; do not change the criterion now, leave it to a later governance slice); ② the G5(d) evidence-pack fence pitfall (P62/P63 hit the same pitfall on their first runs; candidates = a step-0 requirement to declare the pack in the fence in the same round, or gate pitfall No. 26) — both carried at v53 generation |
 
 ## Known defects (to be handled before later slices)
 

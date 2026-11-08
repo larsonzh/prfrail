@@ -11,6 +11,8 @@
 
 ## 1. 执行摘要
 
+> **P63 时点注记（2026-11-09）**：P63 `AT23-RECHECK` 已按 P62 修订后的 R-08.5 五要素完成复核判定，**F2 继承漂移豁免不成立**（要素②按字面不成立）⇒ AT-23 保持 PARTIAL；本节以下结论原文不变，详见 §10。
+
 **AT-23 条件闭合未达成**：前提①因 F2 `process-tree-taken-away` 继承漂移不满足（成因 `02d5797`，非 P61 引入，B4 基线今日重跑同样会红）；前提②满足（run-1 启动 + run-2 执行阻塞 + run-3 停机 + run-5 unsupported 与 B1 #8 同形态）；本片以 PARTIAL 收口（用户裁定 (E)，ADR-036）。
 
 - 前提①「机制腿全绿」：**不满足**——层 3 机制腿 F2 正例一处断言由基线 `true` 变为 `false`，9 腿的 `verdictClass` / `chainState` / `taskState` / `stepState` / `observations` 漂移为 0。
@@ -376,3 +378,38 @@ docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/input-list.md	repo
 ## 9. 后续指针（P62 追加）
 
 > **时点注记（P62，2026-11-08）**：R-08.5 判据已于 P62 修订，增加「继承漂移豁免」五要素；P61 的前提①判定不变（当时 R-08.5 未修订），但后续 AT-23 复核可按 P62 修订后的判据评估。
+
+## 10. P63 复核结论（P63 追加，2026-11-09）
+
+- 切片：`AT23-RECHECK`（判定类 `[SLICE]`，v52 §四 层 1 第 11 项「AT-23 按 P62 修订后判据复核」）；起跑 2026-11-09；主控 `DeepSeek V4 Pro`（ADR-038）；本片只判定、不修复。
+- ⑦ 判定原文：盲审 `BLIND REVIEW: FINDINGS` + 终审 `FINAL REVIEW: PARTIAL`；两读独立收敛于同一结论（豁免不成立）。
+- 五要素逐项：① 同基线 **成立**；② 同断言 **不成立**；③ 漂移方向更严格 **成立**；④ 四态不变 **成立**；⑤ 成因可追溯 **成立**。
+- 要素② 理由：方面甲 = F2 检查表达式与断言 id 在 B4（`e8cbff6`）与 HEAD 逐字节相同；方面乙 = `tools/b4-e2e/main.go` 自 B4 以来被 `02d5797` 修改，按 R-08.5 字面「harness 有改动即不满足」（`02d5797` 改动 `tools/b4-e2e/main.go`，落点 L690/L697/L1093，均不在 F2 检查代码路径；F2 检查表达式在 `e8cbff6` 与 HEAD 逐字节相同）。
+- 最终判定：**F2 继承漂移豁免不成立**。
+- 后续动作：AT-23 保持 PARTIAL（P61 判定不变，§1 与 §4.1 原文不改）；F2 修复片（层 1 第 10 项）启动条件已达成、等用户点名起跑（用户 2026-11-09 裁定启动，起跑消息由用户另行起草），本片不启动；前提①保持不满足、前提②已满足不变。
+- 证据包：`docs/validation/evidence/P63-AT23-RECHECK/`；ADR 指针：`docs/ADR_REGISTER.md` ADR-038（含「判定结论补充（2026-11-09）」）。
+- v53 观察项候选（用户 2026-11-09 裁定登记，v53 生成时承载）：
+  - 观察项 1：R-08.5「同断言」（要素②）按文件级判——「不影响 F2 检查路径的 harness 改动」（如 `02d5797` 改 L690/L697/L1093）也被判不成立，过严；候选修法 = 把「同断言」定义从「harness 文件不变」改为「断言表达式 + 断言含义 + 断言所在代码路径不变」（语义级）；**不现在改判据**，留作后续治理片评估（等 F2 修复完成、AT-23 条件闭合后，观察是否还有类似继承漂移）。
+  - 观察项 2：G5(d) 证据包围栏声明坑——P62 与 P63 首跑 index 均报 `G5(d) staged is a subset of declared`（新增证据包未在变更报告 `artifacts` 围栏声明），追加围栏后转绿；同类问题第二次；候选 = ① 起跑消息「步骤 0」强制要求「新增证据包必须同轮在变更报告围栏声明」；② 或作为门禁坑第 26 条候选。
+
+```artifacts
+docs/ADR_REGISTER.md	repo
+docs/ADR_REGISTER_EN.md	repo
+docs/t027/REMAINING_SLICES.md	repo
+docs/t027/REMAINING_SLICES_EN.md	repo
+docs/validation/at23-restricted-candidate.md	repo
+docs/validation/at23-restricted-candidate_EN.md	repo
+docs/validation/evidence/P63-AT23-RECHECK/00-briefing.md	repo
+docs/validation/evidence/P63-AT23-RECHECK/01-arch/design-r1.md	repo
+docs/validation/evidence/P63-AT23-RECHECK/04-reviews/05-prereview-r1.txt	repo
+docs/validation/evidence/P63-AT23-RECHECK/04-reviews/05-prereview-r2.txt	repo
+docs/validation/evidence/P63-AT23-RECHECK/04-reviews/06-scan-r1.txt	repo
+docs/validation/evidence/P63-AT23-RECHECK/04-reviews/07-blind-r1.txt	repo
+docs/validation/evidence/P63-AT23-RECHECK/04-reviews/07-final-r1.txt	repo
+docs/validation/evidence/P63-AT23-RECHECK/MANIFEST.md	repo
+docs/validation/evidence/P63-AT23-RECHECK/SHA256SUMS.txt	repo
+docs/validation/evidence/P63-AT23-RECHECK/freedom-list.md	repo
+docs/validation/evidence/P63-AT23-RECHECK/input-list.md	repo
+docs/validation/s1-exit.md	repo
+docs/validation/s1-exit_EN.md	repo
+```

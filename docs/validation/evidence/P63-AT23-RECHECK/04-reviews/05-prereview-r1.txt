@@ -1,0 +1,35 @@
+PRE-REVIEW: FINDINGS
+
+**核面 1（对照表事实准确性）**
+- FINDING Medium：§B④ / §C Q4 的**四态四字段行号引用错误**。design-r1 写「B4 L14–17；P61 同位置同值」，实况两份文件四字段均为 **L11–14**：
+  - B4 `docs/validation/evidence/directive-history/b4/archive/evidence/f2-pos/verdict-run.json` L11–14；P61 `.../P61-AT23-RESTRICTED-CANDIDATE/03-test/layer3/l3-f2-evidence/f2-pos/verdict-run.json` L11–14，逐字均为：
+    - L11 `"verdictClass": "uncertain-or-paused",`
+    - L12 `"chainState": "PAUSED",`
+    - L13 `"taskState": "b4-task\u00001=FAILED",`
+    - L14 `"stepState": "b4-task\u0000b4-code-step\u00001=FAILED",`
+  - 字段**值**与 design 引用逐字一致，仅行号错（14–17 应为 11–14）。
+- 其余关键核对点逐条核对为 PASS：
+  - R-08.5 五要素原文（`r08-r09-ruling.md` L42–49，含豁免后果 L48、豁免边界 L49）与 §A 引用逐字一致，L42–49 行号准确 ✓
+  - `l3-baseline-compare.txt`：L5 `now=false baseline=true`、L6 now detail（`...missing required pid report(s) stub-child.pid...`）、L7 baseline detail（`reported pids gone: true (<nil>)`）、L22 `summary: field drifts=0; failed checks in this run=1` ✓
+  - 两份 f2-pos `process-tree-taken-away` 检查（均 L136）：B4 `pass: true` / `detail: "reported pids gone: true (<nil>)"`；P61 `pass: false` / `detail: "reported pids gone: false (AgentRunner evidence invalid: missing required pid report(s) stub-child.pid ...)"` ✓
+  - `tools/b4-e2e/main.go` L766 F2 表达式与 `git show e8cbff6:tools/b4-e2e/main.go` 同语句逐字节相同 ✓
+  - `git log --oneline e8cbff6..HEAD -- tools/b4-e2e/main.go` 输出仅 `02d5797` ✓
+  - `02d5797`（2026-10-22）改动面：postflight Leg 5 起于 L370（`双 pid 报告必须存在` 判缺在 L381–383）、Leg 7 起于 L392（重读双报告 L397–407、重算第六枚事实 L408）；main.go L690/L697 `six-facts-distinct`（F1 面 five→six）、L1093 `ProcessPidReportsHash`（facts 适配器）✓
+  - `9ba621d`（2026-10-21）stub 增 `writeEmptyChildPIDReport()`，仅非 hang 公共路径调用（L141/L182）；hang 分支（L112–116）只 `writeOwnPID()` 后睡眠，不写 `stub-child.pid` ✓
+  - `t027-at23-e2e.md` L60（两腿均断言所报 pid 已消失）、L77（`-mode hang`、看门狗上界 5s、映射 uncertain、无冻结事实、错误证据 5 枚）✓；`pack-verdict.json` L2 generatedAt、L1418–1420 `failedChecks` 空数组 ✓；相邻字段 B4 `treeStatus=stopped`/`errorEvidenceCount=5`、P61 `unknown`/`6` ✓
+- FINDING Low：§B「要素原文（逐字）」列并非严格逐字——五要素行的反引号全部去掉，① 行还省略 `docs/validation/`、`docs/validation/evidence/` 路径前缀。§A 已另载完整逐字引用且核对无误，语义无伤；建议表头改「要素原文（压缩）」或补全。
+- FINDING Low：Leg 5 / Leg 7 行号区间与实况差 1–3 行（实况 Leg 5 = L370–386、Leg 7 = L392–411；design 写 L370–385 / L392–408）。所引区间覆盖了所述核心语义，属区间边界近似，建议 ⑦ 核对时以实况为准。
+
+**核面 2（五要素覆盖完整性）**：PASS。§B 恰好五行（①–⑤），§C 恰有 Q1–Q5 与之一一对应，无遗漏、无额外发明要素（§A 的豁免后果/豁免边界系 R-08.5 自身文本的引述，非新增要素）。
+
+**核面 3（红线·不预判）**：PASS。§B 问题均为「本要素成立/不成立？」中性设问；§B③「同名断言同方向」为对 R-08.5 例示的事实性比照，未下倾向结论；§C 明写「本文档不预填任何倾向性答案」，全文无豁免成立/不成立的预给结论。
+
+**核面 4（判定后文档更新清单）**：PASS（附 Low 观察）。§D 两分支按 ①–⑯ 覆盖起跑消息【四】全部 16 项：必改 1/2/3/4/11、按需 5/10、不适用 6–9/12–16 的定性均与起跑消息一致；「豁免不成立」分支对 DEV_PLAN 标「不适用 + 理由（状态未变）」、TEST_STRATEGY 同标不适用，与起跑消息第 5/10 项原文一致。
+- FINDING Low：§D② 证据包清单漏列 `00-briefing.md`（起跑消息【四】2 列明其为包内件）。该文件为步骤 0 已建项、判定后无需更新，但 ⑧ 装配时须确认不因清单缺项而遗漏。
+- Low 观察：§D④ 仅写「ADR-038 登记判定结论」，未重申起跑消息第 4 项列明的「主控 V4 Pro + 四要素 + 不得作先例」——这些属步骤 0 已登记要素，判定后仅需追加结论，建议 ⑧ 装配时复核 ADR-038 已含全部要素。
+
+**核面 5（⑦ 首轮输入包构成）**：PASS。§E 明确「首轮（盲审与终审）不附本文档 B/C 的对照表与问题清单（锚定硬隔离）」，仅附原始材料；六类材料（R-08.5 全文 L36–50、l3-baseline-compare、两份 f2-pos verdict、02d5797/9ba621d 摘要、P61 §1/§2.4/§8.3 原文、B4 锚点）齐全，且所引行号已逐条核对准确（§1 L8–17、§2.4 L44–53、§8.3 L207–212、§9 L376–378 均命中对应小节）。另附 P61 §9 属额外原始材料，不违反硬隔离。
+
+**核面 6（格式与结构）**：PASS。§A–E 结构齐全；末行 `DESIGN: DONE`；全文 6,143 字符 ≤ 10,000；实测 UTF-8 **with BOM**（首字节 EF BB BF）+ LF（CR=0），符合仓库编码硬规则。
+
+**结论**：1 条 Medium（四态行号 L14–17 应为 L11–14，字段值本身正确）+ 4 条 Low。按「任一事实错误按 Medium 计」，⑤ 结论为 FINDINGS；建议主控修正 §B④/§C Q4 的行号后原位重跑本环。

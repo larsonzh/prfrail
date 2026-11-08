@@ -1,0 +1,24 @@
+FINAL REVIEW: PARTIAL
+
+1. 要素① 同基线：成立。  
+理由：R-08.5 明确对照只能是 B4 基线存档，见 [docs/validation/r08-r09-ruling.md#L43](docs/validation/r08-r09-ruling.md#L43)。本次对比文件首行明确写明基线即 B4 存档的 pack verdict，见 [docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/03-test/layer3/l3-baseline-compare.txt#L1](docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/03-test/layer3/l3-baseline-compare.txt#L1)；B4 归档时间戳与 failedChecks 空列表可核验，见 [docs/validation/evidence/directive-history/b4/archive/pack-verdict.json#L2](docs/validation/evidence/directive-history/b4/archive/pack-verdict.json#L2)、[docs/validation/evidence/directive-history/b4/archive/pack-verdict.json#L1418-L1420](docs/validation/evidence/directive-history/b4/archive/pack-verdict.json#L1418-L1420)。
+
+2. 要素② 同断言：不成立。  
+理由：  
+方面甲（成立部分）：F2 断言代码行在 B4 提交与当前一致，当前行为 [tools/b4-e2e/main.go#L766](tools/b4-e2e/main.go#L766)；两份 verdict 的断言 id 一致，见 [docs/validation/evidence/directive-history/b4/archive/evidence/f2-pos/verdict-run.json#L136](docs/validation/evidence/directive-history/b4/archive/evidence/f2-pos/verdict-run.json#L136) 与 [docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/03-test/layer3/l3-f2-evidence/f2-pos/verdict-run.json#L136](docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/03-test/layer3/l3-f2-evidence/f2-pos/verdict-run.json#L136)。  
+方面乙（否决部分）：R-08.5 明示 harness 有改动即不满足，见 [docs/validation/r08-r09-ruling.md#L44](docs/validation/r08-r09-ruling.md#L44)。同一 harness 文件自 e8cbff6 以来存在 02d5797 改动（只读 git log 显示该文件区间仅此一提交），且改动落点在 [tools/b4-e2e/main.go#L690](tools/b4-e2e/main.go#L690)、[tools/b4-e2e/main.go#L697](tools/b4-e2e/main.go#L697)、[tools/b4-e2e/main.go#L1093](tools/b4-e2e/main.go#L1093)。按判据文本，②整体不成立。
+
+3. 要素③ 漂移方向更严格：成立。  
+理由：对比结果为 now=false、baseline=true，见 [docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/03-test/layer3/l3-baseline-compare.txt#L5](docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/03-test/layer3/l3-baseline-compare.txt#L5)，并且 now 细节是“无法证明进程已消失”，见 [docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/03-test/layer3/l3-baseline-compare.txt#L6](docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/03-test/layer3/l3-baseline-compare.txt#L6)。这与“true→false 属更保守/更严格”定义一致，见 [docs/validation/r08-r09-ruling.md#L45](docs/validation/r08-r09-ruling.md#L45)。
+
+4. 要素④ 四态不变：成立。  
+理由：B4 与 P61 重跑两份 verdict 的四态字段逐字一致，见 [docs/validation/evidence/directive-history/b4/archive/evidence/f2-pos/verdict-run.json#L11-L14](docs/validation/evidence/directive-history/b4/archive/evidence/f2-pos/verdict-run.json#L11-L14) 与 [docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/03-test/layer3/l3-f2-evidence/f2-pos/verdict-run.json#L11-L14](docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/03-test/layer3/l3-f2-evidence/f2-pos/verdict-run.json#L11-L14)；对比摘要也给出 field drifts=0，见 [docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/03-test/layer3/l3-baseline-compare.txt#L22](docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/03-test/layer3/l3-baseline-compare.txt#L22)。
+
+5. 要素⑤ 成因可追溯：成立。  
+理由：02d5797（2026-10-22）将 pid reports 绑定入第六事实并引入双报告缺失即 uncertain 的后飞检查链：Leg 5 与 Leg 7 见 [internal/adapters/agent_runner_postflight.go#L370-L382](internal/adapters/agent_runner_postflight.go#L370-L382)、[internal/adapters/agent_runner_postflight.go#L392-L409](internal/adapters/agent_runner_postflight.go#L392-L409)，缺失文案常量见 [internal/adapters/agent_runner_postflight.go#L62](internal/adapters/agent_runner_postflight.go#L62)。而 hang 负载路径仅写自身 pid 后休眠，见 [tools/agent-stub/main.go#L112-L115](tools/agent-stub/main.go#L112-L115)；写空 child 报告发生在另一公共路径，见 [tools/agent-stub/main.go#L140-L141](tools/agent-stub/main.go#L140-L141)。因此出现 stub-child.pid 缺失并触发 uncertain，与 P61 F2 细节完全对齐，见 [docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/03-test/layer3/l3-f2-evidence/f2-pos/verdict-run.json#L139](docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/03-test/layer3/l3-f2-evidence/f2-pos/verdict-run.json#L139)。
+
+最终判定：F2 继承漂移豁免不成立。  
+后果：五要素未同时满足（②不成立），不得触发“前提①视为满足”的豁免后果；AT-23 维持 PARTIAL，F2 修复片启动条件达成。该后果与 R-08.5 规则一致，见 [docs/validation/r08-r09-ruling.md#L48](docs/validation/r08-r09-ruling.md#L48)；与现有 P61 结论状态一致，见 [docs/validation/at23-restricted-candidate.md#L14-L17](docs/validation/at23-restricted-candidate.md#L14-L17)。
+
+HIGH/MEDIUM 发现：
+- HIGH：R-08.5 要素②被判不成立（harness 在 B4 之后发生改动），因此“继承漂移豁免”法理前提未闭合，不能以豁免覆盖前提①。

@@ -11,6 +11,8 @@
 
 ## 1. Executive summary
 
+> **P63 point-in-time note (2026-11-09)**: P63 `AT23-RECHECK` completed the re-check under the P62-revised R-08.5 five elements and ruled that **the F2 inherited-drift waiver does not hold** (element ② fails on the literal reading) ⇒ AT-23 stays PARTIAL; the conclusions below in this section are unchanged, see §10.
+
 **AT-23 conditional closure not achieved**: premise ① is unmet because of the F2 `process-tree-taken-away` inherited drift (cause `02d5797`, not introduced by P61; the B4 baseline re-run today would go red as well); premise ② is met (run-1 start + run-2 execution blocked + run-3 stop + run-5 unsupported, the same shape as B1 #8); this slice closes as PARTIAL (user ruling (E), ADR-036).
 
 - Premise ① "mechanism legs all green": **not met** — one F2 positive-leg assertion moved from the baseline `true` to `false`, while the 9 legs show 0 drift on `verdictClass` / `chainState` / `taskState` / `stepState` / `observations`.
@@ -376,3 +378,38 @@ docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/input-list.md	repo
 ## 9. Follow-up pointer (appended by P62)
 
 > **Point-in-time note (P62, 2026-11-08)**: the R-08.5 criterion was revised in P62 to add the five elements of the "inherited-drift exemption"; P61's premise-① verdict is unchanged (R-08.5 was not yet revised at that time), but a later AT-23 re-check may be evaluated under the P62-revised criterion.
+
+## 10. P63 re-check conclusion (appended by P63, 2026-11-09)
+
+- Slice: `AT23-RECHECK` (judgment class `[SLICE]`, v52 §4 layer-1 item 11 "AT-23 re-check under the P62-revised criterion"); started 2026-11-09; controller `DeepSeek V4 Pro` (ADR-038); this slice only judges, it does not fix.
+- ⑦ verdict text: blind `BLIND REVIEW: FINDINGS` + final `FINAL REVIEW: PARTIAL`; the two independent reads converge on one conclusion (the waiver does not hold).
+- Five elements one by one: ① same baseline **holds**; ② same assertion **does not hold**; ③ stricter drift direction **holds**; ④ four states unchanged **holds**; ⑤ traceable cause **holds**.
+- Element ② rationale: side A = the F2 check expression and assertion id are byte-identical between B4 (`e8cbff6`) and HEAD; side B = `tools/b4-e2e/main.go` was modified since B4 by `02d5797`, so under the literal R-08.5 wording "any harness change fails the test" (`02d5797` changed `tools/b4-e2e/main.go` at L690/L697/L1093, none of them on the F2 check code path; the F2 check expression is byte-identical between `e8cbff6` and HEAD).
+- Final verdict: **the F2 inherited-drift waiver does not hold**.
+- Follow-up: AT-23 stays PARTIAL (the P61 verdict is unchanged; the §1 and §4.1 text is not edited); the F2 fix slice (layer-1 item 10) start condition is met and it awaits the user's explicit kickoff (the user ruled on 2026-11-09 to start it; its briefing will be drafted by the user separately), and this slice does not start it; premise ① stays unmet and premise ② stays met.
+- Evidence pack: `docs/validation/evidence/P63-AT23-RECHECK/`; ADR pointer: ADR-038 in `docs/ADR_REGISTER_EN.md` (with the "verdict-conclusion addendum (2026-11-09)").
+- v53 observation-item candidates (registered by the user's 2026-11-09 ruling, carried at v53 generation):
+  - Observation 1: the R-08.5 "same assertion" (element ②) is judged at the file level — a harness change that does not affect the F2 check path (e.g., `02d5797` changing L690/L697/L1093) is also ruled "does not hold", which is too strict; the candidate fix = redefine "same assertion" from "the harness file unchanged" to "the assertion expression + the assertion meaning + the assertion's code path unchanged" (semantic level); **do not change the criterion now** — leave it to a later governance slice (after the F2 fix completes and AT-23 condition closure, observe whether similar inherited drift still occurs).
+  - Observation 2: the G5(d) evidence-pack fence pitfall — both P62 and P63 hit `G5(d) staged is a subset of declared` on their first index run (the newly added evidence pack was not declared in the changed report's `artifacts` fence) and turned green after appending the fence; this is the second occurrence of the same class; candidates = ① make the kickoff message's "step 0" require "a newly added evidence pack must be declared in the changed report's fence in the same round"; ② or register it as gate pitfall No. 26.
+
+```artifacts
+docs/ADR_REGISTER.md	repo
+docs/ADR_REGISTER_EN.md	repo
+docs/t027/REMAINING_SLICES.md	repo
+docs/t027/REMAINING_SLICES_EN.md	repo
+docs/validation/at23-restricted-candidate.md	repo
+docs/validation/at23-restricted-candidate_EN.md	repo
+docs/validation/evidence/P63-AT23-RECHECK/00-briefing.md	repo
+docs/validation/evidence/P63-AT23-RECHECK/01-arch/design-r1.md	repo
+docs/validation/evidence/P63-AT23-RECHECK/04-reviews/05-prereview-r1.txt	repo
+docs/validation/evidence/P63-AT23-RECHECK/04-reviews/05-prereview-r2.txt	repo
+docs/validation/evidence/P63-AT23-RECHECK/04-reviews/06-scan-r1.txt	repo
+docs/validation/evidence/P63-AT23-RECHECK/04-reviews/07-blind-r1.txt	repo
+docs/validation/evidence/P63-AT23-RECHECK/04-reviews/07-final-r1.txt	repo
+docs/validation/evidence/P63-AT23-RECHECK/MANIFEST.md	repo
+docs/validation/evidence/P63-AT23-RECHECK/SHA256SUMS.txt	repo
+docs/validation/evidence/P63-AT23-RECHECK/freedom-list.md	repo
+docs/validation/evidence/P63-AT23-RECHECK/input-list.md	repo
+docs/validation/s1-exit.md	repo
+docs/validation/s1-exit_EN.md	repo
+```

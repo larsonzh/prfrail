@@ -1,0 +1,25 @@
+```sixstage
+## Section A
+INDEPENDENT SCAN: PASS
+
+## Section B
+(none)
+
+## Section C
+- ① 同基线：R-08.5 明确规定对照基线为 B4 存档，且设计文档与原文一致：[docs/validation/r08-r09-ruling.md](docs/validation/r08-r09-ruling.md#L35-L50)。B4 侧事实与 P61 对照文件一致： [docs/validation/t027-at23-e2e.md](docs/validation/t027-at23-e2e.md#L55-L80) 说明 F2 正向负载与 pid 失效语义；[docs/validation/evidence/directive-history/b4/archive/evidence/f2-pos/verdict-run.json](docs/validation/evidence/directive-history/b4/archive/evidence/f2-pos/verdict-run.json#L1-L150) 的四态字段与 checks 均为 B4 基线；[docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/03-test/layer3/l3-baseline-compare.txt](docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/03-test/layer3/l3-baseline-compare.txt#L1-L22) 也确认该存档为唯一对照物，未混用其它基线。
+- ② 同断言：断言 id 与表达式在 B4 与当前走查中一致，且设计文档的事实列对应到同一检查点：[tools/b4-e2e/main.go](tools/b4-e2e/main.go#L690-L780) 中 `process-tree-taken-away` 表达式与检查语义保持稳定；[docs/validation/evidence/directive-history/b4/archive/evidence/f2-pos/verdict-run.json](docs/validation/evidence/directive-history/b4/archive/evidence/f2-pos/verdict-run.json#L120-L150) 和 [docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/03-test/layer3/l3-f2-evidence/f2-pos/verdict-run.json](docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/03-test/layer3/l3-f2-evidence/f2-pos/verdict-run.json#L120-L150) 均含同一断言 id。此处的 “改动不在该断言路径上” 也被 [internal/adapters/agent_runner_postflight.go](internal/adapters/agent_runner_postflight.go#L360-L411) 的 Leg 5/7 说明对应地归因到 pid reports 绑定，而不是改写断言。
+- ③ 漂移方向更严格：两侧 detail 与方向定义一致，true→false 属更保守/更严格方向，且与裁定原文一致：[docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/03-test/layer3/l3-baseline-compare.txt](docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/03-test/layer3/l3-baseline-compare.txt#L1-L10) 直接写出 `now=false baseline=true`，并在详情中说明“未证明所报 pid 已消失”；[docs/validation/r08-r09-ruling.md](docs/validation/r08-r09-ruling.md#L39-L47) 也把 `true -> false` 解释为更保守。
+- ④ 四态不变：B4 与 P61 两份 f2-pos verdict 的四态字段一致，并且 compare 文件给出 `field drifts=0`：[docs/validation/evidence/directive-history/b4/archive/evidence/f2-pos/verdict-run.json](docs/validation/evidence/directive-history/b4/archive/evidence/f2-pos/verdict-run.json#L1-L30) 与 [docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/03-test/layer3/l3-f2-evidence/f2-pos/verdict-run.json](docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/03-test/layer3/l3-f2-evidence/f2-pos/verdict-run.json#L1-L30) 的 `verdictClass` / `chainState` / `taskState` / `stepState` 完全一致；[docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/03-test/layer3/l3-baseline-compare.txt](docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/03-test/layer3/l3-baseline-compare.txt#L20-L22) 的 summary 也确认 `field drifts=0`。相邻字段差异（如 `treeStatus` / `errorEvidenceCount`）不在四态判据覆盖范围内。
+- ⑤ 成因可追溯：设计文档对成因归因点是正确的，且对应到具体 product change： [internal/adapters/agent_runner_postflight.go](internal/adapters/agent_runner_postflight.go#L360-L411) 的 Leg 5/7 明确要求双 pid 报告必须存在且重新计算第六枚事实；因此 `stub-child.pid` 缺失直接导致 `process-tree-taken-away` 判定 false。该归因与 R-08.5 例示的一致性成立，且与设计文档的 “特定产品改动” 叙述相符。
+
+## Section D
+- 可证伪性审计：① 同基线、② 同断言、③ 漂移方向、④ 四态不变、⑤ 成因可追溯，以上五条都可用对比法机械证伪，证据来源为 [docs/validation/r08-r09-ruling.md](docs/validation/r08-r09-ruling.md#L35-L50)、[docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/03-test/layer3/l3-baseline-compare.txt](docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/03-test/layer3/l3-baseline-compare.txt#L1-L22)、[docs/validation/evidence/directive-history/b4/archive/evidence/f2-pos/verdict-run.json](docs/validation/evidence/directive-history/b4/archive/evidence/f2-pos/verdict-run.json#L1-L150)、[docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/03-test/layer3/l3-f2-evidence/f2-pos/verdict-run.json](docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/03-test/layer3/l3-f2-evidence/f2-pos/verdict-run.json#L1-L150)、[tools/b4-e2e/main.go](tools/b4-e2e/main.go#L690-L780)、[internal/adapters/agent_runner_postflight.go](internal/adapters/agent_runner_postflight.go#L360-L411)。
+- 删除任何一项关键证据就会翻红：删掉 B4 基线 JSON 会失去同基线/四态对照；删掉 P61 JSON 会失去当前漂移；删掉 L3 compare 文件会失去对 `true→false` 与 `field drifts=0` 的直接证据；删掉 harness / postflight 代码文件，会让 “同断言” 与 “成因可追溯” 无法被审计。
+
+## Section E
+- 无法验证部分：设计文档中提到的某些提交摘要/提交图谱事实并非本扫描允许的落盘文件证据；本次只读扫描按“读取主控落盘的仓库文件”要求，未将提交日志输出当作证据来源，因此不将其纳入结论。该限制不影响本片核心判定，因为关键事实已落在上述六个仓库文件中。
+- 推翻条件：若主控落盘中出现相反事实——例如 B4/P61 四态字段出现任一漂移、L3 compare 文件结论不再为 `field drifts=0`、或设计文档中出现「豁免成立/不成立」的预填结论——则本次独立扫描应改判为 FINDINGS，并要求 ⑦ 重新作成独立判定。
+- 另外，设计文档在 §A、§E、§F 中明确要求“本文档不含任何豁免成立/不成立结论”，这一红线未被破坏；本扫描未发现对照表或问题清单与五要素错位，也未发现首轮输入包附带对照表/问题清单的硬隔离违规。
+
+INDEPENDENT SCAN: PASS
+```

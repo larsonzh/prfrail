@@ -1,0 +1,25 @@
+`PRE-REVIEW: PASS`
+
+**整改 1（Medium，四态行号）— PASS**
+- §B④ 已写「（B4 L11–14；P61 同位置同值）」；§C Q4 已写「L11–14」。
+- 机械核对两份 f2-pos verdict-run.json：B4（`directive-history/b4/archive/evidence/f2-pos/`）与 P61（`P61-AT23-RESTRICTED-CANDIDATE/03-test/layer3/l3-f2-evidence/f2-pos/`）四字段逐行均在 **L11–14**：L11 `verdictClass: uncertain-or-paused`、L12 `chainState: PAUSED`、L13 `taskState: b4-task\u00001=FAILED`、L14 `stepState: b4-task\u0000b4-code-step\u00001=FAILED`；两文件 L11–14 逐字节相同（`SAME` ×4）。
+
+**整改 2（Low，§B 表头）— PASS**
+- 表头已改为「要素原文（压缩摘引；逐字原文见 §A）」，与 §A 完整逐字引用分工相符。
+
+**整改 3（Low，Leg 5/7 行号）— PASS**
+- §B⑤ 已写「Leg 5（L370–386）与 Leg 7（L392–411）」。机械核对 `internal/adapters/agent_runner_postflight.go`：L370 = Leg 5 注释首行、L386 = Leg 5 收尾 `}`、L392 = Leg 7 注释首行、L411 = Leg 7 收尾 `}`、L412 = `legs := []string{`。与 §F 修订 3 所述四个锚点完全一致。
+
+**整改 4（Low，§D 成立分支②）— PASS**
+- 清单已含 `00-briefing.md`（现文：`00-briefing.md / design-r1 / 04-reviews / MANIFEST / SHA256SUMS / freedom-list / input-list`）；该文件确已在证据包根目录存在。
+
+**整改 5（Low，§D④ ADR-038 注记）— PASS**
+- §D④ 已补「（四要素与「不得作为先例」已于步骤 0 登记，⑧ 仅追加判定结论）」，与起跑消息第 4 项口径一致。
+
+**副作用核对 — 全部 PASS**
+- §F 修订注记：5 条修订逐条与实际改动一致；所载机械锚点（JSON L11–14、postflight L370/L386/L392/L411）与磁盘实况逐一命中；§F 声明「无判定性改动」，通读未发现新增倾向性结论。
+- 末行：`DESIGN: DONE` 为最后一个非空行，其后仅换行，全文仅出现 1 次。
+- 编码：实测 UTF-8 **with BOM**（EF BB BF）+ LF（CR=0），符合 `.md` 硬规则。
+- 字符数：6,650 字符（UTF-16 计数口径，与 r1 同口径）≤ 10,000 ✓（附注：UTF-8 字节数为 11,102，若按字节口径则超限；本片与 r1 均按字符口径计）。
+
+收窄范围外无新增问题；未发现 §F 与实况不符之处。本环仅只读核对，未落盘。
