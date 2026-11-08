@@ -91,6 +91,7 @@
 | P59 DIRECTIVE-SCOPE-GUARD | ✅ 已完成（2026-11-06；R-12 裁定 A2×B1×Y1；v1.63） | P58 | S | — | 报告对 `docs/validation/p59-directive-scope-guard{,_EN}.md`；证据包 `docs/validation/evidence/P59-DIRECTIVE-SCOPE-GUARD/`；R = 0、D = 0 |
 | P60 DIRECTIVE-JUDGE-BLINDSPOTS | ✅ 已完成（2026-11-06；裁定 J2×J3、J1 不选；v1.64） | P59 | M | 2026-11-06 | 报告对 `docs/validation/p60-directive-judge-blindspots{,_EN}.md`；证据包 `docs/validation/evidence/P60-DIRECTIVE-JUDGE-BLINDSPOTS/`；R = 0、D = 2 |
 | P61 AT23-RESTRICTED-CANDIDATE | ✅ 已完成（PARTIAL 收口；2026-11-08 收口，⑦ `FINAL REVIEW: PARTIAL`，ADR-036） | P60（R-08/R-09 已裁） | M | 2026-11-08 | 报告对 `docs/validation/at23-restricted-candidate{,_EN}.md`；证据包 `docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/` |
+| P62 R08-R09-RULING-REVISION | ✅ 已完成（2026-11-08 收口；⑦ `FINAL REVIEW: PASS`，终审 1 + 复审 0；ADR-037；R/D=0；停于 ⑩ 等授权） | P61（路径 A：R-08.5 修订片优先） | M | 2026-11-08 | 修订 `docs/validation/r08-r09-ruling{,_EN}.md`（R-08.5 继承漂移豁免五要素 + R-08.1 事实修正）；P61 报告时点注记；证据包 `docs/validation/evidence/P62-R08-R09-RULING-REVISION/` |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -1744,8 +1745,33 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 执行自由度清单落盘路径 | `docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/freedom-list.md` |
 | R / D 基线 | R = 0、D = 0（2026-11-07 起跑登记） |
 | 临时件落点声明 | 本片临时目录 = `tmp/P61-AT23-RESTRICTED-CANDIDATE/`（⑧c 前只增不删） |
-| 层 1 第 8 项状态标记 | 🔄 P61 评估完成，前提②满足，前提①因继承漂移不满足，待 R-08.5 修订片裁定豁免（v50 快照表体不改，标记落活台账，见报告 §6.3） |
+| 层 1 第 8 项状态标记 | 🔄 P62 已修订 R-08.5；前提①尚需 ⑦ 按新判据判定豁免；豁免成立则条件闭合可达成（P61 PARTIAL 结论不变；v50 快照表体不改，标记落活台账） |
 | 完成记录 | 报告对：`docs/validation/at23-restricted-candidate{,_EN}.md` |
+
+
+### P62 — `R08-R09-RULING-REVISION`（层 1 第 9 项 · 治理类） · ✅ 已完成（2026-11-08 收口；R/D=0）
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `R08-R09-RULING-REVISION`（治理类 `[SLICE]`；承载 v51 §四 层 1 第 9 项「R-08.5 判据修订片」） |
+| 状态 | ✅ 已完成（2026-11-08 收口；⑦ `FINAL REVIEW: PASS`（终审 1 + 复审 0；L-1 裁定保留「第六枚冻结事实」）；主控 V4 Pro，ADR-037；R/D=0；停于 ⑩ 等同一轮授权） |
+| 目标 | ① R-08.5 增补「继承漂移豁免」适用条件五要素（同基线 / 同断言 / 漂移方向更严格 / 四态不变 / 成因可追溯）；② R-08.1 事实错误修正（「已落地代码」→「P61 ② 新建」+ 时点注记）；③ P61 报告加时点注记指针 |
+| 依赖 | P61 闭环（PARTIAL，ADR-036）；R-08/R-09 裁定文档（`docs/validation/r08-r09-ruling{,_EN}.md`） |
+| 规模 | M（纯 .md 修订；③ 测试按 v1.64 §5.2 文档型切片裁剪） |
+| 步骤 | ① 判据设计（轻量）→ ② 判据文本实现 → ④ 门禁 → ⑤ 预审 → ⑥ 独立扫描 → ⑦ 终审 → ⑧ 文档装配 → ⑨ 三作用域 + SELFTEST → ⑧c → ⑩ |
+| 现状缺口 | P61 前提①因 F2 `process-tree-taken-away` 继承漂移不满足；本片为 R-08.5 定义豁免适用条件，不直接修复 F2 |
+| 交付物 | 修订 `docs/validation/r08-r09-ruling{,_EN}.md`；P61 报告时点注记；ADR-037（步骤 0）；本台账 P62 段 |
+| 验收证据 | 三作用域 `TOTAL_FAIL=0`；`SELFTEST 722/722`；双语镜像逐行 0 失配；⑦ 终审无 Medium+ |
+| 边界 | 只改仓库内 `r08-r09-ruling{,_EN}.md` 及相关引用；不改交接文档 v3（仓库外，用户自行处理）；豁免成立的判定主体 = ⑦（写入判据文本）；受 §1.7.2 三条 bullet 约束；不开 VM / 代理、不启用 Sol 双打 |
+| 分级 | `[SLICE]`（治理类） |
+| 探针额度 | 0（纯文档，无外部调用） |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/P62-R08-R09-RULING-REVISION/freedom-list.md` |
+| R / D 基线 | R = 0、D = 0（2026-11-08 起跑登记） |
+| 临时件落点声明 | 本片临时目录 = `tmp/P62-R08-R09-RULING-REVISION/`（⑧c 前只增不删） |
+| 层 1 第 9 项状态标记 | ✅ P62 完成（R-08.5 五要素落地 + R-08.1 事实修正完成）；层 1 第 9 项出队；层 1 第 8 项（AT-23）复核已登记（暂名 P63），起跑待用户点名 |
+| 完成记录 | 修订后的裁定文档对：`docs/validation/r08-r09-ruling{,_EN}.md`（含 R-08.5 继承漂移豁免五要素 + R-08.1 事实修正）；P61 报告后续指针节；证据包 `docs/validation/evidence/P62-R08-R09-RULING-REVISION/` |
+| 层 1 第 10 项状态标记 | 后置（理由更新：豁免判定由 ⑦ 执行、结果未出；v52 生成时同步 v51 §四 第 10 项依赖列） |
+| 下一步建议 | ① 下一步 = `AT-23 按 P62 修订后判据复核`（暂名 P63，规模 S，⑦ 必须参与豁免判定），起跑时机由用户另行点名；② F2 修复片的启动条件 = ⑦ 按 P62 修订后判据判定 F2 豁免不成立（成立 ⇒ 取消，不成立 ⇒ 启动） |
 
 ## 已知缺陷（后续切片前处理）
 

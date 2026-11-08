@@ -91,6 +91,7 @@
 | P59 DIRECTIVE-SCOPE-GUARD | ✅ Done (2026-11-06; R-12 ruled A2×B1×Y1; v1.63) | P58 | S | — | report pair `docs/validation/p59-directive-scope-guard{,_EN}.md`; evidence pack `docs/validation/evidence/P59-DIRECTIVE-SCOPE-GUARD/`; R = 0, D = 0 |
 | P60 DIRECTIVE-JUDGE-BLINDSPOTS | ✅ Done (2026-11-06; ruling J2×J3, J1 not selected; v1.64) | P59 | M | 2026-11-06 | report pair `docs/validation/p60-directive-judge-blindspots{,_EN}.md`; evidence pack `docs/validation/evidence/P60-DIRECTIVE-JUDGE-BLINDSPOTS/`; R = 0, D = 2 |
 | P61 AT23-RESTRICTED-CANDIDATE | ✅ Done (PARTIAL close-out; closed 2026-11-08, ⑦ `FINAL REVIEW: PARTIAL`, ADR-036) | P60 (R-08/R-09 ruled) | M | 2026-11-08 | Report pair `docs/validation/at23-restricted-candidate{,_EN}.md`; evidence pack `docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/` |
+| P62 R08-R09-RULING-REVISION | ✅ Done (closed 2026-11-08; ⑦ `FINAL REVIEW: PASS`, 1 final + 0 re-review; ADR-037; R/D=0; stopped at ⑩ awaiting authorization) | P61 (path A: R-08.5 revision first) | M | 2026-11-08 | Revise `docs/validation/r08-r09-ruling{,_EN}.md` (the R-08.5 inherited-drift waiver five elements + the R-08.1 factual correction); P61 report timestamp note; evidence pack `docs/validation/evidence/P62-R08-R09-RULING-REVISION/` |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1731,8 +1732,33 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Freedom-list path | `docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/freedom-list.md` |
 | R / D baseline | R = 0, D = 0 (registered at start, 2026-11-07) |
 | Temp artefact location | `tmp/P61-AT23-RESTRICTED-CANDIDATE/` (append-only until 8c) |
-| Layer 1 item 8 status marker | 🔄 P61 assessment done, premise ② met, premise ① unmet because of the inherited drift, awaiting the R-08.5 revision slice's waiver ruling (the v50 snapshot table body is unchanged; the marker lives in the live ledger, see report §6.3) |
+| Layer 1 item 8 status marker | 🔄 P62 has revised R-08.5; premise ① still requires ⑦'s waiver verdict under the new criterion; if the waiver holds, conditional closure becomes reachable (the P61 PARTIAL conclusion is unchanged; the v50 snapshot table body is unchanged; the marker lives in the live ledger) |
 | Completion record | Report pair: `docs/validation/at23-restricted-candidate{,_EN}.md` |
+
+
+### P62 — `R08-R09-RULING-REVISION` (layer 1 item 9 · governance class) · ✅ Done (closed 2026-11-08; R/D=0)
+
+| Field | Content |
+|---|---|
+| Identifier | `R08-R09-RULING-REVISION` (governance-class `[SLICE]`; carries layer 1 item 9 of §4 in v51, "R-08.5 criterion revision slice") |
+| Status | ✅ Done (closed 2026-11-08; ⑦ `FINAL REVIEW: PASS` (1 final + 0 re-review; L-1 ruling: keep "sixth frozen fact"); controller V4 Pro, ADR-037; R/D=0; stopped at ⑩ awaiting same-turn authorization) |
+| Goal | ① add the "inherited-drift waiver" applicability condition with five elements to R-08.5 (same baseline / same assertions / stricter drift direction / four states unchanged / traceable cause); ② correct the R-08.1 factual error ("already landed code" → "newly built in P61 ②" + a timestamp note); ③ add a timestamp pointer note to the P61 report |
+| Depends on | P61 closed (PARTIAL, ADR-036); the R-08/R-09 ruling docs (`docs/validation/r08-r09-ruling{,_EN}.md`) |
+| Size | M (pure .md revision; ③ tests pruned per the v1.64 §5.2 doc-slice note) |
+| Steps | ① criterion design (lightweight) → ② criterion text implementation → ④ gates → ⑤ pre-review → ⑥ independent scan → ⑦ final review → ⑧ docs assembly → ⑨ three scopes + SELFTEST → ⑧c → ⑩ |
+| Current gap | P61 premise ① unmet because of the F2 `process-tree-taken-away` inherited drift; this slice defines the waiver condition for R-08.5 and does not fix F2 directly |
+| Deliverables | Revised `docs/validation/r08-r09-ruling{,_EN}.md`; the P61 report timestamp note; ADR-037 (step 0); this ledger's P62 block |
+| Acceptance evidence | Three scopes `TOTAL_FAIL=0`; `SELFTEST 722/722`; bilingual mirror 0 mismatches line by line; ⑦ final review with no Medium+ |
+| Boundary | Only in-repo `r08-r09-ruling{,_EN}.md` and related references; not the out-of-repo handover doc v3 (the user handles it); the waiver decision owner = ⑦ (written into the criterion text); bound by the three bullets of §1.7.2; no VM / proxy, no Sol double |
+| Class | `[SLICE]` (governance) |
+| Probe budget | 0 (pure docs, no external calls) |
+| Freedom-list path | `docs/validation/evidence/P62-R08-R09-RULING-REVISION/freedom-list.md` |
+| R / D baseline | R = 0, D = 0 (registered at start, 2026-11-08) |
+| Temp artefact location | `tmp/P62-R08-R09-RULING-REVISION/` (append-only until 8c) |
+| Layer 1 item 9 status marker | ✅ P62 done (the R-08.5 five elements landed + the R-08.1 factual correction done); layer 1 item 9 dequeued; layer 1 item 8 (AT-23) re-check registered (working name P63), start pending the user's explicit kickoff |
+| Completion record | Revised ruling doc pair: `docs/validation/r08-r09-ruling{,_EN}.md` (the R-08.5 inherited-drift waiver five elements + the R-08.1 factual correction); the P61 report follow-up pointer section; evidence pack `docs/validation/evidence/P62-R08-R09-RULING-REVISION/` |
+| Layer 1 item 10 status marker | Deferred (reason updated: the waiver verdict is to be issued by ⑦, not yet out; v52 generation will sync the v51 §4 item-10 dependency column) |
+| Next-step suggestion | ① next step = `AT-23 re-check under the P62-revised criterion` (working name P63, size S, ⑦ must take part in the waiver verdict), start timing per the user's explicit kickoff; ② the F2 fix slice's start condition = ⑦ rules the F2 waiver does NOT hold under the P62-revised criterion (holds ⇒ cancelled, does not hold ⇒ start) |
 
 ## Known defects (to be handled before later slices)
 

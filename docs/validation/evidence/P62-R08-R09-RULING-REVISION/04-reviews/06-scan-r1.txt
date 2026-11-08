@@ -1,0 +1,23 @@
+INDEPENDENT SCAN r1 (P62 ⑥, MAI-Code-1.1-Flash, 2026-11-08) — verbatim archive
+
+## ⑥ Independent scan verdict — P62 R08-R09-RULING-REVISION
+
+### Result
+- Verdict: PASS
+- Severity: no High or Medium findings remain.
+- The scan confirms the revision in [docs/validation/r08-r09-ruling.md](docs/validation/r08-r09-ruling.md) and [docs/validation/r08-r09-ruling_EN.md](docs/validation/r08-r09-ruling_EN.md) matches the briefing and the supporting evidence.
+
+### Confirmed checks
+- The inherited-drift exemption language in R-08.5 is explicit and complete: same baseline, same assertion, stricter drift direction, four-state invariance, and traceable cause are all present.
+- The factual correction in the §8 note is consistent with the P61 evidence and does not rewrite history; it adds a point-in-time note, consistent with the rule in [docs/validation/at23-restricted-candidate.md](docs/validation/at23-restricted-candidate.md) and [docs/validation/at23-restricted-candidate_EN.md](docs/validation/at23-restricted-candidate_EN.md).
+- The status sync is consistent across [docs/t027/REMAINING_SLICES.md](docs/t027/REMAINING_SLICES.md), [docs/ADR_REGISTER.md](docs/ADR_REGISTER.md), and the evidence pack in [docs/validation/evidence/P62-R08-R09-RULING-REVISION/MANIFEST.md](docs/validation/evidence/P62-R08-R09-RULING-REVISION/MANIFEST.md).
+- The P61 partial closure and the follow-up pointer remain intact; no contradictory language was introduced.
+
+### Evidence
+- Gate checks reported `TOTAL_FAIL=0` in both tree and index scopes.
+- The base validation output is green: `go build ./...`, `go vet ./...`, and `go test ./...` all passed.
+- There is one informational low-level note from G9-e about unindexed temporary references, but it is explicitly informational and not a failure condition.
+
+### Decision
+- Ready to proceed to ⑦ final review.
+- No controller-side fix is required before that step.

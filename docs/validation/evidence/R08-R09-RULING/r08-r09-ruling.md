@@ -39,6 +39,15 @@
 - 每次 unsupported/unknown 必须有具体错误信息或证据（stderr 原文、退出码、失败阶段），不能只有「跑不通」。
 - 报告必须明写「AT-23 条件闭合，不构成真实候选兼容性证明」。
 
+- **继承漂移豁免的适用条件（五要素，须同时满足）**：
+- ① **同基线**：对照基线 = B4 基线存档（`docs/validation/t027-at23-e2e.md` + `docs/validation/evidence/directive-history/b4/archive/`）；只允许以该存档为对照，不得另选或混用其它基线。
+- ② **同断言**：断言 id、断言含义、断言所在 harness（`tools/b4-e2e/`）与 B4 基线均不变；harness 有改动或断言被重定义即不满足。
+- ③ **漂移方向更严格**：断言值变化方向更保守/更严格（如 `process-tree-taken-away` 从 `true` 变 `false` = 未检测到进程树被取走 = 判定更保守）；反向变化（如 `false` 变 `true` = 更宽松）不满足。
+- ④ **四态不变**：`verdictClass` / `chainState` / `taskState` / `stepState` 与 B4 基线逐字一致；任一字段漂移即不满足。
+- ⑤ **成因可追溯**：漂移成因可追溯到 B4 之后的特定产品改动（如 P61 的 `02d5797`，A5 pid reports 绑定为第六枚冻结事实）；无法归因到特定改动即不满足。
+- **豁免后果**：五要素同时满足 ⇒ 豁免「前提①不满足」的判定，前提①视为满足（继承漂移豁免成立）；任一不满足 ⇒ 不豁免，按本小节既有判据处理。
+- **豁免边界**：豁免成立不等于 AT-23 条件闭合——真实候选腿的前提②仍须满足；豁免须由 **⑦（独立终审）** 判定，主控不得自行判定。
+
 ### R-08.6 BYOK 平行路径
 
 - (a) 主路径 / (a) 无条件 / (b) 独立计费（不占 Copilot premium request，受 BYOK 费用上限约束）。
@@ -163,26 +172,38 @@ v3 补充：分阶段策略独立成节、待办清单加阶段升级。
 | R-08.4 VM/代理开关 | 极低 | 纯环境 |
 | R-09.1~R-09.9 边界 | 低（放宽）/ 中（收紧） | 纯文档；收紧比放宽贵 |
 | AT-23 分层纪律 / 分阶段策略 | 低 | 执行策略，不影响判定 |
-| R-08.1 封装函数 | 中 | 已落地代码，要过审查链 |
+| R-08.1 封装函数 | 中 | **P61 ② 新建**（Invoke-CopilotCli / buildCopilotArgs），要过审查链 |
 | R-08.6 BYOK 配置 | 中 | 配置层，但被 AT-23 依赖 |
 | P60 J2 判据 | 中偏高 | 判据本体 + 升版 + 重审 |
 | R-08.3 从 P 改到 P′ | 高 | 开 VM + 跑注入矩阵 |
 | R-08.5 从条件闭合改整体不通过 | 高 | 推翻已签收结论 |
 | R-09 从放宽改严格（AT-24 已签收后） | 高 | 重跑 AT-24 |
 
+> **时点注记（P62，2026-11-08）**：本行原写「已落地代码」，实况是 P61 ② 才新建（commit 6bb23a1 之前仓库无此函数）。按 §11.1 历史行不改写，本行加注记。事实错误独立于设计决策（R-08.1 裁定本身不变）。
+
 **原则**：「会变的东西」设计成可变的（预算、环境、层数、阶段），「不能变的东西」明确冻结（判定口径、安全底线、已落地代码）。
 
 - ⑥ 跳过：本片为 `[ROUTINE]` docs-only 裁定记录落地，无代码 / 判据 / 契约变更，§7.2.1 允许文档片跳过 ⑥ 并记录理由。
 
 ```artifacts
-docs/t027/CHECKLIST_v49.md	repo
-docs/t027/CHECKLIST_v49_EN.md	repo
+docs/ADR_REGISTER.md	repo
+docs/ADR_REGISTER_EN.md	repo
 docs/t027/REMAINING_SLICES.md	repo
 docs/t027/REMAINING_SLICES_EN.md	repo
+docs/validation/at23-restricted-candidate.md	repo
+docs/validation/at23-restricted-candidate_EN.md	repo
+docs/validation/evidence/P62-R08-R09-RULING-REVISION/00-briefing.md	repo
+docs/validation/evidence/P62-R08-R09-RULING-REVISION/01-arch/design-r1.md	repo
+docs/validation/evidence/P62-R08-R09-RULING-REVISION/MANIFEST.md	repo
+docs/validation/evidence/P62-R08-R09-RULING-REVISION/SHA256SUMS.txt	repo
+docs/validation/evidence/P62-R08-R09-RULING-REVISION/freedom-list.md	repo
+docs/validation/evidence/P62-R08-R09-RULING-REVISION/input-list.md	repo
 docs/validation/evidence/R08-R09-RULING/MANIFEST.md	repo
 docs/validation/evidence/R08-R09-RULING/SHA256SUMS.txt	repo
 docs/validation/evidence/R08-R09-RULING/r08-r09-ruling.md	repo
 docs/validation/evidence/R08-R09-RULING/r08-r09-ruling_EN.md	repo
 docs/validation/r08-r09-ruling.md	repo
 docs/validation/r08-r09-ruling_EN.md	repo
+docs/validation/s1-exit.md	repo
+docs/validation/s1-exit_EN.md	repo
 ```

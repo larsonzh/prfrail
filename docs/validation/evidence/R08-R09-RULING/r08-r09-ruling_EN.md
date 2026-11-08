@@ -39,6 +39,15 @@
 - Every unsupported/unknown must carry concrete error information or evidence (raw stderr, exit code, failing stage), never just "cannot run".
 - The report must state clearly "AT-23 is conditionally closed and does not constitute proof of real-candidate compatibility".
 
+- **Applicability conditions of the inherited-drift exemption (five elements, all must hold simultaneously)**:
+- ① **Same baseline**: the comparison baseline = the B4 baseline archive (`docs/validation/t027-at23-e2e.md` + `docs/validation/evidence/directive-history/b4/archive/`); only this archive may serve as the comparison target — no other baseline may be chosen or mixed in.
+- ② **Same assertion**: the assertion id, the assertion meaning and the assertion's harness (`tools/b4-e2e/`) are all unchanged versus the B4 baseline; any harness change or any redefinition of the assertion fails.
+- ③ **Drift direction stricter**: the assertion value changes in the more conservative / stricter direction (e.g. `process-tree-taken-away` from `true` to `false` = no process-tree takeover detected = a more conservative verdict); the reverse direction (e.g. `false` to `true` = more lenient) fails.
+- ④ **Four states unchanged**: `verdictClass` / `chainState` / `taskState` / `stepState` are verbatim-identical to the B4 baseline; any drift in any of these fields fails.
+- ⑤ **Cause traceable**: the drift cause is traceable to a specific product change after B4 (e.g. P61's `02d5797`, the A5 pid-reports binding as the sixth frozen fact); a cause that cannot be attributed to a specific change fails.
+- **Consequence of the exemption**: all five elements hold simultaneously ⇒ the "premise ① unmet" verdict is exempted and premise ① is treated as satisfied (the inherited-drift exemption is established); any element fails ⇒ no exemption, and the existing criteria of this subsection apply.
+- **Exemption boundary**: the exemption does not equal AT-23 conditional closure — premise ② of the real candidate leg must still hold; the exemption must be adjudicated by **⑦ (independent final review)**, and the controller must not adjudicate it on its own.
+
 ### R-08.6 BYOK parallel path
 
 - (a) main path / (a) unconditional / (b) independently billed (does not consume Copilot premium requests, subject to the BYOK cost cap).
@@ -163,26 +172,38 @@ This table lists the change cost of each ruling, for reference in future revisio
 | R-08.4 VM/proxy toggles | Very low | Pure environment |
 | R-09.1~R-09.9 boundaries | Low (loosen) / Medium (tighten) | Pure docs; tightening costs more |
 | AT-23 layering / staging | Low | Execution strategy, does not affect verdicts |
-| R-08.1 wrapper function | Medium | Landed code; must pass the review chain |
+| R-08.1 wrapper function | Medium | **newly created by P61 ②** (Invoke-CopilotCli / buildCopilotArgs); must pass the review chain |
 | R-08.6 BYOK config | Medium | Config layer, but AT-23 depends on it |
 | P60 J2 criterion | Medium-high | Criterion body + version bump + re-review |
 | R-08.3 P → P′ | High | Open VM + run injection matrix |
 | R-08.5 conditional-closure → overall-fail | High | Overturns a signed conclusion |
 | R-09 loosen → strict (after AT-24 signed) | High | Re-run AT-24 |
 
+> **Point-in-time note (P62, 2026-11-08)**: this row originally read "landed code"; in reality the function was only newly created by P61 ② (before commit 6bb23a1 the repository had no such function). Per §11.1 historical rows are not rewritten, so this row gains a note. The factual error is independent of the design decision (the R-08.1 ruling itself is unchanged).
+
 **Principle**: "things that will change" are designed to be changeable (budget, environment, layers, stages); "things that must not change" are explicitly frozen (verdict criteria, safety bottom lines, landed code).
 
 - ⑥ skipped: this is a `[ROUTINE]` docs-only ruling-record landing with no code / criterion / contract change; §7.2.1 allows a docs-only slice to skip ⑥ with a recorded reason.
 
 ```artifacts
-docs/t027/CHECKLIST_v49.md	repo
-docs/t027/CHECKLIST_v49_EN.md	repo
+docs/ADR_REGISTER.md	repo
+docs/ADR_REGISTER_EN.md	repo
 docs/t027/REMAINING_SLICES.md	repo
 docs/t027/REMAINING_SLICES_EN.md	repo
+docs/validation/at23-restricted-candidate.md	repo
+docs/validation/at23-restricted-candidate_EN.md	repo
+docs/validation/evidence/P62-R08-R09-RULING-REVISION/00-briefing.md	repo
+docs/validation/evidence/P62-R08-R09-RULING-REVISION/01-arch/design-r1.md	repo
+docs/validation/evidence/P62-R08-R09-RULING-REVISION/MANIFEST.md	repo
+docs/validation/evidence/P62-R08-R09-RULING-REVISION/SHA256SUMS.txt	repo
+docs/validation/evidence/P62-R08-R09-RULING-REVISION/freedom-list.md	repo
+docs/validation/evidence/P62-R08-R09-RULING-REVISION/input-list.md	repo
 docs/validation/evidence/R08-R09-RULING/MANIFEST.md	repo
 docs/validation/evidence/R08-R09-RULING/SHA256SUMS.txt	repo
 docs/validation/evidence/R08-R09-RULING/r08-r09-ruling.md	repo
 docs/validation/evidence/R08-R09-RULING/r08-r09-ruling_EN.md	repo
 docs/validation/r08-r09-ruling.md	repo
 docs/validation/r08-r09-ruling_EN.md	repo
+docs/validation/s1-exit.md	repo
+docs/validation/s1-exit_EN.md	repo
 ```

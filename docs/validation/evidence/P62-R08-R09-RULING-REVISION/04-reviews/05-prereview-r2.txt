@@ -1,0 +1,35 @@
+PRE-REVIEW r2 (P62 ⑤, DeepSeek V4 Pro, 2026-11-08) — verbatim archive
+
+核验完毕，全部证据链闭合。以下是 ⑤ r2 预审结论。
+
+---
+
+**PRE-REVIEW: PASS WITH FIXES**（r2；无 Medium+，唯一 Low 交 ⑦ 裁定）
+
+## M-1/M-2/M-3 落地核对（逐字对照 design-r1）
+
+- **M-1 CLOSED**：`at23-restricted-candidate{,_EN}.md:376-378` 新 §9 节。报告原有 §1–§8 + Section A–E，无「下一步建议」节 ⇒ 按起跑消息 §3.3 末尾新加一节成立；编号无冲突。结构（空行→节标题→空行→注记行）、CN/EN 注记文本与 design-r1 §3.3 逐字一致；diff（r5-diff-m123.txt）仅文末 +4 行。
+- **M-2 CLOSED**：`s1-exit{,_EN}.md:43` AT-23 行。触发条件满足（旧单元格含「前提①因继承漂移不满足」）；新单元格 CN/EN 与 design-r1 §3.4 整格替换逐字一致，括注位于「仍 BLOCKED / still BLOCKED」之后、链接列之前，位置正确。
+- **M-3 CLOSED**：`evidence/R08-R09-RULING/` 两份副本与正文逐字一致（实测 SHA256：正文 CN/EN = `a1e921fb…c748` / `a44998f2…441` = 归档副本 = SHA256SUMS 记录 = MANIFEST 记录，四方一致）；MANIFEST（10 行改）与 SHA256SUMS（4 行改）已重算同步。
+
+## A–F 项复核
+
+ruling 正文、ADR-037、REMAINING_SLICES 台账、自由清单自 r1 以来未再改：逐字节 `fc /b` 比对当前 index diff 与上轮包 `r5-diff-ruling.txt` / `r5-diff-ledger.txt` ⇒ **RULING-IDENTICAL / LEDGER-IDENTICAL**。抽查段 B-1 表行、段 B-2 注记、段 C 判定主体句（「豁免须由 **⑦（独立终审）** 判定，主控不得自行判定」）均在正文落地且措辞与 design-r1 一致。
+
+## 新增 diff 范围
+
+已暂存 20 文件 = r1 六文件（未再改）+ 步骤 0 六工件 + **r2 新增恰为 M-1/M-2/M-3 三处**（at23-restricted-candidate ×2、s1-exit ×2、evidence/R08-R09-RULING ×4）。无第四处改动。
+
+## L-1 处置建议（仍成立）
+
+`r08-r09-ruling.md:47`（`_EN.md:47`）五要素⑤ 仍含「A5 pid reports 绑定为第六枚冻结事实」；起跑消息 §3.1 ⑤ 字面止于「A5 pid reports 绑定」，「第六枚冻结事实」为超字面的事实补充性定语（Low，不改五要素语义）。正文未改 ⇒ **建议仍成立：交 ⑦（GPT-5.3-Codex）终审裁定保留或删去**——该裁定恰属 ⑦ 判据文本职责范围，并入终审意见即可。
+
+## 门禁
+
+SELFTEST `PASS 722/722`；g4-tree/g4-index `TOTAL_FAIL=0`（ok=15 FAIL=0）。
+
+## 风险提示（Info）
+
+M-1 注记「后续 AT-23 复核可按 P62 修订后的判据评估」为指针性陈述，与 briefing §3.3 字面一致，不构成豁免判定；豁免判定主体仍唯一归 ⑦，无越权。
+
+**结论**：M-1/M-2/M-3 全部 CLOSED；A–F 维持成立；无 Medium+。仅 L-1（Low）按建议交 ⑦ 裁定——主控可据此如实登记并派 ⑦ 复审代为确认，无需升级用户裁决。

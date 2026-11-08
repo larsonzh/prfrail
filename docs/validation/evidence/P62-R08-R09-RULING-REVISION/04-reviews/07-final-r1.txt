@@ -1,0 +1,30 @@
+FINAL REVIEW r1 (P62 ⑦, GPT-5.3-Codex, 2026-11-08) — verbatim archive
+
+FINAL REVIEW: PASS
+
+High
+- 无。
+
+Medium
+- 无。
+
+Low
+- L-1（已裁定为可接受，不要求整改）：[docs/validation/r08-r09-ruling.md#L47](docs/validation/r08-r09-ruling.md#L47)、[docs/validation/r08-r09-ruling_EN.md#L47](docs/validation/r08-r09-ruling_EN.md#L47) 使用了“第六枚冻结事实 / sixth frozen fact”定语。
+依据：[docs/validation/evidence/P62-R08-R09-RULING-REVISION/00-briefing.md#L46](docs/validation/evidence/P62-R08-R09-RULING-REVISION/00-briefing.md#L46) 原字面到“A5 pid reports 绑定”，而该定语可在 P61 事实中追溯到同源表述：[docs/validation/at23-restricted-candidate.md#L76](docs/validation/at23-restricted-candidate.md#L76)、[docs/validation/at23-restricted-candidate_EN.md#L76](docs/validation/at23-restricted-candidate_EN.md#L76)。
+修复建议：无需修复；若后续仅做文风收敛，可在不改语义前提下删去该定语。
+
+Info
+- 五要素与豁免边界已完整落地，且“豁免判定主体=⑦”明写：[docs/validation/r08-r09-ruling.md#L42](docs/validation/r08-r09-ruling.md#L42)、[docs/validation/r08-r09-ruling.md#L49](docs/validation/r08-r09-ruling.md#L49)、[docs/validation/r08-r09-ruling_EN.md#L49](docs/validation/r08-r09-ruling_EN.md#L49)。建议：保持该句作为不可删关键句。
+- R-08.1 事实修正与时点注记一致落地：[docs/validation/r08-r09-ruling.md#L175](docs/validation/r08-r09-ruling.md#L175)、[docs/validation/r08-r09-ruling.md#L182](docs/validation/r08-r09-ruling.md#L182)、[docs/validation/r08-r09-ruling_EN.md#L175](docs/validation/r08-r09-ruling_EN.md#L175)、[docs/validation/r08-r09-ruling_EN.md#L182](docs/validation/r08-r09-ruling_EN.md#L182)；归档副本同位：[docs/validation/evidence/R08-R09-RULING/r08-r09-ruling.md#L175](docs/validation/evidence/R08-R09-RULING/r08-r09-ruling.md#L175)、[docs/validation/evidence/R08-R09-RULING/r08-r09-ruling_EN.md#L175](docs/validation/evidence/R08-R09-RULING/r08-r09-ruling_EN.md#L175)。建议：后续继续采用“历史不改写+时点注记”模式。
+- P61 后续指针与 s1-exit 括注已同位落地：[docs/validation/at23-restricted-candidate.md#L376](docs/validation/at23-restricted-candidate.md#L376)、[docs/validation/at23-restricted-candidate.md#L378](docs/validation/at23-restricted-candidate.md#L378)、[docs/validation/at23-restricted-candidate_EN.md#L376](docs/validation/at23-restricted-candidate_EN.md#L376)、[docs/validation/s1-exit.md#L43](docs/validation/s1-exit.md#L43)、[docs/validation/s1-exit_EN.md#L43](docs/validation/s1-exit_EN.md#L43)。建议：后续复核 AT-23 时直接引用该指针段。
+- ⑤/⑥ 处置链如实：⑤ r1 为 FINDINGS、⑤ r2 为 PASS WITH FIXES、⑥ 为 PASS 且“可进入⑦”：[docs/validation/evidence/P62-R08-R09-RULING-REVISION/04-reviews/05-prereview-r1.txt#L7](docs/validation/evidence/P62-R08-R09-RULING-REVISION/04-reviews/05-prereview-r1.txt#L7)、[docs/validation/evidence/P62-R08-R09-RULING-REVISION/04-reviews/05-prereview-r2.txt#L7](docs/validation/evidence/P62-R08-R09-RULING-REVISION/04-reviews/05-prereview-r2.txt#L7)、[docs/validation/evidence/P62-R08-R09-RULING-REVISION/04-reviews/06-scan-r1.txt#L6](docs/validation/evidence/P62-R08-R09-RULING-REVISION/04-reviews/06-scan-r1.txt#L6)、[docs/validation/evidence/P62-R08-R09-RULING-REVISION/04-reviews/06-scan-r1.txt#L22](docs/validation/evidence/P62-R08-R09-RULING-REVISION/04-reviews/06-scan-r1.txt#L22)。建议：维持该归档顺序。
+- 门禁原始读数满足全绿：tree/index 均 TOTAL_FAIL=0，selftest 为 PASS 722/722：[tmp/P62-R08-R09-RULING-REVISION/g4-tree.txt#L52](tmp/P62-R08-R09-RULING-REVISION/g4-tree.txt#L52)、[tmp/P62-R08-R09-RULING-REVISION/g4-index.txt#L52](tmp/P62-R08-R09-RULING-REVISION/g4-index.txt#L52)、[tmp/P62-R08-R09-RULING-REVISION/g4-selftest.txt#L727](tmp/P62-R08-R09-RULING-REVISION/g4-selftest.txt#L727)；G3 对称检查通过：[tmp/P62-R08-R09-RULING-REVISION/g4-tree.txt#L10](tmp/P62-R08-R09-RULING-REVISION/g4-tree.txt#L10)、[tmp/P62-R08-R09-RULING-REVISION/g4-index.txt#L10](tmp/P62-R08-R09-RULING-REVISION/g4-index.txt#L10)。建议：无需追加修复。
+
+L-1 裁定
+- 裁定结果：保留“第六枚冻结事实 / sixth frozen fact”。
+- 裁定理由：该短语处于“如 …”示例括注，不改变五要素⑤的规范语义主干（仍是“成因可追溯到 B4 之后特定产品改动”）；且与 P61 既有事实陈述一致可追溯（见上引 L76）。
+- 对 ⑤ r2 登记口径的确认：可接受。其“无 Medium+、Low 交⑦裁定”与本次终审结论一致。
+
+越界审计结论
+- 本轮核对未见越界改动（未触产品代码/CI/契约/schema/fixtures/准则正文），变更范围与治理类纯文档修订一致。
+- ⑦ 额度状态：本次完成“1 次终审”；未触发 Medium+，因此不消耗复审额度。

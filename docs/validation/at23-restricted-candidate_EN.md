@@ -372,3 +372,7 @@ docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/SHA256SUMS.txt	repo
 docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/freedom-list.md	repo
 docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/input-list.md	repo
 ```
+
+## 9. Follow-up pointer (appended by P62)
+
+> **Point-in-time note (P62, 2026-11-08)**: the R-08.5 criterion was revised in P62 to add the five elements of the "inherited-drift exemption"; P61's premise-① verdict is unchanged (R-08.5 was not yet revised at that time), but a later AT-23 re-check may be evaluated under the P62-revised criterion.

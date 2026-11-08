@@ -40,7 +40,7 @@
 | AT-20 | PASS | [T023 cost ledger](t023-cost-ledger.md) |
 | AT-21 | PASS | [T024 lifecycle](t024-lifecycle.md) |
 | AT-22 | PASS | [T025 operator interaction](t025-operator-interaction.md)：Schema/golden/hash/replay、聚焦终端收件箱、结构化响应、Engine 控制权归还及故障恢复 |
-| AT-23 | P61 评估完成（PARTIAL）：前提②满足、前提①因继承漂移不满足，待 R-08.5 修订片裁定豁免；仍 BLOCKED | [P61 报告](at23-restricted-candidate.md)：机制腿与 B4 基线 0 漂移（仅 F2 一处断言继承漂移）、真实候选腿实际跑过启动 / 执行 / 停机并记录 unsupported，不构成真实候选兼容性证明；[T026 报告](t026-agent-runner-contract.md) 的历史结论不变 |
+| AT-23 | P61 评估完成（PARTIAL）：前提②满足、前提①因继承漂移不满足，待 R-08.5 修订片裁定豁免；仍 BLOCKED（R-08.5 判据已于 P62 修订，含继承漂移豁免五要素；AT-23 现状待复核） | [P61 报告](at23-restricted-candidate.md)：机制腿与 B4 基线 0 漂移（仅 F2 一处断言继承漂移）、真实候选腿实际跑过启动 / 执行 / 停机并记录 unsupported，不构成真实候选兼容性证明；[T026 报告](t026-agent-runner-contract.md) 的历史结论不变 |
 | AT-24 | 条件闭合 | [T028 黑箱模式](t028-supervised-black-box.md)：T028 已完成（`DEV_PLAN.md:119`），visible 黑箱候选的风险确认、隔离投递、显式归还、全量扇描与 reduced/unknown 报告已实现；闭合依据为 (b)/(c) 裁定，**真实 CLI 端到端仍依赖 T027-B**（D-18） |
 
 这些 PASS 表示对应 AT 的现有确定性验收，不自动满足阶段文档与发布门禁。

@@ -372,3 +372,7 @@ docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/SHA256SUMS.txt	repo
 docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/freedom-list.md	repo
 docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/input-list.md	repo
 ```
+
+## 9. 后续指针（P62 追加）
+
+> **时点注记（P62，2026-11-08）**：R-08.5 判据已于 P62 修订，增加「继承漂移豁免」五要素；P61 的前提①判定不变（当时 R-08.5 未修订），但后续 AT-23 复核可按 P62 修订后的判据评估。
