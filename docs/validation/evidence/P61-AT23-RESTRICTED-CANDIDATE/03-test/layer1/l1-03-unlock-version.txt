@@ -1,0 +1,17 @@
+P61 AT23-RESTRICTED-CANDIDATE / layer 1 / item 3 - unlock version (zero billing)
+date: 2026-11-08
+role: prfrail-tester (3)
+command: dot-source tools/agent-probe/CopilotCli.ps1 ; Invoke-CopilotCli -Subcommand version -Unlock
+wrapper argv: version  (prefix --no-auto-update dropped, as ruled in design-r1 A.1)
+exit code: 0
+stdout (verbatim): GitHub Copilot CLI 1.0.85
+observed version token: 1.0.85
+assert: token in {1.0.83, 1.0.85}, expected 1.0.85
+RESULT: PASS
+
+wrapper-side evidence (three cross-check paths, all under tmp/P61-AT23-RESTRICTED-CANDIDATE):
+  1. wrapper-version-evidence.txt  - last record: mode=unlock verdict=ok version=GitHub Copilot CLI 1.0.85.
+     (previous record on the same call chain: mode=pinned verdict=ok version=GitHub Copilot CLI 1.0.83.)
+  2. wrapper-probe-count.txt       - value 11 (item 1 was probe 10; both probes incremented the counter)
+  3. observed stdout in this file + $script:CopilotCliLastVersionText = GitHub Copilot CLI 1.0.85.
+note: the unlock path asserts the observed token against the accepted set and throws when outside it (fail-closed); no out-of-set version was observed

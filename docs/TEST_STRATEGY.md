@@ -60,6 +60,8 @@ AT-23 前置强检项（P38/P39 新增）：
 - N4 探针额度可重复：同一 Permit 不得重复或并发取得额度
 - P39 并发反例：跨进程上限竞态、提交故障三态、`unknown` 占用、只读不写入确认、账本缺失拒绝重发
 
+AT-23 验收结论（P61 新增）：P61 **PARTIAL 收口**——机制腿仅除 F2 一处继承漂移（前提①不满足）、真实候选腿实际跑过启动 / 执行 / 停机且含 unsupported（前提②满足）；AT-23 整体**仍未通过**，待 R-08.5 修订片裁定豁免。报告：[中文](validation/at23-restricted-candidate.md) / [English](validation/at23-restricted-candidate_EN.md)。
+
 AT-02 强制反例（P53 新增，GAP-77 中间符号链接逃逸）：常驻回归 `TestBoundDirMiddleSymlinkEscapesBound`、`TestBoundDirMiddleSymlinkRefusedWithClosedErrno`、`TestBoundDirRenameStormNeverYieldsOutsideBytes`、`TestBoundDirBindMountImportRefused`、`TestBoundDirFailClosedWithoutOpenat2`、`TestBoundDirConcurrentCloseAndRead`；红基线历史为 P52 击穿（界外内容可读）转 P53 红转绿；变异检验 `PRFRAIL_P53_RED_BASELINE=1 go test -run TestBoundDirRedBaselineMiddleSymlinkEscape`。
 
 AT-13 证据补链（P55 新增）：seed 驱动构建、外部 oracle 比较与失败不损 seed 的两平台捕获已归档于[证据包](validation/evidence/EXIT-SEED-BUILD-EVIDENCE/MANIFEST.md)；本节只登记「补证已归档」，不表示 AT-13 已通过，能力边界（S-1..S-7 成立、N-1..N-7 不 assert）见该包 `claim-scope.md`。

@@ -40,7 +40,7 @@
 | AT-20 | PASS | [T023 cost ledger](t023-cost-ledger.md) |
 | AT-21 | PASS | [T024 lifecycle](t024-lifecycle.md) |
 | AT-22 | PASS | [T025 operator interaction](t025-operator-interaction.md)：Schema/golden/hash/replay、聚焦终端收件箱、结构化响应、Engine 控制权归还及故障恢复 |
-| AT-23 | BLOCKED | [T026 报告](t026-agent-runner-contract.md)：能力表征完成，10 verified、2 unsupported、0 unknown；固定候选的工具/网络控制不兼容，且 T027 adapter 与独立验收闭环未实现 |
+| AT-23 | P61 评估完成（PARTIAL）：前提②满足、前提①因继承漂移不满足，待 R-08.5 修订片裁定豁免；仍 BLOCKED | [P61 报告](at23-restricted-candidate.md)：机制腿与 B4 基线 0 漂移（仅 F2 一处断言继承漂移）、真实候选腿实际跑过启动 / 执行 / 停机并记录 unsupported，不构成真实候选兼容性证明；[T026 报告](t026-agent-runner-contract.md) 的历史结论不变 |
 | AT-24 | 条件闭合 | [T028 黑箱模式](t028-supervised-black-box.md)：T028 已完成（`DEV_PLAN.md:119`），visible 黑箱候选的风险确认、隔离投递、显式归还、全量扇描与 reduced/unknown 报告已实现；闭合依据为 (b)/(c) 裁定，**真实 CLI 端到端仍依赖 T027-B**（D-18） |
 
 这些 PASS 表示对应 AT 的现有确定性验收，不自动满足阶段文档与发布门禁。
@@ -49,7 +49,7 @@
 
 | 门禁 | 状态 | 证据/缺口 |
 |---|---|---|
-| 核心任务链与 fail-close 场景 | BLOCKED | 既有 AT-01–AT-22 通过；T026 完成但固定候选为 10 verified、2 unsupported、0 unknown，整体不兼容；T027 未完成、AT-23 未通过；T028 已完成、AT-24 条件闭合 |
+| 核心任务链与 fail-close 场景 | BLOCKED | 既有 AT-01–AT-22 通过；T026 完成但固定候选为 10 verified、2 unsupported、0 unknown，整体不兼容；T027 未完成、AT-23 未通过；T028 已完成、AT-24 条件闭合；**依赖链**：AT-23 部分验证完成，前提①待修复（P61 PARTIAL） |
 | seed 自托管与真实平台 | PASS | T017 Windows/Linux 可信矩阵及 Windows 本机两代演练 |
 | whois 只读影子 | PASS | 9/9 固定用例与 3 类漂移负例；不含生产切换 |
 | generic/C/Go harness | PASS | 三套 harness 定义及三个最小用户样例均通过只读 CLI 闭环 |

@@ -1,0 +1,10 @@
+run-1 (startup leg) - recorded by the ③ test role
+outer shell: pwsh 7 (Windows)
+command: & powershell -NoProfile -ExecutionPolicy Bypass -File tmp\P61-AT23-RESTRICTED-CANDIDATE\Invoke-ByokLayer0.ps1 -InvokeWrapper -WrapperPrompt "List the files in the current directory" -WrapperEffort high
+cwd: D:\LZProjects\prfrail
+argv produced by tools/agent-probe/CopilotCli.ps1 buildCopilotArgs (no -Unlock):
+  --no-auto-update -p "List the files in the current directory" --effort=high
+stdout capture: stdout.txt (full)
+stderr capture: stderr.raw-cp936.txt (untouched) and stderr.txt (annotated copy, see its header)
+exit code: 0
+credential handling: injected by the tmp companion, cleared in its finally block ("BYOK env cleanup: verified (all six cleared)")

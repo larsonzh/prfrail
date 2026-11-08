@@ -98,3 +98,5 @@
 尊	docs/validation/p45-e2e-zero-model.md	"只读边界被尊重" (verbatim 6-scan Section C item 6; both the CN and the _EN report carry it)
 弄	docs/validation/g4b-corpus-decouple.md	"newline 分割会把路径弄坏" (verbatim 6-scan Section C item 1; both the CN and the _EN report carry it)
 稽	docs/validation/p60-directive-judge-blindspots.md	「稽核」（⑥ 独立扫描原文用词，sixstage 围栏逐字转录引入；非新造词）
+妨	docs/validation/at23-restricted-candidate.md	「不妨碍」（⑥ 独立扫描 Section C 第 8 条原文用词，sixstage 围栏逐字转录引入；非新造词）
+军	docs/validation/at23-restricted-candidate.md	「军规」（⑥ 独立扫描 Section D 原文用词，sixstage 围栏逐字转录引入；非新造词）

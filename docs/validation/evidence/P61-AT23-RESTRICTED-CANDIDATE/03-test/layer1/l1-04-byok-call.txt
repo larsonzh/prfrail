@@ -1,0 +1,16 @@
+P61 AT23-RESTRICTED-CANDIDATE / layer 1 / item 4 - BYOK call through wrapper (billing #3, approved, ~CNY 0.01)
+date: 2026-11-08
+role: prfrail-tester (3)
+command: powershell -NoProfile -File tmp/P61-AT23-RESTRICTED-CANDIDATE/Invoke-ByokLayer0.ps1 -InvokeWrapper -WrapperPrompt "say hello"
+wrapper argv summary: --no-auto-update -p say hello   (Subcommand empty, Effort empty)
+exit code: 0  (wrapper exit code: 0)
+reply first line (<=120 chars, verbatim capture): 
+Hello! 馃憢
+reply non-empty: yes (greeting plus duration/token block)
+cleanup line (verbatim): 
+BYOK env cleanup: verified (all six cleared)
+assert: exit 0 + non-empty reply + exact cleanup line "BYOK env cleanup: verified (all six cleared)"
+note: console capture shows mojibake for non-ASCII (emoji/CJK) - PowerShell 5.1 code-page artifact of the capture, not a call failure
+note: CLI warns "No token count multiplier is known for Anthropic model deepseek-flash ... configure a recognized canonical model ID" - same canonical-model-ID boundary recorded in layer 0
+run count: exactly one paid call, no retry, no extra call
+RESULT: PASS

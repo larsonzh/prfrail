@@ -1,0 +1,11 @@
+phase=P61 AT23-RESTRICTED-CANDIDATE task=3 copilot-hosted GPT-6 Luna connectivity
+argv=C:\Users\妙妙呜\AppData\Roaming\npm\node_modules\@github\copilot\node_modules\@github\copilot-win32-x64\copilot.exe --no-auto-update --model gpt-6-luna -p say hello
+workingDirectory=D:\LZProjects\prfrail\tmp\P61-AT23-RESTRICTED-CANDIDATE\luna-ws
+byokEnvSet=none (removal only; before=[] after=[])
+exitCode=0
+verdict=connected
+reason=exit 0 with non-empty reply
+replyFirstLine=Hello!
+premiumRequests=1 (approved as payment item 2; not part of the acceptance conclusion)
+recordedAtUtc=2026-11-07T18:45:10.1594812Z
+formatRepairedAtUtc=2026-11-07T18:46:06.201Z (single call only; line joining repaired, values unchanged)

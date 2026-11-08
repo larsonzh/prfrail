@@ -1,0 +1,10 @@
+! No token count multiplier is known for Anthropic model "deepseek-flash". Token estimates will use
+  the 1.0 fallback; configure a recognized canonical model ID to enable model-specific token
+  counting.
+
+
+
+Changes    +0 -0
+Duration   11s
+Tokens     ↑ 16.7k (11.9k cached) • ↓ 286 (64 reasoning)
+Resume     copilot --resume=590a5e9a-66e0-4743-88d6-58d105ad470b

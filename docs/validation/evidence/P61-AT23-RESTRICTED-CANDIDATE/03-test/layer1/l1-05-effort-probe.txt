@@ -1,0 +1,17 @@
+P61 AT23-RESTRICTED-CANDIDATE / layer 1 / item 5 - effort=high three-state probe (billing #4, approved, ~CNY 0.01)
+date: 2026-11-08
+role: prfrail-tester (3)
+command: powershell -NoProfile -File tmp/P61-AT23-RESTRICTED-CANDIDATE/Invoke-ByokLayer0.ps1 -InvokeWrapper -WrapperPrompt "say hello" -WrapperEffort "high"
+wrapper argv summary: --no-auto-update -p say hello --effort=high
+exit code: 0  (wrapper exit code: 0)
+state verdict: SUPPORTED  (exit 0 and non-empty reply)
+reply first line (<=120 chars, verbatim capture): 
+Hello! 馃憢
+error text: none (no usage error, no unknown option)
+cleanup line (verbatim): 
+BYOK env cleanup: verified (all six cleared)
+assert: supported = exit 0 + non-empty reply => effort=high supported
+budget discipline: exactly one paid call; low/medium/xhigh/max were NOT probed (outside the approved amount)
+boundary (not blocking): this probe proves the CLI accepts --effort=high and completes normally; whether the BYOK provider actually applies that effort level is not observable at this layer (unmeasurable surface)
+note: CLI still warns "No token count multiplier is known for Anthropic model deepseek-flash" (canonical model ID boundary, same as layer 0)
+RESULT: PASS

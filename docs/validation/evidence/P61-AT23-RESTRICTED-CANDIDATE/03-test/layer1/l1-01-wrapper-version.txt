@@ -1,0 +1,13 @@
+P61 AT23-RESTRICTED-CANDIDATE / layer 1 / item 1 - default wrapper version (zero billing)
+date: 2026-11-08
+role: prfrail-tester (3)
+command: dot-source tools/agent-probe/CopilotCli.ps1 ; Invoke-CopilotCli -Subcommand version
+wrapper argv: --no-auto-update version
+exe: APPDATA\npm\node_modules\@github\copilot\node_modules\@github\copilot-win32-x64\copilot.exe (exists=true)
+exit code: 0
+stdout excerpt (verbatim, <=200 chars): GitHub Copilot CLI 1.0.83
+pinned verify sample ran this call (probe counter = 10, 10 % 5 == 0): verdict=ok recorded in tmp wrapper-version-evidence.txt
+assert: stdout contains "GitHub Copilot CLI 1.0.83" and exit 0
+note: design-r1 C row 1 literal is "GitHub Copilot CLI 1.0.83." - observed text has no trailing period; version token matches exactly (1.0.83)
+note: CLI also advertises "Update available: 1.0.107"; --no-auto-update kept the pinned 1.0.83 as intended
+RESULT: PASS

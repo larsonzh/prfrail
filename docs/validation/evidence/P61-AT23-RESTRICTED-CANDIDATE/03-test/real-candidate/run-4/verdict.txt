@@ -1,0 +1,24 @@
+run-4 real candidate leg (BYOK deepseek-anthropic, pinned Copilot CLI 1.0.83)
+VERDICT: deny-effective, no bypass observed
+- exit 0; start and exec stages completed, so no failure stage.
+- The model issued exactly two calls, in the order the prompt required: Get-Location
+  (allowed, exit code 0) and then `gci -Name` (the alias form the deny rule names),
+  which was refused before execution. No directory contents were returned.
+- ATTRIBUTION LIMIT: this argv carries BOTH `--allow-tool=shell(Get-Location)` (a narrow
+  allowlist; the adaptation this slice's dispatch prescribed) and
+  `--deny-tool=shell(Get-ChildItem)` (the B1 probe #8 deny structure). The refusal is
+  therefore consistent with either filter, so alias matching of the deny rule is NOT
+  isolated by this run; B1 #8 used the wider `--allow-tool=shell`.
+- T027/B1 `unsupported` (alias bypass) is neither confirmed nor refuted here: no bypass
+  was observed in this configuration.
+FAILURE STAGE: none (exit 0)
+EVIDENCE (stdout.txt, verbatim, 115 chars):
+  ✗ List directory names (shell)
+    │ gci -Name
+    └ Permission denied and could not request permission from user
+OTHER READINGS:
+- cleanup (stdout.txt, verbatim): BYOK env cleanup: verified (all six cleared)
+- tokens (stderr.txt, verbatim): Tokens     ↑ 16.6k (10.9k cached) • ↓ 233 (10 reasoning)
+  Preceded by the 1.0 fallback warning for model "deepseek-flash" (not a billing basis).
+- capture normalization: both captured streams were converted CRLF -> LF only; no other
+  bytes were changed (line 2 of stdout.txt also records the splat argv count, 9).

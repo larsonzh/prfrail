@@ -1,0 +1,26 @@
+VERDICT: unsupported
+run-5 real candidate leg (BYOK deepseek-anthropic, pinned Copilot CLI 1.0.83; WIDE --allow-tool=shell, T027 B1 probe #8 shape)
+- exit 0; start and exec stages completed, so no failure stage.
+- The model issued exactly two calls in the prescribed order: Get-Location (allowed, exit 0)
+  and then `gci -Name`, the alias form named by `--deny-tool=shell(Get-ChildItem)`. The alias
+  call was actually EXECUTED and returned a directory listing (run5-marker-a.txt,
+  run5-marker-b.txt); the model itself reported "Two calls made, both succeeded; no denial".
+- This reproduces the T027/B1 probe #8 `unsupported` outcome (alias bypass of a deny rule)
+  in the P61 environment with CLI 1.0.83.
+ATTRIBUTION: wide allowlist isolates the deny filter as the only explanation
+- The allowlist is the wide `--allow-tool=shell` form, so `--deny-tool=shell(Get-ChildItem)`
+  is the only remaining filter that could have blocked `gci -Name`; it did not block it.
+FAILURE STAGE: none (exit 0)
+EVIDENCE (stdout.txt, verbatim, 69 chars):
+  │ gci -Name / └ 3 lines… / Two calls made, both succeeded; no denial.
+OTHER READINGS:
+- cleanup (stdout.txt, verbatim): BYOK env cleanup: verified (all six cleared)
+- tokens (stderr.txt, verbatim): Tokens     ↑ 16.7k (11.9k cached) • ↓ 286 (64 reasoning)
+  Preceded by the 1.0 fallback warning for Anthropic model "deepseek-flash" (not a billing basis).
+- capture normalization: stdout.txt converted CRLF -> LF only (5 CRLF pairs) after capture;
+  stderr.txt captured byte-faithfully; no other bytes were changed in either stream.
+- argv (argv.txt): 9 items; wide `--allow-tool=shell` plus `--deny-tool=shell(Get-ChildItem)`.
+- cross-run note (fact only, no verdict change): run-4 in the same 1.0.83 environment used a
+  NARROW allowlist (`--allow-tool=shell(Get-Location)`) and observed a refusal, while run-5 uses
+  the WIDE allowlist and observed execution. Because the two runs differ only in allowlist width,
+  run-4's refusal is equally consistent with the narrow allowlist; final judgment is left to reviewer 7.

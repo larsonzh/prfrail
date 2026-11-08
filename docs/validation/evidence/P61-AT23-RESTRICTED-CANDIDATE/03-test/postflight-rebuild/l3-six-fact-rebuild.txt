@@ -1,0 +1,112 @@
+postflight fact rebuild (A5 six facts) - layer 3 mechanism legs
+digest rules: internal/adapters/agent_runner_evidence.go; frozen values: state-events.jsonl terminal routing event evidence[2..7]
+
+== f2-pos ==
+terminal routing event: ABSENT (no agent-terminal-completed transition)
+frozen facts (evidence[2..7]): none
+run evidence dir: request-run-b4
+  manifest frozen=none rebuilt=sha256:c952179ebb0cbe65 -> NO-FROZEN-FACT (expected: the leg published no completed terminal)
+  diff     frozen=none rebuilt=sha256:f8700730d4d8f747 -> NO-FROZEN-FACT (expected: the leg published no completed terminal)
+  logs     frozen=none rebuilt=sha256:e3b0c44298fc1c14 -> NO-FROZEN-FACT (expected: the leg published no completed terminal) (logsComplete=false)
+  usage    frozen=none -> MISSING
+  stop     frozen=none -> NOT-RECONSTRUCTIBLE (guard termination evidence is not persisted as a run artifact; only its digest reaches the chain); frozen value ABSENT
+  pids     frozen=none -> GAP (missing report(s): stub-child.pid)
+  pids-live parent=gone(45244) child=absent (semantic substitute for the process-stop fact)
+
+== f2-neg ==
+terminal routing event: ABSENT (no agent-terminal-completed transition)
+frozen facts (evidence[2..7]): none
+run evidence dir: request-run-b4
+  manifest frozen=none rebuilt=sha256:a87f17047d546775 -> NO-FROZEN-FACT (expected: the leg published no completed terminal)
+  diff     frozen=none rebuilt=sha256:f8700730d4d8f747 -> NO-FROZEN-FACT (expected: the leg published no completed terminal)
+  logs     frozen=none rebuilt=sha256:31d4333fbce4a002 -> NO-FROZEN-FACT (expected: the leg published no completed terminal) (logsComplete=true)
+  usage    frozen=none rebuilt=sha256:4d51d872aaf58619 -> NO-FROZEN-FACT (expected: the leg published no completed terminal)
+  stop     frozen=none -> NOT-RECONSTRUCTIBLE (guard termination evidence is not persisted as a run artifact; only its digest reaches the chain); frozen value ABSENT
+  pids     frozen=none rebuilt=sha256:29e2473f9a7a9d37 -> NO-FROZEN-FACT (expected: the leg published no completed terminal)
+  pids-live parent=gone(47964) child=gone(47964) (semantic substitute for the process-stop fact)
+
+== f2-neg-r2 ==
+terminal routing event: ABSENT (no agent-terminal-completed transition)
+frozen facts (evidence[2..7]): none
+run evidence dir: request-run-b4
+  manifest frozen=none rebuilt=sha256:ce1f64a9e4ef40df -> NO-FROZEN-FACT (expected: the leg published no completed terminal)
+  diff     frozen=none rebuilt=sha256:f8700730d4d8f747 -> NO-FROZEN-FACT (expected: the leg published no completed terminal)
+  logs     frozen=none rebuilt=sha256:31d4333fbce4a002 -> NO-FROZEN-FACT (expected: the leg published no completed terminal) (logsComplete=true)
+  usage    frozen=none rebuilt=sha256:4d51d872aaf58619 -> NO-FROZEN-FACT (expected: the leg published no completed terminal)
+  stop     frozen=none -> NOT-RECONSTRUCTIBLE (guard termination evidence is not persisted as a run artifact; only its digest reaches the chain); frozen value ABSENT
+  pids     frozen=none rebuilt=sha256:7a540d0f9ff33878 -> NO-FROZEN-FACT (expected: the leg published no completed terminal)
+  pids-live parent=gone(24268) child=gone(24268) (semantic substitute for the process-stop fact)
+
+== f3-pos ==
+terminal routing event: ABSENT (no agent-terminal-completed transition)
+frozen facts (evidence[2..7]): none
+run evidence dir: request-run-b4
+  manifest frozen=none rebuilt=sha256:cbe05df13daaf52a -> NO-FROZEN-FACT (expected: the leg published no completed terminal)
+  diff     frozen=none rebuilt=sha256:f8700730d4d8f747 -> NO-FROZEN-FACT (expected: the leg published no completed terminal)
+  logs     frozen=none rebuilt=sha256:e3b0c44298fc1c14 -> NO-FROZEN-FACT (expected: the leg published no completed terminal) (logsComplete=false)
+  usage    frozen=none rebuilt=sha256:4d51d872aaf58619 -> NO-FROZEN-FACT (expected: the leg published no completed terminal)
+  stop     frozen=none -> NOT-RECONSTRUCTIBLE (guard termination evidence is not persisted as a run artifact; only its digest reaches the chain); frozen value ABSENT
+  pids     frozen=none rebuilt=sha256:bb0b42befffa07a2 -> NO-FROZEN-FACT (expected: the leg published no completed terminal)
+  pids-live parent=gone(44844) child=no-pid (semantic substitute for the process-stop fact)
+
+== f3-neg ==
+terminal routing event: sequence=10 evidence=10
+frozen facts (evidence[2..7]): sha256:46ca7fb69f551f31 | sha256:f8700730d4d8f747 | sha256:31d4333fbce4a002 | sha256:4d51d872aaf58619 | sha256:1493bbd65c1d4c95 | sha256:fb7e6a2f2936b148
+run evidence dir: request-run-b4
+  manifest frozen=sha256:46ca7fb69f551f31 rebuilt=sha256:46ca7fb69f551f31 -> MATCH
+  diff     frozen=sha256:f8700730d4d8f747 rebuilt=sha256:f8700730d4d8f747 -> MATCH
+  logs     frozen=sha256:31d4333fbce4a002 rebuilt=sha256:31d4333fbce4a002 -> MATCH (logsComplete=true)
+  usage    frozen=sha256:4d51d872aaf58619 rebuilt=sha256:4d51d872aaf58619 -> MATCH
+  stop     frozen=sha256:1493bbd65c1d4c95 -> NOT-RECONSTRUCTIBLE (guard termination evidence is not persisted as a run artifact; only its digest reaches the chain); frozen value valid digest shape
+  pids     frozen=sha256:fb7e6a2f2936b148 rebuilt=sha256:fb7e6a2f2936b148 -> MATCH
+  pids-live parent=gone(32624) child=no-pid (semantic substitute for the process-stop fact)
+
+== f3-neg-r2 ==
+terminal routing event: sequence=10 evidence=10
+frozen facts (evidence[2..7]): sha256:c686d70fc8d28799 | sha256:f8700730d4d8f747 | sha256:31d4333fbce4a002 | sha256:4d51d872aaf58619 | sha256:81ca93357bd05087 | sha256:532c2b60a0175264
+run evidence dir: request-run-b4
+  manifest frozen=sha256:c686d70fc8d28799 rebuilt=sha256:c686d70fc8d28799 -> MATCH
+  diff     frozen=sha256:f8700730d4d8f747 rebuilt=sha256:f8700730d4d8f747 -> MATCH
+  logs     frozen=sha256:31d4333fbce4a002 rebuilt=sha256:31d4333fbce4a002 -> MATCH (logsComplete=true)
+  usage    frozen=sha256:4d51d872aaf58619 rebuilt=sha256:4d51d872aaf58619 -> MATCH
+  stop     frozen=sha256:81ca93357bd05087 -> NOT-RECONSTRUCTIBLE (guard termination evidence is not persisted as a run artifact; only its digest reaches the chain); frozen value valid digest shape
+  pids     frozen=sha256:532c2b60a0175264 rebuilt=sha256:532c2b60a0175264 -> MATCH
+  pids-live parent=gone(18292) child=no-pid (semantic substitute for the process-stop fact)
+
+== f4-pos ==
+terminal routing event: ABSENT (no agent-terminal-completed transition)
+frozen facts (evidence[2..7]): none
+run evidence dir: request-run-b4
+  manifest frozen=none -> MISSING
+  diff     frozen=none -> MISSING
+  logs     frozen=none rebuilt=sha256:a3eabcead1e7d806 -> NO-FROZEN-FACT (expected: the leg published no completed terminal) (logsComplete=false)
+  usage    frozen=none -> MISSING
+  stop     frozen=none -> NOT-RECONSTRUCTIBLE (guard termination evidence is not persisted as a run artifact; only its digest reaches the chain); frozen value ABSENT
+  pids     frozen=none -> GAP (missing report(s): stub.pid,stub-child.pid)
+  pids-live parent=absent child=absent (semantic substitute for the process-stop fact)
+
+== f4-neg ==
+terminal routing event: ABSENT (no agent-terminal-completed transition)
+frozen facts (evidence[2..7]): none
+run evidence dir: request-run-b4
+  manifest frozen=none -> MISSING
+  diff     frozen=none -> MISSING
+  logs     frozen=none rebuilt=sha256:31d4333fbce4a002 -> NO-FROZEN-FACT (expected: the leg published no completed terminal) (logsComplete=true)
+  usage    frozen=none rebuilt=sha256:4d51d872aaf58619 -> NO-FROZEN-FACT (expected: the leg published no completed terminal)
+  stop     frozen=none -> NOT-RECONSTRUCTIBLE (guard termination evidence is not persisted as a run artifact; only its digest reaches the chain); frozen value ABSENT
+  pids     frozen=none rebuilt=sha256:4fd8cb0b032dd1ff -> NO-FROZEN-FACT (expected: the leg published no completed terminal)
+  pids-live parent=gone(31700) child=no-pid (semantic substitute for the process-stop fact)
+
+== f4-neg-r2 ==
+terminal routing event: ABSENT (no agent-terminal-completed transition)
+frozen facts (evidence[2..7]): none
+run evidence dir: request-run-b4
+  manifest frozen=none -> MISSING
+  diff     frozen=none -> MISSING
+  logs     frozen=none rebuilt=sha256:31d4333fbce4a002 -> NO-FROZEN-FACT (expected: the leg published no completed terminal) (logsComplete=true)
+  usage    frozen=none rebuilt=sha256:4d51d872aaf58619 -> NO-FROZEN-FACT (expected: the leg published no completed terminal)
+  stop     frozen=none -> NOT-RECONSTRUCTIBLE (guard termination evidence is not persisted as a run artifact; only its digest reaches the chain); frozen value ABSENT
+  pids     frozen=none rebuilt=sha256:52ffc84396979977 -> NO-FROZEN-FACT (expected: the leg published no completed terminal)
+  pids-live parent=gone(44704) child=no-pid (semantic substitute for the process-stop fact)
+
+REBUILD: DONE (every rebuildable fact matches its frozen value; the process-stop fact is declared not reconstructible)

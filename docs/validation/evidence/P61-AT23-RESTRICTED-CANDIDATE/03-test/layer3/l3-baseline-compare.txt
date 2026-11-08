@@ -1,0 +1,23 @@
+layer 3 mechanism verdicts vs archived B4 baseline (docs/validation/evidence/directive-history/b4/archive/pack-verdict.json)
+baseline generatedAt: 2026-09-22T16:57:51.437Z; baseline failedChecks: []
+
+== f2 (this run failedChecks: ["f2-pos/process-tree-taken-away"]) ==
+  CHECK-PASS-DIFF f2-pos/process-tree-taken-away: now=false baseline=true
+    now detail     : reported pids gone: false (AgentRunner evidence invalid: missing required pid report(s) stub-child.pid so the managed processes cannot be proven gone)
+    baseline detail: reported pids gone: true (<nil>)
+  f2-pos: now=uncertain-or-paused/PAUSED baseline=uncertain-or-paused/PAUSED checks=6 (baseline 6)
+  f2-neg: now=uncertain-or-paused/PAUSED baseline=uncertain-or-paused/PAUSED checks=4 (baseline 4)
+  f2-neg-r2: now=uncertain-or-paused/PAUSED baseline=uncertain-or-paused/PAUSED checks=4 (baseline 4)
+
+== f3 (this run failedChecks: []) ==
+  f3-pos: now=uncertain-or-paused/PAUSED baseline=uncertain-or-paused/PAUSED checks=2 (baseline 2)
+  f3-neg: now=completed/COMPLETED baseline=completed/COMPLETED checks=2 (baseline 2)
+  f3-neg-r2: now=completed/COMPLETED baseline=completed/COMPLETED checks=2 (baseline 2)
+
+== f4 (this run failedChecks: []) ==
+  f4-pos: now=uncertain-or-paused/PAUSED baseline=uncertain-or-paused/PAUSED checks=4 (baseline 4)
+  f4-neg: now=refused/RUNNING baseline=refused/RUNNING checks=2 (baseline 2)
+  f4-neg-r2: now=refused/RUNNING baseline=refused/RUNNING checks=2 (baseline 2)
+
+summary: field drifts=0; failed checks in this run=1
+note: deviating checks and new-finding checks are listed above; an empty drift list means every verdict class, state and check pass value matches the baseline.

@@ -90,6 +90,7 @@
 | P58 P58-OB-TRIAGE | ✅ Done (2026-11-05) | P56 | S | — | report pair `docs/validation/p58-ob-triage-assessment{,_EN}.md`; evidence pack `docs/validation/evidence/P58-OB-TRIAGE/`; R = 0, D = 0 |
 | P59 DIRECTIVE-SCOPE-GUARD | ✅ Done (2026-11-06; R-12 ruled A2×B1×Y1; v1.63) | P58 | S | — | report pair `docs/validation/p59-directive-scope-guard{,_EN}.md`; evidence pack `docs/validation/evidence/P59-DIRECTIVE-SCOPE-GUARD/`; R = 0, D = 0 |
 | P60 DIRECTIVE-JUDGE-BLINDSPOTS | ✅ Done (2026-11-06; ruling J2×J3, J1 not selected; v1.64) | P59 | M | 2026-11-06 | report pair `docs/validation/p60-directive-judge-blindspots{,_EN}.md`; evidence pack `docs/validation/evidence/P60-DIRECTIVE-JUDGE-BLINDSPOTS/`; R = 0, D = 2 |
+| P61 AT23-RESTRICTED-CANDIDATE | ✅ Done (PARTIAL close-out; closed 2026-11-08, ⑦ `FINAL REVIEW: PARTIAL`, ADR-036) | P60 (R-08/R-09 ruled) | M | 2026-11-08 | Report pair `docs/validation/at23-restricted-candidate{,_EN}.md`; evidence pack `docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/` |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1710,6 +1711,28 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Completion record | Report pair: `docs/validation/p60-directive-judge-blindspots{,_EN}.md`; review chain ① `DESIGN: DONE` → ② two rounds (r2 fixed F-1/F-2) → ③ two rounds `TEST: DONE` (T119–T124) → ⑤ r1 `PASS WITH FIXES` (M-1/M-2) → r2 `PASS` → ⑥ `INDEPENDENT SCAN: PASS` → ⑦ `FINAL REVIEW: PASS` + blind r1 `FINDINGS` (1 Medium = the G7-f expected item, closed by the ⑧ transcript) → r2 `FINDINGS` (3 wrap-up-timing items, fixed) → r2b `PASS` (final, also serving as the ⑦ post-remediation re-review); SELFTEST 703 → 722; R=0, D=2 (D-1 blind-review order deviation / D-2 tmp-top-level leftover); committed `e381898` + `dafe004` and pushed to origin (not gitee), CI `42323986343` / `42328605588` both green |
 
 - R-08/R-09 rulings see `docs/validation/r08-r09-ruling{,_EN}.md` (finalized 2026-11-06; landed 2026-11-07, [ROUTINE] docs-only).
+
+### P61 — `AT23-RESTRICTED-CANDIDATE` (layer 1 item 8 · acceptance class) · ✅ Done (PARTIAL close-out)
+
+| Field | Content |
+|---|---|
+| Identifier | `AT23-RESTRICTED-CANDIDATE` (acceptance-class `[SLICE]`; carries layer 1 item 8 of §4 in v50, "AT-23 restricted real candidate and sign-off") |
+| Status | ✅ Done (PARTIAL close-out; closed 2026-11-08; final verdict = ⑦ `FINAL REVIEW: PARTIAL`, user ruling (E), ADR-036; start anchor HEAD = `05e8e35`; controller model = `DeepSeek V4 Pro`, ADR-035; R-08/R-09 ruled ⇒ block lifted) |
+| Goal | Layered/staged AT-23 execution: layer 0 BYOK feasibility → layer 1 skeleton → layer 2 single scenarios → layer 3 full scenarios; close out per the R-08.5 conditional-closure approach (mechanism leg all green + real candidate leg run ≥3 times with unsupported/unknown recorded), with the report stating "does not constitute real-candidate compatibility proof" |
+| Depends on | P60 closed; the R-08/R-09 ruling (`docs/validation/r08-r09-ruling{,_EN}.md`); existing B4 mechanism-leg evidence (`docs/validation/t027-at23-e2e.md`) |
+| Size | M; ⑦ hard-gate high tier = 1 final + 3 re-reviews + 1 blind counted separately |
+| Steps | ① execution-plan confirmation (lightweight) → ② BYOK wrapper + one Copilot smoke → ③ mechanism-leg four scenarios → ④ gates → ⑤ pre-review → ⑥ independent scan → ⑦ final review (with blind) → ⑧ docs → ⑨ three scopes + SELFTEST → ⑧c → ⑩ |
+| Current gap | The AT-23 real candidate leg was unreachable (OB-21); this slice assesses AT-23 under the R-08.5 conditional-closure approach with BYOK as the main path plus local runs (R-08 ruling) |
+| Deliverables | Report pair `docs/validation/at23-restricted-candidate{,_EN}.md`; evidence pack `docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/`; BYOK wrapper `Invoke-CopilotCli` / `buildCopilotArgs`; ADR-035 (step 0); this ledger's P61 block |
+| Acceptance evidence | Layer gates all green layer by layer; conditional-closure premises (mechanism leg all green + real candidate leg ≥3 times); the three report sentences; three scopes `TOTAL_FAIL=0`; `SELFTEST 722/722`; **actual P61 outcome**: premise ① unmet, premise ② met ⇒ PARTIAL close-out |
+| Boundary | No VM / proxy (R-08.3 / R-08.4); the controller must not enable a proxy or switch endpoints on its own; bound by the three bullets of §1.7.2; the BYOK conclusion does not replace the B1 Copilot-hosted baseline; the stage 1→2 upgrade waits for the user's ruling |
+| Class | `[SLICE]` (acceptance) |
+| Probe budget | Stage 1 per-run declaration (R-08.2; user approval in the same turn) |
+| Freedom-list path | `docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/freedom-list.md` |
+| R / D baseline | R = 0, D = 0 (registered at start, 2026-11-07) |
+| Temp artefact location | `tmp/P61-AT23-RESTRICTED-CANDIDATE/` (append-only until 8c) |
+| Layer 1 item 8 status marker | 🔄 P61 assessment done, premise ② met, premise ① unmet because of the inherited drift, awaiting the R-08.5 revision slice's waiver ruling (the v50 snapshot table body is unchanged; the marker lives in the live ledger, see report §6.3) |
+| Completion record | Report pair: `docs/validation/at23-restricted-candidate{,_EN}.md` |
 
 ## Known defects (to be handled before later slices)
 

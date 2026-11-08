@@ -1,0 +1,11 @@
+--- F4 positive leg: identity mirror (single file, end state) ---
+managed-process.identity.json: {"pid":5568,"startToken":"01dd6f1a7e4467ed"}
+managed-process.launch.slot: launch-request-run-b4
+dmpexe5imxvk
+state-events.jsonl lines=10 dispatch-ish lines=1
+--- F4 negative leg: terminal artifacts after forged resume ---
+tmp/b4/runs/f4-neg/agent-runner-replay/runs/request-run-b4/terminal exists=false
+tmp/b4/runs/f4-neg/terminal exists=false
+tmp/b4/runs/f4-neg/events/terminal.jsonl exists=false
+f4-neg state-events lines=9
+f4-neg last event: {"schemaVersion":"1.0.0","event":{"eventId":"b4-event-1794098749150830900-9","runId":"run-b4","sequence":9,"occurredAt":"2026-11-08T00:45:49.150Z","actor":{"type":"system","id":"engine"},"entity":{"ki

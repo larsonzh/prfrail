@@ -90,6 +90,7 @@
 | P58 P58-OB-TRIAGE | ✅ 已完成（2026-11-05） | P56 | S | — | 报告对 `docs/validation/p58-ob-triage-assessment{,_EN}.md`；证据包 `docs/validation/evidence/P58-OB-TRIAGE/`；R = 0、D = 0 |
 | P59 DIRECTIVE-SCOPE-GUARD | ✅ 已完成（2026-11-06；R-12 裁定 A2×B1×Y1；v1.63） | P58 | S | — | 报告对 `docs/validation/p59-directive-scope-guard{,_EN}.md`；证据包 `docs/validation/evidence/P59-DIRECTIVE-SCOPE-GUARD/`；R = 0、D = 0 |
 | P60 DIRECTIVE-JUDGE-BLINDSPOTS | ✅ 已完成（2026-11-06；裁定 J2×J3、J1 不选；v1.64） | P59 | M | 2026-11-06 | 报告对 `docs/validation/p60-directive-judge-blindspots{,_EN}.md`；证据包 `docs/validation/evidence/P60-DIRECTIVE-JUDGE-BLINDSPOTS/`；R = 0、D = 2 |
+| P61 AT23-RESTRICTED-CANDIDATE | ✅ 已完成（PARTIAL 收口；2026-11-08 收口，⑦ `FINAL REVIEW: PARTIAL`，ADR-036） | P60（R-08/R-09 已裁） | M | 2026-11-08 | 报告对 `docs/validation/at23-restricted-candidate{,_EN}.md`；证据包 `docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/` |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -1723,6 +1724,28 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 完成记录 | 报告对：`docs/validation/p60-directive-judge-blindspots{,_EN}.md`；审查链 ① `DESIGN: DONE` → ② 两轮（r2 修 F-1/F-2）→ ③ 两轮 `TEST: DONE`（T119–T124）→ ⑤ r1 `PASS WITH FIXES`（M-1/M-2）→ r2 `PASS` → ⑥ `INDEPENDENT SCAN: PASS` → ⑦ `FINAL REVIEW: PASS` + 盲审 r1 `FINDINGS`（1 Medium = G7-f 预期项，⑧ 转录闭合）→ r2 `FINDINGS`（3 项收尾时序，已修）→ r2b `PASS`（终局，兼 ⑦ 修复后复审）；SELFTEST 703 → 722；R=0、D=2（D-1 盲审顺序偏离 / D-2 tmp 顶层残留）；已提交 `e381898` + `dafe004` 并推 origin（未推 gitee），CI `42323986343` / `42328605588` 双绿 |
 
 - R-08/R-09 裁定见 `docs/validation/r08-r09-ruling{,_EN}.md`（2026-11-06 定稿；2026-11-07 落地，[ROUTINE] docs-only）。
+
+### P61 — `AT23-RESTRICTED-CANDIDATE`（层 1 第 8 项 · 验收类） · ✅ 已完成（PARTIAL 收口）
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `AT23-RESTRICTED-CANDIDATE`（验收类 `[SLICE]`；承载 v50 §四 层 1 第 8 项「AT-23 受限真实候选与签收」） |
+| 状态 | ✅ 已完成（PARTIAL 收口；2026-11-08 收口；最终结论 = ⑦ `FINAL REVIEW: PARTIAL`，用户裁定 (E)、ADR-036；起跑锚点 HEAD = `05e8e35`；主控模型 = `DeepSeek V4 Pro`，ADR-035；R-08/R-09 已裁 ⇒ 阻断解除） |
+| 目标 | 分层/分阶段执行 AT-23：层 0 BYOK 可行性 → 层 1 骨架 → 层 2 单场景 → 层 3 全场景；按 R-08.5 条件闭合口径收口（机制腿全绿 + 真实候选腿 ≥3 次并记录 unsupported/unknown），报告明写「不构成真实候选兼容性证明」 |
+| 依赖 | P60 闭环；R-08/R-09 裁定（`docs/validation/r08-r09-ruling{,_EN}.md`）；B4 机制腿既有证据（`docs/validation/t027-at23-e2e.md`） |
+| 规模 | M；⑦ 硬门高配 = 1 终审 + 3 复审 + 盲审另计 1 |
+| 步骤 | ① 执行计划确认（轻量化）→ ② BYOK 封装函数 + Copilot 1 次冒烟 → ③ 机制腿四场景 → ④ 门禁 → ⑤ 预审 → ⑥ 独立扫描 → ⑦ 终审（含盲审）→ ⑧ 文档 → ⑨ 三作用域 + SELFTEST → ⑧c → ⑩ |
+| 现状缺口 | AT-23 真实候选腿此前不可达（OB-21）；本片以 BYOK 主路径 + 本机跑按 R-08.5 条件闭合口径评估（R-08 裁定） |
+| 交付物 | 报告对 `docs/validation/at23-restricted-candidate{,_EN}.md`；证据包 `docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/`；BYOK 封装函数 `Invoke-CopilotCli` / `buildCopilotArgs`；ADR-035（步骤 0）；本台账 P61 段 |
+| 验收证据 | 分层闸门逐层全绿；条件闭合前提（机制腿全绿 + 真实候选腿 ≥3 次）；报告三句话；三作用域 `TOTAL_FAIL=0`；`SELFTEST 722/722`；**本片实得**：前提①不满足、前提②满足 ⇒ PARTIAL 收口 |
+| 边界 | 不开 VM / 代理（R-08.3 / R-08.4）；主控不得自行启用代理或切端点；受 §1.7.2 三条 bullet 约束；BYOK 结论不替代 B1 的 Copilot-hosted 基线；阶段 1→2 升级等用户裁定 |
+| 分级 | `[SLICE]`（验收类） |
+| 探针额度 | 阶段 1 逐次声明（R-08.2；用户同轮批准） |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/P61-AT23-RESTRICTED-CANDIDATE/freedom-list.md` |
+| R / D 基线 | R = 0、D = 0（2026-11-07 起跑登记） |
+| 临时件落点声明 | 本片临时目录 = `tmp/P61-AT23-RESTRICTED-CANDIDATE/`（⑧c 前只增不删） |
+| 层 1 第 8 项状态标记 | 🔄 P61 评估完成，前提②满足，前提①因继承漂移不满足，待 R-08.5 修订片裁定豁免（v50 快照表体不改，标记落活台账，见报告 §6.3） |
+| 完成记录 | 报告对：`docs/validation/at23-restricted-candidate{,_EN}.md` |
 
 ## 已知缺陷（后续切片前处理）
 

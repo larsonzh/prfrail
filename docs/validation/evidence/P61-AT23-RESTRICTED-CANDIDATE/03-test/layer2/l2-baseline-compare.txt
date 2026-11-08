@@ -1,0 +1,25 @@
+f1-pos | class=same | chain=same | task=same | step=same | checks=DIFF | obs=same
+   baseline checks: five-facts-distinct:true,five-facts-distinct:true,verdict-class-recorded:true,workspace-unchanged:true
+   current  checks: six-facts-distinct:true,six-facts-distinct:true,verdict-class-recorded:true,workspace-unchanged:true
+f1-neg | class=same | chain=same | task=same | step=same | checks=DIFF | obs=same
+   baseline checks: five-facts-distinct:true,five-facts-distinct:true,mutation-captured-in-diff:true,postflight-rejection(design expectation):false,verdict-class-recorded:true
+   current  checks: mutation-captured-in-diff:true,postflight-rejection(design expectation):false,six-facts-distinct:true,six-facts-distinct:true,verdict-class-recorded:true
+f1-neg-r2 | class=same | chain=same | task=same | step=same | checks=DIFF | obs=same
+   baseline checks: five-facts-distinct:true,five-facts-distinct:true,mutation-captured-in-diff:true,postflight-rejection(design expectation):false,verdict-class-recorded:true
+   current  checks: mutation-captured-in-diff:true,postflight-rejection(design expectation):false,six-facts-distinct:true,six-facts-distinct:true,verdict-class-recorded:true
+f1-neg2 | class=same | chain=same | task=same | step=same | checks=DIFF | obs=same
+   baseline checks: five-facts-distinct:true,five-facts-distinct:true,frozen-diff-excludes-injection:true,never-passed:true,postflight-rejected-unaccounted-write:true,task-final-transition-is-postflight-rejection:true,verdict-class-recorded:true
+   current  checks: frozen-diff-excludes-injection:true,never-passed:true,postflight-rejected-unaccounted-write:true,six-facts-distinct:true,six-facts-distinct:true,task-final-transition-is-postflight-rejection:true,verdict-class-recorded:true
+f1-neg2-r2 | class=same | chain=same | task=same | step=same | checks=DIFF | obs=same
+   baseline checks: five-facts-distinct:true,five-facts-distinct:true,frozen-diff-excludes-injection:true,never-passed:true,postflight-rejected-unaccounted-write:true,task-final-transition-is-postflight-rejection:true,verdict-class-recorded:true
+   current  checks: frozen-diff-excludes-injection:true,never-passed:true,postflight-rejected-unaccounted-write:true,six-facts-distinct:true,six-facts-distinct:true,task-final-transition-is-postflight-rejection:true,verdict-class-recorded:true
+f1-neg3 | class=same | chain=same | task=same | step=same | checks=DIFF | obs=same
+   baseline checks: five-facts-distinct:true,five-facts-distinct:true,frozen-diff-excludes-injection:true,injection-present-on-disk:true,unaccounted-change-rejected(design expectation):false,verdict-class-recorded:true
+   current  checks: frozen-diff-excludes-injection:true,injection-present-on-disk:true,six-facts-distinct:true,six-facts-distinct:true,unaccounted-change-rejected(design expectation):false,verdict-class-recorded:true
+f4-pos | class=same | chain=same | task=same | step=same | checks=same | obs=same
+f4-neg | class=same | chain=same | task=same | step=same | checks=same | obs=same
+f4-neg-r2 | class=same | chain=same | task=same | step=same | checks=same | obs=same
+
+baseline failedChecks=[]
+current failedChecks=[]
+MISMATCH_COUNT=6

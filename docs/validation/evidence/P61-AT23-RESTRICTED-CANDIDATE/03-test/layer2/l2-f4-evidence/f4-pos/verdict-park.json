@@ -1,0 +1,83 @@
+{
+  "face": "f4",
+  "case": "pos",
+  "phase": "park",
+  "runId": "run-b4",
+  "requestId": "request-run-b4",
+  "runRoot": "D:\\LZProjects\\prfrail\\tmp\\b4\\runs\\f4-pos",
+  "workspace": "D:\\LZProjects\\prfrail\\tmp\\b4\\runs\\f4-pos\\workspace",
+  "startedAt": "2026-11-08T00:45:46.834Z",
+  "endedAt": "2026-11-08T00:45:46.949Z",
+  "verdictClass": "parked",
+  "chainState": "RUNNING",
+  "taskState": "b4-task\u00001=STEPS_RUNNING",
+  "stepState": "b4-task\u0000b4-code-step\u00001=TERMINAL_PENDING",
+  "eventLogHash": "sha256:3557b8d8878cc686e62c75e83c14ec33246863268a429e4c00eea55f0c4c9c9d",
+  "eventSequence": 9,
+  "load": {
+    "args": [
+      "-mode",
+      "crash",
+      "-exit-code",
+      "7",
+      "-sleep",
+      "3s"
+    ],
+    "timeout": "30s",
+    "grace": "2s"
+  },
+  "legs": [
+    {
+      "leg": "dispatch",
+      "status": "ran: process spawned through the production launcher and step parked in TERMINAL_PENDING"
+    }
+  ],
+  "journal": [
+    {
+      "leg": "baseline",
+      "at": "2026-11-08T00:45:46.854Z",
+      "outcome": "captured",
+      "detail": {
+        "entries": "1",
+        "hash": "sha256:1fbe6bb28268c36250659573df59b691d1c85dde12018bc091ddc5c5dce408ed"
+      }
+    },
+    {
+      "leg": "dispatch",
+      "at": "2026-11-08T00:45:46.854Z",
+      "outcome": "production-path-refused-by-platform",
+      "detail": {
+        "error": "AgentRunner replay store publication durability unproven: request publication"
+      }
+    },
+    {
+      "leg": "dispatch",
+      "at": "2026-11-08T00:45:46.854Z",
+      "outcome": "fallback-spawned-through-production-launcher",
+      "detail": {
+        "launchId": "launch-request-run-b4",
+        "processId": "{\"pid\":5568,\"startToken\":\"01dd6f1a7e4467ed\"}"
+      }
+    },
+    {
+      "leg": "dispatch",
+      "at": "2026-11-08T00:45:46.854Z",
+      "outcome": "parked",
+      "detail": {
+        "requestId": "request-run-b4"
+      }
+    }
+  ],
+  "checks": [],
+  "artifacts": {
+    "logs/stderr.log": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "logs/stdout.log": "sha256:a3eabcead1e7d806ad5228ed078c37d4c471332557187a726c825d9c20c3e75a"
+  },
+  "observations": {},
+  "errors": [],
+  "notes": [
+    "the runner is parked after dispatch, then restarted on the same run root",
+    "requestRecordHash=sha256:b003c345e865dca566c45ef400fc7a6258bbd708aaf5235a75de7e63d5b03c02",
+    "declared-inputs: capability disposition=compatible (declared, not probed); enforcement record declared but not consulted on that path; adapterId=b4-pinned-cli-declared"
+  ]
+}

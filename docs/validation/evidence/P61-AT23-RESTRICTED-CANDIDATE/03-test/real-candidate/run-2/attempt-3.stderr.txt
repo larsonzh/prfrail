@@ -1,0 +1,8 @@
+Version mismatch; expected to contain 1.0.83
+At D:\LZProjects\prfrail\tools\agent-probe\Invoke-AgentProbe.ps1:1185 char:28
++ ... ersionOk) { throw ('Version mismatch; expected to contain {0}' -f $Ex ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (Version mismatc... contain 1.0.83:String)  
+   [], RuntimeException
+    + FullyQualifiedErrorId : Version mismatch; expected to contain 1.0.83
+ 

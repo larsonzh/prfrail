@@ -170,6 +170,8 @@ T027 前置状态更新（2026-10-31，DOCS-ALIGNMENT）：本片把 DEV_PLAN、
 
 T027 前置状态更新（2026-11-04，P54 CONTRACTS-S7-DURABILITY）：在上一段基础上，T027-B 的**发布耐久项**更新为已完成（契约与实现类切片，非平台升级）：`docs/CONTRACTS{,_EN}.md` §7 新增「C6 判定路径」与附件 C 允许集表，Windows C6 预建槽机制与 store 级激活已落地（装配层 `PrebuildReplaySlots` + 16B 头槽容器 + 六阶段写入 + `prebuild-set.jsonl`），并经两轮 Sol 红队与 ⑤ 预审 `PASS WITH FIXES`（0H/0M/4L）、⑥ 独立扫描 `PASS` 复核。**平台边界不变**：Windows 平台发布耐久等级仍为 `unproven`，first-dispatch 继续拒绝，任何文档不得写成 `proven`；C2 候选级结论不改写（引用须带「（仅限前提 P′；P′ 覆盖物理机目标部署环境未论证）」完整括注）；**AT-23 不豁免**，T027 仍 `BLOCKED / NOT IMPLEMENTED`。证据：[中文](validation/contracts-s7-durability.md) / [English](validation/contracts-s7-durability_EN.md)，证据包 `docs/validation/evidence/CONTRACTS-S7-DURABILITY/`。
 
+T027 前置状态更新（2026-11-08，P61 AT23-RESTRICTED-CANDIDATE）：在上一段基础上，AT-23 的现状已完成评估并以 **PARTIAL** 收口（用户 2026-11-08 裁定 (E)，ADR-036）：机制腿九腿的 `verdictClass` / `chainState` / `taskState` / `stepState` / `observations` 与 B4 基线 0 漂移，但 F2 正例一处断言 `process-tree-taken-away` 由 `true` 变 `false`（成因 `02d5797` 的继承漂移，非本片引入）⇒ **前提①不满足**；真实候选腿已实际跑过启动 / 执行 / 停机并记录 unsupported（与 B1 探针 #8 同形态）⇒ **前提②满足**。**AT-23 仍不通过**，待 R-08.5 修订片裁定豁免后重新评估；F2 修复与判据修订属独立后续切片。证据：[中文](validation/at23-restricted-candidate.md) / [English](validation/at23-restricted-candidate_EN.md)。
+
 ### 11 月重构里程碑（T027-B）
 
 - P37 判定基线：C1–C7 缺陷判定与修复基线（P38 施工图给文件/函数级测试矩阵；报告 `docs/validation/t027b-breakthrough{,_EN}.md`、`docs/validation/t027b-tactical-blueprint{,_EN}.md`）

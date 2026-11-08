@@ -1,0 +1,2 @@
+BYOK script call: D:\LZProjects\prfrail\tools\agent-probe\Invoke-AgentProbe.ps1 -Provider deepseek-anthropic -Scenario tool-deny -Run -ProbeRoot tmp\P61-AT23-RESTRICTED-CANDIDATE\probe-run-2
+BYOK env cleanup: verified (all six cleared)

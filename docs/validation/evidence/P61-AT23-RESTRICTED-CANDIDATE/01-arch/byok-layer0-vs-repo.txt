@@ -1,0 +1,22 @@
+# P61 BYOK layer-0 companion script vs repo record (B3a precedent)
+
+Purpose: fix the identity of the temporary BYOK injection wrapper so that its hash and
+landing timestamps remain comparable after the 8c cleanup. The script lives only under
+tmp/ and is never committed to the repository.
+
+- script path: tmp/P61-AT23-RESTRICTED-CANDIDATE/Invoke-ByokLayer0.ps1
+- sha256 (final, after the FILETIME layout fix + the cleanup self-check): DA9C358FD585D1D7EDB83FF3F89EAE6CFE4BFD19EF6B54370500ACBFF0006DE4
+- sha256 (after the FILETIME layout fix): EED594F5735D392056B787E3600AC944CFFC81D6CA170D036F3D196778A4792A
+- sha256 (pre-fix): 109B3F662A9FF4A79177093C9D3B23BD8988A84C46B8FECA30674A870433721A
+- first landing (creation time): 2026-11-08 01:10:57 (local)
+- last write: 2026-11-08 (updated through ③ prep; see hash history)
+- parse check: 0 errors
+- dry-run exit code (credential missing path): 2
+- fix note: the CREDENTIALW struct field LastWritten was first declared as `long` (8 bytes) which
+  shifted CredentialBlobSize/CredentialBlob by 4 bytes and made the read path report "missing"
+  for a present credential; fixed to two `uint` fields (FILETIME layout) and re-validated via
+  the diagnostic probe (ok=True, blobSize=35, type=1, persist=2).
+- companion binary: tmp/P61-AT23-RESTRICTED-CANDIDATE/prfrail.exe (go build -o, tmp-only)
+- sha256 (final, after the -InvokeWrapper routing addition): a897bb2823784bec57cace1503166cb894f5f696d4cd0d53d1c01d8ecb343875
+- sha256 (final, after the -ScriptFile runner addition): 51ad6e4a51ca43e74b30924f6c33697eb8e618efc7ccf1978d92e06d819344b5
+- cleanup: removed by 8c; the script never contains or prints the key value

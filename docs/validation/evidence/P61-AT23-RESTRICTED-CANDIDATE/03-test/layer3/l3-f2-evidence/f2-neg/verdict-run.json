@@ -1,0 +1,167 @@
+{
+  "face": "f2",
+  "case": "neg",
+  "phase": "run",
+  "runId": "run-b4",
+  "requestId": "request-run-b4",
+  "runRoot": "D:\\LZProjects\\prfrail\\tmp\\b4\\runs\\f2-neg",
+  "workspace": "D:\\LZProjects\\prfrail\\tmp\\b4\\runs\\f2-neg\\workspace",
+  "startedAt": "2026-11-08T01:04:37.969Z",
+  "endedAt": "2026-11-08T01:04:42.723Z",
+  "verdictClass": "uncertain-or-paused",
+  "chainState": "PAUSED",
+  "taskState": "b4-task\u00001=FAILED",
+  "stepState": "b4-task\u0000b4-code-step\u00001=FAILED",
+  "eventLogHash": "sha256:c6b00a2987051461cdb15f85f807aecb71614b4380a3df28ae59220e36c2e129",
+  "eventSequence": 12,
+  "load": {
+    "args": [
+      "-mode",
+      "spawn",
+      "-child-life",
+      "1h",
+      "-sleep",
+      "5s"
+    ],
+    "timeout": "3s",
+    "grace": "2s"
+  },
+  "mapping": {
+    "status": "uncertain",
+    "treeStatus": "stopped",
+    "logsComplete": true,
+    "usageComplete": true,
+    "eventsComplete": true,
+    "manifestsComplete": true,
+    "factCount": 0,
+    "errorEvidenceCount": 3,
+    "elapsedMs": 3020
+  },
+  "legs": [
+    {
+      "leg": "dispatch",
+      "status": "ran: process spawned through the production launcher and step parked in TERMINAL_PENDING"
+    },
+    {
+      "leg": "dispatch-\u003ewait-\u003ecollect-\u003emap",
+      "status": "ran: uncertain"
+    },
+    {
+      "leg": "terminal-publication (production AgentRunnerTerminalPublisher)",
+      "status": "failed closed",
+      "error": "AgentRunner request conflict: terminal publication requires a persisted request record for requestId request-run-b4",
+      "alternativeEvidence": "the durable terminal chain is built through the public record constructors and adapters.ToChainAgentRunnerTerminal instead; the chain-side routing below is unmodified production code"
+    },
+    {
+      "leg": "cost settlement (production tickets.CostLedger.Settle)",
+      "status": "booked"
+    },
+    {
+      "leg": "terminal routing (chain.SubmitAgentRunnerTerminal)",
+      "status": "routed as uncertain"
+    },
+    {
+      "leg": "postflight/acceptance/review/promotion",
+      "status": "skipped: a non-completed terminal never reaches the downstream legs"
+    }
+  ],
+  "journal": [
+    {
+      "leg": "baseline",
+      "at": "2026-11-08T01:04:38.676Z",
+      "outcome": "captured",
+      "detail": {
+        "entries": "1",
+        "hash": "sha256:1fbe6bb28268c36250659573df59b691d1c85dde12018bc091ddc5c5dce408ed"
+      }
+    },
+    {
+      "leg": "dispatch",
+      "at": "2026-11-08T01:04:38.676Z",
+      "outcome": "production-path-refused-by-platform",
+      "detail": {
+        "error": "AgentRunner replay store publication durability unproven: request publication"
+      }
+    },
+    {
+      "leg": "dispatch",
+      "at": "2026-11-08T01:04:38.676Z",
+      "outcome": "fallback-spawned-through-production-launcher",
+      "detail": {
+        "launchId": "launch-request-run-b4",
+        "processId": "{\"pid\":10264,\"startToken\":\"01dd6f1d215a1c14\"}"
+      }
+    },
+    {
+      "leg": "dispatch",
+      "at": "2026-11-08T01:04:38.676Z",
+      "outcome": "parked",
+      "detail": {
+        "requestId": "request-run-b4"
+      }
+    },
+    {
+      "leg": "terminal-routing",
+      "at": "2026-11-08T01:04:38.676Z",
+      "outcome": "uncertain",
+      "detail": {
+        "chain": "PAUSED",
+        "step": "FAILED",
+        "task": "FAILED"
+      }
+    }
+  ],
+  "checks": [
+    {
+      "id": "outcome-not-completed",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "mapped status uncertain"
+    },
+    {
+      "id": "no-frozen-facts",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "facts present: false"
+    },
+    {
+      "id": "process-tree-taken-away",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "reported pids gone: true (\u003cnil\u003e)"
+    },
+    {
+      "id": "verdict-class-recorded",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "verdict class uncertain-or-paused"
+    }
+  ],
+  "diff": {
+    "added": [],
+    "removed": [],
+    "changed": []
+  },
+  "artifacts": {
+    "diff.json": "sha256:f8700730d4d8f747ac5ce273bcc6d6ca0dabf339d43ef439e97a75e370f72f35",
+    "events.jsonl": "sha256:4fafb99cd4a2b5d910b7998711ef3f1faa7357d4a5944fe288083f0a9dd5dec1",
+    "logs/stderr.log": "sha256:4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2",
+    "logs/stdout.log": "sha256:4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2",
+    "manifest.post.json": "sha256:a87f17047d5467753cc6474ab75c62697b6c64bb5eb20622e3b99307edd0f187",
+    "manifest.pre.json": "sha256:6e1b35b54dd3a7dfc7899c39b8e5ec465b5bebe1975c80e1eb39581d84feaad9",
+    "stub-child.pid": "sha256:a85d9666015fd69ee5dcee86bfbb9297a7a0aad078a988249b8d630656e0f17c",
+    "stub.pid": "sha256:a85d9666015fd69ee5dcee86bfbb9297a7a0aad078a988249b8d630656e0f17c",
+    "usage.json": "sha256:4d51d872aaf586199a7d77dc5b623d83c2c58d36e94d62a2872984d1bf9af953"
+  },
+  "observations": {
+    "gateHookSteps": "0",
+    "stopError": "",
+    "stopOutcome": "unknown"
+  },
+  "errors": [],
+  "notes": [
+    "run leaves a long-lived descendant; the stop must take the whole tree",
+    "requestRecordHash=sha256:f1ce6a44120c55c2d9584b82e55ddd8a30a811d0f76b9efc79d4deff914b502d",
+    "declared-inputs: capability disposition=compatible (declared, not probed); enforcement record declared but not consulted on that path; adapterId=b4-pinned-cli-declared"
+  ]
+}

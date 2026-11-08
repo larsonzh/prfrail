@@ -1,0 +1,10 @@
+b4 driver: repo=D:\LZProjects\prfrail
+b4 driver: -SkipBuild, reusing the artifacts already in tmp/b4/bin
+b4 driver: ran f2-pos-run exit=0
+b4 driver: recorded f2-pos -> uncertain-or-paused
+b4 driver: ran f2-neg-run exit=0
+b4 driver: recorded f2-neg -> uncertain-or-paused
+b4 driver: ran f2-neg-r2-run exit=0
+b4 driver: recorded f2-neg-r2 -> uncertain-or-paused
+b4 driver: aggregating pack verdict
+FAILED CHECKS: f2-pos/process-tree-taken-away

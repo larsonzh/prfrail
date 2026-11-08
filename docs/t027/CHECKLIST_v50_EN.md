@@ -72,7 +72,7 @@ Fixed `tmp` assertion: top level = `.gitkeep` + `gates-cache`; `gates-cache` hol
 
 | Seq | Slice | Identifier and content | Size | ⑦ quota | Depends on | Boundary |
 |---|---|---|---|---|---|---|
-| 8 | AT23-RESTRICTED-CANDIDATE | AT-23 restricted real candidate and sign-off | M | Codex 1 final review | **R-08 / R-09 ruled (2026-11-06) ⇒ unblocked** | no sign-off without a real-candidate authorization |
+| 8 | AT23-RESTRICTED-CANDIDATE | AT-23 restricted real candidate and sign-off | M | Codex 1 final review | **R-08 / R-09 ruled (2026-11-06) ⇒ unblocked; 🔄 P61 assessment complete (2026-11-08, PARTIAL close-out): premise ② satisfied, premise ① not satisfied due to inherited drift, awaiting the R-08.5 revision slice ruling** | no sign-off without a real-candidate authorization; awaiting fix (marked per the user's 2026-11-08 ruling, not blocking other layers) |
 
 ### Layer 2 routine governance (debt clearance)
 

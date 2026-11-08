@@ -1,0 +1,19 @@
+run-2 (execution leg) - recorded by the ③ test role
+prescribed form: BYOK companion -> tools/agent-probe/Invoke-AgentProbe.ps1 -Provider deepseek-anthropic -Scenario tool-deny -Run
+attempt 1: powershell -File <companion> ... -ScriptArgs <array>  -> exit 1, no model call
+  cause: -File binds only the first array element, so Scenario received "-Provider"
+  evidence: not captured to a file (console only); attempt 2 reproduces the identical error
+attempt 2: same intent through tmp launcher (array splat inside one process) -> exit 1, no model call
+  cause: an array splat binds positionally; the probe has a param block, so Scenario still received "-Provider"
+  evidence: attempt-2-param-binding-failure.stdout.txt / .stderr.txt
+attempt 3: named-parameter splat added to the tmp companion (tmp-only change), probe reached its own pre-flight
+  result: exit 1, zero model calls; the probe refused because its bare "--version" resolves to 1.0.85
+  while its pin expects 1.0.83 (the wrapper keeps 1.0.83 by passing --no-auto-update)
+  evidence: attempt-3.stdout.txt / attempt-3.stderr.txt
+exit code: 1 for all three attempts
+failure stage: start (parameter binding for attempts 1 and 2; pre-flight version pin for attempt 3)
+model calls: zero for all three attempts; no BYOK cost incurred
+planned argv of the probe (never executed):
+  -p "<tool-deny prompt>" -C <probe workspace> --name proofrail-t026-tool-deny-<stamp>
+  --available-tools=powershell --allow-tool=shell(Get-Location) --deny-tool=shell(Get-ChildItem)
+  --usage-output-file <usage.json> --log-dir <logs>

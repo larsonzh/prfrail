@@ -1,0 +1,12 @@
+D:\LZProjects\prfrail\tools\agent-probe\Invoke-AgentProbe.ps1 : Cannot validate argument on 
+parameter 'Scenario'. The argument "-Provider" does not belong to the set "provider-smoke,to
+ol-deny,tool-deny-compound,tool-deny-indirect,tool-deny-alias,permission-failclosed,network-
+deny,network-shell-deny,cancel,resume" specified by the ValidateSet attribute. Supply an arg
+ument that is in the set and then try the command again.
+At D:\LZProjects\prfrail\tmp\P61-AT23-RESTRICTED-CANDIDATE\Invoke-ByokLayer0.ps1:113 char:23
++         & $ScriptFile @ScriptArgs
++                       ~~~~~~~~~~~
+    + CategoryInfo          : InvalidData: (:) [Invoke-AgentProbe.ps1], ParentContainsError 
+   RecordException
+    + FullyQualifiedErrorId : ParameterArgumentValidationError,Invoke-AgentProbe.ps1
+ 

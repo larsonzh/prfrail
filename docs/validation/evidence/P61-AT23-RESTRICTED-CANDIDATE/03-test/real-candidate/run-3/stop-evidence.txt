@@ -1,0 +1,30 @@
+run-3 stop leg (BYOK wrapper call interrupted by taskkill /T /F)
+invocation: powershell -NoProfile -ExecutionPolicy Bypass -File <tmp>\Invoke-Layer3Run.ps1 -Mode call
+wrapper call: Invoke-CopilotCli -Prompt "<see prompt below>" -Effort high
+prompt: 
+Run this PowerShell command and wait for it to finish: Start-Sleep -Seconds 120. After it finishes reply DONE. Do not modify any files.
+host pid: 
+43976
+started at: 
+2026-11-08T01:10:55.5181812Z
+stopped/killed at: 
+2026-11-08T01:11:36.4196935Z
+exited before stop window: 
+False
+taskkill command: taskkill /PID 
+43976
+ /T /F
+taskkill exit code: 
+0
+taskkill output: 
+SUCCESS: The process with PID 16172 (child process of PID 43976) has been terminated. | SUCCESS: The process with PID 43976 (child process of PID 30216) has been terminated.
+host process after stop: 
+gone
+host exit code: 
+
+failure stage: 
+stop (process tree killed by taskkill /T /F while the session was running)
+stdout capture: 
+stop-call.stdout.txt
+stderr capture: 
+stop-call.stderr.txt

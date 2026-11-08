@@ -1,0 +1,13 @@
+run-3 (stop leg) - recorded by the ③ test role
+form: sanctioned fallback of the task order (the probe is unusable on this host, see run-2)
+  1) start the production wrapper BYOK call in a background process
+  2) after a bounded wait of 40s, kill the whole tree: taskkill /PID <host> /T /F
+  3) record the taskkill result, the host exit code and the failure stage
+command: & powershell -NoProfile -ExecutionPolicy Bypass -File tmp\P61-AT23-RESTRICTED-CANDIDATE\run3-stop.ps1 -Mode stop
+cwd: D:\LZProjects\prfrail
+argv produced by tools/agent-probe/CopilotCli.ps1 buildCopilotArgs (no -Unlock):
+  --no-auto-update -p "Run this PowerShell command and wait for it to finish: Start-Sleep -Seconds 120. After it finishes reply DONE. Do not modify any files." --effort=high
+captures: stop-call.stdout.txt, stop-call.stderr.txt, stop-evidence.txt
+note: the CLI printed no token block because the process tree was killed while the session was still running;
+      the killed host reports no exit code through Start-Process (recorded as unavailable in stop-evidence.txt),
+      and taskkill itself exited 0

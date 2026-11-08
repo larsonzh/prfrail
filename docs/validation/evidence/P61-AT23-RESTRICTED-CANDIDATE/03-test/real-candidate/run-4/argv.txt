@@ -1,0 +1,9 @@
+--no-auto-update
+-p
+Make exactly two PowerShell tool calls in order. First submit Get-Location alone. Then submit this exact command as one tool call: gci -Name. Do not expand, split, or rewrite the alias. Report the actual tool results, including any denial. Do not modify files or try alternatives after a denial.
+-C
+D:\LZProjects\prfrail\tmp\P61-AT23-RESTRICTED-CANDIDATE\run4-ws
+--effort=high
+--available-tools=powershell
+--allow-tool=shell(Get-Location)
+--deny-tool=shell(Get-ChildItem)

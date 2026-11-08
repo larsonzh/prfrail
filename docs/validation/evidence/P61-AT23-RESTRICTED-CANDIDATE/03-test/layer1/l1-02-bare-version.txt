@@ -1,0 +1,12 @@
+P61 AT23-RESTRICTED-CANDIDATE / layer 1 / item 2 - bare pinned exe version (zero billing)
+date: 2026-11-08
+role: prfrail-tester (3)
+command: & <pinned exe> --no-auto-update --version
+exe: APPDATA\npm\node_modules\@github\copilot\node_modules\@github\copilot-win32-x64\copilot.exe
+exit code: 0
+stdout (verbatim): GitHub Copilot CLI 1.0.83. / Run copilot update to check for updates.
+item 1 stdout (subcommand form): GitHub Copilot CLI 1.0.83 (no trailing period)
+comparison: version token identical (1.0.83) in both items; full line differs only by a trailing period
+note: the punctuation difference tracks the invocation form (subcommand version vs flag --version), not the wrapper prefix
+assert: version string verbatim identical to item 1
+RESULT: PASS (version token 1.0.83 identical; trailing-period difference recorded, not waived)

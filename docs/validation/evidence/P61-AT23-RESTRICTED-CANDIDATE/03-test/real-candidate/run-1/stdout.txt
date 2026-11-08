@@ -1,0 +1,16 @@
+BYOK wrapper call: Invoke-CopilotCli -Subcommand  -Prompt List the files in the current directory -Effort high
+I'll list the current directory contents.
+
+● List files in current directory (shell)
+  │ Get-ChildItem -Force | Select-Object Mode, Length, Name
+  └ 23 lines…
+
+Current directory `D:\LZProjects\prfrail`:
+
+**Directories:** `.git`, `.github`, `.vscode`, `cmd`, `docs`, `examples`, `harnesses`, `internal`, `schemas`, `testdata`, `tmp`, `tools`
+
+**Files:** `.gitattributes`, `.gitignore`, `go.mod`, `go.sum`, `LICENSE`, `prfrail.exe` (2.4 MB), `README.md`, `supervisor.exe` (4.8 MB)
+
+0
+wrapper exit code: 0
+BYOK env cleanup: verified (all six cleared)

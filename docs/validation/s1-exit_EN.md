@@ -40,7 +40,7 @@ Date: 2026-09-09. Verdict: `BLOCKED`. T018 passes the frozen read-only whois com
 | AT-20 | PASS | [T023 cost ledger](t023-cost-ledger_EN.md) |
 | AT-21 | PASS | [T024 lifecycle](t024-lifecycle_EN.md) |
 | AT-22 | PASS | [T025 operator interaction](t025-operator-interaction_EN.md): Schema/goldens/hash/replay, focused terminal inbox, structured response, Engine control return, and failure recovery |
-| AT-23 | BLOCKED | [T026 report](t026-agent-runner-contract_EN.md): characterization is complete with ten verified, two unsupported, and zero unknown capabilities; the pinned candidate's tool/network controls are incompatible, and the T027 adapter and independent acceptance loop are absent |
+| AT-23 | P61 assessment done (PARTIAL): premise ② met, premise ① unmet because of the inherited drift, awaiting the R-08.5 revision slice's waiver ruling; still BLOCKED | [P61 report](at23-restricted-candidate_EN.md): the mechanism legs show 0 drift against the B4 baseline (only one inherited F2 assertion drift), and the real candidate legs actually ran start / execution / stop and recorded unsupported; this does not constitute real-candidate compatibility proof; the historical [T026 report](t026-agent-runner-contract_EN.md) conclusion is unchanged |
 | AT-24 | Conditionally closed | [T028 black-box mode](t028-supervised-black-box_EN.md): T028 is complete (`DEV_PLAN_EN.md:119`); visible black-box risk acknowledgment, isolated delivery, explicit return, full scan and reduced/unknown reporting are implemented; closed under rulings (b)/(c), and **the real CLI end-to-end path still depends on T027-B** (D-18) |
 
 These PASS verdicts cover the existing deterministic AT evidence; they do not automatically satisfy stage documentation and release gates.
@@ -49,7 +49,7 @@ These PASS verdicts cover the existing deterministic AT evidence; they do not au
 
 | Gate | Status | Evidence/gap |
 |---|---|---|
-| Core task chain and fail-closed scenarios | BLOCKED | Existing AT-01–AT-22 pass; T026 is complete, but its pinned candidate has ten verified, two unsupported, and zero unknown capabilities and is incompatible; T027 is incomplete and AT-23 is not passed, while T028 is complete and AT-24 is conditionally closed |
+| Core task chain and fail-closed scenarios | BLOCKED | Existing AT-01–AT-22 pass; T026 is complete, but its pinned candidate has ten verified, two unsupported, and zero unknown capabilities and is incompatible; T027 is incomplete and AT-23 is not passed, while T028 is complete and AT-24 is conditionally closed; **dependency chain**: AT-23 is partially verified and premise ① awaits its fix (P61 PARTIAL) |
 | Seed self-host and real platforms | PASS | T017 Windows/Linux trust matrix and native Windows two-generation drill |
 | Read-only whois shadow | PASS | 9/9 fixed cases and three drift counterexamples; no production cutover |
 | generic/C/Go harnesses | PASS | All three harness definitions and minimal user examples pass the read-only CLI loop |

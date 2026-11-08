@@ -1,0 +1,204 @@
+{
+  "face": "f1",
+  "case": "pos",
+  "phase": "run",
+  "runId": "run-b4",
+  "requestId": "request-run-b4",
+  "runRoot": "D:\\LZProjects\\prfrail\\tmp\\b4\\runs\\f1-pos",
+  "workspace": "D:\\LZProjects\\prfrail\\tmp\\b4\\runs\\f1-pos\\workspace",
+  "startedAt": "2026-11-08T00:44:50.369Z",
+  "endedAt": "2026-11-08T00:44:52.921Z",
+  "verdictClass": "completed",
+  "chainState": "COMPLETED",
+  "taskState": "b4-task\u00001=PASSED",
+  "stepState": "b4-task\u0000b4-code-step\u00001=PASSED",
+  "eventLogHash": "sha256:43a9cc556eed20f794b65b982a6735a141cf96bad2b93c0af5224d3e734282f9",
+  "eventSequence": 13,
+  "load": {
+    "args": [
+      "-mode",
+      "run",
+      "-sleep",
+      "2s"
+    ],
+    "timeout": "30s",
+    "grace": "2s"
+  },
+  "mapping": {
+    "status": "completed",
+    "treeStatus": "stopped",
+    "logsComplete": true,
+    "usageComplete": true,
+    "eventsComplete": true,
+    "manifestsComplete": true,
+    "factCount": 6,
+    "errorEvidenceCount": 0,
+    "elapsedMs": 2009
+  },
+  "legs": [
+    {
+      "leg": "dispatch",
+      "status": "ran: process spawned through the production launcher and step parked in TERMINAL_PENDING"
+    },
+    {
+      "leg": "dispatch-\u003ewait-\u003ecollect-\u003emap",
+      "status": "ran: completed"
+    },
+    {
+      "leg": "terminal-publication (production AgentRunnerTerminalPublisher)",
+      "status": "failed closed",
+      "error": "AgentRunner request conflict: terminal publication requires a persisted request record for requestId request-run-b4",
+      "alternativeEvidence": "the durable terminal chain is built through the public record constructors and adapters.ToChainAgentRunnerTerminal instead; the chain-side routing below is unmodified production code"
+    },
+    {
+      "leg": "cost settlement (production tickets.CostLedger.Settle)",
+      "status": "booked"
+    },
+    {
+      "leg": "terminal routing (chain.SubmitAgentRunnerTerminal)",
+      "status": "routed as completed"
+    },
+    {
+      "leg": "postflight/acceptance/review/promotion",
+      "status": "ran to the end of the task"
+    }
+  ],
+  "journal": [
+    {
+      "leg": "baseline",
+      "at": "2026-11-08T00:44:50.391Z",
+      "outcome": "captured",
+      "detail": {
+        "entries": "1",
+        "hash": "sha256:1fbe6bb28268c36250659573df59b691d1c85dde12018bc091ddc5c5dce408ed"
+      }
+    },
+    {
+      "leg": "dispatch",
+      "at": "2026-11-08T00:44:50.391Z",
+      "outcome": "production-path-refused-by-platform",
+      "detail": {
+        "error": "AgentRunner replay store publication durability unproven: request publication"
+      }
+    },
+    {
+      "leg": "dispatch",
+      "at": "2026-11-08T00:44:50.391Z",
+      "outcome": "fallback-spawned-through-production-launcher",
+      "detail": {
+        "launchId": "launch-request-run-b4",
+        "processId": "{\"pid\":38032,\"startToken\":\"01dd6f1a5cd1f835\"}"
+      }
+    },
+    {
+      "leg": "dispatch",
+      "at": "2026-11-08T00:44:50.391Z",
+      "outcome": "parked",
+      "detail": {
+        "requestId": "request-run-b4"
+      }
+    },
+    {
+      "leg": "terminal-routing",
+      "at": "2026-11-08T00:44:50.391Z",
+      "outcome": "completed",
+      "detail": {
+        "chain": "RUNNING",
+        "step": "PASSED",
+        "task": "STEPS_RUNNING"
+      }
+    },
+    {
+      "leg": "postflight",
+      "at": "2026-11-08T00:44:50.391Z",
+      "outcome": "passed",
+      "detail": {
+        "legs": "7"
+      }
+    },
+    {
+      "leg": "acceptance",
+      "at": "2026-11-08T00:44:50.391Z",
+      "outcome": "frozen",
+      "detail": {
+        "candidateHash": "sha256:068f1169102771ac483d7a6eb747c4a458529b533ab727255ba7752f70d00e2e",
+        "parentHash": "sha256:1fbe6bb28268c36250659573df59b691d1c85dde12018bc091ddc5c5dce408ed"
+      }
+    },
+    {
+      "leg": "review",
+      "at": "2026-11-08T00:44:50.391Z",
+      "outcome": "approve",
+      "detail": {
+        "candidateHash": "sha256:068f1169102771ac483d7a6eb747c4a458529b533ab727255ba7752f70d00e2e"
+      }
+    },
+    {
+      "leg": "publish",
+      "at": "2026-11-08T00:44:50.391Z",
+      "outcome": "completed",
+      "detail": {
+        "candidateHash": "sha256:068f1169102771ac483d7a6eb747c4a458529b533ab727255ba7752f70d00e2e",
+        "workspaceDigest": "sha256:397615775e93bc21c838b1ed81ea385ccc14ae7f1a1d4c7667e87766681e9a7d"
+      }
+    },
+    {
+      "leg": "downstream",
+      "at": "2026-11-08T00:44:50.391Z",
+      "outcome": "completed"
+    }
+  ],
+  "checks": [
+    {
+      "id": "six-facts-distinct",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "frozen facts present: true"
+    },
+    {
+      "id": "six-facts-distinct",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "distinct fact digests: 6"
+    },
+    {
+      "id": "workspace-unchanged",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "diff added=[] removed=[] changed=[]"
+    },
+    {
+      "id": "verdict-class-recorded",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "verdict class completed"
+    }
+  ],
+  "diff": {
+    "added": [],
+    "removed": [],
+    "changed": []
+  },
+  "artifacts": {
+    "diff.json": "sha256:f8700730d4d8f747ac5ce273bcc6d6ca0dabf339d43ef439e97a75e370f72f35",
+    "events.jsonl": "sha256:4fafb99cd4a2b5d910b7998711ef3f1faa7357d4a5944fe288083f0a9dd5dec1",
+    "logs/stderr.log": "sha256:4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2",
+    "logs/stdout.log": "sha256:4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2",
+    "manifest.post.json": "sha256:7462328bb9ab44ad4938b2481ecd5d0a7471f84a6a6f58f9a78a3f218d043b68",
+    "manifest.pre.json": "sha256:e3771e4190fe3f414846c416b44bf949db3f0045e504d3121f943224142b9ea4",
+    "stub-child.pid": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stub.pid": "sha256:4f41f0c02bc0fab1aeb9b9bf11362a992e689bfd3ab2c634fabe077bbb5c97f0",
+    "usage.json": "sha256:4d51d872aaf586199a7d77dc5b623d83c2c58d36e94d62a2872984d1bf9af953"
+  },
+  "observations": {
+    "gateHookSteps": "0",
+    "stopError": "",
+    "stopOutcome": "stopped"
+  },
+  "errors": [],
+  "notes": [
+    "clean deterministic run; the workspace must be unchanged and all six facts must be provable",
+    "requestRecordHash=sha256:0810463385e4b17eb33dc2eaf6a296d6feff79278b5b529f7e49203a985a5d52",
+    "declared-inputs: capability disposition=compatible (declared, not probed); enforcement record declared but not consulted on that path; adapterId=b4-pinned-cli-declared"
+  ]
+}

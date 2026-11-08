@@ -1,0 +1,13 @@
+b4 driver: repo=D:\LZProjects\prfrail
+b4 driver: -SkipBuild, reusing the artifacts already in tmp/b4/bin
+b4 driver: ran f4-pos-p1-park exit=0
+b4 driver: ran f4-pos-p2-recover exit=0
+b4 driver: recorded f4-pos -> uncertain-or-paused
+b4 driver: ran f4-neg-p1-park exit=0
+b4 driver: ran f4-neg-p2-forge exit=0
+b4 driver: recorded f4-neg -> refused
+b4 driver: ran f4-neg-r2-p1-park exit=0
+b4 driver: ran f4-neg-r2-p2-forge exit=0
+b4 driver: recorded f4-neg-r2 -> refused
+b4 driver: aggregating pack verdict
+b4 driver: all recorded checks passed

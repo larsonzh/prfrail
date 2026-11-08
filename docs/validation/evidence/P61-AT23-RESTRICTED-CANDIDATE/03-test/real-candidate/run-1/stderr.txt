@@ -1,0 +1,17 @@
+# ENCODING NOTE (added by the ③ test role; content is otherwise untouched)
+# The capture was taken while the console code page was active, so the arrow glyphs of
+# the CLI token block were decoded as CP936 and their last byte was replaced by "?".
+# Wording, ordering and every number are verbatim. The untouched bytes are stored in
+# stderr.raw-cp936.txt next to this file; this file only prepends these five lines.
+# Affected glyph groups: two damaged groups in the "Tokens" line (up arrow, and the
+# pair that ends the cached count). The counts themselves are exact: 36.5k, 24.8k cached, 189.
+! No token count multiplier is known for Anthropic model "deepseek-flash". Token estimates will use
+  the 1.0 fallback; configure a recognized canonical model ID to enable model-specific token
+  counting.
+
+
+
+Changes    +0 -0
+Duration   9s
+Tokens     鈫?36.5k (24.8k cached) 鈥?鈫?189
+Resume     copilot --resume=d5e88f22-34cd-4590-a5f7-60347ed7d7f9
