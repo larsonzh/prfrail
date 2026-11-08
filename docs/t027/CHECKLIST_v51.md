@@ -245,6 +245,9 @@
 17. **报告写「已停止 / Stopped」会触发 `G7-d` 停止态判据**：⑩ 停点措辞应写「⑩ 停点已到达 / Reached the 10 stop point」，只有真正停止的切片才写「已停止——未完成」。
 18. **捕获件的 `COMMAND:` 行必须与真实 argv 同形**：显示缩写（漏 `--noop-chain` 等必要旗标）会使该捕获「按记录不可重放」，属保真缺陷；⑤ 会以 Medium 判出。修法：`anomalies.md` 立 E-N 勘误 + 派生 `index.json` 写忠实命令与 `commandErrata`。
 19. **远端 Go 模块获取**：VM 到 `proxy.golang.org` / `sum.golang.org` 可能是 IPv6 黑洞且 `GOPROXY=direct` 亦因虚名解析失败 ⇒ 用可达镜像预取后**构建期设 `GOPROXY=off`**（既解决下载又反证离线可构建）；模块缓存只读，删除前须 `chmod -R u+w`。
+
+### P56 起（v46 新增，v50–v51 累计）
+
 20. **子代理自删前必须先报主控**（候选纪律，P56 实证）：执行角色在 `tmp/<切片ID>/` 之外误建临时目录后**立刻自删**，致 §5.1 自愈档的「读数②基线」不可得。正确次序：**自报 → 主控取预快照（`tmp` 递归计数 + `git status --porcelain -uall`）→ 自删 → 零残留回读**；违者按非自愈档处置。
 21. **PowerShell 直读 UTF-8 stdout 会按 GBK 解码**（P58 实证）：`Select-String` / `Out-File -Encoding utf8` 处理门禁与 `gh` 的中文输出后成乱码，既产生假阴性（扫描结果恒为 0），也会造成二次转码。正确做法：用 `node -e` 的 `execFileSync(cmd, args, {encoding:'utf8'})` 直读、`fs.writeFileSync` 原样落盘，或让脚本只输出 ASCII 摘要。
 22. **审查方结论行取值必须严格属于 §4.1 闭集**（P59 实证）：⑦ 首轮输出 `FINAL REVIEW: CHANGES_REQUESTED`，取值表外 ⇒ 按 §7.2 格式偏离处置；同 stage 重发**计入额度上限**，不得写「无效轮次不占额度」。主控派单文本应把合法取值枚举写进任务包。
