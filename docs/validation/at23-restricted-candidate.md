@@ -1,6 +1,6 @@
 ﻿# P61 AT23-RESTRICTED-CANDIDATE 受限真实候选评估（验证报告）
 
-**状态：✅ 已完成（PARTIAL 收口）**（最终结论 = ⑦ 终审 `FINAL REVIEW: PARTIAL`，用户 2026-11-08 裁定 (E) 接受；停于 ⑩ 等提交授权，未 commit / 未 push）。
+**状态：✅ 已完成（PARTIAL 收口）**（最终结论 = ⑦ 终审 `FINAL REVIEW: PARTIAL`，用户 2026-11-08 裁定 (E) 接受；已提交 `6bb23a1`，CI `42452377967` 双绿；停于 ⑩ 等后续片裁定）。
 
 - 切片：`AT23-RESTRICTED-CANDIDATE`（验收类 `[SLICE]`，v50 §四 层 1 第 8 项「AT-23 受限真实候选与签收」）
 - 起跑：2026-11-07；起跑锚点 HEAD = `05e8e35`；准则 v1.64

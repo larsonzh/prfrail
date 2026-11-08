@@ -1,6 +1,6 @@
 ﻿# P61 AT23-RESTRICTED-CANDIDATE restricted real-candidate evaluation (validation report)
 
-**Status: ✅ Done (PARTIAL close-out)** (final verdict = ⑦ final review `FINAL REVIEW: PARTIAL`, accepted by the user on 2026-11-08 under ruling (E); waiting at ⑩ for commit authorization; not committed / not pushed).
+**Status: ✅ Done (PARTIAL close-out)** (final verdict = ⑦ final review `FINAL REVIEW: PARTIAL`, accepted by the user on 2026-11-08 under ruling (E); committed `6bb23a1`, CI `42452377967` dual-green; waiting at ⑩ for follow-up slice rulings).
 
 - Slice: `AT23-RESTRICTED-CANDIDATE` (acceptance-class `[SLICE]`, v50 §4 layer 1 item 8 "AT-23 restricted real candidate and sign-off")
 - Started: 2026-11-07; start anchor HEAD = `05e8e35`; directive v1.64
