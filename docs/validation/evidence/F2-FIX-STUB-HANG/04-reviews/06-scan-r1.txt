@@ -1,0 +1,19 @@
+## SCAN: PASS
+
+- [High] 1. 变更面
+  依据工作区现状和切片证据，tools/agent-stub/main.go 与 tools/agent-stub/main_test.go 是本片唯一被确认的代码改动范围。实现回执在 docs/validation/evidence/F2-FIX-STUB-HANG/02-impl/impl-r1.md 中明确说明：唯一变更为 hang 分支和新增回归测试；测试回执在 docs/validation/evidence/F2-FIX-STUB-HANG/03-test/test-r1.md 中进一步声明未修改 harness 与其它脚本。没有证据显示存在「改动范围扩散」到其它代码路径。
+
+- [Medium] 2. 契约面
+  这次修复与 docs/CONTRACTS.md 的 A6 语义一致：缺失文件是证据缺口、fail-closed；存在且为空的文件才是「确实无子进程」的正事实。当前 hang 分支在写 own pid 后立即写空 child pid 文件，且在此之前不产生子进程，因此它满足「空文件 = 无子进程」的契约。
+  需要注意的风险不是当前补丁本身，而是「未来有人在 hang 分支再增加 spawn，同时保留空报告写法」——那会直接违反 A6。当前补丁没有发生这种违约，且测试也专门锁定了 0 字节空报告与 own pid 关系。
+
+- [Low] 3. 安全面
+  新增测试的进程管理是稳妥的：Kill + Wait 后用 stopped 标志做幂等保护，避免重复 Wait。它使用测试的临时目录，不走共享目录，也没有引入额外的系统级权限动作。环境变量仅用于传递 evidence 目录；没有 secrets、tokens、passwords 或凭据被加入代码或测试。没有引入网络访问、外部命令执行或敏感输出。
+
+- [Low] 4. 残留面
+  在 stub 包中未发现 TODO、FIXME、调试输出或残留占位代码；正常错误信息仅用于明确失败原因。临时件与证据归档声明位于 docs/validation/evidence/F2-FIX-STUB-HANG/MANIFEST.md；它按「证据包」的方式声明了归档项，且 tmp/b4 与 tmp/F2-FIX-STUB-HANG 的临时物件没有混进受版本控制的源文件。代码读取显示它符合 Go 源文件的常见格式约定，未看到 BOM 或 CRLF 迹象（本轮未运行格式化或终端命令）。
+
+- [Medium] 5. 回归面
+  修复是极小范围的：hang 分支单独加上 empty child pid report，而其它 mode（run、spawn、no-usage 等）走公共路径，当前改动不会影响它们的既有行为。这不是系统级重构，而是严格的「hang-only」线性修复。红绿判据也没有被「自己放行」：测试要求的是明确、机械的事实——0 字节 child pid report 存在，并且 own pid 必须写入且等于本进程 pid。它不接受「看起来像对了」或「退出码 0」这种宽泛条件，因此回归判断是严谨的，不存在明显的判据自放行风险。
+
+结论：本片无阻断性缺陷，独立扫描结论为 PASS。风险集中在「未来有人误用空报告」，但这属于违反 A6 契约的后续错误，不是当前补丁的现状问题。

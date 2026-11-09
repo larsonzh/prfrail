@@ -1,0 +1,647 @@
+{
+    "generatedAt":  "2026-11-09T00:00:42.823Z",
+    "host":  "Microsoft Windows NT 10.0.26100.0",
+    "cliRecords":  [
+                       {
+                           "label":  "cli-validate",
+                           "command":  "D:\\LZProjects\\prfrail\\tmp\\b4\\bin\\prfrail.exe",
+                           "arguments":  [
+                                             "validate",
+                                             "--chain",
+                                             "D:\\LZProjects\\prfrail\\tmp\\b4\\input\\b4-chain.json"
+                                         ],
+                           "cwd":  "D:\\LZProjects\\prfrail",
+                           "exitCode":  0,
+                           "stdoutPath":  "D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\cli\\cli-validate.stdout.txt",
+                           "stdoutSha256":  "ff3044f8ac344e76e0b794e192ac7a6ce49d152e030a4e71e3057bbc41d19acf",
+                           "stdoutBytes":  235,
+                           "stderrPath":  "D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\cli\\cli-validate.stderr.txt",
+                           "stderrSha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                           "stderrBytes":  0,
+                           "stdoutExcerpt":  "validate: ok\nconfig: D:\\LZProjects\\prfrail\\tmp\\b4\\input\\b4-chain.json\nchain: b4-at23 tasks=1 steps=1\nrunnableInCli: false\nwarning: local CLI runtime currently executes noop-only chains; use validate/config explain for executable steps\n",
+                           "stderrExcerpt":  "",
+                           "startedAt":  "2026-11-09T00:00:21.180Z",
+                           "endedAt":  "2026-11-09T00:00:23.224Z"
+                       },
+                       {
+                           "label":  "cli-preview",
+                           "command":  "D:\\LZProjects\\prfrail\\tmp\\b4\\bin\\prfrail.exe",
+                           "arguments":  [
+                                             "preview",
+                                             "--chain",
+                                             "D:\\LZProjects\\prfrail\\tmp\\b4\\input\\b4-chain.json"
+                                         ],
+                           "cwd":  "D:\\LZProjects\\prfrail",
+                           "exitCode":  0,
+                           "stdoutPath":  "D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\cli\\cli-preview.stdout.txt",
+                           "stdoutSha256":  "b8041a075535455fc3c73ffb8ec197a28871c052345044451c1dcbe63cc7413c",
+                           "stdoutBytes":  917,
+                           "stderrPath":  "D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\cli\\cli-preview.stderr.txt",
+                           "stderrSha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                           "stderrBytes":  0,
+                           "stdoutExcerpt":  "previewHash: sha256:005252eb67ae0f3d93b798da423b2d26b5ae5791fa041281241e73c0e12970e1\nconfig: D:\\LZProjects\\prfrail\\tmp\\b4\\input\\b4-chain.json\nmode: offline-read-only\noutcome: blocked\nrunnableInCli: false\nsteps: 1\ncallCounters: command=0 network=0 model=0 credential=0 versionProbe=0\nunknown: version-probe reason=preview does not run tool/version probes next=authorize validate/run for observed tool versions\nunknown: network-access reason=preview does not perform network checks next=authorize controlled preflight/network verification\nunknown: credential-input reason=preview does not collect secre",
+                           "stderrExcerpt":  "",
+                           "startedAt":  "2026-11-09T00:00:23.229Z",
+                           "endedAt":  "2026-11-09T00:00:24.249Z"
+                       },
+                       {
+                           "label":  "cli-validate-hook",
+                           "command":  "D:\\LZProjects\\prfrail\\tmp\\b4\\bin\\prfrail.exe",
+                           "arguments":  [
+                                             "validate",
+                                             "--chain",
+                                             "D:\\LZProjects\\prfrail\\tmp\\b4\\input\\b4-chain-hook.json"
+                                         ],
+                           "cwd":  "D:\\LZProjects\\prfrail",
+                           "exitCode":  0,
+                           "stdoutPath":  "D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\cli\\cli-validate-hook.stdout.txt",
+                           "stdoutSha256":  "64484b42fb09beea88283e2570e5e13d1e4ef7e5ae09ac242fdf66697c7b5e83",
+                           "stdoutBytes":  240,
+                           "stderrPath":  "D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\cli\\cli-validate-hook.stderr.txt",
+                           "stderrSha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                           "stderrBytes":  0,
+                           "stdoutExcerpt":  "validate: ok\nconfig: D:\\LZProjects\\prfrail\\tmp\\b4\\input\\b4-chain-hook.json\nchain: b4-at23 tasks=1 steps=2\nrunnableInCli: false\nwarning: local CLI runtime currently executes noop-only chains; use validate/config explain for executable steps\n",
+                           "stderrExcerpt":  "",
+                           "startedAt":  "2026-11-09T00:00:24.262Z",
+                           "endedAt":  "2026-11-09T00:00:25.281Z"
+                       },
+                       {
+                           "label":  "cli-preview-hook",
+                           "command":  "D:\\LZProjects\\prfrail\\tmp\\b4\\bin\\prfrail.exe",
+                           "arguments":  [
+                                             "preview",
+                                             "--chain",
+                                             "D:\\LZProjects\\prfrail\\tmp\\b4\\input\\b4-chain-hook.json"
+                                         ],
+                           "cwd":  "D:\\LZProjects\\prfrail",
+                           "exitCode":  0,
+                           "stdoutPath":  "D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\cli\\cli-preview-hook.stdout.txt",
+                           "stdoutSha256":  "9a8c5a7a0a3743546bf43686979fcec20bb09f7f32741104052b9aa064d7f8d5",
+                           "stdoutBytes":  922,
+                           "stderrPath":  "D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\cli\\cli-preview-hook.stderr.txt",
+                           "stderrSha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                           "stderrBytes":  0,
+                           "stdoutExcerpt":  "previewHash: sha256:5d0d7745461893e6a6e2bf03f1ebcaf4f127aef24f2156bcf78cafa794eccb9e\nconfig: D:\\LZProjects\\prfrail\\tmp\\b4\\input\\b4-chain-hook.json\nmode: offline-read-only\noutcome: blocked\nrunnableInCli: false\nsteps: 2\ncallCounters: command=0 network=0 model=0 credential=0 versionProbe=0\nunknown: version-probe reason=preview does not run tool/version probes next=authorize validate/run for observed tool versions\nunknown: network-access reason=preview does not perform network checks next=authorize controlled preflight/network verification\nunknown: credential-input reason=preview does not collect ",
+                           "stderrExcerpt":  "",
+                           "startedAt":  "2026-11-09T00:00:25.291Z",
+                           "endedAt":  "2026-11-09T00:00:26.315Z"
+                       }
+                   ],
+    "declaredInputs":  {
+                           "path":  "D:\\LZProjects\\prfrail\\tmp\\b4\\input\\b4-inputs.json",
+                           "sha256":  "e2915d2ed1aed74f680ce2621d3ee5096f6313a8c9237954b6c23d98830a0f27"
+                       },
+    "cases":  [
+                  {
+                      "label":  "f2-pos",
+                      "face":  "f2",
+                      "case":  "pos",
+                      "runRoot":  "D:\\LZProjects\\prfrail\\tmp\\b4\\runs\\f2-pos",
+                      "phases":  [
+                                     "run"
+                                 ],
+                      "verdictPath":  "D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\f2-pos\\verdict-run.json",
+                      "verdictClass":  "uncertain-or-paused",
+                      "chainState":  "PAUSED",
+                      "taskState":  "b4-task\u00001=FAILED",
+                      "stepState":  "b4-task\u0000b4-code-step\u00001=FAILED",
+                      "checks":  [
+                                     {
+                                         "id":  "outcome-not-completed",
+                                         "kind":  "assertion",
+                                         "pass":  true,
+                                         "detail":  "mapped status uncertain"
+                                     },
+                                     {
+                                         "id":  "no-frozen-facts",
+                                         "kind":  "assertion",
+                                         "pass":  true,
+                                         "detail":  "facts present: false"
+                                     },
+                                     {
+                                         "id":  "timeout-fired",
+                                         "kind":  "assertion",
+                                         "pass":  true,
+                                         "detail":  "watch timedOut=true elapsedMs=5020 boundMs=5000"
+                                     },
+                                     {
+                                         "id":  "error-evidence-present",
+                                         "kind":  "assertion",
+                                         "pass":  true,
+                                         "detail":  "error evidence digests: 5"
+                                     },
+                                     {
+                                         "id":  "process-tree-taken-away",
+                                         "kind":  "assertion",
+                                         "pass":  true,
+                                         "detail":  "reported pids gone: true (\u003cnil\u003e)"
+                                     },
+                                     {
+                                         "id":  "verdict-class-recorded",
+                                         "kind":  "assertion",
+                                         "pass":  true,
+                                         "detail":  "verdict class uncertain-or-paused"
+                                     }
+                                 ],
+                      "artifacts":  {
+                                        "diff.json":  "sha256:f8700730d4d8f747ac5ce273bcc6d6ca0dabf339d43ef439e97a75e370f72f35",
+                                        "logs/stderr.log":  "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                                        "logs/stdout.log":  "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                                        "manifest.post.json":  "sha256:89ffb816825f40a74cacb575a7300823e530e81b5eb25e8e5d27e7e69413f21c",
+                                        "manifest.pre.json":  "sha256:3fd4f1a1ca52557a01d8405c929f6daa92178c401d59705559ae574c31a79379",
+                                        "stub-child.pid":  "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                                        "stub.pid":  "sha256:ab670877b2ef479aafd7bab291f79d8f7bb24930278fbed9674767f508cb41b7"
+                                    },
+                      "observations":  {
+                                           "gateHookSteps":  "0",
+                                           "stopError":  "",
+                                           "stopOutcome":  "unknown"
+                                       },
+                      "legs":  [
+                                   {
+                                       "leg":  "dispatch",
+                                       "status":  "ran: process spawned through the production launcher and step parked in TERMINAL_PENDING"
+                                   },
+                                   {
+                                       "leg":  "dispatch-\u003ewait-\u003ecollect-\u003emap",
+                                       "status":  "ran: uncertain"
+                                   },
+                                   {
+                                       "leg":  "terminal-publication (production AgentRunnerTerminalPublisher)",
+                                       "status":  "failed closed",
+                                       "error":  "AgentRunner request conflict: terminal publication requires a persisted request record for requestId request-run-b4",
+                                       "alternativeEvidence":  "the durable terminal chain is built through the public record constructors and adapters.ToChainAgentRunnerTerminal instead; the chain-side routing below is unmodified production code"
+                                   },
+                                   {
+                                       "leg":  "cost settlement (production tickets.CostLedger.Settle)",
+                                       "status":  "booked"
+                                   },
+                                   {
+                                       "leg":  "terminal routing (chain.SubmitAgentRunnerTerminal)",
+                                       "status":  "routed as uncertain"
+                                   },
+                                   {
+                                       "leg":  "postflight/acceptance/review/promotion",
+                                       "status":  "skipped: a non-completed terminal never reaches the downstream legs"
+                                   }
+                               ]
+                  },
+                  {
+                      "label":  "f2-neg",
+                      "face":  "f2",
+                      "case":  "neg",
+                      "runRoot":  "D:\\LZProjects\\prfrail\\tmp\\b4\\runs\\f2-neg",
+                      "phases":  [
+                                     "run"
+                                 ],
+                      "verdictPath":  "D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\f2-neg\\verdict-run.json",
+                      "verdictClass":  "uncertain-or-paused",
+                      "chainState":  "PAUSED",
+                      "taskState":  "b4-task\u00001=FAILED",
+                      "stepState":  "b4-task\u0000b4-code-step\u00001=FAILED",
+                      "checks":  [
+                                     {
+                                         "id":  "outcome-not-completed",
+                                         "kind":  "assertion",
+                                         "pass":  true,
+                                         "detail":  "mapped status uncertain"
+                                     },
+                                     {
+                                         "id":  "no-frozen-facts",
+                                         "kind":  "assertion",
+                                         "pass":  true,
+                                         "detail":  "facts present: false"
+                                     },
+                                     {
+                                         "id":  "process-tree-taken-away",
+                                         "kind":  "assertion",
+                                         "pass":  true,
+                                         "detail":  "reported pids gone: true (\u003cnil\u003e)"
+                                     },
+                                     {
+                                         "id":  "verdict-class-recorded",
+                                         "kind":  "assertion",
+                                         "pass":  true,
+                                         "detail":  "verdict class uncertain-or-paused"
+                                     }
+                                 ],
+                      "artifacts":  {
+                                        "diff.json":  "sha256:f8700730d4d8f747ac5ce273bcc6d6ca0dabf339d43ef439e97a75e370f72f35",
+                                        "events.jsonl":  "sha256:4fafb99cd4a2b5d910b7998711ef3f1faa7357d4a5944fe288083f0a9dd5dec1",
+                                        "logs/stderr.log":  "sha256:4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2",
+                                        "logs/stdout.log":  "sha256:4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2",
+                                        "manifest.post.json":  "sha256:2671d9ffed41d8e93036ddca141bd4286f4122e979d0885af8a33de178a4ac4a",
+                                        "manifest.pre.json":  "sha256:4af4247fca6506f8d27325e9c8cc1a63bcb36dfab0a0673fbaf7c71e42dc2c8a",
+                                        "stub-child.pid":  "sha256:fcad85d19d59ecfcf1a99d99f8d2022667ccbbb7bb0f91b42f5ac54d8377e669",
+                                        "stub.pid":  "sha256:fcad85d19d59ecfcf1a99d99f8d2022667ccbbb7bb0f91b42f5ac54d8377e669",
+                                        "usage.json":  "sha256:4d51d872aaf586199a7d77dc5b623d83c2c58d36e94d62a2872984d1bf9af953"
+                                    },
+                      "observations":  {
+                                           "gateHookSteps":  "0",
+                                           "stopError":  "",
+                                           "stopOutcome":  "unknown"
+                                       },
+                      "legs":  [
+                                   {
+                                       "leg":  "dispatch",
+                                       "status":  "ran: process spawned through the production launcher and step parked in TERMINAL_PENDING"
+                                   },
+                                   {
+                                       "leg":  "dispatch-\u003ewait-\u003ecollect-\u003emap",
+                                       "status":  "ran: uncertain"
+                                   },
+                                   {
+                                       "leg":  "terminal-publication (production AgentRunnerTerminalPublisher)",
+                                       "status":  "failed closed",
+                                       "error":  "AgentRunner request conflict: terminal publication requires a persisted request record for requestId request-run-b4",
+                                       "alternativeEvidence":  "the durable terminal chain is built through the public record constructors and adapters.ToChainAgentRunnerTerminal instead; the chain-side routing below is unmodified production code"
+                                   },
+                                   {
+                                       "leg":  "cost settlement (production tickets.CostLedger.Settle)",
+                                       "status":  "booked"
+                                   },
+                                   {
+                                       "leg":  "terminal routing (chain.SubmitAgentRunnerTerminal)",
+                                       "status":  "routed as uncertain"
+                                   },
+                                   {
+                                       "leg":  "postflight/acceptance/review/promotion",
+                                       "status":  "skipped: a non-completed terminal never reaches the downstream legs"
+                                   }
+                               ]
+                  },
+                  {
+                      "label":  "f2-neg-r2",
+                      "face":  "f2",
+                      "case":  "neg",
+                      "runRoot":  "D:\\LZProjects\\prfrail\\tmp\\b4\\runs\\f2-neg-r2",
+                      "phases":  [
+                                     "run"
+                                 ],
+                      "verdictPath":  "D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\f2-neg-r2\\verdict-run.json",
+                      "verdictClass":  "uncertain-or-paused",
+                      "chainState":  "PAUSED",
+                      "taskState":  "b4-task\u00001=FAILED",
+                      "stepState":  "b4-task\u0000b4-code-step\u00001=FAILED",
+                      "checks":  [
+                                     {
+                                         "id":  "outcome-not-completed",
+                                         "kind":  "assertion",
+                                         "pass":  true,
+                                         "detail":  "mapped status uncertain"
+                                     },
+                                     {
+                                         "id":  "no-frozen-facts",
+                                         "kind":  "assertion",
+                                         "pass":  true,
+                                         "detail":  "facts present: false"
+                                     },
+                                     {
+                                         "id":  "process-tree-taken-away",
+                                         "kind":  "assertion",
+                                         "pass":  true,
+                                         "detail":  "reported pids gone: true (\u003cnil\u003e)"
+                                     },
+                                     {
+                                         "id":  "verdict-class-recorded",
+                                         "kind":  "assertion",
+                                         "pass":  true,
+                                         "detail":  "verdict class uncertain-or-paused"
+                                     }
+                                 ],
+                      "artifacts":  {
+                                        "diff.json":  "sha256:f8700730d4d8f747ac5ce273bcc6d6ca0dabf339d43ef439e97a75e370f72f35",
+                                        "events.jsonl":  "sha256:4fafb99cd4a2b5d910b7998711ef3f1faa7357d4a5944fe288083f0a9dd5dec1",
+                                        "logs/stderr.log":  "sha256:4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2",
+                                        "logs/stdout.log":  "sha256:4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2",
+                                        "manifest.post.json":  "sha256:6f87db106d3b6b21b84b034958ed5d8d769e37cdd23543ba3108a2ed8ce60bda",
+                                        "manifest.pre.json":  "sha256:13184aea369a5e6b63b2c4cc809e0fe3a2b45bf0a2c042f26e0ff46fd8685b30",
+                                        "stub-child.pid":  "sha256:89d039a70f73a06e01ee5e3050703cc686fb4226b1de936f13d6960675e4f35f",
+                                        "stub.pid":  "sha256:89d039a70f73a06e01ee5e3050703cc686fb4226b1de936f13d6960675e4f35f",
+                                        "usage.json":  "sha256:4d51d872aaf586199a7d77dc5b623d83c2c58d36e94d62a2872984d1bf9af953"
+                                    },
+                      "observations":  {
+                                           "gateHookSteps":  "0",
+                                           "stopError":  "",
+                                           "stopOutcome":  "unknown"
+                                       },
+                      "legs":  [
+                                   {
+                                       "leg":  "dispatch",
+                                       "status":  "ran: process spawned through the production launcher and step parked in TERMINAL_PENDING"
+                                   },
+                                   {
+                                       "leg":  "dispatch-\u003ewait-\u003ecollect-\u003emap",
+                                       "status":  "ran: uncertain"
+                                   },
+                                   {
+                                       "leg":  "terminal-publication (production AgentRunnerTerminalPublisher)",
+                                       "status":  "failed closed",
+                                       "error":  "AgentRunner request conflict: terminal publication requires a persisted request record for requestId request-run-b4",
+                                       "alternativeEvidence":  "the durable terminal chain is built through the public record constructors and adapters.ToChainAgentRunnerTerminal instead; the chain-side routing below is unmodified production code"
+                                   },
+                                   {
+                                       "leg":  "cost settlement (production tickets.CostLedger.Settle)",
+                                       "status":  "booked"
+                                   },
+                                   {
+                                       "leg":  "terminal routing (chain.SubmitAgentRunnerTerminal)",
+                                       "status":  "routed as uncertain"
+                                   },
+                                   {
+                                       "leg":  "postflight/acceptance/review/promotion",
+                                       "status":  "skipped: a non-completed terminal never reaches the downstream legs"
+                                   }
+                               ]
+                  }
+              ],
+    "failedChecks":  [
+
+                     ],
+    "deviations":  [
+
+                   ],
+    "excludedFromChecksums":  [
+                                  "driver-stdout.txt",
+                                  "driver-stderr.txt"
+                              ],
+    "invocations":  [
+                        {
+                            "label":  "build-prfrail",
+                            "command":  "go",
+                            "arguments":  [
+                                              "build",
+                                              "-o",
+                                              "D:\\LZProjects\\prfrail\\tmp\\b4\\bin\\prfrail.exe",
+                                              "./cmd/prfrail"
+                                          ],
+                            "cwd":  "D:\\LZProjects\\prfrail",
+                            "exitCode":  0,
+                            "stdoutPath":  "D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\build\\build-prfrail.stdout.txt",
+                            "stdoutSha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                            "stdoutBytes":  0,
+                            "stderrPath":  "D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\build\\build-prfrail.stderr.txt",
+                            "stderrSha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                            "stderrBytes":  0,
+                            "stdoutExcerpt":  "",
+                            "stderrExcerpt":  "",
+                            "startedAt":  "2026-11-09T00:00:12.691Z",
+                            "endedAt":  "2026-11-09T00:00:14.787Z"
+                        },
+                        {
+                            "label":  "build-agent-stub",
+                            "command":  "go",
+                            "arguments":  [
+                                              "build",
+                                              "-o",
+                                              "D:\\LZProjects\\prfrail\\tmp\\b4\\bin\\agent-stub.exe",
+                                              "./tools/agent-stub"
+                                          ],
+                            "cwd":  "D:\\LZProjects\\prfrail",
+                            "exitCode":  0,
+                            "stdoutPath":  "D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\build\\build-agent-stub.stdout.txt",
+                            "stdoutSha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                            "stdoutBytes":  0,
+                            "stderrPath":  "D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\build\\build-agent-stub.stderr.txt",
+                            "stderrSha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                            "stderrBytes":  0,
+                            "stdoutExcerpt":  "",
+                            "stderrExcerpt":  "",
+                            "startedAt":  "2026-11-09T00:00:15.088Z",
+                            "endedAt":  "2026-11-09T00:00:18.122Z"
+                        },
+                        {
+                            "label":  "build-b4-e2e",
+                            "command":  "go",
+                            "arguments":  [
+                                              "build",
+                                              "-o",
+                                              "D:\\LZProjects\\prfrail\\tmp\\b4\\bin\\b4-e2e.exe",
+                                              "./tools/b4-e2e"
+                                          ],
+                            "cwd":  "D:\\LZProjects\\prfrail",
+                            "exitCode":  0,
+                            "stdoutPath":  "D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\build\\build-b4-e2e.stdout.txt",
+                            "stdoutSha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                            "stdoutBytes":  0,
+                            "stderrPath":  "D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\build\\build-b4-e2e.stderr.txt",
+                            "stderrSha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                            "stderrBytes":  0,
+                            "stdoutExcerpt":  "",
+                            "stderrExcerpt":  "",
+                            "startedAt":  "2026-11-09T00:00:18.133Z",
+                            "endedAt":  "2026-11-09T00:00:21.169Z"
+                        },
+                        {
+                            "label":  "cli-validate",
+                            "command":  "D:\\LZProjects\\prfrail\\tmp\\b4\\bin\\prfrail.exe",
+                            "arguments":  [
+                                              "validate",
+                                              "--chain",
+                                              "D:\\LZProjects\\prfrail\\tmp\\b4\\input\\b4-chain.json"
+                                          ],
+                            "cwd":  "D:\\LZProjects\\prfrail",
+                            "exitCode":  0,
+                            "stdoutPath":  "D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\cli\\cli-validate.stdout.txt",
+                            "stdoutSha256":  "ff3044f8ac344e76e0b794e192ac7a6ce49d152e030a4e71e3057bbc41d19acf",
+                            "stdoutBytes":  235,
+                            "stderrPath":  "D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\cli\\cli-validate.stderr.txt",
+                            "stderrSha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                            "stderrBytes":  0,
+                            "stdoutExcerpt":  "validate: ok\nconfig: D:\\LZProjects\\prfrail\\tmp\\b4\\input\\b4-chain.json\nchain: b4-at23 tasks=1 steps=1\nrunnableInCli: false\nwarning: local CLI runtime currently executes noop-only chains; use validate/config explain for executable steps\n",
+                            "stderrExcerpt":  "",
+                            "startedAt":  "2026-11-09T00:00:21.180Z",
+                            "endedAt":  "2026-11-09T00:00:23.224Z"
+                        },
+                        {
+                            "label":  "cli-preview",
+                            "command":  "D:\\LZProjects\\prfrail\\tmp\\b4\\bin\\prfrail.exe",
+                            "arguments":  [
+                                              "preview",
+                                              "--chain",
+                                              "D:\\LZProjects\\prfrail\\tmp\\b4\\input\\b4-chain.json"
+                                          ],
+                            "cwd":  "D:\\LZProjects\\prfrail",
+                            "exitCode":  0,
+                            "stdoutPath":  "D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\cli\\cli-preview.stdout.txt",
+                            "stdoutSha256":  "b8041a075535455fc3c73ffb8ec197a28871c052345044451c1dcbe63cc7413c",
+                            "stdoutBytes":  917,
+                            "stderrPath":  "D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\cli\\cli-preview.stderr.txt",
+                            "stderrSha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                            "stderrBytes":  0,
+                            "stdoutExcerpt":  "previewHash: sha256:005252eb67ae0f3d93b798da423b2d26b5ae5791fa041281241e73c0e12970e1\nconfig: D:\\LZProjects\\prfrail\\tmp\\b4\\input\\b4-chain.json\nmode: offline-read-only\noutcome: blocked\nrunnableInCli: false\nsteps: 1\ncallCounters: command=0 network=0 model=0 credential=0 versionProbe=0\nunknown: version-probe reason=preview does not run tool/version probes next=authorize validate/run for observed tool versions\nunknown: network-access reason=preview does not perform network checks next=authorize controlled preflight/network verification\nunknown: credential-input reason=preview does not collect secre",
+                            "stderrExcerpt":  "",
+                            "startedAt":  "2026-11-09T00:00:23.229Z",
+                            "endedAt":  "2026-11-09T00:00:24.249Z"
+                        },
+                        {
+                            "label":  "cli-validate-hook",
+                            "command":  "D:\\LZProjects\\prfrail\\tmp\\b4\\bin\\prfrail.exe",
+                            "arguments":  [
+                                              "validate",
+                                              "--chain",
+                                              "D:\\LZProjects\\prfrail\\tmp\\b4\\input\\b4-chain-hook.json"
+                                          ],
+                            "cwd":  "D:\\LZProjects\\prfrail",
+                            "exitCode":  0,
+                            "stdoutPath":  "D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\cli\\cli-validate-hook.stdout.txt",
+                            "stdoutSha256":  "64484b42fb09beea88283e2570e5e13d1e4ef7e5ae09ac242fdf66697c7b5e83",
+                            "stdoutBytes":  240,
+                            "stderrPath":  "D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\cli\\cli-validate-hook.stderr.txt",
+                            "stderrSha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                            "stderrBytes":  0,
+                            "stdoutExcerpt":  "validate: ok\nconfig: D:\\LZProjects\\prfrail\\tmp\\b4\\input\\b4-chain-hook.json\nchain: b4-at23 tasks=1 steps=2\nrunnableInCli: false\nwarning: local CLI runtime currently executes noop-only chains; use validate/config explain for executable steps\n",
+                            "stderrExcerpt":  "",
+                            "startedAt":  "2026-11-09T00:00:24.262Z",
+                            "endedAt":  "2026-11-09T00:00:25.281Z"
+                        },
+                        {
+                            "label":  "cli-preview-hook",
+                            "command":  "D:\\LZProjects\\prfrail\\tmp\\b4\\bin\\prfrail.exe",
+                            "arguments":  [
+                                              "preview",
+                                              "--chain",
+                                              "D:\\LZProjects\\prfrail\\tmp\\b4\\input\\b4-chain-hook.json"
+                                          ],
+                            "cwd":  "D:\\LZProjects\\prfrail",
+                            "exitCode":  0,
+                            "stdoutPath":  "D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\cli\\cli-preview-hook.stdout.txt",
+                            "stdoutSha256":  "9a8c5a7a0a3743546bf43686979fcec20bb09f7f32741104052b9aa064d7f8d5",
+                            "stdoutBytes":  922,
+                            "stderrPath":  "D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\cli\\cli-preview-hook.stderr.txt",
+                            "stderrSha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                            "stderrBytes":  0,
+                            "stdoutExcerpt":  "previewHash: sha256:5d0d7745461893e6a6e2bf03f1ebcaf4f127aef24f2156bcf78cafa794eccb9e\nconfig: D:\\LZProjects\\prfrail\\tmp\\b4\\input\\b4-chain-hook.json\nmode: offline-read-only\noutcome: blocked\nrunnableInCli: false\nsteps: 2\ncallCounters: command=0 network=0 model=0 credential=0 versionProbe=0\nunknown: version-probe reason=preview does not run tool/version probes next=authorize validate/run for observed tool versions\nunknown: network-access reason=preview does not perform network checks next=authorize controlled preflight/network verification\nunknown: credential-input reason=preview does not collect ",
+                            "stderrExcerpt":  "",
+                            "startedAt":  "2026-11-09T00:00:25.291Z",
+                            "endedAt":  "2026-11-09T00:00:26.315Z"
+                        },
+                        {
+                            "label":  "emit-inputs",
+                            "command":  "D:\\LZProjects\\prfrail\\tmp\\b4\\bin\\b4-e2e.exe",
+                            "arguments":  [
+                                              "-emit-record",
+                                              "-chain",
+                                              "D:\\LZProjects\\prfrail\\tmp\\b4\\input\\b4-chain.json",
+                                              "-workspace",
+                                              "D:\\LZProjects\\prfrail\\tmp\\b4\\input\\seed",
+                                              "-out",
+                                              "D:\\LZProjects\\prfrail\\tmp\\b4\\input\\b4-inputs.json"
+                                          ],
+                            "cwd":  "D:\\LZProjects\\prfrail",
+                            "exitCode":  0,
+                            "stdoutPath":  "D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\cli\\emit-inputs.stdout.txt",
+                            "stdoutSha256":  "051b6f67af0ab8afeb5162950183f92f3861bba2d76be51c492362a78e563153",
+                            "stdoutBytes":  201,
+                            "stderrPath":  "D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\cli\\emit-inputs.stderr.txt",
+                            "stderrSha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                            "stderrBytes":  0,
+                            "stdoutExcerpt":  "inputs: D:\\LZProjects\\prfrail\\tmp\\b4\\input\\b4-inputs.json\nrunId: run-b4\ntaskId: b4-task\nstepId: b4-code-step\nparentSnapshotHash: sha256:1fbe6bb28268c36250659573df59b691d1c85dde12018bc091ddc5c5dce408ed\n",
+                            "stderrExcerpt":  "",
+                            "startedAt":  "2026-11-09T00:00:26.329Z",
+                            "endedAt":  "2026-11-09T00:00:28.377Z"
+                        },
+                        {
+                            "label":  "f2-pos-run",
+                            "command":  "D:\\LZProjects\\prfrail\\tmp\\b4\\bin\\b4-e2e.exe",
+                            "arguments":  [
+                                              "-face",
+                                              "f2",
+                                              "-case",
+                                              "pos",
+                                              "-run-root",
+                                              "D:\\LZProjects\\prfrail\\tmp\\b4\\runs\\f2-pos",
+                                              "-inputs",
+                                              "D:\\LZProjects\\prfrail\\tmp\\b4\\input\\b4-inputs.json",
+                                              "-chain",
+                                              "D:\\LZProjects\\prfrail\\tmp\\b4\\input\\b4-chain.json",
+                                              "-stub",
+                                              "D:\\LZProjects\\prfrail\\tmp\\b4\\bin\\agent-stub.exe",
+                                              "-phase",
+                                              "run",
+                                              "-verdict",
+                                              "D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\f2-pos\\verdict-run.json"
+                                          ],
+                            "cwd":  "D:\\LZProjects\\prfrail",
+                            "exitCode":  0,
+                            "stdoutPath":  "D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\f2-pos\\f2-pos-run.stdout.txt",
+                            "stdoutSha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                            "stdoutBytes":  0,
+                            "stderrPath":  "D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\f2-pos\\f2-pos-run.stderr.txt",
+                            "stderrSha256":  "1626d0d53d2c86861b473e61c5a371be43442381793bb4dbade14549e8ed25bc",
+                            "stderrBytes":  107,
+                            "stdoutExcerpt":  "",
+                            "stderrExcerpt":  "verdict written: D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\f2-pos\\verdict-run.json (class=uncertain-or-paused)\n",
+                            "startedAt":  "2026-11-09T00:00:28.434Z",
+                            "endedAt":  "2026-11-09T00:00:34.456Z"
+                        },
+                        {
+                            "label":  "f2-neg-run",
+                            "command":  "D:\\LZProjects\\prfrail\\tmp\\b4\\bin\\b4-e2e.exe",
+                            "arguments":  [
+                                              "-face",
+                                              "f2",
+                                              "-case",
+                                              "neg",
+                                              "-run-root",
+                                              "D:\\LZProjects\\prfrail\\tmp\\b4\\runs\\f2-neg",
+                                              "-inputs",
+                                              "D:\\LZProjects\\prfrail\\tmp\\b4\\input\\b4-inputs.json",
+                                              "-chain",
+                                              "D:\\LZProjects\\prfrail\\tmp\\b4\\input\\b4-chain.json",
+                                              "-stub",
+                                              "D:\\LZProjects\\prfrail\\tmp\\b4\\bin\\agent-stub.exe",
+                                              "-phase",
+                                              "run",
+                                              "-verdict",
+                                              "D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\f2-neg\\verdict-run.json"
+                                          ],
+                            "cwd":  "D:\\LZProjects\\prfrail",
+                            "exitCode":  0,
+                            "stdoutPath":  "D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\f2-neg\\f2-neg-run.stdout.txt",
+                            "stdoutSha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                            "stdoutBytes":  0,
+                            "stderrPath":  "D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\f2-neg\\f2-neg-run.stderr.txt",
+                            "stderrSha256":  "63905a95fdf95022b4c50e8240b58605451b209562ad8022128cb46fdc62e5b7",
+                            "stderrBytes":  107,
+                            "stdoutExcerpt":  "",
+                            "stderrExcerpt":  "verdict written: D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\f2-neg\\verdict-run.json (class=uncertain-or-paused)\n",
+                            "startedAt":  "2026-11-09T00:00:34.714Z",
+                            "endedAt":  "2026-11-09T00:00:38.737Z"
+                        },
+                        {
+                            "label":  "f2-neg-r2-run",
+                            "command":  "D:\\LZProjects\\prfrail\\tmp\\b4\\bin\\b4-e2e.exe",
+                            "arguments":  [
+                                              "-face",
+                                              "f2",
+                                              "-case",
+                                              "neg",
+                                              "-run-root",
+                                              "D:\\LZProjects\\prfrail\\tmp\\b4\\runs\\f2-neg-r2",
+                                              "-inputs",
+                                              "D:\\LZProjects\\prfrail\\tmp\\b4\\input\\b4-inputs.json",
+                                              "-chain",
+                                              "D:\\LZProjects\\prfrail\\tmp\\b4\\input\\b4-chain.json",
+                                              "-stub",
+                                              "D:\\LZProjects\\prfrail\\tmp\\b4\\bin\\agent-stub.exe",
+                                              "-phase",
+                                              "run",
+                                              "-verdict",
+                                              "D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\f2-neg-r2\\verdict-run.json"
+                                          ],
+                            "cwd":  "D:\\LZProjects\\prfrail",
+                            "exitCode":  0,
+                            "stdoutPath":  "D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\f2-neg-r2\\f2-neg-r2-run.stdout.txt",
+                            "stdoutSha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                            "stdoutBytes":  0,
+                            "stderrPath":  "D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\f2-neg-r2\\f2-neg-r2-run.stderr.txt",
+                            "stderrSha256":  "c6e2f489b560d4ac0b8154b52e656cdc6540a3dcd9a6f0a80048457ae5b9f566",
+                            "stderrBytes":  110,
+                            "stdoutExcerpt":  "",
+                            "stderrExcerpt":  "verdict written: D:\\LZProjects\\prfrail\\tmp\\b4\\evidence\\f2-neg-r2\\verdict-run.json (class=uncertain-or-paused)\n",
+                            "startedAt":  "2026-11-09T00:00:38.774Z",
+                            "endedAt":  "2026-11-09T00:00:42.799Z"
+                        }
+                    ]
+}

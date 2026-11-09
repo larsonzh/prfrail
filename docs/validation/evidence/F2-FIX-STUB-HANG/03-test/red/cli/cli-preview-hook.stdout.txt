@@ -1,0 +1,12 @@
+previewHash: sha256:dacb89fe871112dd221710dd94497a06bae1187974f2a5cc5358c0a00e212017
+config: D:\LZProjects\prfrail\tmp\b4\input\b4-chain-hook.json
+mode: offline-read-only
+outcome: blocked
+runnableInCli: false
+steps: 2
+callCounters: command=0 network=0 model=0 credential=0 versionProbe=0
+unknown: version-probe reason=preview does not run tool/version probes next=authorize validate/run for observed tool versions
+unknown: network-access reason=preview does not perform network checks next=authorize controlled preflight/network verification
+unknown: credential-input reason=preview does not collect secret input next=use manual-handoff secret-direct input in authorized execution
+unknown: command-execution reason=preview never runs steps or hooks next=authorize runtime execution after reviewing blocking steps
+warning: preview is read-only; executable steps require separate authorization and runtime capability probes

@@ -1,0 +1,6 @@
+=== RUN   TestHangWritesEmptyChildPIDReport
+    main_test.go:417: the hang run must write the empty child pid report C:\Users\濡欏鍛淺AppData\Local\Temp\TestHangWritesEmptyChildPIDReport3125205711\001\stub-child.pid, but after 5.0060128s it still reads as GetFileAttributesEx C:\Users\濡欏鍛淺AppData\Local\Temp\TestHangWritesEmptyChildPIDReport3125205711\001\stub-child.pid: The system cannot find the file specified. (evidence dir C:\Users\濡欏鍛淺AppData\Local\Temp\TestHangWritesEmptyChildPIDReport3125205711\001): the hang branch wrote only stub.pid before sleeping
+--- FAIL: TestHangWritesEmptyChildPIDReport (10.85s)
+FAIL
+FAIL	github.com/larsonzh/prfrail/tools/agent-stub	11.921s
+FAIL

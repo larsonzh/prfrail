@@ -1,0 +1,26 @@
+BLIND（首轮，不附 ⑤⑥ 意见）四问逐项判定：
+
+1. F2 三腿 verdict 类/状态/observations 与 B4 基线逐字段一致：满足（含预期差异说明）。
+green pack f2-pos 与 B4 pack f2-pos 的 verdictClass/chainState/taskState/stepState 分别一致（uncertain-or-paused / PAUSED / FAILED / FAILED）。
+green f2-neg 与 baseline f2-neg 同值；green f2-neg-r2 与 baseline f2-neg-r2 同值。
+observations 的 stopOutcome 均为 unknown，三腿一致。
+预期差异已确认：green 的 f2-pos artifacts 新增 stub-child.pid，而 B4 f2-pos 该键缺失；此项属于修复目标产物，不计漂移。
+
+2. process-tree-taken-away 是否回到 true：满足。
+修复后为 true（green f2-pos verdict-run L136–139）。
+B4 基线也是 true（baseline f2-pos verdict-run L136–139）。
+红基线为 false（red f2-pos verdict-run L136–139），与历史漂移记录一致（l3-baseline-compare.txt）。
+
+3. failedChecks 是否空集：满足。
+修复后空集（green pack L358）。B4 基线同为空集（baseline pack L1418）。
+修复前红证据非空且仅 f2-pos/process-tree-taken-away（red pack L357–358）。
+
+4. six-facts-distinct 等其它断言是否受影响：未受影响（满足）。
+f1-control 对照腿仍为 six-facts-distinct 全绿（f1-pos verdict-run L153–162）。
+f1-control 顶层 failedChecks 为空（f1-control pack L662）。
+
+BLIND: 四问均成立（Q1 仅存在「f2-pos artifacts 新增 stub-child.pid」这一修复预期差异） → 前提①：满足（唯一判定）
+
+备注：
+本判定仅针对「F2 修复后 AT-23 前提①」，未重判 R-08.5/豁免议题，符合 AT-23 §10 的边界。
+A6 契约依据与本次修复语义一致（无子进程写 0 字节空报告）：CONTRACTS A6 L256；代码落点与回归测试分别在 main.go L112 与 main_test.go L375。

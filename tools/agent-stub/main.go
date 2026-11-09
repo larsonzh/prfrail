@@ -112,6 +112,10 @@ func (run options) execute() int {
 	case "hang":
 		// No artifacts beyond its own pid: the run is stopped from the outside.
 		run.writeOwnPID()
+		// A hang never spawns a child, so the empty report is the positive fact
+		// the constant-write contract requires: consumers can tell "no child"
+		// apart from "report never written" (the latter must stay fail-closed).
+		run.writeEmptyChildPIDReport()
 		time.Sleep(time.Hour)
 		return 0
 	case "run", "spawn", "spawn-exit", "spawn-wait", "no-usage", "ask", "mutate-workspace", "torn-events":

@@ -1,0 +1,208 @@
+{
+  "face": "f1",
+  "case": "neg2",
+  "phase": "run",
+  "runId": "run-b4",
+  "requestId": "request-run-b4",
+  "runRoot": "D:\\LZProjects\\prfrail\\tmp\\b4\\runs\\f1-neg2-r2",
+  "workspace": "D:\\LZProjects\\prfrail\\tmp\\b4\\runs\\f1-neg2-r2\\workspace",
+  "startedAt": "2026-11-09T00:38:14.766Z",
+  "endedAt": "2026-11-09T00:38:16.977Z",
+  "verdictClass": "uncertain-or-paused",
+  "chainState": "PAUSED",
+  "taskState": "b4-task\u00001=REPAIR_PENDING",
+  "stepState": "b4-task\u0000b4-code-step\u00001=PASSED",
+  "eventLogHash": "sha256:06bed33a25680454fcfb5c403d0a6cf4bf0e6ab34f2b94f32d36b47961eb2c92",
+  "eventSequence": 12,
+  "load": {
+    "args": [
+      "-mode",
+      "run",
+      "-sleep",
+      "2s"
+    ],
+    "timeout": "30s",
+    "grace": "2s"
+  },
+  "mapping": {
+    "status": "completed",
+    "treeStatus": "stopped",
+    "logsComplete": true,
+    "usageComplete": true,
+    "eventsComplete": true,
+    "manifestsComplete": true,
+    "factCount": 6,
+    "errorEvidenceCount": 0,
+    "elapsedMs": 2011
+  },
+  "legs": [
+    {
+      "leg": "dispatch",
+      "status": "ran: process spawned through the production launcher and step parked in TERMINAL_PENDING"
+    },
+    {
+      "leg": "dispatch-\u003ewait-\u003ecollect-\u003emap",
+      "status": "ran: completed"
+    },
+    {
+      "leg": "terminal-publication (production AgentRunnerTerminalPublisher)",
+      "status": "failed closed",
+      "error": "AgentRunner request conflict: terminal publication requires a persisted request record for requestId request-run-b4",
+      "alternativeEvidence": "the durable terminal chain is built through the public record constructors and adapters.ToChainAgentRunnerTerminal instead; the chain-side routing below is unmodified production code"
+    },
+    {
+      "leg": "cost settlement (production tickets.CostLedger.Settle)",
+      "status": "booked"
+    },
+    {
+      "leg": "terminal routing (chain.SubmitAgentRunnerTerminal)",
+      "status": "routed as completed"
+    },
+    {
+      "leg": "postflight/acceptance/review/promotion",
+      "status": "returned chain paused",
+      "error": "chain paused"
+    }
+  ],
+  "journal": [
+    {
+      "leg": "baseline",
+      "at": "2026-11-09T00:38:14.788Z",
+      "outcome": "captured",
+      "detail": {
+        "entries": "1",
+        "hash": "sha256:1fbe6bb28268c36250659573df59b691d1c85dde12018bc091ddc5c5dce408ed"
+      }
+    },
+    {
+      "leg": "dispatch",
+      "at": "2026-11-09T00:38:14.788Z",
+      "outcome": "production-path-refused-by-platform",
+      "detail": {
+        "error": "AgentRunner replay store publication durability unproven: request publication"
+      }
+    },
+    {
+      "leg": "dispatch",
+      "at": "2026-11-09T00:38:14.788Z",
+      "outcome": "fallback-spawned-through-production-launcher",
+      "detail": {
+        "launchId": "launch-request-run-b4",
+        "processId": "{\"pid\":48616,\"startToken\":\"01dd6fe29b3be27e\"}"
+      }
+    },
+    {
+      "leg": "dispatch",
+      "at": "2026-11-09T00:38:14.788Z",
+      "outcome": "parked",
+      "detail": {
+        "requestId": "request-run-b4"
+      }
+    },
+    {
+      "leg": "terminal-routing",
+      "at": "2026-11-09T00:38:14.788Z",
+      "outcome": "completed",
+      "detail": {
+        "chain": "RUNNING",
+        "step": "PASSED",
+        "task": "STEPS_RUNNING"
+      }
+    },
+    {
+      "leg": "injection",
+      "at": "2026-11-09T00:38:14.788Z",
+      "outcome": "unaccounted-workspace-write",
+      "detail": {
+        "contentHash": "sha256:1345e1cb0e0e7d980f1bd51fa5a1e8501757857a7ac695fa55a6adb10346a045",
+        "path": "agent-stub-mutation.txt"
+      }
+    },
+    {
+      "leg": "postflight",
+      "at": "2026-11-09T00:38:14.788Z",
+      "outcome": "failed",
+      "detail": {
+        "detail": "agent-stub-mutation.txt",
+        "domain": "proofrail:b4-postflight-manifest-mismatch:1\n"
+      }
+    },
+    {
+      "leg": "downstream",
+      "at": "2026-11-09T00:38:14.788Z",
+      "outcome": "returned",
+      "error": "chain paused"
+    }
+  ],
+  "checks": [
+    {
+      "id": "six-facts-distinct",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "frozen facts present: true"
+    },
+    {
+      "id": "six-facts-distinct",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "distinct fact digests: 6"
+    },
+    {
+      "id": "frozen-diff-excludes-injection",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "frozen diff added=[] removed=[] changed=[]"
+    },
+    {
+      "id": "postflight-rejected-unaccounted-write",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "task state after the unaccounted write: b4-task\u00001=REPAIR_PENDING"
+    },
+    {
+      "id": "never-passed",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "task reached PASSED: false"
+    },
+    {
+      "id": "task-final-transition-is-postflight-rejection",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "sequence=11 toState=REPAIR_PENDING reason=postflight-rejected"
+    },
+    {
+      "id": "verdict-class-recorded",
+      "kind": "assertion",
+      "pass": true,
+      "detail": "verdict class uncertain-or-paused"
+    }
+  ],
+  "diff": {
+    "added": [],
+    "removed": [],
+    "changed": []
+  },
+  "artifacts": {
+    "diff.json": "sha256:f8700730d4d8f747ac5ce273bcc6d6ca0dabf339d43ef439e97a75e370f72f35",
+    "events.jsonl": "sha256:4fafb99cd4a2b5d910b7998711ef3f1faa7357d4a5944fe288083f0a9dd5dec1",
+    "logs/stderr.log": "sha256:4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2",
+    "logs/stdout.log": "sha256:4fb6d740cb144aa9a1263080025622fc1a4ad50edaaba6c2ec74f73846e417b2",
+    "manifest.post.json": "sha256:6b0fe138d2bfa2d4a13e77ac37faf7c1c9a910c4fd118521adc895328c9bf7f4",
+    "manifest.pre.json": "sha256:39dd6c852b9d472b4bf58d1d56eae850c03919d859d1696c12124519a032f952",
+    "stub-child.pid": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stub.pid": "sha256:0a2e53d4507cd0a73ff5f66aba37489d4fa2feacaae53c65aa61106d6431be5a",
+    "usage.json": "sha256:4d51d872aaf586199a7d77dc5b623d83c2c58d36e94d62a2872984d1bf9af953"
+  },
+  "observations": {
+    "stopError": "",
+    "stopOutcome": "stopped",
+    "taskFinalTransition": "sequence=11 toState=REPAIR_PENDING reason=postflight-rejected"
+  },
+  "errors": [],
+  "notes": [
+    "clean run plus an unaccounted workspace write injected after the terminal was published; the postflight rescan must reject it",
+    "requestRecordHash=sha256:75ff291bed5a8b342b117b44a418c44ba99d09066b905ab7f795f33359bb081e",
+    "declared-inputs: capability disposition=compatible (declared, not probed); enforcement record declared but not consulted on that path; adapterId=b4-pinned-cli-declared"
+  ]
+}

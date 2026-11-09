@@ -1,0 +1,40 @@
+PREREVIEW: PASS WITH FIXES（无阻断项；3 项建议 + 4 项记录，供 ⑥/⑦/⑧/⑨ 采纳）
+
+### 1. 修复正确性 —— 通过
+
+- [通过] 落点正确：tools/agent-stub/main.go L112–120 case "hang"，在 run.writeOwnPID()（L114）之后、time.Sleep(time.Hour)（L119）之前插入 run.writeEmptyChildPIDReport()（L118），与 02-impl/impl-r1.md 及 01-arch/design-r1.md §B diff 逐字一致。
+- [通过] 符合 CONTRACTS A6 恒定写口径：docs/CONTRACTS.md L256 原文「无子进程写空文件（0 字节）」；writeEmptyChildPIDReport()（L264–268，os.WriteFile(..., nil, 0o600)）即 0 字节文件，写失败 os.Exit(11) 与 run 模式同构，fail-closed 语义保留。
+- [通过] 不落到公共路径：case "hang" L120 return 0 早退；L121 起 case "run", … 与 L139–146 公共写路径逐字节未动（run.writeOwnPID() + if !run.spawnsChild() 门控）。hang 是「无子进程」运行，空报告是事实而非伪造。
+- [通过] 无其它 mode 副作用：child/fail-fast/crash 在 hang 之前早退；spawn 族经 spawnChild() 写真实子 pid，与 hang 分支无交集；hang 依旧不写 usage/events/marker，f2-pos 期望（uncertain、factCount=0）不变。
+- [通过] 是根修复而非绕过断言：tools/b4-e2e/postflight.go L222–259 alivePIDs 双报告 present 检查 + L128–148 Leg 7 重读重算对账均按契约执行；修复后绿跑 process-tree-taken-away 的 detail=reported pids gone: true (<nil>) 是契约成立后的真实测量。
+
+### 2. 回归测试充分性 —— 通过（含 1 项建议）
+
+- [通过] 真正固定缺陷：tools/agent-stub/main_test.go L375–464。红证据 03-test/red-regression.txt：缺修复时 5s deadline 触发 t.Fatalf("…wrote only stub.pid before sleeping")，exit=1 —— 可证伪成立；修复后同测试 PASS。
+- [通过] 断言充分：0 字节 + 常规文件（Mode().IsRegular()）+ stub.pid 十进制且 == cmd.Process.Pid（防陈旧/截断产物冒充）；与 A6 三态（缺失=缺口/空=无子/非空=解析）对应。
+- [通过] 无进程/句柄泄漏：stop 闭包幂等（stopped 标志），Kill()+Wait() 兜底 defer + 正常路径各一次，Wait 不会被调两次；所有 t.Fatalf 路径均在 defer 保护内。
+- [通过] 与既有 4 测试无冲突：各自 t.TempDir()；buildStub 经 sync.Once 共享二进制；5 个 func Test + TestMain，go test ./tools/agent-stub 5/5 与 test-r1 一致。
+- [建议-1] main.go L113 原注释 // No artifacts beyond its own pid… 与修复后行为字面冲突（现已写两份报告），建议下轮顺手改为「写 pid 报告后停止」类措辞；不影响功能，⑥⑦ 不必为此回退。
+
+### 3. 测试证据链 —— 自洽（1 项建议 + 3 项记录）
+
+- [通过] 红基线：03-test/red/pack-verdict.json failedChecks=["f2-pos/process-tree-taken-away"]；red/f2-pos/verdict-run.json pass=false、detail 与 P61 逐字一致（missing required pid report(s) stub-child.pid…）；error evidence digests: 6 = P61 口径。
+- [通过] 绿重跑：03-test/green/pack-verdict.json failedChecks=[]；green/f2-pos/verdict-run.json pass=true、detail=reported pids gone: true (<nil>)、error evidence digests: 5 = B4 归档基线——「恢复为 5」成立（P61=6 为缺口期，非基线）。run-faces.ps1 L416–429：failedChecks 非空 ⇒ exit 1、为空 ⇒ exit 0，与红 exit=1 / 绿 exit=0 读数一致。
+- [通过] GLM-1 漂移：pass 漂移 0（三腿红绿 pass 态逐项一致）；字段漂移 1 仅 f2-pos artifacts["stub-child.pid"]（绿新增，sha256:e3b0c442… = 空文件哈希）。独立核对：B4 归档 f2-neg/f2-neg-r2 已有该键，f2-neg/f2-neg-r2 红绿哈希相同 ⇒ 漂移确实只发生在 f2-pos，计数 1 准确。
+- [建议-2] 红/绿 f2-pos 的 artifacts["stub.pid"] 哈希互异属正常（pid 每跑不同），请 ⑦ 在逐字段对照时明确按「预期差异白名单」处理，避免误报漂移。
+- [记录-1] 03-test/red-regression.txt 中临时目录路径含乱码（控制台 GBK/UTF-8 混合渲染，用户名为中文所致），属证据原样归档，不影响证明力；无需重跑。
+- [记录-2] red-regression.txt 引用的 main_test.go:417 是 ③ 写入时点行号；② 落地后 deadline t.Fatalf 现位于 L419–420（插入了 stop 闭包与 IsRegular() 断言），行号错位是测试演进所致，非内容漂移。
+- [记录-3] design-r1.md §A 对 writeOwnPID/writeEmptyChildPIDReport 的行号标注（L254–258/L260–267）与磁盘实况（L256–259/L264–268）有 ±2 行偏差；impl-r1.md 的 L112–120 与磁盘一致。仅影响追溯精度，不影响结论。
+
+### 4. 流程合规 —— 通过（1 项建议 + 1 项记录）
+
+- [通过] 门禁读数：SELFTEST 722/722、INDEX/TREE/CI 三作用域 TOTAL_FAIL=0、go test ok=15 FAIL=0（终端实况 exit=0，与 15 包 + tools/agent-stub 计数吻合）；harness tools/b4-e2e 零改动（P63 已证 F2 检查表达式 e8cbff6≡HEAD，本片未动）。
+- [通过] ②/③ 纪律声明：02-impl/impl-r1.md（仅触碰 main.go、未 commit/push、精确暂存）与 03-test/test-r1.md（未改 harness/生产脚本、tmp/b4 落临时件、证据无密钥）齐备且相互一致。步骤 0 登记齐备：ADR-039、REMAINING_SLICES.md 台账登记均已落盘。
+- [建议-3] ④ 门禁原始输出未归档进证据包。请 ⑧/⑨ 在结项时把 ④ 与 ⑨ 的门禁原始行同轮归档，避免 G5(d)「已声明未归档」类坑。
+- [记录-4] 起跑消息【二】要求 GLM 实派 ≥2 次，目前仅 GLM-1（三腿对照）可见；GLM-2（双语镜像检查）按流水线应随 ⑧ 文档装配执行。请 ⑧ 在 ⑩ 回执中同时登记 GLM-2 的实得字符数与结论，否则构成批量辅助未满额缺口。
+
+### 给 ⑦ 的重点提示
+
+① ⑦ 的判定对象是「F2 修复后 AT-23 前提①是否满足」，建议逐字段对照以 green/pack-verdict.json cases 为对象、B4 归档 pack-verdict.json 为基线（f2-neg/f2-neg-r2 单腿 verdict 属剪裁中间转储，不可作基线）；② 对照时注意 stub.pid 哈希、时间戳、requestId 等运行态字段天然不同，与 stub-child.pid 键新增（f2-pos 专属）区分开；③ 本片不重判 R-08.5 五要素（起跑消息 3.3），⑦ 不得越界重开豁免议题。
+
+结论：修复最小且正确、测试可证伪、证据链自洽、流程未见违规。无阻断项；上述 3 项建议与 4 项记录建议在 ⑥/⑦ 环节原位消化，不要求 ②③ 返工。

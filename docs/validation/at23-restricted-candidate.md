@@ -12,6 +12,7 @@
 ## 1. 执行摘要
 
 > **P63 时点注记（2026-11-09）**：P63 `AT23-RECHECK` 已按 P62 修订后的 R-08.5 五要素完成复核判定，**F2 继承漂移豁免不成立**（要素②按字面不成立）⇒ AT-23 保持 PARTIAL；本节以下结论原文不变，详见 §10。
+> **F2 修复片时点注记（2026-11-09）**：F2-FIX-STUB-HANG 修复完成、⑦ 判定前提①满足、AT-23 阶段 1 条件闭合达成（阶段 2 不适用，用户 2026-11-09 裁定 A1），详见 §11。
 
 **AT-23 条件闭合未达成**：前提①因 F2 `process-tree-taken-away` 继承漂移不满足（成因 `02d5797`，非 P61 引入，B4 基线今日重跑同样会红）；前提②满足（run-1 启动 + run-2 执行阻塞 + run-3 停机 + run-5 unsupported 与 B1 #8 同形态）；本片以 PARTIAL 收口（用户裁定 (E)，ADR-036）。
 
@@ -412,4 +413,200 @@ docs/validation/evidence/P63-AT23-RECHECK/freedom-list.md	repo
 docs/validation/evidence/P63-AT23-RECHECK/input-list.md	repo
 docs/validation/s1-exit.md	repo
 docs/validation/s1-exit_EN.md	repo
+```
+
+## 11. F2 修复片复核结论（F2-FIX-STUB-HANG，2026-11-09）
+
+- 切片：`F2-FIX-STUB-HANG`（修复类 `[SLICE]`，v52 §四 层 1 第 10 项「F2 修复片」）；起跑 2026-11-09；主控 `DeepSeek V4 Pro`（ADR-039）；本片修复 + 验证 + ⑦ 判定，不重判 R-08.5 五要素。
+- 修复内容：`tools/agent-stub` 的 `hang` 分支补写 0 字节空 `stub-child.pid`（CONTRACTS §7 恒定写语义；无子进程写 0 字节空报告，符合契约而非绕过断言）。
+- 验证：回归测试 `TestHangWritesEmptyChildPIDReport`（修复前红：exit=1，唯一红点 = deadline `t.Fatalf`；修复后绿：PASS，`go test ./tools/agent-stub -v` 5/5 全 PASS）；layer3 F2 红/绿重跑（`tools/b4-e2e/run-faces.ps1 -OnlyFace f2`：红 exit=1 `FAILED CHECKS: f2-pos/process-tree-taken-away`、绿 exit=0 `all recorded checks passed`）；f1-control 对照腿全绿。
+- ⑦ 判定：盲审四问均成立 → 终审 `FINAL: PASS WITH FIXES`（唯一 Low = hang 分支首行注释措辞，不改变判定）→ **前提①「机制腿全绿」满足**。
+
+### 11.1 ⑦ 判定原文（逐字转录）
+
+**盲审（`04-reviews/07-blind-r1.txt`）**：
+
+```text
+BLIND（首轮，不附 ⑤⑥ 意见）四问逐项判定：
+
+1. F2 三腿 verdict 类/状态/observations 与 B4 基线逐字段一致：满足（含预期差异说明）。
+green pack f2-pos 与 B4 pack f2-pos 的 verdictClass/chainState/taskState/stepState 分别一致（uncertain-or-paused / PAUSED / FAILED / FAILED）。
+green f2-neg 与 baseline f2-neg 同值；green f2-neg-r2 与 baseline f2-neg-r2 同值。
+observations 的 stopOutcome 均为 unknown，三腿一致。
+预期差异已确认：green 的 f2-pos artifacts 新增 stub-child.pid，而 B4 f2-pos 该键缺失；此项属于修复目标产物，不计漂移。
+
+2. process-tree-taken-away 是否回到 true：满足。
+修复后为 true（green f2-pos verdict-run L136–139）。
+B4 基线也是 true（baseline f2-pos verdict-run L136–139）。
+红基线为 false（red f2-pos verdict-run L136–139），与历史漂移记录一致（l3-baseline-compare.txt）。
+
+3. failedChecks 是否空集：满足。
+修复后空集（green pack L358）。B4 基线同为空集（baseline pack L1418）。
+修复前红证据非空且仅 f2-pos/process-tree-taken-away（red pack L357–358）。
+
+4. six-facts-distinct 等其它断言是否受影响：未受影响（满足）。
+f1-control 对照腿仍为 six-facts-distinct 全绿（f1-pos verdict-run L153–162）。
+f1-control 顶层 failedChecks 为空（f1-control pack L662）。
+
+BLIND: 四问均成立（Q1 仅存在「f2-pos artifacts 新增 stub-child.pid」这一修复预期差异） → 前提①：满足（唯一判定）
+
+备注：
+本判定仅针对「F2 修复后 AT-23 前提①」，未重判 R-08.5/豁免议题，符合 AT-23 §10 的边界。
+A6 契约依据与本次修复语义一致（无子进程写 0 字节空报告）：CONTRACTS A6 L256；代码落点与回归测试分别在 main.go L112 与 main_test.go L375。
+```
+
+**终审（`04-reviews/07-final-r1.txt`）**：
+
+```text
+FINAL（第二读，附 ⑤⑥ 与盲审结论交叉核对）：
+
+审查发现（按严重度）
+1. Low：hang 分支首行注释与当前实现行为存在措辞不一致，建议在后续文档化回写中修正（main.go L113 注释仍写「No artifacts beyond its own pid」，而同分支已调用空子 pid 报告写入 L118）。
+2. Medium+：未发现。
+
+四问独立复核（仅判「前提①」，不重判 R-08.5）：
+1. 三腿 verdict 四态与 B4 基线一致：是。修复后三腿 green 包均为 uncertain-or-paused / PAUSED / FAILED / FAILED；B4 对应三腿同态。
+2. process-tree-taken-away 恢复为 true：是。修复前 red 的 f2-pos 为 false 且明确缺失 stub-child.pid；修复后 green 三腿均为 true，且与 B4 一致。
+3. failedChecks 清空：是。red 聚合仍有 f2-pos/process-tree 失败；green failedChecks 为空；B4 基线 failedChecks 也为空。
+4. 未引入其他断言副作用：未见。f1-control 仍保持 six-facts-distinct 且 failedChecks 为空；字段漂移仅记录到 f2-pos 的 stub-child.pid 这一处预期差异。
+
+⑤ 建议/记录对「前提①」减分核对（逐条）：
+1. hang 注释措辞：需修复。对前提①：不减分（非机制断言项，属文案一致性）。
+2. 预期差异白名单：接受。对前提①：不减分（已被 test-r1 与 green 产物明确收口）。
+3. 门禁原始行归档：不影响。对前提①：不减分（属于审计可追溯增强）。
+4. red-regression 路径乱码原样留痕：不影响。对前提①：不减分（属原样归档；日志与清单一致）。
+5. 行号偏移/设计文档 ±2 记录：不影响。对前提①：不减分（文档对齐项）。
+6. GLM-2 待 ⑧ 执行：不影响。对前提①：不减分（属后续装配/流程闭环项）。
+
+与盲审一致/分歧：
+1. 一致：前提①满足；核心依据均落在「process-tree 恢复 true + failedChecks 清空 + 三腿四态对齐基线」。
+2. 一致：不重判 R-08.5 五要素，只就 F2 修复后的前提①给结论。
+3. 轻微差异：额外保留 1 条 Low 文案修复建议（hang 注释措辞），但不改变前提①判定。
+
+FINAL: PASS WITH FIXES → 前提①：满足
+```
+
+### 11.2 F2 三腿与 B4 基线逐字段对照摘要（数据来源：`docs/validation/evidence/F2-FIX-STUB-HANG/03-test/test-r1.md` §4）
+
+- verdict 四态一致：green 三腿（f2-pos / f2-neg / f2-neg-r2）的 verdictClass / chainState / taskState / stepState 与 B4 基线对应三腿逐字段一致（f2-pos 为 uncertain-or-paused / PAUSED / FAILED / FAILED；f2-neg / f2-neg-r2 与 baseline 同值）。
+- `process-tree-taken-away`：修复后 **true**（green f2-pos verdict-run L136–139）；B4 基线 **true**；修复前红证据 **false**（red f2-pos verdict-run L136–139，detail 明确缺失 `stub-child.pid`）。
+- `failedChecks`：修复后 **空集**（green pack L358）；B4 基线同为空集（baseline pack L1418）；修复前红证据非空且仅 `f2-pos/process-tree-taken-away`（red pack L357–358）。
+- 字段漂移仅 1 处：`f2-pos artifacts["stub-child.pid"]` 由基线「键不存在」变为「存在（`sha256:e3b0c442…b855` = 空文件哈希）」——即本片修复的预期产物，非异常漂移（test-r1 §4：pass 漂移 0 处、字段漂移 1 处）。
+- 其它断言：`six-facts-distinct` 未受影响（f1-control 对照腿全绿；f1-control 顶层 failedChecks 为空）。
+
+### 11.3 AT-23 状态变化
+
+- **AT-23：PARTIAL → 阶段 1 条件闭合达成；阶段 2 不适用（用户 2026-11-09 裁定 A1）**（前提① = 机制腿全绿，本片满足；前提② = P61 已满足）。§1/§4/§10 的 P61/P63 时点原文一律不改，本 §11 为时点性结论追加。
+- 层 1 第 10 项（F2 修复片）✅ 出队；层 1 第 8 项（AT-23）从 🔄 转 ✅ 出队。
+- S1 Exit：AT-23 阶段 1 条件闭合（阶段 2 不适用，用户 2026-11-09 裁定 A1；依据本片 ⑦ 判定）、S-G7 依赖链更新；**不声称 S1 Exit 整体通过**（其余门 S-G2~S-G6、S-G8 仍待）。
+
+### 11.4 v53 观察项候选（用户 2026-11-09 裁定登记，v53 生成时承载）
+
+- **G5(d) 新增证据包围栏声明坑（第 26 条门禁坑候选）**：连续三片（P62 `d0971e5` / P63 `de37c58` / F2-FIX 本片）首跑 index 都报 `G5(d) staged is a subset of declared`，根因 = 步骤 0 建新证据包时未同轮补 `artifacts` 围栏行。候选：① 起跑消息步骤 0 强制「新增证据包 → 报告围栏同轮补行」；② 或作为门禁坑第 26 条。累计 3 次，须 v53 生成时评估落点（起跑消息纪律 or 门禁坑）。
+- **R-08.5 文件级 vs 语义级判据问题（长期观察项保留）**：F2 修复后不再有继承漂移，语义级问题暂不触发；作为长期观察项保留（内容 = P63 回执已有，不重写）。
+
+```artifacts
+docs/validation/evidence/F2-FIX-STUB-HANG/00-briefing.md	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/01-arch/design-r1.md	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/02-impl/impl-r1.md	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/b4-inputs.json	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/cli/cli-preview-hook.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/cli/cli-preview-hook.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/cli/cli-preview.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/cli/cli-preview.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/cli/cli-validate-hook.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/cli/cli-validate-hook.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/cli/cli-validate.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/cli/cli-validate.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/cli/emit-inputs.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/cli/emit-inputs.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/driver.log	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/f1-neg-r2/f1-neg-r2-run.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/f1-neg-r2/f1-neg-r2-run.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/f1-neg-r2/verdict-run.json	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/f1-neg/f1-neg-run.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/f1-neg/f1-neg-run.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/f1-neg/verdict-run.json	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/f1-neg2-r2/f1-neg2-r2-run.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/f1-neg2-r2/f1-neg2-r2-run.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/f1-neg2-r2/verdict-run.json	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/f1-neg2/f1-neg2-run.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/f1-neg2/f1-neg2-run.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/f1-neg2/verdict-run.json	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/f1-neg3/f1-neg3-run.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/f1-neg3/f1-neg3-run.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/f1-neg3/verdict-run.json	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/f1-pos/f1-pos-run.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/f1-pos/f1-pos-run.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/f1-pos/verdict-run.json	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/pack-verdict.json	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/b4-inputs.json	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/cli/cli-preview-hook.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/cli/cli-preview-hook.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/cli/cli-preview.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/cli/cli-preview.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/cli/cli-validate-hook.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/cli/cli-validate-hook.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/cli/cli-validate.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/cli/cli-validate.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/cli/emit-inputs.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/cli/emit-inputs.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/driver.log	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/f2-neg-r2/f2-neg-r2-run.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/f2-neg-r2/f2-neg-r2-run.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/f2-neg-r2/verdict-run.json	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/f2-neg/f2-neg-run.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/f2-neg/f2-neg-run.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/f2-neg/verdict-run.json	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/f2-pos/f2-pos-run.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/f2-pos/f2-pos-run.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/f2-pos/verdict-run.json	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/pack-verdict.json	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red-regression.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/b4-inputs.json	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/cli/cli-preview-hook.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/cli/cli-preview-hook.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/cli/cli-preview.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/cli/cli-preview.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/cli/cli-validate-hook.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/cli/cli-validate-hook.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/cli/cli-validate.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/cli/cli-validate.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/cli/emit-inputs.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/cli/emit-inputs.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/driver.log	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/f2-neg-r2/f2-neg-r2-run.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/f2-neg-r2/f2-neg-r2-run.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/f2-neg-r2/verdict-run.json	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/f2-neg/f2-neg-run.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/f2-neg/f2-neg-run.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/f2-neg/verdict-run.json	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/f2-pos/f2-pos-run.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/f2-pos/f2-pos-run.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/f2-pos/verdict-run.json	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/pack-verdict.json	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/test-r1.md	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/04-reviews/05-prereview-r1.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/04-reviews/06-scan-r1.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/04-reviews/07-blind-r1.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/04-reviews/07-final-r1.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/04-reviews/09-gates-r1.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/freedom-list.md	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/input-list.md	repo
+tools/agent-stub/main.go	repo
+tools/agent-stub/main_test.go	repo
+docs/ADR_REGISTER.md	repo
+docs/ADR_REGISTER_EN.md	repo
+docs/t027/REMAINING_SLICES.md	repo
+docs/t027/REMAINING_SLICES_EN.md	repo
+docs/validation/at23-restricted-candidate.md	repo
+docs/validation/at23-restricted-candidate_EN.md	repo
+docs/DEV_PLAN.md	repo
+docs/DEV_PLAN_EN.md	repo
+docs/TEST_STRATEGY.md	repo
+docs/TEST_STRATEGY_EN.md	repo
+docs/validation/s1-exit.md	repo
+docs/validation/s1-exit_EN.md	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/MANIFEST.md	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/SHA256SUMS.txt	repo
 ```

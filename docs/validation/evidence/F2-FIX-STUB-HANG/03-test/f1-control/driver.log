@@ -1,0 +1,16 @@
+2026-11-09T00:37:49.338Z built D:\LZProjects\prfrail\tmp\b4\bin\prfrail.exe
+2026-11-09T00:37:51.406Z built D:\LZProjects\prfrail\tmp\b4\bin\agent-stub.exe
+2026-11-09T00:37:54.454Z built D:\LZProjects\prfrail\tmp\b4\bin\b4-e2e.exe
+2026-11-09T00:38:04.912Z b4 driver: ran f1-pos-run exit=0
+2026-11-09T00:38:05.554Z b4 driver: recorded f1-pos -> completed
+2026-11-09T00:38:08.624Z b4 driver: ran f1-neg-run exit=0
+2026-11-09T00:38:08.632Z b4 driver: recorded f1-neg -> completed
+2026-11-09T00:38:11.679Z b4 driver: ran f1-neg-r2-run exit=0
+2026-11-09T00:38:11.685Z b4 driver: recorded f1-neg-r2 -> completed
+2026-11-09T00:38:14.721Z b4 driver: ran f1-neg2-run exit=0
+2026-11-09T00:38:14.726Z b4 driver: recorded f1-neg2 -> uncertain-or-paused
+2026-11-09T00:38:17.773Z b4 driver: ran f1-neg2-r2-run exit=0
+2026-11-09T00:38:17.778Z b4 driver: recorded f1-neg2-r2 -> uncertain-or-paused
+2026-11-09T00:38:20.828Z b4 driver: ran f1-neg3-run exit=0
+2026-11-09T00:38:20.835Z b4 driver: recorded f1-neg3 -> completed
+2026-11-09T00:38:20.836Z b4 driver: aggregating pack verdict

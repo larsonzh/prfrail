@@ -62,6 +62,8 @@ AT-23 前置强检项（P38/P39 新增）：
 
 AT-23 验收结论（P61 新增）：P61 **PARTIAL 收口**——机制腿仅除 F2 一处继承漂移（前提①不满足）、真实候选腿实际跑过启动 / 执行 / 停机且含 unsupported（前提②满足）；AT-23 整体**仍未通过**，待 R-08.5 修订片裁定豁免。报告：[中文](validation/at23-restricted-candidate.md) / [English](validation/at23-restricted-candidate_EN.md)。
 
+AT-23 验收结论（F2 修复片更新，2026-11-09）：F2 修复片收口——hang 分支补写 0 字节空 `stub-child.pid`、回归测试 `TestHangWritesEmptyChildPIDReport`、layer3 F2 红/绿重跑与 f1-control 对照全绿；⑦ 终审 `FINAL: PASS WITH FIXES` ⇒ 前提①满足（F2 三腿 verdict 四态与 B4 基线一致、`process-tree-taken-away` 回 `true`、`failedChecks` 空集、字段漂移仅 1 处 = f2-pos artifacts 新增 stub-child.pid 键（修复预期产物））⇒ **AT-23 阶段 1 条件闭合达成**（前提② P61 已满足；阶段 2 不适用，用户 2026-11-09 裁定 A1）；S1 Exit 整体仍未通过。报告：[中文](validation/at23-restricted-candidate.md) §11 / [English](validation/at23-restricted-candidate_EN.md)。
+
 AT-02 强制反例（P53 新增，GAP-77 中间符号链接逃逸）：常驻回归 `TestBoundDirMiddleSymlinkEscapesBound`、`TestBoundDirMiddleSymlinkRefusedWithClosedErrno`、`TestBoundDirRenameStormNeverYieldsOutsideBytes`、`TestBoundDirBindMountImportRefused`、`TestBoundDirFailClosedWithoutOpenat2`、`TestBoundDirConcurrentCloseAndRead`；红基线历史为 P52 击穿（界外内容可读）转 P53 红转绿；变异检验 `PRFRAIL_P53_RED_BASELINE=1 go test -run TestBoundDirRedBaselineMiddleSymlinkEscape`。
 
 AT-13 证据补链（P55 新增）：seed 驱动构建、外部 oracle 比较与失败不损 seed 的两平台捕获已归档于[证据包](validation/evidence/EXIT-SEED-BUILD-EVIDENCE/MANIFEST.md)；本节只登记「补证已归档」，不表示 AT-13 已通过，能力边界（S-1..S-7 成立、N-1..N-7 不 assert）见该包 `claim-scope.md`。

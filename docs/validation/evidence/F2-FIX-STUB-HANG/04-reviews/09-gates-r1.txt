@@ -1,0 +1,70 @@
+④ 门禁读数（gate.js 原始尾行，verbatim；执行于 2026-11-09，HEAD=de37c58）
+
+[1] node tools\gates\gate.js --selftest（尾 3 行）
+ok   F1 every declared fixture mutation applied (a stale mutation would weaken the suite silently)
+ok   F1 mutation coverage floor (>= 8 fixture mutations exercised)
+SELFTEST: PASS 722/722
+
+[2] node tools\gates\gate.js --all --scope=index（尾 5 行）
+PASS  base gofmt -l . :: empty
+PASS  base go build ./... :: exit 0
+PASS  base go vet ./... :: exit 0
+PASS  base go test ./... :: ok=15 FAIL=0
+TOTAL_FAIL=0
+
+[3] node tools\gates\gate.js --all --scope=tree（尾 5 行）
+PASS  base gofmt -l . :: empty
+PASS  base go build ./... :: exit 0
+PASS  base go vet ./... :: exit 0
+PASS  base go test ./... :: ok=15 FAIL=0
+TOTAL_FAIL=0
+
+[4] node tools\gates\gate.js --all --scope=ci（尾 7 行）
+INFO  G9-e tmp/ reference (informational) :: docs/t027/REMAINING_SLICES.md:1796 tmp/P63-AT23-RECHECK :: not present at HEAD:tmp/P63-AT23-RECHECK
+INFO  G9-e tmp/ reference (informational) :: docs/t027/REMAINING_SLICES_EN.md:1783 tmp/P63-AT23-RECHECK :: not present at HEAD:tmp/P63-AT23-RECHECK
+INFO  G9-e tmp/ reference summary :: scanned 134 added line(s), 2 reference(s), 2 unresolvable
+PASS  base gofmt -l . :: empty
+PASS  base go build ./... :: exit 0
+PASS  base go vet ./... :: exit 0
+PASS  base go test ./... :: ok=15 FAIL=0
+TOTAL_FAIL=0
+
+注：G9-e 两条 INFO 为 P63 遗留的台账 tmp/ 引用（指向已清空的 P63 tmp 目录），非本片引入；
+门禁判据为 TOTAL_FAIL=0（三作用域均达标）。本片未修改该台账行（P63 片已登记），避免越界。
+
+----
+
+⑨ 门禁读数（gate.js 原始尾行，verbatim；执行于 2026-11-09，⑧ 文档装配后）
+
+[S] SELFTEST: PASS 722/722
+
+[I] node tools\gates\gate.js --all --scope=index（尾 5 行）
+PASS  base gofmt -l . :: empty
+PASS  base go build ./... :: exit 0
+PASS  base go vet ./... :: exit 0
+PASS  base go test ./... :: ok=15 FAIL=0
+TOTAL_FAIL=0
+
+[T] node tools\gates\gate.js --all --scope=tree（尾 5 行）
+PASS  base gofmt -l . :: empty
+PASS  base go build ./... :: exit 0
+PASS  base go vet ./... :: exit 0
+PASS  base go test ./... :: ok=15 FAIL=0
+TOTAL_FAIL=0
+
+[C] node tools\gates\gate.js --all --scope=ci（尾 5 行）
+PASS  base gofmt -l . :: empty
+PASS  base go build ./... :: exit 0
+PASS  base go vet ./... :: exit 0
+PASS  base go test ./... :: ok=15 FAIL=0
+TOTAL_FAIL=0
+
+⑨ 首跑修复回放（如实登记，G5(d) 同坑第三次）：
+- 首跑 index/tree 各 TOTAL_FAIL=1：`G5(d) staged is a subset of declared`，未声明路径 =
+  `docs/validation/evidence/F2-FIX-STUB-HANG/MANIFEST.md` 与 `.../SHA256SUMS.txt`（⑧ 围栏从 MANIFEST 清单
+  生成时遗漏了清单自身两文件）。
+- 处置：向 at23 报告 CN/EN 的 §11 artifacts 围栏末尾补两条 `…/MANIFEST.md<TAB>repo`、`…/SHA256SUMS.txt<TAB>repo`；
+  复跑 index/tree `TOTAL_FAIL=0`。
+- G9-e INFO（informational，不计 FAIL）：台账 `REMAINING_SLICES{,_EN}` 的 F2 段「临时件落点声明」行引用
+  `tmp/F2-FIX-STUB-HANG`（gitignore 目录，不随索引暂存），属切片协议要求声明的临时目录指针；
+  与 P63 同款 INFO 同源。⑧c 清理后该引用变为「not present」（P63 模式，informational）。

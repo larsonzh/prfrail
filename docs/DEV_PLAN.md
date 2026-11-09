@@ -172,6 +172,8 @@ T027 前置状态更新（2026-11-04，P54 CONTRACTS-S7-DURABILITY）：在上�
 
 T027 前置状态更新（2026-11-08，P61 AT23-RESTRICTED-CANDIDATE）：在上一段基础上，AT-23 的现状已完成评估并以 **PARTIAL** 收口（用户 2026-11-08 裁定 (E)，ADR-036）：机制腿九腿的 `verdictClass` / `chainState` / `taskState` / `stepState` / `observations` 与 B4 基线 0 漂移，但 F2 正例一处断言 `process-tree-taken-away` 由 `true` 变 `false`（成因 `02d5797` 的继承漂移，非本片引入）⇒ **前提①不满足**；真实候选腿已实际跑过启动 / 执行 / 停机并记录 unsupported（与 B1 探针 #8 同形态）⇒ **前提②满足**。**AT-23 仍不通过**，待 R-08.5 修订片裁定豁免后重新评估；F2 修复与判据修订属独立后续切片。证据：[中文](validation/at23-restricted-candidate.md) / [English](validation/at23-restricted-candidate_EN.md)。
 
+T027 前置状态更新（2026-11-09，F2-FIX-STUB-HANG）：在上一段基础上，F2 修复片已收口——`tools/agent-stub` 的 `hang` 分支补写 0 字节空 `stub-child.pid`（回归测试 `TestHangWritesEmptyChildPIDReport`）并重跑 layer3 F2（红/绿）+ f1-control 对照；⑦ 终审 `FINAL: PASS WITH FIXES` ⇒ 前提①「机制腿全绿」满足 ⇒ **AT-23 阶段 1 条件闭合达成**（前提② P61 已满足；阶段 2 不适用，用户 2026-11-09 裁定 A1）；S1 Exit 整体仍未通过。证据：[中文](validation/at23-restricted-candidate.md) §11 / [English](validation/at23-restricted-candidate_EN.md)，证据包 `docs/validation/evidence/F2-FIX-STUB-HANG/`。
+
 ### 11 月重构里程碑（T027-B）
 
 - P37 判定基线：C1–C7 缺陷判定与修复基线（P38 施工图给文件/函数级测试矩阵；报告 `docs/validation/t027b-breakthrough{,_EN}.md`、`docs/validation/t027b-tactical-blueprint{,_EN}.md`）

@@ -1,0 +1,5 @@
+inputs: D:\LZProjects\prfrail\tmp\b4\input\b4-inputs.json
+runId: run-b4
+taskId: b4-task
+stepId: b4-code-step
+parentSnapshotHash: sha256:1fbe6bb28268c36250659573df59b691d1c85dde12018bc091ddc5c5dce408ed

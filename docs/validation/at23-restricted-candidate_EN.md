@@ -12,6 +12,7 @@
 ## 1. Executive summary
 
 > **P63 point-in-time note (2026-11-09)**: P63 `AT23-RECHECK` completed the re-check under the P62-revised R-08.5 five elements and ruled that **the F2 inherited-drift waiver does not hold** (element ② fails on the literal reading) ⇒ AT-23 stays PARTIAL; the conclusions below in this section are unchanged, see §10.
+> **F2 fix slice point-in-time note (2026-11-09)**: F2-FIX-STUB-HANG fix completed, ⑦ ruled premise ① met, and AT-23 stage-1 condition closure is achieved (stage 2 not applicable, user ruling A1, 2026-11-09); see §11.
 
 **AT-23 conditional closure not achieved**: premise ① is unmet because of the F2 `process-tree-taken-away` inherited drift (cause `02d5797`, not introduced by P61; the B4 baseline re-run today would go red as well); premise ② is met (run-1 start + run-2 execution blocked + run-3 stop + run-5 unsupported, the same shape as B1 #8); this slice closes as PARTIAL (user ruling (E), ADR-036).
 
@@ -412,4 +413,200 @@ docs/validation/evidence/P63-AT23-RECHECK/freedom-list.md	repo
 docs/validation/evidence/P63-AT23-RECHECK/input-list.md	repo
 docs/validation/s1-exit.md	repo
 docs/validation/s1-exit_EN.md	repo
+```
+
+## 11. F2 fix slice re-check conclusion (F2-FIX-STUB-HANG, 2026-11-09)
+
+- Slice: `F2-FIX-STUB-HANG` (fix class `[SLICE]`, v52 §4 layer-1 item 10 "F2 fix slice"); started 2026-11-09; controller `DeepSeek V4 Pro` (ADR-039); this slice fixes + verifies + lets ⑦ judge; the R-08.5 five elements are not re-judged.
+- Fix content: the `hang` branch of `tools/agent-stub` now writes the 0-byte empty `stub-child.pid` (the CONTRACTS §7 constant-write rule; a childless process writes a 0-byte empty report, conforming to the contract rather than bypassing the assertion).
+- Verification: the regression test `TestHangWritesEmptyChildPIDReport` (red before the fix: exit=1, the only red point = the deadline `t.Fatalf`; green after the fix: PASS, `go test ./tools/agent-stub -v` 5/5 all PASS); the layer3 F2 red/green re-runs (`tools/b4-e2e/run-faces.ps1 -OnlyFace f2`: red exit=1 `FAILED CHECKS: f2-pos/process-tree-taken-away`, green exit=0 `all recorded checks passed`); the f1-control contrast leg all green.
+- ⑦ verdict: the blind review's four questions all hold → final `FINAL: PASS WITH FIXES` (the only Low = the wording of the first comment line of the hang branch, which does not change the verdict) → **premise ① "mechanism legs all green" is met**.
+
+### 11.1 ⑦ verdict text (verbatim transcription)
+
+**Blind review (`04-reviews/07-blind-r1.txt`)**:
+
+```text
+BLIND (first read, without the ⑤⑥ opinions) — the four questions judged one by one:
+
+1. The F2 three-leg verdict classes / states / observations are field-identical to the B4 baseline: MET (including the expected-difference note).
+The green pack f2-pos and the B4 pack f2-pos agree on verdictClass/chainState/taskState/stepState respectively (uncertain-or-paused / PAUSED / FAILED / FAILED).
+Green f2-neg equals the baseline f2-neg; green f2-neg-r2 equals the baseline f2-neg-r2.
+The observations' stopOutcome is unknown on all three legs, consistent across them.
+The expected difference is confirmed: the green f2-pos artifacts adds stub-child.pid, which the B4 f2-pos lacks; this is the product of the fix target and is not counted as drift.
+
+2. Is process-tree-taken-away back to true: MET.
+After the fix it is true (green f2-pos verdict-run L136–139).
+The B4 baseline is also true (baseline f2-pos verdict-run L136–139).
+The red baseline is false (red f2-pos verdict-run L136–139), consistent with the historical drift record (l3-baseline-compare.txt).
+
+3. Is failedChecks the empty set: MET.
+After the fix it is empty (green pack L358). The B4 baseline is empty as well (baseline pack L1418).
+The pre-fix red evidence is non-empty and only f2-pos/process-tree-taken-away (red pack L357–358).
+
+4. Are other assertions such as six-facts-distinct affected: NOT AFFECTED (MET).
+The f1-control contrast leg remains all-green on six-facts-distinct (f1-pos verdict-run L153–162).
+The f1-control top-level failedChecks is empty (f1-control pack L662).
+
+BLIND: all four questions hold (Q1 has only the fix-expected difference "the f2-pos artifacts adds stub-child.pid") → premise ①: MET (the only verdict)
+
+Notes:
+This verdict only targets "AT-23 premise ① after the F2 fix"; the R-08.5 / waiver topic is not re-judged, consistent with the AT-23 §10 boundary.
+The A6 contract basis is consistent with this fix's semantics (a childless process writes a 0-byte empty report): CONTRACTS A6 L256; the code landing point and the regression test are at main.go L112 and main_test.go L375 respectively.
+```
+
+**Final review (`04-reviews/07-final-r1.txt`)**:
+
+```text
+FINAL (second read, with the ⑤⑥ and the blind verdict cross-checked):
+
+Review findings (by severity)
+1. Low: the first comment line of the hang branch is inconsistent in wording with the current implemented behavior; it is suggested to fix it in a later documentation write-back (the main.go L113 comment still says "No artifacts beyond its own pid" while the same branch has already called the empty child-pid report write at L118).
+2. Medium+: none found.
+
+The four questions independently re-checked (only "premise ①" is judged; R-08.5 is not re-judged):
+1. The three-leg verdict four states agree with the B4 baseline: yes. After the fix all three green packs are uncertain-or-paused / PAUSED / FAILED / FAILED; the corresponding B4 three legs share the same states.
+2. process-tree-taken-away restored to true: yes. The pre-fix red f2-pos was false and explicitly lacked stub-child.pid; after the fix all three green legs are true, consistent with B4.
+3. failedChecks cleared: yes. The red aggregate still has the f2-pos/process-tree failure; the green failedChecks is empty; the B4 baseline failedChecks is empty too.
+4. No other assertion side effects introduced: none seen. f1-control still holds six-facts-distinct with an empty failedChecks; the only field drift recorded is the expected difference of stub-child.pid in f2-pos.
+
+⑤ suggestion/record penalty check on "premise ①" (item by item):
+1. The hang comment wording: needs fixing. For premise ①: no penalty (not a mechanism-assertion item; wording consistency only).
+2. The expected-difference allowlist: accepted. For premise ①: no penalty (explicitly closed out by test-r1 and the green artifacts).
+3. Gate raw-line archiving: no impact. For premise ①: no penalty (an audit-traceability enhancement).
+4. The red-regression path mojibake kept as-is: no impact. For premise ①: no penalty (archived as-is; log and inventory consistent).
+5. The line-number offset / design doc ±2 records: no impact. For premise ①: no penalty (documentation-alignment items).
+6. GLM-2 awaiting ⑧: no impact. For premise ①: no penalty (a later assembly / process-closure item).
+
+Agreements / divergences with the blind review:
+1. Agree: premise ① is met; the core grounds are all "process-tree restored to true + failedChecks cleared + the three-leg four states aligned with the baseline".
+2. Agree: the R-08.5 five elements are not re-judged; a verdict is given only on premise ① after the F2 fix.
+3. Minor divergence: one extra Low wording-fix suggestion is kept (the hang comment wording), which does not change the premise-① verdict.
+
+FINAL: PASS WITH FIXES → premise ①: MET
+```
+
+### 11.2 F2 three-leg vs B4 baseline field-by-field comparison (data source: `docs/validation/evidence/F2-FIX-STUB-HANG/03-test/test-r1.md` §4)
+
+- The verdict four states agree: the green three legs (f2-pos / f2-neg / f2-neg-r2) agree field by field with the corresponding B4 baseline three legs on verdictClass / chainState / taskState / stepState (f2-pos is uncertain-or-paused / PAUSED / FAILED / FAILED; f2-neg / f2-neg-r2 equal the baseline).
+- `process-tree-taken-away`: after the fix **true** (green f2-pos verdict-run L136–139); B4 baseline **true**; the pre-fix red evidence **false** (red f2-pos verdict-run L136–139, the detail explicitly missing `stub-child.pid`).
+- `failedChecks`: after the fix **empty** (green pack L358); B4 baseline empty as well (baseline pack L1418); the pre-fix red evidence non-empty with only `f2-pos/process-tree-taken-away` (red pack L357–358).
+- Only 1 field drift: `f2-pos artifacts["stub-child.pid"]` changed from "key absent" in the baseline to "present (`sha256:e3b0c442…b855` = the empty-file hash)" — the fix-expected product of this slice, not anomalous drift (test-r1 §4: 0 pass drift, 1 field drift).
+- Other assertions: `six-facts-distinct` unaffected (the f1-control contrast leg all green; the f1-control top-level failedChecks empty).
+
+### 11.3 AT-23 state change
+
+- **AT-23: PARTIAL → stage-1 condition closure achieved; stage 2 not applicable (user ruling A1, 2026-11-09)** (premise ① = mechanism legs all green, met by this slice; premise ② = already met by P61). The P61/P63 point-in-time text of §1/§4/§10 is not edited at all; this §11 is an appended point-in-time conclusion.
+- Layer-1 item 10 (the F2 fix slice) ✅ dequeued; layer-1 item 8 (AT-23) turns from 🔄 to ✅ dequeued.
+- S1 Exit: AT-23 stage-1 condition closure (stage 2 not applicable, user ruling A1, 2026-11-09; per this slice's ⑦ verdict) and the S-G7 dependency chain is updated; **S1 Exit passing as a whole is not claimed** (the remaining gates S-G2~S-G6, S-G8 are still pending).
+
+### 11.4 v53 observation-item candidates (registered by user ruling 2026-11-09, carried at v53 generation)
+
+- **The G5(d) evidence-pack fence pitfall (gate-pitfall No. 26 candidate)**: three consecutive slices (P62 `d0971e5` / P63 `de37c58` / F2-FIX this slice) all hit `G5(d) staged is a subset of declared` on their first index runs; root cause = a new evidence pack was created at step 0 without adding `artifacts` fence rows in the same round. Candidates: ① a step-0 requirement that a new evidence pack must add the fence rows in the same round; ② or record it as gate pitfall No. 26. 3 occurrences in total; the landing spot (briefing discipline or gate pitfall) must be evaluated at v53 generation.
+- **The R-08.5 file-level vs semantic-level criterion problem (kept as a long-term observation)**: after the F2 fix there is no inherited drift, so the semantic-level problem is not triggered for now; it is kept as a long-term observation (content = what the P63 receipt already has; not rewritten).
+
+```artifacts
+docs/validation/evidence/F2-FIX-STUB-HANG/00-briefing.md	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/01-arch/design-r1.md	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/02-impl/impl-r1.md	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/b4-inputs.json	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/cli/cli-preview-hook.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/cli/cli-preview-hook.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/cli/cli-preview.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/cli/cli-preview.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/cli/cli-validate-hook.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/cli/cli-validate-hook.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/cli/cli-validate.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/cli/cli-validate.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/cli/emit-inputs.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/cli/emit-inputs.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/driver.log	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/f1-neg-r2/f1-neg-r2-run.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/f1-neg-r2/f1-neg-r2-run.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/f1-neg-r2/verdict-run.json	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/f1-neg/f1-neg-run.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/f1-neg/f1-neg-run.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/f1-neg/verdict-run.json	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/f1-neg2-r2/f1-neg2-r2-run.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/f1-neg2-r2/f1-neg2-r2-run.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/f1-neg2-r2/verdict-run.json	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/f1-neg2/f1-neg2-run.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/f1-neg2/f1-neg2-run.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/f1-neg2/verdict-run.json	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/f1-neg3/f1-neg3-run.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/f1-neg3/f1-neg3-run.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/f1-neg3/verdict-run.json	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/f1-pos/f1-pos-run.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/f1-pos/f1-pos-run.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/f1-pos/verdict-run.json	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/f1-control/pack-verdict.json	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/b4-inputs.json	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/cli/cli-preview-hook.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/cli/cli-preview-hook.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/cli/cli-preview.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/cli/cli-preview.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/cli/cli-validate-hook.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/cli/cli-validate-hook.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/cli/cli-validate.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/cli/cli-validate.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/cli/emit-inputs.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/cli/emit-inputs.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/driver.log	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/f2-neg-r2/f2-neg-r2-run.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/f2-neg-r2/f2-neg-r2-run.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/f2-neg-r2/verdict-run.json	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/f2-neg/f2-neg-run.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/f2-neg/f2-neg-run.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/f2-neg/verdict-run.json	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/f2-pos/f2-pos-run.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/f2-pos/f2-pos-run.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/f2-pos/verdict-run.json	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/green/pack-verdict.json	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red-regression.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/b4-inputs.json	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/cli/cli-preview-hook.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/cli/cli-preview-hook.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/cli/cli-preview.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/cli/cli-preview.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/cli/cli-validate-hook.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/cli/cli-validate-hook.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/cli/cli-validate.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/cli/cli-validate.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/cli/emit-inputs.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/cli/emit-inputs.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/driver.log	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/f2-neg-r2/f2-neg-r2-run.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/f2-neg-r2/f2-neg-r2-run.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/f2-neg-r2/verdict-run.json	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/f2-neg/f2-neg-run.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/f2-neg/f2-neg-run.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/f2-neg/verdict-run.json	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/f2-pos/f2-pos-run.stderr.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/f2-pos/f2-pos-run.stdout.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/f2-pos/verdict-run.json	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/red/pack-verdict.json	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/03-test/test-r1.md	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/04-reviews/05-prereview-r1.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/04-reviews/06-scan-r1.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/04-reviews/07-blind-r1.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/04-reviews/07-final-r1.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/04-reviews/09-gates-r1.txt	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/freedom-list.md	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/input-list.md	repo
+tools/agent-stub/main.go	repo
+tools/agent-stub/main_test.go	repo
+docs/ADR_REGISTER.md	repo
+docs/ADR_REGISTER_EN.md	repo
+docs/t027/REMAINING_SLICES.md	repo
+docs/t027/REMAINING_SLICES_EN.md	repo
+docs/validation/at23-restricted-candidate.md	repo
+docs/validation/at23-restricted-candidate_EN.md	repo
+docs/DEV_PLAN.md	repo
+docs/DEV_PLAN_EN.md	repo
+docs/TEST_STRATEGY.md	repo
+docs/TEST_STRATEGY_EN.md	repo
+docs/validation/s1-exit.md	repo
+docs/validation/s1-exit_EN.md	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/MANIFEST.md	repo
+docs/validation/evidence/F2-FIX-STUB-HANG/SHA256SUMS.txt	repo
 ```

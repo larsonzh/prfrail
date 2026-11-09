@@ -1,0 +1,26 @@
+FINAL（第二读，附 ⑤⑥ 与盲审结论交叉核对）：
+
+审查发现（按严重度）
+1. Low：hang 分支首行注释与当前实现行为存在措辞不一致，建议在后续文档化回写中修正（main.go L113 注释仍写「No artifacts beyond its own pid」，而同分支已调用空子 pid 报告写入 L118）。
+2. Medium+：未发现。
+
+四问独立复核（仅判「前提①」，不重判 R-08.5）：
+1. 三腿 verdict 四态与 B4 基线一致：是。修复后三腿 green 包均为 uncertain-or-paused / PAUSED / FAILED / FAILED；B4 对应三腿同态。
+2. process-tree-taken-away 恢复为 true：是。修复前 red 的 f2-pos 为 false 且明确缺失 stub-child.pid；修复后 green 三腿均为 true，且与 B4 一致。
+3. failedChecks 清空：是。red 聚合仍有 f2-pos/process-tree 失败；green failedChecks 为空；B4 基线 failedChecks 也为空。
+4. 未引入其他断言副作用：未见。f1-control 仍保持 six-facts-distinct 且 failedChecks 为空；字段漂移仅记录到 f2-pos 的 stub-child.pid 这一处预期差异。
+
+⑤ 建议/记录对「前提①」减分核对（逐条）：
+1. hang 注释措辞：需修复。对前提①：不减分（非机制断言项，属文案一致性）。
+2. 预期差异白名单：接受。对前提①：不减分（已被 test-r1 与 green 产物明确收口）。
+3. 门禁原始行归档：不影响。对前提①：不减分（属于审计可追溯增强）。
+4. red-regression 路径乱码原样留痕：不影响。对前提①：不减分（属原样归档；日志与清单一致）。
+5. 行号偏移/设计文档 ±2 记录：不影响。对前提①：不减分（文档对齐项）。
+6. GLM-2 待 ⑧ 执行：不影响。对前提①：不减分（属后续装配/流程闭环项）。
+
+与盲审一致/分歧：
+1. 一致：前提①满足；核心依据均落在「process-tree 恢复 true + failedChecks 清空 + 三腿四态对齐基线」。
+2. 一致：不重判 R-08.5 五要素，只就 F2 修复后的前提①给结论。
+3. 轻微差异：额外保留 1 条 Low 文案修复建议（hang 注释措辞），但不改变前提①判定。
+
+FINAL: PASS WITH FIXES → 前提①：满足

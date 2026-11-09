@@ -1,0 +1,5 @@
+validate: ok
+config: D:\LZProjects\prfrail\tmp\b4\input\b4-chain-hook.json
+chain: b4-at23 tasks=1 steps=2
+runnableInCli: false
+warning: local CLI runtime currently executes noop-only chains; use validate/config explain for executable steps

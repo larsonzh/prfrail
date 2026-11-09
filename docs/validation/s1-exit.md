@@ -40,7 +40,7 @@
 | AT-20 | PASS | [T023 cost ledger](t023-cost-ledger.md) |
 | AT-21 | PASS | [T024 lifecycle](t024-lifecycle.md) |
 | AT-22 | PASS | [T025 operator interaction](t025-operator-interaction.md)：Schema/golden/hash/replay、聚焦终端收件箱、结构化响应、Engine 控制权归还及故障恢复 |
-| AT-23 | P63 复核判定完成（2026-11-09）：⑦ 终审 `FINAL REVIEW: PARTIAL` + 盲审 `BLIND REVIEW: FINDINGS`，**F2 继承漂移豁免不成立**（要素②按字面不成立）⇒ AT-23 保持 PARTIAL、S-G1 未闭合，待 F2 修复片（层 1 第 10 项，启动条件已达成、待用户点名）；仍 BLOCKED | [P63 结论](at23-restricted-candidate.md) §10（前提①保持不满足、前提②已满足不变）；[P61 报告](at23-restricted-candidate.md)：机制腿与 B4 基线 0 漂移（仅 F2 一处断言继承漂移）、真实候选腿实际跑过启动 / 执行 / 停机并记录 unsupported，不构成真实候选兼容性证明；[T026 报告](t026-agent-runner-contract.md) 的历史结论不变 |
+| AT-23 | 阶段 1 条件闭合达成（2026-11-09，F2 修复片收口；阶段 2 不适用，用户 2026-11-09 裁定 A1）：⑦ 终审 `FINAL: PASS WITH FIXES` + 盲审四问均成立 ⇒ 前提①满足 ⇒ **AT-23 阶段 1 条件闭合达成**（前提② P61 已满足）；P63 豁免判定与 P61 PARTIAL 为历史时点结论、原文保留 | [F2 修复片结论](at23-restricted-candidate.md) §11（⑦ 判定原文逐字 + F2 三腿与 B4 基线逐字段对照：verdict 四态一致、`process-tree-taken-away` 回 `true`、`failedChecks` 空集、字段漂移仅 1 处 = f2-pos artifacts 新增 stub-child.pid 键（修复预期产物））；[P61 报告](at23-restricted-candidate.md)：机制腿与 B4 基线 0 漂移（仅 F2 一处断言继承漂移）、真实候选腿实际跑过启动 / 执行 / 停机并记录 unsupported，不构成真实候选兼容性证明；[T026 报告](t026-agent-runner-contract.md) 的历史结论不变 |
 | AT-24 | 条件闭合 | [T028 黑箱模式](t028-supervised-black-box.md)：T028 已完成（`DEV_PLAN.md:119`），visible 黑箱候选的风险确认、隔离投递、显式归还、全量扇描与 reduced/unknown 报告已实现；闭合依据为 (b)/(c) 裁定，**真实 CLI 端到端仍依赖 T027-B**（D-18） |
 
 这些 PASS 表示对应 AT 的现有确定性验收，不自动满足阶段文档与发布门禁。
@@ -49,7 +49,7 @@
 
 | 门禁 | 状态 | 证据/缺口 |
 |---|---|---|
-| 核心任务链与 fail-close 场景 | BLOCKED | 既有 AT-01–AT-22 通过；T026 完成但固定候选为 10 verified、2 unsupported、0 unknown，整体不兼容；T027 未完成、AT-23 未通过；T028 已完成、AT-24 条件闭合；**依赖链**：AT-23 部分验证完成；P63 判定完成、F2 继承漂移豁免不成立 ⇒ S-G1 未闭合，前提①待 F2 修复片（层 1 第 10 项） |
+| 核心任务链与 fail-close 场景 | BLOCKED | 既有 AT-01–AT-22 通过；T026 完成但固定候选为 10 verified、2 unsupported、0 unknown，整体不兼容；T027 未完成、AT-23 未通过；T028 已完成、AT-24 条件闭合；**依赖链**：AT-23 阶段 1 条件闭合达成（前提① F2 修复片满足、前提② P61 已满足；阶段 2 不适用，用户 2026-11-09 裁定 A1）⇒ **S-G1 依据 = AT-23 阶段 1 条件闭合**（阶段 2 不适用，用户 2026-11-09 裁定 A1；依据本片 ⑦ 判定，而非 S1 Exit 整体通过）；S-G7 依赖链同步：依赖链中 AT-23 部分已阶段 1 条件闭合（阶段 2 不适用），其余门（S-G2~S-G6、S-G8）仍待，**不得声称 S1 Exit 整体通过** |
 | seed 自托管与真实平台 | PASS | T017 Windows/Linux 可信矩阵及 Windows 本机两代演练 |
 | whois 只读影子 | PASS | 9/9 固定用例与 3 类漂移负例；不含生产切换 |
 | generic/C/Go harness | PASS | 三套 harness 定义及三个最小用户样例均通过只读 CLI 闭环 |

@@ -362,3 +362,92 @@ func TestSpawnWithUnwritableChildPIDReportKillsChildAndFails(t *testing.T) {
 			dir, got, want)
 	}
 }
+
+// TestHangWritesEmptyChildPIDReport pins the hang branch to the "no descendant"
+// contract: before sleeping, a childless run must publish the empty stub-child.pid
+// as a fact, not merely write stub.pid and then become unobservable.
+//
+// The hang branch is the fact source the B4 E2E f2-pos surface depends on: the
+// process-tree-taken-away check asserts that a stopped childless run leaves a
+// 0-byte stub-child.pid behind, and a red f2-pos/process-tree-taken-away is the
+// defect this test fixes in place. The hang run sleeps for an hour, so the test
+// starts it in the background, polls for the report, and stops it itself.
+func TestHangWritesEmptyChildPIDReport(t *testing.T) {
+	dir := t.TempDir()
+
+	cmd := exec.Command(buildStub(t), "-mode", "hang")
+	cmd.Env = append(os.Environ(), evidenceDirVarName+"="+dir)
+	if err := cmd.Start(); err != nil {
+		t.Fatalf("could not start the hang stub: %v", err)
+	}
+
+	// Every exit path must stop the hour-long hang: a Fatal inside the polling
+	// loop has to leave no process behind. stop is idempotent so the deferred
+	// fallback and the normal end-of-test call cannot call Wait twice.
+	var stopped bool
+	stop := func() {
+		if stopped {
+			return
+		}
+		stopped = true
+		if cmd.Process != nil {
+			_ = cmd.Process.Kill()
+		}
+		// A killed stub exits non-zero; that is the expected outcome of Kill, not
+		// a failure of the run under test. Wait also reaps the process, which
+		// Windows otherwise keeps a handle for.
+		_ = cmd.Wait()
+	}
+	defer stop()
+
+	// The contract is "exists and 0 bytes": a missing report is a defect, never
+	// a state to infer, so poll until the report appears or the deadline proves
+	// it will not.
+	reportPath := filepath.Join(dir, childPIDReportName)
+	started := time.Now()
+	deadline := started.Add(5 * time.Second)
+	var reportInfo os.FileInfo
+	for {
+		info, statErr := os.Stat(reportPath)
+		if statErr == nil {
+			reportInfo = info
+			break
+		}
+		if !time.Now().Before(deadline) {
+			t.Fatalf("the hang run must write the empty child pid report %s, but after %s it still reads as %v (evidence dir %s): the hang branch wrote only %s before sleeping",
+				reportPath, time.Since(started), statErr, dir, ownPIDReportName)
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+
+	if reportInfo.IsDir() {
+		t.Fatalf("child pid report %s is a directory, want a 0-byte regular file", reportPath)
+	}
+	if !reportInfo.Mode().IsRegular() {
+		t.Fatalf("child pid report %s has mode %v, want a regular file", reportPath, reportInfo.Mode())
+	}
+	if reportInfo.Size() != 0 {
+		t.Fatalf("child pid report %s has %d bytes, want exactly 0 bytes as the positive statement \"no descendant\"; content: %q",
+			reportPath, reportInfo.Size(), readReport(t, reportPath))
+	}
+
+	// The empty report only means "no child" if the run reached the step before
+	// it: stub.pid proves the hang branch really ran to the write point, and its
+	// pid must name this run, so an empty report cannot come from a truncated or
+	// stale execution.
+	ownPIDPath := filepath.Join(dir, ownPIDReportName)
+	ownPID := readReport(t, ownPIDPath)
+	if len(ownPID) == 0 {
+		t.Fatalf("own pid report %s is empty (%d bytes), want a decimal pid written before the child report", ownPIDPath, len(ownPID))
+	}
+	pid, err := strconv.Atoi(strings.TrimSpace(string(ownPID)))
+	if err != nil {
+		t.Fatalf("own pid report %s holds %q, want a decimal pid: %v", ownPIDPath, ownPID, err)
+	}
+	if pid != cmd.Process.Pid {
+		t.Fatalf("own pid report %s names %d, want the hang stub's own pid %d: the report must come from this run",
+			ownPIDPath, pid, cmd.Process.Pid)
+	}
+
+	stop()
+}
