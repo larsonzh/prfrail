@@ -1,0 +1,118 @@
+P64 AT24-SUPERVISED-BLACK-BOX · 腿 9.8 重跑证据 · R=2（schema 七项闭集加严后）
+=============================================================
+执行角色：③ prfrail-tester（DeepSeek V4.1 Flash，runSubagent 显式传 model）
+执行时点：2026-11-11
+工作目录：D:\LZProjects\prfrail
+触发：② 将 schemas/supervised-report.schema.json 的 unknownDimensions 加严为
+      minItems=7 + maxItems=7 + uniqueItems + 七个 contains；
+      新增 invalid 夹具 supervised-report-unknown-dimensions-missing-network-access
+      （rejectionLayer=schema）；contracts.test.js fixtureCount 143 -> 144。
+性质：schema 层独立直校（Ajv）+ 三层回归取证。③ 未改任何源码 / schema / fixtures。
+原始输出目录：tmp/P64-AT24-SUPERVISED-BLACK-BOX/raw-r2/
+上一轮：同目录 L09-08-mandatory-fields.txt [R1]（R=1，Go/CLI 闭合，schema 层仍 ACCEPT 六项集）
+
+[1] 加严后的 schema 事实（原文摘录）
+----------------------
+schemas/supervised-report.schema.json -> properties.record.properties.unknownDimensions:
+  "type": "array",
+  "minItems": 7,
+  "maxItems": 7,
+  "uniqueItems": true,
+  "items": { "$ref": "#/$defs/unknownDimension" },
+  "allOf": [
+    { "contains": { "const": "tool-use" },               "minContains": 1 },
+    { "contains": { "const": "resource-reads" },         "minContains": 1 },
+    { "contains": { "const": "network-access" },         "minContains": 1 },
+    { "contains": { "const": "cost" },                   "minContains": 1 },
+    { "contains": { "const": "background-processes" },   "minContains": 1 },
+    { "contains": { "const": "session-continuity" },     "minContains": 1 },
+    { "contains": { "const": "external-side-effects" },  "minContains": 1 }
+  ]
+
+三层现状：
+  层 1（schema）七项闭集全必填（本轮加严点）
+  层 2（Go）validateSupervisedReportBody 七项缺失校验（R=1 已闭合）
+  层 3（CLI）supervised report 子命令走同一校验（R=1 已闭合）
+
+[2] schema 层探针（Ajv 直校，9 例）
+--------------------------
+命令原文：
+  node tmp\P64-AT24-SUPERVISED-BLACK-BOX\probe-schema-r2.js
+（脚本为临时件，使用 tools/contracts/validator.js 的 createValidator 注册全部 schemas，
+  再以 https://proofrail.dev/schemas/v1/supervised-report.schema.json 直校夹具实例）
+原始输出：raw-r2/leg9-8-schema.txt
+
+  用例                                                    期望     实况     判定
+  p5-full-seven（七项全集）                                 ACCEPT   ACCEPT   PASS
+  p5-only-cost（仅 cost，缺六项）                           REJECT   REJECT   PASS
+  p5-missing-network-access（六项集，缺 network-access）    REJECT   REJECT   PASS
+  p5-missing-cost（六项集，缺 cost）                        REJECT   REJECT   PASS
+  p8-safe-dimension（七项 + safe）                          REJECT   REJECT   PASS
+  p8-verified-dimension（七项 + verified）                  REJECT   REJECT   PASS
+  catalog:supervised-report-unknown-dimensions-missing-network-access
+    （② 新增的 invalid 契约夹具实例）                       REJECT   REJECT   PASS
+  synth:seven-with-duplicate（7 条含重复 session-continuity） REJECT  REJECT   PASS
+  synth:eight-entries（8 条，含重复）                       REJECT   REJECT   PASS
+  SCHEMA_PROBE_RESULT=PASS   SCHEMA_EXIT=0
+
+关键错误串摘录：
+  p5-only-cost             -> /record/unknownDimensions must contain at least 1 valid item(s)（七项 contains 未满足）
+  p5-missing-network-access-> 多个 /record/unknownDimensions/<i> must be equal to constant（network-access contains 未满足）
+  p5-missing-cost          -> 同为 contains 未满足
+  p8-safe-dimension        -> "unknownDimensions must NOT have more than 7 items"
+                              + "/record/unknownDimensions/7 must be equal to one of the allowed values"
+  synth:eight-entries      -> "must NOT have more than 7 items"
+                              + "must NOT have duplicate items (items ## 6 and 7 are identical)"
+
+[Ajv 直校结论] 七项全集 ACCEPT；缺任一项 REJECT；闭集外项 REJECT；重复/超长 REJECT
+=> schema 层与 Go/CLI 层方向一致（R=1 的「Go 严于 schema」单向差已闭合）。
+
+[3] 契约夹具全量核验
+--------------
+命令原文：
+  node tmp\P64-AT24-SUPERVISED-BLACK-BOX\check-supervised-fixtures.js
+原始输出（raw-r2/leg9-8-fixtures.txt）：
+  PASS  supervised-report-valid                                          expected=accept
+  PASS  supervised-report-assurance-level-full                           expected=reject
+  PASS  supervised-report-unknown-dimensions-empty                       expected=reject
+  PASS  supervised-report-unknown-dimensions-missing-cost                expected=reject
+  PASS  supervised-report-unknown-dimension-id-unknown                   expected=reject
+  PASS  supervised-report-unknown-dimensions-missing-network-access      expected=reject
+  SUPERVISED_REPORT_FIXTURES=6   FIXTURES_EXIT=0
+
+⇒ supervised-report 契约夹具由 5 条增至 6 条（新增项按 schema 层 REJECT 通过）。
+  全部 6 条 PASS（1 正 + 5 反）。
+
+[4] C 层契约测试（fixtureCount 144）
+---------------------------
+命令原文：
+  npm --prefix tools/contracts test
+  tests 4 / pass 4 / fail 0 / cancelled 0 / skipped 0 / todo 0   NPM_EXIT=0
+
+fixtureCount 机械核验（独立遍历，排除 vectors）：
+  invalid 97（9+1+15+9+2+9+19+33） + valid 47（6+1+7+9+2+8+11+3） = 144；
+  vectors/canonical.json 的 4 条不计入断言。
+  => assert.equal(fixtureCount, 144) 通过。
+
+[5] 三层回归（Go）
+------------
+go test -count=1 -run 'SupervisedReport' ./internal/chain ./internal/console -v
+  TOP_PASS=3 / TOP_FAIL=0 / SUBTEST_PASS=11 / SUBTEST_FAIL=0 / GOTEST_EXIT=0
+go test -count=1 ./internal/chain ./internal/console
+  ok internal/chain 2.868s / ok internal/console 14.880s / FULL_EXIT=0
+
+[6] 断言读数 M9-8（R=2）
+----------------
+  缺六项之一（only-cost / missing-network-access）  -> REJECT（slice 层 + CLI 层）-> PASS
+  仅 cost                                          -> REJECT -> PASS
+  七项全集                                          -> ACCEPT（schema） / exit 0（CLI）-> PASS
+  闭集外项（safe / verified）                       -> REJECT -> PASS
+  七项含重复 / 八条超长                             -> REJECT -> PASS
+  新增契约夹具                                      -> schema REJECT，C 层 PASS -> PASS
+  判定：**全部命中**；R=1 遗留的 schema 层单向差已闭合。
+
+[7] 偏差与说明
+----------
+  无新增偏差。D-13（全链报告 JSON 未落盘）/ D-14（exit 区间口径）沿用前轮登记。
+
+结论：LEG 9.8 R=2 复跑 PASS（schema / Go / CLI 三层对七项闭集判定一致）。

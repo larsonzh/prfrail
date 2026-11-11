@@ -350,7 +350,7 @@ func TestSupervisedReportNewAlwaysReduced(t *testing.T) {
 		StepID:             "supervised-one",
 		Attempt:            1,
 		VerifiedDimensions: []string{"independent-gates", "process-stop-proof"},
-		UnknownDimensions:  []string{"tool-use"},
+		UnknownDimensions:  append([]string{}, supervisedUnknownDimensionSet...),
 		Evidence:           []string{supervisedReportEvidence},
 	}, fixedClock, func() string { return "supervised-report-one" })
 	if err != nil {
@@ -362,8 +362,10 @@ func TestSupervisedReportNewAlwaysReduced(t *testing.T) {
 	if record.Record.Mode != "supervised-black-box" {
 		t.Fatalf("unexpected mode %q", record.Record.Mode)
 	}
-	if !containsAll(record.Record.UnknownDimensions, "cost") {
-		t.Fatalf("the unknown dimension set must always carry cost: %v", record.Record.UnknownDimensions)
+	// R-09.8 / contracts section 7.1d: every one of the seven unobservable
+	// dimensions must appear, so cost alone is never a complete report.
+	if !containsAll(record.Record.UnknownDimensions, supervisedUnknownDimensionSet...) {
+		t.Fatalf("the unknown dimension set must carry all seven required dimensions: %v", record.Record.UnknownDimensions)
 	}
 	// An empty unknown set falls back to the full closed set, still carrying cost.
 	empty, err := NewSupervisedReport(SupervisedReportInput{ReportID: "supervised-report-two", RunID: "run-one", TaskID: "task-one", StepID: "supervised-one", Attempt: 1, Evidence: []string{supervisedReportEvidence}}, fixedClock, func() string { return "supervised-report-two" })
@@ -373,13 +375,44 @@ func TestSupervisedReportNewAlwaysReduced(t *testing.T) {
 	if len(empty.Record.UnknownDimensions) != len(supervisedUnknownDimensionSet) {
 		t.Fatalf("an empty unknown set must fall back to the closed set: %v", empty.Record.UnknownDimensions)
 	}
-	// A full assurance level, an empty unknown set and a cost-free unknown set
-	// are all refused even when the record hash is recomputed over them.
+	// A partial set is refused at construction rather than silently completed.
+	for name, unknown := range map[string][]string{
+		"only cost":       {"cost"},
+		"missing network": supervisedUnknownDimensionSetWithout("network-access"),
+		"outside the set": {"cost", "safe"},
+	} {
+		t.Run("constructor/"+name, func(t *testing.T) {
+			_, err := NewSupervisedReport(SupervisedReportInput{
+				ReportID:          "supervised-report-partial",
+				RunID:             "run-one",
+				TaskID:            "task-one",
+				StepID:            "supervised-one",
+				Attempt:           1,
+				UnknownDimensions: unknown,
+				Evidence:          []string{supervisedReportEvidence},
+			}, fixedClock, func() string { return "supervised-report-partial" })
+			if !errors.Is(err, ErrInvalidSupervisedReport) {
+				t.Fatalf("a partial unknown dimension set must be refused, got %v", err)
+			}
+		})
+	}
+	// A full assurance level or a mutated unknown set is refused even when the
+	// record hash is recomputed over it.
 	for name, mutate := range map[string]func(*SupervisedReport){
 		"full assurance": func(body *SupervisedReport) { body.AssuranceLevel = "full" },
 		"empty unknown":  func(body *SupervisedReport) { body.UnknownDimensions = []string{} },
-		"cost-free":      func(body *SupervisedReport) { body.UnknownDimensions = []string{"tool-use"} },
-		"unknown id":     func(body *SupervisedReport) { body.UnknownDimensions = []string{"cost", "not-a-dimension"} },
+		"only cost":      func(body *SupervisedReport) { body.UnknownDimensions = []string{"cost"} },
+		"missing network": func(body *SupervisedReport) {
+			body.UnknownDimensions = supervisedUnknownDimensionSetWithout("network-access")
+		},
+		"cost-free":  func(body *SupervisedReport) { body.UnknownDimensions = supervisedUnknownDimensionSetWithout("cost") },
+		"unknown id": func(body *SupervisedReport) { body.UnknownDimensions = []string{"cost", "not-a-dimension"} },
+		"safe dimension": func(body *SupervisedReport) {
+			body.UnknownDimensions = append(supervisedUnknownDimensionSetWithout("cost"), "cost", "safe")
+		},
+		"duplicate": func(body *SupervisedReport) {
+			body.UnknownDimensions = append([]string{"cost"}, supervisedUnknownDimensionSet...)
+		},
 	} {
 		t.Run(name, func(t *testing.T) {
 			body := record.Record
@@ -394,6 +427,18 @@ func TestSupervisedReportNewAlwaysReduced(t *testing.T) {
 			}
 		})
 	}
+}
+
+// supervisedUnknownDimensionSetWithout returns the frozen closed set minus the
+// named dimension, so a test can present a six-item "looks complete" set.
+func supervisedUnknownDimensionSetWithout(name string) []string {
+	trimmed := make([]string, 0, len(supervisedUnknownDimensionSet))
+	for _, dimension := range supervisedUnknownDimensionSet {
+		if dimension != name {
+			trimmed = append(trimmed, dimension)
+		}
+	}
+	return trimmed
 }
 
 func TestOpenSupervisedWorkWindowWithValidConfirmation(t *testing.T) {
@@ -809,7 +854,7 @@ func TestSupervisedRecordJSONShapesMatchFrozenSchemas(t *testing.T) {
 		StepID:             "supervised-one",
 		Attempt:            1,
 		VerifiedDimensions: []string{"independent-gates"},
-		UnknownDimensions:  []string{"cost"},
+		UnknownDimensions:  append([]string{}, supervisedUnknownDimensionSet...),
 		Evidence:           []string{supervisedReportEvidence},
 	}, fixedClock, func() string { return "supervised-report-one" })
 	if err != nil {

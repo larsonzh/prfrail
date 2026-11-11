@@ -1,0 +1,73 @@
+P64 AT24-SUPERVISED-BLACK-BOX · 腿 2 证据 · 投递 ≠ 完成（R-09 + CONTRACTS §7 supervised 段）
+=====================================================================
+执行角色：③ prfrail-tester（DeepSeek V4.1 Flash，runSubagent 显式传 model）
+执行时点：2026-11-11
+工作目录：D:\LZProjects\prfrail
+环境：Windows 本机；无 VM / 无代理 / 无外部调用；Go 1.22 工具链
+性质：机制腿（stub visible 投递 + 模拟人工归还 + 后置扫描），非真实 SessionBridge visible 端到端
+证据原始输出：tmp/P64-AT24-SUPERVISED-BLACK-BOX/raw/（临时件，⑧c 清理；本文件为正式归档摘录）
+
+[0] 设计名 vs 实况名对照
+----------------
+设计引用名 → 实况名 → 结论：
+  TestSubmitSupervisedReturnRejectsDeliveryOnlyEvidence     → 实况存在（internal/console） → 一致
+  TestVisibleDeliveryMapsAccepted                           → 实况存在（internal/adapters）→ 一致
+  TestSubmitSupervisedReturnRejectsReceiptNotBoundToFacts   → 实况存在（internal/chain）   → 一致
+结论：3/3 一致，无杜撰。
+
+[1] A 层命令原文
+-----------
+go test -count=1 -run 'DeliveryOnlyEvidence|VisibleDelivery|ReceiptNotBoundToFacts' ./internal/chain ./internal/console ./internal/adapters -v
+
+（M2 的 <p2> 即上式 -run 参数）
+
+[2] 原始输出关键摘录
+------------
+--- PASS: TestSubmitSupervisedReturnRejectsDeliveryOnlyEvidence (0.00s)
+--- PASS: TestSubmitSupervisedReturnRejectsReceiptNotBoundToFacts (0.00s)
+--- PASS: TestVisibleDeliveryMapsAccepted (0.00s)
+--- PASS: TestVisibleDeliveryUnavailableReason (0.00s)
+--- PASS: TestVisibleDeliveryRequestIDMismatch (0.00s)
+ok  	github.com/larsonzh/prfrail/internal/chain	1.284s
+ok  	github.com/larsonzh/prfrail/internal/console	1.447s [no tests to run]
+ok  	github.com/larsonzh/prfrail/internal/adapters	1.949s
+GOTEST_EXIT=0
+
+[3] 正例组结果
+---------
+PASS  TestSubmitSupervisedReturnRejectsDeliveryOnlyEvidence（「仅投递证据」不构成归还 ⇒ 拒：投递成功只证明 UI 可见）
+PASS  TestVisibleDeliveryMapsAccepted                     （visible 投递映射结果为 accepted；投递层零回执语义）
+PASS  TestVisibleDeliveryUnavailableReason                （M2 正则带入：不可用原因映射）
+PASS  TestVisibleDeliveryRequestIDMismatch                （M2 正则带入：requestId 不匹配）
+
+[4] 反例组结果
+---------
+PASS  TestSubmitSupervisedReturnRejectsReceiptNotBoundToFacts（回执未绑五事实 ⇒ 拒）
+结论：反例组 1/1 PASS；连同「仅投递证据」拒绝负例，构成「投递 ≠ 完成」双向断言。
+
+[5] B 层 CLI 黑箱探针（投递失败 ⇒ 无 PASS 语义）
+----------------------------------
+同一探针（腿 1 [5]）的事件日志作为腿 2 的补充机械证据：
+  事件总数 8 条，终态停留在 step=RUNNING；
+  grep 'risk-confirmation|window|delivery' 命中 0 条；
+  无任何 task→PASS / step→PASS 事件；
+  进程退出码 1（投递未接受即整体失败，未产生「完成」假象）。
+
+说明：本片 CLI 无「投递成功」的生产路径（visible 通道为 unavailableVisibleClient 占位，T028 D-18），
+     因此「投递成功但不置 PASS」只能以 A 层 stub 测试取证；如实登记，不冒充真实端到端。
+
+[6] 断言读数
+--------
+M2：PASS=5，FAIL=0 ⇒ 阈值 PASS>=4 / FAIL==0 ⇒ PASS
+附加：B 层事件日志无 task/step PASS 事件（0 条）⇒ 与 M2 语义一致
+附加（机械核验）：事件日志 8 条 toState 序列 = CREATED,BASELINED,RUNNING,PENDING,PRECHECK,STEPS_RUNNING,PENDING,RUNNING；
+                  正则 PASSED|"PASS" 命中 0 条（PASSED_hits=0）。
+
+[7] 偏差与说明
+---------
+D-6（M2 正则宽度）：M2 的 <p2> 正则带入 2 个适配器层测试（VisibleDeliveryUnavailableReason /
+    VisibleDeliveryRequestIDMismatch），二者 PASS；如实登记计数构成。
+D-7（真实投递路径边界）：生产 visible 通道不可用（T028 §8 D-18），「投递成功但 task/step 未置 PASS」
+    仅由 stub 驱动测试证明；真实 SessionBridge visible 端到端登记为 unknown/边界（起跑消息 3.4 必含项）。
+
+LEG 2: PASS（M2 PASS=5/FAIL=0；投递零回执 + 仅投递证据拒绝双证据链）

@@ -1,0 +1,62 @@
+P64 AT24-SUPERVISED-BLACK-BOX · 腿 9.5 证据 · 后台进程 unknown（R-09.5 · 裁定值 (a) 可接受）
+=====================================================================
+执行角色：③ prfrail-tester（DeepSeek V4.1 Flash，runSubagent 显式传 model）
+执行时点：2026-11-11（批次 3/3）
+证据原始输出：tmp/P64-AT24-SUPERVISED-BLACK-BOX/raw/leg9-5.txt、leg9-5-6-render.txt（临时件，⑧c 清理）
+
+[1] A 层命令与原始输出（M9-5 前半）
+-----------------------
+go test -count=1 -run 'TestSupervisedReturnRefusesLiveManagedProcess' ./internal/chain ./internal/console -v
+
+  testing: warning: no tests to run
+  PASS
+  ok      github.com/larsonzh/prfrail/internal/chain      1.151s [no tests to run]
+  === RUN   TestSupervisedReturnRefusesLiveManagedProcess
+  --- PASS: TestSupervisedReturnRefusesLiveManagedProcess (0.08s)
+  PASS
+  ok      github.com/larsonzh/prfrail/internal/console    1.617s
+  GOTEST_EXIT=0
+
+机械计数：PASS=1  FAIL=0
+
+测试语义（runtime_supervised_test.go:1156-1186）：
+  - 写入受管进程身份文件 managedProcessIdentityFileName（内容 = 当前测试进程身份，实测 alive）
+  - ExecuteSupervisedReturn(..., "complete") 必须返回 errors.Is(err, ErrSupervisedGateFailed)
+  - 且 summary.ChainState != "COMPLETED"，StepStateCounts 不含 "PASSED"
+  ⇒ 受管进程存活时归还被 fail closed 拒绝。
+  注释同时声明：外部 agent 进程树不可正向观测，其可观测性由报告的 background-processes 未知维度承担。
+
+[2] 报告含 background-processes（M9-5 后半，前半）
+---------------------------------------
+B 层渲染（本批次重跑，raw/leg9-5-6-render.txt）：
+  tmp\P64-AT24-SUPERVISED-BLACK-BOX\prfrail.exe supervised report --run-dir fixtures\runs\p5-full-seven
+  输出含：unknown: background-processes=unknown
+  旁证：fixtures/runs/p5-full-seven/supervised/report.json 的 unknownDimensions 中
+        background-processes 计数 = 1（见 L09-04 [1] BG_IN_DIMS=1）
+  生产常量 internal/console/runtime_supervised.go:145 七项含 "background-processes"（原样传入 :1128）
+⇒ 报告必须携带该未知维度  ⇒ 命中。
+
+[3] 「用户负责清理」计数（⑧ 写入义务，③ 只登记指针）
+----------------------------------
+本时点机械扫描（docs/ 与 internal/ 下 *.md,*.go grep -SimpleMatch '用户负责清理'）：
+  命中位置仅 4 处，均为设计/裁定/起跑文本，**无一处来自 AT-24 报告**：
+    docs/validation/evidence/P64-AT24-SUPERVISED-BLACK-BOX/01-arch/design-r1.md:93
+    docs/validation/evidence/P64-AT24-SUPERVISED-BLACK-BOX/00-briefing.md:60
+    docs/validation/r08-r09-ruling.md:79
+    docs/validation/evidence/R08-R09-RULING/r08-r09-ruling.md:79
+  报告文件是否存在：docs/validation/at24-supervised-black-box.md  → **不存在**
+                    docs/validation/at24-supervised-black-box_EN.md → **不存在**
+⇒ 报告侧计数 == 0，登记 **PENDING-⑧**：
+  ⑧ 文档装配时必须在 at24-supervised-black-box{,_EN}.md 明写「用户负责清理」义务（R-09.5 要求
+  「用户负责清理；报告明写」），否则 M9-5 的第三项在后置核验中不成立。
+  ③ 不改报告（报告归 ⑧），只保持指针。
+
+[4] 断言读数 M9-5
+-----------
+  组件                                                  实测            判定
+  <p9-5>=RefusesLiveManagedProcess  PASS≥1               PASS=1          命中
+  报告含 background-processes                            渲染行+JSON=1   命中
+  「用户负责清理」计数≥1（报告侧）                       0（报告未生成）  **PENDING-⑧**
+  判定：**部分命中（2/3）** —— 第三项为 ⑧ 的写入义务，非实现缺陷，非阻塞 ③。
+
+LEG 9.5: DONE（PENDING-⑧：报告「用户负责清理」待 ⑧ 装配）

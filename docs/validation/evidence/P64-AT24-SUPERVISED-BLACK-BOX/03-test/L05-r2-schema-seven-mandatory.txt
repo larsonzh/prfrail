@@ -1,0 +1,126 @@
+P64 AT24-SUPERVISED-BLACK-BOX · 腿 5 重跑证据 · R=2（schema 七项闭集加严后）
+=============================================================
+执行角色：③ prfrail-tester（DeepSeek V4.1 Flash，runSubagent 显式传 model）
+执行时点：2026-11-11
+工作目录：D:\LZProjects\prfrail
+触发：② 将 schemas/supervised-report.schema.json 的 unknownDimensions 加严为
+      minItems=7 + maxItems=7 + uniqueItems + 七个 contains（七项闭集全必填），
+      并新增 invalid 夹具 supervised-report-unknown-dimensions-missing-network-access；
+      tools/contracts/contracts.test.js fixtureCount 143 -> 144。
+性质：纯复跑与取证。③ 未改任何源码 / schema / fixtures。
+原始输出目录：tmp/P64-AT24-SUPERVISED-BLACK-BOX/raw-r2/（临时件，⑧c 清理；本文件为正式归档摘录）
+上一轮：同目录 L05-unknown-dimensions-cost.txt [R1]（R=1，Go/CLI 层闭合、schema 层未动）
+
+[1] 环境与构建
+-----------
+go build -o tmp\P64-AT24-SUPERVISED-BLACK-BOX\prfrail.exe ./cmd/prfrail
+  BUILD_EXIT=0
+
+[2] A 层：Go 测试重跑
+---------------
+命令原文：
+  go test -count=1 -run 'SupervisedReport' ./internal/chain ./internal/console -v
+
+原始输出摘录（raw-r2/leg5-a-layer.txt）：
+  === RUN   TestSupervisedReportNewAlwaysReduced
+  === RUN   TestSupervisedReportNewAlwaysReduced/constructor/only_cost
+  === RUN   TestSupervisedReportNewAlwaysReduced/constructor/missing_network
+  === RUN   TestSupervisedReportNewAlwaysReduced/constructor/outside_the_set
+  === RUN   TestSupervisedReportNewAlwaysReduced/duplicate
+  === RUN   TestSupervisedReportNewAlwaysReduced/full_assurance
+  === RUN   TestSupervisedReportNewAlwaysReduced/empty_unknown
+  === RUN   TestSupervisedReportNewAlwaysReduced/only_cost
+  === RUN   TestSupervisedReportNewAlwaysReduced/missing_network
+  === RUN   TestSupervisedReportNewAlwaysReduced/cost-free
+  === RUN   TestSupervisedReportNewAlwaysReduced/unknown_id
+  === RUN   TestSupervisedReportNewAlwaysReduced/safe_dimension
+  --- PASS: TestSupervisedReportNewAlwaysReduced (0.00s)
+  PASS
+  ok      github.com/larsonzh/prfrail/internal/chain      2.392s
+  === RUN   TestSupervisedReportRenderGolden
+  --- PASS: TestSupervisedReportRenderGolden (1.37s)
+  === RUN   TestSupervisedReportOmitsUnprovenReviewDimension
+  --- PASS: TestSupervisedReportOmitsUnprovenReviewDimension (0.35s)
+  PASS
+  ok      github.com/larsonzh/prfrail/internal/console    4.956s
+  GOTEST_EXIT=0
+
+机械计数：TOP_PASS=3  TOP_FAIL=0  SUBTEST_PASS=11  SUBTEST_FAIL=0  OK_LINES=2
+说明：本轮 ② 只改 schema + 夹具 + C 层计数，未改 Go 源码；A 层读数与 R=1 一致，
+      11 个子例全 PASS（构造入口 3 项 + 校验入口 8 项，其中 duplicate / safe_dimension 为闭集反例）。
+
+[3] B 层：CLI 黑箱探针重跑（6 例，含期望）
+--------------------------------
+命令原文（逐例）：
+  tmp\P64-AT24-SUPERVISED-BLACK-BOX\prfrail.exe supervised report \
+    --run-dir tmp\P64-AT24-SUPERVISED-BLACK-BOX\fixtures\runs\<case>
+原始输出：raw-r2/leg5-b-layer.txt
+
+  夹具                      期望                       实况 exit  判定
+  p5-only-cost              拒绝（缺其余六项）          1          PASS
+  p5-missing-network-access 拒绝（缺 network-access）    1          PASS
+  p5-missing-cost           拒绝（缺 cost）              1          PASS
+  p5-full-seven             接受（正例基线）             0          PASS
+  p8-safe-dimension         拒绝（闭集外 safe）          1          PASS
+  p8-verified-dimension     拒绝（闭集外 verified）      1          PASS
+
+错误串原文：
+  p5-only-cost              -> "supervised report: invalid supervised report: unknown dimensions must carry
+                                all seven required dimensions (missing: tool-use, resource-reads,
+                                network-access, background-processes, session-continuity, external-side-effects)"
+  p5-missing-network-access -> "supervised report: invalid supervised report: unknown dimensions must carry
+                                all seven required dimensions (missing: network-access)"
+  p5-missing-cost           -> "supervised report: invalid supervised report: unknown dimensions must carry cost"
+  p8-safe-dimension         -> "supervised report: invalid supervised report: unknown dimension \"safe\" is outside the closed set"
+  p8-verified-dimension     -> "supervised report: invalid supervised report: unknown dimension \"verified\" is outside the closed set"
+  p5-full-seven             -> exit 0，渲染 7 行 unknown（tool-use / resource-reads / network-access / cost /
+                                background-processes / session-continuity / external-side-effects）
+                                + assuranceLevel: reduced
+
+结论：6/6 与期望一致；R=1 已闭合的 CLI 行为在 schema 加严后无回归。
+
+[4] C 层：契约测试重跑
+---------------
+命令原文：
+  npm --prefix tools/contracts test
+原始输出摘录（raw-r2/leg-c-layer.txt；✔/ℹ 字形在 cp936 控制台乱码，数字完整）：
+  > proofrail-contract-validator@1.0.0 test
+  > node --test
+  PASS  all schemas compile and every catalog matches its independent expectation (3224.3699ms)
+  PASS  canonical vectors reproduce the frozen bytes and digests (41.573ms)
+  PASS  AgentRunner mapping constants stay aligned across vectors and request fixtures (10.9704ms)
+  PASS  AgentRunner effect mapping fails closed and permits grant supersets (23.7906ms)
+  tests 4 / suites 0 / pass 4 / fail 0 / cancelled 0 / skipped 0 / todo 0
+  NPM_EXIT=0
+
+fixtureCount 机械核验（独立遍历 testdata/contracts，不含 vectors）：
+  invalid: agent-runner 9 / ai-availability 1 / core-config 15 / evidence-transactions 9 /
+           operator-interaction 2 / product-records 9 / runtime-records 19 / semantic-rules 33
+  valid:   agent-runner 6 / ai-availability 1 / core-config 7 / evidence-transactions 9 /
+           operator-interaction 2 / product-records 8 / runtime-records 11 / semantic-scenarios 3
+  合计 = 144（另 vectors/canonical.json = 4，不计入 fixtureCount 断言）
+  => contracts.test.js 的 assert.equal(fixtureCount, 144) 通过（首条 PASS 即含该断言）
+
+[5] 回归（受影响包全量）
+-----------------
+go test -count=1 ./internal/chain ./internal/console
+  ok      github.com/larsonzh/prfrail/internal/chain      2.868s
+  ok      github.com/larsonzh/prfrail/internal/console    14.880s
+  FULL_EXIT=0
+
+[6] 断言读数 M5（R=2）
+---------------
+  A 层 TOP_PASS=3 / TOP_FAIL=0 / SUBTEST_PASS=11 / SUBTEST_FAIL=0   -> PASS
+  B 层 6/6 探针 exit 与期望一致                                      -> PASS
+  C 层 tests 4 / pass 4 / fail 0 + fixtureCount=144 断言通过          -> PASS
+  受影响包全量回归 ok/ok                                             -> PASS
+  未新增观测缺陷（R=1 已登记的 schema 单向差由本次 ② 加严闭合）
+
+[7] 偏差与说明
+----------
+  D-14 沿用（exit 区间口径）：设计写 "exit∈[10,20]"，实况 CLI 仅 exitSuccess=0 / exitFailure=1 /
+       exitUsage=2，实测 1；采信「非零即拒」。
+  D-13 沿用（全链报告 JSON 未落盘）：本环境无真实 visible 投递，正例走合成报告 + CLI 渲染代证。
+  本片未新增偏差。
+
+结论：LEG 5 R=2 复跑 PASS。

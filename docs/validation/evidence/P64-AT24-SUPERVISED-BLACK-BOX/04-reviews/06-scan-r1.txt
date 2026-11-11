@@ -1,0 +1,14 @@
+P64 AT24-SUPERVISED-BLACK-BOX · ⑥ 独立扫描 · independent-reviewer + MAI-Code-1.1-Flash · 只读
+
+Section A 验收腿完整性：抽样 SUMMARY/L05/L06/L09-03/L09-08，读数与「17 子腿 / 15 PASS / 1 SKIP / 1 PENDING」一致；DEF-1 首跑缺陷与 R=1 重跑闭合均如实记录，未被掩盖。
+Section B R-09 九项边界落实：9.3 确认精确句计数=1、外部连接 0；9.7 确认原文时间线可追溯（起跑前未确认/补录确认）；9.8 修复集中在 ValidateSupervisedReport（闭集拒绝缺项/非法值/重复项）；schema 层 permissive 差异已登记为已知边界，未隐瞒。
+Section C 三句话逐字：L06 以机械计数口径声明 count_total=2/§1=1/摘要=1/区段外=0，正式计数待 ⑨；未见脚本性摘要变体替代原句。
+Section D ② 修复代码复核：空集拒绝/缺 cost 拒绝/非法维度拒绝/重复拒绝/缺闭集成员拒绝五类保护齐备；测试给出 only cost/missing network/outside the set 反例，修复方向正确，无范围外改动。认可。
+Section E 报告结构与围栏：summary/known boundaries/evidence fence/not performed/pending/transcript 分区严肃；PENDING-⑦/PENDING-⑧/9.1 SKIP/9.8 R=1 均显式声明；CN/EN 结构镜像+路径对齐+证据引用一致（翻译件不应按同一字节文本要求）。
+
+⑤ 发现 M1–M4 认可度：认可（理由：四处问题均属已确认、已记录、可修复，非隐藏缺陷）。
+
+发现清单：Critical none / Major none / Minor none
+Note：1) 9.3/9.7 措辞必须按精确字符串计数；2) L06 机械计数留待 ⑨；3) schema 闭集差异已登记为已知边界。
+
+INDEPENDENT SCAN: PASS

@@ -1,0 +1,91 @@
+P64 AT24-SUPERVISED-BLACK-BOX · 腿 9.1 证据 · 工具使用 unknown（R-09.1 · 裁定值 (c) 视情况）
+=====================================================================
+执行角色：③ prfrail-tester（DeepSeek V4.1 Flash，runSubagent 显式传 model）
+执行时点：2026-11-11（批次 3/3）
+工作目录：D:\LZProjects\prfrail
+环境：Windows 本机；无 VM / 无代理 / 无外部调用；Go 1.22 工具链
+性质：机制腿（stub visible 投递 + 模拟人工归还 + 后置扫描），非真实 SessionBridge visible 端到端
+证据原始输出：tmp/P64-AT24-SUPERVISED-BLACK-BOX/raw/leg9-1-a-layer.txt、leg9-1-extended.txt（临时件，⑧c 清理）
+
+[0] 设计名 vs 实况名对照
+----------------
+  TestSupervisedAssemblyFullChainExtendedScans                → internal/console/runtime_supervised_test.go:1236 → 一致
+  TestSupervisedReturnRefusesOutOfScopeChange                 → :922  → 一致
+  TestSupervisedScopeUnderivableFailsClosed                   → :958  → 一致
+  TestSupervisedScopeRejectsUnresolvableRoot                  → :983  → 设计未列，命中 <p9-1> 正则中的 ScopeRejects
+  TestSupervisedScopeAllowsRejectsLinkResolvingOutsideRoot    → :1000 → 一致（本环境 SKIP，见 [4]）
+结论：设计点名的 4 名全部命中；正则另命中 1 个实况反例（ScopeRejectsUnresolvableRoot）。
+
+[1] A 层命令原文（M9-1 组）
+-------------------
+go test -count=1 -run 'OutOfScopeChange|ScopeUnderivable|ScopeRejects|ScopeAllows' ./internal/chain ./internal/console -v
+
+原始输出（raw/leg9-1-a-layer.txt 逐行摘录）：
+  testing: warning: no tests to run
+  PASS
+  ok      github.com/larsonzh/prfrail/internal/chain      0.923s [no tests to run]
+  === RUN   TestSupervisedReturnRefusesOutOfScopeChange
+  --- PASS: TestSupervisedReturnRefusesOutOfScopeChange (0.07s)
+  === RUN   TestSupervisedScopeUnderivableFailsClosed
+  --- PASS: TestSupervisedScopeUnderivableFailsClosed (0.00s)
+  === RUN   TestSupervisedScopeRejectsUnresolvableRoot
+  --- PASS: TestSupervisedScopeRejectsUnresolvableRoot (0.00s)
+  === RUN   TestSupervisedScopeAllowsRejectsLinkResolvingOutsideRoot
+      runtime_supervised_test.go:1008: symlink creation unavailable: symlink ... A required privilege is not held by the client.
+  --- SKIP: TestSupervisedScopeAllowsRejectsLinkResolvingOutsideRoot (0.00s)
+  PASS
+  ok      github.com/larsonzh/prfrail/internal/console    1.186s
+  GOTEST_EXIT=0
+
+机械计数：TOP_PASS=3  TOP_SKIP=1  TOP_FAIL=0
+
+[2] 全链 ExtendedScans 读数（正例：产物在 workspace 内）
+--------------------------------------------
+go test -count=1 -run 'TestSupervisedAssemblyFullChainExtendedScans' ./internal/console -v
+  === RUN   TestSupervisedAssemblyFullChainExtendedScans
+  --- PASS: TestSupervisedAssemblyFullChainExtendedScans (0.13s)
+  PASS
+  ok      github.com/larsonzh/prfrail/internal/console    1.427s
+  GOTEST_EXIT=0
+
+该测试的实际断言（runtime_supervised_test.go:1253-1262）：
+  for _, dimension := range []string{"scope-scan", "file-type-scan", "side-effect-scan"} {
+      if !containsName(report.Record.VerifiedDimensions, dimension) { t.Fatalf(...) }
+  }
+  ⇒ verifiedDimensions 必须含 scope-scan / file-type-scan / side-effect-scan
+  同测试另断言 scan.{ChangeSetInScope, SideEffectClean, FileTypeScanClean, SecretScanClean} 全 true
+  ⇒ 「范围扫描证明变更全在 workspace 内」与「副作用扫描干净」是全链完成的必经条件。
+
+生产侧常量（internal/console/runtime_supervised.go）：
+  :146  supervisedVerifiedDimensions = []string{"workspace-isolation","manifest-before","manifest-after",
+        "diff","scope-scan","secret-scan","file-type-scan","side-effect-scan","process-stop-proof","independent-gates"}
+  :1127 VerifiedDimensions: append([]string{}, supervisedVerifiedDimensions...)   ⇒ 原样写入报告，无裁剪
+常量计数：VERIFIED_DIMENSIONS=10（含 scope-scan 与 side-effect-scan 各 1）
+
+[3] 正例 / 反例结论
+-------------
+正例（接受路径）：全链在 workspace 内产出 artifact ⇒ 三扫描全绿 ⇒ ChainState=COMPLETED（[2] PASS）。
+反例（阻断路径，本环境可执行的三条）：
+  - 越界变更（workspace 外痕迹）        ⇒ RefusesOutOfScopeChange  PASS（阻断成立）
+  - 范围不可推导（fail closed）          ⇒ ScopeUnderivableFailsClosed PASS（阻断成立）
+  - 根不可解析                          ⇒ ScopeRejectsUnresolvableRoot PASS（阻断成立）
+反例（本环境不可执行的一条）：
+  - 符号链接解析到 workspace 外          ⇒ ScopeAllowsRejectsLinkResolvingOutsideRoot SKIP
+    原因：Windows 本机无 SeCreateSymbolicLinkPrivilege / Developer Mode 未开，测试内建「symlink 不可用 ⇒ SKIP」
+    可见代码路径（runtime_supervised_test.go:1000-1022）在 t.Skip 前不执行任何断言 ⇒ 该反例在本环境**不可测**。
+
+[4] 断言读数 M9-1
+-----------
+  设计阈值：PASS≥4、FAIL==0
+  实测：    TOP_PASS=3  TOP_SKIP=1  TOP_FAIL=0
+  判定：    FAIL==0 成立；PASS=3 < 4 ⇒ **阈值未达（差 1，缺项为环境 SKIP，非实现缺陷）**
+  说明：唯一缺口为 9.1 反例组第 4 条（symlink 越界）。该条在 Linux/管理员特权环境下可执行；
+        本片环境声明为 Windows 本机、不提权（design-r1 §2、00-briefing【〇】），不改变环境以凑阈值。
+
+[5] 结论
+------
+  9.1 机制成立：工具使用的「产物必须落在 workspace 内」由 scope-scan + side-effect-scan + 三扫描 clean
+  共同强制，三条可执行反例全部阻断，正例全绿。
+  M9-1 严格阈值（PASS≥4）未达 1 项，登记为「环境不可测（symlink 特权）」，不视为 T028 实现缺陷。
+
+LEG 9.1: DONE WITH SKIP（PASS=3 / SKIP=1 / FAIL=0；SKIP 属环境限制）

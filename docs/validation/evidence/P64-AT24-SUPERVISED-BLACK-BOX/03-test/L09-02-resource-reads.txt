@@ -1,0 +1,51 @@
+P64 AT24-SUPERVISED-BLACK-BOX · 腿 9.2 证据 · 资源读取 unknown（R-09.2 · 裁定值 (c) 视情况）
+=====================================================================
+执行角色：③ prfrail-tester（DeepSeek V4.1 Flash，runSubagent 显式传 model）
+执行时点：2026-11-11（批次 3/3）
+环境：Windows 本机；无 VM / 无代理 / 无外部调用
+性质：机制腿（stub visible 投递 + 模拟人工归还 + 后置扫描）
+证据原始输出：tmp/P64-AT24-SUPERVISED-BLACK-BOX/raw/leg9-2.txt（临时件，⑧c 清理）
+
+[1] 命令原文
+--------
+go test -count=1 -run 'TestSupervisedIsolationReadsOnlyWorkspace' ./internal/chain ./internal/console -v
+
+原始输出（raw/leg9-2.txt）：
+  testing: warning: no tests to run
+  PASS
+  ok      github.com/larsonzh/prfrail/internal/chain      1.088s [no tests to run]
+  === RUN   TestSupervisedIsolationReadsOnlyWorkspace
+  --- PASS: TestSupervisedIsolationReadsOnlyWorkspace (0.12s)
+  PASS
+  ok      github.com/larsonzh/prfrail/internal/console    1.454s
+  GOTEST_EXIT=0
+
+机械计数：CHAIN_PASS=0（无匹配测试）  CONSOLE_PASS=1  FAIL=0
+
+[2] 该测试断言的实际内容（runtime_supervised_test.go:1188-1235）
+--------------------------------------------------
+  a) 在 <runRoot>/outside-candidate.txt 放置候选文件（workspace 外），内容固定；
+  b) harness.workspace() 必须等于 <runRoot>/workspaces/<taskID>-attempt-1（隔离根，非 runRoot）；
+  c) 在隔离 workspace 内写 artifact.txt 后执行 ExecuteSupervisedReturn(..., "complete")：
+       summary.ChainState == "COMPLETED"；
+  d) harness.loadScanReport() 的 ChangedPaths 必须恰好为 ["added artifact.txt"]，EntryCount == 1
+     ⇒ manifest/diff 的读取面只覆盖隔离 workspace；
+  e) workspace 外候选文件读回内容必须与原内容逐字相同 ⇒ 未被读取消费、未被修改。
+
+⇒ 「只读 workspace 内文件」不是靠日志声明，而是靠 (d) 的读取面计数 + (e) 的 workspace 外文件不变性共同证明。
+
+[3] 正例 / 反例
+---------
+正例：隔离根内单产物 ⇒ 归还完成、扫描面积恰为 1 项（PASS）。
+反例：workspace 外候选 ⇒ 既不被纳入 ChangedPaths/EntryCount，也未被改写（同一测试内断言）。
+      「越界读取痕迹 ⇒ 阻断」的显式阻断断言由 9.1 反例组（OutOfScopeChange / ScopeUnderivable /
+      ScopeRejects）承担，本环境全部 PASS（见 L09-01 [1]）。
+
+[4] 断言读数 M9-2
+-----------
+  设计阈值：PASS≥1，且 M9-1 组 FAIL==0
+  实测：    PASS=1（TestSupervisedIsolationReadsOnlyWorkspace）  FAIL=0
+           M9-1 组 FAIL=0（L09-01 [1]：TOP_FAIL=0）
+  判定：    **命中**
+
+LEG 9.2: DONE

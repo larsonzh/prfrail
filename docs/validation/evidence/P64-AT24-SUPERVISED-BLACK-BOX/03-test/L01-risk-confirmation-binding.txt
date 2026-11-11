@@ -1,0 +1,131 @@
+P64 AT24-SUPERVISED-BLACK-BOX · 腿 1 证据 · 风险确认绑定（R-09.7 + CONTRACTS §7.1(a)）
+=====================================================================
+执行角色：③ prfrail-tester（DeepSeek V4.1 Flash，runSubagent 显式传 model）
+执行时点：2026-11-11
+工作目录：D:\LZProjects\prfrail
+环境：Windows 本机；无 VM / 无代理 / 无外部调用；Go 1.22 工具链
+性质：机制腿（stub visible 投递 + 模拟人工归还 + 后置扫描），非真实 SessionBridge visible 端到端
+证据原始输出：tmp/P64-AT24-SUPERVISED-BLACK-BOX/raw/（临时件，⑧c 清理；本文件为正式归档摘录）
+
+[0] 设计名 vs 实况名对照（先枚举后执行）
+------------------------
+枚举命令：go test -list 'Supervised|Visible|Delivery|SubmitSupervised|SupervisedReturn' ./internal/chain ./internal/console ./internal/adapters
+设计引用名 → 实况名 → 结论：
+  TestSupervisedRiskConfirmationRoundTrip                 → 实况存在 → 一致
+  TestOpenSupervisedWorkWindowWithValidConfirmation       → 实况存在 → 一致
+  TestSupervisedRiskNoticeIsTruthfulAndVersioned          → 实况存在 → 一致
+  TestSupervisedAssemblyFullChain                         → 实况存在 → 一致（但不在 M1 正则内，见 [7] D-3）
+  TestOpenSupervisedWorkWindowWithoutConfirmation         → 实况存在 → 一致
+  TestOpenSupervisedWorkWindowWrongNoticeVersion          → 实况存在 → 一致
+  TestSupervisedRiskConfirmationRejectsBindingDrift       → 实况存在 → 一致
+  TestSupervisedAssemblyBlocksWithoutConfirmation         → 实况存在 → 一致
+  TestSupervisedAssemblyRejectsSelectionReject            → 实况存在 → 一致
+  TestOpenSupervisedWorkWindowRejectsUnacceptedDelivery   → 实况存在 → 一致
+
+结论：设计引用的腿 1 测试名 10/10 与实况一致，无杜撰、无替换。
+
+[1] A 层命令原文
+-----------
+go test -count=1 -run 'SupervisedRiskConfirmation|OpenSupervisedWorkWindow|SupervisedRiskNotice|SupervisedAssemblyBlocksWithoutConfirmation|SupervisedAssemblyRejectsSelectionReject' ./internal/chain ./internal/console ./internal/adapters -v
+
+（M1 的 <p1> 即上式 -run 参数）
+
+[2] 原始输出关键摘录（顶层 PASS/FAIL + 包级 ok 行）
+------------------------------------
+--- PASS: TestSupervisedRiskConfirmationRoundTrip (0.00s)
+--- PASS: TestSupervisedRiskConfirmationLedgerIdempotentAppend (0.00s)
+--- PASS: TestOpenSupervisedWorkWindowWithValidConfirmation (0.00s)
+--- PASS: TestOpenSupervisedWorkWindowWithoutConfirmation (0.00s)
+--- PASS: TestOpenSupervisedWorkWindowWrongNoticeVersion (0.00s)
+--- PASS: TestSupervisedRiskConfirmationRejectsBindingDrift (0.01s)
+--- PASS: TestSupervisedRiskConfirmationRejectsRejectSelection (0.00s)
+--- PASS: TestOpenSupervisedWorkWindowWithoutActiveStep (0.00s)
+--- PASS: TestOpenSupervisedWorkWindowRejectsUnacceptedDelivery (0.01s)
+--- PASS: TestSupervisedRiskNoticeIsTruthfulAndVersioned (0.00s)
+--- PASS: TestSupervisedAssemblyBlocksWithoutConfirmation (0.06s)
+--- PASS: TestSupervisedAssemblyRejectsSelectionReject (0.05s)
+ok  	github.com/larsonzh/prfrail/internal/chain	1.563s
+ok  	github.com/larsonzh/prfrail/internal/console	2.047s
+ok  	github.com/larsonzh/prfrail/internal/adapters	2.401s [no tests to run]
+GOTEST_EXIT=0
+
+[3] 正例组结果
+---------
+PASS  TestSupervisedRiskConfirmationRoundTrip                     （确认记录往返）
+PASS  TestOpenSupervisedWorkWindowWithValidConfirmation           （有效确认开窗）
+PASS  TestSupervisedRiskNoticeIsTruthfulAndVersioned              （提示真实且带版本）
+PASS  TestSupervisedRiskConfirmationLedgerIdempotentAppend        （M1 正则带入的附加正例：账本幂等追加）
+PASS  TestOpenSupervisedWorkWindowWithoutActiveStep               （M1 正则带入的附加正例：无活动步开窗拒绝）
+说明：TestSupervisedAssemblyFullChain 属设计列出的腿 1 正例，但它不匹配 M1 正则，改由腿 3 的 M3 <p3>（FullChain）覆盖，实测 PASS（见 L03 证据）。
+
+[4] 反例组结果
+---------
+PASS  TestOpenSupervisedWorkWindowWithoutConfirmation      （无确认 ⇒ 阻断）
+PASS  TestOpenSupervisedWorkWindowWrongNoticeVersion       （版本漂移 ⇒ 阻断）
+PASS  TestSupervisedRiskConfirmationRejectsBindingDrift    （run/task/step/attempt 绑定漂移 ⇒ 拒）
+PASS  TestSupervisedRiskConfirmationRejectsRejectSelection （selection=reject ⇒ 拒）
+PASS  TestSupervisedAssemblyBlocksWithoutConfirmation      （装配层无确认 ⇒ 阻断）
+PASS  TestSupervisedAssemblyRejectsSelectionReject         （装配层 selection=reject ⇒ 拒）
+PASS  TestOpenSupervisedWorkWindowRejectsUnacceptedDelivery（投递未被接受 ⇒ 不开窗）
+结论：反例组 7/7 PASS，即全部阻断路径均被断言到（非「只跑正例」）。
+
+[5] B 层 CLI 黑箱探针（生产 wired visible 不可用 ⇒ 无窗口）
+--------------------------------------------
+夹具（合成，非仓库既有 fixture）：tmp/P64-AT24-SUPERVISED-BLACK-BOX/fixtures/supervised-probe.chain.json
+  编码核验：UTF-8 without BOM + LF（bytes=1459 bom=false crlf=false）
+  内容要点：schemaVersion 1.0.0 / chain.profile=standard / step.kind=code / execution=supervised-black-box /
+            handoffPolicy{allowedTargets:[source], inputPolicy:structured, handoffTimeoutMs:3600000,
+            returnActions:[complete,abort], hooksAfterReturn:[return-scan]} /
+            ai.channels 含 sessionbridge-visible（否则配置层即被拒，见 [7] D-4）
+
+命令原文：
+  prfrail.exe run --chain tmp/P64-AT24-SUPERVISED-BLACK-BOX/fixtures/supervised-probe.chain.json \
+                  --run-id p64-probe-run-2 --run-dir tmp/P64-AT24-SUPERVISED-BLACK-BOX/runs/probe-run-2
+  （经 Start-Process 分离 stdout / stderr 采集，避免重定向符号造成 CRLF）
+
+构建：go build -o tmp/P64-AT24-SUPERVISED-BLACK-BOX/prfrail.exe ./cmd/prfrail ⇒ BUILD_EXIT=0
+
+实测 exit code：1
+STDOUT 字节数：0
+STDERR 字节数：137
+STDERR 原文：run: supervised visible delivery is not accepted: visible delivery uncertain: visible_delivery_unavailable: sessbridge client unavailable
+
+stderr 命中串核验：含 "supervised visible delivery is not accepted" ⇒ 是
+
+run 目录实况（证明「无窗口」）：
+  tmp/P64-AT24-SUPERVISED-BLACK-BOX/runs/probe-run-2/events/state-events.jsonl
+  tmp/P64-AT24-SUPERVISED-BLACK-BOX/runs/probe-run-2/snapshot-store/{objects,tmp}
+  tmp/P64-AT24-SUPERVISED-BLACK-BOX/runs/probe-run-2/supervised/scans/before-manifest.json
+  tmp/P64-AT24-SUPERVISED-BLACK-BOX/runs/probe-run-2/workspaces/p64-task-attempt-1
+
+  ⇒ 无 supervised-risk-confirmation 记录；无 window/session 文件；
+    事件日志 8 条（CREATED→BASELINED→RUNNING→task PENDING→PRECHECK→STEPS_RUNNING→step PENDING→RUNNING），
+    grep 'risk-confirmation|window|delivery' 命中 0 条 ⇒ 未开窗、未置任何 task/step PASS。
+
+[6] 断言读数
+--------
+M1-A（A 层）：PASS=12，FAIL=0 ⇒ 阈值 PASS>=10 / FAIL==0 ⇒ PASS
+M1-B（B 层）：exit=1（非零失败），stderr 命中 "supervised visible delivery is not accepted" ⇒ 语义 PASS
+              但设计期望 "exit∈[10,20]"，实况 1 ⇒ 偏差 D-1（见 [7]）
+顶层 PASS 计数口径：go test -v 顶层 "--- PASS: <TestName>" 行（不含子测试缩进行）。
+
+[7] 偏差与说明（如实登记，不杜撰）
+-------------------
+D-1（设计 vs 实况，exit code 口径）：design-r1 §3 腿 1 与 §5 M1 期望 B 层探针 "exit∈[10,20]"。
+    实况：internal/console/cli.go:23-25 仅定义 exitSuccess=0 / exitFailure=1 / exitUsage=2，无 10–20 区间；
+    实测 exit=1。判定：采信「非零失败退出 + stderr 精确命中串」，exit 区间期望不成立。
+    根因层：① 设计（预期读数）偏差，非实现缺陷 ⇒ 不派 ②、不改代码。
+D-2（M1 正则宽度）：M1 的 <p1> 正则带入 2 个设计未列测试
+    （TestSupervisedRiskConfirmationLedgerIdempotentAppend / TestOpenSupervisedWorkWindowWithoutActiveStep），
+    二者均 PASS，不改变断言结论；如实登记计数构成。
+D-3（设计正例未入正则）：TestSupervisedAssemblyFullChain 在设计腿 1 正例清单中，但不匹配 M1 正则；
+    已由腿 3 的 M3 <p3>（FullChain）实测 PASS（L03 证据），无覆盖缺口。
+D-4（夹具前置条件，执行中发现）：首轮探针因 ai.profile 使用 authMode=secret 但缺 baseUrl 被配置层拒绝
+    （"invalid AI provider profile: secret authentication requires baseUrl"），且 supervised 步骤要求
+    ai.channels 含 sessionbridge-visible（internal/console/config.go:607 validateSupervisedChannel）。
+    已补 baseUrl + visible 通道后重跑。此为实现既有前置校验，非缺陷。
+D-5（可证伪性取证边界）：本片 ③ 禁止改源码 ⇒ 未做「删守卫⇒变红」现场变异；
+    变异证伪证据沿用 T028 报告 §7.4 已落盘读数（归还入口移除漂移校验 ⇒ 红；abort 加回漂移检查 ⇒ 红）。
+    本腿对应的反例测试均为「拒绝型」断言（errors.Is 精确匹配错误哨兵），满足可证伪形态。
+
+LEG 1: PASS（M1 PASS=12/FAIL=0；B 层 exit=1 + 精确命中串；偏差 D-1 已登记）

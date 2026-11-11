@@ -1,0 +1,118 @@
+P64 AT24-SUPERVISED-BLACK-BOX · 腿 9.8 证据 · 强制字段（R-09.8 · 裁定值 (a) 七项全必填）
+=====================================================================
+执行角色：③ prfrail-tester（DeepSeek V4.1 Flash，runSubagent 显式传 model）
+执行时点：2026-11-11（批次 3/3）
+证据原始输出：tmp/P64-AT24-SUPERVISED-BLACK-BOX/raw/leg9-8-schema.txt、leg9-8-cli.txt、leg9-8-def1.txt
+复用：批次 2 的 L05-unknown-dimensions-cost.txt（[4] B 层探针矩阵 / [6] DEF-1 原文）
+
+[1] 三层强制结构（schema / Go / CLI）
+--------------------------
+  层 1（schema）schemas/supervised-report.schema.json：
+      assuranceLevel 枚举含 full/reduced，但生产链恒写 reduced；
+      unknownDimensions: minItems=1 + contains({const:"cost"})
+  层 2（Go）internal/chain/supervised_report.go:190-192 —— validateSupervisedReportBody：
+      非空 + 必须含 cost（单条 if）
+  层 3（CLI）internal/console —— supervised report 子命令调用同一 ValidateSupervisedReport，
+      失败即非零退出并打印 "invalid supervised report: ..."
+
+[2] 反例探针 A：schema 层三反例（M9-8 的 ×3 前半）
+-----------------------------------
+node tmp\P64-AT24-SUPERVISED-BLACK-BOX\check-supervised-fixtures.js
+原始输出（raw/leg9-8-schema.txt）：
+  PASS  supervised-report-valid                            expected=accept  layer=schema
+  PASS  supervised-report-assurance-level-full             expected=reject  layer=schema
+  PASS  supervised-report-unknown-dimensions-empty         expected=reject  layer=schema
+  PASS  supervised-report-unknown-dimensions-missing-cost  expected=reject  layer=schema
+  PASS  supervised-report-unknown-dimension-id-unknown     expected=reject  layer=schema
+  SUPERVISED_REPORT_FIXTURES=5   SCHEMA_EXIT=0
+
+三反例命中：assurance-level-full / unknown-dimensions-empty / missing-cost ⇒ REJECT 3/3
+（第 4 条 unknown-dimension-id-unknown 为额外封闭集校验，亦 REJECT）
+
+[3] 反例探针 B：CLI 层缺 cost（M9-8 的 ×3 后半）
+------------------------------------
+tmp\P64-AT24-SUPERVISED-BLACK-BOX\prfrail.exe supervised report \
+  --run-dir tmp\P64-AT24-SUPERVISED-BLACK-BOX\fixtures\runs\p5-missing-cost
+原始输出（raw/leg9-8-cli.txt）：
+  supervised report: invalid supervised report: unknown dimensions must be non-empty and carry cost
+  CLI_MISSING_COST_EXIT=1
+⇒ 缺 cost 被 CLI 拒绝（非零退出）。
+
+[4] 关键反例探针：缺「其余六项之一」是否被接受（DEF-1 事实登记）
+-----------------------------------------------
+raw/leg9-8-def1.txt（本批次重跑，二进制为当前源码构建，BUILD_EXIT=0）：
+  p5-only-cost            => EXIT=0   （unknownDimensions=["cost"]，其余六项全缺）
+  p5-missing-network-access => EXIT=0 （七项中缺 network-access）
+两份报告均由 CLI 正常渲染（渲染头行 runId/taskId 正常输出）。
+
+⇒ 事实：**缺六项之一被接受**。schema（Ajv 直校）同向 ACCEPT（L05 [4] 旁证）。
+⇒ 与 R-09.8「七项全必填」及腿 5 判据「缺任何一项 ⇒ 报告不合规」**不符**。
+
+DEF-1（状态更新：仍 OPEN，② 待修）
+  编号：DEF-1（首次登记于 L05 [6]，本腿确认未修复）
+  症状：unknownDimensions 缺任一非 cost 项 ⇒ CLI exit=0 接受并渲染；schema 同向接受
+  期望：按 R-09.8 拒绝
+  根因层：
+    (a) internal/chain/supervised_report.go:190-192 —— 只校验 non-empty + contains(cost)
+    (b) schemas/supervised-report.schema.json —— 只声明 minItems=1 + contains(cost)
+  修复边界：Go 层加「必须等于封闭七项集」可修；若要求 schema 与 Go 一致 ⇒ 需改 schemas/ + 可能补夹具
+            ⇒ 按 design-r1 §3.3「需改 schema/fixtures ⇒ 超界停下升级」
+  ③ 处置：不修（禁改源码/schema/fixtures），交 ② 与 ⑦/用户裁决。
+  对 9.8 的影响：**强制字段机制在「cost 必填」与「非空」两维成立，在「其余六项必填」维度不成立**
+                ⇒ 9.8 判为 **DONE WITH DEFECT**，不得表述为「七项强制已落实」。
+
+[5] 断言读数 M9-8
+-----------
+  三反例探针（schema reject ×3 + CLI 非零 exit）计数 == 3   → 实测 3   → 命中
+  缺项探针（cost 在、其余六项缺 / 仅缺一项）              → 【接受】 ⇒ DEF-1 成立（如实记录）
+  判定：**部分命中** —— 三反例断言命中；「七项全必填」未落实（DEF-1 OPEN）。
+
+LEG 9.8: DONE WITH DEFECT（DEF-1 OPEN，② 待修）
+
+[R1] R 重跑（2026-11-11，② 修复 DEF-1 后 · R=1）
+---------------------------------------------
+触发：② 修复 internal/chain/supervised_report.go（七项闭集强制校验）+ internal/console loadReport 加严；
+      schemas/ 未动（已登记）。构建 BUILD_EXIT=0；原始输出 raw-r1/。未改任何源码 / schema / fixtures。
+
+三层现状（R1 实测）：
+  层 1（schema）未改动：unknownDimensions 仍为 minItems=1 + contains({const:"cost"})
+  层 2（Go）validateSupervisedReportBody 新增 missingSupervisedUnknownDimensions 校验：
+       缺任一项 ⇒ "unknown dimensions must carry all seven required dimensions (missing: ...)"
+       （另：构造器不再自动补 cost，部分集合直接拒绝）
+  层 3（CLI）supervised report 子命令走同一校验；loadReport 读回持久化报告时同步校验
+
+[2-R1] schema 层反例重跑
+  node tmp\P64-AT24-SUPERVISED-BLACK-BOX\check-supervised-fixtures.js
+  PASS  supervised-report-valid
+  PASS  supervised-report-assurance-level-full
+  PASS  supervised-report-unknown-dimensions-empty
+  PASS  supervised-report-unknown-dimensions-missing-cost
+  PASS  supervised-report-unknown-dimension-id-unknown
+  SUPERVISED_REPORT_FIXTURES=5   SCHEMA_EXIT=0
+  ⇒ 三反例（full / empty / missing-cost）仍 REJECT 3/3（schema 未改动，读数与首跑一致）。
+
+[3-R1] CLI 层反例重跑（全部真实 exit code）
+  p5-missing-cost            ⇒ EXIT=1   unknown dimensions must carry cost
+  p5-only-cost               ⇒ EXIT=1   unknown dimensions must carry all seven required dimensions
+                                        (missing: tool-use, resource-reads, network-access,
+                                         background-processes, session-continuity, external-side-effects)
+  p5-missing-network-access  ⇒ EXIT=1   unknown dimensions must carry all seven required dimensions
+                                        (missing: network-access)
+  p8-safe-dimension          ⇒ EXIT=1   unknown dimension "safe" is outside the closed set
+  p8-verified-dimension      ⇒ EXIT=1   unknown dimension "verified" is outside the closed set
+
+[4-R1] DEF-1 闭合判定
+  首跑：p5-only-cost / p5-missing-network-access ⇒ EXIT=0（缺陷事实）
+  重跑：两者 ⇒ EXIT=1（拒绝）⇒ DEF-1 在 Go 层与 CLI 层闭合。
+  遗留：schema 层（Ajv 直校）对上述两例仍 ACCEPT（raw-r1/leg9-8-schema-p5.txt）——
+        已由 ② 登记为「schema 层未动」，属跨层单向差（Go 严于 schema，fail closed）；
+        不改变本腿「强制字段机制」判定，但 schema 独立校验的七项完备性仍待后续片处理。
+
+[5-R1] 断言读数 M9-8（重跑）
+  三反例探针（schema reject ×3 + CLI 非零 exit）计数 == 3  → 实测 3 → 命中
+  缺项探针（only-cost / missing-network-access）           → EXIT=1 → 命中
+  缺 cost 探针                                             → EXIT=1 → 命中
+  回归（go test -count=1 ./internal/chain ./internal/console）→ ok / ok（FULL_EXIT=0）
+  判定：**命中**
+
+LEG 9.8 RERUN(R=1): PASS（DEF-1 Go/CLI 层闭合；schema 层差异已登记）

@@ -1,0 +1,47 @@
+P64 AT24-SUPERVISED-BLACK-BOX · ⑦ 终审 · independent-reviewer + GPT-5.3-Codex · 只读 · 首轮不附任何清单（锚定硬隔离）
+
+FINAL REVIEW: PARTIAL
+
+A. 17 子腿逐项判定
+1 风险确认绑定：通过（M1 PASS=12 FAIL=0；探针 exit=1）
+2 投递≠完成：通过（M2 PASS=5 FAIL=0）
+3 显式归还+后置扫描：通过（主跑 PASS=17 FAIL=0；补跑 PASS=2 FAIL=0）
+4 独立 gates/review：通过（M4 PASS=26 FAIL=0；点名 5/5）
+5 七项 unknown 含 cost：通过（R1 后 only-cost/missing-network-access exit=1，full-seven exit=0）
+6 三句话硬性出现：通过（S1/S2/S3 total=2，摘要=1、§1=1、区段外=0）
+7 禁止自动降级：通过（M7 PASS=16 FAIL=0；点名 7/7）
+8 未知维度不显示为安全：通过（M8 PASS=2 FAIL=0；safe/verified 探针 exit=1；渲染 0/0）
+9.1 工具使用：不通过（PASS=3 SKIP=1 FAIL=0，未达设计阈值 PASS≥4）
+9.2 资源读取：通过（PASS=1 FAIL=0；ChangedPaths 恰 1 项）
+9.3 网络：通过（确认精确句 count=1；外部连接 0 条）
+9.4 费用：通过（cost 计数=1；assuranceLevel=reduced；缺 cost exit=1）
+9.5 后台进程：通过（RefusesLiveManagedProcess PASS=1；报告已明写「用户负责清理」）
+9.6 会话连续性：通过（PASS=4 FAIL=0）
+9.7 外部副作用：通过（确认精确句 count=1；TOP=2/SUB=5 FAIL=0）
+9.8 强制字段：通过（运行时路径；schema 层差异见 E）
+9.9 判定口径：通过（L09 文件数=9；本终审逐项独立 9 行判定）
+
+B. R-09.1~R-09.9 九项边界逐项判定（四要素）
+R-09.1 (c) 视情况：部分吻合（1 条关键反例环境 SKIP、阈值未达）⇒ 不通过
+R-09.2 (c)：吻合 ⇒ 通过
+R-09.3 (c)：吻合 ⇒ 通过
+R-09.4 (a)：吻合 ⇒ 通过
+R-09.5 (a)：吻合 ⇒ 通过
+R-09.6 (a)：吻合 ⇒ 通过
+R-09.7 (c)：吻合 ⇒ 通过
+R-09.8 (a) 七项全必填：部分吻合（Go/CLI 层吻合；schema 层未同步）⇒ 部分通过
+R-09.9 (b)：吻合 ⇒ 通过
+
+C. 三句话逐字核验：S1/S2/S3 分区计数 摘要=1、§1=1、区段外=0、total=2 ⇒ 逐字核验通过。
+
+D. AT-24 验收结论：部分通过
+理由：① 17 子腿 16 通过、1 不通过（9.1，symlink SKIP 阈值未达）；② R-09.8 运行时路径闭合、schema 层一致性残留；③ 本地独立复验 go test -count=1 ./internal/chain ./internal/console 均通过。
+
+E. 发现清单
+Critical：无
+Major：9.1 关键反例覆盖缺口（环境 SKIP 阈值未达）
+Major：R-09.8 schema/运行时一致性未闭合（schema 仍仅 minItems=1+contains(cost)）
+Minor：证据包草案态（⑤/⑥ 已实际执行未回写报告、06-gates 归档待补）
+Note：D-16 编号在不同文档含义不同，定稿统一
+
+F. 「不得作为先例」引用说明：本终审未把任何标注「不得作为先例」的条款作为通过或否决依据；判定仅基于本片证据、R-09 原文与 CONTRACTS 7.1。

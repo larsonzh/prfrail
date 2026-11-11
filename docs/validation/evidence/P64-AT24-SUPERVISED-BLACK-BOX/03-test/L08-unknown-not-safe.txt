@@ -1,0 +1,88 @@
+P64 AT24-SUPERVISED-BLACK-BOX · 腿 8 证据 · 未知维度不显示为安全（CONTRACTS §7.1(d)）
+=====================================================================
+执行角色：③ prfrail-tester（DeepSeek V4.1 Flash，runSubagent 显式传 model）
+执行时点：2026-11-11
+工作目录：D:\LZProjects\prfrail
+环境：Windows 本机；无 VM / 无代理 / 无外部调用；Go 1.22 工具链
+性质：机制腿（stub visible 投递 + 模拟人工归还 + 后置扫描），非真实 SessionBridge visible 端到端
+证据原始输出：tmp/P64-AT24-SUPERVISED-BLACK-BOX/raw/leg8-a-layer.txt、raw/leg8-render.txt（临时件，⑧c 清理）
+
+[0] 设计名 vs 实况名对照
+----------------
+  TestSupervisedReportRenderGolden                → internal/console/runtime_supervised_test.go:401 → 一致
+  TestSupervisedReportOmitsUnprovenReviewDimension → :436 → 一致（实况全名，设计简写 OmitsUnproven）
+结论：设计点名 2/2 实况命中。
+
+[1] A 层命令原文
+-----------
+go test -count=1 -run 'ReportRenderGolden|ReportOmitsUnproven' ./internal/console ./internal/chain -v
+
+原始输出摘录：
+  --- PASS: TestSupervisedReportRenderGolden (0.10s)
+  --- PASS: TestSupervisedReportOmitsUnprovenReviewDimension (0.10s)
+  PASS
+  ok      github.com/larsonzh/prfrail/internal/console    1.600s
+  PASS
+  ok      github.com/larsonzh/prfrail/internal/chain      1.071s [no tests to run]
+  GOTEST_EXIT=0
+
+机械计数：TOP_PASS=2  TOP_FAIL=0  SUBTEST_PASS=0  SUBTEST_FAIL=0
+
+语义（正例）：
+  RenderGolden 断言渲染含 "unknown: cost=unknown" 与 "assuranceLevel: reduced"，且
+  不含 "safe" / "verified" / "independent-review"（report 在 review 之前冻结）；
+  OmitsUnprovenReviewDimension 断言冻结报告不得声称 independent-review，同时 10 项写时维度
+  （workspace-isolation / manifest-before / manifest-after / diff / scope-scan / secret-scan /
+   file-type-scan / side-effect-scan / process-stop-proof / independent-gates）必须齐备。
+
+[2] 渲染输出机械计数（B 层）
+---------------------
+命令原文：
+  tmp\P64-AT24-SUPERVISED-BLACK-BOX\prfrail.exe supervised report --run-dir \
+    tmp\P64-AT24-SUPERVISED-BLACK-BOX\fixtures\runs\p5-full-seven
+
+计数（对渲染文本逐字符 grep）：
+  RENDER_EXIT=0
+  UNKNOWN_LINES=7          （^unknown: 行数 = 7 项 unknown 维度）
+  SAFE_COUNT=0             （"safe" 出现 0 次）
+  VERIFIED_COUNT=0         （"verified" 出现 0 次）
+  ASSURANCE_REDUCED=1      （"assuranceLevel: reduced" 出现 1 次）
+
+渲染原文（节选，raw/leg8-render.txt 全文）：
+  mode: supervised-black-box
+  assuranceLevel: reduced
+  proved: workspace-isolation
+  proved: manifest-before
+  proved: diff
+  proved: independent-gates
+  unknown: tool-use=unknown
+  unknown: resource-reads=unknown
+  unknown: network-access=unknown
+  unknown: cost=unknown
+  unknown: background-processes=unknown
+  unknown: session-continuity=unknown
+  unknown: external-side-effects=unknown
+⇒ 每个未知维度只显示 `unknown`；无 safe / 无 verified / 无数字承诺。
+
+[3] 反例（B 层：closed-set 之外的词）
+---------------------------
+命令同 [2]，换 --run-dir：
+  p8-safe-dimension       exit=1  stderr: "supervised report: invalid supervised report: unknown dimension \"safe\" is outside the closed set"
+  p8-verified-dimension   exit=1  stderr: "supervised report: invalid supervised report: unknown dimension \"verified\" is outside the closed set"
+⇒ 试图把未知维度改写成 safe / verified 的报告在 CLI 校验层即被拒，渲染不到终端。
+
+[4] 断言读数 M8
+--------
+  A 层 PASS=2 / FAIL=0                      → PASS（阈值 PASS>=2 / FAIL==0）
+  B 层 safe / verified 探针 exit=1（非零拒） → PASS（语义）；exit∉[10,20] → 同 L05 的 D-14
+  渲染 grep safe==0 且 verified==0           → PASS（0/0）
+
+[5] 说明
+-----
+D-17（渲染覆盖面）：渲染层只列 unknown/proved 两类标签，不输出任何「安全性」形容词，
+     词表封闭来自 internal/chain/supervised_report.go 的 verified/unknown 两个闭合集
+     + ValidateSupervisedReport 的 closed-set 校验（同 L05 [4] 旁证）。
+     本腿不覆盖「JSON --json 输出是否含 safe/verified」以外的自由文本；--json 输出为结构体
+     直出，字段名固定，无自由文本。
+
+LEG 8: PASS（M8 PASS=2/FAIL=0；B 层 safe/verified 均 exit=1 拒；渲染 grep 0/0）

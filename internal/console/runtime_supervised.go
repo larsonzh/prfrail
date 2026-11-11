@@ -131,8 +131,9 @@ const (
 // (supervisedUnknownDimensionSet); the two copies must stay equal and must be
 // re-evaluated together. The copy exists because the console must build a
 // report without exporting the chain's unexported set; ValidateSupervisedReport
-// still refuses anything outside the chain's own set, so a drift can only ever
-// fail closed.
+// still refuses anything outside the chain's own set and refuses a set that
+// drops any of the seven required dimensions, so a drift can only ever fail
+// closed.
 //
 // supervisedVerifiedDimensions is deliberately NOT the chain's full closed set:
 // it is the subset proven at the moment the report is frozen. The report is
@@ -1803,7 +1804,16 @@ func (runtime *supervisedRuntime) loadReceipt(state *supervisedTaskState) (chain
 func (runtime *supervisedRuntime) loadReport(state *supervisedTaskState) (chain.SupervisedReportRecord, bool, error) {
 	var report chain.SupervisedReportRecord
 	found, err := readSupervisedJSON(runtime.reportPath(state), &report)
-	return report, found, err
+	if err != nil || !found {
+		return report, found, err
+	}
+	// A persisted report feeds the frozen ReportHash fact, so it is validated as
+	// a whole here: a body that silently drops a required unknown dimension must
+	// never be reconciled as consistent (ruling R-09.8).
+	if err := chain.ValidateSupervisedReport(report); err != nil {
+		return chain.SupervisedReportRecord{}, false, err
+	}
+	return report, true, nil
 }
 
 func (runtime *supervisedRuntime) loadBeforeManifest(state *supervisedTaskState) (snapshot.SnapshotManifest, bool, error) {

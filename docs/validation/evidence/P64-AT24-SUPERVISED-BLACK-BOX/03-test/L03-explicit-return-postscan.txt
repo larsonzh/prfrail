@@ -1,0 +1,105 @@
+P64 AT24-SUPERVISED-BLACK-BOX · 腿 3 证据 · 显式归还 + 后置全量扫描（R-09.1/9.2 + CONTRACTS §7.1(b)）
+=====================================================================
+执行角色：③ prfrail-tester（DeepSeek V4.1 Flash，runSubagent 显式传 model）
+执行时点：2026-11-11
+工作目录：D:\LZProjects\prfrail
+环境：Windows 本机；无 VM / 无代理 / 无外部调用；Go 1.22 工具链
+性质：机制腿（stub visible 投递 + 模拟人工归还 + 后置扫描），非真实 SessionBridge visible 端到端
+证据原始输出：tmp/P64-AT24-SUPERVISED-BLACK-BOX/raw/（临时件，⑧c 清理；本文件为正式归档摘录）
+
+[0] 设计名 vs 实况名对照
+----------------
+正例：TestSubmitSupervisedReturnCompleteFlow / TestSupervisedAssemblyFullChain /
+      TestSupervisedAssemblyFullChainExtendedScans ⇒ 实况三者均存在，一致。
+反例：TestSubmitSupervisedReturnRejectsAbortReceipt / TestSupervisedReturnRefusesSecretFinding /
+      TestSupervisedReturnRefusesOutOfScopeChange / TestSupervisedReturnRefusesSideEffect /
+      TestSupervisedSideEffectScanBlocksTamperedManifests / TestSupervisedFileTypeScanRejectsUnacceptedType /
+      TestSupervisedReturnRefusesLiveManagedProcess / TestSupervisedReturnRefusesFailedGate /
+      TestSupervisedReturnRefusesTimeout / TestSupervisedReturnEnforcesFrozenPolicy /
+      TestSupervisedReturnRefusesDriftedPolicy ⇒ 实况 11/11 存在，一致。
+补充实测（设计反例清单未列、但 M3 正则带入）：TestSubmitSupervisedReturnIdempotentReplay /
+      TestSubmitSupervisedReturnRejectsFactCollisions / TestSubmitSupervisedReturnRejectsDeliveryOnlyEvidence /
+      TestSubmitSupervisedReturnRejectsReceiptNotBoundToFacts。
+结论：设计引用名 14/14 实况命中，无杜撰、无替换。
+
+[1] A 层命令原文
+-----------
+主跑（M3 的 <p3>）：
+go test -count=1 -run 'SubmitSupervisedReturn|SupervisedReturnRefuses|SideEffectScanBlocks|FileTypeScanRejects|FullChain' ./internal/chain ./internal/console ./internal/adapters -v
+
+补跑（设计清单中不被 <p3> 正则覆盖的冻结策略两项）：
+go test -count=1 -run 'SupervisedReturnEnforcesFrozenPolicy|SupervisedFrozenPolicySnapshotIsCanonical' ./internal/chain ./internal/console ./internal/adapters -v
+
+[2] 原始输出关键摘录（主跑）
+----------------
+--- PASS: TestSubmitSupervisedReturnCompleteFlow (0.00s)
+--- PASS: TestSubmitSupervisedReturnIdempotentReplay (0.00s)
+--- PASS: TestSubmitSupervisedReturnRejectsAbortReceipt (0.00s)
+--- PASS: TestSubmitSupervisedReturnRejectsFactCollisions (0.00s)
+--- PASS: TestSubmitSupervisedReturnRejectsDeliveryOnlyEvidence (0.00s)
+--- PASS: TestSubmitSupervisedReturnRejectsReceiptNotBoundToFacts (0.00s)
+--- PASS: TestSupervisedAssemblyFullChain (0.13s)
+--- PASS: TestSupervisedReturnRefusesFailedGate (0.09s)
+--- PASS: TestSupervisedReturnRefusesTimeout (0.09s)
+--- PASS: TestSupervisedReturnRefusesDriftedPolicy (0.23s)
+--- PASS: TestSupervisedReturnRefusesSecretFinding (0.09s)
+--- PASS: TestSupervisedReturnRefusesOutOfScopeChange (0.09s)
+--- PASS: TestSupervisedReturnRefusesSideEffect (0.09s)
+--- PASS: TestSupervisedSideEffectScanBlocksTamperedManifests (0.02s)
+--- PASS: TestSupervisedFileTypeScanRejectsUnacceptedType (0.00s)
+--- PASS: TestSupervisedReturnRefusesLiveManagedProcess (0.08s)
+--- PASS: TestSupervisedAssemblyFullChainExtendedScans (0.12s)
+ok  	github.com/larsonzh/prfrail/internal/chain	1.351s
+ok  	github.com/larsonzh/prfrail/internal/console	2.663s
+ok  	github.com/larsonzh/prfrail/internal/adapters	2.369s [no tests to run]
+GOTEST_EXIT=0
+
+[2b] 原始输出关键摘录（补跑）
+-----------------
+--- PASS: TestSupervisedReturnEnforcesFrozenPolicy (0.10s)
+--- PASS: TestSupervisedFrozenPolicySnapshotIsCanonical (0.01s)
+ok  	github.com/larsonzh/prfrail/internal/chain	1.175s [no tests to run]
+ok  	github.com/larsonzh/prfrail/internal/console	2.202s
+ok  	github.com/larsonzh/prfrail/internal/adapters	1.535s [no tests to run]
+GOTEST_EXIT=0
+
+[3] 正例组结果
+---------
+PASS  TestSubmitSupervisedReturnCompleteFlow            （显式归还 complete 全流程，handoff-receipt{outcome=complete}）
+PASS  TestSupervisedAssemblyFullChain                   （全链：归还后 manifest/diff + 独立 gates/review）
+PASS  TestSupervisedAssemblyFullChainExtendedScans      （全链 + 扩展扫描集合）
+PASS  TestSubmitSupervisedReturnIdempotentReplay        （M3 正则带入：归还幂等重放）
+
+[4] 反例组结果
+---------
+PASS  TestSubmitSupervisedReturnRejectsAbortReceipt        （abort 回执 ≠ complete ⇒ 拒）
+PASS  TestSubmitSupervisedReturnRejectsFactCollisions      （事实冲突 ⇒ 拒）
+PASS  TestSupervisedReturnRefusesSecretFinding             （秘密扫描命中 ⇒ 阻断）
+PASS  TestSupervisedReturnRefusesOutOfScopeChange          （范围扫描越界 ⇒ 阻断）
+PASS  TestSupervisedReturnRefusesSideEffect                （副作用扫描命中 ⇒ 阻断）
+PASS  TestSupervisedSideEffectScanBlocksTamperedManifests  （被篡改 manifest ⇒ 副作用扫描阻断）
+PASS  TestSupervisedFileTypeScanRejectsUnacceptedType      （文件类型不在接受集 ⇒ 阻断）
+PASS  TestSupervisedReturnRefusesLiveManagedProcess        （受管进程仍存活 ⇒ 阻断）
+PASS  TestSupervisedReturnRefusesFailedGate                （后置 gate 失败 ⇒ 阻断）
+PASS  TestSupervisedReturnRefusesTimeout                   （冻结窗口超时 ⇒ 仅允许 abort）
+PASS  TestSupervisedReturnRefusesDriftedPolicy             （归还期策略漂移 ⇒ 阻断）
+PASS  TestSupervisedReturnEnforcesFrozenPolicy             （补跑：归还期强制冻结策略）
+PASS  TestSupervisedFrozenPolicySnapshotIsCanonical        （补跑：冻结策略快照规范化）
+结论：反例组 13/13 PASS，扫描族（范围/秘密/文件类型/副作用/进程/gates/超时/漂移）逐项有阻断断言。
+
+[5] 断言读数
+--------
+M3（主跑）：PASS=17，FAIL=0 ⇒ 阈值 PASS>=13 / FAIL==0 ⇒ PASS
+M3 补跑：PASS=2，FAIL=0（设计清单覆盖补齐）
+合计覆盖设计清单 14/14 + M3 带入 4 项。
+
+[6] 偏差与说明
+---------
+D-8（M3 正则宽度）：<p3> 带入 6 个 SubmitSupervisedReturn 族测试（含幂等/事实冲突/仅投递/未绑事实），
+    实况 17 项全 PASS；设计清单 11 项反例 + 3 项正例 全部在实况中命中。
+D-9（设计反例清单外补跑）：TestSupervisedReturnEnforcesFrozenPolicy 与
+    TestSupervisedFrozenPolicySnapshotIsCanonical 不匹配 <p3> 正则，故单列补跑，避免覆盖缺口。
+D-10（范围扫描为近似）：TestSupervisedReturnRefusesOutOfScopeChange 的通过不等于 glob 级授权比对；
+    T028 §8 (c) 已登记「AllowedTargets glob 表不在链定义/控制台配置内」为已知边界，本片不改变该结论。
+
+LEG 3: PASS（M3 PASS=17/FAIL=0 + 补跑 2/2；扫描族逐项阻断断言齐备）

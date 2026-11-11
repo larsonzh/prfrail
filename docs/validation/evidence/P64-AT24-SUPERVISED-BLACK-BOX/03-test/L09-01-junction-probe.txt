@@ -1,0 +1,14 @@
+P64 AT24-SUPERVISED-BLACK-BOX · 裁决② Major B 前置判断：junction 等价性探针（2026-11-11）
+
+1. 查阅对象：TestSupervisedScopeAllowsRejectsLinkResolvingOutsideRoot（internal/console/runtime_supervised_test.go:1000）——root 内符号链接 escape.txt 指向 root 外文件，scope.allows("escape.txt") 须报 ErrSupervisedScopeOutOfBounds；本机因无符号链接特权 SKIP。
+2. 等价性分析：scope.allows（internal/console/runtime_supervised.go:1281）以 filepath.EvalSymlinks 解析链接后判 Rel 是否越界；junction（目录联接）同为 reparse point，EvalSymlinks 在 Windows 上可解析 ⇒ 等价形态 = root 内 junction 指向 root 外目录。
+3. 探针实现：临时测试 TestJunctionProbeLinkResolvingOutsideRoot（mklink /J 无特权创建）：
+   - 反例：escape-dir（junction → outside）⇒ scope.allows("escape-dir") 期望 ErrSupervisedScopeOutOfBounds
+   - 正例：in-link（junction → root 内 inner）⇒ scope.allows("in-link") 须通过
+4. 探针结果：go test -count=1 -run TestJunctionProbeLinkResolvingOutsideRoot ./internal/console -v
+   === RUN   TestJunctionProbeLinkResolvingOutsideRoot
+   --- PASS: TestJunctionProbeLinkResolvingOutsideRoot (0.18s)
+   PASS
+   ok github.com/larsonzh/prfrail/internal/console 1.351s（PROBE_EXIT=0）
+5. 判定：junction 等价覆盖成立（越界 junction 被同一 OutOfBounds 哨兵阻断、根内 junction 放行）⇒ 按裁决②分支 A 转正式测试。
+6. 正式化：探针更名为 TestSupervisedScopeAllowsRejectsJunctionResolvingOutsideRoot（保留双例），gofmt -w 后 BOM=false、CR=0。

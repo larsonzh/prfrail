@@ -1,0 +1,68 @@
+P64 AT24-SUPERVISED-BLACK-BOX · 腿 9.7 证据 · 外部副作用 unknown 底线（R-09.7 · 裁定值 (c) 视情况）
+=====================================================================
+执行角色：③ prfrail-tester（DeepSeek V4.1 Flash，runSubagent 显式传 model）
+执行时点：2026-11-11（批次 3/3）
+证据原始输出：tmp/P64-AT24-SUPERVISED-BLACK-BOX/raw/leg9-7.txt、leg9-3-9-7-grep.txt（临时件，⑧c 清理）
+
+[1] 用户确认件精确句计数（M9-7 前半）
+--------------------------
+命令原文（node 逐字节读取）：
+  文件：docs/validation/evidence/P64-AT24-SUPERVISED-BLACK-BOX/01-arch/r09-7-user-confirmation.md
+  精确句：「已接受未知外部副作用。」
+
+原始读数字面（控制台 cp936 回显乱码，数字准确；raw/leg9-3-9-7-grep.txt）：
+  r09-7-user-confirmation.md :: "已接受未知外部副作用。" => count=1
+  （对照子串计数：「已接受未知外部副作用」=> count=4；仅 1 处以句号结尾，即「确认原文」行
+    ⇒ 精确句唯一且位于用户确认原文处）
+
+补充：本件首段落盘为「未确认」（起跑时用户不在线），次段为 ③ 执行前的「补录确认」
+      （确认原文：已接受未知外部副作用。裁决人=用户）。补录时点在 ③ 执行之前，满足 R-09.7
+      「用户显式确认则接受；没有确认则阻断」的实质要求；确认在案 ⇒ 不触发阻断分支。
+
+[2] 副作用扫描执法（M9-7 后半）
+--------------------
+go test -count=1 -run 'RefusesSideEffect|SideEffectScanBlocks' ./internal/chain ./internal/console -v
+
+  testing: warning: no tests to run
+  PASS
+  ok      github.com/larsonzh/prfrail/internal/chain      1.079s [no tests to run]
+  === RUN   TestSupervisedReturnRefusesSideEffect
+  --- PASS: TestSupervisedReturnRefusesSideEffect (0.07s)
+  === RUN   TestSupervisedSideEffectScanBlocksTamperedManifests
+  === RUN   TestSupervisedSideEffectScanBlocksTamperedManifests/positive_control:_unmodified_pair_passes
+  === RUN   TestSupervisedSideEffectScanBlocksTamperedManifests/type_change
+  === RUN   TestSupervisedSideEffectScanBlocksTamperedManifests/permission_change
+  === RUN   TestSupervisedSideEffectScanBlocksTamperedManifests/absolute_link_target
+  === RUN   TestSupervisedSideEffectScanBlocksTamperedManifests/relative_link_escaping_the_workspace_root
+  --- PASS: TestSupervisedSideEffectScanBlocksTamperedManifests (0.01s)
+      --- PASS: .../positive_control:_unmodified_pair_passes (0.00s)
+      --- PASS: .../type_change (0.00s)
+      --- PASS: .../permission_change (0.00s)
+      --- PASS: .../absolute_link_target (0.00s)
+      --- PASS: .../relative_link_escaping_the_workspace_root (0.00s)
+  PASS
+  ok      github.com/larsonzh/prfrail/internal/console    1.394s
+  GOTEST_EXIT=0
+
+机械计数：TOP_PASS=2  SUBTEST_PASS=5  TOP_FAIL=0  SUBTEST_FAIL=0
+
+语义：
+  - RefusesSideEffect（runtime_supervised_test.go:1024）：扫描发现副作用 ⇒ 归还被拒。
+  - SideEffectScanBlocksTamperedManifests（:1062）：对前后 manifest 对被篡改的五种形态
+    （正面对照 / 类型变更 / 权限变更 / 绝对链接目标 / 相对链接逃逸 workspace 根）逐一断言阻断。
+  ⇒ 「未知外部副作用」不因用户确认而免检：用户确认的是「未知部分」，已知可观测的副作用仍被扫描硬拦。
+
+[3] 正例 / 反例
+---------
+正例：合法改动（正面对照 unmodified pair）⇒ 扫描通过（SUBTEST PASS）。
+反例：五类篡改 / 副作用痕迹 ⇒ 阻断（5/5 子断言 PASS）。
+底线层：用户确认句在案（count==1）⇒ 未知部分按 R-09.7 接受。
+
+[4] 断言读数 M9-7
+-----------
+  确认件 grep -c 精确句 == 1                  → 实测 1        → 命中
+  <p9-7>=RefusesSideEffect|SideEffectScanBlocks PASS≥2 → 实测 2 → 命中
+  FAIL==0                                      → 实测 0        → 命中
+  判定：**命中**
+
+LEG 9.7: DONE

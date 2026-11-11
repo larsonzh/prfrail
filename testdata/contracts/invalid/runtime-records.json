@@ -648,5 +648,43 @@
       },
       "recordHash": "sha256:8888888888888888888888888888888888888888888888888888888888888888"
     }
+  },
+  {
+    "fixtureId": "supervised-report-unknown-dimensions-missing-network-access",
+    "schema": "supervised-report.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "All seven unknown dimensions must be listed; a six-item set missing network-access is rejected",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "record": {
+        "kind": "supervised-report",
+        "reportId": "supervised-report-one",
+        "recordedAt": "2026-09-07T12:30:00.000Z",
+        "recordedBy": {
+          "type": "system",
+          "id": "proofrail"
+        },
+        "runId": "run-one",
+        "taskId": "task-one",
+        "stepId": "step-one",
+        "attempt": 1,
+        "mode": "supervised-black-box",
+        "assuranceLevel": "reduced",
+        "verifiedDimensions": ["diff"],
+        "unknownDimensions": [
+          "tool-use",
+          "resource-reads",
+          "cost",
+          "background-processes",
+          "session-continuity",
+          "external-side-effects"
+        ],
+        "evidence": [
+          "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+        ]
+      },
+      "recordHash": "sha256:8888888888888888888888888888888888888888888888888888888888888888"
+    }
   }
 ]

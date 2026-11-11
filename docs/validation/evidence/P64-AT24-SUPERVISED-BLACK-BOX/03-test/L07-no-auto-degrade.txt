@@ -1,0 +1,94 @@
+P64 AT24-SUPERVISED-BLACK-BOX · 腿 7 证据 · 禁止自动降级（R-09 + CONTRACTS §7 四条禁止①）
+=====================================================================
+执行角色：③ prfrail-tester（DeepSeek V4.1 Flash，runSubagent 显式传 model）
+执行时点：2026-11-11
+工作目录：D:\LZProjects\prfrail
+环境：Windows 本机；无 VM / 无代理 / 无外部调用；Go 1.22 工具链
+性质：机制腿（stub visible 投递 + 模拟人工归还 + 后置扫描），非真实 SessionBridge visible 端到端
+证据原始输出：tmp/P64-AT24-SUPERVISED-BLACK-BOX/raw/leg7-a-layer.txt（临时件，⑧c 清理）
+
+[0] 设计名 vs 实况名对照
+----------------
+  TestRunCommandRefusesMixedSupervisedAgentRunnerInputs   → internal/console/runtime_supervised_test.go:869
+  TestAgentRunnerAssemblyRefusesSupervisedDefinition      → :882
+  TestSupervisedAssemblyRefusesAgentRunnerDefinition      → :901
+  TestNoSupervisedReferencesInAgentRunnerPaths            → :1381
+  TestSupervisedPathNeverRoutesThroughAgentRunner         → :1422
+  TestSupervisedStepRejectsAgentRunnerExecutionTarget     → internal/chain/supervised_blackbox_test.go:741
+  TestRouterRefusesSupervisedWithoutPort                  → internal/chain/supervised_blackbox_test.go:827
+结论：设计点名 7/7 实况命中，无杜撰、无替换。
+
+[1] A 层命令原文
+-----------
+go test -count=1 -run 'RunCommandRefusesMixed|AssemblyRefuses|NoSupervisedReferencesInAgentRunnerPaths|SupervisedPathNeverRoutes|SupervisedStepRejectsAgentRunner|RouterRefusesSupervised' ./internal/chain ./internal/console ./internal/adapters -v
+
+（M7 的 <p7> 即上式 -run 参数）
+
+[2] 原始输出关键摘录
+----------------
+  --- PASS: TestAgentRunnerAssemblyRefusesOnUnprovenDurability (0.10s)
+  --- PASS: TestAgentRunnerAssemblyRefusesOnUncompensatedCapability (0.07s)
+  --- PASS: TestAgentRunnerAssemblyRefusesOnPlatformMismatch (0.07s)
+  --- PASS: TestAgentRunnerAssemblyRefusesOnStaleEnforcement (0.07s)
+  --- PASS: TestAgentRunnerAssemblyRefusesOnUnavailableChannel (0.07s)
+  --- PASS: TestAgentRunnerAssemblyRefusesOnWorkspaceReplayOverlap (0.05s)
+  --- PASS: TestAgentRunnerAssemblyRefusesOnIncompleteRecords (0.02s)
+  --- PASS: TestAgentRunnerAssemblyRefusesPublishWithoutPIDReport (0.38s)   [8 子测试全 PASS]
+  --- PASS: TestAgentRunnerAssemblyRefusesNonInitialAttempt (0.02s)
+  --- PASS: TestRunCommandRefusesMixedSupervisedAgentRunnerInputs (0.01s)
+  --- PASS: TestAgentRunnerAssemblyRefusesSupervisedDefinition (0.00s)
+  --- PASS: TestSupervisedAssemblyRefusesAgentRunnerDefinition (0.00s)
+  --- PASS: TestNoSupervisedReferencesInAgentRunnerPaths (0.02s)
+  --- PASS: TestSupervisedPathNeverRoutesThroughAgentRunner (0.14s)
+  PASS
+  ok      github.com/larsonzh/prfrail/internal/console    2.409s
+  --- PASS: TestSupervisedStepRejectsAgentRunnerExecutionTarget (0.00s)
+  --- PASS: TestRouterRefusesSupervisedWithoutPort (0.00s)
+  PASS
+  ok      github.com/larsonzh/prfrail/internal/chain      1.099s
+  PASS
+  ok      github.com/larsonzh/prfrail/internal/adapters   2.182s [no tests to run]
+  GOTEST_EXIT=0
+
+机械计数：TOP_PASS=16  TOP_FAIL=0  SUBTEST_PASS=8  SUBTEST_FAIL=0
+
+[3] 反例逐项（设计点名的 7 项，全部为拒绝型断言）
+---------------------------------
+  PASS  TestRunCommandRefusesMixedSupervisedAgentRunnerInputs
+        ⇒ 同一 run 请求混用 supervised 定义与 AgentRunner 输入 ⇒ 命令层直接拒（不择路、不降级）
+  PASS  TestAgentRunnerAssemblyRefusesSupervisedDefinition
+        ⇒ AgentRunner 装配收到 supervised 定义 ⇒ 拒（不把黑箱定义塞进 AgentRunner 通道）
+  PASS  TestSupervisedAssemblyRefusesAgentRunnerDefinition
+        ⇒ supervised 装配收到 AgentRunner 定义 ⇒ 拒（不把 AgentRunner 定义降级为黑箱）
+  PASS  TestNoSupervisedReferencesInAgentRunnerPaths
+        ⇒ AgentRunner 代码路径内不出现任何 supervised 引用（静态边证明：无暗门跳转）
+  PASS  TestSupervisedPathNeverRoutesThroughAgentRunner
+        ⇒ supervised 路径永不经过 AgentRunner 路由（「AgentRunner 失败 ⇒ 自动切黑箱」结构性不可能）
+  PASS  TestSupervisedStepRejectsAgentRunnerExecutionTarget
+        ⇒ supervised 步骤拒绝把 AgentRunner 作为执行目标
+  PASS  TestRouterRefusesSupervisedWithoutPort
+        ⇒ 无 supervised 端口的路由直接拒，不回落其它执行器
+
+[4] 正例方向（各测试的非拒绝分支）
+-------------------------
+  同上 7 项测试内部均以「合法 supervised 定义 / 合法 AgentRunner 定义」为对照分支，
+  证明拒绝是针对「错配」而非「一律拒绝」；此外 TestSupervisedAssemblyFullChain 等
+  全链正例在批次 1（L01/L03/L04）已 PASS，本腿不重复计量。
+
+[5] 断言读数 M7
+--------
+  PASS=16，FAIL=0 ⇒ 阈值 PASS>=7 / FAIL==0 ⇒ PASS
+  其中设计点名 7 项 PASS=7/7；其余 9 项为 <p7> 中 "AssemblyRefuses" 宽匹配带入的
+  AgentRunner 装配回归反例（同样全部 PASS），见 D-15。
+
+[6] 偏差与说明
+---------
+D-15（M7 正则宽度，非阻断）：<p7> 的 "AssemblyRefuses" 为宽匹配，带入 9 项非本腿点名的
+     AgentRunner 装配反例，使 PASS 由 7 抬升到 16。阈值仍满足，但读数不可读作「禁止自动降级有 16 条覆盖」；
+     设计点名 7 项逐项 PASS 才是本腿有效读数（与 L04 的 D-11 同形态）。
+D-16（可证伪性说明）：本腿反例均为「结构性拒绝」断言（混用/错配/路由缺失 ⇒ 立即拒），
+     若实现被改回「自动降级」，TestNoSupervisedReferencesInAgentRunnerPaths 与
+     TestSupervisedPathNeverRoutesThroughAgentRunner 会先变红 —— 满足「删掉守卫 ⇒ 变红」。
+     现场变异（改码）本片禁止，未执行。
+
+LEG 7: PASS（M7 PASS=16/FAIL=0，其中设计点名 7/7 PASS；D-15 正则宽度已登记）

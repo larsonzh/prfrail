@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://proofrail.dev/schemas/v1/supervised-report.schema.json",
   "title": "ProofRail supervised-black-box reduced/unknown report",
-  "description": "Factual record of what a supervised-black-box run can and cannot prove (contracts section 7.1d). assuranceLevel is permanently reduced and unknownDimensions is non-empty and must contain cost, so an unknown dimension can never be rendered as safe. The canonical record hash domain separator lives in the hash layer, not here.",
+  "description": "Factual record of what a supervised-black-box run can and cannot prove (contracts section 7.1d). assuranceLevel is permanently reduced and unknownDimensions is non-empty and must contain cost; all seven unknown dimensions must be listed (tool-use, resource-reads, network-access, cost, background-processes, session-continuity, external-side-effects) with no missing, duplicate, or unlisted entry, so an unknown dimension can never be rendered as safe. The canonical record hash domain separator lives in the hash layer, not here.",
   "type": "object",
   "additionalProperties": false,
   "required": ["schemaVersion", "record", "recordHash"],
@@ -141,15 +141,21 @@
         },
         "unknownDimensions": {
           "type": "array",
-          "minItems": 1,
+          "minItems": 7,
+          "maxItems": 7,
           "uniqueItems": true,
           "items": {
             "$ref": "#/$defs/unknownDimension"
           },
-          "contains": {
-            "const": "cost"
-          },
-          "minContains": 1
+          "allOf": [
+            { "contains": { "const": "tool-use" }, "minContains": 1 },
+            { "contains": { "const": "resource-reads" }, "minContains": 1 },
+            { "contains": { "const": "network-access" }, "minContains": 1 },
+            { "contains": { "const": "cost" }, "minContains": 1 },
+            { "contains": { "const": "background-processes" }, "minContains": 1 },
+            { "contains": { "const": "session-continuity" }, "minContains": 1 },
+            { "contains": { "const": "external-side-effects" }, "minContains": 1 }
+          ]
         },
         "evidence": {
           "$ref": "#/$defs/nonemptyHashSet"

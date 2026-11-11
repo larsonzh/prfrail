@@ -1,0 +1,59 @@
+P64 AT24-SUPERVISED-BLACK-BOX · 腿 6 证据 · 三句话硬性出现（R-09 §5.3）
+=====================================================================
+执行角色：③ prfrail-tester（DeepSeek V4.1 Flash，runSubagent 显式传 model）
+执行时点：2026-11-11
+工作目录：D:\LZProjects\prfrail
+性质：位置与计数安排腿。本阶段报告（at24-supervised-black-box{,_EN}.md）尚未装配，
+      故【本文件只登记位置、逐字原文与计数口径，不做计数断言，不虚报】；机械计数在 ⑨ 执行。
+
+[0] 逐字原文来源（机械提取，非人工转录）
+-------------------------------
+来源文件：docs/validation/evidence/P64-AT24-SUPERVISED-BLACK-BOX/00-briefing.md（起跑消息逐字落盘件）
+提取脚本：tmp/P64-AT24-SUPERVISED-BLACK-BOX/gen-l06-evidence.js（读取 00-briefing.md，按锚点各命中 1 行，取「…」本体）
+锚点：①/本报告的保证级别是　②/七项 unknown 维度的接受边界为　③/本报告不构成对黑箱
+
+[1] 三句精确串（逐字，计数以本串为准）
+--------------------------
+S1（00-briefing.md 第 140 行，UTF-8 62 字节）
+「本报告的保证级别是 `reduced`，不是 `full`。」
+
+S2（00-briefing.md 第 141 行，UTF-8 286 字节）
+「七项 unknown 维度的接受边界为：工具使用/资源读取 = 视情况（扫描能证无越界则接受）；后台进程/会话连续性 = 可接受；网络 = 回环可接受、公网阻断；费用 = 显式标 unknown；外部副作用 = 用户已显式确认接受。」
+
+S3（00-briefing.md 第 142 行，UTF-8 146 字节）
+「本报告不构成对黑箱 Agent 过程正确性的保证；ProofRail 只保证归还后的产物扫描、独立门禁、证据和评审。」
+
+计数口径（供 ⑨ 机械执行）：
+  - 精确串 = 上列 S1/S2/S3 全文（含中文引号「」，含 S1 内的反引号 \`reduced\` / \`full\`，含 S2 内半角空格）；
+  - 大小写、全半角、标点一律不放宽；不得用摘要变体或改写版计数。
+
+[2] 位置安排（每句必须出现 2 次：§1 一次 + 执行摘要一次；其余区段 0 次）
+---------------------------------------------
+  位置 A：docs/validation/at24-supervised-black-box.md 的 §1（执行摘要之前的正文章节）
+  位置 B：同文件「执行摘要」区段
+  位置 C：全文其余任何区段 —— 必须 0 次（防止散落/重复声明）
+  期望读数：每句 count_total=2、count_section1=1、count_summary=1、count_outside=0
+
+  逐字核验责任人（非 ③ 自证）：
+    ⑧a 文档装配 —— 按本文件 [1] 的精确串写入 §1 与执行摘要各一次；
+    ⑤ 预审     —— 逐环逐字核验（核验回执指针写入 04-reviews/）
+    ⑥ 独立扫描 —— 逐字核验（回执指针写入 04-reviews/）
+    ⑦ 终审     —— 逐字核验 + 独立复核（回执指针写入 04-reviews/）
+    ④ / ⑨      —— 只做机械精确串计数（不做语义判断）
+
+[3] 当前状态（如实登记）
+------------------
+  报告文件尚不存在 ⇒ 三句计数 = PENDING，未执行、未声称通过。
+  ⑨ 执行时的机械计数命令（任选其一，需保留原始输出）：
+    Select-String -Path docs\validation\at24-supervised-black-box.md -SimpleMatch -AllMatches -Pattern '<S1 全文>'
+    node -e "const fs=require('fs');const t=fs.readFileSync('docs/validation/at24-supervised-black-box.md','utf8');console.log((t.split(process.argv[1]).length-1))" '<S1 全文>'
+  EN 镜像（at24-supervised-black-box_EN.md）承载英译，不参与中文精确串计数；
+  CN/EN 双语镜像同位比对属 ② 批量辅助另一路（GLM），与本腿口径不混用。
+
+[4] 可证伪性
+--------
+  反例：任何改写/摘要/换引号/换标点的变体 ⇒ 精确串计数 0 ⇒ 本腿 FAIL（可机械判定，无解释空间）。
+  正例：§1 与执行摘要各 1 次、区段外 0 次 ⇒ count_total=2 且分区读数命中。
+  本腿在 ⑨ 之前不得登记为 PASS（只登记安排）。
+
+LEG 6: PENDING-COUNT（位置与逐字原文已登记；计数在 ⑨ 执行，未虚报）

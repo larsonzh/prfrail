@@ -3,6 +3,7 @@ package chain
 import (
 	"fmt"
 	"slices"
+	"strings"
 
 	"github.com/larsonzh/prfrail/internal/evidence"
 )
@@ -10,9 +11,11 @@ import (
 // The reduced/unknown report is the factual record of what a supervised
 // black-box run can and cannot prove (contracts section 7.1d). The assurance
 // level is permanently "reduced": it is the ceiling of the mode, never a
-// degraded state. The unknown dimension set is non-empty, always contains
-// "cost", and every member comes from the frozen closed set, so an unknown
-// dimension can never be rendered as safe.
+// degraded state. The unknown dimension set must carry every member of the
+// frozen closed set (tool usage, resource reads, network access, cost,
+// background processes, session continuity and external side effects, ruling
+// R-09.8), so no unobservable dimension can be dropped from the record and no
+// unknown dimension can ever be rendered as safe.
 const (
 	supervisedReportDomain     = "proofrail:supervised-report:1\n"
 	supervisedReportKind       = "supervised-report"
@@ -89,9 +92,10 @@ type SupervisedReportInput struct {
 }
 
 // NewSupervisedReport builds and validates a report. The assurance level is
-// always the reduced constant, and the unknown dimension set always contains
-// "cost": a caller can list fewer unobservable dimensions, never fewer than the
-// mode demands, and can never raise the level.
+// always the reduced constant and can never be raised. An empty unknown
+// dimension set falls back to the full closed set; a caller-supplied set must
+// carry all seven required dimensions, so a partial set is refused instead of
+// being silently completed.
 func NewSupervisedReport(input SupervisedReportInput, clock Clock, ids IDSource) (SupervisedReportRecord, error) {
 	if clock == nil {
 		clock = defaultClock
@@ -102,9 +106,6 @@ func NewSupervisedReport(input SupervisedReportInput, clock Clock, ids IDSource)
 	unknown := cloneStrings(input.UnknownDimensions)
 	if len(unknown) == 0 {
 		unknown = cloneStrings(supervisedUnknownDimensionSet)
-	}
-	if !slices.Contains(unknown, supervisedUnknownCost) {
-		unknown = append(unknown, supervisedUnknownCost)
 	}
 	body := SupervisedReport{
 		Kind:               supervisedReportKind,
@@ -151,8 +152,9 @@ func DecodeSupervisedReport(input []byte) (SupervisedReportRecord, error) {
 }
 
 // ValidateSupervisedReport checks the envelope and the body, and recomputes the
-// canonical record hash. A report that claims full assurance, omits "cost", or
-// lists a dimension outside the closed set is refused.
+// canonical record hash. A report that claims full assurance, omits any of the
+// seven required unknown dimensions, or lists a dimension outside the closed
+// set is refused.
 func ValidateSupervisedReport(record SupervisedReportRecord) error {
 	if record.SchemaVersion != supervisedReportSchema || !evidence.ValidHash(record.RecordHash) {
 		return fmt.Errorf("%w: schema version or record hash", ErrInvalidSupervisedReport)
@@ -186,8 +188,11 @@ func validateSupervisedReportBody(body SupervisedReport) error {
 	if body.AssuranceLevel != supervisedAssuranceReduced {
 		return fmt.Errorf("%w: assurance level is permanently reduced", ErrInvalidSupervisedReport)
 	}
-	if len(body.UnknownDimensions) == 0 || !slices.Contains(body.UnknownDimensions, supervisedUnknownCost) {
-		return fmt.Errorf("%w: unknown dimensions must be non-empty and carry cost", ErrInvalidSupervisedReport)
+	if len(body.UnknownDimensions) == 0 {
+		return fmt.Errorf("%w: unknown dimensions must be non-empty", ErrInvalidSupervisedReport)
+	}
+	if !slices.Contains(body.UnknownDimensions, supervisedUnknownCost) {
+		return fmt.Errorf("%w: unknown dimensions must carry cost", ErrInvalidSupervisedReport)
 	}
 	for _, dimension := range body.UnknownDimensions {
 		if !slices.Contains(supervisedUnknownDimensionSet, dimension) {
@@ -196,6 +201,9 @@ func validateSupervisedReportBody(body SupervisedReport) error {
 	}
 	if len(uniqueHashes(body.UnknownDimensions)) != len(body.UnknownDimensions) {
 		return fmt.Errorf("%w: unknown dimensions must be unique", ErrInvalidSupervisedReport)
+	}
+	if missing := missingSupervisedUnknownDimensions(body.UnknownDimensions); len(missing) > 0 {
+		return fmt.Errorf("%w: unknown dimensions must carry all seven required dimensions (missing: %s)", ErrInvalidSupervisedReport, strings.Join(missing, ", "))
 	}
 	for _, dimension := range body.VerifiedDimensions {
 		if !slices.Contains(supervisedVerifiedDimensionSet, dimension) {
@@ -209,4 +217,17 @@ func validateSupervisedReportBody(body SupervisedReport) error {
 		return fmt.Errorf("%w: report evidence must be a non-empty unique hash set", ErrInvalidSupervisedReport)
 	}
 	return nil
+}
+
+// missingSupervisedUnknownDimensions returns the required dimensions that are
+// absent from the supplied set, in the canonical closed-set order, so the
+// rejection message names exactly what the report failed to record.
+func missingSupervisedUnknownDimensions(dimensions []string) []string {
+	missing := make([]string, 0, len(supervisedUnknownDimensionSet))
+	for _, dimension := range supervisedUnknownDimensionSet {
+		if !slices.Contains(dimensions, dimension) {
+			missing = append(missing, dimension)
+		}
+	}
+	return missing
 }

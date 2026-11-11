@@ -1,0 +1,18 @@
+P64 AT24-SUPERVISED-BLACK-BOX · 腿 9.1 重跑（R=2，junction 等价补测，裁决②分支 A，2026-11-11）
+
+1. 补测：新增正式测试 TestSupervisedScopeAllowsRejectsJunctionResolvingOutsideRoot（internal/console/runtime_supervised_junction_probe_test.go）——Windows 非提权 junction 越界反例 + 根内 junction 正例；探针与等价性分析见 L09-01-junction-probe.txt。
+2. M9-1 正则重跑：go test -count=1 -run 'OutOfScopeChange|ScopeUnderivable|ScopeRejects|ScopeAllows' ./internal/chain ./internal/console -v
+   === RUN   TestSupervisedScopeAllowsRejectsJunctionResolvingOutsideRoot
+   --- PASS: TestSupervisedScopeAllowsRejectsJunctionResolvingOutsideRoot (0.18s)
+   === RUN   TestSupervisedReturnRefusesOutOfScopeChange
+   --- PASS: TestSupervisedReturnRefusesOutOfScopeChange (0.07s)
+   === RUN   TestSupervisedScopeUnderivableFailsClosed
+   --- PASS: TestSupervisedScopeUnderivableFailsClosed (0.00s)
+   === RUN   TestSupervisedScopeRejectsUnresolvableRoot
+   --- PASS: TestSupervisedScopeRejectsUnresolvableRoot (0.00s)
+   === RUN   TestSupervisedScopeAllowsRejectsLinkResolvingOutsideRoot
+   --- SKIP: TestSupervisedScopeAllowsRejectsLinkResolvingOutsideRoot (0.00s)（symlink 环境不可测，junction 腿为等价覆盖）
+   PASS
+   ok github.com/larsonzh/prfrail/internal/console 1.421s（M91_EXIT=0）
+3. 断言读数：M9-1 PASS=4 / SKIP=1（symlink 原腿）/ FAIL=0 ⇒ 设计阈值 PASS≥4 达标；越界阻断由 junction 腿在 Windows 本机实取，等价覆盖成立。
+4. 结论：LEG 9.1 RERUN R2: PASS（junction equivalent cover）

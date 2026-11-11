@@ -1,0 +1,21 @@
+P64 AT24-SUPERVISED-BLACK-BOX · ⑦ 复审（RE-REVIEW r1，收窄输入） · independent-reviewer + GPT-5.3-Codex · 只读
+
+RE-REVIEW: PASS
+
+Q1 Major A 闭合判定：闭合
+- schema 七项闭集表达到位：unknownDimensions = minItems:7 + maxItems:7 + uniqueItems + allOf 七个 contains（schemas/supervised-report.schema.json:142）。
+- 合法报告未被误伤：valid 夹具仍七项全集（testdata/contracts/valid/runtime-records.json:364）；新增 invalid 夹具精确命中「缺 network-access 的六项集」（testdata/contracts/invalid/runtime-records.json:653）。
+- 夹具与断言同步完整：fixtureCount 143→144（tools/contracts/contracts.test.js:87）。
+- 修复前后读数支持 R-09.8 翻通过：修复前缺陷态（six-item 被接受）见 L09-08-mandatory-fields.txt:44/48/70；修复后 schema 直校 9 例全对 + npm 4/4 见 L09-08-r2-schema-seven-mandatory.txt:56/81/90/118 与 L05-r2-schema-seven-mandatory.txt:115/126。
+
+Q2 Major B 闭合判定：闭合
+- junction 与 symlink 反例走同一判定路径 scope.allows（internal/console/runtime_supervised.go:1281）且判同一 ErrSupervisedScopeOutOfBounds 哨兵；symlink 腿见 runtime_supervised_test.go:1000、junction 正式补测见 runtime_supervised_junction_probe_test.go:19。
+- 等价性探针 PASS（03-test/L09-01-junction-probe.txt:13）；M9-1 读数 PASS=4/SKIP=1/FAIL=0、R2 PASS（03-test/L09-01-r2.txt:17/18）。
+- 结论：Windows 本机已实取 junction 等价反例，支撑 9.1/R-09.1 翻通过；symlink 原腿 SKIP 属环境限制且已被裁决允许的等价替代覆盖。
+
+Q3 AT-24 验收结论更新：条件闭合
+- 按本次收窄输入两条闭合路径均成立，上一轮 PARTIAL 的阻断点已消除，本轮将 AT-24 在该审查范围内更新为通过。
+- 范围声明：本结论不重审其他腿位与历史未纳入本次输入的事项。
+
+新发现（Medium+）：Critical 无 / Major 无 / Minor 无
+Note：symlink 原腿仍受宿主权限影响会 SKIP，但裁决要求的 junction 等价腿已在 Windows 实测通过，与原腿共享同一路径与哨兵。

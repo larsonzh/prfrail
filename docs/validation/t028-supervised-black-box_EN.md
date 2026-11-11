@@ -2,6 +2,9 @@
 
 > Slice id: `T028`; directive v1.27; date 2026-10-11. Tier `[PILOT]`; size M-L; probes 0; `[ROUTINE]` not applicable.
 > **Status**: **⑧b final + commit and CI writeback** (⑨ local validation and the §7.7 A12 dedicated independent experiment are in §7; ⑧c wrap-up records are in §11; the commit and CI facts are in §9). **Authorization boundary**: the commit and push ran under the user's **same-turn bundled authorization** (origin-only / SSH); gitee no; probes 0 (no additions).
+> **Timestamp note (2026-11-11)**: AT-24 has been accepted (P64, conditional closure) — see `docs/validation/at24-supervised-black-box{,_EN}.md`. The original text of this report is unchanged.
+
+- ⑥ historical exemption: T028 is a historical report (finalized 2026-10-11); this slice only adds the timestamp pointer and does not re-run the six-stage pipeline.
 
 ## 1. Objective and scope
 

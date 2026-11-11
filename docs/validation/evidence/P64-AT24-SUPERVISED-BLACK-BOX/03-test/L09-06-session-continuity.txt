@@ -1,0 +1,58 @@
+P64 AT24-SUPERVISED-BLACK-BOX · 腿 9.6 证据 · 会话连续性 unknown（R-09.6 · 裁定值 (a) 可接受）
+=====================================================================
+执行角色：③ prfrail-tester（DeepSeek V4.1 Flash，runSubagent 显式传 model）
+执行时点：2026-11-11（批次 3/3）
+证据原始输出：tmp/P64-AT24-SUPERVISED-BLACK-BOX/raw/leg9-6.txt、leg9-5-6-render.txt（临时件，⑧c 清理）
+
+[1] A 层命令与原始输出（M9-6 前半）
+-----------------------
+go test -count=1 -run 'TestSupervisedRunRestartRecovery|TestSupervisedConfirmationCrashAfter' ./internal/chain ./internal/console -v
+
+  testing: warning: no tests to run
+  PASS
+  ok      github.com/larsonzh/prfrail/internal/chain      1.068s [no tests to run]
+  === RUN   TestSupervisedRunRestartRecovery
+  --- PASS: TestSupervisedRunRestartRecovery (0.12s)
+  === RUN   TestSupervisedConfirmationCrashAfterAppendConverges
+  --- PASS: TestSupervisedConfirmationCrashAfterAppendConverges (0.11s)
+  === RUN   TestSupervisedConfirmationCrashAfterResumeConverges
+  --- PASS: TestSupervisedConfirmationCrashAfterResumeConverges (0.18s)
+  === RUN   TestSupervisedConfirmationCrashAfterWindowOpenConverges
+  --- PASS: TestSupervisedConfirmationCrashAfterWindowOpenConverges (0.13s)
+  PASS
+  ok      github.com/larsonzh/prfrail/internal/console    1.845s
+  GOTEST_EXIT=0
+
+机械计数：PASS=4  FAIL=0  （设计阈值 PASS≥4 ⇒ **恰好命中**）
+
+测试语义：
+  - TestSupervisedRunRestartRecovery（runtime_supervised_test.go:370）
+      重启后从持久化状态恢复，不重复已决步骤、不丢失未决窗口。
+  - TestSupervisedConfirmationCrashAfter{Append,Resume,WindowOpen}Converges（:1319 / :1340 / :1359）
+      在确认序列三个耐久边界注入崩溃后重入：requireConvergedWindow 断言
+        (a) 重入 ExecuteSupervisedRun 必须收敛（不报错）；
+        (b) 收敛后 ChainState == "PAUSED"（等待归还，不越权推进）；
+        (c) handoff session 文件必须持久化；
+        (d) 归还后 ChainState == "COMPLETED"。
+  ⇒ ProofRail 侧的「崩溃/重启后状态连续」是可执行的硬断言，而非声明。
+
+[2] 报告含 session-continuity（M9-6 后半）
+--------------------------------
+B 层渲染（raw/leg9-5-6-render.txt）：输出含 `unknown: session-continuity=unknown`
+旁证：p5-full-seven report.json 的 unknownDimensions 中 session-continuity 计数 = 1（L09-04 [1] SC_IN_DIMS=1）
+生产常量 runtime_supervised.go:145 七项含 "session-continuity"（:1128 原样传入）
+⇒ 报告必须携带该未知维度 ⇒ 命中。
+
+[3] 边界说明（外部 agent 会话不可观测）
+--------------------------
+R-09.6 的裁定对象是「黑箱 agent 的外部会话连续性」——该维度在 ProofRail 侧**不可观测**，
+因此报告只能以 unknown 呈现；ProofRail 能证明的是自身状态机的崩溃/重启收敛（[1] 四条 PASS）。
+本腿不声称「外部 agent 会话连续」，只声称「ProofRail 侧连续性有硬断言 + 报告如实标 unknown」。
+
+[4] 断言读数 M9-6
+-----------
+  <p9-6>=RestartRecovery|ConfirmationCrashAfter PASS≥4   → 实测 4   → 命中
+  报告含 session-continuity                              → 实测 1   → 命中
+  判定：**命中**
+
+LEG 9.6: DONE

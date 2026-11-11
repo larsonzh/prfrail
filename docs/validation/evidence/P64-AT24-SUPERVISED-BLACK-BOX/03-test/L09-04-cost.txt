@@ -1,0 +1,51 @@
+P64 AT24-SUPERVISED-BLACK-BOX · 腿 9.4 证据 · 费用 unknown（R-09.4 · 裁定值 (a) 显式标 unknown）
+=====================================================================
+执行角色：③ prfrail-tester（DeepSeek V4.1 Flash，runSubagent 显式传 model）
+执行时点：2026-11-11（批次 3/3）
+证据原始输出：tmp/P64-AT24-SUPERVISED-BLACK-BOX/raw/leg9-4-cost.txt（临时件，⑧c 清理）
+复用：批次 2 的 L05-unknown-dimensions-cost.txt（[3] 七项常量代证 / [4] B 层探针）
+
+[1] 命令原文
+--------
+node -e '读 fixtures/runs/p5-full-seven/supervised/report.json，统计 cost 出现次数与 unknownDimensions 内容'
+
+原始输出（raw/leg9-4-cost.txt）：
+  FILE=tmp/P64-AT24-SUPERVISED-BLACK-BOX/fixtures/runs/p5-full-seven/supervised/report.json
+  COST_JSON_TOKEN_COUNT=1
+  COST_IN_DIMS=1
+  BG_IN_DIMS=1
+  SC_IN_DIMS=1
+  DIMS=["tool-use","resource-reads","network-access","cost","background-processes","session-continuity","external-side-effects"]
+  ASSURANCE=reduced
+  NODE_EXIT=0
+
+[2] 三段式读数（与 L05 联动的全链代证）
+--------------------------
+  (i)   生产常量 internal/console/runtime_supervised.go:145  supervisedUnknownDimensions 七项含 "cost"（ITEMS=7）
+  (ii)  构造点 :1128  UnknownDimensions: append([]string{}, supervisedUnknownDimensions...)  ⇒ 原样传入
+  (iii) CLI 渲染（本批次重跑，raw/leg9-5-6-render.txt）逐行输出七条 unknown，其中含：
+          unknown: cost=unknown
+  ⇒ 「cost 是报告中的一等未知维度」，且 assuranceLevel=reduced（同一渲染头行）。
+
+[3] 正例 / 反例
+---------
+正例：完整七项报告 ⇒ cost 计数 1、CLI 接受并渲染 cost=unknown（RENDER_EXIT=0）。
+反例：缺 cost ⇒ 拒绝。实测（raw/leg9-8-cli.txt）：
+      prfrail.exe supervised report --run-dir fixtures/runs/p5-missing-cost
+      → "supervised report: invalid supervised report: unknown dimensions must be non-empty and carry cost"
+      → CLI_MISSING_COST_EXIT=1（非 0 ⇒ 拒）
+      C 层 schema 同向：supervised-report-unknown-dimensions-missing-cost expected=reject PASS。
+
+[4] 断言读数 M9-4
+-----------
+  报告 JSON `cost` 计数 == 1   → 实测 1（token 计数 1、维度计数 1）→ 命中
+  联动 M5（L05）：七项计数==7 且 reduced==1 → 命中
+  判定：**命中**
+
+[5] 证据形态说明
+---------
+  「全链运行时报告文件」不可得（harness 用 t.TempDir()，测试结束即删；生产 run 需真实 visible 投递，
+  本环境不可用 —— 详见 L05 [7] D-13）。本腿采用「常量七项 → 构造原样传入 → CLI 渲染」三段式代证，
+  与 L05 同一口径，不重复登记偏差。
+
+LEG 9.4: DONE

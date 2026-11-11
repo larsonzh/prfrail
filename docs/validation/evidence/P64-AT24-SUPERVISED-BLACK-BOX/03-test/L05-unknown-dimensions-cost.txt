@@ -1,0 +1,217 @@
+P64 AT24-SUPERVISED-BLACK-BOX · 腿 5 证据 · unknownDimensions 七项全必填含 cost（R-09.4 / R-09.8）
+=====================================================================
+执行角色：③ prfrail-tester（DeepSeek V4.1 Flash，runSubagent 显式传 model）
+执行时点：2026-11-11
+工作目录：D:\LZProjects\prfrail
+环境：Windows 本机；无 VM / 无代理 / 无外部调用；Go 1.22 工具链
+性质：机制腿（stub visible 投递 + 模拟人工归还 + 后置扫描），非真实 SessionBridge visible 端到端
+证据原始输出：tmp/P64-AT24-SUPERVISED-BLACK-BOX/raw/（临时件，⑧c 清理；本文件为正式归档摘录）
+
+[0] 设计名 vs 实况名对照
+----------------
+  TestSupervisedReportNewAlwaysReduced                     → 实况存在 internal/chain/supervised_blackbox_test.go:345 → 一致
+  契约夹具 supervised-report-assurance-level-full          → 实况存在 testdata/contracts/invalid/runtime-records.json:529 → 一致
+  契约夹具 supervised-report-unknown-dimensions-empty      → 实况存在 :560 → 一致
+  契约夹具 supervised-report-missing-cost（设计简写）      → 实况名 supervised-report-unknown-dimensions-missing-cost :591 → 同一夹具，按实况名采信
+  额外实况（设计未列）：supervised-report-unknown-dimension-id-unknown :622、supervised-report-valid（accept 基线）
+结论：设计引用名全部命中，无杜撰；C 层实际 supervised-report 夹具 5 条（1 正 + 4 反）。
+
+[1] A 层命令原文
+-----------
+go test -count=1 -run 'SupervisedReport' ./internal/chain ./internal/console -v
+
+原始输出摘录（tmp/P64-AT24-SUPERVISED-BLACK-BOX/raw/leg5-a-layer.txt）：
+  === RUN   TestSupervisedReportNewAlwaysReduced
+  === RUN   TestSupervisedReportNewAlwaysReduced/full_assurance
+  === RUN   TestSupervisedReportNewAlwaysReduced/empty_unknown
+  === RUN   TestSupervisedReportNewAlwaysReduced/cost-free
+  === RUN   TestSupervisedReportNewAlwaysReduced/unknown_id
+  --- PASS: TestSupervisedReportNewAlwaysReduced (0.00s)
+      --- PASS: TestSupervisedReportNewAlwaysReduced/full_assurance (0.00s)
+      --- PASS: TestSupervisedReportNewAlwaysReduced/empty_unknown (0.00s)
+      --- PASS: TestSupervisedReportNewAlwaysReduced/cost-free (0.00s)
+      --- PASS: TestSupervisedReportNewAlwaysReduced/unknown_id (0.00s)
+  PASS
+  ok      github.com/larsonzh/prfrail/internal/chain      1.006s
+  === RUN   TestSupervisedReportRenderGolden
+  --- PASS: TestSupervisedReportRenderGolden (0.09s)
+  === RUN   TestSupervisedReportOmitsUnprovenReviewDimension
+  --- PASS: TestSupervisedReportOmitsUnprovenReviewDimension (0.08s)
+  PASS
+  ok      github.com/larsonzh/prfrail/internal/console    1.363s
+  GOTEST_EXIT=0
+
+机械计数：TOP_PASS=3  TOP_FAIL=0  SUBTEST_PASS=4  SUBTEST_FAIL=0
+
+语义（正例）：构造器恒置 assuranceLevel=reduced；空 unknown 集回退到封闭全集（len==7）；
+             caller 传入的集合若缺 cost 则自动补 cost —— 即「构造入口」侧七项/含 cost 是被强制的。
+语义（反例，A 层内嵌）：full assurance / empty unknown / cost-free / unknown id 四种篡改
+             在重算 recordHash 后仍被 ValidateSupervisedReport 拒绝（4/4 PASS）。
+
+[2] C 层契约测试（命令 + 总数）
+------------------
+npm --prefix tools/contracts test
+原始输出（tmp/P64-AT24-SUPERVISED-BLACK-BOX/raw/leg5-c-layer.txt；ℹ/✔ 字形在 cp936 控制台为乱码，数字完整）：
+  > proofrail-contract-validator@1.0.0 test
+  > node --test
+  [PASS] all schemas compile and every catalog matches its independent expectation (1004.3433ms)
+  [PASS] canonical vectors reproduce the frozen bytes and digests (9.8779ms)
+  [PASS] AgentRunner mapping constants stay aligned across vectors and request fixtures (4.6519ms)
+  [PASS] AgentRunner effect mapping fails closed and permits grant supersets (6.9614ms)
+  tests 4 / suites 0 / pass 4 / fail 0 / cancelled 0 / skipped 0 / todo 0
+  NPM_EXIT=0
+
+定向夹具核验（node tmp/P64-AT24-SUPERVISED-BLACK-BOX/check-supervised-fixtures.js）：
+  PASS  supervised-report-valid                              expected=accept  layer=schema
+  PASS  supervised-report-assurance-level-full               expected=reject  layer=schema
+  PASS  supervised-report-unknown-dimensions-empty           expected=reject  layer=schema
+  PASS  supervised-report-unknown-dimensions-missing-cost    expected=reject  layer=schema
+  PASS  supervised-report-unknown-dimension-id-unknown       expected=reject  layer=schema
+  SUPERVISED_REPORT_FIXTURES=5   EXIT=0
+
+[M5-C] 设计点名的三反例（full / empty / missing-cost）均 schema 拒 ⇒ 3/3 命中；C 层总数 tests 4 / pass 4 / fail 0 ⇒ 命中 M5 阈值。
+
+[3] 七项计数（全链侧机械证据）
+---------------------
+生产链路的报告由 internal/console/runtime_supervised.go:1120 构造，UnknownDimensions 取自常量
+supervisedUnknownDimensions（同文件:145）：
+
+  supervisedUnknownDimensions = []string{"tool-use", "resource-reads", "network-access", "cost",
+    "background-processes", "session-continuity", "external-side-effects"}
+
+机械统计：
+  internal/console/runtime_supervised.go:145  CONST_ITEMS=7
+  internal/chain/supervised_report.go:27-35    SET_ITEMS=7（两份副本逐项同名同序）
+  runtime_supervised.go:1128 UnknownDimensions: append([]string{}, supervisedUnknownDimensions...)  ⇒ 原样传入，无裁剪
+以该 7 项集合合成报告并经 CLI 渲染（命令见 [4] 的 p5-full-seven）：
+  UNKNOWN_LINES=7   ASSURANCE_REDUCED=1
+  unknown: tool-use=unknown / resource-reads / network-access / cost / background-processes /
+           session-continuity / external-side-effects 逐项出现
+⇒ 七项计数 == 7 且 assuranceLevel == "reduced" 成立（证据形态说明见 D-13）。
+
+[4] B 层 CLI 黑箱探针（合成报告 6 份）
+-----------------------------
+生成器：node tmp/P64-AT24-SUPERVISED-BLACK-BOX/gen-report-fixtures.js（recordHash 按
+       sha256("proofrail:supervised-report:1\n" + RFC8785 规范体) 实算；基线 p5-full-seven 被接受即证明算 hash 正确）
+命令原文：tmp\P64-AT24-SUPERVISED-BLACK-BOX\prfrail.exe supervised report --run-dir \
+          tmp\P64-AT24-SUPERVISED-BLACK-BOX\fixtures\runs\<case>
+（构建：go build -o tmp\P64-AT24-SUPERVISED-BLACK-BOX\prfrail.exe ./cmd/prfrail ⇒ BUILD_EXIT=0）
+
+  case                         unknownDimensions                               exit  判定
+  p5-full-seven                七项全集                                       0     接受（正例基线）
+  p5-missing-cost              六项，缺 cost                                  1     拒绝 ✔（M5 反例命中）
+  p5-only-cost                 仅 ["cost"]，其余六项全缺                       0     【接受】✘ 关键探针失败
+  p5-missing-network-access    六项含 cost，缺 network-access                 0     【接受】✘ 关键探针失败
+  p8-safe-dimension            七项 + "safe"                                  1     拒绝（腿 8 复用）
+  p8-verified-dimension        七项 + "verified"                              1     拒绝（腿 8 复用）
+
+stderr/stdout 原文摘录：
+  p5-missing-cost            → "supervised report: invalid supervised report: unknown dimensions must be non-empty and carry cost"
+  p5-only-cost               → exit 0，正常渲染，仅一行 "unknown: cost=unknown"
+  p5-missing-network-access  → exit 0，正常渲染，六行 unknown（无 network-access）
+
+schema 层旁证（Ajv 直校，tools/contracts/validator.js 的 createValidator）：
+  ACCEPT  p5-full-seven
+  REJECT  p5-missing-cost   ["/record/unknownDimensions must contain at least 1 valid item(s)" ...]
+  ACCEPT  p5-only-cost
+  ACCEPT  p5-missing-network-access
+  REJECT  p8-safe-dimension
+⇒ 缺陷不是 CLI 独有：schemas/supervised-report.schema.json 的 unknownDimensions 仅约束
+  minItems=1 + contains(cost)，未约束「七项全必填」；Go 层 validateSupervisedReportBody
+  同样只校验 non-empty + contains(cost)（internal/chain/supervised_report.go:190-192）。
+
+[5] 断言读数 M5
+--------
+  C 层 tests 4 / pass 4 / fail 0                 → PASS（阈值 pass 4 / fail 0）
+  三反例夹具 schema 拒 3/3                       → PASS
+  七项计数 == 7 且 assuranceLevel=="reduced"     → PASS（代证，D-13）
+  缺 cost 探针 exit != 0（实测 1）               → PASS（语义）；exit∉[10,20] → D-14
+  缺项探针（cost 在、其余六项缺）                → 【接受】⇒ 缺陷候选 DEF-1
+  A 层 TOP_PASS=3 / SUBTEST_PASS=4 / FAIL=0      → PASS
+
+[6] 缺陷候选
+--------
+DEF-1（T028 实现缺陷候选，七项全必填未强制）
+  症状：unknownDimensions = ["cost"]（其余六项全缺）或仅缺一项（如 network-access）的报告，
+        经 `prfrail supervised report` 校验 exit=0 并被正常渲染；schema（Ajv）同样 ACCEPT。
+  期望：按 R-09.8「七项全必填」/ 腿 5 判据「缺任何一项 ⇒ 报告不合规」应拒绝。
+  根因层（两处，均需处置）：
+    a) internal/chain/supervised_report.go:190 —— 只校验 non-empty + contains(cost)（单条 if，190-192）；
+    b) schemas/supervised-report.schema.json —— unknownDimensions 只声明 minItems=1 + contains(cost)。
+  影响面：生产链路当前不暴露该缺口（构造器在「空集」时回退到七项全集），但「部分集合」直通，
+        与 R-09.8 字面不符；属「校验弱于裁定」的实现缺陷。
+  修复边界：Go 层可加「必须等于封闭七项集」的校验（现有 testdata/contracts/valid 的
+        supervised-report-valid 已含七项，加严不会破坏该夹具）；但若要 schema 与 Go 一致，
+        需改 schemas/ + 可能补夹具 ⇒ 按 design-r1 §3 腿 5 与 3.3 属「需改 schema/fixtures ⇒ 超界停下升级」。
+        ③ 不自行修复，交 ② / ⑦ / 用户裁决。
+
+[7] 偏差登记
+--------
+D-13（全链报告 JSON 未落盘，显著）：设计期望「跑出全链报告 JSON 数七项」。实况：
+     (i) 全链报告只由 console 测试 harness 产出，harness 用 t.TempDir()（runtime_supervised_test.go:109）
+         测试结束即删；(ii) 生产 `prfrail.exe run` 需真实 visible 投递，本环境不可用（批次 1 L01 探针已证
+         exit=1 "supervised visible delivery is not accepted"），故无法产出真实全链报告文件。
+     代证三段式（常量 7 项 → 原样传入构造器 → CLI 渲染 7 行 + reduced）已登记于 [3]，读数成立但证据形态弱于设计。
+     未采用「临时新增 Go 测试文件」方案，因本片禁止改源码。
+D-14（exit 区间口径，同 L01 的 D-1）：设计写 "exit∈[10,20]"，实况 CLI 仅 exitSuccess=0/exitFailure=1/
+     exitUsage=2（internal/console/cli.go:23-25），实测 1。采信「非零即拒」，区间期望不成立。
+
+LEG 5: DONE WITH DEFECT（机制与 C 层断言 PASS；DEF-1 七项全必填未强制 ⇒ T028 实现缺陷候选）
+
+[R1] R 重跑（2026-11-11，② 修复 DEF-1 后 · R=1）
+---------------------------------------------
+触发：② 已修复 DEF-1（internal/chain/supervised_report.go 增加七项闭集强制校验；
+      internal/console loadReport 同步加严；schemas/ 未动，已登记）。本次仅重跑受影响腿 5 / 9.8，
+      未改任何源码 / schema / fixtures。
+
+构建原样：go build -o tmp/P64-AT24-SUPERVISED-BLACK-BOX/prfrail.exe ./cmd/prfrail ⇒ BUILD_EXIT=0
+原始输出目录：tmp/P64-AT24-SUPERVISED-BLACK-BOX/raw-r1/（临时件，⑧c 清理；本文件为正式归档摘录）
+
+A 层重跑：go test -count=1 -run 'SupervisedReport' ./internal/chain ./internal/console -v
+  === RUN   TestSupervisedReportNewAlwaysReduced（11 子例）
+    --- PASS: constructor/only_cost · constructor/missing_network · constructor/outside_the_set
+              duplicate · full_assurance · empty_unknown · only_cost · missing_network
+              cost-free · unknown_id · safe_dimension
+  --- PASS: TestSupervisedReportNewAlwaysReduced (0.00s)
+  --- PASS: TestSupervisedReportRenderGolden (0.12s)
+  --- PASS: TestSupervisedReportOmitsUnprovenReviewDimension (0.12s)
+  ok      github.com/larsonzh/prfrail/internal/chain      1.048s
+  ok      github.com/larsonzh/prfrail/internal/console    1.545s
+  GOTEST_EXIT=0
+机械计数（R1）：TOP_PASS=3  TOP_FAIL=0  SUBTEST_PASS=11  SUBTEST_FAIL=0
+新增反例（② 补充 7 例）：constructor/only_cost · constructor/missing_network · constructor/outside_the_set
+  · duplicate · only_cost · missing_network · safe_dimension ⇒ 7/7 PASS（构造入口与校验入口双向拒绝）
+语义变化：构造器不再为 caller 集合静默补 cost；传入部分集合 ⇒ 直接拒绝，不再「静默补全后接受」。
+
+C 层重跑：npm --prefix tools/contracts test
+  tests 4 / pass 4 / fail 0 / cancelled 0 / skipped 0 / todo 0   NPM_EXIT=0
+  （与首跑读数一致；schema 未改动，C 层夹具语义不变）
+
+B 层 CLI 探针重跑（二进制 = 当前源码构建；命令同 [4]）：
+  case                        期望                        实测 exit   stderr 关键串
+  p5-only-cost                拒绝（缺六项）               1          unknown dimensions must carry all seven required dimensions
+                                                                   (missing: tool-use, resource-reads, network-access,
+                                                                    background-processes, session-continuity, external-side-effects)
+  p5-missing-network-access   拒绝（缺 network-access）     1          unknown dimensions must carry all seven required dimensions
+                                                                   (missing: network-access)
+  p5-missing-cost             拒绝（缺 cost）               1          unknown dimensions must carry cost
+  p5-full-seven               接受（正例基线）             0          渲染 7 行 unknown + assuranceLevel: reduced
+⇒ 首跑失败的 2 个关键探针（p5-only-cost / p5-missing-network-access）由 exit=0 转为 exit=1；
+  正例基线仍被接受 ⇒ DEF-1 在 CLI 层闭合。
+
+断言读数（R1）：
+  C 层 tests 4 / pass 4 / fail 0                          → PASS
+  三反例夹具 schema 拒 3/3                                → PASS（schema 未动，读数不变）
+  七项计数 == 7 且 assuranceLevel=="reduced"              → PASS（沿用 [3] 三段式代证，D-13）
+  缺 cost 探针 exit != 0（实测 1）                        → PASS
+  缺项探针（only-cost / missing-network-access）exit == 1 → PASS（首跑 exit=0 ⇒ 已闭合）
+  A 层 TOP_PASS=3 / SUBTEST_PASS=11 / FAIL=0              → PASS
+  回归：go test -count=1 ./internal/chain ./internal/console ⇒ ok / ok（FULL_EXIT=0）
+        覆盖 chain 12 + console 32 个 TestSupervised*；loadReport 加严未引入回归。
+
+R1 结论：DEF-1 在 Go 层与 CLI 层闭合。遗留（已登记，不属本片 ③ 修复范围）：
+  schemas/supervised-report.schema.json 仍只约束 minItems=1 + contains(cost)；Ajv 直校
+  p5-only-cost / p5-missing-network-access 仍 ACCEPT（raw-r1/leg9-8-schema-p5.txt）⇒
+  schema 独立校验与 Go 层存在单向差（Go 更严，fail closed）。
+
+LEG 5 RERUN(R=1): PASS（DEF-1 Go/CLI 层闭合；schema 层差异已登记）

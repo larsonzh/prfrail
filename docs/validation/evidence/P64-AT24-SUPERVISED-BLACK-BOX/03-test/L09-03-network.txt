@@ -1,0 +1,55 @@
+P64 AT24-SUPERVISED-BLACK-BOX · 腿 9.3 证据 · 网络 unknown 底线（R-09.3 · 裁定值 (c) 视情况）
+=====================================================================
+执行角色：③ prfrail-tester（DeepSeek V4.1 Flash，runSubagent 显式传 model）
+执行时点：2026-11-11（批次 3/3）
+环境：Windows 本机；无 VM / 无代理 / 无外部调用
+性质：机制腿（非真实 SessionBridge visible 端到端）
+
+[1] 用户确认件精确句计数（M9-3 前半）
+--------------------------
+命令原文（node 逐字节读取，避免控制台代码页干扰）：
+  node -e "count('r09-3-user-confirmation.md','回环可接受、公网必须阻断。')"
+  文件：docs/validation/evidence/P64-AT24-SUPERVISED-BLACK-BOX/01-arch/r09-3-user-confirmation.md
+
+原始读数字面（控制台回显为 cp936 乱码，数字为准确值；raw/leg9-3-9-7-grep.txt）：
+  r09-3-user-confirmation.md :: "回环可接受、公网必须阻断。" => count=1
+  （对照子串计数：「回环可接受」=> count=3，分别出现在 依据摘引 / 补录确认原文 / 补录确认依据；
+    仅 1 处以句号结尾，即「确认原文」行 ⇒ 精确句唯一且位于用户确认原文处）
+
+结论：精确句 grep -c == 1  ⇒ **命中**
+补充：本件含两段——首段落盘为「未确认」（起跑时用户不在线），次段为 ③ 执行前的「补录确认」
+      （确认原文：回环可接受、公网必须阻断。裁决人=用户）。补录时点在 ③ 执行之前，符合 R-09.3
+      「起跑前一次性确认，不阻断起跑」的实质要求。
+
+[2] 外部连接审计注记（本片零外部调用事实）
+---------------------------
+本批次（3/3）执行的全部命令，均为本机进程：
+  - go test -count=1 ...（本地编译 + 本地测试，无 module 下载；GOFLAGS 未触发网络）
+  - go build -o tmp\P64-AT24-SUPERVISED-BLACK-BOX\prfrail.exe ./cmd/prfrail（本地编译）
+  - node -e ... / node tmp\...\check-supervised-fixtures.js（本地脚本，仅读本地文件）
+  - tmp\...\prfrail.exe supervised report --run-dir tmp\...\fixtures\runs\<case>（本地 CLI，读本地 JSON）
+  - Select-String / Get-ChildItem / Get-Content（本地文件系统）
+
+代理状态实测（.vscode/scripts/proxy-toggle.ps1 无参 = Status；raw/leg9-3-proxy.txt）：
+  [proxy] system proxy: OFF (http://10.0.0.246:8080)
+  [proxy] git http.proxy:   (not set)
+  [proxy] git https.proxy:  (not set)
+⇒ 未开启系统代理、未设置 git 代理；本片全程未启动 VM、未开启代理、无 curl/Invoke-WebRequest 类外部请求。
+
+外部连接条目数：**0**（本批次及批次 1/2 的全部命令均为本机进程内执行）
+⇒ 对 R-09.3「公网必须阻断」而言，这是该条底线的最强形式：不是「拦截了公网」，而是「全程无公网调用可拦截」。
+  回环（loopback）在本片中同样未被使用（无本地 HTTP 服务、无 socket 监听）。
+
+[3] 正例 / 反例
+---------
+正例：零外部调用 + 用户确认句在案 ⇒ 9.3 满足。
+反例（可证伪设计）：若确认件缺失精确句 ⇒ grep -c == 0 ⇒ 本腿阻断。本件实测 1 ⇒ 未触发阻断。
+  本片未构造「删句」反例（禁止修改 01-arch 用户确认件）；以计数==1 的机械读数作为可证伪点。
+
+[4] 断言读数 M9-3
+-----------
+  确认件 grep -c 精确句 == 1                     → 实测 1  → 命中
+  L09-03 网络审计注记 =「外部连接 0 条」          → 已登记  → 命中
+  判定：**命中**
+
+LEG 9.3: DONE

@@ -94,6 +94,7 @@
 | P62 R08-R09-RULING-REVISION | ✅ 已完成（2026-11-08 收口；⑦ `FINAL REVIEW: PASS`，终审 1 + 复审 0；ADR-037；R/D=0；停于 ⑩ 等授权） | P61（路径 A：R-08.5 修订片优先） | M | 2026-11-08 | 修订 `docs/validation/r08-r09-ruling{,_EN}.md`（R-08.5 继承漂移豁免五要素 + R-08.1 事实修正）；P61 报告时点注记；证据包 `docs/validation/evidence/P62-R08-R09-RULING-REVISION/` |
 | P63 AT23-RECHECK | ✅ 已完成（2026-11-09 收口；⑦ 判定豁免不成立；R/D=0；停于 ⑩ 等授权） | P62（层 1 第 11 项） | S | 2026-11-09 | 证据包 `docs/validation/evidence/P63-AT23-RECHECK/`；P61 报告 §10 + §1 时点注记 |
 | F2-FIX-STUB-HANG | ✅ 已完成（2026-11-09 收口；⑦ 终审 `FINAL: PASS WITH FIXES` ⇒ 前提①满足；R/D=0；停于 ⑩ 等授权） | P63（豁免不成立 ⇒ 启动） | S | 2026-11-09 | 修复 hang 分支补写 0 字节空 stub-child.pid + 回归测试 + layer3 F2 红/绿重跑 + f1 对照；AT-23 阶段 1 条件闭合达成（阶段 2 不适用，用户裁定 A1）；证据包 `docs/validation/evidence/F2-FIX-STUB-HANG/`；P61 报告 §11 + §1 时点注记 |
+| P64 AT24-SUPERVISED-BLACK-BOX | ✅ 已完成（2026-11-11 收口；AT-24 条件闭合；⑦ 复审 RE-REVIEW: PASS；R=2；停于 ⑩ 等授权） | F2-FIX（层 1 后续候选第 12 项） | M | 2026-11-11 | 证据包 `docs/validation/evidence/P64-AT24-SUPERVISED-BLACK-BOX/`；临时件 `tmp/P64-AT24-SUPERVISED-BLACK-BOX/` |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -1825,6 +1826,28 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 层 1 第 8 项状态标记 | ✅ 出队（**阶段 1 条件闭合达成**（2026-11-09，F2-FIX 闭环）；**阶段 2 不适用**（用户 2026-11-09 裁定 A1）；前提①=机制腿全绿（本片满足）、前提②=P61 已满足；由本片 ⑦ 判定触发） |
 | 完成记录 | 修复 `tools/agent-stub/main.go` hang 分支补写 0 字节空 `stub-child.pid` + 回归测试 `TestHangWritesEmptyChildPIDReport`（`main_test.go`）；layer3 F2 红/绿重跑 + f1-control 对照全绿；⑦ 终审 `FINAL: PASS WITH FIXES` + 盲审四问均成立 ⇒ 前提①满足 ⇒ AT-23 阶段 1 条件闭合达成（阶段 2 不适用，用户 2026-11-09 裁定 A1）；证据包 `docs/validation/evidence/F2-FIX-STUB-HANG/` |
 | v53 观察项候选 | ① **G5(d) 新增证据包围栏声明坑（第 26 条门禁坑候选）**：连续三片（P62 `d0971e5` / P63 `de37c58` / F2-FIX 本片）首跑 index 都报 `G5(d) staged is a subset of declared`，根因 = 步骤 0 建新证据包时未同轮补 `artifacts` 围栏行；候选：① 起跑消息步骤 0 强制「新增证据包 → 报告围栏同轮补行」；② 或作为门禁坑第 26 条；累计 3 次，须 v53 生成时评估落点；② R-08.5 文件级 vs 语义级判据问题（F2 修复后不再触发，长期保留）——均待 v53 生成时承载 |
+
+### P64 — `AT24-SUPERVISED-BLACK-BOX`（层 1 后续候选第 12 项 · 验收类） · ✅ 已完成（2026-11-11 收口）
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `AT24-SUPERVISED-BLACK-BOX`（验收类 `[SLICE]`；承载 v53 §四 层 1 后续候选第 12 项「AT-24」） |
+| 状态 | ✅ 已完成（2026-11-11 收口；AT-24 条件闭合；⑦ 复审 RE-REVIEW: PASS；R=2；停于 ⑩ 等授权） |
+| 目标 | AT-24 验收（`supervised-black-box` 显式模式）：9 项验收腿（第 9 项展开 9 子项，主腿与子腿合计十七条，每项正例 + 反例 + 机械断言）；R-09 三句话硬性出现；**⑦ 是 R-09.1~R-09.9 逐项判定 + AT-24 验收结论的唯一主体** |
+| 依赖 | F2-FIX 闭环（AT-23 阶段 1 条件闭合达成）；R-09 裁定（`docs/validation/r08-r09-ruling{,_EN}.md`）；T028 实现（`DEV_PLAN.md:119`）；用户点名起跑 |
+| 规模 | M；⑦ 高风险档 = 1 终审 + 3 复审，盲审另计 1（§7.7 必抽：触及停机/身份语义） |
+| 步骤 | ① 计划（轻量化）→ ③ 验收腿 → ② 实现（仅当发现 T028 缺陷）→ ④ 门禁 → ⑤ 预审 → ⑥ 独立扫描 → ⑦ 终审 + 盲审 → ⑧ 文档 → ⑨ → ⑧c → ⑩ |
+| 现状缺口 | 真实 SessionBridge visible 端到端依赖 T027-B ⇒ 登记为 unknown/边界（按 R-09.3 / R-09.7 判）；本片验收腿 = 机制腿（stub visible 投递 + 模拟人工归还 + 后置扫描） |
+| 交付物 | 报告对 `docs/validation/at24-supervised-black-box{,_EN}.md`；证据包 `docs/validation/evidence/P64-AT24-SUPERVISED-BLACK-BOX/`；ADR-040（步骤 0）；本台账本段；DEV_PLAN / TEST_STRATEGY / s1-exit 按验收结论更新 |
+| 验收证据 | 9 项验收腿（含 9 子项）正例 + 反例 + 机械断言；R-09 九项边界逐项判定（⑦ 唯一主体）；三句话逐字出现（⑤⑥⑦ 逐环核验）；三作用域 TOTAL_FAIL=0 + SELFTEST 722/722 |
+| 边界 | 不改产品代码（T028 已实现；缺陷修复范围限 `internal/console/**` 与 `internal/chain/**` 的 supervised 相关文件）；不改 CONTRACTS / schema / fixtures / workflows / 准则 / R-09 / T028 报告原文；契约缺陷或 R-09 缺陷停下升级；受 §1.7.2 三条 bullet 约束；不开 VM / 代理 / Sol 双打；不声称 S1 Exit 整体通过 |
+| 分级 | `[SLICE]`（验收类） |
+| 探针额度 | 0（本机 console/chain 层验收 + stub visible 投递，无外部调用） |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/P64-AT24-SUPERVISED-BLACK-BOX/freedom-list.md` |
+| R / D 基线 | R = 0、D = 0（2026-11-11 起跑登记） |
+| 临时件落点声明 | 本片临时目录 = `tmp/P64-AT24-SUPERVISED-BLACK-BOX/`（⑧c 前只增不删） |
+| 层 1 后续候选第 12 项状态标记 | ✅ 出队（2026-11-11 收口；⑦ 判定 AT-24 验收结论 = 条件闭合） |
+| 完成记录 | AT-24 条件闭合（⑦ 复审 RE-REVIEW: PASS；报告对 `docs/validation/at24-supervised-black-box{,_EN}.md`） |
 
 ## 已知缺陷（后续切片前处理）
 

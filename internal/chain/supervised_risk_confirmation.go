@@ -37,7 +37,8 @@ var (
 	ErrInvalidSupervisedConfirmation = errors.New("invalid supervised risk confirmation")
 	// ErrInvalidSupervisedReport reports a reduced/unknown report that cannot be
 	// trusted: a wrong assurance level, an unknown dimension outside the frozen
-	// closed set, an empty or cost-free unknown set, or a malformed hash.
+	// closed set, an empty, cost-free or incomplete unknown set (all seven
+	// required dimensions must be carried, ruling R-09.8), or a malformed hash.
 	ErrInvalidSupervisedReport = errors.New("invalid supervised report")
 	// supervisedTransportIDPattern is the accepted transport request id shape.
 	// It is deliberately broader than evidence.ValidID because the visible

@@ -1,0 +1,19 @@
+P64 AT24-SUPERVISED-BLACK-BOX · ⑤ 预审（r1）· deep-reasoner + DeepSeek V4 Pro · 只读
+
+1. 逐面结论
+A. 17 子腿完整性 —— PASS（1 项 Minor：SUMMARY 9.5 行记 PASS(2/3) 与报告 §3 记 PASS(3/3) 不一致，M2）
+B. R-09 九项边界符合性 —— PASS（1 项 Major 待 ⑦：r09-3/7 确认件补录时点是否满足【五】7/8「起跑前一次性确认」，须 ⑦ 逐项判定，M1）
+C. 三句话逐字核验 —— PASS（S1/S2/S3 report==briefing: true；分区 摘要=1/§1=1/区段外=0）
+D. ② 修复正确性 —— PASS（七项闭集校验与 R-09.8/§7.1(d) 一致；仅 4 个 internal supervised 文件；断言加强未弱化）
+E. 报告结构合规 —— PASS（§4 含 3.4 三项；§5 未执行事项齐备；artifacts 围栏 CN/EN 逐字节相同 37 行；「用户负责清理」已写入 4 处）
+F. 双语镜像 —— PASS（H2 7/7、表格 28/28；§4 第 3、5 条 EN 多出解释从句，M3）
+
+2. 发现清单
+Critical：无
+Major：M1（治理，待 ⑦）：两件确认件首段「未确认」处置与补录确认的关系须 ⑦ 裁定
+Minor：M2 SUMMARY 9.5 指针未回写；M3 §4 第 3、5 条 CN/EN 条目级不对称；M4 SUMMARY 末行「LEGS 9: DONE WITH FAILS」与 R1 后整体结论张力
+Note：N1 腿 6 PENDING-COUNT 留 ⑨ 机械复算；N2 ④ 读数装配时实测、06-gates 归档待 ⑧b
+
+3. 结论行
+PRE-REVIEW: PASS WITH FIXES
+（无 Critical；M1 并入 ⑦ 判定问题清单；M2–M4 为 ⑧b 回写/对齐项，不阻断 ⑥/⑦ 推进。）

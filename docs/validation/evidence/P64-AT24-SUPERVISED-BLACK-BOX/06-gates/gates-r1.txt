@@ -1,0 +1,11 @@
+P64 AT24-SUPERVISED-BLACK-BOX · ④ 门禁读数（2026-11-11 装配时实测）
+
+go build ./... => BUILD_EXIT=0
+go vet ./... => VET_EXIT=0
+go test -count=1 ./... => ok 15 包（internal/chain ok；internal/console ok；tools/agent-stub ok；等），TEST_EXIT=0
+node tools/gates/gate.js --all --scope=index => TOTAL_FAIL=0，INDEX_EXIT=0
+node tools/gates/gate.js --all --scope=tree => TOTAL_FAIL=0，TREE_EXIT=0
+node tools/gates/gate.js --all --scope=ci => TOTAL_FAIL=0，CI_EXIT=0
+node tools/gates/gate.js --selftest => SELFTEST: PASS 722/722，SELFTEST_EXIT=0
+
+注：index 首跑曾报 TOTAL_FAIL=3（G1(e2) 台账 🔄 段完成记录行 / G6-4 共N量词 / G8-b 证据包载荷未登记），修复后复跑 TOTAL_FAIL=0。⑨ 将全量复跑。

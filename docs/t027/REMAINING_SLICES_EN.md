@@ -94,6 +94,7 @@
 | P62 R08-R09-RULING-REVISION | ✅ Done (closed 2026-11-08; ⑦ `FINAL REVIEW: PASS`, 1 final + 0 re-review; ADR-037; R/D=0; stopped at ⑩ awaiting authorization) | P61 (path A: R-08.5 revision first) | M | 2026-11-08 | Revise `docs/validation/r08-r09-ruling{,_EN}.md` (the R-08.5 inherited-drift waiver five elements + the R-08.1 factual correction); P61 report timestamp note; evidence pack `docs/validation/evidence/P62-R08-R09-RULING-REVISION/` |
 | P63 AT23-RECHECK | ✅ Done (closed 2026-11-09; ⑦ rules the waiver does not hold; R/D=0; stopped at ⑩ awaiting authorization) | P62 (layer-1 item 11) | S | 2026-11-09 | Evidence pack `docs/validation/evidence/P63-AT23-RECHECK/`; P61 report §10 + the §1 timestamp note |
 | F2-FIX-STUB-HANG | ✅ Done (closed 2026-11-09; ⑦ final `FINAL: PASS WITH FIXES` ⇒ premise ① met; R/D=0; stops at ⑩ awaiting authorization) | P63 (the waiver does not hold ⇒ start) | S | 2026-11-09 | Fixed the hang branch to write the 0-byte empty stub-child.pid + regression test + layer3 F2 red/green re-runs + f1 contrast; AT-23 stage-1 condition closure achieved (stage 2 not applicable, user ruling A1); evidence pack `docs/validation/evidence/F2-FIX-STUB-HANG/`; P61 report §11 + §1 timestamp note |
+| P64 AT24-SUPERVISED-BLACK-BOX | ✅ Done (closed 2026-11-11; AT-24 conditionally closed; ⑦ re-review `RE-REVIEW: PASS`; R=2; stopped at ⑩ awaiting authorization) | F2-FIX (layer 1 post-hard-gate candidate item 12) | M | 2026-11-11 | Evidence pack `docs/validation/evidence/P64-AT24-SUPERVISED-BLACK-BOX/`; temp `tmp/P64-AT24-SUPERVISED-BLACK-BOX/` |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1812,6 +1813,28 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Layer 1 item 8 status marker | ✅ Dequeued (**stage-1 condition closure achieved** (2026-11-09, F2-FIX closed); **stage 2 not applicable** (user ruling A1, 2026-11-09); premise ① = mechanism legs all green (met by this slice), premise ② = already met by P61; triggered by this slice's ⑦ verdict) |
 | Completion record | Fixed the `hang` branch of `tools/agent-stub/main.go` to write the 0-byte empty `stub-child.pid` + the regression test `TestHangWritesEmptyChildPIDReport` (`main_test.go`); layer3 F2 red/green re-runs + the f1-control contrast all green; ⑦ final `FINAL: PASS WITH FIXES` + the blind review's four questions all hold ⇒ premise ① met ⇒ AT-23 stage-1 condition closure achieved (stage 2 not applicable, user ruling A1, 2026-11-09); evidence pack `docs/validation/evidence/F2-FIX-STUB-HANG/` |
 | v53 observation-item candidates | ① **the G5(d) evidence-pack fence pitfall (gate-pitfall No. 26 candidate)**: three consecutive slices (P62 `d0971e5` / P63 `de37c58` / F2-FIX this slice) all hit `G5(d) staged is a subset of declared` on their first index runs; root cause = a new evidence pack was created at step 0 without adding `artifacts` fence rows in the same round; candidates: ① a step-0 requirement that a new evidence pack must add the fence rows in the same round; ② or record it as gate pitfall No. 26; 3 occurrences in total, the landing spot to be evaluated at v53 generation; ② the R-08.5 file-level vs semantic-level criterion problem (no longer triggered after the F2 fix; kept long-term) — both carried at v53 generation |
+
+### P64 — `AT24-SUPERVISED-BLACK-BOX` (layer 1 post-hard-gate candidate item 12 · acceptance class) · ✅ Done (closed 2026-11-11)
+
+| Field | Content |
+|---|---|
+| Identifier | `AT24-SUPERVISED-BLACK-BOX` (acceptance class `[SLICE]`; carries v53 §4 layer-1 post-hard-gate candidate item 12 "AT-24") |
+| Status | ✅ Done (closed 2026-11-11; AT-24 conditionally closed; ⑦ re-review `RE-REVIEW: PASS`; R=2; stopped at ⑩ awaiting authorization) |
+| Goal | AT-24 acceptance (the `supervised-black-box` explicit mode): 9 acceptance legs (item 9 expands into 9 sub-legs = 17 sub-legs in total, each with a positive + a negative example + a mechanical assertion); the R-09 three hard sentences must appear; **⑦ is the sole owner of the item-by-item R-09.1~R-09.9 judgment + the AT-24 acceptance conclusion** |
+| Dependencies | F2-FIX closed (AT-23 stage-1 condition closure achieved); the R-09 ruling (`docs/validation/r08-r09-ruling{,_EN}.md`); the T028 implementation (`DEV_PLAN.md:119`); the user's explicit kickoff |
+| Size | M; ⑦ high-risk tier = 1 final + 3 re-reviews, blind review +1 separately (§7.7 mandatory: touching stop/identity semantics) |
+| Steps | ① plan (lightweight) → ③ acceptance legs → ② implementation (only when a T028 defect is found) → ④ gates → ⑤ pre-review → ⑥ independent scan → ⑦ final review + blind review → ⑧ docs → ⑨ → 8c → ⑩ |
+| Current gap | The real SessionBridge visible E2E depends on T027-B ⇒ registered as unknown/boundary (judged per R-09.3 / R-09.7); this slice's acceptance legs are mechanism legs (stub visible delivery + simulated manual handoff + post-scan) |
+| Deliverables | Report pair `docs/validation/at24-supervised-black-box{,_EN}.md`; evidence pack `docs/validation/evidence/P64-AT24-SUPERVISED-BLACK-BOX/`; ADR-040 (step 0); this ledger block; DEV_PLAN / TEST_STRATEGY / s1-exit updated per the acceptance conclusion |
+| Acceptance evidence | Positive + negative examples + mechanical assertions for the 9 acceptance legs (including the 9 sub-legs); item-by-item R-09 boundary judgments (sole owner ⑦); the three sentences verbatim (checked ring by ring by ⑤⑥⑦); three scopes TOTAL_FAIL=0 + SELFTEST 722/722 |
+| Boundary | No product-code changes (T028 already implemented; defect fixes limited to the supervised-related files under `internal/console/**` and `internal/chain/**`); no CONTRACTS / schema / fixtures / workflows / directive / R-09 / T028-report-text changes; contract defects or R-09 defects stop and escalate; bound by the three bullets of §1.7.2; no VM / proxy / Sol double; no claim that S1 Exit passes as a whole |
+| Class | `[SLICE]` (acceptance) |
+| Probe budget | 0 (local console/chain-layer acceptance + stub visible delivery, no external calls) |
+| Freedom-list path | `docs/validation/evidence/P64-AT24-SUPERVISED-BLACK-BOX/freedom-list.md` |
+| R / D baseline | R = 0, D = 0 (registered at start, 2026-11-11) |
+| Temp artefact location | `tmp/P64-AT24-SUPERVISED-BLACK-BOX/` (append-only until 8c) |
+| Layer 1 post-hard-gate candidate item 12 status marker | ✅ Dequeued (closed 2026-11-11; ⑦ ruled the AT-24 acceptance conclusion = conditional closure) |
+| Completion record | AT-24 conditionally closed (⑦ re-review `RE-REVIEW: PASS`; report pair `docs/validation/at24-supervised-black-box{,_EN}.md`) |
 
 ## Known defects (to be handled before later slices)
 

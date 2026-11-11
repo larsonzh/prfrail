@@ -1,0 +1,93 @@
+P64 AT24-SUPERVISED-BLACK-BOX · 腿 4 证据 · 独立 gates/review（CONTRACTS §7.1(b) review/promotion）
+=====================================================================
+执行角色：③ prfrail-tester（DeepSeek V4.1 Flash，runSubagent 显式传 model）
+执行时点：2026-11-11
+工作目录：D:\LZProjects\prfrail
+环境：Windows 本机；无 VM / 无代理 / 无外部调用；Go 1.22 工具链
+性质：机制腿（stub visible 投递 + 模拟人工归还 + 后置扫描），非真实 SessionBridge visible 端到端
+证据原始输出：tmp/P64-AT24-SUPERVISED-BLACK-BOX/raw/（临时件，⑧c 清理；本文件为正式归档摘录）
+
+[0] 设计名 vs 实况名对照
+----------------
+  TestSupervisedPostflightQualifiesReviewPending              → 实况存在 → 一致
+  TestSupervisedPostflightDecisionMustConsumeAllFacts         → 实况存在 → 一致
+  TestSupervisedReturnRefusesFailedGate                       → 实况存在 → 一致
+  TestSupervisedUnqualifiedReviewRefused                      → 实况存在 → 一致
+  TestSupervisedTaskWithoutReturnFactsFailsClosed             → 实况存在 → 一致
+结论：设计引用名 5/5 实况命中，无杜撰、无替换。
+
+[1] A 层命令原文
+-----------
+go test -count=1 -run 'Postflight|UnqualifiedReview|TaskWithoutReturnFacts|ReturnRefusesFailedGate' ./internal/chain ./internal/console ./internal/adapters -v
+
+（M4 的 <p4> 即上式 -run 参数）
+
+[2] 原始输出关键摘录（顶层 PASS/FAIL + 包级 ok）
+----------------------------------
+--- PASS: TestEngineRequiresAPostflightPort (0.00s)
+--- PASS: TestPostflightGateConvergesAfterReviewPendingWasPersisted (0.01s)
+--- PASS: TestRequirePostflightQualifiedReviewFailsClosed (0.02s)
+--- PASS: TestPostflightGateRefusesAnUnqualifiedReviewState (0.00s)
+--- PASS: TestPostflightGateHandsAParentDigestFactSetToThePort (0.00s)
+--- PASS: TestPostflightDecisionRejectsMalformedEvidence (0.00s)
+--- PASS: TestPostflightGatePassesAndBindsTheFrozenFacts (0.01s)
+--- PASS: TestPostflightGateRefusesAnUnprovenPass (0.01s)
+--- PASS: TestPostflightGateRejectionParksTheTaskForRepair (0.01s)
+--- PASS: TestPostflightGateUncertainFailsAndPausesWithoutRetry (0.00s)
+--- PASS: TestPostflightGatePortFailureFailsTheTask (0.00s)
+--- PASS: TestPostflightGateConvergesAfterPartialWrite (0.01s)
+--- PASS: TestPostflightDecisionValidate (0.00s)
+--- PASS: TestPostflightGateRefusesTasksWithSeveralRoutedSteps (0.01s)
+--- PASS: TestSupervisedPostflightDecisionMustConsumeAllFacts (0.00s)
+--- PASS: TestSupervisedPostflightQualifiesReviewPending (0.00s)
+--- PASS: TestSupervisedUnqualifiedReviewRefused (0.00s)
+--- PASS: TestSupervisedTaskWithoutReturnFactsFailsClosed (0.00s)
+--- PASS: TestSupervisedReturnRefusesFailedGate (0.14s)
+--- PASS: TestAgentRunnerPostflightPassesOnRecordedEvidence (0.46s)
+--- PASS: TestAgentRunnerPostflightRejectsTamperedLegs (1.57s)
+--- PASS: TestAgentRunnerPostflightRejectsArtifactsNotBoundToFrozenFacts (0.34s)
+--- PASS: TestAgentRunnerPostflightIsUncertainWithoutPIDReport (0.48s)
+--- PASS: TestAgentRunnerPostflightRejectsUnreadablePIDReports (0.20s)
+--- PASS: TestAgentRunnerPostflightDispatchedParityMatchesRun (5.36s)
+--- PASS: TestAgentRunnerPostflightDispatchedParityReceiptsValidate (0.44s)
+ok  	github.com/larsonzh/prfrail/internal/chain	1.810s
+ok  	github.com/larsonzh/prfrail/internal/console	2.310s
+ok  	github.com/larsonzh/prfrail/internal/adapters	11.436s
+GOTEST_EXIT=0
+
+[3] 正例组结果（设计点名的 5 项 supervised 测试）
+----------------------------------
+--- PASS: TestSupervisedPostflightDecisionMustConsumeAllFacts (0.00s)
+--- PASS: TestSupervisedPostflightQualifiesReviewPending (0.00s)
+--- PASS: TestSupervisedUnqualifiedReviewRefused (0.00s)
+--- PASS: TestSupervisedTaskWithoutReturnFactsFailsClosed (0.00s)
+--- PASS: TestSupervisedReturnRefusesFailedGate (0.14s)
+
+语义：postflight 决策必须消费全部事实（不得部分消费）；合格 review 只到 review-pending，
+      不直接产出 task PASS ⇒ 「exit 0 / completed receipt 不直接 PASS」由 postflight 端口承担。
+
+[4] 反例组结果（设计点名的 3 项拒绝型测试）
+-------------------------
+PASS  TestSupervisedReturnRefusesFailedGate         （独立 gate 红 ⇒ 不 PASS）
+PASS  TestSupervisedUnqualifiedReviewRefused        （review 不合格 ⇒ 拒）
+PASS  TestSupervisedTaskWithoutReturnFactsFailsClosed（无归还事实 ⇒ fail-closed）
+结论：反例组 3/3 PASS。
+
+[5] 断言读数
+--------
+M4：PASS=26，FAIL=0 ⇒ 阈值 PASS>=5 / FAIL==0 ⇒ PASS
+    其中设计点名的 supervised 5 项 PASS=5/5；
+    其余 21 项为 <p4> 正则 "Postflight" 带入的非 supervised postflight 回归测试（见 [6] D-11）。
+可证伪性：TestSupervisedReturnRefusesFailedGate 为拒绝型断言（gate 失败 ⇒ 拒绝），
+          与「exit 0 直接 PASS」构成互斥；T028 §7.4 的变异表未覆盖本项，如需现场变异需 ② 授权改码。
+
+[6] 偏差与说明
+---------
+D-11（M4 正则宽度，显著）：<p4> 中的 "Postflight" 为宽匹配，带入 21 项非 supervised 的 postflight/AgentRunner
+    回归测试，使 PASS 读数由 5 抬升到 26。断言阈值仍满足，但读数不可读作「supervised 独立 gates 有 26 条覆盖」。
+    设计点名 5 项逐项 PASS 才是本腿的有效读数。
+D-12（review 独立性边界）：独立 gates 由 gates.Runner（GuardExecutor + DefaultSecretScanner）承担；
+    hook 定义来源在 CLI 装配中为空（T028 §8 D-18 / C-14），故真实 return 在当前装配下 fail-closed，
+    本腿的 review 通过路径由 stub postflight 端口驱动，非真实子进程 review。
+
+LEG 4: PASS（M4 PASS=26/FAIL=0，其中设计点名 5/5 PASS；D-11 正则宽度已登记）
