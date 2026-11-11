@@ -130,7 +130,7 @@ If 2 or more items disagree, take the repository as ground truth and report the 
   1. **G5(d) pitfall item-26 candidate** — formalized as item 26 in directive §13.4 by P66 (symptom and disposition kept verbatim); P65's "A-part carry-over" is closed at the same time.
   2. **In-snapshot frozen-content inflation** — resolved by the P66 §13 migration: the rule entities of §7 / §8 / §9 moved into the directive, and this snapshot keeps pointers only.
 - **Added in this version (5, all found at P66 close-out, all → P67)**:
-  1. **g4b cache has no LRU or cap**: P64 90 → P65 94 → P66 100, a 3–6 `.json` increment per slice, with no eviction. → P67 #1
+  1. **g4b cache has no LRU or cap**: P64 90 → P65 93 → P66 96, a +3 `.json` increment per slice, with no eviction. → P67 #1
   2. **The §12.4 proportional-sampling record block has not advanced since v1.32**: a debt that degrades v54's point-in-time accuracy. → P67 #3
   3. **⑥ independent-scan formal defects (all three P66 rounds invalid)**: r1 did not use the A–E shape (voided), r2 used A–E but two Medium findings were stale readings, r3 used `## A. Scope` instead of `## Section A` (downgraded to low-weight corroboration after the allowance was exhausted). → P67 #4
   4. **Three wording traps**: `忌` (a G4b unregistered character), the aggregate-count wording (the G6-4 aggregate-count shape), `候选` (read as a point-in-time word after being migrated into a formal table). → P67 #2
