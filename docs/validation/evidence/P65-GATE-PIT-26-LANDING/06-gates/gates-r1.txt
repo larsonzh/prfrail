@@ -1,0 +1,11 @@
+P65 GATE-PIT-26-LANDING · ④ 门禁读数（2026-11-11 实测；⑧ 装配后复跑同口径）
+
+go build ./... => BUILD_EXIT=0
+go vet ./... => VET_EXIT=0
+go test -count=1 ./... => ok 15 包（含 internal/chain、internal/console、tools/agent-stub），TEST_EXIT=0
+node tools/gates/gate.js --all --scope=index => TOTAL_FAIL=0，INDEX_EXIT=0（G1(e2) 2 judged；G5(d) 14 declared；G7-b 28 rows；G7-e 314 行；G7-f 2 围栏；G5(f) index hygiene PASS）
+node tools/gates/gate.js --all --scope=tree => TOTAL_FAIL=0，TREE_EXIT=0
+node tools/gates/gate.js --all --scope=ci => TOTAL_FAIL=0，CI_EXIT=0
+node tools/gates/gate.js --selftest => SELFTEST: PASS 722/722，SELFTEST_EXIT=0
+
+注：本片不改代码，Go 三件套保持绿；准则未升版（头部 v1.64 / §0.3 / 附录 C 未动），G1-b 未报红；升版口径留 ⑩ 用户裁决。

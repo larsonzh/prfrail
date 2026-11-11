@@ -1,0 +1,20 @@
+P65 GATE-PIT-26-LANDING · ⑦ 复审 r1（RE-REVIEW，收窄输入） · independent-reviewer + GPT-5.3-Codex · 只读
+
+RE-REVIEW: PASS
+
+Q1：Minor 1（M1）已闭合。
+- 是。EN 槽位行已为无重复版本（DELIVERY_DIRECTIVE_EN.md:L1388）。
+- CN/EN 同位对应成立（DELIVERY_DIRECTIVE.md:L1388 与 DELIVERY_DIRECTIVE_EN.md:L1388）。
+- 全文检索 EN 重复子句 "see DELIVERY_DIRECTIVE §6.3 G5(d)" 已无命中。
+
+Q2：Major 1 可判为"信息缺口已澄清"，不再阻断。
+- 可以。可见证据支持"+23 是相对 HEAD 的步骤 0 既有登记差异，不等于 ② 本轮净改动"：① 历史快照文件记录 numstat（tmp/P65-GATE-PIT-26-LANDING/hunks.txt:L73-L74）；② 同一快照显示准则两文件 +1（hunks.txt:L71-L72）；③ 台账当前确有步骤 0 起跑登记顶表行与 P65 段（REMAINING_SLICES.md:L98、EN:L98）；④ A-part 单行现位于字段表（REMAINING_SLICES.md:L1872、EN:L1859）。
+- 结论：按本轮收窄口径，可从"实现缺陷"降为"信息缺口已澄清"。
+
+Q3：Major 2 可判为"⑩ 用户裁决项"，不阻断 ⑧/⑨。
+- 可以，与上一轮 D 面口径一致。
+- 机械现状仍是"未升版/未补 §0.3"：头部仍 v1.64（DD:L3、EN:L3）；最新变更日志行仍到 v1.64（DD:L111、EN:L111）。
+- 因此可放行 ⑧/⑨，但仍保留硬条件：未获 ⑩ 同轮裁决前，不得按"已闭环"结项/提交。
+
+新发现（仅本轮范围）
+- Note：未在仓内检索到四个基线哈希前缀（9a82ffe、3202ca0、919d13e、1b380d3），Q2 中"删 A-part 后回到步骤 0 基线"当前只能依据主控机械回执事实判断，仓内暂缺可独立重放的哈希证据文本。此项不构成阻断。

@@ -95,6 +95,7 @@
 | P63 AT23-RECHECK | ✅ 已完成（2026-11-09 收口；⑦ 判定豁免不成立；R/D=0；停于 ⑩ 等授权） | P62（层 1 第 11 项） | S | 2026-11-09 | 证据包 `docs/validation/evidence/P63-AT23-RECHECK/`；P61 报告 §10 + §1 时点注记 |
 | F2-FIX-STUB-HANG | ✅ 已完成（2026-11-09 收口；⑦ 终审 `FINAL: PASS WITH FIXES` ⇒ 前提①满足；R/D=0；停于 ⑩ 等授权） | P63（豁免不成立 ⇒ 启动） | S | 2026-11-09 | 修复 hang 分支补写 0 字节空 stub-child.pid + 回归测试 + layer3 F2 红/绿重跑 + f1 对照；AT-23 阶段 1 条件闭合达成（阶段 2 不适用，用户裁定 A1）；证据包 `docs/validation/evidence/F2-FIX-STUB-HANG/`；P61 报告 §11 + §1 时点注记 |
 | P64 AT24-SUPERVISED-BLACK-BOX | ✅ 已完成（2026-11-11 收口；AT-24 条件闭合；⑦ 复审 RE-REVIEW: PASS；R=2；停于 ⑩ 等授权） | F2-FIX（层 1 后续候选第 12 项） | M | 2026-11-11 | 证据包 `docs/validation/evidence/P64-AT24-SUPERVISED-BLACK-BOX/`；临时件 `tmp/P64-AT24-SUPERVISED-BLACK-BOX/` |
+| P65 GATE-PIT-26-LANDING | ✅ 已完成（2026-11-11 收口；B-part 落地 + A-part 路径登记；A-part 实际落地待 v54/P66 生成时；R=1；停于 ⑩ 等授权） | P64（v53 §五 观察项升格；非层 2 原队列） | S | 2026-11-11 | 证据包 `docs/validation/evidence/P65-GATE-PIT-26-LANDING/`；临时件 `tmp/P65-GATE-PIT-26-LANDING/`；报告对 `docs/validation/gate-pit-26-landing{,_EN}.md` |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -1848,6 +1849,28 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 临时件落点声明 | 本片临时目录 = `tmp/P64-AT24-SUPERVISED-BLACK-BOX/`（⑧c 前只增不删） |
 | 层 1 后续候选第 12 项状态标记 | ✅ 出队（2026-11-11 收口；⑦ 判定 AT-24 验收结论 = 条件闭合） |
 | 完成记录 | AT-24 条件闭合（⑦ 复审 RE-REVIEW: PASS；报告对 `docs/validation/at24-supervised-black-box{,_EN}.md`） |
+
+### P65 — `GATE-PIT-26-LANDING`（层 2 治理侧 · v53 §五 观察项升格 · 治理类） · ✅ 已完成（2026-11-11 收口）
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `GATE-PIT-26-LANDING`（治理类 `[SLICE]`；自 v53 §五「G5(d) 第 26 条门禁坑候选」观察项升格；非层 2 原队列项） |
+| 状态 | ✅ 已完成（2026-11-11 收口；R = 1；主控 Flash；A-part 实际落地待 v54/P66 生成时；停于 ⑩ 等授权） |
+| 目标 | G5(d) 第 26 条门禁坑正式化 + 落点评估（A 只落 §九 / B 只落附录 B.7.1 / C 双保险；① 三案对比后自主推荐） |
+| 依赖 | P64 闭环（`2dbc54a`）；v53 §五 观察项；v1.64 §7.5 治理片 ⑦ 1+3 |
+| 规模 | S；⑦ 治理片档 = 1 终审 + 3 复审；盲审按 §7.7 判定（必抽条件不适用） |
+| 步骤 | ① 三案对比 → ② 文档实现 → ③ 一致性检查 → ④ 门禁 → ⑤ 预审 → ⑥ 独立扫描 → ⑦ 终审 → ⑧ 文档装配 → ⑨ → ⑧c → ⑩ |
+| 现状缺口 | 落点已定（用户裁决路线②：B-part 落地 + A-part 待 v54/P66）；v53 保持冻结 |
+| 交付物 | 报告对 `docs/validation/gate-pit-26-landing{,_EN}.md`；证据包 `docs/validation/evidence/P65-GATE-PIT-26-LANDING/`；准则 `DELIVERY_DIRECTIVE{,_EN}.md` 按落点改动；本台账本段 |
+| 验收证据 | 三案对比完整性 + CN/EN 逐条同位 + 门禁坑 1–26 编号连续 + 与 §5.0 无冲突 + 三作用域 TOTAL_FAIL=0 + SELFTEST 722/722 |
+| 边界 | 不改判据本体（`tools/gates/**`）/ CONTRACTS / schema / fixtures / 产品代码 / CI；判定需要则停下升级；不改 §九 1–25 条本体；不改 §5.0 其他步骤与附录 B.7 其他槽位；受 §1.7.2 三条 bullet 约束；不开 VM / 代理 / Sol 双打 |
+| 分级 | `[SLICE]`（治理类） |
+| 探针额度 | 0（纯文档本机） |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/P65-GATE-PIT-26-LANDING/freedom-list.md` |
+| R / D 基线 | R = 0、D = 0（2026-11-11 起跑登记） |
+| 临时件落点声明 | 本片临时目录 = `tmp/P65-GATE-PIT-26-LANDING/`（⑧c 前只增不删） |
+| A-part 继承待办 | v54/P66 生成时把 v53 §九 第 26 条候选正式化为正式条目（A1 正文 + A2 表头/版本注同步；逐字文本见 `docs/validation/gate-pit-26-landing{,_EN}.md` §3 与 `docs/validation/evidence/P65-GATE-PIT-26-LANDING/01-arch/design-r1.md` §4.1）；本片不改 v53（快照冻结） |
+| 完成记录 | B-part 落地（附录 B.7.1 槽位）+ A-part 路径登记；A-part 实际落地待 v54/P66 生成时（逐字文本见报告 §3 与 design-r1 §4.1）；报告对 `docs/validation/gate-pit-26-landing{,_EN}.md` |
 
 ## 已知缺陷（后续切片前处理）
 

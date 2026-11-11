@@ -1,0 +1,25 @@
+P65 GATE-PIT-26-LANDING · ⑥ 独立扫描 · independent-reviewer + MAI-Code-1.1-Flash · 只读
+
+INDEPENDENT SCAN: PASS
+
+Why this passes
+- v53 快照（docs/t027/CHECKLIST_v53{,_EN}.md）仍为在位权威，未被就地重写。
+- 路线②与冻结规则及台账记录一致：保持 v53 冻结、经台账指针承接 A-part、起跑消息槽位留在 DELIVERY_DIRECTIVE{,_EN}.md。
+- 一致性检查（03-test/consistency-r1.md）确认编号连续、指针可解析、同轮围栏问题范围划定正确。
+
+Severity summary
+- Critical: 0
+- Major: 0
+- Minor: 1
+- Note: 2
+
+⑤ findings disposition
+- M1「EN repeated clause」：ACCEPTED as Minor——EN 重复子句是真实措辞问题但非阻断；处置 = 删除重复句或 EN 对齐 CN；不影响路线②冻结决策。
+- M2「version registration gap」：REJECTED——本片有意不升准则版本、不编辑冻结的 v53 快照；登记已通过台账 + 待办指针（REMAINING_SLICES）正确完成，而非改写 v53；与「保持 v53 冻结」裁决一致。
+- N1–N5：REJECTED / not material——或为 M1/M2 的重复陈述，或为形态问题，不改变技术结论；均不推翻正确的路线②解释。
+
+Notes
+- 本审查未编辑文件、未改变仓库状态。
+- 唯一真实残留 = 上述 EN 重复句；属清理项，非阻断。
+
+Final ruling: route 2 is the correct landing, and the slice remains valid under the independent review.

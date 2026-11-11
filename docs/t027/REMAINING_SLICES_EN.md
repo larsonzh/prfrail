@@ -95,6 +95,7 @@
 | P63 AT23-RECHECK | ✅ Done (closed 2026-11-09; ⑦ rules the waiver does not hold; R/D=0; stopped at ⑩ awaiting authorization) | P62 (layer-1 item 11) | S | 2026-11-09 | Evidence pack `docs/validation/evidence/P63-AT23-RECHECK/`; P61 report §10 + the §1 timestamp note |
 | F2-FIX-STUB-HANG | ✅ Done (closed 2026-11-09; ⑦ final `FINAL: PASS WITH FIXES` ⇒ premise ① met; R/D=0; stops at ⑩ awaiting authorization) | P63 (the waiver does not hold ⇒ start) | S | 2026-11-09 | Fixed the hang branch to write the 0-byte empty stub-child.pid + regression test + layer3 F2 red/green re-runs + f1 contrast; AT-23 stage-1 condition closure achieved (stage 2 not applicable, user ruling A1); evidence pack `docs/validation/evidence/F2-FIX-STUB-HANG/`; P61 report §11 + §1 timestamp note |
 | P64 AT24-SUPERVISED-BLACK-BOX | ✅ Done (closed 2026-11-11; AT-24 conditionally closed; ⑦ re-review `RE-REVIEW: PASS`; R=2; stopped at ⑩ awaiting authorization) | F2-FIX (layer 1 post-hard-gate candidate item 12) | M | 2026-11-11 | Evidence pack `docs/validation/evidence/P64-AT24-SUPERVISED-BLACK-BOX/`; temp `tmp/P64-AT24-SUPERVISED-BLACK-BOX/` |
+| P65 GATE-PIT-26-LANDING | ✅ Done (closed 2026-11-11; B-part landed + A-part path registered; the actual A-part landing awaits v54/P66 generation; R=1; stopped at ⑩ awaiting authorization) | P64 (promoted from the v53 §5 observation item; not a layer-2 queue item) | S | 2026-11-11 | Evidence pack `docs/validation/evidence/P65-GATE-PIT-26-LANDING/`; temp `tmp/P65-GATE-PIT-26-LANDING/`; report pair `docs/validation/gate-pit-26-landing{,_EN}.md` |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1835,6 +1836,28 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Temp artefact location | `tmp/P64-AT24-SUPERVISED-BLACK-BOX/` (append-only until 8c) |
 | Layer 1 post-hard-gate candidate item 12 status marker | ✅ Dequeued (closed 2026-11-11; ⑦ ruled the AT-24 acceptance conclusion = conditional closure) |
 | Completion record | AT-24 conditionally closed (⑦ re-review `RE-REVIEW: PASS`; report pair `docs/validation/at24-supervised-black-box{,_EN}.md`) |
+
+### P65 — `GATE-PIT-26-LANDING` (layer-2 governance side · promoted from a v53 §5 observation item · governance class) · ✅ Done (closed 2026-11-11)
+
+| Field | Content |
+|---|---|
+| Identifier | `GATE-PIT-26-LANDING` (governance `[SLICE]`; promoted from the v53 §5 observation item "G5(d) gate-pitfall No. 26 candidate"; not a layer-2 queue item) |
+| Status | ✅ Done (closed 2026-11-11; R = 1; controller Flash; the actual A-part landing awaits v54/P66 generation; stopped at ⑩ awaiting authorization) |
+| Goal | Formalize gate pitfall No. 26 (G5(d) new evidence-pack fence) and evaluate the landing point (A §9 only / B appendix B.7.1 only / C both; ① compares the three cases and recommends) |
+| Dependencies | P64 closed (`2dbc54a`); the v53 §5 observation item; v1.64 §7.5 governance tier ⑦ 1+3 |
+| Size | S; ⑦ governance tier = 1 final + 3 re-reviews; blind review per §7.7 (mandatory-pick condition not applicable) |
+| Steps | ① three-case comparison → ② doc implementation → ③ consistency check → ④ gates → ⑤ pre-review → ⑥ independent scan → ⑦ final review → ⑧ doc assembly → ⑨ → 8c → ⑩ |
+| Current gap | Landing point decided (user ruling route ②: B-part landed + A-part awaits v54/P66); v53 stays frozen |
+| Deliverables | Report pair `docs/validation/gate-pit-26-landing{,_EN}.md`; evidence pack `docs/validation/evidence/P65-GATE-PIT-26-LANDING/`; directive `DELIVERY_DIRECTIVE{,_EN}.md` per the chosen landing point; this ledger block |
+| Acceptance evidence | Complete three-case comparison + line-by-line CN/EN parity + pitfall 1–26 numbering continuity + no conflict with §5.0 + three scopes TOTAL_FAIL=0 + SELFTEST 722/722 |
+| Boundary | No criterion-body (`tools/gates/**`) / CONTRACTS / schema / fixtures / product-code / CI changes; escalate if a judgment requires any; no change to §9 items 1–25; no change to other §5.0 steps or other appendix B.7 slots; bound by the three bullets of §1.7.2; no VM / proxy / Sol double |
+| Class | `[SLICE]` (governance) |
+| Probe budget | 0 (pure documentation, local) |
+| Freedom-list path | `docs/validation/evidence/P65-GATE-PIT-26-LANDING/freedom-list.md` |
+| R / D baseline | R = 0, D = 0 (registered at start, 2026-11-11) |
+| Temp artefact location | `tmp/P65-GATE-PIT-26-LANDING/` (append-only until 8c) |
+| A-part carry-over | At v54/P66 generation, formalize the v53 §9 item-26 candidate into a formal entry (A1 body + A2 header/version-note sync; verbatim text in `docs/validation/gate-pit-26-landing{,_EN}.md` §3 and `docs/validation/evidence/P65-GATE-PIT-26-LANDING/01-arch/design-r1.md` §4.1); this slice does not touch v53 (frozen snapshot) |
+| Completion record | B-part landed (the Appendix B.7.1 slot) + A-part path registered; the actual A-part landing awaits v54/P66 generation (verbatim text in the report §3 and design-r1 §4.1); report pair `docs/validation/gate-pit-26-landing{,_EN}.md` |
 
 ## Known defects (to be handled before later slices)
 

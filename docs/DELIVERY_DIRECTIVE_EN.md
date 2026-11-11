@@ -1,6 +1,6 @@
 ﻿# ProofRail Delivery Execution Directive (DELIVERY_DIRECTIVE)
 
-Version: v1.64. Date: 2026-11-06. Status: **CN body frozen** ( `_EN` mirror in `docs/DELIVERY_DIRECTIVE_EN.md`).
+Version: v1.65. Date: 2026-11-11. Status: **CN body frozen** ( `_EN` mirror in `docs/DELIVERY_DIRECTIVE_EN.md`).
 
 > **Multilingual note**: this file is a strict positional mirror of the CN body, maintained in step with it (updated after CN is frozen, to avoid bilingual rework during review); `docs/DELIVERY_DIRECTIVE.md` is authoritative and wins on any conflict (see §11.1). **Language tag**: `lang:en` (the G6-6 word-table selection key, see §6.3).
 > **Encoding**: this document and its `_EN` mirror must stay UTF-8 **with BOM** + **LF**.
@@ -109,6 +109,7 @@ Version: v1.64. Date: 2026-11-06. Status: **CN body frozen** ( `_EN` mirror in `
 | v1.62 | 2026-11-05 | **Ledger backfill (close-out of slice `P58-OB-TRIAGE`; no user authorization)**: the disposition cells of OB-13 / OB-48 / OB-68 / OB-75 / OB-77 in §12.4 gain a "P58 assessment recommendation" pointer, and the "Infrastructure maintenance" row in §12.5 gains a pointer of the same origin; **no opening status word is changed, neither 已处置 nor 已裁决 is flipped, no criterion is added and no rule semantics is altered**; evidence in `docs/validation/p58-ob-triage-assessment{,_EN}.md`. This row was issued by the controller under the ledger-backfill MINOR precedent; **it is a §1.7.2 opportunistic-edit deviation without user authorization**, and **awaits the user's ⑩ ratification** (ratify keeps v1.62, otherwise revert to v1.61). **Ratification note (user ⑩, 2026-11-05)**: on 2026-11-05 the user ratified v1.62 at ⑩; it is a ledger-backfill MINOR that only appends pointers and a log row and alters no rule semantics. | `P58-OB-TRIAGE` (this slice's report §1 records v1.62 as an in-slice ledger-backfill by-product) |
 | v1.63 | 2026-11-06 | **Slice `P59 DIRECTIVE-SCOPE-GUARD` landed (user R-12 ruling of 2026-11-06: A2×B1×Y1, tier S)**: (1) the §1.7.2 escalation-boundary list gains three trailing bullets (no same-turn-authorized directive bump / authorization-basis wording must be traceable / dispatch beyond the authorized quantity or scope; P58's D-6 is a twice-repeated empirical case); (2) §0.2 gains the sentence "a directive version bump is a §1.7.2 escalation boundary"; (3) §4.2.1 minimum verification actions grow from six to seven (item 7 = authorization traceability, OB-137 landed); (4) the OB-137 disposition cell of §12.4 flips to `已处置` with a landing note. **This bump is authorized by the user's 2026-11-06 R-12 ruling, not a self-made in-slice decision**. **No change to §2.2 / §2.4 / §5.2 matrix / §7.5 numbers / §6.3 criterion bodies; `tools/gates/**`, CONTRACTS / schema / fixtures / workflows and `internal/**` untouched.** | `P59 DIRECTIVE-SCOPE-GUARD` (this slice) |
 | v1.64 | 2026-11-06 | **Slice `P60 DIRECTIVE-JUDGE-BLINDSPOTS` landed (user P60 ruling of 2026-11-06: J2×J3, tier M)**: (1) §6.3 G1 gains sub-check (e2) (an added in-block completion-record field row ⇒ the enclosing block's heading must be `✅`; historical rows are never re-judged); (2) §6.3 G5 gains sub-check (e2) (the evidence path of an added in-block completion-record field row resolves); (3) `tools/gates/lib/criteria/g1.js` / `g5.js` and the selftest fixtures are updated in step; (4) OB-138 in §12.4 is turned to 「已处置」 (in-block completion rows of P40–P58 remain a human duty; future slices are covered by (e2)). The version bump of this slice is authorized by the user's P60 ruling of 2026-11-06 (J2), not decided inside the slice. | P60 |
+| v1.65 | 2026-11-11 | **Slice `P65 GATE-PIT-26-LANDING` landed (B-part Appendix B.7.1 slot + A-part ledger carry-over; version bump authorized by the user's ⑩ ruling, option B)**: (1) the Appendix B.7.1 startup-message template gains a "new evidence pack → same-round fence declaration" slot (CN/EN positional, +1 line per file); (2) the P65 block of `REMAINING_SLICES{,_EN}.md` gains an "A-part carry-over" row (formalize the v53 §9 item-26 candidate when v54 or P66 is generated); (3) Appendix C gains this slice's ledger block **C.0as**. **v53 is untouched (frozen snapshot); the §6.3 criterion body, CONTRACTS / schema / fixtures, `internal/**` and CI are unchanged.** | `P65 GATE-PIT-26-LANDING` (this slice; no action required) |
 ---
 
 ## 1. Scope and Slice Model
@@ -1385,6 +1386,7 @@ Slice definition: [ledger file §subsection ｜ or give the field table of §1.2
 Effort tier: [low / high / max] (the operator has already set it on the UI side; this line is for the record only)
 Probe budget: [n times ｜ none]
 ⑥⑦ input-package scope: [per §7.3 blind-review package / narrowed package / other (reason required)]
+New evidence pack → same-round fence declaration: [whether this slice creates a new evidence pack; if yes ⇒ add rows to the changed report's artifacts fence in the same round (incl. MANIFEST and SHA256SUMS themselves); precedent = gate pitfall No. 26 (docs/t027/CHECKLIST current §9), calibre = §6.3 G5(d)]
 Authorization boundary: [commit pre-authorized?] / [push pre-authorized?] / [paid-call cap]
 [pilot period only] Pilot metrics declaration: [cite the metric line in §12.1]
 Notes: [other constraints]
@@ -2124,6 +2126,19 @@ The following files **only get a supersede pointer added to the file header and 
 | Evidence | after the staged deletion of `docs/ADR_REGISTER.md`, the old enumeration corpus is one character short and reports 1 unknown, while the difference set of the new enumeration is empty (the A/B probe readings are in the evidence pack of this slice) |
 | Review chain | ⑤ two rounds (`PRE-REVIEW: PASS WITH FIXES`) → ⑥ `INDEPENDENT SCAN: PASS` → ⑦ three rounds (`FINAL REVIEW: FINDINGS` → `RE-REVIEW: FINDINGS` → `RE-REVIEW: PASS`) |
 | Note | this slice repairs a criterion implementation and changes no role set, pipeline structure or cost cap |
+
+### C.0as Gate-pitfall No. 26 landing slice `GATE-PIT-26-LANDING` (v1.65)
+
+| Item | Content |
+|---|---|
+| Slice / size | `GATE-PIT-26-LANDING` (governance `[SLICE]`; tier S, documentation-only governance; 0 probes) |
+| Trigger | The v53 snapshot §5 observation item + the §9 item-26 candidate; two in-slice hits during P64 as empirical evidence |
+| Goal | B-part: the Appendix B.7.1 startup-message template gains the "new evidence pack → same-round fence declaration" slot; A-part: register the formalization carry-over for v54/P66 generation in the ledger |
+| Deliverables | Appendix B.7.1 of `docs/DELIVERY_DIRECTIVE{,_EN}.md` (+1 line per file); the "A-part carry-over" row of `docs/t027/REMAINING_SLICES{,_EN}.md` (+1 line per file) |
+| Scope | Only Appendix B.7.1 and the ledger; the criterion body / CONTRACTS / schema / fixtures / code are unchanged; v53 is untouched (frozen snapshot) |
+| Review | ⑤ 1+1 (`PRE-REVIEW: PASS WITH FIXES`, no Medium or above); ⑥ 1 run (`INDEPENDENT SCAN: PASS`, 0 Critical / 0 Major / 1 Minor); ⑦ one final plus one re-review (`RE-REVIEW: PASS`, R=1); no blind review (§7.7 mandatory draw not applicable; not drawn under §12.4) |
+| Version | v1.65 bumped under the user's ⑩ ruling (option B); ⑦ not re-run per the §7.8.4 OB-11 exception (metadata-level change) |
+| Note | This slice front-loads the B-part before the snapshot→directive migration; the A-part is completed by v54/P66; the pitfall-26 trap hit a 6th time during this slice's implementation and the fence was patched in the same round |
 
 ### C.1 v3.1 section numbers → this directive
 

@@ -1,0 +1,28 @@
+P65 GATE-PIT-26-LANDING · ⑦ 终审 · independent-reviewer + GPT-5.3-Codex · 只读 · 首轮不附任何清单（锚定硬隔离）
+
+FINAL REVIEW: FINDINGS
+
+发现清单
+Critical
+1. 无。
+
+Major
+1. ②改动不满足"4 文件各恰好 +1 行"。机械读数（暂存区 numstat）为：docs/DELIVERY_DIRECTIVE.md +1/-0；docs/DELIVERY_DIRECTIVE_EN.md +1/-0；docs/t027/REMAINING_SLICES.md +23/-0；docs/t027/REMAINING_SLICES_EN.md +23/-0。大块新增定位见 REMAINING_SLICES.md:L1853 与 REMAINING_SLICES_EN.md:L1840。
+2. 准则正文已改，但未同步升版与 §0.3 变更日志，当前不满足准则自身版本纪律。已改位置：DELIVERY_DIRECTIVE.md:L1388、DELIVERY_DIRECTIVE_EN.md:L1388。规则要求：每次变更必须更新版本与 §0.3 日志（DELIVERY_DIRECTIVE.md:L37）。同时准则升版又属于升级边界，需同轮用户授权（DELIVERY_DIRECTIVE.md:L236）。
+
+Minor
+1. CN/EN 新增槽位语义基本同位，但 EN 多出一段重复指针"see DELIVERY_DIRECTIVE §6.3 G5(d)"，严格同位性略有偏差（DD_EN:L1388 vs DD:L1388）。
+2. A-part 继承待办存在"双来源"依赖；其中一个来源尚未落盘，执行时有轻微歧义风险（REMAINING_SLICES.md:L1872、REMAINING_SLICES_EN.md:L1859；现存可执行逐字源在 01-arch/design-r1.md:L46）。
+
+Note
+1. B-part 槽位位置正确：位于"⑥⑦ 输入包范围"后、"授权边界"前（DD:L1387/L1388/L1389）。
+2. 第 26 条候选与 §五三点叙述保持一致，且门禁坑编号 1–26 连续（CHECKLIST_v53.md:L120、L278）。
+3. §6.3 G5(d) 与实现一致，当前未见"必须改判据本体"的证据（g5.js:L236、L250）。
+
+A–F 逐项判定
+A. 落点充分性（路线②）：① 结论：文档治理闭环"B-part 槽位 + A-part 继承待办"在本片范围内是可成立的，且已有 G5(d) 机械检测兜底。② 判定：不触发 ESCALATION REQUIRED（当前没有证据表明必须改 tools/gates 判据本体）。
+B. ②改动正确性：① 未通过"4 文件各 +1 行"这一硬条件（两份台账各 +23）。② 通过项：B-part 槽位插入位置正确；v53 未改；门禁坑 1–25 未改；§5.0 未改；判据本体/契约/产品代码未触（就暂存清单看）。
+C. A-part 继承待办可执行性：① 基本可执行：何时（v54/P66 生成时）+ 落哪（v53 §九第26条候选正式化）+ 逐字源（design-r1 §4.1）均已给出。② 信息缺口：引用了一个尚未落盘的报告目标，建议在⑧装配后统一到单一已存在权威源，降低歧义。
+D. 未升版合规影响（v1.64 头部未动、§0.3 无新增、附录 C 无块）：① 这是实质合规缺口，不宜按"已闭环"结项。② 但不必判为本轮立即停机：可在⑩由用户同轮授权后补做升版与日志（再进入收口）。③ 若未获得⑩授权，则不得以当前文本状态结项/提交。
+E. 第26条与§五三点一致性、1–26连续性：① 一致性：通过（症状/根因/候选处置三点对齐）。② 编号连续：通过（1–26 连续，无缺无重）。
+F. "不得作为先例"条款使用说明：① 本审主结论未依赖"不得作为先例"进行放行。② 若后续选择"先不升版、仅登记后补"，该动作超出常规字面标准，必须走用户直接裁定并按元规则登记"不得作为先例"。
