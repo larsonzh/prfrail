@@ -96,6 +96,7 @@
 | F2-FIX-STUB-HANG | ✅ 已完成（2026-11-09 收口；⑦ 终审 `FINAL: PASS WITH FIXES` ⇒ 前提①满足；R/D=0；停于 ⑩ 等授权） | P63（豁免不成立 ⇒ 启动） | S | 2026-11-09 | 修复 hang 分支补写 0 字节空 stub-child.pid + 回归测试 + layer3 F2 红/绿重跑 + f1 对照；AT-23 阶段 1 条件闭合达成（阶段 2 不适用，用户裁定 A1）；证据包 `docs/validation/evidence/F2-FIX-STUB-HANG/`；P61 报告 §11 + §1 时点注记 |
 | P64 AT24-SUPERVISED-BLACK-BOX | ✅ 已完成（2026-11-11 收口；AT-24 条件闭合；⑦ 复审 RE-REVIEW: PASS；R=2；停于 ⑩ 等授权） | F2-FIX（层 1 后续候选第 12 项） | M | 2026-11-11 | 证据包 `docs/validation/evidence/P64-AT24-SUPERVISED-BLACK-BOX/`；临时件 `tmp/P64-AT24-SUPERVISED-BLACK-BOX/` |
 | P65 GATE-PIT-26-LANDING | ✅ 已完成（2026-11-11 收口；B-part 落地 + A-part 路径登记；A-part 实际落地待 v54/P66 生成时；R=1；停于 ⑩ 等授权） | P64（v53 §五 观察项升格；非层 2 原队列） | S | 2026-11-11 | 证据包 `docs/validation/evidence/P65-GATE-PIT-26-LANDING/`；临时件 `tmp/P65-GATE-PIT-26-LANDING/`；报告对 `docs/validation/gate-pit-26-landing{,_EN}.md` |
+| P66 CHECKLIST-RULES-HOIST | ✅ 已完成（2026-11-11 收口；§13 五节落地；⑦ 终审 FINDINGS⇒整改后复审；⑥ 形式缺陷降级；R=3；停于 ⑩ 等授权） | P65（层 2 治理侧，快照→准则结构性迁移） | L | 2026-11-11 | 报告对 `docs/validation/checklist-rules-hoist{,_EN}.md`；证据包 `docs/validation/evidence/P66-CHECKLIST-RULES-HOIST/`；临时件 `tmp/P66-CHECKLIST-RULES-HOIST/` |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -1871,6 +1872,27 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 临时件落点声明 | 本片临时目录 = `tmp/P65-GATE-PIT-26-LANDING/`（⑧c 前只增不删） |
 | A-part 继承待办 | v54/P66 生成时把 v53 §九 第 26 条候选正式化为正式条目（A1 正文 + A2 表头/版本注同步；逐字文本见 `docs/validation/gate-pit-26-landing{,_EN}.md` §3 与 `docs/validation/evidence/P65-GATE-PIT-26-LANDING/01-arch/design-r1.md` §4.1）；本片不改 v53（快照冻结） |
 | 完成记录 | B-part 落地（附录 B.7.1 槽位）+ A-part 路径登记；A-part 实际落地待 v54/P66 生成时（逐字文本见报告 §3 与 design-r1 §4.1）；报告对 `docs/validation/gate-pit-26-landing{,_EN}.md` |
+
+### P66 — `CHECKLIST-RULES-HOIST`（层 2 治理侧 · 快照→准则结构性迁移 · 治理类） · ✅ 已完成（2026-11-11 收口）
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `CHECKLIST-RULES-HOIST`（治理类 `[SLICE]`；任务包已送达；由用户裁定立项） |
+| 状态 | ✅ 已完成（2026-11-11 收口；§13 五节落地；⑦ 终审 FINDINGS⇒整改后复审；⑥ 形式缺陷降级；R = 3；停于 ⑩ 等授权） |
+| 目标 | 把 v53 §七 / §八 / §九（清单元规则与门禁坑 1–26 条）中已固化的执行纪律迁移到准则新增 §13「跨片协作与起跑通则」，软约束升格为硬约束；v54 起快照只保留时点数据 |
+| 依赖 | P65 闭环（`0eda074`）；v53 §五 观察项（快照内容膨胀）；v1.65 §7.5 L 档治理片 ⑦ 1+3 |
+| 规模 | L；⑦ 治理片档 = 1 终审 + 3 复审；盲审按 §7.7 判定 |
+| 步骤 | ① 四件（三案对比 / 去重分析 / 迁移映射 / 决策清单）→ ② 分步 A–G → ③ 一致性检查 → ④ 门禁 → ⑤ 预审 → ⑥ 独立扫描 → ⑦ 终审 → ⑧ 文档装配 → ⑨ → ⑧c → ⑩ |
+| 现状缺口 | 迁移范围与落点待 ① 判定；v53 §九 与准则 §6.3 的部分重叠需逐条定性 |
+| 交付物 | 报告对 `docs/validation/checklist-rules-hoist{,_EN}.md`；证据包 `docs/validation/evidence/P66-CHECKLIST-RULES-HOIST/`；准则 `DELIVERY_DIRECTIVE{,_EN}.md` 新增 §13 五节 + 版本行；本台账本段 |
+| 验收证据 | 去重分析逐条落地 + 迁移映射逐条可核 + 门禁坑 1–26 编号连续且 CN/EN 26/26 + §13 与 §1–§12 无重复定义 + 三作用域 TOTAL_FAIL=0 + SELFTEST 722/722 |
+| 边界 | 不改判据本体 / CONTRACTS / schema / fixtures / 产品代码 / CI；不改准则 §0–§12 正文（§0.3 新行与头部版本号除外）；不改 v50–v53；不改门禁坑 26 条原文语义；受 §1.7.2 三条 bullet 约束；不开 VM / 代理 / Sol 双打 |
+| 分级 | `[SLICE]`（治理类） |
+| 探针额度 | 0（纯文档本机） |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/P66-CHECKLIST-RULES-HOIST/freedom-list.md` |
+| R / D 基线 | R = 0、D = 0（2026-11-11 起跑登记） |
+| 临时件落点声明 | 本片临时目录 = `tmp/P66-CHECKLIST-RULES-HOIST/`（⑧c 前只增不删） |
+| 完成记录 | §13 五节落盘 + 附录 C.0at + §0.3 v1.66 + B.7.1/B.7.4 指针；报告对 `docs/validation/checklist-rules-hoist{,_EN}.md` |
 
 ## 已知缺陷（后续切片前处理）
 

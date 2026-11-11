@@ -1,0 +1,11 @@
+=== P66 stage-9 final gates 2026-11-11 ===
+COMMAND: gate.js --all --scope=index
+TOTAL_FAIL=0
+COMMAND: gate.js --all --scope=tree
+TOTAL_FAIL=0
+COMMAND: gate.js --all --scope=ci
+TOTAL_FAIL=0
+COMMAND: gate.js --selftest
+SELFTEST: PASS 722/722
+build EXIT=0 / vet EXIT=0 / test EXIT=0 (go build|vet|test -count=1 ./...)
+SELFTEST 722/722; go test ok=15 FAIL=0

@@ -1,6 +1,6 @@
 ﻿# ProofRail Delivery Execution Directive (DELIVERY_DIRECTIVE)
 
-Version: v1.65. Date: 2026-11-11. Status: **CN body frozen** ( `_EN` mirror in `docs/DELIVERY_DIRECTIVE_EN.md`).
+Version: v1.66. Date: 2026-11-11. Status: **CN body frozen** ( `_EN` mirror in `docs/DELIVERY_DIRECTIVE_EN.md`).
 
 > **Multilingual note**: this file is a strict positional mirror of the CN body, maintained in step with it (updated after CN is frozen, to avoid bilingual rework during review); `docs/DELIVERY_DIRECTIVE.md` is authoritative and wins on any conflict (see §11.1). **Language tag**: `lang:en` (the G6-6 word-table selection key, see §6.3).
 > **Encoding**: this document and its `_EN` mirror must stay UTF-8 **with BOM** + **LF**.
@@ -110,6 +110,7 @@ Version: v1.65. Date: 2026-11-11. Status: **CN body frozen** ( `_EN` mirror in `
 | v1.63 | 2026-11-06 | **Slice `P59 DIRECTIVE-SCOPE-GUARD` landed (user R-12 ruling of 2026-11-06: A2×B1×Y1, tier S)**: (1) the §1.7.2 escalation-boundary list gains three trailing bullets (no same-turn-authorized directive bump / authorization-basis wording must be traceable / dispatch beyond the authorized quantity or scope; P58's D-6 is a twice-repeated empirical case); (2) §0.2 gains the sentence "a directive version bump is a §1.7.2 escalation boundary"; (3) §4.2.1 minimum verification actions grow from six to seven (item 7 = authorization traceability, OB-137 landed); (4) the OB-137 disposition cell of §12.4 flips to `已处置` with a landing note. **This bump is authorized by the user's 2026-11-06 R-12 ruling, not a self-made in-slice decision**. **No change to §2.2 / §2.4 / §5.2 matrix / §7.5 numbers / §6.3 criterion bodies; `tools/gates/**`, CONTRACTS / schema / fixtures / workflows and `internal/**` untouched.** | `P59 DIRECTIVE-SCOPE-GUARD` (this slice) |
 | v1.64 | 2026-11-06 | **Slice `P60 DIRECTIVE-JUDGE-BLINDSPOTS` landed (user P60 ruling of 2026-11-06: J2×J3, tier M)**: (1) §6.3 G1 gains sub-check (e2) (an added in-block completion-record field row ⇒ the enclosing block's heading must be `✅`; historical rows are never re-judged); (2) §6.3 G5 gains sub-check (e2) (the evidence path of an added in-block completion-record field row resolves); (3) `tools/gates/lib/criteria/g1.js` / `g5.js` and the selftest fixtures are updated in step; (4) OB-138 in §12.4 is turned to 「已处置」 (in-block completion rows of P40–P58 remain a human duty; future slices are covered by (e2)). The version bump of this slice is authorized by the user's P60 ruling of 2026-11-06 (J2), not decided inside the slice. | P60 |
 | v1.65 | 2026-11-11 | **Slice `P65 GATE-PIT-26-LANDING` landed (B-part Appendix B.7.1 slot + A-part ledger carry-over; version bump authorized by the user's ⑩ ruling, option B)**: (1) the Appendix B.7.1 startup-message template gains a "new evidence pack → same-round fence declaration" slot (CN/EN positional, +1 line per file); (2) the P65 block of `REMAINING_SLICES{,_EN}.md` gains an "A-part carry-over" row (formalize the v53 §9 item-26 candidate when v54 or P66 is generated); (3) Appendix C gains this slice's ledger block **C.0as**. **v53 is untouched (frozen snapshot); the §6.3 criterion body, CONTRACTS / schema / fixtures, `internal/**` and CI are unchanged.** | `P65 GATE-PIT-26-LANDING` (this slice; no action required) |
+| v1.66 | 2026-11-11 | **Slice `P66 CHECKLIST-RULES-HOIST` landed (the execution discipline already solidified in the v53 snapshot is elevated into the directive body; structural-migration slice)**: (1) §13 "Cross-slice collaboration and startup general rules" is added, with five subsections (§13.1 startup and step-0 general rules / §13.2 cross-slice collaboration discipline / §13.3 checklist meta-rules / §13.4 gate pitfalls / §13.5 snapshot structure template); (2) the execution discipline already solidified in the v53 snapshot is elevated into the directive body; (3) the historical snapshots v50–v53 are not retrofitted. **No change to the §0–§12 body; the criterion body / CONTRACTS / schema / fixtures / product code and the v50–v53 snapshots are unchanged.** | `P66 CHECKLIST-RULES-HOIST` (this slice; no action required) |
 ---
 
 ## 1. Scope and Slice Model
@@ -1206,6 +1207,173 @@ Observation items (phenomena not yet sufficient to change the directive) are reg
 
 **Gap-row registration timing (OB-16, v1.33)**: a §12.5 gap row produced by the slice itself is **registered when the slice starts**, with a truthful-receipt note (recording that the row predates this slice's conclusion); it must **not** be deferred until after the commit, or "the workspace is clean before work starts" (§1.5) and the existence of that row become entangled.
 
+## 13. Cross-slice collaboration and startup general rules
+
+> This chapter promotes execution discipline long frozen in the cross-session snapshot into the directive body (sources: v53 §7 / §8 / §9); historical snapshots v50–v53 are never retro-edited (§11.1), and this chapter applies only to snapshots and slices from v54 on.
+
+### 13.1 Startup and step-0 general rules
+
+This section specifies the anchor verification, step-0 registration and pre-declarations every slice must complete at start-up.
+
+- **13.1.1 Anchor verification and step-0 registration**: verify the anchors → step 0: register this slice's ledger (`R/D = 0` baseline, temporary-artefact location `tmp/<sliceID>/`) and land `input-list.md` and `freedom-list.md`. Ledger registration discipline is in §1.8, the `tmp/` lifecycle and location closed set in §1.5.1 and §5.1, and the fixed path and traceability requirements of the freedom list in §1.7.3.
+- **13.1.2 Every fix slice must ship regression tests**: every fix slice must ship **regression tests** and register any "test/lint not executed" explicitly. The base gate set is in §6.1 and the report structure in §11.3.
+- **13.1.3 All-green conditions before commit**: ⑨ three-scope all green + SELFTEST all green + `go build/vet/test ./...` all green, and only then may the slice commit. Gate entries are in §6.1, the three-scope self-check and SELFTEST criteria in §6.3; the concrete SELFTEST assertion count is point-in-time data and is not registered here (see §13.5).
+- **13.1.4 Model and carrier binding (pointer)**: the single authority for the model–carrier triple and the call string is §2.2, and the prohibition list is §2.4; "every `runSubagent` call must pass both `agentName` and `model`" is carried by R2.1 / R2.2. This section does not restate the model list.
+- **13.1.5 Execution cadence (pointer)**: the criteria for "no regular stop", per-ring closure and the single regular stop point live only in §5.3 and §10.4; this section does not restate them.
+- **13.1.6 Cross-version and cross-platform triage**: for a CI-versus-local divergence, check the toolchain version and build-tag coverage first; after a cross build, re-check with `go env GOOS GOARCH`; before deleting a symbol "unused locally", run at least one `go vet` against the opposite `GOOS`.
+- **13.1.7 Minimum batch-assistant dispatches**: each slice must dispatch `deep-reasoner` + the batch-assistant preferred model (values in the §2.2 batch-assistant note) **≥ 2 times**; **strictly serial** (R5.1), parallel subagents are forbidden.
+- **13.1.8 Master model policy**: the master takes the session master model of §2.2 and appendix B.0 by default; on a low-level concurrency / state-machine / handle-passing slice, a single design document over 10,000 characters, deep root-cause analysis of a large CI log set, or two consecutive behaviour drifts of the master, it must first suggest "upgrade the master model" to the user, or switch itself only after same-turn user authorisation, and must **never switch silently**; **any downgrade must be registered independently under the OB-37 meta-rule of §7.8.4** (with the truthful flags for rule-semantics change / beyond the literal standard / direct user ruling), and traced per §1.7.4.
+- **13.1.9 Role carriers are not substitutable**: ② must be dispatched to `prfrail-implementer` and ③ to `prfrail-tester`; the master only orchestrates, persists artefacts, runs gates and issues receipts (§3.2). **Exception**: pure evidence-completion / log-capture slices may be self-executed by the master, but only with same-turn explicit user direction (§1.7.4 ①). Carrier and model values are in §2.2; for documentation-type slices, ②/③ degrade to `prfrail-documenter` per §5.2, and this entry sets up no further exception.
+- **13.1.10 The startup message is an artefact**: step 0 must persist the user's startup message verbatim as `docs/validation/evidence/<sliceID>/00-briefing.md`, add it to `MANIFEST.md` and `SHA256SUMS.txt`, and declare it in the `artifacts` fence; without this file the slice may not enter ①. The startup flow is in §5.0 and the fence-disclosure and manifest criteria in §6.3 G5(d) / G8.
+- **13.1.11 Linearisation-point discipline**: where a persistent state machine is involved, "persisted successfully" must be the linearisation point; an in-memory CAS serves only as a same-process fast-reject cache.
+- **13.1.12 Evidence-package and fence synchronisation**: a new evidence payload must, in the same turn, gain a `MANIFEST.md` entry, a recomputed `SHA256SUMS.txt` and a line in the `artifacts` fence. Self-consistency criteria are in §6.3 G8 and G5(d), and the temporary-file location closed set in §5.1.
+- **13.1.13 Reviewer artefact archiving**: ⑤⑥⑦ output must be archived verbatim (`04-reviews/`); the master must not rebuild it from bullet points. The transcription contract and its scope are in §11.3, blind review and proportional sampling in §7.7.
+- **13.1.14 Assembly-verification slice discipline**: assertions must rest on falsifiable mechanical criteria; constant identities must be declared explicitly as non-sentinels; the report must state whether production code was left untouched. Falsifiability and conclusion landing are in §7.3 and criterion shapes in §6.3.
+- **13.1.15 Stop point of evaluation slices (pointer)**: the criterion for stopping at ⑩ after ⑨ is all green for an evaluation slice lives only in §10.4; this section does not restate it.
+- **13.1.16 A single output must not exceed 10,000 characters**: split into batches before the limit; self-restart is forbidden; read on demand.
+- **13.1.17 Compaction ends the slice**: at 100K of context or on a compaction prompt ⇒ end the current slice immediately; one conversation runs one L-tier slice only.
+- **13.1.18 The startup message must contain a "documentation sync" chapter**: if the slice changes the project phase state or a contract capability, the ⑧ phase must update the authoritative documents; omitting the chapter counts as a structural defect. The write-back caliber is in §11.2, and authority domains and the bilingual duty in §11.1.
+- **13.1.19 Environment pre-check and reuse iron rule**: an external environment must be declared explicitly at step 0; a missing tool must be probed before a minimal install; **remote SSH must use `bash -lc`** to load the login environment and probe user-level directories; installs must pin the version aligned with CI and verify checksums. Probe quotas are in §7.6.
+- **13.1.20 Reproducibility and fidelity of captured evidence**: the `COMMAND:` line of a capture must match the real argv; if only a display abbreviation can be written, an erratum entry must be raised in `anomalies.md` and the faithful command plus a `commandErrata` pointer written into the derived `index.json`; drift / constructed input artefacts must carry replayable rebuild steps in `replay.md`.
+
+### 13.2 Cross-slice collaboration discipline
+
+This section specifies the role–carrier–model binding, mechanical dispatch-table reading, and commit and temporary-artefact discipline for cross-slice work.
+
+- **13.2.1 Carrier table (pointer)**: the carrier split between ①⑤⑥⑦ and ②③⑧, "writable carriers must not run any review stage" and "batch assistance must not use `quick-researcher`" are defined only in §2.2 and its "carrier correction" note; this section does not restate the carrier or model list.
+- **13.2.2 Mechanical dispatch-table reading**: every `agentName` in the ⑩ dispatch table must be read verbatim and mechanically from `transcript.arguments.agentName`, with the script stdout attached verbatim; if that session's debug log carries no transcript, the receipt must explicitly mark "not mechanically verified" and register it as a known fact. The transcription contract is in §11.3.
+- **13.2.3 Serial dispatch (pointer)**: the serial-blocking caliber of `runSubagent`, "parallel subagents are forbidden" and "every call must pass `agentName` and `model`" are entities in R5.1 and R2.1 / R2.2; this section does not restate them.
+- **13.2.4 Commit message**: commit messages are always English, and any non-ASCII character requires `git commit -F <UTF-8 file>`; the format and language requirements are in §10.3.
+- **13.2.5 Independently checkable vs not independently checkable**: for independently checkable output (enumerations, fact comparisons, citation-point lists) a model error does not void it; for what cannot be checked independently (judgements, conclusions, review opinions) the work must be redone. Conclusion landing is in §7.3 and the falsifiability requirement in §1.2.
+- **13.2.6 ⑥ before ⑦**: ⑥ must complete before ⑦; where ⑥ is re-dispatched and the documents changed, the ⑦ conclusion must be re-assessed. Ring order is in §5.1 and closed-loop re-runs in §5.3.
+- **13.2.7 Temporary-artefact location and cleanup**: temporary artefacts always go to `tmp/<sliceID>/`, may only be cleaned by ⑧c, and only this slice's directory may be deleted — recursive deletion of a parent directory is forbidden; measuring character counts or recording intermediate state always uses an inline script. The location closed set is in §5.1.
+- **13.2.8 Long-command redirection**: never land PowerShell cmdlet output with `>`; use `node` direct writes, or `cmd /c` redirection for native commands (stdout passes through as bytes); `Tee-Object` is limited to pure-ASCII output (under PS 5.1 it also goes through the console code page, so non-ASCII turns into mojibake). This shares its root with the "UTF-8 stdout mojibake" row of §9.3: that row already lists `node` direct writes and "bare `>` byte passthrough for native commands" as dispositions, and this entry only adds the ASCII limit on `Tee-Object`, without contradicting it.
+- **13.2.9 Gate execution (pointer)**: the `--all --skip-base` usage for intermediate rings and the scripted entry point are in §6.3, the all-green conditions before commit in §13.1.3, and the hard rule for the pre-commit gate in R6.2; this section does not restate them.
+- **13.2.10 Discipline E · index scope order**: exact `git add` first → then `--scope=index`; the receipt must report `G6-1 scanned N` with N greater than 0. The order and scope criteria are in §6.3.
+- **13.2.11 Discipline F · norm-over-example boundary**: where a startup example conflicts with this directive, the directive wins, but the receipt must register the conflict. This entry covers only "startup example vs directive"; conflicts between documents are handled in §0.1.
+- **13.2.12 Discipline G · the fence is the landing snapshot**: the `artifacts` fence is sorted by path, TAB-separated, and byte-identical between CN and EN; touching a new file requires adding a line in the same turn. Fence and manifest criteria are in §6.3 G7 and G5(d).
+- **13.2.13 Discipline H · opposite-GOOS re-check (pointer)**: carried by §13.1.6 (the same rule as the identically named entry in v53 §7, merged into one); this section does not restate it.
+- **13.2.14 Discipline O · output-length defence (pointer)**: carried by §13.1.16 (the same rule as the identically named entries in v53 §7 and §9, merged into one); this section does not restate it.
+- **13.2.15 Discipline P · master-model switch triggers (pointer)**: the switch triggers and "never switch silently" are in §13.1.8; downgrade registration is in the OB-37 meta-rule of §7.8.4. The model list is not restated here (see §2.2 and §2.4).
+- **13.2.16 Discipline Q · batch-assistant output ceiling**: the dispatch must state a character ceiling and the receipt must report the character count actually received. The minimum dispatch count is in §13.1.7, and the batch-assistant model and prohibitions are in §2.2.
+- **13.2.17 Discipline R · one-shot clearing of stale ledger state**: when the ledger and the facts disagree, run a one-shot clearing slice with code and commits as the source of truth. The ledger caliber is in OB-28 of §12.4 and the write-back caliber in §11.2.
+- **13.2.18 Discipline S · session length and compaction discipline (pointer)**: carried by §13.1.17 (the same rule as the identically named entries in v53 §7 and §9, merged into one); this section does not restate it.
+- **13.2.19 Discipline T · quantifier form**: the ledger and reports must not write the form where an identifier is immediately followed by a quantifier — `G6-4` reads it as a line-count literal; write "that entry" or "that record" instead. The criterion is §6.3 G6-4.
+- **13.2.20 Discipline U · no verbatim quoting of trigger strings**: reports must not quote the strings that trigger a criterion verbatim. The criterion-side self-reference guard is in §6.3.
+- **13.2.21 Discipline V · large-task splitting and half-done contamination**: split a large task into small serial dispatches; after a timeout, always inspect half-done artefacts with `git status` / `git diff` and, where needed, revert precisely with `git checkout`. The splitting caliber is in §3.1.
+- **13.2.22 Discipline W · bilingual report structural alignment**: report pairs must be same-order and same-shape — equal `##` heading counts, byte-identical `artifacts` fences, and a complete five-part `sixstage` fence whose last line states the same conclusion. The six shapes of G3 cover only the directive pair, while this entry covers every report pair; the criteria are §6.3 G3 and G7-f.
+- **13.2.23 Discipline X · report before self-deleting (pointer)**: the order of disposition is already written in §5.1 (report the path first, wait for the master to take pre-readings, then delete), and a violation goes to the non-self-healing tier; this section does not restate it.
+- **13.2.24 Discipline Z · blank line before blockquote notes**: a blockquote-class note (`> **...**`) must be preceded by a blank line, otherwise the renderer merges the note into the table / paragraph above; after landing, mechanically assert that the count of `> **` note lines without a preceding blank line is 0.
+- **13.2.25 Discipline Y · no in-slice version bump (pointer)**: promoted by P59 into the body of §1.7.2 (v1.63); this section does not restate it (§11.2: one fact is described in one place only).
+- **13.2.26 GLM batch-assistance strategy**: the batch-assistant model (values in the §2.2 batch-assistant note) has ample capacity, so "≥ 2 times" is only a floor (floor in §13.1.7); mechanical checks, long-document excerpts, bilingual mirror checks, dispatch drafts and log extraction should be outsourced as much as possible; complex judgement and preferential selection must not be assigned to it (prohibitions in §2.2).
+
+### 13.3 Checklist meta-rules
+
+This section specifies the checklist meta-rules: how to cite entries, when to regenerate, and wording taboos.
+
+- **13.3.1 Cite by the first sentence, never by "item N"**: checklist entries are always cited by their **first sentence**, never in the form 「第 N 条」; the entry titles of this section follow exactly that form — a title is the entry's first sentence.
+- **13.3.2 Every 2 slices / a pending-ruling change / a directive version bump / a queue change / a user request / ≥2 anchor mismatches ⇒ regenerate**: any one of these occasions requires regenerating the checklist; "every 2 slices" is a fixed cadence and the other five are event triggers.
+- **13.3.3 Pending-ruling items must be named one by one**: the checklist's pending-ruling items must be named one by one; merging, generalizing or omitting them is forbidden.
+- **13.3.4 A queue item must supply the six elements**: identifier / content / size tier / ⑦ quota / dependency / boundary; the six elements apply to queue items and are independent of the §1.2 slice field table — neither replaces the other.
+- **13.3.5 A rule obligation ≠ a gate obligation**: rule text must not be used directly as a mechanical criterion; the division between the criterion itself, the record-only state and the directive text is in §6.3 and §9.3 and is not restated here.
+- **13.3.6 No physical-clock assertions**: observation-type clauses are triggered by events only, never by a physical clock or a duration reading; the local caliber for time budgets is in §5.1 and §7.5.
+- **13.3.7 Gate green before commit (pointer)**: the gates must be all green before a commit; criteria are in §6.1 and §6.3, the hard rule in R6.2, the all-green conditions in §13.1.3, and the failure mode of committing while red in §9.3; this section does not restate them.
+- **13.3.8 Mechanical reading of the dispatch-table agentName**: every `agentName` in the ⑩ dispatch table must be read verbatim from `transcript.arguments.agentName`; where unavailable, mark "not mechanically verified" truthfully. The full flow and the transcription contract are in §13.2.2 and §11.3 and are not restated here.
+- **13.3.9 Governance slices do not write back DEV_PLAN (pointer)**: for a directive-governance slice the authoritative ledger = Appendix C.0–C.0x, and the write-back scope is divided by document domain — see §11.2; this section does not restate it.
+- **13.3.10 A slice name is frozen once it enters the ledger**: a slice name is not changed after it enters the ledger, so cross-slice references stay stable; the stable-identifier requirement is in §1.2.
+- **13.3.11 Where an authorization count conflicts with policy, policy prevails (pointer)**: see Discipline D of §1.7.2; this section does not restate it (including "must not be used to rule an over-reach or to refuse execution").
+- **13.3.12 One fact is described in one place only**: a fact is described either in the body or in a pointer, never in both; the pointer entries of this section and of §13.1 / §13.2 are landed exactly on that basis.
+- **13.3.13 Master-registered text may be completed in wording; reviewer text must be verbatim (pointer)**: the scope and the boundary of "verbatim" are in §11.3 (v1.54), and reviewer archiving in §13.1.13; this section does not restate them.
+- **13.3.14 Factual errors are independent of design decisions**: a ledger–report contradiction is a factual error and must be corrected as fact, never folded into a design disagreement.
+- **13.3.15 The ⑩ receipt must attach the "fact pack for the next checklist version"**: the fields are HEAD, CI run, ledger additions, new observation items, new discipline candidates, the highest OB / deferral, the highest ADR / DR number, the tmp assertions, the diff against the previous version, and open items; the write-back check caliber is in §11.2.
+- **13.3.16 A [ROUTINE] small fix takes no new slice number but loses no discipline**: a `[ROUTINE]` small fix **takes no new slice number** but **loses no discipline** — record-keeping follows the §6.1 self-check + §6.3 + CI + fence line addition; the ring count of `[ROUTINE]` is in §1.6.
+- **13.3.17 The startup message is itself an artefact (pointer)**: landing `00-briefing.md`, listing it in `MANIFEST.md` and `SHA256SUMS.txt`, and declaring it in the `artifacts` fence are entities of §13.1.10; this section does not restate them.
+- **13.3.18 A carrier deviation = the highest independence downgrade**: a deviation from the execution carrier counts as the highest independence downgrade and requires a D item plus an independent impact assessment; independent OB / ADR record-keeping is in §1.7.4 and carrier and model values in §2.2.
+- **13.3.19 Mechanical criteria outrank testimonial statements**: mechanical criteria outrank testimonial statements; zero-model / zero-side-effect assertions must be falsifiable, with criterion shapes in §6.3.
+- **13.3.20 Concurrency assertions must cover liveness and release**: beyond the failure surface, a concurrency assertion must assert that the winner stays alive and that a released slot can be re-sent; the coverage matrix is in §4.2.
+- **13.3.21 A layer boundary must not be widened by reading**: a capability a layer does not support must be declared explicitly and must not be inferred from a higher layer; the known boundary of each criterion is in §6.3.
+- **13.3.22 An evaluation slice must stop at ⑩ after ⑨ (pointer)**: the stop criterion lives only in §10.4 (also §13.1.15); this section does not restate it.
+- **13.3.23 A single output must not exceed 10000 characters (pointer)**: the entity is already in §13.1.16 (batch before the limit, no self-restart); this section does not restate it.
+- **13.3.24 Compaction ends the slice (pointer)**: the entity is already in §13.1.17 (also §13.2.18); this section does not restate it.
+- **13.3.25 The batch-assistance floor cannot be replaced by a master self-check**: this entry supplements the real-dispatch floor of §13.1.7 — **an insufficient real-dispatch count ⇒ dispatch the remainder in the same round**, and no exemption may be claimed on the grounds that "the script already checked"; the floor itself is in §13.1.7 and is not restated here.
+
+### 13.4 Gate pitfalls
+
+This section registers the gate-pitfall list (number, symptom and disposition) for pre-start avoidance.
+
+> **Source grouping**: P48 six + P49 seven + P52 two + P55 four + P56 one + P57 zero + P58 one + P59 one + v49 D-calibre mini-fix one + P60 one + P61 one + F2-FIX one (item #26).
+
+> **Items 1–19 follow v45 verbatim (v46–v50 lost them; v51 restores them)**; the P56 entry follows v46, P57 added none; v49 adds #22 (from P59); v50 adds #23 / #24; v51 adds #25 (from P61); **item #26 came out of F2-FIX evidence and is now formal**.
+
+| # | Symptom | Disposition |
+|---|---|---|
+| 1 | **`.go` copies under `tmp/` are compiled by `go build ./...`** | review-input source copies must be `*.go.txt`. |
+| 2 | **`G7-b` disposition closed set** | uncommitted temp files are `local-only`; writing `local` reports an unknown disposition. |
+| 3 | **A report containing an `INDEPENDENT SCAN` marker must carry a `sixstage` fence** | `## Section A` to `## Section E` exactly once each, the conclusion line being the last non-empty line in the block, with merge differences disclosed outside the fence. The current criterion is in §6.3's G7-f / §11.3 (the old-generation caliber was relaxed by v1.48). |
+| 4 | **`.md` writes must add the BOM explicitly** | a node rewrite without the BOM trips `G4a` immediately. |
+| 5 | **`G8-b` requires MANIFEST to list payloads one by one** | a directory row is rejected as "payload not listed". |
+| 6 | **Backfill readings last** | closing a slice changes `changed=` and `scanned=` readings. |
+| 7 | **Changing `.github/workflows/*.yml` requires syncing the `internal/release` workflow freeze contract** | sync and revise the `internal/release` workflow freeze contract. |
+| 8 | **Remote SSH pre-check** | non-interactive sessions do not load the user PATH; use `bash -lc` and probe user-level directories such as `~/.local/bin`. |
+| 9 | **PowerShell to ssh quoting** | complex cross-shell commands must be written as a remote shell script and uploaded for execution. |
+| 10 | **⑥ output must be A–E shaped** | `Section A` (scope) → `B` (findings or `(no findings)`) → `C` (evidence) → `D` (falsifiability audit) → `E` (unverified parts + overturn conditions) → the conclusion line at the block end. |
+| 11 | **Fence and disk enumeration must agree** | new payloads need a fence line, a MANIFEST row and a recomputed SHA256SUMS in the same round. |
+| 12 | **`gofmt -l .` walks hidden directories and `tmp/`** | see item 16 of this table. |
+| 13 | **Recompute hashes with a read-only script** | a rewriting normaliser fails with `EBUSY` when an editor holds the payload. |
+| 14 | **Section heading status glyph must match the status row** | `G1(d)` compares both closed sets. |
+| 15 | **Recompute SHA256SUMS after any line-number correction** | content fixes change payload hashes. |
+| 16 | **`go build`/`go test` with isolated `GOCACHE`/`GOMODCACHE` under `tmp/<sliceID>/` pollutes `gofmt -l .`** | the module cache contains third-party `.go` sources (e.g. `gopkg.in/yaml.v3`) and `base gofmt` goes red immediately. Fix: delete the whole directory after capture **and clear the session-level `$env:GOCACHE`/`$env:GOMODCACHE`**, otherwise a later `go test` recreates it. |
+| 17 | **Writing "stopped" in a report trips the `G7-d` stopped-state criterion** | use "the ⑩ stop point is reached / Reached the 10 stop point"; only a genuinely stopped slice writes "stopped — incomplete". |
+| 18 | **A capture's `COMMAND:` line must match the real argv** | a display abbreviation (missing `--noop-chain` and similar necessary flags) makes the capture "unreplayable as recorded", a fidelity defect that ⑤ will raise as Medium. Fix: add an E-N erratum in `anomalies.md` and write the faithful command plus `commandErrata` into the derived `index.json`. |
+| 19 | **Remote Go module acquisition** | the VM may blackhole `proxy.golang.org` / `sum.golang.org` over IPv6 and `GOPROXY=direct` may fail on vanity resolution ⇒ preload from a reachable mirror then **set `GOPROXY=off` for builds** (fixes download and proves offline buildability); the module cache is read-only, so `chmod -R u+w` before deleting. |
+| 20 | **A subagent must report to the controller before self-deleting** (candidate discipline, P56 evidence) | a role that creates a stray temp directory outside `tmp/<sliceID>/` **deletes it immediately**, making the self-heal tier's "reading-2 baseline" unobtainable. Correct order: **self-report → controller takes the pre-snapshot (`tmp` recursive count + `git status --porcelain -uall`) → self-delete → zero-residue re-read**; violations fall under the non-self-heal tier. |
+| 21 | **PowerShell decoding UTF-8 stdout as GBK** (P58 evidence) | `Select-String` / `Out-File -Encoding utf8` mangles the Chinese output of gates and `gh` — producing both false negatives (a constant 0 scan) and double transcoding. Correct: `node -e` with `execFileSync(cmd, args, {encoding:'utf8'})` reading and `fs.writeFileSync` writing as-is, or make scripts print ASCII-only summaries. |
+| 22 | **A reviewer's conclusion-line value must strictly belong to the §4.1 closed set** (P59 evidence) | the ⑦ first round printed `FINAL REVIEW: CHANGES_REQUESTED`, outside the value table ⇒ handled as a §7.2 format deviation; a same-stage resend **counts toward the quota cap** — never write "invalid round, no quota". Controller dispatch texts should include the legal value enumeration. |
+| 23 | **A normalization script re-adds the BOM to an already-BOM file** (v49 D-calibre mini-fix evidence) | `readFileSync(f,'utf8')` keeps the leading U+FEFF, so prepending the BOM again doubles it (G4a reports `bom=2`). Correct: first strip every leading BOM in a loop, then add one back; verify BOM=1 / double-BOM=0 / CR=0 after writing. |
+| 24 | **G6-4 misreads 「a version number directly followed by 行」 as a line-count assertion** (P60 evidence) | `d{2,}s*行` only matches 「digits directly followed by 行」; a version number followed by 行 trips it. Safe rewrite: replace 行 with a wording like 条目 (inserting a word between the digits and 行 is safe). |
+| 25 | **Inline scripts broken by PowerShell backticks** (P61 evidence) | `node -e "..."` inline scripts writing backticks inside a PowerShell double-quoted string get eaten by PS escaping, leaving a hanging `>>` continuation prompt on failure. Correct: inline scripts must avoid backticks and `$`; complex logic goes into a `.js` / `.ps1` file executed after `Parser::ParseFile` / `node --check`. |
+| 26 (F2-FIX) | **the G5(d) new-evidence-fence declaration pitfall** (F2-FIX evidence, three consecutive slices): step 0 created the new evidence pack without adding the fence rows to the changed report's `artifacts` fence in the same round ⇒ the first index run reports `G5(d) staged is a subset of declared` (P62 `d0971e5` / P63 `de37c58` / F2-FIX `57631a3`, the same pitfall three times in a row). | **The briefing's step 0 must force "new evidence pack → report fence rows added in the same round (including the two files MANIFEST and SHA256SUMS themselves)"**; or promote it to a formal gate-pitfall entry (this item is now formal). |
+
+> **Register calibre**: this table is an incident register; symptoms and dispositions follow the incident text verbatim. Where an entry refers to the same rule as the body text or another section (e.g. item 11 with §13.1.12, item 21 with §9.3, item 8 with §13.1.19), the body text or the existing section remains the normative source (§11.2) and this register sets up no second normative source.
+
+### 13.5 Snapshot structure template (effective from v54)
+
+This section gives the snapshot structure template effective from v54 and the retention scope of point-in-time data.
+
+**Sections kept (retained in the snapshot only, carried over from v54)**
+
+| Section | Section name | Retained content | Note |
+|---|---|---|---|
+| §1 | Current anchors (check these 8 numbers first) | Anchor figures: HEAD, CI run number, SELFTEST assertion count, three-scope readings | Same as the v53 section name; the figures and readings are point-in-time data |
+| §2 | F2-FIX fact pack | The fact pack of the current slice | Same as the v53 section name; the slice identifier is replaced per version |
+| §3 | Completed slices (recent baseline) | The completed-slice list | Same as the v53 section name |
+| §4 | Execution queue | The layer 0 / 1 / 2 / 3 sub-sections and the queue-item state | Same as the v53 section name; the four sub-sections are kept |
+| §5 | Observations | Observation state and mechanical readings | Same as the v53 section name |
+| §6 | Awaiting user rulings (R-01 to R-12) | Pending-item state and ruling notes | Same as the v53 section name; the ID range changes per version |
+| §10 | One-sentence opening for a new session | The opening sentence and the supplementary-document list | Same as the v53 section name |
+| §11 | Current state in one sentence | The current state in one sentence | Same as the v53 section name |
+
+**Sections turned into pointers (one pointer line + section-name mapping, no rule entity copied)**
+
+| Section | Former section name | Pointer target |
+|---|---|---|
+| §7 | Start-up and step-0 general rules | §13.1 |
+| §8 | Cross-slice collaboration disciplines (the briefing must land them) | §13.2 |
+| §9 | Checklist meta-rules | §13.3 |
+| §9 | Gate pitfalls (accumulated from P48 up to entry 26) | §13.4 |
+
+From v54 on, these sections keep only one pointer line plus the section-name mapping and no longer copy rule entities; basis: §11.2, one fact is described in one place only.
+
+**Retention scope of point-in-time data**
+
+| Data class | Retained where | Note |
+|---|---|---|
+| Anchor figures (SELFTEST assertion count / HEAD / CI run number) | Snapshot §1 | Point-in-time data, kept in the snapshot only |
+| Current fact-pack content | Snapshot §2 | Point-in-time data, kept in the snapshot only |
+| Completed-slice list | Snapshot §3 | Point-in-time data, kept in the snapshot only |
+| Queue and observation state | Snapshot §4 / §5 | Point-in-time data, kept in the snapshot only |
+| Rule text | Not in the snapshot | Only in §13; the snapshot points to it (§11.2) |
+
 ---
 
 ## Appendix A: Historical Versions and Sources of Experience
@@ -1386,7 +1554,7 @@ Slice definition: [ledger file §subsection ｜ or give the field table of §1.2
 Effort tier: [low / high / max] (the operator has already set it on the UI side; this line is for the record only)
 Probe budget: [n times ｜ none]
 ⑥⑦ input-package scope: [per §7.3 blind-review package / narrowed package / other (reason required)]
-New evidence pack → same-round fence declaration: [whether this slice creates a new evidence pack; if yes ⇒ add rows to the changed report's artifacts fence in the same round (incl. MANIFEST and SHA256SUMS themselves); precedent = gate pitfall No. 26 (docs/t027/CHECKLIST current §9), calibre = §6.3 G5(d)]
+New evidence pack → same-round fence declaration: [whether this slice creates a new evidence pack; if yes ⇒ add rows to the changed report's artifacts fence in the same round (incl. MANIFEST and SHA256SUMS themselves); precedent = gate pitfall No. 26 (see §13.4), calibre = §6.3 G5(d)]
 Authorization boundary: [commit pre-authorized?] / [push pre-authorized?] / [paid-call cap]
 [pilot period only] Pilot metrics declaration: [cite the metric line in §12.1]
 Notes: [other constraints]
@@ -1432,7 +1600,7 @@ Awaiting authorization: [commit / push / probe top-up / user adjudication items]
 
 | Slice type | Required section numbers |
 |---|---|
-| **All** | §0.1, §0.2, §1.2, §1.5, §1.6, §1.7, §2.2, §2.4, §2.6, §3.1–§3.4, §5.0–§5.3, §6.1–§6.4, §7.5, §7.6, §10.1–§10.4, §11.1–§11.3, Appendix B.0 + the role templates enabled this round |
+| **All** | §0.1, §0.2, §1.2, §1.5, §1.6, §1.7, §2.2, §2.4, §2.6, §3.1–§3.4, §5.0–§5.3, §6.1–§6.4, §7.5, §7.6, §10.1–§10.4, §11.1–§11.3, §13, Appendix B.0 + the role templates enabled this round |
 | **Document-type / simple** | the table above + §5.2's "Note (document-type slices)", §7.1–§7.3 (including the ⑥ skip criterion in §7.2), §7.7, §9.3, Appendix B.4 |
 | **Medium** | the table above + §4.1–§4.3, §7.1–§7.8, §8, §9.1–§9.3, Appendix B.1–B.6 |
 | **Complex / high risk** | the table above + §4.1–§4.3, §7.1–§7.8, §8, all of §9, Appendix B.1–B.6 |
@@ -2139,6 +2307,19 @@ The following files **only get a supersede pointer added to the file header and 
 | Review | ⑤ 1+1 (`PRE-REVIEW: PASS WITH FIXES`, no Medium or above); ⑥ 1 run (`INDEPENDENT SCAN: PASS`, 0 Critical / 0 Major / 1 Minor); ⑦ one final plus one re-review (`RE-REVIEW: PASS`, R=1); no blind review (§7.7 mandatory draw not applicable; not drawn under §12.4) |
 | Version | v1.65 bumped under the user's ⑩ ruling (option B); ⑦ not re-run per the §7.8.4 OB-11 exception (metadata-level change) |
 | Note | This slice front-loads the B-part before the snapshot→directive migration; the A-part is completed by v54/P66; the pitfall-26 trap hit a 6th time during this slice's implementation and the fence was patched in the same round |
+
+### C.0at P66 CHECKLIST-RULES-HOIST (v1.66)
+
+| Item | Content |
+|---|---|
+| Slice / size | `P66 CHECKLIST-RULES-HOIST` (governance `[SLICE]`; structural migration that elevates the v53 snapshot execution discipline into the directive body) |
+| Trigger | The execution discipline solidified in the v53 snapshot existed only inside the snapshot; from v54 a directive-body-level authority is required (the P65 ledger "A-part carry-over") |
+| Goal | Add §13 "Cross-slice collaboration and startup general rules" (§13.1–§13.5, five subsections) and elevate the v53 snapshot execution discipline into the directive body |
+| Deliverables | The full §13 text of `docs/DELIVERY_DIRECTIVE{,_EN}.md`; `docs/validation/checklist-rules-hoist{,_EN}.md`; the evidence pack `docs/validation/evidence/P66-CHECKLIST-RULES-HOIST/` |
+| Scope | Only §13 and the closing metadata (header version line, §0.3 log row, this block, Appendix B.7.1 / B.7.4 pointers); the §0–§12 body, the criterion body, CONTRACTS / schema / fixtures, product code and the v50–v53 snapshots are unchanged |
+| Review | ⑤ 1+1; ⑥ independent scan; ⑦ one final review + three re-reviews (the final and re-review conclusions follow the report) |
+| Version | v1.66 (the header version line matches the latest §0.3 row, G1-b) |
+| Note | This slice is a snapshot→directive structural migration; the A-part (formalizing v53 §9 item 26) is completed by §13.4 of this slice; the g4b cache and the §12.4 spot-check debt are outside this slice's scope |
 
 ### C.1 v3.1 section numbers → this directive
 

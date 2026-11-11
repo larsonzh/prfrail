@@ -96,6 +96,7 @@
 | F2-FIX-STUB-HANG | ✅ Done (closed 2026-11-09; ⑦ final `FINAL: PASS WITH FIXES` ⇒ premise ① met; R/D=0; stops at ⑩ awaiting authorization) | P63 (the waiver does not hold ⇒ start) | S | 2026-11-09 | Fixed the hang branch to write the 0-byte empty stub-child.pid + regression test + layer3 F2 red/green re-runs + f1 contrast; AT-23 stage-1 condition closure achieved (stage 2 not applicable, user ruling A1); evidence pack `docs/validation/evidence/F2-FIX-STUB-HANG/`; P61 report §11 + §1 timestamp note |
 | P64 AT24-SUPERVISED-BLACK-BOX | ✅ Done (closed 2026-11-11; AT-24 conditionally closed; ⑦ re-review `RE-REVIEW: PASS`; R=2; stopped at ⑩ awaiting authorization) | F2-FIX (layer 1 post-hard-gate candidate item 12) | M | 2026-11-11 | Evidence pack `docs/validation/evidence/P64-AT24-SUPERVISED-BLACK-BOX/`; temp `tmp/P64-AT24-SUPERVISED-BLACK-BOX/` |
 | P65 GATE-PIT-26-LANDING | ✅ Done (closed 2026-11-11; B-part landed + A-part path registered; the actual A-part landing awaits v54/P66 generation; R=1; stopped at ⑩ awaiting authorization) | P64 (promoted from the v53 §5 observation item; not a layer-2 queue item) | S | 2026-11-11 | Evidence pack `docs/validation/evidence/P65-GATE-PIT-26-LANDING/`; temp `tmp/P65-GATE-PIT-26-LANDING/`; report pair `docs/validation/gate-pit-26-landing{,_EN}.md` |
+| P66 CHECKLIST-RULES-HOIST | ✅ Done (closed 2026-11-11; §13 five subsections landed; ⑦ final FINDINGS ⇒ remediation then re-review; ⑥ formal defect downgraded; R=3; stopped at ⑩ awaiting authorization) | P65 (layer-2 governance side, snapshot→directive structural migration) | L | 2026-11-11 | Report pair `docs/validation/checklist-rules-hoist{,_EN}.md`; evidence pack `docs/validation/evidence/P66-CHECKLIST-RULES-HOIST/`; temp artefacts `tmp/P66-CHECKLIST-RULES-HOIST/` |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1858,6 +1859,27 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Temp artefact location | `tmp/P65-GATE-PIT-26-LANDING/` (append-only until 8c) |
 | A-part carry-over | At v54/P66 generation, formalize the v53 §9 item-26 candidate into a formal entry (A1 body + A2 header/version-note sync; verbatim text in `docs/validation/gate-pit-26-landing{,_EN}.md` §3 and `docs/validation/evidence/P65-GATE-PIT-26-LANDING/01-arch/design-r1.md` §4.1); this slice does not touch v53 (frozen snapshot) |
 | Completion record | B-part landed (the Appendix B.7.1 slot) + A-part path registered; the actual A-part landing awaits v54/P66 generation (verbatim text in the report §3 and design-r1 §4.1); report pair `docs/validation/gate-pit-26-landing{,_EN}.md` |
+
+### P66 — `CHECKLIST-RULES-HOIST` (layer-2 governance side · snapshot→directive structural migration · governance) · ✅ Done (closed 2026-11-11)
+
+| Field | Content |
+|---|---|
+| Identifier | `CHECKLIST-RULES-HOIST` (governance `[SLICE]`; task package delivered; launched by user ruling) |
+| Status | ✅ Done (closed 2026-11-11; §13 five subsections landed; ⑦ final FINDINGS ⇒ remediation then re-review; ⑥ formal defect downgraded; R = 3; stopped at ⑩ awaiting authorization) |
+| Goal | Move the execution discipline already frozen in v53 §7 / §8 / §9 (the checklist meta-rules and gate pitfalls 1–26) into a new directive §13 "Cross-slice collaboration and startup general rules", promoting soft constraints to hard constraints; from v54 on, the snapshot keeps only point-in-time data |
+| Dependency | P65 closed (`0eda074`); v53 §5 observation item (snapshot content inflation); v1.65 §7.5 tier-L governance ⑦ 1+3 |
+| Size | L; ⑦ governance allowance = 1 final + 3 re-reviews; blind review judged per §7.7 |
+| Steps | ① four artefacts (three-case comparison / dedup analysis / migration mapping / decision list) → ② steps A–G → ③ consistency check → ④ gates → ⑤ pre-review → ⑥ independent scan → ⑦ final review → ⑧ report assembly → ⑨ → ⑧c → ⑩ |
+| Current gap | Migration scope and landing await the ① verdict; the partial overlap between v53 §9 and directive §6.3 must be classified item by item |
+| Deliverables | Report pair `docs/validation/checklist-rules-hoist{,_EN}.md`; evidence pack `docs/validation/evidence/P66-CHECKLIST-RULES-HOIST/`; directive `DELIVERY_DIRECTIVE{,_EN}.md` new §13 (five subsections) plus the version line; this ledger block |
+| Acceptance evidence | Dedup analysis landed item by item + migration mapping verifiable item by item + gate pitfalls 1–26 numbered contiguously with CN/EN 26/26 + §13 free of duplicate definitions against §1–§12 + three scopes TOTAL_FAIL=0 + SELFTEST 722/722 |
+| Boundary | No change to the criterion body / CONTRACTS / schema / fixtures / product code / CI; no change to directive §0–§12 body text (except the §0.3 new row and the header version line); no change to v50–v53; no change to the semantics of gate pitfalls 1–26; bound by the three §1.7.2 bullets; no VM / proxy / Sol double-run |
+| Tier | `[SLICE]` (governance) |
+| Probe budget | 0 (documentation-only, local machine) |
+| Freedom-list path | `docs/validation/evidence/P66-CHECKLIST-RULES-HOIST/freedom-list.md` |
+| R / D baseline | R = 0, D = 0 (registered at start, 2026-11-11) |
+| Temp artefact location | `tmp/P66-CHECKLIST-RULES-HOIST/` (append-only until 8c) |
+| Completion record | §13 five subsections on disk + Appendix C.0at + the §0.3 v1.66 row + B.7.1/B.7.4 pointers; report pair `docs/validation/checklist-rules-hoist{,_EN}.md` |
 
 ## Known defects (to be handled before later slices)
 
