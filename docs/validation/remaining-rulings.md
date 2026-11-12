@@ -146,6 +146,14 @@
 - ③ 旧口径 grep：无（不适用）——本片未改准则正文与口径，未执行旧口径 grep。
 - ④ ⑥/⑦ 每轮 Info / Low 落地：有——⑤ r1 的 1 项 Low 已整改（见 `04-reviews/05-prereview-r1.md`）；⑥ 跳过、⑦ r1 0 findings，无另外条目。
 
+## 9. 提交与 CI
+
+- 主提交 `e0d745c`（`docs: land the P68 four-R rulings, the full R-07 advice, and ADR-042`；已推 `origin` main：`365a930..e0d745c`；未推 gitee）。
+- CI run `43177025096`（head `e0d745c`）首跑双腿全绿：
+  - windows（5m5s）：`SELFTEST: PASS 737/737`；`GATE REPORT scope=ci changed=21`；`TOTAL_FAIL=0`。
+  - ubuntu（3m28s）：`SELFTEST: PASS 737/737`；`GATE REPORT scope=ci changed=21`；`TOTAL_FAIL=0`。
+- 本节由本片主控在 CI 双绿后以 docs-only 提交补全（§11.2 台账完成行口径：commit hash 与 CI run 号只进报告）；该回填提交自身的 run 只作观察记录，不再为其新增提交。
+
 - ⑥ 跳过：本片为评估类纯文档片，不触代码、不触 §7.2.1 ③ 四类语义 ⇒ 可跳过（待 ⑦ 确认）；若 ⑦ 判定不成立，改跑 ⑥ 并以 `sixstage` 围栏替换本行。
 
 ```artifacts

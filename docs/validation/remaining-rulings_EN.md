@@ -146,6 +146,14 @@ The stage-progression framework (Stage vs Layer / scope R-08.1+R-08.2 / the thre
 - ③ Legacy-wording grep: none (not applicable) - no directive body or wording was changed, so no legacy grep was run.
 - ④ ⑥/⑦ per-round Info / Low capture: yes - the single Low from ⑤ r1 was remediated (see `04-reviews/05-prereview-r1.md`); ⑥ skipped and ⑦ r1 had 0 findings, so no extra entries.
 
+## 9. Commit and CI
+
+- Main commit `e0d745c` (`docs: land the P68 four-R rulings, the full R-07 advice, and ADR-042`; pushed to `origin` main: `365a930..e0d745c`; no gitee push).
+- CI run `43177025096` (head `e0d745c`) green on the first attempt on both legs:
+  - windows (5m5s): `SELFTEST: PASS 737/737`; `GATE REPORT scope=ci changed=21`; `TOTAL_FAIL=0`.
+  - ubuntu (3m28s): `SELFTEST: PASS 737/737`; `GATE REPORT scope=ci changed=21`; `TOTAL_FAIL=0`.
+- This section is back-filled by this slice's controller in a docs-only commit after CI went green on both legs (§11.2 ledger completion-row rule: commit hash and CI run numbers go into the report only); that back-fill commit's own run is observation-only and no further commit is made for it.
+
 - ⑥ skipped: this is an assessment-type documentation-only slice that touches no code and none of the four semantic classes in §7.2.1 ③ ⇒ it may be skipped (pending ⑦ confirmation); if ⑦ rules otherwise, ⑥ is run and this line is replaced by a `sixstage` fence.
 
 ```artifacts
