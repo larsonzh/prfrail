@@ -100,3 +100,4 @@
 稽	docs/validation/p60-directive-judge-blindspots.md	「稽核」（⑥ 独立扫描原文用词，sixstage 围栏逐字转录引入；非新造词）
 妨	docs/validation/at23-restricted-candidate.md	「不妨碍」（⑥ 独立扫描 Section C 第 8 条原文用词，sixstage 围栏逐字转录引入；非新造词）
 军	docs/validation/at23-restricted-candidate.md	「军规」（⑥ 独立扫描 Section D 原文用词，sixstage 围栏逐字转录引入；非新造词）
+忌	docs/validation/evidence/P66-CHECKLIST-RULES-HOIST/03-test/step-A-check.md	「表述禁忌」（P66 证据包 step-A-check.md R2-2 实证未登记字；P67 #2 方案 α 按起跑消息 3.1.3 登记）

@@ -1,0 +1,26 @@
+# 02-batch/glm-batch1 — P67 GATES-DEBT-CLEANUP（批量辅助① g4b 缓存键枚举，逐字归档）
+
+> 载体：deep-reasoner + `GLM-5.3-Flash (glm)`（§2.2 批量辅助）；只读枚举。以下为回执原文。
+
+## g4b 缓存键构成（tools/gates/lib/criteria/g4b.js，只读核验）
+
+键 = sha256(keyString)；keyString 6 段以竖线拼接，每次读前重算、不单独持久化；条目文件名 <64hex>.json，值仅 {v:2, corpus:string[]}（不含 verdict/新增行字符/白名单）。
+
+| # | 键分量 | 当前取值来源 | 失效场景 | LRU 需覆盖 |
+|---|---|---|---|---|
+| 1 | 格式版本 | CACHE_VERSION='v2'（L37） | ctx.js 的 listAllMarkdown/showAt 语义变化须手动 bump（二者不被 sourceDigest 覆盖）；v2 即 G4B-CORPUS-DECOUPLE 枚举语义变更产物 | 候选 |
+| 2 | 解析 sha | resolvedSha(ctx)=git rev-parse corpusRef(ctx)；corpusRef=(kind∈{range,ci})?ctx.baseRef:'HEAD'；git 失败→'none' 且 cacheUsable=false | HEAD 前进（tree/index）；baseRef 变化（range/ci） | 候选 |
+| 3 | 作用域 kind | String(ctx.kind \|\| '') | tree/index/ci 键必不同（防不同 scope 共享记录） | 候选 |
+| 4 | 白名单来源+文本摘要 | ctx.loadWhitelist(WHITELIST_REL)，WHITELIST_REL='tools/gates/cjk-newwords.txt'；取 wl.source + sha256(wl.text)；tree/index=工作树，range/ci=endpoint rev（GATES-EXT F1，与 G6 同一快照） | 白名单文本变化（text sha 段）；来源 revision 变化（source 段；同 text 异 source 也变键） | 候选 |
+| 5 | 判据源码摘要 | sourceDigest()=sha256(JSON.stringify([WHITELIST_REL, cjkChars.toString(), runBody()]))；runBody=run.toString()（闭包 toString，防内存变异模块读磁盘假源码） | cjkChars 源码 / run 闭包源码 / WHITELIST_REL 常量任一变化；hit/miss 门控函数（cacheUsable/validValue/store plumbing）故意不进 digest | 候选 |
+
+## 失效场景逐项
+1. HEAD 前进 → 段2 变 → miss；2. 白名单文本变化 → 段4 text-digest 变（wl.source 变亦变键）；3. 判据源码变化 → 段5 变；4. 格式版本升级 → 段1 变，旧条目全体过期；5. kind 不同 → 段3 不同；6. git 无法解析 ref → 缓存整体关闭（cacheUsable=false），非旧键失效。
+
+## LRU（第 7 项）
+- CACHE_CAP=100（原无界，~96 条/每 resolved sha 一条，HEAD 前进后多永久死；100 全保留留余量）。
+- CACHE_ENTRY_RE=/^[0-9a-f]{64}\.json$/：仅该形为淘汰候选；原子临时文件 .tmp.<pid>.<seq> 不匹配。
+- evictToCap(dir, CACHE_CAP)：readdir→正则过滤→按 mtime 升序删最旧至 ≤cap；put（rename 刷 mtime）与 get（parse 成功后 utimesSync touch）刷新 mtime；全部失败吞掉（fail open；Windows unlink 竞争失败留待下轮）；返回实际删除数，不抛。
+- 覆盖性：5 段共同决定条目身份（文件名即 sha256(keyString)），LRU 不区分键语义、只按 mtime；容量 100 下当前活键（现 resolved sha）不会被逐出。
+
+BATCH-1: DONE（实得 1849 字符）

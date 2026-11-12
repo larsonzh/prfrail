@@ -97,6 +97,7 @@
 | P64 AT24-SUPERVISED-BLACK-BOX | ✅ 已完成（2026-11-11 收口；AT-24 条件闭合；⑦ 复审 RE-REVIEW: PASS；R=2；停于 ⑩ 等授权） | F2-FIX（层 1 后续候选第 12 项） | M | 2026-11-11 | 证据包 `docs/validation/evidence/P64-AT24-SUPERVISED-BLACK-BOX/`；临时件 `tmp/P64-AT24-SUPERVISED-BLACK-BOX/` |
 | P65 GATE-PIT-26-LANDING | ✅ 已完成（2026-11-11 收口；B-part 落地 + A-part 路径登记；A-part 实际落地待 v54/P66 生成时；R=1；停于 ⑩ 等授权） | P64（v53 §五 观察项升格；非层 2 原队列） | S | 2026-11-11 | 证据包 `docs/validation/evidence/P65-GATE-PIT-26-LANDING/`；临时件 `tmp/P65-GATE-PIT-26-LANDING/`；报告对 `docs/validation/gate-pit-26-landing{,_EN}.md` |
 | P66 CHECKLIST-RULES-HOIST | ✅ 已完成（2026-11-11 收口；§13 五节落地；⑦ 终审 FINDINGS⇒整改后复审；⑥ 形式缺陷降级；R=3；停于 ⑩ 等授权） | P65（层 2 治理侧，快照→准则结构性迁移） | L | 2026-11-11 | 报告对 `docs/validation/checklist-rules-hoist{,_EN}.md`；证据包 `docs/validation/evidence/P66-CHECKLIST-RULES-HOIST/`；临时件 `tmp/P66-CHECKLIST-RULES-HOIST/` |
+| P67 GATES-DEBT-CLEANUP | 🔄 进行中（2026-11-12 起跑；R/D=0；主控 V4 Pro，ADR-041；停点 ⑩ 等授权） | P66（层 2 新增队列第 13 项；清欠四类：g4b 缓存 LRU / 第 27 条门禁坑 / §12.4 抽查记录块 / ⑥ 提示词加固） | L | 2026-11-12 | 报告对 `docs/validation/gates-debt-cleanup{,_EN}.md`；证据包 `docs/validation/evidence/P67-GATES-DEBT-CLEANUP/`；临时件 `tmp/P67-GATES-DEBT-CLEANUP/` |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -1893,6 +1894,27 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | R / D 基线 | R = 0、D = 0（2026-11-11 起跑登记） |
 | 临时件落点声明 | 本片临时目录 = `tmp/P66-CHECKLIST-RULES-HOIST/`（⑧c 前只增不删） |
 | 完成记录 | §13 五节落盘 + 附录 C.0at + §0.3 v1.66 + B.7.1/B.7.4 指针；报告对 `docs/validation/checklist-rules-hoist{,_EN}.md` |
+
+### P67 — `GATES-DEBT-CLEANUP`（层 2 治理侧 · 判据本体 + 文档 + 审查体系一次性清欠 · 治理类） · 🔄 进行中（2026-11-12 起跑）
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `GATES-DEBT-CLEANUP`（治理类 `[SLICE]`；层 2 新增队列第 13 项；用户点名起跑） |
+| 状态 | 🔄 进行中（2026-11-12 起跑；R = 0、D = 0；主控 `DeepSeek V4 Pro (deepseek)`，ADR-041；停点 ⑩ 等授权） |
+| 目标 | 一次性清欠四类：① g4b 缓存加 LRU + 条目数上限（判据本体）；② 第 27 条门禁坑候选正式化（4 坑合并）；③ §12.4 按比例抽查记录块清账；④ ⑥ 提示词加固 |
+| 依赖 | P66 闭环（`1650d5f` + v54 快照提交）；v54 §五 五项新增观察项；v1.66 §7.5 L 档治理片 ⑦ 1+3 |
+| 规模 | L；⑦ 治理片档 = 1 终审 + 3 复审；盲审按 §7.7 判定（主控主动加 1 次，见起跑消息【一】） |
+| 步骤 | ① 执行计划确认（五件）→ ② 分步 A–G → ③ 一致性检查 → ④ 门禁 → ⑤ 预审 → ⑥ 独立扫描 → ⑦ 终审（1+3）→ ⑧ 报告装配 → ⑨ → ⑧c → ⑩ |
+| 现状缺口 | ① 四案对比与停升级边界判定待完成；②③ 不适用「文档型切片退化」（#1 判据本体 + #4 审查体系语义） |
+| 交付物 | 报告对 `docs/validation/gates-debt-cleanup{,_EN}.md`；证据包 `docs/validation/evidence/P67-GATES-DEBT-CLEANUP/`；准则 `DELIVERY_DIRECTIVE{,_EN}.md` 按落点改动；本台账本段 |
+| 验收证据 | 四案对比表 + #1 边界确认 + #2 七坑判定 + #3 清账方案 + #4 边界判定（design-r1.md）；步骤 A–G 每步核验；§13.4 编号连续 27–30 且 1–26 零改动；§12.4 清账与 §7.7 无冲突；附录 B.6 与 §7.2.2 语义一致；三作用域 TOTAL_FAIL=0 + SELFTEST 722 起增 |
+| 边界 | 不改准则 §1–§12 已有条款 + §13.1–§13.3 + §13.5；不改 v50–v54；#1 限于 LRU + 上限；#2 门禁坑 1–26 零改动；#3 不改 §7.7 规则本身；#4 限于附录 B.6（可能也改 B.7.4）；不改 CONTRACTS / schema / fixtures / 产品代码 / CI；受 §1.7.2 三条 bullet 约束；不开 VM / 代理 / Sol 双打 |
+| 分级 | `[SLICE]`（治理类） |
+| 探针额度 | 0（Windows 本机治理片，无外部调用） |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/P67-GATES-DEBT-CLEANUP/freedom-list.md` |
+| R / D 基线 | R = 0、D = 0（2026-11-12 起跑登记）；临时件 D = 1（含 1 次主控本人违规、用户代行确认；本片一次性例外，不得作先例） |
+| 临时件落点声明 | 本片临时目录 = `tmp/P67-GATES-DEBT-CLEANUP/`（⑧c 前只增不删） |
+| 收口行 | 进行中；收口时回填（commit + CI run 按 §11.2 由回填提交登记） |
 
 ## 已知缺陷（后续切片前处理）
 

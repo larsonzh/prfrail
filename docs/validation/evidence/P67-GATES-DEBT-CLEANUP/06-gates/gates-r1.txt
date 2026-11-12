@@ -1,0 +1,898 @@
+GATES SELFTEST (in-process; fixtures under tools/gates/testdata/)
+  T3/T12 need real git ranges and are recorded as evidence, not here:
+    --scope=range:b738e6b^..b738e6b (A1 must be red) / range:9f68a52^..9f68a52 (green)
+    --scope=range:1b01115^..1b01115 (C1: G7 must be red)
+ok   T13 fixture files are not *.md, so a tree/ci run never judges the runner own fixtures
+ok   T1 G6-1 detects pending(⑥)+completion(⑥ 实得) in one block
+ok   T1 G6-1 reports exactly one finding for the fixture
+ok   T1 reverse mutation (drop completion row) clears G6-1
+ok   T1 delete-criterion mutation (G6-1 removed) leaves the corpus clean
+ok   T1 F1 completion shape `（实得）` is detected
+ok   T1 F1 completion shape `✅ 已完成` is detected
+ok   T1 F1 completion shape `✅ **已完成**` is detected
+ok   T1 F1 plain shape with a different label stays clean (label window intact)
+ok   T2 provenance file carries exactly one excerpt line
+ok   T2 fixture embeds the historical OB-11 row verbatim
+ok   T2 OB-11 row (with 冲突 marker) is clean
+ok   T2 reverse mutation (drop the 冲突 exclusion marker) turns G6-1 red
+ok   T4 provenance file carries the two historical cost rows
+ok   T4 fixture embeds both historical cost rows verbatim
+ok   T4 cost-clause parser yields identical realized vectors for the historical pair
+ok   T4 budget clause is exempt: consistent rows pass G6-2
+ok   T4 reverse mutation (预算 -> 成本) turns G6-2 red
+ok   T4 delete-criterion mutation (G6-2 removed) leaves the mutated corpus clean
+ok   T5 legal 11-digit run id passes G6-3
+ok   T5 legal fixture yields no finding
+ok   T6 placeholder run ids fail G6-3
+ok   T6 one finding per placeholder line (4)
+ok   T6 delete-criterion mutation (G6-3 removed) leaves the corpus clean
+ok   F7 G6-3 boundary table (token-final): 1-digit id `run 3` must FAIL
+ok   F7 G6-3 boundary table (token-final): 2-digit id `run 33` must FAIL
+ok   F7 G6-3 boundary table (token-final): 3-digit id `run 333` must FAIL
+ok   F7 G6-3 floor rule (token-final): the 3-digit reject names the 9-digit floor
+ok   F7 G6-3 boundary table (token-final): 4-digit id `run 3333` must FAIL
+ok   F7 G6-3 floor rule (token-final): the 4-digit reject names the 9-digit floor
+ok   F7 G6-3 boundary table (token-final): 5-digit id `run 33333` must FAIL
+ok   F7 G6-3 floor rule (token-final): the 5-digit reject names the 9-digit floor
+ok   F7 G6-3 boundary table (token-final): 6-digit id `run 333333` must FAIL
+ok   F7 G6-3 floor rule (token-final): the 6-digit reject names the 9-digit floor
+ok   F7 G6-3 boundary table (token-final): 7-digit id `run 3333333` must FAIL
+ok   F7 G6-3 floor rule (token-final): the 7-digit reject names the 9-digit floor
+ok   F7 G6-3 boundary table (token-final): 8-digit id `run 33333333` must FAIL
+ok   F7 G6-3 floor rule (token-final): the 8-digit reject names the 9-digit floor
+ok   F7 G6-3 boundary table (token-final): 9-digit id `run 333333333` must PASS
+ok   F7 G6-3 boundary table (token-final): 10-digit id `run 3333333333` must PASS
+ok   F7 G6-3 boundary table (token-final): 11-digit id `run 33333333333` must PASS
+ok   F7 G6-3 boundary table (token-final): 12-digit id `run 333333333333` must PASS
+ok   F7 G6-3 boundary table (token-final): 13-digit id `run 3333333333333` must PASS
+ok   F7 G6-3 boundary table (token-final): 14-digit id `run 33333333333333` must FAIL
+ok   F7 G6-3 boundary table (token-final): 15-digit id `run 333333333333333` must FAIL
+ok   F7 G6-3 boundary table (token-final): 16-digit id `run 3333333333333333` must FAIL
+ok   F7 G6-3 boundary table (token-final): 17-digit id `run 33333333333333333` must FAIL
+ok   F7 G6-3 boundary table (token-final): 18-digit id `run 333333333333333333` must FAIL
+ok   F7 G6-3 boundary table (token-final): 19-digit id `run 3333333333333333333` must FAIL
+ok   F7 G6-3 boundary table (token-final): 20-digit id `run 33333333333333333333` must FAIL
+ok   F7 G6-3 boundary table (backticked): 1-digit id `run 3` must FAIL
+ok   F7 G6-3 boundary table (backticked): 2-digit id `run 33` must FAIL
+ok   F7 G6-3 boundary table (backticked): 3-digit id `run 333` must FAIL
+ok   F7 G6-3 floor rule (backticked): the 3-digit reject names the 9-digit floor
+ok   F7 G6-3 boundary table (backticked): 4-digit id `run 3333` must FAIL
+ok   F7 G6-3 floor rule (backticked): the 4-digit reject names the 9-digit floor
+ok   F7 G6-3 boundary table (backticked): 5-digit id `run 33333` must FAIL
+ok   F7 G6-3 floor rule (backticked): the 5-digit reject names the 9-digit floor
+ok   F7 G6-3 boundary table (backticked): 6-digit id `run 333333` must FAIL
+ok   F7 G6-3 floor rule (backticked): the 6-digit reject names the 9-digit floor
+ok   F7 G6-3 boundary table (backticked): 7-digit id `run 3333333` must FAIL
+ok   F7 G6-3 floor rule (backticked): the 7-digit reject names the 9-digit floor
+ok   F7 G6-3 boundary table (backticked): 8-digit id `run 33333333` must FAIL
+ok   F7 G6-3 floor rule (backticked): the 8-digit reject names the 9-digit floor
+ok   F7 G6-3 boundary table (backticked): 9-digit id `run 333333333` must PASS
+ok   F7 G6-3 boundary table (backticked): 10-digit id `run 3333333333` must PASS
+ok   F7 G6-3 boundary table (backticked): 11-digit id `run 33333333333` must PASS
+ok   F7 G6-3 boundary table (backticked): 12-digit id `run 333333333333` must PASS
+ok   F7 G6-3 boundary table (backticked): 13-digit id `run 3333333333333` must PASS
+ok   F7 G6-3 boundary table (backticked): 14-digit id `run 33333333333333` must FAIL
+ok   F7 G6-3 boundary table (backticked): 15-digit id `run 333333333333333` must FAIL
+ok   F7 G6-3 boundary table (backticked): 16-digit id `run 3333333333333333` must FAIL
+ok   F7 G6-3 boundary table (backticked): 17-digit id `run 33333333333333333` must FAIL
+ok   F7 G6-3 boundary table (backticked): 18-digit id `run 333333333333333333` must FAIL
+ok   F7 G6-3 boundary table (backticked): 19-digit id `run 3333333333333333333` must FAIL
+ok   F7 G6-3 boundary table (backticked): 20-digit id `run 33333333333333333333` must FAIL
+ok   F7 G6-3 named case `run 0` (all-zero id, 1 digit) must FAIL
+ok   F7 G6-3 named case `run 000000` (all-zero id, 6 digits) must FAIL
+ok   F7 G6-3 named case `run 00000000000000000000` (all-zero id, 20 digits (fails at any length)) must FAIL
+ok   F7 G6-3 named case ``run 00000000000000000000`` (all-zero id, 20 digits, backticked) must FAIL
+ok   F7 G6-3 named case `run <RUN_ID>` (angle-bracket placeholder) must FAIL
+ok   F7 G6-3 named case `run TBD` (word placeholder TBD) must FAIL
+ok   F7 G6-3 named case `run TODO` (word placeholder TODO) must FAIL
+ok   F7 G6-3 named case `run N/A` (word placeholder N/A) must FAIL
+ok   F7 G6-3 named case `run 待定` (placeholder wording 待) must FAIL
+ok   F7 G6-3 named case `run 占位` (placeholder wording 占位) must FAIL
+ok   F7 G6-3 named case `run 35646859765` (real-world 11-digit run id) must PASS
+ok   F7 G6-3 named case ``run 35646859765`` (real-world 11-digit run id inside a code span) must PASS
+ok   F7 G6-3 named case `see run 111` (token-final 3-digit id at end of line) must FAIL
+ok   F7 G6-3 named case `run 1234。` (3-8 digit id terminated by CJK punctuation (not a word)) must FAIL
+ok   F7 G6-3 named case `run 7！` (1-2 digit id terminated by punctuation) must FAIL
+ok   F7 G6-3 named case `report run 123456789012345！` (>= 14 digit id terminated by punctuation) must FAIL
+ok   F7 G6-3 named case `see run <RUN_ID> here` (angle-bracket placeholder mid-prose) must FAIL
+ok   F7 G6-3 named case `see run TBD here` (word placeholder TBD mid-prose) must FAIL
+ok   F7 G6-3 named case `see run TODO here` (word placeholder TODO mid-prose) must FAIL
+ok   F7 G6-3 named case `see run N/A here` (word placeholder N/A mid-prose) must FAIL
+ok   F7 G6-3 named case `see run 待定 here` (CJK placeholder 待 mid-prose) must FAIL
+ok   F7 G6-3 named case `see run 占位 here` (CJK placeholder 占位 mid-prose) must FAIL
+ok   F7 G6-3 named case ``run 1234`` (backticked malformed id stays judged) must FAIL
+ok   F7 G6-3 named case `The run log shows `run 1234` as the marker.` (backticked malformed id inside a prose sentence) must FAIL
+ok   2e G6-3 prose probe `The retry loop was executed run 1234 times by the harness.` (3-8 digit rule vs ASCII word) must PASS (no finding)
+ok   2e G6-3 prose probe `连续 run 12 次后任务完成。` (1-2 digit rule vs CJK word) must PASS (no finding)
+ok   2e G6-3 prose probe ``inventory run 1 failed`` (pre-existing docs/t027/B3B_DESIGN.md:236 shape (1-2 digit rule)) must PASS (no finding)
+ok   2e G6-3 prose probe `run 111 次后停止。` (3-8 digit rule vs CJK word) must PASS (no finding)
+ok   2e G6-3 prose probe `run 000 次。` (all-zero rule vs CJK word) must PASS (no finding)
+ok   2e G6-3 prose probe `run 123456789012345 次。` (>= 14 digit rule vs CJK word) must PASS (no finding)
+ok   2e G6-3 prose probe `the tool ran run 1234 quickly` (3-8 digit rule vs ASCII word (no punctuation)) must PASS (no finding)
+ok   2e G6-3 prose probe `see run 7 files` (1-2 digit rule vs ASCII word) must PASS (no finding)
+ok   2e G6-3 prose probes are load-bearing: the same digit runs DO fail when token-final
+ok   2f G6-3 leading-boundary probe `rerun 1234` (ASCII letter immediately before `run`) must PASS (no finding)
+ok   2f G6-3 leading-boundary probe `The harness will rerun 1234.` (word-embedded `run` inside a prose sentence) must PASS (no finding)
+ok   2f G6-3 leading-boundary probe `在run 1234` (CJK ideograph glued to the FRONT of `run`) must PASS (no finding)
+ok   2f G6-3 leading-boundary probe `prerun 12` (ASCII-letter prefix on the 1-2 digit rule) must PASS (no finding)
+ok   2f G6-3 leading-boundary probe `rerun <RUN_ID>` (placeholder rule carries the leading guard too (NF-2 consistency)) must PASS (no finding)
+ok   2f G6-3 leading-boundary probe `prerun TBD` (word-placeholder rule carries the leading guard too) must PASS (no finding)
+ok   2f G6-3 still-judged probe `see run 1234` (token-final 3-8 digit id mid-prose) must FAIL
+ok   2f G6-3 still-judged probe `（run 1234）` (id wrapped in CJK parentheses) must FAIL
+ok   2f G6-3 still-judged probe ``run 1234`` (backticked malformed id) must FAIL
+ok   2f G6-3 still-judged probe `run 1234。` (id terminated by CJK punctuation) must FAIL
+ok   2f G6-3 still-judged probe `run 111` (3-digit id at end of line) must FAIL
+ok   2f G6-3 still-judged probe `run TBD` (word placeholder at end of line) must FAIL
+ok   2f G6-3 still-judged probe `see run TBD here` (word placeholder mid-prose) must FAIL
+ok   2f G6-3 word-followed exemption `run 1234 times` (digit run followed by an ASCII word) must PASS (no finding)
+ok   2f G6-3 word-followed exemption `连续 run 12 次` (digit run followed by a CJK word) must PASS (no finding)
+ok   2f G6-3 word-followed exemption ``run 1234 times`` (BACKTICKED digit run still followed by a word (NF-1 prose correction)) must PASS (no finding)
+ok   2f G6-3 glued-form consequence `run 1234times` (no separator before the trailing ASCII word) must PASS (documented, not a defect)
+ok   2f G6-3 glued-form consequence `run 12345678次` (no separator before the trailing CJK word) must PASS (documented, not a defect)
+ok   T7 expiring literals fail G6-4
+ok   T7 two literal lines produce two findings
+ok   T7 whitelisting ONE of two findings leaves G6-4 red with one fatal finding
+ok   T7 whitelisting both findings turns G6-4 green (whitelist is load-bearing)
+ok   T8 report without an artifacts block fails G7-a
+ok   T8 delete-criterion mutation (G7-a removed) leaves the corpus clean
+ok   T9 unresolved repo disposition (tmp path, omitted token) fails G7-b
+ok   T9 marking the tmp path local-only turns G7-b green
+ok   T9 unknown disposition token fails G7-b
+ok   T10 existing repo artifact + local-only + missing-historical pass G7-b
+ok   T10 unresolvable repo artifact fails G7-b
+ok   T11 finding row without a disposition cell fails G7-c
+ok   T11 adding the disposition cell turns G7-c green
+ok   T11 delete-criterion mutation (G7-c removed) leaves the corpus clean
+ok   G7-d stopped status line without 已停止——未完成 fails
+ok   G7-d fires only on the status line, not on prose naming the rule (self-reference guard)
+ok   G7-d adding the incomplete mark turns it green
+ok   T14 tree/index resolve whitelists from the working tree
+ok   T14 range/ci resolve whitelists from the endpoint revision (range -> head, ci -> HEAD)
+ok   T14 G6 reads its whitelist through ctx.loadWhitelist
+ok   T14 G4b reads its whitelist through the same ctx.loadWhitelist
+ok   T14 both criteria print the whitelist source they used
+ok   T15 tree scope rejects a gitignored / never-staged path marked repo (F2 probe)
+ok   T15 tree scope accepts a path present in the index and on disk
+ok   T15 range scope still resolves repo artifacts at the endpoint revision
+ok   T15 whitelist source resolves to endpoint:<rev> and yields zero entries when the endpoint revision lacks the file
+ok   T15 any-commit variant: endpoint label + zero entries hold for the real HEAD revision too
+ok   T15 G7-b FAILs an ignored path marked repo in tree scope
+ok   T15 G7-b accepts the same row once the path is in the index
+ok   T16 disposition vocabulary covers the CN and EN token sets stated in 6.3
+ok   T16 G7-c accepts the English disposition `Fixed`
+ok   T16 G7-c accepts the English disposition `Resolved`
+ok   T16 G7-c accepts the English disposition `Closed`
+ok   T16 G7-c accepts the English disposition `Accepted`
+ok   T16 G7-c accepts the English disposition `Rejected`
+ok   T16 G7-c accepts the English disposition `Deferred`
+ok   T16 G7-c accepts the English disposition `Recorded`
+ok   T16 G7-c accepts the English disposition `To do`
+ok   T16 G7-c accepts the English disposition `Observed`
+ok   T16 G7-c accepts the English disposition `To be discussed`
+ok   T16 G7-c accepts the English disposition `Not a problem`
+ok   T16 G7-c accepts the English disposition `Documented`
+ok   T16 G7-c still rejects a finding row with no disposition cell
+ok   F2 G7-c structural disposition probe `| **High** | 描述里写“已修” | |` (disposition token inside the description cell, disposition cell empty) must FAIL
+ok   F2 G7-c structural disposition probe `| **High** | evidence chain missing | Fixed |` (English disposition in the last cell) must PASS
+ok   F2 G7-c structural disposition probe `| **High** | 描述里写“已修” | 拒收 |` (CN disposition in the last cell (token also appears in the description)) must PASS
+ok   F2 G7-c structural disposition probe `| **Medium** | description says "Resolved" | Rejected |` (another EN token pair resolves in the last cell) must PASS
+ok   F2 G7-c structural disposition probe `| **High** | evidence chain missing` (row with no disposition cell at all (no trailing pipe)) must FAIL
+ok   F2 G7-c structural disposition probe `| **High** | 证据链缺失 |` (row with a structurally present but EMPTY disposition cell) must FAIL
+ok   F2 G7-c structural disposition probe `| **Low** | 描述含“已修” | 已修 |` (control: token in both cells) must PASS
+ok   F2 G7-c takes the disposition from the LAST cell only (internals)
+ok   F3 G7-d stopped-state vocabulary is bilingual (internals)
+ok   F3 G7-d bilingual stopped-state probe `| Status | Stopped (pending user ruling) |` (EN status line without the incomplete mark) must FAIL
+ok   F3 G7-d bilingual stopped-state probe `| Status | Stopped — incomplete |` (EN status line carrying the EN incomplete mark) must PASS
+ok   F3 G7-d bilingual stopped-state probe `| Status | 已停止——未完成（等用户裁决） |` (CN status line carrying the CN incomplete mark) must PASS
+ok   F3 G7-d bilingual stopped-state probe `| Status | 已停止（等用户裁决后决定是否重启） |` (CN status line without the mark) must FAIL
+ok   F3 G7-d bilingual stopped-state probe `| Status | Halted (awaiting ruling) |` (Halted is part of the EN token set) must FAIL
+ok   F3 G7-d bilingual stopped-state probe `| Status | halted (awaiting ruling) |` (EN tokens match case-insensitively (lowercase halted)) must FAIL
+ok   F3 G7-d bilingual stopped-state probe `| Status | stopped — incomplete |` (the EN mark matches case-insensitively too) must PASS
+ok   F3 G7-d bilingual stopped-state probe `| Status | Stopped (pending user ruling) |` (the mark appears later in the SAME block, so the row is closed out) must PASS
+ok   F3 G7-d ignores a CN prose line naming 停止态 (self-reference guard)
+ok   T72 OB-42 positive control: a closed-set verdict line passes (bold marker + parenthetical note allowed)
+ok   T72 OB-42 an out-of-set value under a closed-set prefix is a format deviation
+ok   T72 OB-42 a value legal for ANOTHER prefix is still a deviation (per-prefix sets, not one merged set)
+ok   T72 OB-42 the bare-token rule: a prefix-less `PASS` is a deviation
+ok   T72 OB-42 the table-external rule: an unknown prefix carrying exactly one closed value is a deviation
+ok   T72 OB-42 a residual `RE_` placeholder is a deviation (4.1 abolished it)
+ok   T72 OB-42 stated boundary: a gate reading that only LOOKS like a verdict line is not judged
+ok   T72 OB-42 self-reference guard: an illegal form quoted on a marked line is skipped
+ok   T72 OB-42 mutation applied: the membership line matched g7.js (a stale patch would weaken the suite silently)
+ok   T72 OB-42 load-bearing proof: accepting any recognisable value makes the SAME out-of-set line pass
+ok   T72 restore: g7.js is byte-identical after the mutation window and the cached module still fails the line
+ok   T73 OB-29 positive control: a call string matching the 2.2 qualified name passes (code span vs plain text is normalised away)
+ok   T73 OB-29 a call string outside the 2.2 qualified-name column fails
+ok   T73 OB-29 the `_EN` side is judged with its own lowercase table header
+ok   T73 OB-29 a directive without an appendix B region is not judged
+ok   T73 OB-29 fail-closed: an appendix B whose 2.2 qualified-name column cannot be read raises UsageError
+ok   T73 OB-29 mutation applied: the 2.2 membership line matched g5c.js (a stale patch would weaken the suite silently)
+ok   T73 OB-29 load-bearing proof: with the membership test patched out the SAME out-of-set call string passes
+ok   T73 restore: g5c.js is byte-identical after the mutation window and the cached module still fails the call string
+ok   T74 OB-90 an `_EN.md`-only change is now judged instead of silently ignored, and fails the symmetry test
+ok   T74 OB-90 a CN-only change whose `_EN` mirror exists is judged too (the mirror need not be in the change set)
+ok   T74 OB-90 directive pair, EN-only edit with a shape drift: G3(a.1) and G3(a.2) both go red
+ok   T74 OB-90 directive pair, EN-only edit with a shape-neutral body: only G3(a.1) goes red, G3(a.2) stays silent
+ok   T74 OB-90 a non-canonical `_en.md` spelling is judged as the EN side of the same pair, not as two untouched paths (5 r1 F4)
+ok   T74 OB-90 load-bearing guard: a single-language `.md` without an `_EN` mirror stays out of scope, so the mirror-less corpus docs cannot go red
+ok   T74 OB-90 no behaviour drift: a two-sided equal edit still yields one green aggregate and no per-pair FAIL
+ok   T74 OB-90 equal deletion on both sides still passes (an unreadable pair no longer skips the numstat verdict)
+ok   T74 OB-90 a deleted `_EN` side still yields a G3(a.1) FAIL (the old code skipped unreadable pairs entirely)
+ok   T74 OB-90 the directive pair with an unreadable side reports G3(a.2) FAIL (premise broken, fail closed)
+ok   T74 OB-90 mutation applied: the pairing-guard block matched g3a.js (a stale patch would weaken the suite silently)
+ok   T74 OB-90 load-bearing proof: with the either-side guard reverted the SAME `_EN`-only change produces NO record again
+ok   T74 restore: g3a.js is byte-identical after the mutation window and the cached module still judges the `_EN`-only change
+ok   T74 OB-90 mutation applied (mirror-existence guard): the guard line matched g3a.js
+ok   T74 OB-90 load-bearing proof (mirror-existence guard): without the predicate the SAME single-language document goes red
+ok   T74 restore (mirror-existence guard): g3a.js is byte-identical and the single-language document is silent again
+ok   T75 OB-91 the 7 r3 residual is closed: `lang:zh_cn` is consumed whole and rejected (it used to truncate to a legal `lang:zh`)
+ok   T75 OB-91 the same holds for `lang:en_us` on the `_EN` side
+ok   T75 OB-91 a bare `lang:` is an unknown tag rather than an invisible token
+ok   T75 OB-91 coexistence is fail-closed for the new form as well (`lang:zh` plus a bare `lang:`)
+ok   T75 OB-91 coexistence (`lang:zh` plus `lang:zh_cn`) is rejected too
+ok   T75 OB-91 a trailing continuation character (`lang:zh-`) is rejected
+ok   T75 OB-91 a trailing dot (`lang:zh.`) belongs to the token and is rejected (the terminator set is the complement of the continuation set)
+ok   T75 OB-91 the comparison stays whole-token and case-sensitive (`lang:ZH`)
+ok   T75 OB-91 a digit suffix (`lang:zh2`) is rejected
+ok   T75 OB-91 a comma terminates the token, so `lang:zh,` stays legal
+ok   T75 OB-91 prose after the tag creates no phantom occurrence (a tag followed by a space and more words)
+ok   T75 OB-91 a leading dot is not part of the token (`.lang:zh` still declares zh)
+ok   T75 OB-91 an occurrence preceded by a word character is not an occurrence (`xlang:zh` declares nothing and fails as missing)
+ok   T75 OB-91 mutation applied: the continuation-charset line matched g6.js (a stale patch would weaken the suite silently)
+ok   T75 OB-91 load-bearing proof: with the continuation charset narrowed back the SAME `lang:zh_cn` header passes again (the charset, not the closed set, is what catches it)
+ok   T75 restore: g6.js is byte-identical after the mutation window and the cached module still rejects `lang:zh_cn`
+ok   T78 OB-90 an `_EN`-only bold drift is judged from the EN side: numstat and the bold shape both go red
+ok   T78 OB-90 the backtick shape is judged on its own (equal numstat, so only G3(a.2) can speak)
+ok   T78 OB-90 a heading downshift on the `_EN` side (one inserted line) fails G3(a.2) with `head` false
+ok   T78 OB-90 the pipe shape is judged on its own (a table row widened on the `_EN` side)
+ok   T78 OB-90 the blank-line shape is judged on its own (same line count, one blank line filled in)
+ok   T78 OB-90 the line-count shape is judged on its own (a trailing body line, heading positions intact)
+ok   T78 OB-90 control: an equal two-sided edit stays green (one aggregate PASS, no per-pair FAIL)
+ok   T78 OB-90 control: an identical shape change on BOTH sides stays green (the six shapes compare sides, not an absolute form)
+ok   T78 OB-90 pairing without shape drift: an `_EN`-only modification fails G3(a.1) and leaves G3(a.2) silent
+ok   T78 OB-90 an `_EN` side that is NEWLY ADDED (+2/-0) is judged against the untouched CN baseline and fails G3(a.1)
+ok   T78 OB-90 a DELETED `_EN` side (+0/-4) still yields G3(a.1) FAIL, so a removal cannot pass as "nothing to compare"
+ok   T78 OB-90 an `_EN` RENAME is judged as two pairs (old mirror deleted, new mirror added), each with its own G3(a.1)
+ok   T78 OB-90 a non-canonical `_en.md` spelling is paired under the CANONICAL CN id, so the half a reader looks for is the one reported
+ok   T78 OB-90 an orphan `_EN.md` (no CN side at all) is still judged and fails G3(a.1) against a +0/-0 baseline
+ok   T78 OB-90 a single-language document without an `_EN` mirror produces NO record (no false red on the mirror-less corpus)
+ok   T78 OB-90 aggregate uniqueness: the same `_EN`-only drift emits exactly ONE G3(a) record (a duplicate aggregate would double-count)
+ok   T79 OB-91 illegal form `lang:zh_cn` is consumed whole and rejected as an unknown tag
+ok   T79 OB-91 illegal form `lang:zh-cn` is consumed whole and rejected as an unknown tag
+ok   T79 OB-91 illegal form `lang:en_us` is consumed whole and rejected as an unknown tag
+ok   T79 OB-91 illegal form `lang:en-us` is consumed whole and rejected as an unknown tag
+ok   T79 OB-91 illegal form `lang:` is consumed whole and rejected as an unknown tag
+ok   T79 OB-91 illegal form `lang:ZH` is consumed whole and rejected as an unknown tag
+ok   T79 OB-91 illegal form `lang:zh-` is consumed whole and rejected as an unknown tag
+ok   T79 OB-91 illegal form `lang:zh.` is consumed whole and rejected as an unknown tag
+ok   T79 OB-91 illegal form `lang:zh2` is consumed whole and rejected as an unknown tag
+ok   T79 OB-91 illegal form `lang:zh:` is consumed whole and rejected as an unknown tag
+ok   T79 OB-91 legal + illegal coexistence is fail-closed (lang:zh + lang:zh-cn)
+ok   T79 OB-91 legal + illegal coexistence is fail-closed (lang:zh-cn + lang:zh)
+ok   T79 OB-91 legal + illegal coexistence is fail-closed (lang:en + lang:en-us)
+ok   T79 OB-91 legal + illegal coexistence is fail-closed (lang:en-us + lang:en)
+ok   T79 OB-91 continuation char extends the token (`lang:en_` is one unknown token, not a legal prefix)
+ok   T79 OB-91 continuation char extends the token (`lang:en.` is one unknown token, not a legal prefix)
+ok   T79 OB-91 continuation char extends the token (`lang:en-` is one unknown token, not a legal prefix)
+ok   T79 OB-91 continuation char extends the token (`lang:en2` is one unknown token, not a legal prefix)
+ok   T79 OB-91 continuation char extends the token (`lang:enA` is one unknown token, not a legal prefix)
+ok   T79 OB-91 continuation char extends the token (`lang:ena` is one unknown token, not a legal prefix)
+ok   T79 OB-91 continuation char extends the token (`lang:zhA` is one unknown token, not a legal prefix)
+ok   T79 OB-91 continuation char extends the token (`lang:zha` is one unknown token, not a legal prefix)
+ok   T79 OB-91 continuation char extends the token (`lang:zh9` is one unknown token, not a legal prefix)
+ok   T79 OB-91 continuation char extends the token (`lang:zh__` is one unknown token, not a legal prefix)
+ok   T79 OB-91 continuation char extends the token (`lang:zh-_` is one unknown token, not a legal prefix)
+ok   T79 OB-91 continuation char extends the token (`lang:zh.1` is one unknown token, not a legal prefix)
+ok   T79 OB-91 continuation char extends the token (`lang:zhCN` is one unknown token, not a legal prefix)
+ok   T79 OB-91 continuation char extends the token (`lang:en-001` is one unknown token, not a legal prefix)
+ok   T79 OB-91 legal shape "zh-alone" is not turned red by the token rule
+ok   T79 OB-91 legal shape "zh-comma" is not turned red by the token rule
+ok   T79 OB-91 legal shape "zh-space" is not turned red by the token rule
+ok   T79 OB-91 legal shape "zh-tab" is not turned red by the token rule
+ok   T79 OB-91 legal shape "zh-cjk-comma" is not turned red by the token rule
+ok   T79 OB-91 legal shape "zh-cjk-paren" is not turned red by the token rule
+ok   T79 OB-91 legal shape "zh-declaration-line" is not turned red by the token rule
+ok   T79 OB-91 legal shape "zh-bracket" is not turned red by the token rule
+ok   T79 OB-91 legal shape "zh-paren" is not turned red by the token rule
+ok   T79 OB-91 legal shape "zh-quote" is not turned red by the token rule
+ok   T79 OB-91 legal shape "zh-pipe" is not turned red by the token rule
+ok   T79 OB-91 legal shape "zh-twice" is not turned red by the token rule
+ok   T79 OB-91 legal shape "en-alone" is not turned red by the token rule
+ok   T79 OB-91 legal shape "en-comma" is not turned red by the token rule
+ok   T79 OB-91 legal shape "en-declaration-line" is not turned red by the token rule
+ok   T79 OB-91 legal shape "zh-line-15-of-window" is not turned red by the token rule
+ok   T79 OB-91 fail-closed premise: tag on line 16 is outside the header window
+ok   T79 OB-91 fail-closed premise: two legal tags conflict
+ok   T79 OB-91 fail-closed premise: declared tag disagrees with the file name
+ok   T79 OB-91 fail-closed premise: no tag at all
+ok   T79 OB-91 fail-closed premise: a word character before `lang:` means no occurrence
+ok   T79 OB-91 fail-closed premise: a bare tag next to a legal one is still unknown
+ok   T79 canary: constants are locked — LANG_HEADER_WINDOW = 15, LANG_TAG_EXACT is exactly {lang:zh, lang:en}, and LANG_TAG_CONT_RE is exactly [A-Za-z0-9._:-] (behavior pair: `lang:zh` legal, `lang:zh_cn` illegal)
+ok   T79 canary: LANG_TAG_CONT_RE source text is frozen to the literal class [A-Za-z0-9._:-]
+ok   T79 canary: slash (U+002F) is an external terminator, not a continuation char — `lang:zh/en` splits into the legal tag `lang:zh` plus free text and stays green
+ok   T79 canary: question mark (U+003F) is an external terminator, not a continuation char — `lang:zh?en` splits into the legal tag `lang:zh` plus free text and stays green
+ok   T79 canary: equals sign (U+003D) is an external terminator, not a continuation char — `lang:zh=en` splits into the legal tag `lang:zh` plus free text and stays green
+ok   T79 canary: space (U+0020) is an external terminator, not a continuation char — `lang:zh en` splits into the legal tag `lang:zh` plus free text and stays green
+ok   T79 canary: fullwidth semicolon (U+FF1B) is an external terminator, not a continuation char — `lang:zh；en` splits into the legal tag `lang:zh` plus free text and stays green
+ok   T79 canary: fullwidth comma (U+FF0C) is an external terminator, not a continuation char — `lang:zh，en` splits into the legal tag `lang:zh` plus free text and stays green
+ok   T79 canary: ideographic comma (U+3001) is an external terminator, not a continuation char — `lang:zh、en` splits into the legal tag `lang:zh` plus free text and stays green
+ok   T79 canary: black-box tokenization — `lang:zh` PASSes, `lang:zh_cn` is an unknown tag, `lang:zh/en` PASSes (/ terminates the token)
+ok   T76 G1 a consistent ledger (heading / status table / completion log) passes all four sub-checks
+ok   T76 G1 an unknown state symbol outside the ledger closed set fails G1(c)
+ok   T76 G1 the pending-evaluation marker is only legal on headings, never in the status table
+ok   T76 G1 a heading that disagrees with its status-table row fails G1(d)
+ok   T76 G1 a completion-log row whose status row is still ⬜ fails G1(e)
+ok   T76 G1 in-progress wording inside a completion row fails G1(f) (the GATES-EDGE-COVERAGE defect, mechanised)
+ok   T76 G1 the same holds for the English wording (In progress / awaiting finalisation)
+ok   T76 G1 a completion key binds to a heading through its backticked alias (the P-series governance case)
+ok   T76 G1 the same row passes once the aliased heading is ✅ (the binding is real, not a lucky string match)
+ok   T76 G1 mutation applied on the alias lookup (defect 3: completion key never bound to a P-series heading)
+ok   T76 G1 load-bearing proof: with the alias fallback removed the SAME mismatched row passes, i.e. G1(e) was vacuous for every governance slice
+ok   T76 G1 restore after the alias mutation window
+ok   T76 G1 an UNKNOWN state symbol on a heading reaches G1(c) instead of slipping past every guard (r2 F-2)
+ok   T76 G1 G1(f) judges ADDED completion rows only: the same historical row fails when it is in the added set and passes when it is not (r2 F-3)
+ok   T76 G1 an unbound completion key also emits an explicit INFO record, so the directive promise "no binding is INFO" is literal (r2 F-4)
+ok   T76 G1 a ledger without its state-symbol declaration line raises UsageError (exit 2, never a silent guess)
+ok   T76 G1 mutation applied: the in-progress test line matched g1.js (a stale patch would weaken the suite silently)
+ok   T76 G1 load-bearing proof: with the wording test patched out the SAME in-progress row passes
+ok   T76 G1 restore: g1.js is byte-identical after the mutation window and the wording row fails again
+ok   T76 G1 an unreadable ledger pair reports SKIP (never a vacuous PASS)
+ok   T119 G1(e2) an ADDED in-block completion row under a ✅ heading passes
+ok   T119 G1(e2) an ADDED in-block completion row under a non-✅ heading fails
+ok   T119 G1(e2) the same row is not re-judged when it is not in the added set (forward rule)
+ok   T119 G1(e2) an in-block row whose nearest heading carries no state symbol is skipped, not failed
+ok   T121 G1(e2) the ✅ PASS is a JUDGED row, not a vacuous skip (counter: 1 judged, 0 skipped, 0 historical)
+ok   T121 G1(e2) the forward rule is a real exclusion: an unadded row is counted historical, never judged
+ok   T121 G1(e2) an added row with NO heading above it is skipped via the headKey guard (not silently passed as judged)
+ok   T121 G1(e2) the row binds to the NEAREST heading: a ✅ heading above a 🔄 one does not excuse it
+ok   T121 G1(e2) the EN field name `| Completion record |` is collected and judged like the CN one
+ok   T77 G5 a declared, staged, resolvable change set passes G5(d) / G5(e) / G5(f)
+ok   T77 G5 a staged path nobody declared fails G5(d) - the observable consequence of `git add -A`
+ok   T77 G5 the reverse direction (declared but untouched) is INFO, because a fence is the landing snapshot - the §11.2 backfill case
+ok   T77 G5 an evidence reference that does not resolve fails G5(e)
+ok   T77 G5 an unstaged modification in index scope fails G5(f) (index must equal the worktree)
+ok   T77 G5 a STAGED entry (porcelain X column) does not dirty the index - staging is the normal state of index scope
+ok   T77 G5 a change set without a report records INFO on G5(d) instead of a vacuous pass
+ok   T77 G5 outside index scope the staging check is INFO (a clean CI checkout has no index state)
+ok   T77 G5 an external GATES_CHANGESET_JSON that disagrees with the derived fields raises UsageError (exit 2)
+ok   T77 G5 a declared-but-untouched path also emits an explicit INFO record (r2 F-4)
+ok   T77 G5 mutation applied on the deletion guard, which must read the parser boolean and not the two-char XY status (r2 F-1)
+ok   T77 G5 load-bearing proof: with the deletion guard patched out the same deleted path is reported as undeclared (r2 F-1)
+ok   T77 G5 restore after the deletion-guard mutation window
+ok   T77 G5 a declared-but-untouched path also emits an explicit INFO record (r2 F-4)
+ok   T77 G5 evidence references are read from BARE paths too (30/30 corpus rows carry no backticks, so backtick-only extraction was vacuous)
+ok   T77 G5 a repository-root artifact in the evidence cell is extracted too (⑥ finding: the prefix whitelist made G5(e) vacuous for root files)
+ok   T77 G5 mutation applied on the bare-path scan (defect 2: evidenceRefs were backtick-only)
+ok   T77 G5 load-bearing proof: with the bare-path scan removed the same row yields no reference at all
+ok   T77 G5 restore after the bare-path mutation window
+ok   T77 G5 a deleted staged path is not a change-set member (removing a file declares nothing)
+ok   T77 G5 mutation applied: the set-equality line matched g5.js (a stale patch would weaken the suite silently)
+ok   T77 G5 load-bearing proof: with the equality verdict patched the SAME undeclared path passes
+ok   T77 G5 restore: g5.js is byte-identical after the mutation window and the undeclared path fails again
+ok   T120 G5(e2) an ADDED in-block completion row whose evidence path resolves passes
+ok   T120 G5(e2) an ADDED in-block completion row whose evidence path does not resolve fails
+ok   T120 G5(e2) without an added in-block completion row there is nothing to resolve (PASS)
+ok   T122 G5(e2) the resolvable PASS is a REAL resolution (counter: 1 reference(s) resolved)
+ok   T122 G5(e2) an ADDED EN `| Completion record |` row is extracted and resolved like the CN one
+ok   T123 G5(e2) `x{,_EN}.md` expands to BOTH sides and resolves (counter: 2 reference(s) resolved)
+ok   T123 G5(e2) the expansion is load-bearing: a missing `_EN` side fails instead of being dropped
+ok   T123 G5(e2) a second brace group stays unexpandable: the skip is VISIBLE, not a silent pass
+ok   T124 G5(e2) a stem-less brace group yields NO reference: a visible skip, never a false FAIL
+ok   T124 G5(e2) on a brace-free row the in-block extractor agrees EXACTLY with the shared G5(e) extractor
+ok   T13 whole fixture corpus yields exactly the expected FAIL id set
+ok   T13 whole fixture corpus has no unexpected SKIP/INFO storm
+ok   T17 unresolvable range base is a usage error, not an empty change set
+ok   T17 unresolvable range base is a usage error, not an empty change set
+ok   T17 unresolvable range head is a usage error, not an empty change set
+ok   T17 unresolvable range head is a usage error, not an empty change set
+ok   T17 positive control: a resolvable range still builds a context
+ok   T18 a failed `git diff` is an environment error even when both endpoints resolve
+ok   T18 a failed `git status` in tree scope is an environment error, not an empty change set
+ok   T18 a failed `git status` in index scope is an environment error too
+ok   T18 --scope=ci refuses a SHALLOW clone instead of falling back to the whole tree
+ok   T18 an inconclusive shallow probe is an environment error, not a licence to fall back
+ok   T18 positive control: a genuine root commit still falls back to EMPTY_TREE
+ok   T19 G6-5 accepts §7.5 (exact heading) / §7.2 (parent prefix of §7.2.1) / §1.7.1 (bold line-leading label)
+ok   T19 the legal fixture is scanned (6 in-region lines, 3 references) with zero findings
+ok   T19 directiveLabels reads the REAL directive: bold line-leading §1.7.1 plus heading §7.5 / §7.2.1
+ok   T19 resolvesRef: exact and parent-prefix accepted, a dangling number rejected
+ok   T20 G6-5 FAILs a §7.9 reference on a line INSIDE the §0.3 region
+ok   T20 exactly one finding, and its detail names `§7.9 unresolved`
+ok   T20 reverse mutation (§7.9 -> §7.8) clears G6-5: the assertion tracks the reference, not the line
+ok   T21 the C.1 v3.1 comparison table produces no finding (zero corpus FAIL)
+ok   T21 the excluded §3.10 row is genuinely out of region: 0 references counted
+ok   T21 OB-46 fail-closed: renaming `### C.1` aborts with UsageError instead of judging an unbounded region
+ok   T21b OB-46 positive control: an intact ledger keeps both target regions (no over-rejection)
+ok   T21b OB-46 boundary: a file with neither heading stays region-free and raises nothing (ordinary markdown)
+ok   T21b OB-46 fail-closed: `### C.0` without a `### C.1` delimiter raises UsageError (started-but-unterminated region)
+ok   T22 G6-5 skips a line carrying the 示例 exclusion marker
+ok   T22 reverse mutation (drop the 示例 marker) turns the very same line red on §7.9
+ok   T22 exclusion marker `不得残留` suppresses the finding, and dropping it restores the red
+ok   T22 exclusion marker `示例` suppresses the finding, and dropping it restores the red
+ok   T22 exclusion marker `引文` suppresses the finding, and dropping it restores the red
+ok   T22 exclusion marker `冲突` suppresses the finding, and dropping it restores the red
+ok   T22 exclusion marker `矛盾` suppresses the finding, and dropping it restores the red
+ok   T23 an in-memory whitelist entry exempts the dangling reference (PASS + exactly one SKIP)
+ok   T23 the exemption is load-bearing: the same fixture without the entry stays red
+ok   T23 no entry was preloaded into tools/gates/g6-whitelist.txt (the exemption above is in-memory only)
+ok   T24 the out-of-region §7.9 line yields no finding: 6 lines scanned, 0 references counted
+ok   T24 boundary mutation (drop the closing heading) extends the region onto the §7.9 line and turns G6-5 red
+ok   T25 precondition: the legal fixture is green BEFORE the mutation
+ok   T25 mutation ② applied: the patch text matched g6.js (a stale patch would weaken the suite silently)
+ok   T25 mutation ②: without the bold-label collector the §1.7.1 reference dangles and G6-5 turns red
+ok   T25 the same mutation leaves the heading-derived labels intact (§7.5 / §7.2 still resolve)
+ok   T25 restore: g6.js is byte-identical after the mutation window (no disk residue)
+ok   T25 restore: the cached criterion module is unmutated, the legal fixture is green again
+ok   T26 all six CN closed-set words pass, including the `**已处置**（v1.1）` parenthetical shape
+ok   T26 the CN/EN closed sets are exactly the six documented words
+ok   T26 firstStatusWord accepts `词`, `词（括注）`, `**词**（括注）` and rejects a legacy value
+ok   T26 rowCellsOf splits on unescaped pipes and drops the two outer cells
+ok   T26 ledgerRegionRange = [§12.4 heading, next ^#{2,4} heading)
+ok   T26 a ledger-shaped row ABOVE the §12.4 heading is out of region and not judged
+ok   T26 a non-OB table row inside §12.4 is not judged (LEDGER_ROW_RE)
+ok   T26 a ledger row in a file without a §12.4 heading is not judged (no target region)
+ok   T27 G6-6 FAILs `**下一片必做**` and `**已落地**` with exactly two findings
+ok   T27 both offending cells are named, and the legal control row (已登记) is NOT reported
+ok   T27 reverse mutation (both legacy words -> closed-set words) clears G6-6
+ok   T28 mutation ③ applied: the patch text matched g6.js
+ok   T28 the mutated CN closed set has five words and no 观察中
+ok   T28 mutation ③: the 观察中 row alone turns red; the other five closed-set rows stay green
+ok   T28 restore: g6.js is byte-identical and the cached module still carries 观察中
+ok   T28 the `_EN` fixture selects the EN word table: all six EN words pass
+ok   T28 the `_EN` word-table switch is load-bearing: EN word fails under a CN name, passes under `_EN`, CN word fails under `_EN`
+ok   T28b OB-47 declaredLang reads the header tag and agrees with the name (zh -> CN table, en -> EN table)
+ok   T28b OB-47 fail-closed: no declared language tag raises UsageError instead of defaulting to CN
+ok   T28b OB-47 fail-closed: a third language (`lang:fr`) raises UsageError instead of being judged as CN
+ok   T28b OB-47 fail-closed: a PREFIX form (`lang:zh-cn`) raises UsageError instead of counting as zh (7 r1 High-2)
+ok   T28b OB-47 fail-closed: the same holds for `lang:en-us` on the `_EN` side
+ok   T28b OB-91 fail-closed: a legal tag plus an illegal one (`lang:zh` + `lang:zh-cn`) raises UsageError (7 r2 Medium)
+ok   T28b OB-91 fail-closed: the same coexistence rule holds on the `_EN` side (`lang:en` + `lang:en-us`)
+ok   T28b OB-47 fail-closed: a renamed file (`_EN.md` keeping `lang:zh`) raises UsageError instead of switching the table
+ok   T28b OB-47 fail-closed: two conflicting declarations raise UsageError
+ok   T28b OB-47 the header window is bounded: a tag below it is not a declaration
+ok   T28b OB-47 positive control: a compliant declaration is never rejected on either side
+ok   T28b OB-47 scope: a §12.4-shaped heading with no ledger row is skipped, not forced to declare (the RFC case)
+ok   T28b OB-47 scope: the same foreign file carrying a real ledger row is judged, so it must declare (fail closed)
+ok   T28c OB-73 positive control: equal backtick counts leave G3(a.2) silent and the aggregate green
+ok   T28c OB-73 the sixth shape is load-bearing: one extra backtick on the `_EN` side turns G3(a.2) red
+ok   T28c OB-73 mutation applied: the sixth-shape line matched g3a.js (a stale patch would weaken the suite silently)
+ok   T28c OB-73 load-bearing proof: with the sixth shape patched out the SAME drift passes (the shape, not the pair, is what catches it)
+ok   T28c restore: g3a.js is byte-identical after the mutation window and the cached module still catches the drift
+ok   T28c OB-73 the live directive pair satisfies all six shapes (real whole-file files)
+ok   T29 G5-b passes a model value that is a closed-set member
+ok   T30 G5-b passes a role file that omits the model key (section 2.6 shape)
+ok   T31 G5-b fails the one remaining blacklist member (kimi-k3 is not in the set)
+ok   T32 G5-b comparison is case-sensitive: the right model in the wrong case fails
+ok   T33 G5-b comparison is verbatim: a quoted set member still fails
+ok   T34 G5-b collects EVERY model key: a legal first key does not hide an illegal second one
+ok   T35 G5-b fails a former blacklist value that is not a closed-set member
+ok   T36 empty model value is G5-a 2 s finding and not G5-b s: G5-b passes while G5-a(2) fails
+ok   T37 the closed set is load-bearing: adding gpt-5.4 to the set flips that fixture to PASS
+ok   T37 restore: g5b.js is byte-identical and the cached module still fails gpt-5.4
+ok   T38 G5-b parses the frontmatter block only: a model key in the body is not judged
+ok   T39 G5-b trims both ends: a legal value with a trailing space still passes
+ok   T40 G5-b is verbatim: a legal value followed by an inline comment fails
+ok   T41 G5-b accepts each member this slice added (deep tier and parallel alternative)
+ok   T42 the added member is load-bearing: dropping gpt-6-luna from the set makes that fixture fail
+ok   T42 restore: g5b.js is byte-identical and the cached module still accepts gpt-6-luna
+ok   T43 G8-a accepts a pack member (nearest ancestor carries MANIFEST + SHA256SUMS)
+ok   T43 G8-a accepts a root-level *-freedom-list.md
+ok   T43 G8-a accepts a path registered verbatim in evidence-forms.txt
+ok   T43 the registration is load-bearing: without it the same path fails
+ok   T43 G8-a FAILs a stray root-level path with a `not a pack member` reason token
+ok   T43 a SUBSTRING match does not register (entry.match must EQUAL the path)
+ok   T43 a registration row with 2 fields is a UsageError (exit 2, never a silent pass)
+ok   T43 a duplicate registration for the same path is a UsageError
+ok   T44 G8-b accepts a fully self-consistent pack (runtime-computed hashes)
+ok   T44 G8-b FAILs a pack without the 归档条目清单 section (token `missing`, names the pack)
+ok   T44 G8-b FAILs an unlisted pack-root payload (token `not listed`, names the file in both lists)
+ok   T44 G8-b recomputes hashes and FAILs a mismatch (token `hash mismatch`, names the payload)
+ok   T44 G8-b FAILs a 未入库 entry colliding with a payload (token `untracked-list conflict`, names the path)
+ok   T44 G8-b normalizes backslash SHA256SUMS paths to POSIX and passes
+ok   T44 the backslash normalization is load-bearing: a wrong hash on the same line still FAILs
+ok   T44 a single flipped hash digit turns G8-b red (the recompute is load-bearing)
+ok   T45 G8-c accepts a MANIFEST whose archive hash equals the SHA256SUMS record
+ok   T45 G8-c FAILs an archive hash that disagrees with SHA256SUMS (token `hash mismatch`, names the payload)
+ok   T45 G8-c exempts a legacy pack without the 后缀与编码映射 section (explicit note, not a blank PASS)
+ok   T46 G8-d accepts a 重建归档 note carrying source + basis and no bad sha token
+ok   T46 G8-d FAILs a 重建归档 note missing the basis (token `basis`, names the file)
+ok   T47 inside the tree the violating content is NOT judged by G1-a/G2/G4a/G4b/G6
+ok   T47 G4a reports the excluded count instead of judging the tree file
+ok   T47 the SAME content outside the tree IS judged: G1-a/G2/G4a/G4b/G6-4 all turn red and name the path
+ok   T48 every G8 sub-check reports INFO (not a vacuous PASS) when the change set has no evidence path
+ok   T48 the INFO is the absence of an evidence path, not a blanket: the same sub-check is NOT INFO when one is present
+ok   T49 ctx.listTreeFiles returns the recursive, sorted pack file list
+ok   T49 isEvidenceTree is case-insensitive, prefix-anchored and does not over-match near misses
+ok   T50 in-tree violating content yields ZERO finding from G1-a/G2/G4a/G4b/G6
+ok   T50 the SAME bytes at docs/t027/ turn G1-a/G2/G4a/G4b/G6-4/G6-6 red and name the path
+ok   T50 G8 still judges the in-tree file: G8-a PASS + G8-b PASS on the pack carrying the violation
+ok   T50 G8-a still FAILs a non-member tree path (the shape guard is not inert)
+ok   T51 ctx.changedMarkdown() (shipped lib/ctx) drops the tree .md and keeps the docs/t027 .md
+ok   T51 the selftest ctx and lib/ctx agree on changedMarkdown (no local re-derivation drift)
+ok   T51 G1-a shares the single exclusion (tree-only ctx green, docs/t027 ctx red)
+ok   T51 G2 shares the single exclusion (tree-only ctx green, docs/t027 ctx red)
+ok   T51 G4b shares the single exclusion (tree-only ctx green, docs/t027 ctx red)
+ok   T51 G6 shares the single exclusion (tree-only ctx green, docs/t027 ctx red)
+ok   T52 G4a excludes a BOM+CRLF .md and a BOM-less .md inside the tree and counts BOTH
+ok   T52 the identical bytes outside the tree DO fail G4a (the exclusion is the only reason the in-tree run is green)
+ok   T89 G4a accepts a .md carrying exactly one BOM
+ok   T89 G4a fails a .md carrying zero BOMs and reports bom=0
+ok   T89 G4a fails a .md carrying two consecutive BOMs and reports bom=2
+ok   T89 G4a fails a non-.md file carrying one BOM and reports bom=1
+ok   T89 reverse mutation (bomCount >= 1) makes the double-BOM file pass again, so the equality is load-bearing
+ok   T53 a malformed SHA256SUMS line FAILs and names the line/pack, never a silent pass
+ok   T53 a truncated 归档条目清单 (heading present, table empty) FAILs and names the unlisted payload
+ok   T54 an 归档路径 absent from the pack payload FAILs G8-c and names the path
+ok   T54 an 归档路径 present in the payload but absent from SHA256SUMS FAILs G8-c and names the path
+ok   T55 a 重建归档 mention OUTSIDE the annotation zone does not trigger G8-d
+ok   T55 a non-64-hex sha256 token INSIDE the annotation zone FAILs G8-d
+ok   T55 the precedent file is not misjudged despite 重建归档 + a 16-digit sha-original short hash
+ok   T55 the precedent 16-digit short hash sits OUTSIDE the annotation zone (why it is never a sha256 token)
+ok   T56 mutation anchor (a) exists verbatim in lib/ctx.js (the exclusion being mutated)
+ok   T56 mutation anchor (b) exists verbatim in lib/criteria/g8.js (the hash recompute being mutated)
+ok   T57 --scope=ci is a valid reading (exit 0/1, never the usage-error exit 2)
+ok   T57 an unresolvable range endpoint exits 2 (usage/environment error), not a silent green
+ok   T57 DEF-1 an unresolvable range endpoint exits 2 with a NON-EMPTY stderr carrying the `gate.js:` diagnosis (never a silent exit that degrades into an empty change set)
+ok   T57 the historical range 4284e94 is a valid reading (exit 0/1, not 2)
+ok   T57 listTreeFiles in range scope walks `git ls-tree -r -z --name-only <endpoint> -- <dir>` (not the disk)
+ok   T58 tree scope reads the registration table from the working tree
+ok   T58 the real registered root-level path is listed VERBATIM (match === file) in the worktree registry
+ok   T58 a historical range endpoint reads the registration table from the endpoint (absent then ⇒ zero entries)
+ok   T58 the SAME path is green with the worktree registry and red with the endpoint (empty) registry
+ok   T59 EXPECTED_CORPUS_FAILS is sorted and duplicate-free
+ok   T59 every expected corpus FAIL id belongs to the known criterion vocabulary
+ok   T59 no criterion id is duplicated in ALL_SUBCHECKS
+ok   T59 every G8 sub-check id is present in ALL_SUBCHECKS
+ok   T60 DEF-2 regression anchor: the tree branch batches a whole directory into EXACTLY ONE `git check-ignore --stdin -z` spawn (never a per-file check-ignore), memoises per dir, and returns the disk set minus the ignored set
+ok   T61 G5-b accepts both members this slice added (glm-5.3 pre-review and glm-5.3-flash batch assistance)
+ok   T62 the glm-5.3-flash member is load-bearing: dropping it from the set makes that fixture fail
+ok   T63 restore: g5b.js is byte-identical and the cached module still accepts glm-5.3-flash
+ok   T64 the glm-5.3 member is load-bearing: dropping it from the set makes that fixture fail
+ok   T65 restore: g5b.js is byte-identical and the cached module still accepts glm-5.3
+ok   T66 G5-b stays case-sensitive for the GLM member: GLM-5.3 (wrong case) fails
+ok   T67 G5-b rejects a qualified call string: glm-5.3 (glm) is not the modelId (R2.2 boundary)
+ok   T68 OB-20: git grep exit 1 (no match) is data - G5-a(1) still PASSes
+ok   T69 OB-20: a failed git grep (exit 128) is a UsageError, never a silent PASS
+ok   T70 OB-20: a missing git binary (exit 127) is a UsageError too
+ok   T70 OB-20 positive control: a real hit still FAILs (the guard rejects nothing legitimate)
+ok   T71 OB-17: the CLI usage example `run <chain-file>` is no longer judged
+ok   T71 OB-17: the id-like placeholder `run <RUN_ID>` still fails
+ok   T71 OB-17: a short uppercase placeholder `run <ID>` still fails
+ok   T71 OB-17 the narrowing is load-bearing: widening it back turns the usage example red
+ok   T71 OB-17 restore: g6.js is byte-identical after the mutation probe
+ok   T80 G9 passes ordinary documents and Go files (no temp-artifact shape)
+ok   T80 G9 excludes the frozen evidence tree (OB-79): a legacy.log inside it is not judged
+ok   T80 G9 honours a whitelist registration (match + file)
+ok   T80 G9 passes the tracked tmp directory placeholder tmp/.gitkeep
+ok   T80 G9 excludes deleted paths (a deletion submits no bytes)
+ok   T81 G9 fails a .log outside the tmp root (token `temp-shape`, names the path)
+ok   T81 G9 fails a .tmp outside the tmp root (token `temp-shape`, names the path)
+ok   T81 G9 fails a .bak outside the tmp root (token `temp-shape`, names the path)
+ok   T81 G9 fails any tmp-root path except tmp/.gitkeep (token `tmp-root`, names the path)
+ok   T81 G9 fails a mixed-case tmp root (token `tmp-root`, original spelling kept)
+ok   T81 G9 fails an upper-case tmp root (token `tmp-root`, original spelling kept)
+ok   T82 M1 the shape regex is load-bearing: /(?!x)x/ turns N1/N2/N3 green
+ok   T82 M2 the whitelist exemption is load-bearing: deleting it turns P3 red
+ok   T82 M3 the evidence-tree exclusion is load-bearing: deleting it turns P2 red
+ok   T82 M4 the tmp/.gitkeep guard is load-bearing: an unconditional skip turns N4 green
+ok   T83 G9 restore: g9.js is byte-identical and the cached module keeps N1 red / P2 green / P4 green
+ok   T84 OB-97 positive: the widened continuation set leaves the ordinary declaration intact (`lang:zh` still declares zh)
+ok   T84 OB-97 positive: a fullwidth comma still terminates the token, so `lang:zh，` stays legal
+ok   T84 OB-97 negative: `lang:zh:en` is consumed whole and rejected (it used to truncate to the legal `lang:zh`)
+ok   T84 OB-97 negative: a trailing colon belongs to the token, so `lang:zh:` is rejected
+ok   T84 OB-97 negative: coexistence (`lang:zh` plus `lang:zh:`) is fail-closed
+ok   T84 OB-97 mutation applied + load-bearing: with the pre-OB-97 charset the SAME `lang:zh:en` header passes again
+ok   T84 OB-97 restore: g6.js is byte-identical after the mutation window and the cached module rejects `lang:zh:en` again
+ok   T85 G6-7 positive: a §0.3 declaration whose ID exists in the §12.4 ledger passes
+ok   T85 G6-7 positive: a PRE-EXISTING (not added) appendix-C ledger line still satisfies the declaration
+ok   T85 G6-7 positive: an exclusion-marker line and a NEGATED verb (`不新增 … OB-905`) are not judged
+ok   T85 G6-7 positive: a declaration outside the §0.3 region is not judged
+ok   T85 G6-7 negative: a declared ID with no ledger row anywhere fails and the finding names the ID
+ok   T85 G6-7 mutation applied + load-bearing: disabling the verb test turns the same negative case green
+ok   T85 G6-7 mutation applied + load-bearing: ignoring the ledger evidence turns the same negative case green
+ok   T85 G6-7 restore: g6.js is byte-identical after both mutation windows and the shipped module still fails the same negative case
+ok   T85 G6-7 boundary: `ADR-027` is not a `DR-027` declaration and the line is not judged
+ok   T85 G6-7 boundary: `登记 ADR-028 与 OB-103` yields exactly one declaration (OB-103)
+ok   T86 G5-d positive: a role file carrying the five §2.6 keys exactly once passes
+ok   T86 G5-d positive: an EXTRA key is not judged (model stays with G5-a / G5-b)
+ok   T86 G5-d positive: a non-agent path is not a target (INFO, never a vacuous PASS claim)
+ok   T86 G5-d negative: a missing `target` key fails and the finding names it
+ok   T86 G5-d negative: a duplicated `tools` key fails (exactly once required)
+ok   T86 G5-d negative: an empty value and an absent frontmatter both fail
+ok   T86 G5-d mutation applied + load-bearing: removing `target` from the required set turns the missing-target case green
+ok   T86 G5-d restore: g5d.js is byte-identical and the shipped module still fails the missing-target case
+ok   T87 G9-e positive: a tracked tmp/ artifact resolves in tree scope (disk + index)
+ok   T87 G9-e positive: a bare `tmp/` has no path segment and is not judged
+ok   T87 G9-e positive: an exclusion-marker line is skipped
+ok   T87 G9-e positive: the frozen evidence tree is excluded from the reference scan
+ok   T87 G9-e positive: the range/ci branch resolves at the endpoint revision (HEAD:tmp/.gitkeep)
+ok   T87 G9-e negative: an unresolvable reference is INFO (G9 stays PASS) and the record names the path
+ok   T87 G9-e mutation applied + load-bearing: accepting every reference makes the informational record disappear
+ok   T87 G9-e restore: g9.js is byte-identical and the shipped module emits the informational record again
+ok   T88 G3(a.2) control: an equal synthetic directive pair stays green (no per-pair FAIL record)
+ok   T88 G3(a.2) seventh shape (CJK inter-character space) is record-only: a drift with all six shapes equal stays PASS
+ok   T88 G3(a.2) eighth shape (per-line triplet multiset) is record-only: a compensating drift with equal totals stays PASS
+ok   T90 --help on its own still exits 0 with the usage text
+ok   T90 the --skip-base guard fires before the --help early return (no combination escapes it)
+ok   T90 concurrent scheduling keeps every record in plan order
+ok   T90 the 0 ms criterion ends before the 150 ms one that started first (completion order proves overlap)
+ok   T90 two async criteria are pending at the same moment (impossible under a serial loop)
+ok   T90 synchronous criteria go through the same scheduler and keep plan order
+ok   T90 a rejecting criterion rejects the plan and writes no partial records
+ok   T91 G6-8 positive: distinct mint rows on added lines pass and the record names the registered set
+ok   T91 G6-8 negative: a mint row that reuses a registered number fails and names BOTH line numbers
+ok   T91 G6-8 negative: a three-digit id in the mint cell fails as `三位 = ADR 域`
+ok   T91 G6-8 negative: a reference to an unregistered id fails and names the id
+ok   T91 G6-8 positive: every token of a range cell is judged on its own (refs=2, both registered)
+ok   T91 G6-8 positive: `ADR-027` and a three-digit `DR-027` mint no token (refs=1, only DR-2 judged)
+ok   T91 G6-8 positive: the bullet face is bracket-anchored (DR-42 judged with `（`, ignored without)
+ok   T91 G6-8 premise: with no target document the record is a PASS over 0 scanned lines (never a crash)
+ok   T91 G6-8 mutation applied + load-bearing: disabling the uniqueness test turns the collision case green
+ok   T91 G6-8 mutation applied + load-bearing: disabling the three-digit test turns the DR-027 case green
+ok   T91 G6-8 mutation applied + load-bearing: ignoring the registered set turns the dangling reference green
+ok   T91 G6-8 restore: g6.js is byte-identical after all three mutation windows and the shipped module still fails both samples
+ok   T92 G7-f positive: five sections A→B→C→D→E plus a closed-set conclusion pass
+ok   T92 G7-f negative: a missing Section C fails and the detail names the sequence found
+ok   T92 G7-f negative: a reordered pair (A B D C E) fails
+ok   T92 G7-f negative: content after the conclusion line fails with the "note outside the fence" reason
+ok   T92 G7-f negative: SEVERITY rows with PASS and FINDINGS with no SEVERITY row both fail
+ok   T92 G7-f positive: SEVERITY rows with a FINDINGS conclusion pass (the pairing is not one-directional)
+ok   T92 G7-f negative: a report naming INDEPENDENT SCAN with no sixstage fence fails (self-contradictory)
+ok   T92 G7-f positive: a fixed-form skip declaration with no fence passes
+ok   T92 G7-f premise: an EXISTING report with neither fence, marker nor skip declaration is INFO, never FAIL
+ok   T92 G7-f mutation applied + load-bearing: disabling the section-sequence test turns the missing-C case green
+ok   T92 G7-f restore: g7.js is byte-identical after the mutation window and the shipped module still fails the missing-C case
+ok   T93 G7-f negative: an out-of-set conclusion value (`MAYBE`) fails as outside the closed set
+ok   T93 G7-f negative: five sections and NO conclusion line fails (the real P23 breach shape)
+ok   T93 G7-f mutation applied + load-bearing: disabling the conclusion closed-set test turns the MAYBE case green
+ok   T93 G7-f restore: g7.js is byte-identical after the mutation window and the shipped module still fails the MAYBE case
+ok   T94 G6-8 positive: a mint row present in BOTH mirrors passes the dual-mint rule (the corpus shape)
+ok   T94 G6-8 negative: a mint row missing from the other mirror fails and the detail names the missing side
+ok   T95 G6-8 FACE D: the spaced EN bullet form `- **DR-42 (…)` is judged (adjacency is no longer required)
+ok   T96 G7-f positive: the historical-exemption declaration (CN and EN forms) reaches PASS with the marker present
+ok   T96 G7-f M4: a marker occurrence on an exclusion-marked line is filtered out (existing report), so the record is INFO not FAIL
+ok   T96 G7-f L9: an unclosed sixstage fence fails and the detail names the opening line
+ok   T97 G7-f C-1: a blank reason is not a declaration - the blank skip falls back to INFO and a blank historical exemption falls back to the marker FAIL
+ok   T98 G7-f C-1/F1: a report ADDED by the change set may not use the historical exemption - status A and the untracked variant both FAIL naming the exemption channel
+ok   T98 G7-f C-1 positive control: a newly added report CARRYING the fence passes, so the guard is not a blanket rejection
+ok   T98 G7-f C-1/F1 mutation applied + load-bearing: disabling the newly-added branch lets the exemption on a new report reach the historical channel (PASS)
+ok   T98 G7-f C-1/F1 restore: g7.js is byte-identical after the mutation window and the shipped module still fails the exemption on a new report
+ok   T99 G7-f P26: two conclusion lines FAIL when the first one is not the Section-A first line (the C-4 escape stays red)
+ok   T99 G7-f P26 mutation applied + load-bearing: disabling the position-pair gate turns the two-conclusion fence green
+ok   T99 G7-f P26 restore: g7.js is byte-identical after the mutation window and the shipped module still fails the position-pair case
+ok   T100 G6-8 C-8: an unreadable other mirror skips the dual-mint face but the PASS detail carries `dual-mint: other mirror unreadable, face skipped`
+ok   T100 G6-8 C-8 premise: the row under test is the same mint row shape the readable control judges
+ok   T101 G7-f real shape: headings carrying descriptive text (`## Section A 扫描范围与方法`) count as sections, so the five-section face passes
+ok   T101 G7-f real shape: `| 1 | Low | … |` (severity in the SECOND cell) plus FINDINGS is a PASS - the ⑥ form that used to be failed
+ok   T101 G7-f real shape: the same second-cell severity row with PASS FAILs and names the row count
+ok   T101 G7-f real shape: FINDINGS with no severity row at all still FAILs (the pairing is kept two-directional)
+ok   T101 G7-f cell equality: `**High**` in the second cell matches after marker stripping, while a prose cell containing `Low risk…` does not
+ok   T101 G7-f heading boundary: `## Section AA` and `## Subsection A` are NOT read as Section A (the found sequence is BCDE)
+ok   T101 G7-f mutation applied + load-bearing: disabling the cell-equality guard turns the second-cell FINDINGS case RED (the real shape stops being recognised)
+ok   T101 G7-f mutation applied + load-bearing: restoring the `$`-anchored heading regex turns the titled-heading case RED
+ok   T101 G7-f restore: g7.js is byte-identical after both mutation windows and the shipped module still passes both real-shape cases
+ok   T102 G7-f F1-①: a newly added report with no fence, no marker and no declaration FAILs with the fence-or-skip-declaration wording
+ok   T102 G7-f F1-②: a newly added report with a non-empty-reason skip declaration PASSes (the §7.2.1 legitimate skip)
+ok   T102 G7-f F1-③: a blank-reason skip declaration on a newly added report is not a declaration, so the report FAILs like a bare one
+ok   T102 G7-f F1-④: an EXISTING report (explicit M record) with neither fence, marker nor declaration stays INFO
+ok   T102 G7-f F1 mutation applied + load-bearing: disabling the newly-added branch turns the bare new report green (the existing-report bare state is INFO)
+ok   T102 G7-f F1 restore: g7.js is byte-identical after the mutation window and the shipped module still fails the bare new report
+ok   T103 G7-f F2-⑤: a change touching ONLY the opening fence line enters judgement (the body lacks Section C, so the block FAILs with `ABDE`)
+ok   T103 G7-f F2-⑤ twin: a change touching ONLY the closing fence line enters judgement too (the interval spans both fence lines)
+ok   T103 G7-f F2-⑥ precondition: the touched-loop needle occurs exactly once in the shipped g7.js
+ok   T103 G7-f F2-⑥ mutation applied + load-bearing: shrinking the touch window back to body-only lets the opening-line-only change escape judgement (INFO, not FAIL)
+ok   T103 G7-f F2-⑥ restore: g7.js is byte-identical after the mutation window (byte comparison) and the shipped module still fails the opening-line-only change
+ok   T104 G7-f P26 positive: an equal conclusion pair (Section-A first line + block-final line) passes, and a FINDINGS pair with a SEVERITY row passes too
+ok   T104 G7-f P26 precondition: each multi-conclusion mutation needle occurs exactly once in the shipped g7.js
+ok   T105 G7-f P26 negative: an equal-position pair with UNEQUAL values fails and the detail names both values
+ok   T105 G7-f P26 mutation applied + load-bearing: disabling the value-equality test turns the unequal pair green
+ok   T105 G7-f P26 restore: g7.js is byte-identical after the mutation window and the shipped module still fails the unequal pair
+ok   T106 G7-f P26 negative: content after the block-final conclusion line fails with the "note outside the fence" reason
+ok   T106 G7-f P26 mutation applied + load-bearing: disabling the block-final test turns the trailing-content fence green
+ok   T106 G7-f P26 restore: g7.js is byte-identical after the mutation window and the shipped module still fails the trailing-content case
+ok   T107 G7-f P26 negative: three conclusion lines fail and the detail says more than two are not allowed
+ok   T107 G7-f P26 mutation applied + load-bearing: raising the ceiling to three turns the three-line fence green
+ok   T107 G7-f P26 restore: g7.js is byte-identical after the mutation window and the shipped module still fails the three-line case
+ok   T108 G4b cache positive control: the first run misses and the second run on the same key hits
+ok   T108 both runs report the same twelve-hex key prefix and the cached corpus size
+ok   T108 the hit caches the corpus only: the G4b verdict/detail are recomputed and still name the whitelist
+ok   T109 G4b cache counterexample 1: a changed HEAD sha misses, names a different key and stores a second entry
+ok   T109 G4b cache mutation applied + load-bearing: pinning the sha segment turns the second run into a hit
+ok   T109 restore: g4b.js is byte-identical after the mutation window and the shipped module still misses on the new sha
+ok   T110 G4b cache counterexample 2: a changed whitelist text misses and stores a second entry
+ok   T110 G4b cache mutation applied + load-bearing: pinning the whitelist digest turns the second run into a hit
+ok   T110 restore: g4b.js is byte-identical after the mutation window and the shipped module still misses on the new whitelist
+ok   T111 G4b cache counterexample 3: a changed criterion source misses even with the same sha and whitelist
+ok   T111 G4b cache mutation applied + load-bearing: blinding the digest to the run body lets a changed source hit
+ok   T111 restore: g4b.js is byte-identical after all mutation windows and the shipped module still misses on the changed source
+ok   T112 G4b cache fail-open 1: a store whose get() throws still yields a verdict and emits NO cache record
+ok   T112 G4b cache fail-open 2: a malformed entry is a miss and is rewritten as a valid entry of this version
+ok   T112 G4b cache key shape: six pipe-separated segments starting with the format version
+ok   T112 G4b cache switched off: g4bCacheDisabled forces the full scan and emits NO cache record
+ok   T112 G4b cache switched off when git cannot resolve the corpus revision (silent full scan, no record)
+ok   T113 G4b cache index-dirtiness independence: a staged delta does not disable the cache for tree/index (condition 3 must not resurrect) - run 1 misses and still produces the verdict
+ok   T113 G4b cache index-dirtiness independence: a staged delta does not disable the cache for tree/index (condition 3 must not resurrect) - run 2 hits on the same sha and whitelist
+ok   T113 G4b cache index-dirtiness independence: a staged delta does not disable the cache for tree/index (condition 3 must not resurrect) - the dirty and clean fixtures yield the identical G4b verdict and detail
+ok   T113 G4b cache index-dirtiness independence: a staged delta does not disable the cache for tree/index (condition 3 must not resurrect) - the six-segment key shape does not degrade under a dirty index
+ok   T113 G4b cache index-dirtiness independence: a staged delta does not disable the cache for tree/index (condition 3 must not resurrect) - mutation applied + load-bearing: resurrecting condition 3 removes every G4b-cache record
+ok   T113 restore: g4b.js is byte-identical after the mutation window and the shipped module still hits on a dirty index
+ok   T114 G4b corpus enumeration reads the object store: ls-tree HEAD answers and ls-files is never called
+ok   T115 G4b corpus cold/warm equivalence under a staged markdown deletion: miss then hit, corpus=1 both times
+ok   T115 both runs PASS on the HEAD corpus (an ls-files fallback drops the only "丙" and turns this red) and agree
+ok   T116 the cached entry carries v === CACHE_VERSION (G4B-CORPUS-DECOUPLE bumped both to v2)
+ok   T117 G4b range-scope corpus enumeration is NUL-separated ls-tree at the range base (the pre-slice newline form and ls-files are both rejected)
+ok   T118 G4b index-scope corpus enumeration also reads ls-tree HEAD with NUL separation (an ls-files fallback or a non-HEAD ref turns this red, and the .MD suffix survives)
+ok   T125 evictToCap evicts the OLDEST mtimes first and returns the exact number removed (5 entries, cap 2, names ordered against the clock)
+ok   T125 evictToCap only considers CACHE_ENTRY_RE names: a 63-hex near-miss and an atomic temp file survive a cap=0 pass that removes the single real entry
+ok   T126 entries == cap: evictToCap returns 0 and deletes nothing (the excess > 0 guard)
+ok   T126 entries < cap: evictToCap returns 0 and keeps every entry
+ok   T126 entries > cap: exactly entries - cap are removed and the newest cap survive
+ok   T127 the fixture starts at exactly CACHE_CAP (100) entries and the run misses, so the write that triggers eviction really happened
+ok   T127 put keeps the directory at CACHE_CAP: the oldest entry is gone, the newest and the freshly written one survive
+ok   T128 the cold run stores exactly {v:2, corpus:[...]} and nothing else
+ok   T128 a hit reproduces the cold run: same key prefix, same verdict, same detail, cached corpus size 1
+ok   T128 the hit touches the entry (mtime advances past the seeded stamp) without rewriting the stored value
+ok   T129 fail-open (a): a throwing unlinkFn neither escapes nor loses an entry (0 removed, all 3 survive)
+ok   T129 fail-open (b): an entry whose stat() throws is skipped, not counted, and does not throw (2 of 4 counted, cap 2, 0 removed)
+ok   T129 fail-open (c): a missing directory and a non-directory path both return 0 without throwing
+ok   T129 fail-open (d): an unusable cache directory degrades to the full scan - no cache record, no exception, verdict and detail identical to a healthy run
+ok   F1 every declared fixture mutation applied (a stale mutation would weaken the suite silently)
+ok   F1 mutation coverage floor (>= 8 fixture mutations exercised)
+SELFTEST: PASS 736/736
+GATE REPORT scope=tree repo=D:\LZProjects\prfrail changed=20
+PASS  G1-a table structure :: no `||` on added rows
+PASS  G1-b version metadata :: docs/DELIVERY_DIRECTIVE.md header=v1.66 last=v1.66 2026-11-11/2026-11-11 rows=67 OK | docs/DELIVERY_DIRECTIVE_EN.md header=v1.66 last=v1.66 2026-11-11/2026-11-11 rows=67 OK
+PASS  G1(c) status marker c :: closed set respected (398 cells)
+PASS  G1(d) status marker d :: heading and status table agree
+PASS  G1(e) status marker e :: completion rows imply completed (72 bound, 34 unbound)
+PASS  G1(e2) in-block completion rows imply completed :: 0 judged, 0 skipped, 56 historical (v1.64)
+INFO  G1(e-info) completion keys without a binding :: 34 completion row(s) have no heading to bind to (their slice heading was removed); G1(e) judges bound rows only
+PASS  G1(f) status marker f :: no in-progress wording in added completion rows
+PASS  G2 placeholder residue :: none
+PASS  G3(a) symmetry + mirror parity :: docs/ADR_REGISTER.md +1/-0 vs _EN +1/-0 OK || docs/DELIVERY_DIRECTIVE.md +4/-0 vs _EN +4/-0 OK || docs/t027/REMAINING_SLICES.md +22/-0 vs _EN +22/-0 OK || docs/validation/gates-debt-cleanup.md +52/-0 vs _EN +52/-0 OK ;; docs/ADR_REGISTER.md {"lines":false,"head":false,"bold":false,"bars":true,"blank":false,"backticks":false} ;; docs/DELIVERY_DIRECTIVE.md {"lines":true,"head":true,"bold":true,"bars":true,"blank":true,"backticks":true} ;; docs/t027/REMAINING_SLICES.md {"lines":false,"head":false,"bold":false,"bars":false,"blank":false,"backticks":false} ;; docs/validation/gates-debt-cleanup.md {"lines":true,"head":true,"bold":true,"bars":true,"blank":true,"backticks":true}
+PASS  G3(b) key-field alignment :: hash 0/0 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK | hash 0/0 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK | hash 1/1 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK | hash 0/0 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK
+PASS  G4a BOM+LF :: 20 file(s) OK (10 excluded: evidence tree)
+INFO  G4b-cache G4b cache :: hit ffbf9796326d corpus=1451
+PASS  G4b CJK diff minus whitelist :: newCjk=436 unknown=[] (whitelist=62 whitelist-source=worktree)
+PASS  G5-a(1) no model key in prfrail-* :: 0 hits
+PASS  G5-a(2) no empty model :: 0 hits / 14 files
+PASS  G5-b closed-set model value :: checked 0 file(s)
+PASS  G5-c appendix-B call strings in the 2.2 qualified-name set :: call strings OK (2 file(s), scanned 0 changed carrier line(s))
+INFO  G5-d role-file frontmatter contract :: no changed `.github/agents/*.agent.md` in scope
+PASS  G5(d) staged is a subset of declared :: 20 path(s) declared (scope=tree) ; addMode=explicit (derived label, not a command-history assertion)
+PASS  G5(e) evidence references resolve :: no added completion row (nothing to resolve)
+PASS  G5(e2) in-block completion-row evidence resolves :: no added in-block completion row (nothing to resolve)
+INFO  G5(f) index hygiene :: scope=tree: staging is not part of this scope
+PASS  R2.5 header-note position :: distinct=1 uniform 14/14
+PASS  G6-1 status tense :: no pending/completion conflict on added lines (scanned 158) whitelist-source=worktree
+PASS  G6-2 cost clause :: no realized cost clause on added lines (scanned 158) whitelist-source=worktree
+PASS  G6-3 run-id format :: no malformed run id on added lines (scanned 158) whitelist-source=worktree
+PASS  G6-4 expiring literal :: no expiring literal on added lines (scanned 158) whitelist-source=worktree
+PASS  G6-5 section-reference resolution :: no unresolved section reference on added ledger/changelog lines (scanned 0, refs 0) whitelist-source=worktree
+PASS  G6-6 ledger status closed set :: every added ledger row opens with a closed-set status word (scanned 0) whitelist-source=worktree
+PASS  G6-7 declaration/ledger reconciliation :: every declared ID on an added section 0.3 line exists in the 12.4 / appendix-C ledger (scanned 0, declarations 0) whitelist-source=worktree
+PASS  G6-8 DR number uniqueness and membership :: registered DR set {1,2,3,4,5,6,7,8,9,10,11,12,13}; no DR collision or dangling reference on added lines (scanned 148, refs 0) whitelist-source=worktree
+PASS  G7-a artifacts block present :: 2 report(s) OK
+PASS  G7-b artifact path/disposition resolvable :: 40 artifact row(s) OK (repo check: git ls-files --error-unmatch + worktree presence)
+PASS  G7-c finding row disposition cell :: 0 changed finding row(s) with disposition
+PASS  G7-d stopped state marked incomplete :: no stopped-state row missing the incomplete mark
+PASS  G7-e verdict line closed set :: every verdict line on added report lines is inside the 4.1 closed set (scanned 103)
+PASS  G7-f sixstage transcript contract :: 2 changed report(s) waived ⑥ by declaration (`- ⑥ 跳过：` / `- ⑥ skipped: `)
+PASS  G8-a evidence-tree path shape :: 10 path(s) OK
+PASS  G8-b pack self-consistency :: 1 pack(s) self-consistent
+PASS  G8-c encoding-normalization record :: 0 pack(s) checked (1 exempt: no `## 后缀与编码映射` section)
+PASS  G8-d rebuilt-archive note :: 10 changed file(s) OK
+PASS  G9 临时件与 tmp/ 引用 :: 20 path(s) OK (10 excluded) (whitelist=worktree)
+INFO  G9-e tmp/ reference (informational) :: docs/t027/REMAINING_SLICES.md:100 tmp/P67-GATES-DEBT-CLEANUP :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/t027/REMAINING_SLICES.md:1916 tmp/P67-GATES-DEBT-CLEANUP :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/t027/REMAINING_SLICES_EN.md:100 tmp/P67-GATES-DEBT-CLEANUP :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/t027/REMAINING_SLICES_EN.md:1903 tmp/P67-GATES-DEBT-CLEANUP :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference summary :: scanned 158 added line(s), 4 reference(s), 4 unresolvable
+PASS  base gofmt -l . :: empty
+PASS  base go build ./... :: exit 0
+PASS  base go vet ./... :: exit 0
+PASS  base go test ./... :: ok=15 FAIL=0
+TOTAL_FAIL=0
+GATE REPORT scope=index repo=D:\LZProjects\prfrail changed=20
+PASS  G1-a table structure :: no `||` on added rows
+PASS  G1-b version metadata :: docs/DELIVERY_DIRECTIVE.md header=v1.66 last=v1.66 2026-11-11/2026-11-11 rows=67 OK | docs/DELIVERY_DIRECTIVE_EN.md header=v1.66 last=v1.66 2026-11-11/2026-11-11 rows=67 OK
+PASS  G1(c) status marker c :: closed set respected (398 cells)
+PASS  G1(d) status marker d :: heading and status table agree
+PASS  G1(e) status marker e :: completion rows imply completed (72 bound, 34 unbound)
+PASS  G1(e2) in-block completion rows imply completed :: 0 judged, 0 skipped, 56 historical (v1.64)
+INFO  G1(e-info) completion keys without a binding :: 34 completion row(s) have no heading to bind to (their slice heading was removed); G1(e) judges bound rows only
+PASS  G1(f) status marker f :: no in-progress wording in added completion rows
+PASS  G2 placeholder residue :: none
+PASS  G3(a) symmetry + mirror parity :: docs/ADR_REGISTER.md +1/-0 vs _EN +1/-0 OK || docs/DELIVERY_DIRECTIVE.md +4/-0 vs _EN +4/-0 OK || docs/t027/REMAINING_SLICES.md +22/-0 vs _EN +22/-0 OK || docs/validation/gates-debt-cleanup.md +52/-0 vs _EN +52/-0 OK ;; docs/ADR_REGISTER.md {"lines":false,"head":false,"bold":false,"bars":true,"blank":false,"backticks":false} ;; docs/DELIVERY_DIRECTIVE.md {"lines":true,"head":true,"bold":true,"bars":true,"blank":true,"backticks":true} ;; docs/t027/REMAINING_SLICES.md {"lines":false,"head":false,"bold":false,"bars":false,"blank":false,"backticks":false} ;; docs/validation/gates-debt-cleanup.md {"lines":true,"head":true,"bold":true,"bars":true,"blank":true,"backticks":true}
+PASS  G3(b) key-field alignment :: hash 0/0 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK | hash 0/0 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK | hash 1/1 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK | hash 0/0 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK
+PASS  G4a BOM+LF :: 20 file(s) OK (10 excluded: evidence tree)
+INFO  G4b-cache G4b cache :: hit 5ceb4bd32839 corpus=1451
+PASS  G4b CJK diff minus whitelist :: newCjk=436 unknown=[] (whitelist=62 whitelist-source=worktree)
+PASS  G5-a(1) no model key in prfrail-* :: 0 hits
+PASS  G5-a(2) no empty model :: 0 hits / 14 files
+PASS  G5-b closed-set model value :: checked 0 file(s)
+PASS  G5-c appendix-B call strings in the 2.2 qualified-name set :: call strings OK (2 file(s), scanned 0 changed carrier line(s))
+INFO  G5-d role-file frontmatter contract :: no changed `.github/agents/*.agent.md` in scope
+PASS  G5(d) staged is a subset of declared :: 20 path(s) declared (scope=index) ; addMode=explicit (derived label, not a command-history assertion)
+PASS  G5(e) evidence references resolve :: no added completion row (nothing to resolve)
+PASS  G5(e2) in-block completion-row evidence resolves :: no added in-block completion row (nothing to resolve)
+PASS  G5(f) index hygiene :: index equals worktree, no untracked path
+PASS  R2.5 header-note position :: distinct=1 uniform 14/14
+PASS  G6-1 status tense :: no pending/completion conflict on added lines (scanned 158) whitelist-source=worktree
+PASS  G6-2 cost clause :: no realized cost clause on added lines (scanned 158) whitelist-source=worktree
+PASS  G6-3 run-id format :: no malformed run id on added lines (scanned 158) whitelist-source=worktree
+PASS  G6-4 expiring literal :: no expiring literal on added lines (scanned 158) whitelist-source=worktree
+PASS  G6-5 section-reference resolution :: no unresolved section reference on added ledger/changelog lines (scanned 0, refs 0) whitelist-source=worktree
+PASS  G6-6 ledger status closed set :: every added ledger row opens with a closed-set status word (scanned 0) whitelist-source=worktree
+PASS  G6-7 declaration/ledger reconciliation :: every declared ID on an added section 0.3 line exists in the 12.4 / appendix-C ledger (scanned 0, declarations 0) whitelist-source=worktree
+PASS  G6-8 DR number uniqueness and membership :: registered DR set {1,2,3,4,5,6,7,8,9,10,11,12,13}; no DR collision or dangling reference on added lines (scanned 148, refs 0) whitelist-source=worktree
+PASS  G7-a artifacts block present :: 2 report(s) OK
+PASS  G7-b artifact path/disposition resolvable :: 40 artifact row(s) OK (repo check: git ls-files --error-unmatch + worktree presence)
+PASS  G7-c finding row disposition cell :: 0 changed finding row(s) with disposition
+PASS  G7-d stopped state marked incomplete :: no stopped-state row missing the incomplete mark
+PASS  G7-e verdict line closed set :: every verdict line on added report lines is inside the 4.1 closed set (scanned 103)
+PASS  G7-f sixstage transcript contract :: 2 changed report(s) waived ⑥ by declaration (`- ⑥ 跳过：` / `- ⑥ skipped: `)
+PASS  G8-a evidence-tree path shape :: 10 path(s) OK
+PASS  G8-b pack self-consistency :: 1 pack(s) self-consistent
+PASS  G8-c encoding-normalization record :: 0 pack(s) checked (1 exempt: no `## 后缀与编码映射` section)
+PASS  G8-d rebuilt-archive note :: 10 changed file(s) OK
+PASS  G9 临时件与 tmp/ 引用 :: 20 path(s) OK (10 excluded) (whitelist=worktree)
+INFO  G9-e tmp/ reference (informational) :: docs/t027/REMAINING_SLICES.md:100 tmp/P67-GATES-DEBT-CLEANUP :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/t027/REMAINING_SLICES.md:1916 tmp/P67-GATES-DEBT-CLEANUP :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/t027/REMAINING_SLICES_EN.md:100 tmp/P67-GATES-DEBT-CLEANUP :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/t027/REMAINING_SLICES_EN.md:1903 tmp/P67-GATES-DEBT-CLEANUP :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference summary :: scanned 158 added line(s), 4 reference(s), 4 unresolvable
+PASS  base gofmt -l . :: empty
+PASS  base go build ./... :: exit 0
+PASS  base go vet ./... :: exit 0
+PASS  base go test ./... :: ok=15 FAIL=0
+TOTAL_FAIL=0
+GATE REPORT scope=ci repo=D:\LZProjects\prfrail changed=2
+PASS  G1-a table structure :: no `||` on added rows
+PASS  G1(c) status marker c :: closed set respected (394 cells)
+PASS  G1(d) status marker d :: heading and status table agree
+PASS  G1(e) status marker e :: completion rows imply completed (72 bound, 34 unbound)
+PASS  G1(e2) in-block completion rows imply completed :: 0 judged, 0 skipped, 56 historical (v1.64)
+INFO  G1(e-info) completion keys without a binding :: 34 completion row(s) have no heading to bind to (their slice heading was removed); G1(e) judges bound rows only
+PASS  G1(f) status marker f :: no in-progress wording in added completion rows
+PASS  G2 placeholder residue :: none
+PASS  G3(a) symmetry + mirror parity :: docs/t027/CHECKLIST_v54.md +1/-1 vs _EN +1/-1 OK ;; docs/t027/CHECKLIST_v54.md {"lines":true,"head":true,"bold":true,"bars":true,"blank":true,"backticks":true}
+PASS  G3(b) key-field alignment :: hash 0/0 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK
+PASS  G4a BOM+LF :: 2 file(s) OK
+INFO  G4b-cache G4b cache :: hit 421bdc7505cb corpus=1451
+PASS  G4b CJK diff minus whitelist :: newCjk=13 unknown=[] (whitelist=62 whitelist-source=endpoint:HEAD)
+PASS  G5-a(1) no model key in prfrail-* :: 0 hits
+PASS  G5-a(2) no empty model :: 0 hits / 14 files
+PASS  G5-b closed-set model value :: checked 0 file(s)
+PASS  G5-c appendix-B call strings in the 2.2 qualified-name set :: call strings OK (2 file(s), scanned 0 changed carrier line(s))
+INFO  G5-d role-file frontmatter contract :: no changed `.github/agents/*.agent.md` in scope
+INFO  G5(d) change set vs declared set :: no report in the change set; nothing declares this change
+PASS  G5(e) evidence references resolve :: no added completion row (nothing to resolve)
+PASS  G5(e2) in-block completion-row evidence resolves :: no added in-block completion row (nothing to resolve)
+INFO  G5(f) index hygiene :: scope=ci: staging is not part of this scope
+PASS  R2.5 header-note position :: distinct=1 uniform 14/14
+PASS  G6-1 status tense :: no pending/completion conflict on added lines (scanned 2) whitelist-source=endpoint:HEAD
+PASS  G6-2 cost clause :: no realized cost clause on added lines (scanned 2) whitelist-source=endpoint:HEAD
+PASS  G6-3 run-id format :: no malformed run id on added lines (scanned 2) whitelist-source=endpoint:HEAD
+PASS  G6-4 expiring literal :: no expiring literal on added lines (scanned 2) whitelist-source=endpoint:HEAD
+PASS  G6-5 section-reference resolution :: no unresolved section reference on added ledger/changelog lines (scanned 0, refs 0) whitelist-source=endpoint:HEAD
+PASS  G6-6 ledger status closed set :: every added ledger row opens with a closed-set status word (scanned 0) whitelist-source=endpoint:HEAD
+PASS  G6-7 declaration/ledger reconciliation :: every declared ID on an added section 0.3 line exists in the 12.4 / appendix-C ledger (scanned 0, declarations 0) whitelist-source=endpoint:HEAD
+PASS  G6-8 DR number uniqueness and membership :: registered DR set {1,2,3,4,5,6,7,8,9,10,11,12,13}; no DR collision or dangling reference on added lines (scanned 0, refs 0) whitelist-source=endpoint:HEAD
+INFO  G7-a artifacts block present :: no changed report in scope
+INFO  G7-b artifact path/disposition resolvable :: no changed report in scope
+INFO  G7-c finding row disposition cell :: no changed report in scope
+INFO  G7-d stopped state marked incomplete :: no changed report in scope
+INFO  G7-e verdict line closed set :: no changed report in scope
+INFO  G7-f sixstage transcript contract :: no changed report in scope
+INFO  G8-a evidence-tree path shape :: no changed evidence-tree path in scope
+INFO  G8-b pack self-consistency :: no touched evidence pack in scope
+INFO  G8-c encoding-normalization record :: no touched evidence pack in scope
+INFO  G8-d rebuilt-archive note :: no changed evidence file in scope
+PASS  G9 临时件与 tmp/ 引用 :: 2 path(s) OK (whitelist=endpoint:HEAD)
+INFO  G9-e tmp/ reference summary :: scanned 2 added line(s), 0 reference(s), 0 unresolvable
+PASS  base gofmt -l . :: empty
+PASS  base go build ./... :: exit 0
+PASS  base go vet ./... :: exit 0
+PASS  base go test ./... :: ok=15 FAIL=0
+TOTAL_FAIL=0

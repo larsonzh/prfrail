@@ -7010,6 +7010,382 @@ async function runTests() {
     );
   }
 
+  // ---- T125-T129: the G4b cache directory bound (LRU eviction, slice P67 #1 step B).
+  // `evictToCap(dir, cap, statFn, unlinkFn)` keeps at most `cap` entries and picks the
+  // survivors by file mtime - the access stamp that `put` (fresh write) and `get` (touch)
+  // maintain. The faces below pin, in order: the LRU ORDER and the entry-name filter, the
+  // cap boundary arithmetic, the `put` -> `evictToCap` wiring against the real CACHE_CAP,
+  // hit/cold equivalence (a touch must never rewrite the stored value), and fail-open at
+  // every injection point. Each face names the guard it falsifies. Every temporary
+  // directory lives under the OS temp root and is removed in the `finally`, so the
+  // repository tree is never written by this block.
+  {
+    const osTmp = require('os');
+    const ENTRY_RE_LOCAL = /^[0-9a-f]{64}\.json$/;
+    const BASE = Date.UTC(2021, 0, 1);
+    const dirs = [];
+    const mkTemp = (tag) => {
+      const d = fs.mkdtempSync(path.join(osTmp.tmpdir(), 'prfrail-g4b-' + tag + '-'));
+      dirs.push(d);
+      return d;
+    };
+    const dropDir = (dir) => {
+      let names = [];
+      try {
+        names = fs.readdirSync(dir);
+      } catch (e) {
+        return; // already gone
+      }
+      for (const n of names) {
+        try {
+          fs.unlinkSync(path.join(dir, n));
+        } catch (e) {
+          /* best effort */
+        }
+      }
+      try {
+        fs.rmdirSync(dir);
+      } catch (e) {
+        /* best effort: a leftover empty temp directory must not fail the suite */
+      }
+    };
+    // Cache entry FILE name: exactly the 64 hex characters of the key plus `.json`, i.e.
+    // what `CACHE_ENTRY_RE` accepts and what `readdirSync` reports (suffix included).
+    const entryName = (i) => i.toString(16).padStart(64, '0') + '.json';
+    const writeEntry = (dir, name, ms) => {
+      const file = path.join(dir, name);
+      fs.writeFileSync(file, '{"v":2,"corpus":[]}', 'utf8');
+      fs.utimesSync(file, new Date(ms), new Date(ms));
+      return file;
+    };
+    const entriesOf = (dir) => {
+      try {
+        return fs.readdirSync(dir).filter((n) => ENTRY_RE_LOCAL.test(n)).sort();
+      } catch (e) {
+        return [];
+      }
+    };
+    const memStore2 = () => {
+      const m = new Map();
+      return {
+        get: (k) => (m.has(k) ? m.get(k) : null),
+        put: (k, v) => {
+          m.set(k, v);
+        },
+      };
+    };
+    /**
+     * Real disk-backed context: no injected store and `g4bCacheDir` pointing at the temp
+     * directory, so `run` exercises the SHIPPED `diskStore` (write + touch + eviction).
+     * Omitting `dir` leaves the store unset so the caller can inject a memory one.
+     */
+    const g4bCtx2 = (wlText, dir) => {
+      const ctx = makeCtx(['g6-4-literals'], {
+        whitelistText: { [G4B.internals.WHITELIST_REL]: wlText },
+        whitelistSource: 'worktree',
+      });
+      ctx.git = (args) => {
+        const k = args.join(' ');
+        if (k === 'rev-parse HEAD') return { ok: true, code: 0, out: 'shaA\n', err: '', spawnError: null };
+        return { ok: false, code: 127, out: '', err: '', spawnError: null };
+      };
+      ctx.listAllMarkdown = () => ['docs/t027/probe-corpus.md'];
+      ctx.showAt = () => '甲';
+      if (dir !== undefined) ctx.g4bCacheDir = dir;
+      return ctx;
+    };
+    const g4bSink2 = () => ({
+      records: [],
+      rec(id, verdict, label, detail) {
+        this.records.push({ id, verdict, label, detail });
+      },
+    });
+    const g4bCacheRecs = (sink) => sink.records.filter((r) => r.id === 'G4b-cache');
+    const g4bCacheWord = (sink) => {
+      const d = (g4bCacheRecs(sink)[0] || {}).detail || '';
+      const m = /^(hit|miss) ([0-9a-f]{12}) corpus=(\d+)$/.exec(d);
+      return m ? { word: m[1], key12: m[2], corpus: m[3] } : null;
+    };
+    const W1 = '甲\tf\tr';
+
+    try {
+      // ---- T125: LRU order and the entry-name filter, driven by REAL mtimes. The stamps
+      // are ASCENDING in index order but the names sort the OTHER way round, so a pass that
+      // follows `readdir` order instead of mtime keeps the wrong three.
+      const dirLru = mkTemp('lru');
+      [0, 1, 2, 3, 4].forEach((i) => writeEntry(dirLru, entryName(i), BASE + (4 - i) * 60000));
+      const removedLru = G4B.internals.evictToCap(dirLru, 2);
+      const leftLru = entriesOf(dirLru);
+      // Guard: `entries.sort((a, b) => a.mtime - b.mtime)` + the `excess` loop. Dropping
+      // the sort (readdir order = alphabetical here) or evicting the newest entries instead
+      // turns the survivor set red; a wrong return count also fails here.
+      check(
+        'T125 evictToCap evicts the OLDEST mtimes first and returns the exact number removed (5 entries, cap 2, names ordered against the clock)',
+        removedLru === 3 && JSON.stringify(leftLru) === JSON.stringify([entryName(0), entryName(1)]),
+        'removed=' + removedLru + ' left=' + JSON.stringify(leftLru)
+      );
+
+      const dirRe = mkTemp('name-filter');
+      writeEntry(dirRe, entryName(9), BASE); // the ONLY real entry, and the NEWEST stamp
+      const nearMiss = path.join(dirRe, 'a'.repeat(63) + '.json');
+      fs.writeFileSync(nearMiss, '{}', 'utf8');
+      fs.utimesSync(nearMiss, new Date(BASE - 60000), new Date(BASE - 60000)); // older
+      const tmpShape = path.join(dirRe, entryName(8) + '.tmp.4242.7');
+      fs.writeFileSync(tmpShape, '{}', 'utf8');
+      fs.utimesSync(tmpShape, new Date(BASE - 120000), new Date(BASE - 120000)); // oldest
+      const removedRe = G4B.internals.evictToCap(dirRe, 0);
+      // Guard: `if (!CACHE_ENTRY_RE.test(name)) continue;`. Without it the 63-hex near-miss
+      // and the atomic temp file - both OLDER than the real entry - are the candidates and
+      // the real entry is the one that survives.
+      check(
+        'T125 evictToCap only considers CACHE_ENTRY_RE names: a 63-hex near-miss and an atomic temp file survive a cap=0 pass that removes the single real entry',
+        removedRe === 1 && entriesOf(dirRe).length === 0 &&
+          fs.existsSync(nearMiss) && fs.existsSync(tmpShape),
+        'removed=' + removedRe + ' entries=' + JSON.stringify(entriesOf(dirRe)) +
+          ' nearMiss=' + fs.existsSync(nearMiss) + ' tmp=' + fs.existsSync(tmpShape)
+      );
+
+      // ---- T126: the cap boundary arithmetic (`excess = entries.length - cap`).
+      const dirEq = mkTemp('cap-equal');
+      [0, 1, 2, 3].forEach((i) => writeEntry(dirEq, entryName(i), BASE + i * 60000));
+      const removedEq = G4B.internals.evictToCap(dirEq, 4);
+      // Guard: `if (!(excess > 0)) return 0;`. An off-by-one (`>= 0`) deletes at exactly cap.
+      check(
+        'T126 entries == cap: evictToCap returns 0 and deletes nothing (the excess > 0 guard)',
+        removedEq === 0 && entriesOf(dirEq).length === 4,
+        'removed=' + removedEq + ' entries=' + entriesOf(dirEq).length
+      );
+
+      const dirUnder = mkTemp('cap-under');
+      [0, 1].forEach((i) => writeEntry(dirUnder, entryName(i), BASE + i * 60000));
+      const removedUnder = G4B.internals.evictToCap(dirUnder, 5);
+      check(
+        'T126 entries < cap: evictToCap returns 0 and keeps every entry',
+        removedUnder === 0 && entriesOf(dirUnder).length === 2,
+        'removed=' + removedUnder + ' entries=' + entriesOf(dirUnder).length
+      );
+
+      const dirOver = mkTemp('cap-over');
+      [0, 1, 2, 3, 4, 5].forEach((i) => writeEntry(dirOver, entryName(i), BASE + i * 60000));
+      const removedOver = G4B.internals.evictToCap(dirOver, 3);
+      // Guard: `const excess = entries.length - cap` (not "delete until empty", not "keep the
+      // OLDEST cap"): the survivors must be the newest three.
+      check(
+        'T126 entries > cap: exactly entries - cap are removed and the newest cap survive',
+        removedOver === 3 &&
+          JSON.stringify(entriesOf(dirOver)) === JSON.stringify([entryName(3), entryName(4), entryName(5)]),
+        'removed=' + removedOver + ' left=' + JSON.stringify(entriesOf(dirOver))
+      );
+
+      // ---- T127: `put` really evicts, against the SHIPPED CACHE_CAP.
+      const dirPut = mkTemp('put-wiring');
+      const cap = G4B.internals.CACHE_CAP;
+      const poisoned = [];
+      for (let i = 0; i < cap; i += 1) {
+        poisoned.push(entryName(i));
+        writeEntry(dirPut, entryName(i), BASE + i * 60000);
+      }
+      const beforePut = entriesOf(dirPut).length;
+      const putSink = g4bSink2();
+      G4B.run(g4bCtx2(W1, dirPut), putSink);
+      const putWord = g4bCacheWord(putSink);
+      const afterPut = entriesOf(dirPut);
+      const fresh = afterPut.filter((n) => poisoned.indexOf(n) < 0);
+      // Guard: the fixture precondition + the miss. If the run hit instead of writing, no
+      // eviction pass would happen at all and the assertions below would be vacuous.
+      check(
+        'T127 the fixture starts at exactly CACHE_CAP (' + cap + ') entries and the run misses, so the write that triggers eviction really happened',
+        cap > 1 && beforePut === cap && !!putWord && putWord.word === 'miss',
+        'cap=' + cap + ' before=' + beforePut + ' word=' + JSON.stringify(putWord)
+      );
+      // Guard: the `evictToCap(dir, CACHE_CAP)` call at the end of `diskStore.put`. Removing
+      // it leaves cap + 1 entries; passing any other cap leaves a different size; evicting
+      // the wrong side loses the newest poisoned entry instead of the oldest.
+      check(
+        'T127 put keeps the directory at CACHE_CAP: the oldest entry is gone, the newest and the freshly written one survive',
+        afterPut.length === cap && fresh.length === 1 &&
+          afterPut.indexOf(entryName(0)) < 0 && afterPut.indexOf(entryName(cap - 1)) >= 0,
+        'after=' + afterPut.length + ' fresh=' + JSON.stringify(fresh) + ' oldestGone=' + (afterPut.indexOf(entryName(0)) < 0)
+      );
+
+      // ---- T128: a hit must be indistinguishable from a cold run.
+      const dirHit = mkTemp('hit-equivalence');
+      const coldSink = g4bSink2();
+      G4B.run(g4bCtx2(W1, dirHit), coldSink);
+      const coldWord = g4bCacheWord(coldSink);
+      const coldFiles = entriesOf(dirHit);
+      const storedFile = coldFiles.length === 1 ? path.join(dirHit, coldFiles[0]) : '';
+      const rawCold = storedFile === '' ? '' : fs.readFileSync(storedFile, 'utf8');
+      let parsedCold = null;
+      try {
+        parsedCold = JSON.parse(rawCold);
+      } catch (e) {
+        parsedCold = null;
+      }
+      const wantShape = JSON.stringify({ v: 2, corpus: ['甲'] });
+      // Guard: the `put` payload `{v: 2, corpus: [...corpus]}` + `validValue`'s shape test.
+      // Storing anything else (a verdict, the whitelist, the added lines) or a wider object
+      // changes the bytes below; the version is read from CACHE_VERSION, not hard-coded.
+      check(
+        'T128 the cold run stores exactly {v:2, corpus:[...]} and nothing else',
+        !!coldWord && coldWord.word === 'miss' && coldFiles.length === 1 && rawCold === wantShape &&
+          !!parsedCold && parsedCold.v === Number(String(G4B.internals.CACHE_VERSION).replace(/^v/, '')) &&
+          Array.isArray(parsedCold.corpus) && parsedCold.corpus.every((c) => typeof c === 'string'),
+        'files=' + JSON.stringify(coldFiles) + ' raw=' + rawCold
+      );
+
+      const mtimeSeeded = BASE;
+      fs.utimesSync(storedFile, new Date(mtimeSeeded), new Date(mtimeSeeded));
+      const warmSink = g4bSink2();
+      G4B.run(g4bCtx2(W1, dirHit), warmSink);
+      const warmWord = g4bCacheWord(warmSink);
+      // Guard: the corpus is the ONLY cached state - the verdict and its detail are
+      // recomputed on every hit, so a hit can never mask a finding.
+      check(
+        'T128 a hit reproduces the cold run: same key prefix, same verdict, same detail, cached corpus size 1',
+        !!warmWord && warmWord.word === 'hit' && warmWord.corpus === '1' && !!coldWord &&
+          warmWord.key12 === coldWord.key12 &&
+          verdictOf(warmSink.records, 'G4b') === verdictOf(coldSink.records, 'G4b') &&
+          detailOf(warmSink.records, 'G4b') === detailOf(coldSink.records, 'G4b'),
+        'cold=' + verdictOf(coldSink.records, 'G4b') + ' warm=' + verdictOf(warmSink.records, 'G4b') +
+          ' word=' + JSON.stringify(warmWord) + ' detail=' + detailOf(warmSink.records, 'G4b')
+      );
+
+      const mtimeAfterHit = fs.statSync(storedFile).mtimeMs;
+      const rawAfterHit = fs.readFileSync(storedFile, 'utf8');
+      // Guard: the `fs.utimesSync(file, now, now)` access stamp in `diskStore.get` (drop it
+      // and the mtime stays at the seeded 2021 stamp, so LRU degenerates to insertion order)
+      // AND the rule that a touch never rewrites the value (the bytes must stay identical).
+      check(
+        'T128 the hit touches the entry (mtime advances past the seeded stamp) without rewriting the stored value',
+        mtimeAfterHit > mtimeSeeded && rawAfterHit === rawCold,
+        'seeded=' + mtimeSeeded + ' after=' + mtimeAfterHit + ' bytesStable=' + (rawAfterHit === rawCold)
+      );
+
+      // ---- T129 (a): a throwing unlinkFn must never escape eviction.
+      const dirUnlink = mkTemp('fail-unlink');
+      [0, 1, 2].forEach((i) => writeEntry(dirUnlink, entryName(i), BASE + i * 60000));
+      let unlinkThrew = null;
+      let unlinkRemoved = null;
+      try {
+        unlinkRemoved = G4B.internals.evictToCap(dirUnlink, 1, undefined, () => {
+          throw new Error('EBUSY: simulated lock');
+        });
+      } catch (e) {
+        unlinkThrew = e;
+      }
+      // Guard: the per-entry try/catch around `unlink(...)`. Without it the EBUSY escapes
+      // and the whole G4b run dies inside `put`, i.e. an optimisation would break the gate.
+      check(
+        'T129 fail-open (a): a throwing unlinkFn neither escapes nor loses an entry (0 removed, all 3 survive)',
+        unlinkThrew === null && unlinkRemoved === 0 && entriesOf(dirUnlink).length === 3,
+        'threw=' + (unlinkThrew === null ? 'no' : String(unlinkThrew)) + ' removed=' + unlinkRemoved +
+          ' entries=' + entriesOf(dirUnlink).length
+      );
+
+      // ---- T129 (b): an entry whose stat() throws is not counted.
+      const dirStat = mkTemp('fail-stat');
+      [0, 1, 2, 3].forEach((i) => writeEntry(dirStat, entryName(i), BASE + i * 60000));
+      const blind = [entryName(0), entryName(1)]; // the two OLDEST, i.e. the ones that would go
+      let statThrew = null;
+      let statRemoved = null;
+      try {
+        statRemoved = G4B.internals.evictToCap(
+          dirStat,
+          2,
+          (f) => {
+            if (blind.indexOf(path.basename(f)) >= 0) throw new Error('EACCES: simulated');
+            return fs.statSync(f);
+          },
+          undefined
+        );
+      } catch (e) {
+        statThrew = e;
+      }
+      // Guard: the try/catch around `stat(file)`. An unreadable entry must be SKIPPED, not
+      // counted: 4 files - 2 unreadable = 2 == cap, so nothing is evicted. Counting a
+      // throwing entry with mtime 0 instead would evict it (and one more) => red.
+      check(
+        'T129 fail-open (b): an entry whose stat() throws is skipped, not counted, and does not throw (2 of 4 counted, cap 2, 0 removed)',
+        statThrew === null && statRemoved === 0 && entriesOf(dirStat).length === 4,
+        'threw=' + (statThrew === null ? 'no' : String(statThrew)) + ' removed=' + statRemoved +
+          ' entries=' + entriesOf(dirStat).length
+      );
+
+      // ---- T129 (c): an unreadable directory returns 0 instead of throwing.
+      const dirGhost = mkTemp('fail-readdir');
+      const missing = path.join(dirGhost, 'no-such-subdir', 'deeper');
+      const plainFile = path.join(dirGhost, 'plain.txt');
+      fs.writeFileSync(plainFile, 'x', 'utf8');
+      let readThrew = null;
+      let missRemoved = null;
+      let fileRemoved = null;
+      try {
+        missRemoved = G4B.internals.evictToCap(missing, 0); // ENOENT
+        fileRemoved = G4B.internals.evictToCap(plainFile, 0); // ENOTDIR
+      } catch (e) {
+        readThrew = e;
+      }
+      // Guard: the try/catch around `fs.readdirSync(dir)` (missing path => ENOENT, a regular
+      // file => ENOTDIR). Both must degrade to "nothing to evict".
+      check(
+        'T129 fail-open (c): a missing directory and a non-directory path both return 0 without throwing',
+        readThrew === null && missRemoved === 0 && fileRemoved === 0,
+        'threw=' + (readThrew === null ? 'no' : String(readThrew)) +
+          ' missing=' + missRemoved + ' nonDir=' + fileRemoved
+      );
+
+      // ---- T129 (d): an unusable cache directory must not change the verdict.
+      const dirBlock = mkTemp('fail-store');
+      const blocker = path.join(dirBlock, 'blocker');
+      fs.writeFileSync(blocker, 'x', 'utf8');
+      const refSink = g4bSink2();
+      const refCtx = g4bCtx2(W1);
+      refCtx.g4bCacheStore = memStore2(); // healthy run: no disk, no eviction
+      G4B.run(refCtx, refSink);
+      const blockedSink = g4bSink2();
+      let storeThrew = null;
+      try {
+        G4B.run(g4bCtx2(W1, blocker), blockedSink); // mkdirSync on a regular file => EEXIST
+      } catch (e) {
+        storeThrew = e;
+      }
+      // Guard: the `storeOf(ctx)` try/catch in `run` (an unusable store degrades to the full
+      // scan) plus the rule that the cache never carries the verdict - the blocked run must
+      // judge exactly like the healthy one.
+      check(
+        'T129 fail-open (d): an unusable cache directory degrades to the full scan - no cache record, no exception, verdict and detail identical to a healthy run',
+        storeThrew === null && g4bCacheRecs(blockedSink).length === 0 &&
+          verdictOf(blockedSink.records, 'G4b') === verdictOf(refSink.records, 'G4b') &&
+          detailOf(blockedSink.records, 'G4b') === detailOf(refSink.records, 'G4b'),
+        'threw=' + (storeThrew === null ? 'no' : String(storeThrew)) +
+          ' cacheRecords=' + g4bCacheRecs(blockedSink).length +
+          ' blocked=' + verdictOf(blockedSink.records, 'G4b') + ' ref=' + verdictOf(refSink.records, 'G4b')
+      );
+
+      // ---- T130: the shipped cap value itself, pinned to a LITERAL.
+      // T127 derives its expectation from `G4B.internals.CACHE_CAP`, so it stays green if
+      // the cap drifts (e.g. 100 -> 101): the implementation and the expectation would move
+      // together and the bound would weaken silently. This face is the falsifiable anchor -
+      // change `CACHE_CAP` to 101 (or any value other than 100) and this check goes red.
+      // A deliberate cap change therefore requires updating THIS assertion together with
+      // `02-impl/impl-r1.md` and the slice definition; that coupling is the point.
+      check(
+        'T130 CACHE_CAP is pinned at 100 (a drifted cap would silently weaken the bound)',
+        G4B.internals.CACHE_CAP === 100,
+        'CACHE_CAP=' + G4B.internals.CACHE_CAP + ' expected=100'
+      );
+    } catch (e) {
+      check(
+        'T125-T129 G4b cache-bound harness ran to completion (a throw here would silently skip every face)',
+        false,
+        e && e.stack ? e.stack : String(e)
+      );
+    } finally {
+      for (const d of dirs) dropDir(d);
+    }
+  }
+
   // ---- F1: a stale mutation (no-op) must not silently weaken the suite.
   {
     const stale = MUTATION_LOG.filter((m) => !m.applied);

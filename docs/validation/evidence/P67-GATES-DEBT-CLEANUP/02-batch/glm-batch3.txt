@@ -1,0 +1,20 @@
+# 02-batch/glm-batch3 — P67 GATES-DEBT-CLEANUP（批量辅助③ ⑥ 三轮输出枚举，逐字归档）
+
+> 载体：deep-reasoner + `GLM-5.3-Flash (glm)`（§2.2 批量辅助）；只读枚举。以下为回执原文。
+
+统计完成（1401 为占位基准，代入实际位数后自洽值 1404）。以下为任务③输出：
+
+P66 ⑥ 扫描三轮枚举（只读；对照 checklist-rules-hoist.md §10/§11）
+
+| 轮次 | A–E 形状 | Section 标题合规 | 结论行位置与取值 | SEVERITY 与 Section B 一致性 | 陈旧读数迹象 |
+|---|---|---|---|---|---|
+| r1（作废，重派不计 R） | 否：4 段自定义 `### Scope / Validation / Findings / Final result` | 不合规 | 两处：正文第 3 行 `## INDEPENDENT SCAN: PASS`（作废声明块内）；文末 `### Final result` 段内取值 PASS | N/A：无 Section B、无 SEVERITY 标签；PASS 与「无 findings」内容自洽 | 不适用（作废轮） |
+| r2（有效轮） | 是：`## Section A`…`## Section E` 五段齐全 | 合规 | 文末裸行，取值 `INDEPENDENT SCAN: FINDINGS` | 一致：Section B 共 4 条 = 2×[Medium]（13.1.9 与 §5.2 口径冲突；§13.4 规范源二义）+ 2×[Low]（13.3.5 指向 §9.3 不精确、13.3.16 指向 §1.6 不精确），与 C/D 证据段对应 | 有：§11 登记其 2 项 Medium 经 ③-r2 收敛句核实为已闭合陈旧读数；r3 复核证实两项 Medium 实质闭合 |
+| r3（降级旁证） | 是：A–E 五段齐全 | 不合规：标题写作 `## A. Scope / ## B. Findings / ## C. Evidence / ## D. Falsifiability / audit / ## E. Unverified / cannot verify`，非 `## Section X` | 文末裸行，取值 `INDEPENDENT SCAN: PASS` | 一致：Section B 为「None」，无 SEVERITY 标签，PASS 与空 findings 一致 | 有：相对 r2 的 2 项 Medium 已实质闭合（r3 自述）；§10/§11 将其 PASS 降级为低权重旁证 |
+
+对照核验：
+- §10：r3 的 A–E 五段已逐段转录进 sixstage 围栏；围栏外注记声明「标题按 §4.1 契约归一（原文标题为 `## A. Scope` 等）」且「⑥ 效力按 §11 降级为旁证」；转录正文与 06-scan-r3.md 逐段一致（仅标题归一）。
+- §11：r1 作废 / r2 FINDINGS（2 项 Medium＝陈旧读数）/ r3 PASS＋形式缺陷降级 —— 与三份文件事实一致；⑦-r1 登记 [High] F-01（⑥ PASS 不作有效通过结论），结论行 `FINAL REVIEW: FINDINGS`；R=3 含 ⑥-r2→r3 修正 1 次。
+- 仅枚举事实：三轮中仅 r2 携带 SEVERITY 标签；r1/r3 结论行取值均为 PASS；§11.1 将三轮形式缺陷登记为 v54 事实包候选。
+
+BATCH-3: DONE（实得 1404 字符）

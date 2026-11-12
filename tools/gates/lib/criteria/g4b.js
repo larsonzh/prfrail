@@ -42,6 +42,19 @@ const WHITELIST_REL = 'tools/gates/cjk-newwords.txt';
  */
 const CACHE_VERSION = 'v2';
 
+/**
+ * Upper bound on the number of on-disk corpus entries (LRU eviction, slice P67 #1).
+ * Before this slice the directory grew without a bound - it held ~96 entries (one per
+ * resolved sha, most of them permanently dead once HEAD moved on). 100 keeps all of
+ * those and leaves a little headroom, so eviction only kicks in for genuinely stale
+ * records, whose least recently used entry can never be the one a live run wants.
+ */
+const CACHE_CAP = 100;
+
+/** A cache entry file is exactly the sha256 hex of its key plus the `.json` suffix
+ *  (atomic temp files are `.<tmp>.<pid>.<seq>` and must never be eviction candidates). */
+const CACHE_ENTRY_RE = /^[0-9a-f]{64}\.json$/;
+
 function cjkChars(s) {
   const o = new Set();
   for (const ch of s) {
@@ -157,17 +170,81 @@ function validValue(v) {
   );
 }
 
+/**
+ * Drop the least recently used entries of `dir` until at most `cap` remain.
+ *
+ * Access order lives in the file system, never in the stored value: `put` writes a
+ * fresh mtime and `get` touches a hit, so the oldest mtime is the entry no run has
+ * needed for the longest time. Only files named `<64 hex>.json` count as entries;
+ * anything else (atomic temp files, unrelated artefacts) is ignored.
+ *
+ * `statFn` / `unlinkFn` are injectable so the selftest can drive real mtimes on a
+ * temporary directory. EVERY failure is swallowed: eviction is an optimisation and
+ * may never change a verdict. A losing race with another process (Windows keeps an
+ * open handle, so its `unlink` fails) simply leaves that entry for the next pass, and
+ * an over-eager concurrent pass can only make the directory slightly smaller.
+ *
+ * Returns the number of entries actually removed (informational; never throws).
+ */
+function evictToCap(dir, cap, statFn, unlinkFn) {
+  const stat = statFn || fs.statSync;
+  const unlink = unlinkFn || fs.unlinkSync;
+  let names;
+  try {
+    names = fs.readdirSync(dir);
+  } catch (e) {
+    return 0; // unreadable directory: nothing we can enumerate, nothing to evict
+  }
+  const entries = [];
+  for (const name of names) {
+    if (!CACHE_ENTRY_RE.test(name)) continue;
+    const file = path.join(dir, name);
+    try {
+      entries.push({ file, mtime: stat(file).mtimeMs });
+    } catch (e) {
+      /* vanished or unreadable: not an eviction candidate */
+    }
+  }
+  const excess = entries.length - cap;
+  if (!(excess > 0)) return 0;
+  entries.sort((a, b) => a.mtime - b.mtime); // oldest first (stable: ties keep readdir order)
+  let removed = 0;
+  for (let i = 0; i < excess; i += 1) {
+    try {
+      unlink(entries[i].file);
+      removed += 1;
+    } catch (e) {
+      /* fail open: a racing reader/writer keeps this entry alive for now */
+    }
+  }
+  return removed;
+}
+
 function diskStore(ctx) {
   const dir = cacheDir(ctx);
   // Created eagerly: an unusable directory disables the cache BEFORE any record exists.
   fs.mkdirSync(dir, { recursive: true });
   return {
     get(k) {
+      const file = path.join(dir, k + '.json');
+      let parsed;
       try {
-        return JSON.parse(fs.readFileSync(path.join(dir, k + '.json'), 'utf8'));
+        parsed = JSON.parse(fs.readFileSync(file, 'utf8'));
       } catch (e) {
         return null; // absent / unreadable / malformed: a miss, never an error
       }
+      // LRU access stamp: the entry file's mtime is the visit record, so the stored
+      // value keeps its exact `{v: 2, corpus}` shape and the hit semantics stay
+      // "identical to a cold run". Touching happens ONLY after a successful parse
+      // (a failed read/parse is a miss and records nothing), and a failed touch is
+      // harmless - the entry merely looks older - so it must never unseat the hit.
+      try {
+        const now = new Date();
+        fs.utimesSync(file, now, now);
+      } catch (e) {
+        /* fail open: the hit stands even when the timestamp cannot be written */
+      }
+      return parsed;
     },
     put(k, v) {
       const target = path.join(dir, k + '.json');
@@ -182,6 +259,10 @@ function diskStore(ctx) {
           /* the rename consumed it (or a racing process did) - nothing to clean */
         }
       }
+      // The rename above refreshed `target`'s mtime, i.e. this entry is now the most
+      // recently used one; drop the oldest entries so the directory stays bounded.
+      // Only a successful write reaches this point (a throw skips the eviction pass).
+      evictToCap(dir, CACHE_CAP);
     },
   };
 }
@@ -278,5 +359,15 @@ module.exports = {
   title: '编码 + 异常字',
   scripted: true,
   run,
-  internals: { WHITELIST_REL, CACHE_VERSION, cjkChars, corpusRef, sourceDigest, keyString, cacheDir },
+  internals: {
+    WHITELIST_REL,
+    CACHE_VERSION,
+    CACHE_CAP,
+    cjkChars,
+    corpusRef,
+    sourceDigest,
+    keyString,
+    cacheDir,
+    evictToCap,
+  },
 };
