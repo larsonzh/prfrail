@@ -168,3 +168,11 @@ INDEPENDENT SCAN: PASS
 ```
 
 以上 A–E 五段为 ⑥ r1 的逐字转录（§11.3）；原文见证据包 `04-reviews/06-scan-r1.md`。
+
+## 9. 提交与 CI
+
+- 主提交 `18b6ef9`（`feat: add LRU eviction and cap to the G4b corpus cache and land the P67 debt cleanup (v1.67)`；已推 `origin` main：`266b9cd..18b6ef9`；未推 gitee）。
+- CI run `43124686702`（head `18b6ef9`）首跑双腿全绿：
+  - windows（3m59s）：`SELFTEST: PASS 737/737`；`GATE REPORT scope=ci changed=37`；`TOTAL_FAIL=0`；15 条包级 `ok`。
+  - ubuntu（3m22s）：`SELFTEST: PASS 737/737`；`GATE REPORT scope=ci changed=37`；`TOTAL_FAIL=0`；15 条包级 `ok`。
+- 本节由本片主控在 CI 双绿后以 docs-only 提交补全（§11.2 台账完成行口径：commit hash 与 CI run 号只进报告）；该回填提交自身的 run 只作观察记录，不再为其新增提交。

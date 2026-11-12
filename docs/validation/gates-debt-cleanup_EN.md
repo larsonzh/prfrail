@@ -168,3 +168,11 @@ INDEPENDENT SCAN: PASS
 ```
 
 The five sections A–E above are the verbatim transcription of ⑥ r1 (§11.3); the original text is in the evidence pack `04-reviews/06-scan-r1.md`.
+
+## 9. Commit and CI
+
+- Main commit `18b6ef9` (`feat: add LRU eviction and cap to the G4b corpus cache and land the P67 debt cleanup (v1.67)`; pushed to `origin` main: `266b9cd..18b6ef9`; no gitee push).
+- CI run `43124686702` (head `18b6ef9`) green on the first attempt on both legs:
+  - windows (3m59s): `SELFTEST: PASS 737/737`; `GATE REPORT scope=ci changed=37`; `TOTAL_FAIL=0`; 15 package-level `ok` lines.
+  - ubuntu (3m22s): `SELFTEST: PASS 737/737`; `GATE REPORT scope=ci changed=37`; `TOTAL_FAIL=0`; 15 package-level `ok` lines.
+- This section is back-filled by this slice's controller in a docs-only commit after CI went green on both legs (§11.2 ledger completion-row rule: commit hash and CI run numbers go into the report only); that back-fill commit's own run is observation-only and no further commit is made for it.

@@ -97,7 +97,7 @@
 | P64 AT24-SUPERVISED-BLACK-BOX | ✅ Done (closed 2026-11-11; AT-24 conditionally closed; ⑦ re-review `RE-REVIEW: PASS`; R=2; stopped at ⑩ awaiting authorization) | F2-FIX (layer 1 post-hard-gate candidate item 12) | M | 2026-11-11 | Evidence pack `docs/validation/evidence/P64-AT24-SUPERVISED-BLACK-BOX/`; temp `tmp/P64-AT24-SUPERVISED-BLACK-BOX/` |
 | P65 GATE-PIT-26-LANDING | ✅ Done (closed 2026-11-11; B-part landed + A-part path registered; the actual A-part landing awaits v54/P66 generation; R=1; stopped at ⑩ awaiting authorization) | P64 (promoted from the v53 §5 observation item; not a layer-2 queue item) | S | 2026-11-11 | Evidence pack `docs/validation/evidence/P65-GATE-PIT-26-LANDING/`; temp `tmp/P65-GATE-PIT-26-LANDING/`; report pair `docs/validation/gate-pit-26-landing{,_EN}.md` |
 | P66 CHECKLIST-RULES-HOIST | ✅ Done (closed 2026-11-11; §13 five subsections landed; ⑦ final FINDINGS ⇒ remediation then re-review; ⑥ formal defect downgraded; R=3; stopped at ⑩ awaiting authorization) | P65 (layer-2 governance side, snapshot→directive structural migration) | L | 2026-11-11 | Report pair `docs/validation/checklist-rules-hoist{,_EN}.md`; evidence pack `docs/validation/evidence/P66-CHECKLIST-RULES-HOIST/`; temp artefacts `tmp/P66-CHECKLIST-RULES-HOIST/` |
-| P67 GATES-DEBT-CLEANUP | 🔄 In progress (started 2026-11-12; R/D=0; controller V4 Pro, ADR-041; stop point ⑩ awaiting authorization) | P66 (layer-2 new queue item 13; one-shot cleanup: g4b cache LRU / gate pitfall 27 / §12.4 sampling block / ⑥ prompt hardening) | L | 2026-11-12 | Report pair `docs/validation/gates-debt-cleanup{,_EN}.md`; evidence pack `docs/validation/evidence/P67-GATES-DEBT-CLEANUP/`; temp artefacts `tmp/P67-GATES-DEBT-CLEANUP/` |
+| P67 GATES-DEBT-CLEANUP | ✅ Done (closed 2026-11-12; R=3, D=1; ⑦ blind 1 + final 1 + re-review 1; SELFTEST 737/737; controller V4 Pro, ADR-041) | P66 (layer-2 new queue item 13; one-shot cleanup: g4b cache LRU / gate pitfall 27 / §12.4 sampling block / ⑥ prompt hardening) | L | 2026-11-12 | Report pair `docs/validation/gates-debt-cleanup{,_EN}.md`; evidence pack `docs/validation/evidence/P67-GATES-DEBT-CLEANUP/`; temp artefacts `tmp/P67-GATES-DEBT-CLEANUP/` |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1882,12 +1882,12 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Temp artefact location | `tmp/P66-CHECKLIST-RULES-HOIST/` (append-only until 8c) |
 | Completion record | §13 five subsections on disk + Appendix C.0at + the §0.3 v1.66 row + B.7.1/B.7.4 pointers; report pair `docs/validation/checklist-rules-hoist{,_EN}.md` |
 
-### P67 — `GATES-DEBT-CLEANUP` (layer-2 governance side · criterion body + docs + review system one-shot cleanup · governance) · 🔄 In progress (started 2026-11-12)
+### P67 — `GATES-DEBT-CLEANUP` (layer-2 governance side · criterion body + docs + review system one-shot cleanup · governance) · ✅ Done (closed 2026-11-12)
 
 | Field | Content |
 |---|---|
 | Identifier | `GATES-DEBT-CLEANUP` (governance `[SLICE]`; layer-2 new queue item 13; started by the user's naming) |
-| Status | 🔄 In progress (started 2026-11-12; R = 0, D = 0; controller `DeepSeek V4 Pro (deepseek)`, ADR-041; stop point ⑩ awaiting authorization) |
+| Status | ✅ Done (closed 2026-11-12; R = 3, D = 1; ⑦ blind 1 + final 1 + re-review 1; SELFTEST 737/737; controller `DeepSeek V4 Pro (deepseek)`, ADR-041) |
 | Goal | One-shot debt cleanup of four classes: ① g4b cache LRU + entry cap (criterion body); ② formalize the gate-pitfall-27 candidates (4 pits merged); ③ settle the §12.4 proportional-sampling record block; ④ harden the ⑥ prompt |
 | Dependency | P66 closed (`1650d5f` plus the v54 snapshot commit); v54 §5 five new observation items; v1.66 §7.5 tier-L governance ⑦ 1+3 |
 | Size | L; ⑦ governance allowance = 1 final + 3 re-reviews; blind review judged per §7.7 (controller proactively adds 1, per briefing 【一】) |
@@ -1901,7 +1901,7 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Freedom-list path | `docs/validation/evidence/P67-GATES-DEBT-CLEANUP/freedom-list.md` |
 | R / D baseline | R = 0, D = 0 (registered at start, 2026-11-12); temp-artefact D = 1 (including 1 controller violation, confirmed by the user in lieu; a one-time exception for this slice, not precedent-setting) |
 | Temp artefact location | `tmp/P67-GATES-DEBT-CLEANUP/` (append-only until 8c) |
-| Closeout row | In progress; back-filled at closeout (commit + CI run per §11.2 by the back-fill commit) |
+| Closeout row | Criterion LRU + cap (g4b) + §13.4 items 27–30 + §12.4 settlement block + Appendix B.6 hardening landed; report pair `docs/validation/gates-debt-cleanup{,_EN}.md` (commit hash and CI run go into the report only, per §11.2, not into this ledger) |
 
 ## Known defects (to be handled before later slices)
 
