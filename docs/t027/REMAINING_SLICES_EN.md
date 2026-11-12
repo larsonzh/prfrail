@@ -98,7 +98,10 @@
 | P65 GATE-PIT-26-LANDING | ✅ Done (closed 2026-11-11; B-part landed + A-part path registered; the actual A-part landing awaits v54/P66 generation; R=1; stopped at ⑩ awaiting authorization) | P64 (promoted from the v53 §5 observation item; not a layer-2 queue item) | S | 2026-11-11 | Evidence pack `docs/validation/evidence/P65-GATE-PIT-26-LANDING/`; temp `tmp/P65-GATE-PIT-26-LANDING/`; report pair `docs/validation/gate-pit-26-landing{,_EN}.md` |
 | P66 CHECKLIST-RULES-HOIST | ✅ Done (closed 2026-11-11; §13 five subsections landed; ⑦ final FINDINGS ⇒ remediation then re-review; ⑥ formal defect downgraded; R=3; stopped at ⑩ awaiting authorization) | P65 (layer-2 governance side, snapshot→directive structural migration) | L | 2026-11-11 | Report pair `docs/validation/checklist-rules-hoist{,_EN}.md`; evidence pack `docs/validation/evidence/P66-CHECKLIST-RULES-HOIST/`; temp artefacts `tmp/P66-CHECKLIST-RULES-HOIST/` |
 | P67 GATES-DEBT-CLEANUP | ✅ Done (closed 2026-11-12; R=3, D=1; ⑦ blind 1 + final 1 + re-review 1; SELFTEST 737/737; controller V4 Pro, ADR-041) | P66 (layer-2 new queue item 13; one-shot cleanup: g4b cache LRU / gate pitfall 27 / §12.4 sampling block / ⑥ prompt hardening) | L | 2026-11-12 | Report pair `docs/validation/gates-debt-cleanup{,_EN}.md`; evidence pack `docs/validation/evidence/P67-GATES-DEBT-CLEANUP/`; temp artefacts `tmp/P67-GATES-DEBT-CLEANUP/` |
-| P68 REMAINING-RULINGS | ✅ Done (closed 2026-11-12; R=1, D=0; ⑥ skip confirmed by ⑦; ⑦ final PASS; SELFTEST 737/737; controller Flash) | P67 (layer-2 governance side; advice on the four R items + stage-progression seal confirmation) | M | 2026-11-12 | Report pair `docs/validation/remaining-rulings{,_EN}.md`; evidence pack `docs/validation/evidence/P68-REMAINING-RULINGS/`; temp artefacts `tmp/P68-REMAINING-RULINGS/` |
+| P68 REMAINING-RULINGS | ✅ Done (closed 2026-11-12; R=1, D=1; ⑥ skip confirmed by ⑦; ⑦ final PASS; SELFTEST 737/737; controller Flash) | P67 (layer-2 governance side; advice on the four R items + stage-progression seal confirmation) | M | 2026-11-12 | Report pair `docs/validation/remaining-rulings{,_EN}.md`; evidence pack `docs/validation/evidence/P68-REMAINING-RULINGS/`; temp artefacts `tmp/P68-REMAINING-RULINGS/` |
+| P69 T027B-E2E-WIRING | ⬜ Not started (depends on P44 / P67 / P68 all closed; user must name it) | P68 (the R-1 closeout from R-06 = b) | M | — | Wire the P44 readiness / permit verdicts into the production assembly and the CLI entry; evidence pack `docs/validation/evidence/P69-T027B-E2E-WIRING/` |
+| P70 S1-STREAM-PROGRESS | ⬜ Not started (user must name it) | P68 (R-07 b1 condition 1) | S | — | The lightweight `run --progress` stream switch (off by default, consuming the existing event stream, no view layer); evidence pack `docs/validation/evidence/P70-S1-STREAM-PROGRESS/` |
+| P71 S1-SCOPE-ANNOTATE | ⬜ Not started (user must name it; needs a same-turn explicit authorization) | P68 (R-07 b1 condition 2) | M | — | The visible debugging guidance + the REQ stage-ownership column + the matrix / strategy / gate-applicability write-backs (X-style, no entry deleted); evidence pack `docs/validation/evidence/P71-S1-SCOPE-ANNOTATE/` |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1919,6 +1922,60 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Temp artefact location | `tmp/P68-REMAINING-RULINGS/` (append-only until 8c) |
 | Four-R rulings (user, 2026-11-12, same turn) | R-04 = **option a**; R-06 = **option b** (close the P44 end-to-end wiring R-1 first, then start T027-B; the R-1 work is its own slice, not advanced here); R-07 = **option b1 plus conditions** (X-style deferral: only the REQ stage-ownership column changes - no REQ deleted, the MVA acceptance composite untouched, self-hosting untouched; condition 1 = the TUI carve-out presupposes a `run --progress` addition inside S1, carried by `S1-STREAM-PROGRESS`; condition 2 = the visible debugging guidance goes into `OPERATIONS` with three boundaries, carried by an S1 documentation slice); R-10 = **option a** (keep §7.5; no directive edit). The OB-11 exception is registered as ADR-042 (not a precedent) |
 | Closeout row | Stage-progression seal confirmed (four landing anchors) + advice and rulings on the four R items landed + the full R-07 advice (technical premises A-D + three options + the four b1 combinations); report pair `docs/validation/remaining-rulings{,_EN}.md` (commit hash and CI run go into the report only, per §11.2) |
+
+### P69 — `T027B-E2E-WIRING` (R-1 closeout) · ⬜ not started
+
+| Field | Content |
+|---|---|
+| Identifier | `T027B-E2E-WIRING` (layer-2 governance side; source = R-1 in P57 report §3.3) |
+| Status | ⬜ not started (depends on P44 / P67 / P68 all closed; user must name it) |
+| Goal | Wire the P44 readiness / permit verdicts into the production assembly path and the CLI entry |
+| Dependency | P44 (closed); P67 / P68 (closed) |
+| Size | M |
+| Steps | (1) current-state check → (2) wiring → (3) tests → (4) gates → (5) pre-review → (6) scan → (7) final review → (8) → (9) → (8c) → (10) |
+| Current gap | The P44 verdict implementation and tests are done; the end-to-end wiring is not (P57 §3.3 R-1) |
+| Deliverables | Wiring implementation + tests + report pair; evidence pack `docs/validation/evidence/P69-T027B-E2E-WIRING/` |
+| Acceptance evidence | The production assembly path actually consumes the P44 verdicts; related tests and gates all green |
+| Boundary | Do not change the P44 verdict body or the `CONTRACTS` semantics; wiring only; no gitee push |
+| Tier | `[SLICE]` |
+| Probe budget | 0 (local machine, no external calls) |
+| Freedom-list path | `docs/validation/evidence/P69-T027B-E2E-WIRING/freedom-list.md` |
+
+### P70 — `S1-STREAM-PROGRESS` (TUI carve-out condition 1) · ⬜ not started
+
+| Field | Content |
+|---|---|
+| Identifier | `S1-STREAM-PROGRESS` (layer-2 governance side; source = R-07 b1 condition 1) |
+| Status | ⬜ not started (user must name it) |
+| Goal | Add a lightweight `run --progress` stream switch (off by default, consuming the existing event stream, printing per-task/step start and end plus gate command start/end and exit codes plus AI tool-call summary lines) |
+| Dependency | P68 (closed, R-07 condition 1) |
+| Size | S |
+| Steps | (1) event-surface check → (2) switch and printing → (3) tests → (4) gates → (5) → (6) → (7) → (8) → (9) → (8c) → (10) |
+| Current gap | `run` has no live output at all (six summary lines only when finished); no `--verbose` / `--progress`; no heartbeat |
+| Deliverables | `internal/console` changes + tests + report pair; evidence pack `docs/validation/evidence/P70-S1-STREAM-PROGRESS/` |
+| Acceptance evidence | Default behaviour unchanged; with the switch on, per-task/step lines are visible; `--json` semantics unchanged; gates all green |
+| Boundary | `console` + tests; no new event model; no view layer; no change to `CONTRACTS` / `--json` semantics; no gitee push |
+| Tier | `[SLICE]` |
+| Probe budget | 0 |
+| Freedom-list path | `docs/validation/evidence/P70-S1-STREAM-PROGRESS/freedom-list.md` |
+
+### P71 — `S1-SCOPE-ANNOTATE` (TUI carve-out condition 2 plus the stage-ownership column) · ⬜ not started
+
+| Field | Content |
+|---|---|
+| Identifier | `S1-SCOPE-ANNOTATE` (layer-2 governance side; source = R-07 b1 condition 2 and the X-style write-back) |
+| Status | ⬜ not started (user must name it; needs a same-turn explicit authorization) |
+| Goal | Write the visible debugging guidance into `OPERATIONS{,_EN}` with three boundaries; mark the stage-ownership column of REQ-009 / REQ-019 / REQ-007 / REQ-021 as "not required by S1, deferred to S2"; align `S1_SUPPORT_MATRIX` with the TUI carve-out and the visible degraded guarantee; align the AT-13 / AT-24 items in `TEST_STRATEGY`; add the gate-applicability note to `s1-exit` |
+| Dependency | P68 (closed, R-07 condition 2); recommended after P69 and P70 |
+| Size | M (documentation only; touches product-side release wording) |
+| Steps | (1) current-state and difference check → (2) per-document write-back → (3) consistency check → (4) gates → (5) → (6) → (7) → (8) → (9) → (8c) → (10) |
+| Current gap | The S1 scope and stage ownership are not yet written per R-07 b1; the visible guidance is missing |
+| Deliverables | The five document write-backs + report pair; evidence pack `docs/validation/evidence/P71-S1-SCOPE-ANNOTATE/` |
+| Acceptance evidence | Stage-ownership marks in place with no entry deleted; the three visible boundaries present; matrix and strategy consistent; gates all green |
+| Boundary | No change to REQ numbering or item count (X-style); no change to the MVA acceptance composite; no change to directive §7.5 / §6.3 criteria; no gitee push |
+| Tier | `[SLICE]` |
+| Probe budget | 0 |
+| Freedom-list path | `docs/validation/evidence/P71-S1-SCOPE-ANNOTATE/freedom-list.md` |
 
 ## Known defects (to be handled before later slices)
 
