@@ -77,6 +77,8 @@ console 多任务串行装配（P50）：装配计划把 `chain.Definition` 展�
 
 console 多任务 CLI 接线（P51）：`prfrail run` 以可重复 `--request-records <path>` 逐任务声明 `agent-runner-request` 记录，CLI 解码后按 `agentRunnerRequestRecordKey(taskID, stepID)` 建立注册表并注入 `AgentRunnerAssemblyOptions.RequestRecords`；单值 `--request-record` 保持单任务兼容路径，两者互斥。CLI 侧 fail-closed 覆盖双 flag、空路径、重复键、键未命中链定义、定义缺覆盖、记录 `runId` 与 `--run-id` 不一致，以及 noop-only 链上声明多记录；全部拒绝发生在 run-root 创建与事件日志写入之前（零写入）。supervised 装配不含记录输入端，故不在此列。
 
+console 装配入口的 P44 门（P69）：`ProbePermit` 门在装配入口的位置为——`ExecuteAgentRunnerRun` 在 Step 1 前置校验之前做 readiness presence 判定（缺许可 ⇒ `ErrProbePermitMissing`、零痕迹拒绝），Step 1 全部通过后、run-root 事件日志标记之前调用 `requireProbePermit`（一次性额度 Require + defer Complete）；`ExecuteSupervisedRun` 以「操作员交互 ledger 不存在 = 首次起跑」的 fresh 门在可见通道校验后、标记前执行同一三件套，重入不重复消费；CLI `run` 在路由到两条装配路径之前用 `--probe-permit` 旗标做同样的 presence 判定（只判定不消费）。判定本体零改动（`internal/gates/**`），本片只做接线。
+
 A6 镜像共享语义（P50 复核）：runRoot 级身份镜像与启动槽是「**同一时刻至多一个在跑 launch**」的排他点，不是 run 生命周期内的一次性唯一；串行装配因此不需要新锁，也不产生并发 spawn。任务切换时镜像由新 launch 以临时文件 + rename 原子覆盖，与既有「镜像命名死亡进程即陈旧、可被替换」语义一致；并发 Start 的败者依旧不得创建日志工件、不得覆盖身份镜像。时刻级排他、镜像轮换与「先证明停机、再发 R」三者合起来，使「每 runRoot 唯一镜像」在共享使用下仍然成立。
 
 调度机制（P50）：wire 与磁盘工件的流键仍是 `requestId`（R/C、launch-intent/identity、终局与证据目录均按它隔离），装配层用 `(runID, taskID, stepID, attempt)` 映射到唯一请求记录，chain 层只认 `runID`；该 runRoot 的 `events/state-events.jsonl` 仍是唯一全序源。各 task 的六枚冻结事实由该 task 终局路由事件的 `evidence[2..7]` 位置化载荷归属，不得跨 task 对账。

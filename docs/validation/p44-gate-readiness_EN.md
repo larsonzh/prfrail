@@ -163,6 +163,7 @@ The severity column keeps the review reports' own wording and is never bolded; t
 
 - **R-2**: L3 takes the `Seal` binding and `AT23Hash` as input and carries no constructor-signature binding as the design required; cross-level access is still blocked by the sealed interface and the three method sets.
 - **R-3**: C7/N4 are not wired end to end, so only gate readiness and the permit path may be declared as meeting this slice's acceptance premise; the end-to-end claim stays banned.
+- **End-to-end wiring is completed by P69 `T027B-E2E-WIRING` (report: `docs/validation/t027b-e2e-wiring{,_EN}.md`)**
 - **R-4**: `-race` did not run on this machine, so the concurrency conclusion rests on the `-count=50 -cpu 1,2,4` and `-count=20` substitute evidence; the CI Race leg does not cover `internal/gates`.
 - **6 Section D now covered**: the three `SealBinding.validate` boundaries (`Attempt < 1`, empty `TaskKey`, illegal `SealHash`) were added in FR-02 and are recorded as covered.
 - **6 Section D still uncovered (registered, not defects)**: `LoadProbePermit` failing on a read error other than `NotExist`, the `ctx == nil` branch of `Require`, the `Complete` unknown state, and a genuine cross-process double write.

@@ -69,6 +69,8 @@ F1 与 F2 在**本片回写前**互斥：前者称已立项，后者称无设计
 | R-2 | enforcement 生产落地 B 段 | F6：归属三选一未裁 | OB-55 待议 + R-06 待裁 | 用户裁定 OB-55 归属 |
 | R-3 | 真实 CLI 端到端（AT-23 真实候选腿） | F7 + `docs/validation/s1-exit.md:43` | 层 1 第 8 项 `AT23-RESTRICTED-CANDIDATE` | R-08 / R-09 裁定 + 兼容候选 |
 
+- **R-1 已由 P69 `T027B-E2E-WIRING` 收口**（报告：`docs/validation/t027b-e2e-wiring{,_EN}.md`）
+
 ## 4. P6 评估 — S1 Exit 剩余门收口清单
 
 ### 4.1 判定

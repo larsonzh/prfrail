@@ -182,7 +182,8 @@ T027 前置状态更新（2026-11-09，F2-FIX-STUB-HANG）：在上一段基础�
 - P41 归属：C2 与 N1（已完成，报告 `docs/validation/p41-spawn-ownership{,_EN}.md`）
 - P42 绑定：C3 与 N2（已完成，报告 `docs/validation/p42-evidence-bind{,_EN}.md`）
 - P43 封存：C4 与 C5 与 N3（已完成，报告 `docs/validation/p43-state-seal{,_EN}.md`）
-- P44 门序：C7 与 N4（判定实现与测试已完成，报告 `docs/validation/p44-gate-readiness{,_EN}.md`；端到端接线为后续切片）
+- P44 门序：C7 与 N4（判定实现与测试已完成，报告 `docs/validation/p44-gate-readiness{,_EN}.md`；端到端接线已由 P69 完成）
+- P69 接线：P44 readiness / permit 门接到生产装配与 CLI 入口（报告 `docs/validation/t027b-e2e-wiring{,_EN}.md`）
 - P45 零模型 E2E：完成（装配验证；生产代码零改动；三任务状态序与 T3 未启动在引擎级与 console 级均有断言；报告 `docs/validation/p45-e2e-zero-model{,_EN}.md`）
 - P46 战略回看：断点 A 部分闭合、断点 B 未闭合，缺口台账 GAP-01–GAP-76（报告 `docs/validation/strategic-review-2026-11-02{,_EN}.md`）
 - P47 治理基线核验：断点 B 七项二选一核验，补登记 OB-133 至 OB-136（报告 `docs/validation/governance-baseline-verify{,_EN}.md`）

@@ -176,7 +176,7 @@ A probe permit is a **one-shot quota**: three states `Unused` → `Claimed` → 
 
 Failures, timeouts and restarts never reset the quota: `LoadProbePermit` rebuilds a permit as `Spent` whenever it sees the marker - a corrupted marker body also counts as `Spent` - and absence of the marker is `Unused`. `Complete` settles the terminal state with `CAS(1→2)`, is idempotent for an already `Spent` permit, and refuses a permit that never went through `Require` (`Unused`) with `ErrProbePermitInUse`, so completion cannot invent a quota. A context cancellation before the persist consumes nothing; cancellation after the persist still consumes, and an abandoned attempt never refunds. The marker file belongs to the caller for the whole life of the permit: deleting it re-issues the quota, so production paths must never delete it.
 
-Boundary: this slice lands the decision implementation and its tests only, and `internal/console/**` is unchanged, so the end-to-end wiring of C7 / N4 is not done yet and belongs to a later slice.
+Boundary: this slice lands the decision implementation and its tests only; the end-to-end wiring of C7 / N4 is completed by P69 `T027B-E2E-WIRING` (report: `docs/validation/t027b-e2e-wiring{,_EN}.md`); the wiring points under `internal/console/**` are listed in §2 of that report.
 
 ## 5. Gate Hooks
 

@@ -16,6 +16,7 @@ import (
 	"github.com/larsonzh/prfrail/internal/adapters"
 	"github.com/larsonzh/prfrail/internal/chain"
 	"github.com/larsonzh/prfrail/internal/evidence"
+	"github.com/larsonzh/prfrail/internal/gates"
 	"github.com/larsonzh/prfrail/internal/tickets"
 )
 
@@ -293,6 +294,7 @@ func (cli CLI) executeRun(ctx context.Context, args []string, stdout, stderr io.
 	costLedger := set.String("cost-ledger", "", "path to a cost ledger")
 	agentCLIPath := set.String("agent-cli", "", "path to the pinned agent CLI executable")
 	agentVersion := set.String("agent-version", "", "pinned agent CLI version")
+	probePermit := set.String("probe-permit", "", "path to the one-shot probe permit marker (required for the AgentRunner and supervised assembly routes)")
 	if err := set.Parse(args); err != nil {
 		return writeUsageError(stdout, stderr, "run", *jsonOutput, parseErr.String(), runUsage)
 	}
@@ -372,11 +374,35 @@ func (cli CLI) executeRun(ctx context.Context, args []string, stdout, stderr io.
 	if err != nil {
 		return writeCommandError(stdout, stderr, "run", *jsonOutput, err)
 	}
+	// The probe permit gate is a CLI-side presence check only. It resolves and
+	// loads the marker so a bad path or an unreadable marker fails here, but it
+	// never consumes the quota: consumption belongs to gates.ProbePermit.Require
+	// at the assembly entry. A permit that passes this check can still be spent,
+	// and the assembly entry is where that is decided.
+	var gatePermit *gates.ProbePermit
+	if len(supervised) > 0 || len(executable) > 0 {
+		if strings.TrimSpace(*probePermit) == "" {
+			err := fmt.Errorf("--probe-permit is required when the chain routes to the AgentRunner or supervised assembly")
+			return writeCommandError(stdout, stderr, "run", *jsonOutput, err)
+		}
+		permitPath, err := resolvePathFromCWD(cwd, *probePermit)
+		if err != nil {
+			return writeCommandError(stdout, stderr, "run", *jsonOutput, err)
+		}
+		permit, err := gates.LoadProbePermit(permitPath)
+		if err != nil {
+			return writeCommandError(stdout, stderr, "run", *jsonOutput, err)
+		}
+		if _, err := gates.EvaluateT027BReadiness(gates.GoalProbe, gates.ReadinessInput{Permit: permit}); err != nil {
+			return writeCommandError(stdout, stderr, "run", *jsonOutput, err)
+		}
+		gatePermit = permit
+	}
 	if len(supervised) > 0 {
-		return cli.executeSupervisedRun(ctx, *runID, resolvedRunDir, definition, *jsonOutput, stdout, stderr)
+		return cli.executeSupervisedRun(ctx, *runID, resolvedRunDir, definition, gatePermit, *jsonOutput, stdout, stderr)
 	}
 	if len(executable) > 0 {
-		return cli.executeAgentRunnerRun(ctx, *runID, resolvedRunDir, definition, inputs, *jsonOutput, stdout, stderr)
+		return cli.executeAgentRunnerRun(ctx, *runID, resolvedRunDir, definition, inputs, gatePermit, *jsonOutput, stdout, stderr)
 	}
 	summary, err := ExecuteNoopRun(ctx, *runID, resolvedRunDir, definition, filepath.Dir(resolvedPath), cli.now)
 	if err != nil {
@@ -385,7 +411,7 @@ func (cli CLI) executeRun(ctx context.Context, args []string, stdout, stderr io.
 	return writeRunSummary(stdout, *jsonOutput, resolvedRunDir, summary)
 }
 
-const runUsage = "usage: prfrail run [--chain <path>] [--run-id <id>] [--run-dir <path>] [--json] (--request-record <path> | --request-records <path>)... --capability-record <path> --enforcement-record <path> --availability-record <path> --authorization-ledger <path> --cost-ledger <path> --agent-cli <path> --agent-version <version>"
+const runUsage = "usage: prfrail run [--chain <path>] [--run-id <id>] [--run-dir <path>] [--json] (--request-record <path> | --request-records <path>)... --capability-record <path> --enforcement-record <path> --availability-record <path> --authorization-ledger <path> --cost-ledger <path> --agent-cli <path> --agent-version <version> --probe-permit <path>"
 
 // agentRunnerRunInputs is the all-or-nothing AgentRunner CLI surface. Before the
 // run command routes to the AgentRunner assembly the request-record dimension
@@ -451,7 +477,8 @@ func (inputs agentRunnerRunInputs) anyProvided() bool {
 // executeAgentRunnerRun decodes the declared record files and drives the
 // production assembly. Decoding is CLI-side file IO; the assembly re-validates
 // every record before the engine exists.
-func (cli CLI) executeAgentRunnerRun(ctx context.Context, runID, runDir string, definition chain.Definition, inputs agentRunnerRunInputs, jsonOutput bool, stdout, stderr io.Writer) int {
+func (cli CLI) executeAgentRunnerRun(ctx context.Context, runID, runDir string, definition chain.Definition, inputs agentRunnerRunInputs, probePermit *gates.ProbePermit, jsonOutput bool, stdout, stderr io.Writer) int {
+	// probePermit is only forwarded: the assembly entry evaluates and consumes it.
 	cwd, err := cli.getwd()
 	if err != nil {
 		return writeCommandError(stdout, stderr, "run", jsonOutput, err)
@@ -545,6 +572,7 @@ func (cli CLI) executeAgentRunnerRun(ctx context.Context, runID, runDir string, 
 		RunID:               runID,
 		RunRoot:             runDir,
 		Definition:          definition,
+		ProbePermit:         probePermit,
 		RequestRecord:       requestRecord,
 		RequestRecords:      requestRecords,
 		CapabilityRecord:    capabilityRecord,

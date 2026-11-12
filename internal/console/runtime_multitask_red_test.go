@@ -132,7 +132,7 @@ func TestAgentRunnerAssemblyAcceptsMultiTaskDefinitionShape(t *testing.T) {
 		t.Fatalf("the fixture must carry two tasks, got %d", len(definition.Tasks))
 	}
 
-	summary, err := ExecuteAgentRunnerRun(context.Background(), AgentRunnerAssemblyOptions{Definition: definition})
+	summary, err := ExecuteAgentRunnerRun(context.Background(), AgentRunnerAssemblyOptions{Definition: definition, ProbePermit: newTestProbePermit(t)})
 	if err == nil {
 		t.Fatalf("a definition without request records must not reach a live run, got summary %+v", summary)
 	}
@@ -151,7 +151,7 @@ func TestAgentRunnerAssemblyAcceptsMultiTaskDefinitionShape(t *testing.T) {
 
 	// The zero-task refusal is retained with its own wording, and it must run
 	// before the step check (an empty definition has no task to inspect).
-	_, zeroErr := ExecuteAgentRunnerRun(context.Background(), AgentRunnerAssemblyOptions{Definition: chain.Definition{ID: multiTaskDefinitionID}})
+	_, zeroErr := ExecuteAgentRunnerRun(context.Background(), AgentRunnerAssemblyOptions{Definition: chain.Definition{ID: multiTaskDefinitionID}, ProbePermit: newTestProbePermit(t)})
 	if !errors.Is(zeroErr, ErrInvalidConfig) || !strings.Contains(zeroErr.Error(), agentRunnerZeroTaskRefusal) {
 		t.Fatalf("a zero-task definition must be refused with %q, got %v", agentRunnerZeroTaskRefusal, zeroErr)
 	}
@@ -162,7 +162,7 @@ func TestAgentRunnerAssemblyAcceptsMultiTaskDefinitionShape(t *testing.T) {
 	// every task of the definition.
 	overloaded := multiTaskIsolatedDefinition()
 	overloaded.Tasks[1].Steps = append(overloaded.Tasks[1].Steps, chain.Step{ID: "code-extra", Kind: "code", Mode: chain.IsolatedWorkspace})
-	_, stepErr := ExecuteAgentRunnerRun(context.Background(), AgentRunnerAssemblyOptions{Definition: overloaded})
+	_, stepErr := ExecuteAgentRunnerRun(context.Background(), AgentRunnerAssemblyOptions{Definition: overloaded, ProbePermit: newTestProbePermit(t)})
 	if !errors.Is(stepErr, ErrInvalidConfig) || !strings.Contains(stepErr.Error(), agentRunnerSingleStepRefusal) {
 		t.Fatalf("a task with two steps must be refused per task, got %v", stepErr)
 	}
@@ -179,7 +179,7 @@ func TestSupervisedAssemblyAcceptsMultiTaskDefinitionShape(t *testing.T) {
 		t.Fatalf("the fixture must carry two tasks, got %d", len(definition.Tasks))
 	}
 
-	summary, err := ExecuteSupervisedRun(context.Background(), SupervisedAssemblyOptions{Definition: definition})
+	summary, err := ExecuteSupervisedRun(context.Background(), SupervisedAssemblyOptions{Definition: definition, ProbePermit: newTestProbePermit(t)})
 	if err == nil {
 		t.Fatalf("a definition without a run root must not reach a live run, got summary %+v", summary)
 	}
@@ -194,7 +194,7 @@ func TestSupervisedAssemblyAcceptsMultiTaskDefinitionShape(t *testing.T) {
 		t.Fatalf("a refused assembly must return an empty summary, got %+v", summary)
 	}
 
-	_, zeroErr := ExecuteSupervisedRun(context.Background(), SupervisedAssemblyOptions{Definition: chain.Definition{ID: multiTaskDefinitionID}})
+	_, zeroErr := ExecuteSupervisedRun(context.Background(), SupervisedAssemblyOptions{Definition: chain.Definition{ID: multiTaskDefinitionID}, ProbePermit: newTestProbePermit(t)})
 	if !errors.Is(zeroErr, ErrInvalidConfig) || !strings.Contains(zeroErr.Error(), supervisedZeroTaskRefusal) {
 		t.Fatalf("a zero-task definition must be refused with %q, got %v", supervisedZeroTaskRefusal, zeroErr)
 	}
@@ -202,7 +202,7 @@ func TestSupervisedAssemblyAcceptsMultiTaskDefinitionShape(t *testing.T) {
 
 	overloaded := multiTaskSupervisedDefinition()
 	overloaded.Tasks[1].Steps = append(overloaded.Tasks[1].Steps, multiTaskSupervisedStep("code-extra"))
-	_, stepErr := ExecuteSupervisedRun(context.Background(), SupervisedAssemblyOptions{Definition: overloaded})
+	_, stepErr := ExecuteSupervisedRun(context.Background(), SupervisedAssemblyOptions{Definition: overloaded, ProbePermit: newTestProbePermit(t)})
 	if !errors.Is(stepErr, ErrInvalidConfig) || !strings.Contains(stepErr.Error(), supervisedSingleStepRefusal) {
 		t.Fatalf("a task with two steps must be refused per task, got %v", stepErr)
 	}
@@ -228,7 +228,7 @@ func TestMultiTaskDefinitionShapeIsOtherwiseValid(t *testing.T) {
 	// selection, so each task's step shape is accepted on its own.
 	for _, task := range agentDefinition.Tasks {
 		single := singleTaskIsolatedDefinition(task)
-		_, err := ExecuteAgentRunnerRun(context.Background(), AgentRunnerAssemblyOptions{Definition: single})
+		_, err := ExecuteAgentRunnerRun(context.Background(), AgentRunnerAssemblyOptions{Definition: single, ProbePermit: newTestProbePermit(t)})
 		if err == nil {
 			t.Fatalf("task %q alone must not reach a live run", task.ID)
 		}
@@ -239,7 +239,7 @@ func TestMultiTaskDefinitionShapeIsOtherwiseValid(t *testing.T) {
 	}
 	for _, task := range supervisedDefinition.Tasks {
 		single := chain.Definition{ID: multiTaskDefinitionID, Tasks: []chain.Task{task}}
-		_, err := ExecuteSupervisedRun(context.Background(), SupervisedAssemblyOptions{Definition: single})
+		_, err := ExecuteSupervisedRun(context.Background(), SupervisedAssemblyOptions{Definition: single, ProbePermit: newTestProbePermit(t)})
 		if err == nil {
 			t.Fatalf("task %q alone must not reach a live run", task.ID)
 		}
@@ -250,8 +250,8 @@ func TestMultiTaskDefinitionShapeIsOtherwiseValid(t *testing.T) {
 	}
 
 	// 3. The two-task errors name no retired gate.
-	_, agentErr := ExecuteAgentRunnerRun(context.Background(), AgentRunnerAssemblyOptions{Definition: agentDefinition})
+	_, agentErr := ExecuteAgentRunnerRun(context.Background(), AgentRunnerAssemblyOptions{Definition: agentDefinition, ProbePermit: newTestProbePermit(t)})
 	requireNoRetiredRefusal(t, agentErr, agentRunnerRetiredMultiTaskRefusal, agentRunnerSingleStepRefusal, agentRunnerStepShapeRefusal)
-	_, supervisedErr := ExecuteSupervisedRun(context.Background(), SupervisedAssemblyOptions{Definition: supervisedDefinition})
+	_, supervisedErr := ExecuteSupervisedRun(context.Background(), SupervisedAssemblyOptions{Definition: supervisedDefinition, ProbePermit: newTestProbePermit(t)})
 	requireNoRetiredRefusal(t, supervisedErr, supervisedRetiredMultiTaskRefusal, supervisedSingleStepRefusal, supervisedStepShapeRefusal)
 }

@@ -15,6 +15,7 @@ import (
 	"github.com/larsonzh/prfrail/internal/adapters"
 	"github.com/larsonzh/prfrail/internal/chain"
 	"github.com/larsonzh/prfrail/internal/evidence"
+	"github.com/larsonzh/prfrail/internal/gates"
 	"github.com/larsonzh/prfrail/internal/guard"
 	"github.com/larsonzh/prfrail/internal/snapshot"
 	"github.com/larsonzh/prfrail/internal/tickets"
@@ -102,6 +103,11 @@ type AgentRunnerAssemblyOptions struct {
 	// overlap the replay store must refuse.
 	WorkspaceRoot string
 
+	// ProbePermit is the one-shot probe permit bound by the CLI. The assembly
+	// evaluates its presence before any precondition and consumes it only after
+	// every precondition passed; nil refuses fail-closed with no footprint.
+	ProbePermit *gates.ProbePermit
+
 	Clock func() time.Time
 	IDs   func() string
 
@@ -136,6 +142,13 @@ func ExecuteAgentRunnerRun(ctx context.Context, options AgentRunnerAssemblyOptio
 	// chain ports for in-package tests.
 	stub := options.testStub
 
+	// Step 0 (P69 T027B-E2E-WIRING): the probe permit readiness gate. Presence is
+	// evaluated before any precondition so a missing permit refuses with zero
+	// footprint. Quota consumption is the Require call after Step 1.
+	if _, err := gates.EvaluateT027BReadiness(gates.GoalProbe, gates.ReadinessInput{Permit: options.ProbePermit}); err != nil {
+		return RunSummary{}, err
+	}
+
 	// Step 1: assembly preconditions. The definition may name several tasks (each
 	// one exactly one isolated-workspace code step, CONTRACTS.md A6), and every task
 	// must bind its own persisted request record, so no task can borrow another
@@ -169,6 +182,16 @@ func ExecuteAgentRunnerRun(ctx context.Context, options AgentRunnerAssemblyOptio
 	if err := agentRunnerValidateCLI(options.AgentCLI); err != nil {
 		return RunSummary{}, err
 	}
+
+	// The probe permit quota is claimed only after every precondition passed: a
+	// configuration refusal must not burn the one-shot quota. The release defers
+	// Complete so the quota is spent on every path past this point, success or
+	// failure (N4: a claimed permit is never refunded).
+	releaseProbePermit, err := requireProbePermit(ctx, options.ProbePermit)
+	if err != nil {
+		return RunSummary{}, err
+	}
+	defer releaseProbePermit()
 
 	// Step 2: the run-root marker comes first. The replay store refuses to be
 	// constructed without it, so the order is a correctness rule, not a script.

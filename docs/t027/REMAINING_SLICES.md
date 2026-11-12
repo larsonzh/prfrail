@@ -99,7 +99,7 @@
 | P66 CHECKLIST-RULES-HOIST | ✅ 已完成（2026-11-11 收口；§13 五节落地；⑦ 终审 FINDINGS⇒整改后复审；⑥ 形式缺陷降级；R=3；停于 ⑩ 等授权） | P65（层 2 治理侧，快照→准则结构性迁移） | L | 2026-11-11 | 报告对 `docs/validation/checklist-rules-hoist{,_EN}.md`；证据包 `docs/validation/evidence/P66-CHECKLIST-RULES-HOIST/`；临时件 `tmp/P66-CHECKLIST-RULES-HOIST/` |
 | P67 GATES-DEBT-CLEANUP | ✅ 已完成（2026-11-12 收口；R=3、D=1；⑦ 盲审 1 + 终审 1 + 复审 1；SELFTEST 737/737；主控 V4 Pro，ADR-041） | P66（层 2 新增队列第 13 项；清欠四类：g4b 缓存 LRU / 第 27 条门禁坑 / §12.4 抽查记录块 / ⑥ 提示词加固） | L | 2026-11-12 | 报告对 `docs/validation/gates-debt-cleanup{,_EN}.md`；证据包 `docs/validation/evidence/P67-GATES-DEBT-CLEANUP/`；临时件 `tmp/P67-GATES-DEBT-CLEANUP/` |
 | P68 REMAINING-RULINGS | ✅ 已完成（2026-11-12 收口；R=1、D=1；⑥ 跳过经 ⑦ 确认；⑦ 终审 PASS；SELFTEST 737/737；主控 Flash） | P67（层 2 治理侧；四项 R 裁定建议 + 分阶段策略封板确认） | M | 2026-11-12 | 报告对 `docs/validation/remaining-rulings{,_EN}.md`；证据包 `docs/validation/evidence/P68-REMAINING-RULINGS/`；临时件 `tmp/P68-REMAINING-RULINGS/` |
-| P69 T027B-E2E-WIRING | ⬜ 未开始（依赖 P44 / P67 / P68 均闭环；须用户点名） | P68（R-06 = b 的 R-1 收口） | M | — | 把 P44 的 readiness / permit 判定接到生产装配与 CLI 入口；证据包 `docs/validation/evidence/P69-T027B-E2E-WIRING/` |
+| P69 T027B-E2E-WIRING | ✅ 已完成（2026-11-12 收口；报告对 `docs/validation/t027b-e2e-wiring{,_EN}.md`） | P68（R-06 = b 的 R-1 收口） | M | 2026-11-12 | 把 P44 的 readiness / permit 判定接到生产装配与 CLI 入口；证据包 `docs/validation/evidence/P69-T027B-E2E-WIRING/`；审查链 ⑤ PASS / ⑥ PASS / ⑦ PASS；R=0、D=1（⑧a1 文档载体自删辅助脚本，⑩ 升级用户裁定） |
 | P70 S1-STREAM-PROGRESS | ⬜ 未开始（须用户点名） | P68（R-07 b1 附条件 1） | S | — | `run --progress` 轻量流式开关（默认关闭、消费现有事件流、不做视图层）；证据包 `docs/validation/evidence/P70-S1-STREAM-PROGRESS/` |
 | P71 S1-SCOPE-ANNOTATE | ⬜ 未开始（须用户点名；需同轮显式授权） | P68（R-07 b1 附条件 2） | M | — | visible 调试指引 + REQ 阶段归属列 + 矩阵/策略/门适用性回写（X 方案，不删条目）；证据包 `docs/validation/evidence/P71-S1-SCOPE-ANNOTATE/` |
 
@@ -1936,12 +1936,12 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 四项 R 裁定（用户 2026-11-12，同轮） | R-04 = **方案 a**；R-06 = **方案 b**（先补 P44 端到端接线 R-1 收口再起 T027-B；R-1 补全另立切片，本片不推进）；R-07 = **方案 b1 + 附条件**（X 标注推迟：只动 REQ 阶段归属列，不删 REQ、不动 MVA 验收复合标准、不动自托管；附条件 1 = TUI 移出以 S1 补 `run --progress` 为前提，另立 `S1-STREAM-PROGRESS`；附条件 2 = visible 调试指引写入 `OPERATIONS` + 三条边界，随 S1 文档片）；R-10 = **方案 a**（维持 §7.5，不触准则）。OB-11 例外按 ADR-042 登记（不得作先例） |
 | 收口行 | 分阶段封板已确认（四处落地锚点）+ 四项 R 建议与裁定已落 + R-07 完整建议（技术前提 A–D + 三方案 + b1 四组合）；报告对 `docs/validation/remaining-rulings{,_EN}.md`（commit hash 与 CI run 按 §11.2 只进报告） |
 
-### P69 — `T027B-E2E-WIRING`（R-1 收口） · ⬜ 未开始
+### P69 — `T027B-E2E-WIRING`（R-1 收口） · ✅ 已完成（2026-11-12 收口）
 
 | 字段 | 内容 |
 |---|---|
 | 标识 | `T027B-E2E-WIRING`（层 2 治理侧；来源 = P57 报告 §3.3 的 R-1） |
-| 状态 | ⬜ 未开始（依赖 P44 / P67 / P68 均闭环；须用户点名） |
+| 状态 | ✅ 已完成（2026-11-12 收口；停于 ⑩ 等授权；报告对见「完成记录」行） |
 | 目标 | 把 P44 的 readiness / permit 判定接到生产装配路径与 CLI 入口 |
 | 依赖 | P44（已闭环）；P67 / P68（已闭环） |
 | 规模 | M |
@@ -1953,6 +1953,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 分级 | `[SLICE]` |
 | 探针额度 | 0（本机，无外部调用） |
 | 执行自由度清单落盘路径 | `docs/validation/evidence/P69-T027B-E2E-WIRING/freedom-list.md` |
+| 完成记录 | 报告对 `docs/validation/t027b-e2e-wiring{,_EN}.md`；审查链 ① `DESIGN: DONE` → ②a–②c 全绿 → ③ 7 条测试 + M1–M5 变异闭环 → ⑤ `PRE-REVIEW: PASS`（1 Low 注释级修复，④ 原位重跑）→ ⑥ `INDEPENDENT SCAN: PASS` → ⑦ `FINAL REVIEW: PASS`（终审 1 + 复审 0 + 盲审 0）；GLM 批量 2 次；R=0、D=1（⑧a1 文档载体在切片目录内自删其一次性辅助脚本、预删计数未记——次序违规，⑩ 升级用户裁定）；停于 ⑩ 等授权（不写 hash/run，§11.2）。后续 ⑧a 文档载体在 `tmp/<切片ID>/` 内不得自删其辅助脚本，须由 ⑧c 统一清理 |
 
 ### P70 — `S1-STREAM-PROGRESS`（TUI 移出附条件 1） · ⬜ 未开始
 

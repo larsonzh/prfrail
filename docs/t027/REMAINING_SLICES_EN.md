@@ -99,7 +99,7 @@
 | P66 CHECKLIST-RULES-HOIST | ✅ Done (closed 2026-11-11; §13 five subsections landed; ⑦ final FINDINGS ⇒ remediation then re-review; ⑥ formal defect downgraded; R=3; stopped at ⑩ awaiting authorization) | P65 (layer-2 governance side, snapshot→directive structural migration) | L | 2026-11-11 | Report pair `docs/validation/checklist-rules-hoist{,_EN}.md`; evidence pack `docs/validation/evidence/P66-CHECKLIST-RULES-HOIST/`; temp artefacts `tmp/P66-CHECKLIST-RULES-HOIST/` |
 | P67 GATES-DEBT-CLEANUP | ✅ Done (closed 2026-11-12; R=3, D=1; ⑦ blind 1 + final 1 + re-review 1; SELFTEST 737/737; controller V4 Pro, ADR-041) | P66 (layer-2 new queue item 13; one-shot cleanup: g4b cache LRU / gate pitfall 27 / §12.4 sampling block / ⑥ prompt hardening) | L | 2026-11-12 | Report pair `docs/validation/gates-debt-cleanup{,_EN}.md`; evidence pack `docs/validation/evidence/P67-GATES-DEBT-CLEANUP/`; temp artefacts `tmp/P67-GATES-DEBT-CLEANUP/` |
 | P68 REMAINING-RULINGS | ✅ Done (closed 2026-11-12; R=1, D=1; ⑥ skip confirmed by ⑦; ⑦ final PASS; SELFTEST 737/737; controller Flash) | P67 (layer-2 governance side; advice on the four R items + stage-progression seal confirmation) | M | 2026-11-12 | Report pair `docs/validation/remaining-rulings{,_EN}.md`; evidence pack `docs/validation/evidence/P68-REMAINING-RULINGS/`; temp artefacts `tmp/P68-REMAINING-RULINGS/` |
-| P69 T027B-E2E-WIRING | ⬜ Not started (depends on P44 / P67 / P68 all closed; user must name it) | P68 (the R-1 closeout from R-06 = b) | M | — | Wire the P44 readiness / permit verdicts into the production assembly and the CLI entry; evidence pack `docs/validation/evidence/P69-T027B-E2E-WIRING/` |
+| P69 T027B-E2E-WIRING | ✅ Done (closed 2026-11-12; report pair `docs/validation/t027b-e2e-wiring{,_EN}.md`) | P68 (the R-1 closeout from R-06 = b) | M | 2026-11-12 | Wire the P44 readiness / permit verdicts into the production assembly and the CLI entry; evidence pack `docs/validation/evidence/P69-T027B-E2E-WIRING/`; review chain ⑤ PASS / ⑥ PASS / ⑦ PASS; R=0, D=1 (the ⑧a1 doc carrier deleted its helper scripts, escalated to the user at ⑩) |
 | P70 S1-STREAM-PROGRESS | ⬜ Not started (user must name it) | P68 (R-07 b1 condition 1) | S | — | The lightweight `run --progress` stream switch (off by default, consuming the existing event stream, no view layer); evidence pack `docs/validation/evidence/P70-S1-STREAM-PROGRESS/` |
 | P71 S1-SCOPE-ANNOTATE | ⬜ Not started (user must name it; needs a same-turn explicit authorization) | P68 (R-07 b1 condition 2) | M | — | The visible debugging guidance + the REQ stage-ownership column + the matrix / strategy / gate-applicability write-backs (X-style, no entry deleted); evidence pack `docs/validation/evidence/P71-S1-SCOPE-ANNOTATE/` |
 
@@ -1923,12 +1923,12 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Four-R rulings (user, 2026-11-12, same turn) | R-04 = **option a**; R-06 = **option b** (close the P44 end-to-end wiring R-1 first, then start T027-B; the R-1 work is its own slice, not advanced here); R-07 = **option b1 plus conditions** (X-style deferral: only the REQ stage-ownership column changes - no REQ deleted, the MVA acceptance composite untouched, self-hosting untouched; condition 1 = the TUI carve-out presupposes a `run --progress` addition inside S1, carried by `S1-STREAM-PROGRESS`; condition 2 = the visible debugging guidance goes into `OPERATIONS` with three boundaries, carried by an S1 documentation slice); R-10 = **option a** (keep §7.5; no directive edit). The OB-11 exception is registered as ADR-042 (not a precedent) |
 | Closeout row | Stage-progression seal confirmed (four landing anchors) + advice and rulings on the four R items landed + the full R-07 advice (technical premises A-D + three options + the four b1 combinations); report pair `docs/validation/remaining-rulings{,_EN}.md` (commit hash and CI run go into the report only, per §11.2) |
 
-### P69 — `T027B-E2E-WIRING` (R-1 closeout) · ⬜ not started
+### P69 — `T027B-E2E-WIRING` (R-1 closeout) · ✅ done (closed 2026-11-12)
 
 | Field | Content |
 |---|---|
 | Identifier | `T027B-E2E-WIRING` (layer-2 governance side; source = R-1 in P57 report §3.3) |
-| Status | ⬜ not started (depends on P44 / P67 / P68 all closed; user must name it) |
+| Status | ✅ done (closed 2026-11-12; stopped at ⑩ pending authorisation; see the "Completion record" row for the report pair) |
 | Goal | Wire the P44 readiness / permit verdicts into the production assembly path and the CLI entry |
 | Dependency | P44 (closed); P67 / P68 (closed) |
 | Size | M |
@@ -1940,6 +1940,7 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Tier | `[SLICE]` |
 | Probe budget | 0 (local machine, no external calls) |
 | Freedom-list path | `docs/validation/evidence/P69-T027B-E2E-WIRING/freedom-list.md` |
+| Completion record | Report pair `docs/validation/t027b-e2e-wiring{,_EN}.md`; review chain ① `DESIGN: DONE` → ②a–②c all green → ③ 7 tests + the M1–M5 mutation loop closed → ⑤ `PRE-REVIEW: PASS` (1 Low comment-level fix, ④ rerun in place) → ⑥ `INDEPENDENT SCAN: PASS` → ⑦ `FINAL REVIEW: PASS` (final 1 + re-review 0 + blind 0); GLM batch 2 times; R=0, D=1 (the ⑧a1 doc carrier deleted its one-shot helper scripts inside the slice directory before the pre-deletion count was recorded - an ordering violation, escalated to the user at ⑩); stopped at ⑩ pending authorisation (no hash/run recorded, §11.2). From the next slice on, the ⑧a doc carrier must not delete its helper scripts inside `tmp/<slice-id>/`; the ⑧c wrap-up removes them |
 
 ### P70 — `S1-STREAM-PROGRESS` (TUI carve-out condition 1) · ⬜ not started
 

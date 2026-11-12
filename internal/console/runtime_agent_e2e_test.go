@@ -16,6 +16,7 @@ import (
 	"github.com/larsonzh/prfrail/internal/adapters"
 	"github.com/larsonzh/prfrail/internal/chain"
 	"github.com/larsonzh/prfrail/internal/evidence"
+	"github.com/larsonzh/prfrail/internal/gates"
 	"github.com/larsonzh/prfrail/internal/guard"
 	"github.com/larsonzh/prfrail/internal/snapshot"
 	"github.com/larsonzh/prfrail/internal/tickets"
@@ -356,6 +357,7 @@ func newAssemblyFixture(t *testing.T, knobs assemblyKnobs) *assemblyFixture {
 			RunID:               assemblyRunID,
 			RunRoot:             runRoot,
 			Definition:          assemblyDefinition(),
+			ProbePermit:         newTestProbePermit(t),
 			RequestRecord:       requestRecord,
 			CapabilityRecord:    capability,
 			EnforcementRecord:   enforcement,
@@ -376,6 +378,13 @@ func newAssemblyFixture(t *testing.T, knobs assemblyKnobs) *assemblyFixture {
 			Clock:         func() time.Time { return time.Now().UTC() },
 		},
 	}
+}
+
+// newTestProbePermit returns a fresh one-shot probe permit bound to a marker in
+// the test's own temporary directory, so each fixture owns an unclaimed quota.
+func newTestProbePermit(t *testing.T) *gates.ProbePermit {
+	t.Helper()
+	return gates.NewProbePermit("test-probe-permit", filepath.Join(t.TempDir(), "probe-permit.marker"), 1)
 }
 
 // agentRunnerPublicationDurability probes the platform constant through the

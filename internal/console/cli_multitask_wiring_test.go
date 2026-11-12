@@ -142,6 +142,7 @@ func p51SevenAgentRunnerArgs(t *testing.T) []string {
 		"--cost-ledger", filepath.Join(dir, "cost.json"),
 		"--agent-cli", filepath.Join(dir, "agent-cli"),
 		"--agent-version", "p51-agent-0.1.0",
+		"--probe-permit", filepath.Join(t.TempDir(), "probe-permit.marker"),
 	}
 }
 

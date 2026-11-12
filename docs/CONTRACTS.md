@@ -185,7 +185,7 @@ attempt 的唯一真源是持久执行上下文（`TaskAttemptResolver`）；缺
 
 失败、超时与重启均不重置额度：`LoadProbePermit` 见到标记即重建为 `Spent`，标记体损坏同样按 `Spent` 处理，无标记才是 `Unused`。`Complete` 以 `CAS(1→2)` 落终态，对已 `Spent` 幂等，对从未 `Require` 的 `Unused` 返回 `ErrProbePermitInUse`，故完成动作不能凭空造出额度。上下文取消发生在落盘之前则不消耗额度；落盘之后取消仍然消耗，被放弃的尝试不退额度。标记文件的生命周期归调用方：删除标记等同于重新签发额度，生产路径不得删除。
 
-边界：本切片只落判定实现与测试，`internal/console/**` 未被改动，故 C7 / N4 的端到端接线尚未完成，接线属后续切片。
+边界：本切片只落判定实现与测试，C7 / N4 的端到端接线已由 P69 `T027B-E2E-WIRING` 完成（报告：`docs/validation/t027b-e2e-wiring{,_EN}.md`）；`internal/console/**` 的接线点见该报告 §2。
 
 ## 5. Gate Hook 协议
 

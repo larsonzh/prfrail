@@ -235,6 +235,11 @@ type SupervisedAssemblyOptions struct {
 	GateHooks     map[string]gates.Hook
 	Clock         func() time.Time
 	IDs           func() string
+	// ProbePermit is the one-shot probe permit of the first start. The
+	// supervised run is a re-entrant state machine, so only the first start (no
+	// operator-interaction ledger yet) claims the quota; every re-entry passes
+	// without one. A nil permit on a first start refuses fail-closed.
+	ProbePermit *gates.ProbePermit
 	// CrashPoint, when set, is called at each durable boundary of the
 	// confirmation sequence (supervisedCrashAfterConfirmation /
 	// supervisedCrashAfterResume / supervisedCrashAfterWindowOpen). It exists so
@@ -278,6 +283,24 @@ func ExecuteSupervisedRun(ctx context.Context, options SupervisedAssemblyOptions
 	}
 	if options.VisibleSender == nil {
 		return RunSummary{}, fmt.Errorf("%w: visible sender is required", ErrInvalidConfig)
+	}
+	// The probe permit gate applies to the first start only: the supervised run
+	// is a re-entrant state machine and the operator-interaction ledger exists
+	// once the first start parked, so a re-entry must not be forced to hold a
+	// fresh quota. A non-NotExist stat error fails closed.
+	freshStart := false
+	if _, statErr := os.Stat(SupervisedInteractionsLedgerPath(options.RunRoot)); statErr != nil {
+		if !errors.Is(statErr, os.ErrNotExist) {
+			return RunSummary{}, fmt.Errorf("supervised probe permit ledger check: %w", statErr)
+		}
+		freshStart = true
+	}
+	if freshStart {
+		releaseProbePermit, permitErr := requireProbePermit(ctx, options.ProbePermit)
+		if permitErr != nil {
+			return RunSummary{}, permitErr
+		}
+		defer releaseProbePermit()
 	}
 	eventLog := runEventLogPath(options.RunRoot)
 	if err := ensureAgentRunnerEventLogMarker(eventLog); err != nil {

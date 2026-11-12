@@ -132,6 +132,9 @@ func newSupervisedHarness(t *testing.T, script []string, hookFail bool, timeoutM
 		GateHooks: map[string]gates.Hook{supervisedTestHookID: supervisedTestHook(supervisedTestHookID)},
 		Clock:     harness.clock,
 		IDs:       harness.nextID,
+		// Every harness owns a fresh run root, so the first start of every
+		// harness legitimately claims its own one-shot probe permit.
+		ProbePermit: newTestProbePermit(t),
 	}
 	return harness
 }
@@ -882,9 +885,10 @@ func TestRunCommandRefusesMixedSupervisedAgentRunnerInputs(t *testing.T) {
 func TestAgentRunnerAssemblyRefusesSupervisedDefinition(t *testing.T) {
 	runRoot := t.TempDir()
 	_, err := ExecuteAgentRunnerRun(context.Background(), AgentRunnerAssemblyOptions{
-		RunID:      supervisedTestRunID,
-		RunRoot:    runRoot,
-		Definition: supervisedTestDefinition(300000),
+		RunID:       supervisedTestRunID,
+		RunRoot:     runRoot,
+		Definition:  supervisedTestDefinition(300000),
+		ProbePermit: newTestProbePermit(t),
 	})
 	if !errors.Is(err, ErrInvalidConfig) {
 		t.Fatalf("P1: the AgentRunner assembly must refuse a supervised definition, got %v", err)
@@ -904,9 +908,10 @@ func TestSupervisedAssemblyRefusesAgentRunnerDefinition(t *testing.T) {
 		Steps: []chain.Step{{ID: supervisedTestStepID, Kind: "code", Mode: chain.IsolatedWorkspace}},
 	}}}
 	_, err := ExecuteSupervisedRun(context.Background(), SupervisedAssemblyOptions{
-		RunID:      supervisedTestRunID,
-		RunRoot:    t.TempDir(),
-		Definition: definition,
+		RunID:       supervisedTestRunID,
+		RunRoot:     t.TempDir(),
+		Definition:  definition,
+		ProbePermit: newTestProbePermit(t),
 	})
 	if !errors.Is(err, ErrInvalidConfig) {
 		t.Fatalf("the supervised assembly must refuse an AgentRunner definition, got %v", err)
@@ -968,6 +973,7 @@ func TestSupervisedScopeUnderivableFailsClosed(t *testing.T) {
 		Definition:    definition,
 		VisibleSender: &adapters.StubVisibleClient{Script: []string{adapters.VisibleStubAccepted}},
 		Clock:         func() time.Time { return time.Date(2026, 10, 11, 9, 0, 0, 0, time.UTC) },
+		ProbePermit:   newTestProbePermit(t),
 	})
 	if !errors.Is(err, chain.ErrInvalidDefinition) {
 		t.Fatalf("an underivable scope must fail closed, got %v", err)

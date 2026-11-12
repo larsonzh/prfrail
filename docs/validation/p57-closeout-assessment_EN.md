@@ -69,6 +69,8 @@ Verdict: `T027-B` is valid as a **milestone** and is registered; as an **open it
 | R-2 | Enforcement production landing, segment B | F6: three candidate scopes, no ruling | OB-55 open item + pending R-06 | The user rules on OB-55 ownership |
 | R-3 | Real CLI end-to-end (AT-23 real-candidate leg) | F7 + `docs/validation/s1-exit.md:43` | layer 1 item 8 `AT23-RESTRICTED-CANDIDATE` | R-08 / R-09 rulings plus a compatible candidate |
 
+- **R-1 is closed by P69 `T027B-E2E-WIRING`** (report: `docs/validation/t027b-e2e-wiring{,_EN}.md`)
+
 ## 4. P6 assessment — S1 Exit remaining-gate closeout inventory
 
 ### 4.1 Verdict

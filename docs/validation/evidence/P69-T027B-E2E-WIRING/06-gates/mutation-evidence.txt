@@ -1,0 +1,34 @@
+# P69 ③ 变异检验证据（mutation-evidence）
+
+载体：`prfrail-tester` + `DeepSeek V4.1 Flash (deepseek)`。备份与红绿日志在 `tmp/P69-T027B-E2E-WIRING/03-tests/`（⑧c 清理）。恢复方式 = 写回备份字节（全程未用 git checkout / git restore）；每次恢复后 sha256 与备份一致，再跑聚焦测试确认绿。
+
+| 变异 | 对象（文件 / 块） | 聚焦测试 | 红 | 恢复 sha256 一致 | 恢复后绿 |
+|---|---|---|---|---|---|
+| M1 | runtime_agent.go：Step 0 判定块 + requireProbePermit/defer 块（一起删） | TestAgentRunnerAssemblyRefusesNilProbePermit | FAIL | 一致（1100E2DE…C3F336） | PASS |
+| M2 | runtime_agent.go：仅 requireProbePermit + defer 块 | TestAgentRunnerAssemblyRefusesSpentProbePermit | FAIL | 一致（1100E2DE…C3F336；首轮恢复撞文件锁，重试循环成功，如实登记） | PASS |
+| M3 | cli.go：整个 CLI presence gate 块（保编译补 `_ = *probePermit`） | TestRunRefusesMissingProbePermitFlag | FAIL | 一致（5C8D6B15…620EE2B） | PASS |
+| M4 | cli.go：`!inputs.complete()` 拒绝块 | TestRunRefusesIncompleteRecordsBeforeBurningPermit | FAIL | 一致（5C8D6B15…620EE2B） | PASS |
+| M5 | runtime_agent.go：`defer releaseProbePermit()` → `_ = releaseProbePermit`（丢释放保编译的等价变异） | TestProbePermitConsumedAfterSuccessfulAssembly | FAIL | 一致（1100E2DE…C3F336） | PASS |
+
+## 红时输出尾行（原文）
+
+M1: readiness_gate_test.go:113: a nil probe permit must be refused with the missing sentinel, got AgentRunner replay store publication durability unproven: request publication: mitigation stop outcome unproven: no launch receipt was recorded
+M2: readiness_gate_test.go:152: a spent probe permit must be refused with the consumed sentinel, got AgentRunner replay store publication durability unproven: request publication: mitigation stop outcome unproven: no launch receipt was recorded
+M3: readiness_gate_test.go:200: the refusal must name the missing --probe-permit flag, stderr="run: request record: open C:\Users\...\request-record.json: The system cannot find the file specified."
+M4: readiness_gate_test.go:220: the refusal must keep the noop-only wording, stderr="run: request record: open C:\Users\...\request-record.json: The system cannot find the file specified."
+M5: readiness_gate_test.go:98: a second run on the same permit must refuse with the consumed sentinel, got probe permit already in use: probe permit "t027-consumed" is held by an in-flight attempt
+
+## 变异口径说明（③ 原文）
+
+1. 正例 1 的「运行成功」断言平台感知：`agentRunnerPublicationDurability` 在 Windows 为 unproven，生产 dispatcher 在 R 前拒绝 ⇒ 本地断言 nil error + COMPLETED 仅在耐久 proven 分支；否则断言已登记的 `ErrAgentRunnerReplayStoreDurabilityUnproven`。被检验对象（额度恰消费一次、二跑 = Consumed 非 InUse）在两端都可执行可证伪（M5 证实）。Ubuntu CI 上严格成功分支运行。
+2. M1 的红落在哨兵断言（Windows 上 marker 断言在耐久拒绝之后才可及）；被测行为不受影响。
+3. M5 以 `_ = releaseProbePermit` 表达（删除该行是编译错误）。
+4. M3 保编译补 `_ = *probePermit`。
+5. M2 首轮恢复撞 Windows 文件锁（go test 刚结束），重试循环后恢复成功并补绿跑。
+
+## 回归读数（③ 原文）
+
+- `go test -count=1 ./internal/gates/...` ok（反例 4：既有 P44 判定测试不变，gates 零 diff）
+- `go test -count=1 ./internal/console/...` ok
+- 聚焦 7 条新测试 PASS
+- gofmt 空 / build exit 0 / vet exit 0

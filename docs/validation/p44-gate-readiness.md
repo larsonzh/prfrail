@@ -163,6 +163,7 @@ INDEPENDENT SCAN: PASS
 
 - **R-2**：L3 以 `Seal` 绑定与 `AT23Hash` 为输入，不含 ① 要求的构造签名层绑定；跨层取用仍由 sealed interface 与三个方法集差异阻挡。
 - **R-3**：C7/N4 未端到端接线，只能宣称门控就绪与许可路径已满足当前切片验收前提，不得宣称端到端闭合。
+- **端到端接线已由 P69 `T027B-E2E-WIRING` 完成（报告：`docs/validation/t027b-e2e-wiring{,_EN}.md`）**
 - **R-4**：`-race` 未在本机执行，并发结论依赖 `-count=50 -cpu 1,2,4` 与 `-count=20` 替代证据；CI Race 腿不含 `internal/gates`。
 - **⑥ Section D 已补覆盖**：`SealBinding.validate` 三边界（`Attempt < 1`、`TaskKey` 为空、`SealHash` 非法）已在 FR-02 补测，记为已覆盖。
 - **⑥ Section D 仍未覆盖（登记，非缺陷）**：`LoadProbePermit` 非 `NotExist` 读失败、`Require` 的 `ctx == nil` 分支、`Complete` 未知态、真跨进程双写。
