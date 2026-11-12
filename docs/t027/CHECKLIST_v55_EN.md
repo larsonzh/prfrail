@@ -4,7 +4,7 @@ Generated: 2026-11-12, HEAD = `665a31f` (the P68 back-fill commit), directive v1
 Supersedes: v54 and every older snapshot in full (historical snapshot files are kept, not deleted). A docs-only back-fill commit only advances HEAD and does not change the meaning of this section's anchors.
 **Structure note**: this version keeps the post-§13-migration structure - §7 / §8 / §9 are pointer sections (to directive §13.1 / §13.2 / §13.3 / §13.4) and rule entities are not duplicated here (§11.2, "one fact described in one place"). Snapshots v50-v54 are not retro-edited (§11.1).
 
-Changes versus v54: (1) **P68 recorded** (assessment type, closed); (2) **§2 fact pack switched to P68**; (3) **§4 layer 2 gains three items P69 / P70 / P71**, and `T027-B` is stated explicitly as a main-line milestone; (4) **§5 gains one observation** (the TUI carve-out condition not yet landed = long-run usability degradation); (5) **§6 cleared** (R-04 / R-06 / R-07 / R-10 ruled).
+Changes versus v54: (1) **P68 recorded** (assessment type, closed); (2) **§2 fact pack switched to P68**; (3) **§4 layer 2 gains three items P69 / P70 / P71**, and `T027-B` is stated explicitly as a main-line milestone; (4) **§5 records one slice-level recommendation** (the TUI carve-out condition not yet landed = long-run usability degradation, not registered as an OB); (5) **§6 cleared** (R-04 / R-06 / R-07 / R-10 ruled).
 
 ## 1. Current anchors (check these 8 numbers first)
 
