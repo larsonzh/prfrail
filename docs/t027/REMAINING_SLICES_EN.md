@@ -98,6 +98,7 @@
 | P65 GATE-PIT-26-LANDING | ✅ Done (closed 2026-11-11; B-part landed + A-part path registered; the actual A-part landing awaits v54/P66 generation; R=1; stopped at ⑩ awaiting authorization) | P64 (promoted from the v53 §5 observation item; not a layer-2 queue item) | S | 2026-11-11 | Evidence pack `docs/validation/evidence/P65-GATE-PIT-26-LANDING/`; temp `tmp/P65-GATE-PIT-26-LANDING/`; report pair `docs/validation/gate-pit-26-landing{,_EN}.md` |
 | P66 CHECKLIST-RULES-HOIST | ✅ Done (closed 2026-11-11; §13 five subsections landed; ⑦ final FINDINGS ⇒ remediation then re-review; ⑥ formal defect downgraded; R=3; stopped at ⑩ awaiting authorization) | P65 (layer-2 governance side, snapshot→directive structural migration) | L | 2026-11-11 | Report pair `docs/validation/checklist-rules-hoist{,_EN}.md`; evidence pack `docs/validation/evidence/P66-CHECKLIST-RULES-HOIST/`; temp artefacts `tmp/P66-CHECKLIST-RULES-HOIST/` |
 | P67 GATES-DEBT-CLEANUP | ✅ Done (closed 2026-11-12; R=3, D=1; ⑦ blind 1 + final 1 + re-review 1; SELFTEST 737/737; controller V4 Pro, ADR-041) | P66 (layer-2 new queue item 13; one-shot cleanup: g4b cache LRU / gate pitfall 27 / §12.4 sampling block / ⑥ prompt hardening) | L | 2026-11-12 | Report pair `docs/validation/gates-debt-cleanup{,_EN}.md`; evidence pack `docs/validation/evidence/P67-GATES-DEBT-CLEANUP/`; temp artefacts `tmp/P67-GATES-DEBT-CLEANUP/` |
+| P68 REMAINING-RULINGS | ✅ Done (closed 2026-11-12; R=1, D=0; ⑥ skip confirmed by ⑦; ⑦ final PASS; SELFTEST 737/737; controller Flash) | P67 (layer-2 governance side; advice on the four R items + stage-progression seal confirmation) | M | 2026-11-12 | Report pair `docs/validation/remaining-rulings{,_EN}.md`; evidence pack `docs/validation/evidence/P68-REMAINING-RULINGS/`; temp artefacts `tmp/P68-REMAINING-RULINGS/` |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1902,6 +1903,22 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | R / D baseline | R = 0, D = 0 (registered at start, 2026-11-12); temp-artefact D = 1 (including 1 controller violation, confirmed by the user in lieu; a one-time exception for this slice, not precedent-setting) |
 | Temp artefact location | `tmp/P67-GATES-DEBT-CLEANUP/` (append-only until 8c) |
 | Closeout row | Criterion LRU + cap (g4b) + §13.4 items 27–30 + §12.4 settlement block + Appendix B.6 hardening landed; report pair `docs/validation/gates-debt-cleanup{,_EN}.md` (commit hash and CI run go into the report only, per §11.2, not into this ledger) |
+
+### P68 — `REMAINING-RULINGS` (layer-2 governance side · stage-progression seal confirmation + ruling advice for the four R items · assessment type) · ✅ Done (closed 2026-11-12)
+
+| Field | Content |
+|---|---|
+| Identifier | `REMAINING-RULINGS` (assessment-type `[SLICE]`; started by the user's naming; advice only, no ruling on the user's behalf) |
+| Status | ✅ Done (closed 2026-11-12; R = 1, D = 1; ⑥ skipped (§7.2.1 three conditions, confirmed by ⑦); ⑦ final `FINAL REVIEW: PASS` with 0 findings; SELFTEST 737/737; controller `DeepSeek V4.1 Flash (deepseek)` (default)) |
+| Goal | ① confirm the stage-progression seal (verify inside this repo where the A1 ruling of 2026-11-09 landed); ② for each of the four R items (R-04 / R-06 / R-07 / R-10): current-state anchors + candidate options + impact analysis + advice |
+| Pipeline | ① five artefacts → ③ consistency check → ④ gates → ⑤ pre-review → ⑥ (judged under §7.2.1; a skip needs ⑦ confirmation) → ⑦ final review 1+2 → ⑧ → ⑨ → ⑧c → ⑩ (no ②③ implementation or tests) |
+| Boundary | Advice only, no ruling on the user's behalf; no change to product code / CONTRACTS / schema / fixtures / CI; no change to the directive body (if R-10 needs a §7.5 edit ⇒ advise only, stop and escalate); no change to v50–v54; v55 not generated |
+| Deliverables | Report pair `docs/validation/remaining-rulings{,_EN}.md`; evidence pack `docs/validation/evidence/P68-REMAINING-RULINGS/`; this ledger block |
+| Freedom-list path | `docs/validation/evidence/P68-REMAINING-RULINGS/freedom-list.md` |
+| R / D baseline | R = 0, D = 0 (registered at start, 2026-11-12) |
+| Temp artefact location | `tmp/P68-REMAINING-RULINGS/` (append-only until 8c) |
+| Four-R rulings (user, 2026-11-12, same turn) | R-04 = **option a**; R-06 = **option b** (close the P44 end-to-end wiring R-1 first, then start T027-B; the R-1 work is its own slice, not advanced here); R-07 = **option b1 plus conditions** (X-style deferral: only the REQ stage-ownership column changes - no REQ deleted, the MVA acceptance composite untouched, self-hosting untouched; condition 1 = the TUI carve-out presupposes a `run --progress` addition inside S1, carried by `S1-STREAM-PROGRESS`; condition 2 = the visible debugging guidance goes into `OPERATIONS` with three boundaries, carried by an S1 documentation slice); R-10 = **option a** (keep §7.5; no directive edit). The OB-11 exception is registered as ADR-042 (not a precedent) |
+| Closeout row | Stage-progression seal confirmed (four landing anchors) + advice and rulings on the four R items landed + the full R-07 advice (technical premises A-D + three options + the four b1 combinations); report pair `docs/validation/remaining-rulings{,_EN}.md` (commit hash and CI run go into the report only, per §11.2) |
 
 ## Known defects (to be handled before later slices)
 

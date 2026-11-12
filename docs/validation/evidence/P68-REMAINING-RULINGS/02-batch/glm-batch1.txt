@@ -1,0 +1,35 @@
+R-04（DR-13「已修复 + 观察」口径）
+- 事实 1：`docs/t027/REMAINING_SLICES.md:1950` — DR-13 行为 `TestAgentRunnerPinnedCLILauncherConcurrentStartsHaveOneWinner`，处置列写「**已修复**（2026-11-01）——① 定性 `DIAGNOSIS: B` 真实排他窗口…④ 若再现同一断言串即重开」。
+- 事实 2：`docs/t027/REMAINING_SLICES.md:1405` — 段标题「DR13-FIX — `DR13-FIX`（P45 前置修复片）· ✅ 已完成」。
+- 事实 3：`docs/t027/REMAINING_SLICES.md:1413` — 依赖「P44 闭环（`16abe2b`）；DR-13 二次复现（run `41253798647` 与 `41257990185`）」。
+
+观察期复现记录：四个版本只出现 R-04 行本身（口径文字「待裁」），未出现新的复现登记。
+- v51：`docs/t027/CHECKLIST_v51.md:113` — 「| R-04 | DR-13「已修复 + 观察」口径 | 待裁 |」；无其他 DR-13 行（无）。
+- v52：`docs/t027/CHECKLIST_v52.md:119` — 同行同文「待裁」；无。
+- v53：`docs/t027/CHECKLIST_v53.md:131` — 同行同文「待裁」；无。
+- v54：`docs/t027/CHECKLIST_v54.md:144` — 同行同文「待裁」；另 `:150` 记「R-04 / R-06 / R-07 / R-10 维持待裁」。
+
+R-06（OB-55 归属与 T027-B 节奏）
+- 事实 1：`docs/t027/CHECKLIST_v54.md:145` — 「| R-06 | OB-55 归属与 T027-B 节奏 | 待裁 |」。
+- 事实 2：`docs/t027/REMAINING_SLICES.md:639` — T027-B 追踪行出处 = `DEV_PLAN.md:145`（待评估登记）+ `DELIVERY_DIRECTIVE.md:910`（OB-55）+ `t028-supervised-black-box.md:140`（D-18 已知边界）。
+- 事实 3：`docs/t027/REMAINING_SLICES.md:642` — P57 评估结论「**不新立片**…R-2 OB-55 归属（待 R-06）、R-3 真实 CLI 端到端（层 1 第 8 项）」。
+- 事实 4：`docs/DEV_PLAN.md:151` — 「T027-B 立项登记（2026-10-31…）：`T027-B`（防御性重构期）已立项；边界冲突 OB-55 与真实 CLI 端到端依赖仍然有效」。
+- 事实 5：`docs/DEV_PLAN.md:153` — 收口评估记「P5 判定 `T027-B` 不新立片…余项三叉…R-2 OB-55 归属（待 R-06 裁定）」。
+- 事实 6：`docs/DEV_PLAN.md:177` — 段标题「### 11 月重构里程碑（T027-B）」，下列 P37 基线、P39–P44 完成状态。
+
+R-07（MVA、S1 移出项与 S2 承诺收窄）
+- 事实 1：`docs/t027/CHECKLIST_v54.md:146` — 「| R-07 | MVA、S1 移出项与 S2 承诺收窄 | 待裁 |」。
+- 事实 2：`docs/validation/s1-exit.md:43` — AT-23 行：「阶段 1 条件闭合达成（2026-11-09，F2 修复片收口；阶段 2 不适用，用户 2026-11-09 裁定 A1）」。
+- 事实 3：`docs/validation/s1-exit.md:52` — 「核心任务链与 fail-close 场景 | BLOCKED …S-G1 依据 = AT-23 阶段 1 条件闭合…**不得声称 S1 Exit 整体通过**；S-G2 门级判定待 v54 快照」。
+- 事实 4：`docs/validation/p57-closeout-assessment.md:82` — S-G1 现状「不可达 / 未通过：`s1-exit.md:43`」；`:88` S-G7「不可达：`s1-exit.md:52`…」。
+- 事实 5：`docs/DEV_PLAN.md:119` — T028 完成记「状态：`COMPLETED`…本片非可运行发布，真实 CLI 端到端依赖 T027-B」。
+
+R-10（总预算与各片模型上限）
+- 事实 1：`docs/t027/CHECKLIST_v54.md:147` — 「| R-10 | 总预算与各片模型上限 | 待裁（阻塞排片） |」。
+- 事实 2：`docs/t027/CHECKLIST_v53.md:137` — 同行文字为「待裁（阻塞排片）」（v51 `:119` 同）。
+- 事实 3：`docs/t027/CHECKLIST_v54.md:140` — §六 标题同时点名 R-04 / R-06 / R-07 / R-10 四项为本次待裁集合。
+- 说明：本节所列六份文档内未出现预算数值或各片额度表行；`docs/validation/r08-r09-ruling.md:152`（§6 回写去向）只列出 §六 R 表翻转去向，未涉 R-10 预算数值。
+
+补充：`docs/validation/r08-r09-ruling.md:103`（§4 分阶段策略标题）、`:111`–`:113`（阶段 1→2 三条触发条件）、`:120`（「分阶段只影响 R-08.1 和 R-08.2 两项」）；`docs/validation/p57-closeout-assessment.md:78`（§4.2 门清单标题）。
+
+BATCH-1: DONE（实得 2418 字符）

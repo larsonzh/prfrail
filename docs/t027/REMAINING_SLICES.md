@@ -98,6 +98,7 @@
 | P65 GATE-PIT-26-LANDING | ✅ 已完成（2026-11-11 收口；B-part 落地 + A-part 路径登记；A-part 实际落地待 v54/P66 生成时；R=1；停于 ⑩ 等授权） | P64（v53 §五 观察项升格；非层 2 原队列） | S | 2026-11-11 | 证据包 `docs/validation/evidence/P65-GATE-PIT-26-LANDING/`；临时件 `tmp/P65-GATE-PIT-26-LANDING/`；报告对 `docs/validation/gate-pit-26-landing{,_EN}.md` |
 | P66 CHECKLIST-RULES-HOIST | ✅ 已完成（2026-11-11 收口；§13 五节落地；⑦ 终审 FINDINGS⇒整改后复审；⑥ 形式缺陷降级；R=3；停于 ⑩ 等授权） | P65（层 2 治理侧，快照→准则结构性迁移） | L | 2026-11-11 | 报告对 `docs/validation/checklist-rules-hoist{,_EN}.md`；证据包 `docs/validation/evidence/P66-CHECKLIST-RULES-HOIST/`；临时件 `tmp/P66-CHECKLIST-RULES-HOIST/` |
 | P67 GATES-DEBT-CLEANUP | ✅ 已完成（2026-11-12 收口；R=3、D=1；⑦ 盲审 1 + 终审 1 + 复审 1；SELFTEST 737/737；主控 V4 Pro，ADR-041） | P66（层 2 新增队列第 13 项；清欠四类：g4b 缓存 LRU / 第 27 条门禁坑 / §12.4 抽查记录块 / ⑥ 提示词加固） | L | 2026-11-12 | 报告对 `docs/validation/gates-debt-cleanup{,_EN}.md`；证据包 `docs/validation/evidence/P67-GATES-DEBT-CLEANUP/`；临时件 `tmp/P67-GATES-DEBT-CLEANUP/` |
+| P68 REMAINING-RULINGS | ✅ 已完成（2026-11-12 收口；R=1、D=0；⑥ 跳过经 ⑦ 确认；⑦ 终审 PASS；SELFTEST 737/737；主控 Flash） | P67（层 2 治理侧；四项 R 裁定建议 + 分阶段策略封板确认） | M | 2026-11-12 | 报告对 `docs/validation/remaining-rulings{,_EN}.md`；证据包 `docs/validation/evidence/P68-REMAINING-RULINGS/`；临时件 `tmp/P68-REMAINING-RULINGS/` |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -1915,6 +1916,22 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | R / D 基线 | R = 0、D = 0（2026-11-12 起跑登记）；临时件 D = 1（含 1 次主控本人违规、用户代行确认；本片一次性例外，不得作先例） |
 | 临时件落点声明 | 本片临时目录 = `tmp/P67-GATES-DEBT-CLEANUP/`（⑧c 前只增不删） |
 | 收口行 | 判据本体 LRU + 上限（g4b）+ §13.4 第 27–30 条 + §12.4 清账块 + 附录 B.6 加固已落盘；报告对 `docs/validation/gates-debt-cleanup{,_EN}.md`（commit hash 与 CI run 按 §11.2 只进报告，不进本台账） |
+
+### P68 — `REMAINING-RULINGS`（层 2 治理侧 · 分阶段策略封板确认 + 四项 R 裁定建议 · 评估类） · ✅ 已完成（2026-11-12 收口）
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `REMAINING-RULINGS`（评估类 `[SLICE]`；用户点名起跑；只出建议、不替用户裁定） |
+| 状态 | ✅ 已完成（2026-11-12 收口；R = 1、D = 1；⑥ 跳过（§7.2.1 三条件，⑦ 确认）；⑦ 终审 `FINAL REVIEW: PASS` 0 findings；Selftest 737/737；主控 `DeepSeek V4.1 Flash (deepseek)`（默认）） |
+| 目标 | ① 分阶段策略封板确认（A1 裁定 2026-11-09 在本仓库内的落地核实）；② 四项 R（R-04 / R-06 / R-07 / R-10）现状锚点 + 候选方案 + 影响分析 + 建议 |
+| 流水线 | ① 五件 → ③ 一致性检查 → ④ 门禁 → ⑤ 预审 → ⑥（按 §7.2.1 判定，可跳过需 ⑦ 确认）→ ⑦ 终审 1+2 → ⑧ → ⑨ → ⑧c → ⑩（无 ②③ 实现与测试） |
+| 边界 | 只出建议、不替用户裁定；不改产品代码 / 契约 / schema / fixtures / CI；不改准则正文（R-10 若需触 §7.5 ⇒ 只建议、停升级）；不改 v50–v54；不生成 v55 |
+| 交付物 | 报告对 `docs/validation/remaining-rulings{,_EN}.md`；证据包 `docs/validation/evidence/P68-REMAINING-RULINGS/`；本台账本段 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/P68-REMAINING-RULINGS/freedom-list.md` |
+| R / D 基线 | R = 0、D = 0（2026-11-12 起跑登记） |
+| 临时件落点声明 | 本片临时目录 = `tmp/P68-REMAINING-RULINGS/`（⑧c 前只增不删） |
+| 四项 R 裁定（用户 2026-11-12，同轮） | R-04 = **方案 a**；R-06 = **方案 b**（先补 P44 端到端接线 R-1 收口再起 T027-B；R-1 补全另立切片，本片不推进）；R-07 = **方案 b1 + 附条件**（X 标注推迟：只动 REQ 阶段归属列，不删 REQ、不动 MVA 验收复合标准、不动自托管；附条件 1 = TUI 移出以 S1 补 `run --progress` 为前提，另立 `S1-STREAM-PROGRESS`；附条件 2 = visible 调试指引写入 `OPERATIONS` + 三条边界，随 S1 文档片）；R-10 = **方案 a**（维持 §7.5，不触准则）。OB-11 例外按 ADR-042 登记（不得作先例） |
+| 收口行 | 分阶段封板已确认（四处落地锚点）+ 四项 R 建议与裁定已落 + R-07 完整建议（技术前提 A–D + 三方案 + b1 四组合）；报告对 `docs/validation/remaining-rulings{,_EN}.md`（commit hash 与 CI run 按 §11.2 只进报告） |
 
 ## 已知缺陷（后续切片前处理）
 
