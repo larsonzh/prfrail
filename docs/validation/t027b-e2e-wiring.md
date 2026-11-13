@@ -71,6 +71,7 @@
 - `node tools/gates/gate.js --selftest` ⇒ `SELFTEST: PASS 737/737`。
 - 三作用域：`--scope=index` / `--scope=tree` 均 `TOTAL_FAIL=0`（`changed=38`；G4b `newCjk=405 unknown=[]`；G8-a/b OK；G5(f) 索引=工作区）；`--scope=ci` 本地为 `HEAD^1..HEAD` 退化范围（changed=2，`TOTAL_FAIL=0`），本片变更集覆盖由 index/tree 给出、真实 ci 读数待推送后由 CI 产生（仓库既有口径）。
 - 归档口径：门禁读数未归档（可重跑获取），变异证据已归档。
+- newCjk 时点注记：本节 `newCjk=405` 系 P69 ⑩ r2 回执（记录 402）后回填——裁定轮追加 D=1 防再犯句与归档口径句（新增 3 字）后重跑门禁，读数 402→405，按「读数最后回填」纪律收敛后提交；`402` 是回执时点读数（当时与报告一致）。
 
 ## §7 已知边界
 
