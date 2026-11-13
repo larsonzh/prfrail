@@ -4,7 +4,7 @@ Generated: 2026-11-13, HEAD = `759c934` (the P69 main commit), directive v1.67, 
 Supersedes: v55 and every older snapshot in full (historical snapshot files are kept, not deleted). A docs-only back-fill commit only advances HEAD and does not change the meaning of this section's anchors.
 **Structure note**: this version keeps the post-§13-migration structure - §7 / §8 / §9 are pointer sections (to directive §13.1 / §13.2 / §13.3 / §13.4) and rule entities are not duplicated here (§11.2, "one fact described in one place"). Snapshots v50-v55 are not retro-edited (§11.1).
 
-Changes versus v55: (1) **P69 recorded** (implementation type, closed); (2) **§2 fact pack switched to P69**; (3) **§4 layer 2 updated** (P69 dequeued, P70 / P71 content updated, the `T027-B` start condition now satisfied); (4) **§5 observation items** (new slice-level recommendation item 2, E-1); (5) **§6 still empty** (no new ruling items).
+Changes versus v55: (1) **P69 recorded** (implementation type, closed); (2) **§2 fact pack switched to P69**; (3) **§4 layer 2 updated** (P69 dequeued, P70 / P71 content updated, the `T027-B` start condition now satisfied); (4) **§5 observation items** (new slice-level recommendation item 2, E-1; item 1 carried over from v55); (5) **§6 still empty** (no new ruling items).
 
 ## 1. Current anchors (check these 8 numbers first)
 
@@ -85,7 +85,7 @@ Dequeued: closed 2026-11-13; main commit `759c934`; run `43264324421` green on b
 | Identifier | `S1-STREAM-PROGRESS` (layer-2 governance side; source = R-07 b1 condition 1) |
 | Status | ⬜ not started (starts only when the user names it) |
 | Goal | Add a lightweight `run --progress` stream switch inside S1: off by default, consuming the existing `events/state-events.jsonl` plus the AgentRunner events, no CONTRACTS change, no view layer, print granularity = per task/step start and end plus gate command start/end and exit codes plus AI tool-call summary lines |
-| Dependency | P68 (closed, R-07 condition 1); **P69 closing is not a dependency, but the E-1 process discipline went into the P70 kickoff message** |
+| Dependency | P68 (closed, R-07 condition 1); **P69 closing is not a dependency, but the E-1 process discipline is in §5 slice-level suggestion item 2, which the P70 kickoff message should follow** |
 | Size | S |
 | Steps | (1) event-surface check → (2) switch and printing → (3) tests → (4) gates → (5) → (6) → (7) → (8) → (9) → (8c) → (10) |
 | Current gap | `run` has no live output at all (six summary lines only when finished); no `--verbose` / `--progress`; no heartbeat |
@@ -123,7 +123,7 @@ Dequeued: closed 2026-11-13; main commit `759c934`; run `43264324421` green on b
 | Identifier | `OB-50` / `spawnGit` / `ci frozen cost` / `%TEMP% leftover 22 items` / `GATES-EXEMPT` |
 | Current status (verified item by item) | OB-50 = **disposed** (§12.4, v1.41); spawnGit = the git-call helper in `tools/gates/selftest.js` (the spawn wrapper in `lib/ctx.js`, which collects stderr into the result object instead of printing it); registered in the P27 `G4b-CACHE` report §5 item 5 as a "candidate OB (diagnostics)" (Low / observing), never formally registered as a §12.4 OB id (`git log -S "spawnGit"` has zero hits across history); under the §1.8.1 pending-item handling rule, it is an "unregistered candidate OB"; candidate fix = append the last N bytes of stderr to `detail` on spawn failure (no verdict change, diagnostics only); trigger = the next git-related assertion failure of unknown cause, evaluated by ① on whether it is worth adding; ci frozen cost = **no §12.4 entry** (the OB-113 symptom column has no such text, the mapping does not hold); actual origin = the P27 `G4b-CACHE` report §7 "candidate OB (performance)" (the ci-scope 24-37 s freeze-cost source undetermined), **never formally registered**; %TEMP% leftover 22 items = maps to OB-98 (**disposed**, G9-c static shape) / OB-99 (**observing**) / OB-100 (**observing**, window sub-range disposed); GATES-EXEMPT = **not yet a project** (§12.4 has no entry; the P33 ①-3(iv) split slice, touching 4 criteria files) |
 | Content | item by item see the matching §12.4 OB rows; `GATES-EXEMPT` = the P33 ①-3(iv) split slice, not yet a project, touching 4 criteria files |
-| Dependency | suspended long-term only for the not-yet-disposed items (spawnGit / ci frozen cost / the %TEMP% timing shape / GATES-EXEMPT); no clear trigger |
+| Dependency | suspended long-term only for the not-yet-disposed items (spawnGit / ci frozen cost / the %TEMP% timing shape (OB-99 / OB-100) / GATES-EXEMPT); no clear trigger |
 | Size | varies (S through M-L) |
 | (7) budget | none |
 | Boundary | item by item see §12.4 |
