@@ -1984,6 +1984,46 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Temporary-file location | Slice temp directory = `tmp/P71-S1-SCOPE-ANNOTATE/` (append-only until ⑧c; captures never at the `tmp/` root) |
 | Completion record | Report pair `docs/validation/s1-scope-annotate{,_EN}.md`; review chain ① `DESIGN: DONE` (including the F-1 ruling) → ②a–②g all green step by step → ③ consistency (controller self-executed, carrier deviation registered) → ⑤ `PRE-REVIEW: PASS WITH FIXES` → ⑥ skipped (confirmed by ⑦) → ⑦ blind `PASS` + final `PASS`; GLM batch 2 times; R=0, D=2; stopped at ⑩ pending authorisation (no hash/run recorded, §11.2) |
 
+### P72 — `REQ020-S2-RESTRICTION` (registering the S2 commitment narrowing for REQ-020) · ⬜ Not started
+
+| Field | Content |
+|---|---|
+| Identifier | `REQ020-S2-RESTRICTION` (layer-2 routine governance; source = the step-5 Info recommendation of P71 plus the S2 narrowing in P68 b1 item 3 (the Q3 language freeze)) |
+| Status | ⬜ Not started (starts when the user names it) |
+| Goal | The REQ-020 stage-ownership column becomes "not required by S1 (C+Go contract only); S2 commitment narrowed (Python/Node official harness + three-language product tasks + the release-support commitment frozen; existing tool scripts / open language IDs / generic capability are not frozen)"; sync AT-01 in `TEST_STRATEGY` and the language rows of `S1_SUPPORT_MATRIX` |
+| Dependency | P68 (R-07 b1 / Q3 language freeze, closed), P71 (step-5 Info recommendation, closed) |
+| Size | S (documentation only; touches the REQ stage ownership and the language support commitment wording) |
+| Steps | (1) current-state and difference check -> (2) per-document write-back -> (3) consistency check -> (4) gates -> (5) -> (6) -> (7) -> (8) -> (9) -> (8c) -> (10) |
+| Current gap | The REQ-020 stage column is still `S0-S2` with no S2-narrowing note; AT-01 and the language rows are not in sync |
+| Deliverables | REQ-020 stage-column write-back + AT-01 and language-row sync + report pair; evidence pack `docs/validation/evidence/P72-REQ020-S2-RESTRICTION/` |
+| Acceptance evidence | The three-language wording agrees; no entry deleted, no numbering changed, the "acceptable requirements" column untouched; gates all green |
+| Boundary | Only the REQ-020 stage column plus the related documents; the MVA composite / criterion bodies / product code unchanged; no gitee push; **the kick-off discipline must cite the D=2 recurrence-prevention clause (P71 report §8) and the OB-139 "observing" wording** |
+| Tier | `[SLICE]` |
+| Probe budget | 0 |
+| Freedom-list landing path | `docs/validation/evidence/P72-REQ020-S2-RESTRICTION/freedom-list.md` |
+| R/D baseline | R = 0, D = 0 (registered at step 0, §13.1.1; does not inherit P71's R=0 / D=2) |
+| Temp-file location declaration | This slice's temp directory = `tmp/P72-REQ020-S2-RESTRICTION/` (add-only before ⑧c; no capture file at the `tmp/` root) |
+
+### P73 — `T027B-ADMISSION` (three-way OB-55 ownership assessment + part-B boundary) · ⬜ Not started
+
+| Field | Content |
+|---|---|
+| Identifier | `T027B-ADMISSION` (layer-2 routine governance; source = the admission assessment after the R-06 = b ruling moved OB-55 into the T027-B boundary) |
+| Status | ⬜ Not started (starts when the user names it and P72 is closed) |
+| Goal | A three-way assessment of where OB-55 belongs (a standalone slice / landing the `Sandbox` interface early / keeping it in S2) + the part-B implementation boundary + candidate versions + the resource and probe authorisation needs; **after step 1 produces the three-way comparison plus a recommendation, stop and wait for the user to rule on OB-55, then push steps 2-10** |
+| Dependency | P72 closed (this slice comes after it) |
+| Size | M (assessment type; produces no production code) |
+| Steps | (1) three-way comparison plus recommendation (**stop point: wait for the user's OB-55 ruling**) -> (2) register the ruling and land the T027-B section of `DEV_PLAN` -> (3) consistency -> (4) gates -> (5) -> (6) -> (7) -> (8) -> (9) -> (8c) -> (10) |
+| Current gap | OB-55 ownership is undecided; the part-B implementation boundary and resource needs of T027-B are not shaped, so the main-line milestone cannot start |
+| Deliverables | Three-way assessment + user ruling registration + `DEV_PLAN` T027-B section update + report pair; evidence pack `docs/validation/evidence/P73-T027B-ADMISSION/` |
+| Acceptance evidence | The three-way comparison covers the cost / risk / rollback axes; the ruling registration carries all four elements; the T027-B start condition becomes decidable |
+| Boundary | No production code; only the assessment plus the ruling registration; the criterion bodies / `CONTRACTS` / schema / fixtures / CI unchanged; no gitee push; **the kick-off discipline must cite the D=2 recurrence-prevention clause (P71 report §8) and the OB-139 "observing" wording** |
+| Tier | `[SLICE]` |
+| Probe budget | 0 |
+| Freedom-list landing path | `docs/validation/evidence/P73-T027B-ADMISSION/freedom-list.md` |
+| R/D baseline | R = 0, D = 0 (registered at step 0, §13.1.1; does not inherit P72) |
+| Temp-file location declaration | This slice's temp directory = `tmp/P73-T027B-ADMISSION/` (add-only before ⑧c; no capture file at the `tmp/` root) |
+
 ## Known defects (to be handled before later slices)
 
 > **Blocking rule unchanged**: only high-frequency / reproduced defects block; observation-grade flakes are recorded and listed in the validation report.
