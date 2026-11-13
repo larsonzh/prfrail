@@ -101,7 +101,7 @@
 | P68 REMAINING-RULINGS | ✅ Done (closed 2026-11-12; R=1, D=1; ⑥ skip confirmed by ⑦; ⑦ final PASS; SELFTEST 737/737; controller Flash) | P67 (layer-2 governance side; advice on the four R items + stage-progression seal confirmation) | M | 2026-11-12 | Report pair `docs/validation/remaining-rulings{,_EN}.md`; evidence pack `docs/validation/evidence/P68-REMAINING-RULINGS/`; temp artefacts `tmp/P68-REMAINING-RULINGS/` |
 | P69 T027B-E2E-WIRING | ✅ Done (closed 2026-11-12; report pair `docs/validation/t027b-e2e-wiring{,_EN}.md`) | P68 (the R-1 closeout from R-06 = b) | M | 2026-11-12 | Wire the P44 readiness / permit verdicts into the production assembly and the CLI entry; evidence pack `docs/validation/evidence/P69-T027B-E2E-WIRING/`; review chain ⑤ PASS / ⑥ PASS / ⑦ PASS; R=0, D=1 (the ⑧a1 doc carrier deleted its helper scripts, escalated to the user at ⑩) |
 | P70 S1-STREAM-PROGRESS | ✅ Done (closed 2026-11-13; R=1, D=2; ⑦ final 1 + re-review 1; SELFTEST 737/737; controller Flash) | P68 (R-07 b1 condition 1) | S | 2026-11-13 | The lightweight `run --progress` stream switch (off by default, consuming the existing event stream, no view layer); evidence pack `docs/validation/evidence/P70-S1-STREAM-PROGRESS/` |
-| P71 S1-SCOPE-ANNOTATE | ⬜ Not started (user must name it; needs a same-turn explicit authorization) | P68 (R-07 b1 condition 2) | M | — | The visible debugging guidance + the REQ stage-ownership column + the matrix / strategy / gate-applicability write-backs (X-style, no entry deleted); evidence pack `docs/validation/evidence/P71-S1-SCOPE-ANNOTATE/` |
+| P71 S1-SCOPE-ANNOTATE | ✅ Done (closed 2026-11-13; R=0, D=2; step 7 blind 1 + final 1; SELFTEST 737/737; controller Flash) | P68 (R-07 b1 condition 2) | M | 2026-11-13 | The visible debugging guidance + the REQ stage-ownership column + the matrix / strategy / gate-applicability write-backs (X-style, no entry deleted); evidence pack `docs/validation/evidence/P71-S1-SCOPE-ANNOTATE/` |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -1963,12 +1963,12 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Temporary-file location | Slice temp directory = `tmp/P70-S1-STREAM-PROGRESS/` (append-only until ⑧c) |
 | Completion record | Report pair `docs/validation/s1-stream-progress{,_EN}.md`; review chain ① `DESIGN: DONE` → ②a–②c all green → ③ R1–R9 + the M1–M8 mutation loop closed → ⑤ `PRE-REVIEW: PASS` → ⑥ `INDEPENDENT SCAN: PASS` → ⑦ final 1 + re-review 1; GLM batch 2 times; R=1, D=2 (R=1 counts the CI first-run red and its fix repush; D=2 counts the capture files misplaced at the `tmp/` root inside the post-wrap-up slot and removed with zero residue, with DR-14 registered separately in the defect table); stopped at ⑩ pending authorisation (no hash/run recorded, §11.2) |
 
-### P71 — `S1-SCOPE-ANNOTATE` (TUI carve-out condition 2 plus the stage-ownership column) · ⬜ not started
+### P71 — `S1-SCOPE-ANNOTATE` (TUI carve-out condition 2 plus the stage-ownership column) · ✅ done (closed 2026-11-13)
 
 | Field | Content |
 |---|---|
 | Identifier | `S1-SCOPE-ANNOTATE` (layer-2 governance side; source = R-07 b1 condition 2 and the X-style write-back) |
-| Status | ⬜ not started (user must name it; needs a same-turn explicit authorization) |
+| Status | ✅ done (closed 2026-11-13) |
 | Goal | Write the visible debugging guidance into `OPERATIONS{,_EN}` with three boundaries; mark the stage-ownership column of REQ-009 / REQ-019 / REQ-007 / REQ-021 as "not required by S1, deferred to S2"; align `S1_SUPPORT_MATRIX` with the TUI carve-out and the visible degraded guarantee; align the AT-13 / AT-24 items in `TEST_STRATEGY`; add the gate-applicability note to `s1-exit` |
 | Dependency | P68 (closed, R-07 condition 2); recommended after P69 and P70 |
 | Size | M (documentation only; touches product-side release wording) |
@@ -1980,6 +1980,9 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Tier | `[SLICE]` |
 | Probe budget | 0 |
 | Freedom-list path | `docs/validation/evidence/P71-S1-SCOPE-ANNOTATE/freedom-list.md` |
+| R/D baseline | R = 0, D = 0 (registered at step 0, §13.1.1; P70's R=1 / D=2 is not inherited) |
+| Temporary-file location | Slice temp directory = `tmp/P71-S1-SCOPE-ANNOTATE/` (append-only until ⑧c; captures never at the `tmp/` root) |
+| Completion record | Report pair `docs/validation/s1-scope-annotate{,_EN}.md`; review chain ① `DESIGN: DONE` (including the F-1 ruling) → ②a–②g all green step by step → ③ consistency (controller self-executed, carrier deviation registered) → ⑤ `PRE-REVIEW: PASS WITH FIXES` → ⑥ skipped (confirmed by ⑦) → ⑦ blind `PASS` + final `PASS`; GLM batch 2 times; R=0, D=2; stopped at ⑩ pending authorisation (no hash/run recorded, §11.2) |
 
 ## Known defects (to be handled before later slices)
 

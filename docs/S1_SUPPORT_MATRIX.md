@@ -6,7 +6,7 @@
 
 | 范围 | S1 候选状态 | 约束 |
 |---|---|---|
-| Windows 11 amd64 | 正式支持候选 | 纯 Go `CGO_ENABLED=0` 便携 ZIP；手工解压、显式路径运行、不修改 PATH；最终 ZIP 须重跑安装生命周期 |
+| Windows 11 amd64 | 正式支持候选 | 纯 Go `CGO_ENABLED=0` 便携 ZIP；手工解压、显式路径运行、不修改 PATH；最终 ZIP 须重跑安装生命周期；基础终端（逐行 CLI / `interactions tui` / `--progress`）保留；完整一体化 TUI 移出 S1、由 S2 承接 |
 | Linux amd64 | 核心 CI | 仅构建、测试、候选探针和自托管；不宣称 S1 生产支持 |
 | macOS / Windows on Arm / Linux arm64 | 不支持 | 未进入 S1 验收矩阵 |
 | generic/C/Go harness | 配置与 noop 编排 | language scope、只读 preview 和 noop-only 闭环已验证；executable step 仍 fail-close |
@@ -29,3 +29,5 @@
 > 切片同步（P55 `EXIT-SEED-BUILD-EVIDENCE`）：本片不适用（无平台与版本支持范围增减）；理由：补证只归档既有 seed 驱动构建的两平台捕获，平台清单、支持层级与 EOL 政策不变。
 
 > 切片同步（P57 `P5-P6-CLOSEOUT-ASSESSMENT`）：本片不适用（无平台清单、支持层级、EOL 政策或安装模型的增减）；理由：P57 只把 T018 剩余门整理为收口清单，未改变任何门的判定，本文件措辞逐字不动。
+
+> 切片同步（P71 `S1-SCOPE-ANNOTATE`）：TUI 移出与 visible 降级保证口径已同步；理由：R-07 b1 附条件 2 落地只改 REQ 阶段归属与调试指引——平台清单与支持层级不变，TUI 移出系 P68 已裁定的**功能阶段归属同步**，Windows 行状态仍为「正式支持候选」，visible 行仍为「降级保证」。

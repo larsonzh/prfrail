@@ -90,6 +90,8 @@ Verdict: `T027-B` is valid as a **milestone** and is registered; as an **open it
 | S-G7 S1 exit overall (RFC §14) | all ATs pass, T018 complete, §14 fully exited | unreachable: `s1-exit.md:52` (core task chain `BLOCKED`), `:56` to `:58` (three `PARTIAL`), `:60` | S-G1 through S-G6 | all of the above green |
 | S-G8 Real CLI end-to-end | the supervised path runs end-to-end on a real CLI and a real candidate | not passed: `docs/DEV_PLAN.md:119` (D-18 states it depends on T027-B) | P5 residue R-3 | unlocked together with S-G1 |
 
+- **P71 pointer (2026-11-13)**: `docs/validation/s1-exit{,_EN}.md` now carries a "P71 applicability note" added by the `S1-SCOPE-ANNOTATE` slice (the REQ stage-ownership change does not affect gate-level verdicts; this section remains the definition source for the S-Gx numbering); the report is `docs/validation/s1-scope-annotate{,_EN}.md`. The eight-gate definitions and verdicts in this section stay unchanged (§11.1).
+
 ### 4.3 Three stale statements (registered, not fixed)
 
 1. `s1-exit.md:44` (AT-24) says "T028 not implemented", contradicting `DEV_PLAN.md:119` which says `COMPLETED`.

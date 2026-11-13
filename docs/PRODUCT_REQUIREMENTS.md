@@ -66,9 +66,9 @@ S0 完成规范、Schema/黄金样例和技术探针，再由用户批准 S1。S
 | REQ-004 | R4 | S1 | 只读捕获源目录，已接受快照传播及恢复不依赖 Git；拒绝不可移植路径 |
 | REQ-005 | R5 | S1 | 技术通过只进入 REVIEW_PENDING；独立 approve/有效 waive 后才 PASSED |
 | REQ-006 | R6 | S1-S3 | S1 Windows 正式、Linux 核心 CI；固定 CLI Agent/配置，启动前探测非交互、cwd、事件/日志、会话、停机、工具/网络/权限和用量能力；能力不足暂停，不静默切换执行器 |
-| REQ-007 | R7 | S1 | 正式 AI 执行统一经 `AgentRunner` 和 ProofRail 回执；另允许用户显式选择 `supervised-black-box` 候选导入。SessionBridge visible 只桥接可见界面且不证明完成，auto 不进入正式流程，任一失败均不得自动切换执行模式 |
+| REQ-007 | R7 | S1/S2（黑箱候选子项推迟 S2） | 正式 AI 执行统一经 `AgentRunner` 和 ProofRail 回执；另允许用户显式选择 `supervised-black-box` 候选导入。SessionBridge visible 只桥接可见界面且不证明完成，auto 不进入正式流程，任一失败均不得自动切换执行模式 |
 | REQ-008 | R8 | S1 | context envelope 可在宿主重启后重建；Agent session/process/attempt 绑定可核验，不确定时新建 attempt；Agent transcript 与聊天历史均不作事实源 |
-| REQ-009 | R9 | S1 | 一体化 TUI 展示任务、门禁、票据、Agent 事件/日志、预算及待人工处理请求；用户可在同一终端提交结构化答复并将控制权交还当前可恢复 Agent session，不依赖 SessionBridge chat participant 或额外监控窗口 |
+| REQ-009 | R9 | S1 不要求，推迟至 S2（基础终端保留） | 一体化 TUI 展示任务、门禁、票据、Agent 事件/日志、预算及待人工处理请求；用户可在同一终端提交结构化答复并将控制权交还当前可恢复 Agent session，不依赖 SessionBridge chat participant 或额外监控窗口 |
 | REQ-010 | R10 | S1 | init/validate/config explain 生成、检查并解释配置；运行状态不回写配置 |
 | REQ-011 | R11 | S1/S2 | S1 generic/C/Go harness 外置，核心无语言判断分支；S2 扩展语言 |
 | REQ-012 | R12 | S1 | 分离 executable 与 args，执行前能力检查，超时/输出/网络/环境受策略约束 |

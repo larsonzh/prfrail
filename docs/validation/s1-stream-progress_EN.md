@@ -80,6 +80,7 @@ Raw step-4 batch readings (Windows host, 2026-11-13; the step-9 rerun after this
 - Recurrence prevention: inside the post-wrap-up capture window every gate capture must use inline printing (`node -e` / `execFileSync`) or land in `tmp/<slice-id>/`; never at the `tmp/` root. Both D=2 occurrences in this slice were instances of that violation.
 - P68 counts in the §7.7 window (see §5) => **P71 must draw a blind review at kickoff**; P71 has to cite this line.
 - DR-14 (CI first-run red, fixed in this slice): carrier = the `progressSummaryJSON` guard starting at `internal/console/progress_test.go:172`; the ledger registration is the DR-14 entry in the `docs/t027/REMAINING_SLICES{,_EN}.md` known-defects table; evidence = run `43400311736` (head `f77ab49`) with the ubuntu `Test` step red, attempt 2 still red and the windows leg green; the fix commit `6a405bd` (run `43403891205`) is green on both legs.
+- **P71 landing pointer (2026-11-13)**: the "P71 must draw a blind review at kickoff" line recorded in §8 of this report has been executed - the P71 `S1-SCOPE-ANNOTATE` slice drew one blind review before its final review, with the verdict in `docs/validation/s1-scope-annotate{,_EN}.md` §5. The original line above stays untouched (§11.1).
 
 Artifact list of this slice (repo-relative path + disposition, TAB separated; the fence is byte-identical in this file and its `_EN` mirror).
 

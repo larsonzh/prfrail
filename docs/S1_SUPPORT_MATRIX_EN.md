@@ -6,7 +6,7 @@ Date: 2026-09-09. Status: `CANDIDATE`, effective only after the formal release c
 
 | Scope | S1 candidate status | Constraints |
 |---|---|---|
-| Windows 11 amd64 | Production-support candidate | Pure-Go `CGO_ENABLED=0` portable ZIP; manual extraction, explicit-path invocation, no PATH modification; rerun the lifecycle against the final ZIP |
+| Windows 11 amd64 | Production-support candidate | Pure-Go `CGO_ENABLED=0` portable ZIP; manual extraction, explicit-path invocation, no PATH modification; rerun the lifecycle against the final ZIP; the basic terminal (line-oriented CLI / `interactions tui` / `--progress`) stays; the full unified TUI moves out of S1 and is taken up by S2 |
 | Linux amd64 | Core CI | Build, test, candidate probe, and self-host only; no S1 production-support claim |
 | macOS / Windows on Arm / Linux arm64 | Unsupported | Not included in the S1 acceptance matrix |
 | generic/C/Go harnesses | Configuration and noop orchestration | Language scopes, read-only preview, and noop-only loops are verified; executable steps still fail closed |
@@ -29,3 +29,5 @@ A candidate release requires a full commit SHA, GitHub CI, `SHA256SUMS`, an SPDX
 > Slice sync (P55 `EXIT-SEED-BUILD-EVIDENCE`): not applicable (no platform or version support-range change); reason: the supplement only archives the two-platform capture of the existing seed-driven build, so the platform list, support tiers and EOL policy stay unchanged.
 
 > Slice sync (P57 `P5-P6-CLOSEOUT-ASSESSMENT`): not applicable (no change to the platform list, support tiers, EOL policy or install model); reason: P57 only turns the remaining T018 gates into a close-out inventory and changes no gate verdict, so this file's wording stays byte-identical.
+
+> Slice sync (P71 `S1-SCOPE-ANNOTATE`): the TUI carve-out and the visible reduced-assurance wording are now aligned; reason: landing R-07 b1 condition 2 changes only REQ stage ownership and the debugging guidance - the platform list and support tiers are unchanged, the TUI carve-out is the **functional stage-ownership sync** already ruled by P68, the Windows row status stays "Production-support candidate" and the visible row stays "reduced assurance".

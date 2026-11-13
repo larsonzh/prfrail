@@ -90,6 +90,8 @@ F1 与 F2 在**本片回写前**互斥：前者称已立项，后者称无设计
 | S-G7 S1 exit 总体（RFC §14） | 全 AT 通过且 T018 完成且 §14 全 exit | 不可达：`s1-exit.md:52`（核心任务链 `BLOCKED`）、`:56` 至 `:58`（三项 `PARTIAL`）、`:60` | S-G1 至 S-G6 | 上列全绿 |
 | S-G8 真实 CLI 端到端 | 受监督路径可在真实 CLI 与真实候选下端到端运行 | 未通过：`docs/DEV_PLAN.md:119`（D-18 明写依赖 T027-B） | P5 的 R-3 | 与 S-G1 同源解锁 |
 
+- **P71 指针（2026-11-13）**：`docs/validation/s1-exit{,_EN}.md` 已由切片 `S1-SCOPE-ANNOTATE` 追加「P71 适用性说明」段（REQ 阶段归属变更不影响门级判定；S-Gx 编号仍以本节为定义源）；报告见 `docs/validation/s1-scope-annotate{,_EN}.md`。本表八门定义与判定不改（§11.1）。
+
 ### 4.3 三处时态滞后（登记不修）
 
 1. `s1-exit.md:44` 的 AT-24 条目称「T028 尚未实现」，与 `DEV_PLAN.md:119` 的 `COMPLETED` 互斥。

@@ -101,7 +101,7 @@
 | P68 REMAINING-RULINGS | ✅ 已完成（2026-11-12 收口；R=1、D=1；⑥ 跳过经 ⑦ 确认；⑦ 终审 PASS；SELFTEST 737/737；主控 Flash） | P67（层 2 治理侧；四项 R 裁定建议 + 分阶段策略封板确认） | M | 2026-11-12 | 报告对 `docs/validation/remaining-rulings{,_EN}.md`；证据包 `docs/validation/evidence/P68-REMAINING-RULINGS/`；临时件 `tmp/P68-REMAINING-RULINGS/` |
 | P69 T027B-E2E-WIRING | ✅ 已完成（2026-11-12 收口；报告对 `docs/validation/t027b-e2e-wiring{,_EN}.md`） | P68（R-06 = b 的 R-1 收口） | M | 2026-11-12 | 把 P44 的 readiness / permit 判定接到生产装配与 CLI 入口；证据包 `docs/validation/evidence/P69-T027B-E2E-WIRING/`；审查链 ⑤ PASS / ⑥ PASS / ⑦ PASS；R=0、D=1（⑧a1 文档载体自删辅助脚本，⑩ 升级用户裁定） |
 | P70 S1-STREAM-PROGRESS | ✅ 已完成（2026-11-13 收口；R=1、D=2；⑦ 终审 1 + 复审 1；SELFTEST 737/737；主控 Flash） | P68（R-07 b1 附条件 1） | S | 2026-11-13 | `run --progress` 轻量流式开关（默认关闭、消费现有事件流、不做视图层）；证据包 `docs/validation/evidence/P70-S1-STREAM-PROGRESS/` |
-| P71 S1-SCOPE-ANNOTATE | ⬜ 未开始（须用户点名；需同轮显式授权） | P68（R-07 b1 附条件 2） | M | — | visible 调试指引 + REQ 阶段归属列 + 矩阵/策略/门适用性回写（X 方案，不删条目）；证据包 `docs/validation/evidence/P71-S1-SCOPE-ANNOTATE/` |
+| P71 S1-SCOPE-ANNOTATE | ✅ 已完成（2026-11-13 收口；R=0、D=2；⑦ 盲审 1 + 终审 1；SELFTEST 737/737；主控 Flash） | P68（R-07 b1 附条件 2） | M | 2026-11-13 | visible 调试指引 + REQ 阶段归属列 + 矩阵/策略/门适用性回写（X 方案，不删条目）；证据包 `docs/validation/evidence/P71-S1-SCOPE-ANNOTATE/` |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -1976,12 +1976,12 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 临时件落点声明 | 本片临时目录 = `tmp/P70-S1-STREAM-PROGRESS/`（⑧c 前只增不删） |
 | 完成记录 | 报告对 `docs/validation/s1-stream-progress{,_EN}.md`；审查链 ① `DESIGN: DONE` → ②a–②c 全绿 → ③ R1–R9 + M1–M8 变异闭环 → ⑤ `PRE-REVIEW: PASS` → ⑥ `INDEPENDENT SCAN: PASS` → ⑦ 终审 1 + 复审 1；GLM 批量 2 次；R=1、D=2（R=1 = CI 首跑红后的修复重推；D=2 = ⑧c 后取证窗口内捕获件误落 `tmp/` 根，已零残留清除，DR-14 另计于缺陷表）；停于 ⑩ 等授权（不写 hash/run，§11.2） |
 
-### P71 — `S1-SCOPE-ANNOTATE`（TUI 移出附条件 2 + 阶段归属列） · ⬜ 未开始
+### P71 — `S1-SCOPE-ANNOTATE`（TUI 移出附条件 2 + 阶段归属列） · ✅ 已完成（2026-11-13 收口）
 
 | 字段 | 内容 |
 |---|---|
 | 标识 | `S1-SCOPE-ANNOTATE`（层 2 治理侧；来源 = R-07 b1 附条件 2 与 X 方案回写） |
-| 状态 | ⬜ 未开始（须用户点名；需同轮显式授权） |
+| 状态 | ✅ 已完成（2026-11-13 收口） |
 | 目标 | visible 调试指引写入 `OPERATIONS{,_EN}` + 三条边界；REQ-009 / REQ-019 / REQ-007 / REQ-021 的「阶段归属」列标「S1 不要求，推迟至 S2」；`S1_SUPPORT_MATRIX` 同步 TUI 移出与 visible 降级保证；`TEST_STRATEGY` 的 AT-13 / AT-24 按阶段归属同步；`s1-exit` 八门适用性说明 |
 | 依赖 | P68（已闭环，R-07 附条件 2）；建议排在 P69 与 P70 之后 |
 | 规模 | M（纯文档；触产品侧发布结论表述） |
@@ -1993,6 +1993,9 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 分级 | `[SLICE]` |
 | 探针额度 | 0 |
 | 执行自由度清单落盘路径 | `docs/validation/evidence/P71-S1-SCOPE-ANNOTATE/freedom-list.md` |
+| R/D 基线 | R = 0、D = 0（步骤 0 登记，§13.1.1；不继承 P70 的 R=1 / D=2） |
+| 临时件落点声明 | 本片临时目录 = `tmp/P71-S1-SCOPE-ANNOTATE/`（⑧c 前只增不删；捕获件不落 `tmp/` 根） |
+| 完成记录 | 报告对 `docs/validation/s1-scope-annotate{,_EN}.md`；审查链 ① `DESIGN: DONE`（含 F-1 裁定）→ ②a–②g 分步全绿 → ③ 一致性（主控自执行，载体偏离已登记）→ ⑤ `PRE-REVIEW: PASS WITH FIXES` → ⑥ 跳过（⑦ 确认）→ ⑦ 盲审 `PASS` + 终审 `PASS`；GLM 批量 2 次；R=0、D=2；停于 ⑩ 等授权（不写 hash/run，§11.2） |
 
 ## 已知缺陷（后续切片前处理）
 

@@ -30,7 +30,7 @@ Date: 2026-09-09. Verdict: `BLOCKED`. T018 passes the frozen read-only whois com
 | AT-10 | PASS | [T014 handoff](t014-handoff_EN.md) |
 | AT-11 | PASS | [T015 harness/docs](t015-taskdef-documentation_EN.md) |
 | AT-12 | PASS | [T016 CLI](t016-cli-console_EN.md) |
-| AT-13 | PASS | [T017 self-host](s1-selfhost_EN.md), including Node 24 run `34325758548` |
+| AT-13 | PASS | [T017 self-host](s1-selfhost_EN.md), including Node 24 run `34325758548`; self-hosting stays in S1 (P68 b1 does not approve a carve-out) |
 | AT-14 | PASS | [T017 self-host](s1-selfhost_EN.md), eight Windows/Linux jobs and six artifacts |
 | AT-15 | PASS | `examples/whois-shadow/`, all three `*-minimal` language examples, and focused checks in this report |
 | AT-16 | PASS | [T019 preview](t019-preview_EN.md) |
@@ -41,7 +41,7 @@ Date: 2026-09-09. Verdict: `BLOCKED`. T018 passes the frozen read-only whois com
 | AT-21 | PASS | [T024 lifecycle](t024-lifecycle_EN.md) |
 | AT-22 | PASS | [T025 operator interaction](t025-operator-interaction_EN.md): Schema/goldens/hash/replay, focused terminal inbox, structured response, Engine control return, and failure recovery |
 | AT-23 | Stage-1 condition closure achieved (2026-11-09, F2 fix slice closed; stage 2 not applicable, user ruling A1, 2026-11-09): ⑦ final `FINAL: PASS WITH FIXES` + the blind review's four questions all hold ⇒ premise ① met ⇒ **AT-23 stage-1 condition closure achieved** (premise ② already met by P61); the P63 waiver verdict and the P61 PARTIAL are historical point-in-time conclusions and their text is preserved | [F2 fix slice conclusion](at23-restricted-candidate_EN.md) §11 (the ⑦ verdict text verbatim + the F2 three-leg vs B4 baseline field-by-field comparison: the verdict four states agree, `process-tree-taken-away` back to `true`, `failedChecks` empty, and only 1 field drift = the newly added stub-child.pid key in the f2-pos artifacts (the fix-expected product)); [P61 report](at23-restricted-candidate_EN.md): the mechanism legs show 0 drift against the B4 baseline (only one inherited F2 assertion drift), and the real candidate legs actually ran start / execution / stop and recorded unsupported; this does not constitute real-candidate compatibility proof; the historical [T026 report](t026-agent-runner-contract_EN.md) conclusion is unchanged |
-| AT-24 | Conditionally closed (2026-11-11, P64 acceptance; ⑦ re-review `RE-REVIEW: PASS`) | [T028 black-box mode](t028-supervised-black-box_EN.md): T028 is complete (`DEV_PLAN_EN.md:119`); visible black-box risk acknowledgment, isolated delivery, explicit return, full scan and reduced/unknown reporting are implemented; closed under rulings (b)/(c), and P64 accepted it under that caliber as conditional closure ([P64 report](at24-supervised-black-box_EN.md)); **the real CLI end-to-end path still depends on T027-B** (D-18) |
+| AT-24 | Conditionally closed (2026-11-11, P64 acceptance; ⑦ re-review `RE-REVIEW: PASS`) | [T028 black-box mode](t028-supervised-black-box_EN.md): T028 is complete (`DEV_PLAN_EN.md:119`); visible black-box risk acknowledgment, isolated delivery, explicit return, full scan and reduced/unknown reporting are implemented; closed under rulings (b)/(c), and P64 accepted it under that caliber as conditional closure ([P64 report](at24-supervised-black-box_EN.md)); **the real CLI end-to-end path still depends on T027-B** (D-18); the black-box sub-item is owned by stage S2 (P68 b1) and the conditional closure is not revoked |
 
 These PASS verdicts cover the existing deterministic AT evidence; they do not automatically satisfy stage documentation and release gates.
 
@@ -58,6 +58,8 @@ These PASS verdicts cover the existing deterministic AT evidence; they do not au
 | Support matrix and release notes | PARTIAL | The [candidate support matrix](../S1_SUPPORT_MATRIX_EN.md) and [release-note draft](../S1_RELEASE_NOTES_EN.md) exist but are not bound to a formal release |
 | Independent review | PASS | Both T017 baseline and Node 24 replacement received Codex/DeepSeek reviews |
 | Final product-owner S1 approval | BLOCKED | This session's fixture-read authorization is not release or stage approval |
+
+**P71 applicability note (`S1-SCOPE-ANNOTATE`, 2026-11-13)**: landing R-07 b1 condition 2 changes only REQ stage ownership - the full unified TUI (REQ-009) is marked "not required by S1, deferred to S2 (the basic terminal stays)", the black-box candidate sub-items (REQ-007/021) are marked as deferred to S2, and self-hosting (REQ-019 / AT-13) stays in S1; the MVA acceptance composite is not approved as a formal definition. **The gate table's nine rows keep their names, count and verdicts unchanged** (the TUI carve-out is not a gate-level verdict change); the visible reduced-assurance wording is unchanged. The `S-G1`...`S-G8` numbering is defined in `docs/validation/p57-closeout-assessment_EN.md` Section 4.2; this file does not introduce that numbering and does not map it onto the gate-table row names. The existing PASS evidence is unaffected: the assertions of AT-12 / AT-16 / AT-22 all rest on the basic terminal and `interactions tui` and do not depend on the full unified TUI.
 
 ## Residual Risks and Next Steps
 

@@ -40,7 +40,7 @@ AT 编号代表测试组，不是已存在的测试函数。每组必须拆正/�
 | AT-10 | REQ-021/025 | 未声明 prompt 停止；secret-direct 仅终端；无安全输入能力暂停；secret canary 不入证据/模型 | gates/console；T014 |
 | AT-11 | REQ-011/013/020/022 | generic/C/Go、锁模板生成 A；自批/手改生成物/文档缺失阻断；C+Go 同 task 整体恢复 | taskdef/gates；T015 |
 | AT-12 | REQ-009/010/015/016/027 | 无 IDE init/validate/run/report/config explain；键盘/无色/窄终端/--json；非实现命令不得冒充成功 | console/cmd；T016 |
-| AT-13 | REQ-015/019/024 | seed 与 candidate 分离；外部 oracle 比较；clean-room 成功及失败不损 seed | harness/release；T017 |
+| AT-13 | REQ-015/019/024 | seed 与 candidate 分离；外部 oracle 比较；clean-room 成功及失败不损 seed | harness/release；T017；阶段归属：自托管仍在 S1（P68 b1 不批移出） |
 | AT-14 | REQ-006/015/019/025/028 | Windows 原生/Linux 核心 CI；最低 Go/固定发布 Go；旧格式只读/未知版本拒写；固定 commit、SHA256SUMS、SBOM/许可证清单核验；校验和不冒充身份认证 | release；T017 |
 | AT-15 | REQ-001/002/011/014 | whois 冻结夹具只读影子，同输入/结果/失败分类；小 Go 非 C 夹具闭环，不触碰正式仓库 | harness；T018 |
 | AT-16 | REQ-009/010/016/027 | PC-01：无 AI 夹具预览；恶意 hook、版本探测、凭据/网络调用计数全为零；unknown 显示，源/store 不变，窄屏/JSON 同事实 | taskdef/console；T019 |
@@ -51,7 +51,7 @@ AT 编号代表测试组，不是已存在的测试函数。每组必须拆正/�
 | AT-21 | REQ-019/025/028 | PC-06：闭包缺对象/活动写者/未知格式阻断；新 store 恢复验证，原件不变；卸载保留证据/共享工具，删除确认与保留冲突，离线撤销状态 unknown | snapshot/evidence/release；T024 |
 | AT-22 | REQ-006/007/008/009/016/021/023/024/025/027 | 仅结构化请求可进入 WAITING_FOR_OPERATOR；TUI 展示允许响应并拒绝错主体/attempt/context hash、陈旧/重复响应；超时/断线/持久化失败保持暂停，重启重建待办；同 conversationId/新 requestId 恢复；人工写入走 handoff，secret-direct 不入模型/证据；没有 `@sbr-review` 仍可闭环 | adapters/chain/console/evidence；T025 |
 | AT-23 | REQ-006/007/008/009/016/023/024/025/026 | fake AgentRunner 契约与真实固定 CLI 能力探针；隔离 workspace 工具迭代，记录版本/配置/session/process/events/logs/usage；超时、日志缺失、停机或恢复不明暂停；Agent 退出 0 后仍重扫并独立 gates/review | adapters/guard/chain/evidence；T026/T027 |
-| AT-24 | REQ-007/009/021/023/024/025/026/027 | visible 黑箱模式启动前显示并持久化绑定风险确认；只在隔离 workspace，投递不等于完成；显式归还后全量 manifest/diff、范围/秘密/文件/副作用扫描及独立 gates/review；未确认、断线与可检测的未知进程/费用/外部副作用阻断，原理不可观测者标 unknown，报告标记 reduced/unknown 且禁止自动降级 | console/adapters/chain/guard/evidence；T028；AT-24 已验收 = 条件闭合（P64，2026-11-11；`docs/validation/at24-supervised-black-box{,_EN}.md`） |
+| AT-24 | REQ-007/009/021/023/024/025/026/027 | visible 黑箱模式启动前显示并持久化绑定风险确认；只在隔离 workspace，投递不等于完成；显式归还后全量 manifest/diff、范围/秘密/文件/副作用扫描及独立 gates/review；未确认、断线与可检测的未知进程/费用/外部副作用阻断，原理不可观测者标 unknown，报告标记 reduced/unknown 且禁止自动降级 | console/adapters/chain/guard/evidence；T028；AT-24 已验收 = 条件闭合（P64，2026-11-11；`docs/validation/at24-supervised-black-box{,_EN}.md`）；阶段归属：黑箱子项推迟 S2（P68 b1），条件闭合不撤销 |
 
 AT-23 前置强检项（P38/P39 新增）：
 - N1 宿主崩溃窗口：子进程创建后、加入 Job 前宿主崩溃不得产生孤儿

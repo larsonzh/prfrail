@@ -30,7 +30,7 @@
 | AT-10 | PASS | [T014 handoff](t014-handoff.md) |
 | AT-11 | PASS | [T015 harness/docs](t015-taskdef-documentation.md) |
 | AT-12 | PASS | [T016 CLI](t016-cli-console.md) |
-| AT-13 | PASS | [T017 self-host](s1-selfhost.md)，含 Node 24 run `34325758548` |
+| AT-13 | PASS | [T017 self-host](s1-selfhost.md)，含 Node 24 run `34325758548`；自托管仍在 S1（P68 b1 不批移出） |
 | AT-14 | PASS | [T017 self-host](s1-selfhost.md)，Windows/Linux 8/8 jobs 与 6 artifacts |
 | AT-15 | PASS | `examples/whois-shadow/` 与三个 `*-minimal` 语言样例；本报告聚焦验证 |
 | AT-16 | PASS | [T019 preview](t019-preview.md) |
@@ -41,7 +41,7 @@
 | AT-21 | PASS | [T024 lifecycle](t024-lifecycle.md) |
 | AT-22 | PASS | [T025 operator interaction](t025-operator-interaction.md)：Schema/golden/hash/replay、聚焦终端收件箱、结构化响应、Engine 控制权归还及故障恢复 |
 | AT-23 | 阶段 1 条件闭合达成（2026-11-09，F2 修复片收口；阶段 2 不适用，用户 2026-11-09 裁定 A1）：⑦ 终审 `FINAL: PASS WITH FIXES` + 盲审四问均成立 ⇒ 前提①满足 ⇒ **AT-23 阶段 1 条件闭合达成**（前提② P61 已满足）；P63 豁免判定与 P61 PARTIAL 为历史时点结论、原文保留 | [F2 修复片结论](at23-restricted-candidate.md) §11（⑦ 判定原文逐字 + F2 三腿与 B4 基线逐字段对照：verdict 四态一致、`process-tree-taken-away` 回 `true`、`failedChecks` 空集、字段漂移仅 1 处 = f2-pos artifacts 新增 stub-child.pid 键（修复预期产物））；[P61 报告](at23-restricted-candidate.md)：机制腿与 B4 基线 0 漂移（仅 F2 一处断言继承漂移）、真实候选腿实际跑过启动 / 执行 / 停机并记录 unsupported，不构成真实候选兼容性证明；[T026 报告](t026-agent-runner-contract.md) 的历史结论不变 |
-| AT-24 | 条件闭合（2026-11-11，P64 验收；⑦ 复审 RE-REVIEW: PASS） | [T028 黑箱模式](t028-supervised-black-box.md)：T028 已完成（`DEV_PLAN.md:119`），visible 黑箱候选的风险确认、隔离投递、显式归还、全量扇描与 reduced/unknown 报告已实现；闭合依据为 (b)/(c) 裁定，P64 按该口径验收并判条件闭合（[P64 报告](at24-supervised-black-box.md)）；**真实 CLI 端到端仍依赖 T027-B**（D-18） |
+| AT-24 | 条件闭合（2026-11-11，P64 验收；⑦ 复审 RE-REVIEW: PASS） | [T028 黑箱模式](t028-supervised-black-box.md)：T028 已完成（`DEV_PLAN.md:119`），visible 黑箱候选的风险确认、隔离投递、显式归还、全量扇描与 reduced/unknown 报告已实现；闭合依据为 (b)/(c) 裁定，P64 按该口径验收并判条件闭合（[P64 报告](at24-supervised-black-box.md)）；**真实 CLI 端到端仍依赖 T027-B**（D-18）；黑箱子项阶段归属 S2（P68 b1），条件闭合不撤销 |
 
 这些 PASS 表示对应 AT 的现有确定性验收，不自动满足阶段文档与发布门禁。
 
@@ -58,6 +58,8 @@
 | 支持矩阵与发行说明 | PARTIAL | [候选支持矩阵](../S1_SUPPORT_MATRIX.md)与[发行说明草案](../S1_RELEASE_NOTES.md)已建立，尚未绑定正式发行物 |
 | 独立评审 | PASS | T017 基线及 Node 24 替换均经 Codex/DeepSeek 双主审 |
 | 产品所有者最终 S1 批准 | BLOCKED | 本轮只授权 whois 夹具读取，不等于 S1 发布/阶段批准 |
+
+**P71 适用性说明（`S1-SCOPE-ANNOTATE`，2026-11-13）**：R-07 b1 附条件 2 落地只改变 REQ 阶段归属——完整一体化 TUI（REQ-009）标「S1 不要求，推迟至 S2（基础终端保留）」，黑箱候选子项（REQ-007/021）标推迟 S2，自托管（REQ-019 / AT-13）仍在 S1；MVA 作为验收复合标准不批正式定义。**本文件门表 9 行的行名、行数与状态判定全部不变**（完整 TUI 移出不构成门级判定变更）；visible 降级保证口径不变。`S-G1`…`S-G8` 编号体系定义于 `docs/validation/p57-closeout-assessment.md` §4.2，本文件不引入该编号，亦不建立其与门表行名的映射。既有 PASS 证据不受影响：AT-12 / AT-16 / AT-22 的断言全部基于基础终端与 `interactions tui`，不依赖完整一体化 TUI。
 
 ## 剩余风险与下一步
 

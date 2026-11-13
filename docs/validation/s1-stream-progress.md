@@ -80,6 +80,7 @@ c) **临时件 D = 1**：⑧c 清空后、⑩ 回执前的取证窗口内，主�
 - 防再犯：⑧c 后取证窗口内的门禁捕获件一律使用内联打印（`node -e` / `execFileSync`）或落 `tmp/<切片ID>/`；不得落 `tmp/` 根。本片 D=2 两起均为该违规的实例。
 - P68 计入 §7.7 窗口（判定见 §5）⇒ **P71 起跑应抽盲审**；P71 起跑时须引用本行。
 - DR-14（CI 首跑红，本片修复）：载体 = `internal/console/progress_test.go:172` 起的 `progressSummaryJSON` 守卫；台账登记见 `docs/t027/REMAINING_SLICES{,_EN}.md` 的「已知缺陷」表 DR-14 条目；证据 = run `43400311736`（head `f77ab49`）ubuntu 腿 `Test` 步红、attempt 2 仍红、windows 腿绿；修复提交 `6a405bd`（run `43403891205` 双腿 success）。
+- **P71 落地指针（2026-11-13）**：本片 §8 记录的「P71 起跑应抽盲审」已执行——P71 `S1-SCOPE-ANNOTATE` 已抽 1 次盲审（先于终审），结论见 `docs/validation/s1-scope-annotate{,_EN}.md` §5；本片原行不改（§11.1）。
 
 以下为本片归档条目清单（仓库相对路径 + 处置，TAB 分隔；CN 与 `_EN` 两侧围栏逐字节相同）。
 

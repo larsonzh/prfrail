@@ -104,6 +104,8 @@ The stage-progression framework (Stage vs Layer / scope R-08.1+R-08.2 / the thre
 - Recommend **option b1**: the availability cost of carving out the TUI can be cheaply mitigated by "the event stream already exists on disk + documenting the tail guidance" (no full TUI needed); the black-box carve-out matches ADR-012's degraded guarantee; the S2 freeze does not affect S1; self-hosting is not carved out (the N-1/N-6 gaps should not lose acceptance pressure); MVA waits until S1 Exit closes. **The final ruling is to be made by the user in the same turn after ⑩ or in batches.**
 - **User ruling (2026-11-12, same turn): option b1 plus conditions** - X-style deferral; condition 1 = the TUI carve-out presupposes a `run --progress` lightweight stream switch inside S1 (carried by `S1-STREAM-PROGRESS`; P68 does not start it); condition 2 = the visible debugging guidance goes into `OPERATIONS` with three boundaries (carried by an S1 documentation slice).
 
+- **P71 landing pointer (2026-11-13)**: **condition 2** of R-07 b1 (the visible debugging guidance plus three boundaries) has been landed by the `S1-SCOPE-ANNOTATE` slice; the report is `docs/validation/s1-scope-annotate{,_EN}.md`. The original lines above stay untouched (§11.1).
+
 ## 6. R-10 advice (overall budget and the per-slice model caps)
 
 ### 6.1 Current-state anchors

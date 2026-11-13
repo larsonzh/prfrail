@@ -34,6 +34,8 @@ go run ./cmd/prfrail report --run-dir .\tmp\prfrail-runs\run-demo
 
 T025 已提供聚焦终端交互：`interactions list [--ledger <path>] [--json]` 重建待处理收件箱，`interactions respond` 按 interaction/actor/attempt/context/允许选项写入结构化响应，`interactions tui` 在无 ANSI 的同一终端逐项展示并选择。task/step 保持 `WAITING_FOR_OPERATOR`，直至 chain 控制 API 校验 request/response、当前绑定与持久状态，并在事件写入完成后返回恢复命令。恢复真实 CLI Agent 前仍须由 T027 重验 session/进程和授权；完整统一 TUI 未交付。SessionBridge `@sbr-review` 只用于独立诊断。
 
+**visible 调试观察（便利、非交付）**：长任务 / 调试期可借 SessionBridge visible 经 Copilot Chat 面板观察 AI 行为，便于定位卡点。三条强制边界：(1) visible **不是 S1 交付承诺**——`docs/S1_SUPPORT_MATRIX.md` 明写核心离线 CLI 不要求它，正式支持范围不变；(2) visible **不构成权威证据**——ADR-012（`docs/ADR_REGISTER.md:22`）拒绝把 transcript、完成声明或退出 0 当作权威事实，它只是调试便利，验收仍以事件日志 / 门禁 / 证据包为准；(3) 使用它须依赖 VS Code + Copilot Chat + 桥扩展，并由用户显式确认风险与保持人工监督；真实 CLI 端到端仍依赖 T027-B。
+
 ## 2. 安装与首次使用
 
 S1 使用手工解压的 Windows amd64 便携 ZIP：核对固定 commit/GitHub CI 并验证 SHA256SUMS、SBOM 和许可证清单，解压到用户选择的独立版本目录，再以 `prfrail.exe` 完整路径执行 version 和静态预览。不得修改 PATH、注册表或系统目录，不得覆盖运行中的 host。可复制命令和升级/回滚/卸载步骤见 [安装指南](INSTALLATION.md)。SHA256SUMS 只证明内容与清单一致，不认证发布者身份；平台不匹配不得执行。Linux 在 S1 仅核心 CI/预览，不宣传正式支持。
