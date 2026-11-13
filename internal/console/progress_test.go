@@ -169,10 +169,20 @@ func progressSummaryJSON(t *testing.T, summary RunSummary, runDir string) string
 	if err := json.Unmarshal(fields["eventLogPath"], &eventLogPath); err != nil {
 		t.Fatalf("decode eventLogPath from the JSON image %s: %v", image, err)
 	}
-	if !strings.HasPrefix(eventLogPath, runDir) {
-		t.Fatalf("eventLogPath %q must live under the run directory %q", eventLogPath, runDir)
+	relative := strings.TrimPrefix(eventLogPath, runDir)
+	if relative == eventLogPath {
+		// A leg whose stdout was masked before it reached this helper already
+		// carries the <run-dir> placeholder. Accept that form explicitly instead
+		// of depending on the path separator: on Linux the masker's literal
+		// replacement matches the JSON text, on Windows the JSON escapes the
+		// backslashes and the replacement misses, so a raw-prefix-only guard is
+		// green on one leg and red on the other.
+		if !strings.HasPrefix(eventLogPath, "<run-dir>") {
+			t.Fatalf("eventLogPath %q must live under the run directory %q", eventLogPath, runDir)
+		}
+		relative = strings.TrimPrefix(eventLogPath, "<run-dir>")
 	}
-	maskedPath, err := json.Marshal("<run-dir>" + strings.TrimPrefix(eventLogPath, runDir))
+	maskedPath, err := json.Marshal("<run-dir>" + relative)
 	if err != nil {
 		t.Fatalf("mask eventLogPath %q: %v", eventLogPath, err)
 	}
