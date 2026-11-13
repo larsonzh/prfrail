@@ -81,6 +81,7 @@ c) **②g 重复调用**：②g 首次派单网络中断但已落盘，重试仅
 - 暂存前 tree 的唯一红 `G7-b`（7 条 `repo` 工件仍为未跟踪：`02-batch/` 2 件 + `04-reviews/` 3 件 + 报告对自身 2 件）已随精确 `git add` 转绿。
 - 报告对生成前的 index / tree 读数：`G5(d)` 红（结构性：staged 路径尚无人声明；报告围栏生成后消解）、`G5(f)`（未暂存，已按纪律 E 处理），暂存后均转绿；另见 `G8-b` 红（证据包「归档条目清单」与 `SHA256SUMS.txt` 未含 `02-batch/` 与 `04-reviews/` 五件载荷），已在本片 ⑧ 收口时补齐后转绿。
 - 基础门禁：`gofmt -l .` 空输出；`go build ./...` exit 0；`go vet ./...` exit 0；`go test ./...` ok=15 / FAIL=0。
+- CI 链路（提交后）：主提交 `6ee2c61` 的 run `43463089586` **双腿 success**（windows `5m6s`、ubuntu `3m14s`；两腿包级 `ok github.com/larsonzh/prfrail/internal/console` 分别为 `21.982s` 与 `4.160s`（Test）/ `13.624s`（Race）；两腿 `--- FAIL` 行数均为 0、包级 `FAIL` 行数均为 0；包级 `ok` 计数 windows 腿 15 条、ubuntu 腿 21 条）。`Candidate build` / `Candidate probe` / `Bootstrap and release evidence` 三个 job 按既有配置 skipped，非本片引入。本 CI 事实链由回填提交承载（回填提交 hash 与回填 run 见该提交记录与 ⑩ r2 回执，避免自指）；回填只补 CI 读数，不改台账（§11.2：台账完成行只写报告路径，hash / run 只进报告）。
 
 ## 7. 已知边界
 
