@@ -8,7 +8,7 @@ Date: 2026-11-13. Status: documentation assembly finalised (steps 1-7 closed). S
 - Delivery: the lightweight `run --progress` stream switch, off by default; new file `internal/console/progress.go`.
 - Conclusion: form A landed; default behaviour unchanged; `--json` semantics unchanged; gates all green.
 - Metering: step 5 once (`PRE-REVIEW: PASS`), step 6 once (`INDEPENDENT SCAN: PASS`), step 7 final review 1 + re-review 1 (`FINAL REVIEW: PASS WITH FIXES` followed by `RE-REVIEW: FINDINGS`); blind review 0; GLM batch assistance 2 times.
-- Counts: **R = 0, D = 2** (temporary-file D accumulated twice; both were capture files the controller misplaced at the `tmp/` root inside the post-wrap-up capture slot, each removed item by item with zero residue, registered under the §5.1 non-self-healing tier for a user ruling).
+- Counts: **R = 1, D = 2** (R = 1 counts the CI first-run red and its fix repush under §9.2; temporary-file D accumulated twice; both were capture files the controller misplaced at the `tmp/` root inside the post-wrap-up capture slot, each removed item by item with zero residue, registered under the §5.1 non-self-healing tier for a user ruling).
 
 ### 1.1 Exceptions and Deviations
 
@@ -61,6 +61,7 @@ Raw step-4 batch readings (Windows host, 2026-11-13; the step-9 rerun after this
 - `GOOS=linux GOARCH=amd64 go build ./...` and `go vet ./...` both empty with exit 0 (host-side evidence of zero Unix impact; the CI ubuntu leg backs it up).
 - Focused tests `go test ./internal/console/... -count=1 -run Progress -v`: all nine `--- PASS` lines are green.
 - The ⑨ closing readings (rerun after the ⑧ documentation assembly, with an explicit stage before reading the index): `--scope=index` => `changed=33`, `TOTAL_FAIL=0`; `--scope=tree` => `changed=33`, `TOTAL_FAIL=0`; `--scope=ci` => `changed=2`, `TOTAL_FAIL=0`; `SELFTEST: PASS 737/737`; `go test ./... -count=1` exit 0; `GOOS=linux` `go build` and `go vet` both exit 0.
+- Post-commit CI chain: the main commit `f77ab49` first run turned the **ubuntu `Test` leg red** (run `43400311736`, exit 1; the windows leg stayed green) => attempt 2 from `gh run rerun --failed` on the same run kept **ubuntu red and windows green with the same test, the same line and the same assertion string** (not a flake; registered as DR-14) => the fix commit `6a405bd` in run `43403891205` made **both legs succeed** (ubuntu 3m17s including Race / Contract fixtures / Gates, windows 4m28s; the package-level `ok github.com/larsonzh/prfrail/internal/console` lines read `3.477s` / `15.783s` and `24.133s`, with `--- FAIL` line counts of 0).
 
 ## 7. Known Limits
 
@@ -78,6 +79,7 @@ Raw step-4 batch readings (Windows host, 2026-11-13; the step-9 rerun after this
 - The self-healing confirmer for D=2 is missing: the step-7 quota of 1 + 1 was already exhausted, so no same-round independent review layer could confirm it; it is registered under the §5.1 non-self-healing tier and escalated, and the user accepted it on 2026-11-13 with one condition - if a third occurrence of the same class (D=3) happens, the §5.1 accumulated ceiling forces the slice to stop.
 - Recurrence prevention: inside the post-wrap-up capture window every gate capture must use inline printing (`node -e` / `execFileSync`) or land in `tmp/<slice-id>/`; never at the `tmp/` root. Both D=2 occurrences in this slice were instances of that violation.
 - P68 counts in the §7.7 window (see §5) => **P71 must draw a blind review at kickoff**; P71 has to cite this line.
+- DR-14 (CI first-run red, fixed in this slice): carrier = the `progressSummaryJSON` guard starting at `internal/console/progress_test.go:172`; the ledger registration is the DR-14 entry in the `docs/t027/REMAINING_SLICES{,_EN}.md` known-defects table; evidence = run `43400311736` (head `f77ab49`) with the ubuntu `Test` step red, attempt 2 still red and the windows leg green; the fix commit `6a405bd` (run `43403891205`) is green on both legs.
 
 Artifact list of this slice (repo-relative path + disposition, TAB separated; the fence is byte-identical in this file and its `_EN` mirror).
 

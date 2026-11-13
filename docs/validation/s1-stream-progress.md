@@ -8,7 +8,7 @@
 - 交付：`run --progress` 轻量流式开关，默认关闭；新增 `internal/console/progress.go`。
 - 结论：形态 A 落地；默认行为不变；`--json` 语义不变；门禁全绿。
 - 计量：⑤ 一次（`PRE-REVIEW: PASS`）、⑥ 一次（`INDEPENDENT SCAN: PASS`）、⑦ 终审 1 + 复审 1（`FINAL REVIEW: PASS WITH FIXES` 之后接 `RE-REVIEW: FINDINGS`）；盲审 0；GLM 批量辅助 2 次。
-- 计数：**R = 0、D = 2**（临时件 D 累计 2 次；均为⑧c 后取证窗口内主控将捕获件误落 `tmp/` 根，已逐件精确清除、零残留，按 §5.1 非自愈档登记并升级用户裁决）。
+- 计数：**R = 1、D = 2**（R = 1 = CI 首跑红后的修复重推，§9.2；临时件 D 累计 2 次；均为⑧c 后取证窗口内主控将捕获件误落 `tmp/` 根，已逐件精确清除、零残留，按 §5.1 非自愈档登记并升级用户裁决）。
 
 ### 1.1 异常与偏离登记
 
@@ -61,6 +61,7 @@ c) **临时件 D = 1**：⑧c 清空后、⑩ 回执前的取证窗口内，主�
 - `GOOS=linux GOARCH=amd64 go build ./...` 与 `go vet ./...` 均空输出、exit 0（Unix 零影响的本机证据；CI ubuntu 腿兜底）。
 - 聚焦测试 `go test ./internal/console/... -count=1 -run Progress -v`：九条 `--- PASS` 全绿。
 - ⑨ 定稿读数（⑧ 文档装配完成后复跑，先精确暂存再取 index）：`--scope=index` ⇒ `changed=33`、`TOTAL_FAIL=0`；`--scope=tree` ⇒ `changed=33`、`TOTAL_FAIL=0`；`--scope=ci` ⇒ `changed=2`、`TOTAL_FAIL=0`；`SELFTEST: PASS 737/737`；`go test ./... -count=1` exit 0；`GOOS=linux` 的 `go build` / `go vet` 均 exit 0。
+- CI 链路（提交后）：主提交 `f77ab49` 首跑 **ubuntu 腿 `Test` 红**（run `43400311736`，exit 1；windows 腿绿）⇒ 同 run `gh run rerun --failed` 的 attempt 2 **ubuntu 仍红、windows 仍绿、同一测试同一行号同一断言串**（非 flake，登记 DR-14）⇒ 修复提交 `6a405bd` 的 run `43403891205` **双腿 success**（ubuntu 3m17s 含 Race / Contract fixtures / Gates、windows 4m28s；两腿包级 `ok github.com/larsonzh/prfrail/internal/console` 分别为 `3.477s` / `15.783s` 与 `24.133s`，`--- FAIL` 行数均为 0）。
 
 ## 7. 已知边界
 
@@ -78,6 +79,7 @@ c) **临时件 D = 1**：⑧c 清空后、⑩ 回执前的取证窗口内，主�
 - D=2 的自愈确认者缺失：因 ⑦ 额度 1+1 已用尽，无法同轮独立审查层确认；按 §5.1 非自愈档登记并升级，用户 2026-11-13 裁定接受，限定条件 = 若第 3 次同类违规（D=3）发生，按 §5.1 累计上界强制停片。
 - 防再犯：⑧c 后取证窗口内的门禁捕获件一律使用内联打印（`node -e` / `execFileSync`）或落 `tmp/<切片ID>/`；不得落 `tmp/` 根。本片 D=2 两起均为该违规的实例。
 - P68 计入 §7.7 窗口（判定见 §5）⇒ **P71 起跑应抽盲审**；P71 起跑时须引用本行。
+- DR-14（CI 首跑红，本片修复）：载体 = `internal/console/progress_test.go:172` 起的 `progressSummaryJSON` 守卫；台账登记见 `docs/t027/REMAINING_SLICES{,_EN}.md` 的「已知缺陷」表 DR-14 条目；证据 = run `43400311736`（head `f77ab49`）ubuntu 腿 `Test` 步红、attempt 2 仍红、windows 腿绿；修复提交 `6a405bd`（run `43403891205` 双腿 success）。
 
 以下为本片归档条目清单（仓库相对路径 + 处置，TAB 分隔；CN 与 `_EN` 两侧围栏逐字节相同）。
 

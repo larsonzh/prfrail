@@ -100,7 +100,7 @@
 | P67 GATES-DEBT-CLEANUP | ✅ 已完成（2026-11-12 收口；R=3、D=1；⑦ 盲审 1 + 终审 1 + 复审 1；SELFTEST 737/737；主控 V4 Pro，ADR-041） | P66（层 2 新增队列第 13 项；清欠四类：g4b 缓存 LRU / 第 27 条门禁坑 / §12.4 抽查记录块 / ⑥ 提示词加固） | L | 2026-11-12 | 报告对 `docs/validation/gates-debt-cleanup{,_EN}.md`；证据包 `docs/validation/evidence/P67-GATES-DEBT-CLEANUP/`；临时件 `tmp/P67-GATES-DEBT-CLEANUP/` |
 | P68 REMAINING-RULINGS | ✅ 已完成（2026-11-12 收口；R=1、D=1；⑥ 跳过经 ⑦ 确认；⑦ 终审 PASS；SELFTEST 737/737；主控 Flash） | P67（层 2 治理侧；四项 R 裁定建议 + 分阶段策略封板确认） | M | 2026-11-12 | 报告对 `docs/validation/remaining-rulings{,_EN}.md`；证据包 `docs/validation/evidence/P68-REMAINING-RULINGS/`；临时件 `tmp/P68-REMAINING-RULINGS/` |
 | P69 T027B-E2E-WIRING | ✅ 已完成（2026-11-12 收口；报告对 `docs/validation/t027b-e2e-wiring{,_EN}.md`） | P68（R-06 = b 的 R-1 收口） | M | 2026-11-12 | 把 P44 的 readiness / permit 判定接到生产装配与 CLI 入口；证据包 `docs/validation/evidence/P69-T027B-E2E-WIRING/`；审查链 ⑤ PASS / ⑥ PASS / ⑦ PASS；R=0、D=1（⑧a1 文档载体自删辅助脚本，⑩ 升级用户裁定） |
-| P70 S1-STREAM-PROGRESS | ✅ 已完成（2026-11-13 收口；R=0、D=0；⑦ 终审 1 + 复审 1；SELFTEST 737/737；主控 Flash） | P68（R-07 b1 附条件 1） | S | 2026-11-13 | `run --progress` 轻量流式开关（默认关闭、消费现有事件流、不做视图层）；证据包 `docs/validation/evidence/P70-S1-STREAM-PROGRESS/` |
+| P70 S1-STREAM-PROGRESS | ✅ 已完成（2026-11-13 收口；R=1、D=2；⑦ 终审 1 + 复审 1；SELFTEST 737/737；主控 Flash） | P68（R-07 b1 附条件 1） | S | 2026-11-13 | `run --progress` 轻量流式开关（默认关闭、消费现有事件流、不做视图层）；证据包 `docs/validation/evidence/P70-S1-STREAM-PROGRESS/` |
 | P71 S1-SCOPE-ANNOTATE | ⬜ 未开始（须用户点名；需同轮显式授权） | P68（R-07 b1 附条件 2） | M | — | visible 调试指引 + REQ 阶段归属列 + 矩阵/策略/门适用性回写（X 方案，不删条目）；证据包 `docs/validation/evidence/P71-S1-SCOPE-ANNOTATE/` |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
@@ -1974,7 +1974,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 执行自由度清单落盘路径 | `docs/validation/evidence/P70-S1-STREAM-PROGRESS/freedom-list.md` |
 | R/D 基线 | R = 0、D = 0（步骤 0 登记，§13.1.1） |
 | 临时件落点声明 | 本片临时目录 = `tmp/P70-S1-STREAM-PROGRESS/`（⑧c 前只增不删） |
-| 完成记录 | 报告对 `docs/validation/s1-stream-progress{,_EN}.md`；审查链 ① `DESIGN: DONE` → ②a–②c 全绿 → ③ R1–R9 + M1–M8 变异闭环 → ⑤ `PRE-REVIEW: PASS` → ⑥ `INDEPENDENT SCAN: PASS` → ⑦ 终审 1 + 复审 1；GLM 批量 2 次；R=0、D=0；停于 ⑩ 等授权（不写 hash/run，§11.2） |
+| 完成记录 | 报告对 `docs/validation/s1-stream-progress{,_EN}.md`；审查链 ① `DESIGN: DONE` → ②a–②c 全绿 → ③ R1–R9 + M1–M8 变异闭环 → ⑤ `PRE-REVIEW: PASS` → ⑥ `INDEPENDENT SCAN: PASS` → ⑦ 终审 1 + 复审 1；GLM 批量 2 次；R=1、D=2（R=1 = CI 首跑红后的修复重推；D=2 = ⑧c 后取证窗口内捕获件误落 `tmp/` 根，已零残留清除，DR-14 另计于缺陷表）；停于 ⑩ 等授权（不写 hash/run，§11.2） |
 
 ### P71 — `S1-SCOPE-ANNOTATE`（TUI 移出附条件 2 + 阶段归属列） · ⬜ 未开始
 
