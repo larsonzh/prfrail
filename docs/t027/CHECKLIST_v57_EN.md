@@ -19,7 +19,9 @@ Changes in this version (relative to v56): (1) §1 anchors rotated (HEAD / direc
 | Three scopes | **all TOTAL_FAIL=0** | `gate.js --all --scope=index`, `tree`, `ci` |
 | v54 whole-file lines | **180 (LF count, CN/EN symmetric)** | count `docs/t027/CHECKLIST_v54{,_EN}.md` by LF |
 | v55 whole-file lines | **182 (LF count, CN/EN symmetric)** | count `docs/t027/CHECKLIST_v55{,_EN}.md` by LF |
-| v56 whole-file lines | **183 (LF count, CN/EN symmetric)** | count `docs/t027/CHECKLIST_v56{,_EN}.md` by LF |
+| v56 whole-file lines | **185 (LF count, CN/EN symmetric)** | count `docs/t027/CHECKLIST_v56{,_EN}.md` by LF |
+
+> This snapshot's HEAD = `147008a` is the generation-time anchor after commit A; once commit B (v57 itself) lands, HEAD moves forward, and the repository truth is whatever `git rev-parse --short HEAD` reports then.
 
 > The rolling window is the latest 3 versions (v54 / v55 / v56); v53 has rolled out. This snapshot's own line count is carried by v58 (same roll-out rule as v52). If 2 or more anchors disagree => take the repository as truth, report the terminal readings first, then continue.
 
@@ -91,7 +93,18 @@ Changes in this version (relative to v56): (1) §1 anchors rotated (HEAD / direc
 
 ### Layer 3 low-priority candidates
 
-- Keep the v54-v56 wording: nothing added or removed in this version.
+#### L-1 - low-priority candidates (parked long-term) · ⬜ never started without a trigger
+
+| Field | Content |
+|---|---|
+| Identifier | `OB-50` / `spawnGit` / `ci freeze cost` / `%TEMP% historical 22 leftovers` / `GATES-EXEMPT` |
+| Current state (checked item by item) | OB-50 = **disposed** (§12.4, v1.41); spawnGit = the git-call helper of `tools/gates/selftest.js` (the spawn wrapper in `lib/ctx.js`) that captures stderr into the result object instead of printing it; the P27 `G4b-CACHE` report §5 item 5 registered it as a "candidate OB (diagnostics)" (Low / observing) and it was never formally registered as a §12.4 OB number; under the §1.8.1 rule for to-be-assessed items it is an "unregistered candidate OB"; candidate fix = attach the last N bytes of stderr to `detail` when spawn fails (no verdict change, diagnostics only); trigger = the next time any git-related assertion fails for an unknown reason, let step 1 assess it; ci freeze cost = **no matching §12.4 entry**; the real source is the P27 report §7 "candidate OB (performance)" (the origin of the 24-37 s ci-scope freeze cost is undetermined) and it is **not formally registered**; %TEMP% historical 22 leftovers = OB-98 (**disposed**, G9-c static form) / OB-99 (**observing**) / OB-100 (**observing**, the window sub-range already disposed); GATES-EXEMPT = **not chartered** (no §12.4 entry; the P33 item 1-3(iv) split, touching four criterion files) |
+| Contents | Five items, each in its corresponding §12.4 row; `GATES-EXEMPT` = the P33 item 1-3(iv) split, not chartered |
+| Dependency | The long-term park covers only undisposed items (spawnGit / ci freeze cost / the %TEMP% timing shape (OB-99 / OB-100) / GATES-EXEMPT); no definite trigger |
+| Size | Varies (S through M-L) |
+| Step-7 budget | none |
+| Boundary | Each item per §12.4; this version adds no layer-3 entry and advances no parked item |
+| Start condition | The user must name it explicitly |
 
 **Queue discipline**:
 
