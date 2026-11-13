@@ -194,6 +194,7 @@ T027 前置状态更新（2026-11-09，F2-FIX-STUB-HANG）：在上一段基础�
 - P52 验收反例：接受链安全反例已覆盖（P52 `ACCEPTANCE-SECURITY-COUNTEREXAMPLES`，含 GAP-77 击穿登记与 P53 修复指向；生产代码零改动；报告 `docs/validation/acceptance-security-counterexamples{,_EN}.md`）
 - P53 修复：GAP-77 中间符号链接逃逸已修复（openat2 单次受限解析加 fail-closed，无 walk 降级；T51-1 红转绿并常驻回归，含 F1/F2 反例；规范同步 SECURITY SEC-02 与 TEST_STRATEGY AT-02；报告与证据包 `docs/validation/evidence/FIX-GAP-77-SYMLINK-ESCAPE/`；实现与审查完成，停于 ⑩ 等授权）
 - P54 发布耐久：C6 预建槽机制落地（契约先行：§7 C6 判定路径 + 附件 C；Windows `unproven` 不变、AT-23 不豁免；报告 `docs/validation/contracts-s7-durability{,_EN}.md`；证据包 `docs/validation/evidence/CONTRACTS-S7-DURABILITY/`）
+- P70 S1-STREAM-PROGRESS：`run --progress` 轻量流式开关（报告对 `docs/validation/s1-stream-progress{,_EN}.md`）
 
 ## 3. 需求映射
 

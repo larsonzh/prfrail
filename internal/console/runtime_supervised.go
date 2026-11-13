@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path"
 	"path/filepath"
@@ -235,6 +236,11 @@ type SupervisedAssemblyOptions struct {
 	GateHooks     map[string]gates.Hook
 	Clock         func() time.Time
 	IDs           func() string
+	// Progress is the optional per-task/per-step progress sink resolved from the
+	// CLI --progress flag. A nil value means progress is off (the zero value),
+	// which keeps every existing run byte-identical; a non-nil value decorates the
+	// event store with the per-event progress line.
+	Progress io.Writer
 	// ProbePermit is the one-shot probe permit of the first start. The
 	// supervised run is a re-entrant state machine, so only the first start (no
 	// operator-interaction ledger yet) claims the quota; every re-entry passes
@@ -617,10 +623,16 @@ func newSupervisedEngine(ctx context.Context, options SupervisedAssemblyOptions,
 	if err != nil {
 		return nil, nil, err
 	}
+	// --progress only decorates the store; a nil writer keeps the plain store so
+	// the run stays byte-identical to the pre-flag behaviour.
+	var events chain.EventStore = eventStore
+	if options.Progress != nil {
+		events = newProgressStore(eventStore, options.Progress)
+	}
 	engine, err := chain.New(ctx, chain.Options{
 		RunID:      options.RunID,
 		Definition: options.Definition,
-		Events:     eventStore,
+		Events:     events,
 		Baselines:  runtime,
 		Workspaces: runtime,
 		Steps:      runtime,

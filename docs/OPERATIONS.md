@@ -25,6 +25,8 @@ go run ./cmd/prfrail cost report --ledger .\cost-ledger.json
 go run ./cmd/prfrail ai check --chain .\proofrail.chain.json --channel agent-runner-cli --copilot C:\path\to\copilot.exe --workspace . --max-requests 1 --out .\tmp\ai-availability.json --json
 go run ./cmd/prfrail ai verify --chain .\proofrail.chain.json --record .\tmp\ai-availability.json --channel agent-runner-cli --max-age 10m --max-requests 1 --json
 go run ./cmd/prfrail run --chain .\proofrail.chain.json --run-id run-demo
+go run ./cmd/prfrail run --chain .\proofrail.chain.json --run-id run-demo --progress
+# --progress 为运行期开关，默认关闭；开启后每个状态事件向 stderr 打印一行 progress: <occurredAt> <entity> <fromState>-><toState> <reasonCode>，stdout 输出（含 --json）保持不变；事件日志不可读时不报错、不中止，仅表现为无进展行。
 go run ./cmd/prfrail report --run-dir .\tmp\prfrail-runs\run-demo
 ```
 

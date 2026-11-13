@@ -75,6 +75,8 @@ AI 需要人工输入时，AgentRunner 或辅助 adapter 只接收结构化 `ope
 
 console 多任务串行装配（P50）：装配计划把 `chain.Definition` 展开为逐 task 绑定表——`agentRunnerAssemblyPlan` 与 `supervisedAssemblyPlan` 各要求每个 task 恰有一个 code step（分别 isolated-workspace 与 supervised-black-box），0 task 以专用文案拒绝；每个 `(taskId, stepId, attempt)` 绑定各自已持久化的 `agent-runner-request`，`agentRunnerAssemblyRecords` 强制 `requestId` 互异且 attempt 恒为 1。驱动循环在生产入口内逐 task 串行推进：等待该 task 的派发→发布终局→载入 chain 终局→路由提交；非 completed 终局即停止后续 task。任务间停机证明屏障由 `proveTaskStopped` 承担，它复用 `managedProcessesGone` 的三态判定（已停止 / 仍存活 / 证据缺失），任一不满足即 fail-closed，绝不进入下一 task 的 R 与 launch-intent。CLI 接线后置，本片范围限生产装配层与离线 harness。
 
+`run --progress` 流式摘要（P70）：console 侧以事件存储装饰实现，`progressStore` 包装 `chain.FileEventStore`，在 `Append` 落盘成功后按事件序向 stderr 打印一行摘要，并转发 `Load` 与 `SealSink` 两方法（`SealTaskEvidence` / `LoadTaskSeal`）以保住封存屏障；只读重放路径不装饰。未引入订阅 API、goroutine 或视图层。
+
 console 多任务 CLI 接线（P51）：`prfrail run` 以可重复 `--request-records <path>` 逐任务声明 `agent-runner-request` 记录，CLI 解码后按 `agentRunnerRequestRecordKey(taskID, stepID)` 建立注册表并注入 `AgentRunnerAssemblyOptions.RequestRecords`；单值 `--request-record` 保持单任务兼容路径，两者互斥。CLI 侧 fail-closed 覆盖双 flag、空路径、重复键、键未命中链定义、定义缺覆盖、记录 `runId` 与 `--run-id` 不一致，以及 noop-only 链上声明多记录；全部拒绝发生在 run-root 创建与事件日志写入之前（零写入）。supervised 装配不含记录输入端，故不在此列。
 
 console 装配入口的 P44 门（P69）：`ProbePermit` 门在装配入口的位置为——`ExecuteAgentRunnerRun` 在 Step 1 前置校验之前做 readiness presence 判定（缺许可 ⇒ `ErrProbePermitMissing`、零痕迹拒绝），Step 1 全部通过后、run-root 事件日志标记之前调用 `requireProbePermit`（一次性额度 Require + defer Complete）；`ExecuteSupervisedRun` 以「操作员交互 ledger 不存在 = 首次起跑」的 fresh 门在可见通道校验后、标记前执行同一三件套，重入不重复消费；CLI `run` 在路由到两条装配路径之前用 `--probe-permit` 旗标做同样的 presence 判定（只判定不消费）。判定本体零改动（`internal/gates/**`），本片只做接线。

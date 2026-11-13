@@ -25,6 +25,8 @@ go run ./cmd/prfrail cost report --ledger .\cost-ledger.json
 go run ./cmd/prfrail ai check --chain .\proofrail.chain.json --channel agent-runner-cli --copilot C:\path\to\copilot.exe --workspace . --max-requests 1 --out .\tmp\ai-availability.json --json
 go run ./cmd/prfrail ai verify --chain .\proofrail.chain.json --record .\tmp\ai-availability.json --channel agent-runner-cli --max-age 10m --max-requests 1 --json
 go run ./cmd/prfrail run --chain .\proofrail.chain.json --run-id run-demo
+go run ./cmd/prfrail run --chain .\proofrail.chain.json --run-id run-demo --progress
+# --progress is a runtime switch and off by default; when enabled every state event prints one line to stderr as progress: <occurredAt> <entity> <fromState>-><toState> <reasonCode>, while stdout output (including --json) stays unchanged; if the event log is unreadable it neither errors nor aborts and only shows no progress lines.
 go run ./cmd/prfrail report --run-dir .\tmp\prfrail-runs\run-demo
 ```
 

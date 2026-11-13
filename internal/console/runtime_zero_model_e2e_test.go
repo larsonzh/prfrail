@@ -73,7 +73,7 @@ func TestZeroModelConsoleNoopThreeTaskE2E(t *testing.T) {
 	}}
 	now := zeroModelClock
 
-	summary, err := ExecuteNoopRun(context.Background(), "run-zero-model-noop", runDir, definition, workspace, now)
+	summary, err := ExecuteNoopRun(context.Background(), "run-zero-model-noop", runDir, definition, workspace, now, nil)
 	if err != nil {
 		t.Fatalf("the noop console path must run without any model: %v", err)
 	}
@@ -112,7 +112,7 @@ func TestZeroModelConsoleNaturalFailureStopsLaterTasks(t *testing.T) {
 		zeroModelNoopTask("task-three"),
 	}}
 
-	_, err := ExecuteNoopRun(context.Background(), "run-zero-model-fail", runDir, definition, workspace, zeroModelClock)
+	_, err := ExecuteNoopRun(context.Background(), "run-zero-model-fail", runDir, definition, workspace, zeroModelClock, nil)
 	if err == nil {
 		t.Fatal("a non-noop step must fail the console run instead of being skipped")
 	}

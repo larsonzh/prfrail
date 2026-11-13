@@ -195,6 +195,7 @@ T027 prerequisite status update (2026-11-09, F2-FIX-STUB-HANG): building on the 
 - P52 acceptance counterexamples: acceptance-chain security counterexamples are now covered (P52 `ACCEPTANCE-SECURITY-COUNTEREXAMPLES`, including the GAP-77 break registration and the P53 remediation pointer; production code unchanged; report `docs/validation/acceptance-security-counterexamples{,_EN}.md`)
 - P53 fix: the GAP-77 middle symlink escape is fixed (openat2 single restricted resolution plus fail-closed, no walk fallback; T51-1 turned red-to-green and stays as a resident regression, with the F1/F2 counterexamples; spec sync to SECURITY SEC-02 and TEST_STRATEGY AT-02; report and evidence package `docs/validation/evidence/FIX-GAP-77-SYMLINK-ESCAPE/`; implementation and review complete, stopped at 10 for authorisation)
 - P54 publication durability: the C6 prebuilt-slot mechanism has landed (contract first: §7 C6 Decision Path + Annex C; Windows `unproven` unchanged, AT-23 not waived; report `docs/validation/contracts-s7-durability{,_EN}.md`; package `docs/validation/evidence/CONTRACTS-S7-DURABILITY/`)
+- P70 S1-STREAM-PROGRESS: the lightweight `run --progress` stream switch (report pair `docs/validation/s1-stream-progress{,_EN}.md`)
 
 ## 3. Requirement Mapping
 

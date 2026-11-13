@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -110,6 +111,12 @@ type AgentRunnerAssemblyOptions struct {
 
 	Clock func() time.Time
 	IDs   func() string
+
+	// Progress is the optional per-task/per-step progress sink resolved from the
+	// CLI --progress flag. A nil value means progress is off (the zero value),
+	// which keeps every existing run byte-identical; a non-nil value decorates the
+	// event store with the per-event progress line.
+	Progress io.Writer
 
 	// testStub is the in-package test seam of the production entry. It is
 	// unexported, so no caller outside this package can reach it and every
@@ -342,10 +349,16 @@ func ExecuteAgentRunnerRun(ctx context.Context, options AgentRunnerAssemblyOptio
 	if err != nil {
 		return RunSummary{}, err
 	}
+	// --progress only decorates the store; a nil writer keeps the plain store so
+	// the run stays byte-identical to the pre-flag behaviour.
+	var events chain.EventStore = eventStore
+	if options.Progress != nil {
+		events = newProgressStore(eventStore, options.Progress)
+	}
 	engine, err := chain.New(ctx, chain.Options{
 		RunID:       options.RunID,
 		Definition:  options.Definition,
-		Events:      eventStore,
+		Events:      events,
 		Baselines:   assemblyRuntime,
 		Workspaces:  assemblyRuntime,
 		Steps:       assemblyRuntime,

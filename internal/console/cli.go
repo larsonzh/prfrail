@@ -278,6 +278,7 @@ func (cli CLI) executeRun(ctx context.Context, args []string, stdout, stderr io.
 	runDir := set.String("run-dir", "", "run directory")
 	runID := set.String("run-id", "", "run identifier")
 	jsonOutput := set.Bool("json", false, "output as JSON")
+	progressOutput := set.Bool("progress", false, "stream per-task and per-step progress to stderr")
 	requestRecord := set.String("request-record", "", "path to a declared AgentRunner request record (enables the AgentRunner assembly)")
 	requestRecordPaths := make([]string, 0)
 	set.Func("request-records", "path to a declared AgentRunner request record (repeatable; one per task/step)", func(value string) error {
@@ -398,20 +399,27 @@ func (cli CLI) executeRun(ctx context.Context, args []string, stdout, stderr io.
 		}
 		gatePermit = permit
 	}
+	// The progress writer is resolved once, before routing, so all three routes
+	// receive the same nil-or-stderr decision. A nil writer keeps every existing
+	// output byte-identical: no route writes progress when the flag is absent.
+	var progressWriter io.Writer
+	if *progressOutput {
+		progressWriter = stderr
+	}
 	if len(supervised) > 0 {
-		return cli.executeSupervisedRun(ctx, *runID, resolvedRunDir, definition, gatePermit, *jsonOutput, stdout, stderr)
+		return cli.executeSupervisedRun(ctx, *runID, resolvedRunDir, definition, gatePermit, *jsonOutput, stdout, stderr, progressWriter)
 	}
 	if len(executable) > 0 {
-		return cli.executeAgentRunnerRun(ctx, *runID, resolvedRunDir, definition, inputs, gatePermit, *jsonOutput, stdout, stderr)
+		return cli.executeAgentRunnerRun(ctx, *runID, resolvedRunDir, definition, inputs, gatePermit, *jsonOutput, stdout, stderr, progressWriter)
 	}
-	summary, err := ExecuteNoopRun(ctx, *runID, resolvedRunDir, definition, filepath.Dir(resolvedPath), cli.now)
+	summary, err := ExecuteNoopRun(ctx, *runID, resolvedRunDir, definition, filepath.Dir(resolvedPath), cli.now, progressWriter)
 	if err != nil {
 		return writeCommandError(stdout, stderr, "run", *jsonOutput, err)
 	}
 	return writeRunSummary(stdout, *jsonOutput, resolvedRunDir, summary)
 }
 
-const runUsage = "usage: prfrail run [--chain <path>] [--run-id <id>] [--run-dir <path>] [--json] (--request-record <path> | --request-records <path>)... --capability-record <path> --enforcement-record <path> --availability-record <path> --authorization-ledger <path> --cost-ledger <path> --agent-cli <path> --agent-version <version> --probe-permit <path>"
+const runUsage = "usage: prfrail run [--chain <path>] [--run-id <id>] [--run-dir <path>] [--json] [--progress] (--request-record <path> | --request-records <path>)... --capability-record <path> --enforcement-record <path> --availability-record <path> --authorization-ledger <path> --cost-ledger <path> --agent-cli <path> --agent-version <version> --probe-permit <path>"
 
 // agentRunnerRunInputs is the all-or-nothing AgentRunner CLI surface. Before the
 // run command routes to the AgentRunner assembly the request-record dimension
@@ -477,7 +485,7 @@ func (inputs agentRunnerRunInputs) anyProvided() bool {
 // executeAgentRunnerRun decodes the declared record files and drives the
 // production assembly. Decoding is CLI-side file IO; the assembly re-validates
 // every record before the engine exists.
-func (cli CLI) executeAgentRunnerRun(ctx context.Context, runID, runDir string, definition chain.Definition, inputs agentRunnerRunInputs, probePermit *gates.ProbePermit, jsonOutput bool, stdout, stderr io.Writer) int {
+func (cli CLI) executeAgentRunnerRun(ctx context.Context, runID, runDir string, definition chain.Definition, inputs agentRunnerRunInputs, probePermit *gates.ProbePermit, jsonOutput bool, stdout, stderr io.Writer, progress io.Writer) int {
 	// probePermit is only forwarded: the assembly entry evaluates and consumes it.
 	cwd, err := cli.getwd()
 	if err != nil {
@@ -588,7 +596,8 @@ func (cli CLI) executeAgentRunnerRun(ctx context.Context, runID, runDir string, 
 			Timeout:     agentRunnerDefaultRunTimeout,
 			MaxLogBytes: agentRunnerDefaultMaxLogBytes,
 		},
-		Clock: cli.now,
+		Clock:    cli.now,
+		Progress: progress,
 	}
 	summary, err := ExecuteAgentRunnerRun(ctx, options)
 	if err != nil {

@@ -21,7 +21,7 @@ func TestDefaultStopRunReturnsTerminalEvidence(t *testing.T) {
 	}
 	runID := "run-terminal"
 	runDir := filepath.Join(root, "tmp", "prfrail-runs", runID)
-	if _, err := ExecuteNoopRun(context.Background(), runID, runDir, definition, root, time.Now); err != nil {
+	if _, err := ExecuteNoopRun(context.Background(), runID, runDir, definition, root, time.Now, nil); err != nil {
 		t.Fatal(err)
 	}
 
@@ -56,7 +56,7 @@ func TestDefaultStopRunRespectsRunDirOverride(t *testing.T) {
 	}
 	runID := "run-overridden"
 	runDir := filepath.Join(root, "custom-runs", runID)
-	if _, err := ExecuteNoopRun(context.Background(), runID, runDir, definition, root, time.Now); err != nil {
+	if _, err := ExecuteNoopRun(context.Background(), runID, runDir, definition, root, time.Now, nil); err != nil {
 		t.Fatal(err)
 	}
 

@@ -1,0 +1,57 @@
+P70 S1-STREAM-PROGRESS · ③ 变异检验证据（M1–M6）
+
+方法：临时改生产代码 → 跑聚焦测试 → 记录红/绿与失败输出 → 逐字还原 → 核对 SHA256 与变异前一致 → 重跑确认全绿。
+基线 SHA256（变异前）：
+  internal/console/runtime.go  = 88A736ED44C7EAF47907E5A74A9DC4BA924CE30350B872F4049E18B27B55BCDD
+  internal/console/progress.go = F3F76FA128477429679A84F02A30D947E7C00F962AD36BEC522809DC07F9821B
+
+M1 | 删 runtime.go 的 `if progress != nil` 守卫（无条件包裹）
+  target: R1 | result: RED (exit=1)
+  output: panic: fmt.Fprintln({0x0, 0x0}, ...) at progress.go:44 <- Append <- ExecuteNoopRun at runtime.go:62
+          FAIL github.com/larsonzh/prfrail/internal/console 1.382s
+  restore: ok, SHA256 match = yes
+
+M2 | progress.go: fmt.Fprintln(s.out, ...) -> fmt.Fprintln(os.Stdout, ...)
+  target: R2 | result: RED (exit=1)
+  output: progress lines leaked to process stdout; progress_test.go:219: expected at least 3 progress lines on stderr, got 0 (stderr="")
+  restore: ok, SHA256 match = yes
+
+M3 | Append: `_, _ = fmt.Fprintln(...)` -> `if _, err := fmt.Fprintln(...); err != nil { return err }`
+  target: R3 | result: RED (exit=1)
+  output: progress_test.go:248: a broken progress sink must never fail the append: progress sink is broken
+  restore: ok, SHA256 match = yes
+
+M4 | Append 转发前插入 event.Event.Reason.Message = "progress-mutation"
+  target: R4 | result: RED (exit=1)
+  output: bare store `"reason":{"code":"run-created"}` vs decorated `"reason":{"code":"run-created","message":"progress-mutation"}` (3 events)
+  restore: ok, SHA256 match = yes
+  note: Reason.Message 带 omitempty，赋值后新增字节，语义不变 —— 最小可证伪扰动
+
+M5 | progressPlaceholder "-" -> ""
+  target: R5 | result: RED (exit=1)
+  output: TestFormatProgressLineSnapshot/empty_fields: got "progress:  chain -> " want "progress: - chain -->- -"
+  restore: ok, SHA256 match = yes
+
+M6 | progressStore.SealTaskEvidence 改为 return "", nil（不转发）
+  target: R6b | result: RED (exit=1)
+  output: progress_test.go:461: both stores must return a seal digest: bare="sha256:a98ea083...79ad" decorated=""
+          (同时 R1/R2/R7 连带红：noop run 的接受闭包依赖 seal 写路径)
+  restore: ok, SHA256 match = yes
+
+M7（⑦ 复审 Low 整改后的守卫有效性）| 关掉 R8/R9 的 JSON 归一化（保留真实 lastEventHash 参与比较）
+  target: R8 / R9 | result: RED (exit=1)
+  output: progress_test.go:786: --progress changed the JSON summary
+          progress_test.go:943: --progress changed the JSON report
+  restore: ok（归一化复位）
+
+M8（⑦ 复审 Low 整改的守卫有效性）| 把 runtime_agent.go / runtime_supervised.go 的 `if options.Progress != nil` 改为 `if false && ...`
+  target: R8 / R9 | result: RED (exit=1)
+  output: progress_test.go:677: expected one progress line per event: got 0 want 22
+          progress_test.go:784: expected at least one "chain" progress line, got map[] (stderr="")
+  restore: ok, 文件哈希与备份一致
+
+恢复后全量：
+  gofmt -l internal/console -> 空
+  go build ./... -> exit 0
+  go vet ./... -> exit 0
+  go test ./internal/console/... -count=1 -> ok  github.com/larsonzh/prfrail/internal/console

@@ -1,0 +1,74 @@
+P70 S1-STREAM-PROGRESS · ④ 门禁原始读数（2026-11-13，Windows 本机）
+
+COMMAND: gofmt -l .
+OUTPUT: (无输出)
+EXIT: 0
+
+COMMAND: go build ./...
+OUTPUT: (无输出)
+EXIT: 0
+
+COMMAND: go vet ./...
+OUTPUT: (无输出)
+EXIT: 0
+
+COMMAND: go test ./... -count=1
+OUTPUT (ok lines):
+ok  	github.com/larsonzh/prfrail/examples/whois-shadow	1.500s
+ok  	github.com/larsonzh/prfrail/internal/adapters	53.935s
+ok  	github.com/larsonzh/prfrail/internal/applier	2.733s
+ok  	github.com/larsonzh/prfrail/internal/chain	4.893s
+ok  	github.com/larsonzh/prfrail/internal/console	23.605s
+ok  	github.com/larsonzh/prfrail/internal/evidence	2.522s
+ok  	github.com/larsonzh/prfrail/internal/gates	9.932s
+ok  	github.com/larsonzh/prfrail/internal/guard	14.325s
+ok  	github.com/larsonzh/prfrail/internal/release	20.183s
+ok  	github.com/larsonzh/prfrail/internal/repair	2.955s
+ok  	github.com/larsonzh/prfrail/internal/snapshot	4.314s
+ok  	github.com/larsonzh/prfrail/internal/taskdef	2.728s
+ok  	github.com/larsonzh/prfrail/internal/tickets	9.870s
+ok  	github.com/larsonzh/prfrail/tools/agent-probe/enforcement-proxy	4.609s
+ok  	github.com/larsonzh/prfrail/tools/agent-stub	10.140s
+ok 包数 = 15，FAIL = 0
+EXIT: 0
+
+COMMAND: node tools/gates/gate.js --selftest
+OUTPUT: SELFTEST: PASS 737/737
+EXIT: 0
+
+COMMAND: node tools/gates/gate.js --all --scope=tree
+OUTPUT:
+GATE REPORT scope=tree repo=D:\LZProjects\prfrail changed=19
+PASS  base go build ./... :: exit 0
+PASS  base go vet ./... :: exit 0
+TOTAL_FAIL=0
+EXIT: 0
+
+COMMAND: node tools/gates/gate.js --all --scope=ci
+OUTPUT:
+GATE REPORT scope=ci repo=D:\LZProjects\prfrail changed=2
+PASS  base go build ./... :: exit 0
+PASS  base go vet ./... :: exit 0
+TOTAL_FAIL=0
+EXIT: 0
+
+COMMAND: GOOS=linux GOARCH=amd64 go build ./...
+OUTPUT: (无输出)
+EXIT: 0
+
+COMMAND: GOOS=linux GOARCH=amd64 go vet ./...
+OUTPUT: (无输出)
+EXIT: 0
+
+COMMAND: go test ./internal/console/... -count=1 -run Progress -v
+OUTPUT (PASS lines):
+--- PASS: TestProgressFlagStreamsToStderrAndKeepsStdout (0.06s)
+--- PASS: TestProgressFlagKeepsJSONOutputIdentical (0.06s)
+--- PASS: TestProgressStoreSwallowsWriterFailure (0.02s)
+--- PASS: TestProgressStoreForwardsEventsUnchanged (0.02s)
+--- PASS: TestFormatProgressLineSnapshot (0.00s)
+--- PASS: TestProgressStoreKeepsSealSink (0.02s)
+--- PASS: TestRunCommandAcceptsProgressFlag (0.04s)
+--- PASS: TestProgressFlagAgentRunnerRouteKeepsTheRunIdentical (0.51s)
+--- PASS: TestProgressFlagSupervisedRouteKeepsStdoutAndStreamsToStderr (0.18s)
+EXIT: 0

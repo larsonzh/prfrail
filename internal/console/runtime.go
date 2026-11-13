@@ -3,6 +3,7 @@ package console
 import (
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"sort"
@@ -30,17 +31,24 @@ type StateCount struct {
 	Count int    `json:"count"`
 }
 
-func ExecuteNoopRun(ctx context.Context, runID, runDir string, definition chain.Definition, workspaceRoot string, now func() time.Time) (RunSummary, error) {
+// ExecuteNoopRun drives the noop-only chain locally. progress is the optional
+// per-task/per-step progress sink resolved from --progress; a nil writer means
+// progress is off and the run stays byte-identical to the pre-flag behaviour.
+func ExecuteNoopRun(ctx context.Context, runID, runDir string, definition chain.Definition, workspaceRoot string, now func() time.Time, progress io.Writer) (RunSummary, error) {
 	store, err := chain.NewFileEventStore(runEventLogPath(runDir))
 	if err != nil {
 		return RunSummary{}, err
+	}
+	var events chain.EventStore = store
+	if progress != nil {
+		events = newProgressStore(store, progress)
 	}
 
 	runtime := &localRuntime{runDir: runDir, workspaceRoot: workspaceRoot, now: now}
 	options := chain.Options{
 		RunID:      runID,
 		Definition: definition,
-		Events:     store,
+		Events:     events,
 		Baselines:  runtime,
 		Workspaces: runtime,
 		Steps:      runtime,
