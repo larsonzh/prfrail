@@ -1,0 +1,154 @@
+== scope=index ==
+GATE REPORT scope=index repo=D:\LZProjects\prfrail changed=26
+PASS  G1-a table structure :: no `||` on added rows
+PASS  G1(c) status marker c :: closed set respected (418 cells)
+PASS  G1(d) status marker d :: heading and status table agree
+PASS  G1(e) status marker e :: completion rows imply completed (72 bound, 34 unbound)
+PASS  G1(e2) in-block completion rows imply completed :: 2 judged, 0 skipped, 62 historical (v1.64)
+INFO  G1(e-info) completion keys without a binding :: 34 completion row(s) have no heading to bind to (their slice heading was removed); G1(e) judges bound rows only
+PASS  G1(f) status marker f :: no in-progress wording in added completion rows
+PASS  G2 placeholder residue :: none
+PASS  G3(a) symmetry + mirror parity :: docs/PRODUCT_REQUIREMENTS.md +1/-1 vs _EN +1/-1 OK || docs/S1_SUPPORT_MATRIX.md +1/-1 vs _EN +1/-1 OK || docs/TEST_STRATEGY.md +1/-1 vs _EN +1/-1 OK || docs/t027/REMAINING_SLICES.md +3/-2 vs _EN +3/-2 OK || docs/validation/remaining-rulings.md +2/-0 vs _EN +2/-0 OK || docs/validation/req020-s2-restriction.md +101/-0 vs _EN +101/-0 OK || docs/validation/s1-scope-annotate.md +1/-0 vs _EN +1/-0 OK ;; docs/PRODUCT_REQUIREMENTS.md {"lines":false,"head":false,"bold":true,"bars":true,"blank":false,"backticks":true} ;; docs/S1_SUPPORT_MATRIX.md {"lines":true,"head":true,"bold":true,"bars":true,"blank":true,"backticks":true} ;; docs/TEST_STRATEGY.md {"lines":true,"head":true,"bold":true,"bars":true,"blank":true,"backticks":false} ;; docs/t027/REMAINING_SLICES.md {"lines":false,"head":false,"bold":false,"bars":false,"blank":false,"backticks":false} ;; docs/validation/remaining-rulings.md {"lines":true,"head":true,"bold":true,"bars":true,"blank":true,"backticks":false} ;; docs/validation/req020-s2-restriction.md {"lines":true,"head":true,"bold":true,"bars":true,"blank":true,"backticks":true} ;; docs/validation/s1-scope-annotate.md {"lines":true,"head":true,"bold":true,"bars":true,"blank":true,"backticks":true}
+PASS  G3(b) key-field alignment :: hash 0/0 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK | hash 0/0 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK | hash 0/0 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK | hash 0/0 OK | run 0/0 OK | glyph 2/2 OK | to-do 0/0 OK | not-reviewed 0/0 OK | hash 0/0 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK | hash 1/1 OK | run 0/0 OK | glyph 1/1 OK | to-do 0/0 OK | not-reviewed 0/0 OK | hash 0/0 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK
+PASS  G4a BOM+LF :: 26 file(s) OK (12 excluded: evidence tree)
+INFO  G4b-cache G4b cache :: hit 3a50eebb19c4 corpus=1453
+PASS  G4b CJK diff minus whitelist :: newCjk=331 unknown=[] (whitelist=63 whitelist-source=worktree)
+PASS  G5-a(1) no model key in prfrail-* :: 0 hits
+PASS  G5-a(2) no empty model :: 0 hits / 14 files
+PASS  G5-b closed-set model value :: checked 0 file(s)
+PASS  G5-c appendix-B call strings in the 2.2 qualified-name set :: call strings OK (2 file(s), scanned 0 changed carrier line(s))
+INFO  G5-d role-file frontmatter contract :: no changed `.github/agents/*.agent.md` in scope
+PASS  G5(d) staged is a subset of declared :: 26 path(s) declared (scope=index) ; declared-not-touched=36 (INFO: a fence is the landing snapshot) ; addMode=explicit (derived label, not a command-history assertion)
+INFO  G5(d-info) declared but not touched :: 36 declared path(s) are outside the change set (a fence is the landing snapshot); G5(d) judges the other direction only
+PASS  G5(e) evidence references resolve :: no added completion row (nothing to resolve)
+PASS  G5(e2) in-block completion-row evidence resolves :: 2 row(s), 4 reference(s) resolved (v1.64)
+PASS  G5(f) index hygiene :: index equals worktree, no untracked path
+PASS  R2.5 header-note position :: distinct=1 uniform 14/14
+PASS  G6-1 status tense :: no pending/completion conflict on added lines (scanned 220) whitelist-source=worktree
+PASS  G6-2 cost clause :: no realized cost clause on added lines (scanned 220) whitelist-source=worktree
+PASS  G6-3 run-id format :: no malformed run id on added lines (scanned 220) whitelist-source=worktree
+PASS  G6-4 expiring literal :: no expiring literal on added lines (scanned 220) whitelist-source=worktree
+PASS  G6-5 section-reference resolution :: no unresolved section reference on added ledger/changelog lines (scanned 0, refs 0) whitelist-source=worktree
+PASS  G6-6 ledger status closed set :: every added ledger row opens with a closed-set status word (scanned 0) whitelist-source=worktree
+PASS  G6-7 declaration/ledger reconciliation :: every declared ID on an added section 0.3 line exists in the 12.4 / appendix-C ledger (scanned 0, declarations 0) whitelist-source=worktree
+PASS  G6-8 DR number uniqueness and membership :: registered DR set {1,2,3,4,5,6,7,8,9,10,11,12,13,14}; no DR collision or dangling reference on added lines (scanned 214, refs 0) whitelist-source=worktree
+PASS  G7-a artifacts block present :: 6 report(s) OK
+PASS  G7-b artifact path/disposition resolvable :: 156 artifact row(s) OK (repo check: git ls-files --error-unmatch + worktree presence)
+PASS  G7-c finding row disposition cell :: 0 changed finding row(s) with disposition
+PASS  G7-d stopped state marked incomplete :: no stopped-state row missing the incomplete mark
+PASS  G7-e verdict line closed set :: every verdict line on added report lines is inside the 4.1 closed set (scanned 208)
+PASS  G7-f sixstage transcript contract :: 6 changed report(s) waived ⑥ by declaration (`- ⑥ 跳过：` / `- ⑥ skipped: `)
+PASS  G8-a evidence-tree path shape :: 12 path(s) OK
+FAIL  G8-b pack self-consistency :: docs/validation/evidence/P72-REQ020-S2-RESTRICTION/06-gates/gates-r1.txt hash mismatch (recorded 691b6fedf0e4..., actual 3bcf2350441d...)
+PASS  G8-c encoding-normalization record :: 0 pack(s) checked (1 exempt: no `## 后缀与编码映射` section)
+PASS  G8-d rebuilt-archive note :: 12 changed file(s) OK
+PASS  G9 临时件与 tmp/ 引用 :: 26 path(s) OK (12 excluded) (whitelist=worktree)
+INFO  G9-e tmp/ reference summary :: scanned 220 added line(s), 0 reference(s), 0 unresolvable
+PASS  base gofmt -l . :: empty
+PASS  base go build ./... :: exit 0
+PASS  base go vet ./... :: exit 0
+PASS  base go test ./... :: ok=15 FAIL=0
+TOTAL_FAIL=1
+
+== scope=tree ==
+GATE REPORT scope=tree repo=D:\LZProjects\prfrail changed=26
+PASS  G1-a table structure :: no `||` on added rows
+PASS  G1(c) status marker c :: closed set respected (418 cells)
+PASS  G1(d) status marker d :: heading and status table agree
+PASS  G1(e) status marker e :: completion rows imply completed (72 bound, 34 unbound)
+PASS  G1(e2) in-block completion rows imply completed :: 2 judged, 0 skipped, 62 historical (v1.64)
+INFO  G1(e-info) completion keys without a binding :: 34 completion row(s) have no heading to bind to (their slice heading was removed); G1(e) judges bound rows only
+PASS  G1(f) status marker f :: no in-progress wording in added completion rows
+PASS  G2 placeholder residue :: none
+PASS  G3(a) symmetry + mirror parity :: docs/PRODUCT_REQUIREMENTS.md +1/-1 vs _EN +1/-1 OK || docs/S1_SUPPORT_MATRIX.md +1/-1 vs _EN +1/-1 OK || docs/TEST_STRATEGY.md +1/-1 vs _EN +1/-1 OK || docs/t027/REMAINING_SLICES.md +3/-2 vs _EN +3/-2 OK || docs/validation/remaining-rulings.md +2/-0 vs _EN +2/-0 OK || docs/validation/req020-s2-restriction.md +101/-0 vs _EN +101/-0 OK || docs/validation/s1-scope-annotate.md +1/-0 vs _EN +1/-0 OK ;; docs/PRODUCT_REQUIREMENTS.md {"lines":false,"head":false,"bold":true,"bars":true,"blank":false,"backticks":true} ;; docs/S1_SUPPORT_MATRIX.md {"lines":true,"head":true,"bold":true,"bars":true,"blank":true,"backticks":true} ;; docs/TEST_STRATEGY.md {"lines":true,"head":true,"bold":true,"bars":true,"blank":true,"backticks":false} ;; docs/t027/REMAINING_SLICES.md {"lines":false,"head":false,"bold":false,"bars":false,"blank":false,"backticks":false} ;; docs/validation/remaining-rulings.md {"lines":true,"head":true,"bold":true,"bars":true,"blank":true,"backticks":false} ;; docs/validation/req020-s2-restriction.md {"lines":true,"head":true,"bold":true,"bars":true,"blank":true,"backticks":true} ;; docs/validation/s1-scope-annotate.md {"lines":true,"head":true,"bold":true,"bars":true,"blank":true,"backticks":true}
+PASS  G3(b) key-field alignment :: hash 0/0 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK | hash 0/0 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK | hash 0/0 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK | hash 0/0 OK | run 0/0 OK | glyph 2/2 OK | to-do 0/0 OK | not-reviewed 0/0 OK | hash 0/0 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK | hash 1/1 OK | run 0/0 OK | glyph 1/1 OK | to-do 0/0 OK | not-reviewed 0/0 OK | hash 0/0 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK
+PASS  G4a BOM+LF :: 26 file(s) OK (12 excluded: evidence tree)
+INFO  G4b-cache G4b cache :: hit d57db181421e corpus=1453
+PASS  G4b CJK diff minus whitelist :: newCjk=331 unknown=[] (whitelist=63 whitelist-source=worktree)
+PASS  G5-a(1) no model key in prfrail-* :: 0 hits
+PASS  G5-a(2) no empty model :: 0 hits / 14 files
+PASS  G5-b closed-set model value :: checked 0 file(s)
+PASS  G5-c appendix-B call strings in the 2.2 qualified-name set :: call strings OK (2 file(s), scanned 0 changed carrier line(s))
+INFO  G5-d role-file frontmatter contract :: no changed `.github/agents/*.agent.md` in scope
+PASS  G5(d) staged is a subset of declared :: 26 path(s) declared (scope=tree) ; declared-not-touched=36 (INFO: a fence is the landing snapshot) ; addMode=explicit (derived label, not a command-history assertion)
+INFO  G5(d-info) declared but not touched :: 36 declared path(s) are outside the change set (a fence is the landing snapshot); G5(d) judges the other direction only
+PASS  G5(e) evidence references resolve :: no added completion row (nothing to resolve)
+PASS  G5(e2) in-block completion-row evidence resolves :: 2 row(s), 4 reference(s) resolved (v1.64)
+INFO  G5(f) index hygiene :: scope=tree: staging is not part of this scope
+PASS  R2.5 header-note position :: distinct=1 uniform 14/14
+PASS  G6-1 status tense :: no pending/completion conflict on added lines (scanned 220) whitelist-source=worktree
+PASS  G6-2 cost clause :: no realized cost clause on added lines (scanned 220) whitelist-source=worktree
+PASS  G6-3 run-id format :: no malformed run id on added lines (scanned 220) whitelist-source=worktree
+PASS  G6-4 expiring literal :: no expiring literal on added lines (scanned 220) whitelist-source=worktree
+PASS  G6-5 section-reference resolution :: no unresolved section reference on added ledger/changelog lines (scanned 0, refs 0) whitelist-source=worktree
+PASS  G6-6 ledger status closed set :: every added ledger row opens with a closed-set status word (scanned 0) whitelist-source=worktree
+PASS  G6-7 declaration/ledger reconciliation :: every declared ID on an added section 0.3 line exists in the 12.4 / appendix-C ledger (scanned 0, declarations 0) whitelist-source=worktree
+PASS  G6-8 DR number uniqueness and membership :: registered DR set {1,2,3,4,5,6,7,8,9,10,11,12,13,14}; no DR collision or dangling reference on added lines (scanned 214, refs 0) whitelist-source=worktree
+PASS  G7-a artifacts block present :: 6 report(s) OK
+PASS  G7-b artifact path/disposition resolvable :: 156 artifact row(s) OK (repo check: git ls-files --error-unmatch + worktree presence)
+PASS  G7-c finding row disposition cell :: 0 changed finding row(s) with disposition
+PASS  G7-d stopped state marked incomplete :: no stopped-state row missing the incomplete mark
+PASS  G7-e verdict line closed set :: every verdict line on added report lines is inside the 4.1 closed set (scanned 208)
+PASS  G7-f sixstage transcript contract :: 6 changed report(s) waived ⑥ by declaration (`- ⑥ 跳过：` / `- ⑥ skipped: `)
+PASS  G8-a evidence-tree path shape :: 12 path(s) OK
+FAIL  G8-b pack self-consistency :: docs/validation/evidence/P72-REQ020-S2-RESTRICTION/06-gates/gates-r1.txt hash mismatch (recorded 691b6fedf0e4..., actual 3bcf2350441d...)
+PASS  G8-c encoding-normalization record :: 0 pack(s) checked (1 exempt: no `## 后缀与编码映射` section)
+PASS  G8-d rebuilt-archive note :: 12 changed file(s) OK
+PASS  G9 临时件与 tmp/ 引用 :: 26 path(s) OK (12 excluded) (whitelist=worktree)
+INFO  G9-e tmp/ reference summary :: scanned 220 added line(s), 0 reference(s), 0 unresolvable
+PASS  base gofmt -l . :: empty
+PASS  base go build ./... :: exit 0
+PASS  base go vet ./... :: exit 0
+PASS  base go test ./... :: ok=15 FAIL=0
+TOTAL_FAIL=1
+
+== scope=ci ==
+GATE REPORT scope=ci repo=D:\LZProjects\prfrail changed=2
+PASS  G1-a table structure :: no `||` on added rows
+PASS  G1(c) status marker c :: closed set respected (418 cells)
+PASS  G1(d) status marker d :: heading and status table agree
+PASS  G1(e) status marker e :: completion rows imply completed (72 bound, 34 unbound)
+PASS  G1(e2) in-block completion rows imply completed :: 0 judged, 0 skipped, 62 historical (v1.64)
+INFO  G1(e-info) completion keys without a binding :: 34 completion row(s) have no heading to bind to (their slice heading was removed); G1(e) judges bound rows only
+PASS  G1(f) status marker f :: no in-progress wording in added completion rows
+PASS  G2 placeholder residue :: none
+PASS  G3(a) symmetry + mirror parity :: docs/t027/CHECKLIST_v57.md +15/-2 vs _EN +15/-2 OK ;; docs/t027/CHECKLIST_v57.md {"lines":true,"head":true,"bold":true,"bars":true,"blank":true,"backticks":true}
+PASS  G3(b) key-field alignment :: hash 1/1 OK | run 0/0 OK | glyph 1/1 OK | to-do 0/0 OK | not-reviewed 0/0 OK
+PASS  G4a BOM+LF :: 2 file(s) OK
+INFO  G4b-cache G4b cache :: hit 19ead96f7775 corpus=1453
+PASS  G4b CJK diff minus whitelist :: newCjk=184 unknown=[] (whitelist=63 whitelist-source=endpoint:HEAD)
+PASS  G5-a(1) no model key in prfrail-* :: 0 hits
+PASS  G5-a(2) no empty model :: 0 hits / 14 files
+PASS  G5-b closed-set model value :: checked 0 file(s)
+PASS  G5-c appendix-B call strings in the 2.2 qualified-name set :: call strings OK (2 file(s), scanned 0 changed carrier line(s))
+INFO  G5-d role-file frontmatter contract :: no changed `.github/agents/*.agent.md` in scope
+INFO  G5(d) change set vs declared set :: no report in the change set; nothing declares this change
+PASS  G5(e) evidence references resolve :: no added completion row (nothing to resolve)
+PASS  G5(e2) in-block completion-row evidence resolves :: no added in-block completion row (nothing to resolve)
+INFO  G5(f) index hygiene :: scope=ci: staging is not part of this scope
+PASS  R2.5 header-note position :: distinct=1 uniform 14/14
+PASS  G6-1 status tense :: no pending/completion conflict on added lines (scanned 30) whitelist-source=endpoint:HEAD
+PASS  G6-2 cost clause :: no realized cost clause on added lines (scanned 30) whitelist-source=endpoint:HEAD
+PASS  G6-3 run-id format :: no malformed run id on added lines (scanned 30) whitelist-source=endpoint:HEAD
+PASS  G6-4 expiring literal :: no expiring literal on added lines (scanned 30) whitelist-source=endpoint:HEAD
+PASS  G6-5 section-reference resolution :: no unresolved section reference on added ledger/changelog lines (scanned 0, refs 0) whitelist-source=endpoint:HEAD
+PASS  G6-6 ledger status closed set :: every added ledger row opens with a closed-set status word (scanned 0) whitelist-source=endpoint:HEAD
+PASS  G6-7 declaration/ledger reconciliation :: every declared ID on an added section 0.3 line exists in the 12.4 / appendix-C ledger (scanned 0, declarations 0) whitelist-source=endpoint:HEAD
+PASS  G6-8 DR number uniqueness and membership :: registered DR set {1,2,3,4,5,6,7,8,9,10,11,12,13,14}; no DR collision or dangling reference on added lines (scanned 0, refs 0) whitelist-source=endpoint:HEAD
+INFO  G7-a artifacts block present :: no changed report in scope
+INFO  G7-b artifact path/disposition resolvable :: no changed report in scope
+INFO  G7-c finding row disposition cell :: no changed report in scope
+INFO  G7-d stopped state marked incomplete :: no changed report in scope
+INFO  G7-e verdict line closed set :: no changed report in scope
+INFO  G7-f sixstage transcript contract :: no changed report in scope
+INFO  G8-a evidence-tree path shape :: no changed evidence-tree path in scope
+INFO  G8-b pack self-consistency :: no touched evidence pack in scope
+INFO  G8-c encoding-normalization record :: no touched evidence pack in scope
+INFO  G8-d rebuilt-archive note :: no changed evidence file in scope
+PASS  G9 临时件与 tmp/ 引用 :: 2 path(s) OK (whitelist=endpoint:HEAD)
+INFO  G9-e tmp/ reference summary :: scanned 30 added line(s), 0 reference(s), 0 unresolvable
+PASS  base gofmt -l . :: empty
+PASS  base go build ./... :: exit 0
+PASS  base go vet ./... :: exit 0
+PASS  base go test ./... :: ok=15 FAIL=0
+TOTAL_FAIL=0

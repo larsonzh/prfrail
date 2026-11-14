@@ -1997,12 +1997,12 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 临时件落点声明 | 本片临时目录 = `tmp/P71-S1-SCOPE-ANNOTATE/`（⑧c 前只增不删；捕获件不落 `tmp/` 根） |
 | 完成记录 | 报告对 `docs/validation/s1-scope-annotate{,_EN}.md`；审查链 ① `DESIGN: DONE`（含 F-1 裁定）→ ②a–②g 分步全绿 → ③ 一致性（主控自执行，载体偏离已登记）→ ⑤ `PRE-REVIEW: PASS WITH FIXES` → ⑥ 跳过（⑦ 确认）→ ⑦ 盲审 `PASS` + 终审 `PASS`；GLM 批量 2 次；R=0、D=2；停于 ⑩ 等授权（不写 hash/run，§11.2） |
 
-### P72 — `REQ020-S2-RESTRICTION`（REQ-020 的 S2 承诺收窄登记） · ⬜ 未开始
+### P72 — `REQ020-S2-RESTRICTION`（REQ-020 的 S2 承诺收窄登记） · ✅ 已完成（2026-11-14 收口）
 
 | 字段 | 内容 |
 |---|---|
 | 标识 | `REQ020-S2-RESTRICTION`（层 2 常规治理；来源 = P71 ⑤ Info 建议登记 + P68 b1 ③ 的 S2 收窄（Q3 语言冻结）） |
-| 状态 | ⬜ 未开始（用户点名起跑） |
+| 状态 | ✅ 已完成（2026-11-14 收口） |
 | 目标 | REQ-020 的阶段归属列改为「S1 不要求（仅 C+Go 契约）；S2 承诺收窄（Python/Node 官方 harness + 三语言产品任务 + 正式支持承诺冻结；不冻既有工具脚本 / 开放语言 ID / generic 能力）」；同步 `TEST_STRATEGY` 的 AT-01 与 `S1_SUPPORT_MATRIX` 的语言行 |
 | 依赖 | P68（R-07 b1 / Q3 语言冻结，已闭环）、P71（⑤ Info 建议登记，已闭环） |
 | 规模 | S（纯文档；触 REQ 阶段归属与语言支持承诺表述） |
@@ -2016,6 +2016,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 执行自由度清单落盘路径 | `docs/validation/evidence/P72-REQ020-S2-RESTRICTION/freedom-list.md` |
 | R/D 基线 | R = 0、D = 0（步骤 0 登记，§13.1.1；不继承 P71 的 R=0 / D=2） |
 | 临时件落点声明 | 本片临时目录 = `tmp/P72-REQ020-S2-RESTRICTION/`（⑧c 前只增不删；捕获件不落 `tmp/` 根） |
+| 完成记录 | 报告对 `docs/validation/req020-s2-restriction{,_EN}.md`；审查链 ① `DESIGN: DONE`（(h) 窄读）→ ②a–②c 与 ②e–②f 分步全绿 → ③ 一致性 → ⑤ `PRE-REVIEW: PASS WITH FIXES`（2 Low + 4 Info 已处理）→ ⑥ 跳过（⑦ 确认）→ ⑦ `FINAL REVIEW: PASS WITH FIXES`（1 Low + 1 Info 已整改）、盲审 0；GLM 批量 2 次；R=0、D=0；停于 ⑩ 等授权（不写 hash/run，§11.2） |
 
 ### P73 — `T027B-ADMISSION`（OB-55 归属三选一评估 + B 段实施边界） · ⬜ 未开始
 

@@ -106,6 +106,8 @@ The stage-progression framework (Stage vs Layer / scope R-08.1+R-08.2 / the thre
 
 - **P71 landing pointer (2026-11-13)**: **condition 2** of R-07 b1 (the visible debugging guidance plus three boundaries) has been landed by the `S1-SCOPE-ANNOTATE` slice; the report is `docs/validation/s1-scope-annotate{,_EN}.md`. The original lines above stay untouched (§11.1).
 
+- **P72 landing pointer (2026-11-14)**: the S2 narrowing in R-07 b1 item 3 (the Q3 language freeze) has been landed by the `REQ020-S2-RESTRICTION` slice; the report is `docs/validation/req020-s2-restriction{,_EN}.md`. The original lines above stay untouched (§11.1).
+
 ## 6. R-10 advice (overall budget and the per-slice model caps)
 
 ### 6.1 Current-state anchors

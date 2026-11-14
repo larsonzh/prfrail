@@ -79,7 +79,7 @@ S0 完成规范、Schema/黄金样例和技术探针，再由用户批准 S1。S
 | REQ-017 | R17 | S0 | P0 文档、Schema/黄金样例、探针、授权全部满足才进入 S1 |
 | REQ-018 | R18 | S1 | code/build/verify/noop 有序、显式；noop 有原因和 receipt 且不启动进程 |
 | REQ-019 | R19 | S1 | seed 构建候选、外部 oracle、隔离 clean-room 重放、独立发布批准 |
-| REQ-020 | R20 | S0-S2 | S0 验证双/三语言配置；S1 C+Go 契约；S2 三语言实跑，失败整任务阻断 |
+| REQ-020 | R20 | S1 不要求（仅 C+Go 契约）；S2 承诺收窄（Python/Node 官方 harness + 三语言产品任务 + 正式支持承诺冻结；不冻既有工具脚本 / 开放语言 ID / generic 能力） | S0 验证双/三语言配置；S1 C+Go 契约；S2 三语言实跑，失败整任务阻断 |
 | REQ-021 | R21 | S1/S2 | S1 单写租约交接、结构化非秘密输入、超时/断线恢复与归还复检；黑箱候选须显式开始/归还、全量重扫和独立复检；S2 扩展 supervised |
 | REQ-022 | R22 | S1/S2 | 文档一等 target、确定性 impact rule、生成方向、waiver 和整体验收；S2 智能提示 |
 

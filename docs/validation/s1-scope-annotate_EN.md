@@ -88,6 +88,7 @@ c) **Step-2g duplicate call**: the first 2g dispatch was interrupted by the netw
 - (1) The `s1-exit` gate table has nine rows of Chinese gate names and no `S-Gx` row identifiers; `S-Gx` is defined in `docs/validation/p57-closeout-assessment.md` §4.2, and this slice establishes no mapping.
 - (2) `S-G2` has no row of its own and its wording is "the gate-level verdict awaits the v54 snapshot"; this slice does not change it.
 - (3) **The "S2 commitment narrowing registration" for REQ-020 is outside this slice** (a step-5 Info item suggests registering it; it is left to a later slice).
+- (3a) **P72 landing pointer (2026-11-14)**: the "S2 commitment narrowing registration" for REQ-020 referred to in item 3 has been landed by the `REQ020-S2-RESTRICTION` slice; the report is `docs/validation/req020-s2-restriction{,_EN}.md`. The original line above stays untouched.
 - (4) `S1_SUPPORT_MATRIX` has no TUI row, so the TUI carve-out is expressed through the Windows row constraint plus the tail note rather than a new row.
 
 ## 8. Explicitly Not Executed

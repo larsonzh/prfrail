@@ -1984,12 +1984,12 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Temporary-file location | Slice temp directory = `tmp/P71-S1-SCOPE-ANNOTATE/` (append-only until ⑧c; captures never at the `tmp/` root) |
 | Completion record | Report pair `docs/validation/s1-scope-annotate{,_EN}.md`; review chain ① `DESIGN: DONE` (including the F-1 ruling) → ②a–②g all green step by step → ③ consistency (controller self-executed, carrier deviation registered) → ⑤ `PRE-REVIEW: PASS WITH FIXES` → ⑥ skipped (confirmed by ⑦) → ⑦ blind `PASS` + final `PASS`; GLM batch 2 times; R=0, D=2; stopped at ⑩ pending authorisation (no hash/run recorded, §11.2) |
 
-### P72 — `REQ020-S2-RESTRICTION` (registering the S2 commitment narrowing for REQ-020) · ⬜ Not started
+### P72 — `REQ020-S2-RESTRICTION` (registering the S2 commitment narrowing for REQ-020) · ✅ Completed (closed 2026-11-14)
 
 | Field | Content |
 |---|---|
 | Identifier | `REQ020-S2-RESTRICTION` (layer-2 routine governance; source = the step-5 Info recommendation of P71 plus the S2 narrowing in P68 b1 item 3 (the Q3 language freeze)) |
-| Status | ⬜ Not started (starts when the user names it) |
+| Status | ✅ Completed (closed 2026-11-14) |
 | Goal | The REQ-020 stage-ownership column becomes "not required by S1 (C+Go contract only); S2 commitment narrowed (Python/Node official harness + three-language product tasks + the release-support commitment frozen; existing tool scripts / open language IDs / generic capability are not frozen)"; sync AT-01 in `TEST_STRATEGY` and the language rows of `S1_SUPPORT_MATRIX` |
 | Dependency | P68 (R-07 b1 / Q3 language freeze, closed), P71 (step-5 Info recommendation, closed) |
 | Size | S (documentation only; touches the REQ stage ownership and the language support commitment wording) |
@@ -2003,6 +2003,7 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Freedom-list landing path | `docs/validation/evidence/P72-REQ020-S2-RESTRICTION/freedom-list.md` |
 | R/D baseline | R = 0, D = 0 (registered at step 0, §13.1.1; does not inherit P71's R=0 / D=2) |
 | Temp-file location declaration | This slice's temp directory = `tmp/P72-REQ020-S2-RESTRICTION/` (add-only before ⑧c; no capture file at the `tmp/` root) |
+| Completion record | Report pair `docs/validation/req020-s2-restriction{,_EN}.md`; review chain ① `DESIGN: DONE` ((h) narrow reading) -> ②a–②c and ②e–②f green step by step -> ③ consistency -> ⑤ `PRE-REVIEW: PASS WITH FIXES` (2 Low + 4 Info addressed) -> ⑥ skipped (confirmed by ⑦) -> ⑦ `FINAL REVIEW: PASS WITH FIXES` (1 Low + 1 Info fixed), blind review 0; GLM batch 2 times; R=0, D=0; stopped at ⑩ pending authorisation (no hash/run recorded, §11.2) |
 
 ### P73 — `T027B-ADMISSION` (three-way OB-55 ownership assessment + part-B boundary) · ⬜ Not started
 

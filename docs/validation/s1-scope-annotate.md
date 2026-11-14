@@ -88,6 +88,7 @@ c) **②g 重复调用**：②g 首次派单网络中断但已落盘，重试仅
 - ① `s1-exit` 门表为 9 行中文门名、无 `S-Gx` 行标识；`S-Gx` 定义在 `docs/validation/p57-closeout-assessment.md` §4.2，本片不建立映射。
 - ② `S-G2` 无独立行，且其口径为「门级判定待 v54 快照」，本片不改。
 - ③ **REQ-020 的「S2 承诺收窄登记」不在本片范围**（⑤ Info 建议登记，留待后续切片）。
+- ③a **P72 落地指针（2026-11-14）**：③ 所指「REQ-020 的 S2 承诺收窄登记」已由切片 `REQ020-S2-RESTRICTION` 落地，报告见 `docs/validation/req020-s2-restriction{,_EN}.md`；③ 原行不改。
 - ④ `S1_SUPPORT_MATRIX` 无 TUI 行，故 TUI 移出以 Windows 行约束 + 尾注表达，不新增行。
 
 ## 8. 明确未执行

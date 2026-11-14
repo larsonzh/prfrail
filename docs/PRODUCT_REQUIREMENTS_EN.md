@@ -77,7 +77,7 @@ Edge cases include empty tasks/steps, unknown fields/versions, path escape, case
 | REQ-017 | R17 | S0 | Complete P0 documents, schemas/goldens, spikes and authorization before S1 |
 | REQ-018 | R18 | S1 | Explicit ordered code/build/verify/noop; noop has a reason and receipt and starts no process |
 | REQ-019 | R19 | S1 | Seed builds candidate, external oracle, isolated clean-room replay and independent release approval |
-| REQ-020 | R20 | S0-S2 | S0 dual/triple-language configs; S1 C+Go contracts; S2 three-language execution with whole-task failure |
+| REQ-020 | R20 | Not required by S1 (C+Go contract only); S2 commitment narrowed (Python/Node official harness + three-language product tasks + the release-support commitment frozen; existing tool scripts / open language IDs / generic capability are not frozen) | S0 dual/triple-language configs; S1 C+Go contracts; S2 three-language execution with whole-task failure |
 | REQ-021 | R21 | S1/S2 | S1 single-writer handoff, structured non-secret input, timeout/disconnection recovery and return checks; black-box candidates require explicit start/return, full rescan and independent revalidation; S2 extends supervised execution |
 | REQ-022 | R22 | S1/S2 | First-class docs, deterministic impact rules, generation direction, waivers and aggregate acceptance; S2 intelligent hints |
 

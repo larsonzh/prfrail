@@ -28,7 +28,7 @@ AT IDs are planned test groups, not existing functions. Expand each into positiv
 
 | ID | Requirements | Scenario/assertion | Owner/plan |
 |---|---|---|---|
-| AT-01 | REQ-001/010/017/018/020/022/028 | Valid schemas; reject unknown fields/versions, duplicate IDs, empty steps, invalid noop, overlapping targets and dependency/generation cycles; dual/triple-language, handoff and doc fixtures | taskdef; T002/T003 |
+| AT-01 | REQ-001/010/017/018/020/022/028 | Valid schemas; reject unknown fields/versions, duplicate IDs, empty steps, invalid noop, overlapping targets and dependency/generation cycles; C+Go contract (three-language execution frozen to S2, see REQ-020), handoff and doc fixtures | taskdef; T002/T003 |
 | AT-02 | REQ-004/024 | Uncommitted source capture remains unchanged; reserved/case/symlink/reparse/hardlink/long-path/concurrent-change/quota cases | snapshot; T006 |
 | AT-03 | REQ-002/003/018/024/026 | Three mixed-step tasks, zero-process noop, T2 failure blocks T3; pause/cancel/restart, runaway children and disk pressure | chain/guard; T007/T009 |
 | AT-04 | REQ-004/024/025/028 | Missing/reordered events, corrupt objects, torn tails, crashes at journal/receipt/projection writes; only completed acceptance is replayable | evidence/applier; T005/T008 |

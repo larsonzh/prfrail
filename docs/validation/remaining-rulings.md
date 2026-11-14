@@ -106,6 +106,8 @@
 
 - **P71 落地指针（2026-11-13）**：R-07 b1 的**附条件 2**（visible 调试指引 + 三条边界）已由切片 `S1-SCOPE-ANNOTATE` 落地，报告见 `docs/validation/s1-scope-annotate{,_EN}.md`；本文件原行不改（§11.1）。
 
+- **P72 落地指针（2026-11-14）**：R-07 b1 ③ 的 S2 收窄（Q3 语言冻结）已由切片 `REQ020-S2-RESTRICTION` 落地，报告见 `docs/validation/req020-s2-restriction{,_EN}.md`；本文件原行不改（§11.1）。
+
 ## 6. R-10 建议（总预算与各片模型上限）
 
 ### 6.1 现状锚点
