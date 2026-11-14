@@ -105,6 +105,7 @@ gate.js --all --scope=ci   : TOTAL_FAIL=0
 - P38 施工图与 P57 收口评估的时点判定未回写落地态（历史报告不改，§11.1）。
 - `DEV_PLAN:153` 的过时表述保留，由新增条目在语义上取代。
 - 本片对 `DELIVERY_DIRECTIVE` 的改动限于 §12.4 的 OB-55 处置单元格，并按 §0.2 与历史先例补升版本 **v1.69**（头部版本行 + §0.3 日志行 + 附录 C.0av 留痕块），系元数据补齐，不改任何规则语义。
+- 主提交前补升版 v1.69（头部版本行 + §0.3 日志行 + 附录 C.0av 留痕块），系元数据补齐；`G1-b` / `G3(a.2)` / `G6-5` / `G6-7` 全绿。
 
 ## 14. 明确未执行
 
@@ -112,6 +113,14 @@ gate.js --all --scope=ci   : TOTAL_FAIL=0
 - 未改 v50–v57 历史快照；未改 P38 / P57 等历史报告正文（仅加法式指针）。
 - 未启动 `P74-SANDBOX-INTERFACE`；未替用户裁定后续切片内容。
 - 未 commit / push（停于 ⑩ 等授权）；未启动新切片。
+
+
+## 15. 提交与 CI 事实链
+
+- 主提交：`8c59712`（评估结论 + 裁定落地 + 准则台账单元与 v1.69 元数据；英文提交信息 `feat: rule the OB-55 admission as option b and add the sandbox interface to S1`）。
+- CI：run `43622770750`（ubuntu-latest 3m15s / windows-latest 4m44s，双腿 `success`）。
+- 双腿读数：`SELFTEST: PASS 737/737`；`TOTAL_FAIL=0`。
+- 本节由回填提交写入，只补全事实，不改业务内容。
 
 ```artifacts
 docs/DEV_PLAN.md	repo

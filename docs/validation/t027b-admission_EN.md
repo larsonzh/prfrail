@@ -105,6 +105,7 @@ gate.js --all --scope=ci   : TOTAL_FAIL=0
 - The time-point verdicts in the P38 working drawing and the P57 closeout assessment are not rewritten to the landed state (historical reports stay untouched, §11.1).
 - The stale wording at `DEV_PLAN:153` is kept and superseded in meaning by the new entry.
 - The change to `DELIVERY_DIRECTIVE` is limited to the OB-55 disposition cell in §12.4, with the version bumped to **v1.69** per §0.2 and the historical precedents (header version line plus a §0.3 log row plus the appendix C.0av record block); this is a metadata completion and changes no rule semantics.
+- The version was bumped to v1.69 before the main commit (header version line plus a §0.3 log row plus the appendix C.0av record block) as a metadata completion; `G1-b` / `G3(a.2)` / `G6-5` / `G6-7` all green.
 
 ## 14. Explicitly not executed
 
@@ -112,6 +113,14 @@ gate.js --all --scope=ci   : TOTAL_FAIL=0
 - No change to the v50-v57 snapshots; no change to the body of the P38 / P57 and other historical reports (additive pointers only).
 - `P74-SANDBOX-INTERFACE` is not started; no ruling is made on later slice content.
 - No commit / push (stopped at ⑩ pending authorisation); no new slice started.
+
+
+## 15. Commit and CI fact chain
+
+- Main commit: `8c59712` (assessment plus ruling landing plus the directive ledger cell and the v1.69 metadata; English subject `feat: rule the OB-55 admission as option b and add the sandbox interface to S1`).
+- CI: run `43622770750` (ubuntu-latest 3m15s / windows-latest 4m44s, both legs `success`).
+- Both legs: `SELFTEST: PASS 737/737`; `TOTAL_FAIL=0`.
+- This section is written by the backfill commit and records facts only; no business content changes.
 
 ```artifacts
 docs/DEV_PLAN.md	repo
