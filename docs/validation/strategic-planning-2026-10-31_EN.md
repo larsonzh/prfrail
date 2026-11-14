@@ -41,6 +41,8 @@ The three run in series on one resource pool and a later item never pre-empts an
 
 **First step (within 7 days)**: submit and rule on the pre-project admission pack for T027-B (OB-55 ownership, implementation boundary, pinned candidate, Windows / P, AT-23 and refusal-path mapping, evidence gaps, resource and probe cost caps). The ruling may only be "limited implementation allowed" or "blocked with release conditions", and **it grants no production admission**.
 
+- **P73 landing pointer (2026-11-14)**: that first step is slice P73 `T027B-ADMISSION`, landed with the OB-55 ruling = option b; reports: `docs/validation/t027b-admission{,_EN}.md`, ADR-044. (Timing note: the window counted from the 2026-10-31 planning date was pushed to today by the R-06 ruling rhythm and the P69-P72 insertions, which is the user ruling cadence and not a defect.)
+
 ## 4 Awaiting a user ruling
 
 1. OB-55 ownership, and whether T027-B is projected on the frozen boundary.

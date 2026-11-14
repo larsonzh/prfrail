@@ -185,6 +185,8 @@ flowchart LR
    （`sandbox_windows.go`）+ fail-closed 空实现（`sandbox_unsupported.go`）。**S1 不实做**，仅在 S2 启动时按此接口扩展；
    在 S1 提前落地该接口会产生无人调用的死代码，反而增加维护面。
 
+> **P73 更新（2026-11-14）**：本条「`Sandbox` 接口推迟到 S2」已由 R-06（2026-11-12）与 P73 `T027B-ADMISSION` 更新——接口提前到 S1，落地由 `P74-SANDBOX-INTERFACE` 承载，且接口与调用点同片落地以规避死代码；见 `docs/validation/t027b-admission{,_EN}.md` 与 ADR-044。本条原行不改（§11.1）。
+
 ## 9. B4 入口条件与移交
 
 - 端口固定 `39877`；**复用前必须重跑基线失效快照**（`New-B2Snapshot` + `Get-B2SnapshotDiff`）。
@@ -267,3 +269,10 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools\agent-probe\appcontain
 - `revert` 默认删除容器 profile；为 B4 复用保留时需显式 `-KeepProfile` 并接受 `profile-existence-changed` 信息行；
   B4 复用同一端口前必须重做基线快照与只读确认。
 - 证据包冻结后可直接删除 `tmp/b2/`；届时 `assemble-evidence.ps1` 会把历史 run 目录报为 `missingArtifact`（预期）。
+
+本围栏为 P73 的 G7-a 合规补登（原报告无该围栏）；声明范围仅限本报告自身两个文件，不代表本片变更集。
+
+```artifacts
+docs/validation/B2-EXTERNAL-ENFORCEMENT.md	repo
+docs/validation/B2-EXTERNAL-ENFORCEMENT_EN.md	repo
+```

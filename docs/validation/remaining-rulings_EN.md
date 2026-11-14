@@ -77,6 +77,8 @@ The stage-progression framework (Stage vs Layer / scope R-08.1+R-08.2 / the thre
 - Recommend **option c**: no usable candidate plus the dead-code prohibition plus S1 having no remaining time window form a triple constraint; if the goal becomes unlocking S-G1, switching to option a requires a newly admitted candidate as the precondition. **The final ruling is to be made by the user in the same turn after ⑩ or in batches.**
 - **User ruling (2026-11-12, same turn): option b** (close the P44 end-to-end wiring R-1 first, then start T027-B); **the R-1 work itself is carried by a later slice, P68 does not advance it**.
 
+- **P73 landing pointer (2026-11-14)**: the OB-55 ownership under R-06 option b has been ruled and confirmed by the `T027B-ADMISSION` slice (= option b; the `Sandbox` interface moves into S1 and the implementing slice `P74-SANDBOX-INTERFACE` is not yet started); reports: `docs/validation/t027b-admission{,_EN}.md`, ADR-044. The original lines above stay untouched (§11.1).
+
 ## 5. R-07 advice (MVA, the S1 carve-out and narrowing the S2 commitment)
 
 ### 5.1 Current-state anchors

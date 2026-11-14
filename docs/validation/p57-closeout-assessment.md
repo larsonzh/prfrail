@@ -71,6 +71,8 @@ F1 与 F2 在**本片回写前**互斥：前者称已立项，后者称无设计
 
 - **R-1 已由 P69 `T027B-E2E-WIRING` 收口**（报告：`docs/validation/t027b-e2e-wiring{,_EN}.md`）
 
+- **R-2 已由 P73 裁定（2026-11-14）**：OB-55 归属 = 方案 b（`Sandbox` 接口提前到 S1，实施片 `P74-SANDBOX-INTERFACE` 待起跑）；报告：`docs/validation/t027b-admission{,_EN}.md`、ADR-044。本表八门定义与判定不改（§11.1）。
+
 ## 4. P6 评估 — S1 Exit 剩余门收口清单
 
 ### 4.1 判定

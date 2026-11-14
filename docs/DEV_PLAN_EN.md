@@ -197,6 +197,7 @@ T027 prerequisite status update (2026-11-09, F2-FIX-STUB-HANG): building on the 
 - P54 publication durability: the C6 prebuilt-slot mechanism has landed (contract first: §7 C6 Decision Path + Annex C; Windows `unproven` unchanged, AT-23 not waived; report `docs/validation/contracts-s7-durability{,_EN}.md`; package `docs/validation/evidence/CONTRACTS-S7-DURABILITY/`)
 - P70 S1-STREAM-PROGRESS: the lightweight `run --progress` stream switch (report pair `docs/validation/s1-stream-progress{,_EN}.md`)
 
+- P73 admission (OB-55 ruling = option b): the `Sandbox` interface moves into S1; the implementation boundary is contract-first (`CONTRACTS` §7 gains a Sandbox section) + `internal/guard/sandbox{,_windows,_unsupported}.go` + an assembly check point (same layer as the P69 permit) + tests; no change to the `internal/chain|adapters` criterion bodies, schema, fixtures, CI, candidate version or the R-08 / R-09 rulings; the implementing slice is `P74-SANDBOX-INTERFACE` (tier M, standalone, not yet started); the candidate version stays GitHub Copilot CLI 1.0.83 (R-08.1); the Windows premise stays P only and P-prime is not introduced; **part B does not unlock S-G1 / S-G8**; probe demand = 0; evidence gaps = the Sandbox contract section, the call-site wiring evidence, the dead-code-ban disposal record and the ⑦ review record; reports `docs/validation/t027b-admission{,_EN}.md`, ADR-044.
 ## 3. Requirement Mapping
 
 Unless a task is explicitly marked complete, implementation evidence is planned and does not represent implementation.

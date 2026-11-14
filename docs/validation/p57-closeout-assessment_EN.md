@@ -71,6 +71,8 @@ Verdict: `T027-B` is valid as a **milestone** and is registered; as an **open it
 
 - **R-1 is closed by P69 `T027B-E2E-WIRING`** (report: `docs/validation/t027b-e2e-wiring{,_EN}.md`)
 
+- **R-2 is ruled by P73 (2026-11-14)**: OB-55 ownership = option b (the `Sandbox` interface moves into S1; the implementing slice `P74-SANDBOX-INTERFACE` is not yet started); reports: `docs/validation/t027b-admission{,_EN}.md`, ADR-044. The eight-gate definitions and verdicts in this table stay untouched (§11.1).
+
 ## 4. P6 assessment — S1 Exit remaining-gate closeout inventory
 
 ### 4.1 Verdict

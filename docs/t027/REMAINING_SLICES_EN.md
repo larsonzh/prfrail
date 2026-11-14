@@ -2005,12 +2005,12 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Temp-file location declaration | This slice's temp directory = `tmp/P72-REQ020-S2-RESTRICTION/` (add-only before ⑧c; no capture file at the `tmp/` root) |
 | Completion record | Report pair `docs/validation/req020-s2-restriction{,_EN}.md`; review chain ① `DESIGN: DONE` ((h) narrow reading) -> ②a–②c and ②e–②f green step by step -> ③ consistency -> ⑤ `PRE-REVIEW: PASS WITH FIXES` (2 Low + 4 Info addressed) -> ⑥ skipped (confirmed by ⑦) -> ⑦ `FINAL REVIEW: PASS WITH FIXES` (1 Low + 1 Info fixed), blind review 0; GLM batch 2 times; temp-file R=0, D=0 (the report's exception section separately records D-1 carrier deviation and D-2 unverified dispatch read - an independent sequence, not temp-file D); stopped at ⑩ pending authorisation (no hash/run recorded, §11.2) |
 
-### P73 — `T027B-ADMISSION` (three-way OB-55 ownership assessment + part-B boundary) · ⬜ Not started
+### P73 — `T027B-ADMISSION` (three-way OB-55 ownership assessment + part-B boundary) · ✅ Completed (closed 2026-11-14)
 
 | Field | Content |
 |---|---|
 | Identifier | `T027B-ADMISSION` (layer-2 routine governance; source = the admission assessment after the R-06 = b ruling moved OB-55 into the T027-B boundary) |
-| Status | ⬜ Not started (starts when the user names it and P72 is closed) |
+| Status | ✅ Completed (closed 2026-11-14) |
 | Goal | A three-way assessment of where OB-55 belongs (a standalone slice / landing the `Sandbox` interface early / keeping it in S2) + the part-B implementation boundary + candidate versions + the resource and probe authorisation needs; **after step 1 produces the three-way comparison plus a recommendation, stop and wait for the user to rule on OB-55, then push steps 2-10** |
 | Dependency | P72 closed (this slice comes after it) |
 | Size | M (assessment type; produces no production code) |
@@ -2024,6 +2024,7 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Freedom-list landing path | `docs/validation/evidence/P73-T027B-ADMISSION/freedom-list.md` |
 | R/D baseline | R = 0, D = 0 (registered at step 0, §13.1.1; does not inherit P72) |
 | Temp-file location declaration | This slice's temp directory = `tmp/P73-T027B-ADMISSION/` (add-only before ⑧c; no capture file at the `tmp/` root) |
+| Completion record | Report pair `docs/validation/t027b-admission{,_EN}.md`; OB-55 ruling = option b (2026-11-14, a confirmation and refinement in the same direction as R-06, all three conditions accepted); review chain ① `DESIGN: DONE` -> ②a-②c step by step -> ③ consistency (controller self-executed, D-1 recorded) -> ⑤ `PASS` (r1 `PASS WITH FIXES`, re-run in place) -> ⑥ skipped (⑦ `SKIP CONFIRMED`) -> ⑦ `FINAL REVIEW: PASS` (0 findings plus 1 Info), blind review 0; GLM batch 2 times; R=0, D=0 (the exception section separately records D-1 / D-2, an independent sequence); stopped at ⑩ pending authorisation (no hash/run recorded, §11.2) |
 
 ## Known defects (to be handled before later slices)
 

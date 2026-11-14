@@ -216,6 +216,8 @@ against `proxy-decisions/allow-run-usage.json` and the WAF pages), so premium co
    unsupported implementation (`sandbox_unsupported.go`). **S1 does not implement it**; the interface is added
    at S2 startup. Landing it during S1 would produce dead code with no caller and add maintenance surface.
 
+> **P73 update (2026-11-14)**: this item ("the `Sandbox` interface is deferred to S2") has been updated by R-06 (2026-11-12) and by P73 `T027B-ADMISSION` - the interface moves into S1 and lands through `P74-SANDBOX-INTERFACE`, with the interface and its call site landed in the same slice so the dead-code objection is avoided; see `docs/validation/t027b-admission{,_EN}.md` and ADR-044. The original lines above stay untouched (§11.1).
+
 ## 9. B4 entry conditions and handover
 
 - The port is fixed at `39877`; **re-run the baseline invalidation snapshot before reusing it**
@@ -312,3 +314,10 @@ Standing constraints (unchanged by clearing the list):
   must take a fresh baseline snapshot and a read-only confirmation first.
 - Once the bundle is frozen, `tmp/b2/` may be deleted; `assemble-evidence.ps1` will then report the historical run
   directories as `missingArtifact` (expected).
+
+This fence is a G7-a compliance addition by P73 (the original report had none); it declares only this report pair and is not a change-set declaration.
+
+```artifacts
+docs/validation/B2-EXTERNAL-ENFORCEMENT.md	repo
+docs/validation/B2-EXTERNAL-ENFORCEMENT_EN.md	repo
+```
