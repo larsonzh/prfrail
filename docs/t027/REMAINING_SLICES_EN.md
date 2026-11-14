@@ -2003,7 +2003,7 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Freedom-list landing path | `docs/validation/evidence/P72-REQ020-S2-RESTRICTION/freedom-list.md` |
 | R/D baseline | R = 0, D = 0 (registered at step 0, §13.1.1; does not inherit P71's R=0 / D=2) |
 | Temp-file location declaration | This slice's temp directory = `tmp/P72-REQ020-S2-RESTRICTION/` (add-only before ⑧c; no capture file at the `tmp/` root) |
-| Completion record | Report pair `docs/validation/req020-s2-restriction{,_EN}.md`; review chain ① `DESIGN: DONE` ((h) narrow reading) -> ②a–②c and ②e–②f green step by step -> ③ consistency -> ⑤ `PRE-REVIEW: PASS WITH FIXES` (2 Low + 4 Info addressed) -> ⑥ skipped (confirmed by ⑦) -> ⑦ `FINAL REVIEW: PASS WITH FIXES` (1 Low + 1 Info fixed), blind review 0; GLM batch 2 times; R=0, D=0; stopped at ⑩ pending authorisation (no hash/run recorded, §11.2) |
+| Completion record | Report pair `docs/validation/req020-s2-restriction{,_EN}.md`; review chain ① `DESIGN: DONE` ((h) narrow reading) -> ②a–②c and ②e–②f green step by step -> ③ consistency -> ⑤ `PRE-REVIEW: PASS WITH FIXES` (2 Low + 4 Info addressed) -> ⑥ skipped (confirmed by ⑦) -> ⑦ `FINAL REVIEW: PASS WITH FIXES` (1 Low + 1 Info fixed), blind review 0; GLM batch 2 times; temp-file R=0, D=0 (the report's exception section separately records D-1 carrier deviation and D-2 unverified dispatch read - an independent sequence, not temp-file D); stopped at ⑩ pending authorisation (no hash/run recorded, §11.2) |
 
 ### P73 — `T027B-ADMISSION` (three-way OB-55 ownership assessment + part-B boundary) · ⬜ Not started
 

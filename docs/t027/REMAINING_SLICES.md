@@ -2016,7 +2016,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 执行自由度清单落盘路径 | `docs/validation/evidence/P72-REQ020-S2-RESTRICTION/freedom-list.md` |
 | R/D 基线 | R = 0、D = 0（步骤 0 登记，§13.1.1；不继承 P71 的 R=0 / D=2） |
 | 临时件落点声明 | 本片临时目录 = `tmp/P72-REQ020-S2-RESTRICTION/`（⑧c 前只增不删；捕获件不落 `tmp/` 根） |
-| 完成记录 | 报告对 `docs/validation/req020-s2-restriction{,_EN}.md`；审查链 ① `DESIGN: DONE`（(h) 窄读）→ ②a–②c 与 ②e–②f 分步全绿 → ③ 一致性 → ⑤ `PRE-REVIEW: PASS WITH FIXES`（2 Low + 4 Info 已处理）→ ⑥ 跳过（⑦ 确认）→ ⑦ `FINAL REVIEW: PASS WITH FIXES`（1 Low + 1 Info 已整改）、盲审 0；GLM 批量 2 次；R=0、D=0；停于 ⑩ 等授权（不写 hash/run，§11.2） |
+| 完成记录 | 报告对 `docs/validation/req020-s2-restriction{,_EN}.md`；审查链 ① `DESIGN: DONE`（(h) 窄读）→ ②a–②c 与 ②e–②f 分步全绿 → ③ 一致性 → ⑤ `PRE-REVIEW: PASS WITH FIXES`（2 Low + 4 Info 已处理）→ ⑥ 跳过（⑦ 确认）→ ⑦ `FINAL REVIEW: PASS WITH FIXES`（1 Low + 1 Info 已整改）、盲审 0；GLM 批量 2 次；临时件 R=0、D=0（报告异常处理章另计 D-1 载体偏离、D-2 派单未机械读取，两者为独立序列、非临时件 D）；停于 ⑩ 等授权（不写 hash/run，§11.2） |
 
 ### P73 — `T027B-ADMISSION`（OB-55 归属三选一评估 + B 段实施边界） · ⬜ 未开始
 

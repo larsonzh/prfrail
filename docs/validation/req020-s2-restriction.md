@@ -71,7 +71,26 @@ gate.js --all --scope=ci   : TOTAL_FAIL=0
 - 未改 REQ 表结构（条目不增删、编号不变、「可验收要求」列零改动）、未改 MVA 复合标准、未改 S1 Exit 八门判定本身。
 - 未新增 `S1_SUPPORT_MATRIX` 的 Python/Node 独立行；未替用户裁定；未 commit / push；未启动新切片。
 
-- 载体偏离（§1.7.4 登记）：本片 ② / ③ / ⑧ 的文档改写与一致性核验由主控执行（未派 prfrail-documenter），原因 = 纯整行替换 + 机械核验，派单成本高于收益；该偏离不改变改动面与判据，已在 ⑩ 回执登记，不得作为先例。
+## 9. 异常处理
+
+### D-1 载体偏离（② / ③ / ⑧ 由主控执行，未派 `prfrail-documenter`）
+
+- **现象**：本片 ② 逐文档回写、③ 一致性检查、⑧ 文档装配均由主控执行。
+- **原因**：改动均为整行精确替换 + 机械核验（`git diff --numstat`、拆列比对、计数核对），派单往返成本高于收益。
+- **独立影响评估**：该偏离削弱的是「实现与校验分离」的强度，而非结论的正确性——正确性由 ⑤（V4 Pro）与 ⑦（Codex）两环独立复核，二者均 `PASS WITH FIXES` 且无 Medium 及以上；① 的设计文本由 V4 Pro 产出并被逐字比对。残留风险 = 若主控改写时误读冻结原文，⑤/⑦ 可能在同源材料上放过；本片以 `r07-refined.md:49` 原文逐句对应缓解。
+- **结论**：保留该做法并如实登记，**不得作为先例**；后续含语义判断的文档片仍须派执行角色。
+
+### D-2 派单表未机械读取
+
+- 本会话 debug-log 目录仅含 `main.jsonl`（一条 `session_start`）与 `models.json`，无工具调用记录 ⇒ ⑩ 派单表按派单原文登记，**未按 `transcript.arguments.agentName` 逐字机械读取**；符合 §13.2.2 的如实标注口径。
+
+## 10. 提交与 CI 事实链
+
+- 主提交：`fb0ab57`（docs-only；英文提交信息 `<type>: <summary>`；路径数 26）。
+- CI：run `43566904684`（ubuntu-latest 3m23s / windows-latest 4m40s，双腿 `success`）。
+- 双腿读数：`SELFTEST: PASS 737/737`（两腿各一次）；`GATE REPORT scope=ci changed=26`；`PASS  base go test ./... :: ok=15 FAIL=0`；`TOTAL_FAIL=0`。
+- 本节由回填提交写入，只补全事实，不改产品面。
+
 ```artifacts
 docs/PRODUCT_REQUIREMENTS.md	repo
 docs/PRODUCT_REQUIREMENTS_EN.md	repo

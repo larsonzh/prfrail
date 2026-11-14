@@ -71,7 +71,26 @@ gate.js --all --scope=ci   : TOTAL_FAIL=0
 - No change to the REQ table structure (no entry added or removed, no renumbering, the testable-requirement column untouched), no change to the MVA composite, no change to the S1 Exit eight gates themselves.
 - No standalone Python/Node row added to `S1_SUPPORT_MATRIX`; no ruling made on the user's behalf; no commit / push; no new slice started.
 
-- Carrier deviation (§1.7.4 record): the write-back and the consistency check in ② / ③ / ⑧ were executed by the controller (no prfrail-documenter dispatch), because they are whole-line replacements plus mechanical checks whose dispatch cost outweighs the benefit; the deviation changes neither the change surface nor the criteria, is recorded in the ⑩ receipt, and must not be treated as a precedent.
+## 9. Exception handling
+
+### D-1 Carrier deviation (② / ③ / ⑧ executed by the controller, no `prfrail-documenter` dispatch)
+
+- **Symptom**: the write-back in ②, the consistency check in ③ and the assembly in ⑧ were executed by the controller.
+- **Cause**: every change is an exact whole-line replacement plus mechanical checks (`git diff --numstat`, split-column comparison, count checks), so a dispatch round-trip costs more than it returns.
+- **Independent impact assessment**: the deviation weakens the separation between implementation and verification, not the correctness of the conclusion - correctness is reviewed independently by ⑤ (V4 Pro) and ⑦ (Codex), both `PASS WITH FIXES` with no Medium or above; the ① design text was produced by V4 Pro and compared word by word. Residual risk = if the controller misreads the freeze source while rewriting, ⑤/⑦ could pass on the same material; this slice mitigates it by mapping each clause to `r07-refined.md:49`.
+- **Conclusion**: the practice is recorded as-is and **must not be treated as a precedent**; later documentation slices with semantic judgement must still dispatch an execution role.
+
+### D-2 Dispatch table not mechanically read
+
+- This session debug-log directory holds only `main.jsonl` (one `session_start`) and `models.json`, with no tool-call records, so the ⑩ dispatch table is recorded from the dispatch text and is **not mechanically read from `transcript.arguments.agentName`**; this follows the honest-labelling rule of §13.2.2.
+
+## 10. Commit and CI fact chain
+
+- Main commit: `fb0ab57` (docs-only; English subject `<type>: <summary>`; 26 paths).
+- CI: run `43566904684` (ubuntu-latest 3m23s / windows-latest 4m40s, both legs `success`).
+- Both legs: `SELFTEST: PASS 737/737` (once per leg); `GATE REPORT scope=ci changed=26`; `PASS  base go test ./... :: ok=15 FAIL=0`; `TOTAL_FAIL=0`.
+- This section is written by the backfill commit and records facts only; no product surface changes.
+
 ```artifacts
 docs/PRODUCT_REQUIREMENTS.md	repo
 docs/PRODUCT_REQUIREMENTS_EN.md	repo
