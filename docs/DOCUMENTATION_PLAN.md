@@ -25,6 +25,8 @@
 
 先读本页→[开发计划](DEV_PLAN.md) 中当前 T 编号→该任务所属权威文档的小节和 AT→相关源文件/测试。仅为追溯设计理由或处理尚未迁移内容时读取项目建议书；不要每轮读整套中英文。
 
+> **跨会话交接入口**：以 `docs/t027/` 下最新版本的 CHECKLIST 快照作为跨会话交接起点；项目全景（P36 战略方向 / R-08·R-09 裁定全文 / AT-23·AT-24 分层执行方案）分别见 `docs/validation/strategic-planning-2026-10-31{,_EN}.md` / `docs/validation/r08-r09-ruling{,_EN}.md` / `docs/validation/at23-restricted-candidate{,_EN}.md` 与 `docs/validation/at24-supervised-black-box{,_EN}.md`。
+
 ## 2. 文档交付目录与职责覆盖
 
 | 文档包 | 中文/English | 覆盖内容 | 维护触发/责任 |

@@ -25,6 +25,8 @@ The former `RFC-proofrail-unattended-ai-engineering-product.md` is the [project 
 
 Read this page, the current T task in [DEV_PLAN_EN.md](DEV_PLAN_EN.md), the applicable authority sections/AT, and nearby code/tests. Read the proposal only to trace rationale or handle content not yet migrated. Do not load both complete language sets each round.
 
+> **Cross-session hand-off entry**: use the latest CHECKLIST snapshot under `docs/t027/` as the starting point for cross-session hand-offs; for the project panorama (P36 strategic direction / the R-08·R-09 ruling full text / the AT-23·AT-24 layered execution plans), see `docs/validation/strategic-planning-2026-10-31{,_EN}.md` / `docs/validation/r08-r09-ruling{,_EN}.md` / `docs/validation/at23-restricted-candidate{,_EN}.md` and `docs/validation/at24-supervised-black-box{,_EN}.md` respectively.
+
 ## 2. Delivery Index and Responsibility Coverage
 
 | Package | Chinese/English | Coverage | Trigger/owner |
