@@ -159,6 +159,13 @@ R-3 ruling: **(A) cannot start for now** (user ruling in the same round, 2026-11
 
 p57 §4.3 is a point-in-time register of 2026-11-05; items 1 and 2 below were corrected and confirmed by the 2026-11-15 disk re-check, and item 3 is the residual.
 
+| P75 §11.2 item | P57 §4.3 original item | Disposition |
+|---|---|---|
+| item 1 (the AT-24 row at `s1-exit.md:44`) | original item 1 | corrected by P64 ⇒ closed |
+| item 3 (the core task-chain row at `s1-exit.md:52`) | original item 2 | the only residual ⇒ handed to the S1 exit closure slice |
+| item 2 (row G-D of `s1-reach`) | original item 3 | corrected by s1-reach ⇒ closed |
+
+
 1. Item 1 (the AT-24 row at `docs/validation/s1-exit.md:44`): **disk re-check on 2026-11-15 = already corrected** - the row now reads "conditionally closed (2026-11-11, P64 acceptance)", consistent with `COMPLETED` at `docs/DEV_PLAN.md:119` ⇒ closed, no hand-off.
 2. Item 2 (row G-D of `docs/validation/s1-reach-reachability.md` §2): **disk re-check on 2026-11-15 = already corrected** - the row now cites `DEV_PLAN.md:119` and notes the s1-exit correction ⇒ closed, no hand-off.
 3. Item 3 (the core task-chain row at `docs/validation/s1-exit.md:52`): **residual, the only hand-off** - the first half still says "T027 not done, AT-23 not passed" while the same cell later says "the AT-23 stage-1 conditional closure is reached" ⇒ inconsistent wording inside one row; fix timing = when the S1 exit closure slice restates the gate conclusions.
@@ -213,6 +220,13 @@ p57 §4.3 is a point-in-time register of 2026-11-05; items 1 and 2 below were co
 - P75-3 (carrier deviation): the ③ consistency check was controller self-executed (§13.3.18); independent impact assessment = the action is fact comparison, and its conclusions were independently re-checked by ⑤ r2 and by both ⑦ readings; not to be treated as a precedent.
 - P75-4 (timing deviation): the freedom-list was finalised later than the "after ⑥, before ⑦" window of §1.7.3 (finalised at ⑧); impact assessment = the list items are unchanged since step 0 and both ⑦ readings checked scope against them; not to be treated as a precedent.
 - P75-5 (subagent temp file): a batch-assistance subagent created and immediately deleted a temp file while counting characters; zero residue confirmed; not a waiver for other slices.
+
+## 16. Commit and CI fact chain (backfilled)
+
+- Commit: `ed2e26e` (`docs: rule R-3 as not startable and declare T027-B complete in part`), 27 files `+2287 / -0`.
+- Push: `origin/main` `c5c3a78..ed2e26e` (origin only; no gitee push).
+- CI: run `43732384194`; `Go ubuntu-latest` success (3m19s), `Go windows-latest` success (4m41s); both legs `GATE REPORT scope=ci changed=27`, `TOTAL_FAIL=0`, `SELFTEST: PASS 737/737`.
+- Note: this section was added by the docs-only commit after CI turned green (§11.2); the CI run of that backfill commit itself is an observation record only.
 
 ```artifacts
 docs/ADR_REGISTER.md	repo
