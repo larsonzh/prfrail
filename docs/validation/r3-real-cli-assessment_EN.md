@@ -220,6 +220,7 @@ p57 §4.3 is a point-in-time register of 2026-11-05; items 1 and 2 below were co
 - P75-3 (carrier deviation): the ③ consistency check was controller self-executed (§13.3.18); independent impact assessment = the action is fact comparison, and its conclusions were independently re-checked by ⑤ r2 and by both ⑦ readings; not to be treated as a precedent.
 - P75-4 (timing deviation): the freedom-list was finalised later than the "after ⑥, before ⑦" window of §1.7.3 (finalised at ⑧); impact assessment = the list items are unchanged since step 0 and both ⑦ readings checked scope against them; not to be treated as a precedent.
 - P75-5 (subagent temp file): a batch-assistance subagent created and immediately deleted a temp file while counting characters; zero residue confirmed; not a waiver for other slices.
+- P75-6 (temporary-file D = 1): two CI observation captures landed at the tmp/ root (watch-p75.txt / watch-p75-backfill.txt); they were self-healed with evidence and removed with zero residue; this is the 5th OB-139 occurrence and the user ruled on 2026-11-16 = option 1 (keep observing plus a strengthened D=2 recurrence-prevention clause written into briefings from v59), with no governance slice raised.
 
 ## 16. Commit and CI fact chain (backfilled)
 

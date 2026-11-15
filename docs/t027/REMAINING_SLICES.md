@@ -2081,7 +2081,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | R/D 基线 | R = 0、D = 0（步骤 0 登记，§13.1.1；不继承 P74 的 R=3 / D=0） |
 | 临时件落点声明 | 本片临时目录 = `tmp/P75-R3-REAL-CLI-ASSESSMENT/`（⑧c 前只增不删；捕获件不落 `tmp/` 根） |
 
-完成记录（2026-11-15）：报告对 `docs/validation/r3-real-cli-assessment{,_EN}.md`；R-3 裁定 = (A) 暂不可起跑（含 A1–A5 与 O-7 = ②）；T027-B 宣告「完成（部分不适用）」；S-G8 保持 blocked 至 S2；ADR-045；R = 1、D = 0（按 §11.2 不写 hash / run）。
+完成记录（2026-11-15）：报告对 `docs/validation/r3-real-cli-assessment{,_EN}.md`；R-3 裁定 = (A) 暂不可起跑（含 A1–A5 与 O-7 = ②）；T027-B 宣告「完成（部分不适用）」；S-G8 保持 blocked 至 S2；ADR-045；R = 1、D = 1（按 §11.2 不写 hash / run）。
 
 ## 已知缺陷（后续切片前处理）
 

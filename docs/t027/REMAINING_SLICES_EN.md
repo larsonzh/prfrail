@@ -2068,7 +2068,7 @@ Completion record (2026-11-15): report pair `docs/validation/sandbox-interface{,
 | R/D baseline | R = 0, D = 0 (step-0 registration, §13.1.1; does not inherit P74's R=3 / D=0) |
 | Temp-file location declaration | Slice temp directory = `tmp/P75-R3-REAL-CLI-ASSESSMENT/` (add-only before ⑧c; no capture file at the `tmp/` root) |
 
-Completion record (2026-11-15): report pair `docs/validation/r3-real-cli-assessment{,_EN}.md`; R-3 ruling = (A) cannot start for now (including A1-A5 and O-7 = option 2); T027-B declared "complete (partly not applicable)"; S-G8 stays blocked until S2; ADR-045; R = 1, D = 0 (no hash / run recorded, per §11.2).
+Completion record (2026-11-15): report pair `docs/validation/r3-real-cli-assessment{,_EN}.md`; R-3 ruling = (A) cannot start for now (including A1-A5 and O-7 = option 2); T027-B declared "complete (partly not applicable)"; S-G8 stays blocked until S2; ADR-045; R = 1, D = 1 (no hash / run recorded, per §11.2).
 
 ## Known defects (to be handled before later slices)
 
