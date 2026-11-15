@@ -73,6 +73,8 @@ Verdict: `T027-B` is valid as a **milestone** and is registered; as an **open it
 
 - **R-2 is ruled by P73 (2026-11-14)**: OB-55 ownership = option b (the `Sandbox` interface moves into S1; the implementing slice `P74-SANDBOX-INTERFACE` is not yet started); reports: `docs/validation/t027b-admission{,_EN}.md`, ADR-044. The eight-gate definitions and verdicts in this table stay untouched (§11.1).
 
+- **R-3 is ruled by P75 = cannot start for now** (report: `docs/validation/r3-real-cli-assessment{,_EN}.md`); the eight-gate definitions and verdicts in this table stay untouched (§11.1).
+
 ## 4. P6 assessment — S1 Exit remaining-gate closeout inventory
 
 ### 4.1 Verdict
@@ -93,6 +95,8 @@ Verdict: `T027-B` is valid as a **milestone** and is registered; as an **open it
 | S-G8 Real CLI end-to-end | the supervised path runs end-to-end on a real CLI and a real candidate | not passed: `docs/DEV_PLAN.md:119` (D-18 states it depends on T027-B) | P5 residue R-3 | unlocked together with S-G1 |
 
 - **P71 pointer (2026-11-13)**: `docs/validation/s1-exit{,_EN}.md` now carries a "P71 applicability note" added by the `S1-SCOPE-ANNOTATE` slice (the REQ stage-ownership change does not affect gate-level verdicts; this section remains the definition source for the S-Gx numbering); the report is `docs/validation/s1-scope-annotate{,_EN}.md`. The eight-gate definitions and verdicts in this section stay unchanged (§11.1).
+
+- **S-G8 verdict ruled by P75**: stays blocked until S2 enforcement lands (report: `docs/validation/r3-real-cli-assessment{,_EN}.md`). The eight-gate definitions and verdicts in this table stay unchanged (§11.1).
 
 ### 4.3 Three stale statements (registered, not fixed)
 

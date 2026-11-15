@@ -2061,6 +2061,28 @@ A6 ② 进度（第 2 批，2026-09-15）：
 
 完成记录（2026-11-15）：报告对 `docs/validation/sandbox-interface{,_EN}.md`；证据包 `docs/validation/evidence/P74-SANDBOX-INTERFACE/`；R = 3、D = 0（按 §11.2 不写 hash / run）。
 
+### P75 — `R3-REAL-CLI-ASSESSMENT`（层 1 T027-B 主线里程碑余项评估 · 评估类）· ✅ 已完成
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `R3-REAL-CLI-ASSESSMENT`（层 1 T027-B 主线里程碑唯一余项评估；来源 = v58 §四「T027-B 唯一余项 = R-3 真实 CLI 端到端评估」） |
+| 状态 | ✅ 已完成（2026-11-15 收口） |
+| 目标 | 回答 T027-B 主线里程碑的 R-3 余项三问——① 主线里程碑可否宣告完成（C1–C7 / N1–N4 / R-1 / R-2 已全部落地）；② S-G8 门可否推进；③ AT-23 阶段 1 条件闭合状态是否维持；产出 R-3 三选一对比（A 暂不可起跑 / B 分阶段起跑 / C 引入 P′ 或换候选）+ 推荐，**① 阶段强制停下等用户裁 R-3** |
+| 依赖 | P74 闭环（`Sandbox` 检查层落地）、P73（T027-B 准入裁定）、P57（§3.3 R-3 登记 / §4.2 八门）、B1 与 B2（真实 CLI 端到端结论）、R-08 与 R-09 裁定（2026-11-06） |
+| 规模 | M（评估类；不产生产代码） |
+| 步骤 | ① 现状核对 + 三选一对比 + 八件评估（**停点：等用户裁 R-3**）→ ② 裁定登记 + `DEV_PLAN` T027-B 段更新 + 报告成文 → ③ 一致性 → ④ 门禁 → ⑤ → ⑥（按 §7.2.1 判定）→ ⑦ 盲审 + 终审 + 复审 → ⑧ → ⑨ → ⑧c → ⑩ |
+| 现状缺口 | 无（R-3 已裁定 = (A)；完成判定、S-G8 口径与 AT-23 维持均已成文） |
+| 交付物 | 报告对 `docs/validation/r3-real-cli-assessment{,_EN}.md` + `DEV_PLAN{,_EN}` 的 T027-B 段更新 + 证据包 `docs/validation/evidence/P75-R3-REAL-CLI-ASSESSMENT/` |
+| 验收证据 | 三选一对比含成本 / 风险 / 可回滚三轴；裁定登记四要素齐备；八件评估逐项成文；三作用域与 SELFTEST 全绿 |
+| 边界 | 不产生产代码；不改准则正文 / 判据本体 / `CONTRACTS` / schema / fixtures / CI / S1 Exit 八门判定；不替用户裁定；不推 gitee；**起跑纪律须引用 D=2 防再犯句（P71 报告 §8）与 OB-139「观察中」口径** |
+| 分级 | `[SLICE]` |
+| 探针额度 | 0 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/P75-R3-REAL-CLI-ASSESSMENT/freedom-list.md` |
+| R/D 基线 | R = 0、D = 0（步骤 0 登记，§13.1.1；不继承 P74 的 R=3 / D=0） |
+| 临时件落点声明 | 本片临时目录 = `tmp/P75-R3-REAL-CLI-ASSESSMENT/`（⑧c 前只增不删；捕获件不落 `tmp/` 根） |
+
+完成记录（2026-11-15）：报告对 `docs/validation/r3-real-cli-assessment{,_EN}.md`；R-3 裁定 = (A) 暂不可起跑（含 A1–A5 与 O-7 = ②）；T027-B 宣告「完成（部分不适用）」；S-G8 保持 blocked 至 S2；ADR-045；R = 1、D = 0（按 §11.2 不写 hash / run）。
+
 ## 已知缺陷（后续切片前处理）
 
 > **阻断口径不变**：仅高频/已复现缺陷阻断，观测级 flake 只记录并在验证报告中列示。

@@ -2048,6 +2048,28 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 
 Completion record (2026-11-15): report pair `docs/validation/sandbox-interface{,_EN}.md`; evidence pack `docs/validation/evidence/P74-SANDBOX-INTERFACE/`; R = 3, D = 0 (no hash / run recorded, per §11.2).
 
+### P75 — `R3-REAL-CLI-ASSESSMENT` (residual assessment of the layer-1 T027-B main-line milestone · assessment) · ✅ Complete
+
+| Field | Content |
+|---|---|
+| Identifier | `R3-REAL-CLI-ASSESSMENT` (assessment of the only residual item of the layer-1 T027-B main-line milestone; source = v58 §4 "the only T027-B residual = the R-3 real CLI end-to-end assessment") |
+| Status | ✅ Complete (closed 2026-11-15) |
+| Goal | answer the three R-3 residual questions of the T027-B main-line milestone - (1) whether the milestone can be declared complete (C1-C7 / N1-N4 / R-1 / R-2 all landed); (2) whether the S-G8 gate can advance; (3) whether the closed AT-23 stage-1 condition state is maintained; produce the R-3 three-way comparison (A cannot start yet / B start in stages / C introduce P-prime or swap the candidate) plus a recommendation, **and stop mandatorily after step 1 pending the user's R-3 ruling** |
+| Dependency | P74 closed (the `Sandbox` check layer landed), P73 (the T027-B admission ruling), P57 (§3.3 R-3 registration / §4.2 the eight gates), B1 and B2 (real CLI end-to-end conclusions), the R-08 and R-09 rulings (2026-11-06) |
+| Size | M (assessment type; produces no production code) |
+| Steps | (1) current-state check + three-way comparison + the eight assessments (**stop point: pending the user's R-3 ruling**) -> (2) ruling registration + `DEV_PLAN` T027-B section update + report write-up -> (3) consistency -> (4) gates -> (5) -> (6) (judged per §7.2.1) -> (7) blind + final + re-review -> (8) -> (9) -> (8c) -> (10) |
+| Current gap | none (R-3 is ruled = (A); the completion decision, the S-G8 wording and the AT-23 maintenance are all written up) |
+| Deliverables | report pair `docs/validation/r3-real-cli-assessment{,_EN}.md` + the T027-B section update in `DEV_PLAN{,_EN}` + evidence pack `docs/validation/evidence/P75-R3-REAL-CLI-ASSESSMENT/` |
+| Acceptance evidence | the three-way comparison covers the cost / risk / rollback axes; the ruling registration carries all four elements; the eight assessments are written item by item; the three scopes and SELFTEST are all green |
+| Boundary | no production code; the directive body / criterion bodies / `CONTRACTS` / schema / fixtures / CI / the S1 Exit eight-gate decisions unchanged; no ruling on the user's behalf; no gitee push; **the kick-off discipline must cite the D=2 recurrence-prevention clause (P71 report §8) and the OB-139 "observing" wording** |
+| Tier | `[SLICE]` |
+| Probe budget | 0 |
+| Freedom-list landing path | `docs/validation/evidence/P75-R3-REAL-CLI-ASSESSMENT/freedom-list.md` |
+| R/D baseline | R = 0, D = 0 (step-0 registration, §13.1.1; does not inherit P74's R=3 / D=0) |
+| Temp-file location declaration | Slice temp directory = `tmp/P75-R3-REAL-CLI-ASSESSMENT/` (add-only before ⑧c; no capture file at the `tmp/` root) |
+
+Completion record (2026-11-15): report pair `docs/validation/r3-real-cli-assessment{,_EN}.md`; R-3 ruling = (A) cannot start for now (including A1-A5 and O-7 = option 2); T027-B declared "complete (partly not applicable)"; S-G8 stays blocked until S2; ADR-045; R = 1, D = 0 (no hash / run recorded, per §11.2).
+
 ## Known defects (to be handled before later slices)
 
 > **Blocking rule unchanged**: only high-frequency / reproduced defects block; observation-grade flakes are recorded and listed in the validation report.

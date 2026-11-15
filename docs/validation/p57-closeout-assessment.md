@@ -73,6 +73,8 @@ F1 与 F2 在**本片回写前**互斥：前者称已立项，后者称无设计
 
 - **R-2 已由 P73 裁定（2026-11-14）**：OB-55 归属 = 方案 b（`Sandbox` 接口提前到 S1，实施片 `P74-SANDBOX-INTERFACE` 待起跑）；报告：`docs/validation/t027b-admission{,_EN}.md`、ADR-044。本表八门定义与判定不改（§11.1）。
 
+- **R-3 已由 P75 裁定 = 暂不可起跑**（报告：`docs/validation/r3-real-cli-assessment{,_EN}.md`）；本表八门定义与判定不改（§11.1）。
+
 ## 4. P6 评估 — S1 Exit 剩余门收口清单
 
 ### 4.1 判定
@@ -93,6 +95,8 @@ F1 与 F2 在**本片回写前**互斥：前者称已立项，后者称无设计
 | S-G8 真实 CLI 端到端 | 受监督路径可在真实 CLI 与真实候选下端到端运行 | 未通过：`docs/DEV_PLAN.md:119`（D-18 明写依赖 T027-B） | P5 的 R-3 | 与 S-G1 同源解锁 |
 
 - **P71 指针（2026-11-13）**：`docs/validation/s1-exit{,_EN}.md` 已由切片 `S1-SCOPE-ANNOTATE` 追加「P71 适用性说明」段（REQ 阶段归属变更不影响门级判定；S-Gx 编号仍以本节为定义源）；报告见 `docs/validation/s1-scope-annotate{,_EN}.md`。本表八门定义与判定不改（§11.1）。
+
+- **S-G8 判定已由 P75 裁定**：保持 blocked 直到 S2 enforcement 接入（报告：`docs/validation/r3-real-cli-assessment{,_EN}.md`）。本表八门定义与判定不改（§11.1）。
 
 ### 4.3 三处时态滞后（登记不修）
 

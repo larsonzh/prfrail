@@ -199,6 +199,8 @@ T027 前置状态更新（2026-11-09，F2-FIX-STUB-HANG）：在上一段基础�
 - P73 准入（OB-55 裁定 = 方案 b）：`Sandbox` 接口提前到 S1；实施边界 = 契约先行（`CONTRACTS` §7 新增 Sandbox 段）+ `internal/guard/sandbox{,_windows,_unsupported}.go` + 装配检查点（与 P69 permit 同层）+ 对应测试；不改 `internal/chain|adapters` 判定本体、schema、fixtures、CI、候选版本与 R-08 / R-09 裁定；实施片 = `P74-SANDBOX-INTERFACE`（M 档，独立片，待起跑）；候选版本维持 GitHub Copilot CLI 1.0.83（R-08.1）；Windows 前提仍为只 P，不引入 P′；**B 段不解锁 S-G1 / S-G8**；探针需求 = 0；证据缺口 = Sandbox 契约段、调用点接线证据、死代码禁令处置留痕与 ⑦ 评审记录；报告 `docs/validation/t027b-admission{,_EN}.md`、ADR-044。
 
 - P74 SANDBOX-INTERFACE：`Sandbox` 检查层落地（`internal/guard/sandbox{,_windows,_unsupported}.go`）+ 两条派发路径的装配检查点（均在 permit 之前）+ 触发源 `PRFRAIL_SANDBOX_CHECK`（S1 默认 `off`，零行为变化）；`CONTRACTS` §7.2 契约段已落；真实 enforcement 边界仍留 S2；报告对 `docs/validation/sandbox-interface{,_EN}.md`。
+
+- T027-B 收口裁定（P75 `R3-REAL-CLI-ASSESSMENT`，2026-11-15）：T027-B 宣告「**完成（部分不适用）**」——主线 C1–C7 / N1–N4 / R-1 / R-2 已全部落地；R-3 部分不适用（真实 CLI 端到端需 S2 enforcement 前提，S1 内不做）。**R-3 已由 P75 裁定 = 暂不可起跑**；真实 CLI 端到端待 S2 enforcement 接入。报告 `docs/validation/r3-real-cli-assessment{,_EN}.md`、ADR-045。
 ## 3. 需求映射
 
 除明确标记完成的任务外，Implementation evidence 是计划证据，不代表实现。
