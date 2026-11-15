@@ -135,8 +135,10 @@ Windows 本机，2026-11-15（④ 批次；⑨ 定稿复跑见 §9）：
 
 ## 14. 提交与 CI 事实链（回填）
 
-- 提交事实链：本报告定稿时未 commit、未 push（HEAD = `f834ce5`）；授权后由后续轮次在同一节登记提交 hash。
-- CI 事实链：本报告定稿时无 CI 运行（尚未推送）；推送后按 §6.4 观察双腿并按需登记 run 号与包级读数。
+- 主提交：`3300364`（`feat: add the sandbox check layer before the one-shot probe permit`；单提交，本片暂存集一次性提交）；推送 `f834ce5..3300364 main -> main`（仅 origin）。
+- CI（主提交，run `43669748483`，head `3300364`）：**双腿 success** —— `Go windows-latest` success（4.9 min）、`Go ubuntu-latest` success（3.35 min）；其余 3 个 job 为 `skipped`（非本切片触发）。
+- 包级证据（`go test` 原始 `ok` 行）：windows `ok internal/console 21.010s` / `ok internal/guard 3.106s`；ubuntu `ok internal/console 3.939s` / `ok internal/guard 0.992s`；ubuntu Race 腿 `ok internal/console 15.224s` / `ok internal/guard 2.992s`。ubuntu `Test` 腿绿 ⇒ `//go:build !windows` 的 `TestUnsupportedPlatformReturnsUnknown` 已在 Linux 实机通过（即 §11 所指「非 Windows 运行态由 CI ubuntu 腿承担」已兑现）。
+- 回填说明：本节由回填提交（docs-only，仍仅推 origin）写入；**回填提交自身的 run 号只作观察记录（§11.2 自指避免），不作为本片 CI 事实链的权威读数**。
 
 以下为本片归档条目清单（仓库相对路径 + 处置，TAB 分隔；CN 与 `_EN` 两侧围栏逐字节相同）。
 

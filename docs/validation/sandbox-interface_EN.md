@@ -135,8 +135,10 @@ Windows host, 2026-11-15 (④ batch; the ⑨ final re-run is in §9):
 
 ## 14. Commit and CI fact chain (backfill)
 
-- Commit fact chain: no commit and no push when this report was finalised (HEAD = `f834ce5`); a later round records the commit hash in this section once authorised.
-- CI fact chain: no CI run exists when this report was finalised (nothing was pushed); after the push the two legs are observed per §6.4 and the run id plus package-level readings are recorded as needed.
+- Main commit: `3300364` (`feat: add the sandbox check layer before the one-shot probe permit`; one commit carrying the whole staged set of this slice); pushed as `f834ce5..3300364 main -> main` (origin only).
+- CI (main commit, run `43669748483`, head `3300364`): **both legs success** — `Go windows-latest` success (4.9 min) and `Go ubuntu-latest` success (3.35 min); the other 3 jobs are `skipped` (not triggered by this slice).
+- Package-level evidence (raw `go test` `ok` lines): windows `ok internal/console 21.010s` / `ok internal/guard 3.106s`; ubuntu `ok internal/console 3.939s` / `ok internal/guard 0.992s`; ubuntu Race leg `ok internal/console 15.224s` / `ok internal/guard 2.992s`. The green ubuntu `Test` leg means the `//go:build !windows` test `TestUnsupportedPlatformReturnsUnknown` passed on a real Linux host (i.e. the §11 boundary "the non-Windows runtime reading is carried by the CI ubuntu leg" is now discharged).
+- Backfill note: this section is written by a docs-only backfill commit (still pushed to origin only); **the backfill commit's own run id is an observation record only (§11.2 self-reference avoidance) and is not the authoritative CI reading of this slice**.
 
 The following is the archived-entry list of this slice (repository-relative path + disposition, TAB separated; the CN and `_EN` fences are byte-identical).
 
