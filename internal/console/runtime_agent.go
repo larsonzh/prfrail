@@ -109,6 +109,15 @@ type AgentRunnerAssemblyOptions struct {
 	// every precondition passed; nil refuses fail-closed with no footprint.
 	ProbePermit *gates.ProbePermit
 
+	// SandboxEnforced requests the sandbox check-layer preflight of this
+	// dispatch. The zero value (every caller that does not opt in, and every
+	// production caller unless PRFRAIL_SANDBOX_CHECK=enforce is set) keeps the
+	// pre-slice control flow: the check is skipped and nothing is consumed. When
+	// set, the check runs before the probe permit is claimed, so a check refusal
+	// never burns the one-shot quota and never creates the run-root marker
+	// (CONTRACTS.md 7.2 (d)).
+	SandboxEnforced bool
+
 	Clock func() time.Time
 	IDs   func() string
 
@@ -188,6 +197,16 @@ func ExecuteAgentRunnerRun(ctx context.Context, options AgentRunnerAssemblyOptio
 	}
 	if err := agentRunnerValidateCLI(options.AgentCLI); err != nil {
 		return RunSummary{}, err
+	}
+
+	// Sandbox check layer (CONTRACTS.md 7.2): the check runs before the probe
+	// permit is claimed, so an environment or configuration refusal never burns
+	// the one-shot quota, never creates the run-root marker and never spawns.
+	// The zero value of SandboxEnforced keeps the pre-slice control flow intact.
+	if options.SandboxEnforced {
+		if err := preflightSandbox(ctx, agentRunnerSandboxDispatchReason); err != nil {
+			return RunSummary{}, fmt.Errorf("%w: sandbox preflight failed (fail-closed): %w", ErrInvalidConfig, err)
+		}
 	}
 
 	// The probe permit quota is claimed only after every precondition passed: a

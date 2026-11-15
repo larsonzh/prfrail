@@ -318,6 +318,44 @@ canonical statement，receiptHash 再覆盖 statement 与签名字节；cross-ho
 （d）**reduced/unknown 报告**：完成后写一枚 `supervised-report` 记录，`assuranceLevel` 恒为常量 `reduced`，`unknownDimensions` 非空且必须含 `cost`，逐项列出外部代理的工具使用、资源读取、网络、费用、后台进程、会话连续性与外部副作用等不可观测维度。**禁止把未知项显示为安全**：报告与渲染对每个未知维度只显示 `unknown`，不得显示 `safe`、`verified` 或任何数字承诺。
 
 四条禁止项的契约后果：ProofRail 不得因 AgentRunner 不可用而自动落入本模式；`visible` 投递回执不得冒充完成；风险确认不得豁免授权、handoff 与门禁；费用、进程与外部副作用等未知项不得被显示为安全。
+### 7.2 Sandbox 检查层接口
+
+Sandbox 检查层（`guard.Sandbox`）是**检查层而非执行层**：只回答「当前环境是否满足
+enforcement 要求」这一个问题，本身不执行 enforcement。S1 阶段仅落实 fail-closed
+拒绝派发；检查通过时不改变任何既有行为。以下八条为该层的接口契约。
+
+（a）**检查层定位**：方法集为 `Check(ctx, CheckSpec) (Verdict, error)`，只做环境判定；
+**不提供 Create/Exec/Destroy/Terminate 等进程生命周期方法**，与 `ProcessSpec` /
+`ProcessIdentity` / `ManagedProcess` 无类型重叠（三者零改动、零新字段）。
+
+（b）**裁决三态**：`Allowed` / `Denied(reason)` / `Unknown(reason)`；
+**`Denied` 与 `Unknown` 均为 fail-closed 拒绝派发**，仅 `Allowed` 放行；
+`reason` 随拒绝错误进入审计与诊断信息。
+
+（c）**错误分类**：`ErrSandboxUnavailable` 表示检查能力不可用（如平台无实现），
+调用方必须 fail-closed；`ErrSandboxRejected` 表示非 `Allowed` 的 fail-closed 拒绝。
+两者都不得被解释为放行。
+
+（d）**检查点位置（方案 i）**：Sandbox 检查位于 **probe permit 认领之前**、
+Step 2 run-root marker 之前——环境/配置类拒绝不得消耗不可退还的一次性探针配额。
+拒绝时不得创建 run-root marker、不得 spawn，也不得进入 permit 之后的任何启动步骤。
+
+（e）**触发面（S1）**：唯一触发源为环境变量 `PRFRAIL_SANDBOX_CHECK`，
+取值 `enforce` / `off`（缺省与空值 = `off`）；非法取值 ⇒ CLI usage error 且零副作用
+（先于任何文件读取）。**S1 默认 `off` ⇒ 默认控制流与引入前逐句等价
+（零行为变化）**。置 `enforce` 时，两条派发路径均执行检查：AgentRunner 装配路径与
+supervised 首次起跑（`freshStart`）分支；supervised 再入路径（非 `freshStart`）
+不检查、不消费配额。
+
+（f）**平台实现**：非 Windows 平台（`//go:build !windows`）恒返回 `Unknown` +
+`ErrSandboxUnavailable`；Windows 形态 α 在 S1 阶段亦恒返回 `Unknown`，如实陈述
+「未执行检查、无法判定」，**不得**以 `Denied` 谎报确定性。两平台的拒绝语义一致。
+
+（g）**边界（不做）**：本子段不改变 chain 判定本体（`internal/chain/**`），不改变
+adapters 的 spawn 语义（`internal/adapters/**`），不落真实 enforcement 边界（留 S2）；
+B 段接入 enforcement 时填充 `Allowed` 判定逻辑。
+
+（h）**B 段未解锁声明**：本接口落地**不解锁 S-G1 / S-G8**，S1 Exit 门判定不变。
 
 ## 8. 错误与验收边界
 

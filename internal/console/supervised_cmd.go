@@ -31,7 +31,7 @@ func (unavailableVisibleClient) SendVisible(context.Context, adapters.RequestEnv
 }
 
 // executeSupervisedRun is the `run` routing entry of a supervised definition.
-func (cli CLI) executeSupervisedRun(ctx context.Context, runID, runDir string, definition chain.Definition, probePermit *gates.ProbePermit, jsonOutput bool, stdout, stderr io.Writer, progress io.Writer) int {
+func (cli CLI) executeSupervisedRun(ctx context.Context, runID, runDir string, definition chain.Definition, probePermit *gates.ProbePermit, sandboxEnforced, jsonOutput bool, stdout, stderr io.Writer, progress io.Writer) int {
 	options, err := cli.supervisedAssemblyOptions(runID, runDir, definition)
 	if err != nil {
 		return writeCommandError(stdout, stderr, "run", jsonOutput, err)
@@ -40,6 +40,10 @@ func (cli CLI) executeSupervisedRun(ctx context.Context, runID, runDir string, d
 	// The CLI gate and the assembly share one permit instance, so the assembly
 	// claims the same one-shot quota the route already validated.
 	options.ProbePermit = probePermit
+	// The sandbox trigger is resolved once by the route and injected here: the
+	// assembly entry never reads the environment itself, so a test that builds
+	// options directly is never contaminated by the host environment.
+	options.SandboxEnforced = sandboxEnforced
 	summary, err := ExecuteSupervisedRun(ctx, options)
 	if err != nil {
 		return writeCommandError(stdout, stderr, "run", jsonOutput, err)

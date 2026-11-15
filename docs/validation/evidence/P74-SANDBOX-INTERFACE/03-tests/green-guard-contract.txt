@@ -1,0 +1,12 @@
+=== RUN   TestSandboxInterfaceContract
+=== RUN   TestSandboxInterfaceContract/allowed
+=== RUN   TestSandboxInterfaceContract/denied
+=== RUN   TestSandboxInterfaceContract/unknown
+=== RUN   TestSandboxInterfaceContract/unavailable
+--- PASS: TestSandboxInterfaceContract (0.00s)
+    --- PASS: TestSandboxInterfaceContract/allowed (0.00s)
+    --- PASS: TestSandboxInterfaceContract/denied (0.00s)
+    --- PASS: TestSandboxInterfaceContract/unknown (0.00s)
+    --- PASS: TestSandboxInterfaceContract/unavailable (0.00s)
+PASS
+ok  	github.com/larsonzh/prfrail/internal/guard	1.154s

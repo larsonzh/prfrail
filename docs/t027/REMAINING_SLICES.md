@@ -2039,6 +2039,28 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 临时件落点声明 | 本片临时目录 = `tmp/P73-T027B-ADMISSION/`（⑧c 前只增不删；捕获件不落 `tmp/` 根） |
 | 完成记录 | 报告对 `docs/validation/t027b-admission{,_EN}.md`；OB-55 裁定 = 方案 b（2026-11-14，与 R-06 同向的确认与细化，三条附条件全接受）；审查链 ① `DESIGN: DONE` → ②a–②c 分步 → ③ 一致性（主控自执行，D-1 已登记）→ ⑤ `PASS`（r1 `PASS WITH FIXES` 整改后原位重跑）→ ⑥ 跳过（⑦ `SKIP CONFIRMED`）→ ⑦ `FINAL REVIEW: PASS`（0 发现 + 1 Info）、盲审 0；GLM 批量 2 次；R=0、D=0（报告异常处理章另计 D-1 / D-2，独立序列）；停于 ⑩ 等授权（不写 hash/run，§11.2） |
 
+### P74 — `SANDBOX-INTERFACE`（层 1 主线 B 段引入 · 实现类）· ✅ 已完成
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `SANDBOX-INTERFACE`（层 1 B 段引入独立片；来源 = P73 裁定 = OB-55 方案 b 的实施首片） |
+| 状态 | ✅ 已完成（2026-11-15 收口） |
+| 目标 | 落 `Sandbox` 接口抽象层 + 装配检查点（与 P69 permit 同层），不落真实 enforcement 边界（留 S2） |
+| 依赖 | P73（ADR-044 + 三条附条件，已闭环） |
+| 规模 | M（实现类；新增 `internal/guard/sandbox*.go` + 两处装配接线） |
+| 步骤 | ① 设计 → ②a 契约 → ③0 骨架 → ③ 红测 → ②b 实现 → ④ → ⑤ → ⑥（必做）→ ⑦ → ⑧ → ⑨ → ⑧c → ⑩ |
+| 现状缺口 | `Sandbox` 抽象层不存在；装配路径无 enforcement 检查点 |
+| 交付物 | `CONTRACTS{,_EN}` §7 新增 Sandbox 段；`internal/guard/sandbox{,_windows,_unsupported}.go`；`runtime_agent.go` / `runtime_supervised.go` 检查点；红测与绿测；报告对；证据包 |
+| 验收证据 | 红测跑红 → 转绿；变异检验可证伪；`GOOS=linux go build/vet` 全绿；门禁四项全绿 |
+| 边界 | 不改 `internal/chain/**` / `internal/adapters/**` 判定本体、schema / fixtures / CI、候选版本、R-08 / R-09；不引入 P′；不扩域；**B 段不解锁 S-G1 / S-G8** |
+| 分级 | `[SLICE]` |
+| 探针额度 | 0 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/P74-SANDBOX-INTERFACE/freedom-list.md` |
+| R/D 基线 | R = 0、D = 0（步骤 0 登记，§13.1.1） |
+| 临时件落点声明 | 本片临时目录 = `tmp/P74-SANDBOX-INTERFACE/`（⑧c 前只增不删；捕获件不落 `tmp/` 根） |
+
+完成记录（2026-11-15）：报告对 `docs/validation/sandbox-interface{,_EN}.md`；证据包 `docs/validation/evidence/P74-SANDBOX-INTERFACE/`；R = 3、D = 0（按 §11.2 不写 hash / run）。
+
 ## 已知缺陷（后续切片前处理）
 
 > **阻断口径不变**：仅高频/已复现缺陷阻断，观测级 flake 只记录并在验证报告中列示。

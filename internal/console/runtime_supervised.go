@@ -246,6 +246,14 @@ type SupervisedAssemblyOptions struct {
 	// operator-interaction ledger yet) claims the quota; every re-entry passes
 	// without one. A nil permit on a first start refuses fail-closed.
 	ProbePermit *gates.ProbePermit
+	// SandboxEnforced requests the sandbox check-layer preflight of the first
+	// start. The zero value keeps the pre-slice control flow: the check is
+	// skipped and nothing is consumed. When set, the fresh-start branch runs the
+	// check before the probe permit is claimed, so a refusal burns no quota and
+	// leaves no operator-interaction ledger and no run-root marker behind
+	// (CONTRACTS.md 7.2 (d) and (e)). A re-entry (not a fresh start) never
+	// checks: it dispatches nothing and consumes nothing.
+	SandboxEnforced bool
 	// CrashPoint, when set, is called at each durable boundary of the
 	// confirmation sequence (supervisedCrashAfterConfirmation /
 	// supervisedCrashAfterResume / supervisedCrashAfterWindowOpen). It exists so
@@ -302,6 +310,16 @@ func ExecuteSupervisedRun(ctx context.Context, options SupervisedAssemblyOptions
 		freshStart = true
 	}
 	if freshStart {
+		// Sandbox check layer (CONTRACTS.md 7.2): the check runs before the probe
+		// permit is claimed, so a refusal burns no quota and leaves neither the
+		// operator-interaction ledger nor the run-root marker behind. A re-entry
+		// dispatches nothing and is not checked. The zero value of
+		// SandboxEnforced keeps the pre-slice control flow intact.
+		if options.SandboxEnforced {
+			if err := preflightSandbox(ctx, supervisedSandboxDispatchReason); err != nil {
+				return RunSummary{}, fmt.Errorf("%w: sandbox preflight failed (fail-closed): %w", ErrInvalidConfig, err)
+			}
+		}
 		releaseProbePermit, permitErr := requireProbePermit(ctx, options.ProbePermit)
 		if permitErr != nil {
 			return RunSummary{}, permitErr

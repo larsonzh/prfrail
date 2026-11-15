@@ -1,0 +1,14 @@
+=== RUN   TestSupervisedRunSandboxRefusesBeforePermit
+=== RUN   TestSupervisedRunSandboxRefusesBeforePermit/denied
+    runtime_supervised_sandbox_test.go:65: invocation 1: the dispatch must be refused with guard: sandbox check rejected dispatch, got supervised visible delivery is not accepted: visible delivery uncertain: visible_delivery_unavailable: 
+=== RUN   TestSupervisedRunSandboxRefusesBeforePermit/unknown
+    runtime_supervised_sandbox_test.go:65: invocation 1: the dispatch must be refused with guard: sandbox check rejected dispatch, got supervised visible delivery is not accepted: visible delivery uncertain: visible_delivery_unavailable: 
+=== RUN   TestSupervisedRunSandboxRefusesBeforePermit/unavailable
+    runtime_supervised_sandbox_test.go:65: invocation 1: the dispatch must be refused with guard: sandbox check unavailable, got supervised visible delivery is not accepted: visible delivery uncertain: visible_delivery_unavailable: 
+--- FAIL: TestSupervisedRunSandboxRefusesBeforePermit (0.09s)
+    --- FAIL: TestSupervisedRunSandboxRefusesBeforePermit/denied (0.03s)
+    --- FAIL: TestSupervisedRunSandboxRefusesBeforePermit/unknown (0.03s)
+    --- FAIL: TestSupervisedRunSandboxRefusesBeforePermit/unavailable (0.03s)
+FAIL
+FAIL	github.com/larsonzh/prfrail/internal/console	1.509s
+FAIL

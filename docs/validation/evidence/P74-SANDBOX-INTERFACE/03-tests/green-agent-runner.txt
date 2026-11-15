@@ -1,0 +1,10 @@
+=== RUN   TestAgentRunnerRunSandboxRefusesBeforePermit
+=== RUN   TestAgentRunnerRunSandboxRefusesBeforePermit/denied
+=== RUN   TestAgentRunnerRunSandboxRefusesBeforePermit/unknown
+=== RUN   TestAgentRunnerRunSandboxRefusesBeforePermit/unavailable
+--- PASS: TestAgentRunnerRunSandboxRefusesBeforePermit (0.07s)
+    --- PASS: TestAgentRunnerRunSandboxRefusesBeforePermit/denied (0.03s)
+    --- PASS: TestAgentRunnerRunSandboxRefusesBeforePermit/unknown (0.02s)
+    --- PASS: TestAgentRunnerRunSandboxRefusesBeforePermit/unavailable (0.02s)
+PASS
+ok  	github.com/larsonzh/prfrail/internal/console	1.770s

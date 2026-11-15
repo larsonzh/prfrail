@@ -2026,6 +2026,28 @@ Sources: newly established by the user on 2026-10-13; `docs/DELIVERY_DIRECTIVE.m
 | Temp-file location declaration | This slice's temp directory = `tmp/P73-T027B-ADMISSION/` (add-only before ⑧c; no capture file at the `tmp/` root) |
 | Completion record | Report pair `docs/validation/t027b-admission{,_EN}.md`; OB-55 ruling = option b (2026-11-14, a confirmation and refinement in the same direction as R-06, all three conditions accepted); review chain ① `DESIGN: DONE` -> ②a-②c step by step -> ③ consistency (controller self-executed, D-1 recorded) -> ⑤ `PASS` (r1 `PASS WITH FIXES`, re-run in place) -> ⑥ skipped (⑦ `SKIP CONFIRMED`) -> ⑦ `FINAL REVIEW: PASS` (0 findings plus 1 Info), blind review 0; GLM batch 2 times; R=0, D=0 (the exception section separately records D-1 / D-2, an independent sequence); stopped at ⑩ pending authorisation (no hash/run recorded, §11.2) |
 
+### P74 — `SANDBOX-INTERFACE` (layer-1 part-B introduction · implementation) · ✅ Complete
+
+| Field | Content |
+|---|---|
+| Identifier | `SANDBOX-INTERFACE` (layer-1 part-B introduction slice; source = the P73 ruling = the first implementing slice of OB-55 option b) |
+| Status | ✅ Complete (closed 2026-11-15) |
+| Goal | land the `Sandbox` interface abstraction plus the assembly check point (same layer as the P69 permit); no real enforcement boundary (left to S2) |
+| Dependency | P73 (ADR-044 plus the three conditions, closed) |
+| Size | M (implementation; new `internal/guard/sandbox*.go` plus two assembly wiring points) |
+| Steps | ① design -> ②a contract -> ③0 skeleton -> ③ red tests -> ②b implementation -> ④ -> ⑤ -> ⑥ (mandatory) -> ⑦ -> ⑧ -> ⑨ -> ⑧c -> ⑩ |
+| Current gap | the `Sandbox` abstraction does not exist and the assembly paths have no enforcement check point |
+| Deliverables | a new Sandbox section in `CONTRACTS{,_EN}` §7; `internal/guard/sandbox{,_windows,_unsupported}.go`; check points in `runtime_agent.go` / `runtime_supervised.go`; red and green tests; report pair; evidence pack |
+| Acceptance evidence | red tests fail first and then pass; the mutation check is falsifiable; `GOOS=linux go build/vet` all green; the four gate runs all green |
+| Boundary | no change to the `internal/chain/**` / `internal/adapters/**` criterion bodies, schema / fixtures / CI, candidate version or R-08 / R-09; no P-prime; no scope expansion; **part B does not unlock S-G1 / S-G8** |
+| Tier | `[SLICE]` |
+| Probe budget | 0 |
+| Freedom-list landing path | `docs/validation/evidence/P74-SANDBOX-INTERFACE/freedom-list.md` |
+| R/D baseline | R = 0, D = 0 (step-0 registration, §13.1.1) |
+| Temp-file location declaration | Slice temp directory = `tmp/P74-SANDBOX-INTERFACE/` (add-only before ⑧c; no capture file at the `tmp/` root) |
+
+Completion record (2026-11-15): report pair `docs/validation/sandbox-interface{,_EN}.md`; evidence pack `docs/validation/evidence/P74-SANDBOX-INTERFACE/`; R = 3, D = 0 (no hash / run recorded, per §11.2).
+
 ## Known defects (to be handled before later slices)
 
 > **Blocking rule unchanged**: only high-frequency / reproduced defects block; observation-grade flakes are recorded and listed in the validation report.

@@ -1,0 +1,10 @@
+=== RUN   TestSupervisedRunSandboxRefusesBeforePermit
+=== RUN   TestSupervisedRunSandboxRefusesBeforePermit/denied
+=== RUN   TestSupervisedRunSandboxRefusesBeforePermit/unknown
+=== RUN   TestSupervisedRunSandboxRefusesBeforePermit/unavailable
+--- PASS: TestSupervisedRunSandboxRefusesBeforePermit (0.02s)
+    --- PASS: TestSupervisedRunSandboxRefusesBeforePermit/denied (0.01s)
+    --- PASS: TestSupervisedRunSandboxRefusesBeforePermit/unknown (0.01s)
+    --- PASS: TestSupervisedRunSandboxRefusesBeforePermit/unavailable (0.00s)
+PASS
+ok  	github.com/larsonzh/prfrail/internal/console	1.502s

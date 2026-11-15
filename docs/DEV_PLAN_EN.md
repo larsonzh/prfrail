@@ -198,6 +198,8 @@ T027 prerequisite status update (2026-11-09, F2-FIX-STUB-HANG): building on the 
 - P70 S1-STREAM-PROGRESS: the lightweight `run --progress` stream switch (report pair `docs/validation/s1-stream-progress{,_EN}.md`)
 
 - P73 admission (OB-55 ruling = option b): the `Sandbox` interface moves into S1; the implementation boundary is contract-first (`CONTRACTS` §7 gains a Sandbox section) + `internal/guard/sandbox{,_windows,_unsupported}.go` + an assembly check point (same layer as the P69 permit) + tests; no change to the `internal/chain|adapters` criterion bodies, schema, fixtures, CI, candidate version or the R-08 / R-09 rulings; the implementing slice is `P74-SANDBOX-INTERFACE` (tier M, standalone, not yet started); the candidate version stays GitHub Copilot CLI 1.0.83 (R-08.1); the Windows premise stays P only and P-prime is not introduced; **part B does not unlock S-G1 / S-G8**; probe demand = 0; evidence gaps = the Sandbox contract section, the call-site wiring evidence, the dead-code-ban disposal record and the ⑦ review record; reports `docs/validation/t027b-admission{,_EN}.md`, ADR-044.
+
+- P74 SANDBOX-INTERFACE: the `Sandbox` check layer has landed (`internal/guard/sandbox{,_windows,_unsupported}.go`) with an assembly check point on both dispatch paths (both ahead of the permit) and the `PRFRAIL_SANDBOX_CHECK` trigger (S1 default `off`, zero behaviour change); the `CONTRACTS` §7.2 contract section has landed; the real enforcement boundary stays in S2; report pair `docs/validation/sandbox-interface{,_EN}.md`.
 ## 3. Requirement Mapping
 
 Unless a task is explicitly marked complete, implementation evidence is planned and does not represent implementation.

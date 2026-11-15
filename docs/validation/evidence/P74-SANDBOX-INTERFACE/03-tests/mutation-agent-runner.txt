@@ -1,0 +1,14 @@
+=== RUN   TestAgentRunnerRunSandboxRefusesBeforePermit
+=== RUN   TestAgentRunnerRunSandboxRefusesBeforePermit/denied
+    runtime_agent_sandbox_test.go:127: the dispatch must be refused with guard: sandbox check rejected dispatch, got <nil>
+=== RUN   TestAgentRunnerRunSandboxRefusesBeforePermit/unknown
+    runtime_agent_sandbox_test.go:127: the dispatch must be refused with guard: sandbox check rejected dispatch, got <nil>
+=== RUN   TestAgentRunnerRunSandboxRefusesBeforePermit/unavailable
+    runtime_agent_sandbox_test.go:127: the dispatch must be refused with guard: sandbox check unavailable, got <nil>
+--- FAIL: TestAgentRunnerRunSandboxRefusesBeforePermit (0.32s)
+    --- FAIL: TestAgentRunnerRunSandboxRefusesBeforePermit/denied (0.11s)
+    --- FAIL: TestAgentRunnerRunSandboxRefusesBeforePermit/unknown (0.10s)
+    --- FAIL: TestAgentRunnerRunSandboxRefusesBeforePermit/unavailable (0.11s)
+FAIL
+FAIL	github.com/larsonzh/prfrail/internal/console	2.199s
+FAIL

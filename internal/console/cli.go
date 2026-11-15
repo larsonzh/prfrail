@@ -302,6 +302,13 @@ func (cli CLI) executeRun(ctx context.Context, args []string, stdout, stderr io.
 	if len(set.Args()) != 0 {
 		return writeUsageError(stdout, stderr, "run", *jsonOutput, "run does not accept positional arguments", runUsage)
 	}
+	// The sandbox trigger is resolved once, before any file read, and injected
+	// into the two dispatch routes. An invalid value is a usage error with zero
+	// side effect (CONTRACTS.md 7.2 (e)).
+	sandboxEnforced, sandboxErr := sandboxEnforcementFromEnv()
+	if sandboxErr != nil {
+		return writeUsageError(stdout, stderr, "run", *jsonOutput, sandboxErr.Error(), runUsage)
+	}
 
 	cwd, err := cli.getwd()
 	if err != nil {
@@ -407,10 +414,10 @@ func (cli CLI) executeRun(ctx context.Context, args []string, stdout, stderr io.
 		progressWriter = stderr
 	}
 	if len(supervised) > 0 {
-		return cli.executeSupervisedRun(ctx, *runID, resolvedRunDir, definition, gatePermit, *jsonOutput, stdout, stderr, progressWriter)
+		return cli.executeSupervisedRun(ctx, *runID, resolvedRunDir, definition, gatePermit, sandboxEnforced, *jsonOutput, stdout, stderr, progressWriter)
 	}
 	if len(executable) > 0 {
-		return cli.executeAgentRunnerRun(ctx, *runID, resolvedRunDir, definition, inputs, gatePermit, *jsonOutput, stdout, stderr, progressWriter)
+		return cli.executeAgentRunnerRun(ctx, *runID, resolvedRunDir, definition, inputs, gatePermit, sandboxEnforced, *jsonOutput, stdout, stderr, progressWriter)
 	}
 	summary, err := ExecuteNoopRun(ctx, *runID, resolvedRunDir, definition, filepath.Dir(resolvedPath), cli.now, progressWriter)
 	if err != nil {
@@ -485,7 +492,7 @@ func (inputs agentRunnerRunInputs) anyProvided() bool {
 // executeAgentRunnerRun decodes the declared record files and drives the
 // production assembly. Decoding is CLI-side file IO; the assembly re-validates
 // every record before the engine exists.
-func (cli CLI) executeAgentRunnerRun(ctx context.Context, runID, runDir string, definition chain.Definition, inputs agentRunnerRunInputs, probePermit *gates.ProbePermit, jsonOutput bool, stdout, stderr io.Writer, progress io.Writer) int {
+func (cli CLI) executeAgentRunnerRun(ctx context.Context, runID, runDir string, definition chain.Definition, inputs agentRunnerRunInputs, probePermit *gates.ProbePermit, sandboxEnforced, jsonOutput bool, stdout, stderr io.Writer, progress io.Writer) int {
 	// probePermit is only forwarded: the assembly entry evaluates and consumes it.
 	cwd, err := cli.getwd()
 	if err != nil {
@@ -581,6 +588,7 @@ func (cli CLI) executeAgentRunnerRun(ctx context.Context, runID, runDir string, 
 		RunRoot:             runDir,
 		Definition:          definition,
 		ProbePermit:         probePermit,
+		SandboxEnforced:     sandboxEnforced,
 		RequestRecord:       requestRecord,
 		RequestRecords:      requestRecords,
 		CapabilityRecord:    capabilityRecord,

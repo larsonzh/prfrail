@@ -306,6 +306,44 @@ Rule: one (cut point × scenario) admits exactly one allowed set; the verifier f
 (d) **The reduced/unknown report**: after the work completes, one `supervised-report` record is written; `assuranceLevel` is the constant `reduced`, `unknownDimensions` is non-empty and must contain `cost`, and it lists the unobservable dimensions of the external agent one by one — tool use, resource reads, network, cost, background processes, session continuity and external side effects. **An unknown item is never displayed as safe**: the report and its rendering show only `unknown` for every unknown dimension, never `safe`, `verified` or any numeric promise.
 
 Contract-level consequences of the four prohibitions: ProofRail must never fall back into this mode because AgentRunner is unavailable; a `visible` delivery receipt never masquerades as completion; the risk acknowledgment never exempts authorization, handoff or gates; and unknown cost, process or external side effects are never shown as safe.
+### 7.2 Sandbox check-layer interface
+
+The sandbox check layer (`guard.Sandbox`) is a **check layer, not an execution layer**: it answers only
+one question — "does the current environment satisfy the enforcement requirements" — and performs no
+enforcement itself. In S1 it lands fail-closed dispatch refusal only; a passing check changes nothing.
+
+(a) **Check-layer positioning**: the method set is `Check(ctx, CheckSpec) (Verdict, error)` and does
+environment judgment only; it **provides no Create/Exec/Destroy/Terminate process-lifecycle methods**
+and has no type overlap with `ProcessSpec` / `ProcessIdentity` / `ManagedProcess` (all unchanged).
+
+(b) **Three-state verdict**: `Allowed` / `Denied(reason)` / `Unknown(reason)`; **both `Denied` and
+`Unknown` are fail-closed dispatch refusals**, only `Allowed` lets a dispatch through; `reason` enters
+audit and diagnostics with the refusal error.
+
+(c) **Error classification**: `ErrSandboxUnavailable` means the check capability is unavailable (e.g.
+no platform implementation) and callers must fail closed; `ErrSandboxRejected` is the fail-closed
+refusal for any non-`Allowed` verdict. Neither may ever be read as permission.
+
+(d) **Checkpoint position (option i)**: the sandbox check sits **before claiming the probe permit** and
+before the Step 2 run-root marker — an environment/configuration refusal must not consume the
+non-refundable one-shot probe quota. On refusal it must not create the marker, must not spawn, nor continue.
+
+(e) **Trigger surface (S1)**: the only trigger is the environment variable `PRFRAIL_SANDBOX_CHECK`, with
+values `enforce` / `off` (unset and empty = `off`); an invalid value is a CLI usage error with zero side
+effects (before any file read). **S1 defaults to `off`, so the default control flow is sentence-for-sentence
+equivalent to before this interface (zero behavior change)**. With `enforce` both dispatch paths check:
+the AgentRunner assembly path and the supervised first-start (`freshStart`) branch; the re-entry path neither checks nor consumes quota.
+
+(f) **Platform implementations**: non-Windows platforms (`//go:build !windows`) always return `Unknown`
++ `ErrSandboxUnavailable`; Windows form α also always returns `Unknown` in S1, stating truthfully
+"no check was performed, so nothing can be determined", and **must not** misreport certainty as
+`Denied`. Refusal semantics are identical on both platforms.
+
+(g) **Boundaries (not done)**: this subsection changes neither the chain decision core (`internal/chain/**`)
+nor the adapters spawn semantics (`internal/adapters/**`), and lands no real enforcement boundary
+(deferred to S2); the B slice fills in the `Allowed` decision logic when enforcement is wired.
+
+(h) **B-slice not unlocked**: landing this interface **unlocks neither S-G1 nor S-G8**.
 
 ## 8. Errors and Acceptance
 

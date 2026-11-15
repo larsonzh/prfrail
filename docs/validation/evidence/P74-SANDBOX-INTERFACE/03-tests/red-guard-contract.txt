@@ -1,0 +1,6 @@
+=== RUN   TestSandboxInterfaceContract
+    sandbox_interface_test.go:27: NewSandbox must never return nil: a nil default would turn every check into a silent pass
+--- FAIL: TestSandboxInterfaceContract (0.00s)
+FAIL
+FAIL	github.com/larsonzh/prfrail/internal/guard	1.060s
+FAIL
