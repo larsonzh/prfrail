@@ -6,7 +6,7 @@ Supersedes: this version supersedes v57 (`docs/t027/CHECKLIST_v57{,_EN}.md` is f
 
 **Structure**: §1 anchors -> §2 fact pack -> §3 completed slices -> §4 execution queue -> §5 observation items -> §6 pending rulings -> §7 / §8 / §9 pointer sections -> §10 opener -> §11 one-line status; the rule entities of §7-§9 have moved into directive §13, so this snapshot does not duplicate them.
 
-Changes in this version (relative to v57): (1) §1 anchors rotated (HEAD `150423d` / directive v1.69 / the rolling window drops v54 and takes in v57); (2) §2 becomes the P74 fact pack (the P72 / P73 fact packs are carried as one-line §3 records plus report paths); (3) §3 gains the P72 / P73 / P74 rows (keeping the eight P64-P71 rows of v57, eleven in total); (4) §4 layer 2 is emptied (P72 / P73 dequeued) and layer 1 T027-B is updated to "only R-3 remains"; (5) §5 gains a slice-level recommendation (P74 is the first slice to trip the R=3 high-risk marker, so kick-off messages should pre-place a dynamic-budget clause).
+Changes in this version (relative to v57): (1) §1 anchors rotated (HEAD `150423d` / directive v1.69 / the rolling window drops v54 and takes in v57); (2) §2 becomes the P74 fact pack (the P72 / P73 fact packs are carried as one-line §3 records plus report paths); (3) §3 gains the P72 / P73 / P74 rows (keeping the eight P64-P71 rows of v57, eleven in total); (4) §4 layer 2 is emptied (P72 / P73 dequeued) and layer 1 T027-B is updated to "only R-3 remains"; (5) §5 slice-level recommendations updated (the `R-ACCUMULATION-MECHANISM` item is added; the `--progress` coverage item is kept; E-1 is now a fixed kick-off 【〇·零】"memory recall" red line - a drafting convention, not formally registered in the directive / an OB / an ADR - and is removed from the recommendations).
 
 ## 1. Current anchors (check these 8 numbers first)
 
@@ -80,11 +80,23 @@ Changes in this version (relative to v57): (1) §1 anchors rotated (HEAD `150423
 
 ### Layer 2 routine governance
 
-- P72 / P73 ✅ dequeued (layer 2 is **fully emptied**; see §3).
+- P72 / P73 ✅ dequeued (layer 2 is **fully emptied**; see the §3 row summary).
+  - **The full §1.2 field definitions of P72 / P73** (slice identifier / goal / dependency / size / steps / current gap / deliverables / acceptance evidence / boundary / tier / probe budget / freedom-list landing path) are in the P72 / P73 sections of `docs/t027/REMAINING_SLICES{,_EN}.md`.
 
 ### Layer 3 low-priority candidates
 
-- L-1 low-priority candidates (same as v57, nothing new): `OB-50` disposed / `spawnGit` not formally registered / `ci freeze cost` not formally registered / `%TEMP% 22 leftovers` = OB-98 disposed + OB-99/OB-100 observing / `GATES-EXEMPT` not chartered; never started without a trigger.
+- L-1 low-priority candidates (parked long-term) · ⬜ never started without a trigger
+
+| Field | Content |
+|---|---|
+| Identifier | `OB-50` / `spawnGit` / `ci freeze cost` / `%TEMP% historical 22 leftovers` / `GATES-EXEMPT` |
+| Current status (verified item-by-item) | OB-50 = **disposed** (§12.4, v1.41); spawnGit = the git-call helper of `tools/gates/selftest.js` (the spawn wrapper in `lib/ctx.js`) that captures stderr into the result object instead of printing it; the P27 `G4b-CACHE` report §5 item 5 registered it as a "candidate OB (diagnostics)" (Low / observing) and it was never formally registered as a §12.4 OB number; under the §1.8.1 rule for to-be-assessed items it is an "unregistered candidate OB"; candidate fix = attach the last N bytes of stderr to `detail` when spawn fails (no verdict change, diagnostics only); trigger = the next time any git-related assertion fails for an unknown reason, let step 1 assess it; ci freeze cost = **no matching §12.4 entry**; the real source is the P27 report §7 "candidate OB (performance)" (the origin of the 24-37 s ci-scope freeze cost is undetermined) and it is **not formally registered**; %TEMP% historical 22 leftovers = OB-98 (**disposed**, G9-c static form) / OB-99 (**observing**) / OB-100 (**observing**, the window sub-range already disposed); GATES-EXEMPT = **not chartered** (no §12.4 entry; the P33 item 1-3(iv) split, touching four criterion files) |
+| Contains | Five items, each in its corresponding §12.4 row; `GATES-EXEMPT` = the P33 item 1-3(iv) split, not chartered |
+| Dependencies | The long-term park covers only undisposed items (spawnGit / ci freeze cost / the %TEMP% timing shape (OB-99 / OB-100) / GATES-EXEMPT); no definite trigger |
+| Size | Varies (S through M-L) |
+| ⑦ quota | none |
+| Boundary | Each item per §12.4; this version adds no layer-3 entry and advances no parked item |
+| Start condition | The user must name it explicitly |
 
 **Queue discipline**: same as v57 (layer boundary, numbering discipline, sub-actions A/B are not batched with the snapshot generation: this slice is [ROUTINE] and a single batch; the A / B convention applies only to snapshot generation that bumps the directive, and this slice bumps nothing).
 
@@ -93,8 +105,11 @@ Changes in this version (relative to v57): (1) §1 anchors rotated (HEAD `150423
 - Observing (**14**): `OB-1 / 7 / 10 / 33 / 87 / 99 / 100 / 104 / 105 / 107 / 111 / 113 / 135` (13 items carried from v57) + **OB-139** (temp-file location violations at the `tmp/` root; four instances across P70 / P71; **P72 / P73 / P74 did not repeat it, so the 5th did not happen**; the state stays `observing`).
 - Under discussion (9): `OB-19 / 21 / 52 / 53 / 57 / 58 / 59 / 61 / 75` (**OB-55 was flipped to "disposed" by P73 and left this list**).
 - To do (1): `OB-69`. Non-terminal total **24** (14 + 9 + 1).
-- **Slice-level recommendation (1 item, no OB registered)**:
-  1. **`R-ACCUMULATION-MECHANISM` (recommended tracking)**: P74 is the first slice to trip §9.2 "R>=2 => high risk" plus §7.5 "high risk 1+3"; **later implementation kick-off messages should pre-place a dynamic-budget clause** ("if R accumulates to >=2 during execution, apply the §9.2 high-risk marker and the §7.5 high-risk 1+3 budget"), and the dispatch table should pre-place a reminder to upgrade when R reaches 2. **No OB is registered now**; if P75+ repeats the same defect ("no dynamic-budget clause in the kick-off message") => it becomes a formal OB.
+- **Slice-level recommendations (2 items, no OB registered)**:
+  1. **`R-ACCUMULATION-MECHANISM` (recommended tracking, new in this version)**: P74 is the first slice to trip §9.2 "R>=2 => high risk" plus §7.5 "high risk 1+3"; **later implementation kick-off messages should pre-place a dynamic-budget clause** ("if R accumulates to >=2 during execution, apply the §9.2 high-risk marker and the §7.5 high-risk 1+3 budget"), and the dispatch table should pre-place a reminder to upgrade when R reaches 2. **No OB is registered now**; if P75+ repeats the same defect ("no dynamic-budget clause in the kick-off message") => it becomes a formal OB.
+  2. **`--progress` covers state transitions only, not log-type output (carried from v57)**: `--progress` prints the chain / task / step state transitions line by line (`progress: <occurredAt> <entity> <fromState>-><toState> <reasonCode>`), but it does **not** forward the live stdout / stderr of gate commands, does **not** consume AgentRunner's `events.jsonl` (tool calls / output summaries), and has **no heartbeat**; P70's original kick-off goal "gate command start/end plus exit codes + AI tool-call summary lines" was narrowed at step 1 because AgentRunner events were not dependable. **Recommendation**: if long-run observability needs later stand out (the R-3 real-CLI end-to-end assessment is the most likely trigger point), assess adding a `--progress verbose` level or a separate `--tail-logs` switch; no OB is registered now, so it is tracked as a slice-level recommendation.
+- **Removed in this version**: "E-1: the temp directory re-materialized on disk through the editor buffer after ⑧c" (carried from v57) - **it is now a fixed kick-off 【〇·零】"memory recall" red line** (since P72; P72 / P73 / P74 all carried it; it is a drafting convention, **not yet formally registered in the directive / an OB / an ADR**). None of P72 / P73 / P74 triggered it (each slice's ⑧c second read-back was clean). **E-1 leaves the slice-level recommendations and becomes a kick-off convention**; if P75+ repeats the same shape (the editor buffer re-materializing on disk) => **register it as a new OB**.
+- **Flipped to `disposed` in this version**: none (OB-55 was flipped to `disposed` by P73; this version adds no flip).
 - Machine readings: §12.4 OB max = **139**; ADR max = **44**; DR max = **14**; deferral max = **#25**.
 
 ## 6. Pending user rulings
