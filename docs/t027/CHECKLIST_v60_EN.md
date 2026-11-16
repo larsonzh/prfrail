@@ -70,7 +70,7 @@ Generated: 2026-11-16. HEAD = `0f80c1e`; directive = v1.69; three CI runs: the P
 
 **Evidence pack**: `docs/validation/evidence/P76-S1-EXIT-CLOSEOUT-ASSESSMENT/` (`MANIFEST.md` plus 15 `SHA256SUMS.txt` entries over 15 payloads: `00-briefing.md` / `input-list.md` / `freedom-list.md` / `01-arch/design-r1.md` / `02-batch/batch-01-s1-exit-p57.md` / `batch-02-s1-reach.md` / `batch-03-lagging-docs.md` / `02-ruling/ruling-2026-11-16.md` / `04-reviews/prereview-r1.md` / `prereview-r2.md` / `final-r1.md` / `06-gates/gate-index.txt` / `gate-tree.txt` / `gate-ci.txt` / `gate-selftest.txt`).
 
-**Known boundaries**: the risk surfaces listed in §17 of the P76 report plus the uncovered scope in ADR-047; S1 Exit cannot pass as a whole inside S1 (the premise of the Q10=(C) two-step approval); the S-G5 and independent-security-review relation is clarified by ADR-047, with a mandatory review before S2.
+**Known boundaries**: **the AT-23 stage-1 condition closure is a permanent fact (ruling A3), and R-08.5 states that the conditional closure is not a real-candidate compatibility proof**; the risk surfaces listed in §17 of the P76 report plus the uncovered scope in ADR-047; S1 Exit cannot pass as a whole inside S1 (the premise of the Q10=(C) two-step approval); the S-G5 and independent-security-review relation is clarified by ADR-047, with a mandatory review before S2.
 
 **Ledger caliber** (§11.2): the P76 completion row records only the report paths plus R/D (no hash or run id), and the CI fact chain lives only in §16 of the report.
 
@@ -121,7 +121,7 @@ Generated: 2026-11-16. HEAD = `0f80c1e`; directive = v1.69; three CI runs: the P
 
 ### Layer 1 main-line hard gates
 
-- Items 8-12: ✅ all dequeued (see §4 of v57 / v58).
+- Items 8-12: ✅ all dequeued (see §4 of v57 / v58; **the original dequeue records have been pushed into earlier versions by the rolling window, so trace them back layer by layer through the citation chain in §4 of v57**).
 - **`T027-B` (the defensive-refactor main-line milestone) = complete (partly not applicable)**: C1-C7 / N1-N4 / R-1 / R-2 / R-3 are all dispositioned (R-3 = (A), ruled by the user on 2026-11-15; the A1 declaration caliber is "complete, partly not applicable"). **The main line is fully dequeued.**
 - **`S1 Exit closeout` (in progress)**: **P76 produced the closeout roadmap and re-evaluated the gate-level verdicts**. The eight gates stand as follows after the P76 Q2=(a) re-evaluation:
 
@@ -140,10 +140,38 @@ Generated: 2026-11-16. HEAD = `0f80c1e`; directive = v1.69; three CI runs: the P
 
 - **S1 Exit cannot pass as a whole inside S1** (the premise of Q2=(a) and Q10=(C)). The remaining actionable items are **S-G3 / S-G4 / S-G5 / S-G6** (S-G7 is composite, S-G8 needs S2, and S-G1 is not passed).
 - **No admission residual blocks the closeout follow-up slices**: the only P75 §11.2 residual (the core task chain row at `s1-exit.md:52`) was fully corrected by P76 correction 1 (the AT-23 fragment) plus the S-G2 correction (`0f80c1e`).
-- **Suggested follow-up slices** (per P76 §18):
-  - **An ADR-010 approval slice** (`[SLICE]`, documentation type) to close S-G4, with the product owner approving ADR-010.
-  - **A Release plus ZIP binding and rerun slice** (`[SLICE]`, implementation type) to close S-G3: the v0.1.0 Release, the ZIP binding and the rerun, with S-G4 preceding it or running in parallel.
-  - **An independent-security-review slice before S2 starts** (`[SLICE]`, assessment type) to discharge the ADR-047 compensation obligation (the review must complete before S2, with the same due date).
+- **`ADR010-APPROVAL` (S-G4 closeout · **next item** · starting on the user's 2026-11-16 call · P77)**
+
+| Field | Content |
+|---|---|
+| Identifier | `ADR010-APPROVAL` (ledger section = **P77**, registered when the kick-off message is drafted) |
+| Contents | (1) flip the ADR-010 status in `ADR_REGISTER{,_EN}.md` to `APPROVED` (currently `PROPOSED / NOT APPROVED`); (2) update the "this proposal is not yet approved" sentence in the tail of `S1_SUPPORT_MATRIX{,_EN}.md` to approved plus the 90-day EOL window in force; (3) update the EOL item at `INSTALLATION_PLAN{,_EN}.md:32`; (4) update any matching sentence in `S1_RELEASE_NOTES{,_EN}.md`; the controller performs the document updates, and the product owner's approval is stated by the user in the same turn as this slice's kick-off message |
+| Size tier | **S** (`[SLICE]`, documentation type) |
+| (7) budget | tier S: one final review plus one re-review (§7.5) |
+| Dependency | none (the product owner approves personally); may run in parallel with `RELEASE-ZIP-BINDING` |
+| Boundary | no other ADR is touched; the S1_SUPPORT_MATRIX platform list and support levels stay; the INSTALLATION install model stays; no directive change; no product code |
+
+- **`RELEASE-ZIP-BINDING` (S-G3 closeout · P78)**
+
+| Field | Content |
+|---|---|
+| Identifier | `RELEASE-ZIP-BINDING` (ledger section = **P78**, registered when the kick-off message is drafted) |
+| Contents | (1) create the v0.1.0 Release on GitHub; (2) build the ZIP artifact (the Windows amd64 portable ZIP); (3) bind the release record (commit SHA / CI / SHA256SUMS / SPDX SBOM / license manifest); (4) rerun the install lifecycle (first run / upgrade / rollback / uninstall keeping data) |
+| Size tier | **M-L** (`[SLICE]`, implementation type; produces a publishable artifact) |
+| (7) budget | tier M-L: one final review plus three re-reviews (§7.5) |
+| Dependency | **`ADR010-APPROVAL` closed** (S-G4 passed and the version comes from ADR-010) |
+| Boundary | the ZIP structure stays (ADR-009 froze it: manual extraction, a dedicated directory, explicit-path invocation, no PATH / registry / system-directory changes); no product code; no formal Linux release (S1 is Windows formal support plus Linux core CI only); **no code signing** (ADR-006 simplified release trust: fixed commit SHA, GitHub CI, SHA256SUMS, SBOM and a license manifest are the required evidence); no gitee push |
+
+- **`S2-PRE-INDEPENDENT-SECURITY-REVIEW` (the ADR-047 compensation obligation · P79)**
+
+| Field | Content |
+|---|---|
+| Identifier | `S2-PRE-INDEPENDENT-SECURITY-REVIEW` (ledger section = **P79**, registered when the kick-off message is drafted) |
+| Contents | complete the independent security review (the S0-to-S1 gate in `PRODUCT_REQUIREMENTS` §7); archive the review conclusion under `docs/validation/` and update the note at `SECURITY.md:5` to "completed, with the review date and reviewer"; a later slice may flip the ADR-047 risk-acceptance record to "compensated" |
+| Size tier | **M-L** (`[SLICE]`, assessment type; the review is work in its own right) |
+| (7) budget | tier M-L: one final review plus three re-reviews (§7.5) |
+| Dependency | before S2 starts (not an immediate S1 need); the ADR-047 due date is the earlier of the S2 start date and 2027-03-31 |
+| Boundary | the review scope is the S0-to-S1 security gate; the S1 Exit eight-gate criteria stay; the `SECURITY.md` threat-model baseline stays (only the review conclusion is archived); no directive change |
 - **`S-G8`** stays blocked until S2 enforcement lands (P73 A2 / P75 A2 / ADR-044 / ADR-045); the gate table in `s1-exit{,_EN}.md` is untouched (P76 only edited the fragment inside row `:52`).
 
 ### Layer 2 routine governance
@@ -156,9 +184,9 @@ Generated: 2026-11-16. HEAD = `0f80c1e`; directive = v1.69; three CI runs: the P
 | Field | Content |
 |---|---|
 | Identifier | `OB-50` / `spawnGit` / `ci freeze cost` / 22 historical `%TEMP%` items / `GATES-EXEMPT` |
-| Current state (verified item by item) | as in v59 §4 (the five classes are: settled / not formally registered / not formally registered / settled plus observing plus observing / not initiated); this version adds no layer-3 item and advances no suspended item |
+| Current state (verified item by item) | OB-50 = **settled** (§12.4, v1.41); spawnGit = the git-call helper of `tools/gates/selftest.js` (the spawn wrapper in `lib/ctx.js`) that folds stderr into the result object instead of printing it; the P27 `G4b-CACHE` report §5 item 5 registered it as a "candidate OB (diagnostic)" (Low / observing) and it was never formally registered as a §12.4 OB id, so under the §1.8.1 pending-item rule it is an "unregistered candidate OB"; candidate fix = attach the last N bytes of stderr to `detail` when the spawn fails (diagnostics only, the verdict is unchanged); trigger = the next unexplained git-related assertion failure is assessed by (1); ci freeze cost = **no §12.4 entry**, its real origin is item 7 of the P27 report as a "candidate OB (performance)", **not formally registered**; the 22 historical %TEMP% items map to OB-98 (**settled**) / OB-99 (**observing**) / OB-100 (**observing**); GATES-EXEMPT = **not initiated** (no §12.4 entry; the P33 item 1-3(iv) split slice, touching four criterion files) |
 | Contents | see the matching §12.4 rows; `GATES-EXEMPT` is the P33 item 1-3(iv) split slice, not initiated |
-| Dependency | the long suspension covers only unsettled items; there is no concrete trigger |
+| Dependency | the long suspension covers only unsettled items (spawnGit / ci freeze cost / the %TEMP% timing shapes (OB-99 / OB-100) / GATES-EXEMPT); there is no concrete trigger |
 | Size | varies (S through M-L) |
 | (7) budget | none |
 | Boundary | per item in §12.4; this version adds no layer-3 item and advances no suspended item |
