@@ -140,7 +140,7 @@ Generated: 2026-11-16. HEAD = `0f80c1e`; directive = v1.69; three CI runs: the P
 
 - **S1 Exit cannot pass as a whole inside S1** (the premise of Q2=(a) and Q10=(C)). The remaining actionable items are **S-G3 / S-G4 / S-G5 / S-G6** (S-G7 is composite, S-G8 needs S2, and S-G1 is not passed).
 - **No admission residual blocks the closeout follow-up slices**: the only P75 §11.2 residual (the core task chain row at `s1-exit.md:52`) was fully corrected by P76 correction 1 (the AT-23 fragment) plus the S-G2 correction (`0f80c1e`).
-- **`ADR010-APPROVAL` (S-G4 closeout · **next item** · starting on the user's 2026-11-16 call · P77)**
+- **`ADR010-APPROVAL` (S-G4 closeout · `next item` · starting on the user's 2026-11-16 call · P77)**
 
 | Field | Content |
 |---|---|
@@ -172,6 +172,7 @@ Generated: 2026-11-16. HEAD = `0f80c1e`; directive = v1.69; three CI runs: the P
 | (7) budget | tier M-L: one final review plus three re-reviews (§7.5) |
 | Dependency | before S2 starts (not an immediate S1 need); the ADR-047 due date is the earlier of the S2 start date and 2027-03-31 |
 | Boundary | the review scope is the S0-to-S1 security gate; the S1 Exit eight-gate criteria stay; the `SECURITY.md` threat-model baseline stays (only the review conclusion is archived); no directive change |
+
 - **`S-G8`** stays blocked until S2 enforcement lands (P73 A2 / P75 A2 / ADR-044 / ADR-045); the gate table in `s1-exit{,_EN}.md` is untouched (P76 only edited the fragment inside row `:52`).
 
 ### Layer 2 routine governance
