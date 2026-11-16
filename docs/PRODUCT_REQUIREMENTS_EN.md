@@ -106,6 +106,8 @@ On 2026-09-06, the product owner approved the S0 specification freeze and ADR se
 
 Future monetary authorization requires bounded worst-case reservations and prohibits automatic calls without a bound. Subscription mode requires separately approved call/token hard caps and acknowledgment that monetary bills are not guaranteed; see RFC section 19.5. Independent security review remains a blocking gate before S1.
 
+(**P76 additive note, 2026-11-16**): this item has never been executed; **ADR-047** waives it and defers it to S2, and it must complete before S2 starts and no later than 2027-03-31. The original criterion is unchanged.
+
 One structured S0 interview confirms the three most common tasks, acceptable intervention points, evidence retention and machine limits. S1 shadow records validate H1-H3 and feed the stage report. Market size, willingness to pay and competitor performance do not block the safety loop but require separate evidence before promotional claims.
 
 ## 8. Product Completeness Review (2026-09-06)

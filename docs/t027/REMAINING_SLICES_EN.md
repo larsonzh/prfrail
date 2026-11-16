@@ -2070,6 +2070,27 @@ Completion record (2026-11-15): report pair `docs/validation/sandbox-interface{,
 
 Completion record (2026-11-15): report pair `docs/validation/r3-real-cli-assessment{,_EN}.md`; R-3 ruling = (A) cannot start for now (including A1-A5 and O-7 = option 2); T027-B declared "complete (partly not applicable)"; S-G8 stays blocked until S2; ADR-045; R = 1, D = 1 (no hash / run recorded, per §11.2).
 
+### P76 — `S1-EXIT-CLOSEOUT-ASSESSMENT` (S1 Exit closeout roadmap assessment; assessment type) · ✅ Complete
+
+| Field | Content |
+|---|---|
+| Identifier | `S1-EXIT-CLOSEOUT-ASSESSMENT` (the S1 Exit eight-gate closeout roadmap; source = v59 §4 "remaining actionable items S-G3 / S-G4 / S-G5 / S-G6") |
+| Status | ✅ Complete (closed 2026-11-16) |
+| Goal | answer how S1 Exit gets from the four remaining actionable items to a declaration; Q1-Q11 written item by item (the eight-gate and ten-gate mapping, the S-G1 / S-G2 caliber, the `:52` correction, the S-G3 / S-G4 / S-G5 / S-G6 paths, the approval timing, the REQ boundary) |
+| Dependency | P75 closed (R-3 = (A), S-G8 blocked, the AT-23 stage-1 permanent fact), P57 §4.2 the eight gates, the S1-REACH ten-gate frame |
+| Size | M (assessment type; produces no production code) |
+| Steps | (1) roadmap + stop point -> (2a) ruling registration + (2b) document sync + (2c) report -> (3) consistency -> (4) gates -> (5) (r1 + r2) -> (6) (skipped, confirmed by (7)) -> (7) final review -> (8) -> (9) -> (8c) -> (10) |
+| Deliverables | report pair `docs/validation/s1-exit-closeout-assessment{,_EN}.md`; ADR-046 / ADR-047; the additive `:52` correction in `s1-exit{,_EN}`; the support-matrix `:13` / `:14` caliber; additive notes in SECURITY and PRODUCT_REQUIREMENTS §7; the p57 additive pointer; evidence pack `docs/validation/evidence/P76-S1-EXIT-CLOSEOUT-ASSESSMENT/` |
+| Acceptance evidence | Q1-Q11 written item by item; six rulings plus the additional item plus the X authorization registered; the three scopes and SELFTEST all green; the report pair's six shapes equal |
+| Boundary | no production code; no directive version bump; no change to `s1-reach`; no AT re-run; the S-G2 clause is not edited (registered residual, proposed carrier `S1-EXIT-SG2-SYNC`); no gitee push |
+| Tier | `[SLICE]` |
+| Probe budget | 0 |
+| Freedom-list landing path | `docs/validation/evidence/P76-S1-EXIT-CLOSEOUT-ASSESSMENT/freedom-list.md` |
+| R/D baseline | R = 0, D = 0 (step-0 registration, §13.1.1; does not inherit P75's R=1 / D=1) |
+| Temp-file location declaration | Slice temp directory = `tmp/P76-S1-EXIT-CLOSEOUT-ASSESSMENT/` (add-only before ⑧c; no capture file at the `tmp/` root) |
+
+Completion record (2026-11-16): report pair `docs/validation/s1-exit-closeout-assessment{,_EN}.md`; Q2=(a) / Q3=A additive / Q7=A waived and deferred to S2 / Q9 included / Q10=(C) two-step; ADR-046 / ADR-047; R = 1, D = 0 (no hash / run recorded, per §11.2).
+
 ## Known defects (to be handled before later slices)
 
 > **Blocking rule unchanged**: only high-frequency / reproduced defects block; observation-grade flakes are recorded and listed in the validation report.

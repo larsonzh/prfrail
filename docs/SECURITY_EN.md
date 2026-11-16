@@ -4,6 +4,8 @@
 
 Date: 2026-09-07; security-design baseline without independent security sign-off. This document is the normative authority for permissions, threat modeling, and hard security gates. [Project proposal](RFC-proofrail-unattended-ai-engineering-product.md) sections 12 and 16.7-16.8 retain risk and design provenance. Requirements: REQ-004/005/007/013/019/021-026/028.
 
+The independent security review (the S0-to-S1 gate in `PRODUCT_REQUIREMENTS` section 7) has never been executed; **ADR-047** (2026-11-16) waives it and defers it to S2, and it must complete before S2 starts and no later than 2027-03-31. This note does not change the original status wording above.
+
 ## 1. Assets and Trust
 
 Protect source trees, baseline/accepted snapshots, events/journals/receipts, secrets, approval authority and cost budgets. S1 trusts the local OS and core binary, not models, repository text, hooks, adapters or external results. Same-user directory separation is not a malicious-process sandbox; hashes are not authentication. Reject missing capabilities rather than silently replacing required isolation with risk acknowledgment.

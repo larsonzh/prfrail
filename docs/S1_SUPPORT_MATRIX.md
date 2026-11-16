@@ -10,8 +10,8 @@
 | Linux amd64 | 核心 CI | 仅构建、测试、候选探针和自托管；不宣称 S1 生产支持 |
 | macOS / Windows on Arm / Linux arm64 | 不支持 | 未进入 S1 验收矩阵 |
 | generic/C/Go harness | 配置与 noop 编排 | language scope、只读 preview 和 noop-only 闭环已验证；executable step 仍 fail-close；Python/Node 官方 harness + 三语言产品任务 + 正式支持承诺冻结至 S2（REQ-020 S2 承诺收窄）；不冻既有工具脚本 / 开放语言 ID / generic 能力 |
-| CLI Agent / AgentRunner | 规划、未交付 | 目标正式 AI 执行通道；须固定版本/配置、能力探针、隔离 workspace、进程/会话证据与独立验收；T026/T027/AT-23 阻断 S1 |
-| VS Code / Copilot Chat / SessionBridge visible 黑箱候选 | 产品侧已实现（降级保证）、真实 CLI 端到端依赖 T027-B、尚不可运行发布 | 核心离线 CLI 不要求；仅在用户显式确认风险并监督时桥接隔离候选，归还后独立验收；不保证工具/网络/费用/外部副作用，AT-24 条件闭合，S1 仍因 T027/AT-23 阻断 |
+| CLI Agent / AgentRunner | 规划、未交付 | 目标正式 AI 执行通道；须固定版本/配置、能力探针、隔离 workspace、进程/会话证据与独立验收；R-3 = (A) 暂不可起跑；S-G8 blocked 至 S2 enforcement 接入（ADR-045） |
+| VS Code / Copilot Chat / SessionBridge visible 黑箱候选 | 产品侧已实现（降级保证）、真实 CLI 端到端依赖 T027-B、尚不可运行发布 | 核心离线 CLI 不要求；仅在用户显式确认风险并监督时桥接隔离候选，归还后独立验收；不保证工具/网络/费用/外部副作用，AT-24 条件闭合；真实 CLI 端到端依赖 S2 enforcement（R-3 = (A)，ADR-045） |
 
 ## 版本与安全维护候选政策
 

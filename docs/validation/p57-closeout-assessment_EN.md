@@ -98,6 +98,8 @@ Verdict: `T027-B` is valid as a **milestone** and is registered; as an **open it
 
 - **S-G8 verdict ruled by P75**: stays blocked until S2 enforcement lands (report: `docs/validation/r3-real-cli-assessment{,_EN}.md`). The eight-gate definitions and verdicts in this table stay unchanged (§11.1).
 
+- **P76 gate-level re-evaluation pointer (2026-11-16)**: the S-G1 / S-G2 gate-level verdicts are re-evaluated by P76 `S1-EXIT-CLOSEOUT-ASSESSMENT` (Q2=(a) criterion-literal): the S-G1 criterion is unmet ⇒ not passed; the S-G2 criterion is met ⇒ passed. The S-G7 verdict is unchanged (still unreachable); the in-cell caliber of `s1-exit.md:52` is corrected additively under P75 section 11.2 item 3. See `docs/validation/s1-exit-closeout-assessment{,_EN}.md` and ADR-046. This note is additive and changes no verdict word in this table. (The S-G2 clause at `s1-exit.md:52` is not yet synchronized; it stays a registered residual carried by the proposed slice `S1-EXIT-SG2-SYNC`.)
+
 ### 4.3 Three stale statements (registered, not fixed)
 
 1. `s1-exit.md:44` (AT-24) says "T028 not implemented", contradicting `DEV_PLAN.md:119` which says `COMPLETED`.

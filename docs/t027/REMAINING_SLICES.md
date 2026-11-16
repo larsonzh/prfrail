@@ -2083,6 +2083,27 @@ A6 ② 进度（第 2 批，2026-09-15）：
 
 完成记录（2026-11-15）：报告对 `docs/validation/r3-real-cli-assessment{,_EN}.md`；R-3 裁定 = (A) 暂不可起跑（含 A1–A5 与 O-7 = ②）；T027-B 宣告「完成（部分不适用）」；S-G8 保持 blocked 至 S2；ADR-045；R = 1、D = 1（按 §11.2 不写 hash / run）。
 
+### P76 — `S1-EXIT-CLOSEOUT-ASSESSMENT`（S1 Exit 收口路线图评估 · 评估类）· ✅ 已完成
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `S1-EXIT-CLOSEOUT-ASSESSMENT`（S1 Exit 八门收口路线图；来源 = v59 §四「剩余可推进项 S-G3 / S-G4 / S-G5 / S-G6」） |
+| 状态 | ✅ 已完成（2026-11-16 收口） |
+| 目标 | 回答 S1 Exit 如何从剩余可推进四项到达宣告；Q1–Q11 逐项成文（八门↔十门映射、S-G1 / S-G2 口径、`:52` 修文、S-G3 / S-G4 / S-G5 / S-G6 路径、批准时机、REQ 边界） |
+| 依赖 | P75 闭环（R-3 = (A)、S-G8 blocked、AT-23 阶段 1 永久事实）、P57 §4.2 八门、S1-REACH 十门框架 |
+| 规模 | M（评估类；不产生产代码） |
+| 步骤 | ① 路线图 + 停点 → ②a 裁定登记 + ②b 文档同步 + ②c 报告 → ③ 一致性 → ④ 门禁 → ⑤（r1 + r2）→ ⑥（⑦ 确认跳过）→ ⑦ 终审 → ⑧ → ⑨ → ⑧c → ⑩ |
+| 交付物 | 报告对 `docs/validation/s1-exit-closeout-assessment{,_EN}.md`；ADR-046 / ADR-047；`s1-exit{,_EN}` 的 `:52` 加法式修文；支持矩阵 `:13` / `:14` 口径；SECURITY 与 PRODUCT_REQUIREMENTS §7 加法式注记；p57 加法式指针；证据包 `docs/validation/evidence/P76-S1-EXIT-CLOSEOUT-ASSESSMENT/` |
+| 验收证据 | Q1–Q11 逐项成文；六项裁定 + 附加项 + X 授权登记；三作用域与 SELFTEST 全绿；报告对六形状全等 |
+| 边界 | 不产生产代码；不改准则版本；不改 `s1-reach`；不重跑 AT；不改 S-G2 句（已登记残余，承载建议片 `S1-EXIT-SG2-SYNC`）；不推 gitee |
+| 分级 | `[SLICE]` |
+| 探针额度 | 0 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/P76-S1-EXIT-CLOSEOUT-ASSESSMENT/freedom-list.md` |
+| R/D 基线 | R = 0、D = 0（步骤 0 登记，§13.1.1；不继承 P75 的 R=1 / D=1） |
+| 临时件落点声明 | 本片临时目录 = `tmp/P76-S1-EXIT-CLOSEOUT-ASSESSMENT/`（⑧c 前只增不删；捕获件不落 `tmp/` 根） |
+
+完成记录（2026-11-16）：报告对 `docs/validation/s1-exit-closeout-assessment{,_EN}.md`；Q2=(a) / Q3=A 加法式 / Q7=A 豁免顺延 S2 / Q9 纳入 / Q10=(C) 分两步；ADR-046 / ADR-047；R = 1、D = 0（按 §11.2 不写 hash / run）。
+
 ## 已知缺陷（后续切片前处理）
 
 > **阻断口径不变**：仅高频/已复现缺陷阻断，观测级 flake 只记录并在验证报告中列示。

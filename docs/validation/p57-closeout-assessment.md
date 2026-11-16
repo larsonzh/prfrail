@@ -98,6 +98,8 @@ F1 与 F2 在**本片回写前**互斥：前者称已立项，后者称无设计
 
 - **S-G8 判定已由 P75 裁定**：保持 blocked 直到 S2 enforcement 接入（报告：`docs/validation/r3-real-cli-assessment{,_EN}.md`）。本表八门定义与判定不改（§11.1）。
 
+- **P76 门级重评指针（2026-11-16）**：S-G1 / S-G2 的门级判定已由 P76 `S1-EXIT-CLOSEOUT-ASSESSMENT` 重评（Q2=(a) 判据字面）：S-G1 判据不满足 ⇒ 不通过；S-G2 判据满足 ⇒ 通过。S-G7 判定不变（仍不可达）；`s1-exit.md:52` 行内口径已按 P75 §11.2 第 3 项加法式修正。详见 `docs/validation/s1-exit-closeout-assessment{,_EN}.md` 与 ADR-046。本注记为加法式，不改本表任何判定词。（`s1-exit.md:52` 的 S-G2 句尚未同步，属已登记残余，承载建议片 = `S1-EXIT-SG2-SYNC`。）
+
 ### 4.3 三处时态滞后（登记不修）
 
 1. `s1-exit.md:44` 的 AT-24 条目称「T028 尚未实现」，与 `DEV_PLAN.md:119` 的 `COMPLETED` 互斥。
