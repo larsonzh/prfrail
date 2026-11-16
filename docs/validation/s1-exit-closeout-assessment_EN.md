@@ -154,6 +154,9 @@ The full ruling text is archived at `02-ruling/ruling-2026-11-16.md` in the evid
 
 This is an assessment slice, so the mapping between the landing commit and the CI run is added by a backfill commit (§11.2); the backfill commit run itself is an observation record only.
 
+- Landing commit `77f23d2` (`docs: assess the S1 exit closeout and land the P76 rulings`), pushed to `origin/main` over the range `b90de21..77f23d2` (no gitee push).
+- CI run `43785603244` was green on both legs at the first attempt: ubuntu `3m24s`, windows `5m12s`; both legs reported `SELFTEST: PASS 737/737`, `GATE REPORT scope=ci changed=33` and `TOTAL_FAIL=0`.
+
 ## 17. Known boundaries
 
 - Real enforcement stays in S2; S-G8 stays blocked; the AT-23 stage-1 condition closure is a permanent fact; no AT is re-run; the probe budget is zero.

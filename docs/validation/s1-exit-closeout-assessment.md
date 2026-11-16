@@ -154,6 +154,9 @@ S-G3 依赖 S-G4：版本号在 ADR-010 内，因此 S-G4 的批准动作须先�
 
 本片为评估类，主提交与 CI run 的对应关系由回填提交补入（§11.2）；该回填提交自身的 run 只作观察记录。
 
+- 主提交 `77f23d2`（`docs: assess the S1 exit closeout and land the P76 rulings`）；推送 `origin/main`，范围 `b90de21..77f23d2`（未推 gitee）。
+- CI run `43785603244` 首跑双腿 success：ubuntu `3m24s`、windows `5m12s`；两腿 `SELFTEST: PASS 737/737`、`GATE REPORT scope=ci changed=33`、`TOTAL_FAIL=0`。
+
 ## 17. 已知边界
 
 - 真实 enforcement 留 S2；S-G8 保持 blocked；AT-23 阶段 1 条件闭合作为永久事实；本片不重跑任何 AT；探针额度为零。
