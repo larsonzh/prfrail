@@ -2,7 +2,7 @@
 
 [English](S1_RELEASE_NOTES_EN.md)
 
-日期：2026-09-09。状态：`DRAFT / NOT RELEASED`。版本、下载链接、正式 artifact 文件名、支持起始日期和批准人均待 S1 exit 冻结；本文件不授权 tag、GitHub Release、发布或安装。
+日期：2026-09-09；更新于 2026-11-17（P78 `RELEASE-ZIP-BINDING`）。状态：`CANDIDATE / RELEASED`。v0.1.0 候选发行已创建并绑定：版本 `v0.1.0`、candidate commit `c93571352f456a275d6e71ce3e084c9f96360e86`、CI run `44043705691`、文件名 `prfrail-Windows-c93571352f456a275d6e71ce3e084c9f96360e86.zip`；下载入口 = GitHub Release `v0.1.0`。支持起始日期与 S1 exit 整体批准仍待 S2 前冻结；本文件说明的是候选发行，不构成 S1 exit 整体通过。
 
 ## 候选能力
 
@@ -15,15 +15,17 @@
 
 ## 支持与已知限制
 
-支持范围以 [S1 候选支持矩阵](S1_SUPPORT_MATRIX.md) 为准。S1 安装模型是[手工解压 Windows 便携 ZIP](INSTALLATION.md)、显式路径运行且不修改 PATH。当前仍无正式发行包，界面是逐行 CLI。正式 AgentRunner/CLI Agent 仍未交付；受监督 visible 黑箱候选的产品侧已由 T028 实现（AT-24 条件闭合），但真实 CLI 端到端依赖 T027-B、尚不可运行发布；该路径即使完成也只保证归还后的产物验收，不保证工具、网络、费用或外部副作用，并须用户显式确认风险和监督。S1 也不提供签名/attestation、Linux 正式支持、自动更新、Web 控制台、完整 TUI 或任意 executable hook。
+支持范围以 [S1 候选支持矩阵](S1_SUPPORT_MATRIX.md) 为准。S1 安装模型是[手工解压 Windows 便携 ZIP](INSTALLATION.md)、显式路径运行且不修改 PATH。当前发行物为 `v0.1.0` 候选发行（非已发布 SLA），界面是逐行 CLI。正式 AgentRunner/CLI Agent 仍未交付；受监督 visible 黑箱候选的产品侧已由 T028 实现（AT-24 条件闭合），但真实 CLI 端到端依赖 T027-B、尚不可运行发布；该路径即使完成也只保证归还后的产物验收，不保证工具、网络、费用或外部副作用，并须用户显式确认风险和监督。S1 也不提供签名/attestation、Linux 正式支持、自动更新、Web 控制台、完整 TUI 或任意 executable hook。
 
 ## 发布前剩余门禁
 
-1. 对最终 ZIP 复跑核验、首次运行、升级、回滚和卸载。
-2. 将版本、artifact 文件名、下载位置、EOL 通知方式和支持日期绑定到本说明及支持矩阵。
-3. 获得独立评审结论和产品所有者明确 S1 exit/发行批准。
-4. 完成 T027 并通过 AT-23；T028 已完成、AT-24 条件闭合；S1 仍因 T027/AT-23 阻断。
+1. 对最终 ZIP 复跑核验、首次运行、升级、回滚和卸载。——已于 2026-11-17 由 P78 `RELEASE-ZIP-BINDING` 完成（证据：`validation/release-zip-binding.md`）。
+2. 将版本、artifact 文件名、下载位置、EOL 通知方式和支持日期绑定到本说明及支持矩阵。——版本 `v0.1.0`、文件名 `prfrail-Windows-c93571352f456a275d6e71ce3e084c9f96360e86.zip` 与下载位置（GitHub Release `v0.1.0`）已绑定；EOL 通知方式已由 ADR-010 冻结（2026-11-16）；支持起始日期待 S1 exit 批准时冻结。
+3. 获得独立评审结论和产品所有者明确 S1 exit/发行批准。——发行部分已由产品所有者批准（2026-11-17，P78 起跑消息同轮；ADR-046 Q10=(C) 第一步）；S1 exit 整体批准待 S2。
+4. 完成 T027 并通过 AT-23；T028 已完成、AT-24 条件闭合；S1 仍因 T027/AT-23 阻断。——T027-B 已完成（部分不适用，ADR-045）；AT-23 阶段 1 条件闭合为永久事实（ADR-045）；S-G1 / S-G8 仍 blocked；S1 Exit 整体批准待 S2。
 
 > 切片同步（P55 `EXIT-SEED-BUILD-EVIDENCE`）：本片不适用（无发行物与功能变更，仅证据补链）；理由：本片不产生 tag、artifact 或功能项，只在 `docs/validation/evidence/EXIT-SEED-BUILD-EVIDENCE/` 归档 AT-13 补证，候选能力与剩余门禁逐字不变。
 
 > 切片同步（P57 `P5-P6-CLOSEOUT-ASSESSMENT`）：本片不适用（无 tag、artifact 或功能项）；理由：P57 只整理 S1 Exit 剩余门的收口清单（见 `docs/validation/p57-closeout-assessment.md` §4），不改动本文件「发布前剩余门禁」的措辞。
+
+> 切片同步（P78 `RELEASE-ZIP-BINDING`）：GitHub Release `v0.1.0` 已创建并绑定发行记录（版本 `v0.1.0` / candidate commit `c93571352f456a275d6e71ce3e084c9f96360e86` / CI run `44043705691` / 文件名 `prfrail-Windows-c93571352f456a275d6e71ce3e084c9f96360e86.zip`）；复验四项通过；本段门禁清单已同步更新。

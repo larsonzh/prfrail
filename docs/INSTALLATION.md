@@ -2,7 +2,7 @@
 
 [English](INSTALLATION_EN.md)
 
-日期：2026-09-10。S1 安装模型已冻结为：Windows 11 amd64 便携 ZIP、手工解压到用户选择的独立目录、始终用 `prfrail.exe` 的显式路径运行，不修改 `PATH`、注册表或系统目录。ZIP 解压后只有一个 `prfrail/` 顶层目录，四个发行文件均在其中。当前尚无正式 GitHub Release；新目录结构必须通过新的可信候选 artifact 复验后，才能视为与最终发行物结构相同。
+日期：2026-09-10。S1 安装模型已冻结为：Windows 11 amd64 便携 ZIP、手工解压到用户选择的独立目录、始终用 `prfrail.exe` 的显式路径运行，不修改 `PATH`、注册表或系统目录。ZIP 解压后只有一个 `prfrail/` 顶层目录，四个发行文件均在其中。正式 GitHub Release `v0.1.0` 已创建（2026-11-17，P78 `RELEASE-ZIP-BINDING`）；最终 ZIP 已按 §2 下载并复验通过，与最终发行物结构相同。
 
 ## 1. 环境要求与能力层次
 
@@ -151,6 +151,8 @@ try {
 
 预期解压根目录只含 `prfrail/`，该目录只含 `prfrail.exe`、`SHA256SUMS`、`sbom.spdx.json` 和 `licenses.json`。校验和只证明文件与清单一致，不认证发布者身份；run/verifier/candidate 必须从受信发布记录独立核对，包内 `version --json` 必须绑定同一 candidate commit。不要执行平台或 commit 不匹配的二进制。Actions artifact 可能过期，它不是长期正式下载入口。
 
+正式下载入口为 GitHub Release `v0.1.0` 的资产 `prfrail-Windows-c93571352f456a275d6e71ce3e084c9f96360e86.zip`（`https://github.com/larsonzh/prfrail/releases/tag/v0.1.0`）；下方 Actions run 下载路径保留为 CI 证据下载路径。
+
 ## 3. 五步快速上手
 
 以下路径先验证无副作用的核心 CLI，不要求 SessionBridge，也不会调用 AI：
@@ -203,4 +205,4 @@ $PrfRail = Join-Path $InstallDir 'prfrail.exe'
 
 确认没有运行中的 ProofRail 进程后，只删除对应版本的二进制目录。由于安装从未修改 `PATH`、注册表或系统目录，无需恢复这些设置。证据、配置、run 和 store 默认保留；删除它们需要单独授权并先确认保留/审计要求。
 
-正式发行前，以上命令须用最终 ZIP 再执行一次，并在 [S1 exit 报告](validation/s1-exit.md)、[支持矩阵](S1_SUPPORT_MATRIX.md)和[发行说明](S1_RELEASE_NOTES.md)中绑定最终版本、commit、run 和文件名。
+本页 §2 命令已于 2026-11-17 用最终 ZIP `prfrail-Windows-c93571352f456a275d6e71ce3e084c9f96360e86.zip` 复验通过，并在 [S1 exit 报告](validation/s1-exit.md)、[支持矩阵](S1_SUPPORT_MATRIX.md)和[发行说明](S1_RELEASE_NOTES.md)中绑定：版本 `v0.1.0`、candidate commit `c93571352f456a275d6e71ce3e084c9f96360e86`、CI run `44043705691`、文件名 `prfrail-Windows-c93571352f456a275d6e71ce3e084c9f96360e86.zip`。

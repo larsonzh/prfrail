@@ -2113,6 +2113,29 @@ Completion record (2026-11-16): report pair `docs/validation/s1-exit-closeout-as
 
 Completion record (2026-11-17): report pair `docs/validation/adr010-approval{,_EN}.md`; ADR-010 flipped to `APPROVED` with `S1_SUPPORT_MATRIX` / `INSTALLATION_PLAN` / `PRODUCT_REQUIREMENTS` / `s1-exit` synced; S-G4 moves from not passed to passed (p57 and s1-exit gate tables untouched); R = 1, D = 0 (no hash / run recorded, per §11.2).
 
+### P78 — `RELEASE-ZIP-BINDING` (v0.1.0 Release creation + final ZIP build + release-record binding + install lifecycle re-verification; M-L implementation type) · ✅ Complete
+
+| Field | Content |
+|---|---|
+| Identifier | `RELEASE-ZIP-BINDING` (v0.1.0 official Release creation, final ZIP candidate artifact build, release-record binding and install lifecycle re-verification; source = v61 §4 layer-1 queue item marked as the next slice) |
+| Status | ✅ Complete (closed 2026-11-17) |
+| Goal | land steps (2)(3)(4) of the P76 Q5 four-step plan: build the final ZIP and release evidence; bind version / commit / run / file name to the three landing spots named by `INSTALLATION.md:206`; re-run install / upgrade / rollback / uninstall-with-retained-data against the final ZIP; create the GitHub Release `v0.1.0`; move S-G3 from not passed to passed |
+| Dependency | ADR-010 froze the first candidate version `v0.1.0` and the EOL notification policy; ADR-009 froze the install model and ZIP structure; ADR-006 froze release trust (pinned commit + GitHub CI + SHA256SUMS + SBOM + license manifest, no code signing); P77 turned S-G4 to passed; the user's same-turn approval in the 2026-11-17 start message authorizes the Release creation |
+| Size | M-L (implementation type; no product code or CI workflow change, deliverables are artifacts, an external release action and documentation binding) |
+| Steps | 0 -> (1) -> (2a) build -> (2b) binding and Release -> (2c) re-verification -> (2d) documentation sync -> (2e) draft report -> (3) consistency -> (4) gates -> (5) pre-review -> (6) independent scan (required) -> (7) final review -> (8a) -> (9) -> (8b) -> (8c) -> (10) |
+| Gap | the "no official GitHub Release yet" sentence in `INSTALLATION{,_EN}` is still true; the three binding landing spots still lack a checkable version / commit / run / file-name tuple; S-G3 of the S1 Exit is still not passed |
+| Deliverables | (1) the report pair `docs/validation/release-zip-binding{,_EN}.md` (with the S-G3 close-out chapter and the `sixstage` fence); (2) the GitHub Release `v0.1.0` with assets (ZIP / `SHA256SUMS` / SBOM / license manifest); (3) the three binding landing spots (`s1-exit{,_EN}` outside the gate table / `S1_SUPPORT_MATRIX{,_EN}` additive / `S1_RELEASE_NOTES{,_EN}`); (4) the `INSTALLATION{,_EN}` ZIP file name and download entry; (5) evidence for all four re-verification items; (6) the `REMAINING_SLICES{,_EN}` completion record; (7) the evidence pack `docs/validation/evidence/P78-RELEASE-ZIP-BINDING/` |
+| Acceptance evidence | the three scopes `TOTAL_FAIL=0`; SELFTEST 737/737; `go build` / `go vet` / `go test` all green; one success assertion per re-verification item; the binding tuple identical across the three landing spots; the report pair's six shapes equal |
+| Boundary | no change to product code / `go.mod` / `ci.yml`; no change to the p57 or `s1-exit` gate tables; no change to the directive / CONTRACTS / schema / fixtures / other ADRs; no change to the ADR-009 ZIP structure or the ADR-006 release trust; no code signing; no official Linux release; no change to the `S1_SUPPORT_MATRIX` platform list or support tiers; no new ADR / OB; no gitee action of any kind |
+| Tier | `[SLICE]` |
+| Probe budget | 0 |
+| Freedom-list landing path | `docs/validation/evidence/P78-RELEASE-ZIP-BINDING/freedom-list.md` |
+| R/D baseline | R = 0, D = 0 (step-0 registration, §13.1.1; does not inherit P77's R=1 / D=0) |
+| Temp-file location declaration | Slice temp directory = `tmp/P78-RELEASE-ZIP-BINDING/` (add-only before ⑧c; build outputs and CI captures also land there, never at the `tmp/` root) |
+| Budget-rule disclosure | the (7) budget follows §7.5 = 1 final review + 2 re-reviews (M-L counts as tier M); the v61 §4 P78 queue item's wording of one final review plus three re-reviews is a citation error, so this slice follows §7.5 and the correction ships with v62 or a later `[ROUTINE]` |
+
+Completion record (2026-11-17): report pair `docs/validation/release-zip-binding{,_EN}.md`; GitHub Release `v0.1.0` created (tag targets the candidate commit, four assets present); the final ZIP passed install / upgrade / rollback / uninstall-with-retained-data re-verification; the three landing spots bind one tuple; S-G3 moves from not passed to passed (p57 and s1-exit gate tables untouched); R = 0, D = 1 (D-1 = the implementation-order change that used an empty commit as the verifier identity, self-disclosed and judged by (7) re-review as a difference that may be recorded in the report; no hash / run recorded, per §11.2).
+
 ## Known defects (to be handled before later slices)
 
 > **Blocking rule unchanged**: only high-frequency / reproduced defects block; observation-grade flakes are recorded and listed in the validation report.

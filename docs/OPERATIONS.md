@@ -2,7 +2,7 @@
 
 [English](OPERATIONS_EN.md)
 
-日期：2026-09-11；S1 操作设计稿。当前没有 ProofRail 正式发行包；手工解压 Windows amd64 便携 ZIP、显式路径运行且不修改 PATH 的 S1 安装模型已获批，候选步骤见 [安装指南](INSTALLATION.md)。当前已交付 CLI 与交付底座：`version/init/validate/config explain/preview/approvals/interactions/cost report/secret/ai check/run/report` 和库级导出模块（`internal/snapshot/export.go`、`internal/evidence/delivery.go`）。`preview` 为离线只读静态预览，不执行命令/网络/模型/凭据读取；`ai check` 是需单独授权的真实单请求可用性探测，不是 AgentRunner；`run` 目前只支持 noop-only 任务链，遇到 `code/build/verify` 会 fail-close 并返回非零退出码。其余产品能力仍是 RFC 规划接口。待决发行绑定见 [安装部署规划](INSTALLATION_PLAN.md)，完整用户流程见 [业务流程](BUSINESS_WORKFLOWS.md)。
+日期：2026-09-11；S1 操作设计稿。正式发行 `v0.1.0` 已创建（2026-11-17，P78 `RELEASE-ZIP-BINDING`；候选状态、非已发布 SLA）；手工解压 Windows amd64 便携 ZIP、显式路径运行且不修改 PATH 的 S1 安装模型已获批，候选步骤见 [安装指南](INSTALLATION.md)。当前已交付 CLI 与交付底座：`version/init/validate/config explain/preview/approvals/interactions/cost report/secret/ai check/run/report` 和库级导出模块（`internal/snapshot/export.go`、`internal/evidence/delivery.go`）。`preview` 为离线只读静态预览，不执行命令/网络/模型/凭据读取；`ai check` 是需单独授权的真实单请求可用性探测，不是 AgentRunner；`run` 目前只支持 noop-only 任务链，遇到 `code/build/verify` 会 fail-close 并返回非零退出码。其余产品能力仍是 RFC 规划接口。发行绑定已完成（版本 `v0.1.0`、candidate commit `c93571352f456a275d6e71ce3e084c9f96360e86`、CI run `44043705691`、文件名 `prfrail-Windows-c93571352f456a275d6e71ce3e084c9f96360e86.zip`），详见 [安装部署规划](INSTALLATION_PLAN.md)，完整用户流程见 [业务流程](BUSINESS_WORKFLOWS.md)。
 
 ## 1. 当前可执行
 

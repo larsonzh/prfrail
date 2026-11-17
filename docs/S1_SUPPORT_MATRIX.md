@@ -24,10 +24,14 @@
 
 ## 发行信任边界
 
-候选发行要求完整 commit SHA、GitHub CI、`SHA256SUMS`、SPDX SBOM 和许可证清单。校验和证明内容与清单一致，不认证发布者身份；S1 不宣称签名或 attestation。安装模型见 [便携 ZIP 安装指南](INSTALLATION.md)；具体文件名、下载位置和支持起始日期须与最终发行说明一起批准。
+候选发行要求完整 commit SHA、GitHub CI、`SHA256SUMS`、SPDX SBOM 和许可证清单。校验和证明内容与清单一致，不认证发布者身份；S1 不宣称签名或 attestation。安装模型见 [便携 ZIP 安装指南](INSTALLATION.md)；具体文件名与下载位置已随 v0.1.0 发行绑定（见文末「已绑定发行记录」），支持起始日期仍待 S1 exit 批准时冻结。
 
 > 切片同步（P55 `EXIT-SEED-BUILD-EVIDENCE`）：本片不适用（无平台与版本支持范围增减）；理由：补证只归档既有 seed 驱动构建的两平台捕获，平台清单、支持层级与 EOL 政策不变。
 
 > 切片同步（P57 `P5-P6-CLOSEOUT-ASSESSMENT`）：本片不适用（无平台清单、支持层级、EOL 政策或安装模型的增减）；理由：P57 只把 T018 剩余门整理为收口清单，未改变任何门的判定，本文件措辞逐字不动。
 
 > 切片同步（P71 `S1-SCOPE-ANNOTATE`）：TUI 移出与 visible 降级保证口径已同步；理由：R-07 b1 附条件 2 落地只改 REQ 阶段归属与调试指引——平台清单与支持层级不变，TUI 移出系 P68 已裁定的**功能阶段归属同步**，Windows 行状态仍为「正式支持候选」，visible 行仍为「降级保证」。
+
+## 已绑定发行记录
+
+v0.1.0 候选发行（P78 `RELEASE-ZIP-BINDING`，2026-11-17）已绑定：版本 `v0.1.0`；candidate commit `c93571352f456a275d6e71ce3e084c9f96360e86`；CI run `44043705691`（candidate-build / candidate-probe / selfhost 双腿全绿）；文件名 `prfrail-Windows-c93571352f456a275d6e71ce3e084c9f96360e86.zip`。发行信任边界仍以本页「发行信任边界」节为准；本绑定不改变平台清单与支持层级。

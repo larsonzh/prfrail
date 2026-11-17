@@ -2126,6 +2126,29 @@ A6 ② 进度（第 2 批，2026-09-15）：
 
 完成记录（2026-11-17）：报告对 `docs/validation/adr010-approval{,_EN}.md`；ADR-010 状态翻 `APPROVED` 并同步 `S1_SUPPORT_MATRIX` / `INSTALLATION_PLAN` / `PRODUCT_REQUIREMENTS` / `s1-exit`；S-G4 由未通过转通过（p57 与 s1-exit 门表零改动）；R = 1、D = 0（按 §11.2 不写 hash / run）。
 
+### P78 — `RELEASE-ZIP-BINDING`（v0.1.0 Release 创建 + 最终 ZIP 构建 + 发行记录绑定 + 安装生命周期复验 · M-L 实现类）· ✅ 已完成
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `RELEASE-ZIP-BINDING`（v0.1.0 正式 Release 创建、最终 ZIP 候选工件构建、发行记录绑定与安装生命周期复验；来源 = v61 §四 层 1 队列项 `下一项`） |
+| 状态 | ✅ 已完成（2026-11-17 收口） |
+| 目标 | 按 P76 Q5 四步的第②③④步落地：构建最终 ZIP 与发布证据；把版本 / commit / run / 文件名绑定到 `INSTALLATION.md:206` 明定的三处落点；用最终 ZIP 重跑安装 / 升级 / 回滚 / 卸载保留数据；创建 GitHub Release `v0.1.0`；S-G3 由未通过转通过 |
+| 依赖 | ADR-010 已冻结首版候选 `v0.1.0` 与 EOL 通知方式；ADR-009 已冻结安装模型与 ZIP 结构；ADR-006 已冻结发布信任（固定 commit + GitHub CI + SHA256SUMS + SBOM + 许可证清单，不做代码签名）；P77 已使 S-G4 通过；用户 2026-11-17 起跑消息同轮批准 Release 创建 |
+| 规模 | M-L（实现类；不改产品代码与 CI 工作流，产出为工件、外部发行动作与文档绑定） |
+| 步骤 | 0 → ① → ②a 构建 → ②b 绑定与 Release → ②c 复验 → ②d 文档同步 → ②e 报告初稿 → ③ 一致性 → ④ 门禁 → ⑤ 预审 → ⑥ 独立扫描（必做）→ ⑦ 终审 → ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| 现状缺口 | `INSTALLATION{,_EN}` 的「当前尚无正式 GitHub Release」句仍为真值；三处绑定落点尚无可核对的版本 / commit / run / 文件名四元组；S1 Exit 的 S-G3 仍为未通过 |
+| 交付物 | ① 报告对 `docs/validation/release-zip-binding{,_EN}.md`（含 S-G3 收口章与 `sixstage` 围栏）；② GitHub Release `v0.1.0` 与附件（ZIP / `SHA256SUMS` / SBOM / 许可证清单）；③ 三处绑定点（`s1-exit{,_EN}` 非门表区 / `S1_SUPPORT_MATRIX{,_EN}` 加法式 / `S1_RELEASE_NOTES{,_EN}`）；④ `INSTALLATION{,_EN}` ZIP 文件名与下载入口；⑤ 复验四项证据；⑥ `REMAINING_SLICES{,_EN}` 完成记录；⑦ 证据包 `docs/validation/evidence/P78-RELEASE-ZIP-BINDING/` |
+| 验收证据 | 三作用域 `TOTAL_FAIL=0`；SELFTEST 737/737；`go build` / `go vet` / `go test` 全绿；复验四项逐项成功断言；绑定四元组在三处落点逐字一致；报告对六形状全等 |
+| 边界 | 不改产品代码 / `go.mod` / `ci.yml`；不改 p57 门表与 `s1-exit` 门表；不改准则 / CONTRACTS / schema / fixtures / 其它 ADR；不改 ADR-009 ZIP 结构与 ADR-006 发布信任；不做代码签名；不做 Linux 正式发布；不改 `S1_SUPPORT_MATRIX` 平台清单与支持层级；不新增 ADR / OB；不做任何 gitee 动作 |
+| 分级 | `[SLICE]` |
+| 探针额度 | 0 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/P78-RELEASE-ZIP-BINDING/freedom-list.md` |
+| R/D 基线 | R = 0、D = 0（步骤 0 登记，§13.1.1；不继承 P77 的 R=1 / D=0） |
+| 临时件落点声明 | 本片临时目录 = `tmp/P78-RELEASE-ZIP-BINDING/`（⑧c 前只增不删；构建产物与 CI 捕获件同样落该目录，不落 `tmp/` 根） |
+| 额度口径披露 | ⑦ 额度按 §7.5 = 1 终审 + 2 复审（M-L 视同 M 档）；v61 §四 P78 队列项写「1 终审 + 3 复审」系引用误差，本片按 §7.5 执行，修正随 v62 或后续 `[ROUTINE]` 补正 |
+
+完成记录（2026-11-17）：报告对 `docs/validation/release-zip-binding{,_EN}.md`；GitHub Release `v0.1.0` 已创建（tag 指向 candidate commit，四资产齐备）；最终 ZIP 完成安装 / 升级 / 回滚 / 卸载保留数据四项复验；三处落点绑定同一四元组；S-G3 由未通过转通过（p57 与 s1-exit 门表零改动）；R = 0、D = 1（D-1 = 以空提交作 verifier 标识的实施顺序调整，自主披露并经 ⑦ 复审判定为可在报告内如实登记的差异；按 §11.2 不写 hash / run）。
+
 ## 已知缺陷（后续切片前处理）
 
 > **阻断口径不变**：仅高频/已复现缺陷阻断，观测级 flake 只记录并在验证报告中列示。

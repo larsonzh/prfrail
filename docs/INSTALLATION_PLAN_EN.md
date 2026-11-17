@@ -4,7 +4,7 @@
 
 [简体中文](INSTALLATION_PLAN.md)
 
-Date: 2026-09-09. Status: the S1 installation model is decided, while formal release remains pending. No formal release package or supported production deployment exists yet. This document records the frozen model, open decisions, and pre-release gates; see the [portable ZIP installation guide](INSTALLATION_EN.md) for operational steps.
+Date: 2026-09-09; updated 2026-11-17 (P78). Status: the S1 installation model is decided; the `v0.1.0` candidate release is created and bound to its release record (not a published SLA; whole S1 exit approval still awaits S2). The current artifact is a candidate and no supported production deployment exists yet. This document records the frozen model, open decisions, and pre-release gates; see the [portable ZIP installation guide](INSTALLATION_EN.md) for operational steps.
 
 ## 1. Currently Available Path
 
@@ -24,18 +24,18 @@ The S1 target is a local, single-user, single-writer CLI/TUI with explicit binar
 | Default state/store location | User data directory or explicit workspace configuration | Verifiable non-overlap, permissions, and backup policy | TBD |
 | Configuration search order | Explicit argument, workspace, user profile | T016 freezes CLI and config-explain behavior | TBD |
 | Release trust | S1 uses fixed commit, GitHub CI, SHA256SUMS, SBOM and license manifest | Checksums prove only content integrity; signing/attestation is deferred | S1 baseline decided |
-| Update mechanism | Manually verify and extract each version into a new directory, then explicitly switch paths; reconsider package managers later | Support matrix, schema compatibility, backup/recovery gates | S1 model decided; final ZIP awaits rerun |
+| Update mechanism | Manually verify and extract each version into a new directory, then explicitly switch paths; reconsider package managers later | Support matrix, schema compatibility, backup/recovery gates | S1 model decided; the final ZIP is rerun (P78, 2026-11-17) |
 | Uninstall/data retention | Manually remove the version directory; retain run/store by default and separately authorize data deletion | T024 lifecycle record and explicit deletion authorization | S1 model and library rules frozen |
 | CLI Agent/AgentRunner | Optional for core offline mode; required for formal AI execution. GitHub Copilot CLI 1.0.83 is the current pinned Windows x64 candidate | Pinned version/native executable digest, account/subscription/network/model entitlement, supported authentication (1.0.83 rejects classic PATs), capability matrix, isolation, stop/resume, evidence, and independent acceptance pass AT-23; rerun preflight after updates | T026 and web OAuth login are complete; runtime probes show ten verified, two unsupported, and zero unknown capabilities. Tool aliases and shell networking bypass CLI denials, so the candidate is incompatible and requires replacement/upgrade or a provable external enforcement boundary; T027/AT-23 remain blocked |
 | VS Code visible black-box candidate | Optional reduced assurance; requires VS Code 1.82+, usable Copilot Chat, and SessionBridge 0.1.1 | Explicit risk acknowledgment, non-legacy `visible`, human supervision/return, post-return full scan and AT-24; no automatic fallback | T028 product side implemented (reduced assurance), real CLI end-to-end depends on T027-B, not yet a runnable release; AT-24 conditionally closed, S1 still blocked by T027/AT-23 |
 
-S1 defines no default install directory, publishes no one-click installer, does not modify PATH, claims no automatic updates, and requires no administrator privileges. The default state/store location and formal download entry point remain open; the EOL notification channel was approved by the product owner via ADR-010 (2026-11-16).
+S1 defines no default install directory, publishes no one-click installer, does not modify PATH, claims no automatic updates, and requires no administrator privileges. The default state/store location remains open; the formal download entry point is bound to the GitHub Release `v0.1.0` asset `prfrail-Windows-c93571352f456a275d6e71ce3e084c9f96360e86.zip`; the EOL notification channel was approved by the product owner via ADR-010 (2026-11-16).
 
 ## 4. Completed Candidate Portable-Package Drill
 
 On 2026-09-09, two trusted Windows amd64 CI artifacts completed offline verifier checks plus first run, upgrade, rollback, and evidence-preserving uninstall under an explicit temporary directory. The old and new full candidate SHAs are `1e7af676e8e84028c7ecfef1ccde91213738c20c` and `603e8dc03e9fb74ce9c53243d38e704fd8469c6a`. See the [S1 Windows portable-package installation drill](validation/s1-install-drill_EN.md) for evidence.
 
-This closes the engineering question of whether candidate artifacts can execute the lifecycle and supports the manually extracted portable-ZIP, no-PATH model approved on 2026-09-09. The formal download entry point and final ZIP do not yet exist, so the final carrier must rerun the drill.
+This closes the engineering question of whether candidate artifacts can execute the lifecycle and supports the manually extracted portable-ZIP, no-PATH model approved on 2026-09-09. The formal download entry point and final ZIP now exist (GitHub Release `v0.1.0`), and the drill reran against the final carrier (P78, 2026-11-17).
 
 ## 5. Planned User Path
 
@@ -47,7 +47,7 @@ This closes the engineering question of whether candidate artifacts can execute 
 6. Before upgrade, stop writers and make a complete recoverable backup to a new store. Preserve the old binary and store on failure.
 7. Uninstall retains evidence and configuration by default; data deletion is separately authorized.
 
-See the [portable ZIP installation guide](INSTALLATION_EN.md) for copyable commands. T024 supplies library-level complete backup, new-store verification, retention-by-default, and explicit deletion-authorization rules; formal release filenames and download locations remain bound to release approval.
+See the [portable ZIP installation guide](INSTALLATION_EN.md) for copyable commands. T024 supplies library-level complete backup, new-store verification, retention-by-default, and explicit deletion-authorization rules; the formal release filename and download location are bound: `prfrail-Windows-c93571352f456a275d6e71ce3e084c9f96360e86.zip` on GitHub Release `v0.1.0` (P78, 2026-11-17).
 
 ## 6. Pre-Release Installation Gates
 

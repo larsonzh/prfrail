@@ -2,7 +2,7 @@
 
 [中文](INSTALLATION.md)
 
-Date: 2026-09-10. The frozen S1 installation model is a Windows 11 amd64 portable ZIP, manually extracted to an independent user-selected directory and always invoked through an explicit `prfrail.exe` path. It does not modify `PATH`, the registry, or system directories. The extracted ZIP has one top-level `prfrail/` directory containing all four release files. No formal GitHub Release exists yet; the new layout must pass a fresh trusted-candidate replay before it can be treated as matching the final carrier.
+Date: 2026-09-10. The frozen S1 installation model is a Windows 11 amd64 portable ZIP, manually extracted to an independent user-selected directory and always invoked through an explicit `prfrail.exe` path. It does not modify `PATH`, the registry, or system directories. The extracted ZIP has one top-level `prfrail/` directory containing all four release files. The formal GitHub Release `v0.1.0` was created on 2026-11-17 (P78 `RELEASE-ZIP-BINDING`); the final ZIP was downloaded and reverified per section 2 and matches the final carrier layout.
 
 ## 1. Environment Requirements and Capability Levels
 
@@ -151,6 +151,8 @@ try {
 
 The extraction root must contain only `prfrail/`, which in turn contains only `prfrail.exe`, `SHA256SUMS`, `sbom.spdx.json`, and `licenses.json`. Checksums prove agreement with the manifest, not publisher identity. Independently verify the run/verifier/candidate from a trusted record, and require package `version --json` to bind the same candidate commit. Never execute a binary for a different platform or commit. Actions artifacts may expire and are not a durable formal download location.
 
+The formal download entry is the GitHub Release `v0.1.0` asset `prfrail-Windows-c93571352f456a275d6e71ce3e084c9f96360e86.zip` (`https://github.com/larsonzh/prfrail/releases/tag/v0.1.0`); the Actions-run download path above remains the CI-evidence path.
+
 ## 3. Five-Step Quick Start
 
 This path first verifies the side-effect-free core CLI. It requires no SessionBridge and makes no AI call:
@@ -203,4 +205,4 @@ There is no automatic update, `current` link, or implicit version switch. The op
 
 After confirming no ProofRail process is running, remove only the selected version's binary directory. Because installation never changed `PATH`, the registry, or system directories, none of them needs restoration. Evidence, configuration, runs, and stores are retained by default; deleting them requires separate authorization and prior retention/audit review.
 
-Before formal release, rerun these commands against the final ZIP and bind its version, commit, run, and filename in the [S1 exit report](validation/s1-exit_EN.md), [support matrix](S1_SUPPORT_MATRIX_EN.md), and [release notes](S1_RELEASE_NOTES_EN.md).
+The section 2 commands were rerun and verified on 2026-11-17 against the final ZIP `prfrail-Windows-c93571352f456a275d6e71ce3e084c9f96360e86.zip`, and the [S1 exit report](validation/s1-exit_EN.md), [support matrix](S1_SUPPORT_MATRIX_EN.md), and [release notes](S1_RELEASE_NOTES_EN.md) now bind: version `v0.1.0`, candidate commit `c93571352f456a275d6e71ce3e084c9f96360e86`, CI run `44043705691`, filename `prfrail-Windows-c93571352f456a275d6e71ce3e084c9f96360e86.zip`.

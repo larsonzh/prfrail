@@ -24,10 +24,14 @@ Date: 2026-09-09. Status: `CANDIDATE`, effective only after the formal release c
 
 ## Release Trust Boundary
 
-A candidate release requires a full commit SHA, GitHub CI, `SHA256SUMS`, an SPDX SBOM, and a license manifest. Checksums prove agreement with a manifest, not publisher identity; S1 does not claim signing or attestation. See the [portable ZIP installation guide](INSTALLATION_EN.md); filenames, download locations, and the support start date must be approved with the final release notes.
+A candidate release requires a full commit SHA, GitHub CI, `SHA256SUMS`, an SPDX SBOM, and a license manifest. Checksums prove agreement with a manifest, not publisher identity; S1 does not claim signing or attestation. See the [portable ZIP installation guide](INSTALLATION_EN.md); the filenames and download locations are bound with the v0.1.0 release (see "Bound Release Record" below), and the support start date still awaits S1 exit approval.
 
 > Slice sync (P55 `EXIT-SEED-BUILD-EVIDENCE`): not applicable (no platform or version support-range change); reason: the supplement only archives the two-platform capture of the existing seed-driven build, so the platform list, support tiers and EOL policy stay unchanged.
 
 > Slice sync (P57 `P5-P6-CLOSEOUT-ASSESSMENT`): not applicable (no change to the platform list, support tiers, EOL policy or install model); reason: P57 only turns the remaining T018 gates into a close-out inventory and changes no gate verdict, so this file's wording stays byte-identical.
 
 > Slice sync (P71 `S1-SCOPE-ANNOTATE`): the TUI carve-out and the visible reduced-assurance wording are now aligned; reason: landing R-07 b1 condition 2 changes only REQ stage ownership and the debugging guidance - the platform list and support tiers are unchanged, the TUI carve-out is the **functional stage-ownership sync** already ruled by P68, the Windows row status stays "Production-support candidate" and the visible row stays "reduced assurance".
+
+## Bound Release Record
+
+The v0.1.0 candidate release (P78 `RELEASE-ZIP-BINDING`, 2026-11-17) is bound: version `v0.1.0`; candidate commit `c93571352f456a275d6e71ce3e084c9f96360e86`; CI run `44043705691` (candidate-build / candidate-probe / selfhost green on both legs); filename `prfrail-Windows-c93571352f456a275d6e71ce3e084c9f96360e86.zip`. The release trust boundary still follows the "Release Trust Boundary" section of this page; this binding does not change the platform list or support tiers.
