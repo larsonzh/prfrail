@@ -2091,7 +2091,7 @@ Completion record (2026-11-15): report pair `docs/validation/r3-real-cli-assessm
 
 Completion record (2026-11-16): report pair `docs/validation/s1-exit-closeout-assessment{,_EN}.md`; Q2=(a) / Q3=A additive / Q7=A waived and deferred to S2 / Q9 included / Q10=(C) two-step; ADR-046 / ADR-047; R = 1, D = 0 (no hash / run recorded, per §11.2).
 
-### P77 — `ADR010-APPROVAL` (EOL notification documentation sync after ADR-010 approval; documentation type) · 🔄 In progress
+### P77 — `ADR010-APPROVAL` (EOL notification documentation sync after ADR-010 approval; documentation type) · ✅ Complete
 
 | Field | Content |
 |---|---|

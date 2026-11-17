@@ -138,6 +138,12 @@ Criterion (unchanged): the S-G4 row in §4.2 of `p57-closeout-assessment{,_EN}` 
 - The final-state readings, commit hash and CI run id are in the ⑩ receipt (this report records no commit hash or run id, per §11.2).
 - Anchor for the next slice: P78 `RELEASE-ZIP-BINDING` takes the post-closeout `HEAD` and CI run id as its step-0 anchor.
 
+## 10. CI fact chain
+
+This section is added by the docs-only backfill commit after the CI legs turned green (§11.2); the backfill commit's own run is observation-only.
+
+- Main commit `33272be` (`docs: approve ADR-010 and sync the EOL notification policy (P77)`); pushed to `origin/main`, range `fb90a20..33272be` (no gitee push).
+- CI run `43986942087` green on the first attempt on both legs: ubuntu `3m22s`, windows `4m32s`; both legs `SELFTEST: PASS 737/737`, `GATE REPORT scope=ci changed=29`, `TOTAL_FAIL=0`; package-level `ok` ubuntu 21 / windows 15; base `go test ok=15 FAIL=0`.
 ## artifacts
 
 ```artifacts

@@ -138,6 +138,12 @@ EN 侧改动同构：状态词取 `APPROVED`，四要素改为英文同一句型
 - 终态读数、提交号与 CI 运行号见 ⑩ 回执（本报告按 §11.2 不写入提交号与运行号）。
 - 给下一片的锚点：P78 `RELEASE-ZIP-BINDING` 以本片闭环后的 `HEAD` 与 CI 运行号为步骤 0 锚点。
 
+## 10. CI 事实链
+
+本节由 CI 双绿后的 docs-only 回填提交补入（§11.2）；该回填提交自身的 run 只作观察记录。
+
+- 主提交 `33272be`（`docs: approve ADR-010 and sync the EOL notification policy (P77)`）；推送 `origin/main`，范围 `fb90a20..33272be`（未推 gitee）。
+- CI run `43986942087` 首跑双腿 success：ubuntu `3m22s`、windows `4m32s`；两腿 `SELFTEST: PASS 737/737`、`GATE REPORT scope=ci changed=29`、`TOTAL_FAIL=0`；包级 `ok` ubuntu 21 / windows 15；base `go test ok=15 FAIL=0`。
 ## artifacts
 
 ```artifacts

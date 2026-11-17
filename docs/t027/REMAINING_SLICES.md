@@ -2104,7 +2104,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 
 完成记录（2026-11-16）：报告对 `docs/validation/s1-exit-closeout-assessment{,_EN}.md`；Q2=(a) / Q3=A 加法式 / Q7=A 豁免顺延 S2 / Q9 纳入 / Q10=(C) 分两步；ADR-046 / ADR-047；R = 1、D = 0（按 §11.2 不写 hash / run）。
 
-### P77 — `ADR010-APPROVAL`（ADR-010 批准后的 EOL 通知方式文档同步 · 文档类）· 🔄 进行中
+### P77 — `ADR010-APPROVAL`（ADR-010 批准后的 EOL 通知方式文档同步 · 文档类）· ✅ 已完成
 
 | 字段 | 内容 |
 |---|---|
