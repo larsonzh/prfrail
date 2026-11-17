@@ -2104,6 +2104,28 @@ A6 ② 进度（第 2 批，2026-09-15）：
 
 完成记录（2026-11-16）：报告对 `docs/validation/s1-exit-closeout-assessment{,_EN}.md`；Q2=(a) / Q3=A 加法式 / Q7=A 豁免顺延 S2 / Q9 纳入 / Q10=(C) 分两步；ADR-046 / ADR-047；R = 1、D = 0（按 §11.2 不写 hash / run）。
 
+### P77 — `ADR010-APPROVAL`（ADR-010 批准后的 EOL 通知方式文档同步 · 文档类）· 🔄 进行中
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `ADR010-APPROVAL`（ADR-010 批准后的 EOL 通知方式文档同步；来源 = v60 §四 层 1 队列项） |
+| 状态 | ✅ 已完成（2026-11-17 收口） |
+| 目标 | 产品所有者批准 ADR-010 后，主控执行文档落地：ADR-010 状态改为 `APPROVED`，并把生效的 EOL 通知方式同步到所有相关文档 |
+| 依赖 | 用户 2026-11-16 同轮批准（起跑消息即同轮授权）；v60 快照已把 P77 列为「下一项」；P76 已把 ADR-010 批准列为 S-G4 解锁条件 |
+| 规模 | S（`[SLICE]` 文档类） |
+| 步骤 | 0 → ① → ②a → ③ → ④ → ⑤ → ⑥ → ⑦ → ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| 现状缺口 | ADR-010 当前为 `PROPOSED / NOT APPROVED`，EOL 通知方式未冻结；`S1_SUPPORT_MATRIX` 尾部仍写「该提议尚未获批」；S-G4 因 ADR-010 未批准而未通过 |
+| 交付物 | ① `ADR_REGISTER{,_EN}` 状态改为 `APPROVED` + 用户批准四要素；② `S1_SUPPORT_MATRIX{,_EN}` 尾部 EOL 段更新；③ `INSTALLATION_PLAN{,_EN}` EOL 项同步（实读确认落点）；④ `PRODUCT_REQUIREMENTS{,_EN}` §7 EOL 项加法式指针（实读确认）；⑤ 视实读触项：`S1_RELEASE_NOTES{,_EN}` / `INSTALLATION{,_EN}` / `OPERATIONS{,_EN}` 的 EOL 相关内容；⑥ `REMAINING_SLICES{,_EN}` P77 完成记录；⑦ `docs/validation/adr010-approval{,_EN}.md` 报告对（新建）；⑧ 证据包 |
+| 验收证据 | 三作用域 `TOTAL_FAIL=0`；SELFTEST 737/737；CN/EN 改动行数对称；报告对六形状全等；ADR-010 状态栏 `APPROVED` 存在性断言；`S1_SUPPORT_MATRIX` 的「该提议尚未获批」字符串零命中 |
+| 边界 | 不改 S1 Exit 八门判据（p57 门表 / s1-exit 门表零改动，P76 已明令）；不改 EOL 通知方式本身；不改 `S1_SUPPORT_MATRIX` 平台清单与支持层级；不改 INSTALLATION 安装模型；不做 GitHub Release notes 外部动作（属 P78）；不改其它 ADR；不改任何产品代码 / CONTRACTS / schema / fixtures / CI |
+| 分级 | `[SLICE]` |
+| 探针额度 | 0 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/P77-ADR010-APPROVAL/freedom-list.md` |
+| R/D 基线 | R = 0、D = 0（步骤 0 登记，§13.1.1；不继承 P76 的 R=1 / D=0） |
+| 临时件落点声明 | 本片临时目录 = `tmp/P77-ADR010-APPROVAL/`（⑧c 前只增不删；捕获件不落 `tmp/` 根） |
+
+完成记录（2026-11-17）：报告对 `docs/validation/adr010-approval{,_EN}.md`；ADR-010 状态翻 `APPROVED` 并同步 `S1_SUPPORT_MATRIX` / `INSTALLATION_PLAN` / `PRODUCT_REQUIREMENTS` / `s1-exit`；S-G4 由未通过转通过（p57 与 s1-exit 门表零改动）；R = 1、D = 0（按 §11.2 不写 hash / run）。
+
 ## 已知缺陷（后续切片前处理）
 
 > **阻断口径不变**：仅高频/已复现缺陷阻断，观测级 flake 只记录并在验证报告中列示。

@@ -18,9 +18,9 @@ Date: 2026-09-09. Status: `CANDIDATE`, effective only after the formal release c
 - Product versions use `vMAJOR.MINOR.PATCH`, beginning with candidate `v0.1.0`; patch releases do not start a new EOL countdown.
 - The current stable minor and previous minor receive security fixes; the candidate maintenance window for the previous minor is 90 days.
 - Unknown historical runs remain read-only and are not automatically migrated.
-- Proposed ADR-010: when a new minor is released, announce the previous minor's EOL date in both the GitHub Release notes and this support matrix, with EOL on the 90th calendar day after release.
+- **ADR-010 (approved 2026-11-16)**: when a new minor is released, announce the previous minor's EOL date in both the GitHub Release notes and this support matrix, with EOL on the 90th calendar day after release.
 - Ninety days is the initial prototype-phase window; before each minor release, review stability, adoption, and maintenance capacity, and only lengthen future newly announced windows.
-- Deviations require a dated ADR with rationale and expiry, explicit product-owner approval, and synchronized publication in both channels, and must not retroactively shorten an announced window. This proposal is not approved, and this page does not replace the final notice.
+- Deviations require a dated ADR with rationale and expiry, explicit product-owner approval, and synchronized publication in both channels, and must not retroactively shorten an announced window. ADR-010 was approved by the product owner on 2026-11-16; this page does not replace the formal notice in the Release notes.
 
 ## Release Trust Boundary
 

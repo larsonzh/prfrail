@@ -29,7 +29,7 @@ S1 目标是本地单用户、单写者、无常驻云服务的 CLI/TUI：ProofR
 | CLI Agent/AgentRunner | 核心离线模式可选；正式 AI 执行必需。Windows x64 当前固定候选为 GitHub Copilot CLI 1.0.83 | 固定版本/原生可执行文件摘要、账号/订阅/网络/模型权限、受支持认证（1.0.83 拒绝 classic PAT）、能力矩阵、隔离、停止/恢复、证据与独立验收通过 AT-23；更新后重跑 preflight | T026 已完成、web OAuth 登录成功；真实探针为 10 verified、2 unsupported、0 unknown，工具别名和 shell 网络可绕过 CLI deny，候选不兼容。须更换/升级候选或增加可证明的外部强制边界；T027/AT-23 仍阻断 |
 | VS Code visible 黑箱候选 | 可选降级保证；要求 VS Code 1.82+、可用 Copilot Chat、SessionBridge 0.1.1 | 显式风险确认、`visible`/非 legacy、人工监督/归还、后置全扫与 AT-24；禁止自动 fallback | T028 产品侧已实现（降级保证）、真实 CLI 端到端依赖 T027-B、尚不可运行发布；AT-24 条件闭合，S1 仍因 T027/AT-23 阻断 |
 
-S1 不指定默认安装目录，不发布一键安装脚本，不修改 PATH，不声明自动更新，也不要求管理员权限。state/store 默认位置、正式下载入口与 EOL 通知仍待冻结。
+S1 不指定默认安装目录，不发布一键安装脚本，不修改 PATH，不声明自动更新，也不要求管理员权限。state/store 默认位置与正式下载入口仍待冻结；EOL 通知方式已由 ADR-010 获产品所有者批准（2026-11-16）。
 
 ## 4. 已完成的候选便携包演练
 

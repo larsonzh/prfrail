@@ -2091,6 +2091,28 @@ Completion record (2026-11-15): report pair `docs/validation/r3-real-cli-assessm
 
 Completion record (2026-11-16): report pair `docs/validation/s1-exit-closeout-assessment{,_EN}.md`; Q2=(a) / Q3=A additive / Q7=A waived and deferred to S2 / Q9 included / Q10=(C) two-step; ADR-046 / ADR-047; R = 1, D = 0 (no hash / run recorded, per §11.2).
 
+### P77 — `ADR010-APPROVAL` (EOL notification documentation sync after ADR-010 approval; documentation type) · 🔄 In progress
+
+| Field | Content |
+|---|---|
+| Identifier | `ADR010-APPROVAL` (the EOL notification documentation sync after ADR-010 approval; source = v60 §4 layer-1 queue item) |
+| Status | ✅ Complete (closed 2026-11-17) |
+| Goal | after the product owner approves ADR-010, the controller lands the documentation: flip ADR-010 to `APPROVED` and sync the now-effective EOL notification policy to every related document |
+| Dependency | the user's same-turn approval on 2026-11-16 (the start message is the same-turn authorization); v60 lists P77 as the next item; P76 already recorded the ADR-010 approval as the S-G4 unblock condition |
+| Size | S (documentation `[SLICE]`) |
+| Steps | 0 -> (1) -> (2a) -> (3) -> (4) -> (5) -> (6) -> (7) -> (8a) -> (9) -> (8b) -> (8c) -> (10) |
+| Gap | ADR-010 currently reads `PROPOSED / NOT APPROVED` and the EOL notification policy is not frozen; the `S1_SUPPORT_MATRIX` tail still says the proposal is not approved yet; S-G4 has not passed because ADR-010 was unapproved |
+| Deliverables | (1) `ADR_REGISTER{,_EN}` status flipped to `APPROVED` plus the four approval elements; (2) the `S1_SUPPORT_MATRIX{,_EN}` tail EOL section update; (3) `INSTALLATION_PLAN{,_EN}` EOL item sync (landing spot confirmed by reading); (4) an additive pointer on the `PRODUCT_REQUIREMENTS{,_EN}` §7 EOL item (confirmed by reading); (5) reading-dependent touches: EOL content in `S1_RELEASE_NOTES{,_EN}` / `INSTALLATION{,_EN}` / `OPERATIONS{,_EN}`; (6) the `REMAINING_SLICES{,_EN}` P77 completion record; (7) the report pair `docs/validation/adr010-approval{,_EN}.md` (new); (8) the evidence pack |
+| Acceptance evidence | the three scopes `TOTAL_FAIL=0`; SELFTEST 737/737; CN/EN changed-line symmetry; the report pair's six shapes equal; an existence assertion for the `APPROVED` string in the ADR-010 status cell; zero hits for the "not approved yet" phrase in `S1_SUPPORT_MATRIX` |
+| Boundary | no change to the S1 Exit eight gates (the p57 and s1-exit gate tables stay untouched, as ordered by P76); no change to the EOL notification policy itself; no change to the `S1_SUPPORT_MATRIX` platform list or support tiers; no change to the INSTALLATION install model; no external GitHub Release notes action (that belongs to P78); no change to any other ADR; no change to product code / CONTRACTS / schema / fixtures / CI |
+| Tier | `[SLICE]` |
+| Probe budget | 0 |
+| Freedom-list landing path | `docs/validation/evidence/P77-ADR010-APPROVAL/freedom-list.md` |
+| R/D baseline | R = 0, D = 0 (step-0 registration, §13.1.1; does not inherit P76's R=1 / D=0) |
+| Temp-file location declaration | Slice temp directory = `tmp/P77-ADR010-APPROVAL/` (add-only before ⑧c; no capture file at the `tmp/` root) |
+
+Completion record (2026-11-17): report pair `docs/validation/adr010-approval{,_EN}.md`; ADR-010 flipped to `APPROVED` with `S1_SUPPORT_MATRIX` / `INSTALLATION_PLAN` / `PRODUCT_REQUIREMENTS` / `s1-exit` synced; S-G4 moves from not passed to passed (p57 and s1-exit gate tables untouched); R = 1, D = 0 (no hash / run recorded, per §11.2).
+
 ## Known defects (to be handled before later slices)
 
 > **Blocking rule unchanged**: only high-frequency / reproduced defects block; observation-grade flakes are recorded and listed in the validation report.
