@@ -32,7 +32,9 @@
 ## 3. 异常处理（R 计数 / 临时件 D 计数 / 偏离登记）
 
 - **R = 0**：本片无「失败后修复重跑」，也无主控兜底介入（§9.2 的 R 计数定义）。⑤ 的 4 条 Low 属记录级整改，不构成返工。
-- **临时件 D = 0**：全部过程件落在 `tmp/P81-DIRECTIVE-MODEL-UPGRADE/`，未出现 `tmp/` 根落件、仓库根落件或 `$env:TEMP` 落件（OB-139 不触发；第 5 次计数不变）。
+- **临时件 D = 2**：事件 1（自愈档成立）= 主控在回填阶段把 `gate --all --scope=index` 的捕获件误落 `tmp/` 根（无子目录），发现后自报、取证并逐件删除；零残留证据 = 该路径 `Test-Path` 为 `False`、`git status --porcelain -uall` 的未跟踪项为 0、`tmp/` 顶层恢复为 `.gitkeep` 与 `gates-cache`。
+- **事件 2（非自愈档，按 §5.1 应停下升级）**：同一阶段的第二次门禁捕获件写到了 `%TEMP%`（仓库外位置），且删除动作与创建写在同一命令内、自删先于自报 ⇒ 不满足自愈档的次序强制，且「同命令建删 + 仓库外位置」按 §5.1 属无自愈路径的组合。该项在本报告如实登记并交用户裁定，主控不自行定级或豁免。
+- **OB-139 触发（转待议）**：按用户 2026-11-18 起跑消息的口径，本片为 `[SLICE]` 且出现位置违规 ⇒ 至少字面计为第 6 次，不得引用 P80 的一次性宽免 ⇒ 该条转「待议」并在 ⑩ 停点交用户裁定（含本片两次事件各计与否）。
 - **⑥ 的格式偏离（不计 D）**：r1 未按 §7.2.2 的 Section A–E 契约输出、无指定结论行 ⇒ 按该节的失败处置**重发 1 次**；两轮均计入 §7.2 的 3 次有效调用上限（用 2 次）。r1 原文留痕于证据包 `04-reviews/scan-r1.md`。
 - **③ 的一条断言校准（不计 D）**：其 C-8 把「退役 modelId 出现次数 = 0」写成字面断言，而 §11.1 要求历史行不追溯 ⇒ 该断言按「历史面之外为 0」解读成立（实测历史面之外为 0）。属**断言口径校准**，不是文档缺陷，不改正文。
 - **偏离台账**：无「整改后未重做配套动作」型偏离（⑤ 的 4 条 Low 整改后已重新生成 `impl.diff` / `impl.numstat` 与门禁读数）。
@@ -123,11 +125,12 @@ INDEPENDENT SCAN: PASS
 - `node tools/gates/gate.js --all --scope=ci` ⇒ `changed=2`、`TOTAL_FAIL=0`。
 - 基础门禁：`gofmt` 空输出、`go build ./...` 与 `go vet ./...` 均 exit 0、`go test ./...` 为 15 个包 ok 与 0 个 FAIL。
 - CN / EN 对称：`docs/DELIVERY_DIRECTIVE{,_EN}.md` 的 numstat 两侧均为 +29 / -10；六形状（行数 / 标题行号 / 加粗 / 竖线 / 空行 / 反引号）逐项相等。
+- **CI（提交 `45590e8`，run `44281812336`）**：首跑两腿均 success，未触发 §6.4。两腿均输出 `SELFTEST: PASS 740/740`、`GATE REPORT scope=ci changed=28`、`TOTAL_FAIL=0` 与 `base go test ./... :: ok=15 FAIL=0`；包级 `ok` 行 ubuntu 为 21、windows 为 15，`FAIL` 为 0。
 
 ## 11. ⑧c 收尾清洁记录
 
 - 全类型逐文件编码核验：`docs/**` 的 `.md` 均为 1 个 BOM + 无 CR；新增夹具为无 BOM + LF；`SHA256SUMS.txt` 为无 BOM + LF。
-- 临时件：`tmp/P81-DIRECTIVE-MODEL-UPGRADE/` 内过程件已在 ⑧c 逐件精确清理；`tmp/` 顶层仍为 `.gitkeep` 与 `gates-cache`（运行时缓存例外，§5.1）。
+- 临时件：`tmp/P81-DIRECTIVE-MODEL-UPGRADE/` 内过程件已在 ⑧c 逐件精确清理；回填阶段误落 `tmp/` 根的单件已自愈清除（见 §3），`tmp/` 顶层仍为 `.gitkeep` 与 `gates-cache`（运行时缓存例外，§5.1）。
 - 未跟踪残留：`git status --porcelain -uall` 的未跟踪项 = 0（⑩ 前终态回读的五条读数见 §16）。
 - 证据包自洽：`MANIFEST.md` 的归档条目集、`SHA256SUMS.txt` 的条目集与包内载荷文件集三方相等，逐条 sha256 复算 0 失配。
 

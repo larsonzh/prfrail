@@ -32,7 +32,9 @@ The slice replaces one generation of the stage-6 carrier model and of the stage-
 ## 3. Exception handling (R count / temp-file D count / deviation log)
 
 - **R = 0**: no "fix-and-rerun after failure" and no master fallback intervention (the R definition in section 9.2). The four Low findings of (5) are record-level remediations, not rework.
-- **Temp-file D = 0**: every process artifact lands in `tmp/P81-DIRECTIVE-MODEL-UPGRADE/`; nothing landed at the `tmp/` root, the repo root or `$env:TEMP` (OB-139 not triggered; its fifth-occurrence count is unchanged).
+- **Temp-file D = 2**: event 1 (self-heal grade holds) = during the back-fill stage the master dropped a `gate --all --scope=index` capture at the `tmp/` root (no subdirectory) and, on noticing it, self-reported, captured evidence and removed it item by item; zero-residue evidence = `Test-Path` for that path is `False`, the untracked entries of `git status --porcelain -uall` are zero, and the `tmp/` top level is back to `.gitkeep` plus `gates-cache`.
+- **Event 2 (non-self-heal grade; section 5.1 requires stopping and escalating)**: the second gate capture of the same stage was written to `%TEMP%` (a location outside the repository), and the delete was issued inside the same command as the create, so the self-deletion preceded the self-report; this fails the ordering requirement of the self-heal grade, and the "same-command create-delete plus out-of-repository location" combination has no self-heal path under section 5.1. It is recorded here as-is and handed to the user, and the master neither grades nor waives it.
+- **OB-139 tripped (moved to "to be discussed")**: per the user kickoff of 2026-11-18, this slice is `[SLICE]` and location violations occurred, so the literal count is at least the sixth; the one-off P80 waiver may not be cited, so the entry moves to "to be discussed" and is handed to the user at the (10) stop point (including whether each of this slice's two events counts).
 - **(6) format deviation (not counted as D)**: r1 did not follow the section 7.2.2 Section A-E contract and carried no prescribed verdict line, so it was **re-sent once** per that section; both rounds count against the section 7.2 cap of three effective calls (two used). The r1 text is kept in `04-reviews/scan-r1.md`.
 - **One assertion calibration in (3) (not counted as D)**: its C-8 stated "retired modelId occurrences = 0" literally, while section 11.1 requires historical rows to stay untouched, so the assertion holds under the "zero outside the historical faces" reading (measured zero outside those faces). This is an **assertion-caliber calibration**, not a document defect; the body is not changed.
 - **Deviation ledger**: no "did not redo the accompanying action after remediation" deviation (after the four Low remediations the `impl.diff`, `impl.numstat` and gate readings were regenerated).
@@ -123,11 +125,12 @@ This report cites no `A-NN` identifier (the slice has no anomaly-ruling entries)
 - `node tools/gates/gate.js --all --scope=ci` gives `changed=2` and `TOTAL_FAIL=0`.
 - Base gates: `gofmt` prints nothing, `go build ./...` and `go vet ./...` both exit 0, and `go test ./...` reports 15 ok packages and zero FAIL.
 - CN / EN symmetry: both sides of `docs/DELIVERY_DIRECTIVE{,_EN}.md` show +29 / -10 in the numstat, and the six shapes (lines / heading positions / bold / bars / blank lines / backticks) are equal item by item.
+- **CI (commit `45590e8`, run `44281812336`)**: the first attempt is green on both legs, so section 6.4 is not triggered. Both legs print `SELFTEST: PASS 740/740`, `GATE REPORT scope=ci changed=28`, `TOTAL_FAIL=0` and `base go test ./... :: ok=15 FAIL=0`; the package-level `ok` lines are 21 on ubuntu and 15 on windows, with zero `FAIL`.
 
 ## 11. (8c) wrap-up cleanup record
 
 - Per-file encoding check of all types: every `.md` under `docs/**` has exactly one BOM and no CR; the new fixtures are BOM-less with LF; `SHA256SUMS.txt` is BOM-less with LF.
-- Temp files: the process artifacts inside `tmp/P81-DIRECTIVE-MODEL-UPGRADE/` were removed item by item at (8c); the `tmp/` top level still holds only `.gitkeep` and `gates-cache` (the runtime-cache exception of section 5.1).
+- Temp files: the process artifacts inside `tmp/P81-DIRECTIVE-MODEL-UPGRADE/` were removed item by item at (8c); the single item dropped at the `tmp/` root during the back-fill stage was cleared by self-heal (see section 3), and the `tmp/` top level still holds only `.gitkeep` and `gates-cache` (the runtime-cache exception of section 5.1).
 - Untracked residue: the untracked entries of `git status --porcelain -uall` are zero (the five final readings before (10) are in section 16).
 - Evidence-pack self-consistency: the entry set of `MANIFEST.md`, the entry set of `SHA256SUMS.txt` and the payload file set of the pack are equal, and re-computing every sha256 yields zero mismatches.
 
