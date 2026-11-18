@@ -13,7 +13,6 @@ Generated: 2026-11-18. HEAD = `58c2794`; directive = v1.69; two CI runs: the P80
 - (4) §4 queue update: P80 leaves the queue; next = the model-upgrade slice (directive governance, bumping to v1.70); then P79; then the post-S2 re-evaluations (S-G5 step two / S-G1 / S-G8 / S-G7).
 - (5) §5 keeps the fourteen observation items; OB-139 records the P80 waiver ruling (not a precedent); the three slice-level suggestions stay.
 - (6) §6 is cleared; the next ruling item is expected to be the model-upgrade implementation details and the S2 schedule.
-- (6) §6 records the next adjudication as P80's S-G5 wording ruling.
 
 ---
 
@@ -30,11 +29,11 @@ Generated: 2026-11-18. HEAD = `58c2794`; directive = v1.69; two CI runs: the P80
 | Three scopes | **all TOTAL_FAIL=0** | `gate.js --all --scope=index` / `tree` / `ci` |
 | v61 total lines | **214** (LF count, CN / EN symmetric) | `docs/t027/CHECKLIST_v61{,_EN}.md` by LF |
 | v62 total lines | **217** (LF count, CN / EN symmetric) | `docs/t027/CHECKLIST_v62{,_EN}.md` by LF |
-| v63 total lines | **223** (LF count, CN / EN symmetric; re-checked by v64) | `docs/t027/CHECKLIST_v63{,_EN}.md` by LF |
+| v63 total lines | **222** (LF count, CN / EN symmetric; re-checked by v64) | `docs/t027/CHECKLIST_v63{,_EN}.md` by LF |
 
 > This snapshot's HEAD = `58c2794` is the checkpoint after the P80 backfill commit; once v63 lands, HEAD advances, so use `git rev-parse --short HEAD` as the live value.
 
-> Rolling window = the most recent 3 versions (v61 / v62 / v63); v60 has dropped out (the same rule that dropped v52); this snapshot's own line count is 223 (LF count), re-checked by v64. If two or more items disagree, trust the repository and report the terminal reading before continuing.
+> Rolling window = the most recent 3 versions (v61 / v62 / v63); v60 has dropped out (the same rule that dropped v52); this snapshot's own line count is 222 (LF count), re-checked by v64. If two or more items disagree, trust the repository and report the terminal reading before continuing.
 
 `tmp` fixed assertion: top level = `.gitkeep` + `gates-cache`; `gates-cache` holds only `g4b`; `tmp/P80-SG6-GATELEVEL-CONSOLIDATE/` was cleared in P80 ⑧c.
 
