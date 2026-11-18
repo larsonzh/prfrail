@@ -14,7 +14,9 @@ The slice replaces one generation of the stage-6 carrier model and of the stage-
 - **Ledger**: `docs/t027/REMAINING_SLICES{,_EN}.md` each gain the P81 section (+22 / -0), including the honest note that the number order and the start order are inverted.
 - **Evidence pack**: `docs/validation/evidence/P81-DIRECTIVE-MODEL-UPGRADE/` (kickoff message, design document, batch list, review transcripts, freedom list, input list, manifest and hashes).
 
-**Not changed** (line by line against the user boundary): the G5-b wording and comparison rules, the section 2.4 blacklist body, the section 7.5 tier numbers and the Sol unit prices, the section 8.2 effort table proper, the p57 and `s1-exit` gate tables, the v63 snapshot, CONTRACTS / schema / fixtures / product code / CI / `go.mod`, `.github/agents/**`; no new ADR / OB; no Astra expansion.
+**Not changed** (line by line against the user boundary): the G5-b wording and comparison rules, the section 2.4 blacklist body, the section 7.5 tier numbers and the Sol unit prices, the section 8.2 effort table proper, the p57 and `s1-exit` gate tables, CONTRACTS / schema / fixtures / product code / CI / `go.mod`, `.github/agents/**`; no new ADR / OB; no Astra expansion.
+
+**Post-(10) back-fill (2026-11-19, driven by a user ruling)**: (1) two extra probes (new stage 6 / new stage 7) with payloads under `03-probes/`; (2) sections 3 / 4 / 12 correct the probe-target deviation and carry **R = 1**; (3) section 5 of `docs/t027/CHECKLIST_v63{,_EN}.md` changes only the OB-139 line and its two counts (under observation 14 -> 13, to be discussed 9 -> 10), nothing else; (4) the disposition cell of OB-139 in directive section 12.4 is flipped with a trace in the v1.70 change log of section 0.3 (no new criterion, no rule-semantics change); (5) the ledger gains a P82 registration section.
 
 ## 2. Execution pipeline
 
@@ -31,10 +33,11 @@ The slice replaces one generation of the stage-6 carrier model and of the stage-
 
 ## 3. Exception handling (R count / temp-file D count / deviation log)
 
-- **R = 0**: no "fix-and-rerun after failure" and no master fallback intervention (the R definition in section 9.2). The four Low findings of (5) are record-level remediations, not rework.
+- **R = 1 (corrected on 2026-11-19; it was registered as 0)**: after the (10) receipt the user review found a **probe-target deviation** - the kickoff intended probes of the qualified-name availability of the two new models (new stage 6 `MAI Code 2 Flash (copilot)` / new stage 7 `GPT-6.2 Sol (copilot)`), while the first batch of three probes actually went to three **already-enrolled** models (`DeepSeek V4 Pro (deepseek)` / `MAI-Code-1.1-Flash (copilot)` / `GPT-5.3-Codex (copilot)`), leaving both new models unmeasured and undisclosed in the (10) receipt. The deviation is corrective rework after discovery (two extra dispatches plus this section and section 4 being rewritten), so it counts as **R = 1** under section 9.2, recorded as-is and not counted as D. The four Low findings of (5) remain record-level remediations, not rework.
+- **Probe-target deviation (corrected)**: the same turn on 2026-11-19 authorised two extra probes (counted separately under section 7.6), targeting the new stage 6 and stage 7, and **both returned `PROBE-OK`**; the call string, dispatch text, reply text and verdict are in `03-probes/probe-new-mai-code-2-flash.md` and `03-probes/probe-new-gpt-6.2-sol.md`. The stage-7 model self-reported that it cannot verify its own backing model or vendor, which is recorded as-is - the probe criterion is the **dispatch availability** of the qualified name, not the model's self-description, so no escalation follows. The process files of the first three probes were not archived as payloads (removed at (8c)); their targets and verdicts follow the correction in section 4.
 - **Temp-file D = 2**: event 1 (self-heal grade holds) = during the back-fill stage the master dropped a `gate --all --scope=index` capture at the `tmp/` root (no subdirectory) and, on noticing it, self-reported, captured evidence and removed it item by item; zero-residue evidence = `Test-Path` for that path is `False`, the untracked entries of `git status --porcelain -uall` are zero, and the `tmp/` top level is back to `.gitkeep` plus `gates-cache`.
 - **Event 2 (non-self-heal grade; section 5.1 requires stopping and escalating)**: the second gate capture of the same stage was written to `%TEMP%` (a location outside the repository), and the delete was issued inside the same command as the create, so the self-deletion preceded the self-report; this fails the ordering requirement of the self-heal grade, and the "same-command create-delete plus out-of-repository location" combination has no self-heal path under section 5.1. It is recorded here as-is and handed to the user, and the master neither grades nor waives it.
-- **OB-139 tripped (moved to "to be discussed")**: per the user kickoff of 2026-11-18, this slice is `[SLICE]` and location violations occurred, so the literal count is at least the sixth; the one-off P80 waiver may not be cited, so the entry moves to "to be discussed" and is handed to the user at the (10) stop point (including whether each of this slice's two events counts).
+- **OB-139 ruled (2026-11-19)**: the user accepted both events of this slice as **D = 2** and confirmed that OB-139 **tripped for the sixth time** - status flips from "under observation" to "to be discussed" (under observation 14 -> 13, to be discussed 9 -> 10) and slice **P82** is registered (directive-governance slice, bumps to v1.71, schedule pending, start requires the user to name it); the ruling grants no waiver and may not be cited as a precedent, and the master did not cite the one-off P80 waiver ("the P80 waiver is not a precedent" was honoured).
 - **(6) format deviation (not counted as D)**: r1 did not follow the section 7.2.2 Section A-E contract and carried no prescribed verdict line, so it was **re-sent once** per that section; both rounds count against the section 7.2 cap of three effective calls (two used). The r1 text is kept in `04-reviews/scan-r1.md`.
 - **One assertion calibration in (3) (not counted as D)**: its C-8 stated "retired modelId occurrences = 0" literally, while section 11.1 requires historical rows to stay untouched, so the assertion holds under the "zero outside the historical faces" reading (measured zero outside those faces). This is an **assertion-caliber calibration**, not a document defect; the body is not changed.
 - **Deviation ledger**: no "did not redo the accompanying action after remediation" deviation (after the four Low remediations the `impl.diff`, `impl.numstat` and gate readings were regenerated).
@@ -43,7 +46,7 @@ The slice replaces one generation of the stage-6 carrier model and of the stage-
 
 - Platform: Windows, local machine; master model `DeepSeek V4.1 Flash (deepseek)`, effort High (the "medium" row of section 8.2).
 - (7) effort: `GPT-5.3-Codex (copilot)` runs Extra High (its mapping is a fixed Extra High, section 8.2); no mid-slice upgrade.
-- Probes: three minimal availability calls (new stage 6 / new stage 7 / legacy stage 6), all `PROBE-OK`; the bookkeeping is in `probe-1.md` to `probe-3.md` on the `tmp` side.
+- Probes (**target deviation corrected on 2026-11-19**): the first three minimal availability calls actually targeted the enrolled models `DeepSeek V4 Pro (deepseek)` / `MAI-Code-1.1-Flash (copilot)` / `GPT-5.3-Codex (copilot)` (the earlier record of "new stage 6 / new stage 7 / legacy stage 6" did not match reality and is corrected here); the user ruling of 2026-11-19 added two probes targeting the new stage 6 `MAI Code 2 Flash (copilot)` and the new stage 7 `GPT-6.2 Sol (copilot)`, and **both returned `PROBE-OK`**. Five probes in total (the original section 7.6 authorisation of 3 plus 2 added in the same turn). Bookkeeping: `03-probes/probe-new-mai-code-2-flash.md`, `03-probes/probe-new-gpt-6.2-sol.md`; the process files of the first three were not archived as payloads (removed at (8c)).
 
 ## 5. Review verdict summary ((5) / (6) / (7))
 
@@ -125,6 +128,7 @@ This report cites no `A-NN` identifier (the slice has no anomaly-ruling entries)
 - `node tools/gates/gate.js --all --scope=ci` gives `changed=2` and `TOTAL_FAIL=0`.
 - Base gates: `gofmt` prints nothing, `go build ./...` and `go vet ./...` both exit 0, and `go test ./...` reports 15 ok packages and zero FAIL.
 - CN / EN symmetry: both sides of `docs/DELIVERY_DIRECTIVE{,_EN}.md` show +29 / -10 in the numstat, and the six shapes (lines / heading positions / bold / bars / blank lines / backticks) are equal item by item.
+- Post-(10) back-fill re-run (2026-11-19): `--selftest`, `--scope=index`, `--scope=tree` and `--scope=ci` all report `TOTAL_FAIL=0`; this back-fill touches no `.go` file and no criterion.
 - **CI (commit `45590e8`, run `44281812336`)**: the first attempt is green on both legs, so section 6.4 is not triggered. Both legs print `SELFTEST: PASS 740/740`, `GATE REPORT scope=ci changed=28`, `TOTAL_FAIL=0` and `base go test ./... :: ok=15 FAIL=0`; the package-level `ok` lines are 21 on ubuntu and 15 on windows, with zero `FAIL`.
 
 ## 11. (8c) wrap-up cleanup record
@@ -145,7 +149,8 @@ This report cites no `A-NN` identifier (the slice has no anomaly-ruling entries)
 | (5) Pre-review | `DeepSeek V4 Pro (deepseek)` | 1 | budget 1 + 1, only the first round used (zero Medium+) |
 | (6) Independent scan | `MAI-Code-1.1-Flash (copilot)` | 2 | budget 3; r1 format deviation, r2 compliant |
 | (7) Final review | `GPT-5.3-Codex (copilot)` | 1 | governance budget 1 + 3, only the final review used |
-| Probes | one per each of three models | 3 | section 7.6 cap 3, fully used |
+| Probes (first batch) | one per each of three enrolled models | 3 | the original section 7.6 cap of 3, fully used; target deviation in section 4 |
+| Probes (extra, user ruling 2026-11-19) | one per each of the new stage 6 / stage 7 | 2 | added in the same turn (counted separately under section 7.6); both `PROBE-OK` |
 
 **Metering source of truth** (R7.1): each row is taken from the session call receipts (the `agentName` and `model` arguments of `runSubagent`), never from dictated counts. Blind reviews are zero (not sampled) and are listed separately from the final review.
 
@@ -172,6 +177,8 @@ The slice cites one clause marked "must not be used as a precedent": the P80 (7)
 ```artifacts
 docs/DELIVERY_DIRECTIVE.md	repo
 docs/DELIVERY_DIRECTIVE_EN.md	repo
+docs/t027/CHECKLIST_v63.md	repo
+docs/t027/CHECKLIST_v63_EN.md	repo
 docs/t027/REMAINING_SLICES.md	repo
 docs/t027/REMAINING_SLICES_EN.md	repo
 docs/validation/directive-model-upgrade.md	repo
@@ -179,6 +186,8 @@ docs/validation/directive-model-upgrade_EN.md	repo
 docs/validation/evidence/P81-DIRECTIVE-MODEL-UPGRADE/00-briefing.md	repo
 docs/validation/evidence/P81-DIRECTIVE-MODEL-UPGRADE/01-arch/design-r1.md	repo
 docs/validation/evidence/P81-DIRECTIVE-MODEL-UPGRADE/02-batch/batch-01-inventory.md	repo
+docs/validation/evidence/P81-DIRECTIVE-MODEL-UPGRADE/03-probes/probe-new-gpt-6.2-sol.md	repo
+docs/validation/evidence/P81-DIRECTIVE-MODEL-UPGRADE/03-probes/probe-new-mai-code-2-flash.md	repo
 docs/validation/evidence/P81-DIRECTIVE-MODEL-UPGRADE/04-reviews/blind-note.md	repo
 docs/validation/evidence/P81-DIRECTIVE-MODEL-UPGRADE/04-reviews/final-r1.md	repo
 docs/validation/evidence/P81-DIRECTIVE-MODEL-UPGRADE/04-reviews/prereview-r1.md	repo

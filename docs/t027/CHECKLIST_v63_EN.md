@@ -57,7 +57,7 @@ Generated: 2026-11-18. HEAD = `58c2794`; directive = v1.69; two CI runs: the P80
 - **Three user rulings (2026-11-18; made directly by the user, not usable as a precedent)**:
   1. **§7.8.3 trace landing spot**: the trace currently living in report §14.3 of `sg6-gatelevel-consolidate{,_EN}.md` is ratified; no v1.70 slice and no ADR are created; the formal entry in `DELIVERY_DIRECTIVE` **§12.4 / appendix C** is folded into the **next directive-revision slice**; this snapshot records the landing-spot difference.
   2. **D reading**: **D = 1 is kept (self-imposed reading)**, covering the two items above (the orchestration-sequence error plus the self-healed `tmp/` root misplacement).
-  3. **OB-139**: the `tmp/` root misplacement is ratified as **self-healed and not counted as the sixth occurrence** (moved immediately, zero terminal residue, self-reported by the controller, no real contamination); **the waiver is not a precedent and the literal criterion is unchanged**; OB-139 stays under observation and **the count remains at five**.
+  3. **OB-139**: the `tmp/` root misplacement is ratified as **self-healed and not counted as the sixth occurrence** (moved immediately, zero terminal residue, self-reported by the controller, no real contamination); **the waiver is not a precedent and the literal criterion is unchanged**; OB-139 stays under observation and **the count remains at five**; **(later on 2026-11-19 OB-139 moved to pending discussion with slice P82 registered, see section 5)**.
 
 ### Appendix A: "obligation transfer" (historical trace; no new transfer in v63)
 
@@ -180,11 +180,11 @@ Generated: 2026-11-18. HEAD = `58c2794`; directive = v1.69; two CI runs: the P80
 
 ## §5 Observation items
 
-- Under observation (**14**): `OB-1 / 7 / 10 / 33 / 87 / 99 / 100 / 104 / 105 / 107 / 111 / 113 / 135 / 139` (carried from v61).
-  - **OB-139** (temp files placed at the `tmp/` root; P70 / P71 four times plus P75 once = the fifth occurrence already happened; the user ruled on 2026-11-16 to **keep it under observation**; **a sixth occurrence turns it into a pending decision plus a new slice**): the S-G2 correction [ROUTINE] D=1 was ruled by the user as not counting toward the sixth; **the P77 / P78 main slices have D = 0, so the sixth was not triggered**; **the P80 backfill-script `tmp/` root misplacement was ratified by the user on 2026-11-18 as self-healed and not counted as the sixth (the waiver is not a precedent and the literal criterion is unchanged)**; OB-139 stays under observation and **the count remains at five**.
+- Under observation (**13**): `OB-1 / 7 / 10 / 33 / 87 / 99 / 100 / 104 / 105 / 107 / 111 / 113 / 135` (carried from v61; OB-139 moved to pending discussion on 2026-11-19).
+  - **OB-139 moved to pending discussion (user ruling 2026-11-19)**: both temp-file events of P81 are accepted as D = 2, and the "out-of-repository location (`%TEMP%`) plus same-command create-delete" combination has no self-heal channel under section 5.1, so the **sixth trigger is confirmed**; the entry moves from "under observation" to "pending discussion" and slice **P82** is registered (`TMP-DISCIPLINE-OUT-OF-REPO`, directive-governance slice, bumps to v1.71, schedule pending, start requires the user to name it). The ruling grants no waiver and may not be cited as a precedent.
   - **The reinforced D=2 recurrence-prevention sentence (standard kick-off content since v59, carried into v61)**: "the executing roles (`prfrail-implementer` / `prfrail-tester` / `prfrail-documenter`) **and the controller** must always work under a `tmp/` slice directory (`tmp/<slice-id>/`); **the same holds for CI observation captures, which must never land at the `tmp/` root**; three D occurrences inside one slice force the slice to stop."
-- Pending discussion (9): `OB-19 / 21 / 52 / 53 / 57 / 58 / 59 / 61 / 75`.
-- To do (1): `OB-69`. Non-terminal total **24** (14 plus 9 plus 1).
+- Pending discussion (10): `OB-19 / 21 / 52 / 53 / 57 / 58 / 59 / 61 / 75 / 139`.
+- To do (1): `OB-69`. Non-terminal total **24** (13 plus 10 plus 1).
 - **Slice-level suggestions (three, not registered as OBs)**:
   1. **`R-ACCUMULATION-MECHANISM` (carried from v58)**: P74 was the first case to trigger the §9.2 rule (R>=2 means high risk) together with the §7.5 high-risk tier (one plus three); later implementation slices should pre-place the dynamic budget sentence in their kick-off message; P75 / P76 / P77 recorded R = 1, below the threshold, so it did not trigger. **No OB is registered now**; a recurrence in a later slice turns it into a formal OB.
   2. **`--progress` covers state transitions only, not log output (carried from v58)**: if long-running observability becomes a real need (the S1 Exit closeout slices are the most likely trigger), evaluate adding `--progress verbose` or `--tail-logs`.

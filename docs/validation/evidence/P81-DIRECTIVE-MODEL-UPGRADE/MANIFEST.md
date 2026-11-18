@@ -13,6 +13,8 @@
 | `00-briefing.md` | 用户 2026-11-18 起跑消息逐字原文（§13.1.10；授权可回溯性依据） |
 | `01-arch/design-r1.md` | ① 阶段方案书原文（Q1 至 Q7） |
 | `02-batch/batch-01-inventory.md` | 批量辅助落点清单（现役落点 / 历史行 / 冻结件三层归属） |
+| `03-probes/probe-new-gpt-6.2-sol.md` | 补探针 2（新 ⑦ `GPT-6.2 Sol (copilot)`）：调用串 / 派单原文 / 回传原文 / 结论（2026-11-19 用户裁定追加，§7.6 另计 2 次） |
+| `03-probes/probe-new-mai-code-2-flash.md` | 补探针 1（新 ⑥ `MAI Code 2 Flash (copilot)`）：调用串 / 派单原文 / 回传原文 / 结论（2026-11-19 用户裁定追加，§7.6 另计 2 次） |
 | `04-reviews/blind-note.md` | ⑦ 盲审不抽的判定记录（§7.7） |
 | `04-reviews/final-r1.md` | ⑦ 终审 r1 输出原文 |
 | `04-reviews/prereview-r1.md` | ⑤ 预审 r1 输出原文 |
@@ -28,6 +30,7 @@
 ## 后续追加计划
 
 - 按 ⑤ / ⑥ / ⑦ / ⑨ 各轮追加；⑧c 只重算 `SHA256SUMS.txt` 并核验五条读数。
+- 2026-11-19 追加 `03-probes/` 两件补探针载荷（探针对象偏差的纠正性返工，见报告 §3 / §4），并同步本表与 `SHA256SUMS.txt`。
 - 新增载荷必须同轮补本表条目并重算 `SHA256SUMS.txt`（§13.1.12）。
 
 ## 编码

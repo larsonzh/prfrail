@@ -1,6 +1,8 @@
 15379b7809e5ada9d1084fcc2afae5c3f5c8f5a2bfb002afb69ec991a4143557  00-briefing.md
 a18178a7c791d1f1090e59fc71ff3fe166de27e7d58d8f9e75a2b545b1de3126  01-arch/design-r1.md
 e5cb75aa82d27d0120778478750a3c464cd01cf504657c8e93475a010dfbf29a  02-batch/batch-01-inventory.md
+64f6e42906f8c0b5506dbb8d810087c10d983aedd882d4a55fbdba013c01b550  03-probes/probe-new-gpt-6.2-sol.md
+99e4a0a6d995bfa0eff0ac4c830f56873bffeb2fffe7371f746c0299ce6ffc85  03-probes/probe-new-mai-code-2-flash.md
 a010caf1b6c516f69cea33bc9b12218e9d150edd3768d5581ab5f3054c808f92  04-reviews/blind-note.md
 8448cf185e6292f2d712adcfec2eca8d05221643429a5fb3dad22fc1303afb7b  04-reviews/final-r1.md
 73945b91d8a244df5b8a6eb1609b10262306a9e28949c4fbc0e6787983afdcf9  04-reviews/prereview-r1.md
