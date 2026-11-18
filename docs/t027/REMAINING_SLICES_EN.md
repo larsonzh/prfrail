@@ -2159,6 +2159,30 @@ Completion record (2026-11-17): report pair `docs/validation/release-zip-binding
 
 Completion record (2026-11-18): report pair `docs/validation/sg6-gatelevel-consolidate{,_EN}.md`; the S-G6 gate-level side holding, the T018 task-level side-by-side wording and the S1 Exit next-step list are all on disk; the p57 and `s1-exit` gate tables are untouched; R = 2, D = 1 (D under the self-imposed reading, for user ratification; no hash / run recorded, per §11.2).
 
+### P81 — `DIRECTIVE-MODEL-UPGRADE` (direct replacement of the stage-6 carrier and the stage-7 deep-tier model + landing the P80 ruling (1) trace; governance slice) · ✅ Complete
+
+| Field | Content |
+|---|---|
+| Identifier | `DIRECTIVE-MODEL-UPGRADE` (replace the section 2.2 stage-6 carrier model `MAI-Code-1.1-Flash (copilot)` with `MAI Code 2 Flash (copilot)` and the stage-7 deep tier `GPT-6.1 Sol (copilot)` with `GPT-6.2 Sol (copilot)` directly, synchronise section 5.2 / the G5-b closed set in section 6.3 / the section 7.5 cost table / the section 8.2 effort mapping and the `tools/gates/**` criterion code, and land the section 7.8.3 trace obligation of P80 ruling (1); source = the v63 section 4 layer-1 queue item marked as the next slice) |
+| Status | ✅ Complete (closed 2026-11-18) |
+| Goal | replace the stage-6 and stage-7 deep-tier carrier models **directly** per the user ruling of 2026-11-18 (no Astra expansion); make the three-way closed set (the modelId column in section 2.2 / the G5-b closed set in section 6.3 / `CLOSED_SET` in `g5b.js`) identical word for word; raise the directive to v1.70 and land the authorisation-exception trace of P80 ruling (1) |
+| Dependency | the user ruling in the same turn on 2026-11-18 (replacement plan, effort semantics (a), the operator-UI read that Sol pricing is unchanged); P80 already closed (its ruling (1) landing obligation is taken over by this slice); the legacy stage-6 model is still dispatchable (all three probes passed) |
+| Size | M (governance slice; touches sections 2.2 / 5.2 / 6.3 / 7.5 / 8.2, `tools/gates/**`, section 12.4 and appendix C) |
+| Steps | 0 -> (1) -> (2) -> (3) consistency -> (4) gates -> (5) pre-review -> (6) independent scan (mandatory) -> (7) final review -> (8a) -> (9) -> (8b) -> (8c) -> (10) |
+| Gap | the qualified names / modelIds of the stage-6 carrier and the stage-7 deep tier still point at the previous generation although the user has ruled the upgrade; the authorisation text and narrowed-input declaration of P80 ruling (1) are not yet in the directive (they live only in that report section 14.3) |
+| Deliverables | (1) the directive pair `docs/DELIVERY_DIRECTIVE{,_EN}.md` (sections 2.2 / 5.2 / 6.3 / 7.5 / 8.2 / 12.4 / appendix B.6 / appendix C, raised to v1.70); (2) `tools/gates/lib/criteria/g5b.js` plus `tools/gates/selftest.js` and its fixtures; (3) the report pair `docs/validation/directive-model-upgrade{,_EN}.md`; (4) the P81 ledger registration and completion record; (5) the evidence pack `docs/validation/evidence/P81-DIRECTIVE-MODEL-UPGRADE/` |
+| Acceptance evidence | the three scopes `TOTAL_FAIL=0`; the SELFTEST count equals the value the design document predicts; the three-way closed set is identical word for word (the member count is 8); the CN/EN changed-line counts are symmetric and the directive pair has all six shapes equal; G1-b version metadata agrees; the authorisation text and the narrowed-input declaration of P80 ruling (1) are retrievable word for word inside the directive |
+| Boundary | no change to the G5-b wording or comparison semantics proper; no change to the p57 / `s1-exit` gate tables or the v63 snapshot; no change to CONTRACTS / schema / fixtures / product code / CI / `go.mod`; no change to the section 7.5 tier numbers or the section 8.2 effort table proper; no new ADR / OB unless the user rules otherwise; no Astra expansion; no gitee action |
+| Tier | `[SLICE]` |
+| Probe budget | 3 (minimal availability calls, section 7.6 pre-authorisation: new stage 6 / new stage 7 / legacy stage 6) |
+| Freedom-list landing path | `docs/validation/evidence/P81-DIRECTIVE-MODEL-UPGRADE/freedom-list.md` |
+| R/D baseline | R = 0, D = 0 (step-0 registration, section 13.1.1; does not inherit P80 R=2 / D=1) |
+| Temp-file location declaration | Slice temp directory = `tmp/P81-DIRECTIVE-MODEL-UPGRADE/` (add-only before (8c); CI captures also land there, never at the `tmp/` root) |
+| Budget-rule disclosure | the (7) budget follows the governance-slice row of section 7.5 = 1 final review + 3 re-reviews (when several rows match, take the one with the most re-reviews; the second re-review uses narrowed input and the third only checks the closure path of the previous Medium+ set); no blind review (none of the three mandatory semantics is touched and this is the first slice of the proportional spot-check window); the v63 section 4 queue item says "M 1+2", which is a citation slip (it misses the governance-slice row), so the section 7.5 tier rule yields 1+3 and the v64 snapshot corrects it |
+| Numbering note | the number P81 follows registration order while the start order precedes P79 (that number was pre-allocated in v62), so number order and start order are inverted; recorded as-is |
+
+Completion record (2026-11-18): report pair `docs/validation/directive-model-upgrade{,_EN}.md`; the stage-6 and stage-7 deep-tier models are replaced and the three-way closed set (the section 2.2 modelId column / the section 6.3 G5-b closed set / `CLOSED_SET` in `g5b.js`) agrees word for word; the authorisation-exception trace of P80 ruling (1) is landed as a reference block at the end of section 12.4; SELFTEST rises from 737 to 740; R = 0, D = 0 (no hash / run recorded, per section 11.2).
+
 ## Known defects (to be handled before later slices)
 
 > **Blocking rule unchanged**: only high-frequency / reproduced defects block; observation-grade flakes are recorded and listed in the validation report.

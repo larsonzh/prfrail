@@ -1,0 +1,6 @@
+---
+name: fixture-g5b-illegal-retired-mai
+description: G5-b probe fixture - the retired stage-6 identifier must be rejected
+model: mai-code-1.1-flash
+---
+Probe body. This file is test data, not a real agent role file.

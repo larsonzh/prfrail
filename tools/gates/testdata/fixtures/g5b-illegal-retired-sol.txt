@@ -1,0 +1,6 @@
+---
+name: fixture-g5b-illegal-retired-sol
+description: G5-b probe fixture - the retired deep-tier identifier must be rejected
+model: gpt-6.1-sol
+---
+Probe body. This file is test data, not a real agent role file.

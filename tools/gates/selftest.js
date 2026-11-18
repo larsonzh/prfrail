@@ -106,6 +106,11 @@ const FIXTURES = {
   'g5b-illegal-inline-comment': { disk: 'g5b-illegal-inline-comment.txt', virtual: '.github/agents/fixture-g5b-illegal-inline-comment.agent.md' },
   'g5b-closed-set-legal-sol': { disk: 'g5b-closed-set-legal-sol.txt', virtual: '.github/agents/fixture-g5b-closed-set-legal-sol.agent.md' },
   'g5b-closed-set-legal-luna': { disk: 'g5b-closed-set-legal-luna.txt', virtual: '.github/agents/fixture-g5b-closed-set-legal-luna.agent.md' },
+  // P81 DIRECTIVE-MODEL-UPGRADE: the renamed members are load-bearing, and the two
+  // retired identifiers must not sneak back into the closed set.
+  'g5b-closed-set-legal-mai': { disk: 'g5b-closed-set-legal-mai.txt', virtual: '.github/agents/fixture-g5b-closed-set-legal-mai.agent.md' },
+  'g5b-illegal-retired-sol': { disk: 'g5b-illegal-retired-sol.txt', virtual: '.github/agents/fixture-g5b-illegal-retired-sol.agent.md' },
+  'g5b-illegal-retired-mai': { disk: 'g5b-illegal-retired-mai.txt', virtual: '.github/agents/fixture-g5b-illegal-retired-mai.agent.md' },
   // GLM members (slice DIRECTIVE-GLM-LANDING, v1.26). Two positive fixtures pin the two new
   // closed-set members; two negative fixtures pin case sensitivity and the R2.2 boundary (a
   // qualified call string is not the `modelId`), matching the existing g5b-* shape.
@@ -4212,6 +4217,30 @@ async function runTests() {
       'T42 restore: g5b.js is byte-identical and the cached module still accepts gpt-6-luna',
       drop.identical === true && g5bProbe('g5b-closed-set-legal-luna').verdict === 'PASS',
       'identical=' + drop.identical + ' cached=' + g5bProbe('g5b-closed-set-legal-luna').verdict
+    );
+
+    // P81 DIRECTIVE-MODEL-UPGRADE: the stage-6 carrier and the stage-7 deep-tier model
+    // were swapped wholesale, so both new members must be accepted and both retired
+    // identifiers must be rejected by the same criterion body.
+    const mai = g5bProbe('g5b-closed-set-legal-mai');
+    check(
+      'T131a G5-b accepts the stage-6 member after the P81 rename (mai-code-2-flash)',
+      mai.verdict === 'PASS' && mai.findings === 0,
+      JSON.stringify({ verdict: mai.verdict, findings: mai.findings, detail: mai.detail })
+    );
+
+    const retiredSol = g5bProbe('g5b-illegal-retired-sol');
+    check(
+      'T131b the retired deep-tier identifier is rejected (gpt-6.1-sol is outside the closed set)',
+      retiredSol.verdict === 'FAIL' && retiredSol.findings === 1 && retiredSol.detail.includes('model=gpt-6.1-sol'),
+      'verdict=' + retiredSol.verdict + ' findings=' + retiredSol.findings + ' :: ' + retiredSol.detail
+    );
+
+    const retiredMai = g5bProbe('g5b-illegal-retired-mai');
+    check(
+      'T131c the retired stage-6 identifier is rejected (mai-code-1.1-flash is outside the closed set)',
+      retiredMai.verdict === 'FAIL' && retiredMai.findings === 1 && retiredMai.detail.includes('model=mai-code-1.1-flash'),
+      'verdict=' + retiredMai.verdict + ' findings=' + retiredMai.findings + ' :: ' + retiredMai.detail
     );
   }
 

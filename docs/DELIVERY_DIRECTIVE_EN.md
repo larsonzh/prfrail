@@ -1,6 +1,6 @@
 ﻿# ProofRail Delivery Execution Directive (DELIVERY_DIRECTIVE)
 
-Version: v1.69. Date: 2026-11-15. Status: **CN body frozen** ( `_EN` mirror in `docs/DELIVERY_DIRECTIVE_EN.md`).
+Version: v1.70. Date: 2026-11-18. Status: **CN body frozen** ( `_EN` mirror in `docs/DELIVERY_DIRECTIVE_EN.md`).
 
 > **Multilingual note**: this file is a strict positional mirror of the CN body, maintained in step with it (updated after CN is frozen, to avoid bilingual rework during review); `docs/DELIVERY_DIRECTIVE.md` is authoritative and wins on any conflict (see §11.1). **Language tag**: `lang:en` (the G6-6 word-table selection key, see §6.3).
 > **Encoding**: this document and its `_EN` mirror must stay UTF-8 **with BOM** + **LF**.
@@ -114,6 +114,7 @@ Version: v1.69. Date: 2026-11-15. Status: **CN body frozen** ( `_EN` mirror in `
 | v1.67 | 2026-11-12 | **Slice `P67 GATES-DEBT-CLEANUP` landed (one-off debt cleanup on the layer-2 governance side; tier L)**: (1) the `tools/gates/lib/criteria/g4b.js` criterion body gains LRU eviction plus an entry cap (`CACHE_CAP = 100`, mtime access order; the five boundaries — cache key / value structure / hit semantics / fail-open / corpus-only storage — are unchanged, and the mtime boundary is ruled in-bounds by the user on 2026-11-12); (2) §13.4 gate pitfalls gain items 27–30 (items 1–26 unchanged); (3) the "proportional spot-check record" block at the end of §12.4 is settled (A′: window start unmoved, historical debt registered, per-slice registration resumed from P67); (4) Appendix B.6 ⑥ prompt hardening (A–E headings / conclusion-line position / input-surface declaration / standalone UNCOVERED sentence / ⑥-only note). **No change to the §7.2.2 / §6.3 / §7.7 bodies; §13.1–§13.3 / §13.5 are unchanged; the v50–v54 snapshots are unchanged.** The §12.4 settlement block carries the pitfall-7 landing declaration (record-status, without a ⑦ re-review). | `P67 GATES-DEBT-CLEANUP` (this slice; no action required) |
 | v1.68 | 2026-11-14 | **Ledger registration (v57 snapshot generation action; same-turn user authorisation on 2026-11-14)**: §12.4 registers **OB-139** (temp-file location violations at the `tmp/` root, four instances across P70/P71, first state word `observing`); **no new criterion, no change to any rule semantics, no change to the §6.3 criterion scope**. This row is a by-product of generating v57, not a standalone directive-governance slice. | none (`[ROUTINE]` action) |
 | v1.69 | 2026-11-15 | **Ledger registration (item ②b of P73 `T027B-ADMISSION`; same-turn user ruling of 2026-11-14)**: the OB-55 disposition cell in §12.4 flips from `To be discussed` to `Resolved` (option b ruled by P73; report `docs/validation/t027b-admission{,_EN}.md`, ADR-044); **no new criterion, no rule-semantics change, no change to the §6.3 criterion scope**. This row is a by-product of the P73 slice, not a standalone directive-governance slice. | `T027B-ADMISSION` (the slice report records v1.69 as a by-product) |
+| v1.70 | 2026-11-18 | **Direct replacement of the stage-6 and stage-7 deep-tier carrier models (slice `DIRECTIVE-MODEL-UPGRADE`; user ruling of 2026-11-18)**: (1) in the §2.2 stage-6 row the qualified name changes from `MAI-Code-1.1-Flash (copilot)` to `MAI Code 2 Flash (copilot)` and the `modelId` to `mai-code-2-flash`; in the stage-7 deep-tier row the qualified name changes from `GPT-6.1 Sol (copilot)` to `GPT-6.2 Sol (copilot)` and the `modelId` to `gpt-6.2-sol` (the Codex regular tier and the Luna parallel alternative are untouched, and Astra is not added); (2) the "⑦ three-tier selection" sentence of §2.2 and the deep-tier row of the §5.2 ⑦ tier table follow the same renaming; (3) the §6.3 G5-b closed set swaps those two members (the criterion wording and comparison rules stay verbatim), and the `tools/gates` implementation and self-test fixtures are synchronised; (4) the Sol row of the §7.5 ⑦ cost table changes the `modelId` only (the prices stay 200 / 1000, based on the operator-UI read confirming both generations are level); the §8.2 ⑦ tier mapping row keeps "Extra High (**Max** allowed)" and the tier-authorisation sentence only renames; (5) the stage-6 carrier call string in Appendix B.6 follows the renaming; (6) the §7.8.3 authorisation-exception trace ruled by P80 ruling (1) is landed (a reference block at the end of §12.4); (7) Appendix C gains C.0aw. | `DIRECTIVE-MODEL-UPGRADE` (this slice) |
 ---
 
 ## 1. Scope and Slice Model
@@ -299,14 +300,14 @@ The conclusion may be "no slice" - that is itself a valuable output.
 | Implementer | ② | `prfrail-implementer` | `DeepSeek V4.1 Flash (deepseek)` | `deepseek-flash` | **Yes (transitional state)** | Read/write + execute |
 | Tester | ③ | `prfrail-tester` | `DeepSeek V4.1 Flash (deepseek)` | `deepseek-flash` | **Yes (transitional state)** | Read/write + execute |
 | Documenter | ⑧ | `prfrail-documenter` | `DeepSeek V4.1 Flash (deepseek)` | `deepseek-flash` | **Yes (transitional state)** | Read/write + execute |
-| Independent scanner | ⑥ | `independent-reviewer` | `MAI-Code-1.1-Flash (copilot)` | `mai-code-1.1-flash` | No | Read-only |
+| Independent scanner | ⑥ | `independent-reviewer` | `MAI Code 2 Flash (copilot)` | `mai-code-2-flash` | No | Read-only |
 | Independent final reviewer | ⑦ | `independent-reviewer` | `GPT-5.3-Codex (copilot)` | `gpt-5.3-codex` | No | Read-only |
-| Independent final reviewer (deep tier) | ⑦ | `independent-reviewer` | `GPT-6.1 Sol (copilot)` | `gpt-6.1-sol` | No | Read-only |
+| Independent final reviewer (deep tier) | ⑦ | `independent-reviewer` | `GPT-6.2 Sol (copilot)` | `gpt-6.2-sol` | No | Read-only |
 | Independent final reviewer (parallel alternative) | ⑦ | `independent-reviewer` | `GPT-6-Luna (copilot)` | `gpt-6-luna` | No | Read-only |
 
 **The qualified name is the sole authority for the call string** (R2.2): task packages and Appendix B templates always write the qualified name (the `Model Name (vendor)` form; values are in the "qualified name" column of this table). `modelId` is an **internal identifier** — used by the whitelist closed set (§2.4, §6.3 G5-b), the §5.2 ⑦ tier table and `LEGACY_FLASH_MODEL_IDS` and other internal criteria, and **must not be used as a call string**. The qualified name follows whatever the operator UI currently shows (its version number, e.g. `V4.1`, is part of the qualified name) ⇒ **the qualified name is subject to version drift**: a version bump or a display-format change may make an old string rejected by the tool, and the maintenance mechanism is in R2.2; the "qualified name" column of this table takes the current values, **subject to what the operator UI currently shows**. **Measured basis** (the three measurements of `DIRECTIVE-CLEANUP-EVAL` + the official documentation check): the `model` argument of `runSubagent` accepts a qualified-name string (such as `GPT-5.3-Codex (copilot)`), while the `modelId` form (such as `gpt-5.3-codex`) is answered by the tool with not found ⇒ **call string = qualified name** (for the historical record of the difference see OB-67 and OB-70 of §12.4).
 
-**⑦ three-tier selection**: the selection criteria for `gpt-5.3-codex` (regular), `gpt-6.1-sol` (deep tier) and `gpt-6-luna` (parallel alternative) are **defined only in the §5.2 ⑦ tier table** (the tier table uses `modelId` as the internal tier identifier; at call time write the corresponding value from the "qualified name" column of this table); this table lists only the triple and the qualified name (R2.2 reading) — the tier table is the sole authority on which tier to pick.
+**⑦ three-tier selection**: the selection criteria for `gpt-5.3-codex` (regular), `gpt-6.2-sol` (deep tier) and `gpt-6-luna` (parallel alternative) are **defined only in the §5.2 ⑦ tier table** (the tier table uses `modelId` as the internal tier identifier; at call time write the corresponding value from the "qualified name" column of this table); this table lists only the triple and the qualified name (R2.2 reading) — the tier table is the sole authority on which tier to pick.
 
 **⑤ preferred / backup (added 2026-10-06; swapped 2026-10-24)**: the ⑤ pre-review **preferred** = `DeepSeek V4 Pro (deepseek)` (the "Pre-reviewer" row of this table) and the **backup** = `GLM-5.3 (glm)` (the "Pre-reviewer (backup)" row of this table); when the backup row is activated (the preferred is missing / unavailable), the master records the actual qualified name in the task package (R2.2).
 
@@ -557,7 +558,7 @@ The above are minimum verification actions; they must not replace independent ju
 | ⑦ tier | `modelId` (internal identifier) | Selection criterion (choose the tier when satisfied; tiers are **never mixed** within one review loop of one slice) |
 |---|---|---|
 | Regular | `gpt-5.3-codex` | default tier; used when neither of the other two tiers criteria is satisfied |
-| Deep tier | `gpt-6.1-sol` | hard-gate / high-risk rounds: A7 / B2 / B3 / B4-class slices, security / machine state / protocol semantics, pre-release final review |
+| Deep tier | `gpt-6.2-sol` | hard-gate / high-risk rounds: A7 / B2 / B3 / B4-class slices, security / machine state / protocol semantics, pre-release final review |
 | Parallel alternative | `gpt-6-luna` | parallel substitute when `gpt-5.3-codex` is unavailable or the §7.5 budget is constrained |
 **Cost and effort boundary of this table**: this table defines the tier-selection criterion only and **does not define** the cost cap or the effort tier - the cost cap is in the ⑦ quota rows of §7.5 and the thinking-mode tier is in the "⑦ tier mapping" table of §8.2; the former "⑦ Codex" labels in §7.5 and §8.2 are unified as "⑦ (chosen from the §5.2 tier table)" by v1.43 (OB-68 disposition).
 
@@ -637,7 +638,7 @@ When any stage fails or needs remediation, **the stage itself must be re-execute
 
 > **Origin**: ⑦ round 2 pointed out that "the F3 defense rests only on manual pre-check" ⇒ G5-a was added; ⑦ round 3 further pointed out that the original criteria **matched only a fixed form and covered only `prfrail-*`** (whitespace variants and other role files were missed) ⇒ this clause is hardened accordingly.
 
-**G5 sub-rule G5-b (role-file `model` value gate, added 2026-09-21, changed to a whitelist closed set on 2026-10-03)**: for **newly added or modified** `.github/agents/*.agent.md`, the value of the `model` field (**if present**) **must belong to the whitelist closed set** — the closed set = `deepseek-v4-pro`, `deepseek-flash`, `mai-code-1.1-flash`, `gpt-5.3-codex`, `gpt-6.1-sol`, `gpt-6-luna`, `glm-5.3`, `glm-5.3-flash` (matching the §2.2 `modelId` (internal identifier) column; **case-sensitive, verbatim equality**, both ends trimmed before comparison, and a quoted value is not verbatim equal). Mechanical criterion: parse the frontmatter block only and extract the values of **all** `model` keys in it; **any value outside the closed set ⇒ FAIL**; a missing key ⇒ PASS (§2.6); an empty value ⇒ judged by G5-a ②. Violation ⇒ G5 fails ⇒ **stop the commit**.
+**G5 sub-rule G5-b (role-file `model` value gate, added 2026-09-21, changed to a whitelist closed set on 2026-10-03)**: for **newly added or modified** `.github/agents/*.agent.md`, the value of the `model` field (**if present**) **must belong to the whitelist closed set** — the closed set = `deepseek-v4-pro`, `deepseek-flash`, `mai-code-2-flash`, `gpt-5.3-codex`, `gpt-6.2-sol`, `gpt-6-luna`, `glm-5.3`, `glm-5.3-flash` (matching the §2.2 `modelId` (internal identifier) column; **case-sensitive, verbatim equality**, both ends trimmed before comparison, and a quoted value is not verbatim equal). Mechanical criterion: parse the frontmatter block only and extract the values of **all** `model` keys in it; **any value outside the closed set ⇒ FAIL**; a missing key ⇒ PASS (§2.6); an empty value ⇒ judged by G5-a ②. Violation ⇒ G5 fails ⇒ **stop the commit**.
 > **Origin (root fix for OB-8)**: measurement on 2026-09-21 found that the default `model` of 8 existing role files belonged to the blacklist (when `model` is not passed explicitly, the black is reachable directly via `agentName`). The user's ruling adopted the combination of "**delete the default value + hard gate**" (**do not delete the files**): first perform a **field-deletion probe** on one inactive file (delete the `model` line → invoke that carrier: **it loads and works normally**); after the probe passes, delete the `model` field from all 8 blacklist files; this G5-b clause then prevents its re-introduction.
 
 **G5 sub-rule G5-c (appendix-B call strings in the 2.2 qualified-name set, added v1.33, landed by OB-29)**: for a `model='<qualified name>'` call string on a **changed line** inside appendix B, the value (**after stripping whitespace and backticks**) must be a member of the **qualified-name column of section 2.2 in the same file** (that column is the authority and the criterion reads it from the document itself, so editing 2.2 moves the judged set with it and the two cannot drift); a value outside the set ⇒ G5 fails ⇒ stop the commit. **Scope**: changed lines inside the appendix B region only (the same discipline as G6 / G7-c / G7-d); historical lines are not re-judged. **Fail-closed**: an appendix B region whose 2.2 qualified-name column cannot be read (missing heading or header, or an empty column) ⇒ throw `UsageError` (exit 2) - never a silent pass. **Origin**: OB-29 (appendix B's `model=` value set previously had no mechanical criterion; the wording was synced from the `modelId` column to the qualified-name column when R2.2 landed).
@@ -781,7 +782,7 @@ Exceeding a cap ⇒ escalate to user adjudication.
 | ⑦ model (§5.2 tier table) | Input (Credits / 1M tokens) | Output (Credits / 1M tokens) |
 |---|---|---|
 | `gpt-5.3-codex` | 175 | 1400 |
-| `gpt-6.1-sol` | 200 | 1000 |
+| `gpt-6.2-sol` | 200 | 1000 |
 | `gpt-6-luna` | 20 | 75 |
 
 **Fallback**: if a model's pricing page is unavailable (not displayed), stop and escalate per §1.7.2; **must not estimate or fill in a price on its own**. **Up-front budget caliber**: the estimated per-reading cost = the Input / Output prices in the table × the estimated token volume; the only admissible sources for the estimated token volume are "the median token count of this tier's historical readings" and "the token volume of this slice's declared review input pack"; if neither exists, stop and escalate per §1.7.2 instead of guessing.
@@ -862,9 +863,9 @@ Slices that need real external calls must declare a quota cap in advance; when t
 | ⑦ model (§5.2 tier table) | thinking-mode tier |
 |---|---|
 | `gpt-5.3-codex` | **Extra High** |
-| `gpt-6.1-sol` | **Extra High** (**Max** allowed) |
+| `gpt-6.2-sol` | **Extra High** (**Max** allowed) |
 | `gpt-6-luna` | **Max** |
-**Tier authorization**: taking `Max` with `gpt-6.1-sol` requires an explicit declaration in the kickoff message plus a same-turn authorization; without that declaration the default is `Extra High` (consistent with "no mid-slice tier upgrade" in §7.5).
+**Tier authorization**: taking `Max` with `gpt-6.2-sol` requires an explicit declaration in the kickoff message plus a same-turn authorization; without that declaration the default is `Extra High` (consistent with "no mid-slice tier upgrade" in §7.5).
 
 ### 8.3 Tiers of same-model roles cannot be separated (**known limitation**, D2=A)
 
@@ -1182,6 +1183,8 @@ Observation items (phenomena not yet sufficient to change the directive) are reg
 
 > **Master-orchestrator invocation record for this slice (`T027-ASSEMBLY-MIN`) (user ruling of 2026-10-02; no OB number taken)**: this slice does not use `sol-orchestrator` (its disposition and the generator-inclusion condition are OB-50; the prohibition basis is §2.4); the master is the direct session master, ① and ⑦ follow the §2.2 allowlist and the §5.2 tiers, and ⑦ is carried by `GPT-5.3-Codex` without downgrade; this slice makes zero `sol-orchestrator` calls.
 > **⑦ round exception for this slice (`DIRECTIVE-HAIKU-BUMP`) (user pre-authorization issued in the same turn, 2026-10-11; this slice only)**: ⑦'s re-review (read 2) judged one Medium in this slice (Appendix C.0p's "`--scope=tree` is all green" claim lacked raw gate-reading support) as **partially closed**; the user, **in the same turn**, ruled that **driver self-verification is not accepted as closure** and authorized **one additional narrower ⑦ read**. **Authorization (item-by-item transcription; the Chinese text is authoritative)**: "⑦'s Medium #2 - driver self-verification is not accepted as closure. One additional narrower ⑦ read is authorized. Scope (this round only, not generalizable): carrier = `GPT-5.3-Codex (copilot)`, not downgraded; input = a narrowed package (pass only: the C.0p acceptance-evidence sentence + the re-run tree raw line + the index/selftest raw lines); task = check Medium #2 only: whether C.0p's tree/index/selftest claims have raw gate-reading support; do not re-review the whole slice, do not attach the ⑤/⑥ lists, do not attach any list from before this round; conclusion line = `RE-REVIEW: …` (per §4.1's closed-set enumeration); if this read still reports Medium+ ⇒ stop and register in §12.4, with no 4th read." **Narrowed-input declaration**: read 3's input package contained **only** "the Appendix C.0p acceptance-evidence row verbatim (CN and `_EN`)" and "the raw output text of the three commands tree / index / selftest" (four items); it **did not** attach the slice definition, the change set, the freedom list, or any ⑤ / ⑥ / earlier ⑦ list, and **did not** re-review the slice. **Result**: read 3 gave `RE-REVIEW: PASS` (0 findings) ⇒ the Medium is **independently closed** by ⑦. **This authorization does not generalize and is valid for this slice only**: other slices still follow §7.5 (1 final + 1 re-review), and a 4th read is **not** automatically authorized for this slice (§7.8.3's row: "usable as a precedent = this slice only").
+
+> **This slice (`SG6-GATELEVEL-CONSOLIDATE` (P80)) ⑦ narrowed-read exception (same-turn authorisation by the user, 2026-11-18; valid for this slice only)**: both the ⑦ final review and the re-review reported one Medium each and the tier-S budget was exhausted ⇒ the slice stopped and escalated per the "user-authorised exception" row of §7.8.3; the user ruled option A in the same turn. **Authorisation text (verbatim)**: 「用户裁定：选 A——授权一次收窄读（§7.8.3「用户授权例外」行），额度 = ⑦ Codex 常规档 1 次，仅限本片、不得作先例（GATES-EXT 先例口径）。」**Narrowed-input declaration**: the input was (1) the three scope sentences of §12; (2) the same-batch readings under `06-gates/`; (3) `impl.numstat`; (4) the chapters the narrowed task needed; the pack **did not** include the slice definition, the full change set, the ⑤ list, or the blind and final review finding lists; the task was limited to checking "whether the single r2 Medium is CLOSED" and "whether the patch is faithful". **Verdict**: `RE-REVIEW: PASS` (0 findings). **This authorisation does not generalise and is valid for this slice only** (original trace = P80 report §14.2 / §14.3; this block lands P80 ruling (1), whose landing-spot difference was ruled by the user and must not be used as a precedent).
 
 > **Proportional spot-check record (§7.7; takes no OB number)**: this block is the **sole ledger-registration location** for the §7.7 proportional spot-check (a sampled slice still records the sampling result in its report per the original §7.7 sentence).
 > The window starts at v1.32; the counting anchor = the registration order of the "later batch slices" section of the ledger (only closed formal slices count); the fields = slice number / number of blind-review findings / whether ⑥'s PASS was overturned, with the slice id registered by the later deciding slice.
@@ -1526,7 +1529,7 @@ The output must end with one line: `PRE-REVIEW: PASS` / `PRE-REVIEW: PASS WITH F
 
 ```
 Role: independent reviewer. Read-only; must not modify, create, or delete any file.
-⑥ Vehicle: runSubagent(agentName='independent-reviewer', model='MAI-Code-1.1-Flash (copilot)')
+⑥ Vehicle: runSubagent(agentName='independent-reviewer', model='MAI Code 2 Flash (copilot)')
 ⑦ Vehicle: runSubagent(agentName='independent-reviewer', model='GPT-5.3-Codex (copilot)')   ← regular tier; the qualified names of the deep tier and the parallel alternative are in §2.2 and the §5.2 ⑦ tier table, capped per §7.5
 
 Input: ① slice definition ② the raw diff (**paths**, not paraphrase) ③ the original contract sentences ④ the read-only constraint
@@ -2362,6 +2365,22 @@ The following files **only get a supersede pointer added to the file header and 
 | Review | ⑤ r1 `PASS WITH FIXES` -> r2 `PASS`; ⑥ skipped (⑦ `SKIP CONFIRMED`); ⑦ `FINAL REVIEW: PASS` (final 1 + re-review 0 + blind 0) |
 | Version | v1.69 (the header version line agrees with the latest §0.3 row, G1-b) |
 | Note | **this block is a record only and has no body effect**: the OB-55 ruling and ADR-044 are authoritative in the P73 report and the ADR, and are not restated here. The user same-turn ruling of 2026-11-14 authorises the version bump. |
+
+
+### C.0aw P81 DIRECTIVE-MODEL-UPGRADE (v1.70)
+
+> **Record only, no body effect**.
+
+| Item | Content |
+|---|---|
+| Slice / size | `DIRECTIVE-MODEL-UPGRADE` (governance `[SLICE]`; tier M; 3 probes; local Windows) |
+| Trigger | item "next" of the layer-1 queue in v63 §4; the user ruling of 2026-11-18 "replace the stage-6 carrier and the stage-7 deep-tier model directly, do not add Astra" |
+| Goal | generational swap of the stage-6 carrier and the stage-7 deep-tier model; the three-way closed set kept verbatim-identical; the directive bumped to v1.70; the §7.8.3 trace of P80 ruling (1) landed |
+| Deliverables | the directive pair `docs/DELIVERY_DIRECTIVE{,_EN}.md`; `tools/gates/lib/criteria/g5b.js`; `tools/gates/selftest.js` and `tools/gates/testdata/fixtures/g5b-*`; the P81 ledger section; the report pair `docs/validation/directive-model-upgrade{,_EN}.md`; the evidence pack `docs/validation/evidence/P81-DIRECTIVE-MODEL-UPGRADE/` |
+| Scope | no change to the §2.4 blacklist body, the G5-b criterion wording and comparison rules, the §7.5 budget-tier numbers, or the §8.2 effort-table body; no change to p57 / `s1-exit` / the v63 snapshot / CONTRACTS / schema / product code / CI; no new ADR or OB |
+| Review | ⑤ pre-review, ⑥ independent scan (mandatory), ⑦ final review (governance-slice budget 1 + 3); the readings are authoritative in that slice report |
+| Version | v1.70 (the header version line agrees with the latest §0.3 row, G1-b) |
+| Note | the authorisation text and the narrowed-input declaration of P80 ruling (1) land in the §12.4 trailing reference block; this block is a pointer only and does not restate them |
 
 
 ### C.1 v3.1 section numbers → this directive

@@ -21,9 +21,9 @@
 const CLOSED_SET = [
   'deepseek-v4-pro',
   'deepseek-flash',
-  'mai-code-1.1-flash',
+  'mai-code-2-flash',
   'gpt-5.3-codex',
-  'gpt-6.1-sol',
+  'gpt-6.2-sol',
   'gpt-6-luna',
   'glm-5.3',
   'glm-5.3-flash',
