@@ -2136,6 +2136,29 @@ Completion record (2026-11-17): report pair `docs/validation/adr010-approval{,_E
 
 Completion record (2026-11-17): report pair `docs/validation/release-zip-binding{,_EN}.md`; GitHub Release `v0.1.0` created (tag targets the candidate commit, four assets present); the final ZIP passed install / upgrade / rollback / uninstall-with-retained-data re-verification; the three landing spots bind one tuple; S-G3 moves from not passed to passed (p57 and s1-exit gate tables untouched); R = 0, D = 1 (D-1 = the implementation-order change that used an empty commit as the verifier identity, self-disclosed and judged by (7) re-review as a difference that may be recorded in the report; no hash / run recorded, per §11.2).
 
+### P80 — `SG6-GATELEVEL-CONSOLIDATE` (S-G6 gate-level consolidation + T018 side-by-side wording + S1 Exit next-step list; documentation type) · ✅ Complete
+
+| Field | Content |
+|---|---|
+| Identifier | `SG6-GATELEVEL-CONSOLIDATE` (consolidate the gate-level verdicts and evidence landing spots of S-G1 through S-G5, decide whether the S-G6 gate-level side holds, state the side-by-side wording that separates it from the T018 task level, and produce the S1 Exit next-step list; source = v62 §4 layer-1 queue item marked as the next slice) |
+| Status | ✅ Complete (closed 2026-11-18) |
+| Goal | consolidate the gate-level verdicts and exact evidence landing spots of S-G1 through S-G5; decide under the criterion "dependency fields satisfied and the four remaining gates closed" whether the S-G6 gate-level side holds; separate the gate level from the T018 task level with side-by-side wording (P76 Q8=(c)); produce the S1 Exit next-step list (S-G5 step two, re-evaluation prerequisites, P79 security review, S2 scheduling advice) |
+| Dependency | S-G2 / S-G3 / S-G4 already passed; S-G5 release part approved (step one, ADR-046 Q10=(C)); the user ruling in the same turn on 2026-11-18 that the step-one approval is sufficient to close the S-G6 gate-level side; the T018 task-level side-by-side wording follows P76 Q8=(c) |
+| Size | S (documentation type; the slice carries adjudicated facts, it changes neither criteria nor gate tables) |
+| Steps | 0 -> (1) -> (2) -> (3) consistency -> (4) gates -> (5) pre-review -> (6) skipped (confirmed by (7)) -> (7) blind review + final review + re-review -> (8a) -> (9) -> (8b) -> (8c) -> (10) |
+| Gap | there is no consolidated gate-level verdict text for S-G6 yet; the S1 Exit next-step list has not been written to disk |
+| Deliverables | (1) the report pair `docs/validation/sg6-gatelevel-consolidate{,_EN}.md` (Q1 through Q6 outputs, the S-G6 gate-level verdict chapter, the side-by-side wording chapter, the next-step list chapter, the gate readings and the `artifacts` fence); (2) the P80 ledger registration and completion record; (3) the evidence pack `docs/validation/evidence/P80-SG6-GATELEVEL-CONSOLIDATE/` |
+| Acceptance evidence | the three scopes `TOTAL_FAIL=0`; SELFTEST 737/737; the S-G1 through S-G5 consolidation matches the source reports word for word; the S-G6 gate-level verdict does not conflict with p57 §4.2 / `s1-exit` / v62 §4 / ADR-046 / P76 Q8=(c); the p57 and `s1-exit` gate tables are untouched; the report pair has all six shapes equal |
+| Boundary | no change to the S1 Exit gate criteria or the p57 / `s1-exit` gate tables; no change to the v62 snapshot; no change to the directive / CONTRACTS / schema / fixtures / product code / CI; no new ADR / OB unless the user rules otherwise; no inclusion of an s1-exit sync slice; no gitee action of any kind |
+| Tier | `[SLICE]` |
+| Probe budget | 0 |
+| Freedom-list landing path | `docs/validation/evidence/P80-SG6-GATELEVEL-CONSOLIDATE/freedom-list.md` |
+| R/D baseline | R = 0, D = 0 (step-0 registration, §13.1.1; does not inherit P78's R=0 / D=1) |
+| Temp-file location declaration | Slice temp directory = `tmp/P80-SG6-GATELEVEL-CONSOLIDATE/` (add-only before ⑧c; CI captures also land there, never at the `tmp/` root) |
+| Budget-rule disclosure | the (7) budget follows §7.5 = 1 final review + 1 re-review (tier S); one extra blind review follows the §7.7 proportional spot-check (not counted against the 1 + 1); reaching R = 2 also stops and escalates rather than self-upgrading to the high-risk 1 + 3 |
+
+Completion record (2026-11-18): report pair `docs/validation/sg6-gatelevel-consolidate{,_EN}.md`; the S-G6 gate-level side holding, the T018 task-level side-by-side wording and the S1 Exit next-step list are all on disk; the p57 and `s1-exit` gate tables are untouched; R = 2, D = 1 (D under the self-imposed reading, for user ratification; no hash / run recorded, per §11.2).
+
 ## Known defects (to be handled before later slices)
 
 > **Blocking rule unchanged**: only high-frequency / reproduced defects block; observation-grade flakes are recorded and listed in the validation report.
