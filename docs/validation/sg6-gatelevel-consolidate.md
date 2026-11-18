@@ -233,7 +233,10 @@ S2 启动排期建议（**供用户参考，不作裁定**）：先做 P79 独�
 
 ## 17. 提交与 CI
 
-本片主提交与 CI run 的对应关系按 §11.2 由回填提交补入；回填提交自身的 run 只作观察记录，不再为它新增提交。
+- 主提交 `e00d79b`（`docs: consolidate the S-G6 gate-level verdict and next steps (P80)`）；推送 `origin/main`，范围 `b5ff8ee..e00d79b`（未推 gitee）。
+- CI run `44211368890` 首跑双腿 success：windows `4m55s`、ubuntu `3m18s`；两腿 `SELFTEST: PASS 737/737`、`GATE REPORT scope=ci changed=20`、`TOTAL_FAIL=0`。
+- 包级 `ok` 计数：ubuntu 腿 21、windows 腿 15，`FAIL` 均为 0（ubuntu 腿含 Race 与 Contract fixtures 两段）。
+- 回填提交（本段）自身的 run 只作观察记录，不再为它新增提交（§11.2）。
 
 ```artifacts
 docs/t027/REMAINING_SLICES_EN.md	repo

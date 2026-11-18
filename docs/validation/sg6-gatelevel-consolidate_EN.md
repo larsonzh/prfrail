@@ -233,7 +233,10 @@ Two rounds do not enter R: (5) pre-review r1 (3 Low / 3 Info, no Medium+) and th
 
 ## 17. Commit and CI
 
-The mapping between the main commit and the CI run is filled in by the §11.2 backfill commit; the backfill commit's own run is an observation record only, and no further commit is made for it.
+- Main commit `e00d79b` (`docs: consolidate the S-G6 gate-level verdict and next steps (P80)`); pushed to `origin/main`, range `b5ff8ee..e00d79b` (no gitee push).
+- CI run `44211368890` passed both legs on the first attempt: windows `4m55s`, ubuntu `3m18s`; both legs report `SELFTEST: PASS 737/737`, `GATE REPORT scope=ci changed=20`, `TOTAL_FAIL=0`.
+- Package-level `ok` counts: ubuntu leg 21, windows leg 15, with `FAIL` 0 on both (the ubuntu leg also runs the Race and Contract fixtures stages).
+- The backfill commit (this section) produces an observation-only run, and no further commit is made for it (§11.2).
 
 ```artifacts
 docs/t027/REMAINING_SLICES_EN.md	repo
