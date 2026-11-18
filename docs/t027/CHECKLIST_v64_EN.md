@@ -140,7 +140,7 @@ Generated: 2026-11-19. HEAD = `9ca6576`; directive = v1.70; three CI runs: the P
 | Identifier | `TMP-DISCIPLINE-OUT-OF-REPO` (governance slice; source = the user ruling of 2026-11-19 on the sixth OB-139 trigger: register a fix to §5.1, the directive rises to v1.71; ledger section = **P82**) |
 | Contents | add a disposition channel (self-heal or downgrade) for "an out-of-repository location (`%TEMP%` and the like) combined with a same-command create-delete", and state the `tmp/`-root self-heal caliber explicitly; the three readings and the stop-the-slice ceiling of the existing self-heal grade are not changed |
 | Size tier | **M** (governance slice; touches the §5.1 body plus §0.3 and appendix C; no criterion code expected to change) |
-| (7) budget | M: 1 final review + 2 re-reviews; the (7) model follows the §5.2 tier table (governance defaults to Codex Extra High) |
+| (7) budget | governance slice: 1 final review + 3 re-reviews (the §7.5 tiering rule: revising the directive = the governance-slice row; re-review 2 takes narrowed input, re-review 3 checks only the Medium+ closure path); the (7) model follows the §5.2 tier table (Codex Extra High) |
 | Dependency | P81 closed (the sixth trigger was ruled by the user on 2026-11-19); **the start requires the user to name it**; the order relative to P79 is the user's call (the current advice is P82 first) |
 | Boundary | no change to the three self-heal readings or the D ceiling; no change to the criteria proper or the gate tables; no change to CONTRACTS / schema / fixtures / product code / CI; no gitee action |
 
