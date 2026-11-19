@@ -2183,12 +2183,12 @@ Completion record (2026-11-18): report pair `docs/validation/sg6-gatelevel-conso
 
 Completion record (updated 2026-11-19): report pair `docs/validation/directive-model-upgrade{,_EN}.md`; the stage-6 and stage-7 deep-tier models are replaced and the three-way closed set (the section 2.2 modelId column / the section 6.3 G5-b closed set / `CLOSED_SET` in `g5b.js`) agrees word for word; the authorisation-exception trace of P80 ruling (1) is landed as a reference block at the end of section 12.4; SELFTEST rises from 737 to 740; **R = 1** (the probe-target deviation was found by the user while reviewing the (10) receipt and corrected: one extra dispatch each for the new stage 6 `MAI Code 2 Flash (copilot)` and the new stage 7 `GPT-6.2 Sol (copilot)`, both `PROBE-OK`, payloads under `03-probes/` in the evidence pack), **D = 2** (event 1 is the temp-file self-heal grade; event 2 is the "same-command create-delete plus out-of-repository location" combination with no self-heal path); the user ruling of 2026-11-19 confirms that OB-139 **tripped for the sixth time**, moves it to "to be discussed" and registers slice P82; no hash / run recorded, per section 11.2.
 
-### P82 — `TMP-DISCIPLINE-OUT-OF-REPO` (section 5.1 temp-file discipline gains a disposition channel + the `tmp/`-root self-heal caliber; governance slice) · ⬜ Not started (schedule pending)
+### P82 — `TMP-DISCIPLINE-OUT-OF-REPO` (section 5.1 temp-file discipline gains a disposition channel + the `tmp/`-root self-heal caliber; governance slice) · ✅ Completed (closed 2026-11-19)
 
 | Field | Content |
 |---|---|
 | Identifier | `TMP-DISCIPLINE-OUT-OF-REPO` (governance slice; source = the user ruling of 2026-11-19 on the sixth OB-139 trigger: **register** a change to the section 5.1 temp-file discipline, the directive rises to v1.71) |
-| Status | ⬜ Not started (schedule pending; **the start requires the user to name it**) |
+| Status | ✅ Completed (closed 2026-11-19) |
 | Goal | add a disposition channel (self-heal or downgrade) for "an out-of-repository location (`%TEMP%` and the like) combined with a same-command create-delete", and state the self-heal caliber for the `tmp/` root explicitly; the three readings of the existing self-heal grade are not changed |
 | Dependency | P81 closed (sixth OB-139 trigger, user ruling of 2026-11-19; this slice takes over its registration); the existing `tmp/` lifecycle and evidence-window clauses (sections 1.5.1 / 5.1) |
 | Size | M (governance slice; touches the section 5.1 body plus sections 0.3 and appendix C; no criterion code expected to change) |
@@ -2198,8 +2198,14 @@ Completion record (updated 2026-11-19): report pair `docs/validation/directive-m
 | Acceptance evidence | the three scopes `TOTAL_FAIL=0`; the CN/EN changed-line counts are symmetric and the directive pair has all six shapes equal; G1-b version metadata agrees; the new channel is retrievable word for word inside the directive |
 | Boundary | no change to the three readings or the stop-the-slice ceiling of the existing self-heal grade; no change to the criteria proper or the gate tables; no change to CONTRACTS / schema / fixtures / product code / CI; no gitee action |
 | Tier | `[SLICE]` |
+| Probe budget | 0 (this slice changes no model and needs no real external call) |
+| Freedom-list path | `docs/validation/evidence/P82-TMP-DISCIPLINE-OUT-OF-REPO/freedom-list.md` |
 | R/D baseline | R = 0, D = 0 (registered at start, section 13.1.1) |
+| (7) budget | the governance row = 1 final review + 3 re-reviews (section 7.5 tier rule; the second re-review narrows its input and the third checks only the closure path of the previous round's Medium-plus items); no blind review; no downgrade |
+| Temp-file location | this slice's temp directory = `tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO/` (append-only before (8)c; CI captures go to that same directory, never to the `tmp/` root) |
 | Precedent caliber | this registration follows the user ruling of 2026-11-19, and that ruling **grants no waiver and may not be cited as a precedent** |
+
+Completion record (updated 2026-11-19): report pair `docs/validation/tmp-discipline-out-of-repo{,_EN}.md`; the directive rises to v1.71 (MINOR): section 5.1 gains the "out-of-repo same-command create-and-delete self-heal sub-clause" and the "`tmp/`-root self-heal per-element caliber", the "out-of-repo locations are strict" sentence is revised, section 0.3 gains the v1.71 row, the OB-139 disposition cell in section 12.4 flips to resolved, and appendix C gains C.0ax; **R = 2, D = 0**; stage 6 `MAI Code 2 Flash (copilot)` r1 FINDINGS -> r2 PASS (budget 3 used 2); stage 7 `GPT-5.3-Codex (copilot)` r1 FINDINGS -> r2 `RE-REVIEW: PASS` (budget 1+3 used 1+1); stage 5 exhausted its 2/2 budget and then, with user authorisation, one narrowed read returned `PASS` (this slice only, not a precedent).
 
 ## Known defects (to be handled before later slices)
 

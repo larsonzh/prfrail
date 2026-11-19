@@ -1,0 +1,96 @@
+﻿GATE REPORT scope=index repo=D:\LZProjects\prfrail changed=13
+PASS  G1-a table structure :: no `||` on added rows
+PASS  G1-b version metadata :: docs/DELIVERY_DIRECTIVE.md header=v1.71 last=v1.71 2026-11-19/2026-11-19 rows=72 OK | docs/DELIVERY_DIRECTIVE_EN.md header=v1.71 last=v1.71 2026-11-19/2026-11-19 rows=72 OK
+PASS  G1(c) status marker c :: closed set respected (434 cells)
+PASS  G1(d) status marker d :: heading and status table agree
+PASS  G1(e) status marker e :: completion rows imply completed (72 bound, 34 unbound)
+PASS  G1(e2) in-block completion rows imply completed :: 0 judged, 0 skipped, 66 historical (v1.64)
+INFO  G1(e-info) completion keys without a binding :: 34 completion row(s) have no heading to bind to (their slice heading was removed); G1(e) judges bound rows only
+PASS  G1(f) status marker f :: no in-progress wording in added completion rows
+PASS  G2 placeholder residue :: none
+PASS  G3(a) symmetry + mirror parity :: docs/DELIVERY_DIRECTIVE.md +24/-3 vs _EN +24/-3 OK || docs/t027/CHECKLIST_v64.md +18/-18 vs _EN +18/-18 OK || docs/t027/REMAINING_SLICES.md +6/-2 vs _EN +6/-2 OK || docs/validation/tmp-discipline-out-of-repo.md +204/-0 vs _EN +204/-0 OK ;; docs/DELIVERY_DIRECTIVE.md {"lines":true,"head":true,"bold":true,"bars":true,"blank":true,"backticks":true} ;; docs/t027/CHECKLIST_v64.md {"lines":true,"head":true,"bold":true,"bars":true,"blank":true,"backticks":false} ;; docs/t027/REMAINING_SLICES.md {"lines":false,"head":false,"bold":false,"bars":false,"blank":false,"backticks":false} ;; docs/validation/tmp-discipline-out-of-repo.md {"lines":true,"head":true,"bold":true,"bars":true,"blank":true,"backticks":true}
+PASS  G3(b) key-field alignment :: hash 0/0 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK | hash 3/3 OK | run 0/0 OK | glyph 1/1 OK | to-do 0/0 OK | not-reviewed 0/0 OK | hash 0/0 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK | hash 0/0 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK
+PASS  G4a BOM+LF :: 13 file(s) OK (5 excluded: evidence tree)
+INFO  G4b-cache G4b cache :: hit bbf2f207b227 corpus=1459
+PASS  G4b CJK diff minus whitelist :: newCjk=573 unknown=[] (whitelist=63 whitelist-source=worktree)
+PASS  G5-a(1) no model key in prfrail-* :: 0 hits
+PASS  G5-a(2) no empty model :: 0 hits / 14 files
+PASS  G5-b closed-set model value :: checked 0 file(s)
+PASS  G5-c appendix-B call strings in the 2.2 qualified-name set :: call strings OK (2 file(s), scanned 0 changed carrier line(s))
+INFO  G5-d role-file frontmatter contract :: no changed `.github/agents/*.agent.md` in scope
+PASS  G5(d) staged is a subset of declared :: 13 path(s) declared (scope=index) ; addMode=explicit (derived label, not a command-history assertion)
+PASS  G5(e) evidence references resolve :: no added completion row (nothing to resolve)
+PASS  G5(e2) in-block completion-row evidence resolves :: no added in-block completion row (nothing to resolve)
+PASS  G5(f) index hygiene :: index equals worktree, no untracked path
+PASS  R2.5 header-note position :: distinct=1 uniform 14/14
+PASS  G6-1 status tense :: no pending/completion conflict on added lines (scanned 504) whitelist-source=worktree
+PASS  G6-2 cost clause :: no realized cost clause on added lines (scanned 504) whitelist-source=worktree
+PASS  G6-3 run-id format :: no malformed run id on added lines (scanned 504) whitelist-source=worktree
+PASS  G6-4 expiring literal :: no expiring literal on added lines (scanned 504) whitelist-source=worktree
+PASS  G6-5 section-reference resolution :: no unresolved section reference on added ledger/changelog lines (scanned 34, refs 18) whitelist-source=worktree
+PASS  G6-6 ledger status closed set :: every added ledger row opens with a closed-set status word (scanned 2) whitelist-source=worktree
+PASS  G6-7 declaration/ledger reconciliation :: every declared ID on an added section 0.3 line exists in the 12.4 / appendix-C ledger (scanned 2, declarations 1) whitelist-source=worktree
+PASS  G6-8 DR number uniqueness and membership :: registered DR set {1,2,3,4,5,6,7,8,9,10,11,12,13,14}; no DR collision or dangling reference on added lines (scanned 420, refs 0) whitelist-source=worktree
+PASS  G7-a artifacts block present :: 2 report(s) OK
+PASS  G7-b artifact path/disposition resolvable :: 52 artifact row(s) OK (repo check: git ls-files --error-unmatch + worktree presence)
+PASS  G7-c finding row disposition cell :: 0 changed finding row(s) with disposition
+PASS  G7-d stopped state marked incomplete :: no stopped-state row missing the incomplete mark
+PASS  G7-e verdict line closed set :: every verdict line on added report lines is inside the 4.1 closed set (scanned 404)
+PASS  G7-f sixstage transcript contract :: 2 changed ```sixstage fence(s) complete (A→B→C→D→E, closed-set conclusion, SEVERITY consistency)
+PASS  G8-a evidence-tree path shape :: 5 path(s) OK
+PASS  G8-b pack self-consistency :: 1 pack(s) self-consistent
+PASS  G8-c encoding-normalization record :: 0 pack(s) checked (1 exempt: no `## 后缀与编码映射` section)
+PASS  G8-d rebuilt-archive note :: 5 changed file(s) OK
+PASS  G9 临时件与 tmp/ 引用 :: 13 path(s) OK (5 excluded) (whitelist=worktree)
+INFO  G9-e tmp/ reference (informational) :: docs/DELIVERY_DIRECTIVE.md:1183 tmp/g71.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/DELIVERY_DIRECTIVE.md:1183 tmp/gi.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/DELIVERY_DIRECTIVE.md:1183 tmp/gt.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/DELIVERY_DIRECTIVE.md:1183 tmp/p71-2a-annotate.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/DELIVERY_DIRECTIVE.md:1183 tmp/p71d-wt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/DELIVERY_DIRECTIVE_EN.md:1183 tmp/g71.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/DELIVERY_DIRECTIVE_EN.md:1183 tmp/gi.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/DELIVERY_DIRECTIVE_EN.md:1183 tmp/gt.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/DELIVERY_DIRECTIVE_EN.md:1183 tmp/p71-2a-annotate.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/DELIVERY_DIRECTIVE_EN.md:1183 tmp/p71d-wt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/t027/REMAINING_SLICES.md:2218 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/t027/REMAINING_SLICES_EN.md:2205 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo.md:39 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO/06-scan-r2.md :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo.md:40 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo.md:103 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo.md:112 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo.md:128 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo.md:140 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo.md:191 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO/05-prereview-r1.md :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo.md:192 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO/05-prereview-r2.md :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo.md:193 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO/05-prereview-r3.md :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo.md:194 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO/06-scan-r1.md :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo.md:195 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO/06-scan-r2.md :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo.md:196 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO/07-final-r1.md :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo.md:197 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO/design-r1.md :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo.md:198 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO/gate-index.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo.md:199 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO/gate-selftest.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo.md:200 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO/gate-tree.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo.md:201 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO/impl.numstat :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo.md:202 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO/impl-report.md :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo.md:203 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO/test-report.md :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo_EN.md:39 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO/06-scan-r2.md :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo_EN.md:40 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo_EN.md:103 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo_EN.md:112 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo_EN.md:128 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo_EN.md:140 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo_EN.md:191 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO/05-prereview-r1.md :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo_EN.md:192 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO/05-prereview-r2.md :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo_EN.md:193 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO/05-prereview-r3.md :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo_EN.md:194 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO/06-scan-r1.md :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo_EN.md:195 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO/06-scan-r2.md :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo_EN.md:196 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO/07-final-r1.md :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo_EN.md:197 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO/design-r1.md :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo_EN.md:198 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO/gate-index.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo_EN.md:199 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO/gate-selftest.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo_EN.md:200 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO/gate-tree.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo_EN.md:201 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO/impl.numstat :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo_EN.md:202 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO/impl-report.md :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/tmp-discipline-out-of-repo_EN.md:203 tmp/P82-TMP-DISCIPLINE-OUT-OF-REPO/test-report.md :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference summary :: scanned 504 added line(s), 50 reference(s), 50 unresolvable
+TOTAL_FAIL=0

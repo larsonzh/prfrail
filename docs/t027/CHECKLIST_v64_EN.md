@@ -11,8 +11,8 @@ Generated: 2026-11-19. HEAD = `9ca6576`; directive = v1.70; three CI runs: the P
 - (2) §2 becomes the P81 fact pack (the stage-6/stage-7 replacement and the three-way closed set with 8 members, the self-corrected probe-target deviation, the (6) format-deviation re-send, R = 1 / D = 2, the ten v1.70 landing points, and the two wording-side G6-4 / G6-6 self-corrections); appendix A records the P82 hand-off of the OB-139 correction channel, appendix B is unchanged.
 - (3) §3 appends one P81 row (the sixteen rows of v63 plus one = seventeen rows).
 - (4) §4 queue update: P81 leaves the queue; next = P82 (`TMP-DISCIPLINE-OUT-OF-REPO`, fixes §5.1, bumps to v1.71, start requires the user to name it); then P79; then the post-S2 re-evaluations.
-- (5) §5: OB-139 has moved to pending discussion (13 observing, 10 pending, 24 non-terminal), with the P82 registration and the 2026-11-19 ruling recorded (no waiver, not a precedent).
-- (6) §6 is cleared; the next ruling item is expected to be the start order of P82 versus P79 (the current advice is P82 first).
+- (5) §5: OB-139 is now **resolved** (its rule clauses landed with v1.71; **slice P82 itself remains in progress**; 13 observing, 9 pending, 23 non-terminal), and the 2026-11-19 ruling (no waiver, not a precedent) has been discharged.
+- (6) §6 is cleared; the next ruling item is expected to be the start timing of P79 (P82 started on 2026-11-19 at the user's naming).
 - (7) §10 / §11 roll over; the cross-session handoff pointer in `DOCUMENTATION_PLAN{,_EN}.md` now points at v64.
 
 ---
@@ -133,7 +133,7 @@ Generated: 2026-11-19. HEAD = `9ca6576`; directive = v1.70; three CI runs: the P
 - **`RELEASE-ZIP-BINDING` (S-G3 close-out)**: **P78 is closed** (release source commit `c935713`; main commit `308b235`; R = 0, D = 0; S-G3 passed; the p57 and `s1-exit` gate tables are untouched). Removed from the queue; the fact pack is in §2; the report is `docs/validation/release-zip-binding{,_EN}.md`.
 - **`DIRECTIVE-MODEL-UPGRADE` (stage-6 carrier and stage-7 deep-tier replacement - P81)**: **P81 is closed** (main commit `45590e8`; §11.2 back-fill `fd4d8fb`; probe / OB-139 back-fill `9ca6576`; R = 1, D = 2; **directive v1.70**; the G5-b closed set agrees three ways with 8 members). Removed from the queue; the fact pack is in §2; the report is `docs/validation/directive-model-upgrade{,_EN}.md`.
 
-**Next item = P82 `TMP-DISCIPLINE-OUT-OF-REPO` (governance slice; fixes the §5.1 temp-file discipline, bumps to v1.71; the start requires the user to name it)**
+**P82 `TMP-DISCIPLINE-OUT-OF-REPO` (governance slice; fixes the §5.1 temp-file discipline, bumps to v1.71) - started on 2026-11-19 at the user's naming, in progress**
 
 | Field | Content |
 |---|---|
@@ -160,20 +160,20 @@ Generated: 2026-11-19. HEAD = `9ca6576`; directive = v1.70; three CI runs: the P
 
 ### Layer 2 routine governance
 
-- P72 / P73 / P74 / P75 / P76 / P77 / P78 / P80 / P81 ✅ removed from the queue (tier 2 is **empty**; P82 is a tier-1 queue item awaiting the user naming it; per-row summaries are in §3).
+- P72 / P73 / P74 / P75 / P76 / P77 / P78 / P80 / P81 ✅ removed from the queue (tier 2 is **empty**; P82 started on 2026-11-19 at the user's naming and is in progress; per-row summaries are in §3).
 - The full §1.2 field definitions for P72 / P73 / P74 / P75 / P76 / P77 / P78 / P80 / P81 are in the corresponding segments of `docs/t027/REMAINING_SLICES{,_EN}.md`; the P82 fields are in the matching segment of that ledger.
 
 ### Layer 3 low-priority options
 
 | Field | Content |
 |---|---|
-| Identifier | `OB-50` / `spawnGit` / `ci freeze cost` / 22 historical `%TEMP%` items / `GATES-EXEMPT` |
-| Current state (verified item by item) | OB-50 = **settled** (§12.4, v1.41); spawnGit = the git-call helper of `tools/gates/selftest.js` (the spawn wrapper in `lib/ctx.js`) that folds stderr into the result object instead of printing it; the P27 `G4b-CACHE` report §5 item 5 registered it as a "candidate OB (diagnostic)" (Low / observing) and it was never formally registered as a §12.4 OB id, so under the §1.8.1 pending-item rule it is an "unregistered candidate OB"; candidate fix = attach the last N bytes of stderr to `detail` when the spawn fails (diagnostics only, the verdict is unchanged); trigger = the next unexplained git-related assertion failure is assessed by (1); ci freeze cost = **no §12.4 entry**, its real origin is item 7 of the P27 report as a "candidate OB (performance)", **not formally registered**; the 22 historical %TEMP% items map to OB-98 (**settled**) / OB-99 (**observing**) / OB-100 (**observing**); GATES-EXEMPT = **not initiated** (no §12.4 entry; the P33 item 1-3(iv) split slice, touching four criterion files) |
-| Contents | see the matching §12.4 rows; `GATES-EXEMPT` is the P33 item 1-3(iv) split slice, not initiated |
-| Dependency | the long suspension covers only unsettled items (spawnGit / ci freeze cost / the %TEMP% timing shapes (OB-99 / OB-100) / GATES-EXEMPT); there is no concrete trigger |
+| Identifier | `OB-50` / `spawnGit` / `ci freeze cost` / 22 historical `%TEMP%` items / `GATES-EXEMPT` / `GATES-PERF-ASSESS` |
+| Current state (verified item by item) | OB-50 = **settled** (§12.4, v1.41); spawnGit = the git-call helper of `tools/gates/selftest.js` (the spawn wrapper in `lib/ctx.js`) that folds stderr into the result object instead of printing it; the P27 `G4b-CACHE` report §5 item 5 registered it as a "candidate OB (diagnostic)" (Low / observing) and it was never formally registered as a §12.4 OB id, so under the §1.8.1 pending-item rule it is an "unregistered candidate OB"; candidate fix = attach the last N bytes of stderr to `detail` when the spawn fails (diagnostics only, the verdict is unchanged); trigger = the next unexplained git-related assertion failure is assessed by (1); ci freeze cost = **no §12.4 entry**, its real origin is item 7 of the P27 report as a "candidate OB (performance)", **not formally registered**; the 22 historical %TEMP% items map to OB-98 (**settled**) / OB-99 (**observing**) / OB-100 (**observing**); GATES-EXEMPT = **not initiated** (no §12.4 entry; the P33 item 1-3(iv) split slice, touching four criterion files); GATES-PERF-ASSESS = **a new candidate** (registered by the user ruling of 2026-11-19, **not initiated as an implementation**; a gate-cost composition assessment that measures how `SELFTEST` and the three scopes spend their time and how often the `base` trio repeats; an assessment-grade candidate that needs the user to name it at start) |
+| Contents | see the matching §12.4 rows for the six items (`GATES-PERF-ASSESS` has no §12.4 entry and is registered only in this table and the ledger); `GATES-EXEMPT` is the P33 item 1-3(iv) split slice, not initiated |
+| Dependency | the long suspension covers only unsettled items (spawnGit / ci freeze cost / the %TEMP% timing shapes (OB-99 / OB-100) / GATES-EXEMPT); `GATES-PERF-ASSESS` has no prerequisite and ranks after P82 / P79; none of them has a concrete trigger |
 | Size | varies (S through M-L) |
 | (7) budget | none |
-| Boundary | per item in §12.4; this version adds no layer-3 item and advances no suspended item |
+| Boundary | per item in §12.4; this version adds one layer-3 candidate (`GATES-PERF-ASSESS`, registered by the user ruling of 2026-11-19 and not initiated as an implementation) and advances no suspended item |
 | Start condition | the user must name the item explicitly |
 
 **Queue discipline**: as in v60 (layer boundaries and numbering discipline; this [ROUTINE] slice runs in a single batch and does not bump the version).
@@ -182,17 +182,17 @@ Generated: 2026-11-19. HEAD = `9ca6576`; directive = v1.70; three CI runs: the P
 
 ## §5 Observation items
 
-- Under observation (**13**): `OB-1 / 7 / 10 / 33 / 87 / 99 / 100 / 104 / 105 / 107 / 111 / 113 / 135` (carried from v61; OB-139 moved to pending discussion on 2026-11-19).
-  - **OB-139 moved to pending discussion (user ruling 2026-11-19)**: both temp-file events of P81 are accepted as D = 2, and the "out-of-repository location (`%TEMP%`) plus same-command create-delete" combination has no self-heal channel under section 5.1, so the **sixth trigger is confirmed**; the entry moves from "under observation" to "pending discussion" and slice **P82** is registered (`TMP-DISCIPLINE-OUT-OF-REPO`, directive-governance slice, bumps to v1.71, schedule pending, start requires the user to name it). The ruling grants no waiver and may not be cited as a precedent.
+- Under observation (**13**): `OB-1 / 7 / 10 / 33 / 87 / 99 / 100 / 104 / 105 / 107 / 111 / 113 / 135` (carried from v61).
+  - **OB-139 is resolved (landed by P82 `TMP-DISCIPLINE-OUT-OF-REPO`, v1.71)**: §5.1 adds the "out-of-repo same-command create-and-delete self-heal sub-clause" and fixes the per-element caliber of `tmp/`-root self-heal; this disposition grants no waiver and may not be cited as a precedent.
   - **The reinforced D=2 recurrence-prevention sentence (standard kick-off content since v59, carried into v61)**: "the executing roles (`prfrail-implementer` / `prfrail-tester` / `prfrail-documenter`) **and the controller** must always work under a `tmp/` slice directory (`tmp/<slice-id>/`); **the same holds for CI observation captures, which must never land at the `tmp/` root**; three D occurrences inside one slice force the slice to stop."
-- Pending discussion (10): `OB-19 / 21 / 52 / 53 / 57 / 58 / 59 / 61 / 75 / 139`.
-- To do (1): `OB-69`. Non-terminal total **24** (13 plus 10 plus 1).
+- Pending discussion (9): `OB-19 / 21 / 52 / 53 / 57 / 58 / 59 / 61 / 75`.
+- To do (1): `OB-69`. Non-terminal total **23** (13 plus 9 plus 1).
 - **Slice-level suggestions (three, not registered as OBs)**:
   1. **`R-ACCUMULATION-MECHANISM` (carried from v58)**: P74 was the first case to trigger the §9.2 rule (R>=2 means high risk) together with the §7.5 high-risk tier (one plus three); later implementation slices should pre-place the dynamic budget sentence in their kick-off message; P75 / P76 / P77 recorded R = 1, below the threshold, so it did not trigger. **No OB is registered now**; a recurrence in a later slice turns it into a formal OB.
   2. **`--progress` covers state transitions only, not log output (carried from v58)**: if long-running observability becomes a real need (the S1 Exit closeout slices are the most likely trigger), evaluate adding `--progress verbose` or `--tail-logs`.
   3. **The "obligation hand-off" convention (in use since v59, first applied to P75 O-7)**: whenever a slice hands an obligation to a future slice, that slice's fact package must carry a hand-off section, the landing slice entry in §4 must carry an "admission condition" section, and §5 may track it as an optional "pending execution list" (without an OB). **No OB is registered now**; if a hand-off is ever left dangling it becomes a formal OB.
 - **Removed in this version**: none.
-- **Flipped to `settled` in this version**: none.
+- **Flipped to `settled` in this version**: `OB-139` (landed by P82, v1.71).
 - Mechanical readings: max OB in §12.4 = **139**; **max ADR = 47**; max DR = 14; max deferral = round 25.
 
 ---
@@ -200,7 +200,7 @@ Generated: 2026-11-19. HEAD = `9ca6576`; directive = v1.70; three CI runs: the P
 ## §6 Pending user rulings
 
 - **The table is currently empty** (the three P81 rulings of 2026-11-19 have been made, see the last bullet of §2 and §5).
-- **Next ruling item (expected)**: **the start order of P82 versus P79** (the current advice is **P82 first**: the OB-139 correction channel already has two instances and is a recurring discipline gap, while the P79 due date is the earlier of the S2 start date and 2027-03-31 and still has room).
+- **Next ruling item (expected)**: **the start timing of P79** (P82 started on 2026-11-19 at the user's naming; the P79 due date is the earlier of the S2 start date and 2027-03-31).
 - **Three P81 rulings**: the two extra probes with `R = 1`, the acceptance of both temp-file events as `D = 2`, and the sixth OB-139 trigger moving the entry to "to be discussed" with P82 registered; all three are marked "made directly by the user, not usable as a precedent".
 
 ---
@@ -217,8 +217,8 @@ Same structure as v60: §7 (kick-off and step-0 general rules) points at directi
 >
 > [paste this checklist in full v64]
 >
-> [supporting documents] `REMAINING_SLICES{,_EN}.md` (P81 closed, P82 registered), `DELIVERY_DIRECTIVE.md` (**v1.70**), `directive-model-upgrade{,_EN}.md` (P81 report), `sg6-gatelevel-consolidate{,_EN}.md` (P80 report), `release-zip-binding{,_EN}.md` (P78 report), `ADR_REGISTER{,_EN}.md` (with ADR-045 / ADR-046 / ADR-047), `DOCUMENTATION_PLAN{,_EN}.md` (cross-session handoff entry pointer), `CHECKLIST_v63{,_EN}.md` (frozen, superseded by v64).
+> [supporting documents] `REMAINING_SLICES{,_EN}.md` (P81 closed, P82 in progress), `DELIVERY_DIRECTIVE.md` (**v1.71**), `directive-model-upgrade{,_EN}.md` (P81 report), `sg6-gatelevel-consolidate{,_EN}.md` (P80 report), `release-zip-binding{,_EN}.md` (P78 report), `ADR_REGISTER{,_EN}.md` (with ADR-045 / ADR-046 / ADR-047), `DOCUMENTATION_PLAN{,_EN}.md` (cross-session handoff entry pointer), `CHECKLIST_v63{,_EN}.md` (frozen, superseded by v64).
 >
-> Current slice: P81 is closed (main commit `45590e8` plus back-fills `fd4d8fb` and `9ca6576`). Next = **P82 (fixes the §5.1 temp-file discipline, bumps to v1.71, requires the user to name it)**; then P79 (the pre-S2 independent security review).
+> Current slice: P82 is in progress (started on 2026-11-19 at the user's naming; changes the §5.1 temp-file discipline and bumps to v1.71); then P79 (the pre-S2 independent security review).
 ## §11 One-line current state
-P81 closed (main commit `45590e8` plus back-fills `fd4d8fb` and `9ca6576` pushed to origin, runs `44281812336` + `44284200392` + `44392113028` all success; **R = 1 (probe-target deviation, corrective rework), D = 2 (two temp-file events)**; directive **v1.70**, the stage-6 `MAI Code 2 Flash` / stage-7 deep tier `GPT-6.2 Sol` replacement is in place, the G5-b closed set agrees three ways with 8 members, SELFTEST 740/740; the sixth OB-139 trigger moves the entry to "to be discussed" and registers P82); every advanceable tier-1 gate-level item stays closed; next = **P82 (bumps to v1.71, requires the user to name it)**, then P79.
+P81 closed (main commit `45590e8` plus back-fills `fd4d8fb` and `9ca6576` pushed to origin, runs `44281812336` + `44284200392` + `44392113028` all success; **R = 1 (probe-target deviation, corrective rework), D = 2 (two temp-file events)**; directive **v1.70**, the stage-6 `MAI Code 2 Flash` / stage-7 deep tier `GPT-6.2 Sol` replacement is in place, the G5-b closed set agrees three ways with 8 members, SELFTEST 740/740; the sixth OB-139 trigger is now disposed of by P82 and the directive rises to v1.71); every advanceable tier-1 gate-level item stays closed; current = P82 in progress, then P79.
