@@ -223,10 +223,12 @@ This slice cites two prohibitions marked not usable as a precedent: the P80 one-
 | Object | stage-7 post-fix re-review / **stop-and-escalate** (section 5.1 cumulative ceiling) |
 | Round | stage-7 narrowed read (user-authorised, see A-8 in section 3) and the **stop-and-escalate registration** (after A-9) |
 | Governing sections | section 5.1 "cumulative ceiling" (D reaches 3) plus section 7.8.3 "budget exhausted / user-authorised exception" |
-| Verdict line verbatim | `RE-REVIEW: PASS` (the narrowed read); the stop disposition = halt the slice's remaining steps and escalate to the user |
-| Budget count | stage 7 = 1 final review + 4 re-review calls (the fourth is the authorised narrowed read, see A-8); stage 6 = 2 of 3; stage 5 = 3 (r1 / r2 plus the authorised narrowed r3); probes 0 |
+| Verdict line verbatim | (1) `RE-REVIEW: PASS` (the B-prime narrowed read; finding 1 CLOSED); (2) `RE-REVIEW: FINDINGS` (the A-9 narrowed read, whose only finding was that the A-9 passage did not state the `tmp/` recursive file count and the untracked-entry reading explicitly); **on 2026-11-19 the user directly ruled that this FINDINGS is closed by `9d83089`** (a user ruling, not a precedent) |
+| Budget count | stage 7 = 1 final review + 3 in-budget re-reviews (r2, self-heal confirmation 1, self-heal confirmation 2) **exhausted**, plus 2 user-authorised narrowed reads (B-prime and A-9, off-budget and adding no R; the receipt draft records this as 1+4); stage 6 = 2 of 3; stage 5 = 3 (r1 / r2 plus the authorised narrowed r3); probes 0 |
 
 **Declared nature**: the D=3 stop-and-escalate of this slice was authorised by the user ruling of 2026-11-19 to finish the closing steps (section 7.8.3 user-authorised exception) and **may not be cited as a precedent**; the D count, the R count and the high-risk mark all stand (R = 2, D = 3).
+
+**The A-9 narrowed read and the user's closure ruling (verbatim trace)**: the A-9 narrowed read's verdict line = `RE-REVIEW: FINDINGS` (its check 2, "is the D=3 registration faithful", answered yes; the only finding was the explicitness gap); the controller then landed the minimal fix `9d83089` (adding the `tmp/` recursive file count before and after plus the untracked-entry reading to the A-9 passage, CN/EN symmetric, gates re-run green); on 2026-11-19 the user directly ruled that this FINDINGS is closed by `9d83089` (basis = an independent verbatim check that the three readings are complete, CN/EN are symmetric and the gates are green), **a user ruling and not a precedent**.
 
 ## 17. Artifact fence
 
