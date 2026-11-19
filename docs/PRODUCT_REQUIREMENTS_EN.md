@@ -108,6 +108,8 @@ Future monetary authorization requires bounded worst-case reservations and prohi
 
 (**P76 additive note, 2026-11-16**): this item has never been executed; **ADR-047** waives it and defers it to S2, and it must complete before S2 starts and no later than 2027-03-31. The original criterion is unchanged.
 
+(**P79 additive note, 2026-11-20**): the gate was reviewed on 2026-11-19 (conclusion = `FINDINGS`, 3 High + 5 Medium, report at `docs/validation/s2-pre-independent-security-review{,_EN}.md`; the ADR-047 status now reads `COMPENSATED`). The original criterion and its blocking force are unchanged.
+
 One structured S0 interview confirms the three most common tasks, acceptable intervention points, evidence retention and machine limits. S1 shadow records validate H1-H3 and feed the stage report. Market size, willingness to pay and competitor performance do not block the safety loop but require separate evidence before promotional claims.
 
 ## 8. Product Completeness Review (2026-09-06)

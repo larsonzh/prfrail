@@ -2,9 +2,9 @@
 
 [简体中文](SECURITY.md)
 
-Date: 2026-09-07; security-design baseline without independent security sign-off. This document is the normative authority for permissions, threat modeling, and hard security gates. [Project proposal](RFC-proofrail-unattended-ai-engineering-product.md) sections 12 and 16.7-16.8 retain risk and design provenance. Requirements: REQ-004/005/007/013/019/021-026/028.
+Date: 2026-09-07; security-design baseline; the independent security review was completed on 2026-11-19 (reviewer = independent final review, (7) deep tier `GPT-6.2 Sol (copilot)`; conclusion = `FINDINGS`; report in `s2-pre-independent-security-review{,_EN}.md`; this note supersedes the former "independent security sign-off not completed" status wording). This document is the normative authority for permissions, threat modeling, and hard security gates. [Project proposal](RFC-proofrail-unattended-ai-engineering-product.md) sections 12 and 16.7-16.8 retain risk and design provenance. Requirements: REQ-004/005/007/013/019/021-026/028.
 
-The independent security review (the S0-to-S1 gate in `PRODUCT_REQUIREMENTS` section 7) has never been executed; **ADR-047** (2026-11-16) waives it and defers it to S2, and it must complete before S2 starts and no later than 2027-03-31. This note does not change the original status wording above.
+Before P79 the independent security review (the S0-to-S1 gate in `PRODUCT_REQUIREMENTS` section 7) had never been executed; **ADR-047** (2026-11-16) waives it and defers it to S2, and it must complete before S2 starts and no later than 2027-03-31. This note does not change the original status wording in this line.
 
 ## 1. Assets and Trust
 

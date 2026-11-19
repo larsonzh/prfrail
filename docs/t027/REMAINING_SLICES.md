@@ -2220,6 +2220,29 @@ A6 ② 进度（第 2 批，2026-09-15）：
 
 完成记录（2026-11-19 更新）：报告对 `docs/validation/tmp-discipline-out-of-repo{,_EN}.md`；准则升 v1.71（MINOR）：§5.1 新增「仓库外同命令建删自愈子款」与「`tmp/` 根自愈的逐要素口径」、修订「仓库外位置从严」句，§0.3 增 v1.71 日志行，§12.4 的 OB-139 处置列翻 `已处置`，附录 C 增 C.0ax；**R = 2、D = 0**；⑥ `MAI Code 2 Flash (copilot)` r1 FINDINGS → r2 PASS（额度 3 用 2）；⑦ `GPT-5.3-Codex (copilot)` r1 FINDINGS → r2 `RE-REVIEW: PASS`（额度 1+3 用 1+1）；⑤ 额度 2/2 用尽后经用户授权 1 次收窄读 `PASS`（仅本片、不得作先例）。
 
+### P79 — `S2-PRE-INDEPENDENT-SECURITY-REVIEW`（ADR-047 补偿义务 · 独立安全评审补评 · 评估类）· 🔄 起跑
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `S2-PRE-INDEPENDENT-SECURITY-REVIEW`（独立安全评审补评；范围 = `PRODUCT_REQUIREMENTS` §7 的 S0→S1 安全门禁；来源 = ADR-047 补偿义务 + v65 快照 §四 队列项 `下一项`；编号 P79 先于 P81 / P82 预分配、起跑序在其后，如实登记） |
+| 状态 | 🔄 进行中（2026-11-19 用户点名起跑） |
+| 目标 | 在 S2 启动前完成一次独立安全评审并登记结论；三面 = 威胁模型面 / 硬安全门禁面 / 秘密与凭据面（ADR-047「未覆盖范围」逐字承接）；结论归档 `docs/validation/s2-pre-independent-security-review{,_EN}.md`，并同步 `SECURITY{,_EN}` 注记与 `ADR_REGISTER{,_EN}` 完成注记 |
+| 依赖 | ADR-047（`ADR_REGISTER` 的 ADR-047 所在行）；`SECURITY{,_EN}.md` 基线；`PRODUCT_REQUIREMENTS` §7 阻断门禁句；S2 启动前（到期日 = S2 启动日与 2027-03-31 中较早者） |
+| 规模 | M-L（评估类；v65 快照 §四 已冻结登记，本片不改快照） |
+| 步骤 | 0 → ① → ② 文档实现 → ③ 一致性 → ④ 门禁 → ⑤ 预审 → ⑥ 独立扫描 → ⑦ 终审（1 + 3 复审）→ ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| 现状缺口 | 独立安全评审历史状态 = 从未执行；`SECURITY{,_EN}` 的注记行仍标「未完成独立安全签署」；ADR-047 补偿义务尚未履行 |
+| 交付物 | ① 报告对 `docs/validation/s2-pre-independent-security-review{,_EN}.md`；② `docs/SECURITY{,_EN}.md` 注记行更新为「已完成 + 评审日期 + 评审者」；③ `docs/ADR_REGISTER{,_EN}.md` 的 ADR-047 完成注记；④ 本台账段与完成记录；⑤ 证据包 `docs/validation/evidence/P79-S2-PRE-INDEPENDENT-SECURITY-REVIEW/` |
+| 验收证据 | 三作用域 `TOTAL_FAIL=0`；SELFTEST 全绿；三面逐面给出结论档（PASS 或 FINDINGS + file:line + 最小修复）；报告对结构与 `artifacts` 围栏合规；`SECURITY{,_EN}` 注记四项齐全 |
+| 边界 | 评审范围为 S0→S1 安全门禁；不改 S1 Exit 八门判据；不改 `SECURITY{,_EN}` 威胁模型基线（仅评审结论归档与注记）；不改准则；不新增 OB / ADR（除非用户裁定）；不做任何 gitee 动作 |
+| 分级 | `[SLICE]` |
+| 探针额度 | 0（无外部真实调用） |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/P79-S2-PRE-INDEPENDENT-SECURITY-REVIEW/freedom-list.md` |
+| R/D 基线 | R = 0、D = 0（步骤 0 登记，§13.1.1；不继承 P82 的 R = 2 / D = 3） |
+| 临时件落点声明 | 本片临时目录 = `tmp/P79-S2-PRE-INDEPENDENT-SECURITY-REVIEW/`（⑧c 前只增不删；CI 捕获件同样落该目录，不落 `tmp/` 根） |
+| 额度口径披露 | ⑦ 额度按 L 档 = 1 终审 + 3 复审（用户 2026-11-19 同轮裁定；该判定超出「M-L 视同 M」的 §7.5 字面标准，系用户直接裁定、**不得作为先例**，报告「审查与计量」节须如实标注）；盲审不抽（必抽三语义不触） |
+
+完成记录（2026-11-19）：报告对 `docs/validation/s2-pre-independent-security-review{,_EN}.md`；⑦ 深度档 `GPT-6.2 Sol (copilot)` 首轮（盲态）`FINAL REVIEW: FINDINGS`（3 High + 5 Medium，三面皆 FINDINGS）；⑤ 2 轮（额度用尽）、⑥ 2 轮（额度 3 用 2，r2 `INDEPENDENT SCAN: PASS`）；R = 2（其一 = ⑤ 环整改重跑；其二 = ⑥ 环整改重跑）、D = 0；发现清单（F1–F8，3 High + 5 Medium）移交修复片，片名与起跑时点由用户后续点名；按 §11.2 不写 hash / run。
+
 ## 已知缺陷（后续切片前处理）
 
 > **阻断口径不变**：仅高频/已复现缺陷阻断，观测级 flake 只记录并在验证报告中列示。

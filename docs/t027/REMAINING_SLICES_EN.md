@@ -2207,6 +2207,29 @@ Completion record (updated 2026-11-19): report pair `docs/validation/directive-m
 
 Completion record (updated 2026-11-19): report pair `docs/validation/tmp-discipline-out-of-repo{,_EN}.md`; the directive rises to v1.71 (MINOR): section 5.1 gains the "out-of-repo same-command create-and-delete self-heal sub-clause" and the "`tmp/`-root self-heal per-element caliber", the "out-of-repo locations are strict" sentence is revised, section 0.3 gains the v1.71 row, the OB-139 disposition cell in section 12.4 flips to resolved, and appendix C gains C.0ax; **R = 2, D = 0**; stage 6 `MAI Code 2 Flash (copilot)` r1 FINDINGS -> r2 PASS (budget 3 used 2); stage 7 `GPT-5.3-Codex (copilot)` r1 FINDINGS -> r2 `RE-REVIEW: PASS` (budget 1+3 used 1+1); stage 5 exhausted its 2/2 budget and then, with user authorisation, one narrowed read returned `PASS` (this slice only, not a precedent).
 
+### P79 — `S2-PRE-INDEPENDENT-SECURITY-REVIEW` (ADR-047 compensation duty: independent security review supplement; assessment type) · 🔄 In progress
+
+| Field | Content |
+|---|---|
+| Identifier | `S2-PRE-INDEPENDENT-SECURITY-REVIEW` (independent security review supplement; scope = the S0-to-S1 security gate in `PRODUCT_REQUIREMENTS` section 7; source = the ADR-047 compensation duty plus the v65 snapshot section 4 queue item `next`; number P79 was pre-allocated before P81 / P82 while this slice starts after them, recorded as is) |
+| Status | 🔄 In progress (started 2026-11-19 on the user's naming) |
+| Goal | finish one independent security review before S2 starts and register the conclusion; three facets = threat-model facet / hard security gate facet / secrets and credentials facet (carried word for word from the ADR-047 "uncovered scope"); the conclusion is archived in `docs/validation/s2-pre-independent-security-review{,_EN}.md` and the `SECURITY{,_EN}` note and the `ADR_REGISTER{,_EN}` completion note are synced |
+| Dependency | ADR-047 (the ADR-047 row of `ADR_REGISTER`); the `SECURITY{,_EN}.md` baseline; the blocking gate sentence in `PRODUCT_REQUIREMENTS` section 7; before S2 starts (due date = the earlier of the S2 start date and 2027-03-31) |
+| Size | M-L (assessment type; already frozen in v65 snapshot section 4, this slice does not change the snapshot) |
+| Steps | 0 -> (1) -> (2) document implementation -> (3) consistency -> (4) gates -> (5) pre-review -> (6) independent scan -> (7) final review (1 + 3 re-reviews) -> (8a) -> (9) -> (8b) -> (8c) -> (10) |
+| Gap | the historical state of the independent security review = never executed; the note line of `SECURITY{,_EN}` still says "independent security sign-off not completed"; the ADR-047 compensation duty is still open |
+| Deliverables | (1) the report pair `docs/validation/s2-pre-independent-security-review{,_EN}.md`; (2) the note line of `docs/SECURITY{,_EN}.md` updated to "completed + review date + reviewer"; (3) the ADR-047 completion note in `docs/ADR_REGISTER{,_EN}.md`; (4) this ledger section and the completion record; (5) the evidence pack `docs/validation/evidence/P79-S2-PRE-INDEPENDENT-SECURITY-REVIEW/` |
+| Acceptance evidence | the three scopes `TOTAL_FAIL=0`; SELFTEST all green; each of the three facets gets a conclusion grade (PASS or FINDINGS + file:line + minimal fix); the report pair structure and the `artifacts` fence comply; the `SECURITY{,_EN}` note has all four items |
+| Boundary | the review scope is the S0-to-S1 security gate; no change to the eight S1 Exit gate criteria; no change to the `SECURITY{,_EN}` threat-model baseline (only the conclusion archive and the note); no change to the directive; no new OB / ADR unless the user rules otherwise; no gitee action |
+| Tier | `[SLICE]` |
+| Probe budget | 0 (no real external call) |
+| Freedom-list path | `docs/validation/evidence/P79-S2-PRE-INDEPENDENT-SECURITY-REVIEW/freedom-list.md` |
+| R/D baseline | R = 0, D = 0 (registered at start, section 13.1.1; does not inherit R = 2 / D = 3 from P82) |
+| Temp-file location | this slice's temp directory = `tmp/P79-S2-PRE-INDEPENDENT-SECURITY-REVIEW/` (append-only before (8)c; CI captures go to that same directory, never to the `tmp/` root) |
+| (7) budget | the (7) budget follows the L row = 1 final review + 3 re-reviews (user ruling of 2026-11-19 in the same turn; that ruling exceeds the section 7.5 literal standard "M-L counts as M", is a direct user ruling, **may not be cited as a precedent**, and the report's review-and-metering section must say so); no blind review (the three mandatory semantics are not touched) |
+
+Completion record (2026-11-19): report pair `docs/validation/s2-pre-independent-security-review{,_EN}.md`; (7) deep tier `GPT-6.2 Sol (copilot)` first round (blind) `FINAL REVIEW: FINDINGS` (3 High + 5 Medium, all three faces FINDINGS); (5) 2 rounds (budget exhausted), (6) 2 rounds (budget 3 used 2, r2 `INDEPENDENT SCAN: PASS`); R = 2 (one for the stage-5 fix re-run, one for the stage-6 fix re-run), D = 0; the finding list (F1–F8, 3 High + 5 Medium) is handed over to a fix slice whose name and start time the user will designate later; per section 11.2 no hash / run recorded.
+
 ## Known defects (to be handled before later slices)
 
 > **Blocking rule unchanged**: only high-frequency / reproduced defects block; observation-grade flakes are recorded and listed in the validation report.
