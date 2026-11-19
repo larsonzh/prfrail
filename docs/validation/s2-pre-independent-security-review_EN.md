@@ -356,6 +356,9 @@ This report uses no `A-NN` numbering; F1–F8 are the finding identifiers of sec
 - **R measured = 2** (one for the stage-5 round, one for the stage-6 round; the stage-7 re-review round is not counted under section 9.2). This reaches the `R>=2` threshold of section 9.2, which calls for marking the slice "high risk"; the marker was not set explicitly, **recorded here as a deviation of this slice** (every stage required by the high-risk row of section 5.2 — (1)(2)(3)(5)(6)(7)(9) — was actually executed, so no stage was skipped in substance), submitted to the user for the (10) review ruling.
 - **D measured = 1**: after the (8)c clean-up, the controller mistakenly created `tmp/P79-fix/` (not `tmp/<slice ID>/`) to hold the scripts for this correction; the whole directory was deleted immediately with zero residue (`tmp` top level = `.gitkeep` + `gates-cache`; the recursive file count excluding `gates-cache/g4b` is 1). Registered as **D = 1** under the section 5.1 self-heal grade; since the controller itself was the violator, the **self-heal verdict awaits the same-turn independent review layer or the user**, and is not deemed established before that confirmation.
 
+- **User ratification (A, 2026-11-20)**: regarding the missing explicit "high risk" marker at R = 2, the user ratifies the record above as written and orders **no rework and no further R/D counting** (ruling party = the user; date = 2026-11-20; reason = every stage was actually executed and no stage was skipped in substance, so rework yields nothing; basis = the user's review ruling of 2026-11-20); **this is a direct user ruling and may not be cited as a precedent**.
+- **User confirmation (B, 2026-11-20)**: the self-heal of D = 1 is established (self-report + immediate deletion on discovery + zero residue, with the `tmp` top level verified as `gates-cache,.gitkeep`); **D = 1 stands** and is recorded in the ledger completion record.
+
 ## 工件围栏
 
 ```artifacts

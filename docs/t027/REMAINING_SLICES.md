@@ -2241,7 +2241,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 临时件落点声明 | 本片临时目录 = `tmp/P79-S2-PRE-INDEPENDENT-SECURITY-REVIEW/`（⑧c 前只增不删；CI 捕获件同样落该目录，不落 `tmp/` 根） |
 | 额度口径披露 | ⑦ 额度按 L 档 = 1 终审 + 3 复审（用户 2026-11-19 同轮裁定；该判定超出「M-L 视同 M」的 §7.5 字面标准，系用户直接裁定、**不得作为先例**，报告「审查与计量」节须如实标注）；盲审不抽（必抽三语义不触） |
 
-完成记录（2026-11-19）：报告对 `docs/validation/s2-pre-independent-security-review{,_EN}.md`；⑦ 深度档 `GPT-6.2 Sol (copilot)` 首轮（盲态）`FINAL REVIEW: FINDINGS`（3 High + 5 Medium，三面皆 FINDINGS）；⑤ 2 轮（额度用尽）、⑥ 2 轮（额度 3 用 2，r2 `INDEPENDENT SCAN: PASS`）；R = 2（其一 = ⑤ 环整改重跑；其二 = ⑥ 环整改重跑）、D = 0；发现清单（F1–F8，3 High + 5 Medium）移交修复片，片名与起跑时点由用户后续点名；按 §11.2 不写 hash / run。
+完成记录（2026-11-19）：报告对 `docs/validation/s2-pre-independent-security-review{,_EN}.md`；⑦ 深度档 `GPT-6.2 Sol (copilot)` 首轮（盲态）`FINAL REVIEW: FINDINGS`（3 High + 5 Medium，三面皆 FINDINGS）；⑤ 2 轮（额度用尽）、⑥ 2 轮（额度 3 用 2，r2 `INDEPENDENT SCAN: PASS`）；R = 2（其一 = ⑤ 环整改重跑；其二 = ⑥ 环整改重跑）、D = 1（⑧c 后为落补正误建 `tmp/P79-fix/`，即时整目录删除、零残留；自愈判定待独立审查层或用户确认）；发现清单（F1–F8，3 High + 5 Medium）移交修复片，片名与起跑时点由用户后续点名；按 §11.2 不写 hash / run。
 
 ## 已知缺陷（后续切片前处理）
 
