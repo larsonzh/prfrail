@@ -208,7 +208,27 @@ This slice cites two prohibitions marked not usable as a precedent: the P80 one-
 - ⑧b (the ledger completion record: the report path plus R / D only) and ⑧c (temp-file cleanup and hash recomputation) run in that order, then the ⑩ receipt is issued.
 - Next slice recommendation: controller High; stage 1 and stage 5 on `DeepSeek V4 Pro (deepseek)`; stage 7 chosen from the §5.2 tier table; the effort setting belongs to the operator.
 
-## 16. Artifact fence
+## 16. Commit and CI (section 11.2 back-fill) and the stop trace
+
+- **Main commit**: `0264bcd` (`docs: close the temp-file discipline gap for out-of-repo paths (P82)`), whose file count matches the changeset this slice declares, with `+2064/-46`.
+- **Push**: `origin/main`, range `cd790b6..0264bcd` (**no gitee push**).
+- **CI**: run **`44447198220`** (head `0264bcd`) ended **success**; `Go ubuntu-latest` success, `Go windows-latest` success, the other three jobs skipped as usual.
+- **D=3 registration commit**: `adb8cb9` (`docs: record the third temp-file event and its stop-and-escalate handling (P82)`), 2 files, `+12/-6`, pushed to `origin/main` (**no gitee push**).
+- This section is back-filled after the main commit's CI turned green (section 11.2); the CI run of any later docs-only commit is an observation record only and earns no further commit.
+
+**Section 7.8.5 stop-decision trace (five fields)**:
+
+| Field | Value |
+|---|---|
+| Object | stage-7 post-fix re-review / **stop-and-escalate** (section 5.1 cumulative ceiling) |
+| Round | stage-7 narrowed read (user-authorised, see A-8 in section 3) and the **stop-and-escalate registration** (after A-9) |
+| Governing sections | section 5.1 "cumulative ceiling" (D reaches 3) plus section 7.8.3 "budget exhausted / user-authorised exception" |
+| Verdict line verbatim | `RE-REVIEW: PASS` (the narrowed read); the stop disposition = halt the slice's remaining steps and escalate to the user |
+| Budget count | stage 7 = 1 final review + 4 re-review calls (the fourth is the authorised narrowed read, see A-8); stage 6 = 2 of 3; stage 5 = 3 (r1 / r2 plus the authorised narrowed r3); probes 0 |
+
+**Declared nature**: the D=3 stop-and-escalate of this slice was authorised by the user ruling of 2026-11-19 to finish the closing steps (section 7.8.3 user-authorised exception) and **may not be cited as a precedent**; the D count, the R count and the high-risk mark all stand (R = 2, D = 3).
+
+## 17. Artifact fence
 
 ```artifacts
 docs/DELIVERY_DIRECTIVE.md	repo

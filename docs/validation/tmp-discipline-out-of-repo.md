@@ -208,7 +208,27 @@ TOTAL_FAIL=0
 - ⑧b（台账完成记录：只写报告路径与 R / D）与 ⑧c（临时件清理与哈希复算）按序执行，随后出 ⑩ 回执。
 - 下一片建议：主控 High；① 与 ⑤ 用 `DeepSeek V4 Pro (deepseek)`；⑦ 按 §5.2 分档表选定；档位设定权归 operator。
 
-## 16. 工件围栏
+## 16. 提交与 CI（§11.2 回填）与停片留痕
+
+- **主提交**：`0264bcd`（`docs: close the temp-file discipline gap for out-of-repo paths (P82)`），变更集文件数与 §13 的声明一致，行数 `+2064/−46`。
+- **推送**：`origin/main`，范围 `cd790b6..0264bcd`（**未推 gitee**）。
+- **CI**：run **`44447198220`**（head `0264bcd`）终态 **success**；`Go ubuntu-latest` success、`Go windows-latest` success，其余三个 job 常态 skipped。
+- **D=3 登记提交**：`adb8cb9`（`docs: record the third temp-file event and its stop-and-escalate handling (P82)`），2 文件 `+12/−6`，已推 `origin/main`（**未推 gitee**）。
+- 本节由主提交 CI 双绿后补入（§11.2）；后续 docs-only 提交自身的 CI run 只作观察记录，不为其新增提交。
+
+**§7.8.5 停止决策留痕（五字段）**：
+
+| 字段 | 取值 |
+|---|---|
+| 对象 | ⑦ 整改后复审 / **停片升级**（§5.1 累计上界） |
+| 轮次 | ⑦ 收窄读（用户授权，见 §3 的 A-8）与**停片升级登记**（A-9 之后） |
+| 依据节号 | §5.1 的「累计上界」（D 达 3）+ §7.8.3「额度用尽 / 用户授权例外」 |
+| 结论行原文 | `RE-REVIEW: PASS`（收窄读）；停片处置 = 停止该切片后续环节并升级用户裁决 |
+| 额度计数 | ⑦ = 1 终审 + 4 复审调用（第 4 次为授权收窄读，见 A-8）；⑥ = 2 / 3；⑤ = 3（r1 / r2 + 授权收窄读 r3）；探针 0 |
+
+**性质如实标注**：本片的 D=3 停片升级由用户 2026-11-19 裁定授权完成收尾（§7.8.3 用户授权例外），**不得作为先例**；D 计数、R 计数与高风险标记均保持（R = 2、D = 3）。
+
+## 17. 工件围栏
 
 ```artifacts
 docs/DELIVERY_DIRECTIVE.md	repo
