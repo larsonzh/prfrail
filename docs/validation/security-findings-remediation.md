@@ -128,6 +128,17 @@
 | `TestP83Fix7T5c1RetainedSymlinkIsRefused` | 同上（Windows 侧链接拒绝分支以静态与 junction 变体覆盖） |
 | `TestP83Fix8T4c` / `E` 的变异复核 | 同上 |
 
+### CI 执行记录
+
+| 阶段 | 提交 | run | 结果 |
+|---|---|---|---|
+| 首跑（红） | `ec532a4` | `44795140136` | ubuntu `Test` 5 例失败；windows `Gates` 的 `base go test ./...` 报 ok=14 FAIL=3 |
+| 修复 | `c820743` | — | 仅 3 个测试文件：F8 夹具改为平台感知、F2 端到端接受更早的准入门、fix8E 兄弟进程脚本稳健化 |
+| 复跑（绿） | `c820743` | `44801690679` | 双腿 `success`；ubuntu 的 Test/Race/Contract fixtures/Gates 全执行；windows 的 Test/Gates 执行（Race 与 Contract fixtures 按设计跳过） |
+| 包级硬证据 | `c820743` | `44801690679` | 两腿 `PASS  base go test ./... :: ok=15 FAIL=0`、`SELFTEST: PASS 740/740`、`TOTAL_FAIL=0` |
+
+VM 本地（`10.0.0.199`，go1.22.12）：定向 `internal/adapters` / `internal/console` / `internal/guard` 全 `ok`；全量 15 包全 `ok`；5 例 verbose 均 `--- PASS`（无 SKIP）；定向 `-race` 全 `ok`。
+
 ## 12. 环境与档位
 
 | 角色 | 载体与档位 | 设定时刻 | 是否暂停 |

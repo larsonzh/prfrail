@@ -128,6 +128,17 @@ All five are deferred parts of the F1–F8 remediation duty; the user names P84 
 | `TestP83Fix7T5c1RetainedSymlinkIsRefused` | same as above (the Windows link-refusal branch is covered statically and by the junction variant) |
 | `TestP83Fix8T4c` / `E` mutation replay | same as above |
 
+### CI execution record
+
+| Stage | Commit | Run | Result |
+|---|---|---|---|
+| First run (red) | `ec532a4` | `44795140136` | ubuntu `Test` failed 5 cases; windows `Gates` reported `base go test ./...` ok=14 FAIL=3 |
+| Fix | `c820743` | — | three test files only: platform-neutral F8 fixtures, F2 end-to-end accepting the earlier admission gate, robust fix8E sibling script |
+| Re-run (green) | `c820743` | `44801690679` | both legs `success`; ubuntu ran Test/Race/Contract fixtures/Gates; windows ran Test/Gates (Race and Contract fixtures skipped by design) |
+| Package-level evidence | `c820743` | `44801690679` | both legs `PASS  base go test ./... :: ok=15 FAIL=0`, `SELFTEST: PASS 740/740`, `TOTAL_FAIL=0` |
+
+VM local (`10.0.0.199`, go1.22.12): targeted `internal/adapters` / `internal/console` / `internal/guard` all `ok`; full suite 15 packages all `ok`; the five cases all `--- PASS` in verbose mode (no SKIP); targeted `-race` all `ok`.
+
 ## 12. Environment and tiers
 
 | Role | Carrier and tier | Set at | Paused |
