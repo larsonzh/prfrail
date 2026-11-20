@@ -2253,6 +2253,48 @@ Completion record (2026-11-19): report pair `docs/validation/s2-pre-independent-
 
 Completion record (2026-11-21): report pair `docs/validation/security-findings-remediation{,_EN}.md` (verdict `PARTIALLY CLOSED`); **F2 / F5 / F7 plus the T9 narrowing are closed; F1 / F4 partially implemented with residuals deferred to P84; F3 / F6 / F8 deferred to P84** (T2 STOP = AgentRunner has no persistable, independently re-verifiable frozen policy artifact; T3 = the Windows name-to-launch-image binding window and Linux same-inode not meaning byte-immutable; T8a = "refuse BYOK when on-disk redaction cannot be proven" not implemented); five deferral candidates (P84-a policy artifact, P84-b immutable install source, P84-c BYOK proof carrier, P84-d bounddir case-folding and reparse residuals, plus P84-e durable proof recovery) are listed in the report section 8; **contract impact = all eight are DOES-NOT-TOUCH** (no `CONTRACTS{,_EN}` / schema / fixture change); **R = 2, D = 0**; (7) ran six rounds (blind 1, final 1, re-review 3, additional 1); the (5) 2/2 and (6) 2/3 PASS verdicts bind the pre-remediation snapshot, and the final snapshot is covered only by the (7) re-reviews, which remained FINDINGS; anomaly E-1 (an unstaged change in `CHECKLIST_v66.md` whose origin could not be attributed) was reverted with `git checkout --` per the user ruling and is not counted as D; **the first CI run `44795140136` (head `ec532a4`) was red on both legs**: ubuntu `Test` failed 5 cases (the F8 fixtures used `cmd.exe`, the F2 end-to-end assertion was too strict, and the fix8E sibling script was not robust) while windows `Gates` reported `base go test ./...` ok=14 FAIL=3; **after fix commit `c820743` (three test files only) run `44801690679` is `success` on both legs** (ubuntu ran Test/Race/Contract fixtures/Gates; windows ran Test/Gates, with Race and Contract fixtures skipped by design), both legs report `PASS base go test ./... :: ok=15 FAIL=0`, `SELFTEST 740/740`, `TOTAL_FAIL=0`; on the VM (go1.22.12) the five cases all PASS in verbose mode, the full suite is 15/15 ok, and the targeted `-race` run is ok; the windows three-package flake is registered as DR-15; hash / run are recorded in this CI record (section 11.2 backfill).
 
+### P84 — `BOUNDDIR-RESIDUAL` (T4 / T5#4 residuals, closes F1 / F4; implementation type) · ⬜ Not started
+
+| Field | Content |
+|---|---|
+| Identifier | `BOUNDDIR-RESIDUAL` (carries P84-d and P84-e from the P83 report section 8: T4 = bounddir case folding, intermediate reparse, root relative-path semantics; T5#4 = predecessor validation in the batch rewrite and a recoverable generation-to-proof transaction; source = the user's scheduling ruling of 2026-11-21) |
+| Status | ⬜ Not started (**the user must name the start**; the start message records the four elements) |
+| Goal | Close F1 and F4: make artifact enumeration and root binding provable on case-sensitive Windows directories and across intermediate reparse points, and make the lease generation plus task-proof update a recoverable transaction whose batch rewrite validates every predecessor |
+| Dependencies | P83 partially closed (`4323503`); P83 report section 8 deferral list P84-d / P84-e; current state of `internal/evidence/bounddir_*`, `internal/guard/lease.go`, `internal/console/runtime_supervised.go` |
+| Size | M (two platform-binding / transaction semantics areas; changes concentrate in the evidence and guard / console proof chain) |
+| Steps | 0 → (1) → (2) → (3) consistency → (4) gates → (5) pre-review → (6) independent scan → (7) blind + final + re-review → (8)a → (9) → (8)b → (8)c → (10) |
+| Current gap | Windows descendant enumeration compares path strings only, so `EqualFold` cannot prove ownership; an intermediate reparse point can still be followed; the root is expressed as an empty relative path while an explicit `.` is refused; the batch proof rewrite compares only `ResourceID`, so another task's proof can stand in; the generation commit and the proof write are not one transaction, so a cross-process interruption cannot be recovered |
+| Deliverables | (1) the platform binding implementation and tests (including the Linux leg); (2) the transactional proof update and predecessor validation; (3) report pair `docs/validation/bounddir-residual{,_EN}.md`; (4) this ledger section and its completion record; (5) the evidence pack |
+| Acceptance evidence | One falsifiable assertion plus counterexample and mutation check per item; at least one counterexample each for case folding, intermediate reparse, root semantics, predecessor tampering and interruption recovery; all three scopes `TOTAL_FAIL=0`; both the Ubuntu and the Windows leg actually run |
+| Boundaries | Fix the F1 / F4 residuals only; do not change F3 / F6 / F8; do not change the S1 Exit eight gates; do not change the threat-model baseline; do not bump the directive version; no gitee |
+| Grade | `[SLICE]` |
+| Probe budget | 0 (no real external call) |
+| Freedom-list path | `docs/validation/evidence/P84-BOUNDDIR-RESIDUAL/freedom-list.md` |
+| R/D baseline | R = 0, D = 0 (registered at start, section 13.1.1; does not inherit R = 2 / D = 0 from P83) |
+| Temp-file location | this slice's temp directory = `tmp/P84-BOUNDDIR-RESIDUAL/` (append-only before (8)c; CI captures go to that same directory, never to the `tmp/` root) |
+| (7) budget | (7) deep tier = `GPT-6.2 Sol (copilot)`; budget = 1 final review + 3 re-reviews with one mandatory blind review (counted separately as +1); **this is the user's scheduling ruling of 2026-11-21 and may not be cited as a precedent**; the start message records the four elements; protocol first: (1) judges the contract impact before any code moves |
+
+### P85 — `SECURITY-PROOF-SUBSYSTEM` (policy artifact / immutable install source / BYOK proof carrier; closes F3 / F6 / F8; implementation type) · ⬜ Not started
+
+| Field | Content |
+|---|---|
+| Identifier | `SECURITY-PROOF-SUBSYSTEM` (carries P84-a / P84-b / P84-c from the P83 report section 8: T2 = a frozen policy artifact an AgentRunner run can re-verify persistently; T3 = an immutable install source; T8a = a BYOK proof carrier; source = the user's scheduling ruling of 2026-11-21) |
+| Status | ⬜ Not started (**the user must name the start**; the start message records the four elements) |
+| Goal | Close F3 / F6 / F8: provide policy evidence that is protected from the executor, persistable and independently re-verifiable, bound to run / task / step; establish an install source that can be proven not to change; prove the BYOK child writes no unredacted log, and refuse when that cannot be proven |
+| Dependencies | P83 partially closed (`4323503`); P83 report section 8 deferral list P84-a / P84-b / P84-c; P84 may run in parallel (no hard dependency) |
+| Size | L (three new evidence capabilities; expected to touch `CONTRACTS{,_EN}` plus schemas / fixtures, so protocol first) |
+| Steps | 0 → (1) contract-impact verdict → protocol first (change the contract before code when touched) → (2) → (3) → (4) → (5) → (6) → (7) blind + final + re-review → (8)a → (9) → (8)b → (8)c → (10) |
+| Current gap | AgentRunner has no persistent frozen policy artifact, so `grant.PolicyHash` has nothing independent to compare against; the Windows launch-image binding window and the Linux same-inode byte mutability remain open; the BYOK child's own on-disk logging is uncontrolled and `T8a` is not implemented |
+| Deliverables | (1) the policy artifact (writer / verifier plus counterexamples); (2) the immutable install-source decision; (3) the BYOK proof carrier and its refusal path; (4) contract plus schemas / fixtures (when step (1) judges the semantics are touched); (5) report pair `docs/validation/security-proof-subsystem{,_EN}.md`; (6) the ledger section and completion record; (7) the evidence pack |
+| Acceptance evidence | Each of the three has "missing / unreadable / shape-valid but mismatching" counterexamples that all refuse; an unprovable BYOK probe performs zero starts; all three scopes `TOTAL_FAIL=0`; both CI legs actually run; the report pair is strictly mirrored |
+| Boundaries | Close only the deferred parts of F3 / F6 / F8; do not change F1 / F4 (P84 owns them); do not change the S1 Exit eight gates; do not change the threat-model baseline; do not bump the directive version; no gitee |
+| Grade | `[SLICE]` |
+| Probe budget | 0 (default; if a real BYOK call is needed, stop and request pre-authorization per section 7.6) |
+| Freedom-list path | `docs/validation/evidence/P85-SECURITY-PROOF-SUBSYSTEM/freedom-list.md` |
+| R/D baseline | R = 0, D = 0 (registered at start, section 13.1.1; does not inherit R = 2 / D = 0 from P83) |
+| Temp-file location | this slice's temp directory = `tmp/P85-SECURITY-PROOF-SUBSYSTEM/` (append-only before (8)c; CI captures go to that same directory, never to the `tmp/` root) |
+| (7) budget | (7) deep tier = `GPT-6.2 Sol (copilot)`; budget = 1 final review + 3 re-reviews with one mandatory blind review (counted separately as +1); **this is the user's scheduling ruling of 2026-11-21 and may not be cited as a precedent**; the start message records the four elements; protocol first: (1) judges the contract impact before any code moves |
+
 ## Known defects (to be handled before later slices)
 
 > **Blocking rule unchanged**: only high-frequency / reproduced defects block; observation-grade flakes are recorded and listed in the validation report.

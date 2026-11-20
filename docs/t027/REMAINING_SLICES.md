@@ -2266,6 +2266,48 @@ A6 ② 进度（第 2 批，2026-09-15）：
 
 完成记录（2026-11-21）：报告对 `docs/validation/security-findings-remediation{,_EN}.md`（结论 `PARTIALLY CLOSED`）；**F2 / F5 / F7 + T9 收窄已闭合；F1 / F4 部分实现（残余顺延 P84）；F3 / F6 / F8 顺延 P84**（T2 STOP = AgentRunner 无可持久复验的冻结策略制品；T3 = Windows 名称到启动映像的绑定窗口与 Linux 同 inode 不等于字节不可变；T8a = 「无法证明禁写即拒发 BYOK」未实施）；顺延候选 5 项（P84-a 策略制品 / P84-b 不可变安装来源 / P84-c BYOK 证明载体 / P84-d bounddir 大小写与 reparse 残余 / P84-d 之补充 proof 恢复持久化）见报告 §8；**契约影响 = 八项均 DOES-NOT-TOUCH**（未改 `CONTRACTS{,_EN}` / schema / 夹具）；**R = 2、D = 0**；⑦ 共 6 轮（盲审 1 + 终审 1 + 复审 3 + 追加 1）；⑤ 2/2 与 ⑥ 2/3 的 PASS 绑定整改前快照，最终快照仅由 ⑦ 复审覆盖且仍为 FINDINGS；异常 E-1（`CHECKLIST_v66.md` 未暂存改动，来源未归因）已按用户裁定 `git checkout --` 回滚，不计 D；**CI 首跑 `44795140136`（head `ec532a4`）双红**：ubuntu `Test` 5 例（F8 夹具用 `cmd.exe`、F2 端到端断言过严、fix8E 兄弟脚本不稳健）与 windows `Gates` 的 `base go test ./...` 报 ok=14 FAIL=3；**修复提交 `c820743`（仅 3 个测试文件）后 run `44801690679` 双腿 `success`**（ubuntu Test/Race/Contract fixtures/Gates 全执行；windows Test/Gates 执行，Race 与 Contract fixtures 按设计跳过），两腿 `PASS base go test ./... :: ok=15 FAIL=0`、`SELFTEST 740/740`、`TOTAL_FAIL=0`；VM（go1.22.12）本地 5 例 verbose 全 PASS、全量 15 包 ok、定向 `-race` ok；windows 3 包 flake 按 DR-15 登记观察；hash / run 见本段 CI 记录（§11.2 回填）。
 
+### P84 — `BOUNDDIR-RESIDUAL`（T4 / T5#4 残余 · 闭合 F1 / F4 · 实现类）· ⬜ 未开始
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `BOUNDDIR-RESIDUAL`（承接 P83 报告 §8 的 P84-d 与 P84-e：T4 = bounddir 大小写折叠、中间 reparse、根相对路径语义；T5#4 = 批量回写前驱验证、代次到 proof 的可恢复事务；来源 = 用户 2026-11-21 排片裁定） |
+| 状态 | ⬜ 未开始（**起跑须用户点名**；起跑消息须四要素留痕） |
+| 目标 | 闭合 F1 与 F4：使产物枚举与根绑定在 Windows 大小写敏感目录与中间 reparse 下仍可证明归属；使租约代次与任务 proof 的更新成为可恢复事务，批量回写必须逐条校验前驱 |
+| 依赖 | P83 部分闭合（`4323503`）；P83 报告 §8 顺延清单 P84-d / P84-e；`internal/evidence/bounddir_*`、`internal/guard/lease.go`、`internal/console/runtime_supervised.go` 现状 |
+| 规模 | M（两处平台绑定 / 事务语义，改动面集中在 evidence 与 guard / console 的证明链） |
+| 步骤 | 0 → ① → ② → ③ 一致性 → ④ 门禁 → ⑤ 预审 → ⑥ 独立扫描 → ⑦ 盲审 + 终审 + 复审 → ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| 现状缺口 | Windows 枚举后代仅比路径字符串，`EqualFold` 不能证明归属；中间 reparse 可被跟随；根以空相对路径表示而显式 `.` 被拒；批量 proof 回写只比 `ResourceID`，可被他任务 proof 顶替；代次提交与 proof 写入非同一事务，跨进程中断不可恢复 |
+| 交付物 | ① 平台绑定实现与测试（含 Linux 腿）；② 事务化 proof 更新与前驱校验；③ 报告对 `docs/validation/bounddir-residual{,_EN}.md`；④ 台账本段与完成记录；⑤ 证据包 |
+| 验收证据 | 每项一条可证伪断言 + 反例与变异检验；大小写折叠 / 中间 reparse / 根语义 / 前驱篡改 / 中断恢复各有至少一条反例；三作用域 `TOTAL_FAIL=0`；Ubuntu 腿与 windows 腿均实跑 |
+| 边界 | 只修 F1 / F4 残余；不改 F3 / F6 / F8；不改 S1 Exit 八门判据；不改威胁模型基线；不升准则版本；不做 gitee |
+| 分级 | `[SLICE]` |
+| 探针额度 | 0（无外部真实调用） |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/P84-BOUNDDIR-RESIDUAL/freedom-list.md` |
+| R/D 基线 | R = 0、D = 0（起跑时登记，§13.1.1；不继承 P83 的 R = 2 / D = 0） |
+| 临时件落点声明 | 本片临时目录 = `tmp/P84-BOUNDDIR-RESIDUAL/`（⑧c 前只增不删；CI 捕获件同样落该目录，不落 `tmp/` 根） |
+| 额度口径披露 | ⑦ 深度档 = `GPT-6.2 Sol (copilot)`；额度 = 1 终审 + 3 复审，盲审必抽 1 次（另计 +1）；**系用户 2026-11-21 排片裁定、不得作为先例**；起跑须四要素留痕；协议先行：先由 ① 判定契约影响再动代码 |
+
+### P85 — `SECURITY-PROOF-SUBSYSTEM`（策略制品 / 不可变安装来源 / BYOK 证明载体 · 闭合 F3 / F6 / F8 · 实现类）· ⬜ 未开始
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `SECURITY-PROOF-SUBSYSTEM`（承接 P83 报告 §8 的 P84-a / P84-b / P84-c：T2 = AgentRunner 可持久复验的冻结策略制品；T3 = 不可变安装来源；T8a = BYOK 证明载体；来源 = 用户 2026-11-21 排片裁定） |
+| 状态 | ⬜ 未开始（**起跑须用户点名**；起跑消息须四要素留痕） |
+| 目标 | 闭合 F3 / F6 / F8：提供受执行者不可写保护、可持久复核的策略证据并绑定 run / task / step；建立可证明不可改写的安装来源；证明 BYOK 子进程不落未脱敏日志，不能证明即拒发 |
+| 依赖 | P83 部分闭合（`4323503`）；P83 报告 §8 顺延清单 P84-a / P84-b / P84-c；P84 可并行（无硬依赖） |
+| 规模 | L（三类新证据能力；预计触 `CONTRACTS{,_EN}` 与 schema / 夹具，须协议先行） |
+| 步骤 | 0 → ① 契约影响判定 → 协议先行（触则先改契约）→ ② → ③ → ④ → ⑤ → ⑥ → ⑦ 盲审 + 终审 + 复审 → ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| 现状缺口 | AgentRunner 无持久冻结策略制品，`grant.PolicyHash` 无独立对照物；Windows 启动映像绑定窗口与 Linux 同 inode 字节可变性未闭合；BYOK 子进程自身落盘行为未受控，`T8a` 未实施 |
+| 交付物 | ① 策略制品（含 writer / verifier 与反例）；② 不可变安装来源判定；③ BYOK 证明载体与拒发路径；④ 契约与 schema / 夹具（如 ① 判定触语义）；⑤ 报告对 `docs/validation/security-proof-subsystem{,_EN}.md`；⑥ 台账段与完成记录；⑦ 证据包 |
+| 验收证据 | 三项各自「缺失 / 不可读 / 合形但不匹配」三类反例均拒绝；BYOK 不能证明即零启动；三作用域 `TOTAL_FAIL=0`；双平台 CI 实跑；报告对双语严格镜像 |
+| 边界 | 只闭合 F3 / F6 / F8 的顺延部分；不改 F1 / F4（由 P84 承接）；不改 S1 Exit 八门判据；不改威胁模型基线；不升准则版本；不做 gitee |
+| 分级 | `[SLICE]` |
+| 探针额度 | 0（默认；若需真实 BYOK 调用，按 §7.6 停下申请预授权） |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/P85-SECURITY-PROOF-SUBSYSTEM/freedom-list.md` |
+| R/D 基线 | R = 0、D = 0（起跑时登记，§13.1.1；不继承 P83 的 R = 2 / D = 0） |
+| 临时件落点声明 | 本片临时目录 = `tmp/P85-SECURITY-PROOF-SUBSYSTEM/`（⑧c 前只增不删；CI 捕获件同样落该目录，不落 `tmp/` 根） |
+| 额度口径披露 | ⑦ 深度档 = `GPT-6.2 Sol (copilot)`；额度 = 1 终审 + 3 复审，盲审必抽 1 次（另计 +1）；**系用户 2026-11-21 排片裁定、不得作为先例**；起跑须四要素留痕；协议先行：先由 ① 判定契约影响再动代码 |
+
 ## 已知缺陷（后续切片前处理）
 
 > **阻断口径不变**：仅高频/已复现缺陷阻断，观测级 flake 只记录并在验证报告中列示。
