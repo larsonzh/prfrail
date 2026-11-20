@@ -1,6 +1,6 @@
 //go:build !windows && !darwin
 
-package adapters
+package evidence
 
 // P53 FIX-GAP-77-SYMLINK-ESCAPE: the fail-closed half of the seam contract and the
 // Close/read lifetime contract of a shared BoundDir.
@@ -39,7 +39,7 @@ import (
 // directory produces: openBoundDirFile rejects fd == -1 under dir.mu instead of
 // handing the released number to the kernel. The seam exports no sentinel for this
 // state, so the tests compare the message; a change to either side shows up here.
-const gap77NilBoundDirMessage = "adapters: nil bound directory"
+const gap77NilBoundDirMessage = "evidence: nil bound directory"
 
 // TestBoundDirFailClosedWithoutOpenat2 is the ENOSYS contract of ruling (a).
 //

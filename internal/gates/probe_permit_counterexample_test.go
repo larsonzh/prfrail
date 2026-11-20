@@ -42,7 +42,11 @@ func TestProbePermitRequireNilContextRejected(t *testing.T) {
 	marker := filepath.Join(t.TempDir(), "probe-permit.json")
 	permit := NewProbePermit("permit-nil-context", marker, 1)
 
-	err := permit.Require(nil)
+	// The nil is carried by a typed variable rather than an untyped nil literal:
+	// the subject of this case is the ctx == nil branch, and the variable keeps
+	// staticcheck SA1012 from flagging the deliberate call.
+	var nilContext context.Context
+	err := permit.Require(nilContext)
 	if !errors.Is(err, ErrProbePermitMissing) {
 		t.Fatalf("nil context must be refused as %v, got: %v", ErrProbePermitMissing, err)
 	}

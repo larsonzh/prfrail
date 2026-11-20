@@ -2,6 +2,7 @@ package chain
 
 import (
 	"encoding/json"
+	"errors"
 	"testing"
 	"time"
 
@@ -24,6 +25,8 @@ func TestBuildReviewResultApprove(t *testing.T) {
 		RecordedBy: evidence.Actor{Type: "operator", ID: "reviewer-one"},
 		ReviewMode: "manual",
 		Outcome:    "approve",
+		// F3: an approve decision must bind the candidate evidence root.
+		Evidence: []string{ReviewEvidenceBinding(request.CandidateSnapshotHash, request.EvidenceRootHash)},
 	}
 	result, err := buildReviewResult(request, decision, fixedClock, func() string { return "event-one" })
 	if err != nil {
@@ -31,6 +34,39 @@ func TestBuildReviewResultApprove(t *testing.T) {
 	}
 	if result.ReceiptHash == "" || result.Receipt.Outcome != "approve" {
 		t.Fatalf("unexpected review result: %+v", result)
+	}
+}
+
+// TestBuildReviewResultPolicyApproveRequiresEvidenceRootBinding is the F3
+// regression: a shape-valid policy approve without the candidate/evidence-root
+// binding must be refused by the independent checker and must produce no receipt.
+// Mutation check: deleting the binding comparison in validateReviewDecision lets
+// this approve through and turns the test red.
+func TestBuildReviewResultPolicyApproveRequiresEvidenceRootBinding(t *testing.T) {
+	request := ReviewRequest{
+		RunID:                 "run-one",
+		TaskID:                "task-one",
+		Attempt:               1,
+		ParentSnapshotHash:    baselineHash,
+		CandidateSnapshotHash: acceptedOne,
+		EvidenceRootHash:      stopHash,
+		CandidateProducer:     evidence.Actor{Type: "agent", ID: "agent-one"},
+	}
+	decision := ReviewDecision{
+		ReceiptID:  "review-policy-one",
+		OccurredAt: "2026-09-07T01:02:03.000Z",
+		RecordedBy: evidence.Actor{Type: "policy", ID: "policy-one"},
+		ReviewMode: "policy",
+		PolicyHash: stopHash,
+		Outcome:    "approve",
+		Evidence:   []string{stopHash},
+	}
+	result, err := buildReviewResult(request, decision, fixedClock, func() string { return "event-one" })
+	if !errors.Is(err, ErrInvalidState) {
+		t.Fatalf("approve without the evidence-root binding must be refused with ErrInvalidState, got %v", err)
+	}
+	if result.ReceiptHash != "" || result.Receipt.ReceiptID != "" {
+		t.Fatalf("a refused review must produce no receipt, got %+v", result)
 	}
 }
 

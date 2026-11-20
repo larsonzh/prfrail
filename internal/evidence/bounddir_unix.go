@@ -1,6 +1,6 @@
 //go:build !windows && !darwin
 
-package adapters
+package evidence
 
 // P42-T027B-EVIDENCE-BIND Q2, Unix half: a directory descriptor opened once, and
 // artifact reads resolved against that descriptor instead of a re-resolved path.
@@ -30,12 +30,12 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"sort"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"syscall"
 	"unsafe"
-
-	"github.com/larsonzh/prfrail/internal/evidence"
 )
 
 const (
@@ -106,7 +106,7 @@ func OpenBoundDir(path string) (*BoundDir, error) {
 	}
 	if uint32(stat.Mode)&uint32(syscall.S_IFMT) != uint32(syscall.S_IFDIR) {
 		_ = syscall.Close(fd)
-		return nil, fmt.Errorf("adapters: %s is not a directory", path)
+		return nil, fmt.Errorf("evidence: %s is not a directory", path)
 	}
 	return &BoundDir{fd: fd, path: path}, nil
 }
@@ -114,20 +114,26 @@ func OpenBoundDir(path string) (*BoundDir, error) {
 // OpenBoundDirFile opens one artifact relative to the bound directory. The
 // returned handle is the artifact's identity: the caller reads through it and
 // never resolves the name again.
-func OpenBoundDirFile(dir *BoundDir, rel string, bound int64) (*evidence.BoundFile, error) {
+func OpenBoundDirFile(dir *BoundDir, rel string, bound int64) (*BoundFile, error) {
 	return openBoundDirFile(dir, rel, bound, false)
+}
+
+// OpenBoundDirFileClass is the class-aware form: allowTruncation keeps the log and
+// event class readable past its bound instead of refusing the open.
+func OpenBoundDirFileClass(dir *BoundDir, rel string, bound int64, allowTruncation bool) (*BoundFile, error) {
+	return openBoundDirFile(dir, rel, bound, allowTruncation)
 }
 
 // openBoundDirFile is the class-aware form: allowTruncation keeps the log and
 // event class readable past its bound instead of refusing the open.
-func openBoundDirFile(dir *BoundDir, rel string, bound int64, allowTruncation bool) (*evidence.BoundFile, error) {
+func openBoundDirFile(dir *BoundDir, rel string, bound int64, allowTruncation bool) (*BoundFile, error) {
 	if dir == nil {
-		return nil, fmt.Errorf("adapters: nil bound directory")
+		return nil, fmt.Errorf("evidence: nil bound directory")
 	}
 	dir.mu.Lock()
 	defer dir.mu.Unlock()
 	if dir.fd < 0 {
-		return nil, fmt.Errorf("adapters: nil bound directory")
+		return nil, fmt.Errorf("evidence: nil bound directory")
 	}
 	clean, err := cleanBoundRelativePath(rel)
 	if err != nil {
@@ -140,11 +146,40 @@ func openBoundDirFile(dir *BoundDir, rel string, bound int64, allowTruncation bo
 		// working for a missing artifact.
 		return nil, &os.PathError{Op: "openat", Path: clean, Err: err}
 	}
+	// P83 FIX ROUND 4 (Item B): the open above is non-blocking, so a FIFO with no
+	// writer returns an fd instead of parking the collector forever. The type is
+	// then checked on the returned handle, before any read, and only a regular file
+	// is admitted: anything else is refused as an unsafe artifact with the same
+	// sentinel the other platforms return.
+	if err := boundArtifactRegular(fd, clean); err != nil {
+		_ = syscall.Close(fd)
+		return nil, err
+	}
 	// P53: openat2 confined the whole name beneath the descriptor in the syscall
 	// that opened it, so containment is decided at the instant resolution completes
 	// - unlike the Windows half, which has to confirm the opened file handle against
 	// the bound directory's current real name.
-	return evidence.NewBoundFile(os.NewFile(uintptr(fd), clean), bound, allowTruncation)
+	return NewBoundFile(os.NewFile(uintptr(fd), clean), bound, allowTruncation)
+}
+
+// boundArtifactRegular fstats an already open artifact descriptor and refuses
+// anything that is not a regular file.
+//
+// P83 FIX ROUND 4 (Item B): the check lives on the returned handle rather than on
+// the name, so it describes the very object the caller will read and cannot be
+// raced by a rename or a type swap between an open and a later stat. A FIFO that
+// has no writer is the case that used to hang the collector: the non-blocking open
+// returns, and this refusal makes it a missing/unsafe artifact instead of a read
+// that never ends.
+func boundArtifactRegular(fd int, clean string) error {
+	var stat syscall.Stat_t
+	if err := syscall.Fstat(fd, &stat); err != nil {
+		return fmt.Errorf("evidence: stat %s: %v", clean, err)
+	}
+	if uint32(stat.Mode)&uint32(syscall.S_IFMT) != uint32(syscall.S_IFREG) {
+		return fmt.Errorf("%w: %s has mode %#o", ErrBoundFileNotRegular, clean, uint32(stat.Mode))
+	}
+	return nil
 }
 
 // openBoundArtifactLocked resolves clean against dirfd. The caller holds dir.mu.
@@ -176,18 +211,104 @@ func openBoundArtifactLocked(dirfd int, clean string) (int, error) {
 	return fd, nil
 }
 
-// openat2Resolve performs the single confined resolution. glibc and musl expose no
-// openat2 wrapper (the man page says so) and this is a plain kernel ABI call, so
+// openat2Resolve performs the artifact resolution: the confined open with the
+// artifact open flags (see artifactOpenFlags).
+func openat2Resolve(dirfd int, clean string) (int, error) {
+	return openat2ResolveFlags(dirfd, clean, artifactOpenFlags)
+}
+
+// openBoundDirectoryLocked resolves a DIRECTORY name beneath dirfd with the same
+// confinement an artifact open uses (P83 fix round 7, item T4b). rel "." names the
+// bound directory itself.
+func openBoundDirectoryLocked(dirfd int, clean string) (int, error) {
+	if runtime.GOOS != "linux" || runtime.GOARCH != "amd64" {
+		return -1, syscall.ENOSYS
+	}
+	if openat2Disabled.Load() {
+		return -1, syscall.ENOSYS
+	}
+	fd, err := openat2ResolveFlags(dirfd, clean, artifactOpenFlags|syscall.O_DIRECTORY)
+	if err != nil {
+		if errors.Is(err, syscall.ENOSYS) {
+			openat2Disabled.Store(true)
+		}
+		return -1, err
+	}
+	return fd, nil
+}
+
+// artifactOpenFlags are the flags every bound artifact open uses: read-only, close
+// on exec, no leaf symlink, and non-blocking so a FIFO or a device node without a
+// writer cannot park the caller (P83 fix round 4, item B).
+const artifactOpenFlags = syscall.O_RDONLY | syscall.O_CLOEXEC | syscall.O_NOFOLLOW | syscall.O_NONBLOCK
+
+// BoundDirNames lists the entry names of one directory inside the bound directory
+// object, sorted (P83 fix round 7, item T4b).
+//
+// The listing is read from a descriptor resolved beneath the bound descriptor - not
+// from the caller's path - so the enumeration and the artifact reads describe the
+// same object even when the directory was renamed or replaced after it was bound.
+// rel == "" (or ".") names the bound object itself. A platform that cannot
+// enumerate through the descriptor returns ErrBoundDirUnsupported instead of
+// falling back to a path read.
+func BoundDirNames(dir *BoundDir, rel string) ([]string, error) {
+	if dir == nil {
+		return nil, fmt.Errorf("evidence: nil bound directory")
+	}
+	clean := "."
+	if strings.TrimSpace(rel) != "" {
+		cleaned, err := cleanBoundRelativePath(rel)
+		if err != nil {
+			return nil, err
+		}
+		clean = cleaned
+	}
+	dir.mu.Lock()
+	if dir.fd < 0 {
+		dir.mu.Unlock()
+		return nil, fmt.Errorf("evidence: nil bound directory")
+	}
+	fd, err := openBoundDirectoryLocked(dir.fd, clean)
+	dir.mu.Unlock()
+	if err != nil {
+		return nil, &os.PathError{Op: "openat", Path: rel, Err: err}
+	}
+	file := os.NewFile(uintptr(fd), clean)
+	defer func() { _ = file.Close() }()
+	// T4 (P83 fix round 8): Readdirnames reads the entries with getdents on the
+	// descriptor itself and returns names only. os.File.ReadDir must classify each
+	// entry, so an entry whose directory record carries DT_UNKNOWN - which several
+	// file systems report - is lstat'ed through its relative name (and the directory
+	// itself through "."), i.e. resolved against the process working directory
+	// instead of against the object this descriptor addresses. Names therefore come
+	// from the directory the descriptor names, and every candidate is still resolved
+	// with openat2 beneath the bound descriptor when it is opened, so the listing and
+	// the reads describe one object.
+	names, readErr := file.Readdirnames(-1)
+	if readErr != nil {
+		return nil, readErr
+	}
+	sort.Strings(names)
+	return names, nil
+}
+
+// openat2ResolveFlags performs the single confined resolution. glibc and musl expose
+// no openat2 wrapper (the man page says so) and this is a plain kernel ABI call, so
 // the syscall goes out directly through Syscall6: no cgo, no new dependency, no
 // go.mod change.
-func openat2Resolve(dirfd int, clean string) (int, error) {
+func openat2ResolveFlags(dirfd int, clean string, flags uint64) (int, error) {
 	name, err := syscall.BytePtrFromString(clean)
 	if err != nil {
 		return -1, err
 	}
 	how := openHow{
-		// O_NOFOLLOW stays as the leaf-level belt next to RESOLVE_NO_SYMLINKS.
-		flags:   syscall.O_RDONLY | syscall.O_CLOEXEC | syscall.O_NOFOLLOW,
+		// The caller supplies the open flags; artifactOpenFlags carries the
+		// leaf-level O_NOFOLLOW belt next to RESOLVE_NO_SYMLINKS and the O_NONBLOCK
+		// that keeps a FIFO without a writer from blocking the collector (P83 FIX
+		// ROUND 4, item B). O_NONBLOCK is a no-op for a regular file, which is the
+		// only type the caller then accepts (checked with fstat on the returned
+		// descriptor). A directory listing adds O_DIRECTORY to the same set.
+		flags:   flags,
 		mode:    0,
 		resolve: boundResolveMask,
 	}
@@ -204,6 +325,25 @@ func openat2Resolve(dirfd int, clean string) (int, error) {
 		return -1, errno
 	}
 	return int(fd), nil
+}
+
+// RootPath reports the directory name the bound descriptor was opened at. T4 (P83
+// fix round 6): it is the name the attempt's work directory is derived from, and
+// VerifyBoundDir is what proves that name still addresses this descriptor. T4 (P83
+// fix round 7) removed its other use: the artifact enumeration now reads the entries
+// from the descriptor itself (BoundDirNames) instead of globbing this path, so no
+// enumeration depends on a name. Unix has no portable handle-to-name mapping, so the
+// name of record is the one captured at bind time.
+func (dir *BoundDir) RootPath() (string, error) {
+	if dir == nil {
+		return "", fmt.Errorf("evidence: nil bound directory")
+	}
+	dir.mu.Lock()
+	defer dir.mu.Unlock()
+	if dir.fd < 0 {
+		return "", fmt.Errorf("evidence: nil bound directory")
+	}
+	return dir.path, nil
 }
 
 // Close releases the directory descriptor. It is idempotent and safe against a
@@ -230,16 +370,16 @@ func (dir *BoundDir) Close() error {
 // and is accepted.
 func boundDirVerify(dir *BoundDir, expected string) error {
 	if dir == nil {
-		return fmt.Errorf("adapters: nil bound directory")
+		return fmt.Errorf("evidence: nil bound directory")
 	}
 	dir.mu.Lock()
 	defer dir.mu.Unlock()
 	if dir.fd < 0 {
-		return fmt.Errorf("adapters: nil bound directory")
+		return fmt.Errorf("evidence: nil bound directory")
 	}
 	var boundStat syscall.Stat_t
 	if err := syscall.Fstat(dir.fd, &boundStat); err != nil {
-		return fmt.Errorf("adapters: stat the bound directory: %v", err)
+		return fmt.Errorf("evidence: stat the bound directory: %v", err)
 	}
 	info, err := os.Stat(expected)
 	if err != nil {
@@ -247,10 +387,16 @@ func boundDirVerify(dir *BoundDir, expected string) error {
 	}
 	expectedStat, ok := info.Sys().(*syscall.Stat_t)
 	if !ok {
-		return fmt.Errorf("adapters: %s carries no syscall stat", expected)
+		return fmt.Errorf("evidence: %s carries no syscall stat", expected)
 	}
 	if expectedStat.Dev != boundStat.Dev || expectedStat.Ino != boundStat.Ino {
-		return fmt.Errorf("adapters: bound directory %s is not %s", dir.path, expected)
+		return fmt.Errorf("evidence: bound directory %s is not %s", dir.path, expected)
 	}
 	return nil
+}
+
+// VerifyBoundDir is the exported form of the identity re-check, kept for the
+// adapters alias of the original seam.
+func VerifyBoundDir(dir *BoundDir, expected string) error {
+	return boundDirVerify(dir, expected)
 }

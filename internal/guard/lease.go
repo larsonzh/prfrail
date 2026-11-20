@@ -4,8 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/larsonzh/prfrail/internal/evidence"
@@ -16,6 +18,12 @@ var (
 	ErrLeaseNotHeld         = errors.New("writer lease not held")
 	ErrFencingTokenMismatch = errors.New("writer lease fencing token mismatch")
 	ErrTakeoverEvidence     = errors.New("takeover evidence insufficient")
+	// ErrLeaseHolderMismatch reports a renewal presented by a process that is not
+	// the holder the record names (T5).
+	ErrLeaseHolderMismatch = errors.New("writer lease holder mismatch")
+	// ErrLeaseReclaimUnproven reports an adoption attempted without the ownership
+	// proof the transfer requires (T5).
+	ErrLeaseReclaimUnproven = errors.New("writer lease reclaim unproven")
 )
 
 type FencingToken struct {
@@ -88,7 +96,16 @@ func (store *LeaseStore) Claim(ctx context.Context, resourceID, consumerID, clai
 	})
 }
 
-func (store *LeaseStore) Renew(ctx context.Context, resourceID string, token FencingToken, ttl time.Duration) (Lease, error) {
+// Renew extends the lease the caller currently holds and advances its
+// generation.
+//
+// T5 (P83 fix round 6): a token alone does not prove ownership. The old form
+// renewed on a matching token and kept the recorded process identity, so any
+// process that could read the token out of the run root - including a second
+// successor of a stopped holder - could keep extending a lease it never held.
+// The caller therefore has to present its own process identity, and renewal
+// refuses unless that identity is the holder the record already names.
+func (store *LeaseStore) Renew(ctx context.Context, resourceID string, token FencingToken, process ProcessIdentity, ttl time.Duration) (Lease, error) {
 	return store.mutate(ctx, resourceID, func(current *Lease) (Lease, bool, error) {
 		if current == nil {
 			return Lease{}, false, ErrLeaseNotHeld
@@ -96,8 +113,42 @@ func (store *LeaseStore) Renew(ctx context.Context, resourceID string, token Fen
 		if current.Token != token {
 			return Lease{}, false, ErrFencingTokenMismatch
 		}
+		if current.Process != process {
+			return Lease{}, false, ErrLeaseHolderMismatch
+		}
 		previous := current.LeaseHash
-		return store.newLease(resourceID, current.ConsumerID, FencingToken{ClaimID: token.ClaimID, Generation: token.Generation + 1}, current.Process, ttl, &previous)
+		return store.newLease(resourceID, current.ConsumerID, FencingToken{ClaimID: token.ClaimID, Generation: token.Generation + 1}, process, ttl, &previous)
+	})
+}
+
+// Reclaim transfers a held lease to a new holder and advances the generation.
+//
+// T5 (P83 fix round 6): adoption used to hand the successor the OLD record, so
+// two successors of a stopped holder could both "adopt" it, both verify the same
+// token, and both believe they hold the writer. Reclaiming makes adoption a
+// transfer: the record names the new holder and a new generation, and the second
+// successor - which still presents the previous token - is refused with
+// ErrFencingTokenMismatch.
+//
+// proof runs under the store lock, so the "the previous holder is stopped"
+// decision and the transfer cannot be separated by a competing successor. A
+// missing proof is a refusal: the store never transfers on trust.
+func (store *LeaseStore) Reclaim(ctx context.Context, resourceID string, token FencingToken, process ProcessIdentity, ttl time.Duration, proof func(Lease) error) (Lease, error) {
+	return store.mutate(ctx, resourceID, func(current *Lease) (Lease, bool, error) {
+		if current == nil {
+			return Lease{}, false, ErrLeaseNotHeld
+		}
+		if current.Token != token {
+			return Lease{}, false, ErrFencingTokenMismatch
+		}
+		if proof == nil {
+			return Lease{}, false, ErrLeaseReclaimUnproven
+		}
+		if err := proof(*current); err != nil {
+			return Lease{}, false, err
+		}
+		previous := current.LeaseHash
+		return store.newLease(resourceID, current.ConsumerID, FencingToken{ClaimID: token.ClaimID, Generation: token.Generation + 1}, process, ttl, &previous)
 	})
 }
 
@@ -227,12 +278,100 @@ func (store *LeaseStore) withLock(ctx context.Context, resourceID string, action
 	}
 	defer os.Remove(lockPath)
 	path := store.leasePath(resourceID)
+	// The record this call is about to replace is read before the action runs, so
+	// T5 retention below can keep the outgoing generation addressable by its hash.
+	replaced, replacedErr := readLease(path)
 	lease, write, err := action(path)
 	if err != nil || !write {
 		return lease, err
 	}
+	// T5 (P83 fix round): the record a renewal replaces stays addressable by the
+	// hash it carries, so a receipt bound to the previous generation remains
+	// independently re-verifiable after the renewal moved the current record on.
+	if replacedErr == nil && replaced.LeaseHash != lease.LeaseHash {
+		if err := store.retainGeneration(replaced); err != nil {
+			return Lease{}, err
+		}
+	}
 	if err := writeLease(path, lease); err != nil {
 		return Lease{}, err
+	}
+	return lease, nil
+}
+
+// generationPath names the retained body of one lease generation by its hash. It
+// sits next to the current record and never replaces it.
+//
+// NOTE (P83 fix round 6, registered as a non-blocking finding): retention is per
+// generation and never pruned, so a long-lived run grows this directory by one
+// file per renewal. A retention policy belongs HERE - generationPath is the only
+// place a retained name is derived, so a policy would delete by age or sequence
+// next to it and would never rewrite a name that is itself a hash.
+func (store *LeaseStore) generationPath(resourceID, leaseHash string) string {
+	return filepath.Join(store.root, resourceID+"."+strings.TrimPrefix(leaseHash, "sha256:")+".lease.json")
+}
+
+// retainGeneration writes the record a renewal is about to replace under its own
+// hash. T5: renewal used to overwrite the only copy, so an already completed
+// receipt that bound generation N-1 could no longer be re-verified against the
+// body it named.
+//
+// P83 FIX ROUND 6 (T5 "retention treats path-exists as success"): an existing
+// retained body is not accepted because the name exists. It is read back and has
+// to be the record whose hash names it - fields, chronology, hash - so a
+// corrupted or truncated retained file refuses the renewal instead of silently
+// standing in for an earlier generation that can no longer be verified. Writing a
+// different body under an occupied name is never an option: the name IS the hash.
+//
+// Retention is idempotent for a valid body: re-reading one that already verifies
+// keeps it exactly as it is.
+func (store *LeaseStore) retainGeneration(lease Lease) error {
+	if !evidence.ValidHash(lease.LeaseHash) {
+		return fmt.Errorf("%w: invalid retained lease hash", evidence.ErrInvalidRecord)
+	}
+	path := store.generationPath(lease.ResourceID, lease.LeaseHash)
+	// T5#3 (P83 fix round 7): the existence probe must not follow a link either, or
+	// a symlinked name would be judged "already retained" and the verification below
+	// would be the first thing to notice. Lstat keeps the decision on the name the
+	// store itself derives, and the read that follows refuses a link outright.
+	if _, err := os.Lstat(path); err == nil {
+		if _, verifyErr := store.retainedLease(lease.ResourceID, lease.LeaseHash); verifyErr != nil {
+			return fmt.Errorf("%w: the retained generation %s cannot be verified: %v", evidence.ErrInvalidRecord, lease.LeaseHash, verifyErr)
+		}
+		return nil
+	} else if !errors.Is(err, os.ErrNotExist) {
+		return err
+	}
+	return writeLease(path, lease)
+}
+
+// RetainedLease reads one earlier generation of a resource back by the hash it
+// carries, verifying it exactly like the current record. It is the exported form of
+// the re-verification seam: T5#4 (P83 fix round 8, item C) reconciles a proof that
+// was left on a superseded token only when the predecessor it names is a record the
+// store itself retained, so the reconciliation can never adopt a token that was
+// never issued for this resource.
+func (store *LeaseStore) RetainedLease(resourceID, leaseHash string) (Lease, error) {
+	return store.retainedLease(resourceID, leaseHash)
+}
+
+// retainedLease reads one lease generation back by the hash it carries. It is the
+// re-verification seam for earlier generations: the body is checked exactly like
+// the current record (fields, chronology and hash), and a body that does not hash
+// to the requested identity is refused instead of standing in for it.
+func (store *LeaseStore) retainedLease(resourceID, leaseHash string) (Lease, error) {
+	if err := validateLeaseID(resourceID); err != nil {
+		return Lease{}, err
+	}
+	if !evidence.ValidHash(leaseHash) {
+		return Lease{}, fmt.Errorf("%w: invalid retained lease hash", evidence.ErrInvalidRecord)
+	}
+	lease, err := readLease(store.generationPath(resourceID, leaseHash))
+	if err != nil {
+		return Lease{}, err
+	}
+	if lease.ResourceID != resourceID || lease.LeaseHash != leaseHash {
+		return Lease{}, fmt.Errorf("%w: retained lease hash mismatch", evidence.ErrInvalidRecord)
 	}
 	return lease, nil
 }
@@ -260,11 +399,23 @@ func writeLease(path string, lease Lease) error {
 	return os.Rename(tmpPath, path)
 }
 
+// leaseRecordMaxBytes bounds one lease record read. A record is a few hundred
+// bytes, so the bound exists only to stop a redirected or hostile file from making
+// the store read without end while it holds the resource lock (T5#3, P83 fix round
+// 7).
+const leaseRecordMaxBytes int64 = 64 << 10
+
+// readLease reads one lease record through a bounded, link-refusing handle.
+//
+// T5#3 (P83 fix round 7): the record used to be read with os.ReadFile, which
+// follows a link and reads until end of file. Retention and re-verification both run
+// while the store lock is held, so a record redirected to another file - or to a
+// stream that never ends - could redirect the verification or block every writer of
+// the resource. The read now opens without following a link, requires a regular file
+// on the returned descriptor and stops at leaseRecordMaxBytes; every one of those
+// violations is ErrInvalidRecord, never a shorter or a redirected read.
 func readLease(path string) (Lease, error) {
-	data, err := os.ReadFile(path)
-	if os.IsNotExist(err) {
-		return Lease{}, ErrLeaseNotHeld
-	}
+	data, err := readLeaseRecord(path)
 	if err != nil {
 		return Lease{}, err
 	}
@@ -285,6 +436,34 @@ func readLease(path string) (Lease, error) {
 		return Lease{}, fmt.Errorf("%w: lease hash mismatch", evidence.ErrInvalidRecord)
 	}
 	return lease, nil
+}
+
+// readLeaseRecord returns the bounded bytes of one record. A missing record keeps
+// its "not held" meaning so callers can still tell absence from corruption.
+func readLeaseRecord(path string) ([]byte, error) {
+	file, err := openLeaseRecord(path)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return nil, ErrLeaseNotHeld
+		}
+		return nil, fmt.Errorf("%w: open lease record: %v", evidence.ErrInvalidRecord, err)
+	}
+	defer func() { _ = file.Close() }()
+	info, statErr := file.Stat()
+	if statErr != nil {
+		return nil, fmt.Errorf("%w: stat lease record: %v", evidence.ErrInvalidRecord, statErr)
+	}
+	if !info.Mode().IsRegular() {
+		return nil, fmt.Errorf("%w: lease record is not a regular file", evidence.ErrInvalidRecord)
+	}
+	data, readErr := io.ReadAll(io.LimitReader(file, leaseRecordMaxBytes+1))
+	if readErr != nil {
+		return nil, fmt.Errorf("%w: read lease record: %v", evidence.ErrInvalidRecord, readErr)
+	}
+	if int64(len(data)) > leaseRecordMaxBytes {
+		return nil, fmt.Errorf("%w: lease record exceeds its %d byte bound", evidence.ErrInvalidRecord, leaseRecordMaxBytes)
+	}
+	return data, nil
 }
 
 func payloadOf(lease Lease) leasePayload {

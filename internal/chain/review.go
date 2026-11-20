@@ -11,6 +11,19 @@ import (
 
 const reviewReceiptDomain = "proofrail:review-receipt:1\n"
 
+// reviewEvidenceBindingDomain separates the candidate/evidence-root binding from
+// every other review digest.
+const reviewEvidenceBindingDomain = "proofrail:review-evidence-binding:1\n"
+
+// ReviewEvidenceBinding is the digest an approve decision must carry in its
+// Evidence: it binds the frozen candidate snapshot to the evidence root the
+// review claims to have examined, so a review that approves without naming both
+// cannot form a receipt (CONTRACTS.md:147-148: the independent checker decides
+// whether the evidenceRootHash/policyHash references really exist).
+func ReviewEvidenceBinding(candidateSnapshotHash, evidenceRootHash string) string {
+	return evidence.Digest(reviewEvidenceBindingDomain, []byte(candidateSnapshotHash+"\n"+evidenceRootHash))
+}
+
 type reviewReceipt struct {
 	ReceiptID           string         `json:"receiptId"`
 	OccurredAt          string         `json:"occurredAt"`
@@ -123,6 +136,20 @@ func validateReviewDecision(request ReviewRequest, decision ReviewDecision, now 
 	case "approve":
 		if decision.Reason != nil || decision.WaiverAuthorization != nil || len(decision.ErrorEvidence) != 0 {
 			return fmt.Errorf("%w: invalid approve review payload", ErrInvalidState)
+		}
+		// F3: an approve must bind the candidate evidence root it claims to have
+		// reviewed. Shape-valid policy hashes prove nothing on their own, so the
+		// independent checker refuses an approve whose Evidence omits the binding
+		// (CONTRACTS.md:147-148).
+		//
+		// T9 (finding: over-broad wiring): the requirement belongs to the paths that
+		// PUBLISH - the agent-runner and supervised assemblies, which both review in
+		// "policy" mode - because CONTRACTS.md:150 puts the evidence-root binding in
+		// the promotion transaction. The generic manual receipt used elsewhere is a
+		// review record, not a publish proof, so it keeps its pre-slice shape and is
+		// not forced to carry an item its contract never required.
+		if decision.ReviewMode == "policy" && !slices.Contains(decision.Evidence, ReviewEvidenceBinding(request.CandidateSnapshotHash, request.EvidenceRootHash)) {
+			return fmt.Errorf("%w: review approve must bind the candidate evidence root", ErrInvalidState)
 		}
 	case "reject":
 		if decision.Reason == nil || decision.WaiverAuthorization != nil || len(decision.ErrorEvidence) == 0 {

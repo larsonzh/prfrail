@@ -10,10 +10,30 @@ import (
 )
 
 func validRequest(root string) Request {
-	return Request{
-		RunID: "run-one", TaskID: "task-one", StepID: "step-one", Attempt: 1, ExecutionAttempt: 1, WorkspaceRoot: root, HookDefinitionHash: "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+	request := Request{
+		RunID: "run-one", TaskID: "task-one", StepID: "step-one", Attempt: 1, ExecutionAttempt: 1, WorkspaceRoot: root,
 		Hook: Hook{ID: "go-test", Kind: "test", Runner: ProcessRunner{Type: "process", Executable: "go", Args: []string{"test", "./...; touch injected"}}, EffectClass: "read-only", OnFail: FailurePolicy{Action: "fail-stop"}, Timeout: time.Second, Resources: ResourceLimits{MemoryBytes: 1, OutputBytes: 1024, ProcessCount: 1}, Network: NetworkPolicy{Mode: "deny"}},
 	}
+	// F5 (P83 fix round): Runner.Run now proves that the supplied digest is the
+	// digest of the frozen hook definition, so the fixture binds the real digest.
+	hash, err := DefinitionHash(request.Hook)
+	if err != nil {
+		panic(err)
+	}
+	request.HookDefinitionHash = hash
+	return request
+}
+
+// refreshHookDefinition re-binds the request digest after a test mutates the
+// frozen hook definition. F5: a stale digest is a contradiction, so every
+// mutation of request.Hook must be followed by this call.
+func refreshHookDefinition(t *testing.T, request *Request) {
+	t.Helper()
+	hash, err := DefinitionHash(request.Hook)
+	if err != nil {
+		t.Fatal(err)
+	}
+	request.HookDefinitionHash = hash
 }
 
 func allCapabilities() Capabilities {

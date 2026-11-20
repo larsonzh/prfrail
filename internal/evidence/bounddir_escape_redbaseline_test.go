@@ -1,6 +1,6 @@
 //go:build !windows && !darwin
 
-package adapters
+package evidence
 
 // P53 FIX-GAP-77-SYMLINK-ESCAPE - RED BASELINE VARIANT (runtime gated).
 //

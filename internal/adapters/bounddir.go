@@ -18,5 +18,10 @@ package adapters
 //
 // BoundDir, OpenBoundDir and OpenBoundDirFile are the shared surface; the
 // platform files own the mechanics and the post-open verification. The relative
-// name guard lives in bounddir_clean.go, which the darwin build excludes because
-// its fail-closed half resolves no names.
+// name guard lives with them, in the same package.
+//
+// P83 SECURITY-FINDINGS-REMEDIATION (X-1): the implementation now lives in
+// internal/evidence (bounddir_*.go there) so the gates runner can bind an
+// artifact workspace handle without importing this package. This package keeps
+// only the thin aliases in bounddir_alias.go; nothing here re-implements the
+// primitive.

@@ -35,7 +35,7 @@ type CostReport struct {
 
 func (cli CLI) executeCost(args []string, stdout, stderr io.Writer) int {
 	if len(args) == 0 {
-		fmt.Fprintln(stderr, "usage: prfrail cost report [--ledger <path>] [--json]")
+		fmt.Fprintln(stderr, "usage: prfrail cost report [--ledger <path>] [--run-dir <path>] [--json]")
 		return exitUsage
 	}
 	switch args[0] {
@@ -43,7 +43,7 @@ func (cli CLI) executeCost(args []string, stdout, stderr io.Writer) int {
 		return cli.executeCostReport(args[1:], stdout, stderr)
 	default:
 		fmt.Fprintf(stderr, "unknown cost subcommand: %s\n", args[0])
-		fmt.Fprintln(stderr, "usage: prfrail cost report [--ledger <path>] [--json]")
+		fmt.Fprintln(stderr, "usage: prfrail cost report [--ledger <path>] [--run-dir <path>] [--json]")
 		return exitUsage
 	}
 }
@@ -51,18 +51,23 @@ func (cli CLI) executeCost(args []string, stdout, stderr io.Writer) int {
 func (cli CLI) executeCostReport(args []string, stdout, stderr io.Writer) int {
 	set, parseErr := newFlagSet("cost report")
 	ledgerPath := set.String("ledger", "", "path to cost ledger file")
+	runDir := set.String("run-dir", "", "durable run directory the ledger is derived from")
 	jsonOutput := set.Bool("json", false, "output as JSON")
 	if err := set.Parse(args); err != nil {
-		return writeUsageError(stdout, stderr, "cost report", *jsonOutput, parseErr.String(), "usage: prfrail cost report [--ledger <path>] [--json]")
+		return writeUsageError(stdout, stderr, "cost report", *jsonOutput, parseErr.String(), "usage: prfrail cost report [--ledger <path>] [--run-dir <path>] [--json]")
 	}
 	if len(set.Args()) != 0 {
-		return writeUsageError(stdout, stderr, "cost report", *jsonOutput, "cost report does not accept positional arguments", "usage: prfrail cost report [--ledger <path>] [--json]")
+		return writeUsageError(stdout, stderr, "cost report", *jsonOutput, "cost report does not accept positional arguments", "usage: prfrail cost report [--ledger <path>] [--run-dir <path>] [--json]")
 	}
 	cwd, err := cli.getwd()
 	if err != nil {
 		return writeCommandError(stdout, stderr, "cost report", *jsonOutput, err)
 	}
-	resolvedPath, err := resolveCostLedgerPath(*ledgerPath, cwd)
+	resolvedRunRoot, err := resolveRunRootFromCWD(cwd, *runDir)
+	if err != nil {
+		return writeCommandError(stdout, stderr, "cost report", *jsonOutput, err)
+	}
+	resolvedPath, err := resolveCostLedgerPath(*ledgerPath, cwd, resolvedRunRoot)
 	if err != nil {
 		return writeCommandError(stdout, stderr, "cost report", *jsonOutput, err)
 	}
@@ -92,7 +97,24 @@ func (cli CLI) executeCostReport(args []string, stdout, stderr io.Writer) int {
 	return exitSuccess
 }
 
-func resolveCostLedgerPath(ledgerPath, cwd string) (string, error) {
+// resolveCostLedgerPath resolves the cost ledger of a cost command.
+//
+// T1/CLI (P83 fix round 6): the run writes its cost ledger under the durable run
+// root, so with a run root named the default is that run's own file and a
+// disagreeing --ledger is refused. Without a run root the historical
+// working-directory default remains for the "inspect an arbitrary ledger" flow.
+func resolveCostLedgerPath(ledgerPath, cwd, runRoot string) (string, error) {
+	if strings.TrimSpace(runRoot) != "" {
+		selected := ""
+		if strings.TrimSpace(ledgerPath) != "" {
+			resolved, err := resolvePathFromCWD(cwd, ledgerPath)
+			if err != nil {
+				return "", err
+			}
+			selected = resolved
+		}
+		return trustedLedgerPath(runRoot, defaultCostLedgerName, selected)
+	}
 	if strings.TrimSpace(ledgerPath) == "" {
 		return filepath.Abs(filepath.Join(cwd, defaultCostLedgerName))
 	}

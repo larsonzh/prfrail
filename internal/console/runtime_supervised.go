@@ -112,7 +112,6 @@ const (
 	supervisedReviewEvidenceDomain        = "proofrail:supervised-review-evidence:1\n"
 	supervisedStopperDomain               = "proofrail:supervised-stopper:1\n"
 	supervisedWriterStopDomain            = "proofrail:supervised-writer-stop:1\n"
-	supervisedLeaseDomain                 = "proofrail:supervised-lease:1\n"
 	supervisedPromotionEvidenceDomain     = "proofrail:supervised-promotion-evidence:1\n"
 	supervisedPromotionBlockedDomain      = "proofrail:supervised-promotion-blocked:1\n"
 	supervisedMissingProcessReason        = "no managed process was started by this run"
@@ -483,7 +482,14 @@ type supervisedTaskState struct {
 
 	acceptedEntries []snapshot.Entry
 	acceptedHash    string
-	workspaceReady  bool
+	// acceptedParentHash is the parent the accepted candidate was frozen against,
+	// so Publish can re-derive the candidate evidence root the review bound (F3).
+	acceptedParentHash string
+	// reviewPolicyHash is the policy hash the review decision bound. F3: Publish
+	// re-reads the risk-confirmation ledger and refuses a promotion whose freshly
+	// derived policy hash differs from this one.
+	reviewPolicyHash string
+	workspaceReady   bool
 }
 
 func (state *supervisedTaskState) key() string {
@@ -918,12 +924,21 @@ func (runtime *supervisedRuntime) replayConfirmedWindow(ctx context.Context, sta
 			return fmt.Errorf("%w: replaying the operator resume failed: %v", ErrSupervisedWindowUnproven, err)
 		}
 		session.OpenedAt = openedAt
-		return writeSupervisedJSON(runtime.sessionPath(state), session)
+		if err := writeSupervisedJSON(runtime.sessionPath(state), session); err != nil {
+			return err
+		}
+		// F4: the converged window owns the publish lease exactly like a first
+		// open, so the resumed run can publish provably.
+		return runtime.ensurePublishLease(ctx, state)
 	}
 	if err := runtime.engine.OpenSupervisedWorkWindow(ctx, session, confirmation); err != nil {
 		return err
 	}
-	return writeSupervisedJSON(runtime.sessionPath(state), session)
+	if err := writeSupervisedJSON(runtime.sessionPath(state), session); err != nil {
+		return err
+	}
+	// F4: see the already-open branch above.
+	return runtime.ensurePublishLease(ctx, state)
 }
 
 // supervisedOpenWindowAt reports whether the work window is already open for a
@@ -964,6 +979,71 @@ func supervisedConfirmationForBinding(ledger chain.SupervisedRiskConfirmationLed
 		}
 	}
 	return chain.SupervisedRiskConfirmationRecord{}, false
+}
+
+// supervisedCandidateEvidenceRoot derives the candidate evidence root of one
+// task attempt. Accept freezes it and Publish re-derives it from the same frozen
+// inputs, so the promotion can never ride on a root that drifted after review.
+func supervisedCandidateEvidenceRoot(runID, taskID string, attempt int, parentHash, manifestHash string) string {
+	return digest(supervisedCandidateEvidenceRootDomain, runID, taskID, fmt.Sprintf("%d", attempt), parentHash, manifestHash)
+}
+
+// supervisedReviewPolicyHash derives the review policy hash from the frozen
+// handoff policy. Review binds it and Publish re-derives it from the freshly read
+// freeze artifact (F3), so both ports share one derivation instead of each
+// inventing theirs.
+//
+// T2 (finding F3): the hash is the run's FROZEN policy digest and nothing else.
+// The operator's risk confirmation used to be folded in here, which let "the
+// operator confirmed the risk notice" stand in for "the policy is approved". The
+// confirmation is now a SEPARATE requirement of both ports (Review refuses a
+// missing one, Publish refuses a withdrawn one) and no longer shapes the policy
+// approval.
+func supervisedReviewPolicyHash(session chain.HandoffSession) string {
+	return digest(supervisedReviewPolicyDomain, session.HandoffPolicyHash)
+}
+
+// blockedPromotion is the fail-closed promotion answer of one F3 refusal: an
+// explicit failed outcome with no accepted snapshot and no lease evidence.
+func (runtime *supervisedRuntime) blockedPromotion(reason string) chain.PromotionDecision {
+	return chain.PromotionDecision{
+		ReceiptID:     runtime.nextID(),
+		OccurredAt:    runtime.clock().UTC().Format(timestampLayout),
+		Outcome:       "failed",
+		ErrorEvidence: []string{digest(supervisedPromotionBlockedDomain, reason)},
+	}
+}
+
+// verifyReviewPolicyBinding is the F3 publish-time verification of the supervised
+// assembly. Review adopted a policy hash derived from the handoff session and the
+// operator's risk confirmation; publishing proves the same fact once more against
+// the trusted ledgers, both of which only the operator CLI path writes: the
+// window must still be readable and the confirmation that covers this run/task/
+// step must still be present and derive the exact reviewed hash. An unreadable
+// artifact, a missing confirmation or a different hash refuses the promotion.
+func (runtime *supervisedRuntime) verifyReviewPolicyBinding(state *supervisedTaskState, request chain.PromotionRequest) error {
+	if !evidence.ValidHash(state.reviewPolicyHash) {
+		return fmt.Errorf("%w: no reviewed policy hash is bound to task %q", ErrInvalidConfig, request.TaskID)
+	}
+	session, found, err := runtime.loadSession(state)
+	if err != nil {
+		return fmt.Errorf("%w: the handoff session is unreadable: %v", ErrInvalidConfig, err)
+	}
+	if !found {
+		return fmt.Errorf("%w: promotion requires the supervised window artifacts", ErrSupervisedNotOpen)
+	}
+	ledger, err := runtime.loadConfirmationLedger()
+	if err != nil {
+		return fmt.Errorf("%w: the risk confirmation ledger is unreadable: %v", ErrInvalidConfig, err)
+	}
+	confirmation, ok := supervisedConfirmationForBinding(ledger, request.RunID, request.TaskID, state.stepID)
+	if !ok || !evidence.ValidHash(confirmation.RecordHash) {
+		return fmt.Errorf("%w: no operator risk confirmation covers this promotion", ErrInvalidConfig)
+	}
+	if supervisedReviewPolicyHash(session) != state.reviewPolicyHash {
+		return fmt.Errorf("%w: the frozen handoff policy no longer binds the reviewed policy", ErrInvalidConfig)
+	}
+	return nil
 }
 
 // confirmAndOpenWindow builds the binding risk confirmation, resumes the
@@ -1035,7 +1115,102 @@ func (runtime *supervisedRuntime) confirmAndOpenWindow(ctx context.Context, stat
 	if err := runtime.crash(supervisedCrashAfterWindowOpen); err != nil {
 		return err
 	}
-	return writeSupervisedJSON(runtime.sessionPath(state), session)
+	if err := writeSupervisedJSON(runtime.sessionPath(state), session); err != nil {
+		return err
+	}
+	// F4: the work window owns the run's publish lease. The claim is taken when the
+	// window becomes durable and persisted store-locally, so the re-entrant return
+	// (a new process) can prove it still holds the same exclusive lease before it
+	// publishes (CONTRACTS.md:150-151). A failed claim fails the confirmation
+	// instead of opening a window that could never publish provably.
+	return runtime.ensurePublishLease(ctx, state)
+}
+
+// ensurePublishLease claims the publish lease of this run once per task and
+// persists the proof next to the task's window artifacts. An existing proof is
+// reused, never re-claimed, so a replay converges instead of fighting its own
+// earlier claim; it is renewed instead when the lease is close to expiry, so a
+// long-lived run is not wedged by the TTL (P83 F4 liveness finding (c)).
+func (runtime *supervisedRuntime) ensurePublishLease(ctx context.Context, state *supervisedTaskState) error {
+	proof, found, err := runtime.loadPublishLease(state)
+	if err != nil {
+		return err
+	}
+	if found {
+		refreshed, err := renewPublishLease(ctx, runtime.runRoot, runtime.runID, proof, runtime.clock().UTC())
+		if err != nil {
+			return err
+		}
+		return runtime.persistRenewedPublishLease(proof, refreshed)
+	}
+	claimed, err := claimPublishLease(ctx, runtime.runRoot, runtime.runID)
+	if err != nil {
+		return err
+	}
+	// T5 (P83 fix round 6): a claim that adopted the lease from a predecessor
+	// transfers it to this process at a new generation, which invalidates every
+	// proof written before the transfer. The proofs of this run's other tasks are
+	// refreshed with it, so a task whose window was confirmed earlier can still
+	// publish instead of being refused for a record that no longer exists.
+	if err := runtime.persistRenewedPublishLease(publishLeaseProof{}, claimed); err != nil {
+		return err
+	}
+	return writeSupervisedJSON(runtime.publishLeasePath(state), claimed)
+}
+
+// persistRenewedPublishLease keeps every store-local proof of this run on the
+// renewed lease. A renewal advances the fencing token, so a proof written before
+// it would no longer match the current record and its task would be refused at
+// promotion although the run still owns the lease. Only proofs of the run's own
+// resource are rewritten: a record naming another resource belongs to another run
+// and must stay exactly as it is, unprovable here.
+func (runtime *supervisedRuntime) persistRenewedPublishLease(previous, refreshed publishLeaseProof) error {
+	if refreshed == previous {
+		return nil
+	}
+	paths := []string{}
+	walkErr := filepath.WalkDir(SupervisedDir(runtime.runRoot), func(path string, entry os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if !entry.IsDir() && entry.Name() == publishLeaseProofName {
+			paths = append(paths, path)
+		}
+		return nil
+	})
+	if walkErr != nil && !errors.Is(walkErr, os.ErrNotExist) {
+		return walkErr
+	}
+	for _, path := range paths {
+		var existing publishLeaseProof
+		found, err := readSupervisedJSON(path, &existing)
+		// T5#4 (P83 fix round 7): an unreadable proof is returned, never skipped. A
+		// skipped proof left the task on a token the committed generation no longer
+		// carries while this call still reported success, so the next promotion of
+		// that task was refused with no way back.
+		if err != nil {
+			return err
+		}
+		if !found || existing.ResourceID != refreshed.ResourceID {
+			continue
+		}
+		if err := writeSupervisedJSON(path, refreshed); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// loadPublishLease reads the store-local lease proof of one task attempt.
+func (runtime *supervisedRuntime) loadPublishLease(state *supervisedTaskState) (publishLeaseProof, bool, error) {
+	var proof publishLeaseProof
+	found, err := readSupervisedJSON(runtime.publishLeasePath(state), &proof)
+	return proof, found, err
+}
+
+// publishLeasePath is the store-local proof file of one task attempt.
+func (runtime *supervisedRuntime) publishLeasePath(state *supervisedTaskState) string {
+	return filepath.Join(runtime.taskDir(state), publishLeaseProofName)
 }
 
 // supervisedInteractionBinding is the operator-interaction binding carried by a
@@ -1574,7 +1749,8 @@ func (runtime *supervisedRuntime) Accept(ctx context.Context, runID, taskID stri
 	}
 	state.acceptedEntries = captured.Manifest.Entries
 	state.acceptedHash = captured.ManifestHash
-	evidenceRoot := digest(supervisedCandidateEvidenceRootDomain, runID, taskID, fmt.Sprintf("%d", attempt), parentHash, captured.ManifestHash)
+	state.acceptedParentHash = parentHash
+	evidenceRoot := supervisedCandidateEvidenceRoot(runID, taskID, attempt, parentHash, captured.ManifestHash)
 	return chain.CandidateResult{
 		Snapshot:          chain.SnapshotRef{Hash: captured.ManifestHash},
 		EvidenceRootHash:  evidenceRoot,
@@ -1586,18 +1762,54 @@ func (runtime *supervisedRuntime) Accept(ctx context.Context, runID, taskID stri
 // Review is a real policy review over the frozen candidate. The chain only
 // reaches it from REVIEW_PENDING, so the supervised postflight qualification is
 // already proven; there is no fast path.
+//
+// F3: the policy hash is not derived from the candidate. It is derived from the
+// operator's risk confirmation, which only the operator CLI path appends to
+// <runRoot>/supervised/risk-confirmations.jsonl, so a confined agent has no code
+// path that can forge it (CONTRACTS.md:147-148). A missing window, a missing
+// confirmation for this run/task/step or an unreadable ledger refuses the review
+// instead of approving, and the decision carries the candidate/evidence-root
+// binding the chain independently checks.
 func (runtime *supervisedRuntime) Review(_ context.Context, request chain.ReviewRequest) (chain.ReviewDecision, error) {
 	if !evidence.ValidHash(request.CandidateSnapshotHash) || !evidence.ValidHash(request.EvidenceRootHash) {
 		return chain.ReviewDecision{}, fmt.Errorf("%w: review request carries an invalid binding", ErrInvalidConfig)
 	}
+	state, err := runtime.stateFor(request.TaskID, request.Attempt)
+	if err != nil {
+		return chain.ReviewDecision{}, err
+	}
+	session, found, err := runtime.loadSession(state)
+	if err != nil {
+		return chain.ReviewDecision{}, fmt.Errorf("%w: the handoff session is unreadable: %v", ErrInvalidConfig, err)
+	}
+	if !found {
+		return chain.ReviewDecision{}, fmt.Errorf("%w: review requires an open supervised window", ErrSupervisedNotOpen)
+	}
+	ledger, err := runtime.loadConfirmationLedger()
+	if err != nil {
+		return chain.ReviewDecision{}, fmt.Errorf("%w: the risk confirmation ledger is unreadable: %v", ErrInvalidConfig, err)
+	}
+	confirmation, ok := supervisedConfirmationForBinding(ledger, request.RunID, request.TaskID, state.stepID)
+	if !ok || !evidence.ValidHash(confirmation.RecordHash) {
+		return chain.ReviewDecision{}, fmt.Errorf("%w: no operator risk confirmation covers this review", ErrInvalidConfig)
+	}
+	// T2 (finding F3): the risk confirmation stays a SEPARATE requirement; the
+	// approved policy is the frozen handoff policy digest.
+	policyHash := supervisedReviewPolicyHash(session)
+	// F3: the hash this decision binds is remembered, so Publish can prove the
+	// promotion still runs under the operator-confirmed policy.
+	state.reviewPolicyHash = policyHash
 	return chain.ReviewDecision{
 		ReceiptID:  runtime.nextID(),
 		OccurredAt: runtime.clock().UTC().Format(timestampLayout),
 		RecordedBy: evidence.Actor{Type: "policy", ID: supervisedReviewPolicyLabel},
 		ReviewMode: "policy",
-		PolicyHash: digest(supervisedReviewPolicyDomain, supervisedReviewPolicyLabel, "supervised-postflight-qualified-candidate"),
+		PolicyHash: policyHash,
 		Outcome:    "approve",
-		Evidence:   []string{digest(supervisedReviewEvidenceDomain, request.CandidateSnapshotHash, request.EvidenceRootHash)},
+		Evidence: []string{
+			chain.ReviewEvidenceBinding(request.CandidateSnapshotHash, request.EvidenceRootHash),
+			digest(supervisedReviewEvidenceDomain, request.CandidateSnapshotHash, request.EvidenceRootHash),
+		},
 	}, nil
 }
 
@@ -1612,6 +1824,17 @@ func (runtime *supervisedRuntime) Publish(ctx context.Context, request chain.Pro
 			Outcome:       "failed",
 			ErrorEvidence: []string{digest(supervisedPromotionBlockedDomain, err.Error())},
 		}, nil
+	}
+	// F3: the promotion re-proves the policy it was reviewed under and the
+	// candidate evidence root it was frozen from. Both were true at review time;
+	// this is the verification "before publishing" the contract requires, so a
+	// withdrawn risk confirmation or a drifted evidence root refuses the promotion
+	// instead of completing it on the earlier verdict.
+	if err := runtime.verifyReviewPolicyBinding(state, request); err != nil {
+		return runtime.blockedPromotion(err.Error()), nil
+	}
+	if root := supervisedCandidateEvidenceRoot(runtime.runID, request.TaskID, request.Attempt, state.acceptedParentHash, state.acceptedHash); root != request.EvidenceRootHash {
+		return runtime.blockedPromotion("the candidate evidence root changed after the review"), nil
 	}
 	fresh, err := runtime.captureManifest(ctx, state, "candidate", "supervised-promotion", state.acceptedHash)
 	if err != nil {
@@ -1633,13 +1856,63 @@ func (runtime *supervisedRuntime) Publish(ctx context.Context, request chain.Pro
 			ErrorEvidence: []string{digest(supervisedPromotionBlockedDomain, "a managed process of this run could not be proven stopped")},
 		}, nil
 	}
+	// F4: the promotion binds the lease record this run holds. A missing proof, a
+	// lease that was taken over or replaced, or an expired lease refuses the
+	// promotion instead of deriving evidence from the run id
+	// (CONTRACTS.md:150-151).
+	proof, found, err := runtime.loadPublishLease(state)
+	if err != nil || !found {
+		return chain.PromotionDecision{
+			ReceiptID:     runtime.nextID(),
+			OccurredAt:    runtime.clock().UTC().Format(timestampLayout),
+			Outcome:       "failed",
+			ErrorEvidence: []string{digest(supervisedPromotionBlockedDomain, ErrPublishLeaseUnproven.Error())},
+		}, nil
+	}
+	now := runtime.clock().UTC()
+	// F4 liveness: a window that legitimately outlived the lease TTL is renewed
+	// here before it is verified, because the renewal only ever extends the record
+	// this run's exact token and hash match (P83 F4 liveness finding (c)).
+	refreshed, err := renewPublishLease(ctx, runtime.runRoot, runtime.runID, proof, now)
+	if err != nil {
+		return chain.PromotionDecision{
+			ReceiptID:     runtime.nextID(),
+			OccurredAt:    runtime.clock().UTC().Format(timestampLayout),
+			Outcome:       "failed",
+			ErrorEvidence: []string{digest(supervisedPromotionBlockedDomain, err.Error())},
+		}, nil
+	}
+	if refreshed != proof {
+		// T5#4 (P83 fix round 8, item C): the generation commit already happened
+		// inside the lease store, so the proof for the generation this promotion is
+		// about to bind is written BEFORE the decision is built and returned. A crash
+		// between the commit and this write leaves a stale proof behind, and the next
+		// entry reconciles it through the retained predecessor (renewPublishLease)
+		// instead of being refused; a crash after it leaves the current generation on
+		// disk, which verifies directly.
+		if err := writeSupervisedJSON(runtime.publishLeasePath(state), refreshed); err != nil {
+			return chain.PromotionDecision{}, err
+		}
+		if err := runtime.persistRenewedPublishLease(proof, refreshed); err != nil {
+			return chain.PromotionDecision{}, err
+		}
+	}
+	leaseHash, err := verifyPublishLease(ctx, runtime.runRoot, runtime.runID, refreshed, now)
+	if err != nil {
+		return chain.PromotionDecision{
+			ReceiptID:     runtime.nextID(),
+			OccurredAt:    runtime.clock().UTC().Format(timestampLayout),
+			Outcome:       "failed",
+			ErrorEvidence: []string{digest(supervisedPromotionBlockedDomain, err.Error())},
+		}, nil
+	}
 	return chain.PromotionDecision{
 		ReceiptID:            runtime.nextID(),
 		OccurredAt:           runtime.clock().UTC().Format(timestampLayout),
 		Outcome:              "completed",
 		AcceptedSnapshotHash: request.CandidateSnapshotHash,
 		WriterStopEvidence:   []string{digest(supervisedWriterStopDomain, request.RunID, request.TaskID)},
-		LeaseEvidence:        []string{digest(supervisedLeaseDomain, runtime.runID)},
+		LeaseEvidence:        []string{leaseHash},
 		Evidence:             []string{digest(supervisedPromotionEvidenceDomain, request.ReviewReceiptHash)},
 	}, nil
 }

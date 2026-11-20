@@ -128,6 +128,12 @@ func (fake *fakeReviewer) Review(_ context.Context, request ReviewRequest) (Revi
 		index = len(fake.decisions) - 1
 	}
 	decision := fake.decisions[index]
+	// F3: an approve decision must bind the candidate evidence root, so every
+	// approving test double carries the binding the production ports emit. Tests
+	// that assert the binding is missing construct their decisions directly.
+	if decision.Outcome == "approve" {
+		decision.Evidence = append(append([]string{}, decision.Evidence...), ReviewEvidenceBinding(request.CandidateSnapshotHash, request.EvidenceRootHash))
+	}
 	fake.calls++
 	return decision, nil
 }

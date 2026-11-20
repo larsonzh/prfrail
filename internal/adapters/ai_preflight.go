@@ -19,6 +19,13 @@ type AIChannelProbe interface {
 	Probe(context.Context, AIProviderProfile, []byte, string, int) (AIProbeResult, error)
 }
 
+// AIReceiverBindingVerifier is the optional capability a probe exposes so the
+// checker can prove the receiver binding before it resolves any credential (F6).
+// A probe without it keeps the pre-spawn verification inside its executor.
+type AIReceiverBindingVerifier interface {
+	VerifyReceiverBinding() error
+}
+
 type AIAvailabilityChecker struct {
 	Clock   func() time.Time
 	IDs     func() string
@@ -40,9 +47,25 @@ func (checker *AIAvailabilityChecker) Check(ctx context.Context, profile AIProvi
 		idSource = checker.IDs
 	}
 
+	// F6: the probe's receiver binding and its executable hash are verified before
+	// the credential is resolved, so a swapped executable is detected while the
+	// secret store is still untouched. The executor keeps its own pre-spawn
+	// re-verification as the last line of defence.
+	if checker == nil || checker.Probe == nil {
+		return newLocalAIAvailability(profile, profileHash, channel, idSource(), now(), "unavailable", unavailableProbeReason(channel), 0)
+	}
+	// F6 ordering: the verification runs before the secret is read, never after it.
+	if verifier, ok := checker.Probe.(AIReceiverBindingVerifier); ok && verifier != nil {
+		if err := verifier.VerifyReceiverBinding(); err != nil {
+			return newLocalAIAvailability(profile, profileHash, channel, idSource(), now(), "unavailable", unavailableProbeReason(channel), 0)
+		}
+	}
+
 	credential := []byte(nil)
 	if profile.AuthMode == "secret" {
-		if checker == nil || checker.Secrets == nil {
+		// The nil-receiver case returned above (line 54), so the checker is known
+		// to be non-nil here; only the resolver can still be absent (F6).
+		if checker.Secrets == nil {
 			return newLocalAIAvailability(profile, profileHash, channel, idSource(), now(), "unavailable", "secret_missing", 0)
 		}
 		credential, err = checker.Secrets.Resolve(ctx, profile.SecretRef)
@@ -57,9 +80,6 @@ func (checker *AIAvailabilityChecker) Check(ctx context.Context, profile AIProvi
 		defer clear(credential)
 	}
 
-	if checker == nil || checker.Probe == nil {
-		return newLocalAIAvailability(profile, profileHash, channel, idSource(), now(), "unavailable", unavailableProbeReason(channel), 0)
-	}
 	result, probeErr := checker.Probe.Probe(ctx, profile, credential, channel, maximumRequests)
 	if probeErr != nil {
 		return newLocalAIAvailability(profile, profileHash, channel, idSource(), now(), "unknown", "unknown", result.RequestsUsed)

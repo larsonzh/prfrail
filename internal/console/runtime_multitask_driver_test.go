@@ -84,7 +84,10 @@ func (stub *assemblyDriverStub) Review(_ context.Context, request chain.ReviewRe
 		PolicyHash:            multiTaskTestDigest("review-policy", request.TaskID),
 		Outcome:               "approve",
 		CandidateSnapshotHash: request.CandidateSnapshotHash,
-		Evidence:              []string{multiTaskTestDigest("review-evidence", request.TaskID)},
+		Evidence: []string{
+			multiTaskTestDigest("review-evidence", request.TaskID),
+			chain.ReviewEvidenceBinding(request.CandidateSnapshotHash, request.EvidenceRootHash),
+		},
 	}, nil
 }
 

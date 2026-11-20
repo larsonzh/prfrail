@@ -2,6 +2,8 @@ package adapters
 
 import (
 	"context"
+	"os"
+	"path/filepath"
 	"slices"
 	"strconv"
 	"strings"
@@ -199,6 +201,71 @@ func TestManagedCopilotCLIProbeExecutorFailsClosedWhenExecutableIsMissing(t *tes
 	})
 	if execution.Outcome != "start-failed" || len(execution.Evidence) == 0 {
 		t.Fatalf("unexpected execution: %+v", execution)
+	}
+}
+
+// TestManagedCopilotCLIProbeExecutorNeverPassesLogDir is the F8 regression: the
+// child argv must carry no log destination at all, so the only artifact the child
+// can write is the bounded, structured usage file.
+// Mutation check: re-adding "--log-dir" (and a directory) to copilotCLIProbeExecArgs
+// turns this test red.
+func TestManagedCopilotCLIProbeExecutorNeverPassesLogDir(t *testing.T) {
+	usagePath := filepath.Join(t.TempDir(), "usage.json")
+	args := copilotCLIProbeExecArgs([]string{"-p", "prompt"}, usagePath)
+	logDirFlags := 0
+	usageFlagAt := -1
+	for index, arg := range args {
+		if strings.HasPrefix(strings.ToLower(arg), "--log") {
+			logDirFlags++
+		}
+		if arg == "--usage-output-file" {
+			usageFlagAt = index
+		}
+	}
+	if logDirFlags != 0 {
+		t.Fatalf("the probe argv must never name a log destination, got %#v", args)
+	}
+	if usageFlagAt < 0 || usageFlagAt+1 >= len(args) || args[usageFlagAt+1] != usagePath {
+		t.Fatalf("the probe must keep the structured usage output, got %#v", args)
+	}
+	if len(args) != 4 {
+		t.Fatalf("the probe argv must carry exactly the invocation args plus one usage pair, got %#v", args)
+	}
+}
+
+// TestManagedCopilotCLIProbeExecutorRefusesHashMismatch is the F6 regression: an
+// executor bound to an approved executable refuses to start when the file no
+// longer matches, and no process is spawned (the outcome is the executor's own
+// pre-spawn refusal, not a launcher result).
+func TestManagedCopilotCLIProbeExecutorRefusesHashMismatch(t *testing.T) {
+	root := t.TempDir()
+	executablePath := filepath.Join(root, "copilot-probe")
+	if err := os.WriteFile(executablePath, []byte("approved-content"), 0o700); err != nil {
+		t.Fatal(err)
+	}
+	approved, err := CopilotCLIExecutableHash(executablePath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(executablePath, []byte("swapped-content!"), 0o700); err != nil {
+		t.Fatal(err)
+	}
+	executor := ManagedCopilotCLIProbeExecutor{TemporaryDirectory: root, ExpectedExecutableHash: approved}
+	execution := executor.Execute(context.Background(), CopilotCLIProbeInvocation{
+		Executable:       executablePath,
+		WorkingDirectory: root,
+	})
+	if execution.Outcome != "start-failed" || len(execution.Evidence) == 0 {
+		t.Fatalf("a mismatched executable must refuse before the spawn, got %+v", execution)
+	}
+	entries, err := os.ReadDir(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, entry := range entries {
+		if strings.Contains(entry.Name(), "proofrail-ai-probe-") {
+			t.Fatalf("a refused probe must leave no temporary directory, found %q", entry.Name())
+		}
 	}
 }
 

@@ -71,7 +71,14 @@ func (runtime *localRuntime) Review(_ context.Context, request chain.ReviewReque
 		RecordedBy: evidence.Actor{Type: "operator", ID: "local-reviewer"},
 		ReviewMode: "manual",
 		Outcome:    "approve",
-		Evidence:   []string{digest("proofrail:local-review:1\n", request.RunID, request.TaskID)},
+		// F3: every approve decision must bind the candidate evidence root. This is
+		// the local manual path, whose self-approval remains the registered OB
+		// candidate; only the decision shape is made acceptable to the chain's
+		// independent checker.
+		Evidence: []string{
+			digest("proofrail:local-review:1\n", request.RunID, request.TaskID),
+			chain.ReviewEvidenceBinding(request.CandidateSnapshotHash, request.EvidenceRootHash),
+		},
 	}, nil
 }
 

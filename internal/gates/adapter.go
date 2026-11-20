@@ -22,7 +22,7 @@ func (port ChainPort) RunHook(ctx context.Context, request chain.StepRequest) (c
 	if err != nil {
 		return chain.StepResult{}, err
 	}
-	effectScope := buildEffectScope(request, hook, hash)
+	effectScope := buildEffectScope(request, hook)
 	record, runErr := port.Runner.Run(ctx, Request{RunID: request.RunID, TaskID: request.TaskID, StepID: request.Step.ID, Attempt: request.Attempt, ExecutionAttempt: 1, WorkspaceRoot: request.Workspace.Root, HookDefinitionHash: hash, Effect: effectScope, Hook: hook})
 	result := chain.StepResult{}
 	if evidence.ValidHash(record.ResultHash) {
@@ -95,17 +95,18 @@ func compatibleKind(stepKind, hookKind string) bool {
 	return stepKind == "build" && hookKind == "build" || stepKind == "verify" && (hookKind == "test" || hookKind == "verify")
 }
 
-func buildEffectScope(request chain.StepRequest, hook Hook, hookDefinitionHash string) *EffectScope {
+func buildEffectScope(request chain.StepRequest, hook Hook) *EffectScope {
+	// F5 (P83 fix round): the declared scope states what the hook actually
+	// declares, so the adapter never invents a policy or authorization identity.
+	// A hook that declares no valid authorization hash has no declared scope at
+	// all, which is legitimate: deriveEffectClassification then classifies from
+	// the frozen hook policy alone. The fabricated placeholders that used to sit
+	// here made an unprovable policy look classified.
+	if !evidence.ValidHash(hook.AuthorizationHash) {
+		return nil
+	}
 	effectClass := hook.EffectClass
 	operationKey := defaultHookOperationKey(request, hook.ID)
-	authorizationHash := hook.AuthorizationHash
-	if !evidence.ValidHash(authorizationHash) {
-		authorizationHash = evidence.Digest("proofrail:authorization-placeholder:1\n", []byte(request.RunID+"\n"+request.TaskID+"\n"+request.Step.ID+"\n"+hookDefinitionHash))
-	}
-	policyHash := hook.PolicyHash
-	if !evidence.ValidHash(policyHash) {
-		policyHash = evidence.Digest("proofrail:effect-policy-placeholder:1\n", []byte(hookDefinitionHash+"\n"+request.RunID+"\n"+request.TaskID))
-	}
 	recoveryGuarantee := hook.RecoveryGuarantee
 	if recoveryGuarantee == "" {
 		recoveryGuarantee = defaultEffectRecoveryGuarantee(effectClass)
@@ -118,8 +119,8 @@ func buildEffectScope(request chain.StepRequest, hook Hook, hookDefinitionHash s
 		EffectClass:       effectClass,
 		ExternalSystems:   append([]string{}, hook.ExternalSystems...),
 		RecoveryGuarantee: recoveryGuarantee,
-		PolicyHash:        policyHash,
-		AuthorizationHash: authorizationHash,
+		PolicyHash:        hook.PolicyHash,
+		AuthorizationHash: hook.AuthorizationHash,
 		OperationKey:      operationKey,
 		Evidence:          evidenceHashes,
 	}

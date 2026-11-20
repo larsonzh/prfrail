@@ -116,6 +116,10 @@ type platformProcess struct {
 	// handle, so the count stops at 1; a same-package test uses closeCount to pin
 	// that the handle is released exactly once.
 	releases int
+	// envClearHook is an unexported test seam (F7): it observes the widened
+	// environment block after the deferred clear ran, on both the success and the
+	// failure path. Production code never sets it.
+	envClearHook func(block []uint16)
 }
 
 func (process *platformProcess) jobHandle() (syscall.Handle, bool) {
@@ -210,9 +214,37 @@ func (process *platformProcess) start(spec *ProcessSpec) (*managedCommand, error
 	if !ok {
 		return nil, errors.New("managed process job handle is closed")
 	}
-	executable, err := resolveManagedExecutable(spec.Command)
-	if err != nil {
-		return nil, err
+	// T3 (P83 fix round 7): an approved digest names ONE object, and an approved
+	// object is only addressable by a path. A bare command name would be resolved
+	// through PATH at spawn time - a lookup that happens later and can select a file
+	// the approval never saw - so it is refused here instead of being resolved
+	// behind the approval's back.
+	var approved *approvedExecutable
+	executable := ""
+	if spec.ExecutableDigest != "" {
+		if !strings.ContainsAny(spec.Command, `\/`) {
+			return nil, fmt.Errorf("%w: the approved executable must be named by path", ErrExecutableBinding)
+		}
+		executable = spec.Command
+		// T3: the handle is opened with a share mode that denies write and delete,
+		// hashed through that handle and held across the whole verify -> spawn
+		// sequence below. While it is held the image can neither be rewritten in
+		// place nor replaced, so the path CreateProcessW resolves is the verified
+		// object. A handle that cannot be opened exclusively is a refusal, never a
+		// spawn by path.
+		var openErr error
+		approved, openErr = verifyApprovedExecutable(executable, spec)
+		if openErr != nil {
+			return nil, openErr
+		}
+		// The defer runs when this function returns, which is after CreateProcessW.
+		defer func() { _ = approved.Close() }()
+	} else {
+		var resolveErr error
+		executable, resolveErr = resolveManagedExecutable(spec.Command)
+		if resolveErr != nil {
+			return nil, resolveErr
+		}
 	}
 	commandLine, err := buildCommandLine(spec.Command, spec.Args)
 	if err != nil {
@@ -221,6 +253,22 @@ func (process *platformProcess) start(spec *ProcessSpec) (*managedCommand, error
 	environment, err := buildEnvironmentBlock(spec.Env)
 	if err != nil {
 		return nil, err
+	}
+	// F7: the block owns secrets in UTF-16 form, so it is cleared on every exit path
+	// of this function - a refusal below, a failed CreateProcessW, and the success
+	// path alike. clear() zeroes each element, so no copy of the secrets survives.
+	//
+	// The two defers are ordered so the observation seam runs AFTER the clear (LIFO)
+	// and therefore sees the zeros the contract promises.
+	defer func() {
+		if process.envClearHook != nil {
+			process.envClearHook(environment)
+		}
+	}()
+	defer clear(environment)
+	var environmentPtr *uint16
+	if len(environment) > 0 {
+		environmentPtr = &environment[0]
 	}
 	currentDirectory, err := optionalUTF16(spec.Dir)
 	if err != nil {
@@ -262,7 +310,7 @@ func (process *platformProcess) start(spec *ProcessSpec) (*managedCommand, error
 		0,
 		1,
 		uintptr(uint32(createSuspended|createUnicodeEnvironment|createExtendedStartupInfoPresent)),
-		uintptr(unsafe.Pointer(environment)),
+		uintptr(unsafe.Pointer(environmentPtr)),
 		uintptr(unsafe.Pointer(currentDirectory)),
 		uintptr(unsafe.Pointer(&startup)),
 		uintptr(unsafe.Pointer(&procInfo)),
@@ -441,6 +489,26 @@ func resolveManagedExecutable(name string) (string, error) {
 	return exec.LookPath(name)
 }
 
+// openApprovedExecutable opens the approved executable with FILE_SHARE_READ and
+// nothing else (P83 T3).
+//
+// FILE_SHARE_READ denies every other opener the write and delete access it would
+// need to rewrite the image in place or to replace it by a rename, so as long as
+// this handle is open the name keeps resolving to the object that was hashed. The
+// handle is deliberately not FILE_FLAG_BACKUP_SEMANTICS: the approved object has
+// to be a file, and a directory is refused by the open itself.
+func openApprovedExecutable(path string) (*os.File, error) {
+	name, err := syscall.UTF16PtrFromString(path)
+	if err != nil {
+		return nil, err
+	}
+	handle, err := syscall.CreateFile(name, syscall.GENERIC_READ, syscall.FILE_SHARE_READ, nil, syscall.OPEN_EXISTING, syscall.FILE_ATTRIBUTE_NORMAL, 0)
+	if err != nil {
+		return nil, err
+	}
+	return os.NewFile(uintptr(handle), path), nil
+}
+
 // buildCommandLine builds the command line the same way os/exec does: every
 // argument escaped individually. argv[0] stays the name as the caller wrote it.
 func buildCommandLine(name string, args []string) (*uint16, error) {
@@ -452,22 +520,115 @@ func buildCommandLine(name string, args []string) (*uint16, error) {
 	return syscall.UTF16PtrFromString(strings.Join(parts, " "))
 }
 
+// environmentBlockInitialCapacity is the capacity rule of the environment block:
+// eight UTF-16 units per entry plus the terminating NUL.
+//
+// T7 (P83 fix round 6): the rule is a function so a test can compute the exact
+// capacity and drive the builder to the boundary deterministically - one entry
+// whose encoded length equals this capacity reaches the terminator-headroom branch
+// without relying on a lucky combination of entries. Before this, the branch was
+// only reachable by accident and no counterexample exercised it.
+func environmentBlockInitialCapacity(entries int) int {
+	return entries*8 + 1
+}
+
 // buildEnvironmentBlock encodes the child environment. A nil slice means "inherit
 // the host environment", which is what an unset exec.Cmd environment does.
-func buildEnvironmentBlock(env []string) (*uint16, error) {
+//
+// F7 (CONTRACTS.md:216 "the adapter only ever receives a resolved, short-lived
+// byte copy and clears it after use"): the block is returned as a slice the caller
+// owns rather than as a raw pointer, because the block carries the child's
+// secrets and the caller has to clear it. The previous signature returned
+// &block[0], which had no owner: the buffer stayed live, uncleared, on both the
+// success and every failure path.
+//
+// P83 FIX ROUND 4 (Item D): the per-entry UTF-16 slices this function allocates are
+// intermediates that also carry secrets, and growing the block abandons a backing
+// array that still holds them. Both are now owned by this function and cleared by
+// one deferred helper, so no exit path - success, conversion error, or a grown
+// block - can leave a readable copy behind.
+//
+// T7 (P83 fix round 6): every abandoned array and the partial block of the failure
+// path is handed to the observer seam AFTER it was zeroed, so a test can hold the
+// backing array and assert the clearing instead of merely asserting that the call
+// returned an error.
+func buildEnvironmentBlock(env []string) ([]uint16, error) {
 	if env == nil {
 		return nil, nil
 	}
-	block := make([]uint16, 0, len(env)*8+1)
+	scratch := make([][]uint16, 0, len(env))
+	// The closure captures scratch by reference: a deferred call would snapshot the
+	// empty slice header and clear nothing.
+	defer func() { clearEnvironmentScratch(scratch) }()
+	block := make([]uint16, 0, environmentBlockInitialCapacity(len(env)))
 	for _, entry := range env {
 		converted, err := syscall.UTF16FromString(entry)
 		if err != nil {
+			// The partially built block already holds secrets; clear it before the
+			// error returns. The deferred helper clears every entry converted so far.
+			clear(block)
+			// T7: the zeroed partial block is reported through the same seam the growth
+			// paths use, so the failure path has a direct counterexample.
+			reportEnvironmentBlockScratch("partial-block", block)
 			return nil, err
+		}
+		scratch = append(scratch, converted)
+		// The seam observes the entry before the deferred clear runs, so a test can
+		// hold this very backing array and assert after the call that it was zeroed.
+		reportEnvironmentBlockScratch("entry", converted)
+		if needed := len(block) + len(converted); needed > cap(block) {
+			grown := make([]uint16, len(block), needed*2)
+			copy(grown, block)
+			// The previous backing array still carries the entries written so far, so
+			// it is cleared before the slice is repointed at the new array.
+			clear(block)
+			reportEnvironmentBlockScratch("discarded-block", block)
+			block = grown
 		}
 		block = append(block, converted...)
 	}
+	// F7 (P83 fix round): the terminating NUL is reserved before it is appended. A
+	// slice that happens to be exactly full would otherwise make append allocate a
+	// new backing array and abandon this one while it still holds the child's
+	// environment - a reallocation the clear() calls above cannot see.
+	//
+	// T7 (P83 fix round 6): this branch is reachable deterministically through
+	// environmentBlockInitialCapacity: entries whose encoded length equals the
+	// capacity of the initial block arrive here with len == cap.
+	if len(block) == cap(block) {
+		grown := make([]uint16, len(block), len(block)*2+1)
+		copy(grown, block)
+		clear(block)
+		reportEnvironmentBlockScratch("discarded-block-terminator", block)
+		block = grown
+	}
 	block = append(block, 0)
-	return &block[0], nil
+	return block, nil
+}
+
+// clearEnvironmentScratch zeroes every intermediate UTF-16 slice a build
+// allocated. F7 (Item D): it is called from one deferred site so the success path
+// and every early return share the same guarantee instead of relying on each
+// branch to remember.
+func clearEnvironmentScratch(slices [][]uint16) {
+	for _, slice := range slices {
+		clear(slice)
+	}
+	runtime.KeepAlive(slices)
+}
+
+// environmentBlockScratchObserver is the F7 test seam of this file. Production
+// leaves it nil; a test sets it to collect every intermediate UTF-16 slice and
+// every backing array a growth abandons. The collected slices share their backing
+// arrays with the builder, so a test can assert after the call that each one was
+// zeroed - deleting any clear() in buildEnvironmentBlock turns it red.
+var environmentBlockScratchObserver func(stage string, slice []uint16)
+
+// reportEnvironmentBlockScratch hands one slice to the F7 test seam.
+func reportEnvironmentBlockScratch(stage string, slice []uint16) {
+	if environmentBlockScratchObserver != nil {
+		environmentBlockScratchObserver(stage, slice)
+	}
 }
 
 // optionalUTF16 encodes an optional path argument.

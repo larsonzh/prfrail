@@ -2243,6 +2243,29 @@ A6 ② 进度（第 2 批，2026-09-15）：
 
 完成记录（2026-11-19）：报告对 `docs/validation/s2-pre-independent-security-review{,_EN}.md`；⑦ 深度档 `GPT-6.2 Sol (copilot)` 首轮（盲态）`FINAL REVIEW: FINDINGS`（3 High + 5 Medium，三面皆 FINDINGS）；⑤ 2 轮（额度用尽）、⑥ 2 轮（额度 3 用 2，r2 `INDEPENDENT SCAN: PASS`）；R = 2（其一 = ⑤ 环整改重跑；其二 = ⑥ 环整改重跑）、D = 1（⑧c 后为落补正误建 `tmp/P79-fix/`，即时整目录删除、零残留；自愈判定待独立审查层或用户确认）；发现清单（F1–F8，3 High + 5 Medium）移交修复片，片名与起跑时点由用户后续点名；按 §11.2 不写 hash / run。
 
+### P83 — `SECURITY-FINDINGS-REMEDIATION`（P79 的 F1–F8 修复 · 实现类）· ✅ 部分闭合（2026-11-21）
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `SECURITY-FINDINGS-REMEDIATION`（承接 P79 报告 §9 的 F1–F8（3 High + 5 Medium）逐字修复；来源 = 用户 2026-11-20 裁定 R3 + v66 快照 §四 队列项 `下一项`；编号 P83 按登记序） |
+| 状态 | ✅ 部分闭合（2026-11-21）：F2 / F5 / F7 + T9 收窄已闭合；F1 / F4 部分实现；F3 / F6 / F8 顺延 P84 |
+| 目标 | 按优先级修 F2 / F3（面 2 High）→ F6（面 3 High）→ F1 / F4 / F5 / F7 / F8；每 F 一条可证伪闭合断言 + 至少一条反例回归测试；触契约语义者先改 `docs/CONTRACTS{,_EN}.md` 再动代码 |
+| 依赖 | P79 已闭环（F1–F8 已登记且原文归档于其报告 §9）；`internal/` 七个文件现状；`docs/CONTRACTS{,_EN}.md` 被引用句；用户 2026-11-20 起跑点名 |
+| 规模 | M-L（实现类；8 处位置、7 个文件 + 可能触契约文本） |
+| 步骤 | 0 → ① → ② → ③ 一致性 → ④ 门禁 → ⑤ 预审 → ⑥ 独立扫描 → ⑦ 盲审 + 终审 + 复审 → ⑧a → ⑨ → ⑧b → ⑧c → ⑩（盲审在终审前执行） |
+| 现状缺口 | P79 的 F1–F8 全部处于「已登记、未修复」状态：3 High（launch 前未核对授权 / 预留、策略批准来源不自证、凭据与接收端绑定未校验）+ 5 Medium（产物读取未绑目录句柄、租约证据仅由 run ID 派生、hook 副作用分类缺失、原生环境块未清零、子进程日志未脱敏） |
+| 交付物 | ① 七个代码文件与对应测试；② 若 ① 判定触契约语义：`docs/CONTRACTS{,_EN}.md`（及 schema / 夹具）先行改动；③ 报告对 `docs/validation/security-findings-remediation{,_EN}.md`；④ 本台账段与完成记录；⑤ `docs/SECURITY{,_EN}.md` 注记补修复状态句；⑥ 证据包 `docs/validation/evidence/P83-SECURITY-FINDINGS-REMEDIATION/` |
+| 验收证据 | F1–F8 逐条闭合断言可证伪并各有反例回归测试 + 变异检验（§13.1.2）；三作用域 `TOTAL_FAIL=0`；SELFTEST 全绿；`go build/vet/test ./...` 全绿；报告对双语严格镜像；CN / EN 改动行数对称 |
+| 边界 | 只修 F1–F8；不改 S1 Exit 八门判据；不改 `SECURITY{,_EN}` 威胁模型基线；不升准则版本；不改 CI / `DEV_PLAN`；额外发现只登记候选 OB、不并入本片；不做 gitee |
+| 分级 | `[SLICE]` |
+| 探针额度 | 0（默认；若 ⑨ 验证 F8 拒绝路径需真实 BYOK 调用，按 §7.6 停下申请预授权） |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/P83-SECURITY-FINDINGS-REMEDIATION/freedom-list.md` |
+| R/D 基线 | R = 0、D = 0（步骤 0 登记，§13.1.1；不继承 P79 的 R = 2 / D = 1） |
+| 临时件落点声明 | 本片临时目录 = `tmp/P83-SECURITY-FINDINGS-REMEDIATION/`（⑧c 前只增不删；CI 捕获件同样落该目录，不落 `tmp/` 根） |
+| 额度口径披露 | ⑦ 额度按 L 档 = 1 终审 + 3 复审（用户 2026-11-20 同轮裁定；超出 §7.5「M-L 视同 M」字面标准，系用户直接裁定、**不得作为先例**）；盲审必抽 1 次（F3 / F6 触及身份语义，§7.7；另计 +1、不占终审与复审额度，终审前执行）；⑦ 档位 = `GPT-6.2 Sol (copilot)` Max（同轮取档授权 §8.2）。另经用户 2026-11-20 裁定追加 1 轮复审（复审 3/3 用尽后），同属用户直接裁定、不得作为先例 |
+
+完成记录（2026-11-21）：报告对 `docs/validation/security-findings-remediation{,_EN}.md`（结论 `PARTIALLY CLOSED`）；**F2 / F5 / F7 + T9 收窄已闭合；F1 / F4 部分实现（残余顺延 P84）；F3 / F6 / F8 顺延 P84**（T2 STOP = AgentRunner 无可持久复验的冻结策略制品；T3 = Windows 名称到启动映像的绑定窗口与 Linux 同 inode 不等于字节不可变；T8a = 「无法证明禁写即拒发 BYOK」未实施）；顺延候选 5 项（P84-a 策略制品 / P84-b 不可变安装来源 / P84-c BYOK 证明载体 / P84-d bounddir 大小写与 reparse 残余 / P84-d 之补充 proof 恢复持久化）见报告 §8；**契约影响 = 八项均 DOES-NOT-TOUCH**（未改 `CONTRACTS{,_EN}` / schema / 夹具）；**R = 2、D = 0**；⑦ 共 6 轮（盲审 1 + 终审 1 + 复审 3 + 追加 1）；⑤ 2/2 与 ⑥ 2/3 的 PASS 绑定整改前快照，最终快照仅由 ⑦ 复审覆盖且仍为 FINDINGS；异常 E-1（`CHECKLIST_v66.md` 未暂存改动，来源未归因）已按用户裁定 `git checkout --` 回滚，不计 D；按 §11.2 不写 hash / run。
+
 ## 已知缺陷（后续切片前处理）
 
 > **阻断口径不变**：仅高频/已复现缺陷阻断，观测级 flake 只记录并在验证报告中列示。

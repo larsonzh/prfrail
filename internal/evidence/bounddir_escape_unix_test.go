@@ -1,6 +1,6 @@
 //go:build !windows && !darwin
 
-package adapters
+package evidence
 
 // P52-S2 ACCEPTANCE-SECURITY-COUNTEREXAMPLES recorded the middle-symlink escape on
 // the bound-directory seam as GAP-77 (V-1, HIGH): the old openBoundDirFile resolved

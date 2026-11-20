@@ -54,13 +54,64 @@ func preparePlatformProcess() (*platformProcess, error) {
 // start creates the process in its own process group. Linux has no suspend step,
 // so the group is the ownership anchor and the child runs from the first instant.
 func (process *platformProcess) start(spec *ProcessSpec) (*managedCommand, error) {
+	// T3 (P83 fix round 7): when an approved digest exists the child is created
+	// from the very descriptor that was hashed, not from the name that was hashed.
+	// The name is resolved exactly once - by the open below - and the spawn resolves
+	// the descriptor instead: execveat(fd, "", AT_EMPTY_PATH) semantics, expressed
+	// through the kernel's own descriptor form /proc/self/fd/<n>, because the Go
+	// standard library exposes no execveat wrapper and this repository takes no
+	// third-party dependency. A host that cannot serve that form refuses; it never
+	// falls back to re-resolving the path, which would launch whatever the name
+	// points at now.
+	commandPath := spec.Command
+	var approved *approvedExecutable
+	if spec.ExecutableDigest != "" {
+		if !strings.Contains(spec.Command, "/") {
+			return nil, fmt.Errorf("%w: the approved executable must be named by path", ErrExecutableBinding)
+		}
+		opened, err := verifyApprovedExecutable(spec.Command, spec)
+		if err != nil {
+			return nil, err
+		}
+		approved = opened
+		// Held until this function returns, i.e. until the child exists.
+		defer func() { _ = approved.Close() }()
+		if approved.file.Fd() == ^uintptr(0) {
+			return nil, fmt.Errorf("%w: the verified descriptor is unavailable", ErrExecutableBinding)
+		}
+		// E (P83 fix round 8): the verified descriptor is handed to the child through
+		// ExtraFiles instead of a raw syscall.Dup. A dup clears close-on-exec, so the
+		// duplicated descriptor was inheritable by EVERY process started around the
+		// same time - the verified executable leaked into unrelated concurrent
+		// children. ExtraFiles marks the descriptor inheritable for this child alone
+		// and places it at descriptor 3 (the first free slot above stdin/stdout/stderr),
+		// so the child is still created from the very descriptor that was hashed -
+		// execveat(fd, "", AT_EMPTY_PATH) semantics through the kernel's own
+		// /proc/self/fd/<n> form - and no other child can see it.
+		commandPath = "/proc/self/fd/3"
+	}
+	// argv[0] stays the name the caller wrote: the child is created from the
+	// descriptor but still sees its own path as argv[0], exactly as before.
 	cmd := exec.Command(spec.Command, spec.Args...)
+	if approved != nil {
+		// T3: only the approved branch replaces the resolved path with the verified
+		// descriptor. Rewriting cmd.Path unconditionally would discard the PATH
+		// lookup exec.Command already performed for an unapproved bare command.
+		cmd.Path = commandPath
+		cmd.ExtraFiles = []*os.File{approved.file}
+	}
 	cmd.Dir = spec.Dir
 	cmd.Env = spec.Env
 	cmd.Stdout = spec.Stdout
 	cmd.Stderr = spec.Stderr
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	if err := cmd.Start(); err != nil {
+		// T3: no path fallback. Re-resolving spec.Command here would create the
+		// child from whatever the name addresses at this instant, which is precisely
+		// the substitution the binding exists to refuse.
+		if approved != nil {
+			return nil, fmt.Errorf("%w: start the verified descriptor: %v", ErrExecutableBinding, err)
+		}
 		return nil, err
 	}
 	command := &managedCommand{exitStatus: -1}
@@ -89,6 +140,15 @@ func (process *platformProcess) attach(pid int) error {
 	}
 	process.pgid = pgid
 	return nil
+}
+
+// openApprovedExecutable opens the approved executable read-only without
+// following a link and without blocking on a non-regular object (P83 T3). The
+// descriptor is the object the spawn is created from, so the open is also the only
+// name resolution that happens for an approved executable. O_NONBLOCK only
+// matters for a FIFO or a device node, which the bound open refuses right after.
+func openApprovedExecutable(path string) (*os.File, error) {
+	return os.OpenFile(path, os.O_RDONLY|syscall.O_NOFOLLOW|syscall.O_NONBLOCK, 0)
 }
 
 // resume is a no-op on Linux: there is no suspended state to leave, the process

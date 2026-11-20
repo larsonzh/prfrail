@@ -1,6 +1,6 @@
 //go:build linux && amd64
 
-package adapters
+package evidence
 
 // P53 FIX-GAP-77-SYMLINK-ESCAPE: the two red-team counterexamples that the fix's
 // main path has to close, written before any production change (design r2 §1, §5;

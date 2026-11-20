@@ -24,7 +24,7 @@ func TestLeaseFencingRenewAndRelease(t *testing.T) {
 	if _, err := store.Claim(context.Background(), "workspace-one", "worker-two", "claim-two", process, time.Minute); !errors.Is(err, ErrLeaseHeld) {
 		t.Fatalf("second claim must fail: %v", err)
 	}
-	renewed, err := store.Renew(context.Background(), "workspace-one", lease.Token, time.Minute)
+	renewed, err := store.Renew(context.Background(), "workspace-one", lease.Token, process, time.Minute)
 	if err != nil {
 		t.Fatal(err)
 	}

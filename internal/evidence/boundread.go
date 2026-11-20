@@ -169,6 +169,20 @@ func (bound *BoundFile) Identity() (size int64, mod time.Time, mode os.FileMode)
 	return bound.info.Size(), bound.info.ModTime(), bound.info.Mode()
 }
 
+// FileID returns the platform identity of the object this handle addresses
+// (volume serial plus file index on Windows, device plus inode on Unix).
+//
+// T3 (P83 fix round 6): size, modification time and mode are properties the
+// replacer controls, so they cannot prove that a path still names the approved
+// object. The identity is taken from the open handle and is the value a later
+// open of the same path has to reproduce before anything is executed.
+func (bound *BoundFile) FileID() (string, error) {
+	if err := bound.checkReadable(); err != nil {
+		return "", err
+	}
+	return boundFileID(bound.file)
+}
+
 // Close releases the handle. It is idempotent; ReadAll and Hash report
 // ErrBoundFileClosed afterwards instead of touching a released handle.
 func (bound *BoundFile) Close() error {

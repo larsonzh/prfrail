@@ -27,12 +27,20 @@ type AgentRunnerCompositeAdmission struct {
 	RequestRecord       AgentRunnerRequestRecord
 	AuthorizationLedger chain.AuthorizationLedger
 	CostLedger          *tickets.CostLedger
-	AvailabilityRecord  AIAvailabilityRecord
-	AvailabilityPolicy  AIAvailabilityPolicy
-	CapabilityRecord    AgentRunnerCapabilityRecord
-	EnforcementRecord   *AgentRunnerEnforcementRecord
-	AdmissionPolicy     AgentRunnerAdmissionPolicy
-	Clock               func() time.Time
+	// AuthorizationLedgerSource and CostLedgerSource are the trusted sources the
+	// pre-admission consults at evaluation time (T1, P83 fix round 6). When set,
+	// they replace the in-memory copies above, so admission reads the same derived
+	// durable files the dispatch reconfirmation reads instead of approving on a
+	// snapshot taken at assembly. A source that cannot be read refuses the
+	// admission - it never degrades to the in-memory copy.
+	AuthorizationLedgerSource func() (chain.AuthorizationLedger, error)
+	CostLedgerSource          func() (*tickets.CostLedger, error)
+	AvailabilityRecord        AIAvailabilityRecord
+	AvailabilityPolicy        AIAvailabilityPolicy
+	CapabilityRecord          AgentRunnerCapabilityRecord
+	EnforcementRecord         *AgentRunnerEnforcementRecord
+	AdmissionPolicy           AgentRunnerAdmissionPolicy
+	Clock                     func() time.Time
 }
 
 var _ chain.AgentRunnerAdmission = (*AgentRunnerCompositeAdmission)(nil)
@@ -92,6 +100,35 @@ func (admission *AgentRunnerCompositeAdmission) AdmitAgentRunner(ctx context.Con
 	if admission.AvailabilityPolicy.Channel != "agent-runner-cli" {
 		return compositeAdmissionBlocked(nil, "AgentRunner requires agent-runner-cli availability")
 	}
+	// T1 (P83 fix round 6): admission consults the SAME trusted source the launch
+	// reconfirmation consults. Reading the in-memory copies here meant a grant
+	// revoked (or a budget settled) after assembly was invisible to the preflight
+	// that admits the step, so the two checks could disagree about the operator's
+	// current intent. A source that is configured but unreadable is a refusal; the
+	// in-memory copies remain the compatibility path only for callers that configure
+	// no source at all.
+	//
+	// T1 (P83 fix round 7): the ledgers are read BEFORE the clock is taken. Taking
+	// the time first let a grant that expired during the read be judged against a
+	// timestamp that predates its expiry, so an authorization the operator had
+	// already let lapse still passed admission. Reading first moves the timestamp
+	// after every input the decision is made from.
+	authorizationLedger := admission.AuthorizationLedger
+	if admission.AuthorizationLedgerSource != nil {
+		loaded, err := admission.AuthorizationLedgerSource()
+		if err != nil {
+			return compositeAdmissionBlocked(err, "authorization ledger source unavailable")
+		}
+		authorizationLedger = loaded
+	}
+	costLedger := admission.CostLedger
+	if admission.CostLedgerSource != nil {
+		loaded, err := admission.CostLedgerSource()
+		if err != nil {
+			return compositeAdmissionBlocked(err, "cost ledger source unavailable")
+		}
+		costLedger = loaded
+	}
 	now := admission.Clock().UTC()
 	if now.IsZero() {
 		return compositeAdmissionBlocked(nil, "evaluation clock returned zero time")
@@ -106,10 +143,10 @@ func (admission *AgentRunnerCompositeAdmission) AdmitAgentRunner(ctx context.Con
 	if err := ValidateAgentRunnerAdmission(admission.CapabilityRecord, admission.EnforcementRecord, admissionPolicy); err != nil {
 		return compositeAdmissionBlocked(err, "AgentRunner capability or enforcement admission blocked")
 	}
-	if err := validateAgentRunnerAuthorization(admission.AuthorizationLedger, body, now); err != nil {
+	if err := validateAgentRunnerAuthorization(authorizationLedger, body, now); err != nil {
 		return compositeAdmissionBlocked(err, "AgentRunner authorization blocked")
 	}
-	if err := validateAgentRunnerBudget(admission.CostLedger, body); err != nil {
+	if err := validateAgentRunnerBudget(costLedger, body); err != nil {
 		return compositeAdmissionBlocked(err, "AgentRunner budget blocked")
 	}
 	return nil

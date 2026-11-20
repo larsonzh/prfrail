@@ -27,15 +27,18 @@ const (
 )
 
 type CLI struct {
-	version             string
-	now                 func() time.Time
-	getwd               func() (string, error)
-	stdin               io.Reader
-	stopRun             func(context.Context, string, string) ([]string, error)
-	appendInteraction   func(string, chain.OperatorInteractionRecord) error
-	secretManager       adapters.AISecretManager
-	readSecret          func() ([]byte, error)
-	checkAIAvailability func(context.Context, adapters.AIProviderProfile, string, int, string, string) (adapters.AIAvailabilityRecord, error)
+	version           string
+	now               func() time.Time
+	getwd             func() (string, error)
+	stdin             io.Reader
+	stopRun           func(context.Context, string, string) ([]string, error)
+	appendInteraction func(string, chain.OperatorInteractionRecord) error
+	secretManager     adapters.AISecretManager
+	readSecret        func() ([]byte, error)
+	// checkAIAvailability receives the admitted receiver - the executable path plus
+	// the digest the approval carried - so no implementation has to re-derive the
+	// approved identity from the path (T3, P83 fix round 6).
+	checkAIAvailability func(context.Context, adapters.AIProviderProfile, string, int, aiProbeReceiver, string) (adapters.AIAvailabilityRecord, error)
 	// visibleSender is the visible channel of the supervised-black-box assembly.
 	// It defaults to the fail-closed placeholder until the real SessionBridge
 	// visible wiring lands (T027-B).
@@ -426,14 +429,19 @@ func (cli CLI) executeRun(ctx context.Context, args []string, stdout, stderr io.
 	return writeRunSummary(stdout, *jsonOutput, resolvedRunDir, summary)
 }
 
-const runUsage = "usage: prfrail run [--chain <path>] [--run-id <id>] [--run-dir <path>] [--json] [--progress] (--request-record <path> | --request-records <path>)... --capability-record <path> --enforcement-record <path> --availability-record <path> --authorization-ledger <path> --cost-ledger <path> --agent-cli <path> --agent-version <version> --probe-permit <path>"
+const runUsage = "usage: prfrail run [--chain <path>] [--run-id <id>] [--run-dir <path>] [--json] [--progress] (--request-record <path> | --request-records <path>)... --capability-record <path> --enforcement-record <path> --availability-record <path> --agent-cli <path> --agent-version <version> --probe-permit <path> [--authorization-ledger <path>] [--cost-ledger <path>]"
 
-// agentRunnerRunInputs is the all-or-nothing AgentRunner CLI surface. Before the
+// agentRunnerRunInputs is the declared AgentRunner CLI surface. Before the
 // run command routes to the AgentRunner assembly the request-record dimension
 // must be supplied in exactly one of its two forms, the single-value
-// requestRecord or the repeatable requestRecords, and all seven remaining values
-// must be present. A partially supplied set keeps the existing noop-only refusal
-// instead of assembling from an incomplete declaration.
+// requestRecord or the repeatable requestRecords, and the five remaining values
+// that have no derived location must be present. A partially supplied set keeps
+// the existing noop-only refusal instead of assembling from an incomplete
+// declaration.
+//
+// The two ledger paths are deliberately absent from that requirement (T1/CLI,
+// P83 fix round 6): they are derived from the durable run root, and requiring
+// them made the derived default unreachable.
 type agentRunnerRunInputs struct {
 	requestRecord       string
 	requestRecords      []string
@@ -446,6 +454,16 @@ type agentRunnerRunInputs struct {
 	agentVersion        string
 }
 
+// complete reports whether the AgentRunner CLI surface is fully declared enough to
+// route to the AgentRunner assembly: the request-record dimension in exactly one
+// of its two forms plus the five record/CLI values that have no derived location.
+//
+// T1/CLI (P83 fix round 6): --authorization-ledger and --cost-ledger are NOT part
+// of this gate any more. Both have a derived default under the durable run root
+// (trustedLedgerPath), so requiring them made the derived branch unreachable and
+// left "the ledger next to the run" as dead code. An explicit flag is still
+// honoured only when it names exactly the derived file; a disagreement is refused
+// downstream, not resolved by honouring the caller's path.
 func (inputs agentRunnerRunInputs) complete() bool {
 	if strings.TrimSpace(inputs.requestRecord) == "" && len(inputs.requestRecords) == 0 {
 		return false
@@ -454,8 +472,6 @@ func (inputs agentRunnerRunInputs) complete() bool {
 		inputs.capabilityRecord,
 		inputs.enforcementRecord,
 		inputs.availabilityRecord,
-		inputs.authorizationLedger,
-		inputs.costLedger,
 		inputs.agentCLI,
 		inputs.agentVersion,
 	} {
@@ -555,7 +571,19 @@ func (cli CLI) executeAgentRunnerRun(ctx context.Context, runID, runDir string, 
 	if err != nil {
 		return writeCommandError(stdout, stderr, "run", jsonOutput, err)
 	}
-	ledgerPath, err := resolvePathFromCWD(cwd, inputs.authorizationLedger)
+	// T1 (finding F2): the approval source is the durable run root, not a
+	// caller-selected file. The path is derived from the run directory, the flag may
+	// only name that same file, and the assembly re-checks the derivation before it
+	// builds the dispatch. An omitted flag now means "the ledger next to the run",
+	// which is the same rule the probe applies to its chain configuration.
+	selectedLedger := ""
+	if strings.TrimSpace(inputs.authorizationLedger) != "" {
+		selectedLedger, err = resolvePathFromCWD(cwd, inputs.authorizationLedger)
+		if err != nil {
+			return writeCommandError(stdout, stderr, "run", jsonOutput, err)
+		}
+	}
+	ledgerPath, err := trustedLedgerPath(runDir, defaultApprovalsLedgerName, selectedLedger)
 	if err != nil {
 		return writeCommandError(stdout, stderr, "run", jsonOutput, err)
 	}
@@ -563,7 +591,14 @@ func (cli CLI) executeAgentRunnerRun(ctx context.Context, runID, runDir string, 
 	if err != nil {
 		return writeCommandError(stdout, stderr, "run", jsonOutput, err)
 	}
-	costLedgerPath, err := resolvePathFromCWD(cwd, inputs.costLedger)
+	selectedCostLedger := ""
+	if strings.TrimSpace(inputs.costLedger) != "" {
+		selectedCostLedger, err = resolvePathFromCWD(cwd, inputs.costLedger)
+		if err != nil {
+			return writeCommandError(stdout, stderr, "run", jsonOutput, err)
+		}
+	}
+	costLedgerPath, err := trustedLedgerPath(runDir, defaultCostLedgerName, selectedCostLedger)
 	if err != nil {
 		return writeCommandError(stdout, stderr, "run", jsonOutput, err)
 	}
@@ -597,6 +632,11 @@ func (cli CLI) executeAgentRunnerRun(ctx context.Context, runID, runDir string, 
 		AvailabilityPolicy:  AgentRunnerDefaultAvailabilityPolicy(availabilityRecord, cli.now()),
 		AuthorizationLedger: authorizationLedger,
 		CostLedger:          costLedger,
+		// F2: the resolved ledger paths let the dispatch reread the authoritative
+		// files after publishing R, so revocations and settlements persisted after
+		// assembly are observed before any launch (CONTRACTS.md:212).
+		AuthorizationLedgerPath: ledgerPath,
+		CostLedgerPath:          costLedgerPath,
 		AgentCLI: AgentRunnerCLIOptions{
 			Executable:  agentCLIPath,
 			Version:     inputs.agentVersion,

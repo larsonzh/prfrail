@@ -71,14 +71,15 @@ func (cxAcceptance) Accept(context.Context, string, string, int, SnapshotRef, Wo
 
 type cxReviewer struct{}
 
-func (cxReviewer) Review(context.Context, ReviewRequest) (ReviewDecision, error) {
+func (cxReviewer) Review(_ context.Context, request ReviewRequest) (ReviewDecision, error) {
 	return ReviewDecision{
 		ReceiptID:  "review-one",
 		OccurredAt: "2026-11-03T00:00:00.000Z",
 		RecordedBy: evidence.Actor{Type: "operator", ID: "reviewer-one"},
 		ReviewMode: "manual",
 		Outcome:    "approve",
-		Evidence:   []string{cxStopHash},
+		// F3: an approve decision must bind the candidate evidence root.
+		Evidence: []string{cxStopHash, ReviewEvidenceBinding(request.CandidateSnapshotHash, request.EvidenceRootHash)},
 	}, nil
 }
 

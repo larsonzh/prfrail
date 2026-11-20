@@ -78,6 +78,7 @@ func TestRunnerPersistsPassedResultAndArtifacts(t *testing.T) {
 	}
 	request := validRequest(root)
 	request.Hook.ArtifactGlobs = []string{"report.txt"}
+	refreshHookDefinition(t, &request)
 	executor := &fakeExecutor{executions: []Execution{successfulExecution()}}
 	store := &memoryResults{}
 	record, err := testRunner(executor, fakeScanner{}, store).Run(context.Background(), request)
@@ -101,6 +102,7 @@ func TestRunnerRetriesAndPersistsEveryAttempt(t *testing.T) {
 	failed.ExitCode = &exitCode
 	request := validRequest(t.TempDir())
 	request.Hook.OnFail = FailurePolicy{Action: "retry", MaxAttempts: 2}
+	refreshHookDefinition(t, &request)
 	executor := &fakeExecutor{executions: []Execution{failed, successfulExecution()}}
 	store := &memoryResults{}
 	record, err := testRunner(executor, fakeScanner{}, store).Run(context.Background(), request)
@@ -117,6 +119,7 @@ func TestRunnerFailsOnScanAndMissingArtifact(t *testing.T) {
 		t.Fatalf("scan failure: %v %+v", err, store.records)
 	}
 	request.Hook.ArtifactGlobs = []string{"missing.txt"}
+	refreshHookDefinition(t, &request)
 	store = &memoryResults{}
 	_, err = testRunner(&fakeExecutor{executions: []Execution{successfulExecution()}}, fakeScanner{}, store).Run(context.Background(), request)
 	if !errors.Is(err, ErrGateFailed) || *store.records[0].Result.FailureKind != "artifact-missing" {
@@ -177,7 +180,12 @@ func effectScopeForTest(effectClass string) *EffectScope {
 
 func TestRunnerDeniesExternalWriteEffectWithoutExecuting(t *testing.T) {
 	request := validRequest(t.TempDir())
+	// F5: the frozen hook policy is the classification source, so the external-write
+	// class is declared on the hook and the scope merely restates it. The refusal
+	// under test is the S1 admission denial, not a scope/hook contradiction.
+	request.Hook.EffectClass = "external-write"
 	request.Effect = effectScopeForTest("external-write")
+	refreshHookDefinition(t, &request)
 	executor := &fakeExecutor{executions: []Execution{successfulExecution()}}
 	store := &memoryResults{}
 	record, err := testRunner(executor, fakeScanner{}, store).Run(context.Background(), request)
@@ -233,7 +241,7 @@ func TestRunnerBindsObservationToPassedReadOnlyResult(t *testing.T) {
 func (runner Runner) assessForTest(t *testing.T) Result {
 	t.Helper()
 	request := validRequest(t.TempDir())
-	result, err := runner.assess(context.Background(), request, "result-one", time.Date(2026, 9, 7, 12, 0, 0, 0, time.UTC), successfulExecution(), nil)
+	result, err := runner.assess(context.Background(), request, "result-one", time.Date(2026, 9, 7, 12, 0, 0, 0, time.UTC), successfulExecution(), nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -74,18 +74,23 @@ func (cli CLI) executeApprovals(ctx context.Context, args []string, stdout, stde
 func (cli CLI) executeApprovalsList(args []string, stdout, stderr io.Writer) int {
 	set, parseErr := newFlagSet("approvals list")
 	ledgerPath := set.String("ledger", "", "path to authorization ledger file")
+	runDir := set.String("run-dir", "", "durable run directory the ledger is derived from")
 	jsonOutput := set.Bool("json", false, "output as JSON")
 	if err := set.Parse(args); err != nil {
-		return writeUsageError(stdout, stderr, "approvals list", *jsonOutput, parseErr.String(), "usage: prfrail approvals list [--ledger <path>] [--json]")
+		return writeUsageError(stdout, stderr, "approvals list", *jsonOutput, parseErr.String(), "usage: prfrail approvals list [--ledger <path>] [--run-dir <path>] [--json]")
 	}
 	if len(set.Args()) != 0 {
-		return writeUsageError(stdout, stderr, "approvals list", *jsonOutput, "approvals list does not accept positional arguments", "usage: prfrail approvals list [--ledger <path>] [--json]")
+		return writeUsageError(stdout, stderr, "approvals list", *jsonOutput, "approvals list does not accept positional arguments", "usage: prfrail approvals list [--ledger <path>] [--run-dir <path>] [--json]")
 	}
 	cwd, err := cli.getwd()
 	if err != nil {
 		return writeCommandError(stdout, stderr, "approvals list", *jsonOutput, err)
 	}
-	resolvedPath, err := resolveApprovalsLedgerPath(*ledgerPath, cwd)
+	resolvedRunDir, err := resolveRunRootFromCWD(cwd, *runDir)
+	if err != nil {
+		return writeCommandError(stdout, stderr, "approvals list", *jsonOutput, err)
+	}
+	resolvedPath, err := resolveApprovalsLedgerPath(*ledgerPath, cwd, resolvedRunDir)
 	if err != nil {
 		return writeCommandError(stdout, stderr, "approvals list", *jsonOutput, err)
 	}
@@ -139,7 +144,14 @@ func (cli CLI) executeApprovalsRevoke(ctx context.Context, args []string, stdout
 	if err != nil {
 		return writeCommandError(stdout, stderr, "approvals revoke", *jsonOutput, err)
 	}
-	resolvedPath, err := resolveApprovalsLedgerPath(*ledgerPath, cwd)
+	// T1/CLI (P83 fix round 6): --run-dir already names the durable base of the run
+	// this revocation is about, so the ledger defaults to that run's own file and a
+	// --ledger naming anything else is refused.
+	resolvedRunRoot, err := resolveRunRootFromCWD(cwd, *runDir)
+	if err != nil {
+		return writeCommandError(stdout, stderr, "approvals revoke", *jsonOutput, err)
+	}
+	resolvedPath, err := resolveApprovalsLedgerPath(*ledgerPath, cwd, resolvedRunRoot)
 	if err != nil {
 		return writeCommandError(stdout, stderr, "approvals revoke", *jsonOutput, err)
 	}
@@ -201,7 +213,39 @@ func (cli CLI) executeApprovalsRevoke(ctx context.Context, args []string, stdout
 	return exitSuccess
 }
 
-func resolveApprovalsLedgerPath(ledgerPath, cwd string) (string, error) {
+// resolveRunRootFromCWD resolves an optional --run-dir against the invocation
+// directory. An absent flag yields the empty string, which callers read as "no
+// durable run base was named" (T1/CLI, P83 fix round 6).
+func resolveRunRootFromCWD(cwd, runDir string) (string, error) {
+	if strings.TrimSpace(runDir) == "" {
+		return "", nil
+	}
+	return resolvePathFromCWD(cwd, runDir)
+}
+
+// resolveApprovalsLedgerPath resolves the ledger file of an approvals command.
+//
+// T1/CLI (P83 fix round 6): the default write/read location is the DURABLE RUN
+// ROOT, not the working directory. The run writes its ledger under the run root
+// (trustedLedgerPath in the assembly), so an approvals command defaulting to the
+// working directory could read or revoke a different file than the run it is
+// about - the caller would have to spell the path out every time. When a run root
+// is named it is the only trusted base: a --ledger that disagrees with it is
+// refused rather than honoured. Without a run root there is no durable base to
+// derive from, so the historical working-directory default remains for the
+// "inspect an arbitrary ledger" flow.
+func resolveApprovalsLedgerPath(ledgerPath, cwd, runRoot string) (string, error) {
+	if strings.TrimSpace(runRoot) != "" {
+		selected := ""
+		if strings.TrimSpace(ledgerPath) != "" {
+			resolved, err := resolvePathFromCWD(cwd, ledgerPath)
+			if err != nil {
+				return "", err
+			}
+			selected = resolved
+		}
+		return trustedLedgerPath(runRoot, defaultApprovalsLedgerName, selected)
+	}
 	if ledgerPath == "" {
 		return filepath.Abs(filepath.Join(cwd, defaultApprovalsLedgerName))
 	}

@@ -50,6 +50,20 @@ type ProcessSpec struct {
 	Env     []string
 	Stdout  io.Writer
 	Stderr  io.Writer
+	// ExecutableDigest and ExecutableDigestDomain bind the spawn to ONE approved
+	// executable object (P83 T3). When the digest is set, the platform start opens
+	// the executable itself, hashes that handle with the given domain and refuses
+	// on any mismatch, and the child is then created from that same verified
+	// object: the path is never resolved a second time between the verification and
+	// the spawn (Windows holds a deny-write/deny-delete handle across both, Linux
+	// executes the verified descriptor). An empty digest is the compatibility path
+	// for callers that bind no executable; such a spawn keeps the plain
+	// path/exec.LookPath behaviour exactly.
+	ExecutableDigest string
+	// ExecutableDigestDomain is the digest domain the approval was expressed in.
+	// It is required whenever ExecutableDigest is set, because a digest computed in
+	// another domain would never match the approval.
+	ExecutableDigestDomain string
 	// OnSpawn, when set, runs after the process exists with a complete identity
 	// and its ownership anchor verified, and before it is allowed to run. A
 	// non-nil error means "not started": the guard stops the process again and

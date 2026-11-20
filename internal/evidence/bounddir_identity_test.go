@@ -1,6 +1,6 @@
 //go:build !darwin
 
-package adapters
+package evidence
 
 // P52-S1 ACCEPTANCE-SECURITY-COUNTEREXAMPLES: directory-identity counterexamples.
 //

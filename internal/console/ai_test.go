@@ -5,11 +5,75 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/larsonzh/prfrail/internal/adapters"
+	"github.com/larsonzh/prfrail/internal/chain"
+	"github.com/larsonzh/prfrail/internal/evidence"
 )
+
+// writeAIProbeApprovedLedger writes the operator grant the F6 gate requires, next
+// to the chain configuration (its default ledger location). The grant names the
+// receiver the configured profile targets (https://api.deepseek.com:443), the
+// probe tool id and the digest of the executable under test.
+func writeAIProbeApprovedLedger(t *testing.T, root, executablePath string) string {
+	t.Helper()
+	executableHash, err := adapters.CopilotCLIExecutableHash(executablePath)
+	if err != nil {
+		t.Fatalf("hash the approved probe executable: %v", err)
+	}
+	// T3 (finding F6): the approval must cover the FULL receiver identity, so the
+	// grant evidence carries the profile hash (provider/baseUrl/model/secretRef),
+	// the receiver binding digest (profile + channel + executable) and the
+	// executable digest.
+	profile, found := configuredAIProfile(configuredAIChain(), "agent-runner-cli")
+	if !found {
+		t.Fatal("the shared AI chain must configure the agent-runner-cli channel")
+	}
+	profileHash, err := adapters.AIProviderProfileHash(profile)
+	if err != nil {
+		t.Fatalf("hash the approved profile: %v", err)
+	}
+	binding := evidence.Digest(aiProbeReceiverBindingDomain, []byte(profileHash+"\n"+"agent-runner-cli"+"\n"+executableHash))
+	// newTestCLI pins the clock at 2026-09-08T10:30:00Z, so the grant is issued
+	// before it and expires after it.
+	issued := time.Date(2026, 9, 8, 10, 0, 0, 0, time.UTC)
+	record, err := chain.NewGrantAuthorizationRecord(chain.AuthorizationGrant{
+		RecordID:        "ai-probe-grant-1",
+		Kind:            "grant",
+		IssuedAt:        issued.Format(timestampLayout),
+		IssuedBy:        evidence.Actor{Type: "operator", ID: "ai-probe-operator"},
+		AuthorizationID: "ai-probe-authorization-1",
+		RunID:           "ai-probe-run",
+		RunManifestHash: evidence.Digest("", []byte("ai-probe-manifest")),
+		PolicyHash:      evidence.Digest("", []byte("ai-probe-policy")),
+		Scope: chain.AuthorizationScope{
+			ToolIDs: []string{aiProbeToolID},
+			Network: []chain.AuthorizationNetworkScope{
+				{Protocol: "https", Host: "api.deepseek.com", Port: 443, Purpose: "probe-provider"},
+			},
+			Budget: chain.AuthorizationBudgetLimit{
+				ModelCalls: 1, Tokens: 1000, WallClockMs: 600000, Attempts: 1, Currency: "USD",
+			},
+		},
+		ExpiresAt: issued.Add(time.Hour).Format(timestampLayout),
+		Evidence:  []string{executableHash, profileHash, binding},
+	}, nil, nil)
+	if err != nil {
+		t.Fatalf("build the operator grant: %v", err)
+	}
+	encoded, err := json.Marshal(record)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ledgerPath := filepath.Join(root, defaultApprovalsLedgerName)
+	if err := os.WriteFile(ledgerPath, append(encoded, '\n'), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	return ledgerPath
+}
 
 func writeAIAvailabilityFixture(t *testing.T, root, name string, record adapters.AIAvailabilityRecord) string {
 	t.Helper()
@@ -24,6 +88,11 @@ func TestAICheckUsesConfiguredChannelAndReturnsAvailabilityRecord(t *testing.T) 
 	root := t.TempDir()
 	configPath := filepath.Join(root, DefaultChainConfigName)
 	executablePath := filepath.Join(root, "copilot.exe")
+	// F6: the probe receiver binding hashes the executable, so the test target is a
+	// real file instead of a path that never existed.
+	if err := os.WriteFile(executablePath, []byte("stub-executable"), 0o700); err != nil {
+		t.Fatal(err)
+	}
 	encoded, err := EncodeChainConfig(configuredAIChain())
 	if err != nil {
 		t.Fatal(err)
@@ -31,16 +100,18 @@ func TestAICheckUsesConfiguredChannelAndReturnsAvailabilityRecord(t *testing.T) 
 	if err := os.WriteFile(configPath, encoded, 0o600); err != nil {
 		t.Fatal(err)
 	}
+	// F6: a probe is only admitted by an active operator grant in the ledger.
+	writeAIProbeApprovedLedger(t, root, executablePath)
 
 	called := false
 	cli := newTestCLI(root)
-	cli.checkAIAvailability = func(_ context.Context, profile adapters.AIProviderProfile, channel string, maximumRequests int, executable, workingDirectory string) (adapters.AIAvailabilityRecord, error) {
+	cli.checkAIAvailability = func(_ context.Context, profile adapters.AIProviderProfile, channel string, maximumRequests int, receiver aiProbeReceiver, workingDirectory string) (adapters.AIAvailabilityRecord, error) {
 		called = true
 		if profile.ProfileID != "deepseek-anthropic" || channel != "agent-runner-cli" || maximumRequests != 1 {
 			t.Fatalf("unexpected binding: profile=%s channel=%s requests=%d", profile.ProfileID, channel, maximumRequests)
 		}
-		if executable != executablePath || workingDirectory != root {
-			t.Fatalf("unexpected execution target: executable=%q cwd=%q", executable, workingDirectory)
+		if receiver.Executable != executablePath || workingDirectory != root {
+			t.Fatalf("unexpected execution target: executable=%q cwd=%q", receiver.Executable, workingDirectory)
 		}
 		reason := "credential_rejected"
 		return adapters.NewAIAvailabilityRecord(adapters.AIAvailability{
@@ -102,7 +173,7 @@ func TestAICheckRejectsUnconfiguredOrUnsupportedChannelWithoutProbe(t *testing.T
 		t.Fatal(err)
 	}
 	cli := newTestCLI(root)
-	cli.checkAIAvailability = func(context.Context, adapters.AIProviderProfile, string, int, string, string) (adapters.AIAvailabilityRecord, error) {
+	cli.checkAIAvailability = func(context.Context, adapters.AIProviderProfile, string, int, aiProbeReceiver, string) (adapters.AIAvailabilityRecord, error) {
 		t.Fatal("probe must not run for another or unconfigured channel")
 		return adapters.AIAvailabilityRecord{}, nil
 	}
@@ -122,6 +193,11 @@ func TestAICheckRejectsUnconfiguredOrUnsupportedChannelWithoutProbe(t *testing.T
 func TestAICheckReturnsSuccessOnlyForAvailableRecord(t *testing.T) {
 	root := t.TempDir()
 	configPath := filepath.Join(root, DefaultChainConfigName)
+	executablePath := filepath.Join(root, "copilot.exe")
+	// F6: the receiver binding requires a hashable executable.
+	if err := os.WriteFile(executablePath, []byte("stub-executable"), 0o700); err != nil {
+		t.Fatal(err)
+	}
 	encoded, err := EncodeChainConfig(configuredAIChain())
 	if err != nil {
 		t.Fatal(err)
@@ -129,8 +205,11 @@ func TestAICheckReturnsSuccessOnlyForAvailableRecord(t *testing.T) {
 	if err := os.WriteFile(configPath, encoded, 0o600); err != nil {
 		t.Fatal(err)
 	}
+	// F6: the operator grant is what admits the receiver, so the success path needs
+	// one on disk.
+	writeAIProbeApprovedLedger(t, root, executablePath)
 	cli := newTestCLI(root)
-	cli.checkAIAvailability = func(_ context.Context, profile adapters.AIProviderProfile, channel string, _ int, _, _ string) (adapters.AIAvailabilityRecord, error) {
+	cli.checkAIAvailability = func(_ context.Context, profile adapters.AIProviderProfile, channel string, _ int, _ aiProbeReceiver, _ string) (adapters.AIAvailabilityRecord, error) {
 		return adapters.NewAIAvailabilityRecord(adapters.AIAvailability{
 			ProbeID:           "probe-cli-available",
 			ProfileID:         profile.ProfileID,
@@ -156,7 +235,7 @@ func TestAICheckReturnsSuccessOnlyForAvailableRecord(t *testing.T) {
 
 func TestAICheckRequiresSingleRequestBudgetWithoutProbe(t *testing.T) {
 	cli := newTestCLI(t.TempDir())
-	cli.checkAIAvailability = func(context.Context, adapters.AIProviderProfile, string, int, string, string) (adapters.AIAvailabilityRecord, error) {
+	cli.checkAIAvailability = func(context.Context, adapters.AIProviderProfile, string, int, aiProbeReceiver, string) (adapters.AIAvailabilityRecord, error) {
 		t.Fatal("probe must not run for invalid budget")
 		return adapters.AIAvailabilityRecord{}, nil
 	}
@@ -173,7 +252,7 @@ func TestAICheckRequiresSingleRequestBudgetWithoutProbe(t *testing.T) {
 
 func TestAICheckRequiresOutputWithoutProbe(t *testing.T) {
 	cli := newTestCLI(t.TempDir())
-	cli.checkAIAvailability = func(context.Context, adapters.AIProviderProfile, string, int, string, string) (adapters.AIAvailabilityRecord, error) {
+	cli.checkAIAvailability = func(context.Context, adapters.AIProviderProfile, string, int, aiProbeReceiver, string) (adapters.AIAvailabilityRecord, error) {
 		t.Fatal("probe must not run without a durable output path")
 		return adapters.AIAvailabilityRecord{}, nil
 	}
@@ -201,7 +280,7 @@ func TestAICheckRejectsExistingOutputBeforeProbe(t *testing.T) {
 		t.Fatal(err)
 	}
 	cli := newTestCLI(root)
-	cli.checkAIAvailability = func(context.Context, adapters.AIProviderProfile, string, int, string, string) (adapters.AIAvailabilityRecord, error) {
+	cli.checkAIAvailability = func(context.Context, adapters.AIProviderProfile, string, int, aiProbeReceiver, string) (adapters.AIAvailabilityRecord, error) {
 		t.Fatal("existing output must be rejected before a paid probe")
 		return adapters.AIAvailabilityRecord{}, nil
 	}
@@ -248,7 +327,7 @@ func TestAIVerifyChecksPersistedRecordWithoutProbe(t *testing.T) {
 	}
 	cli := newTestCLI(root)
 	cli.now = func() time.Time { return time.Date(2026, 9, 11, 8, 5, 0, 0, time.UTC) }
-	cli.checkAIAvailability = func(context.Context, adapters.AIProviderProfile, string, int, string, string) (adapters.AIAvailabilityRecord, error) {
+	cli.checkAIAvailability = func(context.Context, adapters.AIProviderProfile, string, int, aiProbeReceiver, string) (adapters.AIAvailabilityRecord, error) {
 		t.Fatal("ai verify must not invoke a live probe")
 		return adapters.AIAvailabilityRecord{}, nil
 	}
@@ -317,7 +396,7 @@ func TestAIVerifyRejectsConflictingPriorRecord(t *testing.T) {
 	priorPath := writeAIAvailabilityFixture(t, root, "prior.json", prior)
 	cli := newTestCLI(root)
 	cli.now = func() time.Time { return time.Date(2026, 9, 11, 8, 5, 0, 0, time.UTC) }
-	cli.checkAIAvailability = func(context.Context, adapters.AIProviderProfile, string, int, string, string) (adapters.AIAvailabilityRecord, error) {
+	cli.checkAIAvailability = func(context.Context, adapters.AIProviderProfile, string, int, aiProbeReceiver, string) (adapters.AIAvailabilityRecord, error) {
 		t.Fatal("ai verify must remain offline")
 		return adapters.AIAvailabilityRecord{}, nil
 	}
@@ -346,4 +425,179 @@ func mustAIProfileHash(t *testing.T, profile adapters.AIProviderProfile) string 
 		t.Fatal(err)
 	}
 	return hash
+}
+
+// recordingProbeSecrets counts credential resolutions so a test can prove the
+// secret store was never touched. onResolve and credential let a test act inside
+// the resolution window - between the receiver binding and the spawn - without
+// replacing the production availability checker.
+type recordingProbeSecrets struct {
+	resolveCalls int
+	onResolve    func()
+	credential   []byte
+}
+
+func (manager *recordingProbeSecrets) Resolve(context.Context, string) ([]byte, error) {
+	manager.resolveCalls++
+	if manager.onResolve != nil {
+		manager.onResolve()
+	}
+	if len(manager.credential) == 0 {
+		return nil, adapters.ErrAISecretNotFound
+	}
+	return manager.credential, nil
+}
+
+func (manager *recordingProbeSecrets) Set(context.Context, string, []byte) error { return nil }
+
+func (manager *recordingProbeSecrets) Exists(context.Context, string) (bool, error) {
+	return false, nil
+}
+
+func (manager *recordingProbeSecrets) Delete(context.Context, string) error { return nil }
+
+// writeAIProbeTestChain writes the shared configured chain next to the probe.
+func writeAIProbeTestChain(t *testing.T, root string) string {
+	t.Helper()
+	configPath := filepath.Join(root, DefaultChainConfigName)
+	encoded, err := EncodeChainConfig(configuredAIChain())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(configPath, encoded, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	return configPath
+}
+
+// TestAICheckRefusesReceiverMismatchWithoutReadingStore is the F6 regression: a
+// probe whose receiver cannot be bound must be refused by the receiver binding
+// or by the executor's pre-spawn re-verification.
+//
+// Both counterexamples hand the command an executable that EXISTS, so a refusal
+// can never be explained by a path that was never there (the shape that made the
+// first version of this test unable to bite).
+//
+// Mutation checks. (1) Deleting the validateAIProbeBinding call enters the
+// availability check in the first subtest. (2) Deleting the executor's
+// ExpectedExecutableHash re-verification spawns the swapped image in the second
+// subtest and downgrades the record from "unavailable" to "unknown".
+func TestAICheckRefusesReceiverMismatchWithoutReadingStore(t *testing.T) {
+	t.Run("receiver-binding-refuses-before-the-availability-check", func(t *testing.T) {
+		root := t.TempDir()
+		configPath := writeAIProbeTestChain(t, root)
+		// The executable exists and is readable, so its digest is computable; it is
+		// one byte past the 64 MiB cap the receiver binding admits, so the binding
+		// itself is what refuses it, not a missing path.
+		executablePath := filepath.Join(root, "copilot.exe")
+		oversized, err := os.Create(executablePath)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := oversized.Truncate(64<<20 + 1); err != nil {
+			_ = oversized.Close()
+			t.Fatal(err)
+		}
+		if err := oversized.Close(); err != nil {
+			t.Fatal(err)
+		}
+
+		secrets := &recordingProbeSecrets{}
+		cli := newTestCLI(root)
+		cli.secretManager = secrets
+		// The seam wraps the production checker instead of replacing it: F6 promises
+		// that the availability check does not run at all, so counting entries keeps
+		// the real path in place while making that promise observable.
+		checkerEntries := 0
+		cli.checkAIAvailability = func(ctx context.Context, profile adapters.AIProviderProfile, channel string, maximumRequests int, receiver aiProbeReceiver, workingDirectory string) (adapters.AIAvailabilityRecord, error) {
+			checkerEntries++
+			return cli.defaultAICheck(ctx, profile, channel, maximumRequests, receiver, workingDirectory)
+		}
+
+		outputPath := filepath.Join(root, "binding-refused.json")
+		code, stdout, _ := runCLI(t, cli,
+			"ai", "check", "--chain", configPath, "--channel", "agent-runner-cli",
+			"--copilot", executablePath, "--max-requests", "1", "--out", outputPath, "--json",
+		)
+		if code != exitFailure {
+			t.Fatalf("an unbindable receiver must fail closed, got code=%d", code)
+		}
+		if !strings.Contains(stdout, "receiver binding") {
+			t.Fatalf("the receiver binding must be the refusing guard, got %q", stdout)
+		}
+		if checkerEntries != 0 {
+			t.Fatalf("the availability check must not run before the receiver binding holds, entries=%d", checkerEntries)
+		}
+		if secrets.resolveCalls != 0 {
+			t.Fatalf("the secret store must not be read before the receiver binding holds, got %d resolutions", secrets.resolveCalls)
+		}
+		if _, statErr := os.Lstat(outputPath); !os.IsNotExist(statErr) {
+			t.Fatalf("no availability record may be written, got err=%v", statErr)
+		}
+	})
+
+	t.Run("executor-refuses-a-swapped-executable-before-the-spawn", func(t *testing.T) {
+		root := t.TempDir()
+		configPath := writeAIProbeTestChain(t, root)
+		// The approved executable the receiver binding digests at bind time.
+		executablePath := filepath.Join(root, "copilot.exe")
+		if err := os.WriteFile(executablePath, []byte("p83-approved-probe-executable"), 0o700); err != nil {
+			t.Fatal(err)
+		}
+		// F6: the swapped-executable leg starts from an approved receiver, so the
+		// ledger carries a grant that names this exact executable digest.
+		writeAIProbeApprovedLedger(t, root, executablePath)
+		// The replacement has to be an image the operating system can start: if the
+		// pre-spawn re-verification disappears the probe really runs it and the
+		// record degrades, which is what the assertion below observes.
+		currentBinary, err := os.Executable()
+		if err != nil {
+			t.Fatalf("locate the test binary: %v", err)
+		}
+		replacement, err := os.ReadFile(currentBinary)
+		if err != nil {
+			t.Fatalf("read the test binary: %v", err)
+		}
+		secrets := &recordingProbeSecrets{
+			credential: []byte("p83-probe-credential"),
+			onResolve: func() {
+				if writeErr := os.WriteFile(executablePath, replacement, 0o700); writeErr != nil {
+					t.Errorf("replace the probe executable: %v", writeErr)
+				}
+			},
+		}
+		cli := newTestCLI(root)
+		cli.secretManager = secrets
+		// NewCLI binds the default checker to the CLI value it was built from, so the
+		// checker is re-bound after the instrumented secret store is installed;
+		// otherwise the probe would talk to the real platform credential store.
+		cli.checkAIAvailability = cli.defaultAICheck
+
+		outputPath := filepath.Join(root, "spawn-refused.json")
+		code, stdout, stderr := runCLI(t, cli,
+			"ai", "check", "--chain", configPath, "--channel", "agent-runner-cli",
+			"--copilot", executablePath, "--max-requests", "1", "--out", outputPath, "--json",
+		)
+		if code != exitFailure {
+			t.Fatalf("a swapped executable must fail closed, got code=%d stdout=%q stderr=%q", code, stdout, stderr)
+		}
+		if secrets.resolveCalls != 1 {
+			t.Fatalf("the approved executable must pass the binding and be resolved exactly once, got %d resolutions stdout=%q", secrets.resolveCalls, stdout)
+		}
+		persisted, err := os.ReadFile(outputPath)
+		if err != nil {
+			t.Fatalf("a probe refused before the spawn must still record its verdict: %v", err)
+		}
+		record, err := adapters.DecodeAIAvailabilityRecord(persisted)
+		if err != nil {
+			t.Fatal(err)
+		}
+		reason := ""
+		if record.Availability.Reason != nil {
+			reason = *record.Availability.Reason
+		}
+		if record.Availability.Status != "unavailable" || reason != "cli_unavailable" {
+			t.Fatalf("the swapped executable must be refused before it starts (status=unavailable reason=cli_unavailable), got status=%s reason=%q", record.Availability.Status, reason)
+		}
+	})
 }

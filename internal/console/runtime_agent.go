@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -33,11 +34,9 @@ import (
 const (
 	agentRunnerEvidenceRootDomain              = "proofrail:agent-runner-evidence-root:1\n"
 	agentRunnerCandidateEvidenceDomain         = "proofrail:agent-runner-candidate-evidence:1\n"
-	agentRunnerReviewPolicyDomain              = "proofrail:agent-runner-review-policy:1\n"
 	agentRunnerReviewEvidenceDomain            = "proofrail:agent-runner-review-evidence:1\n"
 	agentRunnerStopperDomain                   = "proofrail:agent-runner-stopper:1\n"
 	agentRunnerWriterStopDomain                = "proofrail:agent-runner-writer-stop:1\n"
-	agentRunnerLeaseDomain                     = "proofrail:agent-runner-lease:1\n"
 	agentRunnerPromotionEvidenceDomain         = "proofrail:agent-runner-promotion-evidence:1\n"
 	agentRunnerPromotionBlockedDomain          = "proofrail:agent-runner-promotion-blocked:1\n"
 	agentRunnerPlatformDomain                  = "proofrail:agent-runner-platform:1\n"
@@ -97,6 +96,16 @@ type AgentRunnerAssemblyOptions struct {
 	AuthorizationLedger chain.AuthorizationLedger
 	CostLedger          *tickets.CostLedger
 
+	// AuthorizationLedgerPath and CostLedgerPath are the on-disk ledgers the
+	// operator CLI appends to. When set, the dispatch rereads them just before a
+	// launch is reconfirmed instead of trusting the assembly-time copies, so a
+	// revocation or a settlement persisted after assembly is still observed
+	// (CONTRACTS.md:212 "dispatch ... must reconfirm ... after publishing R"). A
+	// zero value keeps the in-memory ledger, which is the compatibility path for
+	// callers that never persisted one.
+	AuthorizationLedgerPath string
+	CostLedgerPath          string
+
 	AgentCLI AgentRunnerCLIOptions
 
 	// WorkspaceRoot overrides the derived isolated workspace. The CLI never sets
@@ -137,6 +146,15 @@ type AgentRunnerAssemblyOptions struct {
 	// where the pinned CLI cannot be launched without proven publication
 	// durability.
 	testStub *agentRunnerAssemblyStub
+
+	// testInMemoryLedgers marks an assembly that may answer the launch
+	// reconfirmation from the in-memory AuthorizationLedger/CostLedger copies
+	// instead of the durable files. T1 (finding F2): a production assembly must
+	// never do that, because an in-memory copy cannot observe a revocation or a
+	// settlement persisted after it was made, so the fallback is gated on this
+	// flag and the flag is unexported - only the in-package test constructors set
+	// it, and every production caller leaves it false.
+	testInMemoryLedgers bool
 }
 
 // ExecuteAgentRunnerRun is the production AgentRunner assembly entry. It builds
@@ -197,6 +215,31 @@ func ExecuteAgentRunnerRun(ctx context.Context, options AgentRunnerAssemblyOptio
 	}
 	if err := agentRunnerValidateCLI(options.AgentCLI); err != nil {
 		return RunSummary{}, err
+	}
+
+	// T1 (finding F2): a production assembly must be authorised by a LIVE ledger
+	// source. The two on-disk ledgers are the operator CLI's append-only files, so
+	// the dispatch can reread them after publishing R; an in-memory copy cannot
+	// observe a revocation or a settlement that lands after assembly. The paths
+	// are therefore required, and they must agree with the location the durable
+	// run root implies (the shared trusted-source rule of T1/T2/T3), so a caller
+	// cannot point the launch reconfirmation at an arbitrary file. Only an
+	// explicitly marked test assembly keeps the in-memory compatibility path.
+	if !options.testInMemoryLedgers {
+		// T1 (P83 fix round 6): the refusal happens at assembly, before the run-root
+		// marker, the replay store, the probe permit and the lease exist, so the
+		// message states that no run state was created. A caller that has to tell
+		// "refused and clean" from "refused after damage" can rely on that.
+		authorizationLedgerPath, err := trustedLedgerPath(options.RunRoot, defaultApprovalsLedgerName, options.AuthorizationLedgerPath)
+		if err != nil {
+			return RunSummary{}, fmt.Errorf("%w: the AgentRunner assembly requires the authorization ledger: %v (refused at assembly; no run state was created)", ErrInvalidConfig, err)
+		}
+		options.AuthorizationLedgerPath = authorizationLedgerPath
+		costLedgerPath, err := trustedLedgerPath(options.RunRoot, defaultCostLedgerName, options.CostLedgerPath)
+		if err != nil {
+			return RunSummary{}, fmt.Errorf("%w: the AgentRunner assembly requires the cost ledger: %v (refused at assembly; no run state was created)", ErrInvalidConfig, err)
+		}
+		options.CostLedgerPath = costLedgerPath
 	}
 
 	// Sandbox check layer (CONTRACTS.md 7.2): the check runs before the probe
@@ -315,6 +358,11 @@ func ExecuteAgentRunnerRun(ctx context.Context, options AgentRunnerAssemblyOptio
 		acceptedEntries: make(map[string][]snapshot.Entry, len(tasks)),
 		clock:           clock,
 		ids:             ids,
+
+		authorizationLedgerPath: options.AuthorizationLedgerPath,
+		authorizationLedger:     options.AuthorizationLedger,
+
+		runRoot: options.RunRoot,
 	}
 	for _, task := range tasks {
 		// The pre-manifest wrapper is always production code: it takes the dispatch
@@ -343,6 +391,19 @@ func ExecuteAgentRunnerRun(ctx context.Context, options AgentRunnerAssemblyOptio
 		AgentRunner:          &agentRunnerDispatchMux{ports: stepPorts},
 		AgentRunnerAdmission: admission,
 	}
+
+	// Step 7b (F4): claim the exclusive publish lease of this run. The lease is
+	// taken before the engine exists, so a run that cannot prove exclusive
+	// publisher ownership never launches, and Publish re-proves the same record
+	// against the durable store (CONTRACTS.md:150-151). A claim failure is
+	// fail-closed: no engine, no dispatch, no promotion. The claim is run-scoped
+	// (P83 F4 liveness), so a resume whose first record has advanced adopts the
+	// lease this run already holds instead of being refused for good.
+	leaseProof, err := claimPublishLease(ctx, options.RunRoot, options.RunID)
+	if err != nil {
+		return RunSummary{}, err
+	}
+	assemblyRuntime.publishLease = leaseProof
 
 	// Step 8: the engine. Every port is the assembly runtime unless the
 	// in-package stub replaces it.
@@ -545,6 +606,26 @@ type agentRunnerRuntime struct {
 	beforeManifests map[string][]byte
 	acceptedEntries map[string][]snapshot.Entry
 
+	// reviewPolicyHashes is the policy hash every review decision bound, per task
+	// attempt. F3: Publish re-reads the operator grant and refuses a promotion
+	// whose freshly granted policy hash differs from the one the review bound, so
+	// a grant revoked or re-issued between review and publish can never be
+	// promoted on the strength of the earlier verdict.
+	reviewPolicyHashes map[string]string
+
+	// authorizationLedgerPath is the operator-written authorization ledger the
+	// review port rereads. When empty the assembly-time ledger below is used, which
+	// keeps every caller that never persisted a ledger on the compatibility path.
+	// F3: the review port must read a source the executing agent cannot write.
+	authorizationLedgerPath string
+	authorizationLedger     chain.AuthorizationLedger
+
+	// runRoot and publishLease are the F4 publish-lease state: the lease was claimed
+	// before the engine existed, and Publish re-proves it against the durable store
+	// instead of deriving evidence from the run id.
+	runRoot      string
+	publishLease publishLeaseProof
+
 	// dispatchedTaskID/dispatchedStepID record the last step the dispatch port
 	// parked. The driver is serial, so the observation is the awaiting task.
 	//
@@ -666,19 +747,126 @@ func (runtime *agentRunnerRuntime) Accept(ctx context.Context, runID, taskID str
 // Review is a real policy review over the frozen candidate. The chain only ever
 // reaches it from REVIEW_PENDING, so the postflight qualification is already
 // proven; the port records the policy it applied.
+//
+// F3: the policy hash is never derived from the candidate itself. A digest that
+// the executing assembly computes proves only that the candidate is
+// self-consistent, so the port instead adopts the policy hash of an operator
+// grant that is still active and that covers this run/task/step, read from the
+// operator-written ledger (CONTRACTS.md:147-148). No covering grant, an
+// unreadable ledger, an expired/revoked grant or a grant without a valid policy
+// hash refuses the review, which parks the task for repair instead of approving
+// it. The decision also carries the candidate/evidence-root binding the chain
+// independently checks.
 func (runtime *agentRunnerRuntime) Review(_ context.Context, request chain.ReviewRequest) (chain.ReviewDecision, error) {
 	if !evidence.ValidHash(request.CandidateSnapshotHash) || !evidence.ValidHash(request.EvidenceRootHash) {
 		return chain.ReviewDecision{}, fmt.Errorf("%w: review request carries an invalid binding", ErrInvalidConfig)
 	}
+	stepID, err := runtime.stepIDForTask(request.TaskID, request.Attempt)
+	if err != nil {
+		return chain.ReviewDecision{}, err
+	}
+	policyHash, err := runtime.operatorApprovedPolicyHash(request.RunID, request.TaskID, stepID)
+	if err != nil {
+		return chain.ReviewDecision{}, err
+	}
+	// F3: the hash this decision binds is remembered, so Publish can prove the
+	// policy it promotes under is still the operator-granted one.
+	if runtime.reviewPolicyHashes == nil {
+		runtime.reviewPolicyHashes = map[string]string{}
+	}
+	runtime.reviewPolicyHashes[agentRunnerTaskStateKey(request.TaskID, request.Attempt)] = policyHash
 	return chain.ReviewDecision{
 		ReceiptID:  runtime.nextEventID(),
 		OccurredAt: runtime.clock().UTC().Format(timestampLayout),
 		RecordedBy: evidence.Actor{Type: "policy", ID: agentRunnerAssemblyReviewPolicyLabel},
 		ReviewMode: "policy",
-		PolicyHash: digest(agentRunnerReviewPolicyDomain, agentRunnerAssemblyReviewPolicyLabel, "postflight-qualified-candidate"),
+		PolicyHash: policyHash,
 		Outcome:    "approve",
-		Evidence:   []string{digest(agentRunnerReviewEvidenceDomain, request.CandidateSnapshotHash, request.EvidenceRootHash)},
+		Evidence: []string{
+			chain.ReviewEvidenceBinding(request.CandidateSnapshotHash, request.EvidenceRootHash),
+			digest(agentRunnerReviewEvidenceDomain, request.CandidateSnapshotHash, request.EvidenceRootHash),
+		},
 	}, nil
+}
+
+// stepIDForTask resolves the step of the task the review belongs to. The request
+// carries no step id, and a grant is scoped per step, so the binding is resolved
+// from the assembly's own record registry rather than guessed.
+func (runtime *agentRunnerRuntime) stepIDForTask(taskID string, attempt int) (string, error) {
+	if record, ok := runtime.requestRecords[agentRunnerTaskStateKey(taskID, attempt)]; ok {
+		if record.Request.TaskID == taskID && record.Request.StepID != "" {
+			return record.Request.StepID, nil
+		}
+	}
+	if runtime.requestRecord.Request.TaskID == taskID && runtime.requestRecord.Request.StepID != "" {
+		return runtime.requestRecord.Request.StepID, nil
+	}
+	return "", fmt.Errorf("%w: no request record is bound to task %q", ErrInvalidConfig, taskID)
+}
+
+// operatorApprovedPolicyHash returns the policy hash of the newest active grant
+// that covers the given run/task/step.
+//
+// F3: the ledger is reread from its file when a path is configured, because the
+// grant source must be the operator CLI's append-only file and never an
+// in-memory copy the executing assembly could have assembled itself. Every
+// refusal is fail-closed: an unreadable ledger, no covering grant, a non-active
+// grant status and a grant whose policy hash is not a valid hash all block the
+// review.
+//
+// T2 (finding F3) is implemented partially, on purpose:
+//   - DONE: only the latest grant record of an authorizationId may authorise, so
+//     an older record's scope can never be backed by the newer record's status.
+//   - NOT DONE: requiring grant.PolicyHash to equal the run's FROZEN policy digest.
+//     This revision has no durable frozen-policy artifact for an AgentRunner run
+//     (schemas/run-manifest.schema.json is declarative only: nothing in this tree
+//     writes it, and the replay store freezes requests, not policies), so
+//     implementing that half would invent a new record type - which the fix
+//     round's hard rule forbids. It is reported as a STOP instead.
+func (runtime *agentRunnerRuntime) operatorApprovedPolicyHash(runID, taskID, stepID string) (string, error) {
+	ledger := runtime.authorizationLedger
+	if runtime.authorizationLedgerPath != "" {
+		loaded, err := loadAuthorizationLedger(runtime.authorizationLedgerPath)
+		if err != nil {
+			return "", fmt.Errorf("%w: authorization ledger is unreadable: %v", ErrInvalidConfig, err)
+		}
+		ledger = loaded
+	}
+	now := runtime.clock().UTC()
+	policyHash := ""
+	for _, record := range ledger.Grants {
+		grant := record.Grant
+		if grant == nil || grant.RunID != runID {
+			continue
+		}
+		if !slices.Contains(grant.Scope.TaskIDs, taskID) || !slices.Contains(grant.Scope.StepIDs, stepID) {
+			continue
+		}
+		// T2 (finding F3): a superseded grant record is history, not a current
+		// approval. A re-issued authorization may narrow its scope, so only the
+		// latest record for an authorizationId may be read as that operator's
+		// intent; an older record's scope must never be mixed with the newer
+		// record's status.
+		latest, _, latestExists := ledger.LatestGrant(grant.AuthorizationID)
+		if !latestExists || latest.RecordHash != record.RecordHash {
+			continue
+		}
+		status, err := chain.EvaluateGrant(grant.AuthorizationID, ledger, now)
+		if err != nil {
+			return "", fmt.Errorf("%w: authorization grant %q cannot be evaluated: %v", ErrInvalidConfig, grant.AuthorizationID, err)
+		}
+		if status != chain.GrantActive {
+			continue
+		}
+		if !evidence.ValidHash(grant.PolicyHash) {
+			return "", fmt.Errorf("%w: authorization grant %q carries no valid policy hash", ErrInvalidConfig, grant.AuthorizationID)
+		}
+		policyHash = grant.PolicyHash
+	}
+	if policyHash == "" {
+		return "", fmt.Errorf("%w: no operator-approved policy grant covers this review", ErrInvalidConfig)
+	}
+	return policyHash, nil
 }
 
 // Publish promotes the candidate only after proving the workspace still matches
@@ -686,6 +874,21 @@ func (runtime *agentRunnerRuntime) Review(_ context.Context, request chain.Revie
 // proof is fail-closed, exactly like postflight leg 5: a run that left no pid
 // report blocks the promotion instead of reading as "nothing alive".
 func (runtime *agentRunnerRuntime) Publish(ctx context.Context, request chain.PromotionRequest) (chain.PromotionDecision, error) {
+	// F3: the promotion re-proves the policy it was reviewed under and the
+	// candidate evidence root it was frozen from. Both were true at review time;
+	// this is the verification "before publishing" the contract requires, so a
+	// revoked grant or a drifted evidence root refuses the promotion instead of
+	// completing it on the earlier verdict.
+	if err := runtime.verifyReviewPolicyBinding(request); err != nil {
+		return runtime.blockedPromotion(err.Error()), nil
+	}
+	freshEvidenceRoot, err := runtime.evidenceRootHash(request.TaskID, request.Attempt)
+	if err != nil {
+		return chain.PromotionDecision{}, err
+	}
+	if freshEvidenceRoot != request.EvidenceRootHash {
+		return runtime.blockedPromotion("the candidate evidence root changed after the review"), nil
+	}
 	workspaceRoot, err := runtime.workspaceRootFor(request.TaskID, request.Attempt)
 	if err != nil {
 		return chain.PromotionDecision{}, err
@@ -722,15 +925,84 @@ func (runtime *agentRunnerRuntime) Publish(ctx context.Context, request chain.Pr
 			ErrorEvidence: []string{digest(agentRunnerPromotionBlockedDomain, "a managed process of this run is still alive")},
 		}, nil
 	}
+	// F4: the promotion binds the lease record this run actually holds. A lease
+	// that is gone, taken over, replaced or expired proves no exclusive writer, so
+	// the promotion is refused with evidence instead of completing on a run-id
+	// derived digest (CONTRACTS.md:150-151).
+	now := runtime.clock().UTC()
+	// F4 liveness finding (c): a run whose window outlived the TTL is not wedged.
+	// The renewal extends only the record this run's exact token and hash match;
+	// anything else is refused right here.
+	// The proof here is never read from disk: it is the in-memory record obtained
+	// from claimPublishLease at assembly time (Step 7b), so it cannot arrive from
+	// another run's store-local file. The run-scoped identity is still re-checked
+	// by both helpers below, so a future on-disk proof path stays fail-closed.
+	refreshed, err := renewPublishLease(ctx, runtime.runRoot, runtime.runID, runtime.publishLease, now)
+	if err != nil {
+		return chain.PromotionDecision{
+			ReceiptID:     runtime.nextEventID(),
+			OccurredAt:    runtime.clock().UTC().Format(timestampLayout),
+			Outcome:       "failed",
+			ErrorEvidence: []string{digest(agentRunnerPromotionBlockedDomain, err.Error())},
+		}, nil
+	}
+	runtime.publishLease = refreshed
+	leaseHash, err := verifyPublishLease(ctx, runtime.runRoot, runtime.runID, refreshed, now)
+	if err != nil {
+		return chain.PromotionDecision{
+			ReceiptID:     runtime.nextEventID(),
+			OccurredAt:    runtime.clock().UTC().Format(timestampLayout),
+			Outcome:       "failed",
+			ErrorEvidence: []string{digest(agentRunnerPromotionBlockedDomain, err.Error())},
+		}, nil
+	}
 	return chain.PromotionDecision{
 		ReceiptID:            runtime.nextEventID(),
 		OccurredAt:           runtime.clock().UTC().Format(timestampLayout),
 		Outcome:              "completed",
 		AcceptedSnapshotHash: request.CandidateSnapshotHash,
 		WriterStopEvidence:   []string{digest(agentRunnerWriterStopDomain, request.RunID, request.TaskID)},
-		LeaseEvidence:        []string{digest(agentRunnerLeaseDomain, runtime.runID)},
+		LeaseEvidence:        []string{leaseHash},
 		Evidence:             []string{digest(agentRunnerPromotionEvidenceDomain, request.ReviewReceiptHash)},
 	}, nil
+}
+
+// blockedPromotion is the fail-closed promotion answer of one F3 refusal: an
+// explicit failed outcome with no accepted snapshot and no lease evidence, so no
+// caller can read it as a completed promotion.
+func (runtime *agentRunnerRuntime) blockedPromotion(reason string) chain.PromotionDecision {
+	return chain.PromotionDecision{
+		ReceiptID:     runtime.nextEventID(),
+		OccurredAt:    runtime.clock().UTC().Format(timestampLayout),
+		Outcome:       "failed",
+		ErrorEvidence: []string{digest(agentRunnerPromotionBlockedDomain, reason)},
+	}
+}
+
+// verifyReviewPolicyBinding is the F3 publish-time verification of the agent
+// assembly. The review rereads the operator ledger and adopts the granted policy
+// hash; publishing proves the same fact once more, as close to the promotion as
+// the port allows: the trusted ledger is read again and the active grant that
+// covers this run/task/step must still bind the exact policy hash the review
+// decision recorded. An unreadable ledger, a lost grant or a different hash all
+// refuse the promotion.
+func (runtime *agentRunnerRuntime) verifyReviewPolicyBinding(request chain.PromotionRequest) error {
+	recorded, ok := runtime.reviewPolicyHashes[agentRunnerTaskStateKey(request.TaskID, request.Attempt)]
+	if !ok || !evidence.ValidHash(recorded) {
+		return fmt.Errorf("%w: no reviewed policy hash is bound to task %q", ErrInvalidConfig, request.TaskID)
+	}
+	stepID, err := runtime.stepIDForTask(request.TaskID, request.Attempt)
+	if err != nil {
+		return err
+	}
+	granted, err := runtime.operatorApprovedPolicyHash(request.RunID, request.TaskID, stepID)
+	if err != nil {
+		return err
+	}
+	if granted != recorded {
+		return fmt.Errorf("%w: the operator grant no longer binds the reviewed policy", ErrInvalidConfig)
+	}
+	return nil
 }
 
 // Stop reports the recorded stop evidence location. The only managed writers are
@@ -1204,6 +1476,28 @@ func agentRunnerBindTasks(options AgentRunnerAssemblyOptions, plan []agentRunner
 		Grace:   options.AgentCLI.Grace,
 	}
 	workspaceOverride := strings.TrimSpace(options.WorkspaceRoot)
+	// T1 (finding F2 / P83 fix round 6): ONE derivation of the trusted ledger
+	// sources, shared by the pre-admission and the dispatch reconfirmation. Both
+	// checks therefore read the same durable files, so they cannot disagree about
+	// what the operator currently authorises or what budget is still available.
+	ledgerSource := func() (chain.AuthorizationLedger, error) {
+		if options.AuthorizationLedgerPath != "" {
+			return loadAuthorizationLedger(options.AuthorizationLedgerPath)
+		}
+		if options.testInMemoryLedgers {
+			return options.AuthorizationLedger, nil
+		}
+		return chain.AuthorizationLedger{}, fmt.Errorf("%w: no authorization ledger source is configured", ErrInvalidConfig)
+	}
+	costSource := func() (*tickets.CostLedger, error) {
+		if options.CostLedgerPath != "" {
+			return loadCostLedgerSnapshot(options.CostLedgerPath)
+		}
+		if options.testInMemoryLedgers {
+			return options.CostLedger, nil
+		}
+		return nil, fmt.Errorf("%w: no cost ledger source is configured", ErrInvalidConfig)
+	}
 	tasks := make([]agentRunnerPlannedTask, 0, len(plan))
 	for index, binding := range plan {
 		record := records[index]
@@ -1239,24 +1533,41 @@ func agentRunnerBindTasks(options AgentRunnerAssemblyOptions, plan []agentRunner
 			process:       process,
 			capturer:      capturer,
 			dispatcher: &adapters.AgentRunnerReplayDispatcher{
-				Store:          store,
-				Launcher:       launcher,
-				Process:        process,
-				LedgerSnapshot: func() (chain.AuthorizationLedger, error) { return options.AuthorizationLedger, nil },
-				CostLedger:     options.CostLedger,
-				RequestRecord:  record,
-				Clock:          clock,
+				Store:    store,
+				Launcher: launcher,
+				Process:  process,
+				// T1 (finding F2): the authorization ledger is reread from its trusted
+				// file at every dispatch, so a revocation appended after assembly is
+				// visible before the launch is reconfirmed (CONTRACTS.md:212). The
+				// in-memory copy is no longer a fallback: it is reachable only from an
+				// explicitly marked test assembly, and a production closure without a
+				// path refuses instead of approving on a snapshot it cannot refresh.
+				LedgerSnapshot: ledgerSource,
+				// T1 (finding F2): the cost ledger is reread from its durable file so a
+				// settlement persisted in another process removes the outstanding
+				// reservation before the launch is permitted (CONTRACTS.md:212). The
+				// in-memory copy is limited to the same marked test assemblies.
+				CostLedgerSnapshot: costSource,
+				CostLedger:         options.CostLedger,
+				RequestRecord:      record,
+				Clock:              clock,
 			},
 			admission: &adapters.AgentRunnerCompositeAdmission{
-				RequestRecord:       record,
-				AuthorizationLedger: options.AuthorizationLedger,
-				CostLedger:          options.CostLedger,
-				AvailabilityRecord:  options.AvailabilityRecord,
-				AvailabilityPolicy:  options.AvailabilityPolicy,
-				CapabilityRecord:    options.CapabilityRecord,
-				EnforcementRecord:   options.EnforcementRecord,
-				AdmissionPolicy:     agentRunnerAdmissionPolicy(clock()),
-				Clock:               clock,
+				RequestRecord: record,
+				// T1 (P83 fix round 6): the pre-admission reads the same derived trusted
+				// sources as the dispatch reconfirmation, so a revocation or settlement
+				// that landed after assembly refuses the step before it is admitted
+				// instead of being judged against the assembly-time snapshot.
+				AuthorizationLedger:       options.AuthorizationLedger,
+				AuthorizationLedgerSource: ledgerSource,
+				CostLedger:                options.CostLedger,
+				CostLedgerSource:          costSource,
+				AvailabilityRecord:        options.AvailabilityRecord,
+				AvailabilityPolicy:        options.AvailabilityPolicy,
+				CapabilityRecord:          options.CapabilityRecord,
+				EnforcementRecord:         options.EnforcementRecord,
+				AdmissionPolicy:           agentRunnerAdmissionPolicy(clock()),
+				Clock:                     clock,
 			},
 			intent:     intent,
 			postflight: postflight,
@@ -1530,6 +1841,375 @@ func agentRunnerMitigateAbandonedLaunch(ctx context.Context, receipts agentRunne
 		return fmt.Errorf("%w: mitigation stop outcome unproven: the stop proof reads %q", runErr, proof.Outcome)
 	}
 	return runErr
+}
+
+// loadCostLedgerSnapshot rereads the durable cost ledger file the operator CLI
+// writes. It exists for F2: the launch reconfirmation must consult the ledger as
+// it is now, not the copy the assembly loaded before any dispatch happened
+// (CONTRACTS.md:212). Every read or decode failure is returned as an error so the
+// caller can refuse the launch; there is no "ledger unreadable therefore empty"
+// fallback, because an empty ledger would silently mean "no outstanding
+// reservation" and block by accident rather than by evidence.
+func loadCostLedgerSnapshot(path string) (*tickets.CostLedger, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+	record, err := tickets.DecodeCostLedgerRecord(data)
+	if err != nil {
+		return nil, err
+	}
+	return tickets.LoadCostLedger(record)
+}
+
+// Publish lease (F4).
+//
+// CONTRACTS.md:150-151 binds the shutdown and the lease evidence of a promotion
+// into one transaction. Deriving the evidence from the run id proves nothing
+// about who currently holds the writer, so both assemblies instead claim a real
+// guard.LeaseStore lease before the chain can reach Publish and bind the current
+// record's hash at publish time. A missing, replaced, taken-over or expired lease
+// refuses the promotion.
+const (
+	publishLeaseTTL            = 24 * time.Hour
+	publishLeaseConsumerID     = "proofrail-publisher"
+	publishLeaseResourceDomain = "proofrail:publish-lease-resource:1\n"
+	// publishLeaseClaimDomain derives the run-scoped claim identity. It is a
+	// digest of the run id and never of an attempt, so every re-entry of the same
+	// run addresses the same claim (P83 F4 liveness finding (a)/(b)).
+	publishLeaseClaimDomain = "proofrail:publish-lease-claim:1\n"
+	// publishLeaseRenewBefore is the remaining lifetime below which a lease that
+	// this run still provably holds is renewed before it is verified. A run whose
+	// publish window legitimately stays open for longer than publishLeaseTTL must
+	// not be wedged by expiry (P83 F4 liveness finding (c)).
+	publishLeaseRenewBefore = publishLeaseTTL / 2
+	// publishLeaseProofName is the store-local file a re-entrant supervised run
+	// reads its claim back from. It is not a wire record.
+	publishLeaseProofName = "publish-lease.json"
+	publishLeaseTimestamp = "2006-01-02T15:04:05.000Z"
+)
+
+// ErrPublishLeaseUnproven reports a promotion whose exclusive lease cannot be
+// proven. It is never a warning: the promotion is refused.
+var ErrPublishLeaseUnproven = errors.New("publish lease proof missing or inconsistent")
+
+// publishLeaseProof is the claim a run persists so a later process can prove it
+// still holds the same lease.
+type publishLeaseProof struct {
+	ResourceID string             `json:"resourceId"`
+	Token      guard.FencingToken `json:"token"`
+	LeaseHash  string             `json:"leaseHash"`
+}
+
+// publishLeaseRoot is the lease directory of a run root.
+func publishLeaseRoot(runRoot string) string { return filepath.Join(runRoot, "leases") }
+
+// publishLeaseResourceID derives the lease resource of a run. The resource id is
+// a run-scoped identifier, never a task or step, because the publication it
+// fences is the run's terminal promotion.
+func publishLeaseResourceID(runID string) string {
+	digest := evidence.Digest(publishLeaseResourceDomain, []byte(runID))
+	return "ws-" + digest[len("sha256:"):len("sha256:")+24]
+}
+
+// newPublishLeaseStore opens the lease store under the run root.
+func newPublishLeaseStore(runRoot string) (*guard.LeaseStore, error) {
+	store, err := guard.NewLeaseStore(publishLeaseRoot(runRoot))
+	if err != nil {
+		return nil, fmt.Errorf("%w: %v", ErrPublishLeaseUnproven, err)
+	}
+	return store, nil
+}
+
+// claimPublishLease claims the run's publish lease and reports the proof to bind
+// at publish time. The claim identity is run-scoped, never per attempt (P83 F4
+// liveness finding (a)/(b)): a supervised run whose task reaches attempt 2 and an
+// agent-runner resume whose first record has advanced both re-enter the same run,
+// so they must adopt the lease the run already holds instead of being refused for
+// the rest of the run.
+//
+// Adoption accepts only a lease this run provably wrote: the same run-scoped
+// resource and the same consumer. It deliberately does not compare the claim id,
+// because older records carry a per-attempt id and every renewal keeps the id but
+// advances the generation. The relaxation cannot admit a foreign owner: the
+// resource id is derived from the run id, so another run addresses a different
+// resource. A deleted, replaced or hash-swapped record is still refused here (the
+// store read fails) and verifyPublishLease re-binds the exact (claim id,
+// generation) token plus lease hash before a promotion may complete.
+//
+// T5 (P83 fix round): adoption is additionally gated on process-level exclusivity.
+// A second PID of the same run may only adopt the record after the recorded holder
+// is proven stopped, and a holder whose liveness cannot be disproved refuses
+// adoption. Without that proof two processes of one run would both believe they
+// hold the writer.
+func claimPublishLease(ctx context.Context, runRoot, runID string) (publishLeaseProof, error) {
+	store, err := newPublishLeaseStore(runRoot)
+	if err != nil {
+		return publishLeaseProof{}, err
+	}
+	resourceID := publishLeaseResourceID(runID)
+	holder := publishLeaseProcess(runID)
+	lease, err := store.Claim(ctx, resourceID, publishLeaseConsumerID, publishLeaseClaimID(runID), holder, publishLeaseTTL)
+	if err != nil {
+		if !errors.Is(err, guard.ErrLeaseHeld) {
+			return publishLeaseProof{}, fmt.Errorf("%w: claim %s: %v", ErrPublishLeaseUnproven, resourceID, err)
+		}
+		current, currentErr := store.Current(ctx, resourceID)
+		if currentErr != nil {
+			return publishLeaseProof{}, fmt.Errorf("%w: claim %s: %v", ErrPublishLeaseUnproven, resourceID, currentErr)
+		}
+		if !publishLeaseBelongsToRun(current, runID) {
+			return publishLeaseProof{}, fmt.Errorf("%w: the publish lease of %s is held by another holder", ErrPublishLeaseUnproven, resourceID)
+		}
+		// T5 (P83 fix round 6): adoption is a TRANSFER, not a hand-out of the old
+		// record. Returning the holder's token let two successors of one stopped
+		// holder both adopt it and both believe they held the writer. The record is
+		// reclaimed instead: it names this process and a new generation, so the
+		// second successor presents the previous token and is refused by the store.
+		//
+		// A record that already names THIS process is not a successor at all - it is
+		// a re-entry of the one holder (another task of the same supervised run, or a
+		// repeated assembly inside one process), and no OS-level liveness proof could
+		// tell two call sites of one process apart. That case keeps the record, so
+		// the proofs already written for this run's other tasks stay valid instead of
+		// being invalidated by a transfer that separates no holders.
+		if current.Process == holder {
+			return publishLeaseProof{ResourceID: resourceID, Token: current.Token, LeaseHash: current.LeaseHash}, nil
+		}
+		reclaimed, reclaimErr := store.Reclaim(ctx, resourceID, current.Token, holder, publishLeaseTTL, func(locked guard.Lease) error {
+			// The proof runs under the store lock, so the "previous holder is stopped"
+			// decision cannot be separated from the transfer by a competing successor.
+			return publishLeasePreviousHolderStopped(locked.Process)
+		})
+		if reclaimErr != nil {
+			return publishLeaseProof{}, fmt.Errorf("%w: adopt %s: %v", ErrPublishLeaseUnproven, resourceID, reclaimErr)
+		}
+		lease = reclaimed
+	}
+	return publishLeaseProof{ResourceID: resourceID, Token: lease.Token, LeaseHash: lease.LeaseHash}, nil
+}
+
+// publishLeaseProcess is the process identity a claim records. T5: it is the real
+// OS identity this repo already inspects (guard.InspectProcess), so a later process
+// can ask the OS whether the recorded holder is still running instead of trusting a
+// token that only names the run. A platform that cannot report an identity keeps
+// the pre-T5 run-token shape, which no other process of the run can distinguish
+// from itself; on those platforms the adoption proof below therefore refuses.
+func publishLeaseProcess(runID string) guard.ProcessIdentity {
+	if identity, err := guard.InspectProcess(os.Getpid()); err == nil {
+		return identity
+	}
+	return guard.ProcessIdentity{PID: os.Getpid(), StartToken: runID}
+}
+
+// publishLeasePreviousHolderStopped is the T5 exclusivity proof of adoption. It
+// admits the record only when the recorded holder is this very process (a
+// re-entry inside one process) or when the OS proves that identity is gone: the
+// identity is not alive AND no process is inspectable at that PID any more. A live
+// holder, a PID that now carries a different process, and an unobservable identity
+// all refuse adoption - the previous holder's stop cannot be disproved for them.
+func publishLeasePreviousHolderStopped(previous guard.ProcessIdentity) error {
+	if self, err := guard.InspectProcess(os.Getpid()); err == nil && previous == self {
+		return nil
+	}
+	alive, aliveErr := guard.ProcessAlive(previous)
+	if aliveErr != nil {
+		return fmt.Errorf("the previous publish lease holder %d cannot be inspected: %v", previous.PID, aliveErr)
+	}
+	if alive {
+		return fmt.Errorf("the previous publish lease holder %d is still running", previous.PID)
+	}
+	if occupant, inspectErr := guard.InspectProcess(previous.PID); inspectErr == nil {
+		return fmt.Errorf("the previous publish lease holder cannot be proven stopped: pid %d is now held by process %d", previous.PID, occupant.PID)
+	}
+	return nil
+}
+
+// publishLeaseClaimID is the run-scoped claim identity of a lease record. The
+// same run always derives the same id, so claim and adoption agree across
+// attempts, processes and resumes.
+func publishLeaseClaimID(runID string) string {
+	digest := evidence.Digest(publishLeaseClaimDomain, []byte(runID))
+	return "run-" + digest[len("sha256:"):len("sha256:")+24]
+}
+
+// publishLeaseBelongsToRun reports whether a lease record is this run's own: the
+// run-scoped resource and the publish consumer. T5: the recorded process identity
+// is no longer compared with the run id, because it now names the real OS process
+// that wrote the record; whether that holder stopped is a separate proof
+// (publishLeasePreviousHolderStopped), and the resource id - a digest of the run
+// id - still keeps another run's record out.
+func publishLeaseBelongsToRun(lease guard.Lease, runID string) bool {
+	return lease.ResourceID == publishLeaseResourceID(runID) &&
+		lease.ConsumerID == publishLeaseConsumerID
+}
+
+// publishLeaseProofBelongsToRun is the F4 identity half of the publish proof: a
+// proof binds a record only when it names this run's own lease resource. The
+// resource id is a digest of the run id, so a proof file replaced with another
+// run's legitimately issued lease (same store root) fails here even though its
+// token and lease hash would match that other run's record.
+func publishLeaseProofBelongsToRun(proof publishLeaseProof, runID string) bool {
+	return proof.ResourceID != "" && proof.ResourceID == publishLeaseResourceID(runID)
+}
+
+// renewPublishLease re-proves that this run still owns the lease record and
+// extends it when less than publishLeaseRenewBefore remains (P83 F4 liveness
+// finding (c)): a run whose window stays open beyond the TTL would otherwise be
+// refused at promotion forever. The renewal is not a weakening of the proof
+// because it runs only after the record was proven to be this run's own record
+// (run-scoped resource, F4) and matched against this run's exact token and lease
+// hash, and the store renews that exact token again under the resource lock. A
+// foreign writer, a swapped record or a deleted record fails before any renewal
+// is attempted.
+//
+// It returns the proof to use from now on; it is unchanged when no renewal was
+// due, so callers persist it only when it actually moved.
+func renewPublishLease(ctx context.Context, runRoot, runID string, proof publishLeaseProof, now time.Time) (publishLeaseProof, error) {
+	if proof.Token.ClaimID == "" || proof.Token.Generation == 0 || !evidence.ValidHash(proof.LeaseHash) {
+		return publishLeaseProof{}, ErrPublishLeaseUnproven
+	}
+	// F4: the proof must bind THIS run's own record. Without this check a proof
+	// file swapped for another run's legitimate lease of the same store root would
+	// be renewed and published although this run never held it.
+	if !publishLeaseProofBelongsToRun(proof, runID) {
+		return publishLeaseProof{}, fmt.Errorf("%w: the proof names lease %q, not this run's %q", ErrPublishLeaseUnproven, proof.ResourceID, publishLeaseResourceID(runID))
+	}
+	store, err := newPublishLeaseStore(runRoot)
+	if err != nil {
+		return publishLeaseProof{}, err
+	}
+	lease, err := store.Current(ctx, proof.ResourceID)
+	if err != nil {
+		return publishLeaseProof{}, fmt.Errorf("%w: %v", ErrPublishLeaseUnproven, err)
+	}
+	holder := publishLeaseProcess(runID)
+	if lease.Token != proof.Token || lease.LeaseHash != proof.LeaseHash {
+		// T5#4 (P83 fix round 7): a generation commit is followed by a best-effort
+		// rewrite of every task's store-local proof, so an interruption between the two
+		// leaves a task on the superseded token although the record still names THIS
+		// process as its holder. Refusing there was a dead end: re-entry presented the
+		// same stale proof forever. A record that names this process IS this process's
+		// authority, so the proof is re-synced to it - which is exactly the ownership
+		// condition verifyPublishLease demands before a promotion may complete.
+		//
+		// T5#4 (P83 fix round 8, item C): "the record names this process" alone is not
+		// enough to accept any token a proof file carries - a proof swapped for another
+		// run's token of the same store root would be re-synced just as happily. The
+		// stale proof is therefore reconciled only when it is a verifiable EARLIER
+		// GENERATION OF THE SAME CLAIM: same lease resource (checked above), same claim
+		// id, exactly one generation behind, the current record naming exactly that hash
+		// as its predecessor, and the retained body for that hash reading back with the
+		// proof's own token. Anything else keeps the refusal.
+		if lease.Process != holder {
+			return publishLeaseProof{}, fmt.Errorf("%w: the current lease of %s is not the one this run claimed", ErrPublishLeaseUnproven, proof.ResourceID)
+		}
+		if err := verifyPublishLeasePredecessor(store, proof, lease); err != nil {
+			return publishLeaseProof{}, fmt.Errorf("%w: %v", ErrPublishLeaseUnproven, err)
+		}
+		proof = publishLeaseProof{ResourceID: proof.ResourceID, Token: lease.Token, LeaseHash: lease.LeaseHash}
+	}
+	// T5 (P83 fix round 6): matching the token proves only that this run once saw
+	// that token; it does not prove who holds the record now. Any process able to
+	// read the store-local proof could otherwise extend a lease it never claimed -
+	// including a second successor of a stopped holder, which would then verify the
+	// same record and publish. The ownership proof below is therefore the same one
+	// adoption uses, and it runs before any expiry decision: a holder that is not
+	// this process has to be provably stopped and is then reclaimed, which is what
+	// makes the second successor fail.
+	if lease.Process != holder {
+		reclaimed, reclaimErr := store.Reclaim(ctx, proof.ResourceID, proof.Token, holder, publishLeaseTTL, func(locked guard.Lease) error {
+			return publishLeasePreviousHolderStopped(locked.Process)
+		})
+		if reclaimErr != nil {
+			return publishLeaseProof{}, fmt.Errorf("%w: take the publish lease of %s: %v", ErrPublishLeaseUnproven, proof.ResourceID, reclaimErr)
+		}
+		return publishLeaseProof{ResourceID: proof.ResourceID, Token: reclaimed.Token, LeaseHash: reclaimed.LeaseHash}, nil
+	}
+	expiresAt, err := time.Parse(publishLeaseTimestamp, lease.LeaseExpiresAt)
+	if err != nil {
+		return publishLeaseProof{}, fmt.Errorf("%w: lease expiry is unreadable: %v", ErrPublishLeaseUnproven, err)
+	}
+	if expiresAt.Sub(now) > publishLeaseRenewBefore {
+		return proof, nil
+	}
+	renewed, err := store.Renew(ctx, proof.ResourceID, proof.Token, holder, publishLeaseTTL)
+	if err != nil {
+		return publishLeaseProof{}, fmt.Errorf("%w: renew %s: %v", ErrPublishLeaseUnproven, proof.ResourceID, err)
+	}
+	return publishLeaseProof{ResourceID: proof.ResourceID, Token: renewed.Token, LeaseHash: renewed.LeaseHash}, nil
+}
+
+// verifyPublishLeasePredecessor proves that a stale store-local proof is a genuine
+// earlier generation of the SAME claim, so a generation commit that was not followed
+// by the proof rewrite stays recoverable without accepting anything else.
+//
+// T5#4 (P83 fix round 8, item C): the generation commit (Renew/Reclaim) and the
+// rewrite of the task proofs are two separate writes, and a process that dies
+// between them leaves a task on the superseded token. Refusing there would strand
+// the task forever, so the next entry reconciles - but only through the retained
+// records: the proof must name the same claim, exactly one generation behind, the
+// hash the current record itself records as its predecessor, and a retained body
+// that verifies and carries the proof's token. A proof carrying a token this store
+// never issued for this resource (another run's token, a forged generation, a
+// fabricated hash) fails one of those checks and is refused.
+func verifyPublishLeasePredecessor(store *guard.LeaseStore, proof publishLeaseProof, current guard.Lease) error {
+	if proof.Token.ClaimID != current.Token.ClaimID {
+		return fmt.Errorf("the stale proof names claim %q, not the current claim %q of %s", proof.Token.ClaimID, current.Token.ClaimID, current.ResourceID)
+	}
+	if proof.Token.Generation+1 != current.Token.Generation {
+		return fmt.Errorf("the stale proof names generation %d, which is not the generation before %d of %s", proof.Token.Generation, current.Token.Generation, current.ResourceID)
+	}
+	if current.PreviousHash == nil || *current.PreviousHash != proof.LeaseHash {
+		return fmt.Errorf("the current lease of %s does not name %s as its predecessor", current.ResourceID, proof.LeaseHash)
+	}
+	retained, err := store.RetainedLease(proof.ResourceID, proof.LeaseHash)
+	if err != nil {
+		return fmt.Errorf("the predecessor of %s cannot be verified from the retained records: %v", current.ResourceID, err)
+	}
+	if retained.Token != proof.Token {
+		return fmt.Errorf("the retained predecessor %s carries token %s/%d, not the proof's %s/%d", proof.LeaseHash, retained.Token.ClaimID, retained.Token.Generation, proof.Token.ClaimID, proof.Token.Generation)
+	}
+	return nil
+}
+
+// verifyPublishLease re-reads the lease and proves it is still the one this run
+// claimed. It returns the current lease hash, which is what the promotion binds.
+func verifyPublishLease(ctx context.Context, runRoot, runID string, proof publishLeaseProof, now time.Time) (string, error) {
+	if proof.Token.ClaimID == "" || proof.Token.Generation == 0 || !evidence.ValidHash(proof.LeaseHash) {
+		return "", ErrPublishLeaseUnproven
+	}
+	// F4: a proof only binds this run's own resource. A repaired proof naming any
+	// other run's lease is refused, so publication cannot bind a foreign hash.
+	if !publishLeaseProofBelongsToRun(proof, runID) {
+		return "", fmt.Errorf("%w: the proof names lease %q, not this run's %q", ErrPublishLeaseUnproven, proof.ResourceID, publishLeaseResourceID(runID))
+	}
+	store, err := newPublishLeaseStore(runRoot)
+	if err != nil {
+		return "", err
+	}
+	lease, err := store.Current(ctx, proof.ResourceID)
+	if err != nil {
+		return "", fmt.Errorf("%w: %v", ErrPublishLeaseUnproven, err)
+	}
+	if lease.Token != proof.Token || lease.LeaseHash != proof.LeaseHash {
+		return "", fmt.Errorf("%w: the current lease of %s is not the one this run claimed", ErrPublishLeaseUnproven, proof.ResourceID)
+	}
+	// T5 (P83 fix round 6): the proof file is a claim, not an ownership proof. The
+	// record has to name THIS process as the holder, so a proof that was read from
+	// disk by a process which never held the lease (a second successor of a stopped
+	// holder, or any reader of the run root) cannot verify it and publish.
+	if holder := publishLeaseProcess(runID); lease.Process != holder {
+		return "", fmt.Errorf("%w: the publish lease of %s names process %d as its holder, not this process", ErrPublishLeaseUnproven, proof.ResourceID, lease.Process.PID)
+	}
+	expiresAt, err := time.Parse(publishLeaseTimestamp, lease.LeaseExpiresAt)
+	if err != nil {
+		return "", fmt.Errorf("%w: lease expiry is unreadable: %v", ErrPublishLeaseUnproven, err)
+	}
+	if !expiresAt.After(now) {
+		return "", fmt.Errorf("%w: the publish lease of %s expired at %s", ErrPublishLeaseUnproven, proof.ResourceID, lease.LeaseExpiresAt)
+	}
+	return lease.LeaseHash, nil
 }
 
 // ensureAgentRunnerEventLogMarker creates the run-root marker the replay store

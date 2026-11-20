@@ -1,6 +1,6 @@
 //go:build !windows && !darwin
 
-package adapters
+package evidence
 
 import (
 	"os"

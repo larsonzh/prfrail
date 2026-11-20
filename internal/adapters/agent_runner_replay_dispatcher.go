@@ -51,13 +51,20 @@ type AgentRunnerProcessConfig struct {
 // invoked after admission; it never launches when admission was skipped, and it
 // never treats an admission verdict as a launch permit.
 type AgentRunnerReplayDispatcher struct {
-	Store          *AgentRunnerReplayStore
-	Launcher       chain.AgentRunnerLauncher
-	Process        AgentRunnerProcessConfig
+	Store    *AgentRunnerReplayStore
+	Launcher chain.AgentRunnerLauncher
+	Process  AgentRunnerProcessConfig
+	// LedgerSnapshot rereads the authorization ledger at dispatch time. A nil hook
+	// is refused: the reconfirmation must always have a ledger source.
 	LedgerSnapshot func() (chain.AuthorizationLedger, error)
-	CostLedger     *tickets.CostLedger
-	RequestRecord  AgentRunnerRequestRecord
-	Clock          func() time.Time
+	// CostLedgerSnapshot rereads the cost ledger at dispatch time (F2: the launch
+	// path must observe a settlement persisted after assembly, CONTRACTS.md:212).
+	// It is nil-safe: when unset the dispatcher falls back to the in-memory
+	// CostLedger, which keeps every existing construction working unchanged.
+	CostLedgerSnapshot func() (*tickets.CostLedger, error)
+	CostLedger         *tickets.CostLedger
+	RequestRecord      AgentRunnerRequestRecord
+	Clock              func() time.Time
 }
 
 var _ chain.AgentRunnerPort = (*AgentRunnerReplayDispatcher)(nil)
@@ -143,26 +150,54 @@ func (dispatcher *AgentRunnerReplayDispatcher) DispatchAgentRunner(ctx context.C
 	default:
 		return chain.StepResult{}, fmt.Errorf("%w: unknown replay decision %s", ErrInvalidAgentRunnerRequest, decision)
 	}
-	now := dispatcher.Clock().UTC()
-	if now.IsZero() {
-		return chain.StepResult{}, fmt.Errorf("%w: evaluation clock returned zero time", ErrAgentRunnerLaunchReconfirmation)
+	// F2: every piece of launch preparation that does not itself publish durable
+	// state runs before the reconfirmation, so the authorization and budget
+	// verdict is the last observation of the external ledgers before the spawn.
+	// Previously the launch id, the intent record and the argv were built after
+	// the verdict, which left a TOCTOU window in which a revocation could land
+	// unnoticed; the contract accepts that the verdict may expire after it is
+	// taken (no lock is held across the fork), but the check must be the last step
+	// before the launch as long as a failed reconfirmation must publish no launch
+	// intent.
+	launchID, err := agentRunnerLaunchID(body.RequestID)
+	if err != nil {
+		return chain.StepResult{}, err
+	}
+	launchRequest := chain.AgentRunnerLaunchRequest{
+		RequestID:     body.RequestID,
+		RunID:         body.RunID,
+		AdapterID:     body.AdapterID,
+		Command:       dispatcher.Process.Command,
+		Args:          append([]string(nil), dispatcher.Process.Args...),
+		Dir:           request.Workspace.Root,
+		Env:           append([]string(nil), dispatcher.Process.Env...),
+		Grace:         dispatcher.Process.Grace,
+		WorkspaceRoot: request.Workspace.Root,
 	}
 	ledger, err := dispatcher.LedgerSnapshot()
 	if err != nil {
 		return chain.StepResult{}, fmt.Errorf("%w: authorization ledger snapshot unavailable: %w", ErrAgentRunnerLaunchReconfirmation, err)
 	}
-	reconfirmer := AgentRunnerLaunchReconfirmer{
-		RequestRecord:       dispatcher.RequestRecord,
-		AuthorizationLedger: ledger,
-		CostLedger:          dispatcher.CostLedger,
-		Clock:               func() time.Time { return now },
+	// F2: the budget half of the reconfirmation is resolved the same way as the
+	// authorization half - from the source the dispatcher was given at dispatch
+	// time. A configured snapshot that fails is a launch refusal and never a
+	// silent fallback to the assembly-time copy.
+	costLedger := dispatcher.CostLedger
+	if dispatcher.CostLedgerSnapshot != nil {
+		snapshot, snapshotErr := dispatcher.CostLedgerSnapshot()
+		if snapshotErr != nil {
+			return chain.StepResult{}, fmt.Errorf("%w: cost ledger snapshot unavailable: %w", ErrAgentRunnerLaunchReconfirmation, snapshotErr)
+		}
+		costLedger = snapshot
 	}
-	if err := reconfirmer.ReconfirmLaunchAuthorization(ctx); err != nil {
-		return chain.StepResult{}, err
-	}
-	launchID, err := agentRunnerLaunchID(body.RequestID)
-	if err != nil {
-		return chain.StepResult{}, err
+	// T1 (finding F2): the evaluation clock is taken AFTER both ledgers were read.
+	// A clock captured before the read would let an authorization that expired
+	// during the read pass the reconfirmation on its stale "now"; taking it here
+	// means the verdict is evaluated at an instant no earlier than the last ledger
+	// observation.
+	now := dispatcher.Clock().UTC()
+	if now.IsZero() {
+		return chain.StepResult{}, fmt.Errorf("%w: evaluation clock returned zero time", ErrAgentRunnerLaunchReconfirmation)
 	}
 	receipt, err := NewAgentRunnerLaunchReceiptRecord(AgentRunnerLaunchReceipt{
 		LaunchID:          launchID,
@@ -180,6 +215,19 @@ func (dispatcher *AgentRunnerReplayDispatcher) DispatchAgentRunner(ctx context.C
 	if err != nil {
 		return chain.StepResult{}, err
 	}
+	reconfirmer := AgentRunnerLaunchReconfirmer{
+		RequestRecord:       dispatcher.RequestRecord,
+		AuthorizationLedger: ledger,
+		CostLedger:          costLedger,
+		Clock:               func() time.Time { return now },
+	}
+	if err := reconfirmer.ReconfirmLaunchAuthorization(ctx); err != nil {
+		return chain.StepResult{}, err
+	}
+	// F2: the launch-intent write below is the only durable step left, and it must
+	// stay on this side of the verdict because a refused reconfirmation publishes
+	// no intent at all; the spawn is the very next action after the single slot
+	// claim, which is what closes the TOCTOU window the finding names.
 	launchDecision, err := dispatcher.Store.RecordLaunchReceipt(receipt)
 	if err != nil {
 		return chain.StepResult{}, err
@@ -187,17 +235,7 @@ func (dispatcher *AgentRunnerReplayDispatcher) DispatchAgentRunner(ctx context.C
 	if launchDecision != AgentRunnerLaunchDecisionFirstLaunch {
 		return chain.StepResult{}, fmt.Errorf("%w: launch slot already owned for requestId %s", ErrAgentRunnerDispatchUnknownBlock, body.RequestID)
 	}
-	result, err := dispatcher.Launcher.StartAgentRunnerProcess(ctx, chain.AgentRunnerLaunchRequest{
-		RequestID:     body.RequestID,
-		RunID:         body.RunID,
-		AdapterID:     body.AdapterID,
-		Command:       dispatcher.Process.Command,
-		Args:          append([]string(nil), dispatcher.Process.Args...),
-		Dir:           request.Workspace.Root,
-		Env:           append([]string(nil), dispatcher.Process.Env...),
-		Grace:         dispatcher.Process.Grace,
-		WorkspaceRoot: request.Workspace.Root,
-	})
+	result, err := dispatcher.Launcher.StartAgentRunnerProcess(ctx, launchRequest)
 	if err != nil {
 		return chain.StepResult{}, fmt.Errorf("%w: %w", ErrAgentRunnerLaunchFailed, err)
 	}

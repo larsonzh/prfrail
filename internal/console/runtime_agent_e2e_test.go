@@ -365,6 +365,10 @@ func newAssemblyFixture(t *testing.T, knobs assemblyKnobs) *assemblyFixture {
 			AvailabilityPolicy:  AgentRunnerDefaultAvailabilityPolicy(availability, base),
 			AuthorizationLedger: chain.AuthorizationLedger{Grants: []chain.AuthorizationRecord{grant}},
 			CostLedger:          ledger,
+			// T1: the fixture drives the ports without operator-written ledger files,
+			// so it declares itself a marked test assembly; a production assembly may
+			// never take this path (the flag is unexported and only tests set it).
+			testInMemoryLedgers: true,
 			AgentCLI: AgentRunnerCLIOptions{
 				Executable:  knobs.declaredExecutable,
 				Version:     knobs.declaredVersion,
