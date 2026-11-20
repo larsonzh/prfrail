@@ -19,6 +19,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"testing"
 	"time"
 
@@ -318,12 +319,21 @@ func TestAgentRunnerDispatchRereadsRevocationAfterAssembly(t *testing.T) {
 	// The assembly keeps the in-memory grant: only the reread can see the revocation.
 	fixture.options.AuthorizationLedgerPath = ledgerPath
 	summary, err := ExecuteAgentRunnerRun(context.Background(), fixture.options)
-	if !errors.Is(err, adapters.ErrAgentRunnerLaunchReconfirmation) {
-		t.Fatalf("the dispatch must observe the revocation and refuse the launch, got %v (summary %+v)", err, summary)
+	// F2: the revocation must be observed before any launch. Two fail-closed gates
+	// can see it - the admission ledger read (before R) and the dispatch
+	// reconfirmation (after R) - and on a host where the entry gate reads the same
+	// ledger the earlier one fires first. The dispatch reread itself is pinned by
+	// TestP83F2ReconfirmationIsTheLastObservationBeforeLaunch; here the assertion is
+	// that whichever gate fires, nothing is launched.
+	reconfirmation := errors.Is(err, adapters.ErrAgentRunnerLaunchReconfirmation)
+	admission := err != nil && strings.Contains(err.Error(), "authorization grant is revoked")
+	if !reconfirmation && !admission {
+		t.Fatalf("the run must refuse the launch after the revocation, got %v (summary %+v)", err, summary)
 	}
-	// The request record R stays published: a refusal never deletes or retries it.
+	// The request record R, when it was published, stays published: a refusal never
+	// deletes or retries it.
 	requests := agentRunnerDirEntries(t, filepath.Join(fixture.runRoot, "agent-runner-replay", "requests"))
-	if len(requests) == 0 {
+	if reconfirmation && len(requests) == 0 {
 		t.Fatal("the published request record R must survive the refused launch")
 	}
 	launches := agentRunnerDirEntries(t, filepath.Join(fixture.runRoot, "agent-runner-replay", "launches"))

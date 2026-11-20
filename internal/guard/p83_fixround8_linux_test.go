@@ -51,8 +51,9 @@ func TestP83Fix8EVerifiedDescriptorInheritedOnlyByItsChild(t *testing.T) {
 	}
 
 	// A sibling child started while the approved child is alive must not see the
-	// verified descriptor. It lists every descriptor it holds.
-	sibling := exec.Command("/bin/sh", "-c", "for fd in /proc/self/fd/*; do readlink \"$fd\"; done")
+	// verified descriptor. It lists every descriptor it holds; a readlink on a
+	// descriptor that closes mid-loop must not fail the inspection itself.
+	sibling := exec.Command("/bin/sh", "-c", "for fd in /proc/self/fd/*; do readlink \"$fd\" 2>/dev/null || true; done")
 	siblingOutput, siblingErr := sibling.CombinedOutput()
 	if siblingErr != nil {
 		t.Fatalf("inspect the sibling descriptors: %v (%s)", siblingErr, siblingOutput)

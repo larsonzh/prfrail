@@ -25,10 +25,27 @@ package adapters
 import (
 	"context"
 	"os"
+	"runtime"
 	"slices"
 	"strings"
 	"testing"
 )
+
+// p83Fix4CanaryCommand returns the platform shell and the argv that echoes the
+// canary. The counterexample must run on every CI leg: a Windows-only child would
+// make the Linux leg fail with start-failed instead of judging the evidence.
+func p83Fix4CanaryCommand(canary string, redirectStderr bool) (string, []string) {
+	if runtime.GOOS == "windows" {
+		if redirectStderr {
+			return "cmd.exe", []string{"/c", "echo", canary, "1>&2"}
+		}
+		return "cmd.exe", []string{"/c", "echo", canary}
+	}
+	if redirectStderr {
+		return "/bin/sh", []string{"-c", "echo " + canary + " 1>&2"}
+	}
+	return "/bin/sh", []string{"-c", "echo " + canary}
+}
 
 // p83Fix4RunProbeWithCanary starts a real child (cmd.exe) whose output carries the
 // canary, so the evidence is produced by the production execution path rather than
@@ -37,12 +54,9 @@ func p83Fix4RunProbeWithCanary(t *testing.T, canary string, redirectStderr bool)
 	t.Helper()
 	root := t.TempDir()
 	executor := ManagedCopilotCLIProbeExecutor{TemporaryDirectory: root}
-	args := []string{"/c", "echo", canary}
-	if redirectStderr {
-		args = []string{"/c", "echo", canary, "1>&2"}
-	}
+	executable, args := p83Fix4CanaryCommand(canary, redirectStderr)
 	execution := executor.Execute(context.Background(), CopilotCLIProbeInvocation{
-		Executable:       "cmd.exe",
+		Executable:       executable,
 		WorkingDirectory: root,
 		Args:             args,
 	})
@@ -149,10 +163,11 @@ func TestP83F8LoggingScreenDistinguishesFlagsFromData(t *testing.T) {
 func TestP83F8BenignProbeArgumentsStillReachTheSpawn(t *testing.T) {
 	root := t.TempDir()
 	executor := ManagedCopilotCLIProbeExecutor{TemporaryDirectory: root}
+	executable, args := p83Fix4CanaryCommand("log", false)
 	execution := executor.Execute(context.Background(), CopilotCLIProbeInvocation{
-		Executable:       "cmd.exe",
+		Executable:       executable,
 		WorkingDirectory: root,
-		Args:             []string{"/c", "echo", "log"},
+		Args:             args,
 	})
 	if execution.Outcome != "exited" {
 		t.Fatalf("a benign probe whose value is the word \"log\" must still run, got %+v", execution)
