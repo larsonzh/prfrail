@@ -165,9 +165,9 @@ Fixed `tmp` assertion: the top level is `.gitkeep` plus `gates-cache`; `gates-ca
 | Field | Content |
 |---|---|
 | Identifier | `OB-50`, `spawnGit`, `ci frozen cost`, `%TEMP% 22 legacy items`, `GATES-EXEMPT`, `GATES-PERF-ASSESS` |
-| Current status (verified item by item) | OB-50 = **disposed** (section 12.4, v1.41); spawnGit = candidate OB (diagnostic, never formally registered); ci frozen cost = not formally registered (P27 report section 7 candidate); %TEMP% legacy = OB-98 disposed with OB-99 and OB-100 observing; GATES-EXEMPT = **not established**; GATES-PERF-ASSESS = **new candidate** (registered by the user on 2026-11-19, deliberately not implemented) |
-| Contents | see the matching section 12.4 rows; `GATES-EXEMPT` is the 1-3(iv) split of P33 |
-| Dependencies | the long suspension covers only undisposed items; `GATES-PERF-ASSESS` has no prerequisite and ranks after P85 |
+| Current status (verified item by item) | OB-50 = **disposed** (section 12.4, v1.41); spawnGit = the git-call helper of `tools/gates/selftest.js` (the spawn wrapper in `lib/ctx.js`, with stderr captured into the result object and never printed); a candidate OB (diagnostic), source = P27 report section 5 item 5, no section 12.4 entry; ci frozen cost = no section 12.4 entry, source = P27 report section 7 "candidate OB (performance)", never formally registered; %TEMP% legacy = OB-98 disposed with OB-99 and OB-100 observing; GATES-EXEMPT = **not established** (no section 12.4 entry; the 1-3(iv) split of P33, touching 4 criterion files); GATES-PERF-ASSESS = a gate-duration composition assessment (the SELFTEST and three-scope duration breakdown, the base triad repetition count); no section 12.4 entry, registered only in this table and the ledger |
+| Contents | see the matching section 12.4 rows; `GATES-EXEMPT` is the 1-3(iv) split of P33 (GATES-PERF-ASSESS has no section 12.4 entry and is registered only in this table and the ledger) |
+| Dependencies | the long suspension covers only undisposed items (spawnGit / ci frozen cost / the %TEMP% timing-shape OB-99 and OB-100 / GATES-EXEMPT), none with an explicit trigger; `GATES-PERF-ASSESS` has no prerequisite and ranks after P85 |
 | Size | varies (S through M-L) |
 | (7) budget | none |
 | Boundaries | this version advances no suspended item; the registration slots stay |

@@ -165,9 +165,9 @@
 | 字段 | 内容 |
 |---|---|
 | 标识 | `OB-50` / `spawnGit` / `ci 冻结成本` / `%TEMP% 历史遗留 22 件` / `GATES-EXEMPT` / `GATES-PERF-ASSESS` |
-| 当前状态（逐项核实） | OB-50 = **已处置**（§12.4，v1.41）；spawnGit = 候选 OB（诊断，未正式登记）；ci 冻结成本 = 未正式登记（P27 报告 §7 候选）；%TEMP% 历史遗留 = OB-98 已处置 / OB-99、OB-100 观察中；GATES-EXEMPT = **未立项**；GATES-PERF-ASSESS = **新增候选**（2026-11-19 用户裁定登记、不立项实现） |
-| 内含 | 逐项见 §12.4 对应行；`GATES-EXEMPT` = P33 的 ①-3(iv) 拆片 |
-| 依赖 | 长期挂起仅针对未处置项；`GATES-PERF-ASSESS` 无前置，优先级排在 P85 之后 |
+| 当前状态（逐项核实） | OB-50 = **已处置**（§12.4，v1.41）；spawnGit = `tools/gates/selftest.js` 的 git 调用辅助（`lib/ctx.js` 的 spawn 封装、stderr 收进结果对象不打印）；候选 OB（诊断），出处 = P27 报告 §5 第 5 条，无 §12.4 条目；ci 冻结成本 = 无 §12.4 条目，出处 = P27 报告 §7「候选 OB（性能）」，未正式登记；%TEMP% 历史遗留 = OB-98 已处置 / OB-99、OB-100 观察中；GATES-EXEMPT = **未立项**（§12.4 无条目；P33 ①-3(iv) 拆片，触 4 个判据文件）；GATES-PERF-ASSESS = 门禁耗时构成评估（SELFTEST 与三作用域耗时构成、base 三件套重复次数）；无 §12.4 条目，只在本表与台账登记 |
+| 内含 | 逐项见 §12.4 对应行；`GATES-EXEMPT` = P33 的 ①-3(iv) 拆片（GATES-PERF-ASSESS 无 §12.4 条目，只在本表与台账登记） |
+| 依赖 | 长期挂起仅针对未处置项（spawnGit / ci 冻结成本 / %TEMP% 时序形态 OB-99、OB-100 / GATES-EXEMPT），均无明确触发；`GATES-PERF-ASSESS` 无前置，优先级排在 P85 之后 |
 | 规模 | 不等（含 S 到 M-L） |
 | ⑦ 额度 | 无 |
 | 边界 | 本版不推进任何挂起项，登记位保持 |
