@@ -102,7 +102,7 @@
 | P69 T027B-E2E-WIRING | ✅ 已完成（2026-11-12 收口；报告对 `docs/validation/t027b-e2e-wiring{,_EN}.md`） | P68（R-06 = b 的 R-1 收口） | M | 2026-11-12 | 把 P44 的 readiness / permit 判定接到生产装配与 CLI 入口；证据包 `docs/validation/evidence/P69-T027B-E2E-WIRING/`；审查链 ⑤ PASS / ⑥ PASS / ⑦ PASS；R=0、D=1（⑧a1 文档载体自删辅助脚本，⑩ 升级用户裁定） |
 | P70 S1-STREAM-PROGRESS | ✅ 已完成（2026-11-13 收口；R=1、D=2；⑦ 终审 1 + 复审 1；SELFTEST 737/737；主控 Flash） | P68（R-07 b1 附条件 1） | S | 2026-11-13 | `run --progress` 轻量流式开关（默认关闭、消费现有事件流、不做视图层）；证据包 `docs/validation/evidence/P70-S1-STREAM-PROGRESS/` |
 | P71 S1-SCOPE-ANNOTATE | ✅ 已完成（2026-11-13 收口；R=0、D=2；⑦ 盲审 1 + 终审 1；SELFTEST 737/737；主控 Flash） | P68（R-07 b1 附条件 2） | M | 2026-11-13 | visible 调试指引 + REQ 阶段归属列 + 矩阵/策略/门适用性回写（X 方案，不删条目）；证据包 `docs/validation/evidence/P71-S1-SCOPE-ANNOTATE/` |
-| P86 BOUNDDIR-UNC-EQUIVALENCE | ⬜ 未开始 | P84（N13-UNC + 证据归因 Low 残余顺延） | S | — | docs/validation/bounddir-unc-equivalence{,_EN}.md（待生成） |
+| P86 BOUNDDIR-UNC-EQUIVALENCE | 🔄 进行中（2026-11-22 用户点名起跑） | P84（N13-UNC + 证据归因 Low 残余顺延） | S | —（2026-11-22 起跑） | docs/validation/bounddir-unc-equivalence{,_EN}.md（待生成） |
 
 状态符号：⬜ 未开始 / 🔄 进行中 / ✅ 完成 / ⛔ 阻断（以上四个为本文件切片条目的闭集）；⏸ 待评估 = 「后续批次切片」节**待评估项**（非正式切片）专用标记，**不属该闭集**。
 
@@ -2312,12 +2312,12 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 临时件落点声明 | 本片临时目录 = `tmp/P85-SECURITY-PROOF-SUBSYSTEM/`（⑧c 前只增不删；CI 捕获件同样落该目录，不落 `tmp/` 根） |
 | 额度口径披露 | ⑦ 深度档 = `GPT-6.2 Sol (copilot)`；额度 = 1 终审 + 3 复审，盲审必抽 1 次（另计 +1）；**系用户 2026-11-21 排片裁定、不得作为先例**；起跑须四要素留痕；协议先行：先由 ① 判定契约影响再动代码 |
 
-### P86 — `BOUNDDIR-UNC-EQUIVALENCE`（UNC 共享根两规范拼写等值 + W10 证据归因更正 · 闭合 N13-UNC / Low 残余 · 实现类）· ⬜ 未开始
+### P86 — `BOUNDDIR-UNC-EQUIVALENCE`（UNC 共享根两规范拼写等值 + W10 证据归因更正 · 闭合 N13-UNC / Low 残余 · 实现类）· 🔄 进行中
 
 | 字段 | 内容 |
 |---|---|
 | 标识 | `BOUNDDIR-UNC-EQUIVALENCE`（承接 P84 报告 §8 的 N13-UNC 残余与证据归因 Low；用户 2026-11-22 裁定另立、不并入 P85） |
-| 状态 | ⬜ 未开始（**起跑须用户点名**；可并行；起跑消息须四要素留痕；**执行顺序：先 P86 后 P85（2026-11-22 用户裁定）；与 P85 无依赖、可并行**） |
+| 状态 | 🔄 进行中（2026-11-22 用户点名起跑；可并行；起跑消息四要素已留痕于 `docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/00-briefing.md`；**执行顺序：先 P86 后 P85（2026-11-22 用户裁定）；与 P85 无依赖、可并行**） |
 | 目标 | 闭合 N13-UNC：使 UNC 共享根的两种规范拼写（`\\server\share` 与带尾分隔符形态）在根分类器 / `boundRelativeSuffix` 等值判定下视为同一根（盘符根已修的等值形态扩展到 UNC）；同时更正 W10 证据归因 Low（变异标注与 r3 原文矛盾） |
 | 依赖 | P84 部分闭合（`509b01b`）；P84 报告 §8 顺延清单 N13-UNC + 证据归因 Low；与 P85 无依赖、可并行；起跑须用户点名 |
 | 规模 | S（单点等值形态 + 一处证据标注；改动面限 `internal/evidence/bounddir_*` 与其测试） |
@@ -2329,9 +2329,9 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 分级 | `[SLICE]` |
 | 探针额度 | 0（默认；无需外部真实调用；如需真实 UNC 共享环境，按 §7.6 停下申请） |
 | 执行自由度清单落盘路径 | `docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/freedom-list.md` |
-| R/D 基线 | R = 0、D = 0（起跑时登记，§13.1.1；不继承 P84 的 R = 3 / D = 0） |
+| R/D 基线 | R = 0、D = 0（起跑时登记，§13.1.1；不继承 P84 的 R = 3 / D = 0；起跑实测 R = 0、D = 0） |
 | 临时件落点声明 | 本片临时目录 = `tmp/P86-BOUNDDIR-UNC-EQUIVALENCE/`（⑧c 前只增不删；CI 捕获件同样落该目录，不落 `tmp/` 根） |
-| 额度口径披露 | ⑦ 深度档 = `GPT-6.2 Sol (copilot)`；额度 = 1 终审 + 3 复审，盲审必抽 1 次（另计 +1）；**系用户 2026-11-22 排片裁定、不得作为先例**；起跑须四要素留痕；协议先行：先由 ① 判定契约影响再动代码 |
+| 额度口径披露 | ⑦ 常规档 = `GPT-5.3-Codex (copilot)`；额度 = **1 终审 + 1 复审**（§7.5 S 档字面，**无额度例外**）；盲审是否必抽由 ① 启动前判定并落盘理由（另计 +1）；起跑四要素已留痕；协议先行：先由 ① 判定契约影响再动代码。**登记（不记漂移）**：本行起跑前预登记为「`GPT-6.2 Sol` 深度档 + 1 终审 + 3 复审 + 盲审必抽」，与用户 2026-11-22 起跑消息「Codex 常规档 + 1+1 + 无额度例外」冲突，按 §0.1 / §13.2.11 纪律 F 以起跑消息为准，已就地更正 |
 
 ## 已知缺陷（后续切片前处理）
 

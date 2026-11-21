@@ -984,6 +984,12 @@ func nonCanonicalReparseTarget(target string) string {
 // bytes and is refused, as is an absolute target on another volume, a relative one
 // and one whose remaining components could walk upwards.
 //
+// P86 (N13-UNC) adds ONE exception, confined to the volume name of a UNC share root:
+// the two canonical spellings (with and without the trailing separator Clean keeps)
+// and ASCII case variants of that host/share name the same root and are admitted
+// below. Descendants, the drive form and the case-variant twin of a plain directory
+// keep the byte comparison W1 pins.
+//
 // P84 fix round 10 (N10): the target is NOT cleaned before the comparison. The
 // canonical-form precondition is checked first, and once it holds the stored bytes
 // themselves are compared - so the object the target names is the object judged, and
@@ -1006,6 +1012,14 @@ func boundRelativeSuffix(base, target string) ([]string, bool) {
 	if target == cleanBase {
 		return nil, true
 	}
+	// P86 (N13-UNC): the two canonical spellings of a UNC share root - with and
+	// without the trailing separator Clean keeps - name the same root, as do
+	// spellings that differ only in ASCII case of the host or share. Volume-name
+	// equality is confined to this branch: descendants, the drive form and the
+	// case-variant twin of a plain directory stay an Ordinal comparison.
+	if baseRoot, targetRoot := uncShareRootName(cleanBase), uncShareRootName(target); baseRoot != "" && uncShareRootEqual(baseRoot, targetRoot) {
+		return nil, true
+	}
 	trimmedBase := strings.TrimRight(cleanBase, `\/`)
 	if trimmedBase == "" {
 		return nil, false
@@ -1022,6 +1036,59 @@ func boundRelativeSuffix(base, target string) ([]string, bool) {
 		}
 	}
 	return parts, true
+}
+
+// uncShareRootName reports the volume name of the ordinary DOS form (\\host\share)
+// when p is exactly that name, with or without the trailing separator filepath.Clean
+// keeps for a share root, and "" otherwise - so the extended (\\?\) and device (\\.\)
+// namespaces never reach the equivalence branch. Host and share bytes stay an Ordinal
+// comparison here; the case fold happens only in uncShareRootEqual.
+func uncShareRootName(p string) string {
+	vol := filepath.VolumeName(p)
+	if !strings.HasPrefix(vol, `\\`) {
+		return ""
+	}
+	if strings.HasPrefix(vol, `\\?\`) || strings.HasPrefix(vol, `\\.\`) {
+		return ""
+	}
+	// A share root names exactly two components - a host and a share. A host-only
+	// volume ("\\host", "\\host\") is not a share root, so it never reaches the
+	// equivalence branch.
+	parts := strings.Split(vol[len(`\\`):], `\`)
+	if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
+		return ""
+	}
+	if p == vol || p == vol+string(filepath.Separator) {
+		return vol
+	}
+	return ""
+}
+
+// uncShareRootEqual reports whether two UNC volume names name the same share root.
+// ASCII letters fold both ways; every other byte must match exactly. SMB resolves
+// host and share names case-insensitively, so two distinct objects can never differ
+// only by ASCII case - folding here removes a false refusal and admits nothing new.
+func uncShareRootEqual(a, b string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := 0; i < len(a); i++ {
+		ca, cb := a[i], b[i]
+		if ca == cb {
+			continue
+		}
+		if lowerASCII(ca) != lowerASCII(cb) {
+			return false
+		}
+	}
+	return true
+}
+
+func lowerASCII(c byte) byte {
+	if c >= 'A' && c <= 'Z' {
+		return c + ('a' - 'A')
+	}
+	return c
 }
 
 // splitDosPathComponents splits an absolute DOS path into its volume component and

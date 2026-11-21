@@ -915,13 +915,26 @@ func TestP84W9NonCanonicalStoredTargetIsRefused(t *testing.T) {
 // separator before appending one, so the root and its descendants are admitted while
 // the case-variant twin stays refused.
 //
-// Mutation check: restoring the round-11-before shape - equality against
-// strings.TrimRight(filepath.Clean(base), `\/`) with the descendant prefix built from
-// that trimmed value - turns the root-equality positive red. Building the prefix from
-// the untrimmed canonical form as well (the literal pre-round-11 arrangement, where
-// "D:\\" was the prefix) turns the root-descendant positive red too. The
-// case-variant refusal is unchanged by either, which is why the positives are what
-// the mutation is measured on.
+// Mutation check: two mutations are kept apart, and each is blamed for the positive
+// it kills.
+//
+//   - M1, the round-11-before shape alone: equality against
+//     strings.TrimRight(filepath.Clean(base), `\/`) with the descendant prefix still
+//     built from that trimmed value. This IS the arrangement r3 recorded: the trimmed
+//     base "D:" produced the single-separator prefix "D:\", so the root itself - the
+//     target equal to that prefix - was refused. Reverting equality alone turns the
+//     root-itself positive red; the root-descendant positives stay green because
+//     their prefix is still "D:\".
+//
+//   - M2, a second mutation on top of M1: also build the prefix from the UNTRIMMED
+//     canonical form, which appends one more separator to the root ("D:\" becomes
+//     the double-separator prefix "D:\\"). That shape is NOT the round-11-before
+//     arrangement - the prefix r3 records is "D:\" - so three reds are the compound
+//     of two mutations, not a faithful reversion of one. M2 with equality restored
+//     turns the root-descendant positives red while root-itself stays green.
+//
+// The case-variant refusal of the drive form is unchanged by either mutation, which
+// is why the positives are what the mutations are measured on.
 func TestP84W10VolumeRootKeepsItsSeparatorForEquality(t *testing.T) {
 	// Everything below rests on Clean keeping the root separator alone.
 	if cleaned := filepath.Clean(`D:\`); cleaned != `D:\` {

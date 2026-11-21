@@ -1,0 +1,10 @@
+in="\\\\host\\share"      clean="\\\\host\\share"        vol="\\\\host\\share"      abs=true
+in="\\\\host\\share\\"    clean="\\\\host\\share\\"      vol="\\\\host\\share"      abs=true
+in="\\\\host\\share\\sub" clean="\\\\host\\share\\sub"   vol="\\\\host\\share"      abs=true
+in="\\\\host\\share\\sub\\" clean="\\\\host\\share\\sub"   vol="\\\\host\\share"      abs=true
+in="\\\\?\\UNC\\host\\share\\" clean="\\\\?\\UNC\\host\\share\\" vol="\\\\?\\UNC\\host\\share" abs=true
+in="D:\\"                 clean="D:\\"                   vol="D:"                   abs=true
+in="D:"                   clean="D:."                    vol="D:"                   abs=false
+in="\\\\host"             clean="\\\\host"               vol="\\\\host"             abs=true
+in="\\\\host\\"           clean="\\\\host\\"             vol="\\\\host\\"           abs=true
+in="\\\\server\\share "   clean="\\\\server\\share "     vol="\\\\server\\share "   abs=true

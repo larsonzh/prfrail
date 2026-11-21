@@ -102,7 +102,7 @@
 | P69 T027B-E2E-WIRING | ✅ Done (closed 2026-11-12; report pair `docs/validation/t027b-e2e-wiring{,_EN}.md`) | P68 (the R-1 closeout from R-06 = b) | M | 2026-11-12 | Wire the P44 readiness / permit verdicts into the production assembly and the CLI entry; evidence pack `docs/validation/evidence/P69-T027B-E2E-WIRING/`; review chain ⑤ PASS / ⑥ PASS / ⑦ PASS; R=0, D=1 (the ⑧a1 doc carrier deleted its helper scripts, escalated to the user at ⑩) |
 | P70 S1-STREAM-PROGRESS | ✅ Done (closed 2026-11-13; R=1, D=2; ⑦ final 1 + re-review 1; SELFTEST 737/737; controller Flash) | P68 (R-07 b1 condition 1) | S | 2026-11-13 | The lightweight `run --progress` stream switch (off by default, consuming the existing event stream, no view layer); evidence pack `docs/validation/evidence/P70-S1-STREAM-PROGRESS/` |
 | P71 S1-SCOPE-ANNOTATE | ✅ Done (closed 2026-11-13; R=0, D=2; step 7 blind 1 + final 1; SELFTEST 737/737; controller Flash) | P68 (R-07 b1 condition 2) | M | 2026-11-13 | The visible debugging guidance + the REQ stage-ownership column + the matrix / strategy / gate-applicability write-backs (X-style, no entry deleted); evidence pack `docs/validation/evidence/P71-S1-SCOPE-ANNOTATE/` |
-| P86 BOUNDDIR-UNC-EQUIVALENCE | ⬜ Not started | P84 (N13-UNC plus the evidence-attribution Low residual deferral) | S | — | docs/validation/bounddir-unc-equivalence{,_EN}.md (to be produced) |
+| P86 BOUNDDIR-UNC-EQUIVALENCE | 🔄 In progress (started by the user on 2026-11-22) | P84 (N13-UNC plus the evidence-attribution Low residual deferral) | S | — (started 2026-11-22) | docs/validation/bounddir-unc-equivalence{,_EN}.md (to be produced) |
 
 Status symbols: ⬜ Not started / 🔄 In progress / ✅ Complete / ⛔ Blocked (the four above are the closed set for slice entries in this file); ⏸ Pending evaluation = a marker used only for **pending-evaluation items** (not formal slices) in the "later batch slices" section and **not a member of that closed set**.
 
@@ -2299,12 +2299,12 @@ Completion record (2026-11-21): report pair `docs/validation/bounddir-residual{,
 | Temp-file location | this slice's temp directory = `tmp/P85-SECURITY-PROOF-SUBSYSTEM/` (append-only before (8)c; CI captures go to that same directory, never to the `tmp/` root) |
 | (7) budget | (7) deep tier = `GPT-6.2 Sol (copilot)`; budget = 1 final review + 3 re-reviews with one mandatory blind review (counted separately as +1); **this is the user's scheduling ruling of 2026-11-21 and may not be cited as a precedent**; the start message records the four elements; protocol first: (1) judges the contract impact before any code moves |
 
-### P86 — `BOUNDDIR-UNC-EQUIVALENCE` (UNC share-root two-spelling equality plus the W10 evidence-attribution correction; closes the N13-UNC / Low residuals; implementation type) · ⬜ Not started
+### P86 — `BOUNDDIR-UNC-EQUIVALENCE` (UNC share-root two-spelling equality plus the W10 evidence-attribution correction; closes the N13-UNC / Low residuals; implementation type) · 🔄 In progress
 
 | Field | Content |
 |---|---|
 | Identifier | `BOUNDDIR-UNC-EQUIVALENCE` (carries the N13-UNC residual and the evidence-attribution Low item from the P84 report section 8; the user's ruling of 2026-11-22 established it separately, not folded into P85) |
-| Status | ⬜ Not started (**the user must name the start**; may run in parallel; the start message records the four elements; **execution order: P86 before P85 (user ruling of 2026-11-22); no dependency on P85, may run in parallel**) |
+| Status | 🔄 In progress (started by the user on 2026-11-22; may run in parallel; the four start-message elements are recorded in `docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/00-briefing.md`; **execution order: P86 before P85 (user ruling of 2026-11-22); no dependency on P85, may run in parallel**) |
 | Goal | Close N13-UNC: make the two canonical spellings of a UNC share root (`\\server\share` and its trailing-separator form) compare as the same root in the root classifier / `boundRelativeSuffix` (extending the already-fixed drive-root equality form to UNC); also correct the W10 evidence-attribution Low item (the mutation annotation contradicts the r3 wording) |
 | Dependencies | P84 partially closed (`509b01b`); the P84 report section 8 deferral list (N13-UNC plus the evidence-attribution Low item); no dependency on P85, may run in parallel; the user must name the start |
 | Size | S (a single equality form plus one evidence annotation; changes limited to `internal/evidence/bounddir_*` and its tests) |
@@ -2316,9 +2316,9 @@ Completion record (2026-11-21): report pair `docs/validation/bounddir-residual{,
 | Grade | `[SLICE]` |
 | Probe budget | 0 (default; no real external call needed; if a real UNC share environment is required, stop and request pre-authorization per section 7.6) |
 | Freedom-list path | `docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/freedom-list.md` |
-| R/D baseline | R = 0, D = 0 (registered at start, section 13.1.1; does not inherit R = 3 / D = 0 from P84) |
+| R/D baseline | R = 0, D = 0 (registered at start, section 13.1.1; does not inherit R = 3 / D = 0 from P84; measured at start: R = 0, D = 0) |
 | Temp-file location | this slice's temp directory = `tmp/P86-BOUNDDIR-UNC-EQUIVALENCE/` (append-only before (8)c; CI captures go to that same directory, never to the `tmp/` root) |
-| (7) budget | (7) deep tier = `GPT-6.2 Sol (copilot)`; budget = 1 final review + 3 re-reviews with one mandatory blind review (counted separately as +1); **this is the user's scheduling ruling of 2026-11-22 and may not be cited as a precedent**; the start message records the four elements; protocol first: (1) judges the contract impact before any code moves |
+| (7) budget | (7) regular tier = `GPT-5.3-Codex (copilot)`; budget = **1 final review + 1 re-review** (the literal S-tier wording of section 7.5, **no budget exception**); whether a blind review is mandatory is decided by (1) before the start and the reason is written down (counted separately as +1); the four start-message elements are recorded; protocol first: (1) judges the contract impact before any code moves. **Registration (not counted as drift)**: this row previously pre-registered "`GPT-6.2 Sol` deep tier + 1 final + 3 re-reviews + mandatory blind review", which conflicts with the user's 2026-11-22 start message ("Codex regular tier + 1+1 + no budget exception"); per section 0.1 / section 13.2.11 discipline F the start message governs, and this row was corrected in place |
 
 ## Known defects (to be handled before later slices)
 
