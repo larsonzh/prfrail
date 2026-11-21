@@ -1141,7 +1141,11 @@ func (runtime *supervisedRuntime) ensurePublishLease(ctx context.Context, state 
 		if err != nil {
 			return err
 		}
-		return runtime.persistRenewedPublishLease(proof, refreshed)
+		store, err := newPublishLeaseStore(runtime.runRoot)
+		if err != nil {
+			return err
+		}
+		return runtime.persistRenewedPublishLease(ctx, store, proof, refreshed)
 	}
 	claimed, err := claimPublishLease(ctx, runtime.runRoot, runtime.runID)
 	if err != nil {
@@ -1151,11 +1155,22 @@ func (runtime *supervisedRuntime) ensurePublishLease(ctx context.Context, state 
 	// transfers it to this process at a new generation, which invalidates every
 	// proof written before the transfer. The proofs of this run's other tasks are
 	// refreshed with it, so a task whose window was confirmed earlier can still
-	// publish instead of being refused for a record that no longer exists.
-	if err := runtime.persistRenewedPublishLease(publishLeaseProof{}, claimed); err != nil {
+	// publish instead of being refused for a record that no longer exists. P84 T5#4
+	// verifies each of those proofs against the retained history before rewriting it.
+	store, err := newPublishLeaseStore(runtime.runRoot)
+	if err != nil {
 		return err
 	}
-	return writeSupervisedJSON(runtime.publishLeasePath(state), claimed)
+	if err := runtime.persistRenewedPublishLease(ctx, store, publishLeaseProof{}, claimed); err != nil {
+		return err
+	}
+	// P84 fix round 9 (N5 residual): this task's own proof is written under the store's
+	// resource lock as well, exactly like Publish's: the record is re-read inside the
+	// critical section, proven equal to the claim just committed, and only then written,
+	// so the re-read, the check and the landing of this proof are serialised with any
+	// generation advance (a renewal takes the same lock) instead of racing it. Only the
+	// path is collected outside the lock.
+	return writePublishLeaseProofLocked(ctx, store, runtime.publishLeasePath(state), claimed)
 }
 
 // persistRenewedPublishLease keeps every store-local proof of this run on the
@@ -1164,9 +1179,37 @@ func (runtime *supervisedRuntime) ensurePublishLease(ctx context.Context, state 
 // promotion although the run still owns the lease. Only proofs of the run's own
 // resource are rewritten: a record naming another resource belongs to another run
 // and must stay exactly as it is, unprovable here.
-func (runtime *supervisedRuntime) persistRenewedPublishLease(previous, refreshed publishLeaseProof) error {
-	if refreshed == previous {
-		return nil
+//
+// P84 T5#4: the rewrite is no longer an unconditional overwrite of every proof that
+// shares the resource id. Each proof is verified against the store's own history
+// first - same claim, a strictly earlier generation, and a hash reachable from the
+// current record through PreviousHash and the retained generations - so a proof
+// planted or left behind by anything else fails the batch (with its path and the
+// failing check named) instead of being stamped with a token it has no claim to.
+//
+// P84 fix round 5: the current record read from the store is the authority for the
+// whole batch; the refreshed claim passed in by the caller must be equal to it
+// (token and lease hash), otherwise the entire batch is refused before any proof is
+// written. Without that equality the batch would project a superseded generation
+// whenever a concurrent advance moved the store forward between the caller's
+// renewal and this walk.
+//
+// P84 fix round 7 (N5): that equality is checked on the record read UNDER the store's
+// resource lock (LeaseStore.RunLocked), not on a read taken between two unlocked
+// writes. The batch used to read the record and then write the proofs with no lock in
+// between, so a renewal - which does take the lock - could advance the generation
+// between the read and the writes and the projection would silently stop being a
+// linearisation of the committed history.
+func (runtime *supervisedRuntime) persistRenewedPublishLease(ctx context.Context, store *guard.LeaseStore, _ publishLeaseProof, refreshed publishLeaseProof) error {
+	// P84 fix round 7 (N4): the previous-generation argument no longer short-circuits
+	// the batch. A claim that did not move still has to reconcile the other tasks of
+	// the run - they can have fallen behind the record while this task's proof was
+	// already current, and this call is the only place they are caught up. The slot
+	// stays in the signature to state which generation the caller believed it was on;
+	// it is not a decision input, and the batch decides on the record the store
+	// carries (P84 回执补正: renamed to `_` so the editor reports no unused parameter).
+	if refreshed.Token.ClaimID == "" || refreshed.Token.Generation == 0 || !evidence.ValidHash(refreshed.LeaseHash) {
+		return fmt.Errorf("%w: the batch refresh names no lease claim", ErrPublishLeaseUnproven)
 	}
 	paths := []string{}
 	walkErr := filepath.WalkDir(SupervisedDir(runtime.runRoot), func(path string, entry os.DirEntry, err error) error {
@@ -1181,24 +1224,54 @@ func (runtime *supervisedRuntime) persistRenewedPublishLease(previous, refreshed
 	if walkErr != nil && !errors.Is(walkErr, os.ErrNotExist) {
 		return walkErr
 	}
-	for _, path := range paths {
-		var existing publishLeaseProof
-		found, err := readSupervisedJSON(path, &existing)
-		// T5#4 (P83 fix round 7): an unreadable proof is returned, never skipped. A
-		// skipped proof left the task on a token the committed generation no longer
-		// carries while this call still reported success, so the next promotion of
-		// that task was refused with no way back.
-		if err != nil {
-			return err
+	// The walk is taken outside the lock (it spans the whole supervised tree, while the
+	// lock is per resource); every proof is read inside it, and a file that disappeared
+	// in between is simply "not found" and skipped.
+	return store.RunLocked(ctx, refreshed.ResourceID, func(current guard.Lease) error {
+		if current.ResourceID == "" {
+			return fmt.Errorf("%w: the lease store carries no record of %s", ErrPublishLeaseUnproven, refreshed.ResourceID)
 		}
-		if !found || existing.ResourceID != refreshed.ResourceID {
-			continue
+		// The record read under the lock is the authority; the refreshed claim of the
+		// arguments must equal it. A caller that raced a generation advance would
+		// otherwise stamp the proofs with a superseded token while the store's current
+		// record already names another, so the projection would stop being a
+		// linearisation of the committed history. The whole batch is refused before any
+		// proof is written.
+		if current.Token != refreshed.Token || current.LeaseHash != refreshed.LeaseHash {
+			return fmt.Errorf("%w: the batch refresh names lease generation %s/%d with hash %s, not the store's current %s/%d with hash %s of %s", ErrPublishLeaseUnproven, refreshed.Token.ClaimID, refreshed.Token.Generation, refreshed.LeaseHash, current.Token.ClaimID, current.Token.Generation, current.LeaseHash, refreshed.ResourceID)
 		}
-		if err := writeSupervisedJSON(path, refreshed); err != nil {
-			return err
+		for _, path := range paths {
+			var existing publishLeaseProof
+			found, err := readSupervisedJSON(path, &existing)
+			// T5#4 (P83 fix round 7): an unreadable proof is returned, never skipped. A
+			// skipped proof left the task on a token the committed generation no longer
+			// carries while this call still reported success, so the next promotion of
+			// that task was refused with no way back.
+			if err != nil {
+				return err
+			}
+			if !found || existing.ResourceID != refreshed.ResourceID {
+				continue
+			}
+			// A proof already carrying the refreshed claim IS the target state. It is not
+			// a historical generation (its generation equals the current one), so the
+			// history check below would rightly refuse it; rewriting it would be a no-op
+			// anyway.
+			if existing == refreshed {
+				continue
+			}
+			// A proof that is not a genuine superseded generation of this claim is an
+			// error, not a skip: the call cannot claim success while a task would be left
+			// (or hoisted) onto a token the store did not issue for it.
+			if err := verifyPublishLeaseHistory(store, existing, current); err != nil {
+				return fmt.Errorf("%w: the store-local proof %s cannot be brought onto the current generation of %s: %v", ErrPublishLeaseUnproven, path, refreshed.ResourceID, err)
+			}
+			if err := writeSupervisedJSON(path, refreshed); err != nil {
+				return err
+			}
 		}
-	}
-	return nil
+		return nil
+	})
 }
 
 // loadPublishLease reads the store-local lease proof of one task attempt.
@@ -1882,6 +1955,10 @@ func (runtime *supervisedRuntime) Publish(ctx context.Context, request chain.Pro
 			ErrorEvidence: []string{digest(supervisedPromotionBlockedDomain, err.Error())},
 		}, nil
 	}
+	store, storeErr := newPublishLeaseStore(runtime.runRoot)
+	if storeErr != nil {
+		return chain.PromotionDecision{}, storeErr
+	}
 	if refreshed != proof {
 		// T5#4 (P83 fix round 8, item C): the generation commit already happened
 		// inside the lease store, so the proof for the generation this promotion is
@@ -1890,12 +1967,39 @@ func (runtime *supervisedRuntime) Publish(ctx context.Context, request chain.Pro
 		// entry reconciles it through the retained predecessor (renewPublishLease)
 		// instead of being refused; a crash after it leaves the current generation on
 		// disk, which verifies directly.
-		if err := writeSupervisedJSON(runtime.publishLeasePath(state), refreshed); err != nil {
-			return chain.PromotionDecision{}, err
+		//
+		// P84 fix round 6 (F4) / P84 fix round 9 (N5 residual): the write is gated on the
+		// store. The claim about to be written as this task's proof has to BE the store's
+		// current record at this moment; without that check a concurrent advance between
+		// the renewal and the write would project a superseded generation into the proof.
+		// Round 9 puts the re-read, the equality and the write into ONE
+		// LeaseStore.RunLocked critical section: a renewal takes that same lock, so the
+		// advance this check guards against can no longer land between the check and the
+		// proof reaching disk - the two are serialised, not merely racing. Only the path
+		// is collected outside the lock. The final verifyPublishLease below still
+		// re-reads the record (fail-closed) for a mover that does not go through this
+		// store's lock at all.
+		wroteErr := writePublishLeaseProofLocked(ctx, store, runtime.publishLeasePath(state), refreshed)
+		if wroteErr != nil {
+			if !errors.Is(wroteErr, ErrPublishLeaseUnproven) {
+				return chain.PromotionDecision{}, wroteErr
+			}
+			return chain.PromotionDecision{
+				ReceiptID:     runtime.nextID(),
+				OccurredAt:    runtime.clock().UTC().Format(timestampLayout),
+				Outcome:       "failed",
+				ErrorEvidence: []string{digest(supervisedPromotionBlockedDomain, wroteErr.Error())},
+			}, nil
 		}
-		if err := runtime.persistRenewedPublishLease(proof, refreshed); err != nil {
-			return chain.PromotionDecision{}, err
-		}
+	}
+	// P84 fix round 7 (N4): the batch runs even when this promotion did not renew the
+	// lease. The identity case is not a no-op to skip - the run's OTHER tasks can have
+	// fallen behind the record while this task's proof was already current, and this
+	// promotion is where they are caught up. Proofs that already carry the current
+	// claim are skipped by the batch itself; proofs that are not real history still
+	// fail it.
+	if err := runtime.persistRenewedPublishLease(ctx, store, proof, refreshed); err != nil {
+		return chain.PromotionDecision{}, err
 	}
 	leaseHash, err := verifyPublishLease(ctx, runtime.runRoot, runtime.runID, refreshed, now)
 	if err != nil {

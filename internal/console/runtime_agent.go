@@ -2065,6 +2065,12 @@ func publishLeaseProofBelongsToRun(proof publishLeaseProof, runID string) bool {
 //
 // It returns the proof to use from now on; it is unchanged when no renewal was
 // due, so callers persist it only when it actually moved.
+//
+// P84 fix round 6 (F2): a proof that is real history of this run's claim is
+// recoverable on both sides of a crash - re-synced when the record still names this
+// process, and transferred (Reclaim, behind the stopped-holder proof) when it names
+// a predecessor process. What is never admitted is a proof that is not on the
+// retained chain of the current record.
 func renewPublishLease(ctx context.Context, runRoot, runID string, proof publishLeaseProof, now time.Time) (publishLeaseProof, error) {
 	if proof.Token.ClaimID == "" || proof.Token.Generation == 0 || !evidence.ValidHash(proof.LeaseHash) {
 		return publishLeaseProof{}, ErrPublishLeaseUnproven
@@ -2083,6 +2089,13 @@ func renewPublishLease(ctx context.Context, runRoot, runID string, proof publish
 	if err != nil {
 		return publishLeaseProof{}, fmt.Errorf("%w: %v", ErrPublishLeaseUnproven, err)
 	}
+	// P84 fix round 7 (N6): the record is this run's publish lease only when it names
+	// the run-scoped resource AND the publish consumer. A retained body can prove that a
+	// token was issued; it cannot prove that it was issued for this consumer. Nothing
+	// below - neither the re-sync nor the transfer - may act on a record that fails this.
+	if !publishLeaseBelongsToRun(lease, runID) {
+		return publishLeaseProof{}, fmt.Errorf("%w: the current lease of %s is not this run's publish lease", ErrPublishLeaseUnproven, proof.ResourceID)
+	}
 	holder := publishLeaseProcess(runID)
 	if lease.Token != proof.Token || lease.LeaseHash != proof.LeaseHash {
 		// T5#4 (P83 fix round 7): a generation commit is followed by a best-effort
@@ -2098,16 +2111,36 @@ func renewPublishLease(ctx context.Context, runRoot, runID string, proof publish
 		// run's token of the same store root would be re-synced just as happily. The
 		// stale proof is therefore reconciled only when it is a verifiable EARLIER
 		// GENERATION OF THE SAME CLAIM: same lease resource (checked above), same claim
-		// id, exactly one generation behind, the current record naming exactly that hash
-		// as its predecessor, and the retained body for that hash reading back with the
-		// proof's own token. Anything else keeps the refusal.
-		if lease.Process != holder {
-			return publishLeaseProof{}, fmt.Errorf("%w: the current lease of %s is not the one this run claimed", ErrPublishLeaseUnproven, proof.ResourceID)
-		}
-		if err := verifyPublishLeasePredecessor(store, proof, lease); err != nil {
+		// id, a strictly earlier generation, the chain of retained bodies from the
+		// current record reaching exactly that hash, and that body carrying the proof's
+		// own token. Anything else keeps the refusal.
+		//
+		// P84 fix round 6 (F2): the two questions this branch used to answer as one -
+		// "is the stale proof real history?" and "may this process act on the record?" -
+		// are now asked in that order, and the holder decides only the second.
+		//
+		//   - Real history is proven first, across generations (verifyPublishLeaseHistory
+		//     walks the retained chain), because a task of this run can legitimately be
+		//     more than one commit behind: several tasks share one run-scoped record.
+		//   - The record naming THIS process keeps the strict single-generation
+		//     predecessor check as the re-check of that path (C4 pins that anything else
+		//     is refused) and then re-syncs the proof to the current generation.
+		//   - The record naming ANOTHER process is NOT refused here any more. That
+		//     refusal was the dead end F2 names: a run resumed in a new process after a
+		//     crash presented its stale task proof forever, because a transfer (not a
+		//     re-sync) is what it needs. The proof stays stale and the Reclaim branch
+		//     below decides, under the store lock and behind the stopped-holder proof.
+		//     Nothing is admitted on trust: a live or unprovable predecessor still
+		//     refuses there.
+		if err := verifyPublishLeaseHistory(store, proof, lease); err != nil {
 			return publishLeaseProof{}, fmt.Errorf("%w: %v", ErrPublishLeaseUnproven, err)
 		}
-		proof = publishLeaseProof{ResourceID: proof.ResourceID, Token: lease.Token, LeaseHash: lease.LeaseHash}
+		if lease.Process == holder {
+			if err := verifyPublishLeasePredecessor(store, proof, lease); err != nil {
+				return publishLeaseProof{}, fmt.Errorf("%w: %v", ErrPublishLeaseUnproven, err)
+			}
+			proof = publishLeaseProof{ResourceID: proof.ResourceID, Token: lease.Token, LeaseHash: lease.LeaseHash}
+		}
 	}
 	// T5 (P83 fix round 6): matching the token proves only that this run once saw
 	// that token; it does not prove who holds the record now. Any process able to
@@ -2117,8 +2150,22 @@ func renewPublishLease(ctx context.Context, runRoot, runID string, proof publish
 	// adoption uses, and it runs before any expiry decision: a holder that is not
 	// this process has to be provably stopped and is then reclaimed, which is what
 	// makes the second successor fail.
+	//
+	// P84 fix round 6 (F2): the transfer presents the CURRENT record's token, not the
+	// proof's. On the mismatch path above the proof is deliberately left stale (the
+	// record is another process's), and Reclaim requires the token of the record it is
+	// about to transfer; the proof was already proven to be a genuine earlier
+	// generation of that very claim, so the transfer moves the same claim forward. A
+	// concurrent advance between the read and the lock still fails the store's token
+	// comparison, which is the fail-closed direction.
 	if lease.Process != holder {
-		reclaimed, reclaimErr := store.Reclaim(ctx, proof.ResourceID, proof.Token, holder, publishLeaseTTL, func(locked guard.Lease) error {
+		reclaimed, reclaimErr := store.Reclaim(ctx, proof.ResourceID, lease.Token, holder, publishLeaseTTL, func(locked guard.Lease) error {
+			// P84 fix round 7 (N6): the record is re-checked under the store lock, because
+			// the transfer is decided on the record the store holds at that moment - not on
+			// the one read before the lock was taken.
+			if !publishLeaseBelongsToRun(locked, runID) {
+				return fmt.Errorf("the locked publish lease of %s is not this run's", locked.ResourceID)
+			}
 			return publishLeasePreviousHolderStopped(locked.Process)
 		})
 		if reclaimErr != nil {
@@ -2173,6 +2220,159 @@ func verifyPublishLeasePredecessor(store *guard.LeaseStore, proof publishLeasePr
 	return nil
 }
 
+// publishLeaseHistoryLimit bounds the retained-history walk one proof may need.
+// Each renewal or transfer retains exactly one generation, so the bound only exists
+// to keep a corrupted or hostile retained chain from walking without end.
+//
+// P84 fix round 4 (review L-4), the boundary is registered rather than tightened:
+// with this slice's TTL of 24h and renewBefore of 12h the lease is renewed twice a
+// day, so a run would have to stay continuously alive for more than 32 days to
+// reach 64 retained generations. Reaching it is fail-closed (the walk returns the
+// depth error below), which is the intended behaviour of a known boundary, not a
+// defect; widening it needs its own slice assessment.
+const publishLeaseHistoryLimit = 64
+
+// publishLeaseHistoryError names the check that rejected one store-local proof, so
+// the batch error can state which condition failed next to the file it failed on.
+type publishLeaseHistoryError struct {
+	check  string
+	detail string
+}
+
+func (err *publishLeaseHistoryError) Error() string {
+	return err.check + " check failed: " + err.detail
+}
+
+// verifyPublishLeaseHistory proves that a store-local proof is a genuine SUPERSEDED
+// generation of the current lease record, which is what makes bringing it onto the
+// current generation a recovery instead of an overwrite.
+//
+// P84 T5#4: the batch rewrite used to compare the resource id alone, so any proof
+// of this run's resource - a forged claim, a fabricated hash, another task's
+// unrelated token - was stamped with the renewed record and would then verify at
+// promotion. The proof now has to name the same claim, a strictly earlier
+// generation, and a hash the store itself retained on the chain the current record
+// reaches through PreviousHash (T5 retention, guard/lease.go), with the retained
+// body carrying exactly the proof's token. Unlike verifyPublishLeasePredecessor
+// this accepts more than one generation of skew, because several tasks of one run
+// can fall behind the same commit by different amounts; it accepts nothing that is
+// not on that chain.
+func verifyPublishLeaseHistory(store *guard.LeaseStore, proof publishLeaseProof, current guard.Lease) error {
+	if proof.Token.ClaimID == "" || proof.Token.Generation == 0 || !evidence.ValidHash(proof.LeaseHash) {
+		return &publishLeaseHistoryError{
+			check:  "shape",
+			detail: fmt.Sprintf("the proof (%q/%d, hash %q) is not a lease claim", proof.Token.ClaimID, proof.Token.Generation, proof.LeaseHash),
+		}
+	}
+	if proof.ResourceID != current.ResourceID {
+		return &publishLeaseHistoryError{
+			check:  "resource",
+			detail: fmt.Sprintf("the proof names lease %q, not the current lease %q", proof.ResourceID, current.ResourceID),
+		}
+	}
+	if proof.Token.ClaimID != current.Token.ClaimID {
+		return &publishLeaseHistoryError{
+			check:  "claim",
+			detail: fmt.Sprintf("the proof names claim %q, not the current claim %q of %s", proof.Token.ClaimID, current.Token.ClaimID, current.ResourceID),
+		}
+	}
+	if proof.Token.Generation >= current.Token.Generation {
+		return &publishLeaseHistoryError{
+			check:  "generation",
+			detail: fmt.Sprintf("the proof names generation %d, which is not an earlier generation than %d of %s", proof.Token.Generation, current.Token.Generation, current.ResourceID),
+		}
+	}
+	hash := current.PreviousHash
+	for hops := 0; hash != nil; hops++ {
+		if hops >= publishLeaseHistoryLimit {
+			return &publishLeaseHistoryError{
+				check:  "depth",
+				detail: fmt.Sprintf("the retained history of %s exceeds %d generations without reaching %s", current.ResourceID, publishLeaseHistoryLimit, proof.LeaseHash),
+			}
+		}
+		retained, err := store.RetainedLease(current.ResourceID, *hash)
+		if err != nil {
+			return &publishLeaseHistoryError{
+				check:  "retained",
+				detail: fmt.Sprintf("the generation %s of %s cannot be read back from the retained records: %v", *hash, current.ResourceID, err),
+			}
+		}
+		if retained.LeaseHash == proof.LeaseHash {
+			if retained.Token != proof.Token {
+				return &publishLeaseHistoryError{
+					check:  "token",
+					detail: fmt.Sprintf("the retained generation %s carries token %s/%d, not the proof's %s/%d", proof.LeaseHash, retained.Token.ClaimID, retained.Token.Generation, proof.Token.ClaimID, proof.Token.Generation),
+				}
+			}
+			return nil
+		}
+		hash = retained.PreviousHash
+	}
+	return &publishLeaseHistoryError{
+		check:  "history",
+		detail: fmt.Sprintf("the retained history of %s does not reach the proof's generation %s", current.ResourceID, proof.LeaseHash),
+	}
+}
+
+// assertPublishLeaseRecord proves the lease record handed in is exactly the claim a
+// task is about to write as its store-local proof (P84 F4, shared by the unlocked and
+// the run-locked callers of fix round 9).
+func assertPublishLeaseRecord(current guard.Lease, proof publishLeaseProof) error {
+	if current.ResourceID == "" {
+		return fmt.Errorf("%w: the lease store carries no record of %s", ErrPublishLeaseUnproven, proof.ResourceID)
+	}
+	if current.Token != proof.Token || current.LeaseHash != proof.LeaseHash {
+		return fmt.Errorf("%w: the proof about to be published names generation %s/%d with hash %s, not the store's current %s/%d with hash %s of %s", ErrPublishLeaseUnproven, proof.Token.ClaimID, proof.Token.Generation, proof.LeaseHash, current.Token.ClaimID, current.Token.Generation, current.LeaseHash, proof.ResourceID)
+	}
+	return nil
+}
+
+// assertPublishLeaseCurrent proves the store's current record is exactly the claim a
+// task is about to write as its own store-local proof, on a read taken OUTSIDE any
+// critical section (P84 F4).
+//
+// Publish used to write the refreshed proof FIRST and let the batch rewrite compare
+// it with the store afterwards, so a generation advance that landed between the
+// renewal and the write left the task's proof naming a generation the store had
+// already superseded - and the write itself was never gated. Fix round 6 checked the
+// equality before that write but between two unlocked operations, which only narrowed
+// the window; fix round 9 moved the production callers onto writePublishLeaseProofLocked
+// (record read, equality and write inside one LeaseStore.RunLocked). This unlocked form
+// is kept for the checks that need a plain read and is what the F4 counterexample pins.
+func assertPublishLeaseCurrent(ctx context.Context, store *guard.LeaseStore, refreshed publishLeaseProof) error {
+	if refreshed.Token.ClaimID == "" || refreshed.Token.Generation == 0 || !evidence.ValidHash(refreshed.LeaseHash) {
+		return ErrPublishLeaseUnproven
+	}
+	current, err := store.Current(ctx, refreshed.ResourceID)
+	if err != nil {
+		return fmt.Errorf("%w: read the current lease of %s before publishing: %v", ErrPublishLeaseUnproven, refreshed.ResourceID, err)
+	}
+	return assertPublishLeaseRecord(current, refreshed)
+}
+
+// writePublishLeaseProofLocked writes one task's store-local lease proof inside the
+// store's resource critical section (P84 fix round 9, the residual of F4/N5).
+//
+// The proof is a projection of the committed record, so it must not be produced from a
+// record that can move while it is being written: the record is re-read UNDER
+// LeaseStore.RunLocked, proven equal to the claim being written, and only then persisted
+// - one critical section, the same lock every renewal and claim takes. A caller that
+// races a generation advance therefore fails the equality here instead of stamping a
+// superseded token onto disk, and a caller that cannot get the lock at all (context
+// expired) writes nothing at all. The callback must not take the lock again; it uses
+// the record RunLocked hands it, exactly as LeaseStore.RunLocked requires.
+func writePublishLeaseProofLocked(ctx context.Context, store *guard.LeaseStore, path string, proof publishLeaseProof) error {
+	if proof.Token.ClaimID == "" || proof.Token.Generation == 0 || !evidence.ValidHash(proof.LeaseHash) {
+		return ErrPublishLeaseUnproven
+	}
+	return store.RunLocked(ctx, proof.ResourceID, func(current guard.Lease) error {
+		if err := assertPublishLeaseRecord(current, proof); err != nil {
+			return err
+		}
+		return writeSupervisedJSON(path, proof)
+	})
+}
+
 // verifyPublishLease re-reads the lease and proves it is still the one this run
 // claimed. It returns the current lease hash, which is what the promotion binds.
 func verifyPublishLease(ctx context.Context, runRoot, runID string, proof publishLeaseProof, now time.Time) (string, error) {
@@ -2194,6 +2394,12 @@ func verifyPublishLease(ctx context.Context, runRoot, runID string, proof publis
 	}
 	if lease.Token != proof.Token || lease.LeaseHash != proof.LeaseHash {
 		return "", fmt.Errorf("%w: the current lease of %s is not the one this run claimed", ErrPublishLeaseUnproven, proof.ResourceID)
+	}
+	// P84 fix round 7 (N6): the resource half is already bound by the proof check above;
+	// the consumer half is bound here, so a record of this run's resource that was
+	// issued for another consumer cannot verify a promotion.
+	if !publishLeaseBelongsToRun(lease, runID) {
+		return "", fmt.Errorf("%w: the record of %s is not this run's publish lease", ErrPublishLeaseUnproven, proof.ResourceID)
 	}
 	// T5 (P83 fix round 6): the proof file is a claim, not an ownership proof. The
 	// record has to name THIS process as the holder, so a proof that was read from

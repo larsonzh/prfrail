@@ -199,6 +199,8 @@ $PrfRail = Join-Path $InstallDir 'prfrail.exe'
 4. After acceptance, use the new full path for subsequent commands and retain the old directory as the rollback point.
 5. To roll back, stop writers, invoke the old full path, and verify historical runs read-only. Do not let an old binary write data migrated incompatibly by a newer version.
 
+Upgrade boundary (from P84): versions before P84 implemented a resource lease lock as a `<lease record path>.lock` directory (a mkdir-style lock). This version takes an OS lock on a lock file of the same name, so the first `Claim`/`Reclaim` that returns `ErrLeaseLockPathIsDirectory` (the message contains `legacy lock directory`) means a directory left by an older version still occupies that path. This version neither removes it nor migrates it blindly: first prove the old run is stopped as in step 1, then remove the leftover `<lease record path>.lock` directory by hand and retry; do not remove it before the old run is proven stopped, or two writers could hold the same resource at once.
+
 There is no automatic update, `current` link, or implicit version switch. The operator explicitly selects the binary path for every switch.
 
 ## 6. Uninstall

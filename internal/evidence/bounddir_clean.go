@@ -37,3 +37,23 @@ func cleanBoundRelativePath(rel string) (string, error) {
 func CleanBoundRelativePath(rel string) (string, error) {
 	return cleanBoundRelativePath(rel)
 }
+
+// boundRootName reports whether rel names the bound directory itself instead of an
+// entry inside it.
+//
+// P84 T4(d): the empty string and "." are the same name, and both halves have to
+// read it the same way. BoundDirNames enumerates the bound object for either
+// spelling, while an artifact open refuses either spelling - an artifact name that
+// resolves to the bound directory is not an artifact. cleanBoundRelativePath keeps
+// its own refusal of "." as the artifact-name guard; this classifier exists so the
+// enumeration half does not inherit that refusal for the root spelling.
+func boundRootName(rel string) bool {
+	return strings.TrimSpace(rel) == "" || filepath.Clean(filepath.FromSlash(rel)) == "."
+}
+
+// errBoundRootArtifact is the one refusal both halves return when an artifact open
+// names the bound directory itself. One constructor keeps the windows and unix
+// messages from drifting apart for the two root spellings.
+func errBoundRootArtifact(rel string) error {
+	return fmt.Errorf("evidence: bound artifact name %q names the bound directory itself", rel)
+}

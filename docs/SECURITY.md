@@ -2,7 +2,7 @@
 
 [English](SECURITY_EN.md)
 
-日期：2026-09-07；安全设计基线，独立安全评审已于 2026-11-19 完成（评审者 = 独立终审 ⑦ 深度档 `GPT-6.2 Sol (copilot)`；结论 = `FINDINGS`，报告见 `s2-pre-independent-security-review{,_EN}.md`；本注记取代原「未完成独立安全签署」状态表述）。**修复状态（P83，2026-11-21）**：F2/F5/F7 已修复；F1/F4 部分实现；F3/F6/F8 顺延 P84（报告见 `security-findings-remediation{,_EN}.md`）。本文是权限、威胁模型与硬安全门禁的规范性权威；[项目建议书](RFC-proofrail-unattended-ai-engineering-product.md) §12、§16.7-16.8 保留风险与设计来源。需求 REQ-004/005/007/013/019/021-026/028。
+日期：2026-09-07；安全设计基线，独立安全评审已于 2026-11-19 完成（评审者 = 独立终审 ⑦ 深度档 `GPT-6.2 Sol (copilot)`；结论 = `FINDINGS`，报告见 `s2-pre-independent-security-review{,_EN}.md`；本注记取代原「未完成独立安全签署」状态表述）。**修复状态（P84，2026-11-21）**：F2/F5/F7 已修复；F1/F4 部分闭合（P84：T5#4 全闭合；T4 残余 = N13-UNC 确定性界内误拒，顺延后续切片；报告见 `bounddir-residual{,_EN}.md`）；F3/F6/F8 顺延 P85。本文是权限、威胁模型与硬安全门禁的规范性权威；[项目建议书](RFC-proofrail-unattended-ai-engineering-product.md) §12、§16.7-16.8 保留风险与设计来源。需求 REQ-004/005/007/013/019/021-026/028。
 
 独立安全评审（`PRODUCT_REQUIREMENTS` §7 的 S0→S1 门禁）在 P79 之前的历史状态 = 从未执行；已由 **ADR-047**（2026-11-16）豁免顺延至 S2，须在 S2 启动前补评且不晚于 2027-03-31。本注记不改变本行原状态表述。
 

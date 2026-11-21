@@ -134,12 +134,24 @@ func TestP83Fix7T5eUnreadableProofFailsTheRenewalBatch(t *testing.T) {
 	}
 
 	runtime := &supervisedRuntime{runID: p83RunID, runRoot: runRoot}
-	refreshed := publishLeaseProof{
-		ResourceID: proof.ResourceID,
-		Token:      guard.FencingToken{ClaimID: proof.Token.ClaimID, Generation: proof.Token.Generation + 1},
-		LeaseHash:  evidence.Digest("", []byte("p83-fix7-t5e-refreshed")),
+	// P84 T5#4: the batch verifies every proof it brings onto the renewed record
+	// against the store's retained history, so the "refreshed" proof has to be a real
+	// generation commit (the retained predecessor of the current record) rather than a
+	// fabricated hash. The test's subject is unchanged: the unreadable sibling.
+	store, err := newPublishLeaseStore(runRoot)
+	if err != nil {
+		t.Fatal(err)
 	}
-	if err := runtime.persistRenewedPublishLease(proof, refreshed); err == nil {
+	advanced, err := store.Renew(ctx, proof.ResourceID, proof.Token, publishLeaseProcess(p83RunID), publishLeaseTTL)
+	if err != nil {
+		t.Fatalf("advance the lease generation: %v", err)
+	}
+	refreshed := publishLeaseProof{
+		ResourceID: advanced.ResourceID,
+		Token:      advanced.Token,
+		LeaseHash:  advanced.LeaseHash,
+	}
+	if err := runtime.persistRenewedPublishLease(ctx, store, proof, refreshed); err == nil {
 		t.Fatal("an unreadable store-local proof must fail the renewal batch")
 	} else if !errors.Is(err, ErrInvalidConfig) {
 		t.Fatalf("the batch must report the unreadable proof, got %v", err)
@@ -149,7 +161,7 @@ func TestP83Fix7T5eUnreadableProofFailsTheRenewalBatch(t *testing.T) {
 	if err := os.Remove(badPath); err != nil {
 		t.Fatal(err)
 	}
-	if err := runtime.persistRenewedPublishLease(proof, refreshed); err != nil {
+	if err := runtime.persistRenewedPublishLease(ctx, store, proof, refreshed); err != nil {
 		t.Fatalf("the same batch must succeed once the unreadable proof is gone, got %v", err)
 	}
 }

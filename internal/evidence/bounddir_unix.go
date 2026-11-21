@@ -31,7 +31,6 @@ import (
 	"os"
 	"runtime"
 	"sort"
-	"strings"
 	"sync"
 	"sync/atomic"
 	"syscall"
@@ -134,6 +133,11 @@ func openBoundDirFile(dir *BoundDir, rel string, bound int64, allowTruncation bo
 	defer dir.mu.Unlock()
 	if dir.fd < 0 {
 		return nil, fmt.Errorf("evidence: nil bound directory")
+	}
+	// P84 T4(d): the bound object itself is not an artifact, and both root spellings
+	// ("", ".") are refused through one shared error so the two halves cannot drift.
+	if boundRootName(rel) {
+		return nil, errBoundRootArtifact(rel)
 	}
 	clean, err := cleanBoundRelativePath(rel)
 	if err != nil {
@@ -248,15 +252,16 @@ const artifactOpenFlags = syscall.O_RDONLY | syscall.O_CLOEXEC | syscall.O_NOFOL
 // The listing is read from a descriptor resolved beneath the bound descriptor - not
 // from the caller's path - so the enumeration and the artifact reads describe the
 // same object even when the directory was renamed or replaced after it was bound.
-// rel == "" (or ".") names the bound object itself. A platform that cannot
-// enumerate through the descriptor returns ErrBoundDirUnsupported instead of
-// falling back to a path read.
+// rel == "" (or ".") names the bound object itself: both spellings go through
+// boundRootName, so the classifier - not the artifact-name guard, which refuses
+// "." - decides that (P84 T4(d)). A platform that cannot enumerate through the
+// descriptor returns ErrBoundDirUnsupported instead of falling back to a path read.
 func BoundDirNames(dir *BoundDir, rel string) ([]string, error) {
 	if dir == nil {
 		return nil, fmt.Errorf("evidence: nil bound directory")
 	}
 	clean := "."
-	if strings.TrimSpace(rel) != "" {
+	if !boundRootName(rel) {
 		cleaned, err := cleanBoundRelativePath(rel)
 		if err != nil {
 			return nil, err

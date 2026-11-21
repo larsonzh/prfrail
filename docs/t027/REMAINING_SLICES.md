@@ -2266,12 +2266,12 @@ A6 ② 进度（第 2 批，2026-09-15）：
 
 完成记录（2026-11-21）：报告对 `docs/validation/security-findings-remediation{,_EN}.md`（结论 `PARTIALLY CLOSED`）；**F2 / F5 / F7 + T9 收窄已闭合；F1 / F4 部分实现（残余顺延 P84）；F3 / F6 / F8 顺延 P84**（T2 STOP = AgentRunner 无可持久复验的冻结策略制品；T3 = Windows 名称到启动映像的绑定窗口与 Linux 同 inode 不等于字节不可变；T8a = 「无法证明禁写即拒发 BYOK」未实施）；顺延候选 5 项（P84-a 策略制品 / P84-b 不可变安装来源 / P84-c BYOK 证明载体 / P84-d bounddir 大小写与 reparse 残余 / P84-d 之补充 proof 恢复持久化）见报告 §8；**契约影响 = 八项均 DOES-NOT-TOUCH**（未改 `CONTRACTS{,_EN}` / schema / 夹具）；**R = 2、D = 0**；⑦ 共 6 轮（盲审 1 + 终审 1 + 复审 3 + 追加 1）；⑤ 2/2 与 ⑥ 2/3 的 PASS 绑定整改前快照，最终快照仅由 ⑦ 复审覆盖且仍为 FINDINGS；异常 E-1（`CHECKLIST_v66.md` 未暂存改动，来源未归因）已按用户裁定 `git checkout --` 回滚，不计 D；**CI 首跑 `44795140136`（head `ec532a4`）双红**：ubuntu `Test` 5 例（F8 夹具用 `cmd.exe`、F2 端到端断言过严、fix8E 兄弟脚本不稳健）与 windows `Gates` 的 `base go test ./...` 报 ok=14 FAIL=3；**修复提交 `c820743`（仅 3 个测试文件）后 run `44801690679` 双腿 `success`**（ubuntu Test/Race/Contract fixtures/Gates 全执行；windows Test/Gates 执行，Race 与 Contract fixtures 按设计跳过），两腿 `PASS base go test ./... :: ok=15 FAIL=0`、`SELFTEST 740/740`、`TOTAL_FAIL=0`；VM（go1.22.12）本地 5 例 verbose 全 PASS、全量 15 包 ok、定向 `-race` ok；windows 3 包 flake 按 DR-15 登记观察；hash / run 见本段 CI 记录（§11.2 回填）。
 
-### P84 — `BOUNDDIR-RESIDUAL`（T4 / T5#4 残余 · 闭合 F1 / F4 · 实现类）· ⬜ 未开始
+### P84 — `BOUNDDIR-RESIDUAL`（T4 / T5#4 残余 · 闭合 F1 / F4 · 实现类）· ✅ 部分闭合（2026-11-21）
 
 | 字段 | 内容 |
 |---|---|
 | 标识 | `BOUNDDIR-RESIDUAL`（承接 P83 报告 §8 的 P84-d 与 P84-e：T4 = bounddir 大小写折叠、中间 reparse、根相对路径语义；T5#4 = 批量回写前驱验证、代次到 proof 的可恢复事务；来源 = 用户 2026-11-21 排片裁定） |
-| 状态 | ⬜ 未开始（**起跑须用户点名**；起跑消息须四要素留痕） |
+| 状态 | ✅ 部分闭合（2026-11-21）：T5#4（F4 残余）全闭合；T4（F1 残余）大部分闭合，残余 = N13-UNC（确定性界内误拒、fail-closed 方向、可用性缺陷；盘符根等值已修，UNC 共享根两种规范拼写的等值未覆盖）顺延后续切片；N12 随 ⑧b 收尾 |
 | 目标 | 闭合 F1 与 F4：使产物枚举与根绑定在 Windows 大小写敏感目录与中间 reparse 下仍可证明归属；使租约代次与任务 proof 的更新成为可恢复事务，批量回写必须逐条校验前驱 |
 | 依赖 | P83 部分闭合（`4323503`）；P83 报告 §8 顺延清单 P84-d / P84-e；`internal/evidence/bounddir_*`、`internal/guard/lease.go`、`internal/console/runtime_supervised.go` 现状 |
 | 规模 | M（两处平台绑定 / 事务语义，改动面集中在 evidence 与 guard / console 的证明链） |
@@ -2285,7 +2285,10 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 执行自由度清单落盘路径 | `docs/validation/evidence/P84-BOUNDDIR-RESIDUAL/freedom-list.md` |
 | R/D 基线 | R = 0、D = 0（起跑时登记，§13.1.1；不继承 P83 的 R = 2 / D = 0） |
 | 临时件落点声明 | 本片临时目录 = `tmp/P84-BOUNDDIR-RESIDUAL/`（⑧c 前只增不删；CI 捕获件同样落该目录，不落 `tmp/` 根） |
-| 额度口径披露 | ⑦ 深度档 = `GPT-6.2 Sol (copilot)`；额度 = 1 终审 + 3 复审，盲审必抽 1 次（另计 +1）；**系用户 2026-11-21 排片裁定、不得作为先例**；起跑须四要素留痕；协议先行：先由 ① 判定契约影响再动代码 |
+| 额度口径披露 | ⑦ 深度档 = `GPT-6.2 Sol (copilot)`；额度 = 1 终审 + 3 复审，盲审必抽 1 次（另计 +1）；**系用户 2026-11-21 排片裁定、不得作为先例**；起跑须四要素留痕；协议先行：先由 ① 判定契约影响再动代码；另加收窄复审 1 轮（额度例外，裁决人 = 用户、日期 = 2026-11-21、理由 = N13 确定性界内误拒方向明确且小、依据 = 用户裁定消息，不得作为先例） |
+
+完成记录（2026-11-21）：报告对 `docs/validation/bounddir-residual{,_EN}.md`（结论 `PARTIALLY CLOSED`）；T5#4 全闭合（前驱链 / 恒等批 / RunLocked 锁内写 / 三处 run+consumer 守卫；C1–C18 反例）；T4 大部分闭合（走链 / FSCTL 归属 / Ordinal / 根语义 / 中间 reparse 界内证明；W1–W11 反例）；残余 N13-UNC + 证据归因 Low 顺延；R = 3、D = 0；⑦ = 盲审 1 + 终审 1 + 复审 3 + 收窄复审 1（额度例外）；⑤ 2/2、⑥ 2/3；⑨ = Windows 本机 + VM（go1.22.12 全量 15 包 ok + 定向 race 4 包 ok）；CI ubuntu 腿的 Race 步骤于推送后首跑，读数按报告 §11.2 回填；证据包 `docs/validation/evidence/P84-BOUNDDIR-RESIDUAL/`（14 载荷 + MANIFEST + SHA256SUMS）
+
 
 ### P85 — `SECURITY-PROOF-SUBSYSTEM`（策略制品 / 不可变安装来源 / BYOK 证明载体 · 闭合 F3 / F6 / F8 · 实现类）· ⬜ 未开始
 

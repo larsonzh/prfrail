@@ -263,21 +263,26 @@ func (store *LeaseStore) withLock(ctx context.Context, resourceID string, action
 	if err := validateLeaseID(resourceID); err != nil {
 		return Lease{}, err
 	}
-	lockPath := store.leasePath(resourceID) + ".lock"
-	for {
-		if err := os.Mkdir(lockPath, 0700); err == nil {
-			break
-		} else if !os.IsExist(err) && !os.IsPermission(err) {
-			return Lease{}, fmt.Errorf("acquire lease lock: %w", err)
-		}
-		select {
-		case <-ctx.Done():
-			return Lease{}, ctx.Err()
-		case <-time.After(5 * time.Millisecond):
-		}
-	}
-	defer os.Remove(lockPath)
 	path := store.leasePath(resourceID)
+	// P84 fix round 8 (Rev 3b, the lock substrate behind F3): the lock is an OS-level
+	// exclusive lock on ONE contended name, "<record>.lock" - LockFileEx with
+	// LOCKFILE_EXCLUSIVE_LOCK|LOCKFILE_FAIL_IMMEDIATELY on Windows, flock(LOCK_EX|LOCK_NB)
+	// on POSIX. All writers derive the same name from the same record path, so the kernel
+	// is what serialises them, across processes and across goroutines of one process
+	// alike (each acquisition uses its own handle).
+	//
+	// Round 7 made the lock the file NAME ("<record>.lock.<pid>", CREATE_NEW / O_EXCL),
+	// which tied identity to the holder's pid: two processes derived two different names
+	// and never blocked each other (tester round 4 measured a parent claiming while its
+	// child held the lock). An OS lock has no such failure mode, and because the kernel
+	// drops it when the holding process dies - crash included - there is no stale lock to
+	// heal: no pid in the name, no liveness query, no removal. A competitor only waits,
+	// ctx still bounds the wait, and the retry interval is unchanged.
+	lock, err := acquireLeaseLock(ctx, path)
+	if err != nil {
+		return Lease{}, err
+	}
+	defer lock.release()
 	// The record this call is about to replace is read before the action runs, so
 	// T5 retention below can keep the outgoing generation addressable by its hash.
 	replaced, replacedErr := readLease(path)
@@ -297,6 +302,127 @@ func (store *LeaseStore) withLock(ctx context.Context, resourceID string, action
 		return Lease{}, err
 	}
 	return lease, nil
+}
+
+// errLeaseLockHeld is what createLeaseLock reports when another holder owns the
+// resource lock right now. It is a sentinel rather than a bare "file exists" test
+// because the lock is an OS lock on a file that always exists: only the kernel's
+// refusal to grant the range means "someone else holds it" (P84 fix round 8).
+var errLeaseLockHeld = errors.New("lease lock is held by another holder")
+
+// ErrLeaseLockPathIsDirectory reports that the resource's lock path exists as a
+// DIRECTORY instead of the lock file this substrate takes its byte range on.
+//
+// P84 fix round 9 (N8): it is the upgrade boundary left by the mkdir-style lock that
+// the substrate replaced in round 8 - a legacy "<record>.lock" directory, not a lock.
+// It is neither acquired nor deleted here: removing it while an old run still believed
+// it held the lock would hand the resource to a second writer, and it will never turn
+// into a free lock file, so waiting on it is pointless too. The caller stops and
+// reports; the operator migrates the directory away only after the old run is proven
+// stopped.
+var ErrLeaseLockPathIsDirectory = errors.New("lease lock path is a legacy lock directory")
+
+// legacyLeaseLockDirectoryError builds the N8 refusal. It names the path so the operator
+// knows what to migrate, and states the precondition (the old run must be proven stopped)
+// rather than suggesting a removal that would be unsafe on its own.
+func legacyLeaseLockDirectoryError(recordPath string) error {
+	return fmt.Errorf("%w: %s exists as a directory; an earlier run left a mkdir-style lock directory there, and it can only be migrated after that run is proven stopped (this substrate neither acquires nor deletes it)", ErrLeaseLockPathIsDirectory, leaseLockPath(recordPath))
+}
+
+// leaseLockPathIsDirectory reports whether the lock path currently names a directory,
+// i.e. whether a legacy Mkdir lock directory occupies it. It is consulted only after an
+// acquisition failed, so the ordinary path pays no extra stat.
+func leaseLockPathIsDirectory(recordPath string) bool {
+	info, err := os.Stat(leaseLockPath(recordPath))
+	return err == nil && info.IsDir()
+}
+
+// leaseLockSuffix names the single contended lock file next to a lease record. Every
+// process derives the same name from the same record path, which is what makes the OS
+// lock taken on it a mutual exclusion between processes (P84 Rev 3b).
+const leaseLockSuffix = ".lock"
+
+// leaseLockWaitInterval is the retry interval of a competing acquisition. It is the
+// interval the previous lock shape used, so ctx semantics do not change.
+const leaseLockWaitInterval = 5 * time.Millisecond
+
+// leaseLockPath names the lock file a resource's writers contend for.
+func leaseLockPath(recordPath string) string {
+	return recordPath + leaseLockSuffix
+}
+
+// acquireLeaseLock takes the resource lock for this process and returns it held.
+//
+// The wait is the whole mechanism: an OS-held lock cannot go stale, so a competitor
+// simply retries every leaseLockWaitInterval until the holder releases it or ctx
+// expires. "The holder" can also be this very process through another goroutine, and
+// that is still a real wait - each acquisition uses its own handle, so the kernel
+// serialises them like any other pair of holders.
+//
+// Two outcomes are NOT contention and end the wait immediately, because neither can
+// ever resolve itself: a platform failure (reported as-is) and the legacy mkdir lock
+// directory (ErrLeaseLockPathIsDirectory, P84 fix round 9 / N8). The directory is
+// never removed here - see the sentinel's comment for why - and withLock passes the
+// error straight back to its caller.
+func acquireLeaseLock(ctx context.Context, recordPath string) (*leaseLock, error) {
+	for {
+		lock, err := createLeaseLock(recordPath)
+		if err == nil {
+			return lock, nil
+		}
+		if !leaseLockOccupied(err) {
+			return nil, fmt.Errorf("acquire lease lock: %w", err)
+		}
+		select {
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		case <-time.After(leaseLockWaitInterval):
+		}
+	}
+}
+
+// leaseLockOccupied reports whether a failed acquisition lost the race for the lock
+// rather than failing for another reason. Only the sentinel counts: a permission or
+// platform failure is reported to the caller instead of turning into an endless wait
+// on a lock that will never be granted.
+func leaseLockOccupied(err error) bool {
+	return errors.Is(err, errLeaseLockHeld)
+}
+
+// RunLocked runs fn with the resource lock held and the resource's current record
+// read under that lock, and persists nothing: fn decides what the caller then does
+// with the record it was given.
+//
+// P84 fix round 7 (N5): the store-local proof batch has to decide on the same record
+// the store's own mutations are serialised against. Reading the record and then
+// writing the proofs without the lock left a window in which a renewal - which does
+// take the lock - advanced the generation between the read and the writes, so the
+// batch projected a superseded generation. With fn running under the lock the record
+// cannot move underneath it.
+//
+// fn MUST NOT call back into the store's locking operations (Claim, Renew, Reclaim,
+// Takeover, Release, mutate, RunLocked itself): it already holds the resource lock and
+// those calls would wait for it. The generation readers it needs - Current,
+// RetainedLease - take no lock and are safe. A resource without a record passes the
+// zero Lease, so fn can decide whether that is an error for its purpose.
+func (store *LeaseStore) RunLocked(ctx context.Context, resourceID string, fn func(current Lease) error) error {
+	if fn == nil {
+		return errors.New("run-locked action is required")
+	}
+	_, err := store.withLock(ctx, resourceID, func(path string) (Lease, bool, error) {
+		lease, err := readLease(path)
+		if err != nil {
+			if errors.Is(err, ErrLeaseNotHeld) {
+				return Lease{}, false, fn(Lease{})
+			}
+			return Lease{}, false, err
+		}
+		if lease.ResourceID != resourceID {
+			return Lease{}, false, fmt.Errorf("%w: lease resource mismatch", evidence.ErrInvalidRecord)
+		}
+		return Lease{}, false, fn(lease)
+	})
+	return err
 }
 
 // generationPath names the retained body of one lease generation by its hash. It
