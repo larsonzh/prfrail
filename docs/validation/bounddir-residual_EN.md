@@ -133,9 +133,29 @@ The table above holds the (4)-gate-time readings, re-checked by the (8)b measure
 | Windows host `go build` / `go vet` / `go test ./...` | `go build` / `go vet` ok; `go test ./... -count=1` EXIT=0, all 15 packages ok |
 | `-race` | not executed (no gcc on this host); carried by the CI ubuntu Race step |
 | Ubuntu VM (`10.0.0.199`, go1.22.12, `bash -lc`, `GOPROXY=https://goproxy.cn,direct GOSUMDB=off`) | `go build` / `go vet` ok; `go test ./... -count=1` EXIT=0, all 15 packages ok; targeted `-race` on 4 packages (evidence / guard / console / adapters) ok |
-| CI ubuntu Race step | first run after the push (backfilled under section 11.2 once (10) authorises it) |
+| CI ubuntu Race step | after the fix commit `32bf234` was pushed, run `44926215282` is green on both legs: ubuntu Race step 6 packages `ok`; windows / ubuntu legs `base go test ./... :: ok=15 FAIL=0`, `SELFTEST 740/740`, `TOTAL_FAIL=0` (see section 11.2 backfill) |
 
 Every reading in this table is backfilled by (8)b from measurement; (8)a states no estimate. If any of the three layers reports FAIL, the verdict must be restated from that measurement instead of keeping this section's conclusion. Items not executable on this host are registered: the Linux-tagged cases (bounddir unix case sensitivity and reparse, lease transaction recovery) are covered by the VM layer; the W1 end-to-end case-sensitive directory is created with `fsutil` and runs successfully on this host without being skipped.
+
+## 11.2 CI first-run red and the fix (section 11.2 backfill, 2026-11-22)
+
+The main commit `d597f1e` turned CI **red** on first run; after the fix commit `32bf234` it is **double-green**. This section records the measured readings and registrations under section 11.2.
+
+| Item | Content |
+|---|---|
+| First-run red | run `44877224368` (head `d597f1e`): windows leg `Test` step red (ubuntu leg green); `gh run rerun --failed` attempt 2 red again on the same windows face |
+| Failure list | attempt 1 = attempt 2 = **26/26 identical item by item** (normalised mechanical diff, zero difference) => a deterministic defect, not a flake; covers the adapters postflight family, two adapters bind tests, two gates tests, evidence W2/W5b/W8/W9 and `TestBoundDirJunctionInsideBoundAdmitted` |
+| Root cause R-2 | `openRelativeComponent` missing `FILE_SYNCHRONOUS_IO_NONALERT` (CreateOptions 0x20) on the **file leaf** open => unreadable on the repo CI go1.22.12 toolchain (87 failures before the fix = contract violation) |
+| Root cause R-1 | `%TEMP%` 8.3 short name (`RUNNER~1`) vs handle long name (`runneradmin`) Ordinal mis-refusal: the short-name root prefix is misclassified as out-of-bound => 4 short-name mis-refusal anchors |
+| Fix | commit `32bf234` (`fix: recover windows abi compatibility for evidence reads`, 2 files +1014/−2, origin only); includes Plan A 48-bit record number + discriminator cases + two comments (narrow review RELEASE; see the carrier ratification below and `15-final-review-A.md`) |
+| CI double-green | run `44926215282` (head `32bf234`): windows / ubuntu legs `Test` step 15 packages `ok` each; `SELFTEST 740/740`; `base go test ./... :: ok=15 FAIL=0`; `TOTAL_FAIL=0`; ubuntu Race step 6 packages `ok` |
+| C7 single failure | in the first go1.22.12 full run, `TestP84T5h4C7HistoryDepthIsFailClosed` failed once with lease-file rename `Access is denied`; isolated 3/3 PASS, the second full run is 15/15 ok => environmental flake, not reproduced; registered as DR-17, not counted as R |
+| Report line-count correction | the report pair on disk is **246/246** (246 LF lines each, ending with LF); the earlier 247 was a split trailing-empty-element error; no line-count statement exists in the body, nothing to edit, recorded here; **post-backfill LF line count = 266** (EN version; CN version see its pair) |
+| Temporary-file disposition | this slice's CI captures and evidence/design files live under `tmp/P84-CI-FIX/`; the toolchain stays repo-external at `D:\LZProjects\.toolchains\go1.22.12` (not repo `tmp`); the `%TEMP%` probe file is deleted, and the editor-buffer re-write after deletion is corrected in the revision record (section 13 D=0) |
+| wasm diagnostics | the `[js,wasm]`-suffixed syscall diagnostics come from an extra gopls analysis view; the build tags and calls predate P84 => listed as a non-acceptance target, not counted as a new P84 issue, not blocking |
+| DR registration | DR-16 (CI first-run red + R-2/R-1 root causes) and DR-17 (C7 single flake) are registered in the known-defect table of `docs/t027/REMAINING_SLICES{,_EN}.md` |
+
+**Carrier ratification (no new model)**: the ruling named "GPT-6.2 Sol Max"; the actually available carrier is `GPT-6.2 Sol (copilot)` (the same as this slice's existing (7) carrier), ratified accordingly; no new model, no new quota (the OB-37 addendum is in `tmp/P84-CI-FIX/10-final-review-request.md`).
 
 ## 12. Environment and tiers
 
@@ -165,7 +185,7 @@ Every reading in this table is backfilled by (8)b from measurement; (8)a states 
 
 ## 14. Explicitly not executed
 
-No gitee action; no directive version bump; no new ADR or OB; no CI or `DEV_PLAN` change; no `-race` (no gcc on this host); the Linux-only cases were not executed on a real Linux host (left to the Ubuntu VM and the CI ubuntu leg); N13-UNC is not fixed (a residual whose disposition needs a user ruling); of the (9) three-layer readings, the Windows host and VM layers are backfilled (section 11) and the CI ubuntu leg's readings are backfilled after the push (section 11.2).
+No gitee action; no directive version bump; no new ADR or OB; no CI or `DEV_PLAN` change; no `-race` (no gcc on this host); the Linux-only cases were not executed on a real Linux host (left to the Ubuntu VM and the CI ubuntu leg); N13-UNC is not fixed (a residual whose disposition needs a user ruling); of the (9) three-layer readings, the Windows host and VM layers are backfilled (section 11) and the CI reading is backfilled under section 11.2 (section 11.2).
 
 ## 15. (8)a self-check
 

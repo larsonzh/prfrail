@@ -133,9 +133,29 @@ N12（证据包 MANIFEST 描述更新）不属顺延项，由 ⑧b 收尾时一�
 | Windows 本机 `go build` / `go vet` / `go test ./...` | `go build` / `go vet` ok；`go test ./... -count=1` EXIT=0，全量 15 包 ok |
 | `-race` | 本机无 gcc，不执行；由 CI ubuntu 腿的 Race 步骤承担 |
 | Ubuntu VM（`10.0.0.199`，go1.22.12，`bash -lc`，`GOPROXY=https://goproxy.cn,direct GOSUMDB=off`） | `go build` / `go vet` ok；`go test ./... -count=1` EXIT=0，全量 15 包 ok；定向 `-race` 4 包（evidence / guard / console / adapters）ok |
-| CI ubuntu 腿 Race 步骤 | 推送后首跑（⑩ 授权后按 §11.2 回填） |
+| CI ubuntu 腿 Race 步骤 | 修复提交 `32bf234` 推送后 run `44926215282` 双腿绿：ubuntu Race 步骤 6 包 `ok`；windows / ubuntu 两腿 `base go test ./... :: ok=15 FAIL=0`、`SELFTEST 740/740`、`TOTAL_FAIL=0`（详见 §11.2 回填） |
 
 本表读数一律由 ⑧b 回填实测值，⑧a 不写预估数字；若三层任一层出现 FAIL，结论须按实测改口而不是沿用本节结论。本机不可执行项登记：Linux-tagged 用例（bounddir unix 大小写与 reparse、lease 事务恢复）由 VM 层覆盖；W1 端到端大小写敏感目录以 `fsutil` 建立，本机成功执行、未 skip。
+
+## 11.2 CI 首跑红与修复（§11.2 回填，2026-11-22）
+
+主提交 `d597f1e` 推送后 CI 首跑**红**；修复提交 `32bf234` 推送后**双绿**。本节按 §11.2 回填实测读数与登记。
+
+| 项 | 内容 |
+|---|---|
+| 首跑红 | run `44877224368`（head `d597f1e`）windows 腿 `Test` 步骤红（ubuntu 腿绿）；`gh run rerun --failed` attempt 2 复跑 windows 腿同面红 |
+| 失败清单 | attempt 1 = attempt 2 = **26/26 逐条相同**（归一化机械 diff 零差异）⇒ 确定性缺陷、非 flake；含 adapters postflight 全族、adapters 两条 bind、gates 两条、evidence W2/W5b/W8/W9 与 `TestBoundDirJunctionInsideBoundAdmitted` |
+| 根因 R-2 | `openRelativeComponent` 对**文件叶**打开缺失 `FILE_SYNCHRONOUS_IO_NONALERT`（CreateOptions 0x20）⇒ 仓库 CI 的 go1.22.12 工具链上不可读（修前 87 失败 = 契约违约） |
+| 根因 R-1 | `%TEMP%` 的 8.3 短名（`RUNNER~1`）与句柄长名（`runneradmin`）Ordinal 误拒：短名根前缀被误判为界外 ⇒ 4 条短名误拒锚点 |
+| 修复 | 提交 `32bf234`（`fix: recover windows abi compatibility for evidence reads`，2 文件 +1014/−2，仅推 origin）；含方案 A 48 位记录号 + 判别用例 + 两处注释（窄复审 RELEASE，见本节末载体追认与 `15-final-review-A.md`） |
+| CI 双绿 | run `44926215282`（head `32bf234`）：windows / ubuntu 两腿 `Test` 步骤各 15 包 `ok`；`SELFTEST 740/740`；`base go test ./... :: ok=15 FAIL=0`；`TOTAL_FAIL=0`；ubuntu Race 步骤 6 包 `ok` |
+| C7 单次失败 | go1.22.12 全量首次运行中 `TestP84T5h4C7HistoryDepthIsFailClosed` 因 lease 文件重命名 `Access is denied` 失败一次；隔离复跑 3/3 PASS、全量第二次 15/15 ok ⇒ 环境性 flake、未复现，按 DR-17 登记、不记 R |
+| 报告行数勘误 | 报告对磁盘实况 = **246/246**（各 246 个 LF 行、结尾带 LF）；此前回执 247 系 split 尾空元素误差；正文无任何行数表述、无需改文，此处如实登记；**回填后本报告 LF 行数 = 266**（CN 版，EN 版见其对） |
+| 临时件落点 | 本片 CI 捕获件与证据/设计件统一落 `tmp/P84-CI-FIX/`；仓库外工具链 `D:\LZProjects\.toolchains\go1.22.12`（不入库 tmp）；`%TEMP%` 探测件已删、编辑器缓冲二次落盘按修订记录补正（§13 D=0 口径） |
+| wasm 诊断 | 带 `[js,wasm]` 后缀的 syscall 诊断来自 gopls 额外分析视图，构建标签与调用 P84 前已存在 ⇒ 单列「非验收目标」，不计 P84 新增问题、不阻断验收 |
+| DR 登记 | DR-16（CI 首跑红 + R-2/R-1 根因）与 DR-17（C7 单次 flake）登记于 `docs/t027/REMAINING_SLICES{,_EN}.md` 已知缺陷表 |
+
+**载体追认（不新增模型）**：用户裁定署名「GPT-6.2 Sol Max」，实际可用载体为 `GPT-6.2 Sol (copilot)`（与本片既有 ⑦ 载体一致），据此如实追认；不新增模型、不新增额度（OB-37 追加登记见 `tmp/P84-CI-FIX/10-final-review-request.md`）。
 
 ## 12. 环境与档位
 
@@ -165,7 +185,7 @@ N12（证据包 MANIFEST 描述更新）不属顺延项，由 ⑧b 收尾时一�
 
 ## 14. 明确未执行事项
 
-未做 gitee 动作；未升准则版本；未新增 ADR 或 OB；未改 CI 与 `DEV_PLAN`；未跑 `-race`（本机无 gcc）；未在 Linux 实机执行 Linux 专属用例（由 Ubuntu VM 与 CI ubuntu 腿承担）；未修 N13-UNC（残余，去向须用户裁定）；⑨ 三层读数中 Windows 本机与 VM 两层已回填（§11），CI ubuntu 腿的读数于推送后回填（§11.2）。
+未做 gitee 动作；未升准则版本；未新增 ADR 或 OB；未改 CI 与 `DEV_PLAN`；未跑 `-race`（本机无 gcc）；未在 Linux 实机执行 Linux 专属用例（由 Ubuntu VM 与 CI ubuntu 腿承担）；未修 N13-UNC（残余，去向须用户裁定）；⑨ 三层读数中 Windows 本机与 VM 两层已回填（§11），CI 读数已按 §11.2 回填（§11.2）。
 
 ## 15. ⑧a 自查
 
