@@ -1,4 +1,4 @@
-﻿# Task execution checklist (cross-session snapshot v68, after the partial P84 closure; next item = P85 start)
+﻿# Task execution checklist (cross-session snapshot v68, after the partial P84 closure; next item = P86 start)
 
 Generated: 2026-11-22. HEAD = `509b01b`; directive = v1.71; three CI runs: first red `44877224368` (`d597f1e`), fix green `44926215282` (`32bf234`), observation green `44928363670` (`509b01b`).
 
@@ -11,9 +11,9 @@ Generated: 2026-11-22. HEAD = `509b01b`; directive = v1.71; three CI runs: first
 - (1) Section 1 anchors rotated: HEAD `509b01b`; directive **v1.71** (unchanged); SELFTEST **740/740**; the rolling window drops v65 and takes in v68 (v66 / v67 / v68), and v67's line count is re-verified by this version.
 - (2) Section 2 becomes the P84 fact pack (`PARTIALLY CLOSED`, three commits and three CI runs, R = 3, D = 0, DR-16 / DR-17).
 - (3) Section 3 appends one P84 row (twenty rows from v67 become twenty-one).
-- (4) Section 4 queue update: P84 leaves the queue; next = **P85 `SECURITY-PROOF-SUBSYSTEM`**; then = **the pre-S2 re-evaluation (S-G1 / S-G8)**, then the post-S2 re-evaluation items (the S-G5 second step plus S-G7); the tier-3 `GATES-PERF-ASSESS` / `GATES-EXEMPT` slots stay.
-- (5) Section 5 observations: no new OB or ADR this version; DR max = **17**; the P84 residuals N13-UNC and the evidence-attribution Low item are registered as deferred to P86 (established, awaiting a named start).
-- (6) Section 6 pending rulings: the next ruling item is **the P85 start time** (this round does not name the start).
+- (4) Section 4 queue update: P84 leaves the queue; next = **P86 `BOUNDDIR-UNC-EQUIVALENCE`**; then = **P85 `SECURITY-PROOF-SUBSYSTEM`**, then **the pre-S2 re-evaluation (S-G1 / S-G8)**, then the post-S2 re-evaluation items (the S-G5 second step plus S-G7); the tier-3 `GATES-PERF-ASSESS` / `GATES-EXEMPT` slots stay.
+- (5) Section 5 observations: no new OB or ADR this version; DR max = **17**; the P84 residuals N13-UNC and the evidence-attribution Low item are registered as deferred to P86 (established, awaiting a named start; it starts before P85 by the user's ruling of 2026-11-22).
+- (6) Section 6 pending rulings: the next ruling item is **the P86 start time** (P86 before P85 by the user's ruling; this round does not name the start).
 - (7) Appendix A rotated: the duty hand-over is now **P83 residuals to the partial P84 closure / P85**; sections 10 and 11 follow.
 
 ---
@@ -125,7 +125,19 @@ Fixed `tmp` assertion: the top level is `.gitkeep` plus `gates-cache`; `gates-ca
 | S-G7 | all ATs pass, T018 complete and section 14 fully exited | unreachable (composite gate) | `s1-exit.md:52` / `:56` to `:58` / `:60` |
 | S-G8 | the supervised path runs end to end with a real CLI and a real candidate | blocked until S2 enforcement lands | P75 A2 / ADR-045; P76 section 6 |
 
-**Next = P85 `SECURITY-PROOF-SUBSYSTEM` (carries P83's T2 / T3 / T8a; the user must name the start; protocol first)**
+**Next = P86 `BOUNDDIR-UNC-EQUIVALENCE` (carries P84's N13-UNC plus the evidence-attribution Low residual; the user must name the start; **S**)**
+
+| Field | Content |
+|---|---|
+| Identifier | `BOUNDDIR-UNC-EQUIVALENCE` (ledger number **P86**; source = the N13-UNC plus evidence-attribution Low items in the P84 report section 8 and the user's ruling of 2026-11-22 that established it separately, not folded into P85) |
+| Contents | N13-UNC = the two canonical spellings of a UNC share root falsely rejected as unequal; W10 = the evidence-attribution Low item (the mutation annotation contradicts the r3 wording) |
+| Size | **S** (implementation type; a single equality form plus one evidence annotation) |
+| (7) budget | deep tier `GPT-6.2 Sol (copilot)`; 1 final review plus 3 re-reviews; one mandatory blind review (separately counted as +1); **the user's scheduling ruling of 2026-11-22, not a precedent** |
+| Dependencies | P84 partially closed (`509b01b`); no dependency on P85, may run in parallel; the user must name the start |
+| Boundaries | fix N13-UNC and W10 only; do not change the P85 scope (F3 / F6 / F8); do not change the gate table, directive or CI |
+| Start condition | **the user must name it explicitly**; **it is named before P85 (user ruling of 2026-11-22)** |
+
+**Then = P85 `SECURITY-PROOF-SUBSYSTEM` (carries P83's T2 / T3 / T8a; the user must name the start; protocol first)**
 
 | Field | Content |
 |---|---|
@@ -136,18 +148,6 @@ Fixed `tmp` assertion: the top level is `.gitkeep` plus `gates-cache`; `gates-ca
 | Dependencies | P83 partially closed (`4323503`); P84 partially closed (`509b01b`); the user must name the start |
 | Boundaries | close only the deferred parts of F3 / F6 / F8; do not touch F1 / F4; do not change the gate table, directive or CI |
 | Start condition | **the user must name it explicitly**; the first step is the contract-impact verdict and protocol-first change |
-
-**Parallel = P86 `BOUNDDIR-UNC-EQUIVALENCE` (carries P84's N13-UNC plus the evidence-attribution Low residual; the user must name the start; no dependency on P85, may run in parallel; **S**)**
-
-| Field | Content |
-|---|---|
-| Identifier | `BOUNDDIR-UNC-EQUIVALENCE` (ledger number **P86**; source = the N13-UNC plus evidence-attribution Low items in the P84 report section 8 and the user's ruling of 2026-11-22 that established it separately, not folded into P85) |
-| Contents | N13-UNC = the two canonical spellings of a UNC share root falsely rejected as unequal; W10 = the evidence-attribution Low item (the mutation annotation contradicts the r3 wording) |
-| Size | **S** (implementation type; a single equality form plus one evidence annotation) |
-| (7) budget | deep tier `GPT-6.2 Sol (copilot)`; 1 final review plus 3 re-reviews; one mandatory blind review (separately counted as +1); **the user's scheduling ruling of 2026-11-22, not a precedent** |
-| Dependencies | P84 partially closed (`509b01b`); no dependency on P85, may run in parallel; the user must name the start |
-| Boundaries | fix N13-UNC and W10 only; do not change the P85 scope (F3 / F6 / F8); do not change the gate table, directive or CI |
-| Start condition | **the user must name it explicitly**; it may be named in the same round or separately |
 
 **Then = the pre-S2 re-evaluation (S-G1 / S-G8)**
 
@@ -193,7 +193,7 @@ Fixed `tmp` assertion: the top level is `.gitkeep` plus `gates-cache`; `gates-ca
 ## Section 6 pending user rulings
 
 - **The table is currently empty** (P84's close-out and scheduling rulings were made on 2026-11-21; the Plan I execution and the section 11.2 backfill landed with `509b01b`).
-- **Next ruling item (anticipated)**: **the P85 start time** (the slice name and priority are fixed; the user must name the start; this round does not name it); **P86 also needs naming, in the same round or separately**.
+- **Next ruling item (anticipated)**: **the P86 start time** (the slice name and priority are fixed; P86 before P85 by the user's ruling; the user must name the start; this round does not name it); **P85 follows, both need naming**.
 
 ---
 
@@ -211,8 +211,8 @@ Same structure as v60: section 7 start and step-0 general rules lead to directiv
 >
 > [supporting documents] `REMAINING_SLICES{,_EN}.md` (P85 established, awaiting a named start), `DELIVERY_DIRECTIVE.md` (**v1.71**), `bounddir-residual{,_EN}.md` (the P84 report with the CI record and the residual deferral list), `SECURITY{,_EN}.md` (line-5 remediation note), `ADR_REGISTER{,_EN}.md` (ADR-047 = `COMPENSATED`), `DOCUMENTATION_PLAN{,_EN}.md` (hand-over entry pointer), `CHECKLIST_v67{,_EN}.md` (frozen, superseded by v68).
 >
-> Now: P84 partially closed (T5#4 fully closed; T4 largely closed; N13-UNC plus the evidence-attribution Low item deferred); next = P85 `SECURITY-PROOF-SUBSYSTEM` (the user must name the start).
+> Now: P84 partially closed (T5#4 fully closed; T4 largely closed; N13-UNC plus the evidence-attribution Low item deferred); next = P86 `BOUNDDIR-UNC-EQUIVALENCE` (the user must name the start), then = P85 `SECURITY-PROOF-SUBSYSTEM`.
 
 ## Section 11 one-line current status
 
-P84 **partially closed** (three commits `d597f1e` / `32bf234` / `509b01b` pushed to origin; the first red run `44877224368` is preserved as-is, the fix run `44926215282` is green on both legs, the backfill observation `44928363670` is success; both legs `base go test ok=15 FAIL=0`, `SELFTEST 740/740`, three scopes 0; R = 3, D = 0; DR-16 / DR-17); next = **P85 (the user must name the start)**, then the **pre-S2 re-evaluation (S-G1 / S-G8)**.
+P84 **partially closed** (three commits `d597f1e` / `32bf234` / `509b01b` pushed to origin; the first red run `44877224368` is preserved as-is, the fix run `44926215282` is green on both legs, the backfill observation `44928363670` is success; both legs `base go test ok=15 FAIL=0`, `SELFTEST 740/740`, three scopes 0; R = 3, D = 0; DR-16 / DR-17); next = **P86 (the user must name the start)**, then **P85**, then the **pre-S2 re-evaluation (S-G1 / S-G8)**.

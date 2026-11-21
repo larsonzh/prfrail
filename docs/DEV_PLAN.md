@@ -176,6 +176,16 @@ T027 前置状态更新（2026-11-08，P61 AT23-RESTRICTED-CANDIDATE）：在上
 
 T027 前置状态更新（2026-11-09，F2-FIX-STUB-HANG）：在上一段基础上，F2 修复片已收口——`tools/agent-stub` 的 `hang` 分支补写 0 字节空 `stub-child.pid`（回归测试 `TestHangWritesEmptyChildPIDReport`）并重跑 layer3 F2（红/绿）+ f1-control 对照；⑦ 终审 `FINAL: PASS WITH FIXES` ⇒ 前提①「机制腿全绿」满足 ⇒ **AT-23 阶段 1 条件闭合达成**（前提② P61 已满足；阶段 2 不适用，用户 2026-11-09 裁定 A1）；S1 Exit 整体仍未通过。证据：[中文](validation/at23-restricted-candidate.md) §11 / [English](validation/at23-restricted-candidate_EN.md)，证据包 `docs/validation/evidence/F2-FIX-STUB-HANG/`。
 
+T027 前置状态更新（2026-11-18，P80 SG6-GATELEVEL-CONSOLIDATE）：在上一段基础上，S-G6 的**门级侧**判定成立（依赖字段满足且四道剩余门闭合的合并判定）；`S-G1` / `S-G7` / `S-G8` 状态不变。证据：[中文](validation/sg6-gatelevel-consolidate.md) / [English](validation/sg6-gatelevel-consolidate_EN.md)。
+
+T027 前置状态更新（2026-11-19，P79 S2-PRE-INDEPENDENT-SECURITY-REVIEW）：在上一段基础上，独立安全评审补齐——三面（机制 / 运行时 / 供应链）皆 `FINDINGS`，F1–F8 与 T9 收窄移交修复切片，ADR-047 翻 `COMPENSATED`。证据：[中文](validation/s2-pre-independent-security-review.md) / [English](validation/s2-pre-independent-security-review_EN.md)。
+
+T027 前置状态更新（2026-11-21，P83 SECURITY-FINDINGS-REMEDIATION）：在上一段基础上，F1–F8 的修复以 **`PARTIALLY CLOSED`** 收口——F2 / F5 / F7 与 T9 收窄已闭合；F1 / F4 部分实现；F3 / F6 / F8 顺延 P85；本片登记 DR-15（`internal/guard` 单次 flake，未复现）。证据：[中文](validation/security-findings-remediation.md) / [English](validation/security-findings-remediation_EN.md)。
+
+T027 前置状态更新（2026-11-21，P84 BOUNDDIR-RESIDUAL）：在上一段基础上，F1 / F4 的残余修复以 **`PARTIALLY CLOSED`** 收口——T5#4（F4 残余）全闭合、T4（F1 残余）大部分闭合；残余 N13-UNC（UNC 共享根两规范拼写的等值误拒）+ 证据归因 Low 顺延 **P86**（2026-11-22 用户裁定另立、不并入 P85）；本片登记 DR-16 / DR-17。证据：[中文](validation/bounddir-residual.md) / [English](validation/bounddir-residual_EN.md)。
+
+T027 立项注记（2026-11-22）：**P85 `SECURITY-PROOF-SUBSYSTEM`**（承接 P83 的 F3 / F6 / F8；L 档；协议先行）与 **P86 `BOUNDDIR-UNC-EQUIVALENCE`**（承接 P84 的 N13-UNC + W10；S 档）已立项；**执行顺序 = 先 P86 后 P85**（2026-11-22 用户裁定），两者均待用户点名起跑。本组补录沿用 2026-10-22 先例：字段取自各片自己的验证报告，只记结论与报告路径、不记提交号与 CI 运行号，且不改写 `T027` 的状态字段。
+
 ### 11 月重构里程碑（T027-B）
 
 - P37 判定基线：C1–C7 缺陷判定与修复基线（P38 施工图给文件/函数级测试矩阵；报告 `docs/validation/t027b-breakthrough{,_EN}.md`、`docs/validation/t027b-tactical-blueprint{,_EN}.md`）

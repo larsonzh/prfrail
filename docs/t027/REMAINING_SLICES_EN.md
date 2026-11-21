@@ -2283,7 +2283,7 @@ Completion record (2026-11-21): report pair `docs/validation/bounddir-residual{,
 | Field | Content |
 |---|---|
 | Identifier | `SECURITY-PROOF-SUBSYSTEM` (carries P84-a / P84-b / P84-c from the P83 report section 8: T2 = a frozen policy artifact an AgentRunner run can re-verify persistently; T3 = an immutable install source; T8a = a BYOK proof carrier; source = the user's scheduling ruling of 2026-11-21) |
-| Status | ⬜ Not started (**the user must name the start**; the start message records the four elements) |
+| Status | ⬜ Not started (**the user must name the start**; the start message records the four elements; **execution order: P86 before P85 (user ruling of 2026-11-22); no dependency on P86, may run in parallel**) |
 | Goal | Close F3 / F6 / F8: provide policy evidence that is protected from the executor, persistable and independently re-verifiable, bound to run / task / step; establish an install source that can be proven not to change; prove the BYOK child writes no unredacted log, and refuse when that cannot be proven |
 | Dependencies | P83 partially closed (`4323503`); P83 report section 8 deferral list P84-a / P84-b / P84-c; P84 may run in parallel (no hard dependency); P86 has no dependency and may run in parallel |
 | Size | L (three new evidence capabilities; expected to touch `CONTRACTS{,_EN}` plus schemas / fixtures, so protocol first) |
@@ -2304,7 +2304,7 @@ Completion record (2026-11-21): report pair `docs/validation/bounddir-residual{,
 | Field | Content |
 |---|---|
 | Identifier | `BOUNDDIR-UNC-EQUIVALENCE` (carries the N13-UNC residual and the evidence-attribution Low item from the P84 report section 8; the user's ruling of 2026-11-22 established it separately, not folded into P85) |
-| Status | ⬜ Not started (**the user must name the start**; may run in parallel; the start message records the four elements) |
+| Status | ⬜ Not started (**the user must name the start**; may run in parallel; the start message records the four elements; **execution order: P86 before P85 (user ruling of 2026-11-22); no dependency on P85, may run in parallel**) |
 | Goal | Close N13-UNC: make the two canonical spellings of a UNC share root (`\\server\share` and its trailing-separator form) compare as the same root in the root classifier / `boundRelativeSuffix` (extending the already-fixed drive-root equality form to UNC); also correct the W10 evidence-attribution Low item (the mutation annotation contradicts the r3 wording) |
 | Dependencies | P84 partially closed (`509b01b`); the P84 report section 8 deferral list (N13-UNC plus the evidence-attribution Low item); no dependency on P85, may run in parallel; the user must name the start |
 | Size | S (a single equality form plus one evidence annotation; changes limited to `internal/evidence/bounddir_*` and its tests) |
