@@ -498,6 +498,13 @@ const (
 	// namespace; the numeric value is the same one fileFlagOpenReparsePoint carries
 	// for CreateFile.
 	createOptionOpenReparsePoint = fileFlagOpenReparsePoint
+	// createOptionSynchronousIONonAlert is FILE_SYNCHRONOUS_IO_NONALERT in the
+	// CreateOptions namespace. It makes the file object synchronous. Measured on
+	// go1.22.12: a synchronous ReadFile without an OVERLAPPED structure on an
+	// asynchronous file object answers ERROR_INVALID_PARAMETER (87). It is added
+	// to file leaves only (see openRelativeComponent); it requires the SYNCHRONIZE
+	// access bit, which every step already requests.
+	createOptionSynchronousIONonAlert = 0x00000020
 	// statusSuccess is STATUS_SUCCESS.
 	statusSuccess = 0
 	// win32InvalidParameter is ERROR_INVALID_PARAMETER, the fallback errno for an
@@ -514,8 +521,10 @@ const (
 	// instead of the list bit (same value, file sense).
 	//
 	// SYNCHRONIZE is required because every step is waited on through its
-	// IO_STATUS_BLOCK. FILE_SYNCHRONOUS_IO_ALERT/NONALERT cannot replace it: adding
-	// either makes NtCreateFile answer STATUS_INVALID_PARAMETER.
+	// IO_STATUS_BLOCK. FILE_SYNCHRONOUS_IO_NONALERT is added to file leaves so
+	// the object they open is synchronous (see openRelativeComponent); it
+	// requires the SYNCHRONIZE access bit and does not replace it.
+	// FILE_SYNCHRONOUS_IO_ALERT is deliberately never used.
 	accessListOrRead     = 0x00000001 // FILE_LIST_DIRECTORY (directory) / FILE_READ_DATA (file)
 	accessReadAttributes = 0x00000080 // FILE_READ_ATTRIBUTES
 	accessSynchronize    = 0x00100000 // SYNCHRONIZE
@@ -610,6 +619,13 @@ var (
 	// procDeviceIoControl reads a reparse point's stored target (P84 F1). It is a
 	// kernel32 call like the other two, so no dependency is added.
 	procDeviceIoControl = syscall.NewLazyDLL("kernel32.dll").NewProc("DeviceIoControl")
+	// procGetDriveTypeW answers the drive class of the R-1 seed: only a fixed local
+	// volume root may start the candidate-root walk.
+	procGetDriveTypeW = syscall.NewLazyDLL("kernel32.dll").NewProc("GetDriveTypeW")
+	// procGetVolumeInformationByHandleW answers the volume class of the OPEN seed
+	// handle: the R-1 fallback requires the handle itself to be an NTFS volume
+	// root, which a drive-letter query alone cannot prove.
+	procGetVolumeInformationByHandleW = syscall.NewLazyDLL("kernel32.dll").NewProc("GetVolumeInformationByHandleW")
 )
 
 // openDescendantRelative opens clean - a cleaned relative name whose components
@@ -737,6 +753,17 @@ func reparseTargetRelativeSuffix(dir *BoundDir, parent syscall.Handle, component
 		return nil, fmt.Errorf("evidence: intermediate reparse point %s stores the target %q, which cannot be interpreted losslessly: it is not the exact form filepath.Clean produces (%s); a target is only compared byte for byte when its own spelling is already canonical", relative, target, reason)
 	}
 	suffix, ok := boundRelativeSuffix(base, target)
+	if !ok {
+		// R-1 (CI windows 8.3 root-prefix short name): the byte comparison admits
+		// only the spelling the handle-derived name carries. A stored target whose
+		// prefix spells the bound root through 8.3 short-name aliases is admitted
+		// when the candidate root is proven to BE the bound object (same volume
+		// serial and file index, every component opened relative to the previously
+		// verified parent handle, no unverified reparse point, and every divergent
+		// component proven to be the OS-reported short-name alias of the long
+		// component). Any failed proof keeps the boundary refusal.
+		suffix, ok = boundRelativeSuffixShortAlias(dir, base, target)
+	}
 	if !ok {
 		return nil, fmt.Errorf("evidence: intermediate reparse point %s resolves to %s, which is outside the bound directory %s", relative, target, base)
 	}
@@ -997,6 +1024,437 @@ func boundRelativeSuffix(base, target string) ([]string, bool) {
 	return parts, true
 }
 
+// splitDosPathComponents splits an absolute DOS path into its volume component and
+// the directory components below it, each kept byte for byte.
+func splitDosPathComponents(path string) []string {
+	volume := filepath.VolumeName(path)
+	rest := strings.TrimPrefix(path[len(volume):], `\`)
+	components := []string{volume}
+	if rest != "" {
+		components = append(components, strings.Split(rest, `\`)...)
+	}
+	return components
+}
+
+// driveFixed is DRIVE_FIXED: the R-1 fallback only starts from a fixed local
+// volume root.
+const driveFixed = 3
+
+// ntfsRootDirectoryFileIndex is the NTFS MFT record number of the volume ROOT
+// directory (record 5 is reserved for it; no other object ever carries it).
+// An MFT segment reference is 64 bits wide (a 16-bit sequence number above
+// a 48-bit record number), so the
+// full record number lives in the LOW 48 bits of the 64-bit file index: the low
+// 32 bits plus the LOW 16 bits of the high word. A volume root therefore has
+// FileIndexHigh&0xFFFF == 0 AND FileIndexLow == 5; the sequence bits may be
+// anything. Measured on the development volume: High = 0x50000, Low = 5 - the
+// sequence bits are 0x5, the high-word record bits are all zero, and the record number
+// is 5, exactly the root. See ntfsRootRecordOf.
+const ntfsRootDirectoryFileIndex = 5
+
+// ntfsRootRecordOf reports whether one 64-bit NTFS file index (split into its
+// high and low 32-bit words as GetFileInformationByHandle answers them) carries
+// the 48-bit record number of the volume ROOT directory. The MFT segment
+// reference is 16 sequence bits in the HIGH 16 bits of the high word plus the
+// 48-bit record number below them, so the record number is proven only when the
+// low 16 bits of the high word are zero AND the low word is 5. Judging the low
+// word alone would admit record 0x1_0000_0005, which is not the root.
+func ntfsRootRecordOf(high, low uint32) bool {
+	return high&0xFFFF == 0 && low == ntfsRootDirectoryFileIndex
+}
+
+// driveTypeOf reports the GetDriveTypeW class of one volume root path, or 0 when
+// the call cannot answer.
+func driveTypeOf(root string) uint32 {
+	ptr, err := syscall.UTF16PtrFromString(root)
+	if err != nil {
+		return 0
+	}
+	kind, _, _ := procGetDriveTypeW.Call(uintptr(unsafe.Pointer(ptr)))
+	return uint32(kind)
+}
+
+// seedIsFixedVolumeRoot proves, ON the already opened seed handle, that the handle
+// is the root directory of a fixed local NTFS volume: GetVolumeInformationByHandle
+// must answer an NTFS volume for the handle, and the handle's file index must
+// carry the full 48-bit NTFS root record number (ntfsRootRecordOf). A drive-letter
+// class query is not part of this proof - the evidence is bound to the handle the
+// walk will use. Any shortcoming refuses only the R-1 fallback; the byte fast
+// path is never touched.
+func seedIsFixedVolumeRoot(handle syscall.Handle) bool {
+	var serial, maxComponent, fsFlags uint32
+	var fsName [8]uint16
+	result, _, _ := procGetVolumeInformationByHandleW.Call(
+		uintptr(handle),
+		0, 0,
+		uintptr(unsafe.Pointer(&serial)),
+		uintptr(unsafe.Pointer(&maxComponent)),
+		uintptr(unsafe.Pointer(&fsFlags)),
+		uintptr(unsafe.Pointer(&fsName[0])),
+		uintptr(len(fsName)),
+	)
+	if result == 0 {
+		return false
+	}
+	if syscall.UTF16ToString(fsName[:]) != "NTFS" {
+		return false
+	}
+	info, err := fileInformationOf(handle)
+	if err != nil {
+		return false
+	}
+	return ntfsRootRecordOf(info.FileIndexHigh, info.FileIndexLow)
+}
+
+// directoryEntryShortNameFn is the production seam the alias admission uses for the
+// same-entry short-name evidence. Tests override it to exercise the evidence gate
+// independently of the kernel, which cannot be made to report a missing short name
+// for a real alias (the shape only the seam can fabricate).
+var directoryEntryShortNameFn = directoryEntryShortName
+
+// directoryEntryShortName reads the 8.3 short name of one directory entry OUT OF
+// THE VERIFIED PARENT HANDLE's own enumeration, and binds the entry to the object
+// the caller already opened: the entry whose long name equals longName must carry
+// the same file id as the opened object (wantHigh/wantLow), and the short name is
+// read from that SAME entry. No spelling derived from an absolute path participates
+// in any admission decision, and an entry that is missing, that no longer belongs
+// to the opened object, that is malformed, or that declares no short name yields
+// ("", false) - every shape refuses fail-closed.
+func directoryEntryShortName(parent syscall.Handle, longName string, wantHigh, wantLow uint32) (string, bool) {
+	if err := assertFileIDBothDirInfoLayout(); err != nil {
+		return "", false
+	}
+	restart := true
+	for size := uint32(readDirBufferStart); ; {
+		buffer := make([]byte, size)
+		// The first call of the scan restarts it; the continuation calls use the
+		// non-restart class so they resume where the previous buffer ended - the
+		// restart class on every call would restart the scan forever.
+		class := uintptr(fileIdBothDirectoryInfo)
+		if restart {
+			class = uintptr(fileIdBothDirectoryInfoRestart)
+		}
+		result, _, callErr := procGetFileInformationByHandleEx.Call(
+			uintptr(parent),
+			class,
+			uintptr(unsafe.Pointer(&buffer[0])),
+			uintptr(size),
+		)
+		if result == 0 {
+			errno, _ := callErr.(syscall.Errno)
+			switch errno {
+			case syscall.ERROR_NO_MORE_FILES, syscall.ERROR_FILE_NOT_FOUND:
+				// The directory is exhausted without the name: no evidence.
+				return "", false
+			case syscall.ERROR_MORE_DATA, syscall.ERROR_INSUFFICIENT_BUFFER, syscall.ERROR_BUFFER_OVERFLOW:
+				if size >= readDirBufferLimit {
+					return "", false
+				}
+				size *= 2
+				continue
+			}
+			return "", false
+		}
+		// The scan has started, so the follow-up calls must not restart it.
+		restart = false
+		shortName, evidenced, refuse := scanFileIDBothDirInfoForShortName(buffer, longName, wantHigh, wantLow)
+		if refuse || evidenced {
+			if refuse {
+				return "", false
+			}
+			return shortName, true
+		}
+		// The buffer is exhausted without a match: the next call continues the
+		// scan where the handle position stopped.
+	}
+}
+
+// scanFileIDBothDirInfoForShortName is the pure, testable half of the directory
+// entry evidence. It validates the WHOLE record chain of one
+// FILE_ID_BOTH_DIR_INFORMATION buffer first and only then reports:
+//
+//   - evidenced: the entry whose long name equals longName exists exactly once,
+//     its full 64-bit file id equals the opened object's, and it declares a short
+//     name (returned byte for byte, with a counted terminator stripped);
+//   - refuse: the buffer is malformed or contradictory - an empty buffer; a
+//     NextEntryOffset that is not 8-byte aligned, shorter than one header, or past
+//     the buffer; a declared record that does not fit its own record range (a
+//     non-last record is bounded by its NextEntryOffset, the last by the buffer);
+//     a FileNameLength that is zero or odd; a ShortNameLength that is odd or wider
+//     than the fixed array; a NUL unit inside either declared name range of ANY
+//     entry; a duplicate OF THE MATCHED long name; or a matching entry whose file
+//     id belongs to
+//     another object (a contradiction, never a reason to look at the next batch).
+//     A malformed answer is never parsed on a guess, so refuse fails the whole
+//     admission closed;
+//   - neither: no entry carries longName (the caller continues the scan), or the
+//     matching entry declares no short name or only a terminator (no evidence).
+//
+// The terminal NUL unit of a declared ShortName range is allowed and stripped:
+// the fixed ShortName array is NUL-terminated by convention when the name does not
+// fill it, and some filesystems count the terminator in ShortNameLength (the same
+// shape N14 pins for reparse names).
+func scanFileIDBothDirInfoForShortName(buffer []byte, longName string, wantHigh, wantLow uint32) (shortName string, evidenced, refuse bool) {
+	if len(buffer) == 0 {
+		return "", false, true
+	}
+	nameOffset := unsafe.Offsetof(fileIDBothDirInfo{}.FileName)
+	bufferBase := unsafe.Pointer(&buffer[0])
+	// Phase 1: validate every record of the chain (and every entry's declared
+	// name ranges) before anything is reported as evidence.
+	var match *fileIDBothDirInfo
+	var matchShort []uint16
+	found := false
+	for offset := uintptr(0); ; {
+		if offset+nameOffset > uintptr(len(buffer)) {
+			return "", false, true
+		}
+		entry := (*fileIDBothDirInfo)(unsafe.Add(bufferBase, offset))
+		next := uintptr(entry.NextEntryOffset)
+		// A non-last record is bounded by its own NextEntryOffset; the last record
+		// is bounded by the buffer. A name that crosses its record boundary would
+		// be read out of the NEXT record while its identity and short name come
+		// from this one - the exact shape that must never evidence.
+		recordLimit := uintptr(len(buffer))
+		if next != 0 {
+			if next%8 != 0 || next < nameOffset || offset+next+nameOffset > uintptr(len(buffer)) {
+				return "", false, true
+			}
+			recordLimit = offset + next
+		}
+		if entry.FileNameLength == 0 || entry.FileNameLength%2 != 0 ||
+			offset+nameOffset+uintptr(entry.FileNameLength) > recordLimit {
+			return "", false, true
+		}
+		units := uintptr(entry.FileNameLength) / 2
+		nameUnits := unsafe.Slice((*uint16)(unsafe.Add(bufferBase, offset+nameOffset)), units)
+		for _, unit := range nameUnits {
+			if unit == 0 {
+				// A NUL inside the declared name range would decode a prefix of
+				// the stored name and the entry could be matched on that prefix.
+				return "", false, true
+			}
+		}
+		// Every entry's short-name range is validated too, not only the matching
+		// one: a malformed answer anywhere in the batch refuses the whole batch.
+		if entry.ShortNameLength%2 != 0 || uintptr(entry.ShortNameLength)/2 > uintptr(len(entry.ShortName)) {
+			return "", false, true
+		}
+		shortUnits := uintptr(entry.ShortNameLength) / 2
+		shortNameUnits := entry.ShortName[:shortUnits]
+		if shortUnits > 0 && shortNameUnits[shortUnits-1] == 0 {
+			shortNameUnits = shortNameUnits[:shortUnits-1]
+		}
+		for _, unit := range shortNameUnits {
+			if unit == 0 {
+				return "", false, true
+			}
+		}
+		if syscall.UTF16ToString(nameUnits) == longName {
+			if found {
+				// The MATCHED long name cannot occur twice: a second matching entry
+				// is a malformed answer, not a second candidate. (Other duplicate
+				// names do not exist on NTFS and are not part of this guarantee.)
+				return "", false, true
+			}
+			found = true
+			match = entry
+			matchShort = shortNameUnits
+		}
+		if next == 0 {
+			break
+		}
+		offset += next
+	}
+	if !found {
+		return "", false, false
+	}
+	// Phase 2: the validated matching entry is evidence only when it still belongs
+	// to the object the caller opened. A file id conflict is a contradiction and
+	// refuses immediately - it never lets the scan look at a later batch for a
+	// friendlier answer.
+	if uint64(match.FileId) != uint64(wantHigh)<<32|uint64(wantLow) {
+		return "", false, true
+	}
+	if len(matchShort) == 0 {
+		// No short name, or only a terminator: the divergence is not an 8.3 alias.
+		return "", false, false
+	}
+	return syscall.UTF16ToString(matchShort), true, false
+}
+
+// boundRelativeSuffixShortAlias is the R-1 fallback the boundary comparison uses
+// when the stored target's spelling does not byte-match the bound root's
+// handle-derived name: a stored target whose prefix spells the bound root's own
+// path through 8.3 short-name aliases (the CI windows runner shape, where the
+// user profile component is stored as its short alias while the handle names the
+// long spelling). Only what the OS proves to be a root-prefix 8.3 alias is
+// admitted, and never for reading directly:
+//
+//   - the target is split at the bound root's component boundary; the components
+//     below it are returned as the suffix byte for byte, unwritten;
+//   - the candidate root is opened one component at a time, every step relative to
+//     the previously verified parent handle (the volume root, opened once, is the
+//     seed) - no per-level absolute path is re-derived and re-opened - and a
+//     reparse point anywhere on the way refuses;
+//   - a component whose spelling diverges from the bound root's is admitted only
+//     when both spellings open to the same file record under the same verified
+//     parent AND the verified parent's own directory enumeration carries, on the
+//     SAME entry that holds the long name and the opened object's file id, a short
+//     name that equals the candidate spelling byte for byte. A file ID alone does
+//     not prove the difference is an 8.3 alias: a case-variant spelling shares the
+//     record but its directory entry declares no short name, so it stays refused;
+//     no spelling derived from an absolute path participates in the decision;
+//   - the final component must be the bound root object itself - the bound
+//     handle's own volume serial and file index, never an ancestor's.
+//
+// The observations anchor at the moment of the final identity comparison. The
+// suffix walk that follows runs from the bound handle and never uses the candidate
+// path again, so an alias changed afterwards cannot redirect it (fail-closed).
+// Every failure returns (nil, false) and the caller keeps the boundary refusal.
+func boundRelativeSuffixShortAlias(dir *BoundDir, base, target string) ([]string, bool) {
+	baseComps := splitDosPathComponents(base)
+	targetComps := splitDosPathComponents(target)
+	if len(targetComps) <= len(baseComps) {
+		return nil, false
+	}
+	// Only the ordinary drive form participates; UNC targets stay refused, and
+	// the volume component is still compared byte for byte.
+	if len(targetComps[0]) != 2 || targetComps[0][1] != ':' || targetComps[0] != baseComps[0] {
+		return nil, false
+	}
+	if len(baseComps) == 1 {
+		// The bound root is the volume root itself: the byte fast path already
+		// covers every spelling that can start at this root.
+		return nil, false
+	}
+	suffix := targetComps[len(baseComps):]
+	divergent := false
+	for k := 1; k < len(baseComps); k++ {
+		if targetComps[k] != baseComps[k] {
+			// Only case differences are the W1 twin shape, not an 8.3 alias: even
+			// when a directory entry happens to report such a spelling as its short
+			// name, the divergence must not enter short-name admission.
+			if strings.EqualFold(targetComps[k], baseComps[k]) {
+				return nil, false
+			}
+			divergent = true
+		}
+	}
+	if !divergent {
+		// The byte fast path already admitted this spelling.
+		return nil, false
+	}
+
+	// Seed: the volume root, opened once and verified. Every later step opens one
+	// component relative to the previously verified parent handle. The seed itself
+	// is opened WITHOUT following a reparse point, and the fallback only proceeds
+	// when the drive answers as a fixed local volume - a drive-letter spelling
+	// alone does not prove that the seed is a real local volume root.
+	volumeRoot := targetComps[0] + string(filepath.Separator)
+	if driveTypeOf(volumeRoot) != driveFixed {
+		return nil, false
+	}
+	parent, err := syscall.CreateFile(
+		syscall.StringToUTF16Ptr(volumeRoot),
+		accessListOrRead|accessReadAttributes|accessSynchronize,
+		fileInformationShareAll, nil, syscall.OPEN_EXISTING,
+		fileFlagBackupSemantics|fileFlagOpenReparsePoint, 0)
+	if err != nil {
+		return nil, false
+	}
+	owned := true
+	closeParent := func() {
+		if owned {
+			_ = syscall.CloseHandle(parent)
+			owned = false
+		}
+	}
+	defer closeParent()
+	seedInfo, infoErr := fileInformationOf(parent)
+	if infoErr != nil || seedInfo.FileAttributes&syscall.FILE_ATTRIBUTE_REPARSE_POINT != 0 {
+		return nil, false
+	}
+	if !seedIsFixedVolumeRoot(parent) {
+		// The handle could not be proven to be the root of a fixed local NTFS
+		// volume (a subst mapping, a non-NTFS or a network volume all land here).
+		// Only the short-name fallback refuses; the byte fast path is untouched.
+		return nil, false
+	}
+
+	for k := 1; k < len(baseComps); k++ {
+		handle, reparse, openErr := openRelativeComponent(parent, targetComps[k], true, false)
+		if openErr != nil {
+			closeParent()
+			return nil, false
+		}
+		if reparse {
+			// A reparse point anywhere in the candidate root is an unverified
+			// redirect and refuses.
+			_ = syscall.CloseHandle(handle)
+			closeParent()
+			return nil, false
+		}
+		targetInfo, targetInfoErr := fileInformationOf(handle)
+		if targetInfoErr != nil {
+			_ = syscall.CloseHandle(handle)
+			closeParent()
+			return nil, false
+		}
+		if targetComps[k] != baseComps[k] {
+			// A divergent spelling: both names must address the same file record
+			// under this parent, and the parent's own directory entry that holds the
+			// long name (bound to the opened object by its file id) must declare the
+			// candidate spelling as its 8.3 short name - the second evidence comes
+			// from the same directory entry, never from an absolute-path spelling
+			// query.
+			baseHandle, baseReparse, baseErr := openRelativeComponent(parent, baseComps[k], true, false)
+			if baseErr != nil || baseReparse {
+				if baseHandle != 0 {
+					_ = syscall.CloseHandle(baseHandle)
+				}
+				_ = syscall.CloseHandle(handle)
+				closeParent()
+				return nil, false
+			}
+			baseInfo, baseInfoErr := fileInformationOf(baseHandle)
+			_ = syscall.CloseHandle(baseHandle)
+			if baseInfoErr != nil ||
+				targetInfo.VolumeSerialNumber != baseInfo.VolumeSerialNumber ||
+				targetInfo.FileIndexHigh != baseInfo.FileIndexHigh ||
+				targetInfo.FileIndexLow != baseInfo.FileIndexLow {
+				_ = syscall.CloseHandle(handle)
+				closeParent()
+				return nil, false
+			}
+			shortName, evidenced := directoryEntryShortNameFn(parent, baseComps[k], baseInfo.FileIndexHigh, baseInfo.FileIndexLow)
+			if !evidenced || shortName != targetComps[k] {
+				_ = syscall.CloseHandle(handle)
+				closeParent()
+				return nil, false
+			}
+		}
+		// The verified child becomes the parent of the next step; the previous
+		// parent closes only after the child is open and proven.
+		closeParent()
+		parent = handle
+		owned = true
+	}
+
+	// The candidate root must BE the bound root object: the bound handle's own
+	// volume serial and file index, not an ancestor's.
+	boundInfo, boundErr := dir.byHandleFileInformation()
+	candInfo, candErr := fileInformationOf(parent)
+	closeParent()
+	if boundErr != nil || candErr != nil ||
+		boundInfo.VolumeSerialNumber != candInfo.VolumeSerialNumber ||
+		boundInfo.FileIndexHigh != candInfo.FileIndexHigh ||
+		boundInfo.FileIndexLow != candInfo.FileIndexLow {
+		return nil, false
+	}
+	return suffix, true
+}
+
 // utf16ComponentLength reports the byte length one component occupies in a
 // UNICODE_STRING, and whether that length fits the 16-bit Length field (P84 F6).
 //
@@ -1054,6 +1512,17 @@ func openRelativeComponent(parent syscall.Handle, component string, directory, f
 		createOptions |= createOptionDirectoryFile
 	} else {
 		createOptions |= createOptionNonDirectoryFile
+		// R-2 (CI windows go1.22.12 regression): a file leaf is opened with
+		// FILE_SYNCHRONOUS_IO_NONALERT so the file object is synchronous. Measured
+		// on go1.22.12: a synchronous ReadFile (no OVERLAPPED structure) answers
+		// ERROR_INVALID_PARAMETER (87) on an asynchronous file object - the failure
+		// the repo's own CI toolchain hit once the P84 walk replaced path-based
+		// opens. Directories stay asynchronous on purpose: they are only enumerated
+		// through readDirNames (GetFileInformationByHandleEx), which is synchronous
+		// by API and unaffected. Measured locally with go1.22.12 and go1.27.0: the
+		// flag makes the go1.22.12 synchronous ReadFile and the go1.27.0 OVERLAPPED
+		// read both succeed on the same handle.
+		createOptions |= createOptionSynchronousIONonAlert
 	}
 	// P84 T4 fix round 2: the access bits are explicit (see the access constants
 	// above). A directory component is opened to be LISTED and identified, the leaf

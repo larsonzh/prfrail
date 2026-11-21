@@ -1141,3 +1141,546 @@ func TestP84W11EmbeddedNULUnitInDeclaredNameIsRefused(t *testing.T) {
 		}
 	})
 }
+
+// p84ShortRootAlias manufactures a real 8.3 short name for one temp directory and
+// reports the directory's short spelling. The alias is per-file (fsutil file
+// setshortname), never a volume policy change, and it dies with the directory.
+// ok=false means the host cannot set one and the caller must skip - a skip is
+// never read as a pass (R-1 fixture discipline).
+func p84ShortRootAlias(t *testing.T, dir string) (string, bool) {
+	t.Helper()
+	if output, err := exec.Command("fsutil", "file", "setshortname", dir, "R1PRO~1").CombinedOutput(); err != nil {
+		t.Logf("setshortname unavailable on this host: %v (%s)", err, strings.TrimSpace(string(output)))
+		return "", false
+	}
+	shortPath, err := p84ShortPathName(dir)
+	if err != nil || shortPath == dir {
+		t.Logf("the volume produced no short spelling for %s: %v", dir, err)
+		return "", false
+	}
+	return shortPath, true
+}
+
+// p84ShortPathName reports the 8.3 short spelling of one existing path.
+func p84ShortPathName(path string) (string, error) {
+	ptr, err := syscall.UTF16PtrFromString(path)
+	if err != nil {
+		return "", err
+	}
+	buffer := make([]uint16, 4096)
+	proc := syscall.NewLazyDLL("kernel32.dll").NewProc("GetShortPathNameW")
+	written, _, callErr := proc.Call(uintptr(unsafe.Pointer(ptr)), uintptr(unsafe.Pointer(&buffer[0])), uintptr(len(buffer)))
+	if written == 0 {
+		if callErr == nil {
+			callErr = syscall.EINVAL
+		}
+		return "", callErr
+	}
+	return syscall.UTF16ToString(buffer[:written]), nil
+}
+
+// TestP84W12ShortAliasRootPrefixIsAdmitted pins the R-1 fallback through the
+// production entry: a junction whose stored target spells the bound root's own
+// path through a REAL 8.3 short-name alias (the CI windows runner shape,
+// RUNNER~1 vs runneradmin) must be admitted and read back the bound bytes.
+//
+// The fixture manufactures its own short alias at runtime (fsutil file
+// setshortname on the temp root, a per-file alias and never a volume policy
+// change). A host where setshortname is unavailable skips - a skip is registered,
+// never counted as a pass, and the CI windows runner plus this host both execute
+// the real leg.
+//
+// Mutation check: deleting the boundRelativeSuffixShortAlias fallback from
+// reparseTargetRelativeSuffix turns the admission assertion red on the same
+// fixture (the byte comparison refuses the short spelling).
+func TestP84W12ShortAliasRootPrefixIsAdmitted(t *testing.T) {
+	root := t.TempDir()
+	bound := filepath.Join(root, "D")
+	inside := filepath.Join(bound, "sub")
+	if err := os.MkdirAll(inside, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(inside, "f"), []byte("inside"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	shortRoot, ok := p84ShortRootAlias(t, root)
+	if !ok {
+		t.Skipf("this host cannot set an 8.3 short name for the temp root; the skip is not evidence")
+	}
+
+	dir, err := OpenBoundDir(bound)
+	if err != nil {
+		t.Fatalf("bind the directory: %v", err)
+	}
+	defer func() { _ = dir.Close() }()
+
+	link := filepath.Join(bound, "j")
+	if output, err := exec.Command("cmd", "/c", "mklink", "/J", link, filepath.Join(shortRoot, "D", "sub")).CombinedOutput(); err != nil {
+		t.Fatalf("create the short-spelled junction: %v (%s)", err, output)
+	}
+	t.Cleanup(func() { _ = os.Remove(link) })
+
+	file, err := OpenBoundDirFile(dir, `j\f`, 1<<20)
+	if err != nil {
+		t.Fatalf("a short-alias-spelled in-bound junction must be admitted, got %v", err)
+	}
+	data, truncated, err := file.ReadAll()
+	_ = file.Close()
+	if err != nil || truncated || string(data) != "inside" {
+		t.Fatalf("the short-alias-spelled target must read the bound bytes, got %q truncated=%v err=%v", data, truncated, err)
+	}
+}
+
+// TestP84W12AliasBranchRefusesDifferentRecord pins the alias admission's refusal
+// of a short-alias prefix whose divergent component names a DIFFERENT object than
+// the bound root's own component (a plain sibling directory name). The shape is
+// refused by the admission machinery as a whole: the per-level same-record
+// comparison, the same-entry short-name evidence and the final candidate-root
+// identity comparison overlap for this shape (a divergent component that fails
+// the same-record test also fails the same-entry evidence, which is bound to the
+// record), so no single-check mutation discriminates, and the final comparison's
+// refusal side is unreachable through a static fixture by construction. The test
+// therefore pins the COMBINED refusal; the same-entry evidence's own refusal is
+// pinned by the case-variant test, the reparse check's by the reparse test, and
+// the final comparison's admission side by the W12 positive test.
+//
+// Mutation check (executed, see the slice record): removing the divergent-level
+// proof block and the final identity comparison together turns this test red
+// (the sibling name is admitted).
+func TestP84W12AliasBranchRefusesDifferentRecord(t *testing.T) {
+	root := t.TempDir()
+	bound := filepath.Join(root, "D")
+	other := filepath.Join(root, "E")
+	if err := os.MkdirAll(bound, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.MkdirAll(other, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	shortRoot, ok := p84ShortRootAlias(t, root)
+	if !ok {
+		t.Skipf("this host cannot set an 8.3 short name for the temp root; the skip is not evidence")
+	}
+	dir, err := OpenBoundDir(bound)
+	if err != nil {
+		t.Fatalf("bind the directory: %v", err)
+	}
+	defer func() { _ = dir.Close() }()
+	base, err := dir.currentName()
+	if err != nil {
+		t.Fatalf("derive the bound name: %v", err)
+	}
+	target := filepath.Join(shortRoot, "E", "sub")
+	if suffix, ok := boundRelativeSuffixShortAlias(dir, base, target); ok || suffix != nil {
+		t.Fatalf("a candidate root that is not the bound object must be refused, got suffix=%q ok=%v", suffix, ok)
+	}
+}
+
+// TestP84W12AliasBranchRefusesReparseComponent pins that a short-alias prefix
+// whose ancestor chain crosses a junction is refused - the candidate-root walk
+// must never follow a reparse point, and a junction leading to the RIGHT tree
+// stays refused because the redirect itself is unverified.
+//
+// Honest scope note (per the review correction): through the helper's
+// (suffix, ok) result the per-level reparse check cannot be isolated from the
+// overlapping same-entry evidence and identity checks (under the follow-swap
+// mutation alone the fixture stays refused by the evidence mismatch, which is
+// registered in the slice record). The test therefore pins the COMBINED refusal
+// of this shape; the discriminating mutation is the follow-swap combined with the
+// wholesale proof removal (the M2C” shape in the slice record), which admits the
+// fixture. The reparse check fires before the other proofs by construction -
+// every component opens with FILE_OPEN_REPARSE_POINT and the reparse attribute
+// refuses immediately.
+//
+// Mutation check (executed, see the slice record): the follow-swap plus the
+// wholesale proof removal turns this test red (the junctioned candidate root is
+// admitted); the follow-swap alone does not, because the evidence still refuses.
+func TestP84W12AliasBranchRefusesReparseComponent(t *testing.T) {
+	root := t.TempDir()
+	real := filepath.Join(root, "real")
+	bound := filepath.Join(real, "D")
+	if err := os.MkdirAll(bound, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if output, err := exec.Command("cmd", "/c", "mklink", "/J", filepath.Join(root, "lnk"), real).CombinedOutput(); err != nil {
+		t.Skipf("this host cannot create a junction: %v (%s)", err, output)
+	}
+	t.Cleanup(func() { _ = os.Remove(filepath.Join(root, "lnk")) })
+	shortRoot, ok := p84ShortRootAlias(t, root)
+	if !ok {
+		t.Skipf("this host cannot set an 8.3 short name for the temp root; the skip is not evidence")
+	}
+	dir, err := OpenBoundDir(bound)
+	if err != nil {
+		t.Fatalf("bind the directory: %v", err)
+	}
+	defer func() { _ = dir.Close() }()
+	base, err := dir.currentName()
+	if err != nil {
+		t.Fatalf("derive the bound name: %v", err)
+	}
+	target := filepath.Join(shortRoot, "lnk", "D", "sub")
+	if suffix, ok := boundRelativeSuffixShortAlias(dir, base, target); ok || suffix != nil {
+		t.Fatalf("a candidate root crossing an unverified reparse point must be refused, got suffix=%q ok=%v", suffix, ok)
+	}
+}
+
+// TestP84W12AliasBranchRefusesCaseVariant pins that a same-record spelling is not
+// enough: a case-variant component shares the file record with the bound root's
+// own component (the volume is case-insensitive), but the case-only gate refuses
+// it before any short-name evidence, so the divergence never enters short-name
+// admission - the W1 case discipline is preserved.
+//
+// Mutation note: the M3 record (removing the same-entry short-name evidence) is
+// HISTORICAL - with the case-only gate the fixture refuses before the evidence,
+// so M3 no longer discriminates this case. The evidence gate alone is now pinned
+// by TestP84W12AliasBranchRefusesMissingEntryEvidence (the seam-injected case).
+func TestP84W12AliasBranchRefusesCaseVariant(t *testing.T) {
+	root := t.TempDir()
+	bound := filepath.Join(root, "D")
+	if err := os.MkdirAll(filepath.Join(bound, "sub"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	dir, err := OpenBoundDir(bound)
+	if err != nil {
+		t.Fatalf("bind the directory: %v", err)
+	}
+	defer func() { _ = dir.Close() }()
+	base, err := dir.currentName()
+	if err != nil {
+		t.Fatalf("derive the bound name: %v", err)
+	}
+	if !strings.HasSuffix(base, `\D`) {
+		t.Fatalf("the fixture needs the bound root to end in a distinct component, got %q", base)
+	}
+	target := filepath.Join(root, "d", "sub")
+	if suffix, ok := boundRelativeSuffixShortAlias(dir, base, target); ok || suffix != nil {
+		t.Fatalf("a case-variant spelling is not an 8.3 alias and must be refused, got suffix=%q ok=%v", suffix, ok)
+	}
+}
+
+// TestP84W12AliasBranchRefusesMissingEntryEvidence pins the evidence gate alone:
+// the same-object preconditions hold for real - a genuine 8.3 alias, a non-case
+// divergence, and the candidate-root walk proving the same file record - and ONLY
+// the same-entry short-name evidence is missing. The absence is injected through
+// the production seam (directoryEntryShortNameFn) because NTFS cannot be made to
+// report a missing short name for a real alias. The current implementation must
+// refuse; removing only the evidence gate admits the fixture.
+//
+// Mutation check (executed, see the slice record): deleting the evidence gate
+// from boundRelativeSuffixShortAlias turns this test red (the alias is admitted
+// on the same-record proof alone).
+func TestP84W12AliasBranchRefusesMissingEntryEvidence(t *testing.T) {
+	root := t.TempDir()
+	bound := filepath.Join(root, "D")
+	if err := os.MkdirAll(filepath.Join(bound, "sub"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	shortRoot, ok := p84ShortRootAlias(t, root)
+	if !ok {
+		t.Skipf("this host cannot set an 8.3 short name for the temp root; the skip is not evidence")
+	}
+	dir, err := OpenBoundDir(bound)
+	if err != nil {
+		t.Fatalf("bind the directory: %v", err)
+	}
+	defer func() { _ = dir.Close() }()
+	base, err := dir.currentName()
+	if err != nil {
+		t.Fatalf("derive the bound name: %v", err)
+	}
+
+	original := directoryEntryShortNameFn
+	directoryEntryShortNameFn = func(syscall.Handle, string, uint32, uint32) (string, bool) {
+		return "", false
+	}
+	t.Cleanup(func() { directoryEntryShortNameFn = original })
+
+	target := filepath.Join(shortRoot, "D", "sub")
+	if suffix, ok := boundRelativeSuffixShortAlias(dir, base, target); ok || suffix != nil {
+		t.Fatalf("a divergence without the same-entry short-name evidence must be refused, got suffix=%q ok=%v", suffix, ok)
+	}
+}
+
+// TestP84W12SeedIsFixedVolumeRoot pins the handle-based volume-root proof: a
+// handle to the volume root of a fixed local NTFS volume proves, while a handle
+// to an ordinary subdirectory never does (its file index is not the NTFS root
+// record).
+//
+// Mutation check (executed, see the slice record): deleting the root-record
+// comparison from seedIsFixedVolumeRoot turns the subdirectory assertion red.
+func TestP84W12SeedIsFixedVolumeRoot(t *testing.T) {
+	volumeRoot := filepath.VolumeName(t.TempDir()) + string(filepath.Separator)
+	if driveTypeOf(volumeRoot) != driveFixed {
+		t.Skipf("the temp volume is not a fixed local volume; the fallback refuses by design on this host")
+	}
+	rootHandle, err := syscall.CreateFile(
+		syscall.StringToUTF16Ptr(volumeRoot),
+		accessListOrRead|accessReadAttributes|accessSynchronize,
+		fileInformationShareAll, nil, syscall.OPEN_EXISTING,
+		fileFlagBackupSemantics|fileFlagOpenReparsePoint, 0)
+	if err != nil {
+		t.Fatalf("open the volume root: %v", err)
+	}
+	defer syscall.CloseHandle(rootHandle)
+	if !seedIsFixedVolumeRoot(rootHandle) {
+		t.Skipf("the temp volume is not an NTFS volume root by this proof; the fallback refuses by design on this host")
+	}
+
+	subdir, err := syscall.CreateFile(
+		syscall.StringToUTF16Ptr(t.TempDir()),
+		accessListOrRead|accessReadAttributes|accessSynchronize,
+		fileInformationShareAll, nil, syscall.OPEN_EXISTING,
+		fileFlagBackupSemantics|fileFlagOpenReparsePoint, 0)
+	if err != nil {
+		t.Fatalf("open a subdirectory: %v", err)
+	}
+	defer syscall.CloseHandle(subdir)
+	if seedIsFixedVolumeRoot(subdir) {
+		t.Fatal("an ordinary subdirectory handle must not prove as the volume root")
+	}
+}
+
+// TestP84W12NtfsRootRecordOf pins the pure 48-bit root-record judgment (Plan A):
+// the MFT segment reference is 16 sequence bits in the HIGH 16 bits of the high
+// word plus the 48-bit record number below them, so only
+// high&0xFFFF == 0 && low == 5 is the root record. Record 0x1_0000_0005 (record
+// bits non-zero in the high word) must refuse; the measured development-volume
+// shape (high = 0x50000, sequence bits only, low = 5) must admit.
+//
+// Mutation check (executed, see the slice record): deleting the high-word mask
+// from ntfsRootRecordOf turns the 0x1_0000_0005 assertion red.
+func TestP84W12NtfsRootRecordOf(t *testing.T) {
+	cases := []struct {
+		name string
+		high uint32
+		low  uint32
+		want bool
+	}{
+		{name: "root-record", high: 0x00000000, low: 5, want: true},
+		{name: "measured-development-volume-root", high: 0x00050000, low: 5, want: true},
+		{name: "sequence-bit-only", high: 0x00010000, low: 5, want: true},
+		// Record number 0x1_0000_0005: the low 16 bits of the high word carry the
+		// record bits, not the sequence - only the high 16 bits are sequence.
+		{name: "record-bit-in-high-word", high: 0x00000001, low: 5, want: false},
+		{name: "sequence-and-record-bits", high: 0x00010001, low: 5, want: false},
+		{name: "other-low-word", high: 0x00000000, low: 6, want: false},
+	}
+	for _, testCase := range cases {
+		t.Run(testCase.name, func(t *testing.T) {
+			if got := ntfsRootRecordOf(testCase.high, testCase.low); got != testCase.want {
+				t.Fatalf("ntfsRootRecordOf(%#x, %d) = %v, want %v", testCase.high, testCase.low, got, testCase.want)
+			}
+		})
+	}
+}
+
+// p84DirEntryBuffer builds one FILE_ID_BOTH_DIR_INFORMATION record in an
+// 8-byte-padded byte buffer for the focused scanner assertions. The FileName
+// range is written WITHOUT a terminator (FileNameLength is authoritative), and
+// the ShortName range is written exactly as many units as declared - variants
+// mutate the buffer afterwards.
+func p84DirEntryBuffer(name, shortName string, fileID uint64, next uint32) []byte {
+	// utf16.Encode returns exactly the code units of the name, no terminator:
+	// FileNameLength and ShortNameLength are authoritative, so nothing is
+	// stripped here (the terminal-NUL variant writes the NUL explicitly).
+	nameUnits := utf16.Encode([]rune(name))
+	shortUnits := utf16.Encode([]rune(shortName))
+	size := fileIDBothDirInfoFileNameOffset + len(nameUnits)*2
+	padded := (size + 7) &^ 7
+	buffer := make([]byte, padded)
+	binary.LittleEndian.PutUint32(buffer[0:4], next)
+	binary.LittleEndian.PutUint32(buffer[60:64], uint32(len(nameUnits)*2))
+	if len(shortUnits) > 0 {
+		buffer[68] = uint8(len(shortUnits) * 2)
+	}
+	for i, unit := range shortUnits {
+		binary.LittleEndian.PutUint16(buffer[70+i*2:72+i*2], unit)
+	}
+	binary.LittleEndian.PutUint64(buffer[96:104], fileID)
+	for i, unit := range nameUnits {
+		binary.LittleEndian.PutUint16(buffer[fileIDBothDirInfoFileNameOffset+i*2:fileIDBothDirInfoFileNameOffset+i*2+2], unit)
+	}
+	return buffer
+}
+
+// TestP84W12DirectoryEntryScannerValidation pins the focused hardening of the
+// directory-entry evidence scanner (scanFileIDBothDirInfoForShortName): a
+// malformed buffer - an invalid NextEntryOffset, an illegal UTF-16 length, or a
+// NUL inside a declared name range - refuses the admission fail-closed instead
+// of being parsed on a guess, while the ordinary shapes still evidence.
+//
+// Mutation checks: deleting the NextEntryOffset validation, the length checks,
+// or the embedded-NUL scans each turn the corresponding refusal assertion red.
+func TestP84W12DirectoryEntryScannerValidation(t *testing.T) {
+	const wantHigh, wantLow uint32 = 0x00000012, 0x00000034
+	fileID := uint64(wantHigh)<<32 | uint64(wantLow)
+
+	t.Run("valid-entry-with-short-name", func(t *testing.T) {
+		buffer := p84DirEntryBuffer("D", "R1PRO~1", fileID, 0)
+		shortName, evidenced, refuse := scanFileIDBothDirInfoForShortName(buffer, "D", wantHigh, wantLow)
+		if refuse || !evidenced || shortName != "R1PRO~1" {
+			t.Fatalf("the matching entry must evidence its short name, got %q evidenced=%v refuse=%v", shortName, evidenced, refuse)
+		}
+	})
+
+	t.Run("valid-entry-without-short-name", func(t *testing.T) {
+		buffer := p84DirEntryBuffer("D", "", fileID, 0)
+		shortName, evidenced, refuse := scanFileIDBothDirInfoForShortName(buffer, "D", wantHigh, wantLow)
+		if refuse || evidenced || shortName != "" {
+			t.Fatalf("an entry without a short name is no evidence, got %q evidenced=%v refuse=%v", shortName, evidenced, refuse)
+		}
+	})
+
+	t.Run("terminal-nul-in-short-name-range-is-the-terminator", func(t *testing.T) {
+		buffer := p84DirEntryBuffer("D", "R1PRO~1", fileID, 0)
+		// Count the terminator in the declared range, the N14 shape.
+		buffer[68] = 16
+		binary.LittleEndian.PutUint16(buffer[70+14:72+14], 0)
+		shortName, evidenced, refuse := scanFileIDBothDirInfoForShortName(buffer, "D", wantHigh, wantLow)
+		if refuse || !evidenced || shortName != "R1PRO~1" {
+			t.Fatalf("a terminal NUL unit is the terminator, got %q evidenced=%v refuse=%v", shortName, evidenced, refuse)
+		}
+	})
+
+	t.Run("embedded-nul-in-short-name-range-refuses", func(t *testing.T) {
+		buffer := p84DirEntryBuffer("D", "R1PRO~1", fileID, 0)
+		binary.LittleEndian.PutUint16(buffer[70+4:72+4], 0)
+		if shortName, evidenced, refuse := scanFileIDBothDirInfoForShortName(buffer, "D", wantHigh, wantLow); !refuse {
+			t.Fatalf("an embedded NUL unit in the declared short-name range must refuse, got %q evidenced=%v refuse=%v", shortName, evidenced, refuse)
+		}
+	})
+
+	t.Run("embedded-nul-in-file-name-range-refuses", func(t *testing.T) {
+		buffer := p84DirEntryBuffer("DD", "R1PRO~1", fileID, 0)
+		// The NUL must sit INSIDE the declared two-unit name range.
+		binary.LittleEndian.PutUint16(buffer[fileIDBothDirInfoFileNameOffset+2:fileIDBothDirInfoFileNameOffset+4], 0)
+		if shortName, evidenced, refuse := scanFileIDBothDirInfoForShortName(buffer, "DD", wantHigh, wantLow); !refuse {
+			t.Fatalf("an embedded NUL unit in the declared file-name range must refuse, got %q evidenced=%v refuse=%v", shortName, evidenced, refuse)
+		}
+	})
+
+	t.Run("odd-file-name-length-refuses", func(t *testing.T) {
+		buffer := p84DirEntryBuffer("D", "R1PRO~1", fileID, 0)
+		binary.LittleEndian.PutUint32(buffer[60:64], 3)
+		if shortName, evidenced, refuse := scanFileIDBothDirInfoForShortName(buffer, "D", wantHigh, wantLow); !refuse {
+			t.Fatalf("an odd FileNameLength must refuse, got %q evidenced=%v refuse=%v", shortName, evidenced, refuse)
+		}
+	})
+
+	t.Run("zero-file-name-length-refuses", func(t *testing.T) {
+		buffer := p84DirEntryBuffer("D", "R1PRO~1", fileID, 0)
+		binary.LittleEndian.PutUint32(buffer[60:64], 0)
+		if shortName, evidenced, refuse := scanFileIDBothDirInfoForShortName(buffer, "D", wantHigh, wantLow); !refuse {
+			t.Fatalf("a zero FileNameLength must refuse, got %q evidenced=%v refuse=%v", shortName, evidenced, refuse)
+		}
+	})
+
+	t.Run("record-past-buffer-refuses", func(t *testing.T) {
+		buffer := p84DirEntryBuffer("D", "R1PRO~1", fileID, 0)
+		binary.LittleEndian.PutUint32(buffer[60:64], uint32(len(buffer)+16))
+		if shortName, evidenced, refuse := scanFileIDBothDirInfoForShortName(buffer, "D", wantHigh, wantLow); !refuse {
+			t.Fatalf("a declared record past the buffer must refuse, got %q evidenced=%v refuse=%v", shortName, evidenced, refuse)
+		}
+	})
+
+	t.Run("unaligned-next-entry-offset-refuses", func(t *testing.T) {
+		buffer := p84DirEntryBuffer("D", "R1PRO~1", fileID, 105)
+		if shortName, evidenced, refuse := scanFileIDBothDirInfoForShortName(buffer, "D", wantHigh, wantLow); !refuse {
+			t.Fatalf("an unaligned NextEntryOffset must refuse, got %q evidenced=%v refuse=%v", shortName, evidenced, refuse)
+		}
+	})
+
+	t.Run("next-entry-offset-shorter-than-a-header-refuses", func(t *testing.T) {
+		buffer := p84DirEntryBuffer("D", "R1PRO~1", fileID, 8)
+		if shortName, evidenced, refuse := scanFileIDBothDirInfoForShortName(buffer, "D", wantHigh, wantLow); !refuse {
+			t.Fatalf("a NextEntryOffset shorter than one header must refuse, got %q evidenced=%v refuse=%v", shortName, evidenced, refuse)
+		}
+	})
+
+	t.Run("next-entry-offset-past-buffer-refuses", func(t *testing.T) {
+		buffer := p84DirEntryBuffer("D", "R1PRO~1", fileID, 0)
+		binary.LittleEndian.PutUint32(buffer[0:4], uint32(len(buffer)+104))
+		if shortName, evidenced, refuse := scanFileIDBothDirInfoForShortName(buffer, "D", wantHigh, wantLow); !refuse {
+			t.Fatalf("a NextEntryOffset past the buffer must refuse, got %q evidenced=%v refuse=%v", shortName, evidenced, refuse)
+		}
+	})
+
+	t.Run("chain-second-entry-evidenced", func(t *testing.T) {
+		first := p84DirEntryBuffer("A", "", 0, uint32(len(p84DirEntryBuffer("A", "", 0, 0))))
+		second := p84DirEntryBuffer("D", "R1PRO~1", fileID, 0)
+		buffer := append(first, second...)
+		shortName, evidenced, refuse := scanFileIDBothDirInfoForShortName(buffer, "D", wantHigh, wantLow)
+		if refuse || !evidenced || shortName != "R1PRO~1" {
+			t.Fatalf("the chain must reach the second entry, got %q evidenced=%v refuse=%v", shortName, evidenced, refuse)
+		}
+	})
+
+	t.Run("file-id-low-half-mismatch-refuses", func(t *testing.T) {
+		// A matched entry whose record belongs to another object is a contradiction,
+		// not a "not found": the scan must refuse instead of looking further.
+		buffer := p84DirEntryBuffer("D", "R1PRO~1", fileID^1, 0)
+		if shortName, evidenced, refuse := scanFileIDBothDirInfoForShortName(buffer, "D", wantHigh, wantLow); !refuse || evidenced {
+			t.Fatalf("a matching entry bound to another object must refuse, got %q evidenced=%v refuse=%v", shortName, evidenced, refuse)
+		}
+	})
+
+	t.Run("file-id-high-half-mismatch-refuses", func(t *testing.T) {
+		// Only the high 32 bits differ: a comparison that degraded to the low half
+		// would admit this buffer.
+		buffer := p84DirEntryBuffer("D", "R1PRO~1", fileID^uint64(1)<<32, 0)
+		if shortName, evidenced, refuse := scanFileIDBothDirInfoForShortName(buffer, "D", wantHigh, wantLow); !refuse || evidenced {
+			t.Fatalf("a high-half file id mismatch must refuse, got %q evidenced=%v refuse=%v", shortName, evidenced, refuse)
+		}
+	})
+
+	t.Run("empty-buffer-refuses", func(t *testing.T) {
+		if shortName, evidenced, refuse := scanFileIDBothDirInfoForShortName(nil, "D", wantHigh, wantLow); !refuse || evidenced {
+			t.Fatalf("an empty buffer must refuse, got %q evidenced=%v refuse=%v", shortName, evidenced, refuse)
+		}
+	})
+
+	t.Run("cross-record-name-range-refuses", func(t *testing.T) {
+		// A non-last record is bounded by its own NextEntryOffset: a name range that
+		// reaches one unit past that boundary must refuse. The padding is filled with
+		// a non-NUL value, the range stops before the next record's zero bytes, and
+		// the next record is itself a valid chained record, so ONLY the record bound
+		// can refuse this buffer: deleting it lets the scan walk the whole chain and
+		// return no evidence instead.
+		first := p84DirEntryBuffer("DD", "R1PRO~1", fileID, uint32(len(p84DirEntryBuffer("DD", "R1PRO~1", fileID, 0))))
+		for i := fileIDBothDirInfoFileNameOffset + 4; i < len(first); i++ {
+			first[i] = 0x11
+		}
+		second := p84DirEntryBuffer("Z", "", 0, uint32(len(first)))
+		third := p84DirEntryBuffer("Q", "", 0, 0)
+		buffer := append(append(first, second...), third...)
+		binary.LittleEndian.PutUint32(buffer[60:64], 10)
+		if shortName, evidenced, refuse := scanFileIDBothDirInfoForShortName(buffer, "D", wantHigh, wantLow); !refuse || evidenced {
+			t.Fatalf("a name range crossing its record boundary must refuse, got %q evidenced=%v refuse=%v", shortName, evidenced, refuse)
+		}
+	})
+
+	t.Run("unaligned-but-in-buffer-offset-refuses", func(t *testing.T) {
+		// The unaligned NextEntryOffset (113) is inside the buffer, leaves a full
+		// header behind it, and still contains this record's declared name range, so
+		// only the alignment rule can refuse this buffer: removing it would let the
+		// scan reach the planted valid entry at 113 and evidence.
+		first := p84DirEntryBuffer("A", "", 0, 113)
+		second := p84DirEntryBuffer("D", "R1PRO~1", fileID, 0)
+		buffer := make([]byte, 113+len(second))
+		copy(buffer, first)
+		copy(buffer[113:], second)
+		if shortName, evidenced, refuse := scanFileIDBothDirInfoForShortName(buffer, "D", wantHigh, wantLow); !refuse || evidenced {
+			t.Fatalf("an unaligned NextEntryOffset inside the buffer must refuse, got %q evidenced=%v refuse=%v", shortName, evidenced, refuse)
+		}
+	})
+
+	t.Run("embedded-nul-in-non-matching-entry-refuses", func(t *testing.T) {
+		// Every entry's declared ranges are validated, not only the matching one.
+		buffer := p84DirEntryBuffer("A", "R1PRO~1", 0, 0)
+		binary.LittleEndian.PutUint16(buffer[70+4:72+4], 0)
+		if shortName, evidenced, refuse := scanFileIDBothDirInfoForShortName(buffer, "D", wantHigh, wantLow); !refuse || evidenced {
+			t.Fatalf("a malformed non-matching entry must refuse the whole batch, got %q evidenced=%v refuse=%v", shortName, evidenced, refuse)
+		}
+	})
+}
