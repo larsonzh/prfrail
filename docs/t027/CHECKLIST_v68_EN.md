@@ -12,7 +12,7 @@ Generated: 2026-11-22. HEAD = `509b01b`; directive = v1.71; three CI runs: first
 - (2) Section 2 becomes the P84 fact pack (`PARTIALLY CLOSED`, three commits and three CI runs, R = 3, D = 0, DR-16 / DR-17).
 - (3) Section 3 appends one P84 row (twenty rows from v67 become twenty-one).
 - (4) Section 4 queue update: P84 leaves the queue; next = **P85 `SECURITY-PROOF-SUBSYSTEM`**; then = **the pre-S2 re-evaluation (S-G1 / S-G8)**, then the post-S2 re-evaluation items (the S-G5 second step plus S-G7); the tier-3 `GATES-PERF-ASSESS` / `GATES-EXEMPT` slots stay.
-- (5) Section 5 observations: no new OB or ADR this version; DR max = **17**; the P84 residuals N13-UNC and the evidence-attribution Low item are registered as deferred to a later slice with an undetermined landing.
+- (5) Section 5 observations: no new OB or ADR this version; DR max = **17**; the P84 residuals N13-UNC and the evidence-attribution Low item are registered as deferred to P86 (established, awaiting a named start).
 - (6) Section 6 pending rulings: the next ruling item is **the P85 start time** (this round does not name the start).
 - (7) Appendix A rotated: the duty hand-over is now **P83 residuals to the partial P84 closure / P85**; sections 10 and 11 follow.
 
@@ -44,7 +44,7 @@ Fixed `tmp` assertion: the top level is `.gitkeep` plus `gates-cache`; `gates-ca
 
 - **Slice / size**: `BOUNDDIR-RESIDUAL` (P84; remediates P83's T4 / T5#4 residuals and closes F1 / F4) / **M**; controller `DeepSeek V4 Pro (deepseek)` High (switched from Flash by the user's ruling of 2026-11-21); the user named the start on 2026-11-21 and ruled several times mid-slice (the three scheduling items, the narrow re-review, Plan A, the corrections, Plan I).
 - **Goal**: remediate P83 report section 8's P84-d and P84-e verbatim - make artifact enumeration and descendant opens provable on Windows (T4); make the generation-to-proof update a recoverable transaction (T5#4).
-- **Verdict**: **`PARTIALLY CLOSED`** - **T5#4 (the F4 residual) is fully closed** (predecessor chain / idempotent batch / in-lock write under RunLocked / the three run+consumer guards; C1-C18 counterexamples); **T4 (the F1 residual) is largely closed** (chain walk / FSCTL ownership / Ordinal / root semantics / in-bound proof across an intermediate reparse; W1-W11 counterexamples); **residuals = N13-UNC** (the UNC share root's two canonical spellings are falsely rejected as unequal, a deterministic in-bound false rejection in the fail-closed direction, an availability defect) plus **one evidence-attribution Low item** (the W10 mutation annotation contradicts the r3 wording), **deferred to a later slice (landing undetermined)**. **It must not be read as "closed" or "security-closed".**
+- **Verdict**: **`PARTIALLY CLOSED`** - **T5#4 (the F4 residual) is fully closed** (predecessor chain / idempotent batch / in-lock write under RunLocked / the three run+consumer guards; C1-C18 counterexamples); **T4 (the F1 residual) is largely closed** (chain walk / FSCTL ownership / Ordinal / root semantics / in-bound proof across an intermediate reparse; W1-W11 counterexamples); **residuals = N13-UNC** (the UNC share root's two canonical spellings are falsely rejected as unequal, a deterministic in-bound false rejection in the fail-closed direction, an availability defect) plus **one evidence-attribution Low item** (the W10 mutation annotation contradicts the r3 wording), **deferred to P86 (established separately on 2026-11-22 by the user's ruling, not folded into P85)**. **It must not be read as "closed" or "security-closed".**
 - **Contract impact**: T4 and T5#4 were both judged **DOES-NOT-TOUCH / IN-BOUNDARY**; `CONTRACTS{,_EN}`, schemas, fixtures and `go.mod` are unchanged.
 - **Review chain**: (1) plan revisions 1 to 6 plus contract triage (`deep-reasoner` + `DeepSeek V4 Pro` Max), then (2) eleven implementation rounds and (3) eight test rounds (`prfrail-implementer` / `prfrail-tester` + `DeepSeek V4.1 Flash`), (5) 2/2 exhausted (r1 PASS WITH FIXES then r2 PASS), (6) 2/3 (r1 FINDINGS then r2 PASS), (7) `GPT-6.2 Sol (copilot)` Max (blind 1 + final 1 + re-review 3 + narrow re-review 1, all FINDINGS; the narrow re-review is a budget exception, a direct user ruling and may not be cited as a precedent), then after the CI first-run red one extra **Plan A narrow review** (`GPT-6.2 Sol`, verdict RELEASE; it exceeds the (7) budget again, registered as an OB-37 addendum in `10-final-review-request.md` and may not be cited as a precedent), then (8)a, (9), (8)b, (8)c and (10).
 - **Accounting**: **R = 3** (one (5)-ring remediation re-run plus one (6)-ring remediation re-run plus one (7)-final remediation re-run; re-review-ring remediation does not count as R); **D = 0**; probes **0**; batch-assist GLM 2 times.
@@ -58,7 +58,7 @@ Fixed `tmp` assertion: the top level is `.gitkeep` plus `gates-cache`; `gates-ca
 ### Appendix A: duty hand-over (this version: **new hand-over**)
 
 - **Historical hand-over** (the first instance traces to P75 O-7): the inconsistent inline wording at `s1-exit.md:52` was discharged by P76 change 1 plus the S-G2 correction (`0f80c1e`).
-- **This version's hand-over**: **new hand-over** - P83's five residuals are partially discharged: **P84 is partially closed** (N13-UNC plus the evidence-attribution Low item are deferred to a later slice with an undetermined landing); **P85 (T2 / T3 / T8a)** keeps carrying F3 / F6 / F8; P85 needs a user-named start and must change the protocol first.
+- **This version's hand-over**: **new hand-over** - P83's five residuals are partially discharged: **P84 is partially closed** (N13-UNC plus the evidence-attribution Low item are deferred to P86, established); **P85 (T2 / T3 / T8a)** keeps carrying F3 / F6 / F8; P85 needs a user-named start and must change the protocol first.
 - **Convention note**: in use since v59; the landing slice's entry must carry an admission-condition facet (the "Status" and "Boundaries" fields of the P85 section already state it).
 
 ### Appendix B: AT-23 stage 2 status (unchanged)
@@ -137,6 +137,18 @@ Fixed `tmp` assertion: the top level is `.gitkeep` plus `gates-cache`; `gates-ca
 | Boundaries | close only the deferred parts of F3 / F6 / F8; do not touch F1 / F4; do not change the gate table, directive or CI |
 | Start condition | **the user must name it explicitly**; the first step is the contract-impact verdict and protocol-first change |
 
+**Parallel = P86 `BOUNDDIR-UNC-EQUIVALENCE` (carries P84's N13-UNC plus the evidence-attribution Low residual; the user must name the start; no dependency on P85, may run in parallel; **S**)**
+
+| Field | Content |
+|---|---|
+| Identifier | `BOUNDDIR-UNC-EQUIVALENCE` (ledger number **P86**; source = the N13-UNC plus evidence-attribution Low items in the P84 report section 8 and the user's ruling of 2026-11-22 that established it separately, not folded into P85) |
+| Contents | N13-UNC = the two canonical spellings of a UNC share root falsely rejected as unequal; W10 = the evidence-attribution Low item (the mutation annotation contradicts the r3 wording) |
+| Size | **S** (implementation type; a single equality form plus one evidence annotation) |
+| (7) budget | deep tier `GPT-6.2 Sol (copilot)`; 1 final review plus 3 re-reviews; one mandatory blind review (separately counted as +1); **the user's scheduling ruling of 2026-11-22, not a precedent** |
+| Dependencies | P84 partially closed (`509b01b`); no dependency on P85, may run in parallel; the user must name the start |
+| Boundaries | fix N13-UNC and W10 only; do not change the P85 scope (F3 / F6 / F8); do not change the gate table, directive or CI |
+| Start condition | **the user must name it explicitly**; it may be named in the same round or separately |
+
 **Then = the pre-S2 re-evaluation (S-G1 / S-G8)**
 
 - Prerequisite = S2 enforcement lands; the independent security review prerequisite was met by P79 and partially remediated by P83, so ADR-047's rollback clause no longer blocks.
@@ -171,7 +183,7 @@ Fixed `tmp` assertion: the top level is `.gitkeep` plus `gates-cache`; `gates-ca
 - Under discussion (9): `OB-19 / 21 / 52 / 53 / 57 / 58 / 59 / 61 / 75`.
 - Pending (1): `OB-69`. Non-terminal total **23** (13 plus 9 plus 1), matching this version's verification.
 - **DR register**: DR max = **17** (v68 adds DR-16: the P84 main commit `d597f1e` turned the CI windows leg deterministically red 26/26 with root causes R-2 + R-1, green on both legs after fix `32bf234`; and DR-17: `TestP84T5h4C7HistoryDepthIsFailClosed` flaked once locally and was not reproduced; both registered under DR boundary 1).
-- **P84 residual registration**: N13-UNC (the UNC share root's two canonical spellings falsely rejected as unequal, a deterministic in-bound false rejection in the fail-closed direction, an availability defect) plus the evidence-attribution Low item (the W10 mutation annotation contradicts the r3 wording) - **deferred to a later slice, landing undetermined** (whether they join the P85 boundary needs a user ruling).
+- **P84 residual registration**: N13-UNC (the UNC share root's two canonical spellings falsely rejected as unequal, a deterministic in-bound false rejection in the fail-closed direction, an availability defect) plus the evidence-attribution Low item (the W10 mutation annotation contradicts the r3 wording) - **deferred to P86 (established, awaiting a named start; established separately on 2026-11-22, not folded into P85)**.
 - **(7) budget caveat (P84 carry-over observation)**: the 1+3 budget, the blind +1 and the narrow re-review (budget exception) are direct user rulings and may not be cited as precedents; the extra Plan A narrow review exceeded the budget again (OB-37 addendum), with the carrier ratified as `GPT-6.2 Sol` and no new model; the (5) 2/2 and (6) 2/3 PASS verdicts bind the pre-remediation snapshot.
 - Mechanical readings: section 12.4 max OB = **139**; ADR max = **47**; DR max = **17**; pilot deferral max = the 25th instance.
 - **Removed this version**: none. **Flipped to disposed this version**: none.
@@ -181,7 +193,7 @@ Fixed `tmp` assertion: the top level is `.gitkeep` plus `gates-cache`; `gates-ca
 ## Section 6 pending user rulings
 
 - **The table is currently empty** (P84's close-out and scheduling rulings were made on 2026-11-21; the Plan I execution and the section 11.2 backfill landed with `509b01b`).
-- **Next ruling item (anticipated)**: **the P85 start time** (the slice name and priority are fixed; the user must name the start; this round does not name it).
+- **Next ruling item (anticipated)**: **the P85 start time** (the slice name and priority are fixed; the user must name the start; this round does not name it); **P86 also needs naming, in the same round or separately**.
 
 ---
 

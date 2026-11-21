@@ -94,7 +94,7 @@ Every transcript is archived under `docs/validation/evidence/P84-BOUNDDIR-RESIDU
 
 | Id | Deferred content | Source |
 |---|---|---|
-| none added | this slice adds no P85 payload; N13-UNC is an F1 residual while the P85 boundary holds F3 / F6 / F8 only, so whether to fold it in needs a user ruling | (7) narrow re-review |
+| none added | this slice adds no P85 payload; N13-UNC is an F1 residual while the P85 boundary holds F3 / F6 / F8 only, so whether to fold it in needs a user ruling; **user ruling of 2026-11-22: N13-UNC and W10 are established as P86 (not folded into P85)** | (7) narrow re-review |
 
 N12 (updating the evidence-pack MANIFEST description) is not a deferral; it lands with the ⑧b close-out.
 
@@ -234,6 +234,8 @@ docs/t027/REMAINING_SLICES.md	repo
 docs/t027/REMAINING_SLICES_EN.md	repo
 docs/validation/bounddir-residual.md	repo
 docs/validation/bounddir-residual_EN.md	repo
+docs/t027/CHECKLIST_v68.md	repo
+docs/t027/CHECKLIST_v68_EN.md	repo
 docs/validation/evidence/P84-BOUNDDIR-RESIDUAL/00-briefing.md	repo
 docs/validation/evidence/P84-BOUNDDIR-RESIDUAL/01-arch/01-arch-design.md	repo
 docs/validation/evidence/P84-BOUNDDIR-RESIDUAL/04-reviews/05-pre-review-r1.md	repo

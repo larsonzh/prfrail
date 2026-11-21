@@ -94,7 +94,7 @@
 
 | 编号 | 顺延内容 | 来源 |
 |---|---|---|
-| 无新增 | 本片不新增 P85 载荷；N13-UNC 属 F1 残余，P85 边界仅含 F3 / F6 / F8，是否并入须用户裁定 | ⑦ 收窄复审 |
+| 无新增 | 本片不新增 P85 载荷；N13-UNC 属 F1 残余，P85 边界仅含 F3 / F6 / F8，是否并入须用户裁定；**2026-11-22 用户裁定：N13-UNC + W10 另立 P86（不并入 P85）** | ⑦ 收窄复审 |
 
 N12（证据包 MANIFEST 描述更新）不属顺延项，由 ⑧b 收尾时一并落地。
 
@@ -234,6 +234,8 @@ docs/t027/REMAINING_SLICES.md	repo
 docs/t027/REMAINING_SLICES_EN.md	repo
 docs/validation/bounddir-residual.md	repo
 docs/validation/bounddir-residual_EN.md	repo
+docs/t027/CHECKLIST_v68.md	repo
+docs/t027/CHECKLIST_v68_EN.md	repo
 docs/validation/evidence/P84-BOUNDDIR-RESIDUAL/00-briefing.md	repo
 docs/validation/evidence/P84-BOUNDDIR-RESIDUAL/01-arch/01-arch-design.md	repo
 docs/validation/evidence/P84-BOUNDDIR-RESIDUAL/04-reviews/05-pre-review-r1.md	repo
