@@ -18,18 +18,18 @@ ProofRail 让 AI 在无人值守下安全地改代码、跑验证、出证据：
 
 ### 状态
 
-**防御性重构期（P39–P45）**（核对时点 2026-10-31；C6 预算已落盘，C1–C7 逐项攻克中；各项以 [docs/DEV_PLAN.md](docs/DEV_PLAN.md) 的任务状态为准）
+**S1 Exit 收口期（P76–P86；安全整改 F1–F8 收尾）**（核对时点 2026-11-22；各项以 [docs/DEV_PLAN.md](docs/DEV_PLAN.md) 的任务状态为准）
 
 | 能力 | 状态 |
 |---|---|
 | 离线 no-AI 链路（`init` / `validate` / `config explain` / `preview` / `approvals` / `interactions` / `cost report` / `secret` / `report`） | 可用 |
 | `ai check` 单请求 live availability probe | 可用（只证明可达性，不证明 AgentRunner enforcement 或 AT-23） |
 | `export`、`effects` / `diagnostics` | 部分可用（库级实现已具备，CLI 入口待后续切片） |
-| 受监督黑箱模式（supervised black-box） | 部分可用（显式风险确认 + 隔离 workspace + 人工监督 + 归还后全量扫描；只保证归还后产物，不保证工具、网络、费用或外部副作用） |
+| 受监督黑箱模式（supervised black-box） | 部分可用（AT-24 条件闭合、S-G2 通过；显式风险确认 + 隔离 workspace + 人工监督 + 归还后全量扇描；只保证归还后产物，不保证工具、网络、费用或外部副作用） |
 | `run` 执行 `code` / `build` / `verify` 任务链 | 未交付（当前只执行 noop-only 链，遇到可执行步骤 fail-close 并返回非零；T027 装配链已有可跑拒绝路径，持久预算已落盘） |
-| 正式 AI 执行（AgentRunner 真实候选腿） | 未交付（AT-23 未通过；C1–C7 与 N1–N4 已归档，P39 起逐项修复） |
+| 正式 AI 执行（AgentRunner 真实候选腿） | 未交付（AT-23 未通过、S-G1 不通过；安全整改 F2/F5/F7 已修复，F1/F4 已由 P84 / P86 全闭合，F3/F6/F8 待 P85） |
 | 完整统一 TUI / `serve` | 未交付 |
-| 正式发行包与安装 | 未交付 |
+| 正式发行包与安装 | 部分可用（GitHub Release `v0.1.0` 已绑定最终 ZIP 并复验、S-G3 通过；安装与分发方案仍见 INSTALLATION_PLAN） |
 
 本项目仍不是正式发行包。分域权威与文档导航见 [docs/DOCUMENTATION_PLAN.md](docs/DOCUMENTATION_PLAN.md)；
 执行顺序与任务状态见 [docs/DEV_PLAN.md](docs/DEV_PLAN.md)，就绪缺口见 [docs/ADR_REGISTER.md](docs/ADR_REGISTER.md)；
@@ -101,18 +101,18 @@ ProofRail enables AI to safely modify code, run validations, and produce evidenc
 
 ### Status
 
-**Defensive refactor period (P39–P45)** (checked 2026-10-31; C6 budget landed and C1–C7 under attack item by item; each row follows the task state in [docs/DEV_PLAN_EN.md](docs/DEV_PLAN_EN.md))
+**S1 exit close-out period (P76–P86; security remediation F1–F8 closing out)** (checked 2026-11-22; each row follows the task state in [docs/DEV_PLAN_EN.md](docs/DEV_PLAN_EN.md))
 
 | Capability | State |
 |---|---|
 | Offline no-AI path (`init` / `validate` / `config explain` / `preview` / `approvals` / `interactions` / `cost report` / `secret` / `report`) | available |
 | `ai check` single-request live availability probe | available (proves reachability only, not AgentRunner enforcement or AT-23) |
 | `export`, `effects` / `diagnostics` | partial (library level shipped; CLI entrypoints in later slices) |
-| Supervised black-box mode | partial (explicit risk acknowledgement + isolated workspace + human supervision + full post-return scan; warrants post-return artifacts only, not tools, network, cost or external effects) |
+| Supervised black-box mode | partial (AT-24 conditionally closed, S-G2 passed; explicit risk acknowledgement + isolated workspace + human supervision + full post-return scan; warrants post-return artifacts only, not tools, network, cost or external effects) |
 | `run` executing `code` / `build` / `verify` chains | not delivered (noop-only today; executable steps fail closed with a non-zero exit; the T027 assembly chain already has a runnable refusal path and the durable budget has landed) |
-| Formal AI execution (real AgentRunner candidate leg) | not delivered (AT-23 not passed; C1–C7 and N1–N4 are archived and fixed item by item from P39) |
+| Formal AI execution (real AgentRunner candidate leg) | not delivered (AT-23 not passed, S-G1 not passed; security remediation F2/F5/F7 fixed and F1/F4 fully closed by P84 / P86, with F3/F6/F8 awaiting P85) |
 | Complete unified TUI / `serve` | not delivered |
-| Production release package and installation | not delivered |
+| Production release package and installation | partial (GitHub Release `v0.1.0` binds the final ZIP and has been re-verified, S-G3 passed; installation and distribution decisions still in INSTALLATION_PLAN) |
 
 This is still not a production release package. See [docs/DOCUMENTATION_PLAN_EN.md](docs/DOCUMENTATION_PLAN_EN.md) for domain authorities and navigation;
 [docs/DEV_PLAN_EN.md](docs/DEV_PLAN_EN.md) for task state and [docs/ADR_REGISTER_EN.md](docs/ADR_REGISTER_EN.md) for readiness gaps;

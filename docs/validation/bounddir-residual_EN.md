@@ -98,6 +98,8 @@ Every transcript is archived under `docs/validation/evidence/P84-BOUNDDIR-RESIDU
 
 N12 (updating the evidence-pack MANIFEST description) is not a deferral; it lands with the ⑧b close-out.
 
+> **Time-point note (2026-11-22, P86 `BOUNDDIR-UNC-EQUIVALENCE`)**: the N13-UNC item and the evidence-attribution W10 **are closed by P86** (report `bounddir-unc-equivalence{,_EN}.md`), so F1 is fully closed from here on; this table is not rewritten retroactively (section 11.1) and this line only adds the timestamp.
+
 ## 9. Documentation sync
 
 | Object | Disposition |
