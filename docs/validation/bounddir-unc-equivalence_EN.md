@@ -128,7 +128,9 @@ Logs: `03-verification/build.txt`, `vet.txt`, `gate-selftest.txt`, `gate-{index,
 - Main commit `f1ae821`; first run **`44962802936`**, **success on both legs** (`Go windows-latest` / `Go ubuntu-latest`); windows leg: `ok github.com/larsonzh/prfrail/internal/evidence`, `SELFTEST: PASS 740/740`, `TOTAL_FAIL=0`; log payloads `03-verification/ci/run-44962802936-windows.log` / `-ubuntu.log`.
 - The first run predates the CI guard (no `-v`, so no PASS/SKIP lines); the guard round (precondition failures become hard failures under CI) was rerun with the fix commit.
 - Guard round first run **`44965434402`** (commit `a5ef122`): the **windows leg went red** (`TestP86UncShareRootProductionEntry` precondition: the CI host derives the share root **without** the trailing separator, `\\localhost\<share>`, while the fixture assumed the separator form), the ubuntu leg succeeded => registered as **DR-18**.
-- Fix: the fixture now takes the OTHER canonical spelling as the stored target based on the observed handle spelling (trailing handle => bare target; bare handle => trailing target), so both host shapes enter the N13 equality branch; the fix round readings follow.
+- Fix: the fixture now takes the OTHER canonical spelling as the stored target based on the observed handle spelling (trailing handle => bare target; bare handle => trailing target), so both host shapes enter the N13 equality branch.
+- Fix round run **`44967047189`** (commit `1eb63d9`): **success on both legs** (`Go windows-latest` / `Go ubuntu-latest`); windows leg `ok github.com/larsonzh/prfrail/internal/evidence`, `SELFTEST: PASS 740/740`, `base go test ./... :: ok=15 FAIL=0`, `TOTAL_FAIL=0`; ubuntu leg `ok internal/evidence`, `SELFTEST 740/740`, `TOTAL_FAIL=0`, Race step success.
+- **Production entry closed**: under CI the guard turns the three precondition failures into hard failures, so a green windows leg proves `TestP86UncShareRootProductionEntry` **really ran and passed** (the N13 equality branch admitted the target through the production entry and the bytes were read back unchanged).
 
 ## 12. Environment and tiers
 
@@ -222,6 +224,8 @@ docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/03-verification/local-flak
 docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/03-verification/ci/run-44962802936-windows.log	repo
 docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/03-verification/ci/run-44962802936-ubuntu.log	repo
 docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/03-verification/ci/run-44965434402-windows.log	repo
+docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/03-verification/ci/run-44967047189-windows.log	repo
+docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/03-verification/ci/run-44967047189-ubuntu.log	repo
 docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/04-reviews/05-pre-review-r1.md	repo
 docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/04-reviews/05-pre-review-r2.md	repo
 docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/04-reviews/06-scan-r1.md	repo

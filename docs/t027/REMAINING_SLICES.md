@@ -2333,7 +2333,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 临时件落点声明 | 本片临时目录 = `tmp/P86-BOUNDDIR-UNC-EQUIVALENCE/`（⑧c 前只增不删；CI 捕获件同样落该目录，不落 `tmp/` 根） |
 | 额度口径披露 | ⑦ 常规档 = `GPT-5.3-Codex (copilot)`；额度 = **1 终审 + 1 复审**（§7.5 S 档字面，**无额度例外**）；盲审是否必抽由 ① 启动前判定并落盘理由（另计 +1）；起跑四要素已留痕；协议先行：先由 ① 判定契约影响再动代码。**登记（不记漂移）**：本行起跑前预登记为「`GPT-6.2 Sol` 深度档 + 1 终审 + 3 复审 + 盲审必抽」，与用户 2026-11-22 起跑消息「Codex 常规档 + 1+1 + 无额度例外」冲突，按 §0.1 / §13.2.11 纪律 F 以起跑消息为准，已就地更正 |
 
-完成记录（2026-11-22）：报告对 `docs/validation/bounddir-unc-equivalence{,_EN}.md`（结论 `CLOSED`）；N13-UNC 闭合——`boundRelativeSuffix` 新增 UNC 共享根等值分支（尾分隔符差异 + 卷名 ASCII 折叠）与助手 `uncShareRootName` / `uncShareRootEqual` / `lowerASCII`，拒绝面零放宽（异主机 / 异共享 / 后代大小写 / 非规范拼写 / host-only / 扩展命名空间均拒）；W10 闭合——M1/M2 两变异分开标注，「`D:\\` = 轮 11 前原形」错误表述删除；反例先红后绿 + 变异实跑（删分支后恰 3 个正例红、恢复逐字节一致）；R = 0、D = 0；⑦ = 盲审 1（另计）+ 终审 1（`PASS WITH FIXES`，无 Medium+）；⑤ 2/2、⑥ 2/2；证据包 `docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/` |
+完成记录（2026-11-22）：报告对 `docs/validation/bounddir-unc-equivalence{,_EN}.md`（结论 `CLOSED`）；N13-UNC 闭合——`boundRelativeSuffix` 新增 UNC 共享根等值分支（尾分隔符差异 + 卷名 ASCII 折叠）与助手 `uncShareRootName` / `uncShareRootEqual` / `lowerASCII`，拒绝面零放宽（异主机 / 异共享 / 后代大小写 / 非规范拼写 / host-only / 扩展命名空间均拒）；W10 闭合——M1/M2 两变异分开标注，「`D:\\` = 轮 11 前原形」错误表述删除；反例先红后绿 + 变异实跑（删分支后恰 3 个正例红、恢复逐字节一致）；R = 0、D = 0；DR-18（CI 守卫轮首跑 windows 腿红，夹具按句柄实际拼写修正后双腿绿）；⑦ = 盲审 1（另计）+ 终审 1（`PASS WITH FIXES`，无 Medium+）；⑤ 2/2、⑥ 2/2；证据包 `docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/` |
 
 ## 已知缺陷（后续切片前处理）
 

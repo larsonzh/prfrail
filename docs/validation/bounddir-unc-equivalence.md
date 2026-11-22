@@ -128,7 +128,9 @@
 - 主提交 `f1ae821`；首跑 run **`44962802936`** **双腿 success**（`Go windows-latest` / `Go ubuntu-latest`）；windows 腿：`ok github.com/larsonzh/prfrail/internal/evidence`、`SELFTEST: PASS 740/740`、`TOTAL_FAIL=0`；日志载荷 `03-verification/ci/run-44962802936-windows.log` / `-ubuntu.log`。
 - 首跑未含 CI 守卫（`-v` 未开启 ⇒ 无 PASS/SKIP 行）；守卫轮（CI 环境下前置失败改硬失败）随修复提交重跑。
 - 守卫轮首跑 run **`44965434402`**（提交 `a5ef122`）：**windows 腿红**（`TestP86UncShareRootProductionEntry` 前置断言：CI 宿主的句柄派生根为**无尾分隔符**形 `\\localhost\<share>`，夹具却假定带尾分隔符），ubuntu 腿 success ⇒ 登记 **DR-18**。
-- 修复：夹具改为**按句柄实际拼写取另一侧拼写**作为存储目标（句柄带尾分隔符 ⇒ 目标无尾；句柄无尾 ⇒ 目标带尾），两种宿主形态都进入 N13 等值分支；修复轮读数见下行。
+- 修复：夹具改为**按句柄实际拼写取另一侧拼写**作为存储目标（句柄带尾分隔符 ⇒ 目标无尾；句柄无尾 ⇒ 目标带尾），两种宿主形态都进入 N13 等值分支。
+- 修复轮 run **`44967047189`**（提交 `1eb63d9`）：**双腿 success**（`Go windows-latest` / `Go ubuntu-latest`）；windows 腿 `ok github.com/larsonzh/prfrail/internal/evidence`、`SELFTEST: PASS 740/740`、`base go test ./... :: ok=15 FAIL=0`、`TOTAL_FAIL=0`；ubuntu 腿 `ok internal/evidence`、`SELFTEST 740/740`、`TOTAL_FAIL=0`、Race 步骤 success。
+- **生产入口闭环**：守卫在 `CI` 环境下把三个前置失败改为硬失败，故 windows 腿绿灯即证明 `TestP86UncShareRootProductionEntry` **真实运行并 PASS**（N13 等值分支经生产入口放行并读回字节一致）。
 
 ## 12. 环境与档位
 
@@ -222,6 +224,8 @@ docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/03-verification/local-flak
 docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/03-verification/ci/run-44962802936-windows.log	repo
 docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/03-verification/ci/run-44962802936-ubuntu.log	repo
 docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/03-verification/ci/run-44965434402-windows.log	repo
+docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/03-verification/ci/run-44967047189-windows.log	repo
+docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/03-verification/ci/run-44967047189-ubuntu.log	repo
 docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/04-reviews/05-pre-review-r1.md	repo
 docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/04-reviews/05-pre-review-r2.md	repo
 docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/04-reviews/06-scan-r1.md	repo

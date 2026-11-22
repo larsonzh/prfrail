@@ -15,6 +15,8 @@
 | `03-verification/ci/run-44962802936-ubuntu.log` | CI 运行日志（run-44962802936-ubuntu.log） |
 | `03-verification/ci/run-44962802936-windows.log` | CI 运行日志（run-44962802936-windows.log） |
 | `03-verification/ci/run-44965434402-windows.log` | CI 运行日志（run-44965434402-windows.log） |
+| `03-verification/ci/run-44967047189-ubuntu.log` | CI 运行日志（run-44967047189-ubuntu.log） |
+| `03-verification/ci/run-44967047189-windows.log` | CI 运行日志（run-44967047189-windows.log） |
 | `03-verification/gate-ci.txt` | gate.js --all --scope=ci 读数 |
 | `03-verification/gate-index.txt` | gate.js --all --scope=index 读数 |
 | `03-verification/gate-selftest.txt` | gate.js --selftest 读数（740/740） |

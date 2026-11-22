@@ -1,0 +1,1147 @@
+Go ubuntu-latest	Set up job	锘?026-11-22T00:31:38.8383279Z Current runner version: '2.338.2'
+Go ubuntu-latest	Set up job	2026-11-22T00:31:38.8421016Z ##[group]Runner Image Provisioner
+Go ubuntu-latest	Set up job	2026-11-22T00:31:38.8422490Z Hosted Compute Agent
+Go ubuntu-latest	Set up job	2026-11-22T00:31:38.8423548Z Version: 20261111.635
+Go ubuntu-latest	Set up job	2026-11-22T00:31:38.8424631Z Commit: b8a594ea514ff44cadb5342986c68b1eac6e22ed
+Go ubuntu-latest	Set up job	2026-11-22T00:31:38.8426185Z Build Date: 2026-11-11T01:49:01Z
+Go ubuntu-latest	Set up job	2026-11-22T00:31:38.8427527Z Worker ID: {bea9ad36-73c8-4e83-91be-4f4fd5d42341}
+Go ubuntu-latest	Set up job	2026-11-22T00:31:38.8428997Z Region: eastus2
+Go ubuntu-latest	Set up job	2026-11-22T00:31:38.8430240Z Cloud: Azure
+Go ubuntu-latest	Set up job	2026-11-22T00:31:38.8431170Z ##[endgroup]
+Go ubuntu-latest	Set up job	2026-11-22T00:31:38.8433620Z ##[group]Operating System
+Go ubuntu-latest	Set up job	2026-11-22T00:31:38.8434691Z Ubuntu
+Go ubuntu-latest	Set up job	2026-11-22T00:31:38.8435668Z 26.04.1
+Go ubuntu-latest	Set up job	2026-11-22T00:31:38.8436605Z LTS
+Go ubuntu-latest	Set up job	2026-11-22T00:31:38.8437433Z ##[endgroup]
+Go ubuntu-latest	Set up job	2026-11-22T00:31:38.8438875Z ##[group]Runner Image
+Go ubuntu-latest	Set up job	2026-11-22T00:31:38.8440194Z Image: ubuntu-26.04
+Go ubuntu-latest	Set up job	2026-11-22T00:31:38.8441278Z Version: 20261116.202.1
+Go ubuntu-latest	Set up job	2026-11-22T00:31:38.8443156Z Included Software: https://github.com/actions/runner-images/blob/ubuntu26/20261116.202/images/ubuntu/Ubuntu2604-Readme.md
+Go ubuntu-latest	Set up job	2026-11-22T00:31:38.8446188Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu26%2F20261116.202
+Go ubuntu-latest	Set up job	2026-11-22T00:31:38.8448126Z ##[endgroup]
+Go ubuntu-latest	Set up job	2026-11-22T00:31:38.8450474Z ##[group]GITHUB_TOKEN Permissions
+Go ubuntu-latest	Set up job	2026-11-22T00:31:38.8453447Z Contents: read
+Go ubuntu-latest	Set up job	2026-11-22T00:31:38.8454630Z Metadata: read
+Go ubuntu-latest	Set up job	2026-11-22T00:31:38.8455719Z ##[endgroup]
+Go ubuntu-latest	Set up job	2026-11-22T00:31:38.8458611Z Secret source: Actions
+Go ubuntu-latest	Set up job	2026-11-22T00:31:38.8460683Z Cache mode: write
+Go ubuntu-latest	Set up job	2026-11-22T00:31:38.8462442Z Prepare workflow directory
+Go ubuntu-latest	Set up job	2026-11-22T00:31:38.9052884Z Prepare all required actions
+Go ubuntu-latest	Set up job	2026-11-22T00:31:38.9126794Z Getting action download info
+Go ubuntu-latest	Set up job	2026-11-22T00:31:39.1550416Z Download action repository 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+Go ubuntu-latest	Set up job	2026-11-22T00:31:39.2709070Z Download action repository 'actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e' (SHA:b7ad1dad31e06c5925ef5d2fc7ad053ef454303e)
+Go ubuntu-latest	Set up job	2026-11-22T00:31:39.5411878Z Complete job name: Go ubuntu-latest
+Go ubuntu-latest	Checkout source	锘?026-11-22T00:31:39.6288261Z ##[group]Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.6289620Z with:
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.6290167Z   persist-credentials: false
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.6290696Z   fetch-depth: 0
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.6291163Z   repository: larsonzh/prfrail
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.6295052Z   token: ***
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.6295480Z   ssh-strict: true
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.6295917Z   ssh-user: git
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.6296341Z   clean: true
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.6296787Z   sparse-checkout-cone-mode: true
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.6297320Z   fetch-tags: false
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.6297778Z   show-progress: true
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.6298227Z   lfs: false
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.6298639Z   submodules: false
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.6299091Z   set-safe-directory: true
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.6299876Z   allow-unsafe-pr-checkout: false
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.6300726Z env:
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.6301157Z   GO_VERSION: 1.22.12
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.6301631Z   CGO_ENABLED: 0
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.6302091Z   GOTOOLCHAIN: local
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.6302570Z ##[endgroup]
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.8956007Z Syncing repository: larsonzh/prfrail
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.8958829Z ##[group]Getting Git version info
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.8960301Z Working directory is '/home/runner/work/prfrail/prfrail'
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.8962093Z [command]/usr/bin/git version
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.8973261Z git version 2.56.1
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.9000040Z ##[endgroup]
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.9015069Z Temporarily overriding HOME='/home/runner/work/_temp/a5e95975-1fd4-403e-9584-2f723dbaac48' before making global git config changes
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.9020752Z Adding repository directory to the temporary git global config as a safe directory
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.9023346Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/prfrail/prfrail
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.9084964Z Deleting the contents of '/home/runner/work/prfrail/prfrail'
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.9088108Z ##[group]Determining repository object format
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.9090011Z ##[endgroup]
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.9091227Z ##[group]Initializing the repository
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.9094034Z [command]/usr/bin/git init /home/runner/work/prfrail/prfrail
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.9200484Z hint: Using 'master' as the name for the initial branch. This default branch name
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.9202627Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.9204829Z hint: to use in all of your new repositories, which will suppress this warning,
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.9206623Z hint: call:
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.9207751Z hint:
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.9209192Z hint: 	git config --global init.defaultBranch <name>
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.9210931Z hint:
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.9212325Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.9214471Z hint: 'development'. The just-created branch can be renamed via this command:
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.9216289Z hint:
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.9217481Z hint: 	git branch -m <name>
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.9218755Z hint:
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.9220544Z hint: Disable this message with "git config set advice.defaultBranchName false"
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.9222904Z Initialized empty Git repository in /home/runner/work/prfrail/prfrail/.git/
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.9226993Z [command]/usr/bin/git remote add origin https://github.com/larsonzh/prfrail
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.9279165Z ##[endgroup]
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.9280761Z ##[group]Disabling automatic garbage collection
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.9281560Z [command]/usr/bin/git config --local gc.auto 0
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.9309781Z ##[endgroup]
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.9311114Z ##[group]Setting up auth
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.9312021Z Removing SSH command configuration
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.9316260Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.9347978Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.9742762Z Removing HTTP extra header
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.9747906Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:39.9782595Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:40.0045544Z Removing includeIf entries pointing to credentials config files
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:40.0051802Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:40.0093553Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:40.0365930Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-d203ed6a-43c9-48d4-a4c3-0d167f166e0f.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:40.0404097Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/prfrail/prfrail/.git.path /home/runner/work/_temp/git-credentials-d203ed6a-43c9-48d4-a4c3-0d167f166e0f.config
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:40.0436456Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/prfrail/prfrail/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-d203ed6a-43c9-48d4-a4c3-0d167f166e0f.config
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:40.0470823Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-d203ed6a-43c9-48d4-a4c3-0d167f166e0f.config
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:40.0502000Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-d203ed6a-43c9-48d4-a4c3-0d167f166e0f.config
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:40.0531121Z ##[endgroup]
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:40.0531941Z ##[group]Fetching the repository
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:40.0536936Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.2629233Z From https://github.com/larsonzh/prfrail
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.2631612Z  * [new branch]      main                 -> origin/main
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.2633465Z  * [new branch]      t017-first-candidate -> origin/t017-first-candidate
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.2635246Z  * [new tag]         v0.1.0               -> v0.1.0
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.2639122Z [command]/usr/bin/git branch --list --remote origin/main
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.2679909Z   origin/main
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.2690389Z [command]/usr/bin/git rev-parse refs/remotes/origin/main
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.2726243Z 1eb63d96a3b57dc10e65acfcca11d5e4c8da3abc
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.2732311Z ##[endgroup]
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.2733736Z ##[group]Determining the checkout info
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.2735288Z ##[endgroup]
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.2737917Z [command]/usr/bin/git sparse-checkout disable
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.2795708Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.2829764Z ##[group]Checking out the ref
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.2834210Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.6331903Z Switched to a new branch 'main'
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.6336324Z branch 'main' set up to track 'origin/main'.
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.6358957Z ##[endgroup]
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.6408254Z [command]/usr/bin/git log -1 --format=%H
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.6436057Z 1eb63d96a3b57dc10e65acfcca11d5e4c8da3abc
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.6451462Z ##[group]Removing auth
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.6452820Z Removing SSH command configuration
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.6454326Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.6485326Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.6765447Z Removing HTTP extra header
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.6770288Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.6804201Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.7080539Z Removing includeIf entries pointing to credentials config files
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.7083171Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.7110036Z includeif.gitdir:/home/runner/work/prfrail/prfrail/.git.path
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.7112375Z includeif.gitdir:/home/runner/work/prfrail/prfrail/.git/worktrees/*.path
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.7114202Z includeif.gitdir:/github/workspace/.git.path
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.7115715Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.7119642Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/prfrail/prfrail/.git.path
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.7143230Z /home/runner/work/_temp/git-credentials-d203ed6a-43c9-48d4-a4c3-0d167f166e0f.config
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.7158932Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/prfrail/prfrail/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-d203ed6a\-43c9\-48d4\-a4c3\-0d167f166e0f\.config
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.7196350Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/prfrail/prfrail/.git/worktrees/*.path
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.7223052Z /home/runner/work/_temp/git-credentials-d203ed6a-43c9-48d4-a4c3-0d167f166e0f.config
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.7235223Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/prfrail/prfrail/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-d203ed6a\-43c9\-48d4\-a4c3\-0d167f166e0f\.config
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.7270772Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.7294859Z /github/runner_temp/git-credentials-d203ed6a-43c9-48d4-a4c3-0d167f166e0f.config
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.7304092Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-d203ed6a\-43c9\-48d4\-a4c3\-0d167f166e0f\.config
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.7337560Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.7360970Z /github/runner_temp/git-credentials-d203ed6a-43c9-48d4-a4c3-0d167f166e0f.config
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.7369876Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-d203ed6a\-43c9\-48d4\-a4c3\-0d167f166e0f\.config
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.7410314Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.7685215Z Removing credentials config '/home/runner/work/_temp/git-credentials-d203ed6a-43c9-48d4-a4c3-0d167f166e0f.config'
+Go ubuntu-latest	Checkout source	2026-11-22T00:31:41.7694497Z ##[endgroup]
+Go ubuntu-latest	Setup Go	锘?026-11-22T00:31:41.8004102Z ##[group]Run actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:41.8005250Z with:
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:41.8006063Z   go-version: 1.22.12
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:41.8006909Z   cache: true
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:41.8007730Z   check-latest: false
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:41.8011545Z   token: ***
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:41.8084271Z env:
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:41.8085815Z   GO_VERSION: 1.22.12
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:41.8087035Z   CGO_ENABLED: 0
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:41.8087892Z   GOTOOLCHAIN: local
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:41.8088766Z ##[endgroup]
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:41.9327308Z Setup go version spec 1.22.12
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:41.9337401Z Attempting to download 1.22.12...
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:42.4511989Z matching 1.22.12...
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:42.4568796Z Acquiring 1.22.12 from https://github.com/actions/go-versions/releases/download/1.22.12-13149489080/go-1.22.12-linux-x64.tar.gz
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:43.0936807Z Extracting Go...
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:43.1068249Z [command]/usr/bin/tar xz --warning=no-unknown-keyword --overwrite -C /home/runner/work/_temp/186e71f7-9477-47eb-90dc-d10400b9fbab -f /home/runner/work/_temp/dd89f1ce-5f40-45e7-a111-ec5613f1c2a7
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:44.2250454Z Successfully extracted go to /home/runner/work/_temp/186e71f7-9477-47eb-90dc-d10400b9fbab
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:44.2251343Z Adding to the cache ...
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:48.2468030Z Successfully cached go to /opt/hostedtoolcache/go/1.22.12/x64
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:48.2470805Z Added go to the path
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:48.2472110Z Successfully set up Go version 1.22.12
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:48.2654792Z [command]/opt/hostedtoolcache/go/1.22.12/x64/bin/go env GOMODCACHE
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:48.2695841Z [command]/opt/hostedtoolcache/go/1.22.12/x64/bin/go env GOCACHE
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:48.2732852Z /home/runner/go/pkg/mod
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:48.2748549Z /home/runner/.cache/go-build
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:48.3491402Z Cache hit for: setup-go-Linux-x64-ubuntu26-go-1.22.12-2f07b6ec62ba90bcd08e45ebcc765a7ea2fd8104887fdaad445ddb80e0e00ca7
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:48.7791901Z Received 68976206 of 68976206 (100.0%), 180.2 MBs/sec
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:48.7792968Z Cache Size: ~66 MB (68976206 B)
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:48.7824540Z [command]/usr/bin/tar -xf /home/runner/work/_temp/ed336f8c-2472-42e8-97a4-5943af0ec26b/cache.tzst -P -C /home/runner/work/prfrail/prfrail --use-compress-program unzstd
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6361431Z Cache restored successfully
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6398684Z Cache restored from key: setup-go-Linux-x64-ubuntu26-go-1.22.12-2f07b6ec62ba90bcd08e45ebcc765a7ea2fd8104887fdaad445ddb80e0e00ca7
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6425400Z go version go1.22.12 linux/amd64
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6425729Z 
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6426157Z ##[group]go env
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6691236Z GO111MODULE=''
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6691695Z GOARCH='amd64'
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6692059Z GOBIN=''
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6692476Z GOCACHE='/home/runner/.cache/go-build'
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6693009Z GOENV='/home/runner/.config/go/env'
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6693486Z GOEXE=''
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6693820Z GOEXPERIMENT=''
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6694561Z GOFLAGS=''
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6694921Z GOHOSTARCH='amd64'
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6695348Z GOHOSTOS='linux'
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6695703Z GOINSECURE=''
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6696087Z GOMODCACHE='/home/runner/go/pkg/mod'
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6696559Z GONOPROXY=''
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6696895Z GONOSUMDB=''
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6697226Z GOOS='linux'
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6697573Z GOPATH='/home/runner/go'
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6697952Z GOPRIVATE=''
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6698403Z GOPROXY='https://proxy.golang.org,direct'
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6699010Z GOROOT='/opt/hostedtoolcache/go/1.22.12/x64'
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6699703Z GOSUMDB='sum.golang.org'
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6700096Z GOTMPDIR=''
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6700423Z GOTOOLCHAIN='local'
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6700971Z GOTOOLDIR='/opt/hostedtoolcache/go/1.22.12/x64/pkg/tool/linux_amd64'
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6701586Z GOVCS=''
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6701911Z GOVERSION='go1.22.12'
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6702276Z GCCGO='gccgo'
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6702602Z GOAMD64='v1'
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6702979Z AR='ar'
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6703271Z CC='gcc'
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6703924Z CXX='g++'
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6704245Z CGO_ENABLED='0'
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6704668Z GOMOD='/home/runner/work/prfrail/prfrail/go.mod'
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6705178Z GOWORK=''
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6705506Z CGO_CFLAGS='-O2 -g'
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6705874Z CGO_CPPFLAGS=''
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6706218Z CGO_CXXFLAGS='-O2 -g'
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6706596Z CGO_FFLAGS='-O2 -g'
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6706955Z CGO_LDFLAGS='-O2 -g'
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6707341Z PKG_CONFIG='pkg-config'
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6708419Z GOGCCFLAGS='-fPIC -m64 -Wl,--no-gc-sections -fmessage-length=0 -ffile-prefix-map=/tmp/go-build4096689792=/tmp/go-build -gno-record-gcc-switches'
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6709551Z 
+Go ubuntu-latest	Setup Go	2026-11-22T00:31:49.6709974Z ##[endgroup]
+Go ubuntu-latest	Build	锘?026-11-22T00:31:49.6944450Z ##[group]Run go build ./...
+Go ubuntu-latest	Build	2026-11-22T00:31:49.6944797Z ^[[36;1mgo build ./...^[[0m
+Go ubuntu-latest	Build	2026-11-22T00:31:49.6982266Z shell: /usr/bin/bash -e {0}
+Go ubuntu-latest	Build	2026-11-22T00:31:49.6982554Z env:
+Go ubuntu-latest	Build	2026-11-22T00:31:49.6982768Z   GO_VERSION: 1.22.12
+Go ubuntu-latest	Build	2026-11-22T00:31:49.6982992Z   CGO_ENABLED: 0
+Go ubuntu-latest	Build	2026-11-22T00:31:49.6983208Z   GOTOOLCHAIN: local
+Go ubuntu-latest	Build	2026-11-22T00:31:49.6983428Z ##[endgroup]
+Go ubuntu-latest	Vet	锘?026-11-22T00:31:53.3384064Z ##[group]Run go vet ./...
+Go ubuntu-latest	Vet	2026-11-22T00:31:53.3384391Z ^[[36;1mgo vet ./...^[[0m
+Go ubuntu-latest	Vet	2026-11-22T00:31:53.3417469Z shell: /usr/bin/bash -e {0}
+Go ubuntu-latest	Vet	2026-11-22T00:31:53.3417730Z env:
+Go ubuntu-latest	Vet	2026-11-22T00:31:53.3417926Z   GO_VERSION: 1.22.12
+Go ubuntu-latest	Vet	2026-11-22T00:31:53.3418142Z   CGO_ENABLED: 0
+Go ubuntu-latest	Vet	2026-11-22T00:31:53.3418347Z   GOTOOLCHAIN: local
+Go ubuntu-latest	Vet	2026-11-22T00:31:53.3418567Z ##[endgroup]
+Go ubuntu-latest	Test	锘?026-11-22T00:31:57.3503013Z ##[group]Run go test -count=1 ./...
+Go ubuntu-latest	Test	2026-11-22T00:31:57.3503371Z ^[[36;1mgo test -count=1 ./...^[[0m
+Go ubuntu-latest	Test	2026-11-22T00:31:57.3536204Z shell: /usr/bin/bash -e {0}
+Go ubuntu-latest	Test	2026-11-22T00:31:57.3536465Z env:
+Go ubuntu-latest	Test	2026-11-22T00:31:57.3536659Z   GO_VERSION: 1.22.12
+Go ubuntu-latest	Test	2026-11-22T00:31:57.3536879Z   CGO_ENABLED: 0
+Go ubuntu-latest	Test	2026-11-22T00:31:57.3537086Z   GOTOOLCHAIN: local
+Go ubuntu-latest	Test	2026-11-22T00:31:57.3537308Z ##[endgroup]
+Go ubuntu-latest	Test	2026-11-22T00:32:00.8141239Z ?   	github.com/larsonzh/prfrail/cmd/prfrail	[no test files]
+Go ubuntu-latest	Test	2026-11-22T00:32:00.8209896Z ?   	github.com/larsonzh/prfrail/cmd/prfrail-release	[no test files]
+Go ubuntu-latest	Test	2026-11-22T00:32:00.8227097Z ok  	github.com/larsonzh/prfrail/examples/whois-shadow	0.006s
+Go ubuntu-latest	Test	2026-11-22T00:32:09.4064204Z ?   	github.com/larsonzh/prfrail/tools/agent-probe/supervisor	[no test files]
+Go ubuntu-latest	Test	2026-11-22T00:32:09.8488865Z ?   	github.com/larsonzh/prfrail/tools/b4-e2e	[no test files]
+Go ubuntu-latest	Test	2026-11-22T00:32:17.5831895Z ok  	github.com/larsonzh/prfrail/internal/adapters	15.324s
+Go ubuntu-latest	Test	2026-11-22T00:32:17.5832762Z ok  	github.com/larsonzh/prfrail/internal/applier	0.420s
+Go ubuntu-latest	Test	2026-11-22T00:32:17.5833522Z ok  	github.com/larsonzh/prfrail/internal/chain	1.038s
+Go ubuntu-latest	Test	2026-11-22T00:32:17.5834164Z ok  	github.com/larsonzh/prfrail/internal/console	5.991s
+Go ubuntu-latest	Test	2026-11-22T00:32:17.5834832Z ok  	github.com/larsonzh/prfrail/internal/evidence	0.133s
+Go ubuntu-latest	Test	2026-11-22T00:32:17.5835490Z ok  	github.com/larsonzh/prfrail/internal/gates	0.210s
+Go ubuntu-latest	Test	2026-11-22T00:32:17.5836114Z ok  	github.com/larsonzh/prfrail/internal/guard	1.368s
+Go ubuntu-latest	Test	2026-11-22T00:32:17.5837068Z ok  	github.com/larsonzh/prfrail/internal/release	1.728s
+Go ubuntu-latest	Test	2026-11-22T00:32:17.5837564Z ok  	github.com/larsonzh/prfrail/internal/repair	0.004s
+Go ubuntu-latest	Test	2026-11-22T00:32:17.5837982Z ok  	github.com/larsonzh/prfrail/internal/snapshot	0.108s
+Go ubuntu-latest	Test	2026-11-22T00:32:17.5838376Z ok  	github.com/larsonzh/prfrail/internal/taskdef	0.026s
+Go ubuntu-latest	Test	2026-11-22T00:32:17.5838749Z ok  	github.com/larsonzh/prfrail/internal/tickets	2.097s
+Go ubuntu-latest	Test	2026-11-22T00:32:17.5839211Z ok  	github.com/larsonzh/prfrail/tools/agent-probe/enforcement-proxy	0.236s
+Go ubuntu-latest	Test	2026-11-22T00:32:17.5839921Z ok  	github.com/larsonzh/prfrail/tools/agent-stub	0.455s
+Go ubuntu-latest	Race	锘?026-11-22T00:32:17.7106877Z ##[group]Run CGO_ENABLED=1 go test -race -count=1 ./internal/adapters/... ./internal/chain/... ./internal/console/... ./internal/gates/... ./internal/guard/... ./internal/tickets/...
+Go ubuntu-latest	Race	2026-11-22T00:32:17.7108297Z ^[[36;1mCGO_ENABLED=1 go test -race -count=1 ./internal/adapters/... ./internal/chain/... ./internal/console/... ./internal/gates/... ./internal/guard/... ./internal/tickets/...^[[0m
+Go ubuntu-latest	Race	2026-11-22T00:32:17.7140551Z shell: /usr/bin/bash -e {0}
+Go ubuntu-latest	Race	2026-11-22T00:32:17.7140810Z env:
+Go ubuntu-latest	Race	2026-11-22T00:32:17.7140998Z   GO_VERSION: 1.22.12
+Go ubuntu-latest	Race	2026-11-22T00:32:17.7141216Z   CGO_ENABLED: 0
+Go ubuntu-latest	Race	2026-11-22T00:32:17.7141425Z   GOTOOLCHAIN: local
+Go ubuntu-latest	Race	2026-11-22T00:32:17.7141637Z ##[endgroup]
+Go ubuntu-latest	Race	2026-11-22T00:34:05.3533293Z ok  	github.com/larsonzh/prfrail/internal/adapters	92.730s
+Go ubuntu-latest	Race	2026-11-22T00:34:05.3534566Z ok  	github.com/larsonzh/prfrail/internal/chain	3.131s
+Go ubuntu-latest	Race	2026-11-22T00:34:05.3535572Z ok  	github.com/larsonzh/prfrail/internal/console	26.506s
+Go ubuntu-latest	Race	2026-11-22T00:34:05.3536560Z ok  	github.com/larsonzh/prfrail/internal/gates	4.357s
+Go ubuntu-latest	Race	2026-11-22T00:34:05.3537366Z ok  	github.com/larsonzh/prfrail/internal/guard	3.432s
+Go ubuntu-latest	Race	2026-11-22T00:34:05.3537770Z ok  	github.com/larsonzh/prfrail/internal/tickets	5.743s
+Go ubuntu-latest	Contract fixtures	锘?026-11-22T00:34:05.4183699Z ##[group]Run npm ci --ignore-scripts
+Go ubuntu-latest	Contract fixtures	2026-11-22T00:34:05.4202307Z ^[[36;1mnpm ci --ignore-scripts^[[0m
+Go ubuntu-latest	Contract fixtures	2026-11-22T00:34:05.4202625Z ^[[36;1mnpm test^[[0m
+Go ubuntu-latest	Contract fixtures	2026-11-22T00:34:05.4233752Z shell: /usr/bin/bash -e {0}
+Go ubuntu-latest	Contract fixtures	2026-11-22T00:34:05.4234022Z env:
+Go ubuntu-latest	Contract fixtures	2026-11-22T00:34:05.4234219Z   GO_VERSION: 1.22.12
+Go ubuntu-latest	Contract fixtures	2026-11-22T00:34:05.4234437Z   CGO_ENABLED: 0
+Go ubuntu-latest	Contract fixtures	2026-11-22T00:34:05.4234644Z   GOTOOLCHAIN: local
+Go ubuntu-latest	Contract fixtures	2026-11-22T00:34:05.4234861Z ##[endgroup]
+Go ubuntu-latest	Contract fixtures	2026-11-22T00:34:06.6013811Z 
+Go ubuntu-latest	Contract fixtures	2026-11-22T00:34:06.6014612Z added 7 packages, and audited 8 packages in 908ms
+Go ubuntu-latest	Contract fixtures	2026-11-22T00:34:06.6015104Z 
+Go ubuntu-latest	Contract fixtures	2026-11-22T00:34:06.6015335Z 2 packages are looking for funding
+Go ubuntu-latest	Contract fixtures	2026-11-22T00:34:06.6015928Z   run `npm fund` for details
+Go ubuntu-latest	Contract fixtures	2026-11-22T00:34:06.6041006Z 
+Go ubuntu-latest	Contract fixtures	2026-11-22T00:34:06.6041395Z 1 moderate severity vulnerability
+Go ubuntu-latest	Contract fixtures	2026-11-22T00:34:06.6041719Z 
+Go ubuntu-latest	Contract fixtures	2026-11-22T00:34:06.6041902Z To address all issues, run:
+Go ubuntu-latest	Contract fixtures	2026-11-22T00:34:06.6042305Z   npm audit fix
+Go ubuntu-latest	Contract fixtures	2026-11-22T00:34:06.6042453Z 
+Go ubuntu-latest	Contract fixtures	2026-11-22T00:34:06.6042570Z Run `npm audit` for details.
+Go ubuntu-latest	Contract fixtures	2026-11-22T00:34:06.7584677Z 
+Go ubuntu-latest	Contract fixtures	2026-11-22T00:34:06.7585295Z > proofrail-contract-validator@1.0.0 test
+Go ubuntu-latest	Contract fixtures	2026-11-22T00:34:06.7585794Z > node --test
+Go ubuntu-latest	Contract fixtures	2026-11-22T00:34:06.7585940Z 
+Go ubuntu-latest	Contract fixtures	2026-11-22T00:34:07.4748617Z 鉁?all schemas compile and every catalog matches its independent expectation (563.968765ms)
+Go ubuntu-latest	Contract fixtures	2026-11-22T00:34:07.4753672Z 鉁?canonical vectors reproduce the frozen bytes and digests (2.227908ms)
+Go ubuntu-latest	Contract fixtures	2026-11-22T00:34:07.4759000Z 鉁?AgentRunner mapping constants stay aligned across vectors and request fixtures (1.359888ms)
+Go ubuntu-latest	Contract fixtures	2026-11-22T00:34:07.4761076Z 鉁?AgentRunner effect mapping fails closed and permits grant supersets (2.427891ms)
+Go ubuntu-latest	Contract fixtures	2026-11-22T00:34:07.4926919Z 鈩?tests 4
+Go ubuntu-latest	Contract fixtures	2026-11-22T00:34:07.4927359Z 鈩?suites 0
+Go ubuntu-latest	Contract fixtures	2026-11-22T00:34:07.4927802Z 鈩?pass 4
+Go ubuntu-latest	Contract fixtures	2026-11-22T00:34:07.4928271Z 鈩?fail 0
+Go ubuntu-latest	Contract fixtures	2026-11-22T00:34:07.4929604Z 鈩?cancelled 0
+Go ubuntu-latest	Contract fixtures	2026-11-22T00:34:07.4929912Z 鈩?skipped 0
+Go ubuntu-latest	Contract fixtures	2026-11-22T00:34:07.4930163Z 鈩?todo 0
+Go ubuntu-latest	Contract fixtures	2026-11-22T00:34:07.4930432Z 鈩?duration_ms 688.083759
+Go ubuntu-latest	Gates	锘?026-11-22T00:34:07.5104317Z ##[group]Run node tools/gates/gate.js --selftest && node tools/gates/gate.js --all --scope=ci
+Go ubuntu-latest	Gates	2026-11-22T00:34:07.5105030Z ^[[36;1mnode tools/gates/gate.js --selftest && node tools/gates/gate.js --all --scope=ci^[[0m
+Go ubuntu-latest	Gates	2026-11-22T00:34:07.5144165Z shell: /usr/bin/bash -e {0}
+Go ubuntu-latest	Gates	2026-11-22T00:34:07.5144442Z env:
+Go ubuntu-latest	Gates	2026-11-22T00:34:07.5144643Z   GO_VERSION: 1.22.12
+Go ubuntu-latest	Gates	2026-11-22T00:34:07.5144872Z   CGO_ENABLED: 0
+Go ubuntu-latest	Gates	2026-11-22T00:34:07.5145082Z   GOTOOLCHAIN: local
+Go ubuntu-latest	Gates	2026-11-22T00:34:07.5145299Z ##[endgroup]
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2426056Z GATES SELFTEST (in-process; fixtures under tools/gates/testdata/)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2427104Z   T3/T12 need real git ranges and are recorded as evidence, not here:
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2428189Z     --scope=range:b738e6b^..b738e6b (A1 must be red) / range:9f68a52^..9f68a52 (green)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2429178Z     --scope=range:1b01115^..1b01115 (C1: G7 must be red)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2430270Z ok   T13 fixture files are not *.md, so a tree/ci run never judges the runner own fixtures
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2431535Z ok   T1 G6-1 detects pending(鈶?+completion(鈶?瀹炲緱) in one block
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2432237Z ok   T1 G6-1 reports exactly one finding for the fixture
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2432914Z ok   T1 reverse mutation (drop completion row) clears G6-1
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2433703Z ok   T1 delete-criterion mutation (G6-1 removed) leaves the corpus clean
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2434513Z ok   T1 F1 completion shape `锛堝疄寰楋級` is detected
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2435158Z ok   T1 F1 completion shape `鉁?宸插畬鎴恅 is detected
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2435813Z ok   T1 F1 completion shape `鉁?**宸插畬鎴?*` is detected
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2436552Z ok   T1 F1 plain shape with a different label stays clean (label window intact)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2437331Z ok   T2 provenance file carries exactly one excerpt line
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2437980Z ok   T2 fixture embeds the historical OB-11 row verbatim
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2438755Z ok   T2 OB-11 row (with 鍐茬獊 marker) is clean
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2439585Z ok   T2 reverse mutation (drop the 鍐茬獊 exclusion marker) turns G6-1 red
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2440240Z ok   T4 provenance file carries the two historical cost rows
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2440688Z ok   T4 fixture embeds both historical cost rows verbatim
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2441209Z ok   T4 cost-clause parser yields identical realized vectors for the historical pair
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2441768Z ok   T4 budget clause is exempt: consistent rows pass G6-2
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2442579Z ok   T4 reverse mutation (棰勭畻 -> 鎴愭湰) turns G6-2 red
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2443087Z ok   T4 delete-criterion mutation (G6-2 removed) leaves the mutated corpus clean
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2443599Z ok   T5 legal 11-digit run id passes G6-3
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2443915Z ok   T5 legal fixture yields no finding
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2444238Z ok   T6 placeholder run ids fail G6-3
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2444587Z ok   T6 one finding per placeholder line (4)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2445029Z ok   T6 delete-criterion mutation (G6-3 removed) leaves the corpus clean
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2445556Z ok   F7 G6-3 boundary table (token-final): 1-digit id `run 3` must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2446053Z ok   F7 G6-3 boundary table (token-final): 2-digit id `run 33` must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2446569Z ok   F7 G6-3 boundary table (token-final): 3-digit id `run 333` must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2447136Z ok   F7 G6-3 floor rule (token-final): the 3-digit reject names the 9-digit floor
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2447662Z ok   F7 G6-3 boundary table (token-final): 4-digit id `run 3333` must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2448159Z ok   F7 G6-3 floor rule (token-final): the 4-digit reject names the 9-digit floor
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2448694Z ok   F7 G6-3 boundary table (token-final): 5-digit id `run 33333` must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2449208Z ok   F7 G6-3 floor rule (token-final): the 5-digit reject names the 9-digit floor
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2449929Z ok   F7 G6-3 boundary table (token-final): 6-digit id `run 333333` must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2450530Z ok   F7 G6-3 floor rule (token-final): the 6-digit reject names the 9-digit floor
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2451601Z ok   F7 G6-3 boundary table (token-final): 7-digit id `run 3333333` must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2452209Z ok   F7 G6-3 floor rule (token-final): the 7-digit reject names the 9-digit floor
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2452754Z ok   F7 G6-3 boundary table (token-final): 8-digit id `run 33333333` must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2453450Z ok   F7 G6-3 floor rule (token-final): the 8-digit reject names the 9-digit floor
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2453990Z ok   F7 G6-3 boundary table (token-final): 9-digit id `run 333333333` must PASS
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2454542Z ok   F7 G6-3 boundary table (token-final): 10-digit id `run 3333333333` must PASS
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2455096Z ok   F7 G6-3 boundary table (token-final): 11-digit id `run 33333333333` must PASS
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2455662Z ok   F7 G6-3 boundary table (token-final): 12-digit id `run 333333333333` must PASS
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2456213Z ok   F7 G6-3 boundary table (token-final): 13-digit id `run 3333333333333` must PASS
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2456786Z ok   F7 G6-3 boundary table (token-final): 14-digit id `run 33333333333333` must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2457363Z ok   F7 G6-3 boundary table (token-final): 15-digit id `run 333333333333333` must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2457946Z ok   F7 G6-3 boundary table (token-final): 16-digit id `run 3333333333333333` must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2458541Z ok   F7 G6-3 boundary table (token-final): 17-digit id `run 33333333333333333` must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2459133Z ok   F7 G6-3 boundary table (token-final): 18-digit id `run 333333333333333333` must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2459963Z ok   F7 G6-3 boundary table (token-final): 19-digit id `run 3333333333333333333` must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2460567Z ok   F7 G6-3 boundary table (token-final): 20-digit id `run 33333333333333333333` must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2461131Z ok   F7 G6-3 boundary table (backticked): 1-digit id `run 3` must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2461630Z ok   F7 G6-3 boundary table (backticked): 2-digit id `run 33` must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2462120Z ok   F7 G6-3 boundary table (backticked): 3-digit id `run 333` must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2462652Z ok   F7 G6-3 floor rule (backticked): the 3-digit reject names the 9-digit floor
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2463169Z ok   F7 G6-3 boundary table (backticked): 4-digit id `run 3333` must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2463703Z ok   F7 G6-3 floor rule (backticked): the 4-digit reject names the 9-digit floor
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2464223Z ok   F7 G6-3 boundary table (backticked): 5-digit id `run 33333` must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2464759Z ok   F7 G6-3 floor rule (backticked): the 5-digit reject names the 9-digit floor
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2465273Z ok   F7 G6-3 boundary table (backticked): 6-digit id `run 333333` must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2465808Z ok   F7 G6-3 floor rule (backticked): the 6-digit reject names the 9-digit floor
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2466345Z ok   F7 G6-3 boundary table (backticked): 7-digit id `run 3333333` must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2466925Z ok   F7 G6-3 floor rule (backticked): the 7-digit reject names the 9-digit floor
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2467502Z ok   F7 G6-3 boundary table (backticked): 8-digit id `run 33333333` must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2468040Z ok   F7 G6-3 floor rule (backticked): the 8-digit reject names the 9-digit floor
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2468564Z ok   F7 G6-3 boundary table (backticked): 9-digit id `run 333333333` must PASS
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2469109Z ok   F7 G6-3 boundary table (backticked): 10-digit id `run 3333333333` must PASS
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2469925Z ok   F7 G6-3 boundary table (backticked): 11-digit id `run 33333333333` must PASS
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2470471Z ok   F7 G6-3 boundary table (backticked): 12-digit id `run 333333333333` must PASS
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2471036Z ok   F7 G6-3 boundary table (backticked): 13-digit id `run 3333333333333` must PASS
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2471606Z ok   F7 G6-3 boundary table (backticked): 14-digit id `run 33333333333333` must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2472163Z ok   F7 G6-3 boundary table (backticked): 15-digit id `run 333333333333333` must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2472956Z ok   F7 G6-3 boundary table (backticked): 16-digit id `run 3333333333333333` must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2473516Z ok   F7 G6-3 boundary table (backticked): 17-digit id `run 33333333333333333` must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2474271Z ok   F7 G6-3 boundary table (backticked): 18-digit id `run 333333333333333333` must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2474869Z ok   F7 G6-3 boundary table (backticked): 19-digit id `run 3333333333333333333` must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2475472Z ok   F7 G6-3 boundary table (backticked): 20-digit id `run 33333333333333333333` must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2476020Z ok   F7 G6-3 named case `run 0` (all-zero id, 1 digit) must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2476483Z ok   F7 G6-3 named case `run 000000` (all-zero id, 6 digits) must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2477111Z ok   F7 G6-3 named case `run 00000000000000000000` (all-zero id, 20 digits (fails at any length)) must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2477809Z ok   F7 G6-3 named case ``run 00000000000000000000`` (all-zero id, 20 digits, backticked) must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2478444Z ok   F7 G6-3 named case `run <RUN_ID>` (angle-bracket placeholder) must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2478985Z ok   F7 G6-3 named case `run TBD` (word placeholder TBD) must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2479667Z ok   F7 G6-3 named case `run TODO` (word placeholder TODO) must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2480159Z ok   F7 G6-3 named case `run N/A` (word placeholder N/A) must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2480717Z ok   F7 G6-3 named case `run 寰呭畾` (placeholder wording 寰? must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2481267Z ok   F7 G6-3 named case `run 鍗犱綅` (placeholder wording 鍗犱綅) must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2481749Z ok   F7 G6-3 named case `run 35646859765` (real-world 11-digit run id) must PASS
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2482374Z ok   F7 G6-3 named case ``run 35646859765`` (real-world 11-digit run id inside a code span) must PASS
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2483018Z ok   F7 G6-3 named case `see run 111` (token-final 3-digit id at end of line) must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2483759Z ok   F7 G6-3 named case `run 1234銆俙 (3-8 digit id terminated by CJK punctuation (not a word)) must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2484506Z ok   F7 G6-3 named case `run 7锛乣 (1-2 digit id terminated by punctuation) must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2485251Z ok   F7 G6-3 named case `report run 123456789012345锛乣 (>= 14 digit id terminated by punctuation) must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2485958Z ok   F7 G6-3 named case `see run <RUN_ID> here` (angle-bracket placeholder mid-prose) must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2486577Z ok   F7 G6-3 named case `see run TBD here` (word placeholder TBD mid-prose) must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2487159Z ok   F7 G6-3 named case `see run TODO here` (word placeholder TODO mid-prose) must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2487748Z ok   F7 G6-3 named case `see run N/A here` (word placeholder N/A mid-prose) must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2488393Z ok   F7 G6-3 named case `see run 寰呭畾 here` (CJK placeholder 寰?mid-prose) must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2489014Z ok   F7 G6-3 named case `see run 鍗犱綅 here` (CJK placeholder 鍗犱綅 mid-prose) must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2489754Z ok   F7 G6-3 named case ``run 1234`` (backticked malformed id stays judged) must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2490521Z ok   F7 G6-3 named case `The run log shows `run 1234` as the marker.` (backticked malformed id inside a prose sentence) must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2491465Z ok   2e G6-3 prose probe `The retry loop was executed run 1234 times by the harness.` (3-8 digit rule vs ASCII word) must PASS (no finding)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2492370Z ok   2e G6-3 prose probe `杩炵画 run 12 娆″悗浠诲姟瀹屾垚銆俙 (1-2 digit rule vs CJK word) must PASS (no finding)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2493180Z ok   2e G6-3 prose probe ``inventory run 1 failed`` (pre-existing docs/t027/B3B_DESIGN.md:236 shape (1-2 digit rule)) must PASS (no finding)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2494051Z ok   2e G6-3 prose probe `run 111 娆″悗鍋滄銆俙 (3-8 digit rule vs CJK word) must PASS (no finding)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2494731Z ok   2e G6-3 prose probe `run 000 娆°€俙 (all-zero rule vs CJK word) must PASS (no finding)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2495459Z ok   2e G6-3 prose probe `run 123456789012345 娆°€俙 (>= 14 digit rule vs CJK word) must PASS (no finding)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2496454Z ok   2e G6-3 prose probe `the tool ran run 1234 quickly` (3-8 digit rule vs ASCII word (no punctuation)) must PASS (no finding)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2497346Z ok   2e G6-3 prose probe `see run 7 files` (1-2 digit rule vs ASCII word) must PASS (no finding)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2497938Z ok   2e G6-3 prose probes are load-bearing: the same digit runs DO fail when token-final
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2498638Z ok   2f G6-3 leading-boundary probe `rerun 1234` (ASCII letter immediately before `run`) must PASS (no finding)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2499855Z ok   2f G6-3 leading-boundary probe `The harness will rerun 1234.` (word-embedded `run` inside a prose sentence) must PASS (no finding)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2501336Z ok   2f G6-3 leading-boundary probe `鍦╮un 1234` (CJK ideograph glued to the FRONT of `run`) must PASS (no finding)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2502124Z ok   2f G6-3 leading-boundary probe `prerun 12` (ASCII-letter prefix on the 1-2 digit rule) must PASS (no finding)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2503036Z ok   2f G6-3 leading-boundary probe `rerun <RUN_ID>` (placeholder rule carries the leading guard too (NF-2 consistency)) must PASS (no finding)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2503980Z ok   2f G6-3 leading-boundary probe `prerun TBD` (word-placeholder rule carries the leading guard too) must PASS (no finding)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2504716Z ok   2f G6-3 still-judged probe `see run 1234` (token-final 3-8 digit id mid-prose) must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2505369Z ok   2f G6-3 still-judged probe `锛坮un 1234锛塦 (id wrapped in CJK parentheses) must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2505910Z ok   2f G6-3 still-judged probe ``run 1234`` (backticked malformed id) must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2506513Z ok   2f G6-3 still-judged probe `run 1234銆俙 (id terminated by CJK punctuation) must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2507056Z ok   2f G6-3 still-judged probe `run 111` (3-digit id at end of line) must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2507580Z ok   2f G6-3 still-judged probe `run TBD` (word placeholder at end of line) must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2508236Z ok   2f G6-3 still-judged probe `see run TBD here` (word placeholder mid-prose) must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2508904Z ok   2f G6-3 word-followed exemption `run 1234 times` (digit run followed by an ASCII word) must PASS (no finding)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2510967Z ok   2f G6-3 word-followed exemption `杩炵画 run 12 娆 (digit run followed by a CJK word) must PASS (no finding)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2512007Z ok   2f G6-3 word-followed exemption ``run 1234 times`` (BACKTICKED digit run still followed by a word (NF-1 prose correction)) must PASS (no finding)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2512997Z ok   2f G6-3 glued-form consequence `run 1234times` (no separator before the trailing ASCII word) must PASS (documented, not a defect)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2514010Z ok   2f G6-3 glued-form consequence `run 12345678娆 (no separator before the trailing CJK word) must PASS (documented, not a defect)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2514623Z ok   T7 expiring literals fail G6-4
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2514957Z ok   T7 two literal lines produce two findings
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2515404Z ok   T7 whitelisting ONE of two findings leaves G6-4 red with one fatal finding
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2515950Z ok   T7 whitelisting both findings turns G6-4 green (whitelist is load-bearing)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2516422Z ok   T8 report without an artifacts block fails G7-a
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2516860Z ok   T8 delete-criterion mutation (G7-a removed) leaves the corpus clean
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2517379Z ok   T9 unresolved repo disposition (tmp path, omitted token) fails G7-b
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2517820Z ok   T9 marking the tmp path local-only turns G7-b green
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2518183Z ok   T9 unknown disposition token fails G7-b
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2518650Z ok   T10 existing repo artifact + local-only + missing-historical pass G7-b
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2519094Z ok   T10 unresolvable repo artifact fails G7-b
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2519761Z ok   T11 finding row without a disposition cell fails G7-c
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2520367Z ok   T11 adding the disposition cell turns G7-c green
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2520801Z ok   T11 delete-criterion mutation (G7-c removed) leaves the corpus clean
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2521330Z ok   G7-d stopped status line without 宸插仠姝⑩€斺€旀湭瀹屾垚 fails
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2521945Z ok   G7-d fires only on the status line, not on prose naming the rule (self-reference guard)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2522446Z ok   G7-d adding the incomplete mark turns it green
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2522831Z ok   T14 tree/index resolve whitelists from the working tree
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2523347Z ok   T14 range/ci resolve whitelists from the endpoint revision (range -> head, ci -> HEAD)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2523860Z ok   T14 G6 reads its whitelist through ctx.loadWhitelist
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2524283Z ok   T14 G4b reads its whitelist through the same ctx.loadWhitelist
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2524722Z ok   T14 both criteria print the whitelist source they used
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2525198Z ok   T15 tree scope rejects a gitignored / never-staged path marked repo (F2 probe)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2525711Z ok   T15 tree scope accepts a path present in the index and on disk
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2526187Z ok   T15 range scope still resolves repo artifacts at the endpoint revision
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2526858Z ok   T15 whitelist source resolves to endpoint:<rev> and yields zero entries when the endpoint revision lacks the file
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2527574Z ok   T15 any-commit variant: endpoint label + zero entries hold for the real HEAD revision too
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2528100Z ok   T15 G7-b FAILs an ignored path marked repo in tree scope
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2528514Z ok   T15 G7-b accepts the same row once the path is in the index
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2528995Z ok   T16 disposition vocabulary covers the CN and EN token sets stated in 6.3
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2529670Z ok   T16 G7-c accepts the English disposition `Fixed`
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2530049Z ok   T16 G7-c accepts the English disposition `Resolved`
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2530414Z ok   T16 G7-c accepts the English disposition `Closed`
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2530786Z ok   T16 G7-c accepts the English disposition `Accepted`
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2531151Z ok   T16 G7-c accepts the English disposition `Rejected`
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2531514Z ok   T16 G7-c accepts the English disposition `Deferred`
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2531878Z ok   T16 G7-c accepts the English disposition `Recorded`
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2532243Z ok   T16 G7-c accepts the English disposition `To do`
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2532605Z ok   T16 G7-c accepts the English disposition `Observed`
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2532996Z ok   T16 G7-c accepts the English disposition `To be discussed`
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2533408Z ok   T16 G7-c accepts the English disposition `Not a problem`
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2533804Z ok   T16 G7-c accepts the English disposition `Documented`
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2534213Z ok   T16 G7-c still rejects a finding row with no disposition cell
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2535170Z ok   F2 G7-c structural disposition probe `| **High** | 鎻忚堪閲屽啓鈥滃凡淇€?| |` (disposition token inside the description cell, disposition cell empty) must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2536126Z ok   F2 G7-c structural disposition probe `| **High** | evidence chain missing | Fixed |` (English disposition in the last cell) must PASS
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2537204Z ok   F2 G7-c structural disposition probe `| **High** | 鎻忚堪閲屽啓鈥滃凡淇€?| 鎷掓敹 |` (CN disposition in the last cell (token also appears in the description)) must PASS
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2538225Z ok   F2 G7-c structural disposition probe `| **Medium** | description says "Resolved" | Rejected |` (another EN token pair resolves in the last cell) must PASS
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2539243Z ok   F2 G7-c structural disposition probe `| **High** | evidence chain missing` (row with no disposition cell at all (no trailing pipe)) must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2540491Z ok   F2 G7-c structural disposition probe `| **High** | 璇佹嵁閾剧己澶?|` (row with a structurally present but EMPTY disposition cell) must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2541349Z ok   F2 G7-c structural disposition probe `| **Low** | 鎻忚堪鍚€滃凡淇€?| 宸蹭慨 |` (control: token in both cells) must PASS
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2542080Z ok   F2 G7-c takes the disposition from the LAST cell only (internals)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2542538Z ok   F3 G7-d stopped-state vocabulary is bilingual (internals)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2543337Z ok   F3 G7-d bilingual stopped-state probe `| Status | Stopped (pending user ruling) |` (EN status line without the incomplete mark) must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2544367Z ok   F3 G7-d bilingual stopped-state probe `| Status | Stopped 鈥?incomplete |` (EN status line carrying the EN incomplete mark) must PASS
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2545340Z ok   F3 G7-d bilingual stopped-state probe `| Status | 宸插仠姝⑩€斺€旀湭瀹屾垚锛堢瓑鐢ㄦ埛瑁佸喅锛?|` (CN status line carrying the CN incomplete mark) must PASS
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2546199Z ok   F3 G7-d bilingual stopped-state probe `| Status | 宸插仠姝紙绛夌敤鎴疯鍐冲悗鍐冲畾鏄惁閲嶅惎锛?|` (CN status line without the mark) must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2546989Z ok   F3 G7-d bilingual stopped-state probe `| Status | Halted (awaiting ruling) |` (Halted is part of the EN token set) must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2547919Z ok   F3 G7-d bilingual stopped-state probe `| Status | halted (awaiting ruling) |` (EN tokens match case-insensitively (lowercase halted)) must FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2548984Z ok   F3 G7-d bilingual stopped-state probe `| Status | stopped 鈥?incomplete |` (the EN mark matches case-insensitively too) must PASS
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2550318Z ok   F3 G7-d bilingual stopped-state probe `| Status | Stopped (pending user ruling) |` (the mark appears later in the SAME block, so the row is closed out) must PASS
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2551186Z ok   F3 G7-d ignores a CN prose line naming 鍋滄鎬?(self-reference guard)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2551797Z ok   T72 OB-42 positive control: a closed-set verdict line passes (bold marker + parenthetical note allowed)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2552462Z ok   T72 OB-42 an out-of-set value under a closed-set prefix is a format deviation
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2553082Z ok   T72 OB-42 a value legal for ANOTHER prefix is still a deviation (per-prefix sets, not one merged set)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2553677Z ok   T72 OB-42 the bare-token rule: a prefix-less `PASS` is a deviation
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2554268Z ok   T72 OB-42 the table-external rule: an unknown prefix carrying exactly one closed value is a deviation
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2554884Z ok   T72 OB-42 a residual `RE_` placeholder is a deviation (4.1 abolished it)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2555451Z ok   T72 OB-42 stated boundary: a gate reading that only LOOKS like a verdict line is not judged
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2556053Z ok   T72 OB-42 self-reference guard: an illegal form quoted on a marked line is skipped
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2556727Z ok   T72 OB-42 mutation applied: the membership line matched g7.js (a stale patch would weaken the suite silently)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2557452Z ok   T72 OB-42 load-bearing proof: accepting any recognisable value makes the SAME out-of-set line pass
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2558168Z ok   T72 restore: g7.js is byte-identical after the mutation window and the cached module still fails the line
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2558965Z ok   T73 OB-29 positive control: a call string matching the 2.2 qualified name passes (code span vs plain text is normalised away)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2559934Z ok   T73 OB-29 a call string outside the 2.2 qualified-name column fails
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2560417Z ok   T73 OB-29 the `_EN` side is judged with its own lowercase table header
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2560879Z ok   T73 OB-29 a directive without an appendix B region is not judged
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2561457Z ok   T73 OB-29 fail-closed: an appendix B whose 2.2 qualified-name column cannot be read raises UsageError
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2562209Z ok   T73 OB-29 mutation applied: the 2.2 membership line matched g5c.js (a stale patch would weaken the suite silently)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2563032Z ok   T73 OB-29 load-bearing proof: with the membership test patched out the SAME out-of-set call string passes
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2563799Z ok   T73 restore: g5c.js is byte-identical after the mutation window and the cached module still fails the call string
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2564711Z ok   T74 OB-90 an `_EN.md`-only change is now judged instead of silently ignored, and fails the symmetry test
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2565416Z ok   T74 OB-90 a CN-only change whose `_EN` mirror exists is judged too (the mirror need not be in the change set)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2566332Z ok   T74 OB-90 directive pair, EN-only edit with a shape drift: G3(a.1) and G3(a.2) both go red
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2567074Z ok   T74 OB-90 directive pair, EN-only edit with a shape-neutral body: only G3(a.1) goes red, G3(a.2) stays silent
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2567855Z ok   T74 OB-90 a non-canonical `_en.md` spelling is judged as the EN side of the same pair, not as two untouched paths (5 r1 F4)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2568751Z ok   T74 OB-90 load-bearing guard: a single-language `.md` without an `_EN` mirror stays out of scope, so the mirror-less corpus docs cannot go red
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2569964Z ok   T74 OB-90 no behaviour drift: a two-sided equal edit still yields one green aggregate and no per-pair FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2570733Z ok   T74 OB-90 equal deletion on both sides still passes (an unreadable pair no longer skips the numstat verdict)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2571466Z ok   T74 OB-90 a deleted `_EN` side still yields a G3(a.1) FAIL (the old code skipped unreadable pairs entirely)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2572189Z ok   T74 OB-90 the directive pair with an unreadable side reports G3(a.2) FAIL (premise broken, fail closed)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2572961Z ok   T74 OB-90 mutation applied: the pairing-guard block matched g3a.js (a stale patch would weaken the suite silently)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2573778Z ok   T74 OB-90 load-bearing proof: with the either-side guard reverted the SAME `_EN`-only change produces NO record again
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2574608Z ok   T74 restore: g3a.js is byte-identical after the mutation window and the cached module still judges the `_EN`-only change
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2575325Z ok   T74 OB-90 mutation applied (mirror-existence guard): the guard line matched g3a.js
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2576050Z ok   T74 OB-90 load-bearing proof (mirror-existence guard): without the predicate the SAME single-language document goes red
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2576861Z ok   T74 restore (mirror-existence guard): g3a.js is byte-identical and the single-language document is silent again
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2577674Z ok   T75 OB-91 the 7 r3 residual is closed: `lang:zh_cn` is consumed whole and rejected (it used to truncate to a legal `lang:zh`)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2578281Z ok   T75 OB-91 the same holds for `lang:en_us` on the `_EN` side
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2578734Z ok   T75 OB-91 a bare `lang:` is an unknown tag rather than an invisible token
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2579659Z ok   T75 OB-91 coexistence is fail-closed for the new form as well (`lang:zh` plus a bare `lang:`)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2580293Z ok   T75 OB-91 coexistence (`lang:zh` plus `lang:zh_cn`) is rejected too
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2580784Z ok   T75 OB-91 a trailing continuation character (`lang:zh-`) is rejected
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2581493Z ok   T75 OB-91 a trailing dot (`lang:zh.`) belongs to the token and is rejected (the terminator set is the complement of the continuation set)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2582224Z ok   T75 OB-91 the comparison stays whole-token and case-sensitive (`lang:ZH`)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2582679Z ok   T75 OB-91 a digit suffix (`lang:zh2`) is rejected
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2583085Z ok   T75 OB-91 a comma terminates the token, so `lang:zh,` stays legal
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2583671Z ok   T75 OB-91 prose after the tag creates no phantom occurrence (a tag followed by a space and more words)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2584299Z ok   T75 OB-91 a leading dot is not part of the token (`.lang:zh` still declares zh)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2585001Z ok   T75 OB-91 an occurrence preceded by a word character is not an occurrence (`xlang:zh` declares nothing and fails as missing)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2585851Z ok   T75 OB-91 mutation applied: the continuation-charset line matched g6.js (a stale patch would weaken the suite silently)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2587120Z ok   T75 OB-91 load-bearing proof: with the continuation charset narrowed back the SAME `lang:zh_cn` header passes again (the charset, not the closed set, is what catches it)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2588091Z ok   T75 restore: g6.js is byte-identical after the mutation window and the cached module still rejects `lang:zh_cn`
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2588931Z ok   T78 OB-90 an `_EN`-only bold drift is judged from the EN side: numstat and the bold shape both go red
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2589776Z ok   T78 OB-90 the backtick shape is judged on its own (equal numstat, so only G3(a.2) can speak)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2590427Z ok   T78 OB-90 a heading downshift on the `_EN` side (one inserted line) fails G3(a.2) with `head` false
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2591041Z ok   T78 OB-90 the pipe shape is judged on its own (a table row widened on the `_EN` side)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2591655Z ok   T78 OB-90 the blank-line shape is judged on its own (same line count, one blank line filled in)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2592336Z ok   T78 OB-90 the line-count shape is judged on its own (a trailing body line, heading positions intact)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2593006Z ok   T78 OB-90 control: an equal two-sided edit stays green (one aggregate PASS, no per-pair FAIL)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2593749Z ok   T78 OB-90 control: an identical shape change on BOTH sides stays green (the six shapes compare sides, not an absolute form)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2594528Z ok   T78 OB-90 pairing without shape drift: an `_EN`-only modification fails G3(a.1) and leaves G3(a.2) silent
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2595262Z ok   T78 OB-90 an `_EN` side that is NEWLY ADDED (+2/-0) is judged against the untouched CN baseline and fails G3(a.1)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2595991Z ok   T78 OB-90 a DELETED `_EN` side (+0/-4) still yields G3(a.1) FAIL, so a removal cannot pass as "nothing to compare"
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2596731Z ok   T78 OB-90 an `_EN` RENAME is judged as two pairs (old mirror deleted, new mirror added), each with its own G3(a.1)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2597561Z ok   T78 OB-90 a non-canonical `_en.md` spelling is paired under the CANONICAL CN id, so the half a reader looks for is the one reported
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2598345Z ok   T78 OB-90 an orphan `_EN.md` (no CN side at all) is still judged and fails G3(a.1) against a +0/-0 baseline
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2599111Z ok   T78 OB-90 a single-language document without an `_EN` mirror produces NO record (no false red on the mirror-less corpus)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2600290Z ok   T78 OB-90 aggregate uniqueness: the same `_EN`-only drift emits exactly ONE G3(a) record (a duplicate aggregate would double-count)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2601023Z ok   T79 OB-91 illegal form `lang:zh_cn` is consumed whole and rejected as an unknown tag
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2601587Z ok   T79 OB-91 illegal form `lang:zh-cn` is consumed whole and rejected as an unknown tag
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2602149Z ok   T79 OB-91 illegal form `lang:en_us` is consumed whole and rejected as an unknown tag
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2602705Z ok   T79 OB-91 illegal form `lang:en-us` is consumed whole and rejected as an unknown tag
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2603256Z ok   T79 OB-91 illegal form `lang:` is consumed whole and rejected as an unknown tag
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2603791Z ok   T79 OB-91 illegal form `lang:ZH` is consumed whole and rejected as an unknown tag
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2604344Z ok   T79 OB-91 illegal form `lang:zh-` is consumed whole and rejected as an unknown tag
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2604885Z ok   T79 OB-91 illegal form `lang:zh.` is consumed whole and rejected as an unknown tag
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2605423Z ok   T79 OB-91 illegal form `lang:zh2` is consumed whole and rejected as an unknown tag
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2605958Z ok   T79 OB-91 illegal form `lang:zh:` is consumed whole and rejected as an unknown tag
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2606494Z ok   T79 OB-91 legal + illegal coexistence is fail-closed (lang:zh + lang:zh-cn)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2607007Z ok   T79 OB-91 legal + illegal coexistence is fail-closed (lang:zh-cn + lang:zh)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2607690Z ok   T79 OB-91 legal + illegal coexistence is fail-closed (lang:en + lang:en-us)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2608351Z ok   T79 OB-91 legal + illegal coexistence is fail-closed (lang:en-us + lang:en)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2608953Z ok   T79 OB-91 continuation char extends the token (`lang:en_` is one unknown token, not a legal prefix)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2610039Z ok   T79 OB-91 continuation char extends the token (`lang:en.` is one unknown token, not a legal prefix)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2610744Z ok   T79 OB-91 continuation char extends the token (`lang:en-` is one unknown token, not a legal prefix)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2611425Z ok   T79 OB-91 continuation char extends the token (`lang:en2` is one unknown token, not a legal prefix)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2612093Z ok   T79 OB-91 continuation char extends the token (`lang:enA` is one unknown token, not a legal prefix)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2612763Z ok   T79 OB-91 continuation char extends the token (`lang:ena` is one unknown token, not a legal prefix)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2613438Z ok   T79 OB-91 continuation char extends the token (`lang:zhA` is one unknown token, not a legal prefix)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2614118Z ok   T79 OB-91 continuation char extends the token (`lang:zha` is one unknown token, not a legal prefix)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2614785Z ok   T79 OB-91 continuation char extends the token (`lang:zh9` is one unknown token, not a legal prefix)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2615469Z ok   T79 OB-91 continuation char extends the token (`lang:zh__` is one unknown token, not a legal prefix)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2616158Z ok   T79 OB-91 continuation char extends the token (`lang:zh-_` is one unknown token, not a legal prefix)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2616842Z ok   T79 OB-91 continuation char extends the token (`lang:zh.1` is one unknown token, not a legal prefix)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2617518Z ok   T79 OB-91 continuation char extends the token (`lang:zhCN` is one unknown token, not a legal prefix)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2618208Z ok   T79 OB-91 continuation char extends the token (`lang:en-001` is one unknown token, not a legal prefix)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2618846Z ok   T79 OB-91 legal shape "zh-alone" is not turned red by the token rule
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2619507Z ok   T79 OB-91 legal shape "zh-comma" is not turned red by the token rule
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2619993Z ok   T79 OB-91 legal shape "zh-space" is not turned red by the token rule
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2620470Z ok   T79 OB-91 legal shape "zh-tab" is not turned red by the token rule
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2620954Z ok   T79 OB-91 legal shape "zh-cjk-comma" is not turned red by the token rule
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2621474Z ok   T79 OB-91 legal shape "zh-cjk-paren" is not turned red by the token rule
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2622006Z ok   T79 OB-91 legal shape "zh-declaration-line" is not turned red by the token rule
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2622713Z ok   T79 OB-91 legal shape "zh-bracket" is not turned red by the token rule
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2623198Z ok   T79 OB-91 legal shape "zh-paren" is not turned red by the token rule
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2623663Z ok   T79 OB-91 legal shape "zh-quote" is not turned red by the token rule
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2624133Z ok   T79 OB-91 legal shape "zh-pipe" is not turned red by the token rule
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2624600Z ok   T79 OB-91 legal shape "zh-twice" is not turned red by the token rule
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2625062Z ok   T79 OB-91 legal shape "en-alone" is not turned red by the token rule
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2625532Z ok   T79 OB-91 legal shape "en-comma" is not turned red by the token rule
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2626047Z ok   T79 OB-91 legal shape "en-declaration-line" is not turned red by the token rule
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2626599Z ok   T79 OB-91 legal shape "zh-line-15-of-window" is not turned red by the token rule
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2627143Z ok   T79 OB-91 fail-closed premise: tag on line 16 is outside the header window
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2627606Z ok   T79 OB-91 fail-closed premise: two legal tags conflict
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2628066Z ok   T79 OB-91 fail-closed premise: declared tag disagrees with the file name
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2628495Z ok   T79 OB-91 fail-closed premise: no tag at all
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2629119Z ok   T79 OB-91 fail-closed premise: a word character before `lang:` means no occurrence
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2630019Z ok   T79 OB-91 fail-closed premise: a bare tag next to a legal one is still unknown
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2631333Z ok   T79 canary: constants are locked 鈥?LANG_HEADER_WINDOW = 15, LANG_TAG_EXACT is exactly {lang:zh, lang:en}, and LANG_TAG_CONT_RE is exactly [A-Za-z0-9._:-] (behavior pair: `lang:zh` legal, `lang:zh_cn` illegal)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2632324Z ok   T79 canary: LANG_TAG_CONT_RE source text is frozen to the literal class [A-Za-z0-9._:-]
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2633300Z ok   T79 canary: slash (U+002F) is an external terminator, not a continuation char 鈥?`lang:zh/en` splits into the legal tag `lang:zh` plus free text and stays green
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2634524Z ok   T79 canary: question mark (U+003F) is an external terminator, not a continuation char 鈥?`lang:zh?en` splits into the legal tag `lang:zh` plus free text and stays green
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2635744Z ok   T79 canary: equals sign (U+003D) is an external terminator, not a continuation char 鈥?`lang:zh=en` splits into the legal tag `lang:zh` plus free text and stays green
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2636928Z ok   T79 canary: space (U+0020) is an external terminator, not a continuation char 鈥?`lang:zh en` splits into the legal tag `lang:zh` plus free text and stays green
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2638191Z ok   T79 canary: fullwidth semicolon (U+FF1B) is an external terminator, not a continuation char 鈥?`lang:zh锛沞n` splits into the legal tag `lang:zh` plus free text and stays green
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2639723Z ok   T79 canary: fullwidth comma (U+FF0C) is an external terminator, not a continuation char 鈥?`lang:zh锛宔n` splits into the legal tag `lang:zh` plus free text and stays green
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2641015Z ok   T79 canary: ideographic comma (U+3001) is an external terminator, not a continuation char 鈥?`lang:zh銆乪n` splits into the legal tag `lang:zh` plus free text and stays green
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2642151Z ok   T79 canary: black-box tokenization 鈥?`lang:zh` PASSes, `lang:zh_cn` is an unknown tag, `lang:zh/en` PASSes (/ terminates the token)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2642938Z ok   T76 G1 a consistent ledger (heading / status table / completion log) passes all four sub-checks
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2643537Z ok   T76 G1 an unknown state symbol outside the ledger closed set fails G1(c)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2644119Z ok   T76 G1 the pending-evaluation marker is only legal on headings, never in the status table
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2644687Z ok   T76 G1 a heading that disagrees with its status-table row fails G1(d)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2645232Z ok   T76 G1 a completion-log row whose status row is still 猬?fails G1(e)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2645860Z ok   T76 G1 in-progress wording inside a completion row fails G1(f) (the GATES-EDGE-COVERAGE defect, mechanised)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2646534Z ok   T76 G1 the same holds for the English wording (In progress / awaiting finalisation)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2647198Z ok   T76 G1 a completion key binds to a heading through its backticked alias (the P-series governance case)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2647998Z ok   T76 G1 the same row passes once the aliased heading is 鉁?(the binding is real, not a lucky string match)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2648720Z ok   T76 G1 mutation applied on the alias lookup (defect 3: completion key never bound to a P-series heading)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2649678Z ok   T76 G1 load-bearing proof: with the alias fallback removed the SAME mismatched row passes, i.e. G1(e) was vacuous for every governance slice
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2650348Z ok   T76 G1 restore after the alias mutation window
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2650890Z ok   T76 G1 an UNKNOWN state symbol on a heading reaches G1(c) instead of slipping past every guard (r2 F-2)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2651717Z ok   T76 G1 G1(f) judges ADDED completion rows only: the same historical row fails when it is in the added set and passes when it is not (r2 F-3)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2652654Z ok   T76 G1 an unbound completion key also emits an explicit INFO record, so the directive promise "no binding is INFO" is literal (r2 F-4)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2653643Z ok   T76 G1 a ledger without its state-symbol declaration line raises UsageError (exit 2, never a silent guess)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2654418Z ok   T76 G1 mutation applied: the in-progress test line matched g1.js (a stale patch would weaken the suite silently)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2655242Z ok   T76 G1 load-bearing proof: with the wording test patched out the SAME in-progress row passes
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2655909Z ok   T76 G1 restore: g1.js is byte-identical after the mutation window and the wording row fails again
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2656492Z ok   T76 G1 an unreadable ledger pair reports SKIP (never a vacuous PASS)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2657048Z ok   T119 G1(e2) an ADDED in-block completion row under a 鉁?heading passes
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2657609Z ok   T119 G1(e2) an ADDED in-block completion row under a non-鉁?heading fails
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2658157Z ok   T119 G1(e2) the same row is not re-judged when it is not in the added set (forward rule)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2658812Z ok   T119 G1(e2) an in-block row whose nearest heading carries no state symbol is skipped, not failed
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2659781Z ok   T121 G1(e2) the 鉁?PASS is a JUDGED row, not a vacuous skip (counter: 1 judged, 0 skipped, 0 historical)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2660473Z ok   T121 G1(e2) the forward rule is a real exclusion: an unadded row is counted historical, never judged
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2661189Z ok   T121 G1(e2) an added row with NO heading above it is skipped via the headKey guard (not silently passed as judged)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2661979Z ok   T121 G1(e2) the row binds to the NEAREST heading: a 鉁?heading above a 馃攧 one does not excuse it
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2662610Z ok   T121 G1(e2) the EN field name `| Completion record |` is collected and judged like the CN one
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2663188Z ok   T77 G5 a declared, staged, resolvable change set passes G5(d) / G5(e) / G5(f)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2663799Z ok   T77 G5 a staged path nobody declared fails G5(d) - the observable consequence of `git add -A`
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2664655Z ok   T77 G5 the reverse direction (declared but untouched) is INFO, because a fence is the landing snapshot - the 搂11.2 backfill case
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2665318Z ok   T77 G5 an evidence reference that does not resolve fails G5(e)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2665850Z ok   T77 G5 an unstaged modification in index scope fails G5(f) (index must equal the worktree)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2666555Z ok   T77 G5 a STAGED entry (porcelain X column) does not dirty the index - staging is the normal state of index scope
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2667225Z ok   T77 G5 a change set without a report records INFO on G5(d) instead of a vacuous pass
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2667827Z ok   T77 G5 outside index scope the staging check is INFO (a clean CI checkout has no index state)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2668517Z ok   T77 G5 an external GATES_CHANGESET_JSON that disagrees with the derived fields raises UsageError (exit 2)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2669176Z ok   T77 G5 a declared-but-untouched path also emits an explicit INFO record (r2 F-4)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2670188Z ok   T77 G5 mutation applied on the deletion guard, which must read the parser boolean and not the two-char XY status (r2 F-1)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2671026Z ok   T77 G5 load-bearing proof: with the deletion guard patched out the same deleted path is reported as undeclared (r2 F-1)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2671657Z ok   T77 G5 restore after the deletion-guard mutation window
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2672156Z ok   T77 G5 a declared-but-untouched path also emits an explicit INFO record (r2 F-4)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2672910Z ok   T77 G5 evidence references are read from BARE paths too (30/30 corpus rows carry no backticks, so backtick-only extraction was vacuous)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2673973Z ok   T77 G5 a repository-root artifact in the evidence cell is extracted too (鈶?finding: the prefix whitelist made G5(e) vacuous for root files)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2674764Z ok   T77 G5 mutation applied on the bare-path scan (defect 2: evidenceRefs were backtick-only)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2675573Z ok   T77 G5 load-bearing proof: with the bare-path scan removed the same row yields no reference at all
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2676112Z ok   T77 G5 restore after the bare-path mutation window
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2676609Z ok   T77 G5 a deleted staged path is not a change-set member (removing a file declares nothing)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2677409Z ok   T77 G5 mutation applied: the set-equality line matched g5.js (a stale patch would weaken the suite silently)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2678114Z ok   T77 G5 load-bearing proof: with the equality verdict patched the SAME undeclared path passes
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2678801Z ok   T77 G5 restore: g5.js is byte-identical after the mutation window and the undeclared path fails again
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2679681Z ok   T120 G5(e2) an ADDED in-block completion row whose evidence path resolves passes
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2680275Z ok   T120 G5(e2) an ADDED in-block completion row whose evidence path does not resolve fails
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2680872Z ok   T120 G5(e2) without an added in-block completion row there is nothing to resolve (PASS)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2681472Z ok   T122 G5(e2) the resolvable PASS is a REAL resolution (counter: 1 reference(s) resolved)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2682073Z ok   T122 G5(e2) an ADDED EN `| Completion record |` row is extracted and resolved like the CN one
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2682699Z ok   T123 G5(e2) `x{,_EN}.md` expands to BOTH sides and resolves (counter: 2 reference(s) resolved)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2683338Z ok   T123 G5(e2) the expansion is load-bearing: a missing `_EN` side fails instead of being dropped
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2683968Z ok   T123 G5(e2) a second brace group stays unexpandable: the skip is VISIBLE, not a silent pass
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2684589Z ok   T124 G5(e2) a stem-less brace group yields NO reference: a visible skip, never a false FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2685238Z ok   T124 G5(e2) on a brace-free row the in-block extractor agrees EXACTLY with the shared G5(e) extractor
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2685816Z ok   T13 whole fixture corpus yields exactly the expected FAIL id set
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2686267Z ok   T13 whole fixture corpus has no unexpected SKIP/INFO storm
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2686727Z ok   T17 unresolvable range base is a usage error, not an empty change set
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2687231Z ok   T17 unresolvable range base is a usage error, not an empty change set
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2687718Z ok   T17 unresolvable range head is a usage error, not an empty change set
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2688199Z ok   T17 unresolvable range head is a usage error, not an empty change set
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2688673Z ok   T17 positive control: a resolvable range still builds a context
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2689171Z ok   T18 a failed `git diff` is an environment error even when both endpoints resolve
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2689849Z ok   T18 a failed `git status` in tree scope is an environment error, not an empty change set
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2690380Z ok   T18 a failed `git status` in index scope is an environment error too
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2690902Z ok   T18 --scope=ci refuses a SHALLOW clone instead of falling back to the whole tree
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2691481Z ok   T18 an inconclusive shallow probe is an environment error, not a licence to fall back
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2692048Z ok   T18 positive control: a genuine root commit still falls back to EMPTY_TREE
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2692773Z ok   T19 G6-5 accepts 搂7.5 (exact heading) / 搂7.2 (parent prefix of 搂7.2.1) / 搂1.7.1 (bold line-leading label)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2693418Z ok   T19 the legal fixture is scanned (6 in-region lines, 3 references) with zero findings
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2694132Z ok   T19 directiveLabels reads the REAL directive: bold line-leading 搂1.7.1 plus heading 搂7.5 / 搂7.2.1
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2694758Z ok   T19 resolvesRef: exact and parent-prefix accepted, a dangling number rejected
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2695317Z ok   T20 G6-5 FAILs a 搂7.9 reference on a line INSIDE the 搂0.3 region
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2695817Z ok   T20 exactly one finding, and its detail names `搂7.9 unresolved`
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2696584Z ok   T20 reverse mutation (搂7.9 -> 搂7.8) clears G6-5: the assertion tracks the reference, not the line
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2697152Z ok   T21 the C.1 v3.1 comparison table produces no finding (zero corpus FAIL)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2697833Z ok   T21 the excluded 搂3.10 row is genuinely out of region: 0 references counted
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2698459Z ok   T21 OB-46 fail-closed: renaming `### C.1` aborts with UsageError instead of judging an unbounded region
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2699139Z ok   T21b OB-46 positive control: an intact ledger keeps both target regions (no over-rejection)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2700072Z ok   T21b OB-46 boundary: a file with neither heading stays region-free and raises nothing (ordinary markdown)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2700833Z ok   T21b OB-46 fail-closed: `### C.0` without a `### C.1` delimiter raises UsageError (started-but-unterminated region)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2701474Z ok   T22 G6-5 skips a line carrying the 绀轰緥 exclusion marker
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2702013Z ok   T22 reverse mutation (drop the 绀轰緥 marker) turns the very same line red on 搂7.9
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2702668Z ok   T22 exclusion marker `涓嶅緱娈嬬暀` suppresses the finding, and dropping it restores the red
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2703319Z ok   T22 exclusion marker `绀轰緥` suppresses the finding, and dropping it restores the red
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2703961Z ok   T22 exclusion marker `寮曟枃` suppresses the finding, and dropping it restores the red
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2704585Z ok   T22 exclusion marker `鍐茬獊` suppresses the finding, and dropping it restores the red
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2705221Z ok   T22 exclusion marker `鐭涚浘` suppresses the finding, and dropping it restores the red
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2705825Z ok   T23 an in-memory whitelist entry exempts the dangling reference (PASS + exactly one SKIP)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2706428Z ok   T23 the exemption is load-bearing: the same fixture without the entry stays red
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2707073Z ok   T23 no entry was preloaded into tools/gates/g6-whitelist.txt (the exemption above is in-memory only)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2707817Z ok   T24 the out-of-region 搂7.9 line yields no finding: 6 lines scanned, 0 references counted
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2708571Z ok   T24 boundary mutation (drop the closing heading) extends the region onto the 搂7.9 line and turns G6-5 red
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2709183Z ok   T25 precondition: the legal fixture is green BEFORE the mutation
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2710113Z ok   T25 mutation 鈶?applied: the patch text matched g6.js (a stale patch would weaken the suite silently)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2710878Z ok   T25 mutation 鈶? without the bold-label collector the 搂1.7.1 reference dangles and G6-5 turns red
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2711599Z ok   T25 the same mutation leaves the heading-derived labels intact (搂7.5 / 搂7.2 still resolve)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2712200Z ok   T25 restore: g6.js is byte-identical after the mutation window (no disk residue)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2712786Z ok   T25 restore: the cached criterion module is unmutated, the legal fixture is green again
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2713486Z ok   T26 all six CN closed-set words pass, including the `**宸插缃?*锛坴1.1锛塦 parenthetical shape
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2714012Z ok   T26 the CN/EN closed sets are exactly the six documented words
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2714579Z ok   T26 firstStatusWord accepts `璇峘, `璇嶏紙鎷敞锛塦, `**璇?*锛堟嫭娉級` and rejects a legacy value
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2715126Z ok   T26 rowCellsOf splits on unescaped pipes and drops the two outer cells
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2715660Z ok   T26 ledgerRegionRange = [搂12.4 heading, next ^#{2,4} heading)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2716215Z ok   T26 a ledger-shaped row ABOVE the 搂12.4 heading is out of region and not judged
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2716776Z ok   T26 a non-OB table row inside 搂12.4 is not judged (LEDGER_ROW_RE)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2717331Z ok   T26 a ledger row in a file without a 搂12.4 heading is not judged (no target region)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2717894Z ok   T27 G6-6 FAILs `**涓嬩竴鐗囧繀鍋?*` and `**宸茶惤鍦?*` with exactly two findings
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2718490Z ok   T27 both offending cells are named, and the legal control row (宸茬櫥璁? is NOT reported
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2719209Z ok   T27 reverse mutation (both legacy words -> closed-set words) clears G6-6
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2720029Z ok   T28 mutation 鈶?applied: the patch text matched g6.js
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2720644Z ok   T28 the mutated CN closed set has five words and no 瑙傚療涓?Go ubuntu-latest	Gates	2026-11-22T00:34:13.2721204Z ok   T28 mutation 鈶? the 瑙傚療涓?row alone turns red; the other five closed-set rows stay green
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2721841Z ok   T28 restore: g6.js is byte-identical and the cached module still carries 瑙傚療涓?Go ubuntu-latest	Gates	2026-11-22T00:34:13.2722364Z ok   T28 the `_EN` fixture selects the EN word table: all six EN words pass
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2723042Z ok   T28 the `_EN` word-table switch is load-bearing: EN word fails under a CN name, passes under `_EN`, CN word fails under `_EN`
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2723828Z ok   T28b OB-47 declaredLang reads the header tag and agrees with the name (zh -> CN table, en -> EN table)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2724520Z ok   T28b OB-47 fail-closed: no declared language tag raises UsageError instead of defaulting to CN
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2725203Z ok   T28b OB-47 fail-closed: a third language (`lang:fr`) raises UsageError instead of being judged as CN
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2725918Z ok   T28b OB-47 fail-closed: a PREFIX form (`lang:zh-cn`) raises UsageError instead of counting as zh (7 r1 High-2)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2726560Z ok   T28b OB-47 fail-closed: the same holds for `lang:en-us` on the `_EN` side
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2727195Z ok   T28b OB-91 fail-closed: a legal tag plus an illegal one (`lang:zh` + `lang:zh-cn`) raises UsageError (7 r2 Medium)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2728175Z ok   T28b OB-91 fail-closed: the same coexistence rule holds on the `_EN` side (`lang:en` + `lang:en-us`)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2729115Z ok   T28b OB-47 fail-closed: a renamed file (`_EN.md` keeping `lang:zh`) raises UsageError instead of switching the table
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2730231Z ok   T28b OB-47 fail-closed: two conflicting declarations raise UsageError
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2730890Z ok   T28b OB-47 the header window is bounded: a tag below it is not a declaration
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2731605Z ok   T28b OB-47 positive control: a compliant declaration is never rejected on either side
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2744472Z ok   T28b OB-47 scope: a 搂12.4-shaped heading with no ledger row is skipped, not forced to declare (the RFC case)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2745318Z ok   T28b OB-47 scope: the same foreign file carrying a real ledger row is judged, so it must declare (fail closed)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2746072Z ok   T28c OB-73 positive control: equal backtick counts leave G3(a.2) silent and the aggregate green
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2746754Z ok   T28c OB-73 the sixth shape is load-bearing: one extra backtick on the `_EN` side turns G3(a.2) red
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2747513Z ok   T28c OB-73 mutation applied: the sixth-shape line matched g3a.js (a stale patch would weaken the suite silently)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2748401Z ok   T28c OB-73 load-bearing proof: with the sixth shape patched out the SAME drift passes (the shape, not the pair, is what catches it)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2749271Z ok   T28c restore: g3a.js is byte-identical after the mutation window and the cached module still catches the drift
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2750274Z ok   T28c OB-73 the live directive pair satisfies all six shapes (real whole-file files)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2750794Z ok   T29 G5-b passes a model value that is a closed-set member
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2751259Z ok   T30 G5-b passes a role file that omits the model key (section 2.6 shape)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2751776Z ok   T31 G5-b fails the one remaining blacklist member (kimi-k3 is not in the set)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2752339Z ok   T32 G5-b comparison is case-sensitive: the right model in the wrong case fails
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2752847Z ok   T33 G5-b comparison is verbatim: a quoted set member still fails
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2753385Z ok   T34 G5-b collects EVERY model key: a legal first key does not hide an illegal second one
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2753934Z ok   T35 G5-b fails a former blacklist value that is not a closed-set member
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2754682Z ok   T36 empty model value is G5-a 2 s finding and not G5-b s: G5-b passes while G5-a(2) fails
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2755286Z ok   T37 the closed set is load-bearing: adding gpt-5.4 to the set flips that fixture to PASS
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2756024Z ok   T37 restore: g5b.js is byte-identical and the cached module still fails gpt-5.4
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2756594Z ok   T38 G5-b parses the frontmatter block only: a model key in the body is not judged
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2757145Z ok   T39 G5-b trims both ends: a legal value with a trailing space still passes
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2757655Z ok   T40 G5-b is verbatim: a legal value followed by an inline comment fails
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2758194Z ok   T41 G5-b accepts each member this slice added (deep tier and parallel alternative)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2758833Z ok   T42 the added member is load-bearing: dropping gpt-6-luna from the set makes that fixture fail
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2759689Z ok   T42 restore: g5b.js is byte-identical and the cached module still accepts gpt-6-luna
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2760281Z ok   T131a G5-b accepts the stage-6 member after the P81 rename (mai-code-2-flash)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2760873Z ok   T131b the retired deep-tier identifier is rejected (gpt-6.1-sol is outside the closed set)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2761540Z ok   T131c the retired stage-6 identifier is rejected (mai-code-1.1-flash is outside the closed set)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2762146Z ok   T43 G8-a accepts a pack member (nearest ancestor carries MANIFEST + SHA256SUMS)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2762622Z ok   T43 G8-a accepts a root-level *-freedom-list.md
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2763044Z ok   T43 G8-a accepts a path registered verbatim in evidence-forms.txt
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2763530Z ok   T43 the registration is load-bearing: without it the same path fails
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2764046Z ok   T43 G8-a FAILs a stray root-level path with a `not a pack member` reason token
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2764578Z ok   T43 a SUBSTRING match does not register (entry.match must EQUAL the path)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2765137Z ok   T43 a registration row with 2 fields is a UsageError (exit 2, never a silent pass)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2765652Z ok   T43 a duplicate registration for the same path is a UsageError
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2766143Z ok   T44 G8-b accepts a fully self-consistent pack (runtime-computed hashes)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2766783Z ok   T44 G8-b FAILs a pack without the 褰掓。鏉＄洰娓呭崟 section (token `missing`, names the pack)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2767402Z ok   T44 G8-b FAILs an unlisted pack-root payload (token `not listed`, names the file in both lists)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2768048Z ok   T44 G8-b recomputes hashes and FAILs a mismatch (token `hash mismatch`, names the payload)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2768805Z ok   T44 G8-b FAILs a 鏈叆搴?entry colliding with a payload (token `untracked-list conflict`, names the path)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2769540Z ok   T44 G8-b normalizes backslash SHA256SUMS paths to POSIX and passes
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2770109Z ok   T44 the backslash normalization is load-bearing: a wrong hash on the same line still FAILs
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2770729Z ok   T44 a single flipped hash digit turns G8-b red (the recompute is load-bearing)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2771280Z ok   T45 G8-c accepts a MANIFEST whose archive hash equals the SHA256SUMS record
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2771921Z ok   T45 G8-c FAILs an archive hash that disagrees with SHA256SUMS (token `hash mismatch`, names the payload)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2772693Z ok   T45 G8-c exempts a legacy pack without the 鍚庣紑涓庣紪鐮佹槧灏?section (explicit note, not a blank PASS)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2773320Z ok   T46 G8-d accepts a 閲嶅缓褰掓。 note carrying source + basis and no bad sha token
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2773889Z ok   T46 G8-d FAILs a 閲嶅缓褰掓。 note missing the basis (token `basis`, names the file)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2774413Z ok   T47 inside the tree the violating content is NOT judged by G1-a/G2/G4a/G4b/G6
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2774922Z ok   T47 G4a reports the excluded count instead of judging the tree file
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2775502Z ok   T47 the SAME content outside the tree IS judged: G1-a/G2/G4a/G4b/G6-4 all turn red and name the path
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2776330Z ok   T48 every G8 sub-check reports INFO (not a vacuous PASS) when the change set has no evidence path
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2777167Z ok   T48 the INFO is the absence of an evidence path, not a blanket: the same sub-check is NOT INFO when one is present
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2777798Z ok   T49 ctx.listTreeFiles returns the recursive, sorted pack file list
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2778383Z ok   T49 isEvidenceTree is case-insensitive, prefix-anchored and does not over-match near misses
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2778986Z ok   T50 in-tree violating content yields ZERO finding from G1-a/G2/G4a/G4b/G6
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2779830Z ok   T50 the SAME bytes at docs/t027/ turn G1-a/G2/G4a/G4b/G6-4/G6-6 red and name the path
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2780458Z ok   T50 G8 still judges the in-tree file: G8-a PASS + G8-b PASS on the pack carrying the violation
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2781436Z ok   T50 G8-a still FAILs a non-member tree path (the shape guard is not inert)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2782315Z ok   T51 ctx.changedMarkdown() (shipped lib/ctx) drops the tree .md and keeps the docs/t027 .md
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2782957Z ok   T51 the selftest ctx and lib/ctx agree on changedMarkdown (no local re-derivation drift)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2783869Z ok   T51 G1-a shares the single exclusion (tree-only ctx green, docs/t027 ctx red)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2784700Z ok   T51 G2 shares the single exclusion (tree-only ctx green, docs/t027 ctx red)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2785226Z ok   T51 G4b shares the single exclusion (tree-only ctx green, docs/t027 ctx red)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2785738Z ok   T51 G6 shares the single exclusion (tree-only ctx green, docs/t027 ctx red)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2786282Z ok   T52 G4a excludes a BOM+CRLF .md and a BOM-less .md inside the tree and counts BOTH
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2786948Z ok   T52 the identical bytes outside the tree DO fail G4a (the exclusion is the only reason the in-tree run is green)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2787504Z ok   T89 G4a accepts a .md carrying exactly one BOM
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2787896Z ok   T89 G4a fails a .md carrying zero BOMs and reports bom=0
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2788344Z ok   T89 G4a fails a .md carrying two consecutive BOMs and reports bom=2
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2788808Z ok   T89 G4a fails a non-.md file carrying one BOM and reports bom=1
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2789667Z ok   T89 reverse mutation (bomCount >= 1) makes the double-BOM file pass again, so the equality is load-bearing
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2790336Z ok   T53 a malformed SHA256SUMS line FAILs and names the line/pack, never a silent pass
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2791066Z ok   T53 a truncated 褰掓。鏉＄洰娓呭崟 (heading present, table empty) FAILs and names the unlisted payload
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2791680Z ok   T54 an 褰掓。璺緞 absent from the pack payload FAILs G8-c and names the path
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2792303Z ok   T54 an 褰掓。璺緞 present in the payload but absent from SHA256SUMS FAILs G8-c and names the path
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2792917Z ok   T55 a 閲嶅缓褰掓。 mention OUTSIDE the annotation zone does not trigger G8-d
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2793403Z ok   T55 a non-64-hex sha256 token INSIDE the annotation zone FAILs G8-d
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2794014Z ok   T55 the precedent file is not misjudged despite 閲嶅缓褰掓。 + a 16-digit sha-original short hash
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2794689Z ok   T55 the precedent 16-digit short hash sits OUTSIDE the annotation zone (why it is never a sha256 token)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2795341Z ok   T56 mutation anchor (a) exists verbatim in lib/ctx.js (the exclusion being mutated)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2795959Z ok   T56 mutation anchor (b) exists verbatim in lib/criteria/g8.js (the hash recompute being mutated)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2796551Z ok   T57 --scope=ci is a valid reading (exit 0/1, never the usage-error exit 2)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2797123Z ok   T57 an unresolvable range endpoint exits 2 (usage/environment error), not a silent green
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2798020Z ok   T57 DEF-1 an unresolvable range endpoint exits 2 with a NON-EMPTY stderr carrying the `gate.js:` diagnosis (never a silent exit that degrades into an empty change set)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2799144Z ok   T57 the historical range 4284e94 is a valid reading (exit 0/1, not 2)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2799977Z ok   T57 listTreeFiles in range scope walks `git ls-tree -r -z --name-only <endpoint> -- <dir>` (not the disk)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2800709Z ok   T58 tree scope reads the registration table from the working tree
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2801292Z ok   T58 the real registered root-level path is listed VERBATIM (match === file) in the worktree registry
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2802108Z ok   T58 a historical range endpoint reads the registration table from the endpoint (absent then 鈬?zero entries)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2802819Z ok   T58 the SAME path is green with the worktree registry and red with the endpoint (empty) registry
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2803347Z ok   T59 EXPECTED_CORPUS_FAILS is sorted and duplicate-free
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2803819Z ok   T59 every expected corpus FAIL id belongs to the known criterion vocabulary
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2804284Z ok   T59 no criterion id is duplicated in ALL_SUBCHECKS
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2804669Z ok   T59 every G8 sub-check id is present in ALL_SUBCHECKS
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2805647Z ok   T60 DEF-2 regression anchor: the tree branch batches a whole directory into EXACTLY ONE `git check-ignore --stdin -z` spawn (never a per-file check-ignore), memoises per dir, and returns the disk set minus the ignored set
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2806774Z ok   T61 G5-b accepts both members this slice added (glm-5.3 pre-review and glm-5.3-flash batch assistance)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2807457Z ok   T62 the glm-5.3-flash member is load-bearing: dropping it from the set makes that fixture fail
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2808097Z ok   T63 restore: g5b.js is byte-identical and the cached module still accepts glm-5.3-flash
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2808713Z ok   T64 the glm-5.3 member is load-bearing: dropping it from the set makes that fixture fail
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2809465Z ok   T65 restore: g5b.js is byte-identical and the cached module still accepts glm-5.3
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2810174Z ok   T66 G5-b stays case-sensitive for the GLM member: GLM-5.3 (wrong case) fails
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2810749Z ok   T67 G5-b rejects a qualified call string: glm-5.3 (glm) is not the modelId (R2.2 boundary)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2811295Z ok   T68 OB-20: git grep exit 1 (no match) is data - G5-a(1) still PASSes
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2811782Z ok   T69 OB-20: a failed git grep (exit 128) is a UsageError, never a silent PASS
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2812258Z ok   T70 OB-20: a missing git binary (exit 127) is a UsageError too
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2812776Z ok   T70 OB-20 positive control: a real hit still FAILs (the guard rejects nothing legitimate)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2813324Z ok   T71 OB-17: the CLI usage example `run <chain-file>` is no longer judged
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2813789Z ok   T71 OB-17: the id-like placeholder `run <RUN_ID>` still fails
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2814223Z ok   T71 OB-17: a short uppercase placeholder `run <ID>` still fails
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2815168Z ok   T71 OB-17 the narrowing is load-bearing: widening it back turns the usage example red
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2815960Z ok   T71 OB-17 restore: g6.js is byte-identical after the mutation probe
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2816464Z ok   T80 G9 passes ordinary documents and Go files (no temp-artifact shape)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2817018Z ok   T80 G9 excludes the frozen evidence tree (OB-79): a legacy.log inside it is not judged
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2817513Z ok   T80 G9 honours a whitelist registration (match + file)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2817932Z ok   T80 G9 passes the tracked tmp directory placeholder tmp/.gitkeep
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2818422Z ok   T80 G9 excludes deleted paths (a deletion submits no bytes)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2818938Z ok   T81 G9 fails a .log outside the tmp root (token `temp-shape`, names the path)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2819842Z ok   T81 G9 fails a .tmp outside the tmp root (token `temp-shape`, names the path)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2820658Z ok   T81 G9 fails a .bak outside the tmp root (token `temp-shape`, names the path)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2821390Z ok   T81 G9 fails any tmp-root path except tmp/.gitkeep (token `tmp-root`, names the path)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2821939Z ok   T81 G9 fails a mixed-case tmp root (token `tmp-root`, original spelling kept)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2822583Z ok   T81 G9 fails an upper-case tmp root (token `tmp-root`, original spelling kept)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2823094Z ok   T82 M1 the shape regex is load-bearing: /(?!x)x/ turns N1/N2/N3 green
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2823591Z ok   T82 M2 the whitelist exemption is load-bearing: deleting it turns P3 red
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2824111Z ok   T82 M3 the evidence-tree exclusion is load-bearing: deleting it turns P2 red
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2824663Z ok   T82 M4 the tmp/.gitkeep guard is load-bearing: an unconditional skip turns N4 green
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2825275Z ok   T83 G9 restore: g9.js is byte-identical and the cached module keeps N1 red / P2 green / P4 green
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2826018Z ok   T84 OB-97 positive: the widened continuation set leaves the ordinary declaration intact (`lang:zh` still declares zh)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2826884Z ok   T84 OB-97 positive: a fullwidth comma still terminates the token, so `lang:zh锛宍 stays legal
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2827568Z ok   T84 OB-97 negative: `lang:zh:en` is consumed whole and rejected (it used to truncate to the legal `lang:zh`)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2828218Z ok   T84 OB-97 negative: a trailing colon belongs to the token, so `lang:zh:` is rejected
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2828765Z ok   T84 OB-97 negative: coexistence (`lang:zh` plus `lang:zh:`) is fail-closed
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2829720Z ok   T84 OB-97 mutation applied + load-bearing: with the pre-OB-97 charset the SAME `lang:zh:en` header passes again
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2830527Z ok   T84 OB-97 restore: g6.js is byte-identical after the mutation window and the cached module rejects `lang:zh:en` again
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2831280Z ok   T85 G6-7 positive: a 搂0.3 declaration whose ID exists in the 搂12.4 ledger passes
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2831914Z ok   T85 G6-7 positive: a PRE-EXISTING (not added) appendix-C ledger line still satisfies the declaration
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2832988Z ok   T85 G6-7 positive: an exclusion-marker line and a NEGATED verb (`涓嶆柊澧?鈥?OB-905`) are not judged
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2833930Z ok   T85 G6-7 positive: a declaration outside the 搂0.3 region is not judged
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2834522Z ok   T85 G6-7 negative: a declared ID with no ledger row anywhere fails and the finding names the ID
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2835343Z ok   T85 G6-7 mutation applied + load-bearing: disabling the verb test turns the same negative case green
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2836466Z ok   T85 G6-7 mutation applied + load-bearing: ignoring the ledger evidence turns the same negative case green
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2837284Z ok   T85 G6-7 restore: g6.js is byte-identical after both mutation windows and the shipped module still fails the same negative case
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2838007Z ok   T85 G6-7 boundary: `ADR-027` is not a `DR-027` declaration and the line is not judged
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2838651Z ok   T85 G6-7 boundary: `鐧昏 ADR-028 涓?OB-103` yields exactly one declaration (OB-103)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2839257Z ok   T86 G5-d positive: a role file carrying the five 搂2.6 keys exactly once passes
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2840066Z ok   T86 G5-d positive: an EXTRA key is not judged (model stays with G5-a / G5-b)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2840632Z ok   T86 G5-d positive: a non-agent path is not a target (INFO, never a vacuous PASS claim)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2841171Z ok   T86 G5-d negative: a missing `target` key fails and the finding names it
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2841663Z ok   T86 G5-d negative: a duplicated `tools` key fails (exactly once required)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2842154Z ok   T86 G5-d negative: an empty value and an absent frontmatter both fail
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2842804Z ok   T86 G5-d mutation applied + load-bearing: removing `target` from the required set turns the missing-target case green
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2843552Z ok   T86 G5-d restore: g5d.js is byte-identical and the shipped module still fails the missing-target case
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2844346Z ok   T87 G9-e positive: a tracked tmp/ artifact resolves in tree scope (disk + index)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2844861Z ok   T87 G9-e positive: a bare `tmp/` has no path segment and is not judged
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2845415Z ok   T87 G9-e positive: an exclusion-marker line is skipped
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2845875Z ok   T87 G9-e positive: the frozen evidence tree is excluded from the reference scan
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2846803Z ok   T87 G9-e positive: the range/ci branch resolves at the endpoint revision (HEAD:tmp/.gitkeep)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2847612Z ok   T87 G9-e negative: an unresolvable reference is INFO (G9 stays PASS) and the record names the path
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2848342Z ok   T87 G9-e mutation applied + load-bearing: accepting every reference makes the informational record disappear
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2849060Z ok   T87 G9-e restore: g9.js is byte-identical and the shipped module emits the informational record again
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2849972Z ok   T88 G3(a.2) control: an equal synthetic directive pair stays green (no per-pair FAIL record)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2850921Z ok   T88 G3(a.2) seventh shape (CJK inter-character space) is record-only: a drift with all six shapes equal stays PASS
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2852337Z ok   T88 G3(a.2) eighth shape (per-line triplet multiset) is record-only: a compensating drift with equal totals stays PASS
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2852976Z ok   T90 --help on its own still exits 0 with the usage text
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2853495Z ok   T90 the --skip-base guard fires before the --help early return (no combination escapes it)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2854032Z ok   T90 concurrent scheduling keeps every record in plan order
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2855016Z ok   T90 the 0 ms criterion ends before the 150 ms one that started first (completion order proves overlap)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2855692Z ok   T90 two async criteria are pending at the same moment (impossible under a serial loop)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2856266Z ok   T90 synchronous criteria go through the same scheduler and keep plan order
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2856805Z ok   T90 a rejecting criterion rejects the plan and writes no partial records
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2857405Z ok   T91 G6-8 positive: distinct mint rows on added lines pass and the record names the registered set
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2858259Z ok   T91 G6-8 negative: a mint row that reuses a registered number fails and names BOTH line numbers
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2859163Z ok   T91 G6-8 negative: a three-digit id in the mint cell fails as `涓変綅 = ADR 鍩焋
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2859905Z ok   T91 G6-8 negative: a reference to an unregistered id fails and names the id
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2860491Z ok   T91 G6-8 positive: every token of a range cell is judged on its own (refs=2, both registered)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2861131Z ok   T91 G6-8 positive: `ADR-027` and a three-digit `DR-027` mint no token (refs=1, only DR-2 judged)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2861851Z ok   T91 G6-8 positive: the bullet face is bracket-anchored (DR-42 judged with `锛坄, ignored without)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2862534Z ok   T91 G6-8 premise: with no target document the record is a PASS over 0 scanned lines (never a crash)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2863230Z ok   T91 G6-8 mutation applied + load-bearing: disabling the uniqueness test turns the collision case green
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2863946Z ok   T91 G6-8 mutation applied + load-bearing: disabling the three-digit test turns the DR-027 case green
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2864645Z ok   T91 G6-8 mutation applied + load-bearing: ignoring the registered set turns the dangling reference green
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2865433Z ok   T91 G6-8 restore: g6.js is byte-identical after all three mutation windows and the shipped module still fails both samples
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2866194Z ok   T92 G7-f positive: five sections A鈫払鈫扖鈫扗鈫扙 plus a closed-set conclusion pass
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2866753Z ok   T92 G7-f negative: a missing Section C fails and the detail names the sequence found
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2867235Z ok   T92 G7-f negative: a reordered pair (A B D C E) fails
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2867951Z ok   T92 G7-f negative: content after the conclusion line fails with the "note outside the fence" reason
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2868581Z ok   T92 G7-f negative: SEVERITY rows with PASS and FINDINGS with no SEVERITY row both fail
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2869455Z ok   T92 G7-f positive: SEVERITY rows with a FINDINGS conclusion pass (the pairing is not one-directional)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2870296Z ok   T92 G7-f negative: a report naming INDEPENDENT SCAN with no sixstage fence fails (self-contradictory)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2870892Z ok   T92 G7-f positive: a fixed-form skip declaration with no fence passes
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2871488Z ok   T92 G7-f premise: an EXISTING report with neither fence, marker nor skip declaration is INFO, never FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2872216Z ok   T92 G7-f mutation applied + load-bearing: disabling the section-sequence test turns the missing-C case green
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2873021Z ok   T92 G7-f restore: g7.js is byte-identical after the mutation window and the shipped module still fails the missing-C case
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2873758Z ok   T93 G7-f negative: an out-of-set conclusion value (`MAYBE`) fails as outside the closed set
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2874382Z ok   T93 G7-f negative: five sections and NO conclusion line fails (the real P23 breach shape)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2875079Z ok   T93 G7-f mutation applied + load-bearing: disabling the conclusion closed-set test turns the MAYBE case green
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2875862Z ok   T93 G7-f restore: g7.js is byte-identical after the mutation window and the shipped module still fails the MAYBE case
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2876593Z ok   T94 G6-8 positive: a mint row present in BOTH mirrors passes the dual-mint rule (the corpus shape)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2877280Z ok   T94 G6-8 negative: a mint row missing from the other mirror fails and the detail names the missing side
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2878050Z ok   T95 G6-8 FACE D: the spaced EN bullet form `- **DR-42 (鈥?` is judged (adjacency is no longer required)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2878772Z ok   T96 G7-f positive: the historical-exemption declaration (CN and EN forms) reaches PASS with the marker present
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2879734Z ok   T96 G7-f M4: a marker occurrence on an exclusion-marked line is filtered out (existing report), so the record is INFO not FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2880453Z ok   T96 G7-f L9: an unclosed sixstage fence fails and the detail names the opening line
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2881234Z ok   T97 G7-f C-1: a blank reason is not a declaration - the blank skip falls back to INFO and a blank historical exemption falls back to the marker FAIL
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2882272Z ok   T98 G7-f C-1/F1: a report ADDED by the change set may not use the historical exemption - status A and the untracked variant both FAIL naming the exemption channel
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2883219Z ok   T98 G7-f C-1 positive control: a newly added report CARRYING the fence passes, so the guard is not a blanket rejection
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2884731Z ok   T98 G7-f C-1/F1 mutation applied + load-bearing: disabling the newly-added branch lets the exemption on a new report reach the historical channel (PASS)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2885754Z ok   T98 G7-f C-1/F1 restore: g7.js is byte-identical after the mutation window and the shipped module still fails the exemption on a new report
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2886621Z ok   T99 G7-f P26: two conclusion lines FAIL when the first one is not the Section-A first line (the C-4 escape stays red)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2887416Z ok   T99 G7-f P26 mutation applied + load-bearing: disabling the position-pair gate turns the two-conclusion fence green
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2888268Z ok   T99 G7-f P26 restore: g7.js is byte-identical after the mutation window and the shipped module still fails the position-pair case
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2889214Z ok   T100 G6-8 C-8: an unreadable other mirror skips the dual-mint face but the PASS detail carries `dual-mint: other mirror unreadable, face skipped`
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2890789Z ok   T100 G6-8 C-8 premise: the row under test is the same mint row shape the readable control judges
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2892568Z ok   T101 G7-f real shape: headings carrying descriptive text (`## Section A 鎵弿鑼冨洿涓庢柟娉昤) count as sections, so the five-section face passes
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2894046Z ok   T101 G7-f real shape: `| 1 | Low | 鈥?|` (severity in the SECOND cell) plus FINDINGS is a PASS - the 鈶?form that used to be failed
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2894963Z ok   T101 G7-f real shape: the same second-cell severity row with PASS FAILs and names the row count
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2895667Z ok   T101 G7-f real shape: FINDINGS with no severity row at all still FAILs (the pairing is kept two-directional)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2896620Z ok   T101 G7-f cell equality: `**High**` in the second cell matches after marker stripping, while a prose cell containing `Low risk鈥 does not
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2897482Z ok   T101 G7-f heading boundary: `## Section AA` and `## Subsection A` are NOT read as Section A (the found sequence is BCDE)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2898423Z ok   T101 G7-f mutation applied + load-bearing: disabling the cell-equality guard turns the second-cell FINDINGS case RED (the real shape stops being recognised)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2899600Z ok   T101 G7-f mutation applied + load-bearing: restoring the `$`-anchored heading regex turns the titled-heading case RED
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2900475Z ok   T101 G7-f restore: g7.js is byte-identical after both mutation windows and the shipped module still passes both real-shape cases
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2901454Z ok   T102 G7-f F1-鈶? a newly added report with no fence, no marker and no declaration FAILs with the fence-or-skip-declaration wording
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2902371Z ok   T102 G7-f F1-鈶? a newly added report with a non-empty-reason skip declaration PASSes (the 搂7.2.1 legitimate skip)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2903274Z ok   T102 G7-f F1-鈶? a blank-reason skip declaration on a newly added report is not a declaration, so the report FAILs like a bare one
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2904140Z ok   T102 G7-f F1-鈶? an EXISTING report (explicit M record) with neither fence, marker nor declaration stays INFO
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2905036Z ok   T102 G7-f F1 mutation applied + load-bearing: disabling the newly-added branch turns the bare new report green (the existing-report bare state is INFO)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2905983Z ok   T102 G7-f F1 restore: g7.js is byte-identical after the mutation window and the shipped module still fails the bare new report
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2906971Z ok   T103 G7-f F2-鈶? a change touching ONLY the opening fence line enters judgement (the body lacks Section C, so the block FAILs with `ABDE`)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2907924Z ok   T103 G7-f F2-鈶?twin: a change touching ONLY the closing fence line enters judgement too (the interval spans both fence lines)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2908727Z ok   T103 G7-f F2-鈶?precondition: the touched-loop needle occurs exactly once in the shipped g7.js
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2909820Z ok   T103 G7-f F2-鈶?mutation applied + load-bearing: shrinking the touch window back to body-only lets the opening-line-only change escape judgement (INFO, not FAIL)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2911010Z ok   T103 G7-f F2-鈶?restore: g7.js is byte-identical after the mutation window (byte comparison) and the shipped module still fails the opening-line-only change
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2912045Z ok   T104 G7-f P26 positive: an equal conclusion pair (Section-A first line + block-final line) passes, and a FINDINGS pair with a SEVERITY row passes too
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2912942Z ok   T104 G7-f P26 precondition: each multi-conclusion mutation needle occurs exactly once in the shipped g7.js
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2913682Z ok   T105 G7-f P26 negative: an equal-position pair with UNEQUAL values fails and the detail names both values
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2914423Z ok   T105 G7-f P26 mutation applied + load-bearing: disabling the value-equality test turns the unequal pair green
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2915233Z ok   T105 G7-f P26 restore: g7.js is byte-identical after the mutation window and the shipped module still fails the unequal pair
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2916056Z ok   T106 G7-f P26 negative: content after the block-final conclusion line fails with the "note outside the fence" reason
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2916999Z ok   T106 G7-f P26 mutation applied + load-bearing: disabling the block-final test turns the trailing-content fence green
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2917965Z ok   T106 G7-f P26 restore: g7.js is byte-identical after the mutation window and the shipped module still fails the trailing-content case
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2918800Z ok   T107 G7-f P26 negative: three conclusion lines fail and the detail says more than two are not allowed
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2919609Z ok   T107 G7-f P26 mutation applied + load-bearing: raising the ceiling to three turns the three-line fence green
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2920648Z ok   T107 G7-f P26 restore: g7.js is byte-identical after the mutation window and the shipped module still fails the three-line case
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2921420Z ok   T108 G4b cache positive control: the first run misses and the second run on the same key hits
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2922026Z ok   T108 both runs report the same twelve-hex key prefix and the cached corpus size
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2922666Z ok   T108 the hit caches the corpus only: the G4b verdict/detail are recomputed and still name the whitelist
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2923395Z ok   T109 G4b cache counterexample 1: a changed HEAD sha misses, names a different key and stores a second entry
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2924126Z ok   T109 G4b cache mutation applied + load-bearing: pinning the sha segment turns the second run into a hit
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2924884Z ok   T109 restore: g4b.js is byte-identical after the mutation window and the shipped module still misses on the new sha
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2925594Z ok   T110 G4b cache counterexample 2: a changed whitelist text misses and stores a second entry
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2926293Z ok   T110 G4b cache mutation applied + load-bearing: pinning the whitelist digest turns the second run into a hit
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2927268Z ok   T110 restore: g4b.js is byte-identical after the mutation window and the shipped module still misses on the new whitelist
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2928746Z ok   T111 G4b cache counterexample 3: a changed criterion source misses even with the same sha and whitelist
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2930350Z ok   T111 G4b cache mutation applied + load-bearing: blinding the digest to the run body lets a changed source hit
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2931955Z ok   T111 restore: g4b.js is byte-identical after all mutation windows and the shipped module still misses on the changed source
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2932917Z ok   T112 G4b cache fail-open 1: a store whose get() throws still yields a verdict and emits NO cache record
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2933634Z ok   T112 G4b cache fail-open 2: a malformed entry is a miss and is rewritten as a valid entry of this version
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2934290Z ok   T112 G4b cache key shape: six pipe-separated segments starting with the format version
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2934920Z ok   T112 G4b cache switched off: g4bCacheDisabled forces the full scan and emits NO cache record
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2935594Z ok   T112 G4b cache switched off when git cannot resolve the corpus revision (silent full scan, no record)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2936600Z ok   T113 G4b cache index-dirtiness independence: a staged delta does not disable the cache for tree/index (condition 3 must not resurrect) - run 1 misses and still produces the verdict
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2937832Z ok   T113 G4b cache index-dirtiness independence: a staged delta does not disable the cache for tree/index (condition 3 must not resurrect) - run 2 hits on the same sha and whitelist
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2939146Z ok   T113 G4b cache index-dirtiness independence: a staged delta does not disable the cache for tree/index (condition 3 must not resurrect) - the dirty and clean fixtures yield the identical G4b verdict and detail
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2940820Z ok   T113 G4b cache index-dirtiness independence: a staged delta does not disable the cache for tree/index (condition 3 must not resurrect) - the six-segment key shape does not degrade under a dirty index
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2942284Z ok   T113 G4b cache index-dirtiness independence: a staged delta does not disable the cache for tree/index (condition 3 must not resurrect) - mutation applied + load-bearing: resurrecting condition 3 removes every G4b-cache record
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2943804Z ok   T113 restore: g4b.js is byte-identical after the mutation window and the shipped module still hits on a dirty index
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2944565Z ok   T114 G4b corpus enumeration reads the object store: ls-tree HEAD answers and ls-files is never called
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2945293Z ok   T115 G4b corpus cold/warm equivalence under a staged markdown deletion: miss then hit, corpus=1 both times
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2946161Z ok   T115 both runs PASS on the HEAD corpus (an ls-files fallback drops the only "涓? and turns this red) and agree
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2946848Z ok   T116 the cached entry carries v === CACHE_VERSION (G4B-CORPUS-DECOUPLE bumped both to v2)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2947665Z ok   T117 G4b range-scope corpus enumeration is NUL-separated ls-tree at the range base (the pre-slice newline form and ls-files are both rejected)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2948750Z ok   T118 G4b index-scope corpus enumeration also reads ls-tree HEAD with NUL separation (an ls-files fallback or a non-HEAD ref turns this red, and the .MD suffix survives)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2949944Z ok   T125 evictToCap evicts the OLDEST mtimes first and returns the exact number removed (5 entries, cap 2, names ordered against the clock)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2950936Z ok   T125 evictToCap only considers CACHE_ENTRY_RE names: a 63-hex near-miss and an atomic temp file survive a cap=0 pass that removes the single real entry
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2951915Z ok   T126 entries == cap: evictToCap returns 0 and deletes nothing (the excess > 0 guard)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2952830Z ok   T126 entries < cap: evictToCap returns 0 and keeps every entry
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2953702Z ok   T126 entries > cap: exactly entries - cap are removed and the newest cap survive
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2954972Z ok   T127 the fixture starts at exactly CACHE_CAP (100) entries and the run misses, so the write that triggers eviction really happened
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2956451Z ok   T127 put keeps the directory at CACHE_CAP: the oldest entry is gone, the newest and the freshly written one survive
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2957187Z ok   T128 the cold run stores exactly {v:2, corpus:[...]} and nothing else
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2957770Z ok   T128 a hit reproduces the cold run: same key prefix, same verdict, same detail, cached corpus size 1
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2958469Z ok   T128 the hit touches the entry (mtime advances past the seeded stamp) without rewriting the stored value
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2959176Z ok   T129 fail-open (a): a throwing unlinkFn neither escapes nor loses an entry (0 removed, all 3 survive)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2960171Z ok   T129 fail-open (b): an entry whose stat() throws is skipped, not counted, and does not throw (2 of 4 counted, cap 2, 0 removed)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2960917Z ok   T129 fail-open (c): a missing directory and a non-directory path both return 0 without throwing
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2961763Z ok   T129 fail-open (d): an unusable cache directory degrades to the full scan - no cache record, no exception, verdict and detail identical to a healthy run
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2962559Z ok   T130 CACHE_CAP is pinned at 100 (a drifted cap would silently weaken the bound)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2963162Z ok   F1 every declared fixture mutation applied (a stale mutation would weaken the suite silently)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2963716Z ok   F1 mutation coverage floor (>= 8 fixture mutations exercised)
+Go ubuntu-latest	Gates	2026-11-22T00:34:13.2964086Z SELFTEST: PASS 740/740
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4133561Z GATE REPORT scope=ci repo=/home/runner/work/prfrail/prfrail changed=8
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4134269Z PASS  G1-a table structure :: no `||` on added rows
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4134961Z PASS  G1(c) status marker c :: closed set respected (446 cells)
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4135680Z PASS  G1(d) status marker d :: heading and status table agree
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4136325Z PASS  G1(e) status marker e :: completion rows imply completed (72 bound, 34 unbound)
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4137588Z PASS  G1(e2) in-block completion rows imply completed :: 0 judged, 0 skipped, 66 historical (v1.64)
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4138590Z INFO  G1(e-info) completion keys without a binding :: 34 completion row(s) have no heading to bind to (their slice heading was removed); G1(e) judges bound rows only
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4139948Z PASS  G1(f) status marker f :: no in-progress wording in added completion rows
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4140430Z PASS  G2 placeholder residue :: none
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4142248Z PASS  G3(a) symmetry + mirror parity :: docs/t027/REMAINING_SLICES.md +1/-0 vs _EN +1/-0 OK || docs/validation/bounddir-unc-equivalence.md +4/-1 vs _EN +4/-1 OK ;; docs/t027/REMAINING_SLICES.md {"lines":false,"head":false,"bold":false,"bars":false,"blank":false,"backticks":false} ;; docs/validation/bounddir-unc-equivalence.md {"lines":true,"head":true,"bold":false,"bars":true,"blank":true,"backticks":false}
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4144585Z PASS  G3(b) key-field alignment :: hash 1/1 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK | hash 1/1 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4145452Z PASS  G4a BOM+LF :: 8 file(s) OK (3 excluded: evidence tree)
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4145867Z INFO  G4b-cache G4b cache :: miss 7a07a038f472 corpus=1464
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4146470Z PASS  G4b CJK diff minus whitelist :: newCjk=107 unknown=[] (whitelist=63 whitelist-source=endpoint:HEAD)
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4147023Z PASS  G5-a(1) no model key in prfrail-* :: 0 hits
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4147374Z PASS  G5-a(2) no empty model :: 0 hits / 14 files
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4147741Z PASS  G5-b closed-set model value :: checked 0 file(s)
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4148381Z PASS  G5-c appendix-B call strings in the 2.2 qualified-name set :: call strings OK (2 file(s), scanned 0 changed carrier line(s))
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4149128Z INFO  G5-d role-file frontmatter contract :: no changed `.github/agents/*.agent.md` in scope
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4150339Z PASS  G5(d) staged is a subset of declared :: 8 path(s) declared (scope=ci) ; declared-not-touched=31 (INFO: a fence is the landing snapshot) ; addMode=explicit (derived label, not a command-history assertion)
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4151675Z INFO  G5(d-info) declared but not touched :: 31 declared path(s) are outside the change set (a fence is the landing snapshot); G5(d) judges the other direction only
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4152565Z PASS  G5(e) evidence references resolve :: no added completion row (nothing to resolve)
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4153307Z PASS  G5(e2) in-block completion-row evidence resolves :: no added in-block completion row (nothing to resolve)
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4153967Z INFO  G5(f) index hygiene :: scope=ci: staging is not part of this scope
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4154442Z PASS  R2.5 header-note position :: distinct=1 uniform 14/14
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4155102Z PASS  G6-1 status tense :: no pending/completion conflict on added lines (scanned 10) whitelist-source=endpoint:HEAD
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4155916Z PASS  G6-2 cost clause :: no realized cost clause on added lines (scanned 10) whitelist-source=endpoint:HEAD
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4156671Z PASS  G6-3 run-id format :: no malformed run id on added lines (scanned 10) whitelist-source=endpoint:HEAD
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4157415Z PASS  G6-4 expiring literal :: no expiring literal on added lines (scanned 10) whitelist-source=endpoint:HEAD
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4158409Z PASS  G6-5 section-reference resolution :: no unresolved section reference on added ledger/changelog lines (scanned 0, refs 0) whitelist-source=endpoint:HEAD
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4159857Z PASS  G6-6 ledger status closed set :: every added ledger row opens with a closed-set status word (scanned 0) whitelist-source=endpoint:HEAD
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4161089Z PASS  G6-7 declaration/ledger reconciliation :: every declared ID on an added section 0.3 line exists in the 12.4 / appendix-C ledger (scanned 0, declarations 0) whitelist-source=endpoint:HEAD
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4162667Z PASS  G6-8 DR number uniqueness and membership :: registered DR set {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18}; no DR collision or dangling reference on added lines (scanned 10, refs 0) whitelist-source=endpoint:HEAD
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4163689Z PASS  G7-a artifacts block present :: 2 report(s) OK
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4164309Z PASS  G7-b artifact path/disposition resolvable :: 78 artifact row(s) OK (repo check: git cat-file -e <endpoint>:<path>)
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4165205Z PASS  G7-c finding row disposition cell :: 0 changed finding row(s) with disposition
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4165877Z PASS  G7-d stopped state marked incomplete :: no stopped-state row missing the incomplete mark
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4166639Z PASS  G7-e verdict line closed set :: every verdict line on added report lines is inside the 4.1 closed set (scanned 8)
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4167660Z INFO  G7-f sixstage transcript contract :: no changed ```sixstage fence in scope (2 report(s) carry an unchanged fence, 0 carry neither fence nor skip declaration)
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4168442Z PASS  G8-a evidence-tree path shape :: 3 path(s) OK
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4168886Z PASS  G8-b pack self-consistency :: 1 pack(s) self-consistent
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4170000Z PASS  G8-c encoding-normalization record :: 0 pack(s) checked (1 exempt: no `## 鍚庣紑涓庣紪鐮佹槧灏刞 section)
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4170590Z PASS  G8-d rebuilt-archive note :: 3 changed file(s) OK
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4171324Z PASS  G9 涓存椂浠朵笌 tmp/ 寮曠敤 :: 8 path(s) OK (3 excluded) (whitelist=endpoint:HEAD)
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4171942Z INFO  G9-e tmp/ reference summary :: scanned 10 added line(s), 0 reference(s), 0 unresolvable
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4172423Z PASS  base gofmt -l . :: empty
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4172721Z PASS  base go build ./... :: exit 0
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4173055Z PASS  base go vet ./... :: exit 0
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4173357Z PASS  base go test ./... :: ok=15 FAIL=0
+Go ubuntu-latest	Gates	2026-11-22T00:34:54.4173644Z TOTAL_FAIL=0
+Go ubuntu-latest	Post Setup Go	锘?026-11-22T00:34:54.4316532Z Post job cleanup.
+Go ubuntu-latest	Post Setup Go	2026-11-22T00:34:54.5504821Z [command]/opt/hostedtoolcache/go/1.22.12/x64/bin/go env GOMODCACHE
+Go ubuntu-latest	Post Setup Go	2026-11-22T00:34:54.5550150Z [command]/opt/hostedtoolcache/go/1.22.12/x64/bin/go env GOCACHE
+Go ubuntu-latest	Post Setup Go	2026-11-22T00:34:54.5577723Z /home/runner/go/pkg/mod
+Go ubuntu-latest	Post Setup Go	2026-11-22T00:34:54.5597313Z /home/runner/.cache/go-build
+Go ubuntu-latest	Post Setup Go	2026-11-22T00:34:54.5604245Z Cache hit occurred on the primary key setup-go-Linux-x64-ubuntu26-go-1.22.12-2f07b6ec62ba90bcd08e45ebcc765a7ea2fd8104887fdaad445ddb80e0e00ca7, not saving cache.
+Go ubuntu-latest	Post Checkout source	锘?026-11-22T00:34:54.5767546Z Post job cleanup.
+Go ubuntu-latest	Post Checkout source	2026-11-22T00:34:54.6622576Z [command]/usr/bin/git version
+Go ubuntu-latest	Post Checkout source	2026-11-22T00:34:54.6662710Z git version 2.56.1
+Go ubuntu-latest	Post Checkout source	2026-11-22T00:34:54.6699267Z Temporarily overriding HOME='/home/runner/work/_temp/9d4ba40a-36b3-449a-b5b9-9c96d078eafd' before making global git config changes
+Go ubuntu-latest	Post Checkout source	2026-11-22T00:34:54.6700862Z Adding repository directory to the temporary git global config as a safe directory
+Go ubuntu-latest	Post Checkout source	2026-11-22T00:34:54.6704047Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/prfrail/prfrail
+Go ubuntu-latest	Post Checkout source	2026-11-22T00:34:54.6735466Z Removing SSH command configuration
+Go ubuntu-latest	Post Checkout source	2026-11-22T00:34:54.6741233Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+Go ubuntu-latest	Post Checkout source	2026-11-22T00:34:54.6776420Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Go ubuntu-latest	Post Checkout source	2026-11-22T00:34:54.7056930Z Removing HTTP extra header
+Go ubuntu-latest	Post Checkout source	2026-11-22T00:34:54.7062023Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Go ubuntu-latest	Post Checkout source	2026-11-22T00:34:54.7098150Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Go ubuntu-latest	Post Checkout source	2026-11-22T00:34:54.7390951Z Removing includeIf entries pointing to credentials config files
+Go ubuntu-latest	Post Checkout source	2026-11-22T00:34:54.7399234Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+Go ubuntu-latest	Post Checkout source	2026-11-22T00:34:54.7469787Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Go ubuntu-latest	Complete job	锘?026-11-22T00:34:54.7930109Z Cleaning up orphan processes

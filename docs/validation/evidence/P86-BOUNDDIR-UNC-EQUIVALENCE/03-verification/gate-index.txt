@@ -1,4 +1,4 @@
-GATE REPORT scope=index repo=D:\LZProjects\prfrail changed=31
+GATE REPORT scope=index repo=D:\LZProjects\prfrail changed=10
 PASS  G1-a table structure :: no `||` on added rows
 PASS  G1(c) status marker c :: closed set respected (446 cells)
 PASS  G1(d) status marker d :: heading and status table agree
@@ -7,46 +7,42 @@ PASS  G1(e2) in-block completion rows imply completed :: 0 judged, 0 skipped, 66
 INFO  G1(e-info) completion keys without a binding :: 34 completion row(s) have no heading to bind to (their slice heading was removed); G1(e) judges bound rows only
 PASS  G1(f) status marker f :: no in-progress wording in added completion rows
 PASS  G2 placeholder residue :: none
-PASS  G3(a) symmetry + mirror parity :: docs/t027/REMAINING_SLICES.md +5/-5 vs _EN +5/-5 OK || docs/validation/bounddir-unc-equivalence.md +225/-0 vs _EN +225/-0 OK ;; docs/t027/REMAINING_SLICES.md {"lines":false,"head":false,"bold":false,"bars":false,"blank":false,"backticks":false} ;; docs/validation/bounddir-unc-equivalence.md {"lines":true,"head":true,"bold":true,"bars":true,"blank":true,"backticks":false}
-PASS  G3(b) key-field alignment :: hash 0/0 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK | hash 4/4 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK
-PASS  G4a BOM+LF :: 31 file(s) OK (24 excluded: evidence tree)
-INFO  G4b-cache G4b cache :: hit 214579358e35 corpus=1463
-PASS  G4b CJK diff minus whitelist :: newCjk=454 unknown=[] (whitelist=63 whitelist-source=worktree)
+PASS  G3(a) symmetry + mirror parity :: docs/t027/REMAINING_SLICES.md +1/-1 vs _EN +1/-1 OK || docs/validation/bounddir-unc-equivalence.md +5/-1 vs _EN +5/-1 OK ;; docs/t027/REMAINING_SLICES.md {"lines":false,"head":false,"bold":false,"bars":false,"blank":false,"backticks":false} ;; docs/validation/bounddir-unc-equivalence.md {"lines":true,"head":true,"bold":false,"bars":true,"blank":true,"backticks":false}
+PASS  G3(b) key-field alignment :: hash 0/0 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK | hash 1/1 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK
+PASS  G4a BOM+LF :: 10 file(s) OK (6 excluded: evidence tree)
+INFO  G4b-cache G4b cache :: miss 604a7c599216 corpus=1464
+PASS  G4b CJK diff minus whitelist :: newCjk=151 unknown=[] (whitelist=63 whitelist-source=worktree)
 PASS  G5-a(1) no model key in prfrail-* :: 0 hits
 PASS  G5-a(2) no empty model :: 0 hits / 14 files
 PASS  G5-b closed-set model value :: checked 0 file(s)
 PASS  G5-c appendix-B call strings in the 2.2 qualified-name set :: call strings OK (2 file(s), scanned 0 changed carrier line(s))
 INFO  G5-d role-file frontmatter contract :: no changed `.github/agents/*.agent.md` in scope
-PASS  G5(d) staged is a subset of declared :: 31 path(s) declared (scope=index) ; declared-not-touched=4 (INFO: a fence is the landing snapshot) ; addMode=explicit (derived label, not a command-history assertion)
-INFO  G5(d-info) declared but not touched :: 4 declared path(s) are outside the change set (a fence is the landing snapshot); G5(d) judges the other direction only
+PASS  G5(d) staged is a subset of declared :: 10 path(s) declared (scope=index) ; declared-not-touched=31 (INFO: a fence is the landing snapshot) ; addMode=explicit (derived label, not a command-history assertion)
+INFO  G5(d-info) declared but not touched :: 31 declared path(s) are outside the change set (a fence is the landing snapshot); G5(d) judges the other direction only
 PASS  G5(e) evidence references resolve :: no added completion row (nothing to resolve)
 PASS  G5(e2) in-block completion-row evidence resolves :: no added in-block completion row (nothing to resolve)
 PASS  G5(f) index hygiene :: index equals worktree, no untracked path
 PASS  R2.5 header-note position :: distinct=1 uniform 14/14
-PASS  G6-1 status tense :: no pending/completion conflict on added lines (scanned 460) whitelist-source=worktree
-PASS  G6-2 cost clause :: no realized cost clause on added lines (scanned 460) whitelist-source=worktree
-PASS  G6-3 run-id format :: no malformed run id on added lines (scanned 460) whitelist-source=worktree
-PASS  G6-4 expiring literal :: no expiring literal on added lines (scanned 460) whitelist-source=worktree
+PASS  G6-1 status tense :: no pending/completion conflict on added lines (scanned 12) whitelist-source=worktree
+PASS  G6-2 cost clause :: no realized cost clause on added lines (scanned 12) whitelist-source=worktree
+PASS  G6-3 run-id format :: no malformed run id on added lines (scanned 12) whitelist-source=worktree
+PASS  G6-4 expiring literal :: no expiring literal on added lines (scanned 12) whitelist-source=worktree
 PASS  G6-5 section-reference resolution :: no unresolved section reference on added ledger/changelog lines (scanned 0, refs 0) whitelist-source=worktree
 PASS  G6-6 ledger status closed set :: every added ledger row opens with a closed-set status word (scanned 0) whitelist-source=worktree
 PASS  G6-7 declaration/ledger reconciliation :: every declared ID on an added section 0.3 line exists in the 12.4 / appendix-C ledger (scanned 0, declarations 0) whitelist-source=worktree
-PASS  G6-8 DR number uniqueness and membership :: registered DR set {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17}; no DR collision or dangling reference on added lines (scanned 460, refs 0) whitelist-source=worktree
+PASS  G6-8 DR number uniqueness and membership :: registered DR set {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18}; no DR collision or dangling reference on added lines (scanned 12, refs 0) whitelist-source=worktree
 PASS  G7-a artifacts block present :: 2 report(s) OK
-PASS  G7-b artifact path/disposition resolvable :: 70 artifact row(s) OK (repo check: git ls-files --error-unmatch + worktree presence)
+PASS  G7-b artifact path/disposition resolvable :: 82 artifact row(s) OK (repo check: git ls-files --error-unmatch + worktree presence)
 PASS  G7-c finding row disposition cell :: 0 changed finding row(s) with disposition
 PASS  G7-d stopped state marked incomplete :: no stopped-state row missing the incomplete mark
-PASS  G7-e verdict line closed set :: every verdict line on added report lines is inside the 4.1 closed set (scanned 445)
-PASS  G7-f sixstage transcript contract :: 2 changed ```sixstage fence(s) complete (A鈫払鈫扖鈫扗鈫扙, closed-set conclusion, SEVERITY consistency)
-PASS  G8-a evidence-tree path shape :: 24 path(s) OK
+PASS  G7-e verdict line closed set :: every verdict line on added report lines is inside the 4.1 closed set (scanned 10)
+INFO  G7-f sixstage transcript contract :: no changed ```sixstage fence in scope (2 report(s) carry an unchanged fence, 0 carry neither fence nor skip declaration)
+PASS  G8-a evidence-tree path shape :: 6 path(s) OK
 PASS  G8-b pack self-consistency :: 1 pack(s) self-consistent
 PASS  G8-c encoding-normalization record :: 0 pack(s) checked (1 exempt: no `## 鍚庣紑涓庣紪鐮佹槧灏刞 section)
-PASS  G8-d rebuilt-archive note :: 24 changed file(s) OK
-PASS  G9 涓存椂浠朵笌 tmp/ 寮曠敤 :: 31 path(s) OK (24 excluded) (whitelist=worktree)
-INFO  G9-e tmp/ reference (informational) :: docs/validation/bounddir-unc-equivalence.md:138 tmp/P86-BOUNDDIR-UNC-EQUIVALENCE :: not staged in the index (git add the artifact first)
-INFO  G9-e tmp/ reference (informational) :: docs/validation/bounddir-unc-equivalence.md:225 tmp/P86-BOUNDDIR-UNC-EQUIVALENCE :: not staged in the index (git add the artifact first)
-INFO  G9-e tmp/ reference (informational) :: docs/validation/bounddir-unc-equivalence_EN.md:138 tmp/P86-BOUNDDIR-UNC-EQUIVALENCE :: not staged in the index (git add the artifact first)
-INFO  G9-e tmp/ reference (informational) :: docs/validation/bounddir-unc-equivalence_EN.md:225 tmp/P86-BOUNDDIR-UNC-EQUIVALENCE :: not staged in the index (git add the artifact first)
-INFO  G9-e tmp/ reference summary :: scanned 460 added line(s), 4 reference(s), 4 unresolvable
+PASS  G8-d rebuilt-archive note :: 6 changed file(s) OK
+PASS  G9 涓存椂浠朵笌 tmp/ 寮曠敤 :: 10 path(s) OK (6 excluded) (whitelist=worktree)
+INFO  G9-e tmp/ reference summary :: scanned 12 added line(s), 0 reference(s), 0 unresolvable
 PASS  base gofmt -l . :: empty
 PASS  base go build ./... :: exit 0
 PASS  base go vet ./... :: exit 0
