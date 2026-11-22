@@ -12,8 +12,9 @@
 | `00-briefing.md` | 起跑消息逐字原文（§13.1.10） |
 | `01-arch/01-arch-design.md` | ① 架构方案书（契约判定、§3 冲突裁定、§10 Rev 2） |
 | `03-verification/build.txt` | go build ./... 读数 |
-| `03-verification/ci/run-44962802936-ubuntu.log` | CI 首跑 run 44962802936 ubuntu 腿完整日志 |
-| `03-verification/ci/run-44962802936-windows.log` | CI 首跑 run 44962802936 windows 腿完整日志 |
+| `03-verification/ci/run-44962802936-ubuntu.log` | CI 运行日志（run-44962802936-ubuntu.log） |
+| `03-verification/ci/run-44962802936-windows.log` | CI 运行日志（run-44962802936-windows.log） |
+| `03-verification/ci/run-44965434402-windows.log` | CI 运行日志（run-44965434402-windows.log） |
 | `03-verification/gate-ci.txt` | gate.js --all --scope=ci 读数 |
 | `03-verification/gate-index.txt` | gate.js --all --scope=index 读数 |
 | `03-verification/gate-selftest.txt` | gate.js --selftest 读数（740/740） |

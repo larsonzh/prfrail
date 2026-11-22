@@ -23,3 +23,4 @@ af7555dc15b4cf91d3b868b9e3a150e3548683ea9ef11e21411f3e52068aad0e  03-verificatio
 b1deb47d804c9a38e83bdf6901f074c68e853ffb56fbcbacd6824c48e986a7cb  04-reviews/05-pre-review-r2.md
 cd25a7f1ef8b3de4746bc0a27ff1f993bfe7452d815377a53160b4b938a5f026  03-verification/mutation-branch-removed.txt
 e9a873bc87bd4b961b9ff56001f9347611e638180af86ab56c5f5c725370a1ce  03-verification/local-flake-tickets-p39.txt
+f3cee47442f6d4b6833694bb04b255755ec40a643b604e0acadb2390f01cb7c4  03-verification/ci/run-44965434402-windows.log

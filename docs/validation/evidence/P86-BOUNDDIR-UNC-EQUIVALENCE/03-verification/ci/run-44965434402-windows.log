@@ -1,0 +1,314 @@
+Go windows-latest	Set up job	锘?026-11-22T00:11:54.1449192Z Current runner version: '2.338.2'
+Go windows-latest	Set up job	2026-11-22T00:11:54.1749684Z ##[group]Runner Image Provisioner
+Go windows-latest	Set up job	2026-11-22T00:11:54.1750621Z Hosted Compute Agent
+Go windows-latest	Set up job	2026-11-22T00:11:54.1751180Z Version: 20261111.635
+Go windows-latest	Set up job	2026-11-22T00:11:54.1751822Z Commit: b8a594ea514ff44cadb5342986c68b1eac6e22ed
+Go windows-latest	Set up job	2026-11-22T00:11:54.1752577Z Build Date: 2026-11-11T01:49:01Z
+Go windows-latest	Set up job	2026-11-22T00:11:54.1753252Z Worker ID: {3b874cda-75fa-4127-8efb-3e9ef85d4c97}
+Go windows-latest	Set up job	2026-11-22T00:11:54.1753996Z Region: northcentralus
+Go windows-latest	Set up job	2026-11-22T00:11:54.1754547Z Cloud: Azure
+Go windows-latest	Set up job	2026-11-22T00:11:54.1755054Z ##[endgroup]
+Go windows-latest	Set up job	2026-11-22T00:11:54.1756403Z ##[group]Operating System
+Go windows-latest	Set up job	2026-11-22T00:11:54.1757057Z Microsoft Windows Server 2025
+Go windows-latest	Set up job	2026-11-22T00:11:54.1757703Z 10.0.26100
+Go windows-latest	Set up job	2026-11-22T00:11:54.1758755Z Datacenter
+Go windows-latest	Set up job	2026-11-22T00:11:54.1759291Z ##[endgroup]
+Go windows-latest	Set up job	2026-11-22T00:11:54.1759953Z ##[group]Runner Image
+Go windows-latest	Set up job	2026-11-22T00:11:54.1760646Z Image: windows-2025-vs2026
+Go windows-latest	Set up job	2026-11-22T00:11:54.1761232Z Version: 20261116.315.1
+Go windows-latest	Set up job	2026-11-22T00:11:54.1762371Z Included Software: https://github.com/actions/runner-images/blob/win25-vs2026/20261116.315/images/windows/Windows2025-VS2026-Readme.md
+Go windows-latest	Set up job	2026-11-22T00:11:54.1764460Z Image Release: https://github.com/actions/runner-images/releases/tag/win25-vs2026%2F20261116.315
+Go windows-latest	Set up job	2026-11-22T00:11:54.1765469Z ##[endgroup]
+Go windows-latest	Set up job	2026-11-22T00:11:54.1766553Z ##[group]GITHUB_TOKEN Permissions
+Go windows-latest	Set up job	2026-11-22T00:11:54.1768443Z Contents: read
+Go windows-latest	Set up job	2026-11-22T00:11:54.1769061Z Metadata: read
+Go windows-latest	Set up job	2026-11-22T00:11:54.1769585Z ##[endgroup]
+Go windows-latest	Set up job	2026-11-22T00:11:54.1771639Z Secret source: Actions
+Go windows-latest	Set up job	2026-11-22T00:11:54.1772590Z Cache mode: write
+Go windows-latest	Set up job	2026-11-22T00:11:54.1773268Z Prepare workflow directory
+Go windows-latest	Set up job	2026-11-22T00:11:54.3321610Z Prepare all required actions
+Go windows-latest	Set up job	2026-11-22T00:11:54.3370995Z Getting action download info
+Go windows-latest	Set up job	2026-11-22T00:11:54.5421293Z Download action repository 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+Go windows-latest	Set up job	2026-11-22T00:11:54.7289722Z Download action repository 'actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e' (SHA:b7ad1dad31e06c5925ef5d2fc7ad053ef454303e)
+Go windows-latest	Set up job	2026-11-22T00:11:55.4603173Z Complete job name: Go windows-latest
+Go windows-latest	Checkout source	锘?026-11-22T00:11:56.3705140Z ##[group]Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+Go windows-latest	Checkout source	2026-11-22T00:11:56.3706599Z with:
+Go windows-latest	Checkout source	2026-11-22T00:11:56.3707063Z   persist-credentials: false
+Go windows-latest	Checkout source	2026-11-22T00:11:56.3707566Z   fetch-depth: 0
+Go windows-latest	Checkout source	2026-11-22T00:11:56.3708012Z   repository: larsonzh/prfrail
+Go windows-latest	Checkout source	2026-11-22T00:11:56.3712054Z   token: ***
+Go windows-latest	Checkout source	2026-11-22T00:11:56.3712478Z   ssh-strict: true
+Go windows-latest	Checkout source	2026-11-22T00:11:56.3712912Z   ssh-user: git
+Go windows-latest	Checkout source	2026-11-22T00:11:56.3713331Z   clean: true
+Go windows-latest	Checkout source	2026-11-22T00:11:56.3713773Z   sparse-checkout-cone-mode: true
+Go windows-latest	Checkout source	2026-11-22T00:11:56.3714287Z   fetch-tags: false
+Go windows-latest	Checkout source	2026-11-22T00:11:56.3714718Z   show-progress: true
+Go windows-latest	Checkout source	2026-11-22T00:11:56.3715141Z   lfs: false
+Go windows-latest	Checkout source	2026-11-22T00:11:56.3715535Z   submodules: false
+Go windows-latest	Checkout source	2026-11-22T00:11:56.3715963Z   set-safe-directory: true
+Go windows-latest	Checkout source	2026-11-22T00:11:56.3716446Z   allow-unsafe-pr-checkout: false
+Go windows-latest	Checkout source	2026-11-22T00:11:56.3717125Z env:
+Go windows-latest	Checkout source	2026-11-22T00:11:56.3717547Z   GO_VERSION: 1.22.12
+Go windows-latest	Checkout source	2026-11-22T00:11:56.3717975Z   CGO_ENABLED: 0
+Go windows-latest	Checkout source	2026-11-22T00:11:56.3718391Z   GOTOOLCHAIN: local
+Go windows-latest	Checkout source	2026-11-22T00:11:56.3718844Z ##[endgroup]
+Go windows-latest	Checkout source	2026-11-22T00:11:56.5700786Z Syncing repository: larsonzh/prfrail
+Go windows-latest	Checkout source	2026-11-22T00:11:56.5702530Z ##[group]Getting Git version info
+Go windows-latest	Checkout source	2026-11-22T00:11:56.5703157Z Working directory is 'D:\a\prfrail\prfrail'
+Go windows-latest	Checkout source	2026-11-22T00:11:56.6604290Z [command]"C:\Program Files\Git\bin\git.exe" version
+Go windows-latest	Checkout source	2026-11-22T00:11:57.0287539Z git version 2.56.1.windows.1
+Go windows-latest	Checkout source	2026-11-22T00:11:57.0332569Z ##[endgroup]
+Go windows-latest	Checkout source	2026-11-22T00:11:57.0375693Z Temporarily overriding HOME='D:\a\_temp\d248bd19-87a3-46f9-b58f-4758febc0e6b' before making global git config changes
+Go windows-latest	Checkout source	2026-11-22T00:11:57.0377524Z Adding repository directory to the temporary git global config as a safe directory
+Go windows-latest	Checkout source	2026-11-22T00:11:57.0379123Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\prfrail\prfrail
+Go windows-latest	Checkout source	2026-11-22T00:11:57.1049245Z Deleting the contents of 'D:\a\prfrail\prfrail'
+Go windows-latest	Checkout source	2026-11-22T00:11:57.1132440Z ##[group]Determining repository object format
+Go windows-latest	Checkout source	2026-11-22T00:11:57.1133866Z ##[endgroup]
+Go windows-latest	Checkout source	2026-11-22T00:11:57.1135177Z ##[group]Initializing the repository
+Go windows-latest	Checkout source	2026-11-22T00:11:57.1136447Z [command]"C:\Program Files\Git\bin\git.exe" init D:\a\prfrail\prfrail
+Go windows-latest	Checkout source	2026-11-22T00:11:57.1979425Z Initialized empty Git repository in D:/a/prfrail/prfrail/.git/
+Go windows-latest	Checkout source	2026-11-22T00:11:57.2026452Z [command]"C:\Program Files\Git\bin\git.exe" remote add origin https://github.com/larsonzh/prfrail
+Go windows-latest	Checkout source	2026-11-22T00:11:57.2677143Z ##[endgroup]
+Go windows-latest	Checkout source	2026-11-22T00:11:57.2678830Z ##[group]Disabling automatic garbage collection
+Go windows-latest	Checkout source	2026-11-22T00:11:57.2686106Z [command]"C:\Program Files\Git\bin\git.exe" config --local gc.auto 0
+Go windows-latest	Checkout source	2026-11-22T00:11:57.3065919Z ##[endgroup]
+Go windows-latest	Checkout source	2026-11-22T00:11:57.3068336Z ##[group]Setting up auth
+Go windows-latest	Checkout source	2026-11-22T00:11:57.3070007Z Removing SSH command configuration
+Go windows-latest	Checkout source	2026-11-22T00:11:57.3077750Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+Go windows-latest	Checkout source	2026-11-22T00:11:57.3465887Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+Go windows-latest	Checkout source	2026-11-22T00:11:58.8363164Z Removing HTTP extra header
+Go windows-latest	Checkout source	2026-11-22T00:11:58.8373115Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Go windows-latest	Checkout source	2026-11-22T00:11:58.8783759Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+Go windows-latest	Checkout source	2026-11-22T00:11:59.4936952Z Removing includeIf entries pointing to credentials config files
+Go windows-latest	Checkout source	2026-11-22T00:11:59.4947145Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+Go windows-latest	Checkout source	2026-11-22T00:11:59.5329718Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+Go windows-latest	Checkout source	2026-11-22T00:12:00.1171266Z [command]"C:\Program Files\Git\bin\git.exe" config --file D:\a\_temp\git-credentials-347d6c75-3abe-4bbe-b75b-462d9d7074a2.config http.https://github.com/.extraheader "AUTHORIZATION: basic ***"
+Go windows-latest	Checkout source	2026-11-22T00:12:00.1572810Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:D:/a/prfrail/prfrail/.git.path D:\a\_temp\git-credentials-347d6c75-3abe-4bbe-b75b-462d9d7074a2.config
+Go windows-latest	Checkout source	2026-11-22T00:12:00.1960774Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:D:/a/prfrail/prfrail/.git/worktrees/*.path D:\a\_temp\git-credentials-347d6c75-3abe-4bbe-b75b-462d9d7074a2.config
+Go windows-latest	Checkout source	2026-11-22T00:12:00.2387070Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-347d6c75-3abe-4bbe-b75b-462d9d7074a2.config
+Go windows-latest	Checkout source	2026-11-22T00:12:00.2817429Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-347d6c75-3abe-4bbe-b75b-462d9d7074a2.config
+Go windows-latest	Checkout source	2026-11-22T00:12:00.3205095Z ##[endgroup]
+Go windows-latest	Checkout source	2026-11-22T00:12:00.3206252Z ##[group]Fetching the repository
+Go windows-latest	Checkout source	2026-11-22T00:12:00.3216639Z [command]"C:\Program Files\Git\bin\git.exe" -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+Go windows-latest	Checkout source	2026-11-22T00:12:02.3806420Z From https://github.com/larsonzh/prfrail
+Go windows-latest	Checkout source	2026-11-22T00:12:02.3807477Z  * [new branch]      main                 -> origin/main
+Go windows-latest	Checkout source	2026-11-22T00:12:02.3808119Z  * [new branch]      t017-first-candidate -> origin/t017-first-candidate
+Go windows-latest	Checkout source	2026-11-22T00:12:02.3809115Z  * [new tag]         v0.1.0               -> v0.1.0
+Go windows-latest	Checkout source	2026-11-22T00:12:02.3859558Z [command]"C:\Program Files\Git\bin\git.exe" branch --list --remote origin/main
+Go windows-latest	Checkout source	2026-11-22T00:12:02.4289380Z   origin/main
+Go windows-latest	Checkout source	2026-11-22T00:12:02.4334683Z [command]"C:\Program Files\Git\bin\git.exe" rev-parse refs/remotes/origin/main
+Go windows-latest	Checkout source	2026-11-22T00:12:02.4909607Z a5ef122a131804571d11dfcca1da3f00a4518c03
+Go windows-latest	Checkout source	2026-11-22T00:12:02.4945932Z ##[endgroup]
+Go windows-latest	Checkout source	2026-11-22T00:12:02.4946331Z ##[group]Determining the checkout info
+Go windows-latest	Checkout source	2026-11-22T00:12:02.4947804Z ##[endgroup]
+Go windows-latest	Checkout source	2026-11-22T00:12:02.4956449Z [command]"C:\Program Files\Git\bin\git.exe" sparse-checkout disable
+Go windows-latest	Checkout source	2026-11-22T00:12:02.5489070Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all extensions.worktreeConfig
+Go windows-latest	Checkout source	2026-11-22T00:12:02.5883779Z ##[group]Checking out the ref
+Go windows-latest	Checkout source	2026-11-22T00:12:02.5884430Z [command]"C:\Program Files\Git\bin\git.exe" checkout --progress --force -B main refs/remotes/origin/main
+Go windows-latest	Checkout source	2026-11-22T00:12:03.6513036Z Updating files:  71% (3619/5076)
+Go windows-latest	Checkout source	2026-11-22T00:12:03.6632703Z Updating files:  72% (3655/5076)
+Go windows-latest	Checkout source	2026-11-22T00:12:03.6822617Z Updating files:  73% (3706/5076)
+Go windows-latest	Checkout source	2026-11-22T00:12:03.7020840Z Updating files:  74% (3757/5076)
+Go windows-latest	Checkout source	2026-11-22T00:12:03.7213813Z Updating files:  75% (3807/5076)
+Go windows-latest	Checkout source	2026-11-22T00:12:03.7385749Z Updating files:  76% (3858/5076)
+Go windows-latest	Checkout source	2026-11-22T00:12:03.7550817Z Updating files:  77% (3909/5076)
+Go windows-latest	Checkout source	2026-11-22T00:12:03.7737949Z Updating files:  78% (3960/5076)
+Go windows-latest	Checkout source	2026-11-22T00:12:03.7871092Z Updating files:  79% (4011/5076)
+Go windows-latest	Checkout source	2026-11-22T00:12:03.8035076Z Updating files:  80% (4061/5076)
+Go windows-latest	Checkout source	2026-11-22T00:12:03.8189295Z Updating files:  81% (4112/5076)
+Go windows-latest	Checkout source	2026-11-22T00:12:03.8337005Z Updating files:  82% (4163/5076)
+Go windows-latest	Checkout source	2026-11-22T00:12:03.8447515Z Updating files:  83% (4214/5076)
+Go windows-latest	Checkout source	2026-11-22T00:12:03.8617014Z Updating files:  84% (4264/5076)
+Go windows-latest	Checkout source	2026-11-22T00:12:03.8789671Z Updating files:  85% (4315/5076)
+Go windows-latest	Checkout source	2026-11-22T00:12:03.8923905Z Updating files:  86% (4366/5076)
+Go windows-latest	Checkout source	2026-11-22T00:12:03.9099948Z Updating files:  87% (4417/5076)
+Go windows-latest	Checkout source	2026-11-22T00:12:03.9245512Z Updating files:  88% (4467/5076)
+Go windows-latest	Checkout source	2026-11-22T00:12:03.9402184Z Updating files:  89% (4518/5076)
+Go windows-latest	Checkout source	2026-11-22T00:12:03.9537857Z Updating files:  90% (4569/5076)
+Go windows-latest	Checkout source	2026-11-22T00:12:03.9684150Z Updating files:  91% (4620/5076)
+Go windows-latest	Checkout source	2026-11-22T00:12:03.9840246Z Updating files:  92% (4670/5076)
+Go windows-latest	Checkout source	2026-11-22T00:12:03.9980603Z Updating files:  93% (4721/5076)
+Go windows-latest	Checkout source	2026-11-22T00:12:04.0131866Z Updating files:  94% (4772/5076)
+Go windows-latest	Checkout source	2026-11-22T00:12:04.0268339Z Updating files:  95% (4823/5076)
+Go windows-latest	Checkout source	2026-11-22T00:12:04.0428851Z Updating files:  96% (4873/5076)
+Go windows-latest	Checkout source	2026-11-22T00:12:04.0584029Z Updating files:  97% (4924/5076)
+Go windows-latest	Checkout source	2026-11-22T00:12:04.0735940Z Updating files:  98% (4975/5076)
+Go windows-latest	Checkout source	2026-11-22T00:12:04.0845343Z Updating files:  99% (5026/5076)
+Go windows-latest	Checkout source	2026-11-22T00:12:04.0846116Z Updating files: 100% (5076/5076)
+Go windows-latest	Checkout source	2026-11-22T00:12:04.0846582Z Updating files: 100% (5076/5076), done.
+Go windows-latest	Checkout source	2026-11-22T00:12:04.1125408Z Switched to a new branch 'main'
+Go windows-latest	Checkout source	2026-11-22T00:12:04.1163442Z branch 'main' set up to track 'origin/main'.
+Go windows-latest	Checkout source	2026-11-22T00:12:04.1244090Z ##[endgroup]
+Go windows-latest	Checkout source	2026-11-22T00:12:04.1764870Z [command]"C:\Program Files\Git\bin\git.exe" log -1 --format=%H
+Go windows-latest	Checkout source	2026-11-22T00:12:04.2119883Z a5ef122a131804571d11dfcca1da3f00a4518c03
+Go windows-latest	Checkout source	2026-11-22T00:12:04.2160848Z ##[group]Removing auth
+Go windows-latest	Checkout source	2026-11-22T00:12:04.2161255Z Removing SSH command configuration
+Go windows-latest	Checkout source	2026-11-22T00:12:04.2169225Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+Go windows-latest	Checkout source	2026-11-22T00:12:04.2557037Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+Go windows-latest	Checkout source	2026-11-22T00:12:04.8393918Z Removing HTTP extra header
+Go windows-latest	Checkout source	2026-11-22T00:12:04.8402932Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Go windows-latest	Checkout source	2026-11-22T00:12:04.8788762Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+Go windows-latest	Checkout source	2026-11-22T00:12:05.4303386Z Removing includeIf entries pointing to credentials config files
+Go windows-latest	Checkout source	2026-11-22T00:12:05.4312061Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+Go windows-latest	Checkout source	2026-11-22T00:12:05.4661182Z includeif.gitdir:D:/a/prfrail/prfrail/.git.path
+Go windows-latest	Checkout source	2026-11-22T00:12:05.4661863Z includeif.gitdir:D:/a/prfrail/prfrail/.git/worktrees/*.path
+Go windows-latest	Checkout source	2026-11-22T00:12:05.4662502Z includeif.gitdir:/github/workspace/.git.path
+Go windows-latest	Checkout source	2026-11-22T00:12:05.4663568Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+Go windows-latest	Checkout source	2026-11-22T00:12:05.4708122Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:D:/a/prfrail/prfrail/.git.path
+Go windows-latest	Checkout source	2026-11-22T00:12:05.5055469Z D:\a\_temp\git-credentials-347d6c75-3abe-4bbe-b75b-462d9d7074a2.config
+Go windows-latest	Checkout source	2026-11-22T00:12:05.5102054Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:D:/a/prfrail/prfrail/.git.path D\:\\a\\_temp\\git\-credentials\-347d6c75\-3abe\-4bbe\-b75b\-462d9d7074a2\.config
+Go windows-latest	Checkout source	2026-11-22T00:12:05.5509946Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:D:/a/prfrail/prfrail/.git/worktrees/*.path
+Go windows-latest	Checkout source	2026-11-22T00:12:05.5858630Z D:\a\_temp\git-credentials-347d6c75-3abe-4bbe-b75b-462d9d7074a2.config
+Go windows-latest	Checkout source	2026-11-22T00:12:05.5909886Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:D:/a/prfrail/prfrail/.git/worktrees/*.path D\:\\a\\_temp\\git\-credentials\-347d6c75\-3abe\-4bbe\-b75b\-462d9d7074a2\.config
+Go windows-latest	Checkout source	2026-11-22T00:12:05.6302218Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:/github/workspace/.git.path
+Go windows-latest	Checkout source	2026-11-22T00:12:05.6658610Z /github/runner_temp/git-credentials-347d6c75-3abe-4bbe-b75b-462d9d7074a2.config
+Go windows-latest	Checkout source	2026-11-22T00:12:05.6701559Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-347d6c75\-3abe\-4bbe\-b75b\-462d9d7074a2\.config
+Go windows-latest	Checkout source	2026-11-22T00:12:05.7087403Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+Go windows-latest	Checkout source	2026-11-22T00:12:05.7444048Z /github/runner_temp/git-credentials-347d6c75-3abe-4bbe-b75b-462d9d7074a2.config
+Go windows-latest	Checkout source	2026-11-22T00:12:05.7495424Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-347d6c75\-3abe\-4bbe\-b75b\-462d9d7074a2\.config
+Go windows-latest	Checkout source	2026-11-22T00:12:05.7899671Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+Go windows-latest	Checkout source	2026-11-22T00:12:06.3522895Z Removing credentials config 'D:\a\_temp\git-credentials-347d6c75-3abe-4bbe-b75b-462d9d7074a2.config'
+Go windows-latest	Checkout source	2026-11-22T00:12:06.3535273Z ##[endgroup]
+Go windows-latest	Setup Go	锘?026-11-22T00:12:06.4029785Z ##[group]Run actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
+Go windows-latest	Setup Go	2026-11-22T00:12:06.4030339Z with:
+Go windows-latest	Setup Go	2026-11-22T00:12:06.4030567Z   go-version: 1.22.12
+Go windows-latest	Setup Go	2026-11-22T00:12:06.4030823Z   cache: true
+Go windows-latest	Setup Go	2026-11-22T00:12:06.4031060Z   check-latest: false
+Go windows-latest	Setup Go	2026-11-22T00:12:06.4034365Z   token: ***
+Go windows-latest	Setup Go	2026-11-22T00:12:06.4034548Z env:
+Go windows-latest	Setup Go	2026-11-22T00:12:06.4034704Z   GO_VERSION: 1.22.12
+Go windows-latest	Setup Go	2026-11-22T00:12:06.4034890Z   CGO_ENABLED: 0
+Go windows-latest	Setup Go	2026-11-22T00:12:06.4035065Z   GOTOOLCHAIN: local
+Go windows-latest	Setup Go	2026-11-22T00:12:06.4035249Z ##[endgroup]
+Go windows-latest	Setup Go	2026-11-22T00:12:06.5545003Z Setup go version spec 1.22.12
+Go windows-latest	Setup Go	2026-11-22T00:12:06.5557553Z Attempting to download 1.22.12...
+Go windows-latest	Setup Go	2026-11-22T00:12:07.1611784Z matching 1.22.12...
+Go windows-latest	Setup Go	2026-11-22T00:12:07.1643979Z Acquiring 1.22.12 from https://github.com/actions/go-versions/releases/download/1.22.12-13149489080/go-1.22.12-win32-x64.zip
+Go windows-latest	Setup Go	2026-11-22T00:12:07.8273945Z Extracting Go...
+Go windows-latest	Setup Go	2026-11-22T00:12:07.9291116Z [command]"C:\Program Files\PowerShell\7\pwsh.exe" -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Unrestricted -Command "$ErrorActionPreference = 'Stop' ; try { Add-Type -AssemblyName System.IO.Compression.ZipFile } catch { } ; try { [System.IO.Compression.ZipFile]::ExtractToDirectory('D:\a\_temp\go-1.22.12-win32-x64.zip', 'D:\a\_temp\d057dbdd-28ca-4b23-92ec-344a93f6086a', $true) } catch { if (($_.Exception.GetType().FullName -eq 'System.Management.Automation.MethodException') -or ($_.Exception.GetType().FullName -eq 'System.Management.Automation.RuntimeException') ){ Expand-Archive -LiteralPath 'D:\a\_temp\go-1.22.12-win32-x64.zip' -DestinationPath 'D:\a\_temp\d057dbdd-28ca-4b23-92ec-344a93f6086a' -Force } else { throw $_ } } ;"
+Go windows-latest	Setup Go	2026-11-22T00:12:12.2457570Z Successfully extracted go to D:\a\_temp\d057dbdd-28ca-4b23-92ec-344a93f6086a
+Go windows-latest	Setup Go	2026-11-22T00:12:12.2458078Z Adding to the cache ...
+Go windows-latest	Setup Go	2026-11-22T00:12:22.7984399Z Created link C:\hostedtoolcache\windows\go\1.22.12\x64 => D:\hostedtoolcache\windows\go\1.22.12\x64
+Go windows-latest	Setup Go	2026-11-22T00:12:22.7989541Z Created link C:\hostedtoolcache\windows\go\1.22.12\x64.complete => D:\hostedtoolcache\windows\go\1.22.12\x64.complete
+Go windows-latest	Setup Go	2026-11-22T00:12:22.7990746Z Successfully cached go to C:\hostedtoolcache\windows\go\1.22.12\x64
+Go windows-latest	Setup Go	2026-11-22T00:12:22.7996256Z Added go to the path
+Go windows-latest	Setup Go	2026-11-22T00:12:22.7998215Z Successfully set up Go version 1.22.12
+Go windows-latest	Setup Go	2026-11-22T00:12:23.2049812Z [command]C:\hostedtoolcache\windows\go\1.22.12\x64\bin\go.exe env GOCACHE
+Go windows-latest	Setup Go	2026-11-22T00:12:23.2098171Z [command]C:\hostedtoolcache\windows\go\1.22.12\x64\bin\go.exe env GOMODCACHE
+Go windows-latest	Setup Go	2026-11-22T00:12:23.2456873Z C:\Users\runneradmin\AppData\Local\go-build
+Go windows-latest	Setup Go	2026-11-22T00:12:23.2481908Z C:\Users\runneradmin\go\pkg\mod
+Go windows-latest	Setup Go	2026-11-22T00:12:23.6669159Z Cache hit for: setup-go-Windows-x64-go-1.22.12-2f07b6ec62ba90bcd08e45ebcc765a7ea2fd8104887fdaad445ddb80e0e00ca7
+Go windows-latest	Setup Go	2026-11-22T00:12:24.2988923Z Received 33757192 of 33757192 (100.0%), 64.8 MBs/sec
+Go windows-latest	Setup Go	2026-11-22T00:12:24.2990833Z Cache Size: ~32 MB (33757192 B)
+Go windows-latest	Setup Go	2026-11-22T00:12:24.3064902Z [command]"C:\Program Files\Git\usr\bin\tar.exe" -xf D:/a/_temp/c9c49820-82f9-4f21-8fe3-76092a567b0f/cache.tzst -P -C D:/a/prfrail/prfrail --force-local --use-compress-program "zstd -d"
+Go windows-latest	Setup Go	2026-11-22T00:12:27.2364090Z Cache restored successfully
+Go windows-latest	Setup Go	2026-11-22T00:12:27.2401940Z Cache restored from key: setup-go-Windows-x64-go-1.22.12-2f07b6ec62ba90bcd08e45ebcc765a7ea2fd8104887fdaad445ddb80e0e00ca7
+Go windows-latest	Setup Go	2026-11-22T00:12:27.2423287Z go version go1.22.12 windows/amd64
+Go windows-latest	Setup Go	2026-11-22T00:12:27.2423536Z 
+Go windows-latest	Setup Go	2026-11-22T00:12:27.2423823Z ##[group]go env
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9885748Z set GO111MODULE=
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9886580Z set GOARCH=amd64
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9887009Z set GOBIN=
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9887684Z set GOCACHE=C:\Users\runneradmin\AppData\Local\go-build
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9888273Z set GOENV=C:\Users\runneradmin\AppData\Roaming\go\env
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9888778Z set GOEXE=.exe
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9889067Z set GOEXPERIMENT=
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9889353Z set GOFLAGS=
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9889628Z set GOHOSTARCH=amd64
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9889929Z set GOHOSTOS=windows
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9892775Z set GOINSECURE=
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9893313Z set GOMODCACHE=C:\Users\runneradmin\go\pkg\mod
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9893838Z set GONOPROXY=
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9894167Z set GONOSUMDB=
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9894516Z set GOOS=windows
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9894875Z set GOPATH=C:\Users\runneradmin\go
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9895331Z set GOPRIVATE=
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9895607Z set GOPROXY=https://proxy.golang.org,direct
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9895956Z set GOROOT=C:\hostedtoolcache\windows\go\1.22.12\x64
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9896264Z set GOSUMDB=sum.golang.org
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9896484Z set GOTMPDIR=
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9896667Z set GOTOOLCHAIN=local
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9897011Z set GOTOOLDIR=C:\hostedtoolcache\windows\go\1.22.12\x64\pkg\tool\windows_amd64
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9897391Z set GOVCS=
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9897571Z set GOVERSION=go1.22.12
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9897771Z set GCCGO=gccgo
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9897943Z set GOAMD64=v1
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9898108Z set AR=ar
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9898276Z set CC=gcc
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9898442Z set CXX=g++
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9898614Z set CGO_ENABLED=0
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9899009Z set GOMOD=D:\a\prfrail\prfrail\go.mod
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9899437Z set GOWORK=
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9901378Z set CGO_CFLAGS=-O2 -g
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9901663Z set CGO_CPPFLAGS=
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9901876Z set CGO_CXXFLAGS=-O2 -g
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9902089Z set CGO_FFLAGS=-O2 -g
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9902293Z set CGO_LDFLAGS=-O2 -g
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9902506Z set PKG_CONFIG=pkg-config
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9903258Z set GOGCCFLAGS=-m64 -Wl,--no-gc-sections -fmessage-length=0 -ffile-prefix-map=C:\Users\RUNNER~1\AppData\Local\Temp\go-build999595070=/tmp/go-build -gno-record-gcc-switches
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9903909Z 
+Go windows-latest	Setup Go	2026-11-22T00:12:27.9904224Z ##[endgroup]
+Go windows-latest	Build	锘?026-11-22T00:12:28.0243628Z ##[group]Run go build ./...
+Go windows-latest	Build	2026-11-22T00:12:28.0243999Z ^[[36;1mgo build ./...^[[0m
+Go windows-latest	Build	2026-11-22T00:12:28.0703473Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+Go windows-latest	Build	2026-11-22T00:12:28.0704005Z env:
+Go windows-latest	Build	2026-11-22T00:12:28.0704246Z   GO_VERSION: 1.22.12
+Go windows-latest	Build	2026-11-22T00:12:28.0704513Z   CGO_ENABLED: 0
+Go windows-latest	Build	2026-11-22T00:12:28.0704773Z   GOTOOLCHAIN: local
+Go windows-latest	Build	2026-11-22T00:12:28.0705056Z ##[endgroup]
+Go windows-latest	Vet	锘?026-11-22T00:12:38.4273984Z ##[group]Run go vet ./...
+Go windows-latest	Vet	2026-11-22T00:12:38.4274356Z ^[[36;1mgo vet ./...^[[0m
+Go windows-latest	Vet	2026-11-22T00:12:38.4345323Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+Go windows-latest	Vet	2026-11-22T00:12:38.4345693Z env:
+Go windows-latest	Vet	2026-11-22T00:12:38.4345873Z   GO_VERSION: 1.22.12
+Go windows-latest	Vet	2026-11-22T00:12:38.4346063Z   CGO_ENABLED: 0
+Go windows-latest	Vet	2026-11-22T00:12:38.4346248Z   GOTOOLCHAIN: local
+Go windows-latest	Vet	2026-11-22T00:12:38.4346438Z ##[endgroup]
+Go windows-latest	Test	锘?026-11-22T00:12:45.3201401Z ##[group]Run go test -count=1 ./...
+Go windows-latest	Test	2026-11-22T00:12:45.3201783Z ^[[36;1mgo test -count=1 ./...^[[0m
+Go windows-latest	Test	2026-11-22T00:12:45.3270018Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+Go windows-latest	Test	2026-11-22T00:12:45.3270377Z env:
+Go windows-latest	Test	2026-11-22T00:12:45.3270559Z   GO_VERSION: 1.22.12
+Go windows-latest	Test	2026-11-22T00:12:45.3270752Z   CGO_ENABLED: 0
+Go windows-latest	Test	2026-11-22T00:12:45.3270933Z   GOTOOLCHAIN: local
+Go windows-latest	Test	2026-11-22T00:12:45.3271124Z ##[endgroup]
+Go windows-latest	Test	2026-11-22T00:12:50.4356272Z ?   	github.com/larsonzh/prfrail/cmd/prfrail	[no test files]
+Go windows-latest	Test	2026-11-22T00:12:50.5252560Z ?   	github.com/larsonzh/prfrail/cmd/prfrail-release	[no test files]
+Go windows-latest	Test	2026-11-22T00:12:50.6976123Z ok  	github.com/larsonzh/prfrail/examples/whois-shadow	0.038s
+Go windows-latest	Test	2026-11-22T00:13:20.1537063Z ?   	github.com/larsonzh/prfrail/tools/agent-probe/supervisor	[no test files]
+Go windows-latest	Test	2026-11-22T00:13:22.3028301Z ?   	github.com/larsonzh/prfrail/tools/b4-e2e	[no test files]
+Go windows-latest	Test	2026-11-22T00:13:41.8268633Z ok  	github.com/larsonzh/prfrail/internal/adapters	50.555s
+Go windows-latest	Test	2026-11-22T00:13:41.8269173Z ok  	github.com/larsonzh/prfrail/internal/applier	6.378s
+Go windows-latest	Test	2026-11-22T00:13:41.8270545Z ok  	github.com/larsonzh/prfrail/internal/chain	5.289s
+Go windows-latest	Test	2026-11-22T00:13:44.0123485Z ok  	github.com/larsonzh/prfrail/internal/console	49.873s
+Go windows-latest	Test	2026-11-22T00:13:44.0124296Z --- FAIL: TestP86UncShareRootProductionEntry (0.77s)
+Go windows-latest	Test	2026-11-22T00:13:44.0126820Z     p86_bounddir_unc_test.go:217: a CI host must derive the trailing-separator spelling for the share root "\\\\localhost\\P86UNC1795306379581774100", got "\\\\localhost\\P86UNC1795306379581774100"
+Go windows-latest	Test	2026-11-22T00:13:44.0128333Z FAIL
+Go windows-latest	Test	2026-11-22T00:13:44.0128797Z FAIL	github.com/larsonzh/prfrail/internal/evidence	1.837s
+Go windows-latest	Test	2026-11-22T00:13:44.0129486Z ok  	github.com/larsonzh/prfrail/internal/gates	2.083s
+Go windows-latest	Test	2026-11-22T00:13:44.0130129Z ok  	github.com/larsonzh/prfrail/internal/guard	9.837s
+Go windows-latest	Test	2026-11-22T00:13:44.0130818Z ok  	github.com/larsonzh/prfrail/internal/release	6.089s
+Go windows-latest	Test	2026-11-22T00:13:44.0131498Z ok  	github.com/larsonzh/prfrail/internal/repair	0.023s
+Go windows-latest	Test	2026-11-22T00:13:44.0132249Z ok  	github.com/larsonzh/prfrail/internal/snapshot	2.460s
+Go windows-latest	Test	2026-11-22T00:13:44.0132940Z ok  	github.com/larsonzh/prfrail/internal/taskdef	0.052s
+Go windows-latest	Test	2026-11-22T00:13:44.0133639Z ok  	github.com/larsonzh/prfrail/internal/tickets	6.542s
+Go windows-latest	Test	2026-11-22T00:13:44.0134472Z ok  	github.com/larsonzh/prfrail/tools/agent-probe/enforcement-proxy	1.867s
+Go windows-latest	Test	2026-11-22T00:13:44.0135323Z ok  	github.com/larsonzh/prfrail/tools/agent-stub	1.580s
+Go windows-latest	Test	2026-11-22T00:13:44.0135861Z FAIL
+Go windows-latest	Test	2026-11-22T00:13:44.2744822Z ##[error]Process completed with exit code 1.
+Go windows-latest	Post Checkout source	锘?026-11-22T00:13:44.3052367Z Post job cleanup.
+Go windows-latest	Post Checkout source	2026-11-22T00:13:44.5174648Z [command]"C:\Program Files\Git\bin\git.exe" version
+Go windows-latest	Post Checkout source	2026-11-22T00:13:44.5554121Z git version 2.56.1.windows.1
+Go windows-latest	Post Checkout source	2026-11-22T00:13:44.5639358Z Temporarily overriding HOME='D:\a\_temp\4fecaad8-3c60-4ddc-b600-6dcf5f3f2bbb' before making global git config changes
+Go windows-latest	Post Checkout source	2026-11-22T00:13:44.5640725Z Adding repository directory to the temporary git global config as a safe directory
+Go windows-latest	Post Checkout source	2026-11-22T00:13:44.5651898Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\prfrail\prfrail
+Go windows-latest	Post Checkout source	2026-11-22T00:13:44.6061076Z Removing SSH command configuration
+Go windows-latest	Post Checkout source	2026-11-22T00:13:44.6072605Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+Go windows-latest	Post Checkout source	2026-11-22T00:13:44.6479995Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+Go windows-latest	Post Checkout source	2026-11-22T00:13:45.2319691Z Removing HTTP extra header
+Go windows-latest	Post Checkout source	2026-11-22T00:13:45.2330362Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+Go windows-latest	Post Checkout source	2026-11-22T00:13:45.2727182Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+Go windows-latest	Post Checkout source	2026-11-22T00:13:46.0393310Z Removing includeIf entries pointing to credentials config files
+Go windows-latest	Post Checkout source	2026-11-22T00:13:46.0405555Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+Go windows-latest	Post Checkout source	2026-11-22T00:13:46.0813497Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+Go windows-latest	Complete job	锘?026-11-22T00:13:46.6596981Z Cleaning up orphan processes

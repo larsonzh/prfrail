@@ -160,12 +160,13 @@ func TestP86N13UncShareRootRefusals(t *testing.T) {
 
 // TestP86UncShareRootProductionEntry drives the equivalence branch through the
 // production entry: a real share root is bound with OpenBoundDir, and a real
-// mount-point reparse point stores the share root WITHOUT the trailing separator the
-// handle-derived name carries.
+// mount-point reparse point stores the share root in the OTHER canonical spelling
+// (with or without the trailing separator the handle-derived name happens to carry).
 //
 // Every fixture step that this host may legitimately refuse (the share command, the
 // directory handle on a UNC root, the hand-built reparse buffer) skips with the
-// reason spelled out rather than pretending the case ran.
+// reason spelled out rather than pretending the case ran. Under CI those failures are
+// hard failures instead, so a green CI proves the production entry really ran.
 func TestP86UncShareRootProductionEntry(t *testing.T) {
 	local := t.TempDir()
 	share := fmt.Sprintf("P86UNC%d", time.Now().UnixNano())
@@ -208,25 +209,35 @@ func TestP86UncShareRootProductionEntry(t *testing.T) {
 	if err != nil {
 		t.Fatalf("derive the bound share root name from the handle: %v", err)
 	}
-	// Precondition: the handle-derived name keeps the share root's trailing separator,
-	// which is the spelling the stored target below deliberately lacks. Without it the
-	// two spellings would be byte-equal and the equivalence branch would not be the
-	// reason the open succeeds.
-	if base != uncRoot+`\` {
+	// Precondition: the handle-derived name is the share root in one of the two
+	// canonical spellings, and the stored target below takes the OTHER one. N13 is
+	// exactly that pair: the two spellings differ only by the trailing separator
+	// Clean keeps for a share root, so the equality step misses and only the P86
+	// branch can admit the target. Which side carries the separator is host
+	// dependent (a CI runner derives the bare form), so the fixture mirrors the
+	// observed spelling instead of assuming one.
+	const sep = `\`
+	var storedShare, printed string
+	switch base {
+	case uncRoot + sep:
+		storedShare, printed = share, uncRoot
+	case uncRoot:
+		storedShare, printed = share+sep, uncRoot+sep
+	default:
 		if os.Getenv("CI") != "" {
-			t.Fatalf("a CI host must derive the trailing-separator spelling for the share root %q, got %q", uncRoot, base)
+			t.Fatalf("a CI host must derive the share root %q in one of its two canonical spellings, got %q", uncRoot, base)
 		}
-		t.Skipf("this host derives %q for the supplied share root %q; the stored target only differs by its trailing separator when the handle name keeps that separator", base, uncRoot)
+		t.Skipf("this host derives %q for the supplied share root %q; N13 needs one of the two canonical spellings", base, uncRoot)
 	}
 	if got := uncShareRootName(base); got != uncRoot {
 		t.Fatalf("uncShareRootName(%q) = %q, want %q", base, got, uncRoot)
 	}
 
-	// Positive: the reparse point stores the share root without the trailing separator.
-	p84SetMountPointReparse(t, filepath.Join(local, "link"), `\??\UNC\localhost\`+share, uncRoot)
+	// Positive: the reparse point stores the share root in the OTHER canonical spelling.
+	p84SetMountPointReparse(t, filepath.Join(local, "link"), `\??\UNC\localhost\`+storedShare, printed)
 	file, err := OpenBoundDirFile(dir, `link\sub\f`, 1<<20)
 	if err != nil {
-		t.Fatalf("the share root spelled without its trailing separator must be admitted and walked: %v", err)
+		t.Fatalf("the share root spelled with the other canonical separator shape must be admitted and walked: %v", err)
 	}
 	data, truncated, err := file.ReadAll()
 	_ = file.Close()
