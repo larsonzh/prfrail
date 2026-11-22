@@ -1,0 +1,25 @@
+?   	github.com/larsonzh/prfrail/cmd/prfrail	[no test files]
+?   	github.com/larsonzh/prfrail/cmd/prfrail-release	[no test files]
+ok  	github.com/larsonzh/prfrail/examples/whois-shadow	1.579s
+ok  	github.com/larsonzh/prfrail/internal/adapters	54.997s
+ok  	github.com/larsonzh/prfrail/internal/applier	2.251s
+ok  	github.com/larsonzh/prfrail/internal/chain	4.722s
+ok  	github.com/larsonzh/prfrail/internal/console	33.960s
+ok  	github.com/larsonzh/prfrail/internal/evidence	6.945s
+ok  	github.com/larsonzh/prfrail/internal/gates	8.730s
+ok  	github.com/larsonzh/prfrail/internal/guard	10.421s
+ok  	github.com/larsonzh/prfrail/internal/release	20.167s
+ok  	github.com/larsonzh/prfrail/internal/repair	2.498s
+ok  	github.com/larsonzh/prfrail/internal/snapshot	5.292s
+ok  	github.com/larsonzh/prfrail/internal/taskdef	2.932s
+--- FAIL: TestP39DurablePrecommitFaultsRejectAck (1.01s)
+    --- FAIL: TestP39DurablePrecommitFaultsRejectAck/dirClose (0.03s)
+        durable_cost_ledger_test.go:1104: seed reserve: durable cost ledger snapshot not committed: atomic replace failed, previous snapshot still in place: rename C:\Users\濡欏鍛淺AppData\Local\Temp\TestP39DurablePrecommitFaultsRejectAckdirClose481747294\001\.cost-ledger-2417099078.tmp C:\Users\濡欏鍛淺AppData\Local\Temp\TestP39DurablePrecommitFaultsRejectAckdirClose481747294\001\cost-project-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.json: Access is denied.
+FAIL
+FAIL	github.com/larsonzh/prfrail/internal/tickets	8.200s
+?   	github.com/larsonzh/prfrail/tmp/P86-BOUNDDIR-UNC-EQUIVALENCE	[no test files]
+ok  	github.com/larsonzh/prfrail/tools/agent-probe/enforcement-proxy	4.295s
+?   	github.com/larsonzh/prfrail/tools/agent-probe/supervisor	[no test files]
+ok  	github.com/larsonzh/prfrail/tools/agent-stub	10.909s
+?   	github.com/larsonzh/prfrail/tools/b4-e2e	[no test files]
+FAIL

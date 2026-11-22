@@ -117,14 +117,16 @@
 ## 11. ⑨ 验证结果与本机不可执行项
 
 - **Windows 本机**：`go test ./internal/evidence -run TestP86 -count=1 -v` → `TestP86N13UncShareRootEquivalence`（5 子例）PASS、`TestP86N13UncShareRootRefusals`（12 子例 + 分类器 10 负例）PASS、`TestP86UncShareRootProductionEntry` **SKIP**（本机非提权：`net share … exit status 2 (发生系统错误 5。拒绝访问。)`；已 `t.Skipf` 写明原因）。
+- **CI 守卫（⑦ 盲审/终审 Low 的机械收口）**：生产入口用例在 `CI` 环境变量存在时，把三个前置失败（建共享、开 UNC 根句柄、句柄名尾分隔符形态）由 skip 改为 **硬失败**，因此**CI 双腿绿 ⇒ 生产入口真实运行并 PASS**；本机（`CI` 未设）仍按 skip 并写明原因。此法不改 CI 工作流（边界内）。
+- **本机 flake 观测（非本片引入）**：本机 3 次 `go test ./... -count=1` 中 1 次 `internal/tickets` 的 `TestP39DurablePrecommitFaultsRejectAck/dirClose` 因 `rename … Access is denied` 失败（与 DR-17 同族的环境性 IO/AV 抖动），其余 2 次全绿、CI 双腿未复现；按「观测级 flake 只记录不阻断」处理，不新增 DR。
 - **变异检验（实跑留证）**：`mutation-record.txt` 记录 `BEFORE_SHA256=35df2761…dba62` / `ANCHOR_COUNT=1` / `MUTATED_SHA256=f6ab720f…64db7` / `MUTATED_TEST_EXIT=1` / `RESTORED_SHA256=35df2761…dba62` / `RESTORED_IDENTICAL=True` / `RESTORED_TEST_EXIT=0`；`mutation-branch-removed.txt` 显示**恰好** 3 个拼写差异子例 FAIL（`trailing-base-bare-target` / `bare-base-trailing-target` / `ascii-case-folded-trailing-target`），`identical-trailing-spellings`、`strict-descendant-regression`、全部反例与 `TestP84W10…` 保持 PASS。
 - **不做 -race**：本机无 gcc（与 P84 同口径）；Race 步骤由 CI ubuntu 腿承担。
 - **Ubuntu VM 不开启**（起跑消息 §三）；Linux 侧零改动，由 CI ubuntu 腿回归。
 
 ## 11.2 CI 读数（⑧b 推送后写入本节）
 
-- 主提交与首跑 run：由 ⑧b 推送后的 CI 结果回写；回写前本节不构成 CI 终态。
-- windows 腿（`go test ./...` / `internal/evidence` / `TestP86UncShareRootProductionEntry`）、ubuntu 腿（`ok` 包数 / Race 步骤）、`SELFTEST`、`--scope=index` 复查：同上。
+- 主提交 `f1ae821`；首跑 run **`44962802936`** **双腿 success**（`Go windows-latest` / `Go ubuntu-latest`）；windows 腿：`ok github.com/larsonzh/prfrail/internal/evidence`、`SELFTEST: PASS 740/740`、`TOTAL_FAIL=0`；日志载荷 `03-verification/ci/run-44962802936-windows.log` / `-ubuntu.log`。
+- 首跑未含 CI 守卫（`-v` 未开启 ⇒ 无 PASS/SKIP 行）；守卫轮（CI 环境下前置失败改硬失败）随修复提交重跑，读数见下行。
 
 ## 12. 环境与档位
 
@@ -214,6 +216,9 @@ docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/03-verification/probe-clea
 docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/03-verification/mutation-record.txt	repo
 docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/03-verification/mutation-branch-removed.txt	repo
 docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/03-verification/test-post-restore.txt	repo
+docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/03-verification/local-flake-tickets-p39.txt	repo
+docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/03-verification/ci/run-44962802936-windows.log	repo
+docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/03-verification/ci/run-44962802936-ubuntu.log	repo
 docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/04-reviews/05-pre-review-r1.md	repo
 docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/04-reviews/05-pre-review-r2.md	repo
 docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/04-reviews/06-scan-r1.md	repo

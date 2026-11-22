@@ -170,6 +170,13 @@ func TestP86UncShareRootProductionEntry(t *testing.T) {
 	local := t.TempDir()
 	share := fmt.Sprintf("P86UNC%d", time.Now().UnixNano())
 	if output, err := exec.Command("net", "share", share+"="+local).CombinedOutput(); err != nil {
+		// A CI runner is elevated, so a failure there is a broken fixture rather than a
+		// host boundary. Letting it skip would leave the production entry unproven while
+		// the suite still reports ok; a red CI is the honest signal. Locally (no
+		// elevation) the share cannot be created and the case skips with the reason.
+		if os.Getenv("CI") != "" {
+			t.Fatalf("net share cannot create the UNC share root fixture, so the production entry would stay unproven: %v (%s)", err, strings.TrimSpace(string(output)))
+		}
 		t.Skipf("net share cannot create the UNC share root fixture on this host: %v (%s)", err, strings.TrimSpace(string(output)))
 	}
 	t.Cleanup(func() {
@@ -190,6 +197,9 @@ func TestP86UncShareRootProductionEntry(t *testing.T) {
 	uncRoot := `\\localhost\` + share
 	dir, err := OpenBoundDir(uncRoot)
 	if err != nil {
+		if os.Getenv("CI") != "" {
+			t.Fatalf("this CI host must be able to open the UNC share root %s as a directory handle: %v", uncRoot, err)
+		}
 		t.Skipf("this host cannot open the UNC share root %s as a directory handle: %v", uncRoot, err)
 	}
 	defer func() { _ = dir.Close() }()
@@ -203,6 +213,9 @@ func TestP86UncShareRootProductionEntry(t *testing.T) {
 	// two spellings would be byte-equal and the equivalence branch would not be the
 	// reason the open succeeds.
 	if base != uncRoot+`\` {
+		if os.Getenv("CI") != "" {
+			t.Fatalf("a CI host must derive the trailing-separator spelling for the share root %q, got %q", uncRoot, base)
+		}
 		t.Skipf("this host derives %q for the supplied share root %q; the stored target only differs by its trailing separator when the handle name keeps that separator", base, uncRoot)
 	}
 	if got := uncShareRootName(base); got != uncRoot {

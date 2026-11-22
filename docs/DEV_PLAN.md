@@ -184,6 +184,8 @@ T027 前置状态更新（2026-11-21，P83 SECURITY-FINDINGS-REMEDIATION）：�
 
 T027 前置状态更新（2026-11-21，P84 BOUNDDIR-RESIDUAL）：在上一段基础上，F1 / F4 的残余修复以 **`PARTIALLY CLOSED`** 收口——T5#4（F4 残余）全闭合、T4（F1 残余）大部分闭合；残余 N13-UNC（UNC 共享根两规范拼写的等值误拒）+ 证据归因 Low 顺延 **P86**（2026-11-22 用户裁定另立、不并入 P85）；本片登记 DR-16 / DR-17。证据：[中文](validation/bounddir-residual.md) / [English](validation/bounddir-residual_EN.md)。
 
+T027 前置状态更新（2026-11-22，P86 BOUNDDIR-UNC-EQUIVALENCE）：F1 的最后两笔已收口——N13-UNC（UNC 共享根两拼写 + 卷名 ASCII 大小写折叠的等值）与 W10（证据归因注释）均在 `boundRelativeSuffix` 与 `p84_bounddir_residual_test.go` 闭合，**F1 自此全闭合**；本片 R = 0、D = 0。证据：[中文](validation/bounddir-unc-equivalence.md) / [English](validation/bounddir-unc-equivalence_EN.md)。
+
 T027 立项注记（2026-11-22）：**P85 `SECURITY-PROOF-SUBSYSTEM`**（承接 P83 的 F3 / F6 / F8；L 档；协议先行）与 **P86 `BOUNDDIR-UNC-EQUIVALENCE`**（承接 P84 的 N13-UNC + W10；S 档）已立项；**执行顺序 = 先 P86 后 P85**（2026-11-22 用户裁定），两者均待用户点名起跑。本组补录沿用 2026-10-22 先例：字段取自各片自己的验证报告，只记结论与报告路径、不记提交号与 CI 运行号，且不改写 `T027` 的状态字段。
 
 ### 11 月重构里程碑（T027-B）

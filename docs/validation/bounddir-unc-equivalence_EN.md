@@ -117,14 +117,16 @@ Logs: `03-verification/build.txt`, `vet.txt`, `gate-selftest.txt`, `gate-{index,
 ## 11. (9) verification readings and host-side non-executables
 
 - **Windows host**: `go test ./internal/evidence -run TestP86 -count=1 -v` -> `TestP86N13UncShareRootEquivalence` (5 subcases) PASS, `TestP86N13UncShareRootRefusals` (12 subcases + 10 classifier negatives) PASS, `TestP86UncShareRootProductionEntry` **SKIP** (this host is not elevated: `net share ... exit status 2 (system error 5, access denied)`; the skip reason is spelled out in `t.Skipf`).
+- **CI guard (the mechanical closure of the (7) blind/final Low)**: when the `CI` environment variable is set, the production-entry case turns three precondition failures (share creation, opening the UNC root handle, the trailing-separator handle spelling) from a skip into a **hard failure**, so **a green CI proves the production entry really ran and passed**; on this host (`CI` unset) it still skips with the reason. This does not change the CI workflow (inside the boundary).
+- **Host flake observation (not introduced here)**: 1 of 3 local `go test ./... -count=1` runs failed `TestP39DurablePrecommitFaultsRejectAck/dirClose` in `internal/tickets` with `rename ... Access is denied` (the same environmental IO/AV jitter family as DR-17); the other 2 runs were green and neither CI leg reproduced it, so it is recorded as an observation-level flake and no DR is opened.
 - **Mutation check (run and recorded)**: `mutation-record.txt` records `BEFORE_SHA256=35df2761...dba62` / `ANCHOR_COUNT=1` / `MUTATED_SHA256=f6ab720f...64db7` / `MUTATED_TEST_EXIT=1` / `RESTORED_SHA256=35df2761...dba62` / `RESTORED_IDENTICAL=True` / `RESTORED_TEST_EXIT=0`; `mutation-branch-removed.txt` shows **exactly** 3 spelling-difference subcases FAIL (`trailing-base-bare-target`, `bare-base-trailing-target`, `ascii-case-folded-trailing-target`) while `identical-trailing-spellings`, `strict-descendant-regression`, every refusal and `TestP84W10...` stay PASS.
 - **No `-race`**: this host has no gcc (same caliber as P84); the Race step is carried by the CI ubuntu leg.
 - **The Ubuntu VM is not started** (start message section 3); the Linux half is untouched and is regressed by the CI ubuntu leg.
 
 ## 11.2 CI readings (written after the (8)b push)
 
-- Main commit and first run: written from the CI result after the (8)b push; before that write-back this section is not a CI terminal state.
-- windows leg (`go test ./...` / `internal/evidence` / `TestP86UncShareRootProductionEntry`), ubuntu leg (`ok` package count / Race step), `SELFTEST`, and the `--scope=index` recheck: same.
+- Main commit `f1ae821`; first run **`44962802936`**, **success on both legs** (`Go windows-latest` / `Go ubuntu-latest`); windows leg: `ok github.com/larsonzh/prfrail/internal/evidence`, `SELFTEST: PASS 740/740`, `TOTAL_FAIL=0`; log payloads `03-verification/ci/run-44962802936-windows.log` / `-ubuntu.log`.
+- The first run predates the CI guard (no `-v`, so no PASS/SKIP lines); the guard round (precondition failures become hard failures under CI) is rerun with the fix commit and its readings follow.
 
 ## 12. Environment and tiers
 
@@ -214,6 +216,9 @@ docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/03-verification/probe-clea
 docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/03-verification/mutation-record.txt	repo
 docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/03-verification/mutation-branch-removed.txt	repo
 docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/03-verification/test-post-restore.txt	repo
+docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/03-verification/local-flake-tickets-p39.txt	repo
+docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/03-verification/ci/run-44962802936-windows.log	repo
+docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/03-verification/ci/run-44962802936-ubuntu.log	repo
 docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/04-reviews/05-pre-review-r1.md	repo
 docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/04-reviews/05-pre-review-r2.md	repo
 docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/04-reviews/06-scan-r1.md	repo

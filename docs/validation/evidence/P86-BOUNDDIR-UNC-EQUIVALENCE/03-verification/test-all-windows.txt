@@ -1,21 +1,21 @@
 ?   	github.com/larsonzh/prfrail/cmd/prfrail	[no test files]
 ?   	github.com/larsonzh/prfrail/cmd/prfrail-release	[no test files]
-ok  	github.com/larsonzh/prfrail/examples/whois-shadow	1.998s
-ok  	github.com/larsonzh/prfrail/internal/adapters	52.241s
-ok  	github.com/larsonzh/prfrail/internal/applier	1.677s
-ok  	github.com/larsonzh/prfrail/internal/chain	4.897s
-ok  	github.com/larsonzh/prfrail/internal/console	31.315s
-ok  	github.com/larsonzh/prfrail/internal/evidence	5.202s
-ok  	github.com/larsonzh/prfrail/internal/gates	3.643s
-ok  	github.com/larsonzh/prfrail/internal/guard	10.291s
-ok  	github.com/larsonzh/prfrail/internal/release	16.902s
-ok  	github.com/larsonzh/prfrail/internal/repair	2.510s
-ok  	github.com/larsonzh/prfrail/internal/snapshot	3.809s
+ok  	github.com/larsonzh/prfrail/examples/whois-shadow	1.675s
+ok  	github.com/larsonzh/prfrail/internal/adapters	50.917s
+ok  	github.com/larsonzh/prfrail/internal/applier	3.126s
+ok  	github.com/larsonzh/prfrail/internal/chain	4.306s
+ok  	github.com/larsonzh/prfrail/internal/console	28.913s
+ok  	github.com/larsonzh/prfrail/internal/evidence	6.892s
+ok  	github.com/larsonzh/prfrail/internal/gates	8.455s
+ok  	github.com/larsonzh/prfrail/internal/guard	12.405s
+ok  	github.com/larsonzh/prfrail/internal/release	17.595s
+ok  	github.com/larsonzh/prfrail/internal/repair	2.524s
+ok  	github.com/larsonzh/prfrail/internal/snapshot	4.390s
 ok  	github.com/larsonzh/prfrail/internal/taskdef	2.739s
-ok  	github.com/larsonzh/prfrail/internal/tickets	7.472s
+ok  	github.com/larsonzh/prfrail/internal/tickets	7.003s
 ?   	github.com/larsonzh/prfrail/tmp/P86-BOUNDDIR-UNC-EQUIVALENCE	[no test files]
-ok  	github.com/larsonzh/prfrail/tools/agent-probe/enforcement-proxy	3.922s
+ok  	github.com/larsonzh/prfrail/tools/agent-probe/enforcement-proxy	3.486s
 ?   	github.com/larsonzh/prfrail/tools/agent-probe/supervisor	[no test files]
-ok  	github.com/larsonzh/prfrail/tools/agent-stub	10.630s
+ok  	github.com/larsonzh/prfrail/tools/agent-stub	8.672s
 ?   	github.com/larsonzh/prfrail/tools/b4-e2e	[no test files]
 EXIT=0
