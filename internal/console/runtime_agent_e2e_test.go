@@ -42,6 +42,15 @@ const (
 	// and a request record is refused without them.
 	assemblyEffectMappingVersion = "1"
 	assemblyEffectMappingHash    = "sha256:2c9609ee374bfc79bd0ed997aea6cfe4865c82ed0216d1a4a288139e0b0c92d4"
+	// assemblyManagedWriteProof is the test-only injection of the F01 managed
+	// identity write proof (AgentRunnerAssemblyOptions.managedWriteProof, unexported
+	// since P85 F01 design rev 3). On this
+	// platform the assembly and the managed agent share one OS identity, so the
+	// real guard can never succeed and the freeze/reuse paths would be untestable
+	// without the seam. The injected value replaces ONLY the platform observation
+	// and must still be a valid evidence digest; the directory binding and the
+	// anchor byte comparison run unchanged.
+	assemblyManagedWriteProof = "sha256:1111111111111111111111111111111111111111111111111111111111111111"
 )
 
 var (
@@ -49,6 +58,30 @@ var (
 	assemblyStubPath string
 	assemblyStubErr  error
 )
+
+// p85StubManagedWriteProofObservation installs the "the fresh observation equals
+// the frozen proof" stand-in on the anchor re-observation seam (P85 design rev 3,
+// section 6: agentRunnerObserveManagedWriteProof).
+//
+// Every fixture in this package freezes its policy with the injected
+// assemblyManagedWriteProof, because on this host the assembly and the managed
+// agent share one OS identity and the real write-domain proof can never succeed.
+// The load/Review/Publish paths re-observe that domain and require the anchor's
+// value to be THAT observation, so without this stand-in every fixture would be
+// refused for a reason unrelated to the property under test. The stub keeps each
+// case's original assertion semantics: the recorded proof still has to be a valid
+// digest and still has to equal the observation - here the observation is the
+// frozen value, exactly as it would be on a host whose domain really is closed.
+// The real primitive is exercised by the M1/M2/M10 counterexamples and by
+// TestP85T2AssemblyRefusesWithoutManagedWriteProof.
+func p85StubManagedWriteProofObservation(t *testing.T, proof string) {
+	t.Helper()
+	previous := agentRunnerObserveManagedWriteProof
+	agentRunnerObserveManagedWriteProof = func(*agentRunnerPolicyDomainChain, []adapters.ManagedPolicyDomainBoundFile) (string, error) {
+		return proof, nil
+	}
+	t.Cleanup(func() { agentRunnerObserveManagedWriteProof = previous })
+}
 
 // buildAssemblyStub builds tools/agent-stub once. It is the pinned offline CLI
 // the production launcher runs; no external dependency and no network is used.
@@ -156,6 +189,11 @@ func assemblyCapabilityMatrix(disposition string) adapters.AgentRunnerCapability
 }
 
 func newAssemblyFixture(t *testing.T, knobs assemblyKnobs) *assemblyFixture {
+	// P85 F01 (design rev 3, section 6): the fixture injects the managed-write
+	// proof below, so the anchor re-observation has to answer with that same
+	// proof - otherwise every load/Review/Publish leg would be refused by the
+	// shared-identity host instead of by the property it measures.
+	p85StubManagedWriteProofObservation(t, assemblyManagedWriteProof)
 	t.Helper()
 	if knobs.capabilityDisposition == "" {
 		knobs.capabilityDisposition = "compatible"
@@ -191,7 +229,15 @@ func newAssemblyFixture(t *testing.T, knobs assemblyKnobs) *assemblyFixture {
 	executableHash := assemblyFileHash(t, knobs.declaredExecutable)
 	configHash := assemblyDeclaredDigest("config", knobs.declaredExecutable, knobs.declaredVersion)
 	platformHash := agentRunnerPlatformHash()
-	policyHash := assemblyDeclaredDigest("policy")
+	// T2 (finding F3): the assembly freezes the previewed policy body before it
+	// dispatches, and the review only approves a grant whose hash names that frozen
+	// artifact, so the fixture derives the granted hash from the body itself
+	// instead of declaring an unrelated digest.
+	policyBody := p85PolicyBody(assemblyDefinition().ID, assemblyTaskID)
+	policyHash, err := agentRunnerFrozenPolicyHash(policyBody)
+	if err != nil {
+		t.Fatalf("derive the frozen policy hash: %v", err)
+	}
 	amount := int64(1000)
 
 	grant, err := chain.NewGrantAuthorizationRecord(chain.AuthorizationGrant{
@@ -365,10 +411,21 @@ func newAssemblyFixture(t *testing.T, knobs assemblyKnobs) *assemblyFixture {
 			AvailabilityPolicy:  AgentRunnerDefaultAvailabilityPolicy(availability, base),
 			AuthorizationLedger: chain.AuthorizationLedger{Grants: []chain.AuthorizationRecord{grant}},
 			CostLedger:          ledger,
+			// T2 (finding F3): the policy body the run was previewed under. The
+			// assembly freezes it per task attempt before any dispatch, and a nil
+			// value is refused fail-closed.
+			PolicySnapshot: &policyBody,
 			// T1: the fixture drives the ports without operator-written ledger files,
 			// so it declares itself a marked test assembly; a production assembly may
 			// never take this path (the flag is unexported and only tests set it).
 			testInMemoryLedgers: true,
+			// F01 (P85 fix round 3): the assembly proves the managed identity cannot
+			// write the frozen policy directory before it freezes anything, and that
+			// proof cannot succeed while the managed agent shares this OS identity.
+			// The fixture injects the test seam so the freeze path stays reachable;
+			// the fail-closed behaviour without it is pinned by
+			// TestP85T2AssemblyRefusesWithoutManagedWriteProof.
+			managedWriteProof: assemblyManagedWriteProof,
 			AgentCLI: AgentRunnerCLIOptions{
 				Executable:  knobs.declaredExecutable,
 				Version:     knobs.declaredVersion,

@@ -280,10 +280,10 @@ func TestP83Fix6T9aHostAuthProfileSucceedsWithoutAnyLedgerFile(t *testing.T) {
 	if err := os.WriteFile(configPath, encoded, 0o600); err != nil {
 		t.Fatal(err)
 	}
-	executable := filepath.Join(root, "copilot.exe")
-	if err := os.WriteFile(executable, []byte("p83-fix6-t9a-host-auth"), 0o700); err != nil {
-		t.Fatal(err)
-	}
+	// T3 (finding F6): the host-auth receiver still has to pass the install source
+	// gate, so the executable is the system shell rather than a stub in the
+	// writable temporary directory.
+	executable := p85T3ImmutableProbeExecutable(t)
 	ledgerPath := filepath.Join(root, defaultApprovalsLedgerName)
 	if _, statErr := os.Stat(ledgerPath); !errors.Is(statErr, os.ErrNotExist) {
 		t.Fatalf("test precondition failed: no ledger file may exist yet, stat err=%v", statErr)

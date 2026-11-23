@@ -32,6 +32,7 @@
 				"visible_delivery_unavailable",
 				"response_invalid",
 				"timeout",
+				"byok_confinement_unproven",
 				"unknown"
 			]
 		},

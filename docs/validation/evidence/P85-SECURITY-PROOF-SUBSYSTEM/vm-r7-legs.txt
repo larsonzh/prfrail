@@ -1,0 +1,22 @@
+# P85 R=7 双平台实跑读数（2026-11-23 终验腿 · 候选=worktree staged 状态）
+
+## Windows 本机（非提升 · 主控实测）
+- go build ./... = 0；go test ./... = 15 包全 ok / FAIL=0（adapters/console/evidence/guard/gates/
+  applier/chain/repair/snapshot/taskdef/tickets/release/examples/whois-shadow/tools/agent-stub/
+  tools/agent-probe/enforcement-proxy）。
+- 三变体交叉构建 GOOS=windows/linux/darwin GOARCH=amd64 go build ./... 全部 exit=0；
+  三视图 go vet ./internal/{console,adapters,evidence} 全部 exit=0。
+- 三视图 gopls unused 清零：GOOS=windows/linux/darwin × gopls check -severity=hint
+  (internal/**/*.go 411 文件) 过滤 unused 均为 0 行。
+- ④ 门禁三作用域 TOTAL_FAIL=0（index/tree/ci）；SELFTEST 740/740。
+
+## Ubuntu VM（10.0.0.199 · larson 非 root · go1.22.12 · worktree ~/p85-work 已同步 R=7 文件）
+- go build ./... = 0；go test ./... = 15 包全 ok / FAIL=0（同一包集）。
+- 新用例实跑：TestP85R7LinuxDirectorySlotReadsTheACLFromItsDescriptor PASS；
+  TestP85R7LinuxDirectorySlotRefusesAReplacedName PASS；
+  TestP85R7LinuxDirectorySlotClosingComparisonRefusesAMovedName PASS；
+  TestP85R7OpenInstallSourceLeafRefusesALinkedChain PASS（Linux symlink 腿）；
+  TestP85R7UnobservableSlotKeepsItsPositionInTheDigest PASS；
+  TestP85R7RoleSuffixContradictionIsRefused 8/8 PASS。
+- 夹具修正：p85R7SetAccessACL 由最小 ACL 改扩展 ACL（命名用户 u:4242 + mask）——
+  最小 ACL 与 mode 等价、内核不落盘，fd/按名判别无法建立；扩展 ACL 强制内核存储。

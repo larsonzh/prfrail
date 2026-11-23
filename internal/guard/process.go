@@ -64,6 +64,13 @@ type ProcessSpec struct {
 	// It is required whenever ExecutableDigest is set, because a digest computed in
 	// another domain would never match the approval.
 	ExecutableDigestDomain string
+	// ExecutableFileID, when set together with ExecutableDigest, extends the final
+	// guard binding to the OBJECT IDENTITY: the verified handle must carry this
+	// file id, not merely the same digest (P85 F05). A same-digest-different-inode
+	// copy can pass a digest-only binding, so the caller that owns a persisted
+	// identity fact (the admitted install-source carrier records the file id) pins
+	// it here. An empty value keeps the digest-only binding exactly.
+	ExecutableFileID string
 	// OnSpawn, when set, runs after the process exists with a complete identity
 	// and its ownership anchor verified, and before it is allowed to run. A
 	// non-nil error means "not started": the guard stops the process again and

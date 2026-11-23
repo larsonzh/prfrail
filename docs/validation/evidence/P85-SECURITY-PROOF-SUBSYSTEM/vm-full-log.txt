@@ -1,0 +1,26 @@
+HOST: Ubuntu VM non-root larson go1.22.12 GOOS=linux
+CMD: go build ./...
+BUILD-EXITCODE=0
+CMD: go test ./...
+?   	github.com/larsonzh/prfrail/cmd/prfrail	[no test files]
+?   	github.com/larsonzh/prfrail/cmd/prfrail-release	[no test files]
+ok  	github.com/larsonzh/prfrail/examples/whois-shadow	(cached)
+?   	github.com/larsonzh/prfrail/tools/agent-probe/supervisor	[no test files]
+?   	github.com/larsonzh/prfrail/tools/b4-e2e	[no test files]
+ok  	github.com/larsonzh/prfrail/internal/adapters	16.082s
+ok  	github.com/larsonzh/prfrail/internal/applier	(cached)
+ok  	github.com/larsonzh/prfrail/internal/chain	(cached)
+ok  	github.com/larsonzh/prfrail/internal/console	13.088s
+ok  	github.com/larsonzh/prfrail/internal/evidence	(cached)
+ok  	github.com/larsonzh/prfrail/internal/gates	(cached)
+ok  	github.com/larsonzh/prfrail/internal/guard	(cached)
+ok  	github.com/larsonzh/prfrail/internal/release	5.823s
+ok  	github.com/larsonzh/prfrail/internal/repair	(cached)
+ok  	github.com/larsonzh/prfrail/internal/snapshot	(cached)
+ok  	github.com/larsonzh/prfrail/internal/taskdef	(cached)
+ok  	github.com/larsonzh/prfrail/internal/tickets	(cached)
+ok  	github.com/larsonzh/prfrail/tools/agent-probe/enforcement-proxy	(cached)
+ok  	github.com/larsonzh/prfrail/tools/agent-stub	(cached)
+TEST-EXITCODE=0
+CMD: go vet ./...
+VET-EXITCODE=0

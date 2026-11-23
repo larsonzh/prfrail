@@ -1,0 +1,81 @@
+=== P85 R6 MUTATION LOG ===
+
+=== MUT-1 slot placement falls back to path order (expect RED) ===
+TARGET=internal/adapters/agent_runner_policy_write_guard.go
+ANCHOR-COUNT=1
+SHA256-BEFORE=da6f7272a7162cd46bd2f11ebb9d21ffbfe7a11e983b636a5d2bb19c9031ab76
+SHA256-MUTATED=58e57a38c525ea2968e512c477d5b8b48e26f6470f535b5dcc1886f7602df7af
+APPLY-EXITCODE=0
+TARGET=internal/adapters/agent_runner_policy_write_guard.go
+SHA256-RESTORED=da6f7272a7162cd46bd2f11ebb9d21ffbfe7a11e983b636a5d2bb19c9031ab76
+SHA256-BACKUP=da6f7272a7162cd46bd2f11ebb9d21ffbfe7a11e983b636a5d2bb19c9031ab76
+BYTE-IDENTICAL=true
+RESTORE-EXITCODE=0
+
+=== MUT-2 one name comparison deleted from the Windows sandwich (expect RED) ===
+TARGET=internal/adapters/agent_runner_policy_write_guard_windows.go
+ANCHOR-COUNT=1
+SHA256-BEFORE=36bfbebb825ef68109d699d473b8a3dee6ce829e38bae2ba4b6eb98661ed01dd
+SHA256-MUTATED=53930f63c4afce57ccb0ad79f0755c12fdf7b47f72b3767a5d0245d441d5be56
+APPLY-EXITCODE=0
+TARGET=internal/adapters/agent_runner_policy_write_guard_windows.go
+SHA256-RESTORED=36bfbebb825ef68109d699d473b8a3dee6ce829e38bae2ba4b6eb98661ed01dd
+SHA256-BACKUP=36bfbebb825ef68109d699d473b8a3dee6ce829e38bae2ba4b6eb98661ed01dd
+BYTE-IDENTICAL=true
+RESTORE-EXITCODE=0
+
+=== MUT-3 carrier publish re-check reverts to FileIDAt (expect RED) ===
+TARGET=internal/console/ai_install_proof_publish_other.go
+ANCHOR-COUNT=1
+SHA256-BEFORE=69d65f9c3436c7d55f1a949000abc0e66f2399e912728d0f5b7626d0cb3907ac
+SHA256-MUTATED=e945fe485089acae332a238aed116e0804ff7b6f06464938b1039cd1c745cb93
+APPLY-EXITCODE=0
+TARGET=internal/console/ai_install_proof_publish_other.go
+SHA256-RESTORED=69d65f9c3436c7d55f1a949000abc0e66f2399e912728d0f5b7626d0cb3907ac
+SHA256-BACKUP=69d65f9c3436c7d55f1a949000abc0e66f2399e912728d0f5b7626d0cb3907ac
+BYTE-IDENTICAL=true
+RESTORE-EXITCODE=0
+
+=== MUT-4 (P85 R7) Linux directory-slot sandwich (expect RED) ===
+# Executed by the coordinator on the Ubuntu VM (non-root, go1.22.12), two mutants:
+#   Mutant A: the directory slot's fd ACL probe swapped for the name form
+#             (slot.dir.AccessACL() -> evidence.AccessACLPath(slot.path)).
+#             RED leg: TestP85R7LinuxDirectorySlotReadsTheACLFromItsDescriptor
+#             (the production ACL probe must refuse the ACL-carrying directory).
+#   Mutant B (ruling-specified): the CLOSING name comparison deleted in
+#             managedAgentPolicyDomainAfterProbe (return nil in place of
+#             managedAgentPolicyDomainAssertNameIdentity(..., "after")).
+#             RED leg: TestP85R7LinuxDirectorySlotClosingComparisonRefusesAMovedName
+#             (pins the production wiring; RefusesAReplacedName pins the helper
+#             directly and stays green under this mutant, as designed).
+MUTATION-STATUS=EXECUTED
+TARGET=internal/adapters/agent_runner_policy_write_guard_unix.go
+MUTANT-A-ANCHOR=present, err := slot.dir.AccessACL()
+MUTANT-A-RED=TestP85R7LinuxDirectorySlotReadsTheACLFromItsDescriptor
+MUTANT-B-ANCHOR=return managedAgentPolicyDomainAssertNameIdentity(slot, handleIdentity, "after")
+MUTANT-B-RED=TestP85R7LinuxDirectorySlotClosingComparisonRefusesAMovedName
+MUTANT-B-GREEN-LEGS=TestP85R7LinuxDirectorySlotReadsTheACLFromItsDescriptor;TestP85R7LinuxDirectorySlotRefusesAReplacedName
+APPLY-EXITCODE=0 (both)
+TEST-COMMAND=go test ./internal/adapters/ -run TestP85R7LinuxDirectorySlot
+TEST-EXITCODE=1 (both mutants; red legs captured)
+BYTE-IDENTICAL=true (both restores verified by SHA-256)
+RESTORE-EXITCODE=0 (both)
+
+=== MUT-5 (P85 R7) OpenBoundDirVerified reverts to a plain open / name identity (expect RED) ===
+# Executed by the coordinator on the local Windows host (non-elevated). Mutant:
+# openInstallSourceLeaf binds the directory with evidence.OpenBoundDir (the
+# link-following form) instead of evidence.OpenBoundDirVerified, so a link
+# component is followed. RED leg: TestP85R7OpenInstallSourceLeafRefusesALinkedChain
+# ("an executable reached through a symbolic-link component must not bind").
+MUTATION-STATUS=EXECUTED
+TARGET=internal/adapters/ai_install_proof.go
+ANCHOR-COUNT=1
+SHA256-BEFORE=0d44525c3eb2cd626c0b560ddcc74ede302d315f76933b69a2b276994d1d9d55
+SHA256-MUTATED=recorded in session capture (diff of the anchor line only)
+APPLY-EXITCODE=0
+TEST-COMMAND=go test ./internal/adapters/ -run TestP85R7OpenInstallSourceLeafRefusesALinkedChain
+TEST-EXITCODE=1 (RED leg captured)
+SHA256-RESTORED=0d44525c3eb2cd626c0b560ddcc74ede302d315f76933b69a2b276994d1d9d55
+BYTE-IDENTICAL=true
+RESTORE-EXITCODE=0
+

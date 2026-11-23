@@ -31,7 +31,9 @@ func openBoundDirFile(dir *BoundDir, rel string, bound int64, allowTruncation bo
 	return evidence.OpenBoundDirFileClass(dir, rel, bound, allowTruncation)
 }
 
-// boundDirVerify forwards the directory identity re-check.
-func boundDirVerify(dir *BoundDir, expected string) error {
+// boundDirVerify forwards the directory identity re-check. P85 F02/F06/F20: the
+// expected value is the identity the binding produced (evidence.FileID), not a
+// path, so the check compares objects instead of two resolutions of one name.
+func boundDirVerify(dir *BoundDir, expected evidence.FileID) error {
 	return evidence.VerifyBoundDir(dir, expected)
 }

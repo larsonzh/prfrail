@@ -32,6 +32,12 @@ func OpenBoundDirFile(dir *BoundDir, rel string, bound int64) (*BoundFile, error
 	return openBoundDirFile(dir, rel, bound, false)
 }
 
+// OpenBoundDirNoFollow refuses for the same reason as OpenBoundDir: darwin has
+// no openat2 and a name-based walk cannot keep the containment guarantee.
+func OpenBoundDirNoFollow(path string) (*BoundDir, error) {
+	return nil, fmt.Errorf("%w: %s", ErrBoundDirUnsupported, path)
+}
+
 // OpenBoundDirFileClass is the class-aware form: allowTruncation keeps the log and
 // event class readable past its bound instead of refusing the open.
 func OpenBoundDirFileClass(dir *BoundDir, rel string, bound int64, allowTruncation bool) (*BoundFile, error) {
@@ -72,13 +78,36 @@ func (dir *BoundDir) Close() error {
 
 // boundDirVerify refuses: an unbound directory proves nothing about the path the
 // caller named.
-func boundDirVerify(dir *BoundDir, expected string) error {
+func boundDirVerify(dir *BoundDir, expected FileID) error {
 	_ = dir
 	return fmt.Errorf("%w: %s", ErrBoundDirUnsupported, expected)
 }
 
-// VerifyBoundDir is the exported form of the identity re-check, kept for the
-// adapters alias of the original seam.
-func VerifyBoundDir(dir *BoundDir, expected string) error {
+// VerifyBoundDir is the exported form of the identity re-check. darwin never
+// binds, so every identity assertion refuses.
+func VerifyBoundDir(dir *BoundDir, expected FileID) error {
 	return boundDirVerify(dir, expected)
+}
+
+// OpenBoundDirVerified refuses for the same reason as OpenBoundDirNoFollow: there
+// is no descriptor to take an identity from (P85 F02/F06/F20).
+func OpenBoundDirVerified(path string) (*BoundDir, FileID, error) {
+	return nil, "", fmt.Errorf("%w: %s", ErrBoundDirUnsupported, path)
+}
+
+// FileID refuses: the placeholder wraps no descriptor.
+func (dir *BoundDir) FileID() (FileID, error) {
+	if dir == nil {
+		return "", fmt.Errorf("evidence: nil bound directory")
+	}
+	return "", fmt.Errorf("%w: %s", ErrBoundDirUnsupported, dir.path)
+}
+
+// SyncDirectory refuses for the same reason as the other entry points: an
+// unbound directory cannot be flushed (P85 F10).
+func (dir *BoundDir) SyncDirectory() error {
+	if dir == nil {
+		return fmt.Errorf("evidence: nil bound directory")
+	}
+	return fmt.Errorf("%w: %s", ErrBoundDirUnsupported, dir.path)
 }

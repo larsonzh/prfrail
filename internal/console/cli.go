@@ -51,8 +51,13 @@ type commandResponse struct {
 	ExitCode int    `json:"exitCode"`
 	Message  string `json:"message,omitempty"`
 	Error    string `json:"error,omitempty"`
-	Usage    string `json:"usage,omitempty"`
-	Data     any    `json:"data,omitempty"`
+	// ErrorClass is the structured, closed-set classification of a refusal (P85
+	// F15). It is a CONSOLE-LOCAL output shape: it is not a wire record, no schema
+	// covers it, and a caller that does not know it simply ignores the omitted
+	// field. Text mode renders the same class as a prefix instead.
+	ErrorClass string `json:"errorClass,omitempty"`
+	Usage      string `json:"usage,omitempty"`
+	Data       any    `json:"data,omitempty"`
 }
 
 func NewCLI(version string) CLI {
@@ -420,7 +425,12 @@ func (cli CLI) executeRun(ctx context.Context, args []string, stdout, stderr io.
 		return cli.executeSupervisedRun(ctx, *runID, resolvedRunDir, definition, gatePermit, sandboxEnforced, *jsonOutput, stdout, stderr, progressWriter)
 	}
 	if len(executable) > 0 {
-		return cli.executeAgentRunnerRun(ctx, *runID, resolvedRunDir, definition, inputs, gatePermit, sandboxEnforced, *jsonOutput, stdout, stderr, progressWriter)
+		// T2 (finding F3): the assembly freezes the policy the operator previewed,
+		// so the run command hands over the same snapshot BuildPreviewReport hashes
+		// (previewPolicySnapshot of the same ChainConfig). No other derivation is
+		// allowed here: grant.PolicyHash is PlanPreview.PolicyHash.
+		policySnapshot := previewPolicySnapshot(cfg)
+		return cli.executeAgentRunnerRun(ctx, *runID, resolvedRunDir, definition, policySnapshot, inputs, gatePermit, sandboxEnforced, *jsonOutput, stdout, stderr, progressWriter)
 	}
 	summary, err := ExecuteNoopRun(ctx, *runID, resolvedRunDir, definition, filepath.Dir(resolvedPath), cli.now, progressWriter)
 	if err != nil {
@@ -508,7 +518,7 @@ func (inputs agentRunnerRunInputs) anyProvided() bool {
 // executeAgentRunnerRun decodes the declared record files and drives the
 // production assembly. Decoding is CLI-side file IO; the assembly re-validates
 // every record before the engine exists.
-func (cli CLI) executeAgentRunnerRun(ctx context.Context, runID, runDir string, definition chain.Definition, inputs agentRunnerRunInputs, probePermit *gates.ProbePermit, sandboxEnforced, jsonOutput bool, stdout, stderr io.Writer, progress io.Writer) int {
+func (cli CLI) executeAgentRunnerRun(ctx context.Context, runID, runDir string, definition chain.Definition, policySnapshot previewPolicy, inputs agentRunnerRunInputs, probePermit *gates.ProbePermit, sandboxEnforced, jsonOutput bool, stdout, stderr io.Writer, progress io.Writer) int {
 	// probePermit is only forwarded: the assembly entry evaluates and consumes it.
 	cwd, err := cli.getwd()
 	if err != nil {
@@ -622,6 +632,7 @@ func (cli CLI) executeAgentRunnerRun(ctx context.Context, runID, runDir string, 
 		RunID:               runID,
 		RunRoot:             runDir,
 		Definition:          definition,
+		PolicySnapshot:      &policySnapshot,
 		ProbePermit:         probePermit,
 		SandboxEnforced:     sandboxEnforced,
 		RequestRecord:       requestRecord,
@@ -844,6 +855,27 @@ func writeCommandError(stdout, stderr io.Writer, command string, jsonOutput bool
 		return exitFailure
 	}
 	fmt.Fprintf(stderr, "%s: %v\n", command, err)
+	return exitFailure
+}
+
+// aiCheckRefusalClass is the closed-set failure class of a probe whose CLI channel
+// is unavailable: the install source cannot be proven, the receiver binding or the
+// authorization ledger does not admit the receiver, or the invocation cannot be
+// configured (P85 F15). S1 has exactly one such class; a refusal that happens
+// INSIDE the checker is reported through the record's `reason` field instead, so
+// the two sources of classification never overlap.
+const aiCheckRefusalClass = "cli_unavailable"
+
+// writeAICheckRefusal publishes one CLASSIFIED refusal of `ai check`. Text mode
+// prefixes the class (`ai check: cli_unavailable: <detail>`) and JSON mode carries
+// it as the structured errorClass field, so a caller no longer has to parse a
+// free-text marker out of the detail message.
+func writeAICheckRefusal(stdout, stderr io.Writer, jsonOutput bool, class string, err error) int {
+	if jsonOutput {
+		_ = writeJSONResponse(stdout, commandResponse{Command: "ai check", OK: false, ExitCode: exitFailure, Error: err.Error(), ErrorClass: class})
+		return exitFailure
+	}
+	fmt.Fprintf(stderr, "ai check: %s: %v\n", class, err)
 	return exitFailure
 }
 

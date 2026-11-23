@@ -31,6 +31,10 @@ func TestBoundDirVerifyRefusesSwappedDirectory(t *testing.T) {
 		t.Fatalf("OpenBoundDir: %v", err)
 	}
 	defer func() { _ = dir.Close() }()
+	boundID, err := dir.FileID()
+	if err != nil {
+		t.Fatalf("identify the bound directory: %v", err)
+	}
 
 	if err := os.Rename(boundPath, boundPath+".bak"); err != nil {
 		t.Fatalf("rename the bound directory away (the handle must stay renamable): %v", err)
@@ -39,7 +43,15 @@ func TestBoundDirVerifyRefusesSwappedDirectory(t *testing.T) {
 		t.Fatalf("create the injected directory at the same path: %v", err)
 	}
 
-	swapped := boundDirVerify(dir, boundPath)
+	// P85 F02/F06/F20: the expected value is the identity the binding produced - the
+	// object the caller approved - and the check compares the handle with it. The
+	// injected directory at the same spelling is a DIFFERENT object, so it must be
+	// refused.
+	injectedID, err := FileIDAt(boundPath)
+	if err != nil {
+		t.Fatalf("identify the injected directory: %v", err)
+	}
+	swapped := boundDirVerify(dir, injectedID)
 	if swapped == nil {
 		t.Fatal("a directory swapped in after the bind must be refused")
 	}
@@ -49,8 +61,8 @@ func TestBoundDirVerifyRefusesSwappedDirectory(t *testing.T) {
 
 	// Control: the very same check accepts the object the handle really holds, so
 	// the refusal above is caused by the swap and not by any verification error.
-	if kept := boundDirVerify(dir, boundPath+".bak"); kept != nil {
-		t.Fatalf("the bound object must still verify under its current name, got %v", kept)
+	if kept := boundDirVerify(dir, boundID); kept != nil {
+		t.Fatalf("the bound object must still verify against its own identity, got %v", kept)
 	}
 
 	if err := dir.Close(); err != nil {

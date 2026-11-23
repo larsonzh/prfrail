@@ -83,5 +83,19 @@ func verifyApprovedExecutable(path string, spec *ProcessSpec) (*approvedExecutab
 		_ = bound.Close()
 		return nil, fmt.Errorf("%w: the opened executable is not the approved object", ErrExecutableBinding)
 	}
+	// P85 F05: when the caller pins the object identity too, the SAME handle that
+	// was digested must carry the approved file id. A digest comparison cannot see
+	// a same-digest-different-inode copy; the identity comparison can.
+	if spec.ExecutableFileID != "" {
+		actualID, idErr := bound.FileID()
+		if idErr != nil {
+			_ = bound.Close()
+			return nil, fmt.Errorf("%w: read the identity of the approved executable: %v", ErrExecutableBinding, idErr)
+		}
+		if actualID != spec.ExecutableFileID {
+			_ = bound.Close()
+			return nil, fmt.Errorf("%w: the opened executable is not the approved object identity", ErrExecutableBinding)
+		}
+	}
 	return &approvedExecutable{file: file, bound: bound}, nil
 }

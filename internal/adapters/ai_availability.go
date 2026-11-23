@@ -219,7 +219,7 @@ func validAIChannel(channel string) bool {
 
 func validAIAvailabilityReason(reason string) bool {
 	switch reason {
-	case "configuration_invalid", "secret_missing", "credential_rejected", "account_unavailable", "quota_exhausted", "network_unreachable", "tls_or_proxy_failure", "provider_unavailable", "model_unavailable", "policy_blocked", "cli_unavailable", "sessionbridge_unavailable", "lm_api_unavailable", "visible_delivery_unavailable", "response_invalid", "timeout", "unknown":
+	case "configuration_invalid", "secret_missing", "credential_rejected", "account_unavailable", "quota_exhausted", "network_unreachable", "tls_or_proxy_failure", "provider_unavailable", "model_unavailable", "policy_blocked", "cli_unavailable", "sessionbridge_unavailable", "lm_api_unavailable", "visible_delivery_unavailable", "response_invalid", "timeout", "byok_confinement_unproven", "unknown":
 		return true
 	default:
 		return false

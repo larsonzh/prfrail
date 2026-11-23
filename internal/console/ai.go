@@ -118,6 +118,12 @@ func loadProbeAuthorizationLedger(path string) (chain.AuthorizationLedger, error
 type aiProbeReceiver struct {
 	Executable     string
 	ExecutableHash string
+	// InstallSource is the install-source FACT the approved carrier records (P85
+	// F05): executable path, digest, object identity, platform and immutability
+	// facts. It travels from the carrier to the probe executor, which re-observes
+	// the source at the spawn boundary and refuses unless every recorded item still
+	// holds. Nil keeps the executor's compatibility path (no carrier was admitted).
+	InstallSource *adapters.AIInstallSourceFacts
 }
 
 // authorizeAIProbeReceiver is the F6 gate: the probe receiver is accepted only
@@ -302,23 +308,23 @@ func (cli CLI) executeAICheck(ctx context.Context, args []string, stdout, stderr
 		return writeUsageError(stdout, stderr, "ai check", *jsonOutput, "--channel, --copilot, --max-requests 1 and --out are required; positional values are forbidden", usage)
 	}
 	if *channel != "agent-runner-cli" {
-		return writeCommandError(stdout, stderr, "ai check", *jsonOutput, fmt.Errorf("%w: %s", ErrAIChannelNotConfigured, *channel))
+		return writeAICheckRefusal(stdout, stderr, *jsonOutput, aiCheckRefusalClass, fmt.Errorf("%w: %s", ErrAIChannelNotConfigured, *channel))
 	}
 	if cli.checkAIAvailability == nil {
-		return writeCommandError(stdout, stderr, "ai check", *jsonOutput, errors.New("AI availability checker unavailable"))
+		return writeAICheckRefusal(stdout, stderr, *jsonOutput, aiCheckRefusalClass, errors.New("AI availability checker unavailable"))
 	}
 
 	cwd, err := cli.getwd()
 	if err != nil {
-		return writeCommandError(stdout, stderr, "ai check", *jsonOutput, err)
+		return writeAICheckRefusal(stdout, stderr, *jsonOutput, aiCheckRefusalClass, err)
 	}
 	resolvedConfig, err := ResolveChainConfigPath(*chainPath, cwd)
 	if err != nil {
-		return writeCommandError(stdout, stderr, "ai check", *jsonOutput, err)
+		return writeAICheckRefusal(stdout, stderr, *jsonOutput, aiCheckRefusalClass, err)
 	}
 	config, _, err := LoadChainConfig(resolvedConfig)
 	if err != nil {
-		return writeCommandError(stdout, stderr, "ai check", *jsonOutput, err)
+		return writeAICheckRefusal(stdout, stderr, *jsonOutput, aiCheckRefusalClass, err)
 	}
 	// F6/T3: the probe is authorised by the ledger of the chain configuration and
 	// by nothing else. The path is DERIVED from the chain-config directory (the
@@ -330,20 +336,20 @@ func (cli CLI) executeAICheck(ctx context.Context, args []string, stdout, stderr
 	if *authorizationLedger != "" {
 		selectedLedger, err = resolvePathFromCWD(cwd, *authorizationLedger)
 		if err != nil {
-			return writeCommandError(stdout, stderr, "ai check", *jsonOutput, err)
+			return writeAICheckRefusal(stdout, stderr, *jsonOutput, aiCheckRefusalClass, err)
 		}
 	}
 	ledgerPath, err := trustedLedgerPath(filepath.Dir(resolvedConfig), defaultApprovalsLedgerName, selectedLedger)
 	if err != nil {
-		return writeCommandError(stdout, stderr, "ai check", *jsonOutput, fmt.Errorf("%w: %v", ErrAIReceiverBinding, err))
+		return writeAICheckRefusal(stdout, stderr, *jsonOutput, aiCheckRefusalClass, fmt.Errorf("%w: %v", ErrAIReceiverBinding, err))
 	}
 	profile, found := configuredAIProfile(config, *channel)
 	if !found {
-		return writeCommandError(stdout, stderr, "ai check", *jsonOutput, fmt.Errorf("%w: %s", ErrAIChannelNotConfigured, *channel))
+		return writeAICheckRefusal(stdout, stderr, *jsonOutput, aiCheckRefusalClass, fmt.Errorf("%w: %s", ErrAIChannelNotConfigured, *channel))
 	}
 	resolvedExecutable, err := resolvePathFromCWD(cwd, *executable)
 	if err != nil {
-		return writeCommandError(stdout, stderr, "ai check", *jsonOutput, err)
+		return writeAICheckRefusal(stdout, stderr, *jsonOutput, aiCheckRefusalClass, err)
 	}
 	workingDirectory := *workspace
 	if workingDirectory == "" {
@@ -351,17 +357,17 @@ func (cli CLI) executeAICheck(ctx context.Context, args []string, stdout, stderr
 	} else {
 		workingDirectory, err = resolvePathFromCWD(cwd, workingDirectory)
 		if err != nil {
-			return writeCommandError(stdout, stderr, "ai check", *jsonOutput, err)
+			return writeAICheckRefusal(stdout, stderr, *jsonOutput, aiCheckRefusalClass, err)
 		}
 	}
 	resolvedOutput, err := resolvePathFromCWD(cwd, *outputPath)
 	if err != nil {
-		return writeCommandError(stdout, stderr, "ai check", *jsonOutput, err)
+		return writeAICheckRefusal(stdout, stderr, *jsonOutput, aiCheckRefusalClass, err)
 	}
 	if _, err := os.Lstat(resolvedOutput); err == nil {
-		return writeCommandError(stdout, stderr, "ai check", *jsonOutput, fmt.Errorf("availability record output already exists: %s", resolvedOutput))
+		return writeAICheckRefusal(stdout, stderr, *jsonOutput, aiCheckRefusalClass, fmt.Errorf("availability record output already exists: %s", resolvedOutput))
 	} else if !errors.Is(err, os.ErrNotExist) {
-		return writeCommandError(stdout, stderr, "ai check", *jsonOutput, err)
+		return writeAICheckRefusal(stdout, stderr, *jsonOutput, aiCheckRefusalClass, err)
 	}
 	// F6: the receiver binding is verified before the availability check runs, so a
 	// mismatched profile/executable pair never reaches the secret store and never
@@ -373,7 +379,7 @@ func (cli CLI) executeAICheck(ctx context.Context, args []string, stdout, stderr
 	// in aiProbeReceiver all the way to the executor - never recomputed there.
 	binding, executableHash, err := validateAIProbeBinding(profile, *channel, resolvedExecutable)
 	if err != nil {
-		return writeCommandError(stdout, stderr, "ai check", *jsonOutput, err)
+		return writeAICheckRefusal(stdout, stderr, *jsonOutput, aiCheckRefusalClass, err)
 	}
 	receiver := aiProbeReceiver{Executable: resolvedExecutable, ExecutableHash: executableHash}
 	// F6 (P83 fix round 4): the probe receiver is accepted only by an ACTIVE
@@ -387,14 +393,37 @@ func (cli CLI) executeAICheck(ctx context.Context, args []string, stdout, stderr
 	if profile.BaseURL != "" {
 		ledger, err := loadProbeAuthorizationLedger(ledgerPath)
 		if err != nil {
-			return writeCommandError(stdout, stderr, "ai check", *jsonOutput, err)
+			return writeAICheckRefusal(stdout, stderr, *jsonOutput, aiCheckRefusalClass, err)
 		}
 		approved, err := authorizeAIProbeReceiverApproval(ledger, profile, binding, executableHash, cli.now())
 		if err != nil {
-			return writeCommandError(stdout, stderr, "ai check", *jsonOutput, err)
+			return writeAICheckRefusal(stdout, stderr, *jsonOutput, aiCheckRefusalClass, err)
 		}
 		receiver.ExecutableHash = approved.ExecutableHash
 	}
+	// T3 (finding F6): the executable's installation source has to be proven
+	// immutable before the probe may run. The carrier is derived from the same
+	// trusted root as the ledger - the chain-config directory - and is never taken
+	// from a flag. The live observation happens first, so a stale carrier cannot
+	// admit a source that fails the check now; a refusal here happens before the
+	// checker exists, so no credential is resolved and no child is started.
+	installProofPath, err := aiInstallSourceProofPath(filepath.Dir(resolvedConfig))
+	if err != nil {
+		return writeAICheckRefusal(stdout, stderr, *jsonOutput, aiCheckRefusalClass, err)
+	}
+	// F03 (P85 fix round 1): the receiver binding's approved digest is handed to the
+	// carrier writer, so the live observation must match the approved executable
+	// before the install-source proof is published.
+	//
+	// F05 (P85): the writer returns the CARRIER's facts. They travel to the executor,
+	// which re-observes the source at the spawn boundary and refuses unless the
+	// executable path, digest, object identity, platform and immutability facts all
+	// still match the record the operator approved.
+	installSource, err := recordOrConfirmAIInstallSourceProof(installProofPath, resolvedExecutable, receiver.ExecutableHash, cli.now())
+	if err != nil {
+		return writeAICheckRefusal(stdout, stderr, *jsonOutput, aiCheckRefusalClass, err)
+	}
+	receiver.InstallSource = &installSource
 	record, err := cli.checkAIAvailability(ctx, profile, *channel, *maximumRequests, receiver, workingDirectory)
 	if err != nil {
 		return writeCommandError(stdout, stderr, "ai check", *jsonOutput, err)
@@ -535,10 +564,26 @@ func (cli CLI) defaultAICheck(ctx context.Context, profile adapters.AIProviderPr
 		Clock:   cli.now,
 		IDs:     newAIProbeID,
 		Secrets: cli.secretManager,
-		Probe: adapters.CopilotCLIProbe{
+		// F13 (P85 fix round 3): the probe is handed as a POINTER so the launch
+		// template frozen by the pre-Resolve proof is stored on the very object the
+		// spawn reads. A value copy would freeze the template onto a copy and the
+		// spawn would reconstruct a second one - exactly the gap the review refused.
+		Probe: &adapters.CopilotCLIProbe{
 			Executable:       receiver.Executable,
 			WorkingDirectory: workingDirectory,
-			Executor:         adapters.ManagedCopilotCLIProbeExecutor{ExpectedExecutableHash: receiver.ExecutableHash},
+			Executor: adapters.ManagedCopilotCLIProbeExecutor{
+				ExpectedExecutableHash: receiver.ExecutableHash,
+				// F05: the approved install-source facts travel to the spawn boundary,
+				// where the executor compares its live observation against them.
+				ApprovedInstallSource: receiver.InstallSource,
+			},
+			// F13: the spawn inputs are DECLARED on the probe, so the pre-Resolve
+			// confinement proof can build and prove the exact launch template that the
+			// spawn will instantiate. They are taken from the same profile and the same
+			// flag the checker is called with, and the probe refuses if they disagree.
+			AuthMode:        profile.AuthMode,
+			Model:           profile.Model,
+			MaximumRequests: maximumRequests,
 		},
 	}
 	return checker.Check(ctx, profile, channel, maximumRequests)

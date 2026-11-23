@@ -1,0 +1,9 @@
+COMMAND: grep -rn 'F04 exemption|F04/F10, registered|does not support.*directory.*fd|second comparison and getxattr' internal/ docs/ (excluding tmp/)
+RESULT:
+D:\LZProjects\prfrail\internal\console\agent_runner_policy_publish_other.go:16: //     publications (user ruling of 2026-11-23): it is not an F04 exemption and must
+D:\LZProjects\prfrail\internal\console\ai_install_proof_publish_other.go:15: //     publications (user ruling of 2026-11-23): it is not an F04 exemption and must
+D:\LZProjects\prfrail\internal\console\ai_install_proof.go:126: // 2026-11-23, not an F04 exemption): the hard link gives ATOMIC
+D:\LZProjects\prfrail\internal\console\ai_install_proof.go:258: //     2026-11-23), not an F04 exemption; darwin and the remaining unix targets
+D:\LZProjects\prfrail\internal\evidence\bounddir_windows.go:82: // registered F04 exemption and is not claimed away here.
+D:\LZProjects\prfrail\internal\evidence\bounddir_windows.go:1823: // registered F04 exemption and is not claimed away here.
+D:\LZProjects\prfrail\internal\evidence\bounddir_windows.go:1866: // F04 exemption, stated here rather than silently skipped by the caller.

@@ -223,6 +223,11 @@ func newAssemblyDriverFixture(t *testing.T) (AgentRunnerAssemblyOptions, *assemb
 
 	options := fixture.options
 	options.Definition = multiTaskIsolatedDefinition()
+	// T2 (finding F3): the pre-dispatch freeze covers every planned task, so the
+	// two-task definition needs its own policy body instead of the single-task one
+	// the base fixture froze.
+	multiTaskPolicy := p85PolicyBody(multiTaskDefinitionID, multiTaskAgentTaskOne, multiTaskAgentTaskTwo)
+	options.PolicySnapshot = &multiTaskPolicy
 	options.RequestRecord = adapters.AgentRunnerRequestRecord{}
 	options.RequestRecords = registry
 	options.testStub = &agentRunnerAssemblyStub{

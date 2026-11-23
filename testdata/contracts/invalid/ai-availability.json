@@ -20,5 +20,28 @@
       },
       "recordHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333"
     }
+  },
+  {
+    "fixtureId": "ai-availability-reason-out-of-closed-set-invalid",
+    "schema": "ai-availability.schema.json",
+    "expected": "reject",
+    "rejectionLayer": "schema",
+    "reason": "Failure reasons must stay inside the closed set; near-miss values are rejected",
+    "instance": {
+      "schemaVersion": "1.0.0",
+      "availability": {
+        "kind": "ai-availability",
+        "probeId": "probe-ai-byok",
+        "profileId": "deepseek-anthropic",
+        "profileConfigHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "channel": "agent-runner-cli",
+        "probedAt": "2026-09-11T08:00:00.000Z",
+        "status": "unavailable",
+        "reason": "byok_confinement_unproven_typo",
+        "requestsUsed": 0,
+        "evidence": ["sha256:2222222222222222222222222222222222222222222222222222222222222222"]
+      },
+      "recordHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+    }
   }
 ]

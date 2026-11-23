@@ -31,6 +31,13 @@ func (probe *fakeAIChannelProbe) Probe(_ context.Context, _ AIProviderProfile, c
 	return probe.result, probe.err
 }
 
+// VerifyBYOKConfinement models a probe whose spawn confinement HAS been proven.
+// T8a (finding F8) makes a missing capability a refusal, so the fake has to carry
+// the capability for the tests below to keep judging the checks they name (the
+// missing-secret path, the channel routing) instead of the BYOK gate. The gate's
+// own counterexamples live in the F8 tests, which deliberately omit it.
+func (probe *fakeAIChannelProbe) VerifyBYOKConfinement() error { return nil }
+
 func deepSeekProfile() AIProviderProfile {
 	return AIProviderProfile{
 		ProfileID:    "deepseek-anthropic",

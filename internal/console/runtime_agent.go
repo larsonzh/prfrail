@@ -88,6 +88,15 @@ type AgentRunnerAssemblyOptions struct {
 	// RequestRecord is then ignored. Every record must carry its own requestId.
 	RequestRecords map[string]adapters.AgentRunnerRequestRecord
 
+	// PolicySnapshot is the policy body the operator previewed and approved this
+	// run under - exactly previewPolicySnapshot of the ChainConfig the definition
+	// was converted from, so its hash is PlanPreview.PolicyHash (preview.go:123).
+	// T2 (finding F3): the assembly freezes it per task attempt before any
+	// dispatch, and the review/publish ports re-derive its digest from the frozen
+	// artifact, so an operator grant can only approve a policy that exists on disk.
+	// A nil value refuses fail-closed: a run without a frozen policy never spawns.
+	PolicySnapshot *previewPolicy
+
 	CapabilityRecord   adapters.AgentRunnerCapabilityRecord
 	EnforcementRecord  *adapters.AgentRunnerEnforcementRecord
 	AvailabilityRecord adapters.AIAvailabilityRecord
@@ -135,6 +144,26 @@ type AgentRunnerAssemblyOptions struct {
 	// which keeps every existing run byte-identical; a non-nil value decorates the
 	// event store with the per-event progress line.
 	Progress io.Writer
+
+	// managedWriteProof is the test seam of the frozen-policy managed-identity
+	// write guard (P85). It is UNEXPORTED on purpose: the field used to be an
+	// exported option, so any caller outside this package could hand the assembly a
+	// well-formed digest and skip the real platform observation entirely. With the
+	// field private, that bypass is closed at COMPILE time - no out-of-package
+	// caller has an entry point at all - and only an in-package test assembly (or
+	// an export_test.go accessor) can set it.
+	//
+	// It is ALWAYS empty in production - no CLI flag, no environment variable and
+	// no adapter populates it - because on this platform the assembly and the
+	// managed agent share one OS identity, so the real guard can never succeed and
+	// the freeze/reuse paths would be untestable without it. When it is a valid
+	// evidence digest the assembly adopts it instead of probing the platform
+	// primitive; when it is empty the guard is probed exactly as before. The proof
+	// stays anchored to THIS assembly's policy directory either way: the injected
+	// value is only the proof digest, while the directory binding is carried by the
+	// bound-directory confirmation and the anchor byte comparison, which run
+	// unconditionally.
+	managedWriteProof string
 
 	// testStub is the in-package test seam of the production entry. It is
 	// unexported, so no caller outside this package can reach it and every
@@ -317,6 +346,17 @@ func ExecuteAgentRunnerRun(ctx context.Context, options AgentRunnerAssemblyOptio
 	// record).
 	tasks, err := agentRunnerBindTasks(options, plan, records, store, launcher, snapshotStore, snapshotRoot, clock)
 	if err != nil {
+		return RunSummary{}, err
+	}
+
+	// Step 6b (T2 / finding F3): freeze the run's policy before anything can
+	// dispatch. Every task attempt gets its own store-local artifact under
+	// <runRoot>/agent-runner-policy/, written atomically and synced before this
+	// returns; only then may the engine exist, so a run that cannot freeze its
+	// policy fails closed with zero launches (same shape as a C6 prebuild
+	// failure). The review and publish ports re-read these artifacts instead of
+	// trusting an in-memory copy.
+	if err := agentRunnerFreezeRunPolicy(options, tasks, store); err != nil {
 		return RunSummary{}, err
 	}
 
@@ -765,7 +805,10 @@ func (runtime *agentRunnerRuntime) Review(_ context.Context, request chain.Revie
 	if err != nil {
 		return chain.ReviewDecision{}, err
 	}
-	policyHash, err := runtime.operatorApprovedPolicyHash(request.RunID, request.TaskID, stepID)
+	// T2 (finding F3): the granted hash is compared against the run's FROZEN
+	// policy artifact of this task attempt, so an approval cannot stand on a
+	// ledger digest that names no policy.
+	policyHash, err := runtime.operatorApprovedPolicyHashForAttempt(request.RunID, request.TaskID, stepID, request.Attempt)
 	if err != nil {
 		return chain.ReviewDecision{}, err
 	}
@@ -805,7 +848,20 @@ func (runtime *agentRunnerRuntime) stepIDForTask(taskID string, attempt int) (st
 }
 
 // operatorApprovedPolicyHash returns the policy hash of the newest active grant
-// that covers the given run/task/step.
+// that covers the given run/task/step, after proving it against that task
+// attempt's frozen policy artifact. The attempt is resolved from the assembly's
+// own record registry (the assembly binds attempt 1 only, so the lookup is
+// exact, never a guess).
+func (runtime *agentRunnerRuntime) operatorApprovedPolicyHash(runID, taskID, stepID string) (string, error) {
+	attempt, err := runtime.attemptForTaskStep(taskID, stepID)
+	if err != nil {
+		return "", err
+	}
+	return runtime.operatorApprovedPolicyHashForAttempt(runID, taskID, stepID, attempt)
+}
+
+// operatorApprovedPolicyHashForAttempt returns the policy hash of the newest
+// active grant that covers the given run/task/step/attempt.
 //
 // F3: the ledger is reread from its file when a path is configured, because the
 // grant source must be the operator CLI's append-only file and never an
@@ -814,16 +870,16 @@ func (runtime *agentRunnerRuntime) stepIDForTask(taskID string, attempt int) (st
 // grant status and a grant whose policy hash is not a valid hash all block the
 // review.
 //
-// T2 (finding F3) is implemented partially, on purpose:
-//   - DONE: only the latest grant record of an authorizationId may authorise, so
-//     an older record's scope can never be backed by the newer record's status.
-//   - NOT DONE: requiring grant.PolicyHash to equal the run's FROZEN policy digest.
-//     This revision has no durable frozen-policy artifact for an AgentRunner run
-//     (schemas/run-manifest.schema.json is declarative only: nothing in this tree
-//     writes it, and the replay store freezes requests, not policies), so
-//     implementing that half would invent a new record type - which the fix
-//     round's hard rule forbids. It is reported as a STOP instead.
-func (runtime *agentRunnerRuntime) operatorApprovedPolicyHash(runID, taskID, stepID string) (string, error) {
+// T2 (finding F3): the granted hash is no longer trusted on its own. Before it
+// is returned, the task attempt's FROZEN policy artifact is re-read from disk
+// and
+//
+//	Digest("", canonical(artifact.policyBody)) == artifact.policyHash == grant.PolicyHash
+//
+// must hold. A missing artifact, an unreadable or malformed one, its own digest
+// mismatch and a granted hash that names another policy all refuse the review,
+// which parks the task for repair instead of approving it.
+func (runtime *agentRunnerRuntime) operatorApprovedPolicyHashForAttempt(runID, taskID, stepID string, attempt int) (string, error) {
 	ledger := runtime.authorizationLedger
 	if runtime.authorizationLedgerPath != "" {
 		loaded, err := loadAuthorizationLedger(runtime.authorizationLedgerPath)
@@ -866,7 +922,77 @@ func (runtime *agentRunnerRuntime) operatorApprovedPolicyHash(runID, taskID, ste
 	if policyHash == "" {
 		return "", fmt.Errorf("%w: no operator-approved policy grant covers this review", ErrInvalidConfig)
 	}
+	if err := runtime.verifyFrozenPolicyArtifact(runID, taskID, stepID, attempt, policyHash); err != nil {
+		return "", err
+	}
 	return policyHash, nil
+}
+
+// attemptForTaskStep resolves the attempt the assembly bound to one task/step from
+// its own record registry. A task/step that is not bound, or that is bound to two
+// different attempts, is refused instead of guessed.
+func (runtime *agentRunnerRuntime) attemptForTaskStep(taskID, stepID string) (int, error) {
+	resolved := 0
+	consider := func(taskID, stepID string, attempt int) error {
+		if resolved != 0 && resolved != attempt {
+			return fmt.Errorf("%w: task %q step %q is bound to attempts %d and %d", ErrInvalidConfig, taskID, stepID, resolved, attempt)
+		}
+		resolved = attempt
+		return nil
+	}
+	for _, record := range runtime.requestRecords {
+		if record.Request.TaskID != taskID || record.Request.StepID != stepID {
+			continue
+		}
+		if err := consider(taskID, stepID, record.Request.Attempt); err != nil {
+			return 0, err
+		}
+	}
+	if record := runtime.requestRecord; record.Request.TaskID == taskID && record.Request.StepID == stepID {
+		if err := consider(taskID, stepID, record.Request.Attempt); err != nil {
+			return 0, err
+		}
+	}
+	if resolved <= 0 {
+		return 0, fmt.Errorf("%w: no request record is bound to task %q step %q", ErrInvalidConfig, taskID, stepID)
+	}
+	return resolved, nil
+}
+
+// verifyFrozenPolicyArtifact re-reads the frozen policy artifact of one task
+// attempt from disk, re-derives its digest and requires
+//
+//	Digest("", canonical(artifact.policyBody)) == artifact.policyHash == expected.
+//
+// F01 (P85 fix round 2): loadAgentRunnerFrozenPolicy additionally requires the
+// assembly anchor of the same task attempt to name that policy hash AND the
+// artifact-external digest of the exact bytes on disk, so the full chain is
+//
+//	Digest(body) == artifact.policyHash == recorded == grant.PolicyHash == anchor
+//
+// where "anchor" is the digest the assembly froze before any dispatch. The anchor
+// is a drift and accidental-rewrite control, not a sandbox: a hostile process
+// running under the same OS identity can write the artifact (docs/SECURITY.md, S1
+// trust boundary), and no in-tree artifact can prove otherwise.
+//
+// The artifact is never answered from memory: review and publish each call this
+// so a review cannot approve on one value while the run publishes under another.
+func (runtime *agentRunnerRuntime) verifyFrozenPolicyArtifact(runID, taskID, stepID string, attempt int, expected string) error {
+	if !evidence.ValidHash(expected) {
+		return fmt.Errorf("%w: the approved policy hash of task %q attempt %d is not a valid hash", ErrInvalidConfig, taskID, attempt)
+	}
+	artifact, err := loadAgentRunnerFrozenPolicy(runtime.store, runtime.runRoot, runID, taskID, stepID, attempt)
+	if err != nil {
+		return fmt.Errorf("%w: the frozen policy of task %q step %q attempt %d cannot be proven: %v", ErrInvalidConfig, taskID, stepID, attempt, err)
+	}
+	derived, err := agentRunnerFrozenPolicyHash(artifact.PolicyBody)
+	if err != nil {
+		return err
+	}
+	if derived != artifact.PolicyHash || artifact.PolicyHash != expected {
+		return fmt.Errorf("%w: the frozen policy of task %q step %q attempt %d does not bind the approved policy (frozen %s, approved %s, re-derived %s)", ErrInvalidConfig, taskID, stepID, attempt, artifact.PolicyHash, expected, derived)
+	}
+	return nil
 }
 
 // Publish promotes the candidate only after proving the workspace still matches
@@ -956,6 +1082,17 @@ func (runtime *agentRunnerRuntime) Publish(ctx context.Context, request chain.Pr
 			ErrorEvidence: []string{digest(agentRunnerPromotionBlockedDomain, err.Error())},
 		}, nil
 	}
+	// F01 (P85 fix round 1): the review-time binding is re-read once more at the
+	// FINAL linearization point of the promotion, after every other refusal above
+	// has been decided and immediately before the completed answer is built. The
+	// entry-time verification alone leaves a window in which the policy artifact
+	// (or the operator grant) is replaced after the entry check and the run still
+	// completes; this second reread closes it. The helper re-reads the artifact
+	// from disk and re-derives its digest (verifyFrozenPolicyArtifact), so an
+	// artifact replaced in that window blocks the promotion with zero publication.
+	if err := runtime.verifyReviewPolicyBinding(request); err != nil {
+		return runtime.blockedPromotion(err.Error()), nil
+	}
 	return chain.PromotionDecision{
 		ReceiptID:            runtime.nextEventID(),
 		OccurredAt:           runtime.clock().UTC().Format(timestampLayout),
@@ -981,11 +1118,21 @@ func (runtime *agentRunnerRuntime) blockedPromotion(reason string) chain.Promoti
 
 // verifyReviewPolicyBinding is the F3 publish-time verification of the agent
 // assembly. The review rereads the operator ledger and adopts the granted policy
-// hash; publishing proves the same fact once more, as close to the promotion as
-// the port allows: the trusted ledger is read again and the active grant that
-// covers this run/task/step must still bind the exact policy hash the review
-// decision recorded. An unreadable ledger, a lost grant or a different hash all
-// refuse the promotion.
+// hash after proving it against the frozen artifact; publishing proves the same
+// fact once more, as close to the promotion as the port allows, and adds the
+// artifact itself to the chain of equalities:
+//
+//	Digest(disk artifact body) == artifact.policyHash == recorded == grant.PolicyHash
+//	                           == assembly anchor (F01)
+//
+// F01 (P85 fix round 2): the last link is the assembly-time anchor, so the
+// comparison no longer stops at "the current artifact agrees with the grant" -
+// it also proves the artifact is still the object the assembly froze. The
+// artifact is re-read from disk here (never from memory), so a policy artifact
+// replaced between the review and the publish turns the promotion red instead of
+// completing it. An unreadable ledger, a lost grant, a missing or malformed
+// artifact, a missing or divergent anchor and any different hash all refuse the
+// promotion.
 func (runtime *agentRunnerRuntime) verifyReviewPolicyBinding(request chain.PromotionRequest) error {
 	recorded, ok := runtime.reviewPolicyHashes[agentRunnerTaskStateKey(request.TaskID, request.Attempt)]
 	if !ok || !evidence.ValidHash(recorded) {
@@ -995,7 +1142,10 @@ func (runtime *agentRunnerRuntime) verifyReviewPolicyBinding(request chain.Promo
 	if err != nil {
 		return err
 	}
-	granted, err := runtime.operatorApprovedPolicyHash(request.RunID, request.TaskID, stepID)
+	if err := runtime.verifyFrozenPolicyArtifact(request.RunID, request.TaskID, stepID, request.Attempt, recorded); err != nil {
+		return err
+	}
+	granted, err := runtime.operatorApprovedPolicyHashForAttempt(request.RunID, request.TaskID, stepID, request.Attempt)
 	if err != nil {
 		return err
 	}
@@ -1512,6 +1662,13 @@ func agentRunnerBindTasks(options AgentRunnerAssemblyOptions, plan []agentRunner
 		// Step 4 of the old single-task path: the isolated workspace and the replay
 		// root may never overlap.
 		if err := store.RejectWriterRoots(workspaceRoot); err != nil {
+			return nil, err
+		}
+		// T2 (finding F3): the frozen policy directory is outside the managed
+		// agent's write root (the isolated workspace). The two may neither contain
+		// one another nor alias one another; the assertion is taken here, while the
+		// assembly is bound and before a single artifact is frozen.
+		if err := agentRunnerRejectPolicyWorkspaceOverlap(agentRunnerPolicyDirectory(options.RunRoot), workspaceRoot); err != nil {
 			return nil, err
 		}
 		capturer, err := adapters.NewAgentRunnerSnapshotCapturer(snapshotStore, options.RunID, binding.TaskID, record.Request.Attempt)

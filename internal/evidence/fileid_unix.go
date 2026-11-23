@@ -27,3 +27,20 @@ func boundFileID(file *os.File) (string, error) {
 	}
 	return fmt.Sprintf("unix:%d:%d", info.Dev, info.Ino), nil
 }
+
+// pathFileID reports the identity of whatever path resolves to right now. It is
+// the name-based half used by FileIDAt: a caller that declared a root needs to
+// know whether that NAME still addresses the object it bound (P85 F02/F20 moved
+// the binding itself off the name; this only answers the caller's-namespace
+// question).
+func pathFileID(path string) (string, error) {
+	info, err := os.Stat(path)
+	if err != nil {
+		return "", err
+	}
+	stat, ok := info.Sys().(*syscall.Stat_t)
+	if !ok {
+		return "", fmt.Errorf("evidence: %s carries no syscall stat", path)
+	}
+	return fmt.Sprintf("unix:%d:%d", stat.Dev, stat.Ino), nil
+}

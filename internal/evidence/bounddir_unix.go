@@ -29,8 +29,10 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"runtime"
 	"sort"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"syscall"
@@ -63,6 +65,15 @@ const (
 	// boundResolveMask is the single mask every bound read uses: NO_XDEV 0x01 |
 	// NO_MAGICLINKS 0x02 | NO_SYMLINKS 0x04 | BENEATH 0x08.
 	boundResolveMask = resolveNoXdev | resolveNoMagiclinks | resolveNoSymlinks | resolveBeneath
+
+	// resolveNoSymlinksMask is the mask used when a directory OUTSIDE the bound
+	// tree has to be bound link-free from the filesystem root (P85 F02/F20).
+	// NO_XDEV is deliberately absent: a policy or proof root may legally live on
+	// its own mount (a tmpfs run root, a separate /home), and refusing a mount
+	// crossing there would refuse every legal layout instead of only a link. What
+	// matters is that no component is a symbolic link, which RESOLVE_NO_SYMLINKS
+	// enforces for the whole chain inside the one resolution.
+	resolveNoSymlinksMask = resolveNoMagiclinks | resolveNoSymlinks | resolveBeneath
 )
 
 // openHow mirrors struct open_how from linux/openat2.h: three little-endian
@@ -108,6 +119,51 @@ func OpenBoundDir(path string) (*BoundDir, error) {
 		return nil, fmt.Errorf("evidence: %s is not a directory", path)
 	}
 	return &BoundDir{fd: fd, path: path}, nil
+}
+
+// OpenBoundDirNoFollow opens path as a directory descriptor WITHOUT following a
+// symbolic link at any component (P85 F02/F06/F20).
+//
+// OpenBoundDir opens the name as given, so a link anywhere in the chain is
+// followed; the descriptor then addresses the link TARGET, and a later
+// VerifyBoundDir compares that target with a fresh stat of the path - which
+// follows the same link, so the two agree no matter which directory the name was
+// pointed at. Agreement between two resolutions of the same name therefore proves
+// nothing about WHICH directory the caller believed it was checking.
+//
+// This entry point removes the resolution from the caller's hands: the whole
+// absolute path is resolved from the filesystem root in ONE openat2(2) call with
+// RESOLVE_NO_SYMLINKS | RESOLVE_NO_MAGICLINKS | RESOLVE_BENEATH, so the descriptor
+// is the object the name addresses at that instant and no component of it can be
+// a link. A path that carries a link is refused (ELOOP) instead of being followed,
+// which is the same rule the per-component pre-check applies to the name - the
+// difference is that this verdict is taken on the object the caller then uses.
+//
+// Hosts without openat2 are refused with ENOSYS exactly like a bound artifact
+// open: a step-by-step walk cannot keep the guarantee.
+func OpenBoundDirNoFollow(path string) (*BoundDir, error) {
+	return openBoundDirNoFollow(path)
+}
+
+// OpenBoundDirVerified binds path AND reports the identity of the object it bound,
+// from ONE resolution (P85 F02/F06/F20).
+//
+// This is the shape a caller needs when the binding itself is the pre-check: the
+// single openat2(2) call below performs the component-level link refusal and
+// returns the descriptor, and the identity is read from that descriptor, so
+// "the object that was checked" and "the handle that is used" cannot be two
+// different objects - there is no name resolution between the two.
+func OpenBoundDirVerified(path string) (*BoundDir, FileID, error) {
+	dir, err := openBoundDirNoFollow(path)
+	if err != nil {
+		return nil, "", err
+	}
+	identity, err := dir.FileID()
+	if err != nil {
+		_ = dir.Close()
+		return nil, "", err
+	}
+	return dir, identity, nil
 }
 
 // OpenBoundDirFile opens one artifact relative to the bound directory. The
@@ -297,11 +353,60 @@ func BoundDirNames(dir *BoundDir, rel string) ([]string, error) {
 	return names, nil
 }
 
+// openBoundDirNoFollow is the Unix half of OpenBoundDirNoFollow.
+func openBoundDirNoFollow(path string) (*BoundDir, error) {
+	clean := filepath.Clean(path)
+	if !filepath.IsAbs(clean) {
+		return nil, &os.PathError{Op: "open", Path: path, Err: syscall.EINVAL}
+	}
+	// The root itself has no component to follow, so the plain open is exact.
+	if clean == string(filepath.Separator) {
+		return OpenBoundDir(clean)
+	}
+	if runtime.GOOS != "linux" || runtime.GOARCH != "amd64" {
+		return nil, &os.PathError{Op: "open", Path: path, Err: syscall.ENOSYS}
+	}
+	if openat2Disabled.Load() {
+		return nil, &os.PathError{Op: "open", Path: path, Err: syscall.ENOSYS}
+	}
+	root, err := syscall.Open(string(filepath.Separator), syscall.O_RDONLY|syscall.O_CLOEXEC|syscall.O_DIRECTORY, 0)
+	if err != nil {
+		return nil, &os.PathError{Op: "open", Path: string(filepath.Separator), Err: err}
+	}
+	defer func() { _ = syscall.Close(root) }()
+	relative := strings.TrimPrefix(clean, string(filepath.Separator))
+	fd, err := openat2ResolveFlagsMask(root, relative, artifactOpenFlags|syscall.O_DIRECTORY, 0, resolveNoSymlinksMask)
+	if err != nil {
+		if errors.Is(err, syscall.ENOSYS) {
+			openat2Disabled.Store(true)
+		}
+		return nil, &os.PathError{Op: "openat", Path: path, Err: err}
+	}
+	var stat syscall.Stat_t
+	if err := syscall.Fstat(fd, &stat); err != nil {
+		_ = syscall.Close(fd)
+		return nil, &os.PathError{Op: "stat", Path: path, Err: err}
+	}
+	if uint32(stat.Mode)&uint32(syscall.S_IFMT) != uint32(syscall.S_IFDIR) {
+		_ = syscall.Close(fd)
+		return nil, fmt.Errorf("evidence: %s is not a directory", path)
+	}
+	return &BoundDir{fd: fd, path: path}, nil
+}
+
 // openat2ResolveFlags performs the single confined resolution. glibc and musl expose
 // no openat2 wrapper (the man page says so) and this is a plain kernel ABI call, so
 // the syscall goes out directly through Syscall6: no cgo, no new dependency, no
 // go.mod change.
 func openat2ResolveFlags(dirfd int, clean string, flags uint64) (int, error) {
+	return openat2ResolveFlagsMask(dirfd, clean, flags, 0, boundResolveMask)
+}
+
+// openat2ResolveFlagsMask is the explicit form: the caller supplies the open
+// flags, the creation mode (open_how.mode, only read when O_CREAT/O_TMPFILE is
+// set) and the resolution mask. The bound artifact and directory opens use
+// boundResolveMask; OpenBoundDirNoFollow uses resolveNoSymlinksMask.
+func openat2ResolveFlagsMask(dirfd int, clean string, flags, mode, resolve uint64) (int, error) {
 	name, err := syscall.BytePtrFromString(clean)
 	if err != nil {
 		return -1, err
@@ -314,8 +419,8 @@ func openat2ResolveFlags(dirfd int, clean string, flags uint64) (int, error) {
 		// only type the caller then accepts (checked with fstat on the returned
 		// descriptor). A directory listing adds O_DIRECTORY to the same set.
 		flags:   flags,
-		mode:    0,
-		resolve: boundResolveMask,
+		mode:    mode,
+		resolve: resolve,
 	}
 	fd, _, errno := syscall.Syscall6(
 		sysOpenat2Nr,
@@ -351,6 +456,65 @@ func (dir *BoundDir) RootPath() (string, error) {
 	return dir.path, nil
 }
 
+// FileID reports the platform identity of the directory object this descriptor
+// addresses, taken from fstat(2) on the descriptor and never from a name (P85
+// F02/F06/F20). It is the value OpenBoundDirVerified hands back and the value
+// VerifyBoundDir compares against.
+func (dir *BoundDir) FileID() (FileID, error) {
+	if dir == nil {
+		return "", fmt.Errorf("evidence: nil bound directory")
+	}
+	dir.mu.Lock()
+	defer dir.mu.Unlock()
+	if dir.fd < 0 {
+		return "", fmt.Errorf("evidence: nil bound directory")
+	}
+	var stat syscall.Stat_t
+	if err := syscall.Fstat(dir.fd, &stat); err != nil {
+		return "", fmt.Errorf("evidence: identify the bound directory: %v", err)
+	}
+	return FileID(fmt.Sprintf("unix:%d:%d", stat.Dev, stat.Ino)), nil
+}
+
+// Descriptor returns the numeric descriptor behind the bound directory handle.
+//
+// P85 design rev 4, section 1: the write-domain observation has to take its
+// permission facts (mode, ownership, effective write) from the SAME object the
+// reads and writes go through. The descriptor is the only way to ask the kernel
+// about that object, so it is exported next to BoundFile.Descriptor instead of
+// being re-derived from a name. The caller must not close it: it stays owned by
+// the BoundDir and the accessor exists for read-only observations.
+func (dir *BoundDir) Descriptor() (uintptr, error) {
+	if dir == nil {
+		return 0, fmt.Errorf("evidence: nil bound directory")
+	}
+	dir.mu.Lock()
+	defer dir.mu.Unlock()
+	if dir.fd < 0 {
+		return 0, fmt.Errorf("evidence: nil bound directory")
+	}
+	return uintptr(dir.fd), nil
+}
+
+// SyncDirectory flushes this directory object with fsync(2) on the bound
+// descriptor (P85 F10). The previous shape re-opened the directory BY NAME to
+// sync it, which proved nothing about which object was synced; with the
+// descriptor held, the object that was read is the object that is flushed.
+func (dir *BoundDir) SyncDirectory() error {
+	if dir == nil {
+		return fmt.Errorf("evidence: nil bound directory")
+	}
+	dir.mu.Lock()
+	defer dir.mu.Unlock()
+	if dir.fd < 0 {
+		return fmt.Errorf("evidence: nil bound directory")
+	}
+	if err := syscall.Fsync(dir.fd); err != nil {
+		return fmt.Errorf("evidence: sync the bound directory: %v", err)
+	}
+	return nil
+}
+
 // Close releases the directory descriptor. It is idempotent and safe against a
 // concurrent read: the descriptor is closed and the field invalidated under mu, so
 // a read either finishes before the close or sees fd == -1 and is refused.
@@ -368,14 +532,22 @@ func (dir *BoundDir) Close() error {
 	return err
 }
 
-// boundDirVerify proves the handle still addresses the directory the caller
-// named, by comparing the descriptor's device and inode with the one the expected
-// path currently resolves to. A directory swapped before the bind is refused; a
-// path whose ancestors are spelled differently still resolves to the same object
-// and is accepted.
-func boundDirVerify(dir *BoundDir, expected string) error {
+// boundDirVerify proves the handle still addresses the object whose identity the
+// caller captured when the binding was made (P85 F02/F06/F20).
+//
+// The comparison used to be handle-versus-path: the descriptor's dev:ino was
+// compared with a fresh os.Stat of the name, which only proved that two
+// resolutions of the SAME name agreed - after a directory was swapped, both sides
+// resolved to the replacement and the check stayed green. The expected value is
+// now the identity the pre-check produced (FileID), and it is compared with the
+// identity of the handle, so the check answers "is this still the object that was
+// approved" instead of "does the name still resolve to itself".
+func boundDirVerify(dir *BoundDir, expected FileID) error {
 	if dir == nil {
 		return fmt.Errorf("evidence: nil bound directory")
+	}
+	if expected == "" {
+		return fmt.Errorf("evidence: the expected directory identity is empty")
 	}
 	dir.mu.Lock()
 	defer dir.mu.Unlock()
@@ -386,22 +558,16 @@ func boundDirVerify(dir *BoundDir, expected string) error {
 	if err := syscall.Fstat(dir.fd, &boundStat); err != nil {
 		return fmt.Errorf("evidence: stat the bound directory: %v", err)
 	}
-	info, err := os.Stat(expected)
-	if err != nil {
-		return err
-	}
-	expectedStat, ok := info.Sys().(*syscall.Stat_t)
-	if !ok {
-		return fmt.Errorf("evidence: %s carries no syscall stat", expected)
-	}
-	if expectedStat.Dev != boundStat.Dev || expectedStat.Ino != boundStat.Ino {
-		return fmt.Errorf("evidence: bound directory %s is not %s", dir.path, expected)
+	actual := FileID(fmt.Sprintf("unix:%d:%d", boundStat.Dev, boundStat.Ino))
+	if actual != expected {
+		return fmt.Errorf("evidence: bound directory %s is not the approved object (%s != %s)", dir.path, actual, expected)
 	}
 	return nil
 }
 
-// VerifyBoundDir is the exported form of the identity re-check, kept for the
-// adapters alias of the original seam.
-func VerifyBoundDir(dir *BoundDir, expected string) error {
+// VerifyBoundDir is the exported form of the identity re-check: the handle's own
+// identity must be the one the binding produced (FileID), never a fresh
+// resolution of a name.
+func VerifyBoundDir(dir *BoundDir, expected FileID) error {
 	return boundDirVerify(dir, expected)
 }

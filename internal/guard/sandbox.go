@@ -51,19 +51,39 @@ type Verdict struct {
 	// Reason is a human readable explanation that travels with the refusal
 	// error into the audit and diagnostic output.
 	Reason string
+	// SpecDigest is the digest of the specification this verdict ANSWERED FOR
+	// (P85 F13). A check layer echoes the CheckSpec.SpecDigest it was asked
+	// about, so "which specification was judged" becomes a fact the caller can
+	// compare instead of an assumption about the caller. CheckSandbox refuses a
+	// verdict whose echo does not equal the digest it asked about, so an answer
+	// about one specification can never be read as an answer about another.
+	SpecDigest string
 }
 
 // IsAllowed reports whether the verdict lets a dispatch continue.
 func (verdict Verdict) IsAllowed() bool { return verdict.Status == VerdictAllowed }
 
 // CheckSpec is the input of one sandbox check. It carries the audit label of
-// the dispatch being checked and nothing else: the check layer creates, runs
-// and destroys no process.
+// the dispatch being checked plus, when the caller has one, the digest of the
+// FROZEN specification the answer has to be about: the check layer creates,
+// runs and destroys no process.
 type CheckSpec struct {
 	// Reason labels the dispatch that triggered the check (for example
 	// "agent-runner-dispatch").
 	Reason string
+	// SpecDigest is the digest of the specification the verdict must answer for
+	// (P85 F13). It turns "the sandbox was allowed" into "the sandbox allowed
+	// THIS specification": a verdict that echoes a different digest is refused,
+	// so two specifications on the same platform can never share one verdict.
+	// It is REQUIRED for SandboxReasonBYOKProbe and optional elsewhere.
+	SpecDigest string
 }
+
+// SandboxReasonBYOKProbe labels the check a probe runs before it hands a
+// credential to a child (T8a, finding F8). The dispatch may only continue when
+// the environment's write restrictions are PROVEN, so an Unknown verdict is a
+// refusal exactly like Denied: S1 admits no BYOK probe.
+const SandboxReasonBYOKProbe = "ai-byok-probe"
 
 // Sandbox is the sandbox check layer: it answers one question, namely whether
 // the current environment satisfies the enforcement requirements. It enforces
@@ -87,6 +107,14 @@ func NewSandbox() Sandbox { return newPlatformSandbox() }
 // checker must not error, or the dispatch is refused fail-closed. A nil
 // implementation falls back to NewSandbox().
 func CheckSandbox(ctx context.Context, sandbox Sandbox, spec CheckSpec) error {
+	// P85 F13: a BYOK probe asks whether the environment may hand a credential to
+	// a child, and that question is only meaningful for one FROZEN specification.
+	// A caller that asks it without naming the specification is refused here, so a
+	// call site that predates the binding can never read as "the sandbox allowed the
+	// spawn we are about to make".
+	if spec.Reason == SandboxReasonBYOKProbe && spec.SpecDigest == "" {
+		return fmt.Errorf("%w: the BYOK probe check carries no specification digest, so the verdict cannot be bound to a frozen spawn", ErrSandboxRejected)
+	}
 	if sandbox == nil {
 		sandbox = NewSandbox()
 	}
@@ -109,6 +137,12 @@ func CheckSandbox(ctx context.Context, sandbox Sandbox, spec CheckSpec) error {
 	}
 	if !verdict.IsAllowed() {
 		return fmt.Errorf("%w: %s", ErrSandboxRejected, verdict.Reason)
+	}
+	// P85 F13: the answer has to be about the specification that was asked about.
+	// The echo is compared even on the Allowed path - an Allowed verdict for a
+	// different specification is not an Allowed verdict for this one.
+	if spec.SpecDigest != "" && verdict.SpecDigest != spec.SpecDigest {
+		return fmt.Errorf("%w: %s", ErrSandboxRejected, "the sandbox answered for a different specification than the one it was asked about")
 	}
 	return nil
 }

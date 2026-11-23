@@ -2278,12 +2278,12 @@ Completion record (2026-11-21): report pair `docs/validation/security-findings-r
 Completion record (2026-11-21): report pair `docs/validation/bounddir-residual{,_EN}.md` (verdict `PARTIALLY CLOSED`); T5#4 fully closed (predecessor chain / idempotent batch / in-lock write under RunLocked / the three run+consumer guards; C1–C18 counterexamples); T4 largely closed (chain walk / FSCTL ownership / Ordinal / root semantics / in-bound proof across an intermediate reparse; W1–W11 counterexamples); residual N13-UNC plus the Low evidence-attribution item closed by P86 (2026-11-22); R = 3, D = 0; (7) = blind 1 + final 1 + re-review 3 + narrow re-review 1 (budget exception); (5) 2/2, (6) 2/3; (9) = Windows host + VM (go1.22.12 full 15 packages ok plus targeted race on 4 packages ok); the CI readings and the first-run-red remediation are backfilled under report section 11.2 (first-run red `44877224368` -> fix `32bf234` -> double-green `44926215282`; DR-16 / DR-17); evidence pack `docs/validation/evidence/P84-BOUNDDIR-RESIDUAL/` (14 payloads + MANIFEST + SHA256SUMS)
 
 
-### P85 — `SECURITY-PROOF-SUBSYSTEM` (policy artifact / immutable install source / BYOK proof carrier; closes F3 / F6 / F8; implementation type) · ⬜ Not started
+### P85 — `SECURITY-PROOF-SUBSYSTEM` (policy artifact / immutable install source / BYOK proof carrier; closes F3 / F6 / F8; implementation type) · 🔄 In progress
 
 | Field | Content |
 |---|---|
 | Identifier | `SECURITY-PROOF-SUBSYSTEM` (carries P84-a / P84-b / P84-c from the P83 report section 8: T2 = a frozen policy artifact an AgentRunner run can re-verify persistently; T3 = an immutable install source; T8a = a BYOK proof carrier; source = the user's scheduling ruling of 2026-11-21) |
-| Status | ⬜ Not started (**the user must name the start**; the start message records the four elements; **execution order: P86 before P85 (user ruling of 2026-11-22); no dependency on P86, may run in parallel**) |
+| Status | 🔄 In progress (started 2026-11-22; four elements: ruled by = the user; date = 2026-11-22; reason = the P83 deferral obligations and closing F3 / F6 / F8; basis = the start message + the v69 snapshot section four) |
 | Goal | Close F3 / F6 / F8: provide policy evidence that is protected from the executor, persistable and independently re-verifiable, bound to run / task / step; establish an install source that can be proven not to change; prove the BYOK child writes no unredacted log, and refuse when that cannot be proven |
 | Dependencies | P83 partially closed (`4323503`); P83 report section 8 deferral list P84-a / P84-b / P84-c; P84 may run in parallel (no hard dependency); P86 has no dependency and may run in parallel |
 | Size | L (three new evidence capabilities; expected to touch `CONTRACTS{,_EN}` plus schemas / fixtures, so protocol first) |

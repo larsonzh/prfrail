@@ -1,0 +1,19 @@
+COMMAND: go test -run TestP85R7 -v ./internal/adapters/ ./internal/console/
+=== RUN   TestP85R7OpenInstallSourceLeafRefusesALinkedChain
+--- PASS: TestP85R7OpenInstallSourceLeafRefusesALinkedChain (0.16s)
+=== RUN   TestP85R7UnobservableSlotKeepsItsPositionInTheDigest
+--- PASS: TestP85R7UnobservableSlotKeepsItsPositionInTheDigest (0.01s)
+=== RUN   TestP85R7RoleSuffixContradictionIsRefused
+=== RUN   TestP85R7RoleSuffixContradictionIsRefused/an-artifact-role-on-an-anchor-name
+=== RUN   TestP85R7RoleSuffixContradictionIsRefused/an-anchor-role-on-an-artifact-name
+=== RUN   TestP85R7RoleSuffixContradictionIsRefused/an-uppercase-artifact-suffix
+=== RUN   TestP85R7RoleSuffixContradictionIsRefused/an-uppercase-anchor-suffix-with-a-declared-role
+=== RUN   TestP85R7RoleSuffixContradictionIsRefused/a-declared-role-without-a-name-marker
+=== RUN   TestP85R7RoleSuffixContradictionIsRefused/the-matching-pair
+=== RUN   TestP85R7RoleSuffixContradictionIsRefused/the-name-marker-alone
+=== RUN   TestP85R7RoleSuffixContradictionIsRefused/no-role-anywhere
+--- PASS: TestP85R7RoleSuffixContradictionIsRefused (0.00s)
+PASS
+ok  	github.com/larsonzh/prfrail/internal/adapters	2.532s
+PASS
+ok  	github.com/larsonzh/prfrail/internal/console	2.469s [no tests to run]

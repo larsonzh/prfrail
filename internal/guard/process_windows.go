@@ -489,6 +489,11 @@ func resolveManagedExecutable(name string) (string, error) {
 	return exec.LookPath(name)
 }
 
+// approvedExecutableOpenReparsePoint is FILE_FLAG_OPEN_REPARSE_POINT: the approved
+// name is opened as itself, so the object class is read from the handle the spawn
+// will use instead of from whatever a redirect points at (P85 F04).
+const approvedExecutableOpenReparsePoint = 0x00200000
+
 // openApprovedExecutable opens the approved executable with FILE_SHARE_READ and
 // nothing else (P83 T3).
 //
@@ -497,14 +502,32 @@ func resolveManagedExecutable(name string) (string, error) {
 // this handle is open the name keeps resolving to the object that was hashed. The
 // handle is deliberately not FILE_FLAG_BACKUP_SEMANTICS: the approved object has
 // to be a file, and a directory is refused by the open itself.
+//
+// P85 F04 (final start-name binding): the name is opened with
+// FILE_FLAG_OPEN_REPARSE_POINT and the object class is read from THAT handle. A
+// reparse point at the approved name (a symlink or junction standing in for the
+// executable) is refused instead of being followed, and so is a directory. The
+// kernel still re-resolves the whole name chain inside CreateProcessW; that window
+// is a registered residual, narrowed on the proofrail side by the ancestor-chain
+// proof (adapters: every component judged, no reparse point anywhere on the chain).
 func openApprovedExecutable(path string) (*os.File, error) {
 	name, err := syscall.UTF16PtrFromString(path)
 	if err != nil {
 		return nil, err
 	}
-	handle, err := syscall.CreateFile(name, syscall.GENERIC_READ, syscall.FILE_SHARE_READ, nil, syscall.OPEN_EXISTING, syscall.FILE_ATTRIBUTE_NORMAL, 0)
+	handle, err := syscall.CreateFile(name, syscall.GENERIC_READ, syscall.FILE_SHARE_READ, nil, syscall.OPEN_EXISTING,
+		syscall.FILE_ATTRIBUTE_NORMAL|approvedExecutableOpenReparsePoint, 0)
 	if err != nil {
 		return nil, err
+	}
+	var info syscall.ByHandleFileInformation
+	if err := syscall.GetFileInformationByHandle(handle, &info); err != nil {
+		syscall.CloseHandle(handle)
+		return nil, err
+	}
+	if info.FileAttributes&syscall.FILE_ATTRIBUTE_REPARSE_POINT != 0 || info.FileAttributes&syscall.FILE_ATTRIBUTE_DIRECTORY != 0 {
+		syscall.CloseHandle(handle)
+		return nil, fmt.Errorf("%w: the approved executable name resolves to a reparse point or a directory", ErrExecutableBinding)
 	}
 	return os.NewFile(uintptr(handle), path), nil
 }

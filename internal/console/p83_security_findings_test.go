@@ -115,8 +115,11 @@ func TestAgentRunnerReviewRefusesWithoutOperatorGrant(t *testing.T) {
 // half: the operator's policy hash is adopted verbatim and the decision carries
 // the candidate/evidence-root binding the chain independently checks.
 func TestAgentRunnerReviewBindsOperatorPolicyAndEvidenceRoot(t *testing.T) {
-	policyHash := evidence.Digest("", []byte("operator-policy"))
-	runtime := p83Runtime(t, chain.AuthorizationLedger{Grants: []chain.AuthorizationRecord{p83Grant(t, policyHash)}})
+	// T2 (finding F3): the operator's policy hash must name the run's frozen policy
+	// artifact, so the fixture freezes that policy first and grants its digest.
+	runtime := p83Runtime(t, chain.AuthorizationLedger{})
+	_, policyHash := p85FreezeAgentRunnerPolicy(t, runtime, p83TaskID, p83StepID, 1)
+	runtime.authorizationLedger = chain.AuthorizationLedger{Grants: []chain.AuthorizationRecord{p83Grant(t, policyHash)}}
 	request := chain.ReviewRequest{
 		RunID:                 p83RunID,
 		TaskID:                p83TaskID,
@@ -149,7 +152,14 @@ func TestAgentRunnerReviewBindsOperatorPolicyAndEvidenceRoot(t *testing.T) {
 // they state that precondition explicitly instead of implying it.
 func p83BindReviewedPolicy(t *testing.T, runtime *agentRunnerRuntime, taskID string, attempt int) string {
 	t.Helper()
-	policyHash := evidence.Digest("", []byte("p83-operator-policy"))
+	stepID, err := runtime.stepIDForTask(taskID, attempt)
+	if err != nil {
+		t.Fatalf("resolve the step of task %q attempt %d: %v", taskID, attempt, err)
+	}
+	// T2 (finding F3): the reviewed policy hash must name a frozen artifact that
+	// really exists on disk, so the fixture freezes one and grants exactly its
+	// digest instead of an arbitrary digest the publish check could not verify.
+	_, policyHash := p85FreezeAgentRunnerPolicy(t, runtime, taskID, stepID, attempt)
 	runtime.authorizationLedger = chain.AuthorizationLedger{Grants: []chain.AuthorizationRecord{p83Grant(t, policyHash)}}
 	if runtime.reviewPolicyHashes == nil {
 		runtime.reviewPolicyHashes = map[string]string{}

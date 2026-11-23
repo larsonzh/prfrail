@@ -41,3 +41,29 @@ import "errors"
 // platform. It is defined here, in a file built on every platform, because the
 // adapters alias refers to it on all of them.
 var ErrBoundDirUnsupported = errors.New("evidence: directory binding is supported on windows and linux only")
+
+// FileID is the platform identity of one filesystem object: the device plus
+// inode on Unix, the volume serial number plus file index on Windows, spelled
+// exactly like BoundFile.FileID (P85 F02/F06/F20).
+//
+// An identity is the quantity a verification compares, and it is what makes "the
+// object the pre-check approved" survive past the check: a path spells a name, a
+// FileID names the object that name addressed at the instant it was observed, so
+// a rename plus a replacement at the same spelling changes the identity while it
+// leaves the path unchanged.
+type FileID string
+
+// FileIDAt resolves path (following a link, exactly as a caller naming it would)
+// and reports the identity of the object it currently addresses.
+//
+// This is the NAME-based counterpart of BoundDir.FileID, and it exists for the
+// one question a handle cannot answer: does the name the caller declared still
+// address the object that was bound? It is never used to establish a binding, and
+// no write path resolves a name through it.
+func FileIDAt(path string) (FileID, error) {
+	identity, err := pathFileID(path)
+	if err != nil {
+		return "", err
+	}
+	return FileID(identity), nil
+}

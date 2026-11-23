@@ -65,7 +65,15 @@ func p83Fix5Grant(t *testing.T, mutate func(*chain.AuthorizationGrant)) chain.Au
 // gate (in-memory ledger) and turns the refusal leg red.
 func TestP83T1aProductionNeverAnswersFromTheInMemoryLedger(t *testing.T) {
 	runRoot := t.TempDir()
-	grant := p83Fix5Grant(t, nil)
+	// T2 (finding F3): the granted policy hash must name the run's frozen policy
+	// artifact, so the compatibility control freezes that policy first and the grant
+	// carries its digest. The production leg below keeps its own empty run root, so
+	// the zero-footprint assertion still measures the refusal alone.
+	control := p83Runtime(t, chain.AuthorizationLedger{})
+	_, frozenHash := p85FreezeAgentRunnerPolicy(t, control, p83TaskID, p83StepID, 1)
+	grant := p83Fix5Grant(t, func(grant *chain.AuthorizationGrant) { grant.PolicyHash = frozenHash })
+	control.authorizationLedger = chain.AuthorizationLedger{Grants: []chain.AuthorizationRecord{grant}}
+
 	runtime := p83Runtime(t, chain.AuthorizationLedger{Grants: []chain.AuthorizationRecord{grant}})
 	runtime.runRoot = runRoot
 	// A production runtime derives the ledger from the durable run root; the derived
@@ -95,7 +103,6 @@ func TestP83T1aProductionNeverAnswersFromTheInMemoryLedger(t *testing.T) {
 	// Compatibility control: the marked in-memory assembly (no path) still answers
 	// from its in-memory ledger, so the refusal above is attributable to the
 	// production source and not to an empty ledger.
-	control := p83Runtime(t, chain.AuthorizationLedger{Grants: []chain.AuthorizationRecord{grant}})
 	controlDecision, err := control.Review(context.Background(), request)
 	if err != nil {
 		t.Fatalf("the marked in-memory assembly must still approve, got %v", err)
@@ -120,10 +127,14 @@ func TestP83T1aProductionNeverAnswersFromTheInMemoryLedger(t *testing.T) {
 func TestP83T1bGrantExpiringDuringLedgerReadRefused(t *testing.T) {
 	root := t.TempDir()
 	ledgerPath := filepath.Join(root, defaultApprovalsLedgerName)
-	grant := p83Fix5Grant(t, nil)
+	// T2 (finding F3): the granted hash must name the frozen policy artifact of this
+	// task attempt, so the fixture freezes it before the approval is built.
+	runtime := p83Runtime(t, chain.AuthorizationLedger{})
+	_, frozenHash := p85FreezeAgentRunnerPolicy(t, runtime, p83TaskID, p83StepID, 1)
+	grant := p83Fix5Grant(t, func(grant *chain.AuthorizationGrant) { grant.PolicyHash = frozenHash })
+	runtime.authorizationLedger = chain.AuthorizationLedger{Grants: []chain.AuthorizationRecord{grant}}
 	writeP83Fix4Ledger(t, ledgerPath, grant)
 
-	runtime := p83Runtime(t, chain.AuthorizationLedger{Grants: []chain.AuthorizationRecord{grant}})
 	runtime.authorizationLedgerPath = ledgerPath
 
 	var clockErr error
@@ -171,10 +182,18 @@ func TestP83T1bGrantExpiringDuringLedgerReadRefused(t *testing.T) {
 // the older record evaluate as active (EvaluateGrant reads the newest record) and
 // the review approves with the older policy hash, turning this red.
 func TestP83T2aSupersededGrantCannotLendItsScope(t *testing.T) {
+	// T2 (finding F3): every grant that can actually approve must name the run's
+	// frozen policy artifact. The narrowed record carries the SAME policy digest as
+	// the widened one on purpose: the only difference left between the two ledgers
+	// is the scope, so the supersession guard stays the single fact this test
+	// measures - if it were deleted the frozen-policy check could not mask it.
+	fixture := p83Runtime(t, chain.AuthorizationLedger{})
+	_, frozenHash := p85FreezeAgentRunnerPolicy(t, fixture, p83TaskID, p83StepID, 1)
+
 	older := p83Fix5Grant(t, nil)
 	newer := p83Fix5Grant(t, func(grant *chain.AuthorizationGrant) {
 		grant.RecordID = "p83-grant-2"
-		grant.PolicyHash = evidence.Digest("", []byte("p83-narrowed-policy"))
+		grant.PolicyHash = frozenHash
 		grant.Scope.TaskIDs = []string{"task-other"}
 		grant.Scope.StepIDs = []string{"step-other"}
 	})
@@ -187,7 +206,7 @@ func TestP83T2aSupersededGrantCannotLendItsScope(t *testing.T) {
 		EvidenceRootHash:      evidence.Digest("", []byte("evidence-root")),
 	}
 
-	superseded := p83Runtime(t, chain.AuthorizationLedger{Grants: []chain.AuthorizationRecord{older, newer}})
+	superseded := p85RuntimeOverFrozenFixture(t, fixture, chain.AuthorizationLedger{Grants: []chain.AuthorizationRecord{older, newer}})
 	decision, err := superseded.Review(context.Background(), request)
 	if !errors.Is(err, ErrInvalidConfig) {
 		t.Fatalf("a superseded grant must not authorise the review, got %+v, %v", decision, err)
@@ -200,9 +219,9 @@ func TestP83T2aSupersededGrantCannotLendItsScope(t *testing.T) {
 	// the task, so the refusal above is the supersession and nothing else.
 	widened := p83Fix5Grant(t, func(grant *chain.AuthorizationGrant) {
 		grant.RecordID = "p83-grant-2"
-		grant.PolicyHash = evidence.Digest("", []byte("p83-narrowed-policy"))
+		grant.PolicyHash = frozenHash
 	})
-	control := p83Runtime(t, chain.AuthorizationLedger{Grants: []chain.AuthorizationRecord{older, widened}})
+	control := p85RuntimeOverFrozenFixture(t, fixture, chain.AuthorizationLedger{Grants: []chain.AuthorizationRecord{older, widened}})
 	controlDecision, err := control.Review(context.Background(), request)
 	if err != nil {
 		t.Fatalf("the newest covering grant must approve, got %v", err)

@@ -183,6 +183,22 @@ func (bound *BoundFile) FileID() (string, error) {
 	return boundFileID(bound.file)
 }
 
+// Descriptor returns the numeric descriptor behind the bound handle.
+//
+// P85 F06/F08: the Linux install-source rule has to take its permission facts
+// (effective write, POSIX access ACL) on the object the digest and identity come
+// from, not on the name that was open a moment earlier. A descriptor is the only
+// way to ask the kernel about that object, so the observation is exported here
+// instead of being re-derived from a path. The caller must not close the
+// descriptor, seek it or write through it: it stays owned by the BoundFile and
+// the accessor exists for read-only observations.
+func (bound *BoundFile) Descriptor() (uintptr, error) {
+	if err := bound.checkReadable(); err != nil {
+		return 0, err
+	}
+	return bound.file.Fd(), nil
+}
+
 // Close releases the handle. It is idempotent; ReadAll and Hash report
 // ErrBoundFileClosed afterwards instead of touching a released handle.
 func (bound *BoundFile) Close() error {

@@ -259,10 +259,10 @@ func TestP83Fix4AICheckRefusesEveryUnauthorisedReceiver(t *testing.T) {
 func TestP83Fix4AICheckAdmitsMatchingActiveGrant(t *testing.T) {
 	root := t.TempDir()
 	configPath := writeAIProbeTestChain(t, root)
-	executablePath := filepath.Join(root, "copilot.exe")
-	if err := os.WriteFile(executablePath, []byte("p83-fix4-approved-probe"), 0o700); err != nil {
-		t.Fatal(err)
-	}
+	// T3 (finding F6) adds an install source gate in front of the same checker, so
+	// the admitted receiver must be an executable this user cannot replace; a stub
+	// in the temporary directory can no longer reach the checker at all.
+	executablePath := p85T3ImmutableProbeExecutable(t)
 	executableHash, err := adapters.CopilotCLIExecutableHash(executablePath)
 	if err != nil {
 		t.Fatalf("hash the probe executable: %v", err)

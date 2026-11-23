@@ -25,6 +25,7 @@ package adapters
 import (
 	"context"
 	"os"
+	"path/filepath"
 	"runtime"
 	"slices"
 	"strings"
@@ -34,17 +35,35 @@ import (
 // p83Fix4CanaryCommand returns the platform shell and the argv that echoes the
 // canary. The counterexample must run on every CI leg: a Windows-only child would
 // make the Linux leg fail with start-failed instead of judging the evidence.
-func p83Fix4CanaryCommand(canary string, redirectStderr bool) (string, []string) {
-	if runtime.GOOS == "windows" {
-		if redirectStderr {
-			return "cmd.exe", []string{"/c", "echo", canary, "1>&2"}
+//
+// P85 (T3, finding F6): the executor re-verifies the child's INSTALLATION SOURCE
+// immediately before the spawn, so the fixture may no longer name a bare "cmd.exe"
+// (no stable absolute path) and may not live in a directory this user can write.
+// The shell is therefore addressed by its absolute system path, and the test skips
+// - never passes - when the host cannot prove that source immutable (a Linux run
+// as uid 0 cannot prove it by design; see ai_install_proof_unix.go).
+func p83Fix4CanaryCommand(t *testing.T, canary string, redirectStderr bool) (string, []string) {
+	t.Helper()
+	var shell string
+	switch runtime.GOOS {
+	case "windows":
+		root := os.Getenv("SystemRoot")
+		if root == "" {
+			root = `C:\Windows`
 		}
-		return "cmd.exe", []string{"/c", "echo", canary}
+		shell = filepath.Join(root, "System32", "cmd.exe")
+	case "linux":
+		shell = "/bin/sh"
+	default:
+		t.Skipf("the install source proof has a platform rule only for windows and linux, not %s", runtime.GOOS)
+	}
+	if _, err := VerifyAIInstallSource(shell); err != nil {
+		t.Skipf("the canary shell %s is not provably immutable for the executing user on this host (%v); this leg needs a native non-root Ubuntu run or a privileged fixture", shell, err)
 	}
 	if redirectStderr {
-		return "/bin/sh", []string{"-c", "echo " + canary + " 1>&2"}
+		return shell, []string{"-c", "echo " + canary + " 1>&2"}
 	}
-	return "/bin/sh", []string{"-c", "echo " + canary}
+	return shell, []string{"-c", "echo " + canary}
 }
 
 // p83Fix4RunProbeWithCanary starts a real child (cmd.exe) whose output carries the
@@ -54,7 +73,7 @@ func p83Fix4RunProbeWithCanary(t *testing.T, canary string, redirectStderr bool)
 	t.Helper()
 	root := t.TempDir()
 	executor := ManagedCopilotCLIProbeExecutor{TemporaryDirectory: root}
-	executable, args := p83Fix4CanaryCommand(canary, redirectStderr)
+	executable, args := p83Fix4CanaryCommand(t, canary, redirectStderr)
 	execution := executor.Execute(context.Background(), CopilotCLIProbeInvocation{
 		Executable:       executable,
 		WorkingDirectory: root,
@@ -163,7 +182,7 @@ func TestP83F8LoggingScreenDistinguishesFlagsFromData(t *testing.T) {
 func TestP83F8BenignProbeArgumentsStillReachTheSpawn(t *testing.T) {
 	root := t.TempDir()
 	executor := ManagedCopilotCLIProbeExecutor{TemporaryDirectory: root}
-	executable, args := p83Fix4CanaryCommand("log", false)
+	executable, args := p83Fix4CanaryCommand(t, "log", false)
 	execution := executor.Execute(context.Background(), CopilotCLIProbeInvocation{
 		Executable:       executable,
 		WorkingDirectory: root,

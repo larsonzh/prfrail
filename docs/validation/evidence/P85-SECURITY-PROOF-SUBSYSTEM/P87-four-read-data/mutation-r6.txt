@@ -1,0 +1,37 @@
+=== P85 R6 MUTATION LOG ===
+
+=== MUT-1 slot placement falls back to path order (expect RED) ===
+TARGET=internal/adapters/agent_runner_policy_write_guard.go
+ANCHOR-COUNT=1
+SHA256-BEFORE=da6f7272a7162cd46bd2f11ebb9d21ffbfe7a11e983b636a5d2bb19c9031ab76
+SHA256-MUTATED=58e57a38c525ea2968e512c477d5b8b48e26f6470f535b5dcc1886f7602df7af
+APPLY-EXITCODE=0
+TARGET=internal/adapters/agent_runner_policy_write_guard.go
+SHA256-RESTORED=da6f7272a7162cd46bd2f11ebb9d21ffbfe7a11e983b636a5d2bb19c9031ab76
+SHA256-BACKUP=da6f7272a7162cd46bd2f11ebb9d21ffbfe7a11e983b636a5d2bb19c9031ab76
+BYTE-IDENTICAL=true
+RESTORE-EXITCODE=0
+
+=== MUT-2 one name comparison deleted from the Windows sandwich (expect RED) ===
+TARGET=internal/adapters/agent_runner_policy_write_guard_windows.go
+ANCHOR-COUNT=1
+SHA256-BEFORE=36bfbebb825ef68109d699d473b8a3dee6ce829e38bae2ba4b6eb98661ed01dd
+SHA256-MUTATED=53930f63c4afce57ccb0ad79f0755c12fdf7b47f72b3767a5d0245d441d5be56
+APPLY-EXITCODE=0
+TARGET=internal/adapters/agent_runner_policy_write_guard_windows.go
+SHA256-RESTORED=36bfbebb825ef68109d699d473b8a3dee6ce829e38bae2ba4b6eb98661ed01dd
+SHA256-BACKUP=36bfbebb825ef68109d699d473b8a3dee6ce829e38bae2ba4b6eb98661ed01dd
+BYTE-IDENTICAL=true
+RESTORE-EXITCODE=0
+
+=== MUT-3 carrier publish re-check reverts to FileIDAt (expect RED) ===
+TARGET=internal/console/ai_install_proof_publish_other.go
+ANCHOR-COUNT=1
+SHA256-BEFORE=69d65f9c3436c7d55f1a949000abc0e66f2399e912728d0f5b7626d0cb3907ac
+SHA256-MUTATED=e945fe485089acae332a238aed116e0804ff7b6f06464938b1039cd1c745cb93
+APPLY-EXITCODE=0
+TARGET=internal/console/ai_install_proof_publish_other.go
+SHA256-RESTORED=69d65f9c3436c7d55f1a949000abc0e66f2399e912728d0f5b7626d0cb3907ac
+SHA256-BACKUP=69d65f9c3436c7d55f1a949000abc0e66f2399e912728d0f5b7626d0cb3907ac
+BYTE-IDENTICAL=true
+RESTORE-EXITCODE=0

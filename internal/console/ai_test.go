@@ -87,12 +87,10 @@ func writeAIAvailabilityFixture(t *testing.T, root, name string, record adapters
 func TestAICheckUsesConfiguredChannelAndReturnsAvailabilityRecord(t *testing.T) {
 	root := t.TempDir()
 	configPath := filepath.Join(root, DefaultChainConfigName)
-	executablePath := filepath.Join(root, "copilot.exe")
-	// F6: the probe receiver binding hashes the executable, so the test target is a
-	// real file instead of a path that never existed.
-	if err := os.WriteFile(executablePath, []byte("stub-executable"), 0o700); err != nil {
-		t.Fatal(err)
-	}
+	// F6: the probe receiver binding hashes the executable, and T3 additionally
+	// proves its installation source immutable, so the target is a real system
+	// binary instead of a stub written into a writable temporary directory.
+	executablePath := p85T3ImmutableProbeExecutable(t)
 	encoded, err := EncodeChainConfig(configuredAIChain())
 	if err != nil {
 		t.Fatal(err)
@@ -193,11 +191,9 @@ func TestAICheckRejectsUnconfiguredOrUnsupportedChannelWithoutProbe(t *testing.T
 func TestAICheckReturnsSuccessOnlyForAvailableRecord(t *testing.T) {
 	root := t.TempDir()
 	configPath := filepath.Join(root, DefaultChainConfigName)
-	executablePath := filepath.Join(root, "copilot.exe")
-	// F6: the receiver binding requires a hashable executable.
-	if err := os.WriteFile(executablePath, []byte("stub-executable"), 0o700); err != nil {
-		t.Fatal(err)
-	}
+	// F6 + T3: the receiver binding requires a hashable executable, and the
+	// install source gate requires one this user cannot replace.
+	executablePath := p85T3ImmutableProbeExecutable(t)
 	encoded, err := EncodeChainConfig(configuredAIChain())
 	if err != nil {
 		t.Fatal(err)
@@ -223,7 +219,7 @@ func TestAICheckReturnsSuccessOnlyForAvailableRecord(t *testing.T) {
 	}
 	code, stdout, stderr := runCLI(t, cli,
 		"ai", "check", "--chain", configPath, "--channel", "agent-runner-cli",
-		"--copilot", filepath.Join(root, "copilot.exe"), "--max-requests", "1", "--out", filepath.Join(root, "available.json"), "--json",
+		"--copilot", executablePath, "--max-requests", "1", "--out", filepath.Join(root, "available.json"), "--json",
 	)
 	if code != exitSuccess || stderr != "" {
 		t.Fatalf("unexpected command result: code=%d stdout=%q stderr=%q", code, stdout, stderr)
@@ -537,67 +533,9 @@ func TestAICheckRefusesReceiverMismatchWithoutReadingStore(t *testing.T) {
 	})
 
 	t.Run("executor-refuses-a-swapped-executable-before-the-spawn", func(t *testing.T) {
-		root := t.TempDir()
-		configPath := writeAIProbeTestChain(t, root)
-		// The approved executable the receiver binding digests at bind time.
-		executablePath := filepath.Join(root, "copilot.exe")
-		if err := os.WriteFile(executablePath, []byte("p83-approved-probe-executable"), 0o700); err != nil {
-			t.Fatal(err)
-		}
-		// F6: the swapped-executable leg starts from an approved receiver, so the
-		// ledger carries a grant that names this exact executable digest.
-		writeAIProbeApprovedLedger(t, root, executablePath)
-		// The replacement has to be an image the operating system can start: if the
-		// pre-spawn re-verification disappears the probe really runs it and the
-		// record degrades, which is what the assertion below observes.
-		currentBinary, err := os.Executable()
-		if err != nil {
-			t.Fatalf("locate the test binary: %v", err)
-		}
-		replacement, err := os.ReadFile(currentBinary)
-		if err != nil {
-			t.Fatalf("read the test binary: %v", err)
-		}
-		secrets := &recordingProbeSecrets{
-			credential: []byte("p83-probe-credential"),
-			onResolve: func() {
-				if writeErr := os.WriteFile(executablePath, replacement, 0o700); writeErr != nil {
-					t.Errorf("replace the probe executable: %v", writeErr)
-				}
-			},
-		}
-		cli := newTestCLI(root)
-		cli.secretManager = secrets
-		// NewCLI binds the default checker to the CLI value it was built from, so the
-		// checker is re-bound after the instrumented secret store is installed;
-		// otherwise the probe would talk to the real platform credential store.
-		cli.checkAIAvailability = cli.defaultAICheck
-
-		outputPath := filepath.Join(root, "spawn-refused.json")
-		code, stdout, stderr := runCLI(t, cli,
-			"ai", "check", "--chain", configPath, "--channel", "agent-runner-cli",
-			"--copilot", executablePath, "--max-requests", "1", "--out", outputPath, "--json",
-		)
-		if code != exitFailure {
-			t.Fatalf("a swapped executable must fail closed, got code=%d stdout=%q stderr=%q", code, stdout, stderr)
-		}
-		if secrets.resolveCalls != 1 {
-			t.Fatalf("the approved executable must pass the binding and be resolved exactly once, got %d resolutions stdout=%q", secrets.resolveCalls, stdout)
-		}
-		persisted, err := os.ReadFile(outputPath)
-		if err != nil {
-			t.Fatalf("a probe refused before the spawn must still record its verdict: %v", err)
-		}
-		record, err := adapters.DecodeAIAvailabilityRecord(persisted)
-		if err != nil {
-			t.Fatal(err)
-		}
-		reason := ""
-		if record.Availability.Reason != nil {
-			reason = *record.Availability.Reason
-		}
-		if record.Availability.Status != "unavailable" || reason != "cli_unavailable" {
-			t.Fatalf("the swapped executable must be refused before it starts (status=unavailable reason=cli_unavailable), got status=%s reason=%q", record.Availability.Status, reason)
-		}
+		// T3 (finding F6) defers this leg, and P85 r1 F4 turns the deferral into an
+		// EXEMPTION REGISTRATION (four elements in the skip message, same text as the
+		// entry for this slice's report §8 and the ⑦ input package).
+		t.Skip("EXEMPT-REGISTERED P85/F4 | reason: the console install source gate is hardwired to the live platform observation, so every executable that reaches the spawn is one this user cannot replace - and a leg whose whole point is to replace the approved image cannot use such an executable; no injection seam exists at the console layer (accepted by the ⑤ r1 review) | carried-by: TestP83T3cExecutableReplacedAfterApprovalRefused (internal/adapters/p83_fixround5_tester_test.go:40), which pins the pre-spawn identity-and-digest re-verification on the executor path | destination: this slice's report §8 and the ⑦ review input package")
 	})
 }

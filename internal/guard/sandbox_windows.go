@@ -11,10 +11,13 @@ import "context"
 // environment provably does not comply.
 type alphaSandbox struct{}
 
-func (alphaSandbox) Check(_ context.Context, _ CheckSpec) (Verdict, error) {
+func (alphaSandbox) Check(_ context.Context, spec CheckSpec) (Verdict, error) {
+	// P85 F13: the verdict echoes the specification it answered for, so a caller
+	// can compare "which specification was judged" instead of assuming it.
 	return Verdict{
-		Status: VerdictUnknown,
-		Reason: "S1 sandbox enforcement checks not implemented; environment compliance unknown",
+		Status:     VerdictUnknown,
+		Reason:     "S1 sandbox enforcement checks not implemented; environment compliance unknown",
+		SpecDigest: spec.SpecDigest,
 	}, nil
 }
 

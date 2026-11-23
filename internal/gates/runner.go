@@ -48,6 +48,28 @@ type Runner struct {
 	Env      func() []string
 }
 
+// gateWorkspaceRootMoved proves the caller's declared root still addresses the
+// directory the runner bound (P85 F02/F06/F20).
+//
+// The handle is asserted against the identity the binding produced, and the
+// declared NAME is resolved once and compared with that identity. Two questions
+// are kept apart on purpose: "is the handle still the approved object" is answered
+// by the handle, and "does the caller's name still mean that object" is the only
+// thing a name resolution may be used for.
+func gateWorkspaceRootMoved(workspace *evidence.BoundDir, boundID evidence.FileID, declaredRoot string) error {
+	if err := evidence.VerifyBoundDir(workspace, boundID); err != nil {
+		return err
+	}
+	current, err := evidence.FileIDAt(declaredRoot)
+	if err != nil {
+		return err
+	}
+	if current != boundID {
+		return fmt.Errorf("the declared root %q no longer names the bound directory (%s != %s)", declaredRoot, current, boundID)
+	}
+	return nil
+}
+
 func (runner Runner) Run(ctx context.Context, request Request) (ResultRecord, error) {
 	if runner.Executor == nil || runner.Scanner == nil || runner.Objects == nil || runner.Store == nil {
 		return ResultRecord{}, ErrPolicyUnavailable
@@ -74,10 +96,20 @@ func (runner Runner) Run(ctx context.Context, request Request) (ResultRecord, er
 	// A bind failure still refuses collection below (fail-closed), but only when
 	// artifacts were declared.
 	var workspace *evidence.BoundDir
+	var workspaceID evidence.FileID
 	if len(request.Hook.ArtifactGlobs) > 0 {
 		if bound, bindErr := evidence.OpenBoundDir(request.WorkspaceRoot); bindErr == nil {
-			workspace = bound
-			defer func() { _ = workspace.Close() }()
+			// P85 F02/F06/F20: the identity is captured from the bound handle, so the
+			// per-attempt check compares the caller's declared name with the object
+			// that was actually bound instead of resolving the same name twice.
+			identity, identityErr := bound.FileID()
+			if identityErr != nil {
+				_ = bound.Close()
+			} else {
+				workspace = bound
+				workspaceID = identity
+				defer func() { _ = workspace.Close() }()
+			}
 		}
 	}
 	clock := runner.Clock
@@ -112,7 +144,7 @@ func (runner Runner) Run(ctx context.Context, request Request) (ResultRecord, er
 		// longer addresses the bound object refuses BEFORE the hook runs, so no side
 		// effect lands in an unproven directory.
 		if workspace != nil {
-			if verifyErr := evidence.VerifyBoundDir(workspace, declaredRoot); verifyErr != nil {
+			if verifyErr := gateWorkspaceRootMoved(workspace, workspaceID, declaredRoot); verifyErr != nil {
 				return ResultRecord{}, fmt.Errorf("%w: %v", ErrWorkspaceRootMoved, verifyErr)
 			}
 			boundRoot, rootErr := workspace.RootPath()

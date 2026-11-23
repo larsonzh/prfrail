@@ -70,6 +70,119 @@ func OpenBoundDir(path string) (*BoundDir, error) {
 	return &BoundDir{handle: handle, path: path}, nil
 }
 
+// OpenBoundDirNoFollow opens path as a directory handle with the Windows
+// primitive.
+//
+// P85 F02/F06/F20: the review's directory-binding finding is about the Unix
+// half, where OpenBoundDir follows a link in any component and the later
+// identity re-check follows the same link. On Windows the artifact opens already
+// walk the bound directory handle component by component and classify every
+// reparse point (openDescendantRelative / confirmOpenedArtifact), so the binding
+// primitive itself is the walk; the CreateProcessW final-name residue stays the
+// registered F04 exemption and is not claimed away here.
+func OpenBoundDirNoFollow(path string) (*BoundDir, error) {
+	return OpenBoundDir(path)
+}
+
+// OpenBoundDirVerified binds path and reports the identity of the object it bound
+// (P85 F02/F06/F20).
+//
+// P85 design rev 4, section 3: the binding walks the NAME CHAIN itself instead of
+// handing the whole path to one CreateFile. Every component below the volume root
+// is opened AS ITSELF (FILE_OPEN_REPARSE_POINT) and classified; a reparse point -
+// junction, symbolic link or any other tag - is REFUSED rather than followed, and
+// the root chain offers no "inside the bound object" target to prove, so it is
+// refused outright (unlike the relative walk below the bound directory, which
+// admits an in-bound middle reparse point). A component that is not a directory,
+// or that does not exist, is a refusal too. The volume root itself is a mount
+// point rather than an NTFS reparse marker and is opened by OpenBoundDir.
+//
+// UNC and extended spellings and relative paths are refused (fail-closed): the
+// chain walk has no volume root to anchor them against.
+func OpenBoundDirVerified(path string) (*BoundDir, FileID, error) {
+	handle, err := openBoundDirChainHandle(path, true)
+	if err != nil {
+		return nil, "", err
+	}
+	dir := &BoundDir{handle: handle, path: filepath.Clean(path)}
+	identity, err := dir.FileID()
+	if err != nil {
+		_ = dir.Close()
+		return nil, "", err
+	}
+	return dir, identity, nil
+}
+
+// ClassifyRootChainNoReparse runs the SAME root-chain walk the verified binding
+// uses and refuses on the same conditions, without keeping the final handle.
+//
+// P85 design rev 4, section 3: the write-domain observation judges a name chain
+// that the binding also judges; one classifier for both keeps "the object that was
+// judged" and "the object that was bound" from drifting apart. wantDir selects
+// whether the LAST component must be a directory (a policy directory) or a regular
+// entry (a frozen policy file).
+func ClassifyRootChainNoReparse(path string, wantDir bool) error {
+	handle, err := openBoundDirChainHandle(path, wantDir)
+	if err != nil {
+		return err
+	}
+	return syscall.CloseHandle(handle)
+}
+
+// openBoundDirChainHandle walks path from the volume root down, opening every
+// component as itself. It returns the handle of the last component (owned by the
+// caller) or a refusal; intermediate handles are released as the walk advances.
+func openBoundDirChainHandle(path string, wantDir bool) (syscall.Handle, error) {
+	clean := filepath.Clean(path)
+	if !filepath.IsAbs(clean) {
+		return 0, fmt.Errorf("evidence: %q is not an absolute path, so its root chain cannot be proven", path)
+	}
+	if strings.HasPrefix(clean, `\\`) || strings.HasPrefix(clean, `//`) {
+		return 0, fmt.Errorf("evidence: %q is a UNC or extended path, so its root chain cannot be proven", path)
+	}
+	volume := filepath.VolumeName(clean)
+	if volume == "" {
+		return 0, fmt.Errorf("evidence: %q carries no volume name, so its root chain cannot be proven", path)
+	}
+	root := volume + string(filepath.Separator)
+	rootDir, err := OpenBoundDir(root)
+	if err != nil {
+		return 0, fmt.Errorf("evidence: open the volume root %s: %w", root, err)
+	}
+	// The walk takes ownership of the root handle; the wrapper must not close it.
+	current := rootDir.handle
+	rootDir.handle = 0
+	remainder := strings.TrimPrefix(clean, root)
+	remainder = strings.TrimPrefix(remainder, string(filepath.Separator))
+	components := make([]string, 0, 8)
+	if remainder != "" {
+		for _, part := range strings.Split(remainder, string(filepath.Separator)) {
+			if part == "" || part == "." {
+				continue
+			}
+			if part == ".." {
+				_ = syscall.CloseHandle(current)
+				return 0, fmt.Errorf("evidence: the root chain %q carries a parent traversal, which cannot be proven", path)
+			}
+			components = append(components, part)
+		}
+	}
+	for index, component := range components {
+		last := index == len(components)-1
+		handle, reparse, openErr := openRelativeComponent(current, component, !last || wantDir, false)
+		_ = syscall.CloseHandle(current)
+		if openErr != nil {
+			return 0, fmt.Errorf("evidence: open %q inside the root chain %q: %w", component, path, openErr)
+		}
+		if reparse {
+			_ = syscall.CloseHandle(handle)
+			return 0, fmt.Errorf("evidence: the component %q of %q is a reparse point, so the name chain cannot be proven", component, path)
+		}
+		current = handle
+	}
+	return current, nil
+}
+
 // OpenBoundDirFile opens one artifact relative to the bound directory. The
 // returned handle is the artifact's identity: the caller reads through it and
 // never resolves the name again.
@@ -1141,6 +1254,34 @@ func driveTypeOf(root string) uint32 {
 	return uint32(kind)
 }
 
+// driveFixedClass is DRIVE_FIXED, the GetDriveTypeW class of a local fixed volume.
+const driveFixedClass = 3
+
+// IsFixedVolumeRoot proves that the bound directory handle addresses the ROOT of a
+// fixed local NTFS volume. It is the P84 anchor seedIsFixedVolumeRoot (volume class
+// plus the full 48-bit NTFS root record, both proven ON the handle the caller holds)
+// combined with the drive-type class of the volume the handle was opened through.
+//
+// P85 F04 reuses this anchor instead of a mutation-right verdict: on Windows the
+// volume root is where Authenticated Users carries the default "(AD)" ace that
+// grants FILE_ADD_SUBDIRECTORY (measured on a non-elevated medium token: C:\ grants
+// FILE_ADD_SUBDIRECTORY, denies FILE_ADD_FILE and GENERIC_WRITE), so judging the
+// root by mutation rights would refuse every legitimate install. What the root
+// contributes to the ancestor chain is identity - "the anchor object IS the fixed
+// volume root" - and the chain above the leaf is judged by mutation rights.
+//
+// This is a read-only accessor over the existing P84 proof: it computes nothing new
+// and changes no existing verdict.
+func (dir *BoundDir) IsFixedVolumeRoot() bool {
+	if dir == nil || dir.handle == 0 {
+		return false
+	}
+	if !seedIsFixedVolumeRoot(dir.handle) {
+		return false
+	}
+	return driveTypeOf(dir.path) == driveFixedClass
+}
+
 // seedIsFixedVolumeRoot proves, ON the already opened seed handle, that the handle
 // is the root directory of a fixed local NTFS volume: GetVolumeInformationByHandle
 // must answer an NTFS volume for the handle, and the handle's file index must
@@ -1671,41 +1812,63 @@ func (dir *BoundDir) Close() error {
 	return err
 }
 
-// boundDirVerify proves the handle still addresses the directory the caller
-// named. The name form is compared first by exact bytes; any other spelling - a
-// short (8.3) form, or a name that differs only by case - falls back to comparing
-// the two directory objects, so a directory swapped between the open and this check
-// is refused. P84 T4(b) removed the case-folding fast path: a differently cased
-// name is precisely how a case-variant twin directory presents itself, so it is
-// admitted only when the object comparison proves it is the same object. A
-// directory that was already replaced when the open happened cannot be detected
-// here - the handle then addresses the replacement, which is exactly what the name
-// resolves to - so the check is bounded to that window by construction.
-func boundDirVerify(dir *BoundDir, expected string) error {
+// boundDirVerify proves the handle still addresses the object whose identity the
+// caller captured when the binding was made (P85 F02/F06/F20).
+//
+// The comparison used to be handle-versus-name: the handle's identity was
+// compared with a fresh resolution of the caller's path, which only proved that
+// the name agreed with itself. The expected value is now the identity the binding
+// produced (FileID), so the check answers "is this still the object that was
+// approved". The final-name residue of a Windows artifact open remains the
+// registered F04 exemption and is not claimed away here.
+func boundDirVerify(dir *BoundDir, expected FileID) error {
 	if dir == nil || dir.handle == 0 {
 		return fmt.Errorf("evidence: nil bound directory")
 	}
-	real, err := dir.currentName()
+	if expected == "" {
+		return fmt.Errorf("evidence: the expected directory identity is empty")
+	}
+	actual, err := dir.FileID()
 	if err != nil {
-		return fmt.Errorf("evidence: derive the bound directory name: %v", err)
+		return err
 	}
-	if filepath.Clean(real) == filepath.Clean(expected) {
-		return nil
-	}
-	same, err := dir.sameObjectAs(expected)
-	if err != nil {
-		return fmt.Errorf("evidence: compare the bound directory with %s: %v", expected, err)
-	}
-	if !same {
-		return fmt.Errorf("evidence: bound directory %q is not %q", real, expected)
+	if actual != expected {
+		return fmt.Errorf("evidence: bound directory %q is not the approved object (%s != %s)", dir.path, actual, expected)
 	}
 	return nil
 }
 
-// VerifyBoundDir is the exported form of the identity re-check, kept for the
-// adapters alias of the original seam.
-func VerifyBoundDir(dir *BoundDir, expected string) error {
+// VerifyBoundDir is the exported form of the identity re-check: the handle's own
+// identity must be the one the binding produced (FileID), never a fresh
+// resolution of a name.
+func VerifyBoundDir(dir *BoundDir, expected FileID) error {
 	return boundDirVerify(dir, expected)
+}
+
+// FileID reports the platform identity of the directory object this handle
+// addresses (volume serial number plus file index), taken from the handle and
+// never from a name (P85 F02/F06/F20).
+func (dir *BoundDir) FileID() (FileID, error) {
+	if dir == nil || dir.handle == 0 {
+		return "", fmt.Errorf("evidence: nil bound directory")
+	}
+	info, err := dir.byHandleFileInformation()
+	if err != nil {
+		return "", fmt.Errorf("evidence: identify the bound directory: %v", err)
+	}
+	return FileID(fmt.Sprintf("win32:%d:%d:%d", info.VolumeSerialNumber, info.FileIndexHigh, info.FileIndexLow)), nil
+}
+
+// SyncDirectory is the Windows half of P85 F10. Windows cannot flush a directory
+// handle through the Go standard library, so there is nothing to call: the
+// atomic-visibility point (the hard link) stands alone and this method reports
+// success without claiming power-loss durability. That residue is the registered
+// F04 exemption, stated here rather than silently skipped by the caller.
+func (dir *BoundDir) SyncDirectory() error {
+	if dir == nil || dir.handle == 0 {
+		return fmt.Errorf("evidence: nil bound directory")
+	}
+	return nil
 }
 
 // RootPath reports the filesystem name the bound directory object carries right

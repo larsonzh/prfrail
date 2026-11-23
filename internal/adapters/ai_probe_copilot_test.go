@@ -56,9 +56,12 @@ func TestCopilotCLIProbeBuildsIsolatedDeepSeekSmoke(t *testing.T) {
 	if result.Status != "available" || result.RequestsUsed != 1 {
 		t.Fatalf("unexpected result: %+v", result)
 	}
+	// P85 F13 (`-C` ruling): a credential-bearing (secret) spawn carries NO working
+	// directory argument - the child's working directory is decided by
+	// ProcessSpec.Dir alone - while the host-auth path keeps `-C <dir>`. The expected
+	// argv below is therefore the secret template.
 	wantArgs := []string{
 		"-p", "Reply with exactly PONG and nothing else. Do not call any tool.",
-		"-C", `C:\probe`,
 		"--name", "proofrail-availability-probe",
 		"--model", "deepseek-flash",
 		"--output-format", "json",
@@ -80,6 +83,28 @@ func TestCopilotCLIProbeBuildsIsolatedDeepSeekSmoke(t *testing.T) {
 	}
 	if !slices.Equal(executor.invocation.Args, wantArgs) {
 		t.Fatalf("unexpected args:\n got: %#v\nwant: %#v", executor.invocation.Args, wantArgs)
+	}
+	// P85 F13: the probe hands the executor the launch template it proved before the
+	// credential was resolved, the template is the ONE constructor's output, and the
+	// secret template cannot carry a working-directory flag (which is why the working
+	// directory of a BYOK child is ProcessSpec.Dir alone).
+	frozen := executor.invocation.FrozenSpawn
+	if frozen == nil {
+		t.Fatal("the probe must pass the frozen launch template to the executor")
+	}
+	if frozen.AuthMode != "secret" || frozen.Executable != probe.Executable || frozen.WorkingDirectory != probe.WorkingDirectory {
+		t.Fatalf("unexpected frozen template header: %+v", *frozen)
+	}
+	if slices.Contains(frozen.Args, "-C") || slices.Contains(frozen.Args, "--working-directory") {
+		t.Fatalf("the credential-bearing template must not name a working directory: %#v", frozen.Args)
+	}
+	wantTemplate, templateErr := copilotCLIProbeLaunchSpec(probe.Executable, probe.WorkingDirectory, "secret", deepSeekProfile().Model, 1, defaultCopilotCLIOutputBytes)
+	if templateErr != nil {
+		t.Fatalf("the frozen template must be constructible through the launch-template constructor: %v", templateErr)
+	}
+	if !slices.Equal(frozen.Args, wantTemplate.Args) || frozen.AuthMode != wantTemplate.AuthMode ||
+		frozen.OutputBound != wantTemplate.OutputBound || !slices.Equal(frozen.EnvironmentKeys, wantTemplate.EnvironmentKeys) {
+		t.Fatalf("the spawned template drifted from the constructor:\n got: %+v\nwant: %+v", *frozen, wantTemplate)
 	}
 	wantEnvironment := map[string]string{
 		"COPILOT_PROVIDER_TYPE":     "anthropic",

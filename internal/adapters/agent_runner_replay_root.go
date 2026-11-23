@@ -357,7 +357,15 @@ func (store *AgentRunnerReplayStore) bindEvidenceDir(requestID, base, directory 
 	if err != nil {
 		return fmt.Errorf("%w: bind %s: %v", ErrInvalidAgentRunnerReplayStore, base, err)
 	}
-	if err := boundDirVerify(bound, base); err != nil {
+	// P85 F02/F06/F20: the identity is taken from the handle and asserted against
+	// itself, so the confirmation describes the object that was bound rather than a
+	// second resolution of the same name.
+	identity, err := bound.FileID()
+	if err != nil {
+		_ = bound.Close()
+		return fmt.Errorf("%w: identify %s for requestId %s: %v", ErrInvalidAgentRunnerReplayStore, directory, requestID, err)
+	}
+	if err := boundDirVerify(bound, identity); err != nil {
 		_ = bound.Close()
 		return fmt.Errorf("%w: confirm %s for requestId %s: %v", ErrInvalidAgentRunnerReplayStore, directory, requestID, err)
 	}

@@ -29,6 +29,16 @@ type CopilotCLIProbeInvocation struct {
 	WorkingDirectory string
 	Args             []string
 	Environment      map[string][]byte
+	// AuthMode DECLARES the authentication mode of this spawn (P85 F14): "host" or
+	// "secret". It is set by the probe, and Execute refuses a declared mode that
+	// disagrees with the credential the environment actually carries. An empty value
+	// is the compatibility path for callers that predate the declaration.
+	AuthMode string
+	// FrozenSpawn is the launch template the confinement was PROVEN against before
+	// the credential was resolved (P85 F13). Execute instantiates it and refuses
+	// unless the spawn it is about to perform equals it element by element. Nil is
+	// the compatibility path for an executor that is called directly.
+	FrozenSpawn *copilotCLIProbeSpawnSpec
 }
 
 type CopilotCLIProbeExecution struct {
@@ -60,6 +70,23 @@ type CopilotCLIProbe struct {
 	Executable       string
 	WorkingDirectory string
 	Executor         CopilotCLIProbeExecutor
+	// AuthMode, Model and MaximumRequests are the DECLARED spawn inputs (P85 F13).
+	// The checker proves the confinement of a concrete launch template before it
+	// resolves a credential, and the only way it can do that is if the probe knows
+	// the inputs the spawn will use. They are taken from the same profile and the
+	// same flag the checker is called with, and Probe refuses when they disagree with
+	// what it is handed. All three empty is the compatibility path for tests and for
+	// callers that only use the executor.
+	AuthMode        string
+	Model           string
+	MaximumRequests int
+	// frozen is the launch template the pre-Resolve proof built and validated
+	// (P85 F13 fix round 3). It is stored on the SAME probe object the checker holds
+	// (production passes a *CopilotCLIProbe), so the object that was proven and the
+	// object that is spawned are one, not two derivations that happen to agree. Nil
+	// is the compatibility path: no proof ran, so Probe builds the template and
+	// documents the equivalence argument.
+	frozen *copilotCLIProbeSpawnSpec
 }
 
 // VerifyReceiverBinding implements AIReceiverBindingVerifier for the Copilot CLI
@@ -79,6 +106,127 @@ func (probe CopilotCLIProbe) VerifyReceiverBinding() error {
 	return binder.VerifyExecutableBinding(probe.Executable)
 }
 
+// VerifyImmutableInstallSource implements AIImmutableInstallSourceVerifier for the
+// Copilot CLI probe. T3 (finding F6): the checker calls it after the receiver
+// binding and before the credential is resolved, so an executable whose
+// installation source this user can write, replace or re-permission is refused
+// while the secret store is still untouched.
+func (probe CopilotCLIProbe) VerifyImmutableInstallSource() error {
+	if probe.Executable == "" {
+		return fmt.Errorf("%w: probe executable missing", ErrInvalidCopilotCLIProbe)
+	}
+	_, err := VerifyAIInstallSource(probe.Executable)
+	return err
+}
+
+// VerifyBYOKConfinement implements AIBYOKConfinementVerifier for the Copilot CLI
+// probe. T8a (finding F8): the checker calls it after the receiver binding and the
+// install source and strictly before the credential is resolved, so a probe whose
+// executor cannot prove the spawn confinement is refused while the secret store is
+// still untouched and no child exists.
+//
+// A missing capability is a refusal, never an admission: the gate must not degrade
+// to "assume confined" when the executor cannot answer.
+//
+// P85 F13 (fix round 3): when the spawn inputs are DECLARED, the launch template is
+// built ONCE here, validated, bound to the platform write verdict and stored on the
+// probe, so Probe spawns that exact object instead of constructing a second one.
+// The receiver is a pointer for exactly that reason: a value receiver would freeze
+// a template onto a copy the spawn never reads.
+func (probe *CopilotCLIProbe) VerifyBYOKConfinement() error {
+	if probe == nil {
+		return fmt.Errorf("%w: the probe is missing", ErrAIBYOKConfinement)
+	}
+	if probe.Executable == "" || probe.WorkingDirectory == "" || probe.Executor == nil {
+		return fmt.Errorf("%w: probe executable, working directory or executor missing", ErrAIBYOKConfinement)
+	}
+	verifier, ok := probe.Executor.(CopilotCLIProbeBYOKConfinementVerifier)
+	if !ok || verifier == nil {
+		return fmt.Errorf("%w: the executor cannot prove the BYOK spawn confinement", ErrAIBYOKConfinement)
+	}
+	// The compatibility path declares no spawn inputs, so there is nothing to freeze;
+	// the executor's own proof is still required.
+	if probe.AuthMode == "" {
+		return verifier.VerifyBYOKConfinement()
+	}
+	spec, err := probe.frozenLaunchTemplate()
+	if err != nil {
+		return err
+	}
+	// P85 F13: the frozen template's digest is what the platform verdict is bound
+	// to. Every proof below names it, so an answer about one specification can never
+	// be read as an answer about another.
+	specDigest := copilotCLIProbeSpawnSpecDigest(spec)
+	if specDigest == "" {
+		return fmt.Errorf("%w: the frozen launch template carries no digest, so no platform verdict can be bound to it", ErrAIBYOKConfinement)
+	}
+	if bound, ok := probe.Executor.(copilotCLIProbeSpecBoundConfinementVerifier); ok && bound != nil {
+		if err := bound.VerifyBYOKConfinementFor(specDigest); err != nil {
+			return err
+		}
+	} else if err := verifier.VerifyBYOKConfinement(); err != nil {
+		return err
+	}
+	// The platform write verdict is part of the frozen specification, so the spawn
+	// can only proceed when it re-observes the same verdict for the same
+	// specification. Before this, the template and the Sandbox verdict were two
+	// independent facts. P85 F18: the layer is read from the executor, so the
+	// pre-Resolve verdict and the spawn-time verdict are answers of ONE instance.
+	verdict, err := copilotCLIProbePlatformWriteVerdict(context.Background(), copilotCLIProbeSandboxOf(probe.Executor), specDigest)
+	if err != nil {
+		return err
+	}
+	spec.PlatformWriteProof = verdict
+	probe.frozen = &spec
+	return nil
+}
+
+// frozenLaunchTemplate builds the launch template from the probe's DECLARED inputs.
+// It is the PURE constructor half of F13: VerifyBYOKConfinement calls it once and
+// keeps the result, Probe calls it only to re-derive a comparison value (or when no
+// proof ran at all).
+func (probe CopilotCLIProbe) frozenLaunchTemplate() (copilotCLIProbeSpawnSpec, error) {
+	spec, err := copilotCLIProbeLaunchSpec(probe.Executable, probe.WorkingDirectory, probe.AuthMode, probe.Model, probe.MaximumRequests, probe.cliOutputBound())
+	if err != nil {
+		return copilotCLIProbeSpawnSpec{}, fmt.Errorf("%w: %v", ErrAIBYOKConfinement, err)
+	}
+	return spec, nil
+}
+
+// launchSpecFor resolves the ONE specification the spawn instantiates (F13).
+//
+// When the pre-Resolve proof froze a template, that object is returned - the spawn
+// consumes the template the credential gate approved - and the pure constructor is
+// used only to assert that the declared inputs still derive the same template. A
+// disagreement is a refusal, never a silent re-freeze. When no proof ran (the
+// compatibility path) the constructor's output is the specification; because it is
+// a pure function over immutable fields of this probe, and the probe is the same
+// value the caller hands to Probe, that output is identical to what a proof would
+// have produced.
+func (probe CopilotCLIProbe) launchSpecFor(profile AIProviderProfile, maximumRequests int) (*copilotCLIProbeSpawnSpec, error) {
+	built, err := copilotCLIProbeLaunchSpec(probe.Executable, probe.WorkingDirectory, profile.AuthMode, profile.Model, maximumRequests, probe.cliOutputBound())
+	if err != nil {
+		return nil, err
+	}
+	if probe.frozen == nil {
+		return &built, nil
+	}
+	if !copilotCLIProbeSpawnSpecEqual(*probe.frozen, built) {
+		return nil, fmt.Errorf("%w: the spawn no longer matches the launch template proven before the credential was resolved", ErrAIBYOKConfinement)
+	}
+	return probe.frozen, nil
+}
+
+// cliOutputBound reports the output bound the executor will enforce, so the frozen
+// template carries the real bound instead of a guess. An executor that cannot answer
+// is bounded by the package default, which is what Execute would use as well.
+func (probe CopilotCLIProbe) cliOutputBound() int64 {
+	if reader, ok := probe.Executor.(copilotCLIProbeOutputBoundReader); ok && reader != nil {
+		return reader.CopilotCLIProbeOutputBound()
+	}
+	return defaultCopilotCLIOutputBytes
+}
+
 func (probe CopilotCLIProbe) Probe(ctx context.Context, profile AIProviderProfile, credential []byte, channel string, maximumRequests int) (AIProbeResult, error) {
 	if channel != "agent-runner-cli" {
 		return AIProbeResult{}, fmt.Errorf("%w: unsupported channel", ErrInvalidCopilotCLIProbe)
@@ -93,11 +241,31 @@ func (probe CopilotCLIProbe) Probe(ctx context.Context, profile AIProviderProfil
 		return unavailableCopilotCLIProbe("secret_missing", 0, nil, CopilotCLIProbeInvocation{}), nil
 	}
 
+	// P85 F13: the spawn argv comes from the ONE launch-template constructor, so the
+	// argv that is spawned is the argv the pre-Resolve proof validated.
+	//
+	// The DECLARED inputs must agree with what the checker hands the probe: a probe
+	// that froze a template for one model/budget/mode may not spawn another. A
+	// disagreement refuses instead of re-freezing silently.
+	if probe.AuthMode != "" && (probe.AuthMode != profile.AuthMode || probe.Model != profile.Model || probe.MaximumRequests != maximumRequests) {
+		return unavailableCopilotCLIRefusal(copilotCLIProbeBYOKFailure, 0, nil), nil
+	}
+	spec, err := probe.launchSpecFor(profile, maximumRequests)
+	if err != nil {
+		// A template that cannot be built cannot be spawned: the confinement class is
+		// the honest classification (the argv/envelope is the thing that failed).
+		if profile.AuthMode == "secret" {
+			return unavailableCopilotCLIRefusal(copilotCLIProbeBYOKFailure, 0, nil), nil
+		}
+		return unavailableCopilotCLIRefusal("cli_unavailable", 0, nil), nil
+	}
 	invocation := CopilotCLIProbeInvocation{
 		Executable:       probe.Executable,
 		WorkingDirectory: probe.WorkingDirectory,
-		Args:             copilotCLIProbeArgs(profile.Model, probe.WorkingDirectory, maximumRequests),
+		Args:             spec.Args,
 		Environment:      copilotCLIProbeEnvironment(profile, credential),
+		AuthMode:         profile.AuthMode,
+		FrozenSpawn:      spec,
 	}
 	defer clearCopilotCLIProbeEnvironment(invocation.Environment)
 	execution := probe.Executor.Execute(ctx, invocation)
@@ -118,6 +286,14 @@ func (probe CopilotCLIProbe) Probe(ctx context.Context, profile AIProviderProfil
 		// invocation (executable, working directory, argv). That fallback can no longer
 		// reach the final evidence of a refusal, so the value independence holds end to
 		// end and not only for the executor markers.
+		//
+		// T8a (finding F8): an unprovable BYOK confinement is its own closed-set
+		// class. It is reported under that class instead of collapsing into
+		// cli_unavailable, so an operator can tell "the executable is unavailable"
+		// apart from "the credential-bearing child could not be confined".
+		if execution.FailureCode == copilotCLIProbeBYOKFailure {
+			return unavailableCopilotCLIRefusal(copilotCLIProbeBYOKFailure, requestsUsed, copilotCLIProbeRefusalEvidence(execution)), nil
+		}
 		return unavailableCopilotCLIRefusal("cli_unavailable", requestsUsed, copilotCLIProbeRefusalEvidence(execution)), nil
 	case "timed-out":
 		return unknownCopilotCLIProbe("timeout", requestsUsed, copilotCLIProbeEvidence(invocation, execution)), nil
@@ -141,10 +317,20 @@ func (probe CopilotCLIProbe) Probe(ctx context.Context, profile AIProviderProfil
 	return AIProbeResult{Status: "available", RequestsUsed: requestsUsed, Evidence: evidenceHashes}, nil
 }
 
-func copilotCLIProbeArgs(model, workingDirectory string, maximumRequests int) []string {
-	return []string{
+// copilotCLIProbeArgs builds the screened child argv. P85 F13 (`-C` ruling): a
+// credential-bearing (BYOK) spawn emits NO working-directory argument - its child
+// working directory is decided by ProcessSpec.Dir alone, the executor-owned
+// temporary directory - while a host-auth spawn keeps `-C <workingDirectory>`.
+// Leaving `-C` in the secret argv pointed the child at the caller's workspace even
+// after ProcessSpec.Dir had been moved to the temporary directory.
+func copilotCLIProbeArgs(model, workingDirectory string, maximumRequests int, authMode string) []string {
+	args := []string{
 		"-p", copilotCLIProbePrompt,
-		"-C", workingDirectory,
+	}
+	if authMode != "secret" {
+		args = append(args, "-C", workingDirectory)
+	}
+	return append(args,
 		"--name", "proofrail-availability-probe",
 		"--model", model,
 		"--output-format", "json",
@@ -163,7 +349,7 @@ func copilotCLIProbeArgs(model, workingDirectory string, maximumRequests int) []
 		"--deny-url=http://*",
 		"--available-tools=powershell",
 		"--deny-tool=shell",
-	}
+	)
 }
 
 func copilotCLIProbeEnvironment(profile AIProviderProfile, credential []byte) map[string][]byte {
@@ -215,7 +401,7 @@ func unavailableCopilotCLIRefusal(reason string, requestsUsed int, evidenceHashe
 
 func validCopilotCLIProbeFailure(reason string) bool {
 	switch reason {
-	case "credential_rejected", "account_unavailable", "quota_exhausted", "network_unreachable", "tls_or_proxy_failure", "provider_unavailable", "model_unavailable", "policy_blocked", "response_invalid":
+	case "credential_rejected", "account_unavailable", "quota_exhausted", "network_unreachable", "tls_or_proxy_failure", "provider_unavailable", "model_unavailable", "policy_blocked", "response_invalid", copilotCLIProbeBYOKFailure:
 		return true
 	default:
 		return false
