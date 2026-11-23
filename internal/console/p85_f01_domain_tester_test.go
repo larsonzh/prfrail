@@ -21,6 +21,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -28,6 +29,33 @@ import (
 	"github.com/larsonzh/prfrail/internal/chain"
 	"github.com/larsonzh/prfrail/internal/evidence"
 )
+
+// p85F01NamedPath extracts the %q-quoted path the refusal names for one slot label
+// ("parent directory"). The message renders the path in double quotes with
+// backslashes escaped, so strconv.Unquote recovers the exact spelling the bound
+// handle resolved - which on a Windows host whose %TEMP% carries an 8.3 short name
+// (GitHub CI runners) is the LONG form, differing from the spelling this test holds.
+func p85F01NamedPath(message, label string) (string, bool) {
+	marker := "on the " + label + " "
+	idx := strings.Index(message, marker)
+	if idx < 0 {
+		return "", false
+	}
+	rest := message[idx+len(marker):]
+	if !strings.HasPrefix(rest, "\"") {
+		return "", false
+	}
+	rest = rest[1:]
+	end := strings.Index(rest, "\"")
+	if end < 0 {
+		return "", false
+	}
+	path, err := strconv.Unquote("\"" + rest[:end] + "\"")
+	if err != nil {
+		return "", false
+	}
+	return path, true
+}
 
 // p85F01ArtifactAndAnchor returns the two names the reuse branch must observe for
 // the one task attempt the T2 fixtures use.
@@ -144,7 +172,21 @@ func TestP85F01PolicyDomainObservesTheParentIdentity(t *testing.T) {
 		}
 		parent := filepath.Dir(agentRunnerPolicyDirectory(runtime.runRoot))
 		if !strings.Contains(err.Error(), fmt.Sprintf("%q", parent)) {
-			t.Fatalf("the creation branch must observe the parent directory %s, got %v", parent, err)
+			// Windows host with an 8.3-short %TEMP% (GitHub CI runners): the refusal
+			// names the parent by the spelling its bound handle resolves (the long
+			// form), which differs from the spelling this test holds. The contract
+			// "the creation branch names the parent" is then pinned by OBJECT
+			// identity: the quoted path after "parent directory" must address the
+			// same object as `parent`.
+			named, ok := p85F01NamedPath(err.Error(), "parent directory")
+			if !ok {
+				t.Fatalf("the creation branch must observe the parent directory %s, got %v", parent, err)
+			}
+			namedID, namedErr := evidence.FileIDAt(named)
+			parentID, parentErr := evidence.FileIDAt(parent)
+			if namedErr != nil || parentErr != nil || namedID != parentID {
+				t.Fatalf("the creation branch must name the parent OBJECT %s (%s), got %v", parent, parentID, err)
+			}
 		}
 	})
 

@@ -31,8 +31,35 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
+	"strings"
 	"testing"
+	"time"
 )
+
+// p85T3ProbeVolumeRoot probes the volume root with bounded retries: a busy host
+// (GitHub CI runners hold the system root open with conflicting share modes during
+// job startup) answers ERROR_SHARING_VIOLATION, whose canonical message is
+// "The process cannot access the file because it is being used by another process".
+// That is transient contention, not an ACL verdict. The probe's production wrap
+// renders the inner error with %v, so the test matches the canonical message text
+// instead of unwrapping. A host that never yields a decisive probe skips: the
+// positive leg is measured only where the probe is decidable, never by assumption.
+func p85T3ProbeVolumeRoot(t *testing.T, root string, rights []uint32) ([]uint32, []uint32) {
+	t.Helper()
+	for attempt := 0; attempt < 5; attempt++ {
+		granted, denied, err := installSourceMutationAccess(root, true, rights)
+		if err == nil {
+			return granted, denied
+		}
+		if strings.Contains(err.Error(), "being used by another process") {
+			time.Sleep(100 * time.Millisecond)
+			continue
+		}
+		t.Fatalf("the volume-root probe of %q must be decidable: %v", root, err)
+	}
+	t.Skipf("the volume root %q stays contended on this host; the decisive probe cannot run here", root)
+	return nil, nil
+}
 
 // p85T3VolumeRootOf returns this host's system volume root (`<SystemDrive>\`).
 func p85T3VolumeRootOf(t *testing.T) string {
@@ -72,10 +99,7 @@ func TestP85T3VolumeRootExcludesCreationRightsOnlyWhenAnchored(t *testing.T) {
 		t.Skipf("%q is not anchored as a fixed volume root on this host; the exclusion must never be measured by assumption", root)
 	}
 
-	grantedRoot, deniedRoot, err := installSourceMutationAccess(root, true, installSourceVolumeRootMutationRights)
-	if err != nil {
-		t.Fatalf("the volume-root probe of %q must be decidable: %v", root, err)
-	}
+	grantedRoot, deniedRoot := p85T3ProbeVolumeRoot(t, root, installSourceVolumeRootMutationRights)
 	if len(grantedRoot) != 0 || len(deniedRoot) != len(installSourceVolumeRootMutationRights) {
 		// The measured baseline of the ruling is "this token holds no non-creation
 		// right on the root". A host where it does is a different environment, not a
@@ -93,10 +117,7 @@ func TestP85T3VolumeRootExcludesCreationRightsOnlyWhenAnchored(t *testing.T) {
 
 	// Counterfactual: the SAME root under the full table grants a creation right and
 	// would therefore be refused.
-	grantedFull, _, err := installSourceMutationAccess(root, true, installSourceDirectoryMutationRights)
-	if err != nil {
-		t.Fatalf("the full-table probe of %q must be decidable: %v", root, err)
-	}
+	grantedFull, _ := p85T3ProbeVolumeRoot(t, root, installSourceDirectoryMutationRights)
 	if !slices.Equal(grantedFull, []uint32{installSourceFileAppendData}) {
 		t.Skipf("the root grants %s under the full table, not only FILE_ADD_SUBDIRECTORY; the counterfactual leg is not measurable here",
 			installSourceRightsText(grantedFull))
