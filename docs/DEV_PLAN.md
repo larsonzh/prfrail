@@ -188,7 +188,7 @@ T027 前置状态更新（2026-11-22，P86 BOUNDDIR-UNC-EQUIVALENCE）：F1 的�
 
 T027 立项注记（2026-11-22）：**P85 `SECURITY-PROOF-SUBSYSTEM`**（承接 P83 的 F3 / F6 / F8；L 档；协议先行）与 **P86 `BOUNDDIR-UNC-EQUIVALENCE`**（承接 P84 的 N13-UNC + W10；S 档）已立项；**执行顺序 = 先 P86 后 P85**（2026-11-22 用户裁定），两者均待用户点名起跑。本组补录沿用 2026-10-22 先例：字段取自各片自己的验证报告，只记结论与报告路径、不记提交号与 CI 运行号，且不改写 `T027` 的状态字段。
 
-T027 前置状态更新（2026-11-24，P85 SECURITY-PROOF-SUBSYSTEM）：在上一段基础上，F3 / F6 / F8 闭合——T2 冻结策略制品（四槽摘要、run/task/step 绑定）、T3 不可变安装来源（双平台根链 + 叶身份对证）、T8a BYOK 证明载体（不能证明即拒发）全部收口；**F1–F8 自此全闭合**。本片 R = 8、D = 0；⑦ 盲审 + 终审 + 复审 3 + 四读同输入 + 定向小读，额度例外 OB-140/141/142/143/144 留痕。证据：validation/evidence/P85-SECURITY-PROOF-SUBSYSTEM/report.md（报告对 docs 落点与 _EN 镜像属 v70 回填待办）。
+T027 前置状态更新（2026-11-24，P85 SECURITY-PROOF-SUBSYSTEM）：在上一段基础上，F3 / F6 / F8 闭合——T2 冻结策略制品（四槽摘要、run/task/step 绑定）、T3 不可变安装来源（双平台根链 + 叶身份对证）、T8a BYOK 证明载体（不能证明即拒发）全部收口；**F1–F8 自此全闭合**。本片 R = 8、D = 0；⑦ 盲审 + 终审 + 复审 3 + 四读同输入 + 定向小读，额度例外 OB-140/141/142/143/144 留痕。证据：[中文](validation/security-proof-subsystem.md) / [English](validation/security-proof-subsystem_EN.md)。
 
 ### 11 月重构里程碑（T027-B）
 

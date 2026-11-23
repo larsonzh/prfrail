@@ -2293,7 +2293,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 
 ### P85 — `SECURITY-PROOF-SUBSYSTEM`（策略制品 / 不可变安装来源 / BYOK 证明载体 · 闭合 F3 / F6 / F8 · 实现类）· ✅ 闭环
 
-完成记录（2026-11-23）：报告落证据包 `docs/validation/evidence/P85-SECURITY-PROOF-SUBSYSTEM/report.md`（T2 / T3 / T8a 全闭合；⑨ 证据债 F17/F22 凭 CI 45208001981 双腿证据销账）；主提交 `cc7d90f` → 首跑 CI windows 腿 2 例环境性失败 → R=8 测试侧修复 `6480bb1`（生产零改动）→ CI 双腿绿（Gates TOTAL_FAIL=0 × 2、adapters/console/guard 包级 ok 双腿全有、FAIL=0）；R = 8、D = 0；⑦ = 盲审 1 + 终审 1 + 复审 3 + 四读同输入（Carbon/Neon/Sol/Codex）+ 定向小读 1（额度例外均 OB 留痕，OB-140/141/142/143/144）；⑤ 2/2、⑥ 2/4（OB-140 追加 1）；变异 MUT-1..5 红→SHA-256 逐字节复原；双平台全仓 15 包 ok；证据包 29 载荷 + MANIFEST + SHA256SUMS。排片交付物行的「报告对 docs/validation/security-proof-subsystem{,_EN}.md」实际落证据包 report.md（CN；_EN 镜像与 docs 落点属 v70 回填待办，已如实登记）。
+完成记录（2026-11-23）：报告落证据包 `docs/validation/evidence/P85-SECURITY-PROOF-SUBSYSTEM/report.md`（T2 / T3 / T8a 全闭合；⑨ 证据债 F17/F22 凭 CI 45208001981 双腿证据销账）；主提交 `cc7d90f` → 首跑 CI windows 腿 2 例环境性失败 → R=8 测试侧修复 `6480bb1`（生产零改动）→ CI 双腿绿（Gates TOTAL_FAIL=0 × 2、adapters/console/guard 包级 ok 双腿全有、FAIL=0）；R = 8、D = 0；⑦ = 盲审 1 + 终审 1 + 复审 3 + 四读同输入（Carbon/Neon/Sol/Codex）+ 定向小读 1（额度例外均 OB 留痕，OB-140/141/142/143/144）；⑤ 2/2、⑥ 2/4（OB-140 追加 1）；变异 MUT-1..5 红→SHA-256 逐字节复原；双平台全仓 15 包 ok；证据包 29 载荷 + MANIFEST + SHA256SUMS。排片交付物行的报告对已落 `docs/validation/security-proof-subsystem{,_EN}.md`（v70 回填完成，2026-11-24）。
 
 | 字段 | 内容 |
 |---|---|
