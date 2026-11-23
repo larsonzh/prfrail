@@ -2291,12 +2291,14 @@ A6 ② 进度（第 2 批，2026-09-15）：
 完成记录（2026-11-21）：报告对 `docs/validation/bounddir-residual{,_EN}.md`（结论 `PARTIALLY CLOSED`）；T5#4 全闭合（前驱链 / 恒等批 / RunLocked 锁内写 / 三处 run+consumer 守卫；C1–C18 反例）；T4 大部分闭合（走链 / FSCTL 归属 / Ordinal / 根语义 / 中间 reparse 界内证明；W1–W11 反例）；残余 N13-UNC + 证据归因 Low **已由 P86 闭合**（2026-11-22）；R = 3、D = 0；⑦ = 盲审 1 + 终审 1 + 复审 3 + 收窄复审 1（额度例外）；⑤ 2/2、⑥ 2/3；⑨ = Windows 本机 + VM（go1.22.12 全量 15 包 ok + 定向 race 4 包 ok）；CI 读数与首跑红修复记录已按 §11.2 回填至报告 §11.2（首跑红 `44877224368` → 修复 `32bf234` → 双绿 `44926215282`；DR-16 / DR-17）；证据包 `docs/validation/evidence/P84-BOUNDDIR-RESIDUAL/`（14 载荷 + MANIFEST + SHA256SUMS）
 
 
-### P85 — `SECURITY-PROOF-SUBSYSTEM`（策略制品 / 不可变安装来源 / BYOK 证明载体 · 闭合 F3 / F6 / F8 · 实现类）· 🔄 执行中
+### P85 — `SECURITY-PROOF-SUBSYSTEM`（策略制品 / 不可变安装来源 / BYOK 证明载体 · 闭合 F3 / F6 / F8 · 实现类）· ✅ 闭环
+
+完成记录（2026-11-23）：报告落证据包 `docs/validation/evidence/P85-SECURITY-PROOF-SUBSYSTEM/report.md`（T2 / T3 / T8a 全闭合；⑨ 证据债 F17/F22 凭 CI 45208001981 双腿证据销账）；主提交 `cc7d90f` → 首跑 CI windows 腿 2 例环境性失败 → R=8 测试侧修复 `6480bb1`（生产零改动）→ CI 双腿绿（Gates TOTAL_FAIL=0 × 2、adapters/console/guard 包级 ok 双腿全有、FAIL=0）；R = 8、D = 0；⑦ = 盲审 1 + 终审 1 + 复审 3 + 四读同输入（Carbon/Neon/Sol/Codex）+ 定向小读 1（额度例外均 OB 留痕，OB-140/141/142/143/144）；⑤ 2/2、⑥ 2/4（OB-140 追加 1）；变异 MUT-1..5 红→SHA-256 逐字节复原；双平台全仓 15 包 ok；证据包 29 载荷 + MANIFEST + SHA256SUMS。排片交付物行的「报告对 docs/validation/security-proof-subsystem{,_EN}.md」实际落证据包 report.md（CN；_EN 镜像与 docs 落点属 v70 回填待办，已如实登记）。
 
 | 字段 | 内容 |
 |---|---|
 | 标识 | `SECURITY-PROOF-SUBSYSTEM`（承接 P83 报告 §8 的 P84-a / P84-b / P84-c：T2 = AgentRunner 可持久复验的冻结策略制品；T3 = 不可变安装来源；T8a = BYOK 证明载体；来源 = 用户 2026-11-21 排片裁定） |
-| 状态 | 🔄 执行中（起跑 2026-11-22；四要素：裁决人 = 用户；日期 = 2026-11-22；理由 = P83 顺延义务与闭合 F3 / F6 / F8；依据 = 起跑消息 + v69 快照 §四） |
+| 状态 | ✅ 闭环（起跑 2026-11-22；闭片 2026-11-23；四要素：裁决人 = 用户；日期 = 2026-11-23；理由 = CI 双腿绿 + F17/F22 凭双腿证据销账；依据 = 回填授权原文 + v69 快照 §四） |
 | 目标 | 闭合 F3 / F6 / F8：提供受执行者不可写保护、可持久复核的策略证据并绑定 run / task / step；建立可证明不可改写的安装来源；证明 BYOK 子进程不落未脱敏日志，不能证明即拒发 |
 | 依赖 | P83 部分闭合（`4323503`）；P83 报告 §8 顺延清单 P84-a / P84-b / P84-c；P84 可并行（无硬依赖）；P86 无依赖、可并行 |
 | 规模 | L（三类新证据能力；预计触 `CONTRACTS{,_EN}` 与 schema / 夹具，须协议先行） |
@@ -2308,7 +2310,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 分级 | `[SLICE]` |
 | 探针额度 | 0（默认；若需真实 BYOK 调用，按 §7.6 停下申请预授权） |
 | 执行自由度清单落盘路径 | `docs/validation/evidence/P85-SECURITY-PROOF-SUBSYSTEM/freedom-list.md` |
-| R/D 基线 | R = 0、D = 0（起跑时登记，§13.1.1；不继承 P83 的 R = 2 / D = 0） |
+| R/D 基线 | R = 8、D = 0（起跑时登记 R = 0 / D = 0，§13.1.1；不继承 P83 的 R = 2 / D = 0；R = 8 = ⑦ 复审后六轮修复，OB-140/142/144 留痕） |
 | 临时件落点声明 | 本片临时目录 = `tmp/P85-SECURITY-PROOF-SUBSYSTEM/`（⑧c 前只增不删；CI 捕获件同样落该目录，不落 `tmp/` 根） |
 | 额度口径披露 | ⑦ 深度档 = `GPT-6.2 Sol (copilot)`；额度 = 1 终审 + 3 复审，盲审必抽 1 次（另计 +1）；**系用户 2026-11-21 排片裁定、不得作为先例**；起跑须四要素留痕；协议先行：先由 ① 判定契约影响再动代码 |
 

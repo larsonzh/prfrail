@@ -28,6 +28,8 @@
 刀	.github/agents/sol-orchestrator.agent.md	"不直接以 Sol 计价操刀" (handle it personally)
 月	.github/agents/sol-orchestrator.agent.md	"月度目标: $50" (monthly goal)
 疾	docs/validation/sw3-role-set-versioning.md	"避免状态与范围不一致的旧疾复发" (old ailment)
+忙	docs/DELIVERY_DIRECTIVE.md	"在忙碌 runner 上遇共享争用" (busy CI runner)
+碌	docs/DELIVERY_DIRECTIVE.md	"在忙碌 runner 上遇共享争用" (busy CI runner)
 鲁	docs/validation/sw3-role-set-versioning.md	"鲁棒性" (robustness)
 棒	docs/validation/sw3-role-set-versioning.md	"鲁棒性" (robustness)
 # 2026-09-21 (DR-3 recurrence registration): new character in a ledger row.

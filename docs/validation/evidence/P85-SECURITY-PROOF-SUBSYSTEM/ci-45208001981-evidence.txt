@@ -1,0 +1,32 @@
+RUN=45208001981 (R=8 fix commit 6480bb1)
+LEGS:
+Go windows-latest	Set up job	2026-11-23T15:41:22.0212540Z Complete job name: Go windows-latest
+Go windows-latest	Complete job	锘?026-11-23T15:46:12.7293890Z Cleaning up orphan processes
+Go ubuntu-latest	Set up job	2026-11-23T15:41:21.8852297Z Complete job name: Go ubuntu-latest
+Go ubuntu-latest	Complete job	锘?026-11-23T15:44:41.0964995Z Cleaning up orphan processes
+GATES STEP:
+Go windows-latest	Gates	2026-11-23T15:43:06.8997765Z ^[[36;1mnode tools/gates/gate.js --selftest && node tools/gates/gate.js --all --scope=ci^[[0m
+Go windows-latest	Gates	2026-11-23T15:43:06.9071491Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+Go windows-latest	Gates	2026-11-23T15:43:06.9071845Z env:
+Go windows-latest	Gates	2026-11-23T15:43:06.9072021Z   GO_VERSION: 1.22.12
+PACKAGE OK LINES:
+Go windows-latest	Test	2026-11-23T15:43:06.0392468Z ok  	github.com/larsonzh/prfrail/internal/adapters	47.714s
+Go windows-latest	Test	2026-11-23T15:43:06.5386096Z ok  	github.com/larsonzh/prfrail/internal/console	45.405s
+Go windows-latest	Test	2026-11-23T15:43:06.5388171Z ok  	github.com/larsonzh/prfrail/internal/guard	9.093s
+Go ubuntu-latest	Test	2026-11-23T15:42:03.7320620Z ok  	github.com/larsonzh/prfrail/internal/adapters	14.909s
+Go ubuntu-latest	Test	2026-11-23T15:42:03.7322803Z ok  	github.com/larsonzh/prfrail/internal/console	7.476s
+Go ubuntu-latest	Test	2026-11-23T15:42:03.7324792Z ok  	github.com/larsonzh/prfrail/internal/guard	1.336s
+Go ubuntu-latest	Race	2026-11-23T15:43:52.0337559Z ok  	github.com/larsonzh/prfrail/internal/adapters	92.731s
+Go ubuntu-latest	Race	2026-11-23T15:43:52.0338993Z ok  	github.com/larsonzh/prfrail/internal/console	27.785s
+Go ubuntu-latest	Race	2026-11-23T15:43:52.0340156Z ok  	github.com/larsonzh/prfrail/internal/guard	3.400s
+=== gates TOTAL_FAIL lines ===
+Go windows-latest	Gates	2026-11-23T15:46:10.0777156Z TOTAL_FAIL=0
+Go ubuntu-latest	Gates	2026-11-23T15:44:40.6863885Z TOTAL_FAIL=0
+=== selftest ===
+Go windows-latest	Gates	锘?026-11-23T15:43:06.8996964Z ##[group]Run node tools/gates/gate.js --selftest && node tools/gates/gate.js --all --scope=ci
+Go windows-latest	Gates	2026-11-23T15:43:06.8997765Z ^[[36;1mnode tools/gates/gate.js --selftest && node tools/gates/gate.js --all --scope=ci^[[0m
+Go windows-latest	Gates	2026-11-23T15:44:18.8147644Z GATES SELFTEST (in-process; fixtures under tools/gates/testdata/)
+Go windows-latest	Gates	2026-11-23T15:44:18.8558734Z ok   T51 the selftest ctx and lib/ctx agree on changedMarkdown (no local re-derivation drift)
+=== the two previously-failing tests ===
+=== FAIL count in Test steps ===
+0

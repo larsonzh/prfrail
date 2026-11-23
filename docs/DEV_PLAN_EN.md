@@ -189,6 +189,8 @@ T027 prerequisite status update (2026-11-22, P86 BOUNDDIR-UNC-EQUIVALENCE): the 
 
 T027 slice registration note (2026-11-22): **P85 `SECURITY-PROOF-SUBSYSTEM`** (carries F3 / F6 / F8 from P83; size L; protocol first) and **P86 `BOUNDDIR-UNC-EQUIVALENCE`** (carries N13-UNC plus W10 from P84; size S) are established; **execution order = P86 before P85** (user ruling of 2026-11-22), and both await a user-named start. This backfill follows the 2026-10-22 precedent: every field comes from the slice's own validation report, only conclusions and report paths are recorded (no commit ids or CI run numbers), and the `T027` status field is not rewritten.
 
+T027 prerequisite status update (2026-11-24, P85 SECURITY-PROOF-SUBSYSTEM): on top of the previous paragraph, F3 / F6 / F8 are closed - T2 the frozen policy artifact (four-slot digest, run/task/step binding), T3 the immutable install source (dual-platform root chain plus leaf identity re-proof) and T8a the BYOK proof carrier (refuse when it cannot be proven) are all wound up; **F1-F8 are thereby all closed**. This slice records R = 8, D = 0; (7) = one blind review + one final review + three re-reviews + the four same-input reads + one targeted small read, with every budget exception registered via OB-140/141/142/143/144. Evidence: validation/evidence/P85-SECURITY-PROOF-SUBSYSTEM/report.md (the report-pair docs location and the _EN mirror are a v70 backfill item).
+
 ### November Refactor Milestone (T027-B)
 
 - P37 decision baseline: C1–C7 defect verdicts and the remediation baseline (the P38 working drawing gives the file/function-level test matrix; reports `docs/validation/t027b-breakthrough{,_EN}.md`, `docs/validation/t027b-tactical-blueprint{,_EN}.md`)

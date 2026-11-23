@@ -37,3 +37,4 @@
 | `mutation-r7-executed.txt` | MUT-4A/4B + MUT-5 红→SHA-256 逐字节复原→绿证据（⑨） |
 | `mutation-r6.txt` | 变异记录（含 R7 补记 MUT-4/MUT-5 执行态） |
 | `old-wording-grep.txt` | ⑧a 自查③ 旧口径 grep 命令与结果 |
+| `ci-45208001981-evidence.txt` | R=8 复跑 CI 双腿证据（Gates TOTAL_FAIL=0×2 + adapters/console/guard 包级 ok 双腿全有 + FAIL=0；F17/F22 销账凭据） |
