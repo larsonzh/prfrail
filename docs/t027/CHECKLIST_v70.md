@@ -16,6 +16,7 @@
 - ⑥ §六 待裁定：下一裁定项 = **v70 提交授权**（用户 2026-11-24 修改裁定；快照改毕暂存后停点报用户）→ 其后 **P87 起跑点名**。
 - ⑦ 附段 A 换代：「义务传递」改为 **无新传递（P83 五项残余全部履行完毕）**；§十 / §十一 同步换代。
 - ⑧ §四 下一项改 P87（用户 2026-11-24 修改裁定，同日二次修正）：S2 前重评保留层 1 为「再后」（不入 §五 观察）；§十 / §十一 再换代（下一步 = P87；S2 前重评 = T027 主线下一站，待用户排期）。
+- ⑨ v70 一致性修正（用户 2026-11-24 第三笔裁定）：§二 / §十一 改「四提交与 CI」并补 `ef1e1f2` + 观察 run；§六 下一裁定项 = P87 起跑点名；如实登记 v70 快照分两次提交（`17d0a3f` 初版 + `a097883` 定版，+24/−24），初版被定版替代，系回填裁定与条件授权交替执行所致，不作 D。
 
 ---
 
@@ -53,7 +54,7 @@
 - **审查链**：① `deep-reasoner` + `DeepSeek V4 Pro Max`（方案书 Rev 1–Rev 4）→ ② / ③ `DeepSeek V4.1 Flash` → ⑤ `DeepSeek V4 Pro`（r1 FINDINGS → r2 PASS）→ ⑥ `MAI Code 2 Flash`（r3 / r4；OB-140 追加 1 轮）→ ⑦ 盲审 1（另计）+ 终审 1（`GPT-6.2 Sol` Max）+ 复审 3 → **四读同输入**（`Gemini 4 Carbon` PASS WITH FIXES / `Gemini 4 Neon` FINDINGS / `GPT-6.2 Sol` FINDINGS / `GPT-5.3-Codex` 盲读 PASS；按判级分歧记录、不作能力排序，P87 数据点）→ R=7 合并修复批（OB-142）→ 定向小读 `Gemini 4 Carbon` High（OB-143，`PASS WITH FIXES`，作 ⑧c 输入）→ R=8 CI 环境测试修复（OB-144）→ ⑧a / ⑨ / ⑧b / ⑧c → ⑩。
 - **计量**：**R = 8**（⑦ 复审后六轮修复）；**D = 0**；探针 0。
 - **缺陷登记**：无新增 DR（首跑 CI 红属环境特性，见下）。
-- **三提交与 CI**：主提交 `cc7d90f` → run `45201921016` **windows 腿 2 例环境性红**（卷根逐权探针遇共享争用、`%TEMP%` 8.3 短名与句柄长名拼写不匹配；本机 / Ubuntu VM 均绿）→ R=8 测试侧修复 `6480bb1`（生产零改动）→ run `45208001981` **双腿 success**（Gates `TOTAL_FAIL=0` × 2、`adapters`/`console`/`guard` 包级 ok 双腿全有、Test 步 FAIL=0）→ 回填提交 `18b2613`。
+- **四提交与 CI**：主提交 `cc7d90f` → run `45201921016` **windows 腿 2 例环境性红**（卷根逐权探针遇共享争用、`%TEMP%` 8.3 短名与句柄长名拼写不匹配；本机 / Ubuntu VM 均绿）→ R=8 测试侧修复 `6480bb1`（生产零改动）→ run `45208001981` **双腿 success**（Gates `TOTAL_FAIL=0` × 2、`adapters`/`console`/`guard` 包级 ok 双腿全有、Test 步 FAIL=0）→ 回填提交 `18b2613` → 报告对回填 `ef1e1f2`（docs/validation 落点）→ 观察 run `45243161685`（双腿 success）。
 - **验证**：本机 Windows（非提升）+ Ubuntu VM（非 root）双平台全仓 15 包 ok；三变体 `GOOS=windows/linux/darwin` build/vet 全绿；三视图 gopls unused 清零；变异 MUT-1..5 红 → SHA-256 逐字节复原；④ 三作用域 `TOTAL_FAIL=0` + `SELFTEST 740/740`。
 - **文档**：报告落证据包 `docs/validation/evidence/P85-SECURITY-PROOF-SUBSYSTEM/report.md`（含 §8 S1 边界独立登记段与自由度清单回写）；**报告对已落 `docs/validation/security-proof-subsystem{,_EN}.md`（v70 回填完成，2026-11-24）**；`SECURITY{,_EN}.md:5` 改「F3 / F6 / F8 已闭合（P85）」；`DEV_PLAN{,_EN}.md` 补录 P85 段；台账 P85 段闭环 + P83/P84 完成记录链闭合；P87 四读原始数据归档 `P87-four-read-data/`（15 件）；证据包 29 载荷 + MANIFEST + SHA256SUMS。
 - **L4 修后审查（D-2）**：审查环后注释措辞修改附 diff 摘录 + 顾问独立实质核验 `ADVISORY VERIFICATION: PASS` + 用户终审，⑩ 已登记。
@@ -177,7 +178,7 @@
 ## §六 待用户裁定
 
 - **本表当前为空**（P85 回填与 v70 生成授权已于 2026-11-24 作出；v70 修改裁定同日作出）。
-- **下一裁定项（预判）**：**v70 提交授权**（快照已按修改裁定改毕并暂存；建议信息 `docs: snapshot v70 after P85 closure` + push origin，禁 gitee）→ 其后 **P87 起跑点名**（原始数据已齐；起跑消息四要素留痕）。
+- **下一裁定项（预判）**：**P87 起跑点名**（`DIRECTIVE-REVIEW-MODEL-POLICY`；须用户点名；起跑消息四要素留痕；原始数据已齐）。
 
 ---
 
@@ -199,4 +200,4 @@
 
 ## §十一 当前状态一句话
 
-P85 **闭环**（三提交 `cc7d90f` / `6480bb1` / `18b2613` 已推 origin；首跑 `45201921016` windows 腿 2 例环境性红、R=8 测试侧修复后 `45208001981` 双腿 success（Gates `TOTAL_FAIL=0` × 2 + 包级 ok 双腿全有）；R = 8、D = 0；T2 / T3 / T8a 闭合、F1–F8 全闭合）；下一步 = **P87 治理片 `DIRECTIVE-REVIEW-MODEL-POLICY`**（须用户点名）；S2 前重评（S-G1 / S-G8）= T027 主线下一站，待用户排期（§四 再后）。
+P85 **闭环**（四提交 `cc7d90f` / `6480bb1` / `18b2613` / `ef1e1f2` 已推 origin；首跑 `45201921016` windows 腿 2 例环境性红、R=8 测试侧修复后 `45208001981` 双腿 success（Gates `TOTAL_FAIL=0` × 2 + 包级 ok 双腿全有）；R = 8、D = 0；T2 / T3 / T8a 闭合、F1–F8 全闭合）；下一步 = **P87 治理片 `DIRECTIVE-REVIEW-MODEL-POLICY`**（须用户点名）；S2 前重评（S-G1 / S-G8）= T027 主线下一站，待用户排期（§四 再后）。
