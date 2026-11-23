@@ -1,6 +1,6 @@
 ﻿# Task execution checklist (cross-session snapshot v70 · after P85 closure · next item = P87)
 
-Generated: 2026-11-24. HEAD = `18b2613`; directive = v1.71; P85's two CI runs: `45201921016` (first run windows leg red, 2 environment-only cases), `45208001981` (R=8 fix run, both legs success).
+Generated: 2026-11-24. HEAD = `ef1e1f2`; directive = v1.71; P85's two CI runs: `45201921016` (first run windows leg red, 2 environment-only cases), `45208001981` (R=8 fix run, both legs success).
 
 **Supersedes**: this version supersedes v69 (`docs/t027/CHECKLIST_v69{,_EN}.md` is frozen and not back-edited).
 
@@ -8,11 +8,11 @@ Generated: 2026-11-24. HEAD = `18b2613`; directive = v1.71; P85's two CI runs: `
 
 **Revisions in this version (relative to v69)**:
 
-- (1) Section (1) anchors refresh: HEAD `18b2613`; directive **v1.71** (unchanged); SELFTEST **740/740**; the rolling window drops v67 and adds v70 (v68 / v69 / v70), and v69's line count is re-checked by this version.
+- (1) Section (1) anchors refresh: HEAD `ef1e1f2`; directive **v1.71** (unchanged); SELFTEST **740/740**; the rolling window drops v67 and adds v70 (v68 / v69 / v70), and v69's line count is re-checked by this version.
 - (2) Section (2) becomes the P85 facts pack (`CLOSED`, three commits and two CI runs, R = 8, D = 0, OB-140/141/142/143/144).
 - (3) Section (3) appends the P85 row (keeps v69's twenty-two rows = twenty-three rows in total).
 - (4) Section (4) queue update: P85 leaves the queue; next item = **P87 `DIRECTIVE-REVIEW-MODEL-POLICY` (governance slice; the user must name it)**; the pre-S2 re-evaluation (S-G1 / S-G8) stays in layer 1 as "after that" (the next T027 main-line stop, awaiting user scheduling); the post-S2 re-evaluation items (S-G5 step two + S-G7) follow; layer 2 appends P85 ✅ as done; the layer 3 `GATES-PERF-ASSESS` dependency row updates (formerly "after P85" → now "no prerequisite").
-- (5) Section (5) observations: DR max = **18** (unchanged); mechanical reading OB max = **144**; the P87 four-read same-input data record gains the comparison-table filename `07-three-read-comparison.md`; the P85 report-pair docs location / _EN mirror v70 item stays.
+- (5) Section (5) observations: DR max = **18** (unchanged); mechanical reading OB max = **144**; the P87 four-read same-input data record gains the comparison-table filename `07-three-read-comparison.md`; the P85 report-pair docs location / _EN mirror v70 item flips to `resolved` (the report pair has landed under docs/validation).
 - (6) Section (6) pending rulings: next ruling item = **the v70 commit authorization** (user modification ruling of 2026-11-24; stop and report after the revised snapshot is staged) → then **the P87 start naming**.
 - (7) Attachment section A refresh: obligation hand-off becomes **no new hand-off (all five P83 residuals are now fulfilled)**; sections (10) / (11) refresh accordingly.
 - (8) Section (4) next item becomes P87 (user modification ruling of 2026-11-24, second correction on the same day): the pre-S2 re-evaluation stays in layer 1 as "after that" (not in the section (5) observations); sections (10) / (11) refresh again (next = P87; the pre-S2 re-evaluation = the next T027 main-line stop, awaiting user scheduling).
@@ -25,15 +25,15 @@ Generated: 2026-11-24. HEAD = `18b2613`; directive = v1.71; P85's two CI runs: `
 
 | Item | Value | Check command |
 |---|---|---|
-| HEAD | `18b2613` | `git rev-parse --short HEAD` |
-| origin/main | `18b2613` | `git rev-parse --short origin/main` |
+| HEAD | `ef1e1f2` | `git rev-parse --short HEAD` |
+| origin/main | `ef1e1f2` | `git rev-parse --short origin/main` |
 | Directive version | **v1.71** | header of `docs/DELIVERY_DIRECTIVE.md` |
 | SELFTEST | **740/740** | `node tools/gates/gate.js --selftest` |
 | Three scopes | **all TOTAL_FAIL=0** | `gate.js --all --scope=index` / `tree` / `ci` |
 | v68 total line count | **218** (LF-counted, CN / EN symmetric) | LF-count `docs/t027/CHECKLIST_v68{,_EN}.md` |
 | v69 total line count | **210** (LF-counted, CN / EN symmetric; **re-checked by this version**) | LF-count `docs/t027/CHECKLIST_v69{,_EN}.md` |
 
-> This snapshot's HEAD = `18b2613` is the anchor at generation time after the P85 backfill commit; after v70 itself lands, HEAD moves forward and the live reading from `git rev-parse --short HEAD` wins. v70's own line count is re-checked by v71.
+> This snapshot's HEAD = `ef1e1f2` is the anchor at generation time after the P85 report-pair backfill commit (v70 backfill); after v70 itself lands, HEAD moves forward and the live reading from `git rev-parse --short HEAD` wins. v70's own line count is re-checked by v71.
 
 > Mechanical readings: ADR max = **47**; OB max = **144**; DR max = **18**; pilot deferral max = the 25th instance.
 
@@ -55,13 +55,13 @@ Generated: 2026-11-24. HEAD = `18b2613`; directive = v1.71; P85's two CI runs: `
 - **Defect records**: no new DR (the first-run CI red is an environment trait, see below).
 - **Three commits and CI**: main commit `cc7d90f` → run `45201921016` **windows leg red on 2 environment-only cases** (the volume-root per-right probe hit a sharing conflict, and the `%TEMP%` 8.3 short name differed from the handle-resolved long spelling; green locally and on the Ubuntu VM) → R=8 test-side fix `6480bb1` (production code unchanged) → run `45208001981` **both legs success** (Gates `TOTAL_FAIL=0` x 2, package-level ok for `adapters`/`console`/`guard` on both legs, Test step FAIL=0) → backfill commit `18b2613`.
 - **Verification**: local Windows (non-elevated) + Ubuntu VM (non-root) full repo 15 packages ok; three-variant `GOOS=windows/linux/darwin` build/vet green; three-view gopls unused zero; mutations MUT-1..5 red → byte-identical SHA-256 restore; (4) three scopes `TOTAL_FAIL=0` + `SELFTEST 740/740`.
-- **Docs**: the report lives in the evidence pack `docs/validation/evidence/P85-SECURITY-PROOF-SUBSYSTEM/report.md` (including the section 8 independent S1-boundary registration and the freedom-list write-back; **the report-pair docs location and the _EN mirror are a v70 backfill item**); `SECURITY{,_EN}.md:5` now reads "F3 / F6 / F8 closed by P85"; `DEV_PLAN{,_EN}.md` backfills the P85 section; the ledger P85 section is closed and the P83/P84 completion-record chain is closed; the P87 four-read raw data is archived under `P87-four-read-data/` (15 files); evidence pack = 29 payloads + MANIFEST + SHA256SUMS.
+- **Docs**: the report lives in the evidence pack `docs/validation/evidence/P85-SECURITY-PROOF-SUBSYSTEM/report.md` (including the section 8 independent S1-boundary registration and the freedom-list write-back); **the report pair has landed at `docs/validation/security-proof-subsystem{,_EN}.md` (v70 backfill complete, 2026-11-24)**; `SECURITY{,_EN}.md:5` now reads "F3 / F6 / F8 closed by P85"; `DEV_PLAN{,_EN}.md` backfills the P85 section; the ledger P85 section is closed and the P83/P84 completion-record chain is closed; the P87 four-read raw data is archived under `P87-four-read-data/` (15 files); evidence pack = 29 payloads + MANIFEST + SHA256SUMS.
 - **L4 post-review check (D-2)**: the post-review comment-wording changes carry a diff excerpt + independent substantive advisory verification `ADVISORY VERIFICATION: PASS` + user final review, registered at (10).
 
 ### Attachment A: obligation hand-off (this version: **no new hand-off**)
 
 - **Historical hand-off** (first traced to P75 O-7): the `s1-exit.md:52` core task-chain in-line wording mismatch was fulfilled by P76 change 1 + S-G2 correction (`0f80c1e`).
-- **This version's hand-off**: **no new hand-off** - all five P83 residuals are fulfilled: F1 closed by P84 + P86; F2 / F5 / F7 + the T9 narrowing closed by P83; **F3 / F6 / F8 closed by P85**, so F1-F8 are all closed. What remains are record-state items (the P85 report-pair docs location and _EN mirror, and P87 scheduling), which do not constitute a security obligation hand-off.
+- **This version's hand-off**: **no new hand-off** - all five P83 residuals are fulfilled: F1 closed by P84 + P86; F2 / F5 / F7 + the T9 narrowing closed by P83; **F3 / F6 / F8 closed by P85**, so F1-F8 are all closed. What remains are record-state items (P87 scheduling), which do not constitute a security obligation hand-off.
 - **Convention note**: adopted since v59; the landing slice entry must carry the admission-condition facing.
 
 ### Attachment B: AT-23 phase 2 status (unchanged)
@@ -101,7 +101,7 @@ Generated: 2026-11-24. HEAD = `18b2613`; directive = v1.71; P85's two CI runs: `
 | v1.71 | P83 SECURITY-FINDINGS-REMEDIATION | `ec532a4` + `c820743` + `4323503` | **Partially closed** (F2 / F5 / F7 + the T9 narrowing closed; F1 / F4 partially implemented; F3 / F6 / F8 deferred to P84 / P85; R = 2, D = 0; DR-15; first run red `44795140136` → `44801690679` dual green → observation `44805856028`) |
 | v1.71 | P84 BOUNDDIR-RESIDUAL | `d597f1e` + `32bf234` + `509b01b` | **Partially closed** (T5#4 fully closed, T4 mostly closed; residuals N13-UNC + the evidence-attribution Low **closed by P86**; R = 3, D = 0; DR-16 / DR-17; first run red `44877224368` → fix `44926215282` dual green → observation `44928363670`) |
 | v1.71 | P86 BOUNDDIR-UNC-EQUIVALENCE | `f1ae821` + `a5ef122` + `1eb63d9` + `565fc9f` | **Closed** (N13-UNC + W10 closed, F1 fully closed; R = 0, D = 0; DR-18; first run `44962802936` dual green → guard round red `44965434402` → fix round `44967047189` dual green → observation `44969239294`) |
-| v1.71 | P85 SECURITY-PROOF-SUBSYSTEM | `cc7d90f` + `6480bb1` + `18b2613` | **Closed** (T2 / T3 / T8a closed, F3 / F6 / F8 wound up, **F1-F8 all closed**; R = 8, D = 0; OB-140/141/142/143/144; first run `45201921016` windows leg red on 2 environment-only cases → R=8 fix `6480bb1` → `45208001981` both legs success) |
+| v1.71 | P85 SECURITY-PROOF-SUBSYSTEM | `cc7d90f` + `6480bb1` + `18b2613` + `ef1e1f2` | **Closed** (T2 / T3 / T8a closed, F3 / F6 / F8 wound up, **F1-F8 all closed**; R = 8, D = 0; OB-140/141/142/143/144; first run `45201921016` windows leg red on 2 environment-only cases → R=8 fix `6480bb1` → `45208001981` both legs success) |
 
 > **Section 3 D caliber** (same as v61): "D = n" in this table is the shorthand for the temp-file discipline violation count (section 5.1); P85 is all **D = 0**. **The D count and the section 9.2 R count are two independent sequences.**
 
@@ -167,10 +167,10 @@ Generated: 2026-11-24. HEAD = `18b2613`; directive = v1.71; P85's two CI runs: `
 - Pending work (1): `OB-69`. Non-final total **23** (13 + 9 + 1), consistent with this version's live re-check.
 - **DR records**: DR max = **18** (unchanged after v69's DR-18; P85 adds no DR - the first-run CI red is an environment trait registered under OB-144, not a DR).
 - **P87 four-read same-input data (archived by P85)**: the raw data of the governance slice `DIRECTIVE-REVIEW-MODEL-POLICY` now lives at `docs/validation/evidence/P85-SECURITY-PROOF-SUBSYSTEM/P87-four-read-data/` (comparison table `07-three-read-comparison.md` + four model reports + the r3 original + the R6-batch input package, 15 files); the grading-divergence rows are listed separately and **no model capability ranking** is written; now the section (4) next item (the user must name it).
-- **P85 report-pair docs location and _EN mirror (v70 item)**: the scheduled deliverable row "report pair docs/validation/security-proof-subsystem{,_EN}.md" actually landed as the evidence-pack `report.md` (CN); the _EN mirror and the docs location are a v70 backfill item, truthfully registered in both the ledger and the DEV_PLAN section, and the evidence links will be updated together with the v70 backfill.
+- **P85 report-pair docs location and _EN mirror (resolved)**: the report pair has landed at `docs/validation/security-proof-subsystem{,_EN}.md` (v70 backfill, 2026-11-24; CN from the evidence-pack report.md, Appendix B sixstage / Appendix C artifacts fences; EN a strict mirror of 235 lines with all six shapes aligned); the DEV_PLAN evidence links now point at the docs dual links (中文/English).
 - **(7) budget caliber (P85 observation)**: 1 final + 3 re-reviews + 1 blind review are the F-01/F-03 user rulings; the four reads (Carbon / Neon / Sol read 5 / Codex) and the targeted small read (Carbon High) are budget exceptions registered via OB-141/143 and the trial authorization, none a precedent.
 - Mechanical readings: section 12.4 max OB = **144**; ADR max = **47**; DR max = **18**; pilot deferral max = the 25th instance.
-- **Removed this version**: none. **Flipped `resolved` this version**: none.
+- **Removed this version**: none. **Flipped `resolved` this version**: the "P85 report-pair docs location and _EN mirror" item (v70 backfill complete).
 
 ---
 
@@ -193,7 +193,7 @@ Same structure as v60: section 7 start and step-0 general rules → directive se
 >
 > 【Paste this checklist in full, v70】
 >
-> 【Supplementary docs】`REMAINING_SLICES{,_EN}.md` (P85 closed; P87 is now the next item, awaiting a start naming), `DELIVERY_DIRECTIVE.md` (**v1.71**), `docs/validation/evidence/P85-SECURITY-PROOF-SUBSYSTEM/report.md` (P85 report, evidence pack), `bounddir-unc-equivalence{,_EN}.md` (P86 report), `SECURITY{,_EN}.md` (line 5 "F3 / F6 / F8 closed by P85"), `ADR_REGISTER{,_EN}.md` (ADR-047 = `COMPENSATED`), `DOCUMENTATION_PLAN{,_EN}.md` (hand-off entry pointer now points at v70), `CHECKLIST_v69{,_EN}.md` (frozen, superseded by v70).
+> 【Supplementary docs】`REMAINING_SLICES{,_EN}.md` (P85 closed; P87 is now the next item, awaiting a start naming), `DELIVERY_DIRECTIVE.md` (**v1.71**), `security-proof-subsystem{,_EN}.md` (P85 report pair), `docs/validation/evidence/P85-SECURITY-PROOF-SUBSYSTEM/report.md` (P85 report, evidence pack), `bounddir-unc-equivalence{,_EN}.md` (P86 report), `SECURITY{,_EN}.md` (line 5 "F3 / F6 / F8 closed by P85"), `ADR_REGISTER{,_EN}.md` (ADR-047 = `COMPENSATED`), `DOCUMENTATION_PLAN{,_EN}.md` (hand-off entry pointer now points at v70), `CHECKLIST_v69{,_EN}.md` (frozen, superseded by v70).
 >
 > Current: P85 closed (T2 / T3 / T8a closed, F1-F8 all closed); next = the P87 governance slice (the user must name it, the start message records the four elements); pre-S2 re-evaluation (S-G1 / S-G8) = the next T027 main-line stop, awaiting user scheduling (section (4) "after that").
 

@@ -1,6 +1,6 @@
 ﻿# 任务执行清单（跨会话快照 v70 · P85 闭环后 · 下一项 = P87）
 
-生成时点：2026-11-24。HEAD = `18b2613`；准则 = v1.71；P85 的两个 CI run：`45201921016`（首跑 windows 腿红，环境性 2 例）、`45208001981`（R=8 修复轮双腿 success）。
+生成时点：2026-11-24。HEAD = `ef1e1f2`；准则 = v1.71；P85 的两个 CI run：`45201921016`（首跑 windows 腿红，环境性 2 例）、`45208001981`（R=8 修复轮双腿 success）。
 
 **替代关系**：本版替代 v69（`docs/t027/CHECKLIST_v69{,_EN}.md` 冻结，不追改）。
 
@@ -8,11 +8,11 @@
 
 **本版修订（相对 v69）**：
 
-- ① §一 锚点换代：HEAD `18b2613`；准则 **v1.71**（不变）；SELFTEST **740/740**；滚动窗口挤出 v67、纳入 v70（v68 / v69 / v70），v69 的行数由本版复核。
+- ① §一 锚点换代：HEAD `ef1e1f2`；准则 **v1.71**（不变）；SELFTEST **740/740**；滚动窗口挤出 v67、纳入 v70（v68 / v69 / v70），v69 的行数由本版复核。
 - ② §二 换成 P85 事实包（`CLOSED`、三提交与两个 CI run、R = 8、D = 0、OB-140/141/142/143/144）。
 - ③ §三 追加 P85 一行（沿用 v69 的二十二行 = 共二十三行）。
 - ④ §四 队列更新：P85 出队；下一项 = **P87 `DIRECTIVE-REVIEW-MODEL-POLICY`（治理片；须用户点名）**；S2 前重评（S-G1 / S-G8）保留层 1 为「再后」（T027 主线下一站，待用户排期）；S2 后重评项（S-G5 第二步 + S-G7）随之；层 2 追加 P85 ✅；层 3 的 `GATES-PERF-ASSESS` 依赖行更新（原「排在 P85 之后」→「无前置」）。
-- ⑤ §五 观察项：DR max = **18**（不变）；机械读数 OB max = **144**；「P87 四读同输入数据」指针补对照表 `07-three-read-comparison.md` 文件名；「P85 报告对 docs 落点与 _EN 镜像 v70 待办」记录不变。
+- ⑤ §五 观察项：DR max = **18**（不变）；机械读数 OB max = **144**；「P87 四读同输入数据」指针补对照表 `07-three-read-comparison.md` 文件名；「P85 报告对 docs 落点与 _EN 镜像 v70 待办」翻 `已处置`（报告对已落 docs/validation）。
 - ⑥ §六 待裁定：下一裁定项 = **v70 提交授权**（用户 2026-11-24 修改裁定；快照改毕暂存后停点报用户）→ 其后 **P87 起跑点名**。
 - ⑦ 附段 A 换代：「义务传递」改为 **无新传递（P83 五项残余全部履行完毕）**；§十 / §十一 同步换代。
 - ⑧ §四 下一项改 P87（用户 2026-11-24 修改裁定，同日二次修正）：S2 前重评保留层 1 为「再后」（不入 §五 观察）；§十 / §十一 再换代（下一步 = P87；S2 前重评 = T027 主线下一站，待用户排期）。
@@ -25,15 +25,15 @@
 
 | 项 | 值 | 核对命令 |
 |---|---|---|
-| HEAD | `18b2613` | `git rev-parse --short HEAD` |
-| origin/main | `18b2613` | `git rev-parse --short origin/main` |
+| HEAD | `ef1e1f2` | `git rev-parse --short HEAD` |
+| origin/main | `ef1e1f2` | `git rev-parse --short origin/main` |
 | 准则版本 | **v1.71** | `docs/DELIVERY_DIRECTIVE.md` 头部 |
 | SELFTEST | **740/740** | `node tools/gates/gate.js --selftest` |
 | 三作用域 | **全 TOTAL_FAIL=0** | `gate.js --all --scope=index` / `tree` / `ci` |
 | v68 全文件行数 | **218**（按 LF 计数，CN / EN 对称） | `docs/t027/CHECKLIST_v68{,_EN}.md` 按 LF 计数 |
 | v69 全文件行数 | **210**（按 LF 计数，CN / EN 对称；**由本版复核**） | `docs/t027/CHECKLIST_v69{,_EN}.md` 按 LF 计数 |
 
-> 本快照的 HEAD = `18b2613` 是 P85 回填提交后的生成时点锚点；v70 自身落盘后 HEAD 前移，届时以 `git rev-parse --short HEAD` 实况为准。v70 自身行数由 v71 复核。
+> 本快照的 HEAD = `ef1e1f2` 是 P85 报告对回填提交（v70 回填）后的生成时点锚点；v70 自身落盘后 HEAD 前移，届时以 `git rev-parse --short HEAD` 实况为准。v70 自身行数由 v71 复核。
 
 > 机械读数：ADR max = **47**；OB max = **144**；DR max = **18**；试点顺延最大 = 第 25 次。
 
@@ -55,13 +55,13 @@
 - **缺陷登记**：无新增 DR（首跑 CI 红属环境特性，见下）。
 - **三提交与 CI**：主提交 `cc7d90f` → run `45201921016` **windows 腿 2 例环境性红**（卷根逐权探针遇共享争用、`%TEMP%` 8.3 短名与句柄长名拼写不匹配；本机 / Ubuntu VM 均绿）→ R=8 测试侧修复 `6480bb1`（生产零改动）→ run `45208001981` **双腿 success**（Gates `TOTAL_FAIL=0` × 2、`adapters`/`console`/`guard` 包级 ok 双腿全有、Test 步 FAIL=0）→ 回填提交 `18b2613`。
 - **验证**：本机 Windows（非提升）+ Ubuntu VM（非 root）双平台全仓 15 包 ok；三变体 `GOOS=windows/linux/darwin` build/vet 全绿；三视图 gopls unused 清零；变异 MUT-1..5 红 → SHA-256 逐字节复原；④ 三作用域 `TOTAL_FAIL=0` + `SELFTEST 740/740`。
-- **文档**：报告落证据包 `docs/validation/evidence/P85-SECURITY-PROOF-SUBSYSTEM/report.md`（含 §8 S1 边界独立登记段与自由度清单回写；**报告对 docs 落点与 _EN 镜像属 v70 回填待办**）；`SECURITY{,_EN}.md:5` 改「F3 / F6 / F8 已闭合（P85）」；`DEV_PLAN{,_EN}.md` 补录 P85 段；台账 P85 段闭环 + P83/P84 完成记录链闭合；P87 四读原始数据归档 `P87-four-read-data/`（15 件）；证据包 29 载荷 + MANIFEST + SHA256SUMS。
+- **文档**：报告落证据包 `docs/validation/evidence/P85-SECURITY-PROOF-SUBSYSTEM/report.md`（含 §8 S1 边界独立登记段与自由度清单回写）；**报告对已落 `docs/validation/security-proof-subsystem{,_EN}.md`（v70 回填完成，2026-11-24）**；`SECURITY{,_EN}.md:5` 改「F3 / F6 / F8 已闭合（P85）」；`DEV_PLAN{,_EN}.md` 补录 P85 段；台账 P85 段闭环 + P83/P84 完成记录链闭合；P87 四读原始数据归档 `P87-four-read-data/`（15 件）；证据包 29 载荷 + MANIFEST + SHA256SUMS。
 - **L4 修后审查（D-2）**：审查环后注释措辞修改附 diff 摘录 + 顾问独立实质核验 `ADVISORY VERIFICATION: PASS` + 用户终审，⑩ 已登记。
 
 ### 附段 A：「义务传递」段（本版：**无新传递**）
 
 - **历史义务传递**（首例追溯 P75 O-7）：`s1-exit.md:52` 核心任务链行内口径不一致已由 P76 改动 1 + S-G2 补正（`0f80c1e`）履行完毕。
-- **本版义务传递**：**无新传递** —— P83 的五项残余已全部履行：F1 由 P84 + P86 闭合；F2 / F5 / F7 + T9 收窄由 P83 闭合；**F3 / F6 / F8 由 P85 闭合**，F1–F8 全闭合。遗留为记录态待办（P85 报告对 docs 落点与 _EN 镜像、P87 排片），不构成安全义务传递。
+- **本版义务传递**：**无新传递** —— P83 的五项残余已全部履行：F1 由 P84 + P86 闭合；F2 / F5 / F7 + T9 收窄由 P83 闭合；**F3 / F6 / F8 由 P85 闭合**，F1–F8 全闭合。遗留为记录态待办（P87 排片），不构成安全义务传递。
 - **惯例标注**：自 v59 起采用；落点片条目必须带「准入条件」面向。
 
 ### 附段 B：「AT-23 阶段 2 状态」段（不变）
@@ -101,7 +101,7 @@
 | v1.71 | P83 SECURITY-FINDINGS-REMEDIATION | `ec532a4` + `c820743` + `4323503` | **部分闭合**（F2 / F5 / F7 + T9 收窄闭合；F1 / F4 部分实现；F3 / F6 / F8 顺延 P84 / P85；R = 2、D = 0；DR-15；首跑红 `44795140136` → `44801690679` 双绿 → 观察 `44805856028`） |
 | v1.71 | P84 BOUNDDIR-RESIDUAL | `d597f1e` + `32bf234` + `509b01b` | **部分闭合**（T5#4 全闭合、T4 大部分闭合；残余 N13-UNC + 证据归因 Low **已由 P86 闭合**；R = 3、D = 0；DR-16 / DR-17；首跑红 `44877224368` → 修复 `44926215282` 双绿 → 观察 `44928363670`） |
 | v1.71 | P86 BOUNDDIR-UNC-EQUIVALENCE | `f1ae821` + `a5ef122` + `1eb63d9` + `565fc9f` | **闭环**（N13-UNC + W10 闭合，F1 全闭合；R = 0、D = 0；DR-18；首跑 `44962802936` 双绿 → 守卫轮红 `44965434402` → 修复轮 `44967047189` 双绿 → 观察 `44969239294`） |
-| v1.71 | P85 SECURITY-PROOF-SUBSYSTEM | `cc7d90f` + `6480bb1` + `18b2613` | **闭环**（T2 / T3 / T8a 闭合，F3 / F6 / F8 收口、**F1–F8 全闭合**；R = 8、D = 0；OB-140/141/142/143/144；首跑 `45201921016` windows 腿 2 例环境性红 → R=8 修复 `6480bb1` → `45208001981` 双腿 success） |
+| v1.71 | P85 SECURITY-PROOF-SUBSYSTEM | `cc7d90f` + `6480bb1` + `18b2613` + `ef1e1f2` | **闭环**（T2 / T3 / T8a 闭合，F3 / F6 / F8 收口、**F1–F8 全闭合**；R = 8、D = 0；OB-140/141/142/143/144；首跑 `45201921016` windows 腿 2 例环境性红 → R=8 修复 `6480bb1` → `45208001981` 双腿 success） |
 
 > **§三 的 D 口径**（同 v61）：本表「D = n」为临时件纪律违规计数的简写（§5.1）；P85 全量 **D = 0**。**D 计数与 §9.2 的 R 计数是两个独立序列**。
 
@@ -167,10 +167,10 @@
 - 待办（1）：`OB-69`。非终态合计 **23**（13 + 9 + 1），与本版实况复核一致。
 - **DR 登记**：DR max = **18**（v69 新增 DR-18 后不变；P85 无新增 DR——首跑 CI 红为环境特性、登记于 OB-144，不占 DR）。
 - **P87 四读同输入数据（P85 归档）**：治理片 `DIRECTIVE-REVIEW-MODEL-POLICY` 原始数据已落 `docs/validation/evidence/P85-SECURITY-PROOF-SUBSYSTEM/P87-four-read-data/`（对照表 `07-three-read-comparison.md` + 四份模型报告 + r3 原文 + R6 批输入包 9 件，合计 15 件）；判级分歧行单列，**不作模型能力排序**；现为 §四 下一项（须用户点名）。
-- **P85 报告对 docs 落点与 _EN 镜像（v70 待办）**：排片交付物行的「报告对 docs/validation/security-proof-subsystem{,_EN}.md」实际落证据包 `report.md`（CN）；_EN 镜像与 docs 落点属 v70 回填待办，台账与 DEV_PLAN 段均已如实登记，v70 回填时同步更新证据链接。
+- **P85 报告对 docs 落点与 _EN 镜像（已处置）**：报告对已落 `docs/validation/security-proof-subsystem{,_EN}.md`（v70 回填，2026-11-24；CN 自证据包 report.md 落点，附 B sixstage / 附 C artifacts 围栏；EN 严格镜像（与 CN 行数全等、六形状全对齐））；DEV_PLAN 证据链接已改 docs 双链接（中文/English）。
 - **⑦ 额度口径（P85 观察）**：1 终审 + 3 复审 + 盲审 1 为 F-01/F-03 用户裁定；四读（Carbon / Neon / Sol 第 5 读 / Codex）与定向小读（Carbon High）为额度例外，OB-141/143 与试水授权留痕，均不得作先例。
 - 机械读数：§12.4 最大 OB = **144**；ADR max = **47**；DR max = **18**；试点顺延最大 = 第 25 次。
-- **本版移除**：无。**本版翻 `已处置`**：无。
+- **本版移除**：无。**本版翻 `已处置`**：「P85 报告对 docs 落点与 _EN 镜像」一条（v70 回填完成）。
 
 ---
 
@@ -193,7 +193,7 @@
 >
 > 【粘贴本清单全文 v70】
 >
-> 【补充文档】`REMAINING_SLICES{,_EN}.md`（P85 已闭环；P87 已列为下一项，待起跑点名）、`DELIVERY_DIRECTIVE.md`（**v1.71**）、`docs/validation/evidence/P85-SECURITY-PROOF-SUBSYSTEM/report.md`（P85 报告，证据包）、`bounddir-unc-equivalence{,_EN}.md`（P86 报告）、`SECURITY{,_EN}.md`（第 5 行「F3 / F6 / F8 已闭合（P85）」）、`ADR_REGISTER{,_EN}.md`（ADR-047 = `COMPENSATED`）、`DOCUMENTATION_PLAN{,_EN}.md`（交接入口指针已指 v70）、`CHECKLIST_v69{,_EN}.md`（已冻结，被 v70 替代）。
+> 【补充文档】`REMAINING_SLICES{,_EN}.md`（P85 已闭环；P87 已列为下一项，待起跑点名）、`DELIVERY_DIRECTIVE.md`（**v1.71**）、`security-proof-subsystem{,_EN}.md`（P85 报告对）、`docs/validation/evidence/P85-SECURITY-PROOF-SUBSYSTEM/report.md`（P85 报告，证据包）、`bounddir-unc-equivalence{,_EN}.md`（P86 报告）、`SECURITY{,_EN}.md`（第 5 行「F3 / F6 / F8 已闭合（P85）」）、`ADR_REGISTER{,_EN}.md`（ADR-047 = `COMPENSATED`）、`DOCUMENTATION_PLAN{,_EN}.md`（交接入口指针已指 v70）、`CHECKLIST_v69{,_EN}.md`（已冻结，被 v70 替代）。
 >
 > 当前：P85 闭环（T2 / T3 / T8a 闭合，F1–F8 全闭合）；下一步 = P87 治理片（须用户点名，起跑消息四要素留痕）；S2 前重评（S-G1 / S-G8）= T027 主线下一站，待用户排期（§四 再后）。
 
