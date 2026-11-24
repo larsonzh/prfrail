@@ -2345,6 +2345,10 @@ Completion record (2026-11-22): report pair `docs/validation/bounddir-unc-equiva
 | Temp-file location | this slice's temp directory = `tmp/P87-DIRECTIVE-REVIEW-MODEL-POLICY/` (append-only before (8)c; CI captures go to that same directory, never to the `tmp/` root) |
 | (7) budget | (7) = governance slice so the section 7.5 "L tier / governance slice / high risk" row applies: 1 final review + 3 re-reviews; tier = `GPT-5.3-Codex` regular tier (the section 5.2 (7) tier table criterion: rules semantics / gate criteria / role authorization imply Codex); one mandatory blind review (counted separately as +1: the model roster touches identity-admission semantics); the Neon cross-check follows the trigger-based wording and is not pre-configured for this slice; batch assist GLM >= 2 dispatches (mirror check / closed-set three-place consistency check) |
 
+Precondition-gap registration (2026-11-24): the light-tier clause (Gemini 4 Hydrogen) is landed while its comparison-review measurement is not done; this is a known P87 precondition gap to be filled by a later business slice under a section 1.7.4 temporary authorization, after which a note is backfilled into the P87 report. This item must not be described as validated.
+
+Closure caliber (2026-11-24): the code and evidence side is closed (main commit `8b64ce3` plus the CI-reading backfill commit); the formal ledger completion record and the v71 snapshot await a separate user ruling.
+
 ## Known defects (to be handled before later slices)
 
 > **Blocking rule unchanged**: only high-frequency / reproduced defects block; observation-grade flakes are recorded and listed in the validation report.

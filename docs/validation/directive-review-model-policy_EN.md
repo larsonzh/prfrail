@@ -21,8 +21,7 @@ The clauses are landed, and the review chain and gates are all green; **current 
 - Three scopes (`--skip-base`): tree / index / ci all `TOTAL_FAIL=0` (readings in `03-verification/gate-*.txt`).
 - `go build ./...` / `go vet ./...` / `go test ./...`: all exit 0 (15 packages ok).
 - Six shapes (CN/EN directive pair): lines 2540, bold 6160, pipes 4287, blank 589, backticks 6838, heading line numbers positionally identical - all equal.
-- `git diff --cached --numstat`: the directive pair, the ADR pair and the ledger pair are each symmetric.
-
+- `git diff --cached --numstat`: the directive pair, the ADR pair and the ledger pair are each symmetric.- CI: run \`45294006169\` (commit \`8b64ce3\`) is green on both legs (windows-latest / ubuntu-latest); the other three jobs are skipped per the CI definition.
 ## 4. Review chain and closure
 
 - (5) pre-review (`DeepSeek V4 Pro`, quota 1 + 1): r1 `PASS WITH FIXES` (6 Medium) -> fixes -> r2 narrowed re-review reported 1 Medium (the deep-tier row lacked the Neon trigger) plus 4 Low. **The (5) quota was then exhausted**; that Medium was landed verbatim from the start message's goal field (the section 5.2 deep-tier row), and its closure was handed to (6) and (7) for verification; the three Low items were handled as well.
@@ -45,9 +44,9 @@ The clauses are landed, and the review chain and gates are all green; **current 
 
 ## 7. Open items and hand-off
 
-- **The Hydrogen comparison-review prerequisite is not yet met**: the light-tier clause is landed but has no measured data for that model; this slice does not call Hydrogen, and a later business slice fills it under a section 1.7.4 temporary authorization.
+- **The Hydrogen comparison-review prerequisite is not yet met**: the light-tier clause (Gemini 4 Hydrogen) is landed while its comparison-review measurement is not done; this is a known P87 precondition gap to be filled by a later business slice under a section 1.7.4 temporary authorization, after which a note is backfilled into the P87 report. This item **must not be described as validated** (this slice does not call Hydrogen).
 - **(7) re-review quota remaining: 3**: the final review passed in one round, so no re-review ran.
-- **CI legs pending the commit**: after the (10) authorization it pushes to origin, and the CI (Gates + selftest, two legs) readings are backfilled into this report.
+- **The CI legs are now evidenced**: run \`45294006169\` (commit \`8b64ce3\`) is green on both legs and was backfilled into section 3; CI runs from later pushes serve as observation records only.
 - **v71 snapshot absorption**: the clauses and the ledger section are absorbed by the v71 snapshot (this slice does not edit `CHECKLIST_v70{,_EN}`).
 
 ## 8. (6) output transcription (verbatim)

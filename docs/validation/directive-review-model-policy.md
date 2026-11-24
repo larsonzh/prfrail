@@ -21,8 +21,7 @@
 - 三作用域（`--skip-base`）：tree / index / ci 均 `TOTAL_FAIL=0`（读数见 `03-verification/gate-*.txt`）。
 - `go build ./...` / `go vet ./...` / `go test ./...`：均退出 0（15 包 ok）。
 - 六形状（CN/EN 准则对）：行数 2540、加粗 6160、竖线 4287、空行 589、反引号 6838、标题行号逐一同位 —— 全等。
-- `git diff --cached --numstat`：准则对、ADR 对、台账对三对逐对称。
-
+- `git diff --cached --numstat`：准则对、ADR 对、台账对三对逐对称。- CI：run \`45294006169\`（commit \`8b64ce3\`）双腿 success（windows-latest / ubuntu-latest）；其余三个 job 按 CI 定义 skipped。
 ## 4. 审查链与闭合
 
 - ⑤ 预审（`DeepSeek V4 Pro`，额度 1 + 1）：r1 `PASS WITH FIXES`（6 Medium）→ 修复 → r2 收窄复审报 1 Medium（深度档缺 Neon 触发条件）+ 4 Low。**⑤ 额度用尽**，该 Medium 已按起跑消息 ①「目标」字段与原 §5.4 文本逐字落盘（`§5.2` 深度档行），其闭合交由 ⑥ 与 ⑦ 复核；3 条 Low 一并处置（生效机制尾句、§7.5 措辞、轻量档措辞）。
@@ -45,9 +44,9 @@
 
 ## 7. 未闭环项与交接
 
-- **Hydrogen 对照评审前置未完成**：轻量档条款已落地但未取得该模型实测数据；本片不调用 Hydrogen，后续业务片按 §1.7.4 临时授权补足。
+- **Hydrogen 对照评审前置未完成**：轻量档（Gemini 4 Hydrogen）条款已落地、对照评审实测未完成，属 P87 已知前置缺口，待后续业务片按 §1.7.4 临时授权补足；补足后回填 P87 报告注记。该项**不得表述为已验证**（本片未调用 Hydrogen）。
 - **⑦ 复审额度剩余 3**：本片终审一次通过，无复审。
-- **CI 双腿待提交后取证**：⑩ 授权后推送 origin，按 CI（Gates + selftest 双腿）回填读数至本报告。
+- **CI 双腿已取证**：run \`45294006169\`（commit \`8b64ce3\`）双腿 success，已回填至 §3；后续 push 产生的 CI run 仅作观察记录。
 - **v71 快照吸收**：本片条款与台账段由 v71 快照再吸收（本片不改 `CHECKLIST_v70{,_EN}`）。
 
 ## 8. ⑥ 输出转录（逐字）
