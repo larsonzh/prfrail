@@ -1,6 +1,6 @@
 ﻿# ProofRail Delivery Execution Directive (DELIVERY_DIRECTIVE)
 
-Version: v1.71. Date: 2026-11-19. Status: **CN body frozen** ( `_EN` mirror in `docs/DELIVERY_DIRECTIVE_EN.md`).
+Version: v1.72. Date: 2026-11-24. Status: **CN body frozen** ( `_EN` mirror in `docs/DELIVERY_DIRECTIVE_EN.md`).
 
 > **Multilingual note**: this file is a strict positional mirror of the CN body, maintained in step with it (updated after CN is frozen, to avoid bilingual rework during review); `docs/DELIVERY_DIRECTIVE.md` is authoritative and wins on any conflict (see §11.1). **Language tag**: `lang:en` (the G6-6 word-table selection key, see §6.3).
 > **Encoding**: this document and its `_EN` mirror must stay UTF-8 **with BOM** + **LF**.
@@ -116,6 +116,7 @@ Version: v1.71. Date: 2026-11-19. Status: **CN body frozen** ( `_EN` mirror in `
 | v1.69 | 2026-11-15 | **Ledger registration (item ②b of P73 `T027B-ADMISSION`; same-turn user ruling of 2026-11-14)**: the OB-55 disposition cell in §12.4 flips from `To be discussed` to `Resolved` (option b ruled by P73; report `docs/validation/t027b-admission{,_EN}.md`, ADR-044); **no new criterion, no rule-semantics change, no change to the §6.3 criterion scope**. This row is a by-product of the P73 slice, not a standalone directive-governance slice. | `T027B-ADMISSION` (the slice report records v1.69 as a by-product) |
 | v1.70 | 2026-11-18 | **Direct replacement of the stage-6 and stage-7 deep-tier carrier models (slice `DIRECTIVE-MODEL-UPGRADE`; user ruling of 2026-11-18)**: (1) in the §2.2 stage-6 row the qualified name changes from `MAI-Code-1.1-Flash (copilot)` to `MAI Code 2 Flash (copilot)` and the `modelId` to `mai-code-2-flash`; in the stage-7 deep-tier row the qualified name changes from `GPT-6.1 Sol (copilot)` to `GPT-6.2 Sol (copilot)` and the `modelId` to `gpt-6.2-sol` (the Codex regular tier and the Luna parallel alternative are untouched, and Astra is not added); (2) the "⑦ three-tier selection" sentence of §2.2 and the deep-tier row of the §5.2 ⑦ tier table follow the same renaming; (3) the §6.3 G5-b closed set swaps those two members (the criterion wording and comparison rules stay verbatim), and the `tools/gates` implementation and self-test fixtures are synchronised; (4) the Sol row of the §7.5 ⑦ cost table changes the `modelId` only (the prices stay 200 / 1000, based on the operator-UI read confirming both generations are level); the §8.2 ⑦ tier mapping row keeps "Extra High (**Max** allowed)" and the tier-authorisation sentence only renames; (5) the stage-6 carrier call string in Appendix B.6 follows the renaming; (6) the §7.8.3 authorisation-exception trace ruled by P80 ruling (1) is landed (a reference block at the end of §12.4); (7) Appendix C gains C.0aw; (8) **user ruling 2026-11-19**: the sixth OB-139 trigger fired, so the disposition cell in section 12.4 flips from `under observation` to `pending discussion` and slice P82 is registered (directive-governance slice, bumps to v1.71, schedule pending); no new criterion and no rule-semantics change. | `DIRECTIVE-MODEL-UPGRADE` (this slice) |
 | v1.71 | 2026-11-19 | **Slice `P82 TMP-DISCIPLINE-OUT-OF-REPO` lands (governance `[SLICE]`, tier M; registered by the user ruling of 2026-11-19)**: (1) §5.1 gains an "out-of-repo same-command create-and-delete self-heal sub-clause" - it gives the "out-of-repo location (`$env:TEMP` / `%TEMP%` and the like) combined with a same-command create-and-delete" combination a self-heal channel, whose five gates include per-path `Test-Path` readbacks and a `$env:TEMP` slice-ID hit-count assertion both executed by the master personally, and whose waiver of the forced order and of reading ②'s baseline is confined to that sub-clause; the "out-of-repo locations are strict" sentence in the same section is revised to point at the sub-clause (the pre-revision wording is archived in place); (2) the §5.1 self-heal tier gains a "per-element caliber for `tmp/`-root self-heal" sentence (fixed commands and order, with the three readings left textually untouched); (3) the OB-139 disposition cell in §12.4 flips to `Resolved` (no waiver, no precedent); (4) Appendix C gains C.0ax. **No change to the three readings or the D cap of the self-heal tier, the five gates of the same-command create-and-delete exception, the §6.3 criteria or `tools/gates/**`, CONTRACTS / schema / fixtures / product code / CI.** | `P82 TMP-DISCIPLINE-OUT-OF-REPO` (this slice) |
+| v1.72 | 2026-11-24 | **Slice `P87 DIRECTIVE-REVIEW-MODEL-POLICY` lands (governance `[SLICE]`, tier M; named by the user for a 2026-11-24 start, ADR-048)**: (1) §2.2 gains three Gemini final-review rows (Neon deep-tier cross-check / Carbon large-context document tier / Hydrogen light tier) plus a Sol cost-effective regular-tier alternative sentence, and the tier note is re-pointed at the §5.2 selection matrix; (2) the ⑦ three-tier table of §5.2 is upgraded into a four-tier selection matrix (regular / deep / large-context document / light), with a new judging-threshold consensus sentence, a combination-trigger clause and an applicability-exclusion sentence; (3) a new §5.4 "(2) hardening-round trigger and fallback" (S1-S4 mechanical criteria plus the sensitivity linkage note plus an optional pre-declaration plus a four-step flow plus the record format); (4) the §7.5 price table gains three rows and three notes (context-window pricing, alternative-tier budget, four-read measured consumption); (5) the §8.2 effort mapping gains three rows and the effort-authorization sentence is extended; (6) the §6.3 G5-b closed set grows to 11 members and the `tools/gates` implementation and self-test fixtures follow; (7) Appendix C gains C.0ay. **No change to the current (5) / (6) first choice, the deep-tier Sol Max first-choice position or its criterion row, the §2.4 blacklist body, or the G5-b criterion wording and comparison rules; no change to CONTRACTS / schema / contract fixtures / workflows, `internal/**` product code or CI.** | `P87 DIRECTIVE-REVIEW-MODEL-POLICY` (this slice) |
 ---
 
 ## 1. Scope and Slice Model
@@ -305,10 +306,15 @@ The conclusion may be "no slice" - that is itself a valuable output.
 | Independent final reviewer | ⑦ | `independent-reviewer` | `GPT-5.3-Codex (copilot)` | `gpt-5.3-codex` | No | Read-only |
 | Independent final reviewer (deep tier) | ⑦ | `independent-reviewer` | `GPT-6.2 Sol (copilot)` | `gpt-6.2-sol` | No | Read-only |
 | Independent final reviewer (parallel alternative) | ⑦ | `independent-reviewer` | `GPT-6-Luna (copilot)` | `gpt-6-luna` | No | Read-only |
+| Independent final reviewer (deep-tier cross-check) | ⑦ | `independent-reviewer` | `Gemini 4 Neon (copilot)` | `gemini-4-neon` | No | Read-only |
+| Independent final reviewer (large-context document tier) | ⑦ | `independent-reviewer` | `Gemini 4 Carbon (copilot)` | `gemini-4-carbon` | No | Read-only |
+| Independent final reviewer (light tier) | ⑦ | `independent-reviewer` | `Gemini 4 Hydrogen (copilot)` | `gemini-4-hydrogen` | No | Read-only |
 
-**The qualified name is the sole authority for the call string** (R2.2): task packages and Appendix B templates always write the qualified name (the `Model Name (vendor)` form; values are in the "qualified name" column of this table). `modelId` is an **internal identifier** — used by the whitelist closed set (§2.4, §6.3 G5-b), the §5.2 ⑦ tier table and `LEGACY_FLASH_MODEL_IDS` and other internal criteria, and **must not be used as a call string**. The qualified name follows whatever the operator UI currently shows (its version number, e.g. `V4.1`, is part of the qualified name) ⇒ **the qualified name is subject to version drift**: a version bump or a display-format change may make an old string rejected by the tool, and the maintenance mechanism is in R2.2; the "qualified name" column of this table takes the current values, **subject to what the operator UI currently shows**. **Measured basis** (the three measurements of `DIRECTIVE-CLEANUP-EVAL` + the official documentation check): the `model` argument of `runSubagent` accepts a qualified-name string (such as `GPT-5.3-Codex (copilot)`), while the `modelId` form (such as `gpt-5.3-codex`) is answered by the tool with not found ⇒ **call string = qualified name** (for the historical record of the difference see OB-67 and OB-70 of §12.4).
+**The qualified name is the sole authority for the call string** (R2.2): task packages and Appendix B templates always write the qualified name (the `Model Name (vendor)` form; values are in the "qualified name" column of this table). `modelId` is an **internal identifier** — used by the whitelist closed set (§2.4, §6.3 G5-b), the §5.2 ⑦ selection matrix and `LEGACY_FLASH_MODEL_IDS` and other internal criteria, and **must not be used as a call string**. The qualified name follows whatever the operator UI currently shows (its version number, e.g. `V4.1`, is part of the qualified name) ⇒ **the qualified name is subject to version drift**: a version bump or a display-format change may make an old string rejected by the tool, and the maintenance mechanism is in R2.2; the "qualified name" column of this table takes the current values, **subject to what the operator UI currently shows**. **Measured basis** (the three measurements of `DIRECTIVE-CLEANUP-EVAL` + the official documentation check): the `model` argument of `runSubagent` accepts a qualified-name string (such as `GPT-5.3-Codex (copilot)`), while the `modelId` form (such as `gpt-5.3-codex`) is answered by the tool with not found ⇒ **call string = qualified name** (for the historical record of the difference see OB-67 and OB-70 of §12.4).
 
-**⑦ three-tier selection**: the selection criteria for `gpt-5.3-codex` (regular), `gpt-6.2-sol` (deep tier) and `gpt-6-luna` (parallel alternative) are **defined only in the §5.2 ⑦ tier table** (the tier table uses `modelId` as the internal tier identifier; at call time write the corresponding value from the "qualified name" column of this table); this table lists only the triple and the qualified name (R2.2 reading) — the tier table is the sole authority on which tier to pick.
+**⑦ selection-matrix pointer**: the selection criteria for the ⑦ review models are **defined only in the §5.2 selection matrix** (since P87; the matrix uses `modelId` as the internal tier identifier, and at call time write the corresponding value from the "qualified name" column of this table); this table lists only the triple and the qualified name (R2.2 reading) - the selection matrix is the sole authority on which tier to pick.
+
+**Sol as the cost-effective regular-tier alternative (landed by P87)**: `GPT-6.2 Sol` Max may serve as the **cost-effective alternative for the regular tier** (budget-tight rounds); its selection criterion, pricing and effort are in the §5.2 selection matrix / §7.5 / §8.2; the alternative does not change the regular tier's default status.
 
 **⑤ preferred / backup (added 2026-10-06; swapped 2026-10-24)**: the ⑤ pre-review **preferred** = `DeepSeek V4 Pro (deepseek)` (the "Pre-reviewer" row of this table) and the **backup** = `GLM-5.3 (glm)` (the "Pre-reviewer (backup)" row of this table); when the backup row is activated (the preferred is missing / unavailable), the master records the actual qualified name in the task package (R2.2).
 
@@ -502,7 +508,7 @@ The above are minimum verification actions; they must not replace independent ju
 
 ```
 ①architecture (if needed) → ②implementation → ③testing → ④master integration+gates → ⑤pre-review (preferred)
-   → ⑥ independent scan (MAI) → ⑦ final review (per §5.2 tier table) → ⑧a document draft → ⑨ native validation → ⑧b document finalization → ⑧c wrap-up cleanup → ⑩ stop point (awaiting authorization)
+   → ⑥ independent scan (MAI) → ⑦ final review (per §5.2 selection matrix) → ⑧a document draft → ⑨ native validation → ⑧b document finalization → ⑧c wrap-up cleanup → ⑩ stop point (awaiting authorization)
 ```
 
 **Note: ⑧ is split into two steps (prevent document lag)** — **⑧a draft** is done immediately after ⑦ (does not block ⑨; get the settled conclusions onto disk first); **⑧b finalization** is done after ⑨, absorbing native validation results and any rollback fixes. ⇒ Avoids "a ⑨ failure forcing a document rewrite".
@@ -558,14 +564,23 @@ The above are minimum verification actions; they must not replace independent ju
 
 **Note (document-type slices, removing the conflict with the "simple" definition in §7.2)**: when a slice satisfies the three conditions of §7.2 (pure `.md`/comments, no code semantics), this matrix's **②implementation/③testing degenerate into the documenter's "document implementation" and "document consistency check"** (no code produced, no test engineer needed); **⑨native validation degenerates into encoding gate + G1–G9 self-check + link/reference resolvability check**. ⇒ In that form, the three columns ②/③/⑨ **are not executed under the code-slice criteria**, but **⑦ independent final review cannot be omitted**. **Blind review is triggered per §7.7** (mandatory for ownership / shutdown / identity semantics; plus 1 in 4 slices), **not by this matrix**, to avoid double counting.
 
-**⑦ three-model tier table (added 2026-10-03)**:
+**⑦ review-model selection matrix (landed by P87; this table is the sole authority on tier selection)**:
 
-| ⑦ tier | `modelId` (internal identifier) | Selection criterion (choose the tier when satisfied; tiers are **never mixed** within one review loop of one slice) |
-|---|---|---|
-| Regular | `gpt-5.3-codex` | default tier; used when neither of the other two tiers criteria is satisfied |
-| Deep tier | `gpt-6.2-sol` | hard-gate / high-risk rounds: A7 / B2 / B3 / B4-class slices, security / machine state / protocol semantics, pre-release final review |
-| Parallel alternative | `gpt-6-luna` | parallel substitute when `gpt-5.3-codex` is unavailable or the §7.5 budget is constrained |
-**Cost and effort boundary of this table**: this table defines the tier-selection criterion only and **does not define** the cost cap or the effort tier - the cost cap is in the ⑦ quota rows of §7.5 and the thinking-mode tier is in the "⑦ tier mapping" table of §8.2; the former "⑦ Codex" labels in §7.5 and §8.2 are unified as "⑦ (chosen from the §5.2 tier table)" by v1.43 (OB-68 disposition).
+| ⑦ tier | `modelId` (internal identifier) | Effort tier (§8.2) | Selection criterion (choose the tier when satisfied) |
+|---|---|---|---|
+| Regular tier | `gpt-5.3-codex`; cost-effective alternative `gpt-6.2-sol` | Extra High (Sol taking Max needs a same-round authorization) | default tier; used when none of the other three tiers' criteria is satisfied; budget-tight rounds take the Sol alternative |
+| Deep tier | `gpt-6.2-sol` main read; cross-check `gemini-4-neon` | Max | hard-gate / high-risk rounds: A7 / B2 / B3 / B4-class slices, security / machine state / protocol semantics, pre-release final review; the highest-risk round always pairs a Neon cross-check; when the main read reports Medium+ or a structural doubt remains, add a Neon deep-dive |
+| Large-context document tier | `gemini-4-carbon` | High (fixed) | the review input pack exceeds 400K tokens and the slice is pure-document / S-tier |
+| Light tier | `gemini-4-hydrogen` | Extra High | finalization reviews and targeted small reads of document-type / governance slices (low-cost review) |
+| Parallel-alternative tier | `gpt-6-luna` | Max | the parallel substitute when `gpt-5.3-codex` is unavailable or the §7.5 budget is constrained |
+
+**Judging-threshold consensus (landed by P87)**: review severity is judged against **verbatim contract completeness**, and the judging does not change with the model that carries it; when models disagree, the **stricter side** becomes the registered conclusion and the other side is recorded as a divergence data point; a fail-closed fallback must not be read as "completeness proven", and no model may lower the judging threshold on capability grounds.
+
+**Combination-trigger clause (landed by P87, replacing this table's former "no mixing" wording)**: no mixing by default; a combination = a main-read leg plus a cross-check leg, only for hard-gate / high-risk rounds and only with a same-round user authorization, counted as two rounds.
+
+**Applicability-exclusion sentence (landed by P87)**: `gpt-5.3-codex` and `gemini-4-carbon` **must not carry a deep-water round's final review alone** when handle / ACL / concurrency / security / protocol semantics are touched (the P85 four-read evidence shows both missed a verified real Medium on the same input; a deep-water round = `gpt-6.2-sol` Max main read plus a triggered `gemini-4-neon` cross-check).
+
+**Cost and effort boundary**: this table defines the tier-selection criterion only and **does not define** the cost cap or the effort tier - the cost cap is in the ⑦ quota rows of §7.5 and the thinking-mode tier is in the "⑦ tier mapping" table of §8.2; the former "⑦ Codex" labels in §7.5 and §8.2 are unified as "⑦ (chosen from the §5.2 selection matrix)" by v1.43 (OB-68 disposition). **Effect mechanism (landed by P87)**: from now on master snapshots cite this matrix directly, and a start message declares the ⑦ tier choice and the reason per the matrix; a deep-water round must declare both its main-read leg and its cross-check leg; the effort tier keeps the one-time pre-start setting and must not be raised mid-slice.
 
 **⑤ pre-review model note (added 2026-10-06)**: the ⑤ pre-review **preferred** and **backup** model values are in the "Pre-reviewer" and "Pre-reviewer (backup)" rows of §2.2; the ⑤ column of this matrix and the pre-reviewer cap of §7.5 are **unchanged** (this slice does not touch the matrix or the figures). Batch assistance is **a non-pipeline role and does not enter this matrix**; its model and the four-class limit are in the batch-assistance note of §2.2.
 
@@ -583,6 +598,25 @@ When any stage fails or needs remediation, **the stage itself must be re-execute
 | ⑧a/⑧b | any document inconsistency returns to ⑧a/⑧b for rewrite; if the ⑧b rewrite's diff touches **semantics / criteria / conclusion wording**, ⑦ re-review must be re-run - that re-review **uses the §7.5 re-review quota**, and when the quota is exhausted ⇒ escalate to the user per §7.5; **exceptions and stop decisions are in §7.8** |
 | ⑨ | fix in place and re-run, the re-run counts into R (§9.2); **R≥2 ⇒ apply the §5.2 high-risk row** (⑤ re-check becomes required); **R>3 ⇒ pause and wait for human review**; fall back to ① only when an architecture assumption is falsified by native evidence |
 | ⑧c | a wrap-up cleanup finding ⇒ fix in place and **re-run ⑧c** until all green (frozen evidence packs run the self-consistency check per the ⑧c exemption entry in §5.1); a failed pre-⑩ final-state readback (the "post-⑧c evidence window" clause of §5.1) ⇒ clean up in place and re-run that readback until it passes |
+
+### 5.4 (2) Hardening-round trigger and fallback (landed by P87)
+
+**Trigger criteria (any one of the four triggers it; all bind to existing mechanical readings, and a subjective judgement must not substitute)**:
+
+| ID | Criterion | Mechanical reading source |
+|---|---|---|
+| S1 | the same implementation unit turns red **twice with the same root cause** (④ gate or focused test with the same failing assertion string; the root cause is judged per the same-root-cause merge caliber of §9.2) | ④ gate log + normalized test-failure string |
+| S2 | the ② subagent **re-sends the same task pack ≥3 times** (truncation / exception / format deviation) | §7.5 R7.1 invocation-receipt resend count |
+| S3 | the ⑤ pre-review reports **Medium+** and the root cause is classified as an "implementation / design defect" rather than "spec ambiguity" | ⑤ conclusion line + finding attribution |
+| S4 | the ⑦ re-review reports **High** and localizes it to implementation detail (not contract / semantics) | ⑦ conclusion line + finding localization |
+
+**Sensitivity linkage note**: the S3 / S4 readings come from the ⑤ / ⑦ models - a lenient-judging model (such as `gemini-4-carbon` High, only within its large-context document-tier scenario) under-reports ⇒ trigger sensitivity drops (P85 four-read evidence); the ⑦ main-read leg of a deep-water / security round must be the deep tier (`gpt-6.2-sol` Max, see the §5.2 selection matrix) to keep trigger sensitivity.
+
+**Pre-declaration (optional)**: a start message may pre-declare, for an "L-tier + concurrency / crash window + cross-package change" slice, that "a S1-S4 trigger in this slice authorizes a hardening-round candidate per this section"; when pre-declared, no second stop is needed on trigger, and when not pre-declared a trigger must stop and report to the user.
+
+**Flow**: ① on trigger → the master **stops** (no silent switch per §13.1.8, no mid-flight effort raise per §8.3) → reports to the user; ② the user rules → authorizes the ② hardening round to carry **that implementation unit** (single round / single pack, five-element record per §1.7.4, no precedent); ③ tier choice = `gpt-5.3-codex` Extra High (first choice) or `gemini-4-hydrogen` Extra High (by input-pack size and budget headroom); ④ once that unit completes (④ gate + focused test green) it **falls back** to `DeepSeek V4.1 Flash` normal mode and the authorization does not carry over.
+
+**Record format**: every trigger and authorization is entered one by one into the report's "anomaly handling" chapter: {criterion ID, mechanical reading excerpt, ruling party, date, qualified name of the round's model, fallback time}; the R count accrues normally per §9.2 (a hardening round itself does not waive the rework count).
 
 ---
 
@@ -643,7 +677,7 @@ When any stage fails or needs remediation, **the stage itself must be re-execute
 
 > **Origin**: ⑦ round 2 pointed out that "the F3 defense rests only on manual pre-check" ⇒ G5-a was added; ⑦ round 3 further pointed out that the original criteria **matched only a fixed form and covered only `prfrail-*`** (whitespace variants and other role files were missed) ⇒ this clause is hardened accordingly.
 
-**G5 sub-rule G5-b (role-file `model` value gate, added 2026-09-21, changed to a whitelist closed set on 2026-10-03)**: for **newly added or modified** `.github/agents/*.agent.md`, the value of the `model` field (**if present**) **must belong to the whitelist closed set** — the closed set = `deepseek-v4-pro`, `deepseek-flash`, `mai-code-2-flash`, `gpt-5.3-codex`, `gpt-6.2-sol`, `gpt-6-luna`, `glm-5.3`, `glm-5.3-flash` (matching the §2.2 `modelId` (internal identifier) column; **case-sensitive, verbatim equality**, both ends trimmed before comparison, and a quoted value is not verbatim equal). Mechanical criterion: parse the frontmatter block only and extract the values of **all** `model` keys in it; **any value outside the closed set ⇒ FAIL**; a missing key ⇒ PASS (§2.6); an empty value ⇒ judged by G5-a ②. Violation ⇒ G5 fails ⇒ **stop the commit**.
+**G5 sub-rule G5-b (role-file `model` value gate, added 2026-09-21, changed to a whitelist closed set on 2026-10-03)**: for **newly added or modified** `.github/agents/*.agent.md`, the value of the `model` field (**if present**) **must belong to the whitelist closed set** — the closed set = `deepseek-v4-pro`, `deepseek-flash`, `mai-code-2-flash`, `gpt-5.3-codex`, `gpt-6.2-sol`, `gpt-6-luna`, `glm-5.3`, `glm-5.3-flash`, `gemini-4-neon`, `gemini-4-carbon`, `gemini-4-hydrogen` (matching the §2.2 `modelId` (internal identifier) column; **case-sensitive, verbatim equality**, both ends trimmed before comparison, and a quoted value is not verbatim equal). Mechanical criterion: parse the frontmatter block only and extract the values of **all** `model` keys in it; **any value outside the closed set ⇒ FAIL**; a missing key ⇒ PASS (§2.6); an empty value ⇒ judged by G5-a ②. Violation ⇒ G5 fails ⇒ **stop the commit**.
 > **Origin (root fix for OB-8)**: measurement on 2026-09-21 found that the default `model` of 8 existing role files belonged to the blacklist (when `model` is not passed explicitly, the black is reachable directly via `agentName`). The user's ruling adopted the combination of "**delete the default value + hard gate**" (**do not delete the files**): first perform a **field-deletion probe** on one inactive file (delete the `model` line → invoke that carrier: **it loads and works normally**); after the probe passes, delete the `model` field from all 8 blacklist files; this G5-b clause then prevents its re-introduction.
 
 **G5 sub-rule G5-c (appendix-B call strings in the 2.2 qualified-name set, added v1.33, landed by OB-29)**: for a `model='<qualified name>'` call string on a **changed line** inside appendix B, the value (**after stripping whitespace and backticks**) must be a member of the **qualified-name column of section 2.2 in the same file** (that column is the authority and the criterion reads it from the document itself, so editing 2.2 moves the judged set with it and the two cannot drift); a value outside the set ⇒ G5 fails ⇒ stop the commit. **Scope**: changed lines inside the appendix B region only (the same discipline as G6 / G7-c / G7-d); historical lines are not re-judged. **Fail-closed**: an appendix B region whose 2.2 qualified-name column cannot be read (missing heading or header, or an empty column) ⇒ throw `UsageError` (exit 2) - never a silent pass. **Origin**: OB-29 (appendix B's `model=` value set previously had no mechanical criterion; the wording was synced from the `modelId` column to the qualified-name column when R2.2 landed).
@@ -710,7 +744,7 @@ After pushing, GitHub Actions must be observed and **reported back as double gre
 |---|---|---|---|
 | ⑤ | Pre-reviewer (preferred) | whether the implementation deviates from the plan | covers the plan item by item + the three classes of counter-examples |
 | ⑥ | Independent scan (MAI) | low-cost supplementary scan | **Does not reference anyone else's checklist**; Section A–E |
-| ⑦ | Independent final review (per §5.2 tier table) | the sole final-review gate | **The first round attaches no ⑤/⑥ checklist**; four-item review |
+| ⑦ | Independent final review (per §5.2 selection matrix) | the sole final-review gate | **The first round attaches no ⑤/⑥ checklist**; four-item review |
 
 > **Note (⑧c is not one of the three review layers)**: the ⑧c wrap-up cleanup is executed **by the master** and **does not belong to** the ⑤⑥⑦ review layers - it is a fixed stage of §5.1 (see §5.1 / §3.4), parallel to ⑨ native validation.
 
@@ -769,9 +803,9 @@ Before implementation the following are mandatory: ① the plan's change points 
 | Architect | ≤ 1 | complex/high-risk slices |
 | Pre-reviewer | ≤ 1 (re-review after remediation +1) | excludes the ⑦ blind-review add-on |
 | ⑥ MAI | ≤ 3 (effective calls) | see §7.2 |
-| ⑦ (per §5.2 tier table) · S tier / documentation | 1 (final review) + 1 (re-review) | re-review after remediation is an obligation; the "mandatory-sampled blind review" is counted separately as +1 and may be merged with the latter but **must be judged and its reason recorded before start-up**; **exceptions and stop decisions are in §7.8** |
-| ⑦ (per §5.2 tier table) · M tier | 1 (final review) + 2 (re-reviews) | from v1.35: the second re-review must **narrow its input** (repair diff + prior findings + mechanical readings only) and must not re-review the whole text |
-| ⑦ (per §5.2 tier table) · L tier / governance / high risk | 1 (final review) + 3 (re-reviews) | from v1.35: the third re-review **checks only the closure path of the previous round's Medium+**; the tier is set once before start-up and **may not be raised mid-slice** |
+| ⑦ (per §5.2 selection matrix) · S tier / documentation | 1 (final review) + 1 (re-review) | re-review after remediation is an obligation; the "mandatory-sampled blind review" is counted separately as +1 and may be merged with the latter but **must be judged and its reason recorded before start-up**; **exceptions and stop decisions are in §7.8** |
+| ⑦ (per §5.2 selection matrix) · M tier | 1 (final review) + 2 (re-reviews) | from v1.35: the second re-review must **narrow its input** (repair diff + prior findings + mechanical readings only) and must not re-review the whole text |
+| ⑦ (per §5.2 selection matrix) · L tier / governance / high risk | 1 (final review) + 3 (re-reviews) | from v1.35: the third re-review **checks only the closure path of the previous round's Medium+**; the tier is set once before start-up and **may not be raised mid-slice** |
 | Blind review (§7.7 mandatory and proportional sampling) | counted separately as +1 | merging it with any re-review requires a pre-start ruling with a recorded reason; it does not consume the three rows above |
 
 Exceeding a cap ⇒ escalate to user adjudication.
@@ -780,15 +814,24 @@ Exceeding a cap ⇒ escalate to user adjudication.
 
 **Basis for the quota tiers (v1.35, grounded in ADR-025)**: the former "1 final review + 1 re-review" was **systematically mismatched** with the review volume of governance and L-tier slices - ADR-025 lists seven anchored instances of the "⑦ extra round" class, and its newest instance, `GATES-TIGHTEN`'s ⑦ r1-r3, shows that criterion revisions often need more than one re-review. Three anti-abuse constraints remain after tiering: (1) re-reviews two and three must **narrow their input** and must not re-review the whole text; (2) the tier is **set once before start-up** and may not be raised mid-slice (raising it needs a same-turn user ruling and a separate count); (3) exceeding the tier cap still **escalates to the user** per the table-following sentence of this section. Metering still lists items against R7.1's single source of truth.
 
-**Tier-decision rule (v1.35)**: "tier" in this table means the **§1.2 size tier** and is **not** the §8.2 thinking-mode effort setting nor the §5.2 three-model ⑦ split; when several rows match, take the row with the **most re-reviews**; `M-L` counts as M; a "governance slice" is one that amends this directive or the `tools/gates/**` criteria; a "documentation" slice is one meeting the three conditions of §7.2; a slice already **in flight** when this table takes effect keeps the quota stated in its kickoff until it closes. **Cost-gradient note** (measured pricing, USD per million tokens, offPeak input/output): Flash `0.15/0.6`, V4 Pro `0.66/1.98` ⇒ **prefer pushing coding/testing/documentation/gates down to Flash**.
+**Tier-decision rule (v1.35)**: "tier" in this table means the **§1.2 size tier** and is **not** the §8.2 thinking-mode effort setting nor the §5.2 ⑦ selection-matrix split; when several rows match, take the row with the **most re-reviews**; `M-L` counts as M; a "governance slice" is one that amends this directive or the `tools/gates/**` criteria; a "documentation" slice is one meeting the three conditions of §7.2; a slice already **in flight** when this table takes effect keeps the quota stated in its kickoff until it closes. **Cost-gradient note** (measured pricing, USD per million tokens, offPeak input/output): Flash `0.15/0.6`, V4 Pro `0.66/1.98` ⇒ **prefer pushing coding/testing/documentation/gates down to Flash**.
 
 **⑦ cost definition (v1.43, OB-68 / OB-84 hand-off)**: the unit of this paragraph is Credits, which differs from the USD caliber of the "cost-gradient note" in the same section; the two must not be converted into or merged with each other. The single-read cost of ⑦ = **Input price × input tokens + Output price × output tokens** (both per **1M tokens**, itemized in two columns and never merged into one price); the ⑦-specific pricing is the table below (Credits / 1M tokens, read from the user's operator UI on 2026-10-22):
 
-| ⑦ model (§5.2 tier table) | Input (Credits / 1M tokens) | Output (Credits / 1M tokens) |
+| ⑦ model (§5.2 selection matrix) | Input (Credits / 1M tokens) | Output (Credits / 1M tokens) |
 |---|---|---|
 | `gpt-5.3-codex` | 175 | 1400 |
 | `gpt-6.2-sol` | 200 | 1000 |
 | `gpt-6-luna` | 20 | 75 |
+| `gemini-4-carbon` | 200 | 1000 |
+| `gemini-4-neon` | 300 | 1500 |
+| `gemini-4-hydrogen` | 150 | 750 |
+
+**Context-window pricing note (landed by P87)**: the 1M tier of `gpt-6.2-sol` is 400 / 1500 (input 2x and output 1.5x the table above); `gemini-4-carbon` and `gemini-4-hydrogen` have a 1M tier only, so the prices above are the real prices; `gemini-4-neon` has two tiers, 200K / 1M; `gpt-5.3-codex` is measured at 400K. Cache read / write prices (Credits / 1M tokens) are Neon 15 / 0, Carbon 10 / 0, Hydrogen 7.5 / 0 respectively.
+
+**Alternative-tier budget (landed by P87)**: the alternative tier (the Sol alternative of the regular tier) takes the **same budget caliber as the deep tier** - both read their value from the §7.5 slice-tier row (L tier / governance / high risk = 1 final review + 3 re-reviews); the light tier (`gemini-4-hydrogen`) matches the regular tier. The model tier decides only the model and the price and does not change the slice-tier call caps of §7.5.
+
+**Four-read measured-consumption note (landed by P87)**: on the same input and the same batch (n=1) the measured consumption was Sol 67.9, Codex 129.9, Carbon 266.8 and Neon 493.4 credits, with elapsed times of 14m50s / 26m58s / 40m22s / 21m3s respectively — the GPT family measured markedly cheaper than the Gemini family; the main variable of measured consumption is the model's output and thinking behaviour rather than the unit price, and **that ratio must not be hard-coded**; this table serves only as the unit-price source of truth. The figures above are data points, not budget promises.
 
 **Fallback**: if a model's pricing page is unavailable (not displayed), stop and escalate per §1.7.2; **must not estimate or fill in a price on its own**. **Up-front budget caliber**: the estimated per-reading cost = the Input / Output prices in the table × the estimated token volume; the only admissible sources for the estimated token volume are "the median token count of this tier's historical readings" and "the token volume of this slice's declared review input pack"; if neither exists, stop and escalate per §1.7.2 instead of guessing.
 
@@ -861,16 +904,19 @@ Slices that need real external calls must declare a quota cap in advance; when t
 | Complex | High | Max | same as above | same as above |
 | High risk | **Max** | Max | same as above | same as above |
 | Routine [ROUTINE] | inherits the current session tier (not set from this table) | — | — | — |
-| ⑦ (per §5.2 tier table) | — | — | — | **per the ⑦ tier mapping table below** |
+| ⑦ (per §5.2 selection matrix) | — | — | — | **per the ⑦ tier mapping table below** |
 
-**⑦ tier mapping (v1.43, OB-68 landing)**: the thinking-mode tier of ⑦ follows the model chosen in the §5.2 tier table - this table lists only each model's **legal tier set**; the actual tier is still set once before start-up per this section's header; the same-model tier-separation constraint of the master and the product layer is in §8.3 and is unrelated to this table.
+**⑦ tier mapping (v1.43, OB-68 landing)**: the thinking-mode tier of ⑦ follows the model chosen in the §5.2 selection matrix - this table lists only each model's **legal tier set**; the actual tier is still set once before start-up per this section's header; the same-model tier-separation constraint of the master and the product layer is in §8.3 and is unrelated to this table.
 
-| ⑦ model (§5.2 tier table) | thinking-mode tier |
+| ⑦ model (§5.2 selection matrix) | thinking-mode tier |
 |---|---|
 | `gpt-5.3-codex` | **Extra High** |
 | `gpt-6.2-sol` | **Extra High** (**Max** allowed) |
 | `gpt-6-luna` | **Max** |
-**Tier authorization**: taking `Max` with `gpt-6.2-sol` requires an explicit declaration in the kickoff message plus a same-turn authorization; without that declaration the default is `Extra High` (consistent with "no mid-slice tier upgrade" in §7.5).
+| `gemini-4-neon` | **Extra High** |
+| `gemini-4-carbon` | **High** (fixed) |
+| `gemini-4-hydrogen` | **Extra High** |
+**Tier authorization**: taking `Max` with `gpt-6.2-sol` requires an explicit declaration in the kickoff message plus a same-turn authorization; without that declaration the default is `Extra High` (consistent with "no mid-slice tier upgrade" in §7.5). The three Gemini members take their tier per the §5.2 selection matrix with no extra tier authorization; any `Max` tier still needs a same-round authorization.
 
 ### 8.3 Tiers of same-model roles cannot be separated (**known limitation**, D2=A)
 
@@ -1540,7 +1586,7 @@ The output must end with one line: `PRE-REVIEW: PASS` / `PRE-REVIEW: PASS WITH F
 ```
 Role: independent reviewer. Read-only; must not modify, create, or delete any file.
 ⑥ Vehicle: runSubagent(agentName='independent-reviewer', model='MAI Code 2 Flash (copilot)')
-⑦ Vehicle: runSubagent(agentName='independent-reviewer', model='GPT-5.3-Codex (copilot)')   ← regular tier; the qualified names of the deep tier and the parallel alternative are in §2.2 and the §5.2 ⑦ tier table, capped per §7.5
+⑦ Vehicle: runSubagent(agentName='independent-reviewer', model='GPT-5.3-Codex (copilot)')   ← regular tier; the qualified names of the deep tier and the parallel alternative are in §2.2 and the §5.2 ⑦ selection matrix, capped per §7.5
 
 Input: ① slice definition ② the raw diff (**paths**, not paraphrase) ③ the original contract sentences ④ the read-only constraint
      !! ⑦ first round **attaches no** ⑤/⑥ checklist; only a re-review round may attach one, and it must be marked "read only after completing the independent scan".
@@ -2407,6 +2453,22 @@ The following files **only get a supersede pointer added to the file header and 
 | Review | ⑤ pre-review, ⑥ independent scan (mandatory), ⑦ final review (governance-slice budget 1 + 3); the readings are authoritative in that slice report |
 | Version | v1.71 (the header version line agrees with the last §0.3 row, G1-b) |
 | Note | this block is a pointer only; the sub-clause and the caliber live in §5.1 and are not restated here |
+
+
+### C.0ay P87 DIRECTIVE-REVIEW-MODEL-POLICY (v1.72)
+
+> **Record only, no body effect**.
+
+| Item | Content |
+|---|---|
+| Slice / tier | `DIRECTIVE-REVIEW-MODEL-POLICY` (governance `[SLICE]`; tier M; zero probes; local Windows) |
+| Trigger | the v70 snapshot's §4 queue item; named by the user for a 2026-11-24 start (four elements: ruling party = the user; date = 2026-11-24; reason = the four-read data is complete and the draft is final; basis = the start message plus the v70 snapshot's §4) |
+| Goal | the (7) review-model selection matrix (four tiers) plus the judging-threshold consensus plus the combination-trigger clause plus the new §5.4; the G5-b closed set byte-identical in three places; the directive raised to v1.72 |
+| Deliverables | the directive pair `docs/DELIVERY_DIRECTIVE{,_EN}.md`; `docs/ADR_REGISTER{,_EN}.md` (ADR-048); `tools/gates/lib/criteria/g5b.js`; `tools/gates/selftest.js` and `tools/gates/testdata/fixtures/g5b-*`; the P87 ledger section; the report pair `docs/validation/directive-review-model-policy{,_EN}.md`; the evidence pack `docs/validation/evidence/P87-DIRECTIVE-REVIEW-MODEL-POLICY/` |
+| Scope | no change to the current (5) / (6) first choice, the deep-tier Sol Max first-choice position or its criterion row, the §2.4 blacklist body, the G5-b criterion wording and comparison rules, or the §7.5 quota-tier figures; no touch to CONTRACTS / schema / contract fixtures / workflows, `internal/**`, CI, the `s1-exit` gate table or the v70 snapshot |
+| Review | ⑤ pre-review, ⑥ independent scan (mandatory), ⑦ blind plus final (governance quota 1 + 3); readings per that slice's report |
+| Version | v1.72 (the header version line agrees with the latest §0.3 row, G1-b) |
+| Note | this block is a pointer only; the matrix, the threshold consensus, §5.4 and the pricing live in their own sections and are not restated here |
 
 
 ### C.1 v3.1 section numbers → this directive

@@ -2337,6 +2337,27 @@ A6 ② 进度（第 2 批，2026-09-15）：
 
 完成记录（2026-11-22）：报告对 `docs/validation/bounddir-unc-equivalence{,_EN}.md`（结论 `CLOSED`）；N13-UNC 闭合——`boundRelativeSuffix` 新增 UNC 共享根等值分支（尾分隔符差异 + 卷名 ASCII 折叠）与助手 `uncShareRootName` / `uncShareRootEqual` / `lowerASCII`，拒绝面零放宽（异主机 / 异共享 / 后代大小写 / 非规范拼写 / host-only / 扩展命名空间均拒）；W10 闭合——M1/M2 两变异分开标注，「`D:\\` = 轮 11 前原形」错误表述删除；反例先红后绿 + 变异实跑（删分支后恰 3 个正例红、恢复逐字节一致）；R = 0、D = 0；DR-18（CI 守卫轮首跑 windows 腿红，夹具按句柄实际拼写修正后双腿绿）；⑦ = 盲审 1（另计）+ 终审 1（`PASS WITH FIXES`，无 Medium+）；⑤ 2/2、⑥ 2/2；证据包 `docs/validation/evidence/P86-BOUNDDIR-UNC-EQUIVALENCE/` |
 
+### P87 — `DIRECTIVE-REVIEW-MODEL-POLICY`（⑦ 评审模型选型矩阵 + 判级门槛共识 + ② 加强轮触发 · 治理片）· 🔄 执行中
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `DIRECTIVE-REVIEW-MODEL-POLICY`（台账编号 = **P87**；来源 = 用户 2026-11-23 系列裁定（Sol/Carbon 对比、Gemini 全系评估、Grok 终裁不纳入、② 加强轮触发判据、P85 四读矩阵 OB-141/142 留痕）+ 用户 2026-11-24 选型矩阵三处再修订裁定（成本实测：GPT 族显著低于 Gemini 族）；P85 收口后启动、须用户点名） |
+| 状态 | 🔄 执行中（起跑 2026-11-24；四要素：裁决人 = 用户；日期 = 2026-11-24；理由 = 四读数据齐备与草案定稿；依据 = 本起跑消息 + v70 快照 §四） |
+| 目标 | ① ⑦ 评审模型选用规则写成常设选型矩阵（任务类型 × 风险 × 成本 × 上下文），并固定判级门槛共识（fail-closed 兜底 vs 契约完备性，消除跨模型判级漂移）；模型池四档（常规档 `GPT-5.3-Codex` Extra High 默认 + `GPT-6.2 Sol` Max 性价比备选；深度档 `GPT-6.2 Sol` Max 主读 + `Gemini 4 Neon` Extra High 触发式交叉复核；大上下文文档档 `Gemini 4 Carbon` High；轻量档 `Gemini 4 Hydrogen` Extra High）；② 修订 §5.2「同环不混用」为组合触发条款；③ 新增 §5.4「② 加强轮触发与回退」（S1–S4 机械判据 + 灵敏度联动注记）；④ ⑤ 预审第二备用可选改 Hydrogen（B-part，用户另行裁定）；⑤ 生效机制（主控生成快照直接引用本矩阵，起跑消息按矩阵声明选档与理由） |
+| 依赖 | P85 闭环（`SECURITY-PROOF-SUBSYSTEM`）；前置试水已由 P85 四读矩阵完成（Carbon / Neon / Sol / Codex 同输入各 1 次，数据包 = `docs/validation/evidence/P85-SECURITY-PROOF-SUBSYSTEM/P87-four-read-data/` + 对照表 `07-three-read-comparison.md`，OB-140/141/142/143）；Hydrogen 对照评审 ≥1 次仍为前置（后续业务片按 §1.7.4 临时授权，或并入本片 B-part 由用户另行裁定）；Grok 不纳入（用户终裁） |
+| 规模 | **M**（治理片：§2.2 / §5.2 / §5.4 / §6.3 / §7.5 / §8.2 条款 + `tools/gates` 判据实现与自测） |
+| 步骤 | 0 → ① 契约影响判定（预计不触 CONTRACTS；触准则本体）→ ② 实现（准则条款 + `g5b.js`）→ ③ 一致性 → ④ 门禁 → ⑤ → ⑥ → ⑦ 盲审（必抽：模型名单触身份准入语义）+ 终审 + 复审 → ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| 现状缺口 | §2.2 / §5.2 无 Gemini 系任何成员；G5-b 闭集无 `gemini-4-*`；§7.5 单价表无 Carbon / Neon / Hydrogen 行；§5.2「同环不混用」无组合例外；无「② 加强轮」触发与回退条款；无判级门槛定义条款 |
+| 交付物 | ① §2.2 角色表增「独立终审员（深度档交叉复核）」/「独立终审员（大上下文文档档）」/「独立终审员（轻量档）」三行（限定名 `Gemini 4 Neon (copilot)` / `Gemini 4 Carbon (copilot)` / `Gemini 4 Hydrogen (copilot)`，modelId `gemini-4-neon` / `gemini-4-carbon` / `gemini-4-hydrogen`）；② §5.2 选型矩阵四档 + 判级门槛共识句 + 组合触发条款（「默认不混用；组合 = 主读 + 交叉复核双腿，仅限硬门 / 高风险轮次且经用户同轮授权，计数按两轮」）+ 适用域排除句（Codex 与 Carbon 不得单独承担深水轮终审）；③ 新增 §5.4（S1–S4 + 灵敏度联动注记 + 前置声明 + 流程 + 留痕格式）；④ §7.5 单价表三行 + 上下文档位计价注记 + 四读实测消耗注记 + 备选额度口径；⑤ §8.2 档位映射（Carbon = High 固定、Neon / Hydrogen = Extra High）+ 取档授权句；⑥ §6.3 G5-b 闭集 + `g5b.js` `CLOSED_SET` + selftest 夹具同步；⑦ 附录 C 台账块 + 版本 MINOR；⑧ 报告对 `docs/validation/directive-review-model-policy{,_EN}.md`；⑨ 台账段与完成记录；⑩ 证据包 |
+| 验收证据 | ① G5-b 闭集三处逐字一致（§2.2 modelId 列 / §6.3 闭集 / `g5b.js` `CLOSED_SET`）+ 新夹具红绿对（`gemini-4-*` 三枚合法 + 一枚非法）；② 选型矩阵条款、判级门槛共识句与组合触发条款字面可判（对照表逐行）；③ §5.4 的 S1–S4 全部绑定既有机械读数来源且灵敏度联动注记在位；④ 三作用域 `TOTAL_FAIL=0`、SELFTEST 计数更新；⑤ 报告对双语严格镜像 |
+| 边界 | 不新增本草案清单以外的任何模型行（模型池以清单为闭集，弃用 / 不采用的模型不写准则）；不改 ⑤⑥ 现役首选（MAI Code 2 Flash 维持 ⑥；B-part 除外）；不改深度档 `GPT-6.2 Sol` Max 首选地位与其判据行；不触 CONTRACTS / schema / fixtures / workflows；不升准则 MAJOR；不动 `internal/**` 产品代码；Grok 4.7 不纳入；P85 在飞条款不追改 |
+| 分级 | `[SLICE]` |
+| 探针额度 | 0（模型限定名与定价以 operator UI 实读为准，不计探针；试水对照评审已在 P85 四读矩阵完成、Hydrogen 试水在前置业务片以 §1.7.4 临时授权完成，均不占本片额度） |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/P87-DIRECTIVE-REVIEW-MODEL-POLICY/freedom-list.md` |
+| R/D 基线 | R = 0、D = 0（起跑时登记，§13.1.1） |
+| 临时件落点声明 | 本片临时目录 = `tmp/P87-DIRECTIVE-REVIEW-MODEL-POLICY/`（⑧c 前只增不删；CI 捕获件同样落该目录，不落 `tmp/` 根） |
+| 额度口径披露 | ⑦ = 治理片 ⇒ §7.5「L 档 / 治理片 / 高风险」1 终审 + 3 复审；档位 = `GPT-5.3-Codex` 常规档（§5.2 ⑦ 分档表判据：触规则语义 / 门禁判据 / 角色授权 ⇒ Codex）；盲审必抽 1 次（另计 +1：模型名单触身份准入语义）；Neon 交叉复核按触发式口径、本片不预配；批量辅助 GLM ≥2（镜像核对 / 闭集三处一致核对） |
+
 ## 已知缺陷（后续切片前处理）
 
 > **阻断口径不变**：仅高频/已复现缺陷阻断，观测级 flake 只记录并在验证报告中列示。

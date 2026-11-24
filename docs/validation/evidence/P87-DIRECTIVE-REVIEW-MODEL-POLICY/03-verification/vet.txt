@@ -1,0 +1,2 @@
+
+EXIT=0 (captured by the P87 verification harness)

@@ -14,6 +14,8 @@
  *     T123 adds the `x{,_EN}.md` brace-shorthand expansion, its unresolved side and the
  *     unexpandable two-group form that must stay a visible skip; T124 guards the stem-less
  *     group against an EMPTY reference and pins extractor parity on the brace-free path).
+ *   + T132a-T132c (the three gemini-4-* members P87 appended to the section 2.2 modelId
+ *     closed set, plus the load-bearing mutation of the `gemini-4-carbon` member).
  * T3 (defect A1 against commit b738e6b) and T12 (defect C1 against commit 1b01115)
  * need real git ranges and are therefore executed as recorded evidence:
  *   node tools/gates/gate.js --check=G6 --scope=range:b738e6b^..b738e6b
@@ -111,6 +113,13 @@ const FIXTURES = {
   'g5b-closed-set-legal-mai': { disk: 'g5b-closed-set-legal-mai.txt', virtual: '.github/agents/fixture-g5b-closed-set-legal-mai.agent.md' },
   'g5b-illegal-retired-sol': { disk: 'g5b-illegal-retired-sol.txt', virtual: '.github/agents/fixture-g5b-illegal-retired-sol.agent.md' },
   'g5b-illegal-retired-mai': { disk: 'g5b-illegal-retired-mai.txt', virtual: '.github/agents/fixture-g5b-illegal-retired-mai.agent.md' },
+  // P87 DIRECTIVE-REVIEW-MODEL-POLICY: the three gemini-4-* members joined the section 2.2
+  // modelId closed set, so each positive member gets its own fixture and the neighbouring
+  // but unlisted `gemini-4-pro` gets the negative one.
+  'g5b-closed-set-legal-neon': { disk: 'g5b-closed-set-legal-neon.txt', virtual: '.github/agents/fixture-g5b-closed-set-legal-neon.agent.md' },
+  'g5b-closed-set-legal-carbon': { disk: 'g5b-closed-set-legal-carbon.txt', virtual: '.github/agents/fixture-g5b-closed-set-legal-carbon.agent.md' },
+  'g5b-closed-set-legal-hydrogen': { disk: 'g5b-closed-set-legal-hydrogen.txt', virtual: '.github/agents/fixture-g5b-closed-set-legal-hydrogen.agent.md' },
+  'g5b-illegal-gemini-unknown': { disk: 'g5b-illegal-gemini-unknown.txt', virtual: '.github/agents/fixture-g5b-illegal-gemini-unknown.agent.md' },
   // GLM members (slice DIRECTIVE-GLM-LANDING, v1.26). Two positive fixtures pin the two new
   // closed-set members; two negative fixtures pin case sensitivity and the R2.2 boundary (a
   // qualified call string is not the `modelId`), matching the existing g5b-* shape.
@@ -1010,6 +1019,12 @@ const G5B_LUNA_MEMBER = "  'gpt-6-luna',\n";
  */
 const G5B_GLM_MEMBER = "  'glm-5.3',\n";
 const G5B_GLM_FLASH_MEMBER = "  'glm-5.3-flash',\n";
+/**
+ * Mutation target (T132c): one of the three `gemini-4-*` members appended by slice P87
+ * (DIRECTIVE-REVIEW-MODEL-POLICY). The quoted line is unique in the source, so
+ * `split().join('')` removes exactly that member.
+ */
+const G5B_CARBON_MEMBER = "  'gemini-4-carbon',\n";
 
 /**
  * G5-c probe (OB-29): a synthetic directive pair. G5-c reads `ctx.readLineArray` /
@@ -4241,6 +4256,43 @@ async function runTests() {
       'T131c the retired stage-6 identifier is rejected (mai-code-1.1-flash is outside the closed set)',
       retiredMai.verdict === 'FAIL' && retiredMai.findings === 1 && retiredMai.detail.includes('model=mai-code-1.1-flash'),
       'verdict=' + retiredMai.verdict + ' findings=' + retiredMai.findings + ' :: ' + retiredMai.detail
+    );
+  }
+
+  // ---- T132a-T132c: the three gemini-4-* members appended to the section 2.2 modelId
+  // closed set by slice P87 (DIRECTIVE-REVIEW-MODEL-POLICY). The positives prove each
+  // member is inside the set, the negative proves the neighbouring-but-unlisted
+  // `gemini-4-pro` is outside it, and the mutation proves the new members are
+  // load-bearing rather than decorative entries.
+  {
+    const neon = g5bProbe('g5b-closed-set-legal-neon');
+    const carbon = g5bProbe('g5b-closed-set-legal-carbon');
+    const hydrogen = g5bProbe('g5b-closed-set-legal-hydrogen');
+    check(
+      'T132a G5-b accepts all three gemini-4-* members added by P87 (neon, carbon, hydrogen)',
+      neon.verdict === 'PASS' && neon.findings === 0 &&
+        carbon.verdict === 'PASS' && carbon.findings === 0 &&
+        hydrogen.verdict === 'PASS' && hydrogen.findings === 0,
+      JSON.stringify({ neon: neon.verdict, carbon: carbon.verdict, hydrogen: hydrogen.verdict, neonDetail: neon.detail, carbonDetail: carbon.detail, hydrogenDetail: hydrogen.detail })
+    );
+
+    const unknown = g5bProbe('g5b-illegal-gemini-unknown');
+    check(
+      'T132b G5-b rejects gemini-4-pro: a neighbouring identifier outside the closed set fails',
+      unknown.verdict === 'FAIL' && unknown.findings === 1 && unknown.detail.includes('model=gemini-4-pro'),
+      'verdict=' + unknown.verdict + ' findings=' + unknown.findings + ' :: ' + unknown.detail
+    );
+
+    const dropCarbon = loadMutatedG5b(G5B_CARBON_MEMBER, '', 'drop-gemini-carbon-member');
+    check(
+      'T132c the gemini-4-carbon member is load-bearing: dropping it from the set makes that fixture fail',
+      dropCarbon.applied === true && g5bProbeWith(dropCarbon.exports, 'g5b-closed-set-legal-carbon').verdict === 'FAIL',
+      'applied=' + dropCarbon.applied + ' patched_verdict=' + g5bProbeWith(dropCarbon.exports, 'g5b-closed-set-legal-carbon').verdict
+    );
+    check(
+      'T132c restore: g5b.js is byte-identical and the cached module still accepts gemini-4-carbon',
+      dropCarbon.identical === true && g5bProbe('g5b-closed-set-legal-carbon').verdict === 'PASS',
+      'identical=' + dropCarbon.identical + ' cached=' + g5bProbe('g5b-closed-set-legal-carbon').verdict
     );
   }
 

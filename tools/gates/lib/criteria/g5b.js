@@ -17,6 +17,10 @@
  * `model` occurrences in it are collected; comparison is case-sensitive and verbatim
  * after trimming both ends; a quoted value is therefore not equal to a set member.
  * A missing key passes (section 2.6); an EMPTY value is G5-a 2's finding, not ours.
+ *
+ * The three `gemini-4-*` members (`gemini-4-neon`, `gemini-4-carbon`,
+ * `gemini-4-hydrogen`) were appended by slice P87 (DIRECTIVE-REVIEW-MODEL-POLICY) and
+ * are part of the same section 2.2 `modelId` closed set as every member above.
  */
 const CLOSED_SET = [
   'deepseek-v4-pro',
@@ -27,6 +31,9 @@ const CLOSED_SET = [
   'gpt-6-luna',
   'glm-5.3',
   'glm-5.3-flash',
+  'gemini-4-neon',
+  'gemini-4-carbon',
+  'gemini-4-hydrogen',
 ];
 const ALLOWED = new Set(CLOSED_SET);
 const FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---/;

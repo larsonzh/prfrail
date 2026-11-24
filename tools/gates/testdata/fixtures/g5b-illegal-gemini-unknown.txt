@@ -1,0 +1,6 @@
+---
+name: fixture-g5b-illegal-gemini-unknown
+description: G5-b probe fixture - gemini-4-pro is outside the closed set and must fail
+model: gemini-4-pro
+---
+Probe body. This file is test data, not a real agent role file.

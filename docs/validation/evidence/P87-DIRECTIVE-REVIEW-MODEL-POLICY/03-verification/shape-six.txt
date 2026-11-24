@@ -1,0 +1,6 @@
+lines 2540 2540 OK
+bold 6160 6160 OK
+pipes 4287 4287 OK
+blank 589 589 OK
+ticks 6838 6838 OK
+headings 152 152 OK
