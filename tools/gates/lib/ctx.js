@@ -391,16 +391,53 @@ function createContext(options) {
     return path.join(repoRoot, p.split('/').join(path.sep));
   }
 
+  /**
+   * P88 GATES-PERF-ASSESS (O-3c): per-context memo for the RAW reads below. The cache key
+   * is the plain path in tree/index scope and `<endpoint ref> NUL <path>` in range/ci
+   * scope (the endpoint is fixed for the lifetime of a context), so a key can never mix
+   * two snapshots of the same path.
+   *
+   * The cached value is EXACTLY what the un-memoized call returns - a Buffer or null, a
+   * boolean, or an [added, deleted] pair - so no caller can observe a type or content
+   * difference. Buffers are never mutated by any consumer (they are only measured or
+   * decoded), and numstat hands back a fresh copy so a caller that rewrote its result
+   * could not poison the cache.
+   *
+   * Why this cannot move a verdict: a context lives for exactly one gate run and no gate
+   * criterion writes to the repository, so a second identical read of the same path can
+   * only produce the first result. It is also a pure bypass for the injected test runner:
+   * a fake `spawnGit` answering once is now asked once instead of twice and still returns
+   * the same answer it always did.
+   */
+  const bytesCache = new Map();
+  const existsCache = new Map();
+  const trackedCache = new Map();
+  const numstatCache = new Map();
+
+  function refKey(ref, p) {
+    return ref + '\u0000' + p;
+  }
+
+  function readKey(p) {
+    return kind === 'range' || kind === 'ci' ? refKey(headRef, p) : p;
+  }
+
   function readBytes(p) {
+    const key = readKey(p);
+    if (bytesCache.has(key)) return bytesCache.get(key);
+    let v;
     if (kind === 'range' || kind === 'ci') {
       const r = git(['show', headRef + ':' + p], { binary: true });
-      return r.ok ? r.out : null;
+      v = r.ok ? r.out : null;
+    } else {
+      try {
+        v = fs.readFileSync(pathOnDisk(p));
+      } catch (e) {
+        v = null;
+      }
     }
-    try {
-      return fs.readFileSync(pathOnDisk(p));
-    } catch (e) {
-      return null;
-    }
+    bytesCache.set(key, v);
+    return v;
   }
 
   function readLines(p) {
@@ -419,19 +456,109 @@ function createContext(options) {
   }
 
   function exists(p) {
-    if (kind === 'range' || kind === 'ci') {
-      return git(['cat-file', '-e', headRef + ':' + p]).ok;
-    }
-    return fs.existsSync(pathOnDisk(p));
+    const key = readKey(p);
+    if (existsCache.has(key)) return existsCache.get(key);
+    const v =
+      kind === 'range' || kind === 'ci'
+        ? git(['cat-file', '-e', headRef + ':' + p]).ok
+        : fs.existsSync(pathOnDisk(p));
+    existsCache.set(key, v);
+    return v;
   }
 
   function trackedAt(ref, p) {
-    return git(['cat-file', '-e', ref + ':' + p]).ok;
+    const key = refKey(ref, p);
+    if (trackedCache.has(key)) return trackedCache.get(key);
+    const v = git(['cat-file', '-e', ref + ':' + p]).ok;
+    trackedCache.set(key, v);
+    return v;
   }
 
+  /**
+   * Blob reads keyed by `ref NUL path` (P88 O-1 + O-3c). `has()` gates the lookup because
+   * a MISSING object caches as `null`, and a truthiness test would re-spawn `git show` for
+   * every absent file. The stored value keeps the original semantics verbatim:
+   * `r.ok ? r.out : null`, where `r.out` is the utf8 spawnSync string - no BOM stripping,
+   * no CRLF normalisation.
+   */
+  const showCache = new Map();
+
   function showAt(ref, p) {
+    const key = refKey(ref, p);
+    if (showCache.has(key)) return showCache.get(key);
     const r = git(['show', ref + ':' + p]);
-    return r.ok ? r.out : null;
+    const v = r.ok ? r.out : null;
+    showCache.set(key, v);
+    return v;
+  }
+
+  /**
+   * P88 GATES-PERF-ASSESS (O-1): serve a whole blob list from ONE `git cat-file --batch`.
+   *
+   * G4b's corpus scan used to pay one `git show <ref>:<path>` process PER file (1131 files
+   * on the measured host, ~349 ms each), which dominated the run. `--batch` emits the
+   * identical bytes from a single process, so the per-file `showAt` calls become cache
+   * hits and G4b itself stays untouched.
+   *
+   * FAIL-OPEN, ALWAYS: this is a pure optimisation. Any anomaly - spawn error, non-zero
+   * exit, empty output, unparsable header, out-of-range size, a missing separator LF, a
+   * response count that does not match the request, or a non-blob object - DISCARDS THE
+   * WHOLE BATCH: nothing is written to `showCache`, nothing is thrown, nothing is printed.
+   * `showAt` then falls back to the original one-process-per-path call, i.e. exactly the
+   * pre-slice behaviour. The commit happens only after the ENTIRE response parsed, so a
+   * partial parse can never be adopted.
+   *
+   * Equivalence premise (P88 (5) Low): `git show <ref>:<path>` and `cat-file --batch` both
+   * hand back the raw blob, but a textconv / diff driver bound to the path would make the
+   * former transform its output while the latter never does. Today no textconv or `-text`
+   * attribute applies to `.md` (measured with `git check-attr`), so the two agree byte for
+   * byte; if `.gitattributes` ever binds such a driver to a corpus suffix, this premise
+   * must be re-checked before trusting the batch.
+   */
+  function prefetchBlobs(ref, list) {
+    if (!Array.isArray(list) || list.length < 8) return; // below the threshold one batch is not worth it
+    for (const p of list) {
+      // A newline cannot be expressed in the `--batch` line protocol; a non-string is a
+      // caller bug we refuse to guess at.
+      if (typeof p !== 'string' || p.indexOf('\n') !== -1) return;
+    }
+    const r = spawn(
+      repoRoot,
+      ['cat-file', '--batch'],
+      true,
+      Buffer.from(list.map((p) => ref + ':' + p).join('\n') + '\n', 'utf8')
+    );
+    if (r.spawnError) return;
+    if (!r.ok) return;
+    const buf = r.out;
+    if (!Buffer.isBuffer(buf) || buf.length === 0) return;
+    const values = [];
+    let pos = 0;
+    for (let i = 0; i < list.length; i++) {
+      const nl = buf.indexOf(0x0a, pos);
+      if (nl < 0) return;
+      const header = buf.toString('utf8', pos, nl);
+      pos = nl + 1;
+      // `<spec> missing` is git's answer for an unresolvable object; `git show` failing
+      // yields null for the same path, so the cached value must be null too.
+      if (header.length > 8 && header.slice(-8) === ' missing') {
+        values.push(null);
+        continue;
+      }
+      const parts = header.split(' ');
+      if (parts.length !== 3) return;
+      if (parts[1] !== 'blob') return;
+      if (!/^(0|[1-9][0-9]*)$/.test(parts[2])) return;
+      const size = Number(parts[2]);
+      if (!Number.isSafeInteger(size) || pos + size > buf.length) return;
+      const after = pos + size;
+      if (after >= buf.length || buf[after] !== 0x0a) return;
+      // Same text `git show` produces: utf8 decoding of the raw blob bytes.
+      values.push(buf.toString('utf8', pos, after));
+      pos = after + 1;
+    }
+    if (pos !== buf.length) return; // trailing bytes => more responses than requests
+    for (let i = 0; i < list.length; i++) showCache.set(refKey(ref, list[i]), values[i]);
   }
 
   /**
@@ -517,20 +644,31 @@ function createContext(options) {
   }
 
   function numstat(p) {
+    // P88 O-3c: memoized as a [added, deleted] pair; every call gets its own copy so a
+    // caller cannot corrupt the cached value by rewriting the array it received.
+    const key = readKey(p);
+    if (numstatCache.has(key)) return numstatCache.get(key).slice();
+    let v;
     const rec = byPath.get(p);
     if (rec && rec.untracked) {
       const text = readText(p);
-      return [String(text === null ? 0 : splitAddedLines(text).length), '0'];
+      v = [String(text === null ? 0 : splitAddedLines(text).length), '0'];
+    } else {
+      v = ['0', '0'];
+      for (const prefix of diffPrefixes()) {
+        const r = git(prefix.concat(['--numstat', '--', p]));
+        if (!r.ok) continue;
+        const line = r.out.trim().split('\n')[0];
+        if (!line) continue;
+        const parts = line.split('\t');
+        if (parts.length >= 2) {
+          v = [parts[0], parts[1]];
+          break;
+        }
+      }
     }
-    for (const prefix of diffPrefixes()) {
-      const r = git(prefix.concat(['--numstat', '--', p]));
-      if (!r.ok) continue;
-      const line = r.out.trim().split('\n')[0];
-      if (!line) continue;
-      const parts = line.split('\t');
-      if (parts.length >= 2) return [parts[0], parts[1]];
-    }
-    return ['0', '0'];
+    numstatCache.set(key, v);
+    return v.slice();
   }
 
   function listAllMarkdown() {
@@ -546,7 +684,17 @@ function createContext(options) {
     // `git show <ref>:<quoted>` would silently drop those files.
     const ref = kind === 'range' || kind === 'ci' ? baseRef : 'HEAD';
     const r = git(['ls-tree', '-r', '-z', '--name-only', ref]);
-    return r.ok ? r.out.split('\0').filter((p) => p && /\.md$/i.test(p)) : [];
+    if (!r.ok) return [];
+    const list = r.out.split('\0').filter((p) => p && /\.md$/i.test(p));
+    // P88 O-1: warm `showCache` with ONE `cat-file --batch` instead of one `git show` per
+    // file. The prefetch is fail-open on its own; the try/catch here is belt and braces so
+    // that even a defect inside it can only cost performance, never a verdict.
+    try {
+      prefetchBlobs(ref, list);
+    } catch (e) {
+      /* optimisation only: fall back to per-file `git show` */
+    }
+    return list;
   }
 
   function listAgentFiles() {

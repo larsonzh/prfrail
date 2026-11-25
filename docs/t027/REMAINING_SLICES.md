@@ -2362,12 +2362,12 @@ A6 ② 进度（第 2 批，2026-09-15）：
 
 完成记录（2026-11-25）：R = 0、D = 0、探针 0；主提交 `8b64ce3`（准则 v1.72）+ 回填 `2782a09`（5 文件）；CI 主轮 `45294006169` 双腿 success（已回填报告）、回填轮 `45356014951` 仅作观察记录；⑦ = 盲审 1 + 终审 1 PASS（1+3 未用尽）；⑥ 2/3；⑤ 1+1；② 由 `prfrail-implementer`、③ 由 `prfrail-tester` 承担；G5-b 闭集 11 枚三处逐字一致；SELFTEST 744/744；三作用域 `TOTAL_FAIL=0`；ADR-048 已登记（模型白名单 / G5-b 闭集变更触身份准入语义，参照 ADR-019）；报告对 `docs/validation/directive-review-model-policy{,_EN}.md`；证据包 `docs/validation/evidence/P87-DIRECTIVE-REVIEW-MODEL-POLICY/`（19 载荷）。**Hydrogen 前置缺口**：轻量档条款已落地、对照评审实测未完成，指向后续业务片（§1.7.4 临时授权 + OB 留痕），不得表述为已验证。
 
-### P88 — `GATES-PERF-ASSESS`（门禁耗时构成评估 + 轻量效率优化 · 工具片）· ⬜ 未立项
+### P88 — `GATES-PERF-ASSESS`（门禁耗时构成评估 + 轻量效率优化 · 工具片）· ✅ 闭环
 
 | 字段 | 内容 |
 |---|---|
 | 标识 | `GATES-PERF-ASSESS`（台账编号 = **P88**；来源 = P27 报告 §7「候选 OB（性能）」+ v70 快照层 3 登记位 + 用户 2026-11-25 排片裁定；**P87 闭环后启动、须用户点名**） |
-| 状态 | ⬜ 未立项（起跑须用户点名；起跑消息须四要素留痕） |
+| 状态 | ✅ 闭环（2026-11-25；完成记录见本节末） |
 | 目标 | ① 实测并落盘门禁耗时构成（SELFTEST、三作用域 index / tree / ci、base 三件套 gofmt / build / vet / test 的执行次数与耗时占比）；② 依据构成落**轻量效率优化**（候选：base 三件套跨作用域去重、可复用读数缓存、无依赖步骤并行化）——**判据判定结论逐字不变**；③ 输出优化前后对照证据与后续大改建议（如需大重构另立片，不在本片实施） |
 | 依赖 | P87 闭环（`DIRECTIVE-REVIEW-MODEL-POLICY`）；无其它前置；G5-b 闭集 v1.72 已含 11 枚（基线） |
 | 规模 | **S**（评估 + 轻量优化；纯 `tools/gates/**` + 报告对；不触 `internal/**`） |
@@ -2383,6 +2383,8 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 临时件落点声明 | `tmp/P88-GATES-PERF-ASSESS/`（⑧c 前只增不删） |
 | 额度口径披露 | ⑦ = S 档 ⇒ §7.5「S 档 1+1」；档位 = `GPT-5.3-Codex` 常规档（§5.2 分档表判据：触门禁判据实现 ⇒ Codex；不触 OS / 安全语义，不触发深度档）；盲审不抽（不触身份准入语义）；批量辅助 GLM ≥1（耗时数据整理 / 双语镜像） |
 | 起跑条件 | 须用户显式点名；四要素留痕；P87 台账正式完成记录与 v71 快照已闭环 |
+
+完成记录（2026-11-25）：R = 0、D = 0、探针 0；①②③ 分别由 `deep-reasoner` + `DeepSeek V4 Pro`、`prfrail-implementer`、`prfrail-tester`（均 `DeepSeek V4.1 Flash`）承担；⑤ 1/2、⑥ 2/3、⑦ 终审 1/2（复审额度保留）；优化 = `tools/gates/lib/ctx.js` 的批量 blob 预取（O-1）与原始读数 memo（O-3c），判据判定逻辑零改动；同输入 A/B 五对逐字节相同（含 `INFO G4b-cache` 行的 `key12` 与 `corpus=`）；`SELFTEST` 744/744 不变；三作用域 `TOTAL_FAIL=0`；CI 判据面冷语料由 170277 ms 降至 12929 ms；准则升 v1.73（MINOR）并落附录 C.0az；报告对 `docs/validation/gates-perf-assess{,_EN}.md`；证据包 `docs/validation/evidence/P88-GATES-PERF-ASSESS/`（22 载荷，以该包 `MANIFEST.md` 为准，与 `SHA256SUMS.txt` 条目集相等）。`range` 作用域的 `TOTAL_FAIL=1` 判定 ID = **`G5(d)`**（`stagedNotDeclared` 列出四项未声明的文档），属**历史提交区间既有判定**而非本片回归：优化前实现对同一区间的输出与之逐字相同，配对证据见 `03-verification/ab-report.md` 的 B3 与 B4 两格；台账三作用域为 `index` / `tree` / `ci`，不含 `range`。提交号与 CI run 在推送后同轮补入本记录与报告。
 
 ## 已知缺陷（后续切片前处理）
 

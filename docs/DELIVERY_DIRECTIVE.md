@@ -1,6 +1,6 @@
 ﻿# ProofRail 交付执行准则（DELIVERY_DIRECTIVE）
 
-版本：v1.72。日期：2026-11-24。状态：**CN 正文冻结**（ `_EN` 镜像见 `docs/DELIVERY_DIRECTIVE_EN.md`）。
+版本：v1.73。日期：2026-11-25。状态：**CN 正文冻结**（ `_EN` 镜像见 `docs/DELIVERY_DIRECTIVE_EN.md`）。
 
 > **多语言说明**：本文件为中文权威版；`docs/DELIVERY_DIRECTIVE_EN.md` 为严格同位镜像（与 CN 同步维护；CN 冻结后同步更新，避免评审期双语返工）。**语言标识**：`lang:zh`（G6-6 词表选取依据，见 §6.3）。
 > **编码**：本文及 `_EN` 必须保持 UTF-8 **with BOM** + **LF**。
@@ -117,6 +117,7 @@
 | v1.70 | 2026-11-18 | **⑥ 与 ⑦ 深度档载体模型直接替换（切片 `DIRECTIVE-MODEL-UPGRADE`；用户 2026-11-18 裁定）**：① §2.2 的 ⑥ 行限定名由 `MAI-Code-1.1-Flash (copilot)` 改为 `MAI Code 2 Flash (copilot)`、`modelId` 改为 `mai-code-2-flash`；⑦ 深度档行的限定名由 `GPT-6.1 Sol (copilot)` 改为 `GPT-6.2 Sol (copilot)`、`modelId` 改为 `gpt-6.2-sol`（Codex 常规档与 Luna 平行备选不动，不扩列 Astra）；② §2.2 的「⑦ 三档分档」句与 §5.2 的 ⑦ 分档表深度档行同步换名；③ §6.3 的 G5-b 闭集换这两枚成员（判据表述与比较规则逐字不动），并同步 `tools/gates` 的实现与自检夹具；④ §7.5 的 ⑦ 成本表 Sol 行只换 `modelId`（单价沿用 200 / 1000，依据 = 用户 operator UI 实读确认两代同水平）；§8.2 的 ⑦ 档位映射行沿用「Extra High（允许 **Max**）」，取档授权句只换名；⑤ 附录 B.6 的 ⑥ 载体调用串同步换名；⑥ 补落 P80 裁定 ① 的 §7.8.3 授权例外留痕（§12.4 表尾引用块）；⑦ 附录 C 增 C.0aw；⑧ **2026-11-19 用户裁定**：OB-139 第 6 次触发 ⇒ §12.4 处置列由 `观察中` 翻 `待议` 并立项 P82（准则治理片，升 v1.71，待排期）；不新增判据、不改任何规则语义。 | `DIRECTIVE-MODEL-UPGRADE`（本片） |
 | v1.71 | 2026-11-19 | **切片 `P82 TMP-DISCIPLINE-OUT-OF-REPO` 落地（治理片 `[SLICE]`，M 档；用户 2026-11-19 裁定立项）**：① §5.1 新增「仓库外同命令建删自愈子款」——为「仓库外位置（`$env:TEMP` / `%TEMP%` 等）与同命令建删」补自愈通道，五项门槛含主控亲自取证的逐路径 `Test-Path` 与 `$env:TEMP` 切片 ID 命中数断言，次序强制与读数②基线的豁免仅限本子款；同段的「仓库外位置从严」句修订为指向本子款（修订前原文就地留档）；② §5.1 自愈档补「`tmp/` 根自愈的逐要素口径」句（固定命令与时序固化，三项读数文本零改动）；③ §12.4 的 OB-139 处置列翻 `已处置`（不宽免、不得作为先例）；④ 附录 C 增 C.0ax。**不改自愈档三项读数文本、D 上界、同命令建删特例五项门槛、§6.3 判据与 `tools/gates/**`、CONTRACTS / schema / fixtures / 产品代码 / CI。** | `P82 TMP-DISCIPLINE-OUT-OF-REPO`（本片） |
 | v1.72 | 2026-11-24 | **切片 `P87 DIRECTIVE-REVIEW-MODEL-POLICY` 落地（治理片 `[SLICE]`，M 档；用户 2026-11-24 点名起跑，ADR-048）**：① §2.2 增三行 Gemini 终审角色（Neon 深度档交叉复核 / Carbon 大上下文文档档 / Hydrogen 轻量档）与 Sol 常规档性价比备选句，并把分档注记改指 §5.2 选型矩阵；② §5.2 的 ⑦ 三档分档表升级为四档选型矩阵（常规 / 深度 / 大上下文文档 / 轻量），新增判级门槛共识句、组合触发条款与适用域排除句；③ 新增 §5.4「② 加强轮触发与回退」（S1–S4 机械判据 + 灵敏度联动注记 + 可选前置声明 + 四步流程 + 留痕格式）；④ §7.5 单价表增三行并补上下文档位计价、备选额度与四读实测消耗三项注记；⑤ §8.2 档位映射增三行并扩写取档授权句；⑥ §6.3 的 G5-b 闭集增至 11 枚，`tools/gates` 的实现与自检夹具同步；⑦ 附录 C 增 C.0ay。**不改 ⑤⑥ 现役首选、深度档 Sol Max 首选地位与其判据行、§2.4 黑名单正文、G5-b 判据表述与比较规则；不动 CONTRACTS / schema / 契约夹具 / workflows、`internal/**` 产品代码与 CI。** | `P87 DIRECTIVE-REVIEW-MODEL-POLICY`（本片） |
+| v1.73 | 2026-11-25 | **切片 `P88 GATES-PERF-ASSESS` 落地（工具片 `[SLICE]`，S 档；用户 2026-11-25 点名起跑）**：① `tools/gates/lib/ctx.js` 新增批量 blob 预取（一次 `git cat-file --batch` 取回整份 `.md` 语料，`showAt` 由 per-context 缓存供给；任何异常整批丢弃并回退逐文件读）与原始读数 memo（`readBytes` / `exists` / `trackedAt` / `numstat`）；② 判据本体、`g4b.js` 的 `run` 体与 `CACHE_VERSION` 零改动，缓存键 `key12` 不变；③ 三作用域输出与 `SELFTEST` 744/744 逐字不变（同输入 A/B 字节相等）。**不新增判据、不改 §6.3 判据文本本体与判定逻辑、不改 G5-b 闭集与白名单、不改命令行面与报告格式；不动 CONTRACTS / schema / 契约夹具 / workflows、`internal/**` 与 CI workflow；不升 MAJOR。** | `P88 GATES-PERF-ASSESS`（本片） |
 ---
 
 ## 1. 适用范围与切片模型
@@ -2470,6 +2471,22 @@ SLICE: READY_FOR_REVIEW | SLICE: BLOCKED
 | 版本 | v1.72（头部版本行与 §0.3 最新行一致，G1-b） |
 | 附注 | 本块只做指针；矩阵、门槛共识、§5.4 与计价的正文以对应节为准，本块不复述 |
 
+
+
+### C.0az P88 GATES-PERF-ASSESS（v1.73）
+
+> **仅为留痕，无正文效力**。
+
+| 项 | 内容 |
+|---|---|
+| 切片 / 规模 | `GATES-PERF-ASSESS`（工具类 `[SLICE]`；S 档；探针 0；Windows 本机） |
+| 触发 | 台账 P88（源 = P27 报告 §7 候选 OB 与 v70 快照层 3 登记位）；用户 2026-11-25 点名起跑（四要素：裁决人 = 用户；日期 = 2026-11-25；理由 = 门禁优化排片裁定；依据 = 起跑消息 + v71 快照 §四） |
+| 目标 | 门禁耗时构成实测 + 轻量效率优化（批量 blob 预取 / 原始读数 memo），判据判定结论逐字不变 |
+| 交付物 | `tools/gates/lib/ctx.js`；报告对 `docs/validation/gates-perf-assess{,_EN}.md`；台账 P88 段；证据包 `docs/validation/evidence/P88-GATES-PERF-ASSESS/` |
+| 范围 | 不动判据判定逻辑与 §6.3 判据文本本体、`g4b.js` / `gate.js` / `selftest.js`、G5-b 闭集与白名单、命令行面与报告格式、CONTRACTS / schema / 契约夹具 / workflows、`internal/**`、CI workflow、`DEV_PLAN`、v71 快照 |
+| 审查 | ⑤ 预审、⑥ 独立扫描（必做）、⑦ 终审 + 复审（S 档 1+1、Codex 常规档）；读数以该片报告为准 |
+| 版本 | v1.73（头部版本行与 §0.3 最新行一致，G1-b） |
+| 附注 | 本块只做指针；耗时构成与优化前后对照的正文以该片报告为准，本块不复述 |
 
 ### C.1 v3.1 节号 → 本准则
 
