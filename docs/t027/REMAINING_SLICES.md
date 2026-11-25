@@ -2386,6 +2386,29 @@ A6 ② 进度（第 2 批，2026-09-15）：
 
 完成记录（2026-11-25）：R = 0、D = 0、探针 0；①②③ 分别由 `deep-reasoner` + `DeepSeek V4 Pro`、`prfrail-implementer`、`prfrail-tester`（均 `DeepSeek V4.1 Flash`）承担；⑤ 1/2、⑥ 2/3、⑦ 终审 1/2（复审额度保留）；优化 = `tools/gates/lib/ctx.js` 的批量 blob 预取（O-1）与原始读数 memo（O-3c），判据判定逻辑零改动；同输入 A/B 五对逐字节相同（含 `INFO G4b-cache` 行的 `key12` 与 `corpus=`）；`SELFTEST` 744/744 不变；三作用域 `TOTAL_FAIL=0`；CI 判据面冷语料由 170277 ms 降至 12929 ms；准则升 v1.73（MINOR）并落附录 C.0az；报告对 `docs/validation/gates-perf-assess{,_EN}.md`；证据包 `docs/validation/evidence/P88-GATES-PERF-ASSESS/`（22 载荷，以该包 `MANIFEST.md` 为准，与 `SHA256SUMS.txt` 条目集相等）。`range` 作用域的 `TOTAL_FAIL=1` 判定 ID = **`G5(d)`**（`stagedNotDeclared` 列出四项未声明的文档），属**历史提交区间既有判定**而非本片回归：优化前实现对同一区间的输出与之逐字相同，配对证据见 `03-verification/ab-report.md` 的 B3 与 B4 两格；台账三作用域为 `index` / `tree` / `ci`，不含 `range`。主提交 `03c45f7` 已推 `origin/main`（范围 `fed0f5c..03c45f7`，**未推 gitee**）；CI 主轮 `45523666470` 双腿 success（`Go ubuntu-latest` 3m09s / `Go windows-latest` 2m58s；两腿 `SELFTEST` 744/744、`scope=ci changed=31`、`TOTAL_FAIL=0`；包级 ok ubuntu 21 / windows 15、FAIL 0，首跑即双绿）；回填提交仅记录本节，其自身 CI run 只作观察记录。
 
+### P89 — `TMP-ARCHIVE-P84-P85`（tmp 两目录归档 + 引用改写 · 工具片）· ⬜ 未立项
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `TMP-ARCHIVE-P84-P85`（台账编号 = **P89**；来源 = v72 快照 §四 队列下一项 + tmp 三件遗留登记；**v72 快照闭环后启动、须用户点名**） |
+| 状态 | ⬜ 未立项（起跑须用户点名；起跑消息须四要素留痕） |
+| 目标 | ① 把 `tmp/P84-CI-FIX` 与 `tmp/P85-SECURITY-PROOF-SUBSYSTEM` 各自归档进对应证据包（`docs/validation/evidence/…`）；② 按 §11.1 判断历史文件是否改写或仅加更正注记（由 ① 判定）；③ 清除两个 tmp 目录；④ 输出引用改写清单与归档自洽证据（MANIFEST ↔ SHA256SUMS ↔ 载荷） |
+| 依赖 | v72 快照闭环；无其它前置；`find-quotes.js` **不在本片范围**（交 tmp 生命周期片） |
+| 规模 | **S**（工具 / 证据片；纯 `docs/validation/**` + 台账 + 一处测试文件注释；不触 `internal/**` 生产逻辑） |
+| 步骤 | 0 → ① 影响判定（是否触 CONTRACTS、是否需准则 MINOR；证据包内历史文件的改写口径由 ① 判定）→ ② 归档与引用改写 → ③ 一致性（归档包自洽 + 引用可解析）→ ④ 门禁 → ⑤ → ⑥ → ⑦ → ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| 现状缺口 | 两个 tmp 目录仍被多处引用支撑；无归档副本；无 §12.4 条目 |
+| 交付物 | ① 两个归档包（含 MANIFEST + SHA256SUMS，条目三方相等）；② 引用改写（逐处列出改写前后）；③ 两目录清除证据（`Test-Path` 前后读数）；④ 报告对 `docs/validation/tmp-archive-p84-p85{,_EN}.md`；⑤ 台账段与完成记录；⑥ 证据包 |
+| 验收证据 | ① `git grep` 对两条 tmp 路径零命中（`find-quotes.js` 除外，本片不处置）；② 归档包 `MANIFEST ↔ SHA256SUMS ↔ 磁盘` 条目集相等；③ `SELFTEST` 744/744 不变；④ 三作用域 `TOTAL_FAIL=0`；⑤ 报告对双语严格镜像 |
+| 边界 | 不动 `find-quotes.js`；不做 tmp 全清；不碰准则正文（除非 ① 判定需 MINOR 版本行）；不改 `internal/**` 生产逻辑（仅 `p85_t2_frozen_policy_tester_test.go` 的注释行）；不改 CONTRACTS / schema / 契约夹具 / workflows / CI workflow；不做 gitee |
+| 分级 | `[SLICE]` |
+| 探针额度 | 0 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/P89-TMP-ARCHIVE-P84-P85/freedom-list.md` |
+| R/D 基线 | R = 0、D = 0（起跑时登记） |
+| 临时件落点声明 | `tmp/P89-TMP-ARCHIVE-P84-P85/`（⑧c 前只增不删）；归档动作本身不得在 `tmp` 根新增文件 |
+| 额度口径披露 | ⑦ = S 档 ⇒ §7.5「S 档 1+1」；档位由起跑消息定（触证据包与引用改写、不触判据本体）；盲审不抽（不触身份准入语义）；批量辅助 GLM ≥1（引用清单核对 / 双语镜像） |
+| 起跑条件 | 须用户显式点名；四要素留痕；v72 快照闭环 |
+| 引用点实测清单 | 2026-11-25 `git grep -F` 实测：九个来源文件、十五处。台账对 `REMAINING_SLICES.md:2314` / `_EN.md:2301`（排片字段注记）；P84 报告对 `bounddir-residual.md:156,160` / `_EN.md:156,160`（§12 字段注记）；`internal/console/p85_t2_frozen_policy_tester_test.go:6`（代码注释）；P85 证据包 `00-briefing.md:109`、`07-carbon-r7-targeted-read.md:10`、`P87-four-read-data/07-codex-baseline-read.md:11,14,21,26`、`P87-four-read-data/diff.patch:237,11818`（起跑草案曾记七个文件、十三处；实测多出 `diff.patch` 两处，**以实测为准**；证据包内部历史文件是否改写或加注记由 ① 判定） |
+
 ## 已知缺陷（后续切片前处理）
 
 > **阻断口径不变**：仅高频/已复现缺陷阻断，观测级 flake 只记录并在验证报告中列示。
