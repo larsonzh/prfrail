@@ -2435,6 +2435,30 @@ A6 ② 进度（第 2 批，2026-09-15）：
 
 完成记录（2026-11-25）：R = 1（`create_file` 产出无 BOM + CRLF，已统一归一）、D = 0、探针 0；`Gates` 步改 `--all --skip-base --scope=ci`（`--selftest` 保留），新增 `Format` 步（`shell: bash`，`set -e` + 非空输出判红）补回 gofmt 防线，`cache: true` 仅加注记（Go 缓存判「已覆盖不动」）；冻结契约同步三处（`test` 步骤名表、`test/Gates` 摘要、`test/Format` 摘要与 `shell`）加 `different-shell` 由 `bash` 改 `sh` 的必要适配，代裁如实标注「待用户追认、不得作先例」；③ A/B 剥离四条 base 后两侧 sha256 同为 `ee00e354…`，比对器翻转 1 字节即 DIFFERENT；⑨ 三作用域 `TOTAL_FAIL=0`（tree 含 base 四条全 PASS、`go test` 为 ok=15 FAIL=0）、`--selftest` 为 744/744；证据包 22 件载荷三方相等；⑤ 两轮（1 Medium + 2 Low 全闭合）、⑥ 两轮（r1 报 2 Medium，r2 `PASS`）、⑦ 两轮（r1 `FINDINGS` 为 1 Medium + 1 Low，r2 `RE-REVIEW: PASS`）；**未提交、未推送**（停于 ⑩，等同轮授权）；唯一未闭合验收项 = CI 双腿读数（推送后回填，改动前基线 run `45614659141`：windows `Gates` 103 s / ubuntu 44 s）；准则滞后句登记候选 OB-145；主提交 `ec221f5` 已推 `origin/main`（未推 gitee），CI run `45659843522` 双腿 success（两腿 `SELFTEST` 744/744、`GATE REPORT scope=ci changed=31`、`TOTAL_FAIL=0`；`Format` 步两腿 success ⇒ `shell: bash` 在 windows 腿可用；`Gates` 步 45 s / 6 s，改动前 103 s / 44 s）。
 
+### P91 — `DIRECTIVE-CI-INVOCATION-SYNC`（准则 CI 调用句同步 · 治理片）· ✅ 闭环
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `DIRECTIVE-CI-INVOCATION-SYNC`（台账编号 = **P91**；来源 = P90 候选 OB-145 + v74 快照 §四/§六 下一裁定项 + 用户 2026-11-26 点名） |
+| 状态 | ✅ 闭环（2026-11-26 收口；四要素见 `docs/validation/evidence/P91-DIRECTIVE-CI-INVOCATION-SYNC/00-briefing.md`；报告对 `docs/validation/directive-ci-invocation-sync{,_EN}.md`） |
+| 目标 | ① 把准则「脚本化状态」句的 CI 调用描述同步为 `--all --skip-base --scope=ci` 并写明 base 由同作业前序步覆盖；② 落版本包（头部 v1.73 → v1.74 + §0.3 变更行 + 附录 C 下一空位）；③ OB-145 登记入 §12.4 并翻「已处置」；④ 输出双语镜像证据 |
+| 依赖 | v74 快照闭环；P90 闭环（拟改文本出处） |
+| 规模 | **S**（纯准则对 + 报告对 + 台账 + 证据包） |
+| 步骤 | 0 → ① 影响判定 → ② 实现 → ③ 一致性 → ④ 门禁 → ⑤ → ⑥ → ⑦ → ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| 现状缺口 | 准则「脚本化状态」句仍描述 P90 之前的 CI 调用；OB-145 尚未登记 §12.4 |
+| 交付物 | ① 准则 CN/EN 双侧描述句同步（逐字镜像）；② 版本包三件（头 / §0.3 / 附录 C）；③ OB-145 登记并翻已处置；④ 报告对 `docs/validation/directive-ci-invocation-sync{,_EN}.md`；⑤ 本台账段与完成记录；⑥ 证据包 |
+| 验收证据 | ① CN/EN 描述句逐字镜像 + 版本包三件齐全；② 三作用域 `TOTAL_FAIL=0`；③ `SELFTEST` 744/744 不变；④ 双语字形门禁绿；⑤ 报告对严格镜像 |
+| 边界 | 不改任何判据（判据本体与判定逻辑零改动）；不改 `tools/gates/**`；不改 `ci.yml`；不改 CONTRACTS / schema / 契约夹具 / `internal/**`；不新增 ADR；不做 gitee |
+| 分级 | `[SLICE]` |
+| 探针额度 | 0 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/P91-DIRECTIVE-CI-INVOCATION-SYNC/freedom-list.md` |
+| R/D 基线 | R = 0、D = 0（起跑时登记） |
+| 临时件落点声明 | `tmp/P91-DIRECTIVE-CI-INVOCATION-SYNC/`（⑧c 前只增不删） |
+| 额度口径披露 | ⑦ = S 档 1+1（用户裁定）；档位 = `GPT-5.3-Codex (copilot)` 常规档；盲审不抽；批量辅助不派（机械核验，用户裁定） |
+| 起跑条件 | 用户 2026-11-26 点名；四要素留痕；v74 快照闭环 |
+
+完成记录（2026-11-26）：R = 1（`create_file` 产出 `.md` 为无 BOM + CRLF，已统一归一）、D = 0、探针 0；准则 :675 句改为「再 `--all --skip-base --scope=ci`（base 由前序 Build/Vet/Test/Format 步覆盖，P90）」，`_EN` 逐字镜像，`ci.yml` 的 `Gates` 步 run 串与之逐字一致；版本包三件（头 v1.74 / §0.3 变更行 / 附录 C `C.0ba`）齐备，§12.4 登记 OB-145 并翻 `已处置`；③ 六形状全等（`2575 / 6187 / 4362 / 597 / 6944`）；⑨ 三作用域 `TOTAL_FAIL=0`、`--selftest` 744/744、基础门禁 `ok` 15 包 / 包级 `FAIL` 0；⑤ 1 轮 `PASS WITH FIXES`（3 Low + 1 注记，`verdict: no Medium+`）、⑥ 跳过（⑦ `SKIP CONFIRMED: YES`）、⑦ 1 轮 `PASS WITH FIXES`（1 Low，`verdict: no Medium+`，复审额度未用）；**未提交、未推送**（停于 ⑩，等同轮授权）；CI 双腿读数于推送后按 §11.2 回填。口径更正（2026-11-26）：报告对各行数 110（CN/EN 相等），证据包载荷 16 件（以 `MANIFEST.md` 条目为准）。
+
 ## 已知缺陷（后续切片前处理）
 
 > **阻断口径不变**：仅高频/已复现缺陷阻断，观测级 flake 只记录并在验证报告中列示。

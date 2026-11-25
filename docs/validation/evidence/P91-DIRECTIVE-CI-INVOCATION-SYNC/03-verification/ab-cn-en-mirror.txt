@@ -1,0 +1,39 @@
+P91 (3) consistency readings — CN/EN mirror (prfrail-tester, 2026-11-26)
+
+== directive pair (docs/DELIVERY_DIRECTIVE.md vs _EN.md) ==
+lines: CN=2575 EN=2575 equal=true
+bold: CN=6187 EN=6187 equal=true
+bars: CN=4362 EN=4362 equal=true
+blank: CN=597 EN=597 equal=true
+backticks: CN=6944 EN=6944 equal=true
+headings count CN=137 EN=137 seqEqual=true
+
+PASS  G3(a) symmetry + mirror parity :: docs/DELIVERY_DIRECTIVE.md +19/-2 vs _EN +19/-2 OK ;; docs/DELIVERY_DIRECTIVE.md {"lines":true,"head":true,"bold":true,"bars":true,"blank":true,"backticks":true}
+PASS  G3(b) key-field alignment :: hash 0/0 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK
+
+== section 6.3 sentence (new form present / old in-sentence form absent) ==
+CN new-form=1; EN new-form=1; CN old-form=0; EN old-form=0
+
+== version package ==
+CN head L3: 版本：v1.74。日期：2026-11-26。状态：**CN 正文冻结**...
+EN head L3: Version: v1.74. Date: 2026-11-26. Status: **CN body frozen**...
+CN/EN last version row: L121 :: | v1.74 | 2026-11-26 | ...
+C.0ba before C.1 on both sides (same line numbers on both sides)
+PASS  G1-b version metadata :: header=v1.74 last=v1.74 2026-11-26/2026-11-26 rows=75 OK
+
+== OB-145 ==
+CN disposition head: **已处置**（四要素：裁决人 = 用户；日期 = 2026-11-26 ...
+EN disposition head: **Resolved** (four elements: ...
+OB-145 row: ** CN=7 EN=7; backticks CN=18 EN=18; cells CN=4 EN=4
+
+== SELFTEST ==
+SELFTEST: PASS 744/744
+
+== code fences ==
+fence lines: CN=24 EN=24 ; equal=true ; both even
+
+== boundary ==
+git status --porcelain: only the directive pair, the ledger pair and the P91 evidence pack
+boundary: ZERO forbidden entries (no ci.yml, tools/gates/**, internal/**, CONTRACTS, schemas/, testdata/)
+
+TEST: PASS
