@@ -1,0 +1,18 @@
+NEW_CJK_COUNT=136
+UNKNOWN=[]
+{
+  "cn": {
+    "t3Line": 216,
+    "p1Line": 231,
+    "p2Line": 233,
+    "oldT3Len": 441,
+    "newT3Len": 573
+  },
+  "en": {
+    "t3Line": 210,
+    "p1Line": 225,
+    "p2Line": 227,
+    "oldT3Len": 1116,
+    "newT3Len": 1542
+  }
+}

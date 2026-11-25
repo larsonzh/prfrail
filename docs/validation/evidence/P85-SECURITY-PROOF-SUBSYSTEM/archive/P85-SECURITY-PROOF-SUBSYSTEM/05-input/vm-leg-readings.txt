@@ -1,0 +1,28 @@
+VM_LEG_READING_BEGIN
+--- PASS: TestP85F02PublicationStaysInsideTheBoundDirectory (0.00s)
+ok  	github.com/larsonzh/prfrail/internal/console	0.009s
+--- PASS: TestP85F07ShebangWindowIncludesTheMagicBytes (0.00s)
+--- PASS: TestP85T3LinuxRefusesWritableInstallDirectory (0.00s)
+--- PASS: TestP85T3LinuxRefusesADirectoryThisUserOwns (0.00s)
+--- PASS: TestP85T3LinuxShebangInterpreterInWritableDirectoryRefused (0.00s)
+--- PASS: TestP85T3LinuxNonELFWithoutShebangIsNotProven (0.00s)
+--- PASS: TestP85T3LinuxELFObjectIsThePositiveControl (0.01s)
+--- PASS: TestP85T3LinuxLinkedInterpreterChainIsRefused (0.00s)
+--- SKIP: TestP85T3LinuxSameInodeRewriteRequiresAPrivilegedFixture (0.00s)
+ok  	github.com/larsonzh/prfrail/internal/adapters	0.047s
+ok  	github.com/larsonzh/prfrail/examples/whois-shadow	0.006s
+ok  	github.com/larsonzh/prfrail/internal/adapters	18.514s
+ok  	github.com/larsonzh/prfrail/internal/applier	0.489s
+ok  	github.com/larsonzh/prfrail/internal/chain	1.346s
+ok  	github.com/larsonzh/prfrail/internal/console	10.701s
+ok  	github.com/larsonzh/prfrail/internal/evidence	0.235s
+ok  	github.com/larsonzh/prfrail/internal/gates	0.287s
+ok  	github.com/larsonzh/prfrail/internal/guard	1.505s
+ok  	github.com/larsonzh/prfrail/internal/release	5.082s
+ok  	github.com/larsonzh/prfrail/internal/repair	0.017s
+ok  	github.com/larsonzh/prfrail/internal/snapshot	0.173s
+ok  	github.com/larsonzh/prfrail/internal/taskdef	0.030s
+ok  	github.com/larsonzh/prfrail/internal/tickets	2.739s
+ok  	github.com/larsonzh/prfrail/tools/agent-probe/enforcement-proxy	0.348s
+ok  	github.com/larsonzh/prfrail/tools/agent-stub	0.666s
+VM_LEG_READING_END

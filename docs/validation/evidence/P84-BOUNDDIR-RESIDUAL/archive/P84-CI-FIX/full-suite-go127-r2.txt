@@ -1,0 +1,19 @@
+?   	github.com/larsonzh/prfrail/cmd/prfrail	[no test files]
+?   	github.com/larsonzh/prfrail/cmd/prfrail-release	[no test files]
+ok  	github.com/larsonzh/prfrail/examples/whois-shadow	1.232s
+ok  	github.com/larsonzh/prfrail/internal/adapters	51.634s
+ok  	github.com/larsonzh/prfrail/internal/applier	2.214s
+ok  	github.com/larsonzh/prfrail/internal/chain	4.778s
+ok  	github.com/larsonzh/prfrail/internal/console	30.880s
+ok  	github.com/larsonzh/prfrail/internal/evidence	4.317s
+ok  	github.com/larsonzh/prfrail/internal/gates	3.653s
+ok  	github.com/larsonzh/prfrail/internal/guard	10.482s
+ok  	github.com/larsonzh/prfrail/internal/release	17.065s
+ok  	github.com/larsonzh/prfrail/internal/repair	0.967s
+ok  	github.com/larsonzh/prfrail/internal/snapshot	3.526s
+ok  	github.com/larsonzh/prfrail/internal/taskdef	2.259s
+ok  	github.com/larsonzh/prfrail/internal/tickets	7.295s
+ok  	github.com/larsonzh/prfrail/tools/agent-probe/enforcement-proxy	4.154s
+?   	github.com/larsonzh/prfrail/tools/agent-probe/supervisor	[no test files]
+ok  	github.com/larsonzh/prfrail/tools/agent-stub	9.332s
+?   	github.com/larsonzh/prfrail/tools/b4-e2e	[no test files]

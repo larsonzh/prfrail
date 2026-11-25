@@ -153,11 +153,11 @@ N12（证据包 MANIFEST 描述更新）不属顺延项，由 ⑧b 收尾时一�
 | CI 双绿 | run `44926215282`（head `32bf234`）：windows / ubuntu 两腿 `Test` 步骤各 15 包 `ok`；`SELFTEST 740/740`；`base go test ./... :: ok=15 FAIL=0`；`TOTAL_FAIL=0`；ubuntu Race 步骤 6 包 `ok` |
 | C7 单次失败 | go1.22.12 全量首次运行中 `TestP84T5h4C7HistoryDepthIsFailClosed` 因 lease 文件重命名 `Access is denied` 失败一次；隔离复跑 3/3 PASS、全量第二次 15/15 ok ⇒ 环境性 flake、未复现，按 DR-17 登记、不记 R |
 | 报告行数勘误 | 报告对磁盘实况 = **246/246**（各 246 个 LF 行、结尾带 LF）；此前回执 247 系 split 尾空元素误差；正文无任何行数表述、无需改文，此处如实登记；**回填后本报告 LF 行数 = 266**（CN 版，EN 版见其对） |
-| 临时件落点 | 本片 CI 捕获件与证据/设计件统一落 `tmp/P84-CI-FIX/`；仓库外工具链 `D:\LZProjects\.toolchains\go1.22.12`（不入库 tmp）；`%TEMP%` 探测件已删、编辑器缓冲二次落盘按修订记录补正（§13 D=0 口径） |
+| 临时件落点 | 本片 CI 捕获件与证据/设计件已归档至 `docs/validation/evidence/P84-BOUNDDIR-RESIDUAL/archive/P84-CI-FIX/`（归档执行 = P89，2026-11-25；原临时目录已清除）；仓库外工具链 `D:\LZProjects\.toolchains\go1.22.12`（不入库 tmp）；`%TEMP%` 探测件已删、编辑器缓冲二次落盘按修订记录补正（§13 D=0 口径 ） |
 | wasm 诊断 | 带 `[js,wasm]` 后缀的 syscall 诊断来自 gopls 额外分析视图，构建标签与调用 P84 前已存在 ⇒ 单列「非验收目标」，不计 P84 新增问题、不阻断验收 |
 | DR 登记 | DR-16（CI 首跑红 + R-2/R-1 根因）与 DR-17（C7 单次 flake）登记于 `docs/t027/REMAINING_SLICES{,_EN}.md` 已知缺陷表 |
 
-**载体追认（不新增模型）**：用户裁定署名「GPT-6.2 Sol Max」，实际可用载体为 `GPT-6.2 Sol (copilot)`（与本片既有 ⑦ 载体一致），据此如实追认；不新增模型、不新增额度（OB-37 追加登记见 `tmp/P84-CI-FIX/10-final-review-request.md`）。
+**载体追认（不新增模型）**：用户裁定署名「GPT-6.2 Sol Max」，实际可用载体为 `GPT-6.2 Sol (copilot)`（与本片既有 ⑦ 载体一致），据此如实追认；不新增模型、不新增额度（OB-37 追加登记原件见 `docs/validation/evidence/P84-BOUNDDIR-RESIDUAL/archive/P84-CI-FIX/10-final-review-request.md`）。
 
 ## 12. 环境与档位
 

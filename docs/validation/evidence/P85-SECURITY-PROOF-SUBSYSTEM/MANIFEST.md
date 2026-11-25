@@ -5,6 +5,8 @@
 **载荷集**：本清单与 `SHA256SUMS.txt` 为元数据，其余为载荷；条目集三方相等（磁盘 / 本清单 / `SHA256SUMS.txt`）。
 **重算口径**：新增载荷后按磁盘派生重建 `SHA256SUMS.txt`，路径相对本目录。
 
+**归档来源（P89，2026-11-25）**：本包 `archive/P85-SECURITY-PROOF-SUBSYSTEM/**` 为旧临时目录（`tmp` 根下 `P85-SECURITY-PROOF-SUBSYSTEM`）的归档副本，原目录已清除；逐件的「原始字节 sha256 / 归档字节 sha256 / 处置」见 `docs/validation/evidence/P89-TMP-ARCHIVE-P84-P85/archive-byte-provenance.tsv`，引用改写对照见 `docs/validation/tmp-archive-p84-p85{,_EN}.md`。
+
 ## 归档条目清单
 
 | 路径 | 说明 |
@@ -38,3 +40,69 @@
 | `mutation-r6.txt` | 变异记录（含 R7 补记 MUT-4/MUT-5 执行态） |
 | `old-wording-grep.txt` | ⑧a 自查③ 旧口径 grep 命令与结果 |
 | `ci-45208001981-evidence.txt` | R=8 复跑 CI 双腿证据（Gates TOTAL_FAIL=0×2 + adapters/console/guard 包级 ok 双腿全有 + FAIL=0；F17/F22 销账凭据） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/01-design-rev2.md` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/01-design-rev3.md` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/01-design-rev4.md` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/01-design-review.md` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/01-design.md` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/01-r7-start-message.md` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/02a-anchor-check.js` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/02a-cjk-check.js` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/02a-contracts.diff` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/02a-purity.js` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/02a-verify.js` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/02c-f04-ruling.md` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/04-reviews/03-tester-t2.md` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/04-reviews/03-tester-t3.md` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/04-reviews/03-tester-t8a.md` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/04-reviews/05-pre-review-r1.md` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/04-reviews/05-pre-review-r2.md` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/04-reviews/06-scan-r3.md` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/04-reviews/06-scan-r4.md` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/04-reviews/07-blind-review.md` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/04-reviews/07-carbon-main-read.md` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/04-reviews/07-carbon-r7-targeted-read.md` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/04-reviews/07-codex-baseline-read.md` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/04-reviews/07-final-review.md` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/04-reviews/07-neon-cross-read.md` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/04-reviews/07-re-review-r1.md` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/04-reviews/07-re-review-r2.md` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/04-reviews/07-re-review-r3.md` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/04-reviews/07-sol-baseline-read.md` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/04-reviews/07-three-read-comparison.md` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/04-reviews/08-bc-handoff.md` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/04-reviews/09-l4-diff-excerpt.md` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/05-input/ci-45208001981-evidence.txt` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/05-input/diff.patch` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/05-input/gate-ci.txt` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/05-input/gate-index.txt` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/05-input/gate-tree.txt` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/05-input/local-full-log.txt` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/05-input/local-r7-legs.txt` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/05-input/mutation-r4.txt` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/05-input/mutation-r6.txt` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/05-input/mutation-r7-executed.txt` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/05-input/numstat.txt` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/05-input/old-wording-grep.txt` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/05-input/probe-verify-main.go.txt` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/05-input/r7-fix.diff` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/05-input/selftest.txt` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/05-input/test-r4.txt` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/05-input/test-r6.txt` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/05-input/vm-full-log.txt` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/05-input/vm-go-test.txt` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/05-input/vm-leg-readings.txt` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/05-input/vm-r4-legs.txt` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/05-input/vm-r6-legs.txt` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/05-input/vm-r7-legs.txt` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/input-list.md` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/land-r4-contracts.js` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/land-r4.out.txt` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/p85-worktree.patch` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/report.md` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/space-r4.js` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/space-r4.out.txt` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/strict-r4-contracts.js` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/strict-r4.out.txt` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/verify-r4-contracts.js` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |
+| `archive/P85-SECURITY-PROOF-SUBSYSTEM/verify-r4.out.txt` | 归档原件（P89 归档；处置见 P89 包 `archive-byte-provenance.tsv`） |

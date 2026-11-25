@@ -1,0 +1,1516 @@
+diff --git "a/tmp\\r6-baseline\\internal/evidence/acl_linux.go" b/internal/evidence/acl_linux.go
+index df4580f..7c93a33 100644
+--- "a/tmp\\r6-baseline\\internal/evidence/acl_linux.go"
++++ b/internal/evidence/acl_linux.go
+@@ -17,9 +17,13 @@ package evidence
+ // filesystem cannot store one, so in both cases no named grant can exist. Any
+ // other error is a refusal: a question that could not be answered is not a "no".
+ //
+-// The handle form is what the leaf uses (P85 F06: the permission facts describe
+-// the object the digest and identity come from); the path form exists only for
+-// ancestors, which have no handle in this walk and are already Lstat'ed by name.
++// The handle form is what a bound object uses (P85 F06: the permission facts
++// describe the object the digest and identity come from). P85 R7 added the
++// DIRECTORY handle form (BoundDir.AccessACL): fgetxattr(2) is defined for any
++// descriptor opened readable, an O_RDONLY|O_DIRECTORY descriptor included, so the
++// write-domain observation no longer has to read a directory ACL by name. The path
++// form remains only for the nominal entry, which holds no descriptor at all and
++// re-lstats the name around the read.
+ 
+ import (
+ 	"errors"
+@@ -37,16 +41,45 @@ func (bound *BoundFile) AccessACL() (bool, error) {
+ 	if err := bound.checkReadable(); err != nil {
+ 		return false, err
+ 	}
++	return accessACLOnDescriptor(bound.file.Fd())
++}
++
++// AccessACL reports whether the DIRECTORY this descriptor addresses carries a
++// POSIX access ACL (P85 R7).
++//
++// It is the directory twin of BoundFile.AccessACL and exists for the same reason:
++// the write-domain observation has to judge the ACL of the object the descriptor
++// addresses, not of whatever the name resolves to a moment later. fgetxattr(2) is
++// defined for any descriptor opened readable - an O_RDONLY|O_DIRECTORY descriptor
++// included - so no path is needed here and none is resolved.
++//
++// An O_PATH descriptor would answer EBADF to fgetxattr(2); the bindings never
++// create one (both OpenBoundDir and the verified binding open with O_RDONLY), so
++// EBADF is reported as the refusal it is instead of being folded into a verdict.
++func (bound *BoundDir) AccessACL() (bool, error) {
++	if bound == nil {
++		return false, fmt.Errorf("evidence: nil bound directory")
++	}
++	bound.mu.Lock()
++	defer bound.mu.Unlock()
++	if bound.fd < 0 {
++		return false, fmt.Errorf("evidence: nil bound directory")
++	}
++	return accessACLOnDescriptor(uintptr(bound.fd))
++}
++
++// accessACLOnDescriptor is the shared fgetxattr(2) probe behind both handle
++// forms. go1.22's syscall package exposes Getxattr but not Fgetxattr, so the ABI
++// call goes out directly: fgetxattr(fd, name, NULL, 0) reports the size the value
++// would need, or the errno that decides the verdict.
++func accessACLOnDescriptor(fd uintptr) (bool, error) {
+ 	name, err := syscall.BytePtrFromString(accessACLAttribute)
+ 	if err != nil {
+ 		return false, err
+ 	}
+-	// go1.22's syscall package exposes Getxattr but not Fgetxattr, so the ABI call
+-	// goes out directly: fgetxattr(fd, name, NULL, 0) reports the size the value
+-	// would need, or the errno that decides the verdict.
+ 	_, _, errno := syscall.Syscall6(
+ 		syscall.SYS_FGETXATTR,
+-		bound.file.Fd(),
++		fd,
+ 		uintptr(unsafe.Pointer(name)),
+ 		0,
+ 		0,
+@@ -60,9 +93,10 @@ func (bound *BoundFile) AccessACL() (bool, error) {
+ }
+ 
+ // AccessACLPath reports whether the object the path currently names carries a
+-// POSIX access ACL. It is the ancestor form; it resolves the name exactly like the
+-// Lstat of the same component does, so it describes the object that walk has just
+-// described.
++// POSIX access ACL. It is the name form, used only where no descriptor exists (the
++// nominal write-domain entry and the ancestor components of the install-source
++// walk); its callers re-lstat the name around the read so a name that moved is
++// refused instead of described (P85 R7).
+ func AccessACLPath(path string) (bool, error) {
+ 	if _, err := syscall.Getxattr(path, accessACLAttribute, nil); err != nil {
+ 		return accessACLVerdict(err)
+diff --git "a/tmp\\r6-baseline\\internal/adapters/agent_runner_policy_write_guard.go" b/internal/adapters/agent_runner_policy_write_guard.go
+index ccaa891..7ae6cb9 100644
+--- "a/tmp\\r6-baseline\\internal/adapters/agent_runner_policy_write_guard.go"
++++ b/internal/adapters/agent_runner_policy_write_guard.go
+@@ -49,17 +49,6 @@ import (
+ // dispatched.
+ var ErrManagedAgentPolicyWriteProof = errors.New("the managed agent can write the frozen policy directory")
+ 
+-// managedAgentPolicyWriteProofDomain separates the recorded proof digest from
+-// every other evidence digest. The digest is what the assembly anchor carries, so
+-// two different observations can never be compared as equal by accident.
+-//
+-// P85 design rev 4, section 2: the version moved from :1 to :2 because the
+-// observed vector shape changed - it is now always the FOUR fixed slots
+-// [policy directory | parent directory | artifact | anchor], with an absent slot
+-// rendered as the canonical empty marker instead of being omitted. A digest of the
+-// old variable-length shape must never compare equal to a new one.
+-const managedAgentPolicyWriteProofDomain = "proofrail:agent-runner-policy-write-guard:2\n"
+-
+ // managedAgentPolicyDomainEmptySlot is the canonical rendering of an absent slot.
+ // It keeps the vector shape fixed, so "no artifact yet" and "no anchor yet" are
+ // positions in a stable sequence instead of a shorter sequence that could collide
+@@ -187,6 +176,10 @@ func managedPolicyDomainRoleFromRoleMarker(role string) int {
+ // managedPolicyDomainRoleFromName maps a file NAME onto its slot index through the
+ // role markers the frozen policy contract spells. Matching is on the suffix, so the
+ // task/step/attempt prefix never has to be parsed here.
++//
++// The comparison is the contract's lowercase spelling (P85 R7): a name that matches
++// only case-insensitively is refused by managedPolicyDomainResolveFileRole instead
++// of being placed.
+ func managedPolicyDomainRoleFromName(path string) int {
+ 	base := filepath.Base(path)
+ 	switch {
+@@ -198,6 +191,58 @@ func managedPolicyDomainRoleFromName(path string) int {
+ 	return -1
+ }
+ 
++// managedPolicyDomainRoleFromNameIgnoringCase reports the role a name would carry
++// if the contract's suffix were matched case-insensitively. It never PLACES a slot;
++// it exists only so a differently-cased suffix can be refused explicitly.
++func managedPolicyDomainRoleFromNameIgnoringCase(path string) int {
++	base := strings.ToLower(filepath.Base(path))
++	switch {
++	case strings.HasSuffix(base, managedPolicyDomainAnchorSuffix):
++		return 1
++	case strings.HasSuffix(base, managedPolicyDomainArtifactSuffix):
++		return 0
++	}
++	return -1
++}
++
++// managedPolicyDomainResolveFileRole resolves one handle-form file onto its
++// contract role (P85 R7).
++//
++// The declared role wins only when the name AGREES with it. An explicit
++// Role:"artifact" on a ".anchor.json" name - or the mirror image - describes two
++// different slots for one object; picking either silently would place the object in
++// the slot the other side of the contract does not expect, so the pair is refused.
++//
++// A name whose suffix matches only case-insensitively is not the spelling the
++// contract freezes, so it is refused instead of being either accepted or left to
++// path order. A name with no role marker at all keeps role -1 (the caller places it
++// in the first free slot, deterministically by path).
++func managedPolicyDomainResolveFileRole(declared, path string) (int, error) {
++	declaredRole := managedPolicyDomainRoleFromRoleMarker(declared)
++	nameRole := managedPolicyDomainRoleFromName(path)
++	// A suffix that matches only case-insensitively is refused with or without a
++	// declared role: the contract freezes the lowercase spelling, and accepting the
++	// other spelling would let a name mean "the anchor" to one reader and "no role"
++	// to another.
++	if nameRole < 0 {
++		if casing := managedPolicyDomainRoleFromNameIgnoringCase(path); casing >= 0 {
++			return -1, fmt.Errorf("%w: the %q slot carries the %s role suffix in a spelling other than the contract's lowercase form",
++				ErrManagedAgentPolicyWriteProof, path, managedPolicyDomainFileSlotLabel(casing))
++		}
++	}
++	switch {
++	case declaredRole >= 0 && nameRole >= 0 && declaredRole != nameRole:
++		return -1, fmt.Errorf("%w: the %q slot declares the %s role, but its name is the %s role",
++			ErrManagedAgentPolicyWriteProof, path,
++			managedPolicyDomainFileSlotLabel(declaredRole), managedPolicyDomainFileSlotLabel(nameRole))
++	case declaredRole >= 0:
++		return declaredRole, nil
++	case nameRole >= 0:
++		return nameRole, nil
++	}
++	return -1, nil
++}
++
+ // managedPolicyDomainFileSlotLabel names a file slot by its ROLE, so a refusal
+ // says which position of the contract failed instead of "some existing file".
+ func managedPolicyDomainFileSlotLabel(index int) string {
+@@ -339,9 +384,9 @@ func managedAgentPolicyDomainHandleSlots(directory *evidence.BoundDir, directory
+ 			return nil, fmt.Errorf("%w: the %s slot carries no path", ErrManagedAgentPolicyWriteProof, file.Role)
+ 		}
+ 		clean := filepath.Clean(file.Path)
+-		role := managedPolicyDomainRoleFromRoleMarker(file.Role)
+-		if role < 0 {
+-			role = managedPolicyDomainRoleFromName(clean)
++		role, err := managedPolicyDomainResolveFileRole(file.Role, clean)
++		if err != nil {
++			return nil, err
+ 		}
+ 		candidates = append(candidates, managedPolicyDomainFileCandidate{
+ 			role: role,
+diff --git "a/tmp\\r6-baseline\\internal/adapters/agent_runner_policy_write_guard_unix.go" b/internal/adapters/agent_runner_policy_write_guard_unix.go
+index 79d18a0..00fe893 100644
+--- "a/tmp\\r6-baseline\\internal/adapters/agent_runner_policy_write_guard_unix.go"
++++ b/internal/adapters/agent_runner_policy_write_guard_unix.go
+@@ -58,9 +58,13 @@ func managedAgentPolicyDomainWriteProofSlots(slots []managedAgentPolicyDomainSlo
+ 			continue
+ 		}
+ 		line, objectErr := managedAgentPolicyDomainSlotObservation(slot)
+-		if line != "" {
+-			observed = append(observed, line)
++		if line == "" {
++			// P85 R7: an observation that could not render a line keeps its POSITION in
++			// the vector and records the canonical empty marker, so a refusal digest still
++			// carries the fixed four-slot shape instead of silently becoming shorter.
++			line = managedAgentPolicyDomainEmptySlot
+ 		}
++		observed = append(observed, line)
+ 		if objectErr != nil {
+ 			failures = append(failures, objectErr)
+ 		}
+@@ -90,20 +94,25 @@ func managedAgentPolicyDomainWriteProofSlots(slots []managedAgentPolicyDomainSlo
+ //
+ // so a name that no longer addresses the descriptor's object refuses instead of
+ // judging another object, and the caller's terminal ReassertIdentities closes the
+-// observation afterwards.
++// observation afterwards. P85 R7 moved the ACL probe itself onto the descriptor for
++// both handle forms, so a handle-form slot has no path-based probe left; the two
++// comparisons stay because they pin the recorded path to the object that was judged.
+ //
+-// The access ACL is the one probe Linux cannot yet ask of a DIRECTORY descriptor:
+-// evidence exposes fgetxattr for bound files (BoundFile.AccessACL) but only the
+-// name-based AccessACLPath for directories, so a directory slot reads it by name
+-// inside that sandwich. File slots do not go through the name at all.
++// P85 R7 (review r6 findings): the access ACL is read from the DESCRIPTOR for both
++// handle forms - BoundFile.AccessACL and BoundDir.AccessACL both issue
++// fgetxattr(2) on the descriptor the binding opened - so a handle-form slot never
++// resolves the name for the ACL probe. The two name comparisons therefore no longer
++// bracket a by-name read for a directory slot; they pin the recorded path to the
++// descriptor so the observation line (and any refusal that quotes it) describes the
++// object that was judged.
+ //
+-// Registered residue (S1 boundary): for a DIRECTORY slot the instant between the
+-// second comparison and getxattr(2) - and the resolution inside getxattr itself -
+-// is a name re-resolution this layer cannot eliminate. A name redirected to another
+-// object and restored within that window would deliver that object's ACL. The
+-// window is bounded by the two fstats (the descriptor cannot change under them) and
+-// by the two name comparisons, and the probe writes nothing; it is recorded as a
+-// known boundary instead of being claimed away.
++// The only remaining by-name ACL read is the NOMINAL entry
++// (VerifyManagedAgentCannotWritePolicyDomain), which holds no descriptor at all.
++// That window is registered as an INTERNAL API BOUNDARY - evidence has no
++// directory handle to offer there - not as a kernel limitation: fgetxattr(2) works
++// on any readable directory descriptor, and the handle-form callers use it. The
++// nominal entry re-lstats the name after the read, so the unverified instant is
++// the resolution inside getxattr(2) itself; the probe writes nothing.
+ func managedAgentPolicyDomainSlotObservation(slot managedAgentPolicyDomainSlot) (string, error) {
+ 	fd, hasHandle, err := managedAgentPolicyDomainSlotDescriptor(slot)
+ 	if err != nil {
+@@ -146,30 +155,22 @@ func managedAgentPolicyDomainSlotObservation(slot managedAgentPolicyDomainSlot)
+ 		return "", fmt.Errorf("%w: the %s %q is not a regular file", ErrManagedAgentPolicyWriteProof, slot.label, slot.path)
+ 	}
+ 	line := fmt.Sprintf("%s:%d:%d:%04o:%d:%d", slot.path, stat.Dev, stat.Ino, mode.Perm(), stat.Uid, stat.Gid)
+-	// The opening name comparison: the ACL probe below must judge the object the
+-	// descriptor addresses, and this is the only way to prove the name still reaches
+-	// it.
++	// The opening name comparison: the observation line quotes this path, so the
++	// path has to address the descriptor's object on BOTH sides of the probe.
+ 	if err := managedAgentPolicyDomainAssertNameIdentity(slot, handleIdentity, "before"); err != nil {
+ 		return line, err
+ 	}
+-	if err := managedAgentPolicyDomainDenyAccessACL(slot); err != nil {
+-		return line, err
++	aclErr := managedAgentPolicyDomainDenyAccessACL(slot)
++	// P85 R7: the closing verification runs even when the probe refused. A refusal
++	// has to describe the object the observation was pinned to, so the refused branch
++	// re-checks the descriptor (and, on the handle form, the name) before returning
++	// the probe error instead of returning straight out of the probe.
++	probeErr := managedAgentPolicyDomainAfterProbe(slot, fd, hasHandle, handleIdentity, stat)
++	if aclErr != nil {
++		return line, aclErr
+ 	}
+-	if hasHandle {
+-		var after syscall.Stat_t
+-		if err := syscall.Fstat(fd, &after); err != nil {
+-			return line, fmt.Errorf("%w: fstat the %s %q after its ACL check: %v", ErrManagedAgentPolicyWriteProof, slot.label, slot.path, err)
+-		}
+-		if after.Dev != stat.Dev || after.Ino != stat.Ino || after.Mode != stat.Mode || after.Uid != stat.Uid || after.Gid != stat.Gid {
+-			return line, fmt.Errorf("%w: the %s %q changed identity between its descriptor observation and the ACL check", ErrManagedAgentPolicyWriteProof, slot.label, slot.path)
+-		}
+-		// The closing name comparison of the sandwich. Together with the opening one
+-		// it proves the name addressed the descriptor on BOTH sides of the probe; the
+-		// probe itself is the registered residue (see the function comment), and the
+-		// caller's ReassertIdentities is the terminal verdict over the whole domain.
+-		if err := managedAgentPolicyDomainAssertNameIdentity(slot, handleIdentity, "after"); err != nil {
+-			return line, err
+-		}
++	if probeErr != nil {
++		return line, probeErr
+ 	}
+ 	if err := installSourceEffectiveWritability(slot.path, mode, int(stat.Uid), int(stat.Gid)); err != nil {
+ 		return line, fmt.Errorf("%w: %v", ErrManagedAgentPolicyWriteProof, err)
+@@ -177,6 +178,44 @@ func managedAgentPolicyDomainSlotObservation(slot managedAgentPolicyDomainSlot)
+ 	return line, nil
+ }
+ 
++// managedAgentPolicyDomainAfterProbe re-verifies, AFTER the ACL probe, that the
++// observation still describes the object it started on (P85 R7).
++//
++//   - handle form: fstat(2) must report the same identity, and the NAME must still
++//     address the descriptor's object. With the opening comparison this brackets the
++//     probe, so the recorded line, the probe and the descriptor are one object.
++//   - name form (the nominal entry, which has no descriptor): a second Lstat must
++//     reproduce the first observation. The ACL read still resolves the name, so the
++//     window shrinks to the resolution inside getxattr(2); that residue is
++//     registered as an internal API boundary (see the observation comment).
++func managedAgentPolicyDomainAfterProbe(slot managedAgentPolicyDomainSlot, fd int, hasHandle bool, handleIdentity evidence.FileID, before syscall.Stat_t) error {
++	if !hasHandle {
++		info, err := os.Lstat(slot.path)
++		if err != nil {
++			return fmt.Errorf("%w: lstat the %s %q after its ACL check: %v", ErrManagedAgentPolicyWriteProof, slot.label, slot.path, err)
++		}
++		after, ok := info.Sys().(*syscall.Stat_t)
++		if !ok {
++			return fmt.Errorf("%w: the %s %q carries no ownership information after its ACL check", ErrManagedAgentPolicyWriteProof, slot.label, slot.path)
++		}
++		if after.Dev != before.Dev || after.Ino != before.Ino || after.Mode != before.Mode || after.Uid != before.Uid || after.Gid != before.Gid {
++			return fmt.Errorf("%w: the %s %q changed identity during its ACL check, so the ACL was not read from the observed object", ErrManagedAgentPolicyWriteProof, slot.label, slot.path)
++		}
++		return nil
++	}
++	var after syscall.Stat_t
++	if err := syscall.Fstat(fd, &after); err != nil {
++		return fmt.Errorf("%w: fstat the %s %q after its ACL check: %v", ErrManagedAgentPolicyWriteProof, slot.label, slot.path, err)
++	}
++	if after.Dev != before.Dev || after.Ino != before.Ino || after.Mode != before.Mode || after.Uid != before.Uid || after.Gid != before.Gid {
++		return fmt.Errorf("%w: the %s %q changed identity between its descriptor observation and the ACL check", ErrManagedAgentPolicyWriteProof, slot.label, slot.path)
++	}
++	// The closing name comparison. With the opening one it proves the recorded path
++	// addressed the descriptor on both sides of the probe; the caller's
++	// ReassertIdentities is the terminal verdict over the whole domain.
++	return managedAgentPolicyDomainAssertNameIdentity(slot, handleIdentity, "after")
++}
++
+ // managedAgentPolicyDomainSlotHandleIdentity reports the identity of the handle
+ // that owns the slot. It is the value every name-based comparison has to reproduce
+ // literally.
+@@ -220,10 +259,10 @@ func managedAgentPolicyDomainAssertNameIdentity(slot managedAgentPolicyDomainSlo
+ 
+ // managedAgentPolicyDomainDenyAccessACL is the ACL probe of one slot.
+ //
+-// A bound FILE reads it from its own descriptor through fgetxattr (no name
+-// resolution at all). A bound DIRECTORY has no descriptor-based reader in evidence
+-// yet, so it falls back to the name-based read - which is exactly why its caller
+-// wraps this call in the identity sandwich and registers the residue.
++// Both handle forms read the ACL from their own descriptor through fgetxattr(2),
++// so no name is resolved (P85 R7). Only the nominal slot - neither a bound file nor
++// a bound directory - falls back to the name-based read, which is the registered
++// internal API boundary.
+ func managedAgentPolicyDomainDenyAccessACL(slot managedAgentPolicyDomainSlot) error {
+ 	if slot.file != nil {
+ 		present, err := slot.file.AccessACL()
+@@ -235,6 +274,16 @@ func managedAgentPolicyDomainDenyAccessACL(slot managedAgentPolicyDomainSlot) er
+ 		}
+ 		return nil
+ 	}
++	if slot.dir != nil {
++		present, err := slot.dir.AccessACL()
++		if err != nil {
++			return fmt.Errorf("%w: the access ACL of the %s %q cannot be read on its handle: %v", ErrManagedAgentPolicyWriteProof, slot.label, slot.path, err)
++		}
++		if present {
++			return fmt.Errorf("%w: the %s %q carries a POSIX access ACL, so a named grant to this user cannot be excluded", ErrManagedAgentPolicyWriteProof, slot.label, slot.path)
++		}
++		return nil
++	}
+ 	if err := installSourceDenyAccessACLPath(slot.path); err != nil {
+ 		return fmt.Errorf("%w: %v", ErrManagedAgentPolicyWriteProof, err)
+ 	}
+diff --git "a/tmp\\r6-baseline\\internal/adapters/agent_runner_policy_write_guard_windows.go" b/internal/adapters/agent_runner_policy_write_guard_windows.go
+index d0b84db..7143abf 100644
+--- "a/tmp\\r6-baseline\\internal/adapters/agent_runner_policy_write_guard_windows.go"
++++ b/internal/adapters/agent_runner_policy_write_guard_windows.go
+@@ -49,9 +49,13 @@ func managedAgentPolicyDomainWriteProofSlots(slots []managedAgentPolicyDomainSlo
+ 			continue
+ 		}
+ 		line, granted, objectErr := managedAgentPolicyDomainSlotObservation(slot, sidText)
+-		if line != "" {
+-			observed = append(observed, line)
++		if line == "" {
++			// P85 R7: an observation that could not render a line keeps its POSITION in
++			// the vector and records the canonical empty marker, so a refusal digest still
++			// carries the fixed four-slot shape instead of silently becoming shorter.
++			line = managedAgentPolicyDomainEmptySlot
+ 		}
++		observed = append(observed, line)
+ 		if objectErr != nil {
+ 			failures = append(failures, objectErr)
+ 			continue
+@@ -78,6 +82,11 @@ func managedAgentPolicyDomainWriteProofSlots(slots []managedAgentPolicyDomainSlo
+ //   - the name CHAIN is classified with the same root-chain walk the verified
+ //     binding uses, so a reparse point anywhere in the chain refuses instead of
+ //     being followed by the kernel.
++//
++// P85 R7 (review r6 finding): every BY-NAME read of this observation - the
++// per-right access checks and the DACL digest (GetNamedSecurityInfoW) - sits
++// between the two chain classifications and the two identity comparisons, so the
++// DACL that enters the digest describes the object the handle addresses.
+ func managedAgentPolicyDomainSlotObservation(slot managedAgentPolicyDomainSlot, sidText string) (string, int, error) {
+ 	handleIdentity := ""
+ 	if slot.dir != nil {
+@@ -112,6 +121,19 @@ func managedAgentPolicyDomainSlotObservation(slot managedAgentPolicyDomainSlot,
+ 	if err != nil {
+ 		return "", 0, fmt.Errorf("%w: %v", ErrManagedAgentPolicyWriteProof, err)
+ 	}
++	// P85 R7 (review r6 finding): the DACL digest is a BY-NAME read
++	// (GetNamedSecurityInfoW), so it belongs INSIDE the sandwich. Taking it after the
++	// closing comparison would describe a name that nothing re-checked afterwards.
++	descriptor, err := installSourceDescriptorDigest(slot.path)
++	if err != nil {
++		return "", 0, fmt.Errorf("%w: %v", ErrManagedAgentPolicyWriteProof, err)
++	}
++	// The closing half of the sandwich runs after every by-name read: the root chain
++	// must still be reparse-free and the name must still address the object it started
++	// on, so the recorded DACL describes the object that was judged.
++	if err := evidence.ClassifyRootChainNoReparse(slot.path, slot.isDir); err != nil {
++		return "", 0, fmt.Errorf("%w: re-classify the root chain of the %s %q after its access probes: %v", ErrManagedAgentPolicyWriteProof, slot.label, slot.path, err)
++	}
+ 	after, err := evidence.FileIDAt(slot.path)
+ 	if err != nil {
+ 		return "", 0, fmt.Errorf("%w: re-identify the %s %q: %v", ErrManagedAgentPolicyWriteProof, slot.label, slot.path, err)
+@@ -120,10 +142,6 @@ func managedAgentPolicyDomainSlotObservation(slot managedAgentPolicyDomainSlot,
+ 		return "", 0, fmt.Errorf("%w: the %s %q changed identity during its access probes (%s != %s)",
+ 			ErrManagedAgentPolicyWriteProof, slot.label, slot.path, after, before)
+ 	}
+-	descriptor, err := installSourceDescriptorDigest(slot.path)
+-	if err != nil {
+-		return "", 0, fmt.Errorf("%w: %v", ErrManagedAgentPolicyWriteProof, err)
+-	}
+ 	identity := handleIdentity
+ 	if identity == "" {
+ 		identity = string(before)
+NEW FILE: internal/adapters/agent_runner_policy_write_guard_domain.go
+//go:build linux || windows
+
+package adapters
+
+// managedAgentPolicyWriteProofDomain separates the recorded proof digest from
+// every other evidence digest. The digest is what the assembly anchor carries, so
+// two different observations can never be compared as equal by accident.
+//
+// P85 design rev 4, section 2: the version moved from :1 to :2 because the
+// observed vector shape changed - it is now always the FOUR fixed slots
+// [policy directory | parent directory | artifact | anchor], with an absent slot
+// rendered as the canonical empty marker instead of being omitted. A digest of the
+// old variable-length shape must never compare equal to a new one.
+//
+// P85 R=7 (user ruling of 2026-11-23): the constant lives in its own file behind
+// the build tag the two observing halves carry (linux and windows). The remaining
+// platform file never reads it, so keeping it in the shared file made it look
+// unused in the darwin IDE view. This relocation fixes that diagnostic only; it is
+// not a precedent for keeping code that is otherwise dead.
+const managedAgentPolicyWriteProofDomain = "proofrail:agent-runner-policy-write-guard:2\n"
+diff --git "a/tmp\\r6-baseline\\internal/adapters/ai_install_proof_windows.go" b/internal/adapters/ai_install_proof_windows.go
+index f2a448b..e41714b 100644
+--- "a/tmp\\r6-baseline\\internal/adapters/ai_install_proof_windows.go"
++++ b/internal/adapters/ai_install_proof_windows.go
+@@ -153,9 +153,14 @@ var (
+ // executable for this user's token: every directory above the leaf is judged by its
+ // per-right mutation grants, the volume root is anchored by identity, and the leaf
+ // is judged by the file table. leaf is the handle the executable was opened through
+-// (P85 F06); the Windows rule needs no fact from its bytes, so it is not read here.
++// (P85 F06); the Windows rule needs no fact from its bytes.
++//
++// P85 R7 (review r6 finding): the permission facts are tied to THAT object instead
++// of to whatever the name addresses. The identity of the leaf handle is captured
++// and the leaf NAME has to reproduce it before the probes and again after them, so
++// the ACL/DACL observation cannot describe a different object than the bytes that
++// were hashed.
+ func verifyInstallSourceImmutability(executable string, leaf *evidence.BoundFile) (AIInstallSourceImmutability, error) {
+-	_ = leaf
+ 	// P85 F07: the ORIGINAL spelling is judged. A path that is not already
+ 	// canonical names a chain the kernel walks literally and this rule would
+ 	// otherwise fold away ("\..", ".", doubled or trailing separators), so it is
+@@ -164,6 +169,21 @@ func verifyInstallSourceImmutability(executable string, leaf *evidence.BoundFile
+ 	if err := installSourceRequireCanonicalSpelling(path); err != nil {
+ 		return AIInstallSourceImmutability{}, err
+ 	}
++	if leaf == nil {
++		return AIInstallSourceImmutability{}, fmt.Errorf("%w: %q has no bound handle, so its permission facts cannot be tied to the object whose bytes were hashed", ErrAIInstallSourceProof, path)
++	}
++	leafIdentity, err := leaf.FileID()
++	if err != nil {
++		return AIInstallSourceImmutability{}, fmt.Errorf("%w: identify the bound executable %q: %v", ErrAIInstallSourceProof, path, err)
++	}
++	leafNameBefore, err := evidence.FileIDAt(path)
++	if err != nil {
++		return AIInstallSourceImmutability{}, fmt.Errorf("%w: identify the install source %q before its permission probes: %v", ErrAIInstallSourceProof, path, err)
++	}
++	if string(leafNameBefore) != leafIdentity {
++		return AIInstallSourceImmutability{}, fmt.Errorf("%w: the install source %q does not name the executable whose bytes were hashed (%s != %s)",
++			ErrAIInstallSourceProof, path, leafNameBefore, leafIdentity)
++	}
+ 	sidText, err := installSourceCurrentUserSIDText()
+ 	if err != nil {
+ 		return AIInstallSourceImmutability{}, err
+@@ -234,6 +254,18 @@ func verifyInstallSourceImmutability(executable string, leaf *evidence.BoundFile
+ 			break
+ 		}
+ 	}
++	// The closing half of the leaf verification: after every by-name probe the leaf
++	// name must still address the object the handle addresses. A name that moved
++	// during the walk refuses instead of contributing another object's ACL/DACL to
++	// the evidence (P85 R7).
++	leafNameAfter, err := evidence.FileIDAt(path)
++	if err != nil {
++		return AIInstallSourceImmutability{}, fmt.Errorf("%w: re-identify the install source %q after its permission probes: %v", ErrAIInstallSourceProof, path, err)
++	}
++	if string(leafNameAfter) != leafIdentity {
++		return AIInstallSourceImmutability{}, fmt.Errorf("%w: the install source %q no longer addresses the object whose bytes were hashed (%s != %s)",
++			ErrAIInstallSourceProof, path, leafNameAfter, leafIdentity)
++	}
+ 	facts := AIInstallSourceImmutability{Windows: &AIInstallSourceWindowsFacts{
+ 		DirACLDeniesWriteDelete: denies,
+ 		ACLEvidenceHash: evidence.Digest(aiInstallSourceACLDomain, []byte(strings.ToLower(path)+"\n"+
+diff --git "a/tmp\\r6-baseline\\internal/adapters/ai_install_proof_unsupported.go" b/internal/adapters/ai_install_proof_unsupported.go
+index 670b125..e441ae3 100644
+--- "a/tmp\\r6-baseline\\internal/adapters/ai_install_proof_unsupported.go"
++++ b/internal/adapters/ai_install_proof_unsupported.go
+@@ -7,9 +7,11 @@ package adapters
+ // equivalent rule: a probe on a platform whose immutability rule is unknown must
+ // fail closed, not fall back to "assume immutable".
+ //
+-// The two symbols below are the ones the shared files and the platform-tagged tests
+-// reference, so an unsupported host still compiles and every entry point refuses at
+-// run time.
++// The symbol below is the one the shared files and the platform-tagged tests
++// reference, so an unsupported host still compiles and every entry point refuses
++// at run time. installSourceInterpreter is declared by the Windows and Linux halves
++// only: nothing outside them calls it, so it is absent here on purpose (it would be
++// dead code on darwin).
+ 
+ import (
+ 	"fmt"
+@@ -19,13 +21,14 @@ import (
+ )
+ 
+ // verifyInstallSourceImmutability always refuses on an unsupported platform.
++//
++// The signature is the same one the Windows and Linux halves carry, and leaf has
++// the same meaning in all three: the handle the executable was opened through. This
++// half refuses before any permission fact is observed, so the handle is accepted and
++// intentionally unused - a caller holding it gets the same fail-closed verdict it
++// would get by name, never a different one.
+ func verifyInstallSourceImmutability(executable string, leaf *evidence.BoundFile) (AIInstallSourceImmutability, error) {
++	_ = leaf
+ 	return AIInstallSourceImmutability{}, fmt.Errorf("%w: %s has no install source rule, so %q cannot be proven immutable",
+ 		ErrAIInstallSourceProof, runtime.GOOS, executable)
+ }
+-
+-// installSourceInterpreter always refuses on an unsupported platform.
+-func installSourceInterpreter(path string) (*AIInstallSourceInterpreter, error) {
+-	return nil, fmt.Errorf("%w: %s has no interpreter rule, so %q cannot be proven",
+-		ErrAIInstallSourceProof, runtime.GOOS, path)
+-}
+diff --git "a/tmp\\r6-baseline\\internal/adapters/ai_install_proof_unix.go" b/internal/adapters/ai_install_proof_unix.go
+index 3bfde15..c034870 100644
+--- "a/tmp\\r6-baseline\\internal/adapters/ai_install_proof_unix.go"
++++ b/internal/adapters/ai_install_proof_unix.go
+@@ -132,27 +132,6 @@ func verifyInstallSourceImmutability(executable string, leaf *evidence.BoundFile
+ 	}}, nil
+ }
+ 
+-// verifyUnwritableInstallPath proves every component of one absolute path (the root
+-// slash included, the final object included) is non-writable by this user and not
+-// owned by this user. It returns the domain digest of the observed facts, which is
+-// what the carrier records.
+-//
+-// P85 F06: os.Lstat, not os.Stat - a component that is a symbolic link is refused,
+-// because the NAME chain is what the kernel walks and the link target is not the
+-// object the rule would then describe.
+-//
+-// The path-only form opens the leaf itself (link-free) so it describes the same
+-// object the handle-based walk describes; production callers already hold the leaf
+-// handle and use verifyUnwritableInstallPathAgainstLeaf directly.
+-func verifyUnwritableInstallPath(path string) (string, error) {
+-	leaf, err := openInstallSourceLeaf(path)
+-	if err != nil {
+-		return "", err
+-	}
+-	defer func() { _ = leaf.Close() }()
+-	return verifyUnwritableInstallPathAgainstLeaf(path, leaf)
+-}
+-
+ // verifyUnwritableInstallPathAgainstLeaf is the bound form: every ancestor is
+ // inspected by name (a link component is refused), and the LEAF is described by
+ // the handle the caller already read the digest and header from (P85 F06), so the
+diff --git "a/tmp\\r6-baseline\\internal/adapters/p85_r6_sandwich_linux_test.go" b/internal/adapters/p85_r6_sandwich_linux_test.go
+index 3488f48..c9449fd 100644
+--- "a/tmp\\r6-baseline\\internal/adapters/p85_r6_sandwich_linux_test.go"
++++ b/internal/adapters/p85_r6_sandwich_linux_test.go
+@@ -21,8 +21,13 @@ package adapters
+ 
+ import (
+ 	"errors"
++	"os"
++	"path/filepath"
+ 	"strings"
++	"syscall"
+ 	"testing"
++
++	"github.com/larsonzh/prfrail/internal/evidence"
+ )
+ 
+ func init() {
+@@ -60,3 +65,167 @@ func init() {
+ 		},
+ 	})
+ }
++
++// p85R7SetAccessACL writes an EXTENDED POSIX access ACL (version 2: user object
++// rwx, a named user rwx, group object r-x, mask rwx, other r-x) onto path, or
++// skips the caller when this host's filesystem cannot store one. The named user
++// entry matters: a MINIMAL ACL (no named entries) is equivalent to the mode bits,
++// and the kernel does not persist it, so getxattr/fgetxattr would answer ENODATA
++// and the fd-versus-name discrimination below could never be established. Without
++// a storable ACL the discrimination cannot run, so skipping is the honest outcome.
++func p85R7SetAccessACL(t *testing.T, path string) {
++	t.Helper()
++	blob := []byte{2, 0, 0, 0} // ACL version 2, little-endian
++	appendEntry := func(tag, perm uint16, id uint32) {
++		blob = append(blob,
++			byte(tag), byte(tag>>8),
++			byte(perm), byte(perm>>8),
++			byte(id), byte(id>>8), byte(id>>16), byte(id>>24))
++	}
++	appendEntry(0x01, 0o7, 0xFFFFFFFF) // ACL_USER_OBJ
++	appendEntry(0x02, 0o7, 4242)       // ACL_USER (named; forces kernel storage)
++	appendEntry(0x04, 0o5, 0xFFFFFFFF) // ACL_GROUP_OBJ
++	appendEntry(0x10, 0o7, 0xFFFFFFFF) // ACL_MASK (required with named entries)
++	appendEntry(0x20, 0o5, 0xFFFFFFFF) // ACL_OTHER
++	if err := syscall.Setxattr(path, "system.posix_acl_access", blob, 0); err != nil {
++		t.Skipf("this host cannot store a POSIX access ACL on %s: %v", path, err)
++	}
++}
++
++// p85R7DirectorySlotFixture binds one policy directory and returns the DIRECTORY
++// slot of the fixed four-slot vector, the identity its handle reports, and the swap
++// that moves the name onto a fresh directory. The descriptor keeps addressing the
++// object that was bound, which is what the slot's identity has to follow.
++func p85R7DirectorySlotFixture(t *testing.T) (managedAgentPolicyDomainSlot, evidence.FileID, func()) {
++	t.Helper()
++	root := t.TempDir()
++	policy := filepath.Join(root, "agent-runner-policy")
++	if err := os.MkdirAll(policy, 0o755); err != nil {
++		t.Fatalf("create the policy directory: %v", err)
++	}
++	directory, identity, err := evidence.OpenBoundDirVerified(policy)
++	if err != nil {
++		t.Skipf("this host's temporary root is not bindable as a verified directory: %v", err)
++	}
++	t.Cleanup(func() { _ = directory.Close() })
++	slot := managedAgentPolicyDomainSlot{
++		label:   "policy directory",
++		path:    policy,
++		isDir:   true,
++		present: true,
++		dir:     directory,
++	}
++	swap := func() {
++		t.Helper()
++		// Rename first so the retired directory keeps its identity; a create-after-delete
++		// can hand the same inode back and make the fixture agree by accident.
++		if err := os.Rename(policy, policy+".retired"); err != nil {
++			t.Fatalf("rename the policy directory away: %v", err)
++		}
++		if err := os.Mkdir(policy, 0o755); err != nil {
++			t.Fatalf("create the replacement policy directory: %v", err)
++		}
++	}
++	return slot, identity, swap
++}
++
++// TestP85R7LinuxDirectorySlotReadsTheACLFromItsDescriptor is the discriminating
++// case for the fd-ification of the directory slot: the descriptor addresses a
++// directory that CARRIES an access ACL while the NAME addresses one that does not.
++// Only a descriptor-based read refuses; a regression to evidence.AccessACLPath
++// accepts, and the assertion below goes red.
++func TestP85R7LinuxDirectorySlotReadsTheACLFromItsDescriptor(t *testing.T) {
++	slot, _, swap := p85R7DirectorySlotFixture(t)
++	p85R7SetAccessACL(t, slot.path)
++	swap()
++
++	byName, err := evidence.AccessACLPath(slot.path)
++	if err != nil {
++		t.Skipf("this host cannot read the access ACL of %s by name: %v", slot.path, err)
++	}
++	if byName {
++		t.Skipf("the replacement directory inherited an access ACL, so the fd-versus-name discrimination cannot be established here")
++	}
++	onHandle, err := slot.dir.AccessACL()
++	if err != nil {
++		t.Fatalf("read the directory access ACL on its descriptor: %v", err)
++	}
++	if !onHandle {
++		t.Fatal("the descriptor addresses the ACL-carrying directory; a name-based read would report the ACL-free stand-in")
++	}
++	if err := managedAgentPolicyDomainDenyAccessACL(slot); err == nil {
++		t.Fatal("the production ACL probe must refuse the directory that carries an access ACL")
++	} else if !strings.Contains(err.Error(), "carries a POSIX access ACL") {
++		t.Fatalf("the refusal must be the access-ACL verdict, got %v", err)
++	}
++}
++
++// TestP85R7LinuxDirectorySlotRefusesAReplacedName pins both identity comparisons of
++// the DIRECTORY slot. The opening comparison passes on the untouched name, the swap
++// happens, the closing comparison refuses, and the production observation refuses
++// with the identity verdict rather than with the writability rule (the temporary
++// root is owned by the executing user, which that rule would also refuse, so the
++// message is what attributes the refusal to the sandwich).
++//
++// Mutation check: short-circuiting the directory slot's name comparison (or
++// removing the closing call) leaves the observation to refuse with a different
++// verdict, and this leg goes red.
++func TestP85R7LinuxDirectorySlotRefusesAReplacedName(t *testing.T) {
++	slot, identity, swap := p85R7DirectorySlotFixture(t)
++	if err := managedAgentPolicyDomainAssertNameIdentity(slot, identity, "before"); err != nil {
++		t.Fatalf("the untouched name must pass the opening comparison, got %v", err)
++	}
++	swap()
++	closingErr := managedAgentPolicyDomainAssertNameIdentity(slot, identity, "after")
++	if closingErr == nil {
++		t.Fatal("a moved name must refuse the closing comparison")
++	}
++	if !errors.Is(closingErr, ErrManagedAgentPolicyWriteProof) {
++		t.Fatalf("the closing refusal must be the write-proof sentinel, got %v", closingErr)
++	}
++	if !strings.Contains(closingErr.Error(), "no longer addresses the object its handle addresses") {
++		t.Fatalf("the closing refusal must be the name-versus-handle comparison, got %v", closingErr)
++	}
++
++	_, err := managedAgentPolicyDomainSlotObservation(slot)
++	if err == nil {
++		t.Fatal("the production observation must refuse a directory whose name moved off its handle")
++	}
++	if !strings.Contains(err.Error(), "before its ACL check") {
++		t.Fatalf("the refusal must come from the opening comparison of the sandwich, got %v", err)
++	}
++	if strings.Contains(err.Error(), "owned by the executing user") {
++		t.Fatal("the refusal must be the identity comparison, not the writability rule")
++	}
++}
++
++// TestP85R7LinuxDirectorySlotClosingComparisonRefusesAMovedName exercises the
++// CLOSING half of the directory sandwich directly. The post-probe verification runs
++// on the descriptor and then repeats the name comparison; with the name moved off
++// the descriptor that comparison must refuse.
++//
++// Mutation check: deleting the closing comparison from
++// managedAgentPolicyDomainAfterProbe leaves this call returning nil and the leg goes
++// red (the descriptor itself did not change, so nothing else can refuse here).
++func TestP85R7LinuxDirectorySlotClosingComparisonRefusesAMovedName(t *testing.T) {
++	slot, identity, swap := p85R7DirectorySlotFixture(t)
++	fd, hasHandle, err := managedAgentPolicyDomainSlotDescriptor(slot)
++	if err != nil {
++		t.Fatalf("read the directory descriptor: %v", err)
++	}
++	if !hasHandle {
++		t.Fatal("the directory slot must carry a descriptor")
++	}
++	var before syscall.Stat_t
++	if err := syscall.Fstat(fd, &before); err != nil {
++		t.Fatalf("fstat the directory descriptor: %v", err)
++	}
++	swap()
++	closingErr := managedAgentPolicyDomainAfterProbe(slot, fd, hasHandle, identity, before)
++	if closingErr == nil {
++		t.Fatal("the closing half must refuse a name that moved off the descriptor")
++	}
++	if !strings.Contains(closingErr.Error(), "no longer addresses the object its handle addresses") {
++		t.Fatalf("the refusal must be the closing name-versus-handle comparison, got %v", closingErr)
++	}
++}
+NEW FILE: internal/adapters/p85_r7_open_bounddir_verified_test.go
+//go:build windows || linux
+
+package adapters
+
+// P85 R7 (mutation coverage, review r6 finding): openInstallSourceLeaf must bind
+// its directory through evidence.OpenBoundDirVerified. The mutant is a plain open
+// (whose resolution follows a link) or a name-level identity check
+// (evidence.FileIDAt, whose stat follows a link too) - both accept the linked chain
+// below and turn this leg red.
+//
+// The counterexample uses a link that resolves to the SAME object the direct path
+// reaches, so an identity comparison alone cannot refuse it: only a binding that
+// refuses a link component can.
+
+import (
+	"errors"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"runtime"
+	"strings"
+	"testing"
+
+	"github.com/larsonzh/prfrail/internal/evidence"
+)
+
+// p85R7CreateDirectoryLink creates a directory link that the root-chain walk must
+// refuse: a junction on Windows (no elevation needed) and a symbolic link on Linux.
+// The caller skips when the host cannot create one.
+func p85R7CreateDirectoryLink(t *testing.T, link, target string) {
+	t.Helper()
+	if runtime.GOOS == "windows" {
+		if output, err := exec.Command("cmd", "/c", "mklink", "/J", link, target).CombinedOutput(); err != nil {
+			t.Skipf("this host cannot create the junction %s -> %s: %v (%s)", link, target, err, strings.TrimSpace(string(output)))
+		}
+		// Registered after t.TempDir's cleanup so it runs first (LIFO): the recursive
+		// removal must never walk through the reparse point.
+		t.Cleanup(func() { _ = os.Remove(link) })
+		return
+	}
+	if err := os.Symlink(target, link); err != nil {
+		t.Skipf("this host cannot create the symbolic link %s -> %s: %v", link, target, err)
+	}
+}
+
+// TestP85R7OpenInstallSourceLeafRefusesALinkedChain binds the same executable twice:
+// once as itself (the positive control) and once through a link directory.
+func TestP85R7OpenInstallSourceLeafRefusesALinkedChain(t *testing.T) {
+	root := t.TempDir()
+	realDir := filepath.Join(root, "real")
+	binDir := filepath.Join(realDir, "bin")
+	if err := os.MkdirAll(binDir, 0o755); err != nil {
+		t.Fatalf("create the install-source directory: %v", err)
+	}
+	executable := filepath.Join(binDir, "agent-stub.exe")
+	if err := os.WriteFile(executable, []byte("MZ p85-r7"), 0o700); err != nil {
+		t.Fatalf("write the executable: %v", err)
+	}
+
+	// Positive control: the same leaf reached without any link component binds, so
+	// this host can run the counterexample at all.
+	control, err := openInstallSourceLeaf(executable)
+	if err != nil {
+		t.Skipf("this host's temporary root is not link-free, so the positive control cannot be established: %v", err)
+	}
+	controlIdentity, err := control.FileID()
+	if err != nil {
+		t.Fatalf("identify the bound executable: %v", err)
+	}
+	if err := control.Close(); err != nil {
+		t.Fatalf("close the bound executable: %v", err)
+	}
+
+	link := filepath.Join(root, "linked")
+	p85R7CreateDirectoryLink(t, link, realDir)
+	throughLink := filepath.Join(link, "bin", "agent-stub.exe")
+
+	// A name-level identity check follows the link and reports the same object as the
+	// direct path, so identity alone cannot refuse this chain.
+	followed, err := evidence.FileIDAt(throughLink)
+	if err != nil {
+		t.Fatalf("identify the linked name: %v", err)
+	}
+	if string(followed) != controlIdentity {
+		t.Fatalf("the fixture must make the linked name resolve to the linked-to object (%s != %s)", followed, controlIdentity)
+	}
+
+	leaf, err := openInstallSourceLeaf(throughLink)
+	if err == nil {
+		_ = leaf.Close()
+		t.Fatal("an executable reached through a symbolic-link component must not bind")
+	}
+	if !errors.Is(err, ErrAIInstallSourceProof) {
+		t.Fatalf("the refusal must be the install-source sentinel, got %v", err)
+	}
+
+	// Removing the link restores the acceptance of the same target, so the refusal is
+	// attributable to the link and not to the fixture.
+	if err := os.Remove(link); err != nil {
+		t.Fatalf("remove the directory link: %v", err)
+	}
+	restored, err := openInstallSourceLeaf(executable)
+	if err != nil {
+		t.Fatalf("the same leaf must bind once the link is gone, got %v", err)
+	}
+	if err := restored.Close(); err != nil {
+		t.Fatalf("close the re-bound executable: %v", err)
+	}
+}
+NEW FILE: internal/adapters/p85_r7_refusal_slot_test.go
+//go:build windows || linux
+
+package adapters
+
+// P85 R7 (review r6 finding): a PRESENT slot whose observation cannot render a line
+// must keep its position in the fixed four-slot vector, recording the canonical
+// empty marker. Before this, the slot was dropped and the refusal digest described a
+// shorter vector than the contract fixes - a digest that looked like a two-slot
+// domain.
+
+import (
+	"os"
+	"path/filepath"
+	"runtime"
+	"testing"
+
+	"github.com/larsonzh/prfrail/internal/evidence"
+)
+
+// TestP85R7UnobservableSlotKeepsItsPositionInTheDigest compares the refusal digest
+// with the digest of the same domain whose only slot is the canonical empty marker.
+func TestP85R7UnobservableSlotKeepsItsPositionInTheDigest(t *testing.T) {
+	if runtime.GOOS != "windows" && os.Geteuid() == 0 {
+		t.Skip("the Linux half refuses as root before it observes any slot")
+	}
+	missing := filepath.Join(t.TempDir(), "gone.policy.json")
+	digest, err := managedAgentPolicyDomainWriteProofSlots([]managedAgentPolicyDomainSlot{
+		{label: managedPolicyDomainArtifactRole, path: missing, present: true},
+	})
+	if err == nil {
+		t.Fatal("a present slot that cannot be observed must refuse")
+	}
+	if digest == "" {
+		t.Fatal("the refusal must still carry the observation digest")
+	}
+	want := evidence.Digest(managedAgentPolicyWriteProofDomain, []byte(managedAgentPolicyDomainEmptySlot))
+	if digest != want {
+		t.Fatalf("an unobservable slot must record the canonical empty marker in place (%s), got %s", want, digest)
+	}
+	if empty := evidence.Digest(managedAgentPolicyWriteProofDomain, nil); digest == empty {
+		t.Fatal("an unobservable present slot must keep its position instead of shortening the vector")
+	}
+}
+NEW FILE: internal/adapters/p85_r7_role_suffix_test.go
+package adapters
+
+// P85 R7 (review r6 finding): an explicit role that contradicts the contract's name
+// suffix describes two different slots for one object, and a suffix spelled in a
+// different case is not the spelling the contract freezes. Both are refused instead
+// of being resolved by precedence, so a caller cannot place the anchor in the
+// artifact slot by declaring it as one.
+
+import (
+	"errors"
+	"strings"
+	"testing"
+)
+
+// TestP85R7RoleSuffixContradictionIsRefused pins the role resolution of the
+// handle-form file slots at its smallest unit.
+func TestP85R7RoleSuffixContradictionIsRefused(t *testing.T) {
+	const (
+		artifactName = "task.step.attempt.1.policy.json"
+		anchorName   = "task.step.attempt.1.anchor.json"
+	)
+	cases := []struct {
+		name     string
+		declared string
+		path     string
+		wantRole int
+		wantErr  string
+	}{
+		{
+			name:     "an-artifact-role-on-an-anchor-name",
+			declared: managedPolicyDomainArtifactRole, path: anchorName,
+			wantRole: -1, wantErr: "declares the artifact role",
+		},
+		{
+			name:     "an-anchor-role-on-an-artifact-name",
+			declared: managedPolicyDomainAnchorRole, path: artifactName,
+			wantRole: -1, wantErr: "declares the anchor role",
+		},
+		{
+			name:     "an-uppercase-artifact-suffix",
+			declared: "", path: strings.ToUpper(artifactName),
+			wantRole: -1, wantErr: "lowercase form",
+		},
+		{
+			name:     "an-uppercase-anchor-suffix-with-a-declared-role",
+			declared: managedPolicyDomainAnchorRole, path: strings.ToUpper(anchorName),
+			wantRole: -1, wantErr: "lowercase form",
+		},
+		{
+			name:     "a-declared-role-without-a-name-marker",
+			declared: managedPolicyDomainAnchorRole, path: "declared-name.json",
+			wantRole: 1,
+		},
+		{
+			name:     "the-matching-pair",
+			declared: managedPolicyDomainArtifactRole, path: artifactName,
+			wantRole: 0,
+		},
+		{
+			name:     "the-name-marker-alone",
+			declared: "", path: anchorName,
+			wantRole: 1,
+		},
+		{
+			name:     "no-role-anywhere",
+			declared: "", path: "declared-name.json",
+			wantRole: -1,
+		},
+	}
+	for _, testCase := range cases {
+		testCase := testCase
+		t.Run(testCase.name, func(t *testing.T) {
+			role, err := managedPolicyDomainResolveFileRole(testCase.declared, testCase.path)
+			if testCase.wantErr == "" {
+				if err != nil {
+					t.Fatalf("this pair must resolve without a refusal, got %v", err)
+				}
+				if role != testCase.wantRole {
+					t.Fatalf("the role must be %d, got %d", testCase.wantRole, role)
+				}
+				return
+			}
+			if err == nil {
+				t.Fatalf("this pair must be refused, got role %d", role)
+			}
+			if !errors.Is(err, ErrManagedAgentPolicyWriteProof) {
+				t.Fatalf("the refusal must be the write-proof sentinel, got %v", err)
+			}
+			if !strings.Contains(err.Error(), testCase.wantErr) {
+				t.Fatalf("the refusal must mention %q, got %v", testCase.wantErr, err)
+			}
+		})
+	}
+}
+diff --git "a/tmp\\r6-baseline\\internal/console/agent_runner_policy.go" b/internal/console/agent_runner_policy.go
+index 0ce63e8..e82d17d 100644
+--- "a/tmp\\r6-baseline\\internal/console/agent_runner_policy.go"
++++ b/internal/console/agent_runner_policy.go
+@@ -351,14 +351,6 @@ func agentRunnerFreezeRunPolicy(options AgentRunnerAssemblyOptions, tasks []agen
+ 	return nil
+ }
+ 
+-// persistAgentRunnerFrozenPolicy publishes one frozen policy artifact without a
+-// write-proof injection. It is the production-shaped entry for call sites that
+-// have no assembly options to read the test seam from, and it delegates with an
+-// empty injection, which is the production behaviour.
+-func persistAgentRunnerFrozenPolicy(store *adapters.AgentRunnerReplayStore, runRoot, runID, taskID, stepID string, attempt int, body previewPolicy) (agentRunnerFrozenPolicy, error) {
+-	return persistAgentRunnerFrozenPolicyProven(store, runRoot, runID, taskID, stepID, attempt, body, "")
+-}
+-
+ // persistAgentRunnerFrozenPolicyProven publishes one frozen policy artifact and
+ // returns the artifact as it was read back from disk. Persisting is the
+ // linearization point: only after the artifact is renamed into place and the
+@@ -1060,68 +1052,6 @@ func confirmAgentRunnerFrozenPolicyAnchorFrom(bound *evidence.BoundFile, anchorP
+ 	return nil
+ }
+ 
+-// readAgentRunnerPolicyBytes reads one policy file (artifact or anchor) through a
+-// single bound handle and returns the RAW bytes as they are on disk. found=false
+-// means "no file at that name"; every other failure (including a symlink or a
+-// reparse point at any component, which the primitive refuses) is an error, so an
+-// unreadable file never degrades into "recompute and continue".
+-//
+-// F02: evidence.OpenBoundDir binds the containing directory and
+-// evidence.OpenBoundDirFile opens the entry relative to that handle, so the last
+-// component is opened with O_NOFOLLOW (unix) / FILE_OPEN_REPARSE_POINT plus a
+-// reparse classification (Windows) instead of being followed.
+-func readAgentRunnerPolicyBytes(path string, bound int64) ([]byte, bool, error) {
+-	file, err := openAgentRunnerPolicyFile(path, bound)
+-	if err != nil {
+-		if errors.Is(err, os.ErrNotExist) {
+-			return nil, false, nil
+-		}
+-		return nil, false, fmt.Errorf("%w: the frozen policy file %s cannot be opened: %v", ErrInvalidConfig, path, err)
+-	}
+-	defer func() { _ = file.Close() }()
+-	data, truncated, err := file.ReadAll()
+-	if err != nil {
+-		return nil, false, fmt.Errorf("%w: the frozen policy file %s cannot be read: %v", ErrInvalidConfig, path, err)
+-	}
+-	if truncated {
+-		return nil, false, fmt.Errorf("%w: the frozen policy file %s exceeds its byte bound", ErrInvalidConfig, path)
+-	}
+-	return data, true, nil
+-}
+-
+-// openAgentRunnerPolicyFile opens one policy file relative to a BOUND directory
+-// handle (F02). The caller's path is used only to open the directory; the file
+-// name - last component included - is resolved inside the handle that was opened,
+-// so a directory replaced between the two calls cannot redirect the read and a
+-// symlinked or reparse-point leaf is refused by the primitive itself.
+-//
+-// P85 F02/F06/F20 (design rev 3, section 2): the directory is bound by ONE
+-// resolution that refuses a link at any component AND returns the identity of the
+-// object it bound (evidence.OpenBoundDirVerified). There is no second resolution
+-// of the name to compare against, so "the directory that was approved" is the
+-// descriptor itself and not a spelling that happened to resolve the same way
+-// twice.
+-func openAgentRunnerPolicyFile(path string, bound int64) (*evidence.BoundFile, error) {
+-	directory := filepath.Dir(path)
+-	// P85 F02/F06/F20: one verified binding - the link-free resolution and the
+-	// identity of the object it produced come from the SAME kernel call, so "the
+-	// directory that was approved" is the descriptor, not a name that will be
+-	// resolved again later.
+-	boundDirectory, fileID, err := evidence.OpenBoundDirVerified(directory)
+-	if err != nil {
+-		return nil, err
+-	}
+-	defer func() { _ = boundDirectory.Close() }()
+-	// The handle's own identity is asserted against the one the binding produced.
+-	// Together with the directory + parent + artifact + anchor observation of F01,
+-	// this is what makes the reuse branch's write-domain proof describe the object
+-	// the bytes are read from.
+-	if err := evidence.VerifyBoundDir(boundDirectory, fileID); err != nil {
+-		return nil, fmt.Errorf("%w: the frozen policy directory %s cannot be confirmed: %v", ErrInvalidConfig, directory, err)
+-	}
+-	return evidence.OpenBoundDirFile(boundDirectory, filepath.Base(path), bound)
+-}
+-
+ // decodeAgentRunnerFrozenPolicy strictly decodes one artifact payload.
+ func decodeAgentRunnerFrozenPolicy(path string, data []byte) (agentRunnerFrozenPolicy, error) {
+ 	var artifact agentRunnerFrozenPolicy
+@@ -1159,35 +1089,6 @@ func publishAgentRunnerPolicyFileFrom(bound *evidence.BoundDir, fileID evidence.
+ 	return publishAgentRunnerPolicyFileIn(bound, fileID, filepath.Dir(path), filepath.Base(path), payload, label)
+ }
+ 
+-// publishAgentRunnerPolicyFile publishes one payload without replacing an existing
+-// name, through ONE verified directory handle (P85 F02/F06/F20).
+-//
+-// The handle is the verified binding: evidence.OpenBoundDirVerified resolves the
+-// directory once, refuses a link at any component, and hands back both the
+-// descriptor and the identity of the object it bound. Publication then happens
+-// relative to THAT descriptor (the platform halves own the mechanics):
+-//
+-//   - Linux creates the temporary file inside the descriptor, hard-links the final
+-//     name inside it, removes the temporary name and fsyncs the descriptor - the
+-//     same shape T3 already uses for the install-source carrier (F09: no rename
+-//     fallback, a name is never replaced);
+-//   - Windows keeps the path-based CreateTemp + Link form, because the standard
+-//     library cannot create or link relative to a directory handle there. Its
+-//     final-name residue is the registered F04 exemption; the handle identity is
+-//     still asserted before and after the path operations.
+-func publishAgentRunnerPolicyFile(path string, payload []byte, label string) error {
+-	directory := filepath.Dir(path)
+-	bound, fileID, err := evidence.OpenBoundDirVerified(directory)
+-	if err != nil {
+-		return fmt.Errorf("%w: the %s directory %s cannot be bound without following a symbolic link: %v", ErrInvalidConfig, label, directory, err)
+-	}
+-	defer func() { _ = bound.Close() }()
+-	if err := evidence.VerifyBoundDir(bound, fileID); err != nil {
+-		return fmt.Errorf("%w: the %s directory %s cannot be confirmed: %v", ErrInvalidConfig, label, directory, err)
+-	}
+-	return publishAgentRunnerPolicyFileIn(bound, fileID, directory, filepath.Base(path), payload, label)
+-}
+-
+ // agentRunnerProvePolicyWriteProtection was the name-based assembly-time proof of
+ // F01. P85 design rev 4, section 1 moved it onto the evidence handle chain
+ // (agentRunnerPolicyDomainChain.observeDomain), so the domain that is judged is
+@@ -1195,28 +1096,6 @@ func publishAgentRunnerPolicyFile(path string, payload []byte, label string) err
+ // primitive adapters.VerifyManagedAgentCannotWritePolicyDomain remains available
+ // for call sites that hold no handles.
+ 
+-// agentRunnerConfirmPolicyDirectory binds the policy directory to a handle,
+-// re-confirms that the handle addresses the directory the path names, and syncs it
+-// once on the platforms that can.
+-//
+-// F02: the binding is what makes "the directory was checked" and "the directory
+-// the file is opened in" the same object. F10: the sync makes the directory entry
+-// durable before anything is written into it.
+-func agentRunnerConfirmPolicyDirectory(directory string) error {
+-	bound, fileID, err := evidence.OpenBoundDirVerified(directory)
+-	if err != nil {
+-		return fmt.Errorf("%w: the frozen policy directory %s cannot be bound: %v", ErrInvalidConfig, directory, err)
+-	}
+-	defer func() { _ = bound.Close() }()
+-	if err := evidence.VerifyBoundDir(bound, fileID); err != nil {
+-		return fmt.Errorf("%w: the frozen policy directory %s cannot be confirmed: %v", ErrInvalidConfig, directory, err)
+-	}
+-	// F10 (P85 design rev 3, section 2): the sync happens on the descriptor that
+-	// was just verified, so the object that was confirmed is the object that is
+-	// flushed. The previous shape re-opened the directory by name.
+-	return bound.SyncDirectory()
+-}
+-
+ // agentRunnerConfirmExistingPolicyDirectory is the reuse-branch form of the F10
+ // durability proof: it binds, re-confirms and syncs the directory when it already
+ // exists, and reports nothing when it does not (the creation branch proves the new
+diff --git "a/tmp\\r6-baseline\\internal/console/agent_runner_policy_publish_other.go" b/internal/console/agent_runner_policy_publish_other.go
+index 162cd77..5944f81 100644
+--- "a/tmp\\r6-baseline\\internal/console/agent_runner_policy_publish_other.go"
++++ b/internal/console/agent_runner_policy_publish_other.go
+@@ -11,8 +11,13 @@ package console
+ // agent_runner_policy_publish_linux.go. This half keeps the path-based steps:
+ //
+ //   - Windows cannot create or hard-link relative to a directory handle with the
+-//     standard library, so the final-name resolution residue is the registered F04
+-//     exemption, stated here rather than claimed away;
++//     standard library, so the final-name resolution stays path-based. P85 R7
++//     registers that residue as an INDEPENDENT S1 boundary of the user-mode path
++//     publications (user ruling of 2026-11-23): it is not an F04 exemption and must
++//     not be cited as one. The identity is re-proved immediately before and after
++//     the path operations, so a directory swapped in between refuses instead of
++//     receiving the artifact; the creation and link steps themselves are the
++//     registered remainder;
+ //   - darwin and the remaining unix targets refuse directory binding outright, so
+ //     the verified binding never produces a handle here and this function is
+ //     unreachable on them.
+@@ -90,7 +95,8 @@ func publishAgentRunnerPolicyFileIn(bound *evidence.BoundDir, fileID evidence.Fi
+ // name-based evidence.FileIDAt. A junction or symbolic link introduced in the
+ // directory path after the bind is therefore refused by the walk instead of being
+ // followed to whatever object it points at, which is the shape that made the old
+-// comparison agree with itself (the F04 residue cannot back this position).
++// comparison agree with itself (the registered path-based publication boundary
++// cannot back this position).
+ func agentRunnerAssertDirectoryIdentity(bound *evidence.BoundDir, fileID evidence.FileID, directory, label string) error {
+ 	if err := evidence.VerifyBoundDir(bound, fileID); err != nil {
+ 		return fmt.Errorf("%w: the %s directory %s is no longer the approved object: %v", ErrInvalidConfig, label, directory, err)
+diff --git "a/tmp\\r6-baseline\\internal/console/ai_install_proof.go" b/internal/console/ai_install_proof.go
+index 2cc6c40..54ef353 100644
+--- "a/tmp\\r6-baseline\\internal/console/ai_install_proof.go"
++++ b/internal/console/ai_install_proof.go
+@@ -168,33 +168,6 @@ func recordOrConfirmAIInstallSourceProof(path, executable, approvedExecutableHas
+ 	return published.Facts(), nil
+ }
+ 
+-// readAIInstallSourceProof reads and validates one carrier through a single bounded
+-// handle. found=false means "no carrier at that name"; every other failure -
+-// unreadable, oversized, malformed, failing validation - is an error, so a carrier
+-// that cannot be read never degrades into "recompute and continue".
+-//
+-// F20 (P85 fix round 2): the handle is taken through the same two-step binding the
+-// frozen policy uses - the derived directory is opened as a handle
+-// (evidence.OpenBoundDir) and the carrier name, last component included, is opened
+-// relative to it (evidence.OpenBoundDirFile). A symlink or reparse point at any
+-// component of the carrier path is therefore refused by the primitive instead of
+-// followed, and the directory that was checked is the directory the bytes come
+-// from.
+-func readAIInstallSourceProof(path string) (adapters.AIInstallSourceProof, bool, error) {
+-	bound, fileID, err := aiInstallSourceBindCarrierDirectory(path)
+-	if err != nil {
+-		if errors.Is(err, os.ErrNotExist) {
+-			return adapters.AIInstallSourceProof{}, false, nil
+-		}
+-		return adapters.AIInstallSourceProof{}, false, fmt.Errorf("%w: the install source proof %s cannot be opened: %v", ErrAIInstallSourceUnproven, path, err)
+-	}
+-	defer func() { _ = bound.Close() }()
+-	if err := aiInstallSourceConfirmBoundDirectory(bound, fileID, filepath.Dir(path)); err != nil {
+-		return adapters.AIInstallSourceProof{}, false, err
+-	}
+-	return readAIInstallSourceProofFrom(bound, filepath.Base(path), adapters.AIInstallSourceProofByteBound)
+-}
+-
+ // readAIInstallSourceProofFrom reads and validates one carrier RELATIVE to a
+ // directory handle the caller already holds (P85 design rev 3, section 4).
+ //
+@@ -280,32 +253,9 @@ var aiInstallSourceReentryRequiresSync = true
+ //   - every other platform keeps the path-based publication with an identity
+ //     assertion around it (ai_install_proof_publish_other.go). Windows cannot
+ //     create or link relative to a directory handle with the standard library, and
+-//     its final-name residue is the registered F04 exemption; darwin and the
+-//     remaining unix targets already refuse the install-source proof outright.
++//     those two steps are the registered S1 user-mode path boundary (user ruling of
++//     2026-11-23), not an F04 exemption; darwin and the remaining unix targets
++//     already refuse the install-source proof outright.
+ //
+ // Persisting is the linearization point: only after the carrier is in place and its
+ // directory is synced may the check run.
+-
+-// openAIInstallSourceProof opens the carrier relative to a BOUND directory handle
+-// (F20). The caller's path is used only to open the directory; the carrier name -
+-// last component included - is resolved inside that handle, so a directory
+-// replaced between the two calls cannot redirect the read and a symlink or reparse
+-// point at the leaf is refused by the primitive (O_NOFOLLOW on unix, an explicit
+-// reparse classification on Windows).
+-//
+-// P85 F02/F20 (design rev 3, section 2): the handle comes from
+-// evidence.OpenBoundDirVerified, so the descriptor and the identity it is checked
+-// against come from ONE link-free resolution instead of the name being resolved
+-// twice.
+-func openAIInstallSourceProof(path string, bound int64) (*evidence.BoundFile, error) {
+-	directory := filepath.Dir(path)
+-	boundDirectory, fileID, err := evidence.OpenBoundDirVerified(directory)
+-	if err != nil {
+-		return nil, err
+-	}
+-	defer func() { _ = boundDirectory.Close() }()
+-	if err := evidence.VerifyBoundDir(boundDirectory, fileID); err != nil {
+-		return nil, fmt.Errorf("%w: the install source proof directory %s cannot be confirmed: %v", ErrAIInstallSourceUnproven, directory, err)
+-	}
+-	return evidence.OpenBoundDirFile(boundDirectory, filepath.Base(path), bound)
+-}
+diff --git "a/tmp\\r6-baseline\\internal/console/ai_install_proof_publish_other.go" b/internal/console/ai_install_proof_publish_other.go
+index 006ee42..4f120a2 100644
+--- "a/tmp\\r6-baseline\\internal/console/ai_install_proof_publish_other.go"
++++ b/internal/console/ai_install_proof_publish_other.go
+@@ -10,12 +10,14 @@ package console
+ // behaviour unchanged:
+ //
+ //   - Windows cannot create or hard-link relative to a directory handle with the
+-//     standard library; its final-name resolution residue is the registered F04
+-//     exemption, not a claim made here. P85 R6 narrowed what is left: the directory
+-//     that receives the temporary file and the link is re-bound through the
+-//     root-chain walk before and after the publication (see
++//     standard library, so the creation and link steps stay path-based. P85 R7
++//     registers that residue as an INDEPENDENT S1 boundary of the user-mode path
++//     publications (user ruling of 2026-11-23): it is not an F04 exemption and must
++//     not be cited as one, and no durability is claimed from it. P85 R6 narrowed
++//     what is left: the directory that receives the temporary file and the link is
++//     re-bound through the root-chain walk before and after the publication (see
+ //     aiInstallSourceAssertDirectoryIdentity), so a chain that becomes a reparse
+-//     point refuses; only the CREATE/LINK steps themselves stay path-based.
++//     point refuses.
+ //   - darwin and the remaining unix targets already refuse the install-source proof
+ //     before this point (adapters.VerifyAIInstallSource fails closed there), so this
+ //     function is unreachable on them.
+@@ -41,10 +43,10 @@ import (
+ //
+ // P85 F10 (design rev 3, section 4): the caller passes the descriptor it already
+ // read the carrier through, so this half never has to decide "which directory"
+-// again. The path-based steps are the registered F04 residue (Windows cannot
+-// create or link relative to a directory handle through Go); the identity of the
+-// bound object is asserted around them, so a swap is refused instead of receiving
+-// the carrier.
++// again. The create/link steps stay path-based (Windows cannot create or link
++// relative to a directory handle through Go); that residue is the registered S1
++// user-mode path boundary, and the identity of the bound object is re-proved around
++// them, so a swap is refused instead of receiving the carrier.
+ func writeAIInstallSourceProofFileIn(bound *evidence.BoundDir, fileID evidence.FileID, path string, payload []byte) error {
+ 	directory := filepath.Dir(path)
+ 	if err := aiInstallSourceAssertDirectoryIdentity(bound, fileID, directory); err != nil {
+@@ -79,7 +81,8 @@ func writeAIInstallSourceProofFileIn(bound *evidence.BoundDir, fileID evidence.F
+ 		return err
+ 	}
+ 	// Atomic visibility is not power-loss durability: the hard link above is the
+-	// durability point this platform can offer (F04/F10, registered). The seam is
++	// durability point this platform can offer (F10, registered; the path-based link
++	// itself is the registered S1 user-mode boundary). The seam is
+ 	// still used so both halves report a failing sync the same way.
+ 	return aiInstallSourceCarrierDirectorySync(bound)
+ }
+diff --git "a/tmp\\r6-baseline\\internal/console/p85_f02_publish_handle_linux_test.go" b/internal/console/p85_f02_publish_handle_linux_test.go
+index 8095bd3..d62e83c 100644
+--- "a/tmp\\r6-baseline\\internal/console/p85_f02_publish_handle_linux_test.go"
++++ b/internal/console/p85_f02_publish_handle_linux_test.go
+@@ -15,8 +15,8 @@ package console
+ // assertions below go red.
+ //
+ // Windows note: the Windows half is deliberately path-based (Go cannot create or
+-// link relative to a directory handle there) and its final-name residue is the
+-// registered F04 exemption, so this leg is Linux-only by design.
++// link relative to a directory handle there); those two steps are the registered S1
++// user-mode path boundary, so this leg is Linux-only by design.
+ 
+ import (
+ 	"os"
+diff --git "a/tmp\\r6-baseline\\internal/console/p85_r4_linux_native_test.go" b/internal/console/p85_r4_linux_native_test.go
+index bce6067..fd95feb 100644
+--- "a/tmp\\r6-baseline\\internal/console/p85_r4_linux_native_test.go"
++++ b/internal/console/p85_r4_linux_native_test.go
+@@ -31,6 +31,39 @@ import (
+ 	"github.com/larsonzh/prfrail/internal/evidence"
+ )
+ 
++// p85R4SwapPolicyDirectory renames the policy directory away and puts a complete
++// stand-in (same names, same bytes, different directory object) at the path.
++//
++// P85 R=7 (user ruling of 2026-11-23): this helper moved here from
++// p85_r4_m13_chain_tester_test.go. Only this linux-tagged leg calls it, so living
++// in the platform-independent file made it look unused in the windows and darwin
++// IDE views. See the note on p85R4ReplaceArtifact for why the Windows legs stage
++// the artifact instead.
++func p85R4SwapPolicyDirectory(t *testing.T, runtime *agentRunnerRuntime) error {
++	t.Helper()
++	directory := agentRunnerPolicyDirectory(runtime.runRoot)
++	retired := directory + ".retired"
++	if err := os.Rename(directory, retired); err != nil {
++		return err
++	}
++	if err := os.Mkdir(directory, 0o755); err != nil {
++		return err
++	}
++	for _, path := range []string{
++		agentRunnerFrozenPolicyPath(runtime.runRoot, p83TaskID, p83StepID, 1),
++		agentRunnerFrozenPolicyAnchorPath(runtime.runRoot, p83TaskID, p83StepID, 1),
++	} {
++		payload, err := os.ReadFile(filepath.Join(retired, filepath.Base(path)))
++		if err != nil {
++			return err
++		}
++		if err := os.WriteFile(filepath.Join(directory, filepath.Base(path)), payload, 0o600); err != nil {
++			return err
++		}
++	}
++	return nil
++}
++
+ // TestP85R4M13LinuxNativeIdentityIsTheDirectoryObject is the M13 native leg.
+ func TestP85R4M13LinuxNativeIdentityIsTheDirectoryObject(t *testing.T) {
+ 	runtime := p85R4FrozenCreationRuntime(t)
+diff --git "a/tmp\\r6-baseline\\internal/console/p85_r4_m13_chain_tester_test.go" b/internal/console/p85_r4_m13_chain_tester_test.go
+index d1d06c6..d34fb3f 100644
+--- "a/tmp\\r6-baseline\\internal/console/p85_r4_m13_chain_tester_test.go"
++++ b/internal/console/p85_r4_m13_chain_tester_test.go
+@@ -29,7 +29,6 @@ package console
+ import (
+ 	"errors"
+ 	"os"
+-	"path/filepath"
+ 	"strings"
+ 	"testing"
+ 
+@@ -80,35 +79,6 @@ func p85R4ReplaceArtifact(t *testing.T, runtime *agentRunnerRuntime) error {
+ 	return os.WriteFile(path, payload, 0o600)
+ }
+ 
+-// p85R4SwapPolicyDirectory renames the policy directory away and puts a complete
+-// stand-in (same names, same bytes, different directory object) at the path. It is
+-// used by the Linux-native leg; see the note on p85R4ReplaceArtifact for why the
+-// Windows legs stage the artifact instead.
+-func p85R4SwapPolicyDirectory(t *testing.T, runtime *agentRunnerRuntime) error {
+-	t.Helper()
+-	directory := agentRunnerPolicyDirectory(runtime.runRoot)
+-	retired := directory + ".retired"
+-	if err := os.Rename(directory, retired); err != nil {
+-		return err
+-	}
+-	if err := os.Mkdir(directory, 0o755); err != nil {
+-		return err
+-	}
+-	for _, path := range []string{
+-		agentRunnerFrozenPolicyPath(runtime.runRoot, p83TaskID, p83StepID, 1),
+-		agentRunnerFrozenPolicyAnchorPath(runtime.runRoot, p83TaskID, p83StepID, 1),
+-	} {
+-		payload, err := os.ReadFile(filepath.Join(retired, filepath.Base(path)))
+-		if err != nil {
+-			return err
+-		}
+-		if err := os.WriteFile(filepath.Join(directory, filepath.Base(path)), payload, 0o600); err != nil {
+-			return err
+-		}
+-	}
+-	return nil
+-}
+-
+ // TestP85R4M13TerminalReassertRefusesAStandInSwappedMidEntry is the cross-segment
+ // counterexample of M13: the replacement happens AFTER the write-domain observation
+ // (the seam runs inside agentRunnerReverifyManagedWriteProof, which is reached after
+diff --git "a/tmp\\r6-baseline\\internal/evidence/bounddir_clean.go" b/internal/evidence/bounddir_clean.go
+index c3c494f..c53994d 100644
+--- "a/tmp\\r6-baseline\\internal/evidence/bounddir_clean.go"
++++ b/internal/evidence/bounddir_clean.go
+@@ -7,6 +7,12 @@ package evidence
+ // exported for the adapters alias, and an alias must compile on every platform;
+ // on darwin it simply has no internal caller because that half never resolves a
+ // name.
++//
++// P85 R=7 (user ruling of 2026-11-23): boundRootName and errBoundRootArtifact were
++// moved to bounddir_clean_root.go (build tag !darwin, i.e. the windows half and
++// every non-darwin unix half). The darwin half never references them, so keeping
++// them in this shared file made them look unused in the darwin IDE view. Only the
++// two root-name helpers moved; the artifact-name guard below stays shared.
+ 
+ import (
+ 	"fmt"
+@@ -37,23 +43,3 @@ func cleanBoundRelativePath(rel string) (string, error) {
+ func CleanBoundRelativePath(rel string) (string, error) {
+ 	return cleanBoundRelativePath(rel)
+ }
+-
+-// boundRootName reports whether rel names the bound directory itself instead of an
+-// entry inside it.
+-//
+-// P84 T4(d): the empty string and "." are the same name, and both halves have to
+-// read it the same way. BoundDirNames enumerates the bound object for either
+-// spelling, while an artifact open refuses either spelling - an artifact name that
+-// resolves to the bound directory is not an artifact. cleanBoundRelativePath keeps
+-// its own refusal of "." as the artifact-name guard; this classifier exists so the
+-// enumeration half does not inherit that refusal for the root spelling.
+-func boundRootName(rel string) bool {
+-	return strings.TrimSpace(rel) == "" || filepath.Clean(filepath.FromSlash(rel)) == "."
+-}
+-
+-// errBoundRootArtifact is the one refusal both halves return when an artifact open
+-// names the bound directory itself. One constructor keeps the windows and unix
+-// messages from drifting apart for the two root spellings.
+-func errBoundRootArtifact(rel string) error {
+-	return fmt.Errorf("evidence: bound artifact name %q names the bound directory itself", rel)
+-}
+NEW FILE: internal/evidence/bounddir_clean_root.go
+//go:build !darwin
+
+package evidence
+
+// P85 R=7 (user ruling of 2026-11-23): boundRootName and errBoundRootArtifact
+// moved here from bounddir_clean.go. They are referenced by the windows half
+// (bounddir_windows.go) and by the non-darwin unix half (bounddir_unix.go), never
+// by bounddir_darwin.go, so the shared file made them look unused in the darwin
+// IDE view. This relocation fixes that diagnostic only; it is not a precedent for
+// keeping code that is otherwise dead.
+//
+// The tag is !darwin rather than "windows || linux" because bounddir_unix.go is
+// itself tagged !windows && !darwin: every GOOS that compiles that file needs both
+// symbols, and a windows||linux tag here would break the remaining unix targets.
+
+import (
+	"fmt"
+	"path/filepath"
+	"strings"
+)
+
+// boundRootName reports whether rel names the bound directory itself instead of an
+// entry inside it.
+//
+// P84 T4(d): the empty string and "." are the same name, and both halves have to
+// read it the same way. BoundDirNames enumerates the bound object for either
+// spelling, while an artifact open refuses either spelling - an artifact name that
+// resolves to the bound directory is not an artifact. cleanBoundRelativePath keeps
+// its own refusal of "." as the artifact-name guard; this classifier exists so the
+// enumeration half does not inherit that refusal for the root spelling.
+func boundRootName(rel string) bool {
+	return strings.TrimSpace(rel) == "" || filepath.Clean(filepath.FromSlash(rel)) == "."
+}
+
+// errBoundRootArtifact is the one refusal both halves return when an artifact open
+// names the bound directory itself. One constructor keeps the windows and unix
+// messages from drifting apart for the two root spellings.
+func errBoundRootArtifact(rel string) error {
+	return fmt.Errorf("evidence: bound artifact name %q names the bound directory itself", rel)
+}

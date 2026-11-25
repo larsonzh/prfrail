@@ -1,0 +1,16 @@
+# P85 R=7 变异证据（2026-11-23 · 红 → 字节复原 → 绿）
+
+## MUT-4（Linux 目录槽三明治 · Ubuntu VM 非 root）
+- Mutant A：slot.dir.AccessACL() → evidence.AccessACLPath(slot.path)（fd 化回退按名读）。
+  RED = TestP85R7LinuxDirectorySlotReadsTheACLFromItsDescriptor
+  （"the production ACL probe must refuse the directory that carries an access ACL"）。
+- Mutant B（裁定指定）：managedAgentPolicyDomainAfterProbe 删除闭名对证（return nil）。
+  RED = TestP85R7LinuxDirectorySlotClosingComparisonRefusesAMovedName；
+  绿腿 = ReadsTheACLFromItsDescriptor / RefusesAReplacedName（后者直接钉 helper，设计如此）。
+- 复原：SHA-256 逐字节一致（byte-identical=True × 2），恢复后 Targeted 腿全绿。
+
+## MUT-5（OpenBoundDirVerified → OpenBoundDir 跟随链接 · Windows 本机非提升）
+- RED = TestP85R7OpenInstallSourceLeafRefusesALinkedChain
+  （"an executable reached through a symbolic-link component must not bind"）。
+- SHA256-BEFORE = SHA256-RESTORED =
+  0d44525c3eb2cd626c0b560ddcc74ede302d315f76933b69a2b276994d1d9d55；恢复后绿。

@@ -3,7 +3,7 @@ package console
 // P85 T2 (finding F3): the counterexamples and the mutation targets of the
 // durable FROZEN policy artifact.
 //
-// The design (tmp/P85-SECURITY-PROOF-SUBSYSTEM/01-design.md §2.4-§2.6) names
+// The design (docs/validation/evidence/P85-SECURITY-PROOF-SUBSYSTEM/archive/P85-SECURITY-PROOF-SUBSYSTEM/01-design.md §2.4-§2.6) names
 // three counterexample classes and two mutations:
 //
 //	missing          - the artifact does not exist when Review/Publish reread it;

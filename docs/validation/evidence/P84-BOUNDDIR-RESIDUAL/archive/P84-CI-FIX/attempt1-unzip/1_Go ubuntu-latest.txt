@@ -1,0 +1,1155 @@
+2026-11-21T06:47:44.0360773Z Current runner version: '2.338.2'
+2026-11-21T06:47:44.0378279Z ##[group]Runner Image Provisioner
+2026-11-21T06:47:44.0378987Z Hosted Compute Agent
+2026-11-21T06:47:44.0379407Z Version: 20261111.635
+2026-11-21T06:47:44.0379854Z Commit: b8a594ea514ff44cadb5342986c68b1eac6e22ed
+2026-11-21T06:47:44.0380792Z Build Date: 2026-11-11T01:49:01Z
+2026-11-21T06:47:44.0381301Z Worker ID: {d1f9a297-1814-4f68-a64b-dde541ba8ca9}
+2026-11-21T06:47:44.0381832Z Region: us-west-2
+2026-11-21T06:47:44.0382227Z Cloud: AWS
+2026-11-21T06:47:44.0382599Z ##[endgroup]
+2026-11-21T06:47:44.0383814Z ##[group]Operating System
+2026-11-21T06:47:44.0384270Z Ubuntu
+2026-11-21T06:47:44.0384617Z 26.04.1
+2026-11-21T06:47:44.0385003Z LTS
+2026-11-21T06:47:44.0385361Z ##[endgroup]
+2026-11-21T06:47:44.0385904Z ##[group]Runner Image
+2026-11-21T06:47:44.0386343Z Image: ubuntu-26.04
+2026-11-21T06:47:44.0386755Z Version: 20261116.88.1
+2026-11-21T06:47:44.0387655Z Included Software: https://github.com/actions/runner-images/blob/ubuntu26/20261116.88/images/ubuntu/Ubuntu2604-Readme.md
+2026-11-21T06:47:44.0388743Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu26%2F20261116.88
+2026-11-21T06:47:44.0389466Z ##[endgroup]
+2026-11-21T06:47:44.0390457Z ##[group]GITHUB_TOKEN Permissions
+2026-11-21T06:47:44.0392287Z Contents: read
+2026-11-21T06:47:44.0392671Z Metadata: read
+2026-11-21T06:47:44.0393105Z ##[endgroup]
+2026-11-21T06:47:44.0394634Z Secret source: Actions
+2026-11-21T06:47:44.0395303Z Cache mode: write
+2026-11-21T06:47:44.0395844Z Prepare workflow directory
+2026-11-21T06:47:44.0662487Z Prepare all required actions
+2026-11-21T06:47:44.0698703Z Getting action download info
+2026-11-21T06:47:44.3773329Z Download action repository 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+2026-11-21T06:47:45.3584793Z Download action repository 'actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e' (SHA:b7ad1dad31e06c5925ef5d2fc7ad053ef454303e)
+2026-11-21T06:47:45.8349294Z Complete job name: Go ubuntu-latest
+2026-11-21T06:47:45.8924777Z ##[group]Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+2026-11-21T06:47:45.8925413Z with:
+2026-11-21T06:47:45.8925718Z   persist-credentials: false
+2026-11-21T06:47:45.8926030Z   fetch-depth: 0
+2026-11-21T06:47:45.8926326Z   repository: larsonzh/prfrail
+2026-11-21T06:47:45.8928497Z   token: ***
+2026-11-21T06:47:45.8928781Z   ssh-strict: true
+2026-11-21T06:47:45.8929065Z   ssh-user: git
+2026-11-21T06:47:45.8929321Z   clean: true
+2026-11-21T06:47:45.8929610Z   sparse-checkout-cone-mode: true
+2026-11-21T06:47:45.8929928Z   fetch-tags: false
+2026-11-21T06:47:45.8930503Z   show-progress: true
+2026-11-21T06:47:45.8930818Z   lfs: false
+2026-11-21T06:47:45.8931096Z   submodules: false
+2026-11-21T06:47:45.8931378Z   set-safe-directory: true
+2026-11-21T06:47:45.8931692Z   allow-unsafe-pr-checkout: false
+2026-11-21T06:47:45.8932321Z env:
+2026-11-21T06:47:45.8932581Z   GO_VERSION: 1.22.12
+2026-11-21T06:47:45.8932838Z   CGO_ENABLED: 0
+2026-11-21T06:47:45.8933223Z   GOTOOLCHAIN: local
+2026-11-21T06:47:45.8933483Z ##[endgroup]
+2026-11-21T06:47:49.5739674Z Syncing repository: larsonzh/prfrail
+2026-11-21T06:47:49.5741990Z ##[group]Getting Git version info
+2026-11-21T06:47:49.5742755Z Working directory is '/home/runner/work/prfrail/prfrail'
+2026-11-21T06:47:49.5743622Z [command]/usr/bin/git version
+2026-11-21T06:47:49.5744087Z git version 2.56.1
+2026-11-21T06:47:49.5745647Z ##[endgroup]
+2026-11-21T06:47:49.5751368Z Temporarily overriding HOME='/home/runner/work/_temp/0fa30085-3814-4eb0-aa44-c33a138636a0' before making global git config changes
+2026-11-21T06:47:49.5752397Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-21T06:47:49.5755792Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/prfrail/prfrail
+2026-11-21T06:47:49.5834176Z Deleting the contents of '/home/runner/work/prfrail/prfrail'
+2026-11-21T06:47:49.5836007Z ##[group]Determining repository object format
+2026-11-21T06:47:49.5837211Z ##[endgroup]
+2026-11-21T06:47:49.5838294Z ##[group]Initializing the repository
+2026-11-21T06:47:49.5841209Z [command]/usr/bin/git init /home/runner/work/prfrail/prfrail
+2026-11-21T06:47:49.7923539Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-11-21T06:47:49.7924408Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-11-21T06:47:49.7925228Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-11-21T06:47:49.7925768Z hint: call:
+2026-11-21T06:47:49.7926128Z hint:
+2026-11-21T06:47:49.7926627Z hint: 	git config --global init.defaultBranch <name>
+2026-11-21T06:47:49.7927090Z hint:
+2026-11-21T06:47:49.7927587Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-11-21T06:47:49.7928203Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-11-21T06:47:49.7928760Z hint:
+2026-11-21T06:47:49.7929131Z hint: 	git branch -m <name>
+2026-11-21T06:47:49.7929510Z hint:
+2026-11-21T06:47:49.7930464Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-11-21T06:47:49.7943665Z Initialized empty Git repository in /home/runner/work/prfrail/prfrail/.git/
+2026-11-21T06:47:49.7952659Z [command]/usr/bin/git remote add origin https://github.com/larsonzh/prfrail
+2026-11-21T06:47:49.8014535Z ##[endgroup]
+2026-11-21T06:47:49.8015576Z ##[group]Disabling automatic garbage collection
+2026-11-21T06:47:49.8017815Z [command]/usr/bin/git config --local gc.auto 0
+2026-11-21T06:47:49.8040397Z ##[endgroup]
+2026-11-21T06:47:49.8041182Z ##[group]Setting up auth
+2026-11-21T06:47:49.8041684Z Removing SSH command configuration
+2026-11-21T06:47:49.8045278Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-21T06:47:49.8067185Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-21T06:47:50.0505227Z Removing HTTP extra header
+2026-11-21T06:47:50.0511243Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-21T06:47:50.0533191Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-21T06:47:50.0695580Z Removing includeIf entries pointing to credentials config files
+2026-11-21T06:47:50.0706507Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-21T06:47:50.0734266Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-21T06:47:50.0904582Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-9928bc6c-054a-4376-b1cf-88db816bff22.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-11-21T06:47:50.0927528Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/prfrail/prfrail/.git.path /home/runner/work/_temp/git-credentials-9928bc6c-054a-4376-b1cf-88db816bff22.config
+2026-11-21T06:47:50.0946959Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/prfrail/prfrail/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-9928bc6c-054a-4376-b1cf-88db816bff22.config
+2026-11-21T06:47:50.0972136Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-9928bc6c-054a-4376-b1cf-88db816bff22.config
+2026-11-21T06:47:50.0993085Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-9928bc6c-054a-4376-b1cf-88db816bff22.config
+2026-11-21T06:47:50.1009835Z ##[endgroup]
+2026-11-21T06:47:50.1010994Z ##[group]Fetching the repository
+2026-11-21T06:47:50.1015547Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+2026-11-21T06:47:51.5060875Z From https://github.com/larsonzh/prfrail
+2026-11-21T06:47:51.5061553Z  * [new branch]      main                 -> origin/main
+2026-11-21T06:47:51.5062044Z  * [new branch]      t017-first-candidate -> origin/t017-first-candidate
+2026-11-21T06:47:51.5062523Z  * [new tag]         v0.1.0               -> v0.1.0
+2026-11-21T06:47:51.5069767Z [command]/usr/bin/git branch --list --remote origin/main
+2026-11-21T06:47:51.5090439Z   origin/main
+2026-11-21T06:47:51.5101390Z [command]/usr/bin/git rev-parse refs/remotes/origin/main
+2026-11-21T06:47:51.5113338Z d597f1eba1e9d2b94253cd3e61a312e2777e4b71
+2026-11-21T06:47:51.5119891Z ##[endgroup]
+2026-11-21T06:47:51.5120837Z ##[group]Determining the checkout info
+2026-11-21T06:47:51.5121396Z ##[endgroup]
+2026-11-21T06:47:51.5121775Z [command]/usr/bin/git sparse-checkout disable
+2026-11-21T06:47:51.5170485Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-11-21T06:47:51.5190892Z ##[group]Checking out the ref
+2026-11-21T06:47:51.5193459Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-11-21T06:47:51.7180559Z Switched to a new branch 'main'
+2026-11-21T06:47:51.7188048Z branch 'main' set up to track 'origin/main'.
+2026-11-21T06:47:51.7201004Z ##[endgroup]
+2026-11-21T06:47:51.7247328Z [command]/usr/bin/git log -1 --format=%H
+2026-11-21T06:47:51.7268282Z d597f1eba1e9d2b94253cd3e61a312e2777e4b71
+2026-11-21T06:47:51.7275230Z ##[group]Removing auth
+2026-11-21T06:47:51.7275742Z Removing SSH command configuration
+2026-11-21T06:47:51.7277340Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-21T06:47:51.7300635Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-21T06:47:51.7489216Z Removing HTTP extra header
+2026-11-21T06:47:51.7492489Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-21T06:47:51.7511881Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-21T06:47:51.7682335Z Removing includeIf entries pointing to credentials config files
+2026-11-21T06:47:51.7711218Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-21T06:47:51.7712190Z includeif.gitdir:/home/runner/work/prfrail/prfrail/.git.path
+2026-11-21T06:47:51.7712954Z includeif.gitdir:/home/runner/work/prfrail/prfrail/.git/worktrees/*.path
+2026-11-21T06:47:51.7713575Z includeif.gitdir:/github/workspace/.git.path
+2026-11-21T06:47:51.7714183Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-11-21T06:47:51.7715953Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/prfrail/prfrail/.git.path
+2026-11-21T06:47:51.7719092Z /home/runner/work/_temp/git-credentials-9928bc6c-054a-4376-b1cf-88db816bff22.config
+2026-11-21T06:47:51.7732510Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/prfrail/prfrail/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-9928bc6c\-054a\-4376\-b1cf\-88db816bff22\.config
+2026-11-21T06:47:51.7753674Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/prfrail/prfrail/.git/worktrees/*.path
+2026-11-21T06:47:51.7768338Z /home/runner/work/_temp/git-credentials-9928bc6c-054a-4376-b1cf-88db816bff22.config
+2026-11-21T06:47:51.7774283Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/prfrail/prfrail/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-9928bc6c\-054a\-4376\-b1cf\-88db816bff22\.config
+2026-11-21T06:47:51.7796504Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+2026-11-21T06:47:51.7811973Z /github/runner_temp/git-credentials-9928bc6c-054a-4376-b1cf-88db816bff22.config
+2026-11-21T06:47:51.7816739Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-9928bc6c\-054a\-4376\-b1cf\-88db816bff22\.config
+2026-11-21T06:47:51.7838929Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-11-21T06:47:51.7854619Z /github/runner_temp/git-credentials-9928bc6c-054a-4376-b1cf-88db816bff22.config
+2026-11-21T06:47:51.7859277Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-9928bc6c\-054a\-4376\-b1cf\-88db816bff22\.config
+2026-11-21T06:47:51.7880426Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-21T06:47:51.8051939Z Removing credentials config '/home/runner/work/_temp/git-credentials-9928bc6c-054a-4376-b1cf-88db816bff22.config'
+2026-11-21T06:47:51.8071590Z ##[endgroup]
+2026-11-21T06:47:51.8278988Z ##[group]Run actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
+2026-11-21T06:47:51.8279354Z with:
+2026-11-21T06:47:51.8279575Z   go-version: 1.22.12
+2026-11-21T06:47:51.8280061Z   cache: true
+2026-11-21T06:47:51.8280531Z   check-latest: false
+2026-11-21T06:47:51.8282440Z   token: ***
+2026-11-21T06:47:51.8282668Z env:
+2026-11-21T06:47:51.8282875Z   GO_VERSION: 1.22.12
+2026-11-21T06:47:51.8283105Z   CGO_ENABLED: 0
+2026-11-21T06:47:51.8283321Z   GOTOOLCHAIN: local
+2026-11-21T06:47:51.8283543Z ##[endgroup]
+2026-11-21T06:47:51.9145014Z Setup go version spec 1.22.12
+2026-11-21T06:47:51.9150236Z Attempting to download 1.22.12...
+2026-11-21T06:47:52.4915163Z matching 1.22.12...
+2026-11-21T06:47:52.4948567Z Acquiring 1.22.12 from https://github.com/actions/go-versions/releases/download/1.22.12-13149489080/go-1.22.12-linux-x64.tar.gz
+2026-11-21T06:47:53.1407761Z Extracting Go...
+2026-11-21T06:47:53.1528015Z [command]/usr/bin/tar xz --warning=no-unknown-keyword --overwrite -C /home/runner/work/_temp/070ea948-c89d-43b5-844a-f0d9879f218a -f /home/runner/work/_temp/e563b184-78aa-4389-9e0a-08bfa8d0b558
+2026-11-21T06:47:53.9422234Z Successfully extracted go to /home/runner/work/_temp/070ea948-c89d-43b5-844a-f0d9879f218a
+2026-11-21T06:47:53.9422884Z Adding to the cache ...
+2026-11-21T06:47:56.0172310Z Successfully cached go to /opt/hostedtoolcache/go/1.22.12/x64
+2026-11-21T06:47:56.0173611Z Added go to the path
+2026-11-21T06:47:56.0175072Z Successfully set up Go version 1.22.12
+2026-11-21T06:47:56.0300992Z [command]/opt/hostedtoolcache/go/1.22.12/x64/bin/go env GOCACHE
+2026-11-21T06:47:56.0324701Z [command]/opt/hostedtoolcache/go/1.22.12/x64/bin/go env GOMODCACHE
+2026-11-21T06:47:56.0347653Z /home/runner/.cache/go-build
+2026-11-21T06:47:56.0356549Z /home/runner/go/pkg/mod
+2026-11-21T06:47:56.2807734Z Cache hit for: setup-go-Linux-x64-ubuntu26-go-1.22.12-2f07b6ec62ba90bcd08e45ebcc765a7ea2fd8104887fdaad445ddb80e0e00ca7
+2026-11-21T06:47:57.6832694Z Received 0 of 68976206 (0.0%), 0.0 MBs/sec
+2026-11-21T06:47:58.5206109Z Received 68976206 of 68976206 (100.0%), 35.8 MBs/sec
+2026-11-21T06:47:58.5206603Z Cache Size: ~66 MB (68976206 B)
+2026-11-21T06:47:58.5297925Z [command]/usr/bin/tar -xf /home/runner/work/_temp/06dad66d-b84f-4517-af19-0ce5f0e5fe99/cache.tzst -P -C /home/runner/work/prfrail/prfrail --use-compress-program unzstd
+2026-11-21T06:47:58.9566180Z Cache restored successfully
+2026-11-21T06:47:58.9594804Z Cache restored from key: setup-go-Linux-x64-ubuntu26-go-1.22.12-2f07b6ec62ba90bcd08e45ebcc765a7ea2fd8104887fdaad445ddb80e0e00ca7
+2026-11-21T06:47:58.9621237Z go version go1.22.12 linux/amd64
+2026-11-21T06:47:58.9621508Z 
+2026-11-21T06:47:58.9621921Z ##[group]go env
+2026-11-21T06:47:59.0011375Z GO111MODULE=''
+2026-11-21T06:47:59.0011915Z GOARCH='amd64'
+2026-11-21T06:47:59.0012223Z GOBIN=''
+2026-11-21T06:47:59.0012585Z GOCACHE='/home/runner/.cache/go-build'
+2026-11-21T06:47:59.0013023Z GOENV='/home/runner/.config/go/env'
+2026-11-21T06:47:59.0013326Z GOEXE=''
+2026-11-21T06:47:59.0013733Z GOEXPERIMENT=''
+2026-11-21T06:47:59.0013969Z GOFLAGS=''
+2026-11-21T06:47:59.0014165Z GOHOSTARCH='amd64'
+2026-11-21T06:47:59.0014396Z GOHOSTOS='linux'
+2026-11-21T06:47:59.0014626Z GOINSECURE=''
+2026-11-21T06:47:59.0014962Z GOMODCACHE='/home/runner/go/pkg/mod'
+2026-11-21T06:47:59.0015231Z GONOPROXY=''
+2026-11-21T06:47:59.0015420Z GONOSUMDB=''
+2026-11-21T06:47:59.0015661Z GOOS='linux'
+2026-11-21T06:47:59.0015868Z GOPATH='/home/runner/go'
+2026-11-21T06:47:59.0016099Z GOPRIVATE=''
+2026-11-21T06:47:59.0016373Z GOPROXY='https://proxy.golang.org,direct'
+2026-11-21T06:47:59.0016973Z GOROOT='/opt/hostedtoolcache/go/1.22.12/x64'
+2026-11-21T06:47:59.0017271Z GOSUMDB='sum.golang.org'
+2026-11-21T06:47:59.0017501Z GOTMPDIR=''
+2026-11-21T06:47:59.0017730Z GOTOOLCHAIN='local'
+2026-11-21T06:47:59.0018069Z GOTOOLDIR='/opt/hostedtoolcache/go/1.22.12/x64/pkg/tool/linux_amd64'
+2026-11-21T06:47:59.0018390Z GOVCS=''
+2026-11-21T06:47:59.0018596Z GOVERSION='go1.22.12'
+2026-11-21T06:47:59.0018805Z GCCGO='gccgo'
+2026-11-21T06:47:59.0019172Z GOAMD64='v1'
+2026-11-21T06:47:59.0019373Z AR='ar'
+2026-11-21T06:47:59.0019571Z CC='gcc'
+2026-11-21T06:47:59.0019765Z CXX='g++'
+2026-11-21T06:47:59.0019974Z CGO_ENABLED='0'
+2026-11-21T06:47:59.0020418Z GOMOD='/home/runner/work/prfrail/prfrail/go.mod'
+2026-11-21T06:47:59.0020692Z GOWORK=''
+2026-11-21T06:47:59.0020906Z CGO_CFLAGS='-O2 -g'
+2026-11-21T06:47:59.0021145Z CGO_CPPFLAGS=''
+2026-11-21T06:47:59.0021344Z CGO_CXXFLAGS='-O2 -g'
+2026-11-21T06:47:59.0021590Z CGO_FFLAGS='-O2 -g'
+2026-11-21T06:47:59.0021798Z CGO_LDFLAGS='-O2 -g'
+2026-11-21T06:47:59.0022017Z PKG_CONFIG='pkg-config'
+2026-11-21T06:47:59.0022588Z GOGCCFLAGS='-fPIC -m64 -Wl,--no-gc-sections -fmessage-length=0 -ffile-prefix-map=/tmp/go-build125655549=/tmp/go-build -gno-record-gcc-switches'
+2026-11-21T06:47:59.0022977Z 
+2026-11-21T06:47:59.0023347Z ##[endgroup]
+2026-11-21T06:47:59.0139259Z ##[group]Run go build ./...
+2026-11-21T06:47:59.0139623Z [36;1mgo build ./...[0m
+2026-11-21T06:47:59.0163324Z shell: /usr/bin/bash -e {0}
+2026-11-21T06:47:59.0163731Z env:
+2026-11-21T06:47:59.0163979Z   GO_VERSION: 1.22.12
+2026-11-21T06:47:59.0164249Z   CGO_ENABLED: 0
+2026-11-21T06:47:59.0164478Z   GOTOOLCHAIN: local
+2026-11-21T06:47:59.0164692Z ##[endgroup]
+2026-11-21T06:48:01.4793484Z ##[group]Run go vet ./...
+2026-11-21T06:48:01.4793810Z [36;1mgo vet ./...[0m
+2026-11-21T06:48:01.4813525Z shell: /usr/bin/bash -e {0}
+2026-11-21T06:48:01.4813798Z env:
+2026-11-21T06:48:01.4814035Z   GO_VERSION: 1.22.12
+2026-11-21T06:48:01.4814280Z   CGO_ENABLED: 0
+2026-11-21T06:48:01.4814516Z   GOTOOLCHAIN: local
+2026-11-21T06:48:01.4814864Z ##[endgroup]
+2026-11-21T06:48:03.9017719Z ##[group]Run go test -count=1 ./...
+2026-11-21T06:48:03.9018117Z [36;1mgo test -count=1 ./...[0m
+2026-11-21T06:48:03.9037148Z shell: /usr/bin/bash -e {0}
+2026-11-21T06:48:03.9037432Z env:
+2026-11-21T06:48:03.9037650Z   GO_VERSION: 1.22.12
+2026-11-21T06:48:03.9037896Z   CGO_ENABLED: 0
+2026-11-21T06:48:03.9038132Z   GOTOOLCHAIN: local
+2026-11-21T06:48:03.9038374Z ##[endgroup]
+2026-11-21T06:48:07.0381850Z ?   	github.com/larsonzh/prfrail/cmd/prfrail	[no test files]
+2026-11-21T06:48:07.0611711Z ?   	github.com/larsonzh/prfrail/cmd/prfrail-release	[no test files]
+2026-11-21T06:48:07.1225825Z ok  	github.com/larsonzh/prfrail/examples/whois-shadow	0.002s
+2026-11-21T06:48:11.4759929Z ?   	github.com/larsonzh/prfrail/tools/agent-probe/supervisor	[no test files]
+2026-11-21T06:48:12.1151615Z ?   	github.com/larsonzh/prfrail/tools/b4-e2e	[no test files]
+2026-11-21T06:48:20.8498500Z ok  	github.com/larsonzh/prfrail/internal/adapters	13.487s
+2026-11-21T06:48:20.8499320Z ok  	github.com/larsonzh/prfrail/internal/applier	0.159s
+2026-11-21T06:48:20.8499743Z ok  	github.com/larsonzh/prfrail/internal/chain	0.403s
+2026-11-21T06:48:20.8500379Z ok  	github.com/larsonzh/prfrail/internal/console	4.346s
+2026-11-21T06:48:20.8500837Z ok  	github.com/larsonzh/prfrail/internal/evidence	0.051s
+2026-11-21T06:48:20.8501243Z ok  	github.com/larsonzh/prfrail/internal/gates	0.119s
+2026-11-21T06:48:20.8501880Z ok  	github.com/larsonzh/prfrail/internal/guard	1.256s
+2026-11-21T06:48:20.8502303Z ok  	github.com/larsonzh/prfrail/internal/release	0.851s
+2026-11-21T06:48:20.8502772Z ok  	github.com/larsonzh/prfrail/internal/repair	0.003s
+2026-11-21T06:48:20.8503219Z ok  	github.com/larsonzh/prfrail/internal/snapshot	0.052s
+2026-11-21T06:48:20.8503658Z ok  	github.com/larsonzh/prfrail/internal/taskdef	0.005s
+2026-11-21T06:48:20.8504068Z ok  	github.com/larsonzh/prfrail/internal/tickets	1.873s
+2026-11-21T06:48:20.8504590Z ok  	github.com/larsonzh/prfrail/tools/agent-probe/enforcement-proxy	0.224s
+2026-11-21T06:48:20.8505135Z ok  	github.com/larsonzh/prfrail/tools/agent-stub	0.349s
+2026-11-21T06:48:20.8643930Z ##[group]Run CGO_ENABLED=1 go test -race -count=1 ./internal/adapters/... ./internal/chain/... ./internal/console/... ./internal/gates/... ./internal/guard/... ./internal/tickets/...
+2026-11-21T06:48:20.8644808Z [36;1mCGO_ENABLED=1 go test -race -count=1 ./internal/adapters/... ./internal/chain/... ./internal/console/... ./internal/gates/... ./internal/guard/... ./internal/tickets/...[0m
+2026-11-21T06:48:20.8663185Z shell: /usr/bin/bash -e {0}
+2026-11-21T06:48:20.8663511Z env:
+2026-11-21T06:48:20.8663771Z   GO_VERSION: 1.22.12
+2026-11-21T06:48:20.8664019Z   CGO_ENABLED: 0
+2026-11-21T06:48:20.8664263Z   GOTOOLCHAIN: local
+2026-11-21T06:48:20.8664493Z ##[endgroup]
+2026-11-21T06:50:01.5205152Z ok  	github.com/larsonzh/prfrail/internal/adapters	90.199s
+2026-11-21T06:50:01.5205659Z ok  	github.com/larsonzh/prfrail/internal/chain	2.284s
+2026-11-21T06:50:01.5206277Z ok  	github.com/larsonzh/prfrail/internal/console	23.226s
+2026-11-21T06:50:01.5206862Z ok  	github.com/larsonzh/prfrail/internal/gates	4.213s
+2026-11-21T06:50:01.5207316Z ok  	github.com/larsonzh/prfrail/internal/guard	3.343s
+2026-11-21T06:50:01.5207779Z ok  	github.com/larsonzh/prfrail/internal/tickets	5.422s
+2026-11-21T06:50:01.5392031Z ##[group]Run npm ci --ignore-scripts
+2026-11-21T06:50:01.5392361Z [36;1mnpm ci --ignore-scripts[0m
+2026-11-21T06:50:01.5392971Z [36;1mnpm test[0m
+2026-11-21T06:50:01.5411267Z shell: /usr/bin/bash -e {0}
+2026-11-21T06:50:01.5411547Z env:
+2026-11-21T06:50:01.5411822Z   GO_VERSION: 1.22.12
+2026-11-21T06:50:01.5412044Z   CGO_ENABLED: 0
+2026-11-21T06:50:01.5412295Z   GOTOOLCHAIN: local
+2026-11-21T06:50:01.5412531Z ##[endgroup]
+2026-11-21T06:50:05.6911258Z 
+2026-11-21T06:50:05.6912270Z added 7 packages, and audited 8 packages in 1s
+2026-11-21T06:50:05.6912529Z 
+2026-11-21T06:50:05.6912714Z 2 packages are looking for funding
+2026-11-21T06:50:05.6913027Z   run `npm fund` for details
+2026-11-21T06:50:05.6928907Z 
+2026-11-21T06:50:05.6929756Z 1 moderate severity vulnerability
+2026-11-21T06:50:05.6930079Z 
+2026-11-21T06:50:05.6930495Z To address all issues, run:
+2026-11-21T06:50:05.6930987Z   npm audit fix
+2026-11-21T06:50:05.6931177Z 
+2026-11-21T06:50:05.6931495Z Run `npm audit` for details.
+2026-11-21T06:50:05.7820463Z 
+2026-11-21T06:50:05.7821262Z > proofrail-contract-validator@1.0.0 test
+2026-11-21T06:50:05.7821613Z > node --test
+2026-11-21T06:50:05.7821893Z 
+2026-11-21T06:50:06.2703377Z ✔ all schemas compile and every catalog matches its independent expectation (388.061842ms)
+2026-11-21T06:50:06.2704170Z ✔ canonical vectors reproduce the frozen bytes and digests (1.730052ms)
+2026-11-21T06:50:06.2709623Z ✔ AgentRunner mapping constants stay aligned across vectors and request fixtures (0.966727ms)
+2026-11-21T06:50:06.2710568Z ✔ AgentRunner effect mapping fails closed and permits grant supersets (2.048971ms)
+2026-11-21T06:50:06.2824547Z ℹ tests 4
+2026-11-21T06:50:06.2824837Z ℹ suites 0
+2026-11-21T06:50:06.2825105Z ℹ pass 4
+2026-11-21T06:50:06.2825374Z ℹ fail 0
+2026-11-21T06:50:06.2825621Z ℹ cancelled 0
+2026-11-21T06:50:06.2825870Z ℹ skipped 0
+2026-11-21T06:50:06.2826097Z ℹ todo 0
+2026-11-21T06:50:06.2826343Z ℹ duration_ms 470.888468
+2026-11-21T06:50:06.2939836Z ##[group]Run node tools/gates/gate.js --selftest && node tools/gates/gate.js --all --scope=ci
+2026-11-21T06:50:06.2940994Z [36;1mnode tools/gates/gate.js --selftest && node tools/gates/gate.js --all --scope=ci[0m
+2026-11-21T06:50:06.2959657Z shell: /usr/bin/bash -e {0}
+2026-11-21T06:50:06.2959901Z env:
+2026-11-21T06:50:06.2960338Z   GO_VERSION: 1.22.12
+2026-11-21T06:50:06.2960656Z   CGO_ENABLED: 0
+2026-11-21T06:50:06.2960903Z   GOTOOLCHAIN: local
+2026-11-21T06:50:06.2961126Z ##[endgroup]
+2026-11-21T06:50:10.2206286Z GATES SELFTEST (in-process; fixtures under tools/gates/testdata/)
+2026-11-21T06:50:10.2207685Z   T3/T12 need real git ranges and are recorded as evidence, not here:
+2026-11-21T06:50:10.2228302Z     --scope=range:b738e6b^..b738e6b (A1 must be red) / range:9f68a52^..9f68a52 (green)
+2026-11-21T06:50:10.2229478Z     --scope=range:1b01115^..1b01115 (C1: G7 must be red)
+2026-11-21T06:50:10.2230432Z ok   T13 fixture files are not *.md, so a tree/ci run never judges the runner own fixtures
+2026-11-21T06:50:10.2231361Z ok   T1 G6-1 detects pending(⑥)+completion(⑥ 实得) in one block
+2026-11-21T06:50:10.2231848Z ok   T1 G6-1 reports exactly one finding for the fixture
+2026-11-21T06:50:10.2232323Z ok   T1 reverse mutation (drop completion row) clears G6-1
+2026-11-21T06:50:10.2232839Z ok   T1 delete-criterion mutation (G6-1 removed) leaves the corpus clean
+2026-11-21T06:50:10.2233387Z ok   T1 F1 completion shape `（实得）` is detected
+2026-11-21T06:50:10.2233832Z ok   T1 F1 completion shape `✅ 已完成` is detected
+2026-11-21T06:50:10.2234321Z ok   T1 F1 completion shape `✅ **已完成**` is detected
+2026-11-21T06:50:10.2234792Z ok   T1 F1 plain shape with a different label stays clean (label window intact)
+2026-11-21T06:50:10.2235281Z ok   T2 provenance file carries exactly one excerpt line
+2026-11-21T06:50:10.2235745Z ok   T2 fixture embeds the historical OB-11 row verbatim
+2026-11-21T06:50:10.2236218Z ok   T2 OB-11 row (with 冲突 marker) is clean
+2026-11-21T06:50:10.2236760Z ok   T2 reverse mutation (drop the 冲突 exclusion marker) turns G6-1 red
+2026-11-21T06:50:10.2237241Z ok   T4 provenance file carries the two historical cost rows
+2026-11-21T06:50:10.2237663Z ok   T4 fixture embeds both historical cost rows verbatim
+2026-11-21T06:50:10.2238225Z ok   T4 cost-clause parser yields identical realized vectors for the historical pair
+2026-11-21T06:50:10.2238772Z ok   T4 budget clause is exempt: consistent rows pass G6-2
+2026-11-21T06:50:10.2239584Z ok   T4 reverse mutation (预算 -> 成本) turns G6-2 red
+2026-11-21T06:50:10.2240092Z ok   T4 delete-criterion mutation (G6-2 removed) leaves the mutated corpus clean
+2026-11-21T06:50:10.2240839Z ok   T5 legal 11-digit run id passes G6-3
+2026-11-21T06:50:10.2241214Z ok   T5 legal fixture yields no finding
+2026-11-21T06:50:10.2241591Z ok   T6 placeholder run ids fail G6-3
+2026-11-21T06:50:10.2241997Z ok   T6 one finding per placeholder line (4)
+2026-11-21T06:50:10.2242479Z ok   T6 delete-criterion mutation (G6-3 removed) leaves the corpus clean
+2026-11-21T06:50:10.2243030Z ok   F7 G6-3 boundary table (token-final): 1-digit id `run 3` must FAIL
+2026-11-21T06:50:10.2243619Z ok   F7 G6-3 boundary table (token-final): 2-digit id `run 33` must FAIL
+2026-11-21T06:50:10.2244169Z ok   F7 G6-3 boundary table (token-final): 3-digit id `run 333` must FAIL
+2026-11-21T06:50:10.2244608Z ok   F7 G6-3 floor rule (token-final): the 3-digit reject names the 9-digit floor
+2026-11-21T06:50:10.2245020Z ok   F7 G6-3 boundary table (token-final): 4-digit id `run 3333` must FAIL
+2026-11-21T06:50:10.2245421Z ok   F7 G6-3 floor rule (token-final): the 4-digit reject names the 9-digit floor
+2026-11-21T06:50:10.2245877Z ok   F7 G6-3 boundary table (token-final): 5-digit id `run 33333` must FAIL
+2026-11-21T06:50:10.2246289Z ok   F7 G6-3 floor rule (token-final): the 5-digit reject names the 9-digit floor
+2026-11-21T06:50:10.2246721Z ok   F7 G6-3 boundary table (token-final): 6-digit id `run 333333` must FAIL
+2026-11-21T06:50:10.2247378Z ok   F7 G6-3 floor rule (token-final): the 6-digit reject names the 9-digit floor
+2026-11-21T06:50:10.2247808Z ok   F7 G6-3 boundary table (token-final): 7-digit id `run 3333333` must FAIL
+2026-11-21T06:50:10.2248237Z ok   F7 G6-3 floor rule (token-final): the 7-digit reject names the 9-digit floor
+2026-11-21T06:50:10.2248703Z ok   F7 G6-3 boundary table (token-final): 8-digit id `run 33333333` must FAIL
+2026-11-21T06:50:10.2249166Z ok   F7 G6-3 floor rule (token-final): the 8-digit reject names the 9-digit floor
+2026-11-21T06:50:10.2249588Z ok   F7 G6-3 boundary table (token-final): 9-digit id `run 333333333` must PASS
+2026-11-21T06:50:10.2250005Z ok   F7 G6-3 boundary table (token-final): 10-digit id `run 3333333333` must PASS
+2026-11-21T06:50:10.2251059Z ok   F7 G6-3 boundary table (token-final): 11-digit id `run 33333333333` must PASS
+2026-11-21T06:50:10.2251731Z ok   F7 G6-3 boundary table (token-final): 12-digit id `run 333333333333` must PASS
+2026-11-21T06:50:10.2252331Z ok   F7 G6-3 boundary table (token-final): 13-digit id `run 3333333333333` must PASS
+2026-11-21T06:50:10.2252764Z ok   F7 G6-3 boundary table (token-final): 14-digit id `run 33333333333333` must FAIL
+2026-11-21T06:50:10.2253320Z ok   F7 G6-3 boundary table (token-final): 15-digit id `run 333333333333333` must FAIL
+2026-11-21T06:50:10.2253885Z ok   F7 G6-3 boundary table (token-final): 16-digit id `run 3333333333333333` must FAIL
+2026-11-21T06:50:10.2254469Z ok   F7 G6-3 boundary table (token-final): 17-digit id `run 33333333333333333` must FAIL
+2026-11-21T06:50:10.2255380Z ok   F7 G6-3 boundary table (token-final): 18-digit id `run 333333333333333333` must FAIL
+2026-11-21T06:50:10.2256034Z ok   F7 G6-3 boundary table (token-final): 19-digit id `run 3333333333333333333` must FAIL
+2026-11-21T06:50:10.2256744Z ok   F7 G6-3 boundary table (token-final): 20-digit id `run 33333333333333333333` must FAIL
+2026-11-21T06:50:10.2257310Z ok   F7 G6-3 boundary table (backticked): 1-digit id `run 3` must FAIL
+2026-11-21T06:50:10.2257942Z ok   F7 G6-3 boundary table (backticked): 2-digit id `run 33` must FAIL
+2026-11-21T06:50:10.2258499Z ok   F7 G6-3 boundary table (backticked): 3-digit id `run 333` must FAIL
+2026-11-21T06:50:10.2259063Z ok   F7 G6-3 floor rule (backticked): the 3-digit reject names the 9-digit floor
+2026-11-21T06:50:10.2259691Z ok   F7 G6-3 boundary table (backticked): 4-digit id `run 3333` must FAIL
+2026-11-21T06:50:10.2260757Z ok   F7 G6-3 floor rule (backticked): the 4-digit reject names the 9-digit floor
+2026-11-21T06:50:10.2261437Z ok   F7 G6-3 boundary table (backticked): 5-digit id `run 33333` must FAIL
+2026-11-21T06:50:10.2262165Z ok   F7 G6-3 floor rule (backticked): the 5-digit reject names the 9-digit floor
+2026-11-21T06:50:10.2262731Z ok   F7 G6-3 boundary table (backticked): 6-digit id `run 333333` must FAIL
+2026-11-21T06:50:10.2263321Z ok   F7 G6-3 floor rule (backticked): the 6-digit reject names the 9-digit floor
+2026-11-21T06:50:10.2263862Z ok   F7 G6-3 boundary table (backticked): 7-digit id `run 3333333` must FAIL
+2026-11-21T06:50:10.2264616Z ok   F7 G6-3 floor rule (backticked): the 7-digit reject names the 9-digit floor
+2026-11-21T06:50:10.2265192Z ok   F7 G6-3 boundary table (backticked): 8-digit id `run 33333333` must FAIL
+2026-11-21T06:50:10.2265710Z ok   F7 G6-3 floor rule (backticked): the 8-digit reject names the 9-digit floor
+2026-11-21T06:50:10.2266301Z ok   F7 G6-3 boundary table (backticked): 9-digit id `run 333333333` must PASS
+2026-11-21T06:50:10.2266828Z ok   F7 G6-3 boundary table (backticked): 10-digit id `run 3333333333` must PASS
+2026-11-21T06:50:10.2267375Z ok   F7 G6-3 boundary table (backticked): 11-digit id `run 33333333333` must PASS
+2026-11-21T06:50:10.2267924Z ok   F7 G6-3 boundary table (backticked): 12-digit id `run 333333333333` must PASS
+2026-11-21T06:50:10.2268474Z ok   F7 G6-3 boundary table (backticked): 13-digit id `run 3333333333333` must PASS
+2026-11-21T06:50:10.2269034Z ok   F7 G6-3 boundary table (backticked): 14-digit id `run 33333333333333` must FAIL
+2026-11-21T06:50:10.2269770Z ok   F7 G6-3 boundary table (backticked): 15-digit id `run 333333333333333` must FAIL
+2026-11-21T06:50:10.2270769Z ok   F7 G6-3 boundary table (backticked): 16-digit id `run 3333333333333333` must FAIL
+2026-11-21T06:50:10.2271330Z ok   F7 G6-3 boundary table (backticked): 17-digit id `run 33333333333333333` must FAIL
+2026-11-21T06:50:10.2272010Z ok   F7 G6-3 boundary table (backticked): 18-digit id `run 333333333333333333` must FAIL
+2026-11-21T06:50:10.2272651Z ok   F7 G6-3 boundary table (backticked): 19-digit id `run 3333333333333333333` must FAIL
+2026-11-21T06:50:10.2273220Z ok   F7 G6-3 boundary table (backticked): 20-digit id `run 33333333333333333333` must FAIL
+2026-11-21T06:50:10.2273785Z ok   F7 G6-3 named case `run 0` (all-zero id, 1 digit) must FAIL
+2026-11-21T06:50:10.2274241Z ok   F7 G6-3 named case `run 000000` (all-zero id, 6 digits) must FAIL
+2026-11-21T06:50:10.2274862Z ok   F7 G6-3 named case `run 00000000000000000000` (all-zero id, 20 digits (fails at any length)) must FAIL
+2026-11-21T06:50:10.2275530Z ok   F7 G6-3 named case ``run 00000000000000000000`` (all-zero id, 20 digits, backticked) must FAIL
+2026-11-21T06:50:10.2276113Z ok   F7 G6-3 named case `run <RUN_ID>` (angle-bracket placeholder) must FAIL
+2026-11-21T06:50:10.2276636Z ok   F7 G6-3 named case `run TBD` (word placeholder TBD) must FAIL
+2026-11-21T06:50:10.2277066Z ok   F7 G6-3 named case `run TODO` (word placeholder TODO) must FAIL
+2026-11-21T06:50:10.2277585Z ok   F7 G6-3 named case `run N/A` (word placeholder N/A) must FAIL
+2026-11-21T06:50:10.2278246Z ok   F7 G6-3 named case `run 待定` (placeholder wording 待) must FAIL
+2026-11-21T06:50:10.2278825Z ok   F7 G6-3 named case `run 占位` (placeholder wording 占位) must FAIL
+2026-11-21T06:50:10.2279295Z ok   F7 G6-3 named case `run 35646859765` (real-world 11-digit run id) must PASS
+2026-11-21T06:50:10.2279846Z ok   F7 G6-3 named case ``run 35646859765`` (real-world 11-digit run id inside a code span) must PASS
+2026-11-21T06:50:10.2281159Z ok   F7 G6-3 named case `see run 111` (token-final 3-digit id at end of line) must FAIL
+2026-11-21T06:50:10.2281930Z ok   F7 G6-3 named case `run 1234。` (3-8 digit id terminated by CJK punctuation (not a word)) must FAIL
+2026-11-21T06:50:10.2282619Z ok   F7 G6-3 named case `run 7！` (1-2 digit id terminated by punctuation) must FAIL
+2026-11-21T06:50:10.2283344Z ok   F7 G6-3 named case `report run 123456789012345！` (>= 14 digit id terminated by punctuation) must FAIL
+2026-11-21T06:50:10.2284074Z ok   F7 G6-3 named case `see run <RUN_ID> here` (angle-bracket placeholder mid-prose) must FAIL
+2026-11-21T06:50:10.2284667Z ok   F7 G6-3 named case `see run TBD here` (word placeholder TBD mid-prose) must FAIL
+2026-11-21T06:50:10.2285228Z ok   F7 G6-3 named case `see run TODO here` (word placeholder TODO mid-prose) must FAIL
+2026-11-21T06:50:10.2285837Z ok   F7 G6-3 named case `see run N/A here` (word placeholder N/A mid-prose) must FAIL
+2026-11-21T06:50:10.2286437Z ok   F7 G6-3 named case `see run 待定 here` (CJK placeholder 待 mid-prose) must FAIL
+2026-11-21T06:50:10.2287063Z ok   F7 G6-3 named case `see run 占位 here` (CJK placeholder 占位 mid-prose) must FAIL
+2026-11-21T06:50:10.2287637Z ok   F7 G6-3 named case ``run 1234`` (backticked malformed id stays judged) must FAIL
+2026-11-21T06:50:10.2288323Z ok   F7 G6-3 named case `The run log shows `run 1234` as the marker.` (backticked malformed id inside a prose sentence) must FAIL
+2026-11-21T06:50:10.2289173Z ok   2e G6-3 prose probe `The retry loop was executed run 1234 times by the harness.` (3-8 digit rule vs ASCII word) must PASS (no finding)
+2026-11-21T06:50:10.2290044Z ok   2e G6-3 prose probe `连续 run 12 次后任务完成。` (1-2 digit rule vs CJK word) must PASS (no finding)
+2026-11-21T06:50:10.2291095Z ok   2e G6-3 prose probe ``inventory run 1 failed`` (pre-existing docs/t027/B3B_DESIGN.md:236 shape (1-2 digit rule)) must PASS (no finding)
+2026-11-21T06:50:10.2291939Z ok   2e G6-3 prose probe `run 111 次后停止。` (3-8 digit rule vs CJK word) must PASS (no finding)
+2026-11-21T06:50:10.2292569Z ok   2e G6-3 prose probe `run 000 次。` (all-zero rule vs CJK word) must PASS (no finding)
+2026-11-21T06:50:10.2293455Z ok   2e G6-3 prose probe `run 123456789012345 次。` (>= 14 digit rule vs CJK word) must PASS (no finding)
+2026-11-21T06:50:10.2294205Z ok   2e G6-3 prose probe `the tool ran run 1234 quickly` (3-8 digit rule vs ASCII word (no punctuation)) must PASS (no finding)
+2026-11-21T06:50:10.2295147Z ok   2e G6-3 prose probe `see run 7 files` (1-2 digit rule vs ASCII word) must PASS (no finding)
+2026-11-21T06:50:10.2295812Z ok   2e G6-3 prose probes are load-bearing: the same digit runs DO fail when token-final
+2026-11-21T06:50:10.2296508Z ok   2f G6-3 leading-boundary probe `rerun 1234` (ASCII letter immediately before `run`) must PASS (no finding)
+2026-11-21T06:50:10.2297340Z ok   2f G6-3 leading-boundary probe `The harness will rerun 1234.` (word-embedded `run` inside a prose sentence) must PASS (no finding)
+2026-11-21T06:50:10.2298342Z ok   2f G6-3 leading-boundary probe `在run 1234` (CJK ideograph glued to the FRONT of `run`) must PASS (no finding)
+2026-11-21T06:50:10.2299157Z ok   2f G6-3 leading-boundary probe `prerun 12` (ASCII-letter prefix on the 1-2 digit rule) must PASS (no finding)
+2026-11-21T06:50:10.2300019Z ok   2f G6-3 leading-boundary probe `rerun <RUN_ID>` (placeholder rule carries the leading guard too (NF-2 consistency)) must PASS (no finding)
+2026-11-21T06:50:10.2301085Z ok   2f G6-3 leading-boundary probe `prerun TBD` (word-placeholder rule carries the leading guard too) must PASS (no finding)
+2026-11-21T06:50:10.2301895Z ok   2f G6-3 still-judged probe `see run 1234` (token-final 3-8 digit id mid-prose) must FAIL
+2026-11-21T06:50:10.2302566Z ok   2f G6-3 still-judged probe `（run 1234）` (id wrapped in CJK parentheses) must FAIL
+2026-11-21T06:50:10.2303156Z ok   2f G6-3 still-judged probe ``run 1234`` (backticked malformed id) must FAIL
+2026-11-21T06:50:10.2303812Z ok   2f G6-3 still-judged probe `run 1234。` (id terminated by CJK punctuation) must FAIL
+2026-11-21T06:50:10.2304396Z ok   2f G6-3 still-judged probe `run 111` (3-digit id at end of line) must FAIL
+2026-11-21T06:50:10.2304981Z ok   2f G6-3 still-judged probe `run TBD` (word placeholder at end of line) must FAIL
+2026-11-21T06:50:10.2305611Z ok   2f G6-3 still-judged probe `see run TBD here` (word placeholder mid-prose) must FAIL
+2026-11-21T06:50:10.2306312Z ok   2f G6-3 word-followed exemption `run 1234 times` (digit run followed by an ASCII word) must PASS (no finding)
+2026-11-21T06:50:10.2307125Z ok   2f G6-3 word-followed exemption `连续 run 12 次` (digit run followed by a CJK word) must PASS (no finding)
+2026-11-21T06:50:10.2307972Z ok   2f G6-3 word-followed exemption ``run 1234 times`` (BACKTICKED digit run still followed by a word (NF-1 prose correction)) must PASS (no finding)
+2026-11-21T06:50:10.2308946Z ok   2f G6-3 glued-form consequence `run 1234times` (no separator before the trailing ASCII word) must PASS (documented, not a defect)
+2026-11-21T06:50:10.2309895Z ok   2f G6-3 glued-form consequence `run 12345678次` (no separator before the trailing CJK word) must PASS (documented, not a defect)
+2026-11-21T06:50:10.2310715Z ok   T7 expiring literals fail G6-4
+2026-11-21T06:50:10.2311103Z ok   T7 two literal lines produce two findings
+2026-11-21T06:50:10.2311630Z ok   T7 whitelisting ONE of two findings leaves G6-4 red with one fatal finding
+2026-11-21T06:50:10.2312185Z ok   T7 whitelisting both findings turns G6-4 green (whitelist is load-bearing)
+2026-11-21T06:50:10.2312673Z ok   T8 report without an artifacts block fails G7-a
+2026-11-21T06:50:10.2313182Z ok   T8 delete-criterion mutation (G7-a removed) leaves the corpus clean
+2026-11-21T06:50:10.2313699Z ok   T9 unresolved repo disposition (tmp path, omitted token) fails G7-b
+2026-11-21T06:50:10.2314236Z ok   T9 marking the tmp path local-only turns G7-b green
+2026-11-21T06:50:10.2314682Z ok   T9 unknown disposition token fails G7-b
+2026-11-21T06:50:10.2315192Z ok   T10 existing repo artifact + local-only + missing-historical pass G7-b
+2026-11-21T06:50:10.2315664Z ok   T10 unresolvable repo artifact fails G7-b
+2026-11-21T06:50:10.2316182Z ok   T11 finding row without a disposition cell fails G7-c
+2026-11-21T06:50:10.2316704Z ok   T11 adding the disposition cell turns G7-c green
+2026-11-21T06:50:10.2317189Z ok   T11 delete-criterion mutation (G7-c removed) leaves the corpus clean
+2026-11-21T06:50:10.2317859Z ok   G7-d stopped status line without 已停止——未完成 fails
+2026-11-21T06:50:10.2318374Z ok   G7-d fires only on the status line, not on prose naming the rule (self-reference guard)
+2026-11-21T06:50:10.2319064Z ok   G7-d adding the incomplete mark turns it green
+2026-11-21T06:50:10.2319504Z ok   T14 tree/index resolve whitelists from the working tree
+2026-11-21T06:50:10.2320050Z ok   T14 range/ci resolve whitelists from the endpoint revision (range -> head, ci -> HEAD)
+2026-11-21T06:50:10.2320897Z ok   T14 G6 reads its whitelist through ctx.loadWhitelist
+2026-11-21T06:50:10.2321385Z ok   T14 G4b reads its whitelist through the same ctx.loadWhitelist
+2026-11-21T06:50:10.2321846Z ok   T14 both criteria print the whitelist source they used
+2026-11-21T06:50:10.2322360Z ok   T15 tree scope rejects a gitignored / never-staged path marked repo (F2 probe)
+2026-11-21T06:50:10.2322899Z ok   T15 tree scope accepts a path present in the index and on disk
+2026-11-21T06:50:10.2323424Z ok   T15 range scope still resolves repo artifacts at the endpoint revision
+2026-11-21T06:50:10.2324135Z ok   T15 whitelist source resolves to endpoint:<rev> and yields zero entries when the endpoint revision lacks the file
+2026-11-21T06:50:10.2324746Z ok   T15 any-commit variant: endpoint label + zero entries hold for the real HEAD revision too
+2026-11-21T06:50:10.2325167Z ok   T15 G7-b FAILs an ignored path marked repo in tree scope
+2026-11-21T06:50:10.2325513Z ok   T15 G7-b accepts the same row once the path is in the index
+2026-11-21T06:50:10.2325921Z ok   T16 disposition vocabulary covers the CN and EN token sets stated in 6.3
+2026-11-21T06:50:10.2326343Z ok   T16 G7-c accepts the English disposition `Fixed`
+2026-11-21T06:50:10.2326680Z ok   T16 G7-c accepts the English disposition `Resolved`
+2026-11-21T06:50:10.2327003Z ok   T16 G7-c accepts the English disposition `Closed`
+2026-11-21T06:50:10.2327317Z ok   T16 G7-c accepts the English disposition `Accepted`
+2026-11-21T06:50:10.2327687Z ok   T16 G7-c accepts the English disposition `Rejected`
+2026-11-21T06:50:10.2328027Z ok   T16 G7-c accepts the English disposition `Deferred`
+2026-11-21T06:50:10.2328357Z ok   T16 G7-c accepts the English disposition `Recorded`
+2026-11-21T06:50:10.2328700Z ok   T16 G7-c accepts the English disposition `To do`
+2026-11-21T06:50:10.2329017Z ok   T16 G7-c accepts the English disposition `Observed`
+2026-11-21T06:50:10.2329384Z ok   T16 G7-c accepts the English disposition `To be discussed`
+2026-11-21T06:50:10.2329742Z ok   T16 G7-c accepts the English disposition `Not a problem`
+2026-11-21T06:50:10.2330437Z ok   T16 G7-c accepts the English disposition `Documented`
+2026-11-21T06:50:10.2331007Z ok   T16 G7-c still rejects a finding row with no disposition cell
+2026-11-21T06:50:10.2331878Z ok   F2 G7-c structural disposition probe `| **High** | 描述里写“已修” | |` (disposition token inside the description cell, disposition cell empty) must FAIL
+2026-11-21T06:50:10.2332578Z ok   F2 G7-c structural disposition probe `| **High** | evidence chain missing | Fixed |` (English disposition in the last cell) must PASS
+2026-11-21T06:50:10.2333362Z ok   F2 G7-c structural disposition probe `| **High** | 描述里写“已修” | 拒收 |` (CN disposition in the last cell (token also appears in the description)) must PASS
+2026-11-21T06:50:10.2334109Z ok   F2 G7-c structural disposition probe `| **Medium** | description says "Resolved" | Rejected |` (another EN token pair resolves in the last cell) must PASS
+2026-11-21T06:50:10.2334948Z ok   F2 G7-c structural disposition probe `| **High** | evidence chain missing` (row with no disposition cell at all (no trailing pipe)) must FAIL
+2026-11-21T06:50:10.2335738Z ok   F2 G7-c structural disposition probe `| **High** | 证据链缺失 |` (row with a structurally present but EMPTY disposition cell) must FAIL
+2026-11-21T06:50:10.2336506Z ok   F2 G7-c structural disposition probe `| **Low** | 描述含“已修” | 已修 |` (control: token in both cells) must PASS
+2026-11-21T06:50:10.2336952Z ok   F2 G7-c takes the disposition from the LAST cell only (internals)
+2026-11-21T06:50:10.2337467Z ok   F3 G7-d stopped-state vocabulary is bilingual (internals)
+2026-11-21T06:50:10.2338015Z ok   F3 G7-d bilingual stopped-state probe `| Status | Stopped (pending user ruling) |` (EN status line without the incomplete mark) must FAIL
+2026-11-21T06:50:10.2338766Z ok   F3 G7-d bilingual stopped-state probe `| Status | Stopped — incomplete |` (EN status line carrying the EN incomplete mark) must PASS
+2026-11-21T06:50:10.2339508Z ok   F3 G7-d bilingual stopped-state probe `| Status | 已停止——未完成（等用户裁决） |` (CN status line carrying the CN incomplete mark) must PASS
+2026-11-21T06:50:10.2340309Z ok   F3 G7-d bilingual stopped-state probe `| Status | 已停止（等用户裁决后决定是否重启） |` (CN status line without the mark) must FAIL
+2026-11-21T06:50:10.2340975Z ok   F3 G7-d bilingual stopped-state probe `| Status | Halted (awaiting ruling) |` (Halted is part of the EN token set) must FAIL
+2026-11-21T06:50:10.2341654Z ok   F3 G7-d bilingual stopped-state probe `| Status | halted (awaiting ruling) |` (EN tokens match case-insensitively (lowercase halted)) must FAIL
+2026-11-21T06:50:10.2342421Z ok   F3 G7-d bilingual stopped-state probe `| Status | stopped — incomplete |` (the EN mark matches case-insensitively too) must PASS
+2026-11-21T06:50:10.2343187Z ok   F3 G7-d bilingual stopped-state probe `| Status | Stopped (pending user ruling) |` (the mark appears later in the SAME block, so the row is closed out) must PASS
+2026-11-21T06:50:10.2343859Z ok   F3 G7-d ignores a CN prose line naming 停止态 (self-reference guard)
+2026-11-21T06:50:10.2344346Z ok   T72 OB-42 positive control: a closed-set verdict line passes (bold marker + parenthetical note allowed)
+2026-11-21T06:50:10.2344920Z ok   T72 OB-42 an out-of-set value under a closed-set prefix is a format deviation
+2026-11-21T06:50:10.2345433Z ok   T72 OB-42 a value legal for ANOTHER prefix is still a deviation (per-prefix sets, not one merged set)
+2026-11-21T06:50:10.2345909Z ok   T72 OB-42 the bare-token rule: a prefix-less `PASS` is a deviation
+2026-11-21T06:50:10.2346442Z ok   T72 OB-42 the table-external rule: an unknown prefix carrying exactly one closed value is a deviation
+2026-11-21T06:50:10.2346955Z ok   T72 OB-42 a residual `RE_` placeholder is a deviation (4.1 abolished it)
+2026-11-21T06:50:10.2347401Z ok   T72 OB-42 stated boundary: a gate reading that only LOOKS like a verdict line is not judged
+2026-11-21T06:50:10.2347881Z ok   T72 OB-42 self-reference guard: an illegal form quoted on a marked line is skipped
+2026-11-21T06:50:10.2348414Z ok   T72 OB-42 mutation applied: the membership line matched g7.js (a stale patch would weaken the suite silently)
+2026-11-21T06:50:10.2348994Z ok   T72 OB-42 load-bearing proof: accepting any recognisable value makes the SAME out-of-set line pass
+2026-11-21T06:50:10.2349535Z ok   T72 restore: g7.js is byte-identical after the mutation window and the cached module still fails the line
+2026-11-21T06:50:10.2350425Z ok   T73 OB-29 positive control: a call string matching the 2.2 qualified name passes (code span vs plain text is normalised away)
+2026-11-21T06:50:10.2350951Z ok   T73 OB-29 a call string outside the 2.2 qualified-name column fails
+2026-11-21T06:50:10.2351331Z ok   T73 OB-29 the `_EN` side is judged with its own lowercase table header
+2026-11-21T06:50:10.2351785Z ok   T73 OB-29 a directive without an appendix B region is not judged
+2026-11-21T06:50:10.2352238Z ok   T73 OB-29 fail-closed: an appendix B whose 2.2 qualified-name column cannot be read raises UsageError
+2026-11-21T06:50:10.2352797Z ok   T73 OB-29 mutation applied: the 2.2 membership line matched g5c.js (a stale patch would weaken the suite silently)
+2026-11-21T06:50:10.2353362Z ok   T73 OB-29 load-bearing proof: with the membership test patched out the SAME out-of-set call string passes
+2026-11-21T06:50:10.2354041Z ok   T73 restore: g5c.js is byte-identical after the mutation window and the cached module still fails the call string
+2026-11-21T06:50:10.2354628Z ok   T74 OB-90 an `_EN.md`-only change is now judged instead of silently ignored, and fails the symmetry test
+2026-11-21T06:50:10.2355208Z ok   T74 OB-90 a CN-only change whose `_EN` mirror exists is judged too (the mirror need not be in the change set)
+2026-11-21T06:50:10.2355759Z ok   T74 OB-90 directive pair, EN-only edit with a shape drift: G3(a.1) and G3(a.2) both go red
+2026-11-21T06:50:10.2356300Z ok   T74 OB-90 directive pair, EN-only edit with a shape-neutral body: only G3(a.1) goes red, G3(a.2) stays silent
+2026-11-21T06:50:10.2356884Z ok   T74 OB-90 a non-canonical `_en.md` spelling is judged as the EN side of the same pair, not as two untouched paths (5 r1 F4)
+2026-11-21T06:50:10.2357581Z ok   T74 OB-90 load-bearing guard: a single-language `.md` without an `_EN` mirror stays out of scope, so the mirror-less corpus docs cannot go red
+2026-11-21T06:50:10.2358198Z ok   T74 OB-90 no behaviour drift: a two-sided equal edit still yields one green aggregate and no per-pair FAIL
+2026-11-21T06:50:10.2358769Z ok   T74 OB-90 equal deletion on both sides still passes (an unreadable pair no longer skips the numstat verdict)
+2026-11-21T06:50:10.2359368Z ok   T74 OB-90 a deleted `_EN` side still yields a G3(a.1) FAIL (the old code skipped unreadable pairs entirely)
+2026-11-21T06:50:10.2359910Z ok   T74 OB-90 the directive pair with an unreadable side reports G3(a.2) FAIL (premise broken, fail closed)
+2026-11-21T06:50:10.2360614Z ok   T74 OB-90 mutation applied: the pairing-guard block matched g3a.js (a stale patch would weaken the suite silently)
+2026-11-21T06:50:10.2361289Z ok   T74 OB-90 load-bearing proof: with the either-side guard reverted the SAME `_EN`-only change produces NO record again
+2026-11-21T06:50:10.2361932Z ok   T74 restore: g3a.js is byte-identical after the mutation window and the cached module still judges the `_EN`-only change
+2026-11-21T06:50:10.2362475Z ok   T74 OB-90 mutation applied (mirror-existence guard): the guard line matched g3a.js
+2026-11-21T06:50:10.2363040Z ok   T74 OB-90 load-bearing proof (mirror-existence guard): without the predicate the SAME single-language document goes red
+2026-11-21T06:50:10.2363672Z ok   T74 restore (mirror-existence guard): g3a.js is byte-identical and the single-language document is silent again
+2026-11-21T06:50:10.2364273Z ok   T75 OB-91 the 7 r3 residual is closed: `lang:zh_cn` is consumed whole and rejected (it used to truncate to a legal `lang:zh`)
+2026-11-21T06:50:10.2364767Z ok   T75 OB-91 the same holds for `lang:en_us` on the `_EN` side
+2026-11-21T06:50:10.2365157Z ok   T75 OB-91 a bare `lang:` is an unknown tag rather than an invisible token
+2026-11-21T06:50:10.2365634Z ok   T75 OB-91 coexistence is fail-closed for the new form as well (`lang:zh` plus a bare `lang:`)
+2026-11-21T06:50:10.2366078Z ok   T75 OB-91 coexistence (`lang:zh` plus `lang:zh_cn`) is rejected too
+2026-11-21T06:50:10.2366502Z ok   T75 OB-91 a trailing continuation character (`lang:zh-`) is rejected
+2026-11-21T06:50:10.2367058Z ok   T75 OB-91 a trailing dot (`lang:zh.`) belongs to the token and is rejected (the terminator set is the complement of the continuation set)
+2026-11-21T06:50:10.2367577Z ok   T75 OB-91 the comparison stays whole-token and case-sensitive (`lang:ZH`)
+2026-11-21T06:50:10.2367973Z ok   T75 OB-91 a digit suffix (`lang:zh2`) is rejected
+2026-11-21T06:50:10.2368345Z ok   T75 OB-91 a comma terminates the token, so `lang:zh,` stays legal
+2026-11-21T06:50:10.2368810Z ok   T75 OB-91 prose after the tag creates no phantom occurrence (a tag followed by a space and more words)
+2026-11-21T06:50:10.2369310Z ok   T75 OB-91 a leading dot is not part of the token (`.lang:zh` still declares zh)
+2026-11-21T06:50:10.2369871Z ok   T75 OB-91 an occurrence preceded by a word character is not an occurrence (`xlang:zh` declares nothing and fails as missing)
+2026-11-21T06:50:10.2370720Z ok   T75 OB-91 mutation applied: the continuation-charset line matched g6.js (a stale patch would weaken the suite silently)
+2026-11-21T06:50:10.2371459Z ok   T75 OB-91 load-bearing proof: with the continuation charset narrowed back the SAME `lang:zh_cn` header passes again (the charset, not the closed set, is what catches it)
+2026-11-21T06:50:10.2372251Z ok   T75 restore: g6.js is byte-identical after the mutation window and the cached module still rejects `lang:zh_cn`
+2026-11-21T06:50:10.2372801Z ok   T78 OB-90 an `_EN`-only bold drift is judged from the EN side: numstat and the bold shape both go red
+2026-11-21T06:50:10.2373295Z ok   T78 OB-90 the backtick shape is judged on its own (equal numstat, so only G3(a.2) can speak)
+2026-11-21T06:50:10.2373803Z ok   T78 OB-90 a heading downshift on the `_EN` side (one inserted line) fails G3(a.2) with `head` false
+2026-11-21T06:50:10.2374305Z ok   T78 OB-90 the pipe shape is judged on its own (a table row widened on the `_EN` side)
+2026-11-21T06:50:10.2374893Z ok   T78 OB-90 the blank-line shape is judged on its own (same line count, one blank line filled in)
+2026-11-21T06:50:10.2375423Z ok   T78 OB-90 the line-count shape is judged on its own (a trailing body line, heading positions intact)
+2026-11-21T06:50:10.2376000Z ok   T78 OB-90 control: an equal two-sided edit stays green (one aggregate PASS, no per-pair FAIL)
+2026-11-21T06:50:10.2376574Z ok   T78 OB-90 control: an identical shape change on BOTH sides stays green (the six shapes compare sides, not an absolute form)
+2026-11-21T06:50:10.2377163Z ok   T78 OB-90 pairing without shape drift: an `_EN`-only modification fails G3(a.1) and leaves G3(a.2) silent
+2026-11-21T06:50:10.2377769Z ok   T78 OB-90 an `_EN` side that is NEWLY ADDED (+2/-0) is judged against the untouched CN baseline and fails G3(a.1)
+2026-11-21T06:50:10.2378334Z ok   T78 OB-90 a DELETED `_EN` side (+0/-4) still yields G3(a.1) FAIL, so a removal cannot pass as "nothing to compare"
+2026-11-21T06:50:10.2378919Z ok   T78 OB-90 an `_EN` RENAME is judged as two pairs (old mirror deleted, new mirror added), each with its own G3(a.1)
+2026-11-21T06:50:10.2379615Z ok   T78 OB-90 a non-canonical `_en.md` spelling is paired under the CANONICAL CN id, so the half a reader looks for is the one reported
+2026-11-21T06:50:10.2380857Z ok   T78 OB-90 an orphan `_EN.md` (no CN side at all) is still judged and fails G3(a.1) against a +0/-0 baseline
+2026-11-21T06:50:10.2381447Z ok   T78 OB-90 a single-language document without an `_EN` mirror produces NO record (no false red on the mirror-less corpus)
+2026-11-21T06:50:10.2382081Z ok   T78 OB-90 aggregate uniqueness: the same `_EN`-only drift emits exactly ONE G3(a) record (a duplicate aggregate would double-count)
+2026-11-21T06:50:10.2382665Z ok   T79 OB-91 illegal form `lang:zh_cn` is consumed whole and rejected as an unknown tag
+2026-11-21T06:50:10.2383133Z ok   T79 OB-91 illegal form `lang:zh-cn` is consumed whole and rejected as an unknown tag
+2026-11-21T06:50:10.2383569Z ok   T79 OB-91 illegal form `lang:en_us` is consumed whole and rejected as an unknown tag
+2026-11-21T06:50:10.2384042Z ok   T79 OB-91 illegal form `lang:en-us` is consumed whole and rejected as an unknown tag
+2026-11-21T06:50:10.2384461Z ok   T79 OB-91 illegal form `lang:` is consumed whole and rejected as an unknown tag
+2026-11-21T06:50:10.2384907Z ok   T79 OB-91 illegal form `lang:ZH` is consumed whole and rejected as an unknown tag
+2026-11-21T06:50:10.2385378Z ok   T79 OB-91 illegal form `lang:zh-` is consumed whole and rejected as an unknown tag
+2026-11-21T06:50:10.2385816Z ok   T79 OB-91 illegal form `lang:zh.` is consumed whole and rejected as an unknown tag
+2026-11-21T06:50:10.2386246Z ok   T79 OB-91 illegal form `lang:zh2` is consumed whole and rejected as an unknown tag
+2026-11-21T06:50:10.2386663Z ok   T79 OB-91 illegal form `lang:zh:` is consumed whole and rejected as an unknown tag
+2026-11-21T06:50:10.2387131Z ok   T79 OB-91 legal + illegal coexistence is fail-closed (lang:zh + lang:zh-cn)
+2026-11-21T06:50:10.2387563Z ok   T79 OB-91 legal + illegal coexistence is fail-closed (lang:zh-cn + lang:zh)
+2026-11-21T06:50:10.2388056Z ok   T79 OB-91 legal + illegal coexistence is fail-closed (lang:en + lang:en-us)
+2026-11-21T06:50:10.2388496Z ok   T79 OB-91 legal + illegal coexistence is fail-closed (lang:en-us + lang:en)
+2026-11-21T06:50:10.2388965Z ok   T79 OB-91 continuation char extends the token (`lang:en_` is one unknown token, not a legal prefix)
+2026-11-21T06:50:10.2389558Z ok   T79 OB-91 continuation char extends the token (`lang:en.` is one unknown token, not a legal prefix)
+2026-11-21T06:50:10.2390074Z ok   T79 OB-91 continuation char extends the token (`lang:en-` is one unknown token, not a legal prefix)
+2026-11-21T06:50:10.2391720Z ok   T79 OB-91 continuation char extends the token (`lang:en2` is one unknown token, not a legal prefix)
+2026-11-21T06:50:10.2392232Z ok   T79 OB-91 continuation char extends the token (`lang:enA` is one unknown token, not a legal prefix)
+2026-11-21T06:50:10.2392742Z ok   T79 OB-91 continuation char extends the token (`lang:ena` is one unknown token, not a legal prefix)
+2026-11-21T06:50:10.2393296Z ok   T79 OB-91 continuation char extends the token (`lang:zhA` is one unknown token, not a legal prefix)
+2026-11-21T06:50:10.2393781Z ok   T79 OB-91 continuation char extends the token (`lang:zha` is one unknown token, not a legal prefix)
+2026-11-21T06:50:10.2394304Z ok   T79 OB-91 continuation char extends the token (`lang:zh9` is one unknown token, not a legal prefix)
+2026-11-21T06:50:10.2394888Z ok   T79 OB-91 continuation char extends the token (`lang:zh__` is one unknown token, not a legal prefix)
+2026-11-21T06:50:10.2395433Z ok   T79 OB-91 continuation char extends the token (`lang:zh-_` is one unknown token, not a legal prefix)
+2026-11-21T06:50:10.2395953Z ok   T79 OB-91 continuation char extends the token (`lang:zh.1` is one unknown token, not a legal prefix)
+2026-11-21T06:50:10.2396454Z ok   T79 OB-91 continuation char extends the token (`lang:zhCN` is one unknown token, not a legal prefix)
+2026-11-21T06:50:10.2397021Z ok   T79 OB-91 continuation char extends the token (`lang:en-001` is one unknown token, not a legal prefix)
+2026-11-21T06:50:10.2397480Z ok   T79 OB-91 legal shape "zh-alone" is not turned red by the token rule
+2026-11-21T06:50:10.2397884Z ok   T79 OB-91 legal shape "zh-comma" is not turned red by the token rule
+2026-11-21T06:50:10.2398280Z ok   T79 OB-91 legal shape "zh-space" is not turned red by the token rule
+2026-11-21T06:50:10.2398655Z ok   T79 OB-91 legal shape "zh-tab" is not turned red by the token rule
+2026-11-21T06:50:10.2399055Z ok   T79 OB-91 legal shape "zh-cjk-comma" is not turned red by the token rule
+2026-11-21T06:50:10.2399461Z ok   T79 OB-91 legal shape "zh-cjk-paren" is not turned red by the token rule
+2026-11-21T06:50:10.2399947Z ok   T79 OB-91 legal shape "zh-declaration-line" is not turned red by the token rule
+2026-11-21T06:50:10.2400500Z ok   T79 OB-91 legal shape "zh-bracket" is not turned red by the token rule
+2026-11-21T06:50:10.2400904Z ok   T79 OB-91 legal shape "zh-paren" is not turned red by the token rule
+2026-11-21T06:50:10.2401321Z ok   T79 OB-91 legal shape "zh-quote" is not turned red by the token rule
+2026-11-21T06:50:10.2401685Z ok   T79 OB-91 legal shape "zh-pipe" is not turned red by the token rule
+2026-11-21T06:50:10.2402102Z ok   T79 OB-91 legal shape "zh-twice" is not turned red by the token rule
+2026-11-21T06:50:10.2402482Z ok   T79 OB-91 legal shape "en-alone" is not turned red by the token rule
+2026-11-21T06:50:10.2402943Z ok   T79 OB-91 legal shape "en-comma" is not turned red by the token rule
+2026-11-21T06:50:10.2403350Z ok   T79 OB-91 legal shape "en-declaration-line" is not turned red by the token rule
+2026-11-21T06:50:10.2403855Z ok   T79 OB-91 legal shape "zh-line-15-of-window" is not turned red by the token rule
+2026-11-21T06:50:10.2404346Z ok   T79 OB-91 fail-closed premise: tag on line 16 is outside the header window
+2026-11-21T06:50:10.2404723Z ok   T79 OB-91 fail-closed premise: two legal tags conflict
+2026-11-21T06:50:10.2405141Z ok   T79 OB-91 fail-closed premise: declared tag disagrees with the file name
+2026-11-21T06:50:10.2405560Z ok   T79 OB-91 fail-closed premise: no tag at all
+2026-11-21T06:50:10.2405984Z ok   T79 OB-91 fail-closed premise: a word character before `lang:` means no occurrence
+2026-11-21T06:50:10.2406433Z ok   T79 OB-91 fail-closed premise: a bare tag next to a legal one is still unknown
+2026-11-21T06:50:10.2407332Z ok   T79 canary: constants are locked — LANG_HEADER_WINDOW = 15, LANG_TAG_EXACT is exactly {lang:zh, lang:en}, and LANG_TAG_CONT_RE is exactly [A-Za-z0-9._:-] (behavior pair: `lang:zh` legal, `lang:zh_cn` illegal)
+2026-11-21T06:50:10.2408053Z ok   T79 canary: LANG_TAG_CONT_RE source text is frozen to the literal class [A-Za-z0-9._:-]
+2026-11-21T06:50:10.2408762Z ok   T79 canary: slash (U+002F) is an external terminator, not a continuation char — `lang:zh/en` splits into the legal tag `lang:zh` plus free text and stays green
+2026-11-21T06:50:10.2409614Z ok   T79 canary: question mark (U+003F) is an external terminator, not a continuation char — `lang:zh?en` splits into the legal tag `lang:zh` plus free text and stays green
+2026-11-21T06:50:10.2410776Z ok   T79 canary: equals sign (U+003D) is an external terminator, not a continuation char — `lang:zh=en` splits into the legal tag `lang:zh` plus free text and stays green
+2026-11-21T06:50:10.2411592Z ok   T79 canary: space (U+0020) is an external terminator, not a continuation char — `lang:zh en` splits into the legal tag `lang:zh` plus free text and stays green
+2026-11-21T06:50:10.2412512Z ok   T79 canary: fullwidth semicolon (U+FF1B) is an external terminator, not a continuation char — `lang:zh；en` splits into the legal tag `lang:zh` plus free text and stays green
+2026-11-21T06:50:10.2413399Z ok   T79 canary: fullwidth comma (U+FF0C) is an external terminator, not a continuation char — `lang:zh，en` splits into the legal tag `lang:zh` plus free text and stays green
+2026-11-21T06:50:10.2414281Z ok   T79 canary: ideographic comma (U+3001) is an external terminator, not a continuation char — `lang:zh、en` splits into the legal tag `lang:zh` plus free text and stays green
+2026-11-21T06:50:10.2415233Z ok   T79 canary: black-box tokenization — `lang:zh` PASSes, `lang:zh_cn` is an unknown tag, `lang:zh/en` PASSes (/ terminates the token)
+2026-11-21T06:50:10.2415868Z ok   T76 G1 a consistent ledger (heading / status table / completion log) passes all four sub-checks
+2026-11-21T06:50:10.2416357Z ok   T76 G1 an unknown state symbol outside the ledger closed set fails G1(c)
+2026-11-21T06:50:10.2416808Z ok   T76 G1 the pending-evaluation marker is only legal on headings, never in the status table
+2026-11-21T06:50:10.2417318Z ok   T76 G1 a heading that disagrees with its status-table row fails G1(d)
+2026-11-21T06:50:10.2417755Z ok   T76 G1 a completion-log row whose status row is still ⬜ fails G1(e)
+2026-11-21T06:50:10.2418263Z ok   T76 G1 in-progress wording inside a completion row fails G1(f) (the GATES-EDGE-COVERAGE defect, mechanised)
+2026-11-21T06:50:10.2418823Z ok   T76 G1 the same holds for the English wording (In progress / awaiting finalisation)
+2026-11-21T06:50:10.2419325Z ok   T76 G1 a completion key binds to a heading through its backticked alias (the P-series governance case)
+2026-11-21T06:50:10.2419920Z ok   T76 G1 the same row passes once the aliased heading is ✅ (the binding is real, not a lucky string match)
+2026-11-21T06:50:10.2420650Z ok   T76 G1 mutation applied on the alias lookup (defect 3: completion key never bound to a P-series heading)
+2026-11-21T06:50:10.2421329Z ok   T76 G1 load-bearing proof: with the alias fallback removed the SAME mismatched row passes, i.e. G1(e) was vacuous for every governance slice
+2026-11-21T06:50:10.2421830Z ok   T76 G1 restore after the alias mutation window
+2026-11-21T06:50:10.2422254Z ok   T76 G1 an UNKNOWN state symbol on a heading reaches G1(c) instead of slipping past every guard (r2 F-2)
+2026-11-21T06:50:10.2422884Z ok   T76 G1 G1(f) judges ADDED completion rows only: the same historical row fails when it is in the added set and passes when it is not (r2 F-3)
+2026-11-21T06:50:10.2423604Z ok   T76 G1 an unbound completion key also emits an explicit INFO record, so the directive promise "no binding is INFO" is literal (r2 F-4)
+2026-11-21T06:50:10.2424244Z ok   T76 G1 a ledger without its state-symbol declaration line raises UsageError (exit 2, never a silent guess)
+2026-11-21T06:50:10.2424871Z ok   T76 G1 mutation applied: the in-progress test line matched g1.js (a stale patch would weaken the suite silently)
+2026-11-21T06:50:10.2425419Z ok   T76 G1 load-bearing proof: with the wording test patched out the SAME in-progress row passes
+2026-11-21T06:50:10.2425918Z ok   T76 G1 restore: g1.js is byte-identical after the mutation window and the wording row fails again
+2026-11-21T06:50:10.2426409Z ok   T76 G1 an unreadable ledger pair reports SKIP (never a vacuous PASS)
+2026-11-21T06:50:10.2426859Z ok   T119 G1(e2) an ADDED in-block completion row under a ✅ heading passes
+2026-11-21T06:50:10.2427298Z ok   T119 G1(e2) an ADDED in-block completion row under a non-✅ heading fails
+2026-11-21T06:50:10.2427731Z ok   T119 G1(e2) the same row is not re-judged when it is not in the added set (forward rule)
+2026-11-21T06:50:10.2428231Z ok   T119 G1(e2) an in-block row whose nearest heading carries no state symbol is skipped, not failed
+2026-11-21T06:50:10.2428801Z ok   T121 G1(e2) the ✅ PASS is a JUDGED row, not a vacuous skip (counter: 1 judged, 0 skipped, 0 historical)
+2026-11-21T06:50:10.2429322Z ok   T121 G1(e2) the forward rule is a real exclusion: an unadded row is counted historical, never judged
+2026-11-21T06:50:10.2429863Z ok   T121 G1(e2) an added row with NO heading above it is skipped via the headKey guard (not silently passed as judged)
+2026-11-21T06:50:10.2430611Z ok   T121 G1(e2) the row binds to the NEAREST heading: a ✅ heading above a 🔄 one does not excuse it
+2026-11-21T06:50:10.2431111Z ok   T121 G1(e2) the EN field name `| Completion record |` is collected and judged like the CN one
+2026-11-21T06:50:10.2431565Z ok   T77 G5 a declared, staged, resolvable change set passes G5(d) / G5(e) / G5(f)
+2026-11-21T06:50:10.2432074Z ok   T77 G5 a staged path nobody declared fails G5(d) - the observable consequence of `git add -A`
+2026-11-21T06:50:10.2432694Z ok   T77 G5 the reverse direction (declared but untouched) is INFO, because a fence is the landing snapshot - the §11.2 backfill case
+2026-11-21T06:50:10.2433210Z ok   T77 G5 an evidence reference that does not resolve fails G5(e)
+2026-11-21T06:50:10.2433664Z ok   T77 G5 an unstaged modification in index scope fails G5(f) (index must equal the worktree)
+2026-11-21T06:50:10.2434202Z ok   T77 G5 a STAGED entry (porcelain X column) does not dirty the index - staging is the normal state of index scope
+2026-11-21T06:50:10.2434698Z ok   T77 G5 a change set without a report records INFO on G5(d) instead of a vacuous pass
+2026-11-21T06:50:10.2435187Z ok   T77 G5 outside index scope the staging check is INFO (a clean CI checkout has no index state)
+2026-11-21T06:50:10.2435706Z ok   T77 G5 an external GATES_CHANGESET_JSON that disagrees with the derived fields raises UsageError (exit 2)
+2026-11-21T06:50:10.2436222Z ok   T77 G5 a declared-but-untouched path also emits an explicit INFO record (r2 F-4)
+2026-11-21T06:50:10.2436766Z ok   T77 G5 mutation applied on the deletion guard, which must read the parser boolean and not the two-char XY status (r2 F-1)
+2026-11-21T06:50:10.2437393Z ok   T77 G5 load-bearing proof: with the deletion guard patched out the same deleted path is reported as undeclared (r2 F-1)
+2026-11-21T06:50:10.2437863Z ok   T77 G5 restore after the deletion-guard mutation window
+2026-11-21T06:50:10.2438265Z ok   T77 G5 a declared-but-untouched path also emits an explicit INFO record (r2 F-4)
+2026-11-21T06:50:10.2438856Z ok   T77 G5 evidence references are read from BARE paths too (30/30 corpus rows carry no backticks, so backtick-only extraction was vacuous)
+2026-11-21T06:50:10.2439614Z ok   T77 G5 a repository-root artifact in the evidence cell is extracted too (⑥ finding: the prefix whitelist made G5(e) vacuous for root files)
+2026-11-21T06:50:10.2440392Z ok   T77 G5 mutation applied on the bare-path scan (defect 2: evidenceRefs were backtick-only)
+2026-11-21T06:50:10.2440965Z ok   T77 G5 load-bearing proof: with the bare-path scan removed the same row yields no reference at all
+2026-11-21T06:50:10.2441405Z ok   T77 G5 restore after the bare-path mutation window
+2026-11-21T06:50:10.2441841Z ok   T77 G5 a deleted staged path is not a change-set member (removing a file declares nothing)
+2026-11-21T06:50:10.2442378Z ok   T77 G5 mutation applied: the set-equality line matched g5.js (a stale patch would weaken the suite silently)
+2026-11-21T06:50:10.2442924Z ok   T77 G5 load-bearing proof: with the equality verdict patched the SAME undeclared path passes
+2026-11-21T06:50:10.2443456Z ok   T77 G5 restore: g5.js is byte-identical after the mutation window and the undeclared path fails again
+2026-11-21T06:50:10.2443938Z ok   T120 G5(e2) an ADDED in-block completion row whose evidence path resolves passes
+2026-11-21T06:50:10.2444404Z ok   T120 G5(e2) an ADDED in-block completion row whose evidence path does not resolve fails
+2026-11-21T06:50:10.2444866Z ok   T120 G5(e2) without an added in-block completion row there is nothing to resolve (PASS)
+2026-11-21T06:50:10.2445319Z ok   T122 G5(e2) the resolvable PASS is a REAL resolution (counter: 1 reference(s) resolved)
+2026-11-21T06:50:10.2445833Z ok   T122 G5(e2) an ADDED EN `| Completion record |` row is extracted and resolved like the CN one
+2026-11-21T06:50:10.2446296Z ok   T123 G5(e2) `x{,_EN}.md` expands to BOTH sides and resolves (counter: 2 reference(s) resolved)
+2026-11-21T06:50:10.2446776Z ok   T123 G5(e2) the expansion is load-bearing: a missing `_EN` side fails instead of being dropped
+2026-11-21T06:50:10.2447263Z ok   T123 G5(e2) a second brace group stays unexpandable: the skip is VISIBLE, not a silent pass
+2026-11-21T06:50:10.2447755Z ok   T124 G5(e2) a stem-less brace group yields NO reference: a visible skip, never a false FAIL
+2026-11-21T06:50:10.2448281Z ok   T124 G5(e2) on a brace-free row the in-block extractor agrees EXACTLY with the shared G5(e) extractor
+2026-11-21T06:50:10.2448726Z ok   T13 whole fixture corpus yields exactly the expected FAIL id set
+2026-11-21T06:50:10.2449124Z ok   T13 whole fixture corpus has no unexpected SKIP/INFO storm
+2026-11-21T06:50:10.2449499Z ok   T17 unresolvable range base is a usage error, not an empty change set
+2026-11-21T06:50:10.2449885Z ok   T17 unresolvable range base is a usage error, not an empty change set
+2026-11-21T06:50:10.2450464Z ok   T17 unresolvable range head is a usage error, not an empty change set
+2026-11-21T06:50:10.2450886Z ok   T17 unresolvable range head is a usage error, not an empty change set
+2026-11-21T06:50:10.2451283Z ok   T17 positive control: a resolvable range still builds a context
+2026-11-21T06:50:10.2451681Z ok   T18 a failed `git diff` is an environment error even when both endpoints resolve
+2026-11-21T06:50:10.2452163Z ok   T18 a failed `git status` in tree scope is an environment error, not an empty change set
+2026-11-21T06:50:10.2452589Z ok   T18 a failed `git status` in index scope is an environment error too
+2026-11-21T06:50:10.2453001Z ok   T18 --scope=ci refuses a SHALLOW clone instead of falling back to the whole tree
+2026-11-21T06:50:10.2453471Z ok   T18 an inconclusive shallow probe is an environment error, not a licence to fall back
+2026-11-21T06:50:10.2453941Z ok   T18 positive control: a genuine root commit still falls back to EMPTY_TREE
+2026-11-21T06:50:10.2454528Z ok   T19 G6-5 accepts §7.5 (exact heading) / §7.2 (parent prefix of §7.2.1) / §1.7.1 (bold line-leading label)
+2026-11-21T06:50:10.2455116Z ok   T19 the legal fixture is scanned (6 in-region lines, 3 references) with zero findings
+2026-11-21T06:50:10.2455694Z ok   T19 directiveLabels reads the REAL directive: bold line-leading §1.7.1 plus heading §7.5 / §7.2.1
+2026-11-21T06:50:10.2456223Z ok   T19 resolvesRef: exact and parent-prefix accepted, a dangling number rejected
+2026-11-21T06:50:10.2456679Z ok   T20 G6-5 FAILs a §7.9 reference on a line INSIDE the §0.3 region
+2026-11-21T06:50:10.2457174Z ok   T20 exactly one finding, and its detail names `§7.9 unresolved`
+2026-11-21T06:50:10.2457699Z ok   T20 reverse mutation (§7.9 -> §7.8) clears G6-5: the assertion tracks the reference, not the line
+2026-11-21T06:50:10.2458174Z ok   T21 the C.1 v3.1 comparison table produces no finding (zero corpus FAIL)
+2026-11-21T06:50:10.2458689Z ok   T21 the excluded §3.10 row is genuinely out of region: 0 references counted
+2026-11-21T06:50:10.2459210Z ok   T21 OB-46 fail-closed: renaming `### C.1` aborts with UsageError instead of judging an unbounded region
+2026-11-21T06:50:10.2459730Z ok   T21b OB-46 positive control: an intact ledger keeps both target regions (no over-rejection)
+2026-11-21T06:50:10.2460389Z ok   T21b OB-46 boundary: a file with neither heading stays region-free and raises nothing (ordinary markdown)
+2026-11-21T06:50:10.2460978Z ok   T21b OB-46 fail-closed: `### C.0` without a `### C.1` delimiter raises UsageError (started-but-unterminated region)
+2026-11-21T06:50:10.2461526Z ok   T22 G6-5 skips a line carrying the 示例 exclusion marker
+2026-11-21T06:50:10.2461960Z ok   T22 reverse mutation (drop the 示例 marker) turns the very same line red on §7.9
+2026-11-21T06:50:10.2462469Z ok   T22 exclusion marker `不得残留` suppresses the finding, and dropping it restores the red
+2026-11-21T06:50:10.2462993Z ok   T22 exclusion marker `示例` suppresses the finding, and dropping it restores the red
+2026-11-21T06:50:10.2463481Z ok   T22 exclusion marker `引文` suppresses the finding, and dropping it restores the red
+2026-11-21T06:50:10.2463989Z ok   T22 exclusion marker `冲突` suppresses the finding, and dropping it restores the red
+2026-11-21T06:50:10.2464489Z ok   T22 exclusion marker `矛盾` suppresses the finding, and dropping it restores the red
+2026-11-21T06:50:10.2464976Z ok   T23 an in-memory whitelist entry exempts the dangling reference (PASS + exactly one SKIP)
+2026-11-21T06:50:10.2465431Z ok   T23 the exemption is load-bearing: the same fixture without the entry stays red
+2026-11-21T06:50:10.2465932Z ok   T23 no entry was preloaded into tools/gates/g6-whitelist.txt (the exemption above is in-memory only)
+2026-11-21T06:50:10.2466554Z ok   T24 the out-of-region §7.9 line yields no finding: 6 lines scanned, 0 references counted
+2026-11-21T06:50:10.2467100Z ok   T24 boundary mutation (drop the closing heading) extends the region onto the §7.9 line and turns G6-5 red
+2026-11-21T06:50:10.2467594Z ok   T25 precondition: the legal fixture is green BEFORE the mutation
+2026-11-21T06:50:10.2468119Z ok   T25 mutation ② applied: the patch text matched g6.js (a stale patch would weaken the suite silently)
+2026-11-21T06:50:10.2468705Z ok   T25 mutation ②: without the bold-label collector the §1.7.1 reference dangles and G6-5 turns red
+2026-11-21T06:50:10.2469251Z ok   T25 the same mutation leaves the heading-derived labels intact (§7.5 / §7.2 still resolve)
+2026-11-21T06:50:10.2469739Z ok   T25 restore: g6.js is byte-identical after the mutation window (no disk residue)
+2026-11-21T06:50:10.2470353Z ok   T25 restore: the cached criterion module is unmutated, the legal fixture is green again
+2026-11-21T06:50:10.2470915Z ok   T26 all six CN closed-set words pass, including the `**已处置**（v1.1）` parenthetical shape
+2026-11-21T06:50:10.2471363Z ok   T26 the CN/EN closed sets are exactly the six documented words
+2026-11-21T06:50:10.2471842Z ok   T26 firstStatusWord accepts `词`, `词（括注）`, `**词**（括注）` and rejects a legacy value
+2026-11-21T06:50:10.2472263Z ok   T26 rowCellsOf splits on unescaped pipes and drops the two outer cells
+2026-11-21T06:50:10.2472692Z ok   T26 ledgerRegionRange = [§12.4 heading, next ^#{2,4} heading)
+2026-11-21T06:50:10.2473142Z ok   T26 a ledger-shaped row ABOVE the §12.4 heading is out of region and not judged
+2026-11-21T06:50:10.2473619Z ok   T26 a non-OB table row inside §12.4 is not judged (LEDGER_ROW_RE)
+2026-11-21T06:50:10.2474062Z ok   T26 a ledger row in a file without a §12.4 heading is not judged (no target region)
+2026-11-21T06:50:10.2474510Z ok   T27 G6-6 FAILs `**下一片必做**` and `**已落地**` with exactly two findings
+2026-11-21T06:50:10.2475073Z ok   T27 both offending cells are named, and the legal control row (已登记) is NOT reported
+2026-11-21T06:50:10.2475523Z ok   T27 reverse mutation (both legacy words -> closed-set words) clears G6-6
+2026-11-21T06:50:10.2475944Z ok   T28 mutation ③ applied: the patch text matched g6.js
+2026-11-21T06:50:10.2476354Z ok   T28 the mutated CN closed set has five words and no 观察中
+2026-11-21T06:50:10.2476833Z ok   T28 mutation ③: the 观察中 row alone turns red; the other five closed-set rows stay green
+2026-11-21T06:50:10.2477310Z ok   T28 restore: g6.js is byte-identical and the cached module still carries 观察中
+2026-11-21T06:50:10.2477719Z ok   T28 the `_EN` fixture selects the EN word table: all six EN words pass
+2026-11-21T06:50:10.2478280Z ok   T28 the `_EN` word-table switch is load-bearing: EN word fails under a CN name, passes under `_EN`, CN word fails under `_EN`
+2026-11-21T06:50:10.2478850Z ok   T28b OB-47 declaredLang reads the header tag and agrees with the name (zh -> CN table, en -> EN table)
+2026-11-21T06:50:10.2479385Z ok   T28b OB-47 fail-closed: no declared language tag raises UsageError instead of defaulting to CN
+2026-11-21T06:50:10.2479947Z ok   T28b OB-47 fail-closed: a third language (`lang:fr`) raises UsageError instead of being judged as CN
+2026-11-21T06:50:10.2480657Z ok   T28b OB-47 fail-closed: a PREFIX form (`lang:zh-cn`) raises UsageError instead of counting as zh (7 r1 High-2)
+2026-11-21T06:50:10.2481142Z ok   T28b OB-47 fail-closed: the same holds for `lang:en-us` on the `_EN` side
+2026-11-21T06:50:10.2481629Z ok   T28b OB-91 fail-closed: a legal tag plus an illegal one (`lang:zh` + `lang:zh-cn`) raises UsageError (7 r2 Medium)
+2026-11-21T06:50:10.2482201Z ok   T28b OB-91 fail-closed: the same coexistence rule holds on the `_EN` side (`lang:en` + `lang:en-us`)
+2026-11-21T06:50:10.2482850Z ok   T28b OB-47 fail-closed: a renamed file (`_EN.md` keeping `lang:zh`) raises UsageError instead of switching the table
+2026-11-21T06:50:10.2483341Z ok   T28b OB-47 fail-closed: two conflicting declarations raise UsageError
+2026-11-21T06:50:10.2483775Z ok   T28b OB-47 the header window is bounded: a tag below it is not a declaration
+2026-11-21T06:50:10.2484215Z ok   T28b OB-47 positive control: a compliant declaration is never rejected on either side
+2026-11-21T06:50:10.2484798Z ok   T28b OB-47 scope: a §12.4-shaped heading with no ledger row is skipped, not forced to declare (the RFC case)
+2026-11-21T06:50:10.2485390Z ok   T28b OB-47 scope: the same foreign file carrying a real ledger row is judged, so it must declare (fail closed)
+2026-11-21T06:50:10.2485937Z ok   T28c OB-73 positive control: equal backtick counts leave G3(a.2) silent and the aggregate green
+2026-11-21T06:50:10.2486437Z ok   T28c OB-73 the sixth shape is load-bearing: one extra backtick on the `_EN` side turns G3(a.2) red
+2026-11-21T06:50:10.2487066Z ok   T28c OB-73 mutation applied: the sixth-shape line matched g3a.js (a stale patch would weaken the suite silently)
+2026-11-21T06:50:10.2487700Z ok   T28c OB-73 load-bearing proof: with the sixth shape patched out the SAME drift passes (the shape, not the pair, is what catches it)
+2026-11-21T06:50:10.2488302Z ok   T28c restore: g3a.js is byte-identical after the mutation window and the cached module still catches the drift
+2026-11-21T06:50:10.2488836Z ok   T28c OB-73 the live directive pair satisfies all six shapes (real whole-file files)
+2026-11-21T06:50:10.2489279Z ok   T29 G5-b passes a model value that is a closed-set member
+2026-11-21T06:50:10.2489670Z ok   T30 G5-b passes a role file that omits the model key (section 2.6 shape)
+2026-11-21T06:50:10.2490108Z ok   T31 G5-b fails the one remaining blacklist member (kimi-k3 is not in the set)
+2026-11-21T06:50:10.2490686Z ok   T32 G5-b comparison is case-sensitive: the right model in the wrong case fails
+2026-11-21T06:50:10.2491093Z ok   T33 G5-b comparison is verbatim: a quoted set member still fails
+2026-11-21T06:50:10.2491510Z ok   T34 G5-b collects EVERY model key: a legal first key does not hide an illegal second one
+2026-11-21T06:50:10.2492034Z ok   T35 G5-b fails a former blacklist value that is not a closed-set member
+2026-11-21T06:50:10.2492499Z ok   T36 empty model value is G5-a 2 s finding and not G5-b s: G5-b passes while G5-a(2) fails
+2026-11-21T06:50:10.2493012Z ok   T37 the closed set is load-bearing: adding gpt-5.4 to the set flips that fixture to PASS
+2026-11-21T06:50:10.2493482Z ok   T37 restore: g5b.js is byte-identical and the cached module still fails gpt-5.4
+2026-11-21T06:50:10.2493936Z ok   T38 G5-b parses the frontmatter block only: a model key in the body is not judged
+2026-11-21T06:50:10.2494410Z ok   T39 G5-b trims both ends: a legal value with a trailing space still passes
+2026-11-21T06:50:10.2494909Z ok   T40 G5-b is verbatim: a legal value followed by an inline comment fails
+2026-11-21T06:50:10.2495344Z ok   T41 G5-b accepts each member this slice added (deep tier and parallel alternative)
+2026-11-21T06:50:10.2495873Z ok   T42 the added member is load-bearing: dropping gpt-6-luna from the set makes that fixture fail
+2026-11-21T06:50:10.2496383Z ok   T42 restore: g5b.js is byte-identical and the cached module still accepts gpt-6-luna
+2026-11-21T06:50:10.2496860Z ok   T131a G5-b accepts the stage-6 member after the P81 rename (mai-code-2-flash)
+2026-11-21T06:50:10.2497358Z ok   T131b the retired deep-tier identifier is rejected (gpt-6.1-sol is outside the closed set)
+2026-11-21T06:50:10.2497887Z ok   T131c the retired stage-6 identifier is rejected (mai-code-1.1-flash is outside the closed set)
+2026-11-21T06:50:10.2498367Z ok   T43 G8-a accepts a pack member (nearest ancestor carries MANIFEST + SHA256SUMS)
+2026-11-21T06:50:10.2498809Z ok   T43 G8-a accepts a root-level *-freedom-list.md
+2026-11-21T06:50:10.2499160Z ok   T43 G8-a accepts a path registered verbatim in evidence-forms.txt
+2026-11-21T06:50:10.2499552Z ok   T43 the registration is load-bearing: without it the same path fails
+2026-11-21T06:50:10.2499977Z ok   T43 G8-a FAILs a stray root-level path with a `not a pack member` reason token
+2026-11-21T06:50:10.2500576Z ok   T43 a SUBSTRING match does not register (entry.match must EQUAL the path)
+2026-11-21T06:50:10.2501032Z ok   T43 a registration row with 2 fields is a UsageError (exit 2, never a silent pass)
+2026-11-21T06:50:10.2501447Z ok   T43 a duplicate registration for the same path is a UsageError
+2026-11-21T06:50:10.2501834Z ok   T44 G8-b accepts a fully self-consistent pack (runtime-computed hashes)
+2026-11-21T06:50:10.2502360Z ok   T44 G8-b FAILs a pack without the 归档条目清单 section (token `missing`, names the pack)
+2026-11-21T06:50:10.2502848Z ok   T44 G8-b FAILs an unlisted pack-root payload (token `not listed`, names the file in both lists)
+2026-11-21T06:50:10.2503337Z ok   T44 G8-b recomputes hashes and FAILs a mismatch (token `hash mismatch`, names the payload)
+2026-11-21T06:50:10.2503925Z ok   T44 G8-b FAILs a 未入库 entry colliding with a payload (token `untracked-list conflict`, names the path)
+2026-11-21T06:50:10.2504366Z ok   T44 G8-b normalizes backslash SHA256SUMS paths to POSIX and passes
+2026-11-21T06:50:10.2504832Z ok   T44 the backslash normalization is load-bearing: a wrong hash on the same line still FAILs
+2026-11-21T06:50:10.2505340Z ok   T44 a single flipped hash digit turns G8-b red (the recompute is load-bearing)
+2026-11-21T06:50:10.2505781Z ok   T45 G8-c accepts a MANIFEST whose archive hash equals the SHA256SUMS record
+2026-11-21T06:50:10.2506254Z ok   T45 G8-c FAILs an archive hash that disagrees with SHA256SUMS (token `hash mismatch`, names the payload)
+2026-11-21T06:50:10.2506814Z ok   T45 G8-c exempts a legacy pack without the 后缀与编码映射 section (explicit note, not a blank PASS)
+2026-11-21T06:50:10.2507354Z ok   T46 G8-d accepts a 重建归档 note carrying source + basis and no bad sha token
+2026-11-21T06:50:10.2507820Z ok   T46 G8-d FAILs a 重建归档 note missing the basis (token `basis`, names the file)
+2026-11-21T06:50:10.2508243Z ok   T47 inside the tree the violating content is NOT judged by G1-a/G2/G4a/G4b/G6
+2026-11-21T06:50:10.2508677Z ok   T47 G4a reports the excluded count instead of judging the tree file
+2026-11-21T06:50:10.2509198Z ok   T47 the SAME content outside the tree IS judged: G1-a/G2/G4a/G4b/G6-4 all turn red and name the path
+2026-11-21T06:50:10.2509744Z ok   T48 every G8 sub-check reports INFO (not a vacuous PASS) when the change set has no evidence path
+2026-11-21T06:50:10.2510467Z ok   T48 the INFO is the absence of an evidence path, not a blanket: the same sub-check is NOT INFO when one is present
+2026-11-21T06:50:10.2511000Z ok   T49 ctx.listTreeFiles returns the recursive, sorted pack file list
+2026-11-21T06:50:10.2511494Z ok   T49 isEvidenceTree is case-insensitive, prefix-anchored and does not over-match near misses
+2026-11-21T06:50:10.2511959Z ok   T50 in-tree violating content yields ZERO finding from G1-a/G2/G4a/G4b/G6
+2026-11-21T06:50:10.2512450Z ok   T50 the SAME bytes at docs/t027/ turn G1-a/G2/G4a/G4b/G6-4/G6-6 red and name the path
+2026-11-21T06:50:10.2512914Z ok   T50 G8 still judges the in-tree file: G8-a PASS + G8-b PASS on the pack carrying the violation
+2026-11-21T06:50:10.2513391Z ok   T50 G8-a still FAILs a non-member tree path (the shape guard is not inert)
+2026-11-21T06:50:10.2513852Z ok   T51 ctx.changedMarkdown() (shipped lib/ctx) drops the tree .md and keeps the docs/t027 .md
+2026-11-21T06:50:10.2514397Z ok   T51 the selftest ctx and lib/ctx agree on changedMarkdown (no local re-derivation drift)
+2026-11-21T06:50:10.2514850Z ok   T51 G1-a shares the single exclusion (tree-only ctx green, docs/t027 ctx red)
+2026-11-21T06:50:10.2515263Z ok   T51 G2 shares the single exclusion (tree-only ctx green, docs/t027 ctx red)
+2026-11-21T06:50:10.2515727Z ok   T51 G4b shares the single exclusion (tree-only ctx green, docs/t027 ctx red)
+2026-11-21T06:50:10.2516139Z ok   T51 G6 shares the single exclusion (tree-only ctx green, docs/t027 ctx red)
+2026-11-21T06:50:10.2516596Z ok   T52 G4a excludes a BOM+CRLF .md and a BOM-less .md inside the tree and counts BOTH
+2026-11-21T06:50:10.2517109Z ok   T52 the identical bytes outside the tree DO fail G4a (the exclusion is the only reason the in-tree run is green)
+2026-11-21T06:50:10.2517577Z ok   T89 G4a accepts a .md carrying exactly one BOM
+2026-11-21T06:50:10.2517914Z ok   T89 G4a fails a .md carrying zero BOMs and reports bom=0
+2026-11-21T06:50:10.2518283Z ok   T89 G4a fails a .md carrying two consecutive BOMs and reports bom=2
+2026-11-21T06:50:10.2518723Z ok   T89 G4a fails a non-.md file carrying one BOM and reports bom=1
+2026-11-21T06:50:10.2519215Z ok   T89 reverse mutation (bomCount >= 1) makes the double-BOM file pass again, so the equality is load-bearing
+2026-11-21T06:50:10.2519860Z ok   T53 a malformed SHA256SUMS line FAILs and names the line/pack, never a silent pass
+2026-11-21T06:50:10.2520587Z ok   T53 a truncated 归档条目清单 (heading present, table empty) FAILs and names the unlisted payload
+2026-11-21T06:50:10.2521105Z ok   T54 an 归档路径 absent from the pack payload FAILs G8-c and names the path
+2026-11-21T06:50:10.2521628Z ok   T54 an 归档路径 present in the payload but absent from SHA256SUMS FAILs G8-c and names the path
+2026-11-21T06:50:10.2522172Z ok   T55 a 重建归档 mention OUTSIDE the annotation zone does not trigger G8-d
+2026-11-21T06:50:10.2522587Z ok   T55 a non-64-hex sha256 token INSIDE the annotation zone FAILs G8-d
+2026-11-21T06:50:10.2523082Z ok   T55 the precedent file is not misjudged despite 重建归档 + a 16-digit sha-original short hash
+2026-11-21T06:50:10.2523631Z ok   T55 the precedent 16-digit short hash sits OUTSIDE the annotation zone (why it is never a sha256 token)
+2026-11-21T06:50:10.2524181Z ok   T56 mutation anchor (a) exists verbatim in lib/ctx.js (the exclusion being mutated)
+2026-11-21T06:50:10.2524696Z ok   T56 mutation anchor (b) exists verbatim in lib/criteria/g8.js (the hash recompute being mutated)
+2026-11-21T06:50:10.2525250Z ok   T57 --scope=ci is a valid reading (exit 0/1, never the usage-error exit 2)
+2026-11-21T06:50:10.2525752Z ok   T57 an unresolvable range endpoint exits 2 (usage/environment error), not a silent green
+2026-11-21T06:50:10.2526573Z ok   T57 DEF-1 an unresolvable range endpoint exits 2 with a NON-EMPTY stderr carrying the `gate.js:` diagnosis (never a silent exit that degrades into an empty change set)
+2026-11-21T06:50:10.2527174Z ok   T57 the historical range 4284e94 is a valid reading (exit 0/1, not 2)
+2026-11-21T06:50:10.2527737Z ok   T57 listTreeFiles in range scope walks `git ls-tree -r -z --name-only <endpoint> -- <dir>` (not the disk)
+2026-11-21T06:50:10.2528239Z ok   T58 tree scope reads the registration table from the working tree
+2026-11-21T06:50:10.2528774Z ok   T58 the real registered root-level path is listed VERBATIM (match === file) in the worktree registry
+2026-11-21T06:50:10.2529409Z ok   T58 a historical range endpoint reads the registration table from the endpoint (absent then ⇒ zero entries)
+2026-11-21T06:50:10.2530046Z ok   T58 the SAME path is green with the worktree registry and red with the endpoint (empty) registry
+2026-11-21T06:50:10.2530651Z ok   T59 EXPECTED_CORPUS_FAILS is sorted and duplicate-free
+2026-11-21T06:50:10.2531076Z ok   T59 every expected corpus FAIL id belongs to the known criterion vocabulary
+2026-11-21T06:50:10.2531459Z ok   T59 no criterion id is duplicated in ALL_SUBCHECKS
+2026-11-21T06:50:10.2531828Z ok   T59 every G8 sub-check id is present in ALL_SUBCHECKS
+2026-11-21T06:50:10.2532546Z ok   T60 DEF-2 regression anchor: the tree branch batches a whole directory into EXACTLY ONE `git check-ignore --stdin -z` spawn (never a per-file check-ignore), memoises per dir, and returns the disk set minus the ignored set
+2026-11-21T06:50:10.2533356Z ok   T61 G5-b accepts both members this slice added (glm-5.3 pre-review and glm-5.3-flash batch assistance)
+2026-11-21T06:50:10.2533931Z ok   T62 the glm-5.3-flash member is load-bearing: dropping it from the set makes that fixture fail
+2026-11-21T06:50:10.2534415Z ok   T63 restore: g5b.js is byte-identical and the cached module still accepts glm-5.3-flash
+2026-11-21T06:50:10.2535062Z ok   T64 the glm-5.3 member is load-bearing: dropping it from the set makes that fixture fail
+2026-11-21T06:50:10.2535565Z ok   T65 restore: g5b.js is byte-identical and the cached module still accepts glm-5.3
+2026-11-21T06:50:10.2536032Z ok   T66 G5-b stays case-sensitive for the GLM member: GLM-5.3 (wrong case) fails
+2026-11-21T06:50:10.2536513Z ok   T67 G5-b rejects a qualified call string: glm-5.3 (glm) is not the modelId (R2.2 boundary)
+2026-11-21T06:50:10.2536947Z ok   T68 OB-20: git grep exit 1 (no match) is data - G5-a(1) still PASSes
+2026-11-21T06:50:10.2537416Z ok   T69 OB-20: a failed git grep (exit 128) is a UsageError, never a silent PASS
+2026-11-21T06:50:10.2537816Z ok   T70 OB-20: a missing git binary (exit 127) is a UsageError too
+2026-11-21T06:50:10.2538259Z ok   T70 OB-20 positive control: a real hit still FAILs (the guard rejects nothing legitimate)
+2026-11-21T06:50:10.2538756Z ok   T71 OB-17: the CLI usage example `run <chain-file>` is no longer judged
+2026-11-21T06:50:10.2539136Z ok   T71 OB-17: the id-like placeholder `run <RUN_ID>` still fails
+2026-11-21T06:50:10.2539512Z ok   T71 OB-17: a short uppercase placeholder `run <ID>` still fails
+2026-11-21T06:50:10.2539925Z ok   T71 OB-17 the narrowing is load-bearing: widening it back turns the usage example red
+2026-11-21T06:50:10.2540557Z ok   T71 OB-17 restore: g6.js is byte-identical after the mutation probe
+2026-11-21T06:50:10.2540963Z ok   T80 G9 passes ordinary documents and Go files (no temp-artifact shape)
+2026-11-21T06:50:10.2541401Z ok   T80 G9 excludes the frozen evidence tree (OB-79): a legacy.log inside it is not judged
+2026-11-21T06:50:10.2541847Z ok   T80 G9 honours a whitelist registration (match + file)
+2026-11-21T06:50:10.2542195Z ok   T80 G9 passes the tracked tmp directory placeholder tmp/.gitkeep
+2026-11-21T06:50:10.2542593Z ok   T80 G9 excludes deleted paths (a deletion submits no bytes)
+2026-11-21T06:50:10.2542985Z ok   T81 G9 fails a .log outside the tmp root (token `temp-shape`, names the path)
+2026-11-21T06:50:10.2543436Z ok   T81 G9 fails a .tmp outside the tmp root (token `temp-shape`, names the path)
+2026-11-21T06:50:10.2544062Z ok   T81 G9 fails a .bak outside the tmp root (token `temp-shape`, names the path)
+2026-11-21T06:50:10.2544664Z ok   T81 G9 fails any tmp-root path except tmp/.gitkeep (token `tmp-root`, names the path)
+2026-11-21T06:50:10.2545182Z ok   T81 G9 fails a mixed-case tmp root (token `tmp-root`, original spelling kept)
+2026-11-21T06:50:10.2545658Z ok   T81 G9 fails an upper-case tmp root (token `tmp-root`, original spelling kept)
+2026-11-21T06:50:10.2546079Z ok   T82 M1 the shape regex is load-bearing: /(?!x)x/ turns N1/N2/N3 green
+2026-11-21T06:50:10.2546479Z ok   T82 M2 the whitelist exemption is load-bearing: deleting it turns P3 red
+2026-11-21T06:50:10.2546939Z ok   T82 M3 the evidence-tree exclusion is load-bearing: deleting it turns P2 red
+2026-11-21T06:50:10.2547389Z ok   T82 M4 the tmp/.gitkeep guard is load-bearing: an unconditional skip turns N4 green
+2026-11-21T06:50:10.2547868Z ok   T83 G9 restore: g9.js is byte-identical and the cached module keeps N1 red / P2 green / P4 green
+2026-11-21T06:50:10.2548471Z ok   T84 OB-97 positive: the widened continuation set leaves the ordinary declaration intact (`lang:zh` still declares zh)
+2026-11-21T06:50:10.2549146Z ok   T84 OB-97 positive: a fullwidth comma still terminates the token, so `lang:zh，` stays legal
+2026-11-21T06:50:10.2549665Z ok   T84 OB-97 negative: `lang:zh:en` is consumed whole and rejected (it used to truncate to the legal `lang:zh`)
+2026-11-21T06:50:10.2550306Z ok   T84 OB-97 negative: a trailing colon belongs to the token, so `lang:zh:` is rejected
+2026-11-21T06:50:10.2550773Z ok   T84 OB-97 negative: coexistence (`lang:zh` plus `lang:zh:`) is fail-closed
+2026-11-21T06:50:10.2551294Z ok   T84 OB-97 mutation applied + load-bearing: with the pre-OB-97 charset the SAME `lang:zh:en` header passes again
+2026-11-21T06:50:10.2551888Z ok   T84 OB-97 restore: g6.js is byte-identical after the mutation window and the cached module rejects `lang:zh:en` again
+2026-11-21T06:50:10.2552510Z ok   T85 G6-7 positive: a §0.3 declaration whose ID exists in the §12.4 ledger passes
+2026-11-21T06:50:10.2553011Z ok   T85 G6-7 positive: a PRE-EXISTING (not added) appendix-C ledger line still satisfies the declaration
+2026-11-21T06:50:10.2553579Z ok   T85 G6-7 positive: an exclusion-marker line and a NEGATED verb (`不新增 … OB-905`) are not judged
+2026-11-21T06:50:10.2554120Z ok   T85 G6-7 positive: a declaration outside the §0.3 region is not judged
+2026-11-21T06:50:10.2554581Z ok   T85 G6-7 negative: a declared ID with no ledger row anywhere fails and the finding names the ID
+2026-11-21T06:50:10.2555097Z ok   T85 G6-7 mutation applied + load-bearing: disabling the verb test turns the same negative case green
+2026-11-21T06:50:10.2555632Z ok   T85 G6-7 mutation applied + load-bearing: ignoring the ledger evidence turns the same negative case green
+2026-11-21T06:50:10.2556301Z ok   T85 G6-7 restore: g6.js is byte-identical after both mutation windows and the shipped module still fails the same negative case
+2026-11-21T06:50:10.2556850Z ok   T85 G6-7 boundary: `ADR-027` is not a `DR-027` declaration and the line is not judged
+2026-11-21T06:50:10.2557363Z ok   T85 G6-7 boundary: `登记 ADR-028 与 OB-103` yields exactly one declaration (OB-103)
+2026-11-21T06:50:10.2557871Z ok   T86 G5-d positive: a role file carrying the five §2.6 keys exactly once passes
+2026-11-21T06:50:10.2558298Z ok   T86 G5-d positive: an EXTRA key is not judged (model stays with G5-a / G5-b)
+2026-11-21T06:50:10.2558738Z ok   T86 G5-d positive: a non-agent path is not a target (INFO, never a vacuous PASS claim)
+2026-11-21T06:50:10.2559224Z ok   T86 G5-d negative: a missing `target` key fails and the finding names it
+2026-11-21T06:50:10.2559625Z ok   T86 G5-d negative: a duplicated `tools` key fails (exactly once required)
+2026-11-21T06:50:10.2560046Z ok   T86 G5-d negative: an empty value and an absent frontmatter both fail
+2026-11-21T06:50:10.2560688Z ok   T86 G5-d mutation applied + load-bearing: removing `target` from the required set turns the missing-target case green
+2026-11-21T06:50:10.2561369Z ok   T86 G5-d restore: g5d.js is byte-identical and the shipped module still fails the missing-target case
+2026-11-21T06:50:10.2561871Z ok   T87 G9-e positive: a tracked tmp/ artifact resolves in tree scope (disk + index)
+2026-11-21T06:50:10.2562270Z ok   T87 G9-e positive: a bare `tmp/` has no path segment and is not judged
+2026-11-21T06:50:10.2562732Z ok   T87 G9-e positive: an exclusion-marker line is skipped
+2026-11-21T06:50:10.2563119Z ok   T87 G9-e positive: the frozen evidence tree is excluded from the reference scan
+2026-11-21T06:50:10.2563601Z ok   T87 G9-e positive: the range/ci branch resolves at the endpoint revision (HEAD:tmp/.gitkeep)
+2026-11-21T06:50:10.2564114Z ok   T87 G9-e negative: an unresolvable reference is INFO (G9 stays PASS) and the record names the path
+2026-11-21T06:50:10.2564680Z ok   T87 G9-e mutation applied + load-bearing: accepting every reference makes the informational record disappear
+2026-11-21T06:50:10.2565240Z ok   T87 G9-e restore: g9.js is byte-identical and the shipped module emits the informational record again
+2026-11-21T06:50:10.2565744Z ok   T88 G3(a.2) control: an equal synthetic directive pair stays green (no per-pair FAIL record)
+2026-11-21T06:50:10.2566346Z ok   T88 G3(a.2) seventh shape (CJK inter-character space) is record-only: a drift with all six shapes equal stays PASS
+2026-11-21T06:50:10.2566940Z ok   T88 G3(a.2) eighth shape (per-line triplet multiset) is record-only: a compensating drift with equal totals stays PASS
+2026-11-21T06:50:10.2567419Z ok   T90 --help on its own still exits 0 with the usage text
+2026-11-21T06:50:10.2567875Z ok   T90 the --skip-base guard fires before the --help early return (no combination escapes it)
+2026-11-21T06:50:10.2568298Z ok   T90 concurrent scheduling keeps every record in plan order
+2026-11-21T06:50:10.2568783Z ok   T90 the 0 ms criterion ends before the 150 ms one that started first (completion order proves overlap)
+2026-11-21T06:50:10.2569275Z ok   T90 two async criteria are pending at the same moment (impossible under a serial loop)
+2026-11-21T06:50:10.2569921Z ok   T90 synchronous criteria go through the same scheduler and keep plan order
+2026-11-21T06:50:10.2570581Z ok   T90 a rejecting criterion rejects the plan and writes no partial records
+2026-11-21T06:50:10.2571062Z ok   T91 G6-8 positive: distinct mint rows on added lines pass and the record names the registered set
+2026-11-21T06:50:10.2571626Z ok   T91 G6-8 negative: a mint row that reuses a registered number fails and names BOTH line numbers
+2026-11-21T06:50:10.2572158Z ok   T91 G6-8 negative: a three-digit id in the mint cell fails as `三位 = ADR 域`
+2026-11-21T06:50:10.2572576Z ok   T91 G6-8 negative: a reference to an unregistered id fails and names the id
+2026-11-21T06:50:10.2573030Z ok   T91 G6-8 positive: every token of a range cell is judged on its own (refs=2, both registered)
+2026-11-21T06:50:10.2573571Z ok   T91 G6-8 positive: `ADR-027` and a three-digit `DR-027` mint no token (refs=1, only DR-2 judged)
+2026-11-21T06:50:10.2574130Z ok   T91 G6-8 positive: the bullet face is bracket-anchored (DR-42 judged with `（`, ignored without)
+2026-11-21T06:50:10.2574640Z ok   T91 G6-8 premise: with no target document the record is a PASS over 0 scanned lines (never a crash)
+2026-11-21T06:50:10.2575309Z ok   T91 G6-8 mutation applied + load-bearing: disabling the uniqueness test turns the collision case green
+2026-11-21T06:50:10.2575859Z ok   T91 G6-8 mutation applied + load-bearing: disabling the three-digit test turns the DR-027 case green
+2026-11-21T06:50:10.2576430Z ok   T91 G6-8 mutation applied + load-bearing: ignoring the registered set turns the dangling reference green
+2026-11-21T06:50:10.2577067Z ok   T91 G6-8 restore: g6.js is byte-identical after all three mutation windows and the shipped module still fails both samples
+2026-11-21T06:50:10.2577667Z ok   T92 G7-f positive: five sections A→B→C→D→E plus a closed-set conclusion pass
+2026-11-21T06:50:10.2578137Z ok   T92 G7-f negative: a missing Section C fails and the detail names the sequence found
+2026-11-21T06:50:10.2578633Z ok   T92 G7-f negative: a reordered pair (A B D C E) fails
+2026-11-21T06:50:10.2579270Z ok   T92 G7-f negative: content after the conclusion line fails with the "note outside the fence" reason
+2026-11-21T06:50:10.2579823Z ok   T92 G7-f negative: SEVERITY rows with PASS and FINDINGS with no SEVERITY row both fail
+2026-11-21T06:50:10.2580530Z ok   T92 G7-f positive: SEVERITY rows with a FINDINGS conclusion pass (the pairing is not one-directional)
+2026-11-21T06:50:10.2581266Z ok   T92 G7-f negative: a report naming INDEPENDENT SCAN with no sixstage fence fails (self-contradictory)
+2026-11-21T06:50:10.2581735Z ok   T92 G7-f positive: a fixed-form skip declaration with no fence passes
+2026-11-21T06:50:10.2582215Z ok   T92 G7-f premise: an EXISTING report with neither fence, marker nor skip declaration is INFO, never FAIL
+2026-11-21T06:50:10.2582797Z ok   T92 G7-f mutation applied + load-bearing: disabling the section-sequence test turns the missing-C case green
+2026-11-21T06:50:10.2583394Z ok   T92 G7-f restore: g7.js is byte-identical after the mutation window and the shipped module still fails the missing-C case
+2026-11-21T06:50:10.2583973Z ok   T93 G7-f negative: an out-of-set conclusion value (`MAYBE`) fails as outside the closed set
+2026-11-21T06:50:10.2584456Z ok   T93 G7-f negative: five sections and NO conclusion line fails (the real P23 breach shape)
+2026-11-21T06:50:10.2585015Z ok   T93 G7-f mutation applied + load-bearing: disabling the conclusion closed-set test turns the MAYBE case green
+2026-11-21T06:50:10.2585603Z ok   T93 G7-f restore: g7.js is byte-identical after the mutation window and the shipped module still fails the MAYBE case
+2026-11-21T06:50:10.2586149Z ok   T94 G6-8 positive: a mint row present in BOTH mirrors passes the dual-mint rule (the corpus shape)
+2026-11-21T06:50:10.2586716Z ok   T94 G6-8 negative: a mint row missing from the other mirror fails and the detail names the missing side
+2026-11-21T06:50:10.2587292Z ok   T95 G6-8 FACE D: the spaced EN bullet form `- **DR-42 (…)` is judged (adjacency is no longer required)
+2026-11-21T06:50:10.2587862Z ok   T96 G7-f positive: the historical-exemption declaration (CN and EN forms) reaches PASS with the marker present
+2026-11-21T06:50:10.2588508Z ok   T96 G7-f M4: a marker occurrence on an exclusion-marked line is filtered out (existing report), so the record is INFO not FAIL
+2026-11-21T06:50:10.2589231Z ok   T96 G7-f L9: an unclosed sixstage fence fails and the detail names the opening line
+2026-11-21T06:50:10.2589821Z ok   T97 G7-f C-1: a blank reason is not a declaration - the blank skip falls back to INFO and a blank historical exemption falls back to the marker FAIL
+2026-11-21T06:50:10.2590736Z ok   T98 G7-f C-1/F1: a report ADDED by the change set may not use the historical exemption - status A and the untracked variant both FAIL naming the exemption channel
+2026-11-21T06:50:10.2591807Z ok   T98 G7-f C-1 positive control: a newly added report CARRYING the fence passes, so the guard is not a blanket rejection
+2026-11-21T06:50:10.2592653Z ok   T98 G7-f C-1/F1 mutation applied + load-bearing: disabling the newly-added branch lets the exemption on a new report reach the historical channel (PASS)
+2026-11-21T06:50:10.2593430Z ok   T98 G7-f C-1/F1 restore: g7.js is byte-identical after the mutation window and the shipped module still fails the exemption on a new report
+2026-11-21T06:50:10.2594231Z ok   T99 G7-f P26: two conclusion lines FAIL when the first one is not the Section-A first line (the C-4 escape stays red)
+2026-11-21T06:50:10.2594834Z ok   T99 G7-f P26 mutation applied + load-bearing: disabling the position-pair gate turns the two-conclusion fence green
+2026-11-21T06:50:10.2595494Z ok   T99 G7-f P26 restore: g7.js is byte-identical after the mutation window and the shipped module still fails the position-pair case
+2026-11-21T06:50:10.2596163Z ok   T100 G6-8 C-8: an unreadable other mirror skips the dual-mint face but the PASS detail carries `dual-mint: other mirror unreadable, face skipped`
+2026-11-21T06:50:10.2597012Z ok   T100 G6-8 C-8 premise: the row under test is the same mint row shape the readable control judges
+2026-11-21T06:50:10.2597700Z ok   T101 G7-f real shape: headings carrying descriptive text (`## Section A 扫描范围与方法`) count as sections, so the five-section face passes
+2026-11-21T06:50:10.2598481Z ok   T101 G7-f real shape: `| 1 | Low | … |` (severity in the SECOND cell) plus FINDINGS is a PASS - the ⑥ form that used to be failed
+2026-11-21T06:50:10.2599032Z ok   T101 G7-f real shape: the same second-cell severity row with PASS FAILs and names the row count
+2026-11-21T06:50:10.2599562Z ok   T101 G7-f real shape: FINDINGS with no severity row at all still FAILs (the pairing is kept two-directional)
+2026-11-21T06:50:10.2600455Z ok   T101 G7-f cell equality: `**High**` in the second cell matches after marker stripping, while a prose cell containing `Low risk…` does not
+2026-11-21T06:50:10.2601106Z ok   T101 G7-f heading boundary: `## Section AA` and `## Subsection A` are NOT read as Section A (the found sequence is BCDE)
+2026-11-21T06:50:10.2601816Z ok   T101 G7-f mutation applied + load-bearing: disabling the cell-equality guard turns the second-cell FINDINGS case RED (the real shape stops being recognised)
+2026-11-21T06:50:10.2602549Z ok   T101 G7-f mutation applied + load-bearing: restoring the `$`-anchored heading regex turns the titled-heading case RED
+2026-11-21T06:50:10.2603178Z ok   T101 G7-f restore: g7.js is byte-identical after both mutation windows and the shipped module still passes both real-shape cases
+2026-11-21T06:50:10.2603895Z ok   T102 G7-f F1-①: a newly added report with no fence, no marker and no declaration FAILs with the fence-or-skip-declaration wording
+2026-11-21T06:50:10.2604577Z ok   T102 G7-f F1-②: a newly added report with a non-empty-reason skip declaration PASSes (the §7.2.1 legitimate skip)
+2026-11-21T06:50:10.2605266Z ok   T102 G7-f F1-③: a blank-reason skip declaration on a newly added report is not a declaration, so the report FAILs like a bare one
+2026-11-21T06:50:10.2605935Z ok   T102 G7-f F1-④: an EXISTING report (explicit M record) with neither fence, marker nor declaration stays INFO
+2026-11-21T06:50:10.2606621Z ok   T102 G7-f F1 mutation applied + load-bearing: disabling the newly-added branch turns the bare new report green (the existing-report bare state is INFO)
+2026-11-21T06:50:10.2607319Z ok   T102 G7-f F1 restore: g7.js is byte-identical after the mutation window and the shipped module still fails the bare new report
+2026-11-21T06:50:10.2608024Z ok   T103 G7-f F2-⑤: a change touching ONLY the opening fence line enters judgement (the body lacks Section C, so the block FAILs with `ABDE`)
+2026-11-21T06:50:10.2608773Z ok   T103 G7-f F2-⑤ twin: a change touching ONLY the closing fence line enters judgement too (the interval spans both fence lines)
+2026-11-21T06:50:10.2609398Z ok   T103 G7-f F2-⑥ precondition: the touched-loop needle occurs exactly once in the shipped g7.js
+2026-11-21T06:50:10.2610295Z ok   T103 G7-f F2-⑥ mutation applied + load-bearing: shrinking the touch window back to body-only lets the opening-line-only change escape judgement (INFO, not FAIL)
+2026-11-21T06:50:10.2611183Z ok   T103 G7-f F2-⑥ restore: g7.js is byte-identical after the mutation window (byte comparison) and the shipped module still fails the opening-line-only change
+2026-11-21T06:50:10.2611949Z ok   T104 G7-f P26 positive: an equal conclusion pair (Section-A first line + block-final line) passes, and a FINDINGS pair with a SEVERITY row passes too
+2026-11-21T06:50:10.2612613Z ok   T104 G7-f P26 precondition: each multi-conclusion mutation needle occurs exactly once in the shipped g7.js
+2026-11-21T06:50:10.2613258Z ok   T105 G7-f P26 negative: an equal-position pair with UNEQUAL values fails and the detail names both values
+2026-11-21T06:50:10.2613854Z ok   T105 G7-f P26 mutation applied + load-bearing: disabling the value-equality test turns the unequal pair green
+2026-11-21T06:50:10.2614469Z ok   T105 G7-f P26 restore: g7.js is byte-identical after the mutation window and the shipped module still fails the unequal pair
+2026-11-21T06:50:10.2615408Z ok   T106 G7-f P26 negative: content after the block-final conclusion line fails with the "note outside the fence" reason
+2026-11-21T06:50:10.2616216Z ok   T106 G7-f P26 mutation applied + load-bearing: disabling the block-final test turns the trailing-content fence green
+2026-11-21T06:50:10.2616925Z ok   T106 G7-f P26 restore: g7.js is byte-identical after the mutation window and the shipped module still fails the trailing-content case
+2026-11-21T06:50:10.2617612Z ok   T107 G7-f P26 negative: three conclusion lines fail and the detail says more than two are not allowed
+2026-11-21T06:50:10.2618191Z ok   T107 G7-f P26 mutation applied + load-bearing: raising the ceiling to three turns the three-line fence green
+2026-11-21T06:50:10.2618832Z ok   T107 G7-f P26 restore: g7.js is byte-identical after the mutation window and the shipped module still fails the three-line case
+2026-11-21T06:50:10.2619416Z ok   T108 G4b cache positive control: the first run misses and the second run on the same key hits
+2026-11-21T06:50:10.2620109Z ok   T108 both runs report the same twelve-hex key prefix and the cached corpus size
+2026-11-21T06:50:10.2620967Z ok   T108 the hit caches the corpus only: the G4b verdict/detail are recomputed and still name the whitelist
+2026-11-21T06:50:10.2621765Z ok   T109 G4b cache counterexample 1: a changed HEAD sha misses, names a different key and stores a second entry
+2026-11-21T06:50:10.2622657Z ok   T109 G4b cache mutation applied + load-bearing: pinning the sha segment turns the second run into a hit
+2026-11-21T06:50:10.2623435Z ok   T109 restore: g4b.js is byte-identical after the mutation window and the shipped module still misses on the new sha
+2026-11-21T06:50:10.2623990Z ok   T110 G4b cache counterexample 2: a changed whitelist text misses and stores a second entry
+2026-11-21T06:50:10.2624557Z ok   T110 G4b cache mutation applied + load-bearing: pinning the whitelist digest turns the second run into a hit
+2026-11-21T06:50:10.2625139Z ok   T110 restore: g4b.js is byte-identical after the mutation window and the shipped module still misses on the new whitelist
+2026-11-21T06:50:10.2625763Z ok   T111 G4b cache counterexample 3: a changed criterion source misses even with the same sha and whitelist
+2026-11-21T06:50:10.2626322Z ok   T111 G4b cache mutation applied + load-bearing: blinding the digest to the run body lets a changed source hit
+2026-11-21T06:50:10.2626954Z ok   T111 restore: g4b.js is byte-identical after all mutation windows and the shipped module still misses on the changed source
+2026-11-21T06:50:10.2627523Z ok   T112 G4b cache fail-open 1: a store whose get() throws still yields a verdict and emits NO cache record
+2026-11-21T06:50:10.2628033Z ok   T112 G4b cache fail-open 2: a malformed entry is a miss and is rewritten as a valid entry of this version
+2026-11-21T06:50:10.2628604Z ok   T112 G4b cache key shape: six pipe-separated segments starting with the format version
+2026-11-21T06:50:10.2629093Z ok   T112 G4b cache switched off: g4bCacheDisabled forces the full scan and emits NO cache record
+2026-11-21T06:50:10.2629611Z ok   T112 G4b cache switched off when git cannot resolve the corpus revision (silent full scan, no record)
+2026-11-21T06:50:10.2630542Z ok   T113 G4b cache index-dirtiness independence: a staged delta does not disable the cache for tree/index (condition 3 must not resurrect) - run 1 misses and still produces the verdict
+2026-11-21T06:50:10.2631458Z ok   T113 G4b cache index-dirtiness independence: a staged delta does not disable the cache for tree/index (condition 3 must not resurrect) - run 2 hits on the same sha and whitelist
+2026-11-21T06:50:10.2632397Z ok   T113 G4b cache index-dirtiness independence: a staged delta does not disable the cache for tree/index (condition 3 must not resurrect) - the dirty and clean fixtures yield the identical G4b verdict and detail
+2026-11-21T06:50:10.2633394Z ok   T113 G4b cache index-dirtiness independence: a staged delta does not disable the cache for tree/index (condition 3 must not resurrect) - the six-segment key shape does not degrade under a dirty index
+2026-11-21T06:50:10.2634580Z ok   T113 G4b cache index-dirtiness independence: a staged delta does not disable the cache for tree/index (condition 3 must not resurrect) - mutation applied + load-bearing: resurrecting condition 3 removes every G4b-cache record
+2026-11-21T06:50:10.2635511Z ok   T113 restore: g4b.js is byte-identical after the mutation window and the shipped module still hits on a dirty index
+2026-11-21T06:50:10.2636126Z ok   T114 G4b corpus enumeration reads the object store: ls-tree HEAD answers and ls-files is never called
+2026-11-21T06:50:10.2636689Z ok   T115 G4b corpus cold/warm equivalence under a staged markdown deletion: miss then hit, corpus=1 both times
+2026-11-21T06:50:10.2637358Z ok   T115 both runs PASS on the HEAD corpus (an ls-files fallback drops the only "丙" and turns this red) and agree
+2026-11-21T06:50:10.2638033Z ok   T116 the cached entry carries v === CACHE_VERSION (G4B-CORPUS-DECOUPLE bumped both to v2)
+2026-11-21T06:50:10.2638935Z ok   T117 G4b range-scope corpus enumeration is NUL-separated ls-tree at the range base (the pre-slice newline form and ls-files are both rejected)
+2026-11-21T06:50:10.2640112Z ok   T118 G4b index-scope corpus enumeration also reads ls-tree HEAD with NUL separation (an ls-files fallback or a non-HEAD ref turns this red, and the .MD suffix survives)
+2026-11-21T06:50:10.2641446Z ok   T125 evictToCap evicts the OLDEST mtimes first and returns the exact number removed (5 entries, cap 2, names ordered against the clock)
+2026-11-21T06:50:10.2642563Z ok   T125 evictToCap only considers CACHE_ENTRY_RE names: a 63-hex near-miss and an atomic temp file survive a cap=0 pass that removes the single real entry
+2026-11-21T06:50:10.2643492Z ok   T126 entries == cap: evictToCap returns 0 and deletes nothing (the excess > 0 guard)
+2026-11-21T06:50:10.2644035Z ok   T126 entries < cap: evictToCap returns 0 and keeps every entry
+2026-11-21T06:50:10.2644523Z ok   T126 entries > cap: exactly entries - cap are removed and the newest cap survive
+2026-11-21T06:50:10.2645079Z ok   T127 the fixture starts at exactly CACHE_CAP (100) entries and the run misses, so the write that triggers eviction really happened
+2026-11-21T06:50:10.2645917Z ok   T127 put keeps the directory at CACHE_CAP: the oldest entry is gone, the newest and the freshly written one survive
+2026-11-21T06:50:10.2646614Z ok   T128 the cold run stores exactly {v:2, corpus:[...]} and nothing else
+2026-11-21T06:50:10.2647253Z ok   T128 a hit reproduces the cold run: same key prefix, same verdict, same detail, cached corpus size 1
+2026-11-21T06:50:10.2648035Z ok   T128 the hit touches the entry (mtime advances past the seeded stamp) without rewriting the stored value
+2026-11-21T06:50:10.2648827Z ok   T129 fail-open (a): a throwing unlinkFn neither escapes nor loses an entry (0 removed, all 3 survive)
+2026-11-21T06:50:10.2649438Z ok   T129 fail-open (b): an entry whose stat() throws is skipped, not counted, and does not throw (2 of 4 counted, cap 2, 0 removed)
+2026-11-21T06:50:10.2650019Z ok   T129 fail-open (c): a missing directory and a non-directory path both return 0 without throwing
+2026-11-21T06:50:10.2650873Z ok   T129 fail-open (d): an unusable cache directory degrades to the full scan - no cache record, no exception, verdict and detail identical to a healthy run
+2026-11-21T06:50:10.2651476Z ok   T130 CACHE_CAP is pinned at 100 (a drifted cap would silently weaken the bound)
+2026-11-21T06:50:10.2651950Z ok   F1 every declared fixture mutation applied (a stale mutation would weaken the suite silently)
+2026-11-21T06:50:10.2652448Z ok   F1 mutation coverage floor (>= 8 fixture mutations exercised)
+2026-11-21T06:50:10.2652761Z SELFTEST: PASS 740/740
+2026-11-21T06:50:44.8234998Z GATE REPORT scope=ci repo=/home/runner/work/prfrail/prfrail changed=36
+2026-11-21T06:50:44.8235759Z PASS  G1-a table structure :: no `||` on added rows
+2026-11-21T06:50:44.8236301Z PASS  G1(c) status marker c :: closed set respected (442 cells)
+2026-11-21T06:50:44.8236872Z PASS  G1(d) status marker d :: heading and status table agree
+2026-11-21T06:50:44.8237724Z PASS  G1(e) status marker e :: completion rows imply completed (72 bound, 34 unbound)
+2026-11-21T06:50:44.8238545Z PASS  G1(e2) in-block completion rows imply completed :: 0 judged, 0 skipped, 66 historical (v1.64)
+2026-11-21T06:50:44.8239572Z INFO  G1(e-info) completion keys without a binding :: 34 completion row(s) have no heading to bind to (their slice heading was removed); G1(e) judges bound rows only
+2026-11-21T06:50:44.8240614Z PASS  G1(f) status marker f :: no in-progress wording in added completion rows
+2026-11-21T06:50:44.8241096Z PASS  G2 placeholder residue :: none
+2026-11-21T06:50:44.8243215Z PASS  G3(a) symmetry + mirror parity :: docs/INSTALLATION.md +2/-0 vs _EN +2/-0 OK || docs/SECURITY.md +1/-1 vs _EN +1/-1 OK || docs/t027/REMAINING_SLICES.md +6/-3 vs _EN +6/-3 OK || docs/validation/bounddir-residual.md +246/-0 vs _EN +246/-0 OK ;; docs/INSTALLATION.md {"lines":true,"head":true,"bold":true,"bars":true,"blank":true,"backticks":false} ;; docs/SECURITY.md {"lines":true,"head":true,"bold":true,"bars":true,"blank":true,"backticks":true} ;; docs/t027/REMAINING_SLICES.md {"lines":false,"head":false,"bold":false,"bars":false,"blank":false,"backticks":false} ;; docs/validation/bounddir-residual.md {"lines":true,"head":true,"bold":true,"bars":true,"blank":true,"backticks":true}
+2026-11-21T06:50:44.8245969Z PASS  G3(b) key-field alignment :: hash 0/0 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK | hash 0/0 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK | hash 0/0 OK | run 0/0 OK | glyph 2/2 OK | to-do 0/0 OK | not-reviewed 0/0 OK | hash 2/2 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK
+2026-11-21T06:50:44.8247009Z PASS  G4a BOM+LF :: 36 file(s) OK (16 excluded: evidence tree)
+2026-11-21T06:50:44.8247527Z INFO  G4b-cache G4b cache :: miss 6f21b6b966ff corpus=1461
+2026-11-21T06:50:44.8248125Z PASS  G4b CJK diff minus whitelist :: newCjk=506 unknown=[] (whitelist=63 whitelist-source=endpoint:HEAD)
+2026-11-21T06:50:44.8248720Z PASS  G5-a(1) no model key in prfrail-* :: 0 hits
+2026-11-21T06:50:44.8249156Z PASS  G5-a(2) no empty model :: 0 hits / 14 files
+2026-11-21T06:50:44.8249563Z PASS  G5-b closed-set model value :: checked 0 file(s)
+2026-11-21T06:50:44.8250471Z PASS  G5-c appendix-B call strings in the 2.2 qualified-name set :: call strings OK (2 file(s), scanned 0 changed carrier line(s))
+2026-11-21T06:50:44.8251268Z INFO  G5-d role-file frontmatter contract :: no changed `.github/agents/*.agent.md` in scope
+2026-11-21T06:50:44.8252104Z PASS  G5(d) staged is a subset of declared :: 36 path(s) declared (scope=ci) ; addMode=explicit (derived label, not a command-history assertion)
+2026-11-21T06:50:44.8252874Z PASS  G5(e) evidence references resolve :: no added completion row (nothing to resolve)
+2026-11-21T06:50:44.8253598Z PASS  G5(e2) in-block completion-row evidence resolves :: no added in-block completion row (nothing to resolve)
+2026-11-21T06:50:44.8254297Z INFO  G5(f) index hygiene :: scope=ci: staging is not part of this scope
+2026-11-21T06:50:44.8254893Z PASS  R2.5 header-note position :: distinct=1 uniform 14/14
+2026-11-21T06:50:44.8255597Z PASS  G6-1 status tense :: no pending/completion conflict on added lines (scanned 510) whitelist-source=endpoint:HEAD
+2026-11-21T06:50:44.8256367Z PASS  G6-2 cost clause :: no realized cost clause on added lines (scanned 510) whitelist-source=endpoint:HEAD
+2026-11-21T06:50:44.8257121Z PASS  G6-3 run-id format :: no malformed run id on added lines (scanned 510) whitelist-source=endpoint:HEAD
+2026-11-21T06:50:44.8257882Z PASS  G6-4 expiring literal :: no expiring literal on added lines (scanned 510) whitelist-source=endpoint:HEAD
+2026-11-21T06:50:44.8258785Z PASS  G6-5 section-reference resolution :: no unresolved section reference on added ledger/changelog lines (scanned 0, refs 0) whitelist-source=endpoint:HEAD
+2026-11-21T06:50:44.8259841Z PASS  G6-6 ledger status closed set :: every added ledger row opens with a closed-set status word (scanned 0) whitelist-source=endpoint:HEAD
+2026-11-21T06:50:44.8262941Z PASS  G6-7 declaration/ledger reconciliation :: every declared ID on an added section 0.3 line exists in the 12.4 / appendix-C ledger (scanned 0, declarations 0) whitelist-source=endpoint:HEAD
+2026-11-21T06:50:44.8264366Z PASS  G6-8 DR number uniqueness and membership :: registered DR set {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}; no DR collision or dangling reference on added lines (scanned 504, refs 0) whitelist-source=endpoint:HEAD
+2026-11-21T06:50:44.8265280Z PASS  G7-a artifacts block present :: 2 report(s) OK
+2026-11-21T06:50:44.8265921Z PASS  G7-b artifact path/disposition resolvable :: 74 artifact row(s) OK (repo check: git cat-file -e <endpoint>:<path>)
+2026-11-21T06:50:44.8266644Z PASS  G7-c finding row disposition cell :: 0 changed finding row(s) with disposition
+2026-11-21T06:50:44.8267321Z PASS  G7-d stopped state marked incomplete :: no stopped-state row missing the incomplete mark
+2026-11-21T06:50:44.8268118Z PASS  G7-e verdict line closed set :: every verdict line on added report lines is inside the 4.1 closed set (scanned 488)
+2026-11-21T06:50:44.8269402Z PASS  G7-f sixstage transcript contract :: 2 changed ```sixstage fence(s) complete (A→B→C→D→E, closed-set conclusion, SEVERITY consistency)
+2026-11-21T06:50:44.8270364Z PASS  G8-a evidence-tree path shape :: 16 path(s) OK
+2026-11-21T06:50:44.8270839Z PASS  G8-b pack self-consistency :: 1 pack(s) self-consistent
+2026-11-21T06:50:44.8271534Z PASS  G8-c encoding-normalization record :: 0 pack(s) checked (1 exempt: no `## 后缀与编码映射` section)
+2026-11-21T06:50:44.8272173Z PASS  G8-d rebuilt-archive note :: 16 changed file(s) OK
+2026-11-21T06:50:44.8272916Z PASS  G9 临时件与 tmp/ 引用 :: 36 path(s) OK (16 excluded) (whitelist=endpoint:HEAD)
+2026-11-21T06:50:44.8273936Z INFO  G9-e tmp/ reference (informational) :: docs/validation/bounddir-residual.md:127 tmp/P84-BOUNDDIR-RESIDUAL/gate-tree-postNarrow.txt :: not present at HEAD:tmp/P84-BOUNDDIR-RESIDUAL/gate-tree-postNarrow.txt
+2026-11-21T06:50:44.8275308Z INFO  G9-e tmp/ reference (informational) :: docs/validation/bounddir-residual.md:127 tmp/P84-BOUNDDIR-RESIDUAL/gate-tree-8b.txt :: not present at HEAD:tmp/P84-BOUNDDIR-RESIDUAL/gate-tree-8b.txt
+2026-11-21T06:50:44.8276487Z INFO  G9-e tmp/ reference (informational) :: docs/validation/bounddir-residual.md:245 tmp/P84-BOUNDDIR-RESIDUAL :: not present at HEAD:tmp/P84-BOUNDDIR-RESIDUAL
+2026-11-21T06:50:44.8277759Z INFO  G9-e tmp/ reference (informational) :: docs/validation/bounddir-residual_EN.md:127 tmp/P84-BOUNDDIR-RESIDUAL/gate-tree-postNarrow.txt :: not present at HEAD:tmp/P84-BOUNDDIR-RESIDUAL/gate-tree-postNarrow.txt
+2026-11-21T06:50:44.8279056Z INFO  G9-e tmp/ reference (informational) :: docs/validation/bounddir-residual_EN.md:127 tmp/P84-BOUNDDIR-RESIDUAL/gate-tree-8b.txt :: not present at HEAD:tmp/P84-BOUNDDIR-RESIDUAL/gate-tree-8b.txt
+2026-11-21T06:50:44.8280436Z INFO  G9-e tmp/ reference (informational) :: docs/validation/bounddir-residual_EN.md:245 tmp/P84-BOUNDDIR-RESIDUAL :: not present at HEAD:tmp/P84-BOUNDDIR-RESIDUAL
+2026-11-21T06:50:44.8281281Z INFO  G9-e tmp/ reference summary :: scanned 510 added line(s), 6 reference(s), 6 unresolvable
+2026-11-21T06:50:44.8281839Z PASS  base gofmt -l . :: empty
+2026-11-21T06:50:44.8282223Z PASS  base go build ./... :: exit 0
+2026-11-21T06:50:44.8282572Z PASS  base go vet ./... :: exit 0
+2026-11-21T06:50:44.8282945Z PASS  base go test ./... :: ok=15 FAIL=0
+2026-11-21T06:50:44.8283290Z TOTAL_FAIL=0
+2026-11-21T06:50:44.8387919Z Post job cleanup.
+2026-11-21T06:50:44.9266073Z [command]/opt/hostedtoolcache/go/1.22.12/x64/bin/go env GOMODCACHE
+2026-11-21T06:50:44.9300298Z [command]/opt/hostedtoolcache/go/1.22.12/x64/bin/go env GOCACHE
+2026-11-21T06:50:44.9319742Z /home/runner/go/pkg/mod
+2026-11-21T06:50:44.9331312Z /home/runner/.cache/go-build
+2026-11-21T06:50:44.9335032Z Cache hit occurred on the primary key setup-go-Linux-x64-ubuntu26-go-1.22.12-2f07b6ec62ba90bcd08e45ebcc765a7ea2fd8104887fdaad445ddb80e0e00ca7, not saving cache.
+2026-11-21T06:50:44.9447859Z Post job cleanup.
+2026-11-21T06:50:45.0079758Z [command]/usr/bin/git version
+2026-11-21T06:50:45.0106230Z git version 2.56.1
+2026-11-21T06:50:45.0131575Z Temporarily overriding HOME='/home/runner/work/_temp/425e7c44-516b-4b6d-835a-59858ee0cae7' before making global git config changes
+2026-11-21T06:50:45.0132540Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-21T06:50:45.0134754Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/prfrail/prfrail
+2026-11-21T06:50:45.0157205Z Removing SSH command configuration
+2026-11-21T06:50:45.0162166Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-21T06:50:45.0184673Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-21T06:50:45.0372299Z Removing HTTP extra header
+2026-11-21T06:50:45.0375675Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-21T06:50:45.0513434Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-21T06:50:45.0568021Z Removing includeIf entries pointing to credentials config files
+2026-11-21T06:50:45.0572289Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-21T06:50:45.0593862Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-21T06:50:45.0870611Z Cleaning up orphan processes

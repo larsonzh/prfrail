@@ -1,0 +1,162 @@
+=== P85 R4 MUTATION LOG (baseline sha256) 
+2228847e5ab6a08ab9f09695bce3c93e1b9994bc96ef57d0ab9bd3762a7bab36  D:\LZProjects\prfrail\internal\console\agent_runner_policy.go 
+0e72f8e452afb9b94260936133fd7effaf11050a082815b3f9db1c36e3a92045  D:\LZProjects\prfrail\internal\evidence\bounddir_windows.go 
+e4f7be876459d75d9afadd06532bed64df63e565462c4b305923c15f1212cc15  D:\LZProjects\prfrail\internal\console\agent_runner_policy_publish_other.go 
+d5b39ac74ab9cb1c04efe2c476de1a239b57eda79dfec81be77b97e622fe8c02  D:\LZProjects\prfrail\internal\console\ai_install_proof.go 
+ 
+=== MUT-A M13 delete-name-reassertions (expect RED) 
+=== RUN   TestP85R4M13TerminalReassertRefusesAStandInSwappedMidEntry
+    p85_r4_m13_chain_tester_test.go:145: an artifact replaced between the segments must refuse the load, got <nil>
+--- FAIL: TestP85R4M13TerminalReassertRefusesAStandInSwappedMidEntry (0.06s)
+=== RUN   TestP85R4M13ChainSlotsRefuseAReplacedArtifact
+    p85_r4_m13_chain_tester_test.go:224: an artifact replaced after the binding must refuse, got <nil>
+--- FAIL: TestP85R4M13ChainSlotsRefuseAReplacedArtifact (0.05s)
+=== RUN   TestP85R4M13BoundChainAcceptsAnUntouchedDomain
+--- PASS: TestP85R4M13BoundChainAcceptsAnUntouchedDomain (0.05s)
+FAIL
+FAIL	github.com/larsonzh/prfrail/internal/console	1.906s
+FAIL
+EXITCODE=1 
+RESTORE-MUT-A sha256=2228847e5ab6a08ab9f09695bce3c93e1b9994bc96ef57d0ab9bd3762a7bab36 (baseline 2228847e5ab6a08ab9f09695bce3c93e1b9994bc96ef57d0ab9bd3762a7bab36) 
+ok  	github.com/larsonzh/prfrail/internal/console	2.294s
+EXITCODE=0 
+ 
+=== MUT-B M13 directory-only-reassert (expect RED) 
+=== RUN   TestP85R4M13TerminalReassertRefusesAStandInSwappedMidEntry
+    p85_r4_m13_chain_tester_test.go:145: an artifact replaced between the segments must refuse the load, got <nil>
+--- FAIL: TestP85R4M13TerminalReassertRefusesAStandInSwappedMidEntry (0.09s)
+=== RUN   TestP85R4M13ChainSlotsRefuseAReplacedArtifact
+    p85_r4_m13_chain_tester_test.go:224: an artifact replaced after the binding must refuse, got <nil>
+--- FAIL: TestP85R4M13ChainSlotsRefuseAReplacedArtifact (0.08s)
+=== RUN   TestP85R4M13BoundChainAcceptsAnUntouchedDomain
+--- PASS: TestP85R4M13BoundChainAcceptsAnUntouchedDomain (0.08s)
+FAIL
+FAIL	github.com/larsonzh/prfrail/internal/console	2.239s
+FAIL
+EXITCODE=1 
+RESTORE-MUT-B sha256=2228847e5ab6a08ab9f09695bce3c93e1b9994bc96ef57d0ab9bd3762a7bab36 byte-identical-to-baseline=True 
+ok  	github.com/larsonzh/prfrail/internal/console	2.578s
+EXITCODE=0 
+ 
+=== MUT-C M14 delete-root-chain-reparse-refusal (expect RED) 
+=== RUN   TestP85R4M14RootChainRefusesAReparseComponent
+=== RUN   TestP85R4M14RootChainRefusesAReparseComponent/an-intermediate-junction-is-refused
+    p85_r4_m14_root_chain_windows_test.go:92: a directory bound through an intermediate junction must be refused BECAUSE it is a reparse point, got evidence: open "policy" inside the root chain "C:\\Users\\妙妙呜\\AppData\\Local\\Temp\\TestP85R4M14RootChainRefusesAReparseComponent2689298538\\001\\linked\\policy": The name of the file cannot be resolved by the system.
+=== RUN   TestP85R4M14RootChainRefusesAReparseComponent/a-last-component-junction-is-refused
+    p85_r4_m14_root_chain_windows_test.go:120: a directory whose own name is a junction must be refused by the root-chain walk, got a successful bind
+=== RUN   TestP85R4M14RootChainRefusesAReparseComponent/a-junction-to-the-very-same-object-is-refused
+    p85_r4_m14_root_chain_windows_test.go:143: a junction that resolves to the bound object must be refused by the root-chain walk, got a successful bind
+--- FAIL: TestP85R4M14RootChainRefusesAReparseComponent (0.34s)
+    --- FAIL: TestP85R4M14RootChainRefusesAReparseComponent/an-intermediate-junction-is-refused (0.23s)
+    --- FAIL: TestP85R4M14RootChainRefusesAReparseComponent/a-last-component-junction-is-refused (0.05s)
+    --- FAIL: TestP85R4M14RootChainRefusesAReparseComponent/a-junction-to-the-very-same-object-is-refused (0.06s)
+FAIL
+FAIL	github.com/larsonzh/prfrail/internal/evidence	2.364s
+=== RUN   TestP85R4M14PublishRecheckRefusesASameObjectJunction
+    p85_r4_m14_publish_recheck_windows_test.go:71: the refusal must come from the root-chain re-bind, got invalid proofrail configuration: the frozen policy artifact directory C:\Users\妙妙呜\AppData\Local\Temp\TestP85R4M14PublishRecheckRefusesASameObjectJunction2022060255\001\agent-runner-policy no longer names the object that was bound (win32:1825482194:65536:1702362 != win32:1825482194:65536:1702361)
+--- FAIL: TestP85R4M14PublishRecheckRefusesASameObjectJunction (0.13s)
+FAIL
+FAIL	github.com/larsonzh/prfrail/internal/console	1.484s
+FAIL
+EXITCODE=1 
+RESTORE-MUT-C sha256=0e72f8e452afb9b94260936133fd7effaf11050a082815b3f9db1c36e3a92045 byte-identical-to-baseline=True 
+ok  	github.com/larsonzh/prfrail/internal/evidence	1.693s
+ok  	github.com/larsonzh/prfrail/internal/console	2.209s
+EXITCODE=0 
+ 
+=== MUT-D M14 publish-recheck-name-based (expect RED) 
+=== RUN   TestP85R4M14PublishRecheckRefusesASameObjectJunction
+    p85_r4_m14_publish_recheck_windows_test.go:68: a directory whose name is now a junction must refuse the publication re-check even though it resolves to the bound object
+--- FAIL: TestP85R4M14PublishRecheckRefusesASameObjectJunction (0.15s)
+FAIL
+FAIL	github.com/larsonzh/prfrail/internal/console	2.126s
+FAIL
+EXITCODE=1 
+RESTORE-MUT-D sha256=e4f7be876459d75d9afadd06532bed64df63e565462c4b305923c15f1212cc15 byte-identical-to-baseline=True 
+ok  	github.com/larsonzh/prfrail/internal/console	2.108s
+EXITCODE=0 
+ 
+=== MUT-E M15 delete-current-domain-verification (expect RED) 
+=== RUN   TestP85R4M15ShapeDecidesWhichDomainIsSealed
+=== RUN   TestP85R4M15ShapeDecidesWhichDomainIsSealed/a-creation-anchor-reenters-unchanged
+=== RUN   TestP85R4M15ShapeDecidesWhichDomainIsSealed/a-reuse-anchor-reenters-unchanged
+=== RUN   TestP85R4M15ShapeDecidesWhichDomainIsSealed/a-creation-anchor-rewritten-as-reuse-is-refused
+=== RUN   TestP85R4M15ShapeDecidesWhichDomainIsSealed/a-domain-that-is-writable-now-is-refused
+    p85_r4_m15_m17_shape_tester_test.go:197: an artifact writable by this identity must refuse the load even when the sealed domain still matches, got <nil>
+=== RUN   TestP85R4M15ShapeDecidesWhichDomainIsSealed/an-anchor-without-a-shape-is-refused
+--- FAIL: TestP85R4M15ShapeDecidesWhichDomainIsSealed (0.38s)
+    --- PASS: TestP85R4M15ShapeDecidesWhichDomainIsSealed/a-creation-anchor-reenters-unchanged (0.06s)
+    --- PASS: TestP85R4M15ShapeDecidesWhichDomainIsSealed/a-reuse-anchor-reenters-unchanged (0.06s)
+    --- PASS: TestP85R4M15ShapeDecidesWhichDomainIsSealed/a-creation-anchor-rewritten-as-reuse-is-refused (0.13s)
+    --- FAIL: TestP85R4M15ShapeDecidesWhichDomainIsSealed/a-domain-that-is-writable-now-is-refused (0.07s)
+    --- PASS: TestP85R4M15ShapeDecidesWhichDomainIsSealed/an-anchor-without-a-shape-is-refused (0.07s)
+FAIL
+FAIL	github.com/larsonzh/prfrail/internal/console	2.352s
+FAIL
+EXITCODE=1 
+RESTORE-MUT-E sha256=2228847e5ab6a08ab9f09695bce3c93e1b9994bc96ef57d0ab9bd3762a7bab36 byte-identical-to-baseline=True 
+ok  	github.com/larsonzh/prfrail/internal/console	2.276s
+EXITCODE=0 
+ 
+=== MUT-F M17 restore-short-domain-shortcut (expect RED) 
+=== RUN   TestP85R4M17ShortDomainShortcutIsGone
+=== RUN   TestP85R4M17ShortDomainShortcutIsGone/a-closed-domain-with-a-creation-anchor-is-adopted
+=== RUN   TestP85R4M17ShortDomainShortcutIsGone/a-creation-anchor-over-a-writable-object-set-is-refused
+    p85_r4_m15_m17_shape_tester_test.go:244: a creation anchor must not short-circuit the current-domain verification, got <nil>
+=== RUN   TestP85R4M17ShortDomainShortcutIsGone/a-reuse-anchor-over-a-writable-artifact-is-refused
+    p85_r4_m15_m17_shape_tester_test.go:266: a reuse anchor must not short-circuit the current-domain verification, got <nil>
+=== RUN   TestP85R4M17ShortDomainShortcutIsGone/a-reuse-anchor-over-an-unwritable-artifact-is-adopted
+--- FAIL: TestP85R4M17ShortDomainShortcutIsGone (0.20s)
+    --- PASS: TestP85R4M17ShortDomainShortcutIsGone/a-closed-domain-with-a-creation-anchor-is-adopted (0.05s)
+    --- FAIL: TestP85R4M17ShortDomainShortcutIsGone/a-creation-anchor-over-a-writable-object-set-is-refused (0.05s)
+    --- FAIL: TestP85R4M17ShortDomainShortcutIsGone/a-reuse-anchor-over-a-writable-artifact-is-refused (0.05s)
+    --- PASS: TestP85R4M17ShortDomainShortcutIsGone/a-reuse-anchor-over-an-unwritable-artifact-is-adopted (0.05s)
+FAIL
+FAIL	github.com/larsonzh/prfrail/internal/console	2.055s
+FAIL
+EXITCODE=1 
+RESTORE-MUT-F sha256=2228847e5ab6a08ab9f09695bce3c93e1b9994bc96ef57d0ab9bd3762a7bab36 byte-identical-to-baseline=True 
+ok  	github.com/larsonzh/prfrail/internal/console	2.154s
+EXITCODE=0 
+ 
+=== MUT-G M16 delete-reentry-sync (expect RED) 
+=== RUN   TestP85R4M16ReentrySyncGuardIsDiscriminating
+=== RUN   TestP85R4M16ReentrySyncGuardIsDiscriminating/leg-P-positive-control
+=== RUN   TestP85R4M16ReentrySyncGuardIsDiscriminating/leg-R-guard-on-while-sync-still-fails-refuses
+    p85_r4_m16_sync_guard_tester_test.go:96: with the guard on and the sync still failing the re-entry must refuse with the sync failure, got <nil>
+=== RUN   TestP85R4M16ReentrySyncGuardIsDiscriminating/leg-G-guard-off-while-sync-still-fails-adopts
+--- FAIL: TestP85R4M16ReentrySyncGuardIsDiscriminating (0.08s)
+    --- PASS: TestP85R4M16ReentrySyncGuardIsDiscriminating/leg-P-positive-control (0.02s)
+    --- FAIL: TestP85R4M16ReentrySyncGuardIsDiscriminating/leg-R-guard-on-while-sync-still-fails-refuses (0.02s)
+    --- PASS: TestP85R4M16ReentrySyncGuardIsDiscriminating/leg-G-guard-off-while-sync-still-fails-adopts (0.03s)
+FAIL
+FAIL	github.com/larsonzh/prfrail/internal/console	1.544s
+FAIL
+EXITCODE=1 
+RESTORE-MUT-G sha256=d5b39ac74ab9cb1c04efe2c476de1a239b57eda79dfec81be77b97e622fe8c02 byte-identical-to-baseline=True 
+ok  	github.com/larsonzh/prfrail/internal/console	1.888s
+EXITCODE=0 
+ 
+=== MUT-H M16 delete-guard-condition (expect RED) 
+=== RUN   TestP85R4M16ReentrySyncGuardIsDiscriminating
+=== RUN   TestP85R4M16ReentrySyncGuardIsDiscriminating/leg-P-positive-control
+=== RUN   TestP85R4M16ReentrySyncGuardIsDiscriminating/leg-R-guard-on-while-sync-still-fails-refuses
+=== RUN   TestP85R4M16ReentrySyncGuardIsDiscriminating/leg-G-guard-off-while-sync-still-fails-adopts
+    p85_r4_m16_sync_guard_tester_test.go:120: with only the guard withdrawn the unchanged carrier must be adopted, got the probe install source cannot be admitted: sync the install source proof directory C:\Users\妙妙呜\AppData\Local\Temp\TestP85R4M16ReentrySyncGuardIsDiscriminatingleg-G-guard-off-whi270716633\001: the probe install source cannot be admitted: injected same-handle directory sync failure
+--- FAIL: TestP85R4M16ReentrySyncGuardIsDiscriminating (0.07s)
+    --- PASS: TestP85R4M16ReentrySyncGuardIsDiscriminating/leg-P-positive-control (0.03s)
+    --- PASS: TestP85R4M16ReentrySyncGuardIsDiscriminating/leg-R-guard-on-while-sync-still-fails-refuses (0.02s)
+    --- FAIL: TestP85R4M16ReentrySyncGuardIsDiscriminating/leg-G-guard-off-while-sync-still-fails-adopts (0.02s)
+FAIL
+FAIL	github.com/larsonzh/prfrail/internal/console	1.499s
+FAIL
+EXITCODE=1 
+RESTORE-MUT-H sha256=d5b39ac74ab9cb1c04efe2c476de1a239b57eda79dfec81be77b97e622fe8c02 byte-identical-to-baseline=True 
+ok  	github.com/larsonzh/prfrail/internal/console	1.613s
+EXITCODE=0 
+ 
+=== RESTORE SUMMARY (all four mutated files, after every mutation) 
+d5b39ac74ab9cb1c04efe2c476de1a239b57eda79dfec81be77b97e622fe8c02 byte-identical-to-baseline=True internal\console\ai_install_proof.go 
+0e72f8e452afb9b94260936133fd7effaf11050a082815b3f9db1c36e3a92045 byte-identical-to-baseline=True internal\evidence\bounddir_windows.go 
+2228847e5ab6a08ab9f09695bce3c93e1b9994bc96ef57d0ab9bd3762a7bab36 byte-identical-to-baseline=True internal\console\agent_runner_policy.go 
+e4f7be876459d75d9afadd06532bed64df63e565462c4b305923c15f1212cc15 byte-identical-to-baseline=True internal\console\agent_runner_policy_publish_other.go 

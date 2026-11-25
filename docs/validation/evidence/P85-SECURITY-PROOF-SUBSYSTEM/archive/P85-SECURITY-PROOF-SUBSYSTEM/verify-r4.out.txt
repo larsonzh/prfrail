@@ -1,0 +1,45 @@
+{
+  "cn": {
+    "path": "docs/CONTRACTS.md",
+    "bom": true,
+    "doubleBom": false,
+    "cr": false,
+    "lines": 411,
+    "blank": 119,
+    "bold": 133,
+    "bars": 248,
+    "backticks": 1096,
+    "trailingNewline": true
+  },
+  "en": {
+    "path": "docs/CONTRACTS_EN.md",
+    "bom": true,
+    "doubleBom": false,
+    "cr": false,
+    "lines": 403,
+    "blank": 119,
+    "bold": 135,
+    "bars": 248,
+    "backticks": 1094,
+    "trailingNewline": true
+  },
+  "delta": {
+    "lines": -8,
+    "blank": 0,
+    "bold": 2,
+    "bars": 0,
+    "backticks": -2
+  }
+}
+NUMSTAT:
+4	1	docs/CONTRACTS.md
+4	1	docs/CONTRACTS_EN.md
+HUNKS: @@ -216 +216 @@ ProofRail 端口接受版本化 context envelope：任务契约、父快照、 | @@ -230,0 +231,3 @@ CLI Agent 只在为当前 task/attempt 物化的可丢弃 run-workspace 中工 | @@ -210 +210 @@ Before any AI-assisted entry point starts, ProofRail must perform a fail-closed | @@ -224,0 +225,3 @@ The CLI Agent works only inside the disposable run-workspace materialized for th
+PREFIX_CN={"indexLine":216,"worktreeLine":216,"oldLen":441,"newLen":573,"preserved":true}
+PREFIX_EN={"indexLine":210,"worktreeLine":210,"oldLen":1116,"newLen":1542,"preserved":true}
+CN216={"first":"对 `agent-runner-cli` 通道的可用性探测，探针可执行文件的安装来源必须可证明不可变：Windows 上","last":"se 标记一律拒绝；UNC、扩展与相对路径同样拒绝。该判据只约束取证绑定的名称链，与 spawn 名的既有表述互不替代。","len":573}
+CN231={"first":"冻结策略制品在装配期封存时，其摘要锚必须以 `managedWriteProofShape` 记录 `ManagedWr","last":"）；重入复验按该 Shape 重建同域并逐字节对证，字段缺失或取值未知一律拒绝（fail-closed），既有锚不迁移。","len":159}
+CN233={"first":"受管身份写保护观测的摘要域为 `proofrail:agent-runner-policy-write-guard:2\\","last":" | 制品 | 锚]`，缺失的槽以规范空标记 `∅` 占位，槽序与槽数不随对象是否存在而变化，跨版本摘要不得比较为相等。","len":155}
+EN210={"first":"For availability probing of the `agent-runner-cli` channel, ","last":"changeable with any existing statement about the spawn name.","len":1542}
+EN225={"first":"When the frozen policy artifact is sealed at assembly, its d","last":" value (fail-closed), and existing anchors are not migrated.","len":364}
+EN227={"first":"The digest domain of the managed-identity write-protection o","last":" from different domain versions are never compared as equal.","len":455}

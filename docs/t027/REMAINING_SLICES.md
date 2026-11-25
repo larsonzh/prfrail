@@ -2311,7 +2311,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 探针额度 | 0（默认；若需真实 BYOK 调用，按 §7.6 停下申请预授权） |
 | 执行自由度清单落盘路径 | `docs/validation/evidence/P85-SECURITY-PROOF-SUBSYSTEM/freedom-list.md` |
 | R/D 基线 | R = 8、D = 0（起跑时登记 R = 0 / D = 0，§13.1.1；不继承 P83 的 R = 2 / D = 0；R = 8 = ⑦ 复审后六轮修复，OB-140/142/144 留痕） |
-| 临时件落点声明 | 本片临时目录 = `tmp/P85-SECURITY-PROOF-SUBSYSTEM/`（⑧c 前只增不删；CI 捕获件同样落该目录，不落 `tmp/` 根） |
+| 临时件落点声明 | 本片临时目录已归档至 `docs/validation/evidence/P85-SECURITY-PROOF-SUBSYSTEM/archive/P85-SECURITY-PROOF-SUBSYSTEM/`（归档执行 = P89，2026-11-25；原目录已清除；「⑧c 前只增不删、CI 捕获件不落 tmp 根」为该片历史执行口径） |
 | 额度口径披露 | ⑦ 深度档 = `GPT-6.2 Sol (copilot)`；额度 = 1 终审 + 3 复审，盲审必抽 1 次（另计 +1）；**系用户 2026-11-21 排片裁定、不得作为先例**；起跑须四要素留痕；协议先行：先由 ① 判定契约影响再动代码 |
 
 ### P86 — `BOUNDDIR-UNC-EQUIVALENCE`（UNC 共享根两规范拼写等值 + W10 证据归因更正 · 闭合 N13-UNC / Low 残余 · 实现类）· ✅ 闭环
@@ -2386,13 +2386,13 @@ A6 ② 进度（第 2 批，2026-09-15）：
 
 完成记录（2026-11-25）：R = 0、D = 0、探针 0；①②③ 分别由 `deep-reasoner` + `DeepSeek V4 Pro`、`prfrail-implementer`、`prfrail-tester`（均 `DeepSeek V4.1 Flash`）承担；⑤ 1/2、⑥ 2/3、⑦ 终审 1/2（复审额度保留）；优化 = `tools/gates/lib/ctx.js` 的批量 blob 预取（O-1）与原始读数 memo（O-3c），判据判定逻辑零改动；同输入 A/B 五对逐字节相同（含 `INFO G4b-cache` 行的 `key12` 与 `corpus=`）；`SELFTEST` 744/744 不变；三作用域 `TOTAL_FAIL=0`；CI 判据面冷语料由 170277 ms 降至 12929 ms；准则升 v1.73（MINOR）并落附录 C.0az；报告对 `docs/validation/gates-perf-assess{,_EN}.md`；证据包 `docs/validation/evidence/P88-GATES-PERF-ASSESS/`（22 载荷，以该包 `MANIFEST.md` 为准，与 `SHA256SUMS.txt` 条目集相等）。`range` 作用域的 `TOTAL_FAIL=1` 判定 ID = **`G5(d)`**（`stagedNotDeclared` 列出四项未声明的文档），属**历史提交区间既有判定**而非本片回归：优化前实现对同一区间的输出与之逐字相同，配对证据见 `03-verification/ab-report.md` 的 B3 与 B4 两格；台账三作用域为 `index` / `tree` / `ci`，不含 `range`。主提交 `03c45f7` 已推 `origin/main`（范围 `fed0f5c..03c45f7`，**未推 gitee**）；CI 主轮 `45523666470` 双腿 success（`Go ubuntu-latest` 3m09s / `Go windows-latest` 2m58s；两腿 `SELFTEST` 744/744、`scope=ci changed=31`、`TOTAL_FAIL=0`；包级 ok ubuntu 21 / windows 15、FAIL 0，首跑即双绿）；回填提交仅记录本节，其自身 CI run 只作观察记录。
 
-### P89 — `TMP-ARCHIVE-P84-P85`（tmp 两目录归档 + 引用改写 · 工具片）· ⬜ 未立项
+### P89 — `TMP-ARCHIVE-P84-P85`（tmp 两目录归档 + 引用改写 · 工具片）· ✅ 闭环
 
 | 字段 | 内容 |
 |---|---|
 | 标识 | `TMP-ARCHIVE-P84-P85`（台账编号 = **P89**；来源 = v72 快照 §四 队列下一项 + tmp 三件遗留登记；**v72 快照闭环后启动、须用户点名**） |
-| 状态 | ⬜ 未立项（起跑须用户点名；起跑消息须四要素留痕） |
-| 目标 | ① 把 `tmp/P84-CI-FIX` 与 `tmp/P85-SECURITY-PROOF-SUBSYSTEM` 各自归档进对应证据包（`docs/validation/evidence/…`）；② 按 §11.1 判断历史文件是否改写或仅加更正注记（由 ① 判定）；③ 清除两个 tmp 目录；④ 输出引用改写清单与归档自洽证据（MANIFEST ↔ SHA256SUMS ↔ 载荷） |
+| 状态 | ✅ 闭环（2026-11-25 闭环；四要素留痕见 `docs/validation/evidence/P89-TMP-ARCHIVE-P84-P85/00-briefing.md`；报告对 `docs/validation/tmp-archive-p84-p85{,_EN}.md`） |
+| 目标 | ① 把两个旧临时目录（`P84-CI-FIX`、`P85-SECURITY-PROOF-SUBSYSTEM`，均在 `tmp` 根下，已清除）归档进对应证据包（落点 = `docs/validation/evidence/P84-BOUNDDIR-RESIDUAL/archive/P84-CI-FIX/` 与 `docs/validation/evidence/P85-SECURITY-PROOF-SUBSYSTEM/archive/P85-SECURITY-PROOF-SUBSYSTEM/`）；② 按 **§1.5.1**（tmp 生命周期四类口径）判定历史文件处置（改写 / 更正注记 / 保留原样；① 判、⑦ 背书），回写按 **§11.2**；③ 清除两个旧目录；④ 输出引用改写清单与归档自洽证据（MANIFEST ↔ SHA256SUMS ↔ 载荷） |
 | 依赖 | v72 快照闭环；无其它前置；`find-quotes.js` **不在本片范围**（交 tmp 生命周期片） |
 | 规模 | **S**（工具 / 证据片；纯 `docs/validation/**` + 台账 + 一处测试文件注释；不触 `internal/**` 生产逻辑） |
 | 步骤 | 0 → ① 影响判定（是否触 CONTRACTS、是否需准则 MINOR；证据包内历史文件的改写口径由 ① 判定）→ ② 归档与引用改写 → ③ 一致性（归档包自洽 + 引用可解析）→ ④ 门禁 → ⑤ → ⑥ → ⑦ → ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
@@ -2407,7 +2407,9 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 临时件落点声明 | `tmp/P89-TMP-ARCHIVE-P84-P85/`（⑧c 前只增不删）；归档动作本身不得在 `tmp` 根新增文件 |
 | 额度口径披露 | ⑦ = S 档 ⇒ §7.5「S 档 1+1」；档位由起跑消息定（触证据包与引用改写、不触判据本体）；盲审不抽（不触身份准入语义）；批量辅助 GLM ≥1（引用清单核对 / 双语镜像） |
 | 起跑条件 | 须用户显式点名；四要素留痕；v72 快照闭环 |
-| 引用点实测清单 | 2026-11-25 `git grep -F` 实测：九个来源文件、十五处。台账对 `REMAINING_SLICES.md:2314` / `_EN.md:2301`（排片字段注记）；P84 报告对 `bounddir-residual.md:156,160` / `_EN.md:156,160`（§12 字段注记）；`internal/console/p85_t2_frozen_policy_tester_test.go:6`（代码注释）；P85 证据包 `00-briefing.md:109`、`07-carbon-r7-targeted-read.md:10`、`P87-four-read-data/07-codex-baseline-read.md:11,14,21,26`、`P87-four-read-data/diff.patch:237,11818`（起跑草案曾记七个文件、十三处；实测多出 `diff.patch` 两处，**以实测为准**；证据包内部历史文件是否改写或加注记由 ① 判定） |
+| 引用点实测清单 | 2026-11-25 `git grep -F` 实测：九个来源文件、十五处。台账对 `REMAINING_SLICES.md:2314` / `_EN.md:2301`（排片字段注记）；P84 报告对 `bounddir-residual.md:156,160` / `_EN.md:156,160`（§12 字段注记）；`internal/console/p85_t2_frozen_policy_tester_test.go:6`（代码注释）；P85 证据包 `00-briefing.md:109`、`07-carbon-r7-targeted-read.md:10`、`P87-four-read-data/07-codex-baseline-read.md:11,14,21,26`、`P87-four-read-data/diff.patch:237,11818`（起跑草案曾记七个文件、十三处；实测多出 `diff.patch` 两处，**以实测为准**；证据包内部历史文件是否改写或加注记由 ① 判定）。**P89 执行期复核（2026-11-25）**：上述「九个来源文件、十五处」为规划值；按 `git grep -F -o` 计出现次数则为 **11 件载体、39 处**（差额 = `CHECKLIST_v72{,_EN}.md:137` 两行×两条路径，冻结快照不追改）。 |
+
+完成记录（2026-11-25）：R = 0、D = 0、探针 0；归档 110 件（`P84-CI-FIX` 44 件 / `P85-SECURITY-PROOF-SUBSYSTEM` 66 件）进各自证据包 `archive/` 子树并删除原目录（`Test-Path` 前 True/True → 后 False/False）；字节归一 88 件（`.gitattributes` = `* text=auto eol=lf`，必须先归一再计哈希）、路径字面归一 11 件 39 处；三包 `MANIFEST ↔ SHA256SUMS ↔ 磁盘` 三方相等（P84 58 / P85 95 / P89 11），110 件溯源从原件备份重放全通过；`git grep` 两条旧路径残余命中 16 处 = 白名单 16 处（冻结快照 2 + P85 冻结原文 8 + 本片逐字原文 6）；`SELFTEST` 744/744、三作用域 `TOTAL_FAIL=0`；⑤ 2/2（r2 残留为描述与计数）、⑥ 1/3 `PASS`、⑦ 2/2（`PASS WITH FIXES` → 唯一修复已闭环），背书 B1–B4 与 F-9 / F-13；报告对 `docs/validation/tmp-archive-p84-p85{,_EN}.md`；证据包 `docs/validation/evidence/P89-TMP-ARCHIVE-P84-P85/`（11 件载荷 + 两件元数据）。
 
 ## 已知缺陷（后续切片前处理）
 

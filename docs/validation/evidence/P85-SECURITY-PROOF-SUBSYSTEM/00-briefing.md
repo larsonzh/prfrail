@@ -172,3 +172,7 @@ F3 / F6 / F8（三项均为「证明载体」类能力）。步骤链首位 = �
 - 任一环报 Medium+ ⇒ 原位重跑至清零（§5.3），禁跳序；
 - 单次输出 ≤ 10,000 字符（§13.1.16），超限分批、禁止自重启；
 - 提交信息英文；完成后停于 ⑩，等同轮授权；仅 origin。
+
+---
+
+**P89 归档注记（2026-11-25，仅追加、正文未改）**：本文件是 P85 起跑消息的逐字原文（§13.1.10）。文中提到的旧临时目录（`tmp` 根下 `P85-SECURITY-PROOF-SUBSYSTEM`）已由 P89 归档至 `docs/validation/evidence/P85-SECURITY-PROOF-SUBSYSTEM/archive/P85-SECURITY-PROOF-SUBSYSTEM/` 并清除；逐件的原始/归档字节 sha256 见 `docs/validation/evidence/P89-TMP-ARCHIVE-P84-P85/archive-byte-provenance.tsv`，引用改写对照见 `docs/validation/tmp-archive-p84-p85{,_EN}.md`。

@@ -1,6 +1,4 @@
 3600aaf3ffafb73a058bac3eae82d963a61c6c651b1a7764422a2e58a75cae52  00-briefing.md
-0d544419d1f2af483bfb97833c7c20918ecca627371a26dea23b850eb652872c  input-list.md
-35875921ca35f56b714a7476e1cd7429c2e2ca9f4d407f12476af47c5064bca8  freedom-list.md
 7ea423b154ac01d08b93f9a5b5e9625b826cc0fd420de48482ebff8400a299de  01-arch/01-arch-design.md
 794f1e4d0a1f2fa0ba36f8ac5b4dd79d9a3e165a582078ccc18ddb5d3b3d74e9  04-reviews/05-pre-review-r1.md
 4e92107cf752a43158653b3e03f39cde599dbeb8a1942bb473c9846572df2ba4  04-reviews/05-pre-review-r2.md
@@ -8,7 +6,53 @@
 ed5271bde63d7b68e44553cfec0c20a912887d641ad4cefced554c684b1db9e5  04-reviews/06-scan-r2.md
 78614c76ee7b7c75ae79d5f80d259450d13e0c5513ef8671b2487d5020ddc642  04-reviews/07-blind-review.md
 68c956b15952f2184bc98b8a2573ba3dcfc3c5a852d1d8c6f87a7714132cecfa  04-reviews/07-final-review-r1.md
+9703c263372c8ae8ed03bf27934dd5ee7a412190a22aeb3887164988392e607c  04-reviews/07-narrow-re-review.md
 716cf3155b78bea5a70531768af8e4836742db4117eb70aafb737d998166c622  04-reviews/07-re-review-r1.md
 12d50384cf7ad77c01806e985a87201f75f3e4d2c4a1bd68c66149d37433fa02  04-reviews/07-re-review-r2.md
 a091b4e4c18b296150cc1b356400ef08884d29775f2affeaa6dce0a9bb8a1032  04-reviews/07-re-review-r3.md
-9703c263372c8ae8ed03bf27934dd5ee7a412190a22aeb3887164988392e607c  04-reviews/07-narrow-re-review.md
+46e345392fd276747638464a147041152831c643cd2c83a0ebbb5f54993fb973  archive/P84-CI-FIX/01-r2-contract-judgment.md
+b69474ce5217b7df397d40c9d10d3e463463e90895b17300ec0ece4027557ba1  archive/P84-CI-FIX/02-r2-verification-matrix.md
+eb2f9b4fed8365cdd40ac7ed4d26c8dabb4de88e5694011db176fe81ce8991a4  archive/P84-CI-FIX/03-r1-design.md
+05035b0e47d8a5e1e2be68af1dfea5a870a1b24beb94669c85a1e3211026d9a0  archive/P84-CI-FIX/04-ci-rerun-evidence.md
+92ce1f5f34019b70cdfb71c6812c12ebe4046d984f6a3d29940aabc720e5c7ae  archive/P84-CI-FIX/07-narrow-review-request.md
+186a327939779d554de582c41260c7ea93c1f4535a98d1e1f43e6a59bda33b7c  archive/P84-CI-FIX/08-narrow-re-review.md
+b8cbc870b01fee68fa2357b26a2d9282e60f6b9c4d3e834ef245a6de6988fb49  archive/P84-CI-FIX/09-narrow-review-request-r2.md
+fedaa5b0b0e75c3a640971ed4e2ea4fe6426428812b9855edb3d80df976abe7b  archive/P84-CI-FIX/10-final-review-request.md
+459b302f3ec255c01b02669f5a2f35a1f6cf123c6c21289de5d43eaf93c639a6  archive/P84-CI-FIX/11-narrow-re-review-r2.md
+a990cf948b7da9e5ec4f5989696b33f2a8aff18cce09ce7189e9e12a6dd61f7e  archive/P84-CI-FIX/12-rectification-record.md
+56a15562b60a45664a3725271b3b2e2c03585fd99784319f270ee6bc46868a2f  archive/P84-CI-FIX/13-final-narrow-review.md
+77d39a5b6f51404e3464969d4a4d55d25c16ebb1b4cb9e204a36e63dc43e4fc6  archive/P84-CI-FIX/14-rectification-A.md
+421fc495d5e4f9d09c75e60bb4466cbd0450814711bd3682e246aac5fdbd4af3  archive/P84-CI-FIX/15-final-review-A.md
+229a3ce11554db25cd6cdf448899bfa713436e212d55056d7162104adbe704a7  archive/P84-CI-FIX/attempt1-full-log.zip
+563020afdb0c9157ff0143dde2fb49c3c95218e7346a1ee810a6a50372b8ef92  archive/P84-CI-FIX/attempt1-shortname-anchors.txt
+978274bf6e26a9a071b363014fdf7a9be7ead2b761c35316b969d2d76a0bb075  archive/P84-CI-FIX/attempt1-test-fail-list-normalized.txt
+9700ec44b78ca953614dc78e1a82c192fd54ff8e40ea027844034fb1bf3f4634  archive/P84-CI-FIX/attempt1-unzip/0_Go windows-latest.txt
+7c440097dabb5440892ff1405a5f706499d6556022e0523379abed1fe087e39d  archive/P84-CI-FIX/attempt1-unzip/1_Go ubuntu-latest.txt
+9dd1d699fbd8996d81027795a9894be87ea2ade627aabea39ca23833ee8bb94a  archive/P84-CI-FIX/attempt1-unzip/Go ubuntu-latest/system.txt
+49a23ae6277630e1f3760f4fd1259cb3d60c5a0e05700f70091b968b5d051717  archive/P84-CI-FIX/attempt1-unzip/Go windows-latest/system.txt
+b77340a7cf91f81f26d386574d47d709e6d7cdcdb5599e80ddccc4905c2cdb18  archive/P84-CI-FIX/attempt1-windows-failed-log-excerpt.txt
+f117f9d9e4f81c2049dcc75f601ede5d21e8e2b226271db82ff52533cbccf18a  archive/P84-CI-FIX/attempt2-windows-failed-log-excerpt.txt
+f30dd6ce0a6756eb7c161a4d2d0b5ae2b38c24ecced5a795075ca86dcba1d33d  archive/P84-CI-FIX/full-go122-r4.txt
+fd75f002771f59f23dc6241e15968eeb485598856eacfaa2cdea2a84693607bb  archive/P84-CI-FIX/full-go127-r4.txt
+7b892f5bfb7157eb0d1682a7be2e7131157b3cc91aa7492f7e05be8f4ef247a4  archive/P84-CI-FIX/full-suite-go122-r2.txt
+20592f30cacec23d973e94a4f31d92e9a7d8c6142e3fa6d363064dfa064af7a8  archive/P84-CI-FIX/full-suite-go122-r3.txt
+d9dbb037eabd99ed63e38b079854d4f21559e306481401af19319919ffa4d0e8  archive/P84-CI-FIX/full-suite-go122.txt
+5877a51fe035aadad8fb062d55fe99b9d34620d1aa954a4d572c4b7fa7c48cda  archive/P84-CI-FIX/full-suite-go127-r2.txt
+a1f702b7a327328fc98233709dc380d3596154bb49791938f73644a7fc9dfb37  archive/P84-CI-FIX/full-suite-go127-r3.txt
+ece5959da1d76a8cf9b6211f2f90f2743a9c3fc6c404f2e3065aad17dfb4fa88  archive/P84-CI-FIX/full-suite-go127.txt
+bf254b24fec16497071d52cbdc13327a3d300eb0091675ca279d1fc27a7427a9  archive/P84-CI-FIX/gates-index-r4.txt
+bf254b24fec16497071d52cbdc13327a3d300eb0091675ca279d1fc27a7427a9  archive/P84-CI-FIX/gates-index-r6.txt
+abc7e9b6a2010fc4db010a59a3c57fa5607c81695b3c499d56fcdeee85114cd7  archive/P84-CI-FIX/gates-tree-r4.txt
+abc7e9b6a2010fc4db010a59a3c57fa5607c81695b3c499d56fcdeee85114cd7  archive/P84-CI-FIX/gates-tree-r6.txt
+d61e0e6dbec0cb457ca89cf6b6c08051e6c21367922415dde9eff82d25b10289  archive/P84-CI-FIX/r1-probe-output-go127.txt
+af142c51244bb2ad2b88e8ae81aa373fd0b5de8ec73aa0ba48b58a841c23a8c2  archive/P84-CI-FIX/r1-probe-output.txt
+71ddc7b5d3af8444dd9398b6e156a97e7fed944463702c669da69f5ae7fa690b  archive/P84-CI-FIX/r1r2-final-diff-r2.txt
+669fe92141cf8c851c483af716701677b68699cae6a2fba74d8d29c1fa6b7fdf  archive/P84-CI-FIX/r1r2-final-diff-r3.txt
+88e866260f7cd03c82e41da2fe82f05aff24f93ac6fbc77d7c54b0f91c98558c  archive/P84-CI-FIX/r1r2-final-diff-r4.txt
+88e866260f7cd03c82e41da2fe82f05aff24f93ac6fbc77d7c54b0f91c98558c  archive/P84-CI-FIX/r1r2-final-diff-r5.txt
+438d7355a9d485f37758d692c2baae918549037434cb9acfc5b8d59542fdbe66  archive/P84-CI-FIX/r1r2-final-diff-r6.txt
+d32699fae9078626ea7920f8188e86a7086090cf73c2169f8a48e40736b8bf53  archive/P84-CI-FIX/r1r2-final-diff.txt
+4852615361f6fa4949613e8e3e56b170e6e6241e4ac935cd5e057c45e1b1d09d  archive/P84-CI-FIX/w12-go122-r4.txt
+734e207315a607f91849bc6529e963539871b967a9e9d3adb7a2e76daab9b14d  archive/P84-CI-FIX/w12-go127-r4.txt
+35875921ca35f56b714a7476e1cd7429c2e2ca9f4d407f12476af47c5064bca8  freedom-list.md
+0d544419d1f2af483bfb97833c7c20918ecca627371a26dea23b850eb652872c  input-list.md

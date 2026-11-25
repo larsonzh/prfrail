@@ -1,0 +1,27 @@
+﻿# ⑧c 输入定向小读原文（P85 R=7 批 · Gemini 4 Carbon High · §1.7.4 临时授权 OB-143）
+
+TARGETED REVIEW: PASS WITH FIXES
+
+### 一、九项修复逐项判定
+
+1. **① Linux 目录槽 ACL fd 化 · CLOSED**：[BoundDir.AccessACL](internal/evidence/acl_linux.go#L59-L69) 经 `SYS_FGETXATTR` 直读已绑定的 `O_RDONLY` 目录 `fd`，[目录槽分支](internal/adapters/agent_runner_policy_write_guard_unix.go#L277-L286) 改走句柄不再按名读取；[观测拒绝分支](internal/adapters/agent_runner_policy_write_guard_unix.go#L163-L174) 重写为先执行 `managedAgentPolicyDomainAfterProbe` 再返回而非仅删改注释；[窗口登记](internal/adapters/agent_runner_policy_write_guard_unix.go#L101-L115) 已更正方向并如实收窄为非生产名义入口的内部 API 边界。
+2. **② Windows DACL 指纹入闭名对证 + 闭端根链复查 · CLOSED**：[Windows 槽位观测](internal/adapters/agent_runner_policy_write_guard_windows.go#L103-L144) 将全部按名读取（`installSourceMutationAccess` 与 `installSourceDescriptorDigest`）包入前后两次 `ClassifyRootChainNoReparse` 及 `FileIDAt` 对证之间，闭端之后无任何按名读取，覆盖完整。
+3. **③ Windows leaf 前后身份对证 · CLOSED**：[verifyInstallSourceImmutability](internal/adapters/ai_install_proof_windows.go#L172-L186) 要求非空 `leaf`，并在组件探测前与 [探测循环后](internal/adapters/ai_install_proof_windows.go#L261-L268) 各做一次 `FileIDAt(path) == leafIdentity` 对证；[不支持平台变体](internal/adapters/ai_install_proof_unsupported.go#L30-L34) 签名已同步且维持 fail-closed。
+4. **④ 目录槽夹具 + OpenBoundDirVerified 变异 + 用例补缺 · CLOSED**：[目录槽测试](internal/adapters/p85_r6_sandwich_linux_test.go#L99-L231) 补齐真实 `slot.dir` 扩展 ACL 判别腿与闭端核验腿，[跨平台根链测试](internal/adapters/p85_r7_open_bounddir_verified_test.go#L49-L108) 钉住 `openInstallSourceLeaf` 拒斥中间链接，[变异日志](docs/validation/evidence/P85-SECURITY-PROOF-SUBSYSTEM/archive/P85-SECURITY-PROOF-SUBSYSTEM/05-input/mutation-r6.txt#L38-L77) 已登记 MUT-4/MUT-5 变红与逐字节复原。
+5. **⑤ Role/后缀矛盾及大小写拒绝 · CLOSED**：[managedPolicyDomainResolveFileRole](internal/adapters/agent_runner_policy_write_guard.go#L217-L244) 拒绝显式 `Role` 与路径后缀矛盾及非小写契约后缀，句柄入口已接入并由 [角色后缀单测](internal/adapters/p85_r7_role_suffix_test.go#L18-L95) 覆盖（非生产名义入口见 Low-2）。
+6. **⑥ 名义入口按名 Getxattr 后二次 Lstat · CLOSED**：[managedAgentPolicyDomainAfterProbe](internal/adapters/agent_runner_policy_write_guard_unix.go#L191-L205) 在 `!hasHandle` 分支执行二次 `os.Lstat` 并完整核对 `Dev/Ino/Mode/Uid/Gid`。
+7. **⑦ 拒绝路径固定四槽、空槽 `∅` · CLOSED**：[Linux 观测汇总](internal/adapters/agent_runner_policy_write_guard_unix.go#L61-L67) 与 [Windows 观测汇总](internal/adapters/agent_runner_policy_write_guard_windows.go#L52-L58) 对 `present: true` 但返回空行的失败槽统一回填 `∅` 保位，[拒绝槽位单测](internal/adapters/p85_r7_refusal_slot_test.go#L22-L43) 确认 `:2` 拒绝摘要保持固定四槽。
+8. **⑧ Windows 发布残余注释改登 S1 独立边界 · CLOSED**：[策略发布](internal/console/agent_runner_policy_publish_other.go#L14-L20)、[载体发布](internal/console/ai_install_proof_publish_other.go#L13-L19)、[载体耐久说明](internal/console/ai_install_proof_publish_other.go#L84-L85)、[主文件尾注](internal/console/ai_install_proof.go#L256-L258) 及 [Linux 发布测试](internal/console/p85_f02_publish_handle_linux_test.go#L18-L19) 均已改登 S1 用户态路径独立边界，不再挂靠 F04 豁免（复用分支一处旧注见 Low-4）。
+9. **⑨ IDE 告警三类处置 · CLOSED**：[Unix 安装源](internal/adapters/ai_install_proof_unix.go#L132-L138)、[控制台策略](internal/console/agent_runner_policy.go#L351-L356) 与 [控制台安装源](internal/console/ai_install_proof.go#L168-L173) 及 [不支持变体](internal/adapters/ai_install_proof_unsupported.go#L12-L34) 共 9 处无引用函数已实删，全仓零悬空引用、零 `//nolint`；`managedAgentPolicyWriteProofDomain` 迁入 [internal/adapters/agent_runner_policy_write_guard_domain.go](internal/adapters/agent_runner_policy_write_guard_domain.go)、`boundRootName`/`errBoundRootArtifact` 迁入 [internal/evidence/bounddir_clean_root.go](internal/evidence/bounddir_clean_root.go)、`p85R4SwapPolicyDirectory` 迁入 [internal/console/p85_r4_linux_native_test.go](internal/console/p85_r4_linux_native_test.go#L42-L65)。
+
+### 二、新发现（0 Medium+，4 Low，均不阻断）
+
+- **Low-1 · [internal/adapters/p85_t3_windows_f04_tester_test.go](internal/adapters/p85_t3_windows_f04_tester_test.go#L218-L224)**：`TestP85T3DirectoryTableKeepsCreationRights` 仍调用 `verifyInstallSourceImmutability(executable, nil)`，R=7 起命中 [空句柄前置拒绝](internal/adapters/ai_install_proof_windows.go#L172-L174)（`facts.Windows == nil`）而提前返回，未再走到祖先创建权拒绝分支（生产端已由 `VerifyAIInstallSource` 用例覆盖，无放行风险）；建议后续改传已绑定 `*evidence.BoundFile` 并补一条 `leaf` 身份失配负例。
+- **Low-2 · [internal/adapters/agent_runner_policy_write_guard.go](internal/adapters/agent_runner_policy_write_guard.go#L337)**：非生产名义入口 `managedAgentPolicyDomainNameSlots` 仍直调 `managedPolicyDomainRoleFromName(clean)` 而非 `managedPolicyDomainResolveFileRole("", clean)`，大写角色后缀在名义入口会落入 `role=-1` 兜底而非拒绝；生产句柄入口不受影响。
+- **Low-3 · [internal/adapters/agent_runner_policy_write_guard_unix.go](internal/adapters/agent_runner_policy_write_guard_unix.go#L168-L174)**：`aclErr != nil` 时虽已执行 `managedAgentPolicyDomainAfterProbe`，但紧接 `return line, aclErr` 丢弃了可能非空的 `probeErr`（未做 `errors.Join`），仅影响伴随名称漂移时的附加诊断，不影响 fail-closed 结论。
+- **Low-4 · [internal/console/ai_install_proof.go](internal/console/ai_install_proof.go#L125) 与 [internal/evidence/acl_linux.go](internal/evidence/acl_linux.go#L97-L99)**：前者复用分支注释仍残留一处 `(F04/F10, registered)`；后者称路径形态调用方均在读后二次 `Lstat`，但 [安装源祖先链](internal/adapters/ai_install_proof_unix.go#L169-L185) 仅前置单次 `Lstat`（另 [不支持变体注释](internal/adapters/ai_install_proof_unsupported.go#L12) 称 Windows 亦声明 `installSourceInterpreter`，实仅 Linux 声明）。
+
+### 三、⑧c 口径
+
+- **可作 ⑧c 输入**：R=7 九项修复全部 CLOSED，0 Medium+、4 Low（纯白盒测试精度/非生产入口/诊断与注释微瑕），满足 §7.8 收敛条件；本次 `Gemini 4 Carbon` High 定向小读属 §1.7.4 临时授权（OB-143 留痕，不得作为先例）。
+- **F17/F22 口径维持**：不单独阻断代码复审，但缺证不得关片；⑨ 归档须绑定同一最终候选提交补齐双端全仓构建测试完整日志与退出码、非提升 Windows / 非 root Ubuntu 原生正对照及逐腿 `PASS/SKIP` 明细、MUT-4/MUT-5 具体 SHA-256 哈希读数及双腿 CI 包级 `ok` 证据，并在报告 §8 独立登记 Windows 发布路径 S1 边界（不挂 F04）。

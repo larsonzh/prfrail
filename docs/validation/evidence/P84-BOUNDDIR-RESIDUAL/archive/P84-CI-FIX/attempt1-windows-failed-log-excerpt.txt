@@ -1,0 +1,40 @@
+##[group]Run go test -count=1 ./...
+^[[36;1mgo test -count=1 ./...^[[0m
+shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+env:
+GO_VERSION: 1.22.12
+CGO_ENABLED: 0
+GOTOOLCHAIN: local
+##[endgroup]
+?   	github.com/larsonzh/prfrail/cmd/prfrail	[no test files]
+?   	github.com/larsonzh/prfrail/cmd/prfrail-release	[no test files]
+ok  	github.com/larsonzh/prfrail/examples/whois-shadow	0.028s
+?   	github.com/larsonzh/prfrail/tools/agent-probe/supervisor	[no test files]
+?   	github.com/larsonzh/prfrail/tools/b4-e2e	[no test files]
+--- FAIL: TestAgentRunnerPostflightPassesOnRecordedEvidence (0.14s)
+agent_runner_postflight_test.go:208: a clean recorded run must pass: {Outcome:uncertain Evidence:[] ErrorEvidence:[sha256:7e4012f9c8da9ccf56b2b666e894e1096d15141429e7ea78801cfec554712866]}
+--- FAIL: TestAgentRunnerPostflightRejectsTamperedLegs (2.00s)
+--- FAIL: TestAgentRunnerPostflightRejectsTamperedLegs/workspace_change_is_a_manifest_failure (0.22s)
+agent_runner_postflight_test.go:237: an unaccounted workspace write must fail: {Outcome:uncertain Evidence:[] ErrorEvidence:[sha256:7e4012f9c8da9ccf56b2b666e894e1096d15141429e7ea78801cfec554712866]}
+--- FAIL: TestAgentRunnerPostflightRejectsTamperedLegs/tampered_diff_artifact_is_a_diff_failure (0.72s)
+agent_runner_postflight_test.go:256: a tampered diff must fail on the diff leg: {Outcome:uncertain Evidence:[] ErrorEvidence:[sha256:7e4012f9c8da9ccf56b2b666e894e1096d15141429e7ea78801cfec554712866]}
+--- FAIL: TestAgentRunnerPostflightRejectsTamperedLegs/tampered_log_artifact_is_a_log_failure (0.12s)
+agent_runner_postflight_test.go:283: a tampered log must fail on the log leg: {Outcome:uncertain Evidence:[] ErrorEvidence:[sha256:7e4012f9c8da9ccf56b2b666e894e1096d15141429e7ea78801cfec554712866]}
+--- FAIL: TestAgentRunnerPostflightRejectsTamperedLegs/tampered_usage_artifact_is_a_usage_failure (0.22s)
+agent_runner_postflight_test.go:297: a tampered usage artifact must fail on the usage leg: {Outcome:uncertain Evidence:[] ErrorEvidence:[sha256:7e4012f9c8da9ccf56b2b666e894e1096d15141429e7ea78801cfec554712866]}
+--- FAIL: TestAgentRunnerPostflightRejectsTamperedLegs/a_rewritten_pid_report_is_a_pid-reports_failure (0.27s)
+agent_runner_postflight_test.go:315: a rewritten pid report must fail on the pid-reports leg: {Outcome:uncertain Evidence:[] ErrorEvidence:[sha256:7e4012f9c8da9ccf56b2b666e894e1096d15141429e7ea78801cfec554712866]}
+--- FAIL: TestAgentRunnerPostflightRejectsTamperedLegs/a_recorded_live_pid_is_a_process_failure (0.11s)
+agent_runner_postflight_test.go:337: a live recorded pid must fail on the process leg: {Outcome:uncertain Evidence:[] ErrorEvidence:[sha256:7e4012f9c8da9ccf56b2b666e894e1096d15141429e7ea78801cfec554712866]}
+--- FAIL: TestAgentRunnerPostflightRejectsTamperedLegs/a_secret_marker_in_the_workspace_is_a_secret_failure (0.21s)
+agent_runner_postflight_test.go:350: a secret marker must fail on the secret leg: {Outcome:uncertain Evidence:[] ErrorEvidence:[sha256:7e4012f9c8da9ccf56b2b666e894e1096d15141429e7ea78801cfec554712866]}
+--- FAIL: TestAgentRunnerPostflightRejectsArtifactsNotBoundToFrozenFacts (0.34s)
+--- FAIL: TestAgentRunnerPostflightRejectsArtifactsNotBoundToFrozenFacts/a_rewritten_post_manifest_is_a_manifest_failure (0.13s)
+agent_runner_postflight_test.go:396: a rewritten post manifest must fail on the manifest leg: {Outcome:uncertain Evidence:[] ErrorEvidence:[sha256:7e4012f9c8da9ccf56b2b666e894e1096d15141429e7ea78801cfec554712866]}
+--- FAIL: TestAgentRunnerPostflightRejectsArtifactsNotBoundToFrozenFacts/a_rewritten_diff_is_a_diff_failure (0.20s)
+agent_runner_postflight_test.go:420: a rewritten diff must fail on the diff leg: {Outcome:uncertain Evidence:[] ErrorEvidence:[sha256:7e4012f9c8da9ccf56b2b666e894e1096d15141429e7ea78801cfec554712866]}
+--- FAIL: TestAgentRunnerPostflightIsUncertainWithoutPIDReport (0.63s)
+--- FAIL: TestAgentRunnerPostflightIsUncertainWithoutPIDReport/both_pid_reports_deleted_is_uncertain (0.21s)
+agent_runner_postflight_test.go:467: the process leg must name the missing pid report: [sha256:7e4012f9c8da9ccf56b2b666e894e1096d15141429e7ea78801cfec554712866]
+--- FAIL: TestAgentRunnerPostflightIsUncertainWithoutPIDReport/a_missing_child_report_is_uncertain (0.16s)
+agent_runner_postflight_test.go:467: the process leg must name the missing pid report: [sha256:7e4012f9c8da9ccf56b2b666e894e1096d15141429e7ea78801cfec554712866]

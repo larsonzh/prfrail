@@ -1,0 +1,346 @@
+2026-11-21T06:47:43.8568713Z Current runner version: '2.338.2'
+2026-11-21T06:47:43.8593162Z ##[group]Runner Image Provisioner
+2026-11-21T06:47:43.8593899Z Hosted Compute Agent
+2026-11-21T06:47:43.8594402Z Version: 20261111.635
+2026-11-21T06:47:43.8594932Z Commit: b8a594ea514ff44cadb5342986c68b1eac6e22ed
+2026-11-21T06:47:43.8595823Z Build Date: 2026-11-11T01:49:01Z
+2026-11-21T06:47:43.8596427Z Worker ID: {dd52e4c4-dc55-4c19-bc20-2095c4be1b28}
+2026-11-21T06:47:43.8597074Z Region: westus3
+2026-11-21T06:47:43.8597544Z Cloud: Azure
+2026-11-21T06:47:43.8597988Z ##[endgroup]
+2026-11-21T06:47:43.8599301Z ##[group]Operating System
+2026-11-21T06:47:43.8599871Z Microsoft Windows Server 2025
+2026-11-21T06:47:43.8600376Z 10.0.26100
+2026-11-21T06:47:43.8600775Z Datacenter
+2026-11-21T06:47:43.8601214Z ##[endgroup]
+2026-11-21T06:47:43.8601674Z ##[group]Runner Image
+2026-11-21T06:47:43.8602169Z Image: windows-2025-vs2026
+2026-11-21T06:47:43.8602667Z Version: 20261116.315.1
+2026-11-21T06:47:43.8603986Z Included Software: https://github.com/actions/runner-images/blob/win25-vs2026/20261116.315/images/windows/Windows2025-VS2026-Readme.md
+2026-11-21T06:47:43.8605416Z Image Release: https://github.com/actions/runner-images/releases/tag/win25-vs2026%2F20261116.315
+2026-11-21T06:47:43.8606253Z ##[endgroup]
+2026-11-21T06:47:43.8607163Z ##[group]GITHUB_TOKEN Permissions
+2026-11-21T06:47:43.8609316Z Contents: read
+2026-11-21T06:47:43.8609803Z Metadata: read
+2026-11-21T06:47:43.8610241Z ##[endgroup]
+2026-11-21T06:47:43.8612156Z Secret source: Actions
+2026-11-21T06:47:43.8612900Z Cache mode: write
+2026-11-21T06:47:43.8613587Z Prepare workflow directory
+2026-11-21T06:47:43.8993803Z Prepare all required actions
+2026-11-21T06:47:43.9042215Z Getting action download info
+2026-11-21T06:47:44.2097497Z Download action repository 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+2026-11-21T06:47:44.3279623Z Download action repository 'actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e' (SHA:b7ad1dad31e06c5925ef5d2fc7ad053ef454303e)
+2026-11-21T06:47:45.0490874Z Complete job name: Go windows-latest
+2026-11-21T06:47:45.2160218Z ##[group]Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+2026-11-21T06:47:45.2162350Z with:
+2026-11-21T06:47:45.2163229Z   persist-credentials: false
+2026-11-21T06:47:45.2163899Z   fetch-depth: 0
+2026-11-21T06:47:45.2164441Z   repository: larsonzh/prfrail
+2026-11-21T06:47:45.2168511Z   token: ***
+2026-11-21T06:47:45.2169004Z   ssh-strict: true
+2026-11-21T06:47:45.2169520Z   ssh-user: git
+2026-11-21T06:47:45.2169998Z   clean: true
+2026-11-21T06:47:45.2170516Z   sparse-checkout-cone-mode: true
+2026-11-21T06:47:45.2171106Z   fetch-tags: false
+2026-11-21T06:47:45.2171609Z   show-progress: true
+2026-11-21T06:47:45.2172112Z   lfs: false
+2026-11-21T06:47:45.2172579Z   submodules: false
+2026-11-21T06:47:45.2173111Z   set-safe-directory: true
+2026-11-21T06:47:45.2173682Z   allow-unsafe-pr-checkout: false
+2026-11-21T06:47:45.2174601Z env:
+2026-11-21T06:47:45.2175141Z   GO_VERSION: 1.22.12
+2026-11-21T06:47:45.2175641Z   CGO_ENABLED: 0
+2026-11-21T06:47:45.2176210Z   GOTOOLCHAIN: local
+2026-11-21T06:47:45.2176744Z ##[endgroup]
+2026-11-21T06:47:45.3783308Z Syncing repository: larsonzh/prfrail
+2026-11-21T06:47:45.3785196Z ##[group]Getting Git version info
+2026-11-21T06:47:45.3785840Z Working directory is 'D:\a\prfrail\prfrail'
+2026-11-21T06:47:45.4581194Z [command]"C:\Program Files\Git\bin\git.exe" version
+2026-11-21T06:47:45.7696631Z git version 2.56.1.windows.1
+2026-11-21T06:47:45.7753303Z ##[endgroup]
+2026-11-21T06:47:45.7769002Z Temporarily overriding HOME='D:\a\_temp\880ed2a1-0920-4681-a80e-aa75cbbec82c' before making global git config changes
+2026-11-21T06:47:45.7771549Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-21T06:47:45.7778715Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\prfrail\prfrail
+2026-11-21T06:47:45.8597365Z Deleting the contents of 'D:\a\prfrail\prfrail'
+2026-11-21T06:47:45.8603079Z ##[group]Determining repository object format
+2026-11-21T06:47:45.8605256Z ##[endgroup]
+2026-11-21T06:47:45.8606742Z ##[group]Initializing the repository
+2026-11-21T06:47:45.8614036Z [command]"C:\Program Files\Git\bin\git.exe" init D:\a\prfrail\prfrail
+2026-11-21T06:47:45.9507148Z Initialized empty Git repository in D:/a/prfrail/prfrail/.git/
+2026-11-21T06:47:45.9564270Z [command]"C:\Program Files\Git\bin\git.exe" remote add origin https://github.com/larsonzh/prfrail
+2026-11-21T06:47:46.0231681Z ##[endgroup]
+2026-11-21T06:47:46.0234514Z ##[group]Disabling automatic garbage collection
+2026-11-21T06:47:46.0241288Z [command]"C:\Program Files\Git\bin\git.exe" config --local gc.auto 0
+2026-11-21T06:47:46.0645973Z ##[endgroup]
+2026-11-21T06:47:46.0648275Z ##[group]Setting up auth
+2026-11-21T06:47:46.0649957Z Removing SSH command configuration
+2026-11-21T06:47:46.0658911Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+2026-11-21T06:47:46.1055283Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+2026-11-21T06:47:47.7727982Z Removing HTTP extra header
+2026-11-21T06:47:47.7740068Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-21T06:47:47.8169723Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+2026-11-21T06:47:48.3854793Z Removing includeIf entries pointing to credentials config files
+2026-11-21T06:47:48.3870479Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-21T06:47:48.4271572Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+2026-11-21T06:47:48.9753706Z [command]"C:\Program Files\Git\bin\git.exe" config --file D:\a\_temp\git-credentials-41f16a6d-48af-4bc1-b352-8f00e418b581.config http.https://github.com/.extraheader "AUTHORIZATION: basic ***"
+2026-11-21T06:47:49.0157803Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:D:/a/prfrail/prfrail/.git.path D:\a\_temp\git-credentials-41f16a6d-48af-4bc1-b352-8f00e418b581.config
+2026-11-21T06:47:49.0561445Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:D:/a/prfrail/prfrail/.git/worktrees/*.path D:\a\_temp\git-credentials-41f16a6d-48af-4bc1-b352-8f00e418b581.config
+2026-11-21T06:47:49.1007640Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-41f16a6d-48af-4bc1-b352-8f00e418b581.config
+2026-11-21T06:47:49.1400806Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-41f16a6d-48af-4bc1-b352-8f00e418b581.config
+2026-11-21T06:47:49.1809686Z ##[endgroup]
+2026-11-21T06:47:49.1810255Z ##[group]Fetching the repository
+2026-11-21T06:47:49.1823015Z [command]"C:\Program Files\Git\bin\git.exe" -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+2026-11-21T06:47:51.7637450Z From https://github.com/larsonzh/prfrail
+2026-11-21T06:47:51.7638910Z  * [new branch]      main                 -> origin/main
+2026-11-21T06:47:51.7639590Z  * [new branch]      t017-first-candidate -> origin/t017-first-candidate
+2026-11-21T06:47:51.7640142Z  * [new tag]         v0.1.0               -> v0.1.0
+2026-11-21T06:47:51.7696156Z [command]"C:\Program Files\Git\bin\git.exe" branch --list --remote origin/main
+2026-11-21T06:47:51.8113510Z   origin/main
+2026-11-21T06:47:51.8165389Z [command]"C:\Program Files\Git\bin\git.exe" rev-parse refs/remotes/origin/main
+2026-11-21T06:47:51.8562125Z d597f1eba1e9d2b94253cd3e61a312e2777e4b71
+2026-11-21T06:47:51.8604170Z ##[endgroup]
+2026-11-21T06:47:51.8604554Z ##[group]Determining the checkout info
+2026-11-21T06:47:51.8605140Z ##[endgroup]
+2026-11-21T06:47:51.8613951Z [command]"C:\Program Files\Git\bin\git.exe" sparse-checkout disable
+2026-11-21T06:47:51.9136255Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all extensions.worktreeConfig
+2026-11-21T06:47:51.9524439Z ##[group]Checking out the ref
+2026-11-21T06:47:51.9538312Z [command]"C:\Program Files\Git\bin\git.exe" checkout --progress --force -B main refs/remotes/origin/main
+2026-11-21T06:47:53.0360960Z Updating files:  87% (4390/5044)
+2026-11-21T06:47:53.0511324Z Updating files:  88% (4439/5044)
+2026-11-21T06:47:53.0638863Z Updating files:  89% (4490/5044)
+2026-11-21T06:47:53.0752252Z Updating files:  90% (4540/5044)
+2026-11-21T06:47:53.0872901Z Updating files:  91% (4591/5044)
+2026-11-21T06:47:53.1000314Z Updating files:  92% (4641/5044)
+2026-11-21T06:47:53.1115339Z Updating files:  93% (4691/5044)
+2026-11-21T06:47:53.1227011Z Updating files:  94% (4742/5044)
+2026-11-21T06:47:53.1337678Z Updating files:  95% (4792/5044)
+2026-11-21T06:47:53.1486993Z Updating files:  96% (4843/5044)
+2026-11-21T06:47:53.1618190Z Updating files:  97% (4893/5044)
+2026-11-21T06:47:53.1743464Z Updating files:  98% (4944/5044)
+2026-11-21T06:47:53.1835426Z Updating files:  99% (4994/5044)
+2026-11-21T06:47:53.1838345Z Updating files: 100% (5044/5044)
+2026-11-21T06:47:53.1838770Z Updating files: 100% (5044/5044), done.
+2026-11-21T06:47:53.2028152Z Switched to a new branch 'main'
+2026-11-21T06:47:53.2052448Z branch 'main' set up to track 'origin/main'.
+2026-11-21T06:47:53.2135221Z ##[endgroup]
+2026-11-21T06:47:53.2618981Z [command]"C:\Program Files\Git\bin\git.exe" log -1 --format=%H
+2026-11-21T06:47:53.2971698Z d597f1eba1e9d2b94253cd3e61a312e2777e4b71
+2026-11-21T06:47:53.3020239Z ##[group]Removing auth
+2026-11-21T06:47:53.3021630Z Removing SSH command configuration
+2026-11-21T06:47:53.3029310Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+2026-11-21T06:47:53.3449374Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+2026-11-21T06:47:53.9660326Z Removing HTTP extra header
+2026-11-21T06:47:53.9669913Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-21T06:47:54.0068866Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+2026-11-21T06:47:54.5603025Z Removing includeIf entries pointing to credentials config files
+2026-11-21T06:47:54.5610889Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-21T06:47:54.5955082Z includeif.gitdir:D:/a/prfrail/prfrail/.git.path
+2026-11-21T06:47:54.5955909Z includeif.gitdir:D:/a/prfrail/prfrail/.git/worktrees/*.path
+2026-11-21T06:47:54.5957068Z includeif.gitdir:/github/workspace/.git.path
+2026-11-21T06:47:54.5957408Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-11-21T06:47:54.6011657Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:D:/a/prfrail/prfrail/.git.path
+2026-11-21T06:47:54.6343275Z D:\a\_temp\git-credentials-41f16a6d-48af-4bc1-b352-8f00e418b581.config
+2026-11-21T06:47:54.6395145Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:D:/a/prfrail/prfrail/.git.path D\:\\a\\_temp\\git\-credentials\-41f16a6d\-48af\-4bc1\-b352\-8f00e418b581\.config
+2026-11-21T06:47:54.6781996Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:D:/a/prfrail/prfrail/.git/worktrees/*.path
+2026-11-21T06:47:54.7109267Z D:\a\_temp\git-credentials-41f16a6d-48af-4bc1-b352-8f00e418b581.config
+2026-11-21T06:47:54.7159449Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:D:/a/prfrail/prfrail/.git/worktrees/*.path D\:\\a\\_temp\\git\-credentials\-41f16a6d\-48af\-4bc1\-b352\-8f00e418b581\.config
+2026-11-21T06:47:54.7539868Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:/github/workspace/.git.path
+2026-11-21T06:47:54.7879676Z /github/runner_temp/git-credentials-41f16a6d-48af-4bc1-b352-8f00e418b581.config
+2026-11-21T06:47:54.7930320Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-41f16a6d\-48af\-4bc1\-b352\-8f00e418b581\.config
+2026-11-21T06:47:54.8326083Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-11-21T06:47:54.8670542Z /github/runner_temp/git-credentials-41f16a6d-48af-4bc1-b352-8f00e418b581.config
+2026-11-21T06:47:54.8720970Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-41f16a6d\-48af\-4bc1\-b352\-8f00e418b581\.config
+2026-11-21T06:47:54.9116310Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+2026-11-21T06:47:55.4815061Z Removing credentials config 'D:\a\_temp\git-credentials-41f16a6d-48af-4bc1-b352-8f00e418b581.config'
+2026-11-21T06:47:55.4826698Z ##[endgroup]
+2026-11-21T06:47:55.5244828Z ##[group]Run actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
+2026-11-21T06:47:55.5245337Z with:
+2026-11-21T06:47:55.5245524Z   go-version: 1.22.12
+2026-11-21T06:47:55.5245725Z   cache: true
+2026-11-21T06:47:55.5245938Z   check-latest: false
+2026-11-21T06:47:55.5248126Z   token: ***
+2026-11-21T06:47:55.5248368Z env:
+2026-11-21T06:47:55.5248528Z   GO_VERSION: 1.22.12
+2026-11-21T06:47:55.5248709Z   CGO_ENABLED: 0
+2026-11-21T06:47:55.5248908Z   GOTOOLCHAIN: local
+2026-11-21T06:47:55.5249089Z ##[endgroup]
+2026-11-21T06:47:55.6754242Z Setup go version spec 1.22.12
+2026-11-21T06:47:55.6765607Z Attempting to download 1.22.12...
+2026-11-21T06:47:56.6197368Z matching 1.22.12...
+2026-11-21T06:47:56.6218035Z Acquiring 1.22.12 from https://github.com/actions/go-versions/releases/download/1.22.12-13149489080/go-1.22.12-win32-x64.zip
+2026-11-21T06:47:57.3650048Z Extracting Go...
+2026-11-21T06:47:57.4633632Z [command]"C:\Program Files\PowerShell\7\pwsh.exe" -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Unrestricted -Command "$ErrorActionPreference = 'Stop' ; try { Add-Type -AssemblyName System.IO.Compression.ZipFile } catch { } ; try { [System.IO.Compression.ZipFile]::ExtractToDirectory('D:\a\_temp\go-1.22.12-win32-x64.zip', 'D:\a\_temp\784a50e9-5544-48fd-b30c-4b81457d8cf7', $true) } catch { if (($_.Exception.GetType().FullName -eq 'System.Management.Automation.MethodException') -or ($_.Exception.GetType().FullName -eq 'System.Management.Automation.RuntimeException') ){ Expand-Archive -LiteralPath 'D:\a\_temp\go-1.22.12-win32-x64.zip' -DestinationPath 'D:\a\_temp\784a50e9-5544-48fd-b30c-4b81457d8cf7' -Force } else { throw $_ } } ;"
+2026-11-21T06:48:01.0269758Z Successfully extracted go to D:\a\_temp\784a50e9-5544-48fd-b30c-4b81457d8cf7
+2026-11-21T06:48:01.0270177Z Adding to the cache ...
+2026-11-21T06:48:09.1492717Z Created link C:\hostedtoolcache\windows\go\1.22.12\x64 => D:\hostedtoolcache\windows\go\1.22.12\x64
+2026-11-21T06:48:09.1496203Z Created link C:\hostedtoolcache\windows\go\1.22.12\x64.complete => D:\hostedtoolcache\windows\go\1.22.12\x64.complete
+2026-11-21T06:48:09.1497349Z Successfully cached go to C:\hostedtoolcache\windows\go\1.22.12\x64
+2026-11-21T06:48:09.1502779Z Added go to the path
+2026-11-21T06:48:09.1506038Z Successfully set up Go version 1.22.12
+2026-11-21T06:48:09.4733831Z [command]C:\hostedtoolcache\windows\go\1.22.12\x64\bin\go.exe env GOMODCACHE
+2026-11-21T06:48:09.4786230Z [command]C:\hostedtoolcache\windows\go\1.22.12\x64\bin\go.exe env GOCACHE
+2026-11-21T06:48:09.5171265Z C:\Users\runneradmin\go\pkg\mod
+2026-11-21T06:48:09.5173877Z C:\Users\runneradmin\AppData\Local\go-build
+2026-11-21T06:48:09.8306149Z Cache hit for: setup-go-Windows-x64-go-1.22.12-2f07b6ec62ba90bcd08e45ebcc765a7ea2fd8104887fdaad445ddb80e0e00ca7
+2026-11-21T06:48:10.8676159Z Received 33757192 of 33757192 (100.0%), 39.7 MBs/sec
+2026-11-21T06:48:10.8679015Z Cache Size: ~32 MB (33757192 B)
+2026-11-21T06:48:10.8761881Z [command]"C:\Program Files\Git\usr\bin\tar.exe" -xf D:/a/_temp/eff437d4-dfbf-48f3-b5de-13819334ac02/cache.tzst -P -C D:/a/prfrail/prfrail --force-local --use-compress-program "zstd -d"
+2026-11-21T06:48:13.4840055Z Cache restored successfully
+2026-11-21T06:48:13.4884034Z Cache restored from key: setup-go-Windows-x64-go-1.22.12-2f07b6ec62ba90bcd08e45ebcc765a7ea2fd8104887fdaad445ddb80e0e00ca7
+2026-11-21T06:48:13.4903957Z go version go1.22.12 windows/amd64
+2026-11-21T06:48:13.4904162Z 
+2026-11-21T06:48:13.4904444Z ##[group]go env
+2026-11-21T06:48:13.9719776Z set GO111MODULE=
+2026-11-21T06:48:13.9720287Z set GOARCH=amd64
+2026-11-21T06:48:13.9720575Z set GOBIN=
+2026-11-21T06:48:13.9720948Z set GOCACHE=C:\Users\runneradmin\AppData\Local\go-build
+2026-11-21T06:48:13.9721489Z set GOENV=C:\Users\runneradmin\AppData\Roaming\go\env
+2026-11-21T06:48:13.9721920Z set GOEXE=.exe
+2026-11-21T06:48:13.9722223Z set GOEXPERIMENT=
+2026-11-21T06:48:13.9722509Z set GOFLAGS=
+2026-11-21T06:48:13.9722788Z set GOHOSTARCH=amd64
+2026-11-21T06:48:13.9725565Z set GOHOSTOS=windows
+2026-11-21T06:48:13.9726011Z set GOINSECURE=
+2026-11-21T06:48:13.9726445Z set GOMODCACHE=C:\Users\runneradmin\go\pkg\mod
+2026-11-21T06:48:13.9726865Z set GONOPROXY=
+2026-11-21T06:48:13.9727166Z set GONOSUMDB=
+2026-11-21T06:48:13.9727475Z set GOOS=windows
+2026-11-21T06:48:13.9727858Z set GOPATH=C:\Users\runneradmin\go
+2026-11-21T06:48:13.9728252Z set GOPRIVATE=
+2026-11-21T06:48:13.9728642Z set GOPROXY=https://proxy.golang.org,direct
+2026-11-21T06:48:13.9729063Z set GOROOT=C:\hostedtoolcache\windows\go\1.22.12\x64
+2026-11-21T06:48:13.9729372Z set GOSUMDB=sum.golang.org
+2026-11-21T06:48:13.9729590Z set GOTMPDIR=
+2026-11-21T06:48:13.9729782Z set GOTOOLCHAIN=local
+2026-11-21T06:48:13.9730115Z set GOTOOLDIR=C:\hostedtoolcache\windows\go\1.22.12\x64\pkg\tool\windows_amd64
+2026-11-21T06:48:13.9730486Z set GOVCS=
+2026-11-21T06:48:13.9730674Z set GOVERSION=go1.22.12
+2026-11-21T06:48:13.9730880Z set GCCGO=gccgo
+2026-11-21T06:48:13.9731063Z set GOAMD64=v1
+2026-11-21T06:48:13.9731248Z set AR=ar
+2026-11-21T06:48:13.9731423Z set CC=gcc
+2026-11-21T06:48:13.9731589Z set CXX=g++
+2026-11-21T06:48:13.9731759Z set CGO_ENABLED=0
+2026-11-21T06:48:13.9731979Z set GOMOD=D:\a\prfrail\prfrail\go.mod
+2026-11-21T06:48:13.9732258Z set GOWORK=
+2026-11-21T06:48:13.9732490Z set CGO_CFLAGS=-O2 -g
+2026-11-21T06:48:13.9732746Z set CGO_CPPFLAGS=
+2026-11-21T06:48:13.9732962Z set CGO_CXXFLAGS=-O2 -g
+2026-11-21T06:48:13.9733175Z set CGO_FFLAGS=-O2 -g
+2026-11-21T06:48:13.9733375Z set CGO_LDFLAGS=-O2 -g
+2026-11-21T06:48:13.9733591Z set PKG_CONFIG=pkg-config
+2026-11-21T06:48:13.9734275Z set GOGCCFLAGS=-m64 -Wl,--no-gc-sections -fmessage-length=0 -ffile-prefix-map=C:\Users\RUNNER~1\AppData\Local\Temp\go-build3232953145=/tmp/go-build -gno-record-gcc-switches
+2026-11-21T06:48:13.9735127Z 
+2026-11-21T06:48:13.9735449Z ##[endgroup]
+2026-11-21T06:48:14.0073989Z ##[group]Run go build ./...
+2026-11-21T06:48:14.0074343Z [36;1mgo build ./...[0m
+2026-11-21T06:48:14.0603483Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+2026-11-21T06:48:14.0603841Z env:
+2026-11-21T06:48:14.0604027Z   GO_VERSION: 1.22.12
+2026-11-21T06:48:14.0604233Z   CGO_ENABLED: 0
+2026-11-21T06:48:14.0604424Z   GOTOOLCHAIN: local
+2026-11-21T06:48:14.0605676Z ##[endgroup]
+2026-11-21T06:48:23.6817414Z ##[group]Run go vet ./...
+2026-11-21T06:48:23.6817784Z [36;1mgo vet ./...[0m
+2026-11-21T06:48:23.6887970Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+2026-11-21T06:48:23.6888320Z env:
+2026-11-21T06:48:23.6888503Z   GO_VERSION: 1.22.12
+2026-11-21T06:48:23.6888692Z   CGO_ENABLED: 0
+2026-11-21T06:48:23.6888883Z   GOTOOLCHAIN: local
+2026-11-21T06:48:23.6889090Z ##[endgroup]
+2026-11-21T06:48:29.8792336Z ##[group]Run go test -count=1 ./...
+2026-11-21T06:48:29.8792707Z [36;1mgo test -count=1 ./...[0m
+2026-11-21T06:48:29.8861697Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+2026-11-21T06:48:29.8862054Z env:
+2026-11-21T06:48:29.8862257Z   GO_VERSION: 1.22.12
+2026-11-21T06:48:29.8862460Z   CGO_ENABLED: 0
+2026-11-21T06:48:29.8862706Z   GOTOOLCHAIN: local
+2026-11-21T06:48:29.8862935Z ##[endgroup]
+2026-11-21T06:48:35.0671039Z ?   	github.com/larsonzh/prfrail/cmd/prfrail	[no test files]
+2026-11-21T06:48:35.0762816Z ?   	github.com/larsonzh/prfrail/cmd/prfrail-release	[no test files]
+2026-11-21T06:48:35.1395297Z ok  	github.com/larsonzh/prfrail/examples/whois-shadow	0.028s
+2026-11-21T06:48:55.5076558Z ?   	github.com/larsonzh/prfrail/tools/agent-probe/supervisor	[no test files]
+2026-11-21T06:48:56.0523391Z ?   	github.com/larsonzh/prfrail/tools/b4-e2e	[no test files]
+2026-11-21T06:49:12.0190246Z --- FAIL: TestAgentRunnerPostflightPassesOnRecordedEvidence (0.14s)
+2026-11-21T06:49:12.0193205Z     agent_runner_postflight_test.go:208: a clean recorded run must pass: {Outcome:uncertain Evidence:[] ErrorEvidence:[sha256:7e4012f9c8da9ccf56b2b666e894e1096d15141429e7ea78801cfec554712866]}
+2026-11-21T06:49:12.0194688Z --- FAIL: TestAgentRunnerPostflightRejectsTamperedLegs (2.00s)
+2026-11-21T06:49:12.0195872Z     --- FAIL: TestAgentRunnerPostflightRejectsTamperedLegs/workspace_change_is_a_manifest_failure (0.22s)
+2026-11-21T06:49:12.0198142Z         agent_runner_postflight_test.go:237: an unaccounted workspace write must fail: {Outcome:uncertain Evidence:[] ErrorEvidence:[sha256:7e4012f9c8da9ccf56b2b666e894e1096d15141429e7ea78801cfec554712866]}
+2026-11-21T06:49:12.0200018Z     --- FAIL: TestAgentRunnerPostflightRejectsTamperedLegs/tampered_diff_artifact_is_a_diff_failure (0.72s)
+2026-11-21T06:49:12.0202210Z         agent_runner_postflight_test.go:256: a tampered diff must fail on the diff leg: {Outcome:uncertain Evidence:[] ErrorEvidence:[sha256:7e4012f9c8da9ccf56b2b666e894e1096d15141429e7ea78801cfec554712866]}
+2026-11-21T06:49:12.0204045Z     --- FAIL: TestAgentRunnerPostflightRejectsTamperedLegs/tampered_log_artifact_is_a_log_failure (0.12s)
+2026-11-21T06:49:12.0206239Z         agent_runner_postflight_test.go:283: a tampered log must fail on the log leg: {Outcome:uncertain Evidence:[] ErrorEvidence:[sha256:7e4012f9c8da9ccf56b2b666e894e1096d15141429e7ea78801cfec554712866]}
+2026-11-21T06:49:12.0208112Z     --- FAIL: TestAgentRunnerPostflightRejectsTamperedLegs/tampered_usage_artifact_is_a_usage_failure (0.22s)
+2026-11-21T06:49:12.0210776Z         agent_runner_postflight_test.go:297: a tampered usage artifact must fail on the usage leg: {Outcome:uncertain Evidence:[] ErrorEvidence:[sha256:7e4012f9c8da9ccf56b2b666e894e1096d15141429e7ea78801cfec554712866]}
+2026-11-21T06:49:12.0212728Z     --- FAIL: TestAgentRunnerPostflightRejectsTamperedLegs/a_rewritten_pid_report_is_a_pid-reports_failure (0.27s)
+2026-11-21T06:49:12.0215149Z         agent_runner_postflight_test.go:315: a rewritten pid report must fail on the pid-reports leg: {Outcome:uncertain Evidence:[] ErrorEvidence:[sha256:7e4012f9c8da9ccf56b2b666e894e1096d15141429e7ea78801cfec554712866]}
+2026-11-21T06:49:12.0217108Z     --- FAIL: TestAgentRunnerPostflightRejectsTamperedLegs/a_recorded_live_pid_is_a_process_failure (0.11s)
+2026-11-21T06:49:12.0219340Z         agent_runner_postflight_test.go:337: a live recorded pid must fail on the process leg: {Outcome:uncertain Evidence:[] ErrorEvidence:[sha256:7e4012f9c8da9ccf56b2b666e894e1096d15141429e7ea78801cfec554712866]}
+2026-11-21T06:49:12.0221663Z     --- FAIL: TestAgentRunnerPostflightRejectsTamperedLegs/a_secret_marker_in_the_workspace_is_a_secret_failure (0.21s)
+2026-11-21T06:49:12.0223984Z         agent_runner_postflight_test.go:350: a secret marker must fail on the secret leg: {Outcome:uncertain Evidence:[] ErrorEvidence:[sha256:7e4012f9c8da9ccf56b2b666e894e1096d15141429e7ea78801cfec554712866]}
+2026-11-21T06:49:12.0227581Z --- FAIL: TestAgentRunnerPostflightRejectsArtifactsNotBoundToFrozenFacts (0.34s)
+2026-11-21T06:49:12.0229209Z     --- FAIL: TestAgentRunnerPostflightRejectsArtifactsNotBoundToFrozenFacts/a_rewritten_post_manifest_is_a_manifest_failure (0.13s)
+2026-11-21T06:49:12.0232113Z         agent_runner_postflight_test.go:396: a rewritten post manifest must fail on the manifest leg: {Outcome:uncertain Evidence:[] ErrorEvidence:[sha256:7e4012f9c8da9ccf56b2b666e894e1096d15141429e7ea78801cfec554712866]}
+2026-11-21T06:49:12.0234153Z     --- FAIL: TestAgentRunnerPostflightRejectsArtifactsNotBoundToFrozenFacts/a_rewritten_diff_is_a_diff_failure (0.20s)
+2026-11-21T06:49:12.0236542Z         agent_runner_postflight_test.go:420: a rewritten diff must fail on the diff leg: {Outcome:uncertain Evidence:[] ErrorEvidence:[sha256:7e4012f9c8da9ccf56b2b666e894e1096d15141429e7ea78801cfec554712866]}
+2026-11-21T06:49:12.0238129Z --- FAIL: TestAgentRunnerPostflightIsUncertainWithoutPIDReport (0.63s)
+2026-11-21T06:49:12.0239641Z     --- FAIL: TestAgentRunnerPostflightIsUncertainWithoutPIDReport/both_pid_reports_deleted_is_uncertain (0.21s)
+2026-11-21T06:49:12.0240811Z         agent_runner_postflight_test.go:467: the process leg must name the missing pid report: [sha256:7e4012f9c8da9ccf56b2b666e894e1096d15141429e7ea78801cfec554712866]
+2026-11-21T06:49:12.0241939Z     --- FAIL: TestAgentRunnerPostflightIsUncertainWithoutPIDReport/a_missing_child_report_is_uncertain (0.16s)
+2026-11-21T06:49:12.0243012Z         agent_runner_postflight_test.go:467: the process leg must name the missing pid report: [sha256:7e4012f9c8da9ccf56b2b666e894e1096d15141429e7ea78801cfec554712866]
+2026-11-21T06:49:12.0244059Z     --- FAIL: TestAgentRunnerPostflightIsUncertainWithoutPIDReport/a_missing_parent_report_is_uncertain (0.26s)
+2026-11-21T06:49:12.0245306Z         agent_runner_postflight_test.go:467: the process leg must name the missing pid report: [sha256:7e4012f9c8da9ccf56b2b666e894e1096d15141429e7ea78801cfec554712866]
+2026-11-21T06:49:12.0246042Z --- FAIL: TestBoundDirJunctionInsideBoundAdmitted (0.02s)
+2026-11-21T06:49:12.0247754Z     bounddir_escape_windows_test.go:112: a junction staying inside the bound directory must be admitted: open j\f: evidence: intermediate reparse point j resolves to C:\Users\RUNNER~1\AppData\Local\Temp\TestBoundDirJunctionInsideBoundAdmitted4114860051\001\D\sub, which is outside the bound directory C:\Users\runneradmin\AppData\Local\Temp\TestBoundDirJunctionInsideBoundAdmitted4114860051\001\D
+2026-11-21T06:49:12.0249449Z --- FAIL: TestBoundDirReadSurvivesAncestorReplacement (0.00s)
+2026-11-21T06:49:12.0250288Z     evidence_bind_dir_windows_test.go:70: ReadAll through the bound directory: read f.txt: The parameter is incorrect.
+2026-11-21T06:49:12.0250918Z --- FAIL: TestStoreReadBoundEvidenceSurvivesAncestorReplacement (0.01s)
+2026-11-21T06:49:12.0251709Z     evidence_bind_semantics_test.go:56: readBoundEvidence through the bound directory: read request-one\f.txt: The parameter is incorrect.
+2026-11-21T06:49:12.0252266Z FAIL
+2026-11-21T06:49:12.0252545Z FAIL	github.com/larsonzh/prfrail/internal/adapters	36.103s
+2026-11-21T06:49:12.0252939Z ok  	github.com/larsonzh/prfrail/internal/applier	5.685s
+2026-11-21T06:49:12.0253301Z ok  	github.com/larsonzh/prfrail/internal/chain	4.899s
+2026-11-21T06:49:12.0253661Z ok  	github.com/larsonzh/prfrail/internal/console	31.940s
+2026-11-21T06:49:12.0254062Z --- FAIL: TestP84W2IntermediateJunctionInsideIsAdmitted (0.03s)
+2026-11-21T06:49:12.0256064Z     p84_bounddir_residual_test.go:239: an intermediate junction staying inside the bound object must be admitted: open j\f: evidence: intermediate reparse point j resolves to C:\Users\RUNNER~1\AppData\Local\Temp\TestP84W2IntermediateJunctionInsideIsAdmitted4264393877\001\bound\sub, which is outside the bound directory C:\Users\runneradmin\AppData\Local\Temp\TestP84W2IntermediateJunctionInsideIsAdmitted4264393877\001\bound
+2026-11-21T06:49:12.0257797Z --- FAIL: TestP84W5bChainedJunctionSuffixIsRefused (0.06s)
+2026-11-21T06:49:12.0260079Z     p84_bounddir_residual_test.go:348: an in-bound chained junction must be admitted, got open k\f: evidence: intermediate reparse point k resolves to C:\Users\RUNNER~1\AppData\Local\Temp\TestP84W5bChainedJunctionSuffixIsRefused4025878453\001\D\hop, which is outside the bound directory C:\Users\runneradmin\AppData\Local\Temp\TestP84W5bChainedJunctionSuffixIsRefused4025878453\001\D
+2026-11-21T06:49:12.0262007Z --- FAIL: TestP84W8TrailingBlankingCodePointIsNotStrippedFromTheStoredTarget (0.01s)
+2026-11-21T06:49:12.0262837Z     p84_bounddir_residual_test.go:764: the control artifact must read the bound bytes, got "" err=read f: The parameter is incorrect.
+2026-11-21T06:49:12.0263444Z --- FAIL: TestP84W9NonCanonicalStoredTargetIsRefused (0.01s)
+2026-11-21T06:49:12.0264025Z     --- FAIL: TestP84W9NonCanonicalStoredTargetIsRefused/production-chain-canonical (0.00s)
+2026-11-21T06:49:12.0266395Z         p84_bounddir_residual_test.go:869: a canonical in-bound stored target must stay admitted, got evidence: intermediate reparse point mid resolves to C:\Users\RUNNER~1\AppData\Local\Temp\TestP84W9NonCanonicalStoredTargetIsRefusedproduction-chain-canonical1690282450\001\Bound\sub, which is outside the bound directory C:\Users\runneradmin\AppData\Local\Temp\TestP84W9NonCanonicalStoredTargetIsRefusedproduction-chain-canonical1690282450\001\Bound
+2026-11-21T06:49:12.0268351Z FAIL
+2026-11-21T06:49:12.0268622Z FAIL	github.com/larsonzh/prfrail/internal/evidence	0.743s
+2026-11-21T06:49:12.0269033Z --- FAIL: TestP83Fix7T4aGlobNamesComeFromTheBoundObject (0.04s)
+2026-11-21T06:49:12.0269626Z     p83_fixround7_tester_test.go:117: the run must collect the bound object's artifact, got gate failed
+2026-11-21T06:49:12.0270156Z --- FAIL: TestRunnerPersistsPassedResultAndArtifacts (0.00s)
+2026-11-21T06:49:12.0270537Z     runner_test.go:86: gate failed
+2026-11-21T06:49:12.0270769Z FAIL
+2026-11-21T06:49:12.0271008Z FAIL	github.com/larsonzh/prfrail/internal/gates	0.900s
+2026-11-21T06:49:12.0271353Z ok  	github.com/larsonzh/prfrail/internal/guard	3.630s
+2026-11-21T06:49:12.0271715Z ok  	github.com/larsonzh/prfrail/internal/release	3.997s
+2026-11-21T06:49:12.0272089Z ok  	github.com/larsonzh/prfrail/internal/repair	0.023s
+2026-11-21T06:49:12.0272582Z ok  	github.com/larsonzh/prfrail/internal/snapshot	1.361s
+2026-11-21T06:49:12.0272934Z ok  	github.com/larsonzh/prfrail/internal/taskdef	0.098s
+2026-11-21T06:49:12.0273291Z ok  	github.com/larsonzh/prfrail/internal/tickets	4.195s
+2026-11-21T06:49:12.0273706Z ok  	github.com/larsonzh/prfrail/tools/agent-probe/enforcement-proxy	0.815s
+2026-11-21T06:49:12.0274131Z ok  	github.com/larsonzh/prfrail/tools/agent-stub	1.459s
+2026-11-21T06:49:12.0274544Z FAIL
+2026-11-21T06:49:12.2437631Z ##[error]Process completed with exit code 1.
+2026-11-21T06:49:12.2776452Z Post job cleanup.
+2026-11-21T06:49:12.4842269Z [command]"C:\Program Files\Git\bin\git.exe" version
+2026-11-21T06:49:12.5230885Z git version 2.56.1.windows.1
+2026-11-21T06:49:12.5306613Z Temporarily overriding HOME='D:\a\_temp\e65cf79b-6b5c-4798-89e0-c6f2f2a17c0b' before making global git config changes
+2026-11-21T06:49:12.5307867Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-21T06:49:12.5320409Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\prfrail\prfrail
+2026-11-21T06:49:12.5794835Z Removing SSH command configuration
+2026-11-21T06:49:12.5810186Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+2026-11-21T06:49:12.6205372Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+2026-11-21T06:49:13.5291504Z Removing HTTP extra header
+2026-11-21T06:49:13.5301451Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-21T06:49:13.5673544Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+2026-11-21T06:49:14.1006639Z Removing includeIf entries pointing to credentials config files
+2026-11-21T06:49:14.1017736Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-21T06:49:14.1386947Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+2026-11-21T06:49:14.6916858Z Cleaning up orphan processes

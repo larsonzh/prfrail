@@ -1,0 +1,30 @@
+VM_R4_LEGS_BEGIN
+--- PASS: TestP85R4M13LinuxNativeIdentityIsTheDirectoryObject (0.03s)
+--- PASS: TestP85R4M16LinuxNativeCarrierPublicationLeavesNoTemporaryName (0.12s)
+ok  	github.com/larsonzh/prfrail/internal/console	0.170s
+--- PASS: TestP85F07ShebangWindowIncludesTheMagicBytes (0.00s)
+--- PASS: TestP85T3LinuxRefusesWritableInstallDirectory (0.00s)
+--- PASS: TestP85T3LinuxRefusesADirectoryThisUserOwns (0.00s)
+--- PASS: TestP85T3LinuxShebangInterpreterInWritableDirectoryRefused (0.00s)
+--- PASS: TestP85T3LinuxNonELFWithoutShebangIsNotProven (0.00s)
+--- PASS: TestP85T3LinuxELFObjectIsThePositiveControl (0.01s)
+--- PASS: TestP85T3LinuxLinkedInterpreterChainIsRefused (0.00s)
+--- SKIP: TestP85T3LinuxSameInodeRewriteRequiresAPrivilegedFixture (0.00s)
+ok  	github.com/larsonzh/prfrail/internal/adapters	0.026s
+VM_FULL_BEGIN
+ok  	github.com/larsonzh/prfrail/examples/whois-shadow	0.004s
+ok  	github.com/larsonzh/prfrail/internal/adapters	19.796s
+ok  	github.com/larsonzh/prfrail/internal/applier	0.475s
+ok  	github.com/larsonzh/prfrail/internal/chain	1.420s
+ok  	github.com/larsonzh/prfrail/internal/console	12.011s
+ok  	github.com/larsonzh/prfrail/internal/evidence	0.233s
+ok  	github.com/larsonzh/prfrail/internal/gates	0.266s
+ok  	github.com/larsonzh/prfrail/internal/guard	1.543s
+ok  	github.com/larsonzh/prfrail/internal/release	5.335s
+ok  	github.com/larsonzh/prfrail/internal/repair	0.024s
+ok  	github.com/larsonzh/prfrail/internal/snapshot	0.312s
+ok  	github.com/larsonzh/prfrail/internal/taskdef	0.030s
+ok  	github.com/larsonzh/prfrail/internal/tickets	3.020s
+ok  	github.com/larsonzh/prfrail/tools/agent-probe/enforcement-proxy	0.307s
+ok  	github.com/larsonzh/prfrail/tools/agent-stub	0.675s
+VM_R4_END

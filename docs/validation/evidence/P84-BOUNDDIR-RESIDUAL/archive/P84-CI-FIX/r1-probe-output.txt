@@ -1,0 +1,5 @@
+fixture: root=C:\Users\濡欏鍛淺AppData\Local\Temp\r1probe-1542438368 shortRoot=C:\Users\濡欏鍛淺AppData\Local\Temp\R1PRO~1
+RED  (current product): OpenBoundDirFile(j\f) refused: open j\f: evidence: intermediate reparse point j resolves to C:\Users\濡欏鍛淺AppData\Local\Temp\R1PRO~1\D\sub, which is outside the bound directory C:\Users\濡欏鍛淺AppData\Local\Temp\r1probe-1542438368\D
+candidateID={vol:1825482194 indexHigh:196608 indexLow:1648053} boundID={vol:1825482194 indexHigh:196608 indexLow:1648053}
+GREEN (proposed branch): candidate root proven same vol+fileID; suffix read back "inside-bytes"
+RESULT: RED-GREEN pair demonstrated on the same short-name fixture

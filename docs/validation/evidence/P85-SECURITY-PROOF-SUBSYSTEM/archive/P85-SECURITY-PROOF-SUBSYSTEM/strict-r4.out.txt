@@ -1,0 +1,79 @@
+{
+  "checks": {
+    "cnT3Exact": true,
+    "enT3Exact": true,
+    "cnP1Exact": true,
+    "cnBlank": true,
+    "cnP2Exact": true,
+    "enP1Exact": true,
+    "enBlank": true,
+    "enP2Exact": true,
+    "cnAllElseEqual": true,
+    "enAllElseEqual": true
+  },
+  "pre": {
+    "cn": {
+      "lines": 408,
+      "blank": 118,
+      "bold": 133,
+      "bars": 245,
+      "bt": 1080
+    },
+    "en": {
+      "lines": 400,
+      "blank": 118,
+      "bold": 135,
+      "bars": 245,
+      "bt": 1078
+    }
+  },
+  "post": {
+    "cn": {
+      "lines": 411,
+      "blank": 119,
+      "bold": 133,
+      "bars": 248,
+      "bt": 1096
+    },
+    "en": {
+      "lines": 403,
+      "blank": 119,
+      "bold": 135,
+      "bars": 248,
+      "bt": 1094
+    }
+  },
+  "myDeltas": {
+    "cn": {
+      "lines": 3,
+      "blank": 1,
+      "bold": 0,
+      "bars": 3,
+      "bt": 16
+    },
+    "en": {
+      "lines": 3,
+      "blank": 1,
+      "bold": 0,
+      "bars": 3,
+      "bt": 16
+    }
+  },
+  "pairDeltaBefore": {
+    "lines": -8,
+    "blank": 0,
+    "bold": 2,
+    "bars": 0,
+    "bt": -2
+  },
+  "pairDeltaAfter": {
+    "lines": -8,
+    "blank": 0,
+    "bold": 2,
+    "bars": 0,
+    "bt": -2
+  },
+  "pairDeltaUnchanged": true,
+  "addedLineCount": 8,
+  "g64Hits": []
+}

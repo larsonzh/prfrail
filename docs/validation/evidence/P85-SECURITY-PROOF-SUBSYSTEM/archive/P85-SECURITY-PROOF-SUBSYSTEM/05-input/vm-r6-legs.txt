@@ -1,0 +1,23 @@
+VM_R6_BEGIN
+--- PASS: TestP85R6SandwichRefusesANameSwapBetweenAssertions (0.00s)
+--- PASS: TestP85R6SlotOrderMatchesTheContract (0.00s)
+ok  	github.com/larsonzh/prfrail/internal/adapters	0.019s
+--- PASS: TestP85R6SlotOrderMatchesTheContract (0.05s)
+ok  	github.com/larsonzh/prfrail/internal/console	0.060s
+VM_R6_FULL_BEGIN
+ok  	github.com/larsonzh/prfrail/examples/whois-shadow	0.005s
+ok  	github.com/larsonzh/prfrail/internal/adapters	19.947s
+ok  	github.com/larsonzh/prfrail/internal/applier	0.515s
+ok  	github.com/larsonzh/prfrail/internal/chain	1.313s
+ok  	github.com/larsonzh/prfrail/internal/console	12.178s
+ok  	github.com/larsonzh/prfrail/internal/evidence	0.212s
+ok  	github.com/larsonzh/prfrail/internal/gates	0.267s
+ok  	github.com/larsonzh/prfrail/internal/guard	1.498s
+ok  	github.com/larsonzh/prfrail/internal/release	5.271s
+ok  	github.com/larsonzh/prfrail/internal/repair	0.014s
+ok  	github.com/larsonzh/prfrail/internal/snapshot	0.203s
+ok  	github.com/larsonzh/prfrail/internal/taskdef	0.026s
+ok  	github.com/larsonzh/prfrail/internal/tickets	2.752s
+ok  	github.com/larsonzh/prfrail/tools/agent-probe/enforcement-proxy	0.342s
+ok  	github.com/larsonzh/prfrail/tools/agent-stub	0.858s
+VM_R6_END

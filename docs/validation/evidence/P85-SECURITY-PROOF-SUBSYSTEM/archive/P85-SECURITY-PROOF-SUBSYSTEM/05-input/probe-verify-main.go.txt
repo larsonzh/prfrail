@@ -1,0 +1,20 @@
+package main
+
+import (
+	"fmt"
+	"os"
+
+	"github.com/larsonzh/prfrail/internal/adapters"
+)
+
+func main() {
+	for _, path := range os.Args[1:] {
+		facts, err := adapters.VerifyAIInstallSource(path)
+		if err != nil {
+			fmt.Printf("REFUSED %s: %v\n", path, err)
+			continue
+		}
+		fmt.Printf("PROVEN  %s hash=%s fileID=%s platform=%s/%s windows=%+v\n",
+			path, facts.ExecutableHash, facts.FileID, facts.Platform.OS, facts.Platform.Arch, facts.Immutability.Windows)
+	}
+}

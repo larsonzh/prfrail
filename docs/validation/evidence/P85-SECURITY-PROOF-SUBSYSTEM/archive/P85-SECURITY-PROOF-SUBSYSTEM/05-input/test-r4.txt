@@ -1,0 +1,2540 @@
+=== RUN   TestAICheckUsesConfiguredChannelAndReturnsAvailabilityRecord
+--- PASS: TestAICheckUsesConfiguredChannelAndReturnsAvailabilityRecord (0.09s)
+=== RUN   TestAICheckRejectsUnconfiguredOrUnsupportedChannelWithoutProbe
+--- PASS: TestAICheckRejectsUnconfiguredOrUnsupportedChannelWithoutProbe (0.01s)
+=== RUN   TestAICheckReturnsSuccessOnlyForAvailableRecord
+--- PASS: TestAICheckReturnsSuccessOnlyForAvailableRecord (0.08s)
+=== RUN   TestAICheckRequiresSingleRequestBudgetWithoutProbe
+--- PASS: TestAICheckRequiresSingleRequestBudgetWithoutProbe (0.01s)
+=== RUN   TestAICheckRequiresOutputWithoutProbe
+--- PASS: TestAICheckRequiresOutputWithoutProbe (0.01s)
+=== RUN   TestAICheckRejectsExistingOutputBeforeProbe
+--- PASS: TestAICheckRejectsExistingOutputBeforeProbe (0.01s)
+=== RUN   TestAIVerifyChecksPersistedRecordWithoutProbe
+--- PASS: TestAIVerifyChecksPersistedRecordWithoutProbe (0.02s)
+=== RUN   TestAIVerifyRejectsConflictingPriorRecord
+--- PASS: TestAIVerifyRejectsConflictingPriorRecord (0.03s)
+=== RUN   TestAICheckRefusesReceiverMismatchWithoutReadingStore
+=== RUN   TestAICheckRefusesReceiverMismatchWithoutReadingStore/receiver-binding-refuses-before-the-availability-check
+=== RUN   TestAICheckRefusesReceiverMismatchWithoutReadingStore/executor-refuses-a-swapped-executable-before-the-spawn
+    ai_test.go:539: EXEMPT-REGISTERED P85/F4 | reason: the console install source gate is hardwired to the live platform observation, so every executable that reaches the spawn is one this user cannot replace - and a leg whose whole point is to replace the approved image cannot use such an executable; no injection seam exists at the console layer (accepted by the ⑤ r1 review) | carried-by: TestP83T3cExecutableReplacedAfterApprovalRefused (internal/adapters/p83_fixround5_tester_test.go:40), which pins the pre-spawn identity-and-digest re-verification on the executor path | destination: this slice's report §8 and the ⑦ review input package
+--- PASS: TestAICheckRefusesReceiverMismatchWithoutReadingStore (0.01s)
+    --- PASS: TestAICheckRefusesReceiverMismatchWithoutReadingStore/receiver-binding-refuses-before-the-availability-check (0.01s)
+    --- SKIP: TestAICheckRefusesReceiverMismatchWithoutReadingStore/executor-refuses-a-swapped-executable-before-the-spawn (0.00s)
+=== RUN   TestApprovalsListEmptyLedgerZeroPendingWithoutSideEffects
+--- PASS: TestApprovalsListEmptyLedgerZeroPendingWithoutSideEffects (0.01s)
+=== RUN   TestApprovalsRevokeRequestedPersistsAndListsRevoked
+--- PASS: TestApprovalsRevokeRequestedPersistsAndListsRevoked (0.02s)
+=== RUN   TestApprovalsRevokeStopUncertainRecordsRevocationAndFails
+--- PASS: TestApprovalsRevokeStopUncertainRecordsRevocationAndFails (0.02s)
+=== RUN   TestApprovalsRevokeNotRequiredSkipsStopper
+--- PASS: TestApprovalsRevokeNotRequiredSkipsStopper (0.01s)
+=== RUN   TestApprovalsRevokeRequestedFailsClosedWhenManagedIdentityMissing
+--- PASS: TestApprovalsRevokeRequestedFailsClosedWhenManagedIdentityMissing (0.01s)
+=== RUN   TestApprovalsRevokeMissingGrantFails
+--- PASS: TestApprovalsRevokeMissingGrantFails (0.01s)
+=== RUN   TestApprovalsListTextHasNoANSI
+--- PASS: TestApprovalsListTextHasNoANSI (0.01s)
+=== RUN   TestApprovalsReportUsesLatestGrantPerAuthorization
+--- PASS: TestApprovalsReportUsesLatestGrantPerAuthorization (0.02s)
+=== RUN   TestRunRequestRecordsPathsAreRead
+--- PASS: TestRunRequestRecordsPathsAreRead (0.02s)
+=== RUN   TestRunRefusesRequestRecordWithRequestRecords
+--- PASS: TestRunRefusesRequestRecordWithRequestRecords (0.01s)
+=== RUN   TestRunRefusesDuplicateRequestRecordKey
+--- PASS: TestRunRefusesDuplicateRequestRecordKey (0.02s)
+=== RUN   TestRunRefusesRequestRecordRunIDMismatch
+--- PASS: TestRunRefusesRequestRecordRunIDMismatch (0.03s)
+=== RUN   TestRunRefusesRequestRecordsWithoutExecutableSteps
+--- PASS: TestRunRefusesRequestRecordsWithoutExecutableSteps (0.02s)
+=== RUN   TestRunRefusesRequestRecordOutsideChainDefinition
+--- PASS: TestRunRefusesRequestRecordOutsideChainDefinition (0.02s)
+=== RUN   TestRunRefusesRequestRecordCoverageGap
+--- PASS: TestRunRefusesRequestRecordCoverageGap (0.02s)
+=== RUN   TestRunSingleRequestRecordStaysCompatible
+--- PASS: TestRunSingleRequestRecordStaysCompatible (0.02s)
+=== RUN   TestInitValidateAndExplainJSON
+--- PASS: TestInitValidateAndExplainJSON (0.01s)
+=== RUN   TestRunAndReportNoopChain
+--- PASS: TestRunAndReportNoopChain (0.21s)
+=== RUN   TestLanguageExamplesCompleteReadOnlyCLILoop
+=== RUN   TestLanguageExamplesCompleteReadOnlyCLILoop/generic-minimal
+=== RUN   TestLanguageExamplesCompleteReadOnlyCLILoop/c-minimal
+=== RUN   TestLanguageExamplesCompleteReadOnlyCLILoop/go-minimal
+--- PASS: TestLanguageExamplesCompleteReadOnlyCLILoop (0.25s)
+    --- PASS: TestLanguageExamplesCompleteReadOnlyCLILoop/generic-minimal (0.08s)
+    --- PASS: TestLanguageExamplesCompleteReadOnlyCLILoop/c-minimal (0.11s)
+    --- PASS: TestLanguageExamplesCompleteReadOnlyCLILoop/go-minimal (0.06s)
+=== RUN   TestRunRejectsExecutableSteps
+--- PASS: TestRunRejectsExecutableSteps (0.01s)
+=== RUN   TestValidateRejectsUnknownField
+--- PASS: TestValidateRejectsUnknownField (0.01s)
+=== RUN   TestTextOutputHasNoANSI
+--- PASS: TestTextOutputHasNoANSI (0.01s)
+=== RUN   TestPreviewJSONAndTextParityWithoutSideEffects
+--- PASS: TestPreviewJSONAndTextParityWithoutSideEffects (0.01s)
+=== RUN   TestPreviewReadyForNoopChain
+--- PASS: TestPreviewReadyForNoopChain (0.02s)
+=== RUN   TestUnknownCommandUsageExitCode
+--- PASS: TestUnknownCommandUsageExitCode (0.01s)
+=== RUN   TestAIConfigRoundTripAndExplainRedactsSecretReference
+--- PASS: TestAIConfigRoundTripAndExplainRedactsSecretReference (0.00s)
+=== RUN   TestAIConfigRejectsInvalidOrderingBindingAndProfile
+=== RUN   TestAIConfigRejectsInvalidOrderingBindingAndProfile/host-with-secret
+=== RUN   TestAIConfigRejectsInvalidOrderingBindingAndProfile/profiles-unsorted
+=== RUN   TestAIConfigRejectsInvalidOrderingBindingAndProfile/duplicate-profile
+=== RUN   TestAIConfigRejectsInvalidOrderingBindingAndProfile/channels-unsorted
+=== RUN   TestAIConfigRejectsInvalidOrderingBindingAndProfile/duplicate-channel
+=== RUN   TestAIConfigRejectsInvalidOrderingBindingAndProfile/dangling-profile
+=== RUN   TestAIConfigRejectsInvalidOrderingBindingAndProfile/unsafe-base-url
+--- PASS: TestAIConfigRejectsInvalidOrderingBindingAndProfile (0.00s)
+    --- PASS: TestAIConfigRejectsInvalidOrderingBindingAndProfile/host-with-secret (0.00s)
+    --- PASS: TestAIConfigRejectsInvalidOrderingBindingAndProfile/profiles-unsorted (0.00s)
+    --- PASS: TestAIConfigRejectsInvalidOrderingBindingAndProfile/duplicate-profile (0.00s)
+    --- PASS: TestAIConfigRejectsInvalidOrderingBindingAndProfile/channels-unsorted (0.00s)
+    --- PASS: TestAIConfigRejectsInvalidOrderingBindingAndProfile/duplicate-channel (0.00s)
+    --- PASS: TestAIConfigRejectsInvalidOrderingBindingAndProfile/dangling-profile (0.00s)
+    --- PASS: TestAIConfigRejectsInvalidOrderingBindingAndProfile/unsafe-base-url (0.00s)
+=== RUN   TestAIConfigRequiresProfilesAndChannels
+=== RUN   TestAIConfigRequiresProfilesAndChannels/profiles-only
+=== RUN   TestAIConfigRequiresProfilesAndChannels/channels-only
+=== RUN   TestAIConfigRequiresProfilesAndChannels/empty
+--- PASS: TestAIConfigRequiresProfilesAndChannels (0.00s)
+    --- PASS: TestAIConfigRequiresProfilesAndChannels/profiles-only (0.00s)
+    --- PASS: TestAIConfigRequiresProfilesAndChannels/channels-only (0.00s)
+    --- PASS: TestAIConfigRequiresProfilesAndChannels/empty (0.00s)
+=== RUN   TestAIConfigCLIValidateAndExplainDoNotReadSecretStore
+--- PASS: TestAIConfigCLIValidateAndExplainDoNotReadSecretStore (0.01s)
+=== RUN   TestCostReportJSONAndText
+--- PASS: TestCostReportJSONAndText (0.04s)
+=== RUN   TestCostReportMissingLedgerIsNonFatal
+--- PASS: TestCostReportMissingLedgerIsNonFatal (0.01s)
+=== RUN   TestCostReportSubscriptionDisclaimer
+--- PASS: TestCostReportSubscriptionDisclaimer (0.02s)
+=== RUN   TestPrepareHandoffInputStructured
+--- PASS: TestPrepareHandoffInputStructured (0.00s)
+=== RUN   TestPrepareHandoffInputRejectsUndeclaredPrompt
+--- PASS: TestPrepareHandoffInputRejectsUndeclaredPrompt (0.00s)
+=== RUN   TestPrepareHandoffInputRejectsUnknownChannel
+--- PASS: TestPrepareHandoffInputRejectsUnknownChannel (0.00s)
+=== RUN   TestPrepareHandoffInputSecretDirectRequiresSecureTerminal
+--- PASS: TestPrepareHandoffInputSecretDirectRequiresSecureTerminal (0.00s)
+=== RUN   TestPrepareHandoffInputSecretDirectDoesNotExposeSecret
+--- PASS: TestPrepareHandoffInputSecretDirectDoesNotExposeSecret (0.00s)
+=== RUN   TestInteractionsListRebuildsPendingInboxAfterRestart
+--- PASS: TestInteractionsListRebuildsPendingInboxAfterRestart (0.01s)
+=== RUN   TestInteractionsRespondPersistsAndClosesPendingItem
+--- PASS: TestInteractionsRespondPersistsAndClosesPendingItem (0.02s)
+=== RUN   TestInteractionsRespondRejectsStaleOrUnstructuredInput
+=== RUN   TestInteractionsRespondRejectsStaleOrUnstructuredInput/wrong_actor
+=== RUN   TestInteractionsRespondRejectsStaleOrUnstructuredInput/stale_attempt
+=== RUN   TestInteractionsRespondRejectsStaleOrUnstructuredInput/wrong_context
+=== RUN   TestInteractionsRespondRejectsStaleOrUnstructuredInput/free_text
+--- PASS: TestInteractionsRespondRejectsStaleOrUnstructuredInput (0.07s)
+    --- PASS: TestInteractionsRespondRejectsStaleOrUnstructuredInput/wrong_actor (0.01s)
+    --- PASS: TestInteractionsRespondRejectsStaleOrUnstructuredInput/stale_attempt (0.02s)
+    --- PASS: TestInteractionsRespondRejectsStaleOrUnstructuredInput/wrong_context (0.02s)
+    --- PASS: TestInteractionsRespondRejectsStaleOrUnstructuredInput/free_text (0.02s)
+=== RUN   TestInteractionsListMissingLedgerHasNoSideEffects
+--- PASS: TestInteractionsListMissingLedgerHasNoSideEffects (0.01s)
+=== RUN   TestInteractionsTUIShowsFactsAndRecordsAllowedResponse
+--- PASS: TestInteractionsTUIShowsFactsAndRecordsAllowedResponse (0.02s)
+=== RUN   TestInteractionsTUIInvalidInputLeavesRequestPending
+--- PASS: TestInteractionsTUIInvalidInputLeavesRequestPending (0.02s)
+=== RUN   TestInteractionsRespondPersistenceFailureLeavesRequestPending
+--- PASS: TestInteractionsRespondPersistenceFailureLeavesRequestPending (0.01s)
+=== RUN   TestAgentRunnerDispatchLedgerSnapshotRereadsOperatorRevocation
+--- PASS: TestAgentRunnerDispatchLedgerSnapshotRereadsOperatorRevocation (0.13s)
+=== RUN   TestAgentRunnerDispatchCostSnapshotRefusesUnreadableLedger
+--- PASS: TestAgentRunnerDispatchCostSnapshotRefusesUnreadableLedger (0.13s)
+=== RUN   TestAgentRunnerAttemptTwoAdoptsRunScopedPublishLease
+--- PASS: TestAgentRunnerAttemptTwoAdoptsRunScopedPublishLease (0.25s)
+=== RUN   TestClaimPublishLeaseRefusesRecordHeldByAnotherRun
+--- PASS: TestClaimPublishLeaseRefusesRecordHeldByAnotherRun (0.02s)
+=== RUN   TestAgentRunnerPublishRefusesStaleLeaseProof
+--- PASS: TestAgentRunnerPublishRefusesStaleLeaseProof (0.08s)
+=== RUN   TestSupervisedReturnRenewsLeaseAtThreshold
+--- PASS: TestSupervisedReturnRenewsLeaseAtThreshold (0.25s)
+=== RUN   TestSupervisedReturnRenewsExpiredLeaseInsteadOfRefusing
+--- PASS: TestSupervisedReturnRenewsExpiredLeaseInsteadOfRefusing (0.38s)
+=== RUN   TestSupervisedReturnRefusesExpiredLeaseHeldByAnotherRun
+--- PASS: TestSupervisedReturnRefusesExpiredLeaseHeldByAnotherRun (0.36s)
+=== RUN   TestSupervisedReturnRefusesProofOfAnotherRun
+--- PASS: TestSupervisedReturnRefusesProofOfAnotherRun (0.24s)
+=== RUN   TestAICheckRefusesUnbindableReceiverWithoutResolvingSecret
+--- PASS: TestAICheckRefusesUnbindableReceiverWithoutResolvingSecret (0.01s)
+=== RUN   TestP83F3AgentPublishRefusesGrantRevokedAfterReview
+--- PASS: TestP83F3AgentPublishRefusesGrantRevokedAfterReview (0.18s)
+=== RUN   TestP83F3SupervisedPublishRefusesConfirmationWithdrawnAfterReview
+--- PASS: TestP83F3SupervisedPublishRefusesConfirmationWithdrawnAfterReview (0.14s)
+=== RUN   TestP83F3SupervisedPublishRefusesCandidateEvidenceRootDrift
+--- PASS: TestP83F3SupervisedPublishRefusesCandidateEvidenceRootDrift (0.12s)
+=== RUN   TestP83Fix4AICheckRefusesEveryUnauthorisedReceiver
+=== RUN   TestP83Fix4AICheckRefusesEveryUnauthorisedReceiver/a-ledger-file-absent
+=== RUN   TestP83Fix4AICheckRefusesEveryUnauthorisedReceiver/b-ledger-present-without-any-grant
+=== RUN   TestP83Fix4AICheckRefusesEveryUnauthorisedReceiver/c-grant-expired
+=== RUN   TestP83Fix4AICheckRefusesEveryUnauthorisedReceiver/d-grant-revoked
+=== RUN   TestP83Fix4AICheckRefusesEveryUnauthorisedReceiver/e-grant-network-scope-names-other-host
+=== RUN   TestP83Fix4AICheckRefusesEveryUnauthorisedReceiver/e-grant-network-scope-names-other-port
+=== RUN   TestP83Fix4AICheckRefusesEveryUnauthorisedReceiver/e-grant-network-scope-names-other-protocol
+=== RUN   TestP83Fix4AICheckRefusesEveryUnauthorisedReceiver/f-grant-tool-ids-lack-the-probe
+=== RUN   TestP83Fix4AICheckRefusesEveryUnauthorisedReceiver/g-grant-evidence-lacks-the-executable-hash
+--- PASS: TestP83Fix4AICheckRefusesEveryUnauthorisedReceiver (0.17s)
+    --- PASS: TestP83Fix4AICheckRefusesEveryUnauthorisedReceiver/a-ledger-file-absent (0.01s)
+    --- PASS: TestP83Fix4AICheckRefusesEveryUnauthorisedReceiver/b-ledger-present-without-any-grant (0.01s)
+    --- PASS: TestP83Fix4AICheckRefusesEveryUnauthorisedReceiver/c-grant-expired (0.02s)
+    --- PASS: TestP83Fix4AICheckRefusesEveryUnauthorisedReceiver/d-grant-revoked (0.02s)
+    --- PASS: TestP83Fix4AICheckRefusesEveryUnauthorisedReceiver/e-grant-network-scope-names-other-host (0.01s)
+    --- PASS: TestP83Fix4AICheckRefusesEveryUnauthorisedReceiver/e-grant-network-scope-names-other-port (0.01s)
+    --- PASS: TestP83Fix4AICheckRefusesEveryUnauthorisedReceiver/e-grant-network-scope-names-other-protocol (0.03s)
+    --- PASS: TestP83Fix4AICheckRefusesEveryUnauthorisedReceiver/f-grant-tool-ids-lack-the-probe (0.02s)
+    --- PASS: TestP83Fix4AICheckRefusesEveryUnauthorisedReceiver/g-grant-evidence-lacks-the-executable-hash (0.02s)
+=== RUN   TestP83Fix4AICheckAdmitsMatchingActiveGrant
+--- PASS: TestP83Fix4AICheckAdmitsMatchingActiveGrant (0.08s)
+=== RUN   TestP83Fix4LoadProbeLedgerNeverDegradesToNoGrant
+--- PASS: TestP83Fix4LoadProbeLedgerNeverDegradesToNoGrant (0.01s)
+=== RUN   TestP83T1aProductionNeverAnswersFromTheInMemoryLedger
+--- PASS: TestP83T1aProductionNeverAnswersFromTheInMemoryLedger (0.10s)
+=== RUN   TestP83T1bGrantExpiringDuringLedgerReadRefused
+--- PASS: TestP83T1bGrantExpiringDuringLedgerReadRefused (0.10s)
+=== RUN   TestP83T2aSupersededGrantCannotLendItsScope
+--- PASS: TestP83T2aSupersededGrantCannotLendItsScope (0.08s)
+=== RUN   TestP83T2bSupervisedConfirmationIsSeparateFromPolicyApproval
+--- PASS: TestP83T2bSupervisedConfirmationIsSeparateFromPolicyApproval (0.12s)
+=== RUN   TestP83T3aAwayAuthorizationLedgerPathRefused
+--- PASS: TestP83T3aAwayAuthorizationLedgerPathRefused (0.02s)
+=== RUN   TestP83T3bSameReceiverDifferentSecretRefRefused
+--- PASS: TestP83T3bSameReceiverDifferentSecretRefRefused (0.02s)
+=== RUN   TestP83T9bHostAuthProfileWithoutBaseURLAdmitted
+--- PASS: TestP83T9bHostAuthProfileWithoutBaseURLAdmitted (0.01s)
+=== RUN   TestP83T5aSecondLiveHolderCannotAdoptLease
+--- PASS: TestP83T5aSecondLiveHolderCannotAdoptLease (0.16s)
+=== RUN   TestP83Fix5T5HolderHelperProcess
+    p83_fixround5_tester_test.go:485: helper process for the T5a lease exclusivity test
+--- SKIP: TestP83Fix5T5HolderHelperProcess (0.00s)
+=== RUN   TestP83T7bPreGrowthTerminalSecretBufferIsZeroed
+--- PASS: TestP83T7bPreGrowthTerminalSecretBufferIsZeroed (0.00s)
+=== RUN   TestP83Fix6T1aRunDerivesTheLedgerPathsWithoutFlags
+--- PASS: TestP83Fix6T1aRunDerivesTheLedgerPathsWithoutFlags (0.03s)
+=== RUN   TestP83Fix6T1bRunDirDerivesTheDefaultLedgerPath
+--- PASS: TestP83Fix6T1bRunDirDerivesTheDefaultLedgerPath (0.02s)
+=== RUN   TestP83Fix6T3bEmptyApprovedDigestDoesNotDegradeToAnUnboundPath
+--- PASS: TestP83Fix6T3bEmptyApprovedDigestDoesNotDegradeToAnUnboundPath (0.01s)
+=== RUN   TestP83Fix6T9aHostAuthProfileSucceedsWithoutAnyLedgerFile
+--- PASS: TestP83Fix6T9aHostAuthProfileSucceedsWithoutAnyLedgerFile (0.08s)
+=== RUN   TestP83Fix6T5aThirdSuccessorIsRefusedByTheFencingToken
+--- PASS: TestP83Fix6T5aThirdSuccessorIsRefusedByTheFencingToken (0.04s)
+=== RUN   TestP83Fix6T5dSupervisedPublishRefusesAForeignOnDiskProof
+--- PASS: TestP83Fix6T5dSupervisedPublishRefusesAForeignOnDiskProof (0.09s)
+=== RUN   TestP83Fix6T5dForeignHolderHelperProcess
+    p83_fixround6_tester_test.go:488: helper process for the T5d publish ownership test
+--- SKIP: TestP83Fix6T5dForeignHolderHelperProcess (0.00s)
+=== RUN   TestP83Fix7T5dStaleProofHeldByThisProcessIsResynced
+--- PASS: TestP83Fix7T5dStaleProofHeldByThisProcessIsResynced (0.04s)
+=== RUN   TestP83Fix7T5dStaleProofHeldByAnotherProcessIsRefused
+--- PASS: TestP83Fix7T5dStaleProofHeldByAnotherProcessIsRefused (0.02s)
+=== RUN   TestP83Fix7T5eUnreadableProofFailsTheRenewalBatch
+--- PASS: TestP83Fix7T5eUnreadableProofFailsTheRenewalBatch (0.05s)
+=== RUN   TestP83Fix8T5c4bGenuinePredecessorPublishProceeds
+--- PASS: TestP83Fix8T5c4bGenuinePredecessorPublishProceeds (0.03s)
+=== RUN   TestP83Fix8T5c4aUnverifiablePredecessorIsRefused
+--- PASS: TestP83Fix8T5c4aUnverifiablePredecessorIsRefused (0.10s)
+=== RUN   TestAgentRunnerReviewRefusesWithoutOperatorGrant
+--- PASS: TestAgentRunnerReviewRefusesWithoutOperatorGrant (0.00s)
+=== RUN   TestAgentRunnerReviewBindsOperatorPolicyAndEvidenceRoot
+--- PASS: TestAgentRunnerReviewBindsOperatorPolicyAndEvidenceRoot (0.10s)
+=== RUN   TestAgentRunnerPublishRefusesWithoutCurrentLease
+--- PASS: TestAgentRunnerPublishRefusesWithoutCurrentLease (0.22s)
+=== RUN   TestSupervisedReturnRefusesDriftedPublishLease
+--- PASS: TestSupervisedReturnRefusesDriftedPublishLease (0.23s)
+=== RUN   TestAgentRunnerDispatchRereadsRevocationAfterAssembly
+    p83_security_findings_test.go:301: SKIP: publication durability is unproven on windows, so the production dispatch refuses before R and the reread cannot be observed. The reread runs on the Ubuntu CI leg.
+--- SKIP: TestAgentRunnerDispatchRereadsRevocationAfterAssembly (0.04s)
+=== RUN   TestP84T5h4C1ForeignProofIsNotRewritten
+=== RUN   TestP84T5h4C1ForeignProofIsNotRewritten/another-claim
+=== RUN   TestP84T5h4C1ForeignProofIsNotRewritten/unretained-hash
+--- PASS: TestP84T5h4C1ForeignProofIsNotRewritten (0.12s)
+    --- PASS: TestP84T5h4C1ForeignProofIsNotRewritten/another-claim (0.06s)
+    --- PASS: TestP84T5h4C1ForeignProofIsNotRewritten/unretained-hash (0.05s)
+=== RUN   TestP84T5h4C2MultiGenerationHistoryIsCaughtUp
+--- PASS: TestP84T5h4C2MultiGenerationHistoryIsCaughtUp (0.09s)
+=== RUN   TestP84T5h4C3CrossProcessReentryRecoversProof
+--- PASS: TestP84T5h4C3CrossProcessReentryRecoversProof (0.11s)
+=== RUN   TestP84T5h4C3ChildProcess
+    p84_t5h4_residual_test.go:319: helper process for the P84 T5#4 cross-process re-entry test
+--- SKIP: TestP84T5h4C3ChildProcess (0.00s)
+=== RUN   TestP84T5h4C6ConcurrentAdvanceRefusesTheWholeBatch
+--- PASS: TestP84T5h4C6ConcurrentAdvanceRefusesTheWholeBatch (0.05s)
+=== RUN   TestP84T5h4C7HistoryDepthIsFailClosed
+    p84_t5h4_residual_test.go:454: built 65 retained generations in 844.3872ms
+--- PASS: TestP84T5h4C7HistoryDepthIsFailClosed (0.98s)
+=== RUN   TestP84LeaseLockChildProcess
+    p84_t5h4_residual_test.go:605: helper process for the P84 lease-lock constructions
+--- SKIP: TestP84LeaseLockChildProcess (0.00s)
+=== RUN   TestP84C8DeadIdentityChild
+    p84_t5h4_residual_test.go:680: helper process for the P84 C8 dead-holder construction
+--- SKIP: TestP84C8DeadIdentityChild (0.00s)
+=== RUN   TestP84C8DeadHolderReentryTransfersTheLease
+--- PASS: TestP84C8DeadHolderReentryTransfersTheLease (0.09s)
+=== RUN   TestP84C9DeadHolderLockIsReleasedByTheKernel
+--- PASS: TestP84C9DeadHolderLockIsReleasedByTheKernel (0.11s)
+=== RUN   TestP84C10AssertPublishLeaseCurrentRejectsASupersededProof
+--- PASS: TestP84C10AssertPublishLeaseCurrentRejectsASupersededProof (0.03s)
+=== RUN   TestP84C11LiveHolderKeepsTheLockUntilItExits
+--- PASS: TestP84C11LiveHolderKeepsTheLockUntilItExits (0.56s)
+=== RUN   TestP84T5h4C13CurrentRefreshStillReconcilesSiblings
+--- PASS: TestP84T5h4C13CurrentRefreshStillReconcilesSiblings (0.06s)
+=== RUN   TestP84T5h4C14BatchWaitsForTheResourceLock
+--- PASS: TestP84T5h4C14BatchWaitsForTheResourceLock (0.54s)
+=== RUN   TestP84C15ForeignConsumerRecordIsNotThisRunsLease
+--- PASS: TestP84C15ForeignConsumerRecordIsNotThisRunsLease (0.07s)
+=== RUN   TestP84C16PublishProofStaysUntouchedWhileTheResourceLockIsHeld
+--- PASS: TestP84C16PublishProofStaysUntouchedWhileTheResourceLockIsHeld (0.54s)
+=== RUN   TestP84C18PublishEntryHoldsTheResourceLockWithoutRenewing
+--- PASS: TestP84C18PublishEntryHoldsTheResourceLockWithoutRenewing (0.61s)
+=== RUN   TestP84C17LegacyLockDirectoryIsReportedNotWaitedOn
+--- PASS: TestP84C17LegacyLockDirectoryIsReportedNotWaitedOn (0.01s)
+=== RUN   TestP85F01PolicyDomainObservesEachExistingFile
+=== RUN   TestP85F01PolicyDomainObservesEachExistingFile/the-refusal-names-each-existing-file
+=== RUN   TestP85F01PolicyDomainObservesEachExistingFile/the-digest-tracks-the-artifact-identity
+--- PASS: TestP85F01PolicyDomainObservesEachExistingFile (0.08s)
+    --- PASS: TestP85F01PolicyDomainObservesEachExistingFile/the-refusal-names-each-existing-file (0.06s)
+    --- PASS: TestP85F01PolicyDomainObservesEachExistingFile/the-digest-tracks-the-artifact-identity (0.02s)
+=== RUN   TestP85F01PolicyDomainObservesTheParentIdentity
+=== RUN   TestP85F01PolicyDomainObservesTheParentIdentity/the-creation-branch-names-the-parent
+=== RUN   TestP85F01PolicyDomainObservesTheParentIdentity/the-digest-tracks-the-parent-identity
+--- PASS: TestP85F01PolicyDomainObservesTheParentIdentity (0.05s)
+    --- PASS: TestP85F01PolicyDomainObservesTheParentIdentity/the-creation-branch-names-the-parent (0.03s)
+    --- PASS: TestP85F01PolicyDomainObservesTheParentIdentity/the-digest-tracks-the-parent-identity (0.02s)
+=== RUN   TestP85F01AssemblyOptionsCarryNoExportedWriteProof
+--- PASS: TestP85F01AssemblyOptionsCarryNoExportedWriteProof (0.14s)
+=== RUN   TestP85F06AnchorProofFromAnotherDomainRefusesReview
+--- PASS: TestP85F06AnchorProofFromAnotherDomainRefusesReview (0.07s)
+=== RUN   TestP85F06AnchorProofFromAnotherDomainRefusesPublish
+--- PASS: TestP85F06AnchorProofFromAnotherDomainRefusesPublish (0.13s)
+=== RUN   TestP85R4M13TerminalReassertRefusesAStandInSwappedMidEntry
+--- PASS: TestP85R4M13TerminalReassertRefusesAStandInSwappedMidEntry (0.06s)
+=== RUN   TestP85R4M13ChainSlotsRefuseAReplacedArtifact
+--- PASS: TestP85R4M13ChainSlotsRefuseAReplacedArtifact (0.04s)
+=== RUN   TestP85R4M13BoundChainAcceptsAnUntouchedDomain
+--- PASS: TestP85R4M13BoundChainAcceptsAnUntouchedDomain (0.05s)
+=== RUN   TestP85R4M14PublishRecheckRefusesASameObjectJunction
+--- PASS: TestP85R4M14PublishRecheckRefusesASameObjectJunction (0.16s)
+=== RUN   TestP85R4M15ShapeDecidesWhichDomainIsSealed
+=== RUN   TestP85R4M15ShapeDecidesWhichDomainIsSealed/a-creation-anchor-reenters-unchanged
+=== RUN   TestP85R4M15ShapeDecidesWhichDomainIsSealed/a-reuse-anchor-reenters-unchanged
+=== RUN   TestP85R4M15ShapeDecidesWhichDomainIsSealed/a-creation-anchor-rewritten-as-reuse-is-refused
+=== RUN   TestP85R4M15ShapeDecidesWhichDomainIsSealed/a-domain-that-is-writable-now-is-refused
+=== RUN   TestP85R4M15ShapeDecidesWhichDomainIsSealed/an-anchor-without-a-shape-is-refused
+--- PASS: TestP85R4M15ShapeDecidesWhichDomainIsSealed (0.40s)
+    --- PASS: TestP85R4M15ShapeDecidesWhichDomainIsSealed/a-creation-anchor-reenters-unchanged (0.07s)
+    --- PASS: TestP85R4M15ShapeDecidesWhichDomainIsSealed/a-reuse-anchor-reenters-unchanged (0.06s)
+    --- PASS: TestP85R4M15ShapeDecidesWhichDomainIsSealed/a-creation-anchor-rewritten-as-reuse-is-refused (0.12s)
+    --- PASS: TestP85R4M15ShapeDecidesWhichDomainIsSealed/a-domain-that-is-writable-now-is-refused (0.06s)
+    --- PASS: TestP85R4M15ShapeDecidesWhichDomainIsSealed/an-anchor-without-a-shape-is-refused (0.08s)
+=== RUN   TestP85R4M17ShortDomainShortcutIsGone
+=== RUN   TestP85R4M17ShortDomainShortcutIsGone/a-closed-domain-with-a-creation-anchor-is-adopted
+=== RUN   TestP85R4M17ShortDomainShortcutIsGone/a-creation-anchor-over-a-writable-object-set-is-refused
+=== RUN   TestP85R4M17ShortDomainShortcutIsGone/a-reuse-anchor-over-a-writable-artifact-is-refused
+=== RUN   TestP85R4M17ShortDomainShortcutIsGone/a-reuse-anchor-over-an-unwritable-artifact-is-adopted
+--- PASS: TestP85R4M17ShortDomainShortcutIsGone (0.35s)
+    --- PASS: TestP85R4M17ShortDomainShortcutIsGone/a-closed-domain-with-a-creation-anchor-is-adopted (0.09s)
+    --- PASS: TestP85R4M17ShortDomainShortcutIsGone/a-creation-anchor-over-a-writable-object-set-is-refused (0.09s)
+    --- PASS: TestP85R4M17ShortDomainShortcutIsGone/a-reuse-anchor-over-a-writable-artifact-is-refused (0.09s)
+    --- PASS: TestP85R4M17ShortDomainShortcutIsGone/a-reuse-anchor-over-an-unwritable-artifact-is-adopted (0.09s)
+=== RUN   TestP85R4M16ReentrySyncGuardIsDiscriminating
+=== RUN   TestP85R4M16ReentrySyncGuardIsDiscriminating/leg-P-positive-control
+=== RUN   TestP85R4M16ReentrySyncGuardIsDiscriminating/leg-R-guard-on-while-sync-still-fails-refuses
+=== RUN   TestP85R4M16ReentrySyncGuardIsDiscriminating/leg-G-guard-off-while-sync-still-fails-adopts
+--- PASS: TestP85R4M16ReentrySyncGuardIsDiscriminating (0.15s)
+    --- PASS: TestP85R4M16ReentrySyncGuardIsDiscriminating/leg-P-positive-control (0.05s)
+    --- PASS: TestP85R4M16ReentrySyncGuardIsDiscriminating/leg-R-guard-on-while-sync-still-fails-refuses (0.04s)
+    --- PASS: TestP85R4M16ReentrySyncGuardIsDiscriminating/leg-G-guard-off-while-sync-still-fails-adopts (0.05s)
+=== RUN   TestP85T2ReviewRefusesMissingPolicyArtifact
+--- PASS: TestP85T2ReviewRefusesMissingPolicyArtifact (0.12s)
+=== RUN   TestP85T2ReviewRefusesUnreadablePolicyArtifact
+=== RUN   TestP85T2ReviewRefusesUnreadablePolicyArtifact/malformed_json
+=== RUN   TestP85T2ReviewRefusesUnreadablePolicyArtifact/wrong_typed_body
+=== RUN   TestP85T2ReviewRefusesUnreadablePolicyArtifact/unknown_strict_fields
+--- PASS: TestP85T2ReviewRefusesUnreadablePolicyArtifact (0.31s)
+    --- PASS: TestP85T2ReviewRefusesUnreadablePolicyArtifact/malformed_json (0.10s)
+    --- PASS: TestP85T2ReviewRefusesUnreadablePolicyArtifact/wrong_typed_body (0.10s)
+    --- PASS: TestP85T2ReviewRefusesUnreadablePolicyArtifact/unknown_strict_fields (0.10s)
+=== RUN   TestP85T2ReviewRefusesPolicyArtifactThatIsNotTheGrantedOne
+--- PASS: TestP85T2ReviewRefusesPolicyArtifactThatIsNotTheGrantedOne (0.08s)
+=== RUN   TestP85T2PublishRefusesArtifactReplacedAfterReview
+=== RUN   TestP85T2PublishRefusesArtifactReplacedAfterReview/the_artifact_is_replaced_with_another_policy
+=== RUN   TestP85T2PublishRefusesArtifactReplacedAfterReview/the_artifact_is_deleted_after_the_review
+--- PASS: TestP85T2PublishRefusesArtifactReplacedAfterReview (0.43s)
+    --- PASS: TestP85T2PublishRefusesArtifactReplacedAfterReview/the_artifact_is_replaced_with_another_policy (0.22s)
+    --- PASS: TestP85T2PublishRefusesArtifactReplacedAfterReview/the_artifact_is_deleted_after_the_review (0.21s)
+=== RUN   TestP85T2AssemblyRefusesWithoutFrozenPolicy
+--- PASS: TestP85T2AssemblyRefusesWithoutFrozenPolicy (0.09s)
+=== RUN   TestP85T2PublishRefusesArtifactReplacedAtPromotionPoint
+--- PASS: TestP85T2PublishRefusesArtifactReplacedAtPromotionPoint (0.25s)
+=== RUN   TestP85T2AssemblyRefusesMismatchedPolicySnapshot
+=== RUN   TestP85T2AssemblyRefusesMismatchedPolicySnapshot/the_snapshot_names_another_chain
+=== RUN   TestP85T2AssemblyRefusesMismatchedPolicySnapshot/the_snapshot_describes_another_task_count
+=== RUN   TestP85T2AssemblyRefusesMismatchedPolicySnapshot/the_snapshot_names_another_task_at_a_position
+=== RUN   TestP85T2AssemblyRefusesMismatchedPolicySnapshot/the_snapshot_carries_the_same_tasks_in_another_order
+--- PASS: TestP85T2AssemblyRefusesMismatchedPolicySnapshot (0.42s)
+    --- PASS: TestP85T2AssemblyRefusesMismatchedPolicySnapshot/the_snapshot_names_another_chain (0.09s)
+    --- PASS: TestP85T2AssemblyRefusesMismatchedPolicySnapshot/the_snapshot_describes_another_task_count (0.09s)
+    --- PASS: TestP85T2AssemblyRefusesMismatchedPolicySnapshot/the_snapshot_names_another_task_at_a_position (0.10s)
+    --- PASS: TestP85T2AssemblyRefusesMismatchedPolicySnapshot/the_snapshot_carries_the_same_tasks_in_another_order (0.15s)
+=== RUN   TestP85T2AssemblyRefusesWithoutManagedWriteProof
+--- PASS: TestP85T2AssemblyRefusesWithoutManagedWriteProof (0.15s)
+=== RUN   TestP85T2AssemblyRefusesInvalidManagedWriteProof
+--- PASS: TestP85T2AssemblyRefusesInvalidManagedWriteProof (0.13s)
+=== RUN   TestP85T2PublishRefusesAnchorRewrittenAlone
+=== RUN   TestP85T2PublishRefusesAnchorRewrittenAlone/a_rewritten_anchor_refuses_the_reopening_assembly
+=== RUN   TestP85T2PublishRefusesAnchorRewrittenAlone/a_rewritten_anchor_refuses_publish
+--- PASS: TestP85T2PublishRefusesAnchorRewrittenAlone (0.29s)
+    --- PASS: TestP85T2PublishRefusesAnchorRewrittenAlone/a_rewritten_anchor_refuses_the_reopening_assembly (0.09s)
+    --- PASS: TestP85T2PublishRefusesAnchorRewrittenAlone/a_rewritten_anchor_refuses_publish (0.20s)
+=== RUN   TestP85T3ReentryConfirmsDirectoryDurabilityBeforeAdoptingCarrier
+    p85_t3_reentry_tester_test.go:89: the re-entry durability leg is Linux-only: on windows the publish grants no directory durability at all (atomic visibility only)
+--- SKIP: TestP85T3ReentryConfirmsDirectoryDurabilityBeforeAdoptingCarrier (0.00s)
+=== RUN   TestP85F10ReentryRefusesToAdoptWhenTheSameHandleSyncFails
+=== RUN   TestP85F10ReentryRefusesToAdoptWhenTheSameHandleSyncFails/a-failed-sync-refuses-the-first-publication
+--- PASS: TestP85F10ReentryRefusesToAdoptWhenTheSameHandleSyncFails (0.05s)
+    --- PASS: TestP85F10ReentryRefusesToAdoptWhenTheSameHandleSyncFails/a-failed-sync-refuses-the-first-publication (0.04s)
+=== RUN   TestP85T3RefusesUnprovableInstallSourceWithoutPublishingCarrier
+--- PASS: TestP85T3RefusesUnprovableInstallSourceWithoutPublishingCarrier (0.02s)
+=== RUN   TestP85T3RefusesMalformedCarrierInsteadOfRecomputing
+--- PASS: TestP85T3RefusesMalformedCarrierInsteadOfRecomputing (0.04s)
+=== RUN   TestP85T3RefusesCarrierThatNoLongerDescribesTheSource
+--- PASS: TestP85T3RefusesCarrierThatNoLongerDescribesTheSource (0.06s)
+=== RUN   TestP85T3PublishesTheCarrierAndConverges
+--- PASS: TestP85T3PublishesTheCarrierAndConverges (0.11s)
+=== RUN   TestProgressFlagStreamsToStderrAndKeepsStdout
+--- PASS: TestProgressFlagStreamsToStderrAndKeepsStdout (0.09s)
+=== RUN   TestProgressFlagKeepsJSONOutputIdentical
+--- PASS: TestProgressFlagKeepsJSONOutputIdentical (0.09s)
+=== RUN   TestProgressStoreSwallowsWriterFailure
+--- PASS: TestProgressStoreSwallowsWriterFailure (0.02s)
+=== RUN   TestProgressStoreForwardsEventsUnchanged
+--- PASS: TestProgressStoreForwardsEventsUnchanged (0.02s)
+=== RUN   TestFormatProgressLineSnapshot
+=== RUN   TestFormatProgressLineSnapshot/chain
+=== RUN   TestFormatProgressLineSnapshot/task
+=== RUN   TestFormatProgressLineSnapshot/step
+=== RUN   TestFormatProgressLineSnapshot/empty_fields
+--- PASS: TestFormatProgressLineSnapshot (0.00s)
+    --- PASS: TestFormatProgressLineSnapshot/chain (0.00s)
+    --- PASS: TestFormatProgressLineSnapshot/task (0.00s)
+    --- PASS: TestFormatProgressLineSnapshot/step (0.00s)
+    --- PASS: TestFormatProgressLineSnapshot/empty_fields (0.00s)
+=== RUN   TestProgressStoreKeepsSealSink
+=== RUN   TestProgressStoreKeepsSealSink/keeps_capability_and_missing-seal_shape
+=== RUN   TestProgressStoreKeepsSealSink/forwards_seal_write_path
+--- PASS: TestProgressStoreKeepsSealSink (0.02s)
+    --- PASS: TestProgressStoreKeepsSealSink/keeps_capability_and_missing-seal_shape (0.00s)
+    --- PASS: TestProgressStoreKeepsSealSink/forwards_seal_write_path (0.01s)
+=== RUN   TestRunCommandAcceptsProgressFlag
+--- PASS: TestRunCommandAcceptsProgressFlag (0.06s)
+=== RUN   TestProgressFlagAgentRunnerRouteKeepsTheRunIdentical
+--- PASS: TestProgressFlagAgentRunnerRouteKeepsTheRunIdentical (0.83s)
+=== RUN   TestProgressFlagSupervisedRouteKeepsStdoutAndStreamsToStderr
+--- PASS: TestProgressFlagSupervisedRouteKeepsStdoutAndStreamsToStderr (0.74s)
+=== RUN   TestProbePermitConsumedAfterSuccessfulAssembly
+--- PASS: TestProbePermitConsumedAfterSuccessfulAssembly (0.24s)
+=== RUN   TestAgentRunnerAssemblyRefusesNilProbePermit
+--- PASS: TestAgentRunnerAssemblyRefusesNilProbePermit (0.05s)
+=== RUN   TestSupervisedAssemblyRefusesNilProbePermit
+--- PASS: TestSupervisedAssemblyRefusesNilProbePermit (0.01s)
+=== RUN   TestAgentRunnerAssemblyRefusesSpentProbePermit
+--- PASS: TestAgentRunnerAssemblyRefusesSpentProbePermit (0.06s)
+=== RUN   TestSupervisedAssemblyRefusesSpentProbePermit
+--- PASS: TestSupervisedAssemblyRefusesSpentProbePermit (0.02s)
+=== RUN   TestRunRefusesMissingProbePermitFlag
+--- PASS: TestRunRefusesMissingProbePermitFlag (0.01s)
+=== RUN   TestRunRefusesIncompleteRecordsBeforeBurningPermit
+--- PASS: TestRunRefusesIncompleteRecordsBeforeBurningPermit (0.02s)
+=== RUN   TestZeroModelAgentCLIHelper
+--- PASS: TestZeroModelAgentCLIHelper (0.00s)
+=== RUN   TestZeroModelConcurrentStartOneWinner
+--- PASS: TestZeroModelConcurrentStartOneWinner (1.76s)
+=== RUN   TestAgentRunnerAssemblyFullChain
+    runtime_agent_e2e_test.go:520: SKIP: publication durability is unproven on windows, so the production dispatcher refuses before R and the full chain cannot run here. The Windows-native evidence is TestAgentRunnerAssemblyRefusesOnUnprovenDurability; the full chain runs on Ubuntu CI (local Unix).
+--- SKIP: TestAgentRunnerAssemblyFullChain (0.03s)
+=== RUN   TestAgentRunnerAssemblyRefusesOnUnprovenDurability
+--- PASS: TestAgentRunnerAssemblyRefusesOnUnprovenDurability (0.19s)
+=== RUN   TestAgentRunnerAssemblyRefusesOnUncompensatedCapability
+--- PASS: TestAgentRunnerAssemblyRefusesOnUncompensatedCapability (0.16s)
+=== RUN   TestAgentRunnerAssemblyRefusesOnPlatformMismatch
+--- PASS: TestAgentRunnerAssemblyRefusesOnPlatformMismatch (0.20s)
+=== RUN   TestAgentRunnerAssemblyRefusesOnStaleEnforcement
+--- PASS: TestAgentRunnerAssemblyRefusesOnStaleEnforcement (0.19s)
+=== RUN   TestAgentRunnerAssemblyRefusesOnUnavailableChannel
+--- PASS: TestAgentRunnerAssemblyRefusesOnUnavailableChannel (0.18s)
+=== RUN   TestAgentRunnerAssemblyRefusesOnWorkspaceReplayOverlap
+--- PASS: TestAgentRunnerAssemblyRefusesOnWorkspaceReplayOverlap (0.08s)
+=== RUN   TestAgentRunnerAssemblyRefusesOnIncompleteRecords
+--- PASS: TestAgentRunnerAssemblyRefusesOnIncompleteRecords (0.03s)
+=== RUN   TestAgentRunnerMitigateAbandonedLaunchStopsAndKeepsTheOriginalError
+=== RUN   TestAgentRunnerMitigateAbandonedLaunchStopsAndKeepsTheOriginalError/a_proven_stop_keeps_the_original_error
+=== RUN   TestAgentRunnerMitigateAbandonedLaunchStopsAndKeepsTheOriginalError/a_missing_receipt_is_unproven
+=== RUN   TestAgentRunnerMitigateAbandonedLaunchStopsAndKeepsTheOriginalError/a_stop_error_is_unproven
+=== RUN   TestAgentRunnerMitigateAbandonedLaunchStopsAndKeepsTheOriginalError/an_unproven_stop_proof_is_unproven
+--- PASS: TestAgentRunnerMitigateAbandonedLaunchStopsAndKeepsTheOriginalError (0.00s)
+    --- PASS: TestAgentRunnerMitigateAbandonedLaunchStopsAndKeepsTheOriginalError/a_proven_stop_keeps_the_original_error (0.00s)
+    --- PASS: TestAgentRunnerMitigateAbandonedLaunchStopsAndKeepsTheOriginalError/a_missing_receipt_is_unproven (0.00s)
+    --- PASS: TestAgentRunnerMitigateAbandonedLaunchStopsAndKeepsTheOriginalError/a_stop_error_is_unproven (0.00s)
+    --- PASS: TestAgentRunnerMitigateAbandonedLaunchStopsAndKeepsTheOriginalError/an_unproven_stop_proof_is_unproven (0.00s)
+=== RUN   TestAgentRunnerSeedChildPIDReportLandsInTheEvidenceDir
+--- PASS: TestAgentRunnerSeedChildPIDReportLandsInTheEvidenceDir (0.06s)
+=== RUN   TestAgentRunnerAssemblyRefusesPublishWithoutPIDReport
+=== RUN   TestAgentRunnerAssemblyRefusesPublishWithoutPIDReport/both_pid_reports_deleted_is_a_fail-closed_refusal
+=== RUN   TestAgentRunnerAssemblyRefusesPublishWithoutPIDReport/only_a_parent_report_is_a_fail-closed_refusal
+=== RUN   TestAgentRunnerAssemblyRefusesPublishWithoutPIDReport/only_a_child_report_is_a_fail-closed_refusal
+=== RUN   TestAgentRunnerAssemblyRefusesPublishWithoutPIDReport/both_reports_with_a_live_parent_keep_the_assembly_blocked
+=== RUN   TestAgentRunnerAssemblyRefusesPublishWithoutPIDReport/both_reports_with_gone_pids_prove_stopped
+=== RUN   TestAgentRunnerAssemblyRefusesPublishWithoutPIDReport/an_unparsable_pid_report_is_a_fail-closed_refusal
+=== RUN   TestAgentRunnerAssemblyRefusesPublishWithoutPIDReport/a_parent_report_with_trailing_garbage_is_a_fail-closed_refusal
+=== RUN   TestAgentRunnerAssemblyRefusesPublishWithoutPIDReport/a_parent_report_with_a_float_pid_is_a_fail-closed_refusal
+--- PASS: TestAgentRunnerAssemblyRefusesPublishWithoutPIDReport (0.51s)
+    --- PASS: TestAgentRunnerAssemblyRefusesPublishWithoutPIDReport/both_pid_reports_deleted_is_a_fail-closed_refusal (0.05s)
+    --- PASS: TestAgentRunnerAssemblyRefusesPublishWithoutPIDReport/only_a_parent_report_is_a_fail-closed_refusal (0.05s)
+    --- PASS: TestAgentRunnerAssemblyRefusesPublishWithoutPIDReport/only_a_child_report_is_a_fail-closed_refusal (0.05s)
+    --- PASS: TestAgentRunnerAssemblyRefusesPublishWithoutPIDReport/both_reports_with_a_live_parent_keep_the_assembly_blocked (0.06s)
+    --- PASS: TestAgentRunnerAssemblyRefusesPublishWithoutPIDReport/both_reports_with_gone_pids_prove_stopped (0.06s)
+    --- PASS: TestAgentRunnerAssemblyRefusesPublishWithoutPIDReport/an_unparsable_pid_report_is_a_fail-closed_refusal (0.06s)
+    --- PASS: TestAgentRunnerAssemblyRefusesPublishWithoutPIDReport/a_parent_report_with_trailing_garbage_is_a_fail-closed_refusal (0.06s)
+    --- PASS: TestAgentRunnerAssemblyRefusesPublishWithoutPIDReport/a_parent_report_with_a_float_pid_is_a_fail-closed_refusal (0.06s)
+=== RUN   TestAgentRunnerReadPIDsMatrixConsoleTwin
+=== RUN   TestAgentRunnerReadPIDsMatrixConsoleTwin/plain_7
+=== RUN   TestAgentRunnerReadPIDsMatrixConsoleTwin/signed_plus_7
+=== RUN   TestAgentRunnerReadPIDsMatrixConsoleTwin/padded_7
+=== RUN   TestAgentRunnerReadPIDsMatrixConsoleTwin/zero_padded_007
+=== RUN   TestAgentRunnerReadPIDsMatrixConsoleTwin/CRLF_terminated_7
+=== RUN   TestAgentRunnerReadPIDsMatrixConsoleTwin/two_pids_with_an_interior_blank_line
+=== RUN   TestAgentRunnerReadPIDsMatrixConsoleTwin/trailing_garbage_12abc
+=== RUN   TestAgentRunnerReadPIDsMatrixConsoleTwin/float_7.0
+=== RUN   TestAgentRunnerReadPIDsMatrixConsoleTwin/underscore_1_0
+=== RUN   TestAgentRunnerReadPIDsMatrixConsoleTwin/hex_0x10
+=== RUN   TestAgentRunnerReadPIDsMatrixConsoleTwin/negative_zero_-0
+=== RUN   TestAgentRunnerReadPIDsMatrixConsoleTwin/negative_-5
+=== RUN   TestAgentRunnerReadPIDsMatrixConsoleTwin/int64_overflow
+=== RUN   TestAgentRunnerReadPIDsMatrixConsoleTwin/missing_file
+=== RUN   TestAgentRunnerReadPIDsMatrixConsoleTwin/empty_file
+=== RUN   TestAgentRunnerReadPIDsMatrixConsoleTwin/whitespace_only
+--- PASS: TestAgentRunnerReadPIDsMatrixConsoleTwin (0.10s)
+    --- PASS: TestAgentRunnerReadPIDsMatrixConsoleTwin/plain_7 (0.01s)
+    --- PASS: TestAgentRunnerReadPIDsMatrixConsoleTwin/signed_plus_7 (0.01s)
+    --- PASS: TestAgentRunnerReadPIDsMatrixConsoleTwin/padded_7 (0.01s)
+    --- PASS: TestAgentRunnerReadPIDsMatrixConsoleTwin/zero_padded_007 (0.01s)
+    --- PASS: TestAgentRunnerReadPIDsMatrixConsoleTwin/CRLF_terminated_7 (0.01s)
+    --- PASS: TestAgentRunnerReadPIDsMatrixConsoleTwin/two_pids_with_an_interior_blank_line (0.01s)
+    --- PASS: TestAgentRunnerReadPIDsMatrixConsoleTwin/trailing_garbage_12abc (0.01s)
+    --- PASS: TestAgentRunnerReadPIDsMatrixConsoleTwin/float_7.0 (0.01s)
+    --- PASS: TestAgentRunnerReadPIDsMatrixConsoleTwin/underscore_1_0 (0.01s)
+    --- PASS: TestAgentRunnerReadPIDsMatrixConsoleTwin/hex_0x10 (0.01s)
+    --- PASS: TestAgentRunnerReadPIDsMatrixConsoleTwin/negative_zero_-0 (0.01s)
+    --- PASS: TestAgentRunnerReadPIDsMatrixConsoleTwin/negative_-5 (0.01s)
+    --- PASS: TestAgentRunnerReadPIDsMatrixConsoleTwin/int64_overflow (0.01s)
+    --- PASS: TestAgentRunnerReadPIDsMatrixConsoleTwin/missing_file (0.00s)
+    --- PASS: TestAgentRunnerReadPIDsMatrixConsoleTwin/empty_file (0.01s)
+    --- PASS: TestAgentRunnerReadPIDsMatrixConsoleTwin/whitespace_only (0.01s)
+=== RUN   TestAgentRunnerMitigateAbandonedLaunchClosureCoversEveryUnprovenShape
+=== RUN   TestAgentRunnerMitigateAbandonedLaunchClosureCoversEveryUnprovenShape/an_unavailable_reclaimer_is_unproven
+=== RUN   TestAgentRunnerMitigateAbandonedLaunchClosureCoversEveryUnprovenShape/an_unreadable_receipt_is_unproven
+--- PASS: TestAgentRunnerMitigateAbandonedLaunchClosureCoversEveryUnprovenShape (0.00s)
+    --- PASS: TestAgentRunnerMitigateAbandonedLaunchClosureCoversEveryUnprovenShape/an_unavailable_reclaimer_is_unproven (0.00s)
+    --- PASS: TestAgentRunnerMitigateAbandonedLaunchClosureCoversEveryUnprovenShape/an_unreadable_receipt_is_unproven (0.00s)
+=== RUN   TestAgentRunnerAssemblyFunnelsEveryPostSpawnFailureThroughTheFallback
+--- PASS: TestAgentRunnerAssemblyFunnelsEveryPostSpawnFailureThroughTheFallback (0.00s)
+=== RUN   TestSandboxEnforcementFromEnv
+=== RUN   TestSandboxEnforcementFromEnv/unset
+=== RUN   TestSandboxEnforcementFromEnv/empty
+=== RUN   TestSandboxEnforcementFromEnv/off
+=== RUN   TestSandboxEnforcementFromEnv/enforce
+=== RUN   TestSandboxEnforcementFromEnv/unknown_value
+=== RUN   TestSandboxEnforcementFromEnv/wrong_case
+--- PASS: TestSandboxEnforcementFromEnv (0.00s)
+    --- PASS: TestSandboxEnforcementFromEnv/unset (0.00s)
+    --- PASS: TestSandboxEnforcementFromEnv/empty (0.00s)
+    --- PASS: TestSandboxEnforcementFromEnv/off (0.00s)
+    --- PASS: TestSandboxEnforcementFromEnv/enforce (0.00s)
+    --- PASS: TestSandboxEnforcementFromEnv/unknown_value (0.00s)
+    --- PASS: TestSandboxEnforcementFromEnv/wrong_case (0.00s)
+=== RUN   TestAgentRunnerRunSandboxRefusesBeforePermit
+=== RUN   TestAgentRunnerRunSandboxRefusesBeforePermit/denied
+=== RUN   TestAgentRunnerRunSandboxRefusesBeforePermit/unknown
+=== RUN   TestAgentRunnerRunSandboxRefusesBeforePermit/unavailable
+--- PASS: TestAgentRunnerRunSandboxRefusesBeforePermit (0.13s)
+    --- PASS: TestAgentRunnerRunSandboxRefusesBeforePermit/denied (0.05s)
+    --- PASS: TestAgentRunnerRunSandboxRefusesBeforePermit/unknown (0.05s)
+    --- PASS: TestAgentRunnerRunSandboxRefusesBeforePermit/unavailable (0.04s)
+=== RUN   TestAgentRunnerMultiTaskSerialOfflineHarness
+    runtime_multitask_agent_test.go:428: R/C publication skipped: durability is unproven on this platform
+--- PASS: TestAgentRunnerMultiTaskSerialOfflineHarness (0.14s)
+=== RUN   TestAgentRunnerDriverTwoTaskSerialAssembly
+=== RUN   TestAgentRunnerDriverTwoTaskSerialAssembly/a_proven_stop_lets_the_next_task_start
+=== RUN   TestAgentRunnerDriverTwoTaskSerialAssembly/a_live_launch_blocks_the_next_task
+=== RUN   TestAgentRunnerDriverTwoTaskSerialAssembly/a_missing_stop_report_fails_closed
+--- PASS: TestAgentRunnerDriverTwoTaskSerialAssembly (1.07s)
+    --- PASS: TestAgentRunnerDriverTwoTaskSerialAssembly/a_proven_stop_lets_the_next_task_start (0.44s)
+    --- PASS: TestAgentRunnerDriverTwoTaskSerialAssembly/a_live_launch_blocks_the_next_task (0.34s)
+    --- PASS: TestAgentRunnerDriverTwoTaskSerialAssembly/a_missing_stop_report_fails_closed (0.29s)
+=== RUN   TestAgentRunnerDriverStopsTheLaunchOfTheTaskThatJustFailed
+--- PASS: TestAgentRunnerDriverStopsTheLaunchOfTheTaskThatJustFailed (0.37s)
+=== RUN   TestAgentRunnerAssemblyRefusesNonInitialAttempt
+--- PASS: TestAgentRunnerAssemblyRefusesNonInitialAttempt (0.04s)
+=== RUN   TestAgentRunnerAssemblyAcceptsMultiTaskDefinitionShape
+--- PASS: TestAgentRunnerAssemblyAcceptsMultiTaskDefinitionShape (0.01s)
+=== RUN   TestSupervisedAssemblyAcceptsMultiTaskDefinitionShape
+--- PASS: TestSupervisedAssemblyAcceptsMultiTaskDefinitionShape (0.01s)
+=== RUN   TestMultiTaskDefinitionShapeIsOtherwiseValid
+--- PASS: TestMultiTaskDefinitionShapeIsOtherwiseValid (0.01s)
+=== RUN   TestSupervisedMultiTaskSerialHarness
+--- PASS: TestSupervisedMultiTaskSerialHarness (0.47s)
+=== RUN   TestSupervisedScopeAllowsRejectsJunctionResolvingOutsideRoot
+--- PASS: TestSupervisedScopeAllowsRejectsJunctionResolvingOutsideRoot (0.14s)
+=== RUN   TestSupervisedRunSandboxRefusesBeforePermit
+=== RUN   TestSupervisedRunSandboxRefusesBeforePermit/denied
+=== RUN   TestSupervisedRunSandboxRefusesBeforePermit/unknown
+=== RUN   TestSupervisedRunSandboxRefusesBeforePermit/unavailable
+--- PASS: TestSupervisedRunSandboxRefusesBeforePermit (0.03s)
+    --- PASS: TestSupervisedRunSandboxRefusesBeforePermit/denied (0.01s)
+    --- PASS: TestSupervisedRunSandboxRefusesBeforePermit/unknown (0.01s)
+    --- PASS: TestSupervisedRunSandboxRefusesBeforePermit/unavailable (0.01s)
+=== RUN   TestSupervisedAssemblyFullChain
+--- PASS: TestSupervisedAssemblyFullChain (0.24s)
+=== RUN   TestSupervisedRunRestartRecovery
+--- PASS: TestSupervisedRunRestartRecovery (0.26s)
+=== RUN   TestSupervisedReportRenderGolden
+--- PASS: TestSupervisedReportRenderGolden (0.21s)
+=== RUN   TestSupervisedReportOmitsUnprovenReviewDimension
+--- PASS: TestSupervisedReportOmitsUnprovenReviewDimension (0.25s)
+=== RUN   TestSupervisedAssemblyBlocksWithoutConfirmation
+--- PASS: TestSupervisedAssemblyBlocksWithoutConfirmation (0.06s)
+=== RUN   TestSupervisedAssemblyRejectsSelectionReject
+--- PASS: TestSupervisedAssemblyRejectsSelectionReject (0.08s)
+=== RUN   TestSupervisedVisibleUnavailableFailsClosed
+=== RUN   TestSupervisedVisibleUnavailableFailsClosed/unavailable
+=== RUN   TestSupervisedVisibleUnavailableFailsClosed/unknown
+--- PASS: TestSupervisedVisibleUnavailableFailsClosed (0.10s)
+    --- PASS: TestSupervisedVisibleUnavailableFailsClosed/unavailable (0.05s)
+    --- PASS: TestSupervisedVisibleUnavailableFailsClosed/unknown (0.05s)
+=== RUN   TestSupervisedConfirmationRefusesNonAcceptedPersistedDelivery
+=== RUN   TestSupervisedConfirmationRefusesNonAcceptedPersistedDelivery/unavailable
+=== RUN   TestSupervisedConfirmationRefusesNonAcceptedPersistedDelivery/unknown
+--- PASS: TestSupervisedConfirmationRefusesNonAcceptedPersistedDelivery (0.25s)
+    --- PASS: TestSupervisedConfirmationRefusesNonAcceptedPersistedDelivery/unavailable (0.10s)
+    --- PASS: TestSupervisedConfirmationRefusesNonAcceptedPersistedDelivery/unknown (0.15s)
+=== RUN   TestSupervisedReturnRefusesFailedGate
+--- PASS: TestSupervisedReturnRefusesFailedGate (0.30s)
+=== RUN   TestSupervisedReturnRefusesTimeout
+--- PASS: TestSupervisedReturnRefusesTimeout (0.26s)
+=== RUN   TestSupervisedReturnEnforcesFrozenPolicy
+--- PASS: TestSupervisedReturnEnforcesFrozenPolicy (0.42s)
+=== RUN   TestSupervisedReturnRefusesDriftedPolicy
+=== RUN   TestSupervisedReturnRefusesDriftedPolicy/different_timeout
+=== RUN   TestSupervisedReturnRefusesDriftedPolicy/different_after-return_hooks
+=== RUN   TestSupervisedReturnRefusesDriftedPolicy/different_allowed_targets
+--- PASS: TestSupervisedReturnRefusesDriftedPolicy (0.50s)
+    --- PASS: TestSupervisedReturnRefusesDriftedPolicy/different_timeout (0.18s)
+    --- PASS: TestSupervisedReturnRefusesDriftedPolicy/different_after-return_hooks (0.16s)
+    --- PASS: TestSupervisedReturnRefusesDriftedPolicy/different_allowed_targets (0.16s)
+=== RUN   TestSupervisedReturnAllowsAbortUnderDriftedPolicy
+--- PASS: TestSupervisedReturnAllowsAbortUnderDriftedPolicy (0.15s)
+=== RUN   TestSupervisedFrozenPolicySnapshotIsCanonical
+--- PASS: TestSupervisedFrozenPolicySnapshotIsCanonical (0.01s)
+=== RUN   TestSupervisedReturnRefusesSecretFinding
+--- PASS: TestSupervisedReturnRefusesSecretFinding (0.15s)
+=== RUN   TestRunCommandRefusesMixedSupervisedAgentRunnerInputs
+--- PASS: TestRunCommandRefusesMixedSupervisedAgentRunnerInputs (0.01s)
+=== RUN   TestAgentRunnerAssemblyRefusesSupervisedDefinition
+--- PASS: TestAgentRunnerAssemblyRefusesSupervisedDefinition (0.01s)
+=== RUN   TestSupervisedAssemblyRefusesAgentRunnerDefinition
+--- PASS: TestSupervisedAssemblyRefusesAgentRunnerDefinition (0.00s)
+=== RUN   TestSupervisedReturnRefusesOutOfScopeChange
+--- PASS: TestSupervisedReturnRefusesOutOfScopeChange (0.17s)
+=== RUN   TestSupervisedScopeUnderivableFailsClosed
+--- PASS: TestSupervisedScopeUnderivableFailsClosed (0.02s)
+=== RUN   TestSupervisedScopeRejectsUnresolvableRoot
+--- PASS: TestSupervisedScopeRejectsUnresolvableRoot (0.00s)
+=== RUN   TestSupervisedScopeAllowsRejectsLinkResolvingOutsideRoot
+    runtime_supervised_test.go:1014: symlink creation unavailable: symlink C:\Users\妙妙呜\AppData\Local\Temp\TestSupervisedScopeAllowsRejectsLinkResolvingOutsideRoot476273230\002\target.txt C:\Users\妙妙呜\AppData\Local\Temp\TestSupervisedScopeAllowsRejectsLinkResolvingOutsideRoot476273230\001\escape.txt: A required privilege is not held by the client.
+--- SKIP: TestSupervisedScopeAllowsRejectsLinkResolvingOutsideRoot (0.01s)
+=== RUN   TestSupervisedReturnRefusesSideEffect
+--- PASS: TestSupervisedReturnRefusesSideEffect (0.18s)
+=== RUN   TestSupervisedSideEffectScanBlocksTamperedManifests
+=== RUN   TestSupervisedSideEffectScanBlocksTamperedManifests/positive_control:_unmodified_pair_passes
+=== RUN   TestSupervisedSideEffectScanBlocksTamperedManifests/type_change
+=== RUN   TestSupervisedSideEffectScanBlocksTamperedManifests/permission_change
+=== RUN   TestSupervisedSideEffectScanBlocksTamperedManifests/absolute_link_target
+=== RUN   TestSupervisedSideEffectScanBlocksTamperedManifests/relative_link_escaping_the_workspace_root
+--- PASS: TestSupervisedSideEffectScanBlocksTamperedManifests (0.02s)
+    --- PASS: TestSupervisedSideEffectScanBlocksTamperedManifests/positive_control:_unmodified_pair_passes (0.00s)
+    --- PASS: TestSupervisedSideEffectScanBlocksTamperedManifests/type_change (0.00s)
+    --- PASS: TestSupervisedSideEffectScanBlocksTamperedManifests/permission_change (0.00s)
+    --- PASS: TestSupervisedSideEffectScanBlocksTamperedManifests/absolute_link_target (0.00s)
+    --- PASS: TestSupervisedSideEffectScanBlocksTamperedManifests/relative_link_escaping_the_workspace_root (0.00s)
+=== RUN   TestSupervisedFileTypeScanRejectsUnacceptedType
+--- PASS: TestSupervisedFileTypeScanRejectsUnacceptedType (0.00s)
+=== RUN   TestSupervisedReturnRefusesLiveManagedProcess
+--- PASS: TestSupervisedReturnRefusesLiveManagedProcess (0.16s)
+=== RUN   TestSupervisedIsolationReadsOnlyWorkspace
+--- PASS: TestSupervisedIsolationReadsOnlyWorkspace (0.25s)
+=== RUN   TestSupervisedAssemblyFullChainExtendedScans
+--- PASS: TestSupervisedAssemblyFullChainExtendedScans (0.20s)
+=== RUN   TestSupervisedConfirmationCrashAfterAppendConverges
+--- PASS: TestSupervisedConfirmationCrashAfterAppendConverges (0.21s)
+=== RUN   TestSupervisedConfirmationCrashAfterResumeConverges
+--- PASS: TestSupervisedConfirmationCrashAfterResumeConverges (0.18s)
+=== RUN   TestSupervisedConfirmationCrashAfterWindowOpenConverges
+--- PASS: TestSupervisedConfirmationCrashAfterWindowOpenConverges (0.25s)
+=== RUN   TestNoSupervisedReferencesInAgentRunnerPaths
+--- PASS: TestNoSupervisedReferencesInAgentRunnerPaths (0.05s)
+=== RUN   TestSupervisedPathNeverRoutesThroughAgentRunner
+--- PASS: TestSupervisedPathNeverRoutesThroughAgentRunner (0.26s)
+=== RUN   TestZeroModelConsoleNoopThreeTaskE2E
+--- PASS: TestZeroModelConsoleNoopThreeTaskE2E (0.10s)
+=== RUN   TestZeroModelConsoleNaturalFailureStopsLaterTasks
+--- PASS: TestZeroModelConsoleNaturalFailureStopsLaterTasks (0.07s)
+=== RUN   TestZeroModelPreviewStaysRunnableWithoutAI
+--- PASS: TestZeroModelPreviewStaysRunnableWithoutAI (0.00s)
+=== RUN   TestSecretCLISetStatusDeleteWithoutDisclosure
+--- PASS: TestSecretCLISetStatusDeleteWithoutDisclosure (0.00s)
+=== RUN   TestSecretCLIRejectsPositionalValueWithoutReading
+--- PASS: TestSecretCLIRejectsPositionalValueWithoutReading (0.00s)
+=== RUN   TestSecretCLIRequiresReference
+--- PASS: TestSecretCLIRequiresReference (0.00s)
+=== RUN   TestDefaultStopRunReturnsTerminalEvidence
+--- PASS: TestDefaultStopRunReturnsTerminalEvidence (0.05s)
+=== RUN   TestDefaultStopRunFailsClosedWhenManagedIdentityMissing
+--- PASS: TestDefaultStopRunFailsClosedWhenManagedIdentityMissing (0.00s)
+=== RUN   TestDefaultStopRunRespectsRunDirOverride
+--- PASS: TestDefaultStopRunRespectsRunDirOverride (0.05s)
+=== RUN   TestDefaultStopRunAppliesBoundedStopTimeout
+--- PASS: TestDefaultStopRunAppliesBoundedStopTimeout (0.01s)
+PASS
+ok  	github.com/larsonzh/prfrail/internal/console	29.993s
+=== RUN   TestAgentRunnerCompositeAdmissionEffectClassCoverage
+--- PASS: TestAgentRunnerCompositeAdmissionEffectClassCoverage (0.01s)
+=== RUN   TestAgentRunnerCompositeAdmissionAdmitsOfflineBoundRequest
+--- PASS: TestAgentRunnerCompositeAdmissionAdmitsOfflineBoundRequest (0.00s)
+=== RUN   TestAgentRunnerCompositeAdmissionRejectsMissingInvalidOrTamperedFacts
+=== RUN   TestAgentRunnerCompositeAdmissionRejectsMissingInvalidOrTamperedFacts/missing
+=== RUN   TestAgentRunnerCompositeAdmissionRejectsMissingInvalidOrTamperedFacts/invalid-hash
+=== RUN   TestAgentRunnerCompositeAdmissionRejectsMissingInvalidOrTamperedFacts/invalid-request-id
+--- PASS: TestAgentRunnerCompositeAdmissionRejectsMissingInvalidOrTamperedFacts (0.00s)
+    --- PASS: TestAgentRunnerCompositeAdmissionRejectsMissingInvalidOrTamperedFacts/missing (0.00s)
+    --- PASS: TestAgentRunnerCompositeAdmissionRejectsMissingInvalidOrTamperedFacts/invalid-hash (0.00s)
+    --- PASS: TestAgentRunnerCompositeAdmissionRejectsMissingInvalidOrTamperedFacts/invalid-request-id (0.00s)
+=== RUN   TestAgentRunnerCompositeAdmissionRejectsMissingExecutionTarget
+--- PASS: TestAgentRunnerCompositeAdmissionRejectsMissingExecutionTarget (0.00s)
+=== RUN   TestAgentRunnerCompositeAdmissionRejectsMissingClock
+--- PASS: TestAgentRunnerCompositeAdmissionRejectsMissingClock (0.00s)
+=== RUN   TestAgentRunnerCompositeAdmissionRejectsAdapterCandidateMismatch
+--- PASS: TestAgentRunnerCompositeAdmissionRejectsAdapterCandidateMismatch (0.00s)
+=== RUN   TestAgentRunnerCompositeAdmissionRequiresAgentRunnerCLIAvailability
+--- PASS: TestAgentRunnerCompositeAdmissionRequiresAgentRunnerCLIAvailability (0.00s)
+=== RUN   TestAgentRunnerCompositeAdmissionUsesCurrentEvaluationTime
+--- PASS: TestAgentRunnerCompositeAdmissionUsesCurrentEvaluationTime (0.00s)
+=== RUN   TestAgentRunnerCompositeAdmissionRejectsResumeWithoutContinuityEvidence
+--- PASS: TestAgentRunnerCompositeAdmissionRejectsResumeWithoutContinuityEvidence (0.00s)
+=== RUN   TestAgentRunnerCompositeAdmissionBindsStepIdentityAndFacts
+=== RUN   TestAgentRunnerCompositeAdmissionBindsStepIdentityAndFacts/budget-hash
+=== RUN   TestAgentRunnerCompositeAdmissionBindsStepIdentityAndFacts/run
+=== RUN   TestAgentRunnerCompositeAdmissionBindsStepIdentityAndFacts/task
+=== RUN   TestAgentRunnerCompositeAdmissionBindsStepIdentityAndFacts/request-id
+=== RUN   TestAgentRunnerCompositeAdmissionBindsStepIdentityAndFacts/workspace-hash
+=== RUN   TestAgentRunnerCompositeAdmissionBindsStepIdentityAndFacts/context-hash
+=== RUN   TestAgentRunnerCompositeAdmissionBindsStepIdentityAndFacts/step
+=== RUN   TestAgentRunnerCompositeAdmissionBindsStepIdentityAndFacts/attempt
+=== RUN   TestAgentRunnerCompositeAdmissionBindsStepIdentityAndFacts/parent
+=== RUN   TestAgentRunnerCompositeAdmissionBindsStepIdentityAndFacts/authorization-hash
+--- PASS: TestAgentRunnerCompositeAdmissionBindsStepIdentityAndFacts (0.01s)
+    --- PASS: TestAgentRunnerCompositeAdmissionBindsStepIdentityAndFacts/budget-hash (0.00s)
+    --- PASS: TestAgentRunnerCompositeAdmissionBindsStepIdentityAndFacts/run (0.00s)
+    --- PASS: TestAgentRunnerCompositeAdmissionBindsStepIdentityAndFacts/task (0.00s)
+    --- PASS: TestAgentRunnerCompositeAdmissionBindsStepIdentityAndFacts/request-id (0.00s)
+    --- PASS: TestAgentRunnerCompositeAdmissionBindsStepIdentityAndFacts/workspace-hash (0.00s)
+    --- PASS: TestAgentRunnerCompositeAdmissionBindsStepIdentityAndFacts/context-hash (0.00s)
+    --- PASS: TestAgentRunnerCompositeAdmissionBindsStepIdentityAndFacts/step (0.00s)
+    --- PASS: TestAgentRunnerCompositeAdmissionBindsStepIdentityAndFacts/attempt (0.00s)
+    --- PASS: TestAgentRunnerCompositeAdmissionBindsStepIdentityAndFacts/parent (0.00s)
+    --- PASS: TestAgentRunnerCompositeAdmissionBindsStepIdentityAndFacts/authorization-hash (0.00s)
+=== RUN   TestAgentRunnerCompositeAdmissionRejectsInvalidRequestRecord
+--- PASS: TestAgentRunnerCompositeAdmissionRejectsInvalidRequestRecord (0.00s)
+=== RUN   TestAgentRunnerCompositeAdmissionCallsAvailabilityBeforeCapability
+--- PASS: TestAgentRunnerCompositeAdmissionCallsAvailabilityBeforeCapability (0.00s)
+=== RUN   TestAgentRunnerCompositeAdmissionRejectsCapabilityAndEnforcementBlocks
+=== RUN   TestAgentRunnerCompositeAdmissionRejectsCapabilityAndEnforcementBlocks/capability
+=== RUN   TestAgentRunnerCompositeAdmissionRejectsCapabilityAndEnforcementBlocks/enforcement
+--- PASS: TestAgentRunnerCompositeAdmissionRejectsCapabilityAndEnforcementBlocks (0.01s)
+    --- PASS: TestAgentRunnerCompositeAdmissionRejectsCapabilityAndEnforcementBlocks/capability (0.00s)
+    --- PASS: TestAgentRunnerCompositeAdmissionRejectsCapabilityAndEnforcementBlocks/enforcement (0.01s)
+=== RUN   TestAgentRunnerCompositeAdmissionRequiresActiveScopedAuthorization
+=== RUN   TestAgentRunnerCompositeAdmissionRequiresActiveScopedAuthorization/missing_grant
+=== RUN   TestAgentRunnerCompositeAdmissionRequiresActiveScopedAuthorization/revoked_grant
+=== RUN   TestAgentRunnerCompositeAdmissionRequiresActiveScopedAuthorization/target_outside_scope
+=== RUN   TestAgentRunnerCompositeAdmissionRequiresActiveScopedAuthorization/bound_expired_grant_with_newer_active_grant
+--- PASS: TestAgentRunnerCompositeAdmissionRequiresActiveScopedAuthorization (0.01s)
+    --- PASS: TestAgentRunnerCompositeAdmissionRequiresActiveScopedAuthorization/missing_grant (0.00s)
+    --- PASS: TestAgentRunnerCompositeAdmissionRequiresActiveScopedAuthorization/revoked_grant (0.00s)
+    --- PASS: TestAgentRunnerCompositeAdmissionRequiresActiveScopedAuthorization/target_outside_scope (0.00s)
+    --- PASS: TestAgentRunnerCompositeAdmissionRequiresActiveScopedAuthorization/bound_expired_grant_with_newer_active_grant (0.00s)
+=== RUN   TestAgentRunnerCompositeAdmissionRequiresOutstandingBoundBudget
+=== RUN   TestAgentRunnerCompositeAdmissionRequiresOutstandingBoundBudget/missing_ledger
+=== RUN   TestAgentRunnerCompositeAdmissionRequiresOutstandingBoundBudget/settled_reservation
+=== RUN   TestAgentRunnerCompositeAdmissionRequiresOutstandingBoundBudget/run_binding_mismatch
+=== RUN   TestAgentRunnerCompositeAdmissionRequiresOutstandingBoundBudget/request_binding_mismatch
+=== RUN   TestAgentRunnerCompositeAdmissionRequiresOutstandingBoundBudget/authorization_binding_mismatch
+--- PASS: TestAgentRunnerCompositeAdmissionRequiresOutstandingBoundBudget (0.01s)
+    --- PASS: TestAgentRunnerCompositeAdmissionRequiresOutstandingBoundBudget/missing_ledger (0.00s)
+    --- PASS: TestAgentRunnerCompositeAdmissionRequiresOutstandingBoundBudget/settled_reservation (0.00s)
+    --- PASS: TestAgentRunnerCompositeAdmissionRequiresOutstandingBoundBudget/run_binding_mismatch (0.00s)
+    --- PASS: TestAgentRunnerCompositeAdmissionRequiresOutstandingBoundBudget/request_binding_mismatch (0.00s)
+    --- PASS: TestAgentRunnerCompositeAdmissionRequiresOutstandingBoundBudget/authorization_binding_mismatch (0.00s)
+=== RUN   TestAgentRunnerCompositeAdmissionIsStatelessPreflight
+--- PASS: TestAgentRunnerCompositeAdmissionIsStatelessPreflight (0.00s)
+=== RUN   TestAgentRunnerCompositeAdmissionFailureLeavesNoConsumedState
+=== RUN   TestAgentRunnerCompositeAdmissionFailureLeavesNoConsumedState/invalid_request_record
+=== RUN   TestAgentRunnerCompositeAdmissionFailureLeavesNoConsumedState/missing_clock
+--- PASS: TestAgentRunnerCompositeAdmissionFailureLeavesNoConsumedState (0.00s)
+    --- PASS: TestAgentRunnerCompositeAdmissionFailureLeavesNoConsumedState/invalid_request_record (0.00s)
+    --- PASS: TestAgentRunnerCompositeAdmissionFailureLeavesNoConsumedState/missing_clock (0.00s)
+=== RUN   TestAgentRunnerCompositeAdmissionConcurrentRepeatsPass
+--- PASS: TestAgentRunnerCompositeAdmissionConcurrentRepeatsPass (0.01s)
+=== RUN   TestAgentRunnerCompositeAdmissionLeavesInputsUnchanged
+=== RUN   TestAgentRunnerCompositeAdmissionLeavesInputsUnchanged/passing_verdict
+=== RUN   TestAgentRunnerCompositeAdmissionLeavesInputsUnchanged/blocked_verdict
+--- PASS: TestAgentRunnerCompositeAdmissionLeavesInputsUnchanged (0.00s)
+    --- PASS: TestAgentRunnerCompositeAdmissionLeavesInputsUnchanged/passing_verdict (0.00s)
+    --- PASS: TestAgentRunnerCompositeAdmissionLeavesInputsUnchanged/blocked_verdict (0.00s)
+=== RUN   TestAgentRunnerCompositeAdmissionRejectsNilReceiverCancelledContextAndZeroClock
+=== RUN   TestAgentRunnerCompositeAdmissionRejectsNilReceiverCancelledContextAndZeroClock/nil_receiver
+=== RUN   TestAgentRunnerCompositeAdmissionRejectsNilReceiverCancelledContextAndZeroClock/cancelled_context
+=== RUN   TestAgentRunnerCompositeAdmissionRejectsNilReceiverCancelledContextAndZeroClock/zero_evaluation_clock
+--- PASS: TestAgentRunnerCompositeAdmissionRejectsNilReceiverCancelledContextAndZeroClock (0.00s)
+    --- PASS: TestAgentRunnerCompositeAdmissionRejectsNilReceiverCancelledContextAndZeroClock/nil_receiver (0.00s)
+    --- PASS: TestAgentRunnerCompositeAdmissionRejectsNilReceiverCancelledContextAndZeroClock/cancelled_context (0.00s)
+    --- PASS: TestAgentRunnerCompositeAdmissionRejectsNilReceiverCancelledContextAndZeroClock/zero_evaluation_clock (0.00s)
+=== RUN   TestB3bCandidateDeviceFlush
+    agent_runner_b3b_candidates_windows_test.go:181: volume handle not available at this privilege level (reported, not swallowed): Access is denied.
+--- PASS: TestB3bCandidateDeviceFlush (0.01s)
+=== RUN   TestB3bCandidateMoveFileExNoReplace
+--- PASS: TestB3bCandidateMoveFileExNoReplace (0.01s)
+=== RUN   TestB3bCandidateDirectoryFlush
+--- PASS: TestB3bCandidateDirectoryFlush (0.01s)
+=== RUN   TestAgentRunnerCapabilityDispositionFailsClosed
+--- PASS: TestAgentRunnerCapabilityDispositionFailsClosed (0.00s)
+=== RUN   TestAgentRunnerCapabilityRejectsInvalidPlatform
+=== RUN   TestAgentRunnerCapabilityRejectsInvalidPlatform/os
+=== RUN   TestAgentRunnerCapabilityRejectsInvalidPlatform/arch
+=== RUN   TestAgentRunnerCapabilityRejectsInvalidPlatform/hash
+--- PASS: TestAgentRunnerCapabilityRejectsInvalidPlatform (0.00s)
+    --- PASS: TestAgentRunnerCapabilityRejectsInvalidPlatform/os (0.00s)
+    --- PASS: TestAgentRunnerCapabilityRejectsInvalidPlatform/arch (0.00s)
+    --- PASS: TestAgentRunnerCapabilityRejectsInvalidPlatform/hash (0.00s)
+=== RUN   TestAgentRunnerCapabilityReplayAndConflict
+--- PASS: TestAgentRunnerCapabilityReplayAndConflict (0.00s)
+=== RUN   TestAgentRunnerCapabilityIndexConcurrentReplay
+--- PASS: TestAgentRunnerCapabilityIndexConcurrentReplay (0.01s)
+=== RUN   TestAgentRunnerCapabilityIndexConcurrentConflict
+--- PASS: TestAgentRunnerCapabilityIndexConcurrentConflict (0.00s)
+=== RUN   TestPinnedAgentRunnerCapabilityReport
+--- PASS: TestPinnedAgentRunnerCapabilityReport (0.00s)
+=== RUN   TestAgentRunnerCompletionRequiresCompleteExternalEvidence
+--- PASS: TestAgentRunnerCompletionRequiresCompleteExternalEvidence (0.00s)
+=== RUN   TestAgentRunnerCompletionBinding
+--- PASS: TestAgentRunnerCompletionBinding (0.00s)
+=== RUN   TestAgentRunnerCompletionReplayAndRequestConflict
+--- PASS: TestAgentRunnerCompletionReplayAndRequestConflict (0.00s)
+=== RUN   TestAgentRunnerCompletionConcurrentReplay
+--- PASS: TestAgentRunnerCompletionConcurrentReplay (0.00s)
+=== RUN   TestAgentRunnerCompletionConcurrentRequestConflict
+--- PASS: TestAgentRunnerCompletionConcurrentRequestConflict (0.00s)
+=== RUN   TestAgentRunnerEnforcementRecordCanonicalRoundTrip
+--- PASS: TestAgentRunnerEnforcementRecordCanonicalRoundTrip (0.00s)
+=== RUN   TestAgentRunnerEnforcementRejectsTamperingAndUnknownFields
+--- PASS: TestAgentRunnerEnforcementRejectsTamperingAndUnknownFields (0.00s)
+=== RUN   TestAgentRunnerEnforcementReplayAndConflict
+--- PASS: TestAgentRunnerEnforcementReplayAndConflict (0.00s)
+=== RUN   TestAgentRunnerEnforcementConcurrentReplay
+--- PASS: TestAgentRunnerEnforcementConcurrentReplay (0.00s)
+=== RUN   TestAgentRunnerEnforcementConcurrentConflict
+--- PASS: TestAgentRunnerEnforcementConcurrentConflict (0.00s)
+=== RUN   TestAgentRunnerEnforcementRejectsDispositionMatrixMismatch
+=== RUN   TestAgentRunnerEnforcementRejectsDispositionMatrixMismatch/verified-with-gap
+=== RUN   TestAgentRunnerEnforcementRejectsDispositionMatrixMismatch/blocked-while-complete
+--- PASS: TestAgentRunnerEnforcementRejectsDispositionMatrixMismatch (0.00s)
+    --- PASS: TestAgentRunnerEnforcementRejectsDispositionMatrixMismatch/verified-with-gap (0.00s)
+    --- PASS: TestAgentRunnerEnforcementRejectsDispositionMatrixMismatch/blocked-while-complete (0.00s)
+=== RUN   TestAgentRunnerAdmissionRequiresBoundCompleteEnforcement
+=== RUN   TestAgentRunnerAdmissionRequiresBoundCompleteEnforcement/policy-platform-hash
+=== RUN   TestAgentRunnerAdmissionRequiresBoundCompleteEnforcement/policy-os
+=== RUN   TestAgentRunnerAdmissionRequiresBoundCompleteEnforcement/policy-arch
+=== RUN   TestAgentRunnerAdmissionRequiresBoundCompleteEnforcement/platform
+=== RUN   TestAgentRunnerAdmissionRequiresBoundCompleteEnforcement/executable
+=== RUN   TestAgentRunnerAdmissionRequiresBoundCompleteEnforcement/config
+--- PASS: TestAgentRunnerAdmissionRequiresBoundCompleteEnforcement (0.00s)
+    --- PASS: TestAgentRunnerAdmissionRequiresBoundCompleteEnforcement/policy-platform-hash (0.00s)
+    --- PASS: TestAgentRunnerAdmissionRequiresBoundCompleteEnforcement/policy-os (0.00s)
+    --- PASS: TestAgentRunnerAdmissionRequiresBoundCompleteEnforcement/policy-arch (0.00s)
+    --- PASS: TestAgentRunnerAdmissionRequiresBoundCompleteEnforcement/platform (0.00s)
+    --- PASS: TestAgentRunnerAdmissionRequiresBoundCompleteEnforcement/executable (0.00s)
+    --- PASS: TestAgentRunnerAdmissionRequiresBoundCompleteEnforcement/config (0.00s)
+=== RUN   TestAgentRunnerAdmissionRejectsInvalidPolicy
+=== RUN   TestAgentRunnerAdmissionRejectsInvalidPolicy/arch
+=== RUN   TestAgentRunnerAdmissionRejectsInvalidPolicy/platform-hash
+=== RUN   TestAgentRunnerAdmissionRejectsInvalidPolicy/time
+=== RUN   TestAgentRunnerAdmissionRejectsInvalidPolicy/age
+=== RUN   TestAgentRunnerAdmissionRejectsInvalidPolicy/os
+--- PASS: TestAgentRunnerAdmissionRejectsInvalidPolicy (0.00s)
+    --- PASS: TestAgentRunnerAdmissionRejectsInvalidPolicy/arch (0.00s)
+    --- PASS: TestAgentRunnerAdmissionRejectsInvalidPolicy/platform-hash (0.00s)
+    --- PASS: TestAgentRunnerAdmissionRejectsInvalidPolicy/time (0.00s)
+    --- PASS: TestAgentRunnerAdmissionRejectsInvalidPolicy/age (0.00s)
+    --- PASS: TestAgentRunnerAdmissionRejectsInvalidPolicy/os (0.00s)
+=== RUN   TestAgentRunnerAdmissionRejectsStaleAndFutureEnforcement
+=== RUN   TestAgentRunnerAdmissionRejectsStaleAndFutureEnforcement/before-capability
+=== RUN   TestAgentRunnerAdmissionRejectsStaleAndFutureEnforcement/too-old
+=== RUN   TestAgentRunnerAdmissionRejectsStaleAndFutureEnforcement/future
+--- PASS: TestAgentRunnerAdmissionRejectsStaleAndFutureEnforcement (0.00s)
+    --- PASS: TestAgentRunnerAdmissionRejectsStaleAndFutureEnforcement/before-capability (0.00s)
+    --- PASS: TestAgentRunnerAdmissionRejectsStaleAndFutureEnforcement/too-old (0.00s)
+    --- PASS: TestAgentRunnerAdmissionRejectsStaleAndFutureEnforcement/future (0.00s)
+=== RUN   TestAgentRunnerAdmissionAcceptsFreshnessBoundaries
+=== RUN   TestAgentRunnerAdmissionAcceptsFreshnessBoundaries/at-evaluation
+=== RUN   TestAgentRunnerAdmissionAcceptsFreshnessBoundaries/at-capability
+=== RUN   TestAgentRunnerAdmissionAcceptsFreshnessBoundaries/at-maximum-age
+--- PASS: TestAgentRunnerAdmissionAcceptsFreshnessBoundaries (0.00s)
+    --- PASS: TestAgentRunnerAdmissionAcceptsFreshnessBoundaries/at-evaluation (0.00s)
+    --- PASS: TestAgentRunnerAdmissionAcceptsFreshnessBoundaries/at-capability (0.00s)
+    --- PASS: TestAgentRunnerAdmissionAcceptsFreshnessBoundaries/at-maximum-age (0.00s)
+=== RUN   TestAgentRunnerEnforcementRejectsOneSidedCompensation
+--- PASS: TestAgentRunnerEnforcementRejectsOneSidedCompensation (0.00s)
+=== RUN   TestAgentRunnerAdmissionCombinesControlSources
+--- PASS: TestAgentRunnerAdmissionCombinesControlSources (0.00s)
+=== RUN   TestAgentRunnerAdmissionRejectsNonControlGap
+--- PASS: TestAgentRunnerAdmissionRejectsNonControlGap (0.00s)
+=== RUN   TestCompatibleAgentRunnerAdmissionNeedsNoEnforcement
+--- PASS: TestCompatibleAgentRunnerAdmissionNeedsNoEnforcement (0.00s)
+=== RUN   TestCompatibleAgentRunnerAdmissionRejectsPlatformMismatch
+=== RUN   TestCompatibleAgentRunnerAdmissionRejectsPlatformMismatch/os
+=== RUN   TestCompatibleAgentRunnerAdmissionRejectsPlatformMismatch/arch
+=== RUN   TestCompatibleAgentRunnerAdmissionRejectsPlatformMismatch/platform-hash
+--- PASS: TestCompatibleAgentRunnerAdmissionRejectsPlatformMismatch (0.00s)
+    --- PASS: TestCompatibleAgentRunnerAdmissionRejectsPlatformMismatch/os (0.00s)
+    --- PASS: TestCompatibleAgentRunnerAdmissionRejectsPlatformMismatch/arch (0.00s)
+    --- PASS: TestCompatibleAgentRunnerAdmissionRejectsPlatformMismatch/platform-hash (0.00s)
+=== RUN   TestPinnedCandidateCannotStartWithoutEnforcement
+--- PASS: TestPinnedCandidateCannotStartWithoutEnforcement (0.00s)
+=== RUN   TestAgentRunnerEventBinding
+--- PASS: TestAgentRunnerEventBinding (0.00s)
+=== RUN   TestAgentRunnerEventReplayAndSequenceConflict
+--- PASS: TestAgentRunnerEventReplayAndSequenceConflict (0.00s)
+=== RUN   TestAgentRunnerEventIndexConcurrentReplay
+--- PASS: TestAgentRunnerEventIndexConcurrentReplay (0.00s)
+=== RUN   TestAgentRunnerEventIndexConcurrentSequenceConflict
+--- PASS: TestAgentRunnerEventIndexConcurrentSequenceConflict (0.00s)
+=== RUN   TestAgentRunnerEvidenceCollectsCompleteRun
+--- PASS: TestAgentRunnerEvidenceCollectsCompleteRun (0.03s)
+=== RUN   TestAgentRunnerEvidenceRequiresBothPIDReports
+=== RUN   TestAgentRunnerEvidenceRequiresBothPIDReports/missing_stub.pid
+=== RUN   TestAgentRunnerEvidenceRequiresBothPIDReports/missing_stub-child.pid
+--- PASS: TestAgentRunnerEvidenceRequiresBothPIDReports (0.07s)
+    --- PASS: TestAgentRunnerEvidenceRequiresBothPIDReports/missing_stub.pid (0.03s)
+    --- PASS: TestAgentRunnerEvidenceRequiresBothPIDReports/missing_stub-child.pid (0.04s)
+=== RUN   TestAgentRunnerPidReportsDigestFollowsTheContractCaliber
+--- PASS: TestAgentRunnerPidReportsDigestFollowsTheContractCaliber (0.00s)
+=== RUN   TestAgentRunnerEvidenceGapsNeverProduceFacts
+=== RUN   TestAgentRunnerEvidenceGapsNeverProduceFacts/invalid_usage
+=== RUN   TestAgentRunnerEvidenceGapsNeverProduceFacts/usage_with_unknown_field
+=== RUN   TestAgentRunnerEvidenceGapsNeverProduceFacts/negative_usage
+=== RUN   TestAgentRunnerEvidenceGapsNeverProduceFacts/missing_marker
+=== RUN   TestAgentRunnerEvidenceGapsNeverProduceFacts/missing_stdout
+--- PASS: TestAgentRunnerEvidenceGapsNeverProduceFacts (0.19s)
+    --- PASS: TestAgentRunnerEvidenceGapsNeverProduceFacts/invalid_usage (0.04s)
+    --- PASS: TestAgentRunnerEvidenceGapsNeverProduceFacts/usage_with_unknown_field (0.04s)
+    --- PASS: TestAgentRunnerEvidenceGapsNeverProduceFacts/negative_usage (0.05s)
+    --- PASS: TestAgentRunnerEvidenceGapsNeverProduceFacts/missing_marker (0.03s)
+    --- PASS: TestAgentRunnerEvidenceGapsNeverProduceFacts/missing_stdout (0.02s)
+=== RUN   TestAgentRunnerEvidenceLogsHashRawBytesAndBoundTruncation
+--- PASS: TestAgentRunnerEvidenceLogsHashRawBytesAndBoundTruncation (0.08s)
+=== RUN   TestAgentRunnerEvidenceTornEventLineIsAGap
+--- PASS: TestAgentRunnerEvidenceTornEventLineIsAGap (0.05s)
+=== RUN   TestAgentRunnerEvidenceMissingEventLogIsAnEmptyLog
+--- PASS: TestAgentRunnerEvidenceMissingEventLogIsAnEmptyLog (0.05s)
+=== RUN   TestAgentRunnerEvidenceWithoutAPreManifestIsAGap
+--- PASS: TestAgentRunnerEvidenceWithoutAPreManifestIsAGap (0.03s)
+=== RUN   TestAgentRunnerEvidenceEventRequestBeyondTheBoundIsInvisible
+--- PASS: TestAgentRunnerEvidenceEventRequestBeyondTheBoundIsInvisible (0.15s)
+=== RUN   TestAgentRunnerEvidenceCaptureFailuresAreGaps
+--- PASS: TestAgentRunnerEvidenceCaptureFailuresAreGaps (0.02s)
+=== RUN   TestAgentRunnerEvidencePinsCompletenessGates
+=== RUN   TestAgentRunnerEvidencePinsCompletenessGates/usage
+=== RUN   TestAgentRunnerEvidencePinsCompletenessGates/logs
+=== RUN   TestAgentRunnerEvidencePinsCompletenessGates/events
+=== RUN   TestAgentRunnerEvidencePinsCompletenessGates/manifests
+=== RUN   TestAgentRunnerEvidencePinsCompletenessGates/pid_reports
+--- PASS: TestAgentRunnerEvidencePinsCompletenessGates (0.00s)
+    --- PASS: TestAgentRunnerEvidencePinsCompletenessGates/usage (0.00s)
+    --- PASS: TestAgentRunnerEvidencePinsCompletenessGates/logs (0.00s)
+    --- PASS: TestAgentRunnerEvidencePinsCompletenessGates/events (0.00s)
+    --- PASS: TestAgentRunnerEvidencePinsCompletenessGates/manifests (0.00s)
+    --- PASS: TestAgentRunnerEvidencePinsCompletenessGates/pid_reports (0.00s)
+=== RUN   TestAgentRunnerEvidenceTruncatedEventsAreAGap
+--- PASS: TestAgentRunnerEvidenceTruncatedEventsAreAGap (0.25s)
+=== RUN   TestAgentRunnerEvidenceRefusesUnusableSpecs
+=== RUN   TestAgentRunnerEvidenceRefusesUnusableSpecs/missing_directory
+=== RUN   TestAgentRunnerEvidenceRefusesUnusableSpecs/invalid_request
+=== RUN   TestAgentRunnerEvidenceRefusesUnusableSpecs/unbounded_logs
+--- PASS: TestAgentRunnerEvidenceRefusesUnusableSpecs (0.02s)
+    --- PASS: TestAgentRunnerEvidenceRefusesUnusableSpecs/missing_directory (0.00s)
+    --- PASS: TestAgentRunnerEvidenceRefusesUnusableSpecs/invalid_request (0.00s)
+    --- PASS: TestAgentRunnerEvidenceRefusesUnusableSpecs/unbounded_logs (0.00s)
+=== RUN   TestAgentRunnerStepIntentRegistryBindsEachRecordToItsOwnStep
+--- PASS: TestAgentRunnerStepIntentRegistryBindsEachRecordToItsOwnStep (0.00s)
+=== RUN   TestAgentRunnerStepIntentRegistryRejectsCrossRecordDrift
+--- PASS: TestAgentRunnerStepIntentRegistryRejectsCrossRecordDrift (0.00s)
+=== RUN   TestNewAgentRunnerStepIntentRegistryReusesPerRecordAdmission
+--- PASS: TestNewAgentRunnerStepIntentRegistryReusesPerRecordAdmission (0.00s)
+=== RUN   TestAgentRunnerStepIntentPreparerProjectsValidatedRequest
+--- PASS: TestAgentRunnerStepIntentPreparerProjectsValidatedRequest (0.00s)
+=== RUN   TestAgentRunnerStepIntentPreparerLeavesOtherStepsOnDefaultRoute
+--- PASS: TestAgentRunnerStepIntentPreparerLeavesOtherStepsOnDefaultRoute (0.00s)
+=== RUN   TestAgentRunnerStepIntentPreparerRejectsTargetBindingDrift
+=== RUN   TestAgentRunnerStepIntentPreparerRejectsTargetBindingDrift/mode
+=== RUN   TestAgentRunnerStepIntentPreparerRejectsTargetBindingDrift/parent
+=== RUN   TestAgentRunnerStepIntentPreparerRejectsTargetBindingDrift/workspace
+=== RUN   TestAgentRunnerStepIntentPreparerRejectsTargetBindingDrift/attempt
+--- PASS: TestAgentRunnerStepIntentPreparerRejectsTargetBindingDrift (0.00s)
+    --- PASS: TestAgentRunnerStepIntentPreparerRejectsTargetBindingDrift/mode (0.00s)
+    --- PASS: TestAgentRunnerStepIntentPreparerRejectsTargetBindingDrift/parent (0.00s)
+    --- PASS: TestAgentRunnerStepIntentPreparerRejectsTargetBindingDrift/workspace (0.00s)
+    --- PASS: TestAgentRunnerStepIntentPreparerRejectsTargetBindingDrift/attempt (0.00s)
+=== RUN   TestAgentRunnerStepIntentPreparerRejectsRunDriftAndInvalidRecord
+--- PASS: TestAgentRunnerStepIntentPreparerRejectsRunDriftAndInvalidRecord (0.00s)
+=== RUN   TestNewAgentRunnerStepIntentPreparerRejectsMissingOrInvalidTarget
+--- PASS: TestNewAgentRunnerStepIntentPreparerRejectsMissingOrInvalidTarget (0.00s)
+=== RUN   TestAgentRunnerLaunchReceiptRecordsValidateBindings
+--- PASS: TestAgentRunnerLaunchReceiptRecordsValidateBindings (0.00s)
+=== RUN   TestAgentRunnerReplayStoreLaunchReceiptRequiresPersistedRequest
+--- PASS: TestAgentRunnerReplayStoreLaunchReceiptRequiresPersistedRequest (0.03s)
+=== RUN   TestAgentRunnerReplayStoreLaunchReceiptSingleWinnerReplayAndConflicts
+--- PASS: TestAgentRunnerReplayStoreLaunchReceiptSingleWinnerReplayAndConflicts (0.14s)
+=== RUN   TestAgentRunnerReplayStoreLaunchReceiptUnprovenStoreBlocksPublication
+--- PASS: TestAgentRunnerReplayStoreLaunchReceiptUnprovenStoreBlocksPublication (0.08s)
+=== RUN   TestAgentRunnerReplayStoreLaunchReceiptRunIDBinding
+--- PASS: TestAgentRunnerReplayStoreLaunchReceiptRunIDBinding (0.09s)
+=== RUN   TestAgentRunnerReplayStoreLaunchReceiptCorruptionWithoutRequest
+--- PASS: TestAgentRunnerReplayStoreLaunchReceiptCorruptionWithoutRequest (0.04s)
+=== RUN   TestAgentRunnerReplayStoreLaunchIdentityRequiresMatchingIntent
+--- PASS: TestAgentRunnerReplayStoreLaunchIdentityRequiresMatchingIntent (0.07s)
+=== RUN   TestAgentRunnerReplayStoreLaunchIdentityReplayAndConflict
+--- PASS: TestAgentRunnerReplayStoreLaunchIdentityReplayAndConflict (0.10s)
+=== RUN   TestAgentRunnerReplayStoreLaunchIdentityUnprovenReplayOnly
+--- PASS: TestAgentRunnerReplayStoreLaunchIdentityUnprovenReplayOnly (0.09s)
+=== RUN   TestAgentRunnerReplayStoreLaunchMethodsFailClosedOnZeroValueStore
+--- PASS: TestAgentRunnerReplayStoreLaunchMethodsFailClosedOnZeroValueStore (0.00s)
+=== RUN   TestAgentRunnerReplayStoreLaunchReceiptMessagesNameTheSlot
+--- PASS: TestAgentRunnerReplayStoreLaunchReceiptMessagesNameTheSlot (0.06s)
+=== RUN   TestAgentRunnerReplayStoreLaunchReceiptCrossStoreSingleWinner
+--- PASS: TestAgentRunnerReplayStoreLaunchReceiptCrossStoreSingleWinner (0.21s)
+=== RUN   TestAgentRunnerReplayStoreLaunchReceiptCollisionClassification
+=== RUN   TestAgentRunnerReplayStoreLaunchReceiptCollisionClassification/visible_winner_with_same_payload_resolves_as_replay
+=== RUN   TestAgentRunnerReplayStoreLaunchReceiptCollisionClassification/visible_winner_with_foreign_payload_surfaces_conflict
+--- PASS: TestAgentRunnerReplayStoreLaunchReceiptCollisionClassification (0.11s)
+    --- PASS: TestAgentRunnerReplayStoreLaunchReceiptCollisionClassification/visible_winner_with_same_payload_resolves_as_replay (0.06s)
+    --- PASS: TestAgentRunnerReplayStoreLaunchReceiptCollisionClassification/visible_winner_with_foreign_payload_surfaces_conflict (0.05s)
+=== RUN   TestAgentRunnerReplayStoreLaunchIdentityOrphanIsCorruption
+--- PASS: TestAgentRunnerReplayStoreLaunchIdentityOrphanIsCorruption (0.03s)
+=== RUN   TestAgentRunnerLaunchReconfirmerAcceptsBoundFreshFacts
+--- PASS: TestAgentRunnerLaunchReconfirmerAcceptsBoundFreshFacts (0.00s)
+=== RUN   TestAgentRunnerLaunchReconfirmerBlocksRevokedGrant
+--- PASS: TestAgentRunnerLaunchReconfirmerBlocksRevokedGrant (0.00s)
+=== RUN   TestAgentRunnerLaunchReconfirmerBlocksExpiredGrant
+--- PASS: TestAgentRunnerLaunchReconfirmerBlocksExpiredGrant (0.00s)
+=== RUN   TestAgentRunnerLaunchReconfirmerBlocksSettledReservation
+--- PASS: TestAgentRunnerLaunchReconfirmerBlocksSettledReservation (0.00s)
+=== RUN   TestAgentRunnerLaunchReconfirmerBlocksBindingMismatch
+--- PASS: TestAgentRunnerLaunchReconfirmerBlocksBindingMismatch (0.00s)
+=== RUN   TestAgentRunnerLaunchReconfirmerFailsClosedOnInvalidInputs
+--- PASS: TestAgentRunnerLaunchReconfirmerFailsClosedOnInvalidInputs (0.00s)
+=== RUN   TestAgentRunnerPinnedCLIHelper
+--- PASS: TestAgentRunnerPinnedCLIHelper (0.00s)
+=== RUN   TestAgentRunnerPinnedCLILauncherStartsAndStops
+--- PASS: TestAgentRunnerPinnedCLILauncherStartsAndStops (1.25s)
+=== RUN   TestAgentRunnerPinnedCLILauncherRefusesASecondLiveLaunch
+--- PASS: TestAgentRunnerPinnedCLILauncherRefusesASecondLiveLaunch (1.66s)
+=== RUN   TestAgentRunnerPinnedCLILauncherRefusesASecondInstanceWhileTheMirrorIsLive
+--- PASS: TestAgentRunnerPinnedCLILauncherRefusesASecondInstanceWhileTheMirrorIsLive (1.74s)
+=== RUN   TestAgentRunnerPinnedCLILauncherStopGraceFollowsTheLaunch
+--- PASS: TestAgentRunnerPinnedCLILauncherStopGraceFollowsTheLaunch (0.80s)
+=== RUN   TestAgentRunnerNeedsDurableStopCoversUnsettledRuns
+=== RUN   TestAgentRunnerNeedsDurableStopCoversUnsettledRuns/natural_exit
+=== RUN   TestAgentRunnerNeedsDurableStopCoversUnsettledRuns/settled_guard_stop
+=== RUN   TestAgentRunnerNeedsDurableStopCoversUnsettledRuns/unsettled
+--- PASS: TestAgentRunnerNeedsDurableStopCoversUnsettledRuns (0.00s)
+    --- PASS: TestAgentRunnerNeedsDurableStopCoversUnsettledRuns/natural_exit (0.00s)
+    --- PASS: TestAgentRunnerNeedsDurableStopCoversUnsettledRuns/settled_guard_stop (0.00s)
+    --- PASS: TestAgentRunnerNeedsDurableStopCoversUnsettledRuns/unsettled (0.00s)
+=== RUN   TestAgentRunnerPinnedCLILauncherStopNeverReachesAnotherLaunch
+--- PASS: TestAgentRunnerPinnedCLILauncherStopNeverReachesAnotherLaunch (1.30s)
+=== RUN   TestAgentRunnerPinnedCLILauncherHoldsNoSlotDuringThePrecheck
+--- PASS: TestAgentRunnerPinnedCLILauncherHoldsNoSlotDuringThePrecheck (2.06s)
+=== RUN   TestAgentRunnerPinnedCLILauncherVersionMismatchNeverSpawns
+--- PASS: TestAgentRunnerPinnedCLILauncherVersionMismatchNeverSpawns (0.08s)
+=== RUN   TestAgentRunnerPinnedCLILauncherRefusesAnotherExecutable
+--- PASS: TestAgentRunnerPinnedCLILauncherRefusesAnotherExecutable (0.04s)
+=== RUN   TestAgentRunnerPinnedCLILauncherStopsThroughPersistedIdentity
+--- PASS: TestAgentRunnerPinnedCLILauncherStopsThroughPersistedIdentity (0.84s)
+=== RUN   TestAgentRunnerPinnedCLILauncherUnprovenIdentityStopsTheSpawn
+--- PASS: TestAgentRunnerPinnedCLILauncherUnprovenIdentityStopsTheSpawn (0.82s)
+=== RUN   TestAgentRunnerPinnedCLILauncherStopsItsOwnProcessWhenTheMirrorIsUnreadable
+--- PASS: TestAgentRunnerPinnedCLILauncherStopsItsOwnProcessWhenTheMirrorIsUnreadable (0.81s)
+=== RUN   TestAgentRunnerPinnedCLILauncherRefusesToStopAForeignLaunch
+--- PASS: TestAgentRunnerPinnedCLILauncherRefusesToStopAForeignLaunch (0.81s)
+=== RUN   TestAgentRunnerPinnedCLILauncherRefusesStopWhenTheSlotIsUnreadable
+--- PASS: TestAgentRunnerPinnedCLILauncherRefusesStopWhenTheSlotIsUnreadable (0.84s)
+=== RUN   TestAgentRunnerPinnedCLILauncherConcurrentStartsHaveOneWinner
+--- PASS: TestAgentRunnerPinnedCLILauncherConcurrentStartsHaveOneWinner (1.29s)
+=== RUN   TestAgentRunnerPinnedCLILauncherRefusesAnUnreadableIdentityMirror
+--- PASS: TestAgentRunnerPinnedCLILauncherRefusesAnUnreadableIdentityMirror (1.65s)
+=== RUN   TestAgentRunnerPinnedCLILauncherRefusesUnusableConfig
+=== RUN   TestAgentRunnerPinnedCLILauncherRefusesUnusableConfig/missing_executable
+=== RUN   TestAgentRunnerPinnedCLILauncherRefusesUnusableConfig/missing_version
+--- PASS: TestAgentRunnerPinnedCLILauncherRefusesUnusableConfig (0.03s)
+    --- PASS: TestAgentRunnerPinnedCLILauncherRefusesUnusableConfig/missing_executable (0.00s)
+    --- PASS: TestAgentRunnerPinnedCLILauncherRefusesUnusableConfig/missing_version (0.00s)
+=== RUN   TestAgentRunnerPinnedCLIChildEnvAllowlist
+--- PASS: TestAgentRunnerPinnedCLIChildEnvAllowlist (0.03s)
+=== RUN   TestAgentRunnerPinnedCLILauncherStopWithoutIdentityFailsClosed
+--- PASS: TestAgentRunnerPinnedCLILauncherStopWithoutIdentityFailsClosed (0.03s)
+=== RUN   TestAgentRunnerPostflightPassesOnRecordedEvidence
+--- PASS: TestAgentRunnerPostflightPassesOnRecordedEvidence (0.20s)
+=== RUN   TestAgentRunnerPostflightRejectsTamperedLegs
+=== RUN   TestAgentRunnerPostflightRejectsTamperedLegs/workspace_change_is_a_manifest_failure
+=== RUN   TestAgentRunnerPostflightRejectsTamperedLegs/tampered_diff_artifact_is_a_diff_failure
+=== RUN   TestAgentRunnerPostflightRejectsTamperedLegs/tampered_log_artifact_is_a_log_failure
+=== RUN   TestAgentRunnerPostflightRejectsTamperedLegs/tampered_usage_artifact_is_a_usage_failure
+=== RUN   TestAgentRunnerPostflightRejectsTamperedLegs/a_rewritten_pid_report_is_a_pid-reports_failure
+=== RUN   TestAgentRunnerPostflightRejectsTamperedLegs/a_recorded_live_pid_is_a_process_failure
+=== RUN   TestAgentRunnerPostflightRejectsTamperedLegs/a_secret_marker_in_the_workspace_is_a_secret_failure
+=== RUN   TestAgentRunnerPostflightRejectsTamperedLegs/a_missing_artifact_is_uncertain,_never_a_pass
+--- PASS: TestAgentRunnerPostflightRejectsTamperedLegs (1.87s)
+    --- PASS: TestAgentRunnerPostflightRejectsTamperedLegs/workspace_change_is_a_manifest_failure (0.23s)
+    --- PASS: TestAgentRunnerPostflightRejectsTamperedLegs/tampered_diff_artifact_is_a_diff_failure (0.23s)
+    --- PASS: TestAgentRunnerPostflightRejectsTamperedLegs/tampered_log_artifact_is_a_log_failure (0.21s)
+    --- PASS: TestAgentRunnerPostflightRejectsTamperedLegs/tampered_usage_artifact_is_a_usage_failure (0.21s)
+    --- PASS: TestAgentRunnerPostflightRejectsTamperedLegs/a_rewritten_pid_report_is_a_pid-reports_failure (0.25s)
+    --- PASS: TestAgentRunnerPostflightRejectsTamperedLegs/a_recorded_live_pid_is_a_process_failure (0.25s)
+    --- PASS: TestAgentRunnerPostflightRejectsTamperedLegs/a_secret_marker_in_the_workspace_is_a_secret_failure (0.22s)
+    --- PASS: TestAgentRunnerPostflightRejectsTamperedLegs/a_missing_artifact_is_uncertain,_never_a_pass (0.26s)
+=== RUN   TestAgentRunnerPostflightRejectsArtifactsNotBoundToFrozenFacts
+=== RUN   TestAgentRunnerPostflightRejectsArtifactsNotBoundToFrozenFacts/a_rewritten_post_manifest_is_a_manifest_failure
+=== RUN   TestAgentRunnerPostflightRejectsArtifactsNotBoundToFrozenFacts/a_rewritten_diff_is_a_diff_failure
+--- PASS: TestAgentRunnerPostflightRejectsArtifactsNotBoundToFrozenFacts (0.44s)
+    --- PASS: TestAgentRunnerPostflightRejectsArtifactsNotBoundToFrozenFacts/a_rewritten_post_manifest_is_a_manifest_failure (0.23s)
+    --- PASS: TestAgentRunnerPostflightRejectsArtifactsNotBoundToFrozenFacts/a_rewritten_diff_is_a_diff_failure (0.22s)
+=== RUN   TestAgentRunnerPostflightIsUncertainWithoutPIDReport
+=== RUN   TestAgentRunnerPostflightIsUncertainWithoutPIDReport/both_pid_reports_deleted_is_uncertain
+=== RUN   TestAgentRunnerPostflightIsUncertainWithoutPIDReport/a_missing_child_report_is_uncertain
+=== RUN   TestAgentRunnerPostflightIsUncertainWithoutPIDReport/a_missing_parent_report_is_uncertain
+--- PASS: TestAgentRunnerPostflightIsUncertainWithoutPIDReport (0.67s)
+    --- PASS: TestAgentRunnerPostflightIsUncertainWithoutPIDReport/both_pid_reports_deleted_is_uncertain (0.20s)
+    --- PASS: TestAgentRunnerPostflightIsUncertainWithoutPIDReport/a_missing_child_report_is_uncertain (0.23s)
+    --- PASS: TestAgentRunnerPostflightIsUncertainWithoutPIDReport/a_missing_parent_report_is_uncertain (0.23s)
+=== RUN   TestAgentRunnerPostflightRejectsUnreadablePIDReports
+=== RUN   TestAgentRunnerPostflightRejectsUnreadablePIDReports/an_unparsable_pid_line_is_uncertain
+=== RUN   TestAgentRunnerPostflightRejectsUnreadablePIDReports/an_unobservable_liveness_answer_is_an_error
+--- PASS: TestAgentRunnerPostflightRejectsUnreadablePIDReports (0.23s)
+    --- PASS: TestAgentRunnerPostflightRejectsUnreadablePIDReports/an_unparsable_pid_line_is_uncertain (0.22s)
+    --- PASS: TestAgentRunnerPostflightRejectsUnreadablePIDReports/an_unobservable_liveness_answer_is_an_error (0.01s)
+=== RUN   TestAgentRunnerPostflightDispatchedParityMatchesRun
+=== RUN   TestAgentRunnerPostflightDispatchedParityMatchesRun/completed_leg
+=== RUN   TestAgentRunnerPostflightDispatchedParityMatchesRun/guard_stop_leg
+--- PASS: TestAgentRunnerPostflightDispatchedParityMatchesRun (6.84s)
+    --- PASS: TestAgentRunnerPostflightDispatchedParityMatchesRun/completed_leg (1.62s)
+    --- PASS: TestAgentRunnerPostflightDispatchedParityMatchesRun/guard_stop_leg (2.37s)
+=== RUN   TestAgentRunnerPostflightDispatchedParityReceiptsValidate
+--- PASS: TestAgentRunnerPostflightDispatchedParityReceiptsValidate (0.50s)
+=== RUN   TestAgentRunnerReadPIDsMatrix
+=== RUN   TestAgentRunnerReadPIDsMatrix/plain_7
+=== RUN   TestAgentRunnerReadPIDsMatrix/signed_plus_7
+=== RUN   TestAgentRunnerReadPIDsMatrix/padded_7
+=== RUN   TestAgentRunnerReadPIDsMatrix/zero_padded_007
+=== RUN   TestAgentRunnerReadPIDsMatrix/CRLF_terminated_7
+=== RUN   TestAgentRunnerReadPIDsMatrix/two_pids_with_an_interior_blank_line
+=== RUN   TestAgentRunnerReadPIDsMatrix/trailing_garbage_12abc
+=== RUN   TestAgentRunnerReadPIDsMatrix/float_7.0
+=== RUN   TestAgentRunnerReadPIDsMatrix/underscore_1_0
+=== RUN   TestAgentRunnerReadPIDsMatrix/hex_0x10
+=== RUN   TestAgentRunnerReadPIDsMatrix/negative_zero_-0
+=== RUN   TestAgentRunnerReadPIDsMatrix/negative_-5
+=== RUN   TestAgentRunnerReadPIDsMatrix/int64_overflow
+=== RUN   TestAgentRunnerReadPIDsMatrix/missing_file
+=== RUN   TestAgentRunnerReadPIDsMatrix/empty_file
+=== RUN   TestAgentRunnerReadPIDsMatrix/whitespace_only
+--- PASS: TestAgentRunnerReadPIDsMatrix (0.07s)
+    --- PASS: TestAgentRunnerReadPIDsMatrix/plain_7 (0.00s)
+    --- PASS: TestAgentRunnerReadPIDsMatrix/signed_plus_7 (0.00s)
+    --- PASS: TestAgentRunnerReadPIDsMatrix/padded_7 (0.00s)
+    --- PASS: TestAgentRunnerReadPIDsMatrix/zero_padded_007 (0.00s)
+    --- PASS: TestAgentRunnerReadPIDsMatrix/CRLF_terminated_7 (0.00s)
+    --- PASS: TestAgentRunnerReadPIDsMatrix/two_pids_with_an_interior_blank_line (0.01s)
+    --- PASS: TestAgentRunnerReadPIDsMatrix/trailing_garbage_12abc (0.00s)
+    --- PASS: TestAgentRunnerReadPIDsMatrix/float_7.0 (0.00s)
+    --- PASS: TestAgentRunnerReadPIDsMatrix/underscore_1_0 (0.00s)
+    --- PASS: TestAgentRunnerReadPIDsMatrix/hex_0x10 (0.00s)
+    --- PASS: TestAgentRunnerReadPIDsMatrix/negative_zero_-0 (0.01s)
+    --- PASS: TestAgentRunnerReadPIDsMatrix/negative_-5 (0.00s)
+    --- PASS: TestAgentRunnerReadPIDsMatrix/int64_overflow (0.01s)
+    --- PASS: TestAgentRunnerReadPIDsMatrix/missing_file (0.00s)
+    --- PASS: TestAgentRunnerReadPIDsMatrix/empty_file (0.00s)
+    --- PASS: TestAgentRunnerReadPIDsMatrix/whitespace_only (0.00s)
+=== RUN   TestAgentRunnerSettlementForDeclaredOfflineWorkloadCarriesZeroCost
+=== RUN   TestAgentRunnerSettlementForDeclaredOfflineWorkloadCarriesZeroCost/completed_usage_settles_as_observed_with_a_zero_cost
+=== RUN   TestAgentRunnerSettlementForDeclaredOfflineWorkloadCarriesZeroCost/a_non-completed_status_stays_unknown_and_amount-free
+=== RUN   TestAgentRunnerSettlementForDeclaredOfflineWorkloadCarriesZeroCost/an_incomplete_usage_artifact_stays_unknown_and_amount-free
+=== RUN   TestAgentRunnerSettlementForDeclaredOfflineWorkloadCarriesZeroCost/the_bare_mapping_remains_fail-closed
+--- PASS: TestAgentRunnerSettlementForDeclaredOfflineWorkloadCarriesZeroCost (0.00s)
+    --- PASS: TestAgentRunnerSettlementForDeclaredOfflineWorkloadCarriesZeroCost/completed_usage_settles_as_observed_with_a_zero_cost (0.00s)
+    --- PASS: TestAgentRunnerSettlementForDeclaredOfflineWorkloadCarriesZeroCost/a_non-completed_status_stays_unknown_and_amount-free (0.00s)
+    --- PASS: TestAgentRunnerSettlementForDeclaredOfflineWorkloadCarriesZeroCost/an_incomplete_usage_artifact_stays_unknown_and_amount-free (0.00s)
+    --- PASS: TestAgentRunnerSettlementForDeclaredOfflineWorkloadCarriesZeroCost/the_bare_mapping_remains_fail-closed (0.00s)
+=== RUN   TestAgentRunnerProcessIDRoundTripFailsClosed
+=== RUN   TestAgentRunnerProcessIDRoundTripFailsClosed/unknown_field
+=== RUN   TestAgentRunnerProcessIDRoundTripFailsClosed/missing_token
+=== RUN   TestAgentRunnerProcessIDRoundTripFailsClosed/nonpositive_pid
+=== RUN   TestAgentRunnerProcessIDRoundTripFailsClosed/empty
+=== RUN   TestAgentRunnerProcessIDRoundTripFailsClosed/blank
+=== RUN   TestAgentRunnerProcessIDRoundTripFailsClosed/not_json
+--- PASS: TestAgentRunnerProcessIDRoundTripFailsClosed (0.02s)
+    --- PASS: TestAgentRunnerProcessIDRoundTripFailsClosed/unknown_field (0.00s)
+    --- PASS: TestAgentRunnerProcessIDRoundTripFailsClosed/missing_token (0.00s)
+    --- PASS: TestAgentRunnerProcessIDRoundTripFailsClosed/nonpositive_pid (0.00s)
+    --- PASS: TestAgentRunnerProcessIDRoundTripFailsClosed/empty (0.00s)
+    --- PASS: TestAgentRunnerProcessIDRoundTripFailsClosed/blank (0.00s)
+    --- PASS: TestAgentRunnerProcessIDRoundTripFailsClosed/not_json (0.00s)
+=== RUN   TestAgentRunnerProcessRegistryRefusesDuplicatesAndRestart
+--- PASS: TestAgentRunnerProcessRegistryRefusesDuplicatesAndRestart (0.02s)
+=== RUN   TestAgentRunnerProcessIdentityMirrorIsReadableByTheOperatorStopPath
+--- PASS: TestAgentRunnerProcessIdentityMirrorIsReadableByTheOperatorStopPath (0.03s)
+=== RUN   TestAgentRunnerReplayDispatcherFirstDispatchPublishesReceiptsAndLaunches
+--- PASS: TestAgentRunnerReplayDispatcherFirstDispatchPublishesReceiptsAndLaunches (0.05s)
+=== RUN   TestAgentRunnerReplayDispatcherBlocksWithoutClaiming
+=== RUN   TestAgentRunnerReplayDispatcherBlocksWithoutClaiming/request_only
+=== RUN   TestAgentRunnerReplayDispatcherBlocksWithoutClaiming/intent_present
+=== RUN   TestAgentRunnerReplayDispatcherBlocksWithoutClaiming/identity_present
+=== RUN   TestAgentRunnerReplayDispatcherBlocksWithoutClaiming/terminal_receipt
+--- PASS: TestAgentRunnerReplayDispatcherBlocksWithoutClaiming (0.13s)
+    --- PASS: TestAgentRunnerReplayDispatcherBlocksWithoutClaiming/request_only (0.02s)
+    --- PASS: TestAgentRunnerReplayDispatcherBlocksWithoutClaiming/intent_present (0.03s)
+    --- PASS: TestAgentRunnerReplayDispatcherBlocksWithoutClaiming/identity_present (0.04s)
+    --- PASS: TestAgentRunnerReplayDispatcherBlocksWithoutClaiming/terminal_receipt (0.04s)
+=== RUN   TestAgentRunnerReplayDispatcherReconfirmationFailureLeavesUnknownBlock
+--- PASS: TestAgentRunnerReplayDispatcherReconfirmationFailureLeavesUnknownBlock (0.04s)
+=== RUN   TestAgentRunnerReplayDispatcherDurabilityGatePrecedesLaunch
+--- PASS: TestAgentRunnerReplayDispatcherDurabilityGatePrecedesLaunch (0.01s)
+=== RUN   TestAgentRunnerReplayDispatcherStartFailureRetainsIntentWithoutRelaunch
+--- PASS: TestAgentRunnerReplayDispatcherStartFailureRetainsIntentWithoutRelaunch (0.05s)
+=== RUN   TestAgentRunnerReplayDispatcherLaunchIDMismatchIsUnproven
+--- PASS: TestAgentRunnerReplayDispatcherLaunchIDMismatchIsUnproven (0.04s)
+=== RUN   TestAgentRunnerReplayDispatcherConcurrentDispatchLaunchesOnce
+--- PASS: TestAgentRunnerReplayDispatcherConcurrentDispatchLaunchesOnce (0.11s)
+=== RUN   TestAgentRunnerReplayDispatcherRejectsBindingMismatch
+--- PASS: TestAgentRunnerReplayDispatcherRejectsBindingMismatch (0.01s)
+=== RUN   TestAgentRunnerReplayDispatcherIdentityConflictSurfacesAsUnproven
+--- PASS: TestAgentRunnerReplayDispatcherIdentityConflictSurfacesAsUnproven (0.05s)
+=== RUN   TestAgentRunnerReplayDispatcherLedgerSnapshotFailureBlocksLaunch
+--- PASS: TestAgentRunnerReplayDispatcherLedgerSnapshotFailureBlocksLaunch (0.02s)
+=== RUN   TestAgentRunnerReplayDispatcherFailsClosedOnMissingFields
+=== RUN   TestAgentRunnerReplayDispatcherFailsClosedOnMissingFields/launcher
+=== RUN   TestAgentRunnerReplayDispatcherFailsClosedOnMissingFields/ledger
+=== RUN   TestAgentRunnerReplayDispatcherFailsClosedOnMissingFields/clock
+=== RUN   TestAgentRunnerReplayDispatcherFailsClosedOnMissingFields/store
+--- PASS: TestAgentRunnerReplayDispatcherFailsClosedOnMissingFields (0.01s)
+    --- PASS: TestAgentRunnerReplayDispatcherFailsClosedOnMissingFields/launcher (0.00s)
+    --- PASS: TestAgentRunnerReplayDispatcherFailsClosedOnMissingFields/ledger (0.00s)
+    --- PASS: TestAgentRunnerReplayDispatcherFailsClosedOnMissingFields/clock (0.00s)
+    --- PASS: TestAgentRunnerReplayDispatcherFailsClosedOnMissingFields/store (0.00s)
+=== RUN   TestAgentRunnerReplayDispatcherReclaimNeverFiresOnSuccess
+--- PASS: TestAgentRunnerReplayDispatcherReclaimNeverFiresOnSuccess (0.04s)
+=== RUN   TestAgentRunnerReplayDispatcherLaunchIDMismatchReclaimsOnce
+--- PASS: TestAgentRunnerReplayDispatcherLaunchIDMismatchReclaimsOnce (0.05s)
+=== RUN   TestAgentRunnerReplayDispatcherIdentityConstructionFailureReclaimsOnce
+--- PASS: TestAgentRunnerReplayDispatcherIdentityConstructionFailureReclaimsOnce (0.06s)
+=== RUN   TestAgentRunnerReplayDispatcherIdentityPublicationFailureReclaimsOnce
+--- PASS: TestAgentRunnerReplayDispatcherIdentityPublicationFailureReclaimsOnce (0.06s)
+=== RUN   TestAgentRunnerReplayDispatcherReclaimFailureKeepsBothChains
+--- PASS: TestAgentRunnerReplayDispatcherReclaimFailureKeepsBothChains (0.05s)
+=== RUN   TestAgentRunnerReplayDispatcherReclaimUnprovenIsReported
+--- PASS: TestAgentRunnerReplayDispatcherReclaimUnprovenIsReported (0.05s)
+=== RUN   TestAgentRunnerReplayDispatcherWithoutStopCapabilityReportsUnprovenReclaim
+--- PASS: TestAgentRunnerReplayDispatcherWithoutStopCapabilityReportsUnprovenReclaim (0.04s)
+=== RUN   TestAgentRunnerReplayDispatcherReclaimsRealProcessWhenIdentityPublicationFails
+--- PASS: TestAgentRunnerReplayDispatcherReclaimsRealProcessWhenIdentityPublicationFails (1.24s)
+=== RUN   TestAgentRunnerReplayDispatcherReclaimSurvivesCallerCancellation
+--- PASS: TestAgentRunnerReplayDispatcherReclaimSurvivesCallerCancellation (0.03s)
+=== RUN   TestAgentRunnerReplayDispatcherTypedNilReclaimerIsReportedFailClosed
+=== RUN   TestAgentRunnerReplayDispatcherTypedNilReclaimerIsReportedFailClosed/pinned_CLI_nil_pointer_is_refused_before_any_reclaim
+=== RUN   TestAgentRunnerReplayDispatcherTypedNilReclaimerIsReportedFailClosed/typed_nil_reclaimer_reports_the_failed_reclaim
+--- PASS: TestAgentRunnerReplayDispatcherTypedNilReclaimerIsReportedFailClosed (0.05s)
+    --- PASS: TestAgentRunnerReplayDispatcherTypedNilReclaimerIsReportedFailClosed/pinned_CLI_nil_pointer_is_refused_before_any_reclaim (0.02s)
+    --- PASS: TestAgentRunnerReplayDispatcherTypedNilReclaimerIsReportedFailClosed/typed_nil_reclaimer_reports_the_failed_reclaim (0.03s)
+=== RUN   TestAgentRunnerReplayStoreForRunDerivesStableRoot
+--- PASS: TestAgentRunnerReplayStoreForRunDerivesStableRoot (0.03s)
+=== RUN   TestAgentRunnerReplayStoreForRunRejectsInvalidInputs
+=== RUN   TestAgentRunnerReplayStoreForRunRejectsInvalidInputs/empty_run_id
+=== RUN   TestAgentRunnerReplayStoreForRunRejectsInvalidInputs/invalid_run_id
+=== RUN   TestAgentRunnerReplayStoreForRunRejectsInvalidInputs/empty_run_root
+=== RUN   TestAgentRunnerReplayStoreForRunRejectsInvalidInputs/relative_run_root
+=== RUN   TestAgentRunnerReplayStoreForRunRejectsInvalidInputs/missing_run_root
+=== RUN   TestAgentRunnerReplayStoreForRunRejectsInvalidInputs/file_run_root
+--- PASS: TestAgentRunnerReplayStoreForRunRejectsInvalidInputs (0.01s)
+    --- PASS: TestAgentRunnerReplayStoreForRunRejectsInvalidInputs/empty_run_id (0.00s)
+    --- PASS: TestAgentRunnerReplayStoreForRunRejectsInvalidInputs/invalid_run_id (0.00s)
+    --- PASS: TestAgentRunnerReplayStoreForRunRejectsInvalidInputs/empty_run_root (0.00s)
+    --- PASS: TestAgentRunnerReplayStoreForRunRejectsInvalidInputs/relative_run_root (0.00s)
+    --- PASS: TestAgentRunnerReplayStoreForRunRejectsInvalidInputs/missing_run_root (0.00s)
+    --- PASS: TestAgentRunnerReplayStoreForRunRejectsInvalidInputs/file_run_root (0.00s)
+=== RUN   TestAgentRunnerReplayStoreForRunRequiresDurableRunRootMarker
+=== RUN   TestAgentRunnerReplayStoreForRunRequiresDurableRunRootMarker/missing_events_directory
+=== RUN   TestAgentRunnerReplayStoreForRunRequiresDurableRunRootMarker/events_path_is_a_file
+=== RUN   TestAgentRunnerReplayStoreForRunRequiresDurableRunRootMarker/missing_event_log
+=== RUN   TestAgentRunnerReplayStoreForRunRequiresDurableRunRootMarker/event_log_is_a_directory
+--- PASS: TestAgentRunnerReplayStoreForRunRequiresDurableRunRootMarker (0.02s)
+    --- PASS: TestAgentRunnerReplayStoreForRunRequiresDurableRunRootMarker/missing_events_directory (0.00s)
+    --- PASS: TestAgentRunnerReplayStoreForRunRequiresDurableRunRootMarker/events_path_is_a_file (0.01s)
+    --- PASS: TestAgentRunnerReplayStoreForRunRequiresDurableRunRootMarker/missing_event_log (0.01s)
+    --- PASS: TestAgentRunnerReplayStoreForRunRequiresDurableRunRootMarker/event_log_is_a_directory (0.01s)
+=== RUN   TestAgentRunnerReplayStoreForRunRejectsForeignRunWrites
+--- PASS: TestAgentRunnerReplayStoreForRunRejectsForeignRunWrites (0.02s)
+=== RUN   TestAgentRunnerReplayStoreForRunDetectsPersistedRunIDMismatch
+--- PASS: TestAgentRunnerReplayStoreForRunDetectsPersistedRunIDMismatch (0.03s)
+=== RUN   TestAgentRunnerReplayStoreForRunOwnershipPreflight
+=== RUN   TestAgentRunnerReplayStoreForRunOwnershipPreflight/tampered_run_id_conflicts
+=== RUN   TestAgentRunnerReplayStoreForRunOwnershipPreflight/tampered_run_root_hash_conflicts
+=== RUN   TestAgentRunnerReplayStoreForRunOwnershipPreflight/invalid_createdAt_is_corruption
+=== RUN   TestAgentRunnerReplayStoreForRunOwnershipPreflight/undecodable_marker_is_corruption
+=== RUN   TestAgentRunnerReplayStoreForRunOwnershipPreflight/missing_marker_with_published_records_is_corruption
+=== RUN   TestAgentRunnerReplayStoreForRunOwnershipPreflight/missing_marker_with_launch_intent_is_corruption
+=== RUN   TestAgentRunnerReplayStoreForRunOwnershipPreflight/missing_marker_with_terminal_intent_is_corruption
+=== RUN   TestAgentRunnerReplayStoreForRunOwnershipPreflight/missing_marker_without_records_is_rebuilt
+=== RUN   TestAgentRunnerReplayStoreForRunOwnershipPreflight/copied_run_root_conflicts
+=== RUN   TestAgentRunnerReplayStoreForRunOwnershipPreflight/different_run_id_conflicts
+=== RUN   TestAgentRunnerReplayStoreForRunOwnershipPreflight/marker_directory_is_corruption
+=== RUN   TestAgentRunnerReplayStoreForRunOwnershipPreflight/residual_temp_file_without_ownership_is_corruption
+--- PASS: TestAgentRunnerReplayStoreForRunOwnershipPreflight (0.56s)
+    --- PASS: TestAgentRunnerReplayStoreForRunOwnershipPreflight/tampered_run_id_conflicts (0.04s)
+    --- PASS: TestAgentRunnerReplayStoreForRunOwnershipPreflight/tampered_run_root_hash_conflicts (0.04s)
+    --- PASS: TestAgentRunnerReplayStoreForRunOwnershipPreflight/invalid_createdAt_is_corruption (0.04s)
+    --- PASS: TestAgentRunnerReplayStoreForRunOwnershipPreflight/undecodable_marker_is_corruption (0.04s)
+    --- PASS: TestAgentRunnerReplayStoreForRunOwnershipPreflight/missing_marker_with_published_records_is_corruption (0.05s)
+    --- PASS: TestAgentRunnerReplayStoreForRunOwnershipPreflight/missing_marker_with_launch_intent_is_corruption (0.07s)
+    --- PASS: TestAgentRunnerReplayStoreForRunOwnershipPreflight/missing_marker_with_terminal_intent_is_corruption (0.06s)
+    --- PASS: TestAgentRunnerReplayStoreForRunOwnershipPreflight/missing_marker_without_records_is_rebuilt (0.05s)
+    --- PASS: TestAgentRunnerReplayStoreForRunOwnershipPreflight/copied_run_root_conflicts (0.06s)
+    --- PASS: TestAgentRunnerReplayStoreForRunOwnershipPreflight/different_run_id_conflicts (0.04s)
+    --- PASS: TestAgentRunnerReplayStoreForRunOwnershipPreflight/marker_directory_is_corruption (0.04s)
+    --- PASS: TestAgentRunnerReplayStoreForRunOwnershipPreflight/residual_temp_file_without_ownership_is_corruption (0.03s)
+=== RUN   TestAgentRunnerReplayStoreForRunRejectsOverlappingWriterRoots
+--- PASS: TestAgentRunnerReplayStoreForRunRejectsOverlappingWriterRoots (0.07s)
+=== RUN   TestAgentRunnerReplayStoreForRunRejectsProtectedRoots
+--- PASS: TestAgentRunnerReplayStoreForRunRejectsProtectedRoots (0.08s)
+=== RUN   TestAgentRunnerReplayStoreForRunConvergesUnderConcurrentFirstOpen
+--- PASS: TestAgentRunnerReplayStoreForRunConvergesUnderConcurrentFirstOpen (0.05s)
+=== RUN   TestAgentRunnerReplayStoreForRunKeepsPublicationDurabilitySemantics
+--- PASS: TestAgentRunnerReplayStoreForRunKeepsPublicationDurabilitySemantics (0.03s)
+=== RUN   TestAgentRunnerReplayStoreForRunRejectsReplayRootAsFile
+--- PASS: TestAgentRunnerReplayStoreForRunRejectsReplayRootAsFile (0.01s)
+=== RUN   TestAgentRunnerReplayStoreForRunRejectsForeignRunCompletionWrites
+--- PASS: TestAgentRunnerReplayStoreForRunRejectsForeignRunCompletionWrites (0.05s)
+=== RUN   TestAgentRunnerReplayStoreForRunConcurrentDistinctRunsConflict
+--- PASS: TestAgentRunnerReplayStoreForRunConcurrentDistinctRunsConflict (0.03s)
+=== RUN   TestAgentRunnerReplayRootWindowsRejectsJunctionReplayRoot
+--- PASS: TestAgentRunnerReplayRootWindowsRejectsJunctionReplayRoot (0.17s)
+=== RUN   TestAgentRunnerReplayStoreForRunWindowsAcceptsCaseAliasSpelling
+--- PASS: TestAgentRunnerReplayStoreForRunWindowsAcceptsCaseAliasSpelling (0.03s)
+=== RUN   TestAgentRunnerReplayStoreForRunWindowsRejectsShortNameAliasOverlap
+--- PASS: TestAgentRunnerReplayStoreForRunWindowsRejectsShortNameAliasOverlap (0.04s)
+=== RUN   TestAgentRunnerReplayStoreForRunWindowsRejectsProtectedShortNameAlias
+--- PASS: TestAgentRunnerReplayStoreForRunWindowsRejectsProtectedShortNameAlias (0.03s)
+=== RUN   TestAgentRunnerReplayStoreForRunWindowsAcceptsExtendedPathPrefix
+--- PASS: TestAgentRunnerReplayStoreForRunWindowsAcceptsExtendedPathPrefix (0.04s)
+=== RUN   TestAgentRunnerReplayStoreForRunWindowsRejectsDriveRelativeWriterRoot
+--- PASS: TestAgentRunnerReplayStoreForRunWindowsRejectsDriveRelativeWriterRoot (0.04s)
+=== RUN   TestAgentRunnerReplayStoreForRunWindowsRejectsRuntimeSubdirectorySwap
+--- PASS: TestAgentRunnerReplayStoreForRunWindowsRejectsRuntimeSubdirectorySwap (0.11s)
+=== RUN   TestAgentRunnerReplayStoreForRunWindowsRejectsRuntimeLaunchesSwap
+--- PASS: TestAgentRunnerReplayStoreForRunWindowsRejectsRuntimeLaunchesSwap (0.12s)
+=== RUN   TestAgentRunnerReplayStoreForRunWindowsConcurrentDistinctSpellings
+--- PASS: TestAgentRunnerReplayStoreForRunWindowsConcurrentDistinctSpellings (0.04s)
+=== RUN   TestA7PublishStageHookIsNilByDefaultAndSeesEveryStage
+--- PASS: TestA7PublishStageHookIsNilByDefaultAndSeesEveryStage (0.03s)
+=== RUN   TestA7CrashAtEveryStageLeavesOnlyLegalReplayStates
+--- PASS: TestA7CrashAtEveryStageLeavesOnlyLegalReplayStates (0.26s)
+=== RUN   TestA7MarkerPublicationAddsNoDurabilityClassAndNoNewState
+--- PASS: TestA7MarkerPublicationAddsNoDurabilityClassAndNoNewState (0.04s)
+=== RUN   TestA7LeftoverTempArtifactsAreInvisibleAndDoNotBlockPublication
+--- PASS: TestA7LeftoverTempArtifactsAreInvisibleAndDoNotBlockPublication (0.04s)
+=== RUN   TestA7ReplayIdempotenceAndConflictGuardsStillBind
+--- PASS: TestA7ReplayIdempotenceAndConflictGuardsStillBind (0.05s)
+=== RUN   TestB3bPublishPrimitiveHookIsNilByDefaultAndSeesEveryPublish
+--- PASS: TestB3bPublishPrimitiveHookIsNilByDefaultAndSeesEveryPublish (0.03s)
+=== RUN   TestB3bPublishPrimitiveHookPreservesErrExistMapping
+--- PASS: TestB3bPublishPrimitiveHookPreservesErrExistMapping (0.02s)
+=== RUN   TestB3bPublishPrimitiveHookEquivalenceWithLink
+--- PASS: TestB3bPublishPrimitiveHookEquivalenceWithLink (0.03s)
+=== RUN   TestB3bParentSyncHookIsNilByDefaultAndFiresOnceAfterPrimitive
+--- PASS: TestB3bParentSyncHookIsNilByDefaultAndFiresOnceAfterPrimitive (0.03s)
+=== RUN   TestB3bParentSyncHookFailureAbortsPublishAndCleansTemp
+--- PASS: TestB3bParentSyncHookFailureAbortsPublishAndCleansTemp (0.02s)
+=== RUN   TestB3bParentSyncHookNilEquivalence
+--- PASS: TestB3bParentSyncHookNilEquivalence (0.03s)
+=== RUN   TestC6PrebuildNoopWithoutActivation
+--- PASS: TestC6PrebuildNoopWithoutActivation (0.01s)
+=== RUN   TestAgentRunnerTerminalRecordValidation
+--- PASS: TestAgentRunnerTerminalRecordValidation (0.00s)
+=== RUN   TestAgentRunnerTerminalIntentFactsBindingFailsClosed
+=== RUN   TestAgentRunnerTerminalIntentFactsBindingFailsClosed/failed_with_facts
+=== RUN   TestAgentRunnerTerminalIntentFactsBindingFailsClosed/uncertain_with_facts
+=== RUN   TestAgentRunnerTerminalIntentFactsBindingFailsClosed/completed_without_facts
+=== RUN   TestAgentRunnerTerminalIntentFactsBindingFailsClosed/failed_without_facts
+=== RUN   TestAgentRunnerTerminalIntentFactsBindingFailsClosed/completed_with_facts
+=== RUN   TestAgentRunnerTerminalIntentFactsBindingFailsClosed/facts_must_be_mutually_distinct
+--- PASS: TestAgentRunnerTerminalIntentFactsBindingFailsClosed (0.00s)
+    --- PASS: TestAgentRunnerTerminalIntentFactsBindingFailsClosed/failed_with_facts (0.00s)
+    --- PASS: TestAgentRunnerTerminalIntentFactsBindingFailsClosed/uncertain_with_facts (0.00s)
+    --- PASS: TestAgentRunnerTerminalIntentFactsBindingFailsClosed/completed_without_facts (0.00s)
+    --- PASS: TestAgentRunnerTerminalIntentFactsBindingFailsClosed/failed_without_facts (0.00s)
+    --- PASS: TestAgentRunnerTerminalIntentFactsBindingFailsClosed/completed_with_facts (0.00s)
+    --- PASS: TestAgentRunnerTerminalIntentFactsBindingFailsClosed/facts_must_be_mutually_distinct (0.00s)
+=== RUN   TestAgentRunnerReplayStoreTerminalIntentRequiresPersistedRequest
+--- PASS: TestAgentRunnerReplayStoreTerminalIntentRequiresPersistedRequest (0.01s)
+=== RUN   TestAgentRunnerReplayStoreTerminalIntentSingleWinnerReplayAndConflicts
+--- PASS: TestAgentRunnerReplayStoreTerminalIntentSingleWinnerReplayAndConflicts (0.05s)
+=== RUN   TestAgentRunnerReplayStoreTerminalClosureLifecycle
+--- PASS: TestAgentRunnerReplayStoreTerminalClosureLifecycle (0.06s)
+=== RUN   TestAgentRunnerReplayStoreTerminalClosureOrphanIsCorruption
+--- PASS: TestAgentRunnerReplayStoreTerminalClosureOrphanIsCorruption (0.02s)
+=== RUN   TestAgentRunnerReplayStoreTerminalRunIDBinding
+--- PASS: TestAgentRunnerReplayStoreTerminalRunIDBinding (0.03s)
+=== RUN   TestAgentRunnerReplayStoreTerminalUnprovenReplayOnly
+--- PASS: TestAgentRunnerReplayStoreTerminalUnprovenReplayOnly (0.06s)
+=== RUN   TestAgentRunnerReplayStoreTerminalCrossStoreSingleWinner
+--- PASS: TestAgentRunnerReplayStoreTerminalCrossStoreSingleWinner (0.21s)
+=== RUN   TestAgentRunnerReplayStoreTerminalMethodsFailClosedOnZeroValueStore
+--- PASS: TestAgentRunnerReplayStoreTerminalMethodsFailClosedOnZeroValueStore (0.00s)
+=== RUN   TestAgentRunnerReplayStoreTerminalClosureIntentRunIDMismatchIsCorruption
+--- PASS: TestAgentRunnerReplayStoreTerminalClosureIntentRunIDMismatchIsCorruption (0.02s)
+=== RUN   TestAgentRunnerReplayStoreRequiresAbsoluteRoot
+--- PASS: TestAgentRunnerReplayStoreRequiresAbsoluteRoot (0.00s)
+=== RUN   TestAgentRunnerReplayStoreUsesSafePrefixedFileNames
+--- PASS: TestAgentRunnerReplayStoreUsesSafePrefixedFileNames (0.00s)
+=== RUN   TestAgentRunnerReplayStorePublicationDurabilityMatchesPlatform
+--- PASS: TestAgentRunnerReplayStorePublicationDurabilityMatchesPlatform (0.00s)
+=== RUN   TestAgentRunnerReplayStoreRecordRequestRejectsUnprovenDurabilityWithoutWriting
+--- PASS: TestAgentRunnerReplayStoreRecordRequestRejectsUnprovenDurabilityWithoutWriting (0.00s)
+=== RUN   TestAgentRunnerReplayStoreZeroValueCannotBypassDurabilityGate
+--- PASS: TestAgentRunnerReplayStoreZeroValueCannotBypassDurabilityGate (0.00s)
+=== RUN   TestAgentRunnerReplayStoreUnprovenCompletionAllowsOnlyExistingReplay
+--- PASS: TestAgentRunnerReplayStoreUnprovenCompletionAllowsOnlyExistingReplay (0.04s)
+=== RUN   TestAgentRunnerReplayStoreFirstRequestAndIdempotentReplay
+--- PASS: TestAgentRunnerReplayStoreFirstRequestAndIdempotentReplay (0.03s)
+=== RUN   TestAgentRunnerReplayStoreRejectsRequestConflict
+--- PASS: TestAgentRunnerReplayStoreRejectsRequestConflict (0.03s)
+=== RUN   TestAgentRunnerReplayStoreRejectsInvalidCompletionBinding
+--- PASS: TestAgentRunnerReplayStoreRejectsInvalidCompletionBinding (0.02s)
+=== RUN   TestAgentRunnerReplayStoreInvalidCompletionDoesNotConsumeRequestIdentity
+--- PASS: TestAgentRunnerReplayStoreInvalidCompletionDoesNotConsumeRequestIdentity (0.02s)
+=== RUN   TestAgentRunnerReplayStoreCompletionFirstReplayAndConflict
+--- PASS: TestAgentRunnerReplayStoreCompletionFirstReplayAndConflict (0.04s)
+=== RUN   TestAgentRunnerReplayStoreCollisionNeverReplacesExistingCompletion
+--- PASS: TestAgentRunnerReplayStoreCollisionNeverReplacesExistingCompletion (0.02s)
+=== RUN   TestAgentRunnerReplayStoreRequestCollisionVisibilityExhaustionIsConvergenceFailure
+--- PASS: TestAgentRunnerReplayStoreRequestCollisionVisibilityExhaustionIsConvergenceFailure (0.02s)
+=== RUN   TestAgentRunnerReplayStoreCompletionCollisionVisibilityExhaustionIsConvergenceFailure
+--- PASS: TestAgentRunnerReplayStoreCompletionCollisionVisibilityExhaustionIsConvergenceFailure (0.03s)
+=== RUN   TestAgentRunnerReplayStorePublishSyncFailureFailsClosedWithoutRollback
+--- PASS: TestAgentRunnerReplayStorePublishSyncFailureFailsClosedWithoutRollback (0.02s)
+=== RUN   TestAgentRunnerReplayStoreOrphanCompletionRejectsWithoutWritingRequest
+--- PASS: TestAgentRunnerReplayStoreOrphanCompletionRejectsWithoutWritingRequest (0.02s)
+=== RUN   TestAgentRunnerReplayStoreOrphanCompletionRejectsRecordRequestWithoutWritingRequest
+--- PASS: TestAgentRunnerReplayStoreOrphanCompletionRejectsRecordRequestWithoutWritingRequest (0.02s)
+=== RUN   TestAgentRunnerReplayStoreRestartRecoveryForUnknownAndCompleted
+--- PASS: TestAgentRunnerReplayStoreRestartRecoveryForUnknownAndCompleted (0.04s)
+=== RUN   TestAgentRunnerReplayStoreUncertainCompletionYieldsTerminalReceiptPresent
+--- PASS: TestAgentRunnerReplayStoreUncertainCompletionYieldsTerminalReceiptPresent (0.04s)
+=== RUN   TestAgentRunnerReplayStoreRequestOnlyCrashWindowBlocksRedispatch
+--- PASS: TestAgentRunnerReplayStoreRequestOnlyCrashWindowBlocksRedispatch (0.02s)
+=== RUN   TestAgentRunnerReplayStoreCompletionPersistedWindowConvergesReplay
+--- PASS: TestAgentRunnerReplayStoreCompletionPersistedWindowConvergesReplay (0.04s)
+=== RUN   TestAgentRunnerReplayStoreConcurrentSameRequestHasSingleFirstDispatch
+--- PASS: TestAgentRunnerReplayStoreConcurrentSameRequestHasSingleFirstDispatch (0.20s)
+=== RUN   TestAgentRunnerReplayStoreConcurrentSameRequestAcrossStoresHasSingleFirstDispatch
+--- PASS: TestAgentRunnerReplayStoreConcurrentSameRequestAcrossStoresHasSingleFirstDispatch (0.12s)
+=== RUN   TestAgentRunnerReplayStoreConcurrentDifferentCompletionsAcrossStoresConflicts
+--- PASS: TestAgentRunnerReplayStoreConcurrentDifferentCompletionsAcrossStoresConflicts (0.03s)
+=== RUN   TestAgentRunnerReplayStoreStateRejectsOrphanCompletion
+--- PASS: TestAgentRunnerReplayStoreStateRejectsOrphanCompletion (0.02s)
+=== RUN   TestAgentRunnerReplayStoreStateRejectsCorruptRequestJSON
+--- PASS: TestAgentRunnerReplayStoreStateRejectsCorruptRequestJSON (0.01s)
+=== RUN   TestAgentRunnerReplayStoreStateRejectsDiskIDMismatch
+--- PASS: TestAgentRunnerReplayStoreStateRejectsDiskIDMismatch (0.01s)
+=== RUN   TestAgentRunnerReplayStoreStateRejectsCompletionIDMismatch
+--- PASS: TestAgentRunnerReplayStoreStateRejectsCompletionIDMismatch (0.02s)
+=== RUN   TestAgentRunnerReplayStoreConvergesCrossStorePublicationAfterAbsentRequestRead
+=== RUN   TestAgentRunnerReplayStoreConvergesCrossStorePublicationAfterAbsentRequestRead/state
+=== RUN   TestAgentRunnerReplayStoreConvergesCrossStorePublicationAfterAbsentRequestRead/record_request
+=== RUN   TestAgentRunnerReplayStoreConvergesCrossStorePublicationAfterAbsentRequestRead/record_completion
+--- PASS: TestAgentRunnerReplayStoreConvergesCrossStorePublicationAfterAbsentRequestRead (0.07s)
+    --- PASS: TestAgentRunnerReplayStoreConvergesCrossStorePublicationAfterAbsentRequestRead/state (0.02s)
+    --- PASS: TestAgentRunnerReplayStoreConvergesCrossStorePublicationAfterAbsentRequestRead/record_request (0.02s)
+    --- PASS: TestAgentRunnerReplayStoreConvergesCrossStorePublicationAfterAbsentRequestRead/record_completion (0.02s)
+=== RUN   TestAgentRunnerReplayStoreMonotonicStateInvariants
+=== RUN   TestAgentRunnerReplayStoreMonotonicStateInvariants/absent
+=== RUN   TestAgentRunnerReplayStoreMonotonicStateInvariants/dispatched
+=== RUN   TestAgentRunnerReplayStoreMonotonicStateInvariants/terminal
+=== RUN   TestAgentRunnerReplayStoreMonotonicStateInvariants/orphan_fails_closed
+--- PASS: TestAgentRunnerReplayStoreMonotonicStateInvariants (0.06s)
+    --- PASS: TestAgentRunnerReplayStoreMonotonicStateInvariants/absent (0.01s)
+    --- PASS: TestAgentRunnerReplayStoreMonotonicStateInvariants/dispatched (0.02s)
+    --- PASS: TestAgentRunnerReplayStoreMonotonicStateInvariants/terminal (0.02s)
+    --- PASS: TestAgentRunnerReplayStoreMonotonicStateInvariants/orphan_fails_closed (0.02s)
+=== RUN   TestAgentRunnerReplayStoreStateClassifiesDiskBindingMismatchAsCorruption
+--- PASS: TestAgentRunnerReplayStoreStateClassifiesDiskBindingMismatchAsCorruption (0.02s)
+=== RUN   TestAgentRunnerReplayStoreAbsentState
+--- PASS: TestAgentRunnerReplayStoreAbsentState (0.01s)
+=== RUN   TestAgentRunnerPinnedCLIRunCompletedOutcomeCarriesFacts
+--- PASS: TestAgentRunnerPinnedCLIRunCompletedOutcomeCarriesFacts (0.15s)
+=== RUN   TestAgentRunnerPinnedCLIRunTimeoutIsUncertainWithAProvenStop
+--- PASS: TestAgentRunnerPinnedCLIRunTimeoutIsUncertainWithAProvenStop (0.45s)
+=== RUN   TestAgentRunnerPinnedCLIRunCallerDeadlineIsCancelled
+--- PASS: TestAgentRunnerPinnedCLIRunCallerDeadlineIsCancelled (3.04s)
+=== RUN   TestAgentRunnerPinnedCLIRunTornEventLogIsUncertain
+--- PASS: TestAgentRunnerPinnedCLIRunTornEventLogIsUncertain (0.11s)
+=== RUN   TestAgentRunnerPinnedCLIRunCancellationIsCancelled
+--- PASS: TestAgentRunnerPinnedCLIRunCancellationIsCancelled (0.10s)
+=== RUN   TestAgentRunnerPinnedCLIRunCrashIsFailed
+--- PASS: TestAgentRunnerPinnedCLIRunCrashIsFailed (0.12s)
+=== RUN   TestAgentRunnerPinnedCLIRunMissingUsageIsUncertain
+--- PASS: TestAgentRunnerPinnedCLIRunMissingUsageIsUncertain (0.14s)
+=== RUN   TestAgentRunnerPinnedCLIRunOperatorAskOutranksSuccessAndTimeout
+--- PASS: TestAgentRunnerPinnedCLIRunOperatorAskOutranksSuccessAndTimeout (0.43s)
+=== RUN   TestAgentRunnerPinnedCLIRunTimeoutStopsTheWholeTree
+--- PASS: TestAgentRunnerPinnedCLIRunTimeoutStopsTheWholeTree (0.83s)
+=== RUN   TestAgentRunnerPinnedCLIRunNaturalExitLeavesNoDescendant
+--- PASS: TestAgentRunnerPinnedCLIRunNaturalExitLeavesNoDescendant (0.14s)
+=== RUN   TestAgentRunnerVerifyTreeGoneDetectsSurvivors
+--- PASS: TestAgentRunnerVerifyTreeGoneDetectsSurvivors (0.35s)
+=== RUN   TestAgentRunnerChildPIDReportThreeStates
+--- PASS: TestAgentRunnerChildPIDReportThreeStates (0.00s)
+=== RUN   TestAgentRunnerVerifyTreeGoneMissingReportIsUnproven
+--- PASS: TestAgentRunnerVerifyTreeGoneMissingReportIsUnproven (0.00s)
+=== RUN   TestAgentRunnerTerminalStatusMapsEveryDegradation
+=== RUN   TestAgentRunnerTerminalStatusMapsEveryDegradation/clean
+=== RUN   TestAgentRunnerTerminalStatusMapsEveryDegradation/operator_ask
+=== RUN   TestAgentRunnerTerminalStatusMapsEveryDegradation/timeout
+=== RUN   TestAgentRunnerTerminalStatusMapsEveryDegradation/cancel
+=== RUN   TestAgentRunnerTerminalStatusMapsEveryDegradation/caller_deadline
+=== RUN   TestAgentRunnerTerminalStatusMapsEveryDegradation/tree_remained
+=== RUN   TestAgentRunnerTerminalStatusMapsEveryDegradation/termination_uncertain
+=== RUN   TestAgentRunnerTerminalStatusMapsEveryDegradation/unclassified_stop
+=== RUN   TestAgentRunnerTerminalStatusMapsEveryDegradation/stopped,_no_watchdog_verdict
+=== RUN   TestAgentRunnerTerminalStatusMapsEveryDegradation/tree_alive
+=== RUN   TestAgentRunnerTerminalStatusMapsEveryDegradation/stop_unproven
+=== RUN   TestAgentRunnerTerminalStatusMapsEveryDegradation/stop_forced
+=== RUN   TestAgentRunnerTerminalStatusMapsEveryDegradation/exit_code
+=== RUN   TestAgentRunnerTerminalStatusMapsEveryDegradation/log_gap
+=== RUN   TestAgentRunnerTerminalStatusMapsEveryDegradation/events_gap
+=== RUN   TestAgentRunnerTerminalStatusMapsEveryDegradation/manifest_gap
+=== RUN   TestAgentRunnerTerminalStatusMapsEveryDegradation/pid_reports_gap
+=== RUN   TestAgentRunnerTerminalStatusMapsEveryDegradation/timeout_without_a_stopped_process
+=== RUN   TestAgentRunnerTerminalStatusMapsEveryDegradation/timeout_on_a_natural_failure
+=== RUN   TestAgentRunnerTerminalStatusMapsEveryDegradation/unclassified_error_without_a_stopped_process
+=== RUN   TestAgentRunnerTerminalStatusMapsEveryDegradation/usage_gap_on_a_natural_failure
+=== RUN   TestAgentRunnerTerminalStatusMapsEveryDegradation/events_gap_on_a_natural_failure
+=== RUN   TestAgentRunnerTerminalStatusMapsEveryDegradation/manifest_gap_on_a_natural_failure
+=== RUN   TestAgentRunnerTerminalStatusMapsEveryDegradation/natural_failure_with_an_unproven_tree
+=== RUN   TestAgentRunnerTerminalStatusMapsEveryDegradation/evidence_normalization
+--- PASS: TestAgentRunnerTerminalStatusMapsEveryDegradation (0.00s)
+    --- PASS: TestAgentRunnerTerminalStatusMapsEveryDegradation/clean (0.00s)
+    --- PASS: TestAgentRunnerTerminalStatusMapsEveryDegradation/operator_ask (0.00s)
+    --- PASS: TestAgentRunnerTerminalStatusMapsEveryDegradation/timeout (0.00s)
+    --- PASS: TestAgentRunnerTerminalStatusMapsEveryDegradation/cancel (0.00s)
+    --- PASS: TestAgentRunnerTerminalStatusMapsEveryDegradation/caller_deadline (0.00s)
+    --- PASS: TestAgentRunnerTerminalStatusMapsEveryDegradation/tree_remained (0.00s)
+    --- PASS: TestAgentRunnerTerminalStatusMapsEveryDegradation/termination_uncertain (0.00s)
+    --- PASS: TestAgentRunnerTerminalStatusMapsEveryDegradation/unclassified_stop (0.00s)
+    --- PASS: TestAgentRunnerTerminalStatusMapsEveryDegradation/stopped,_no_watchdog_verdict (0.00s)
+    --- PASS: TestAgentRunnerTerminalStatusMapsEveryDegradation/tree_alive (0.00s)
+    --- PASS: TestAgentRunnerTerminalStatusMapsEveryDegradation/stop_unproven (0.00s)
+    --- PASS: TestAgentRunnerTerminalStatusMapsEveryDegradation/stop_forced (0.00s)
+    --- PASS: TestAgentRunnerTerminalStatusMapsEveryDegradation/exit_code (0.00s)
+    --- PASS: TestAgentRunnerTerminalStatusMapsEveryDegradation/log_gap (0.00s)
+    --- PASS: TestAgentRunnerTerminalStatusMapsEveryDegradation/events_gap (0.00s)
+    --- PASS: TestAgentRunnerTerminalStatusMapsEveryDegradation/manifest_gap (0.00s)
+    --- PASS: TestAgentRunnerTerminalStatusMapsEveryDegradation/pid_reports_gap (0.00s)
+    --- PASS: TestAgentRunnerTerminalStatusMapsEveryDegradation/timeout_without_a_stopped_process (0.00s)
+    --- PASS: TestAgentRunnerTerminalStatusMapsEveryDegradation/timeout_on_a_natural_failure (0.00s)
+    --- PASS: TestAgentRunnerTerminalStatusMapsEveryDegradation/unclassified_error_without_a_stopped_process (0.00s)
+    --- PASS: TestAgentRunnerTerminalStatusMapsEveryDegradation/usage_gap_on_a_natural_failure (0.00s)
+    --- PASS: TestAgentRunnerTerminalStatusMapsEveryDegradation/events_gap_on_a_natural_failure (0.00s)
+    --- PASS: TestAgentRunnerTerminalStatusMapsEveryDegradation/manifest_gap_on_a_natural_failure (0.00s)
+    --- PASS: TestAgentRunnerTerminalStatusMapsEveryDegradation/natural_failure_with_an_unproven_tree (0.00s)
+    --- PASS: TestAgentRunnerTerminalStatusMapsEveryDegradation/evidence_normalization (0.00s)
+=== RUN   TestAgentRunnerTerminalStatusArchivesTheStopEvidence
+--- PASS: TestAgentRunnerTerminalStatusArchivesTheStopEvidence (0.00s)
+=== RUN   TestAgentRunnerSettlementOnlyObservesCompletedUsage
+=== RUN   TestAgentRunnerSettlementOnlyObservesCompletedUsage/usage_gap
+=== RUN   TestAgentRunnerSettlementOnlyObservesCompletedUsage/uncertain_run
+=== RUN   TestAgentRunnerSettlementOnlyObservesCompletedUsage/cancelled_run
+--- PASS: TestAgentRunnerSettlementOnlyObservesCompletedUsage (0.00s)
+    --- PASS: TestAgentRunnerSettlementOnlyObservesCompletedUsage/usage_gap (0.00s)
+    --- PASS: TestAgentRunnerSettlementOnlyObservesCompletedUsage/uncertain_run (0.00s)
+    --- PASS: TestAgentRunnerSettlementOnlyObservesCompletedUsage/cancelled_run (0.00s)
+=== RUN   TestAgentRunnerVerifyTreeGoneUsesTheLivenessObservation
+--- PASS: TestAgentRunnerVerifyTreeGoneUsesTheLivenessObservation (0.43s)
+=== RUN   TestAgentRunnerPinnedCLIRunUsesThePreRunManifest
+--- PASS: TestAgentRunnerPinnedCLIRunUsesThePreRunManifest (0.11s)
+=== RUN   TestAgentRunnerPinnedCLIRunManifestGapIsUncertainNotAnError
+--- PASS: TestAgentRunnerPinnedCLIRunManifestGapIsUncertainNotAnError (0.11s)
+=== RUN   TestAgentRunnerPinnedCLIRunRefusesUnusableRequests
+=== RUN   TestAgentRunnerPinnedCLIRunRefusesUnusableRequests/missing_request_hash
+=== RUN   TestAgentRunnerPinnedCLIRunRefusesUnusableRequests/missing_task
+=== RUN   TestAgentRunnerPinnedCLIRunRefusesUnusableRequests/missing_step
+=== RUN   TestAgentRunnerPinnedCLIRunRefusesUnusableRequests/missing_attempt
+=== RUN   TestAgentRunnerPinnedCLIRunRefusesUnusableRequests/missing_timeout
+=== RUN   TestAgentRunnerPinnedCLIRunRefusesUnusableRequests/unbounded_logs
+--- PASS: TestAgentRunnerPinnedCLIRunRefusesUnusableRequests (0.02s)
+    --- PASS: TestAgentRunnerPinnedCLIRunRefusesUnusableRequests/missing_request_hash (0.00s)
+    --- PASS: TestAgentRunnerPinnedCLIRunRefusesUnusableRequests/missing_task (0.00s)
+    --- PASS: TestAgentRunnerPinnedCLIRunRefusesUnusableRequests/missing_step (0.00s)
+    --- PASS: TestAgentRunnerPinnedCLIRunRefusesUnusableRequests/missing_attempt (0.00s)
+    --- PASS: TestAgentRunnerPinnedCLIRunRefusesUnusableRequests/missing_timeout (0.00s)
+    --- PASS: TestAgentRunnerPinnedCLIRunRefusesUnusableRequests/unbounded_logs (0.00s)
+=== RUN   TestStartingMarkerReleaseRemovesBeforeUnlock
+--- PASS: TestStartingMarkerReleaseRemovesBeforeUnlock (0.00s)
+=== RUN   TestStartingMarkerReleaseRemovesThePublishedPath
+--- PASS: TestStartingMarkerReleaseRemovesThePublishedPath (0.01s)
+=== RUN   TestStartingMarkerReleaseIsIdempotent
+--- PASS: TestStartingMarkerReleaseIsIdempotent (0.01s)
+=== RUN   TestStartingMarkerReleaseNeverExposesReleasedContent
+    agent_runner_starting_marker_order_test.go:406: stress window clean: 178 releases, 0 free-lock observations during release, 27 residual deletes
+--- PASS: TestStartingMarkerReleaseNeverExposesReleasedContent (3.00s)
+=== RUN   TestStartingMarkerReleaseFailClosedWhenTheNameIsOccupied
+--- PASS: TestStartingMarkerReleaseFailClosedWhenTheNameIsOccupied (0.01s)
+=== RUN   TestStartingMarkerReleaseShareFactProbe
+    agent_runner_starting_marker_order_windows_test.go:134: os.OpenFile handle blocks os.Remove: err=remove C:\Users\妙妙呜\AppData\Local\Temp\TestStartingMarkerReleaseShareFactProbe1287892883\001\share-probe.txt: The process cannot access the file because it is being used by another process. errno=32 (0x20), matching the windows.go comment
+--- PASS: TestStartingMarkerReleaseShareFactProbe (0.01s)
+=== RUN   TestToChainAgentRunnerTerminalMapsThePublishedChain
+--- PASS: TestToChainAgentRunnerTerminalMapsThePublishedChain (0.07s)
+=== RUN   TestLoadChainAgentRunnerTerminalRequiresASettledClosure
+--- PASS: TestLoadChainAgentRunnerTerminalRequiresASettledClosure (0.09s)
+=== RUN   TestToChainAgentRunnerTerminalFailsClosed
+=== RUN   TestToChainAgentRunnerTerminalFailsClosed/foreign_settlement_entry
+=== RUN   TestToChainAgentRunnerTerminalFailsClosed/foreign_settlement_key
+=== RUN   TestToChainAgentRunnerTerminalFailsClosed/resume_session_mismatch
+=== RUN   TestToChainAgentRunnerTerminalFailsClosed/zero_request
+=== RUN   TestToChainAgentRunnerTerminalFailsClosed/zero_intent
+=== RUN   TestToChainAgentRunnerTerminalFailsClosed/zero_closure
+=== RUN   TestToChainAgentRunnerTerminalFailsClosed/foreign_intent_binding
+--- PASS: TestToChainAgentRunnerTerminalFailsClosed (0.00s)
+    --- PASS: TestToChainAgentRunnerTerminalFailsClosed/foreign_settlement_entry (0.00s)
+    --- PASS: TestToChainAgentRunnerTerminalFailsClosed/foreign_settlement_key (0.00s)
+    --- PASS: TestToChainAgentRunnerTerminalFailsClosed/resume_session_mismatch (0.00s)
+    --- PASS: TestToChainAgentRunnerTerminalFailsClosed/zero_request (0.00s)
+    --- PASS: TestToChainAgentRunnerTerminalFailsClosed/zero_intent (0.00s)
+    --- PASS: TestToChainAgentRunnerTerminalFailsClosed/zero_closure (0.00s)
+    --- PASS: TestToChainAgentRunnerTerminalFailsClosed/foreign_intent_binding (0.00s)
+=== RUN   TestToChainAgentRunnerTerminalCarriesResumeBinding
+--- PASS: TestToChainAgentRunnerTerminalCarriesResumeBinding (0.00s)
+=== RUN   TestAgentRunnerTerminalPublisherHappyPathPublishesChainInOrder
+--- PASS: TestAgentRunnerTerminalPublisherHappyPathPublishesChainInOrder (0.09s)
+=== RUN   TestAgentRunnerTerminalPublisherReplayIsIdempotent
+--- PASS: TestAgentRunnerTerminalPublisherReplayIsIdempotent (0.08s)
+=== RUN   TestAgentRunnerTerminalPublisherConcurrentSingleWinner
+--- PASS: TestAgentRunnerTerminalPublisherConcurrentSingleWinner (0.29s)
+=== RUN   TestAgentRunnerTerminalPublisherCrashAfterIntentRecovers
+--- PASS: TestAgentRunnerTerminalPublisherCrashAfterIntentRecovers (0.10s)
+=== RUN   TestAgentRunnerTerminalPublisherCrashAfterSettleRecovers
+--- PASS: TestAgentRunnerTerminalPublisherCrashAfterSettleRecovers (0.10s)
+=== RUN   TestAgentRunnerTerminalPublisherOrphanCompletionFailsClosed
+--- PASS: TestAgentRunnerTerminalPublisherOrphanCompletionFailsClosed (0.04s)
+=== RUN   TestAgentRunnerTerminalPublisherRejectsForeignSettlement
+--- PASS: TestAgentRunnerTerminalPublisherRejectsForeignSettlement (0.04s)
+=== RUN   TestAgentRunnerTerminalPublisherUnknownSettlementKeepsReservation
+--- PASS: TestAgentRunnerTerminalPublisherUnknownSettlementKeepsReservation (0.08s)
+=== RUN   TestAgentRunnerTerminalPublisherSettlementMatrix
+=== RUN   TestAgentRunnerTerminalPublisherSettlementMatrix/uncertain_requires_unknown
+=== RUN   TestAgentRunnerTerminalPublisherSettlementMatrix/uncertain_accepts_unknown
+=== RUN   TestAgentRunnerTerminalPublisherSettlementMatrix/incomplete_usage_requires_unknown
+=== RUN   TestAgentRunnerTerminalPublisherSettlementMatrix/incomplete_usage_accepts_unknown
+=== RUN   TestAgentRunnerTerminalPublisherSettlementMatrix/observed_requires_a_charged_amount
+--- PASS: TestAgentRunnerTerminalPublisherSettlementMatrix (0.17s)
+    --- PASS: TestAgentRunnerTerminalPublisherSettlementMatrix/uncertain_requires_unknown (0.02s)
+    --- PASS: TestAgentRunnerTerminalPublisherSettlementMatrix/uncertain_accepts_unknown (0.06s)
+    --- PASS: TestAgentRunnerTerminalPublisherSettlementMatrix/incomplete_usage_requires_unknown (0.02s)
+    --- PASS: TestAgentRunnerTerminalPublisherSettlementMatrix/incomplete_usage_accepts_unknown (0.06s)
+    --- PASS: TestAgentRunnerTerminalPublisherSettlementMatrix/observed_requires_a_charged_amount (0.02s)
+=== RUN   TestAgentRunnerTerminalPublisherRejectsChargedOverReserved
+--- PASS: TestAgentRunnerTerminalPublisherRejectsChargedOverReserved (0.05s)
+=== RUN   TestAgentRunnerTerminalPublisherRefusesDifferentOutcomeSameRequest
+--- PASS: TestAgentRunnerTerminalPublisherRefusesDifferentOutcomeSameRequest (0.09s)
+=== RUN   TestAgentRunnerTerminalPublisherUnprovenRejectsBeforeSettlement
+--- PASS: TestAgentRunnerTerminalPublisherUnprovenRejectsBeforeSettlement (0.04s)
+=== RUN   TestAgentRunnerTerminalPublisherRejectsResumeSessionMismatch
+--- PASS: TestAgentRunnerTerminalPublisherRejectsResumeSessionMismatch (0.09s)
+=== RUN   TestAgentRunnerTerminalPublisherDifferentClocksConverge
+--- PASS: TestAgentRunnerTerminalPublisherDifferentClocksConverge (0.12s)
+=== RUN   TestAgentRunnerTerminalPublisherDifferentClocksSequentialConverge
+--- PASS: TestAgentRunnerTerminalPublisherDifferentClocksSequentialConverge (0.09s)
+=== RUN   TestAgentRunnerTerminalPublisherRejectsInvalidEvidenceBeforeIntent
+--- PASS: TestAgentRunnerTerminalPublisherRejectsInvalidEvidenceBeforeIntent (0.02s)
+=== RUN   TestAgentRunnerTerminalPublisherRefusesACompletedOutcomeWithoutFacts
+--- PASS: TestAgentRunnerTerminalPublisherRefusesACompletedOutcomeWithoutFacts (0.02s)
+=== RUN   TestAgentRunnerTerminalPublisherDeduplicatesEvidence
+--- PASS: TestAgentRunnerTerminalPublisherDeduplicatesEvidence (0.08s)
+=== RUN   TestAgentRunnerTerminalPublisherConvergeUnprovenRefusesWithoutSettlement
+=== RUN   TestAgentRunnerTerminalPublisherConvergeUnprovenRefusesWithoutSettlement/intent_without_settlement
+=== RUN   TestAgentRunnerTerminalPublisherConvergeUnprovenRefusesWithoutSettlement/settled_without_closure
+--- PASS: TestAgentRunnerTerminalPublisherConvergeUnprovenRefusesWithoutSettlement (0.14s)
+    --- PASS: TestAgentRunnerTerminalPublisherConvergeUnprovenRefusesWithoutSettlement/intent_without_settlement (0.06s)
+    --- PASS: TestAgentRunnerTerminalPublisherConvergeUnprovenRefusesWithoutSettlement/settled_without_closure (0.08s)
+=== RUN   TestAgentRunnerTerminalPublisherClosureWithoutCompletionIsCorruption
+--- PASS: TestAgentRunnerTerminalPublisherClosureWithoutCompletionIsCorruption (0.06s)
+=== RUN   TestAgentRunnerTerminalPublisherUnprovenCompleteChainIsWriteFree
+--- PASS: TestAgentRunnerTerminalPublisherUnprovenCompleteChainIsWriteFree (0.09s)
+=== RUN   TestAgentRunnerTerminalPublisherClosureBindingMismatchIsCorruption
+--- PASS: TestAgentRunnerTerminalPublisherClosureBindingMismatchIsCorruption (0.07s)
+=== RUN   TestAgentRunnerTerminalPublisherRecoveryRequiresPersistedRequest
+--- PASS: TestAgentRunnerTerminalPublisherRecoveryRequiresPersistedRequest (0.04s)
+=== RUN   TestAgentRunnerTerminalPublisherFailsClosedOnInvalidInputs
+=== RUN   TestAgentRunnerTerminalPublisherFailsClosedOnInvalidInputs/clock
+=== RUN   TestAgentRunnerTerminalPublisherFailsClosedOnInvalidInputs/store
+=== RUN   TestAgentRunnerTerminalPublisherFailsClosedOnInvalidInputs/ledger
+--- PASS: TestAgentRunnerTerminalPublisherFailsClosedOnInvalidInputs (0.01s)
+    --- PASS: TestAgentRunnerTerminalPublisherFailsClosedOnInvalidInputs/clock (0.00s)
+    --- PASS: TestAgentRunnerTerminalPublisherFailsClosedOnInvalidInputs/store (0.00s)
+    --- PASS: TestAgentRunnerTerminalPublisherFailsClosedOnInvalidInputs/ledger (0.00s)
+=== RUN   TestAgentRunnerRequestRecordCanonicalRoundTrip
+--- PASS: TestAgentRunnerRequestRecordCanonicalRoundTrip (0.00s)
+=== RUN   TestAgentRunnerEffectMappingContract
+--- PASS: TestAgentRunnerEffectMappingContract (0.00s)
+=== RUN   TestAgentRunnerRequestRejectsInvalidEffectMappingBindings
+=== RUN   TestAgentRunnerRequestRejectsInvalidEffectMappingBindings/tampered_hash
+=== RUN   TestAgentRunnerRequestRejectsInvalidEffectMappingBindings/unknown_effect
+=== RUN   TestAgentRunnerRequestRejectsInvalidEffectMappingBindings/missing_version
+=== RUN   TestAgentRunnerRequestRejectsInvalidEffectMappingBindings/unknown_version
+=== RUN   TestAgentRunnerRequestRejectsInvalidEffectMappingBindings/missing_hash
+--- PASS: TestAgentRunnerRequestRejectsInvalidEffectMappingBindings (0.00s)
+    --- PASS: TestAgentRunnerRequestRejectsInvalidEffectMappingBindings/tampered_hash (0.00s)
+    --- PASS: TestAgentRunnerRequestRejectsInvalidEffectMappingBindings/unknown_effect (0.00s)
+    --- PASS: TestAgentRunnerRequestRejectsInvalidEffectMappingBindings/missing_version (0.00s)
+    --- PASS: TestAgentRunnerRequestRejectsInvalidEffectMappingBindings/unknown_version (0.00s)
+    --- PASS: TestAgentRunnerRequestRejectsInvalidEffectMappingBindings/missing_hash (0.00s)
+=== RUN   TestAgentRunnerRequestRecordRejectsTamperingAndUnknownFields
+--- PASS: TestAgentRunnerRequestRecordRejectsTamperingAndUnknownFields (0.00s)
+=== RUN   TestAgentRunnerRequestModeBindings
+--- PASS: TestAgentRunnerRequestModeBindings (0.00s)
+=== RUN   TestAgentRunnerWatchdogTimesOutWithBoundedEvidence
+--- PASS: TestAgentRunnerWatchdogTimesOutWithBoundedEvidence (0.14s)
+=== RUN   TestAgentRunnerWatchdogPrefersCallerCancellation
+--- PASS: TestAgentRunnerWatchdogPrefersCallerCancellation (0.05s)
+=== RUN   TestAgentRunnerWatchdogReturnsTheRunError
+--- PASS: TestAgentRunnerWatchdogReturnsTheRunError (0.00s)
+=== RUN   TestAgentRunnerWatchdogRefusesUnusableTimeouts
+=== RUN   TestAgentRunnerWatchdogRefusesUnusableTimeouts/zero_timeout
+=== RUN   TestAgentRunnerWatchdogRefusesUnusableTimeouts/negative
+--- PASS: TestAgentRunnerWatchdogRefusesUnusableTimeouts (0.20s)
+    --- PASS: TestAgentRunnerWatchdogRefusesUnusableTimeouts/zero_timeout (0.00s)
+    --- PASS: TestAgentRunnerWatchdogRefusesUnusableTimeouts/negative (0.00s)
+=== RUN   TestAgentRunnerWatchdogRaceClassificationIsSingleValued
+--- PASS: TestAgentRunnerWatchdogRaceClassificationIsSingleValued (0.50s)
+=== RUN   TestAIAvailabilityAdmissionAcceptsBoundFreshLiveProbe
+--- PASS: TestAIAvailabilityAdmissionAcceptsBoundFreshLiveProbe (0.00s)
+=== RUN   TestAIAvailabilityAdmissionDoesNotCrossChannels
+--- PASS: TestAIAvailabilityAdmissionDoesNotCrossChannels (0.00s)
+=== RUN   TestAIAvailabilityAdmissionRejectsStaleAndOverBudgetEvidence
+--- PASS: TestAIAvailabilityAdmissionRejectsStaleAndOverBudgetEvidence (0.00s)
+=== RUN   TestAIAvailabilityUnavailableReasonBlocksAdmission
+--- PASS: TestAIAvailabilityUnavailableReasonBlocksAdmission (0.00s)
+=== RUN   TestAIAvailabilityRequiresLiveEvidenceForAvailable
+=== RUN   TestAIAvailabilityRequiresLiveEvidenceForAvailable/no-evidence
+=== RUN   TestAIAvailabilityRequiresLiveEvidenceForAvailable/reason
+=== RUN   TestAIAvailabilityRequiresLiveEvidenceForAvailable/no-request
+--- PASS: TestAIAvailabilityRequiresLiveEvidenceForAvailable (0.00s)
+    --- PASS: TestAIAvailabilityRequiresLiveEvidenceForAvailable/no-evidence (0.00s)
+    --- PASS: TestAIAvailabilityRequiresLiveEvidenceForAvailable/reason (0.00s)
+    --- PASS: TestAIAvailabilityRequiresLiveEvidenceForAvailable/no-request (0.00s)
+=== RUN   TestAIAvailabilityReplayAndConflict
+--- PASS: TestAIAvailabilityReplayAndConflict (0.00s)
+=== RUN   TestAIAvailabilityIndexConcurrentReplay
+--- PASS: TestAIAvailabilityIndexConcurrentReplay (0.00s)
+=== RUN   TestAIAvailabilityIndexConcurrentConflict
+--- PASS: TestAIAvailabilityIndexConcurrentConflict (0.00s)
+=== RUN   TestWriteAIAvailabilityRecordPublishesCanonicalRecordWithoutReplace
+--- PASS: TestWriteAIAvailabilityRecordPublishesCanonicalRecordWithoutReplace (0.01s)
+=== RUN   TestAIAvailabilityCheckBlocksMissingSecretWithoutProbe
+--- PASS: TestAIAvailabilityCheckBlocksMissingSecretWithoutProbe (0.00s)
+=== RUN   TestAIAvailabilityCheckUsesOnlyRequestedChannelAndClearsSecret
+--- PASS: TestAIAvailabilityCheckUsesOnlyRequestedChannelAndClearsSecret (0.00s)
+=== RUN   TestAIAvailabilityCheckSanitizesInvalidAndUnclassifiedResults
+=== RUN   TestAIAvailabilityCheckSanitizesInvalidAndUnclassifiedResults/invalid-response
+=== RUN   TestAIAvailabilityCheckSanitizesInvalidAndUnclassifiedResults/probe-error
+--- PASS: TestAIAvailabilityCheckSanitizesInvalidAndUnclassifiedResults (0.00s)
+    --- PASS: TestAIAvailabilityCheckSanitizesInvalidAndUnclassifiedResults/invalid-response (0.00s)
+    --- PASS: TestAIAvailabilityCheckSanitizesInvalidAndUnclassifiedResults/probe-error (0.00s)
+=== RUN   TestAIAvailabilityCheckHostAuthenticationDoesNotRequireSecretStore
+--- PASS: TestAIAvailabilityCheckHostAuthenticationDoesNotRequireSecretStore (0.00s)
+=== RUN   TestCopilotCLIProbeBuildsIsolatedDeepSeekSmoke
+--- PASS: TestCopilotCLIProbeBuildsIsolatedDeepSeekSmoke (0.00s)
+=== RUN   TestParseCopilotCLIProbeOutputRequiresOneStructuredRequest
+--- PASS: TestParseCopilotCLIProbeOutputRequiresOneStructuredRequest (0.00s)
+=== RUN   TestCopilotCLIProbeRejectsMissingOrContradictoryUsage
+=== RUN   TestCopilotCLIProbeRejectsMissingOrContradictoryUsage/zero-user-requests
+=== RUN   TestCopilotCLIProbeRejectsMissingOrContradictoryUsage/two-provider-requests
+=== RUN   TestCopilotCLIProbeRejectsMissingOrContradictoryUsage/missing
+--- PASS: TestCopilotCLIProbeRejectsMissingOrContradictoryUsage (0.00s)
+    --- PASS: TestCopilotCLIProbeRejectsMissingOrContradictoryUsage/zero-user-requests (0.00s)
+    --- PASS: TestCopilotCLIProbeRejectsMissingOrContradictoryUsage/two-provider-requests (0.00s)
+    --- PASS: TestCopilotCLIProbeRejectsMissingOrContradictoryUsage/missing (0.00s)
+=== RUN   TestCopilotCLIProbeRejectsResultWithoutUsage
+--- PASS: TestCopilotCLIProbeRejectsResultWithoutUsage (0.00s)
+=== RUN   TestParseCopilotCLIProbeOutputClassifiesOnlyStructuredFailure
+--- PASS: TestParseCopilotCLIProbeOutputClassifiesOnlyStructuredFailure (0.00s)
+=== RUN   TestManagedCopilotCLIProbeExecutorFailsClosedWhenExecutableIsMissing
+--- PASS: TestManagedCopilotCLIProbeExecutorFailsClosedWhenExecutableIsMissing (0.00s)
+=== RUN   TestManagedCopilotCLIProbeExecutorNeverPassesLogDir
+--- PASS: TestManagedCopilotCLIProbeExecutorNeverPassesLogDir (0.00s)
+=== RUN   TestManagedCopilotCLIProbeExecutorRefusesHashMismatch
+--- PASS: TestManagedCopilotCLIProbeExecutorRefusesHashMismatch (0.00s)
+=== RUN   TestCopilotCLIProbeMapsStructuredFailuresWithoutDisclosure
+=== RUN   TestCopilotCLIProbeMapsStructuredFailuresWithoutDisclosure/credential_rejected
+=== RUN   TestCopilotCLIProbeMapsStructuredFailuresWithoutDisclosure/account_unavailable
+=== RUN   TestCopilotCLIProbeMapsStructuredFailuresWithoutDisclosure/quota_exhausted
+=== RUN   TestCopilotCLIProbeMapsStructuredFailuresWithoutDisclosure/network_unreachable
+=== RUN   TestCopilotCLIProbeMapsStructuredFailuresWithoutDisclosure/tls_or_proxy_failure
+=== RUN   TestCopilotCLIProbeMapsStructuredFailuresWithoutDisclosure/provider_unavailable
+=== RUN   TestCopilotCLIProbeMapsStructuredFailuresWithoutDisclosure/model_unavailable
+=== RUN   TestCopilotCLIProbeMapsStructuredFailuresWithoutDisclosure/policy_blocked
+--- PASS: TestCopilotCLIProbeMapsStructuredFailuresWithoutDisclosure (0.00s)
+    --- PASS: TestCopilotCLIProbeMapsStructuredFailuresWithoutDisclosure/credential_rejected (0.00s)
+    --- PASS: TestCopilotCLIProbeMapsStructuredFailuresWithoutDisclosure/account_unavailable (0.00s)
+    --- PASS: TestCopilotCLIProbeMapsStructuredFailuresWithoutDisclosure/quota_exhausted (0.00s)
+    --- PASS: TestCopilotCLIProbeMapsStructuredFailuresWithoutDisclosure/network_unreachable (0.00s)
+    --- PASS: TestCopilotCLIProbeMapsStructuredFailuresWithoutDisclosure/tls_or_proxy_failure (0.00s)
+    --- PASS: TestCopilotCLIProbeMapsStructuredFailuresWithoutDisclosure/provider_unavailable (0.00s)
+    --- PASS: TestCopilotCLIProbeMapsStructuredFailuresWithoutDisclosure/model_unavailable (0.00s)
+    --- PASS: TestCopilotCLIProbeMapsStructuredFailuresWithoutDisclosure/policy_blocked (0.00s)
+=== RUN   TestCopilotCLIProbeRejectsIncompleteResponseAndDoesNotFallback
+=== RUN   TestCopilotCLIProbeRejectsIncompleteResponseAndDoesNotFallback/no-request
+=== RUN   TestCopilotCLIProbeRejectsIncompleteResponseAndDoesNotFallback/two-requests
+=== RUN   TestCopilotCLIProbeRejectsIncompleteResponseAndDoesNotFallback/missing-result
+=== RUN   TestCopilotCLIProbeRejectsIncompleteResponseAndDoesNotFallback/wrong-reply
+=== RUN   TestCopilotCLIProbeRejectsIncompleteResponseAndDoesNotFallback/tool-called
+--- PASS: TestCopilotCLIProbeRejectsIncompleteResponseAndDoesNotFallback (0.00s)
+    --- PASS: TestCopilotCLIProbeRejectsIncompleteResponseAndDoesNotFallback/no-request (0.00s)
+    --- PASS: TestCopilotCLIProbeRejectsIncompleteResponseAndDoesNotFallback/two-requests (0.00s)
+    --- PASS: TestCopilotCLIProbeRejectsIncompleteResponseAndDoesNotFallback/missing-result (0.00s)
+    --- PASS: TestCopilotCLIProbeRejectsIncompleteResponseAndDoesNotFallback/wrong-reply (0.00s)
+    --- PASS: TestCopilotCLIProbeRejectsIncompleteResponseAndDoesNotFallback/tool-called (0.00s)
+=== RUN   TestCopilotCLIProbeMapsTimeoutWithoutRawError
+--- PASS: TestCopilotCLIProbeMapsTimeoutWithoutRawError (0.00s)
+=== RUN   TestCopilotCLIProbeAppliesCreditFloorWithoutChangingRequestBudget
+=== RUN   TestCopilotCLIProbeAppliesCreditFloorWithoutChangingRequestBudget/floor-raised
+=== RUN   TestCopilotCLIProbeAppliesCreditFloorWithoutChangingRequestBudget/floor-exact
+=== RUN   TestCopilotCLIProbeAppliesCreditFloorWithoutChangingRequestBudget/above-floor
+--- PASS: TestCopilotCLIProbeAppliesCreditFloorWithoutChangingRequestBudget (0.00s)
+    --- PASS: TestCopilotCLIProbeAppliesCreditFloorWithoutChangingRequestBudget/floor-raised (0.00s)
+    --- PASS: TestCopilotCLIProbeAppliesCreditFloorWithoutChangingRequestBudget/floor-exact (0.00s)
+    --- PASS: TestCopilotCLIProbeAppliesCreditFloorWithoutChangingRequestBudget/above-floor (0.00s)
+=== RUN   TestCopilotCLIProbeCreditFloorKeepsCliRejectionFailClosed
+--- PASS: TestCopilotCLIProbeCreditFloorKeepsCliRejectionFailClosed (0.00s)
+=== RUN   TestAIProviderProfileHashAcceptsHostAndSecretAuthentication
+=== RUN   TestAIProviderProfileHashAcceptsHostAndSecretAuthentication/github
+=== RUN   TestAIProviderProfileHashAcceptsHostAndSecretAuthentication/deepseek-anthropic
+--- PASS: TestAIProviderProfileHashAcceptsHostAndSecretAuthentication (0.00s)
+    --- PASS: TestAIProviderProfileHashAcceptsHostAndSecretAuthentication/github (0.00s)
+    --- PASS: TestAIProviderProfileHashAcceptsHostAndSecretAuthentication/deepseek-anthropic (0.00s)
+=== RUN   TestAIProviderProfileRejectsUnsafeOrIncompleteConfiguration
+=== RUN   TestAIProviderProfileRejectsUnsafeOrIncompleteConfiguration/invalid-host
+=== RUN   TestAIProviderProfileRejectsUnsafeOrIncompleteConfiguration/host-with-secret
+=== RUN   TestAIProviderProfileRejectsUnsafeOrIncompleteConfiguration/invalid-model
+=== RUN   TestAIProviderProfileRejectsUnsafeOrIncompleteConfiguration/missing-secret-ref
+=== RUN   TestAIProviderProfileRejectsUnsafeOrIncompleteConfiguration/plaintext-http
+=== RUN   TestAIProviderProfileRejectsUnsafeOrIncompleteConfiguration/url-credential
+=== RUN   TestAIProviderProfileRejectsUnsafeOrIncompleteConfiguration/url-query
+=== RUN   TestAIProviderProfileRejectsUnsafeOrIncompleteConfiguration/url-backslash
+--- PASS: TestAIProviderProfileRejectsUnsafeOrIncompleteConfiguration (0.00s)
+    --- PASS: TestAIProviderProfileRejectsUnsafeOrIncompleteConfiguration/invalid-host (0.00s)
+    --- PASS: TestAIProviderProfileRejectsUnsafeOrIncompleteConfiguration/host-with-secret (0.00s)
+    --- PASS: TestAIProviderProfileRejectsUnsafeOrIncompleteConfiguration/invalid-model (0.00s)
+    --- PASS: TestAIProviderProfileRejectsUnsafeOrIncompleteConfiguration/missing-secret-ref (0.00s)
+    --- PASS: TestAIProviderProfileRejectsUnsafeOrIncompleteConfiguration/plaintext-http (0.00s)
+    --- PASS: TestAIProviderProfileRejectsUnsafeOrIncompleteConfiguration/url-credential (0.00s)
+    --- PASS: TestAIProviderProfileRejectsUnsafeOrIncompleteConfiguration/url-query (0.00s)
+    --- PASS: TestAIProviderProfileRejectsUnsafeOrIncompleteConfiguration/url-backslash (0.00s)
+=== RUN   TestWindowsCredentialManagerLifecycle
+--- PASS: TestWindowsCredentialManagerLifecycle (0.02s)
+=== RUN   TestWindowsCredentialManagerRejectsInvalidInputWithoutSecretDisclosure
+=== RUN   TestWindowsCredentialManagerRejectsInvalidInputWithoutSecretDisclosure/wrong-scheme
+=== RUN   TestWindowsCredentialManagerRejectsInvalidInputWithoutSecretDisclosure/empty-target
+=== RUN   TestWindowsCredentialManagerRejectsInvalidInputWithoutSecretDisclosure/control-character
+=== RUN   TestWindowsCredentialManagerRejectsInvalidInputWithoutSecretDisclosure/oversized-target
+=== RUN   TestWindowsCredentialManagerRejectsInvalidInputWithoutSecretDisclosure/empty-secret
+=== RUN   TestWindowsCredentialManagerRejectsInvalidInputWithoutSecretDisclosure/oversized-secret
+--- PASS: TestWindowsCredentialManagerRejectsInvalidInputWithoutSecretDisclosure (0.00s)
+    --- PASS: TestWindowsCredentialManagerRejectsInvalidInputWithoutSecretDisclosure/wrong-scheme (0.00s)
+    --- PASS: TestWindowsCredentialManagerRejectsInvalidInputWithoutSecretDisclosure/empty-target (0.00s)
+    --- PASS: TestWindowsCredentialManagerRejectsInvalidInputWithoutSecretDisclosure/control-character (0.00s)
+    --- PASS: TestWindowsCredentialManagerRejectsInvalidInputWithoutSecretDisclosure/oversized-target (0.00s)
+    --- PASS: TestWindowsCredentialManagerRejectsInvalidInputWithoutSecretDisclosure/empty-secret (0.00s)
+    --- PASS: TestWindowsCredentialManagerRejectsInvalidInputWithoutSecretDisclosure/oversized-secret (0.00s)
+=== RUN   TestBoundDirRefusesJunctionEscape
+--- PASS: TestBoundDirRefusesJunctionEscape (0.04s)
+=== RUN   TestBoundDirJunctionInsideBoundAdmitted
+--- PASS: TestBoundDirJunctionInsideBoundAdmitted (0.04s)
+=== RUN   TestUsageFromResultEnvelopeIncludesVerifiableEvidence
+--- PASS: TestUsageFromResultEnvelopeIncludesVerifiableEvidence (0.02s)
+=== RUN   TestUsageFromDispatchReceiptIncludesVerifiableEvidence
+--- PASS: TestUsageFromDispatchReceiptIncludesVerifiableEvidence (0.00s)
+=== RUN   TestBoundDirReadSurvivesAncestorReplacement
+--- PASS: TestBoundDirReadSurvivesAncestorReplacement (0.01s)
+=== RUN   TestCloseBoundDirsAllowsRemoval
+--- PASS: TestCloseBoundDirsAllowsRemoval (0.01s)
+=== RUN   TestStoreReadBoundEvidenceSurvivesAncestorReplacement
+--- PASS: TestStoreReadBoundEvidenceSurvivesAncestorReplacement (0.01s)
+=== RUN   TestBoundedArtifactKeepsLogTruncationSemantics
+--- PASS: TestBoundedArtifactKeepsLogTruncationSemantics (0.00s)
+=== RUN   TestEvidenceBindSeamSignaturesAreFrozen
+--- PASS: TestEvidenceBindSeamSignaturesAreFrozen (0.00s)
+=== RUN   TestFileQueueDispatchClaimResultFlow
+--- PASS: TestFileQueueDispatchClaimResultFlow (0.02s)
+=== RUN   TestFileQueueDispatchIsIdempotentForSamePayload
+--- PASS: TestFileQueueDispatchIsIdempotentForSamePayload (0.01s)
+=== RUN   TestFileQueueDispatchRejectsDifferentPayloadForSameRequestID
+--- PASS: TestFileQueueDispatchRejectsDifferentPayloadForSameRequestID (0.01s)
+=== RUN   TestFileQueueClaimTakeoverRequiresReceipt
+--- PASS: TestFileQueueClaimTakeoverRequiresReceipt (0.01s)
+=== RUN   TestFileQueueSubmitResultRejectsFencingMismatch
+--- PASS: TestFileQueueSubmitResultRejectsFencingMismatch (0.02s)
+=== RUN   TestFileQueueSubmitResultRejectsWrongRequestHash
+--- PASS: TestFileQueueSubmitResultRejectsWrongRequestHash (0.01s)
+=== RUN   TestWriteCanonicalLineNoReplaceRejectsExistingFile
+--- PASS: TestWriteCanonicalLineNoReplaceRejectsExistingFile (0.01s)
+=== RUN   TestFileQueueClaimGeneration1IsImmutable
+--- PASS: TestFileQueueClaimGeneration1IsImmutable (0.02s)
+=== RUN   TestFileQueueClaimGeneration1RejectsTakeoverReceiptHash
+--- PASS: TestFileQueueClaimGeneration1RejectsTakeoverReceiptHash (0.01s)
+=== RUN   TestFileQueueClaimRenewRejectsTakeoverReceiptHash
+--- PASS: TestFileQueueClaimRenewRejectsTakeoverReceiptHash (0.01s)
+=== RUN   TestP83F2ReconfirmationIsTheLastObservationBeforeLaunch
+--- PASS: TestP83F2ReconfirmationIsTheLastObservationBeforeLaunch (0.02s)
+=== RUN   TestP83F6BindingRefusalPrecedesSecretResolution
+--- PASS: TestP83F6BindingRefusalPrecedesSecretResolution (0.00s)
+=== RUN   TestP83F6SwappedExecutablePrecedesSecretResolution
+--- PASS: TestP83F6SwappedExecutablePrecedesSecretResolution (0.01s)
+=== RUN   TestP83F8ExecutorRefusesLoggingArgumentsBeforeTempDir
+=== RUN   TestP83F8ExecutorRefusesLoggingArgumentsBeforeTempDir/long_flag
+=== RUN   TestP83F8ExecutorRefusesLoggingArgumentsBeforeTempDir/long_flag_with_value
+=== RUN   TestP83F8ExecutorRefusesLoggingArgumentsBeforeTempDir/long_flag_separate_value
+=== RUN   TestP83F8ExecutorRefusesLoggingArgumentsBeforeTempDir/long_log_file
+=== RUN   TestP83F8ExecutorRefusesLoggingArgumentsBeforeTempDir/single_dash_logdir
+=== RUN   TestP83F8ExecutorRefusesLoggingArgumentsBeforeTempDir/windows_slash_log_dir
+=== RUN   TestP83F8ExecutorRefusesLoggingArgumentsBeforeTempDir/mixed_case
+=== RUN   TestP83F8ExecutorRefusesLoggingArgumentsBeforeTempDir/benign_prompt
+--- PASS: TestP83F8ExecutorRefusesLoggingArgumentsBeforeTempDir (0.01s)
+    --- PASS: TestP83F8ExecutorRefusesLoggingArgumentsBeforeTempDir/long_flag (0.00s)
+    --- PASS: TestP83F8ExecutorRefusesLoggingArgumentsBeforeTempDir/long_flag_with_value (0.00s)
+    --- PASS: TestP83F8ExecutorRefusesLoggingArgumentsBeforeTempDir/long_flag_separate_value (0.00s)
+    --- PASS: TestP83F8ExecutorRefusesLoggingArgumentsBeforeTempDir/long_log_file (0.00s)
+    --- PASS: TestP83F8ExecutorRefusesLoggingArgumentsBeforeTempDir/single_dash_logdir (0.00s)
+    --- PASS: TestP83F8ExecutorRefusesLoggingArgumentsBeforeTempDir/windows_slash_log_dir (0.00s)
+    --- PASS: TestP83F8ExecutorRefusesLoggingArgumentsBeforeTempDir/mixed_case (0.00s)
+    --- PASS: TestP83F8ExecutorRefusesLoggingArgumentsBeforeTempDir/benign_prompt (0.00s)
+=== RUN   TestP83F8ObservationEvidenceCarriesNoRawChildOutput
+--- PASS: TestP83F8ObservationEvidenceCarriesNoRawChildOutput (0.12s)
+=== RUN   TestP83F8ObservationEvidenceIgnoresChildStderr
+--- PASS: TestP83F8ObservationEvidenceIgnoresChildStderr (0.06s)
+=== RUN   TestP83F8LoggingScreenDistinguishesFlagsFromData
+=== RUN   TestP83F8LoggingScreenDistinguishesFlagsFromData/prompt-flag-kept
+=== RUN   TestP83F8LoggingScreenDistinguishesFlagsFromData/prompt-value-log-kept
+=== RUN   TestP83F8LoggingScreenDistinguishesFlagsFromData/bare-positional-log-kept
+=== RUN   TestP83F8LoggingScreenDistinguishesFlagsFromData/bare-positional-logdir-kept
+=== RUN   TestP83F8LoggingScreenDistinguishesFlagsFromData/long-flag-refused
+=== RUN   TestP83F8LoggingScreenDistinguishesFlagsFromData/long-flag-with-value-refused
+=== RUN   TestP83F8LoggingScreenDistinguishesFlagsFromData/single-dash-refused
+=== RUN   TestP83F8LoggingScreenDistinguishesFlagsFromData/windows-slash-refused
+=== RUN   TestP83F8LoggingScreenDistinguishesFlagsFromData/mixed-case-refused
+--- PASS: TestP83F8LoggingScreenDistinguishesFlagsFromData (0.00s)
+    --- PASS: TestP83F8LoggingScreenDistinguishesFlagsFromData/prompt-flag-kept (0.00s)
+    --- PASS: TestP83F8LoggingScreenDistinguishesFlagsFromData/prompt-value-log-kept (0.00s)
+    --- PASS: TestP83F8LoggingScreenDistinguishesFlagsFromData/bare-positional-log-kept (0.00s)
+    --- PASS: TestP83F8LoggingScreenDistinguishesFlagsFromData/bare-positional-logdir-kept (0.00s)
+    --- PASS: TestP83F8LoggingScreenDistinguishesFlagsFromData/long-flag-refused (0.00s)
+    --- PASS: TestP83F8LoggingScreenDistinguishesFlagsFromData/long-flag-with-value-refused (0.00s)
+    --- PASS: TestP83F8LoggingScreenDistinguishesFlagsFromData/single-dash-refused (0.00s)
+    --- PASS: TestP83F8LoggingScreenDistinguishesFlagsFromData/windows-slash-refused (0.00s)
+    --- PASS: TestP83F8LoggingScreenDistinguishesFlagsFromData/mixed-case-refused (0.00s)
+=== RUN   TestP83F8BenignProbeArgumentsStillReachTheSpawn
+--- PASS: TestP83F8BenignProbeArgumentsStillReachTheSpawn (0.06s)
+=== RUN   TestP83T3cExecutableReplacedAfterApprovalRefused
+--- PASS: TestP83T3cExecutableReplacedAfterApprovalRefused (0.00s)
+=== RUN   TestP83T3cBoundIdentityRecheckRefusesReplacedFile
+--- PASS: TestP83T3cBoundIdentityRecheckRefusesReplacedFile (0.01s)
+=== RUN   TestP83T8bRefusedLoggingEvidenceIsStable
+--- PASS: TestP83T8bRefusedLoggingEvidenceIsStable (0.00s)
+=== RUN   TestP83Fix6T3aIdentityAndDigestAreBothRequired
+--- PASS: TestP83Fix6T3aIdentityAndDigestAreBothRequired (0.01s)
+=== RUN   TestP83Fix6T8bFinalRefusalEvidenceIsValueIndependent
+--- PASS: TestP83Fix6T8bFinalRefusalEvidenceIsValueIndependent (0.00s)
+=== RUN   TestP83Fix7T1aExpiryDuringTheLedgerReadIsRefused
+--- PASS: TestP83Fix7T1aExpiryDuringTheLedgerReadIsRefused (0.00s)
+=== RUN   TestP83Fix7T8bProbeRefusalEvidenceIsValueIndependent
+--- PASS: TestP83Fix7T8bProbeRefusalEvidenceIsValueIndependent (0.00s)
+=== RUN   TestP83Fix8T8bStartFailedEvidenceIsClosedClassification
+--- PASS: TestP83Fix8T8bStartFailedEvidenceIsClosedClassification (0.00s)
+=== RUN   TestP85F07CanonicalSpellingRefusesFoldedNameChains
+=== RUN   TestP85F07CanonicalSpellingRefusesFoldedNameChains/dot-component
+=== RUN   TestP85F07CanonicalSpellingRefusesFoldedNameChains/doubled-separator
+=== RUN   TestP85F07CanonicalSpellingRefusesFoldedNameChains/trailing-separator
+=== RUN   TestP85F07CanonicalSpellingRefusesFoldedNameChains/relative
+=== RUN   TestP85F07CanonicalSpellingRefusesFoldedNameChains/nul-byte
+=== RUN   TestP85F07CanonicalSpellingRefusesFoldedNameChains/empty
+=== RUN   TestP85F07CanonicalSpellingRefusesFoldedNameChains/parent-component
+--- PASS: TestP85F07CanonicalSpellingRefusesFoldedNameChains (0.00s)
+    --- PASS: TestP85F07CanonicalSpellingRefusesFoldedNameChains/dot-component (0.00s)
+    --- PASS: TestP85F07CanonicalSpellingRefusesFoldedNameChains/doubled-separator (0.00s)
+    --- PASS: TestP85F07CanonicalSpellingRefusesFoldedNameChains/trailing-separator (0.00s)
+    --- PASS: TestP85F07CanonicalSpellingRefusesFoldedNameChains/relative (0.00s)
+    --- PASS: TestP85F07CanonicalSpellingRefusesFoldedNameChains/nul-byte (0.00s)
+    --- PASS: TestP85F07CanonicalSpellingRefusesFoldedNameChains/empty (0.00s)
+    --- PASS: TestP85F07CanonicalSpellingRefusesFoldedNameChains/parent-component (0.00s)
+=== RUN   TestP85F13PlatformWriteProofIsBoundToTheSpawnSpecification
+--- PASS: TestP85F13PlatformWriteProofIsBoundToTheSpawnSpecification (0.00s)
+=== RUN   TestP85F18ThePlatformVerdictAloneDecidesTheStart
+=== RUN   TestP85F18ThePlatformVerdictAloneDecidesTheStart/an-allowed-verdict-reaches-the-start-observation
+=== RUN   TestP85F18ThePlatformVerdictAloneDecidesTheStart/a-non-allowed-verdict-keeps-the-start-count-at-zero
+=== RUN   TestP85F18ThePlatformVerdictAloneDecidesTheStart/the-observation-point-is-the-last-gate
+--- PASS: TestP85F18ThePlatformVerdictAloneDecidesTheStart (0.05s)
+    --- PASS: TestP85F18ThePlatformVerdictAloneDecidesTheStart/an-allowed-verdict-reaches-the-start-observation (0.01s)
+    --- PASS: TestP85F18ThePlatformVerdictAloneDecidesTheStart/a-non-allowed-verdict-keeps-the-start-count-at-zero (0.01s)
+    --- PASS: TestP85F18ThePlatformVerdictAloneDecidesTheStart/the-observation-point-is-the-last-gate (0.01s)
+=== RUN   TestP85T3WritableInstallDirectoryIsNotProven
+--- PASS: TestP85T3WritableInstallDirectoryIsNotProven (0.01s)
+=== RUN   TestP85T3ExecuteRefusesUnprovableInstallSourceWithoutSpawning
+--- PASS: TestP85T3ExecuteRefusesUnprovableInstallSourceWithoutSpawning (0.01s)
+=== RUN   TestP85T3CarrierDecodeRefusesAWeakenedOrMixedClaim
+--- PASS: TestP85T3CarrierDecodeRefusesAWeakenedOrMixedClaim (0.00s)
+=== RUN   TestP85T3MatchesDetectsAChangedObservation
+--- PASS: TestP85T3MatchesDetectsAChangedObservation (0.00s)
+=== RUN   TestP85T3VolumeRootExcludesCreationRightsOnlyWhenAnchored
+=== RUN   TestP85T3VolumeRootExcludesCreationRightsOnlyWhenAnchored/anchored-root-system-executable-is-provable
+--- PASS: TestP85T3VolumeRootExcludesCreationRightsOnlyWhenAnchored (0.02s)
+    --- PASS: TestP85T3VolumeRootExcludesCreationRightsOnlyWhenAnchored/anchored-root-system-executable-is-provable (0.02s)
+=== RUN   TestP85T3DirectoryTableKeepsCreationRights
+--- PASS: TestP85T3DirectoryTableKeepsCreationRights (0.01s)
+=== RUN   TestP85T3UnanchoredVolumeRootFallsBackToFullTable
+--- PASS: TestP85T3UnanchoredVolumeRootFallsBackToFullTable (0.01s)
+=== RUN   TestP85T8AMissingProofRefusesBeforeResolveOrSpawn
+=== RUN   TestP85T8AMissingProofRefusesBeforeResolveOrSpawn/capability-missing
+=== RUN   TestP85T8AMissingProofRefusesBeforeResolveOrSpawn/capability-refused
+--- PASS: TestP85T8AMissingProofRefusesBeforeResolveOrSpawn (0.00s)
+    --- PASS: TestP85T8AMissingProofRefusesBeforeResolveOrSpawn/capability-missing (0.00s)
+    --- PASS: TestP85T8AMissingProofRefusesBeforeResolveOrSpawn/capability-refused (0.00s)
+=== RUN   TestP85T8AUnreadableSandboxVerdictIsNotAdmission
+=== RUN   TestP85T8AUnreadableSandboxVerdictIsNotAdmission/guard-gate-is-fail-closed
+=== RUN   TestP85T8AUnreadableSandboxVerdictIsNotAdmission/guard-gate-is-fail-closed/unknown
+=== RUN   TestP85T8AUnreadableSandboxVerdictIsNotAdmission/guard-gate-is-fail-closed/denied
+=== RUN   TestP85T8AUnreadableSandboxVerdictIsNotAdmission/guard-gate-is-fail-closed/allowed
+=== RUN   TestP85T8AUnreadableSandboxVerdictIsNotAdmission/checker-refuses-unknown-verdict
+=== RUN   TestP85T8AUnreadableSandboxVerdictIsNotAdmission/checker-admits-allowed-verdict
+--- PASS: TestP85T8AUnreadableSandboxVerdictIsNotAdmission (0.00s)
+    --- PASS: TestP85T8AUnreadableSandboxVerdictIsNotAdmission/guard-gate-is-fail-closed (0.00s)
+        --- PASS: TestP85T8AUnreadableSandboxVerdictIsNotAdmission/guard-gate-is-fail-closed/unknown (0.00s)
+        --- PASS: TestP85T8AUnreadableSandboxVerdictIsNotAdmission/guard-gate-is-fail-closed/denied (0.00s)
+        --- PASS: TestP85T8AUnreadableSandboxVerdictIsNotAdmission/guard-gate-is-fail-closed/allowed (0.00s)
+    --- PASS: TestP85T8AUnreadableSandboxVerdictIsNotAdmission/checker-refuses-unknown-verdict (0.00s)
+    --- PASS: TestP85T8AUnreadableSandboxVerdictIsNotAdmission/checker-admits-allowed-verdict (0.00s)
+=== RUN   TestP85T8AConfinementProofRefusesEachBrokenElement
+=== RUN   TestP85T8AConfinementProofRefusesEachBrokenElement/argv-names-a-logging-destination
+=== RUN   TestP85T8AConfinementProofRefusesEachBrokenElement/argv-is-not-the-screened-argv
+=== RUN   TestP85T8AConfinementProofRefusesEachBrokenElement/usage-artifact-outside-the-executor-directory
+=== RUN   TestP85T8AConfinementProofRefusesEachBrokenElement/child-environment-carries-a-foreign-key
+=== RUN   TestP85T8AConfinementProofRefusesEachBrokenElement/byok-environment-carries-a-foreign-key
+=== RUN   TestP85T8AConfinementProofRefusesEachBrokenElement/streams-not-bound
+=== RUN   TestP85T8AConfinementProofRefusesEachBrokenElement/stdout-is-a-file-handle
+=== RUN   TestP85T8AConfinementProofRefusesEachBrokenElement/working-directory-is-not-the-executor-directory
+=== RUN   TestP85T8AConfinementProofRefusesEachBrokenElement/output-capture-is-unbounded
+=== RUN   TestP85T8AConfinementProofRefusesEachBrokenElement/argv-working-directory-outside-the-executor-directory
+=== RUN   TestP85T8AConfinementProofRefusesEachBrokenElement/argv-inline-working-directory-outside-the-executor-directory
+--- PASS: TestP85T8AConfinementProofRefusesEachBrokenElement (0.04s)
+    --- PASS: TestP85T8AConfinementProofRefusesEachBrokenElement/argv-names-a-logging-destination (0.00s)
+    --- PASS: TestP85T8AConfinementProofRefusesEachBrokenElement/argv-is-not-the-screened-argv (0.00s)
+    --- PASS: TestP85T8AConfinementProofRefusesEachBrokenElement/usage-artifact-outside-the-executor-directory (0.00s)
+    --- PASS: TestP85T8AConfinementProofRefusesEachBrokenElement/child-environment-carries-a-foreign-key (0.00s)
+    --- PASS: TestP85T8AConfinementProofRefusesEachBrokenElement/byok-environment-carries-a-foreign-key (0.00s)
+    --- PASS: TestP85T8AConfinementProofRefusesEachBrokenElement/streams-not-bound (0.00s)
+    --- PASS: TestP85T8AConfinementProofRefusesEachBrokenElement/stdout-is-a-file-handle (0.00s)
+    --- PASS: TestP85T8AConfinementProofRefusesEachBrokenElement/working-directory-is-not-the-executor-directory (0.00s)
+    --- PASS: TestP85T8AConfinementProofRefusesEachBrokenElement/output-capture-is-unbounded (0.00s)
+    --- PASS: TestP85T8AConfinementProofRefusesEachBrokenElement/argv-working-directory-outside-the-executor-directory (0.00s)
+    --- PASS: TestP85T8AConfinementProofRefusesEachBrokenElement/argv-inline-working-directory-outside-the-executor-directory (0.00s)
+=== RUN   TestP85T8AConfinementProofAdmitsWorkingDirectoryNamingTheExecutor
+--- PASS: TestP85T8AConfinementProofAdmitsWorkingDirectoryNamingTheExecutor (0.00s)
+=== RUN   TestP85T8AProcessSpecCarriesNoExtraInheritedHandle
+--- PASS: TestP85T8AProcessSpecCarriesNoExtraInheritedHandle (0.00s)
+=== RUN   TestP85T8AExecuteRefusesBrokenBYOKSpawnWithoutSpawning
+--- PASS: TestP85T8AExecuteRefusesBrokenBYOKSpawnWithoutSpawning (0.03s)
+=== RUN   TestP85T8AExecuteRefusesUnprovableVerdictWithoutSpawning
+--- PASS: TestP85T8AExecuteRefusesUnprovableVerdictWithoutSpawning (0.02s)
+=== RUN   TestP85T8ASameClassRefusalsShareEvidenceAcrossValues
+--- PASS: TestP85T8ASameClassRefusalsShareEvidenceAcrossValues (0.01s)
+=== RUN   TestP85T8AHostAuthenticationAndOtherChannelsBypassTheGate
+--- PASS: TestP85T8AHostAuthenticationAndOtherChannelsBypassTheGate (0.00s)
+=== RUN   TestP85T8AEnvironmentKeyValidationRefusesAmbiguousKeys
+=== RUN   TestP85T8AEnvironmentKeyValidationRefusesAmbiguousKeys/key-name-containing-a-separator
+=== RUN   TestP85T8AEnvironmentKeyValidationRefusesAmbiguousKeys/empty-key-name
+=== RUN   TestP85T8AEnvironmentKeyValidationRefusesAmbiguousKeys/nul-in-key-name
+=== RUN   TestP85T8AEnvironmentKeyValidationRefusesAmbiguousKeys/platform-normalised-duplicate
+=== RUN   TestP85T8AEnvironmentKeyValidationRefusesAmbiguousKeys/credential-key-case-variant-is-not-a-credential
+=== RUN   TestP85T8AEnvironmentKeyValidationRefusesAmbiguousKeys/serialized-block-decides-the-auth-mode
+--- PASS: TestP85T8AEnvironmentKeyValidationRefusesAmbiguousKeys (0.00s)
+    --- PASS: TestP85T8AEnvironmentKeyValidationRefusesAmbiguousKeys/key-name-containing-a-separator (0.00s)
+    --- PASS: TestP85T8AEnvironmentKeyValidationRefusesAmbiguousKeys/empty-key-name (0.00s)
+    --- PASS: TestP85T8AEnvironmentKeyValidationRefusesAmbiguousKeys/nul-in-key-name (0.00s)
+    --- PASS: TestP85T8AEnvironmentKeyValidationRefusesAmbiguousKeys/platform-normalised-duplicate (0.00s)
+    --- PASS: TestP85T8AEnvironmentKeyValidationRefusesAmbiguousKeys/credential-key-case-variant-is-not-a-credential (0.00s)
+    --- PASS: TestP85T8AEnvironmentKeyValidationRefusesAmbiguousKeys/serialized-block-decides-the-auth-mode (0.00s)
+=== RUN   TestP85T8AFrozenSpawnSpecIsTheVerifiedObject
+=== RUN   TestP85T8AFrozenSpawnSpecIsTheVerifiedObject/spawn-uses-the-frozen-object
+=== RUN   TestP85T8AFrozenSpawnSpecIsTheVerifiedObject/a-changed-field-refuses-the-spawn
+=== RUN   TestP85T8AFrozenSpawnSpecIsTheVerifiedObject/a-changed-field-refuses-the-spawn/working-dir
+=== RUN   TestP85T8AFrozenSpawnSpecIsTheVerifiedObject/a-changed-field-refuses-the-spawn/authentication-mode
+=== RUN   TestP85T8AFrozenSpawnSpecIsTheVerifiedObject/a-changed-field-refuses-the-spawn/argv
+=== RUN   TestP85T8AFrozenSpawnSpecIsTheVerifiedObject/a-changed-field-refuses-the-spawn/environment-keys
+=== RUN   TestP85T8AFrozenSpawnSpecIsTheVerifiedObject/a-changed-field-refuses-the-spawn/output-bound
+=== RUN   TestP85T8AFrozenSpawnSpecIsTheVerifiedObject/a-changed-field-refuses-the-spawn/executable
+=== RUN   TestP85T8AFrozenSpawnSpecIsTheVerifiedObject/an-empty-verdict-can-never-be-frozen
+    p85_t8a_tester_test.go:1043: S1 host: the platform verdict cannot be observed at all (AI BYOK spawn confinement is not proven: guard: sandbox check rejected dispatch: S1 sandbox enforcement checks not implemented; environment compliance unknown), so only the empty-proof refusal is measurable here; the same-verdict leg needs a host that proves it
+--- PASS: TestP85T8AFrozenSpawnSpecIsTheVerifiedObject (0.03s)
+    --- PASS: TestP85T8AFrozenSpawnSpecIsTheVerifiedObject/spawn-uses-the-frozen-object (0.00s)
+    --- PASS: TestP85T8AFrozenSpawnSpecIsTheVerifiedObject/a-changed-field-refuses-the-spawn (0.03s)
+        --- PASS: TestP85T8AFrozenSpawnSpecIsTheVerifiedObject/a-changed-field-refuses-the-spawn/working-dir (0.00s)
+        --- PASS: TestP85T8AFrozenSpawnSpecIsTheVerifiedObject/a-changed-field-refuses-the-spawn/authentication-mode (0.00s)
+        --- PASS: TestP85T8AFrozenSpawnSpecIsTheVerifiedObject/a-changed-field-refuses-the-spawn/argv (0.00s)
+        --- PASS: TestP85T8AFrozenSpawnSpecIsTheVerifiedObject/a-changed-field-refuses-the-spawn/environment-keys (0.00s)
+        --- PASS: TestP85T8AFrozenSpawnSpecIsTheVerifiedObject/a-changed-field-refuses-the-spawn/output-bound (0.00s)
+        --- PASS: TestP85T8AFrozenSpawnSpecIsTheVerifiedObject/a-changed-field-refuses-the-spawn/executable (0.00s)
+    --- SKIP: TestP85T8AFrozenSpawnSpecIsTheVerifiedObject/an-empty-verdict-can-never-be-frozen (0.00s)
+=== RUN   TestP85T8AEnvironmentBindingIsContainment
+=== RUN   TestP85T8AEnvironmentBindingIsContainment/the-membership-test-is-byte-exact-and-subset-tolerant
+=== RUN   TestP85T8AEnvironmentBindingIsContainment/a-strict-subset-binds
+=== RUN   TestP85T8AEnvironmentBindingIsContainment/an-extra-key-spills-outside-the-frozen-set
+=== RUN   TestP85T8AEnvironmentBindingIsContainment/a-platform-case-variant-spills-outside-the-frozen-set
+=== RUN   TestP85T8AEnvironmentBindingIsContainment/a-windows-case-variant-pair-stays-refused
+--- PASS: TestP85T8AEnvironmentBindingIsContainment (0.01s)
+    --- PASS: TestP85T8AEnvironmentBindingIsContainment/the-membership-test-is-byte-exact-and-subset-tolerant (0.00s)
+    --- PASS: TestP85T8AEnvironmentBindingIsContainment/a-strict-subset-binds (0.00s)
+    --- PASS: TestP85T8AEnvironmentBindingIsContainment/an-extra-key-spills-outside-the-frozen-set (0.00s)
+    --- PASS: TestP85T8AEnvironmentBindingIsContainment/a-platform-case-variant-spills-outside-the-frozen-set (0.00s)
+    --- PASS: TestP85T8AEnvironmentBindingIsContainment/a-windows-case-variant-pair-stays-refused (0.00s)
+=== RUN   TestP85T8APlatformVerdictAloneControlsTheSpawn
+=== RUN   TestP85T8APlatformVerdictAloneControlsTheSpawn/compliant-envelope-is-refused-by-the-platform-verdict-alone
+=== RUN   TestP85T8APlatformVerdictAloneControlsTheSpawn/withdrawing-the-verdict-is-the-only-difference
+=== RUN   TestP85T8APlatformVerdictAloneControlsTheSpawn/a-non-compliant-element-is-refused-even-when-the-verdict-allows
+--- PASS: TestP85T8APlatformVerdictAloneControlsTheSpawn (0.00s)
+    --- PASS: TestP85T8APlatformVerdictAloneControlsTheSpawn/compliant-envelope-is-refused-by-the-platform-verdict-alone (0.00s)
+    --- PASS: TestP85T8APlatformVerdictAloneControlsTheSpawn/withdrawing-the-verdict-is-the-only-difference (0.00s)
+    --- PASS: TestP85T8APlatformVerdictAloneControlsTheSpawn/a-non-compliant-element-is-refused-even-when-the-verdict-allows (0.00s)
+=== RUN   TestSessbridgeDispatchAccepted
+--- PASS: TestSessbridgeDispatchAccepted (0.00s)
+=== RUN   TestSessbridgeDispatchRejected
+--- PASS: TestSessbridgeDispatchRejected (0.00s)
+=== RUN   TestSessbridgeDispatchBusyReturnsUncertain
+--- PASS: TestSessbridgeDispatchBusyReturnsUncertain (0.00s)
+=== RUN   TestSessbridgeDispatchRequestIDMismatchReturnsUncertain
+--- PASS: TestSessbridgeDispatchRequestIDMismatchReturnsUncertain (0.00s)
+=== RUN   TestSessbridgeDispatchClientErrorGeneratesTransportID
+--- PASS: TestSessbridgeDispatchClientErrorGeneratesTransportID (0.00s)
+=== RUN   TestSessbridgeDispatchRequiresClient
+--- PASS: TestSessbridgeDispatchRequiresClient (0.00s)
+=== RUN   TestVisibleDeliveryMapsAccepted
+--- PASS: TestVisibleDeliveryMapsAccepted (0.00s)
+=== RUN   TestStubVisibleClientDeterministic
+--- PASS: TestStubVisibleClientDeterministic (0.00s)
+=== RUN   TestVisibleDeliveryUnavailableReason
+--- PASS: TestVisibleDeliveryUnavailableReason (0.00s)
+=== RUN   TestVisibleDeliveryRequestIDMismatch
+--- PASS: TestVisibleDeliveryRequestIDMismatch (0.00s)
+=== RUN   TestRecoverStartingCleansCrashedHostWindows
+--- PASS: TestRecoverStartingCleansCrashedHostWindows (0.06s)
+=== RUN   TestRecoverStartingRefusesLiveHost
+--- PASS: TestRecoverStartingRefusesLiveHost (0.05s)
+=== RUN   TestSpawnRecoveryHelper
+    spawn_recovery_test.go:47: spawn recovery helper only runs as a child process
+--- SKIP: TestSpawnRecoveryHelper (0.00s)
+=== RUN   TestRecoverStartingIdempotent
+--- PASS: TestRecoverStartingIdempotent (0.05s)
+=== RUN   TestRecoverStartingTokenMismatchFailsClosed
+--- PASS: TestRecoverStartingTokenMismatchFailsClosed (0.05s)
+=== RUN   TestRecoverStartingNeverReclaimsALaunchThisProcessStillOwns
+--- PASS: TestRecoverStartingNeverReclaimsALaunchThisProcessStillOwns (0.05s)
+PASS
+ok  	github.com/larsonzh/prfrail/internal/adapters	50.994s
+=== RUN   TestBoundDirVerifyRefusesSwappedDirectory
+--- PASS: TestBoundDirVerifyRefusesSwappedDirectory (0.01s)
+=== RUN   TestCleanBoundRelativePathRefusesEscapeShapes
+--- PASS: TestCleanBoundRelativePathRefusesEscapeShapes (0.00s)
+=== RUN   TestBoundFileReadAfterCloseRefused
+--- PASS: TestBoundFileReadAfterCloseRefused (0.01s)
+=== RUN   TestBoundFileHashRefusesGrowthPastBound
+--- PASS: TestBoundFileHashRefusesGrowthPastBound (0.00s)
+=== RUN   TestBoundFileNewRefusesNilAndNegativeBound
+--- PASS: TestBoundFileNewRefusesNilAndNegativeBound (0.00s)
+=== RUN   TestBoundFileOpenRefusesDirectoryWithSentinel
+--- PASS: TestBoundFileOpenRefusesDirectoryWithSentinel (0.00s)
+=== RUN   TestBoundFileOpenRefusesOverBoundWithSentinel
+--- PASS: TestBoundFileOpenRefusesOverBoundWithSentinel (0.00s)
+=== RUN   TestBoundFileReadsOriginalAfterPathReplacement
+--- PASS: TestBoundFileReadsOriginalAfterPathReplacement (0.01s)
+=== RUN   TestBoundFileRefusesOverBoundOnOpen
+--- PASS: TestBoundFileRefusesOverBoundOnOpen (0.01s)
+=== RUN   TestBoundFileRefusesDirectory
+--- PASS: TestBoundFileRefusesDirectory (0.00s)
+=== RUN   TestBoundFileMissingPreservesNotExist
+--- PASS: TestBoundFileMissingPreservesNotExist (0.00s)
+=== RUN   TestBoundFileIdentityMatchesRead
+--- PASS: TestBoundFileIdentityMatchesRead (0.00s)
+=== RUN   TestCanonicalVectors
+=== RUN   TestCanonicalVectors/jcs-001
+=== RUN   TestCanonicalVectors/state-event-001
+=== RUN   TestCanonicalVectors/agent-runner-enforcement-001
+=== RUN   TestCanonicalVectors/agent-runner-effect-mapping-001
+--- PASS: TestCanonicalVectors (0.01s)
+    --- PASS: TestCanonicalVectors/jcs-001 (0.00s)
+    --- PASS: TestCanonicalVectors/state-event-001 (0.00s)
+    --- PASS: TestCanonicalVectors/agent-runner-enforcement-001 (0.00s)
+    --- PASS: TestCanonicalVectors/agent-runner-effect-mapping-001 (0.00s)
+=== RUN   TestCanonicalizeRejectsAmbiguousInput
+=== RUN   TestCanonicalizeRejectsAmbiguousInput/duplicate_key
+=== RUN   TestCanonicalizeRejectsAmbiguousInput/trailing_value
+=== RUN   TestCanonicalizeRejectsAmbiguousInput/invalid_UTF-8
+=== RUN   TestCanonicalizeRejectsAmbiguousInput/unpaired_high_surrogate
+=== RUN   TestCanonicalizeRejectsAmbiguousInput/unpaired_low_surrogate
+--- PASS: TestCanonicalizeRejectsAmbiguousInput (0.00s)
+    --- PASS: TestCanonicalizeRejectsAmbiguousInput/duplicate_key (0.00s)
+    --- PASS: TestCanonicalizeRejectsAmbiguousInput/trailing_value (0.00s)
+    --- PASS: TestCanonicalizeRejectsAmbiguousInput/invalid_UTF-8 (0.00s)
+    --- PASS: TestCanonicalizeRejectsAmbiguousInput/unpaired_high_surrogate (0.00s)
+    --- PASS: TestCanonicalizeRejectsAmbiguousInput/unpaired_low_surrogate (0.00s)
+=== RUN   TestCanonicalNumbersFollowECMAScriptThresholds
+--- PASS: TestCanonicalNumbersFollowECMAScriptThresholds (0.00s)
+=== RUN   TestExportRecordCompletedRoundTrip
+--- PASS: TestExportRecordCompletedRoundTrip (0.00s)
+=== RUN   TestExportRecordCompletedRequiresEntriesAndManifest
+--- PASS: TestExportRecordCompletedRequiresEntriesAndManifest (0.00s)
+=== RUN   TestExportRecordFailedRequiresErrorEvidence
+--- PASS: TestExportRecordFailedRequiresErrorEvidence (0.00s)
+=== RUN   TestExportRecordRejectsDestinationPreconditionAndHashMismatch
+--- PASS: TestExportRecordRejectsDestinationPreconditionAndHashMismatch (0.00s)
+=== RUN   TestRecoveryDiagnosisRoundTrip
+--- PASS: TestRecoveryDiagnosisRoundTrip (0.00s)
+=== RUN   TestRecoveryDiagnosisClearAndBlockedRules
+--- PASS: TestRecoveryDiagnosisClearAndBlockedRules (0.00s)
+=== RUN   TestRecoveryDiagnosisRejectsMutationsAndBadFields
+=== RUN   TestRecoveryDiagnosisRejectsMutationsAndBadFields/mutations_performed
+=== RUN   TestRecoveryDiagnosisRejectsMutationsAndBadFields/non-redacted_mode
+=== RUN   TestRecoveryDiagnosisRejectsMutationsAndBadFields/unknown_allowed_action
+=== RUN   TestRecoveryDiagnosisRejectsMutationsAndBadFields/duplicate_allowed_action
+=== RUN   TestRecoveryDiagnosisRejectsMutationsAndBadFields/empty_process_evidence
+=== RUN   TestRecoveryDiagnosisRejectsMutationsAndBadFields/unknown_process_state
+=== RUN   TestRecoveryDiagnosisRejectsMutationsAndBadFields/bad_timestamp
+=== RUN   TestRecoveryDiagnosisRejectsMutationsAndBadFields/unknown_outcome
+--- PASS: TestRecoveryDiagnosisRejectsMutationsAndBadFields (0.00s)
+    --- PASS: TestRecoveryDiagnosisRejectsMutationsAndBadFields/mutations_performed (0.00s)
+    --- PASS: TestRecoveryDiagnosisRejectsMutationsAndBadFields/non-redacted_mode (0.00s)
+    --- PASS: TestRecoveryDiagnosisRejectsMutationsAndBadFields/unknown_allowed_action (0.00s)
+    --- PASS: TestRecoveryDiagnosisRejectsMutationsAndBadFields/duplicate_allowed_action (0.00s)
+    --- PASS: TestRecoveryDiagnosisRejectsMutationsAndBadFields/empty_process_evidence (0.00s)
+    --- PASS: TestRecoveryDiagnosisRejectsMutationsAndBadFields/unknown_process_state (0.00s)
+    --- PASS: TestRecoveryDiagnosisRejectsMutationsAndBadFields/bad_timestamp (0.00s)
+    --- PASS: TestRecoveryDiagnosisRejectsMutationsAndBadFields/unknown_outcome (0.00s)
+=== RUN   TestDecodeRecoveryDiagnosisRejectsUnknownField
+--- PASS: TestDecodeRecoveryDiagnosisRejectsUnknownField (0.00s)
+=== RUN   TestLifecycleBackupRoundTrip
+--- PASS: TestLifecycleBackupRoundTrip (0.00s)
+=== RUN   TestRetirementDefaultsRetainAndPreserveSharedTools
+--- PASS: TestRetirementDefaultsRetainAndPreserveSharedTools (0.00s)
+=== RUN   TestRetirementDeletionAndConflictRequireHumanEvidence
+--- PASS: TestRetirementDeletionAndConflictRequireHumanEvidence (0.00s)
+=== RUN   TestReleaseAllowsUnsignedS1AndRepresentsTrustAsUnknown
+--- PASS: TestReleaseAllowsUnsignedS1AndRepresentsTrustAsUnknown (0.00s)
+=== RUN   TestBuildReleaseInventoryIsDeterministicAndRejectsLinks
+--- PASS: TestBuildReleaseInventoryIsDeterministicAndRejectsLinks (0.01s)
+=== RUN   TestNewStateEventMatchesFrozenVector
+--- PASS: TestNewStateEventMatchesFrozenVector (0.00s)
+=== RUN   TestVerifyEventChain
+=== RUN   TestVerifyEventChain/gap
+=== RUN   TestVerifyEventChain/reordered
+=== RUN   TestVerifyEventChain/corrupt
+=== RUN   TestVerifyEventChain/state_discontinuity
+--- PASS: TestVerifyEventChain (0.00s)
+    --- PASS: TestVerifyEventChain/gap (0.00s)
+    --- PASS: TestVerifyEventChain/reordered (0.00s)
+    --- PASS: TestVerifyEventChain/corrupt (0.00s)
+    --- PASS: TestVerifyEventChain/state_discontinuity (0.00s)
+=== RUN   TestNewStateEventRejectsInvalidTransitions
+--- PASS: TestNewStateEventRejectsInvalidTransitions (0.00s)
+=== RUN   TestVerifyEventChainTracksInterleavedEntities
+--- PASS: TestVerifyEventChainTracksInterleavedEntities (0.00s)
+=== RUN   TestDecodeStateEventRejectsDuplicateField
+--- PASS: TestDecodeStateEventRejectsDuplicateField (0.00s)
+=== RUN   TestP83Fix8T4aEnumeratedDirectoryMustBeTheBoundObject
+--- PASS: TestP83Fix8T4aEnumeratedDirectoryMustBeTheBoundObject (0.01s)
+=== RUN   TestP83Fix8T4bReparseArtifactIsRefused
+=== RUN   TestP83Fix8T4bReparseArtifactIsRefused/file-symlink
+    p83_fixround8_windows_test.go:150: this host cannot create a symbolic link: symlink C:\Users\妙妙呜\AppData\Local\Temp\TestP83Fix8T4bReparseArtifactIsRefused93165476\001\bound\target.txt C:\Users\妙妙呜\AppData\Local\Temp\TestP83Fix8T4bReparseArtifactIsRefused93165476\001\bound\artifact.txt: A required privilege is not held by the client.
+--- PASS: TestP83Fix8T4bReparseArtifactIsRefused (0.01s)
+    --- SKIP: TestP83Fix8T4bReparseArtifactIsRefused/file-symlink (0.00s)
+=== RUN   TestP83Fix8T4bEnumerationReparseIsRefused
+--- PASS: TestP83Fix8T4bEnumerationReparseIsRefused (0.16s)
+=== RUN   TestP84W1CaseVariantTwinIsNotADescendant
+=== RUN   TestP84W1CaseVariantTwinIsNotADescendant/case-variant-twin
+=== RUN   TestP84W1CaseVariantTwinIsNotADescendant/case-variant-twin-dir-itself
+=== RUN   TestP84W1CaseVariantTwinIsNotADescendant/genuine-descendant
+=== RUN   TestP84W1CaseVariantTwinIsNotADescendant/genuine-descendant-trailing-separator
+--- PASS: TestP84W1CaseVariantTwinIsNotADescendant (0.00s)
+    --- PASS: TestP84W1CaseVariantTwinIsNotADescendant/case-variant-twin (0.00s)
+    --- PASS: TestP84W1CaseVariantTwinIsNotADescendant/case-variant-twin-dir-itself (0.00s)
+    --- PASS: TestP84W1CaseVariantTwinIsNotADescendant/genuine-descendant (0.00s)
+    --- PASS: TestP84W1CaseVariantTwinIsNotADescendant/genuine-descendant-trailing-separator (0.00s)
+=== RUN   TestP84W1CaseVariantTwinEscapeIsRefused
+--- PASS: TestP84W1CaseVariantTwinEscapeIsRefused (0.24s)
+=== RUN   TestP84W2IntermediateJunctionOutsideIsRefused
+=== RUN   TestP84W2IntermediateJunctionOutsideIsRefused/artifact-open
+=== RUN   TestP84W2IntermediateJunctionOutsideIsRefused/enumeration
+=== RUN   TestP84W2IntermediateJunctionOutsideIsRefused/excursion-out-and-back
+--- PASS: TestP84W2IntermediateJunctionOutsideIsRefused (0.38s)
+    --- PASS: TestP84W2IntermediateJunctionOutsideIsRefused/artifact-open (0.06s)
+    --- PASS: TestP84W2IntermediateJunctionOutsideIsRefused/enumeration (0.06s)
+    --- PASS: TestP84W2IntermediateJunctionOutsideIsRefused/excursion-out-and-back (0.24s)
+=== RUN   TestP84W2IntermediateJunctionInsideIsAdmitted
+--- PASS: TestP84W2IntermediateJunctionInsideIsAdmitted (0.10s)
+=== RUN   TestP84W3RootSpellingsAgree
+--- PASS: TestP84W3RootSpellingsAgree (0.01s)
+=== RUN   TestP84W5bChainedJunctionSuffixIsRefused
+--- PASS: TestP84W5bChainedJunctionSuffixIsRefused (0.36s)
+=== RUN   TestP84W6RootEnumerationReadsTheBoundHandle
+--- PASS: TestP84W6RootEnumerationReadsTheBoundHandle (0.02s)
+=== RUN   TestP84W7OversizeComponentIsRefusedBeforeOpen
+--- PASS: TestP84W7OversizeComponentIsRefusedBeforeOpen (0.01s)
+=== RUN   TestP84C12SubstituteNameIsTheAuthority
+=== RUN   TestP84C12SubstituteNameIsTheAuthority/print-inside-substitute-outside
+=== RUN   TestP84C12SubstituteNameIsTheAuthority/print-outside-substitute-inside
+--- PASS: TestP84C12SubstituteNameIsTheAuthority (0.02s)
+    --- PASS: TestP84C12SubstituteNameIsTheAuthority/print-inside-substitute-outside (0.00s)
+    --- PASS: TestP84C12SubstituteNameIsTheAuthority/print-outside-substitute-inside (0.00s)
+=== RUN   TestP84W8TrailingBlankingCodePointIsNotStrippedFromTheStoredTarget
+=== RUN   TestP84W8TrailingBlankingCodePointIsNotStrippedFromTheStoredTarget/nt-prefix
+=== RUN   TestP84W8TrailingBlankingCodePointIsNotStrippedFromTheStoredTarget/extended-prefix
+=== RUN   TestP84W8TrailingBlankingCodePointIsNotStrippedFromTheStoredTarget/nt-prefix-blank-tail
+=== RUN   TestP84W8TrailingBlankingCodePointIsNotStrippedFromTheStoredTarget/extended-prefix-blank-tail
+--- PASS: TestP84W8TrailingBlankingCodePointIsNotStrippedFromTheStoredTarget (0.02s)
+    --- PASS: TestP84W8TrailingBlankingCodePointIsNotStrippedFromTheStoredTarget/nt-prefix (0.00s)
+    --- PASS: TestP84W8TrailingBlankingCodePointIsNotStrippedFromTheStoredTarget/extended-prefix (0.00s)
+    --- PASS: TestP84W8TrailingBlankingCodePointIsNotStrippedFromTheStoredTarget/nt-prefix-blank-tail (0.00s)
+    --- PASS: TestP84W8TrailingBlankingCodePointIsNotStrippedFromTheStoredTarget/extended-prefix-blank-tail (0.00s)
+=== RUN   TestP84W9NonCanonicalStoredTargetIsRefused
+=== RUN   TestP84W9NonCanonicalStoredTargetIsRefused/dot-dot-fold
+=== RUN   TestP84W9NonCanonicalStoredTargetIsRefused/dot-component
+=== RUN   TestP84W9NonCanonicalStoredTargetIsRefused/repeated-separator
+=== RUN   TestP84W9NonCanonicalStoredTargetIsRefused/forward-slash
+=== RUN   TestP84W9NonCanonicalStoredTargetIsRefused/trailing-separator
+=== RUN   TestP84W9NonCanonicalStoredTargetIsRefused/bound-object-itself
+=== RUN   TestP84W9NonCanonicalStoredTargetIsRefused/genuine-descendant
+=== RUN   TestP84W9NonCanonicalStoredTargetIsRefused/genuine-descendant-deep
+=== RUN   TestP84W9NonCanonicalStoredTargetIsRefused/production-chain-canonical
+=== RUN   TestP84W9NonCanonicalStoredTargetIsRefused/production-chain-folded
+--- PASS: TestP84W9NonCanonicalStoredTargetIsRefused (0.03s)
+    --- PASS: TestP84W9NonCanonicalStoredTargetIsRefused/dot-dot-fold (0.00s)
+    --- PASS: TestP84W9NonCanonicalStoredTargetIsRefused/dot-component (0.00s)
+    --- PASS: TestP84W9NonCanonicalStoredTargetIsRefused/repeated-separator (0.00s)
+    --- PASS: TestP84W9NonCanonicalStoredTargetIsRefused/forward-slash (0.00s)
+    --- PASS: TestP84W9NonCanonicalStoredTargetIsRefused/trailing-separator (0.00s)
+    --- PASS: TestP84W9NonCanonicalStoredTargetIsRefused/bound-object-itself (0.00s)
+    --- PASS: TestP84W9NonCanonicalStoredTargetIsRefused/genuine-descendant (0.00s)
+    --- PASS: TestP84W9NonCanonicalStoredTargetIsRefused/genuine-descendant-deep (0.00s)
+    --- PASS: TestP84W9NonCanonicalStoredTargetIsRefused/production-chain-canonical (0.01s)
+    --- PASS: TestP84W9NonCanonicalStoredTargetIsRefused/production-chain-folded (0.01s)
+=== RUN   TestP84W10VolumeRootKeepsItsSeparatorForEquality
+=== RUN   TestP84W10VolumeRootKeepsItsSeparatorForEquality/root-itself
+=== RUN   TestP84W10VolumeRootKeepsItsSeparatorForEquality/root-descendant
+=== RUN   TestP84W10VolumeRootKeepsItsSeparatorForEquality/root-descendant-deep
+=== RUN   TestP84W10VolumeRootKeepsItsSeparatorForEquality/descendant-file-under-root-child
+=== RUN   TestP84W10VolumeRootKeepsItsSeparatorForEquality/case-variant-twin-stays-refused
+--- PASS: TestP84W10VolumeRootKeepsItsSeparatorForEquality (0.00s)
+    --- PASS: TestP84W10VolumeRootKeepsItsSeparatorForEquality/root-itself (0.00s)
+    --- PASS: TestP84W10VolumeRootKeepsItsSeparatorForEquality/root-descendant (0.00s)
+    --- PASS: TestP84W10VolumeRootKeepsItsSeparatorForEquality/root-descendant-deep (0.00s)
+    --- PASS: TestP84W10VolumeRootKeepsItsSeparatorForEquality/descendant-file-under-root-child (0.00s)
+    --- PASS: TestP84W10VolumeRootKeepsItsSeparatorForEquality/case-variant-twin-stays-refused (0.00s)
+=== RUN   TestP84W11EmbeddedNULUnitInDeclaredNameIsRefused
+=== RUN   TestP84W11EmbeddedNULUnitInDeclaredNameIsRefused/embedded-nul-in-substitute
+=== RUN   TestP84W11EmbeddedNULUnitInDeclaredNameIsRefused/embedded-nul-in-print-name
+=== RUN   TestP84W11EmbeddedNULUnitInDeclaredNameIsRefused/control-terminator-outside-the-range
+=== RUN   TestP84W11EmbeddedNULUnitInDeclaredNameIsRefused/control-terminator-is-the-last-unit-in-the-range
+=== RUN   TestP84W11EmbeddedNULUnitInDeclaredNameIsRefused/production-entry
+--- PASS: TestP84W11EmbeddedNULUnitInDeclaredNameIsRefused (0.01s)
+    --- PASS: TestP84W11EmbeddedNULUnitInDeclaredNameIsRefused/embedded-nul-in-substitute (0.00s)
+    --- PASS: TestP84W11EmbeddedNULUnitInDeclaredNameIsRefused/embedded-nul-in-print-name (0.00s)
+    --- PASS: TestP84W11EmbeddedNULUnitInDeclaredNameIsRefused/control-terminator-outside-the-range (0.00s)
+    --- PASS: TestP84W11EmbeddedNULUnitInDeclaredNameIsRefused/control-terminator-is-the-last-unit-in-the-range (0.00s)
+    --- PASS: TestP84W11EmbeddedNULUnitInDeclaredNameIsRefused/production-entry (0.01s)
+=== RUN   TestP84W12ShortAliasRootPrefixIsAdmitted
+--- PASS: TestP84W12ShortAliasRootPrefixIsAdmitted (0.37s)
+=== RUN   TestP84W12AliasBranchRefusesDifferentRecord
+--- PASS: TestP84W12AliasBranchRefusesDifferentRecord (0.13s)
+=== RUN   TestP84W12AliasBranchRefusesReparseComponent
+--- PASS: TestP84W12AliasBranchRefusesReparseComponent (0.25s)
+=== RUN   TestP84W12AliasBranchRefusesCaseVariant
+--- PASS: TestP84W12AliasBranchRefusesCaseVariant (0.02s)
+=== RUN   TestP84W12AliasBranchRefusesMissingEntryEvidence
+--- PASS: TestP84W12AliasBranchRefusesMissingEntryEvidence (0.09s)
+=== RUN   TestP84W12SeedIsFixedVolumeRoot
+--- PASS: TestP84W12SeedIsFixedVolumeRoot (0.01s)
+=== RUN   TestP84W12NtfsRootRecordOf
+=== RUN   TestP84W12NtfsRootRecordOf/root-record
+=== RUN   TestP84W12NtfsRootRecordOf/measured-development-volume-root
+=== RUN   TestP84W12NtfsRootRecordOf/sequence-bit-only
+=== RUN   TestP84W12NtfsRootRecordOf/record-bit-in-high-word
+=== RUN   TestP84W12NtfsRootRecordOf/sequence-and-record-bits
+=== RUN   TestP84W12NtfsRootRecordOf/other-low-word
+--- PASS: TestP84W12NtfsRootRecordOf (0.00s)
+    --- PASS: TestP84W12NtfsRootRecordOf/root-record (0.00s)
+    --- PASS: TestP84W12NtfsRootRecordOf/measured-development-volume-root (0.00s)
+    --- PASS: TestP84W12NtfsRootRecordOf/sequence-bit-only (0.00s)
+    --- PASS: TestP84W12NtfsRootRecordOf/record-bit-in-high-word (0.00s)
+    --- PASS: TestP84W12NtfsRootRecordOf/sequence-and-record-bits (0.00s)
+    --- PASS: TestP84W12NtfsRootRecordOf/other-low-word (0.00s)
+=== RUN   TestP84W12DirectoryEntryScannerValidation
+=== RUN   TestP84W12DirectoryEntryScannerValidation/valid-entry-with-short-name
+=== RUN   TestP84W12DirectoryEntryScannerValidation/valid-entry-without-short-name
+=== RUN   TestP84W12DirectoryEntryScannerValidation/terminal-nul-in-short-name-range-is-the-terminator
+=== RUN   TestP84W12DirectoryEntryScannerValidation/embedded-nul-in-short-name-range-refuses
+=== RUN   TestP84W12DirectoryEntryScannerValidation/embedded-nul-in-file-name-range-refuses
+=== RUN   TestP84W12DirectoryEntryScannerValidation/odd-file-name-length-refuses
+=== RUN   TestP84W12DirectoryEntryScannerValidation/zero-file-name-length-refuses
+=== RUN   TestP84W12DirectoryEntryScannerValidation/record-past-buffer-refuses
+=== RUN   TestP84W12DirectoryEntryScannerValidation/unaligned-next-entry-offset-refuses
+=== RUN   TestP84W12DirectoryEntryScannerValidation/next-entry-offset-shorter-than-a-header-refuses
+=== RUN   TestP84W12DirectoryEntryScannerValidation/next-entry-offset-past-buffer-refuses
+=== RUN   TestP84W12DirectoryEntryScannerValidation/chain-second-entry-evidenced
+=== RUN   TestP84W12DirectoryEntryScannerValidation/file-id-low-half-mismatch-refuses
+=== RUN   TestP84W12DirectoryEntryScannerValidation/file-id-high-half-mismatch-refuses
+=== RUN   TestP84W12DirectoryEntryScannerValidation/empty-buffer-refuses
+=== RUN   TestP84W12DirectoryEntryScannerValidation/cross-record-name-range-refuses
+=== RUN   TestP84W12DirectoryEntryScannerValidation/unaligned-but-in-buffer-offset-refuses
+=== RUN   TestP84W12DirectoryEntryScannerValidation/embedded-nul-in-non-matching-entry-refuses
+--- PASS: TestP84W12DirectoryEntryScannerValidation (0.00s)
+    --- PASS: TestP84W12DirectoryEntryScannerValidation/valid-entry-with-short-name (0.00s)
+    --- PASS: TestP84W12DirectoryEntryScannerValidation/valid-entry-without-short-name (0.00s)
+    --- PASS: TestP84W12DirectoryEntryScannerValidation/terminal-nul-in-short-name-range-is-the-terminator (0.00s)
+    --- PASS: TestP84W12DirectoryEntryScannerValidation/embedded-nul-in-short-name-range-refuses (0.00s)
+    --- PASS: TestP84W12DirectoryEntryScannerValidation/embedded-nul-in-file-name-range-refuses (0.00s)
+    --- PASS: TestP84W12DirectoryEntryScannerValidation/odd-file-name-length-refuses (0.00s)
+    --- PASS: TestP84W12DirectoryEntryScannerValidation/zero-file-name-length-refuses (0.00s)
+    --- PASS: TestP84W12DirectoryEntryScannerValidation/record-past-buffer-refuses (0.00s)
+    --- PASS: TestP84W12DirectoryEntryScannerValidation/unaligned-next-entry-offset-refuses (0.00s)
+    --- PASS: TestP84W12DirectoryEntryScannerValidation/next-entry-offset-shorter-than-a-header-refuses (0.00s)
+    --- PASS: TestP84W12DirectoryEntryScannerValidation/next-entry-offset-past-buffer-refuses (0.00s)
+    --- PASS: TestP84W12DirectoryEntryScannerValidation/chain-second-entry-evidenced (0.00s)
+    --- PASS: TestP84W12DirectoryEntryScannerValidation/file-id-low-half-mismatch-refuses (0.00s)
+    --- PASS: TestP84W12DirectoryEntryScannerValidation/file-id-high-half-mismatch-refuses (0.00s)
+    --- PASS: TestP84W12DirectoryEntryScannerValidation/empty-buffer-refuses (0.00s)
+    --- PASS: TestP84W12DirectoryEntryScannerValidation/cross-record-name-range-refuses (0.00s)
+    --- PASS: TestP84W12DirectoryEntryScannerValidation/unaligned-but-in-buffer-offset-refuses (0.00s)
+    --- PASS: TestP84W12DirectoryEntryScannerValidation/embedded-nul-in-non-matching-entry-refuses (0.00s)
+=== RUN   TestP85F02VerifyBoundDirRefusesAnIdentityCapturedBeforeAReplacement
+--- PASS: TestP85F02VerifyBoundDirRefusesAnIdentityCapturedBeforeAReplacement (0.02s)
+=== RUN   TestP85R4M14RootChainRefusesAReparseComponent
+=== RUN   TestP85R4M14RootChainRefusesAReparseComponent/an-intermediate-junction-is-refused
+=== RUN   TestP85R4M14RootChainRefusesAReparseComponent/a-last-component-junction-is-refused
+=== RUN   TestP85R4M14RootChainRefusesAReparseComponent/a-junction-to-the-very-same-object-is-refused
+--- PASS: TestP85R4M14RootChainRefusesAReparseComponent (0.28s)
+    --- PASS: TestP85R4M14RootChainRefusesAReparseComponent/an-intermediate-junction-is-refused (0.09s)
+    --- PASS: TestP85R4M14RootChainRefusesAReparseComponent/a-last-component-junction-is-refused (0.08s)
+    --- PASS: TestP85R4M14RootChainRefusesAReparseComponent/a-junction-to-the-very-same-object-is-refused (0.09s)
+=== RUN   TestP86N13UncShareRootEquivalence
+=== RUN   TestP86N13UncShareRootEquivalence/trailing-base-bare-target
+=== RUN   TestP86N13UncShareRootEquivalence/bare-base-trailing-target
+=== RUN   TestP86N13UncShareRootEquivalence/ascii-case-folded-trailing-target
+=== RUN   TestP86N13UncShareRootEquivalence/identical-trailing-spellings
+=== RUN   TestP86N13UncShareRootEquivalence/strict-descendant-regression
+--- PASS: TestP86N13UncShareRootEquivalence (0.00s)
+    --- PASS: TestP86N13UncShareRootEquivalence/trailing-base-bare-target (0.00s)
+    --- PASS: TestP86N13UncShareRootEquivalence/bare-base-trailing-target (0.00s)
+    --- PASS: TestP86N13UncShareRootEquivalence/ascii-case-folded-trailing-target (0.00s)
+    --- PASS: TestP86N13UncShareRootEquivalence/identical-trailing-spellings (0.00s)
+    --- PASS: TestP86N13UncShareRootEquivalence/strict-descendant-regression (0.00s)
+=== RUN   TestP86N13UncShareRootRefusals
+=== RUN   TestP86N13UncShareRootRefusals/different-host
+=== RUN   TestP86N13UncShareRootRefusals/different-host-trailing-separator
+=== RUN   TestP86N13UncShareRootRefusals/different-share-name
+=== RUN   TestP86N13UncShareRootRefusals/case-variant-descendant-stays-ordinal
+=== RUN   TestP86N13UncShareRootRefusals/repeated-separator
+=== RUN   TestP86N13UncShareRootRefusals/non-root-trailing-separator
+=== RUN   TestP86N13UncShareRootRefusals/forward-slash
+=== RUN   TestP86N13UncShareRootRefusals/parent-component
+=== RUN   TestP86N13UncShareRootRefusals/outside-sibling-share
+=== RUN   TestP86N13UncShareRootRefusals/host-only-volume
+=== RUN   TestP86N13UncShareRootRefusals/host-only-volume-trailing-separator
+=== RUN   TestP86N13UncShareRootRefusals/trailing-blank-share-name
+--- PASS: TestP86N13UncShareRootRefusals (0.00s)
+    --- PASS: TestP86N13UncShareRootRefusals/different-host (0.00s)
+    --- PASS: TestP86N13UncShareRootRefusals/different-host-trailing-separator (0.00s)
+    --- PASS: TestP86N13UncShareRootRefusals/different-share-name (0.00s)
+    --- PASS: TestP86N13UncShareRootRefusals/case-variant-descendant-stays-ordinal (0.00s)
+    --- PASS: TestP86N13UncShareRootRefusals/repeated-separator (0.00s)
+    --- PASS: TestP86N13UncShareRootRefusals/non-root-trailing-separator (0.00s)
+    --- PASS: TestP86N13UncShareRootRefusals/forward-slash (0.00s)
+    --- PASS: TestP86N13UncShareRootRefusals/parent-component (0.00s)
+    --- PASS: TestP86N13UncShareRootRefusals/outside-sibling-share (0.00s)
+    --- PASS: TestP86N13UncShareRootRefusals/host-only-volume (0.00s)
+    --- PASS: TestP86N13UncShareRootRefusals/host-only-volume-trailing-separator (0.00s)
+    --- PASS: TestP86N13UncShareRootRefusals/trailing-blank-share-name (0.00s)
+=== RUN   TestP86UncShareRootProductionEntry
+    p86_bounddir_unc_test.go:181: net share cannot create the UNC share root fixture on this host: exit status 2 (����ϵͳ���� 5��
+        
+        �ܾ����ʡ�)
+--- SKIP: TestP86UncShareRootProductionEntry (0.89s)
+=== RUN   TestEvidenceManifestRoundTrip
+--- PASS: TestEvidenceManifestRoundTrip (0.00s)
+=== RUN   TestEvidenceManifestRejectsSemanticInvalidity
+=== RUN   TestEvidenceManifestRejectsSemanticInvalidity/unsorted
+=== RUN   TestEvidenceManifestRejectsSemanticInvalidity/duplicate_ID
+=== RUN   TestEvidenceManifestRejectsSemanticInvalidity/same_snapshot
+=== RUN   TestEvidenceManifestRejectsSemanticInvalidity/unknown_kind
+=== RUN   TestEvidenceManifestRejectsSemanticInvalidity/bad_media_type
+--- PASS: TestEvidenceManifestRejectsSemanticInvalidity (0.00s)
+    --- PASS: TestEvidenceManifestRejectsSemanticInvalidity/unsorted (0.00s)
+    --- PASS: TestEvidenceManifestRejectsSemanticInvalidity/duplicate_ID (0.00s)
+    --- PASS: TestEvidenceManifestRejectsSemanticInvalidity/same_snapshot (0.00s)
+    --- PASS: TestEvidenceManifestRejectsSemanticInvalidity/unknown_kind (0.00s)
+    --- PASS: TestEvidenceManifestRejectsSemanticInvalidity/bad_media_type (0.00s)
+=== RUN   TestVerifyManifestObjects
+--- PASS: TestVerifyManifestObjects (0.00s)
+=== RUN   TestVerifyManifestObjectsOrdersEventsBySequence
+--- PASS: TestVerifyManifestObjectsOrdersEventsBySequence (0.00s)
+=== RUN   TestVerifyManifestStateEventBinding
+--- PASS: TestVerifyManifestStateEventBinding (0.00s)
+=== RUN   TestVerifyManifestObjectsFailsClosed
+=== RUN   TestVerifyManifestObjectsFailsClosed/missing
+=== RUN   TestVerifyManifestObjectsFailsClosed/tampered
+--- PASS: TestVerifyManifestObjectsFailsClosed (0.00s)
+    --- PASS: TestVerifyManifestObjectsFailsClosed/missing (0.00s)
+    --- PASS: TestVerifyManifestObjectsFailsClosed/tampered (0.00s)
+=== RUN   TestDecodeRecordsRejectsUnknownFieldsAndVersion
+--- PASS: TestDecodeRecordsRejectsUnknownFieldsAndVersion (0.00s)
+PASS
+ok  	github.com/larsonzh/prfrail/internal/evidence	4.972s
+GO_TEST_EXIT=0 
