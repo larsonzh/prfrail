@@ -60,7 +60,7 @@ Deduplication cannot mask a failure: `Gates` is the ninth step, no earlier step 
 
 - K1 **Invariant**: no step between `Test` and `Gates` may modify `.go` sources, otherwise such a change loses base review. Permanent.
 - K2 **Local `--scope=ci` semantics**: without CI environment variables it degrades to `HEAD^1..HEAD` and does not cover working-tree edits; the P90 change set is covered by `--scope=tree` and the CI legs.
-- K3 **CI legs not yet measured**: this slice stops at (10) without commit/push authorization, so the CI-side before/after timings are recorded after the push (pre-change baseline run `45614659141`: windows `Gates` 103 s, ubuntu 44 s).
+- K3 **CI legs (closed)**: after pushing main commit `ec221f5`, run `45659843522` succeeded on both legs, with `Gates` reporting `SELFTEST: PASS 744/744`, `GATE REPORT scope=ci changed=31` and `TOTAL_FAIL=0` on each; the `Format` step succeeded on both legs (proving `shell: bash` works on the windows leg); `Gates` took 45 s / 6 s versus the 103 s / 44 s baseline (per-leg detail in §14).
 - K4 **Directive staleness (found by (6) r1)**: §6.3 "scripting status (updated 2026-10-19, v1.40)" in `docs/DELIVERY_DIRECTIVE{,_EN}.md:675` still reads "`--selftest` then `--all --scope=ci`". That sentence is a dated v1.40 snapshot, and the same paragraph already states that "`--all --skip-base` prints the criterion part byte-identically to `--all` (only the four base records are dropped)". This slice is forbidden to edit the directive ⇒ registered as candidate **OB-145** (suggested slice `DIRECTIVE-CI-INVOCATION-SYNC`, `to be discussed`); proposed edit = replace "then `--all --scope=ci`" with "then `--all --skip-base --scope=ci` (base is covered by the earlier Build/Vet/Test/Format steps, P90)".
 - K5 **Two design predictions refuted**: the draft `Format` digest and "`workflow_mutation_test.go` needs no change" were both refuted during implementation and are recorded in the `## Corrections after ⑤ round 1` table of `01-design.md` without rewriting the (1) original.
 
@@ -71,8 +71,8 @@ Deduplication cannot mask a failure: `Gates` is the ninth step, no earlier step 
 
 ## 10. State and stop point
 
-- This slice stops at (10): every change is **uncommitted and unpushed**, awaiting same-turn authorization. Working-tree changes = the three files above, the ledger pair, the report pair and the evidence pack.
-- To be recorded after the push: both legs of the `Gates` step (`SELFTEST: PASS 744/744`, `GATE REPORT scope=ci`, `TOTAL_FAIL=0`), the actual `Format` step outcome on the windows leg, and the before/after timings.
+- This slice stops at (10): main commit `ec221f5` is pushed to `origin/main` (not gitee), and this backfill commit is the docs-only close-out under the same turn authorization; the change surface = the three files above, the ledger pair, the report pair and the evidence pack.
+- Backfill complete: both legs of the `Gates` step, the actual `Format` step outcome on the windows leg, and the before/after timings are recorded in §14 and in the pack file `03-verification/ci-run-45659843522-legs.md`.
 
 ## 11. (6) independent scan transcript
 
@@ -130,6 +130,7 @@ docs/validation/evidence/P90-GATES-CI-PERF/03-verification/selftest.txt	repo
 docs/validation/evidence/P90-GATES-CI-PERF/03-verification/gate-tree-final.txt	repo
 docs/validation/evidence/P90-GATES-CI-PERF/03-verification/gate-index-final.txt	repo
 docs/validation/evidence/P90-GATES-CI-PERF/03-verification/gate-ci-final.txt	repo
+docs/validation/evidence/P90-GATES-CI-PERF/03-verification/ci-run-45659843522-legs.md	repo
 docs/validation/evidence/P90-GATES-CI-PERF/03-verification/selftest-final.txt	repo
 docs/validation/evidence/P90-GATES-CI-PERF/04-reviews/05-pre-review-r1.md	repo
 docs/validation/evidence/P90-GATES-CI-PERF/04-reviews/05-re-review-r2.md	repo
@@ -145,10 +146,18 @@ docs/validation/evidence/P90-GATES-CI-PERF/04-reviews/07-re-review-r2.md	repo
 - `--all --skip-base --scope=index` and `--scope=ci`: both `TOTAL_FAIL=0` (`changed=31` and `changed=6`).
 - `--selftest`: `SELFTEST: PASS 744/744` (`tools/gates/**` untouched).
 - These readings are archived as payloads (`03-verification/gate-tree-final.txt`, `gate-index-final.txt`, `gate-ci-final.txt`, `selftest-final.txt`) and the `artifacts` fence gained four matching rows. The addition is an (8b) factual record; rule semantics, criteria and verdict wording are unchanged.
-- The only acceptance item still open: the two CI legs (obtained after the push, see K3 in §8 and §10).
+- No acceptance item remains open: the two CI legs were measured (see K3 in §8 and §14).
 
 ### 12.2 Re-review round 2
 
 - Verdict `RE-REVIEW: PASS`: F1–F4 all CLOSED, Residual = NONE; three sampled sha256 values match the disk, and disk / manifest / checksums each hold 17 entries.
 - The round-1 verdicts for Q1–Q4 still stand; the round-1 Q6 RISK dissolved once the Q5 defect was closed.
 
+
+## 14. CI fact chain (backfilled after the push)
+
+- Main commit `ec221f5` (`feat: deduplicate the base gate suite in CI and add the format step (P90)`) → pushed to `origin/main` → run `45659843522` **succeeded on both legs** (attempt 1, §6.4 not triggered).
+- `Go ubuntu-latest`: Build / Vet / Test / Format / Gates all success; `Format` took 0 s and `Gates` 6 s (44 s in the pre-change run `45614659141`).
+- `Go windows-latest`: Build / Vet / Test / Format / Gates all success; `Format` took 0 s and `Gates` 45 s (103 s before) ⇒ `shell: bash` is available on the windows leg and `gofmt` is on PATH.
+- Both legs report `SELFTEST: PASS 744/744`, `GATE REPORT scope=ci changed=31` and `TOTAL_FAIL=0` for the `Gates` step.
+- Scope note: the two runs cover different change sets (six files at baseline, 31 here), so the timing delta is an order-of-magnitude comparison; the controlled equivalence evidence remains the same-scope A/B in §4.

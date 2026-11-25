@@ -1,6 +1,6 @@
 ﻿# MANIFEST — P90-GATES-CI-PERF 证据包
 
-切片：`GATES-CI-PERF`（P90，工具片 `[SLICE]`，S 档）。**执行中至 ⑩**（2026-11-25 起跑；⑧c 已清理 `tmp/`）。
+切片：`GATES-CI-PERF`（P90，工具片 `[SLICE]`，S 档）。**已闭环**（2026-11-25 起跑并收口；⑧c 已清理 `tmp/`）。
 
 **载荷集**：本清单与 `SHA256SUMS.txt` 为元数据，其余为载荷；条目集三方相等（磁盘 / 本清单 / `SHA256SUMS.txt`）。
 **重算口径**：新增载荷后按磁盘派生重建 `SHA256SUMS.txt`，路径相对本目录（POSIX 分隔）。
@@ -16,6 +16,7 @@
 | `03-verification/ab-B-skipbase.txt` | ③ B 侧输出（--all --skip-base） |
 | `03-verification/ab-report.json` | ③ A/B 比对结论（identical=true、双侧同 sha256） |
 | `03-verification/ab-warmup.txt` | ③ 预热轮输出（仅用于消除 G4b 缓存态差异） |
+| `03-verification/ci-run-45659843522-legs.md` | CI run 45659843522 双腿步骤结论、Gates 硬读数与耗时对照 |
 | `03-verification/comparator-sanity.json` | ③ 比对器可证伪性自检 |
 | `03-verification/gate-ci-final.txt` | ⑨ 定稿态 ci 读数 |
 | `03-verification/gate-index-final.txt` | ⑨ 定稿态 index 读数 |

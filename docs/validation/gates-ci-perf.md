@@ -60,7 +60,7 @@
 
 - K1 **不变量**：`Test` 与 `Gates` 之间不得插入会修改 `.go` 源的步骤；否则该改动失去 base 复核。长期保留。
 - K2 **本地 `--scope=ci` 语义**：无 CI 环境变量时退化为 `HEAD^1..HEAD`，不覆盖工作区改动；P90 自身变更集由 `--scope=tree` 与 CI 双腿覆盖。
-- K3 **CI 双腿读数未取**：本片停于 ⑩、未获 commit/push 授权，`Gates` 步改动前后耗时对照的 CI 侧读数于推送后回填（改动前基线 run `45614659141`：windows `Gates` 103 s、ubuntu 44 s）。
+- K3 **CI 双腿读数（已闭合）**：主提交 `ec221f5` 推送后 run `45659843522` 双腿 success，`Gates` 步两腿均 `SELFTEST: PASS 744/744`、`GATE REPORT scope=ci changed=31`、`TOTAL_FAIL=0`；`Format` 步两腿 success（windows 腿证明 `shell: bash` 可用）；`Gates` 步耗时 45 s / 6 s，改动前基线为 103 s / 44 s（逐腿明细见 §14）。
 - K4 **准则滞后（⑥ r1 发现）**：`docs/DELIVERY_DIRECTIVE{,_EN}.md:675` 的 §6.3「脚本化状态（2026-10-19 如实更新，v1.40）」仍写「先 `--selftest` 再 `--all --scope=ci`」。该句为带日期的 v1.40 快照表述，且同段已载明「`--all --skip-base` 的判据输出与 `--all` 的判据部分逐字一致（只省 base 四条）」。本片边界禁止改准则 ⇒ 登记候选 **OB-145**（建议片名 `DIRECTIVE-CI-INVOCATION-SYNC`，`待议`），拟改文本 = 把「再 `--all --scope=ci`」改为「再 `--all --skip-base --scope=ci`（base 由前序 Build/Vet/Test/Format 步覆盖，P90）」。
 - K5 **方案书两处预测偏差**：`Format` 摘要草稿值与「`workflow_mutation_test.go` 零改动」均在实现时被证伪，已在 `01-design.md` 的 `## Corrections after ⑤ round 1` 表如实登记，未改写 ① 原文。
 
@@ -71,8 +71,8 @@
 
 ## 10. 状态与停点
 
-- 本片停于 ⑩：全部改动**未提交、未推送**，等同轮授权。工作区改动 = 上述三文件 + 台账两对 + 报告对 + 证据包。
-- 推送后须回填：CI 两腿 `Gates` 步读数（`SELFTEST: PASS 744/744`、`GATE REPORT scope=ci`、`TOTAL_FAIL=0`）、`Format` 步在 windows 腿的实际执行结论、改动前后耗时对照。
+- 本片停于 ⑩：主提交 `ec221f5` 已推 `origin/main`（未推 gitee），本回填提交为同一轮授权的 docs-only 收尾；改动面 = 上述三文件 + 台账两对 + 报告对 + 证据包。
+- 回填已完成：CI 两腿 `Gates` 步读数、`Format` 步在 windows 腿的实际结论、改动前后耗时对照均写入 §14 与证据包 `03-verification/ci-run-45659843522-legs.md`。
 
 ## 11. ⑥ 独立扫描转录
 
@@ -130,6 +130,7 @@ docs/validation/evidence/P90-GATES-CI-PERF/03-verification/selftest.txt	repo
 docs/validation/evidence/P90-GATES-CI-PERF/03-verification/gate-tree-final.txt	repo
 docs/validation/evidence/P90-GATES-CI-PERF/03-verification/gate-index-final.txt	repo
 docs/validation/evidence/P90-GATES-CI-PERF/03-verification/gate-ci-final.txt	repo
+docs/validation/evidence/P90-GATES-CI-PERF/03-verification/ci-run-45659843522-legs.md	repo
 docs/validation/evidence/P90-GATES-CI-PERF/03-verification/selftest-final.txt	repo
 docs/validation/evidence/P90-GATES-CI-PERF/04-reviews/05-pre-review-r1.md	repo
 docs/validation/evidence/P90-GATES-CI-PERF/04-reviews/05-re-review-r2.md	repo
@@ -145,10 +146,18 @@ docs/validation/evidence/P90-GATES-CI-PERF/04-reviews/07-re-review-r2.md	repo
 - `--all --skip-base --scope=index` 与 `--scope=ci`：均 `TOTAL_FAIL=0`（`changed=31` 与 `changed=6`）。
 - `--selftest`：`SELFTEST: PASS 744/744`（`tools/gates/**` 零改动）。
 - 本节读数已作为载荷归档（`03-verification/gate-tree-final.txt`、`gate-index-final.txt`、`gate-ci-final.txt`、`selftest-final.txt`），`artifacts` 围栏同步补四行。该追加属 ⑧b 事实记录，未改规则语义、判据与结论表述。
-- 仍未闭合的唯一验收项：CI 双腿读数（推送后取得，见 §8 的 K3 与 §10）。
+- 无未闭合验收项：CI 双腿读数已取得（见 §8 的 K3 与 §14）。
 
 ### 12.2 复审第 2 轮
 
 - 结论 `RE-REVIEW: PASS`：F1–F4 全 CLOSED、Residual = NONE；抽验 3 个 sha256 与磁盘一致，磁盘 / 清单 / 校验和三方各 17。
 - 第 1 轮 Q1–Q4 判定仍成立；Q6 的第 1 轮 RISK 已随 Q5 缺陷闭合而消解。
 
+
+## 14. CI 事实链（推送后回填）
+
+- 主提交 `ec221f5`（`feat: deduplicate the base gate suite in CI and add the format step (P90)`）→ 推送 `origin/main` → run `45659843522` **双腿 success**（attempt 1，未触发 §6.4）。
+- `Go ubuntu-latest`：Build / Vet / Test / Format / Gates 全 success；`Format` 0 s、`Gates` 6 s（改动前 run `45614659141` 为 44 s）。
+- `Go windows-latest`：Build / Vet / Test / Format / Gates 全 success；`Format` 0 s、`Gates` 45 s（改动前为 103 s）⇒ `shell: bash` 在 windows 腿可用、`gofmt` 在 PATH。
+- 两腿 `Gates` 步硬读数均为 `SELFTEST: PASS 744/744`、`GATE REPORT scope=ci changed=31`、`TOTAL_FAIL=0`。
+- 口径：两次 run 的变更集规模不同（基线侧为 6、本次为 31），耗时对照属量级对照；受控等价性证据仍以 §4 的同作用域 A/B 为准。
