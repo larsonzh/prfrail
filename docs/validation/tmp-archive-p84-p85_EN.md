@@ -139,7 +139,8 @@ Input = this report + endorsement points B1-B4 + the (5)/(6) verdicts. r1 = `FIN
 - **Double-BOM incident (fixed)**: appending the addendum to the P85 `00-briefing.md` wrote a second BOM, which made the first line read as "delete + add". The extra BOM was stripped and re-verified: `git diff --numstat` is pure addition with zero deletions and the verbatim original is intact.
 - **Measured grep versus the ledger**: the ledger records 9 files / 15 occurrences; the measurement is 11 files / 39 occurrences, the difference being the two `CHECKLIST_v72{,_EN}.md:137` lines times both paths (frozen snapshot, untouched here). The item-by-item account is in `input-list.md` section 3; the ledger row is left as written (no retroactive rewrite).
 - **(1) D8 encoding wording corrected**: see section 2.5.
-- Temp-artifact D count: 0 (the scripts, backup and captures under `tmp/P89-TMP-ARCHIVE-P84-P85/` are removed at (8)c).
+- **Backfill-run CI red, then fixed (a real defect)**: run `45587252859` failed the `Gates` step on both legs, criterion `G8-b`: three captures under `02-verification/` were written with CRLF and hashed as CRLF, while `.gitattributes` normalizes them to LF, so the blob hash differed (the same trap as the archived payloads). Fix: normalize those three to LF, rebuild `SHA256SUMS.txt`, re-verify `G8` and the full gate set locally at `TOTAL_FAIL=0` and `SELFTEST` 744/744, then push the fix commit.
+- Temp-artifact D count: **1** (the fix round left one gate capture `gate-fix-index.txt` in the `tmp` root; it was deleted as soon as it was noticed, and the final `tmp` top level holds only `.gitkeep` + `gates-cache` + `find-quotes.js`).
 
 ## 7. Handover
 

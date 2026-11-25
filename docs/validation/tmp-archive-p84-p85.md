@@ -139,7 +139,8 @@
 - **双 BOM 事故（已回正）**：对 P85 `00-briefing.md` 追加注记时写入了第二个 BOM，使首行被记为「删除 + 新增」。已剥离多余 BOM 并复验：`git diff --numstat` = 纯新增、删除 0，逐字原文完好。
 - **`grep` 实测与台账差额**：台账记 9 件载体 15 处，实测 11 件载体 39 处，差额为 `CHECKLIST_v72{,_EN}.md:137` 两行 × 两条路径（冻结快照，本片不动）；已在 `input-list.md` §三 逐项列明，本片不改台账该行（历史 不追溯）。
 - **① D8 编码口径更正**：见 §2.5。
-- 临时件 D 计数：0（`tmp/P89-TMP-ARCHIVE-P84-P85/` 内脚本、备份与捕获件于 ⑧c 清理）。
+- **回填轮 CI 红 → 修复（真实缺陷，已修）**：回填轮 `45587252859` 双腿 `Gates` 步红，判据 = `G8-b`：`02-verification/` 下三份捕获件以 CRLF 落盘并按 CRLF 计哈希，而 `.gitattributes` 将其归一为 LF ⇒ blob 哈希不符（与归档件同一个坑）。处置：三件先归一 LF → 重建 `SHA256SUMS.txt` → 本机 `G8` 与全门禁复验 `TOTAL_FAIL=0`、`SELFTEST` 744/744 → 推送修复轮。
+- 临时件 D 计数：**1**（修复轮曾在 `tmp` 根落一份门禁捕获件 `gate-fix-index.txt`，发现后即时删除；终态 `tmp` 顶层仅 `.gitkeep` + `gates-cache` + `find-quotes.js`）。
 
 ## 7. 移交
 
