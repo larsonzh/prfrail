@@ -107,4 +107,11 @@ docs/validation/evidence/P91-DIRECTIVE-CI-INVOCATION-SYNC/SHA256SUMS.txt	repo
 
 - R = 1（`create_file` 产出 `.md` 为无 BOM + CRLF，已统一归一；属既定工具行为，非内容缺陷）、D = 0、探针 0。
 - 单轮输出超限（20 KB 级命令回显）一次，已改为 `--output=` 直写，未产生半截产物。
-- **未提交、未推送**：停于 ⑩，等同轮授权。CI 双腿读数于推送后按 §11.2 回填。
+- 已提交并推送：主提交与 CI 读数见 §12。
+
+## 12. 提交与 CI（§11.2 回填）
+
+- 主提交：`f963dd7`（`docs: sync the directive CI invocation sentence with P90 (P91)`，24 个路径），已推 `origin/main`（范围 `254e98f..f963dd7`，**未推 gitee**）。
+- CI：run `45688549781`（head `f963dd7`）**首跑双腿全绿**（Go windows-latest `2m50s` / Go ubuntu-latest `2m49s`；其余三个 dispatch 专用作业常态 skipped）。
+- 双腿 `Gates` 步硬读数：`SELFTEST: PASS 744/744`、`GATE REPORT scope=ci changed=24`、`TOTAL_FAIL=0`（两腿一致）。
+- 本节由 CI 双绿后的 docs-only 提交补入（§11.2）；该回填提交自身的 CI run 只作观察记录，不再为其新增提交。

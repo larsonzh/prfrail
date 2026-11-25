@@ -2457,7 +2457,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 额度口径披露 | ⑦ = S 档 1+1（用户裁定）；档位 = `GPT-5.3-Codex (copilot)` 常规档；盲审不抽；批量辅助不派（机械核验，用户裁定） |
 | 起跑条件 | 用户 2026-11-26 点名；四要素留痕；v74 快照闭环 |
 
-完成记录（2026-11-26）：R = 1（`create_file` 产出 `.md` 为无 BOM + CRLF，已统一归一）、D = 0、探针 0；准则 :675 句改为「再 `--all --skip-base --scope=ci`（base 由前序 Build/Vet/Test/Format 步覆盖，P90）」，`_EN` 逐字镜像，`ci.yml` 的 `Gates` 步 run 串与之逐字一致；版本包三件（头 v1.74 / §0.3 变更行 / 附录 C `C.0ba`）齐备，§12.4 登记 OB-145 并翻 `已处置`；③ 六形状全等（`2575 / 6187 / 4362 / 597 / 6944`）；⑨ 三作用域 `TOTAL_FAIL=0`、`--selftest` 744/744、基础门禁 `ok` 15 包 / 包级 `FAIL` 0；⑤ 1 轮 `PASS WITH FIXES`（3 Low + 1 注记，`verdict: no Medium+`）、⑥ 跳过（⑦ `SKIP CONFIRMED: YES`）、⑦ 1 轮 `PASS WITH FIXES`（1 Low，`verdict: no Medium+`，复审额度未用）；**未提交、未推送**（停于 ⑩，等同轮授权）；CI 双腿读数于推送后按 §11.2 回填。口径更正（2026-11-26）：报告对各行数 110（CN/EN 相等），证据包载荷 16 件（以 `MANIFEST.md` 条目为准）。
+完成记录（2026-11-26）：R = 1（`create_file` 产出 `.md` 为无 BOM + CRLF，已统一归一）、D = 0、探针 0；准则 :675 句改为「再 `--all --skip-base --scope=ci`（base 由前序 Build/Vet/Test/Format 步覆盖，P90）」，`_EN` 逐字镜像，`ci.yml` 的 `Gates` 步 run 串与之逐字一致；版本包三件（头 v1.74 / §0.3 变更行 / 附录 C `C.0ba`）齐备，§12.4 登记 OB-145 并翻 `已处置`；③ 六形状全等（`2575 / 6187 / 4362 / 597 / 6944`）；⑨ 三作用域 `TOTAL_FAIL=0`、`--selftest` 744/744、基础门禁 `ok` 15 包 / 包级 `FAIL` 0；⑤ 1 轮 `PASS WITH FIXES`（3 Low + 1 注记，`verdict: no Medium+`）、⑥ 跳过（⑦ `SKIP CONFIRMED: YES`）、⑦ 1 轮 `PASS WITH FIXES`（1 Low，`verdict: no Medium+`，复审额度未用）；**未提交、未推送**（停于 ⑩，等同轮授权）；CI 双腿读数于推送后按 §11.2 回填。口径更正（2026-11-26）：报告对各行数 110（CN/EN 相等），证据包载荷 16 件（以 `MANIFEST.md` 条目为准）。主提交 `f963dd7` 已推 `origin/main`（未推 gitee），CI run `45688549781` 双腿 success（两腿 `SELFTEST` 744/744、`GATE REPORT scope=ci changed=24`、`TOTAL_FAIL=0`）。
 
 ## 已知缺陷（后续切片前处理）
 

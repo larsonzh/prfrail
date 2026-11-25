@@ -107,4 +107,11 @@ docs/validation/evidence/P91-DIRECTIVE-CI-INVOCATION-SYNC/SHA256SUMS.txt	repo
 
 - R = 1 (`create_file` produces `.md` without BOM and with CRLF, normalized afterwards; a known tool behaviour, not a content defect), D = 0, probes 0.
 - One command echoed 20 KB and exceeded the single-response budget; it was switched to `--output=` and left no half-written artifact.
-- **Uncommitted and unpushed**: stopped at (10) for same-turn authorization. The two-leg CI reading is back-filled after the push per §11.2.
+- Committed and pushed: the main commit and the CI readings are in §12.
+
+## 12. Commit and CI ((11).2 back-fill)
+
+- Main commit: `f963dd7` (`docs: sync the directive CI invocation sentence with P90 (P91)`, 24 files), pushed to `origin/main` (range `254e98f..f963dd7`, **not gitee**).
+- CI: run `45688549781` (head `f963dd7`) was **green on both legs on the first attempt** (Go windows-latest `2m50s` / Go ubuntu-latest `2m49s`; the other three dispatch-only jobs were skipped as usual).
+- Hard readings from the `Gates` step on both legs: `SELFTEST: PASS 744/744`, `GATE REPORT scope=ci changed=24`, `TOTAL_FAIL=0` (identical on both legs).
+- This section was added by the docs-only commit after the double green (§11.2); the CI run of that back-fill commit itself is an observation only and gets no further commit.
