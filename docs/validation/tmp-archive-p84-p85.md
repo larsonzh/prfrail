@@ -70,9 +70,9 @@
 |---|---|---|---|---|---|
 | P84-BOUNDDIR-RESIDUAL | 58 | 58 | 58 | 是 | 0 |
 | P85-SECURITY-PROOF-SUBSYSTEM | 95 | 95 | 95 | 是 | 0 |
-| P89-TMP-ARCHIVE-P84-P85 | 11 | 11 | 11 | 是 | 0 |
+| P89-TMP-ARCHIVE-P84-P85 | 14 | 14 | 14 | 是 | 0 |
 
-> 时点口径：`pack-consistency.txt` 为脚本生成的快照，本表与其同源（终态本包 11 件载荷）；定稿态该包载荷与 `SHA256SUMS.txt` 逐字节一致、漂移 0。
+> 时点口径：`pack-consistency.txt` 为脚本生成的快照，本表与其同源（终态本包 14 件载荷）；定稿态该包载荷与 `SHA256SUMS.txt` 逐字节一致、漂移 0。
 
 ### 3.2 溯源可复原
 
@@ -107,7 +107,8 @@
 
 ### 3.6 门禁读数
 
-② 完成后首轮（⑥ 转录前，改动集 129 路径）：`--all --scope=tree` 与 `--scope=index` 均为 `TOTAL_FAIL=1`，**唯一红项 = `G7-f`**（新增报告须带 `sixstage` 围栏，而该围栏即 ⑥ 转录产物）；其余判据（含 G8 三包自洽、G9、G4a、G5(d)、G6-4、G2）全绿。⑥ 后插入 `sixstage` 并复跑至 `TOTAL_FAIL=0`；⑨ 定稿时回填三作用域终态读数与 CI 双腿。
+首次回填轮（⑥ 转录前，改动集 129 路径）：`--all --scope=tree` 与 `--scope=index` 均为 `TOTAL_FAIL=1`，**唯一红项 = `G7-f`**（新增报告须带 `sixstage` 围栏，而该围栏即 ⑥ 转录产物）。⑥ 后插入 `sixstage` 并复跑至 `TOTAL_FAIL=0`。
+- CI 主轮 `45584959722`（head `5b85f7a`）**双腿 success**：`Go ubuntu-latest` 与 `Go windows-latest` 各 `SELFTEST: PASS 744/744`、`TOTAL_FAIL=0`、`scope=ci changed=135`；包级 `ok` 记录合计 36 条。
 
 ## 4. 审查链
 
@@ -294,6 +295,9 @@ docs/validation/evidence/P85-SECURITY-PROOF-SUBSYSTEM/archive/P85-SECURITY-PROOF
 docs/validation/evidence/P85-SECURITY-PROOF-SUBSYSTEM/archive/P85-SECURITY-PROOF-SUBSYSTEM/verify-r4.out.txt	repo
 docs/validation/evidence/P89-TMP-ARCHIVE-P84-P85/00-briefing.md	repo
 docs/validation/evidence/P89-TMP-ARCHIVE-P84-P85/01-arch/01-arch-design.md	repo
+docs/validation/evidence/P89-TMP-ARCHIVE-P84-P85/02-verification/consistency-check.txt	repo
+docs/validation/evidence/P89-TMP-ARCHIVE-P84-P85/02-verification/gate-index.txt	repo
+docs/validation/evidence/P89-TMP-ARCHIVE-P84-P85/02-verification/gate-tree.txt	repo
 docs/validation/evidence/P89-TMP-ARCHIVE-P84-P85/04-reviews/05-pre-review-r1.md	repo
 docs/validation/evidence/P89-TMP-ARCHIVE-P84-P85/04-reviews/05-pre-review-r2.md	repo
 docs/validation/evidence/P89-TMP-ARCHIVE-P84-P85/04-reviews/06-scan-r1.md	repo

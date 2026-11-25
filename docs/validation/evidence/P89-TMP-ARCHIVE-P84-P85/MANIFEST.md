@@ -20,3 +20,6 @@
 | `04-reviews/06-scan-r1.md` | 载荷（P89 新增） |
 | `04-reviews/07-final-review-r1.md` | 载荷（P89 新增） |
 | `04-reviews/07-re-review-r1.md` | 载荷（P89 新增） |
+| `02-verification/consistency-check.txt` | 载荷（P89 新增） |
+| `02-verification/gate-index.txt` | 载荷（P89 新增） |
+| `02-verification/gate-tree.txt` | 载荷（P89 新增） |

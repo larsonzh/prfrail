@@ -1,12 +1,12 @@
 P89 archive / pack self-consistency evidence
-generated_at=2026-11-25T08:49:26.255Z
+generated_at=2026-11-25T09:24:39.097Z
 
 pack=P84-BOUNDDIR-RESIDUAL
   payload=58 manifest=58 sums=58 three_way_equal=true hash_mismatch=0 set_issues=0
 pack=P85-SECURITY-PROOF-SUBSYSTEM
   payload=95 manifest=95 sums=95 three_way_equal=true hash_mismatch=0 set_issues=0
 pack=P89-TMP-ARCHIVE-P84-P85
-  payload=11 manifest=11 sums=11 three_way_equal=true hash_mismatch=0 set_issues=0
+  payload=14 manifest=14 sums=14 three_way_equal=true hash_mismatch=0 set_issues=0
 
 provenance: rows=110 rederived_ok=110 drift=0
 

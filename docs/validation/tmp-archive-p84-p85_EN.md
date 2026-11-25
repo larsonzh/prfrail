@@ -70,9 +70,9 @@ The `archive/` prefix follows the existing `directive-history/.../archive/` prec
 |---|---|---|---|---|---|
 | P84-BOUNDDIR-RESIDUAL | 58 | 58 | 58 | yes | 0 |
 | P85-SECURITY-PROOF-SUBSYSTEM | 95 | 95 | 95 | yes | 0 |
-| P89-TMP-ARCHIVE-P84-P85 | 11 | 11 | 11 | yes | 0 |
+| P89-TMP-ARCHIVE-P84-P85 | 14 | 14 | 14 | yes | 0 |
 
-> Timing caliber: `pack-consistency.txt` is a script-generated snapshot and this table is derived from the same run (11 payloads in the final state); in the final state the pack's payloads match `SHA256SUMS.txt` byte for byte with zero drift.
+> Timing caliber: `pack-consistency.txt` is a script-generated snapshot and this table is derived from the same run (14 payloads in the final state); in the final state the pack's payloads match `SHA256SUMS.txt` byte for byte with zero drift.
 
 ### 3.2 Provenance is re-derivable
 
@@ -107,7 +107,8 @@ Hit lines = whitelist lines (16); unexpected hits 0; unused whitelist entries 0.
 
 ### 3.6 Gate readings
 
-First round after (2) (before the (6) transcript; change set = 129 paths): `--all --scope=tree` and `--scope=index` both report `TOTAL_FAIL=1`, where the **only red item is `G7-f`** (a newly added report must carry a `sixstage` fence, and that fence IS the (6) transcript). Every other criterion (including the three-pack G8 self-consistency, G9, G4a, G5(d), G6-4, G2) is green. The fence is inserted after (6) and the gates are re-run to `TOTAL_FAIL=0`; the final three-scope readings and the two CI legs are backfilled at (9).
+First backfill round (before the (6) transcript; change set = 129 paths): `--all --scope=tree` and `--scope=index` both reported `TOTAL_FAIL=1`, the **only red item being `G7-f`** (a newly added report must carry a `sixstage` fence, and that fence IS the (6) transcript). The fence was inserted after (6) and the gates re-ran to `TOTAL_FAIL=0`.
+- CI main run `45584959722` (head `5b85f7a`): **both legs success** - `Go ubuntu-latest` and `Go windows-latest` each report `SELFTEST: PASS 744/744`, `TOTAL_FAIL=0` and `scope=ci changed=135`; 36 package-level `ok` records in total.
 
 ## 4. Review chain
 
@@ -294,6 +295,9 @@ docs/validation/evidence/P85-SECURITY-PROOF-SUBSYSTEM/archive/P85-SECURITY-PROOF
 docs/validation/evidence/P85-SECURITY-PROOF-SUBSYSTEM/archive/P85-SECURITY-PROOF-SUBSYSTEM/verify-r4.out.txt	repo
 docs/validation/evidence/P89-TMP-ARCHIVE-P84-P85/00-briefing.md	repo
 docs/validation/evidence/P89-TMP-ARCHIVE-P84-P85/01-arch/01-arch-design.md	repo
+docs/validation/evidence/P89-TMP-ARCHIVE-P84-P85/02-verification/consistency-check.txt	repo
+docs/validation/evidence/P89-TMP-ARCHIVE-P84-P85/02-verification/gate-index.txt	repo
+docs/validation/evidence/P89-TMP-ARCHIVE-P84-P85/02-verification/gate-tree.txt	repo
 docs/validation/evidence/P89-TMP-ARCHIVE-P84-P85/04-reviews/05-pre-review-r1.md	repo
 docs/validation/evidence/P89-TMP-ARCHIVE-P84-P85/04-reviews/05-pre-review-r2.md	repo
 docs/validation/evidence/P89-TMP-ARCHIVE-P84-P85/04-reviews/06-scan-r1.md	repo
