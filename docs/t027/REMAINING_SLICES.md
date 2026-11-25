@@ -2411,6 +2411,30 @@ A6 ② 进度（第 2 批，2026-09-15）：
 
 完成记录（2026-11-25）：R = 0、D = 1、探针 0；归档 110 件（`P84-CI-FIX` 44 件 / `P85-SECURITY-PROOF-SUBSYSTEM` 66 件）进各自证据包 `archive/` 子树并删除原目录（`Test-Path` 前 True/True → 后 False/False）；字节归一 88 件（`.gitattributes` = `* text=auto eol=lf`，必须先归一再计哈希）、路径字面归一 11 件 39 处；三包 `MANIFEST ↔ SHA256SUMS ↔ 磁盘` 三方相等（P84 58 / P85 95 / P89 14），110 件溯源从原件备份重放全通过；`git grep` 两条旧路径残余命中 16 处 = 白名单 16 处（冻结快照 2 + P85 冻结原文 8 + 本片逐字原文 6）；`SELFTEST` 744/744、三作用域 `TOTAL_FAIL=0`；⑤ 2/2（r2 残留为描述与计数）、⑥ 1/3 `PASS`、⑦ 2/2（`PASS WITH FIXES` → 唯一修复已闭环），背书 B1–B4 与 F-9 / F-13；报告对 `docs/validation/tmp-archive-p84-p85{,_EN}.md`；证据包 `docs/validation/evidence/P89-TMP-ARCHIVE-P84-P85/`（14 件载荷 + 两件元数据）。主提交 `5b85f7a` 已推 `origin/main`（**未推 gitee**）；CI 主轮 `45584959722` 双腿 success（两腿 `SELFTEST` 744/744、`TOTAL_FAIL=0`、`scope=ci changed=135`）；回填轮 `45587252859` 双腿 `Gates` 红（`G8-b`：`02-verification/` 三份捕获件以 CRLF 计哈希而 blob 为 LF），修复提交 `e15ad3d` 后 `45589128432` 双腿 success（`TOTAL_FAIL=0`、包级 ok 36 条），D = 1 已在报告对登记；②③ 主控直执、GLM 未派改机械核验、F-09 / F-13 经 ⑦ 背书——用户 2026-11-25 裁定接受，不得作先例。
 
+### P90 — `GATES-CI-PERF`（CI 门禁步 base 去重 + Go 缓存评估 · 工具片）· ✅ 闭环
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `GATES-CI-PERF`（台账编号 = **P90**；来源 = v72 快照层 3 性能候选 + v73 快照 §四/§六 下一裁定项 + 用户 2026-11-25 点名） |
+| 状态 | ✅ 闭环（2026-11-25 闭环；四要素留痕见 `docs/validation/evidence/P90-GATES-CI-PERF/00-briefing.md`；报告对 `docs/validation/gates-ci-perf{,_EN}.md`） |
+| 目标 | ① `Gates` 步由 `--all --scope=ci` 改为 `--all --skip-base --scope=ci`（`--selftest` 保留）；② 补回 base 四件套中的 `gofmt` 缺口（新增独立格式步，防线不变）；③ Go 构建缓存持久化评估落盘（现状 `cache: true`）；④ 输出改动前后判据结论面逐字一致与本机耗时对照 |
+| 依赖 | v73 快照闭环；P88 报告 §7 建议 2（短期替代路径） |
+| 规模 | **S**（工具片；`.github/workflows/ci.yml` + `internal/release/workflow_test.go` 冻结契约同步 + 报告对 + 台账 + 证据包；`tools/gates/**` 零改动） |
+| 步骤 | 0 → ① 影响判定 → ② 实现 → ③ 一致性 → ④ 门禁 → ⑤ → ⑥ → ⑦ → ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| 现状缺口 | CI `Gates` 步重复执行 base 四件套（`Build` / `Vet` / `Test` 三步已覆盖后三件）；base 中的 `gofmt` 在 CI 无对等步；「ci 冻结成本」无 §12.4 条目 |
+| 交付物 | ① `ci.yml` 的 `Gates` 步参数与新增格式步；② `internal/release/workflow_test.go` 的冻结契约同步（摘要值与步骤名表）；③ 报告对 `docs/validation/gates-ci-perf{,_EN}.md`（含覆盖等价论证、`gofmt` 处置、Go 缓存评估结论、大改建议清单）；④ 台账段与完成记录；⑤ 证据包 |
+| 验收证据 | ① `SELFTEST` 744/744 不变；② 同一变更集上 `--all` 与 `--all --skip-base` 的判据结论面逐字一致（base 段除外）且 `TOTAL_FAIL=0`；③ `go test ./internal/release/` 通过（契约同步到位）；④ 三作用域 `TOTAL_FAIL=0`；⑤ 报告对双语严格镜像；⑥ CI 两腿读数于推送后回填 |
+| 边界 | `tools/gates/**` 零改动（`gate.js` / `selftest.js` / `ctx.js` / `lib/criteria/**`）；不动判据本体与判定逻辑；不改 `candidate-build` / `candidate-probe` / `selfhost` 作业；不改 CONTRACTS / schema / 契约夹具；不升准则；不做 gitee。**边界扩展（主控代裁，待用户追认，不得作先例）**：`internal/release/workflow_test.go` 的冻结契约同步纳入本片（摘要、步骤名表，以及 `workflow_mutation_test.go` 的 `different-shell` 变异值必要适配——`bash` 改为 `sh`，否则对 `Format` 步为空操作而假红；`internal/**` 其余零改动）——依据 = 该文件对 `Gates` 步 run 串做 sha256 断言，不改则 CI 两腿必红 |
+| 分级 | `[SLICE]` |
+| 探针额度 | 0 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/P90-GATES-CI-PERF/freedom-list.md` |
+| R/D 基线 | R = 0、D = 0（起跑时登记） |
+| 临时件落点声明 | `tmp/P90-GATES-CI-PERF/`（⑧c 前只增不删） |
+| 额度口径披露 | ⑦ = S 档 ⇒ §7.5「S 档 1+1」；档位 = `GPT-5.3-Codex (copilot)` 常规档；盲审不抽；批量辅助不派（机械核验，用户裁定） |
+| 起跑条件 | 用户 2026-11-25 点名；四要素留痕；v73 快照闭环 |
+
+完成记录（2026-11-25）：R = 1（`create_file` 产出无 BOM + CRLF，已统一归一）、D = 0、探针 0；`Gates` 步改 `--all --skip-base --scope=ci`（`--selftest` 保留），新增 `Format` 步（`shell: bash`，`set -e` + 非空输出判红）补回 gofmt 防线，`cache: true` 仅加注记（Go 缓存判「已覆盖不动」）；冻结契约同步三处（`test` 步骤名表、`test/Gates` 摘要、`test/Format` 摘要与 `shell`）加 `different-shell` 由 `bash` 改 `sh` 的必要适配，代裁如实标注「待用户追认、不得作先例」；③ A/B 剥离四条 base 后两侧 sha256 同为 `ee00e354…`，比对器翻转 1 字节即 DIFFERENT；⑨ 三作用域 `TOTAL_FAIL=0`（tree 含 base 四条全 PASS、`go test` 为 ok=15 FAIL=0）、`--selftest` 为 744/744；证据包 22 件载荷三方相等；⑤ 两轮（1 Medium + 2 Low 全闭合）、⑥ 两轮（r1 报 2 Medium，r2 `PASS`）、⑦ 两轮（r1 `FINDINGS` 为 1 Medium + 1 Low，r2 `RE-REVIEW: PASS`）；**未提交、未推送**（停于 ⑩，等同轮授权）；唯一未闭合验收项 = CI 双腿读数（推送后回填，改动前基线 run `45614659141`：windows `Gates` 103 s / ubuntu 44 s）；准则滞后句登记候选 OB-145。
+
 ## 已知缺陷（后续切片前处理）
 
 > **阻断口径不变**：仅高频/已复现缺陷阻断，观测级 flake 只记录并在验证报告中列示。

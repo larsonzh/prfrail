@@ -1,0 +1,7 @@
+{
+  "baselineIdentical": true,
+  "afterOneByteFlipIdentical": false,
+  "shaA": "ee00e354f971451017850082a9201681aecda4b51a5a62efa7288f7969f50072",
+  "shaB": "ee00e354f971451017850082a9201681aecda4b51a5a62efa7288f7969f50072",
+  "shaFlipped": "c0aa4903a7006f1b66187edc61f718e635e774811e6c38cfb2ba57c570dc4ef2"
+}

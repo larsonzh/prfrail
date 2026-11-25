@@ -1,0 +1,22 @@
+{
+  "aExit": 0,
+  "bExit": 0,
+  "aElapsedMs": 108309,
+  "bElapsedMs": 11224,
+  "aLineCount": 50,
+  "strippedBaseLines": 4,
+  "baseLinesInB": 0,
+  "aPrimeSha256": "ee00e354f971451017850082a9201681aecda4b51a5a62efa7288f7969f50072",
+  "bSha256": "ee00e354f971451017850082a9201681aecda4b51a5a62efa7288f7969f50072",
+  "identical": true,
+  "aTotalFail": "TOTAL_FAIL=0",
+  "bTotalFail": "TOTAL_FAIL=0",
+  "aHeader": "GATE REPORT scope=ci repo=D:\\LZProjects\\prfrail changed=6",
+  "bHeader": "GATE REPORT scope=ci repo=D:\\LZProjects\\prfrail changed=6",
+  "aBaseRecords": [
+    "PASS  base gofmt -l . :: empty",
+    "PASS  base go build ./... :: exit 0",
+    "PASS  base go vet ./... :: exit 0",
+    "PASS  base go test ./... :: ok=15 FAIL=0"
+  ]
+}

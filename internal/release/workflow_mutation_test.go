@@ -55,7 +55,7 @@ func TestWorkflowScriptMutationsAreRejected(t *testing.T) {
 		"shadow-command":          func(step *workflowStep) { step.Run = "function global:go { }\n" + step.Run },
 		"empty-script":            func(step *workflowStep) { step.Run = "" },
 		"skip-step":               func(step *workflowStep) { step.If = "${{ false }}" },
-		"different-shell":         func(step *workflowStep) { step.Shell = "bash" },
+		"different-shell":         func(step *workflowStep) { step.Shell = "sh" },
 		"different-directory":     func(step *workflowStep) { step.WorkingDirectory = "candidate-source" },
 		"extra-action-parameters": func(step *workflowStep) { step.With = map[string]any{"unreviewed": true} },
 	}

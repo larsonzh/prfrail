@@ -184,7 +184,7 @@ func validateWorkflowStructure(workflow workflowDocument) error {
 	}
 	expectedJobs := map[string]jobContract{
 		"test": {
-			steps: []string{"Checkout source", "Setup Go", "Build", "Vet", "Test", "Race", "Contract fixtures", "Gates"},
+			steps: []string{"Checkout source", "Setup Go", "Build", "Vet", "Test", "Race", "Contract fixtures", "Format", "Gates"},
 		},
 		"candidate-build": {
 			condition:   dispatchOnMain,
@@ -246,8 +246,11 @@ func validateWorkflowScripts(workflow workflowDocument) error {
 		}, "test/Contract fixtures": {
 			digest: "94577fb7f37f9fbfcef7207756eebf7999694fea78cfe21c23b7e904d2ce7d5d", condition: "runner.os == 'Linux'", workingDirectory: "tools/contracts",
 		},
+		"test/Format": {
+			digest: "5a9a2b5725f2311225eaa69c3be661ca5caa8602563a1158d693057af3777471", shell: "bash",
+		},
 		"test/Gates": {
-			digest: "ca20623b574d8247377aa96f1f1af589ab854cf28ce2a94a584288225241c8d0",
+			digest: "53f7fed093a67fae3c5af018a308509dd96120491f6362501abfed818a99fbd5",
 		},
 		"candidate-build/Validate candidate pin": {
 			digest: "5b4930d6ebbea82cb11be937304ae3cddb7bfb77236c276596451c9ba711b216", shell: "pwsh",
