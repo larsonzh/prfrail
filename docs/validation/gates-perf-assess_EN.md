@@ -137,7 +137,14 @@ INDEPENDENT SCAN: PASS
 INDEPENDENT SCAN: PASS
 ```
 
-## 10. Artifact fence
+## 10. Commit and CI
+
+- Main commit: `03c45f7` (`feat: batch gate blob reads and memoise raw reads (P88)`), pushed to `origin/main` (range `fed0f5c..03c45f7`; **gitee not pushed**).
+- CI run **`45523666470`** (head `03c45f7`) **is green on both legs on the first attempt**: `Go ubuntu-latest` 3m09s / `Go windows-latest` 2m58s; the three candidate jobs are skipped by the CI definition.
+- Hard evidence from the `Gates` step on both legs: `SELFTEST: PASS 744/744`, `GATE REPORT scope=ci changed=31`, `TOTAL_FAIL=0`; package-level `ok` lines ubuntu 21 / windows 15 and `FAIL` 0.
+- This section is added by the docs-only commit after the CI double green (section 11.2); that backfill commit's own CI run is an observation record only and gets no further commit.
+
+## 11. Artifact fence
 
 ```artifacts
 docs/DELIVERY_DIRECTIVE.md	repo

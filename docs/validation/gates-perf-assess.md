@@ -137,7 +137,14 @@ INDEPENDENT SCAN: PASS
 INDEPENDENT SCAN: PASS
 ```
 
-## 10. 工件围栏
+## 10. 提交与 CI
+
+- 主提交：`03c45f7`（`feat: batch gate blob reads and memoise raw reads (P88)`），已推 `origin/main`（范围 `fed0f5c..03c45f7`；**未推 gitee**）。
+- CI run **`45523666470`**（head `03c45f7`）**首跑双腿全绿**：`Go ubuntu-latest` 3m09s / `Go windows-latest` 2m58s；三个候选作业按 CI 定义 skipped。
+- 两腿 `Gates` 步实测硬证据：`SELFTEST: PASS 744/744`、`GATE REPORT scope=ci changed=31`、`TOTAL_FAIL=0`；包级 `ok` 行 ubuntu 21 / windows 15、`FAIL` 0。
+- 本节由 CI 双绿后的 docs-only 提交补入（§11.2）；该回填提交自身的 CI run 只作观察记录，不再为其新增提交。
+
+## 11. 工件围栏
 
 ```artifacts
 docs/DELIVERY_DIRECTIVE.md	repo
