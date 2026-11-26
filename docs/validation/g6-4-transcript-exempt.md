@@ -21,7 +21,7 @@
 | ④ | 主控 | 完成 | tree 作用域 `TOTAL_FAIL=0` |
 | ⑤ | DeepSeek V4 Pro | 1 轮 | `PASS WITH FIXES`（1 Low，`no Medium+`） |
 | ⑥ | MAI Code 2 Flash | 3 轮 | 末轮 `INDEPENDENT SCAN: PASS`（0 发现） |
-| ⑦ | GPT-5.3-Codex 常规档 | 1 轮 | `FINAL REVIEW: PASS`（0 发现，`no Medium+`，复审额度未用） |
+| ⑦ | GPT-5.3-Codex 常规档 | 3 轮 | 终审 PASS（0 发现）+ 复审 r2 抓 2 处真实缺陷 + r3 全闭合（`no Medium+`） |
 | ⑧a | 主控（⑧a 自查见 §6） | 完成 | 报告对 + 审查原文围栏 |
 | ⑨ | 主控 | 完成 | 三作用域 + `gofmt` / `build` / `vet` / `test` 全绿 |
 | ⑧b | 主控 | 完成 | 台账翻 `✅ 闭环` + 完成记录 |
@@ -34,6 +34,7 @@
 - A-1：⑥ 第 1 轮报 1 Medium（外观围栏可躲 G6-4）⇒ 整改：围栏体须通过 G7-f 的结构面（五段按序），补 T141 / T142。
 - A-2：⑥ 第 2 轮报 1 Medium（标题行未 `.trim()`，与 G7-f 口径分叉）⇒ 整改：`sixstageStructurallyValid` 对每行 `.trim()`，补 T143。
 - A-3：⑤ 的 1 Low（`fence-exempt` 仅在无 finding 时进 detail）⇒ 以准则措辞精确化为「无 finding 时」承接，不改共享 `emit`。该措辞改动已由 ⑥ 与 ⑦ 对改动后文本做实质复核（见 §5）。
+- A-4：⑦ 复审 r2 发现两处真实缺陷——报告 §16 的措辞命中 G2 的被禁串、`artifacts` 围栏未覆盖证据包载荷（G5(d) 与 G7-b）⇒ 改写措辞并把围栏扩到 16 条后逐件暂存，r3 复核全闭合。
 
 ## 4. 环境与档位
 
@@ -44,7 +45,7 @@
 
 - ⑤ 预审（1 轮）：`PRE-REVIEW: PASS WITH FIXES`，1 Low，`no Medium+`。
 - ⑥ 独立扫描（3 轮）：r1 `FINDINGS`（1 Medium）、r2 `FINDINGS`（1 Medium）、r3 `PASS`（0 发现）；末轮原文逐字转录于下方围栏内。
-- ⑦ 终审（1 轮，盲态）：`FINAL REVIEW: PASS`，0 发现，`no Medium+`；复审额度未使用。
+- ⑦ 终审 + 复审（1+2 用尽）：终审 `FINAL REVIEW: PASS`（0 发现）；复审 r2 发现 2 处真实缺陷（G2 / G5(d) 与 G7-b）并整改，r3 `RE-REVIEW: PASS WITH FIXES`（三项全闭合，`no Medium+`）。
 
 ```sixstage
 ## Section A
@@ -105,8 +106,8 @@ INDEPENDENT SCAN: PASS
 
 ## 12. 成本与计量
 
-- ① 1 次、② 1 次、③ 1 次、⑤ 2 次（1+2 额度内用 2）、⑥ 3 次（≤3 用尽）、⑦ 1 次（1+2 额度内用 1）、批量辅助 2 次、探针 0。
-- R = 0、D = 0。
+- ① 1 次、② 1 次、③ 1 次、⑤ 2 次（1+2 额度内用 2）、⑥ 3 次（≤3 用尽）、⑦ 3 次（1 终审 + 2 复审用尽）、批量辅助 2 次、探针 0。
+- R = 4、D = 0（返工：⑤ Low 措辞 / ⑥ r1 结构面 / ⑥ r2 trim / ⑦ r2 的 G2 与 artifacts 整改）。
 
 ## 13. 明确未执行事项
 

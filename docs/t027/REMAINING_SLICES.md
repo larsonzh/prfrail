@@ -2505,7 +2505,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 额度口径披露 | ⑦ = 1+2（用户裁定 a）；档位 = `GPT-5.3-Codex` 常规档；盲审不抽；批量辅助 GLM ≥2（用户裁定 e）；⑥ 必做（触判据实现） |
 | 起跑条件 | 用户 2026-11-26 点名；四要素留痕；v76 快照闭环 |
 
-完成记录（2026-11-26）：R = 0、D = 0、探针 0；通道 = 三选一之 b（G6-4 对已闭合且五段按序的 `sixstage` 围栏体作用域豁免），判定逻辑本体零改动（四条正则 / 逐行扫描 / 白名单 split / `emit` 未动）；单源复用 G7 的围栏解析器与报告目标集，`SELFTEST` 由 744 增至 757（新增 T133–T143），既有 744 条断言行逐字不变；准则升 v1.76（头部行 / §0.3 行 / 附录 C.0bc，六形状全等）；⑨ 三作用域 `TOTAL_FAIL=0` + `gofmt` / `build` / `vet` / `test` 全绿；审查 ⑤ 1 轮 `PASS WITH FIXES`（1 Low）、⑥ 3 轮（末轮 `INDEPENDENT SCAN: PASS`）、⑦ 1+2（终审 PASS、复审两轮闭合且末轮 `no Medium+`）；报告对 `docs/validation/g6-4-transcript-exempt{,_EN}.md`，证据包 `docs/validation/evidence/P93-DIRECTIVE-G6-4-TRANSCRIPT-EXEMPT/`。
+完成记录（2026-11-26）：R = 4、D = 0、探针 0；通道 = 三选一之 b（G6-4 对已闭合且五段按序的 `sixstage` 围栏体作用域豁免），判定逻辑本体零改动（四条正则 / 逐行扫描 / 白名单 split / `emit` 未动）；单源复用 G7 的围栏解析器与报告目标集，`SELFTEST` 由 744 增至 757（新增 T133–T143），既有 744 条断言行逐字不变；准则升 v1.76（头部行 / §0.3 行 / 附录 C.0bc，六形状全等）；⑨ 三作用域 `TOTAL_FAIL=0` + `gofmt` / `build` / `vet` / `test` 全绿；审查 ⑤ 1 轮 `PASS WITH FIXES`（1 Low）、⑥ 3 轮（末轮 `INDEPENDENT SCAN: PASS`）、⑦ 1+2（终审 PASS、复审两轮闭合且末轮 `no Medium+`）；报告对 `docs/validation/g6-4-transcript-exempt{,_EN}.md`，证据包 `docs/validation/evidence/P93-DIRECTIVE-G6-4-TRANSCRIPT-EXEMPT/`。
 ## 已知缺陷（后续切片前处理）
 
 > **阻断口径不变**：仅高频/已复现缺陷阻断，观测级 flake 只记录并在验证报告中列示。

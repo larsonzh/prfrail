@@ -21,7 +21,7 @@ Date: 2026-11-26. Status: **self-checked after completion, CC gates all green**.
 | (4) | master | done | tree scope `TOTAL_FAIL=0` |
 | (5) | DeepSeek V4 Pro | 1 round | `PASS WITH FIXES` (1 Low, `no Medium+`) |
 | (6) | MAI Code 2 Flash | 3 rounds | final `INDEPENDENT SCAN: PASS` (0 findings) |
-| (7) | GPT-5.3-Codex regular tier | 1 round | `FINAL REVIEW: PASS` (0 findings, `no Medium+`, re-review quota unused) |
+| (7) | GPT-5.3-Codex regular tier | 3 rounds | final PASS (0 findings) + re-review r2 caught 2 real defects + r3 closed them (`no Medium+`) |
 | (8a) | master (self-check in §6) | done | report pair + verbatim review fence |
 | (9) | master | done | three scopes + `gofmt` / `build` / `vet` / `test` all green |
 | (8b) | master | done | ledger flipped to `✅ Closed` + completion record |
@@ -34,6 +34,7 @@ Batch helpers: `GLM-5.3-Flash` dispatched twice (bilingual clause mirror, policy
 - A-1: round 1 of (6) raised 1 Medium (a decorative fence could dodge G6-4) => fix: the body must pass the G7-f structural face (five ordered sections), plus T141 / T142.
 - A-2: round 2 of (6) raised 1 Medium (heading lines were not `.trim()`ed, diverging from G7-f) => fix: `sixstageStructurallyValid` trims every line, plus T143.
 - A-3: the 1 Low from (5) (`fence-exempt` only reaches the detail when no finding exists) => answered by tightening the directive wording to "with no finding present" instead of touching the shared `emit`. That wording change was substantively re-checked by (6) and (7) on the changed text (see §5).
+- A-4: re-review r2 of (7) caught two real defects - the §16 phrase carried the G2-forbidden string, and the `artifacts` fence did not cover the evidence payload (G5(d) and G7-b) => the wording was rewritten and the fence extended to 16 rows, then every artifact was staged; r3 confirmed both closed.
 
 ## 4. Environment and tier
 
@@ -44,7 +45,7 @@ Batch helpers: `GLM-5.3-Flash` dispatched twice (bilingual clause mirror, policy
 
 - (5) pre-review (1 round): `PRE-REVIEW: PASS WITH FIXES`, 1 Low, `no Medium+`.
 - (6) independent scan (3 rounds): r1 `FINDINGS` (1 Medium), r2 `FINDINGS` (1 Medium), r3 `PASS` (0 findings); the final message is transcribed verbatim in the fence below.
-- (7) final review (1 round, blind): `FINAL REVIEW: PASS`, 0 findings, `no Medium+`; the re-review quota was not used.
+- (7) final review plus re-reviews (1+2 exhausted): the final round returned `FINAL REVIEW: PASS` (0 findings); re-review r2 caught 2 real defects (G2 / G5(d) and G7-b) which were fixed, and r3 returned `RE-REVIEW: PASS WITH FIXES` (all three closed, `no Medium+`).
 
 ```sixstage
 ## Section A
@@ -105,8 +106,8 @@ This report uses A-1 to A-3, each defined in §3; no dangling reference.
 
 ## 12. Cost and metering
 
-- (1) 1, (2) 1, (3) 1, (5) 2 (within the 1+2 quota), (6) 3 (the <=3 quota fully used), (7) 1 (within 1+2), batch helpers 2, probes 0.
-- R = 0, D = 0.
+- (1) 1, (2) 1, (3) 1, (5) 2 (within the 1+2 quota), (6) 3 (the <=3 quota fully used), (7) 3 (1 final + 2 re-reviews, quota exhausted), batch helpers 2, probes 0.
+- R = 4, D = 0 (rework: the (5) Low wording, the (6) r1 structural face, the (6) r2 trim, the (7) r2 G2 and artifacts fixes).
 
 ## 13. Explicitly not done
 
