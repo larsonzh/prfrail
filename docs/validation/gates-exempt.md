@@ -132,7 +132,10 @@ INDEPENDENT SCAN: PASS
 
 ## 16. 提交与 CI
 
-- 主提交与 CI run 由 ⑧b 的 docs-only 提交补入（§11.2）；本节不写未发生的哈希。
+- 主提交：`49f1609`（16 路径；信息 `feat: extend the sixstage scope exemption to G2 and G4b and add the whitelist threshold clause (P94)`）。
+- 推送：`origin/main`（SSH，未推 gitee），范围 `9217915..49f1609`。
+- CI：run `45910223000`（head `49f1609`）双腿 success；两腿 `Gates` 实测 `SELFTEST: PASS 770/770`、`GATE REPORT scope=ci changed=16`、`TOTAL_FAIL=0`；包级 ok ubuntu 21 / windows 15、FAIL 0；其余三个候选作业常态 skipped。
+- 本节由 CI 双绿后的 docs-only 提交补入（§11.2）；该回填提交自身的 CI run 只作观察记录，不再为其新增提交。
 
 ```artifacts
 docs/DELIVERY_DIRECTIVE.md	repo

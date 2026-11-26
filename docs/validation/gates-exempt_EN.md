@@ -132,7 +132,10 @@ This report uses A-1 to A-6, each with an entity definition in §3; no dangling 
 
 ## 16. Commit and CI
 
-- The main commit and the CI run are added by the ⑧b docs-only commit (§11.2); this section records no hash that has not happened yet.
+- Main commit: `49f1609` (16 paths; message `feat: extend the sixstage scope exemption to G2 and G4b and add the whitelist threshold clause (P94)`).
+- Push: `origin/main` (SSH, gitee untouched), range `9217915..49f1609`.
+- CI: run `45910223000` (head `49f1609`), both legs success; both legs' `Gates` measured `SELFTEST: PASS 770/770`, `GATE REPORT scope=ci changed=16`, `TOTAL_FAIL=0`; package-level ok ubuntu 21 / windows 15, FAIL 0; the other three candidate jobs are skipped as usual.
+- This section is added by the docs-only commit after both legs went green (§11.2); that backfill commit's own CI run is an observation record only, and no further commit is made for it.
 
 ```artifacts
 docs/DELIVERY_DIRECTIVE.md	repo

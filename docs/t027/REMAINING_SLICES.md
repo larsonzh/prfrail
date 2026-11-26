@@ -2529,7 +2529,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 额度口径披露 | ⑦ = 1+2（用户裁定 a）；档位 = `GPT-5.3-Codex` 常规档；盲审不抽；批量辅助 GLM ≥2（用户裁定 e）；⑥ 必做（触判据实现） |
 | 起跑条件 | 用户 2026-11-26 点名；四要素留痕；v77 快照闭环 |
 
-完成记录（2026-11-26）：R = 6、D = 0、探针 0；三件合并评估 = (a) 做同构扩展（`sixstage` 围栏体作用域豁免由 G6-4 扩到 G2 与 G4b，**不做** `gate-exempt` 标记机制）、(b) **不做**通用引用豁免登记位、(c) **做**白名单登记门槛条款（条目仍为零、T23 逐字不动）；判据判定逻辑本体零改动，豁免在扫描前按行号剔除；`SELFTEST` 757 → 770（T144–T156）；准则升 v1.77（头部 / §0.3 / §6.3 两处子句与门槛段 / 附录 C.0bd，六形状全等）；⑨ 三作用域 `TOTAL_FAIL=0` + `gofmt` / `build` / `vet` / `test` 全绿；审查 ⑤ 1 轮 `PASS WITH FIXES`（GLM-5.3 备用档，独立性降低已登记）、⑥ 1 轮 `INDEPENDENT SCAN: PASS`、⑦ 1+2（终审两 Low → 复审 r2 两 Low → r3 `RE-REVIEW: PASS`）；报告对 `docs/validation/gates-exempt{,_EN}.md`，证据包 `docs/validation/evidence/P94-GATES-EXEMPT/`。
+完成记录（2026-11-26）：R = 6、D = 0、探针 0；三件合并评估 = (a) 做同构扩展（`sixstage` 围栏体作用域豁免由 G6-4 扩到 G2 与 G4b，**不做** `gate-exempt` 标记机制）、(b) **不做**通用引用豁免登记位、(c) **做**白名单登记门槛条款（条目仍为零、T23 逐字不动）；判据判定逻辑本体零改动，豁免在扫描前按行号剔除；`SELFTEST` 757 → 770（T144–T156）；准则升 v1.77（头部 / §0.3 / §6.3 两处子句与门槛段 / 附录 C.0bd，六形状全等）；⑨ 三作用域 `TOTAL_FAIL=0` + `gofmt` / `build` / `vet` / `test` 全绿；审查 ⑤ 1 轮 `PASS WITH FIXES`（GLM-5.3 备用档，独立性降低已登记）、⑥ 1 轮 `INDEPENDENT SCAN: PASS`、⑦ 1+2（终审两 Low → 复审 r2 两 Low → r3 `RE-REVIEW: PASS`）；报告对 `docs/validation/gates-exempt{,_EN}.md`，证据包 `docs/validation/evidence/P94-GATES-EXEMPT/`；主提交 `49f1609` 已推 `origin/main`（未推 gitee，范围 `9217915..49f1609`），CI run `45910223000` 双腿 success（两腿 `SELFTEST: PASS 770/770`、`GATE REPORT scope=ci changed=16`、`TOTAL_FAIL=0`；包级 ok ubuntu 21 / windows 15、FAIL 0）。
 
 ## 已知缺陷（后续切片前处理）
 
