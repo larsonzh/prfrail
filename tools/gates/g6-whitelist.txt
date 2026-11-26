@@ -9,3 +9,12 @@
 # A malformed entry (missing field, empty reason) is a usage error: the runner exits 2.
 # Entries are reviewed by ⑤/⑦ like any other claim. Do not register a real defect.
 #
+# Scope exemptions are NOT whitelist duties. Two regions are excluded by the criteria
+# themselves, so they never need (and must never get) an entry here:
+#   1. the evidence tree `docs/validation/evidence/**` (OB-79);
+#   2. a CLOSED `sixstage` transcript fence of a validation report - G6-4 scope
+#      sub-rule, v1.76 (P93): the fence body is a verbatim ⑤/⑥/⑦ transcript that the
+#      controller must not rewrite.
+# Registering a transcript line here does not exempt anything: a preloaded entry fails
+# SELFTEST (T23), because the empty file is a load-bearing invariant.
+#

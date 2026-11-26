@@ -7483,6 +7483,192 @@ async function runTests() {
     }
   }
 
+  // ---- T133-T140: G6-4 `sixstage` transcript scope exemption (v1.76, P93).
+  // The verbatim ⑤/⑥/⑦ transcript (§11.3) may carry count literals that the controller
+  // must NOT rewrite, so G6-4 skips the body of a CLOSED `sixstage` fence in a G7 target
+  // report. Every face below is falsifiable: dropping the info string, the closing fence,
+  // the report path, or the filter itself must turn the matching probe red.
+  {
+    const OUT_REPORT = 'docs/validation/probe-g64.md';
+    const OUT_SCOPE = 'docs/t027/probe-g64.md';
+    const probeCtx = (text, opts) => {
+      const o = opts || {};
+      const p = o.path || OUT_REPORT;
+      const lines = String(text).split('\n');
+      const addedSet = new Set(lines.map((_, i) => i + 1));
+      const rec = { path: p, status: 'A', untracked: true, deleted: false };
+      return {
+        kind: 'tree',
+        scope: { kind: 'tree' },
+        changed: [rec],
+        changedPaths: [p],
+        recordFor: () => rec,
+        readLineArray: (q) => (q === p ? lines : null),
+        addedLineNumbers: () => addedSet,
+        changedMarkdown: () => [p],
+      };
+    };
+    const probe = (text, opts, mod) => {
+      const M = mod || G6;
+      const sub = M.subchecks.find((s) => s.id === 'G6-4');
+      const out = createReport();
+      const res = sub.run(probeCtx(text, opts), out);
+      const rec = out.records[0] || { verdict: 'ABSENT', detail: '' };
+      return {
+        verdict: verdictOf(out.records, 'G6-4'),
+        findings: res.findings.length,
+        why: res.findings.length ? res.findings[0].detail : '',
+        detail: String(rec.detail),
+      };
+    };
+    /** `# h` + open fence + body + close fence. `<TICK>` stands for a bare closing fence. */
+    const doc = (fence, body) =>
+      ['# probe report', '']
+        .concat([fence])
+        .concat(body.concat(['<TICK>', '']))
+        .join('\n')
+        .split('<TICK>')
+        .join('```');
+    const BODY = [
+      '## Section A',
+      'INDEPENDENT SCAN: PASS',
+      '共 128 个文件',
+      '## Section B',
+      '-',
+      '## Section C',
+      '-',
+      '## Section D',
+      '-',
+      '## Section E',
+      '-',
+      'INDEPENDENT SCAN: PASS',
+    ];
+
+    // T133 positive: a compliant fence body is exempt (PASS, zero findings) and the
+    // exemption is VISIBLE in the detail - a silent skip would be unverifiable.
+    const t133 = probe(doc('```sixstage', BODY));
+    check(
+      'T133 G6-4 scope: a count literal inside a CLOSED sixstage fence of a report is exempt (PASS + fence-exempt reported)',
+      t133.verdict === 'PASS' && t133.findings === 0 && /fence-exempt 13/.test(t133.detail),
+      'verdict=' + t133.verdict + ' findings=' + t133.findings + ' :: ' + t133.detail
+    );
+
+    // T134 negative + mutation: drop the info string and the SAME body is judged again;
+    // disabling the filter must reproduce that red, so the filter is load-bearing.
+    const t134 = probe(doc('```', BODY));
+    check(
+      'T134 G6-4 scope: the same body under a plain ``` fence is NOT exempt (FAIL, finding names the literal)',
+      t134.verdict === 'FAIL' && t134.findings === 1 && /file count/.test(t134.why),
+      'verdict=' + t134.verdict + ' findings=' + t134.findings + ' :: ' + t134.why
+    );
+    const m134 = loadMutatedModule(
+      G6_SOURCE,
+      '        if (exempt && exempt.has(n)) {',
+      '        if (false) {',
+      'g64-exempt'
+    );
+    const t134m = probe(doc('```sixstage', BODY), null, m134.exports);
+    check(
+      'T134 G6-4 scope mutation: disabling the fence filter turns the exempt body red (filter is load-bearing)',
+      m134.applied === true && m134.identical === true && t134m.verdict === 'FAIL' && t134m.findings === 1,
+      'applied=' + m134.applied + ' identical=' + m134.identical + ' verdict=' + t134m.verdict + ' findings=' + t134m.findings
+    );
+
+    // T135 fail-closed: an UNCLOSED fence exempts NOTHING (G7-f already fails that shape).
+    const t135 = probe(['# probe report', '', '```sixstage'].concat(BODY).join('\n'));
+    check(
+      'T135 G6-4 scope: an UNCLOSED sixstage fence exempts nothing (literal still FAILs)',
+      t135.verdict === 'FAIL' && t135.findings === 1 && /file count/.test(t135.why),
+      'verdict=' + t135.verdict + ' findings=' + t135.findings + ' :: ' + t135.why
+    );
+
+    // T136 boundary: the exempt region is exactly [open, close) - neighbours still judged.
+    const t136 = probe(
+      ['# probe report', '共 128 个文件', '```sixstage']
+        .concat(BODY, ['```', '共 128 个文件', ''])
+        .join('\n')
+    );
+    check(
+      'T136 G6-4 scope boundary: literals immediately BEFORE the opener and AFTER the closer are judged (exactly two findings)',
+      t136.verdict === 'FAIL' && t136.findings === 2,
+      'verdict=' + t136.verdict + ' findings=' + t136.findings + ' :: ' + t136.detail
+    );
+
+    // T137 early close: a bare ``` inside the body closes the block (same parser as G7-f),
+    // so everything after it is judged again - no "swallow the rest of the file" hole.
+    const t137 = probe(
+      ['# probe report', '', '```sixstage', '## Section A', 'INDEPENDENT SCAN: PASS', '```', '共 128 个文件', ''].join('\n')
+    );
+    check(
+      'T137 G6-4 scope: a bare ``` inside the body closes it early, so later literals are judged again (FAIL)',
+      t137.verdict === 'FAIL' && t137.findings === 1,
+      'verdict=' + t137.verdict + ' findings=' + t137.findings + ' :: ' + t137.detail
+    );
+
+    // T138 info-string boundary: trailing blanks are legal (G7 regex), a suffix is not an opener.
+    const t138a = probe(doc('```sixstage  ', BODY));
+    const t138b = probe(doc('```sixstage-extra', BODY));
+    check(
+      'T138 G6-4 scope: trailing blanks after the sixstage info string are legal (exempt), a -extra suffix is not (judged)',
+      t138a.verdict === 'PASS' && t138a.findings === 0 && t138b.verdict === 'FAIL' && t138b.findings === 1,
+      'trailing=' + t138a.verdict + '/' + t138a.findings + ' suffix=' + t138b.verdict + '/' + t138b.findings
+    );
+
+    // T139 scope limit: the same fence outside the G7 target set has no G7-f coverage,
+    // so it must NOT be exempt.
+    const t139 = probe(doc('```sixstage', BODY), { path: OUT_SCOPE });
+    check(
+      'T139 G6-4 scope limit: the same sixstage fence under docs/t027/ is NOT exempt (FAIL)',
+      t139.verdict === 'FAIL' && t139.findings === 1,
+      'verdict=' + t139.verdict + ' findings=' + t139.findings + ' :: ' + t139.why
+    );
+
+    // T141/T142 (⑥ r1 Medium): a CLOSED fence alone is not enough - the body must carry
+    // the five `Section A`-`Section E` headings IN ORDER (G7-f's structural face). Without
+    // this, a decorative fence would be a trivial escape hatch for count literals.
+    const t141 = probe(doc('```sixstage', ['## Section A', '共 128 个文件', '## Section B', '-']));
+    check(
+      'T141 G6-4 scope: a CLOSED fence WITHOUT the five ordered sections is not exempt (FAIL)',
+      t141.verdict === 'FAIL' && t141.findings === 1,
+      'verdict=' + t141.verdict + ' findings=' + t141.findings + ' :: ' + t141.why
+    );
+    const t142 = probe(
+      doc('```sixstage', ['## Section B', '-', '## Section A', '共 128 个文件', '## Section C', '-', '## Section D', '-', '## Section E', '-'])
+    );
+    check(
+      'T142 G6-4 scope: a CLOSED fence with OUT-OF-ORDER sections is not exempt (FAIL)',
+      t142.verdict === 'FAIL' && t142.findings === 1,
+      'verdict=' + t142.verdict + ' findings=' + t142.findings + ' :: ' + t142.why
+    );
+
+    // T143 (⑥ r2 Medium): G7-f matches headings AFTER `.trim()`, so G6-4 must do the same.
+    // An indented `## Section A` would otherwise be green for G7-f and red for G6-4.
+    const t143 = probe(
+      doc('```sixstage', ['  ## Section A', '共 128 个文件', '  ## Section B', '-', '  ## Section C', '-', '  ## Section D', '-', '  ## Section E', '-'])
+    );
+    check(
+      'T143 G6-4 scope: INDENTED section headings are matched like G7-f does (exempt, no false red)',
+      t143.verdict === 'PASS' && t143.findings === 0,
+      'verdict=' + t143.verdict + ' findings=' + t143.findings + ' :: ' + t143.detail
+    );
+
+    // T140 single source + policy: g6.js must not carry its own fence pattern (drift
+    // guard), and the whitelist header must state that transcripts are not a whitelist duty.
+    const g6Src = decodeBuffer(fs.readFileSync(G6_SOURCE));
+    const wlLines = decodeBuffer(fs.readFileSync(path.join(__dirname, 'g6-whitelist.txt'))).split('\n');
+    const wlEntries = wlLines.filter((l) => l.trim() && l.trim()[0] !== '#');
+    check(
+      'T140 G6-4 scope single-source: g6.js reuses G7.internals.sixstageBlocks (no local fence pattern)',
+      g6Src.indexOf('G7.internals.sixstageBlocks') >= 0 && g6Src.indexOf('```sixstage') < 0,
+      'g7ref=' + (g6Src.indexOf('G7.internals.sixstageBlocks') >= 0) + ' localPattern=' + (g6Src.indexOf('```sixstage') >= 0)
+    );
+    check(
+      'T140 whitelist policy: the header names the transcript exemption as NOT a whitelist duty, and the file stays empty',
+      wlLines.some((l) => l.indexOf('NOT whitelist duties') >= 0) && wlEntries.length === 0,
+      'entries=' + JSON.stringify(wlEntries)
+    );
+  }
+
   // ---- F1: a stale mutation (no-op) must not silently weaken the suite.
   {
     const stale = MUTATION_LOG.filter((m) => !m.applied);

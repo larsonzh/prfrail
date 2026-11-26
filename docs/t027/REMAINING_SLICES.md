@@ -2482,6 +2482,30 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 起跑条件 | 用户 2026-11-26 点名；四要素留痕；v75 快照闭环 |
 
 完成记录（2026-11-26）：R = 3、D = 1、探针 0；`--selftest` 由 150.9 s 降到 70.1 s（2.15×），stdout 逐字节不变且 `SELFTEST` 744/744；判据本体与判定逻辑零改动（只把 23 处仓库根发现收敛为进程级惰性缓存）；报告对 `docs/validation/gates-selftest-split{,_EN}.md`，证据包 `docs/validation/evidence/P92-GATES-SELFTEST-SPLIT/`；准则升 v1.75（头部行 / §0.3 变更日志行 / 附录 C.0bb）；审查 ⑤ 1 轮、⑥ 3 轮（末轮 `INDEPENDENT SCAN: PASS`）、⑦ 1+2 轮 + 1 次收窄确认（末轮 `CONFIRM: FINDINGS`，A 处由用户裁定以机械事实更正闭合）；未按 P85 先例逐轮停点，已如实登记并由用户裁定接受。
+
+### P93 — `DIRECTIVE-G6-4-TRANSCRIPT-EXEMPT`（G6-4 与逐字转录互斥治理 · 治理片）· ✅ 闭环
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `DIRECTIVE-G6-4-TRANSCRIPT-EXEMPT`（台账编号 = **P93**；来源 = P92 报告 §7 第 5 条候选 + v76 快照 §四/§六 + 用户 2026-11-26 点名） |
+| 状态 | ✅ 闭环（2026-11-26 收口；四要素见 `docs/validation/evidence/P93-DIRECTIVE-G6-4-TRANSCRIPT-EXEMPT/00-briefing.md`；报告对 `docs/validation/g6-4-transcript-exempt{,_EN}.md`） |
+| 目标 | ① 在 G6-4 计数型字面量与 §11.3 六阶段逐字转录之间给出正式通道（三选一，① 判定 + ⑦ 背书）；② 同步 T23 断言与白名单政策；③ 既有判据输入回归逐字不变 |
+| 依赖 | v76 快照闭环；P92 闭环（冲突出处）；无其它前置 |
+| 规模 | S |
+| 步骤 | 0 → ① 影响判定 → ② 实现 → ③ 一致性 → ④ 门禁 → ⑤ → ⑥ → ⑦ → ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| 现状缺口 | G6-4 与 §11.3 互斥无合规通道；`tools/gates/g6-whitelist.txt` 零实际条目且 T23 钉死为空，登记即 `SELFTEST` 743/744；P92 只能最小归一 + 围栏外披露（用户裁定接受，不得作先例） |
+| 交付物 | ① 三选一通道落盘（准则条款 + 判据/断言实现 + 白名单口径三处一致）；② 版本包（MINOR v1.76）；③ 新形态自测；④ 报告对 `docs/validation/g6-4-transcript-exempt{,_EN}.md`；⑤ 台账段与完成记录；⑥ 证据包 |
+| 验收证据 | ① 既有输入回归逐字不变（`SELFTEST` 与三作用域判定逐字不变，新增断言只增不改）；② 三作用域 `TOTAL_FAIL=0`；③ 新豁免形态自测通过（闭合围栏内计数形态 PASS、未闭合/非报告路径/普通围栏 FAIL）；④ 报告对双语严格镜像 |
+| 边界 | G6-4 判定逻辑本体不改（只增作用域子规则）；不改 G5-b 闭集与模型白名单；不改 `ci.yml` / `internal/**` / CONTRACTS / schema / fixtures / workflows；ADR 不新增；不做 gitee |
+| 分级 | `[SLICE]` |
+| 探针额度 | 0 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/P93-DIRECTIVE-G6-4-TRANSCRIPT-EXEMPT/freedom-list.md` |
+| R/D 基线 | R = 0、D = 0（起跑时登记） |
+| 临时件落点声明 | `tmp/P93-DIRECTIVE-G6-4-TRANSCRIPT-EXEMPT/`（⑧c 前只增不删） |
+| 额度口径披露 | ⑦ = 1+2（用户裁定 a）；档位 = `GPT-5.3-Codex` 常规档；盲审不抽；批量辅助 GLM ≥2（用户裁定 e）；⑥ 必做（触判据实现） |
+| 起跑条件 | 用户 2026-11-26 点名；四要素留痕；v76 快照闭环 |
+
+完成记录（2026-11-26）：R = 0、D = 0、探针 0；通道 = 三选一之 b（G6-4 对已闭合且五段按序的 `sixstage` 围栏体作用域豁免），判定逻辑本体零改动（四条正则 / 逐行扫描 / 白名单 split / `emit` 未动）；单源复用 G7 的围栏解析器与报告目标集，`SELFTEST` 由 744 增至 757（新增 T133–T143），既有 744 条断言行逐字不变；准则升 v1.76（头部行 / §0.3 行 / 附录 C.0bc，六形状全等）；⑨ 三作用域 `TOTAL_FAIL=0` + `gofmt` / `build` / `vet` / `test` 全绿；审查 ⑤ 1 轮 `PASS WITH FIXES`（1 Low）、⑥ 3 轮（末轮 `INDEPENDENT SCAN: PASS`）、⑦ 1+2（终审 PASS、复审两轮闭合且末轮 `no Medium+`）；报告对 `docs/validation/g6-4-transcript-exempt{,_EN}.md`，证据包 `docs/validation/evidence/P93-DIRECTIVE-G6-4-TRANSCRIPT-EXEMPT/`。
 ## 已知缺陷（后续切片前处理）
 
 > **阻断口径不变**：仅高频/已复现缺陷阻断，观测级 flake 只记录并在验证报告中列示。

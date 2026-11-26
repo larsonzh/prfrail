@@ -2469,6 +2469,30 @@ Completion record (2026-11-26): R = 1 (`create_file` produces `.md` without BOM 
 | Start condition | Named by the user on 2026-11-26; four elements on record; v75 snapshot closed |
 
 Completion record (2026-11-26): R = 3, D = 1, zero probes; `--selftest` drops from 150.9 s to 70.1 s (2.15x) with byte-identical stdout and `SELFTEST` 744/744; zero change to the criterion bodies or their decision logic (only the 23 repo-root discoveries collapse into one process-level lazy memo); report pair `docs/validation/gates-selftest-split{,_EN}.md`, evidence pack `docs/validation/evidence/P92-GATES-SELFTEST-SPLIT/`; the directive moves to v1.75 (header line / §0.3 changelog row / appendix C.0bb); reviews: (5) one round, (6) three rounds (last one `INDEPENDENT SCAN: PASS`), (7) 1+2 plus one narrow confirmation read (last one `CONFIRM: FINDINGS`, whose point A the user ruled closed as a mechanical fact correction); this slice did not stop at every round as the P85 precedent suggests, which is recorded and was accepted by the user.
+
+### P93 — `DIRECTIVE-G6-4-TRANSCRIPT-EXEMPT` (governing the G6-4 / verbatim-transcript exclusion · governance slice) · ✅ Closed
+
+| Field | Content |
+|---|---|
+| Identifier | `DIRECTIVE-G6-4-TRANSCRIPT-EXEMPT` (ledger id = **P93**; source = the P92 report §7 item 5 + the v76 snapshot §4/§6 + the user naming it on 2026-11-26) |
+| Status | ✅ Closed (2026-11-26; the four elements are in `docs/validation/evidence/P93-DIRECTIVE-G6-4-TRANSCRIPT-EXEMPT/00-briefing.md`; report pair `docs/validation/g6-4-transcript-exempt{,_EN}.md`) |
+| Goal | (1) give the G6-4 count literals and the §11.3 six-stage verbatim transcript a formal channel (one of three, judged by (1) and endorsed by (7)); (2) sync the T23 assertion and the whitelist policy; (3) keep the existing criterion inputs' regressions byte-identical |
+| Dependency | v76 snapshot closed; P92 closed (source of the conflict); no other prerequisite |
+| Size | S |
+| Steps | 0 → (1) impact ruling → (2) implementation → (3) consistency → (4) gates → (5) → (6) → (7) → (8a) → (9) → (8b) → (8c) → (10) |
+| Gap | No compliant channel exists for the G6-4 / §11.3 mutual exclusion; `tools/gates/g6-whitelist.txt` has zero real entries and T23 pins it empty, so one registration yields `SELFTEST` 743/744; P92 could only normalise minimally and disclose outside the fence (accepted by the user, not a precedent) |
+| Deliverables | (1) the chosen channel on disk (clause + criterion/assertion implementation + whitelist policy, three places consistent); (2) the version package (MINOR v1.76); (3) a new-shape self-test; (4) the report pair `docs/validation/g6-4-transcript-exempt{,_EN}.md`; (5) the ledger section and completion record; (6) the evidence pack |
+| Acceptance evidence | (1) existing inputs' regressions are byte-identical (`SELFTEST` and the three scopes' verdicts unchanged; new assertions are additive only); (2) all three scopes report `TOTAL_FAIL=0`; (3) the new exemption shape self-test passes (count shapes inside a closed fence PASS; unclosed / non-report path / plain fence FAIL); (4) the report pair mirrors strictly |
+| Boundary | The G6-4 decision logic is untouched (only a scope sub-rule is added); no change to the G5-b closed set or the model allow-list; no change to `ci.yml` / `internal/**` / CONTRACTS / schema / fixtures / workflows; no new ADR; no gitee |
+| Class | `[SLICE]` |
+| Probe quota | 0 |
+| Freedom list path | `docs/validation/evidence/P93-DIRECTIVE-G6-4-TRANSCRIPT-EXEMPT/freedom-list.md` |
+| R/D baseline | R = 0, D = 0 (registered at start-up) |
+| Temp files | `tmp/P93-DIRECTIVE-G6-4-TRANSCRIPT-EXEMPT/` (append-only until (8c)) |
+| Quota disclosure | (7) = 1+2 (user ruling a); tier = `GPT-5.3-Codex` regular; no blind review; batch helper GLM ≥2 (user ruling e); (6) mandatory (touches a criterion implementation) |
+| Start condition | Named by the user on 2026-11-26; four elements on record; v76 snapshot closed |
+
+Completion record (2026-11-26): R = 0, D = 0, zero probes; channel = option b of three (a scope exemption on G6-4 for a CLOSED `sixstage` fence body whose five sections are in order), zero change to the decision logic (the four patterns / line scan / whitelist split / `emit` are untouched); single-source reuse of the G7 fence parser and report target set; `SELFTEST` 744 -> 757 (T133-T143 added) with every one of the 744 existing assertion lines byte-identical; the directive moves to v1.76 (header line / §0.3 row / appendix C.0bc, six shapes equal); (9) three scopes `TOTAL_FAIL=0` plus `gofmt` / `build` / `vet` / `test` all green; reviews: (5) one round `PASS WITH FIXES` (1 Low), (6) three rounds (last `INDEPENDENT SCAN: PASS`), (7) 1+2 (final PASS, both re-reviews closed and the last one `no Medium+`); report pair `docs/validation/g6-4-transcript-exempt{,_EN}.md`, evidence pack `docs/validation/evidence/P93-DIRECTIVE-G6-4-TRANSCRIPT-EXEMPT/`.
 ## Known defects (to be handled before later slices)
 
 > **Blocking rule unchanged**: only high-frequency / reproduced defects block; observation-grade flakes are recorded and listed in the validation report.

@@ -22,6 +22,8 @@
  *   G6-3 run-id format     placeholder / out-of-range run ids (format only, never
  *                          reachability; no network)
  *   G6-4 expiring literal  line counts / file counts / aggregate counts
+ *                          (scope sub-rule v1.76: a CLOSED `sixstage` transcript fence of
+ *                          a G7 target report is exempt - see `sixstageExemptSet`)
  *   G6-5 section refs      §X.Y on added ledger/changelog lines must resolve (OB-32)
  *   G6-6 ledger status     §12.4 disposition cells must open with a closed-set word (OB-38)
  *   G6-7 declaration       a §0.3 declaration names an ID the ledger regions contain (OB-32)
@@ -32,6 +34,14 @@ const fs = require('fs');
 const path = require('path');
 
 const { UsageError, decodeBuffer } = require('../ctx');
+// Single source (P93): the `sixstage` fence parser and the report target set are G7's
+// own - the exemption region is by construction the region G7-f judges, so the two
+// criteria cannot drift apart (`g7` requires only `../ctx`, so this is not a cycle).
+const G7 = require('./g7');
+const g7Targets = G7.internals.targets;
+const g7SixstageBlocks = G7.internals.sixstageBlocks;
+const g7SectionRe = G7.internals.SIXSTAGE_SECTION_RE;
+const g7SectionSeq = G7.internals.SIXSTAGE_SECTION_SEQ;
 
 const WHITELIST_REL = 'tools/gates/g6-whitelist.txt';
 const EXCLUDE_MARKERS = ['不得残留', '示例', '引文', '冲突', '矛盾'];
@@ -383,18 +393,71 @@ const G6_3 = {
   },
 };
 
+/**
+ * G6-4 scope sub-rule (v1.76, slice P93 DIRECTIVE-G6-4-TRANSCRIPT-EXEMPT).
+ *
+ * A `sixstage` fence in a G7 target report holds the VERBATIM transcript of the final
+ * ⑤/⑥/⑦ message (§11.3 + G7-f). The controller must NOT rewrite that text, so a count
+ * literal inside it is not the controller's own prose and cannot be judged - the same
+ * satisfiability argument that already keeps the evidence tree out of G2 / G4b / G6
+ * (OB-79). It is a SCOPE exemption decided by the criterion itself, NEVER a whitelist
+ * entry: `g6-whitelist.txt` stays empty (T23) and remains reserved for one-off real hits.
+ *
+ * Fail-closed: ① an UNCLOSED fence exempts nothing (G7-f already FAILs it, so the two
+ * criteria agree instead of contradicting); ② a CLOSED fence whose body does not carry
+ * the five `Section A`-`Section E` headings IN ORDER does not exempt either - the same
+ * structural face G7-f judges, so a decorative fence cannot be used as an escape hatch;
+ * ③ only G7 target files are eligible - a same-shaped fence anywhere else has no G7-f
+ * coverage and gets no exemption.
+ *
+ * @returns {Set<number>|null} 1-based line numbers exempt in `file`, or null when none.
+ */
+function sixstageStructurallyValid(body) {
+  let seen = 0;
+  for (const line of body) {
+    // `.trim()` mirrors G7-f exactly: an INDENTED `## Section X` heading passes G7-f, so
+    // it must pass here too - otherwise the same fence would be green for one criterion and
+    // red for the other (⑥ r2 Medium, T143 pins the agreement).
+    const m = g7SectionRe.exec(String(line).trim());
+    if (!m) continue;
+    if (m[1] !== g7SectionSeq.charAt(seen)) return false;
+    seen++;
+  }
+  return seen === g7SectionSeq.length;
+}
+
+function sixstageExemptSet(file, L) {
+  if (!g7Targets({ changedPaths: [file] }).length) return null;
+  let set = null;
+  for (const b of g7SixstageBlocks(L)) {
+    if (!b.closed) continue;
+    if (!sixstageStructurallyValid(b.body)) continue;
+    if (!set) set = new Set();
+    // [start, end): the opening fence line through the last body line; the closing
+    // fence line itself is plain ``` and can never match a literal pattern.
+    for (let i = b.start; i < b.end; i++) set.add(i + 1);
+  }
+  return set;
+}
+
 const G6_4 = {
   id: 'G6-4',
   label: 'expiring literal',
   run(ctx, out) {
     const findings = [];
     let scanned = 0;
+    let exempted = 0;
     for (const f of ctx.changedMarkdown()) {
       const L = ctx.readLineArray(f);
       if (!L) continue;
+      const exempt = sixstageExemptSet(f, L);
       for (const n of [...ctx.addedLineNumbers(f)].sort((a, b) => a - b)) {
         const line = L[n - 1];
         if (line === undefined) continue;
+        if (exempt && exempt.has(n)) {
+          exempted++;
+          continue;
+        }
         scanned++;
         if (isExcluded(line)) continue;
         for (const p of LITERAL_PATTERNS) {
@@ -416,7 +479,10 @@ const G6_4 = {
       'G6-4',
       'expiring literal',
       findings,
-      'no expiring literal on added lines (scanned ' + scanned + ')'
+      'no expiring literal on added lines (scanned ' +
+        scanned +
+        (exempted ? ', fence-exempt ' + exempted : '') +
+        ')'
     );
   },
 };
