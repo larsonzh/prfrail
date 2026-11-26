@@ -17,4 +17,24 @@
 #      controller must not rewrite.
 # Registering a transcript line here does not exempt anything: a preloaded entry fails
 # SELFTEST (T23), because the empty file is a load-bearing invariant.
+# Since v1.77 (P94 GATES-EXEMPT) those two scope exemptions cover G2, G4b and G6-4
+# alike, and they stay NOT whitelist duties: each criterion drops the exempt lines
+# before scanning, so no entry here can widen or narrow them.
+#
+# Registration threshold (a real hit only; the file stays empty otherwise):
+#   (a) an explicit same-turn user ruling (section 1.7.4, four elements) or a (7)
+#       final-review endorsement;
+#   (b) the registered line must be a LEGITIMATE line wrongly caught by too-coarse a
+#       rule - a real defect must be fixed, not registered;
+#   (c) all three fields present, and the reason carries a context excerpt;
+#   (d) the matching SELFTEST preload assertion must change in the SAME commit
+#       (registration and assertion change are one atomic action) and the (9) gate
+#       run on that same commit must be all green;
+#   (e) the report section 1 and section 12.4 record it.
+#
+# Division of labour - do not mix the two registries:
+#   tools/gates/cjk-newwords.txt = standing registration of legitimate NEW characters
+#       (its semantics is growth);
+#   tools/gates/g6-whitelist.txt = a per-hit exemption of a line a too-coarse rule
+#       wrongly caught (its semantics is an EMPTY file) - never merge the two.
 #

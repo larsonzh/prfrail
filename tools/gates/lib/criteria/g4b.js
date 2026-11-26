@@ -27,6 +27,15 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const { UsageError } = require('../ctx');
+// Single source (P94 / GATES-EXEMPT): the `sixstage` fence parser and the report target
+// set are G7's own - single source = g7 internals; see g6.js P93. The exemption region
+// is by construction the region G7-f judges, so the criteria cannot drift apart
+// (`g7` requires only `../ctx`, so this is not a cycle). No local fence regex here.
+const G7 = require('./g7');
+const g7Targets = G7.internals.targets;
+const g7SixstageBlocks = G7.internals.sixstageBlocks;
+const g7SectionRe = G7.internals.SIXSTAGE_SECTION_RE;
+const g7SectionSeq = G7.internals.SIXSTAGE_SECTION_SEQ;
 
 const WHITELIST_REL = 'tools/gates/cjk-newwords.txt';
 /**
@@ -64,6 +73,50 @@ function cjkChars(s) {
     }
   }
   return o;
+}
+
+/**
+ * Scope exemption (v1.77, slice P94 GATES-EXEMPT): single source = g7 internals; see
+ * g6.js P93. The body of a CLOSED, structurally valid `sixstage` fence in a G7 target
+ * report is the verbatim ⑤/⑥/⑦ transcript (§11.3 + G7-f), which the controller must NOT
+ * rewrite - so a character outside the base corpus quoted inside it is not the
+ * controller's own prose and cannot be judged (same scope argument as the evidence
+ * tree, OB-79). It is NOT a whitelist duty: `cjk-newwords.txt` is unchanged. Exempt
+ * lines are removed from the candidate set BEFORE the char scan (per line, never the
+ * whole file), and the exemption is only reported when it happens.
+ *
+ * Does the fence body carry the five `Section A`-`Section E` headings IN ORDER? This is
+ * isomorphic to G6's `sixstageStructurallyValid` (P93); `.trim()` mirrors G7-f exactly,
+ * so an indented heading passes everywhere or nowhere.
+ */
+function sixstageStructurallyValid(body) {
+  let seen = 0;
+  for (const line of body) {
+    const m = g7SectionRe.exec(String(line).trim());
+    if (!m) continue;
+    if (m[1] !== g7SectionSeq.charAt(seen)) return false;
+    seen++;
+  }
+  return seen === g7SectionSeq.length;
+}
+
+/**
+ * 1-based lines exempt in `file`, or null when none. Fail-closed: an UNCLOSED fence
+ * exempts nothing (G7-f already FAILs that shape), a CLOSED fence without the five
+ * ordered sections exempts nothing, and a same-shaped fence outside the G7 target set
+ * exempts nothing. Interval = [start, end): the closing fence line itself is plain
+ * ``` and carries no CJK character.
+ */
+function sixstageExemptSet(file, L) {
+  if (!g7Targets({ changedPaths: [file] }).length) return null;
+  let set = null;
+  for (const b of g7SixstageBlocks(L)) {
+    if (!b.closed) continue;
+    if (!sixstageStructurallyValid(b.body)) continue;
+    if (!set) set = new Set();
+    for (let i = b.start; i < b.end; i++) set.add(i + 1);
+  }
+  return set;
 }
 
 /** The base revision the corpus is read from (unchanged pre-change scan ref). */
@@ -331,7 +384,26 @@ function run(ctx, out) {
   }
 
   let newC = new Set();
+  let exempted = 0;
   for (const f of ctx.changedMarkdown()) {
+    const L = ctx.readLineArray(f);
+    const nums = typeof ctx.addedLineNumbers === 'function' ? ctx.addedLineNumbers(f) : null;
+    // Per-line path: the exempt fence body is dropped line by line, so a character that
+    // also appears OUTSIDE the fence is still judged (no whole-file pass-through).
+    if (L && nums) {
+      const exempt = sixstageExemptSet(f, L);
+      for (const n of [...nums].sort((a, b) => a - b)) {
+        const line = L[n - 1];
+        if (line === undefined) continue;
+        if (exempt && exempt.has(n)) {
+          exempted++;
+          continue;
+        }
+        for (const c of cjkChars(line)) newC.add(c);
+      }
+      continue;
+    }
+    // Fast path: no line-number/line-array view, so the exemption cannot be located.
     for (const l of ctx.addedLines(f)) {
       for (const c of cjkChars(l)) newC.add(c);
     }
@@ -349,7 +421,8 @@ function run(ctx, out) {
       white.size +
       ' whitelist-source=' +
       whitelist.source +
-      ')'
+      ')' +
+      (exempted > 0 ? ' fence-exempt ' + exempted : '')
   );
 }
 

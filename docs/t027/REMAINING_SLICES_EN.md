@@ -2493,6 +2493,31 @@ Completion record (2026-11-26): R = 3, D = 1, zero probes; `--selftest` drops fr
 | Start condition | Named by the user on 2026-11-26; four elements on record; v76 snapshot closed |
 
 Completion record (2026-11-26): R = 4, D = 0, zero probes; channel = option b of three (a scope exemption on G6-4 for a CLOSED `sixstage` fence body whose five sections are in order), zero change to the decision logic (the four patterns / line scan / whitelist split / `emit` are untouched); single-source reuse of the G7 fence parser and report target set; `SELFTEST` 744 -> 757 (T133-T143 added) with every one of the 744 existing assertion lines byte-identical; the directive moves to v1.76 (header line / §0.3 row / appendix C.0bc, six shapes equal); (9) three scopes `TOTAL_FAIL=0` plus `gofmt` / `build` / `vet` / `test` all green; reviews: (5) one round `PASS WITH FIXES` (1 Low), (6) three rounds (last `INDEPENDENT SCAN: PASS`), (7) 1+2 (final PASS, both re-reviews closed and the last one `no Medium+`); report pair `docs/validation/g6-4-transcript-exempt{,_EN}.md`, evidence pack `docs/validation/evidence/P93-DIRECTIVE-G6-4-TRANSCRIPT-EXEMPT/`.
+
+### P94 — `GATES-EXEMPT` (merged governance of criterion exemptions and the whitelist threshold · governance slice) · ✅ Closed
+
+| Field | Content |
+|---|---|
+| Identifier | `GATES-EXEMPT` (ledger id = **P94**; source = the tier-3 slot since v28 and the P33 ①-3(iv) split + the P93 handover a / c + the v77 snapshot §4 / §6 + the user naming it on 2026-11-26) |
+| Status | ✅ Closed (2026-11-26; the four elements are in `docs/validation/evidence/P94-GATES-EXEMPT/00-briefing.md`; report pair `docs/validation/gates-exempt{,_EN}.md`) |
+| Goal | (1) merge-evaluate three items: generalising the exemption mechanism of the `GATES-EXEMPT` body itself (tracing the original P33 ①-3(iv) intent to fix its boundary), the P93 handover (a) generic citation-exemption registry slot (including the registry file self-reference and the T23 wording), the P93 handover (c) whitelist registration threshold and assertion policy; (2) land whatever is proven (the channel is fixed by (1) and endorsed by (7)); (3) keep the existing criterion inputs' regressions byte-identical |
+| Dependency | v77 snapshot closed; P93 closed (handover source); no other prerequisite |
+| Size | M |
+| Steps | 0 → (1) impact ruling → (2) implementation → (3) consistency → (4) gates → (5) → (6) → (7) → (8a) → (9) → (8b) → (8c) → (10) |
+| Gap | `GATES-EXEMPT` has no §12.4 row (tier-3 slot only); the whitelist registration threshold is undefined (P92 / P93 both hit "a registration means 743/744"); the transcript-normalisation registry slot is missing (the P93 channel b covers `sixstage` fences only) |
+| Deliverables | (1) the merged evaluation verdict for the three items (each: do / do not / rationale); (2) the approved items on disk (clause + criterion / assertion implementation + whitelist policy, three places consistent); (3) the version package (MINOR v1.77 expected, decided by (1)); (4) the report pair `docs/validation/gates-exempt{,_EN}.md`; (5) the ledger section and completion record; (6) the evidence pack |
+| Acceptance evidence | (1) existing inputs' regressions are byte-identical (`SELFTEST` all PASS; any count change must follow the (1) design and be recorded in the ledger); (2) all three scopes report `TOTAL_FAIL=0`; (3) the new exemption / registration shape self-test passes; (4) the report pair mirrors strictly |
+| Boundary | Zero change to the criteria decision logic (only exemption channels / registry slots / threshold clauses are added); no change to the G5-b closed set or the model allow-list; no change to `ci.yml` / `internal/**` / CONTRACTS / schema / fixtures / workflows; no new ADR (no identity admission); no gitee |
+| Class | `[SLICE]` |
+| Probe quota | 0 |
+| Freedom list path | `docs/validation/evidence/P94-GATES-EXEMPT/freedom-list.md` |
+| R/D baseline | R = 0, D = 0 (registered at start-up) |
+| Temp files | `tmp/P94-GATES-EXEMPT/` (append-only until (8c)) |
+| Quota disclosure | (7) = 1+2 (user ruling a); tier = `GPT-5.3-Codex` regular; no blind review; batch helper GLM ≥2 (user ruling e); (6) mandatory (touches a criterion implementation) |
+| Start condition | Named by the user on 2026-11-26; four elements on record; v77 snapshot closed |
+
+Completion record (2026-11-26): R = 6, D = 0, zero probes; the three merged verdicts = (a) do the isomorphic extension (the `sixstage` fence-body scope exemption moves from G6-4 to G2 and G4b, **not** the `gate-exempt` marker mechanism), (b) do **not** build the generic citation-exemption registry slot, (c) do add the whitelist registration threshold clauses (the file stays empty, T23 byte-identical); zero change to the criteria decision logic, the exempt lines are dropped by line number before scanning; `SELFTEST` 757 -> 770 (T144-T156); the directive moves to v1.77 (header / §0.3 / two §6.3 clauses plus the threshold paragraph / appendix C.0bd, six shapes equal); (9) three scopes `TOTAL_FAIL=0` plus `gofmt` / `build` / `vet` / `test` all green; reviews: (5) one round `PASS WITH FIXES` (GLM-5.3 fallback, reduced independence recorded), (6) one round `INDEPENDENT SCAN: PASS`, (7) 1+2 (two Lows at the final review -> two Lows at re-review r2 -> `RE-REVIEW: PASS` at r3); report pair `docs/validation/gates-exempt{,_EN}.md`, evidence pack `docs/validation/evidence/P94-GATES-EXEMPT/`.
+
 ## Known defects (to be handled before later slices)
 
 > **Blocking rule unchanged**: only high-frequency / reproduced defects block; observation-grade flakes are recorded and listed in the validation report.

@@ -7669,6 +7669,236 @@ async function runTests() {
     );
   }
 
+  // ---- T144-T156: the same `sixstage` scope exemption extended to G2 and G4b (v1.77, P94).
+  // P93 exempted the verbatim transcript from G6-4 only; section 11.3 forbids the
+  // controller from rewriting the fence body, so a placeholder string or an off-corpus
+  // character quoted inside it cannot be judged either. Every face below is falsifiable:
+  // dropping the info string, the closing fence, the report path, the section order, or
+  // the filter itself must turn the matching probe red.
+  {
+    const G2_SOURCE = path.join(__dirname, 'lib', 'criteria', 'g2.js');
+    const P94_REPORT = 'docs/validation/probe-p94.md';
+    const P94_FOREIGN = 'docs/t027/probe-p94.md';
+    const FENCE = '`'.repeat(3);
+    /** One compliant body: five ordered sections plus both probe payloads (a G2
+     *  placeholder string, a G4b off-corpus character, a G6-4 count literal). */
+    const P94_BODY = [
+      '## Section A',
+      '尚未提交',
+      '共 128 个文件',
+      '乙',
+      '## Section B',
+      '-',
+      '## Section C',
+      '-',
+      '## Section D',
+      '-',
+      '## Section E',
+      '-',
+    ];
+    /** `# h` + blank + before + open fence + body + close fence + after. */
+    const p94Doc = (o) => {
+      const text = ['# probe report', ''].concat(o.before || [], [FENCE + (o.info === undefined ? 'sixstage' : o.info)]).concat(o.body);
+      if (o.closed !== false) text.push(FENCE);
+      return text.concat(o.after || []).join('\n');
+    };
+    /** Synthetic tree context: every line of the probe file is an ADDED line. */
+    const p94Ctx = (text, p) => {
+      const lines = String(text).split('\n');
+      const nums = new Set(lines.map((_, i) => i + 1));
+      const rec = { path: p, status: 'A', untracked: true, deleted: false };
+      return {
+        repoRoot: selftestRepoRoot(),
+        kind: 'tree',
+        scope: { kind: 'tree' },
+        baseRef: null,
+        changed: [rec],
+        changedPaths: [p],
+        recordFor: () => rec,
+        changedMarkdown: () => [p],
+        readLineArray: (q) => (q === p ? lines : null),
+        addedLineNumbers: () => nums,
+        addedLines: () => lines,
+        // The base corpus holds exactly 甲 and 丙, so 乙 is the off-corpus probe char.
+        listAllMarkdown: () => ['docs/t027/p94-corpus.md'],
+        showAt: () => '甲丙',
+        loadWhitelist: () => ({ entries: [], error: null, source: 'probe' }),
+        git: () => ({ ok: false, code: 127, out: '', err: '', spawnError: null }),
+      };
+    };
+    /** G2's detail is `<JSON hits>|none` + optional INFO + optional fence-exempt suffix. */
+    const p94Hits = (detail) => {
+      const head = String(detail).split('  [INFO')[0].split('  fence-exempt')[0].trim();
+      if (head === 'none' || head === '') return [];
+      try {
+        const v = JSON.parse(head);
+        return Array.isArray(v) ? v : [];
+      } catch (e) {
+        return [];
+      }
+    };
+    const p94Record = (out, id) => out.records.find((r) => r.id === id) || { verdict: 'ABSENT', detail: '' };
+    const p94G2 = (text, p, mod) => {
+      const out = createReport();
+      (mod || G2).run(p94Ctx(text, p || P94_REPORT), out);
+      const rec = p94Record(out, 'G2');
+      return { verdict: rec.verdict, detail: String(rec.detail), hits: p94Hits(rec.detail) };
+    };
+    const p94G4b = (text, p, mod) => {
+      const out = createReport();
+      (mod || G4B).run(p94Ctx(text, p || P94_REPORT), out);
+      const rec = p94Record(out, 'G4b');
+      return { verdict: rec.verdict, detail: String(rec.detail) };
+    };
+    const p94G64 = (text, p, mod) => {
+      const sub = (mod || G6).subchecks.find((s) => s.id === 'G6-4');
+      const out = createReport();
+      const res = sub.run(p94Ctx(text, p || P94_REPORT), out);
+      const rec = p94Record(out, 'G6-4');
+      return { verdict: rec.verdict, findings: res && res.findings ? res.findings.length : 0, detail: String(rec.detail) };
+    };
+    const OK_DOC = p94Doc({ body: P94_BODY });
+    const OPEN_DOC = p94Doc({ body: P94_BODY, closed: false });
+
+    // T144 positive: a compliant fence body is exempt from G2 (PASS) and the exemption is
+    // VISIBLE in the detail - a silent skip would be unverifiable.
+    const t144 = p94G2(OK_DOC);
+    check(
+      'T144 G2 scope: a placeholder string inside a CLOSED sixstage fence of a report is exempt (PASS + fence-exempt reported)',
+      t144.verdict === 'PASS' && t144.hits.length === 0 && /fence-exempt 13/.test(t144.detail),
+      'verdict=' + t144.verdict + ' hits=' + JSON.stringify(t144.hits) + ' :: ' + t144.detail
+    );
+
+    // T145 negative: drop the info string and the SAME body is judged again.
+    const t145 = p94G2(p94Doc({ info: '', body: P94_BODY }));
+    check(
+      'T145 G2 scope: the same body under a plain ``` fence is NOT exempt (FAIL, the hit names the placeholder line)',
+      t145.verdict === 'FAIL' && t145.hits.length === 1 && /probe-p94\.md:5$/.test(t145.hits[0]),
+      'verdict=' + t145.verdict + ' hits=' + JSON.stringify(t145.hits)
+    );
+
+    // T146 boundary: the exempt region is exactly [open, close) - neighbours still judged.
+    const t146 = p94G2(p94Doc({ before: ['尚未提交'], body: P94_BODY, after: ['尚未提交'] }));
+    check(
+      'T146 G2 scope boundary: placeholders immediately BEFORE the opener and AFTER the closer are judged (exactly two hits)',
+      t146.verdict === 'FAIL' && t146.hits.length === 2,
+      'verdict=' + t146.verdict + ' hits=' + JSON.stringify(t146.hits)
+    );
+
+    // T147 scope limit: the same fence outside the G7 target set has no G7-f coverage.
+    const t147 = p94G2(OK_DOC, P94_FOREIGN);
+    check(
+      'T147 G2 scope limit: the same sixstage fence under docs/t027/ is NOT exempt (FAIL)',
+      t147.verdict === 'FAIL' && t147.hits.length === 1,
+      'verdict=' + t147.verdict + ' hits=' + JSON.stringify(t147.hits)
+    );
+
+    // T148 fail-closed: closed is not enough - the five sections must be present IN ORDER.
+    const t148 = p94G2(
+      p94Doc({
+        body: ['## Section B', '-', '## Section A', '尚未提交', '## Section C', '-', '## Section D', '-', '## Section E', '-'],
+      })
+    );
+    check(
+      'T148 G2 scope: a CLOSED fence with OUT-OF-ORDER / missing sections is not exempt (FAIL)',
+      t148.verdict === 'FAIL' && t148.hits.length === 1,
+      'verdict=' + t148.verdict + ' hits=' + JSON.stringify(t148.hits)
+    );
+
+    // T149 positive for G4b: the off-corpus character 乙 sits inside the exempt body.
+    const t149 = p94G4b(OK_DOC);
+    check(
+      'T149 G4b scope: an off-corpus character inside a CLOSED sixstage fence of a report is exempt (PASS + fence-exempt reported)',
+      t149.verdict === 'PASS' && /unknown=\[\]/.test(t149.detail) && /fence-exempt 13$/.test(t149.detail),
+      'verdict=' + t149.verdict + ' :: ' + t149.detail
+    );
+
+    // T150 fail-closed: an UNCLOSED fence exempts nothing.
+    const t150 = p94G4b(OPEN_DOC);
+    check(
+      'T150 G4b scope: an UNCLOSED sixstage fence exempts nothing (the off-corpus character still FAILs)',
+      t150.verdict === 'FAIL' && /乙/.test(t150.detail),
+      'verdict=' + t150.verdict + ' :: ' + t150.detail
+    );
+
+    // T151 scope limit for G4b.
+    const t151 = p94G4b(OK_DOC, P94_FOREIGN);
+    check(
+      'T151 G4b scope limit: the same sixstage fence under docs/t027/ is NOT exempt (FAIL)',
+      t151.verdict === 'FAIL' && /乙/.test(t151.detail),
+      'verdict=' + t151.verdict + ' :: ' + t151.detail
+    );
+
+    // T152 character granularity: the filter is PER LINE - the same character appearing
+    // outside the fence is still judged, so this is not a whole-file pass-through.
+    const t152 = p94G4b(p94Doc({ body: P94_BODY, after: ['乙'] }));
+    check(
+      'T152 G4b scope granularity: the SAME character on another added line outside the fence still FAILs (per-line removal)',
+      t152.verdict === 'FAIL' && /unknown=\["乙"\]/.test(t152.detail),
+      'verdict=' + t152.verdict + ' :: ' + t152.detail
+    );
+
+    // T153 cross-consistency: G2 / G4b / G6-4 must agree on the same fixture - the three
+    // isomorphic predicates share one source (G7.internals), so a drift would show here.
+    const t153ok = [p94G2(OK_DOC).verdict, p94G4b(OK_DOC).verdict, p94G64(OK_DOC).verdict];
+    const t153bad = [p94G2(OPEN_DOC).verdict, p94G4b(OPEN_DOC).verdict, p94G64(OPEN_DOC).verdict];
+    check(
+      'T153 scope cross-consistency: on one fixture G2 / G4b / G6-4 exempt and reject together (all PASS, then all FAIL)',
+      t153ok.join(',') === 'PASS,PASS,PASS' && t153bad.join(',') === 'FAIL,FAIL,FAIL',
+      'exempt=' + t153ok.join(',') + ' unclosed=' + t153bad.join(',')
+    );
+
+    // T154 load-bearing mutation: disabling the exempt filter in EACH module must turn
+    // its own positive probe red (a filter that cannot be switched off is untested).
+    const m154a = loadMutatedModule(G2_SOURCE, '        if (exempt && exempt.has(i + 1)) {', '        if (false) {', 'p94-g2-exempt');
+    const t154a = p94G2(OK_DOC, null, m154a.exports);
+    const m154b = loadMutatedModule(G4B_SOURCE, '        if (exempt && exempt.has(n)) {', '        if (false) {', 'p94-g4b-exempt');
+    const t154b = p94G4b(OK_DOC, null, m154b.exports);
+    check(
+      'T154 scope mutation: disabling the exempt filter in g2.js / g4b.js turns T144 / T149 red (filter is load-bearing)',
+      m154a.applied === true && m154a.identical === true && t154a.verdict === 'FAIL' && !/fence-exempt/.test(t154a.detail) &&
+        m154b.applied === true && m154b.identical === true && t154b.verdict === 'FAIL' && !/fence-exempt/.test(t154b.detail),
+      'g2=' + t154a.verdict + '/' + m154a.applied + '/' + m154a.identical + ' g4b=' + t154b.verdict + '/' + m154b.applied + '/' + m154b.identical
+    );
+
+    // T155 whitelist header: the registration threshold is documented WITH its five
+    // clauses (a)-(e) - a bare heading would be a formal assertion only (P94 (7) Low).
+    const p94WlText = decodeBuffer(fs.readFileSync(path.join(__dirname, 'g6-whitelist.txt')));
+    const p94WlLines = p94WlText.split('\n');
+    const p94WlEntries = p94WlLines.filter((l) => l.trim() && l.trim()[0] !== '#');
+    const p94WlClauses = [
+      /same-turn user ruling/i,
+      /final-review endorsement/i,
+      /three fields/i,
+      /same commit/i,
+      /section 1/i,
+    ];
+    const p94WlMissing = p94WlClauses.filter((p) => !p.test(p94WlText)).map(String);
+    check(
+      'T155 whitelist policy: the header names the registration threshold, carries all five clauses (a)-(e), and the file still holds zero entries',
+      /registration threshold/i.test(p94WlText) && p94WlMissing.length === 0 && p94WlEntries.length === 0,
+      'threshold=' + /registration threshold/i.test(p94WlText) + ' missing=' + JSON.stringify(p94WlMissing) + ' entries=' + JSON.stringify(p94WlEntries)
+    );
+
+    // T156 counting caliber: `fence-exempt N` counts exempt ADDED lines only, so a
+    // pre-existing compliant fence plus one added line outside it (text identical to a
+    // fence line) must report the hit and NO exempt count (P94 (7) Low, text-vs-number).
+    const t156Text = p94Doc({ body: P94_BODY, after: ['尚未提交'] });
+    const t156Lines = t156Text.split('\n');
+    const t156Added = [t156Lines.length];
+    const t156Ctx = p94Ctx(t156Text, P94_REPORT);
+    t156Ctx.addedLineNumbers = () => new Set(t156Added);
+    t156Ctx.addedLines = () => t156Added.map((n) => t156Lines[n - 1]);
+    const t156Out = createReport();
+    G2.run(t156Ctx, t156Out);
+    const t156Rec = p94Record(t156Out, 'G2');
+    check(
+      'T156 counting caliber: a pre-existing exempt fence does not inflate fence-exempt N (the added line outside still hits)',
+      t156Rec.verdict === 'FAIL' && p94Hits(t156Rec.detail).length === 1 && !/fence-exempt/.test(String(t156Rec.detail)),
+      'verdict=' + t156Rec.verdict + ' hits=' + JSON.stringify(p94Hits(t156Rec.detail)) + ' detail=' + String(t156Rec.detail)
+    );
+  }
+
   // ---- F1: a stale mutation (no-op) must not silently weaken the suite.
   {
     const stale = MUTATION_LOG.filter((m) => !m.applied);

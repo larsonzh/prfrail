@@ -2506,6 +2506,31 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 起跑条件 | 用户 2026-11-26 点名；四要素留痕；v76 快照闭环 |
 
 完成记录（2026-11-26）：R = 4、D = 0、探针 0；通道 = 三选一之 b（G6-4 对已闭合且五段按序的 `sixstage` 围栏体作用域豁免），判定逻辑本体零改动（四条正则 / 逐行扫描 / 白名单 split / `emit` 未动）；单源复用 G7 的围栏解析器与报告目标集，`SELFTEST` 由 744 增至 757（新增 T133–T143），既有 744 条断言行逐字不变；准则升 v1.76（头部行 / §0.3 行 / 附录 C.0bc，六形状全等）；⑨ 三作用域 `TOTAL_FAIL=0` + `gofmt` / `build` / `vet` / `test` 全绿；审查 ⑤ 1 轮 `PASS WITH FIXES`（1 Low）、⑥ 3 轮（末轮 `INDEPENDENT SCAN: PASS`）、⑦ 1+2（终审 PASS、复审两轮闭合且末轮 `no Medium+`）；报告对 `docs/validation/g6-4-transcript-exempt{,_EN}.md`，证据包 `docs/validation/evidence/P93-DIRECTIVE-G6-4-TRANSCRIPT-EXEMPT/`。
+
+### P94 — `GATES-EXEMPT`（判据豁免与白名单门槛合并治理 · 治理片）· ✅ 闭环
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `GATES-EXEMPT`（台账编号 = **P94**；来源 = 层 3 挂起位（v28 起、P33 ①-3(iv) 拆片）+ P93 移交 a / c + v77 快照 §四 / §六 + 用户 2026-11-26 点名） |
+| 状态 | ✅ 闭环（2026-11-26 收口；四要素见 `docs/validation/evidence/P94-GATES-EXEMPT/00-briefing.md`；报告对 `docs/validation/gates-exempt{,_EN}.md`） |
+| 目标 | ① 合并评估三件：`GATES-EXEMPT` 本体的判据豁免机制泛化（追溯 P33 ①-3(iv) 原始意图定边界）、P93 移交 (a) 通用引用豁免登记位（含登记文件自指与 T23 口径）、P93 移交 (c) 白名单登记门槛与断言政策；② 论证通过的项落地（通道落点由 ① 判定 + ⑦ 背书）；③ 既有判据输入回归逐字不变 |
+| 依赖 | v77 快照闭环；P93 闭环（移交出处）；无其它前置 |
+| 规模 | M |
+| 步骤 | 0 → ① 影响判定 → ② 实现 → ③ 一致性 → ④ 门禁 → ⑤ → ⑥ → ⑦ → ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| 现状缺口 | `GATES-EXEMPT` 无 §12.4 条目（仅层 3 登记位）；白名单登记门槛未定义（P92 / P93 两次踩「登记即 743/744」）；转录归一登记位缺位（P93 通道 b 只覆盖 `sixstage` 围栏） |
+| 交付物 | ① 三件合并评估结论（逐项：做 / 不做 / 依据）；② 获批项落盘（准则条款 + 判据 / 断言实现 + 白名单口径三处一致）；③ 版本包（预计 MINOR v1.77，由 ① 判定）；④ 报告对 `docs/validation/gates-exempt{,_EN}.md`；⑤ 台账段与完成记录；⑥ 证据包 |
+| 验收证据 | ① 既有输入回归逐字不变（`SELFTEST` 全 PASS，总数若随断言政策变化须与 ① 方案书一致并台账记录）；② 三作用域 `TOTAL_FAIL=0`；③ 新豁免 / 登记形态自测通过；④ 报告对双语严格镜像 |
+| 边界 | 判据判定逻辑本体零改动（只增豁免通道 / 登记位 / 门槛条款）；不改 G5-b 闭集与模型白名单；不改 `ci.yml` / `internal/**` / CONTRACTS / schema / fixtures / workflows；ADR 不新增（不触身份准入）；不做 gitee |
+| 分级 | `[SLICE]` |
+| 探针额度 | 0 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/P94-GATES-EXEMPT/freedom-list.md` |
+| R/D 基线 | R = 0、D = 0（起跑时登记） |
+| 临时件落点声明 | `tmp/P94-GATES-EXEMPT/`（⑧c 前只增不删） |
+| 额度口径披露 | ⑦ = 1+2（用户裁定 a）；档位 = `GPT-5.3-Codex` 常规档；盲审不抽；批量辅助 GLM ≥2（用户裁定 e）；⑥ 必做（触判据实现） |
+| 起跑条件 | 用户 2026-11-26 点名；四要素留痕；v77 快照闭环 |
+
+完成记录（2026-11-26）：R = 6、D = 0、探针 0；三件合并评估 = (a) 做同构扩展（`sixstage` 围栏体作用域豁免由 G6-4 扩到 G2 与 G4b，**不做** `gate-exempt` 标记机制）、(b) **不做**通用引用豁免登记位、(c) **做**白名单登记门槛条款（条目仍为零、T23 逐字不动）；判据判定逻辑本体零改动，豁免在扫描前按行号剔除；`SELFTEST` 757 → 770（T144–T156）；准则升 v1.77（头部 / §0.3 / §6.3 两处子句与门槛段 / 附录 C.0bd，六形状全等）；⑨ 三作用域 `TOTAL_FAIL=0` + `gofmt` / `build` / `vet` / `test` 全绿；审查 ⑤ 1 轮 `PASS WITH FIXES`（GLM-5.3 备用档，独立性降低已登记）、⑥ 1 轮 `INDEPENDENT SCAN: PASS`、⑦ 1+2（终审两 Low → 复审 r2 两 Low → r3 `RE-REVIEW: PASS`）；报告对 `docs/validation/gates-exempt{,_EN}.md`，证据包 `docs/validation/evidence/P94-GATES-EXEMPT/`。
+
 ## 已知缺陷（后续切片前处理）
 
 > **阻断口径不变**：仅高频/已复现缺陷阻断，观测级 flake 只记录并在验证报告中列示。
