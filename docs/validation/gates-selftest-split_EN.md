@@ -119,7 +119,7 @@ INDEPENDENT SCAN: PASS
 
 ## 9 Commit and CI
 
-- The main commit and the CI readings are backfilled after (8b); this slice stops at (10) pending same-turn authorisation.
+- Main commit `785115f` pushed to `origin/main` (**no gitee**); CI run `45726904763` both legs success / success (windows `Gates` success (33 s); ubuntu `Gates` success (4 s)), both with `SELFTEST` 744/744 and `TOTAL_FAIL=0`.
 - Rework count R = 3: (1) registering 6 entries in `g6-whitelist.txt` turned the T23 assertion red (`SELFTEST` 743/744) and was reverted; (2) one round trip between fence normalisation and verbatim restoration; (3) two refills of the §5 readings (216 -> 435 -> 466, all stale values from a smaller change set). D = 1: the one-off whitelist registration was reverted, recorded under the self-healing tier.
 - §9.2 high-risk handling: this slice did not stop at every round as the P85 precedent suggests; it ran continuously and summarised at (10). That deviation is recorded here for the user to rule on.
 - (7) round 3 (narrow) `RE-REVIEW: FINDINGS`: one Medium = the §5 G4b reading was stale (now corrected to 435 for tree/index and 494 for ci from the final captures); with that corrected the **(7) quota (1+2) is exhausted**, so the slice stops per §7.8.3 and asks for a same-turn narrow confirmation read, whose verdict line is backfilled then.
@@ -156,45 +156,7 @@ docs/validation/evidence/P92-GATES-SELFTEST-SPLIT/freedom-list.md	repo
 docs/validation/evidence/P92-GATES-SELFTEST-SPLIT/input-list.md	repo
 docs/validation/gates-selftest-split.md	repo
 docs/validation/gates-selftest-split_EN.md	repo
-tmp/P92-GATES-SELFTEST-SPLIT/ab/B1.txt	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/ab/B2.txt	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/ab/gate-tree.txt	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/ab/mkverify.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/ab/verify.json	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/capture.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/final-check.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/final-selftest.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/ledger.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/norm.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/normalize-pack.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/pack.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/patch-g4b-466.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/patch-g4b-row.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/patch-rd.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/patch-sec6.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/patch-sec7.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/patch-sec9.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/probe-memo.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/profile-memo-run.txt	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/profile-memo.txt	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/profile-run.txt	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/profile-run1-nospawnbreakdown.txt	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/profile-run2.txt	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/profile.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/profile.txt	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/review/impl.diff	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/review/numstat.txt	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/selftest-stdout-memo.txt	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/selftest-stdout-run1.txt	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/selftest-stdout.txt	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/verbatim-check.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/verify-index.txt	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/verify-md.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/verify-tree.txt	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/verify-tree2.txt	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/version-pack.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/whitelist.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/write-report.js	local-only
 tools/gates/selftest.js	repo
+（原 `tmp/P92-GATES-SELFTEST-SPLIT/` 过程件，⑧c 收尾已清理；其清单随收尾改写为这一条声明）	local-only
 ```
 

@@ -119,7 +119,7 @@ INDEPENDENT SCAN: PASS
 
 ## 9 提交与 CI
 
-- 主提交与 CI 读数于 ⑧b 之后回填（本片停于 ⑩ 等同轮授权）。
+- 主提交 `785115f` 已推 `origin/main`（**未推 gitee**）；CI run `45726904763` 双腿 success / success（windows `Gates` success (33 s)；ubuntu `Gates` success (4 s)），两腿均 `SELFTEST` 744/744、`TOTAL_FAIL=0`。
 - 返工计数 R = 3：① `g6-whitelist.txt` 登记 6 条触发 T23 断言红（`SELFTEST` 743/744）⇒ 回退；② 围栏归一与逐字恢复往返一轮；③ §5 读数两次重填（216 → 435 → 466，均为变更集扩大的旧值）。D = 1：白名单一次性登记后回退，按自愈档如实登记。
 - §9.2 高风险处置：本片未按 P85 先例逐轮停点，改为连续执行后在 ⑩ 汇总；该偏离如实登记，交由用户裁定。
 - ⑦ 第 3 轮（收窄）`RE-REVIEW: FINDINGS`：1 条 Medium = 本报告 §5 的 G4b 读数陈旧（已按最终捕获件改为 tree/index 的 435 与 ci 的 494）；更正后 **⑦ 额度（1+2）已用尽**，按 §7.8.3 停下，等同轮授权后再做一次收窄确认读，届时回填结论行。
@@ -156,45 +156,7 @@ docs/validation/evidence/P92-GATES-SELFTEST-SPLIT/freedom-list.md	repo
 docs/validation/evidence/P92-GATES-SELFTEST-SPLIT/input-list.md	repo
 docs/validation/gates-selftest-split.md	repo
 docs/validation/gates-selftest-split_EN.md	repo
-tmp/P92-GATES-SELFTEST-SPLIT/ab/B1.txt	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/ab/B2.txt	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/ab/gate-tree.txt	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/ab/mkverify.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/ab/verify.json	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/capture.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/final-check.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/final-selftest.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/ledger.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/norm.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/normalize-pack.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/pack.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/patch-g4b-466.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/patch-g4b-row.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/patch-rd.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/patch-sec6.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/patch-sec7.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/patch-sec9.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/probe-memo.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/profile-memo-run.txt	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/profile-memo.txt	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/profile-run.txt	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/profile-run1-nospawnbreakdown.txt	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/profile-run2.txt	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/profile.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/profile.txt	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/review/impl.diff	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/review/numstat.txt	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/selftest-stdout-memo.txt	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/selftest-stdout-run1.txt	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/selftest-stdout.txt	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/verbatim-check.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/verify-index.txt	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/verify-md.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/verify-tree.txt	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/verify-tree2.txt	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/version-pack.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/whitelist.js	local-only
-tmp/P92-GATES-SELFTEST-SPLIT/write-report.js	local-only
 tools/gates/selftest.js	repo
+（原 `tmp/P92-GATES-SELFTEST-SPLIT/` 过程件，⑧c 收尾已清理；其清单随收尾改写为这一条声明）	local-only
 ```
 
