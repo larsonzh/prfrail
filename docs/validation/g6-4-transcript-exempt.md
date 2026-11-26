@@ -124,7 +124,10 @@ INDEPENDENT SCAN: PASS
 
 ## 16. 提交与 CI
 
-- 本节由 CI 双绿后的 docs-only 提交补入（§11.2）；本片停于 ⑩，处于本轮授权范围内。
+- 主提交：`23afa2d`（16 个路径）；推送 `origin/main` 范围 `fba4129..23afa2d`（未推 gitee）。
+- CI：run `45782329377`（head `23afa2d`）双腿 success（`Go ubuntu-latest` / `Go windows-latest`；其余 3 个候选作业常态 skipped）。
+- 更正轮：`04f2c0d`（4 个路径，R/D 与复审记录如实更正）；其 run `45783674680` 按 §11.2 仅作观察记录。
+- 本节由 CI 双绿后的 docs-only 提交补入（§11.2）。
 
 ```artifacts
 docs/DELIVERY_DIRECTIVE.md	repo

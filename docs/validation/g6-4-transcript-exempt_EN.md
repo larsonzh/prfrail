@@ -124,7 +124,10 @@ This report uses A-1 to A-3, each defined in §3; no dangling reference.
 
 ## 16. Commit and CI
 
-- This section is filled by a docs-only commit after CI is green (§11.2); the slice stops at (10) and stays within this turn s authorisation.
+- Main commit: `23afa2d` (16 paths); pushed `origin/main` range `fba4129..23afa2d` (no gitee push).
+- CI: run `45782329377` (head `23afa2d`) is green on both legs (`Go ubuntu-latest` / `Go windows-latest`; the other 3 candidate jobs are skipped as usual).
+- Correction round: `04f2c0d` (4 paths, the R/D count and the re-review record corrected truthfully); its run `45783674680` is an observation record only per §11.2.
+- This section is filled by a docs-only commit after CI is green (§11.2).
 
 ```artifacts
 docs/DELIVERY_DIRECTIVE.md	repo
