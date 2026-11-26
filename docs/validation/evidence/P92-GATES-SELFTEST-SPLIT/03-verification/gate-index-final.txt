@@ -1,0 +1,127 @@
+GATE REPORT scope=index repo=D:\LZProjects\prfrail changed=30
+PASS  G1-a table structure :: no `||` on added rows
+PASS  G1-b version metadata :: docs/DELIVERY_DIRECTIVE.md header=v1.75 last=v1.75 2026-11-26/2026-11-26 rows=76 OK | docs/DELIVERY_DIRECTIVE_EN.md header=v1.75 last=v1.75 2026-11-26/2026-11-26 rows=76 OK
+PASS  G1(c) status marker c :: closed set respected (458 cells)
+PASS  G1(d) status marker d :: heading and status table agree
+PASS  G1(e) status marker e :: completion rows imply completed (72 bound, 34 unbound)
+PASS  G1(e2) in-block completion rows imply completed :: 0 judged, 0 skipped, 66 historical (v1.64)
+INFO  G1(e-info) completion keys without a binding :: 34 completion row(s) have no heading to bind to (their slice heading was removed); G1(e) judges bound rows only
+PASS  G1(f) status marker f :: no in-progress wording in added completion rows
+PASS  G2 placeholder residue :: none
+PASS  G3(a) symmetry + mirror parity :: docs/DELIVERY_DIRECTIVE.md +16/-1 vs _EN +16/-1 OK || docs/t027/REMAINING_SLICES.md +23/-0 vs _EN +23/-0 OK || docs/validation/gates-selftest-split.md +200/-0 vs _EN +200/-0 OK ;; docs/DELIVERY_DIRECTIVE.md {"lines":true,"head":true,"bold":true,"bars":true,"blank":true,"backticks":true} ;; docs/t027/REMAINING_SLICES.md {"lines":false,"head":false,"bold":false,"bars":false,"blank":false,"backticks":false} ;; docs/validation/gates-selftest-split.md {"lines":true,"head":true,"bold":true,"bars":true,"blank":true,"backticks":true}
+PASS  G3(b) key-field alignment :: hash 0/0 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK | hash 0/0 OK | run 0/0 OK | glyph 2/2 OK | to-do 0/0 OK | not-reviewed 0/0 OK | hash 0/0 OK | run 0/0 OK | glyph 0/0 OK | to-do 0/0 OK | not-reviewed 0/0 OK
+PASS  G4a BOM+LF :: 30 file(s) OK (23 excluded: evidence tree)
+INFO  G4b-cache G4b cache :: hit a285417a1bb0 corpus=1472
+PASS  G4b CJK diff minus whitelist :: newCjk=479 unknown=[] (whitelist=65 whitelist-source=worktree)
+PASS  G5-a(1) no model key in prfrail-* :: 0 hits
+PASS  G5-a(2) no empty model :: 0 hits / 14 files
+PASS  G5-b closed-set model value :: checked 0 file(s)
+PASS  G5-c appendix-B call strings in the 2.2 qualified-name set :: call strings OK (2 file(s), scanned 0 changed carrier line(s))
+INFO  G5-d role-file frontmatter contract :: no changed `.github/agents/*.agent.md` in scope
+PASS  G5(d) staged is a subset of declared :: 30 path(s) declared (scope=index) ; addMode=explicit (derived label, not a command-history assertion)
+PASS  G5(e) evidence references resolve :: no added completion row (nothing to resolve)
+PASS  G5(e2) in-block completion-row evidence resolves :: no added in-block completion row (nothing to resolve)
+PASS  G5(f) index hygiene :: index equals worktree, no untracked path
+PASS  R2.5 header-note position :: distinct=1 uniform 14/14
+PASS  G6-1 status tense :: no pending/completion conflict on added lines (scanned 478) whitelist-source=worktree
+PASS  G6-2 cost clause :: no realized cost clause on added lines (scanned 478) whitelist-source=worktree
+PASS  G6-3 run-id format :: no malformed run id on added lines (scanned 478) whitelist-source=worktree
+PASS  G6-4 expiring literal :: no expiring literal on added lines (scanned 478) whitelist-source=worktree
+PASS  G6-5 section-reference resolution :: no unresolved section reference on added ledger/changelog lines (scanned 30, refs 6) whitelist-source=worktree
+PASS  G6-6 ledger status closed set :: every added ledger row opens with a closed-set status word (scanned 0) whitelist-source=worktree
+PASS  G6-7 declaration/ledger reconciliation :: every declared ID on an added section 0.3 line exists in the 12.4 / appendix-C ledger (scanned 2, declarations 1) whitelist-source=worktree
+PASS  G6-8 DR number uniqueness and membership :: registered DR set {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18}; no DR collision or dangling reference on added lines (scanned 446, refs 0) whitelist-source=worktree
+PASS  G7-a artifacts block present :: 2 report(s) OK
+PASS  G7-b artifact path/disposition resolvable :: 138 artifact row(s) OK (repo check: git ls-files --error-unmatch + worktree presence)
+PASS  G7-c finding row disposition cell :: 0 changed finding row(s) with disposition
+PASS  G7-d stopped state marked incomplete :: no stopped-state row missing the incomplete mark
+PASS  G7-e verdict line closed set :: every verdict line on added report lines is inside the 4.1 closed set (scanned 400)
+PASS  G7-f sixstage transcript contract :: 2 changed ```sixstage fence(s) complete (A→B→C→D→E, closed-set conclusion, SEVERITY consistency)
+PASS  G8-a evidence-tree path shape :: 23 path(s) OK
+PASS  G8-b pack self-consistency :: 1 pack(s) self-consistent
+PASS  G8-c encoding-normalization record :: 0 pack(s) checked (1 exempt: no `## 后缀与编码映射` section)
+PASS  G8-d rebuilt-archive note :: 23 changed file(s) OK
+PASS  G9 临时件与 tmp/ 引用 :: 30 path(s) OK (23 excluded) (whitelist=worktree)
+INFO  G9-e tmp/ reference (informational) :: docs/t027/REMAINING_SLICES.md:2480 tmp/P92-GATES-SELFTEST-SPLIT :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/t027/REMAINING_SLICES_EN.md:2467 tmp/P92-GATES-SELFTEST-SPLIT :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:159 tmp/P92-GATES-SELFTEST-SPLIT/ab/B1.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:160 tmp/P92-GATES-SELFTEST-SPLIT/ab/B2.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:161 tmp/P92-GATES-SELFTEST-SPLIT/ab/gate-tree.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:162 tmp/P92-GATES-SELFTEST-SPLIT/ab/mkverify.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:163 tmp/P92-GATES-SELFTEST-SPLIT/ab/verify.json :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:164 tmp/P92-GATES-SELFTEST-SPLIT/capture.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:165 tmp/P92-GATES-SELFTEST-SPLIT/final-check.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:166 tmp/P92-GATES-SELFTEST-SPLIT/final-selftest.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:167 tmp/P92-GATES-SELFTEST-SPLIT/ledger.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:168 tmp/P92-GATES-SELFTEST-SPLIT/norm.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:169 tmp/P92-GATES-SELFTEST-SPLIT/normalize-pack.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:170 tmp/P92-GATES-SELFTEST-SPLIT/pack.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:171 tmp/P92-GATES-SELFTEST-SPLIT/patch-g4b-466.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:172 tmp/P92-GATES-SELFTEST-SPLIT/patch-g4b-row.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:173 tmp/P92-GATES-SELFTEST-SPLIT/patch-rd.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:174 tmp/P92-GATES-SELFTEST-SPLIT/patch-sec6.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:175 tmp/P92-GATES-SELFTEST-SPLIT/patch-sec7.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:176 tmp/P92-GATES-SELFTEST-SPLIT/patch-sec9.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:177 tmp/P92-GATES-SELFTEST-SPLIT/probe-memo.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:178 tmp/P92-GATES-SELFTEST-SPLIT/profile-memo-run.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:179 tmp/P92-GATES-SELFTEST-SPLIT/profile-memo.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:180 tmp/P92-GATES-SELFTEST-SPLIT/profile-run.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:181 tmp/P92-GATES-SELFTEST-SPLIT/profile-run1-nospawnbreakdown.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:182 tmp/P92-GATES-SELFTEST-SPLIT/profile-run2.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:183 tmp/P92-GATES-SELFTEST-SPLIT/profile.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:184 tmp/P92-GATES-SELFTEST-SPLIT/profile.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:185 tmp/P92-GATES-SELFTEST-SPLIT/review/impl.diff :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:186 tmp/P92-GATES-SELFTEST-SPLIT/review/numstat.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:187 tmp/P92-GATES-SELFTEST-SPLIT/selftest-stdout-memo.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:188 tmp/P92-GATES-SELFTEST-SPLIT/selftest-stdout-run1.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:189 tmp/P92-GATES-SELFTEST-SPLIT/selftest-stdout.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:190 tmp/P92-GATES-SELFTEST-SPLIT/verbatim-check.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:191 tmp/P92-GATES-SELFTEST-SPLIT/verify-index.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:192 tmp/P92-GATES-SELFTEST-SPLIT/verify-md.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:193 tmp/P92-GATES-SELFTEST-SPLIT/verify-tree.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:194 tmp/P92-GATES-SELFTEST-SPLIT/verify-tree2.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:195 tmp/P92-GATES-SELFTEST-SPLIT/version-pack.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:196 tmp/P92-GATES-SELFTEST-SPLIT/whitelist.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split.md:197 tmp/P92-GATES-SELFTEST-SPLIT/write-report.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:159 tmp/P92-GATES-SELFTEST-SPLIT/ab/B1.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:160 tmp/P92-GATES-SELFTEST-SPLIT/ab/B2.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:161 tmp/P92-GATES-SELFTEST-SPLIT/ab/gate-tree.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:162 tmp/P92-GATES-SELFTEST-SPLIT/ab/mkverify.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:163 tmp/P92-GATES-SELFTEST-SPLIT/ab/verify.json :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:164 tmp/P92-GATES-SELFTEST-SPLIT/capture.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:165 tmp/P92-GATES-SELFTEST-SPLIT/final-check.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:166 tmp/P92-GATES-SELFTEST-SPLIT/final-selftest.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:167 tmp/P92-GATES-SELFTEST-SPLIT/ledger.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:168 tmp/P92-GATES-SELFTEST-SPLIT/norm.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:169 tmp/P92-GATES-SELFTEST-SPLIT/normalize-pack.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:170 tmp/P92-GATES-SELFTEST-SPLIT/pack.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:171 tmp/P92-GATES-SELFTEST-SPLIT/patch-g4b-466.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:172 tmp/P92-GATES-SELFTEST-SPLIT/patch-g4b-row.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:173 tmp/P92-GATES-SELFTEST-SPLIT/patch-rd.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:174 tmp/P92-GATES-SELFTEST-SPLIT/patch-sec6.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:175 tmp/P92-GATES-SELFTEST-SPLIT/patch-sec7.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:176 tmp/P92-GATES-SELFTEST-SPLIT/patch-sec9.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:177 tmp/P92-GATES-SELFTEST-SPLIT/probe-memo.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:178 tmp/P92-GATES-SELFTEST-SPLIT/profile-memo-run.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:179 tmp/P92-GATES-SELFTEST-SPLIT/profile-memo.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:180 tmp/P92-GATES-SELFTEST-SPLIT/profile-run.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:181 tmp/P92-GATES-SELFTEST-SPLIT/profile-run1-nospawnbreakdown.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:182 tmp/P92-GATES-SELFTEST-SPLIT/profile-run2.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:183 tmp/P92-GATES-SELFTEST-SPLIT/profile.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:184 tmp/P92-GATES-SELFTEST-SPLIT/profile.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:185 tmp/P92-GATES-SELFTEST-SPLIT/review/impl.diff :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:186 tmp/P92-GATES-SELFTEST-SPLIT/review/numstat.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:187 tmp/P92-GATES-SELFTEST-SPLIT/selftest-stdout-memo.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:188 tmp/P92-GATES-SELFTEST-SPLIT/selftest-stdout-run1.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:189 tmp/P92-GATES-SELFTEST-SPLIT/selftest-stdout.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:190 tmp/P92-GATES-SELFTEST-SPLIT/verbatim-check.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:191 tmp/P92-GATES-SELFTEST-SPLIT/verify-index.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:192 tmp/P92-GATES-SELFTEST-SPLIT/verify-md.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:193 tmp/P92-GATES-SELFTEST-SPLIT/verify-tree.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:194 tmp/P92-GATES-SELFTEST-SPLIT/verify-tree2.txt :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:195 tmp/P92-GATES-SELFTEST-SPLIT/version-pack.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:196 tmp/P92-GATES-SELFTEST-SPLIT/whitelist.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference (informational) :: docs/validation/gates-selftest-split_EN.md:197 tmp/P92-GATES-SELFTEST-SPLIT/write-report.js :: not staged in the index (git add the artifact first)
+INFO  G9-e tmp/ reference summary :: scanned 478 added line(s), 80 reference(s), 80 unresolvable
+TOTAL_FAIL=0
+EXIT=0

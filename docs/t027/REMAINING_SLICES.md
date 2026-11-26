@@ -2459,6 +2459,29 @@ A6 ② 进度（第 2 批，2026-09-15）：
 
 完成记录（2026-11-26）：R = 1（`create_file` 产出 `.md` 为无 BOM + CRLF，已统一归一）、D = 0、探针 0；准则 :675 句改为「再 `--all --skip-base --scope=ci`（base 由前序 Build/Vet/Test/Format 步覆盖，P90）」，`_EN` 逐字镜像，`ci.yml` 的 `Gates` 步 run 串与之逐字一致；版本包三件（头 v1.74 / §0.3 变更行 / 附录 C `C.0ba`）齐备，§12.4 登记 OB-145 并翻 `已处置`；③ 六形状全等（`2575 / 6187 / 4362 / 597 / 6944`）；⑨ 三作用域 `TOTAL_FAIL=0`、`--selftest` 744/744、基础门禁 `ok` 15 包 / 包级 `FAIL` 0；⑤ 1 轮 `PASS WITH FIXES`（3 Low + 1 注记，`verdict: no Medium+`）、⑥ 跳过（⑦ `SKIP CONFIRMED: YES`）、⑦ 1 轮 `PASS WITH FIXES`（1 Low，`verdict: no Medium+`，复审额度未用）；**未提交、未推送**（停于 ⑩，等同轮授权）；CI 双腿读数于推送后按 §11.2 回填。口径更正（2026-11-26）：报告对各行数 110（CN/EN 相等），证据包载荷 16 件（以 `MANIFEST.md` 条目为准）。主提交 `f963dd7` 已推 `origin/main`（未推 gitee），CI run `45688549781` 双腿 success（两腿 `SELFTEST` 744/744、`GATE REPORT scope=ci changed=24`、`TOTAL_FAIL=0`）。
 
+### P92 — `GATES-SELFTEST-SPLIT`（selftest 分区计时与夹具读记忆化 · 工具片）· ✅ 闭环
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `GATES-SELFTEST-SPLIT`（台账编号 = **P92**；来源 = v72 快照层 3 性能候选 + v75 快照 §四/§六 下一裁定项 + 用户 2026-11-26 点名） |
+| 状态 | ✅ 闭环（2026-11-26 收口；四要素见 `docs/validation/evidence/P92-GATES-SELFTEST-SPLIT/00-briefing.md`；报告对 `docs/validation/gates-selftest-split{,_EN}.md`） |
+| 目标 | ① `--selftest` 分区计时（按 suite 分区，落盘构成数据）；② 夹具读记忆化（重复磁盘读去重，判据结论逐字不变）；③ G4b 内环增量评估（仅当收益论证通过；动 sourceDigest 则须 `CACHE_VERSION` / key12 迁移协议先行）；④ 内建 `--timings` 评估（输出格式属协议面，① 判定触契约即移出）；⑤ 输出收益论证报告与对照证据 |
+| 依赖 | v75 快照闭环；P88 报告 §7 建议 1/3/5（出处）；无其它前置 |
+| 规模 | **M**（触 `tools/gates/selftest.js` 与 `tools/gates/lib/criteria/g4b.js` 的判据实现） |
+| 步骤 | 0 → ① 影响判定 + 收益论证闸 → ② 实现（按 ① 裁定范围）→ ③ 一致性 → ④ 门禁 → ⑤ → ⑥ → ⑦ → ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| 现状缺口 | selftest 无分区构成数据；夹具重复磁盘读未量化；G4b 内环「百毫秒级」未论证；内建 `--timings` 属协议面未裁 |
+| 交付物 | ① 收益论证报告（分区构成表 + 各候选收益/代价判定）；② 获批项实现（判据结论逐字不变）；③ A/B sha256 对照证据；④ 报告对 `docs/validation/gates-selftest-split{,_EN}.md`；⑤ 台账段与完成记录；⑥ 证据包；⑦ 大改建议清单（未获批项移交） |
+| 验收证据 | ① `SELFTEST` 744/744 不变；② 同输入 A/B 逐字一致（sha256 相同 + 比对器可证伪）；③ 三作用域 `TOTAL_FAIL=0`；④ 报告对双语严格镜像；⑤ 收益论证结论落盘 |
+| 边界 | 判据本体与判定逻辑零改动；不改 `ci.yml` / `internal/**` / CONTRACTS / schema / fixtures / workflows；G5-b 闭集与白名单不动；ADR 不新增（不触身份准入）；准则是否升 MINOR 由 ① 判定；不做 gitee |
+| 分级 | `[SLICE]` |
+| 探针额度 | 0 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/P92-GATES-SELFTEST-SPLIT/freedom-list.md` |
+| R/D 基线 | R = 0、D = 0（起跑时登记） |
+| 临时件落点声明 | `tmp/P92-GATES-SELFTEST-SPLIT/`（⑧c 前只增不删） |
+| 额度口径披露 | ⑦ = M 档 ⇒ §7.5「1+2」；档位 = `GPT-5.3-Codex (copilot)` 常规档；盲审不抽；批量辅助 GLM ≥2（用户裁定 e）；⑥ 必做（触判据实现） |
+| 起跑条件 | 用户 2026-11-26 点名；四要素留痕；v75 快照闭环 |
+
+完成记录（2026-11-26）：R = 3、D = 1、探针 0；`--selftest` 由 150.9 s 降到 70.1 s（2.15×），stdout 逐字节不变且 `SELFTEST` 744/744；判据本体与判定逻辑零改动（只把 23 处仓库根发现收敛为进程级惰性缓存）；报告对 `docs/validation/gates-selftest-split{,_EN}.md`，证据包 `docs/validation/evidence/P92-GATES-SELFTEST-SPLIT/`；准则升 v1.75（头部行 / §0.3 变更日志行 / 附录 C.0bb）；审查 ⑤ 1 轮、⑥ 3 轮（末轮 `INDEPENDENT SCAN: PASS`）、⑦ 1+2 轮 + 1 次收窄确认（末轮 `CONFIRM: FINDINGS`，A 处由用户裁定以机械事实更正闭合）；未按 P85 先例逐轮停点，已如实登记并由用户裁定接受。
 ## 已知缺陷（后续切片前处理）
 
 > **阻断口径不变**：仅高频/已复现缺陷阻断，观测级 flake 只记录并在验证报告中列示。

@@ -1,6 +1,6 @@
 ﻿# ProofRail 交付执行准则（DELIVERY_DIRECTIVE）
 
-版本：v1.74。日期：2026-11-26。状态：**CN 正文冻结**（ `_EN` 镜像见 `docs/DELIVERY_DIRECTIVE_EN.md`）。
+版本：v1.75。日期：2026-11-26。状态：**CN 正文冻结**（ `_EN` 镜像见 `docs/DELIVERY_DIRECTIVE_EN.md`）。
 
 > **多语言说明**：本文件为中文权威版；`docs/DELIVERY_DIRECTIVE_EN.md` 为严格同位镜像（与 CN 同步维护；CN 冻结后同步更新，避免评审期双语返工）。**语言标识**：`lang:zh`（G6-6 词表选取依据，见 §6.3）。
 > **编码**：本文及 `_EN` 必须保持 UTF-8 **with BOM** + **LF**。
@@ -119,6 +119,7 @@
 | v1.72 | 2026-11-24 | **切片 `P87 DIRECTIVE-REVIEW-MODEL-POLICY` 落地（治理片 `[SLICE]`，M 档；用户 2026-11-24 点名起跑，ADR-048）**：① §2.2 增三行 Gemini 终审角色（Neon 深度档交叉复核 / Carbon 大上下文文档档 / Hydrogen 轻量档）与 Sol 常规档性价比备选句，并把分档注记改指 §5.2 选型矩阵；② §5.2 的 ⑦ 三档分档表升级为四档选型矩阵（常规 / 深度 / 大上下文文档 / 轻量），新增判级门槛共识句、组合触发条款与适用域排除句；③ 新增 §5.4「② 加强轮触发与回退」（S1–S4 机械判据 + 灵敏度联动注记 + 可选前置声明 + 四步流程 + 留痕格式）；④ §7.5 单价表增三行并补上下文档位计价、备选额度与四读实测消耗三项注记；⑤ §8.2 档位映射增三行并扩写取档授权句；⑥ §6.3 的 G5-b 闭集增至 11 枚，`tools/gates` 的实现与自检夹具同步；⑦ 附录 C 增 C.0ay。**不改 ⑤⑥ 现役首选、深度档 Sol Max 首选地位与其判据行、§2.4 黑名单正文、G5-b 判据表述与比较规则；不动 CONTRACTS / schema / 契约夹具 / workflows、`internal/**` 产品代码与 CI。** | `P87 DIRECTIVE-REVIEW-MODEL-POLICY`（本片） |
 | v1.73 | 2026-11-25 | **切片 `P88 GATES-PERF-ASSESS` 落地（工具片 `[SLICE]`，S 档；用户 2026-11-25 点名起跑）**：① `tools/gates/lib/ctx.js` 新增批量 blob 预取（一次 `git cat-file --batch` 取回整份 `.md` 语料，`showAt` 由 per-context 缓存供给；任何异常整批丢弃并回退逐文件读）与原始读数 memo（`readBytes` / `exists` / `trackedAt` / `numstat`）；② 判据本体、`g4b.js` 的 `run` 体与 `CACHE_VERSION` 零改动，缓存键 `key12` 不变；③ 三作用域输出与 `SELFTEST` 744/744 逐字不变（同输入 A/B 字节相等）。**不新增判据、不改 §6.3 判据文本本体与判定逻辑、不改 G5-b 闭集与白名单、不改命令行面与报告格式；不动 CONTRACTS / schema / 契约夹具 / workflows、`internal/**` 与 CI workflow；不升 MAJOR。** | `P88 GATES-PERF-ASSESS`（本片） |
 | v1.74 | 2026-11-26 | **切片 `P91 DIRECTIVE-CI-INVOCATION-SYNC` 落地（治理片 `[SLICE]`，S 档；用户 2026-11-26 点名起跑）**：① §6.3「脚本化状态」句的 CI 调用描述同步 P90 实况——「再 `--all --scope=ci`」改为「再 `--all --skip-base --scope=ci`（base 由前序 Build/Vet/Test/Format 步覆盖，P90）」，与 `ci.yml` 的 `Gates` 步 run 串逐字一致；② §12.4 登记 **OB-145**（该句滞后于 P90 实况）并翻 `已处置`；③ 附录 C 增 C.0ba。**不改任何判据本体、不改 ci.yml、不改 tools/gates/**；不动 CONTRACTS / schema / 契约夹具 / workflows、`internal/**` 与 CI workflow。** | `P91 DIRECTIVE-CI-INVOCATION-SYNC`（本片） |
+| v1.75 | 2026-11-26 | **切片 `P92 GATES-SELFTEST-SPLIT` 落地（工具片 `[SLICE]`，M 档；用户 2026-11-26 点名起跑）**：① `--selftest` 分区计时由一次性探针落盘（子进程占 98.5% 墙钟）；② 收益论证闸四项逐项裁定，(b)/(d)/(e) 移出实现范围；③ 获批项 = `tools/gates/selftest.js` 把 23 处 `discoverRepoRoot(__dirname)` 收敛为进程级惰性缓存（实测 150.9 s → 70.1 s，stdout 逐字节不变）；④ 附录 C 增 C.0bb。**不改判据本体与判定逻辑、不改 `lib/**` / fixtures / `ci.yml` / CONTRACTS / schema、不改 G5-b 闭集与白名单、不新增 ADR。** | `P92 GATES-SELFTEST-SPLIT`（本片） |
 ---
 
 ## 1. 适用范围与切片模型
@@ -2505,6 +2506,20 @@ SLICE: READY_FOR_REVIEW | SLICE: BLOCKED
 | 版本 | v1.74（头部版本行与 §0.3 最新行一致，G1-b） |
 | 附注 | 本块只做指针；同步句正文以准则 §6.3 该句为准，本块不复述 |
 
+### C.0bb P92 GATES-SELFTEST-SPLIT（v1.75）
+
+> **仅为留痕，无正文效力**。
+
+| 项 | 内容 |
+|---|---|
+| 切片 / 规模 | `GATES-SELFTEST-SPLIT`（工具片 `[SLICE]`；M 档；探针 0；Windows 本机） |
+| 触发 | 台账 P92（源 = P88 报告 §7 建议 1/3/5 + v75 快照层 3 性能候选）；用户 2026-11-26 点名起跑（四要素：裁决人 = 用户；日期 = 2026-11-26；理由 = 门禁性能优化续片；依据 = 起跑消息 + v75 快照 §四/§六） |
+| 目标 | `--selftest` 分区计时（落盘构成数据）+ 收益论证闸 + 获批项实现（仓库根发现记忆化），判据结论逐字不变 |
+| 交付物 | 报告对 `docs/validation/gates-selftest-split{,_EN}.md`；台账 P92 段；证据包 `docs/validation/evidence/P92-GATES-SELFTEST-SPLIT/` |
+| 范围 | 只把 `tools/gates/selftest.js` 的常量纯函数改为进程级惰性缓存（23 处调用点）；判据本体与判定逻辑零改动；不改 `lib/**` / fixtures / `ci.yml` / CONTRACTS / schema / workflows / `internal/**`；G5-b 闭集与白名单不动；不新增 ADR |
+| 审查 | ⑤ 预审（V4 Pro 1+2）、⑥ 独立扫描（MAI Code 2 Flash ≤3，必做）、⑦ 终审 + 复审（M 档 1+2、Codex 常规档）；盲审不抽；读数以该片报告为准 |
+| 版本 | v1.75（头部版本行与 §0.3 最新行一致，G1-b） |
+| 附注 | 本块只做指针；实现与读数以该片报告与证据包为准，本块不复述 |
 ### C.1 v3.1 节号 → 本准则
 
 | v3.1 原节 | 内容 | 本准则位置 |

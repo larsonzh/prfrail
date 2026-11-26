@@ -67,6 +67,22 @@ function gateApi() {
   return require('./gate');
 }
 
+/**
+ * P92 GATES-SELFTEST-SPLIT: the repository root is a pure function of `__dirname`
+ * (every call site passes the same argument), so probing it once per process is
+ * equivalent to probing it 23 times - and it removes ~410 `git rev-parse
+ * --show-toplevel` child processes (~76 s of wall clock) from a suite run.
+ *
+ * Constraint: this suite never calls `process.chdir` and never relocates the work
+ * tree, so the memo cannot go stale inside one run. A future test that depends on a
+ * changed cwd MUST call `discoverRepoRoot` directly instead of this helper.
+ */
+let memoRepoRoot = null;
+function selftestRepoRoot() {
+  if (memoRepoRoot === null) memoRepoRoot = discoverRepoRoot(__dirname);
+  return memoRepoRoot;
+}
+
 const FIXTURES_DIR = path.join(__dirname, 'testdata', 'fixtures');
 const HISTORICAL_DIR = path.join(__dirname, 'testdata', 'historical');
 
@@ -310,7 +326,7 @@ function applyMutation(text, m) {
  */
 function makeCtx(keys, opts) {
   opts = opts || {};
-  const repoRoot = discoverRepoRoot(__dirname);
+  const repoRoot = selftestRepoRoot();
   if (!repoRoot) throw new Error('selftest needs a git work tree (fixture `repo` paths are resolved against it)');
   const texts = new Map();
   for (const key of keys) {
@@ -451,7 +467,7 @@ function g8Texts(key) {
 
 function injectedCtx(paths, texts, opts) {
   opts = opts || {};
-  const repoRoot = discoverRepoRoot(__dirname);
+  const repoRoot = selftestRepoRoot();
   const spawnGit = (root, args) => {
     const key = args.join(' ');
     if (/^status --porcelain=v1/.test(key)) {
@@ -497,7 +513,7 @@ function runKeysMods(keys, mods) {
  * rather than a fixture paraphrase.
  */
 function g8dRealProbe(relPath) {
-  const repoRoot = discoverRepoRoot(__dirname);
+  const repoRoot = selftestRepoRoot();
   const buf = fs.readFileSync(path.join(repoRoot, relPath.split('/').join(path.sep)));
   const ctx = {
     kind: 'tree',
@@ -523,7 +539,7 @@ function g8dRealProbe(relPath) {
 /** Run the real CLI in a child process and return its exit status + output. */
 function gateCli(args) {
   const r = cp.spawnSync(process.execPath, [path.join(__dirname, 'gate.js')].concat(args), {
-    cwd: discoverRepoRoot(__dirname),
+    cwd: selftestRepoRoot(),
     encoding: 'utf8',
     windowsHide: true,
   });
@@ -747,7 +763,7 @@ function g65Probe(text, virtualPath) {
   const ctx = {
     // `readText` is deliberately absent: the criterion's directive-label read then falls
     // back to the real repository file, which is what gives these probes real labels.
-    repoRoot: discoverRepoRoot(__dirname),
+    repoRoot: selftestRepoRoot(),
     changedMarkdown: () => [p],
     readLineArray: (q) => (q === p ? lines : null),
     addedLineNumbers: () => new Set(lines.map((_, i) => i + 1)),
@@ -762,7 +778,7 @@ function g65Probe(text, virtualPath) {
 function g66Probe(virtualPath, text, mod) {
   const lines = String(text).split('\n');
   const ctx = {
-    repoRoot: discoverRepoRoot(__dirname),
+    repoRoot: selftestRepoRoot(),
     changedMarkdown: () => [virtualPath],
     readLineArray: (q) => (q === virtualPath ? lines : null),
     addedLineNumbers: () => new Set(lines.map((_, i) => i + 1)),
@@ -783,7 +799,7 @@ function g67Probe(virtualPath, text, mod, opts) {
   const lines = String(text).split('\n');
   const added = opts.added || lines.map((_, i) => i + 1);
   const ctx = {
-    repoRoot: discoverRepoRoot(__dirname),
+    repoRoot: selftestRepoRoot(),
     changedMarkdown: () => [virtualPath],
     readLineArray: (q) => (q === virtualPath ? lines : null),
     addedLineNumbers: () => new Set(added),
@@ -819,7 +835,7 @@ function g68Probe(files, opts) {
     // `repoRoot` is overridable so a probe can make a file UNREADABLE on purpose: `readTextFor`
     // falls back to the disk, and a root that does not contain the path is the only way to
     // reach the dual-mint "other mirror unreadable" branch (v1.46 C-8).
-    repoRoot: opts.repoRoot || discoverRepoRoot(__dirname),
+    repoRoot: opts.repoRoot || selftestRepoRoot(),
     kind: 'tree',
     scope: { kind: 'tree' },
     changedMarkdown: () => changed.filter((p) => /\.md$/i.test(p) && !isEvidenceTree(p)),
@@ -870,7 +886,7 @@ function g1Probe(text, mod, added) {
   const M = mod || G1;
   const cn = M._internals.LEDGERS[0];
   const ctx = {
-    repoRoot: discoverRepoRoot(__dirname),
+    repoRoot: selftestRepoRoot(),
     readLineArray: (p) => (p === cn ? String(text).split('\n') : null),
     addedLineNumbers: added ? () => new Set(added) : undefined,
   };
@@ -901,7 +917,7 @@ function g5Probe(o, mod) {
   const M = mod || G5;
   const changed = o.changed || [];
   const ctx = {
-    repoRoot: discoverRepoRoot(__dirname),
+    repoRoot: selftestRepoRoot(),
     kind: o.kind || 'index',
     changedPaths: changed,
     readText: (p) => (o.texts && o.texts[p] !== undefined ? o.texts[p] : null),
@@ -1632,7 +1648,7 @@ async function runTests() {
 
   // ---- T15: G7-b `repo` disposition is scope-consistent (F2, F2 probe).
   {
-    const repoRoot = discoverRepoRoot(__dirname);
+    const repoRoot = selftestRepoRoot();
     const ignored = resolveRepoArtifact(repoRoot, 'tree', null, 'tmp/probe-artifact.txt');
     check(
       'T15 tree scope rejects a gitignored / never-staged path marked repo (F2 probe)',
@@ -2905,7 +2921,7 @@ async function runTests() {
     );
     const unreadable = (() => {
       const out = createReport();
-      G1.run({ repoRoot: discoverRepoRoot(__dirname), readLineArray: () => null }, out);
+      G1.run({ repoRoot: selftestRepoRoot(), readLineArray: () => null }, out);
       const r = out.records[0] || {};
       return r.verdict + ' :: ' + r.detail;
     })();
@@ -3487,7 +3503,7 @@ async function runTests() {
     ]) {
       let err = null;
       try {
-        createContext({ repoRoot: discoverRepoRoot(__dirname), scope: spec[1] });
+        createContext({ repoRoot: selftestRepoRoot(), scope: spec[1] });
       } catch (e) {
         err = e;
       }
@@ -3496,7 +3512,7 @@ async function runTests() {
         'err=' + (err ? err.message : 'NO ERROR (context built - fail-open)'));
     }
     const okCtx = createContext({
-      repoRoot: discoverRepoRoot(__dirname),
+      repoRoot: selftestRepoRoot(),
       scope: 'range:HEAD..HEAD',
     });
     check('T17 positive control: a resolvable range still builds a context',
@@ -3516,7 +3532,7 @@ async function runTests() {
       for (const r of rules) if (r.re.test(key)) return r.res();
       return okRes('');
     };
-    const repoRoot = discoverRepoRoot(__dirname);
+    const repoRoot = selftestRepoRoot();
     const probe = (rules, scope) => {
       try {
         return { ctx: createContext({ repoRoot, scope, spawnGit: fake(rules) }), err: null };
@@ -4098,7 +4114,7 @@ async function runTests() {
       mut.identical === true && g3aProbe(cnOk, enDrift).a2 === 'FAIL',
       'identical=' + mut.identical
     );
-    const root = discoverRepoRoot(__dirname);
+    const root = selftestRepoRoot();
     const real = g3aProbe(
       decodeBuffer(fs.readFileSync(path.join(root, 'docs', 'DELIVERY_DIRECTIVE.md'))),
       decodeBuffer(fs.readFileSync(path.join(root, 'docs', 'DELIVERY_DIRECTIVE_EN.md')))
@@ -4718,7 +4734,7 @@ async function runTests() {
     const badRangeSplit = cp.spawnSync(
       process.execPath,
       [path.join(__dirname, 'gate.js'), '--check=G8-a', '--scope=range:deadbeef^..HEAD'],
-      { cwd: discoverRepoRoot(__dirname), encoding: 'utf8', windowsHide: true }
+      { cwd: selftestRepoRoot(), encoding: 'utf8', windowsHide: true }
     );
     const brStderr = badRangeSplit.stderr || '';
     check(
@@ -4734,7 +4750,7 @@ async function runTests() {
         'min-repro: node tools/gates/gate.js --check=G8-a --scope=range:deadbeef^..HEAD'
       );
     }
-    const realRoot = discoverRepoRoot(__dirname);
+    const realRoot = selftestRepoRoot();
     if (!revAvailable(realRoot, '4284e94')) {
       info('T57 historical range reading SKIPPED (INFO): revision 4284e94 is unavailable in this clone');
     } else {
@@ -5477,7 +5493,7 @@ async function runTests() {
   // restore prove the resolver test is load-bearing.
   {
     const P = 'docs/t027/probe-g9e.md';
-    const repoRoot = discoverRepoRoot(__dirname);
+    const repoRoot = selftestRepoRoot();
     const treeResolve = (p) => resolveRepoArtifact(repoRoot, 'tree', null, p);
     const headResolve = (p) => resolveRepoArtifact(repoRoot, 'range', 'HEAD', p);
     const summaryOf = (probe) => {
@@ -6183,7 +6199,7 @@ async function runTests() {
       changed: [SLCN],
       // A root that cannot hold the other mirror: the disk fallback inside `readTextFor`
       // then answers null, which is exactly the "other mirror unreadable" premise.
-      repoRoot: path.join(discoverRepoRoot(__dirname), '__no_such_mirror_root__'),
+      repoRoot: path.join(selftestRepoRoot(), '__no_such_mirror_root__'),
     });
     check(
       'T100 G6-8 C-8: an unreadable other mirror skips the dual-mint face but the PASS detail carries `dual-mint: other mirror unreadable, face skipped`',
@@ -6953,7 +6969,7 @@ async function runTests() {
     };
     const enumCtx = (store) => {
       const ctx = createContext({
-        repoRoot: discoverRepoRoot(__dirname),
+        repoRoot: selftestRepoRoot(),
         scope: 'tree',
         spawnGit: (root, args) => enumGit(args),
       });
@@ -7041,7 +7057,7 @@ async function runTests() {
       return { ok: false, code: 127, out: '', err: '', spawnError: null };
     };
     const rangeCtx = createContext({
-      repoRoot: discoverRepoRoot(__dirname),
+      repoRoot: selftestRepoRoot(),
       scope: 'range:base1..head1',
       spawnGit: (root, args) => rangeGit(args),
     });
@@ -7076,7 +7092,7 @@ async function runTests() {
       return { ok: false, code: 127, out: '', err: '', spawnError: null };
     };
     const indexCtx = createContext({
-      repoRoot: discoverRepoRoot(__dirname),
+      repoRoot: selftestRepoRoot(),
       scope: 'index',
       spawnGit: (root, args) => indexGit(args),
     });

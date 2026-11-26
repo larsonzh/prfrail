@@ -1,6 +1,6 @@
 ﻿# ProofRail Delivery Execution Directive (DELIVERY_DIRECTIVE)
 
-Version: v1.74. Date: 2026-11-26. Status: **CN body frozen** ( `_EN` mirror in `docs/DELIVERY_DIRECTIVE_EN.md`).
+Version: v1.75. Date: 2026-11-26. Status: **CN body frozen** ( `_EN` mirror in `docs/DELIVERY_DIRECTIVE_EN.md`).
 
 > **Multilingual note**: this file is a strict positional mirror of the CN body, maintained in step with it (updated after CN is frozen, to avoid bilingual rework during review); `docs/DELIVERY_DIRECTIVE.md` is authoritative and wins on any conflict (see §11.1). **Language tag**: `lang:en` (the G6-6 word-table selection key, see §6.3).
 > **Encoding**: this document and its `_EN` mirror must stay UTF-8 **with BOM** + **LF**.
@@ -119,6 +119,7 @@ Version: v1.74. Date: 2026-11-26. Status: **CN body frozen** ( `_EN` mirror in `
 | v1.72 | 2026-11-24 | **Slice `P87 DIRECTIVE-REVIEW-MODEL-POLICY` lands (governance `[SLICE]`, tier M; named by the user for a 2026-11-24 start, ADR-048)**: (1) §2.2 gains three Gemini final-review rows (Neon deep-tier cross-check / Carbon large-context document tier / Hydrogen light tier) plus a Sol cost-effective regular-tier alternative sentence, and the tier note is re-pointed at the §5.2 selection matrix; (2) the ⑦ three-tier table of §5.2 is upgraded into a four-tier selection matrix (regular / deep / large-context document / light), with a new judging-threshold consensus sentence, a combination-trigger clause and an applicability-exclusion sentence; (3) a new §5.4 "(2) hardening-round trigger and fallback" (S1-S4 mechanical criteria plus the sensitivity linkage note plus an optional pre-declaration plus a four-step flow plus the record format); (4) the §7.5 price table gains three rows and three notes (context-window pricing, alternative-tier budget, four-read measured consumption); (5) the §8.2 effort mapping gains three rows and the effort-authorization sentence is extended; (6) the §6.3 G5-b closed set grows to 11 members and the `tools/gates` implementation and self-test fixtures follow; (7) Appendix C gains C.0ay. **No change to the current (5) / (6) first choice, the deep-tier Sol Max first-choice position or its criterion row, the §2.4 blacklist body, or the G5-b criterion wording and comparison rules; no change to CONTRACTS / schema / contract fixtures / workflows, `internal/**` product code or CI.** | `P87 DIRECTIVE-REVIEW-MODEL-POLICY` (this slice) |
 | v1.73 | 2026-11-25 | **Slice `P88 GATES-PERF-ASSESS` lands (tooling `[SLICE]`, tier S; named by the user for a 2026-11-25 start)**: (1) `tools/gates/lib/ctx.js` gains a batched blob prefetch (ONE `git cat-file --batch` for the whole `.md` corpus, with `showAt` served from a per-context cache; any anomaly discards the whole batch and falls back to the per-file read) plus raw-reading memos (`readBytes` / `exists` / `trackedAt` / `numstat`); (2) the criterion bodies, the `g4b.js` `run` body and `CACHE_VERSION` are untouched, so the cache key `key12` does not move; (3) the three-scope output and `SELFTEST` 744/744 stay byte-identical (same-input A/B byte equality). **No new criterion, no change to the §6.3 criterion text or decision logic, no change to the G5-b closed set or the whitelist, no change to the command-line surface or the report format; no change to CONTRACTS / schema / contract fixtures / workflows, `internal/**` or the CI workflow; no MAJOR bump.** | `P88 GATES-PERF-ASSESS` (this slice) |
 | v1.74 | 2026-11-26 | **Slice `P91 DIRECTIVE-CI-INVOCATION-SYNC` lands (governance `[SLICE]`, tier S; named by the user for a 2026-11-26 start)**: (1) the CI-invocation description in the §6.3 "scripting status" sentence is synced with the P90 reality - "then `--all --scope=ci`" becomes "then `--all --skip-base --scope=ci` (base is covered by the earlier Build/Vet/Test/Format steps, P90)", byte-consistent with the `Gates` step run string in `ci.yml`; (2) §12.4 registers **OB-145** (that sentence lagging the P90 reality) and flips it to `Resolved`; (3) appendix C gains C.0ba. **No change to any criterion body, no change to ci.yml or tools/gates/**; no change to CONTRACTS / schema / contract fixtures / workflows, `internal/**` or the CI workflow.** | `P91 DIRECTIVE-CI-INVOCATION-SYNC` (this slice) |
+| v1.75 | 2026-11-26 | **Slice `P92 GATES-SELFTEST-SPLIT` lands (tool `[SLICE]`, tier M; named by the user for a 2026-11-26 start)**: (1) the `--selftest` partition timing is landed as a one-off probe (child processes hold 98.5% of the wall clock); (2) the benefit gate rules each of the four candidates, with (b)/(d)/(e) moved out of the implementation scope; (3) the approved item collapses the 23 `discoverRepoRoot(__dirname)` call sites in `tools/gates/selftest.js` into one process-level lazy memo (measured 150.9 s -> 70.1 s, stdout byte-identical); (4) appendix C gains C.0bb. **No change to the criterion bodies or their decision logic, to `lib/**` / fixtures / `ci.yml` / CONTRACTS / schema, to the G5-b closed set or the whitelist, and no new ADR.** | `P92 GATES-SELFTEST-SPLIT` (this slice) |
 ---
 
 ## 1. Scope and Slice Model
@@ -2505,6 +2506,20 @@ The following files **only get a supersede pointer added to the file header and 
 | Version | v1.74 (the header version line agrees with the latest §0.3 row, G1-b) |
 | Note | this block is a pointer only; the synced sentence lives in §6.3 and is not restated here |
 
+### C.0bb P92 GATES-SELFTEST-SPLIT (v1.75)
+
+> **Record only; no normative force**.
+
+| Item | Content |
+|---|---|
+| Slice / tier | `GATES-SELFTEST-SPLIT` (tool `[SLICE]`; tier M; zero probes; local Windows) |
+| Trigger | ledger P92 (source = the P88 report §7 recommendations 1/3/5 plus the v75 snapshot layer-3 performance candidates); named by the user for a 2026-11-26 start (four elements: ruling party = the user; date = 2026-11-26; reason = the gate-performance continuation slice; basis = the start message plus the v75 snapshot §4/§6) |
+| Goal | `--selftest` partition timing (landed as composition data) plus the benefit gate plus the approved implementation (repo-root discovery memo), with byte-identical verdicts |
+| Deliverables | the report pair `docs/validation/gates-selftest-split{,_EN}.md`; the P92 ledger section; the evidence pack `docs/validation/evidence/P92-GATES-SELFTEST-SPLIT/` |
+| Scope | only turns the constant pure function in `tools/gates/selftest.js` into a process-level lazy memo (23 call sites); zero change to the criterion bodies and decision logic; no change to `lib/**` / fixtures / `ci.yml` / CONTRACTS / schema / workflows / `internal/**`; the G5-b closed set and the whitelist are untouched; no new ADR |
+| Review | (5) pre-review (V4 Pro 1+2), (6) independent scan (MAI Code 2 Flash <=3, mandatory), (7) final plus re-review (tier M 1+2, Codex regular tier); blind review not sampled; readings per that slice's report |
+| Version | v1.75 (the header version line agrees with the latest §0.3 row, G1-b) |
+| Note | this block is a pointer only; the implementation and readings live in that slice's report and evidence pack and are not restated here |
 ### C.1 v3.1 section numbers → this directive
 
 | Original v3.1 section | Content | Location in this directive |

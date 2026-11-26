@@ -2446,6 +2446,29 @@ Completion record (2026-11-25): R = 1 (files created by `create_file` arrive wit
 
 Completion record (2026-11-26): R = 1 (`create_file` produces `.md` without BOM and with CRLF, normalized afterwards), D = 0, probes 0; the directive :675 sentence now reads "then `--all --skip-base --scope=ci` (base is covered by the earlier Build/Vet/Test/Format steps, P90)" and is mirrored verbatim in `_EN`, matching the `Gates` step run string in `ci.yml`; the version package is complete (header v1.74 / a §0.3 change row / appendix C `C.0ba`), and §12.4 registers OB-145 with its status flipped to `Resolved`; (3) all six shapes are equal (`2575 / 6187 / 4362 / 597 / 6944`); (9) three scopes report `TOTAL_FAIL=0`, `--selftest` is 744/744, and the base gates report `ok` for 15 packages with 0 package-level `FAIL`; (5) took one round of `PASS WITH FIXES` (3 Low plus 1 note, `verdict: no Medium+`), (6) was skipped ((7) `SKIP CONFIRMED: YES`), and (7) took one round of `PASS WITH FIXES` (1 Low, `verdict: no Medium+`, re-review budget unused); **uncommitted and unpushed** (stopped at (10) for same-turn authorization); the two-leg CI reading is back-filled after the push per §11.2. Count correction (2026-11-26): each report has 110 lines (CN and EN equal) and the evidence pack has 16 payloads (following the `MANIFEST.md` rows). Main commit `f963dd7` is pushed to `origin/main` (not gitee) and CI run `45688549781` succeeded on both legs (`SELFTEST` 744/744, `GATE REPORT scope=ci changed=24`, `TOTAL_FAIL=0`).
 
+### P92 — `GATES-SELFTEST-SPLIT` (selftest partition timing and fixture-read memoisation · tool slice) · ✅ Closed
+
+| Field | Content |
+|---|---|
+| Identifier | `GATES-SELFTEST-SPLIT` (ledger id = **P92**; source = the v72 snapshot layer-3 performance candidates + the v75 snapshot §4/§6 next ruling + the user naming it on 2026-11-26) |
+| Status | ✅ Closed (2026-11-26; the four elements are in `docs/validation/evidence/P92-GATES-SELFTEST-SPLIT/00-briefing.md`; report pair `docs/validation/gates-selftest-split{,_EN}.md`) |
+| Goal | (1) `--selftest` partition timing (per suite, landed as composition data); (2) fixture-read memoisation (deduplicate repeated disk reads, verdicts byte-identical); (3) G4b inner-loop incremental evaluation (only if the benefit gate passes; touching `sourceDigest` requires a `CACHE_VERSION` / key12 migration protocol first); (4) in-tree `--timings` evaluation (its output format is a protocol surface; it is moved out when (1) rules that it touches the contract); (5) a benefit-gate report with comparison evidence |
+| Dependency | v75 snapshot closed; P88 report §7 recommendations 1/3/5 (source); no other prerequisite |
+| Size | **M** (touches the criterion implementation files `tools/gates/selftest.js` and `tools/gates/lib/criteria/g4b.js`) |
+| Steps | 0 → (1) impact ruling + benefit gate → (2) implementation (within the (1) ruling) → (3) consistency → (4) gates → (5) → (6) → (7) → (8a) → (9) → (8b) → (8c) → (10) |
+| Gap | No partition composition data for the selftest; repeated fixture disk reads are unquantified; the G4b inner loop is claimed to be sub-second without proof; the in-tree `--timings` output is a protocol surface that is not yet ruled |
+| Deliverables | (1) benefit-gate report (composition table plus a benefit/cost verdict per candidate); (2) the approved implementation (verdicts byte-identical); (3) A/B sha256 comparison evidence; (4) the report pair `docs/validation/gates-selftest-split{,_EN}.md`; (5) the ledger section and completion record; (6) the evidence pack; (7) the large-change recommendation list (unapproved items handed over) |
+| Acceptance evidence | (1) `SELFTEST` stays 744/744; (2) same-input A/B is byte-identical (equal sha256 plus a falsifiable comparator); (3) all three scopes report `TOTAL_FAIL=0`; (4) the report pair mirrors strictly; (5) the benefit-gate conclusion is on disk |
+| Boundary | Zero change to the criteria bodies and their decision logic; no change to `ci.yml` / `internal/**` / CONTRACTS / schema / fixtures / workflows; the G5-b closed set and the whitelist are untouched; no new ADR (no identity admission); whether the directive takes a MINOR bump is decided by (1); no gitee |
+| Class | `[SLICE]` |
+| Probe quota | 0 |
+| Freedom list path | `docs/validation/evidence/P92-GATES-SELFTEST-SPLIT/freedom-list.md` |
+| R/D baseline | R = 0, D = 0 (registered at start-up) |
+| Temp files | `tmp/P92-GATES-SELFTEST-SPLIT/` (append-only until (8c)) |
+| Quota disclosure | (7) = size M ⇒ §7.5 "1+2"; tier = `GPT-5.3-Codex (copilot)` regular; no blind review; batch helper GLM ≥2 (user ruling e); (6) mandatory (touches a criterion implementation) |
+| Start condition | Named by the user on 2026-11-26; four elements on record; v75 snapshot closed |
+
+Completion record (2026-11-26): R = 3, D = 1, zero probes; `--selftest` drops from 150.9 s to 70.1 s (2.15x) with byte-identical stdout and `SELFTEST` 744/744; zero change to the criterion bodies or their decision logic (only the 23 repo-root discoveries collapse into one process-level lazy memo); report pair `docs/validation/gates-selftest-split{,_EN}.md`, evidence pack `docs/validation/evidence/P92-GATES-SELFTEST-SPLIT/`; the directive moves to v1.75 (header line / §0.3 changelog row / appendix C.0bb); reviews: (5) one round, (6) three rounds (last one `INDEPENDENT SCAN: PASS`), (7) 1+2 plus one narrow confirmation read (last one `CONFIRM: FINDINGS`, whose point A the user ruled closed as a mechanical fact correction); this slice did not stop at every round as the P85 precedent suggests, which is recorded and was accepted by the user.
 ## Known defects (to be handled before later slices)
 
 > **Blocking rule unchanged**: only high-frequency / reproduced defects block; observation-grade flakes are recorded and listed in the validation report.
