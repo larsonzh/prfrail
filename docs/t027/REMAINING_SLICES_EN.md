@@ -2542,6 +2542,28 @@ Completion record (2026-11-26): R = 6, D = 0, zero probes; the three merged verd
 
 Completion record (2026-11-27): R = 1, D = 0, zero probes; the (1) benefit gate = **do not do it** (the ctx read APIs are fully synchronous and a single Node process cannot overlap synchronous I/O via asynchronisation, so the theoretical benefit ceiling is ≈0 and the practical bound is ≤250 ms out of a 5.8 s wall clock); the user ruled for candidate A at the (1) stop (assessment closure, not a precedent) - criterion code untouched, no directive version bump (v1.77 unchanged); P88 report section 7 recommendation 4 registered as "assessed, benefit does not hold, not implemented"; report pair `docs/validation/gates-criteria-async{,_EN}.md` (strict bilingual mirror), evidence pack `docs/validation/evidence/P95-GATES-CRITERIA-ASYNC/` (10 payloads plus MANIFEST/SHA256SUMS); reviews: (5) one round `PRE-REVIEW: PASS` (2 Lows fixed + 3 Info), (6) one round `INDEPENDENT SCAN: PASS`, (7) 1+1 (r1 `FINDINGS` 1 Medium + 1 Low -> fixed -> r2 `RE-REVIEW: PASS`, quota fully used); batch helper GLM-5.3-Flash x2 (`MIRROR: PASS` / `NUMBERS: PASS`); SELFTEST stays 770/770, all three scopes `TOTAL_FAIL=0`; main commit `238e45c` pushed to `origin/main` (gitee untouched, range `22370fe..238e45c`), CI run `45939437180` both legs success (both legs `SELFTEST: PASS 770/770`, `GATE REPORT scope=ci changed=16`, `TOTAL_FAIL=0`; package-level ok ubuntu 21 / windows 15, FAIL 0); parked at step (10) awaiting commit authorization (origin only); the (10) dispatch table is annotated "not mechanically verified" because the debug log has no transcript record (same-source note in the v79 snapshot section 2).
 
+### P96 — `GATES-BASE-CACHE` (cross-scope base verdict cache · tooling slice) · 🔄 In progress
+
+| Field | Content |
+|---|---|
+| Identifier | `GATES-BASE-CACHE` (ledger id = **P96**; source = P88 report §7 recommendation 2 + the single tier-3 performance candidate in the v79 snapshot + the user naming it on 2026-11-27) |
+| Status | 🔄 In progress (started 2026-11-27; stop 1 ruled = do + option 1 + deep tier 1+3 (direct user ruling, not a precedent); the (2) clause has landed in v1.78; the four elements are in `docs/validation/evidence/P96-GATES-BASE-CACHE/00-briefing.md`) |
+| Goal | (1) benefit gate: measure the four isolated base timings and the repeated payment across the three scopes, plus a key-design draft, a clause draft and a two-option flake policy comparison; (2) clause first: land the base verdict cache clause in §6.1 (directive MINOR bump, v1.78 expected), criteria code untouched, code only after CI is green; (3) implement the cross-scope base verdict cache (key / three counterexamples / fail-open); (4) zero change to the criteria decision logic, base verdict semantics unchanged, never cache any G1-G9 criteria verdict |
+| Dependency | v79 snapshot closed; P88 report §7 recommendation 2 (source); the G4b-CACHE clause template (appendix C.0aj); no other prerequisite |
+| Size | M |
+| Steps | 0 → (1) stop 1 impact ruling + benefit gate → (2) clause landing → (3) implementation → (4) → (5) → (6) → (7) → (8a) → (9) two cold/hot passes → (8b) → (8c) → (10) |
+| Gap | the four base gates (gofmt / build / vet / test) are paid repeatedly across the index / tree / ci scopes; no verdict-level cache exists; §6.1 has no base verdict cache clause |
+| Deliverables | (1) benefit report + key-design draft + clause draft + flake policy comparison; (2) the landed clause (directive v1.78 or per the stop-1 ruling); (3) the cache implementation + new selftest assertions; (4) cold/hot A/B evidence; (5) the report pair `docs/validation/gates-base-cache{,_EN}.md`; (6) the ledger section and completion record; (7) the evidence pack; (8) the list of suggestions for larger changes |
+| Acceptance evidence | (1) the three counterexamples must all miss, the key is recomputed before every read, and any anomaly fails open to the full computation (falsifiable assertions); (2) cold and hot verdicts are byte-identical (including detail and output order) and the comparator is falsifiable by flipping one byte; (3) `SELFTEST` all PASS (new assertions must match the (1) design and be recorded in the ledger); (4) all three scopes report `TOTAL_FAIL=0` in both passes (cold fill then hot hit); (5) the report pair mirrors strictly |
+| Boundary | zero change to the criteria decision logic itself (only the base read path and the cache); the cache stores only the four §6.1 base verdicts and NEVER any G1-G9 criteria verdict; no change to `ci.yml` / `internal/**` / CONTRACTS / schema / fixtures / workflows; the G5-b closed set and the model allow-list stay untouched; whether an ADR is needed is decided by (1) (none expected; the clause landing point is decided by (1)); no gitee |
+| Class | `[SLICE]` |
+| Probe quota | 0 |
+| Freedom list path | `docs/validation/evidence/P96-GATES-BASE-CACHE/freedom-list.md` |
+| R/D baseline | R = 0, D = 0 (registered at start-up) |
+| Temp files | `tmp/P96-GATES-BASE-CACHE/` (append-only until (8c)) |
+| Quota disclosure | (7) = regular tier `GPT-5.3-Codex (copilot)` **1 final review + 2 re-reviews (M-slice 1+2)**; if stop 1 rules high risk the quota rises to 1+3 by user ruling; no blind review; batch helper GLM-5.3-Flash ≥2 (modelId `glm-5.3-flash`, `glm-5.3` forbidden); (6) mandatory (touches the `gate.js` / `selftest.js` criterion implementation) |
+| Start condition | Named by the user (this message); four elements on record; v79 snapshot closed |
+
 ## Known defects (to be handled before later slices)
 
 > **Blocking rule unchanged**: only high-frequency / reproduced defects block; observation-grade flakes are recorded and listed in the validation report.

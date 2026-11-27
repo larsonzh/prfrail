@@ -2555,6 +2555,28 @@ A6 ② 进度（第 2 批，2026-09-15）：
 
 完成记录（2026-11-27）：R = 1、D = 0、探针 0；① 收益论证闸 = **不做**（ctx 读 API 全同步、Node 单进程 async 化无法重叠同步 I/O ⇒ 并发收益理论上界 ≈0、实际 ≤250 ms/5.8 s 墙钟）；用户 ① 停点裁定采纳候选 A（评估类闭环，不得作先例）——判据代码零改动、准则不升版（v1.77 不变）；P88 报告 §7 建议 4 登记「已评估、收益不成立、不实施」；报告对 `docs/validation/gates-criteria-async{,_EN}.md`（双语严格镜像），证据包 `docs/validation/evidence/P95-GATES-CRITERIA-ASYNC/`（10 载荷 + MANIFEST/SHA256SUMS）；审查 ⑤ 1 轮 `PRE-REVIEW: PASS`（2 Low 已整改 + 3 Info）、⑥ 1 轮 `INDEPENDENT SCAN: PASS`、⑦ 1+1（r1 `FINDINGS` 1 Medium + 1 Low → 整改 → r2 `RE-REVIEW: PASS`，额度用满）；批量辅助 GLM-5.3-Flash ×2（`MIRROR: PASS` / `NUMBERS: PASS`）；SELFTEST 770/770 不变、三作用域 `TOTAL_FAIL=0`；主提交 `238e45c` 已推 `origin/main`（未推 gitee，范围 `22370fe..238e45c`），CI run `45939437180` 双腿 success（两腿 `SELFTEST: PASS 770/770`、`GATE REPORT scope=ci changed=16`、`TOTAL_FAIL=0`；包级 ok ubuntu 21 / windows 15、FAIL 0）；停于 ⑩ 等授权提交（仅 origin）；⑩ 派单表因 debug 日志无 transcript 记录，标注「未机械校验」（同源登记于 v79 快照 §二）。
 
+### P96 — `GATES-BASE-CACHE`（跨作用域 base 结论缓存 · 工具片）· 🔄 执行中
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `GATES-BASE-CACHE`（台账编号 = **P96**；来源 = P88 报告 §7 建议 2 + v79 快照层 3 唯一性能候选 + 用户 2026-11-27 点名） |
+| 状态 | 🔄 执行中（2026-11-27 起跑；停点 1 已裁定 = 做 + 案 1 + 深度档 1+3（用户直接裁定、不得作先例）；② 条款已落 v1.78；四要素见 `docs/validation/evidence/P96-GATES-BASE-CACHE/00-briefing.md`） |
+| 目标 | ① 收益论证闸：实测 base 四条孤立计时与三作用域重复支付成本 + 键设计草案 + 条款草案 + flake 政策两案对照；② 条款先行：§6.1 落 base 结论缓存条款（准则升 MINOR，预计 v1.78），判据代码不动、CI 绿后再动代码；③ 实现跨作用域 base 结论缓存（键 / 三反例 / fail-open）；④ 判据判定逻辑零改动、base 结论语义不变、绝不缓存任何 G1–G9 判据结论 |
+| 依赖 | v79 快照闭环；P88 报告 §7 建议 2（出处）；G4b-CACHE 条款模板（附录 C.0aj）；无其它前置 |
+| 规模 | M |
+| 步骤 | 0 → ① 停点 1 影响判定 + 收益论证闸 → ② 条款落地 → ③ 实现 → ④ → ⑤ → ⑥ → ⑦ → ⑧a → ⑨（两遍冷热）→ ⑧b → ⑧c → ⑩ |
+| 现状缺口 | base 四条（gofmt / build / vet / test）在 index / tree / ci 三作用域重复支付；结论级缓存不存在；§6.1 无 base 结论缓存条款 |
+| 交付物 | ① 收益论证报告 + 键设计草案 + 条款草案 + flake 政策对照；② 条款落地（准则升 v1.78 或按停点 1 裁定）；③ 缓存实现 + selftest 新断言；④ 冷热 A/B 对照证据；⑤ 报告对 `docs/validation/gates-base-cache{,_EN}.md`；⑥ 台账段与完成记录；⑦ 证据包；⑧ 大改建议清单 |
+| 验收证据 | ① 三反例必失效 + 读前重算键 + 异常 fail-open 回全量（断言可证伪）；② 冷热结论逐字一致（含 detail 与输出顺序）+ 比对器翻转 1 字节可证伪；③ SELFTEST 全 PASS（新增断言须与 ① 方案书一致并台账记录）；④ 三作用域 TOTAL_FAIL=0（两遍：冷填充 → 热命中）；⑤ 报告对双语严格镜像 |
+| 边界 | 判据判定逻辑本体零改动（只动 base 读路径与缓存）；缓存只存 §6.1 四条 base 结论、绝不缓存任何 G1–G9 判据结论；不改 ci.yml / internal/** / CONTRACTS / schema / fixtures / workflows；G5-b 闭集与模型白名单不动；ADR 由 ① 判定（预计不新增，条款落点由 ① 定）；不做 gitee |
+| 分级 | `[SLICE]` |
+| 探针额度 | 0 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/P96-GATES-BASE-CACHE/freedom-list.md` |
+| R/D 基线 | R = 0、D = 0（起跑时登记） |
+| 临时件落点声明 | `tmp/P96-GATES-BASE-CACHE/`（⑧c 前只增不删） |
+| 额度口径披露 | ⑦ = 常规档 `GPT-5.3-Codex (copilot)` **1 终审 + 2 复审（M 档 1+2）**；停点 1 判高风险 ⇒ 1+3 由用户裁定；盲审不抽；批量辅助 GLM-5.3-Flash ≥2（modelId `glm-5.3-flash`，禁 `glm-5.3`）；⑥ 必做（触 gate.js / selftest.js 判据实现文件） |
+| 起跑条件 | 用户点名（本消息）；四要素留痕；v79 快照闭环 |
+
 ## 已知缺陷（后续切片前处理）
 
 > **阻断口径不变**：仅高频/已复现缺陷阻断，观测级 flake 只记录并在验证报告中列示。
