@@ -2584,7 +2584,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 字段 | 内容 |
 |---|---|
 | 标识 | `HYDROGEN-CONTROL-PILOT`（台账编号 = **P97**；来源 = P87 报告 §7 前置缺口注记 + 台账 P87 段「前置缺口登记」+ v80 快照 §五 + 用户 2026-11-28 点名） |
-| 状态 | ✅ 闭环（2026-11-28；R = 0、D = 1；四要素见证据包 `00-briefing.md`；报告对 `docs/validation/hydrogen-control-pilot{,_EN}.md`） |
+| 状态 | ✅ 闭环（2026-11-28；R = 0、D = 0；四要素见证据包 `00-briefing.md`；报告对 `docs/validation/hydrogen-control-pilot{,_EN}.md`） |
 | 目标 | ① 用 `Gemini 4 Hydrogen (copilot)` 对 P87 输入包做对照评审实测（§1.7.4 临时授权 + OB-146 留痕）；② 产出对照记录（结论 / 发现数 / 严重度 / 误判四面对照，只记录不重裁）；③ 回填 P87 报告 §7 注记与台账 P87 段「已补足」；④ §12.4 登记 OB-146；⑤ 报告对与证据包 |
 | 依赖 | v80 快照闭环；P87 证据包可得（`docs/validation/evidence/P87-DIRECTIVE-REVIEW-MODEL-POLICY/`，含 00-briefing / input-list / 01-arch / 03-verification / 04-reviews）；无其它前置 |
 | 规模 | S |
@@ -2601,7 +2601,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 额度口径披露 | ⑦ = 试水轮 `Gemini 4 Hydrogen (copilot)` 1 轮（§1.7.4 临时授权、额度外、OB-146 留痕）+ 常规终审 `DeepSeek V4 Pro` **1 终审 + 1 复审（S 档 1+1）**；⑥ 跳过（不触判据实现文件，经 ⑦ 确认）；盲审不抽；批量辅助 GLM-5.3-Flash ≥2（modelId `glm-5.3-flash`，禁 `glm-5.3`） |
 | 起跑条件 | 用户点名（2026-11-28 本消息）；四要素留痕；v80 快照闭环 |
 
-完成记录（2026-11-28）：R = 0、D = 1、探针 0；Hydrogen 试水 1 轮 = `FINAL REVIEW: FINDINGS`（1 High + 2 Medium + 2 Low；credits 184.3，用户侧单一真值源）；P87 结论不重裁，3 条新发现登记观察项 O-2..O-4、两条 Low 登记 O-5；⑤ `PRE-REVIEW: PASS`（4 Low 已处置）、⑥ 跳过、⑦ 终审 `FINAL REVIEW: PASS`（3 Low 已解除）；准则升 v1.82（OB-146，窗口自 v1.72 起算第 1 例）；`SELFTEST` 806/806、tree / index / ci 均 `TOTAL_FAIL=0`；D-1 输入包路径声明与落点不一致（审查方发现、无结论影响）；停于 ⑩ 等授权提交（仅 origin）。
+完成记录（2026-11-28）：R = 0、D = 0、探针 0；Hydrogen 试水 1 轮 = `FINAL REVIEW: FINDINGS`（1 High + 2 Medium + 2 Low；credits 184.3，用户侧单一真值源）；P87 结论不重裁，3 条新发现登记观察项 O-2..O-4、两条 Low 登记 O-5；⑤ `PRE-REVIEW: PASS`（4 Low 已处置）、⑥ 跳过、⑦ 终审 `FINAL REVIEW: PASS`（3 Low 已解除）；准则升 v1.82（OB-146，窗口自 v1.72 起算第 1 例）；`SELFTEST` 806/806、tree / index / ci 均 `TOTAL_FAIL=0`；偏离表 D-1 = 输入包路径声明与落点不一致（审查方发现、无结论影响；属报告偏离表序列，非 §5.1 临时件 D 计数）；停于 ⑩ 等授权提交（仅 origin）。
 
 观察项处置方向（用户 2026-11-28 裁定）：O-2..O-4 尽快处理——并入下一治理片顺带修订，或另立独立小修订片（修订对象 = §5.2 深度档档位列与取档授权句对齐 §8.2、§7.5 的 Neon 单价档位归属、矩阵可判性措辞）；O-1 仅记录不追改。
 

@@ -1,7 +1,7 @@
 ﻿# P97 HYDROGEN-CONTROL-PILOT 验证报告（⑦ 轻量档对照评审实测 · docs-only）
 
 - 切片：`HYDROGEN-CONTROL-PILOT`（P97，`[SLICE]`，S 档）。主控：`DeepSeek V4.1 Flash (deepseek)` High。
-- 日期：2026-11-28。准则版本：v1.82（MINOR）。R = 0、D = 1。
+- 日期：2026-11-28。准则版本：v1.82（MINOR）。R = 0、D = 0。
 - 证据包：`docs/validation/evidence/P97-HYDROGEN-CONTROL-PILOT/`。
 
 ## 1. 结论
@@ -63,7 +63,7 @@
 
 ## 10. 异常与偏离
 
-- D-1（D = 1）：输入包路径声明与落点不一致（审查方发现，无结论影响；见 `03-deviation-log.md`）。
+- D-1（偏离表序列，非 §5.1 临时件 D 计数）：输入包路径声明与落点不一致（审查方发现，无结论影响；见 `03-deviation-log.md`）。
 - 输入包规模：目标五节 CN 与 EN 均无截断读取；历史超长行在工具层截断（非目标节）。
 
 ## 11. 未闭环项与交接
@@ -82,6 +82,10 @@ docs/validation/directive-review-model-policy.md	repo
 docs/validation/directive-review-model-policy_EN.md	repo
 docs/validation/hydrogen-control-pilot.md	repo
 docs/validation/hydrogen-control-pilot_EN.md	repo
+docs/t027/CHECKLIST_v81.md	repo
+docs/t027/CHECKLIST_v81_EN.md	repo
+docs/DOCUMENTATION_PLAN.md	repo
+docs/DOCUMENTATION_PLAN_EN.md	repo
 docs/validation/evidence/P97-HYDROGEN-CONTROL-PILOT/00-briefing.md	repo
 docs/validation/evidence/P97-HYDROGEN-CONTROL-PILOT/input-list.md	repo
 docs/validation/evidence/P97-HYDROGEN-CONTROL-PILOT/freedom-list.md	repo

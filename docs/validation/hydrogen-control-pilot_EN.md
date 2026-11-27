@@ -1,7 +1,7 @@
 ﻿# P97 HYDROGEN-CONTROL-PILOT validation report (light-tier comparative review pilot, docs-only)
 
 - Slice: `HYDROGEN-CONTROL-PILOT` (P97, `[SLICE]`, S tier). Lead: `DeepSeek V4.1 Flash (deepseek)` High.
-- Date: 2026-11-28. Directive version: v1.82 (MINOR). R = 0, D = 1.
+- Date: 2026-11-28. Directive version: v1.82 (MINOR). R = 0, D = 0.
 - Evidence pack: `docs/validation/evidence/P97-HYDROGEN-CONTROL-PILOT/`.
 
 ## 1. Conclusion
@@ -63,7 +63,7 @@ The light tier `Gemini 4 Hydrogen (copilot)` completed one comparative review ro
 
 ## 10. Anomalies and deviations
 
-- D-1 (D = 1): the input-pack path declaration and the actual layout disagreed (found by the reviewer, no effect on the verdict; see `03-deviation-log.md`).
+- D-1 (deviation-table series, not the section 5.1 temp-artifact D count): the input-pack path declaration and the actual layout disagreed (found by the reviewer, no effect on the verdict; see `03-deviation-log.md`).
 - Input size: the five target sections were read in full in both CN and EN; over-long historical lines were truncated at the tool layer (outside the target sections).
 
 ## 11. Open items and handover
@@ -82,6 +82,10 @@ docs/validation/directive-review-model-policy.md	repo
 docs/validation/directive-review-model-policy_EN.md	repo
 docs/validation/hydrogen-control-pilot.md	repo
 docs/validation/hydrogen-control-pilot_EN.md	repo
+docs/t027/CHECKLIST_v81.md	repo
+docs/t027/CHECKLIST_v81_EN.md	repo
+docs/DOCUMENTATION_PLAN.md	repo
+docs/DOCUMENTATION_PLAN_EN.md	repo
 docs/validation/evidence/P97-HYDROGEN-CONTROL-PILOT/00-briefing.md	repo
 docs/validation/evidence/P97-HYDROGEN-CONTROL-PILOT/input-list.md	repo
 docs/validation/evidence/P97-HYDROGEN-CONTROL-PILOT/freedom-list.md	repo
