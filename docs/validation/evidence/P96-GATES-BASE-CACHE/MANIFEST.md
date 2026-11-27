@@ -17,6 +17,8 @@
 | `04-reviews/06-scan-r2.md` | ⑥ 独立扫描 r2 逐字原文（FINDINGS：3 Medium + 1 Low） |
 | `04-reviews/06-scan-r3.md` | ⑥ 独立扫描 r3 逐字原文（PASS） |
 | `04-reviews/07-deep-review-log.md` | ⑦ 深度档 r1–r4 + Neon + 两轮收窄复审原文（Section A–D；含 Section C–E 逐字段） |
+| `05-batch/01-mirror-check.md` | GLM 批量辅助 1 逐字原文（报告对双语镜像机械复核） |
+| `05-batch/02-number-check.md` | GLM 批量辅助 2 逐字原文（全片数字核对；载荷数为本二件并入前的时点快照） |
 
 ## 编码与行尾
 

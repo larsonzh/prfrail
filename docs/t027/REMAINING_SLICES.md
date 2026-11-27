@@ -2577,7 +2577,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 额度口径披露 | ⑦ = 常规档 `GPT-5.3-Codex (copilot)` **1 终审 + 2 复审（M 档 1+2）**；停点 1 判高风险 ⇒ 1+3 由用户裁定；盲审不抽；批量辅助 GLM-5.3-Flash ≥2（modelId `glm-5.3-flash`，禁 `glm-5.3`）；⑥ 必做（触 gate.js / selftest.js 判据实现文件） |
 | 起跑条件 | 用户点名（本消息）；四要素留痕；v79 快照闭环 |
 
-完成记录（2026-11-28）：R = 12（③ 2 / ⑥ 2 / ⑦ 3 / 收窄与终局 4 / ⑨ 首轮 G5(d) 1）、D = 0、探针 0；准则 v1.78 → v1.79 → v1.80 → v1.81（同片四段修订）；缓存只覆盖 build / vet / test、gofmt 恒真跑；`SELFTEST` 806/806、冷热 `FULL_IDENTICAL=True`、三反例与 fail-open 均通过；⑦ 深度档 1+3 用尽 + Neon 交叉复核 + 两轮收窄复审（额度外，OB-37）；报告对 `docs/validation/gates-base-cache{,_EN}.md`。
+完成记录（2026-11-28）：R = 12（③ 2 / ⑥ 2 / ⑦ 3 / 收窄与终局 4 / ⑨ 首轮 G5(d) 1）、D = 0、探针 0；准则 v1.78 → v1.79 → v1.80 → v1.81（同片四段修订）；缓存只覆盖 build / vet / test、gofmt 恒真跑；`SELFTEST` 806/806、冷热 `FULL_IDENTICAL=True`、三反例与 fail-open 均通过；⑦ 深度档 1+3 用尽 + Neon 交叉复核 + 两轮收窄复审（额度外，OB-37）；报告对 `docs/validation/gates-base-cache{,_EN}.md`。主提交 `81a6794`、CI run `46053254410` 双腿 success（`SELFTEST: PASS 806/806` ×2、`changed=17` ×2、`TOTAL_FAIL=0` ×2）；GLM 批量辅助 2 次（报告对镜像机械复核 + 全片数字核对）；`find-quotes.js` 处置位随本片 ⑧c 清理（v80 快照吸收）。
 
 ## 已知缺陷（后续切片前处理）
 

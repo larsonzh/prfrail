@@ -34,6 +34,9 @@
 | GOWORK 非空 | `computeKey = null` | 通过 |
 | `SELFTEST` | 806/806 | 通过 |
 | tree / index | `TOTAL_FAIL=0` | 通过 |
+| 冷热两遍 × 三作用域 | tree 125038→26392 ms、index 124263→22862 ms、ci 116902→21920 ms，`TOTAL_FAIL=0` | 通过 |
+| CI 双腿 run `46053254410` | `SELFTEST: PASS 806/806` ×2、`GATE REPORT scope=ci changed=17` ×2、`TOTAL_FAIL=0` ×2 | 通过 |
+| 主提交 | `81a6794` | 落地 |
 
 ## 5. 审查链
 
@@ -88,6 +91,8 @@ docs/validation/evidence/P96-GATES-BASE-CACHE/04-reviews/06-scan-r1.md	repo
 docs/validation/evidence/P96-GATES-BASE-CACHE/04-reviews/06-scan-r2.md	repo
 docs/validation/evidence/P96-GATES-BASE-CACHE/04-reviews/06-scan-r3.md	repo
 docs/validation/evidence/P96-GATES-BASE-CACHE/04-reviews/07-deep-review-log.md	repo
+docs/validation/evidence/P96-GATES-BASE-CACHE/05-batch/01-mirror-check.md	repo
+docs/validation/evidence/P96-GATES-BASE-CACHE/05-batch/02-number-check.md	repo
 ```
 
 ## 10. ⑥ 独立扫描结论（逐字）

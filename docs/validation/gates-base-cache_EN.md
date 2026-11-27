@@ -34,6 +34,9 @@ Slice: `GATES-BASE-CACHE` (P96). Date: 2026-11-28. Size: M. Type: tooling slice 
 | Non-empty GOWORK | `computeKey = null` | pass |
 | `SELFTEST` | 806/806 | pass |
 | tree / index | `TOTAL_FAIL=0` | pass |
+| Cold/hot twice x three scopes | tree 125038→26392 ms, index 124263→22862 ms, ci 116902→21920 ms, `TOTAL_FAIL=0` | pass |
+| CI both legs run `46053254410` | `SELFTEST: PASS 806/806` x2, `GATE REPORT scope=ci changed=17` x2, `TOTAL_FAIL=0` x2 | pass |
+| Main commit | `81a6794` | landed |
 
 ## 5. Review chain
 
@@ -88,6 +91,8 @@ docs/validation/evidence/P96-GATES-BASE-CACHE/04-reviews/06-scan-r1.md	repo
 docs/validation/evidence/P96-GATES-BASE-CACHE/04-reviews/06-scan-r2.md	repo
 docs/validation/evidence/P96-GATES-BASE-CACHE/04-reviews/06-scan-r3.md	repo
 docs/validation/evidence/P96-GATES-BASE-CACHE/04-reviews/07-deep-review-log.md	repo
+docs/validation/evidence/P96-GATES-BASE-CACHE/05-batch/01-mirror-check.md	repo
+docs/validation/evidence/P96-GATES-BASE-CACHE/05-batch/02-number-check.md	repo
 ```
 
 ## 10. (6) independent scan verdict (verbatim)
