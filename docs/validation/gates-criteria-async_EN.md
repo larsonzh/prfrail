@@ -7,7 +7,7 @@
 
 ## 1. Conclusion
 
-This slice does not asynchronise G6 / G7 / G8. The (1) impact assessment and benefit gate returned a rejection: the ctx read APIs are fully synchronous, so under a single Node process asynchronisation cannot overlap synchronous I/O, and the theoretical upper bound of the concurrency benefit is ≈0 while the practical bound is ≤250 ms out of a 5.8 s wall clock. The user ruled for candidate A, so the slice degrades to an assessment-type closure: **criterion code untouched, directive not bumped (v1.77 unchanged)**; P88 report section 7 recommendation 4 is registered in this slice as "**assessed, benefit does not hold, not implemented**"; the two `CHECKLIST_v78` files are untouched and will be absorbed by the v79 snapshot. Current state = parked at step (10), awaiting same-turn commit authorization (origin only).
+This slice does not asynchronise G6 / G7 / G8. The (1) impact assessment and benefit gate returned a rejection: the ctx read APIs are fully synchronous, so under a single Node process asynchronisation cannot overlap synchronous I/O, and the theoretical upper bound of the concurrency benefit is ≈0 while the practical bound is ≤250 ms out of a 5.8 s wall clock. The user ruled for candidate A, so the slice degrades to an assessment-type closure: **criterion code untouched, directive not bumped (v1.77 unchanged)**; P88 report section 7 recommendation 4 is registered in this slice as "**assessed, benefit does not hold, not implemented**"; the two `CHECKLIST_v78` files are untouched and will be absorbed by the v79 snapshot. Current state = pushed to `origin/main`, CI run `45939437180` green on both legs (see section 10); after the backfill commit it parks at step (10) (origin only).
 
 ## 2. Change set and evidence
 
@@ -164,5 +164,12 @@ docs/validation/evidence/P95-GATES-CRITERIA-ASYNC/input-list.md	repo
 docs/validation/gates-criteria-async.md	repo
 docs/validation/gates-criteria-async_EN.md	repo
 ```
+
+## 10. Submission and CI
+
+- Main commit `238e45c` (`docs: record the P95 async-criteria assessment (not implemented)`), pushed to `origin/main` (range `22370fe..238e45c`; **gitee untouched**).
+- CI run **`45939437180`** (head `238e45c`) ended `completed / success`; both legs succeeded (`Go ubuntu-latest` / `Go windows-latest`), the other candidate jobs are skipped by the CI definition.
+- Hard evidence from both legs: `SELFTEST: PASS 770/770`, `GATE REPORT scope=ci changed=16`, `TOTAL_FAIL=0` (on both legs); package-level `ok` lines ubuntu 21 / windows 15, package-level `FAIL` 0; real failure lines verified = 0 (the self-test's expected-failure assertion descriptions are not counted).
+- This section was added by a docs-only commit after both CI legs turned green (§11.2); the backfill commit's own CI run is observation-only.
 
 SLICE: READY_FOR_REVIEW

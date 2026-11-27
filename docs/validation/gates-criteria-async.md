@@ -7,7 +7,7 @@
 
 ## 1. 结论
 
-本片不做 G6 / G7 / G8 异步化。① 影响判定与收益论证闸给出否决结论：ctx 读 API 全同步，Node 单进程下 async 化不能令同步 I/O 重叠，并发收益理论上界 ≈0、实际 ≤250 ms/5.8 s 墙钟。用户裁定采纳候选 A，本片退化为评估类闭环：**判据代码零改动、准则不升版（v1.77 不变）**；P88 报告 §7 建议 4 在本片登记为「**已评估、收益不成立、不实施**」；`CHECKLIST_v78` 双文件不动，由 v79 快照吸收。当前状态 = 停于 ⑩，等同轮授权提交（仅 origin）。
+本片不做 G6 / G7 / G8 异步化。① 影响判定与收益论证闸给出否决结论：ctx 读 API 全同步，Node 单进程下 async 化不能令同步 I/O 重叠，并发收益理论上界 ≈0、实际 ≤250 ms/5.8 s 墙钟。用户裁定采纳候选 A，本片退化为评估类闭环：**判据代码零改动、准则不升版（v1.77 不变）**；P88 报告 §7 建议 4 在本片登记为「**已评估、收益不成立、不实施**」；`CHECKLIST_v78` 双文件不动，由 v79 快照吸收。当前状态 = 已推 `origin/main`，CI run `45939437180` 双腿 success（见 §10）；回填提交后停于 ⑩（仅 origin）。
 
 ## 2. 变更集与证据
 
@@ -164,5 +164,12 @@ docs/validation/evidence/P95-GATES-CRITERIA-ASYNC/input-list.md	repo
 docs/validation/gates-criteria-async.md	repo
 docs/validation/gates-criteria-async_EN.md	repo
 ```
+
+## 10. 提交与 CI
+
+- 主提交 `238e45c`（`docs: record the P95 async-criteria assessment (not implemented)`），已推 `origin/main`（范围 `22370fe..238e45c`；**未推 gitee**）。
+- CI run **`45939437180`**（head `238e45c`）终态 `completed / success`；双腿均 success（`Go ubuntu-latest` / `Go windows-latest`），其余候选作业按 CI 定义 skipped。
+- 双腿实测硬证据：`SELFTEST: PASS 770/770`、`GATE REPORT scope=ci changed=16`、`TOTAL_FAIL=0`（两腿皆然）；包级 `ok` 行 ubuntu 21 / windows 15、包级 `FAIL` 0；真实失败行核验 = 0（判据自测的预期失败断言描述不计）。
+- 本节由 CI 双绿后的 docs-only 提交补入（§11.2）；该回填提交自身的 CI run 只作观察记录。
 
 SLICE: READY_FOR_REVIEW
