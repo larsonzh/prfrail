@@ -52,6 +52,7 @@
 ## 8. 机械读数
 
 - 门禁 tree 与 index 均 `TOTAL_FAIL=0`；`SELFTEST` 806/806 与起跑基线一致（不触判据代码）。
+- CI：run `46077231907`（head `4f3af5f`）双腿 success（ubuntu / windows）；两腿 `Gates` 实测 `SELFTEST: PASS 806/806`、`changed=18`、`TOTAL_FAIL=0`。
 - 证据包 MANIFEST 与 SHA256SUMS 条目集相等（8 条）；双语账本增行对称。
 
 ## 9. 观察项

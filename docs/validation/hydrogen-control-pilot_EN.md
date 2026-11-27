@@ -52,6 +52,7 @@ The light tier `Gemini 4 Hydrogen (copilot)` completed one comparative review ro
 ## 8. Mechanical readings
 
 - Gates tree and index both report `TOTAL_FAIL=0`; `SELFTEST` stays 806/806, equal to the start baseline (no criterion code touched).
+- CI: run `46077231907` (head `4f3af5f`) is green on both legs (ubuntu / windows); the `Gates` step on each leg measured `SELFTEST: PASS 806/806`, `changed=18`, `TOTAL_FAIL=0`.
 - The evidence pack MANIFEST and SHA256SUMS entry sets are equal (8 entries); the bilingual ledger rows are symmetric.
 
 ## 9. Observations

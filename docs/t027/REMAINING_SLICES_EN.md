@@ -2592,6 +2592,8 @@ Completion record (2026-11-28): R = 0, D = 1, zero probes; the Hydrogen pilot ra
 
 Observation disposition direction (user ruling, 2026-11-28): O-2..O-4 must be handled soon - folded into the next governance slice or a standalone small revision slice (revision targets = align the section 5.2 deep-tier tier column and tier-authorization sentence with section 8.2, the Neon price band attribution in section 7.5, and the matrix decidability wording); O-1 is recorded only and not retro-fixed.
 
+CI (2026-11-28): run `46077231907` (head `4f3af5f`) is green on both legs (ubuntu / windows); the `Gates` step on each leg measured `SELFTEST: PASS 806/806`, `changed=18`, `TOTAL_FAIL=0`; this backfill commit's own run is an observation record only.
+
 ## Known defects (to be handled before later slices)
 
 > **Blocking rule unchanged**: only high-frequency / reproduced defects block; observation-grade flakes are recorded and listed in the validation report.
