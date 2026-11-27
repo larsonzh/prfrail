@@ -23,6 +23,7 @@ const cp = require('child_process');
 
 const { createContext, UsageError, parseScopeText } = require('./lib/ctx');
 const { createReport } = require('./lib/report');
+const baseCache = require('./lib/baseCache');
 
 const CRITERIA = {
   'G1-a': require('./lib/criteria/g1a'),
@@ -100,17 +101,65 @@ function runBaseGates(ctx, out) {
       shell: false,
     });
 
-  const gf = exec('gofmt', ['-l', '.']);
-  if (gf.error) throw new UsageError('environment error: cannot run gofmt (' + gf.error.message + ')');
-  const gfOut = (gf.stdout || '').trim();
-  out.rec('base', gf.status === 0 && gfOut === '' ? 'PASS' : 'FAIL', 'gofmt -l .', gfOut === '' ? 'empty' : gfOut);
+  /**
+   * Section 6.1 base conclusion cache (v1.78, slice P96): the four conclusions read only
+   * the working tree, so they are scope-independent and can be replayed from
+   * tmp/gates-cache/base/. The key is recomputed BEFORE the read; every unexpected state
+   * (uncomputable key, missing / malformed entry, store failure) degrades to the full run.
+   * The warm path replays the stored records verbatim - no hit/miss marker is printed, so
+   * cold and warm reports are byte-identical.
+   */
+  // gofmt always runs for real (v1.80): its verdict depends on process resolution
+  // semantics (PATH / execvp / libuv), which are not a pure function of the workspace and
+  // therefore cannot be keyed completely. Only build / vet / test come from the cache.
+  const gfForReal = exec('gofmt', ['-l', '.']);
+  if (gfForReal.error) throw new UsageError('environment error: cannot run gofmt (' + gfForReal.error.message + ')');
+  const gfRealOut = (gfForReal.stdout || '').trim();
+  out.rec(
+    'base',
+    gfForReal.status === 0 && gfRealOut === '' ? 'PASS' : 'FAIL',
+    'gofmt -l .',
+    gfRealOut === '' ? 'empty' : gfRealOut
+  );
+
+  const soft = (cmd, args) => {
+    const r = exec(cmd, args);
+    return { ok: !r.error && r.status === 0, out: r.stdout || '' };
+  };
+  const cacheOn = ctx.baseCacheDisabled !== true && process.env.GATES_BASE_CACHE !== 'off';
+  let store = null;
+  let cacheKey = null;
+  if (cacheOn) {
+    try {
+      const keyInfo = baseCache.computeKey({
+        repoRoot: ctx.repoRoot,
+        git: (args) => soft('git', args),
+        execGo: (args) => soft('go', args),
+      });
+      if (keyInfo && keyInfo.key) {
+        cacheKey = keyInfo.key;
+        store = baseCache.diskStore(ctx.repoRoot);
+        const hit = baseCache.read(store, cacheKey);
+        if (hit) {
+          for (const r of hit) out.rec(r.id, r.verdict, r.label, r.detail);
+          return;
+        }
+      }
+    } catch (e) {
+      store = null;
+      cacheKey = null;
+    }
+  }
+
+  // Records are collected first so the same bytes feed both the report and the cache.
+  const records = [];
+  const emit = (verdict, label, detail) => records.push({ id: 'base', verdict, label, detail: String(detail) });
 
   for (const [step, verb] of [['build', 'build'], ['vet', 'vet']]) {
     const r = exec('go', [verb, './...']);
     if (r.error) throw new UsageError('environment error: cannot run go (' + r.error.message + ')');
     const tail = ((r.stderr || '') + (r.stdout || '')).trim().split('\n').slice(-3).join(' / ');
-    out.rec(
-      'base',
+    emit(
       r.status === 0 ? 'PASS' : 'FAIL',
       'go ' + step + ' ./...',
       r.status === 0 ? 'exit 0' : 'exit ' + r.status + (tail ? ' :: ' + tail : '')
@@ -122,12 +171,15 @@ function runBaseGates(ctx, out) {
   const o = ((t.stdout || '').match(/^ok\s/gm) || []).length;
   const fa = ((t.stdout || '').match(/^FAIL/gm) || []).length;
   const tail = (t.stderr || '').trim().split('\n').slice(-3).join(' / ');
-  out.rec(
-    'base',
+  emit(
     t.status === 0 && fa === 0 ? 'PASS' : 'FAIL',
     'go test ./...',
     'ok=' + o + ' FAIL=' + fa + (t.status === 0 ? '' : ' exit=' + t.status + (tail ? ' :: ' + tail : ''))
   );
+
+  for (const r of records) out.rec(r.id, r.verdict, r.label, r.detail);
+  // Only a four-times-PASS conclusion is cached; a FAIL is never frozen.
+  if (store && cacheKey) baseCache.write(store, cacheKey, records);
 }
 
 /**

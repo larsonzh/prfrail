@@ -57,6 +57,7 @@ const G5A = require('./lib/criteria/g5a');
 const G5B = require('./lib/criteria/g5b');
 const G5C = require('./lib/criteria/g5c');
 const G5D = require('./lib/criteria/g5d');
+const BASE_CACHE = require('./lib/baseCache');
 
 /**
  * gate.js assigns `module.exports` at the END of its body, so a top-level require here
@@ -7896,6 +7897,455 @@ async function runTests() {
       'T156 counting caliber: a pre-existing exempt fence does not inflate fence-exempt N (the added line outside still hits)',
       t156Rec.verdict === 'FAIL' && p94Hits(t156Rec.detail).length === 1 && !/fence-exempt/.test(String(t156Rec.detail)),
       'verdict=' + t156Rec.verdict + ' hits=' + JSON.stringify(p94Hits(t156Rec.detail)) + ' detail=' + String(t156Rec.detail)
+    );
+  }
+
+  // ---- T157-T164: the cross-scope base conclusion cache (v1.78, slice P96
+  // GATES-BASE-CACHE). The cache stores ONLY the four section 6.1 conclusions, never a
+  // G1-G9 verdict; it is key-driven (any key segment change invalidates), PASS-only, and
+  // fail-open on every face. `computeKey` takes fully injected `git` / `execGo` / `fsImpl`
+  // so each key segment can be mutated without spawning a toolchain, and the store is
+  // plain `{get, put}` over a Map so read / write failures can be simulated exactly.
+  {
+    const RECORDS = [
+      { id: 'base', verdict: 'PASS', label: 'go build ./...', detail: 'exit 0' },
+      { id: 'base', verdict: 'PASS', label: 'go vet ./...', detail: 'exit 0' },
+      { id: 'base', verdict: 'PASS', label: 'go test ./...', detail: 'ok=12 FAIL=0' },
+    ];
+    const quad = (rs) => JSON.stringify((rs || []).map((r) => [r.id, r.verdict, r.label, r.detail]));
+    const DEFAULT_GO_ENV = 'GOROOT=C:\\go\nGOOS=windows\nGOARCH=amd64\nCGO_ENABLED=0\nGOFLAGS=\nGOWORK=\n';
+    const BASE_ROOT = 'D:/probe-base-cache';
+    /** Injectable deps: every input of `computeKey` is a field here. */
+    const baseDeps = (o) => {
+      o = o || {};
+      const root = o.repoRoot === undefined ? BASE_ROOT : o.repoRoot;
+      const files = Object.assign({ 'probe-new.go': 'package probe\n', 'probe-mod.go': 'package probe\n' }, o.files || {});
+      const porcelain = o.porcelain === undefined ? '?? probe-new.go\0 M probe-mod.go\0' : o.porcelain;
+      const absOf = (rel) => path.join(root, String(rel).split('/').join(path.sep));
+      return {
+        repoRoot: root,
+        git: (args) => {
+          const k = args.join(' ');
+          if (o.gitOk === false) return { ok: false, out: '' };
+          if (k === 'rev-parse HEAD') return { ok: true, out: (o.head === undefined ? 'head1' : o.head) + '\n' };
+          if (k === 'status --porcelain=v1 -uall -z') return { ok: true, out: porcelain };
+          if (k === 'ls-files --others --ignored --exclude-standard -z -- *.go') {
+            return { ok: true, out: o.ignoredGo === undefined ? '' : o.ignoredGo };
+          }
+          return { ok: false, out: '' };
+        },
+        execGo: (args) => {
+          const k = args.join(' ');
+          if (o.goOk === false) return { ok: false, out: '' };
+          if (k === 'version') return { ok: true, out: o.goVersion || 'go version go1.22.1 windows/amd64\n' };
+          if (k === 'env') {
+            return { ok: true, out: o.goEnv || DEFAULT_GO_ENV };
+          }
+          return { ok: false, out: '' };
+        },
+        fsImpl: {
+          readFileSync: (abs) => {
+            if (/[\\/]gofmt(\.exe)?$/i.test(abs)) return Buffer.from(o.gofmtBytes || 'gofmt-binary', 'utf8');
+            if (typeof o.readFile === 'function') return o.readFile(abs);
+            for (const rel of Object.keys(files)) {
+              if (absOf(rel) === abs) return Buffer.from(String(files[rel]), 'utf8');
+            }
+            throw new Error('ENOENT: ' + abs);
+          },
+        },
+      };
+    };
+    const memStore = () => {
+      const m = new Map();
+      return {
+        get: (k) => (m.has(k) ? m.get(k) : null),
+        put: (k, v) => {
+          m.set(k, v);
+        },
+        size: () => m.size,
+        keys: () => [...m.keys()],
+      };
+    };
+
+    // ---- T157: the key component matrix. Four invalidating categories (HEAD, porcelain,
+    // untracked content, toolchain identity) plus the tracked-modified content, which the
+    // directive's counterexample ① also requires.
+    const kBase = BASE_CACHE.computeKey(baseDeps({}));
+    check(
+      'T157 base cache key: the default probe inputs yield a 64-hex key, a matching 12-hex prefix and the format version base-v2',
+      !!kBase && /^[0-9a-f]{64}$/.test(kBase.key) && kBase.key12 === kBase.key.slice(0, 12) &&
+        BASE_CACHE.CACHE_VERSION === 'base-v2',
+      'key=' + (kBase && kBase.key12) + ' version=' + BASE_CACHE.CACHE_VERSION
+    );
+    const kHead = BASE_CACHE.computeKey(baseDeps({ head: 'head2' }));
+    check(
+      'T157 key matrix: a new HEAD invalidates the key (a commit always forces a real run)',
+      !!kHead && !!kBase && kHead.key !== kBase.key,
+      'head1=' + (kBase && kBase.key12) + ' head2=' + (kHead && kHead.key12)
+    );
+    const kPorcelain = BASE_CACHE.computeKey(baseDeps({ porcelain: '?? probe-new.go\0 M probe-mod.go\0?? probe-extra.go\0' }));
+    check(
+      'T157 key matrix: a changed porcelain output invalidates the key',
+      !!kPorcelain && !!kBase && kPorcelain.key !== kBase.key,
+      'base=' + (kBase && kBase.key12) + ' changed=' + (kPorcelain && kPorcelain.key12)
+    );
+    const kUntracked = BASE_CACHE.computeKey(baseDeps({ files: { 'probe-new.go': 'package probe // edited\n' } }));
+    check(
+      'T157 key matrix: changed UNTRACKED file CONTENT invalidates the key (same path, new bytes)',
+      !!kUntracked && !!kBase && kUntracked.key !== kBase.key,
+      'base=' + (kBase && kBase.key12) + ' changed=' + (kUntracked && kUntracked.key12)
+    );
+    const kTracked = BASE_CACHE.computeKey(baseDeps({ files: { 'probe-mod.go': 'package probe // edited\n' } }));
+    check(
+      'T157 key matrix: changed TRACKED-modified file content invalidates the key',
+      !!kTracked && !!kBase && kTracked.key !== kBase.key,
+      'base=' + (kBase && kBase.key12) + ' changed=' + (kTracked && kTracked.key12)
+    );
+    const kGoVersion = BASE_CACHE.computeKey(baseDeps({ goVersion: 'go version go1.23.0 windows/amd64\n' }));
+    const kGoEnv = BASE_CACHE.computeKey(baseDeps({ goEnv: DEFAULT_GO_ENV.replace('GOFLAGS=', 'GOFLAGS=-mod=mod') }));
+    check(
+      'T157 key matrix: the toolchain identity invalidates the key (`go version` and each `go env` variable)',
+      !!kGoVersion && !!kBase && kGoVersion.key !== kBase.key &&
+        !!kGoEnv && kGoEnv.key !== kBase.key,
+      'base=' + (kBase && kBase.key12) + ' goversion=' + (kGoVersion && kGoVersion.key12) +
+        ' goenv=' + (kGoEnv && kGoEnv.key12)
+    );
+    check(
+      'T157 the toolchain identity is the WHOLE `go env` digest (the per-variable allow-list is retired in v1.81)',
+      BASE_CACHE.internals.GO_ENV_VARS === undefined,
+      'vars=' + JSON.stringify(BASE_CACHE.internals.GO_ENV_VARS)
+    );
+    const kUnreadable = BASE_CACHE.computeKey(
+      baseDeps({
+        porcelain: '?? probe-new.go\0',
+        readFile: () => {
+          throw new Error('EACCES: simulated');
+        },
+      })
+    );
+    const kReadable = BASE_CACHE.computeKey(baseDeps({ porcelain: '?? probe-new.go\0' }));
+    check(
+      'T157 key matrix: an UNREADABLE untracked file still yields a key (recorded as unreadable, never thrown) and differs from the readable one',
+      !!kUnreadable && !!kReadable && kUnreadable.key !== kReadable.key,
+      'unreadable=' + (kUnreadable && kUnreadable.key12) + ' readable=' + (kReadable && kReadable.key12)
+    );
+    const kStable = BASE_CACHE.computeKey(baseDeps({}));
+    check(
+      'T157 key determinism: the same inputs always yield the same key',
+      !!kBase && !!kStable && kBase.key === kStable.key,
+      'first=' + (kBase && kBase.key12) + ' second=' + (kStable && kStable.key12)
+    );
+
+    // ---- T158: fail-open, five faces. None of them may throw or produce a verdict.
+    const kGitFail = BASE_CACHE.computeKey(baseDeps({ gitOk: false }));
+    const kGoFail = BASE_CACHE.computeKey(baseDeps({ goOk: false }));
+    check(
+      'T158 fail-open 1/2: an uncomputable key (git failure / go failure) is null, never a throw',
+      kGitFail === null && kGoFail === null,
+      'git=' + JSON.stringify(kGitFail) + ' go=' + JSON.stringify(kGoFail)
+    );
+    check(
+      'T158 fail-open 3: a missing entry reads as null',
+      BASE_CACHE.read(memStore(), 'no-such-key') === null,
+      'n/a'
+    );
+    check(
+      'T158 fail-open 3b: a malformed entry (invalid JSON) reads as null',
+      BASE_CACHE.read({ get: () => '{not json', put: () => {} }, 'k') === null &&
+        BASE_CACHE.read({ get: () => JSON.stringify({ v: 1, records: RECORDS.slice(0, 3) }), put: () => {} }, 'k') === null &&
+        BASE_CACHE.read({ get: () => JSON.stringify({ v: 2, records: RECORDS }), put: () => {} }, 'k') === null,
+      'n/a'
+    );
+    let readThrew = null;
+    let readValue = 'NOT-CALLED';
+    try {
+      readValue = BASE_CACHE.read(
+        {
+          get: () => {
+            throw new Error('store unavailable');
+          },
+          put: () => {},
+        },
+        'k'
+      );
+    } catch (e) {
+      readThrew = e;
+    }
+    check(
+      'T158 fail-open 4: a store whose get() throws neither escapes nor returns records',
+      readThrew === null && readValue === null,
+      'threw=' + (readThrew === null ? 'no' : String(readThrew)) + ' value=' + JSON.stringify(readValue)
+    );
+    let writeThrew = null;
+    try {
+      BASE_CACHE.write(
+        {
+          get: () => null,
+          put: () => {
+            throw new Error('disk full');
+          },
+        },
+        'k',
+        RECORDS
+      );
+    } catch (e) {
+      writeThrew = e;
+    }
+    check(
+      'T158 fail-open 5: a store whose put() throws is silently swallowed',
+      writeThrew === null,
+      'threw=' + (writeThrew === null ? 'no' : String(writeThrew))
+    );
+
+    // ---- T159: only PASS conclusions are stored.
+    const failRecords = RECORDS.slice();
+    failRecords[2] = Object.assign({}, failRecords[2], { verdict: 'FAIL', detail: 'ok=1 FAIL=1 exit=1' });
+    const failStore = memStore();
+    BASE_CACHE.write(failStore, 'keyFail', failRecords);
+    check(
+      'T159 PASS-only: one FAIL among the four records means nothing is written',
+      failStore.size() === 0,
+      'entries=' + failStore.size()
+    );
+    check(
+      'T159 validRecords rejects a FAIL payload outright (a frozen FAIL can never be read back)',
+      BASE_CACHE.validRecords({ v: 1, key: 'kFail', records: failRecords }) === false &&
+        BASE_CACHE.validRecords({ v: 1, key: 'kPass', records: RECORDS }) === true,
+      'rejectsFail=' + (BASE_CACHE.validRecords({ v: 1, key: 'kFail', records: failRecords }) === false)
+    );
+    const passStore = memStore();
+    BASE_CACHE.write(passStore, 'keyPass', RECORDS);
+    check(
+      'T159 the same four records all PASS: exactly one entry is written',
+      passStore.size() === 1 && passStore.keys()[0] === 'keyPass',
+      'entries=' + passStore.size() + ' keys=' + JSON.stringify(passStore.keys())
+    );
+
+    // ---- T160: cold and warm paths produce the SAME quadruples, and the stored value
+    // carries nothing but `{v, records}`.
+    const roundStore = memStore();
+    const coldRead = BASE_CACHE.read(roundStore, 'keyPass');
+    BASE_CACHE.write(roundStore, 'keyPass', RECORDS);
+    const warmRead = BASE_CACHE.read(roundStore, 'keyPass');
+    const storedText = roundStore.get('keyPass');
+    const storedKeys = storedText === null ? [] : Object.keys(JSON.parse(storedText));
+    check(
+      'T160 cold/warm equivalence: the miss produced the fresh records and the hit reproduces the identical (id, verdict, label, detail) quadruples',
+      coldRead === null && !!warmRead && quad(warmRead) === quad(RECORDS),
+      'cold=' + JSON.stringify(coldRead) + ' warm=' + quad(warmRead)
+    );
+    check(
+      'T160 the stored value carries exactly {v, key, records} - the key binds the entry, no scope, no verdict container',
+      JSON.stringify(storedKeys) === JSON.stringify(['v', 'key', 'records']) &&
+        JSON.parse(storedText).v === 1 &&
+        JSON.parse(storedText).key === 'keyPass' &&
+        JSON.parse(storedText).records.length === 3,
+      'keys=' + JSON.stringify(storedKeys)
+    );
+
+    // ---- T161: the key carries NO scope segment, so three scopes share one entry.
+    const scopeA = baseDeps({});
+    scopeA.scope = { kind: 'tree' };
+    scopeA.kind = 'tree';
+    scopeA.baseRef = null;
+    const scopeB = baseDeps({});
+    scopeB.scope = { kind: 'range', base: 'A', head: 'B' };
+    scopeB.kind = 'range';
+    scopeB.baseRef = 'A';
+    const scopeC = baseDeps({});
+    scopeC.scope = { kind: 'index' };
+    scopeC.kind = 'index';
+    const kScopeA = BASE_CACHE.computeKey(scopeA);
+    const kScopeB = BASE_CACHE.computeKey(scopeB);
+    const kScopeC = BASE_CACHE.computeKey(scopeC);
+    check(
+      'T161 key has no scope segment: tree / range / index deps yield the SAME key (three scopes share one entry)',
+      !!kScopeA && !!kScopeB && !!kScopeC && kScopeA.key === kBase.key &&
+        kScopeB.key === kBase.key && kScopeC.key === kBase.key,
+      JSON.stringify([kScopeA && kScopeA.key12, kScopeB && kScopeB.key12, kScopeC && kScopeC.key12])
+    );
+
+    // ---- T162: the abandon thresholds (fail-open back to the full run).
+    const manyPaths = [];
+    for (let i = 0; i < 201; i += 1) manyPaths.push('?? probe-untracked-' + i + '.go\0');
+    const kTooMany = BASE_CACHE.computeKey(
+      baseDeps({ porcelain: manyPaths.join(''), readFile: () => Buffer.from('x', 'utf8') })
+    );
+    const kAtLimit = BASE_CACHE.computeKey(
+      baseDeps({ porcelain: manyPaths.slice(0, 200).join(''), readFile: () => Buffer.from('x', 'utf8') })
+    );
+    check(
+      'T162 untracked bound: 201 untracked paths abandon the cache, exactly 200 still compute a key',
+      kTooMany === null && !!kAtLimit &&
+        BASE_CACHE.MAX_UNTRACKED_PATHS === 200,
+      'over=' + JSON.stringify(kTooMany) + ' at=' + (kAtLimit && kAtLimit.key12) +
+        ' cap=' + BASE_CACHE.MAX_UNTRACKED_PATHS
+    );
+    const kTooBig = BASE_CACHE.computeKey(
+      baseDeps({
+        porcelain: '?? probe-new.go\0',
+        readFile: () => ({ length: BASE_CACHE.MAX_UNTRACKED_BYTES + 1 }),
+      })
+    );
+    check(
+      'T162 byte bound: untracked content above 64 MiB abandons the cache (checked BEFORE hashing)',
+      kTooBig === null && BASE_CACHE.MAX_UNTRACKED_BYTES === 64 * 1024 * 1024,
+      'result=' + JSON.stringify(kTooBig) + ' cap=' + BASE_CACHE.MAX_UNTRACKED_BYTES
+    );
+
+    // ---- T163: the disk store - atomic entry names, round trip and the LRU bound.
+    const osTmp = require('os');
+    const lruDir = fs.mkdtempSync(path.join(osTmp.tmpdir(), 'prfrail-basecache-'));
+    const rtDir = fs.mkdtempSync(path.join(osTmp.tmpdir(), 'prfrail-basecache-rt-'));
+    const dropDir = (dir) => {
+      let names = [];
+      try {
+        names = fs.readdirSync(dir);
+      } catch (e) {
+        return;
+      }
+      for (const n of names) {
+        try {
+          fs.unlinkSync(path.join(dir, n));
+        } catch (e) {
+          /* best effort */
+        }
+      }
+      try {
+        fs.rmdirSync(dir);
+      } catch (e) {
+        /* best effort */
+      }
+    };
+    try {
+      const lruStore = BASE_CACHE.diskStore(BASE_ROOT, { dir: lruDir });
+      for (let i = 0; i < BASE_CACHE.LRU_CAP + 1; i += 1) {
+        lruStore.put('lru-key-' + i, JSON.stringify({ v: 1, records: RECORDS }));
+      }
+      const entryNames = fs.readdirSync(lruDir).filter((n) => BASE_CACHE.internals.ENTRY_RE.test(n));
+      const tempLeft = fs.readdirSync(lruDir).filter((n) => /\.tmp$/.test(n));
+      check(
+        'T163 LRU bound: after LRU_CAP + 1 writes the directory holds exactly LRU_CAP entries, all named sha256(key).json, with no atomic temp file left behind',
+        BASE_CACHE.LRU_CAP === 50 && entryNames.length === 50 && tempLeft.length === 0,
+        'entries=' + entryNames.length + ' temp=' + tempLeft.length + ' cap=' + BASE_CACHE.LRU_CAP
+      );
+
+      const rtStore = BASE_CACHE.diskStore(BASE_ROOT, { dir: rtDir });
+      BASE_CACHE.write(rtStore, 'round-trip-key', RECORDS);
+      const rtBack = BASE_CACHE.read(rtStore, 'round-trip-key');
+      const rtFiles = fs.readdirSync(rtDir);
+      check(
+        'T163 disk store round trip: write() -> read() reproduces the same quadruples through the real file store',
+        !!rtBack && quad(rtBack) === quad(RECORDS) && rtFiles.length === 1 &&
+          BASE_CACHE.internals.ENTRY_RE.test(rtFiles[0]) &&
+          rtFiles[0] === BASE_CACHE.internals.entryName('round-trip-key'),
+        'files=' + JSON.stringify(rtFiles) + ' back=' + quad(rtBack)
+      );
+
+      let evictThrew = null;
+      let evictValue = 'NOT-CALLED';
+      try {
+        evictValue = BASE_CACHE.internals.evictToCap(path.join(rtDir, 'no-such-dir'), 0);
+      } catch (e) {
+        evictThrew = e;
+      }
+      check(
+        'T163 eviction is fail-open: a missing directory answers 0 instead of throwing',
+        evictThrew === null && evictValue === 0,
+        'threw=' + (evictThrew === null ? 'no' : String(evictThrew)) + ' value=' + JSON.stringify(evictValue)
+      );
+    } finally {
+      dropDir(lruDir);
+      dropDir(rtDir);
+    }
+
+    // ---- T164: gate.js wiring. The runner must compute -> read -> return on a hit and
+    // write only after the four records were really produced; no hit/miss marker may exist.
+    const gateSrc = decodeBuffer(fs.readFileSync(path.join(__dirname, 'gate.js')));
+    const readAt = gateSrc.indexOf('baseCache.read(store, cacheKey)');
+    const writeAt = gateSrc.indexOf('baseCache.write(store, cacheKey, records)');
+    check(
+      'T164 gate.js wiring: computeKey BEFORE read, read -> verbatim replay -> return, write only after the four records exist',
+      gateSrc.indexOf("require('./lib/baseCache')") >= 0 &&
+        gateSrc.indexOf('baseCache.computeKey') >= 0 &&
+        readAt >= 0 &&
+        writeAt > readAt &&
+        /for \(const r of hit\) out\.rec\(r\.id, r\.verdict, r\.label, r\.detail\);/.test(gateSrc),
+      'readAt=' + readAt + ' writeAt=' + writeAt
+    );
+    const computeAt = gateSrc.indexOf('baseCache.computeKey');
+    check(
+      'T164 gate.js recomputes the key BEFORE reading the cache (a read-first order would let a stale key serve)',
+      computeAt >= 0 && readAt >= 0 && computeAt < readAt,
+      'computeAt=' + computeAt + ' readAt=' + readAt
+    );
+    const baseSrc = decodeBuffer(fs.readFileSync(path.join(__dirname, 'lib', 'baseCache.js')));
+    const markerFree = (src) =>
+      src.indexOf("'hit'") < 0 && src.indexOf('"hit"') < 0 &&
+      src.indexOf("'miss'") < 0 && src.indexOf('"miss"') < 0 &&
+      src.indexOf('cache-hit') < 0 && src.indexOf('cache-miss') < 0;
+    check(
+      'T164 no cache marker: no `hit` / `miss` string literal in gate.js or lib/baseCache.js',
+      markerFree(gateSrc) && markerFree(baseSrc),
+      'gate=' + markerFree(gateSrc) + ' base=' + markerFree(baseSrc)
+    );
+    check(
+      'T164 the environment kill switch GATES_BASE_CACHE=off is honoured (comparison evidence path)',
+      gateSrc.indexOf('GATES_BASE_CACHE') >= 0 && gateSrc.indexOf("!== 'off'") >= 0,
+      'switch=' + (gateSrc.indexOf('GATES_BASE_CACHE') >= 0)
+    );
+
+    // ---- T165: the four key-completeness faces found by independent scanning: ignored
+    // `.go` files (invisible to git status but walked by gofmt), the gofmt binary itself,
+    // the tracked-path budget, and forged detail strings.
+    const kIgnored = BASE_CACHE.computeKey(baseDeps({ ignoredGo: '.vscode/probe.go\n' }));
+    check(
+      'T165 an IGNORED `.go` file (invisible to git status) still invalidates the key',
+      !!kIgnored && !!kBase && kIgnored.key !== kBase.key,
+      'base=' + (kBase && kBase.key12) + ' ignored=' + (kIgnored && kIgnored.key12)
+    );
+    const kGofmt = BASE_CACHE.computeKey(baseDeps({ gofmtBytes: 'gofmt-binary-v2' }));
+    check(
+      'T165 the gofmt binary is NOT part of the key (gofmt always runs for real, v1.80)',
+      !!kGofmt && !!kBase && kGofmt.key === kBase.key,
+      'base=' + (kBase && kBase.key12) + ' gofmt=' + (kGofmt && kGofmt.key12)
+    );
+    const bigTracked = Array.from({ length: 201 }, (_, i) => ' M m' + i + '.go').join('\0') + '\0';
+    check(
+      'T165 the tracked-path budget abandons the cache (201 modified tracked files => null)',
+      BASE_CACHE.computeKey(baseDeps({ porcelain: bigTracked })) === null,
+      'tracked201=null'
+    );
+    const forged = { v: 1, key: 'a'.repeat(64), records: RECORDS.map((r) => Object.assign({}, r, { detail: 'forged' })) };
+    const goodValue = { v: 1, key: 'b'.repeat(64), records: RECORDS };
+    check(
+      'T165 a forged detail is rejected (validRecords enforces the exact detail shape)',
+      BASE_CACHE.validRecords(forged) === false && BASE_CACHE.validRecords(goodValue) === true,
+      'forged=' + BASE_CACHE.validRecords(forged) + ' real=' + BASE_CACHE.validRecords(goodValue)
+    );
+    const goWorkDeps = baseDeps({
+      goEnv: 'GOROOT=C:\\go\nGOWORK=' + path.join(BASE_ROOT, 'go.work') + '\n',
+    });
+    check(
+      'T165 a non-empty GOWORK abandons the cache (fail-open; out-of-workspace modules cannot be keyed)',
+      BASE_CACHE.computeKey(goWorkDeps) === null &&
+        !!BASE_CACHE.computeKey(baseDeps({ goEnv: 'GOROOT=C:\\go\nGOWORK=off\n' })),
+      'gowork=null off=ok'
+    );
+    const delPorcelain = Array.from({ length: 201 }, (_, i) => ' D d' + i + '.go').join('\0') + '\0';
+    check(
+      'T165 deleted-path entries count toward the change budget (201 deletions => null)',
+      BASE_CACHE.computeKey(baseDeps({ porcelain: delPorcelain })) === null,
+      'deleted201=null'
+    );
+    const keyStore = memStore();
+    const kFor = BASE_CACHE.computeKey(baseDeps({}));
+    BASE_CACHE.write(keyStore, kFor.key, RECORDS);
+    const keyedEntry = JSON.parse(keyStore.get(kFor.key));
+    check(
+      'T165 a stored entry is bound to its key (a record replayed under another key is a miss)',
+      keyedEntry.key === kFor.key && BASE_CACHE.read(keyStore, 'f'.repeat(64)) === null,
+      'bound=' + (keyedEntry.key === kFor.key)
     );
   }
 

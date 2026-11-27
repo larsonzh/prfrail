@@ -2547,7 +2547,7 @@ Completion record (2026-11-27): R = 1, D = 0, zero probes; the (1) benefit gate 
 | Field | Content |
 |---|---|
 | Identifier | `GATES-BASE-CACHE` (ledger id = **P96**; source = P88 report §7 recommendation 2 + the single tier-3 performance candidate in the v79 snapshot + the user naming it on 2026-11-27) |
-| Status | 🔄 In progress (started 2026-11-27; stop 1 ruled = do + option 1 + deep tier 1+3 (direct user ruling, not a precedent); the (2) clause has landed in v1.78; the four elements are in `docs/validation/evidence/P96-GATES-BASE-CACHE/00-briefing.md`) |
+| Status | 🔄 In progress (started 2026-11-27; stop 1 ruled = do + option 1 + deep tier 1+3 (direct user ruling, not a precedent); the (2) clause has landed in v1.81 (four amendments in one slice); the four elements are in `docs/validation/evidence/P96-GATES-BASE-CACHE/00-briefing.md`) |
 | Goal | (1) benefit gate: measure the four isolated base timings and the repeated payment across the three scopes, plus a key-design draft, a clause draft and a two-option flake policy comparison; (2) clause first: land the base verdict cache clause in §6.1 (directive MINOR bump, v1.78 expected), criteria code untouched, code only after CI is green; (3) implement the cross-scope base verdict cache (key / three counterexamples / fail-open); (4) zero change to the criteria decision logic, base verdict semantics unchanged, never cache any G1-G9 criteria verdict |
 | Dependency | v79 snapshot closed; P88 report §7 recommendation 2 (source); the G4b-CACHE clause template (appendix C.0aj); no other prerequisite |
 | Size | M |
@@ -2563,6 +2563,8 @@ Completion record (2026-11-27): R = 1, D = 0, zero probes; the (1) benefit gate 
 | Temp files | `tmp/P96-GATES-BASE-CACHE/` (append-only until (8c)) |
 | Quota disclosure | (7) = regular tier `GPT-5.3-Codex (copilot)` **1 final review + 2 re-reviews (M-slice 1+2)**; if stop 1 rules high risk the quota rises to 1+3 by user ruling; no blind review; batch helper GLM-5.3-Flash ≥2 (modelId `glm-5.3-flash`, `glm-5.3` forbidden); (6) mandatory (touches the `gate.js` / `selftest.js` criterion implementation) |
 | Start condition | Named by the user (this message); four elements on record; v79 snapshot closed |
+
+Completion record (2026-11-28): R = 12 ((3) 2 / (6) 2 / (7) 3 / narrowing and convergence 4 / (9) first-round G5(d) 1), D = 0, zero probes; the directive moved v1.78 -> v1.79 -> v1.80 -> v1.81 (four amendments in one slice); the cache covers only build / vet / test while gofmt always runs for real; `SELFTEST` 806/806, cold/hot `FULL_IDENTICAL=True`, three counterexamples and fail-open all pass; the (7) deep tier 1+3 was exhausted, plus the Neon cross-check and two out-of-quota narrow re-reviews (OB-37); the report pair is `docs/validation/gates-base-cache{,_EN}.md`.
 
 ## Known defects (to be handled before later slices)
 
