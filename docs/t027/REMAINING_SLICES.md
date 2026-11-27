@@ -2531,6 +2531,30 @@ A6 ② 进度（第 2 批，2026-09-15）：
 
 完成记录（2026-11-26）：R = 6、D = 0、探针 0；三件合并评估 = (a) 做同构扩展（`sixstage` 围栏体作用域豁免由 G6-4 扩到 G2 与 G4b，**不做** `gate-exempt` 标记机制）、(b) **不做**通用引用豁免登记位、(c) **做**白名单登记门槛条款（条目仍为零、T23 逐字不动）；判据判定逻辑本体零改动，豁免在扫描前按行号剔除；`SELFTEST` 757 → 770（T144–T156）；准则升 v1.77（头部 / §0.3 / §6.3 两处子句与门槛段 / 附录 C.0bd，六形状全等）；⑨ 三作用域 `TOTAL_FAIL=0` + `gofmt` / `build` / `vet` / `test` 全绿；审查 ⑤ 1 轮 `PASS WITH FIXES`（GLM-5.3 备用档，独立性降低已登记）、⑥ 1 轮 `INDEPENDENT SCAN: PASS`、⑦ 1+2（终审两 Low → 复审 r2 两 Low → r3 `RE-REVIEW: PASS`）；报告对 `docs/validation/gates-exempt{,_EN}.md`，证据包 `docs/validation/evidence/P94-GATES-EXEMPT/`；主提交 `49f1609` 已推 `origin/main`（未推 gitee，范围 `9217915..49f1609`），CI run `45910223000` 双腿 success（两腿 `SELFTEST: PASS 770/770`、`GATE REPORT scope=ci changed=16`、`TOTAL_FAIL=0`；包级 ok ubuntu 21 / windows 15、FAIL 0）。
 
+### P95 — `GATES-CRITERIA-ASYNC`（G6/G7/G8 异步化 · 工具片）· ✅ 闭环
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `GATES-CRITERIA-ASYNC`（台账编号 = **P95**；来源 = v72 层 3 性能候选 + P88 报告 §7 建议 4 + v78 层 3 记录态 + 用户 2026-11-27 点名） |
+| 状态 | ✅ 闭环（2026-11-27 收口；① 收益闸 = 不做，用户裁定采纳候选 A（评估类闭环，不得作先例）；四要素见 `docs/validation/evidence/P95-GATES-CRITERIA-ASYNC/00-briefing.md`；报告对 `docs/validation/gates-criteria-async{,_EN}.md`） |
+| 目标 | ① 收益论证闸：实测 `--all` 单进程内 G6 / G7 / G8 的串行耗时构成与并发收益上限，并评估共享缓存并发读与报告顺序契约的改造代价；② 论证通过则把 G6 / G7 / G8 改为 `runCriteriaConcurrent` 真并发；③ 判据判定结论逐字不变、报告顺序（`RUN_ORDER` 回填）不变 |
+| 依赖 | v78 快照闭环；P88 报告 §7 建议 4（出处）；无其它前置 |
+| 规模 | M |
+| 步骤 | 0 → ① 影响判定 + 收益论证闸 → ② 实现 → ③ 一致性 → ④ 门禁 → ⑤ → ⑥ → ⑦ → ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| 现状缺口 | G6 / G7 / G8 仍同步串行；`runCriteriaConcurrent` 调度契约已铺好未启用；收益未实测 |
+| 交付物 | ① 收益论证报告（串行构成 + 并发收益上限 + 代价）；② 获批并发化实现；③ A/B sha256 + 报告顺序不变对照证据；④ 报告对 `docs/validation/gates-criteria-async{,_EN}.md`；⑤ 台账段与完成记录；⑥ 证据包；⑦ 大改建议清单 |
+| 验收证据 | ① 同输入 A/B 逐字一致（sha256 相同 + 比对器可证伪）+ 报告顺序逐字不变；② SELFTEST 全 PASS（总数若随断言政策变化，须与 ① 方案书一致并台账记录）；③ 三作用域 TOTAL_FAIL=0；④ 报告对双语严格镜像 |
+| 边界 | 判据判定逻辑本体零改动（只改调度 / 并发方式）；不改 ci.yml / internal/** / CONTRACTS / schema / fixtures / workflows；G5-b 闭集与模型白名单不动；ADR 不新增；准则是否升 MINOR 由 ① 判定；不做 gitee |
+| 分级 | `[SLICE]` |
+| 探针额度 | 0 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/P95-GATES-CRITERIA-ASYNC/freedom-list.md` |
+| R/D 基线 | R = 0、D = 0（起跑时登记） |
+| 临时件落点声明 | `tmp/P95-GATES-CRITERIA-ASYNC/`（⑧c 前只增不删） |
+| 额度口径披露 | ⑦ = 常规档 `GPT-5.3-Codex (copilot)` 1 终审 + 1 复审（S 档口径，用户 2026-11-27 ① 停点裁定，不得作先例）；⑥ = 1 次轻扫（用户裁定保留，未触判据实现）；主控 = V4 Pro Max（用户裁定，不得作先例）；盲审不抽；批量辅助 GLM-5.3-Flash ≥2（modelId `glm-5.3-flash`，禁 `glm-5.3`）；判据代码零改动、准则不升版 |
+| 起跑条件 | 用户点名（本消息）；四要素留痕；v78 快照闭环 |
+
+完成记录（2026-11-27）：R = 1、D = 0、探针 0；① 收益论证闸 = **不做**（ctx 读 API 全同步、Node 单进程 async 化无法重叠同步 I/O ⇒ 并发收益理论上界 ≈0、实际 ≤250 ms/5.8 s 墙钟）；用户 ① 停点裁定采纳候选 A（评估类闭环，不得作先例）——判据代码零改动、准则不升版（v1.77 不变）；P88 报告 §7 建议 4 登记「已评估、收益不成立、不实施」；报告对 `docs/validation/gates-criteria-async{,_EN}.md`（双语严格镜像），证据包 `docs/validation/evidence/P95-GATES-CRITERIA-ASYNC/`（10 载荷 + MANIFEST/SHA256SUMS）；审查 ⑤ 1 轮 `PRE-REVIEW: PASS`（2 Low 已整改 + 3 Info）、⑥ 1 轮 `INDEPENDENT SCAN: PASS`、⑦ 1+1（r1 `FINDINGS` 1 Medium + 1 Low → 整改 → r2 `RE-REVIEW: PASS`，额度用满）；批量辅助 GLM-5.3-Flash ×2（`MIRROR: PASS` / `NUMBERS: PASS`）；SELFTEST 770/770 不变、三作用域 `TOTAL_FAIL=0`；停于 ⑩ 等授权提交（仅 origin）。
+
 ## 已知缺陷（后续切片前处理）
 
 > **阻断口径不变**：仅高频/已复现缺陷阻断，观测级 flake 只记录并在验证报告中列示。
