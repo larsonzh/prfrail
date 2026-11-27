@@ -2358,7 +2358,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 临时件落点声明 | 本片临时目录 = `tmp/P87-DIRECTIVE-REVIEW-MODEL-POLICY/`（⑧c 前只增不删；CI 捕获件同样落该目录，不落 `tmp/` 根） |
 | 额度口径披露 | ⑦ = 治理片 ⇒ §7.5「L 档 / 治理片 / 高风险」1 终审 + 3 复审；档位 = `GPT-5.3-Codex` 常规档（§5.2 ⑦ 分档表判据：触规则语义 / 门禁判据 / 角色授权 ⇒ Codex）；盲审必抽 1 次（另计 +1：模型名单触身份准入语义）；Neon 交叉复核按触发式口径、本片不预配；批量辅助 GLM ≥2（镜像核对 / 闭集三处一致核对） |
 
-前置缺口登记（2026-11-24）：轻量档（Gemini 4 Hydrogen）条款已落地、对照评审实测未完成，属 P87 已知前置缺口，待后续业务片按 §1.7.4 临时授权补足；补足后回填 P87 报告注记。该项不得表述为已验证。
+前置缺口已补足（2026-11-28，P97）：轻量档（Gemini 4 Hydrogen）条款已落地、对照评审实测已由 P97 `HYDROGEN-CONTROL-PILOT` 完成（对照结论见 `hydrogen-control-pilot{,_EN}.md`）；P87 期内该项仍未实测，故不得表述为已验证。
 
 完成记录（2026-11-25）：R = 0、D = 0、探针 0；主提交 `8b64ce3`（准则 v1.72）+ 回填 `2782a09`（5 文件）；CI 主轮 `45294006169` 双腿 success（已回填报告）、回填轮 `45356014951` 仅作观察记录；⑦ = 盲审 1 + 终审 1 PASS（1+3 未用尽）；⑥ 2/3；⑤ 1+1；② 由 `prfrail-implementer`、③ 由 `prfrail-tester` 承担；G5-b 闭集 11 枚三处逐字一致；SELFTEST 744/744；三作用域 `TOTAL_FAIL=0`；ADR-048 已登记（模型白名单 / G5-b 闭集变更触身份准入语义，参照 ADR-019）；报告对 `docs/validation/directive-review-model-policy{,_EN}.md`；证据包 `docs/validation/evidence/P87-DIRECTIVE-REVIEW-MODEL-POLICY/`（19 载荷）。**Hydrogen 前置缺口**：轻量档条款已落地、对照评审实测未完成，指向后续业务片（§1.7.4 临时授权 + OB 留痕），不得表述为已验证。
 
@@ -2578,6 +2578,32 @@ A6 ② 进度（第 2 批，2026-09-15）：
 | 起跑条件 | 用户点名（本消息）；四要素留痕；v79 快照闭环 |
 
 完成记录（2026-11-28）：R = 12（③ 2 / ⑥ 2 / ⑦ 3 / 收窄与终局 4 / ⑨ 首轮 G5(d) 1）、D = 0、探针 0；准则 v1.78 → v1.79 → v1.80 → v1.81（同片四段修订）；缓存只覆盖 build / vet / test、gofmt 恒真跑；`SELFTEST` 806/806、冷热 `FULL_IDENTICAL=True`、三反例与 fail-open 均通过；⑦ 深度档 1+3 用尽 + Neon 交叉复核 + 两轮收窄复审（额度外，OB-37）；报告对 `docs/validation/gates-base-cache{,_EN}.md`。主提交 `81a6794`、CI run `46053254410` 双腿 success（`SELFTEST: PASS 806/806` ×2、`changed=17` ×2、`TOTAL_FAIL=0` ×2）；GLM 批量辅助 2 次（报告对镜像机械复核 + 全片数字核对）；`find-quotes.js` 处置位随本片 ⑧c 清理（v80 快照吸收）。
+
+### P97 — `HYDROGEN-CONTROL-PILOT`（⑦ 轻量档对照评审实测 · docs-only）· ✅ 闭环
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `HYDROGEN-CONTROL-PILOT`（台账编号 = **P97**；来源 = P87 报告 §7 前置缺口注记 + 台账 P87 段「前置缺口登记」+ v80 快照 §五 + 用户 2026-11-28 点名） |
+| 状态 | ✅ 闭环（2026-11-28；R = 0、D = 1；四要素见证据包 `00-briefing.md`；报告对 `docs/validation/hydrogen-control-pilot{,_EN}.md`） |
+| 目标 | ① 用 `Gemini 4 Hydrogen (copilot)` 对 P87 输入包做对照评审实测（§1.7.4 临时授权 + OB-146 留痕）；② 产出对照记录（结论 / 发现数 / 严重度 / 误判四面对照，只记录不重裁）；③ 回填 P87 报告 §7 注记与台账 P87 段「已补足」；④ §12.4 登记 OB-146；⑤ 报告对与证据包 |
+| 依赖 | v80 快照闭环；P87 证据包可得（`docs/validation/evidence/P87-DIRECTIVE-REVIEW-MODEL-POLICY/`，含 00-briefing / input-list / 01-arch / 03-verification / 04-reviews）；无其它前置 |
+| 规模 | S |
+| 步骤 | 0 → ①（停点 1）→ ②③ 对照记录文档 → ④ → ⑤ → ⑥ 跳过（经 ⑦ 确认）→ ⑦ 试水轮 + 终审轮 → ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| 现状缺口 | P87 轻量档（`Gemini 4 Hydrogen`）条款已落地、对照评审实测未完成；该项不得表述为已验证 |
+| 交付物 | ① 方案书（对照对象 / 口径 / OB-146 文本 / 升版判定）；② Hydrogen 试水原文（逐字归档）；③ 对照记录表；④ 报告对 `docs/validation/hydrogen-control-pilot{,_EN}.md`；⑤ P87 报告 §7 注记回填 + 台账 P87 段翻「已补足」+ 本段完成记录；⑥ §12.4 的 OB-146 条目；⑦ 证据包 |
+| 验收证据 | ① 试水原文逐字归档且 MANIFEST / SHA256SUMS 自洽；② 四面对照与 P87 原 ⑦ 结论可比；③ 注记回填双语严格镜像；④ 门禁 tree / index / ci 均 `TOTAL_FAIL=0` 且 CI 双腿 success；⑤ `SELFTEST` 806/806 不变（不触判据代码） |
+| 边界 | 不改 §2.2 / §2.4 / §5.2 矩阵 / §6.3 判据本体与 G5-b 闭集；不改任何规则语义（只登记 OB + 回填注记）；不改 `tools/gates/**` / `internal/**` / `ci.yml` / CONTRACTS / schema / fixtures / workflows；不新增 ADR；不做 gitee |
+| 分级 | `[SLICE]` |
+| 探针额度 | 0 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/P97-HYDROGEN-CONTROL-PILOT/freedom-list.md` |
+| R/D 基线 | R = 0、D = 0（起跑时登记；D 累计达 3 强制停片） |
+| 临时件落点声明 | `tmp/P97-HYDROGEN-CONTROL-PILOT/`（⑧c 前只增不删） |
+| 额度口径披露 | ⑦ = 试水轮 `Gemini 4 Hydrogen (copilot)` 1 轮（§1.7.4 临时授权、额度外、OB-146 留痕）+ 常规终审 `DeepSeek V4 Pro` **1 终审 + 1 复审（S 档 1+1）**；⑥ 跳过（不触判据实现文件，经 ⑦ 确认）；盲审不抽；批量辅助 GLM-5.3-Flash ≥2（modelId `glm-5.3-flash`，禁 `glm-5.3`） |
+| 起跑条件 | 用户点名（2026-11-28 本消息）；四要素留痕；v80 快照闭环 |
+
+完成记录（2026-11-28）：R = 0、D = 1、探针 0；Hydrogen 试水 1 轮 = `FINAL REVIEW: FINDINGS`（1 High + 2 Medium + 2 Low；credits 184.3，用户侧单一真值源）；P87 结论不重裁，3 条新发现登记观察项 O-2..O-4、两条 Low 登记 O-5；⑤ `PRE-REVIEW: PASS`（4 Low 已处置）、⑥ 跳过、⑦ 终审 `FINAL REVIEW: PASS`（3 Low 已解除）；准则升 v1.82（OB-146，窗口自 v1.72 起算第 1 例）；`SELFTEST` 806/806、tree / index / ci 均 `TOTAL_FAIL=0`；D-1 输入包路径声明与落点不一致（审查方发现、无结论影响）；停于 ⑩ 等授权提交（仅 origin）。
+
+观察项处置方向（用户 2026-11-28 裁定）：O-2..O-4 尽快处理——并入下一治理片顺带修订，或另立独立小修订片（修订对象 = §5.2 深度档档位列与取档授权句对齐 §8.2、§7.5 的 Neon 单价档位归属、矩阵可判性措辞）；O-1 仅记录不追改。
 
 ## 已知缺陷（后续切片前处理）
 

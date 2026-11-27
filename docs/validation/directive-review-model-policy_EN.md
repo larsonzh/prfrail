@@ -44,7 +44,7 @@ The clauses are landed, and the review chain and gates are all green; **current 
 
 ## 7. Open items and hand-off
 
-- **The Hydrogen comparison-review prerequisite is not yet met**: the light-tier clause (Gemini 4 Hydrogen) is landed while its comparison-review measurement is not done; this is a known P87 precondition gap to be filled by a later business slice under a section 1.7.4 temporary authorization, after which a note is backfilled into the P87 report. This item **must not be described as validated** (this slice does not call Hydrogen).
+- **The Hydrogen comparison review is now filled (P97, 2026-11-28)**: the light-tier (Gemini 4 Hydrogen) comparison-review measurement was completed by slice P97 `HYDROGEN-CONTROL-PILOT`, with the comparison results in `hydrogen-control-pilot{,_EN}.md`; it was still not measured during P87 (this slice does not call Hydrogen), so the item **must not be described as validated** within P87 itself.
 - **(7) re-review quota remaining: 3**: the final review passed in one round, so no re-review ran.
 - **The CI legs are now evidenced**: run \`45294006169\` (commit \`8b64ce3\`) is green on both legs and was backfilled into section 3; CI runs from later pushes serve as observation records only.
 - **v71 snapshot absorption**: the clauses and the ledger section are absorbed by the v71 snapshot (this slice does not edit `CHECKLIST_v70{,_EN}`).
