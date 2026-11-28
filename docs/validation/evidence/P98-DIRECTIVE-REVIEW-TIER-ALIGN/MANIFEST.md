@@ -16,6 +16,7 @@
 | `04-reviews/05-pre-review.txt` | ⑤ 预审报告逐字（PRE-REVIEW: PASS；.txt 归档） |
 | `04-reviews/08-review-7-r1.txt` | ⑦ 终审第 1 轮原文逐字（FINAL REVIEW: FINDINGS；.txt 归档） |
 | `04-reviews/09-scan-6.txt` | ⑥ 独立扫描报告逐字（补跑；INDEPENDENT SCAN: FINDINGS；.txt 归档） |
+| `04-reviews/10-review-7-r2.txt` | ⑦ 复审第 2 轮原文逐字（RE-REVIEW: FINDINGS；.txt 归档） |
 
 ## 编码与行尾
 

@@ -1,0 +1,22 @@
+P98 ⑦ 复审第 2 轮原文逐字归档（independent-reviewer + GPT-5.3-Codex (copilot) 常规档；2026-11-28；收窄输入轮）
+
+RE-REVIEW: FINDINGS
+
+逐条判定
+
+1. r1 #1（⑥补跑闭合路径）→ 部分
+- 闭合证据已到位：P98 额度行已改为“⑥补跑 1/3”（REMAINING_SLICES.md #L2629 / _EN #L2616）；C.0bf 审查行同步为“⑦ r1 判③不成立后按 §7.2 补跑”（DELIVERY_DIRECTIVE.md #L2604 / _EN #L2604）；F-4 已登记补跑与“1 Medium 元发现由补跑动作处置”（freedom-list.md #L10）；⑥原文归档存在且内容一致（04-reviews/09-scan-6.txt）。
+- 仍有 Medium 残留：P98 步骤行仍写“⑥ 跳过”，与上述补跑口径冲突（REMAINING_SLICES.md #L2619 / _EN #L2606）。
+
+2. r1 #2（台账口径与裁定 2 一致性）→ 部分
+- 已对齐：Goal 与 Acceptance evidence 已采用“单价不分档”口径（REMAINING_SLICES.md #L2616、#L2622；_EN #L2609）。
+- 仍有 Medium 残留：Current gap 仍保留“档位归属/另一档单价缺失”旧口径（EN 同位为 price-band attribution/missing other-band price）（REMAINING_SLICES.md #L2620 / _EN #L2607）。这与“无旧口径残留”的闭合目标不一致。
+
+3. ⑥处置判定 → CLOSED（动作层）
+- ⑥已补跑且产物齐备；09-scan-6 仅报告 1 条 Medium 元发现（针对“跳过不成立”），未引入新的独立技术遗留。
+- 但台账文本同步仍未全闭（见上面第 1、2 条 Medium）。
+
+Section E
+- 本轮严格按给定范围做收窄复核，仅核上一轮 Medium+ 闭合路径相关文件与行。
+- 全程只读，未改写任何文件。
+- 未做门禁重跑、CI 日志二次拉取、哈希复算；结论仅基于盘上文本证据一致性。
