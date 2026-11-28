@@ -98,6 +98,7 @@ INDEPENDENT SCAN: FINDINGS
 - No open Medium+ item (the (7) r3 PASS).
 - The 3 (5) Info items need no fix (#3 = the historical C.0be block is frozen and not retro-fixed).
 - Report-pair and evidence-pack item-set equality is verified by G3/G4; this report pair's own commit CI readings are added by the section 11.2 backfill commit.
+- Report-pair commit `6bb3e90` run `46097218281` both legs success (both legs `SELFTEST` 806/806, `changed=8`, `TOTAL_FAIL=0`); this section is added by the docs-only backfill commit after CI is doubly green (section 11.2), and that backfill commit's own CI run is an observation record only.
 
 ## 10. Artifact fence
 

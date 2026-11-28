@@ -2629,7 +2629,7 @@ CI（2026-11-28）：run `46077231907`（head `4f3af5f`）双腿 success（ubunt
 | 额度口径披露 | ⑦ = 常规档 `GPT-5.3-Codex (copilot)` **1 终审 + 3 复审（治理片行，§7.5）**；⑥ 补跑（⑦ r1 判 §7.2.1 ③ 不成立 ⇒ 按 §7.2 失败处置补跑 1 次，`MAI Code 2 Flash`，额度 1/3）；盲审不抽；批量辅助 GLM-5.3-Flash ≥2（modelId `glm-5.3-flash`，禁 `glm-5.3`） |
 | 起跑条件 | 用户点名（本消息）；四要素留痕；v81 快照闭环 |
 
-完成记录（2026-11-28）：R = 0、D = 0、探针 0；准则升 v1.83（MINOR：头部 + §0.3 新行 + §5.2 / §7.5 / §8.2 修订 + 附录 C.0bf）；停点 1 五项裁定全采（裁定 2 以 operator UI 实读修正 §7.5 单价注记，差异登记 freedom-list F-13）；O-2..O-4 / O-5 翻「已处置（P98）」（O-5 #5 只登记「已知、不追改」）；ADR-048 加 P98 修订注记；审查链 ⑤ `PRE-REVIEW: PASS`（3 Info）、⑥ 补跑 `INDEPENDENT SCAN: FINDINGS`（⑦ r1 判 §7.2.1 ③ 不成立 ⇒ 按 §7.2 补跑 1/3）、⑦ 常规档 `FINAL REVIEW: FINDINGS` → `RE-REVIEW: FINDINGS` → `RE-REVIEW: PASS`（1 终审 + 2 复审）；`SELFTEST` 806/806 不变、index / tree / ci 均 `TOTAL_FAIL=0`；主提交 `a3fa412`（条款）→ `0c6820b`（台账）→ `91a9821` → `f972214`（两轮整改），CI run `46093203794` / `46093550773` / `46095600247` / `46096087094` 均双腿 success；报告对与完成记录提交的 CI 读数由 §11.2 回填。 |
+完成记录（2026-11-28）：R = 0、D = 0、探针 0；准则升 v1.83（MINOR：头部 + §0.3 新行 + §5.2 / §7.5 / §8.2 修订 + 附录 C.0bf）；停点 1 五项裁定全采（裁定 2 以 operator UI 实读修正 §7.5 单价注记，差异登记 freedom-list F-13）；O-2..O-4 / O-5 翻「已处置（P98）」（O-5 #5 只登记「已知、不追改」）；ADR-048 加 P98 修订注记；审查链 ⑤ `PRE-REVIEW: PASS`（3 Info）、⑥ 补跑 `INDEPENDENT SCAN: FINDINGS`（⑦ r1 判 §7.2.1 ③ 不成立 ⇒ 按 §7.2 补跑 1/3）、⑦ 常规档 `FINAL REVIEW: FINDINGS` → `RE-REVIEW: FINDINGS` → `RE-REVIEW: PASS`（1 终审 + 2 复审）；`SELFTEST` 806/806 不变、index / tree / ci 均 `TOTAL_FAIL=0`；主提交 `a3fa412`（条款）→ `0c6820b`（台账）→ `91a9821` → `f972214`（两轮整改）→ `6bb3e90`（报告对与闭环），CI run `46093203794` / `46093550773` / `46095600247` / `46096087094` / `46097218281` 均双腿 success；回填提交自身 run 仅观察（§11.2）。 |
 
 ## 已知缺陷（后续切片前处理）
 

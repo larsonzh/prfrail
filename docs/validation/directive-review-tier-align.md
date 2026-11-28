@@ -98,6 +98,7 @@ INDEPENDENT SCAN: FINDINGS
 - 无 Medium+ 未闭环（⑦ r3 PASS）。
 - ⑤ 3 Info 无需修（#3 = C.0be 历史块冻结不追改）。
 - 报告对与证据包的条目集一致由 G3/G4 校验；本报告对提交的 CI 读数由 §11.2 回填提交补入。
+- 报告对提交 `6bb3e90` run `46097218281` 双腿 success（两腿 `SELFTEST` 806/806、`changed=8`、`TOTAL_FAIL=0`）；本节由 CI 双绿后的 docs-only 回填提交补入（§11.2），该回填提交自身的 CI run 仅作观察记录。
 
 ## 10. 工件围栏
 
