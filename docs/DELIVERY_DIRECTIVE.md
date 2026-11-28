@@ -2601,7 +2601,7 @@ SLICE: READY_FOR_REVIEW | SLICE: BLOCKED
 | 目标 | §5.2 深度档档位列与取档授权句对齐 §8.2（Neon = Extra High）+ 矩阵可判性措辞；§7.5 上下文档位计价注记按 operator UI 实读 2026-11-28 修正（Neon 单价不分档、Carbon 上下文两档选项不分档）+ 备选额度口径精简；观察项 O-2..O-4 / O-5 翻「已处置（P98）」；ADR-048 加修订注记 |
 | 交付物 | 报告对 `docs/validation/directive-review-tier-align{,_EN}.md`；台账 P98 段与 P97 段观察项处置翻转；证据包 `docs/validation/evidence/P98-DIRECTIVE-REVIEW-TIER-ALIGN/` |
 | 范围 | 只改 §5.2 / §7.5 / §8.2 相关行 + 版本包 + 台账与报告；不改 §2.2 / §2.4 / G5-b / §6.3 / `tools/gates/**` / `internal/**` / `ci.yml` / CONTRACTS / schema / fixtures / workflows；不新增 ADR |
-| 审查 | ① 架构师（V4 Pro Max）；⑤ 预审（V4 Pro Max）；⑥ 跳过（经 ⑦ 确认，P72 先例）；⑦ 常规档（GPT-5.3-Codex）治理片行 1+3；盲审不抽；读数以该片报告为准 |
+| 审查 | ① 架构师（V4 Pro Max）；⑤ 预审（V4 Pro Max）；⑥ 独立扫描（MAI Code 2 Flash，⑦ r1 判 §7.2.1 ③ 不成立后按 §7.2 补跑）；⑦ 常规档（GPT-5.3-Codex）治理片行 1+3；盲审不抽；读数以该片报告为准 |
 | 版本 | v1.83（头部版本行与 §0.3 最新行一致，G1-b） |
 | 附注 | 本块只做指针；条款正文以准则 §5.2 / §7.5 / §8.2 为准，本块不复述 |
 ### C.1 v3.1 节号 → 本准则

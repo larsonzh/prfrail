@@ -1,0 +1,34 @@
+P98 ⑥ 独立扫描报告逐字归档（independent-reviewer + MAI Code 2 Flash (copilot)；2026-11-28；⑦ r1 判 §7.2.1 ③ 不成立后的补跑）
+
+Section A
+INDEPENDENT SCAN: FINDINGS
+
+本环确认一项 Medium 问题，其他扫描面无独立新发现。
+
+Section B
+
+| # | SEVERITY | 位置 | 发现 | 建议 |
+|---|---|---|---|---|
+| 1 | Medium | §7.2.1 ③、§5.2、§8.2、P98 台账 | P98 修改了审查角色取档与授权契约：Neon/Sol/Luna 档位及同轮授权口径均已落地；因此 ①② 虽满足，③“不涉及角色/授权契约语义”不成立。台账仍登记“⑥ 跳过”。 | 补跑 ⑥；若继续坚持跳过，须取得同轮用户裁决并明确登记例外，不得沿用当前跳过口径闭环。 |
+
+Section C
+
+- 判据实现零改动：diff-ada55b2..HEAD.diff 与 numstat.txt 均未显示 tools/gates/**、internal/**、ci.yml、CONTRACTS、schema、fixtures 或 workflows 变更。
+- 档位三向一致：§5.2 与 §8.2 均为 Neon = Extra High、Sol Max 须授权、Luna Max 须授权，无现行冲突残留。
+- 单价口径已闭合：Neon/Carbon 均为不分档，Hydrogen 为仅 1M 档，Cache 数值未动；全准则未见“分 200K / 1M 两档”的旧残留。
+- O-3 五子项均已落地：术语定义、逻辑连接词、档位计数、备选门槛、深水轮与一般高风险轮次的界线。
+- 双语镜像：shape-six.txt 六形状全等；ADR-048 注记、P98 台账和 §0.3 新行的中英文语义已对齐。
+- 台账：r1 的第二项已由 0c6820b 修正，P98 台账不再以旧的“Neon 两档单价/两档归属”口径验收。
+- G 面无占位符残留或新增节号悬空；新增文本未发现会过期的行数/文件数字面量形态。
+
+Section D
+
+- G5-b 与 §6.3 判据本体无 diff；作用域明确不含本次修改。
+- 可证伪性：若删除 §7.2.1 ③ 的角色/授权契约限制，现有机械门禁不能区分本片是否触及取档授权语义，导致 ⑥ 可被文档型切片形式豁免。当前判定依赖逐字条款核验。
+
+Section E — UNCOVERED
+
+- operator UI 计价真值只能使用用户声明，本环无 UI 页面独立核验。
+- CI 原始日志的包级 ok <pkg> 行未独立重取；仅核了摘要证据。
+- G3/G4/G6/G8 等机械判据未在本环实际重跑。
+- MANIFEST/SHA256 未独立逐条重算哈希。

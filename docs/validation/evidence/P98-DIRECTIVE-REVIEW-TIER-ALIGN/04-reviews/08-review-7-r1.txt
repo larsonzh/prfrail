@@ -1,0 +1,24 @@
+P98 ⑦ 终审第 1 轮原文逐字归档（independent-reviewer + GPT-5.3-Codex (copilot) 常规档；2026-11-28）
+
+Section A
+FINAL REVIEW: FINDINGS
+
+本轮存在 2 条 Medium 级问题，均与流程契约一致性有关：一是 ⑥ 跳过条件第③条不成立却被标记为“已跳过”；二是台账 P98 段仍保留“Neon 两档单价/档位归属”口径，与停点 1 裁定及已落地条款不一致。建议主控先整改这两条后进入复审轮。
+
+Section B
+| # | SEVERITY | 位置 | 发现 | 建议 |
+|---|---|---|---|---|
+| 1 | Medium | docs/DELIVERY_DIRECTIVE.md 的 §7.2.1（#L785）、§5.2（#L583、#L586、#L588）、§8.2（#L947）；docs/t027/REMAINING_SLICES.md #L2629 | §7.2.1 明确“仅当①②③同时满足”方可跳过⑥。当前切片虽只改文档，但实质改动触及“角色/授权契约语义”：平行备选触发门槛改写、取档次序新增、深水轮由触发式改为必配、Luna 取档授权明文化。该语义面已超出“③不涉及角色/授权契约语义”。但台账仍按“⑥跳过（经⑦确认）”登记。 | 二选一收敛：1) 补跑⑥并按 §7.2.2 产出 A-E；2) 若仍坚持跳过，需同轮用户裁决并按例外流程留痕（至少在台账/报告中明确“③不成立、属裁决例外”），否则不能以“可跳过”口径闭环。 |
+| 2 | Medium | docs/validation/evidence/P98-DIRECTIVE-REVIEW-TIER-ALIGN/02-ruling-stop1.md #L13；docs/DELIVERY_DIRECTIVE.md #L858；docs/t027/REMAINING_SLICES.md #L2616、#L2622；REMAINING_SLICES_EN.md #L2603、#L2607、#L2609 | 停点 1 裁定 2 已改为“Neon 单价不分档”，准则正文也已落地该口径；但 P98 台账块仍写“单价档位归属补全/两档单价齐备/price-band attribution”。同一切片内出现“已裁定口径”与“旧目标口径”并存。 | 将 P98 台账块的 Goal/Current gap/Acceptance evidence 同步到“单价不分档”口径；若需保留历史目标，应显式标注“起跑目标（历史）”并新增“停点1裁定修订后口径”字段，避免验收歧义。 |
+
+Section C
+实际读取文件清单：00-briefing.md、input-list.md、freedom-list.md、02-ruling-stop1.md、04-reviews/05-pre-review.txt、tmp review-input 全 10 件（numstat / shape-six / ci-evidence / sec52/75/82 cn+en / diff-ada55b2..HEAD.diff）、DELIVERY_DIRECTIVE{,_EN}.md、ADR_REGISTER{,_EN}.md、REMAINING_SLICES{,_EN}.md、07-pilot-hydrogen.txt。
+
+Section D
+与其它审查层的分歧/补充：预审结论为 PASS 且“无 Medium+”。本轮补充判定为 2 条 Medium：⑥ 跳过条件③不成立、P98 台账口径与停点 1 裁定不一致。
+
+Section E
+无法验证部分：未看到 CI 原始日志中的包级 ok 证据行，仅有摘要性证据文本（ci-evidence.txt #L1）；未对 MANIFEST/SHA256SUMS 做独立哈希复算（本轮按只读文档证据审查）。
+
+⑥ SKIP CONFIRMED: NO
+依据：§7.2.1 要求 ①②③ 同时满足；本片已触及“角色/授权契约语义”修改，故③不成立（§7.2.1 #L785 与 §5.2 #L583、#L586、#L588、§8.2 #L947）。
