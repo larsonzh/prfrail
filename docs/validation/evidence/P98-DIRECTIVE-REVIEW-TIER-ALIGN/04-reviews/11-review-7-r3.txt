@@ -1,0 +1,11 @@
+P98 ⑦ 复审第 3 轮原文逐字归档（independent-reviewer + GPT-5.3-Codex (copilot) 常规档；2026-11-28；收窄轮）
+
+RE-REVIEW: PASS
+
+逐条 CLOSED 判定
+- Medium-1（步骤行）: CLOSED。P98 步骤已为“⑥ 补跑（⑦ r1 判 §7.2.1 ③ 不成立）”，在 P98 段内未见“⑥ 跳过”残留。
+- Medium-2（现状缺口）: CLOSED。P98 现状缺口已改为“§7.5 Neon 单价口径标注缺（停点1裁定2：单价不分档口径）”，在 P98 段内未见“档位归属/另一档单价缺失”或英文旧口径“price-band attribution/missing other-band price”。
+- 新 Medium+（仅限 P98 五行 + P97 处置行）: CLOSED。未发现新增 Medium+。
+
+Section E
+- 本轮严格按 §7.5 执行收窄复审，仅核复审2两条 Medium 的闭合路径与限定行面，不重审全文，且全程只读。

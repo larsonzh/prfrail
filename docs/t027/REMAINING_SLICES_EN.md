@@ -2594,12 +2594,12 @@ Observation disposition direction (user ruling, 2026-11-28): O-2..O-4 **handled 
 
 CI (2026-11-28): run `46077231907` (head `4f3af5f`) is green on both legs (ubuntu / windows); the `Gates` step on each leg measured `SELFTEST: PASS 806/806`, `changed=18`, `TOTAL_FAIL=0`; this backfill commit's own run is an observation record only.
 
-### P98 — `DIRECTIVE-REVIEW-TIER-ALIGN` ((7) tier-alignment revision · governance slice) · 🔄 In progress
+### P98 — `DIRECTIVE-REVIEW-TIER-ALIGN` ((7) tier-alignment revision · governance slice) · ✅ Closed
 
 | Field | Content |
 |---|---|
 | Identity | `DIRECTIVE-REVIEW-TIER-ALIGN` (ledger id = **P98**; source = v81 snapshot section 5 O-2..O-4 disposition direction (handle soon) + the P97 report observations + user naming on 2026-11-28) |
-| Status | 🔄 In progress (started 2026-11-28; the four stop-1 items ruled; (2) landed v1.83 (main commit `a3fa412`, CI run `46093203794` green on both legs); (3) observation dispositions flipped; the review chain is in progress; four elements in `docs/validation/evidence/P98-DIRECTIVE-REVIEW-TIER-ALIGN/00-briefing.md`) |
+| Status | ✅ Closed (2026-11-28; R = 0, D = 0; four elements in `docs/validation/evidence/P98-DIRECTIVE-REVIEW-TIER-ALIGN/00-briefing.md`; report pair `docs/validation/directive-review-tier-align{,_EN}.md`) |
 | Goal | (1) align the section 5.2 deep-tier tier column and the tier-authorization sentence with section 8.2 (O-2 High: Neon `Max` vs `Extra High` conflict) plus the matrix decidability wording (O-3 Medium); (2) revise the Neon / Carbon pricing caliber in section 7.5 per the operator UI read (O-4 Medium; stop-1 ruling 2: Neon prices are not banded - 300 / 1500 is the all-band real price, Carbon offers the two context options at the single price 200 / 1000) plus the fallback-quota wording (O-5 #4 Low); (3) O-5 #5 (stale numstat) is registered only and never fixed (frozen evidence item); (4) flip observations O-2..O-4 / O-5 to "handled (P98)" |
 | Depends on | v81 snapshot closed; the P97 report pair (O-2..O-4 verbatim); no other prerequisite |
 | Size | M |
@@ -2615,6 +2615,8 @@ CI (2026-11-28): run `46077231907` (head `4f3af5f`) is green on both legs (ubunt
 | Temp files | `tmp/P98-DIRECTIVE-REVIEW-TIER-ALIGN/` (append-only until (8c)) |
 | Quota disclosure | (7) = the regular tier `GPT-5.3-Codex (copilot)` **1 final + 3 re-reviews (governance-slice row, section 7.5)**; (6) re-run (the (7) r1 judged section 7.2.1 condition 3 as not holding, so (6) is re-run once per the section 7.2 failure disposition, `MAI Code 2 Flash`, quota 1/3); no blind review; batch helper GLM-5.3-Flash >= 2 (modelId `glm-5.3-flash`, `glm-5.3` forbidden) |
 | Start condition | Named by the user (this message); four elements on record; v81 snapshot closed |
+
+Completion record (2026-11-28): R = 0, D = 0, zero probes; the directive moved to v1.83 (MINOR: header + a new section 0.3 row + the section 5.2 / 7.5 / 8.2 revisions + appendix C.0bf); all five stop-1 rulings adopted (ruling 2 revised the section 7.5 pricing note per the operator UI read, with the difference registered as freedom-list F-13); O-2..O-4 / O-5 flipped to "handled (P98)" (O-5 #5 is registered only as "known, not retro-fixed"); ADR-048 gained the P98 revision note; review chain: (5) `PRE-REVIEW: PASS` (3 Info), (6) re-run `INDEPENDENT SCAN: FINDINGS` (the (7) r1 judged section 7.2.1 (3) not established, so (6) re-ran once per section 7.2, 1/3), (7) regular tier `FINAL REVIEW: FINDINGS` -> `RE-REVIEW: FINDINGS` -> `RE-REVIEW: PASS` (1 final review + 2 re-reviews); `SELFTEST` stays 806/806 and index / tree / ci are all `TOTAL_FAIL=0`; commits `a3fa412` (clause) -> `0c6820b` (ledger) -> `91a9821` -> `f972214` (two remediation rounds), CI runs `46093203794` / `46093550773` / `46095600247` / `46096087094` all green on both legs; the report-pair and completion-record commit's CI readings are backfilled per section 11.2. |
 
 ## Known defects (to be handled before later slices)
 

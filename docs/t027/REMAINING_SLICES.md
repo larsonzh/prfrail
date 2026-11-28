@@ -2607,12 +2607,12 @@ A6 ② 进度（第 2 批，2026-09-15）：
 
 CI（2026-11-28）：run `46077231907`（head `4f3af5f`）双腿 success（ubuntu / windows）；两腿 `Gates` 实测 `SELFTEST: PASS 806/806`、`changed=18`、`TOTAL_FAIL=0`；本回填提交自身 run 仅作观察记录。
 
-### P98 — `DIRECTIVE-REVIEW-TIER-ALIGN`（⑦ 档位对齐修订 · 治理片）· 🔄 执行中
+### P98 — `DIRECTIVE-REVIEW-TIER-ALIGN`（⑦ 档位对齐修订 · 治理片）· ✅ 闭环
 
 | 字段 | 内容 |
 |---|---|
 | 标识 | `DIRECTIVE-REVIEW-TIER-ALIGN`（台账编号 = P98；来源 = v81 快照 §五 O-2..O-4 处置方向（尽快处理）+ P97 报告观察项 + 用户 2026-11-28 点名） |
-| 状态 | 🔄 执行中（2026-11-28 起跑；停点 1 四项已裁定；② 条款已落 v1.83（主提交 `a3fa412`、CI run `46093203794` 双腿 success）；③ 观察项处置已翻；审查链进行中；四要素见 `docs/validation/evidence/P98-DIRECTIVE-REVIEW-TIER-ALIGN/00-briefing.md`） |
+| 状态 | ✅ 闭环（2026-11-28；R = 0、D = 0；四要素见 `docs/validation/evidence/P98-DIRECTIVE-REVIEW-TIER-ALIGN/00-briefing.md`；报告对 `docs/validation/directive-review-tier-align{,_EN}.md`） |
 | 目标 | ① 修订 §5.2 深度档档位列与取档授权句对齐 §8.2（O-2 High：Neon `Max` vs `Extra High` 冲突）+ 矩阵可判性措辞（O-3 Medium）；② §7.5 Neon / Carbon 单价口径按 operator UI 实读修正（O-4 Medium；停点 1 裁定 2：Neon 单价不分档、300 / 1500 即全档实价，Carbon 上下文两档选项、单价 200 / 1000 不分档）+ 备选额度口径措辞（O-5 #4 Low）；③ O-5 #5（numstat 陈旧）只登记不修（冻结证据包件）；④ 观察项 O-2..O-4 / O-5 处置翻「已处置（P98）」 |
 | 依赖 | v81 快照闭环；P97 报告对（O-2..O-4 原文）；无其它前置 |
 | 规模 | M |
@@ -2628,6 +2628,8 @@ CI（2026-11-28）：run `46077231907`（head `4f3af5f`）双腿 success（ubunt
 | 临时件落点声明 | `tmp/P98-DIRECTIVE-REVIEW-TIER-ALIGN/`（⑧c 前只增不删） |
 | 额度口径披露 | ⑦ = 常规档 `GPT-5.3-Codex (copilot)` **1 终审 + 3 复审（治理片行，§7.5）**；⑥ 补跑（⑦ r1 判 §7.2.1 ③ 不成立 ⇒ 按 §7.2 失败处置补跑 1 次，`MAI Code 2 Flash`，额度 1/3）；盲审不抽；批量辅助 GLM-5.3-Flash ≥2（modelId `glm-5.3-flash`，禁 `glm-5.3`） |
 | 起跑条件 | 用户点名（本消息）；四要素留痕；v81 快照闭环 |
+
+完成记录（2026-11-28）：R = 0、D = 0、探针 0；准则升 v1.83（MINOR：头部 + §0.3 新行 + §5.2 / §7.5 / §8.2 修订 + 附录 C.0bf）；停点 1 五项裁定全采（裁定 2 以 operator UI 实读修正 §7.5 单价注记，差异登记 freedom-list F-13）；O-2..O-4 / O-5 翻「已处置（P98）」（O-5 #5 只登记「已知、不追改」）；ADR-048 加 P98 修订注记；审查链 ⑤ `PRE-REVIEW: PASS`（3 Info）、⑥ 补跑 `INDEPENDENT SCAN: FINDINGS`（⑦ r1 判 §7.2.1 ③ 不成立 ⇒ 按 §7.2 补跑 1/3）、⑦ 常规档 `FINAL REVIEW: FINDINGS` → `RE-REVIEW: FINDINGS` → `RE-REVIEW: PASS`（1 终审 + 2 复审）；`SELFTEST` 806/806 不变、index / tree / ci 均 `TOTAL_FAIL=0`；主提交 `a3fa412`（条款）→ `0c6820b`（台账）→ `91a9821` → `f972214`（两轮整改），CI run `46093203794` / `46093550773` / `46095600247` / `46096087094` 均双腿 success；报告对与完成记录提交的 CI 读数由 §11.2 回填。 |
 
 ## 已知缺陷（后续切片前处理）
 
