@@ -1,6 +1,6 @@
 ﻿# ProofRail Delivery Execution Directive (DELIVERY_DIRECTIVE)
 
-Version: v1.82. Date: 2026-11-28. Status: **CN body frozen** ( `_EN` mirror in `docs/DELIVERY_DIRECTIVE_EN.md`).
+Version: v1.83. Date: 2026-11-28. Status: **CN body frozen** ( `_EN` mirror in `docs/DELIVERY_DIRECTIVE_EN.md`).
 
 > **Multilingual note**: this file is a strict positional mirror of the CN body, maintained in step with it (updated after CN is frozen, to avoid bilingual rework during review); `docs/DELIVERY_DIRECTIVE.md` is authoritative and wins on any conflict (see §11.1). **Language tag**: `lang:en` (the G6-6 word-table selection key, see §6.3).
 > **Encoding**: this document and its `_EN` mirror must stay UTF-8 **with BOM** + **LF**.
@@ -127,6 +127,7 @@ Version: v1.82. Date: 2026-11-28. Status: **CN body frozen** ( `_EN` mirror in `
 | v1.80 | 2026-11-27 | **P96 `GATES-BASE-CACHE` (7) convergence ruling (third amendment of the same slice)**: the §6.1 base cache narrows to the three gates **build / vet / test**; **gofmt always runs for real and is never cached** (its verdict depends on process resolution semantics - PATH / execvp / libuv - and is not a pure function of the workspace, so it cannot be keyed completely); the key loses the gofmt identity segment and the format prefix stays `base-v2` (unreleased version finalised in the same slice, no compatibility duty). **Zero change to the criteria decision logic.** | `P96 GATES-BASE-CACHE` (this slice) |
 | v1.81 | 2026-11-28 | **P96 `GATES-BASE-CACHE` (7) second convergence round (fourth amendment of the same slice)**: the key's toolchain identity becomes `go version` plus a **digest of the WHOLE `go env` output** (no per-variable enumeration; covers GO111MODULE / GOTOOLCHAIN / GOFLAGS and every other variable) plus a **digest of the GOWORK file content** (path and content both bound; unreadable file => fail-open); over-invalidation caused by an irrelevant variable is explicitly acceptable (correctness first). **Zero change to the criteria decision logic.** | `P96 GATES-BASE-CACHE` (this slice) |
 | v1.82 | 2026-11-28 | **`P97 HYDROGEN-CONTROL-PILOT` registration (docs-only measurement slice, S tier; started on user naming, 2026-11-28)**: §12.4 registers **OB-146** (the (7) light-tier `Gemini 4 Hydrogen (copilot)` comparative review pilot, §1.7.4 temporary authorization, out of quota, never a precedent); this version only adds the ledger row and the version line, with **zero rule-semantics change** (sections 2.2 / 2.4 / 5.2 matrix / 6.3 criterion body / G5-b closed set untouched); no new ADR, no change under `tools/gates/**`. | `P97 HYDROGEN-CONTROL-PILOT` (this slice) |
+| v1.83 | 2026-11-28 | **Slice `P98 DIRECTIVE-REVIEW-TIER-ALIGN` lands (governance [SLICE], tier M; started on user naming 2026-11-28, four stop-1 items ruled)**: (1) the §5.2 deep-tier tier column splits into "Sol main read takes Max (same-round authorization needed); Neon cross-check takes Extra High" and aligns verbatim with §8.2; the regular tier "the other three tiers" becomes "the other four tiers", the light tier gains a decidable definition of "finalization review / targeted small read", the large-context document tier gains its logical connectors, the parallel-alternative tier gains its trigger threshold and a Max authorization note, the applicability-exclusion sentence changes "triggered" to "mandatory", and a new "tier-taking order" sentence is added; (2) the §8.2 tier-authorization sentence aligns (Neon = Extra High without authorization; Luna's only tier Max needs a same-round authorization); (3) the §7.5 context-window pricing note is revised per the operator UI read of 2026-11-28 (Neon prices are not banded - 300 / 1500 is the all-band real price; Carbon offers the two context options at the single price 200 / 1000; the usage caliber is added - strongest thinking tier + largest context window), and the alternative-tier budget first sentence is streamlined; (4) observations O-2..O-4 / O-5 flip to "handled (P98)" in the ledger; (5) ADR-048 gains the P98 revision note; (6) appendix C gains C.0bf. **No change to §2.2 / §2.4 / the G5-b closed set and the whitelist / the §6.3 criterion body; no change under `tools/gates/**` / `internal/**` / `ci.yml` / CONTRACTS / schema / fixtures / workflows; no new ADR.** | `P98 DIRECTIVE-REVIEW-TIER-ALIGN` (this slice) |
 ---
 
 ## 1. Scope and Slice Model
@@ -578,17 +579,19 @@ The above are minimum verification actions; they must not replace independent ju
 
 | ⑦ tier | `modelId` (internal identifier) | Effort tier (§8.2) | Selection criterion (choose the tier when satisfied) |
 |---|---|---|---|
-| Regular tier | `gpt-5.3-codex`; cost-effective alternative `gpt-6.2-sol` | Extra High (Sol taking Max needs a same-round authorization) | default tier; used when none of the other three tiers' criteria is satisfied; budget-tight rounds take the Sol alternative |
-| Deep tier | `gpt-6.2-sol` main read; cross-check `gemini-4-neon` | Max | hard-gate / high-risk rounds: A7 / B2 / B3 / B4-class slices, security / machine state / protocol semantics, pre-release final review; the highest-risk round always pairs a Neon cross-check; when the main read reports Medium+ or a structural doubt remains, add a Neon deep-dive |
-| Large-context document tier | `gemini-4-carbon` | High (fixed) | the review input pack exceeds 400K tokens and the slice is pure-document / S-tier |
-| Light tier | `gemini-4-hydrogen` | Extra High | finalization reviews and targeted small reads of document-type / governance slices (low-cost review) |
-| Parallel-alternative tier | `gpt-6-luna` | Max | the parallel substitute when `gpt-5.3-codex` is unavailable or the §7.5 budget is constrained |
+| Regular tier | `gpt-5.3-codex`; cost-effective alternative `gpt-6.2-sol` | Extra High (Sol taking Max needs a same-round authorization) | default tier; used when none of the other four tiers' criteria is satisfied; budget-tight rounds take the Sol alternative (the lower-cost substitute while Codex is available) |
+| Deep tier | `gpt-6.2-sol` main read; cross-check `gemini-4-neon` | Sol main read takes Max (same-round authorization needed); Neon cross-check takes Extra High | hard-gate / high-risk rounds: A7 / B2 / B3 / B4-class slices, security / machine state / protocol semantics, pre-release final review; a deep-water round (defined in the applicability-exclusion sentence below) always pairs a Neon cross-check; other high-risk rounds add a Neon deep-dive when the main read reports Medium+ or a structural doubt remains |
+| Large-context document tier | `gemini-4-carbon` | High (fixed) | the review input pack exceeds 400K tokens and (the slice is pure-document or S-tier) |
+| Light tier | `gemini-4-hydrogen` | Extra High | finalization reviews (a final consistency review of the (8a)/(8b) drafts or the report final draft, not a full re-read) and targeted small reads (input narrowed to a single finding-closure path or a single section) of document-type / governance slices; low-cost review |
+| Parallel-alternative tier | `gpt-6-luna` | Max (taking it needs a same-round authorization) | the parallel substitute when `gpt-5.3-codex` is unavailable or both regular-tier members cannot carry the round |
+
+**Tier-taking order (landed by P98)**: when several tiers match, take the priority tier - deep tier > large-context document tier > light tier > regular tier (default); the parallel-alternative tier is enabled only when both regular-tier members cannot carry the round (see that tier's criterion), and a budget constraint alone does not trigger it.
 
 **Judging-threshold consensus (landed by P87)**: review severity is judged against **verbatim contract completeness**, and the judging does not change with the model that carries it; when models disagree, the **stricter side** becomes the registered conclusion and the other side is recorded as a divergence data point; a fail-closed fallback must not be read as "completeness proven", and no model may lower the judging threshold on capability grounds.
 
 **Combination-trigger clause (landed by P87, replacing this table's former "no mixing" wording)**: no mixing by default; a combination = a main-read leg plus a cross-check leg, only for hard-gate / high-risk rounds and only with a same-round user authorization, counted as two rounds.
 
-**Applicability-exclusion sentence (landed by P87)**: `gpt-5.3-codex` and `gemini-4-carbon` **must not carry a deep-water round's final review alone** when handle / ACL / concurrency / security / protocol semantics are touched (the P85 four-read evidence shows both missed a verified real Medium on the same input; a deep-water round = `gpt-6.2-sol` Max main read plus a triggered `gemini-4-neon` cross-check).
+**Applicability-exclusion sentence (landed by P87)**: `gpt-5.3-codex` and `gemini-4-carbon` **must not carry a deep-water round's final review alone** when handle / ACL / concurrency / security / protocol semantics are touched (the P85 four-read evidence shows both missed a verified real Medium on the same input; a deep-water round = `gpt-6.2-sol` Max main read plus a mandatory `gemini-4-neon` cross-check).
 
 **Cost and effort boundary**: this table defines the tier-selection criterion only and **does not define** the cost cap or the effort tier - the cost cap is in the ⑦ quota rows of §7.5 and the thinking-mode tier is in the "⑦ tier mapping" table of §8.2; the former "⑦ Codex" labels in §7.5 and §8.2 are unified as "⑦ (chosen from the §5.2 selection matrix)" by v1.43 (OB-68 disposition). **Effect mechanism (landed by P87)**: from now on master snapshots cite this matrix directly, and a start message declares the ⑦ tier choice and the reason per the matrix; a deep-water round must declare both its main-read leg and its cross-check leg; the effort tier keeps the one-time pre-start setting and must not be raised mid-slice.
 
@@ -852,9 +855,9 @@ Exceeding a cap ⇒ escalate to user adjudication.
 | `gemini-4-neon` | 300 | 1500 |
 | `gemini-4-hydrogen` | 150 | 750 |
 
-**Context-window pricing note (landed by P87)**: the 1M tier of `gpt-6.2-sol` is 400 / 1500 (input 2x and output 1.5x the table above); `gemini-4-carbon` and `gemini-4-hydrogen` have a 1M tier only, so the prices above are the real prices; `gemini-4-neon` has two tiers, 200K / 1M; `gpt-5.3-codex` is measured at 400K. Cache read / write prices (Credits / 1M tokens) are Neon 15 / 0, Carbon 10 / 0, Hydrogen 7.5 / 0 respectively.
+**Context-window pricing note (landed by P87; revised by P98 per the operator UI read of 2026-11-28)**: the 1M tier of `gpt-6.2-sol` is 400 / 1500 (input 2x and output 1.5x the table above); for `gemini-4-neon` the 200K / 1M context windows are UI options with **no per-band pricing** - the table's 300 / 1500 is the all-band real price; `gemini-4-carbon` likewise offers the two context options 200K / 1M at the single price 200 / 1000; `gemini-4-hydrogen` has a 1M tier only with 150 / 750 as the real price; `gpt-5.3-codex` is measured at 400K. Cache read / write prices (Credits / 1M tokens) are Neon 15 / 0, Carbon 10 / 0, Hydrogen 7.5 / 0 respectively. **Usage caliber**: the table prices are read at each model's **strongest thinking tier + largest context window** (user declaration 2026-11-28, recorded with this note).
 
-**Alternative-tier budget (landed by P87)**: the alternative tier (the Sol alternative of the regular tier) takes the **same budget caliber as the deep tier** - both read their value from the §7.5 slice-tier row (L tier / governance / high risk = 1 final review + 3 re-reviews); the light tier (`gemini-4-hydrogen`) matches the regular tier. The model tier decides only the model and the price and does not change the slice-tier call caps of §7.5.
+**Alternative-tier budget (landed by P87; streamlined by P98)**: the quota of every §5.2 selection-matrix model tier **is read from the §7.5 slice-tier row** - the model tier decides only the model and the price and does not change the slice-tier call caps of §7.5.
 
 **Four-read measured-consumption note (landed by P87)**: on the same input and the same batch (n=1) the measured consumption was Sol 67.9, Codex 129.9, Carbon 266.8 and Neon 493.4 credits, with elapsed times of 14m50s / 26m58s / 40m22s / 21m3s respectively — the GPT family measured markedly cheaper than the Gemini family; the main variable of measured consumption is the model's output and thinking behaviour rather than the unit price, and **that ratio must not be hard-coded**; this table serves only as the unit-price source of truth. The figures above are data points, not budget promises.
 
@@ -941,7 +944,7 @@ Slices that need real external calls must declare a quota cap in advance; when t
 | `gemini-4-neon` | **Extra High** |
 | `gemini-4-carbon` | **High** (fixed) |
 | `gemini-4-hydrogen` | **Extra High** |
-**Tier authorization**: taking `Max` with `gpt-6.2-sol` requires an explicit declaration in the kickoff message plus a same-turn authorization; without that declaration the default is `Extra High` (consistent with "no mid-slice tier upgrade" in §7.5). The three Gemini members take their tier per the §5.2 selection matrix with no extra tier authorization; any `Max` tier still needs a same-round authorization.
+**Tier authorization**: taking `Max` with `gpt-6.2-sol` (including the deep-tier Sol main read taking Max) requires an explicit declaration in the kickoff message plus a same-turn authorization; without that declaration the default is `Extra High` (consistent with "no mid-slice tier upgrade" in §7.5). `gpt-6-luna` has `Max` as its only tier and taking it needs a same-round authorization (same caliber as Sol). The three Gemini members take their tiers per the §5.2 selection matrix - `gemini-4-neon` cross-check takes `Extra High`, `gemini-4-hydrogen` takes `Extra High`, `gemini-4-carbon` takes `High` (fixed) - all non-`Max` tiers, with no extra tier authorization.
 
 ### 8.3 Tiers of same-model roles cannot be separated (**known limitation**, D2=A)
 
@@ -2587,6 +2590,20 @@ The following files **only get a supersede pointer added to the file header and 
 | Review | (5) pre-review (V4 Pro 1+2), (6) independent scan (MAI Code 2 Flash <=3, mandatory), (7) deep tier (Sol Max lead plus Neon triggered cross-check, user ruling 1+3); blind review not sampled; readings per that slice's report |
 | Version | v1.78 (the header version line agrees with the latest §0.3 row, G1-b) |
 | Note | this block is a pointer only; the clause text lives in §6.1 and §5.1 and is not restated here |
+### C.0bf P98 DIRECTIVE-REVIEW-TIER-ALIGN (v1.83)
+
+> **Record only; no normative force.**
+
+| Item | Content |
+|---|---|
+| Slice / tier | P98 `DIRECTIVE-REVIEW-TIER-ALIGN` (governance `[SLICE]`; tier M; zero probes) |
+| Trigger | the v81 snapshot section 5 O-2..O-4 disposition direction (handle soon) + the P97 report observations; named by the user for a 2026-11-28 start (four elements: ruling party = the user; date = 2026-11-28; reason = the O-2..O-4 "handle soon" naming (a standalone small revision slice); basis = the start message + the v81 snapshot section 5 + the P97 report observations) |
+| Goal | align the §5.2 deep-tier tier column and the tier-authorization sentence with §8.2 (Neon = Extra High) plus the matrix decidability wording; revise the §7.5 context-window pricing note per the operator UI read of 2026-11-28 (Neon prices not banded, Carbon's two context options not banded) plus streamline the alternative-tier budget; flip observations O-2..O-4 / O-5 to "handled (P98)"; add the ADR-048 revision note |
+| Deliverables | the report pair `docs/validation/directive-review-tier-align{,_EN}.md`; the ledger P98 block and the P97 observation disposition flips; the evidence pack `docs/validation/evidence/P98-DIRECTIVE-REVIEW-TIER-ALIGN/` |
+| Scope | only the §5.2 / §7.5 / §8.2 related lines plus the version package, the ledger and the reports; no change to §2.2 / §2.4 / G5-b / §6.3 / `tools/gates/**` / `internal/**` / `ci.yml` / CONTRACTS / schema / fixtures / workflows; no new ADR |
+| Review | (1) architect (V4 Pro Max); (5) pre-review (V4 Pro Max); (6) skipped (confirmed by (7), the P72 precedent); (7) regular tier (GPT-5.3-Codex) governance-slice row 1+3; blind review not sampled; readings follow that slice's report |
+| Version | v1.83 (the header version line agrees with the latest §0.3 row, G1-b) |
+| Note | this block is a pointer only; the clause text lives in §5.2 / §7.5 / §8.2 and is not restated here |
 ### C.1 v3.1 section numbers → this directive
 
 | Original v3.1 section | Content | Location in this directive |

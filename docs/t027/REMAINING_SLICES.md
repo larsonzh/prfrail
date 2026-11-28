@@ -2607,6 +2607,28 @@ A6 ② 进度（第 2 批，2026-09-15）：
 
 CI（2026-11-28）：run `46077231907`（head `4f3af5f`）双腿 success（ubuntu / windows）；两腿 `Gates` 实测 `SELFTEST: PASS 806/806`、`changed=18`、`TOTAL_FAIL=0`；本回填提交自身 run 仅作观察记录。
 
+### P98 — `DIRECTIVE-REVIEW-TIER-ALIGN`（⑦ 档位对齐修订 · 治理片）· 🔄 执行中
+
+| 字段 | 内容 |
+|---|---|
+| 标识 | `DIRECTIVE-REVIEW-TIER-ALIGN`（台账编号 = P98；来源 = v81 快照 §五 O-2..O-4 处置方向（尽快处理）+ P97 报告观察项 + 用户 2026-11-28 点名） |
+| 状态 | 🔄 执行中（2026-11-28 起跑；停点 1 四项（修订文本三件套 / 升版判定 / OB 处置口径 / ADR 判定）待用户裁定；四要素见 `docs/validation/evidence/P98-DIRECTIVE-REVIEW-TIER-ALIGN/00-briefing.md`） |
+| 目标 | ① 修订 §5.2 深度档档位列与取档授权句对齐 §8.2（O-2 High：Neon `Max` vs `Extra High` 冲突）+ 矩阵可判性措辞（O-3 Medium）；② §7.5 Neon 单价档位归属补全（O-4 Medium）+ 备选额度口径措辞（O-5 #4 Low）；③ O-5 #5（numstat 陈旧）只登记不修（冻结证据包件）；④ 观察项 O-2..O-4 / O-5 处置翻「已处置（P98）」 |
+| 依赖 | v81 快照闭环；P97 报告对（O-2..O-4 原文）；无其它前置 |
+| 规模 | M |
+| 步骤 | 0 → ①（停点 1）→ ② 条款落地（v1.83）→ 条款 CI 绿 → ③ 台账处置 → ④ → ⑤ → ⑥ 跳过 → ⑦ → ⑧a → ⑨ → ⑧b → ⑧c → ⑩ |
+| 现状缺口 | §5.2 深度档 Neon 档位列与 §8.2 冲突（O-2）；矩阵字面可判性不足（O-3）；§7.5 Neon 单价档位归属缺（O-4）；备选额度措辞易误读（O-5 #4） |
+| 交付物 | ① 修订文本三件套；② 准则 v1.83（头部 / §0.3 新行 / §5.2 / §7.5 / §8.2 / 附录 C 新块 C.0bf）；③ 台账 P98 段与完成记录 + P97 段观察项处置翻转；④ 报告对 `docs/validation/directive-review-tier-align{,_EN}.md`；⑤ 证据包 |
+| 验收证据 | ① 修订后 §5.2 与 §8.2 档位逐字一致（Neon = Extra High）、取档授权句对齐；② §7.5 Neon 两档单价齐备且档位归属明确；③ 六形状双语镜像 HEAD_MISMATCH=0；④ SELFTEST 806/806 不变（判据实现零改动）+ 三作用域 TOTAL_FAIL=0 + CI 双腿 success；⑤ O-2..O-4 / O-5 台账处置翻转双语同步 |
+| 边界 | 只改 §5.2 / §7.5 / §8.2 相关行 + 版本包 + 台账与报告；不改 tools/gates/** / internal/** / ci.yml / CONTRACTS / schema / fixtures / workflows；G5-b 闭集与白名单不动；不新增 ADR（① 判定）；P87 报告对与证据包冻结不追改（numstat 只登记不修）；不做 gitee |
+| 分级 | `[SLICE]` |
+| 探针额度 | 0 |
+| 执行自由度清单落盘路径 | `docs/validation/evidence/P98-DIRECTIVE-REVIEW-TIER-ALIGN/freedom-list.md` |
+| R/D 基线 | R = 0、D = 0（起跑时登记） |
+| 临时件落点声明 | `tmp/P98-DIRECTIVE-REVIEW-TIER-ALIGN/`（⑧c 前只增不删） |
+| 额度口径披露 | ⑦ = 常规档 `GPT-5.3-Codex (copilot)` **1 终审 + 3 复审（治理片行，§7.5）**；⑥ 跳过（不触判据实现文件，经 ⑦ 确认，P72 先例）；盲审不抽；批量辅助 GLM-5.3-Flash ≥2（modelId `glm-5.3-flash`，禁 `glm-5.3`） |
+| 起跑条件 | 用户点名（本消息）；四要素留痕；v81 快照闭环 |
+
 ## 已知缺陷（后续切片前处理）
 
 > **阻断口径不变**：仅高频/已复现缺陷阻断，观测级 flake 只记录并在验证报告中列示。

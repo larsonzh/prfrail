@@ -2594,6 +2594,28 @@ Observation disposition direction (user ruling, 2026-11-28): O-2..O-4 must be ha
 
 CI (2026-11-28): run `46077231907` (head `4f3af5f`) is green on both legs (ubuntu / windows); the `Gates` step on each leg measured `SELFTEST: PASS 806/806`, `changed=18`, `TOTAL_FAIL=0`; this backfill commit's own run is an observation record only.
 
+### P98 — `DIRECTIVE-REVIEW-TIER-ALIGN` ((7) tier-alignment revision · governance slice) · 🔄 In progress
+
+| Field | Content |
+|---|---|
+| Identity | `DIRECTIVE-REVIEW-TIER-ALIGN` (ledger id = **P98**; source = v81 snapshot section 5 O-2..O-4 disposition direction (handle soon) + the P97 report observations + user naming on 2026-11-28) |
+| Status | 🔄 In progress (started 2026-11-28; the stop-1 items (the three revision texts / the version decision / the OB disposition / the ADR decision) await the user ruling; four elements in `docs/validation/evidence/P98-DIRECTIVE-REVIEW-TIER-ALIGN/00-briefing.md`) |
+| Goal | (1) align the section 5.2 deep-tier tier column and the tier-authorization sentence with section 8.2 (O-2 High: Neon `Max` vs `Extra High` conflict) plus the matrix decidability wording (O-3 Medium); (2) complete the Neon price-band attribution in section 7.5 (O-4 Medium) plus the fallback-quota wording (O-5 #4 Low); (3) O-5 #5 (stale numstat) is registered only and never fixed (frozen evidence item); (4) flip observations O-2..O-4 / O-5 to "handled (P98)" |
+| Depends on | v81 snapshot closed; the P97 report pair (O-2..O-4 verbatim); no other prerequisite |
+| Size | M |
+| Steps | 0 -> (1) (stop 1) -> (2) clause landing (v1.83) -> clause CI green -> (3) ledger disposition -> (4) gates -> (5) pre-review -> (6) skipped -> (7) final review -> (8a) -> (9) -> (8b) -> (8c) -> (10) |
+| Current gap | the section 5.2 deep-tier Neon tier column conflicts with section 8.2 (O-2); the matrix is not literally decidable (O-3); the Neon price-band attribution is missing in section 7.5 (O-4); the fallback-quota wording is misreadable (O-5 #4) |
+| Deliverables | (1) the three revision texts; (2) directive v1.83 (header / new section 0.3 row / sections 5.2, 7.5, 8.2 / new appendix C block C.0bf); (3) the ledger P98 block and completion record + the P97 observation disposition flips; (4) the report pair `docs/validation/directive-review-tier-align{,_EN}.md`; (5) the evidence package |
+| Acceptance evidence | (1) after the revision sections 5.2 and 8.2 agree verbatim on the tier (Neon = Extra High) and the authorization sentence is aligned; (2) both Neon price bands are present in section 7.5 with the band attribution explicit; (3) the six-shape bilingual mirror has HEAD_MISMATCH=0; (4) SELFTEST stays 806/806 (zero criterion-implementation change) + all three scopes TOTAL_FAIL=0 + both CI legs succeed; (5) the O-2..O-4 / O-5 ledger disposition flips are bilingual-synced |
+| Boundaries | only the section 5.2 / 7.5 / 8.2 related lines plus the version package, the ledger and the reports; no change to `tools/gates/**` / `internal/**` / `ci.yml` / CONTRACTS / schema / fixtures / workflows; the G5-b closed set and the whitelist stay untouched; no new ADR (decided at stop 1); the P87 report pair and evidence package stay frozen (the numstat is registered only, never fixed); no gitee |
+| Grade | `[SLICE]` |
+| Probe quota | 0 |
+| Freedom-list path | `docs/validation/evidence/P98-DIRECTIVE-REVIEW-TIER-ALIGN/freedom-list.md` |
+| R/D baseline | R = 0, D = 0 (recorded at start) |
+| Temp files | `tmp/P98-DIRECTIVE-REVIEW-TIER-ALIGN/` (append-only until (8c)) |
+| Quota disclosure | (7) = the regular tier `GPT-5.3-Codex (copilot)` **1 final + 3 re-reviews (governance-slice row, section 7.5)**; (6) skipped (no criterion-implementation file touched, confirmed by (7), the P72 precedent); no blind review; batch helper GLM-5.3-Flash >= 2 (modelId `glm-5.3-flash`, `glm-5.3` forbidden) |
+| Start condition | Named by the user (this message); four elements on record; v81 snapshot closed |
+
 ## Known defects (to be handled before later slices)
 
 > **Blocking rule unchanged**: only high-frequency / reproduced defects block; observation-grade flakes are recorded and listed in the validation report.
