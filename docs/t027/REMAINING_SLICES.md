@@ -2603,7 +2603,7 @@ A6 ② 进度（第 2 批，2026-09-15）：
 
 完成记录（2026-11-28）：R = 0、D = 0、探针 0；Hydrogen 试水 1 轮 = `FINAL REVIEW: FINDINGS`（1 High + 2 Medium + 2 Low；credits 184.3，用户侧单一真值源）；P87 结论不重裁，3 条新发现登记观察项 O-2..O-4、两条 Low 登记 O-5；⑤ `PRE-REVIEW: PASS`（4 Low 已处置）、⑥ 跳过、⑦ 终审 `FINAL REVIEW: PASS`（3 Low 已解除）；准则升 v1.82（OB-146，窗口自 v1.72 起算第 1 例）；`SELFTEST` 806/806、tree / index / ci 均 `TOTAL_FAIL=0`；偏离表 D-1 = 输入包路径声明与落点不一致（审查方发现、无结论影响；属报告偏离表序列，非 §5.1 临时件 D 计数）；停于 ⑩ 等授权提交（仅 origin）。
 
-观察项处置方向（用户 2026-11-28 裁定）：O-2..O-4 尽快处理——并入下一治理片顺带修订，或另立独立小修订片（修订对象 = §5.2 深度档档位列与取档授权句对齐 §8.2、§7.5 的 Neon 单价档位归属、矩阵可判性措辞）；O-1 仅记录不追改。
+观察项处置方向（用户 2026-11-28 裁定）：O-2..O-4 **已处置（P98）**——由 P98 `DIRECTIVE-REVIEW-TIER-ALIGN` 修订落地（v1.83：§5.2 深度档档位列与取档授权句对齐 §8.2、§7.5 的 Neon 单价口径按 operator UI 实读修正、矩阵可判性措辞）；O-5 **已处置（P98）**（#4 备选额度口径精简；#5 numstat 陈旧只登记「已知、不追改」）；O-1 仅记录不追改。
 
 CI（2026-11-28）：run `46077231907`（head `4f3af5f`）双腿 success（ubuntu / windows）；两腿 `Gates` 实测 `SELFTEST: PASS 806/806`、`changed=18`、`TOTAL_FAIL=0`；本回填提交自身 run 仅作观察记录。
 
@@ -2612,7 +2612,7 @@ CI（2026-11-28）：run `46077231907`（head `4f3af5f`）双腿 success（ubunt
 | 字段 | 内容 |
 |---|---|
 | 标识 | `DIRECTIVE-REVIEW-TIER-ALIGN`（台账编号 = P98；来源 = v81 快照 §五 O-2..O-4 处置方向（尽快处理）+ P97 报告观察项 + 用户 2026-11-28 点名） |
-| 状态 | 🔄 执行中（2026-11-28 起跑；停点 1 四项（修订文本三件套 / 升版判定 / OB 处置口径 / ADR 判定）待用户裁定；四要素见 `docs/validation/evidence/P98-DIRECTIVE-REVIEW-TIER-ALIGN/00-briefing.md`） |
+| 状态 | 🔄 执行中（2026-11-28 起跑；停点 1 四项已裁定；② 条款已落 v1.83（主提交 `a3fa412`、CI run `46093203794` 双腿 success）；③ 观察项处置已翻；审查链进行中；四要素见 `docs/validation/evidence/P98-DIRECTIVE-REVIEW-TIER-ALIGN/00-briefing.md`） |
 | 目标 | ① 修订 §5.2 深度档档位列与取档授权句对齐 §8.2（O-2 High：Neon `Max` vs `Extra High` 冲突）+ 矩阵可判性措辞（O-3 Medium）；② §7.5 Neon 单价档位归属补全（O-4 Medium）+ 备选额度口径措辞（O-5 #4 Low）；③ O-5 #5（numstat 陈旧）只登记不修（冻结证据包件）；④ 观察项 O-2..O-4 / O-5 处置翻「已处置（P98）」 |
 | 依赖 | v81 快照闭环；P97 报告对（O-2..O-4 原文）；无其它前置 |
 | 规模 | M |
